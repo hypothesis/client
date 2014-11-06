@@ -1,0 +1,125 @@
+<header class="annotation-header">
+  <!-- Deletion notice -->
+  <span ng-if="!vm.editing && vm.annotation.deleted">Annotation deleted.</span>
+
+  <!-- User -->
+  <span ng-if="vm.annotation.user">
+    <a class="annotation-user"
+       target="_blank"
+       ng-href="{{baseURI}}u/{{vm.annotation.user}}"
+       >{{vm.annotation.user | persona}}</a>
+    <i class="small h-icon-locked" ng-show="vm.isPrivate() && !vm.editing"></i>
+    <i class="small h-icon-highlighter" ng-show="vm.isHighlight() && !vm.editing"></i>
+    <i class="small h-icon-comment" ng-show="vm.isComment()"></i>
+    <span class="annotation-citation"
+          ng-if="!vm.embedded"
+          ng-show="vm.document.title">
+      on &ldquo;<a href="{{vm.document.uri}}" target="_blank"
+                   >{{vm.document.title}}</a>&rdquo;
+      <span class="annotation-citation-domain"
+            ng-show="vm.document.domain != vm.document.title"
+            >({{vm.document.domain}})</span>
+    </span>
+    <!-- Editing controls -->
+    <aside class="pull-right" ng-if="vm.editing">
+      <privacy ng-click="$event.stopPropagation()"
+               ng-if="vm.annotation.permissions && vm.editing && action != 'delete'"
+               ng-model="vm.annotation.permissions"
+               class="dropdown privacy pull-right"
+               name="privacy" />
+    </aside>
+    <!-- / Editing controls -->
+  </span>
+
+  <!-- Timestamp -->
+  <a class="annotation-timestamp small pull-right"
+     target="_blank"
+     title="{{vm.annotation.update | moment:'LLLL'}}"
+     ng-if="!vm.editing && vm.annotation.updated"
+     ng-href="{{baseURI}}a/{{vm.annotation.id}}"
+     >{{vm.annotation.updated | fuzzyTime | date : mediumDate}}</a>
+</header>
+
+<!-- Excerpts -->
+<section class="annotation-target"
+         ng-repeat="target in vm.annotation.target track by $index">
+  <blockquote class="annotation-quote"
+              ng-bind-html="selector.exact"
+              ng-repeat="selector in target.selector
+                         | filter : {'type': 'TextQuoteSelector'}
+                         track by $index"></blockquote>
+</section>
+<!-- / Excerpts -- >
+
+<!-- Body -->
+<section name="text"
+         class="annotation-body"
+         ng-model="vm.annotation.text"
+         ng-readonly="!vm.editing"
+         markdown>
+</section>
+<!-- / Body -->
+
+<!-- Tags -->
+<div class="annotation-section form-field" ng-if="vm.editing">
+  <tags-input ng-model="vm.annotation.tags"
+              name="tags"
+              class="tags"
+              placeholder="Add tags…"
+              replace-spaces-with-dashes="false"
+              enable-editing-last-tag="true"></tags-input>
+</div>
+
+<div class="annotation-section tags tags-read-only"
+     ng-if="vm.annotation.tags.length && !vm.editing">
+  <ul class="tag-list">
+    <li class="tag-item" ng-repeat="tag in vm.annotation.tags">
+      <a href="/stream?q=tag:'{{tag.text}}'" target="_blank">{{tag.text}}</a>
+    </li>
+  </ul>
+</div>
+<!-- / Tags -->
+
+<footer class="annotation-footer form-actions"
+        ng-if="vm.editing"
+        ng-switch="vm.action">
+  <div class="form-actions-buttons form-actions-left">
+    <button ng-switch-when="edit"
+            ng-click="vm.save()"
+            class="btn"><i class="h-icon-checkmark btn-icon"></i> Save</button>
+    <button ng-switch-when="delete"
+            ng-click="vm.save()"
+            class="btn"><i class="h-icon-checkmark btn-icon"></i> Delete</button>
+    <button ng-switch-default
+            ng-click="vm.save()"
+            class="btn"><i class="h-icon-checkmark btn-icon"></i> Save</button>
+    <button class="btn btn-clean"
+            ng-click="vm.revert()"
+            ><i class="h-icon-x btn-icon"></i> Cancel</button>
+  </div>
+</footer>
+
+<footer class="annotation-footer annotation-actions"
+        ng-if="!vm.editing && vm.annotation.id">
+  <a class="small magicontrol" href="" title="Reply"
+    ng-click="vm.reply()"
+    ><i class="h-icon-reply"></i> Reply</a>
+  <span class="magicontrol share-dialog-wrapper">
+    <a class="small dropdown-toggle" href="" title="Share"
+      ><i class="h-icon-export"></i> Share</a>
+    <span class="share-dialog" ng-click="$event.stopPropagation()">
+      <a class="h-icon-export"
+        target="_blank"
+        ng-href="{{vm.annotationURI}}"></a>
+      <input type="text" value="{{vm.annotationURI}}" readonly>
+    </span>
+  </span>
+  <a class="small magicontrol" href="" title="Edit"
+    ng-show="vm.authorize('update')"
+    ng-click="vm.edit()"
+    ><i class="h-icon-copy"></i> Edit</a>
+  <a class="small magicontrol" href="" title="Delete"
+    ng-show="vm.authorize('delete')"
+    ng-click="vm.delete()"
+    ><i class="h-icon-x"></i> Delete…</a>
+</footer>
