@@ -38,8 +38,8 @@ function errorMessage(reason) {
  * If there are no draft changes to this annotation, does nothing.
  *
  */
-function restoreFromDrafts(drafts, domainModel, vm) {
-  var draft = drafts.get(domainModel);
+function restoreFromDrafts(drafts, vm) {
+  var draft = drafts.get(vm.annotation);
   if (draft) {
     vm.isPrivate = draft.isPrivate;
     vm.form.tags = draft.tags;
@@ -53,17 +53,17 @@ function restoreFromDrafts(drafts, domainModel, vm) {
   * Any existing drafts for this annotation will be overwritten.
   *
   * @param {object} drafts - The drafts service
-  * @param {object} domainModel - The full domainModel object of the
-  *   annotation to be saved. This full domainModel model is not retrieved
+  * @param {object} vm.annotation - The full vm.annotation object of the
+  *   annotation to be saved. This full vm.annotation model is not retrieved
   *   again from drafts, it's only used to identify the annotation's draft in
   *   order to retrieve the fields below.
   * @param {object} vm - The view model object containing the user's unsaved
   *   changes to the annotation.
   *
   */
-function saveToDrafts(drafts, domainModel, vm) {
+function saveToDrafts(drafts, vm) {
   drafts.update(
-    domainModel,
+    vm.annotation,
     {
       isPrivate: vm.isPrivate,
       tags: vm.form.tags,
@@ -71,48 +71,47 @@ function saveToDrafts(drafts, domainModel, vm) {
     });
 }
 
-/** Update domainModel from vm.
+/** Update `annotation` from vm.
  *
  * Copy any properties from vm that might have been modified by the user into
- * domainModel, overwriting any existing properties in domainModel.
+ * `annotation`, overwriting any existing properties in `annotation`.
  *
- * @param {object} domainModel The object to copy properties to
+ * @param {object} annotation The object to copy properties to
  * @param {object} vm The object to copy properties from
  *
  */
-function updateDomainModel(domainModel, vm, permissions) {
-  domainModel.text = vm.form.text;
-  domainModel.tags = vm.form.tags;
+function updateDomainModel(annotation, vm, permissions) {
+  annotation.text = vm.form.text;
+  annotation.tags = vm.form.tags;
   if (vm.isPrivate) {
-    domainModel.permissions = permissions.private();
+    annotation.permissions = permissions.private();
   } else {
-    domainModel.permissions = permissions.shared(domainModel.group);
+    annotation.permissions = permissions.shared(annotation.group);
   }
 }
 
 /** Update the view model from the domain model changes. */
-function updateViewModel($scope, domainModel,
-                         vm, permissions) {
+function updateViewModel($scope, vm, permissions) {
 
   vm.form = {
-    text: domainModel.text,
-    tags: domainModel.tags,
+    text: vm.annotation.text,
+    tags: vm.annotation.tags,
   };
 
-  if (domainModel.links) {
-    vm.linkInContext = domainModel.links.incontext ||
-                       domainModel.links.html ||
+  if (vm.annotation.links) {
+    vm.linkInContext = vm.annotation.links.incontext ||
+                       vm.annotation.links.html ||
                        '';
-    vm.linkHTML = domainModel.links.html || '';
+    vm.linkHTML = vm.annotation.links.html || '';
   } else {
     vm.linkInContext = '';
     vm.linkHTML = '';
   }
 
   vm.isPrivate = permissions.isPrivate(
-    domainModel.permissions, domainModel.user);
+    vm.annotation.permissions, vm.annotation.user);
 
-  vm.documentMeta = annotationMetadata.domainAndTitle(domainModel);
+  vm.documentMeta = annotationMetadata.domainAndTitle(vm.annotation);
 }
 
 /**
@@ -127,7 +126,6 @@ function AnnotationController(
   settings, store) {
 
   var vm = this;
-  var domainModel;
   var newlyCreatedByHighlightButton;
 
   /** Save an annotation to the server. */
@@ -197,13 +195,6 @@ function AnnotationController(
     /** True if the 'Share' dialog for this annotation is currently open. */
     vm.showShareDialog = false;
 
-    /** The domain model, contains the currently saved version of the
-      * annotation from the server (or in the case of new annotations that
-      * haven't been saved yet - the data that will be saved to the server when
-      * they are saved).
-      */
-    domainModel = vm.annotation;
-
     /**
       * `true` if this AnnotationController instance was created as a result of
       * the highlight button being clicked.
@@ -212,7 +203,7 @@ function AnnotationController(
       * or annotation that was fetched from the server (as opposed to created
       * new client-side).
       */
-    newlyCreatedByHighlightButton = domainModel.$highlight || false;
+    newlyCreatedByHighlightButton = vm.annotation.$highlight || false;
 
     // Call `onAnnotationUpdated()` whenever the "annotationUpdated" event is
     // emitted. This event is emitted after changes to the annotation are
@@ -233,14 +224,14 @@ function AnnotationController(
 
     // New annotations (just created locally by the client, rather then
     // received from the server) have some fields missing. Add them.
-    domainModel.user = domainModel.user || session.state.userid;
-    domainModel.group = domainModel.group || groups.focused().id;
-    if (!domainModel.permissions) {
-      domainModel.permissions = permissions['default'](domainModel.group);
+    vm.annotation.user = vm.annotation.user || session.state.userid;
+    vm.annotation.group = vm.annotation.group || groups.focused().id;
+    if (!vm.annotation.permissions) {
+      vm.annotation.permissions = permissions['default'](vm.annotation.group);
     }
-    domainModel.text = domainModel.text || '';
-    if (!Array.isArray(domainModel.tags)) {
-      domainModel.tags = [];
+    vm.annotation.text = vm.annotation.text || '';
+    if (!Array.isArray(vm.annotation.tags)) {
+      vm.annotation.tags = [];
     }
 
     // Automatically save new highlights to the server when they're created.
@@ -250,31 +241,31 @@ function AnnotationController(
     // log in.
     saveNewHighlight();
 
-    updateView(domainModel);
+    updateView();
 
     // If this annotation is not a highlight and if it's new (has just been
     // created by the annotate button) or it has edits not yet saved to the
     // server - then open the editor on AnnotationController instantiation.
     if (!newlyCreatedByHighlightButton) {
-      if (isNew(domainModel) || drafts.get(domainModel)) {
+      if (isNew(vm.annotation) || drafts.get(vm.annotation)) {
         vm.edit();
       }
     }
   }
 
-  function updateView(domainModel) {
-    updateViewModel($scope, domainModel, vm, permissions);
+  function updateView() {
+    updateViewModel($scope, vm, permissions);
   }
 
   function onAnnotationUpdated(event, updatedDomainModel) {
-    if (updatedDomainModel.id === domainModel.id) {
-      domainModel = updatedDomainModel;
-      updateView(updatedDomainModel);
+    if (updatedDomainModel.id === vm.annotation.id) {
+      vm.annotation = updatedDomainModel;
+      updateView();
     }
   }
 
   function deleteIfNewAndEmpty() {
-    if (isNew(domainModel) && !vm.form.text && vm.form.tags.length === 0) {
+    if (isNew(vm.annotation) && !vm.form.text && vm.form.tags.length === 0) {
       vm.revert();
     }
   }
@@ -287,14 +278,14 @@ function AnnotationController(
     // The annotation component may be destroyed when switching accounts,
     // when switching groups or when the component is scrolled off-screen.
     if (vm.editing()) {
-      saveToDrafts(drafts, domainModel, vm);
+      saveToDrafts(drafts, vm);
     }
   }
 
   function onGroupFocused() {
     // New annotations move to the new group, when a new group is focused.
-    if (isNew(domainModel)) {
-      domainModel.group = groups.focused().id;
+    if (isNew(vm.annotation)) {
+      vm.annotation.group = groups.focused().id;
     }
   }
 
@@ -308,7 +299,7 @@ function AnnotationController(
    *
    */
   function saveNewHighlight() {
-    if (!isNew(domainModel)) {
+    if (!isNew(vm.annotation)) {
       // Already saved.
       return;
     }
@@ -318,18 +309,18 @@ function AnnotationController(
       return;
     }
 
-    if (domainModel.user) {
+    if (vm.annotation.user) {
       // User is logged in, save to server.
       // Highlights are always private.
-      domainModel.permissions = permissions.private();
-      save(domainModel).then(function(model) {
-        domainModel = model;
+      vm.annotation.permissions = permissions.private();
+      save(vm.annotation).then(function(model) {
+        model.$$tag = vm.annotation.$$tag;
         $rootScope.$emit(events.ANNOTATION_CREATED, model);
-        updateView(domainModel);
+        updateView();
       });
     } else {
       // User isn't logged in, save to drafts.
-      saveToDrafts(drafts, domainModel, vm);
+      saveToDrafts(drafts, vm);
     }
   }
 
@@ -355,7 +346,7 @@ function AnnotationController(
     // performance bottleneck and we would need to get the id token into the
     // session, which we should probably do anyway (and move to opaque bearer
     // tokens for the access token).
-    return permissions.permits(action, domainModel, session.state.userid);
+    return permissions.permits(action, vm.annotation, session.state.userid);
   };
 
   /**
@@ -372,7 +363,7 @@ function AnnotationController(
             errorMessage(reason), 'Deleting annotation failed');
         };
         $scope.$apply(function() {
-          annotationMapper.deleteAnnotation(domainModel).then(
+          annotationMapper.deleteAnnotation(vm.annotation).then(
             null, onRejected);
         });
       }
@@ -385,8 +376,8 @@ function AnnotationController(
     * @description Switches the view to an editor.
     */
   vm.edit = function() {
-    restoreFromDrafts(drafts, domainModel, vm);
-    vm.action = isNew(domainModel) ? 'create' : 'edit';
+    restoreFromDrafts(drafts, vm);
+    vm.action = isNew(vm.annotation) ? 'create' : 'edit';
   };
 
   /**
@@ -409,7 +400,7 @@ function AnnotationController(
     * @returns {Object} The full group object associated with the annotation.
     */
   vm.group = function() {
-    return groups.get(domainModel.group);
+    return groups.get(vm.annotation.group);
   };
 
   /**
@@ -426,7 +417,7 @@ function AnnotationController(
     * @returns {boolean} True if this annotation has quotes
     */
   vm.hasQuotes = function() {
-    return domainModel.target.some(function(target) {
+    return vm.annotation.target.some(function(target) {
       return target.selector && target.selector.some(function(selector) {
         return selector.type === 'TextQuoteSelector';
       });
@@ -434,7 +425,7 @@ function AnnotationController(
   };
 
   vm.id = function() {
-    return domainModel.id;
+    return vm.annotation.id;
   };
 
   /**
@@ -445,16 +436,16 @@ function AnnotationController(
   vm.isHighlight = function() {
     if (newlyCreatedByHighlightButton) {
       return true;
-    } else if (isNew(domainModel)) {
+    } else if (isNew(vm.annotation)) {
       return false;
     } else {
       // Once an annotation has been saved to the server there's no longer a
       // simple property that says whether it's a highlight or not.  For
-      // example there's no domainModel.highlight: true.  Instead a highlight is
+      // example there's no vm.annotation.highlight: true.  Instead a highlight is
       // defined as an annotation that isn't a page note or a reply and that
       // has no text or tags.
-      var isPageNote = (domainModel.target || []).length === 0;
-      return (!isPageNote && !isReply(domainModel) && !vm.hasContent());
+      var isPageNote = (vm.annotation.target || []).length === 0;
+      return (!isPageNote && !isReply(vm.annotation) && !vm.hasContent());
     }
   };
 
@@ -488,12 +479,12 @@ function AnnotationController(
     * Creates a new message in reply to this annotation.
     */
   vm.reply = function() {
-    var references = (domainModel.references || []).concat(domainModel.id);
+    var references = (vm.annotation.references || []).concat(vm.annotation.id);
     var reply = annotationMapper.createAnnotation({
       references: references,
-      uri: domainModel.uri
+      uri: vm.annotation.uri
     });
-    reply.group = domainModel.group;
+    reply.group = vm.annotation.group;
 
     if (session.state.userid) {
       if (vm.isPrivate) {
@@ -510,11 +501,11 @@ function AnnotationController(
     * @description Reverts an edit in progress and returns to the viewer.
     */
   vm.revert = function() {
-    drafts.remove(domainModel);
+    drafts.remove(vm.annotation);
     if (vm.action === 'create') {
-      $rootScope.$emit(events.ANNOTATION_DELETED, domainModel);
+      $rootScope.$emit(events.ANNOTATION_DELETED, vm.annotation);
     } else {
-      updateView(domainModel);
+      updateView();
       view();
     }
   };
@@ -525,7 +516,7 @@ function AnnotationController(
     * @description Saves any edits and returns to the viewer.
     */
   vm.save = function() {
-    if (!domainModel.user) {
+    if (!vm.annotation.user) {
       flash.info('Please sign in to save your annotations.');
       return Promise.resolve();
     }
@@ -535,22 +526,21 @@ function AnnotationController(
       return Promise.resolve();
     }
 
-    var updatedModel = angular.copy(domainModel);
+    var updatedModel = angular.copy(vm.annotation);
 
     // Copy across the non-enumerable local tag for the annotation
-    updatedModel.$$tag = domainModel.$$tag;
+    updatedModel.$$tag = vm.annotation.$$tag;
 
     updateDomainModel(updatedModel, vm, permissions);
     var saved = save(updatedModel).then(function (model) {
-      var isNew = !domainModel.id;
-      drafts.remove(domainModel);
-      domainModel = model;
+      var isNew = !vm.annotation.id;
+      drafts.remove(vm.annotation);
       if (isNew) {
-        $rootScope.$emit(events.ANNOTATION_CREATED, domainModel);
+        $rootScope.$emit(events.ANNOTATION_CREATED, vm.annotation);
       } else {
-        $rootScope.$emit(events.ANNOTATION_UPDATED, domainModel);
+        $rootScope.$emit(events.ANNOTATION_UPDATED, vm.annotation);
       }
-      updateView(domainModel);
+      updateView();
     });
 
     // optimistically switch back to view mode and display the saving
@@ -584,7 +574,7 @@ function AnnotationController(
     // creating or editing, we cache that and use the same privacy level the
     // next time they create an annotation.
     // But _don't_ cache it when they change the privacy level of a reply.
-    if (!isReply(domainModel)) {
+    if (!isReply(vm.annotation)) {
       permissions.setDefault(privacy);
     }
     vm.isPrivate = (privacy === 'private');
@@ -595,23 +585,23 @@ function AnnotationController(
   };
 
   vm.target = function() {
-    return domainModel.target;
+    return vm.annotation.target;
   };
 
   vm.updated = function() {
-    return domainModel.updated;
+    return vm.annotation.updated;
   };
 
   vm.user = function() {
-    return domainModel.user;
+    return vm.annotation.user;
   };
 
   vm.username = function() {
-    return persona.username(domainModel.user);
+    return persona.username(vm.annotation.user);
   };
 
   vm.isReply = function () {
-    return isReply(domainModel);
+    return isReply(vm.annotation);
   };
 
   /**

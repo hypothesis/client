@@ -1154,16 +1154,14 @@ describe('annotation', function() {
       });
 
       it('reverts to the most recently saved version', function () {
-        fakeStore.annotation.update = function (params, ann) {
-          return Promise.resolve(Object.assign({}, ann));
-        };
-
         var controller = createDirective({
           id: 'new-annot',
           user: 'acct:bill@localhost',
+          text: 'saved-text',
         }).controller;
         controller.edit();
         controller.form.text = 'New annotation text';
+
         return controller.save().then(function () {
           controller.edit();
           controller.form.text = 'Updated annotation text';
@@ -1171,7 +1169,7 @@ describe('annotation', function() {
         }).then(function () {
           controller.edit();
           controller.revert();
-          assert.equal(controller.form.text, 'Updated annotation text');
+          assert.equal(controller.form.text, controller.annotation.text);
         });
       });
     });
