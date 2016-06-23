@@ -31,23 +31,20 @@ function errorMessage(reason) {
   return message;
 }
 
-/** Update `annotation` from vm.
- *
- * Copy any properties from vm that might have been modified by the user into
- * `annotation`, overwriting any existing properties in `annotation`.
- *
- * @param {object} annotation The object to copy properties to
- * @param {object} vm The object to copy properties from
- *
+/**
+ * Return a copy of `annotation` with changes made in the editor applied.
  */
-function updateDomainModel(annotation, vm, permissions) {
-  annotation.text = vm.state().text;
-  annotation.tags = vm.state().tags;
-  if (vm.state().isPrivate) {
-    annotation.permissions = permissions.private();
-  } else {
-    annotation.permissions = permissions.shared(annotation.group);
-  }
+function updateModel(annotation, changes, permissions) {
+  return Object.assign({}, annotation, {
+    // Explicitly copy across the non-enumerable local tag for the annotation
+    $$tag: annotation.$$tag,
+
+    // Apply changes from the draft
+    tags: changes.tags,
+    text: changes.text,
+    permissions: changes.isPrivate ?
+      permissions.private() : permissions.shared(annotation.group),
+  });
 }
 
 /** Update the view model from the domain model changes. */
@@ -65,11 +62,6 @@ function updateViewModel($scope, vm) {
   vm.documentMeta = annotationMetadata.domainAndTitle(vm.annotation);
 }
 
-/**
-  * @ngdoc type
-  * @name annotation.AnnotationController
-  *
-  */
 // @ngInject
 function AnnotationController(
   $document, $q, $rootScope, $scope, $timeout, $window, annotationUI,
@@ -423,11 +415,6 @@ function AnnotationController(
     }
   };
 
-  /**
-    * @ngdoc method
-    * @name annotation.AnnotationController#save
-    * @description Saves any edits and returns to the viewer.
-    */
   vm.save = function() {
     if (!vm.annotation.user) {
       flash.info('Please sign in to save your annotations.');
@@ -438,29 +425,22 @@ function AnnotationController(
       return Promise.resolve();
     }
 
-    var updatedModel = angular.copy(vm.annotation);
+    var updatedModel = updateModel(vm.annotation, vm.state(), permissions);
 
-    // Copy across the non-enumerable local tag for the annotation
-    updatedModel.$$tag = vm.annotation.$$tag;
-
-    updateDomainModel(updatedModel, vm, permissions);
-    var saved = save(updatedModel).then(function (model) {
-      var isNew = !vm.annotation.id;
-      drafts.remove(vm.annotation);
-      if (isNew) {
-        $rootScope.$emit(events.ANNOTATION_CREATED, vm.annotation);
-      } else {
-        $rootScope.$emit(events.ANNOTATION_UPDATED, vm.annotation);
-      }
-      updateView();
-    });
-
-    // optimistically switch back to view mode and display the saving
+    // Optimistically switch back to view mode and display the saving
     // indicator
     vm.isSaving = true;
 
-    return saved.then(function () {
+    return save(updatedModel).then(function (model) {
+      Object.assign(updatedModel, model);
+
       vm.isSaving = false;
+
+      var event = isNew(vm.annotation) ?
+        events.ANNOTATION_CREATED : events.ANNOTATION_UPDATED;
+      drafts.remove(vm.annotation);
+
+      $rootScope.$emit(event, updatedModel);
     }).catch(function (reason) {
       vm.isSaving = false;
       vm.edit();
@@ -590,7 +570,7 @@ module.exports = {
   // to be unit tested.
   // FIXME: The code should be refactored to enable unit testing without having
   // to do this.
-  updateDomainModel: updateDomainModel,
+  updateModel: updateModel,
 
   // These are meant to be the public API of this module.
   directive: annotation,
