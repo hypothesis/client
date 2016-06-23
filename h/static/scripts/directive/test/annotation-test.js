@@ -377,7 +377,7 @@ describe('annotation', function() {
       });
     });
 
-    describe('.isHighlight()', function() {
+    describe('#isHighlight()', function() {
       it('returns true for new highlights', function() {
         var annotation = fixtures.newHighlight();
 
@@ -906,8 +906,8 @@ describe('annotation', function() {
       });
     });
 
-    describe('onGroupFocused()', function() {
-      it('updates domainModel.group if the annotation is new', function () {
+    describe('when the focused group changes', function() {
+      it('moves new annotations to the focused group', function () {
         var annotation = fixtures.newAnnotation();
         annotation.group = 'old-group-id';
         createDirective(annotation);
@@ -918,7 +918,7 @@ describe('annotation', function() {
         assert.equal(annotation.group, 'new-group-id');
       });
 
-      it('does not update domainModel.group if the annotation is not new',
+      it('does not modify the group of saved annotations',
         function () {
           var annotation = fixtures.oldAnnotation();
           annotation.group = 'old-group-id';
@@ -931,7 +931,6 @@ describe('annotation', function() {
         }
       );
     });
-
 
     describe('reverting edits', function () {
       it('removes the current draft', function() {
@@ -950,7 +949,7 @@ describe('annotation', function() {
     });
 
     describe('tag display', function () {
-      it('displays annotation tags', function () {
+      it('displays links to tags on the stream', function () {
         var directive = createDirective({
           id: '1234',
           tags: ['atag']
