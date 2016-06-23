@@ -11,6 +11,12 @@ var util = require('./util');
 
 var inject = angular.mock.inject;
 
+var fakeDocumentMeta = {
+  domain: 'docs.io',
+  titleLink: 'http://docs.io/doc.html',
+  titleText: 'Dummy title',
+};
+
 /**
  * Returns the annotation directive with helpers stubbed out.
  */
@@ -19,10 +25,13 @@ function annotationDirective() {
 
   var annotation = proxyquire('../annotation', {
     angular: testUtil.noCallThru(angular),
-    '../filter/document-domain': noop,
-    '../filter/document-title': noop,
     '../filter/persona': {
       username: noop,
+    },
+    '../annotation-metadata': {
+      domainAndTitle: function (annot) {
+        return fakeDocumentMeta;
+      },
     }
   });
 
@@ -684,6 +693,14 @@ describe('annotation', function() {
       });
     });
 
+    describe('#documentMeta()', function () {
+      it('returns the domain, title link and text for the annotation', function () {
+        var annot = fixtures.defaultAnnotation();
+        var controller = createDirective(annot).controller;
+        assert.deepEqual(controller.documentMeta(), fakeDocumentMeta);
+      });
+    });
+
     describe('saving a new annotation', function() {
       var annotation;
 
@@ -853,30 +870,6 @@ describe('annotation', function() {
       });
     });
 
-    describe('onAnnotationUpdated()', function() {
-      it('updates vm.annotation', function() {
-        var parts = createDirective();
-        var updatedModel = {
-          id: parts.annotation.id,
-          links: {html: 'http://hyp.is/new-link'}
-        };
-        parts.controller.annotation = updatedModel;
-        $rootScope.$emit(events.ANNOTATION_UPDATED, updatedModel);
-        assert.equal(parts.controller.linkHTML, 'http://hyp.is/new-link');
-      });
-
-      it('doesn\'t update if a different annotation was updated', function() {
-        var parts = createDirective();
-        var updatedModel = {
-          id: 'different annotation id',
-          links: {html: 'http://hyp.is/new-link'},
-        };
-
-        $rootScope.$emit(events.ANNOTATION_UPDATED, updatedModel);
-        assert.notEqual(parts.controller.linkHTML, 'http://hyp.is/new-link');
-      });
-    });
-
     describe('when another new annotation is created', function () {
       it('removes the current annotation if empty', function () {
         var annotation = fixtures.newEmptyAnnotation();
@@ -973,7 +966,7 @@ describe('annotation', function() {
     });
 
     describe('annotation links', function () {
-      it('linkInContext uses the in-context links when available', function () {
+      it('uses the in-context links when available', function () {
         var annotation = Object.assign({}, fixtures.defaultAnnotation(), {
           links: {
             html: 'https://test.hypothes.is/a/deadbeef',
@@ -981,22 +974,20 @@ describe('annotation', function() {
           },
         });
         var controller = createDirective(annotation).controller;
-
-        assert.equal(controller.linkInContext, annotation.links.incontext);
+        assert.equal(controller.links().incontext, annotation.links.incontext);
       });
 
-      it('linkInContext falls back to the HTML link when in-context links are missing', function () {
+      it('falls back to the HTML link when in-context links are missing', function () {
         var annotation = Object.assign({}, fixtures.defaultAnnotation(), {
           links: {
             html: 'https://test.hypothes.is/a/deadbeef',
           },
         });
         var controller = createDirective(annotation).controller;
-
-        assert.equal(controller.linkInContext, annotation.links.html);
+        assert.equal(controller.links().html, annotation.links.html);
       });
 
-      it('linkHTML uses the HTML link when available', function () {
+      it('uses the HTML link when available', function () {
         var annotation = Object.assign({}, fixtures.defaultAnnotation(), {
           links: {
             html: 'https://test.hypothes.is/a/deadbeef',
@@ -1004,22 +995,19 @@ describe('annotation', function() {
           },
         });
         var controller = createDirective(annotation).controller;
-
-        assert.equal(controller.linkHTML, annotation.links.html);
+        assert.equal(controller.links().html, annotation.links.html);
       });
 
-      it('linkInContext is blank when unknown', function () {
+      it('in-context link is blank when unknown', function () {
         var annotation = fixtures.defaultAnnotation();
         var controller = createDirective(annotation).controller;
-
-        assert.equal(controller.linkInContext, '');
+        assert.equal(controller.links().incontext, '');
       });
 
-      it('linkHTML is blank when unknown', function () {
+      it('HTML is blank when unknown', function () {
         var annotation = fixtures.defaultAnnotation();
         var controller = createDirective(annotation).controller;
-
-        assert.equal(controller.linkHTML, '');
+        assert.equal(controller.links().html, '');
       });
     });
   });
