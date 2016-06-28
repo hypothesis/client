@@ -42,7 +42,7 @@ describe('AnnotationUISync', function () {
       ]
     };
 
-    annotationUI = annotationUIFactory({});
+    annotationUI = annotationUIFactory($rootScope, {});
     annotationUI.addAnnotations([
       {id: 'id1', $$tag: 'tag1'},
       {id: 'id2', $$tag: 'tag2'},
