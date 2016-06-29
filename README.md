@@ -15,6 +15,8 @@ The Hypothesis client is a browser-based tool for making annotations on web
 documents. It is used by the [Hypothesis browser extension][ext], and can also
 be [embedded directly on web pages][embed].
 
+![Screenshot of Hypothesis client](/images/screenshot.png?raw=true)
+
 [ext]: https://chrome.google.com/webstore/detail/hypothesis-web-pdf-annota/bjfhmglciegochdpefhhlphglcehbmek
 [embed]: https://hypothes.is/for-publishers/
 
