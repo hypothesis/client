@@ -134,5 +134,10 @@
     },
     "hammerjs": "Hammer",
     "jquery": "$"
+  },
+  "scripts": {
+    "build": "gulp build-app",
+    "deps": "check-dependencies",
+    "test": "gulp test-app"
   }
 }
