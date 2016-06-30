@@ -1,17 +1,33 @@
 .selection-tabs {
   display: flex;
   flex-direction: row;
-  color: $grey-4;
+  color: $grey-5;
   @include font-normal;
-  font-weight: bold;
-  margin: 10px 0px;
+  margin: 0px 0px 10px 0px;
+
+  &:hover {
+    color: $grey-6;
+  }
 }
 
 .selection-tabs--selected {
   color: $grey-6;
+  font-weight: bold;
 }
 
 .selection-tabs__type {
   margin-right: 20px;
   cursor: pointer;
+  min-width: 85px;
+  min-height: 18px;
+}
+
+.selection-tabs__count {
+  position: relative;
+  bottom: 3px;
+  font-size: 10px;
+}
+
+.selection-loading {
+  text-align: center;
 }

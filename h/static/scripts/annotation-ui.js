@@ -63,7 +63,7 @@ function initialState(settings) {
 
     filterQuery: null,
 
-    selectedTab: uiConstants.TAB_ANNOTATIONS,
+    selectedTab: undefined,
 
     // Key by which annotations are currently sorted.
     sortKey: 'Location',

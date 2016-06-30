@@ -28,12 +28,11 @@ describe('selectionTabs', function () {
       });
 
       var tabs = elem[0].querySelectorAll('li');
-      var sups = elem[0].querySelectorAll('sup');
 
       assert.include(tabs[0].textContent, "Annotations");
       assert.include(tabs[1].textContent, "Notes");
-      assert.include(sups[0].textContent, "123");
-      assert.include(sups[1].textContent, "456");
+      assert.include(tabs[0].textContent, "123");
+      assert.include(tabs[1].textContent, "456");
     });
 
     it('should display annotations tab as selected', function () {

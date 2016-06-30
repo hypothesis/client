@@ -38,7 +38,7 @@ body {
 
   @include grey-background;
   font-family: $sans-font-family;
-  font-weight: 300;
+  font-weight: normal;
   padding: $sidebar-h-padding;
   padding-top: $sidebar-h-padding + $top-bar-height;
   -webkit-overflow-scrolling: touch;

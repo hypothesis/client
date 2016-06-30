@@ -95,9 +95,15 @@ module.exports = function WidgetController(
   var visibleThreads = new VirtualThreadList($scope, window, thread());
   annotationUI.subscribe(function () {
     visibleThreads.setRootThread(thread());
+
     $scope.totalAnnotations = countAnnotations(annotationUI.getState().annotations);
     $scope.totalNotes = countNotes(annotationUI.getState().annotations);
-    $scope.selectedTab = annotationUI.getState().selectedTab;
+
+    if (annotationUI.getState().selectedTab) {
+      $scope.selectedTab = annotationUI.getState().selectedTab;
+    } else {
+      $scope.selectedTab = uiConstants.TAB_ANNOTATIONS;
+    }
   });
 
   visibleThreads.on('changed', function (state) {
@@ -381,6 +387,7 @@ module.exports = function WidgetController(
   };
 
   $scope.isLoading = isLoading;
+  annotationUI.selectTab(uiConstants.TAB_ANNOTATIONS);
   $scope.tabAnnotations = uiConstants.TAB_ANNOTATIONS;
   $scope.tabNotes = uiConstants.TAB_NOTES;
   $scope.selectionTabsFlagEnabled = features.flagEnabled('selection_tabs');
