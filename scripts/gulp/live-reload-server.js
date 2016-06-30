@@ -6,7 +6,7 @@ var http = require('http');
 var WebSocketServer = require('websocket').server;
 
 function changelogText() {
-  return fs.readFileSync('./CHANGES', 'utf-8');
+  return fs.readFileSync('./README.md', 'utf-8');
 }
 
 /**
