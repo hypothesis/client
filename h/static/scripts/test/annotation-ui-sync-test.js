@@ -6,7 +6,6 @@ var annotationUIFactory = require('../annotation-ui');
 
 describe('AnnotationUISync', function () {
   var sandbox = sinon.sandbox.create();
-  var $digest;
   var publish;
   var fakeBridge;
   var annotationUI;
@@ -23,7 +22,6 @@ describe('AnnotationUISync', function () {
 
   beforeEach(angular.mock.module('h'));
   beforeEach(angular.mock.inject(function (AnnotationUISync, $rootScope) {
-    $digest = sandbox.stub($rootScope, '$digest');
     var listeners = {};
     publish = function (method) {
       var args = [].slice.apply(arguments);
@@ -42,7 +40,7 @@ describe('AnnotationUISync', function () {
       ]
     };
 
-    annotationUI = annotationUIFactory({});
+    annotationUI = annotationUIFactory($rootScope, {});
     annotationUI.addAnnotations([
       {id: 'id1', $$tag: 'tag1'},
       {id: 'id2', $$tag: 'tag2'},
@@ -96,12 +94,6 @@ describe('AnnotationUISync', function () {
       publish('showAnnotations', ['tag1', 'tag-for-a-new-annotation']);
       assert.calledWith(annotationUI.selectAnnotations, ['id1']);
     });
-
-    it('triggers a digest', function () {
-      createAnnotationUISync();
-      publish('showAnnotations', ['tag1', 'tag2', 'tag3']);
-      assert.called($digest);
-    });
   });
 
   describe('on "focusAnnotations" event', function () {
@@ -114,12 +106,6 @@ describe('AnnotationUISync', function () {
         tag3: true,
       });
     });
-
-    it('triggers a digest', function () {
-      createAnnotationUISync();
-      publish('focusAnnotations', ['tag1', 'tag2', 'tag3']);
-      assert.called($digest);
-    });
   });
 
   describe('on "toggleAnnotationSelection" event', function () {
@@ -128,12 +114,6 @@ describe('AnnotationUISync', function () {
       annotationUI.toggleSelectedAnnotations = sinon.stub();
       publish('toggleAnnotationSelection', ['tag1', 'tag2', 'tag3']);
       assert.calledWith(annotationUI.toggleSelectedAnnotations, ['id1', 'id2', 'id3']);
-    });
-
-    it('triggers a digest', function () {
-      createAnnotationUISync();
-      publish('toggleAnnotationSelection', ['tag1', 'tag2', 'tag3']);
-      assert.called($digest);
     });
   });
 
@@ -148,12 +128,6 @@ describe('AnnotationUISync', function () {
       createAnnotationUISync();
       publish('setVisibleHighlights', true);
       assert.calledWith(fakeBridge.call, 'setVisibleHighlights', true);
-    });
-
-    it('triggers a digest of the application state', function () {
-      createAnnotationUISync();
-      publish('setVisibleHighlights', true);
-      assert.called($digest);
     });
   });
 });
