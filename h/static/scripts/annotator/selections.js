@@ -50,7 +50,7 @@ function selections(document) {
     observable.buffer(100, selectionEvents),
 
     // Emit an initial event on the next tick
-    observable.Observable.of({}),
+    observable.delay(0, observable.Observable.of({})),
   ]);
 
   return events.map(function () {

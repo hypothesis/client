@@ -91,7 +91,7 @@
     "watchify": "^3.7.0",
     "websocket": "^1.0.22",
     "whatwg-fetch": "^0.10.1",
-    "zen-observable": "^0.2.1"
+    "zen-observable": "^0.3.0"
   },
   "browserify": {
     "transform": [

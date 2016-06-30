@@ -32,6 +32,28 @@ var Observable = require('zen-observable');
    });
  }
 
+/**
+ * Delay events from a source Observable by `delay` ms.
+ */
+function delay(delay, src) {
+  return new Observable(function (obs) {
+    var timeouts = [];
+    var sub = src.subscribe({
+      next: function (value) {
+        var t = setTimeout(function () {
+          timeouts = timeouts.filter(function (other) { return other !== t; });
+          obs.next(value);
+        }, delay);
+        timeouts.push(t);
+      },
+    });
+    return function () {
+      timeouts.forEach(clearTimeout);
+      sub.unsubscribe();
+    };
+  });
+}
+
  /**
   * Buffers events from a source Observable, waiting for a pause of `delay`
   * ms with no events before emitting the last value from `src`.
@@ -99,6 +121,7 @@ function drop(src, n) {
 
 module.exports = {
   buffer: buffer,
+  delay: delay,
   drop: drop,
   listen: listen,
   merge: merge,
