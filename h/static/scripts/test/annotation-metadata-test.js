@@ -2,10 +2,11 @@
 
 var annotationMetadata = require('../annotation-metadata');
 
-var extractDocumentMetadata = annotationMetadata.extractDocumentMetadata;
+var documentMetadata = annotationMetadata.documentMetadata;
+var domainAndTitle = annotationMetadata.domainAndTitle;
 
 describe('annotation-metadata', function () {
-  describe('.extractDocumentMetadata', function() {
+  describe('.documentMetadata', function() {
 
     context('when the model has a document property', function() {
       it('returns the hostname from model.uri as the domain', function() {
@@ -14,7 +15,7 @@ describe('annotation-metadata', function () {
           uri: 'http://example.com/'
         };
 
-        assert.equal(extractDocumentMetadata(model).domain, 'example.com');
+        assert.equal(documentMetadata(model).domain, 'example.com');
       });
 
       context('when model.uri does not start with "urn"', function() {
@@ -25,7 +26,7 @@ describe('annotation-metadata', function () {
           };
 
           assert.equal(
-            extractDocumentMetadata(model).uri, 'http://example.com/');
+            documentMetadata(model).uri, 'http://example.com/');
         });
       });
 
@@ -39,7 +40,7 @@ describe('annotation-metadata', function () {
           };
 
           assert.equal(
-            extractDocumentMetadata(model).title, model.document.title[0]);
+            documentMetadata(model).title, model.document.title[0]);
         });
       });
 
@@ -50,7 +51,7 @@ describe('annotation-metadata', function () {
             uri: 'http://example.com/',
           };
 
-          assert.equal(extractDocumentMetadata(model).title, 'example.com');
+          assert.equal(documentMetadata(model).title, 'example.com');
         });
       });
     });
@@ -59,24 +60,70 @@ describe('annotation-metadata', function () {
       it('returns model.uri for the uri', function() {
         var model = {uri: 'http://example.com/'};
 
-        assert.equal(extractDocumentMetadata(model).uri, model.uri);
+        assert.equal(documentMetadata(model).uri, model.uri);
       });
 
       it('returns the hostname of model.uri for the domain', function() {
         var model = {uri: 'http://example.com/'};
 
-        assert.equal(extractDocumentMetadata(model).domain, 'example.com');
+        assert.equal(documentMetadata(model).domain, 'example.com');
       });
 
       it('returns the hostname of model.uri for the title', function() {
         var model = {uri: 'http://example.com/'};
 
-        assert.equal(extractDocumentMetadata(model).title, 'example.com');
+        assert.equal(documentMetadata(model).title, 'example.com');
+      });
+    });
+  });
+
+  describe('.domainAndTitle', function() {
+    context('when an annotation has a non-http(s) uri', function () {
+      it('returns no title link', function () {
+        var model = {
+          uri: 'file:///example.pdf',
+        };
+
+        assert.equal(domainAndTitle(model).titleLink, null);
       });
     });
 
-    context('when the title is longer than 30 characters', function() {
-      it('truncates the title with "…"', function() {
+    context('when an annotation has a direct link', function () {
+      it('returns the direct link as a title link', function () {
+        var model = {
+          links: {
+            incontext: 'https://example.com',
+          }
+        };
+
+        assert.equal(domainAndTitle(model).titleLink, 'https://example.com');
+      });
+    });
+
+    context('when an annotation has no direct link but has a http(s) uri', function () {
+      it('returns the uri as title link', function () {
+        var model = {
+          uri: 'https://example.com',
+        };
+
+        assert.equal(domainAndTitle(model).titleLink, 'https://example.com');
+      });
+    });
+
+    context('when the annotation title is shorter than 30 characters', function () {
+      it('returns the annotation title as title text', function () {
+        var model = {
+          document: {
+            title: ['A Short Document Title'],
+          },
+        };
+
+        assert.equal(domainAndTitle(model).titleText, 'A Short Document Title');
+      });
+    });
+
+    context('when the annotation title is longer than 30 characters', function() {
+      it('truncates the title text with "…"', function() {
         var model = {
           uri: 'http://example.com/',
           document: {
@@ -85,9 +132,60 @@ describe('annotation-metadata', function () {
         };
 
         assert.equal(
-          extractDocumentMetadata(model).title,
+          domainAndTitle(model).titleText,
           'My Really Really Long Document…'
         );
+      });
+    });
+
+    context('when the document uri refers to a filename', function () {
+      it('returns the filename as domain text', function () {
+        var model = {
+          uri: 'file:///path/to/example.pdf',
+          document: {
+            title: ['Document Title'],
+          },
+        };
+
+        assert.equal(domainAndTitle(model).domain, 'example.pdf');
+      });
+    });
+
+    context('when domain and title are the same', function () {
+      it('returns an empty domain text string', function() {
+        var model = {
+          uri: 'https://example.com',
+          document : {
+            title: ['example.com'],
+          },
+        };
+
+        assert.equal(domainAndTitle(model).domain, '');
+      });
+    });
+
+    context('when the document has no domain', function () {
+      it('returns an empty domain text string', function() {
+        var model = {
+          document : {
+            title: ['example.com'],
+          },
+        };
+
+        assert.equal(domainAndTitle(model).domain, '');
+      });
+    });
+
+    context('when the document is a local file with a title', function () {
+      it('returns the filename', function() {
+        var model = {
+          uri: 'file:///home/seanh/MyFile.pdf',
+          document: {
+            title: ['example.com'],
+          },
+        };
+
+        assert.equal(domainAndTitle(model).domain, 'MyFile.pdf');
       });
     });
   });

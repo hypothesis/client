@@ -12,7 +12,7 @@
  *   uri, domain and title.
  *
  */
-function extractDocumentMetadata(annotation) {
+function documentMetadata(annotation) {
   var uri = annotation.uri;
   var domain = new URL(uri).hostname;
   var title = domain;
@@ -21,8 +21,8 @@ function extractDocumentMetadata(annotation) {
     title = annotation.document.title[0];
   }
 
-  if (title.length > 30) {
-    title = title.slice(0, 30) + '…';
+  if (domain === 'localhost') {
+    domain = '';
   }
 
   return {
@@ -30,6 +30,61 @@ function extractDocumentMetadata(annotation) {
     domain: domain,
     title: title,
   };
+}
+
+/**
+ * Return the domain and title of an annotation for display on an annotation
+ * card.
+ */
+function domainAndTitle(annotation) {
+  return {
+    domain: domainTextFromAnnotation(annotation),
+    titleText: titleTextFromAnnotation(annotation),
+    titleLink: titleLinkFromAnnotation(annotation),
+  };
+}
+
+function titleLinkFromAnnotation(annotation) {
+  var titleLink = annotation.uri;
+
+  if (titleLink && !(titleLink.indexOf('http://') === 0 || titleLink.indexOf('https://') === 0)) {
+    // We only link to http(s) URLs.
+    titleLink = null;
+  }
+
+  if (annotation.links && annotation.links.incontext) {
+    titleLink = annotation.links.incontext;
+  }
+
+  return titleLink;
+}
+
+function domainTextFromAnnotation(annotation) {
+  var document = documentMetadata(annotation);
+
+  var domainText = '';
+  if (document.uri && document.uri.indexOf('file://') === 0 && document.title) {
+    var parts = document.uri.split('/');
+    var filename = parts[parts.length - 1];
+    if (filename) {
+      domainText = filename;
+    }
+  } else if (document.domain && document.domain !== document.title) {
+    domainText = document.domain;
+  }
+
+  return domainText;
+}
+
+function titleTextFromAnnotation(annotation) {
+  var document = documentMetadata(annotation);
+
+  var titleText = document.title;
+  if (titleText.length > 30) {
+    titleText = titleText.slice(0, 30) + '…';
+  }
+
+  return titleText;
 }
 
 /** Return `true` if the given annotation is a reply, `false` otherwise. */
@@ -78,7 +133,8 @@ function location(annotation) {
 }
 
 module.exports = {
-  extractDocumentMetadata: extractDocumentMetadata,
+  documentMetadata: documentMetadata,
+  domainAndTitle: domainAndTitle,
   isAnnotation: isAnnotation,
   isNew: isNew,
   isPageNote: isPageNote,
