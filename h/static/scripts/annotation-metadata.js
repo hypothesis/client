@@ -37,8 +37,15 @@ function documentMetadata(annotation) {
  * card.
  */
 function domainAndTitle(annotation) {
-  var document = documentMetadata(annotation);
-  var titleLink = document.uri;
+  return {
+    domain: domainTextFromAnnotation(annotation),
+    titleText: titleTextFromAnnotation(annotation),
+    titleLink: titleLinkFromAnnotation(annotation),
+  };
+}
+
+function titleLinkFromAnnotation(annotation) {
+  var titleLink = annotation.uri;
 
   if (titleLink && !(titleLink.indexOf('http://') === 0 || titleLink.indexOf('https://') === 0)) {
     // We only link to http(s) URLs.
@@ -48,6 +55,12 @@ function domainAndTitle(annotation) {
   if (annotation.links && annotation.links.incontext) {
     titleLink = annotation.links.incontext;
   }
+
+  return titleLink;
+}
+
+function domainTextFromAnnotation(annotation) {
+  var document = documentMetadata(annotation);
 
   var domainText = '';
   if (document.uri && document.uri.indexOf('file://') === 0 && document.title) {
@@ -60,16 +73,18 @@ function domainAndTitle(annotation) {
     domainText = document.domain;
   }
 
+  return domainText;
+}
+
+function titleTextFromAnnotation(annotation) {
+  var document = documentMetadata(annotation);
+
   var titleText = document.title;
   if (titleText.length > 30) {
     titleText = titleText.slice(0, 30) + '…';
   }
 
-  return {
-    domain: domainText,
-    titleText: titleText,
-    titleLink: titleLink,
-  };
+  return titleText;
 }
 
 /** Return `true` if the given annotation is a reply, `false` otherwise. */
