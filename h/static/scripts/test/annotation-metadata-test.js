@@ -78,8 +78,52 @@ describe('annotation-metadata', function () {
   });
 
   describe('.domainAndTitle', function() {
-    context('when the title is longer than 30 characters', function() {
-      it('truncates the title with "…"', function() {
+    context('when an annotation has a non-http(s) uri', function () {
+      it('returns no title link', function () {
+        var model = {
+          uri: 'file:///example.pdf',
+        };
+
+        assert.equal(domainAndTitle(model).titleLink, null);
+      });
+    });
+
+    context('when an annotation has a direct link', function () {
+      it('returns the direct link as a title link', function () {
+        var model = {
+          links: {
+            incontext: 'https://example.com',
+          }
+        };
+
+        assert.equal(domainAndTitle(model).titleLink, 'https://example.com');
+      });
+    });
+
+    context('when an annotation has no direct link but has a http(s) uri', function () {
+      it('returns the uri as title link', function () {
+        var model = {
+          uri: 'https://example.com',
+        };
+
+        assert.equal(domainAndTitle(model).titleLink, 'https://example.com');
+      });
+    });
+
+    context('when the annotation title is shorter than 30 characters', function () {
+      it('returns the annotation title as title text', function () {
+        var model = {
+          document: {
+            title: ['A Short Document Title'],
+          },
+        };
+
+        assert.equal(domainAndTitle(model).titleText, 'A Short Document Title');
+      });
+    });
+
+    context('when the annotation title is longer than 30 characters', function() {
+      it('truncates the title text with "…"', function() {
         var model = {
           uri: 'http://example.com/',
           document: {
@@ -91,6 +135,19 @@ describe('annotation-metadata', function () {
           domainAndTitle(model).titleText,
           'My Really Really Long Document…'
         );
+      });
+    });
+
+    context('when the document uri refers to a filename', function () {
+      it('returns the filename as domain text', function () {
+        var model = {
+          uri: 'file:///path/to/example.pdf',
+          document: {
+            title: ['Document Title'],
+          },
+        };
+
+        assert.equal(domainAndTitle(model).domain, 'example.pdf');
       });
     });
   });
