@@ -237,12 +237,12 @@ describe('annotation-metadata', function () {
 
   describe ('.isAnnotation', function () {
     it ('returns true if an annotation is a top level annotation', function () {
-      assert(annotationMetadata.isAnnotation({
+      assert.isTrue(annotationMetadata.isAnnotation({
         target: [{selector: []}]
       }));
     });
     it ('returns false if an annotation has no target', function () {
-      assert.equal(annotationMetadata.isAnnotation({}), undefined);
+      assert.isFalse(annotationMetadata.isAnnotation({}));
     });
   });
 });
