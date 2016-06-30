@@ -150,6 +150,44 @@ describe('annotation-metadata', function () {
         assert.equal(domainAndTitle(model).domain, 'example.pdf');
       });
     });
+
+    context('when domain and title are the same', function () {
+      it('returns an empty domain text string', function() {
+        var model = {
+          uri: 'https://example.com',
+          document : {
+            title: ['example.com'],
+          },
+        };
+
+        assert.equal(domainAndTitle(model).domain, '');
+      });
+    });
+
+    context('when the document has no domain', function () {
+      it('returns an empty domain text string', function() {
+        var model = {
+          document : {
+            title: ['example.com'],
+          },
+        };
+
+        assert.equal(domainAndTitle(model).domain, '');
+      });
+    });
+
+    context('when the document is a local file with a title', function () {
+      it('returns the filename', function() {
+        var model = {
+          uri: 'file:///home/seanh/MyFile.pdf',
+          document: {
+            title: ['example.com'],
+          },
+        };
+
+        assert.equal(domainAndTitle(model).domain, 'MyFile.pdf');
+      });
+    });
   });
 
   describe('.location', function () {

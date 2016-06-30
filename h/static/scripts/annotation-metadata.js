@@ -21,6 +21,10 @@ function documentMetadata(annotation) {
     title = annotation.document.title[0];
   }
 
+  if (domain === 'localhost') {
+    domain = '';
+  }
+
   return {
     uri: uri,
     domain: domain,
@@ -45,7 +49,7 @@ function domainAndTitle(annotation) {
     titleLink = annotation.links.incontext;
   }
 
-  var domainText;
+  var domainText = '';
   if (document.uri && document.uri.indexOf('file://') === 0 && document.title) {
     var parts = document.uri.split('/');
     var filename = parts[parts.length - 1];
