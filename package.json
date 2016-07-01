@@ -18,7 +18,6 @@
     "autofill-event": "0.0.1",
     "autoprefixer": "^6.0.3",
     "babelify": "^6.1.3",
-    "bootstrap": "3.3.5",
     "browserify": "^13.0.0",
     "browserify-ngannotate": "^1.0.1",
     "browserify-shim": "^3.8.12",
@@ -49,7 +48,6 @@
     "gulp-util": "^3.0.7",
     "hammerjs": "^2.0.4",
     "inherits": "^2.0.1",
-    "is-equal-shallow": "^0.1.3",
     "jquery": "1.11.1",
     "js-polyfills": "^0.1.16",
     "jscs": "^3.0.2",
@@ -91,7 +89,6 @@
     "vinyl": "^1.1.1",
     "watchify": "^3.7.0",
     "websocket": "^1.0.22",
-    "whatwg-fetch": "^0.10.1",
     "zen-observable": "^0.3.0"
   },
   "browserify": {
