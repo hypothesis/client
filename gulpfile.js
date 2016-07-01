@@ -195,7 +195,7 @@ gulp.task('build-css', function () {
     .pipe(gulp.dest(STYLE_DIR));
 });
 
-gulp.task('watch-css', function () {
+gulp.task('watch-css', ['build-css'], function () {
   var vendorCSS = styleFiles.filter(function (path) {
     return path.endsWith('.css');
   });
@@ -212,7 +212,7 @@ gulp.task('build-fonts', function () {
     .pipe(gulp.dest(FONTS_DIR));
 });
 
-gulp.task('watch-fonts', function () {
+gulp.task('watch-fonts', ['build-fonts'], function () {
   gulp.watch(fontFiles, ['build-fonts']);
 });
 
@@ -223,7 +223,7 @@ gulp.task('build-images', function () {
     .pipe(gulp.dest(IMAGES_DIR));
 });
 
-gulp.task('watch-images', function () {
+gulp.task('watch-images', ['build-images'], function () {
   gulp.watch(imageFiles, ['build-images']);
 });
 
