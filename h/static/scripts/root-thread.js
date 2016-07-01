@@ -89,6 +89,7 @@ function RootThread($rootScope, annotationUI, features, searchFilter, viewFilter
   // the Redux store in annotationUI.
   var loadEvents = [events.BEFORE_ANNOTATION_CREATED,
                     events.ANNOTATION_CREATED,
+                    events.ANNOTATION_UPDATED,
                     events.ANNOTATIONS_LOADED];
   loadEvents.forEach(function (event) {
     $rootScope.$on(event, function (event, annotation) {
