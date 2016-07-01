@@ -927,18 +927,26 @@ describe('annotation', function() {
         assert.equal(annotation.group, 'new-group-id');
       });
 
-      it('does not modify the group of saved annotations',
-        function () {
-          var annotation = fixtures.oldAnnotation();
-          annotation.group = 'old-group-id';
-          createDirective(annotation);
-          fakeGroups.focused = sandbox.stub().returns({id: 'new-group-id'});
+      it('does not move replies to the focused group', function () {
+        var annotation = fixtures.newReply();
+        fakeGroups.focused = sandbox.stub().returns({id: 'new-group-id'});
+        createDirective(annotation);
+        fakeGroups.focused = sandbox.stub().returns({id: 'new-group-id-2'});
+        $rootScope.$broadcast(events.GROUP_FOCUSED);
 
-          $rootScope.$broadcast(events.GROUP_FOCUSED);
+        assert.equal(annotation.group, 'new-group-id');
+      });
 
-          assert.equal(annotation.group, 'old-group-id');
-        }
-      );
+      it('does not modify the group of saved annotations', function () {
+        var annotation = fixtures.oldAnnotation();
+        annotation.group = 'old-group-id';
+        createDirective(annotation);
+        fakeGroups.focused = sandbox.stub().returns({id: 'new-group-id'});
+
+        $rootScope.$broadcast(events.GROUP_FOCUSED);
+
+        assert.equal(annotation.group, 'old-group-id');
+      });
     });
 
     describe('reverting edits', function () {

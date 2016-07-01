@@ -30,6 +30,18 @@ function newAnnotation() {
   };
 }
 
+/** Return a new reply */
+function newReply() {
+  return {
+    id: undefined,
+    $highlight: undefined,
+    target: ['foo', 'bar'],
+    references: ['parent-id'],
+    text: 'Annotation text',
+    tags: ['tag_1', 'tag_2']
+  };
+}
+
 /** Return a new annotation which has no tags or text. */
 function newEmptyAnnotation() {
   return {
@@ -111,6 +123,7 @@ module.exports = {
   newAnnotation: newAnnotation,
   newEmptyAnnotation: newEmptyAnnotation,
   newHighlight: newHighlight,
+  newReply: newReply,
   oldAnnotation: oldAnnotation,
   oldHighlight: oldHighlight,
   oldPageNote: oldPageNote,

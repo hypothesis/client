@@ -175,7 +175,7 @@ function AnnotationController(
 
   function onGroupFocused() {
     // New annotations move to the new group, when a new group is focused.
-    if (isNew(vm.annotation)) {
+    if (isNew(vm.annotation) && !isReply(vm.annotation)) {
       vm.annotation.group = groups.focused().id;
     }
   }
