@@ -106,18 +106,6 @@ var appBundles = [{
   name: 'injector',
   entry: './h/static/scripts/annotator/main',
   transforms: ['coffee'],
-},{
-  // Public-facing website
-  name: 'site',
-  entry: './h/static/scripts/site',
-},{
-  // Admin areas of the site
-  name: 'admin-site',
-  entry: './h/static/scripts/admin-site',
-},{
-  // Legacy site bundle (for old homepage)
-  name: 'legacy-site',
-  entry: './h/static/scripts/legacy-site',
 }];
 
 var appBundleConfigs = appBundles.map(function (config) {
@@ -155,21 +143,15 @@ gulp.task('watch-extension-js', ['build-vendor-js'], function () {
 
 var styleFiles = [
   // H
-  './h/static/styles/admin.scss',
   './h/static/styles/annotator/inject.scss',
   './h/static/styles/annotator/pdfjs-overrides.scss',
   './h/static/styles/app.scss',
-  './h/static/styles/front-page/main.css',
-  './h/static/styles/help-page.scss',
-  './h/static/styles/site.scss',
-  './h/static/styles/old-home.scss',
 
   // Vendor
   './h/static/styles/vendor/angular-csp.css',
   './h/static/styles/vendor/icomoon.css',
   './h/static/styles/vendor/katex.min.css',
   './node_modules/angular-toastr/dist/angular-toastr.css',
-  './node_modules/bootstrap/dist/css/bootstrap.css',
 ];
 
 gulp.task('build-css', function () {
