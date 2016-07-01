@@ -887,6 +887,15 @@ describe('annotation', function() {
         assert.notCalled(fakeDrafts.remove);
       });
 
+      it('does not remove the current annotation if the scope was destroyed', function () {
+        var annotation = fixtures.newEmptyAnnotation();
+        var parts = createDirective(annotation);
+        parts.scope.$destroy();
+        $rootScope.$emit(events.BEFORE_ANNOTATION_CREATED,
+          fixtures.newAnnotation());
+        assert.notCalled(fakeDrafts.remove);
+      });
+
       it('does not remove the current annotation if it has text', function () {
         var annotation = fixtures.newAnnotation();
         createDirective(annotation);

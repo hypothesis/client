@@ -123,8 +123,17 @@ function AnnotationController(
     newlyCreatedByHighlightButton = vm.annotation.$highlight || false;
 
     // When a new annotation is created, remove any existing annotations that
-    // are empty
-    $rootScope.$on(events.BEFORE_ANNOTATION_CREATED, deleteIfNewAndEmpty);
+    // are empty.
+    //
+    // This event is currently emitted with $emit rather than $broadcast so
+    // we have to listen for it on the $rootScope and manually de-register
+    // on destruction.
+    var removeNewAnnotListener =
+      $rootScope.$on(events.BEFORE_ANNOTATION_CREATED, deleteIfNewAndEmpty);
+
+    vm.$onDestroy = function () {
+      removeNewAnnotListener();
+    };
 
     // Call `onGroupFocused()` whenever the currently-focused group changes.
     $scope.$on(events.GROUP_FOCUSED, onGroupFocused);
