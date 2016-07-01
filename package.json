@@ -61,6 +61,7 @@
     "karma-phantomjs-launcher": "^0.2.3",
     "karma-sinon": "^1.0.4",
     "lodash.debounce": "^4.0.3",
+    "lodash.get": "^4.3.0",
     "mkdirp": "^0.5.1",
     "mocha": "^2.4.5",
     "ng-tags-input": "^3.1.1",

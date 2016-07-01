@@ -9,8 +9,8 @@ var events = require('../events');
 var noCallThru = require('./util').noCallThru;
 
 var searchClients;
-function FakeSearchClient(resource, opts) {
-  assert.ok(resource);
+function FakeSearchClient(searchFn, opts) {
+  assert.ok(searchFn);
   searchClients.push(this);
   this.cancel = sinon.stub();
   this.incremental = !!opts.incremental;
@@ -118,7 +118,7 @@ describe('WidgetController', function () {
     fakeSettings = {};
 
     fakeStore = {
-      SearchResource: {},
+      search: sinon.stub(),
     };
 
     $provide.value('VirtualThreadList', FakeVirtualThreadList);
