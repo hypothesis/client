@@ -19,6 +19,10 @@ require('raf').polyfill();
 // app itself.
 require('./polyfills');
 
+// PhantomJS 2.x includes a `URL` constructor so `new URL` works
+// but it appears to be broken.
+require('js-polyfills/url');
+
 // disallow console output during tests
 ['debug', 'log', 'warn', 'error'].forEach(function (method) {
   var realFn = window.console[method];
