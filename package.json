@@ -37,6 +37,7 @@
     "dom-seek": "^1.0.1",
     "end-of-stream": "^1.1.0",
     "escape-html": "^1.0.3",
+    "escape-string-regexp": "^1.0.5",
     "exorcist": "^0.4.0",
     "extend": "^2.0.0",
     "gulp": "^3.9.1",
