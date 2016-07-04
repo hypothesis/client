@@ -9,7 +9,6 @@
 module.exports = {
   bundles: {
     jquery: ['jquery'],
-    bootstrap: ['bootstrap'],
     polyfills: [require.resolve('../../h/static/scripts/polyfills')],
     angular: [
       'angular',
