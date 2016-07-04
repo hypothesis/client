@@ -99,6 +99,7 @@ describe('WidgetController', function () {
 
     fakeStreamer = {
       setConfig: sandbox.spy(),
+      connect: sandbox.spy(),
     };
 
     fakeStreamFilter = {
@@ -438,6 +439,27 @@ describe('WidgetController', function () {
       annotationUI.selectAnnotations(['123']);
       $scope.$digest();
       assert.isFalse($scope.shouldShowLoggedOutMessage());
+    });
+  });
+
+  describe('deferred websocket connection', function () {
+    it('should connect the websocket the first time the sidebar opens', function () {
+      $rootScope.$emit('sidebarOpened');
+      assert.called(fakeStreamer.connect);
+    });
+
+    describe('when logged in user changes', function () {
+      it('should not reconnect if the sidebar is closed', function () {
+        $rootScope.$emit(events.USER_CHANGED);
+        assert.notCalled(fakeStreamer.connect);
+      });
+
+      it('should reconnect if the sidebar is open', function () {
+        $rootScope.$emit('sidebarOpened');
+        fakeStreamer.connect.reset();
+        $rootScope.$emit(events.USER_CHANGED);
+        assert.called(fakeStreamer.connect);
+      });
     });
   });
 

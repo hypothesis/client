@@ -63,6 +63,41 @@ function Streamer($rootScope, annotationMapper, groups, session, settings) {
     session.update(message.model);
   }
 
+  function handleSocketOnError (event) {
+    console.warn('Error connecting to H push notification service:', event);
+
+    // In development, warn if the connection failure might be due to
+    // the app's origin not having been whitelisted in the H service's config.
+    //
+    // Unfortunately the error event does not provide a way to get at the
+    // HTTP status code for HTTP -> WS upgrade requests.
+    var websocketHost = new URL(settings.websocketUrl).hostname;
+    if (['localhost', '127.0.0.1'].indexOf(websocketHost) !== -1) {
+      console.warn('Check that your H service is configured to allow ' +
+                   'WebSocket connections from ' + window.location.origin);
+    }
+  }
+
+  function handleSocketOnMessage (event) {
+    // Wrap message dispatches in $rootScope.$apply() so that
+    // scope watches on app state affected by the received message
+    // are updated
+    $rootScope.$apply(function () {
+      var message = JSON.parse(event.data);
+      if (!message) {
+        return;
+      }
+
+      if (message.type === 'annotation-notification') {
+        handleAnnotationNotification(message);
+      } else if (message.type === 'session-change') {
+        handleSessionChangeNotification(message);
+      } else {
+        console.warn('received unsupported notification', message.type);
+      }
+    });
+  }
+
   function sendClientConfig () {
     Object.keys(configMessages).forEach(function (key) {
       if (configMessages[key]) {
@@ -83,73 +118,53 @@ function Streamer($rootScope, annotationMapper, groups, session, settings) {
     }
   }
 
-  var connect = function () {
-    // If we have no URL configured, don't do anything.
+  var _connect = function () {
     var url = settings.websocketUrl;
+
+    // If we have no URL configured, don't do anything.
     if (!url) {
       return;
     }
 
-    // Open a new socket
-    if (socket) {
-      socket.close();
-    }
-
     socket = new Socket(url);
+
+    socket.on('open', sendClientConfig);
+    socket.on('error', handleSocketOnError);
+    socket.on('message', handleSocketOnMessage);
+
+    // Configure the client ID
     setConfig('client-id', {
       messageType: 'client_id',
       value: clientId,
     });
-
-    socket.on('open', function () {
-      sendClientConfig();
-    });
-
-    socket.on('error', function (event) {
-      console.warn('Error connecting to H push notification service:', event);
-
-      // In development, warn if the connection failure might be due to
-      // the app's origin not having been whitelisted in the H service's config.
-      //
-      // Unfortunately the error event does not provide a way to get at the
-      // HTTP status code for HTTP -> WS upgrade requests.
-      var websocketHost = new URL(url).hostname;
-      if (['localhost', '127.0.0.1'].indexOf(websocketHost) !== -1) {
-        console.warn('Check that your H service is configured to allow ' +
-                     'WebSocket connections from ' + window.location.origin);
-      }
-    });
-
-    socket.on('message', function (event) {
-      // Wrap message dispatches in $rootScope.$apply() so that
-      // scope watches on app state affected by the received message
-      // are updated
-      //
-      // Note: The use of $apply() here will no longer be needed once session
-      // state is moved to the Redux store in `annotationUI`.
-      $rootScope.$apply(function () {
-        var message = JSON.parse(event.data);
-        if (!message) {
-          return;
-        }
-
-        if (message.type === 'annotation-notification') {
-          handleAnnotationNotification(message);
-        } else if (message.type === 'session-change') {
-          handleSessionChangeNotification(message);
-        } else {
-          console.warn('received unsupported notification', message.type);
-        }
-      });
-    });
   };
 
-  connect();
+  var connect = function () {
+    if (socket) {
+      return;
+    }
 
-  this.connect = connect;
+    _connect();
+  };
+
+  var reconnect = function () {
+    if (socket) {
+      socket.close();
+    }
+
+    _connect();
+  };
+
   this.clientId = clientId;
+  this.configMessages = configMessages;
+  this.connect = connect;
+  this.reconnect = reconnect;
   this.setConfig = setConfig;
-  this.socket = socket;
+
+  // If the user is logged in, we connect nevertheless
+  if (session && session.state && session.state.userid) {
+    connect();
+  }
 }
 
 module.exports = Streamer;
