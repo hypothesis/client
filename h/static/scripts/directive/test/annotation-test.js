@@ -474,57 +474,36 @@ describe('annotation', function() {
 
       it('creates a new reply with the proper uri and references', function() {
         var controller = createDirective(annotation).controller;
-        controller.reply();
-        var match = sinon.match({
+        var reply = sinon.match({
           references: [annotation.id],
           uri: annotation.uri
         });
-        assert.calledWith(fakeAnnotationMapper.createAnnotation, match);
+        controller.reply();
+        assert.calledWith(fakeAnnotationMapper.createAnnotation, reply);
       });
 
-      it('makes the annotation shared if the parent is shared', function() {
+      it('makes the reply shared if the parent is shared', function() {
         var controller = createDirective(annotation).controller;
-        var reply = {};
-        fakeAnnotationMapper.createAnnotation.returns(reply);
-        fakePermissions.isShared.returns(true);
-        controller.reply();
-        assert.deepEqual(reply.permissions, {
-          read: ['everybody']
+        var perms = {read: ['agroup']};
+        var reply = sinon.match({
+          references: [annotation.id],
+          permissions: perms,
+          uri: annotation.uri
         });
-      });
-
-      it('makes the annotation shared if the parent is shared', function() {
-        var annotation = fixtures.defaultAnnotation();
-        annotation.group = 'my group';
-        annotation.permissions = {
-          read: ['my-group'],
-        };
-        var controller = createDirective(annotation).controller;
-        var reply = {};
-        fakeAnnotationMapper.createAnnotation.returns(reply);
-        fakePermissions.isShared = function(permissions, group) {
-          return permissions.read.indexOf(group) !== -1;
-        };
-        fakePermissions.shared = function(group) {
-          return {
-            read: [group]
-          };
-        };
+        fakePermissions.isShared.returns(true);
+        fakePermissions.shared.returns(perms);
         controller.reply();
-        assert.notEqual(reply.permissions.read.indexOf('my group'), -1);
+        assert.calledWith(fakeAnnotationMapper.createAnnotation, reply);
       });
 
-      it(
-        'does not add the world readable principal if the parent is private',
-        function() {
+      it('makes the reply private if the parent is private', function() {
           var controller = createDirective(annotation).controller;
           fakePermissions.isPrivate.returns(true);
-          var reply = {};
-          fakeAnnotationMapper.createAnnotation.returns(reply);
+          var perms = {read: ['onlyme']};
+          fakePermissions.private.returns(perms);
+          var reply = sinon.match({permissions: perms});
           controller.reply();
-          assert.deepEqual(reply.permissions, {
-            read: ['justme']
-          });
+          assert.calledWith(fakeAnnotationMapper.createAnnotation, reply);
         }
       );
 
@@ -532,10 +511,9 @@ describe('annotation', function() {
         var annotation = fixtures.defaultAnnotation();
         annotation.group = 'my group';
         var controller = createDirective(annotation).controller;
-        var reply = {};
-        fakeAnnotationMapper.createAnnotation.returns(reply);
+        var reply = sinon.match({group: annotation.group});
         controller.reply();
-        assert.equal(reply.group, annotation.group);
+        assert.calledWith(fakeAnnotationMapper.createAnnotation, reply);
       });
     });
 
@@ -927,18 +905,26 @@ describe('annotation', function() {
         assert.equal(annotation.group, 'new-group-id');
       });
 
-      it('does not modify the group of saved annotations',
-        function () {
-          var annotation = fixtures.oldAnnotation();
-          annotation.group = 'old-group-id';
-          createDirective(annotation);
-          fakeGroups.focused = sandbox.stub().returns({id: 'new-group-id'});
+      it('does not move replies to the focused group', function () {
+        var annotation = fixtures.newReply();
+        fakeGroups.focused = sandbox.stub().returns({id: 'new-group-id'});
+        createDirective(annotation);
+        fakeGroups.focused = sandbox.stub().returns({id: 'new-group-id-2'});
+        $rootScope.$broadcast(events.GROUP_FOCUSED);
 
-          $rootScope.$broadcast(events.GROUP_FOCUSED);
+        assert.equal(annotation.group, 'new-group-id');
+      });
 
-          assert.equal(annotation.group, 'old-group-id');
-        }
-      );
+      it('does not modify the group of saved annotations', function () {
+        var annotation = fixtures.oldAnnotation();
+        annotation.group = 'old-group-id';
+        createDirective(annotation);
+        fakeGroups.focused = sandbox.stub().returns({id: 'new-group-id'});
+
+        $rootScope.$broadcast(events.GROUP_FOCUSED);
+
+        assert.equal(annotation.group, 'old-group-id');
+      });
     });
 
     describe('reverting edits', function () {

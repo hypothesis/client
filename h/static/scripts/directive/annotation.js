@@ -175,7 +175,7 @@ function AnnotationController(
 
   function onGroupFocused() {
     // New annotations move to the new group, when a new group is focused.
-    if (isNew(vm.annotation)) {
+    if (isNew(vm.annotation) && !isReply(vm.annotation)) {
       vm.annotation.group = groups.focused().id;
     }
   }
@@ -359,19 +359,18 @@ function AnnotationController(
     */
   vm.reply = function() {
     var references = (vm.annotation.references || []).concat(vm.annotation.id);
-    var reply = annotationMapper.createAnnotation({
-      references: references,
-      uri: vm.annotation.uri
-    });
-    reply.group = vm.annotation.group;
-
+    var group = vm.annotation.group;
+    var replyPermissions;
     if (session.state.userid) {
-      if (vm.state().isPrivate) {
-        reply.permissions = permissions.private();
-      } else {
-        reply.permissions = permissions.shared(reply.group);
-      }
+      replyPermissions = vm.state().isPrivate ?
+        permissions.private() : permissions.shared(group);
     }
+    annotationMapper.createAnnotation({
+      group: group,
+      references: references,
+      permissions: replyPermissions,
+      uri: vm.annotation.uri,
+    });
   };
 
   /**
