@@ -10,13 +10,13 @@ function authStateFromUserID(userid) {
   if (userid) {
     var parsed = parseAccountID(userid);
     return {
-      status: 'signed-in',
+      status: 'logged-in',
       userid: userid,
       username: parsed.username,
       provider: parsed.provider,
     };
   } else {
-    return {status: 'signed-out'};
+    return {status: 'logged-out'};
   }
 }
 

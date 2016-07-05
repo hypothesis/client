@@ -64,7 +64,7 @@ describe('groupList', function () {
   function createGroupList() {
     return util.createDirective(document, 'groupList', {
       auth: {
-        status: 'signed-in',
+        status: 'logged-in',
       },
     });
   }

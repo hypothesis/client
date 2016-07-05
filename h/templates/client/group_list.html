@@ -1,4 +1,4 @@
-<span ng-if="auth.status === 'signed-out'"
+<span ng-if="auth.status === 'logged-out'"
       ng-switch on="groups.focused().public">
   <i class="group-list-label__icon h-icon-public" ng-switch-when="true"></i><!-- nospace
   !--><i class="group-list-label__icon h-icon-group" ng-switch-default></i>
@@ -6,7 +6,7 @@
 </span>
 
 <div class="pull-right"
-     ng-if="auth.status === 'signed-in'"
+     ng-if="auth.status === 'logged-in'"
      dropdown
      keyboard-nav>
   <div class="dropdown-toggle"

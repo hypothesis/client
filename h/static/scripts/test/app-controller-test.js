@@ -140,20 +140,20 @@ describe('AppController', function () {
     assert.equal($scope.auth.status, 'unknown');
   });
 
-  it('sets auth.status to "signed-out" if userid is null', function () {
+  it('sets auth.status to "logged-out" if userid is null', function () {
     createController();
     return fakeSession.load().then(function () {
-      assert.equal($scope.auth.status, 'signed-out');
+      assert.equal($scope.auth.status, 'logged-out');
     });
   });
 
-  it('sets auth.status to "signed-in" if userid is non-null', function () {
+  it('sets auth.status to "logged-in" if userid is non-null', function () {
     fakeSession.load = function () {
       return Promise.resolve({userid: 'acct:jim@hypothes.is'});
     };
     createController();
     return fakeSession.load().then(function () {
-      assert.equal($scope.auth.status, 'signed-in');
+      assert.equal($scope.auth.status, 'logged-in');
     });
   });
 
@@ -177,7 +177,7 @@ describe('AppController', function () {
         userid: 'acct:john@hypothes.is',
       });
       assert.deepEqual($scope.auth, {
-        status: 'signed-in',
+        status: 'logged-in',
         userid: 'acct:john@hypothes.is',
         username: 'john',
         provider: 'hypothes.is',
