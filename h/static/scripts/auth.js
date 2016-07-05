@@ -2,7 +2,7 @@
 
 /**
  * Provides functions for retrieving and caching API tokens required by
- * API requests and signing out of the API.
+ * API requests and logging out of the API.
  */
 
 var queryString = require('query-string');
@@ -12,7 +12,7 @@ var INITIAL_TOKEN = {
   userid: undefined,
   // Promise for the API token for 'userid'.
   // This is initialized when fetchOrReuseToken() is called and
-  // reset when signing out via logout()
+  // reset when logging out via logout()
   token: undefined,
 };
 
@@ -106,9 +106,9 @@ function clearCache() {
 // @ngInject
 function authService(flash, session) {
   /**
-   * Sign out from the API and clear any cached tokens.
+   * Log out from the API and clear any cached tokens.
    *
-   * @return {Promise<void>} - A promise for when signout has completed.
+   * @return {Promise<void>} - A promise for when logout has completed.
    */
   function logout() {
     return session.logout({}).$promise
@@ -116,7 +116,7 @@ function authService(flash, session) {
         clearCache();
       })
       .catch(function(err) {
-        flash.error('Sign out failed!');
+        flash.error('Log out failed!');
         throw err;
       });
   }

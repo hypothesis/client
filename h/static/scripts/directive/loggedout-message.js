@@ -11,7 +11,7 @@ module.exports = function () {
     restrict: 'E',
     scope: {
       /**
-       * Called when the user clicks on the "Sign in" text.
+       * Called when the user clicks on the "Log in" text.
        */
       onLogin: '&',
     },

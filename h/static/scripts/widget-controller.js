@@ -361,7 +361,7 @@ module.exports = function WidgetController(
 
   $scope.shouldShowLoggedOutMessage = function () {
     // If user is not logged out, don't show CTA.
-    if ($scope.auth.status !== 'signed-out') {
+    if ($scope.auth.status !== 'logged-out') {
       return false;
     }
 

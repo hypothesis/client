@@ -19,11 +19,11 @@ module.exports = function () {
        */
       onShowHelpPanel: '&',
       /**
-       * Called when the user clicks on the "Sign in" text.
+       * Called when the user clicks on the "Log in" text.
        */
       onLogin: '&',
       /**
-       * Called when the user clicks on the "Sign out" text.
+       * Called when the user clicks on the "Log out" text.
        */
       onLogout: '&',
       /**
@@ -33,6 +33,6 @@ module.exports = function () {
        */
       newStyle: '<',
     },
-    template: require('../../../templates/client/signin_control.html'),
+    template: require('../../../templates/client/login_control.html'),
   };
 };
