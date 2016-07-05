@@ -6,16 +6,10 @@ var get = require('lodash.get');
 var retryUtil = require('./retry-util');
 var urlUtil = require('./util/url-util');
 
-function prependTransform(defaults, transform) {
-  // We can't guarantee that the default transformation is an array
-  var result = angular.isArray(defaults) ? defaults.slice(0) : [defaults];
-  result.unshift(transform);
-  return result;
-}
-
-// stripInternalProperties returns a shallow clone of `obj`, lacking all
-// properties that begin with a character that marks them as internal
-// (currently '$' or '_');
+/**
+ * Return a shallow clone of `obj` with all client-only properties removed.
+ * Client-only properties are marked by a '$' prefix.
+ */
 function stripInternalProperties(obj) {
   var result = {};
 
@@ -95,15 +89,11 @@ function createAPICall($http, links, route) {
       var descriptor = get(links, route);
       var url = urlUtil.replaceURLParams(descriptor.url, params);
       var req = {
-        data: data,
+        data: data ? stripInternalProperties(data) : null,
         method: descriptor.method,
         params: url.params,
         paramSerializer: serializeParams,
         url: url.url,
-        transformRequest: prependTransform(
-          $http.defaults.transformRequest,
-          stripInternalProperties
-        ),
       };
       return $http(req);
     }).then(function (result) {
