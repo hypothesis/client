@@ -9,7 +9,7 @@ module.exports = {
 
   /** The list of groups changed */
   GROUPS_CHANGED: 'groupsChanged',
-  /** The signed-in user changed */
+  /** The logged-in user changed */
   USER_CHANGED: 'userChanged',
   /**
    * The session state was updated.

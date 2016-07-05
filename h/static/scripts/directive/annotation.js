@@ -388,7 +388,7 @@ function AnnotationController(
 
   vm.save = function() {
     if (!vm.annotation.user) {
-      flash.info('Please sign in to save your annotations.');
+      flash.info('Please log in to save your annotations.');
       return Promise.resolve();
     }
     if (!vm.hasContent() && vm.isShared()) {

@@ -19,11 +19,11 @@ module.exports = function () {
        */
       onShowHelpPanel: '&',
       /**
-       * Called when the user clicks on the "Sign in" text.
+       * Called when the user clicks on the "Log in" text.
        */
       onLogin: '&',
       /**
-       * Called when the user clicks on the "Sign out" text.
+       * Called when the user clicks on the "Log out" text.
        */
       onLogout: '&',
       /**
