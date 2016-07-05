@@ -1,6 +1,5 @@
 'use strict';
 
-var angular = require('angular');
 var get = require('lodash.get');
 
 var retryUtil = require('./retry-util');
@@ -33,8 +32,8 @@ function forEachSorted(obj, iterator, context) {
 
 
 function serializeValue(v) {
-  if (angular.isObject(v)) {
-    return angular.isDate(v) ? v.toISOString() : angular.toJson(v);
+  if (typeof v === 'object') {
+    return v instanceof Date ? v.toISOString() : JSON.stringify(v);
   }
   return v;
 }
@@ -63,8 +62,8 @@ function serializeParams(params) {
     if (value === null || typeof value === 'undefined') {
       return;
     }
-    if (angular.isArray(value)) {
-      angular.forEach(value, function(v, k) {
+    if (Array.isArray(value)) {
+      value.forEach(function(v) {
         parts.push(encodeUriQuery(key)  + '=' + encodeUriQuery(serializeValue(v)));
       });
     } else {
