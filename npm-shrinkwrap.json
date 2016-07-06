@@ -3469,11 +3469,6 @@
       "from": "pff@>=1.0.0 <1.1.0",
       "resolved": "https://registry.npmjs.org/pff/-/pff-1.0.0.tgz"
     },
-    "phantom-ownpropertynames": {
-      "version": "1.0.0",
-      "from": "phantom-ownpropertynames@>=1.0.0 <2.0.0",
-      "resolved": "https://registry.npmjs.org/phantom-ownpropertynames/-/phantom-ownpropertynames-1.0.0.tgz"
-    },
     "pify": {
       "version": "2.3.0",
       "from": "pify@>=2.0.0 <3.0.0",
