@@ -74,7 +74,7 @@
     "raf": "^3.1.0",
     "raven-js": "^2.0.2",
     "redux": "^3.5.2",
-    "request": "^2.71.0",
+    "request": "^2.72.0",
     "retry": "^0.8.0",
     "scroll-into-view": "^1.3.1",
     "seamless-immutable": "^6.0.1",
@@ -135,6 +135,9 @@
   "scripts": {
     "build": "gulp build-app",
     "deps": "check-dependencies",
-    "test": "gulp test-app"
+    "test": "gulp test-app",
+    "preversion": "npm run test",
+    "version": "make clean all && ./scripts/update-changelog.js && git add CHANGELOG.md",
+    "postversion": "git push && git push --tags && ./scripts/create-github-release.js"
   }
 }
