@@ -98,11 +98,11 @@ describe('store', function () {
     var annotation = {
       $highlight: true,
       $notme: 'nooooo!',
-      allowed: 123
+      allowed: 123,
     };
     store.annotation.create({}, annotation);
     $httpBackend.expectPOST('http://example.com/api/annotations', {
-      allowed: 123
+      allowed: 123,
     })
     .respond(function () { return {id: 'test'}; });
     $httpBackend.flush();

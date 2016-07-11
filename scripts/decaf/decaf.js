@@ -53,7 +53,7 @@ var stripReturnPatterns = [
   // Unit test cases
   /it\(/,
   // Assignments in setters etc.
-  /[^=]+=[^=]+/
+  /[^=]+=[^=]+/,
 ];
 
 /**

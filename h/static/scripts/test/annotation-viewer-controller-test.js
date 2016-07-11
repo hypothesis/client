@@ -16,7 +16,7 @@ function FakeStore(annots) {
         });
       }
       return Promise.resolve(result);
-    }
+    },
   };
 
   this.search = function (query) {
@@ -59,7 +59,7 @@ describe('AnnotationViewerController', function () {
       annotationUI: {
         setCollapsed: sinon.stub(),
         highlightAnnotations: sinon.stub(),
-        subscribe: sinon.stub()
+        subscribe: sinon.stub(),
       },
       rootThread: {thread: sinon.stub()},
       streamer: { setConfig: function () {} },
@@ -69,12 +69,12 @@ describe('AnnotationViewerController', function () {
           return {
             addClause: function () {
               return {
-                addClause: function () {}
+                addClause: function () {},
               };
-            }
+            },
           };
         },
-        getFilter: function () {}
+        getFilter: function () {},
       },
       annotationMapper: {
         loadAnnotations: sinon.spy(),

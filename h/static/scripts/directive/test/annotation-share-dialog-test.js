@@ -25,7 +25,7 @@ describe('annotationShareDialog', function () {
   describe('The annotation share dialog', function () {
     it('has class is-open set when it is open', function () {
       element = util.createDirective(document, 'annotationShareDialog', {
-        isOpen: true
+        isOpen: true,
       });
 
       assert.isOk(element.find('.annotation-share-dialog').hasClass('is-open'));
@@ -33,7 +33,7 @@ describe('annotationShareDialog', function () {
 
     it('does not have class is-open set when it is not open', function () {
       element = util.createDirective(document, 'annotationShareDialog', {
-        isOpen: false
+        isOpen: false,
       });
 
       assert.isNotOk(element.find('.annotation-share-dialog').hasClass('is-open'));
@@ -51,7 +51,7 @@ describe('annotationShareDialog', function () {
           group: {
             name: 'Public',
             type: 'public',
-            public: true
+            public: true,
           },
           uri: 'fakeURI',
           isPrivate: false,
@@ -101,9 +101,9 @@ describe('annotationShareDialog', function () {
     it('is available to a group', function () {
       element = util.createDirective(document, 'annotationShareDialog', {
         group: {
-          public: false
+          public: false,
         },
-        isPrivate: false
+        isPrivate: false,
       });
 
       var actualMessage = element.find('.annotation-share-dialog-msg').text();
@@ -116,7 +116,7 @@ describe('annotationShareDialog', function () {
 
     it('is private', function () {
       element = util.createDirective(document, 'annotationShareDialog', {
-        isPrivate: true
+        isPrivate: true,
       });
 
       var actualMessage = element.find('.annotation-share-dialog-msg').text();

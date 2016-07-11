@@ -19,7 +19,7 @@ module.exports = {
       'ng-tags-input',
       'angular-toastr',
       'angulartics/src/angulartics',
-      'angulartics/src/angulartics-ga'
+      'angulartics/src/angulartics-ga',
     ],
     katex: ['katex'],
     showdown: ['showdown'],
@@ -39,5 +39,5 @@ module.exports = {
   noParseModules: [
     'jquery',
     'katex',
-  ]
+  ],
 };

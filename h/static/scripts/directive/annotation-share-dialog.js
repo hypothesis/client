@@ -71,6 +71,6 @@ module.exports = function () {
       isPrivate: '<',
       isOpen: '<',
       onClose: '&',
-    }
+    },
   };
 };

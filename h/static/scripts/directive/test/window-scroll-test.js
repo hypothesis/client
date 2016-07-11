@@ -23,7 +23,7 @@ describe('windowScroll', function () {
     html = {};
     view = {
       addEventListener: sinon.spy(),
-      removeEventListener: sinon.spy()
+      removeEventListener: sinon.spy(),
     };
 
     doc = {documentElement: html, defaultView: view};

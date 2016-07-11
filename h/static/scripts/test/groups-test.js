@@ -11,8 +11,8 @@ var sessionWithThreeGroups = function() {
         {name: 'Group 1', id: 'id1'},
         {name: 'Group 2', id: 'id2'},
         {name: 'Group 3', id: 'id3'},
-      ]
-    }
+      ],
+    },
   };
 };
 
@@ -22,7 +22,7 @@ describe('groups', function() {
   var fakeRootScope;
   var fakeHttp;
   var fakeSettings = {
-    serviceUrl: 'https://test.hypothes.is/'
+    serviceUrl: 'https://test.hypothes.is/',
   };
   var sandbox;
 
@@ -32,7 +32,7 @@ describe('groups', function() {
     fakeSession = sessionWithThreeGroups();
     fakeLocalStorage = {
       getItem: sandbox.stub(),
-      setItem: sandbox.stub()
+      setItem: sandbox.stub(),
     };
     fakeRootScope = {
       eventCallbacks: [],
@@ -43,7 +43,7 @@ describe('groups', function() {
         if (event === events.GROUPS_CHANGED) {
           this.eventCallbacks.push(callback);
         }
-      }
+      },
     };
     fakeHttp = sandbox.stub();
   });
@@ -73,7 +73,7 @@ describe('groups', function() {
       assert.deepEqual(groups, [
         {name: 'Group 1', id: 'id1'},
         {name: 'Group 2', id: 'id2'},
-        {name: 'Group 3', id: 'id3'}
+        {name: 'Group 3', id: 'id3'},
       ]);
     });
   });
@@ -177,7 +177,7 @@ describe('groups', function() {
       s.leave('id2');
       assert.calledWithMatch(fakeHttp, {
         url: fakeSettings.serviceUrl + 'groups/id2/leave',
-        method: 'POST'
+        method: 'POST',
       });
     });
   });

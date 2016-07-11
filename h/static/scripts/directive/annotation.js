@@ -441,7 +441,7 @@ function AnnotationController(
     drafts.update(vm.annotation, {
       tags: vm.state().tags,
       text: vm.state().text,
-      isPrivate: privacy === 'private'
+      isPrivate: privacy === 'private',
     });
   };
 
@@ -544,7 +544,7 @@ function annotation() {
       showDocumentInfo: '<',
       onReplyCountClick: '&',
       replyCount: '<',
-      isCollapsed: '<'
+      isCollapsed: '<',
     },
     template: require('../../../templates/client/annotation.html'),
   };
@@ -560,5 +560,5 @@ module.exports = {
 
   // These are meant to be the public API of this module.
   directive: annotation,
-  Controller: AnnotationController
+  Controller: AnnotationController,
 };

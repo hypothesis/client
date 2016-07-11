@@ -34,7 +34,7 @@ module.exports = function () {
       isShared: '<',
       onCancel: '&',
       onSave: '&',
-      onSetPrivacy: '&'
+      onSetPrivacy: '&',
     },
     template: require('../../../templates/client/publish_annotation_btn.html'),
   };

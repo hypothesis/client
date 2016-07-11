@@ -32,7 +32,7 @@ function annotationDirective() {
       domainAndTitle: function (annot) { // eslint-disable-line no-unused-vars
         return fakeDocumentMeta;
       },
-    }
+    },
   });
 
   return annotation.directive;
@@ -125,10 +125,10 @@ describe('annotation', function() {
             read: ['acct:bill@localhost'],
             update: ['acct:bill@localhost'],
             destroy: ['acct:bill@localhost'],
-            admin: ['acct:bill@localhost']
-          }
+            admin: ['acct:bill@localhost'],
+          },
         }),
-        deleteAnnotation: sandbox.stub()
+        deleteAnnotation: sandbox.stub(),
       };
 
       var fakeAnnotationUI = {};
@@ -136,7 +136,7 @@ describe('annotation', function() {
       fakeDrafts = {
         update: sandbox.stub(),
         remove: sandbox.stub(),
-        get: sandbox.stub()
+        get: sandbox.stub(),
       };
 
       var fakeFeatures = {
@@ -152,21 +152,21 @@ describe('annotation', function() {
         isPrivate: sandbox.stub().returns(false),
         permits: sandbox.stub().returns(true),
         shared: sandbox.stub().returns({
-          read: ['everybody']
+          read: ['everybody'],
         }),
         'private': sandbox.stub().returns({
-          read: ['justme']
+          read: ['justme'],
         }),
         'default': sandbox.stub().returns({
-          read: ['default']
+          read: ['default'],
         }),
-        setDefault: sandbox.stub()
+        setDefault: sandbox.stub(),
       };
 
       fakeSession = {
         state: {
-          userid: 'acct:bill@localhost'
-        }
+          userid: 'acct:bill@localhost',
+        },
       };
 
       var fakeSettings = {
@@ -177,7 +177,7 @@ describe('annotation', function() {
         focused: function() {
           return {};
         },
-        get: function() {}
+        get: function() {},
       };
 
       fakeStore = {
@@ -270,8 +270,8 @@ describe('annotation', function() {
             read: ['foo'],
             update: ['bar'],
             'delete': ['gar'],
-            admin: ['har']
-          }
+            admin: ['har'],
+          },
         };
         var originalPermissions = JSON.parse(JSON.stringify(
           annotation.permissions));
@@ -454,7 +454,7 @@ describe('annotation', function() {
         createDirective(annotation);
         $scope.$digest();
         assert.deepEqual(annotation.permissions, {
-          read: ['justme']
+          read: ['justme'],
         });
       });
     });
@@ -468,7 +468,7 @@ describe('annotation', function() {
           read: ['acct:joe@localhost'],
           update: ['acct:joe@localhost'],
           destroy: ['acct:joe@localhost'],
-          admin: ['acct:joe@localhost']
+          admin: ['acct:joe@localhost'],
         };
       });
 
@@ -476,7 +476,7 @@ describe('annotation', function() {
         var controller = createDirective(annotation).controller;
         var reply = sinon.match({
           references: [annotation.id],
-          uri: annotation.uri
+          uri: annotation.uri,
         });
         controller.reply();
         assert.calledWith(fakeAnnotationMapper.createAnnotation, reply);
@@ -488,7 +488,7 @@ describe('annotation', function() {
         var reply = sinon.match({
           references: [annotation.id],
           permissions: perms,
-          uri: annotation.uri
+          uri: annotation.uri,
         });
         fakePermissions.isShared.returns(true);
         fakePermissions.shared.returns(perms);
@@ -582,10 +582,10 @@ describe('annotation', function() {
           {
             selector: [
               {
-                type: 'TextQuoteSelector'
-              }
-            ]
-          }
+                type: 'TextQuoteSelector',
+              },
+            ],
+          },
         ];
         var controller = createDirective(annotation).controller;
 
@@ -632,7 +632,7 @@ describe('annotation', function() {
           var controller = createDirective().controller;
           sandbox.stub($window, 'confirm').returns(true);
           fakeAnnotationMapper.deleteAnnotation.returns($q.reject({
-            status: 0
+            status: 0,
           }));
           controller.delete().then(function() {
             assert.calledWith(fakeFlash.error,
@@ -649,7 +649,7 @@ describe('annotation', function() {
         fakeAnnotationMapper.deleteAnnotation.returns($q.reject({
           status: 500,
           statusText: 'Server Error',
-          data: {}
+          data: {},
         }));
         controller.delete().then(function() {
           assert.calledWith(fakeFlash.error,
@@ -708,7 +708,7 @@ describe('annotation', function() {
       it('flashes a generic error if the server can\'t be reached', function() {
         var controller = createController();
         fakeStore.annotation.create = sinon.stub().returns(Promise.reject({
-          status: 0
+          status: 0,
         }));
         return controller.save().then(function() {
           assert.calledWith(fakeFlash.error,
@@ -721,7 +721,7 @@ describe('annotation', function() {
         fakeStore.annotation.create = sinon.stub().returns(Promise.reject({
           status: 500,
           statusText: 'Server Error',
-          data: {}
+          data: {},
         }));
         return controller.save().then(function() {
           assert.calledWith(fakeFlash.error,
@@ -782,7 +782,7 @@ describe('annotation', function() {
       it('flashes a generic error if the server cannot be reached', function () {
         var controller = createController();
         fakeStore.annotation.update = sinon.stub().returns(Promise.reject({
-          status: -1
+          status: -1,
         }));
         return controller.save().then(function() {
           assert.calledWith(fakeFlash.error,
@@ -795,7 +795,7 @@ describe('annotation', function() {
         fakeStore.annotation.update = sinon.stub().returns(Promise.reject({
           status: 500,
           statusText: 'Server Error',
-          data: {}
+          data: {},
         }));
         return controller.save().then(function() {
           assert.calledWith(fakeFlash.error,
@@ -815,7 +815,7 @@ describe('annotation', function() {
       it('starts editing immediately if there is a draft', function() {
         fakeDrafts.get.returns({
           tags: ['unsaved'],
-          text: 'unsaved-text'
+          text: 'unsaved-text',
         });
         var controller = createDirective().controller;
         assert.isTrue(controller.editing());
@@ -824,7 +824,7 @@ describe('annotation', function() {
       it('uses the text and tags from the draft if present', function() {
         fakeDrafts.get.returns({
           tags: ['unsaved-tag'],
-          text: 'unsaved-text'
+          text: 'unsaved-text',
         });
         var controller = createDirective().controller;
         assert.deepEqual(controller.state().tags, ['unsaved-tag']);
@@ -947,7 +947,7 @@ describe('annotation', function() {
       it('displays links to tags on the stream', function () {
         var directive = createDirective({
           id: '1234',
-          tags: ['atag']
+          tags: ['atag'],
         });
         var links = [].slice.apply(directive.element[0].querySelectorAll('a'));
         var tagLinks = links.filter(function (link) {
@@ -964,7 +964,7 @@ describe('annotation', function() {
         var annotation = Object.assign({}, fixtures.defaultAnnotation(), {
           links: {
             html: 'https://test.hypothes.is/a/deadbeef',
-            incontext: 'https://hpt.is/deadbeef'
+            incontext: 'https://hpt.is/deadbeef',
           },
         });
         var controller = createDirective(annotation).controller;
@@ -985,7 +985,7 @@ describe('annotation', function() {
         var annotation = Object.assign({}, fixtures.defaultAnnotation(), {
           links: {
             html: 'https://test.hypothes.is/a/deadbeef',
-            incontext: 'https://hpt.is/deadbeef'
+            incontext: 'https://hpt.is/deadbeef',
           },
         });
         var controller = createDirective(annotation).controller;

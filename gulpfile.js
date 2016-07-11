@@ -293,7 +293,7 @@ function runKarma(baseConfig, opts, done) {
     client: {
       mocha: {
         grep: taskArgs.grep,
-      }
+      },
     },
   };
 

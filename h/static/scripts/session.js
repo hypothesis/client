@@ -24,7 +24,7 @@ function sessionActions(options) {
     dismiss_sidebar_tutorial: {
       method: 'POST',
       params: { path: 'dismiss_sidebar_tutorial' },
-    }
+    },
   };
 
   Object.keys(actions).forEach(function (action) {
@@ -54,7 +54,7 @@ function session($http, $resource, $rootScope, flash, raven, settings) {
   var actions = sessionActions({
     headers: headers,
     transformResponse: process,
-    withCredentials: true
+    withCredentials: true,
   });
   var endpoint = new URL('app/:path', settings.serviceUrl).href;
   var resource = $resource(endpoint, {}, actions);

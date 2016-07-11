@@ -36,11 +36,11 @@ describe('groupList', function () {
 
     groups = [{
        id: 'public',
-       public: true
+       public: true,
     },{
        id: 'h-devs',
        name: 'Hypothesis Developers',
-       url: GROUP_LINK
+       url: GROUP_LINK,
     }];
 
     fakeGroups = {

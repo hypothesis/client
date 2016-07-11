@@ -39,7 +39,7 @@ describe('pdf-metadata', function () {
       metadata: {
         metadata: {
           'dc:title': 'fakeTitle',
-        }
+        },
       },
       url: 'http://fake.com',
     };

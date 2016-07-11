@@ -74,7 +74,7 @@ function DraftStore() {
       model: model,
       isPrivate: changes.isPrivate,
       tags: changes.tags,
-      text: changes.text
+      text: changes.text,
     };
     this.remove(model);
     this._drafts.push(newDraft);

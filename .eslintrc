@@ -13,6 +13,7 @@
   "rules": {
     "array-callback-return": "error",
     "block-scoped-var": "error",
+    "comma-dangle": ["error", "always-multiline"],
     "consistent-return": "error",
     "curly": "error",
     "dot-notation": "error",

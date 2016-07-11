@@ -116,7 +116,7 @@ module.exports = function($sanitize) {
         var shortcuts = {
           66: scope.insertBold,
           73: scope.insertItalic,
-          75: scope.insertLink
+          75: scope.insertLink,
         };
 
         var shortcut = shortcuts[e.keyCode];

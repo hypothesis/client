@@ -7,6 +7,6 @@ module.exports = ['$animate', function($animate) {
       $animate.enabled(false, elem);
     },
     restrict: 'C',
-    template: '<span><span></span></span>'
+    template: '<span><span></span></span>',
   };
 }];

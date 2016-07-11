@@ -36,5 +36,5 @@ module.exports = {
       template: require('../../../templates/client/sidebar_tutorial.html'),
     };
   },
-  Controller: SidebarTutorialController
+  Controller: SidebarTutorialController,
 };

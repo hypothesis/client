@@ -12,7 +12,7 @@ describe('annotation-metadata', function () {
       it('returns the hostname from model.uri as the domain', function() {
         var model = {
           document: {},
-          uri: 'http://example.com/'
+          uri: 'http://example.com/',
         };
 
         assert.equal(documentMetadata(model).domain, 'example.com');
@@ -22,7 +22,7 @@ describe('annotation-metadata', function () {
         it('uses model.uri as the uri', function() {
           var model = {
             document: {},
-            uri: 'http://example.com/'
+            uri: 'http://example.com/',
           };
 
           assert.equal(
@@ -35,7 +35,7 @@ describe('annotation-metadata', function () {
           var model = {
             uri: 'http://example.com/',
             document: {
-              title: ['My Document', 'My Other Document']
+              title: ['My Document', 'My Other Document'],
             },
           };
 
@@ -93,7 +93,7 @@ describe('annotation-metadata', function () {
         var model = {
           links: {
             incontext: 'https://example.com',
-          }
+          },
         };
 
         assert.equal(domainAndTitle(model).titleLink, 'https://example.com');
@@ -197,8 +197,8 @@ describe('annotation-metadata', function () {
           selector: [{
             type: 'TextPositionSelector',
             start: 100,
-          }]
-        }]
+          }],
+        }],
       }), 100);
     });
 
@@ -206,7 +206,7 @@ describe('annotation-metadata', function () {
       assert.equal(annotationMetadata.location({
         target: [{
           selector: undefined,
-        }]
+        }],
       }), Number.POSITIVE_INFINITY);
     });
   });
@@ -214,23 +214,23 @@ describe('annotation-metadata', function () {
   describe('.isPageNote', function () {
     it ('returns true for an annotation with an empty target', function () {
       assert.isTrue(annotationMetadata.isPageNote({
-        target: []
+        target: [],
       }));
     });
     it ('returns true for an annotation without selectors', function () {
       assert.isTrue(annotationMetadata.isPageNote({
-        target: [{selector: undefined}]
+        target: [{selector: undefined}],
       }));
     });
     it ('returns true for an annotation without a target', function () {
       assert.isTrue(annotationMetadata.isPageNote({
-        target: undefined
+        target: undefined,
       }));
     });
     it ('returns false for an annotation which is a reply', function () {
       assert.isFalse(annotationMetadata.isPageNote({
         target: [],
-        references: ['xyz']
+        references: ['xyz'],
       }));
     });
   });
@@ -238,7 +238,7 @@ describe('annotation-metadata', function () {
   describe ('.isAnnotation', function () {
     it ('returns true if an annotation is a top level annotation', function () {
       assert.isTrue(annotationMetadata.isAnnotation({
-        target: [{selector: []}]
+        target: [{selector: []}],
       }));
     });
     it ('returns false if an annotation has no target', function () {

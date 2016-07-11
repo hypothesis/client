@@ -86,7 +86,7 @@ describe('annotationMapper', function() {
       assert.called($rootScope.$emit);
       assert.calledWith($rootScope.$emit, events.ANNOTATION_UPDATED, {
         id: 1,
-        url: 'http://example.com'
+        url: 'http://example.com',
       });
     });
 
@@ -118,7 +118,7 @@ describe('annotationMapper', function() {
       annotationMapper.unloadAnnotations(annotations);
       assert.calledWith($rootScope.$emit, events.ANNOTATIONS_UNLOADED, [{
         id: 1,
-        url: 'http://example.com'
+        url: 'http://example.com',
       }]);
     });
   });

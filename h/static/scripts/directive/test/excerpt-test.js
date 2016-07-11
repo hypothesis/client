@@ -219,7 +219,7 @@ describe('excerpt directive', function () {
         onCollapsibleChanged: {
           args: ['collapsible'],
           callback: callback,
-        }
+        },
       }, '<span></span>');
       fakeOverflowMonitor.ctrl.onOverflowChanged(true);
       assert.calledWith(callback, true);

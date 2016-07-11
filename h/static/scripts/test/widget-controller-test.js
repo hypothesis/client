@@ -81,7 +81,7 @@ describe('WidgetController', function () {
 
     fakeAnnotationMapper = {
       loadAnnotations: sandbox.spy(),
-      unloadAnnotations: sandbox.spy()
+      unloadAnnotations: sandbox.spy(),
     };
 
     fakeCrossFrame = {
@@ -98,13 +98,13 @@ describe('WidgetController', function () {
     };
 
     fakeStreamer = {
-      setConfig: sandbox.spy()
+      setConfig: sandbox.spy(),
     };
 
     fakeStreamFilter = {
       resetFilter: sandbox.stub().returnsThis(),
       addClause: sandbox.stub().returnsThis(),
-      getFilter: sandbox.stub().returns({})
+      getFilter: sandbox.stub().returns({}),
     };
 
     fakeGroups = {
@@ -334,7 +334,7 @@ describe('WidgetController', function () {
 
     it('does not clear the selection if the new annotation is a reply', function () {
       $rootScope.$emit('beforeAnnotationCreated', {
-        references: ['parent-id']
+        references: ['parent-id'],
       });
       assert.notCalled($scope.clearSelection);
     });
@@ -353,7 +353,7 @@ describe('WidgetController', function () {
         {
           uri: 'http://www.example.com',
           searchUris: [],
-        }
+        },
       ];
 
       // There is a direct-linked annotation
@@ -393,7 +393,7 @@ describe('WidgetController', function () {
 
     it('shows logged out message if selection is available', function () {
       $scope.auth = {
-        status: 'logged-out'
+        status: 'logged-out',
       };
       annotationUI.addAnnotations([{id: '123'}]);
       annotationUI.selectAnnotations(['123']);
@@ -403,7 +403,7 @@ describe('WidgetController', function () {
 
     it('does not show loggedout message if selection is unavailable', function () {
       $scope.auth = {
-        status: 'logged-out'
+        status: 'logged-out',
       };
       annotationUI.selectAnnotations(['missing']);
       $scope.$digest();
@@ -412,7 +412,7 @@ describe('WidgetController', function () {
 
     it('does not show loggedout message if there is no selection', function () {
       $scope.auth = {
-        status: 'logged-out'
+        status: 'logged-out',
       };
       annotationUI.selectAnnotations([]);
       $scope.$digest();
@@ -421,7 +421,7 @@ describe('WidgetController', function () {
 
     it('does not show loggedout message if user is not logged out', function () {
       $scope.auth = {
-        status: 'logged-in'
+        status: 'logged-in',
       };
       annotationUI.addAnnotations([{id: '123'}]);
       annotationUI.selectAnnotations(['123']);
@@ -431,7 +431,7 @@ describe('WidgetController', function () {
 
     it('does not show loggedout message if not a direct link', function () {
       $scope.auth = {
-        status: 'logged-out'
+        status: 'logged-out',
       };
       delete fakeSettings.annotations;
       annotationUI.addAnnotations([{id: '123'}]);

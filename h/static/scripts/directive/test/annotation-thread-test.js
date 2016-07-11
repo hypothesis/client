@@ -57,8 +57,8 @@ describe('annotationThread', function () {
         id: '1',
         annotation: {id: '1'},
         visible: false,
-        children: []
-      }
+        children: [],
+      },
     });
     var pageObject = new PageObject(element);
     assert.equal(pageObject.annotations().length, 1);
@@ -78,7 +78,7 @@ describe('annotationThread', function () {
           visible: true,
         }],
         collapsed: false,
-      }
+      },
     });
     var pageObject = new PageObject(element);
     assert.isFalse(pageObject.isHidden(pageObject.replyList()));
@@ -97,7 +97,7 @@ describe('annotationThread', function () {
           visible: true,
         }],
         collapsed: true,
-      }
+      },
     });
     var pageObject = new PageObject(element);
     assert.isTrue(pageObject.isHidden(pageObject.replyList()));
@@ -121,7 +121,7 @@ describe('annotationThread', function () {
           visible: true,
         }],
         collapsed: false,
-      }
+      },
     });
     var pageObject = new PageObject(element);
     assert.equal(pageObject.visibleReplies().length, 1);
@@ -140,7 +140,7 @@ describe('annotationThread', function () {
         onChangeCollapsed: {
           args: ['id', 'collapsed'],
           callback: onChangeCollapsed,
-        }
+        },
       });
       element.ctrl.toggleCollapsed();
       assert.calledWith(onChangeCollapsed, '123', false);

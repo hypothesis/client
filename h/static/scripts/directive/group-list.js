@@ -35,7 +35,7 @@ function groupList( $window, groups, settings) {
     },
     restrict: 'E',
     scope: {
-      auth: '<'
+      auth: '<',
     },
     template: require('../../../templates/client/group_list.html'),
   };
@@ -43,5 +43,5 @@ function groupList( $window, groups, settings) {
 
 module.exports = {
   directive: groupList,
-  Controller: GroupListController
+  Controller: GroupListController,
 };

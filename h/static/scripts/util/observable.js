@@ -76,7 +76,7 @@ function delay(delay, src) {
          lastValue = value;
          clearTimeout(timeout);
          timeout = setTimeout(onNext, delay);
-       }
+       },
      });
 
      return function () {

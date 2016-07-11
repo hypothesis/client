@@ -148,7 +148,7 @@ describe('rootThread', function () {
 
     function targetWithPos(pos) {
       return [{
-        selector: [{type: 'TextPositionSelector', start: pos}]
+        selector: [{type: 'TextPositionSelector', start: pos}],
       }];
     }
 

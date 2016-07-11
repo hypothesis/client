@@ -12,7 +12,7 @@ module.exports = function(config) {
       'browserify',
       'mocha',
       'chai',
-      'sinon'
+      'sinon',
     ],
 
     // list of files / patterns to load in the browser
@@ -35,7 +35,7 @@ module.exports = function(config) {
       { pattern: '**/test/*-test.js', watched: false, included: true, served: true },
 
       // Integration tests
-      { pattern: '**/integration/*-test.js', watched: false, included: true, served: true }
+      { pattern: '**/integration/*-test.js', watched: false, included: true, served: true },
     ],
 
     // list of files to exclude
@@ -60,7 +60,7 @@ module.exports = function(config) {
         bundle
           .transform('coffeeify')
           .plugin('proxyquire-universal');
-      }
+      },
     },
 
     mochaReporter: {

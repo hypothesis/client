@@ -22,7 +22,7 @@ var FIXTURES_TO_FUZZY_STRING = [
   [1 * year, '1 Jan 1970'],
   [1 * year + 2 * month, '1 Jan 1970'],
   [2 * year, '1 Jan 1970'],
-  [8 * year, '1 Jan 1970']
+  [8 * year, '1 Jan 1970'],
 ];
 
 var FIXTURES_NEXT_FUZZY_UPDATE = [
@@ -35,7 +35,7 @@ var FIXTURES_NEXT_FUZZY_UPDATE = [
   [27 * hour, null],
   [3 * day + 30 * minute, null],
   [6 * month + 2 * day, null],
-  [8 * year, null]
+  [8 * year, null],
 ];
 
 describe('time', function () {
@@ -69,9 +69,9 @@ describe('time', function () {
               } else {
                 return '1 Jan 1970';
               }
-            }
+            },
           };
-        }
+        },
       };
     }
 

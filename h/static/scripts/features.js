@@ -40,7 +40,7 @@ function features($log, session) {
   }
 
   return {
-    flagEnabled: flagEnabled
+    flagEnabled: flagEnabled,
   };
 }
 

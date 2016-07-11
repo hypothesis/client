@@ -36,8 +36,8 @@ describe('AnnotationUISync', function () {
       links: [
         { window: PARENT_WINDOW, channel: createChannel() },
         { window: 'ANOTHER_WINDOW', channel: createChannel() },
-        { window: 'THIRD_WINDOW', channel: createChannel() }
-      ]
+        { window: 'THIRD_WINDOW', channel: createChannel() },
+      ],
     };
 
     annotationUI = annotationUIFactory($rootScope, {});
