@@ -11,7 +11,9 @@
     "Promise": false,
   },
   "rules": {
+    "array-callback-return": "error",
     "block-scoped-var": "error",
+    "curly": "error",
     "eqeqeq": "error",
     "no-console": [
       "error",

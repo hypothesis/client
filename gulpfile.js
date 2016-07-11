@@ -121,7 +121,7 @@ gulp.task('build-app-js', ['build-vendor-js'], function () {
 });
 
 gulp.task('watch-app-js', ['build-vendor-js'], function () {
-  appBundleConfigs.map(function (config) {
+  appBundleConfigs.forEach(function (config) {
     createBundle(config, {watch: true});
   });
 });

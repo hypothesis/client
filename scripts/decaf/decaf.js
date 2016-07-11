@@ -81,10 +81,9 @@ function stripUnnecessaryReturns(js) {
       for (var i=0; i < stripReturnPatterns.length; i++) {
         if (remainder.match(stripReturnPatterns[i])) {
           return remainder;
-        } else {
-          return remainder;
         }
       }
+      return line;
     } else {
       return line;
     }
