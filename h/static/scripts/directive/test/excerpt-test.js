@@ -30,7 +30,7 @@ describe('excerpt directive', function () {
 
   beforeEach(function () {
     function FakeOverflowMonitor(ctrl) {
-      fakeOverflowMonitor = this;
+      fakeOverflowMonitor = this; // eslint-disable-line consistent-this
 
       this.ctrl = ctrl;
       this.check = sinon.stub();

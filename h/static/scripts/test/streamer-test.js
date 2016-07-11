@@ -9,7 +9,7 @@ var proxyquire = require('proxyquire');
 var fakeWebSocket = null;
 
 function FakeSocket() {
-  fakeWebSocket = this;
+  fakeWebSocket = this; // eslint-disable-line consistent-this
 
   this.messages = [];
   this.didClose = false;

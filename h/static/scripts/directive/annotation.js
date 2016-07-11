@@ -1,4 +1,5 @@
-/* jshint node: true */
+/* eslint consistent-this: ["error", "vm"] */
+
 'use strict';
 
 var annotationMetadata = require('../annotation-metadata');
