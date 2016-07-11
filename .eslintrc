@@ -14,6 +14,7 @@
     "array-callback-return": "error",
     "block-scoped-var": "error",
     "curly": "error",
+    "dot-notation": "error",
     "eqeqeq": "error",
     "no-console": [
       "error",
