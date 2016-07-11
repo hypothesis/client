@@ -101,7 +101,7 @@ describe('windowScroll', function () {
         assert.calledOnce(callback);
 
         view.scrollY = 1800;
-        handler()
+        handler();
         assert.calledTwice(callback);
       });
     });
