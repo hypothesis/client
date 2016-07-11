@@ -196,7 +196,7 @@ describe('rootThread', function () {
       var threadFilterFn = fakeBuildThread.args[0][1].threadFilterFn;
 
       var annotation = {target: [{ selector: {} }]};
-      assert(threadFilterFn({annotation: annotation}));
+      assert.isDefined(threadFilterFn({annotation: annotation}));
     });
 
     it('generates a thread filter function to match notes', function () {
@@ -209,7 +209,7 @@ describe('rootThread', function () {
       rootThread.thread(fakeAnnotationUI.state);
       var threadFilterFn = fakeBuildThread.args[0][1].threadFilterFn;
 
-      assert.equal(threadFilterFn(fakeBuildThread), true);
+      assert.isTrue(threadFilterFn(fakeBuildThread));
     });
 
     it('generates a thread filter function for annotations, when all annotations are of type notes', function () {
@@ -222,7 +222,7 @@ describe('rootThread', function () {
       rootThread.thread(fakeAnnotationUI.state);
       var threadFilterFn = fakeBuildThread.args[0][1].threadFilterFn;
 
-      assert.equal(threadFilterFn(fakeBuildThread), undefined);
+      assert.isFalse(threadFilterFn(fakeBuildThread));
     });
   });
 
@@ -238,7 +238,7 @@ describe('rootThread', function () {
       var filterFn = fakeBuildThread.args[0][1].filterFn;
 
       fakeViewFilter.filter.returns([annotation]);
-      assert.equal(filterFn(annotation), true);
+      assert.isTrue(filterFn(annotation));
       assert.calledWith(fakeViewFilter.filter, sinon.match([annotation]),
         filters);
     });

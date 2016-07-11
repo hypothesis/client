@@ -1,9 +1,16 @@
 'use strict';
 
+var uiConstants = require('../ui-constants');
+
 // @ngInject
 module.exports = function () {
   return {
-    controller: function () {},
+    bindToController: true,
+    controllerAs: 'vm',
+    controller: function () {
+      this.TAB_ANNOTATIONS = uiConstants.TAB_ANNOTATIONS;
+      this.TAB_NOTES = uiConstants.TAB_NOTES;
+    },
     restrict: 'E',
     scope: {
       filterActive: '<',
@@ -12,8 +19,6 @@ module.exports = function () {
       searchQuery: '<',
       selectedTab: '<',
       selectionCount: '<',
-      tabAnnotations: '<',
-      tabNotes: '<',
       totalAnnotations: '<',
       totalNotes: '<',
     },

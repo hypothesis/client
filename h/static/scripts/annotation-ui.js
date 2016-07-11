@@ -10,7 +10,6 @@
 
 var immutable = require('seamless-immutable');
 var redux = require('redux');
-var uiConstants = require('./ui-constants');
 
 function freeze(selection) {
   if (Object.keys(selection).length) {
@@ -63,7 +62,7 @@ function initialState(settings) {
 
     filterQuery: null,
 
-    selectedTab: uiConstants.TAB_ANNOTATIONS,
+    selectedTab: null,
 
     // Key by which annotations are currently sorted.
     sortKey: 'Location',
@@ -126,6 +125,7 @@ function annotationsReducer(state, action) {
 }
 
 function reducer(state, action) {
+  /*jshint maxcomplexity: false*/
   state = annotationsReducer(state, action);
 
   switch (action.type) {

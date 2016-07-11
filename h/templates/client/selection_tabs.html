@@ -1,11 +1,27 @@
 <!-- Tabbed display of annotations and notes. -->
 <ul class="selection-tabs">
-  <li class="selection-tabs__type" ng-class="{'selection-tabs--selected': vm.selectedTab === vm.tabAnnotations}" ng-click="vm.selectTab('annotation')">
+  <li class="selection-tabs__type" ng-class="{'selection-tabs--selected': vm.selectedTab === vm.TAB_ANNOTATIONS}" ng-click="vm.selectTab('annotation')">
     Annotations
-    <sup ng-if="vm.totalAnnotations > 0">{{ vm.totalAnnotations }}</sup>
+    <span class="selection-tabs__count" ng-if="vm.totalAnnotations > 0">{{ vm.totalAnnotations }}</sup>
   </li>
-  <li class="selection-tabs__type" ng-class="{'selection-tabs--selected': vm.selectedTab === vm.tabNotes}" ng-click="vm.selectTab('note')">
+  <li class="selection-tabs__type" ng-class="{'selection-tabs--selected': vm.selectedTab === vm.TAB_NOTES}" ng-click="vm.selectTab('note')">
     Notes
-    <sup ng-if="vm.totalNotes > 0">{{ vm.totalNotes }}</sup>
+    <span class="selection-tabs__count" ng-if="vm.totalNotes > 0">{{ vm.totalNotes }}</sup>
   </li>
 </ul>
+<div ng-if="!vm.isLoading()">
+  <div ng-if="vm.selectedTab === vm.TAB_NOTES && vm.totalNotes === 0"  class="annotation-unavailable-message">
+    <p class="annotation-unavailable-message__label">
+      There are no page notes in this group.
+      <br />
+      Create one by clicking the
+      <i class="help-icon h-icon-note"></i>
+      button.
+    </p>
+  </div>
+  <div ng-if="vm.selectedTab === vm.TAB_ANNOTATIONS && vm.totalAnnotations === 0"  class="annotation-unavailable-message">
+    <p class="annotation-unavailable-message__label">
+      There are no annotations in this group.
+    </p>
+  </div>
+</div>

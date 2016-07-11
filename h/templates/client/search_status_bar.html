@@ -1,33 +1,33 @@
-<div class="search-status-bar" ng-if="filterActive">
+<div class="search-status-bar" ng-if="vm.filterActive">
   <button class="primary-action-btn primary-action-btn--short"
-          ng-click="onClearSelection()"
+          ng-click="vm.onClearSelection()"
           title="Clear the search filter and show all annotations"
   >
     <i class="primary-action-btn__icon h-icon-close"></i> Clear search
   </button>
   <span ng-pluralize
-           count="filterMatchCount"
-           when="{'0': 'No results for “{{searchQuery}}”',
+           count="vm.filterMatchCount"
+           when="{'0': 'No results for “{{vm.searchQuery}}”',
                   'one': '1 search result',
                   'other': '{} search results'}"></span>
 </div>
-<div class="search-status-bar" ng-if="!filterActive && selectionCount > 0">
+<div class="search-status-bar" ng-if="!vm.filterActive && vm.selectionCount > 0">
   <button class="primary-action-btn primary-action-btn--short"
-          ng-click="onClearSelection()"
+          ng-click="vm.onClearSelection()"
           title="Clear the selection and show all annotations">
-    <span ng-if="!selectedTab">
+    <span ng-if="!vm.selectedTab">
       Show all annotations and notes
     </span>
-    <span ng-if="selectedTab === tabAnnotations">
+    <span ng-if="vm.selectedTab === vm.TAB_ANNOTATIONS">
       Show all annotations
-      <span ng-if="totalAnnotations > 1">
-        ({{totalAnnotations}})
+      <span ng-if="vm.totalAnnotations > 1">
+        ({{vm.totalAnnotations}})
       </span>
     </span>
-    <span ng-if="selectedTab === tabNotes">
+    <span ng-if="vm.selectedTab === vm.TAB_NOTES">
       Show all notes
-      <span ng-if="totalNotes > 1">
-        ({{totalNotes}})
+      <span ng-if="vm.totalNotes > 1">
+        ({{vm.totalNotes}})
       </span>
     </span>
   </button>

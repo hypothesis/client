@@ -5,6 +5,7 @@ var scrollIntoView = require('scroll-into-view');
 var events = require('./events');
 var parseAccountID = require('./filter/persona').parseAccountID;
 var scopeTimeout = require('./util/scope-timeout');
+var uiConstants = require('./ui-constants');
 
 function authStateFromUserID(userid) {
   if (userid) {
@@ -130,6 +131,9 @@ module.exports = function AppController(
   };
 
   $scope.clearSelection = function () {
+    if (!annotationUI.getState().selectedTab) {
+        annotationUI.selectTab(uiConstants.TAB_ANNOTATIONS);
+    }
     annotationUI.clearSelectedAnnotations();
   };
 
