@@ -19,7 +19,8 @@ function Controller($scope, $timeout, flash, session, formRespond, settings) {
   }
 
   function failure(form, response) {
-    var errors, reason;
+    var errors;
+    var reason;
 
     try {
       errors = response.data.errors;
