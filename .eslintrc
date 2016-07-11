@@ -15,6 +15,7 @@
       "error",
       { allow: ["warn", "error"] },
     ],
+    "strict": ["error", "safe"],
   },
   "parserOptions": {
     "ecmaVersion": 6,
