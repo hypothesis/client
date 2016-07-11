@@ -11,6 +11,7 @@
     "Promise": false,
   },
   "rules": {
+    "block-scoped-var": "error",
     "no-console": [
       "error",
       { allow: ["warn", "error"] },
