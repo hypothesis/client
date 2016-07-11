@@ -1,10 +1,14 @@
 <!-- Tabbed display of annotations and notes. -->
 <ul class="selection-tabs">
-  <li class="selection-tabs__type" ng-class="{'selection-tabs--selected': vm.selectedTab === vm.TAB_ANNOTATIONS}" ng-click="vm.selectTab('annotation')">
+  <li class="selection-tabs__type"
+      ng-class="{'selection-tabs--selected': vm.selectedTab === vm.TAB_ANNOTATIONS}"
+      h-on-touch="vm.selectTab('annotation')">
     Annotations
     <span class="selection-tabs__count" ng-if="vm.totalAnnotations > 0">{{ vm.totalAnnotations }}</sup>
   </li>
-  <li class="selection-tabs__type" ng-class="{'selection-tabs--selected': vm.selectedTab === vm.TAB_NOTES}" ng-click="vm.selectTab('note')">
+  <li class="selection-tabs__type"
+      ng-class="{'selection-tabs--selected': vm.selectedTab === vm.TAB_NOTES}"
+      h-on-touch="vm.selectTab('note')">
     Notes
     <span class="selection-tabs__count" ng-if="vm.totalNotes > 0">{{ vm.totalNotes }}</sup>
   </li>

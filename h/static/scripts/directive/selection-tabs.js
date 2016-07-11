@@ -7,7 +7,7 @@ module.exports = function () {
     bindToController: true,
     controllerAs: 'vm',
     //@ngInject
-    controller: function (annotationUI) {
+    controller: function ($element, annotationUI) {
       this.TAB_ANNOTATIONS = uiConstants.TAB_ANNOTATIONS;
       this.TAB_NOTES = uiConstants.TAB_NOTES;
 

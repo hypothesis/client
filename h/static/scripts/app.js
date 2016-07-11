@@ -135,6 +135,7 @@ module.exports = angular.module('h', [
   .directive('helpLink', require('./directive/help-link'))
   .directive('helpPanel', require('./directive/help-panel'))
   .directive('hAutofocus', require('./directive/h-autofocus'))
+  .directive('hOnTouch', require('./directive/h-on-touch'))
   .directive('hTooltip', require('./directive/h-tooltip'))
   .directive('loggedoutMessage', require('./directive/loggedout-message'))
   .directive('loginControl', require('./directive/login-control'))
