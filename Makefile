@@ -15,6 +15,10 @@ clean:
 test: node_modules/.uptodate
 	npm test
 
+.PHONY: lint
+lint: node_modules/.uptodate
+	npm run lint
+
 ################################################################################
 
 build/manifest.json: node_modules/.uptodate

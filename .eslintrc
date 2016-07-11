@@ -1,0 +1,22 @@
+{
+  "env": {
+    "mocha": true,
+    "commonjs": true,
+    "browser": true,
+  },
+  "extends": "eslint:recommended",
+  "globals": {
+    "assert": false,
+    "sinon": false,
+    "Promise": false,
+  },
+  "rules": {
+    "no-console": [
+      "error",
+      { allow: ["warn", "error"] },
+    ],
+  },
+  "parserOptions": {
+    "ecmaVersion": 6,
+  }
+}
