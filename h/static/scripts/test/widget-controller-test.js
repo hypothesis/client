@@ -261,7 +261,7 @@ describe('WidgetController', function () {
       it('loads annotations from the focused group instead', function () {
         assert.calledWith(fakeGroups.focus, 'private-group');
         assert.calledWith(fakeAnnotationMapper.loadAnnotations,
-          [{group: "private-group", id: "http://example.com456"}]);
+          [{group: 'private-group', id: 'http://example.com456'}]);
       });
     });
   });
@@ -379,7 +379,7 @@ describe('WidgetController', function () {
       assert.isFalse($scope.selectedAnnotationUnavailable());
     });
 
-    it("doesn't show a message if the document isn't loaded yet", function () {
+    it('doesn\'t show a message if the document isn\'t loaded yet', function () {
       // No search requests have been sent yet.
       searchClients = [];
       // There is a selection but the selected annotation isn't available.

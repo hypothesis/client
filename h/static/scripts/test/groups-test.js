@@ -85,7 +85,7 @@ describe('groups', function() {
       assert.equal(group.id, 'id2');
     });
 
-    it("returns null if the group doesn't exist", function() {
+    it('returns null if the group doesn\'t exist', function() {
       var group = service().get('foobar');
 
       assert.isNull(group);
@@ -142,14 +142,14 @@ describe('groups', function() {
       assert.equal(s.focused().id, 'id2');
     });
 
-    it("does nothing if the named group isn't recognised", function() {
+    it('does nothing if the named group isn\'t recognised', function() {
       var s = service();
       s.focus('foobar');
 
       assert.equal(s.focused().id, 'id1');
     });
 
-    it("stores the focused group id in localStorage", function() {
+    it('stores the focused group id in localStorage', function() {
       var s = service();
       s.focus('id3');
 

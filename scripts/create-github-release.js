@@ -34,11 +34,11 @@ function extractReleaseNotes(changelog, version) {
 const GITHUB_ORG_REPO_PAT = /^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/;
 
 if (!pkg.repository || !pkg.repository.match(GITHUB_ORG_REPO_PAT)) {
-  throw new Error(`package.json is missing a "repository" field of the form :owner/:repo`);
+  throw new Error('package.json is missing a "repository" field of the form :owner/:repo');
 }
 
 if (!process.env.GITHUB_TOKEN) {
-  throw new Error(`GITHUB_TOKEN env var is not set`);
+  throw new Error('GITHUB_TOKEN env var is not set');
 }
 
 const changelog = fs.readFileSync(require.resolve('../CHANGELOG.md')).toString();

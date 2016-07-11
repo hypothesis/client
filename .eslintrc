@@ -43,6 +43,7 @@
     ],
     "no-useless-concat": "error",
     "one-var-declaration-per-line": ["error", "always"],
+    "quotes": ["error", "single"],
     "semi": "error",
     "strict": ["error", "safe"],
   },

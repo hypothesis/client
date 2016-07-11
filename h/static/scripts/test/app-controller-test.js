@@ -237,7 +237,7 @@ describe('AppController', function () {
 
     it('emits "annotationDeleted" for each unsaved draft annotation', function () {
       fakeDrafts.unsaved = sandbox.stub().returns(
-        ["draftOne", "draftTwo", "draftThree"]
+        ['draftOne', 'draftTwo', 'draftThree']
       );
       createController();
       $rootScope.$emit = sandbox.stub();
@@ -246,11 +246,11 @@ describe('AppController', function () {
 
       assert($rootScope.$emit.calledThrice);
       assert.deepEqual(
-        $rootScope.$emit.firstCall.args, ["annotationDeleted", "draftOne"]);
+        $rootScope.$emit.firstCall.args, ['annotationDeleted', 'draftOne']);
       assert.deepEqual(
-        $rootScope.$emit.secondCall.args, ["annotationDeleted", "draftTwo"]);
+        $rootScope.$emit.secondCall.args, ['annotationDeleted', 'draftTwo']);
       assert.deepEqual(
-        $rootScope.$emit.thirdCall.args, ["annotationDeleted", "draftThree"]);
+        $rootScope.$emit.thirdCall.args, ['annotationDeleted', 'draftThree']);
     });
 
     it('discards draft annotations', function () {

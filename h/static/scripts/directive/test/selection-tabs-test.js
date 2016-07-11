@@ -27,10 +27,10 @@ describe('selectionTabs', function () {
 
       var tabs = elem[0].querySelectorAll('a');
 
-      assert.include(tabs[0].textContent, "Annotations");
-      assert.include(tabs[1].textContent, "Notes");
-      assert.include(tabs[0].textContent, "123");
-      assert.include(tabs[1].textContent, "456");
+      assert.include(tabs[0].textContent, 'Annotations');
+      assert.include(tabs[1].textContent, 'Notes');
+      assert.include(tabs[0].textContent, '123');
+      assert.include(tabs[1].textContent, '456');
     });
 
     it('should display annotations tab as selected', function () {

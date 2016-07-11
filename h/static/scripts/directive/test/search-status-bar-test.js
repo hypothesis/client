@@ -20,7 +20,7 @@ describe('searchStatusBar', function () {
         filterActive: true,
         filterMatchCount: 5,
       });
-      assert.include(elem[0].textContent, "5 search results");
+      assert.include(elem[0].textContent, '5 search results');
     });
   });
 
