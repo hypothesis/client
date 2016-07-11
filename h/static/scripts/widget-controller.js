@@ -27,7 +27,7 @@ function groupIDFromSelection(selection, results) {
     return annot.id === id;
   });
   if (!annot) {
-    return;
+    return null;
   }
   return annot.group;
 }
@@ -67,7 +67,7 @@ module.exports = function WidgetController(
   function getThreadHeight(id) {
     var threadElement = document.getElementById(id);
     if (!threadElement) {
-      return;
+      return null;
     }
 
     // Get the height of the element inside the border-box, excluding
@@ -155,11 +155,13 @@ module.exports = function WidgetController(
     if (!annot) {
       return null;
     }
+
     if (metadata.isAnnotation(annot)) {
       return uiConstants.TAB_ANNOTATIONS;
-    }
-    if (metadata.isPageNote(annot)) {
+    } else if (metadata.isPageNote(annot)) {
       return uiConstants.TAB_NOTES;
+    } else {
+      return null;
     }
   }
 
@@ -316,7 +318,7 @@ module.exports = function WidgetController(
     }
 
     annotationUI.clearSelectedAnnotations();
-    return loadAnnotations(crossframe.frames);
+    loadAnnotations(crossframe.frames);
   });
 
   // Watch anything that may require us to reload annotations.

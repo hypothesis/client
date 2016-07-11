@@ -113,8 +113,8 @@ module.exports = function($sanitize) {
 
       // Keyboard shortcuts for bold, italic, and link.
       elem.on('keydown', function(e) {
-        var shortcuts =
-        {66: scope.insertBold,
+        var shortcuts = {
+          66: scope.insertBold,
           73: scope.insertItalic,
           75: scope.insertLink
         };
@@ -122,7 +122,7 @@ module.exports = function($sanitize) {
         var shortcut = shortcuts[e.keyCode];
         if (shortcut && (e.ctrlKey || e.metaKey)) {
           e.preventDefault();
-          return shortcut();
+          shortcut();
         }
       });
 

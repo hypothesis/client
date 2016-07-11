@@ -35,6 +35,7 @@ function groups(localStorage, session, settings, $rootScope, $http) {
         return gs[i];
       }
     }
+    return null;
   }
 
   /** Leave the group with the given ID.

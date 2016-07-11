@@ -36,53 +36,57 @@ var embedGenerators = [
   // Matches URLs like https://www.youtube.com/watch?v=rw6oWkCojpw
   function iframeFromYouTubeWatchURL(link) {
     if (link.hostname !== 'www.youtube.com') {
-      return;
+      return null;
     }
 
     if (!/\/watch\/?/.test(link.pathname)) {
-      return;
+      return null;
     }
 
     var groups = /[&\?]v=([^&#]+)/.exec(link.search);
     if (groups) {
       return youTubeEmbed(groups[1]);
     }
+    return null;
   },
 
   // Matches URLs like https://youtu.be/rw6oWkCojpw
   function iframeFromYouTubeShareURL(link) {
     if (link.hostname !== 'youtu.be') {
-      return;
+      return null;
     }
 
     var groups = /^\/([^\/]+)\/?$/.exec(link.pathname);
     if (groups) {
       return youTubeEmbed(groups[1]);
     }
+    return null;
   },
 
   // Matches URLs like https://vimeo.com/149000090
   function iFrameFromVimeoLink(link) {
     if (link.hostname !== 'vimeo.com') {
-      return;
+      return null;
     }
 
     var groups = /^\/([^\/\?#]+)\/?$/.exec(link.pathname);
     if (groups) {
       return vimeoEmbed(groups[1]);
     }
+    return null;
   },
 
   // Matches URLs like https://vimeo.com/channels/staffpicks/148845534
   function iFrameFromVimeoChannelLink(link) {
     if (link.hostname !== 'vimeo.com') {
-      return;
+      return null;
     }
 
     var groups = /^\/channels\/[^\/]+\/([^\/?#]+)\/?$/.exec(link.pathname);
     if (groups) {
       return vimeoEmbed(groups[1]);
     }
+    return null;
   },
 ];
 
@@ -104,6 +108,7 @@ function embedForLink(link) {
       return embed;
     }
   }
+  return null;
 }
 
 /** Replace the given link element with an embed.

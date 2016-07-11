@@ -62,6 +62,7 @@ function DraftStore() {
         };
       }
     }
+    return null;
   };
 
   /**

@@ -144,6 +144,8 @@ function getBreakpoint(date, now) {
       return breakpoint;
     }
   }
+
+  return null;
 }
 
 function nextFuzzyUpdate(date) {

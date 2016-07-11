@@ -90,7 +90,7 @@ function excerpt(ExcerptOverflowMonitor) {
         contentHeight: function () {
           var contentElem = elem[0].querySelector('.excerpt');
           if (!contentElem) {
-            return;
+            return null;
           }
           return contentElem.scrollHeight;
         },
