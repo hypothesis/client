@@ -20,6 +20,7 @@
     "dot-notation": "error",
     "eqeqeq": "error",
     "guard-for-in": "error",
+    "indent": ["error", 2],
     "no-caller": "error",
     "no-case-declarations": "error",
     "no-console": [

@@ -32,16 +32,16 @@ describe('publishAnnotationBtn', function () {
     // create a new instance of the directive with default
     // attributes
     element = util.createDirective(document, 'publishAnnotationBtn', {
-     group: {
-       name: 'Public',
-       type: 'public',
-     },
-     canPost: true,
-     isShared: false,
-     onSave: function () {},
-     onSetPrivacy: function () {},
-     onCancel: function () {},
-   });
+      group: {
+        name: 'Public',
+        type: 'public',
+      },
+      canPost: true,
+      isShared: false,
+      onSave: function () {},
+      onSetPrivacy: function () {},
+      onCancel: function () {},
+    });
   });
 
   it('should display "Post to Only Me"', function () {

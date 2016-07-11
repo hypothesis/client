@@ -48,14 +48,14 @@ function Streamer($rootScope, annotationMapper, groups, session, settings) {
     }
 
     switch (action) {
-      case 'create':
-      case 'update':
-      case 'past':
-        annotationMapper.loadAnnotations(annotations);
-        break;
-      case 'delete':
-        annotationMapper.unloadAnnotations(annotations);
-        break;
+    case 'create':
+    case 'update':
+    case 'past':
+      annotationMapper.loadAnnotations(annotations);
+      break;
+    case 'delete':
+      annotationMapper.unloadAnnotations(annotations);
+      break;
     }
   }
 

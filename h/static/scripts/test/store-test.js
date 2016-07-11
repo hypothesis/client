@@ -41,25 +41,25 @@ describe('store', function () {
 
     $httpBackend.expectGET('http://example.com/api').respond({
       links: {
-         annotation: {
-           create: {
-             method: 'POST',
-             url: 'http://example.com/api/annotations',
-           },
-           delete: {
-             method: 'DELETE',
-             url: 'http://example.com/api/annotations/:id',
-           },
-           read: {},
-           update: {
-             method: 'PUT',
-             url: 'http://example.com/api/annotations/:id',
-           },
-         },
-         search: {
-           method: 'GET',
-           url: 'http://example.com/api/search',
-         },
+        annotation: {
+          create: {
+            method: 'POST',
+            url: 'http://example.com/api/annotations',
+          },
+          delete: {
+            method: 'DELETE',
+            url: 'http://example.com/api/annotations/:id',
+          },
+          read: {},
+          update: {
+            method: 'PUT',
+            url: 'http://example.com/api/annotations/:id',
+          },
+        },
+        search: {
+          method: 'GET',
+          url: 'http://example.com/api/search',
+        },
       },
     });
     $httpBackend.flush();

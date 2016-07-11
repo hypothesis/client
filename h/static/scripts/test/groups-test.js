@@ -122,9 +122,9 @@ describe('groups', function() {
           fakeSession.state.groups.slice().filter(function (group) {
             return group.id !== id;
           });
-          fakeRootScope.eventCallbacks.forEach(function (callback) {
-            callback();
-          });
+        fakeRootScope.eventCallbacks.forEach(function (callback) {
+          callback();
+        });
       };
 
       leaveGroup('id3');

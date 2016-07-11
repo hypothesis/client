@@ -111,16 +111,16 @@ function excludeAnnotations(current, annotations) {
 
 function annotationsReducer(state, action) {
   switch (action.type) {
-    case types.ADD_ANNOTATIONS:
-      return Object.assign({}, state,
+  case types.ADD_ANNOTATIONS:
+    return Object.assign({}, state,
         {annotations: state.annotations.concat(action.annotations)});
-    case types.REMOVE_ANNOTATIONS:
-      return Object.assign({}, state,
+  case types.REMOVE_ANNOTATIONS:
+    return Object.assign({}, state,
         {annotations: excludeAnnotations(state.annotations, action.annotations)});
-    case types.CLEAR_ANNOTATIONS:
-      return Object.assign({}, state, {annotations: []});
-    default:
-      return state;
+  case types.CLEAR_ANNOTATIONS:
+    return Object.assign({}, state, {annotations: []});
+  default:
+    return state;
   }
 }
 
@@ -129,35 +129,35 @@ function reducer(state, action) {
   state = annotationsReducer(state, action);
 
   switch (action.type) {
-    case types.CLEAR_SELECTION:
-      return Object.assign({}, state, {
-        filterQuery: null,
-        selectedAnnotationMap: null,
-      });
-    case types.SELECT_ANNOTATIONS:
-      return Object.assign({}, state, {selectedAnnotationMap: action.selection});
-    case types.FOCUS_ANNOTATIONS:
-      return Object.assign({}, state, {focusedAnnotationMap: action.focused});
-    case types.SET_HIGHLIGHTS_VISIBLE:
-      return Object.assign({}, state, {visibleHighlights: action.visible});
-    case types.SET_FORCE_VISIBLE:
-      return Object.assign({}, state, {forceVisible: action.forceVisible});
-    case types.SET_EXPANDED:
-      return Object.assign({}, state, {expanded: action.expanded});
-    case types.HIGHLIGHT_ANNOTATIONS:
-      return Object.assign({}, state, {highlighted: action.highlighted});
-    case types.SELECT_TAB:
-      return Object.assign({}, state, {selectedTab: action.tab});
-    case types.SET_FILTER_QUERY:
-      return Object.assign({}, state, {
-        filterQuery: action.query,
-        forceVisible: {},
-        expanded: {},
-      });
-    case types.SET_SORT_KEY:
-      return Object.assign({}, state, {sortKey: action.key});
-    default:
-      return state;
+  case types.CLEAR_SELECTION:
+    return Object.assign({}, state, {
+      filterQuery: null,
+      selectedAnnotationMap: null,
+    });
+  case types.SELECT_ANNOTATIONS:
+    return Object.assign({}, state, {selectedAnnotationMap: action.selection});
+  case types.FOCUS_ANNOTATIONS:
+    return Object.assign({}, state, {focusedAnnotationMap: action.focused});
+  case types.SET_HIGHLIGHTS_VISIBLE:
+    return Object.assign({}, state, {visibleHighlights: action.visible});
+  case types.SET_FORCE_VISIBLE:
+    return Object.assign({}, state, {forceVisible: action.forceVisible});
+  case types.SET_EXPANDED:
+    return Object.assign({}, state, {expanded: action.expanded});
+  case types.HIGHLIGHT_ANNOTATIONS:
+    return Object.assign({}, state, {highlighted: action.highlighted});
+  case types.SELECT_TAB:
+    return Object.assign({}, state, {selectedTab: action.tab});
+  case types.SET_FILTER_QUERY:
+    return Object.assign({}, state, {
+      filterQuery: action.query,
+      forceVisible: {},
+      expanded: {},
+    });
+  case types.SET_SORT_KEY:
+    return Object.assign({}, state, {sortKey: action.key});
+  default:
+    return state;
   }
 }
 

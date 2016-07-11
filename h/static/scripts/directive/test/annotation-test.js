@@ -497,14 +497,14 @@ describe('annotation', function() {
       });
 
       it('makes the reply private if the parent is private', function() {
-          var controller = createDirective(annotation).controller;
-          fakePermissions.isPrivate.returns(true);
-          var perms = {read: ['onlyme']};
-          fakePermissions.private.returns(perms);
-          var reply = sinon.match({permissions: perms});
-          controller.reply();
-          assert.calledWith(fakeAnnotationMapper.createAnnotation, reply);
-        }
+        var controller = createDirective(annotation).controller;
+        fakePermissions.isPrivate.returns(true);
+        var perms = {read: ['onlyme']};
+        fakePermissions.private.returns(perms);
+        var reply = sinon.match({permissions: perms});
+        controller.reply();
+        assert.calledWith(fakeAnnotationMapper.createAnnotation, reply);
+      }
       );
 
       it('sets the reply\'s group to be the same as its parent\'s', function() {

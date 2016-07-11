@@ -141,8 +141,8 @@ function reformat(js) {
   }
 
   return typescriptFormatter.processString(inFile, js, {
-      baseDir: __dirname,
-      tsfmt: true,
+    baseDir: __dirname,
+    tsfmt: true,
   }).then(result => {
     return result.dest;
   })
