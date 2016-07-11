@@ -67,9 +67,8 @@ function forEachNodeInRange(range, callback) {
   var nodeIter = root.ownerDocument.createNodeIterator(root,
     NodeFilter.SHOW_ALL, null /* filter */, false /* expandEntityReferences */);
 
-  /* jshint -W084 */
   var currentNode;
-  while (currentNode = nodeIter.nextNode()) {
+  while (currentNode = nodeIter.nextNode()) { // eslint-disable-line no-cond-assign
     if (isNodeInRange(range, currentNode)) {
       callback(currentNode);
     }

@@ -6,7 +6,6 @@ var groupList = require('../group-list');
 var util = require('./util');
 
 describe('groupList', function () {
-  var $rootScope;
   var $window;
 
   var GROUP_LINK = 'https://hypothes.is/groups/hdevs';
@@ -32,8 +31,7 @@ describe('groupList', function () {
     angular.mock.module('app');
   });
 
-  beforeEach(angular.mock.inject(function (_$rootScope_, _$window_) {
-    $rootScope = _$rootScope_;
+  beforeEach(angular.mock.inject(function (_$window_) {
     $window = _$window_;
 
     groups = [{

@@ -1,5 +1,7 @@
 'use strict';
 
+/* eslint no-console: "off" */
+
 var queryString = require('query-string');
 
 var Socket = require('./websocket');

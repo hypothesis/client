@@ -1,3 +1,7 @@
+'use strict';
+
+var angular = require('angular');
+
 var inject = angular.mock.inject;
 
 var windowScroll = require('../window-scroll');

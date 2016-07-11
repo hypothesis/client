@@ -1,9 +1,13 @@
+'use strict';
+
+var angular = require('angular');
+
 var module = angular.mock.module;
 var inject = angular.mock.inject;
 
 describe('spinner', function () {
   var $animate = null;
-  var $element = null
+  var $element = null;
   var sandbox = null;
 
   before(function () {

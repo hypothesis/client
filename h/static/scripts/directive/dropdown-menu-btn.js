@@ -2,7 +2,7 @@
 
 // @ngInject
 function DropdownMenuBtnController($scope, $timeout) {
-  this.onClick = function($event) {
+  this.onClick = function () {
     $scope.onClick();
   };
 
@@ -11,7 +11,7 @@ function DropdownMenuBtnController($scope, $timeout) {
     $timeout(function () {
       $scope.onToggleDropdown();
     }, 0);
-  }
+  };
 }
 
 module.exports = function () {

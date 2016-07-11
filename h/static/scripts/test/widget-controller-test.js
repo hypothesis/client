@@ -61,7 +61,6 @@ describe('WidgetController', function () {
   var fakeStreamer;
   var fakeStreamFilter;
   var sandbox;
-  var viewer;
 
   before(function () {
     angular.module('h', [])
@@ -138,7 +137,7 @@ describe('WidgetController', function () {
     $rootScope = _$rootScope_;
     $scope = $rootScope.$new();
     annotationUI = _annotationUI_;
-    viewer = $controller('WidgetController', {$scope: $scope});
+    $controller('WidgetController', {$scope: $scope});
   }));
 
   afterEach(function () {

@@ -1,4 +1,4 @@
-var angular = require('angular');
+'use strict';
 
 module.exports = function () {
   return {
