@@ -10,16 +10,19 @@
   }
 }
 
-.selection-tabs--selected {
-  color: $grey-6;
-  font-weight: bold;
-}
-
 .selection-tabs__type {
+  color: $grey-6;
   margin-right: 20px;
   cursor: pointer;
   min-width: 85px;
   min-height: 18px;
+
+  // Disable focus ring for selected tab
+  outline: none;
+}
+
+.selection-tabs__type.is-selected {
+  font-weight: bold;
 }
 
 .selection-tabs__count {
