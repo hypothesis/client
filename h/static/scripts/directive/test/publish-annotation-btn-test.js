@@ -57,7 +57,7 @@ describe('publishAnnotationBtn', function () {
         type: 'group'
       },
       isShared: true
-    })
+    });
     var buttons = element.find('button');
     assert.equal(buttons[0].innerHTML, 'Post to Research Lab');
   });

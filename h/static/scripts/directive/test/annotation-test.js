@@ -29,7 +29,7 @@ function annotationDirective() {
       username: noop,
     },
     '../annotation-metadata': {
-      domainAndTitle: function (annot) {
+      domainAndTitle: function (annot) { // eslint-disable-line no-unused-vars
         return fakeDocumentMeta;
       },
     }

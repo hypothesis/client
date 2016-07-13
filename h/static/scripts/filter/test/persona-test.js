@@ -1,3 +1,5 @@
+'use strict';
+
 var persona = require('../persona');
 
 describe('persona', function () {

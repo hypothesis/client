@@ -8,7 +8,7 @@ var proxyquire = require('proxyquire');
 // the most recently created FakeSocket instance
 var fakeWebSocket = null;
 
-function FakeSocket(url) {
+function FakeSocket() {
   fakeWebSocket = this;
 
   this.messages = [];
@@ -25,7 +25,7 @@ function FakeSocket(url) {
   };
 
   this.close = function () {
-    this.didClose = true
+    this.didClose = true;
   };
 }
 inherits(FakeSocket, EventEmitter);
@@ -36,11 +36,10 @@ describe('streamer', function () {
   var fakeRootScope;
   var fakeSession;
   var fakeSettings;
-  var activeStreamer;
   var streamer;
 
   function createDefaultStreamer() {
-    activeStreamer = streamer.connect(
+    streamer.connect(
       fakeRootScope,
       fakeAnnotationMapper,
       fakeGroups,
@@ -81,7 +80,7 @@ describe('streamer', function () {
   });
 
   it('should not create a websocket connection if websocketUrl is not provided', function () {
-    fakeSettings = {}
+    fakeSettings = {};
     createDefaultStreamer();
     assert.isNull(fakeWebSocket);
   });
@@ -95,9 +94,8 @@ describe('streamer', function () {
 
   it('should close any existing socket', function () {
     createDefaultStreamer();
-    var oldStreamer = activeStreamer;
     var oldWebSocket = fakeWebSocket;
-    var newStreamer = streamer.connect(
+    streamer.connect(
       fakeRootScope,
       fakeAnnotationMapper,
       fakeGroups,

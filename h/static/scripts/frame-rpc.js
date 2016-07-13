@@ -1,3 +1,7 @@
+'use strict';
+
+/* eslint curly: "off" */
+
 /** This software is released under the MIT license:
 
   Permission is hereby granted, free of charge, to any person obtaining a copy

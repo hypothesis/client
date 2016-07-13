@@ -1,3 +1,7 @@
+'use strict';
+
+var angular = require('angular');
+
 var inject = angular.mock.inject;
 
 var windowScroll = require('../window-scroll');
@@ -97,7 +101,7 @@ describe('windowScroll', function () {
         assert.calledOnce(callback);
 
         view.scrollY = 1800;
-        handler()
+        handler();
         assert.calledTwice(callback);
       });
     });

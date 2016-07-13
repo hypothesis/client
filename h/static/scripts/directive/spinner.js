@@ -1,5 +1,6 @@
+'use strict';
+
 module.exports = ['$animate', function($animate) {
-  'use strict';
   return {
     link: function(scope, elem) {
       // ngAnimate conflicts with the spinners own CSS

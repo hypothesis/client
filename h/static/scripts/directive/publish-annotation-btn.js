@@ -16,15 +16,15 @@ module.exports = function () {
 
       this.publishDestination = function () {
         return this.isShared ? this.group.name : this.privateLabel;
-      }
+      };
 
       this.groupType = function () {
         return this.group.public ? 'public' : 'group';
-      }
+      };
 
       this.setPrivacy = function (level) {
         this.onSetPrivacy({level: level});
-      }
+      };
     },
     controllerAs: 'vm',
     restrict: 'E',
@@ -38,4 +38,4 @@ module.exports = function () {
     },
     template: require('../../../templates/client/publish_annotation_btn.html'),
   };
-}
+};

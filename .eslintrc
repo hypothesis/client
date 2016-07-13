@@ -1,0 +1,35 @@
+{
+  "env": {
+    "mocha": true,
+    "commonjs": true,
+    "browser": true,
+  },
+  "extends": "eslint:recommended",
+  "globals": {
+    "assert": false,
+    "sinon": false,
+    "Promise": false,
+  },
+  "rules": {
+    "array-callback-return": "error",
+    "block-scoped-var": "error",
+    "curly": "error",
+    "eqeqeq": "error",
+    "no-console": [
+      "error",
+      { allow: ["warn", "error"] },
+    ],
+    "no-self-compare": "error",
+    "no-throw-literal": "error",
+    "no-unused-expressions": "error",
+    "no-use-before-define": [
+      "error",
+      {"functions": false},
+    ],
+    "semi": "error",
+    "strict": ["error", "safe"],
+  },
+  "parserOptions": {
+    "ecmaVersion": 6,
+  }
+}

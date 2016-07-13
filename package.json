@@ -37,6 +37,7 @@
     "end-of-stream": "^1.1.0",
     "escape-html": "^1.0.3",
     "escape-string-regexp": "^1.0.5",
+    "eslint": "^3.0.1",
     "exorcist": "^0.4.0",
     "extend": "^2.0.0",
     "gulp": "^3.9.1",
@@ -51,7 +52,6 @@
     "inherits": "^2.0.1",
     "jquery": "1.11.1",
     "js-polyfills": "^0.1.16",
-    "jscs": "^3.0.2",
     "karma": "^1.1.0",
     "karma-browserify": "^5.0.5",
     "karma-chai": "^0.1.0",
@@ -135,6 +135,7 @@
   "scripts": {
     "build": "gulp build-app",
     "deps": "check-dependencies",
+    "lint": "eslint .",
     "test": "gulp test-app",
     "preversion": "npm run test",
     "version": "make clean all && ./scripts/update-changelog.js && git add CHANGELOG.md",

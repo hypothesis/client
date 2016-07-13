@@ -1,6 +1,5 @@
 'use strict';
 
-var angular = require('angular');
 var debounce = require('lodash.debounce');
 
 var commands = require('../markdown-commands');

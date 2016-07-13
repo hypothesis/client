@@ -1,7 +1,5 @@
 'use strict';
 
-var events = require('../events');
-
 // @ngInject
 function GroupListController($scope, $window, groups) {
   $scope.leaveGroup = function (groupId) {
@@ -11,11 +9,11 @@ function GroupListController($scope, $window, groups) {
     if ($window.confirm(message)) {
       groups.leave(groupId);
     }
-  }
+  };
 
   $scope.focusGroup = function (groupId) {
     groups.focus(groupId);
-  }
+  };
 }
 
 /**
@@ -28,12 +26,12 @@ function GroupListController($scope, $window, groups) {
 function groupList( $window, groups, settings) {
   return {
     controller: GroupListController,
-    link: function ($scope, elem, attrs) {
+    link: function ($scope) {
       $scope.groups = groups;
 
       $scope.createNewGroup = function() {
         $window.open(settings.serviceUrl + 'groups/new', '_blank');
-      }
+      };
     },
     restrict: 'E',
     scope: {
@@ -41,7 +39,7 @@ function groupList( $window, groups, settings) {
     },
     template: require('../../../templates/client/group_list.html'),
   };
-};
+}
 
 module.exports = {
   directive: groupList,

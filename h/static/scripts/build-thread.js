@@ -121,7 +121,7 @@ function threadAnnotations(annotations) {
   // Collect the set of threads which have no parent as
   // children of the thread root
   var roots = [];
-  Object.keys(threads).map(function (id) {
+  Object.keys(threads).forEach(function (id) {
     if (!threads[id].parent) {
       // Top-level threads are collapsed by default
       threads[id].collapsed = true;

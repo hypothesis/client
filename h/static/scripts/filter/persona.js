@@ -1,3 +1,5 @@
+'use strict';
+
 /**
  * Parses H account names of the form 'acct:<username>@<provider>'
  * into a {username, provider} object or null if the input does not
