@@ -25,7 +25,7 @@ describe('selectionTabs', function () {
         totalNotes: '456',
       });
 
-      var tabs = elem[0].querySelectorAll('li');
+      var tabs = elem[0].querySelectorAll('a');
 
       assert.include(tabs[0].textContent, "Annotations");
       assert.include(tabs[1].textContent, "Notes");
@@ -40,9 +40,8 @@ describe('selectionTabs', function () {
         totalNotes: '456',
       });
 
-      var tabs = elem[0].querySelectorAll('li');
-
-      assert.include(tabs[0].className, "selection-tabs--selected");
+      var tabs = elem[0].querySelectorAll('a');
+      assert.isTrue(tabs[0].classList.contains('is-selected'));
     });
 
     it('should display notes tab as selected', function () {
@@ -52,9 +51,8 @@ describe('selectionTabs', function () {
         totalNotes: '456',
       });
 
-      var tabs = elem[0].querySelectorAll('li');
-
-      assert.include(tabs[1].className, "selection-tabs--selected");
+      var tabs = elem[0].querySelectorAll('a');
+      assert.isTrue(tabs[1].classList.contains('is-selected'));
     });
   });
 });
