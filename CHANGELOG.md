@@ -4,6 +4,26 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+### Added
+
+- Allow keyboard control of the annotations/notes tabs
+  ([#29](https://github.com/hypothesis/client/pull/29))
+
+### Changed
+
+- "Stick" the annotation/notes tabs to the top of the sidebar when scrolling in
+  supported browsers ([#28](https://github.com/hypothesis/client/pull/28))
+
+### Fixed
+
+- Don't display a "no annotations" message while the sidebar is still loading
+  ([#24](https://github.com/hypothesis/client/pull/24))
+
+- Fix an issue which mistakenly hid notes in the stream or on standalone
+  annotation pages ([#24](https://github.com/hypothesis/client/pull/24))
+
 ## [0.32.0] - 2016-07-08
 
 ### Added
