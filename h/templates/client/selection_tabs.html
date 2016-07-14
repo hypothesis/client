@@ -11,7 +11,7 @@
      href="#"
      ng-class="{'is-selected': vm.selectedTab === vm.TAB_NOTES}"
      h-on-touch="vm.selectTab('note')">
-    Notes
+    Page Notes
     <span class="selection-tabs__count" ng-if="vm.totalNotes > 0">{{ vm.totalNotes }}</sup>
   </a>
 </div>
@@ -28,6 +28,9 @@
   <div ng-if="vm.selectedTab === vm.TAB_ANNOTATIONS && vm.totalAnnotations === 0"  class="annotation-unavailable-message">
     <p class="annotation-unavailable-message__label">
       There are no annotations in this group.
+      <br />
+      Create one by selecting some text and clicking the
+      <i class="help-icon h-icon-annotate"></i> button.
     </p>
   </div>
 </div>
