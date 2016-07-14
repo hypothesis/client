@@ -11,7 +11,7 @@
   on-change-sort-key="setSortKey(sortKey)">
 </top-bar>
 
-<div class="create-account-banner" ng-if="isSidebar && (auth.status === 'signed-out' || auth.status === 'logged-out')" ng-cloak>
+<div class="create-account-banner" ng-if="isSidebar && auth.status === 'logged-out'" ng-cloak>
   To annotate this document
   <a href="{{ register_url }}" target="_blank">
     create a free account
