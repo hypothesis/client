@@ -4,13 +4,6 @@ var uuid = require('node-uuid');
 
 var Socket = require('./websocket');
 
-// the randomly generated session UUID
-var clientId = uuid.v4();
-
-// the singleton socket instance, only one may
-// be open at a time
-var socket;
-
 /**
  * Open a new WebSocket connection to the Hypothesis push notification service.
  * Only one websocket connection may exist at a time, any existing socket is
@@ -27,32 +20,17 @@ var socket;
  * @return The push notification service client.
  */
 // @ngInject
-function connect($rootScope, annotationMapper, groups, session, settings) {
-  // The public interface of the streamer. Returned from connect.
-  var controls = {
-    setConfig: setConfig
-  };
+function Streamer($rootScope, annotationMapper, groups, session, settings) {
+  // the randomly generated session UUID
+  var clientId = uuid.v4();
+
+  // the singleton socket instance, only one may
+  // be open at a time
+  var socket;
+
   // Client configuration messages, to be sent each time a new connection is
   // established.
   var configMessages = {};
-
-  // Close any existing socket
-  if (socket) {
-    socket.close();
-  }
-
-  // If we have no URL configured, don't do anything.
-  var url = settings.websocketUrl;
-  if (!url) {
-    return controls;
-  }
-
-  // Open the socket
-  socket = new Socket(url);
-  setConfig('client-id', {
-    messageType: 'client_id',
-    value: clientId
-  });
 
   function handleAnnotationNotification(message) {
     var action = message.options.action;
@@ -108,52 +86,73 @@ function connect($rootScope, annotationMapper, groups, session, settings) {
     }
   }
 
-  socket.on('open', function () {
-    sendClientConfig();
-  });
-
-  socket.on('error', function (event) {
-    console.warn('Error connecting to H push notification service:', event);
-
-    // In development, warn if the connection failure might be due to
-    // the app's origin not having been whitelisted in the H service's config.
-    //
-    // Unfortunately the error event does not provide a way to get at the
-    // HTTP status code for HTTP -> WS upgrade requests.
-    var websocketHost = new URL(url).hostname;
-    if (['localhost', '127.0.0.1'].indexOf(websocketHost) !== -1) {
-      console.warn('Check that your H service is configured to allow ' +
-                   'WebSocket connections from ' + window.location.origin);
+  var connect = function  () {
+    // If we have no URL configured, don't do anything.
+    var url = settings.websocketUrl;
+    if (!url) {
+      return;
     }
-  });
 
-  socket.on('message', function (event) {
-    // Wrap message dispatches in $rootScope.$apply() so that
-    // scope watches on app state affected by the received message
-    // are updated
-    //
-    // Note: The use of $apply() here will no longer be needed once session
-    // state is moved to the Redux store in `annotationUI`.
-    $rootScope.$apply(function () {
-      var message = JSON.parse(event.data);
-      if (!message) {
-        return;
-      }
+    // Open a new socket
+    if (socket) {
+      socket.close();
+    }
 
-      if (message.type === 'annotation-notification') {
-        handleAnnotationNotification(message);
-      } else if (message.type === 'session-change') {
-        handleSessionChangeNotification(message);
-      } else {
-        console.warn('received unsupported notification', message.type);
+    socket = new Socket(url);
+    setConfig('client-id', {
+      messageType: 'client_id',
+      value: clientId,
+    });
+
+    socket.on('open', function () {
+      sendClientConfig();
+    });
+
+    socket.on('error', function (event) {
+      console.warn('Error connecting to H push notification service:', event);
+
+      // In development, warn if the connection failure might be due to
+      // the app's origin not having been whitelisted in the H service's config.
+      //
+      // Unfortunately the error event does not provide a way to get at the
+      // HTTP status code for HTTP -> WS upgrade requests.
+      var websocketHost = new URL(url).hostname;
+      if (['localhost', '127.0.0.1'].indexOf(websocketHost) !== -1) {
+        console.warn('Check that your H service is configured to allow ' +
+                     'WebSocket connections from ' + window.location.origin);
       }
     });
-  });
 
-  return controls;
+    socket.on('message', function (event) {
+      // Wrap message dispatches in $rootScope.$apply() so that
+      // scope watches on app state affected by the received message
+      // are updated
+      //
+      // Note: The use of $apply() here will no longer be needed once session
+      // state is moved to the Redux store in `annotationUI`.
+      $rootScope.$apply(function () {
+        var message = JSON.parse(event.data);
+        if (!message) {
+          return;
+        }
+
+        if (message.type === 'annotation-notification') {
+          handleAnnotationNotification(message);
+        } else if (message.type === 'session-change') {
+          handleSessionChangeNotification(message);
+        } else {
+          console.warn('received unsupported notification', message.type);
+        }
+      });
+    });
+  };
+
+  connect();
+
+  this.connect = connect;
+  this.clientId = clientId;
+  this.setConfig = setConfig;
+  this.socket = socket;
 }
 
-module.exports = {
-  connect: connect,
-  clientId: clientId
-};
+module.exports = Streamer;
