@@ -15,7 +15,7 @@
     <span class="selection-tabs__count" ng-if="vm.totalNotes > 0">{{ vm.totalNotes }}</sup>
   </a>
 </div>
-<div ng-if="!vm.isLoading()">
+<div ng-if="!vm.isLoading()" class="selection-tabs__empty-message">
   <div ng-if="vm.selectedTab === vm.TAB_NOTES && vm.totalNotes === 0"  class="annotation-unavailable-message">
     <p class="annotation-unavailable-message__label">
       There are no page notes in this group.

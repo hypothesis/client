@@ -37,6 +37,8 @@
 
   // Disable focus ring for selected tab
   outline: none;
+
+  user-select: none;
 }
 
 .selection-tabs__type.is-selected {
@@ -49,6 +51,7 @@
   font-size: 10px;
 }
 
-.selection-loading {
-  text-align: center;
+.selection-tabs__empty-message {
+  position: relative;
+  top: 10px;
 }
