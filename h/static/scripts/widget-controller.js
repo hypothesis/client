@@ -224,8 +224,14 @@ module.exports = function WidgetController(
       }
     });
     searchClient.on('end', function () {
-      // Remove client from list of active search clients
-      searchClients.splice(searchClients.indexOf(searchClient), 1);
+      // Remove client from list of active search clients.
+      //
+      // $evalAsync is required here because search results are emitted
+      // asynchronously. A better solution would be that the loading state is
+      // tracked as part of the app state.
+      $scope.$evalAsync(function () {
+        searchClients.splice(searchClients.indexOf(searchClient), 1);
+      });
     });
     searchClient.get({uri: uris, group: group});
   }
