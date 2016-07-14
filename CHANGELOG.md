@@ -4,6 +4,21 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+### Changed
+
+- Annotation / Notes tabs copy update and style tweaks
+  ([#34](https://github.com/hypothesis/client/pull/34))
+
+### Fixed
+
+- Remove sticky tab bar behavior for now because it has some UI issues that
+  need to be resolved ([#35](https://github.com/hypothesis/client/pull/35))
+
+- Update UI state after search API request completes with no results
+  ([#36](https://github.com/hypothesis/client/pull/36))
+
 ## [0.33.0] - 2016-07-13
 
 ### Added
