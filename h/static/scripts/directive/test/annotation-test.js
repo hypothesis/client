@@ -275,7 +275,7 @@ describe('annotation', function() {
         };
         var originalPermissions = JSON.parse(JSON.stringify(
           annotation.permissions));
-        fakePermissions['default'] = function () {
+        fakePermissions.default = function () {
           return 'new permissions';
         };
         fakePermissions.isShared = function () {};
@@ -604,7 +604,7 @@ describe('annotation', function() {
           var parts = createDirective();
           sandbox.stub($window, 'confirm').returns(true);
           fakeAnnotationMapper.deleteAnnotation.returns($q.resolve());
-          parts.controller['delete']().then(function() {
+          parts.controller.delete().then(function() {
             assert.calledWith(fakeAnnotationMapper.deleteAnnotation,
                 parts.annotation);
             done();
@@ -618,7 +618,7 @@ describe('annotation', function() {
         function(done) {
           var parts = createDirective();
           sandbox.stub($window, 'confirm').returns(false);
-          parts.controller['delete']().then(function() {
+          parts.controller.delete().then(function() {
             assert.notCalled(fakeAnnotationMapper.deleteAnnotation);
             done();
           });
@@ -634,7 +634,7 @@ describe('annotation', function() {
           fakeAnnotationMapper.deleteAnnotation.returns($q.reject({
             status: 0
           }));
-          controller['delete']().then(function() {
+          controller.delete().then(function() {
             assert.calledWith(fakeFlash.error,
               'Service unreachable.', 'Deleting annotation failed');
             done();
@@ -651,7 +651,7 @@ describe('annotation', function() {
           statusText: 'Server Error',
           data: {}
         }));
-        controller['delete']().then(function() {
+        controller.delete().then(function() {
           assert.calledWith(fakeFlash.error,
             '500 Server Error', 'Deleting annotation failed');
           done();
@@ -663,7 +663,7 @@ describe('annotation', function() {
         var controller = createDirective().controller;
         sandbox.stub($window, 'confirm').returns(true);
         fakeAnnotationMapper.deleteAnnotation.returns($q.resolve());
-        controller['delete']().then(function() {
+        controller.delete().then(function() {
           assert.notCalled(fakeFlash.error);
           done();
         });

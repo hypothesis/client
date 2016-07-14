@@ -143,7 +143,7 @@ function AnnotationController(
     vm.annotation.user = vm.annotation.user || session.state.userid;
     vm.annotation.group = vm.annotation.group || groups.focused().id;
     if (!vm.annotation.permissions) {
-      vm.annotation.permissions = permissions['default'](vm.annotation.group);
+      vm.annotation.permissions = permissions.default(vm.annotation.group);
     }
     vm.annotation.text = vm.annotation.text || '';
     if (!Array.isArray(vm.annotation.tags)) {
@@ -236,7 +236,7 @@ function AnnotationController(
     * @name annotation.AnnotationController#delete
     * @description Deletes the annotation.
     */
-  vm['delete'] = function() {
+  vm.delete = function() {
     return $timeout(function() {  // Don't use confirm inside the digest cycle.
       var msg = 'Are you sure you want to delete this annotation?';
       if ($window.confirm(msg)) {
