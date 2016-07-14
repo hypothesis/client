@@ -44,6 +44,13 @@ describe('time', function () {
   beforeEach(function () {
     sandbox = sinon.sandbox.create();
     sandbox.useFakeTimers();
+
+    // Ensure that the current local date is 01/01/1970, as this is assumed by
+    // test expectations
+    var offset = new Date().getTimezoneOffset();
+    if (offset > 0) {
+      sandbox.clock.tick(offset * 60 * 1000);
+    }
   });
 
   afterEach(function () {
