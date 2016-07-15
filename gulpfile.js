@@ -126,23 +126,6 @@ gulp.task('watch-app-js', ['build-vendor-js'], function () {
   });
 });
 
-var extensionBundleConfig = {
-  name: 'extension',
-  entry: './h/browser/chrome/lib/extension',
-  path: SCRIPT_DIR,
-  external: vendorModules,
-  minify: IS_PRODUCTION_BUILD,
-  noParse: vendorBundles.noParseModules,
-};
-
-gulp.task('build-extension-js', ['build-vendor-js'], function () {
-  return createBundle(extensionBundleConfig);
-});
-
-gulp.task('watch-extension-js', ['build-vendor-js'], function () {
-  return createBundle(extensionBundleConfig, {watch: true});
-});
-
 var styleFiles = [
   // H
   './h/static/styles/annotator/inject.scss',
@@ -294,7 +277,6 @@ gulp.task('build-app',
 
 gulp.task('build',
           ['build-app-js',
-           'build-extension-js',
            'build-css',
            'build-fonts',
            'build-images'],
@@ -303,7 +285,6 @@ gulp.task('build',
 gulp.task('watch',
           ['start-live-reload-server',
            'watch-app-js',
-           'watch-extension-js',
            'watch-css',
            'watch-fonts',
            'watch-images',
@@ -338,21 +319,12 @@ gulp.task('test-app', function (callback) {
   runKarma('./h/static/scripts/karma.config.js', {singleRun:true}, callback);
 });
 
-gulp.task('test-extension', function (callback) {
-  runKarma('./h/browser/chrome/karma.config.js', {singleRun:true}, callback);
-});
-
 gulp.task('test-watch-app', function (callback) {
   runKarma('./h/static/scripts/karma.config.js', {}, callback);
 });
 
-gulp.task('test-watch-extension', function (callback) {
-  runKarma('./h/browser/chrome/karma.config.js', {}, callback);
-});
-
 gulp.task('upload-sourcemaps',
-          ['build-app-js',
-           'build-extension-js'], function () {
+          ['build-app-js'], function () {
   var uploadToSentry = require('./scripts/gulp/upload-to-sentry');
 
   var opts = {
