@@ -36,10 +36,11 @@ describe('streamer', function () {
   var fakeRootScope;
   var fakeSession;
   var fakeSettings;
-  var streamer;
+  var activeStreamer;
+  var Streamer;
 
   function createDefaultStreamer() {
-    streamer.connect(
+    activeStreamer = new Streamer(
       fakeRootScope,
       fakeAnnotationMapper,
       fakeGroups,
@@ -74,7 +75,7 @@ describe('streamer', function () {
       websocketUrl: 'ws://example.com/ws',
     };
 
-    streamer = proxyquire('../streamer', {
+    Streamer = proxyquire('../streamer', {
       './websocket': FakeSocket,
     });
   });
@@ -89,19 +90,13 @@ describe('streamer', function () {
     createDefaultStreamer();
     assert.equal(fakeWebSocket.messages.length, 1);
     assert.equal(fakeWebSocket.messages[0].messageType, 'client_id');
-    assert.equal(fakeWebSocket.messages[0].value, streamer.clientId);
+    assert.equal(fakeWebSocket.messages[0].value, activeStreamer.clientId);
   });
 
   it('should close any existing socket', function () {
     createDefaultStreamer();
     var oldWebSocket = fakeWebSocket;
-    streamer.connect(
-      fakeRootScope,
-      fakeAnnotationMapper,
-      fakeGroups,
-      fakeSession,
-      fakeSettings
-    );
+    activeStreamer.connect();
     assert.ok(oldWebSocket.didClose);
     assert.ok(!fakeWebSocket.didClose);
   });

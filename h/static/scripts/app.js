@@ -28,8 +28,6 @@ if (settings.raven) {
   angular.module('ngRaven', []);
 }
 
-var streamer = require('./streamer');
-
 // Fetch external state that the app needs before it can run. This includes the
 // authenticated user state, the API endpoint URLs and WebSocket connection.
 var resolve = {
@@ -37,7 +35,6 @@ var resolve = {
   sessionState: function (session) {
     return session.load();
   },
-  streamer: streamer.connect,
 };
 
 // @ngInject
@@ -91,7 +88,7 @@ function configureHttp($httpProvider, jwtInterceptorProvider) {
 }
 
 // @ngInject
-function setupHttp($http) {
+function setupHttp($http, streamer) {
   $http.defaults.headers.common['X-Client-Id'] = streamer.clientId;
 }
 
@@ -175,6 +172,7 @@ module.exports = angular.module('h', [
   .service('rootThread', require('./root-thread'))
   .service('searchFilter', require('./search-filter'))
   .service('session', require('./session'))
+  .service('streamer', require('./streamer'))
   .service('streamFilter', require('./stream-filter'))
   .service('tags', require('./tags'))
   .service('unicode', require('./unicode'))
