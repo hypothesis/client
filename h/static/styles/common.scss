@@ -29,21 +29,7 @@ html {
   line-height: $base-line-height;
 }
 
-//PAPER////////////////////////////////
-//Provides the white background upon which items sit
-.paper {
-  background: $white;
-  border: solid 1px $gray-lighter;
-  border-radius: 2px;
-  padding: 1em;
-}
-
 //MCRANDOM////////////////////////////////
-
-.alert-block {
-  span.errorMsgLbl { @extend .visuallyhidden; }
-  span.errorMsg { @extend .visuallyhidden; }
-}
 
 .small {
   font-size: $body1-font-size;
@@ -97,45 +83,15 @@ html {
 }
 
 //FORM RELATED////////////////////////////////
-.form-horizontal {
-  display: inline-block;
-  .controls, .control-group, div, fieldset,
-  input, button, select, textarea {
-    display: inline-block;
-  }
-  select, textarea, input, button {
-    margin: .5em 0;
-  }
-}
 
 .form-inline .control-group { margin-bottom: 0; }
 
 .form-vertical {
-  legend {
-    font-size: $body1-font-size;
-    line-height: $body1-line-height;
-    margin-top: 1.5em;
-    margin-bottom: 1.5em;
-  }
-
   select, textarea, input, button {
     display: block;
     // margin-top: .75em;
   }
 }
-
-.req {
-  display: none;
-}
-
-.visuallyhidden {
-  position: absolute;
-  overflow: hidden;
-  clip: rect(0 0 0 0);
-  height: 1px; width: 1px;
-  margin: -1px; padding: 0; border: 0;
-}
-
 
 //DROPDOWNS////////////////////////////////
 .dropdown {
@@ -334,20 +290,6 @@ html {
   border: 4px solid $color-dove-gray;
 }
 
-.masthead {
-  margin-bottom: 1em;
-
-  .masthead-heading {
-    color: $gray;
-    font-size: 1.1em;
-    font-weight: 400;
-
-    &:hover {
-      color: $gray-dark;
-    }
-  }
-}
-
 //TABS////////////////////////////////
 .nav-tabs {
   margin-bottom: .7em;
@@ -392,11 +334,3 @@ html {
   }
 }
 
-.tab-content {
-  .tab-pane {
-    display: none;
-    &.active {
-      display: inherit !important;
-    }
-  }
-}
