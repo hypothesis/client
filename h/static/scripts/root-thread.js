@@ -65,6 +65,8 @@ function RootThread($rootScope, annotationUI, features, searchFilter, viewFilter
           return thread.annotation && metadata.isAnnotation(thread.annotation);
         } else if (state.selectedTab === uiConstants.TAB_NOTES) {
           return thread.annotation && metadata.isPageNote(thread.annotation);
+        } else {
+          throw new Error('Invalid selected tab');
         }
       };
     }

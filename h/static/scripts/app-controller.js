@@ -127,7 +127,7 @@ module.exports = function AppController(
     });
     drafts.discard();
     $scope.accountDialog.visible = false;
-    return auth.logout();
+    auth.logout();
   };
 
   $scope.clearSelection = function () {
