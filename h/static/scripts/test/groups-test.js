@@ -85,7 +85,7 @@ describe('groups', function() {
       assert.equal(group.id, 'id2');
     });
 
-    it('returns null if the group doesn\'t exist', function() {
+    it("returns null if the group doesn't exist", function() {
       var group = service().get('foobar');
 
       assert.isNull(group);

@@ -43,7 +43,7 @@
     ],
     "no-useless-concat": "error",
     "one-var-declaration-per-line": ["error", "always"],
-    "quotes": ["error", "single"],
+    "quotes": ["error", "single", {"avoidEscape": true}],
     "semi": "error",
     "strict": ["error", "safe"],
   },
