@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var angular = require('angular');
 
@@ -63,8 +63,8 @@ describe('h:session', function () {
     it('should invoke the flash service with any flash messages', function () {
       var response = {
         flash: {
-          error: ['fail']
-        }
+          error: ['fail'],
+        },
       };
       $httpBackend.expectPOST(url).respond(response);
       session.login({});
@@ -75,12 +75,12 @@ describe('h:session', function () {
     it('should assign errors and status reasons to the model', function () {
       var response = {
         model: {
-          userid: 'alice'
+          userid: 'alice',
         },
         errors: {
-          password: 'missing'
+          password: 'missing',
         },
-        reason: 'bad credentials'
+        reason: 'bad credentials',
       };
       $httpBackend.expectPOST(url).respond(response);
       var result = session.login({});
@@ -95,7 +95,7 @@ describe('h:session', function () {
       var headers = {
         'Accept': 'application/json, text/plain, */*',
         'Content-Type': 'application/json;charset=utf-8',
-        'X-XSRF-TOKEN': token
+        'X-XSRF-TOKEN': token,
       };
       var model = {csrf: token};
       $httpBackend.expectPOST(url).respond({model: model});
@@ -111,8 +111,8 @@ describe('h:session', function () {
     it('should expose the model as session.state', function () {
       var response = {
         model: {
-          userid: 'alice'
-        }
+          userid: 'alice',
+        },
       };
       assert.deepEqual(session.state, {});
       $httpBackend.expectPOST(url).respond(response);
@@ -185,7 +185,7 @@ describe('h:session', function () {
       $rootScope.$on(events.SESSION_CHANGED, sessionChangeCallback);
       session.update({
         groups: [{
-          id: 'groupid'
+          id: 'groupid',
         }],
         csrf: 'dummytoken',
       });
@@ -196,9 +196,9 @@ describe('h:session', function () {
       sessionChangeCallback.reset();
       session.update({
         groups: [{
-          id: 'groupid2'
+          id: 'groupid2',
         }],
-        csrf: 'dummytoken'
+        csrf: 'dummytoken',
       });
       assert.calledWith(sessionChangeCallback, sinon.match({}),
         {initialLoad: false});
@@ -209,9 +209,9 @@ describe('h:session', function () {
       $rootScope.$on(events.GROUPS_CHANGED, groupChangeCallback);
       session.update({
         groups: [{
-          id: 'groupid'
+          id: 'groupid',
         }],
-        csrf: 'dummytoken'
+        csrf: 'dummytoken',
       });
       assert.calledOnce(groupChangeCallback);
     });
@@ -221,7 +221,7 @@ describe('h:session', function () {
       $rootScope.$on(events.USER_CHANGED, userChangeCallback);
       session.update({
         userid: 'fred',
-        csrf: 'dummytoken'
+        csrf: 'dummytoken',
       });
       assert.calledOnce(userChangeCallback);
     });

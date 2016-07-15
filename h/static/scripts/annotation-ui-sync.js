@@ -55,7 +55,7 @@ function AnnotationUISync($rootScope, $window, annotationUI, bridge) {
         annotationUI.setShowHighlights(state);
         bridge.call('setVisibleHighlights', state);
       }
-    }
+    },
   };
 
   for (var channel in channelListeners) {

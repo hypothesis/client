@@ -7,7 +7,7 @@ function defaultAnnotation() {
   return {
     id: 'deadbeef',
     document: {
-      title: 'A special document'
+      title: 'A special document',
     },
     target: [{source: 'source', 'selector': []}],
     uri: 'http://example.com',
@@ -26,7 +26,7 @@ function newAnnotation() {
     target: ['foo', 'bar'],
     references: [],
     text: 'Annotation text',
-    tags: ['tag_1', 'tag_2']
+    tags: ['tag_1', 'tag_2'],
   };
 }
 
@@ -38,7 +38,7 @@ function newReply() {
     target: ['foo', 'bar'],
     references: ['parent-id'],
     text: 'Annotation text',
-    tags: ['tag_1', 'tag_2']
+    tags: ['tag_1', 'tag_2'],
   };
 }
 
@@ -60,7 +60,7 @@ function newEmptyAnnotation() {
 function newHighlight() {
   return {
     id: undefined,
-    $highlight: true
+    $highlight: true,
   };
 }
 
@@ -74,7 +74,7 @@ function oldAnnotation() {
     target: ['foo', 'bar'],
     references: [],
     text: 'This is my annotation',
-    tags: ['tag_1', 'tag_2']
+    tags: ['tag_1', 'tag_2'],
   };
 }
 
@@ -88,7 +88,7 @@ function oldHighlight() {
     target: ['foo', 'bar'],
     references: [],
     text: '',
-    tags: []
+    tags: [],
   };
 }
 
@@ -101,7 +101,7 @@ function oldPageNote() {
     target: [],
     references: [],
     text: '',
-    tags: []
+    tags: [],
   };
 }
 
@@ -114,7 +114,7 @@ function oldReply() {
     target: ['foo'],
     references: ['parent_annotation_id'],
     text: '',
-    tags: []
+    tags: [],
   };
 }
 

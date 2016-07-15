@@ -58,9 +58,9 @@ module.exports = function () {
           this.copyToClipboardMessage = 'Select and copy to share.';
         } finally {
           setTimeout(function () {
-              this.copyToClipboardMessage = null;
-              $scope.$digest();
-            }.bind(this),
+            this.copyToClipboardMessage = null;
+            $scope.$digest();
+          }.bind(this),
             1000);
         }
       }.bind(this);
@@ -71,6 +71,6 @@ module.exports = function () {
       isPrivate: '<',
       isOpen: '<',
       onClose: '&',
-    }
+    },
   };
 };

@@ -9,7 +9,7 @@ var proxyquire = require('proxyquire');
 var fakeWebSocket = null;
 
 function FakeSocket() {
-  fakeWebSocket = this;
+  fakeWebSocket = this; // eslint-disable-line consistent-this
 
   this.messages = [];
   this.didClose = false;
@@ -53,7 +53,7 @@ describe('streamer', function () {
     fakeRootScope = {
       $apply: function (callback) {
         callback();
-      }
+      },
     };
 
     fakeAnnotationMapper = {
@@ -110,8 +110,8 @@ describe('streamer', function () {
           action: 'create',
         },
         payload: [{
-          group: 'public'
-        }]
+          group: 'public',
+        }],
       });
       assert.ok(fakeAnnotationMapper.loadAnnotations.calledOnce);
     });
@@ -124,8 +124,8 @@ describe('streamer', function () {
           action: 'delete',
         },
         payload: [{
-          group: 'public'
-        }]
+          group: 'public',
+        }],
       });
       assert.ok(fakeAnnotationMapper.unloadAnnotations.calledOnce);
     });
@@ -136,8 +136,8 @@ describe('streamer', function () {
       createDefaultStreamer();
       var model = {
         groups: [{
-          id: 'new-group'
-        }]
+          id: 'new-group',
+        }],
       };
       fakeWebSocket.notify({
         type: 'session-change',

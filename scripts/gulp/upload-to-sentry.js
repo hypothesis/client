@@ -73,7 +73,7 @@ function uploadReleaseFile(opts, project, release, file) {
     formData: {
       file: fs.createReadStream(file.path),
       name: path.basename(file.path),
-    }
+    },
   }).then(function (result) {
     if (result.response.statusCode === 201) {
       return;

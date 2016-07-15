@@ -111,7 +111,7 @@ describe('markdown commands', function () {
         'one [' + sel + '](<sel>http://insert-your-link-here.com</sel>) three');
     },[
       {selection: 'two'},
-      {selection: 'jim:smith'}
+      {selection: 'jim:smith'},
     ]);
 
     unroll('converts URLs to links', function (testCase) {

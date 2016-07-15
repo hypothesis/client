@@ -48,7 +48,7 @@ function annotationMapper($rootScope, annotationUI, store) {
 
   function deleteAnnotation(annotation) {
     return store.annotation.delete({
-      id: annotation.id
+      id: annotation.id,
     }).then(function () {
       $rootScope.$emit(events.ANNOTATION_DELETED, annotation);
       return annotation;
@@ -59,7 +59,7 @@ function annotationMapper($rootScope, annotationUI, store) {
     loadAnnotations: loadAnnotations,
     unloadAnnotations: unloadAnnotations,
     createAnnotation: createAnnotation,
-    deleteAnnotation: deleteAnnotation
+    deleteAnnotation: deleteAnnotation,
   };
 }
 

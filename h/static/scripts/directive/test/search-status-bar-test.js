@@ -18,9 +18,9 @@ describe('searchStatusBar', function () {
     it('should display the filter count', function () {
       var elem = util.createDirective(document, 'searchStatusBar', {
         filterActive: true,
-        filterMatchCount: 5
+        filterMatchCount: 5,
       });
-      assert.include(elem[0].textContent, "5 search results");
+      assert.include(elem[0].textContent, '5 search results');
     });
   });
 

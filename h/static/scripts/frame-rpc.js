@@ -1,6 +1,6 @@
 'use strict';
 
-/* eslint curly: "off" */
+/* eslint-disable */
 
 /** This software is released under the MIT license:
 

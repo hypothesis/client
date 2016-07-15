@@ -53,7 +53,7 @@ PDFMetadata.prototype.getMetadata = function () {
     }
 
     var link = [
-      {href: fingerprintToURN(app.documentFingerprint)}
+      {href: fingerprintToURN(app.documentFingerprint)},
     ];
 
     var url = getPDFURL(app);

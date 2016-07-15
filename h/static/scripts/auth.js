@@ -34,7 +34,7 @@ function fetchToken($http, session, settings) {
     skipAuthorization: true,
     transformRequest: function (data) {
       return queryString.stringify(data);
-    }
+    },
   };
   return $http.get(tokenUrl, config).then(function (response) {
     return response.data;

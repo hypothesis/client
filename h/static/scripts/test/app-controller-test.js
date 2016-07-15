@@ -53,7 +53,7 @@ describe('AppController', function () {
 
     fakeAnnotationUI = {
       tool: 'comment',
-      clearSelectedAnnotations: sandbox.spy()
+      clearSelectedAnnotations: sandbox.spy(),
     };
 
     fakeAuth = {
@@ -66,16 +66,16 @@ describe('AppController', function () {
       all: sandbox.stub().returns([]),
       discard: sandbox.spy(),
       count: sandbox.stub().returns(0),
-      unsaved: sandbox.stub().returns([])
+      unsaved: sandbox.stub().returns([]),
     };
 
     fakeFeatures = {
       fetch: sandbox.spy(),
-      flagEnabled: sandbox.stub().returns(false)
+      flagEnabled: sandbox.stub().returns(false),
     };
 
     fakeLocation = {
-      search: sandbox.stub().returns({})
+      search: sandbox.stub().returns({}),
     };
 
     fakeParams = {id: 'test'};
@@ -90,7 +90,7 @@ describe('AppController', function () {
 
     fakeWindow = {
       top: {},
-      confirm: sandbox.stub()
+      confirm: sandbox.stub(),
     };
 
     fakeSettings = {
@@ -237,7 +237,7 @@ describe('AppController', function () {
 
     it('emits "annotationDeleted" for each unsaved draft annotation', function () {
       fakeDrafts.unsaved = sandbox.stub().returns(
-        ["draftOne", "draftTwo", "draftThree"]
+        ['draftOne', 'draftTwo', 'draftThree']
       );
       createController();
       $rootScope.$emit = sandbox.stub();
@@ -246,11 +246,11 @@ describe('AppController', function () {
 
       assert($rootScope.$emit.calledThrice);
       assert.deepEqual(
-        $rootScope.$emit.firstCall.args, ["annotationDeleted", "draftOne"]);
+        $rootScope.$emit.firstCall.args, ['annotationDeleted', 'draftOne']);
       assert.deepEqual(
-        $rootScope.$emit.secondCall.args, ["annotationDeleted", "draftTwo"]);
+        $rootScope.$emit.secondCall.args, ['annotationDeleted', 'draftTwo']);
       assert.deepEqual(
-        $rootScope.$emit.thirdCall.args, ["annotationDeleted", "draftThree"]);
+        $rootScope.$emit.thirdCall.args, ['annotationDeleted', 'draftThree']);
     });
 
     it('discards draft annotations', function () {

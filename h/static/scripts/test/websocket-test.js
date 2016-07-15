@@ -9,7 +9,7 @@ describe('websocket wrapper', function () {
   function FakeWebSocket() {
     this.close = sinon.stub();
     this.send = sinon.stub();
-    fakeSocket = this;
+    fakeSocket = this; // eslint-disable-line consistent-this
   }
   FakeWebSocket.OPEN = 1;
 

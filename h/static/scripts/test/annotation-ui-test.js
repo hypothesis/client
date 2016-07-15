@@ -120,7 +120,7 @@ describe('annotationUI', function () {
     it('adds the passed annotations to the focusedAnnotationMap', function () {
       annotationUI.focusAnnotations([1, 2, 3]);
       assert.deepEqual(annotationUI.getState().focusedAnnotationMap, {
-        1: true, 2: true, 3: true
+        1: true, 2: true, 3: true,
       });
     });
 
@@ -128,7 +128,7 @@ describe('annotationUI', function () {
       annotationUI.focusAnnotations([1]);
       annotationUI.focusAnnotations([2, 3]);
       assert.deepEqual(annotationUI.getState().focusedAnnotationMap, {
-        2: true, 3: true
+        2: true, 3: true,
       });
     });
 
@@ -170,7 +170,7 @@ describe('annotationUI', function () {
     it('adds the passed annotations to the selectedAnnotationMap', function () {
       annotationUI.selectAnnotations([1, 2, 3]);
       assert.deepEqual(annotationUI.getState().selectedAnnotationMap, {
-        1: true, 2: true, 3: true
+        1: true, 2: true, 3: true,
       });
     });
 
@@ -178,7 +178,7 @@ describe('annotationUI', function () {
       annotationUI.selectAnnotations([1]);
       annotationUI.selectAnnotations([2, 3]);
       assert.deepEqual(annotationUI.getState().selectedAnnotationMap, {
-        2: true, 3: true
+        2: true, 3: true,
       });
     });
 
@@ -194,7 +194,7 @@ describe('annotationUI', function () {
       annotationUI.selectAnnotations([1, 2]);
       annotationUI.toggleSelectedAnnotations([3, 4]);
       assert.deepEqual(annotationUI.getState().selectedAnnotationMap, {
-        1: true, 2: true, 3: true, 4: true
+        1: true, 2: true, 3: true, 4: true,
       });
     });
 
@@ -216,7 +216,7 @@ describe('annotationUI', function () {
       annotationUI.selectAnnotations([1, 2, 3]);
       annotationUI.removeSelectedAnnotation(2);
       assert.deepEqual(annotationUI.getState().selectedAnnotationMap, {
-        1: true, 3: true
+        1: true, 3: true,
       });
     });
 

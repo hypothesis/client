@@ -65,7 +65,7 @@ describe('media-embedder', function () {
       assert.equal(element.children[0].tagName, 'IFRAME');
       assert.equal(
         element.children[0].src, 'https://player.vimeo.com/video/149000090');
-      });
+    });
   });
 
   it('replaces Vimeo channel links with iframes', function () {

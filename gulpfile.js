@@ -68,8 +68,8 @@ function getEnv(key) {
 /** A list of all modules included in vendor bundles. */
 var vendorModules = Object.keys(vendorBundles.bundles)
   .reduce(function (deps, key) {
-  return deps.concat(vendorBundles.bundles[key]);
-}, []);
+    return deps.concat(vendorBundles.bundles[key]);
+  }, []);
 
 // Builds the bundles containing vendor JS code
 gulp.task('build-vendor-js', function () {
@@ -293,7 +293,7 @@ function runKarma(baseConfig, opts, done) {
     client: {
       mocha: {
         grep: taskArgs.grep,
-      }
+      },
     },
   };
 
@@ -319,8 +319,7 @@ gulp.task('test-watch-app', function (callback) {
   runKarma('./h/static/scripts/karma.config.js', {}, callback);
 });
 
-gulp.task('upload-sourcemaps',
-          ['build-app-js'], function () {
+gulp.task('upload-sourcemaps', ['build-app-js'], function () {
   var uploadToSentry = require('./scripts/gulp/upload-to-sentry');
 
   var opts = {
@@ -331,5 +330,5 @@ gulp.task('upload-sourcemaps',
   var release = getEnv('SENTRY_RELEASE_VERSION');
 
   return gulp.src(['build/scripts/*.js', 'build/scripts/*.map'])
-    .pipe(uploadToSentry(opts, projects, release));
+             .pipe(uploadToSentry(opts, projects, release));
 });

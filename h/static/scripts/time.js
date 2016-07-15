@@ -103,33 +103,33 @@ var BREAKPOINTS = [
   {
     test: lessThanThirtySecondsAgo,
     format: function () {return 'Just now';},
-    nextUpdate: 1
+    nextUpdate: 1,
   },
   {
     test: lessThanOneMinuteAgo,
     format: nSec,
-    nextUpdate: 1
+    nextUpdate: 1,
   },
   {
     test: lessThanOneHourAgo,
     format: nMin,
-    nextUpdate: minute
+    nextUpdate: minute,
   },
   {
     test: lessThanOneDayAgo,
     format: nHr,
-    nextUpdate: hour
+    nextUpdate: hour,
   },
   {
     test: thisYear,
     format: dayAndMonth,
-    nextUpdate: null
+    nextUpdate: null,
   },
   {
     test: function () {return true;},
     format: dayAndMonthAndYear,
-    nextUpdate: null
-  }
+    nextUpdate: null,
+  },
 ];
 
 function getBreakpoint(date, now) {

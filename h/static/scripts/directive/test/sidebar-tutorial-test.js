@@ -9,9 +9,9 @@ describe('SidebarTutorialController', function () {
       var session = {
         state: {
           preferences: {
-            show_sidebar_tutorial: true
-          }
-        }
+            show_sidebar_tutorial: true,
+          },
+        },
       };
       var controller = new Controller(session);
 
@@ -24,9 +24,9 @@ describe('SidebarTutorialController', function () {
       var session = {
         state: {
           preferences: {
-            show_sidebar_tutorial: false
-          }
-        }
+            show_sidebar_tutorial: false,
+          },
+        },
       };
       var controller = new Controller(session);
 

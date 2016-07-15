@@ -11,7 +11,7 @@ var fakeLocalStorage = {
   },
   getItem: function (key) {
     return fakeStorage[key];
-  }
+  },
 };
 
 describe('publishAnnotationBtn', function () {
@@ -32,16 +32,16 @@ describe('publishAnnotationBtn', function () {
     // create a new instance of the directive with default
     // attributes
     element = util.createDirective(document, 'publishAnnotationBtn', {
-     group: {
-       name: 'Public',
-       type: 'public'
-     },
-     canPost: true,
-     isShared: false,
-     onSave: function () {},
-     onSetPrivacy: function () {},
-     onCancel: function () {}
-   });
+      group: {
+        name: 'Public',
+        type: 'public',
+      },
+      canPost: true,
+      isShared: false,
+      onSave: function () {},
+      onSetPrivacy: function () {},
+      onCancel: function () {},
+    });
   });
 
   it('should display "Post to Only Me"', function () {
@@ -54,9 +54,9 @@ describe('publishAnnotationBtn', function () {
     element.link({
       group: {
         name: 'Research Lab',
-        type: 'group'
+        type: 'group',
       },
-      isShared: true
+      isShared: true,
     });
     var buttons = element.find('button');
     assert.equal(buttons[0].innerHTML, 'Post to Research Lab');
@@ -65,7 +65,7 @@ describe('publishAnnotationBtn', function () {
   it('should save when "Post..." is clicked', function () {
     var savedSpy = sinon.spy();
     element.link({
-      onSave: savedSpy
+      onSave: savedSpy,
     });
     assert.ok(!savedSpy.called);
     angular.element(element.find('button')[0]).click();
@@ -77,7 +77,7 @@ describe('publishAnnotationBtn', function () {
     element.link({
       // for existing annotations, the privacy should not be changed
       // unless the user makes a choice from the list
-      onSetPrivacy: privacyChangedSpy
+      onSetPrivacy: privacyChangedSpy,
     });
 
     assert.ok(!privacyChangedSpy.called);
@@ -91,14 +91,14 @@ describe('publishAnnotationBtn', function () {
 
   it('should disable post buttons when posting is not possible', function () {
     element.link({
-      canPost: false
+      canPost: false,
     });
     var disabledBtns = element.find('button[disabled]');
     assert.equal(disabledBtns.length, 1);
 
     // check that buttons are enabled when posting is possible
     element.link({
-      canPost: true
+      canPost: true,
     });
     disabledBtns = element.find('button[disabled]');
     assert.equal(disabledBtns.length, 0);
@@ -107,7 +107,7 @@ describe('publishAnnotationBtn', function () {
   it('should revert changes when cancel is clicked', function () {
     var cancelSpy = sinon.spy();
     element.link({
-      onCancel: cancelSpy
+      onCancel: cancelSpy,
     });
     var cancelBtn = element.find('.publish-annotation-cancel-btn');
     assert.equal(cancelBtn.length, 1);

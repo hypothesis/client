@@ -81,7 +81,7 @@ describe('build-thread', function () {
         references: ['1'],
       },{
         id: '3',
-        references: ['1','2']
+        references: ['1','2'],
       }];
 
       var thread = createThread(NESTED_FIXTURE);
@@ -92,8 +92,8 @@ describe('build-thread', function () {
           children: [{
             annotation: NESTED_FIXTURE[2],
             children: [],
-          }]
-        }]
+          }],
+        }],
       }]);
     });
 
@@ -210,7 +210,7 @@ describe('build-thread', function () {
         filterFn: function (annot) {
           return annot.text.match(/first/);
         },
-        forceVisible: ['3']
+        forceVisible: ['3'],
       });
       assert.isFalse(thread.children[0].collapsed);
     });
@@ -252,14 +252,14 @@ describe('build-thread', function () {
     context('when there is a selection', function () {
       it('shows only selected annotations', function () {
         var thread = createThread(SIMPLE_FIXTURE, {
-          selected: ['1']
+          selected: ['1'],
         });
         assert.deepEqual(thread, [{
           annotation: SIMPLE_FIXTURE[0],
           children: [{
             annotation: SIMPLE_FIXTURE[2],
             children: [],
-          }]
+          }],
         }]);
       });
     });
@@ -284,7 +284,7 @@ describe('build-thread', function () {
 
         assert.deepEqual(thread, [{
           annotation: fixture[1],
-          children: []
+          children: [],
         }]);
       });
     });
@@ -322,14 +322,14 @@ describe('build-thread', function () {
       },{
         id: '3',
         references: ['1'],
-        created: 100
+        created: 100,
       },{
         id: '2',
         references: ['1'],
         created: 50,
       }];
       var thread = createThread(fixture, {
-        sortCompareFn: function (a, b) { return a.id < b.id; }
+        sortCompareFn: function (a, b) { return a.id < b.id; },
       });
       assert.deepEqual(annots(thread[0].children),
         [fixture[2], fixture[1]]);
@@ -349,7 +349,7 @@ describe('build-thread', function () {
       },{
         annotation: SIMPLE_FIXTURE[1],
         children: [],
-        replyCount: 0
+        replyCount: 0,
       }]);
     });
   });

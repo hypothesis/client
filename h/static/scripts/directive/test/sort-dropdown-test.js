@@ -22,7 +22,7 @@ describe('sortDropdown', function () {
       onChangeSortKey: {
         args: ['sortKey'],
         callback: changeSpy,
-      }
+      },
     });
     var links = elem.find('li');
     angular.element(links[0]).click();

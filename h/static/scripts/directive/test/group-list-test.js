@@ -35,12 +35,12 @@ describe('groupList', function () {
     $window = _$window_;
 
     groups = [{
-       id: 'public',
-       public: true
+      id: 'public',
+      public: true,
     },{
-       id: 'h-devs',
-       name: 'Hypothesis Developers',
-       url: GROUP_LINK
+      id: 'h-devs',
+      name: 'Hypothesis Developers',
+      url: GROUP_LINK,
     }];
 
     fakeGroups = {

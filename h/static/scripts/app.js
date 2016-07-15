@@ -52,24 +52,24 @@ function configureRoutes($routeProvider) {
       controller: 'AnnotationViewerController',
       template: VIEWER_TEMPLATE,
       reloadOnSearch: false,
-      resolve: resolve
+      resolve: resolve,
     });
   $routeProvider.when('/viewer',
     {
       controller: 'WidgetController',
       template: VIEWER_TEMPLATE,
       reloadOnSearch: false,
-      resolve: resolve
+      resolve: resolve,
     });
   $routeProvider.when('/stream',
     {
       controller: 'StreamController',
       template: VIEWER_TEMPLATE,
       reloadOnSearch: false,
-      resolve: resolve
+      resolve: resolve,
     });
   return $routeProvider.otherwise({
-    redirectTo: '/viewer'
+    redirectTo: '/viewer',
   });
 }
 
@@ -115,7 +115,7 @@ module.exports = angular.module('h', [
   ['ui.bootstrap', require('./vendor/ui-bootstrap-custom-tpls-0.13.4')][0],
 
   // Local addons
-  'ngRaven'
+  'ngRaven',
 ])
 
   .controller('AppController', require('./app-controller'))

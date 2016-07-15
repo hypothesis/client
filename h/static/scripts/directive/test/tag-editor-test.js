@@ -25,7 +25,7 @@ describe('tagEditor', function () {
 
   it('converts tags to the form expected by ng-tags-input', function () {
     var element = util.createDirective(document, 'tag-editor', {
-      tags: ['foo', 'bar']
+      tags: ['foo', 'bar'],
     });
     assert.deepEqual(element.ctrl.tagList, [{text: 'foo'}, {text: 'bar'}]);
   });

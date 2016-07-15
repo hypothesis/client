@@ -132,7 +132,7 @@ module.exports = function AppController(
 
   $scope.clearSelection = function () {
     if (!annotationUI.getState().selectedTab) {
-        annotationUI.selectTab(uiConstants.TAB_ANNOTATIONS);
+      annotationUI.selectTab(uiConstants.TAB_ANNOTATIONS);
     }
     annotationUI.clearSelectedAnnotations();
   };

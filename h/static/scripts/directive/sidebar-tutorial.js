@@ -2,10 +2,7 @@
 
 // @ngInject
 function SidebarTutorialController(session) {
-  /*jshint validthis:true */
-  var vm = this;
-
-  vm.showSidebarTutorial = function () {
+  this.showSidebarTutorial = function () {
     if (session.state.preferences) {
       if (session.state.preferences.show_sidebar_tutorial) {
         return true;
@@ -14,7 +11,7 @@ function SidebarTutorialController(session) {
     return false;
   };
 
-  vm.dismiss = function () {
+  this.dismiss = function () {
     session.dismiss_sidebar_tutorial();
   };
 }
@@ -36,5 +33,5 @@ module.exports = {
       template: require('../../../templates/client/sidebar_tutorial.html'),
     };
   },
-  Controller: SidebarTutorialController
+  Controller: SidebarTutorialController,
 };

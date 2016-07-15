@@ -25,6 +25,6 @@ module.exports = function () {
       scope.$on('$destroy', function () {
         view.removeEventListener('scroll', onScroll);
       });
-    }
+    },
   };
 };
