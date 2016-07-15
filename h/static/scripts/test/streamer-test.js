@@ -83,13 +83,11 @@ describe('streamer', function () {
   it('should not create a websocket connection if websocketUrl is not provided', function () {
     fakeSettings = {};
     createDefaultStreamer();
-    activeStreamer.connect();
     assert.isNull(fakeWebSocket);
   });
 
   it('should send a client ID', function () {
     createDefaultStreamer();
-    activeStreamer.connect();
     assert.equal(fakeWebSocket.messages.length, 1);
     assert.equal(fakeWebSocket.messages[0].messageType, 'client_id');
     assert.equal(fakeWebSocket.messages[0].value, activeStreamer.clientId);
@@ -97,7 +95,6 @@ describe('streamer', function () {
 
   it('should close any existing socket', function () {
     createDefaultStreamer();
-    activeStreamer.connect();
     var oldWebSocket = fakeWebSocket;
     activeStreamer.connect();
     assert.ok(oldWebSocket.didClose);
@@ -107,7 +104,6 @@ describe('streamer', function () {
   describe('annotation notifications', function () {
     it('should load new annotations', function () {
       createDefaultStreamer();
-      activeStreamer.connect();
       fakeWebSocket.notify({
         type: 'annotation-notification',
         options: {
@@ -122,7 +118,6 @@ describe('streamer', function () {
 
     it('should unload deleted annotations', function () {
       createDefaultStreamer();
-      activeStreamer.connect();
       fakeWebSocket.notify({
         type: 'annotation-notification',
         options: {
@@ -139,7 +134,6 @@ describe('streamer', function () {
   describe('session change notifications', function () {
     it('updates the session when a notification is received', function () {
       createDefaultStreamer();
-      activeStreamer.connect();
       var model = {
         groups: [{
           id: 'new-group'
@@ -156,7 +150,6 @@ describe('streamer', function () {
   describe('reconnections', function () {
     it('resends configuration messages when a reconnection occurs', function () {
       createDefaultStreamer();
-      activeStreamer.connect();
       fakeWebSocket.messages = [];
       fakeWebSocket.emit('open');
       assert.equal(fakeWebSocket.messages.length, 1);

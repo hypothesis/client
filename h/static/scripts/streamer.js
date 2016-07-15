@@ -16,16 +16,13 @@ var Socket = require('./websocket');
  * @param groups - The local groups store
  * @param session - Provides access to read and update the session state
  * @param settings - Application settings
- *
- * @return The push notification service client.
  */
 // @ngInject
 function Streamer($rootScope, annotationMapper, groups, session, settings) {
-  // the randomly generated session UUID
+  // The randomly generated session UUID
   var clientId = uuid.v4();
 
-  // the singleton socket instance, only one may
-  // be open at a time
+  // The socket instance for this Streamer instance
   var socket;
 
   // Client configuration messages, to be sent each time a new connection is
@@ -86,7 +83,7 @@ function Streamer($rootScope, annotationMapper, groups, session, settings) {
     }
   }
 
-  var connect = function  () {
+  var connect = function () {
     // If we have no URL configured, don't do anything.
     var url = settings.websocketUrl;
     if (!url) {
