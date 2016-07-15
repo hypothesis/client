@@ -12,8 +12,6 @@
  * as a dependency.
  */
 
-require('core-js/fn/object/assign');
-
 var Raven = require('raven-js');
 
 // This is only used in apps where Angular is used,

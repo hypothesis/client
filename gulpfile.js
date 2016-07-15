@@ -2,10 +2,6 @@
 
 'use strict';
 
-require('core-js/es6/promise');
-require('core-js/fn/object/assign');
-require('core-js/fn/string');
-
 var path = require('path');
 
 var batch = require('gulp-batch');
