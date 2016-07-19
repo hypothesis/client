@@ -100,6 +100,7 @@ describe('WidgetController', function () {
     fakeStreamer = {
       setConfig: sandbox.spy(),
       connect: sandbox.spy(),
+      reconnect: sandbox.spy(),
     };
 
     fakeStreamFilter = {
