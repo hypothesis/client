@@ -15,6 +15,14 @@ if (settings.raven) {
   raven.init(settings.raven);
 }
 
+// Disable Angular features that are not compatible with CSP.
+//
+// See https://docs.angularjs.org/api/ng/directive/ngCsp
+//
+// The `ng-csp` attribute must be set on some HTML element in the document
+// _before_ Angular is require'd for the first time.
+document.body.setAttribute('ng-csp', '');
+
 var angular = require('angular');
 
 // autofill-event relies on the existence of window.angular so
