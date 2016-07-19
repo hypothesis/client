@@ -8,7 +8,6 @@ $black: #000 !default;
 // Grays
 // ---------------------
 $gray: #777 !default;
-$gray-darker: #333;
 $gray-dark: #585858;
 $gray-light: #969696 !default;
 $gray-lighter: #d3d3d3 !default;
@@ -19,11 +18,7 @@ $color-dove-gray: #626262;
 $color-gray: #818181;
 $color-silver-chalice: #a6a6a6;
 $color-silver: #bbb;
-$color-alto: #dedede;
-$color-mercury: #e2e2e2;
-$color-gallery: #ececec;
 $color-seashell: #f1f1f1;
-$color-wild-sand: #f5f5f5;
 
 
 // Colors
@@ -38,9 +33,6 @@ $button-background-gradient: to bottom, $button-background-start, $button-backgr
 
 $error-color: #f0480c !default;
 $success-color: #1cbd41 !default;
-
-$mask-start-color: rgba($white, 0) !default;
-$mask-end-color: $white !default;
 
 
 // Variables for the new color palette
@@ -97,24 +89,16 @@ $link-color-hover:       color-weight($brand-color, 700) !default;
 // Typography
 // -------------------------
 $sans-font-family:        "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif !default;
-$serif-font-family:       Georgia, "Bitstream Charter", "Times", "Times New Roman", serif !default;
 $mono-font-family:        Open Sans Mono, Menlo, DejaVu Sans Mono, monospace !default;
 
 $base-font-size:          16px !default;
-$base-font-family:        $sans-font-family !default;
 $base-line-height:        20px !default;
-$alt-font-family:         $serif-font-family !default;
-
-$headings-font-family:    inherit !default;
-$headings-color:          inherit !default;
 
 $body1-font-size:         12px;
 $body1-line-height:       1.4em;
 
 $body2-font-size:         14px;
-$body2-line-height:       1.4em;
 
-$title-font-size:         20px;
 $title-font-weight:       bold;
 
 $normal-font-size: 13px;
@@ -123,41 +107,14 @@ $normal-line-height: 17px;
 $small-font-size: 11px;
 $small-line-height: 12px;
 
-// Front page typography
-// -------------------------
-// These are part of the new design at https://trello.com/c/h6kQMQG8/187-new-homepage-design)
-// and the styles/sizes across the sidebar, site, frontpage and blog need to be
-// made consistent
-$font-size-body1: 13px;
-$font-size-body2: 15px;
-$font-size-heading1: 27px;
-$font-size-heading2: 19px;
-$font-family-site-sans: "Source Sans Pro", sans-serif;
-$font-weight-light: 300;
-
-$line-height-tall: 1.3em;
-
-
-// Stance Colors
-// -------------------------
-$positive: #3aab39;
-$negative: #d11c2b;
-$neutral: #0171ba;
-
 
 // Layout margins
 // -------------------------
 $layout-h-margin: 15px;
 
 
-// Animations
-// -------------------------
-$anim-duration-normal: .3s; // a good default choice for transition lengths
-
-
 // Z-Index Scale
 // -------------------------
-$zindex-dropdown-menu: 10;
 $zindex-tooltip: 20;
 
 
@@ -168,10 +125,7 @@ $highlight-color: rgba(255, 255, 60, 0.3);
 $highlight-color-second: rgba(206, 206, 60, 0.4);
 $highlight-color-third: rgba(192, 192, 49, 0.4);
 $highlight-color-focus: rgba(156, 230, 255, 0.5);
-$score-width: 40px;
-$score-height: $score-width;
 $top-bar-height: 40px;
-$input-border-radius: 2px;
 
 // Mixins
 // ------
