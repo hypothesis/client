@@ -15,6 +15,14 @@ if (settings.raven) {
   raven.init(settings.raven);
 }
 
+// Disable Angular features that are not compatible with CSP.
+//
+// See https://docs.angularjs.org/api/ng/directive/ngCsp
+//
+// The `ng-csp` attribute must be set on some HTML element in the document
+// _before_ Angular is require'd for the first time.
+document.body.setAttribute('ng-csp', '');
+
 var angular = require('angular');
 
 // autofill-event relies on the existence of window.angular so
@@ -118,12 +126,15 @@ module.exports = angular.module('h', [
   'ngRaven',
 ])
 
-  .controller('AppController', require('./app-controller'))
   .controller('AnnotationUIController', require('./annotation-ui-controller'))
   .controller('AnnotationViewerController', require('./annotation-viewer-controller'))
   .controller('StreamController', require('./stream-controller'))
   .controller('WidgetController', require('./widget-controller'))
 
+  // The root component for the application
+  .directive('hypothesisApp', require('./directive/app'))
+
+  // UI components and helpers
   .directive('annotation', require('./directive/annotation').directive)
   .directive('annotationShareDialog', require('./directive/annotation-share-dialog'))
   .directive('annotationThread', require('./directive/annotation-thread'))
@@ -198,3 +209,6 @@ module.exports = angular.module('h', [
   .run(setupHttp);
 
 processAppOpts();
+
+var appEl = document.querySelector('hypothesis-app');
+angular.bootstrap(appEl, ['h'], {strictDi: true});
