@@ -458,7 +458,7 @@ describe('WidgetController', function () {
         $rootScope.$emit('sidebarOpened');
         fakeStreamer.connect.reset();
         $rootScope.$emit(events.USER_CHANGED);
-        assert.called(fakeStreamer.connect);
+        assert.called(fakeStreamer.reconnect);
       });
     });
   });

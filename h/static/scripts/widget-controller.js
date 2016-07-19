@@ -308,7 +308,7 @@ module.exports = function WidgetController(
 
   $rootScope.$on(events.USER_CHANGED, function () {
     if (sidebarOpen) {
-      streamer.connect();
+      streamer.reconnect();
     }
   });
 
