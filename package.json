@@ -70,6 +70,7 @@
     "proxyquire": "^1.7.4",
     "proxyquire-universal": "^1.0.8",
     "proxyquireify": "^3.1.1",
+    "purify-css": "^1.1.9",
     "query-string": "^3.0.1",
     "raf": "^3.1.0",
     "raven-js": "^2.0.2",
@@ -109,8 +110,7 @@
   "browser": {
     "annotator": "./h/static/scripts/vendor/annotator.js",
     "hammerjs": "./node_modules/hammerjs/hammer.js",
-    "katex": "./h/static/scripts/vendor/katex.js",
-    "bootstrap-lite": "./h/static/styles/vendor/bootstrap/bootstrap.js"
+    "katex": "./h/static/scripts/vendor/katex.js"
   },
   "browserify-shim": {
     "annotator": {
@@ -122,11 +122,6 @@
     "angular": {
       "depends": [
         "jquery"
-      ]
-    },
-    "bootstrap-lite": {
-      "depends": [
-        "jquery:jQuery"
       ]
     },
     "hammerjs": "Hammer",

@@ -11,7 +11,6 @@ $base-line-height: 20px;
 @import './annotation';
 @import './annotation-share-dialog';
 @import './annotation-thread';
-@import './api-token-input';
 @import './dropdown-menu-btn';
 @import './excerpt';
 @import './group-list';
@@ -46,10 +45,6 @@ body {
   @include respond-to(tablets desktops) {
     padding-bottom: 4rem;
   }
-}
-
-#{nest("hgroup", "#{headings()}")} {
-  margin: 0;
 }
 
 .content {
