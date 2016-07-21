@@ -299,7 +299,7 @@ module.exports = function WidgetController(
     }
   }
 
-  $rootScope.$on('sidebarOpened', function () {
+  $scope.$on('sidebarOpened', function () {
     streamer.connect();
   });
 
@@ -308,7 +308,7 @@ module.exports = function WidgetController(
     streamer.connect();
   }
 
-  $rootScope.$on(events.USER_CHANGED, function () {
+  $scope.$on(events.USER_CHANGED, function () {
     streamer.reconnect();
   });
 

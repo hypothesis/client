@@ -446,20 +446,20 @@ describe('WidgetController', function () {
 
   describe('deferred websocket connection', function () {
     it('should connect the websocket the first time the sidebar opens', function () {
-      $rootScope.$emit('sidebarOpened');
+      $rootScope.$broadcast('sidebarOpened');
       assert.called(fakeStreamer.connect);
     });
 
     describe('when logged in user changes', function () {
       it('should not reconnect if the sidebar is closed', function () {
-        $rootScope.$emit(events.USER_CHANGED);
+        $rootScope.$broadcast(events.USER_CHANGED);
         assert.calledOnce(fakeStreamer.reconnect);
       });
 
       it('should reconnect if the sidebar is open', function () {
-        $rootScope.$emit('sidebarOpened');
+        $rootScope.$broadcast('sidebarOpened');
         fakeStreamer.connect.reset();
-        $rootScope.$emit(events.USER_CHANGED);
+        $rootScope.$broadcast(events.USER_CHANGED);
         assert.called(fakeStreamer.reconnect);
       });
     });
