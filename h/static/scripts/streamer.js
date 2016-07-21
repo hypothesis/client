@@ -160,11 +160,6 @@ function Streamer($rootScope, annotationMapper, groups, session, settings) {
   this.connect = connect;
   this.reconnect = reconnect;
   this.setConfig = setConfig;
-
-  // If the user is logged in, we connect nevertheless
-  if (session && session.state && session.state.userid) {
-    connect();
-  }
 }
 
 module.exports = Streamer;

@@ -87,21 +87,9 @@ describe('Streamer', function () {
     assert.isNull(fakeWebSocket);
   });
 
-  it('should not create a websocket connection if the user is not logged in', function () {
+  it('should not create a websocket connection', function () {
     createDefaultStreamer();
     assert.isNull(fakeWebSocket);
-  });
-
-  it('should create a websocket connection if the user is logged in', function () {
-    fakeSession.state = {userid: 'foo'};
-    createDefaultStreamer();
-    assert.ok(fakeWebSocket);
-  });
-
-  it('should create a websocket connection if explicitly connected', function () {
-    createDefaultStreamer();
-    activeStreamer.connect();
-    assert.ok(fakeWebSocket);
   });
 
   it('should have a non-null client ID', function () {
@@ -118,6 +106,12 @@ describe('Streamer', function () {
   });
 
   describe('#connect()', function () {
+    it('should create a websocket connection', function () {
+      createDefaultStreamer();
+      activeStreamer.connect();
+      assert.ok(fakeWebSocket);
+    });
+
     it('should not close any existing socket', function () {
       createDefaultStreamer();
       activeStreamer.connect();

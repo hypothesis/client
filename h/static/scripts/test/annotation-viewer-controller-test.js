@@ -62,7 +62,10 @@ describe('AnnotationViewerController', function () {
         subscribe: sinon.stub(),
       },
       rootThread: {thread: sinon.stub()},
-      streamer: { setConfig: function () {} },
+      streamer: {
+        setConfig: function () {},
+        connect: function () {},
+      },
       store: opts.store,
       streamFilter: {
         setMatchPolicyIncludeAny: function () {

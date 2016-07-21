@@ -39,8 +39,6 @@ module.exports = function WidgetController(
   VirtualThreadList
 ) {
 
-  var sidebarOpen = false;
-
   /**
    * Returns the number of top level annotations which are of type annotations
    * and not notes or replies.
@@ -302,14 +300,16 @@ module.exports = function WidgetController(
   }
 
   $rootScope.$on('sidebarOpened', function () {
-    sidebarOpen = true;
     streamer.connect();
   });
 
+  // If the user is logged in, we connect nevertheless
+  if ($scope.auth.status === 'logged-in') {
+    streamer.connect();
+  }
+
   $rootScope.$on(events.USER_CHANGED, function () {
-    if (sidebarOpen) {
-      streamer.reconnect();
-    }
+    streamer.reconnect();
   });
 
   // When a direct-linked annotation is successfully anchored in the page,

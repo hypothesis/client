@@ -138,6 +138,7 @@ describe('WidgetController', function () {
   beforeEach(angular.mock.inject(function ($controller, _annotationUI_, _$rootScope_) {
     $rootScope = _$rootScope_;
     $scope = $rootScope.$new();
+    $scope.auth = {'status': 'unknown'};
     annotationUI = _annotationUI_;
     $controller('WidgetController', {$scope: $scope});
   }));
@@ -452,7 +453,7 @@ describe('WidgetController', function () {
     describe('when logged in user changes', function () {
       it('should not reconnect if the sidebar is closed', function () {
         $rootScope.$emit(events.USER_CHANGED);
-        assert.notCalled(fakeStreamer.connect);
+        assert.calledOnce(fakeStreamer.reconnect);
       });
 
       it('should reconnect if the sidebar is open', function () {
