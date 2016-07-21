@@ -44,6 +44,7 @@ module.exports = class StreamController
     terms = searchFilter.generateFacetedFilter $routeParams.q
     queryParser.populateFilter streamFilter, terms
     streamer.setConfig('filter', {filter: streamFilter.getFilter()})
+    streamer.connect()
 
     # Perform the initial search
     fetch(20)

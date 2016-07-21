@@ -30,7 +30,7 @@ function FakeSocket() {
 }
 inherits(FakeSocket, EventEmitter);
 
-describe('streamer', function () {
+describe('Streamer', function () {
   var fakeAnnotationMapper;
   var fakeGroups;
   var fakeRootScope;
@@ -83,27 +83,60 @@ describe('streamer', function () {
   it('should not create a websocket connection if websocketUrl is not provided', function () {
     fakeSettings = {};
     createDefaultStreamer();
+    activeStreamer.connect();
     assert.isNull(fakeWebSocket);
   });
 
-  it('should send a client ID', function () {
+  it('should not create a websocket connection', function () {
     createDefaultStreamer();
+    assert.isNull(fakeWebSocket);
+  });
+
+  it('should have a non-null client ID', function () {
+    createDefaultStreamer();
+    assert.ok(activeStreamer.clientId);
+  });
+
+  it('should send the client ID on connection', function () {
+    createDefaultStreamer();
+    activeStreamer.connect();
     assert.equal(fakeWebSocket.messages.length, 1);
     assert.equal(fakeWebSocket.messages[0].messageType, 'client_id');
     assert.equal(fakeWebSocket.messages[0].value, activeStreamer.clientId);
   });
 
-  it('should close any existing socket', function () {
-    createDefaultStreamer();
-    var oldWebSocket = fakeWebSocket;
-    activeStreamer.connect();
-    assert.ok(oldWebSocket.didClose);
-    assert.ok(!fakeWebSocket.didClose);
+  describe('#connect()', function () {
+    it('should create a websocket connection', function () {
+      createDefaultStreamer();
+      activeStreamer.connect();
+      assert.ok(fakeWebSocket);
+    });
+
+    it('should not close any existing socket', function () {
+      createDefaultStreamer();
+      activeStreamer.connect();
+      var oldWebSocket = fakeWebSocket;
+      activeStreamer.connect();
+      assert.ok(!oldWebSocket.didClose);
+      assert.ok(!fakeWebSocket.didClose);
+    });
+  });
+
+  describe('#reconnect()', function () {
+    it('should close the existing socket', function () {
+      createDefaultStreamer();
+      activeStreamer.connect();
+      var oldWebSocket = fakeWebSocket;
+      activeStreamer.reconnect();
+      assert.ok(oldWebSocket.didClose);
+      assert.ok(!fakeWebSocket.didClose);
+    });
   });
 
   describe('annotation notifications', function () {
     it('should load new annotations', function () {
       createDefaultStreamer();
+      activeStreamer.connect();
       fakeWebSocket.notify({
         type: 'annotation-notification',
         options: {
@@ -118,6 +151,7 @@ describe('streamer', function () {
 
     it('should unload deleted annotations', function () {
       createDefaultStreamer();
+      activeStreamer.connect();
       fakeWebSocket.notify({
         type: 'annotation-notification',
         options: {
@@ -134,6 +168,7 @@ describe('streamer', function () {
   describe('session change notifications', function () {
     it('updates the session when a notification is received', function () {
       createDefaultStreamer();
+      activeStreamer.connect();
       var model = {
         groups: [{
           id: 'new-group',
@@ -150,6 +185,7 @@ describe('streamer', function () {
   describe('reconnections', function () {
     it('resends configuration messages when a reconnection occurs', function () {
       createDefaultStreamer();
+      activeStreamer.connect();
       fakeWebSocket.messages = [];
       fakeWebSocket.emit('open');
       assert.equal(fakeWebSocket.messages.length, 1);

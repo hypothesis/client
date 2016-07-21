@@ -258,8 +258,10 @@ module.exports = function WidgetController(
    * @param {Array<{uri:string}>} frames - Hypothesis client frames
    *        to load annotations for.
    */
-  function loadAnnotations(frames) {
-    _resetAnnotations();
+  function loadAnnotations(frames, reset) {
+    if (reset || typeof reset === 'undefined') {
+      _resetAnnotations();
+    }
 
     searchClients.forEach(function (client) {
       client.cancel();
@@ -296,6 +298,19 @@ module.exports = function WidgetController(
       streamer.setConfig('filter', {filter: streamFilter.getFilter()});
     }
   }
+
+  $scope.$on('sidebarOpened', function () {
+    streamer.connect();
+  });
+
+  // If the user is logged in, we connect nevertheless
+  if ($scope.auth.status === 'logged-in') {
+    streamer.connect();
+  }
+
+  $scope.$on(events.USER_CHANGED, function () {
+    streamer.reconnect();
+  });
 
   // When a direct-linked annotation is successfully anchored in the page,
   // focus and scroll to it

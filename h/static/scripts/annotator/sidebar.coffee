@@ -133,6 +133,8 @@ module.exports = class Sidebar extends Host
         this.hide()
 
   show: ->
+    @crossframe.call('sidebarOpened')
+
     @frame.css 'margin-left': "#{-1 * @frame.width()}px"
     @frame.removeClass 'annotator-collapsed'
 

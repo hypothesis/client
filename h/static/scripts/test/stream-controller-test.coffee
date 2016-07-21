@@ -69,6 +69,7 @@ describe 'StreamController', ->
       open: sandbox.spy()
       close: sandbox.spy()
       setConfig: sandbox.spy()
+      connect: sandbox.spy()
     }
 
     fakeStreamFilter = {

@@ -99,6 +99,8 @@ describe('WidgetController', function () {
 
     fakeStreamer = {
       setConfig: sandbox.spy(),
+      connect: sandbox.spy(),
+      reconnect: sandbox.spy(),
     };
 
     fakeStreamFilter = {
@@ -136,6 +138,7 @@ describe('WidgetController', function () {
   beforeEach(angular.mock.inject(function ($controller, _annotationUI_, _$rootScope_) {
     $rootScope = _$rootScope_;
     $scope = $rootScope.$new();
+    $scope.auth = {'status': 'unknown'};
     annotationUI = _annotationUI_;
     $controller('WidgetController', {$scope: $scope});
   }));
@@ -438,6 +441,27 @@ describe('WidgetController', function () {
       annotationUI.selectAnnotations(['123']);
       $scope.$digest();
       assert.isFalse($scope.shouldShowLoggedOutMessage());
+    });
+  });
+
+  describe('deferred websocket connection', function () {
+    it('should connect the websocket the first time the sidebar opens', function () {
+      $rootScope.$broadcast('sidebarOpened');
+      assert.called(fakeStreamer.connect);
+    });
+
+    describe('when logged in user changes', function () {
+      it('should not reconnect if the sidebar is closed', function () {
+        $rootScope.$broadcast(events.USER_CHANGED);
+        assert.calledOnce(fakeStreamer.reconnect);
+      });
+
+      it('should reconnect if the sidebar is open', function () {
+        $rootScope.$broadcast('sidebarOpened');
+        fakeStreamer.connect.reset();
+        $rootScope.$broadcast(events.USER_CHANGED);
+        assert.called(fakeStreamer.reconnect);
+      });
     });
   });
 
