@@ -8,13 +8,17 @@ function rect(left, top, width, height) {
 
 describe('adder', function () {
   var adderCtrl;
-  beforeEach(function () {
-    var adderEl = document.createElement('div');
-    adderEl.innerHTML = adder.template();
-    adderEl = adderEl.firstChild;
-    document.body.appendChild(adderEl.firstChild);
+  var adderCallbacks;
 
-    adderCtrl = new adder.Adder(adderEl.firstChild);
+  beforeEach(function () {
+    adderCallbacks = {
+      onAnnotate: sinon.stub(),
+      onHighlight: sinon.stub(),
+    };
+    var adderEl = document.createElement('div');
+    document.body.appendChild(adderEl);
+
+    adderCtrl = new adder.Adder(adderEl, adderCallbacks);
   });
 
   afterEach(function () {
@@ -31,6 +35,20 @@ describe('adder', function () {
     var rect = adderCtrl.element.getBoundingClientRect();
     return {width: rect.width, height: rect.height};
   }
+
+  describe('button handling', function () {
+    it('calls onHighlight callback when Highlight button is clicked', function () {
+      var highlightBtn = adderCtrl.element.querySelector('.js-highlight-btn');
+      highlightBtn.dispatchEvent(new Event('click'));
+      assert.called(adderCallbacks.onHighlight);
+    });
+
+    it('calls onAnnotate callback when Annotate button is clicked', function () {
+      var annotateBtn = adderCtrl.element.querySelector('.js-annotate-btn');
+      annotateBtn.dispatchEvent(new Event('click'));
+      assert.called(adderCallbacks.onAnnotate);
+    });
+  });
 
   describe('#target', function () {
     it('positions the adder below the selection if the selection is forwards', function () {

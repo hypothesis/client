@@ -2,6 +2,8 @@
 
 var classnames = require('classnames');
 
+var template = require('./adder.html');
+
 /**
  * Show the adder above the selection with an arrow pointing down at the
  * selected text.
@@ -14,11 +16,6 @@ var ARROW_POINTING_DOWN = 1;
  */
 var ARROW_POINTING_UP = 2;
 
-/** Returns the HTML template for the adder. */
-function template() {
-  return require('./adder.html');
-}
-
 function toPx(pixels) {
   return pixels.toString() + 'px';
 }
@@ -30,22 +27,53 @@ var ARROW_HEIGHT = 10;
 var ARROW_H_MARGIN = 20;
 
 /**
- * Controller for the 'adder' toolbar which appears next to the selection
+ * Annotation 'adder' toolbar which appears next to the selection
  * and provides controls for the user to create new annotations.
  *
- * @param {Element} element - DOM element for the adder, created from template()
+ * @param {Element} container - The DOM element into which the adder will be created
+ * @param {Object} options - Options object specifying `onAnnotate` and `onHighlight`
+ *        event handlers.
  */
-function Adder(element) {
+function Adder(container, options) {
+
+  container.innerHTML = template;
+  var element = container.querySelector('.js-adder');
+
+  Object.assign(container.style, {
+    // Set initial style. The adder is hidden using the `visibility`
+    // property rather than `display` so that we can compute its size in order to
+    // position it before display.
+    display: 'block',
+    position: 'absolute',
+    visibility: 'hidden',
+
+    // Assign a high Z-index so that the adder shows above any content on the
+    // page
+    zIndex: 999,
+  });
+
   this.element = element;
 
   var view = element.ownerDocument.defaultView;
   var enterTimeout;
 
-  // Set initial style. The adder is hidden using the `visibility`
-  // property rather than `display` so that we can compute its size in order to
-  // position it before display.
-  element.style.display = 'block';
-  element.style.visibility = 'hidden';
+  element.querySelector('.js-annotate-btn')
+         .addEventListener('click', handleCommand.bind(this, 'annotate'));
+  element.querySelector('.js-highlight-btn')
+         .addEventListener('click', handleCommand.bind(this, 'highlight'));
+
+  function handleCommand(command, event) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (command === 'annotate') {
+      options.onAnnotate();
+    } else {
+      options.onHighlight();
+    }
+
+    this.hide();
+  }
 
   function width() {
     return element.getBoundingClientRect().width;
@@ -59,7 +87,7 @@ function Adder(element) {
   this.hide = function () {
     clearTimeout(enterTimeout);
     element.className = classnames({'annotator-adder': true});
-    element.style.visibility = 'hidden';
+    container.style.visibility = 'hidden';
   };
 
   /**
@@ -131,9 +159,12 @@ function Adder(element) {
       'annotator-adder--arrow-down': arrowDirection === ARROW_POINTING_DOWN,
       'annotator-adder--arrow-up': arrowDirection === ARROW_POINTING_UP,
     });
-    element.style.top = toPx(top);
-    element.style.left = toPx(left);
-    element.style.visibility = 'visible';
+
+    Object.assign(container.style, {
+      top: toPx(top),
+      left: toPx(left),
+      visibility: 'visible',
+    });
 
     clearTimeout(enterTimeout);
     enterTimeout = setTimeout(function () {
@@ -146,6 +177,5 @@ module.exports = {
   ARROW_POINTING_DOWN: ARROW_POINTING_DOWN,
   ARROW_POINTING_UP: ARROW_POINTING_UP,
 
-  template: template,
   Adder: Adder,
 };
