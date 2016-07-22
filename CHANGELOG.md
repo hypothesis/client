@@ -4,6 +4,19 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+### Changed
+
+- Defer connecting to the Hypothesis service's WebSocket endpoint for push
+  updates until the user is either logged in or explicitly interacts with the
+  sidebar. This reduces load on the service
+  ([#20](https://github.com/hypothesis/client/pull/20))
+
+- Move the root UI layout for the sidebar app into the client. This makes it
+  easier to serve the client from a web service or bundle it with a browser
+  extension ([#37](https://github.com/hypothesis/client/pull/37))
+
 ## [0.34.0] - 2016-07-15
 
 ### Changed
