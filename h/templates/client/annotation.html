@@ -51,6 +51,7 @@
 
   <!-- Excerpts -->
   <section class="annotation-quote-list"
+    ng-class="{'is-orphan' : vm.isOrphan()}"
     ng-repeat="target in vm.target() track by $index"
     ng-if="vm.hasQuotes()">
     <excerpt collapsed-height="35"

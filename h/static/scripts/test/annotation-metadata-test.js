@@ -1,6 +1,7 @@
 'use strict';
 
 var annotationMetadata = require('../annotation-metadata');
+var fixtures = require('./annotation-fixtures');
 
 var documentMetadata = annotationMetadata.documentMetadata;
 var domainAndTitle = annotationMetadata.domainAndTitle;
@@ -243,6 +244,48 @@ describe('annotation-metadata', function () {
     });
     it ('returns false if an annotation has no target', function () {
       assert.isFalse(annotationMetadata.isAnnotation({}));
+    });
+  });
+
+  describe('.isOrphan', function () {
+    it('returns true if an annotation failed to anchor', function () {
+      var annotation = Object.assign(fixtures.defaultAnnotation(), {$orphan: true});
+      assert.isTrue(annotationMetadata.isOrphan(annotation));
+    });
+
+    it('returns false if an annotation successfully anchored', function() {
+      var orphan = Object.assign(fixtures.defaultAnnotation(), {$orphan: false});
+      assert.isFalse(annotationMetadata.isOrphan(orphan));
+    });
+  });
+
+  describe('.isWaitingToAnchor', function () {
+    var isWaitingToAnchor = annotationMetadata.isWaitingToAnchor;
+
+    it('returns true for annotations that are not yet anchored', function () {
+      assert.isTrue(isWaitingToAnchor(fixtures.defaultAnnotation()));
+    });
+
+    it('returns false for annotations that are anchored', function () {
+      var anchored = Object.assign({}, fixtures.defaultAnnotation(), {
+        $orphan: false,
+      });
+      assert.isFalse(isWaitingToAnchor(anchored));
+    });
+
+    it('returns false for annotations that failed to anchor', function () {
+      var anchored = Object.assign({}, fixtures.defaultAnnotation(), {
+        $orphan: true,
+      });
+      assert.isFalse(isWaitingToAnchor(anchored));
+    });
+
+    it('returns false for replies', function () {
+      assert.isFalse(isWaitingToAnchor(fixtures.oldReply()));
+    });
+
+    it('returns false for page notes', function () {
+      assert.isFalse(isWaitingToAnchor(fixtures.oldPageNote()));
     });
   });
 });

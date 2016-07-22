@@ -10,6 +10,7 @@ module.exports = function () {
     controller: function () {
       this.TAB_ANNOTATIONS = uiConstants.TAB_ANNOTATIONS;
       this.TAB_NOTES = uiConstants.TAB_NOTES;
+      this.TAB_ORPHANS = uiConstants.TAB_ORPHANS;
     },
     restrict: 'E',
     scope: {

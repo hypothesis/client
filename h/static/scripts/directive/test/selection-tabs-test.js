@@ -12,8 +12,13 @@ describe('selectionTabs', function () {
 
   beforeEach(function () {
     var fakeAnnotationUI = {};
+    var fakeFeatures = {
+      flagEnabled: sinon.stub().returns(true),
+    };
+
     angular.mock.module('app', {
       annotationUI: fakeAnnotationUI,
+      features: fakeFeatures,
     });
   });
 

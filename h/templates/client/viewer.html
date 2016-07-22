@@ -1,8 +1,12 @@
-<selection-tabs ng-if="feature('selection_tabs') && !search.query() && selectedAnnotationCount() === 0"
+<selection-tabs ng-if="feature('selection_tabs') &&
+    !search.query() &&
+    selectedAnnotationCount() === 0"
+  is-waiting-to-anchor-annotations="waitingToAnchorAnnotations"
   is-loading="isLoading"
   selected-tab="selectedTab"
   total-annotations="totalAnnotations"
-  total-notes="totalNotes">
+  total-notes="totalNotes"
+  total-orphans="totalOrphans">
 </selection-tabs>
 
 <!-- Annotation thread view
@@ -10,6 +14,7 @@
 (See gh2642 for rationale for 'ng-show="true"')
  -->
 <ul class="thread-list ng-hide"
+    ng-if="!waitingToAnchorAnnotations"
     ng-show="true"
     window-scroll="loadMore(20)">
   <search-status-bar

@@ -137,10 +137,13 @@ module.exports = function AppController(
   };
 
   $scope.clearSelection = function () {
-    if (!annotationUI.getState().selectedTab) {
-      annotationUI.selectTab(uiConstants.TAB_ANNOTATIONS);
+    var selectedTab = annotationUI.getState().selectedTab;
+    if (!annotationUI.getState().selectedTab || annotationUI.getState().selectedTab === uiConstants.TAB_ORPHANS) {
+      selectedTab = uiConstants.TAB_ANNOTATIONS;
     }
+
     annotationUI.clearSelectedAnnotations();
+    annotationUI.selectTab(selectedTab);
   };
 
   $scope.search = {

@@ -140,6 +140,10 @@
   margin-bottom: $layout-h-margin - 3px;
 }
 
+.annotation-quote-list.is-orphan {
+  text-decoration: line-through;
+}
+
 .annotation-media-embed {
   width: 369px;
   height: 208px;

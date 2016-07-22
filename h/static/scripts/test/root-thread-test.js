@@ -6,6 +6,7 @@ var immutable = require('seamless-immutable');
 
 var annotationFixtures = require('./annotation-fixtures');
 var events = require('../events');
+var uiConstants = require('../ui-constants');
 var util = require('./util');
 
 var unroll = util.unroll;
@@ -186,11 +187,11 @@ describe('rootThread', function () {
   });
 
   describe('when the thread filter query is set', function () {
-    it('generates a thread filter function to match annotations', function () {
+    it('filter matches only annotations when Annotations tab is selected', function () {
       fakeBuildThread.reset();
 
       fakeAnnotationUI.state = Object.assign({}, fakeAnnotationUI.state,
-        {selectedTab: 'annotation'});
+        {selectedTab: uiConstants.TAB_ANNOTATIONS});
 
       rootThread.thread(fakeAnnotationUI.state);
       var threadFilterFn = fakeBuildThread.args[0][1].threadFilterFn;
@@ -199,30 +200,55 @@ describe('rootThread', function () {
       assert.isDefined(threadFilterFn({annotation: annotation}));
     });
 
-    it('generates a thread filter function to match notes', function () {
+    it('filter matches only notes when Notes tab is selected', function () {
       fakeBuildThread.reset();
-      fakeBuildThread.annotation = {target: [{}]};
 
       fakeAnnotationUI.state = Object.assign({}, fakeAnnotationUI.state,
-        {selectedTab: 'note'});
+        {selectedTab: uiConstants.TAB_NOTES});
 
       rootThread.thread(fakeAnnotationUI.state);
       var threadFilterFn = fakeBuildThread.args[0][1].threadFilterFn;
 
-      assert.isTrue(threadFilterFn(fakeBuildThread));
+      assert.isTrue(threadFilterFn({annotation: {target: [{}]}}));
     });
 
-    it('generates a thread filter function for annotations, when all annotations are of type notes', function () {
+    it('filter matches only orphans when Orphans tab is selected', function () {
       fakeBuildThread.reset();
-      fakeBuildThread.annotation = {target: [{}]};
 
       fakeAnnotationUI.state = Object.assign({}, fakeAnnotationUI.state,
-        {selectedTab: 'annotation'});
+        {selectedTab: uiConstants.TAB_ORPHANS});
 
       rootThread.thread(fakeAnnotationUI.state);
       var threadFilterFn = fakeBuildThread.args[0][1].threadFilterFn;
 
-      assert.isFalse(threadFilterFn(fakeBuildThread));
+      var orphan = Object.assign(annotationFixtures.defaultAnnotation(),
+        {$orphan: true});
+
+      assert.isTrue(threadFilterFn({annotation: orphan}));
+    });
+
+    it('filter does not match notes when Annotations tab is selected', function () {
+      fakeBuildThread.reset();
+
+      fakeAnnotationUI.state = Object.assign({}, fakeAnnotationUI.state,
+        {selectedTab: uiConstants.TAB_ANNOTATIONS});
+
+      rootThread.thread(fakeAnnotationUI.state);
+      var threadFilterFn = fakeBuildThread.args[0][1].threadFilterFn;
+
+      assert.isFalse(threadFilterFn({annotation: {target: [{}]}}));
+    });
+
+    it('filter does not match orphans when Annotations tab is selected', function () {
+      fakeBuildThread.reset();
+
+      fakeAnnotationUI.state = Object.assign({}, fakeAnnotationUI.state,
+        {selectedTab: uiConstants.TAB_ANNOTATIONS});
+
+      rootThread.thread(fakeAnnotationUI.state);
+      var threadFilterFn = fakeBuildThread.args[0][1].threadFilterFn;
+
+      assert.isFalse(threadFilterFn({annotation: {$orphan: true}}));
     });
   });
 
