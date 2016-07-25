@@ -19,6 +19,7 @@ describe 'Annotator.Plugin.CrossFrame', ->
       stopDiscovery: sandbox.stub()
 
     fakeBridge =
+      destroy: sandbox.stub()
       createChannel: sandbox.stub()
       onConnect: sandbox.stub()
       call: sandbox.stub()
@@ -75,9 +76,14 @@ describe 'Annotator.Plugin.CrossFrame', ->
 
   describe '.destroy', ->
     it 'stops the discovery of new frames', ->
-      bridge = createCrossFrame()
-      bridge.destroy()
+      cf = createCrossFrame()
+      cf.destroy()
       assert.called(fakeDiscovery.stopDiscovery)
+
+    it 'destroys the bridge object', ->
+      cf = createCrossFrame()
+      cf.destroy()
+      assert.called(fakeBridge.destroy)
 
   describe '.sync', ->
     it 'syncs the annotations with the other frame', ->

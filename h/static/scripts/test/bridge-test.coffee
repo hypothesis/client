@@ -190,3 +190,15 @@ describe 'Bridge', ->
       bridge.onConnect(callback)
       bridge.onConnect(callback)
       channel = createChannel()
+
+  describe '.destroy', ->
+    it 'destroys all opened channels', ->
+      channel1 = bridge.createChannel(fakeWindow, 'http://example.com', 'foo')
+      channel2 = bridge.createChannel(fakeWindow, 'http://example.com', 'bar')
+      sinon.spy(channel1, 'destroy')
+      sinon.spy(channel2, 'destroy')
+
+      bridge.destroy()
+
+      assert.called(channel1.destroy)
+      assert.called(channel2.destroy)
