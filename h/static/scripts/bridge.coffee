@@ -14,6 +14,13 @@ module.exports = class Bridge
     @channelListeners = {}
     @onConnectListeners = []
 
+  # Tear down the bridge. We destroy each RPC "channel" object we know about.
+  # This removes the `onmessage` event listeners, thus removing references to
+  # any listeners and allowing them to be garbage collected.
+  destroy: ->
+    for link in @links
+      link.channel.destroy()
+
   createChannel: (source, origin, token) ->
     channel = null
     connected = false

@@ -31,6 +31,7 @@ module.exports = class CrossFrame extends Annotator.Plugin
     this.destroy = ->
       # super doesnt work here :(
       Annotator.Plugin::destroy.apply(this, arguments)
+      bridge.destroy()
       discovery.stopDiscovery()
 
     this.sync = (annotations, cb) ->
