@@ -139,6 +139,7 @@
     "test": "gulp test-app",
     "preversion": "npm run test",
     "version": "make clean all && ./scripts/update-changelog.js && git add CHANGELOG.md",
-    "postversion": "git push && git push --tags && ./scripts/create-github-release.js"
+    "postversion": "git push && git push --tags && ./scripts/create-github-release.js",
+    "prepublish": "npm run-script build"
   }
 }
