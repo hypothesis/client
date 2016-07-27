@@ -52,6 +52,8 @@ module.exports = function AppController(
   // the stream page or an individual annotation page.
   $scope.isSidebar = $window.top !== $window;
 
+  $scope.serviceUrl = settings.serviceUrl;
+
   $scope.sortKey = function () {
     return annotationUI.getState().sortKey;
   };

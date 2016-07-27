@@ -95,6 +95,7 @@ describe('AppController', function () {
 
     fakeSettings = {
       firstRun: false,
+      serviceUrl: 'http://fake.service.com/',
     };
 
     $provide.value('annotationUI', fakeAnnotationUI);
@@ -183,6 +184,11 @@ describe('AppController', function () {
         provider: 'hypothes.is',
       });
     });
+  });
+
+  it('exposes the serviceUrl on the scope', function () {
+    createController();
+    assert.equal($scope.serviceUrl, 'http://fake.service.com/');
   });
 
   it('does not show login form for logged in users', function () {
