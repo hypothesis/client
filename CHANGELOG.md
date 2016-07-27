@@ -4,6 +4,17 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+### Fixed
+
+- Fix annotated sections of the page being highlighted multiple times when
+  activating, de-activating and re-activating the client on a page.
+  ([#47](https://github.com/hypothesis/client/pull/47))
+
+- Fix broken "create a free account" link
+  ([#56](https://github.com/hypothesis/client/pull/56))
+
 ## [0.35.0] - 2016-07-22
 
 ### Changed
