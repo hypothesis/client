@@ -125,16 +125,7 @@ function AnnotationController(
 
     // When a new annotation is created, remove any existing annotations that
     // are empty.
-    //
-    // This event is currently emitted with $emit rather than $broadcast so
-    // we have to listen for it on the $rootScope and manually de-register
-    // on destruction.
-    var removeNewAnnotListener =
-      $rootScope.$on(events.BEFORE_ANNOTATION_CREATED, deleteIfNewAndEmpty);
-
-    vm.$onDestroy = function () {
-      removeNewAnnotListener();
-    };
+    $scope.$on(events.BEFORE_ANNOTATION_CREATED, deleteIfNewAndEmpty);
 
     // Call `onGroupFocused()` whenever the currently-focused group changes.
     $scope.$on(events.GROUP_FOCUSED, onGroupFocused);
@@ -207,7 +198,7 @@ function AnnotationController(
       vm.annotation.permissions = permissions.private();
       save(vm.annotation).then(function(model) {
         model.$$tag = vm.annotation.$$tag;
-        $rootScope.$emit(events.ANNOTATION_CREATED, model);
+        $rootScope.$broadcast(events.ANNOTATION_CREATED, model);
       });
     } else {
       // User isn't logged in, save to drafts.
@@ -382,7 +373,7 @@ function AnnotationController(
   vm.revert = function() {
     drafts.remove(vm.annotation);
     if (isNew(vm.annotation)) {
-      $rootScope.$emit(events.ANNOTATION_DELETED, vm.annotation);
+      $rootScope.$broadcast(events.ANNOTATION_DELETED, vm.annotation);
     }
   };
 
@@ -411,7 +402,7 @@ function AnnotationController(
         events.ANNOTATION_CREATED : events.ANNOTATION_UPDATED;
       drafts.remove(vm.annotation);
 
-      $rootScope.$emit(event, updatedModel);
+      $rootScope.$broadcast(event, updatedModel);
     }).catch(function (reason) {
       vm.isSaving = false;
       vm.edit();
