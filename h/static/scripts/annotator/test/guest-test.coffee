@@ -281,19 +281,6 @@ describe 'Guest', ->
       return guest.getDocumentInfo().then ({uri}) ->
         assert.equal uri, 'urn:x-pdf:aabbcc'
 
-  describe '#onAdderMouseUp()', ->
-    it 'it prevents the default browser action when triggered', () ->
-      event = jQuery.Event('mouseup')
-      guest = createGuest()
-      guest.onAdderMouseup(event)
-      assert.isTrue(event.isDefaultPrevented())
-
-    it 'it stops any further event bubbling', () ->
-      event = jQuery.Event('mouseup')
-      guest = createGuest()
-      guest.onAdderMouseup(event)
-      assert.isTrue(event.isPropagationStopped())
-
   describe '#createAnnotation()', ->
     it 'adds metadata to the annotation object', ->
       guest = createGuest()

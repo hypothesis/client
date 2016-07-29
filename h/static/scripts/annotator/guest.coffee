@@ -35,9 +35,6 @@ module.exports = class Guest extends Annotator
 
   # Events to be bound on Annotator#element.
   events:
-    ".annotator-adder button click":     "onAdderClick"
-    ".annotator-adder button mousedown": "onAdderMousedown"
-    ".annotator-adder button mouseup":   "onAdderMouseup"
     ".annotator-hl click":               "onHighlightClick"
     ".annotator-hl mouseover":           "onHighlightMouseover"
     ".annotator-hl mouseout":            "onHighlightMouseout"
@@ -54,13 +51,21 @@ module.exports = class Guest extends Annotator
   visibleHighlights: false
 
   html: extend {}, Annotator::html,
-    adder: adder.template()
+    adder: '<hypothesis-adder></hypothesis-adder>';
 
   constructor: (element, options) ->
     super
 
     self = this
-    this.adderCtrl = new adder.Adder(@adder[0])
+    this.adderCtrl = new adder.Adder(@adder[0], {
+      onAnnotate: ->
+        self.createAnnotation()
+        Annotator.Util.getGlobal().getSelection().removeAllRanges()
+      onHighlight: ->
+        self.setVisibleHighlights(true)
+        self.createHighlight()
+        Annotator.Util.getGlobal().getSelection().removeAllRanges()
+    })
     this.selections = selections(document).subscribe
       next: (range) ->
         if range
@@ -434,20 +439,3 @@ module.exports = class Guest extends Annotator
 
     @visibleHighlights = shouldShowHighlights
 
-  onAdderMouseup: (event) ->
-    event.preventDefault()
-    event.stopPropagation()
-
-  onAdderMousedown: ->
-
-  onAdderClick: (event) ->
-    event.preventDefault?()
-    event.stopPropagation?()
-    this.adderCtrl.hide()
-    switch $(event.target).data('action')
-      when 'highlight'
-        this.setVisibleHighlights true
-        this.createHighlight()
-      when 'comment'
-        this.createAnnotation()
-    Annotator.Util.getGlobal().getSelection().removeAllRanges()
