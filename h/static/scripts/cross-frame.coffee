@@ -32,7 +32,7 @@ module.exports = class CrossFrame
           parsed
         emit: (args...) ->
           $rootScope.$apply ->
-            $rootScope.$emit.call($rootScope, args...)
+            $rootScope.$broadcast.call($rootScope, args...)
         on: (event, handler) ->
           $rootScope.$on(event, (event, args...) -> handler.apply(this, args))
 
