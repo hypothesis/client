@@ -58,9 +58,9 @@ function Adder(container, options) {
   var enterTimeout;
 
   element.querySelector('.js-annotate-btn')
-         .addEventListener('click', handleCommand.bind(this, 'annotate'));
+    .addEventListener('click', handleCommand.bind(this, 'annotate'));
   element.querySelector('.js-highlight-btn')
-         .addEventListener('click', handleCommand.bind(this, 'highlight'));
+    .addEventListener('click', handleCommand.bind(this, 'highlight'));
 
   function handleCommand(command, event) {
     event.preventDefault();

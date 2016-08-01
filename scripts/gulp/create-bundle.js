@@ -174,7 +174,7 @@ module.exports = function createBundle(config, buildOpts) {
       log('Build error', err.toString());
     });
     var stream = b.pipe(exorcist(sourcemapPath))
-                  .pipe(output);
+      .pipe(output);
     return streamFinished(stream);
   }
 

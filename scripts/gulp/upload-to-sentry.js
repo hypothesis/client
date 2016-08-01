@@ -106,20 +106,20 @@ module.exports = function uploadToSentry(opts, projects, release) {
 
   return through.obj(function (file, enc, callback) {
     Promise.all(releases)
-    .then(function () {
-      gulpUtil.log(`Uploading ${path.basename(file.path)}`);
-      var uploads = projects.map(function (project) {
-        return uploadReleaseFile(opts, project, release, file);
-      });
+      .then(function () {
+        gulpUtil.log(`Uploading ${path.basename(file.path)}`);
+        var uploads = projects.map(function (project) {
+          return uploadReleaseFile(opts, project, release, file);
+        });
 
-      return Promise.all(uploads);
-    })
-    .then(function () {
-      callback();
-    })
-    .catch(function (err) {
-      gulpUtil.log('Sentry upload failed: ', err);
-      callback(err);
-    });
+        return Promise.all(uploads);
+      })
+      .then(function () {
+        callback();
+      })
+      .catch(function (err) {
+        gulpUtil.log('Sentry upload failed: ', err);
+        callback(err);
+      });
   });
 };

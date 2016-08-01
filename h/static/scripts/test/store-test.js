@@ -12,14 +12,14 @@ describe('store', function () {
 
   before(function () {
     angular.module('h')
-    .service('store', proxyquire('../store', util.noCallThru({
-      angular: angular,
-      './retry-util': {
-        retryPromiseOperation: function (fn) {
-          return fn();
+      .service('store', proxyquire('../store', util.noCallThru({
+        angular: angular,
+        './retry-util': {
+          retryPromiseOperation: function (fn) {
+            return fn();
+          },
         },
-      },
-    })));
+      })));
   });
 
   beforeEach(angular.mock.module('h'));
@@ -70,27 +70,27 @@ describe('store', function () {
       assert.isNotNull(saved.id);
     });
     $httpBackend.expectPOST('http://example.com/api/annotations')
-    .respond(function () {
-      return [201, {id: 'new-id'}, {}];
-    });
+      .respond(function () {
+        return [201, {id: 'new-id'}, {}];
+      });
     $httpBackend.flush();
   });
 
   it('updates an annotation', function () {
     store.annotation.update({id: 'an-id'}, {text: 'updated'});
     $httpBackend.expectPUT('http://example.com/api/annotations/an-id')
-    .respond(function () {
-      return [200, {}, {}];
-    });
+      .respond(function () {
+        return [200, {}, {}];
+      });
     $httpBackend.flush();
   });
 
   it('deletes an annotation', function () {
     store.annotation.delete({id: 'an-id'}, {});
     $httpBackend.expectDELETE('http://example.com/api/annotations/an-id')
-    .respond(function () {
-      return [200, {}, {}];
-    });
+      .respond(function () {
+        return [200, {}, {}];
+      });
     $httpBackend.flush();
   });
 
@@ -104,7 +104,7 @@ describe('store', function () {
     $httpBackend.expectPOST('http://example.com/api/annotations', {
       allowed: 123,
     })
-    .respond(function () { return {id: 'test'}; });
+      .respond(function () { return {id: 'test'}; });
     $httpBackend.flush();
   });
 
@@ -113,7 +113,7 @@ describe('store', function () {
   it('encodes semicolons in query parameters', function () {
     store.search({'uri': 'http://example.com/?foo=bar;baz=qux'});
     $httpBackend.expectGET('http://example.com/api/search?uri=http%3A%2F%2Fexample.com%2F%3Ffoo%3Dbar%3Bbaz%3Dqux')
-    .respond(function () { return [200, {}, {}]; });
+      .respond(function () { return [200, {}, {}]; });
     $httpBackend.flush();
   });
 });

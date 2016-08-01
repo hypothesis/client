@@ -17,7 +17,7 @@ describe('h:session', function () {
 
   before(function () {
     angular.module('h', ['ngResource'])
-    .service('session', require('../session'));
+      .service('session', require('../session'));
   });
 
   beforeEach(mock.module('h'));
