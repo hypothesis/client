@@ -30,14 +30,14 @@ function selections(document) {
   var isMouseDown;
   var selectionEvents = observable.listen(document,
     ['mousedown', 'mouseup', 'selectionchange'])
-  .filter(function (event) {
-    if (event.type === 'mousedown' || event.type === 'mouseup') {
-      isMouseDown = event.type === 'mousedown';
-      return false;
-    } else {
-      return !isMouseDown;
-    }
-  });
+    .filter(function (event) {
+      if (event.type === 'mousedown' || event.type === 'mouseup') {
+        isMouseDown = event.type === 'mousedown';
+        return false;
+      } else {
+        return !isMouseDown;
+      }
+    });
 
   var events = observable.merge([
     // Add a delay before checking the state of the selection because

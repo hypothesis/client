@@ -330,5 +330,5 @@ gulp.task('upload-sourcemaps', ['build-app-js'], function () {
   var release = getEnv('SENTRY_RELEASE_VERSION');
 
   return gulp.src(['build/scripts/*.js', 'build/scripts/*.map'])
-             .pipe(uploadToSentry(opts, projects, release));
+    .pipe(uploadToSentry(opts, projects, release));
 });

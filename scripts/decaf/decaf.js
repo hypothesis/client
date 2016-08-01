@@ -146,11 +146,11 @@ function reformat(js) {
   }).then(result => {
     return result.dest;
   })
-  .then(result => {
-    var checker = new Checker();
-    checker.configure(jscsConfig);
-    return checker.fixString(result).output;
-  });
+    .then(result => {
+      var checker = new Checker();
+      checker.configure(jscsConfig);
+      return checker.fixString(result).output;
+    });
 }
 
 function toResultOrError(promise) {
