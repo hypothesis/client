@@ -45,7 +45,7 @@ function LiveReloadServer(port, appServer) {
           liveReloadServer: 'ws://' + appHost + ':${port}',
 
           // Open the sidebar when the page loads
-          firstRun: true,
+          openSidebar: true,
         };
       };
 
