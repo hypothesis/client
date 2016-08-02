@@ -326,24 +326,24 @@ describe('WidgetController', function () {
      *  not part of the selection.
      */
     it('clears the selection', function () {
-      $rootScope.$emit('beforeAnnotationCreated', {});
+      $rootScope.$broadcast('beforeAnnotationCreated', {});
       assert.called($scope.clearSelection);
     });
 
     it('does not clear the selection if the new annotation is a highlight', function () {
-      $rootScope.$emit('beforeAnnotationCreated', {$highlight: true});
+      $rootScope.$broadcast('beforeAnnotationCreated', {$highlight: true});
       assert.notCalled($scope.clearSelection);
     });
 
     it('does not clear the selection if the new annotation is a reply', function () {
-      $rootScope.$emit('beforeAnnotationCreated', {
+      $rootScope.$broadcast('beforeAnnotationCreated', {
         references: ['parent-id'],
       });
       assert.notCalled($scope.clearSelection);
     });
 
     it('scrolls the viewport to the new annotation', function () {
-      $rootScope.$emit('beforeAnnotationCreated', {$$tag: '123'});
+      $rootScope.$broadcast('beforeAnnotationCreated', {$$tag: '123'});
       assert.called(windowScroll);
     });
   });

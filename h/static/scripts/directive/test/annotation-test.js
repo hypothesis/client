@@ -699,9 +699,9 @@ describe('annotation', function() {
 
       it('emits annotationCreated when saving an annotation succeeds', function () {
         var controller = createController();
-        sandbox.spy($rootScope, '$emit');
+        sandbox.spy($rootScope, '$broadcast');
         return controller.save().then(function() {
-          assert.calledWith($rootScope.$emit, events.ANNOTATION_CREATED);
+          assert.calledWith($rootScope.$broadcast, events.ANNOTATION_CREATED);
         });
       });
 
@@ -852,7 +852,7 @@ describe('annotation', function() {
       it('removes the current annotation if empty', function () {
         var annotation = fixtures.newEmptyAnnotation();
         createDirective(annotation);
-        $rootScope.$emit(events.BEFORE_ANNOTATION_CREATED,
+        $rootScope.$broadcast(events.BEFORE_ANNOTATION_CREATED,
           fixtures.newAnnotation());
         assert.calledWith(fakeDrafts.remove, annotation);
       });
@@ -860,7 +860,7 @@ describe('annotation', function() {
       it('does not remove the current annotation if is is not new', function () {
         createDirective(fixtures.defaultAnnotation());
         fakeDrafts.get.returns({text: '', tags: []});
-        $rootScope.$emit(events.BEFORE_ANNOTATION_CREATED,
+        $rootScope.$broadcast(events.BEFORE_ANNOTATION_CREATED,
           fixtures.newAnnotation());
         assert.notCalled(fakeDrafts.remove);
       });
@@ -869,7 +869,7 @@ describe('annotation', function() {
         var annotation = fixtures.newEmptyAnnotation();
         var parts = createDirective(annotation);
         parts.scope.$destroy();
-        $rootScope.$emit(events.BEFORE_ANNOTATION_CREATED,
+        $rootScope.$broadcast(events.BEFORE_ANNOTATION_CREATED,
           fixtures.newAnnotation());
         assert.notCalled(fakeDrafts.remove);
       });
@@ -878,7 +878,7 @@ describe('annotation', function() {
         var annotation = fixtures.newAnnotation();
         createDirective(annotation);
         fakeDrafts.get.returns({text: 'An incomplete thought'});
-        $rootScope.$emit(events.BEFORE_ANNOTATION_CREATED,
+        $rootScope.$broadcast(events.BEFORE_ANNOTATION_CREATED,
           fixtures.newAnnotation());
         assert.notCalled(fakeDrafts.remove);
       });
@@ -887,7 +887,7 @@ describe('annotation', function() {
         var annotation = fixtures.newAnnotation();
         createDirective(annotation);
         fakeDrafts.get.returns({tags: ['a-tag']});
-        $rootScope.$emit(events.BEFORE_ANNOTATION_CREATED,
+        $rootScope.$broadcast(events.BEFORE_ANNOTATION_CREATED,
           fixtures.newAnnotation());
         assert.notCalled(fakeDrafts.remove);
       });
@@ -937,9 +937,9 @@ describe('annotation', function() {
 
       it('deletes the annotation if it was new', function () {
         var controller = createDirective(fixtures.newAnnotation()).controller;
-        sandbox.spy($rootScope, '$emit');
+        sandbox.spy($rootScope, '$broadcast');
         controller.revert();
-        assert.calledWith($rootScope.$emit, events.ANNOTATION_DELETED);
+        assert.calledWith($rootScope.$broadcast, events.ANNOTATION_DELETED);
       });
     });
 

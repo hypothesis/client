@@ -20,7 +20,7 @@ function AnnotationUIController($rootScope, $scope, annotationUI) {
     $scope.focusedAnnotations = state.focusedAnnotationMap;
   });
 
-  $rootScope.$on(events.ANNOTATION_DELETED, function (event, annotation) {
+  $scope.$on(events.ANNOTATION_DELETED, function (event, annotation) {
     annotationUI.removeSelectedAnnotation(annotation.id);
   });
 }

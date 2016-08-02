@@ -60,7 +60,7 @@ describe('AnnotationUIController', function () {
   describe('on annotationDeleted', function () {
     it('removes the deleted annotation from the selection', function () {
       annotationUI.selectAnnotations(['1']);
-      $rootScope.$emit('annotationDeleted', { id: 1 });
+      $rootScope.$broadcast('annotationDeleted', { id: 1 });
       assert.equal(annotationUI.getState().selectedAnnotationMap, null);
     });
   });

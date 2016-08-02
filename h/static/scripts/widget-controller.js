@@ -93,13 +93,15 @@ module.exports = function WidgetController(
   // only those threads, using placeholders above and below the visible threads
   // to reserve space for threads which are not actually rendered.
   var visibleThreads = new VirtualThreadList($scope, window, thread());
-  annotationUI.subscribe(function () {
+  var unsubscribeAnnotationUI = annotationUI.subscribe(function () {
     visibleThreads.setRootThread(thread());
     $scope.selectedTab = annotationUI.getState().selectedTab;
 
     $scope.totalAnnotations = countAnnotations(annotationUI.getState().annotations);
     $scope.totalNotes = countNotes(annotationUI.getState().annotations);
   });
+
+  $scope.$on('$destroy', unsubscribeAnnotationUI);
 
   visibleThreads.on('changed', function (state) {
     $scope.virtualThreadList = {
@@ -314,7 +316,7 @@ module.exports = function WidgetController(
 
   // When a direct-linked annotation is successfully anchored in the page,
   // focus and scroll to it
-  $rootScope.$on(events.ANNOTATIONS_SYNCED, function (event, tags) {
+  $scope.$on(events.ANNOTATIONS_SYNCED, function (event, tags) {
     var selectedAnnot = firstSelectedAnnotation();
     if (!selectedAnnot) {
       return;
@@ -455,7 +457,7 @@ module.exports = function WidgetController(
     }, 200);
   }
 
-  $rootScope.$on(events.BEFORE_ANNOTATION_CREATED, function (event, data) {
+  $scope.$on(events.BEFORE_ANNOTATION_CREATED, function (event, data) {
     if (data.$highlight || (data.references && data.references.length > 0)) {
       return;
     }

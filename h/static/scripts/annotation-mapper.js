@@ -21,13 +21,13 @@ function annotationMapper($rootScope, annotationUI, store) {
       var existing = getExistingAnnotation(annotationUI, annotation.id);
       if (existing) {
         angular.copy(annotation, existing);
-        $rootScope.$emit(events.ANNOTATION_UPDATED, existing);
+        $rootScope.$broadcast(events.ANNOTATION_UPDATED, existing);
         return;
       }
       loaded.push(annotation);
     });
 
-    $rootScope.$emit(events.ANNOTATIONS_LOADED, loaded);
+    $rootScope.$broadcast(events.ANNOTATIONS_LOADED, loaded);
   }
 
   function unloadAnnotations(annotations) {
@@ -38,11 +38,11 @@ function annotationMapper($rootScope, annotationUI, store) {
       }
       return annotation;
     });
-    $rootScope.$emit(events.ANNOTATIONS_UNLOADED, unloaded);
+    $rootScope.$broadcast(events.ANNOTATIONS_UNLOADED, unloaded);
   }
 
   function createAnnotation(annotation) {
-    $rootScope.$emit(events.BEFORE_ANNOTATION_CREATED, annotation);
+    $rootScope.$broadcast(events.BEFORE_ANNOTATION_CREATED, annotation);
     return annotation;
   }
 
@@ -50,7 +50,7 @@ function annotationMapper($rootScope, annotationUI, store) {
     return store.annotation.delete({
       id: annotation.id,
     }).then(function () {
-      $rootScope.$emit(events.ANNOTATION_DELETED, annotation);
+      $rootScope.$broadcast(events.ANNOTATION_DELETED, annotation);
       return annotation;
     });
   }
