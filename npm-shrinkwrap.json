@@ -634,6 +634,23 @@
       "from": "browserify-transform-tools@>=1.5.3 <2.0.0",
       "resolved": "https://registry.npmjs.org/browserify-transform-tools/-/browserify-transform-tools-1.6.0.tgz"
     },
+    "browserify-versionify": {
+      "version": "1.0.6",
+      "from": "browserify-versionify@>=1.0.6 <2.0.0",
+      "resolved": "https://registry.npmjs.org/browserify-versionify/-/browserify-versionify-1.0.6.tgz",
+      "dependencies": {
+        "readable-stream": {
+          "version": "1.0.34",
+          "from": "readable-stream@>=1.0.33-1 <1.1.0-0",
+          "resolved": "https://registry.npmjs.org/readable-stream/-/readable-stream-1.0.34.tgz"
+        },
+        "through2": {
+          "version": "0.6.3",
+          "from": "through2@0.6.3",
+          "resolved": "https://registry.npmjs.org/through2/-/through2-0.6.3.tgz"
+        }
+      }
+    },
     "browserify-zlib": {
       "version": "0.1.4",
       "from": "browserify-zlib@>=0.1.2 <0.2.0",
@@ -1602,6 +1619,11 @@
       "version": "0.3.0",
       "from": "find-parent-dir@>=0.3.0 <0.4.0",
       "resolved": "https://registry.npmjs.org/find-parent-dir/-/find-parent-dir-0.3.0.tgz"
+    },
+    "find-root": {
+      "version": "0.1.2",
+      "from": "find-root@>=0.1.1 <0.2.0",
+      "resolved": "https://registry.npmjs.org/find-root/-/find-root-0.1.2.tgz"
     },
     "find-up": {
       "version": "1.1.2",
