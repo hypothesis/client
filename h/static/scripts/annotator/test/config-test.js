@@ -55,12 +55,12 @@ describe('annotator configuration', function () {
   it('merges the config from hypothesisConfig()', function () {
     var fakeWindow = Object.assign({}, fakeWindowBase, {
       hypothesisConfig: function () {
-        return {firstRun: true};
+        return {foo: true};
       },
     });
     assert.deepEqual(config(fakeWindow), {
       app: 'app.html',
-      firstRun: true,
+      foo: true,
     });
   });
 

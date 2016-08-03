@@ -94,7 +94,6 @@ describe('AppController', function () {
     };
 
     fakeSettings = {
-      firstRun: false,
       serviceUrl: 'http://fake.service.com/',
     };
 
