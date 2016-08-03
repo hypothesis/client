@@ -16,7 +16,7 @@ function replaceURLParams(url, params) {
       var value = params[param];
       var urlParam = ':' + param;
       if (url.indexOf(urlParam) !== -1) {
-        url = url.replace(urlParam, value);
+        url = url.replace(urlParam, encodeURIComponent(value));
       } else {
         unusedParams[param] = value;
       }

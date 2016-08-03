@@ -20,6 +20,7 @@ describe('AppController', function () {
   var fakeSession = null;
   var fakeGroups = null;
   var fakeRoute = null;
+  var fakeServiceUrl = null;
   var fakeSettings = null;
   var fakeWindow = null;
 
@@ -93,14 +94,14 @@ describe('AppController', function () {
       confirm: sandbox.stub(),
     };
 
-    fakeSettings = {
-      serviceUrl: 'http://fake.service.com/',
-    };
+    fakeServiceUrl = sinon.stub();
+    fakeSettings = {};
 
     $provide.value('annotationUI', fakeAnnotationUI);
     $provide.value('auth', fakeAuth);
     $provide.value('drafts', fakeDrafts);
     $provide.value('features', fakeFeatures);
+    $provide.value('serviceUrl', fakeServiceUrl);
     $provide.value('session', fakeSession);
     $provide.value('settings', fakeSettings);
     $provide.value('groups', fakeGroups);
@@ -187,7 +188,7 @@ describe('AppController', function () {
 
   it('exposes the serviceUrl on the scope', function () {
     createController();
-    assert.equal($scope.serviceUrl, 'http://fake.service.com/');
+    assert.equal($scope.serviceUrl, fakeServiceUrl);
   });
 
   it('does not show login form for logged in users', function () {

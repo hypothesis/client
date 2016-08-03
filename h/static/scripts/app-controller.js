@@ -25,7 +25,7 @@ function authStateFromUserID(userid) {
 module.exports = function AppController(
   $controller, $document, $location, $rootScope, $route, $scope,
   $window, annotationUI, auth, drafts, features, groups,
-  session, settings
+  serviceUrl, session, settings
 ) {
   $controller('AnnotationUIController', {$scope: $scope});
 
@@ -52,7 +52,7 @@ module.exports = function AppController(
   // the stream page or an individual annotation page.
   $scope.isSidebar = $window.top !== $window;
 
-  $scope.serviceUrl = settings.serviceUrl;
+  $scope.serviceUrl = serviceUrl;
 
   $scope.sortKey = function () {
     return annotationUI.getState().sortKey;

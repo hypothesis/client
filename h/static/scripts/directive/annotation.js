@@ -50,8 +50,8 @@ function updateModel(annotation, changes, permissions) {
 // @ngInject
 function AnnotationController(
   $document, $q, $rootScope, $scope, $timeout, $window, annotationUI,
-  annotationMapper, drafts, flash, features, groups, permissions, session,
-  settings, store) {
+  annotationMapper, drafts, flash, features, groups, permissions, serviceUrl,
+  session, store) {
 
   var vm = this;
   var newlyCreatedByHighlightButton;
@@ -93,8 +93,7 @@ function AnnotationController(
     // The remaining properties on vm are read-only properties for the
     // templates.
 
-    /** The URL for the Hypothesis service, e.g. 'https://hypothes.is/'. */
-    vm.serviceUrl = settings.serviceUrl;
+    vm.serviceUrl = serviceUrl;
 
     /** Give the template access to the feature flags. */
     vm.feature = features.flagEnabled;
@@ -438,7 +437,7 @@ function AnnotationController(
   };
 
   vm.tagStreamURL = function(tag) {
-    return vm.serviceUrl + 'stream?q=tag:' + encodeURIComponent(tag);
+    return serviceUrl('search.tag', {tag: tag});
   };
 
   vm.target = function() {

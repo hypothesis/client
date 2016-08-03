@@ -10,6 +10,12 @@ describe('url-util', function () {
       assert.equal(replaced.url, 'http://foo.com/things/test');
     });
 
+    it('should URL encode params in URLs', function () {
+      var replaced = urlUtil.replaceURLParams('http://foo.com/things/:id',
+        {id: 'foo=bar'});
+      assert.equal(replaced.url, 'http://foo.com/things/foo%3Dbar');
+    });
+
     it('should return unused params', function () {
       var replaced = urlUtil.replaceURLParams('http://foo.com/:id',
         {id: 'test', 'q': 'unused'});
