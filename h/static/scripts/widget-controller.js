@@ -5,6 +5,7 @@ var events = require('./events');
 var memoize = require('./util/memoize');
 var metadata = require('./annotation-metadata');
 var scopeTimeout = require('./util/scope-timeout');
+var tabCounts = require('./tab-counts');
 var uiConstants = require('./ui-constants');
 
 function firstKey(object) {
@@ -38,48 +39,6 @@ module.exports = function WidgetController(
   features, groups, rootThread, settings, streamer, streamFilter, store,
   VirtualThreadList
 ) {
-
-  /**
-   * Returns the number of annotations which are not yet anchored.
-   */
-  function countWaitingToAnchorAnnotations (annotations) {
-    var total = annotations.reduce(function (count, annotation) {
-      return annotation && metadata.isWaitingToAnchor(annotation) ? count + 1 : count;
-    }, 0);
-    return total;
-  }
-
-  /**
-   * Returns the number of top level annotations which are unanchored i.e orphans.
-   */
-  function countOrphans(annotations) {
-    var total = annotations.reduce(function (count, annotation) {
-      return annotation && metadata.isOrphan(annotation) ? count + 1 : count;
-    }, 0);
-    return total;
-  }
-
-  /**
-   * Returns the number of top level annotations which are of type annotations
-   * and not notes or replies.
-   */
-  function countAnnotations(annotations) {
-    var total = annotations.reduce(function (count, annotation) {
-      return annotation && metadata.isAnnotation(annotation) ? count + 1 : count;
-    }, 0);
-    return total;
-  }
-
-  /**
-   * Returns the number of top level annotations which are of type notes.
-   */
-  function countNotes(annotations) {
-    var total = annotations.reduce(function (count, annotation) {
-      return annotation && metadata.isPageNote(annotation) ? count + 1 : count;
-    }, 0);
-    return total;
-  }
-
   /**
    * Returns the height of the thread for an annotation if it exists in the view
    * or undefined otherwise.
@@ -114,19 +73,21 @@ module.exports = function WidgetController(
   // to reserve space for threads which are not actually rendered.
   var visibleThreads = new VirtualThreadList($scope, window, thread());
   var unsubscribeAnnotationUI = annotationUI.subscribe(function () {
+    var state = annotationUI.getState();
+
     visibleThreads.setRootThread(thread());
-    $scope.selectedTab = annotationUI.getState().selectedTab;
+    $scope.selectedTab = state.selectedTab;
 
-    $scope.waitingToAnchorAnnotations = countWaitingToAnchorAnnotations(annotationUI.getState().annotations) > 0;
+    var counts = tabCounts(state.annotations, {
+      separateOrphans: features.flagEnabled('orphans_tab'),
+    });
 
-    $scope.totalNotes = countNotes(annotationUI.getState().annotations);
-    $scope.totalOrphans = countOrphans(annotationUI.getState().annotations);
-
-    if (!features.flagEnabled('orphans_tab')) {
-      $scope.totalAnnotations = $scope.totalAnnotations + $scope.totalOrphans;
-    } else {
-      $scope.totalAnnotations = countAnnotations(annotationUI.getState().annotations);
-    }
+    Object.assign($scope, {
+      totalNotes: counts.notes,
+      totalAnnotations: counts.annotations,
+      totalOrphans: counts.orphans,
+      waitingToAnchorAnnotations: counts.anchoring > 0,
+    });
   });
 
   $scope.$on('$destroy', unsubscribeAnnotationUI);
