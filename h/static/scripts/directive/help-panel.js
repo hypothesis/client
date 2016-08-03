@@ -13,7 +13,7 @@ module.exports = function () {
     // @ngInject
     controller: function ($scope, $window, settings, crossframe) {
       this.userAgent = $window.navigator.userAgent;
-      this.version = settings.release;
+      this.version = '__VERSION__';  // replaced by versionify
       this.dateTime = new Date();
       this.serviceUrl = settings.serviceUrl;
 

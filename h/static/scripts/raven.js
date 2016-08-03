@@ -74,7 +74,7 @@ function translateSourceURLs(data) {
 
 function init(config) {
   Raven.config(config.dsn, {
-    release: config.release,
+    release: '__VERSION__',  // replaced by versionify
     dataCallback: translateSourceURLs,
   }).install();
   installUnhandledPromiseErrorHandler();
