@@ -1,12 +1,7 @@
 'use strict';
 
 var metadata = require('./annotation-metadata');
-
-function countIf(list, predicate) {
-  return list.reduce(function (count, item) {
-    return predicate(item) ? count + 1 : count;
-  }, 0);
-}
+var countIf = require('./util/array-util').countIf;
 
 /**
  * Return a count of the number of Annotations, Page Notes, Orphans and
