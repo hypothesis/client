@@ -177,31 +177,17 @@ module.exports = function WidgetController(
   /** Returns the annotation type - note or annotation of the first annotation
    *  in `results` whose ID is a key in `selectedAnnotationMap`.
    */
-  function tabTypeFromSelection(selection, results) {
-    var id = firstKey(selection);
-    var annot = results.find(function (annot) {
-      return annot.id === id;
-    });
-    if (!annot) {
-      return null;
-    }
-
+  function tabContainingAnnotation(annot) {
     if (metadata.isOrphan(annot)) {
-      return uiConstants.TAB_ORPHANS;
-    } else if (metadata.isAnnotation(annot)) {
-      return uiConstants.TAB_ANNOTATIONS;
+      if (features.flagEnabled('orphans_tab')) {
+        return uiConstants.TAB_ORPHANS;
+      } else {
+        return uiConstants.TAB_ANNOTATIONS;
+      }
     } else if (metadata.isPageNote(annot)) {
       return uiConstants.TAB_NOTES;
     } else {
-      return null;
-    }
-  }
-
-  function selectAppropriateTab() {
-    if (annotationUI.getState().selectedTab === uiConstants.TAB_ORPHANS) {
-      annotationUI.selectTab(uiConstants.TAB_ANNOTATIONS);
-    } else {
-      annotationUI.selectTab(annotationUI.getState().selectedTab);
+      return uiConstants.TAB_ANNOTATIONS;
     }
   }
 
@@ -242,16 +228,6 @@ module.exports = function WidgetController(
     searchClients.push(searchClient);
     searchClient.on('results', function (results) {
       if (annotationUI.hasSelectedAnnotations()) {
-        // Select appropriate tab - notes, annotations or orphans, for selection
-        $scope.$on(events.ANNOTATIONS_SYNCED, function () {
-          var tabToSelect = tabTypeFromSelection(annotationUI.getState().selectedAnnotationMap, results);
-          if (tabToSelect) {
-            annotationUI.selectTab(tabToSelect);
-          } else {
-            selectAppropriateTab();
-          }
-        });
-
         // Focus the group containing the selected annotation and filter
         // annotations to those from this group
         var groupID = groupIDFromSelection(
@@ -359,8 +335,6 @@ module.exports = function WidgetController(
   });
 
   $scope.$on(events.ANNOTATIONS_SYNCED, function (event, tags) {
-    selectAppropriateTab();
-
     // When a direct-linked annotation is successfully anchored in the page,
     // focus and scroll to it
     var selectedAnnot = firstSelectedAnnotation();
@@ -375,6 +349,9 @@ module.exports = function WidgetController(
     }
     focusAnnotation(selectedAnnot);
     scrollToAnnotation(selectedAnnot);
+
+    var targetTab = tabContainingAnnotation(selectedAnnot);
+    annotationUI.selectTab(targetTab);
   });
 
   $scope.$on(events.GROUP_FOCUSED, function () {
@@ -388,7 +365,8 @@ module.exports = function WidgetController(
     annotationUI.clearSelectedAnnotations();
     loadAnnotations(crossframe.frames);
 
-    selectAppropriateTab();
+    // When switching groups, reset back to the annotations tab
+    annotationUI.selectTab(uiConstants.TAB_ANNOTATIONS);
   });
 
   // Watch anything that may require us to reload annotations.
