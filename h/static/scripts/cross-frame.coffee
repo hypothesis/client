@@ -30,6 +30,9 @@ module.exports = class CrossFrame
           for k, v of annotation when k in whitelist
             parsed[k] = v
           parsed
+        merge: (local, remote) ->
+          annotationUI.updateAnchorStatus(local.id, local.$$tag, remote.$orphan)
+          local
         emit: (args...) ->
           $rootScope.$apply ->
             $rootScope.$broadcast.call($rootScope, args...)
