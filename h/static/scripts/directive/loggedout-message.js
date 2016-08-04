@@ -5,8 +5,8 @@ module.exports = function () {
     bindToController: true,
     controllerAs: 'vm',
     //@ngInject
-    controller: function (settings) {
-      this.serviceUrl = settings.serviceUrl;
+    controller: function (serviceUrl) {
+      this.serviceUrl = serviceUrl;
     },
     restrict: 'E',
     scope: {

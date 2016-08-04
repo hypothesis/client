@@ -21,9 +21,7 @@ describe('groups', function() {
   var fakeLocalStorage;
   var fakeRootScope;
   var fakeHttp;
-  var fakeSettings = {
-    serviceUrl: 'https://test.hypothes.is/',
-  };
+  var fakeServiceUrl;
   var sandbox;
 
   beforeEach(function() {
@@ -46,6 +44,7 @@ describe('groups', function() {
       },
     };
     fakeHttp = sandbox.stub();
+    fakeServiceUrl = sandbox.stub();
   });
 
   afterEach(function () {
@@ -53,8 +52,8 @@ describe('groups', function() {
   });
 
   function service() {
-    return groups(fakeLocalStorage, fakeSession,
-                  fakeSettings, fakeRootScope, fakeHttp);
+    return groups(fakeLocalStorage, fakeServiceUrl, fakeSession,
+      fakeRootScope, fakeHttp);
   }
 
   describe('.all()', function() {
@@ -174,9 +173,12 @@ describe('groups', function() {
   describe('.leave()', function () {
     it('should call the /groups/<id>/leave service', function () {
       var s = service();
+      fakeServiceUrl
+        .withArgs('groups.leave', {id: 'id2'})
+        .returns('https://hyp.is/groups/leave');
       s.leave('id2');
       assert.calledWithMatch(fakeHttp, {
-        url: fakeSettings.serviceUrl + 'groups/id2/leave',
+        url: 'https://hyp.is/groups/leave',
         method: 'POST',
       });
     });

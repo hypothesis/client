@@ -36,7 +36,7 @@ describe 'loginForm.Controller', ->
     $provide.value 'flash', mockFlash
     $provide.value 'session', new MockSession()
     $provide.value 'formRespond', mockFormRespond
-    $provide.value 'settings', sandbox.spy()
+    $provide.value 'serviceUrl', sandbox.spy()
     return
 
   beforeEach inject (_$controller_, $rootScope, _$timeout_, _session_) ->

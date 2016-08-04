@@ -182,6 +182,7 @@ module.exports = angular.module('h', [
   .service('queryParser', require('./query-parser'))
   .service('rootThread', require('./root-thread'))
   .service('searchFilter', require('./search-filter'))
+  .service('serviceUrl', require('./service-url'))
   .service('session', require('./session'))
   .service('streamer', require('./streamer'))
   .service('streamFilter', require('./stream-filter'))

@@ -12,23 +12,21 @@ describe('groupList', function () {
 
   var groups;
   var fakeGroups;
-  var fakeSettings = {
-    serviceUrl: 'https://test.hypothes.is/',
-  };
+  var fakeServiceUrl;
 
   before(function() {
     angular.module('app', [])
       .directive('groupList', groupList.directive)
       .factory('groups', function () {
         return fakeGroups;
-      })
-      .factory('settings', function () {
-        return fakeSettings;
       });
   });
 
   beforeEach(function () {
-    angular.mock.module('app');
+    fakeServiceUrl = sinon.stub();
+    angular.mock.module('app', {
+      serviceUrl: fakeServiceUrl,
+    });
   });
 
   beforeEach(angular.mock.inject(function (_$window_) {
@@ -112,12 +110,16 @@ describe('groupList', function () {
   });
 
   it('should open a window when "New Group" is clicked', function () {
+    fakeServiceUrl
+      .withArgs('groups.new')
+      .returns('https://test.hypothes.is/groups/new');
+
     var element = createGroupList();
     $window.open = sinon.stub();
     var newGroupLink =
       element[0].querySelector('.new-group-btn a');
     angular.element(newGroupLink).click();
-    assert.calledWith($window.open, fakeSettings.serviceUrl + 'groups/new',
+    assert.calledWith($window.open, 'https://test.hypothes.is/groups/new',
       '_blank');
   });
 });

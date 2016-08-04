@@ -11,11 +11,11 @@ module.exports = function () {
     bindToController: true,
     controllerAs: 'vm',
     // @ngInject
-    controller: function ($scope, $window, settings, crossframe) {
+    controller: function ($scope, $window, crossframe, serviceUrl) {
       this.userAgent = $window.navigator.userAgent;
       this.version = '__VERSION__';  // replaced by versionify
       this.dateTime = new Date();
-      this.serviceUrl = settings.serviceUrl;
+      this.serviceUrl = serviceUrl;
 
       $scope.$watchCollection(
         function () {

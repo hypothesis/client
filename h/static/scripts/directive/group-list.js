@@ -19,18 +19,18 @@ function GroupListController($scope, $window, groups) {
 /**
  * @ngdoc directive
  * @name groupList
- * @restrict AE
+ * @restrict E
  * @description Displays a list of groups of which the user is a member.
  */
 // @ngInject
-function groupList( $window, groups, settings) {
+function groupList($window, groups, serviceUrl) {
   return {
     controller: GroupListController,
     link: function ($scope) {
       $scope.groups = groups;
 
       $scope.createNewGroup = function() {
-        $window.open(settings.serviceUrl + 'groups/new', '_blank');
+        $window.open(serviceUrl('groups.new'), '_blank');
       };
     },
     restrict: 'E',

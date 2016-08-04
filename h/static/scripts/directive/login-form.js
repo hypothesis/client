@@ -3,7 +3,7 @@
 var angular = require('angular');
 
 // @ngInject
-function Controller($scope, $timeout, flash, session, formRespond, settings) {
+function Controller($scope, $timeout, flash, session, formRespond, serviceUrl) {
   var pendingTimeout = null;
 
   function success(data) {
@@ -52,7 +52,7 @@ function Controller($scope, $timeout, flash, session, formRespond, settings) {
     pendingTimeout = null;
   }
 
-  this.serviceUrl = settings.serviceUrl;
+  this.serviceUrl = serviceUrl;
 
   this.submit = function submit(form) {
     formRespond(form);

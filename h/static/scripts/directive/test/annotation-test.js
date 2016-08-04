@@ -87,6 +87,7 @@ describe('annotation', function() {
     var fakeFlash;
     var fakeGroups;
     var fakePermissions;
+    var fakeServiceUrl;
     var fakeSession;
     var fakeStore;
     var sandbox;
@@ -169,9 +170,7 @@ describe('annotation', function() {
         },
       };
 
-      var fakeSettings = {
-        serviceUrl: 'https://test.hypothes.is/',
-      };
+      fakeServiceUrl = sinon.stub();
 
       fakeGroups = {
         focused: function() {
@@ -199,7 +198,7 @@ describe('annotation', function() {
       $provide.value('groups', fakeGroups);
       $provide.value('permissions', fakePermissions);
       $provide.value('session', fakeSession);
-      $provide.value('settings', fakeSettings);
+      $provide.value('serviceUrl', fakeServiceUrl);
       $provide.value('store', fakeStore);
     }));
 
@@ -945,6 +944,10 @@ describe('annotation', function() {
 
     describe('tag display', function () {
       it('displays links to tags on the stream', function () {
+        fakeServiceUrl
+          .withArgs('search.tag', {tag: 'atag'})
+          .returns('https://test.hypothes.is/stream?q=tag:atag');
+
         var directive = createDirective({
           id: '1234',
           tags: ['atag'],
@@ -953,6 +956,7 @@ describe('annotation', function() {
         var tagLinks = links.filter(function (link) {
           return link.textContent === 'atag';
         });
+
         assert.equal(tagLinks.length, 1);
         assert.equal(tagLinks[0].href,
                      'https://test.hypothes.is/stream?q=tag:atag');
