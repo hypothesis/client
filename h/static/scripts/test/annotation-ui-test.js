@@ -270,4 +270,20 @@ describe('annotationUI', function () {
       assert.equal(annotationUI.getState().selectedTab, annotationTab);
     });
   });
+
+  describe('#updatingAnchorStatus', function () {
+    it("updates the annotation's tag", function () {
+      var annot = defaultAnnotation();
+      annotationUI.addAnnotations([annot]);
+      annotationUI.updateAnchorStatus(annot.id, 'atag', true);
+      assert.equal(annotationUI.getState().annotations[0].$$tag, 'atag');
+    });
+
+    it("updates the annotation's orphan flag", function () {
+      var annot = defaultAnnotation();
+      annotationUI.addAnnotations([annot]);
+      annotationUI.updateAnchorStatus(annot.id, 'atag', true);
+      assert.equal(annotationUI.getState().annotations[0].$orphan, true);
+    });
+  });
 });

@@ -85,6 +85,11 @@ var types = {
   SET_FILTER_QUERY: 'SET_FILTER_QUERY',
   SET_SORT_KEY: 'SET_SORT_KEY',
   SELECT_TAB: 'SELECT_TAB',
+  /**
+   * Update an annotation's status flags after attempted anchoring in the
+   * document completes.
+   */
+  UPDATE_ANCHOR_STATUS: 'UPDATE_ANCHOR_STATUS',
 };
 
 /**
@@ -119,6 +124,20 @@ function annotationsReducer(state, action) {
         {annotations: excludeAnnotations(state.annotations, action.annotations)});
   case types.CLEAR_ANNOTATIONS:
     return Object.assign({}, state, {annotations: []});
+  case types.UPDATE_ANCHOR_STATUS:
+    {
+      var annotations = state.annotations.map(function (annot) {
+        if (annot.id === action.id) {
+          return Object.assign({}, annot, {
+            $orphan: action.isOrphan,
+            $$tag: action.tag,
+          });
+        } else {
+          return annot;
+        }
+      });
+      return Object.assign({}, state, {annotations: annotations});
+    }
   default:
     return state;
   }
@@ -340,6 +359,23 @@ module.exports = function ($rootScope, settings) {
     /** Set the currently displayed annotations to the empty set. */
     clearAnnotations: function () {
       store.dispatch({type: types.CLEAR_ANNOTATIONS});
+    },
+
+    /**
+     * Updating the local tag and anchoring status of an annotation.
+     *
+     * @param {string} id - Annotation ID
+     * @param {string} tag - The local tag assigned to this annotation to link
+     *        the object in the page and the annotation in the sidebar
+     * @param {boolean} isOrphan - True if the annotation failed to anchor
+     */
+    updateAnchorStatus: function (id, tag, isOrphan) {
+      store.dispatch({
+        type: types.UPDATE_ANCHOR_STATUS,
+        id: id,
+        tag: tag,
+        isOrphan: isOrphan,
+      });
     },
 
     /** Set the type annotations to be displayed. */
