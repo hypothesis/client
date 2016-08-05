@@ -101,14 +101,37 @@ function isNew(annotation) {
   return !annotation.id;
 }
 
-/** Return `true` if the given annotation is a page note, `false` otherwise. */
+/**
+ * Return `true` if `annotation` has a selector.
+ *
+ * An annotation which has a selector refers to a specific part of a document,
+ * as opposed to a Page Note which refers to the whole document or a reply,
+ * which refers to another annotation.
+ */
+function hasSelector(annotation) {
+  return !!(annotation.target &&
+            annotation.target.length > 0 &&
+            annotation.target[0].selector);
+}
+
+/** Return `true` if the given annotation is not yet anchored. */
+function isWaitingToAnchor(annotation) {
+  return hasSelector(annotation) && (typeof annotation.$orphan === 'undefined');
+}
+
+/** Return `true` if the given annotation is an orphan. */
+function isOrphan(annotation) {
+  return hasSelector(annotation) && annotation.$orphan;
+}
+
+/** Return `true` if the given annotation is a page note. */
 function isPageNote(annotation) {
-  return !isAnnotation(annotation) && !isReply(annotation);
+  return !hasSelector(annotation) && !isReply(annotation);
 }
 
 /** Return `true` if the given annotation is a top level annotation, `false` otherwise. */
 function isAnnotation(annotation) {
-  return !!(annotation.target && annotation.target.length > 0 && annotation.target[0].selector);
+  return !!(hasSelector(annotation) && !isOrphan(annotation));
 }
 
 /** Return a numeric key that can be used to sort annotations by location.
@@ -137,7 +160,9 @@ module.exports = {
   domainAndTitle: domainAndTitle,
   isAnnotation: isAnnotation,
   isNew: isNew,
+  isOrphan: isOrphan,
   isPageNote: isPageNote,
   isReply: isReply,
+  isWaitingToAnchor: isWaitingToAnchor,
   location: location,
 };

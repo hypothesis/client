@@ -5,6 +5,7 @@ var immutable = require('seamless-immutable');
 var annotationUIFactory = require('../annotation-ui');
 var annotationFixtures = require('./annotation-fixtures');
 var unroll = require('./util').unroll;
+var uiConstants = require('../ui-constants');
 
 var defaultAnnotation = annotationFixtures.defaultAnnotation;
 
@@ -71,6 +72,14 @@ describe('annotationUI', function () {
       annotationUI.addAnnotations(fixtures.pair);
       annotationUI.removeAnnotations([{$$tag: fixtures.pair[0].$$tag}]);
       assert.deepEqual(annotationUI.getState().annotations, [fixtures.pair[1]]);
+    });
+
+    it('switches back to the Annotations tab when the last orphan is removed', function () {
+      var orphan = Object.assign(defaultAnnotation(), {$orphan: true});
+      annotationUI.addAnnotations([orphan]);
+      annotationUI.selectTab(uiConstants.TAB_ORPHANS);
+      annotationUI.removeAnnotations([orphan]);
+      assert.equal(annotationUI.getState().selectedTab, uiConstants.TAB_ANNOTATIONS);
     });
   });
 

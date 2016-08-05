@@ -60,15 +60,29 @@ function RootThread($rootScope, annotationUI, features, searchFilter, viewFilter
 
     var threadFilterFn;
     if (features.flagEnabled('selection_tabs') && !state.filterQuery && state.selectedTab) {
-      threadFilterFn = function (thread) {
-        if (state.selectedTab === uiConstants.TAB_ANNOTATIONS) {
-          return thread.annotation && metadata.isAnnotation(thread.annotation);
-        } else if (state.selectedTab === uiConstants.TAB_NOTES) {
-          return thread.annotation && metadata.isPageNote(thread.annotation);
-        } else {
-          throw new Error('Invalid selected tab');
-        }
-      };
+      if (!features.flagEnabled('orphans_tab')) {
+        threadFilterFn = function (thread) {
+          if (state.selectedTab === uiConstants.TAB_ANNOTATIONS || state.selectedTab === uiConstants.TAB_ORPHANS) {
+            return thread.annotation && (metadata.isAnnotation(thread.annotation) || metadata.isOrphan(thread.annotation));
+          } else if (state.selectedTab === uiConstants.TAB_NOTES) {
+            return thread.annotation && metadata.isPageNote(thread.annotation);
+          } else {
+            throw new Error('Invalid selected tab');
+          }
+        };
+      } else {
+        threadFilterFn = function (thread) {
+          if (state.selectedTab === uiConstants.TAB_ANNOTATIONS) {
+            return thread.annotation && metadata.isAnnotation(thread.annotation);
+          } else if (state.selectedTab === uiConstants.TAB_NOTES) {
+            return thread.annotation && metadata.isPageNote(thread.annotation);
+          } else if (state.selectedTab === uiConstants.TAB_ORPHANS) {
+            return thread.annotation && metadata.isOrphan(thread.annotation);
+          } else {
+            throw new Error('Invalid selected tab');
+          }
+        };
+      }
     }
 
     // Get the currently loaded annotations and the set of inputs which

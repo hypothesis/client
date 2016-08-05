@@ -443,7 +443,11 @@ function AnnotationController(
   vm.target = function() {
     return vm.annotation.target;
   };
-
+  
+  vm.isOrphan = function() {
+    return vm.annotation.$orphan;
+  };
+  
   vm.updated = function() {
     return vm.annotation.updated;
   };

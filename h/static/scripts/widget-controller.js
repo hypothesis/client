@@ -5,6 +5,7 @@ var events = require('./events');
 var memoize = require('./util/memoize');
 var metadata = require('./annotation-metadata');
 var scopeTimeout = require('./util/scope-timeout');
+var tabCounts = require('./tab-counts');
 var uiConstants = require('./ui-constants');
 
 function firstKey(object) {
@@ -34,32 +35,10 @@ function groupIDFromSelection(selection, results) {
 
 // @ngInject
 module.exports = function WidgetController(
-  $scope, $rootScope, annotationUI, crossframe, annotationMapper,
-  drafts, features, groups, rootThread, settings, streamer, streamFilter, store,
+  $scope, annotationUI, crossframe, annotationMapper, drafts,
+  features, groups, rootThread, settings, streamer, streamFilter, store,
   VirtualThreadList
 ) {
-
-  /**
-   * Returns the number of top level annotations which are of type annotations
-   * and not notes or replies.
-   */
-  function countAnnotations(annotations) {
-    var total = annotations.reduce(function (count, annotation) {
-      return annotation && metadata.isAnnotation(annotation) ? count + 1 : count;
-    }, 0);
-    return total;
-  }
-
-  /**
-   * Returns the number of top level annotations which are of type notes.
-   */
-  function countNotes(annotations) {
-    var total = annotations.reduce(function (count, annotation) {
-      return annotation && metadata.isPageNote(annotation) ? count + 1 : count;
-    }, 0);
-    return total;
-  }
-
   /**
    * Returns the height of the thread for an annotation if it exists in the view
    * or undefined otherwise.
@@ -94,11 +73,21 @@ module.exports = function WidgetController(
   // to reserve space for threads which are not actually rendered.
   var visibleThreads = new VirtualThreadList($scope, window, thread());
   var unsubscribeAnnotationUI = annotationUI.subscribe(function () {
-    visibleThreads.setRootThread(thread());
-    $scope.selectedTab = annotationUI.getState().selectedTab;
+    var state = annotationUI.getState();
 
-    $scope.totalAnnotations = countAnnotations(annotationUI.getState().annotations);
-    $scope.totalNotes = countNotes(annotationUI.getState().annotations);
+    visibleThreads.setRootThread(thread());
+    $scope.selectedTab = state.selectedTab;
+
+    var counts = tabCounts(state.annotations, {
+      separateOrphans: features.flagEnabled('orphans_tab'),
+    });
+
+    Object.assign($scope, {
+      totalNotes: counts.notes,
+      totalAnnotations: counts.annotations,
+      totalOrphans: counts.orphans,
+      waitingToAnchorAnnotations: counts.anchoring > 0,
+    });
   });
 
   $scope.$on('$destroy', unsubscribeAnnotationUI);
@@ -149,21 +138,17 @@ module.exports = function WidgetController(
   /** Returns the annotation type - note or annotation of the first annotation
    *  in `results` whose ID is a key in `selectedAnnotationMap`.
    */
-  function tabTypeFromSelection(selection, results) {
-    var id = firstKey(selection);
-    var annot = results.find(function (annot) {
-      return annot.id === id;
-    });
-    if (!annot) {
-      return null;
-    }
-
-    if (metadata.isAnnotation(annot)) {
-      return uiConstants.TAB_ANNOTATIONS;
+  function tabContainingAnnotation(annot) {
+    if (metadata.isOrphan(annot)) {
+      if (features.flagEnabled('orphans_tab')) {
+        return uiConstants.TAB_ORPHANS;
+      } else {
+        return uiConstants.TAB_ANNOTATIONS;
+      }
     } else if (metadata.isPageNote(annot)) {
       return uiConstants.TAB_NOTES;
     } else {
-      return null;
+      return uiConstants.TAB_ANNOTATIONS;
     }
   }
 
@@ -204,10 +189,6 @@ module.exports = function WidgetController(
     searchClients.push(searchClient);
     searchClient.on('results', function (results) {
       if (annotationUI.hasSelectedAnnotations()) {
-        // Select appropriate tab - notes or annotations, for selection
-        annotationUI.selectTab(
-          tabTypeFromSelection(annotationUI.getState().selectedAnnotationMap, results));
-
         // Focus the group containing the selected annotation and filter
         // annotations to those from this group
         var groupID = groupIDFromSelection(
@@ -314,9 +295,9 @@ module.exports = function WidgetController(
     streamer.reconnect();
   });
 
-  // When a direct-linked annotation is successfully anchored in the page,
-  // focus and scroll to it
   $scope.$on(events.ANNOTATIONS_SYNCED, function (event, tags) {
+    // When a direct-linked annotation is successfully anchored in the page,
+    // focus and scroll to it
     var selectedAnnot = firstSelectedAnnotation();
     if (!selectedAnnot) {
       return;
@@ -329,6 +310,9 @@ module.exports = function WidgetController(
     }
     focusAnnotation(selectedAnnot);
     scrollToAnnotation(selectedAnnot);
+
+    var targetTab = tabContainingAnnotation(selectedAnnot);
+    annotationUI.selectTab(targetTab);
   });
 
   $scope.$on(events.GROUP_FOCUSED, function () {
@@ -339,9 +323,11 @@ module.exports = function WidgetController(
     if (isLoading()) {
       return;
     }
-
     annotationUI.clearSelectedAnnotations();
     loadAnnotations(crossframe.frames);
+
+    // When switching groups, reset back to the annotations tab
+    annotationUI.selectTab(uiConstants.TAB_ANNOTATIONS);
   });
 
   // Watch anything that may require us to reload annotations.
@@ -407,7 +393,6 @@ module.exports = function WidgetController(
   };
 
   $scope.isLoading = isLoading;
-  annotationUI.selectTab(uiConstants.TAB_ANNOTATIONS);
 
   var visibleCount = memoize(function (thread) {
     return thread.children.reduce(function (count, child) {

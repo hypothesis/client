@@ -15,7 +15,7 @@
   <button class="primary-action-btn primary-action-btn--short"
           ng-click="vm.onClearSelection()"
           title="Clear the selection and show all annotations">
-    <span ng-if="!vm.selectedTab">
+    <span ng-if="!vm.selectedTab || vm.selectedTab === vm.TAB_ORPHANS">
       Show all annotations and notes
     </span>
     <span ng-if="vm.selectedTab === vm.TAB_ANNOTATIONS">

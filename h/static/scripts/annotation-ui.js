@@ -11,6 +11,10 @@
 var immutable = require('seamless-immutable');
 var redux = require('redux');
 
+var metadata = require('./annotation-metadata');
+var uiConstants = require('./ui-constants');
+var countIf = require('./util/array-util').countIf;
+
 function freeze(selection) {
   if (Object.keys(selection).length) {
     return immutable(selection);
@@ -62,7 +66,7 @@ function initialState(settings) {
 
     filterQuery: null,
 
-    selectedTab: null,
+    selectedTab: uiConstants.TAB_ANNOTATIONS,
 
     // Key by which annotations are currently sorted.
     sortKey: 'Location',
@@ -120,8 +124,18 @@ function annotationsReducer(state, action) {
     return Object.assign({}, state,
         {annotations: state.annotations.concat(action.annotations)});
   case types.REMOVE_ANNOTATIONS:
-    return Object.assign({}, state,
-        {annotations: excludeAnnotations(state.annotations, action.annotations)});
+    {
+      var annots = excludeAnnotations(state.annotations, action.annotations);
+      var selectedTab = state.selectedTab;
+      if (selectedTab === uiConstants.TAB_ORPHANS &&
+          countIf(annots, metadata.isOrphan) === 0) {
+        selectedTab = uiConstants.TAB_ANNOTATIONS;
+      }
+      return Object.assign({}, state, {
+        annotations: annots,
+        selectedTab: selectedTab,
+      });
+    }
   case types.CLEAR_ANNOTATIONS:
     return Object.assign({}, state, {annotations: []});
   case types.UPDATE_ANCHOR_STATUS:
