@@ -4,6 +4,7 @@ var immutable = require('seamless-immutable');
 
 var annotationUIFactory = require('../annotation-ui');
 var annotationFixtures = require('./annotation-fixtures');
+var metadata = require('../annotation-metadata');
 var unroll = require('./util').unroll;
 var uiConstants = require('../ui-constants');
 
@@ -47,10 +48,49 @@ describe('annotationUI', function () {
   });
 
   describe('#addAnnotations()', function () {
+    var ANCHOR_TIME_LIMIT = 1000;
+    var clock;
+
+    beforeEach(function () {
+      clock = sinon.useFakeTimers();
+    });
+
+    afterEach(function () {
+      clock.restore();
+    });
+
     it('adds annotations to the current state', function () {
       var annot = defaultAnnotation();
       annotationUI.addAnnotations([annot]);
       assert.deepEqual(annotationUI.getState().annotations, [annot]);
+    });
+
+    it('marks annotations as orphans if they fail to anchor within a time limit', function () {
+      var isOrphan = function () {
+        return !!metadata.isOrphan(annotationUI.getState().annotations[0]);
+      };
+
+      var annot = defaultAnnotation();
+      annotationUI.addAnnotations([annot]);
+      assert.isFalse(isOrphan());
+
+      clock.tick(ANCHOR_TIME_LIMIT);
+
+      assert.isTrue(isOrphan());
+    });
+
+    it('does not mark annotations as orphans if they do anchor within a time limit', function () {
+      var isOrphan = function () {
+        return !!metadata.isOrphan(annotationUI.getState().annotations[0]);
+      };
+
+      var annot = defaultAnnotation();
+      annotationUI.addAnnotations([annot]);
+      annotationUI.updateAnchorStatus(annot.id, 'atag', false);
+
+      clock.tick(ANCHOR_TIME_LIMIT);
+
+      assert.isFalse(isOrphan());
     });
   });
 
@@ -106,7 +146,7 @@ describe('annotationUI', function () {
     it('notifies subscribers when the UI state changes', function () {
       var listener = sinon.stub();
       annotationUI.subscribe(listener);
-      annotationUI.addAnnotations(annotationFixtures.defaultAnnotation());
+      annotationUI.addAnnotations([annotationFixtures.defaultAnnotation()]);
       assert.called(listener);
     });
   });
