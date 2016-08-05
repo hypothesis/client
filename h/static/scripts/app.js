@@ -8,8 +8,9 @@ var raven;
 
 // Initialize Raven. This is required at the top of this file
 // so that it happens early in the app's startup flow
+var configParam = queryString.parse(window.location.search).config || 'null';
 var settings = require('./settings')(document);
-Object.assign(settings, queryString.parse(window.location.search));
+Object.assign(settings, JSON.parse(configParam));
 if (settings.raven) {
   raven = require('./raven');
   raven.init(settings.raven);

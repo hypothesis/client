@@ -1,5 +1,4 @@
 Annotator = require('annotator')
-queryString = require('query-string')
 $ = Annotator.$
 
 Guest = require('./guest')
@@ -7,13 +6,13 @@ Guest = require('./guest')
 module.exports = class Host extends Guest
   constructor: (element, options) ->
     # Make a copy of all options except `options.app`, the app base URL.
-    appOpts = queryString.stringify(
-      Object.assign({}, options, {app: undefined})
+    configParam = 'config=' + encodeURIComponent(
+      JSON.stringify(Object.assign({}, options, {app:undefined}))
     )
     if options.app and '?' in options.app
-      options.app += '&' + appOpts
+      options.app += '&' + configParam
     else
-      options.app += '?' + appOpts
+      options.app += '?' + configParam
 
     # Create the iframe
     app = $('<iframe></iframe>')

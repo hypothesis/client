@@ -89,4 +89,5 @@ describe 'Host', ->
     it 'passes options to the sidebar iframe', ->
       appURL = new URL('/base/test/empty.html', window.location.href)
       host = createHost({annotations: '1234'})
-      assert.equal(host.frame[0].children[0].src, appURL + '?annotations=1234')
+      configStr = encodeURIComponent(JSON.stringify({annotations: '1234'}))
+      assert.equal(host.frame[0].children[0].src, appURL + '?config=' + configStr)

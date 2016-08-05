@@ -80,10 +80,7 @@ module.exports = function AppController(
     // after first install of the extension.
     $scope.auth = authStateFromUserID(state.userid);
 
-    // FIXME: Fix this horrendous !== 'false' conditional. Unfortunately, we
-    // currently pass settings from the hosting page into the sidebar via the
-    // URL query string, so type information is lost. Ugh.
-    if (!state.userid && settings.openLoginForm && settings.openLoginForm !== 'false') {
+    if (!state.userid && settings.openLoginForm) {
       $scope.login();
     }
   });
