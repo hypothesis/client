@@ -240,6 +240,12 @@ module.exports = function ($rootScope, settings) {
     });
   }
 
+  function findByID(id) {
+    return store.getState().annotations.find(function (annot) {
+      return annot.id === id;
+    });
+  }
+
   return {
     /**
      * Return the current UI state of the sidebar. This should not be modified
@@ -360,6 +366,30 @@ module.exports = function ($rootScope, settings) {
         type: 'ADD_ANNOTATIONS',
         annotations: annotations,
       });
+
+      // If anchoring fails to complete in a reasonable amount of time, then
+      // we assume that the annotation failed to anchor. If it does later
+      // successfully anchor then the status will be updated.
+      var ANCHORING_TIMEOUT = 500;
+
+      var anchoringAnnots = annotations.filter(metadata.isWaitingToAnchor);
+      if (anchoringAnnots.length) {
+        setTimeout(function () {
+          anchoringAnnots
+            .map(function (annot) {
+              return findByID(annot.id);
+            })
+            .filter(metadata.isWaitingToAnchor)
+            .forEach(function (orphan) {
+              store.dispatch({
+                type: types.UPDATE_ANCHOR_STATUS,
+                id: orphan.id,
+                tag: orphan.$$tag,
+                isOrphan: true,
+              });
+            });
+        }, ANCHORING_TIMEOUT);
+      }
     },
 
     /** Remove annotations from the currently displayed set. */
