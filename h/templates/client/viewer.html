@@ -1,6 +1,5 @@
-<selection-tabs ng-if="feature('selection_tabs') &&
-    !search.query() &&
-    selectedAnnotationCount() === 0"
+<selection-tabs
+  ng-if="!search.query() && selectedAnnotationCount() === 0"
   is-waiting-to-anchor-annotations="waitingToAnchorAnnotations"
   is-loading="isLoading"
   selected-tab="selectedTab"
