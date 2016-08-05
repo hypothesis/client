@@ -4,6 +4,28 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+### Added
+
+- Display annotations that cannot be anchored in the page in a separate Orphans
+  tab and strike-through their quotes in annotation cards
+  ([#52](https://github.com/hypothesis/client/pull/52)). Feature flag:
+  "orphans_tab"
+
+- The Hypothesis client version is now embedded in the built package, rather
+  than requiring the hosting service to provide it
+  ([#65](https://github.com/hypothesis/client/pull/65)).
+
+### Changed
+
+- Replace `firstRun` config option with more usefully named `openSidebar` and
+  `openLoginForm` config options
+  ([#63](https://github.com/hypothesis/client/pull/63)).
+
+- Update the URLs in the Hypothesis service used by 'Sign up' and 'Forgot
+  password' links ([#68](https://github.com/hypothesis/client/pull/68)).
+
 ## [0.36.0] - 2016-07-27
 
 ### Fixed
