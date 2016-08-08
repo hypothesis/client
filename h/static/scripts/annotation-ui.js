@@ -13,7 +13,7 @@ var redux = require('redux');
 
 var metadata = require('./annotation-metadata');
 var uiConstants = require('./ui-constants');
-var countIf = require('./util/array-util').countIf;
+var arrayUtil = require('./util/array-util');
 
 function freeze(selection) {
   if (Object.keys(selection).length) {
@@ -128,7 +128,7 @@ function annotationsReducer(state, action) {
       var annots = excludeAnnotations(state.annotations, action.annotations);
       var selectedTab = state.selectedTab;
       if (selectedTab === uiConstants.TAB_ORPHANS &&
-          countIf(annots, metadata.isOrphan) === 0) {
+          arrayUtil.countIf(annots, metadata.isOrphan) === 0) {
         selectedTab = uiConstants.TAB_ANNOTATIONS;
       }
       return Object.assign({}, state, {
@@ -375,8 +375,8 @@ module.exports = function ($rootScope, settings) {
       var anchoringAnnots = annotations.filter(metadata.isWaitingToAnchor);
       if (anchoringAnnots.length) {
         setTimeout(function () {
-          anchoringAnnots
-            .map(function (annot) {
+          arrayUtil
+            .filterMap(anchoringAnnots, function (annot) {
               return findByID(annot.id);
             })
             .filter(metadata.isWaitingToAnchor)
