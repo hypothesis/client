@@ -4,6 +4,14 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+### Fixed
+
+- If an annotation is loaded and then quickly removed before the anchoring
+  timeout expires, do not attempt to modify it's orphan status
+  ([#75](https://github.com/hypothesis/client/pull/75)).
+
 ## [0.37.0] - 2016-08-08
 
 ### Added
