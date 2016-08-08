@@ -26,6 +26,14 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 - Update the URLs in the Hypothesis service used by 'Sign up' and 'Forgot
   password' links ([#68](https://github.com/hypothesis/client/pull/68)).
 
+- Enable the selection tabs feature for all users.
+  ([#71](https://github.com/hypothesis/client/pull/71)).
+
+- If an annotation fails to anchor within 500ms, mark it as an orphan. If it turns out
+  that anchoring just took longer, it will move from the Orphans tab to the Annotations tab
+  once anchoring completes.
+  ([#72](https://github.com/hypothesis/client/pull/72)).
+
 ## [0.36.0] - 2016-07-27
 
 ### Fixed
