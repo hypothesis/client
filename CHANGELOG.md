@@ -4,7 +4,7 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
-## [Unreleased]
+## [0.38.0] - 2016-08-08
 
 ### Fixed
 
