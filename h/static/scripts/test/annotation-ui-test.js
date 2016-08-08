@@ -92,6 +92,17 @@ describe('annotationUI', function () {
 
       assert.isFalse(isOrphan());
     });
+
+    it('does not attempt to modify orphan status if annotations are removed before anchoring timeout expires', function () {
+      var annot = defaultAnnotation();
+      annotationUI.addAnnotations([annot]);
+      annotationUI.updateAnchorStatus(annot.id, 'atag', false);
+      annotationUI.removeAnnotations([annot]);
+
+      assert.doesNotThrow(function () {
+        clock.tick(ANCHOR_TIME_LIMIT);
+      });
+    });
   });
 
   describe('#removeAnnotations()', function () {
