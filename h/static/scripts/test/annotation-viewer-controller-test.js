@@ -57,6 +57,7 @@ describe('AnnotationViewerController', function () {
         search: {},
       },
       annotationUI: {
+        setAppIsSidebar: sinon.stub(),
         setCollapsed: sinon.stub(),
         highlightAnnotations: sinon.stub(),
         subscribe: sinon.stub(),

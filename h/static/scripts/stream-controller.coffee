@@ -13,6 +13,8 @@ module.exports = class StreamController
      queryParser,   rootThread,   searchFilter,   store,
      streamer,   streamFilter,   annotationMapper
   ) ->
+    annotationUI.setAppIsSidebar(false)
+
     offset = 0
 
     fetch = (limit) ->

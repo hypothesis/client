@@ -103,6 +103,20 @@ describe('annotationUI', function () {
         clock.tick(ANCHOR_TIME_LIMIT);
       });
     });
+
+    it('does not expect annotations to anchor on the stream', function () {
+      var isOrphan = function () {
+        return !!metadata.isOrphan(annotationUI.getState().annotations[0]);
+      };
+
+      var annot = defaultAnnotation();
+      annotationUI.setAppIsSidebar(false);
+      annotationUI.addAnnotations([annot]);
+
+      clock.tick(ANCHOR_TIME_LIMIT);
+
+      assert.isFalse(isOrphan());
+    });
   });
 
   describe('#removeAnnotations()', function () {

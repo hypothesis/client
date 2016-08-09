@@ -40,6 +40,10 @@ function initialSelection(settings) {
 
 function initialState(settings) {
   return Object.freeze({
+    // Flag that indicates whether the app is the sidebar and connected to
+    // a page where annotations are being shown in context
+    isSidebar: true,
+
     // List of all loaded annotations
     annotations: [],
 
@@ -94,6 +98,13 @@ var types = {
    * document completes.
    */
   UPDATE_ANCHOR_STATUS: 'UPDATE_ANCHOR_STATUS',
+  /**
+   * Set whether the app is the sidebar or not.
+   *
+   * When not in the sidebar, we do not expect annotations to anchor and always
+   * display all annotations, rather than only those in the current tab.
+   */
+  SET_SIDEBAR: 'SET_SIDEBAR',
 };
 
 /**
@@ -187,6 +198,8 @@ function reducer(state, action) {
       forceVisible: {},
       expanded: {},
     });
+  case types.SET_SIDEBAR:
+    return Object.assign({}, state, {isSidebar: action.isSidebar});
   case types.SET_SORT_KEY:
     return Object.assign({}, state, {sortKey: action.key});
   default:
@@ -367,6 +380,10 @@ module.exports = function ($rootScope, settings) {
         annotations: annotations,
       });
 
+      if (!store.getState().isSidebar) {
+        return;
+      }
+
       // If anchoring fails to complete in a reasonable amount of time, then
       // we assume that the annotation failed to anchor. If it does later
       // successfully anchor then the status will be updated.
@@ -457,6 +474,11 @@ module.exports = function ($rootScope, settings) {
         type: types.HIGHLIGHT_ANNOTATIONS,
         highlighted: ids,
       });
+    },
+
+    /** Set whether the app is the sidebar */
+    setAppIsSidebar: function (isSidebar) {
+      store.dispatch({type: types.SET_SIDEBAR, isSidebar: isSidebar});
     },
   };
 };

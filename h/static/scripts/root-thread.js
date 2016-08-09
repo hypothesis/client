@@ -59,7 +59,7 @@ function RootThread($rootScope, annotationUI, features, searchFilter, viewFilter
     }
 
     var threadFilterFn;
-    if (!state.filterQuery && state.selectedTab) {
+    if (state.isSidebar && !state.filterQuery) {
       if (!features.flagEnabled('orphans_tab')) {
         threadFilterFn = function (thread) {
           if (state.selectedTab === uiConstants.TAB_ANNOTATIONS || state.selectedTab === uiConstants.TAB_ORPHANS) {
