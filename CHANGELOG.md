@@ -4,6 +4,16 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+### Fixed
+
+- Fix display of annotations on stream with orphans flag enabled
+  ([#76](https://github.com/hypothesis/client/pull/76)).
+
+- Feature-flag orphan quote strikethrough on annotation cards
+  ([#77](https://github.com/hypothesis/client/pull/77)).
+
 ## [0.38.0] - 2016-08-08
 
 ### Fixed
