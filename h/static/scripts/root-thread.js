@@ -111,10 +111,7 @@ function RootThread($rootScope, annotationUI, features, searchFilter, viewFilter
     $rootScope.$on(event, function (event, annotation) {
       var annotations = [].concat(annotation);
 
-      // Remove any annotations which are already loaded
-      annotationUI.removeAnnotations(annotations);
-
-      // Add the new annotations
+      // Add or update annotations
       annotationUI.addAnnotations(annotations);
 
       // Ensure that newly created annotations are always visible

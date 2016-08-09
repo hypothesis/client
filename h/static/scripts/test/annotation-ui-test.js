@@ -59,10 +59,45 @@ describe('annotationUI', function () {
       clock.restore();
     });
 
-    it('adds annotations to the current state', function () {
+    it('adds annotations not in the store', function () {
       var annot = defaultAnnotation();
       annotationUI.addAnnotations([annot]);
       assert.deepEqual(annotationUI.getState().annotations, [annot]);
+    });
+
+    it('updates annotations with matching IDs in the store', function () {
+      var annot = defaultAnnotation();
+      annotationUI.addAnnotations([annot]);
+      var update = Object.assign({}, defaultAnnotation(), {text: 'update'});
+      annotationUI.addAnnotations([update]);
+
+      var updatedAnnot = annotationUI.getState().annotations[0];
+      assert.equal(updatedAnnot.text, 'update');
+    });
+
+    it('updates annotations with matching tags in the store', function () {
+      var annot = annotationFixtures.newAnnotation();
+      annot.$$tag = 'local-tag';
+      annotationUI.addAnnotations([annot]);
+
+      var saved = Object.assign({}, annot, {id: 'server-id'});
+      annotationUI.addAnnotations([saved]);
+
+      var annots = annotationUI.getState().annotations;
+      assert.equal(annots.length, 1);
+      assert.equal(annots[0].id, 'server-id');
+    });
+
+    it('preserves anchoring status of updated annotations', function () {
+      var annot = defaultAnnotation();
+      annotationUI.addAnnotations([annot]);
+      annotationUI.updateAnchorStatus(annot.id, null, false /* not an orphan */);
+
+      var update = Object.assign({}, defaultAnnotation(), {text: 'update'});
+      annotationUI.addAnnotations([update]);
+
+      var updatedAnnot = annotationUI.getState().annotations[0];
+      assert.isFalse(updatedAnnot.$orphan);
     });
 
     it('marks annotations as orphans if they fail to anchor within a time limit', function () {

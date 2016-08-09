@@ -1,6 +1,7 @@
 'use strict';
 
 var angular = require('angular');
+var immutable = require('seamless-immutable');
 
 var events = require('../events');
 
@@ -57,7 +58,7 @@ describe('annotationMapper', function() {
 
     it('triggers the annotationUpdated event for each loaded annotation', function () {
       sandbox.stub($rootScope, '$broadcast');
-      var annotations = [{id: 1}, {id: 2}, {id: 3}];
+      var annotations = immutable([{id: 1}, {id: 2}, {id: 3}]);
       annotationUI.addAnnotations(angular.copy(annotations));
 
       annotationMapper.loadAnnotations(annotations);
