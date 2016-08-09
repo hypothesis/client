@@ -29,6 +29,8 @@ function AnnotationViewerController (
   $location, $routeParams, $scope,
   annotationUI, rootThread, streamer, store, streamFilter, annotationMapper
 ) {
+  annotationUI.setAppIsSidebar(false);
+
   var id = $routeParams.id;
 
   // Provide no-ops until these methods are moved elsewere. They only apply

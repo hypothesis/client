@@ -38,6 +38,7 @@ describe('rootThread', function () {
         focusedAnnotationMap: null,
         forceVisible: {},
         highlighted: [],
+        isSidebar: true,
         selectedAnnotationMap: null,
         sortKey: 'Location',
         sortKeysAvailable: ['Location'],
@@ -186,7 +187,7 @@ describe('rootThread', function () {
     ]);
   });
 
-  describe('when the thread filter query is set', function () {
+  describe('when no filter query is set', function () {
     it('filter matches only annotations when Annotations tab is selected', function () {
       fakeBuildThread.reset();
 
@@ -249,6 +250,19 @@ describe('rootThread', function () {
       var threadFilterFn = fakeBuildThread.args[0][1].threadFilterFn;
 
       assert.isFalse(threadFilterFn({annotation: {$orphan: true}}));
+    });
+
+    it('does not filter annotations when not in the sidebar', function () {
+      fakeBuildThread.reset();
+      fakeAnnotationUI.state = Object.assign({}, fakeAnnotationUI.state,
+        {isSidebar: false});
+
+      rootThread.thread(fakeAnnotationUI.state);
+      var threadFilterFn = fakeBuildThread.args[0][1].threadFilterFn;
+
+      // There should be no thread filter function on the stream and standalone
+      // pages, since we show all types of annotations here
+      assert.notOk(threadFilterFn);
     });
   });
 

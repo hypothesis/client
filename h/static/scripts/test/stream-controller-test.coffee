@@ -40,6 +40,7 @@ describe 'StreamController', ->
 
     fakeAnnotationUI = {
       clearAnnotations: sandbox.spy()
+      setAppIsSidebar: sandbox.spy()
       setCollapsed: sandbox.spy()
       setForceVisible: sandbox.spy()
       setSortKey: sandbox.spy()
