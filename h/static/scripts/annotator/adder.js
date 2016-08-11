@@ -26,6 +26,65 @@ var ARROW_HEIGHT = 10;
 // arrow position.
 var ARROW_H_MARGIN = 20;
 
+function attachShadow(element) {
+  if (element.attachShadow) {
+    // Shadow DOM v1 (Chrome v53, Safari 10)
+    return element.attachShadow({mode: 'open'});
+  } else if (element.createShadowRoot) {
+    // Shadow DOM v0 (Chrome ~35-52)
+    return element.createShadowRoot();
+  } else {
+    return null;
+  }
+}
+
+/**
+ * Create the DOM structure for the Adder.
+ *
+ * Returns the root DOM node for the adder, which may be in a shadow tree.
+ */
+function createAdderDOM(container) {
+  var element;
+
+  // If the browser supports Shadow DOM, use it to isolate the adder
+  // from the page's CSS
+  //
+  // See https://developers.google.com/web/fundamentals/primers/shadowdom/
+  var shadowRoot = attachShadow(container);
+  if (shadowRoot) {
+    shadowRoot.innerHTML = template;
+    element = shadowRoot.querySelector('.js-adder');
+
+    // Load stylesheets required by adder into shadow DOM element
+    var adderStyles = Array.from(document.styleSheets).map(function (sheet) {
+      return sheet.href;
+    }).filter(function (url) {
+      return (url || '').match(/(icomoon|inject)\.css/);
+    });
+
+    // Stylesheet <link> elements are inert inside shadow roots [1]. Until
+    // Shadow DOM implementations support external stylesheets [2], grab the
+    // relevant CSS files from the current page and `@import` them.
+    //
+    // [1] http://stackoverflow.com/questions/27746590
+    // [2] https://github.com/w3c/webcomponents/issues/530
+    //
+    // This will unfortunately break if the page blocks inline stylesheets via
+    // CSP, but that appears to be rare and if this happens, the user will still
+    // get a usable adder, albeit one that uses browser default styles for the
+    // toolbar.
+    var styleEl = document.createElement('style');
+    styleEl.textContent = adderStyles.map(function (url) {
+      return '@import "' + url + '";';
+    }).join('\n');
+    shadowRoot.appendChild(styleEl);
+  } else {
+    container.innerHTML = template;
+    element = container.querySelector('.js-adder');
+  }
+  return element;
+}
+
 /**
  * Annotation 'adder' toolbar which appears next to the selection
  * and provides controls for the user to create new annotations.
@@ -36,8 +95,7 @@ var ARROW_H_MARGIN = 20;
  */
 function Adder(container, options) {
 
-  container.innerHTML = template;
-  var element = container.querySelector('.js-adder');
+  var element = createAdderDOM(container);
 
   Object.assign(container.style, {
     // Set initial style. The adder is hidden using the `visibility`

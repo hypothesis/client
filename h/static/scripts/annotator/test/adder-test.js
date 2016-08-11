@@ -1,6 +1,7 @@
 'use strict';
 
 var adder = require('../adder');
+var unroll = require('../../test/util').unroll;
 
 function rect(left, top, width, height) {
   return {left: left, top: top, width: width, height: height};
@@ -35,6 +36,30 @@ describe('adder', function () {
     var rect = adderCtrl.element.getBoundingClientRect();
     return {width: rect.width, height: rect.height};
   }
+
+  context('when Shadow DOM is supported', function () {
+    unroll('creates the adder DOM in a shadow root', function (testCase) {
+      var adderEl = document.createElement('div');
+      var shadowEl;
+      adderEl[testCase.attachFn] = sinon.spy(function () {
+        shadowEl = document.createElement('shadow-root');
+        adderEl.appendChild(shadowEl);
+        return shadowEl;
+      });
+      document.body.appendChild(adderEl);
+
+      new adder.Adder(adderEl, adderCallbacks);
+
+      assert.called(adderEl[testCase.attachFn]);
+      assert.equal(shadowEl.childNodes[0].tagName.toLowerCase(), 'hypothesis-adder-toolbar');
+
+      adderEl.remove();
+    },[{
+      attachFn: 'createShadowRoot', // Shadow DOM v0 API
+    },{
+      attachFn: 'attachShadow', // Shadow DOM v1 API
+    }]);
+  });
 
   describe('button handling', function () {
     it('calls onHighlight callback when Highlight button is clicked', function () {
