@@ -1,11 +1,12 @@
-#!/usr/bin/env sh
+#!/bin/sh
 
-SCRIPT_DIR=$(dirname `readlink -f "$0"`)
+set -eu
 
-git push
-git push --tags
+cd "$(dirname "$0")"
+
+git push --follow-tags
 
 # Wait a moment to give GitHub a chance to realize that the tag exists
 sleep 2
 
-$SCRIPT_DIR/create-github-release.js
+./create-github-release.js
