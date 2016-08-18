@@ -325,9 +325,6 @@ module.exports = function WidgetController(
     }
     annotationUI.clearSelectedAnnotations();
     loadAnnotations(crossframe.frames);
-
-    // When switching groups, reset back to the annotations tab
-    annotationUI.selectTab(uiConstants.TAB_ANNOTATIONS);
   });
 
   // Watch anything that may require us to reload annotations.
