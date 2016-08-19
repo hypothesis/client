@@ -112,8 +112,7 @@
   "browser": {
     "annotator": "./h/static/scripts/vendor/annotator.js",
     "hammerjs": "./node_modules/hammerjs/hammer.js",
-    "katex": "./h/static/scripts/vendor/katex.js",
-    "bootstrap-lite": "./h/static/styles/vendor/bootstrap/bootstrap.js"
+    "katex": "./h/static/scripts/vendor/katex.js"
   },
   "browserify-shim": {
     "annotator": {
@@ -125,11 +124,6 @@
     "angular": {
       "depends": [
         "jquery"
-      ]
-    },
-    "bootstrap-lite": {
-      "depends": [
-        "jquery:jQuery"
       ]
     },
     "hammerjs": "Hammer",
