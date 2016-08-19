@@ -1,12 +1,8 @@
 @import './base';
 @import './forms';
-@import './grid';
 @import './mixins/responsive';
 
-// Note: These includes are currently source-order
-// dependent.
 @import './styled-text';
-@import './page';
 
 //ELEMENT STYLES////////////////////////////////
 body {
@@ -30,51 +26,13 @@ html {
   line-height: $base-line-height;
 }
 
-//PAPER////////////////////////////////
-//Provides the white background upon which items sit
-.paper {
-  background: $white;
-  border: solid 1px $gray-lighter;
-  border-radius: 2px;
-  padding: 1em;
-}
-
 //MCRANDOM////////////////////////////////
-
-.alert-block {
-  span.errorMsgLbl { @extend .visuallyhidden; }
-  span.errorMsg { @extend .visuallyhidden; }
-}
 
 .small {
   font-size: $body1-font-size;
 }
 
 //Candidate for cleanup
-.btn-link {
-  box-shadow: none;
-  @include reset-box-model;
-  background: none;
-  background-color: transparent;
-  text-decoration: underline;
-  border: none;
-  cursor: pointer;
-  color: $link-color;
-  position: static;
-
-  &:hover, &:focus, &.js-focus, &.js-hover {
-    color: $link-color-hover;
-  }
-}
-
-.red {
-  color: $brand-color;
-}
-
-.pull-left {
-  float: left;
-}
-
 .pull-right {
   float: right;
 }
@@ -90,27 +48,7 @@ html {
   }
 }
 
-.share-links {
-  a {
-    font-size: 1.5em;
-    padding: .3em;
-  }
-}
-
 //FORM RELATED////////////////////////////////
-.form-horizontal {
-  display: inline-block;
-  .controls, .control-group, div, fieldset,
-  input, button, select, textarea {
-    display: inline-block;
-  }
-  select, textarea, input, button {
-    margin: .5em 0;
-  }
-}
-
-.form-inline .control-group { margin-bottom: 0; }
-
 .form-vertical {
   legend {
     font-size: $body1-font-size;
@@ -124,19 +62,6 @@ html {
     // margin-top: .75em;
   }
 }
-
-.req {
-  display: none;
-}
-
-.visuallyhidden {
-  position: absolute;
-  overflow: hidden;
-  clip: rect(0 0 0 0);
-  height: 1px; width: 1px;
-  margin: -1px; padding: 0; border: 0;
-}
-
 
 //DROPDOWNS////////////////////////////////
 .dropdown {
@@ -335,20 +260,6 @@ html {
   border: 4px solid $color-dove-gray;
 }
 
-.masthead {
-  margin-bottom: 1em;
-
-  .masthead-heading {
-    color: $gray;
-    font-size: 1.1em;
-    font-weight: 400;
-
-    &:hover {
-      color: $gray-dark;
-    }
-  }
-}
-
 //TABS////////////////////////////////
 .nav-tabs {
   margin-bottom: .7em;
@@ -389,15 +300,6 @@ html {
 
     &:first-child:before {
       content: none;
-    }
-  }
-}
-
-.tab-content {
-  .tab-pane {
-    display: none;
-    &.active {
-      display: inherit !important;
     }
   }
 }
