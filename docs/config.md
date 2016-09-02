@@ -23,12 +23,14 @@ Config keys
 ### `openLoginForm`
 
 _Boolean_. Controls whether the login panel is automatically opened on startup,
-as if the user had clicked "Log in" themselves.
+as if the user had clicked "Log in" themselves. (Default: _false_.)
 
 ### `openSidebar`
 
 _Boolean_. Controls whether the sidebar opens automatically on startup.
+(Default: _false_.)
 
 ### `showHighlights`
 
 _Boolean_. Controls whether the in-document highlights are shown by default.
+(Default: _true_.)
