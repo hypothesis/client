@@ -28,3 +28,7 @@ as if the user had clicked "Log in" themselves.
 ### `openSidebar`
 
 _Boolean_. Controls whether the sidebar opens automatically on startup.
+
+### `showHighlights`
+
+_Boolean_. Controls whether the in-document highlights are shown by default.
