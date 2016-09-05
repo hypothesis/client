@@ -20,6 +20,17 @@ module.exports = function () {
       this.orphansTabFlagEnabled = function () {
         return features.flagEnabled('orphans_tab');
       };
+
+      this.showAnnotationsUnavailableMessage = function () {
+        return this.selectedTab === this.TAB_ANNOTATIONS &&
+          this.totalAnnotations === 0 &&
+          !this.isWaitingToAnchorAnnotations;
+      };
+
+      this.showNotesUnavailableMessage = function () {
+        return this.selectedTab === this.TAB_NOTES &&
+          this.totalNotes === 0;
+      };
     },
     restrict: 'E',
     scope: {

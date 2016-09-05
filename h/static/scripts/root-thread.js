@@ -62,23 +62,31 @@ function RootThread($rootScope, annotationUI, features, searchFilter, viewFilter
     if (state.isSidebar && !state.filterQuery) {
       if (!features.flagEnabled('orphans_tab')) {
         threadFilterFn = function (thread) {
-          if (state.selectedTab === uiConstants.TAB_ANNOTATIONS || state.selectedTab === uiConstants.TAB_ORPHANS) {
-            return thread.annotation && (metadata.isAnnotation(thread.annotation) || metadata.isOrphan(thread.annotation));
-          } else if (state.selectedTab === uiConstants.TAB_NOTES) {
-            return thread.annotation && metadata.isPageNote(thread.annotation);
+          if (!thread.annotation) {
+            return false;
+          }
+          if (state.selectedTab === uiConstants.TAB_NOTES) {
+            return metadata.isPageNote(thread.annotation);
           } else {
-            throw new Error('Invalid selected tab');
+            return metadata.isAnnotation(thread.annotation) || metadata.isOrphan(thread.annotation);
           }
         };
       } else {
         threadFilterFn = function (thread) {
-          if (state.selectedTab === uiConstants.TAB_ANNOTATIONS) {
-            return thread.annotation && metadata.isAnnotation(thread.annotation);
-          } else if (state.selectedTab === uiConstants.TAB_NOTES) {
-            return thread.annotation && metadata.isPageNote(thread.annotation);
-          } else if (state.selectedTab === uiConstants.TAB_ORPHANS) {
-            return thread.annotation && metadata.isOrphan(thread.annotation);
-          } else {
+          if (!thread.annotation) {
+            return false;
+          }
+          if (metadata.isWaitingToAnchor(thread.annotation)) {
+            return false;
+          }
+          switch (state.selectedTab) {
+          case uiConstants.TAB_ANNOTATIONS:
+            return metadata.isAnnotation(thread.annotation);
+          case uiConstants.TAB_ORPHANS:
+            return metadata.isOrphan(thread.annotation);
+          case uiConstants.TAB_NOTES:
+            return metadata.isPageNote(thread.annotation);
+          default:
             throw new Error('Invalid selected tab');
           }
         };

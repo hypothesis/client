@@ -264,6 +264,22 @@ describe('rootThread', function () {
       // pages, since we show all types of annotations here
       assert.notOk(threadFilterFn);
     });
+
+    it('filter does not match annotation when it is still waiting to anchor', function () {
+      fakeBuildThread.reset();
+
+      fakeAnnotationUI.state = Object.assign({}, fakeAnnotationUI.state,
+        {selectedTab: uiConstants.TAB_ANNOTATIONS});
+
+      rootThread.thread(fakeAnnotationUI.state);
+      var threadFilterFn = fakeBuildThread.args[0][1].threadFilterFn;
+
+      var annotation = {
+        $orphan: undefined,
+        target: [{ selector: {} }],
+      };
+      assert.isFalse(threadFilterFn({annotation: annotation}));
+    });
   });
 
   describe('when the filter query changes', function () {
