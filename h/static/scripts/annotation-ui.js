@@ -129,11 +129,60 @@ function excludeAnnotations(current, annotations) {
   });
 }
 
+function findByID(annotations, id) {
+  return annotations.find(function (annot) {
+    return annot.id === id;
+  });
+}
+
+function findByTag(annotations, tag) {
+  return annotations.find(function (annot) {
+    return annot.$$tag === tag;
+  });
+}
+
 function annotationsReducer(state, action) {
   switch (action.type) {
   case types.ADD_ANNOTATIONS:
-    return Object.assign({}, state,
-        {annotations: state.annotations.concat(action.annotations)});
+    {
+      var updatedIDs = {};
+      var updatedTags = {};
+
+      var added = [];
+      var unchanged = [];
+      var updated = [];
+
+      action.annotations.forEach(function (annot) {
+        var existing = findByID(state.annotations, annot.id);
+        if (!existing && annot.$$tag) {
+          existing = findByTag(state.annotations, annot.$$tag);
+        }
+
+        if (existing) {
+          // Merge the updated annotation with the private fields from the local
+          // annotation
+          updated.push(Object.assign({}, existing, annot));
+          if (annot.id) {
+            updatedIDs[annot.id] = true;
+          }
+          if (existing.$$tag) {
+            updatedTags[existing.$$tag] = true;
+          }
+        } else {
+          added.push(annot);
+        }
+      });
+
+      state.annotations.forEach(function (annot) {
+        if (!updatedIDs[annot.id] && !updatedTags[annot.$$tag]) {
+          unchanged.push(annot);
+        }
+      });
+
+      return Object.assign({}, state, {
+        annotations: added.concat(updated).concat(unchanged),
+      });
+    }
   case types.REMOVE_ANNOTATIONS:
     {
       var annots = excludeAnnotations(state.annotations, action.annotations);
@@ -375,8 +424,12 @@ module.exports = function ($rootScope, settings) {
 
     /** Add annotations to the currently displayed set. */
     addAnnotations: function (annotations) {
+      var added = annotations.filter(function (annot) {
+        return !findByID(annot.id);
+      });
+
       store.dispatch({
-        type: 'ADD_ANNOTATIONS',
+        type: types.ADD_ANNOTATIONS,
         annotations: annotations,
       });
 
@@ -389,7 +442,7 @@ module.exports = function ($rootScope, settings) {
       // successfully anchor then the status will be updated.
       var ANCHORING_TIMEOUT = 500;
 
-      var anchoringAnnots = annotations.filter(metadata.isWaitingToAnchor);
+      var anchoringAnnots = added.filter(metadata.isWaitingToAnchor);
       if (anchoringAnnots.length) {
         setTimeout(function () {
           arrayUtil

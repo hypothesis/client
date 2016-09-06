@@ -20,8 +20,7 @@ function annotationMapper($rootScope, annotationUI, store) {
     annotations.forEach(function (annotation) {
       var existing = getExistingAnnotation(annotationUI, annotation.id);
       if (existing) {
-        angular.copy(annotation, existing);
-        $rootScope.$broadcast(events.ANNOTATION_UPDATED, existing);
+        $rootScope.$broadcast(events.ANNOTATION_UPDATED, annotation);
         return;
       }
       loaded.push(annotation);

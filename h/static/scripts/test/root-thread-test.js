@@ -303,10 +303,10 @@ describe('rootThread', function () {
   context('when annotation events occur', function () {
     var annot = annotationFixtures.defaultAnnotation();
 
-    unroll('removes and reloads annotations when #event event occurs', function (testCase) {
+    unroll('adds or updates annotations when #event event occurs', function (testCase) {
       $rootScope.$broadcast(testCase.event, testCase.annotations);
       var annotations = [].concat(testCase.annotations);
-      assert.calledWith(fakeAnnotationUI.removeAnnotations, sinon.match(annotations));
+      assert.notCalled(fakeAnnotationUI.removeAnnotations);
       assert.calledWith(fakeAnnotationUI.addAnnotations, sinon.match(annotations));
     }, [
       {event: events.BEFORE_ANNOTATION_CREATED, annotations: annot},
