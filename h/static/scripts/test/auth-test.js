@@ -16,7 +16,6 @@ describe('auth', function () {
       get: sinon.spy(function (url, config) {
         assert.equal(config.skipAuthorization, true);
         assert.equal(url, 'https://test.hypothes.is/api/token');
-        assert.equal(config.params.assertion, fakeSession.state.csrf);
 
         var result = {status: 200, data: fakeTokens[fakeTokenIndex]};
         ++fakeTokenIndex;
