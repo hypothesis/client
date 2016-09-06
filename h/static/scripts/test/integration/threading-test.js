@@ -7,18 +7,21 @@ var unroll = require('../util').unroll;
 
 var fixtures = immutable({
   annotations: [{
+    $orphan: false,
     id: '1',
     references: [],
     target: [{selector: []}],
     text: 'first annotation',
     updated: 50,
   },{
+    $orphan: false,
     id: '2',
     references: [],
     text: 'second annotation',
     target: [{selector: []}],
     updated: 200,
   },{
+    $orphan: false,
     id: '3',
     references: ['2'],
     text: 'reply to first annotation',
