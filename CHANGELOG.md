@@ -4,6 +4,24 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## Unreleased
+
+### Changed
+
+- In browsers that support it, the adder is now isolated from the styling of the
+  annotated page using Shadow DOM
+  ([#49](https://github.com/hypothesis/client/pull/49)).
+
+- The selected tab (annotations/page notes/orphans) is now preserved when
+  changing groups ([#82](https://github.com/hypothesis/client/pull/82)).
+
+### Fixed
+
+- Fix an issue where annotations updated via the websocket would unanchor,
+  causing disturbance for anyone trying to annotate on the same page
+  ([#87](https://github.com/hypothesis/client/pull/87),
+  [#88](https://github.com/hypothesis/client/pull/88)).
+
 ## [0.38.1] - 2016-08-09
 
 ### Fixed
