@@ -24,9 +24,12 @@ var cachedToken = INITIAL_TOKEN;
  * @return {Promise} - A promise for a new JWT token.
  */
 // @ngInject
-function fetchToken($http, settings) {
+function fetchToken($http, session, settings) {
   var tokenUrl = new URL('token', settings.apiUrl).href;
   var config = {
+    params: {
+      assertion: session.state.csrf,
+    },
     // Skip JWT authorization for the token request itself.
     skipAuthorization: true,
     transformRequest: function (data) {
@@ -47,7 +50,7 @@ function fetchToken($http, settings) {
 // @ngInject
 function fetchOrReuseToken($http, jwtHelper, session, settings) {
   function refreshToken() {
-    return fetchToken($http, settings).then(function (token) {
+    return fetchToken($http, session, settings).then(function (token) {
       return token;
     });
   }
