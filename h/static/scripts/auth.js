@@ -5,8 +5,6 @@
  * API requests and logging out of the API.
  */
 
-var queryString = require('query-string');
-
 var INITIAL_TOKEN = {
   // The user ID which the current cached token is valid for
   userid: undefined,
@@ -26,16 +24,19 @@ var cachedToken = INITIAL_TOKEN;
 // @ngInject
 function fetchToken($http, session, settings) {
   var tokenUrl = new URL('token', settings.apiUrl).href;
+
+  // Explicitly include the CSRF token in the headers. This won't be done
+  // automatically in the extension as this will be a cross-domain request, and
+  // Angular's CSRF support doesn't operate automatically cross-domain.
+  var headers = {};
+  headers[$http.defaults.xsrfHeaderName] = session.state.csrf;
+
   var config = {
-    params: {
-      assertion: session.state.csrf,
-    },
+    headers: headers,
     // Skip JWT authorization for the token request itself.
     skipAuthorization: true,
-    transformRequest: function (data) {
-      return queryString.stringify(data);
-    },
   };
+
   return $http.get(tokenUrl, config).then(function (response) {
     return response.data;
   });

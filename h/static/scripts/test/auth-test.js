@@ -13,10 +13,13 @@ describe('auth', function () {
   beforeEach(function () {
     fakeTokenIndex = 0;
     fakeHttp = {
+      defaults: {xsrfHeaderName: 'X-CSRF-Token'},
       get: sinon.spy(function (url, config) {
         assert.equal(config.skipAuthorization, true);
         assert.equal(url, 'https://test.hypothes.is/api/token');
-        assert.equal(config.params.assertion, fakeSession.state.csrf);
+        assert.deepEqual(config.headers, {
+          'X-CSRF-Token': fakeSession.state.csrf,
+        });
 
         var result = {status: 200, data: fakeTokens[fakeTokenIndex]};
         ++fakeTokenIndex;
