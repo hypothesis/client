@@ -9,11 +9,16 @@ var unroll = require('./util').unroll;
 var uiConstants = require('../ui-constants');
 
 var defaultAnnotation = annotationFixtures.defaultAnnotation;
+var newAnnotation = annotationFixtures.newAnnotation;
 
 var fixtures = immutable({
   pair: [
     Object.assign(defaultAnnotation(), {id: 1, $$tag: 't1'}),
     Object.assign(defaultAnnotation(), {id: 2, $$tag: 't2'}),
+  ],
+  newPair: [
+    Object.assign(newAnnotation(), {$$tag: 't1'}),
+    Object.assign(newAnnotation(), {$$tag: 't2'}),
   ],
 });
 
@@ -76,7 +81,7 @@ describe('annotationUI', function () {
     });
 
     it('updates annotations with matching tags in the store', function () {
-      var annot = annotationFixtures.newAnnotation();
+      var annot = newAnnotation();
       annot.$$tag = 'local-tag';
       annotationUI.addAnnotations([annot]);
 
@@ -151,6 +156,18 @@ describe('annotationUI', function () {
       clock.tick(ANCHOR_TIME_LIMIT);
 
       assert.isFalse(isOrphan());
+    });
+
+    it('initializes the $orphan field for new annotations', function () {
+      annotationUI.addAnnotations([newAnnotation()]);
+      assert.isFalse(annotationUI.getState().annotations[0].$orphan);
+    });
+
+    it('adds multiple new annotations', function () {
+      annotationUI.addAnnotations([fixtures.newPair[0]]);
+      annotationUI.addAnnotations([fixtures.newPair[1]]);
+
+      assert.equal(annotationUI.getState().annotations.length, 2);
     });
   });
 
@@ -393,6 +410,15 @@ describe('annotationUI', function () {
       annotationUI.addAnnotations([annot]);
       annotationUI.updateAnchorStatus(annot.id, 'atag', true);
       assert.equal(annotationUI.getState().annotations[0].$orphan, true);
+    });
+
+    it('updates annotations by tag', function () {
+      annotationUI.addAnnotations(fixtures.newPair);
+      annotationUI.updateAnchorStatus(null, 't2', true);
+
+      var annots = annotationUI.getState().annotations;
+      assert.isFalse(annots[0].$orphan);
+      assert.isTrue(annots[1].$orphan);
     });
   });
 });

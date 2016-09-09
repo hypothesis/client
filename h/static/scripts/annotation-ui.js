@@ -141,6 +141,27 @@ function findByTag(annotations, tag) {
   });
 }
 
+/**
+ * Initialize the status flags and properties of a new annotation.
+ */
+function initializeAnnot(annotation) {
+  if (annotation.id) {
+    return annotation;
+  }
+
+  // Currently the user ID, permissions and group of new annotations are
+  // initialized in the <annotation> component controller because the session
+  // state and focused group are not stored in the Redux store. Once they are,
+  // that initialization should be moved here.
+
+  return Object.assign({}, annotation, {
+    // Copy $$tag explicitly because it is non-enumerable
+    $$tag: annotation.$$tag,
+    // New annotations must be anchored
+    $orphan: false,
+  });
+}
+
 function annotationsReducer(state, action) {
   switch (action.type) {
   case types.ADD_ANNOTATIONS:
@@ -153,7 +174,10 @@ function annotationsReducer(state, action) {
       var updated = [];
 
       action.annotations.forEach(function (annot) {
-        var existing = findByID(state.annotations, annot.id);
+        var existing;
+        if (annot.id) {
+          existing = findByID(state.annotations, annot.id);
+        }
         if (!existing && annot.$$tag) {
           existing = findByTag(state.annotations, annot.$$tag);
         }
@@ -169,7 +193,7 @@ function annotationsReducer(state, action) {
             updatedTags[existing.$$tag] = true;
           }
         } else {
-          added.push(annot);
+          added.push(initializeAnnot(annot));
         }
       });
 
@@ -201,7 +225,9 @@ function annotationsReducer(state, action) {
   case types.UPDATE_ANCHOR_STATUS:
     {
       var annotations = state.annotations.map(function (annot) {
-        if (annot.id === action.id) {
+        var match = (annot.id && annot.id === action.id) ||
+                    (annot.$$tag && annot.$$tag === action.tag);
+        if (match) {
           return Object.assign({}, annot, {
             $orphan: action.isOrphan,
             $$tag: action.tag,
@@ -478,7 +504,7 @@ module.exports = function ($rootScope, settings) {
     /**
      * Updating the local tag and anchoring status of an annotation.
      *
-     * @param {string} id - Annotation ID
+     * @param {string|null} id - Annotation ID
      * @param {string} tag - The local tag assigned to this annotation to link
      *        the object in the page and the annotation in the sidebar
      * @param {boolean} isOrphan - True if the annotation failed to anchor
