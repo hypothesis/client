@@ -4,6 +4,14 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+### Changed
+
+- When retrieving an API token, the client now sends the CSRF token in a header
+  rather than in a GET request parameter
+  ([#91](https://github.com/hypothesis/client/pull/91)).
+
 ## [0.39.0] - 2016-09-06
 
 ### Changed
