@@ -27,6 +27,7 @@ $base-line-height: 20px;
 @import './simple-search';
 @import './spinner';
 @import './tags-input';
+@import './thread-list';
 @import './tooltip';
 @import './top-bar';
 
@@ -106,20 +107,6 @@ body {
     right: 1em;
     top: 1em;
   }
-}
-
-.thread-list {
-  & > * {
-    // Default spacing between items in the annotation card list
-    margin-bottom: .72em;
-  }
-}
-
-.thread-list__spacer {
-  // This is a hidden element which is used to reserve space for off-screen
-  // threads, so it should not occupy any space other than that set via its
-  // 'height' inline style property.
-  margin: 0;
 }
 
 .annotation-unavailable-message {

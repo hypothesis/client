@@ -41,16 +41,8 @@ function AnnotationViewerController (
     $location.path('/stream').search('q', query);
   };
 
-  function thread() {
-    return rootThread.thread(annotationUI.getState());
-  }
-
   annotationUI.subscribe(function () {
-    $scope.virtualThreadList = {
-      visibleThreads: thread().children,
-      offscreenUpperHeight: '0px',
-      offscreenLowerHeight: '0px',
-    };
+    $scope.rootThread = rootThread.thread(annotationUI.getState());
   });
 
   $scope.setCollapsed = function (id, collapsed) {

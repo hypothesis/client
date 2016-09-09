@@ -36,16 +36,6 @@ function FakeRootThread() {
 }
 inherits(FakeRootThread, EventEmitter);
 
-function FakeVirtualThreadList() {
-  this.setRootThread = sinon.stub();
-  this.setThreadHeight = sinon.stub();
-  this.detach = sinon.stub();
-  this.yOffsetOf = function () {
-    return 100;
-  };
-}
-inherits(FakeVirtualThreadList, EventEmitter);
-
 describe('WidgetController', function () {
   var $rootScope;
   var $scope;
@@ -122,7 +112,6 @@ describe('WidgetController', function () {
       search: sinon.stub(),
     };
 
-    $provide.value('VirtualThreadList', FakeVirtualThreadList);
     $provide.value('annotationMapper', fakeAnnotationMapper);
     $provide.value('crossframe', fakeCrossFrame);
     $provide.value('drafts', fakeDrafts);
@@ -304,47 +293,6 @@ describe('WidgetController', function () {
       $scope.$digest();
       assert.calledWith(loadSpy, [sinon.match({id: uri + '123'})]);
       assert.calledWith(loadSpy, [sinon.match({id: uri + '456'})]);
-    });
-  });
-
-  describe('when a new annotation is created', function () {
-    var windowScroll;
-
-    beforeEach(function () {
-      $scope.clearSelection = sinon.stub();
-      windowScroll = sinon.stub(window, 'scroll');
-    });
-
-    afterEach(function () {
-      windowScroll.restore();
-    });
-
-    /**
-     *  It should clear any selection that exists in the sidebar before
-     *  creating a new annotation. Otherwise the new annotation with its
-     *  form open for the user to type in won't be visible because it's
-     *  not part of the selection.
-     */
-    it('clears the selection', function () {
-      $rootScope.$broadcast('beforeAnnotationCreated', {});
-      assert.called($scope.clearSelection);
-    });
-
-    it('does not clear the selection if the new annotation is a highlight', function () {
-      $rootScope.$broadcast('beforeAnnotationCreated', {$highlight: true});
-      assert.notCalled($scope.clearSelection);
-    });
-
-    it('does not clear the selection if the new annotation is a reply', function () {
-      $rootScope.$broadcast('beforeAnnotationCreated', {
-        references: ['parent-id'],
-      });
-      assert.notCalled($scope.clearSelection);
-    });
-
-    it('scrolls the viewport to the new annotation', function () {
-      $rootScope.$broadcast('beforeAnnotationCreated', {$$tag: '123'});
-      assert.called(windowScroll);
     });
   });
 

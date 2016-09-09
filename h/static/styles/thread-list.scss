@@ -1,0 +1,25 @@
+.thread-list {
+  & > * {
+    // Default spacing between items in the annotation card list
+    margin-bottom: .72em;
+  }
+}
+
+.thread-list__card {
+  box-shadow: 0px 1px 1px 0px rgba(0, 0, 0, 0.10);
+  border-radius: 2px;
+  cursor: pointer;
+  padding: $layout-h-margin;
+  background-color: $white;
+
+  &:hover {
+    box-shadow: 0px 2px 3px 0px rgba(0, 0, 0, 0.15);
+  }
+}
+
+.thread-list__spacer {
+  // This is a hidden element which is used to reserve space for off-screen
+  // threads, so it should not occupy any space other than that set via its
+  // 'height' inline style property.
+  margin: 0;
+}

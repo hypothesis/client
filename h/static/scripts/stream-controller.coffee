@@ -62,15 +62,8 @@ module.exports = class StreamController
       update: (q) -> $location.search({q: q})
     }
 
-    thread = ->
-      rootThread.thread(annotationUI.getState())
-
     annotationUI.subscribe( ->
-      $scope.virtualThreadList = {
-        visibleThreads: thread().children,
-        offscreenUpperHeight: '0px',
-        offscreenLowerHeight: '0px',
-      };
+      $scope.rootThread = rootThread.thread(annotationUI.getState())
     );
 
     # Sort the stream so that the newest annotations are at the top
