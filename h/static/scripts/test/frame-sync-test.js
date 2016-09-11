@@ -54,6 +54,7 @@ describe('FrameSync', function () {
 
   beforeEach(function () {
     fakeAnnotationUI = fakeStore({annotations: []}, {
+      connectFrame: sinon.stub(),
       findIDsForTags: sinon.stub(),
       focusAnnotations: sinon.stub(),
       selectAnnotations: sinon.stub(),
@@ -174,11 +175,11 @@ describe('FrameSync', function () {
 
       fakeBridge.emit('connect', fakeChannel);
 
-      assert.deepEqual(frameSync.frames, [{
+      assert.calledWith(fakeAnnotationUI.connectFrame, {
         documentFingerprint: undefined,
         searchUris: [frameInfo.uri],
         uri: frameInfo.uri,
-      }]);
+      });
     });
 
     it('adds the document fingerprint for PDFs', function () {
@@ -186,11 +187,11 @@ describe('FrameSync', function () {
 
       fakeBridge.emit('connect', fakeChannel);
 
-      assert.deepEqual(frameSync.frames, [{
+      assert.calledWith(fakeAnnotationUI.connectFrame, {
         documentFingerprint: frameInfo.metadata.documentFingerprint,
         searchUris: [frameInfo.uri, 'urn:1234'],
         uri: frameInfo.uri,
-      }]);
+      });
     });
   });
 

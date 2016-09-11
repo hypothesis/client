@@ -18,6 +18,7 @@
  */
 
 var annotations = require('./annotations');
+var frames = require('./frames');
 var selection = require('./selection');
 var session = require('./session');
 var viewer = require('./viewer');
@@ -27,6 +28,7 @@ function init(settings) {
   return Object.assign(
     {},
     annotations.init(),
+    frames.init(),
     selection.init(settings),
     session.init(),
     viewer.init()
@@ -35,6 +37,7 @@ function init(settings) {
 
 var update = util.createReducer(Object.assign(
   annotations.update,
+  frames.update,
   selection.update,
   session.update,
   viewer.update
