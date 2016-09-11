@@ -26,7 +26,7 @@ require('../vendor/annotator.document');  // Does not export the plugin :(
 
 // Cross-frame communication
 Annotator.Plugin.CrossFrame = require('./plugin/cross-frame');
-Annotator.Plugin.CrossFrame.AnnotationSync = require('../annotation-sync');
+Annotator.Plugin.CrossFrame.AnnotationSync = require('./annotation-sync');
 Annotator.Plugin.CrossFrame.Bridge = require('../bridge');
 Annotator.Plugin.CrossFrame.Discovery = require('../discovery');
 

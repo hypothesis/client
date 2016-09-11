@@ -53,12 +53,10 @@ describe 'Annotator.Plugin.CrossFrame', ->
       assert.called(CrossFrame.AnnotationSync)
 
     it 'passes along options to AnnotationSync', ->
-      formatter = (x) -> x
-      createCrossFrame(formatter: formatter)
+      createCrossFrame()
       assert.calledWith(CrossFrame.AnnotationSync, fakeBridge, {
         on: sinon.match.func
         emit: sinon.match.func
-        formatter: formatter
       })
 
   describe '.pluginInit', ->
