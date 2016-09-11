@@ -1,3 +1,9 @@
+# AnnotationSync listens for messages from the sidebar app indicating that
+# annotations have been added or removed and relays them to Annotator.
+#
+# It also listens for events from Annotator when new annotations are created or
+# annotations successfully anchor and relays these to the sidebar app.
+
 module.exports = class AnnotationSync
   # Cache of annotations which have crossed the bridge for fast, encapsulated
   # association of annotations received in arguments to window-local copies.
