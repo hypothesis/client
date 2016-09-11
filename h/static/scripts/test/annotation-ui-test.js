@@ -67,7 +67,21 @@ describe('annotationUI', function () {
     it('adds annotations not in the store', function () {
       var annot = defaultAnnotation();
       annotationUI.addAnnotations([annot]);
-      assert.deepEqual(annotationUI.getState().annotations, [annot]);
+      assert.match(annotationUI.getState().annotations,
+        [sinon.match(annot)]);
+    });
+
+    it('assigns a local tag to annotations', function () {
+      var annotA = Object.assign(defaultAnnotation(), {id: 'a1'});
+      var annotB = Object.assign(defaultAnnotation(), {id: 'a2'});
+
+      annotationUI.addAnnotations([annotA, annotB]);
+
+      var tags = annotationUI.getState().annotations.map(function (a) {
+        return a.$$tag;
+      });
+
+      assert.deepEqual(tags, ['t1','t2']);
     });
 
     it('updates annotations with matching IDs in the store', function () {
@@ -209,13 +223,21 @@ describe('annotationUI', function () {
     it('matches annotations to remove by ID', function () {
       annotationUI.addAnnotations(fixtures.pair);
       annotationUI.removeAnnotations([{id: fixtures.pair[0].id}]);
-      assert.deepEqual(annotationUI.getState().annotations, [fixtures.pair[1]]);
+
+      var ids = annotationUI.getState().annotations.map(function (a) {
+        return a.id;
+      });
+      assert.deepEqual(ids, [fixtures.pair[1].id]);
     });
 
     it('matches annotations to remove by tag', function () {
       annotationUI.addAnnotations(fixtures.pair);
       annotationUI.removeAnnotations([{$$tag: fixtures.pair[0].$$tag}]);
-      assert.deepEqual(annotationUI.getState().annotations, [fixtures.pair[1]]);
+
+      var tags = annotationUI.getState().annotations.map(function (a) {
+        return a.$$tag;
+      });
+      assert.deepEqual(tags, [fixtures.pair[1].$$tag]);
     });
 
     it('switches back to the Annotations tab when the last orphan is removed', function () {
