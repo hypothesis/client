@@ -4,6 +4,13 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+### Fixed
+
+- Fix behavior when there are multiple unsaved annotations
+  ([#95](https://github.com/hypothesis/client/pull/95)).
+
 ## [0.40.0] - 2016-09-09
 
 ### Changed
