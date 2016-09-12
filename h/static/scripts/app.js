@@ -163,6 +163,7 @@ module.exports = angular.module('h', [
   .directive('spinner', require('./directive/spinner'))
   .directive('statusButton', require('./directive/status-button'))
   .directive('tagEditor', require('./directive/tag-editor'))
+  .directive('threadList', require('./directive/thread-list'))
   .directive('timestamp', require('./directive/timestamp'))
   .directive('topBar', require('./directive/top-bar'))
   .directive('windowScroll', require('./directive/window-scroll'))

@@ -1,32 +1,15 @@
 @import "mixins/icons";
 
-//ANNOTATION CARD////////////////////////////////
-
-.annotation-card {
-  box-shadow: 0px 1px 1px 0px rgba(0, 0, 0, 0.10);
-  border-radius: 2px;
-  cursor: pointer;
-  padding: $layout-h-margin;
-  background-color: $white;
-}
-
-.annotation-card:hover {
-  box-shadow: 0px 2px 3px 0px rgba(0, 0, 0, 0.15);
-
-  .annotation-header__user {
-    color: $grey-7;
-  }
-
-  .annotation-quote {
-    border-left: $highlight 3px solid;
-    color: $grey-5;
-  }
+// Highlight quote of annotation whenever its thread is hovered
+.thread-list__card:hover .annotation-quote {
+  border-left: $highlight 3px solid;
+  color: $grey-5;
 }
 
 // When hovering a top-level annotation, show the footer in a hovered state.
 // When hovering a reply (at any level), show the reply's own footer in
 // a hovered state and also the footer of the top-level annotation.
-.annotation-card:hover > .annotation,
+.thread-list__card:hover > .annotation,
 .annotation:hover {
   .annotation-replies__link,
   .annotation-replies__count,
