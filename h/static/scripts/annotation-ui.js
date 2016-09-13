@@ -15,6 +15,27 @@ var metadata = require('./annotation-metadata');
 var uiConstants = require('./ui-constants');
 var arrayUtil = require('./util/array-util');
 
+/**
+ * Default starting tab.
+ */
+var TAB_DEFAULT = uiConstants.TAB_ANNOTATIONS;
+
+/**
+ * Default sort keys for each tab.
+ */
+var TAB_SORTKEY_DEFAULT = {};
+TAB_SORTKEY_DEFAULT[uiConstants.TAB_ANNOTATIONS] = 'Location';
+TAB_SORTKEY_DEFAULT[uiConstants.TAB_NOTES] = 'Oldest';
+TAB_SORTKEY_DEFAULT[uiConstants.TAB_ORPHANS] = 'Location';
+
+/**
+ * Available sort keys for each tab.
+ */
+var TAB_SORTKEYS_AVAILABLE = {};
+TAB_SORTKEYS_AVAILABLE[uiConstants.TAB_ANNOTATIONS] = ['Newest', 'Oldest', 'Location'];
+TAB_SORTKEYS_AVAILABLE[uiConstants.TAB_NOTES] = ['Newest', 'Oldest'];
+TAB_SORTKEYS_AVAILABLE[uiConstants.TAB_ORPHANS] = ['Newest', 'Oldest', 'Location'];
+
 function freeze(selection) {
   if (Object.keys(selection).length) {
     return immutable(selection);
@@ -70,12 +91,12 @@ function initialState(settings) {
 
     filterQuery: null,
 
-    selectedTab: uiConstants.TAB_ANNOTATIONS,
+    selectedTab: TAB_DEFAULT,
 
     // Key by which annotations are currently sorted.
-    sortKey: 'Location',
+    sortKey: TAB_SORTKEY_DEFAULT[TAB_DEFAULT],
     // Keys by which annotations can be sorted.
-    sortKeysAvailable: ['Newest', 'Oldest', 'Location'],
+    sortKeysAvailable: TAB_SORTKEYS_AVAILABLE[TAB_DEFAULT],
   });
 }
 
@@ -162,6 +183,28 @@ function initializeAnnot(annotation) {
   });
 }
 
+
+/**
+ * Return state updates necessary to select a different tab.
+ *
+ * This function accepts the name of a tab and returns an object which must be
+ * merged into the current state to achieve the desired tab change.
+ */
+function selectTab(newTab) {
+  // Do nothing if the "new tab" is not a valid tab.
+  if ([uiConstants.TAB_ANNOTATIONS,
+       uiConstants.TAB_NOTES,
+       uiConstants.TAB_ORPHANS].indexOf(newTab) === -1) {
+    return {};
+  }
+  return {
+    selectedTab: newTab,
+    sortKey: TAB_SORTKEY_DEFAULT[newTab],
+    sortKeysAvailable: TAB_SORTKEYS_AVAILABLE[newTab],
+  };
+}
+
+
 function annotationsReducer(state, action) {
   switch (action.type) {
   case types.ADD_ANNOTATIONS:
@@ -215,10 +258,12 @@ function annotationsReducer(state, action) {
           arrayUtil.countIf(annots, metadata.isOrphan) === 0) {
         selectedTab = uiConstants.TAB_ANNOTATIONS;
       }
-      return Object.assign({}, state, {
-        annotations: annots,
-        selectedTab: selectedTab,
-      });
+      return Object.assign(
+        {},
+        state,
+        {annotations: annots},
+        selectTab(selectedTab)
+      );
     }
   case types.CLEAR_ANNOTATIONS:
     return Object.assign({}, state, {annotations: []});
@@ -266,7 +311,7 @@ function reducer(state, action) {
   case types.HIGHLIGHT_ANNOTATIONS:
     return Object.assign({}, state, {highlighted: action.highlighted});
   case types.SELECT_TAB:
-    return Object.assign({}, state, {selectedTab: action.tab});
+    return Object.assign({}, state, selectTab(action.tab));
   case types.SET_FILTER_QUERY:
     return Object.assign({}, state, {
       filterQuery: action.query,
