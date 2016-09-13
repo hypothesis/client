@@ -176,7 +176,10 @@ function initializeAnnot(annotation) {
   // that initialization should be moved here.
 
   return Object.assign({}, annotation, {
-    // Copy $$tag explicitly because it is non-enumerable
+    // Copy $$tag explicitly because it is non-enumerable.
+    //
+    // FIXME: change $$tag to $tag and make it enumerable so annotations can be
+    // handled more simply in the sidebar.
     $$tag: annotation.$$tag,
     // New annotations must be anchored
     $orphan: false,
@@ -499,9 +502,28 @@ module.exports = function ($rootScope, settings) {
     },
 
     /** Add annotations to the currently displayed set. */
-    addAnnotations: function (annotations) {
+    addAnnotations: function (annotations, now) {
+      now = now || new Date();
+
       var added = annotations.filter(function (annot) {
         return !findByID(annot.id);
+      });
+
+      // Add dates to new annotations. These are ignored by the server but used
+      // when sorting unsaved annotation cards.
+      annotations = annotations.map(function (annot) {
+        if (annot.id) { return annot; }
+        return Object.assign({
+          // Copy $$tag explicitly because it is non-enumerable.
+          //
+          // FIXME: change $$tag to $tag and make it enumerable so annotations
+          // can be handled more simply in the sidebar.
+          $$tag: annot.$$tag,
+          // Date.prototype.toISOString returns a 0-offset (UTC) ISO8601
+          // datetime.
+          created: now.toISOString(),
+          updated: now.toISOString(),
+        }, annot);
       });
 
       store.dispatch({
