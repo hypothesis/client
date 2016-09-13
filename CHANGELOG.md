@@ -4,6 +4,17 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+### Changed
+
+- Only offer 'Newest' and 'Oldest' sort orders when Page Notes tab is selected
+  and sort Page Notes from oldest to newest by default
+  ([#99](https://github.com/hypothesis/client/pull/99)).
+
+- Sort unsaved annotations more predictably
+  ([#101](https://github.com/hypothesis/client/pull/101)).
+
 ## [0.41.0] - 2016-09-12
 
 ### Fixed
