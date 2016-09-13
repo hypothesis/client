@@ -190,11 +190,16 @@ function initializeAnnot(annotation) {
  * This function accepts the name of a tab and returns an object which must be
  * merged into the current state to achieve the desired tab change.
  */
-function selectTab(newTab) {
+function selectTab(state, newTab) {
   // Do nothing if the "new tab" is not a valid tab.
   if ([uiConstants.TAB_ANNOTATIONS,
        uiConstants.TAB_NOTES,
        uiConstants.TAB_ORPHANS].indexOf(newTab) === -1) {
+    return {};
+  }
+  // Shortcut if the tab is already correct, to avoid resetting the sortKey
+  // unnecessarily.
+  if (state.selectedTab === newTab) {
     return {};
   }
   return {
@@ -262,7 +267,7 @@ function annotationsReducer(state, action) {
         {},
         state,
         {annotations: annots},
-        selectTab(selectedTab)
+        selectTab(state, selectedTab)
       );
     }
   case types.CLEAR_ANNOTATIONS:
@@ -311,7 +316,7 @@ function reducer(state, action) {
   case types.HIGHLIGHT_ANNOTATIONS:
     return Object.assign({}, state, {highlighted: action.highlighted});
   case types.SELECT_TAB:
-    return Object.assign({}, state, selectTab(action.tab));
+    return Object.assign({}, state, selectTab(state, action.tab));
   case types.SET_FILTER_QUERY:
     return Object.assign({}, state, {
       filterQuery: action.query,
