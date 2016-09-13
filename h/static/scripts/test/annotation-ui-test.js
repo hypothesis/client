@@ -93,6 +93,33 @@ describe('annotationUI', function () {
       assert.equal(annots[0].id, 'server-id');
     });
 
+    // We add temporary created and updated timestamps to annotations to ensure
+    // that they sort correctly in the sidebar. These fields are ignored by the
+    // server.
+    it('adds created/updated timestamps to new annotations', function () {
+      var now = new Date();
+      var nowStr = now.toISOString();
+
+      annotationUI.addAnnotations([newAnnotation()], now);
+      var annot = annotationUI.getState().annotations[0];
+
+      assert.equal(annot.created, nowStr);
+      assert.equal(annot.updated, nowStr);
+    });
+
+    it('does not overwrite existing created/updated timestamps in new annotations', function () {
+      var now = new Date();
+      var annot = newAnnotation();
+      annot.created = '2000-01-01T01:02:03Z';
+      annot.updated = '2000-01-01T04:05:06Z';
+
+      annotationUI.addAnnotations([annot], now);
+      var result = annotationUI.getState().annotations[0];
+
+      assert.equal(result.created, annot.created);
+      assert.equal(result.updated, annot.updated);
+    });
+
     it('preserves anchoring status of updated annotations', function () {
       var annot = defaultAnnotation();
       annotationUI.addAnnotations([annot]);
