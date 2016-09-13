@@ -429,6 +429,17 @@ describe('annotationUI', function () {
       annotationUI.selectTab(uiConstants.TAB_ORPHANS);
       assert.deepEqual(annotationUI.getState().sortKey, 'Location');
     });
+
+    it('does not reset the sort key unless necessary', function () {
+      // Select the tab, setting sort key to 'Oldest', and then manually
+      // override the sort key.
+      annotationUI.selectTab(uiConstants.TAB_NOTES);
+      annotationUI.setSortKey('Newest');
+
+      annotationUI.selectTab(uiConstants.TAB_NOTES);
+
+      assert.equal(annotationUI.getState().sortKey, 'Newest');
+    });
   });
 
   describe('#updatingAnchorStatus', function () {
