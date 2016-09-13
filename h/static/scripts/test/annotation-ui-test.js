@@ -391,9 +391,43 @@ describe('annotationUI', function () {
 
   describe('#selectTab()', function () {
     it('sets the selected tab', function () {
-      var annotationTab = 'annotation';
-      annotationUI.selectTab(annotationTab);
-      assert.equal(annotationUI.getState().selectedTab, annotationTab);
+      annotationUI.selectTab(uiConstants.TAB_ANNOTATIONS);
+      assert.equal(annotationUI.getState().selectedTab, uiConstants.TAB_ANNOTATIONS);
+    });
+
+    it('ignores junk tag names', function () {
+      annotationUI.selectTab('flibbertigibbert');
+      assert.equal(annotationUI.getState().selectedTab, uiConstants.TAB_ANNOTATIONS);
+    });
+
+    it('allows sorting annotations by time and document location', function () {
+      annotationUI.selectTab(uiConstants.TAB_ANNOTATIONS);
+      assert.deepEqual(annotationUI.getState().sortKeysAvailable, ['Newest', 'Oldest', 'Location']);
+    });
+
+    it('allows sorting page notes by time', function () {
+      annotationUI.selectTab(uiConstants.TAB_NOTES);
+      assert.deepEqual(annotationUI.getState().sortKeysAvailable, ['Newest', 'Oldest']);
+    });
+
+    it('allows sorting orphans by time and document location', function () {
+      annotationUI.selectTab(uiConstants.TAB_ORPHANS);
+      assert.deepEqual(annotationUI.getState().sortKeysAvailable, ['Newest', 'Oldest', 'Location']);
+    });
+
+    it('sorts annotations by document location by default', function () {
+      annotationUI.selectTab(uiConstants.TAB_ANNOTATIONS);
+      assert.deepEqual(annotationUI.getState().sortKey, 'Location');
+    });
+
+    it('sorts page notes from oldest to newest by default', function () {
+      annotationUI.selectTab(uiConstants.TAB_NOTES);
+      assert.deepEqual(annotationUI.getState().sortKey, 'Oldest');
+    });
+
+    it('sorts orphans by document location by default', function () {
+      annotationUI.selectTab(uiConstants.TAB_ORPHANS);
+      assert.deepEqual(annotationUI.getState().sortKey, 'Location');
     });
   });
 
