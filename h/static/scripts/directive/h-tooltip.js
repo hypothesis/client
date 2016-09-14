@@ -38,8 +38,17 @@ function Tooltip(rootElement) {
     var tooltipRect = this._el.getBoundingClientRect();
 
     var targetRect = target.getBoundingClientRect();
-    var top = targetRect.top - tooltipRect.height - TOOLTIP_ARROW_HEIGHT;
+    var top;
+
+    if (this.state.direction === 'up') {
+      top = targetRect.bottom + TOOLTIP_ARROW_HEIGHT;
+    } else {
+      top = targetRect.top - tooltipRect.height - TOOLTIP_ARROW_HEIGHT;
+    }
     var left = targetRect.right - tooltipRect.width;
+
+    this._el.classList.toggle('tooltip--up', this.state.direction === 'up');
+    this._el.classList.toggle('tooltip--down', this.state.direction === 'down');
 
     Object.assign(this._el.style, {
       visibility: '',
@@ -51,10 +60,13 @@ function Tooltip(rootElement) {
   this._el = rootElement.ownerDocument.createElement('div');
   this._el.innerHTML = '<span class="tooltip-label js-tooltip-label"></span>';
   this._el.className = 'tooltip';
+
   rootElement.appendChild(this._el);
   this._labelEl = this._el.querySelector('.js-tooltip-label');
 
-  this.setState({});
+  this.setState({
+    direction: 'down',
+  });
 }
 
 /**
@@ -78,7 +90,11 @@ module.exports = function () {
       var el = $element[0];
 
       el.addEventListener('mouseover', function () {
-        theTooltip.setState({target: el});
+        var direction = el.getAttribute('tooltip-direction') || 'down';
+        theTooltip.setState({
+          direction: direction,
+          target: el,
+        });
       });
 
       el.addEventListener('mouseout', function () {
