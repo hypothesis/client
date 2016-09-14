@@ -7,6 +7,9 @@ require('core-js/fn/array/find-index');
 require('core-js/fn/array/from');
 require('core-js/fn/object/assign');
 
+// ES2017
+require('core-js/fn/object/values');
+
 // URL constructor, required by IE 10/11,
 // early versions of Microsoft Edge.
 try {

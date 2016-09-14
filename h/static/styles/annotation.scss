@@ -165,6 +165,10 @@
   font-weight: normal;
   padding: 0;
   margin: 0px 0px 0px 12px;
+
+  &[disabled] {
+    opacity: 0.2;
+  }
 }
 
 .annotation-quote {
