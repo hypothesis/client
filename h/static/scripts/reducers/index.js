@@ -2,7 +2,8 @@
 
 /**
  * This module defines the main update function (or 'reducer' in Redux's
- * terminology) that handles app state updates.
+ * terminology) that handles app state updates. For an overview of how state
+ * management in Redux works, see the comments at the top of `annotation-ui.js`
  *
  * Each sub-module in this folder defines:
  *
