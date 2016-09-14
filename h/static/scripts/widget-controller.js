@@ -52,6 +52,7 @@ module.exports = function WidgetController(
     });
 
     Object.assign($scope, {
+      totalActions: counts.actions,
       totalNotes: counts.notes,
       totalAnnotations: counts.annotations,
       totalOrphans: counts.orphans,

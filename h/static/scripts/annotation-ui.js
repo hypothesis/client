@@ -27,6 +27,7 @@ var TAB_SORTKEY_DEFAULT = {};
 TAB_SORTKEY_DEFAULT[uiConstants.TAB_ANNOTATIONS] = 'Location';
 TAB_SORTKEY_DEFAULT[uiConstants.TAB_NOTES] = 'Oldest';
 TAB_SORTKEY_DEFAULT[uiConstants.TAB_ORPHANS] = 'Location';
+TAB_SORTKEY_DEFAULT[uiConstants.TAB_ACTIONS] = 'Oldest';
 
 /**
  * Available sort keys for each tab.
@@ -35,6 +36,7 @@ var TAB_SORTKEYS_AVAILABLE = {};
 TAB_SORTKEYS_AVAILABLE[uiConstants.TAB_ANNOTATIONS] = ['Newest', 'Oldest', 'Location'];
 TAB_SORTKEYS_AVAILABLE[uiConstants.TAB_NOTES] = ['Newest', 'Oldest'];
 TAB_SORTKEYS_AVAILABLE[uiConstants.TAB_ORPHANS] = ['Newest', 'Oldest', 'Location'];
+TAB_SORTKEYS_AVAILABLE[uiConstants.TAB_ACTIONS] = ['Newest', 'Oldest'];
 
 function freeze(selection) {
   if (Object.keys(selection).length) {
@@ -197,6 +199,7 @@ function selectTab(state, newTab) {
   // Do nothing if the "new tab" is not a valid tab.
   if ([uiConstants.TAB_ANNOTATIONS,
        uiConstants.TAB_NOTES,
+       uiConstants.TAB_ACTIONS,
        uiConstants.TAB_ORPHANS].indexOf(newTab) === -1) {
     return {};
   }
