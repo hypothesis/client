@@ -129,7 +129,7 @@ var update = {
     var tabUpdateFn = selection.update.SELECT_TAB;
     return Object.assign(
       {annotations: annots},
-      tabUpdateFn(state, selection.selectTab(selectedTab))
+      tabUpdateFn(state, selection.actions.selectTab(selectedTab))
     );
   },
 
@@ -250,10 +250,10 @@ function updateAnchorStatus(id, tag, isOrphan) {
 module.exports = {
   init: init,
   update: update,
-
-  // Actions
-  addAnnotations: addAnnotations,
-  clearAnnotations: clearAnnotations,
-  removeAnnotations: removeAnnotations,
-  updateAnchorStatus: updateAnchorStatus,
+  actions: {
+    addAnnotations: addAnnotations,
+    clearAnnotations: clearAnnotations,
+    removeAnnotations: removeAnnotations,
+    updateAnchorStatus: updateAnchorStatus,
+  },
 };

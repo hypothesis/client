@@ -44,8 +44,8 @@ function setShowHighlights(show) {
 module.exports = {
   init: init,
   update: update,
-
-  // Actions
-  setAppIsSidebar: setAppIsSidebar,
-  setShowHighlights: setShowHighlights,
+  actions: {
+    setAppIsSidebar: setAppIsSidebar,
+    setShowHighlights: setShowHighlights,
+  },
 };

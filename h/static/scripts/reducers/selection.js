@@ -301,18 +301,19 @@ module.exports = {
   init: init,
   update: update,
 
-  // Actions
-  clearSelectedAnnotations: clearSelectedAnnotations,
-  focusAnnotations: focusAnnotations,
-  highlightAnnotations: highlightAnnotations,
-  removeSelectedAnnotation: removeSelectedAnnotation,
-  selectAnnotations: selectAnnotations,
-  selectTab: selectTab,
-  setCollapsed: setCollapsed,
-  setFilterQuery: setFilterQuery,
-  setForceVisible: setForceVisible,
-  setSortKey: setSortKey,
-  toggleSelectedAnnotations: toggleSelectedAnnotations,
+  actions: {
+    clearSelectedAnnotations: clearSelectedAnnotations,
+    focusAnnotations: focusAnnotations,
+    highlightAnnotations: highlightAnnotations,
+    removeSelectedAnnotation: removeSelectedAnnotation,
+    selectAnnotations: selectAnnotations,
+    selectTab: selectTab,
+    setCollapsed: setCollapsed,
+    setFilterQuery: setFilterQuery,
+    setForceVisible: setForceVisible,
+    setSortKey: setSortKey,
+    toggleSelectedAnnotations: toggleSelectedAnnotations,
+  },
 
   // Selectors
   hasSelectedAnnotations: hasSelectedAnnotations,

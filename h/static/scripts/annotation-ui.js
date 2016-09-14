@@ -40,6 +40,7 @@ var reducers = require('./reducers');
 var annotationsReducer = require('./reducers/annotations');
 var selectionReducer = require('./reducers/selection');
 var viewerReducer = require('./reducers/viewer');
+var util = require('./reducers/util');
 
 /**
  * Redux middleware which triggers an Angular change-detection cycle
@@ -66,13 +67,6 @@ function angularDigestMiddleware($rootScope) {
   };
 }
 
-/**
- * Stores the UI state of the annotator in connected clients.
- *
- * This includes:
- * - The IDs of annotations that are currently selected or focused
- * - The state of the bucket bar
- */
 // @ngInject
 module.exports = function ($rootScope, settings) {
   var enhancer = redux.applyMiddleware(
@@ -85,82 +79,31 @@ module.exports = function ($rootScope, settings) {
   var store = redux.createStore(reducers.update, reducers.init(settings),
     enhancer);
 
-  return {
-    /**
-     * Return the current UI state of the sidebar. This should not be modified
-     * directly but only though the helper methods below.
-     */
-    getState: store.getState,
+  // Expose helper functions that create actions as methods of the
+  // `annotationUI` service to make using them easier from app code. eg.
+  //
+  // Instead of:
+  //   annotationUI.dispatch(annotations.actions.addAnnotations(annotations))
+  // You can use:
+  //   annotationUI.addAnnotations(annotations)
+  //
+  var actionCreators = redux.bindActionCreators(Object.assign({},
+    annotationsReducer.actions,
+    selectionReducer.actions,
+    viewerReducer.actions
+  ), store.dispatch);
 
-    /** Listen for changes to the UI state of the sidebar. */
-    subscribe: store.subscribe,
+  // Expose selectors as methods of the `annotationUI` to make using them easier
+  // from app code.
+  //
+  // eg. Instead of:
+  //   selection.isAnnotationSelected(annotationUI.getState(), id)
+  // You can use:
+  //   annotationUI.isAnnotationSelected(id)
+  var selectors = util.bindSelectors({
+    isAnnotationSelected: selectionReducer.isAnnotationSelected,
+    hasSelectedAnnotations: selectionReducer.hasSelectedAnnotations,
+  }, store.getState);
 
-    // Wrappers around annotation actions
-    addAnnotations: function (annotations, now) {
-      store.dispatch(annotationsReducer.addAnnotations(annotations, now));
-    },
-
-    removeAnnotations: function (annotations) {
-      store.dispatch(annotationsReducer.removeAnnotations(annotations));
-    },
-
-    clearAnnotations: function () {
-      store.dispatch(annotationsReducer.clearAnnotations());
-    },
-
-    updateAnchorStatus: function (id, tag, isOrphan) {
-      store.dispatch(annotationsReducer.updateAnchorStatus(id, tag, isOrphan));
-    },
-
-    // Wrappers around selection actions
-    clearSelectedAnnotations: function () {
-      store.dispatch(selectionReducer.clearSelectedAnnotations());
-    },
-    focusAnnotations: function (tags) {
-      store.dispatch(selectionReducer.focusAnnotations(tags));
-    },
-    highlightAnnotations: function (ids) {
-      store.dispatch(selectionReducer.highlightAnnotations(ids));
-    },
-    removeSelectedAnnotation: function (id) {
-      store.dispatch(selectionReducer.removeSelectedAnnotation(id));
-    },
-    selectAnnotations: function (ids) {
-      store.dispatch(selectionReducer.selectAnnotations(ids));
-    },
-    selectTab: function (tab) {
-      store.dispatch(selectionReducer.selectTab(tab));
-    },
-    setCollapsed: function (id, collapsed) {
-      store.dispatch(selectionReducer.setCollapsed(id, collapsed));
-    },
-    setFilterQuery: function (query) {
-      store.dispatch(selectionReducer.setFilterQuery(query));
-    },
-    setForceVisible: function (id, visible) {
-      store.dispatch(selectionReducer.setForceVisible(id, visible));
-    },
-    setSortKey: function (key) {
-      store.dispatch(selectionReducer.setSortKey(key));
-    },
-    toggleSelectedAnnotations: function (ids) {
-      store.dispatch(selectionReducer.toggleSelectedAnnotations(ids));
-    },
-
-    // Wrappers around selection selectors
-    isAnnotationSelected: function (id) {
-      return selectionReducer.isAnnotationSelected(store.getState(), id);
-    },
-    hasSelectedAnnotations: function () {
-      return selectionReducer.hasSelectedAnnotations(store.getState());
-    },
-
-    // Wrappers around viewer actions
-    setShowHighlights: function (show) {
-      store.dispatch(viewerReducer.setShowHighlights(show));
-    },
-    setAppIsSidebar: function (isSidebar) {
-      store.dispatch(viewerReducer.setAppIsSidebar(isSidebar));
-    },
-  };
+  return Object.assign(store, actionCreators, selectors);
 };
