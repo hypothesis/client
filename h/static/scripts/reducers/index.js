@@ -31,11 +31,11 @@ function init(settings) {
   );
 }
 
-var update = util.composeReducers([
+var update = util.createReducer(Object.assign(
   annotations.update,
   selection.update,
-  viewer.update,
-]);
+  viewer.update
+));
 
 module.exports = {
   init: init,

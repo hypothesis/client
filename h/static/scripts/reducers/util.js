@@ -1,17 +1,30 @@
 'use strict';
 
 /**
- * Compose a list of `(state, action) => new state` reducer functions
- * into a single reducer.
+ * Return an object where each key in `updateFns` is mapped to the key itself.
  */
-function composeReducers(reducers) {
+function actionTypes(updateFns) {
+  return Object.keys(updateFns).reduce(function (types, key) {
+    types[key] = key;
+    return types;
+  }, {});
+}
+
+/**
+ * Given an object which maps action names to update functions, this returns
+ * a reducer function that can be passed to the redux `createStore` function.
+ */
+function createReducer(updateFns) {
   return function (state, action) {
-    return reducers.reduce(function (state, reducer) {
-      return reducer(state, action);
-    }, state);
+    var fn = updateFns[action.type];
+    if (!fn) {
+      return state;
+    }
+    return Object.assign({}, state, fn(state, action));
   };
 }
 
 module.exports = {
-  composeReducers: composeReducers,
+  actionTypes: actionTypes,
+  createReducer: createReducer,
 };

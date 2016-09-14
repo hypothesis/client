@@ -14,6 +14,8 @@ var immutable = require('seamless-immutable');
 
 var uiConstants = require('../ui-constants');
 
+var util = require('./util');
+
 /**
 * Default starting tab.
 */
@@ -58,43 +60,6 @@ function toSet(list) {
   }, {});
 }
 
-/**
- * Return state updates necessary to select a different tab.
- *
- * This function accepts the name of a tab and returns an object which must be
- * merged into the current state to achieve the desired tab change.
- */
-function selectTabHelper(state, newTab) {
-  // Do nothing if the "new tab" is not a valid tab.
-  if ([uiConstants.TAB_ANNOTATIONS,
-      uiConstants.TAB_NOTES,
-      uiConstants.TAB_ORPHANS].indexOf(newTab) === -1) {
-    return {};
-  }
-  // Shortcut if the tab is already correct, to avoid resetting the sortKey
-  // unnecessarily.
-  if (state.selectedTab === newTab) {
-    return {};
-  }
-  return {
-    selectedTab: newTab,
-    sortKey: TAB_SORTKEY_DEFAULT[newTab],
-    sortKeysAvailable: TAB_SORTKEYS_AVAILABLE[newTab],
-  };
-}
-
-var actions = {
-  CLEAR_SELECTION: 'CLEAR_SELECTION',
-  SELECT_ANNOTATIONS: 'SELECT_ANNOTATIONS',
-  FOCUS_ANNOTATIONS: 'FOCUS_ANNOTATIONS',
-  HIGHLIGHT_ANNOTATIONS: 'HIGHLIGHT_ANNOTATIONS',
-  SET_FORCE_VISIBLE: 'SET_FORCE_VISIBLE',
-  SET_EXPANDED: 'SET_EXPANDED',
-  SET_FILTER_QUERY: 'SET_FILTER_QUERY',
-  SET_SORT_KEY: 'SET_SORT_KEY',
-  SELECT_TAB: 'SELECT_TAB',
-};
-
 function init(settings) {
   return {
     // Contains a map of annotation tag:true pairs.
@@ -127,37 +92,64 @@ function init(settings) {
   };
 }
 
-function update(state, action) {
-  switch (action.type) {
-  case actions.CLEAR_SELECTION:
-    return Object.assign({}, state, {
-      filterQuery: null,
-      selectedAnnotationMap: null,
-    });
-  case actions.SELECT_ANNOTATIONS:
-    return Object.assign({}, state, {selectedAnnotationMap: action.selection});
-  case actions.FOCUS_ANNOTATIONS:
-    return Object.assign({}, state, {focusedAnnotationMap: action.focused});
-  case actions.SET_FORCE_VISIBLE:
-    return Object.assign({}, state, {forceVisible: action.forceVisible});
-  case actions.SET_EXPANDED:
-    return Object.assign({}, state, {expanded: action.expanded});
-  case actions.HIGHLIGHT_ANNOTATIONS:
-    return Object.assign({}, state, {highlighted: action.highlighted});
-  case actions.SELECT_TAB:
-    return Object.assign({}, state, selectTabHelper(state, action.tab));
-  case actions.SET_FILTER_QUERY:
-    return Object.assign({}, state, {
+var update = {
+  CLEAR_SELECTION: function () {
+    return {filterQuery: null, selectedAnnotationMap: null};
+  },
+
+  SELECT_ANNOTATIONS: function (state, action) {
+    return {selectedAnnotationMap: action.selection};
+  },
+
+  FOCUS_ANNOTATIONS: function (state, action) {
+    return {focusedAnnotationMap: action.focused};
+  },
+
+  SET_FORCE_VISIBLE: function (state, action) {
+    return {forceVisible: action.forceVisible};
+  },
+
+  SET_EXPANDED: function (state, action) {
+    return {expanded: action.expanded};
+  },
+
+  HIGHLIGHT_ANNOTATIONS: function (state, action) {
+    return {highlighted: action.highlighted};
+  },
+
+  SELECT_TAB: function (state, action) {
+    // Do nothing if the "new tab" is not a valid tab.
+    if ([uiConstants.TAB_ANNOTATIONS,
+        uiConstants.TAB_NOTES,
+        uiConstants.TAB_ORPHANS].indexOf(action.tab) === -1) {
+      return {};
+    }
+    // Shortcut if the tab is already correct, to avoid resetting the sortKey
+    // unnecessarily.
+    if (state.selectedTab === action.tab) {
+      return {};
+    }
+    return {
+      selectedTab: action.tab,
+      sortKey: TAB_SORTKEY_DEFAULT[action.tab],
+      sortKeysAvailable: TAB_SORTKEYS_AVAILABLE[action.tab],
+    };
+  },
+
+  SET_FILTER_QUERY: function (state, action) {
+    return {
       filterQuery: action.query,
       forceVisible: {},
       expanded: {},
-    });
-  case actions.SET_SORT_KEY:
-    return Object.assign({}, state, {sortKey: action.key});
-  default:
-    return state;
-  }
-}
+    };
+  },
+
+  SET_SORT_KEY: function (state, action) {
+    return {sortKey: action.key};
+  },
+};
+
+var actions = util.actionTypes(update);
 
 function select(annotations) {
   return {
@@ -325,7 +317,4 @@ module.exports = {
   // Selectors
   hasSelectedAnnotations: hasSelectedAnnotations,
   isAnnotationSelected: isAnnotationSelected,
-
-  // Helpers
-  selectTabHelper: selectTabHelper,
 };

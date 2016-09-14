@@ -10,18 +10,7 @@ var metadata = require('../annotation-metadata');
 var uiConstants = require('../ui-constants');
 
 var selection = require('./selection');
-
-var actions = {
-  ADD_ANNOTATIONS: 'ADD_ANNOTATIONS',
-  REMOVE_ANNOTATIONS: 'REMOVE_ANNOTATIONS',
-  CLEAR_ANNOTATIONS: 'CLEAR_ANNOTATIONS',
-
-  /**
-   * Update an annotation's status flags after attempted anchoring in the
-   * document completes.
-   */
-  UPDATE_ANCHOR_STATUS: 'UPDATE_ANCHOR_STATUS',
-};
+var util = require('./util');
 
 /**
  * Return a copy of `current` with all matching annotations in `annotations`
@@ -87,88 +76,85 @@ function init() {
   };
 }
 
-function update(state, action) {
-  switch (action.type) {
-  case actions.ADD_ANNOTATIONS:
-    {
-      var updatedIDs = {};
-      var updatedTags = {};
+var update = {
+  ADD_ANNOTATIONS: function (state, action) {
+    var updatedIDs = {};
+    var updatedTags = {};
 
-      var added = [];
-      var unchanged = [];
-      var updated = [];
+    var added = [];
+    var unchanged = [];
+    var updated = [];
 
-      action.annotations.forEach(function (annot) {
-        var existing;
-        if (annot.id) {
-          existing = findByID(state.annotations, annot.id);
-        }
-        if (!existing && annot.$$tag) {
-          existing = findByTag(state.annotations, annot.$$tag);
-        }
-
-        if (existing) {
-          // Merge the updated annotation with the private fields from the local
-          // annotation
-          updated.push(Object.assign({}, existing, annot));
-          if (annot.id) {
-            updatedIDs[annot.id] = true;
-          }
-          if (existing.$$tag) {
-            updatedTags[existing.$$tag] = true;
-          }
-        } else {
-          added.push(initializeAnnot(annot));
-        }
-      });
-
-      state.annotations.forEach(function (annot) {
-        if (!updatedIDs[annot.id] && !updatedTags[annot.$$tag]) {
-          unchanged.push(annot);
-        }
-      });
-
-      return Object.assign({}, state, {
-        annotations: added.concat(updated).concat(unchanged),
-      });
-    }
-  case actions.REMOVE_ANNOTATIONS:
-    {
-      var annots = excludeAnnotations(state.annotations, action.annotations);
-      var selectedTab = state.selectedTab;
-      if (selectedTab === uiConstants.TAB_ORPHANS &&
-          arrayUtil.countIf(annots, metadata.isOrphan) === 0) {
-        selectedTab = uiConstants.TAB_ANNOTATIONS;
+    action.annotations.forEach(function (annot) {
+      var existing;
+      if (annot.id) {
+        existing = findByID(state.annotations, annot.id);
       }
-      return Object.assign(
-        {},
-        state,
-        {annotations: annots},
-        selection.selectTabHelper(state, selectedTab)
-      );
-    }
-  case actions.CLEAR_ANNOTATIONS:
-    return Object.assign({}, state, {annotations: []});
-  case actions.UPDATE_ANCHOR_STATUS:
-    {
-      var annotations = state.annotations.map(function (annot) {
-        var match = (annot.id && annot.id === action.id) ||
-                    (annot.$$tag && annot.$$tag === action.tag);
-        if (match) {
-          return Object.assign({}, annot, {
-            $orphan: action.isOrphan,
-            $$tag: action.tag,
-          });
-        } else {
-          return annot;
+      if (!existing && annot.$$tag) {
+        existing = findByTag(state.annotations, annot.$$tag);
+      }
+
+      if (existing) {
+        // Merge the updated annotation with the private fields from the local
+        // annotation
+        updated.push(Object.assign({}, existing, annot));
+        if (annot.id) {
+          updatedIDs[annot.id] = true;
         }
-      });
-      return Object.assign({}, state, {annotations: annotations});
+        if (existing.$$tag) {
+          updatedTags[existing.$$tag] = true;
+        }
+      } else {
+        added.push(initializeAnnot(annot));
+      }
+    });
+
+    state.annotations.forEach(function (annot) {
+      if (!updatedIDs[annot.id] && !updatedTags[annot.$$tag]) {
+        unchanged.push(annot);
+      }
+    });
+
+    return {annotations: added.concat(updated).concat(unchanged)};
+  },
+
+  REMOVE_ANNOTATIONS: function (state, action) {
+    var annots = excludeAnnotations(state.annotations, action.annotations);
+    var selectedTab = state.selectedTab;
+    if (selectedTab === uiConstants.TAB_ORPHANS &&
+        arrayUtil.countIf(annots, metadata.isOrphan) === 0) {
+      selectedTab = uiConstants.TAB_ANNOTATIONS;
     }
-  default:
-    return state;
-  }
-}
+
+    var tabUpdateFn = selection.update.SELECT_TAB;
+    return Object.assign(
+      {annotations: annots},
+      tabUpdateFn(state, selection.selectTab(selectedTab))
+    );
+  },
+
+  CLEAR_ANNOTATIONS: function () {
+    return {annotations: []};
+  },
+
+  UPDATE_ANCHOR_STATUS: function (state, action) {
+    var annotations = state.annotations.map(function (annot) {
+      var match = (annot.id && annot.id === action.id) ||
+                  (annot.$$tag && annot.$$tag === action.tag);
+      if (match) {
+        return Object.assign({}, annot, {
+          $orphan: action.isOrphan,
+          $$tag: action.tag,
+        });
+      } else {
+        return annot;
+      }
+    });
+    return {annotations: annotations};
+  },
+};
+
+var actions = util.actionTypes(update);
 
 /** Add annotations to the currently displayed set. */
 function addAnnotations(annotations, now) {
