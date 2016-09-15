@@ -3918,6 +3918,11 @@
         }
       }
     },
+    "redux-thunk": {
+      "version": "2.1.0",
+      "from": "redux-thunk@>=2.1.0 <3.0.0",
+      "resolved": "https://registry.npmjs.org/redux-thunk/-/redux-thunk-2.1.0.tgz"
+    },
     "regenerate": {
       "version": "1.2.1",
       "from": "regenerate@>=1.2.1 <2.0.0",
