@@ -14,6 +14,8 @@ function selectedElement(document) {
       } else {
         return document.activeElement;
       }
+  } else if (nodeName == "INPUT") {
+      return document.activeElement;
   }
 
   return null;

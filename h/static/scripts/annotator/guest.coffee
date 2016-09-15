@@ -72,6 +72,8 @@ module.exports = class Guest extends Annotator
           self._onClearSelection()
         else if element.nodeName == "BODY"
           self._onSelection(element)
+        else if element.nodeName == "INPUT"
+          self._onInputSelection(element)
         else
           console.log("unknown element encountered: " + element.nodeName)
           return
@@ -365,6 +367,11 @@ module.exports = class Guest extends Annotator
   focusAnnotations: (annotations) ->
     tags = (a.$$tag for a in annotations)
     @crossframe?.call('focusAnnotations', tags)
+
+  _onInputSelection: (element) ->
+    # stub
+    console.log("on input selection")
+    return
 
   _onSelection: (element) ->
     selection =  Annotator.Util.getGlobal().getSelection()
