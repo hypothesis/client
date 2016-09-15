@@ -400,4 +400,33 @@ describe('rootThread', function () {
       });
     });
   });
+
+  describe('when the focused group changes', function () {
+    it('moves new annotations to the focused group', function () {
+      fakeAnnotationUI.state.annotations = [{$$tag: 'a-tag'}];
+
+      $rootScope.$broadcast(events.GROUP_FOCUSED, 'private-group');
+
+      assert.calledWith(fakeAnnotationUI.addAnnotations, sinon.match([{
+        $$tag: 'a-tag',
+        group: 'private-group',
+      }]));
+    });
+
+    it('does not move replies to the new group', function () {
+      fakeAnnotationUI.state.annotations = [annotationFixtures.newReply()];
+
+      $rootScope.$broadcast(events.GROUP_FOCUSED, 'private-group');
+
+      assert.notCalled(fakeAnnotationUI.addAnnotations);
+    });
+
+    it('does not move saved annotations to the new group', function () {
+      fakeAnnotationUI.state.annotations = [annotationFixtures.defaultAnnotation()];
+
+      $rootScope.$broadcast(events.GROUP_FOCUSED, 'private-group');
+
+      assert.notCalled(fakeAnnotationUI.addAnnotations);
+    });
+  });
 });

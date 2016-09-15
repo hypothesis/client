@@ -122,9 +122,6 @@ function AnnotationController(
       */
     newlyCreatedByHighlightButton = vm.annotation.$highlight || false;
 
-    // Call `onGroupFocused()` whenever the currently-focused group changes.
-    $scope.$on(events.GROUP_FOCUSED, onGroupFocused);
-
     // New annotations (just created locally by the client, rather then
     // received from the server) have some fields missing. Add them.
     vm.annotation.user = vm.annotation.user || session.state.userid;
@@ -151,13 +148,6 @@ function AnnotationController(
       if (isNew(vm.annotation) || drafts.get(vm.annotation)) {
         vm.edit();
       }
-    }
-  }
-
-  function onGroupFocused() {
-    // New annotations move to the new group, when a new group is focused.
-    if (isNew(vm.annotation) && !isReply(vm.annotation)) {
-      vm.annotation.group = groups.focused().id;
     }
   }
 

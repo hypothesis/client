@@ -159,6 +159,24 @@ function RootThread($rootScope, annotationUI, drafts, features, searchFilter, vi
     annotationUI.removeAnnotations(annotations);
   });
 
+  // Once the focused group state is moved to the app state store, then the
+  // logic in this event handler can be moved to the annotations reducer.
+  $rootScope.$on(events.GROUP_FOCUSED, function (event, focusedGroupId) {
+    var updatedAnnots = annotationUI.getState().annotations.filter(function (ann) {
+      return metadata.isNew(ann) && !metadata.isReply(ann);
+    }).map(function (ann) {
+      return Object.assign(ann, {
+        // FIXME - $$tag is currently a non-enumerable property so it has to be
+        // copied explicitly
+        $$tag: ann.$$tag,
+        group: focusedGroupId,
+      });
+    });
+    if (updatedAnnots.length > 0) {
+      annotationUI.addAnnotations(updatedAnnots);
+    }
+  });
+
   /**
    * Build the root conversation thread from the given UI state.
    * @return {Thread}

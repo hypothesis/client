@@ -867,40 +867,6 @@ describe('annotation', function() {
       });
     });
 
-    describe('when the focused group changes', function() {
-      it('moves new annotations to the focused group', function () {
-        var annotation = fixtures.newAnnotation();
-        annotation.group = 'old-group-id';
-        createDirective(annotation);
-        fakeGroups.focused = sandbox.stub().returns({id: 'new-group-id'});
-
-        $rootScope.$broadcast(events.GROUP_FOCUSED);
-
-        assert.equal(annotation.group, 'new-group-id');
-      });
-
-      it('does not move replies to the focused group', function () {
-        var annotation = fixtures.newReply();
-        fakeGroups.focused = sandbox.stub().returns({id: 'new-group-id'});
-        createDirective(annotation);
-        fakeGroups.focused = sandbox.stub().returns({id: 'new-group-id-2'});
-        $rootScope.$broadcast(events.GROUP_FOCUSED);
-
-        assert.equal(annotation.group, 'new-group-id');
-      });
-
-      it('does not modify the group of saved annotations', function () {
-        var annotation = fixtures.oldAnnotation();
-        annotation.group = 'old-group-id';
-        createDirective(annotation);
-        fakeGroups.focused = sandbox.stub().returns({id: 'new-group-id'});
-
-        $rootScope.$broadcast(events.GROUP_FOCUSED);
-
-        assert.equal(annotation.group, 'old-group-id');
-      });
-    });
-
     describe('reverting edits', function () {
       it('removes the current draft', function() {
         var controller = createDirective(fixtures.defaultAnnotation()).controller;
