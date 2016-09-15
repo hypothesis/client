@@ -35,7 +35,6 @@ var fixtures = {
     },
     payload: [{
       id: 'an-id',
-      group: 'public',
     }],
   },
 };
@@ -109,9 +108,7 @@ describe('Streamer', function () {
     };
 
     fakeGroups = {
-      focused: function () {
-        return {id: 'public'};
-      },
+      focused: sinon.stub().returns({id: 'public'}),
     };
 
     fakeSession = {
@@ -200,6 +197,12 @@ describe('Streamer', function () {
         fakeWebSocket.notify(fixtures.deleteNotification);
         assert.ok(fakeAnnotationMapper.unloadAnnotations.calledOnce);
       });
+
+      it('ignores notifications about annotations in unfocused groups', function () {
+        fakeGroups.focused.returns({id: 'private'});
+        fakeWebSocket.notify(fixtures.createNotification);
+        assert.notCalled(fakeAnnotationMapper.loadAnnotations);
+      });
     });
 
     context('when realtime updates are deferred', function () {
@@ -210,6 +213,12 @@ describe('Streamer', function () {
       it('saves pending updates', function () {
         fakeWebSocket.notify(fixtures.createNotification);
         assert.equal(activeStreamer.countPendingUpdates(), 1);
+      });
+
+      it('does not save pending updates for annotations in unfocused groups', function () {
+        fakeGroups.focused.returns({id: 'private'});
+        fakeWebSocket.notify(fixtures.createNotification);
+        assert.equal(activeStreamer.countPendingUpdates(), 0);
       });
 
       it('saves pending deletions', function () {
@@ -254,13 +263,6 @@ describe('Streamer', function () {
       activeStreamer.applyPendingUpdates();
       assert.calledWith(fakeAnnotationMapper.loadAnnotations,
         fixtures.createNotification.payload);
-    });
-
-    it('does not apply pending updates for annotations in unfocused groups', function () {
-      fakeWebSocket.notify(fixtures.createNotification);
-      fakeGroups.focused = function () { return {id: 'private'}; };
-      activeStreamer.applyPendingUpdates();
-      assert.calledWith(fakeAnnotationMapper.loadAnnotations, []);
     });
 
     it('applies pending deletions', function () {
