@@ -91,7 +91,7 @@ function createAdderDOM(container) {
  *
  * @param {Element} container - The DOM element into which the adder will be created
  * @param {Object} options - Options object specifying `onAnnotate`, `onHighlight`, 
- *        `onInput` event handlers.
+ *        `onAction` event handlers.
  */
 function Adder(container, options) {
 
@@ -119,8 +119,8 @@ function Adder(container, options) {
     .addEventListener('click', handleCommand.bind(this, 'annotate'));
   element.querySelector('.js-highlight-btn')
     .addEventListener('click', handleCommand.bind(this, 'highlight'));
-  element.querySelector('.js-input-btn')
-    .addEventListener('click', handleCommand.bind(this, 'input'));
+  element.querySelector('.js-action-btn')
+    .addEventListener('click', handleCommand.bind(this, 'action'));
 
   function handleCommand(command, event) {
     event.preventDefault();
@@ -130,8 +130,8 @@ function Adder(container, options) {
       options.onAnnotate();
     } else if (command === "highlight") {
       options.onHighlight();
-    } else if (command === "input") {
-      options.onInput();
+    } else if (command === "action") {
+      options.onAction();
     } else {
       console.error("unhandled command: " + handleCommand);
       return null;

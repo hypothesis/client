@@ -65,7 +65,7 @@ module.exports = class Guest extends Annotator
         self.setVisibleHighlights(true)
         self.createHighlight()
         Annotator.Util.getGlobal().getSelection().removeAllRanges()
-      onInput: ->
+      onAction: ->
         self.createAnnotation()
         Annotator.Util.getGlobal().getSelection().removeAllRanges()
     })
@@ -76,7 +76,7 @@ module.exports = class Guest extends Annotator
         else if element.nodeName == "BODY"
           self._onSelection(element)
         else if element.nodeName == "INPUT"
-          self._onInputSelection(element)
+          self._onActionSelection(element)
         else
           console.error("unknown element encountered: " + element.nodeName)
           return
@@ -371,22 +371,20 @@ module.exports = class Guest extends Annotator
     tags = (a.$$tag for a in annotations)
     @crossframe?.call('focusAnnotations', tags)
 
-  _onInputSelection: (element) ->
-    console.log("on input selection 1")
+  _onActionSelection: (element) ->
     selection =  Annotator.Util.getGlobal().getSelection()
     isBackwards = rangeUtil.isSelectionBackwards(selection)
     focusRect = rangeUtil.selectionFocusRect(selection)
     if !focusRect
       # The selected range does not contain any text
       this._onClearSelection()
-      console.log("clear")
       return
 
     range = selection.getRangeAt(0)
     @selectedRanges = [range]
 
     Annotator.$('.annotator-toolbar .h-icon-note')
-      .attr('title', 'New Input')
+      .attr('title', 'New Action')
       .removeClass('h-icon-note')
       .addClass('h-icon-annotate');
 
