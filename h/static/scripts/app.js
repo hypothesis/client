@@ -162,6 +162,7 @@ module.exports = angular.module('h', [
   .directive('sortDropdown', require('./directive/sort-dropdown'))
   .directive('spinner', require('./directive/spinner'))
   .directive('statusButton', require('./directive/status-button'))
+  .directive('svgIcon', require('./directive/svg-icon'))
   .directive('tagEditor', require('./directive/tag-editor'))
   .directive('threadList', require('./directive/thread-list'))
   .directive('timestamp', require('./directive/timestamp'))
