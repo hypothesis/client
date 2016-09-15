@@ -1,0 +1,51 @@
+'use strict';
+
+var util = require('./util');
+
+/**
+ * This module defines actions and state related to the display mode of the
+ * sidebar.
+ */
+
+function init() {
+  return {
+    // Flag that indicates whether the app is the sidebar and connected to
+    // a page where annotations are being shown in context
+    isSidebar: true,
+
+    visibleHighlights: false,
+  };
+}
+
+var update = {
+  SET_SIDEBAR: function (state, action) {
+    return {isSidebar: action.isSidebar};
+  },
+  SET_HIGHLIGHTS_VISIBLE: function (state, action) {
+    return {visibleHighlights: action.visible};
+  },
+};
+
+var actions = util.actionTypes(update);
+
+/** Set whether the app is the sidebar */
+function setAppIsSidebar(isSidebar) {
+  return {type: actions.SET_SIDEBAR, isSidebar: isSidebar};
+}
+
+/**
+ * Sets whether annotation highlights in connected documents are shown
+ * or not.
+ */
+function setShowHighlights(show) {
+  return {type: actions.SET_HIGHLIGHTS_VISIBLE, visible: show};
+}
+
+module.exports = {
+  init: init,
+  update: update,
+  actions: {
+    setAppIsSidebar: setAppIsSidebar,
+    setShowHighlights: setShowHighlights,
+  },
+};
