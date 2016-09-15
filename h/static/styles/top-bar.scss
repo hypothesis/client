@@ -70,6 +70,7 @@
 // on the current page and applies them when clicked
 .top-bar__apply-update-btn {
   display: inline-block;
+  flex-shrink: 0;
   margin-right: 5px;
 
   background-color: $brand;
