@@ -2,6 +2,7 @@
 
 module.exports = function () {
   return {
+    controller: function () {},
     restrict: 'E',
     scope: {
       auth: '<',
