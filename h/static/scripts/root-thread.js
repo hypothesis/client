@@ -39,7 +39,7 @@ var sortFns = {
  * The root thread is then displayed by viewer.html
  */
 // @ngInject
-function RootThread($rootScope, annotationUI, features, searchFilter, viewFilter) {
+function RootThread($rootScope, annotationUI, drafts, features, searchFilter, viewFilter) {
 
   /**
    * Build the root conversation thread from the given UI state.
@@ -106,38 +106,47 @@ function RootThread($rootScope, annotationUI, features, searchFilter, viewFilter
     });
   }
 
+  function deleteNewAndEmptyAnnotations() {
+    annotationUI.getState().annotations.filter(function (ann) {
+      return metadata.isNew(ann) && !drafts.getIfNotEmpty(ann);
+    }).forEach(function (ann) {
+      drafts.remove(ann);
+      $rootScope.$broadcast(events.ANNOTATION_DELETED, ann);
+    });
+  }
+
   // Listen for annotations being created or loaded
   // and show them in the UI.
   //
   // Note: These events could all be converted into actions that are handled by
   // the Redux store in annotationUI.
-  var loadEvents = [events.BEFORE_ANNOTATION_CREATED,
-                    events.ANNOTATION_CREATED,
+  var loadEvents = [events.ANNOTATION_CREATED,
                     events.ANNOTATION_UPDATED,
                     events.ANNOTATIONS_LOADED];
   loadEvents.forEach(function (event) {
     $rootScope.$on(event, function (event, annotation) {
-      var annotations = [].concat(annotation);
+      annotationUI.addAnnotations([].concat(annotation));
+    });
+  });
 
-      // Add or update annotations
-      annotationUI.addAnnotations(annotations);
+  $rootScope.$on(events.BEFORE_ANNOTATION_CREATED, function (event, ann) {
+    // When a new annotation is created, remove any existing annotations
+    // that are empty.
+    deleteNewAndEmptyAnnotations();
 
-      // Ensure that newly created annotations are always visible
-      if (event.name === events.BEFORE_ANNOTATION_CREATED) {
+    annotationUI.addAnnotations([ann]);
 
-        // If the annotation is of type note or annotation, make sure
-        // the appropriate tab is selected. If it is of type reply, user
-        // stays in the selected tab.
-        if (metadata.isPageNote(annotation)) {
-          annotationUI.selectTab(uiConstants.TAB_NOTES);
-        } else if (metadata.isAnnotation(annotation)) {
-          annotationUI.selectTab(uiConstants.TAB_ANNOTATIONS);
-        }
+    // If the annotation is of type note or annotation, make sure
+    // the appropriate tab is selected. If it is of type reply, user
+    // stays in the selected tab.
+    if (metadata.isPageNote(ann)) {
+      annotationUI.selectTab(uiConstants.TAB_NOTES);
+    } else if (metadata.isAnnotation(ann)) {
+      annotationUI.selectTab(uiConstants.TAB_ANNOTATIONS);
+    }
 
-        (annotation.references || []).forEach(function (parent) {
-          annotationUI.setCollapsed(parent, false);
-        });
-      }
+    (ann.references || []).forEach(function (parent) {
+      annotationUI.setCollapsed(parent, false);
     });
   });
 

@@ -867,51 +867,6 @@ describe('annotation', function() {
       });
     });
 
-    describe('when another new annotation is created', function () {
-      it('removes the current annotation if empty', function () {
-        var annotation = fixtures.newEmptyAnnotation();
-        createDirective(annotation);
-        $rootScope.$broadcast(events.BEFORE_ANNOTATION_CREATED,
-          fixtures.newAnnotation());
-        assert.calledWith(fakeDrafts.remove, annotation);
-      });
-
-      it('does not remove the current annotation if is is not new', function () {
-        createDirective(fixtures.defaultAnnotation());
-        fakeDrafts.get.returns({text: '', tags: []});
-        $rootScope.$broadcast(events.BEFORE_ANNOTATION_CREATED,
-          fixtures.newAnnotation());
-        assert.notCalled(fakeDrafts.remove);
-      });
-
-      it('does not remove the current annotation if the scope was destroyed', function () {
-        var annotation = fixtures.newEmptyAnnotation();
-        var parts = createDirective(annotation);
-        parts.scope.$destroy();
-        $rootScope.$broadcast(events.BEFORE_ANNOTATION_CREATED,
-          fixtures.newAnnotation());
-        assert.notCalled(fakeDrafts.remove);
-      });
-
-      it('does not remove the current annotation if it has text', function () {
-        var annotation = fixtures.newAnnotation();
-        createDirective(annotation);
-        fakeDrafts.get.returns({text: 'An incomplete thought'});
-        $rootScope.$broadcast(events.BEFORE_ANNOTATION_CREATED,
-          fixtures.newAnnotation());
-        assert.notCalled(fakeDrafts.remove);
-      });
-
-      it('does not remove the current annotation if it has tags', function () {
-        var annotation = fixtures.newAnnotation();
-        createDirective(annotation);
-        fakeDrafts.get.returns({tags: ['a-tag']});
-        $rootScope.$broadcast(events.BEFORE_ANNOTATION_CREATED,
-          fixtures.newAnnotation());
-        assert.notCalled(fakeDrafts.remove);
-      });
-    });
-
     describe('when the focused group changes', function() {
       it('moves new annotations to the focused group', function () {
         var annotation = fixtures.newAnnotation();
