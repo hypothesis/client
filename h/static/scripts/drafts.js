@@ -39,8 +39,10 @@ function DraftStore() {
   };
 
   /**
-   * Returns a list of all new annotations (those with no ID) for which
-   * unsaved drafts exist.
+   * Returns a list of local tags of new annotations for which unsaved drafts
+   * exist.
+   *
+   * @return {Array<{$$tag: string}>}
    */
   this.unsaved = function unsaved() {
     return this._drafts.filter(function(draft) {
@@ -71,7 +73,7 @@ function DraftStore() {
    */
   this.update = function update(model, changes) {
     var newDraft = {
-      model: model,
+      model: {id: model.id, $$tag: model.$$tag},
       isPrivate: changes.isPrivate,
       tags: changes.tags,
       text: changes.text,

@@ -54,7 +54,7 @@ describe('drafts', function () {
 
   describe('#unsaved', function () {
     it('should return drafts for unsaved annotations', function () {
-      var model = {};
+      var model = {$$tag: 'local-tag', id: undefined};
       drafts.update(model, {text: 'bar'});
       assert.deepEqual(drafts.unsaved(), [model]);
     });
