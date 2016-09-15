@@ -65,6 +65,9 @@ module.exports = class Guest extends Annotator
         self.setVisibleHighlights(true)
         self.createHighlight()
         Annotator.Util.getGlobal().getSelection().removeAllRanges()
+      onInput: ->
+        self.createAnnotation()
+        Annotator.Util.getGlobal().getSelection().removeAllRanges()
     })
     this.selections = selections(document).subscribe
       next: (element) ->
@@ -75,7 +78,7 @@ module.exports = class Guest extends Annotator
         else if element.nodeName == "INPUT"
           self._onInputSelection(element)
         else
-          console.log("unknown element encountered: " + element.nodeName)
+          console.error("unknown element encountered: " + element.nodeName)
           return
 
     this.anchors = []
@@ -369,9 +372,26 @@ module.exports = class Guest extends Annotator
     @crossframe?.call('focusAnnotations', tags)
 
   _onInputSelection: (element) ->
-    # stub
-    console.log("on input selection")
-    return
+    console.log("on input selection 1")
+    selection =  Annotator.Util.getGlobal().getSelection()
+    isBackwards = rangeUtil.isSelectionBackwards(selection)
+    focusRect = rangeUtil.selectionFocusRect(selection)
+    if !focusRect
+      # The selected range does not contain any text
+      this._onClearSelection()
+      console.log("clear")
+      return
+
+    range = selection.getRangeAt(0)
+    @selectedRanges = [range]
+
+    Annotator.$('.annotator-toolbar .h-icon-note')
+      .attr('title', 'New Input')
+      .removeClass('h-icon-note')
+      .addClass('h-icon-annotate');
+
+    {left, top, arrowDirection} = this.adderCtrl.target(focusRect, isBackwards)
+    this.adderCtrl.showAt(left, top, arrowDirection)
 
   _onSelection: (element) ->
     selection =  Annotator.Util.getGlobal().getSelection()
