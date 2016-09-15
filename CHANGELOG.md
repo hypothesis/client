@@ -4,7 +4,7 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
-## [Unreleased]
+## [0.43.0] - 2016-09-15
 
 ### Added
 
