@@ -2,14 +2,21 @@
 
 var observable = require('../util/observable');
 
-/** Returns the selected `DOMRange` in `document`. */
-function selectedRange(document) {
+/* Returns the active DOM element that was selected, filtering out unactionable selections. */
+function selectedElement(document) {
+
   var selection = document.getSelection();
-  if (!selection.rangeCount || selection.getRangeAt(0).collapsed) {
-    return null;
-  } else {
-    return selection.getRangeAt(0);
+  var nodeName = document.activeElement.nodeName;
+
+  if (nodeName == "BODY") {
+      if (!selection.rangeCount || selection.getRangeAt(0).collapsed) {
+        return null;
+      } else {
+        return document.activeElement;
+      }
   }
+
+  return null;
 }
 
 /**
@@ -24,7 +31,6 @@ function selectedRange(document) {
  * @return Observable<DOMRange|null>
  */
 function selections(document) {
-
   // Get a stream of selection changes that occur whilst the user is not
   // making a selection with the mouse.
   var isMouseDown;
@@ -54,7 +60,7 @@ function selections(document) {
   ]);
 
   return events.map(function () {
-    return selectedRange(document);
+    return selectedElement(document);
   });
 }
 

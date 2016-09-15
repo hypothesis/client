@@ -67,11 +67,14 @@ module.exports = class Guest extends Annotator
         Annotator.Util.getGlobal().getSelection().removeAllRanges()
     })
     this.selections = selections(document).subscribe
-      next: (range) ->
-        if range
-          self._onSelection(range)
-        else
+      next: (element) ->
+        if !element
           self._onClearSelection()
+        else if element.nodeName == "BODY"
+          self._onSelection(element)
+        else
+          console.log("unknown element encountered: " + element.nodeName)
+          return
 
     this.anchors = []
 
@@ -363,8 +366,8 @@ module.exports = class Guest extends Annotator
     tags = (a.$$tag for a in annotations)
     @crossframe?.call('focusAnnotations', tags)
 
-  _onSelection: (range) ->
-    selection = Annotator.Util.getGlobal().getSelection()
+  _onSelection: (element) ->
+    selection =  Annotator.Util.getGlobal().getSelection()
     isBackwards = rangeUtil.isSelectionBackwards(selection)
     focusRect = rangeUtil.selectionFocusRect(selection)
     if !focusRect
@@ -372,6 +375,7 @@ module.exports = class Guest extends Annotator
       this._onClearSelection()
       return
 
+    range = selection.getRangeAt(0)
     @selectedRanges = [range]
 
     Annotator.$('.annotator-toolbar .h-icon-note')
