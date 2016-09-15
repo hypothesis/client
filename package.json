@@ -1,6 +1,6 @@
 {
   "name": "hypothesis",
-  "version": "0.42.0",
+  "version": "0.43.0",
   "description": "Annotate with anyone, anywhere.",
   "license": "BSD-2-Clause",
   "homepage": "https://hypothes.is",
@@ -76,6 +76,7 @@
     "raf": "^3.1.0",
     "raven-js": "^2.0.2",
     "redux": "^3.5.2",
+    "redux-thunk": "^2.1.0",
     "request": "^2.72.0",
     "retry": "^0.8.0",
     "scroll-into-view": "^1.3.1",
@@ -102,7 +103,8 @@
         {
           "appliesTo": {
             "includeExtensions": [
-              ".html"
+              ".html",
+              ".svg"
             ]
           }
         }

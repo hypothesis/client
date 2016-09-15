@@ -145,6 +145,7 @@
       <button class="btn btn-clean annotation-action-btn"
         ng-show="vm.authorize('update') && !vm.isSaving"
         ng-click="vm.edit()"
+        ng-disabled="vm.isDeleted()"
         aria-label="Edit"
         h-tooltip>
         <i class="h-icon-annotation-edit btn-icon "></i>
@@ -152,12 +153,14 @@
       <button class="btn btn-clean annotation-action-btn"
         ng-show="vm.authorize('delete')"
         ng-click="vm.delete()"
+        ng-disabled="vm.isDeleted()"
         aria-label="Delete"
         h-tooltip>
         <i class="h-icon-annotation-delete btn-icon "></i>
       </button>
       <button class="btn btn-clean annotation-action-btn"
         ng-click="vm.reply()"
+        ng-disabled="vm.isDeleted()"
         aria-label="Reply"
         h-tooltip>
         <i class="h-icon-annotation-reply btn-icon "></i>
@@ -165,6 +168,7 @@
       <span class="annotation-share-dialog-wrapper">
         <button class="btn btn-clean annotation-action-btn"
           ng-click="vm.showShareDialog = true"
+          ng-disabled="vm.isDeleted()"
           aria-label="Share"
           h-tooltip>
           <i class="h-icon-annotation-share btn-icon "></i>

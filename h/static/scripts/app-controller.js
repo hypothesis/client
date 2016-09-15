@@ -25,7 +25,7 @@ function authStateFromUserID(userid) {
 module.exports = function AppController(
   $controller, $document, $location, $rootScope, $route, $scope,
   $window, annotationUI, auth, drafts, features, groups,
-  serviceUrl, session, settings
+  serviceUrl, session, settings, streamer
 ) {
   $controller('AnnotationUIController', {$scope: $scope});
 
@@ -151,4 +151,7 @@ module.exports = function AppController(
       annotationUI.setFilterQuery(query);
     },
   };
+
+  $scope.countPendingUpdates = streamer.countPendingUpdates;
+  $scope.applyPendingUpdates = streamer.applyPendingUpdates;
 };

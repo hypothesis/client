@@ -1,6 +1,6 @@
 {
   "name": "hypothesis",
-  "version": "0.42.0",
+  "version": "0.43.0",
   "dependencies": {
     "abbrev": {
       "version": "1.0.7",
@@ -3917,6 +3917,11 @@
           "resolved": "https://registry.npmjs.org/lodash/-/lodash-4.11.2.tgz"
         }
       }
+    },
+    "redux-thunk": {
+      "version": "2.1.0",
+      "from": "redux-thunk@>=2.1.0 <3.0.0",
+      "resolved": "https://registry.npmjs.org/redux-thunk/-/redux-thunk-2.1.0.tgz"
     },
     "regenerate": {
       "version": "1.2.1",

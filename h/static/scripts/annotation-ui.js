@@ -1,8 +1,8 @@
 'use strict';
 
 /**
- * AnnotationUI provides the central store of UI state for the application,
- * using [Redux](http://redux.js.org/).
+ * AnnotationUI is the central store of state for the sidebar application,
+ * managed using [Redux](http://redux.js.org/).
  *
  * Redux is used to provide a predictable way of updating UI state and
  * responding to UI state changes.
@@ -192,8 +192,16 @@ function initializeAnnot(annotation) {
 /**
  * Return state updates necessary to select a different tab.
  *
- * This function accepts the name of a tab and returns an object which must be
- * merged into the current state to achieve the desired tab change.
+ * "middleware" functions can wrap the dispatch process in order to implement
+ *  logging, trigger side effects etc.
+ *
+ * Tests for a given action consist of:
+ *
+ *  1. Checking that the UI (or other event source) dispatches the correct
+ *     action when something happens.
+ *  2. Checking that given an initial state, and an action, a reducer returns
+ *     the correct resulting state.
+ *  3. Checking that the UI correctly presents a given state.
  */
 function selectTab(state, newTab) {
   // Do nothing if the "new tab" is not a valid tab.
@@ -227,116 +235,16 @@ function annotationsReducer(state, action) {
       var unchanged = [];
       var updated = [];
 
-      action.annotations.forEach(function (annot) {
-        var existing;
-        if (annot.id) {
-          existing = findByID(state.annotations, annot.id);
-        }
-        if (!existing && annot.$$tag) {
-          existing = findByTag(state.annotations, annot.$$tag);
-        }
+var redux = require('redux');
 
-        if (existing) {
-          // Merge the updated annotation with the private fields from the local
-          // annotation
-          updated.push(Object.assign({}, existing, annot));
-          if (annot.id) {
-            updatedIDs[annot.id] = true;
-          }
-          if (existing.$$tag) {
-            updatedTags[existing.$$tag] = true;
-          }
-        } else {
-          added.push(initializeAnnot(annot));
-        }
-      });
+// `.default` is needed because 'redux-thunk' is built as an ES2015 module
+var thunk = require('redux-thunk').default;
 
-      state.annotations.forEach(function (annot) {
-        if (!updatedIDs[annot.id] && !updatedTags[annot.$$tag]) {
-          unchanged.push(annot);
-        }
-      });
-
-      return Object.assign({}, state, {
-        annotations: added.concat(updated).concat(unchanged),
-      });
-    }
-  case types.REMOVE_ANNOTATIONS:
-    {
-      var annots = excludeAnnotations(state.annotations, action.annotations);
-      var selectedTab = state.selectedTab;
-      if (selectedTab === uiConstants.TAB_ORPHANS &&
-          arrayUtil.countIf(annots, metadata.isOrphan) === 0) {
-        selectedTab = uiConstants.TAB_ANNOTATIONS;
-      }
-      return Object.assign(
-        {},
-        state,
-        {annotations: annots},
-        selectTab(state, selectedTab)
-      );
-    }
-  case types.CLEAR_ANNOTATIONS:
-    return Object.assign({}, state, {annotations: []});
-  case types.UPDATE_ANCHOR_STATUS:
-    {
-      var annotations = state.annotations.map(function (annot) {
-        var match = (annot.id && annot.id === action.id) ||
-                    (annot.$$tag && annot.$$tag === action.tag);
-        if (match) {
-          return Object.assign({}, annot, {
-            $orphan: action.isOrphan,
-            $$tag: action.tag,
-          });
-        } else {
-          return annot;
-        }
-      });
-      return Object.assign({}, state, {annotations: annotations});
-    }
-  default:
-    return state;
-  }
-}
-
-function reducer(state, action) {
-  /*jshint maxcomplexity: false*/
-  state = annotationsReducer(state, action);
-
-  switch (action.type) {
-  case types.CLEAR_SELECTION:
-    return Object.assign({}, state, {
-      filterQuery: null,
-      selectedAnnotationMap: null,
-    });
-  case types.SELECT_ANNOTATIONS:
-    return Object.assign({}, state, {selectedAnnotationMap: action.selection});
-  case types.FOCUS_ANNOTATIONS:
-    return Object.assign({}, state, {focusedAnnotationMap: action.focused});
-  case types.SET_HIGHLIGHTS_VISIBLE:
-    return Object.assign({}, state, {visibleHighlights: action.visible});
-  case types.SET_FORCE_VISIBLE:
-    return Object.assign({}, state, {forceVisible: action.forceVisible});
-  case types.SET_EXPANDED:
-    return Object.assign({}, state, {expanded: action.expanded});
-  case types.HIGHLIGHT_ANNOTATIONS:
-    return Object.assign({}, state, {highlighted: action.highlighted});
-  case types.SELECT_TAB:
-    return Object.assign({}, state, selectTab(state, action.tab));
-  case types.SET_FILTER_QUERY:
-    return Object.assign({}, state, {
-      filterQuery: action.query,
-      forceVisible: {},
-      expanded: {},
-    });
-  case types.SET_SIDEBAR:
-    return Object.assign({}, state, {isSidebar: action.isSidebar});
-  case types.SET_SORT_KEY:
-    return Object.assign({}, state, {sortKey: action.key});
-  default:
-    return state;
-  }
-}
+var reducers = require('./reducers');
+var annotationsReducer = require('./reducers/annotations');
+var selectionReducer = require('./reducers/selection');
+var viewerReducer = require('./reducers/viewer');
+var util = require('./reducers/util');
 
 /**
  * Redux middleware which triggers an Angular change-detection cycle
@@ -363,276 +271,43 @@ function angularDigestMiddleware($rootScope) {
   };
 }
 
-/**
- * Stores the UI state of the annotator in connected clients.
- *
- * This includes:
- * - The IDs of annotations that are currently selected or focused
- * - The state of the bucket bar
- */
 // @ngInject
 module.exports = function ($rootScope, settings) {
   var enhancer = redux.applyMiddleware(
+    // The `thunk` middleware handles actions which are functions.
+    // This is used to implement actions which have side effects or are
+    // asynchronous (see https://github.com/gaearon/redux-thunk#motivation)
+    thunk,
     angularDigestMiddleware.bind(null, $rootScope)
   );
-  var store = redux.createStore(reducer, initialState(settings), enhancer);
+  var store = redux.createStore(reducers.update, reducers.init(settings),
+    enhancer);
 
-  function select(annotations) {
-    store.dispatch({
-      type: types.SELECT_ANNOTATIONS,
-      selection: freeze(annotations),
-    });
-  }
+  // Expose helper functions that create actions as methods of the
+  // `annotationUI` service to make using them easier from app code. eg.
+  //
+  // Instead of:
+  //   annotationUI.dispatch(annotations.actions.addAnnotations(annotations))
+  // You can use:
+  //   annotationUI.addAnnotations(annotations)
+  //
+  var actionCreators = redux.bindActionCreators(Object.assign({},
+    annotationsReducer.actions,
+    selectionReducer.actions,
+    viewerReducer.actions
+  ), store.dispatch);
 
-  function findByID(id) {
-    return store.getState().annotations.find(function (annot) {
-      return annot.id === id;
-    });
-  }
+  // Expose selectors as methods of the `annotationUI` to make using them easier
+  // from app code.
+  //
+  // eg. Instead of:
+  //   selection.isAnnotationSelected(annotationUI.getState(), id)
+  // You can use:
+  //   annotationUI.isAnnotationSelected(id)
+  var selectors = util.bindSelectors({
+    isAnnotationSelected: selectionReducer.isAnnotationSelected,
+    hasSelectedAnnotations: selectionReducer.hasSelectedAnnotations,
+  }, store.getState);
 
-  return {
-    /**
-     * Return the current UI state of the sidebar. This should not be modified
-     * directly but only though the helper methods below.
-     */
-    getState: store.getState,
-
-    /** Listen for changes to the UI state of the sidebar. */
-    subscribe: store.subscribe,
-
-    /**
-     * Sets whether annotation highlights in connected documents are shown
-     * or not.
-     */
-    setShowHighlights: function (show) {
-      store.dispatch({
-        type: types.SET_HIGHLIGHTS_VISIBLE,
-        visible: show,
-      });
-    },
-
-    /**
-     * Sets which annotations are currently focused.
-     *
-     * @param {Array<string>} Tags of annotations to focus
-     */
-    focusAnnotations: function (tags) {
-      store.dispatch({
-        type: types.FOCUS_ANNOTATIONS,
-        focused: freeze(toSet(tags)),
-      });
-    },
-
-    /**
-     * Return true if any annotations are currently selected.
-     */
-    hasSelectedAnnotations: function () {
-      return !!store.getState().selectedAnnotationMap;
-    },
-
-    /**
-     * Sets whether replies to the annotation with ID `id` are collapsed.
-     *
-     * @param {string} id - Annotation ID
-     * @param {boolean} collapsed
-     */
-    setCollapsed: function (id, collapsed) {
-      var expanded = Object.assign({}, store.getState().expanded);
-      expanded[id] = !collapsed;
-      store.dispatch({
-        type: types.SET_EXPANDED,
-        expanded: expanded,
-      });
-    },
-
-    /**
-     * Sets whether a given annotation should be visible, even if it does not
-     * match the current search query.
-     *
-     * @param {string} id - Annotation ID
-     * @param {boolean} visible
-     */
-    setForceVisible: function (id, visible) {
-      var forceVisible = Object.assign({}, store.getState().forceVisible);
-      forceVisible[id] = visible;
-      store.dispatch({
-        type: types.SET_FORCE_VISIBLE,
-        forceVisible: forceVisible,
-      });
-    },
-
-    /**
-     * Returns true if the annotation with the given `id` is selected.
-     */
-    isAnnotationSelected: function (id) {
-      return (store.getState().selectedAnnotationMap || {}).hasOwnProperty(id);
-    },
-
-    /**
-     * Set the currently selected annotation IDs.
-     */
-    selectAnnotations: function (ids) {
-      select(toSet(ids));
-    },
-
-    /** Toggle whether annotations are selected or not. */
-    toggleSelectedAnnotations: function (ids) {
-      var selection = Object.assign({}, store.getState().selectedAnnotationMap);
-      for (var i = 0; i < ids.length; i++) {
-        var id = ids[i];
-        if (selection[id]) {
-          delete selection[id];
-        } else {
-          selection[id] = true;
-        }
-      }
-      select(selection);
-    },
-
-    /** De-select an annotation. */
-    removeSelectedAnnotation: function (id) {
-      var selection = Object.assign({}, store.getState().selectedAnnotationMap);
-      if (!selection || !id) {
-        return;
-      }
-      delete selection[id];
-      select(selection);
-    },
-
-    /** De-select all annotations. */
-    clearSelectedAnnotations: function () {
-      store.dispatch({type: 'CLEAR_SELECTION'});
-    },
-
-    /** Add annotations to the currently displayed set. */
-    addAnnotations: function (annotations, now) {
-      now = now || new Date();
-
-      var added = annotations.filter(function (annot) {
-        return !findByID(annot.id);
-      });
-
-      // Add dates to new annotations. These are ignored by the server but used
-      // when sorting unsaved annotation cards.
-      annotations = annotations.map(function (annot) {
-        if (annot.id) { return annot; }
-        return Object.assign({
-          // Copy $$tag explicitly because it is non-enumerable.
-          //
-          // FIXME: change $$tag to $tag and make it enumerable so annotations
-          // can be handled more simply in the sidebar.
-          $$tag: annot.$$tag,
-          // Date.prototype.toISOString returns a 0-offset (UTC) ISO8601
-          // datetime.
-          created: now.toISOString(),
-          updated: now.toISOString(),
-        }, annot);
-      });
-
-      store.dispatch({
-        type: types.ADD_ANNOTATIONS,
-        annotations: annotations,
-      });
-
-      if (!store.getState().isSidebar) {
-        return;
-      }
-
-      // If anchoring fails to complete in a reasonable amount of time, then
-      // we assume that the annotation failed to anchor. If it does later
-      // successfully anchor then the status will be updated.
-      var ANCHORING_TIMEOUT = 500;
-
-      var anchoringAnnots = added.filter(metadata.isWaitingToAnchor);
-      if (anchoringAnnots.length) {
-        setTimeout(function () {
-          arrayUtil
-            .filterMap(anchoringAnnots, function (annot) {
-              return findByID(annot.id);
-            })
-            .filter(metadata.isWaitingToAnchor)
-            .forEach(function (orphan) {
-              store.dispatch({
-                type: types.UPDATE_ANCHOR_STATUS,
-                id: orphan.id,
-                tag: orphan.$$tag,
-                isOrphan: true,
-              });
-            });
-        }, ANCHORING_TIMEOUT);
-      }
-    },
-
-    /** Remove annotations from the currently displayed set. */
-    removeAnnotations: function (annotations) {
-      store.dispatch({
-        type: types.REMOVE_ANNOTATIONS,
-        annotations: annotations,
-      });
-    },
-
-    /** Set the currently displayed annotations to the empty set. */
-    clearAnnotations: function () {
-      store.dispatch({type: types.CLEAR_ANNOTATIONS});
-    },
-
-    /**
-     * Updating the local tag and anchoring status of an annotation.
-     *
-     * @param {string|null} id - Annotation ID
-     * @param {string} tag - The local tag assigned to this annotation to link
-     *        the object in the page and the annotation in the sidebar
-     * @param {boolean} isOrphan - True if the annotation failed to anchor
-     */
-    updateAnchorStatus: function (id, tag, isOrphan) {
-      store.dispatch({
-        type: types.UPDATE_ANCHOR_STATUS,
-        id: id,
-        tag: tag,
-        isOrphan: isOrphan,
-      });
-    },
-
-    /** Set the type annotations to be displayed. */
-    selectTab: function (type) {
-      store.dispatch({
-        type: types.SELECT_TAB,
-        tab: type,
-      });
-    },
-
-    /** Set the query used to filter displayed annotations. */
-    setFilterQuery: function (query) {
-      store.dispatch({
-        type: types.SET_FILTER_QUERY,
-        query: query,
-      });
-    },
-
-    /** Sets the sort key for the annotation list. */
-    setSortKey: function (key) {
-      store.dispatch({
-        type: types.SET_SORT_KEY,
-        key: key,
-      });
-    },
-
-    /**
-     * Highlight annotations with the given `ids`.
-     *
-     * This is used to indicate the specific annotation in a thread that was
-     * linked to for example.
-     */
-    highlightAnnotations: function (ids) {
-      store.dispatch({
-        type: types.HIGHLIGHT_ANNOTATIONS,
-        highlighted: ids,
-      });
-    },
-
-    /** Set whether the app is the sidebar */
-    setAppIsSidebar: function (isSidebar) {
-      store.dispatch({type: types.SET_SIDEBAR, isSidebar: isSidebar});
-    },
-  };
+  return Object.assign(store, actionCreators, selectors);
 };

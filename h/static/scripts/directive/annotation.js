@@ -51,7 +51,7 @@ function updateModel(annotation, changes, permissions) {
 function AnnotationController(
   $document, $q, $rootScope, $scope, $timeout, $window, annotationUI,
   annotationMapper, drafts, flash, features, groups, permissions, serviceUrl,
-  session, store) {
+  session, store, streamer) {
 
   var vm = this;
   var newlyCreatedByHighlightButton;
@@ -462,6 +462,10 @@ function AnnotationController(
 
   vm.username = function() {
     return persona.username(vm.annotation.user);
+  };
+
+  vm.isDeleted = function () {
+    return streamer.hasPendingDeletion(vm.annotation.id);
   };
 
   vm.isReply = function () {

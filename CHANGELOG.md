@@ -4,6 +4,16 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [0.43.0] - 2016-09-15
+
+### Added
+
+- Behind the `defer_realtime_updates` flag, add the ability to accumulate
+  "real-time" changes and display a button notifying users of new activity,
+  rather than automatically applying these changes to their view. This should
+  result in a less jumpy experience for users on heavily-annotated documents.
+  ([#106](https://github.com/hypothesis/client/pull/106)).
+
 ## [0.42.0] - 2016-09-13
 
 ### Changed

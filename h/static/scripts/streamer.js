@@ -2,6 +2,7 @@
 
 var uuid = require('node-uuid');
 
+var events = require('./events');
 var Socket = require('./websocket');
 
 /**
@@ -18,7 +19,7 @@ var Socket = require('./websocket');
  * @param settings - Application settings
  */
 // @ngInject
-function Streamer($rootScope, annotationMapper, groups, session, settings) {
+function Streamer($rootScope, annotationMapper, features, groups, session, settings) {
   // The randomly generated session UUID
   var clientId = uuid.v4();
 
@@ -29,6 +30,23 @@ function Streamer($rootScope, annotationMapper, groups, session, settings) {
   // established.
   var configMessages = {};
 
+  // The streamer maintains a set of pending updates and deletions which have
+  // been received via the WebSocket but not yet applied to the contents of the
+  // app.
+  //
+  // This state should be managed as part of the global app state in
+  // annotationUI, but that is currently difficult because applying updates
+  // requires filtering annotations against the focused group (information not
+  // currently stored in the app state) and triggering events in order to update
+  // the annotations displayed in the page.
+
+  // Map of ID -> updated annotation for updates that have been received over
+  // the WS but not yet applied
+  var pendingUpdates = {};
+  // Set of IDs of annotations which have been deleted but for which the
+  // deletion has not yet been applied
+  var pendingDeletions = {};
+
   function handleAnnotationNotification(message) {
     var action = message.options.action;
     var annotations = message.payload;
@@ -37,25 +55,24 @@ function Streamer($rootScope, annotationMapper, groups, session, settings) {
       return;
     }
 
-    // Discard annotations that aren't from the currently focused group.
-    // Unless the action is delete, where we only get an id
-    // FIXME: Have the server only send us annotations from the focused
-    // group in the first place.
-    if (action !== 'delete') {
-      annotations = annotations.filter(function (ann) {
-        return ann.group === groups.focused().id;
-      });
-    }
-
     switch (action) {
     case 'create':
     case 'update':
     case 'past':
-      annotationMapper.loadAnnotations(annotations);
+      annotations.forEach(function (ann) {
+        pendingUpdates[ann.id] = ann;
+      });
       break;
     case 'delete':
-      annotationMapper.unloadAnnotations(annotations);
+      annotations.forEach(function (ann) {
+        delete pendingUpdates[ann.id];
+        pendingDeletions[ann.id] = true;
+      });
       break;
+    }
+
+    if (!features.flagEnabled('defer_realtime_updates')) {
+      applyPendingUpdates();
     }
   }
 
@@ -155,6 +172,59 @@ function Streamer($rootScope, annotationMapper, groups, session, settings) {
     _connect();
   };
 
+  function applyPendingUpdates() {
+    var updates = Object.values(pendingUpdates).filter(function (ann) {
+      // Ignore updates to annotations that are not in the focused group
+      return ann.group === groups.focused().id;
+    });
+    var deletions = Object.keys(pendingDeletions).map(function (id) {
+      return {id: id};
+    });
+
+    annotationMapper.loadAnnotations(updates);
+    annotationMapper.unloadAnnotations(deletions);
+
+    pendingUpdates = {};
+    pendingDeletions = {};
+  }
+
+  function countPendingUpdates() {
+    return Object.keys(pendingUpdates).length;
+  }
+
+  function hasPendingDeletion(id) {
+    return pendingDeletions.hasOwnProperty(id);
+  }
+
+  function removePendingUpdates(event, anns) {
+    if (!Array.isArray(anns)) {
+      anns = [anns];
+    }
+    anns.forEach(function (ann) {
+      delete pendingUpdates[ann.id];
+      delete pendingDeletions[ann.id];
+    });
+  }
+
+  function clearPendingUpdates() {
+    pendingUpdates = {};
+    pendingDeletions = {};
+  }
+
+  var updateEvents = [
+    events.ANNOTATION_DELETED,
+    events.ANNOTATION_UPDATED,
+    events.ANNOTATIONS_UNLOADED,
+  ];
+
+  updateEvents.forEach(function (event) {
+    $rootScope.$on(event, removePendingUpdates);
+  });
+  $rootScope.$on(events.GROUP_FOCUSED, clearPendingUpdates);
+
+  this.applyPendingUpdates = applyPendingUpdates;
+  this.countPendingUpdates = countPendingUpdates;
+  this.hasPendingDeletion = hasPendingDeletion;
   this.clientId = clientId;
   this.configMessages = configMessages;
   this.connect = connect;
