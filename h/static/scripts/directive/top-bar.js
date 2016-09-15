@@ -2,6 +2,7 @@
 
 module.exports = function () {
   return {
+    controller: function () {},
     restrict: 'E',
     scope: {
       auth: '<',
@@ -16,6 +17,8 @@ module.exports = function () {
       sortKey: '<',
       sortKeysAvailable: '<',
       onChangeSortKey: '&',
+      pendingUpdateCount: '<',
+      onApplyPendingUpdates: '&',
     },
     template: require('../../../templates/client/top_bar.html'),
   };

@@ -22,6 +22,7 @@ describe('AppController', function () {
   var fakeRoute = null;
   var fakeServiceUrl = null;
   var fakeSettings = null;
+  var fakeStreamer = null;
   var fakeWindow = null;
 
   var sandbox = null;
@@ -96,6 +97,10 @@ describe('AppController', function () {
 
     fakeServiceUrl = sinon.stub();
     fakeSettings = {};
+    fakeStreamer = {
+      countPendingUpdates: sinon.stub(),
+      applyPendingUpdates: sinon.stub(),
+    };
 
     $provide.value('annotationUI', fakeAnnotationUI);
     $provide.value('auth', fakeAuth);
@@ -104,6 +109,7 @@ describe('AppController', function () {
     $provide.value('serviceUrl', fakeServiceUrl);
     $provide.value('session', fakeSession);
     $provide.value('settings', fakeSettings);
+    $provide.value('streamer', fakeStreamer);
     $provide.value('groups', fakeGroups);
     $provide.value('$route', fakeRoute);
     $provide.value('$location', fakeLocation);

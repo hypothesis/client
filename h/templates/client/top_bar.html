@@ -10,6 +10,15 @@
       always-expanded="true">
     </search-input>
     <div class="top-bar__expander"></div>
+    <a class="top-bar__apply-update-btn"
+       ng-if="pendingUpdateCount > 0"
+       ng-click="onApplyPendingUpdates()"
+       h-tooltip
+       tooltip-direction="up"
+       aria-label="View {{pendingUpdateCount}} updates">
+       <svg-icon class="top-bar__apply-icon" name="'refresh'"></svg-icon>
+       {{pendingUpdateCount}}
+    </a>
     <login-control
       auth="auth"
       new-style="false"
@@ -26,6 +35,15 @@
   <div class="top-bar__inner content" ng-if="::isSidebar">
     <group-list class="group-list" auth="auth"></group-list>
     <div class="top-bar__expander"></div>
+    <a class="top-bar__apply-update-btn"
+       ng-if="pendingUpdateCount > 0"
+       ng-click="onApplyPendingUpdates()"
+       h-tooltip
+       tooltip-direction="up"
+       aria-label="View {{pendingUpdateCount}} updates">
+       <svg-icon class="top-bar__apply-icon" name="'refresh'"></svg-icon>
+       {{pendingUpdateCount}}
+    </a>
     <search-input
       class="search-input"
       query="searchController.query()"

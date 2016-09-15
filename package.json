@@ -103,7 +103,8 @@
         {
           "appliesTo": {
             "includeExtensions": [
-              ".html"
+              ".html",
+              ".svg"
             ]
           }
         }

@@ -90,6 +90,7 @@ describe('annotation', function() {
     var fakeServiceUrl;
     var fakeSession;
     var fakeStore;
+    var fakeStreamer;
     var sandbox;
 
     function createDirective(annotation) {
@@ -190,6 +191,10 @@ describe('annotation', function() {
         },
       };
 
+      fakeStreamer = {
+        hasPendingDeletion: sinon.stub(),
+      };
+
       $provide.value('annotationMapper', fakeAnnotationMapper);
       $provide.value('annotationUI', fakeAnnotationUI);
       $provide.value('drafts', fakeDrafts);
@@ -200,6 +205,7 @@ describe('annotation', function() {
       $provide.value('session', fakeSession);
       $provide.value('serviceUrl', fakeServiceUrl);
       $provide.value('store', fakeStore);
+      $provide.value('streamer', fakeStreamer);
     }));
 
     beforeEach(
@@ -675,6 +681,20 @@ describe('annotation', function() {
         var annot = fixtures.defaultAnnotation();
         var controller = createDirective(annot).controller;
         assert.deepEqual(controller.documentMeta(), fakeDocumentMeta);
+      });
+    });
+
+    describe('#isDeleted', function () {
+      it('returns true if the annotation has been marked as deleted', function () {
+        var controller = createDirective().controller;
+        fakeStreamer.hasPendingDeletion.returns(true);
+        assert.equal(controller.isDeleted(), true);
+      });
+
+      it('returns false if the annotation has not been marked as deleted', function () {
+        var controller = createDirective().controller;
+        fakeStreamer.hasPendingDeletion.returns(false);
+        assert.equal(controller.isDeleted(), false);
       });
     });
 

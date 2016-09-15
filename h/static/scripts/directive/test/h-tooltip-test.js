@@ -44,6 +44,16 @@ describe('h-tooltip', function () {
     assert.equal(tooltipEl.textContent, 'Share');
   });
 
+  it('sets the direction from the target\'s "tooltip-direction" attribute', function () {
+    targetEl.setAttribute('tooltip-direction', 'up');
+    util.sendEvent(targetEl, 'mouseover');
+    assert.deepEqual(Array.from(tooltipEl.classList), ['tooltip','tooltip--up']);
+
+    targetEl.setAttribute('tooltip-direction', 'down');
+    util.sendEvent(targetEl, 'mouseover');
+    assert.deepEqual(Array.from(tooltipEl.classList), ['tooltip','tooltip--down']);
+  });
+
   it('disappears when the target is unhovered', function () {
     util.sendEvent(targetEl, 'mouseout');
     assert.equal(tooltipEl.style.visibility, 'hidden');

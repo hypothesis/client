@@ -1,3 +1,8 @@
+// Tooltips
+// --------
+// Custom tooltips that appear instantly, replacing the browser's default
+// tooltip
+
 @mixin tooltip-arrow($rotation) {
   transform: rotate($rotation);
   background: $grey-7;
@@ -14,6 +19,7 @@
   width: 6px;
 }
 
+// The tooltip background
 .tooltip {
   @include font-small;
 
@@ -29,13 +35,23 @@
   z-index: $zindex-tooltip;
 }
 
-// Arrow at the bottom of the tooltip pointing down at the target element.
-.tooltip:before {
+// Arrow at the bottom of the tooltip pointing at the target element
+
+// Variant for tooltips above the target that point down at it
+.tooltip--down:before {
   @include tooltip-arrow(45deg);
   content: "";
   top: calc(100% - 5px);
 }
 
+// Variant for tooltips below the target that point up at it
+.tooltip--up:before {
+  @include tooltip-arrow(225deg);
+  content: "";
+  top: -3px;
+}
+
+// The text content inside the tooltip
 .tooltip-label {
   // Make the label a positioned element so that it appears _above_ the
   // tooltip's arrow, which partially overlaps the content of the tooltip.

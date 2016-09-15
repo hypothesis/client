@@ -66,6 +66,36 @@
   }
 }
 
+// Button which indicates that other users have made or edited annotations
+// on the current page and applies them when clicked
+//
+// The button displays a 'refresh' icon and an update count, both of which
+// should be vertically centered within the icon.
+.top-bar__apply-update-btn {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  flex-shrink: 0;
+  margin-right: 5px;
+
+  background-color: $brand;
+  border-radius: 2px;
+  color: white;
+  cursor: pointer;
+  font-weight: bold;
+  padding-bottom: 2px;
+  padding-left: 5px;
+  padding-right: 5px;
+  padding-top: 2px;
+  user-select: none;
+}
+
+.top-bar__apply-icon {
+  display: inline-block;
+  line-height: 12px;
+  margin-right: 5px;
+}
+
 .top-bar__dropdown-arrow {
   color: $color-dove-gray;
 }
