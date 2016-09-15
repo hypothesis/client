@@ -206,6 +206,11 @@ function Streamer($rootScope, annotationMapper, features, groups, session, setti
     });
   }
 
+  function clearPendingUpdates() {
+    pendingUpdates = {};
+    pendingDeletions = {};
+  }
+
   var updateEvents = [
     events.ANNOTATION_DELETED,
     events.ANNOTATION_UPDATED,
@@ -215,6 +220,7 @@ function Streamer($rootScope, annotationMapper, features, groups, session, setti
   updateEvents.forEach(function (event) {
     $rootScope.$on(event, removePendingUpdates);
   });
+  $rootScope.$on(events.GROUP_FOCUSED, clearPendingUpdates);
 
   this.applyPendingUpdates = applyPendingUpdates;
   this.countPendingUpdates = countPendingUpdates;

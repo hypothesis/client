@@ -305,6 +305,19 @@ describe('Streamer', function () {
     }, changeEvents);
   });
 
+  describe('when the focused group changes', function () {
+    it('clears pending updates and deletions', function () {
+      createDefaultStreamer();
+      activeStreamer.connect();
+      fakeFeatures.flagEnabled.returns(true);
+
+      fakeWebSocket.notify(fixtures.createNotification);
+      fakeRootScope.$broadcast(events.GROUP_FOCUSED);
+
+      assert.equal(activeStreamer.countPendingUpdates(), 0);
+    });
+  });
+
   describe('session change notifications', function () {
     it('updates the session when a notification is received', function () {
       createDefaultStreamer();
