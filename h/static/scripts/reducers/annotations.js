@@ -247,6 +247,17 @@ function updateAnchorStatus(id, tag, isOrphan) {
   };
 }
 
+/**
+ * Return all loaded annotations which have been saved to the server.
+ *
+ * @param {state} - The global app state
+ */
+function savedAnnotations(state) {
+  return state.annotations.filter(function (ann) {
+    return !metadata.isNew(ann);
+  });
+}
+
 module.exports = {
   init: init,
   update: update,
@@ -256,4 +267,7 @@ module.exports = {
     removeAnnotations: removeAnnotations,
     updateAnchorStatus: updateAnchorStatus,
   },
+
+  // Selectors
+  savedAnnotations: savedAnnotations,
 };

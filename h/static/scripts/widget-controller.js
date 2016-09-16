@@ -119,10 +119,7 @@ module.exports = function WidgetController(
   var searchClients = [];
 
   function _resetAnnotations() {
-    // Unload all the annotations
-    annotationMapper.unloadAnnotations(annotationUI.getState().annotations);
-    // Reload all the drafts
-    annotationUI.addAnnotations(drafts.unsaved());
+    annotationMapper.unloadAnnotations(annotationUI.savedAnnotations());
   }
 
   function _loadAnnotationsFor(uris, group) {
