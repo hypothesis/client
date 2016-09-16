@@ -66,7 +66,7 @@ function RootThread($rootScope, annotationUI, features, searchFilter, viewFilter
             return false;
           }
           if (state.selectedTab === uiConstants.TAB_ACTIONS) {
-            return metadata.isAction(thread.annotation);
+            return metadata.isAnnotation(thread.annotation);
           } else if (state.selectedTab === uiConstants.TAB_NOTES) {
             return metadata.isPageNote(thread.annotation);
           } else {

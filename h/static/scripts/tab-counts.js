@@ -11,7 +11,7 @@ function tabCounts(annotations, opts) {
   opts = opts || {separateOrphans: false};
 
   var counts = {
-    actions: countIf(annotations, metadata.isAction),
+    actions: countIf(annotations, metadata.isAnnotation),
     notes: countIf(annotations, metadata.isPageNote),
     annotations: countIf(annotations, metadata.isAnnotation),
     orphans: countIf(annotations, metadata.isOrphan),
