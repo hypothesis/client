@@ -122,10 +122,6 @@ function AnnotationController(
       */
     newlyCreatedByHighlightButton = vm.annotation.$highlight || false;
 
-    // When a new annotation is created, remove any existing annotations that
-    // are empty.
-    $scope.$on(events.BEFORE_ANNOTATION_CREATED, deleteIfNewAndEmpty);
-
     // Call `onGroupFocused()` whenever the currently-focused group changes.
     $scope.$on(events.GROUP_FOCUSED, onGroupFocused);
 
@@ -155,12 +151,6 @@ function AnnotationController(
       if (isNew(vm.annotation) || drafts.get(vm.annotation)) {
         vm.edit();
       }
-    }
-  }
-
-  function deleteIfNewAndEmpty() {
-    if (isNew(vm.annotation) && !vm.state().text && vm.state().tags.length === 0) {
-      vm.revert();
     }
   }
 

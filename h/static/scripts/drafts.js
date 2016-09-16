@@ -1,6 +1,17 @@
 'use strict';
 
 /**
+ * Return true if a given `draft` is empty and can be discarded without losing
+ * any user input
+ */
+function isEmpty(draft) {
+  if (!draft) {
+    return true;
+  }
+  return !draft.text && draft.tags.length === 0;
+}
+
+/**
  * The drafts service provides temporary storage for unsaved edits to new or
  * existing annotations.
  *
@@ -63,6 +74,15 @@ function DraftStore() {
       }
     }
     return null;
+  };
+
+  /**
+   * Returns the draft changes for an annotation, or null if no draft exists
+   * or the draft is empty.
+   */
+  this.getIfNotEmpty = function (model) {
+    var draft = this.get(model);
+    return isEmpty(draft) ? null : draft;
   };
 
   /**

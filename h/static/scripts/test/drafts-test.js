@@ -2,11 +2,49 @@
 
 var draftsService = require('../drafts');
 
+var fixtures = {
+  draftWithText: {
+    isPrivate: false,
+    text: 'some text',
+    tags: [],
+  },
+  draftWithTags: {
+    isPrivate: false,
+    text: '',
+    tags: ['atag'],
+  },
+  emptyDraft: {
+    isPrivate: false,
+    text: '',
+    tags: [],
+  },
+};
+
 describe('drafts', function () {
   var drafts;
 
   beforeEach(function () {
     drafts = draftsService();
+  });
+
+  describe('#getIfNotEmpty', function () {
+    it('returns the draft if it has tags', function () {
+      var model = {id: 'foo'};
+      drafts.update(model, fixtures.draftWithTags);
+      assert.deepEqual(drafts.getIfNotEmpty(model), fixtures.draftWithTags);
+    });
+
+    it('returns the draft if it has text', function () {
+      var model = {id: 'foo'};
+      drafts.update(model, fixtures.draftWithText);
+      assert.deepEqual(drafts.getIfNotEmpty(model), fixtures.draftWithText);
+    });
+
+    it('returns null if the text and tags are empty', function () {
+      var model = {id: 'foo'};
+      drafts.update(model, fixtures.emptyDraft);
+      assert.isNull(drafts.getIfNotEmpty(model));
+    });
   });
 
   describe('#update', function () {
