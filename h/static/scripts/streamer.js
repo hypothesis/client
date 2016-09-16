@@ -57,9 +57,10 @@ function Streamer($rootScope, annotationMapper, annotationUI, features, groups,
     case 'update':
     case 'past':
       annotations.forEach(function (ann) {
-        // Only include annotations from the focused group, since we reload all
-        // annotations and discard pending updates and deletions when switching
-        // groups
+        // In the sidebar, only save pending updates for annotations in the
+        // focused group, since we only display annotations from the focused
+        // group and reload all annotations and discard pending updates
+        // when switching groups.
         if (ann.group === groups.focused().id || !annotationUI.isSidebar()) {
           pendingUpdates[ann.id] = ann;
         }
@@ -67,8 +68,18 @@ function Streamer($rootScope, annotationMapper, annotationUI, features, groups,
       break;
     case 'delete':
       annotations.forEach(function (ann) {
+        // Discard any pending but not-yet-applied updates for this annotation
         delete pendingUpdates[ann.id];
-        pendingDeletions[ann.id] = true;
+
+        // If we already have this annotation loaded, then record a pending
+        // deletion. We do not check the group of the annotation here because a)
+        // that information is not included with deletion notifications and b)
+        // even if the annotation is from the current group, it might be for a
+        // new annotation (saved in pendingUpdates and removed above), that has
+        // not yet been loaded.
+        if (annotationUI.annotationExists(ann.id)) {
+          pendingDeletions[ann.id] = true;
+        }
       });
       break;
     }
@@ -193,7 +204,8 @@ function Streamer($rootScope, annotationMapper, annotationUI, features, groups,
   }
 
   function countPendingUpdates() {
-    return Object.keys(pendingUpdates).length;
+    return Object.keys(pendingUpdates).length +
+           Object.keys(pendingDeletions).length;
   }
 
   function hasPendingDeletion(id) {

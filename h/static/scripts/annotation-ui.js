@@ -104,6 +104,7 @@ module.exports = function ($rootScope, settings) {
     isAnnotationSelected: selectionReducer.isAnnotationSelected,
     hasSelectedAnnotations: selectionReducer.hasSelectedAnnotations,
 
+    annotationExists: annotationsReducer.annotationExists,
     savedAnnotations: annotationsReducer.savedAnnotations,
 
     isSidebar: viewerReducer.isSidebar,

@@ -258,6 +258,13 @@ function savedAnnotations(state) {
   });
 }
 
+/** Return true if the annotation with a given ID is currently loaded. */
+function annotationExists(state, id) {
+  return state.annotations.some(function (annot) {
+    return annot.id === id;
+  });
+}
+
 module.exports = {
   init: init,
   update: update,
@@ -269,5 +276,6 @@ module.exports = {
   },
 
   // Selectors
+  annotationExists: annotationExists,
   savedAnnotations: savedAnnotations,
 };
