@@ -19,7 +19,8 @@ var Socket = require('./websocket');
  * @param settings - Application settings
  */
 // @ngInject
-function Streamer($rootScope, annotationMapper, features, groups, session, settings) {
+function Streamer($rootScope, annotationMapper, annotationUI, features, groups,
+                  session, settings) {
   // The randomly generated session UUID
   var clientId = uuid.v4();
 
@@ -59,7 +60,7 @@ function Streamer($rootScope, annotationMapper, features, groups, session, setti
         // Only include annotations from the focused group, since we reload all
         // annotations and discard pending updates and deletions when switching
         // groups
-        if (ann.group === groups.focused().id) {
+        if (ann.group === groups.focused().id || !annotationUI.isSidebar()) {
           pendingUpdates[ann.id] = ann;
         }
       });
@@ -72,7 +73,8 @@ function Streamer($rootScope, annotationMapper, features, groups, session, setti
       break;
     }
 
-    if (!features.flagEnabled('defer_realtime_updates')) {
+    if (!features.flagEnabled('defer_realtime_updates') ||
+        !annotationUI.isSidebar()) {
       applyPendingUpdates();
     }
   }
