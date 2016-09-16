@@ -29,6 +29,11 @@
       <span ng-if="vm.totalNotes > 1">
         ({{vm.totalNotes}})
       </span>
+    <span ng-if="vm.selectedTab === vm.TAB_ACTIONS">
+      Show all notes
+      <span ng-if="vm.totalActions > 1">
+        ({{vm.totalNotes}})
+      </span>
     </span>
   </button>
 
