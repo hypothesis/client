@@ -51,16 +51,17 @@ function Streamer($rootScope, annotationMapper, features, groups, session, setti
     var action = message.options.action;
     var annotations = message.payload;
 
-    if (annotations.length === 0) {
-      return;
-    }
-
     switch (action) {
     case 'create':
     case 'update':
     case 'past':
       annotations.forEach(function (ann) {
-        pendingUpdates[ann.id] = ann;
+        // Only include annotations from the focused group, since we reload all
+        // annotations and discard pending updates and deletions when switching
+        // groups
+        if (ann.group === groups.focused().id) {
+          pendingUpdates[ann.id] = ann;
+        }
       });
       break;
     case 'delete':
@@ -173,16 +174,17 @@ function Streamer($rootScope, annotationMapper, features, groups, session, setti
   };
 
   function applyPendingUpdates() {
-    var updates = Object.values(pendingUpdates).filter(function (ann) {
-      // Ignore updates to annotations that are not in the focused group
-      return ann.group === groups.focused().id;
-    });
+    var updates = Object.values(pendingUpdates);
     var deletions = Object.keys(pendingDeletions).map(function (id) {
       return {id: id};
     });
 
-    annotationMapper.loadAnnotations(updates);
-    annotationMapper.unloadAnnotations(deletions);
+    if (updates.length) {
+      annotationMapper.loadAnnotations(updates);
+    }
+    if (deletions.length) {
+      annotationMapper.unloadAnnotations(deletions);
+    }
 
     pendingUpdates = {};
     pendingDeletions = {};
