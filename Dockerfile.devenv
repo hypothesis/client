@@ -1,0 +1,10 @@
+FROM node:4
+MAINTAINER Hypothes.is Project and contributors
+
+VOLUME /client
+WORKDIR /client
+EXPOSE 3000
+
+RUN npm install --global gulp-cli
+CMD ["gulp", "watch"]
+
