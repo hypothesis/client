@@ -9,8 +9,6 @@ EXPOSE 3000
 ENV LANG C.UTF-8
 ENV PATH /usr/local/bin:$PATH
 
-COPY . ./
 RUN npm install --global gulp-cli
 
 CMD make dev
-
