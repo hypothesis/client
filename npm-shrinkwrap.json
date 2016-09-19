@@ -1,6 +1,6 @@
 {
   "name": "hypothesis",
-  "version": "0.43.0",
+  "version": "0.44.0",
   "dependencies": {
     "abbrev": {
       "version": "1.0.7",
