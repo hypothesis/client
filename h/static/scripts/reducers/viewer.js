@@ -41,6 +41,14 @@ function setShowHighlights(show) {
   return {type: actions.SET_HIGHLIGHTS_VISIBLE, visible: show};
 }
 
+/**
+ * Returns true if the app is being used as the sidebar in the annotation
+ * client, as opposed to the standalone annotation page or stream views.
+ */
+function isSidebar(state) {
+  return state.isSidebar;
+}
+
 module.exports = {
   init: init,
   update: update,
@@ -48,4 +56,7 @@ module.exports = {
     setAppIsSidebar: setAppIsSidebar,
     setShowHighlights: setShowHighlights,
   },
+
+  // Selectors
+  isSidebar: isSidebar,
 };

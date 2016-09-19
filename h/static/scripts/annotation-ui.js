@@ -105,6 +105,8 @@ module.exports = function ($rootScope, settings) {
     hasSelectedAnnotations: selectionReducer.hasSelectedAnnotations,
 
     savedAnnotations: annotationsReducer.savedAnnotations,
+
+    isSidebar: viewerReducer.isSidebar,
   }, store.getState);
 
   return Object.assign(store, actionCreators, selectors);

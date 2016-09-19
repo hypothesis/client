@@ -66,6 +66,7 @@ inherits(FakeSocket, EventEmitter);
 
 describe('Streamer', function () {
   var fakeAnnotationMapper;
+  var fakeAnnotationUI;
   var fakeFeatures;
   var fakeGroups;
   var fakeRootScope;
@@ -78,6 +79,7 @@ describe('Streamer', function () {
     activeStreamer = new Streamer(
       fakeRootScope,
       fakeAnnotationMapper,
+      fakeAnnotationUI,
       fakeFeatures,
       fakeGroups,
       fakeSession,
@@ -101,6 +103,10 @@ describe('Streamer', function () {
     fakeAnnotationMapper = {
       loadAnnotations: sinon.stub(),
       unloadAnnotations: sinon.stub(),
+    };
+
+    fakeAnnotationUI = {
+      isSidebar: sinon.stub().returns(true),
     };
 
     fakeFeatures = {
@@ -202,6 +208,30 @@ describe('Streamer', function () {
         fakeGroups.focused.returns({id: 'private'});
         fakeWebSocket.notify(fixtures.createNotification);
         assert.notCalled(fakeAnnotationMapper.loadAnnotations);
+      });
+    });
+
+    context('when the app is the stream', function () {
+      beforeEach(function () {
+        // Enable the `defer_realtime_updates` feature flag
+        fakeFeatures.flagEnabled.returns(true);
+        fakeAnnotationUI.isSidebar.returns(false);
+      });
+
+      it('does not defer updates', function () {
+        fakeWebSocket.notify(fixtures.createNotification);
+
+        assert.calledWith(fakeAnnotationMapper.loadAnnotations,
+          fixtures.createNotification.payload);
+      });
+
+      it('applies updates from all groups', function () {
+        fakeGroups.focused.returns({id: 'private'});
+
+        fakeWebSocket.notify(fixtures.createNotification);
+
+        assert.calledWith(fakeAnnotationMapper.loadAnnotations,
+          fixtures.createNotification.payload);
       });
     });
 
