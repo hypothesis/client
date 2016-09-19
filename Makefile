@@ -17,7 +17,7 @@ test: node_modules/.uptodate
 
 ## Run the development client locally
 .PHONY: dev
-dev: node_modules/.update
+dev: node_modules/.uptodate
 	gulp watch
 
 .PHONY: lint
