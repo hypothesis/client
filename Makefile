@@ -17,7 +17,7 @@ test: node_modules/.uptodate
 
 ## Run the development client locally
 .PHONY: dev
-dev: node_modules
+dev: node_modules/.update
 	gulp watch
 
 .PHONY: lint
@@ -25,9 +25,6 @@ lint: node_modules/.uptodate
 	npm run lint
 
 ################################################################################
-
-node_modules:
-	npm install
 
 build/manifest.json: node_modules/.uptodate
 	npm run-script build
