@@ -9,5 +9,8 @@ EXPOSE 3000
 ENV LANG C.UTF-8
 ENV PATH /usr/local/bin:$PATH
 
-CMD gulp watch
+COPY . ./
+RUN npm install --global gulp-cli
+
+CMD make dev
 
