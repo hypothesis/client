@@ -106,6 +106,7 @@ describe('Streamer', function () {
     };
 
     fakeAnnotationUI = {
+      annotationExists: sinon.stub().returns(false),
       isSidebar: sinon.stub().returns(true),
     };
 
@@ -200,6 +201,7 @@ describe('Streamer', function () {
       });
 
       it('should unload deleted annotations', function () {
+        fakeAnnotationUI.annotationExists.returns(true);
         fakeWebSocket.notify(fixtures.deleteNotification);
         assert.ok(fakeAnnotationMapper.unloadAnnotations.calledOnce);
       });
@@ -251,10 +253,23 @@ describe('Streamer', function () {
         assert.equal(activeStreamer.countPendingUpdates(), 0);
       });
 
-      it('saves pending deletions', function () {
+      it('saves pending deletions if the annotation is loaded', function () {
         var id = fixtures.deleteNotification.payload[0].id;
+        fakeAnnotationUI.annotationExists.returns(true);
+
         fakeWebSocket.notify(fixtures.deleteNotification);
+
         assert.isTrue(activeStreamer.hasPendingDeletion(id));
+        assert.equal(activeStreamer.countPendingUpdates(), 1);
+      });
+
+      it('discards pending deletions if the annotation is not loaded', function () {
+        var id = fixtures.deleteNotification.payload[0].id;
+        fakeAnnotationUI.annotationExists.returns(false);
+
+        fakeWebSocket.notify(fixtures.deleteNotification);
+
+        assert.isFalse(activeStreamer.hasPendingDeletion(id));
       });
 
       it('saves one pending update per annotation', function () {
@@ -263,9 +278,12 @@ describe('Streamer', function () {
         assert.equal(activeStreamer.countPendingUpdates(), 1);
       });
 
-      it('discards pending updates if an annotation is deleted', function () {
+      it('discards pending updates if an unloaded annotation is deleted', function () {
+        fakeAnnotationUI.annotationExists.returns(false);
+
         fakeWebSocket.notify(fixtures.createNotification);
         fakeWebSocket.notify(fixtures.deleteNotification);
+
         assert.equal(activeStreamer.countPendingUpdates(), 0);
       });
 
@@ -296,8 +314,11 @@ describe('Streamer', function () {
     });
 
     it('applies pending deletions', function () {
+      fakeAnnotationUI.annotationExists.returns(true);
+
       fakeWebSocket.notify(fixtures.deleteNotification);
       activeStreamer.applyPendingUpdates();
+
       assert.calledWithMatch(fakeAnnotationMapper.unloadAnnotations,
         sinon.match([{id: 'an-id'}]));
     });
@@ -330,9 +351,11 @@ describe('Streamer', function () {
     }, changeEvents);
 
     unroll('discards pending deletions when #event occurs', function (testCase) {
+      fakeAnnotationUI.annotationExists.returns(true);
       fakeWebSocket.notify(fixtures.deleteNotification);
-      assert.isTrue(activeStreamer.hasPendingDeletion('an-id'));
+
       fakeRootScope.$broadcast(testCase.event, {id: 'an-id'});
+
       assert.isFalse(activeStreamer.hasPendingDeletion('an-id'));
     }, changeEvents);
   });

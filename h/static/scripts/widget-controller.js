@@ -61,12 +61,6 @@ module.exports = function WidgetController(
 
   $scope.$on('$destroy', unsubscribeAnnotationUI);
 
-  function annotationExists(id) {
-    return annotationUI.getState().annotations.some(function (annot) {
-      return annot.id === id;
-    });
-  }
-
   function focusAnnotation(annotation) {
     var highlights = [];
     if (annotation) {
@@ -302,7 +296,7 @@ module.exports = function WidgetController(
     var selectedID = firstKey(annotationUI.getState().selectedAnnotationMap);
     return !isLoading() &&
            !!selectedID &&
-           !annotationExists(selectedID);
+           !annotationUI.annotationExists(selectedID);
   };
 
   $scope.shouldShowLoggedOutMessage = function () {
@@ -323,7 +317,7 @@ module.exports = function WidgetController(
     var selectedID = firstKey(annotationUI.getState().selectedAnnotationMap);
     return !isLoading() &&
            !!selectedID &&
-           annotationExists(selectedID);
+           annotationUI.annotationExists(selectedID);
   };
 
   $scope.isLoading = isLoading;
