@@ -1,10 +1,13 @@
 FROM node:4
 MAINTAINER Hypothes.is Project and contributors
 
-VOLUME /client
 WORKDIR /client
+VOLUME /client
+
 EXPOSE 3000
 
-RUN npm install --global gulp-cli
-CMD ["gulp", "watch"]
+ENV LANG C.UTF-8
+ENV PATH /usr/local/bin:$PATH
+
+CMD gulp watch
 
