@@ -4,6 +4,30 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+### Changed
+
+- Disable deferred updates on the stream and standalone annotation pages
+  ([#112](https://github.com/hypothesis/client/pull/112)).
+
+- Update icon for applying deferred annotation updates
+  ([#113](https://github.com/hypothesis/client/pull/113)).
+
+- Count deleted annotations as pending updates
+  ([#114](https://github.com/hypothesis/client/pull/114)).
+
+### Fixed
+
+- Fix off-screen empty, unsaved annotations not being removed when a new
+  annotation is created ([#107](https://github.com/hypothesis/client/pull/107)).
+
+- Fix off-screen unsaved annotations not being moved to new group when focused
+  group is changed ([#108](https://github.com/hypothesis/client/pull/108)).
+
+- Only count updates to annotations in the focused group as pending updates
+  ([#111](https://github.com/hypothesis/client/pull/111)).
+
 ## [0.43.0] - 2016-09-15
 
 ### Added
