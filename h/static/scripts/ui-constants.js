@@ -7,5 +7,6 @@
 module.exports = {
   TAB_ANNOTATIONS: 'annotation',
   TAB_NOTES: 'note',
+  TAB_ACTIONS: 'action',
   TAB_ORPHANS: 'orphan',
 };

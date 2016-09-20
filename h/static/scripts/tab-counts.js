@@ -4,13 +4,14 @@ var metadata = require('./annotation-metadata');
 var countIf = require('./util/array-util').countIf;
 
 /**
- * Return a count of the number of Annotations, Page Notes, Orphans and
+ * Return a count of the number of Annotations, Page Notes, Actions, Orphans and
  * annotations still being anchored in a set of `annotations`
  */
 function tabCounts(annotations, opts) {
   opts = opts || {separateOrphans: false};
 
   var counts = {
+    actions: countIf(annotations, metadata.isAction),
     notes: countIf(annotations, metadata.isPageNote),
     annotations: countIf(annotations, metadata.isAnnotation),
     orphans: countIf(annotations, metadata.isOrphan),

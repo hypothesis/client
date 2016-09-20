@@ -10,6 +10,7 @@ module.exports = function () {
     controller: function ($element, annotationUI, features) {
       this.TAB_ANNOTATIONS = uiConstants.TAB_ANNOTATIONS;
       this.TAB_NOTES = uiConstants.TAB_NOTES;
+      this.TAB_ACTIONS = uiConstants.TAB_ACTIONS;
       this.TAB_ORPHANS = uiConstants.TAB_ORPHANS;
 
       this.selectTab = function (type) {
@@ -31,6 +32,11 @@ module.exports = function () {
         return this.selectedTab === this.TAB_NOTES &&
           this.totalNotes === 0;
       };
+
+      this.showActionsUnavailableMessage = function () {
+        return this.selectedTab === this.TAB_ACTIONS &&
+          this.totalActions === 0;
+      };
     },
     restrict: 'E',
     scope: {
@@ -39,6 +45,7 @@ module.exports = function () {
       selectedTab: '<',
       totalAnnotations: '<',
       totalNotes: '<',
+      totalActions: '<',
       totalOrphans: '<',
     },
     template: require('../../../templates/client/selection_tabs.html'),

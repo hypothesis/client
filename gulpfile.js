@@ -261,7 +261,7 @@ gulp.task('watch-manifest', function () {
 
 gulp.task('start-live-reload-server', function () {
   var LiveReloadServer = require('./scripts/gulp/live-reload-server');
-  liveReloadServer = new LiveReloadServer(3000, 'http://localhost:5000');
+  liveReloadServer = new LiveReloadServer(3000, 'http://h:5000');
 });
 
 gulp.task('build-app',

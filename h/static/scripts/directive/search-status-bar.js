@@ -10,6 +10,7 @@ module.exports = function () {
     controller: function () {
       this.TAB_ANNOTATIONS = uiConstants.TAB_ANNOTATIONS;
       this.TAB_NOTES = uiConstants.TAB_NOTES;
+      this.TAB_ACTIONS = uiConstants.TAB_ACTIONS;
       this.TAB_ORPHANS = uiConstants.TAB_ORPHANS;
     },
     restrict: 'E',
@@ -22,6 +23,7 @@ module.exports = function () {
       selectionCount: '<',
       totalAnnotations: '<',
       totalNotes: '<',
+      totalActions: '<',
     },
     template: require('../../../templates/client/search_status_bar.html'),
   };
