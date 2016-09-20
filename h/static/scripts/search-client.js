@@ -49,8 +49,14 @@ SearchClient.prototype._getBatch = function (query, offset) {
       self._results = self._results.concat(chunk);
     }
 
+    // Check if there are additional pages of results to fetch. In addition to
+    // checking the `total` figure from the server, we also require that at
+    // least one result was returned in the current page, otherwise we would
+    // end up repeating the same query for the next page. If the server's
+    // `total` count is incorrect for any reason, that will lead to the client
+    // polling the server indefinitely.
     var nextOffset = offset + results.rows.length;
-    if (results.total > nextOffset) {
+    if (results.total > nextOffset && chunk.length > 0) {
       self._getBatch(query, nextOffset);
     } else {
       if (!self._incremental) {

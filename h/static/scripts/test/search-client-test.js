@@ -49,6 +49,30 @@ describe('SearchClient', function () {
     });
   });
 
+  it('stops fetching chunks if the results array is empty', function () {
+    // Simulate a situation where the `total` count for the server is incorrect
+    // and we appear to have reached the end of the result list even though
+    // `total` implies that there should be more results available.
+    //
+    // In that case the client should stop trying to fetch additional pages.
+    fakeSearchFn = sinon.spy(function () {
+      return Promise.resolve({
+        rows: [],
+        total: 1000,
+      });
+    });
+    var client = new SearchClient(fakeSearchFn, {chunkSize: 2});
+    var onResults = sinon.stub();
+    client.on('results', onResults);
+
+    client.get({uri: 'http://example.com'});
+
+    return await(client, 'end').then(function () {
+      assert.calledWith(onResults, []);
+      assert.calledOnce(fakeSearchFn);
+    });
+  });
+
   it('emits "results" once in non-incremental mode', function () {
     var client = new SearchClient(fakeSearchFn,
       {chunkSize: 2, incremental: false});
