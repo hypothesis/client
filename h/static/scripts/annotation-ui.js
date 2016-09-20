@@ -72,7 +72,7 @@ module.exports = function ($rootScope, settings) {
   var enhancer = redux.applyMiddleware(
     // The `thunk` middleware handles actions which are functions.
     // This is used to implement actions which have side effects or are
-    // asynchronous (see https://github.com/gaearon/redux-thunk#motivation)
+    // asynchronous (see https://github.com/gaearon/redux-thunk#motivation) 
     thunk,
     angularDigestMiddleware.bind(null, $rootScope)
   );

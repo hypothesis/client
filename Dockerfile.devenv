@@ -1,0 +1,14 @@
+FROM node:4
+MAINTAINER Hypothes.is Project and contributors
+
+WORKDIR /client
+VOLUME /client
+
+EXPOSE 3000
+
+ENV LANG C.UTF-8
+ENV PATH /usr/local/bin:$PATH
+
+RUN npm install --global gulp-cli
+
+CMD make dev
