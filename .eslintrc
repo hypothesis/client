@@ -1,3 +1,6 @@
 {
-  "extends": "hypothesis"
+  "extends": "hypothesis",
+  "globals": {
+    "Set": false
+  }
 }

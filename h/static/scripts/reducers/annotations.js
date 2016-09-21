@@ -49,30 +49,32 @@ function findByTag(annotations, tag) {
 /**
  * Initialize the status flags and properties of a new annotation.
  */
-function initializeAnnot(annotation) {
-  if (annotation.id) {
-    return annotation;
+function initializeAnnot(annotation, tag) {
+  var orphan = annotation.$orphan;
+
+  if (!annotation.id) {
+    // Currently the user ID, permissions and group of new annotations are
+    // initialized in the <annotation> component controller because the session
+    // state and focused group are not stored in the Redux store. Once they are,
+    // that initialization should be moved here.
+
+    // New annotations must be anchored
+    orphan = false;
   }
 
-  // Currently the user ID, permissions and group of new annotations are
-  // initialized in the <annotation> component controller because the session
-  // state and focused group are not stored in the Redux store. Once they are,
-  // that initialization should be moved here.
-
   return Object.assign({}, annotation, {
-    // Copy $$tag explicitly because it is non-enumerable.
-    //
-    // FIXME: change $$tag to $tag and make it enumerable so annotations can be
-    // handled more simply in the sidebar.
-    $$tag: annotation.$$tag,
-    // New annotations must be anchored
-    $orphan: false,
+    $$tag: annotation.$$tag || tag,
+    $orphan: orphan,
   });
 }
 
 function init() {
   return {
     annotations: [],
+
+    // The local tag to assign to the next annotation that is loaded into the
+    // app
+    nextTag: 1,
   };
 }
 
@@ -84,6 +86,7 @@ var update = {
     var added = [];
     var unchanged = [];
     var updated = [];
+    var nextTag = state.nextTag;
 
     action.annotations.forEach(function (annot) {
       var existing;
@@ -105,7 +108,8 @@ var update = {
           updatedTags[existing.$$tag] = true;
         }
       } else {
-        added.push(initializeAnnot(annot));
+        added.push(initializeAnnot(annot, 't' + nextTag));
+        ++nextTag;
       }
     });
 
@@ -115,7 +119,10 @@ var update = {
       }
     });
 
-    return {annotations: added.concat(updated).concat(unchanged)};
+    return {
+      annotations: added.concat(updated).concat(unchanged),
+      nextTag: nextTag,
+    };
   },
 
   REMOVE_ANNOTATIONS: function (state, action) {

@@ -41,9 +41,9 @@ describe('WidgetController', function () {
   var $scope;
   var annotationUI;
   var fakeAnnotationMapper;
-  var fakeCrossFrame;
   var fakeDrafts;
   var fakeFeatures;
+  var fakeFrameSync;
   var fakeGroups;
   var fakeRootThread;
   var fakeSettings;
@@ -74,8 +74,9 @@ describe('WidgetController', function () {
       unloadAnnotations: sandbox.spy(),
     };
 
-    fakeCrossFrame = {
-      call: sinon.stub(),
+    fakeFrameSync = {
+      focusAnnotations: sinon.stub(),
+      scrollToAnnotation: sinon.stub(),
       frames: [],
     };
 
@@ -113,9 +114,9 @@ describe('WidgetController', function () {
     };
 
     $provide.value('annotationMapper', fakeAnnotationMapper);
-    $provide.value('crossframe', fakeCrossFrame);
     $provide.value('drafts', fakeDrafts);
     $provide.value('features', fakeFeatures);
+    $provide.value('frameSync', fakeFrameSync);
     $provide.value('rootThread', fakeRootThread);
     $provide.value('store', fakeStore);
     $provide.value('streamer', fakeStreamer);
@@ -123,6 +124,7 @@ describe('WidgetController', function () {
     $provide.value('groups', fakeGroups);
     $provide.value('settings', fakeSettings);
   }));
+
 
   beforeEach(angular.mock.inject(function ($controller, _annotationUI_, _$rootScope_) {
     $rootScope = _$rootScope_;
@@ -142,11 +144,11 @@ describe('WidgetController', function () {
       // before reloading annotations for each currently-connected client
       annotationUI.addAnnotations([{id: '123'}]);
       var uri1 = 'http://example.com/page-a';
-      fakeCrossFrame.frames.push({uri: uri1, searchUris: [uri1]});
+      fakeFrameSync.frames.push({uri: uri1, searchUris: [uri1]});
       $scope.$digest();
       fakeAnnotationMapper.unloadAnnotations = sandbox.spy();
       var uri2 = 'http://example.com/page-b';
-      fakeCrossFrame.frames.push({uri: uri2, searchUris: [uri2]});
+      fakeFrameSync.frames.push({uri: uri2, searchUris: [uri2]});
       $scope.$digest();
       assert.calledWith(fakeAnnotationMapper.unloadAnnotations,
         annotationUI.getState().annotations);
@@ -154,7 +156,7 @@ describe('WidgetController', function () {
 
     it('loads all annotations for a frame', function () {
       var uri = 'http://example.com';
-      fakeCrossFrame.frames.push({uri: uri, searchUris: [uri]});
+      fakeFrameSync.frames.push({uri: uri, searchUris: [uri]});
       $scope.$digest();
       var loadSpy = fakeAnnotationMapper.loadAnnotations;
       assert.calledWith(loadSpy, [sinon.match({id: uri + '123'})]);
@@ -164,7 +166,7 @@ describe('WidgetController', function () {
     it('loads all annotations for a frame with multiple urls', function () {
       var uri = 'http://example.com/test.pdf';
       var fingerprint = 'urn:x-pdf:fingerprint';
-      fakeCrossFrame.frames.push({uri: uri, searchUris: [uri, fingerprint]});
+      fakeFrameSync.frames.push({uri: uri, searchUris: [uri, fingerprint]});
       $scope.$digest();
       var loadSpy = fakeAnnotationMapper.loadAnnotations;
       assert.calledWith(loadSpy, [sinon.match({id: uri + '123'})]);
@@ -175,7 +177,7 @@ describe('WidgetController', function () {
 
     it('loads all annotations for all frames', function () {
       var uris = ['http://example.com', 'http://foobar.com'];
-      fakeCrossFrame.frames = uris.map(function (uri) {
+      fakeFrameSync.frames = uris.map(function (uri) {
         return {uri: uri, searchUris: [uri]};
       });
       $scope.$digest();
@@ -191,7 +193,7 @@ describe('WidgetController', function () {
       var id = uri + '123';
 
       beforeEach(function () {
-        fakeCrossFrame.frames = [{uri: uri, searchUris: [uri]}];
+        fakeFrameSync.frames = [{uri: uri, searchUris: [uri]}];
         annotationUI.selectAnnotations([id]);
         $scope.$digest();
       });
@@ -221,7 +223,7 @@ describe('WidgetController', function () {
       var uri = 'http://example.com';
 
       beforeEach(function () {
-        fakeCrossFrame.frames = [{uri: uri, searchUris: [uri]}];
+        fakeFrameSync.frames = [{uri: uri, searchUris: [uri]}];
         fakeGroups.focused = function () { return { id: 'a-group' }; };
         $scope.$digest();
       });
@@ -244,7 +246,7 @@ describe('WidgetController', function () {
       var id = uri + 'does-not-exist';
 
       beforeEach(function () {
-        fakeCrossFrame.frames = [{uri: uri, searchUris: [uri]}];
+        fakeFrameSync.frames = [{uri: uri, searchUris: [uri]}];
         annotationUI.selectAnnotations([id]);
         fakeGroups.focused = function () { return { id: 'private-group' }; };
         $scope.$digest();
@@ -262,7 +264,7 @@ describe('WidgetController', function () {
     it('focuses and scrolls to the annotation if already selected', function () {
       var uri = 'http://example.com';
       annotationUI.selectAnnotations(['123']);
-      fakeCrossFrame.frames.push({uri: uri, searchUris: [uri]});
+      fakeFrameSync.frames.push({uri: uri, searchUris: [uri]});
       var annot = {
         $$tag: 'atag',
         id: '123',
@@ -270,25 +272,24 @@ describe('WidgetController', function () {
       annotationUI.addAnnotations([annot]);
       $scope.$digest();
       $rootScope.$broadcast(events.ANNOTATIONS_SYNCED, [{tag: 'atag'}]);
-      assert.calledWith(fakeCrossFrame.call, 'focusAnnotations', ['atag']);
-      assert.calledWith(fakeCrossFrame.call, 'scrollToAnnotation', 'atag');
+      assert.calledWith(fakeFrameSync.focusAnnotations, ['atag']);
+      assert.calledWith(fakeFrameSync.scrollToAnnotation, 'atag');
     });
   });
 
   describe('when the focused group changes', function () {
     it('should load annotations for the new group', function () {
       var uri = 'http://example.com';
-
       annotationUI.addAnnotations([{id: '123'}]);
       annotationUI.addAnnotations = sinon.stub();
-
       fakeDrafts.unsaved.returns([{id: uri + '123'}, {id: uri + '456'}]);
-
-      fakeCrossFrame.frames.push({uri: uri, searchUris: [uri]});
+      fakeFrameSync.frames.push({uri: uri, searchUris: [uri]});
       var loadSpy = fakeAnnotationMapper.loadAnnotations;
 
       $scope.$broadcast(events.GROUP_FOCUSED);
-      assert.calledWith(fakeAnnotationMapper.unloadAnnotations, [{id: '123'}]);
+
+      assert.calledWith(fakeAnnotationMapper.unloadAnnotations,
+        [sinon.match({id: '123'})]);
       $scope.$digest();
       assert.calledWith(loadSpy, [sinon.match({id: uri + '123'})]);
       assert.calledWith(loadSpy, [sinon.match({id: uri + '456'})]);
@@ -299,7 +300,7 @@ describe('WidgetController', function () {
 
     beforeEach(function () {
       // The document has finished loading.
-      fakeCrossFrame.frames = [
+      fakeFrameSync.frames = [
         {
           uri: 'http://www.example.com',
           searchUris: [],
@@ -335,7 +336,7 @@ describe('WidgetController', function () {
       // There is a selection but the selected annotation isn't available.
       annotationUI.selectAnnotations(['missing']);
       // The document hasn't finished loading.
-      fakeCrossFrame.frames = [];
+      fakeFrameSync.frames = [];
       $scope.$digest();
 
       assert.isFalse($scope.selectedAnnotationUnavailable());

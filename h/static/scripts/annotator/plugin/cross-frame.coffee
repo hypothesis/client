@@ -20,7 +20,7 @@ module.exports = class CrossFrame extends Annotator.Plugin
 
     bridge = new CrossFrame.Bridge()
 
-    opts = extract(options, 'on', 'emit', 'formatter', 'parser')
+    opts = extract(options, 'on', 'emit')
     annotationSync = new CrossFrame.AnnotationSync(bridge, opts)
 
     this.pluginInit = ->

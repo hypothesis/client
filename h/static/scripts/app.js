@@ -83,8 +83,11 @@ function configureRoutes($routeProvider) {
 }
 
 // @ngInject
-function setupCrossFrame(crossframe) {
-  return crossframe.connect();
+function setupFrameSync(frameSync) {
+  // Setup the connection to the frame hosting the sidebar app.
+  // This should only be done if this is the sidebar app, not the stream or
+  // standalone annotation pages.
+  return frameSync.connect();
 }
 
 // @ngInject
@@ -173,11 +176,11 @@ module.exports = angular.module('h', [
   .service('annotationUI', require('./annotation-ui'))
   .service('auth', require('./auth').service)
   .service('bridge', require('./bridge'))
-  .service('crossframe', require('./cross-frame'))
   .service('drafts', require('./drafts'))
   .service('features', require('./features'))
   .service('flash', require('./flash'))
   .service('formRespond', require('./form-respond'))
+  .service('frameSync', require('./frame-sync').default)
   .service('groups', require('./groups'))
   .service('host', require('./host'))
   .service('localStorage', require('./local-storage'))
@@ -195,7 +198,6 @@ module.exports = angular.module('h', [
 
   .factory('store', require('./store'))
 
-  .value('AnnotationSync', require('./annotation-sync'))
   .value('AnnotationUISync', require('./annotation-ui-sync'))
   .value('Discovery', require('./discovery'))
   .value('ExcerptOverflowMonitor', require('./directive/excerpt-overflow-monitor'))
@@ -209,7 +211,7 @@ module.exports = angular.module('h', [
   .config(configureLocation)
   .config(configureRoutes)
 
-  .run(setupCrossFrame)
+  .run(setupFrameSync)
   .run(setupHttp);
 
 processAppOpts();

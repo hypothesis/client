@@ -34,8 +34,8 @@ function groupIDFromSelection(selection, results) {
 
 // @ngInject
 module.exports = function WidgetController(
-  $scope, annotationUI, crossframe, annotationMapper, drafts,
-  features, groups, rootThread, settings, streamer, streamFilter, store
+  $scope, annotationUI, annotationMapper, drafts, features, frameSync, groups,
+  rootThread, settings, streamer, streamFilter, store
 ) {
   function thread() {
     return rootThread.thread(annotationUI.getState());
@@ -66,14 +66,14 @@ module.exports = function WidgetController(
     if (annotation) {
       highlights = [annotation.$$tag];
     }
-    crossframe.call('focusAnnotations', highlights);
+    frameSync.focusAnnotations(highlights);
   }
 
   function scrollToAnnotation(annotation) {
     if (!annotation) {
       return;
     }
-    crossframe.call('scrollToAnnotation', annotation.$$tag);
+    frameSync.scrollToAnnotation(annotation.$$tag);
   }
 
   /** Returns the annotation type - note or annotation of the first annotation
@@ -160,7 +160,7 @@ module.exports = function WidgetController(
   }
 
   function isLoading() {
-    if (!crossframe.frames.some(function (frame) { return frame.uri; })) {
+    if (!frameSync.frames.some(function (frame) { return frame.uri; })) {
       // The document's URL isn't known so the document must still be loading.
       return true;
     }
@@ -262,12 +262,12 @@ module.exports = function WidgetController(
       return;
     }
     annotationUI.clearSelectedAnnotations();
-    loadAnnotations(crossframe.frames);
+    loadAnnotations(frameSync.frames);
   });
 
   // Watch anything that may require us to reload annotations.
   $scope.$watchCollection(function () {
-    return crossframe.frames;
+    return frameSync.frames;
   }, loadAnnotations);
 
   $scope.setCollapsed = function (id, collapsed) {
