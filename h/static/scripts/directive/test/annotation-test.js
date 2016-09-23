@@ -79,7 +79,6 @@ describe('annotation', function() {
   describe('AnnotationController', function() {
     var $rootScope;
     var $scope;
-    var $timeout;
     var $window;
     var fakeAnnotationUI;
     var fakeDrafts;
@@ -206,10 +205,8 @@ describe('annotation', function() {
 
     beforeEach(
       inject(
-        function(_$rootScope_, _$timeout_,
-                _$window_) {
+        function(_$rootScope_, _$window_) {
           $window = _$window_;
-          $timeout = _$timeout_;
           $rootScope = _$rootScope_;
           $scope = $rootScope.$new();
         }
