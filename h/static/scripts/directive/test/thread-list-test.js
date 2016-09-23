@@ -11,14 +11,14 @@ var threadList = require('../thread-list');
 var util = require('./util');
 
 var annotFixtures = immutable({
-  annotation: {$$tag: 't1', id: '1', text: 'text'},
+  annotation: {$tag: 't1', id: '1', text: 'text'},
   reply: {
-    $$tag: 't2',
+    $tag: 't2',
     id: '2',
     references: ['1'],
     text: 'areply',
   },
-  highlight: {$highlight: true, $$tag: 't3', id: '3'},
+  highlight: {$highlight: true, $tag: 't3', id: '3'},
 });
 
 var threadFixtures = immutable({

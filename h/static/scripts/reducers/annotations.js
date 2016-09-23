@@ -23,13 +23,13 @@ function excludeAnnotations(current, annotations) {
     if (annot.id) {
       ids[annot.id] = true;
     }
-    if (annot.$$tag) {
-      tags[annot.$$tag] = true;
+    if (annot.$tag) {
+      tags[annot.$tag] = true;
     }
   });
   return current.filter(function (annot) {
     var shouldRemove = (annot.id && (annot.id in ids)) ||
-                       (annot.$$tag && (annot.$$tag in tags));
+                       (annot.$tag && (annot.$tag in tags));
     return !shouldRemove;
   });
 }
@@ -42,7 +42,7 @@ function findByID(annotations, id) {
 
 function findByTag(annotations, tag) {
   return annotations.find(function (annot) {
-    return annot.$$tag === tag;
+    return annot.$tag === tag;
   });
 }
 
@@ -63,7 +63,7 @@ function initializeAnnot(annotation, tag) {
   }
 
   return Object.assign({}, annotation, {
-    $$tag: annotation.$$tag || tag,
+    $tag: annotation.$tag || tag,
     $orphan: orphan,
   });
 }
@@ -93,8 +93,8 @@ var update = {
       if (annot.id) {
         existing = findByID(state.annotations, annot.id);
       }
-      if (!existing && annot.$$tag) {
-        existing = findByTag(state.annotations, annot.$$tag);
+      if (!existing && annot.$tag) {
+        existing = findByTag(state.annotations, annot.$tag);
       }
 
       if (existing) {
@@ -104,8 +104,8 @@ var update = {
         if (annot.id) {
           updatedIDs[annot.id] = true;
         }
-        if (existing.$$tag) {
-          updatedTags[existing.$$tag] = true;
+        if (existing.$tag) {
+          updatedTags[existing.$tag] = true;
         }
       } else {
         added.push(initializeAnnot(annot, 't' + nextTag));
@@ -114,7 +114,7 @@ var update = {
     });
 
     state.annotations.forEach(function (annot) {
-      if (!updatedIDs[annot.id] && !updatedTags[annot.$$tag]) {
+      if (!updatedIDs[annot.id] && !updatedTags[annot.$tag]) {
         unchanged.push(annot);
       }
     });
@@ -147,11 +147,11 @@ var update = {
   UPDATE_ANCHOR_STATUS: function (state, action) {
     var annotations = state.annotations.map(function (annot) {
       var match = (annot.id && annot.id === action.id) ||
-                  (annot.$$tag && annot.$$tag === action.tag);
+                  (annot.$tag && annot.$tag === action.tag);
       if (match) {
         return Object.assign({}, annot, {
           $orphan: action.isOrphan,
-          $$tag: action.tag,
+          $tag: action.tag,
         });
       } else {
         return annot;
@@ -172,11 +172,11 @@ function addAnnotations(annotations, now) {
   annotations = annotations.map(function (annot) {
     if (annot.id) { return annot; }
     return Object.assign({
-      // Copy $$tag explicitly because it is non-enumerable.
+      // Copy $tag explicitly because it is non-enumerable.
       //
-      // FIXME: change $$tag to $tag and make it enumerable so annotations
+      // FIXME: change $tag to $tag and make it enumerable so annotations
       // can be handled more simply in the sidebar.
-      $$tag: annot.$$tag,
+      $tag: annot.$tag,
       // Date.prototype.toISOString returns a 0-offset (UTC) ISO8601
       // datetime.
       created: now.toISOString(),
@@ -215,7 +215,7 @@ function addAnnotations(annotations, now) {
             dispatch({
               type: actions.UPDATE_ANCHOR_STATUS,
               id: orphan.id,
-              tag: orphan.$$tag,
+              tag: orphan.$tag,
               isOrphan: true,
             });
           });

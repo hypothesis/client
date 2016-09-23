@@ -37,7 +37,7 @@ function DraftStore() {
    * Annotations are matched by ID or local tag.
    */
   function match(draft, model) {
-    return (draft.model.$$tag && model.$$tag === draft.model.$$tag) ||
+    return (draft.model.$tag && model.$tag === draft.model.$tag) ||
            (draft.model.id && model.id === draft.model.id);
   }
 
@@ -53,7 +53,7 @@ function DraftStore() {
    * Returns a list of local tags of new annotations for which unsaved drafts
    * exist.
    *
-   * @return {Array<{$$tag: string}>}
+   * @return {Array<{$tag: string}>}
    */
   this.unsaved = function unsaved() {
     return this._drafts.filter(function(draft) {
@@ -93,7 +93,7 @@ function DraftStore() {
    */
   this.update = function update(model, changes) {
     var newDraft = {
-      model: {id: model.id, $$tag: model.$$tag},
+      model: {id: model.id, $tag: model.$tag},
       isPrivate: changes.isPrivate,
       tags: changes.tags,
       text: changes.text,

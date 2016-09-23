@@ -13,12 +13,12 @@ var newAnnotation = annotationFixtures.newAnnotation;
 
 var fixtures = immutable({
   pair: [
-    Object.assign(defaultAnnotation(), {id: 1, $$tag: 't1'}),
-    Object.assign(defaultAnnotation(), {id: 2, $$tag: 't2'}),
+    Object.assign(defaultAnnotation(), {id: 1, $tag: 't1'}),
+    Object.assign(defaultAnnotation(), {id: 2, $tag: 't2'}),
   ],
   newPair: [
-    Object.assign(newAnnotation(), {$$tag: 't1'}),
-    Object.assign(newAnnotation(), {$$tag: 't2'}),
+    Object.assign(newAnnotation(), {$tag: 't1'}),
+    Object.assign(newAnnotation(), {$tag: 't2'}),
   ],
 });
 
@@ -78,7 +78,7 @@ describe('annotationUI', function () {
       annotationUI.addAnnotations([annotA, annotB]);
 
       var tags = annotationUI.getState().annotations.map(function (a) {
-        return a.$$tag;
+        return a.$tag;
       });
 
       assert.deepEqual(tags, ['t1','t2']);
@@ -96,7 +96,7 @@ describe('annotationUI', function () {
 
     it('updates annotations with matching tags in the store', function () {
       var annot = newAnnotation();
-      annot.$$tag = 'local-tag';
+      annot.$tag = 'local-tag';
       annotationUI.addAnnotations([annot]);
 
       var saved = Object.assign({}, annot, {id: 'server-id'});
@@ -232,12 +232,12 @@ describe('annotationUI', function () {
 
     it('matches annotations to remove by tag', function () {
       annotationUI.addAnnotations(fixtures.pair);
-      annotationUI.removeAnnotations([{$$tag: fixtures.pair[0].$$tag}]);
+      annotationUI.removeAnnotations([{$tag: fixtures.pair[0].$tag}]);
 
       var tags = annotationUI.getState().annotations.map(function (a) {
-        return a.$$tag;
+        return a.$tag;
       });
-      assert.deepEqual(tags, [fixtures.pair[1].$$tag]);
+      assert.deepEqual(tags, [fixtures.pair[1].$tag]);
     });
 
     it('switches back to the Annotations tab when the last orphan is removed', function () {
@@ -496,7 +496,7 @@ describe('annotationUI', function () {
       var annot = defaultAnnotation();
       annotationUI.addAnnotations([annot]);
       annotationUI.updateAnchorStatus(annot.id, 'atag', true);
-      assert.equal(annotationUI.getState().annotations[0].$$tag, 'atag');
+      assert.equal(annotationUI.getState().annotations[0].$tag, 'atag');
     });
 
     it("updates the annotation's orphan flag", function () {

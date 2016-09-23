@@ -37,7 +37,7 @@ function errorMessage(reason) {
 function updateModel(annotation, changes, permissions) {
   return Object.assign({}, annotation, {
     // Explicitly copy across the non-enumerable local tag for the annotation
-    $$tag: annotation.$$tag,
+    $tag: annotation.$tag,
 
     // Apply changes from the draft
     tags: changes.tags,
@@ -67,7 +67,7 @@ function AnnotationController(
     return saved.then(function (savedAnnot) {
       // Copy across internal properties which are not part of the annotation
       // model saved on the server
-      savedAnnot.$$tag = annot.$$tag;
+      savedAnnot.$tag = annot.$tag;
       Object.keys(annot).forEach(function (k) {
         if (k[0] === '$') {
           savedAnnot[k] = annot[k];
@@ -176,7 +176,7 @@ function AnnotationController(
       // Highlights are always private.
       vm.annotation.permissions = permissions.private();
       save(vm.annotation).then(function(model) {
-        model.$$tag = vm.annotation.$$tag;
+        model.$tag = vm.annotation.$tag;
         $rootScope.$broadcast(events.ANNOTATION_CREATED, model);
       });
     } else {

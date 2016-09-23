@@ -64,7 +64,7 @@ module.exports = function WidgetController(
   function focusAnnotation(annotation) {
     var highlights = [];
     if (annotation) {
-      highlights = [annotation.$$tag];
+      highlights = [annotation.$tag];
     }
     frameSync.focusAnnotations(highlights);
   }
@@ -73,7 +73,7 @@ module.exports = function WidgetController(
     if (!annotation) {
       return;
     }
-    frameSync.scrollToAnnotation(annotation.$$tag);
+    frameSync.scrollToAnnotation(annotation.$tag);
   }
 
   /** Returns the annotation type - note or annotation of the first annotation
@@ -241,7 +241,7 @@ module.exports = function WidgetController(
       return;
     }
     var matchesSelection = tags.some(function (tag) {
-      return tag === selectedAnnot.$$tag;
+      return tag === selectedAnnot.$tag;
     });
     if (!matchesSelection) {
       return;

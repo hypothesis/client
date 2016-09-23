@@ -10,7 +10,7 @@ var fakeStore = require('./fake-redux-store');
 var formatAnnot = require('../frame-sync').formatAnnot;
 
 var fixtures = {
-  ann: Object.assign({$$tag: 't1'}, annotationFixtures.defaultAnnotation()),
+  ann: Object.assign({$tag: 't1'}, annotationFixtures.defaultAnnotation()),
 
   // New annotation received from the frame
   newAnnFromFrame: {
@@ -97,7 +97,7 @@ describe('FrameSync', function () {
     });
 
     it('sends a "loadAnnotations" message only for new annotations', function () {
-      var ann2 = Object.assign({}, fixtures.ann, {$$tag: 't2', id: 'a2'});
+      var ann2 = Object.assign({}, fixtures.ann, {$tag: 't2', id: 'a2'});
       fakeAnnotationUI.setState({annotations: [fixtures.ann]});
       fakeBridge.call.reset();
 
@@ -132,7 +132,7 @@ describe('FrameSync', function () {
       fakeBridge.emit('beforeCreateAnnotation', {tag: 't1', msg: ann});
 
       assert.calledWithMatch(onCreated, sinon.match.any, sinon.match({
-        $$tag: 't1',
+        $tag: 't1',
         target: [],
       }));
     });

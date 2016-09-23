@@ -4,7 +4,7 @@
 var DEFAULT_THREAD_STATE = {
   /**
    * The ID of this thread. This will be the same as the annotation ID for
-   * created annotations or the `$$tag` property for new annotations.
+   * created annotations or the `$tag` property for new annotations.
    */
   id: undefined,
   /**
@@ -40,11 +40,11 @@ var DEFAULT_THREAD_STATE = {
 /**
  * Returns a persistent identifier for an Annotation.
  * If the Annotation has been created on the server, it will have
- * an ID assigned, otherwise we fall back to the local-only '$$tag'
+ * an ID assigned, otherwise we fall back to the local-only '$tag'
  * property.
  */
 function id(annotation) {
-  return annotation.id || annotation.$$tag;
+  return annotation.id || annotation.$tag;
 }
 
 /**
