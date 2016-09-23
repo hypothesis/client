@@ -130,6 +130,10 @@ function FrameSync($rootScope, $window, AnnotationUISync, Discovery,
       annotationUI.toggleSelectedAnnotations(annotationUI.findIDsForTags(tags));
     });
 
+    bridge.on('sidebarOpened', function () {
+      $rootScope.$broadcast('sidebarOpened');
+    });
+
     // Create an instance of the AnnotationUISync class which listens for
     // selection/focus messages from the frame and propagates them to the rest
     // of the sidebar app.

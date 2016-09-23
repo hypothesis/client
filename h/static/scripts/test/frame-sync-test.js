@@ -218,4 +218,15 @@ describe('FrameSync', function () {
       assert.calledWith(fakeAnnotationUI.toggleSelectedAnnotations, ['id1', 'id2', 'id3']);
     });
   });
+
+  describe('on "sidebarOpened" message', function () {
+    it('broadcasts a sidebarOpened event', function () {
+      var onSidebarOpened = sinon.stub();
+      $rootScope.$on('sidebarOpened', onSidebarOpened);
+
+      fakeBridge.emit('sidebarOpened');
+
+      assert.called(onSidebarOpened);
+    });
+  });
 });
