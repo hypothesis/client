@@ -153,7 +153,9 @@ function RootThread($rootScope, annotationUI, drafts, features, searchFilter, vi
   // Remove any annotations that are deleted or unloaded
   $rootScope.$on(events.ANNOTATION_DELETED, function (event, annotation) {
     annotationUI.removeAnnotations([annotation]);
-    annotationUI.removeSelectedAnnotation(annotation);
+    if (annotation.id) {
+      annotationUI.removeSelectedAnnotation(annotation.id);
+    }
   });
   $rootScope.$on(events.ANNOTATIONS_UNLOADED, function (event, annotations) {
     annotationUI.removeAnnotations(annotations);
