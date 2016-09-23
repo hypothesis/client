@@ -166,9 +166,6 @@ function RootThread($rootScope, annotationUI, drafts, features, searchFilter, vi
       return metadata.isNew(ann) && !metadata.isReply(ann);
     }).map(function (ann) {
       return Object.assign(ann, {
-        // FIXME - $tag is currently a non-enumerable property so it has to be
-        // copied explicitly
-        $tag: ann.$tag,
         group: focusedGroupId,
       });
     });

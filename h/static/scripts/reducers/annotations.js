@@ -172,11 +172,6 @@ function addAnnotations(annotations, now) {
   annotations = annotations.map(function (annot) {
     if (annot.id) { return annot; }
     return Object.assign({
-      // Copy $tag explicitly because it is non-enumerable.
-      //
-      // FIXME: change $tag to $tag and make it enumerable so annotations
-      // can be handled more simply in the sidebar.
-      $tag: annot.$tag,
       // Date.prototype.toISOString returns a 0-offset (UTC) ISO8601
       // datetime.
       created: now.toISOString(),

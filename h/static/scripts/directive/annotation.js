@@ -36,9 +36,6 @@ function errorMessage(reason) {
  */
 function updateModel(annotation, changes, permissions) {
   return Object.assign({}, annotation, {
-    // Explicitly copy across the non-enumerable local tag for the annotation
-    $tag: annotation.$tag,
-
     // Apply changes from the draft
     tags: changes.tags,
     text: changes.text,
