@@ -13,13 +13,12 @@ var Socket = require('./websocket');
  * @param $rootScope - Scope used to $apply() app state changes
  *                     resulting from WebSocket messages, in order to update
  *                     appropriate watchers.
- * @param annotationMapper - The local annotation store
  * @param groups - The local groups store
  * @param session - Provides access to read and update the session state
  * @param settings - Application settings
  */
 // @ngInject
-function Streamer($rootScope, annotationMapper, annotationUI, features, groups,
+function Streamer($rootScope, annotationUI, features, groups,
                   session, settings) {
   // The randomly generated session UUID
   var clientId = uuid.v4();
@@ -193,10 +192,10 @@ function Streamer($rootScope, annotationMapper, annotationUI, features, groups,
     });
 
     if (updates.length) {
-      annotationMapper.loadAnnotations(updates);
+      annotationUI.addAnnotations(updates);
     }
     if (deletions.length) {
-      annotationMapper.unloadAnnotations(deletions);
+      annotationUI.removeAnnotations(deletions);
     }
 
     pendingUpdates = {};

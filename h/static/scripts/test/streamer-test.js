@@ -65,7 +65,6 @@ function FakeSocket() {
 inherits(FakeSocket, EventEmitter);
 
 describe('Streamer', function () {
-  var fakeAnnotationMapper;
   var fakeAnnotationUI;
   var fakeFeatures;
   var fakeGroups;
@@ -78,7 +77,6 @@ describe('Streamer', function () {
   function createDefaultStreamer() {
     activeStreamer = new Streamer(
       fakeRootScope,
-      fakeAnnotationMapper,
       fakeAnnotationUI,
       fakeFeatures,
       fakeGroups,
@@ -100,12 +98,9 @@ describe('Streamer', function () {
       },
     };
 
-    fakeAnnotationMapper = {
-      loadAnnotations: sinon.stub(),
-      unloadAnnotations: sinon.stub(),
-    };
-
     fakeAnnotationUI = {
+      addAnnotations: sinon.stub(),
+      removeAnnotations: sinon.stub(),
       annotationExists: sinon.stub().returns(false),
       isSidebar: sinon.stub().returns(true),
     };
@@ -197,19 +192,19 @@ describe('Streamer', function () {
     context('when realtime updates are not deferred', function () {
       it('should load new annotations', function () {
         fakeWebSocket.notify(fixtures.createNotification);
-        assert.ok(fakeAnnotationMapper.loadAnnotations.calledOnce);
+        assert.calledOnce(fakeAnnotationUI.addAnnotations);
       });
 
       it('should unload deleted annotations', function () {
         fakeAnnotationUI.annotationExists.returns(true);
         fakeWebSocket.notify(fixtures.deleteNotification);
-        assert.ok(fakeAnnotationMapper.unloadAnnotations.calledOnce);
+        assert.calledOnce(fakeAnnotationUI.removeAnnotations);
       });
 
       it('ignores notifications about annotations in unfocused groups', function () {
         fakeGroups.focused.returns({id: 'private'});
         fakeWebSocket.notify(fixtures.createNotification);
-        assert.notCalled(fakeAnnotationMapper.loadAnnotations);
+        assert.notCalled(fakeAnnotationUI.addAnnotations);
       });
     });
 
@@ -223,7 +218,7 @@ describe('Streamer', function () {
       it('does not defer updates', function () {
         fakeWebSocket.notify(fixtures.createNotification);
 
-        assert.calledWith(fakeAnnotationMapper.loadAnnotations,
+        assert.calledWith(fakeAnnotationUI.addAnnotations,
           fixtures.createNotification.payload);
       });
 
@@ -232,7 +227,7 @@ describe('Streamer', function () {
 
         fakeWebSocket.notify(fixtures.createNotification);
 
-        assert.calledWith(fakeAnnotationMapper.loadAnnotations,
+        assert.calledWith(fakeAnnotationUI.addAnnotations,
           fixtures.createNotification.payload);
       });
     });
@@ -289,12 +284,12 @@ describe('Streamer', function () {
 
       it('does not apply updates immediately', function () {
         fakeWebSocket.notify(fixtures.createNotification);
-        assert.notCalled(fakeAnnotationMapper.loadAnnotations);
+        assert.notCalled(fakeAnnotationUI.addAnnotations);
       });
 
       it('does not apply deletions immediately', function () {
         fakeWebSocket.notify(fixtures.deleteNotification);
-        assert.notCalled(fakeAnnotationMapper.unloadAnnotations);
+        assert.notCalled(fakeAnnotationUI.removeAnnotations);
       });
     });
   });
@@ -309,7 +304,7 @@ describe('Streamer', function () {
     it('applies pending updates', function () {
       fakeWebSocket.notify(fixtures.createNotification);
       activeStreamer.applyPendingUpdates();
-      assert.calledWith(fakeAnnotationMapper.loadAnnotations,
+      assert.calledWith(fakeAnnotationUI.addAnnotations,
         fixtures.createNotification.payload);
     });
 
@@ -319,7 +314,7 @@ describe('Streamer', function () {
       fakeWebSocket.notify(fixtures.deleteNotification);
       activeStreamer.applyPendingUpdates();
 
-      assert.calledWithMatch(fakeAnnotationMapper.unloadAnnotations,
+      assert.calledWithMatch(fakeAnnotationUI.removeAnnotations,
         sinon.match([{id: 'an-id'}]));
     });
 

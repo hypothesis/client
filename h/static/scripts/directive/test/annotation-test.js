@@ -77,12 +77,11 @@ describe('annotation', function() {
   });
 
   describe('AnnotationController', function() {
-    var $q;
     var $rootScope;
     var $scope;
     var $timeout;
     var $window;
-    var fakeAnnotationMapper;
+    var fakeAnnotationUI;
     var fakeDrafts;
     var fakeFlash;
     var fakeGroups;
@@ -121,19 +120,9 @@ describe('annotation', function() {
     beforeEach(angular.mock.module(function($provide) {
       sandbox = sinon.sandbox.create();
 
-      fakeAnnotationMapper = {
-        createAnnotation: sandbox.stub().returns({
-          permissions: {
-            read: ['acct:bill@localhost'],
-            update: ['acct:bill@localhost'],
-            destroy: ['acct:bill@localhost'],
-            admin: ['acct:bill@localhost'],
-          },
-        }),
-        deleteAnnotation: sandbox.stub(),
+      fakeAnnotationUI = {
+        addAnnotations: sandbox.stub(),
       };
-
-      var fakeAnnotationUI = {};
 
       fakeDrafts = {
         update: sandbox.stub(),
@@ -185,6 +174,9 @@ describe('annotation', function() {
           create: sinon.spy(function (annot) {
             return Promise.resolve(Object.assign({}, annot));
           }),
+          delete: sinon.spy(function () {
+            return Promise.resolve();
+          }),
           update: sinon.spy(function (annot) {
             return Promise.resolve(Object.assign({}, annot));
           }),
@@ -195,7 +187,11 @@ describe('annotation', function() {
         hasPendingDeletion: sinon.stub(),
       };
 
-      $provide.value('annotationMapper', fakeAnnotationMapper);
+      var fakeTimeout = function (cb) {
+        return cb();
+      };
+
+      $provide.value('$timeout', fakeTimeout);
       $provide.value('annotationUI', fakeAnnotationUI);
       $provide.value('drafts', fakeDrafts);
       $provide.value('features', fakeFeatures);
@@ -210,10 +206,9 @@ describe('annotation', function() {
 
     beforeEach(
       inject(
-        function(_$q_, _$rootScope_, _$timeout_,
+        function(_$rootScope_, _$timeout_,
                 _$window_) {
           $window = _$window_;
-          $q = _$q_;
           $timeout = _$timeout_;
           $rootScope = _$rootScope_;
           $scope = $rootScope.$new();
@@ -466,6 +461,7 @@ describe('annotation', function() {
 
     describe('#reply', function() {
       var annotation;
+      var onCreateAnnotation;
 
       beforeEach(function() {
         annotation = fixtures.defaultAnnotation();
@@ -475,6 +471,8 @@ describe('annotation', function() {
           destroy: ['acct:joe@localhost'],
           admin: ['acct:joe@localhost'],
         };
+        onCreateAnnotation = sinon.stub();
+        $rootScope.$on(events.BEFORE_ANNOTATION_CREATED, onCreateAnnotation);
       });
 
       it('creates a new reply with the proper uri and references', function() {
@@ -483,8 +481,10 @@ describe('annotation', function() {
           references: [annotation.id],
           uri: annotation.uri,
         });
+
         controller.reply();
-        assert.calledWith(fakeAnnotationMapper.createAnnotation, reply);
+
+        assert.calledWith(onCreateAnnotation, sinon.match.any, reply);
       });
 
       it('makes the reply shared if the parent is shared', function() {
@@ -497,8 +497,10 @@ describe('annotation', function() {
         });
         fakePermissions.isShared.returns(true);
         fakePermissions.shared.returns(perms);
+
         controller.reply();
-        assert.calledWith(fakeAnnotationMapper.createAnnotation, reply);
+
+        assert.calledWith(onCreateAnnotation, sinon.match.any, reply);
       });
 
       it('makes the reply private if the parent is private', function() {
@@ -507,8 +509,10 @@ describe('annotation', function() {
         var perms = {read: ['onlyme']};
         fakePermissions.private.returns(perms);
         var reply = sinon.match({permissions: perms});
+
         controller.reply();
-        assert.calledWith(fakeAnnotationMapper.createAnnotation, reply);
+
+        assert.calledWith(onCreateAnnotation, sinon.match.any, reply);
       }
       );
 
@@ -517,8 +521,10 @@ describe('annotation', function() {
         annotation.group = 'my group';
         var controller = createDirective(annotation).controller;
         var reply = sinon.match({group: annotation.group});
+
         controller.reply();
-        assert.calledWith(fakeAnnotationMapper.createAnnotation, reply);
+
+        assert.calledWith(onCreateAnnotation, sinon.match.any, reply);
       });
     });
 
@@ -599,80 +605,55 @@ describe('annotation', function() {
     });
 
     describe('#delete()', function() {
-      beforeEach(function() {
-        fakeAnnotationMapper.deleteAnnotation = sandbox.stub();
+      it('deletes the annotation if the delete is confirmed', function () {
+        var parts = createDirective();
+        sandbox.stub($window, 'confirm').returns(true);
+        return parts.controller.delete().then(function() {
+          assert.calledWith(fakeStore.annotation.delete, {id: parts.annotation.id});
+        });
       });
 
-      it(
-        'calls annotationMapper.delete() if the delete is confirmed',
-        function(done) {
-          var parts = createDirective();
-          sandbox.stub($window, 'confirm').returns(true);
-          fakeAnnotationMapper.deleteAnnotation.returns($q.resolve());
-          parts.controller.delete().then(function() {
-            assert.calledWith(fakeAnnotationMapper.deleteAnnotation,
-                parts.annotation);
-            done();
-          });
-          $timeout.flush();
-        }
-      );
+      it('doesn\'t delete the annotation if the delete is cancelled', function () {
+        var parts = createDirective();
+        sandbox.stub($window, 'confirm').returns(false);
+        return parts.controller.delete().then(function() {
+          assert.notCalled(fakeStore.annotation.delete);
+        });
+      });
 
-      it(
-        'doesn\'t call annotationMapper.delete() if the delete is cancelled',
-        function(done) {
-          var parts = createDirective();
-          sandbox.stub($window, 'confirm').returns(false);
-          parts.controller.delete().then(function() {
-            assert.notCalled(fakeAnnotationMapper.deleteAnnotation);
-            done();
-          });
-          $timeout.flush();
-        }
-      );
-
-      it(
-        'flashes a generic error if the server cannot be reached',
-        function(done) {
-          var controller = createDirective().controller;
-          sandbox.stub($window, 'confirm').returns(true);
-          fakeAnnotationMapper.deleteAnnotation.returns($q.reject({
-            status: 0,
-          }));
-          controller.delete().then(function() {
-            assert.calledWith(fakeFlash.error,
-              'Service unreachable.', 'Deleting annotation failed');
-            done();
-          });
-          $timeout.flush();
-        }
-      );
-
-      it('flashes an error if the delete fails on the server', function(done) {
+      it('flashes a generic error if the server cannot be reached', function () {
         var controller = createDirective().controller;
         sandbox.stub($window, 'confirm').returns(true);
-        fakeAnnotationMapper.deleteAnnotation.returns($q.reject({
-          status: 500,
-          statusText: 'Server Error',
-          data: {},
-        }));
-        controller.delete().then(function() {
+        fakeStore.annotation.delete = function () {
+          return Promise.reject({status: 0});
+        };
+        return controller.delete().then(function() {
+          assert.calledWith(fakeFlash.error, 'Service unreachable.', 'Deleting annotation failed');
+        });
+      });
+
+      it('flashes an error if the delete fails on the server', function () {
+        var controller = createDirective().controller;
+        sandbox.stub($window, 'confirm').returns(true);
+        fakeStore.annotation.delete = function () {
+          return Promise.reject({
+            status: 500,
+            statusText: 'Server Error',
+            data: {},
+          });
+        };
+        return controller.delete().then(function() {
           assert.calledWith(fakeFlash.error,
             '500 Server Error', 'Deleting annotation failed');
-          done();
         });
-        $timeout.flush();
       });
 
-      it('doesn\'t flash an error if the delete succeeds', function(done) {
+      it('doesn\'t flash an error if the delete succeeds', function () {
         var controller = createDirective().controller;
         sandbox.stub($window, 'confirm').returns(true);
-        fakeAnnotationMapper.deleteAnnotation.returns($q.resolve());
-        controller.delete().then(function() {
+        return controller.delete().then(function() {
           assert.notCalled(fakeFlash.error);
-          done();
         });
-        $timeout.flush();
       });
     });
 
@@ -716,11 +697,10 @@ describe('annotation', function() {
         });
       });
 
-      it('emits annotationCreated when saving an annotation succeeds', function () {
+      it('saves the annotation to the store when saving succeeds', function () {
         var controller = createController();
-        sandbox.spy($rootScope, '$broadcast');
         return controller.save().then(function() {
-          assert.calledWith($rootScope.$broadcast, events.ANNOTATION_CREATED);
+          assert.called(fakeAnnotationUI.addAnnotations);
         });
       });
 

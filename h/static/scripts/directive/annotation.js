@@ -50,7 +50,7 @@ function updateModel(annotation, changes, permissions) {
 // @ngInject
 function AnnotationController(
   $document, $q, $rootScope, $scope, $timeout, $window, annotationUI,
-  annotationMapper, drafts, flash, features, groups, permissions, serviceUrl,
+  drafts, flash, features, groups, permissions, serviceUrl,
   session, store, streamer) {
 
   var vm = this;
@@ -177,7 +177,7 @@ function AnnotationController(
       vm.annotation.permissions = permissions.private();
       save(vm.annotation).then(function(model) {
         model.$$tag = vm.annotation.$$tag;
-        $rootScope.$broadcast(events.ANNOTATION_CREATED, model);
+        annotationUI.addAnnotations([model]);
       });
     } else {
       // User isn't logged in, save to drafts.
@@ -208,19 +208,21 @@ function AnnotationController(
     * @description Deletes the annotation.
     */
   vm.delete = function() {
-    return $timeout(function() {  // Don't use confirm inside the digest cycle.
+    return $timeout(function () {  // Don't use confirm inside the digest cycle.
       var msg = 'Are you sure you want to delete this annotation?';
-      if ($window.confirm(msg)) {
-        var onRejected = function(reason) {
-          flash.error(
-            errorMessage(reason), 'Deleting annotation failed');
-        };
-        $scope.$apply(function() {
-          annotationMapper.deleteAnnotation(vm.annotation).then(
-            null, onRejected);
-        });
+      if (!$window.confirm(msg)) {
+        return Promise.resolve();
       }
-    }, true);
+
+      return store.annotation.delete({
+        id: vm.annotation.id,
+      }).then(function () {
+        $rootScope.$broadcast(events.ANNOTATION_DELETED, vm.annotation);
+        return annotation;
+      }).catch(function (err) {
+        flash.error(errorMessage(err), 'Deleting annotation failed');
+      });
+    });
   };
 
   /**
@@ -336,7 +338,7 @@ function AnnotationController(
       replyPermissions = vm.state().isPrivate ?
         permissions.private() : permissions.shared(group);
     }
-    annotationMapper.createAnnotation({
+    $rootScope.$broadcast(events.BEFORE_ANNOTATION_CREATED, {
       group: group,
       references: references,
       permissions: replyPermissions,
@@ -377,11 +379,9 @@ function AnnotationController(
 
       vm.isSaving = false;
 
-      var event = isNew(vm.annotation) ?
-        events.ANNOTATION_CREATED : events.ANNOTATION_UPDATED;
       drafts.remove(vm.annotation);
 
-      $rootScope.$broadcast(event, updatedModel);
+      annotationUI.addAnnotations([updatedModel]);
     }).catch(function (reason) {
       vm.isSaving = false;
       vm.edit();
