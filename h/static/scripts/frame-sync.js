@@ -2,6 +2,7 @@
 
 var events = require('./events');
 var metadata = require('./annotation-metadata');
+var uiConstants = require('./ui-constants');
 
 /**
  * @typedef FrameInfo
@@ -114,6 +115,19 @@ function FrameSync($rootScope, $window, AnnotationUISync, Discovery,
         annotationUI.updateAnchorStatus(null, event.tag, event.msg.$orphan);
         $rootScope.$broadcast(events.ANNOTATIONS_SYNCED, [event.tag]);
       });
+    });
+
+    bridge.on('showAnnotations', function (tags) {
+      annotationUI.selectAnnotations(annotationUI.findIDsForTags(tags));
+      annotationUI.selectTab(uiConstants.TAB_ANNOTATIONS);
+    });
+
+    bridge.on('focusAnnotations', function (tags) {
+      annotationUI.focusAnnotations(tags || []);
+    });
+
+    bridge.on('toggleAnnotationSelection', function (tags) {
+      annotationUI.toggleSelectedAnnotations(annotationUI.findIDsForTags(tags));
     });
 
     // Create an instance of the AnnotationUISync class which listens for

@@ -80,42 +80,6 @@ describe('AnnotationUISync', function () {
     });
   });
 
-  describe('on "showAnnotations" event', function () {
-    it('selects annotations which have an ID', function () {
-      createAnnotationUISync();
-      annotationUI.selectAnnotations = sinon.stub();
-      publish('showAnnotations', ['tag1', 'tag2', 'tag3']);
-      assert.calledWith(annotationUI.selectAnnotations, ['id1', 'id2', 'id3']);
-    });
-
-    it('does not select annotations which do not have an ID', function () {
-      createAnnotationUISync();
-      annotationUI.selectAnnotations = sinon.stub();
-      publish('showAnnotations', ['tag1', 'tag-for-a-new-annotation']);
-      assert.calledWith(annotationUI.selectAnnotations, ['id1']);
-    });
-  });
-
-  describe('on "focusAnnotations" event', function () {
-    it('focuses the annotations', function () {
-      createAnnotationUISync();
-      publish('focusAnnotations', ['tag1', 'tag2', 'tag3']);
-      assert.deepEqual(annotationUI.getState().focusedAnnotationMap, {
-        tag1: true,
-        tag2: true,
-        tag3: true,
-      });
-    });
-  });
-
-  describe('on "toggleAnnotationSelection" event', function () {
-    it('toggles the selected state of the annotations', function () {
-      createAnnotationUISync();
-      annotationUI.toggleSelectedAnnotations = sinon.stub();
-      publish('toggleAnnotationSelection', ['tag1', 'tag2', 'tag3']);
-      assert.calledWith(annotationUI.toggleSelectedAnnotations, ['id1', 'id2', 'id3']);
-    });
-  });
 
   describe('on "setVisibleHighlights" event', function () {
     it('updates the annotationUI state', function () {

@@ -1,7 +1,5 @@
 'use strict';
 
-var uiConstants = require('./ui-constants');
-
 /**
  * Uses a channel between the sidebar and the attached frames to ensure
  * the interface remains in sync.
@@ -17,36 +15,8 @@ var uiConstants = require('./ui-constants');
  */
 // @ngInject
 function AnnotationUISync($rootScope, $window, annotationUI, bridge) {
-  function lookupByTag(tag) {
-    return annotationUI.getState().annotations.find(function (annot) {
-      return annot.$tag === tag;
-    });
-  }
-
-  function findIDsForTags(tags) {
-    var ids = [];
-    tags.forEach(function (tag) {
-      var annot = lookupByTag(tag);
-      if (annot && annot.id) {
-        ids.push(annot.id);
-      }
-    });
-    return ids;
-  }
 
   var channelListeners = {
-    showAnnotations: function (tags) {
-      var ids = findIDsForTags(tags || []);
-      annotationUI.selectAnnotations(ids);
-      annotationUI.selectTab(uiConstants.TAB_ANNOTATIONS);
-    },
-    focusAnnotations: function (tags) {
-      annotationUI.focusAnnotations(tags || []);
-    },
-    toggleAnnotationSelection: function (tags) {
-      var ids = findIDsForTags(tags || []);
-      annotationUI.toggleSelectedAnnotations(ids);
-    },
     setVisibleHighlights: function (state) {
       if (typeof state !== 'boolean') {
         state = true;

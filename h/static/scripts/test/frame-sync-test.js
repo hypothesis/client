@@ -8,6 +8,7 @@ var events = require('../events');
 var FrameSync = require('../frame-sync').default;
 var fakeStore = require('./fake-redux-store');
 var formatAnnot = require('../frame-sync').formatAnnot;
+var uiConstants = require('../ui-constants');
 
 var fixtures = {
   ann: Object.assign({$tag: 't1'}, annotationFixtures.defaultAnnotation()),
@@ -52,8 +53,14 @@ describe('FrameSync', function () {
   });
 
   beforeEach(function () {
-    fakeAnnotationUI = fakeStore({annotations: []});
-    fakeAnnotationUI.updateAnchorStatus = sinon.stub();
+    fakeAnnotationUI = fakeStore({annotations: []}, {
+      findIDsForTags: sinon.stub(),
+      focusAnnotations: sinon.stub(),
+      selectAnnotations: sinon.stub(),
+      selectTab: sinon.stub(),
+      toggleSelectedAnnotations: sinon.stub(),
+      updateAnchorStatus: sinon.stub(),
+    });
 
     var emitter = new EventEmitter();
     fakeBridge = {
@@ -184,6 +191,31 @@ describe('FrameSync', function () {
         searchUris: [frameInfo.uri, 'urn:1234'],
         uri: frameInfo.uri,
       }]);
+    });
+  });
+
+  describe('on "showAnnotations" message', function () {
+    it('selects annotations which have an ID', function () {
+      fakeAnnotationUI.findIDsForTags.returns(['id1','id2','id3']);
+      fakeBridge.emit('showAnnotations', ['tag1', 'tag2', 'tag3']);
+
+      assert.calledWith(fakeAnnotationUI.selectAnnotations, ['id1', 'id2', 'id3']);
+      assert.calledWith(fakeAnnotationUI.selectTab, uiConstants.TAB_ANNOTATIONS);
+    });
+  });
+
+  describe('on "focusAnnotations" message', function () {
+    it('focuses the annotations', function () {
+      fakeBridge.emit('focusAnnotations', ['tag1', 'tag2', 'tag3']);
+      assert.calledWith(fakeAnnotationUI.focusAnnotations, ['tag1', 'tag2', 'tag3']);
+    });
+  });
+
+  describe('on "toggleAnnotationSelection" message', function () {
+    it('toggles the selected state of the annotations', function () {
+      fakeAnnotationUI.findIDsForTags.returns(['id1','id2','id3']);
+      fakeBridge.emit('toggleAnnotationSelection', ['tag1', 'tag2', 'tag3']);
+      assert.calledWith(fakeAnnotationUI.toggleSelectedAnnotations, ['id1', 'id2', 'id3']);
     });
   });
 });
