@@ -4,6 +4,11 @@ var classnames = require('classnames');
 
 var template = require('./adder.html');
 
+var ANNOTATE_BTN_CLASS = 'js-annotate-btn';
+var ANNOTATE_BTN_SELECTOR = '.js-annotate-btn';
+
+var HIGHLIGHT_BTN_SELECTOR = '.js-highlight-btn';
+
 /**
  * Show the adder above the selection with an arrow pointing down at the
  * selected text.
@@ -119,16 +124,16 @@ function Adder(container, options) {
   var view = element.ownerDocument.defaultView;
   var enterTimeout;
 
-  element.querySelector('.js-annotate-btn')
+  element.querySelector(ANNOTATE_BTN_SELECTOR)
     .addEventListener('click', handleCommand);
-  element.querySelector('.js-highlight-btn')
+  element.querySelector(HIGHLIGHT_BTN_SELECTOR)
     .addEventListener('click', handleCommand);
 
   function handleCommand(event) {
     event.preventDefault();
     event.stopPropagation();
 
-    var isAnnotateCommand = this.classList.contains('js-annotate-btn');
+    var isAnnotateCommand = this.classList.contains(ANNOTATE_BTN_CLASS);
 
     if (isAnnotateCommand) {
       options.onAnnotate();
@@ -227,7 +232,7 @@ function Adder(container, options) {
     // Some sites make big assumptions about interactive
     // elements on the page. Some want to hide interactive elements
     // after use. So we need to make sure the button stays displayed
-    // the way it was originally displayed - withouth the inline styles
+    // the way it was originally displayed - without the inline styles
     // See: https://github.com/hypothesis/client/issues/137
     this.element.querySelector(ANNOTATE_BTN_SELECTOR).style.display = '';
     this.element.querySelector(HIGHLIGHT_BTN_SELECTOR).style.display = '';
