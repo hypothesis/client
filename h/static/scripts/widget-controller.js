@@ -241,7 +241,7 @@ module.exports = function WidgetController(
       return;
     }
     var matchesSelection = tags.some(function (tag) {
-      return tag.tag === selectedAnnot.$$tag;
+      return tag === selectedAnnot.$$tag;
     });
     if (!matchesSelection) {
       return;
