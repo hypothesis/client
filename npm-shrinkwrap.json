@@ -3838,9 +3838,9 @@
       "resolved": "https://registry.npmjs.org/randombytes/-/randombytes-2.0.3.tgz"
     },
     "raven-js": {
-      "version": "2.3.0",
-      "from": "raven-js@>=2.0.2 <3.0.0",
-      "resolved": "https://registry.npmjs.org/raven-js/-/raven-js-2.3.0.tgz"
+      "version": "3.7.0",
+      "from": "raven-js@>=3.7.0 <4.0.0",
+      "resolved": "https://registry.npmjs.org/raven-js/-/raven-js-3.7.0.tgz"
     },
     "raw-body": {
       "version": "2.1.7",
