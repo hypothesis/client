@@ -48,7 +48,7 @@ function sessionActions(options) {
  *
  * @ngInject
  */
-function session($http, $resource, $rootScope, flash, raven, settings) {
+function session($http, $resource, $rootScope, annotationUI, flash, raven, settings) {
   // Headers sent by every request made by the session service.
   var headers = {};
   var actions = sessionActions({
@@ -58,9 +58,6 @@ function session($http, $resource, $rootScope, flash, raven, settings) {
   });
   var endpoint = new URL('app/:path', settings.serviceUrl).href;
   var resource = $resource(endpoint, {}, actions);
-
-  // Blank initial model state
-  resource.state = {};
 
   // Cache the result of _load()
   var lastLoad;
@@ -108,20 +105,22 @@ function session($http, $resource, $rootScope, flash, raven, settings) {
    *              when new state has been pushed to it by the server.
    */
   resource.update = function (model) {
-    var isInitialLoad = !resource.state.csrf;
+    var prevSession = annotationUI.getState().session;
 
-    var userChanged = model.userid !== resource.state.userid;
-    var groupsChanged = !angular.equals(model.groups, resource.state.groups);
+    var isInitialLoad = !prevSession.csrf;
 
-    // Copy the model data (including the CSRF token) into `resource.state`.
-    angular.copy(model, resource.state);
+    var userChanged = model.userid !== prevSession.userid;
+    var groupsChanged = !angular.equals(model.groups, prevSession.groups);
+
+    // Update the session model used by the application
+    annotationUI.updateSession(model);
 
     // Set up subsequent requests to send the CSRF token in the headers.
-    if (resource.state.csrf) {
-      headers[$http.defaults.xsrfHeaderName] = resource.state.csrf;
+    if (model.csrf) {
+      headers[$http.defaults.xsrfHeaderName] = model.csrf;
     }
 
-    lastLoad = Promise.resolve(resource.state);
+    lastLoad = Promise.resolve(model);
     lastLoadTime = Date.now();
 
     $rootScope.$broadcast(events.SESSION_CHANGED, {
@@ -135,9 +134,9 @@ function session($http, $resource, $rootScope, flash, raven, settings) {
       });
 
       // associate error reports with the current user in Sentry
-      if (resource.state.userid) {
+      if (model.userid) {
         raven.setUserInfo({
-          id: resource.state.userid,
+          id: model.userid,
         });
       } else {
         raven.setUserInfo(undefined);
@@ -183,7 +182,21 @@ function session($http, $resource, $rootScope, flash, raven, settings) {
     return resource.update(model);
   }
 
-  return resource;
+  return {
+    dismissSidebarTutorial: resource.dismiss_sidebar_tutorial,
+    load: resource.load,
+    login: resource.login,
+    logout: resource.logout,
+
+    // For the moment, we continue to expose the session state as a property on
+    // this service. In future, other services which access the session state
+    // will do so directly from annotationUI or via selector functions
+    get state() {
+      return annotationUI.getState().session;
+    },
+
+    update: resource.update,
+  };
 }
 
 module.exports = session;

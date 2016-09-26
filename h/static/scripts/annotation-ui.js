@@ -39,6 +39,7 @@ var thunk = require('redux-thunk').default;
 var reducers = require('./reducers');
 var annotationsReducer = require('./reducers/annotations');
 var selectionReducer = require('./reducers/selection');
+var sessionReducer = require('./reducers/session');
 var viewerReducer = require('./reducers/viewer');
 var util = require('./reducers/util');
 
@@ -90,6 +91,7 @@ module.exports = function ($rootScope, settings) {
   var actionCreators = redux.bindActionCreators(Object.assign({},
     annotationsReducer.actions,
     selectionReducer.actions,
+    sessionReducer.actions,
     viewerReducer.actions
   ), store.dispatch);
 

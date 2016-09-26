@@ -12,7 +12,7 @@ function SidebarTutorialController(session) {
   };
 
   this.dismiss = function () {
-    session.dismiss_sidebar_tutorial();
+    session.dismissSidebarTutorial();
   };
 }
 
