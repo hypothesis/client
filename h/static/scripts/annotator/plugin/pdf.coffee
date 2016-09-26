@@ -1,6 +1,7 @@
 extend = require('extend')
 Annotator = require('annotator')
 
+RenderingStates = require('../pdfjs-rendering-states')
 
 module.exports = class PDF extends Annotator.Plugin
   documentLoaded: null
