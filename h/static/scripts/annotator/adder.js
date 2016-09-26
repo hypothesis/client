@@ -102,8 +102,11 @@ function Adder(container, options) {
     // property rather than `display` so that we can compute its size in order to
     // position it before display.
     display: 'block',
-    position: 'absolute',
     visibility: 'hidden',
+
+    // take position out of flow and off screen initially
+    position: 'absolute',
+    top: 0,
 
     // Assign a high Z-index so that the adder shows above any content on the
     // page
