@@ -271,7 +271,7 @@ describe('WidgetController', function () {
       };
       annotationUI.addAnnotations([annot]);
       $scope.$digest();
-      $rootScope.$broadcast(events.ANNOTATIONS_SYNCED, [{tag: 'atag'}]);
+      $rootScope.$broadcast(events.ANNOTATIONS_SYNCED, ['atag']);
       assert.calledWith(fakeFrameSync.focusAnnotations, ['atag']);
       assert.calledWith(fakeFrameSync.scrollToAnnotation, 'atag');
     });
