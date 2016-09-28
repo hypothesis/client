@@ -83,14 +83,6 @@ function configureRoutes($routeProvider) {
 }
 
 // @ngInject
-function setupFrameSync(frameSync) {
-  // Setup the connection to the frame hosting the sidebar app.
-  // This should only be done if this is the sidebar app, not the stream or
-  // standalone annotation pages.
-  return frameSync.connect();
-}
-
-// @ngInject
 function configureHttp($httpProvider, jwtInterceptorProvider) {
   // Use the Pyramid XSRF header name
   $httpProvider.defaults.xsrfHeaderName = 'X-CSRF-Token';
@@ -211,7 +203,6 @@ module.exports = angular.module('h', [
   .config(configureLocation)
   .config(configureRoutes)
 
-  .run(setupFrameSync)
   .run(setupHttp);
 
 processAppOpts();

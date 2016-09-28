@@ -15,6 +15,7 @@ describe('AppController', function () {
   var fakeAuth = null;
   var fakeDrafts = null;
   var fakeFeatures = null;
+  var fakeFrameSync = null;
   var fakeLocation = null;
   var fakeParams = null;
   var fakeSession = null;
@@ -76,6 +77,10 @@ describe('AppController', function () {
       flagEnabled: sandbox.stub().returns(false),
     };
 
+    fakeFrameSync = {
+      connect: sandbox.spy(),
+    };
+
     fakeLocation = {
       search: sandbox.stub().returns({}),
     };
@@ -106,6 +111,7 @@ describe('AppController', function () {
     $provide.value('auth', fakeAuth);
     $provide.value('drafts', fakeDrafts);
     $provide.value('features', fakeFeatures);
+    $provide.value('frameSync', fakeFrameSync);
     $provide.value('serviceUrl', fakeServiceUrl);
     $provide.value('session', fakeSession);
     $provide.value('settings', fakeSettings);
@@ -140,6 +146,18 @@ describe('AppController', function () {
       createController();
       assert.isTrue($scope.isSidebar);
     });
+  });
+
+  it('connects to host frame in the sidebar app', function () {
+    fakeWindow.top = {};
+    createController();
+    assert.called(fakeFrameSync.connect);
+  });
+
+  it('does not connect to the host frame in the stream', function () {
+    fakeWindow.top = fakeWindow;
+    createController();
+    assert.notCalled(fakeFrameSync.connect);
   });
 
   it('auth.status is "unknown" on startup', function () {

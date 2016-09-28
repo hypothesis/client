@@ -24,7 +24,7 @@ function authStateFromUserID(userid) {
 // @ngInject
 module.exports = function AppController(
   $controller, $document, $location, $rootScope, $route, $scope,
-  $window, annotationUI, auth, drafts, features, groups,
+  $window, annotationUI, auth, drafts, features, frameSync, groups,
   serviceUrl, session, settings, streamer
 ) {
   $controller('AnnotationUIController', {$scope: $scope});
@@ -51,6 +51,9 @@ module.exports = function AppController(
   // Check to see if we're in the sidebar, or on a standalone page such as
   // the stream page or an individual annotation page.
   $scope.isSidebar = $window.top !== $window;
+  if ($scope.isSidebar) {
+    frameSync.connect();
+  }
 
   $scope.serviceUrl = serviceUrl;
 
