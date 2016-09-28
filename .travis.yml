@@ -11,7 +11,7 @@ matrix:
     # 'node_js' is listed for each job to ensure that only two builds are run.
     # See https://github.com/hypothesis/client/pull/27#discussion_r70611726
     - env: ACTION=lint
-      node_js: '4.3'
+      node_js: '6.2'
       script: npm run lint
     - env: ACTION=test
-      node_js: '4.3'
+      node_js: '6.2'

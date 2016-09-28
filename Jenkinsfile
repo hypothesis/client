@@ -3,7 +3,7 @@
 node {
     checkout scm
 
-    nodeEnv = docker.image("node:4")
+    nodeEnv = docker.image("node:6.2")
     workspace = pwd()
 
     stage 'Build'
