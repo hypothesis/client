@@ -4,6 +4,20 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+### Fixed
+
+- Fix issue that could cause fetching annotations for current page to continue forever
+  ([#119](https://github.com/hypothesis/client/pull/119)).
+
+- Prevent adder from affecting website's height on load
+  ([#131](https://github.com/hypothesis/client/pull/131)).
+
+- Fix error when trying to activate Hypothesis on https://hypothes.is/stream
+  ([#138](https://github.com/hypothesis/client/pull/138)).
+
+
 ## [0.44.0] - 2016-09-19
 
 ### Changed
