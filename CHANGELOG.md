@@ -4,6 +4,22 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+### Changed
+
+- Upgrade environment to use Node v6.x
+  ([#143](https://github.com/hypothesis/client/pull/143)).
+
+### Fixed
+
+- Support loading client into current version of PDF.js viewer
+  ([#134](https://github.com/hypothesis/client/pull/134)).
+
+- Improve adder to be more resilient against overrides of Function.prototype.bind
+  ([#141](https://github.com/hypothesis/client/pull/141)).
+
+
 ## [0.45.0] - 2016-09-28
 
 ### Fixed
