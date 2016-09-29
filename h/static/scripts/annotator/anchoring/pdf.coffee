@@ -4,8 +4,8 @@ Annotator = require('annotator')
 xpathRange = Annotator.Range
 
 html = require('./html')
+RenderingStates = require('../pdfjs-rendering-states')
 {TextPositionAnchor, TextQuoteAnchor} = require('./types')
-
 
 # Caches for performance
 pageTextCache = {}
