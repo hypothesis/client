@@ -4,6 +4,11 @@ var classnames = require('classnames');
 
 var template = require('./adder.html');
 
+var ANNOTATE_BTN_CLASS = 'js-annotate-btn';
+var ANNOTATE_BTN_SELECTOR = '.js-annotate-btn';
+
+var HIGHLIGHT_BTN_SELECTOR = '.js-highlight-btn';
+
 /**
  * Show the adder above the selection with an arrow pointing down at the
  * selected text.
@@ -95,6 +100,7 @@ function createAdderDOM(container) {
  */
 function Adder(container, options) {
 
+  var self = this;
   var element = createAdderDOM(container);
 
   Object.assign(container.style, {
@@ -118,22 +124,24 @@ function Adder(container, options) {
   var view = element.ownerDocument.defaultView;
   var enterTimeout;
 
-  element.querySelector('.js-annotate-btn')
-    .addEventListener('click', handleCommand.bind(this, 'annotate'));
-  element.querySelector('.js-highlight-btn')
-    .addEventListener('click', handleCommand.bind(this, 'highlight'));
+  element.querySelector(ANNOTATE_BTN_SELECTOR)
+    .addEventListener('click', handleCommand);
+  element.querySelector(HIGHLIGHT_BTN_SELECTOR)
+    .addEventListener('click', handleCommand);
 
-  function handleCommand(command, event) {
+  function handleCommand(event) {
     event.preventDefault();
     event.stopPropagation();
 
-    if (command === 'annotate') {
+    var isAnnotateCommand = this.classList.contains(ANNOTATE_BTN_CLASS);
+
+    if (isAnnotateCommand) {
       options.onAnnotate();
     } else {
       options.onHighlight();
     }
 
-    this.hide();
+    self.hide();
   }
 
   function width() {
@@ -220,6 +228,14 @@ function Adder(container, options) {
       'annotator-adder--arrow-down': arrowDirection === ARROW_POINTING_DOWN,
       'annotator-adder--arrow-up': arrowDirection === ARROW_POINTING_UP,
     });
+
+    // Some sites make big assumptions about interactive
+    // elements on the page. Some want to hide interactive elements
+    // after use. So we need to make sure the button stays displayed
+    // the way it was originally displayed - without the inline styles
+    // See: https://github.com/hypothesis/client/issues/137
+    this.element.querySelector(ANNOTATE_BTN_SELECTOR).style.display = '';
+    this.element.querySelector(HIGHLIGHT_BTN_SELECTOR).style.display = '';
 
     Object.assign(container.style, {
       top: toPx(top),
