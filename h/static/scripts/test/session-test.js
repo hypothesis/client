@@ -20,21 +20,32 @@ describe('h:session', function () {
       .service('session', require('../session'));
   });
 
-  beforeEach(mock.module('h'));
-
-  beforeEach(mock.module(function ($provide) {
+  beforeEach(function () {
     sandbox = sinon.sandbox.create();
+
+    var state = {};
+    var fakeAnnotationUI = {
+      getState: function () {
+        return {session: state};
+      },
+      updateSession: function (session) {
+        state = session;
+      },
+    };
     fakeFlash = {error: sandbox.spy()};
     fakeRaven = {
       setUserInfo: sandbox.spy(),
     };
 
-    $provide.value('settings', {
-      serviceUrl: 'https://test.hypothes.is/root/',
+    mock.module('h', {
+      annotationUI: fakeAnnotationUI,
+      flash: fakeFlash,
+      raven: fakeRaven,
+      settings: {
+        serviceUrl: 'https://test.hypothes.is/root/',
+      },
     });
-    $provide.value('flash', fakeFlash);
-    $provide.value('raven', fakeRaven);
-  }));
+  });
 
 
   beforeEach(mock.inject(function (_$httpBackend_, _$rootScope_, _session_) {
@@ -237,11 +248,11 @@ describe('h:session', function () {
     });
   });
 
-  describe('#dismiss_sidebar_tutorial()', function () {
+  describe('#dismissSidebarTutorial()', function () {
     var url = 'https://test.hypothes.is/root/app/dismiss_sidebar_tutorial';
     it('disables the tutorial for the user', function () {
       $httpBackend.expectPOST(url).respond({});
-      session.dismiss_sidebar_tutorial();
+      session.dismissSidebarTutorial();
       $httpBackend.flush();
     });
   });

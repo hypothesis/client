@@ -19,6 +19,7 @@
 
 var annotations = require('./annotations');
 var selection = require('./selection');
+var session = require('./session');
 var viewer = require('./viewer');
 var util = require('./util');
 
@@ -27,6 +28,7 @@ function init(settings) {
     {},
     annotations.init(),
     selection.init(settings),
+    session.init(),
     viewer.init()
   );
 }
@@ -34,6 +36,7 @@ function init(settings) {
 var update = util.createReducer(Object.assign(
   annotations.update,
   selection.update,
+  session.update,
   viewer.update
 ));
 
