@@ -19,6 +19,10 @@ describe('markdown', function () {
     return editor[0].querySelector('.markdown-body');
   }
 
+  function toolbarButtons(editor) {
+    return Array.from(editor[0].querySelectorAll('.markdown-tools-button'));
+  }
+
   function getRenderedHTML(editor) {
     var contentElement = viewElement(editor);
     if (isHidden(contentElement)) {
@@ -140,12 +144,28 @@ describe('markdown', function () {
         text: 'Hello World',
       });
       var input = inputElement(editor);
-      var buttons = editor[0].querySelectorAll('.markdown-tools-button');
-      for (var i=0; i < buttons.length; i++) {
+      toolbarButtons(editor).forEach(function (button) {
         input.value = 'original text';
-        angular.element(buttons[i]).click();
+        angular.element(button).click();
         assert.equal(input.value, mockFormattingCommand().text);
-      }
+      });
+    });
+
+    it('should notify parent that the text changed', function () {
+      var onEditText = sinon.stub();
+      var editor = util.createDirective(document, 'markdown', {
+        readOnly: false,
+        text: 'Hello World',
+        onEditText: {
+          args: ['text'],
+          callback: onEditText,
+        },
+      });
+      toolbarButtons(editor).forEach(function (button) {
+        onEditText.reset();
+        angular.element(button).click();
+        assert.calledWith(onEditText, inputElement(editor).value);
+      });
     });
   });
 
