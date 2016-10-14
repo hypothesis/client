@@ -1,6 +1,6 @@
 'use strict';
 
-var TextQuoteAnchor = require('dom-anchor-text-quote');
+var domAnchorTextQuote = require('dom-anchor-text-quote');
 
 var FakePDFViewerApplication = require('./fake-pdf-viewer-application');
 var pdfAnchoring = require('../pdf');
@@ -13,7 +13,7 @@ var pdfAnchoring = require('../pdf');
  * @return {Range}
  */
 function findText(container, text) {
-  return new TextQuoteAnchor(container, text).toRange();
+  return domAnchorTextQuote.toRange(container, {exact: text});
 }
 
 var fixtures = {

@@ -120,19 +120,8 @@ var rangeSpecs = [
  */
 var expectedFailures = [
   // [description, expectedFailureTypes]
-  ['Full node contents with empty node at end.', {position: true, quote: true}],
-  ['Text between br tags, elementNode ref at end', {position: true, quote: true}],
-  ['Text between br tags, with <br/> at end', {position: true, quote: true}],
-  ['Text between br tags, with <br/><br/> at end', {position: true, quote: true}],
-  ['Text between br tags, with <br/> at start', {position: true, quote: true}],
-  ['Text between br tags, with <br/><br/> at start', {position: true, quote: true}],
-  ['Text between br tags, elementNode ref at end', {position: true, quote: true}],
-  ['Text between br tags, with <br/> at end', {position: true, quote: true}],
-  ['Text between br tags, with <br/><p><br/></p> at end', {position: true, quote: true}],
-  ['Text between br tags, with <p><br/></p> at the start', {position: true, quote: true}],
-  ['Text between br tags, with <br/><p><br/></p> at the start', {position: true, quote: true}],
-  ['No text node at the end and offset 0', {position: true, quote: true}],
-  ['Range starting at an element node with no children', {position: true, quote: true}],
+
+  // Currently empty.
 ];
 
 describe('HTML anchoring', function () {

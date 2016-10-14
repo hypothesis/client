@@ -1,5 +1,7 @@
-xpathRange = require('./range')
+domAnchorTextPosition = require('dom-anchor-text-position')
+domAnchorTextQuote = require('dom-anchor-text-quote')
 
+xpathRange = require('./range')
 
 # Helper function for throwing common errors
 missingParameter = (name) ->
@@ -47,7 +49,62 @@ class RangeAnchor
       endOffset: range.endOffset
     }
 
+###*
+# Converts between TextPositionSelector selectors and Range objects.
+###
+class TextPositionAnchor
+  constructor: (root, start, end) ->
+    @root = root
+    @start = start
+    @end = end
+
+  @fromRange: (root, range) ->
+    selector = domAnchorTextPosition.fromRange(root, range)
+    TextPositionAnchor.fromSelector(root, selector)
+
+  @fromSelector: (root, selector) ->
+    new TextPositionAnchor(root, selector.start, selector.end)
+
+  toSelector: () ->
+    {
+      type: 'TextPositionSelector',
+      start: @start,
+      end: @end,
+    }
+
+  toRange: () ->
+    domAnchorTextPosition.toRange(@root, {start: @start, end: @end})
+
+###*
+# Converts between TextQuoteSelector selectors and Range objects.
+###
+class TextQuoteAnchor
+  constructor: (root, exact, context = {}) ->
+    @root = root
+    @exact = exact
+    @context = context
+
+  @fromRange: (root, range, options) ->
+    selector = domAnchorTextQuote.fromRange(root, range, options)
+    TextQuoteAnchor.fromSelector(root, selector)
+
+  @fromSelector: (root, selector) ->
+    {prefix, suffix} = selector
+    new TextQuoteAnchor(root, selector.exact, {prefix, suffix})
+
+  toSelector: () ->
+    {
+      type: 'TextQuoteSelector',
+      exact: @exact,
+      prefix: @context.prefix,
+      suffix: @context.suffix,
+    }
+
+  toRange: (options = {}) ->
+    domAnchorTextQuote.toRange(@root, this.toSelector(), options)
+
+
 exports.RangeAnchor = RangeAnchor
 exports.FragmentAnchor = require('dom-anchor-fragment')
-exports.TextPositionAnchor = require('dom-anchor-text-position')
-exports.TextQuoteAnchor = require('dom-anchor-text-quote')
+exports.TextPositionAnchor = TextPositionAnchor
+exports.TextQuoteAnchor = TextQuoteAnchor

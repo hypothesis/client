@@ -66,6 +66,11 @@
       "from": "amdefine@>=0.0.4",
       "resolved": "https://registry.npmjs.org/amdefine/-/amdefine-1.0.0.tgz"
     },
+    "ancestors": {
+      "version": "0.0.3",
+      "from": "ancestors@0.0.3",
+      "resolved": "https://registry.npmjs.org/ancestors/-/ancestors-0.0.3.tgz"
+    },
     "angular": {
       "version": "1.5.6",
       "from": "angular@latest",
@@ -1167,14 +1172,26 @@
       "resolved": "https://registry.npmjs.org/dom-anchor-fragment/-/dom-anchor-fragment-1.0.4.tgz"
     },
     "dom-anchor-text-position": {
-      "version": "2.0.1",
-      "from": "dom-anchor-text-position@>=2.0.0 <3.0.0",
-      "resolved": "https://registry.npmjs.org/dom-anchor-text-position/-/dom-anchor-text-position-2.0.1.tgz"
+      "version": "3.0.3",
+      "from": "dom-anchor-text-position@latest",
+      "resolved": "https://registry.npmjs.org/dom-anchor-text-position/-/dom-anchor-text-position-3.0.3.tgz",
+      "dependencies": {
+        "dom-seek": {
+          "version": "4.0.3",
+          "from": "dom-seek@>=4.0.1 <5.0.0",
+          "resolved": "https://registry.npmjs.org/dom-seek/-/dom-seek-4.0.3.tgz"
+        }
+      }
     },
     "dom-anchor-text-quote": {
-      "version": "2.0.1",
-      "from": "dom-anchor-text-quote@>=2.0.0 <3.0.0",
-      "resolved": "https://registry.npmjs.org/dom-anchor-text-quote/-/dom-anchor-text-quote-2.0.1.tgz"
+      "version": "3.0.0",
+      "from": "dom-anchor-text-quote@latest",
+      "resolved": "https://registry.npmjs.org/dom-anchor-text-quote/-/dom-anchor-text-quote-3.0.0.tgz"
+    },
+    "dom-node-iterator": {
+      "version": "3.5.3",
+      "from": "dom-node-iterator@>=3.5.0 <4.0.0",
+      "resolved": "https://registry.npmjs.org/dom-node-iterator/-/dom-node-iterator-3.5.3.tgz"
     },
     "dom-seek": {
       "version": "1.0.1",
@@ -2192,6 +2209,11 @@
         }
       }
     },
+    "index-of": {
+      "version": "0.2.0",
+      "from": "index-of@>=0.2.0 <0.3.0",
+      "resolved": "https://registry.npmjs.org/index-of/-/index-of-0.2.0.tgz"
+    },
     "indexof": {
       "version": "0.0.1",
       "from": "indexof@0.0.1",
@@ -3197,11 +3219,6 @@
           "resolved": "https://registry.npmjs.org/minimatch/-/minimatch-1.0.0.tgz"
         }
       }
-    },
-    "node-iterator-shim": {
-      "version": "2.0.1",
-      "from": "node-iterator-shim@>=2.0.1 <3.0.0",
-      "resolved": "https://registry.npmjs.org/node-iterator-shim/-/node-iterator-shim-2.0.1.tgz"
     },
     "node-sass": {
       "version": "3.7.0",
