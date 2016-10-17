@@ -41,6 +41,8 @@ module.exports = function($sanitize) {
         // changed. This re-focuses the input field but really it should
         // happen automatically.
         input.focus();
+
+        scope.onEditText({text: input.value});
       }
 
       function focusInput() {
