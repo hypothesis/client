@@ -43,6 +43,8 @@ var sessionReducer = require('./reducers/session');
 var viewerReducer = require('./reducers/viewer');
 var util = require('./reducers/util');
 
+var debugMiddleware = require('./reducers/debug-middleware');
+
 /**
  * Redux middleware which triggers an Angular change-detection cycle
  * if no cycle is currently in progress.
@@ -75,6 +77,7 @@ module.exports = function ($rootScope, settings) {
     // This is used to implement actions which have side effects or are
     // asynchronous (see https://github.com/gaearon/redux-thunk#motivation)
     thunk,
+    debugMiddleware,
     angularDigestMiddleware.bind(null, $rootScope)
   );
   var store = redux.createStore(reducers.update, reducers.init(settings),
