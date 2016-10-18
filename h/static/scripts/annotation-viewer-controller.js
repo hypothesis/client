@@ -27,7 +27,7 @@ function fetchThread(store, id) {
 // @ngInject
 function AnnotationViewerController (
   $location, $routeParams, $scope,
-  annotationUI, rootThread, streamer, store, streamFilter, annotationMapper
+  annotationUI, rootThread, streamer, store, streamFilter
 ) {
   annotationUI.setAppIsSidebar(false);
 
@@ -50,7 +50,7 @@ function AnnotationViewerController (
   };
 
   this.ready = fetchThread(store, id).then(function (annots) {
-    annotationMapper.loadAnnotations(annots);
+    annotationUI.addAnnotations(annots);
 
     var topLevelAnnot = annots.filter(function (annot) {
       return (annot.references || []).length === 0;

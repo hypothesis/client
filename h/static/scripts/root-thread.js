@@ -117,18 +117,6 @@ function RootThread($rootScope, annotationUI, drafts, features, searchFilter, vi
 
   // Listen for annotations being created or loaded
   // and show them in the UI.
-  //
-  // Note: These events could all be converted into actions that are handled by
-  // the Redux store in annotationUI.
-  var loadEvents = [events.ANNOTATION_CREATED,
-                    events.ANNOTATION_UPDATED,
-                    events.ANNOTATIONS_LOADED];
-  loadEvents.forEach(function (event) {
-    $rootScope.$on(event, function (event, annotation) {
-      annotationUI.addAnnotations([].concat(annotation));
-    });
-  });
-
   $rootScope.$on(events.BEFORE_ANNOTATION_CREATED, function (event, ann) {
     // When a new annotation is created, remove any existing annotations
     // that are empty.
@@ -154,9 +142,6 @@ function RootThread($rootScope, annotationUI, drafts, features, searchFilter, vi
   $rootScope.$on(events.ANNOTATION_DELETED, function (event, annotation) {
     annotationUI.removeAnnotations([annotation]);
     annotationUI.removeSelectedAnnotation(annotation);
-  });
-  $rootScope.$on(events.ANNOTATIONS_UNLOADED, function (event, annotations) {
-    annotationUI.removeAnnotations(annotations);
   });
 
   // Once the focused group state is moved to the app state store, then the

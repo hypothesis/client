@@ -322,9 +322,6 @@ describe('rootThread', function () {
       assert.calledWith(fakeAnnotationUI.addAnnotations, sinon.match(annotations));
     }, [
       {event: events.BEFORE_ANNOTATION_CREATED, annotations: annot},
-      {event: events.ANNOTATION_CREATED, annotations: annot},
-      {event: events.ANNOTATION_UPDATED, annotations: annot},
-      {event: events.ANNOTATIONS_LOADED, annotations: [annot]},
     ]);
 
     it('expands the parents of new annotations', function () {
@@ -339,7 +336,6 @@ describe('rootThread', function () {
       assert.calledWith(fakeAnnotationUI.removeAnnotations, sinon.match(annotations));
     }, [
       {event: events.ANNOTATION_DELETED, annotations: annot},
-      {event: events.ANNOTATIONS_UNLOADED, annotations: [annot]},
     ]);
 
     it('deselects deleted annotations', function () {

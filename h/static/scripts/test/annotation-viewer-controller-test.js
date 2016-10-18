@@ -57,6 +57,7 @@ describe('AnnotationViewerController', function () {
         search: {},
       },
       annotationUI: {
+        addAnnotations: sinon.stub(),
         setAppIsSidebar: sinon.stub(),
         setCollapsed: sinon.stub(),
         highlightAnnotations: sinon.stub(),
@@ -80,9 +81,6 @@ describe('AnnotationViewerController', function () {
         },
         getFilter: function () {},
       },
-      annotationMapper: {
-        loadAnnotations: sinon.spy(),
-      },
     };
     locals.ctrl = getControllerService()('AnnotationViewerController', locals);
     return locals;
@@ -96,8 +94,7 @@ describe('AnnotationViewerController', function () {
       ]);
       var controller = createController({store: fakeStore});
       return controller.ctrl.ready.then(function () {
-        assert.calledOnce(controller.annotationMapper.loadAnnotations);
-        assert.calledWith(controller.annotationMapper.loadAnnotations,
+        assert.calledWith(controller.annotationUI.addAnnotations,
           sinon.match(fakeStore.annots));
       });
     });
@@ -122,7 +119,7 @@ describe('AnnotationViewerController', function () {
       ]);
       var controller = createController({store: fakeStore});
       return controller.ctrl.ready.then(function () {
-        assert.calledWith(controller.annotationMapper.loadAnnotations,
+        assert.calledWith(controller.annotationUI.addAnnotations,
           sinon.match(fakeStore.annots));
       });
     });

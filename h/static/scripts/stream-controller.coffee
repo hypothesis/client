@@ -5,13 +5,13 @@ module.exports = class StreamController
     '$scope', '$location', '$route', '$rootScope', '$routeParams',
     'annotationUI',
     'queryParser', 'rootThread', 'searchFilter', 'store',
-    'streamer', 'streamFilter', 'annotationMapper'
+    'streamer', 'streamFilter'
   ]
   constructor: (
      $scope,  $location,   $route,   $rootScope,   $routeParams
      annotationUI,
      queryParser,   rootThread,   searchFilter,   store,
-     streamer,   streamFilter,   annotationMapper
+     streamer,   streamFilter
   ) ->
     annotationUI.setAppIsSidebar(false)
 
@@ -28,7 +28,8 @@ module.exports = class StreamController
 
     load = ({rows, replies}) ->
       offset += rows.length
-      annotationMapper.loadAnnotations(rows, replies)
+      annots = rows.concat(replies)
+      annotationUI.addAnnotations(annots)
 
     # Reload on query change (ignore hash change)
     lastQuery = $routeParams.q

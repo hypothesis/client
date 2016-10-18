@@ -34,7 +34,7 @@ function groupIDFromSelection(selection, results) {
 
 // @ngInject
 module.exports = function WidgetController(
-  $scope, annotationUI, annotationMapper, drafts, features, frameSync, groups,
+  $scope, annotationUI, drafts, features, frameSync, groups,
   rootThread, settings, streamer, streamFilter, store
 ) {
   function thread() {
@@ -113,7 +113,7 @@ module.exports = function WidgetController(
   var searchClients = [];
 
   function _resetAnnotations() {
-    annotationMapper.unloadAnnotations(annotationUI.savedAnnotations());
+    annotationUI.removeAnnotations(annotationUI.savedAnnotations());
   }
 
   function _loadAnnotationsFor(uris, group) {
@@ -143,7 +143,7 @@ module.exports = function WidgetController(
       }
 
       if (results.length) {
-        annotationMapper.loadAnnotations(results);
+        annotationUI.addAnnotations(results);
       }
     });
     searchClient.on('end', function () {

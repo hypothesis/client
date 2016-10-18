@@ -10,7 +10,6 @@ class FakeRootThread extends EventEmitter
 describe 'StreamController', ->
   $controller = null
   $scope = null
-  fakeAnnotationMapper = null
   fakeAnnotationUI = null
   fakeParams = null
   fakeQueryParser = null
@@ -34,11 +33,8 @@ describe 'StreamController', ->
   beforeEach module ($provide) ->
     sandbox = sinon.sandbox.create()
 
-    fakeAnnotationMapper = {
-      loadAnnotations: sandbox.spy()
-    }
-
     fakeAnnotationUI = {
+      addAnnotations: sandbox.spy()
       clearAnnotations: sandbox.spy()
       setAppIsSidebar: sandbox.spy()
       setCollapsed: sandbox.spy()
@@ -81,7 +77,6 @@ describe 'StreamController', ->
 
     fakeRootThread = new FakeRootThread()
 
-    $provide.value 'annotationMapper', fakeAnnotationMapper
     $provide.value 'annotationUI', fakeAnnotationUI
     $provide.value '$route', fakeRoute
     $provide.value '$routeParams', fakeParams
@@ -115,9 +110,8 @@ describe 'StreamController', ->
     createController()
 
     Promise.resolve().then ->
-      assert.calledOnce fakeAnnotationMapper.loadAnnotations
-      assert.calledWith fakeAnnotationMapper.loadAnnotations,
-        ['annotation_1', 'annotation_2'], ['reply_1', 'reply_2', 'reply_3']
+      assert.calledWith fakeAnnotationUI.addAnnotations,
+        ['annotation_1', 'annotation_2', 'reply_1', 'reply_2', 'reply_3']
 
 
   describe 'on $routeUpdate', ->
