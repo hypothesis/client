@@ -132,10 +132,10 @@
     "jquery": "$"
   },
   "scripts": {
-    "build": "gulp build-app",
+    "build": "gulp build",
     "deps": "check-dependencies",
     "lint": "eslint .",
-    "test": "gulp test-app",
+    "test": "gulp test",
     "preversion": "npm run test",
     "version": "make clean all && ./scripts/update-changelog.js && git add CHANGELOG.md",
     "postversion": "./scripts/postversion.sh",

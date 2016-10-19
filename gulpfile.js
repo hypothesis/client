@@ -110,13 +110,13 @@ var appBundleConfigs = appBundles.map(function (config) {
   return Object.assign({}, appBundleBaseConfig, config);
 });
 
-gulp.task('build-app-js', ['build-vendor-js'], function () {
+gulp.task('build-js', ['build-vendor-js'], function () {
   return Promise.all(appBundleConfigs.map(function (config) {
     return createBundle(config);
   }));
 });
 
-gulp.task('watch-app-js', ['build-vendor-js'], function () {
+gulp.task('watch-js', ['build-vendor-js'], function () {
   appBundleConfigs.forEach(function (config) {
     createBundle(config, {watch: true});
   });
@@ -264,15 +264,8 @@ gulp.task('start-live-reload-server', function () {
   liveReloadServer = new LiveReloadServer(3000, 'http://localhost:5000');
 });
 
-gulp.task('build-app',
-          ['build-app-js',
-           'build-css',
-           'build-fonts',
-           'build-images'],
-          generateManifest);
-
 gulp.task('build',
-          ['build-app-js',
+          ['build-js',
            'build-css',
            'build-fonts',
            'build-images'],
@@ -280,7 +273,7 @@ gulp.task('build',
 
 gulp.task('watch',
           ['start-live-reload-server',
-           'watch-app-js',
+           'watch-js',
            'watch-css',
            'watch-fonts',
            'watch-images',
@@ -311,15 +304,15 @@ function runKarma(baseConfig, opts, done) {
   }, cliOpts, opts), done).start();
 }
 
-gulp.task('test-app', function (callback) {
+gulp.task('test', function (callback) {
   runKarma('./h/static/scripts/karma.config.js', {singleRun:true}, callback);
 });
 
-gulp.task('test-watch-app', function (callback) {
+gulp.task('test-watch', function (callback) {
   runKarma('./h/static/scripts/karma.config.js', {}, callback);
 });
 
-gulp.task('upload-sourcemaps', ['build-app-js'], function () {
+gulp.task('upload-sourcemaps', ['build-js'], function () {
   var uploadToSentry = require('./scripts/gulp/upload-to-sentry');
 
   var opts = {
