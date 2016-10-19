@@ -344,7 +344,7 @@ describe('rootThread', function () {
 
     it('deselects deleted annotations', function () {
       $rootScope.$broadcast(events.ANNOTATION_DELETED, annot);
-      assert.calledWith(fakeAnnotationUI.removeSelectedAnnotation, annot);
+      assert.calledWith(fakeAnnotationUI.removeSelectedAnnotation, annot.id);
     });
 
     describe('when a new annotation is created', function () {

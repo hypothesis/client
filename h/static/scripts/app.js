@@ -122,7 +122,6 @@ module.exports = angular.module('h', [
   'ngRaven',
 ])
 
-  .controller('AnnotationUIController', require('./annotation-ui-controller'))
   .controller('AnnotationViewerController', require('./annotation-viewer-controller'))
   .controller('StreamController', require('./stream-controller'))
   .controller('WidgetController', require('./widget-controller'))

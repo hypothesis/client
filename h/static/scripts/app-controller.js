@@ -23,11 +23,10 @@ function authStateFromUserID(userid) {
 
 // @ngInject
 module.exports = function AppController(
-  $controller, $document, $location, $rootScope, $route, $scope,
+  $document, $location, $rootScope, $route, $scope,
   $window, annotationUI, auth, drafts, features, frameSync, groups,
   serviceUrl, session, settings, streamer
 ) {
-  $controller('AnnotationUIController', {$scope: $scope});
 
   // This stores information about the current user's authentication status.
   // When the controller instantiates we do not yet know if the user is

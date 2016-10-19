@@ -45,8 +45,7 @@ describe('AppController', function () {
     }));
 
     angular.module('h', [])
-      .controller('AppController', AppController)
-      .controller('AnnotationUIController', angular.noop);
+      .controller('AppController', AppController);
   });
 
   beforeEach(angular.mock.module('h'));
