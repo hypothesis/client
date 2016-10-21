@@ -1,5 +1,7 @@
 'use strict';
 
+var istanbul = require('browserify-istanbul');
+
 module.exports = function(config) {
   config.set({
 
@@ -57,10 +59,23 @@ module.exports = function(config) {
       extensions: ['.coffee'],
       noParse: [require.resolve('./vendor/katex')],
       configure: function (bundle) {
-        bundle
-          .transform('coffeeify')
-          .plugin('proxyquire-universal');
+        bundle.plugin('proxyquire-universal');
       },
+
+      transform: [
+        'coffeeify',
+        istanbul({
+          ignore: ['**/node_modules/**', '**/katex.js', '**/*.html', '**/*.svg'],
+
+          // There is an outstanding but with karma-converage and istanbul
+          // in regards to doing source mapping and transpiling CoffeeScript
+          // The least bad work around is to replace the instrumenter with
+          // isparta and it will handle doing the re mapping for us.
+          // This issue follows the issue and attempts to fix it:
+          // https://github.com/karma-runner/karma-coverage/issues/157
+          instrumenter: require('isparta'),
+        }),
+      ],
     },
 
     mochaReporter: {
@@ -71,9 +86,16 @@ module.exports = function(config) {
       output: 'minimal',
     },
 
+    coverageReporter: {
+      type : 'html',
+
+      // place this in root of the project
+      dir : '../../../coverage/',
+    },
+
     // Use https://www.npmjs.com/package/karma-mocha-reporter
     // for more helpful rendering of test failures
-    reporters: ['mocha'],
+    reporters: ['mocha', 'coverage'],
 
     // web server port
     port: 9876,

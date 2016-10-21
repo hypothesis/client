@@ -554,6 +554,18 @@
       "from": "browserify-des@>=1.0.0 <2.0.0",
       "resolved": "https://registry.npmjs.org/browserify-des/-/browserify-des-1.0.0.tgz"
     },
+    "browserify-istanbul": {
+      "version": "2.0.0",
+      "from": "browserify-istanbul@>=2.0.0 <3.0.0",
+      "resolved": "http://registry.npmjs.org/browserify-istanbul/-/browserify-istanbul-2.0.0.tgz",
+      "dependencies": {
+        "minimatch": {
+          "version": "3.0.3",
+          "from": "minimatch@>=3.0.0 <4.0.0",
+          "resolved": "http://registry.npmjs.org/minimatch/-/minimatch-3.0.3.tgz"
+        }
+      }
+    },
     "browserify-ngannotate": {
       "version": "1.0.1",
       "from": "browserify-ngannotate@>=1.0.1 <2.0.0",
@@ -2414,10 +2426,49 @@
       "from": "isobject@>=2.0.0 <3.0.0",
       "resolved": "https://registry.npmjs.org/isobject/-/isobject-2.0.0.tgz"
     },
+    "isparta": {
+      "version": "4.0.0",
+      "from": "isparta@>=4.0.0 <5.0.0",
+      "resolved": "http://registry.npmjs.org/isparta/-/isparta-4.0.0.tgz",
+      "dependencies": {
+        "esprima": {
+          "version": "2.7.3",
+          "from": "esprima@>=2.1.0 <3.0.0",
+          "resolved": "http://registry.npmjs.org/esprima/-/esprima-2.7.3.tgz"
+        }
+      }
+    },
     "isstream": {
       "version": "0.1.2",
       "from": "isstream@>=0.1.2 <0.2.0",
       "resolved": "https://registry.npmjs.org/isstream/-/isstream-0.1.2.tgz"
+    },
+    "istanbul": {
+      "version": "0.4.5",
+      "from": "istanbul@latest",
+      "resolved": "http://registry.npmjs.org/istanbul/-/istanbul-0.4.5.tgz",
+      "dependencies": {
+        "esprima": {
+          "version": "2.7.3",
+          "from": "esprima@>=2.7.0 <2.8.0",
+          "resolved": "http://registry.npmjs.org/esprima/-/esprima-2.7.3.tgz"
+        },
+        "handlebars": {
+          "version": "4.0.5",
+          "from": "handlebars@>=4.0.1 <5.0.0",
+          "resolved": "http://registry.npmjs.org/handlebars/-/handlebars-4.0.5.tgz"
+        },
+        "source-map": {
+          "version": "0.4.4",
+          "from": "source-map@>=0.4.4 <0.5.0",
+          "resolved": "https://registry.npmjs.org/source-map/-/source-map-0.4.4.tgz"
+        },
+        "wordwrap": {
+          "version": "1.0.0",
+          "from": "wordwrap@>=1.0.0 <2.0.0",
+          "resolved": "https://registry.npmjs.org/wordwrap/-/wordwrap-1.0.0.tgz"
+        }
+      }
     },
     "jade": {
       "version": "0.26.3",
@@ -2579,6 +2630,18 @@
       "version": "0.1.0",
       "from": "karma-chai@>=0.1.0 <0.2.0",
       "resolved": "https://registry.npmjs.org/karma-chai/-/karma-chai-0.1.0.tgz"
+    },
+    "karma-coverage": {
+      "version": "1.1.1",
+      "from": "karma-coverage@>=1.1.1 <2.0.0",
+      "resolved": "http://registry.npmjs.org/karma-coverage/-/karma-coverage-1.1.1.tgz",
+      "dependencies": {
+        "minimatch": {
+          "version": "3.0.3",
+          "from": "minimatch@^3.0.0",
+          "resolved": "https://registry.npmjs.org/minimatch/-/minimatch-3.0.3.tgz"
+        }
+      }
     },
     "karma-mocha": {
       "version": "1.1.1",
