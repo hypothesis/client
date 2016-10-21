@@ -244,6 +244,7 @@ exports.anchor = (root, selectors, options = {}) ->
 
 
 exports.describe = (root, range, options = {}) ->
+  
   range = new xpathRange.BrowserRange(range).normalize()
 
   startTextLayer = getNodeTextLayer(range.start)

@@ -622,7 +622,7 @@
       }
       nr = {};
       if (r.startOffset > 0) {
-        if (r.start.nodeValue.length > r.startOffset) {
+        if (!r.start.nextSibling || r.start.nodeValue.length > r.startOffset) {
           nr.start = r.start.splitText(r.startOffset);
         } else {
           nr.start = r.start.nextSibling;

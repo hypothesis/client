@@ -29,6 +29,9 @@ var fixtures = {
 
     '"My dear Mr. Bennet," said his lady to him one day, "have you heard that\n' +
     'Netherfield Park is occupied again?" ',
+
+    'NODE A\nNODE B\nNODE C',
+
   ],
 };
 
@@ -95,6 +98,42 @@ describe('PDF anchoring', function () {
         });
       });
     });
+
+    it('returns selector when range starts at end of text node with no next siblings', function () {
+      // this problem is referenced in client issue #122
+      // But what is happening is the startContainer is referencing a text
+      // elment inside of a node. The logic in pdf#describe() was assuming if the
+      // selection was not middle of the word, the text node would have a nextSibling.
+      // However, if the selection is at the end of the only text node of its
+      // parent set, this fails.
+
+
+      viewer.setCurrentPage(3);
+
+      var quote = 'NODE B';
+
+      // this selects NODE A text node
+      var textNodeSelected = container.querySelector('.textLayer div').firstChild;
+      var staticRange = findText(container, quote);
+
+      var range = {
+        // put the selection at the very end of the node
+        startOffset: textNodeSelected.length,
+        startContainer: textNodeSelected,
+        endOffset: staticRange.endOffset,
+        endContainer: staticRange.endContainer,
+        commonAncestorContainer: staticRange.commonAncestorContainer,
+      };
+
+      var contentStr = fixtures.pdfContent.join('');
+      var expectedPos = contentStr.replace(/\n/g,'').lastIndexOf(quote);
+
+      return pdfAnchoring.describe(container, range).then(function (selectors) {
+        var position = selectors[0];
+        assert.equal(position.start, expectedPos);
+        assert.equal(position.end, expectedPos + quote.length);
+      });
+    });
   });
 
   describe('#anchor', function () {
@@ -139,4 +178,5 @@ describe('PDF anchoring', function () {
       });
     });
   });
+
 });
