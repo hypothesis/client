@@ -117,7 +117,7 @@ var expectedFailures = [
   ['Text between br tags, with <br/><p><br/></p> at end', {position: true, quote: true}],
   ['Text between br tags, with <p><br/></p> at the start', {position: true, quote: true}],
   ['Text between br tags, with <br/><p><br/></p> at the start', {position: true, quote: true}],
-  ['No text node at the end and offset 0', {position: true, quote: true, range: true}],
+  ['No text node at the end and offset 0', {position: true, quote: true}],
 ];
 
 describe('HTML anchoring', function () {

@@ -1,5 +1,5 @@
-Annotator = require('annotator')
-$ = Annotator.$
+Range = require('../anchoring/range')
+$ = require('jquery')
 
 highlighter = require('../highlighter')
 
@@ -8,7 +8,7 @@ describe "highlightRange", ->
     txt = document.createTextNode('test highlight span')
     el = document.createElement('span')
     el.appendChild(txt)
-    r = new Annotator.Range.NormalizedRange({
+    r = new Range.NormalizedRange({
       commonAncestor: el,
       start: txt,
       end: txt
@@ -26,7 +26,7 @@ describe "highlightRange", ->
     el.appendChild(txt)
     el.appendChild(blank)
     el.appendChild(txt2)
-    r = new Annotator.Range.NormalizedRange({
+    r = new Range.NormalizedRange({
       commonAncestor: el,
       start: txt,
       end: txt2

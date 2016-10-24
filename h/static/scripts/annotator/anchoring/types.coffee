@@ -1,5 +1,4 @@
-Annotator = require('annotator')
-xpathRange = Annotator.Range
+xpathRange = require('./range')
 
 
 # Helper function for throwing common errors
