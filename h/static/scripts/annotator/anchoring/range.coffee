@@ -163,7 +163,10 @@ class Range.BrowserRange
     # Look at the start
     if @startContainer.nodeType is Node.ELEMENT_NODE
       # We are dealing with element nodes
-      r.start = Util.getFirstTextNodeNotBefore @startContainer.childNodes[@startOffset]
+      if @startOffset < @startContainer.childNodes.length
+        r.start = Util.getFirstTextNodeNotBefore @startContainer.childNodes[@startOffset]
+      else
+        r.start = Util.getFirstTextNodeNotBefore @startContainer
       r.startOffset = 0
     else
       # We are dealing with simple text nodes

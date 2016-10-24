@@ -72,6 +72,8 @@ var rangeSpecs = [
   // Where the *Container nodes are expressed as either an XPath relative to
   // the container or the index into the list of text nodes within the container
   // node
+
+  // Test cases from Annotator v1.2.x's range_spec.coffee
   [ 0,           13,  0,           27,  'habitant morbi',                                    'Partial node contents.' ],
   [ 0,           0,   0,           37,  'Pellentesque habitant morbi tristique',             'Full node contents, textNode refs.' ],
   [ '/p/strong', 0,   '/p/strong', 1,   'Pellentesque habitant morbi tristique',             'Full node contents, elementNode refs.' ],
@@ -98,6 +100,9 @@ var rangeSpecs = [
   [ '/div[2]',   2,'/div[2]/text()[2]',28,'Lorem sed do eiusmod tempor.',                    'Text between br tags, with <p><br/></p> at the start'],
   [ '/div[2]',   1,'/div[2]/text()[2]',28,'Lorem sed do eiusmod tempor.',                    'Text between br tags, with <br/><p><br/></p> at the start'],
   [ '/h2[2]',    0,'/p[4]', 0, 'Header Level 2\n\n\n  Mauris lacinia ipsum nulla, id iaculis quam egestas quis.\n\n\n', 'No text node at the end and offset 0'],
+
+  // Additional test cases
+  [ '/gh-73/div', 0, '/gh-73/span/text()', 4, 'Test', 'Range starting at an element node with no children'],
 ];
 
 /**
@@ -118,6 +123,7 @@ var expectedFailures = [
   ['Text between br tags, with <p><br/></p> at the start', {position: true, quote: true}],
   ['Text between br tags, with <br/><p><br/></p> at the start', {position: true, quote: true}],
   ['No text node at the end and offset 0', {position: true, quote: true}],
+  ['Range starting at an element node with no children', {position: true, quote: true}],
 ];
 
 describe('HTML anchoring', function () {
