@@ -77,7 +77,7 @@ VirtualThreadList.prototype.setRootThread = function (thread) {
  * the actual or 'last-seen' height is used if known. Otherwise an estimate
  * is used.
  *
- * @param {string} id - The annotation ID or $$tag
+ * @param {string} id - The annotation ID or $tag
  * @param {number} height - The height of the annotation thread.
  */
 VirtualThreadList.prototype.setThreadHeight = function (id, height) {

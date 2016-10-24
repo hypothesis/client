@@ -73,8 +73,8 @@ describe('drafts', function () {
     });
 
     it('should replace drafts with the same tag', function () {
-      var modelA = {$$tag: 'foo'};
-      var modelB = {$$tag: 'foo'};
+      var modelA = {$tag: 'foo'};
+      var modelB = {$tag: 'foo'};
       drafts.update(modelA, {isPrivate:true, tags:['foo'], text:'foo'});
       drafts.update(modelB, {isPrivate:true, tags:['foo'], text:'bar'});
       assert.equal(drafts.get(modelA).text, 'bar');
@@ -92,7 +92,7 @@ describe('drafts', function () {
 
   describe('#unsaved', function () {
     it('should return drafts for unsaved annotations', function () {
-      var model = {$$tag: 'local-tag', id: undefined};
+      var model = {$tag: 'local-tag', id: undefined};
       drafts.update(model, {text: 'bar'});
       assert.deepEqual(drafts.unsaved(), [model]);
     });

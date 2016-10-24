@@ -266,7 +266,7 @@ describe('WidgetController', function () {
       annotationUI.selectAnnotations(['123']);
       fakeFrameSync.frames.push({uri: uri, searchUris: [uri]});
       var annot = {
-        $$tag: 'atag',
+        $tag: 'atag',
         id: '123',
       };
       annotationUI.addAnnotations([annot]);

@@ -150,7 +150,7 @@ describe('build-thread', function () {
 
     it('threads new annotations which have tags but not IDs', function () {
       var fixture = [{
-        $$tag: 't1',
+        $tag: 't1',
       }];
       var thread = createThread(fixture);
       assert.deepEqual(thread, [{annotation: fixture[0], children: []}]);
@@ -159,9 +159,9 @@ describe('build-thread', function () {
     it('threads new replies which have tags but not IDs', function () {
       var fixture = [{
         id: '1',
-        $$tag: 't1',
+        $tag: 't1',
       },{
-        $$tag: 't2',
+        $tag: 't2',
         references: ['1'],
       }];
       var thread = createThread(fixture, {}, ['parent']);

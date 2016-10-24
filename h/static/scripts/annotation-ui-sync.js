@@ -19,7 +19,7 @@ var uiConstants = require('./ui-constants');
 function AnnotationUISync($rootScope, $window, annotationUI, bridge) {
   function lookupByTag(tag) {
     return annotationUI.getState().annotations.find(function (annot) {
-      return annot.$$tag === tag;
+      return annot.$tag === tag;
     });
   }
 

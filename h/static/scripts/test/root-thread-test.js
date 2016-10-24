@@ -354,7 +354,7 @@ describe('rootThread', function () {
         onDelete = sinon.stub();
         $rootScope.$on(events.ANNOTATION_DELETED, onDelete);
 
-        existingNewAnnot = {$$tag: 'a-new-tag'};
+        existingNewAnnot = {$tag: 'a-new-tag'};
         fakeAnnotationUI.state.annotations.push(existingNewAnnot);
       });
 
@@ -403,12 +403,12 @@ describe('rootThread', function () {
 
   describe('when the focused group changes', function () {
     it('moves new annotations to the focused group', function () {
-      fakeAnnotationUI.state.annotations = [{$$tag: 'a-tag'}];
+      fakeAnnotationUI.state.annotations = [{$tag: 'a-tag'}];
 
       $rootScope.$broadcast(events.GROUP_FOCUSED, 'private-group');
 
       assert.calledWith(fakeAnnotationUI.addAnnotations, sinon.match([{
-        $$tag: 'a-tag',
+        $tag: 'a-tag',
         group: 'private-group',
       }]));
     });

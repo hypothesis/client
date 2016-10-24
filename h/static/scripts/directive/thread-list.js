@@ -61,7 +61,7 @@ function ThreadListController($scope, VirtualThreadList) {
 
   /**
    * Return the vertical scroll offset for the document in order to position the
-   * annotation thread with a given `id` or $$tag at the top-left corner
+   * annotation thread with a given `id` or $tag at the top-left corner
    * of the view.
    */
   function scrollOffset(id) {
@@ -72,7 +72,7 @@ function ThreadListController($scope, VirtualThreadList) {
     return Math.min(maxYOffset, visibleThreads.yOffsetOf(id));
   }
 
-  /** Scroll the annotation with a given ID or $$tag into view. */
+  /** Scroll the annotation with a given ID or $tag into view. */
   function scrollIntoView(id) {
     var estimatedYOffset = scrollOffset(id);
     window.scroll(0, estimatedYOffset);
@@ -101,7 +101,7 @@ function ThreadListController($scope, VirtualThreadList) {
       return;
     }
     self.onClearSelection();
-    scrollIntoView(annotation.$$tag);
+    scrollIntoView(annotation.$tag);
   });
 
   this.$onChanges = function (changes) {

@@ -22,7 +22,7 @@ var metadata = require('./annotation-metadata');
   */
 function formatAnnot(ann) {
   return {
-    tag: ann.$$tag,
+    tag: ann.$tag,
     msg: {
       document: ann.document,
       target: ann.target,
@@ -69,13 +69,13 @@ function FrameSync($rootScope, $window, AnnotationUISync, Discovery,
           return;
         }
 
-        inSidebar.add(annot.$$tag);
-        if (!inFrame.has(annot.$$tag)) {
+        inSidebar.add(annot.$tag);
+        if (!inFrame.has(annot.$tag)) {
           added.push(annot);
         }
       });
       var deleted = prevAnnotations.filter(function (annot) {
-        return !inSidebar.has(annot.$$tag);
+        return !inSidebar.has(annot.$tag);
       });
       prevAnnotations = state.annotations;
 
@@ -85,12 +85,12 @@ function FrameSync($rootScope, $window, AnnotationUISync, Discovery,
       if (added.length > 0) {
         bridge.call('loadAnnotations', added.map(formatAnnot));
         added.forEach(function (annot) {
-          inFrame.add(annot.$$tag);
+          inFrame.add(annot.$tag);
         });
       }
       deleted.forEach(function (annot) {
         bridge.call('deleteAnnotation', formatAnnot(annot));
-        inFrame.delete(annot.$$tag);
+        inFrame.delete(annot.$tag);
       });
     });
   }
@@ -103,7 +103,7 @@ function FrameSync($rootScope, $window, AnnotationUISync, Discovery,
     // A new annotation, note or highlight was created in the frame
     bridge.on('beforeCreateAnnotation', function (event) {
       inFrame.add(event.tag);
-      var annot = Object.assign({}, event.msg, {$$tag: event.tag});
+      var annot = Object.assign({}, event.msg, {$tag: event.tag});
       $rootScope.$broadcast(events.BEFORE_ANNOTATION_CREATED, annot);
     });
 
