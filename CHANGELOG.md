@@ -4,6 +4,16 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+### Fixed
+
+- Fix formatting changes made via toolbar buttons not persisting
+  ([#148](https://github.com/hypothesis/client/pull/148)).
+
+- Fix error when creating annotations if DOM selection meets certain conditions
+  ([#155](https://github.com/hypothesis/client/pull/155)).
+
 ## [0.46.0] - 2016-09-29
 
 ### Changed
