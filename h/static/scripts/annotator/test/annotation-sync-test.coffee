@@ -36,7 +36,7 @@ describe 'AnnotationSync', ->
   describe 'channel event handlers', ->
     assertBroadcast = (channelEvent, publishEvent) ->
       it 'broadcasts the "' + publishEvent + '" event over the local event bus', ->
-        ann = {id: 1, $$tag: 'tag1'}
+        ann = {id: 1, $tag: 'tag1'}
         annSync = createAnnotationSync()
         eventStub = sinon.stub()
         options.on(publishEvent, eventStub)
@@ -47,7 +47,7 @@ describe 'AnnotationSync', ->
 
     assertReturnValue = (channelEvent) ->
       it 'calls back with a formatted annotation', (done) ->
-        ann = {id: 1, $$tag: 'tag1'}
+        ann = {id: 1, $tag: 'tag1'}
         annSync = createAnnotationSync()
 
         callback = (err, ret) ->
@@ -60,14 +60,14 @@ describe 'AnnotationSync', ->
       it 'removes an existing entry from the cache before the event is triggered', ->
         options.emit = -> assert(!annSync.cache['tag1'])
 
-        ann = {id: 1, $$tag: 'tag1'}
+        ann = {id: 1, $tag: 'tag1'}
         annSync = createAnnotationSync()
         annSync.cache['tag1'] = ann
 
         publish(channelEvent, {msg: ann}, ->)
 
       it 'ensures the annotation is inserted in the cache', ->
-        ann = {id: 1, $$tag: 'tag1'}
+        ann = {id: 1, $tag: 'tag1'}
         annSync = createAnnotationSync()
 
         publish(channelEvent, {msg: ann}, ->)
@@ -81,14 +81,14 @@ describe 'AnnotationSync', ->
       it 'removes an existing entry from the cache before the event is triggered', ->
         options.emit = -> assert(!annSync.cache['tag1'])
 
-        ann = {id: 1, $$tag: 'tag1'}
+        ann = {id: 1, $tag: 'tag1'}
         annSync = createAnnotationSync()
         annSync.cache['tag1'] = ann
 
         publish('deleteAnnotation', {msg: ann}, ->)
 
       it 'removes the annotation from the cache', ->
-        ann = {id: 1, $$tag: 'tag1'}
+        ann = {id: 1, $tag: 'tag1'}
         annSync = createAnnotationSync()
 
         publish('deleteAnnotation', {msg: ann}, ->)
@@ -101,8 +101,8 @@ describe 'AnnotationSync', ->
         options.on('annotationsLoaded', loadedStub)
         annSync = createAnnotationSync()
 
-        annotations = [{id: 1, $$tag: 'tag1'}, {id: 2, $$tag: 'tag2'}, {id: 3, $$tag: 'tag3'}]
-        bodies = ({msg: ann, tag: ann.$$tag} for ann in annotations)
+        annotations = [{id: 1, $tag: 'tag1'}, {id: 2, $tag: 'tag2'}, {id: 3, $tag: 'tag3'}]
+        bodies = ({msg: ann, tag: ann.$tag} for ann in annotations)
         publish('loadAnnotations', bodies, ->)
 
         assert.calledWith(loadedStub, annotations)
@@ -116,10 +116,10 @@ describe 'AnnotationSync', ->
 
         assert.called(fakeBridge.call)
         assert.calledWith(fakeBridge.call, 'beforeCreateAnnotation',
-          {msg: ann, tag: ann.$$tag}, sinon.match.func)
+          {msg: ann, tag: ann.$tag}, sinon.match.func)
 
       it 'returns early if the annotation has a tag', ->
-        ann = {id: 1, $$tag: 'tag1'}
+        ann = {id: 1, $tag: 'tag1'}
         annSync = createAnnotationSync()
         options.emit('beforeAnnotationCreated', ann)
 
