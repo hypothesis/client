@@ -125,12 +125,12 @@ module.exports = class Guest extends Annotator
   _connectAnnotationUISync: (crossframe) ->
     crossframe.on 'focusAnnotations', (tags=[]) =>
       for anchor in @anchors when anchor.highlights?
-        toggle = anchor.annotation.$$tag in tags
+        toggle = anchor.annotation.$tag in tags
         $(anchor.highlights).toggleClass('annotator-hl-focused', toggle)
 
     crossframe.on 'scrollToAnnotation', (tag) =>
       for anchor in @anchors when anchor.highlights?
-        if anchor.annotation.$$tag is tag
+        if anchor.annotation.$tag is tag
           scrollIntoView(anchor.highlights[0])
 
     crossframe.on 'getDocumentInfo', (cb) =>
@@ -348,19 +348,19 @@ module.exports = class Guest extends Annotator
     annotation
 
   showAnnotations: (annotations) ->
-    tags = (a.$$tag for a in annotations)
+    tags = (a.$tag for a in annotations)
     @crossframe?.call('showAnnotations', tags)
 
   toggleAnnotationSelection: (annotations) ->
-    tags = (a.$$tag for a in annotations)
+    tags = (a.$tag for a in annotations)
     @crossframe?.call('toggleAnnotationSelection', tags)
 
   updateAnnotations: (annotations) ->
-    tags = (a.$$tag for a in annotations)
+    tags = (a.$tag for a in annotations)
     @crossframe?.call('updateAnnotations', tags)
 
   focusAnnotations: (annotations) ->
-    tags = (a.$$tag for a in annotations)
+    tags = (a.$tag for a in annotations)
     @crossframe?.call('focusAnnotations', tags)
 
   _onSelection: (range) ->

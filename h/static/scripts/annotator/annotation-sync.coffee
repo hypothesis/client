@@ -40,7 +40,7 @@ module.exports = class AnnotationSync
   _channelListeners:
     'deleteAnnotation': (body, cb) ->
       annotation = this._parse(body)
-      delete @cache[annotation.$$tag]
+      delete @cache[annotation.$tag]
       @_emit('annotationDeleted', annotation)
       cb(null, this._format(annotation))
 
@@ -52,7 +52,7 @@ module.exports = class AnnotationSync
   # Handlers for events coming from this frame, to send them across the channel
   _eventListeners:
     'beforeAnnotationCreated': (annotation) ->
-      return if annotation.$$tag?
+      return if annotation.$tag?
       this._mkCallRemotelyAndParseResults('beforeCreateAnnotation')(annotation)
 
   _mkCallRemotelyAndParseResults: (method, callBack) ->
@@ -76,9 +76,9 @@ module.exports = class AnnotationSync
   # Assign a non-enumerable tag to objects which cross the bridge.
   # This tag is used to identify the objects between message.
   _tag: (ann, tag) ->
-    return ann if ann.$$tag
+    return ann if ann.$tag
     tag = tag or window.btoa(Math.random())
-    Object.defineProperty(ann, '$$tag', value: tag)
+    Object.defineProperty(ann, '$tag', value: tag)
     @cache[tag] = ann
     ann
 
@@ -93,6 +93,6 @@ module.exports = class AnnotationSync
   _format: (ann) ->
     this._tag(ann)
     {
-      tag: ann.$$tag
+      tag: ann.$tag
       msg: ann
     }

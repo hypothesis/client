@@ -124,15 +124,15 @@ describe 'Guest', ->
         options = CrossFrame.lastCall.args[1]
 
       it 'detaches annotations on "annotationDeleted"', ->
-        ann = {id: 1, $$tag: 'tag1'}
+        ann = {id: 1, $tag: 'tag1'}
         sandbox.stub(guest, 'detach')
         options.emit('annotationDeleted', ann)
         assert.calledOnce(guest.detach)
         assert.calledWith(guest.detach, ann)
 
       it 'anchors annotations on "annotationsLoaded"', ->
-        ann1 = {id: 1, $$tag: 'tag1'}
-        ann2 = {id: 2, $$tag: 'tag2'}
+        ann1 = {id: 1, $tag: 'tag1'}
+        ann2 = {id: 2, $tag: 'tag2'}
         sandbox.stub(guest, 'anchor')
         options.emit('annotationsLoaded', [ann1, ann2])
         assert.calledTwice(guest.anchor)
@@ -162,8 +162,8 @@ describe 'Guest', ->
         highlight1 = $('<span></span>')
         guest = createGuest()
         guest.anchors = [
-          {annotation: {$$tag: 'tag1'}, highlights: highlight0.toArray()}
-          {annotation: {$$tag: 'tag2'}, highlights: highlight1.toArray()}
+          {annotation: {$tag: 'tag1'}, highlights: highlight0.toArray()}
+          {annotation: {$tag: 'tag2'}, highlights: highlight1.toArray()}
         ]
         emitGuestEvent('focusAnnotations', ['tag1'])
         assert.isTrue(highlight0.hasClass('annotator-hl-focused'))
@@ -173,8 +173,8 @@ describe 'Guest', ->
         highlight1 = $('<span class="annotator-hl-focused"></span>')
         guest = createGuest()
         guest.anchors = [
-          {annotation: {$$tag: 'tag1'}, highlights: highlight0.toArray()}
-          {annotation: {$$tag: 'tag2'}, highlights: highlight1.toArray()}
+          {annotation: {$tag: 'tag1'}, highlights: highlight0.toArray()}
+          {annotation: {$tag: 'tag2'}, highlights: highlight1.toArray()}
         ]
         emitGuestEvent('focusAnnotations', 'ctx', ['tag1'])
         assert.isFalse(highlight1.hasClass('annotator-hl-focused'))
@@ -188,7 +188,7 @@ describe 'Guest', ->
         highlight = $('<span></span>')
         guest = createGuest()
         guest.anchors = [
-          {annotation: {$$tag: 'tag1'}, highlights: highlight.toArray()}
+          {annotation: {$tag: 'tag1'}, highlights: highlight.toArray()}
         ]
         emitGuestEvent('scrollToAnnotation', 'tag1')
         assert.called(scrollIntoView)
