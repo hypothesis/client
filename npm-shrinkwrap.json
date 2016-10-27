@@ -4906,6 +4906,11 @@
       "from": "xmlhttprequest-ssl@1.5.1",
       "resolved": "https://registry.npmjs.org/xmlhttprequest-ssl/-/xmlhttprequest-ssl-1.5.1.tgz"
     },
+    "xorshift": {
+      "version": "1.0.0",
+      "from": "xorshift@latest",
+      "resolved": "https://registry.npmjs.org/xorshift/-/xorshift-1.0.0.tgz"
+    },
     "xregexp": {
       "version": "3.1.1",
       "from": "xregexp@>=3.0.0 <4.0.0",

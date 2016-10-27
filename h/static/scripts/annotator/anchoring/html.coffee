@@ -85,13 +85,18 @@ exports.anchor = (root, selectors, options = {}) ->
 
 
 exports.describe = (root, range, options = {}) ->
-  types = [FragmentAnchor, RangeAnchor, TextPositionAnchor, TextQuoteAnchor]
+  types = [RangeAnchor, TextPositionAnchor, TextQuoteAnchor]
+
+  if typeof options.fragment == 'undefined' || options.fragment
+    types.unshift(FragmentAnchor)
 
   selectors = for type in types
     try
       anchor = type.fromRange(root, range, options)
       selector = anchor.toSelector(options)
-    catch
+    catch err
+      if typeof options.ignoreErrors != 'undefined' && !options.ignoreErrors
+        throw err
       continue
 
   return selectors
