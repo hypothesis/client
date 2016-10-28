@@ -1,7 +1,6 @@
 seek = require('dom-seek')
 
-Annotator = require('annotator')
-xpathRange = Annotator.Range
+xpathRange = require('./range')
 
 html = require('./html')
 RenderingStates = require('../pdfjs-rendering-states')
@@ -244,7 +243,7 @@ exports.anchor = (root, selectors, options = {}) ->
 
 
 exports.describe = (root, range, options = {}) ->
-  
+
   range = new xpathRange.BrowserRange(range).normalize()
 
   startTextLayer = getNodeTextLayer(range.start)

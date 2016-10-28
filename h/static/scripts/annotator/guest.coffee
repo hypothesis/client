@@ -10,6 +10,7 @@ adder = require('./adder')
 highlighter = require('./highlighter')
 rangeUtil = require('./range-util')
 selections = require('./selections')
+xpathRange = require('./anchoring/range')
 
 animationPromise = (fn) ->
   return new Promise (resolve, reject) ->
@@ -214,7 +215,7 @@ module.exports = class Guest extends Annotator
       # Highlight the range for an anchor.
       return anchor unless anchor.range?
       return animationPromise ->
-        range = Annotator.Range.sniff(anchor.range)
+        range = xpathRange.sniff(anchor.range)
         normedRange = range.normalize(root)
         highlights = highlighter.highlightRange(normedRange)
 
@@ -438,4 +439,3 @@ module.exports = class Guest extends Annotator
       @element.removeClass(SHOW_HIGHLIGHTS_CLASS)
 
     @visibleHighlights = shouldShowHighlights
-

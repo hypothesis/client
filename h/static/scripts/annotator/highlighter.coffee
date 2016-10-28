@@ -1,5 +1,4 @@
-Annotator = require('annotator')
-$ = Annotator.$
+$ = require('jquery')
 
 
 # Public: Wraps the DOM Nodes within the provided range with a highlight
