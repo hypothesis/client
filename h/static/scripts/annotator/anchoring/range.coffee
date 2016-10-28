@@ -45,7 +45,7 @@ Range.sniff = (r) ->
   else if r.start and typeof r.start is "object"
     new Range.NormalizedRange(r)
   else
-    console.error(_t("Could not sniff range type"))
+    console.error("Could not sniff range type")
     false
 
 
@@ -153,7 +153,7 @@ class Range.BrowserRange
   # Returns an instance of Range.NormalizedRange
   normalize: (root) ->
     if @tainted
-      console.error(_t("You may only call normalize() once on a BrowserRange!"))
+      console.error("You may only call normalize() once on a BrowserRange!")
       return false
     else
       @tainted = true
