@@ -24,6 +24,6 @@ lint: node_modules/.uptodate
 build/manifest.json: node_modules/.uptodate
 	npm run-script build
 
-node_modules/.uptodate:
+node_modules/.uptodate: package.json npm-shrinkwrap.json
 	npm run-script deps 2>/dev/null || npm install
 	@touch $@
