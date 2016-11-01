@@ -8,6 +8,7 @@ node {
 
     stage 'Build'
     nodeEnv.inside("-e HOME=${workspace}") {
+        sh 'make clean'
         sh 'make'
     }
 
