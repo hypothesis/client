@@ -152,9 +152,9 @@ describe 'loginForm.Controller', ->
       assert.called $timeout
 
       $timeout.lastCall.args[0]()
-      assert.called $scope.form.$setPristine, 'the form is pristine'
+      assert.called $scope.form.$setPristine
       assert.deepEqual $scope.model, {}, 'the model is erased'
-      assert.called mockFlash.info, 'a flash notification is shown'
+      assert.called mockFlash.info
 
     it 'should not happen if the model is empty', ->
       $scope.model = undefined
