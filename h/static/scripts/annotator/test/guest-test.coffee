@@ -504,7 +504,7 @@ describe 'Guest', ->
 
       guest.anchor(annotation).then ->
         assert.equal(guest.anchors.length, 0)
-        assert.calledOnce(removeHighlights, highlights)
+        assert.calledOnce(removeHighlights)
         assert.calledWith(removeHighlights, highlights)
       .then(done, done)
 
