@@ -17,4 +17,24 @@ describe('annotations reducer', function () {
       assert.deepEqual(savedAnnotations(state), [fixtures.defaultAnnotation()]);
     });
   });
+
+  describe('#findIDsForTags', function () {
+    var findIDsForTags = annotations.findIDsForTags;
+
+    it('returns the IDs corresponding to the provided local tags', function () {
+      var ann = fixtures.defaultAnnotation();
+      var state = {
+        annotations: [Object.assign(ann, {$tag: 't1'})],
+      };
+      assert.deepEqual(findIDsForTags(state, ['t1']), [ann.id]);
+    });
+
+    it('does not return IDs for annotations that do not have an ID', function () {
+      var ann = fixtures.newAnnotation();
+      var state = {
+        annotations: [Object.assign(ann, {$tag: 't1'})],
+      };
+      assert.deepEqual(findIDsForTags(state, ['t1']), []);
+    });
+  });
 });

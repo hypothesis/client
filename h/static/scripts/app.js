@@ -189,7 +189,6 @@ module.exports = angular.module('h', [
 
   .factory('store', require('./store'))
 
-  .value('AnnotationUISync', require('./annotation-ui-sync'))
   .value('Discovery', require('./discovery'))
   .value('ExcerptOverflowMonitor', require('./directive/excerpt-overflow-monitor'))
   .value('VirtualThreadList', require('./virtual-thread-list'))

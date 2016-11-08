@@ -267,6 +267,25 @@ function annotationExists(state, id) {
   });
 }
 
+/**
+ * Return the IDs of annotations that correspond to `tags`.
+ *
+ * If an annotation does not have an ID because it has not been created on
+ * the server, there will be no entry for it in the returned array.
+ *
+ * @param {string[]} Local tags of annotations to look up
+ */
+function findIDsForTags(state, tags) {
+  var ids = [];
+  tags.forEach(function (tag) {
+    var annot = findByTag(state.annotations, tag);
+    if (annot && annot.id) {
+      ids.push(annot.id);
+    }
+  });
+  return ids;
+}
+
 module.exports = {
   init: init,
   update: update,
@@ -279,5 +298,6 @@ module.exports = {
 
   // Selectors
   annotationExists: annotationExists,
+  findIDsForTags: findIDsForTags,
   savedAnnotations: savedAnnotations,
 };

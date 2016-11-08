@@ -515,4 +515,29 @@ describe('annotationUI', function () {
       assert.isTrue(annots[1].$orphan);
     });
   });
+
+  describe('selector functions', function () {
+    // The individual state management modules in reducers/*.js define various
+    // 'selector' functions for extracting data from the app state. These are
+    // then re-exported on the annotationUI module.
+    it('re-exports selectors from reducers', function () {
+      var selectors = [
+        // Selection
+        'hasSelectedAnnotations',
+        'isAnnotationSelected',
+
+        // Annotations
+        'annotationExists',
+        'findIDsForTags',
+        'savedAnnotations',
+
+        // App Status
+        'isSidebar',
+      ];
+
+      selectors.forEach(function (fnName) {
+        assert.equal(typeof annotationUI[fnName], 'function', fnName + ' was exported');
+      });
+    });
+  });
 });

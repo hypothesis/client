@@ -2,6 +2,7 @@
 
 var events = require('./events');
 var metadata = require('./annotation-metadata');
+var uiConstants = require('./ui-constants');
 
 /**
  * @typedef FrameInfo
@@ -37,8 +38,7 @@ function formatAnnot(ann) {
  * sidebar.
  */
 // @ngInject
-function FrameSync($rootScope, $window, AnnotationUISync, Discovery,
-                   annotationUI, bridge) {
+function FrameSync($rootScope, $window, Discovery, annotationUI, bridge) {
 
   // List of frames currently connected to the sidebar
   var frames = [];
@@ -116,14 +116,22 @@ function FrameSync($rootScope, $window, AnnotationUISync, Discovery,
       });
     });
 
-    // Create an instance of the AnnotationUISync class which listens for
-    // selection/focus messages from the frame and propagates them to the rest
-    // of the sidebar app.
-    //
-    // FIXME: The frame message listeners from AnnotationUISync should be
-    // extracted and moved here and then the AnnotationUISync class can be
-    // removed entirely.
-    new AnnotationUISync($rootScope, $window, annotationUI, bridge);
+    bridge.on('showAnnotations', function (tags) {
+      annotationUI.selectAnnotations(annotationUI.findIDsForTags(tags));
+      annotationUI.selectTab(uiConstants.TAB_ANNOTATIONS);
+    });
+
+    bridge.on('focusAnnotations', function (tags) {
+      annotationUI.focusAnnotations(tags || []);
+    });
+
+    bridge.on('toggleAnnotationSelection', function (tags) {
+      annotationUI.toggleSelectedAnnotations(annotationUI.findIDsForTags(tags));
+    });
+
+    bridge.on('sidebarOpened', function () {
+      $rootScope.$broadcast('sidebarOpened');
+    });
   }
 
   /**

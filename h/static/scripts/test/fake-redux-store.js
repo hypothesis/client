@@ -7,8 +7,13 @@ var redux = require('redux');
  *
  * Unlike a real store, this has a `setState()` method that can be used to
  * set the state directly.
+ *
+ * @param {Object} initialState - Initial state for the store
+ * @param {Object} methods - A set of additional properties to mixin to the
+ *        returned store.
+ * @return {Object} Redux store
  */
-function fakeStore(initialState) {
+function fakeStore(initialState, methods) {
   function update(state, action) {
     if (action.state) {
       return action.state;
@@ -23,7 +28,7 @@ function fakeStore(initialState) {
     store.dispatch({type: 'SET_STATE', state: state});
   };
 
-  return store;
+  return Object.assign(store, methods);
 }
 
 module.exports = fakeStore;

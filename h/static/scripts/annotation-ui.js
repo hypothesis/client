@@ -110,6 +110,7 @@ module.exports = function ($rootScope, settings) {
     hasSelectedAnnotations: selectionReducer.hasSelectedAnnotations,
 
     annotationExists: annotationsReducer.annotationExists,
+    findIDsForTags: annotationsReducer.findIDsForTags,
     savedAnnotations: annotationsReducer.savedAnnotations,
 
     isSidebar: viewerReducer.isSidebar,
