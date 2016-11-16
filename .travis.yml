@@ -15,3 +15,5 @@ matrix:
       script: npm run lint
     - env: ACTION=test
       node_js: '6.2'
+      after_success:
+        npm run report-coverage

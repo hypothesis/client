@@ -87,10 +87,11 @@ module.exports = function(config) {
     },
 
     coverageReporter: {
-      type : 'html',
-
-      // place this in root of the project
-      dir : '../../../coverage/',
+      dir: '../../../coverage/',
+      reporters: [
+        {type:'html'},
+        {type:'json', subdir: './'},
+      ],
     },
 
     // Use https://www.npmjs.com/package/karma-mocha-reporter
