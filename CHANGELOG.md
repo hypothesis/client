@@ -4,6 +4,24 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+### Added
+
+- Add links to new Hypothesis Help Center from Help panel
+  ([#161](https://github.com/hypothesis/client/pull/161)).
+
+### Fixed
+
+- Fix bug when anchoring annotations meeting certain criteria
+  ([#158](https://github.com/hypothesis/client/pull/158)).
+
+### Changed
+
+- Generate code coverage metrics for the client
+  ([#156](https://github.com/hypothesis/client/pull/156),
+  [#168](https://github.com/hypothesis/client/pull/168))
+
 ## [0.47.0] - 2016-10-24
 
 ### Fixed
