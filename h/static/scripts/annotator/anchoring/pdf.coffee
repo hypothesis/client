@@ -7,6 +7,8 @@ RenderingStates = require('../pdfjs-rendering-states')
 {TextPositionAnchor, TextQuoteAnchor} = require('./types')
 
 # Caches for performance
+
+# Map of page index to Promise<string>
 pageTextCache = {}
 quotePositionCache = {}
 
@@ -28,7 +30,7 @@ getPage = (pageIndex) ->
 
 getPageTextContent = (pageIndex) ->
   if pageTextCache[pageIndex]?
-    return Promise.resolve(pageTextCache[pageIndex])
+    return pageTextCache[pageIndex]
   else
     joinItems = ({items}) ->
       # Skip empty items since PDF-js leaves their text layer divs blank.
@@ -37,11 +39,11 @@ getPageTextContent = (pageIndex) ->
       # See the appendText method of TextLayerBuilder in pdf.js.
       nonEmpty = (item.str for item in items when /\S/.test(item.str))
       textContent = nonEmpty.join('')
-      pageTextCache[pageIndex] = textContent
       return textContent
 
-    return PDFViewerApplication.pdfViewer.getPageTextContent(pageIndex)
+    pageTextCache[pageIndex] = PDFViewerApplication.pdfViewer.getPageTextContent(pageIndex)
     .then(joinItems)
+    return pageTextCache[pageIndex]
 
 
 getPageOffset = (pageIndex) ->
