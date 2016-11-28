@@ -15,6 +15,11 @@ clean:
 test: node_modules/.uptodate
 	npm test
 
+## Run the development client locally
+.PHONY: dev
+dev: node_modules/.uptodate
+	gulp watch
+
 .PHONY: lint
 lint: node_modules/.uptodate
 	npm run lint
