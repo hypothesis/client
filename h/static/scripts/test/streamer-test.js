@@ -67,7 +67,6 @@ inherits(FakeSocket, EventEmitter);
 describe('Streamer', function () {
   var fakeAnnotationMapper;
   var fakeAnnotationUI;
-  var fakeFeatures;
   var fakeGroups;
   var fakeRootScope;
   var fakeSession;
@@ -80,7 +79,6 @@ describe('Streamer', function () {
       fakeRootScope,
       fakeAnnotationMapper,
       fakeAnnotationUI,
-      fakeFeatures,
       fakeGroups,
       fakeSession,
       fakeSettings
@@ -108,10 +106,6 @@ describe('Streamer', function () {
     fakeAnnotationUI = {
       annotationExists: sinon.stub().returns(false),
       isSidebar: sinon.stub().returns(true),
-    };
-
-    fakeFeatures = {
-      flagEnabled: sinon.stub().returns(false),
     };
 
     fakeGroups = {
@@ -194,29 +188,8 @@ describe('Streamer', function () {
       activeStreamer.connect();
     });
 
-    context('when realtime updates are not deferred', function () {
-      it('should load new annotations', function () {
-        fakeWebSocket.notify(fixtures.createNotification);
-        assert.ok(fakeAnnotationMapper.loadAnnotations.calledOnce);
-      });
-
-      it('should unload deleted annotations', function () {
-        fakeAnnotationUI.annotationExists.returns(true);
-        fakeWebSocket.notify(fixtures.deleteNotification);
-        assert.ok(fakeAnnotationMapper.unloadAnnotations.calledOnce);
-      });
-
-      it('ignores notifications about annotations in unfocused groups', function () {
-        fakeGroups.focused.returns({id: 'private'});
-        fakeWebSocket.notify(fixtures.createNotification);
-        assert.notCalled(fakeAnnotationMapper.loadAnnotations);
-      });
-    });
-
     context('when the app is the stream', function () {
       beforeEach(function () {
-        // Enable the `defer_realtime_updates` feature flag
-        fakeFeatures.flagEnabled.returns(true);
         fakeAnnotationUI.isSidebar.returns(false);
       });
 
@@ -237,11 +210,7 @@ describe('Streamer', function () {
       });
     });
 
-    context('when realtime updates are deferred', function () {
-      beforeEach(function () {
-        fakeFeatures.flagEnabled.returns(true);
-      });
-
+    context('when the app is the sidebar', function () {
       it('saves pending updates', function () {
         fakeWebSocket.notify(fixtures.createNotification);
         assert.equal(activeStreamer.countPendingUpdates(), 1);
@@ -303,7 +272,6 @@ describe('Streamer', function () {
     beforeEach(function () {
       createDefaultStreamer();
       activeStreamer.connect();
-      fakeFeatures.flagEnabled.returns(true);
     });
 
     it('applies pending updates', function () {
@@ -340,7 +308,6 @@ describe('Streamer', function () {
     beforeEach(function () {
       createDefaultStreamer();
       activeStreamer.connect();
-      fakeFeatures.flagEnabled.returns(true);
     });
 
     unroll('discards pending updates when #event occurs', function (testCase) {
@@ -364,7 +331,6 @@ describe('Streamer', function () {
     it('clears pending updates and deletions', function () {
       createDefaultStreamer();
       activeStreamer.connect();
-      fakeFeatures.flagEnabled.returns(true);
 
       fakeWebSocket.notify(fixtures.createNotification);
       fakeRootScope.$broadcast(events.GROUP_FOCUSED);

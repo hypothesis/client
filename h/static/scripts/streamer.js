@@ -19,8 +19,8 @@ var Socket = require('./websocket');
  * @param settings - Application settings
  */
 // @ngInject
-function Streamer($rootScope, annotationMapper, annotationUI, features, groups,
-                  session, settings) {
+function Streamer($rootScope, annotationMapper, annotationUI, groups, session,
+                  settings) {
   // The randomly generated session UUID
   var clientId = uuid.v4();
 
@@ -84,8 +84,7 @@ function Streamer($rootScope, annotationMapper, annotationUI, features, groups,
       break;
     }
 
-    if (!features.flagEnabled('defer_realtime_updates') ||
-        !annotationUI.isSidebar()) {
+    if (!annotationUI.isSidebar()) {
       applyPendingUpdates();
     }
   }
