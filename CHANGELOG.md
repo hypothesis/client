@@ -4,6 +4,16 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+### Changed
+
+- Improve anchoring performance in PDFs
+  ([#171](https://github.com/hypothesis/client/pull/171)).
+
+- Remove `defer_realtime_updates` feature flagging
+  ([#173](https://github.com/hypothesis/client/pull/173)).
+
 ## [0.48.0] - 2016-11-18
 
 ### Added
