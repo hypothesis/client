@@ -4,6 +4,7 @@ var buildThread = require('./build-thread');
 var events = require('./events');
 var memoize = require('./util/memoize');
 var metadata = require('./annotation-metadata');
+var tabs = require('./tabs');
 var uiConstants = require('./ui-constants');
 
 function truthyKeys(map) {
@@ -39,7 +40,7 @@ var sortFns = {
  * The root thread is then displayed by viewer.html
  */
 // @ngInject
-function RootThread($rootScope, annotationUI, drafts, features, searchFilter, viewFilter) {
+function RootThread($rootScope, annotationUI, drafts, searchFilter, viewFilter) {
 
   /**
    * Build the root conversation thread from the given UI state.
@@ -60,37 +61,15 @@ function RootThread($rootScope, annotationUI, drafts, features, searchFilter, vi
 
     var threadFilterFn;
     if (state.isSidebar && !state.filterQuery) {
-      if (!features.flagEnabled('orphans_tab')) {
-        threadFilterFn = function (thread) {
-          if (!thread.annotation) {
-            return false;
-          }
-          if (state.selectedTab === uiConstants.TAB_NOTES) {
-            return metadata.isPageNote(thread.annotation);
-          } else {
-            return metadata.isAnnotation(thread.annotation) || metadata.isOrphan(thread.annotation);
-          }
-        };
-      } else {
-        threadFilterFn = function (thread) {
-          if (!thread.annotation) {
-            return false;
-          }
-          if (metadata.isWaitingToAnchor(thread.annotation)) {
-            return false;
-          }
-          switch (state.selectedTab) {
-          case uiConstants.TAB_ANNOTATIONS:
-            return metadata.isAnnotation(thread.annotation);
-          case uiConstants.TAB_ORPHANS:
-            return metadata.isOrphan(thread.annotation);
-          case uiConstants.TAB_NOTES:
-            return metadata.isPageNote(thread.annotation);
-          default:
-            throw new Error('Invalid selected tab');
-          }
-        };
-      }
+      threadFilterFn = function (thread) {
+        if (!thread.annotation) {
+          return false;
+        }
+
+        var separateOrphans = tabs.shouldSeparateOrphans(state);
+        return tabs.shouldShowInTab(thread.annotation, state.selectedTab,
+          separateOrphans);
+      };
     }
 
     // Get the currently loaded annotations and the set of inputs which
