@@ -19,6 +19,8 @@ getSiblingIndex = (node) ->
 
 
 getNodeTextLayer = (node) ->
+  if node is null
+    return null
   until node.classList?.contains('page')
     node = node.parentNode
   return node.getElementsByClassName('textLayer')[0]
@@ -250,6 +252,10 @@ exports.describe = (root, range, options = {}) ->
 
   startTextLayer = getNodeTextLayer(range.start)
   endTextLayer = getNodeTextLayer(range.end)
+
+  if startTextLayer is null
+    startTextLayer = endTextLayer
+    range.start = range.end
 
   # XXX: range covers only one page
   if startTextLayer isnt endTextLayer
