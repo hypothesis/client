@@ -62,6 +62,15 @@ function findByType(selectors, type) {
 }
 
 /**
+ * Return a copy of a list of selectors sorted by type.
+ */
+function sortByType(selectors) {
+  return selectors.slice().sort(function (a, b) {
+    return a.type.localeCompare(b.type);
+  });
+}
+
+/**
  * Test cases for mapping ranges to selectors.
  *
  * Originally taken from https://github.com/openannotation/annotator/blob/v1.2.x/test/spec/range_spec.coffee
@@ -191,4 +200,50 @@ describe('HTML anchoring', function () {
     });
     return Promise.all(anchored);
   }, testCases);
+
+  describe('Web page baselines', function () {
+    var fixtures = require('./html-baselines');
+    var frame;
+
+    before(function () {
+      frame = document.createElement('iframe');
+      document.body.appendChild(frame);
+    });
+
+    after(function () {
+      frame.remove();
+    });
+
+    unroll('generates selectors which match the baseline (#name)', function (fixture) {
+      var fixtureHtml = fixture.html;
+      var annotations = fixture.annotations.rows;
+
+      // Break references to external stylesheets and images so that the test
+      // runner does not try to load them.
+      //
+      // This method is crude but Good Enough™ for our test fixtures and does
+      // not modify the offset of any substrings within the text content of the
+      // document for matches that occur in a text-content context (eg.
+      // <pre>, <noscript>).
+      fixtureHtml = fixtureHtml.replace(/src=/g, 'sr_=').replace(/href=/g, 'hre_=');
+
+      frame.contentWindow.document.documentElement.innerHTML = fixtureHtml;
+
+      var annotationsChecked = annotations.map(function (ann) {
+        // Anchor the existing selectors
+        var root = frame.contentWindow.document.body;
+        var selectors = ann.target[0].selector;
+        var result = html.anchor(root, selectors);
+        return result.then(function (range) {
+          // Re-anchor the selectors and check that the new and existing
+          // selectors match.
+          return html.describe(root, range);
+        }).then(function (newSelectors) {
+          assert.deepEqual(sortByType(selectors), sortByType(newSelectors));
+        });
+      });
+
+      return Promise.all(annotationsChecked);
+    }, fixtures);
+  });
 });
