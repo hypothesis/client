@@ -79,7 +79,6 @@ describe('FrameSync', function () {
     }
 
     angular.mock.module('app', {
-      AnnotationUISync: sinon.stub(),
       Discovery: FakeDiscovery,
       annotationUI: fakeAnnotationUI,
       bridge: fakeBridge,
