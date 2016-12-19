@@ -46,6 +46,7 @@ describe('tabs', function () {
   describe('shouldShowInTab', function () {
     unroll('returns true if the annotation should be shown', function (testCase) {
       var ann = fixtures.defaultAnnotation();
+      ann.$anchorTimeout = testCase.anchorTimeout;
       ann.$orphan = testCase.orphan;
 
       assert.equal(tabs.shouldShowInTab(ann, uiConstants.TAB_ANNOTATIONS,
@@ -53,18 +54,51 @@ describe('tabs', function () {
       assert.equal(tabs.shouldShowInTab(ann, uiConstants.TAB_ORPHANS,
         testCase.separateOrphans), testCase.expectedTab === uiConstants.TAB_ORPHANS);
     }, [{
+      // Orphans tab disabled, anchoring in progress.
+      anchorTimeout: false,
       orphan: undefined,
       separateOrphans: false,
       expectedTab: uiConstants.TAB_ANNOTATIONS,
     },{
+      // Orphans tab disabled, anchoring succeeded.
+      anchorTimeout: false,
+      orphan: false,
+      separateOrphans: false,
+      expectedTab: uiConstants.TAB_ANNOTATIONS,
+    },{
+      // Orphans tab disabled, anchoring failed
+      anchorTimeout: false,
+      orphan: true,
+      separateOrphans: false,
+      expectedTab: uiConstants.TAB_ANNOTATIONS,
+    },{
+      // Orphans tab enabled, anchoring in progress.
+      anchorTimeout: false,
       orphan: undefined,
       separateOrphans: true,
       expectedTab: null,
     },{
+      // Orphans tab enabled, anchoring succeeded.
+      anchorTimeout: false,
       orphan: false,
       separateOrphans: true,
       expectedTab: uiConstants.TAB_ANNOTATIONS,
     },{
+      // Orphans tab enabled, anchoring failed.
+      anchorTimeout: false,
+      orphan: true,
+      separateOrphans: true,
+      expectedTab: uiConstants.TAB_ORPHANS,
+    },{
+      // Orphans tab enabled, anchoring timed out.
+      anchorTimeout: true,
+      orphan: undefined,
+      separateOrphans: true,
+      expectedTab: uiConstants.TAB_ANNOTATIONS,
+    },{
+      // Orphans tab enabled, anchoring initially timed out but eventually
+      // failed.
+      anchorTimeout: true,
       orphan: true,
       separateOrphans: true,
       expectedTab: uiConstants.TAB_ORPHANS,

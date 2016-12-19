@@ -114,9 +114,16 @@ function hasSelector(annotation) {
             annotation.target[0].selector);
 }
 
-/** Return `true` if the given annotation is not yet anchored. */
+/**
+ * Return `true` if the given annotation is not yet anchored.
+ *
+ * Returns false if anchoring is still in process but the flag indicating that
+ * the initial timeout allowed for anchoring has expired.
+ */
 function isWaitingToAnchor(annotation) {
-  return hasSelector(annotation) && (typeof annotation.$orphan === 'undefined');
+  return hasSelector(annotation) &&
+         (typeof annotation.$orphan === 'undefined') &&
+         !annotation.$anchorTimeout;
 }
 
 /** Return `true` if the given annotation is an orphan. */

@@ -63,6 +63,8 @@ function initializeAnnot(annotation, tag) {
   }
 
   return Object.assign({}, annotation, {
+    // Flag indicating whether waiting for the annotation to anchor timed out.
+    $anchorTimeout: false,
     $tag: annotation.$tag || tag,
     $orphan: orphan,
   });
@@ -150,6 +152,7 @@ var update = {
                   (annot.$tag && annot.$tag === action.tag);
       if (match) {
         return Object.assign({}, annot, {
+          $anchorTimeout: action.anchorTimeout || annot.$anchorTimeout,
           $orphan: action.isOrphan,
           $tag: action.tag,
         });
@@ -209,9 +212,9 @@ function addAnnotations(annotations, now) {
           .forEach(function (orphan) {
             dispatch({
               type: actions.UPDATE_ANCHOR_STATUS,
+              anchorTimeout: true,
               id: orphan.id,
               tag: orphan.$tag,
-              isOrphan: true,
             });
           });
       }, ANCHORING_TIMEOUT);
