@@ -49,6 +49,17 @@ function updateSession(session) {
   };
 }
 
+/**
+ * Return true if a given feature flag is enabled.
+ *
+ * @param {object} state - The application state
+ * @param {string} feature - The name of the feature flag. This matches the
+ *        name of the feature flag as declared in the Hypothesis service.
+ */
+function isFeatureEnabled(state, feature) {
+  return !!state.session.features[feature];
+}
+
 module.exports = {
   init: init,
   update: update,
@@ -56,4 +67,7 @@ module.exports = {
   actions: {
     updateSession: updateSession,
   },
+
+  // Selectors
+  isFeatureEnabled: isFeatureEnabled,
 };

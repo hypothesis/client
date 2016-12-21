@@ -27,7 +27,6 @@ describe('rootThread', function () {
   var fakeAnnotationUI;
   var fakeBuildThread;
   var fakeDrafts;
-  var fakeFeatures;
   var fakeSearchFilter;
   var fakeViewFilter;
 
@@ -46,6 +45,9 @@ describe('rootThread', function () {
         highlighted: [],
         isSidebar: true,
         selectedAnnotationMap: null,
+        session: {
+          features: {'orphans_tab': true},
+        },
         sortKey: 'Location',
         sortKeysAvailable: ['Location'],
         visibleHighlights: false,
@@ -68,10 +70,6 @@ describe('rootThread', function () {
       remove: sinon.stub(),
     };
 
-    fakeFeatures = {
-      flagEnabled: sinon.stub().returns(true),
-    };
-
     fakeSearchFilter = {
       generateFacetedFilter: sinon.stub(),
     };
@@ -83,7 +81,6 @@ describe('rootThread', function () {
     angular.module('app', [])
       .value('annotationUI', fakeAnnotationUI)
       .value('drafts', fakeDrafts)
-      .value('features', fakeFeatures)
       .value('searchFilter', fakeSearchFilter)
       .value('viewFilter', fakeViewFilter)
       .service('rootThread', proxyquire('../root-thread', {
@@ -275,22 +272,6 @@ describe('rootThread', function () {
       // There should be no thread filter function on the stream and standalone
       // pages, since we show all types of annotations here
       assert.notOk(threadFilterFn);
-    });
-
-    it('filter does not match annotation when it is still waiting to anchor', function () {
-      fakeBuildThread.reset();
-
-      fakeAnnotationUI.state = Object.assign({}, fakeAnnotationUI.state,
-        {selectedTab: uiConstants.TAB_ANNOTATIONS});
-
-      rootThread.thread(fakeAnnotationUI.state);
-      var threadFilterFn = fakeBuildThread.args[0][1].threadFilterFn;
-
-      var annotation = {
-        $orphan: undefined,
-        target: [{ selector: {} }],
-      };
-      assert.isFalse(threadFilterFn({annotation: annotation}));
     });
   });
 
