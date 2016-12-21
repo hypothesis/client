@@ -38,6 +38,7 @@ var thunk = require('redux-thunk').default;
 
 var reducers = require('./reducers');
 var annotationsReducer = require('./reducers/annotations');
+var framesReducer = require('./reducers/frames');
 var selectionReducer = require('./reducers/selection');
 var sessionReducer = require('./reducers/session');
 var viewerReducer = require('./reducers/viewer');
@@ -93,6 +94,7 @@ module.exports = function ($rootScope, settings) {
   //
   var actionCreators = redux.bindActionCreators(Object.assign({},
     annotationsReducer.actions,
+    framesReducer.actions,
     selectionReducer.actions,
     sessionReducer.actions,
     viewerReducer.actions
@@ -112,6 +114,8 @@ module.exports = function ($rootScope, settings) {
     annotationExists: annotationsReducer.annotationExists,
     findIDsForTags: annotationsReducer.findIDsForTags,
     savedAnnotations: annotationsReducer.savedAnnotations,
+
+    frames: framesReducer.frames,
 
     isSidebar: viewerReducer.isSidebar,
   }, store.getState);

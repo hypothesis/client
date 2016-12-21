@@ -11,15 +11,15 @@ module.exports = function () {
     bindToController: true,
     controllerAs: 'vm',
     // @ngInject
-    controller: function ($scope, $window, frameSync, serviceUrl) {
+    controller: function ($scope, $window, annotationUI, serviceUrl) {
       this.userAgent = $window.navigator.userAgent;
       this.version = '__VERSION__';  // replaced by versionify
       this.dateTime = new Date();
       this.serviceUrl = serviceUrl;
 
-      $scope.$watchCollection(
+      $scope.$watch(
         function () {
-          return frameSync.frames;
+          return annotationUI.frames();
         },
         function (frames) {
           if (frames.length === 0) {
