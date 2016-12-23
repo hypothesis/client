@@ -413,7 +413,7 @@ function AnnotationController(
     });
   };
 
-  vm.tagStreamURL = function(tag) {
+  vm.tagSearchURL = function(tag) {
     return serviceUrl('search.tag', {tag: tag});
   };
 
