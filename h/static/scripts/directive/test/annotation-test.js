@@ -698,6 +698,33 @@ describe('annotation', function() {
       });
     });
 
+    describe('#isOrphan', function () {
+      it('returns false if the annotation is not an orphan', function () {
+        var controller = createDirective().controller;
+        controller.annotation.$orphan = false;
+        assert.isFalse(controller.isOrphan());
+      });
+
+      it('returns true if the annotation is an orphan', function () {
+        var controller = createDirective().controller;
+        controller.annotation.$orphan = true;
+        assert.isTrue(controller.isOrphan());
+      });
+
+      it('returns true if the anchoring timeout expired', function () {
+        var controller = createDirective().controller;
+        controller.annotation.$anchorTimeout = true;
+        assert.isTrue(controller.isOrphan());
+      });
+
+      it('returns false if the anchoring timeout expired but anchoring did complete', function () {
+        var controller = createDirective().controller;
+        controller.annotation.$orphan = false;
+        controller.annotation.$anchorTimeout = true;
+        assert.isFalse(controller.isOrphan());
+      });
+    });
+
     describe('saving a new annotation', function() {
       var annotation;
 

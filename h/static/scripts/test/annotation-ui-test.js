@@ -146,32 +146,23 @@ describe('annotationUI', function () {
       assert.isFalse(updatedAnnot.$orphan);
     });
 
-    it('marks annotations as orphans if they fail to anchor within a time limit', function () {
-      var isOrphan = function () {
-        return !!metadata.isOrphan(annotationUI.getState().annotations[0]);
-      };
-
+    it('sets the timeout flag on annotations that fail to anchor within a time limit', function () {
       var annot = defaultAnnotation();
       annotationUI.addAnnotations([annot]);
-      assert.isFalse(isOrphan());
 
       clock.tick(ANCHOR_TIME_LIMIT);
 
-      assert.isTrue(isOrphan());
+      assert.isTrue(annotationUI.getState().annotations[0].$anchorTimeout);
     });
 
-    it('does not mark annotations as orphans if they do anchor within a time limit', function () {
-      var isOrphan = function () {
-        return !!metadata.isOrphan(annotationUI.getState().annotations[0]);
-      };
-
+    it('does not set the timeout flag on annotations that do anchor within a time limit', function () {
       var annot = defaultAnnotation();
       annotationUI.addAnnotations([annot]);
       annotationUI.updateAnchorStatus(annot.id, 'atag', false);
 
       clock.tick(ANCHOR_TIME_LIMIT);
 
-      assert.isFalse(isOrphan());
+      assert.isFalse(annotationUI.getState().annotations[0].$anchorTimeout);
     });
 
     it('does not attempt to modify orphan status if annotations are removed before anchoring timeout expires', function () {

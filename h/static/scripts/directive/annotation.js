@@ -426,7 +426,13 @@ function AnnotationController(
   var indicateOrphans = features.flagEnabled('orphans_tab');
 
   vm.isOrphan = function() {
-    return vm.annotation.$orphan && indicateOrphans;
+    if (!indicateOrphans) {
+      return false;
+    }
+    if (typeof vm.annotation.$orphan === 'undefined') {
+      return vm.annotation.$anchorTimeout;
+    }
+    return vm.annotation.$orphan;
   };
 
   vm.updated = function() {

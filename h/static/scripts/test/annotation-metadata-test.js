@@ -287,5 +287,12 @@ describe('annotation-metadata', function () {
     it('returns false for page notes', function () {
       assert.isFalse(isWaitingToAnchor(fixtures.oldPageNote()));
     });
+
+    it('returns false if the anchoring timeout flag was set', function () {
+      var pending = Object.assign({}, fixtures.defaultAnnotation(), {
+        $anchorTimeout: true,
+      });
+      assert.isFalse(isWaitingToAnchor(pending));
+    });
   });
 });
