@@ -4,6 +4,25 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+### Changed
+
+- Show annotations that fail to anchor within an initial timeout in the
+  Annotations tab but with the quote struck through
+  ([#182](https://github.com/hypothesis/client/pull/182)).
+
+- Tags on annotation cards now link to the new Hypothesis search pages
+  (`/search?tag="{tag}`) rather than the stream (`/stream?tag="{tag}"`)
+  ([#183](https://github.com/hypothesis/client/pull/183)).
+
+- Fix highlight visibility on some web pages by using a custom tag name for
+  highlight spans ([#172](https://github.com/hypothesis/client/pull/172)).
+
+- Added a set of baseline tests to guard against unexpected changes to
+  selectors that are captured when anchoring annotations
+  ([#179](https://github.com/hypothesis/client/pull/179)).
+
 ## [0.49.0] - 2016-11-30
 
 ### Changed
