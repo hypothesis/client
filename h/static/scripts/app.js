@@ -63,13 +63,6 @@ function configureRoutes($routeProvider) {
       reloadOnSearch: false,
       resolve: resolve,
     });
-  $routeProvider.when('/viewer',
-    {
-      controller: 'WidgetController',
-      template: VIEWER_TEMPLATE,
-      reloadOnSearch: false,
-      resolve: resolve,
-    });
   $routeProvider.when('/stream',
     {
       controller: 'StreamController',
@@ -77,8 +70,11 @@ function configureRoutes($routeProvider) {
       reloadOnSearch: false,
       resolve: resolve,
     });
-  return $routeProvider.otherwise({
-    redirectTo: '/viewer',
+  $routeProvider.otherwise({
+    controller: 'WidgetController',
+    template: VIEWER_TEMPLATE,
+    reloadOnSearch: false,
+    resolve: resolve,
   });
 }
 
