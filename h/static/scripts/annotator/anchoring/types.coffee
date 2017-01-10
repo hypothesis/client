@@ -101,7 +101,10 @@ class TextQuoteAnchor
     }
 
   toRange: (options = {}) ->
-    domAnchorTextQuote.toRange(@root, this.toSelector(), options)
+    range = domAnchorTextQuote.toRange(@root, this.toSelector(), options)
+    if range == null
+      throw new Error('Quote not found')
+    range
 
 
 exports.RangeAnchor = RangeAnchor

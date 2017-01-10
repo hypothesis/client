@@ -1,8 +1,9 @@
 'use strict';
 
 var html = require('../html');
-var unroll = require('../../../test/util').unroll;
 
+var toResult = require('../../../test/promise-util').toResult;
+var unroll = require('../../../test/util').unroll;
 var fixture = require('./html-anchoring-fixture.html');
 
 /** Return all text node children of `container`. */
@@ -189,6 +190,19 @@ describe('HTML anchoring', function () {
     });
     return Promise.all(anchored);
   }, testCases);
+
+  describe('When anchoring fails', function () {
+    it('throws an error if anchoring using a quote fails', function () {
+      var quoteSelector = {
+        type: 'TextQuoteSelector',
+        exact: 'This text does not appear in the web page',
+      };
+
+      return toResult(html.anchor(container, [quoteSelector])).then(function (result) {
+        assert.equal(result.error.message, 'Quote not found');
+      });
+    });
+  });
 
   describe('Web page baselines', function () {
     var fixtures = require('./html-baselines');
