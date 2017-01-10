@@ -4,6 +4,16 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+### Changed
+
+- Fix client failing to load when restoring a closed tab in Chrome
+  ([#184](https://github.com/hypothesis/client/pull/184)).
+
+- Fix failure to capture quotes for certain content selections
+  ([#159](https://github.com/hypothesis/client/pull/159)).
+
 ## [0.50.0] - 2017-01-05
 
 ### Changed
