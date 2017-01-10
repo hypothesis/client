@@ -22,7 +22,7 @@ var fixtures = immutable({
   ],
 });
 
-describe('annotationUI', function () {
+describe.skip('annotationUI', function () {
   var annotationUI;
   var fakeRootScope;
 
