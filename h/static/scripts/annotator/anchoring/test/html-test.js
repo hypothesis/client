@@ -1,8 +1,9 @@
 'use strict';
 
 var html = require('../html');
-var unroll = require('../../../test/util').unroll;
 
+var toResult = require('../../../test/promise-util').toResult;
+var unroll = require('../../../test/util').unroll;
 var fixture = require('./html-anchoring-fixture.html');
 
 /** Return all text node children of `container`. */
@@ -120,19 +121,8 @@ var rangeSpecs = [
  */
 var expectedFailures = [
   // [description, expectedFailureTypes]
-  ['Full node contents with empty node at end.', {position: true, quote: true}],
-  ['Text between br tags, elementNode ref at end', {position: true, quote: true}],
-  ['Text between br tags, with <br/> at end', {position: true, quote: true}],
-  ['Text between br tags, with <br/><br/> at end', {position: true, quote: true}],
-  ['Text between br tags, with <br/> at start', {position: true, quote: true}],
-  ['Text between br tags, with <br/><br/> at start', {position: true, quote: true}],
-  ['Text between br tags, elementNode ref at end', {position: true, quote: true}],
-  ['Text between br tags, with <br/> at end', {position: true, quote: true}],
-  ['Text between br tags, with <br/><p><br/></p> at end', {position: true, quote: true}],
-  ['Text between br tags, with <p><br/></p> at the start', {position: true, quote: true}],
-  ['Text between br tags, with <br/><p><br/></p> at the start', {position: true, quote: true}],
-  ['No text node at the end and offset 0', {position: true, quote: true}],
-  ['Range starting at an element node with no children', {position: true, quote: true}],
+
+  // Currently empty.
 ];
 
 describe('HTML anchoring', function () {
@@ -200,6 +190,50 @@ describe('HTML anchoring', function () {
     });
     return Promise.all(anchored);
   }, testCases);
+
+  describe('When anchoring fails', function () {
+    var validQuoteSelector = {
+      type: 'TextQuoteSelector',
+      exact: 'Lorem ipsum',
+    };
+
+    it('throws an error if anchoring using a quote fails', function () {
+      var quoteSelector = {
+        type: 'TextQuoteSelector',
+        exact: 'This text does not appear in the web page',
+      };
+
+      return toResult(html.anchor(container, [quoteSelector])).then(function (result) {
+        assert.equal(result.error.message, 'Quote not found');
+      });
+    });
+
+    it('does not throw an error if anchoring using a position fails', function () {
+      var positionSelector = {
+        type: 'TextPositionSelector',
+        start: 1000,
+        end: 1010,
+      };
+
+      // Providing an annotation has quote selector that anchors, a position
+      // selector which fails to anchor should be ignored.
+      return html.anchor(container, [positionSelector, validQuoteSelector]);
+    });
+
+    it('does not throw an error if anchoring using a range fails', function () {
+      var rangeSelector = {
+        type: 'RangeSelector',
+        startContainer: '/main',
+        startOffset: 1,
+        endContainer: '/main',
+        endOffset: 5,
+      };
+
+      // Providing an annotation has quote selector that anchors, a range
+      // selector which fails to anchor should be ignored.
+      return html.anchor(container, [rangeSelector, validQuoteSelector]);
+    });
+  });
 
   describe('Web page baselines', function () {
     var fixtures = require('./html-baselines');
