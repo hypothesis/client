@@ -96,6 +96,7 @@
     "vinyl": "^1.1.1",
     "watchify": "^3.7.0",
     "websocket": "^1.0.22",
+    "xorshift": "^1.0.0",
     "zen-observable": "^0.3.0"
   },
   "browserify": {
