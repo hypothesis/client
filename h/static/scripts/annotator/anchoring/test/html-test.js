@@ -192,6 +192,11 @@ describe('HTML anchoring', function () {
   }, testCases);
 
   describe('When anchoring fails', function () {
+    var validQuoteSelector = {
+      type: 'TextQuoteSelector',
+      exact: 'Lorem ipsum',
+    };
+
     it('throws an error if anchoring using a quote fails', function () {
       var quoteSelector = {
         type: 'TextQuoteSelector',
@@ -201,6 +206,32 @@ describe('HTML anchoring', function () {
       return toResult(html.anchor(container, [quoteSelector])).then(function (result) {
         assert.equal(result.error.message, 'Quote not found');
       });
+    });
+
+    it('does not throw an error if anchoring using a position fails', function () {
+      var positionSelector = {
+        type: 'TextPositionSelector',
+        start: 1000,
+        end: 1010,
+      };
+
+      // Providing an annotation has quote selector that anchors, a position
+      // selector which fails to anchor should be ignored.
+      return html.anchor(container, [positionSelector, validQuoteSelector]);
+    });
+
+    it('does not throw an error if anchoring using a range fails', function () {
+      var rangeSelector = {
+        type: 'RangeSelector',
+        startContainer: '/main',
+        startOffset: 1,
+        endContainer: '/main',
+        endOffset: 5,
+      };
+
+      // Providing an annotation has quote selector that anchors, a range
+      // selector which fails to anchor should be ignored.
+      return html.anchor(container, [rangeSelector, validQuoteSelector]);
     });
   });
 
