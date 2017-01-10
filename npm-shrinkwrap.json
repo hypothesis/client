@@ -1172,9 +1172,9 @@
       "resolved": "https://registry.npmjs.org/dom-anchor-fragment/-/dom-anchor-fragment-1.0.4.tgz"
     },
     "dom-anchor-text-position": {
-      "version": "3.0.3",
+      "version": "4.0.0",
       "from": "dom-anchor-text-position@latest",
-      "resolved": "https://registry.npmjs.org/dom-anchor-text-position/-/dom-anchor-text-position-3.0.3.tgz",
+      "resolved": "https://registry.npmjs.org/dom-anchor-text-position/-/dom-anchor-text-position-4.0.0.tgz",
       "dependencies": {
         "dom-seek": {
           "version": "4.0.3",
@@ -1184,9 +1184,9 @@
       }
     },
     "dom-anchor-text-quote": {
-      "version": "3.0.0",
+      "version": "4.0.1",
       "from": "dom-anchor-text-quote@latest",
-      "resolved": "https://registry.npmjs.org/dom-anchor-text-quote/-/dom-anchor-text-quote-3.0.0.tgz"
+      "resolved": "https://registry.npmjs.org/dom-anchor-text-quote/-/dom-anchor-text-quote-4.0.1.tgz"
     },
     "dom-node-iterator": {
       "version": "3.5.3",
