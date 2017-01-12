@@ -12,7 +12,7 @@ def main():
     args = parser.parse_args()
 
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    vendor_style_dir = script_dir + '/../h/static/styles/vendor'
+    vendor_style_dir = script_dir + '/../src/styles/vendor'
 
     icon_font_archive = ZipFile(args.archive)
     icon_font_archive.extract('selection.json', vendor_style_dir + '/fonts')

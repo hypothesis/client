@@ -97,12 +97,12 @@ var appBundles = [{
   // The sidebar application for displaying and editing annotations
   name: 'app',
   transforms: ['coffee'],
-  entry: './h/static/scripts/app',
+  entry: './src/scripts/app',
 },{
   // The Annotator library which provides annotation controls on
   // the page and sets up the sidebar
   name: 'injector',
-  entry: './h/static/scripts/annotator/main',
+  entry: './src/scripts/annotator/main',
   transforms: ['coffee'],
 }];
 
@@ -124,14 +124,14 @@ gulp.task('watch-js', ['build-vendor-js'], function () {
 
 var styleFiles = [
   // H
-  './h/static/styles/annotator/inject.scss',
-  './h/static/styles/annotator/pdfjs-overrides.scss',
-  './h/static/styles/app.scss',
+  './src/styles/annotator/inject.scss',
+  './src/styles/annotator/pdfjs-overrides.scss',
+  './src/styles/app.scss',
 
   // Vendor
-  './h/static/styles/vendor/angular-csp.css',
-  './h/static/styles/vendor/icomoon.css',
-  './h/static/styles/vendor/katex.min.css',
+  './src/styles/vendor/angular-csp.css',
+  './src/styles/vendor/icomoon.css',
+  './src/styles/vendor/katex.min.css',
   './node_modules/angular-toastr/dist/angular-toastr.css',
 ];
 
@@ -162,12 +162,12 @@ gulp.task('watch-css', ['build-css'], function () {
   var vendorCSS = styleFiles.filter(function (path) {
     return path.endsWith('.css');
   });
-  var styleFileGlobs = vendorCSS.concat('./h/static/styles/**/*.scss');
+  var styleFileGlobs = vendorCSS.concat('./src/styles/**/*.scss');
 
   gulp.watch(styleFileGlobs, ['build-css']);
 });
 
-var fontFiles = 'h/static/styles/vendor/fonts/*.woff';
+var fontFiles = 'src/styles/vendor/fonts/*.woff';
 
 gulp.task('build-fonts', function () {
   gulp.src(fontFiles)
@@ -179,7 +179,7 @@ gulp.task('watch-fonts', ['build-fonts'], function () {
   gulp.watch(fontFiles, ['build-fonts']);
 });
 
-var imageFiles = 'h/static/images/**/*';
+var imageFiles = 'src/images/**/*';
 gulp.task('build-images', function () {
   gulp.src(imageFiles)
     .pipe(changed(IMAGES_DIR))
@@ -305,11 +305,11 @@ function runKarma(baseConfig, opts, done) {
 }
 
 gulp.task('test', function (callback) {
-  runKarma('./h/static/scripts/karma.config.js', {singleRun:true}, callback);
+  runKarma('./src/scripts/karma.config.js', {singleRun:true}, callback);
 });
 
 gulp.task('test-watch', function (callback) {
-  runKarma('./h/static/scripts/karma.config.js', {}, callback);
+  runKarma('./src/scripts/karma.config.js', {}, callback);
 });
 
 gulp.task('upload-sourcemaps', ['build-js'], function () {
