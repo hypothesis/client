@@ -9,7 +9,7 @@
 module.exports = {
   bundles: {
     jquery: ['jquery'],
-    polyfills: [require.resolve('../../src/scripts/polyfills')],
+    polyfills: [require.resolve('../../src/shared/polyfills')],
     angular: [
       'angular',
       'angular-jwt',
