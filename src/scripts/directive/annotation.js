@@ -532,7 +532,7 @@ function annotation() {
       replyCount: '<',
       isCollapsed: '<',
     },
-    template: require('../../../templates/client/annotation.html'),
+    template: require('../../templates/annotation.html'),
   };
 }
 

@@ -9,7 +9,7 @@ module.exports = function () {
     bindToController: true,
     controllerAs: 'vm',
     restrict: 'E',
-    template: require('../../../templates/client/annotation_share_dialog.html'),
+    template: require('../../templates/annotation_share_dialog.html'),
     // @ngInject
     controller: function ($scope, $element) {
       var shareLinkInput = $element.find('input')[0];

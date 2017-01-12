@@ -37,7 +37,7 @@ function groupList($window, groups, serviceUrl) {
     scope: {
       auth: '<',
     },
-    template: require('../../../templates/client/group_list.html'),
+    template: require('../../templates/group_list.html'),
   };
 }
 

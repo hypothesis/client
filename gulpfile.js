@@ -27,7 +27,7 @@ var SCRIPT_DIR = 'build/scripts';
 var STYLE_DIR = 'build/styles';
 var FONTS_DIR = 'build/fonts';
 var IMAGES_DIR = 'build/images';
-var TEMPLATES_DIR = 'h/templates/client';
+var TEMPLATES_DIR = 'src/templates';
 
 // LiveReloadServer instance for sending messages to connected
 // development clients

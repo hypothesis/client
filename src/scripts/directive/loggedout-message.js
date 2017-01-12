@@ -15,6 +15,6 @@ module.exports = function () {
        */
       onLogin: '&',
     },
-    template: require('../../../templates/client/loggedout_message.html'),
+    template: require('../../templates/loggedout_message.html'),
   };
 };
