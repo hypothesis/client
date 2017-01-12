@@ -30,7 +30,7 @@ module.exports = {
       controllerAs: 'vm',
       restrict: 'E',
       scope: {},
-      template: require('../../templates/sidebar_tutorial.html'),
+      template: require('../templates/sidebar_tutorial.html'),
     };
   },
   Controller: SidebarTutorialController,

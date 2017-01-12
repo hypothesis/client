@@ -33,6 +33,6 @@ module.exports = function () {
        */
       newStyle: '<',
     },
-    template: require('../../templates/login_control.html'),
+    template: require('../templates/login_control.html'),
   };
 };

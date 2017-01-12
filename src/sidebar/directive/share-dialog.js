@@ -37,6 +37,6 @@ module.exports = function () {
     scope: {
       onClose: '&',
     },
-    template: require('../../templates/share_dialog.html'),
+    template: require('../templates/share_dialog.html'),
   };
 };

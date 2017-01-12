@@ -119,6 +119,6 @@ module.exports = function () {
        */
       onForceVisible: '&',
     },
-    template: require('../../templates/annotation_thread.html'),
+    template: require('../templates/annotation_thread.html'),
   };
 };

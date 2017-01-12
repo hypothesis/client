@@ -169,6 +169,6 @@ module.exports = function($sanitize) {
       text: '<?',
       onEditText: '&',
     },
-    template: require('../../templates/markdown.html'),
+    template: require('../templates/markdown.html'),
   };
 };

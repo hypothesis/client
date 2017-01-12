@@ -53,7 +53,7 @@ function configureLocation($locationProvider) {
 }
 
 // @ngInject
-var VIEWER_TEMPLATE = require('../templates/viewer.html');
+var VIEWER_TEMPLATE = require('./templates/viewer.html');
 
 function configureRoutes($routeProvider) {
   $routeProvider.when('/a/:id',

@@ -7,6 +7,6 @@ module.exports = function () {
     restrict: 'E',
     controller: AppController,
     scope: {},
-    template: require('../../templates/app.html'),
+    template: require('../templates/app.html'),
   };
 };

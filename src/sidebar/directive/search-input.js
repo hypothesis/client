@@ -48,6 +48,6 @@ module.exports = function () {
       query: '<',
       onSearch: '&',
     },
-    template: require('../../templates/search_input.html'),
+    template: require('../templates/search_input.html'),
   };
 };
