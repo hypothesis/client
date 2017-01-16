@@ -117,9 +117,9 @@
     ]
   },
   "browser": {
-    "annotator": "./h/static/scripts/vendor/annotator.js",
+    "annotator": "./src/scripts/vendor/annotator.js",
     "hammerjs": "./node_modules/hammerjs/hammer.js",
-    "katex": "./h/static/scripts/vendor/katex.js"
+    "katex": "./src/scripts/vendor/katex.js"
   },
   "browserify-shim": {
     "annotator": {

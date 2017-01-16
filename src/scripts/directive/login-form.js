@@ -103,7 +103,7 @@ module.exports = {
       scope: {
         onClose: '&',
       },
-      template: require('../../../templates/client/login_form.html'),
+      template: require('../../templates/login_form.html'),
     };
   },
   Controller: Controller,

@@ -31,7 +31,7 @@ module.exports = function () {
       );
     },
     restrict: 'E',
-    template: require('../../../templates/client/help_panel.html'),
+    template: require('../../templates/help_panel.html'),
     scope: {
       auth: '<',
       onClose: '&',

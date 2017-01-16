@@ -20,6 +20,6 @@ module.exports = function () {
       pendingUpdateCount: '<',
       onApplyPendingUpdates: '&',
     },
-    template: require('../../../templates/client/top_bar.html'),
+    template: require('../../templates/top_bar.html'),
   };
 };

@@ -180,7 +180,7 @@ function excerpt(ExcerptOverflowMonitor) {
     },
     restrict: 'E',
     transclude: true,
-    template: require('../../../templates/client/excerpt.html'),
+    template: require('../../templates/excerpt.html'),
   };
 }
 

@@ -23,6 +23,6 @@ module.exports = function () {
       totalAnnotations: '<',
       totalNotes: '<',
     },
-    template: require('../../../templates/client/search_status_bar.html'),
+    template: require('../../templates/search_status_bar.html'),
   };
 };

@@ -41,6 +41,6 @@ module.exports = function () {
       totalNotes: '<',
       totalOrphans: '<',
     },
-    template: require('../../../templates/client/selection_tabs.html'),
+    template: require('../../templates/selection_tabs.html'),
   };
 };
