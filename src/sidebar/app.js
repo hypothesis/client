@@ -79,12 +79,9 @@ function configureRoutes($routeProvider) {
 }
 
 // @ngInject
-function configureHttp($httpProvider, jwtInterceptorProvider) {
+function configureHttp($httpProvider) {
   // Use the Pyramid XSRF header name
   $httpProvider.defaults.xsrfHeaderName = 'X-CSRF-Token';
-  // Setup JWT tokens for API requests
-  $httpProvider.interceptors.push('jwtInterceptor');
-  jwtInterceptorProvider.tokenGetter = require('./auth').tokenGetter;
 }
 
 // @ngInject
@@ -161,7 +158,7 @@ module.exports = angular.module('h', [
 
   .service('annotationMapper', require('./annotation-mapper'))
   .service('annotationUI', require('./annotation-ui'))
-  .service('auth', require('./auth').service)
+  .service('auth', require('./auth'))
   .service('bridge', require('../shared/bridge'))
   .service('drafts', require('./drafts'))
   .service('features', require('./features'))

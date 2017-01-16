@@ -43,27 +43,25 @@ describe('auth', function () {
     };
   });
 
-  afterEach(function () {
-    auth.clearCache();
-  });
+  function authFactory() {
+    var fakeFlash = { error: sinon.stub() };
+    return auth(fakeHttp, fakeFlash, fakeJwtHelper, fakeSession, fakeSettings);
+  }
 
-  describe('tokenGetter', function () {
-    function tokenGetter() {
-      var config = {url:'https://test.hypothes.is/api/search'};
-      return auth.tokenGetter(fakeHttp, config, fakeJwtHelper,
-        fakeSession, fakeSettings);
-    }
+  describe('#tokenGetter', function () {
 
     it('should fetch and return a new token', function () {
-      return tokenGetter().then(function (token) {
+      var auth = authFactory();
+      return auth.tokenGetter().then(function (token) {
         assert.called(fakeHttp.get);
         assert.equal(token, fakeTokens[0]);
       });
     });
 
     it('should cache tokens for future use', function () {
-      return tokenGetter().then(function () {
-        return tokenGetter();
+      var auth = authFactory();
+      return auth.tokenGetter().then(function () {
+        return auth.tokenGetter();
       }).then(function (token) {
         assert.calledOnce(fakeHttp.get);
         assert.equal(token, fakeTokens[0]);
@@ -71,11 +69,12 @@ describe('auth', function () {
     });
 
     it('should refresh expired tokens', function () {
-      return tokenGetter().then(function () {
+      var auth = authFactory();
+      return auth.tokenGetter().then(function () {
         fakeJwtHelper.isTokenExpired = function () {
           return true;
         };
-        return tokenGetter();
+        return auth.tokenGetter();
       }).then(function (token) {
         assert.calledTwice(fakeHttp.get);
         assert.equal(token, fakeTokens[1]);
@@ -83,9 +82,10 @@ describe('auth', function () {
     });
 
     it('should fetch a new token if the userid changes', function () {
-      return tokenGetter().then(function () {
+      var auth = authFactory();
+      return auth.tokenGetter().then(function () {
         fakeSession.state.userid = 'new-user-id';
-        return tokenGetter();
+        return auth.tokenGetter();
       }).then(function (token) {
         assert.calledTwice(fakeHttp.get);
         assert.equal(token, fakeTokens[1]);
@@ -93,10 +93,10 @@ describe('auth', function () {
     });
   });
 
-  describe('.logout', function () {
+  describe('#logout', function () {
     it('should call session.logout', function () {
-      var fakeFlash = {error: sinon.stub()};
-      return auth.service(fakeFlash, fakeSession).logout().then(function () {
+      var auth = authFactory();
+      return auth.logout().then(function () {
         assert.called(fakeSession.logout);
       });
     });

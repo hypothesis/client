@@ -1,10 +1,5 @@
 'use strict';
 
-/**
- * Provides functions for retrieving and caching API tokens required by
- * API requests and logging out of the API.
- */
-
 var INITIAL_TOKEN = {
   // The user ID which the current cached token is valid for
   userid: undefined,
@@ -14,14 +9,11 @@ var INITIAL_TOKEN = {
   token: undefined,
 };
 
-var cachedToken = INITIAL_TOKEN;
-
 /**
  * Fetches a new API token for the current logged-in user.
  *
  * @return {Promise} - A promise for a new JWT token.
  */
-// @ngInject
 function fetchToken($http, session, settings) {
   var tokenUrl = new URL('token', settings.apiUrl).href;
 
@@ -43,69 +35,59 @@ function fetchToken($http, session, settings) {
 }
 
 /**
- * Fetches or returns a cached JWT API token for the current user.
- *
- * @return {Promise} - A promise for a JWT API token for the current
- *                     user.
+ * Service for fetching and caching access tokens for the Hypothesis API.
  */
 // @ngInject
-function fetchOrReuseToken($http, jwtHelper, session, settings) {
-  function refreshToken() {
-    return fetchToken($http, session, settings).then(function (token) {
-      return token;
-    });
-  }
+function auth($http, flash, jwtHelper, session, settings) {
 
-  var userid;
+  var cachedToken = INITIAL_TOKEN;
 
-  return session.load()
-    .then(function (data) {
-      userid = data.userid;
-      if (userid === cachedToken.userid && cachedToken.token) {
-        return cachedToken.token;
-      } else {
-        cachedToken = {
-          userid: userid,
-          token: refreshToken(),
-        };
-        return cachedToken.token;
-      }
-    })
-    .then(function (token) {
-      if (jwtHelper.isTokenExpired(token)) {
-        cachedToken = {
-          userid: userid,
-          token: refreshToken(),
-        };
-        return cachedToken.token;
-      } else {
+  /**
+   * Fetches or returns a cached JWT API token for the current user.
+   *
+   * @return {Promise} - A promise for a JWT API token for the current
+   *                     user.
+   */
+  // @ngInject
+  function fetchOrReuseToken($http, jwtHelper, session, settings) {
+    function refreshToken() {
+      return fetchToken($http, session, settings).then(function (token) {
         return token;
-      }
-    });
-}
+      });
+    }
 
-/**
- * JWT token fetcher function for use with 'angular-jwt'
- *
- * angular-jwt should be configured to use this function as its
- * tokenGetter implementation.
- */
-// @ngInject
-function tokenGetter($http, config, jwtHelper, session, settings) {
-  // Only send the token on requests to the annotation storage service
-  if (config.url.slice(0, settings.apiUrl.length) === settings.apiUrl) {
-    return fetchOrReuseToken($http, jwtHelper, session, settings);
-  } else {
-    return null;
+    var userid;
+
+    return session.load()
+      .then(function (data) {
+        userid = data.userid;
+        if (userid === cachedToken.userid && cachedToken.token) {
+          return cachedToken.token;
+        } else {
+          cachedToken = {
+            userid: userid,
+            token: refreshToken(),
+          };
+          return cachedToken.token;
+        }
+      })
+      .then(function (token) {
+        if (jwtHelper.isTokenExpired(token)) {
+          cachedToken = {
+            userid: userid,
+            token: refreshToken(),
+          };
+          return cachedToken.token;
+        } else {
+          return token;
+        }
+      });
   }
-}
 
-function clearCache() {
-  cachedToken = INITIAL_TOKEN;
-}
+  function clearCache() {
+    cachedToken = INITIAL_TOKEN;
+  }
 
-// @ngInject
-function authService(flash, session) {
   /**
    * Log out from the API and clear any cached tokens.
    *
@@ -122,13 +104,20 @@ function authService(flash, session) {
       });
   }
 
+  /**
+   * Return an access token for authenticating API requests.
+   *
+   * @return {Promise<string>}
+   */
+  function tokenGetter() {
+    return fetchOrReuseToken($http, jwtHelper, session, settings);
+  }
+
   return {
+    clearCache: clearCache,
+    tokenGetter: tokenGetter,
     logout: logout,
   };
 }
 
-module.exports = {
-  tokenGetter: tokenGetter,
-  clearCache: clearCache,
-  service: authService,
-};
+module.exports = auth;
