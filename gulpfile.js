@@ -27,7 +27,7 @@ var SCRIPT_DIR = 'build/scripts';
 var STYLE_DIR = 'build/styles';
 var FONTS_DIR = 'build/fonts';
 var IMAGES_DIR = 'build/images';
-var TEMPLATES_DIR = 'src/templates';
+var TEMPLATES_DIR = 'src/sidebar/templates';
 
 // LiveReloadServer instance for sending messages to connected
 // development clients
@@ -94,15 +94,15 @@ var appBundleBaseConfig = {
 };
 
 var appBundles = [{
-  // The sidebar application for displaying and editing annotations
+  // The sidebar application for displaying and editing annotations.
   name: 'app',
   transforms: ['coffee'],
-  entry: './src/scripts/app',
+  entry: './src/sidebar/app',
 },{
-  // The Annotator library which provides annotation controls on
-  // the page and sets up the sidebar
+  // The annotation layer which handles displaying highlights, presenting
+  // annotation tools on the page and instantiating the sidebar application.
   name: 'injector',
-  entry: './src/scripts/annotator/main',
+  entry: './src/annotator/main',
   transforms: ['coffee'],
 }];
 
@@ -305,11 +305,11 @@ function runKarma(baseConfig, opts, done) {
 }
 
 gulp.task('test', function (callback) {
-  runKarma('./src/scripts/karma.config.js', {singleRun:true}, callback);
+  runKarma('./src/karma.config.js', {singleRun:true}, callback);
 });
 
 gulp.task('test-watch', function (callback) {
-  runKarma('./src/scripts/karma.config.js', {}, callback);
+  runKarma('./src/karma.config.js', {}, callback);
 });
 
 gulp.task('upload-sourcemaps', ['build-js'], function () {
