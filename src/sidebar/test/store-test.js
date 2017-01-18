@@ -71,6 +71,10 @@ describe('store', function () {
           method: 'GET',
           url: 'http://example.com/api/search',
         },
+        profile: {
+          method: 'GET',
+          url: 'http://example.com/api/profile',
+        },
       },
     });
     $httpBackend.flush();
@@ -139,6 +143,17 @@ describe('store', function () {
 
     $httpBackend.expectGET('http://example.com/api/search?uri=http%3A%2F%2Fexample.com%2F%3Ffoo%3Dbar%3Bbaz%3Dqux')
       .respond(function () { return [200, {}, {}]; });
+    $httpBackend.flush();
+  });
+
+  it("fetches the user's profile", function (done) {
+    var profile = {userid: 'acct:user@publisher.org'};
+    store.profile().then(function (profile_) {
+      assert.deepEqual(profile_, profile);
+      done();
+    });
+    $httpBackend.expectGET('http://example.com/api/profile')
+      .respond(function () { return [200, profile, {}]; });
     $httpBackend.flush();
   });
 });

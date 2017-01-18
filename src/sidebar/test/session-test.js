@@ -13,6 +13,8 @@ describe('session', function () {
   var fakeAuth;
   var fakeFlash;
   var fakeRaven;
+  var fakeSettings;
+  var fakeStore;
   var sandbox;
   var session;
 
@@ -40,15 +42,20 @@ describe('session', function () {
     fakeRaven = {
       setUserInfo: sandbox.spy(),
     };
+    fakeStore = {
+      profile: sandbox.stub(),
+    };
+    fakeSettings = {
+      serviceUrl: 'https://test.hypothes.is/root/',
+    };
 
     mock.module('h', {
       annotationUI: fakeAnnotationUI,
       auth: fakeAuth,
       flash: fakeFlash,
       raven: fakeRaven,
-      settings: {
-        serviceUrl: 'https://test.hypothes.is/root/',
-      },
+      settings: fakeSettings,
+      store: fakeStore,
     });
   });
 
@@ -153,6 +160,24 @@ describe('session', function () {
       $httpBackend.expectGET(url).respond({});
       session.load();
       $httpBackend.flush();
+    });
+
+    context('when the host page provides an OAuth grant token', function () {
+      beforeEach(function () {
+        fakeSettings.services = [{
+          authority: 'publisher.org',
+          grantToken: 'a.jwt.token',
+        }];
+        fakeStore.profile.returns(Promise.resolve({
+          userid: 'acct:user@publisher.org',
+        }));
+      });
+
+      it('should fetch profile data from the API', function () {
+        return session.load().then(function () {
+          assert.equal(session.state.userid, 'acct:user@publisher.org');
+        });
+      });
     });
 
     it('should cache the session data', function () {

@@ -49,7 +49,7 @@ function sessionActions(options) {
  * @ngInject
  */
 function session($http, $resource, $rootScope, annotationUI, auth,
-                 flash, raven, settings) {
+                 flash, raven, settings, store) {
   // Headers sent by every request made by the session service.
   var headers = {};
   var actions = sessionActions({
@@ -84,7 +84,11 @@ function session($http, $resource, $rootScope, annotationUI, auth,
       // the /app endpoint.
       lastLoadTime = Date.now();
       lastLoad = retryUtil.retryPromiseOperation(function () {
-        return resource._load().$promise;
+        if (Array.isArray(settings.services)) {
+          return store.profile().then(update);
+        } else {
+          return resource._load().$promise;
+        }
       }).then(function (session) {
         lastLoadTime = Date.now();
         return session;
