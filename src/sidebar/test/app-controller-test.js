@@ -58,9 +58,7 @@ describe('AppController', function () {
       clearSelectedAnnotations: sandbox.spy(),
     };
 
-    fakeAuth = {
-      logout: sandbox.stub().returns(Promise.resolve()),
-    };
+    fakeAuth = {};
 
     fakeDrafts = {
       contains: sandbox.stub(),
@@ -88,6 +86,7 @@ describe('AppController', function () {
 
     fakeSession = {
       load: sandbox.stub().returns(Promise.resolve({userid: null})),
+      logout: sandbox.stub(),
     };
 
     fakeGroups = {focus: sandbox.spy()};
@@ -254,7 +253,13 @@ describe('AppController', function () {
     });
   });
 
-  describe('logout()', function () {
+  describe('#logout()', function () {
+    it('calls session.logout()', function () {
+      createController();
+      $scope.logout();
+      assert.called(fakeSession.logout);
+    });
+
     it('prompts the user if there are drafts', function () {
       fakeDrafts.count.returns(1);
       createController();

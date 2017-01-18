@@ -6,10 +6,11 @@ var events = require('../events');
 
 var mock = angular.mock;
 
-describe('h:session', function () {
+describe('session', function () {
   var $httpBackend;
   var $rootScope;
 
+  var fakeAuth;
   var fakeFlash;
   var fakeRaven;
   var sandbox;
@@ -32,6 +33,9 @@ describe('h:session', function () {
         state = session;
       },
     };
+    fakeAuth = {
+      clearCache: sandbox.spy(),
+    };
     fakeFlash = {error: sandbox.spy()};
     fakeRaven = {
       setUserInfo: sandbox.spy(),
@@ -39,6 +43,7 @@ describe('h:session', function () {
 
     mock.module('h', {
       annotationUI: fakeAnnotationUI,
+      auth: fakeAuth,
       flash: fakeFlash,
       raven: fakeRaven,
       settings: {
@@ -237,6 +242,11 @@ describe('h:session', function () {
       assert.calledOnce(userChangeCallback);
     });
 
+    it('clears the API token cache when the user changes', function () {
+      session.update({userid: 'different-user', csrf: 'dummytoken'});
+      assert.called(fakeAuth.clearCache);
+    });
+
     it('updates the user ID for Sentry error reports', function () {
       session.update({
         userid: 'anne',
@@ -253,6 +263,31 @@ describe('h:session', function () {
     it('disables the tutorial for the user', function () {
       $httpBackend.expectPOST(url).respond({});
       session.dismissSidebarTutorial();
+      $httpBackend.flush();
+    });
+  });
+
+  describe('#logout()', function () {
+    beforeEach(function () {
+      var url = 'https://test.hypothes.is/root/app?__formid__=logout';
+      $httpBackend.expectPOST(url).respond(200, {
+        model: {
+          userid: 'logged-out-id',
+        },
+      });
+    });
+
+    it('logs the user out on the service and updates the session', function () {
+      session.logout().then(function () {
+        assert.equal(session.state.userid, 'logged-out-id');
+      });
+      $httpBackend.flush();
+    });
+
+    it('clears the API access token cache', function () {
+      session.logout().then(function () {
+        assert.called(fakeAuth.clearCache);
+      });
       $httpBackend.flush();
     });
   });
