@@ -1,6 +1,7 @@
 'use strict';
 
 var queryString = require('query-string');
+var addAnalytics = require('./ga');
 
 require('../shared/polyfills');
 
@@ -35,6 +36,10 @@ if (settings.raven) {
   raven.angularModule(angular);
 } else {
   angular.module('ngRaven', []);
+}
+
+if(settings.googleAnalytics){
+  addAnalytics(settings.googleAnalytics);
 }
 
 // Fetch external state that the app needs before it can run. This includes the
