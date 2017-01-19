@@ -1,8 +1,8 @@
 'use strict';
 
 var queryString = require('query-string');
-var addAnalytics = require('./ga');
 
+var addAnalytics = require('./ga');
 require('../shared/polyfills');
 
 var raven;
