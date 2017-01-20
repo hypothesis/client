@@ -164,6 +164,7 @@ module.exports = angular.module('h', [
   .directive('topBar', require('./directive/top-bar'))
   .directive('windowScroll', require('./directive/window-scroll'))
 
+  .service('analytics', require('./analytics'))
   .service('annotationMapper', require('./annotation-mapper'))
   .service('annotationUI', require('./annotation-ui'))
   .service('auth', require('./auth').service)

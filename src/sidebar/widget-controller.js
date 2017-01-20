@@ -32,8 +32,8 @@ function groupIDFromSelection(selection, results) {
 
 // @ngInject
 module.exports = function WidgetController(
-  $scope, annotationUI, annotationMapper, drafts, features, frameSync, groups,
-  rootThread, settings, streamer, streamFilter, store
+  $scope, analytics, annotationUI, annotationMapper, drafts, features, frameSync,
+  groups, rootThread, settings, streamer, streamFilter, store
 ) {
   function thread() {
     return rootThread.thread(annotationUI.getState());
@@ -201,6 +201,9 @@ module.exports = function WidgetController(
   }
 
   $scope.$on('sidebarOpened', function () {
+
+    analytics.track('sidebarOpened');
+
     streamer.connect();
   });
 
