@@ -1,21 +1,20 @@
 'use strict';
 
-var queryString = require('query-string');
-
 var addAnalytics = require('./ga');
 require('../shared/polyfills');
 
 var raven;
 
-// Initialize Raven. This is required at the top of this file
-// so that it happens early in the app's startup flow
-var configParam = queryString.parse(window.location.search).config || 'null';
 var settings = require('../shared/settings')(document);
-Object.assign(settings, JSON.parse(configParam));
 if (settings.raven) {
+  // Initialize Raven. This is required at the top of this file
+  // so that it happens early in the app's startup flow
   raven = require('./raven');
   raven.init(settings.raven);
 }
+
+var hostPageConfig = require('./host-config');
+Object.assign(settings, hostPageConfig(window));
 
 // Disable Angular features that are not compatible with CSP.
 //
