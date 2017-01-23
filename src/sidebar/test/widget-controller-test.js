@@ -40,6 +40,7 @@ describe('WidgetController', function () {
   var $rootScope;
   var $scope;
   var annotationUI;
+  var fakeAnalytics;
   var fakeAnnotationMapper;
   var fakeDrafts;
   var fakeFeatures;
@@ -68,6 +69,10 @@ describe('WidgetController', function () {
   beforeEach(angular.mock.module(function ($provide) {
     searchClients = [];
     sandbox = sinon.sandbox.create();
+
+    fakeAnalytics = {
+      track: sandbox.spy(),
+    };
 
     fakeAnnotationMapper = {
       loadAnnotations: sandbox.spy(),
@@ -112,6 +117,7 @@ describe('WidgetController', function () {
       search: sinon.stub(),
     };
 
+    $provide.value('analytics', fakeAnalytics);
     $provide.value('annotationMapper', fakeAnnotationMapper);
     $provide.value('drafts', fakeDrafts);
     $provide.value('features', fakeFeatures);
