@@ -4,6 +4,27 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased] - 2017-01-24
+
+### Changed
+
+- Simplify client source code directory structure
+  ([#185](https://github.com/hypothesis/client/pull/185)).
+
+- Add support for `hypothesis-trigger` declarative attribute
+  to toggle the visibility of the sidebar
+  ([#190](https://github.com/hypothesis/client/pull/190)).
+
+- Add Google Analytics to help monitor application interactions
+  ([#194](https://github.com/hypothesis/client/pull/194)).
+
+- Whitelist the settings given to the client application
+  ([#196](https://github.com/hypothesis/client/pull/196)).
+
+- Improve support for Authorization header in API requests
+  ([#191](https://github.com/hypothesis/client/pull/191)).
+
+
 ## [0.51.0] - 2017-01-10
 
 ### Changed
