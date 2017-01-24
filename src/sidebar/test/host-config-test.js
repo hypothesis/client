@@ -14,6 +14,7 @@ describe('hostPageConfig', function () {
   it('parses config from location string and returns whitelisted params', function () {
     var window_ = fakeWindow({
       annotations: '1234',
+      appType: 'bookmarklet',
       openSidebar: true,
       openLoginForm: true,
       showHighlights: true,
@@ -21,6 +22,7 @@ describe('hostPageConfig', function () {
 
     assert.deepEqual(hostPageConfig(window_), {
       annotations: '1234',
+      appType: 'bookmarklet',
       openSidebar: true,
       openLoginForm: true,
       showHighlights: true,

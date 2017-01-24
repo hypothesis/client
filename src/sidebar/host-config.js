@@ -17,6 +17,10 @@ function hostPageConfig(window) {
     // Direct-linked annotation ID
     'annotations',
 
+    // Config param added by the extension, Via etc.  indicating how Hypothesis
+    // was added to the page.
+    'appType',
+
     // Config params documented at
     // https://github.com/hypothesis/client/blob/master/docs/config.md
     'openLoginForm',
