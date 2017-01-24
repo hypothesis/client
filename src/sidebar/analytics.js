@@ -10,7 +10,7 @@ var globalGAOptions = function(win, settings){
     category: '',
   };
 
-  var validTypes = ['chrome-extension', 'embed', 'bookmarklet', 'via'];
+  var validTypes = ['chrome-extension', 'firefox-extension', 'embed', 'bookmarklet', 'via'];
 
   // The preferred method for deciding what type of app is running is
   // through the setting of the appType to one of the valid types above.
