@@ -78,15 +78,19 @@ function serializeParams(params) {
  * Creates a function that will make an API call to a named route.
  *
  * @param $http - The Angular HTTP service
+ * @param $q - The Angular Promises ($q) service.
  * @param links - Object or promise for an object mapping named API routes to
  *                URL templates and methods
  * @param route - The dotted path of the named API route (eg. `annotation.create`)
  * @param {Function} tokenGetter - Function which returns a Promise for an
  *                   access token for the API.
  */
-function createAPICall($http, links, route, tokenGetter) {
+function createAPICall($http, $q, links, route, tokenGetter) {
   return function (params, data) {
-    return Promise.all([links, tokenGetter()]).then(function (linksAndToken) {
+    // `$q.all` is used here rather than `Promise.all` because testing code that
+    // mixes native Promises with the `$q` promises returned by `$http`
+    // functions gets awkward in tests.
+    return $q.all([links, tokenGetter()]).then(function (linksAndToken) {
       var links = linksAndToken[0];
       var token = linksAndToken[1];
 
@@ -120,22 +124,24 @@ function createAPICall($http, links, route, tokenGetter) {
  * the Hypothesis API (see http://h.readthedocs.io/en/latest/api/).
  */
 // @ngInject
-function store($http, auth, settings) {
+function store($http, $q, auth, settings) {
   var links = retryUtil.retryPromiseOperation(function () {
     return $http.get(settings.apiUrl);
   }).then(function (response) {
     return response.data.links;
   });
 
-  var tokenGetter = auth.tokenGetter;
+  function apiCall(route) {
+    return createAPICall($http, $q, links, route, auth.tokenGetter);
+  }
 
   return {
-    search: createAPICall($http, links, 'search', tokenGetter),
+    search: apiCall('search'),
     annotation: {
-      create: createAPICall($http, links, 'annotation.create', tokenGetter),
-      delete: createAPICall($http, links, 'annotation.delete', tokenGetter),
-      get: createAPICall($http, links, 'annotation.read', tokenGetter),
-      update: createAPICall($http, links, 'annotation.update', tokenGetter),
+      create: apiCall('annotation.create'),
+      delete: apiCall('annotation.delete'),
+      get: apiCall('annotation.read'),
+      update: apiCall('annotation.update'),
     },
   };
 }
