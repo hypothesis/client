@@ -22,12 +22,23 @@ describe('store', function () {
       })));
   });
 
-  beforeEach(angular.mock.module('h'));
-
-  beforeEach(angular.mock.module(function ($provide) {
+  beforeEach(function () {
     sandbox = sinon.sandbox.create();
-    $provide.value('settings', {apiUrl: 'http://example.com/api'});
-  }));
+
+    var fakeAuth = {};
+
+    angular.mock.module('h', {
+      auth: fakeAuth,
+      settings: {apiUrl: 'http://example.com/api'},
+    });
+
+    angular.mock.inject(function (_$q_) {
+      var $q = _$q_;
+      fakeAuth.tokenGetter = function () {
+        return $q.resolve('faketoken');
+      };
+    });
+  });
 
   afterEach(function () {
     $httpBackend.verifyNoOutstandingExpectation();
@@ -65,10 +76,12 @@ describe('store', function () {
     $httpBackend.flush();
   }));
 
-  it('saves a new annotation', function () {
+  it('saves a new annotation', function (done) {
     store.annotation.create({}, {}).then(function (saved) {
       assert.isNotNull(saved.id);
+      done();
     });
+
     $httpBackend.expectPOST('http://example.com/api/annotations')
       .respond(function () {
         return [201, {id: 'new-id'}, {}];
@@ -76,8 +89,11 @@ describe('store', function () {
     $httpBackend.flush();
   });
 
-  it('updates an annotation', function () {
-    store.annotation.update({id: 'an-id'}, {text: 'updated'});
+  it('updates an annotation', function (done) {
+    store.annotation.update({id: 'an-id'}, {text: 'updated'}).then(function () {
+      done();
+    });
+
     $httpBackend.expectPUT('http://example.com/api/annotations/an-id')
       .respond(function () {
         return [200, {}, {}];
@@ -85,8 +101,11 @@ describe('store', function () {
     $httpBackend.flush();
   });
 
-  it('deletes an annotation', function () {
-    store.annotation.delete({id: 'an-id'}, {});
+  it('deletes an annotation', function (done) {
+    store.annotation.delete({id: 'an-id'}, {}).then(function () {
+      done();
+    });
+
     $httpBackend.expectDELETE('http://example.com/api/annotations/an-id')
       .respond(function () {
         return [200, {}, {}];
@@ -94,24 +113,30 @@ describe('store', function () {
     $httpBackend.flush();
   });
 
-  it('removes internal properties before sending data to the server', function () {
+  it('removes internal properties before sending data to the server', function (done) {
     var annotation = {
       $highlight: true,
       $notme: 'nooooo!',
       allowed: 123,
     };
-    store.annotation.create({}, annotation);
+    store.annotation.create({}, annotation).then(function () {
+      done();
+    });
+
     $httpBackend.expectPOST('http://example.com/api/annotations', {
       allowed: 123,
     })
-      .respond(function () { return {id: 'test'}; });
+      .respond(function () { return [200, {id: 'test'}, {}]; });
     $httpBackend.flush();
   });
 
   // Our backend service interprets semicolons as query param delimiters, so we
   // must ensure to encode them in the query string.
-  it('encodes semicolons in query parameters', function () {
-    store.search({'uri': 'http://example.com/?foo=bar;baz=qux'});
+  it('encodes semicolons in query parameters', function (done) {
+    store.search({'uri': 'http://example.com/?foo=bar;baz=qux'}).then(function () {
+      done();
+    });
+
     $httpBackend.expectGET('http://example.com/api/search?uri=http%3A%2F%2Fexample.com%2F%3Ffoo%3Dbar%3Bbaz%3Dqux')
       .respond(function () { return [200, {}, {}]; });
     $httpBackend.flush();
