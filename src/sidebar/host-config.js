@@ -26,6 +26,7 @@ function hostPageConfig(window) {
     'openLoginForm',
     'openSidebar',
     'showHighlights',
+    'services',
   ];
 
   return Object.keys(config).reduce(function (result, key) {

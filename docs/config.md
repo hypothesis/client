@@ -34,3 +34,10 @@ _Boolean_. Controls whether the sidebar opens automatically on startup.
 
 _Boolean_. Controls whether the in-document highlights are shown by default.
 (Default: _true_.)
+
+### `services`
+
+_Array_. A list of annotation services which the client should retrieve
+annotations from, optionally including information about the identity of the
+user on that service. When omitted, the client will default to connecting to
+the public [Hypothesis](https://hypothes.is/) service.
