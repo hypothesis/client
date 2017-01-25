@@ -3,6 +3,7 @@ raf = require('raf')
 Hammer = require('hammerjs')
 
 Host = require('./host')
+annotationCounts = require('./annotation-counts')
 sidebarTrigger = require('./sidebar-trigger')
 
 # Minimum width to which the frame can be resized.
@@ -37,13 +38,16 @@ module.exports = class Sidebar extends Host
     this._setupSidebarEvents()
 
   _setupDocumentEvents: ->
-    sidebarTrigger(document, @show.bind(this))
+    sidebarTrigger(document.body, @show.bind(this))
+
     @element.on 'click', (event) =>
       if !@selectedTargets?.length
         this.hide()
     return this
 
   _setupSidebarEvents: ->
+    annotationCounts(document.body, @crossframe)
+
     @crossframe.on('show', this.show.bind(this))
     @crossframe.on('hide', this.hide.bind(this))
 

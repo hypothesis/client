@@ -121,6 +121,13 @@ describe('FrameSync', function () {
     });
   });
 
+  context('when annotation count has changed', function () {
+    it('sends a "publicAnnotationCountChanged" message to the frame', function () {
+      fakeAnnotationUI.setState({annotations: [annotationFixtures.publicAnnotation()]});
+      assert.calledWithMatch(fakeBridge.call, 'publicAnnotationCountChanged', sinon.match(1));
+    });
+  });
+
   context('when annotations are removed from the sidebar', function () {
     it('sends a "deleteAnnotation" message to the frame', function () {
       fakeAnnotationUI.setState({annotations: [fixtures.ann]});
