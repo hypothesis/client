@@ -84,8 +84,12 @@ function session($http, $resource, $rootScope, annotationUI, auth,
       // the /app endpoint.
       lastLoadTime = Date.now();
       lastLoad = retryUtil.retryPromiseOperation(function () {
-        if (Array.isArray(settings.services)) {
-          return store.profile().then(update);
+        var authority;
+        if (Array.isArray(settings.services) && settings.services.length > 0) {
+          authority = settings.services[0].authority;
+        }
+        if (authority) {
+          return store.profile({authority: authority}).then(update);
         } else {
           return resource._load().$promise;
         }

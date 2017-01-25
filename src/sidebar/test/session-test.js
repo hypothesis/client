@@ -175,6 +175,12 @@ describe('session', function () {
 
       it('should fetch profile data from the API', function () {
         return session.load().then(function () {
+          assert.calledWith(fakeStore.profile, {authority: 'publisher.org'});
+        });
+      });
+
+      it('should update the session with the profile data from the API', function () {
+        return session.load().then(function () {
           assert.equal(session.state.userid, 'acct:user@publisher.org');
         });
       });
