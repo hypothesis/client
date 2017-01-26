@@ -1,5 +1,6 @@
 'use strict';
 
+var queryString = require('query-string');
 var uuid = require('node-uuid');
 
 var events = require('./events');
@@ -19,8 +20,8 @@ var Socket = require('./websocket');
  * @param settings - Application settings
  */
 // @ngInject
-function Streamer($rootScope, annotationMapper, annotationUI, groups, session,
-                  settings) {
+function Streamer($rootScope, annotationMapper, annotationUI, auth,
+                  groups, session, settings) {
   // The randomly generated session UUID
   var clientId = uuid.v4();
 
@@ -149,32 +150,49 @@ function Streamer($rootScope, annotationMapper, annotationUI, groups, session,
   }
 
   var _connect = function () {
-    var url = settings.websocketUrl;
-
     // If we have no URL configured, don't do anything.
-    if (!url) {
-      return;
+    if (!settings.websocketUrl) {
+      return Promise.resolve();
     }
 
-    socket = new Socket(url);
+    return auth.tokenGetter().then(function (token) {
+      var url;
+      if (token) {
+        // Include the access token in the URL via a query param. This method
+        // is used to send credentials because the `WebSocket` constructor does
+        // not support setting the `Authorization` header directly as we do for
+        // other API requests.
+        var parsedURL = new URL(settings.websocketUrl);
+        var queryParams = queryString.parse(parsedURL.search);
+        queryParams.access_token = token;
+        parsedURL.search = queryString.stringify(queryParams);
+        url = parsedURL.toString();
+      } else {
+        url = settings.websocketUrl;
+      }
 
-    socket.on('open', sendClientConfig);
-    socket.on('error', handleSocketOnError);
-    socket.on('message', handleSocketOnMessage);
+      socket = new Socket(url);
 
-    // Configure the client ID
-    setConfig('client-id', {
-      messageType: 'client_id',
-      value: clientId,
+      socket.on('open', sendClientConfig);
+      socket.on('error', handleSocketOnError);
+      socket.on('message', handleSocketOnMessage);
+
+      // Configure the client ID
+      setConfig('client-id', {
+        messageType: 'client_id',
+        value: clientId,
+      });
+    }).catch(function (err) {
+      console.error('Failed to fetch token for WebSocket authentication', err);
     });
   };
 
   var connect = function () {
     if (socket) {
-      return;
+      return Promise.resolve();
     }
 
-    _connect();
+    return _connect();
   };
 
   var reconnect = function () {
@@ -182,7 +200,7 @@ function Streamer($rootScope, annotationMapper, annotationUI, groups, session,
       socket.close();
     }
 
-    _connect();
+    return _connect();
   };
 
   function applyPendingUpdates() {

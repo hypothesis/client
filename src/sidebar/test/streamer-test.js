@@ -42,9 +42,10 @@ var fixtures = {
 // the most recently created FakeSocket instance
 var fakeWebSocket = null;
 
-function FakeSocket() {
+function FakeSocket(url) {
   fakeWebSocket = this; // eslint-disable-line consistent-this
 
+  this.url = url;
   this.messages = [];
   this.didClose = false;
 
@@ -67,6 +68,7 @@ inherits(FakeSocket, EventEmitter);
 describe('Streamer', function () {
   var fakeAnnotationMapper;
   var fakeAnnotationUI;
+  var fakeAuth;
   var fakeGroups;
   var fakeRootScope;
   var fakeSession;
@@ -79,6 +81,7 @@ describe('Streamer', function () {
       fakeRootScope,
       fakeAnnotationMapper,
       fakeAnnotationUI,
+      fakeAuth,
       fakeGroups,
       fakeSession,
       fakeSettings
@@ -87,6 +90,12 @@ describe('Streamer', function () {
 
   beforeEach(function () {
     var emitter = new EventEmitter();
+
+    fakeAuth = {
+      tokenGetter: function () {
+        return Promise.resolve('dummy-access-token');
+      },
+    };
 
     fakeRootScope = {
       $apply: function (callback) {
@@ -132,8 +141,10 @@ describe('Streamer', function () {
   it('should not create a websocket connection if websocketUrl is not provided', function () {
     fakeSettings = {};
     createDefaultStreamer();
-    activeStreamer.connect();
-    assert.isNull(fakeWebSocket);
+
+    return activeStreamer.connect().then(function () {
+      assert.isNull(fakeWebSocket);
+    });
   });
 
   it('should not create a websocket connection', function () {
@@ -148,44 +159,79 @@ describe('Streamer', function () {
 
   it('should send the client ID on connection', function () {
     createDefaultStreamer();
-    activeStreamer.connect();
-    assert.equal(fakeWebSocket.messages.length, 1);
-    assert.equal(fakeWebSocket.messages[0].messageType, 'client_id');
-    assert.equal(fakeWebSocket.messages[0].value, activeStreamer.clientId);
+    return activeStreamer.connect().then(function () {
+      assert.equal(fakeWebSocket.messages.length, 1);
+      assert.equal(fakeWebSocket.messages[0].messageType, 'client_id');
+      assert.equal(fakeWebSocket.messages[0].value, activeStreamer.clientId);
+    });
   });
 
   describe('#connect()', function () {
     it('should create a websocket connection', function () {
       createDefaultStreamer();
-      activeStreamer.connect();
-      assert.ok(fakeWebSocket);
+      return activeStreamer.connect().then(function () {
+        assert.ok(fakeWebSocket);
+      });
+    });
+
+    it('should include credentials in the URL if the client has an access token', function () {
+      createDefaultStreamer();
+      return activeStreamer.connect().then(function () {
+        assert.equal(fakeWebSocket.url, 'ws://example.com/ws?access_token=dummy-access-token');
+      });
+    });
+
+    it('should preserve query params when adding access token to URL', function () {
+      fakeSettings.websocketUrl = 'ws://example.com/ws?foo=bar';
+      createDefaultStreamer();
+      return activeStreamer.connect().then(function () {
+        assert.equal(fakeWebSocket.url, 'ws://example.com/ws?access_token=dummy-access-token&foo=bar');
+      });
+    });
+
+    it('should not include credentials in the URL if the client has no access token', function () {
+      fakeAuth.tokenGetter = function () {
+        return Promise.resolve(null);
+      };
+
+      createDefaultStreamer();
+      return activeStreamer.connect().then(function () {
+        assert.equal(fakeWebSocket.url, 'ws://example.com/ws');
+      });
     });
 
     it('should not close any existing socket', function () {
+      var oldWebSocket;
       createDefaultStreamer();
-      activeStreamer.connect();
-      var oldWebSocket = fakeWebSocket;
-      activeStreamer.connect();
-      assert.ok(!oldWebSocket.didClose);
-      assert.ok(!fakeWebSocket.didClose);
+      return activeStreamer.connect().then(function () {
+        oldWebSocket = fakeWebSocket;
+        return activeStreamer.connect();
+      }).then(function () {
+        assert.ok(!oldWebSocket.didClose);
+        assert.ok(!fakeWebSocket.didClose);
+      });
     });
   });
 
   describe('#reconnect()', function () {
     it('should close the existing socket', function () {
+      var oldWebSocket;
       createDefaultStreamer();
-      activeStreamer.connect();
-      var oldWebSocket = fakeWebSocket;
-      activeStreamer.reconnect();
-      assert.ok(oldWebSocket.didClose);
-      assert.ok(!fakeWebSocket.didClose);
+
+      return activeStreamer.connect().then(function () {
+        oldWebSocket = fakeWebSocket;
+        return activeStreamer.reconnect();
+      }).then(function () {
+        assert.ok(oldWebSocket.didClose);
+        assert.ok(!fakeWebSocket.didClose);
+      });
     });
   });
 
   describe('annotation notifications', function () {
     beforeEach(function () {
       createDefaultStreamer();
-      activeStreamer.connect();
+      return activeStreamer.connect();
     });
 
     context('when the app is the stream', function () {
@@ -271,7 +317,7 @@ describe('Streamer', function () {
   describe('#applyPendingUpdates', function () {
     beforeEach(function () {
       createDefaultStreamer();
-      activeStreamer.connect();
+      return activeStreamer.connect();
     });
 
     it('applies pending updates', function () {
@@ -307,7 +353,7 @@ describe('Streamer', function () {
 
     beforeEach(function () {
       createDefaultStreamer();
-      activeStreamer.connect();
+      return activeStreamer.connect();
     });
 
     unroll('discards pending updates when #event occurs', function (testCase) {
@@ -330,40 +376,42 @@ describe('Streamer', function () {
   describe('when the focused group changes', function () {
     it('clears pending updates and deletions', function () {
       createDefaultStreamer();
-      activeStreamer.connect();
+      return activeStreamer.connect().then(function () {
+        fakeWebSocket.notify(fixtures.createNotification);
+        fakeRootScope.$broadcast(events.GROUP_FOCUSED);
 
-      fakeWebSocket.notify(fixtures.createNotification);
-      fakeRootScope.$broadcast(events.GROUP_FOCUSED);
-
-      assert.equal(activeStreamer.countPendingUpdates(), 0);
+        assert.equal(activeStreamer.countPendingUpdates(), 0);
+      });
     });
   });
 
   describe('session change notifications', function () {
     it('updates the session when a notification is received', function () {
       createDefaultStreamer();
-      activeStreamer.connect();
-      var model = {
-        groups: [{
-          id: 'new-group',
-        }],
-      };
-      fakeWebSocket.notify({
-        type: 'session-change',
-        model: model,
+      return activeStreamer.connect().then(function () {
+        var model = {
+          groups: [{
+            id: 'new-group',
+          }],
+        };
+        fakeWebSocket.notify({
+          type: 'session-change',
+          model: model,
+        });
+        assert.ok(fakeSession.update.calledWith(model));
       });
-      assert.ok(fakeSession.update.calledWith(model));
     });
   });
 
   describe('reconnections', function () {
     it('resends configuration messages when a reconnection occurs', function () {
       createDefaultStreamer();
-      activeStreamer.connect();
-      fakeWebSocket.messages = [];
-      fakeWebSocket.emit('open');
-      assert.equal(fakeWebSocket.messages.length, 1);
-      assert.equal(fakeWebSocket.messages[0].messageType, 'client_id');
+      return activeStreamer.connect().then(function () {
+        fakeWebSocket.messages = [];
+        fakeWebSocket.emit('open');
+        assert.equal(fakeWebSocket.messages.length, 1);
+        assert.equal(fakeWebSocket.messages[0].messageType, 'client_id');
+      });
     });
   });
 });
