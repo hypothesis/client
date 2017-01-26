@@ -48,7 +48,8 @@ function sessionActions(options) {
  *
  * @ngInject
  */
-function session($http, $resource, $rootScope, annotationUI, flash, raven, settings) {
+function session($http, $resource, $rootScope, annotationUI, auth,
+                 flash, raven, settings) {
   // Headers sent by every request made by the session service.
   var headers = {};
   var actions = sessionActions({
@@ -104,7 +105,7 @@ function session($http, $resource, $rootScope, annotationUI, flash, raven, setti
    *              the response, update() can be used to update the client
    *              when new state has been pushed to it by the server.
    */
-  resource.update = function (model) {
+  function update(model) {
     var prevSession = annotationUI.getState().session;
 
     var isInitialLoad = !prevSession.csrf;
@@ -128,6 +129,8 @@ function session($http, $resource, $rootScope, annotationUI, flash, raven, setti
     });
 
     if (userChanged) {
+      auth.clearCache();
+
       $rootScope.$broadcast(events.USER_CHANGED, {
         initialLoad: isInitialLoad,
         userid: model.userid,
@@ -151,7 +154,7 @@ function session($http, $resource, $rootScope, annotationUI, flash, raven, setti
 
     // Return the model
     return model;
-  };
+  }
 
   function process(data, headersGetter, status) {
     if (status < 200 || status >= 500) {
@@ -179,14 +182,23 @@ function session($http, $resource, $rootScope, annotationUI, flash, raven, setti
       }
     }
 
-    return resource.update(model);
+    return update(model);
+  }
+
+  function logout() {
+    return resource.logout().$promise.then(function () {
+      auth.clearCache();
+    }).catch(function (err) {
+      flash.error('Log out failed');
+      throw err;
+    });
   }
 
   return {
     dismissSidebarTutorial: resource.dismiss_sidebar_tutorial,
     load: resource.load,
     login: resource.login,
-    logout: resource.logout,
+    logout: logout,
 
     // For the moment, we continue to expose the session state as a property on
     // this service. In future, other services which access the session state
@@ -195,7 +207,7 @@ function session($http, $resource, $rootScope, annotationUI, flash, raven, setti
       return annotationUI.getState().session;
     },
 
-    update: resource.update,
+    update: update,
   };
 }
 
