@@ -41,13 +41,16 @@ function auth($http, settings) {
   }
 
   function tokenGetter() {
-    if (cachedToken && cachedToken.expiresAt > Date.now()) {
+    // performance.now() is used instead of Date.now() because it is
+    // monotonically increasing.
+    if (cachedToken && cachedToken.expiresAt > performance.now()) {
       return Promise.resolve(cachedToken.token);
     } else if (grantToken) {
+      var refreshStart = performance.now();
       return exchangeToken(grantToken).then(function (tokenInfo) {
         cachedToken = {
           token: tokenInfo.access_token,
-          expiresAt: Date.now() + tokenInfo.expires_in * 1000,
+          expiresAt: refreshStart + tokenInfo.expires_in * 1000,
         };
         return cachedToken.token;
       });

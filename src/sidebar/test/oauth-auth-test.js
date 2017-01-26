@@ -7,12 +7,13 @@ var DEFAULT_TOKEN_EXPIRES_IN_SECS = 1000;
 describe('oauth auth', function () {
 
   var auth;
-  var clock;
+  var nowStub;
   var fakeHttp;
   var fakeSettings;
 
   beforeEach(function () {
-    clock = sinon.useFakeTimers();
+    nowStub = sinon.stub(window.performance, 'now');
+    nowStub.returns(300);
 
     fakeHttp = {
       post: sinon.stub().returns(Promise.resolve({
@@ -36,7 +37,7 @@ describe('oauth auth', function () {
   });
 
   afterEach(function () {
-    clock.restore();
+    performance.now.restore();
   });
 
   describe('#tokenGetter', function () {
@@ -74,7 +75,8 @@ describe('oauth auth', function () {
 
     it('should refresh the access token if it has expired', function () {
       return auth.tokenGetter().then(function () {
-        clock.tick(DEFAULT_TOKEN_EXPIRES_IN_SECS * 1000 + 100);
+        var now = performance.now();
+        nowStub.returns(now + DEFAULT_TOKEN_EXPIRES_IN_SECS * 1000 + 100);
         fakeHttp.post.returns(Promise.resolve({
           status: 200,
           data: {
