@@ -187,21 +187,38 @@ function Streamer($rootScope, annotationMapper, annotationUI, auth,
     });
   };
 
-  var connect = function () {
+  /**
+   * Connect to the Hypothesis real time update service.
+   *
+   * If the service has already connected this does nothing.
+   *
+   * @return {Promise} Promise which resolves once the WebSocket connection
+   *                   process has started.
+   */
+  function connect() {
     if (socket) {
       return Promise.resolve();
     }
 
     return _connect();
-  };
+  }
 
-  var reconnect = function () {
+  /**
+   * Connect to the Hypothesis real time update service.
+   *
+   * If the service has already connected this closes the existing connection
+   * and reconnects.
+   *
+   * @return {Promise} Promise which resolves once the WebSocket connection
+   *                   process has started.
+   */
+  function reconnect() {
     if (socket) {
       socket.close();
     }
 
     return _connect();
-  };
+  }
 
   function applyPendingUpdates() {
     var updates = Object.values(pendingUpdates);
