@@ -37,7 +37,12 @@ _Boolean_. Controls whether the in-document highlights are shown by default.
 
 ### `services`
 
-_Array_. A list of annotation services which the client should retrieve
-annotations from, optionally including information about the identity of the
-user on that service. When omitted, the client will default to connecting to
-the public [Hypothesis](https://hypothes.is/) service.
+_Array_. A list of additional annotation services which the client should
+retrieve annotations from, optionally including information about the identity
+of the user on that service. This list is in addition to the public
+[Hypothesis](https://hypothes.is/) service.
+
+Each service description is an object with the keys:
+
+ * `authority` _String_. The domain name which the annotation service is associated with.
+ * `grantToken` _String|null_. An OAuth grant token which the client can exchange for an access token in order to make authenticated requests to the service. If _null_, the user will only be able to read rather than create or modify annotations. (Default: _null_)
