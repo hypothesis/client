@@ -132,7 +132,7 @@ module.exports = function AppController(
     });
     drafts.discard();
     $scope.accountDialog.visible = false;
-    auth.logout();
+    session.logout();
   };
 
   $scope.clearSelection = function () {
