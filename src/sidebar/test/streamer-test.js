@@ -157,12 +157,24 @@ describe('Streamer', function () {
     assert.ok(activeStreamer.clientId);
   });
 
-  it('should send the client ID on connection', function () {
+  it('should send the client ID after connecting', function () {
     createDefaultStreamer();
     return activeStreamer.connect().then(function () {
-      assert.equal(fakeWebSocket.messages.length, 1);
-      assert.equal(fakeWebSocket.messages[0].messageType, 'client_id');
-      assert.equal(fakeWebSocket.messages[0].value, activeStreamer.clientId);
+      var clientIdMsg = fakeWebSocket.messages.find(function (msg) {
+        return msg.messageType === 'client_id';
+      });
+      assert.ok(clientIdMsg);
+      assert.equal(clientIdMsg.value, activeStreamer.clientId);
+    });
+  });
+
+  it('should request the logged-in user ID after connecting', function () {
+    createDefaultStreamer();
+    return activeStreamer.connect().then(function () {
+      var whoamiMsg = fakeWebSocket.messages.find(function (msg) {
+        return msg.type === 'whoami';
+      });
+      assert.ok(whoamiMsg);
     });
   });
 
@@ -409,8 +421,11 @@ describe('Streamer', function () {
       return activeStreamer.connect().then(function () {
         fakeWebSocket.messages = [];
         fakeWebSocket.emit('open');
-        assert.equal(fakeWebSocket.messages.length, 1);
-        assert.equal(fakeWebSocket.messages[0].messageType, 'client_id');
+
+        var configMsgTypes = fakeWebSocket.messages.map(function (msg) {
+          return msg.type || msg.messageType;
+        });
+        assert.deepEqual(configMsgTypes, ['client_id', 'whoami']);
       });
     });
   });

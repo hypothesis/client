@@ -182,6 +182,14 @@ function Streamer($rootScope, annotationMapper, annotationUI, auth,
         messageType: 'client_id',
         value: clientId,
       });
+
+      // Send a "whoami" message. The server will respond with a "whoyouare"
+      // reply which is useful for verifying that authentication worked as
+      // expected.
+      setConfig('auth-check', {
+        type: 'whoami',
+        id: 1,
+      });
     }).catch(function (err) {
       console.error('Failed to fetch token for WebSocket authentication', err);
     });
