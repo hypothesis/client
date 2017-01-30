@@ -18,6 +18,9 @@ describe('hostPageConfig', function () {
       openSidebar: true,
       openLoginForm: true,
       showHighlights: true,
+      services: [{
+        authority: 'hypothes.is',
+      }],
     });
 
     assert.deepEqual(hostPageConfig(window_), {
@@ -26,6 +29,9 @@ describe('hostPageConfig', function () {
       openSidebar: true,
       openLoginForm: true,
       showHighlights: true,
+      services: [{
+        authority: 'hypothes.is',
+      }],
     });
   });
 

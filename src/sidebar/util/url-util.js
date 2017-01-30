@@ -25,6 +25,17 @@ function replaceURLParams(url, params) {
   return {url: url, params: unusedParams};
 }
 
+/**
+ * Resolve a relative URL against a base URL to get an absolute URL.
+ *
+ * @param {string} relativeURL
+ * @param {string} baseURL
+ */
+function resolve(relativeURL, baseURL) {
+  return new URL(relativeURL, baseURL).href;
+}
+
 module.exports = {
   replaceURLParams: replaceURLParams,
+  resolve: resolve,
 };

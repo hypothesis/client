@@ -99,6 +99,13 @@ function processAppOpts() {
   }
 }
 
+var authService;
+if (Array.isArray(settings.services)) {
+  authService = require('./oauth-auth');
+} else {
+  authService = require('./auth');
+}
+
 module.exports = angular.module('h', [
   // Angular addons which export the Angular module name
   // via module.exports
@@ -163,7 +170,7 @@ module.exports = angular.module('h', [
   .service('analytics', require('./analytics'))
   .service('annotationMapper', require('./annotation-mapper'))
   .service('annotationUI', require('./annotation-ui'))
-  .service('auth', require('./auth'))
+  .service('auth', authService)
   .service('bridge', require('../shared/bridge'))
   .service('drafts', require('./drafts'))
   .service('features', require('./features'))
