@@ -50,8 +50,27 @@ function analytics($analytics, $window, settings) {
      *  in our analytics. Example: 'sidebarOpened'. Use camelCase to track multiple
      *  words.
      */
-    track: function(event){
-      $analytics.eventTrack(event, options);
+    track: function(event, label, metricValue){
+      $analytics.eventTrack(event, Object.assign({}, {
+        label: label || undefined,
+        metricValue: isNaN(metricValue) ? undefined : metricValue,
+      }, options));
+    },
+
+    events: {
+      ANNOTATION_CREATED: 'annotationCreated',
+      ANNOTATION_DELETED: 'annotationDeleted',
+      ANNOTATION_UPDATED: 'annotationUpdated',
+      HIGHLIGHT_CREATED: 'highlightCreated',
+      HIGHLIGHT_UPDATED: 'highlightUpdated',
+      HIGHLIGHT_DELETED: 'highlightDeleted',
+      PAGE_NOTE_CREATED: 'pageNoteCreated',
+      PAGE_NOTE_UPDATED: 'pageNoteUpdated',
+      PAGE_NOTE_DELETED: 'pageNoteDeleted',
+      REPLY_CREATED: 'replyCreated',
+      REPLY_UPDATED: 'replyUpdated',
+      REPLY_DELETED: 'replyDeleted',
+      SIDEBAR_OPENED: 'sidebarOpened',
     },
   };
 }

@@ -202,7 +202,7 @@ module.exports = function WidgetController(
 
   $scope.$on('sidebarOpened', function () {
 
-    analytics.track('sidebarOpened');
+    analytics.track(analytics.events.SIDEBAR_OPENED);
 
     streamer.connect();
   });

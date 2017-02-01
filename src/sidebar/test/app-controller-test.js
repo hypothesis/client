@@ -12,6 +12,7 @@ describe('AppController', function () {
   var $rootScope = null;
   var fakeAnnotationMetadata = null;
   var fakeAnnotationUI = null;
+  var fakeAnalytics = null;
   var fakeAuth = null;
   var fakeDrafts = null;
   var fakeFeatures = null;
@@ -56,6 +57,11 @@ describe('AppController', function () {
     fakeAnnotationUI = {
       tool: 'comment',
       clearSelectedAnnotations: sandbox.spy(),
+    };
+
+    fakeAnalytics = {
+      track: sandbox.stub(),
+      events: {},
     };
 
     fakeAuth = {};
@@ -107,6 +113,7 @@ describe('AppController', function () {
 
     $provide.value('annotationUI', fakeAnnotationUI);
     $provide.value('auth', fakeAuth);
+    $provide.value('analytics', fakeAnalytics);
     $provide.value('drafts', fakeDrafts);
     $provide.value('features', fakeFeatures);
     $provide.value('frameSync', fakeFrameSync);
