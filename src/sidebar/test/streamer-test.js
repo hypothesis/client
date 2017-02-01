@@ -115,6 +115,11 @@ describe('Streamer', function () {
     fakeAnnotationUI = {
       annotationExists: sinon.stub().returns(false),
       isSidebar: sinon.stub().returns(true),
+      getState: sinon.stub().returns({
+        session: {
+          userid: 'jim@hypothes.is',
+        },
+      }),
     };
 
     fakeGroups = {
@@ -413,6 +418,60 @@ describe('Streamer', function () {
         assert.ok(fakeSession.update.calledWith(model));
       });
     });
+  });
+
+  describe('whoyouare notifications', function () {
+    beforeEach(function () {
+      sinon.stub(console, 'warn');
+    });
+
+    afterEach(function () {
+      console.warn.restore();
+    });
+
+    unroll('does nothing if the userid matches the logged-in userid', function (testCase) {
+      fakeAnnotationUI.getState.returns({
+        session: {
+          userid: testCase.userid,
+        },
+      });
+      createDefaultStreamer();
+      return activeStreamer.connect().then(function () {
+        fakeWebSocket.notify({
+          type: 'whoyouare',
+          userid: testCase.websocketUserid,
+        });
+        assert.notCalled(console.warn);
+      });
+    }, [{
+      userid: 'acct:mr_bond@hypothes.is',
+      websocketUserid: 'acct:mr_bond@hypothes.is',
+    },{
+      userid: null,
+      websocketUserid: null,
+    }]);
+
+    unroll('logs a warning if the userid does not match the logged-in userid', function (testCase) {
+      fakeAnnotationUI.getState.returns({
+        session: {
+          userid: testCase.userid,
+        },
+      });
+      createDefaultStreamer();
+      return activeStreamer.connect().then(function () {
+        fakeWebSocket.notify({
+          type: 'whoyouare',
+          userid: testCase.websocketUserid,
+        });
+        assert.called(console.warn);
+      });
+    }, [{
+      userid: 'acct:mr_bond@hypothes.is',
+      websocketUserid: 'acct:the_spanish_inquisition@hypothes.is',
+    }, {
+      userid: null,
+      websocketUserid: 'acct:the_spanish_inquisition@hypothes.is',
+    }]);
   });
 
   describe('reconnections', function () {
