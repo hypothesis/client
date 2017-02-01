@@ -71,7 +71,8 @@ describe('WidgetController', function () {
     sandbox = sinon.sandbox.create();
 
     fakeAnalytics = {
-      track: sandbox.spy(),
+      track: sandbox.stub(),
+      events: {},
     };
 
     fakeAnnotationMapper = {

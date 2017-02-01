@@ -9,6 +9,7 @@ var persona = require('../filter/persona');
 
 var isNew = annotationMetadata.isNew;
 var isReply = annotationMetadata.isReply;
+var isPageNote = annotationMetadata.isPageNote;
 
 /** Return a human-readable error message for the given server error.
  *
@@ -46,7 +47,7 @@ function updateModel(annotation, changes, permissions) {
 
 // @ngInject
 function AnnotationController(
-  $document, $q, $rootScope, $scope, $timeout, $window, annotationUI,
+  $document, $q, $rootScope, $scope, $timeout, $window, analytics, annotationUI,
   annotationMapper, drafts, flash, features, groups, permissions, serviceUrl,
   session, store, streamer) {
 
@@ -56,12 +57,18 @@ function AnnotationController(
   /** Save an annotation to the server. */
   function save(annot) {
     var saved;
-    if (annot.id) {
+    var updating = !!annot.id;
+
+    if (updating) {
       saved = store.annotation.update({id: annot.id}, annot);
     } else {
       saved = store.annotation.create({}, annot);
     }
+
     return saved.then(function (savedAnnot) {
+
+      var event;
+
       // Copy across internal properties which are not part of the annotation
       // model saved on the server
       savedAnnot.$tag = annot.$tag;
@@ -70,6 +77,20 @@ function AnnotationController(
           savedAnnot[k] = annot[k];
         }
       });
+
+
+      if(vm.isReply()){
+        event = updating ? analytics.events.REPLY_UPDATED : analytics.events.REPLY_CREATED;
+      }else if(vm.isHighlight()){
+        event = updating ? analytics.events.HIGHLIGHT_UPDATED : analytics.events.HIGHLIGHT_CREATED;
+      }else if(isPageNote(vm.annotation)) {
+        event = updating ? analytics.events.PAGE_NOTE_UPDATED : analytics.events.PAGE_NOTE_CREATED;
+      }else {
+        event = updating ? analytics.events.ANNOTATION_UPDATED : analytics.events.ANNOTATION_CREATED;
+      }
+
+      analytics.track(event);
+
       return savedAnnot;
     });
   }
@@ -213,8 +234,22 @@ function AnnotationController(
             errorMessage(reason), 'Deleting annotation failed');
         };
         $scope.$apply(function() {
-          annotationMapper.deleteAnnotation(vm.annotation).then(
-            null, onRejected);
+          annotationMapper.deleteAnnotation(vm.annotation).then(function(){
+            var event;
+
+            if(vm.isReply()){
+              event = analytics.events.REPLY_DELETED;
+            }else if(vm.isHighlight()){
+              event = analytics.events.HIGHLIGHT_DELETED;
+            }else if(isPageNote(vm.annotation)){
+              event = analytics.events.PAGE_NOTE_DELETED;
+            }else {
+              event = analytics.events.ANNOTATION_DELETED;
+            }
+
+            analytics.track(event);
+
+          }, onRejected);
         });
       }
     }, true);
@@ -291,8 +326,7 @@ function AnnotationController(
       // example there's no vm.annotation.highlight: true.  Instead a highlight is
       // defined as an annotation that isn't a page note or a reply and that
       // has no text or tags.
-      var isPageNote = (vm.annotation.target || []).length === 0;
-      return (!isPageNote && !isReply(vm.annotation) && !vm.hasContent());
+      return (!isPageNote(vm.annotation) && !isReply(vm.annotation) && !vm.hasContent());
     }
   };
 

@@ -82,6 +82,7 @@ describe('annotation', function() {
     var $scope;
     var $timeout;
     var $window;
+    var fakeAnalytics;
     var fakeAnnotationMapper;
     var fakeDrafts;
     var fakeFlash;
@@ -120,6 +121,11 @@ describe('annotation', function() {
     beforeEach(angular.mock.module('h'));
     beforeEach(angular.mock.module(function($provide) {
       sandbox = sinon.sandbox.create();
+
+      fakeAnalytics = {
+        track: sandbox.stub(),
+        events: {},
+      };
 
       fakeAnnotationMapper = {
         createAnnotation: sandbox.stub().returns({
@@ -195,6 +201,7 @@ describe('annotation', function() {
         hasPendingDeletion: sinon.stub(),
       };
 
+      $provide.value('analytics', fakeAnalytics);
       $provide.value('annotationMapper', fakeAnnotationMapper);
       $provide.value('annotationUI', fakeAnnotationUI);
       $provide.value('drafts', fakeDrafts);

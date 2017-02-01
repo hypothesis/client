@@ -71,7 +71,7 @@ function oldAnnotation() {
   return {
     id: 'annotation_id',
     $highlight: undefined,
-    target: ['foo', 'bar'],
+    target: [{source: 'source', 'selector': [] }],
     references: [],
     text: 'This is my annotation',
     tags: ['tag_1', 'tag_2'],
