@@ -72,8 +72,10 @@ describe('store', function () {
           url: 'http://example.com/api/search',
         },
         profile: {
-          method: 'GET',
-          url: 'http://example.com/api/profile',
+          read: {
+            method: 'GET',
+            url: 'http://example.com/api/profile',
+          },
         },
       },
     });
