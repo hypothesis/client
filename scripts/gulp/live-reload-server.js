@@ -36,7 +36,11 @@ function LiveReloadServer(port, appServer) {
       <title>Hypothesis Client Test</title>
     </head>
     <body>
-      <pre style="margin: 75px;">${changelogText()}</pre>
+      <div data-hypothesis-trigger style="margin: 75px 0 0 75px;">
+        Number of annotations:
+        <span data-hypothesis-annotation-count>...</span>
+      </div>
+      <pre style="margin: 20px 75px 75px 75px;">${changelogText()}</pre>
       <script>
       var appHost = document.location.hostname;
 

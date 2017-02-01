@@ -16,6 +16,25 @@ function defaultAnnotation() {
   };
 }
 
+/**
+ * Return a fake public annotation with the basic properties filled in.
+ */
+function publicAnnotation() {
+  return {
+    id: 'pubann',
+    document: {
+      title: 'A special document',
+    },
+    permissions: {
+      read:['group:__world__'],
+    },
+    target: [{source: 'source', 'selector': []}],
+    uri: 'http://example.com',
+    user: 'acct:bill@localhost',
+    updated: '2015-05-10T20:18:56.613388+00:00',
+  };
+}
+
 /** Return an annotation domain model object for a new annotation
  * (newly-created client-side, not yet saved to the server).
  */
@@ -120,6 +139,7 @@ function oldReply() {
 
 module.exports = {
   defaultAnnotation: defaultAnnotation,
+  publicAnnotation: publicAnnotation,
   newAnnotation: newAnnotation,
   newEmptyAnnotation: newEmptyAnnotation,
   newHighlight: newHighlight,

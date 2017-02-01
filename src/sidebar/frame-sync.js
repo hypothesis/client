@@ -1,6 +1,7 @@
 'use strict';
 
 var events = require('./events');
+var bridgeEvents = require('../shared/bridge-events');
 var metadata = require('./annotation-metadata');
 var uiConstants = require('./ui-constants');
 
@@ -50,6 +51,7 @@ function FrameSync($rootScope, $window, Discovery, annotationUI, bridge) {
   function setupSyncToFrame() {
     // List of loaded annotations in previous state
     var prevAnnotations = [];
+    var prevPublicAnns = 0;
 
     annotationUI.subscribe(function () {
       var state = annotationUI.getState();
@@ -57,6 +59,7 @@ function FrameSync($rootScope, $window, Discovery, annotationUI, bridge) {
         return;
       }
 
+      var publicAnns = 0;
       var inSidebar = new Set();
       var added = [];
 
@@ -64,6 +67,10 @@ function FrameSync($rootScope, $window, Discovery, annotationUI, bridge) {
         if (metadata.isReply(annot)) {
           // The frame does not need to know about replies
           return;
+        }
+
+        if (metadata.isPublic(annot)) {
+          ++publicAnns;
         }
 
         inSidebar.add(annot.$tag);
@@ -89,6 +96,11 @@ function FrameSync($rootScope, $window, Discovery, annotationUI, bridge) {
         bridge.call('deleteAnnotation', formatAnnot(annot));
         inFrame.delete(annot.$tag);
       });
+
+      if (publicAnns !== prevPublicAnns) {
+        bridge.call(bridgeEvents.PUBLIC_ANNOTATION_COUNT_CHANGED, publicAnns);
+        prevPublicAnns = publicAnns;
+      }
     });
   }
 

@@ -101,6 +101,24 @@ function isNew(annotation) {
   return !annotation.id;
 }
 
+/** Return `true` if the given annotation is public, `false` otherwise. */
+function isPublic(annotation) {
+  var isPublic = false;
+
+  if (!annotation.permissions) {
+    return isPublic;
+  }
+
+  annotation.permissions.read.forEach(function(perm) {
+    var readPermArr = perm.split(':');
+    if (readPermArr.length === 2 && readPermArr[0] === 'group') {
+      isPublic = true;
+    }
+  });
+
+  return isPublic;
+}
+
 /**
  * Return `true` if `annotation` has a selector.
  *
@@ -169,6 +187,7 @@ module.exports = {
   isNew: isNew,
   isOrphan: isOrphan,
   isPageNote: isPageNote,
+  isPublic: isPublic,
   isReply: isReply,
   isWaitingToAnchor: isWaitingToAnchor,
   location: location,

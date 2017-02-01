@@ -3,6 +3,8 @@
 var annotationMetadata = require('../annotation-metadata');
 var fixtures = require('./annotation-fixtures');
 
+var unroll = require('../../shared/test/util').unroll;
+
 var documentMetadata = annotationMetadata.documentMetadata;
 var domainAndTitle = annotationMetadata.domainAndTitle;
 
@@ -244,6 +246,26 @@ describe('annotation-metadata', function () {
     });
     it ('returns false if an annotation has no target', function () {
       assert.isFalse(annotationMetadata.isAnnotation({}));
+    });
+  });
+
+  describe('.isPublic', function () {
+    it('returns true if an annotation is shared within a group', function () {
+      assert.isTrue(annotationMetadata.isPublic(fixtures.publicAnnotation()));
+    });
+
+    unroll('returns false if an annotation is not publicly readable', function (testCase) {
+      var annotation = Object.assign(fixtures.defaultAnnotation(), {permissions: testCase});
+      assert.isFalse(annotationMetadata.isPublic(annotation));
+    }, [{
+      read:['acct:someemail@localhost'],
+    }, {
+      read:['something invalid'],
+    }]);
+
+    it('returns false if an annotation is missing permissions', function () {
+      var annotation = Object.assign(fixtures.defaultAnnotation());
+      assert.isFalse(annotationMetadata.isPublic(annotation));
     });
   });
 
