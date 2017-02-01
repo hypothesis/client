@@ -264,8 +264,7 @@ describe('annotation-metadata', function () {
     }]);
 
     it('returns false if an annotation is missing permissions', function () {
-      var annotation = Object.assign(fixtures.defaultAnnotation());
-      assert.isFalse(annotationMetadata.isPublic(annotation));
+      assert.isFalse(annotationMetadata.isPublic(fixtures.defaultAnnotation()));
     });
   });
 
