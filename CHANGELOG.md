@@ -4,6 +4,21 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+- Enable the host page to configure the client to log in using a non-Hypothesis
+  ('third party') account by providing the client with an OAuth grant token
+  ([#199](https://github.com/hypothesis/client/pull/199)). This is an initial
+  step towards supporting annotation services other than the public Hypothesis
+  service in the client.
+
+- Support authenticating to real-time API using OAuth access tokens rather than
+  cookies ([#200](https://github.com/hypothesis/client/pull/200)).
+
+- Add support for displaying the count of public annotations in elements on the
+  page embedding the Hypothesis client
+  ([#202](https://github.com/hypothesis/client/pull/202)).
+
 ## [0.52.0] - 2017-01-24
 
 ### Changed
