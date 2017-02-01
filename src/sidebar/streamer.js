@@ -123,6 +123,11 @@ function Streamer($rootScope, annotationMapper, annotationUI, auth,
         handleAnnotationNotification(message);
       } else if (message.type === 'session-change') {
         handleSessionChangeNotification(message);
+      } else if (message.type === 'whoyouare') {
+        var userid = annotationUI.getState().session.userid;
+        if (message.userid !== userid) {
+          console.warn('WebSocket user ID "%s" does not match logged-in ID "%s"', message.userid, userid);
+        }
       } else {
         console.warn('received unsupported notification', message.type);
       }
