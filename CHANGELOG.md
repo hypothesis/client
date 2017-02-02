@@ -19,6 +19,9 @@ Entries in this change log follow the format suggested at http://keepachangelog.
   page embedding the Hypothesis client
   ([#202](https://github.com/hypothesis/client/pull/202)).
 
+- Track basic annotation actions (create, update, delete) via Google Analytics
+  ([#206](https://github.com/hypothesis/client/pull/206)).
+
 ## [0.52.0] - 2017-01-24
 
 ### Changed
