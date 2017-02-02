@@ -4,7 +4,7 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
-## [Unreleased]
+## [0.53.0] - 2017-02-02
 
 - Enable the host page to configure the client to log in using a non-Hypothesis
   ('third party') account by providing the client with an OAuth grant token
