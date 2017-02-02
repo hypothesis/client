@@ -150,7 +150,7 @@ describe('store', function () {
 
   it("fetches the user's profile", function (done) {
     var profile = {userid: 'acct:user@publisher.org'};
-    store.profile({authority: 'publisher.org'}).then(function (profile_) {
+    store.profile.read({authority: 'publisher.org'}).then(function (profile_) {
       assert.deepEqual(profile_, profile);
       done();
     });

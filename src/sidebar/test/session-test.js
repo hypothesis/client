@@ -43,7 +43,9 @@ describe('session', function () {
       setUserInfo: sandbox.spy(),
     };
     fakeStore = {
-      profile: sandbox.stub(),
+      profile: {
+        read: sandbox.stub(),
+      },
     };
     fakeSettings = {
       serviceUrl: 'https://test.hypothes.is/root/',
@@ -168,14 +170,14 @@ describe('session', function () {
           authority: 'publisher.org',
           grantToken: 'a.jwt.token',
         }];
-        fakeStore.profile.returns(Promise.resolve({
+        fakeStore.profile.read.returns(Promise.resolve({
           userid: 'acct:user@publisher.org',
         }));
       });
 
       it('should fetch profile data from the API', function () {
         return session.load().then(function () {
-          assert.calledWith(fakeStore.profile, {authority: 'publisher.org'});
+          assert.calledWith(fakeStore.profile.read, {authority: 'publisher.org'});
         });
       });
 

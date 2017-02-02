@@ -89,7 +89,7 @@ function session($http, $resource, $rootScope, annotationUI, auth,
           authority = settings.services[0].authority;
         }
         if (authority) {
-          return store.profile({authority: authority}).then(update);
+          return store.profile.read({authority: authority}).then(update);
         } else {
           return resource._load().$promise;
         }

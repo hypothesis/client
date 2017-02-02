@@ -143,7 +143,9 @@ function store($http, $q, auth, settings) {
       get: apiCall('annotation.read'),
       update: apiCall('annotation.update'),
     },
-    profile: apiCall('profile.read'),
+    profile: {
+      read: apiCall('profile.read'),
+    },
   };
 }
 
