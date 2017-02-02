@@ -53,6 +53,18 @@ describe('oauth auth', function () {
       });
     });
 
+    it('should raise if a grant token request fails', function () {
+      fakeHttp.post.returns(Promise.resolve({status: 500}));
+      return auth.tokenGetter().then(
+        function onResolved () {
+          assert(false, 'The Promise should have been rejected');
+        },
+        function onRejected (error) {
+          assert.equal(error.message, 'Failed to retrieve access token');
+        }
+      );
+    });
+
     it('should cache tokens for future use', function () {
       return auth.tokenGetter().then(function () {
         fakeHttp.post.reset();
