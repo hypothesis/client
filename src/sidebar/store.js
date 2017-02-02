@@ -145,6 +145,7 @@ function store($http, $q, auth, settings) {
     },
     profile: {
       read: apiCall('profile.read'),
+      update: apiCall('profile.update'),
     },
   };
 }

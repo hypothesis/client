@@ -76,6 +76,10 @@ describe('store', function () {
             method: 'GET',
             url: 'http://example.com/api/profile',
           },
+          update: {
+            method: 'PATCH',
+            url: 'http://example.com/api/profile',
+          },
         },
       },
     });
@@ -156,6 +160,18 @@ describe('store', function () {
     });
     $httpBackend.expectGET('http://example.com/api/profile?authority=publisher.org')
       .respond(function () { return [200, profile, {}]; });
+    $httpBackend.flush();
+  });
+
+  it("updates a user's profile", function (done) {
+    store.profile.update({}, {preferences: {}}).then(function () {
+      done();
+    });
+
+    $httpBackend.expectPATCH('http://example.com/api/profile')
+      .respond(function () {
+        return [200, {}, {}];
+      });
     $httpBackend.flush();
   });
 });
