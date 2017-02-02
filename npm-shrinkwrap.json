@@ -6057,10 +6057,18 @@
           "dev": true
         },
         "graceful-fs": {
-          "version": "3.0.8",
+          "version": "3.0.11",
           "from": "graceful-fs@>=3.0.0 <4.0.0",
-          "resolved": "https://registry.npmjs.org/graceful-fs/-/graceful-fs-3.0.8.tgz",
-          "dev": true
+          "resolved": "https://registry.npmjs.org/graceful-fs/-/graceful-fs-3.0.11.tgz",
+          "dev": true,
+          "dependencies": {
+            "natives": {
+              "version": "1.10",
+              "from": "natives@>=1.1.0 <2.0.0",
+              "resolved": "https://registry.npmjs.org/natives/-/natives-1.1.0.tgz",
+              "dev": true
+            }
+          }
         },
         "readable-stream": {
           "version": "1.0.34",
