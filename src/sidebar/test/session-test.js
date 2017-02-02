@@ -45,6 +45,7 @@ describe('session', function () {
     fakeStore = {
       profile: {
         read: sandbox.stub(),
+        update: sandbox.stub().returns(Promise.resolve({})),
       },
     };
     fakeSettings = {
@@ -292,11 +293,21 @@ describe('session', function () {
   });
 
   describe('#dismissSidebarTutorial()', function () {
-    var url = 'https://test.hypothes.is/root/app/dismiss_sidebar_tutorial';
+    beforeEach(function () {
+      fakeStore.profile.update.returns(Promise.resolve({
+        preferences: {},
+      }));
+    });
+
     it('disables the tutorial for the user', function () {
-      $httpBackend.expectPOST(url).respond({});
       session.dismissSidebarTutorial();
-      $httpBackend.flush();
+      assert.calledWith(fakeStore.profile.update, {}, {preferences: {show_sidebar_tutorial: false}});
+    });
+
+    it('should update the session with the response from the API', function () {
+      return session.dismissSidebarTutorial().then(function () {
+        assert.isNotOk(session.state.preferences.show_sidebar_tutorial);
+      });
     });
   });
 

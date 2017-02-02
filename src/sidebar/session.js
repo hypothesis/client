@@ -20,11 +20,6 @@ function sessionActions(options) {
     },
 
     _load: { method: 'GET' },
-
-    dismiss_sidebar_tutorial: {
-      method: 'POST',
-      params: { path: 'dismiss_sidebar_tutorial' },
-    },
   };
 
   Object.keys(actions).forEach(function (action) {
@@ -103,6 +98,16 @@ function session($http, $resource, $rootScope, annotationUI, auth,
     }
     return lastLoad;
   };
+
+  /**
+   * @name session.dismissSidebarTutorial()
+   *
+   * @description Stores the preference server-side that the user dismissed
+   *              the sidebar tutorial, and then updates the session state.
+   */
+  function dismissSidebarTutorial() {
+    return store.profile.update({}, {preferences: {show_sidebar_tutorial: false}}).then(update);
+  }
 
   /**
    * @name session.update()
@@ -203,7 +208,7 @@ function session($http, $resource, $rootScope, annotationUI, auth,
   }
 
   return {
-    dismissSidebarTutorial: resource.dismiss_sidebar_tutorial,
+    dismissSidebarTutorial: dismissSidebarTutorial,
     load: resource.load,
     login: resource.login,
     logout: logout,
