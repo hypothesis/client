@@ -6,6 +6,11 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 ## [Unreleased]
 
+### Changed
+
+- Enable users with third-party accounts to dismiss the sidebar tutorial
+  ([#207](https://github.com/hypothesis/client/pull/207)).
+
 ### Fixed
 
 - Fix minification of JS and CSS in production builds
