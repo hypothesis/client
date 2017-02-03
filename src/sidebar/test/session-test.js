@@ -43,7 +43,10 @@ describe('session', function () {
       setUserInfo: sandbox.spy(),
     };
     fakeStore = {
-      profile: sandbox.stub(),
+      profile: {
+        read: sandbox.stub(),
+        update: sandbox.stub().returns(Promise.resolve({})),
+      },
     };
     fakeSettings = {
       serviceUrl: 'https://test.hypothes.is/root/',
@@ -168,14 +171,14 @@ describe('session', function () {
           authority: 'publisher.org',
           grantToken: 'a.jwt.token',
         }];
-        fakeStore.profile.returns(Promise.resolve({
+        fakeStore.profile.read.returns(Promise.resolve({
           userid: 'acct:user@publisher.org',
         }));
       });
 
       it('should fetch profile data from the API', function () {
         return session.load().then(function () {
-          assert.calledWith(fakeStore.profile, {authority: 'publisher.org'});
+          assert.calledWith(fakeStore.profile.read, {authority: 'publisher.org'});
         });
       });
 
@@ -290,11 +293,21 @@ describe('session', function () {
   });
 
   describe('#dismissSidebarTutorial()', function () {
-    var url = 'https://test.hypothes.is/root/app/dismiss_sidebar_tutorial';
+    beforeEach(function () {
+      fakeStore.profile.update.returns(Promise.resolve({
+        preferences: {},
+      }));
+    });
+
     it('disables the tutorial for the user', function () {
-      $httpBackend.expectPOST(url).respond({});
       session.dismissSidebarTutorial();
-      $httpBackend.flush();
+      assert.calledWith(fakeStore.profile.update, {}, {preferences: {show_sidebar_tutorial: false}});
+    });
+
+    it('should update the session with the response from the API', function () {
+      return session.dismissSidebarTutorial().then(function () {
+        assert.isNotOk(session.state.preferences.show_sidebar_tutorial);
+      });
     });
   });
 
