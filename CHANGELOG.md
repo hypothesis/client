@@ -4,6 +4,13 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+### Fixed
+
+- Fix minification of JS and CSS in production builds
+  ([#210](https://github.com/hypothesis/client/pull/210)).
+
 ## [0.53.0] - 2017-02-02
 
 - Enable the host page to configure the client to log in using a non-Hypothesis
