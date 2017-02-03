@@ -11,10 +11,6 @@ module.exports = {
   GROUPS_CHANGED: 'groupsChanged',
   /** The logged-in user changed */
   USER_CHANGED: 'userChanged',
-  /**
-   * The session state was updated.
-   */
-  SESSION_CHANGED: 'sessionChanged',
 
   // UI state changes
 

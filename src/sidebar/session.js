@@ -137,10 +137,6 @@ function session($http, $resource, $rootScope, annotationUI, auth,
     lastLoad = Promise.resolve(model);
     lastLoadTime = Date.now();
 
-    $rootScope.$broadcast(events.SESSION_CHANGED, {
-      initialLoad: isInitialLoad,
-    });
-
     if (userChanged) {
       auth.clearCache();
 
