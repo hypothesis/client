@@ -1,6 +1,6 @@
 'use strict';
 
-let loaded = false;
+var loaded = false;
 
 module.exports = function(trackingId){
 
