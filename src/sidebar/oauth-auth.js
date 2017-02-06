@@ -35,6 +35,33 @@ function auth($http, settings) {
       });
   }
 
+  // Exchange the refresh token for a new access token and refresh token pair.
+  // See https://tools.ietf.org/html/rfc6749#section-6
+  function refreshAccessToken(refreshToken) {
+    var data = queryString.stringify({
+      grant_type: 'refresh_token',
+      refresh_token: refreshToken,
+    });
+
+    var requestConfig = {
+      headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+    };
+
+    $http.post(tokenUrl, data, requestConfig).then(function (response) {
+      cachedToken.token = response.data.access_token;
+      cachedToken.refreshToken = response.data.refresh_token;
+
+      var delay = response.expires_in * 1000;
+      // We actually have to refresh the access token _before_ it expires.
+      // If the access token expires in one hour, this should refresh it in
+      // about 55 mins.
+      delay = Math.floor(delay * 0.91);
+
+      window.setTimeout(refreshAccessToken, delay, cachedToken.refreshToken);
+    });
+
+  }
+
   function tokenGetter() {
     if (cachedToken) {
       return Promise.resolve(cachedToken.token);
@@ -54,6 +81,15 @@ function auth($http, settings) {
           token: tokenInfo.access_token,
           refreshToken: tokenInfo.refresh_token,
         };
+
+        var delay = tokenInfo.expires_in;
+        // We actually have to refresh the access token _before_ it expires.
+        // If the access token expires in one hour, this should refresh it in
+        // about 55 mins.
+        delay = Math.floor(delay * 0.91);
+
+        window.setTimeout(refreshAccessToken, delay, cachedToken.refreshToken);
+
         return cachedToken.token;
       });
     }
