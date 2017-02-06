@@ -21,6 +21,7 @@ describe('oauth auth', function () {
         data: {
           access_token: 'an-access-token',
           expires_in: DEFAULT_TOKEN_EXPIRES_IN_SECS,
+          refresh_token: 'a-refresh-token',
         },
       })),
     };

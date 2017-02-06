@@ -52,6 +52,7 @@ function auth($http, settings) {
       return exchangeToken(grantToken).then(function (tokenInfo) {
         cachedToken = {
           token: tokenInfo.access_token,
+          refreshToken: tokenInfo.refresh_token,
         };
         return cachedToken.token;
       });
