@@ -13,7 +13,7 @@ var resolve = require('./util/url-util').resolve;
 // @ngInject
 function auth($http, settings) {
 
-  var cachedToken;
+  var accessTokenPromise;
   var tokenUrl = resolve('token', settings.apiUrl);
 
   // Return a cachedToken object (of the form taken by the cachedToken variable
@@ -42,21 +42,22 @@ function auth($http, settings) {
   function refreshAccessToken(refreshToken) {
     var data = {grant_type: 'refresh_token', refresh_token: refreshToken};
     postToTokenUrl(data).then(function (response) {
-      cachedToken = cachedTokenFromData(response.data);
-      refreshAccessTokenBeforeItExpires(cachedToken);
+      var tokenInfo = cachedTokenFromData(response.data);
+      refreshAccessTokenBeforeItExpires(tokenInfo);
+      accessTokenPromise = Promise.resolve(tokenInfo.token);
     });
   }
 
   // Set a timeout to refresh the access token a few minutes before it expires.
-  function refreshAccessTokenBeforeItExpires(cachedToken) {
-    var delay = cachedToken.expires_in * 1000;
+  function refreshAccessTokenBeforeItExpires(tokenInfo) {
+    var delay = tokenInfo.expires_in * 1000;
 
     // We actually have to refresh the access token _before_ it expires.
     // If the access token expires in one hour, this should refresh it in
     // about 55 mins.
     delay = Math.floor(delay * 0.91);
 
-    window.setTimeout(refreshAccessToken, delay, cachedToken.refreshToken);
+    window.setTimeout(refreshAccessToken, delay, tokenInfo.refreshToken);
   }
 
   // Exchange the JWT grant token for an access token.
@@ -75,8 +76,8 @@ function auth($http, settings) {
   }
 
   function tokenGetter() {
-    if (cachedToken) {
-      return Promise.resolve(cachedToken.token);
+    if (accessTokenPromise) {
+      return accessTokenPromise;
     } else {
       var grantToken;
 
@@ -88,16 +89,19 @@ function auth($http, settings) {
         return Promise.resolve(null);
       }
 
-      return exchangeToken(grantToken).then(function (tokenInfo) {
-        cachedToken = cachedTokenFromData(tokenInfo);
-        refreshAccessTokenBeforeItExpires(cachedToken);
-        return cachedToken.token;
-      });
+      accessTokenPromise = exchangeToken(grantToken)
+        .then(function (data) {
+          var tokenInfo = cachedTokenFromData(data);
+          refreshAccessTokenBeforeItExpires(tokenInfo);
+          return tokenInfo.token;
+        });
+
+      return accessTokenPromise;
     }
   }
 
   function clearCache() {
-    cachedToken = null;
+    accessTokenPromise = null;
   }
 
   return {

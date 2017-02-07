@@ -90,6 +90,31 @@ describe('oauth auth', function () {
       });
     });
 
+    // If an access token request has already been made but is still in
+    // flight when tokenGetter() is called again, then it should just return
+    // the pending Promise for the first request again (and not send a second
+    // concurrent HTTP request).
+    it('should not make two concurrent access token requests', function () {
+      // Make $http.post() return a pending Promise (simulates an in-flight
+      // HTTP request).
+      fakeHttp.post.returns(new Promise(function() {}));
+
+      // The first time tokenGetter() is called it sends the access token HTTP
+      // request and returns a Promise for the access token.
+      var firstAccessTokenPromise = auth.tokenGetter();
+
+      // No matter how many times it's called while there's an HTTP request
+      // in-flight, tokenGetter() never sends a second concurrent HTTP request.
+      auth.tokenGetter();
+      auth.tokenGetter();
+
+      // It just keeps on returning the same Promise for the access token.
+      var accessTokenPromise = auth.tokenGetter();
+
+      assert.strictEqual(accessTokenPromise, firstAccessTokenPromise);
+      assert.equal(fakeHttp.post.callCount, 1);
+    });
+
     it('should refresh the access token before it expires', function () {
       // Get the first access token (and refresh token).
       var tokenPromise = function() {
@@ -120,12 +145,17 @@ describe('oauth auth', function () {
         return function() {
           var expectedBody =
             'grant_type=refresh_token&refresh_token=' + refreshToken;
+
           assert.calledWith(
             fakeHttp.post,
             'https://hypothes.is/api/token',
             expectedBody,
             {headers: {'Content-Type': 'application/x-www-form-urlencoded'},
           });
+
+          // Make sure that only one refresh request was sent.
+          assert.equal(fakeHttp.post.callCount, 1)
+
           fakeHttp.post.reset();
         };
       };
@@ -143,6 +173,26 @@ describe('oauth auth', function () {
         .then(assertThatTokenGetterNowReturnsNewAccessToken)
         .then(expireAccessToken)
         .then(assertRefreshTokenWasUsed('second_refresh_token'));
+    });
+
+    // While a refresh token HTTP request is in-flight, calls to tokenGetter()
+    // should just return the old access token immediately.
+    it('returns the access token while a refresh is in-flight', function() {
+      return auth.tokenGetter().then(function(first_access_token) {
+        // Make $http.post() return a pending Promise (simulates a still
+        // in-flight HTTP request).
+        fakeHttp.post.returns(new Promise(function () {}));
+
+        // Move forward in time so that the current access token expires and
+        // a refresh token request is sent.
+        clock.tick(DEFAULT_TOKEN_EXPIRES_IN_SECS * 1000);
+
+        // The refresh token request will still be in-flight, but tokenGetter()
+        // should still return a Promise for the old access token.
+        return auth.tokenGetter().then(function(second_access_token) {
+          assert.equal(first_access_token, second_access_token);
+        })
+      });
     });
   });
 
