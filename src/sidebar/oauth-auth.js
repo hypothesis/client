@@ -16,13 +16,13 @@ function auth($http, settings) {
   var accessTokenPromise;
   var tokenUrl = resolve('token', settings.apiUrl);
 
-  // Return a cachedToken object (of the form taken by the cachedToken variable
-  // in this module) from the given tokenURL endpoint response body.
-  function cachedTokenFromData(data) {
+  // Return a new tokenInfo object from the given tokenUrl endpoint response.
+  function tokenInfoFrom(response) {
+    var data = response.data;
     return {
-      token:        data.access_token,
+      accessToken:  data.access_token,
+      expiresIn:    data.expires_in,
       refreshToken: data.refresh_token,
-      expires_in:   data.expires_in,
     };
   }
 
@@ -42,15 +42,15 @@ function auth($http, settings) {
   function refreshAccessToken(refreshToken) {
     var data = {grant_type: 'refresh_token', refresh_token: refreshToken};
     postToTokenUrl(data).then(function (response) {
-      var tokenInfo = cachedTokenFromData(response.data);
+      var tokenInfo = tokenInfoFrom(response);
       refreshAccessTokenBeforeItExpires(tokenInfo);
-      accessTokenPromise = Promise.resolve(tokenInfo.token);
+      accessTokenPromise = Promise.resolve(tokenInfo.accessToken);
     });
   }
 
   // Set a timeout to refresh the access token a few minutes before it expires.
   function refreshAccessTokenBeforeItExpires(tokenInfo) {
-    var delay = tokenInfo.expires_in * 1000;
+    var delay = tokenInfo.expiresIn * 1000;
 
     // We actually have to refresh the access token _before_ it expires.
     // If the access token expires in one hour, this should refresh it in
@@ -71,7 +71,7 @@ function auth($http, settings) {
       if (response.status !== 200) {
         throw new Error('Failed to retrieve access token');
       }
-      return response.data;
+      return tokenInfoFrom(response);
     });
   }
 
@@ -90,10 +90,9 @@ function auth($http, settings) {
       }
 
       accessTokenPromise = exchangeToken(grantToken)
-        .then(function (data) {
-          var tokenInfo = cachedTokenFromData(data);
+        .then(function (tokenInfo) {
           refreshAccessTokenBeforeItExpires(tokenInfo);
-          return tokenInfo.token;
+          return tokenInfo.accessToken;
         });
 
       return accessTokenPromise;
