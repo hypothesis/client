@@ -15,4 +15,30 @@ describe('frames reducer', function () {
       assert.deepEqual(frames.frames(state), [frame]);
     });
   });
+
+  describe('#updateFrameAnnotationFetchStatus', function () {
+    it('updates the isAnnotationFetchComplete status of the frame', function () {
+      var frame = {
+        uri: 'http://example.com',
+      };
+      var expectedFrame = {
+        uri: 'http://example.com',
+        isAnnotationFetchComplete: true,
+      };
+      var connectedState = update(init(), actions.connectFrame(frame));
+      var updatedState = update(connectedState,
+        actions.updateFrameAnnotationFetchStatus(frame.uri, true));
+      assert.deepEqual(frames.frames(updatedState), [expectedFrame]);
+    });
+
+    it('does not update the isAnnotationFetchComplete status of the wrong frame', function () {
+      var frame = {
+        uri: 'http://example.com',
+      };
+      var connectedState = update(init(), actions.connectFrame(frame));
+      var updatedState = update(connectedState,
+        actions.updateFrameAnnotationFetchStatus('http://anotherexample.com', true));
+      assert.deepEqual(frames.frames(updatedState), [frame]);
+    });
+  });
 });

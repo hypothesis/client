@@ -51,11 +51,13 @@ function FrameSync($rootScope, $window, Discovery, annotationUI, bridge) {
   function setupSyncToFrame() {
     // List of loaded annotations in previous state
     var prevAnnotations = [];
+    var prevFrames = [];
     var prevPublicAnns = 0;
 
     annotationUI.subscribe(function () {
       var state = annotationUI.getState();
-      if (state.annotations === prevAnnotations) {
+      if (state.annotations === prevAnnotations &&
+          state.frames === prevFrames) {
         return;
       }
 
@@ -82,6 +84,7 @@ function FrameSync($rootScope, $window, Discovery, annotationUI, bridge) {
         return !inSidebar.has(annot.$tag);
       });
       prevAnnotations = state.annotations;
+      prevFrames = state.frames;
 
       // We currently only handle adding and removing annotations from the frame
       // when they are added or removed in the sidebar, but not re-anchoring
@@ -97,9 +100,14 @@ function FrameSync($rootScope, $window, Discovery, annotationUI, bridge) {
         inFrame.delete(annot.$tag);
       });
 
-      if (publicAnns !== prevPublicAnns) {
-        bridge.call(bridgeEvents.PUBLIC_ANNOTATION_COUNT_CHANGED, publicAnns);
-        prevPublicAnns = publicAnns;
+      var frames = annotationUI.frames();
+      if (frames.length > 0) {
+        if (frames.every(function (frame) { return frame.isAnnotationFetchComplete; })) {
+          if (publicAnns === 0 || publicAnns !== prevPublicAnns) {
+            bridge.call(bridgeEvents.PUBLIC_ANNOTATION_COUNT_CHANGED, publicAnns);
+            prevPublicAnns = publicAnns;
+          }
+        }
       }
     });
   }

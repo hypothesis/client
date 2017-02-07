@@ -13,6 +13,22 @@ var update = {
   CONNECT_FRAME: function (state, action) {
     return {frames: state.frames.concat(action.frame)};
   },
+
+  UPDATE_FRAME_ANNOTATION_FETCH_STATUS: function (state, action) {
+    var frames = state.frames.map(function (frame) {
+      var match = (frame.uri && frame.uri === action.uri);
+      if (match) {
+        return Object.assign({}, frame, {
+          isAnnotationFetchComplete: action.isAnnotationFetchComplete,
+        });
+      } else {
+        return frame;
+      }
+    });
+    return {
+      frames: frames,
+    };
+  },
 };
 
 var actions = util.actionTypes(update);
@@ -22,6 +38,17 @@ var actions = util.actionTypes(update);
  */
 function connectFrame(frame) {
   return {type: actions.CONNECT_FRAME, frame: frame};
+}
+
+/**
+ * Update the `isAnnotationFetchComplete` flag of the frame.
+ */
+function updateFrameAnnotationFetchStatus(uri, status) {
+  return {
+    type: actions.UPDATE_FRAME_ANNOTATION_FETCH_STATUS,
+    isAnnotationFetchComplete: status,
+    uri: uri,
+  };
 }
 
 /**
@@ -37,6 +64,7 @@ module.exports = {
 
   actions: {
     connectFrame: connectFrame,
+    updateFrameAnnotationFetchStatus: updateFrameAnnotationFetchStatus,
   },
 
   // Selectors

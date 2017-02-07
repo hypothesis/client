@@ -13,8 +13,6 @@ var ANNOTATION_COUNT_ATTR = 'data-hypothesis-annotation-count';
  */
 
 function annotationCounts(rootEl, crossframe) {
-  updateAnnotationCountElems(0);
-
   crossframe.on(events.PUBLIC_ANNOTATION_COUNT_CHANGED, updateAnnotationCountElems);
 
   function updateAnnotationCountElems(newCount) {
