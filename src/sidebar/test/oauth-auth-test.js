@@ -75,6 +75,31 @@ describe('oauth auth', function () {
       });
     });
 
+    // If an access token request has already been made but is still in
+    // flight when tokenGetter() is called again, then it should just return
+    // the pending Promise for the first request again (and not send a second
+    // concurrent HTTP request).
+    it('should not make two concurrent access token requests', function () {
+      // Make $http.post() return a pending Promise (simulates an in-flight
+      // HTTP request).
+      fakeHttp.post.returns(new Promise(function() {}));
+
+      // The first time tokenGetter() is called it sends the access token HTTP
+      // request and returns a Promise for the access token.
+      var firstAccessTokenPromise = auth.tokenGetter();
+
+      // No matter how many times it's called while there's an HTTP request
+      // in-flight, tokenGetter() never sends a second concurrent HTTP request.
+      auth.tokenGetter();
+      auth.tokenGetter();
+
+      // It just keeps on returning the same Promise for the access token.
+      var accessTokenPromise = auth.tokenGetter();
+
+      assert.strictEqual(accessTokenPromise, firstAccessTokenPromise);
+      assert.equal(fakeHttp.post.callCount, 1);
+    });
+
     it('should return null if no grant token was provided', function () {
       var auth = authService(fakeHttp, {
         services: [{authority: 'publisher.org'}],

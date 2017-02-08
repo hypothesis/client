@@ -13,7 +13,7 @@ var resolve = require('./util/url-util').resolve;
 // @ngInject
 function auth($http, settings) {
 
-  var cachedToken;
+  var accessTokenPromise;
   var tokenUrl = resolve('token', settings.apiUrl);
 
   // Exchange the JWT grant token for an access token.
@@ -36,8 +36,8 @@ function auth($http, settings) {
   }
 
   function tokenGetter() {
-    if (cachedToken) {
-      return Promise.resolve(cachedToken.token);
+    if (accessTokenPromise) {
+      return accessTokenPromise;
     } else {
       var grantToken;
 
@@ -49,12 +49,11 @@ function auth($http, settings) {
         return Promise.resolve(null);
       }
 
-      return exchangeToken(grantToken).then(function (tokenInfo) {
-        cachedToken = {
-          token: tokenInfo.access_token,
-        };
-        return cachedToken.token;
+      accessTokenPromise = exchangeToken(grantToken).then(function (tokenInfo) {
+        return tokenInfo.access_token;
       });
+
+      return accessTokenPromise;
     }
   }
 
