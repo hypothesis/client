@@ -36,25 +36,23 @@ function auth($http, settings) {
   }
 
   function tokenGetter() {
-    if (accessTokenPromise) {
-      return accessTokenPromise;
-    } else {
+    if (!accessTokenPromise) {
       var grantToken;
 
       if (Array.isArray(settings.services) && settings.services.length > 0) {
         grantToken = settings.services[0].grantToken;
       }
 
-      if (!grantToken) {
-        return Promise.resolve(null);
+      if (grantToken) {
+        accessTokenPromise = exchangeToken(grantToken).then(function (tokenInfo) {
+          return tokenInfo.access_token;
+        });
+      } else {
+        accessTokenPromise = Promise.resolve(null);
       }
-
-      accessTokenPromise = exchangeToken(grantToken).then(function (tokenInfo) {
-        return tokenInfo.access_token;
-      });
-
-      return accessTokenPromise;
     }
+
+    return accessTokenPromise;
   }
 
   // clearCache() isn't implemented (or needed) yet for OAuth.
