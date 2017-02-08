@@ -16,11 +16,6 @@ function auth($http, settings) {
   var cachedToken;
   var tokenUrl = resolve('token', settings.apiUrl);
 
-  var grantToken;
-  if (Array.isArray(settings.services) && settings.services.length > 0) {
-    grantToken = settings.services[0].grantToken;
-  }
-
   // Exchange the JWT grant token for an access token.
   // See https://tools.ietf.org/html/rfc7523#section-4
   function exchangeToken(grantToken) {
@@ -41,21 +36,25 @@ function auth($http, settings) {
   }
 
   function tokenGetter() {
-    // performance.now() is used instead of Date.now() because it is
-    // monotonically increasing.
-    if (cachedToken && cachedToken.expiresAt > performance.now()) {
+    if (cachedToken) {
       return Promise.resolve(cachedToken.token);
-    } else if (grantToken) {
-      var refreshStart = performance.now();
+    } else {
+      var grantToken;
+
+      if (Array.isArray(settings.services) && settings.services.length > 0) {
+        grantToken = settings.services[0].grantToken;
+      }
+
+      if (!grantToken) {
+        return Promise.resolve(null);
+      }
+
       return exchangeToken(grantToken).then(function (tokenInfo) {
         cachedToken = {
           token: tokenInfo.access_token,
-          expiresAt: refreshStart + tokenInfo.expires_in * 1000,
         };
         return cachedToken.token;
       });
-    } else {
-      return Promise.resolve(null);
     }
   }
 
