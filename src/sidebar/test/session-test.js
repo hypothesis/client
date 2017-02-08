@@ -263,6 +263,17 @@ describe('session', function () {
         id: 'anne',
       });
     });
+
+    it('does not clear the access token when the host page provides a grant token', function () {
+      fakeSettings.services = [{
+        authority: 'publisher.org',
+        grantToken: 'a.jwt.token',
+      }];
+
+      session.update({userid: 'different-user', csrf: 'dummytoken'});
+
+      assert.notCalled(fakeAuth.clearCache);
+    });
   });
 
   describe('#dismissSidebarTutorial()', function () {
