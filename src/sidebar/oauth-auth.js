@@ -59,8 +59,11 @@ function auth($http, settings) {
     }
   }
 
+  // clearCache() isn't implemented (or needed) yet for OAuth.
+  // In the future, for example when OAuth-authenticated users can login and
+  // logout of the client, this clearCache() will need to clear the access
+  // token and cancel any scheduled refresh token requests.
   function clearCache() {
-    cachedToken = null;
   }
 
   return {

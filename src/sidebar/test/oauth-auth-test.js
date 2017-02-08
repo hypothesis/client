@@ -90,16 +90,4 @@ describe('oauth auth', function () {
       });
     });
   });
-
-  describe('#clearCache', function () {
-    it('should clear cached tokens', function () {
-      return auth.tokenGetter().then(function () {
-        fakeHttp.post.reset();
-        auth.clearCache();
-        return auth.tokenGetter();
-      }).then(function () {
-        assert.calledOnce(fakeHttp.post);
-      });
-    });
-  });
 });
