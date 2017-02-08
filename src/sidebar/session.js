@@ -59,6 +59,16 @@ function session($http, $resource, $rootScope, annotationUI, auth,
   var lastLoad;
   var lastLoadTime;
 
+
+  // Return the authority from the first service defined in the settings.
+  // Return null if there are no services defined in the settings.
+  function getAuthority() {
+    if (Array.isArray(settings.services) && settings.services.length > 0) {
+      return settings.services[0].authority;
+    }
+    return null;
+  }
+
   /**
    * @name session.load()
    * @description Fetches the session data from the server.
@@ -79,10 +89,7 @@ function session($http, $resource, $rootScope, annotationUI, auth,
       // the /app endpoint.
       lastLoadTime = Date.now();
       lastLoad = retryUtil.retryPromiseOperation(function () {
-        var authority;
-        if (Array.isArray(settings.services) && settings.services.length > 0) {
-          authority = settings.services[0].authority;
-        }
+        var authority = getAuthority();
         if (authority) {
           return store.profile.read({authority: authority}).then(update);
         } else {
@@ -138,7 +145,9 @@ function session($http, $resource, $rootScope, annotationUI, auth,
     lastLoadTime = Date.now();
 
     if (userChanged) {
-      auth.clearCache();
+      if (!getAuthority()) {
+        auth.clearCache();
+      }
 
       $rootScope.$broadcast(events.USER_CHANGED, {
         initialLoad: isInitialLoad,
