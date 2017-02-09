@@ -10,14 +10,14 @@
 /* global __MANIFEST__ */
 
 var boot = require('./boot');
+var settings = require('../shared/settings')(document);
 
-// The HYP* properties are set (if at all) by the service which is serving the
-// Hypothesis client to tell it where to load the sidebar and assets from.
-var appHtmlUrl = window.__HYP_APP_HTML_URL__ || 'https://hypothes.is/app.html';
-var assetRoot = window.__HYP_CLIENT_ASSET_ROOT__ || 'https://hypothes.is/assets/client/';
+// The `sidebarAppUrl` and `assetRoot` settings are set by the service which is
+// serving the Hypothesis client to tell it where to load the sidebar and assets
+// from.
 
 boot(document, {
-  appHtmlUrl: appHtmlUrl,
-  assetRoot: assetRoot,
+  assetRoot: settings.assetRoot || 'https://hypothes.is/assets/client/',
   manifest: __MANIFEST__,  // Replaced by build script
+  sidebarAppUrl: settings.sidebarAppUrl || 'https://hypothes.is/app.html',
 });

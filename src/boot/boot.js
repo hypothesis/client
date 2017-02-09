@@ -47,7 +47,7 @@ function bootHypothesisClient(doc, config) {
   // presence of the Hypothesis client on the page.
   var baseUrl = doc.createElement('link');
   baseUrl.rel = 'sidebar';
-  baseUrl.href = config.appHtmlUrl;
+  baseUrl.href = config.sidebarAppUrl;
   baseUrl.type = 'application/annotator+html';
   doc.head.appendChild(baseUrl);
 

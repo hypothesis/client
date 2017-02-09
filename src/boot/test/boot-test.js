@@ -47,7 +47,7 @@ describe('bootstrap', function () {
     }, {});
 
     boot(iframe.contentDocument, {
-      appHtmlUrl: 'https://marginal.ly/app.html',
+      sidebarAppUrl: 'https://marginal.ly/app.html',
       assetRoot: 'https://marginal.ly/client/',
       manifest: manifest,
     });
