@@ -13,7 +13,7 @@ var resolve = require('./util/url-util').resolve;
 // @ngInject
 function auth($http, settings) {
 
-  var cachedToken;
+  var accessTokenPromise;
   var tokenUrl = resolve('token', settings.apiUrl);
 
   // Exchange the JWT grant token for an access token.
@@ -36,26 +36,23 @@ function auth($http, settings) {
   }
 
   function tokenGetter() {
-    if (cachedToken) {
-      return Promise.resolve(cachedToken.token);
-    } else {
+    if (!accessTokenPromise) {
       var grantToken;
 
       if (Array.isArray(settings.services) && settings.services.length > 0) {
         grantToken = settings.services[0].grantToken;
       }
 
-      if (!grantToken) {
-        return Promise.resolve(null);
+      if (grantToken) {
+        accessTokenPromise = exchangeToken(grantToken).then(function (tokenInfo) {
+          return tokenInfo.access_token;
+        });
+      } else {
+        accessTokenPromise = Promise.resolve(null);
       }
-
-      return exchangeToken(grantToken).then(function (tokenInfo) {
-        cachedToken = {
-          token: tokenInfo.access_token,
-        };
-        return cachedToken.token;
-      });
     }
+
+    return accessTokenPromise;
   }
 
   // clearCache() isn't implemented (or needed) yet for OAuth.
