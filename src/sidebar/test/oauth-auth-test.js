@@ -10,6 +10,7 @@ describe('oauth auth', function () {
   var nowStub;
   var fakeHttp;
   var fakeSettings;
+  var clock;
 
   beforeEach(function () {
     nowStub = sinon.stub(window.performance, 'now');
@@ -19,8 +20,9 @@ describe('oauth auth', function () {
       post: sinon.stub().returns(Promise.resolve({
         status: 200,
         data: {
-          access_token: 'an-access-token',
+          access_token: 'firstAccessToken',
           expires_in: DEFAULT_TOKEN_EXPIRES_IN_SECS,
+          refresh_token: 'firstRefreshToken',
         },
       })),
     };
@@ -34,10 +36,13 @@ describe('oauth auth', function () {
     };
 
     auth = authService(fakeHttp, fakeSettings);
+
+    clock = sinon.useFakeTimers();
   });
 
   afterEach(function () {
     performance.now.restore();
+    clock.restore();
   });
 
   describe('#tokenGetter', function () {
@@ -49,7 +54,7 @@ describe('oauth auth', function () {
         assert.calledWith(fakeHttp.post, 'https://hypothes.is/api/token', expectedBody, {
           headers: {'Content-Type': 'application/x-www-form-urlencoded'},
         });
-        assert.equal(token, 'an-access-token');
+        assert.equal(token, 'firstAccessToken');
       });
     });
 
@@ -67,10 +72,10 @@ describe('oauth auth', function () {
 
     it('should cache tokens for future use', function () {
       return auth.tokenGetter().then(function () {
-        fakeHttp.post.reset();
+        resetHttpSpy();
         return auth.tokenGetter();
       }).then(function (token) {
-        assert.equal(token, 'an-access-token');
+        assert.equal(token, 'firstAccessToken');
         assert.notCalled(fakeHttp.post);
       });
     });
@@ -80,9 +85,7 @@ describe('oauth auth', function () {
     // the pending Promise for the first request again (and not send a second
     // concurrent HTTP request).
     it('should not make two concurrent access token requests', function () {
-      // Make $http.post() return a pending Promise (simulates an in-flight
-      // HTTP request).
-      fakeHttp.post.returns(new Promise(function() {}));
+      makeServerUnresponsive();
 
       // The first time tokenGetter() is called it sends the access token HTTP
       // request and returns a Promise for the access token.
@@ -109,5 +112,98 @@ describe('oauth auth', function () {
         assert.equal(token, null);
       });
     });
+
+    it('should refresh the access token before it expires', function () {
+      function callTokenGetter () {
+        var tokenPromise = auth.tokenGetter();
+
+        fakeHttp.post.returns(Promise.resolve({
+          status: 200,
+          data: {
+            access_token: 'secondAccessToken',
+            expires_in: DEFAULT_TOKEN_EXPIRES_IN_SECS,
+            refresh_token: 'secondRefreshToken',
+          },
+        }));
+
+        return tokenPromise;
+      }
+
+      function assertRefreshTokenWasUsed (refreshToken) {
+        return function() {
+          var expectedBody =
+            'grant_type=refresh_token&refresh_token=' + refreshToken;
+
+          assert.calledWith(
+            fakeHttp.post,
+            'https://hypothes.is/api/token',
+            expectedBody,
+            {headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+          });
+        };
+      }
+
+      function assertThatTokenGetterNowReturnsNewAccessToken () {
+        return auth.tokenGetter().then(function (token) {
+          assert.equal(token, 'secondAccessToken');
+        });
+      }
+
+      return callTokenGetter()
+        .then(resetHttpSpy)
+        .then(expireAccessToken)
+        .then(assertRefreshTokenWasUsed('firstRefreshToken'))
+        .then(resetHttpSpy)
+        .then(assertThatTokenGetterNowReturnsNewAccessToken)
+        .then(expireAccessToken)
+        .then(assertRefreshTokenWasUsed('secondRefreshToken'));
+    });
+
+    // While a refresh token HTTP request is in-flight, calls to tokenGetter()
+    // should just return the old access token immediately.
+    it('returns the access token while a refresh is in-flight', function() {
+      return auth.tokenGetter().then(function(firstAccessToken) {
+        makeServerUnresponsive();
+
+        expireAccessToken();
+
+        // The refresh token request will still be in-flight, but tokenGetter()
+        // should still return a Promise for the old access token.
+        return auth.tokenGetter().then(function(secondAccessToken) {
+          assert.equal(firstAccessToken, secondAccessToken);
+        });
+      });
+    });
+
+    // It only sends one refresh request, even if tokenGetter() is called
+    // multiple times and the refresh response hasn't come back yet.
+    it('does not send more than one refresh request', function () {
+      return auth.tokenGetter()
+        .then(resetHttpSpy) // Reset fakeHttp.post.callCount to 0 so that the
+                            // initial access token request isn't counted.
+        .then(auth.tokenGetter)
+        .then(makeServerUnresponsive)
+        .then(auth.tokenGetter)
+        .then(expireAccessToken)
+        .then(function () {
+          assert.equal(fakeHttp.post.callCount, 1);
+        });
+    });
   });
+
+  // Advance time forward so that any current access tokens will have expired.
+  function expireAccessToken () {
+    clock.tick(DEFAULT_TOKEN_EXPIRES_IN_SECS * 1000);
+  }
+
+  // Make $http.post() return a pending Promise (simulates a still in-flight
+  // HTTP request).
+  function makeServerUnresponsive () {
+    fakeHttp.post.returns(new Promise(function () {}));
+  }
+
+  // Reset fakeHttp.post.callCount and other fields.
+  function resetHttpSpy () {
+    fakeHttp.post.reset();
+  }
 });
