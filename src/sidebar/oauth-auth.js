@@ -40,23 +40,29 @@ function auth($http, settings) {
     };
   }
 
-  // Exchange the JWT grant token for an access token.
-  // See https://tools.ietf.org/html/rfc7523#section-4
-  function exchangeToken(grantToken) {
-    var data = queryString.stringify({
-      grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer',
-      assertion: grantToken,
-    });
+  // Post the given data to the tokenUrl endpoint as a form submission.
+  // Return a Promise for the access token response.
+  function postToTokenUrl(data) {
+    data = queryString.stringify(data);
     var requestConfig = {
       headers: {'Content-Type': 'application/x-www-form-urlencoded'},
     };
-    return $http.post(tokenUrl, data, requestConfig)
-      .then(function (response) {
-        if (response.status !== 200) {
-          throw new Error('Failed to retrieve access token');
-        }
-        return tokenInfoFrom(response);
-      });
+    return $http.post(tokenUrl, data, requestConfig);
+  }
+
+  // Exchange the JWT grant token for an access token.
+  // See https://tools.ietf.org/html/rfc7523#section-4
+  function exchangeToken(grantToken) {
+    var data = {
+      grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+      assertion: grantToken,
+    };
+    return postToTokenUrl(data).then(function (response) {
+      if (response.status !== 200) {
+        throw new Error('Failed to retrieve access token');
+      }
+      return tokenInfoFrom(response);
+    });
   }
 
   function tokenGetter() {
