@@ -16,6 +16,30 @@ function auth($http, settings) {
   var accessTokenPromise;
   var tokenUrl = resolve('token', settings.apiUrl);
 
+  /**
+   * An object holding the details of an access token from the tokenUrl endpoint.
+   * @typedef {Object} TokenInfo
+   * @property {string} accessToken  - The access token itself.
+   * @property {number} expiresIn    - The lifetime of the access token,
+   *                                   in seconds.
+   * @property {string} refreshToken - The refresh token that can be used to
+   *                                   get a new access token.
+   */
+
+  /**
+   * Return a new TokenInfo object from the given tokenUrl endpoint response.
+   * @param {Object} response - The HTTP response from a POST to the tokenUrl
+   *                            endpoint (an Angular $http response object).
+   * @returns {TokenInfo}
+   */
+  function tokenInfoFrom(response) {
+    var data = response.data;
+    return {
+      accessToken:  data.access_token,
+      expiresIn:    data.expires_in,
+    };
+  }
+
   // Exchange the JWT grant token for an access token.
   // See https://tools.ietf.org/html/rfc7523#section-4
   function exchangeToken(grantToken) {
@@ -31,7 +55,7 @@ function auth($http, settings) {
         if (response.status !== 200) {
           throw new Error('Failed to retrieve access token');
         }
-        return response.data;
+        return tokenInfoFrom(response);
       });
   }
 
@@ -45,7 +69,7 @@ function auth($http, settings) {
 
       if (grantToken) {
         accessTokenPromise = exchangeToken(grantToken).then(function (tokenInfo) {
-          return tokenInfo.access_token;
+          return tokenInfo.accessToken;
         });
       } else {
         accessTokenPromise = Promise.resolve(null);
