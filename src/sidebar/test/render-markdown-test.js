@@ -17,8 +17,12 @@ describe('render-markdown', function () {
   beforeEach(function () {
     renderMarkdown = proxyquire('../render-markdown', {
       katex: {
-        renderToString: function (input) {
-          return 'math:' + input;
+        renderToString: function (input, opts) {
+          if (opts && opts.displayMode) {
+            return 'math+display:' + input;
+          } else {
+            return 'math:' + input;
+          }
         },
       },
     });
@@ -59,13 +63,13 @@ describe('render-markdown', function () {
 
   describe('math blocks', function () {
     it('should render LaTeX blocks', function () {
-      assert.equal(render('$$x*2$$'), '<p>math:\\displaystyle {x*2}</p>');
+      assert.equal(render('$$x*2$$'), '<p>math+display:x*2</p>');
     });
 
     it('should render mixed blocks', function () {
       assert.equal(render('one $$x*2$$ two $$x*3$$ three'),
-        '<p>one </p>\n\n<p>math:\\displaystyle {x*2}</p>\n\n' +
-        '<p>two </p>\n\n<p>math:\\displaystyle {x*3}</p>\n\n<p>three</p>');
+        '<p>one </p>\n\n<p>math+display:x*2</p>\n\n' +
+        '<p>two </p>\n\n<p>math+display:x*3</p>\n\n<p>three</p>');
     });
 
     it('should not sanitize math renderer output', function () {
@@ -73,12 +77,12 @@ describe('render-markdown', function () {
         return html.toLowerCase();
       };
       assert.equal(render('$$X*2$$ FOO', fakeSanitize),
-        '<p>math:\\displaystyle {X*2}</p>\n\n<p>foo</p>');
+        '<p>math+display:X*2</p>\n\n<p>foo</p>');
     });
 
     it('should render mixed inline and block math', function () {
       assert.equal(render('one \\(x*2\\) three $$x*3$$'),
-        '<p>one math:x*2 three </p>\n\n<p>math:\\displaystyle {x*3}</p>');
+        '<p>one math:x*2 three </p>\n\n<p>math+display:x*3</p>');
     });
   });
 
