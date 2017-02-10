@@ -66,6 +66,7 @@
     "karma-mocha-reporter": "^2.0.4",
     "karma-phantomjs-launcher": "^1.0.1",
     "karma-sinon": "^1.0.5",
+    "katex": "^0.1.1",
     "lodash.debounce": "^4.0.3",
     "lodash.get": "^4.3.0",
     "mkdirp": "^0.5.1",
@@ -118,8 +119,7 @@
   },
   "browser": {
     "annotator": "./src/annotator/vendor/annotator.js",
-    "hammerjs": "./node_modules/hammerjs/hammer.js",
-    "katex": "./src/sidebar/vendor/katex.js"
+    "hammerjs": "./node_modules/hammerjs/hammer.js"
   },
   "browserify-shim": {
     "annotator": {

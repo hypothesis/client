@@ -38,6 +38,5 @@ module.exports = {
   //    when including the bundle in another project.
   noParseModules: [
     'jquery',
-    'katex',
   ],
 };

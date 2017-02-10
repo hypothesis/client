@@ -57,7 +57,6 @@ module.exports = function(config) {
     browserify: {
       debug: true,
       extensions: ['.coffee'],
-      noParse: [require.resolve('./sidebar/vendor/katex')],
       configure: function (bundle) {
         bundle.plugin('proxyquire-universal');
       },
@@ -65,7 +64,7 @@ module.exports = function(config) {
       transform: [
         'coffeeify',
         istanbul({
-          ignore: ['**/node_modules/**', '**/katex.js', '**/*.html', '**/*.svg'],
+          ignore: ['**/node_modules/**', '**/*.html', '**/*.svg'],
 
           // There is an outstanding but with karma-converage and istanbul
           // in regards to doing source mapping and transpiling CoffeeScript
