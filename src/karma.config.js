@@ -67,8 +67,8 @@ module.exports = function(config) {
         istanbul({
           ignore: ['**/node_modules/**', '**/katex.js', '**/*.html', '**/*.svg'],
 
-          // There is an outstanding but with karma-converage and istanbul
-          // in regards to doing source mapping and transpiling CoffeeScript
+          // There is an outstanding bug with karma-coverage and istanbul
+          // in regards to doing source mapping and transpiling CoffeeScript.
           // The least bad work around is to replace the instrumenter with
           // isparta and it will handle doing the re mapping for us.
           // This issue follows the issue and attempts to fix it:
