@@ -1,7 +1,13 @@
 'use strict';
 
+var persona = require('../filter/persona');
+
 // @ngInject
-function GroupListController($scope, $window, groups) {
+function GroupListController($scope, $window, groups, settings) {
+  $scope.isThirdPartyUser = function () {
+    return persona.isThirdPartyUser($scope.auth.userid, settings.authDomain);
+  };
+
   $scope.leaveGroup = function (groupId) {
     var groupName = groups.get(groupId).name;
     var message = 'Are you sure you want to leave the group "' +

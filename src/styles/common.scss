@@ -107,7 +107,16 @@ html {
   }
 
   &__link--subtle {
-    color: $color-gray;
+    &:hover {
+      color: $color-gray;
+    }
+  }
+
+  &__link--disabled {
+    &:hover {
+      cursor: default;
+      color: inherit;
+    }
   }
 
   // These psuedo-elements add the speech bubble tail / triangle.

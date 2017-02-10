@@ -30,7 +30,21 @@ function username(user) {
   return account.username;
 }
 
+/**
+ * Returns true if the authority is of a 3rd party user.
+ */
+function isThirdPartyUser(user, authDomain) {
+  var account = parseAccountID(user);
+
+  if (!account) {
+    return false;
+  }
+
+  return account.provider !== authDomain;
+}
+
 module.exports = {
+  isThirdPartyUser: isThirdPartyUser,
   parseAccountID: parseAccountID,
   username: username,
 };
