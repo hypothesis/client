@@ -167,7 +167,9 @@ gulp.task('watch-css', ['build-css'], function () {
   gulp.watch(styleFileGlobs, ['build-css']);
 });
 
-var fontFiles = 'src/styles/vendor/fonts/*.woff';
+var fontFiles = ['src/styles/vendor/fonts/*.woff',
+                 'node_modules/katex/dist/fonts/*.woff',
+                 'node_modules/katex/dist/fonts/*.woff2'];
 
 gulp.task('build-fonts', function () {
   gulp.src(fontFiles)
