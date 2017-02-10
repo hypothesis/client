@@ -138,6 +138,7 @@
     "hammerjs": "Hammer",
     "jquery": "$"
   },
+  "main": "./build/boot.js",
   "scripts": {
     "build": "NODE_ENV=production gulp build",
     "deps": "check-dependencies",
