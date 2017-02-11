@@ -141,6 +141,7 @@ describe('WidgetController', function () {
     $scope.auth = {'status': 'unknown'};
     annotationUI = _annotationUI_;
     annotationUI.frames = sinon.stub().returns([]);
+    annotationUI.updateFrameAnnotationFetchStatus = sinon.stub();
     $controller('WidgetController', {$scope: $scope});
   }));
 
@@ -198,6 +199,17 @@ describe('WidgetController', function () {
       assert.calledWith(loadSpy, [sinon.match({id: uris[0] + '456'})]);
       assert.calledWith(loadSpy, [sinon.match({id: uris[1] + '123'})]);
       assert.calledWith(loadSpy, [sinon.match({id: uris[1] + '456'})]);
+    });
+
+    it('updates annotation fetch status for all frames', function () {
+      var frameUris = ['http://example.com', 'http://foobar.com'];
+      setFrames(frameUris.map(function (frameUri) {
+        return {uri: frameUri, searchUris: [frameUri]};
+      }));
+      $scope.$digest();
+      var updateSpy = annotationUI.updateFrameAnnotationFetchStatus;
+      assert.isTrue(updateSpy.calledWith(frameUris[0], true));
+      assert.isTrue(updateSpy.calledWith(frameUris[1], true));
     });
 
     context('when there is a selection', function () {

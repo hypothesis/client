@@ -135,6 +135,12 @@ module.exports = function WidgetController(
       $scope.$evalAsync(function () {
         searchClients.splice(searchClients.indexOf(searchClient), 1);
       });
+
+      annotationUI.frames().forEach(function (frame) {
+        if (0 <= uris.indexOf(frame.uri)) {
+          annotationUI.updateFrameAnnotationFetchStatus(frame.uri, true);
+        }
+      });
     });
     searchClient.get({uri: uris, group: group});
   }
@@ -155,19 +161,15 @@ module.exports = function WidgetController(
 
   /**
    * Load annotations for all URLs associated with `frames`.
-   *
-   * @param {Array<{uri:string}>} frames - Hypothesis client frames
-   *        to load annotations for.
    */
-  function loadAnnotations(frames, reset) {
-    if (reset || typeof reset === 'undefined') {
-      _resetAnnotations();
-    }
+  function loadAnnotations() {
+    _resetAnnotations();
 
     searchClients.forEach(function (client) {
       client.cancel();
     });
 
+    var frames = annotationUI.frames();
     var searchUris = frames.reduce(function (uris, frame) {
       for (var i = 0; i < frame.searchUris.length; i++) {
         var uri = frame.searchUris[i];
@@ -245,13 +247,15 @@ module.exports = function WidgetController(
       return;
     }
     annotationUI.clearSelectedAnnotations();
-    loadAnnotations(annotationUI.frames());
+    loadAnnotations();
   });
 
   // Watch anything that may require us to reload annotations.
   $scope.$watch(function () {
-    return annotationUI.frames();
-  }, loadAnnotations);
+    return annotationUI.frames().map(function(frame) {
+      return frame.uri;
+    });
+  }, loadAnnotations, true);
 
   $scope.setCollapsed = function (id, collapsed) {
     annotationUI.setCollapsed(id, collapsed);

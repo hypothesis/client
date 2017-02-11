@@ -57,6 +57,7 @@ describe('FrameSync', function () {
       connectFrame: sinon.stub(),
       findIDsForTags: sinon.stub(),
       focusAnnotations: sinon.stub(),
+      frames: sinon.stub().returns([{uri: 'http://example.com', isAnnotationFetchComplete: true }]),
       selectAnnotations: sinon.stub(),
       selectTab: sinon.stub(),
       toggleSelectedAnnotations: sinon.stub(),
@@ -117,14 +118,39 @@ describe('FrameSync', function () {
 
     it('does not send a "loadAnnotations" message for replies', function () {
       fakeAnnotationUI.setState({annotations: [annotationFixtures.newReply()]});
-      assert.notCalled(fakeBridge.call);
+      assert.isFalse(fakeBridge.call.calledWith('loadAnnotations'));
     });
   });
 
   context('when annotation count has changed', function () {
-    it('sends a "publicAnnotationCountChanged" message to the frame', function () {
-      fakeAnnotationUI.setState({annotations: [annotationFixtures.publicAnnotation()]});
+    it('sends a "publicAnnotationCountChanged" message to the frame when there are public annotations', function () {
+      fakeAnnotationUI.setState({
+        annotations: [annotationFixtures.publicAnnotation()],
+      });
       assert.calledWithMatch(fakeBridge.call, 'publicAnnotationCountChanged', sinon.match(1));
+    });
+
+    it('sends a "publicAnnotationCountChanged" message to the frame when there are only private annotations', function () {
+      fakeAnnotationUI.setState({
+        annotations: [annotationFixtures.defaultAnnotation()],
+      });
+      assert.calledWithMatch(fakeBridge.call, 'publicAnnotationCountChanged', sinon.match(0));
+    });
+
+    it('does not send a "publicAnnotationCountChanged" message to the frame if annotation fetch is not complete', function () {
+      fakeAnnotationUI.frames.returns([{uri: 'http://example.com'}]);
+      fakeAnnotationUI.setState({
+        annotations: [annotationFixtures.publicAnnotation()],
+      });
+      assert.isFalse(fakeBridge.call.calledWith('publicAnnotationCountChanged'));
+    });
+
+    it('does not send a "publicAnnotationCountChanged" message if there are no connected frames', function () {
+      fakeAnnotationUI.frames.returns([]);
+      fakeAnnotationUI.setState({
+        annotations: [annotationFixtures.publicAnnotation()],
+      });
+      assert.isFalse(fakeBridge.call.calledWith('publicAnnotationCountChanged'));
     });
   });
 
