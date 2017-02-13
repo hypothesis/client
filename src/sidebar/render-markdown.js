@@ -105,9 +105,9 @@ function insertMath(html, mathBlocks) {
       if (block.inline) {
         renderedMath = katex.renderToString(block.expression);
       } else {
-        // '\displaystyle {}' results in full-height fonts being used
-        // for blocks.
-        renderedMath = katex.renderToString('\\displaystyle {' + block.expression + '}');
+        renderedMath = katex.renderToString(block.expression, {
+          displayMode: true,
+        });
       }
     } catch (err) {
       renderedMath = escapeHtml(block.expression);

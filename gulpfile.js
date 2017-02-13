@@ -131,7 +131,7 @@ var styleFiles = [
   // Vendor
   './src/styles/vendor/angular-csp.css',
   './src/styles/vendor/icomoon.css',
-  './src/styles/vendor/katex.min.css',
+  './node_modules/katex/dist/katex.min.css',
   './node_modules/angular-toastr/dist/angular-toastr.css',
 ];
 
@@ -167,7 +167,9 @@ gulp.task('watch-css', ['build-css'], function () {
   gulp.watch(styleFileGlobs, ['build-css']);
 });
 
-var fontFiles = 'src/styles/vendor/fonts/*.woff';
+var fontFiles = ['src/styles/vendor/fonts/*.woff',
+                 'node_modules/katex/dist/fonts/*.woff',
+                 'node_modules/katex/dist/fonts/*.woff2'];
 
 gulp.task('build-fonts', function () {
   gulp.src(fontFiles)
