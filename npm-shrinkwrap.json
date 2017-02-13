@@ -1587,9 +1587,9 @@
       }
     },
     "dom-anchor-text-quote": {
-      "version": "4.0.1",
+      "version": "4.0.2",
       "from": "dom-anchor-text-quote@latest",
-      "resolved": "https://registry.npmjs.org/dom-anchor-text-quote/-/dom-anchor-text-quote-4.0.1.tgz",
+      "resolved": "https://registry.npmjs.org/dom-anchor-text-quote/-/dom-anchor-text-quote-4.0.2.tgz",
       "dev": true
     },
     "dom-node-iterator": {
