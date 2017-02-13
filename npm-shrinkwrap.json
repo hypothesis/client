@@ -3465,6 +3465,12 @@
       "resolved": "https://registry.npmjs.org/karma-sinon/-/karma-sinon-1.0.5.tgz",
       "dev": true
     },
+    "katex": {
+      "version": "0.1.1",
+      "from": "katex@0.1.1",
+      "resolved": "https://registry.npmjs.org/katex/-/katex-0.1.1.tgz",
+      "dev": true
+    },
     "kew": {
       "version": "0.7.0",
       "from": "kew@>=0.7.0 <0.8.0",
