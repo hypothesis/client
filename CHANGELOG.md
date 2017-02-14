@@ -4,6 +4,21 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+## Changed
+
+- Improve math rendering by updating KaTeX to v0.7.1
+  ([#224](https://github.com/hypothesis/client/pull/224)).
+
+## Fixed
+
+- Wait for annotations to be fetched before displaying annotation counts in the
+  page ([#225](https://github.com/hypothesis/client/pull/225)).
+
+- Fix quote anchoring in pages which add enumerable properties to
+  Array.prototype ([#226](https://github.com/hypothesis/client/pull/226)).
+
 ## [0.55.0] - 2017-02-10
 
 ### Changed
