@@ -142,7 +142,7 @@
     "lint": "eslint .",
     "test": "gulp test",
     "report-coverage": "codecov -f coverage/coverage-final.json",
-    "preversion": "npm run test",
+    "preversion": "./scripts/preversion.sh",
     "version": "make clean all && ./scripts/update-changelog.js && git add CHANGELOG.md",
     "postversion": "./scripts/postversion.sh",
     "prepublish": "npm run-script build"
