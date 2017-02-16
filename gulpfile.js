@@ -22,6 +22,7 @@ var through = require('through2');
 
 var createBundle = require('./scripts/gulp/create-bundle');
 var manifest = require('./scripts/gulp/manifest');
+var servePackage = require('./scripts/gulp/serve-package');
 var vendorBundles = require('./scripts/gulp/vendor-bundles');
 
 var IS_PRODUCTION_BUILD = process.env.NODE_ENV === 'production';
@@ -286,9 +287,13 @@ gulp.task('watch-manifest', function () {
   }));
 });
 
-gulp.task('start-live-reload-server', function () {
+gulp.task('serve-live-reload', function () {
   var LiveReloadServer = require('./scripts/gulp/live-reload-server');
   liveReloadServer = new LiveReloadServer(3000, 'http://localhost:5000');
+});
+
+gulp.task('serve-package', function () {
+  servePackage(3001);
 });
 
 gulp.task('build',
@@ -299,7 +304,8 @@ gulp.task('build',
           generateManifest);
 
 gulp.task('watch',
-          ['start-live-reload-server',
+          ['serve-package',
+           'serve-live-reload',
            'watch-js',
            'watch-css',
            'watch-fonts',
