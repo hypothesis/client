@@ -77,7 +77,7 @@ describe('bootstrap', function () {
         'styles/inject.1234.css',
         'styles/pdfjs-overrides.1234.css',
       ].map(function (url) {
-        return 'https://marginal.ly/client/' + url;
+        return 'https://marginal.ly/client/build/' + url;
       });
 
       assert.deepEqual(findAssets(iframe.contentDocument), expectedAssets);
@@ -131,7 +131,7 @@ describe('bootstrap', function () {
         'styles/icomoon.1234.css',
         'styles/katex.min.1234.css',
       ].map(function (url) {
-        return 'https://marginal.ly/client/' + url;
+        return 'https://marginal.ly/client/build/' + url;
       });
 
       assert.deepEqual(findAssets(iframe.contentDocument), expectedAssets);
