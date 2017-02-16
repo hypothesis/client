@@ -49,7 +49,7 @@ function updateModel(annotation, changes, permissions) {
 function AnnotationController(
   $document, $q, $rootScope, $scope, $timeout, $window, analytics, annotationUI,
   annotationMapper, drafts, flash, features, groups, permissions, serviceUrl,
-  session, store, streamer) {
+  session, settings, store, streamer) {
 
   var vm = this;
   var newlyCreatedByHighlightButton;
@@ -475,6 +475,10 @@ function AnnotationController(
 
   vm.user = function() {
     return vm.annotation.user;
+  };
+
+  vm.isThirdPartyUser = function () {
+    return persona.isThirdPartyUser(vm.annotation.user, settings.authDomain);
   };
 
   vm.username = function() {

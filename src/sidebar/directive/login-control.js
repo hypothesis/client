@@ -1,12 +1,17 @@
 'use strict';
 
+var persona = require('../filter/persona');
+
 module.exports = function () {
   return {
     bindToController: true,
     controllerAs: 'vm',
     //@ngInject
-    controller: function (serviceUrl) {
+    controller: function (serviceUrl, settings) {
       this.serviceUrl = serviceUrl;
+      this.isThirdPartyUser = function() {
+        return persona.isThirdPartyUser(this.auth.userid, settings.authDomain);
+      };
     },
     restrict: 'E',
     scope: {

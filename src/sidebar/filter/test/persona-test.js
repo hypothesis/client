@@ -27,4 +27,18 @@ describe('persona', function () {
       assert.equal(persona.username('bogus'), '');
     });
   });
+
+  describe('isThirdPartyUser', function () {
+    it('should return true if user is a third party user', function () {
+      assert.isTrue(persona.isThirdPartyUser('acct:someone@example.com', 'ex.com'));
+    });
+
+    it('should return false if user is not a third party user', function () {
+      assert.isFalse(persona.isThirdPartyUser('acct:someone@example.com', 'example.com'));
+    });
+
+    it('should return false if the user is invalid', function () {
+      assert.isFalse(persona.isThirdPartyUser('bogus', 'example.com'));
+    });
+  });
 });

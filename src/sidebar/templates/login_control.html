@@ -20,7 +20,11 @@
   </a>
   <ul class="dropdown-menu pull-right" role="menu">
     <li class="dropdown-menu__row" ng-if="vm.auth.status === 'logged-in'">
-      <a href="{{vm.serviceUrl('user',{user: vm.auth.username})}}"
+      <span ng-if="vm.isThirdPartyUser()"
+         class="dropdown-menu__link dropdown-menu__link--disabled"
+         target="_blank">{{vm.auth.username}}</span>
+      <a ng-if="!vm.isThirdPartyUser()"
+         href="{{vm.serviceUrl('user',{user: vm.auth.username})}}"
          class="dropdown-menu__link"
          title="View all your annotations"
          target="_blank">{{vm.auth.username}}</a>

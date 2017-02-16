@@ -13,6 +13,7 @@ describe('groupList', function () {
   var groups;
   var fakeGroups;
   var fakeServiceUrl;
+  var fakeSettings;
 
   before(function() {
     angular.module('app', [])
@@ -24,8 +25,13 @@ describe('groupList', function () {
 
   beforeEach(function () {
     fakeServiceUrl = sinon.stub();
+    fakeSettings = {
+      authDomain: 'example.com',
+    };
+
     angular.mock.module('app', {
       serviceUrl: fakeServiceUrl,
+      settings: fakeSettings,
     });
   });
 
@@ -61,6 +67,7 @@ describe('groupList', function () {
     return util.createDirective(document, 'groupList', {
       auth: {
         status: 'logged-in',
+        userid: 'acct:person@example.com',
       },
     });
   }

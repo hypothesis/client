@@ -55,7 +55,7 @@
         </div>
       </div>
     </li>
-    <li class="dropdown-menu__row dropdown-menu__row--unpadded new-group-btn">
+    <li ng-if="!isThirdPartyUser()" class="dropdown-menu__row dropdown-menu__row--unpadded new-group-btn">
       <div class="group-item" ng-click="createNewGroup()">
         <div class="group-icon-container"><i class="h-icon-add"></i></div>
         <div class="group-details">

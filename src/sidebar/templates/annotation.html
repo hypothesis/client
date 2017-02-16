@@ -8,8 +8,13 @@
     <span ng-if="vm.user()">
       <a class="annotation-header__user"
         target="_blank"
+        ng-if="!vm.isThirdPartyUser()"
         ng-href="{{vm.serviceUrl('user',{user:vm.user()})}}"
         >{{vm.username()}}</a>
+      <span class="annotation-header__user"
+        target="_blank"
+        ng-if="vm.isThirdPartyUser()"
+        >{{vm.username()}}</span>
       <span class="annotation-collapsed-replies">
         <a class="annotation-link" href=""
           ng-click="vm.onReplyCountClick()"

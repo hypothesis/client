@@ -90,6 +90,7 @@ describe('annotation', function() {
     var fakePermissions;
     var fakeServiceUrl;
     var fakeSession;
+    var fakeSettings;
     var fakeStore;
     var fakeStreamer;
     var sandbox;
@@ -186,6 +187,10 @@ describe('annotation', function() {
         get: function() {},
       };
 
+      fakeSettings = {
+        authDomain: 'example.com',
+      };
+
       fakeStore = {
         annotation: {
           create: sinon.spy(function (annot) {
@@ -211,6 +216,7 @@ describe('annotation', function() {
       $provide.value('permissions', fakePermissions);
       $provide.value('session', fakeSession);
       $provide.value('serviceUrl', fakeServiceUrl);
+      $provide.value('settings', fakeSettings);
       $provide.value('store', fakeStore);
       $provide.value('streamer', fakeStreamer);
     }));
