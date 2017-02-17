@@ -1,6 +1,12 @@
 <span ng-if="auth.status === 'logged-out'"
       ng-switch on="groups.focused().public">
-  <i class="group-list-label__icon h-icon-public" ng-switch-when="true"></i><!-- nospace
+  <img class="group-list-label__icon group-list-label__icon--third-party"
+    ng-src="{{ thirdPartyGroupIcon }}"
+    ng-if="thirdPartyGroupIcon"
+    ng-switch-when="true"><!-- nospace
+  !--><i class="group-list-label__icon h-icon-public"
+    ng-if="!thirdPartyGroupIcon"
+    ng-switch-when="true"></i><!-- nospace
   !--><i class="group-list-label__icon h-icon-group" ng-switch-default></i>
   <span class="group-list-label__label">{{groups.focused().name}}</span>
 </span>
@@ -15,8 +21,15 @@
         role="button"
         ng-switch on="groups.focused().public"
         title="Change the selected group">
-    <i class="group-list-label__icon h-icon-public" ng-switch-when="true"></i><!-- nospace
-    !--><i class="group-list-label__icon h-icon-group" ng-switch-default></i>
+    <img class="group-list-label__icon group-list-label__icon--third-party"
+         ng-src="{{ thirdPartyGroupIcon }}"
+         ng-if="thirdPartyGroupIcon"
+         ng-switch-when="true"><!-- nospace
+    !--><i class="group-list-label__icon h-icon-public"
+           ng-switch-when="true"
+           ng-if="!thirdPartyGroupIcon"></i><!-- nospace
+    !--><i class="group-list-label__icon h-icon-group"
+           ng-switch-default></i>
     <span class="group-list-label__label">{{groups.focused().name}}</span><!-- nospace
     !--><i class="h-icon-arrow-drop-down"></i>
   </div>
@@ -28,7 +41,11 @@
            ng-click="focusGroup(group.id)">
         <!-- the group icon !-->
         <div class="group-icon-container" ng-switch on="group.public">
-          <i class="h-icon-public" ng-switch-when="true"></i>
+          <img class="group-list-label__icon group-list-label__icon--third-party"
+               ng-src="{{ thirdPartyGroupIcon }}"
+               ng-if="thirdPartyGroupIcon"
+               ng-switch-when="true">
+          <i class="h-icon-public" ng-if="!thirdPartyGroupIcon" ng-switch-when="true"></i>
           <i class="h-icon-group" ng-switch-default></i>
         </div>
         <!-- the group name and share link !-->

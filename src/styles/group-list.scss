@@ -80,11 +80,18 @@ $group-list-spacing-below: 50px;
   color: $color-gray;
   display: inline-block;
   margin-right: 4px;
+  position: relative;
   vertical-align: baseline;
 
   // align the base of the chat-heads icon for groups
   // with the baseline of the group name label
   transform: translateY(1px);
+}
+
+.group-list-label__icon--third-party {
+  height: 15px;
+  width: 15px;
+  top: 2px;
 }
 
 // the label showing the currently selected group which opens
