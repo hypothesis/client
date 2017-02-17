@@ -10,6 +10,12 @@ function changelogText() {
 }
 
 /**
+ * @typedef Config
+ * @property {string} clientUrl - The URL of the client's boot script
+ * @property {string} serviceUrl - The URL of the Hypothesis service
+ */
+
+/**
  * An HTTP and WebSocket server which enables live reloading of the client.
  *
  * A simple HTTP and WebSocket server
@@ -18,12 +24,11 @@ function changelogText() {
  * the client to live-reload.
  *
  * @param {number} port - The port that the test server should listen on.
- * @param {string} appServer - The URL of the Hypothesis service to load
- *                             the client from.
+ * @param {Config} config - Config for the server
  *
  * @constructor
  */
-function LiveReloadServer(port, appServer) {
+function LiveReloadServer(port, config) {
   var connections = [];
 
   function listen() {
@@ -44,14 +49,27 @@ function LiveReloadServer(port, appServer) {
       <script>
       var appHost = document.location.hostname;
 
-      window.hypothesisConfig = function () {
-        return {
-          liveReloadServer: 'ws://' + appHost + ':${port}',
+      // When the server is accessed via a non-localhost IP/domain (eg.  when
+      // testing the client on a mobile device on the same WiFi network), we
+      // need to rewrite references to localhost in the sidebar app and client
+      // boot script URLs.
+      var clientUrl = '${config.clientUrl}'.replace('localhost', appHost);
+      var sidebarAppUrl = '${config.serviceUrl}/app.html'.replace('localhost', appHost);
 
-          // Open the sidebar when the page loads
-          openSidebar: true,
-        };
+      var config = {
+        assetRoot: clientUrl + '/',
+        sidebarAppUrl,
+        liveReloadServer: 'ws://' + appHost + ':${port}',
+
+        // Open the sidebar when the page loads
+        openSidebar: true,
       };
+
+      var configEl = document.createElement('script');
+      configEl.className = 'js-hypothesis-settings';
+      configEl.type = 'application/json';
+      configEl.textContent = JSON.stringify(config);
+      document.head.appendChild(configEl);
 
       window.addEventListener('message', function (event) {
         if (event.data.type && event.data.type === 'reloadrequest') {
@@ -60,7 +78,7 @@ function LiveReloadServer(port, appServer) {
       });
 
       var embedScript = document.createElement('script');
-      embedScript.src = '${appServer}/embed.js'.replace('localhost', appHost);
+      embedScript.src = clientUrl;
       document.body.appendChild(embedScript);
       </script>
     </body>

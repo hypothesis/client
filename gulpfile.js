@@ -287,9 +287,12 @@ gulp.task('watch-manifest', function () {
   }));
 });
 
-gulp.task('serve-live-reload', function () {
+gulp.task('serve-live-reload', ['serve-package'], function () {
   var LiveReloadServer = require('./scripts/gulp/live-reload-server');
-  liveReloadServer = new LiveReloadServer(3000, 'http://localhost:5000');
+  liveReloadServer = new LiveReloadServer(3000, {
+    clientUrl: 'http://localhost:3001/hypothesis',
+    serviceUrl: process.env.H_SERVICE_URL,
+  });
 });
 
 gulp.task('serve-package', function () {
