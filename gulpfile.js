@@ -14,6 +14,8 @@ var gulpIf = require('gulp-if');
 var gulpUtil = require('gulp-util');
 var postcss = require('gulp-postcss');
 var postcssURL = require('postcss-url');
+var replace = require('gulp-replace');
+var rename = require('gulp-rename');
 var sass = require('gulp-sass');
 var sourcemaps = require('gulp-sourcemaps');
 var through = require('through2');
@@ -94,6 +96,12 @@ var appBundleBaseConfig = {
 };
 
 var appBundles = [{
+  // The entry point for both the Hypothesis client and the sidebar
+  // application. This is responsible for loading the rest of the assets needed
+  // by the client.
+  name: 'boot',
+  entry: './src/boot/index',
+},{
   // The sidebar application for displaying and editing annotations.
   name: 'app',
   transforms: ['coffee'],
@@ -233,6 +241,19 @@ function triggerLiveReload(changedFiles) {
 }
 
 /**
+ * Generates the `build/boot.js` script which serves as the entry point for
+ * the Hypothesis client.
+ *
+ * @param {Object} manifest - Manifest mapping asset paths to cache-busted URLs
+ */
+function generateBootScript(manifest) {
+  gulp.src('build/scripts/boot.bundle.js')
+    .pipe(replace('__MANIFEST__', JSON.stringify(manifest)))
+    .pipe(rename('boot.js'))
+    .pipe(gulp.dest('build/'));
+}
+
+/**
  * Generate a JSON manifest mapping file paths to
  * URLs containing cache-busting query string parameters.
  */
@@ -242,10 +263,14 @@ function generateManifest() {
     .pipe(through.obj(function (file, enc, callback) {
       gulpUtil.log('Updated asset manifest');
 
+      // Trigger a reload of the client in the dev server at localhost:3000
       var newManifest = JSON.parse(file.contents.toString());
       var changed = changedAssets(prevManifest, newManifest);
       prevManifest = newManifest;
       triggerLiveReload(changed);
+
+      // Expand template vars in boot script bundle
+      generateBootScript(newManifest);
 
       this.push(file);
       callback();

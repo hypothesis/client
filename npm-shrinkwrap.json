@@ -728,6 +728,12 @@
       "resolved": "https://registry.npmjs.org/binary-extensions/-/binary-extensions-1.4.0.tgz",
       "dev": true
     },
+    "binaryextensions": {
+      "version": "1.0.1",
+      "from": "binaryextensions@>=1.0.0 <1.1.0",
+      "resolved": "https://registry.npmjs.org/binaryextensions/-/binaryextensions-1.0.1.tgz",
+      "dev": true
+    },
     "blob": {
       "version": "0.0.4",
       "from": "blob@0.0.4",
@@ -2558,6 +2564,18 @@
       "resolved": "https://registry.npmjs.org/gulp-postcss/-/gulp-postcss-6.1.0.tgz",
       "dev": true
     },
+    "gulp-rename": {
+      "version": "1.2.2",
+      "from": "gulp-rename@latest",
+      "resolved": "https://registry.npmjs.org/gulp-rename/-/gulp-rename-1.2.2.tgz",
+      "dev": true
+    },
+    "gulp-replace": {
+      "version": "0.5.4",
+      "from": "gulp-replace@latest",
+      "resolved": "https://registry.npmjs.org/gulp-replace/-/gulp-replace-0.5.4.tgz",
+      "dev": true
+    },
     "gulp-sass": {
       "version": "2.2.0",
       "from": "gulp-sass@>=2.2.0 <3.0.0",
@@ -3168,6 +3186,12 @@
           "dev": true
         }
       }
+    },
+    "istextorbinary": {
+      "version": "1.0.2",
+      "from": "istextorbinary@1.0.2",
+      "resolved": "https://registry.npmjs.org/istextorbinary/-/istextorbinary-1.0.2.tgz",
+      "dev": true
     },
     "jade": {
       "version": "0.26.3",
@@ -4978,6 +5002,12 @@
         }
       }
     },
+    "replacestream": {
+      "version": "4.0.2",
+      "from": "replacestream@>=4.0.0 <5.0.0",
+      "resolved": "https://registry.npmjs.org/replacestream/-/replacestream-4.0.2.tgz",
+      "dev": true
+    },
     "request": {
       "version": "2.76.0",
       "from": "request@latest",
@@ -5615,6 +5645,12 @@
       "version": "0.2.0",
       "from": "text-table@>=0.2.0 <0.3.0",
       "resolved": "https://registry.npmjs.org/text-table/-/text-table-0.2.0.tgz",
+      "dev": true
+    },
+    "textextensions": {
+      "version": "1.0.2",
+      "from": "textextensions@>=1.0.0 <1.1.0",
+      "resolved": "https://registry.npmjs.org/textextensions/-/textextensions-1.0.2.tgz",
       "dev": true
     },
     "throttleit": {

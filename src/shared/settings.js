@@ -1,5 +1,16 @@
 'use strict';
 
+// `Object.assign()`-like helper. Used because this script needs to work
+// in IE 10/11 without polyfills.
+function assign(dest, src) {
+  for (var k in src) {
+    if (src.hasOwnProperty(k)) {
+      dest[k] = src[k];
+    }
+  }
+  return dest;
+}
+
 /**
  * Return application configuration information from the host page.
  *
@@ -21,7 +32,7 @@ function settings(document, settingsClass) {
 
   var config = {};
   for (var i=0; i < settingsElements.length; i++) {
-    Object.assign(config, JSON.parse(settingsElements[i].textContent));
+    assign(config, JSON.parse(settingsElements[i].textContent));
   }
   return config;
 }

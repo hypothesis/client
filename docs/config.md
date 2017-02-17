@@ -20,6 +20,11 @@ to be ignored.
 Config keys
 -----------
 
+## Client behavior
+
+These keys configure the behavior and initial state of the client when it
+loads.
+
 ### `openLoginForm`
 
 _Boolean_. Controls whether the login panel is automatically opened on startup,
@@ -34,6 +39,21 @@ _Boolean_. Controls whether the sidebar opens automatically on startup.
 
 _Boolean_. Controls whether the in-document highlights are shown by default.
 (Default: _true_.)
+
+## Annotation services
+
+These keys configure which annotation services the client connects to and where
+it loads assets from. By default, the client will connect to the public
+Hypothesis service at [hypothes.is](https://hypothes.is).
+
+### `assetRoot`
+
+_String_. The URL from which client assets are loaded.
+
+### `sidebarAppUrl`
+
+_String_. The URL for the sidebar application which displays annotations
+(Default: _https://hypothes.is/app.html_).
 
 ### `services`
 
