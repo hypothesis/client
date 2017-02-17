@@ -4,6 +4,25 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+## Added
+
+- Add a boot script to the client which replaces the `/embed.js` script served
+  by the Hypothesis service
+  ([#215](https://github.com/hypothesis/client/pull/215)).
+
+## Changed
+
+- Correct CC0 terminology
+  ([#222](https://github.com/hypothesis/client/pull/222)).
+
+- Disable the link to activity pages from usernames for 3rd party accounts
+  ([#228](https://github.com/hypothesis/client/pull/228)).
+
+- Remove account settings and logout link from Account menu for 3rd party
+  accounts ([#231](https://github.com/hypothesis/client/pull/231)).
+
 ## [0.56.0] - 2017-02-14
 
 ## Changed
