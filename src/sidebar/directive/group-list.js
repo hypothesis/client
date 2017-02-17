@@ -20,6 +20,10 @@ function GroupListController($scope, $window, groups, settings) {
   $scope.focusGroup = function (groupId) {
     groups.focus(groupId);
   };
+
+  if (settings.services && settings.services[0].icon) {
+    $scope.thirdPartyGroupIcon = settings.services[0].icon;
+  }
 }
 
 /**
