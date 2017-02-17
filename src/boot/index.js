@@ -16,8 +16,10 @@ var settings = require('../shared/settings')(document);
 // serving the Hypothesis client to tell it where to load the sidebar and assets
 // from.
 
+var defaultAssetRoot = 'https://unpkg.com/hypothesis@__VERSION__/';
+
 boot(document, {
-  assetRoot: settings.assetRoot || 'https://hypothes.is/assets/client/',
+  assetRoot: settings.assetRoot || defaultAssetRoot,
   manifest: __MANIFEST__,  // Replaced by build script
   sidebarAppUrl: settings.sidebarAppUrl || 'https://hypothes.is/app.html',
 });
