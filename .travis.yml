@@ -1,7 +1,5 @@
 language: node_js
-cache:
-  directories:
-    - node_modules
+cache: yarn
 notifications:
   slack:
     rooms:
@@ -12,8 +10,8 @@ matrix:
     # See https://github.com/hypothesis/client/pull/27#discussion_r70611726
     - env: ACTION=lint
       node_js: '6.2'
-      script: npm run lint
+      script: yarn run lint
     - env: ACTION=test
       node_js: '6.2'
       after_success:
-        npm run report-coverage
+        yarn run report-coverage
