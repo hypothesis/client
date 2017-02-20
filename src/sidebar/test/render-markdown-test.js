@@ -68,8 +68,8 @@ describe('render-markdown', function () {
 
     it('should render mixed blocks', function () {
       assert.equal(render('one $$x*2$$ two $$x*3$$ three'),
-        '<p>one </p>\n\n<p>math+display:x*2</p>\n\n' +
-        '<p>two </p>\n\n<p>math+display:x*3</p>\n\n<p>three</p>');
+        '<p>one </p>\n<p>math+display:x*2</p>\n' +
+        '<p>two </p>\n<p>math+display:x*3</p>\n<p>three</p>');
     });
 
     it('should not sanitize math renderer output', function () {
@@ -77,12 +77,12 @@ describe('render-markdown', function () {
         return html.toLowerCase();
       };
       assert.equal(render('$$X*2$$ FOO', fakeSanitize),
-        '<p>math+display:X*2</p>\n\n<p>foo</p>');
+        '<p>math+display:X*2</p>\n<p>foo</p>');
     });
 
     it('should render mixed inline and block math', function () {
       assert.equal(render('one \\(x*2\\) three $$x*3$$'),
-        '<p>one math:x*2 three </p>\n\n<p>math+display:x*3</p>');
+        '<p>one math:x*2 three </p>\n<p>math+display:x*3</p>');
     });
   });
 
