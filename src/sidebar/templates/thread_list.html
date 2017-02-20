@@ -14,6 +14,11 @@
         on-force-visible="vm.onForceVisible({thread: thread})">
       </annotation-thread>
   </li>
+  <li id="{{child.id}}"
+      ng-show="false"
+      ng-repeat="child in vm.virtualThreadList.invisibleThreads track by child.id">
+      <annotation-thread thread="child" />
+  </li>
   <li class="thread-list__spacer"
       ng-style="{height: vm.virtualThreadList.offscreenLowerHeight}"></li>
 </ul>

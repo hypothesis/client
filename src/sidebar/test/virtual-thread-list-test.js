@@ -14,6 +14,9 @@ var unroll = util.unroll;
 describe('VirtualThreadList', function () {
   var lastState;
   var threadList;
+  var threadOptions = {
+    invisibleThreadFilter: null,
+  };
 
   var fakeScope;
   var fakeWindow;
@@ -62,8 +65,10 @@ describe('VirtualThreadList', function () {
       pageYOffset: 0,
     };
 
+    threadOptions.invisibleThreadFilter = sinon.stub().returns(false);
+
     var rootThread = {annotation: undefined, children: []};
-    threadList = new VirtualThreadList(fakeScope, fakeWindow, rootThread);
+    threadList = new VirtualThreadList(fakeScope, fakeWindow, rootThread, threadOptions);
     threadList.on('changed', function (state) {
       lastState = state;
     });
@@ -75,10 +80,16 @@ describe('VirtualThreadList', function () {
     fakeWindow.pageYOffset = testCase.scrollOffset;
     fakeWindow.innerHeight = testCase.windowHeight;
 
+    // make sure for everything that is not being presented in the
+    // visible viewport, we pass it to this function.
+    threadOptions.invisibleThreadFilter.returns(true);
+
     threadList.setRootThread(thread);
 
     var visibleIDs = threadIDs(lastState.visibleThreads);
+    var invisibleIDs = threadIDs(lastState.invisibleThreads);
     assert.deepEqual(visibleIDs, testCase.expectedVisibleThreads);
+    assert.equal(invisibleIDs.length, testCase.threads - testCase.expectedVisibleThreads.length);
     assert.equal(lastState.offscreenUpperHeight, testCase.expectedHeightAbove);
     assert.equal(lastState.offscreenLowerHeight, testCase.expectedHeightBelow);
   },[{

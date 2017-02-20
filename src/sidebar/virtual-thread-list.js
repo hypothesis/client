@@ -20,11 +20,17 @@ var inherits = require('inherits');
  * @param {Window} container - The Window displaying the list of annotation threads.
  * @param {Thread} rootThread - The initial Thread object for the top-level
  *        threads.
+ * @param {Object} options - The render-time options to help make final adjustments
+ *        to what is and is not rendered.
+ *        options.invisibleThreadFilter allows integrator to tell us what should be
+ *          rerendered but not visible to the user yet.
  */
-function VirtualThreadList($scope, window_, rootThread) {
+function VirtualThreadList($scope, window_, rootThread, options) {
   var self = this;
 
   this._rootThread = rootThread;
+
+  this._options = Object.assign({}, options);
 
   // Cache of thread ID -> last-seen height
   this._heights = {};
@@ -133,6 +139,12 @@ VirtualThreadList.prototype._updateVisibleThreads = function () {
   // actually be created.
   var visibleThreads = [];
 
+  // List of annotations which are required to be rendered but we do not
+  // want them visible. This is to ensure that we allow items to be rendered
+  // and initialized (for saving purposes) without having them be presented
+  // in out of context scenarios (i.e. in wrong order for sort)
+  var invisibleThreads = [];
+
   var allThreads = this._rootThread.children;
   var visibleHeight = this.window.innerHeight;
   var usedHeight = 0;
@@ -141,6 +153,7 @@ VirtualThreadList.prototype._updateVisibleThreads = function () {
   for (var i = 0; i < allThreads.length; i++) {
     thread = allThreads[i];
     var threadHeight = this._height(thread.id);
+    var added = false;
 
     if (usedHeight + threadHeight < this.window.pageYOffset - MARGIN_ABOVE) {
       // Thread is above viewport
@@ -148,10 +161,21 @@ VirtualThreadList.prototype._updateVisibleThreads = function () {
     } else if (usedHeight <
       this.window.pageYOffset + visibleHeight + MARGIN_BELOW) {
       // Thread is either in or close to the viewport
-      visibleThreads.push(allThreads[i]);
+      visibleThreads.push(thread);
+      added = true;
     } else {
       // Thread is below viewport
       offscreenLowerHeight += threadHeight;
+    }
+
+    // any thread that is not going to go through the render process
+    // because it is already outside of the viewport should be checked
+    // to see if it needs to be added as an invisible render. So it will
+    // be available to go through rendering but not visible to the user
+    if(!added &&
+        this._options.invisibleThreadFilter &&
+        this._options.invisibleThreadFilter(thread)){
+      invisibleThreads.push(thread);
     }
 
     usedHeight += threadHeight;
@@ -161,6 +185,7 @@ VirtualThreadList.prototype._updateVisibleThreads = function () {
     offscreenLowerHeight: offscreenLowerHeight,
     offscreenUpperHeight: offscreenUpperHeight,
     visibleThreads: visibleThreads,
+    invisibleThreads: invisibleThreads,
   });
 };
 
