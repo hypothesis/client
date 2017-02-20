@@ -4,6 +4,13 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+## Fixed
+
+- Highlights not saving on pages with many highlights and annotations
+  ([#234](https://github.com/hypothesis/client/pull/234)).
+
 ## [0.57.0] - 2017-02-17
 
 ## Added
