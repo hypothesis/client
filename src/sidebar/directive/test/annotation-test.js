@@ -989,5 +989,15 @@ describe('annotation', function() {
         assert.equal(controller.links().html, '');
       });
     });
+
+    it('renders quotes as plain text', function () {
+      var ann = fixtures.defaultAnnotation();
+      ann.target[0].selector = [{
+        type: 'TextQuoteSelector',
+        exact: '<<-&->>',
+      }];
+      var el = createDirective(ann).element;
+      assert.equal(el[0].querySelector('blockquote').textContent, '<<-&->>');
+    });
   });
 });
