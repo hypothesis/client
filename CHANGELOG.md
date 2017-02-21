@@ -4,7 +4,7 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
-## [1.0.0] - 2017-02-20
+## [Unreleased]
 
 ## Fixed
 
