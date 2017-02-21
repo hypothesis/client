@@ -63,7 +63,7 @@
       overflow-hysteresis="20"
       content-data="selector.exact">
       <blockquote class="annotation-quote"
-        ng-bind-html="selector.exact"
+        ng-bind="selector.exact"
         ng-repeat="selector in target.selector
           | filter : {'type': 'TextQuoteSelector'}
           track by $index"></blockquote>
