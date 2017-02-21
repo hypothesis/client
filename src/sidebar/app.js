@@ -5,7 +5,9 @@ require('../shared/polyfills');
 
 var raven;
 
+// Read settings rendered into sidebar app HTML by service/extension.
 var settings = require('../shared/settings')(document);
+
 if (settings.raven) {
   // Initialize Raven. This is required at the top of this file
   // so that it happens early in the app's startup flow
