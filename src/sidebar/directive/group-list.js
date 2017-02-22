@@ -1,6 +1,7 @@
 'use strict';
 
 var persona = require('../filter/persona');
+var serviceConfig = require('../service-config');
 
 // @ngInject
 function GroupListController($scope, $window, groups, settings) {
@@ -20,6 +21,11 @@ function GroupListController($scope, $window, groups, settings) {
   $scope.focusGroup = function (groupId) {
     groups.focus(groupId);
   };
+
+  var svc = serviceConfig(settings);
+  if (svc && svc.icon) {
+    $scope.thirdPartyGroupIcon = svc.icon;
+  }
 }
 
 /**
