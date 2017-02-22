@@ -12,7 +12,6 @@ function changelogText() {
 /**
  * @typedef Config
  * @property {string} clientUrl - The URL of the client's boot script
- * @property {string} serviceUrl - The URL of the Hypothesis service
  */
 
 /**
@@ -48,17 +47,7 @@ function LiveReloadServer(port, config) {
       <pre style="margin: 20px 75px 75px 75px;">${changelogText()}</pre>
       <script>
       var appHost = document.location.hostname;
-
-      // When the server is accessed via a non-localhost IP/domain (eg.  when
-      // testing the client on a mobile device on the same WiFi network), we
-      // need to rewrite references to localhost in the sidebar app and client
-      // boot script URLs.
-      var clientUrl = '${config.clientUrl}'.replace('localhost', appHost);
-      var sidebarAppUrl = '${config.serviceUrl}/app.html'.replace('localhost', appHost);
-
       var config = {
-        assetRoot: clientUrl + '/',
-        sidebarAppUrl,
         liveReloadServer: 'ws://' + appHost + ':${port}',
 
         // Open the sidebar when the page loads
@@ -78,7 +67,7 @@ function LiveReloadServer(port, config) {
       });
 
       var embedScript = document.createElement('script');
-      embedScript.src = clientUrl;
+      embedScript.src = '${config.clientUrl}';
       document.body.appendChild(embedScript);
       </script>
     </body>

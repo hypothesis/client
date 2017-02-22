@@ -242,6 +242,17 @@ function triggerLiveReload(changedFiles) {
 }
 
 /**
+ * Return the hostname that should be used when generating URLs to the package
+ * content server.
+ *
+ * Customizing this can be useful when testing the client on different devices
+ * than the one the package content server is running on.
+ */
+function packageServerHostname() {
+  return process.env.PACKAGE_SERVER_HOSTNAME || 'localhost';
+}
+
+/**
  * Generates the `build/boot.js` script which serves as the entry point for
  * the Hypothesis client.
  *
@@ -249,11 +260,17 @@ function triggerLiveReload(changedFiles) {
  */
 function generateBootScript(manifest) {
   var { version } = require('./package.json');
-  var defaultAssetRoot = process.env.NODE_ENV === 'production' ?
-    `https://cdn.hypothes.is/hypothesis/${version}/` : `http://localhost:3001/hypothesis@${version}/`;
 
   var defaultSidebarAppUrl = process.env.H_SERVICE_URL ?
     `${process.env.H_SERVICE_URL}/app.html` : 'https://hypothes.is/app.html';
+
+  var defaultAssetRoot;
+
+  if (process.env.NODE_ENV === 'production') {
+    defaultAssetRoot = `https://cdn.hypothes.is/hypothesis/${version}/`;
+  } else {
+    defaultAssetRoot = `http://${packageServerHostname()}:3001/hypothesis@${version}/`;
+  }
 
   gulp.src('build/scripts/boot.bundle.js')
     .pipe(replace('__MANIFEST__', JSON.stringify(manifest)))
@@ -299,13 +316,12 @@ gulp.task('watch-manifest', function () {
 gulp.task('serve-live-reload', ['serve-package'], function () {
   var LiveReloadServer = require('./scripts/gulp/live-reload-server');
   liveReloadServer = new LiveReloadServer(3000, {
-    clientUrl: 'http://localhost:3001/hypothesis',
-    serviceUrl: process.env.H_SERVICE_URL,
+    clientUrl: `http://${packageServerHostname()}:3001/hypothesis`,
   });
 });
 
 gulp.task('serve-package', function () {
-  servePackage(3001);
+  servePackage(3001, packageServerHostname());
 });
 
 gulp.task('build',

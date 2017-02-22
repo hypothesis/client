@@ -20,7 +20,7 @@ var { version } = require('../../package.json');
  * returned by the service's '/embed.js' route and included in the '/app.html'
  * app.
  */
-function servePackage(port) {
+function servePackage(port, hostname) {
   var app = express();
 
   // Set up redirects which mirror unpkg's behavior
@@ -42,7 +42,7 @@ function servePackage(port) {
   app.use(`/hypothesis@${version}/`, express.static('.'));
 
   app.listen(port, function () {
-    log(`Package served at http://localhost:${port}`);
+    log(`Package served at http://${hostname}:${port}/hypothesis`);
   });
 }
 
