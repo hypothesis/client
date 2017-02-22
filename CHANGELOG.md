@@ -6,20 +6,20 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 ## [0.58.0] - 2017-02-21
 
-## Fixed
+### Fixed
 
 - Highlights not saving on pages with many highlights and annotations
   ([#234](https://github.com/hypothesis/client/pull/234)).
 
 ## [0.57.0] - 2017-02-17
 
-## Added
+### Added
 
 - Add a boot script to the client which replaces the `/embed.js` script served
   by the Hypothesis service
   ([#215](https://github.com/hypothesis/client/pull/215)).
 
-## Changed
+### Changed
 
 - Correct CC0 terminology
   ([#222](https://github.com/hypothesis/client/pull/222)).
@@ -32,12 +32,12 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 ## [0.56.0] - 2017-02-14
 
-## Changed
+### Changed
 
 - Improve math rendering by updating KaTeX to v0.7.1
   ([#224](https://github.com/hypothesis/client/pull/224)).
 
-## Fixed
+### Fixed
 
 - Wait for annotations to be fetched before displaying annotation counts in the
   page ([#225](https://github.com/hypothesis/client/pull/225)).
