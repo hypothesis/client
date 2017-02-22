@@ -296,8 +296,6 @@ function generateManifest() {
   gulp.src(MANIFEST_SOURCE_FILES)
     .pipe(manifest({name: 'manifest.json'}))
     .pipe(through.obj(function (file, enc, callback) {
-      gulpUtil.log('Updated asset manifest');
-
       // Trigger a reload of the client in the dev server at localhost:3000
       var newManifest = JSON.parse(file.contents.toString());
       var changed = changedAssets(prevManifest, newManifest);
