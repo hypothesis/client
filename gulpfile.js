@@ -252,6 +252,8 @@ function packageServerHostname() {
   return process.env.PACKAGE_SERVER_HOSTNAME || 'localhost';
 }
 
+var isFirstBuild = true;
+
 /**
  * Generates the `build/boot.js` script which serves as the entry point for
  * the Hypothesis client.
@@ -270,6 +272,12 @@ function generateBootScript(manifest) {
     defaultAssetRoot = `https://cdn.hypothes.is/hypothesis/${version}/`;
   } else {
     defaultAssetRoot = `http://${packageServerHostname()}:3001/hypothesis@${version}/`;
+  }
+
+  if (isFirstBuild) {
+    gulpUtil.log(`Sidebar app URL: ${defaultSidebarAppUrl}`);
+    gulpUtil.log(`Client asset root URL: ${defaultAssetRoot}`);
+    isFirstBuild = false;
   }
 
   gulp.src('build/scripts/boot.bundle.js')
