@@ -5,6 +5,7 @@ Hammer = require('hammerjs')
 Host = require('./host')
 annotationCounts = require('./annotation-counts')
 sidebarTrigger = require('./sidebar-trigger')
+events = require('../shared/bridge-events');
 
 # Minimum width to which the frame can be resized.
 MIN_RESIZE = 280
@@ -35,6 +36,9 @@ module.exports = class Sidebar extends Host
     if @plugins.Toolbar?
       this._setupGestures()
 
+    # The partner-provided login callback function (if any).
+    @onLogin = options.services?[0]?.onLogin
+
     this._setupSidebarEvents()
 
   _setupDocumentEvents: ->
@@ -50,6 +54,10 @@ module.exports = class Sidebar extends Host
 
     @crossframe.on('show', this.show.bind(this))
     @crossframe.on('hide', this.hide.bind(this))
+    @crossframe.on(events.DO_LOGIN, =>
+      if @onLogin
+        @onLogin()
+    );
 
     # Return this for chaining
     this

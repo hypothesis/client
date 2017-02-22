@@ -4,6 +4,7 @@ var angular = require('angular');
 var proxyquire = require('proxyquire');
 
 var events = require('../events');
+var bridgeEvents = require('../../shared/bridge-events');
 var util = require('../../shared/test/util');
 
 describe('AppController', function () {
@@ -14,11 +15,13 @@ describe('AppController', function () {
   var fakeAnnotationUI = null;
   var fakeAnalytics = null;
   var fakeAuth = null;
+  var fakeBridge = null;
   var fakeDrafts = null;
   var fakeFeatures = null;
   var fakeFrameSync = null;
   var fakeLocation = null;
   var fakeParams = null;
+  var fakeServiceConfig = null;
   var fakeSession = null;
   var fakeGroups = null;
   var fakeRoute = null;
@@ -36,13 +39,20 @@ describe('AppController', function () {
   };
 
   beforeEach(function () {
+    sandbox = sinon.sandbox.create();
+  });
+
+  beforeEach(function () {
     fakeAnnotationMetadata = {
       location: function () { return 0; },
     };
 
+    fakeServiceConfig = sandbox.stub();
+
     var AppController = proxyquire('../app-controller', util.noCallThru({
       'angular': angular,
       './annotation-metadata': fakeAnnotationMetadata,
+      './service-config': fakeServiceConfig,
     }));
 
     angular.module('h', [])
@@ -52,8 +62,6 @@ describe('AppController', function () {
   beforeEach(angular.mock.module('h'));
 
   beforeEach(angular.mock.module(function ($provide) {
-    sandbox = sinon.sandbox.create();
-
     fakeAnnotationUI = {
       tool: 'comment',
       clearSelectedAnnotations: sandbox.spy(),
@@ -110,6 +118,9 @@ describe('AppController', function () {
       countPendingUpdates: sinon.stub(),
       applyPendingUpdates: sinon.stub(),
     };
+    fakeBridge = {
+      call: sandbox.stub(),
+    };
 
     $provide.value('annotationUI', fakeAnnotationUI);
     $provide.value('auth', fakeAuth);
@@ -120,6 +131,7 @@ describe('AppController', function () {
     $provide.value('serviceUrl', fakeServiceUrl);
     $provide.value('session', fakeSession);
     $provide.value('settings', fakeSettings);
+    $provide.value('bridge', fakeBridge);
     $provide.value('streamer', fakeStreamer);
     $provide.value('groups', fakeGroups);
     $provide.value('$route', fakeRoute);
@@ -245,10 +257,26 @@ describe('AppController', function () {
   });
 
   describe('#login()', function () {
-    it('shows the login dialog', function () {
+    it('shows the login dialog if not using a third-party service', function () {
+      // If no third-party annotation service is in use then it should show the
+      // built-in login dialog.
       createController();
       $scope.login();
       assert.equal($scope.accountDialog.visible, true);
+    });
+
+    it('sends DO_LOGIN if a third-party service is in use', function () {
+      // If the client is using a third-party annotation service then clicking
+      // on a login button should send the DO_LOGIN event over the bridge
+      // (so that the partner site we're embedded in can do its own login
+      // thing).
+      fakeServiceConfig.returns({});
+      createController();
+
+      $scope.login();
+
+      assert.equal(fakeBridge.call.callCount, 1);
+      assert.isTrue(fakeBridge.call.calledWithExactly(bridgeEvents.DO_LOGIN));
     });
   });
 
