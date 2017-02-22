@@ -47,18 +47,15 @@ function LiveReloadServer(port, config) {
       <pre style="margin: 20px 75px 75px 75px;">${changelogText()}</pre>
       <script>
       var appHost = document.location.hostname;
-      var config = {
-        liveReloadServer: 'ws://' + appHost + ':${port}',
 
-        // Open the sidebar when the page loads
-        openSidebar: true,
+      window.hypothesisConfig = function () {
+        return {
+          liveReloadServer: 'ws://' + appHost + ':${port}',
+
+          // Open the sidebar when the page loads
+          openSidebar: true,
+        };
       };
-
-      var configEl = document.createElement('script');
-      configEl.className = 'js-hypothesis-settings';
-      configEl.type = 'application/json';
-      configEl.textContent = JSON.stringify(config);
-      document.head.appendChild(configEl);
 
       window.addEventListener('message', function (event) {
         if (event.data.type && event.data.type === 'reloadrequest') {
