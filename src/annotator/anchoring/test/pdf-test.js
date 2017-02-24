@@ -167,6 +167,24 @@ describe('PDF anchoring', function () {
       });
     });
 
+    it('anchors using a quote if the position anchor fails', function () {
+      viewer.setCurrentPage(0);
+      var range = findText(container, 'Pride And Prejudice');
+      return pdfAnchoring.describe(container, range).then(function (selectors) {
+        var position = selectors[0];
+        var quote = selectors[1];
+
+        // Manipulate the position selector so that it is no longer valid.
+        // Anchoring should fall back to the quote selector instead.
+        position.start += 5;
+        position.end += 5;
+
+        return pdfAnchoring.anchor(container, [position, quote]);
+      }).then(function (range) {
+        assert.equal(range.toString(), 'Pride And Prejudice');
+      });
+    });
+
     it('anchors to a placeholder element if the page is not rendered', function () {
       viewer.setCurrentPage(2);
       var range = findText(container, 'Netherfield Park');
