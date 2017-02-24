@@ -139,7 +139,7 @@ describe('PDF anchoring', function () {
   describe('#anchor', function () {
     it('anchors previously created selectors if the page is rendered', function () {
       viewer.setCurrentPage(2);
-      var range = findText(container, 'Netherfield Park');
+      var range = findText(container, 'My dear Mr. Bennet');
       return pdfAnchoring.describe(container, range).then(function (selectors) {
         var position = selectors[0];
         var quote = selectors[1];
@@ -149,8 +149,7 @@ describe('PDF anchoring', function () {
         var subsets = [
           [position, quote],
           [position],
-          // FIXME - Anchoring a quote on its own does not currently work
-          // [quote],
+          [quote],
         ];
         var subsetsAnchored = subsets.map(function (subset) {
           var types = subset.map(function (s) { return s.type; });
