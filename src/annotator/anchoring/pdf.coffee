@@ -160,8 +160,9 @@ findInPages = ([pageIndex, rest...], quote, position) ->
   offset = getPageOffset(pageIndex)
 
   return Promise.all([page, content, offset])
-  .then(attempt, next)
+  .then(attempt)
   .then(cacheAndFinish)
+  .catch(next)
 
 
 # When a position anchor is available, quote search can prioritize pages by
