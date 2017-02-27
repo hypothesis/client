@@ -1,3 +1,11 @@
+# This module exports a set of classes for converting between DOM `Range`
+# objects and different types of selector. It is mostly a thin wrapper around a
+# set of anchoring libraries. It serves two main purposes:
+#
+#  1. Providing a consistent interface across different types of anchor.
+#  2. Insulating the rest of the code from API changes in the underyling anchoring
+#     libraries.
+
 domAnchorTextPosition = require('dom-anchor-text-position')
 domAnchorTextQuote = require('dom-anchor-text-quote')
 
@@ -105,6 +113,12 @@ class TextQuoteAnchor
     if range == null
       throw new Error('Quote not found')
     range
+
+  toPositionAnchor: (options = {}) ->
+    anchor = domAnchorTextQuote.toTextPosition(@root, this.toSelector(), options)
+    if anchor == null
+      throw new Error('Quote not found')
+    new TextPositionAnchor(@root, anchor.start, anchor.end)
 
 
 exports.RangeAnchor = RangeAnchor

@@ -46,6 +46,8 @@ getPageTextContent = (pageIndex) ->
     return pageTextCache[pageIndex]
 
 
+# Return the offset in the text for the whole document at which the text for
+# `pageIndex` begins.
 getPageOffset = (pageIndex) ->
   index = -1
 
@@ -59,6 +61,8 @@ getPageOffset = (pageIndex) ->
   return next(0)
 
 
+# Return an {index, offset, textContent} object for the page where the given
+# `offset` in the full text of the document occurs.
 findPage = (offset) ->
   index = 0
   total = 0
@@ -125,6 +129,7 @@ anchorByPosition = (page, anchor, options) ->
 
 
 # Search for a quote (with optional position hint) in the given pages.
+# Returns a `Promise<Range>` for the location of the quote.
 findInPages = ([pageIndex, rest...], quote, position) ->
   unless pageIndex?
     return Promise.reject('quote not found')
@@ -244,6 +249,19 @@ exports.anchor = (root, selectors, options = {}) ->
   return promise
 
 
+###*
+# Convert a DOM Range object into a set of selectors.
+#
+# Converts a DOM `Range` object describing a start and end point within a
+# `root` `Element` and converts it to a `[position, quote]` tuple of selectors
+# which can be saved into an annotation and later passed to `anchor` to map
+# the selectors back to a `Range`.
+#
+# :param Element root: The root Element
+# :param Range range: DOM Range object
+# :param Object options: Options passed to `TextQuoteAnchor` and
+#                        `TextPositionAnchor`'s `toSelector` methods.
+###
 exports.describe = (root, range, options = {}) ->
 
   range = new xpathRange.BrowserRange(range).normalize()
@@ -282,6 +300,11 @@ exports.describe = (root, range, options = {}) ->
     return Promise.all([position, quote])
 
 
+###*
+# Clear the internal caches of page text contents and quote locations.
+#
+# This exists mainly as a helper for use in tests.
+###
 exports.purgeCache = ->
   pageTextCache = {}
   quotePositionCache = {}
