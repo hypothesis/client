@@ -4,6 +4,25 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+### Added
+
+- Allow publishers to specify logo for top bar
+  ([#232](https://github.com/hypothesis/client/pull/232)).
+
+### Changed
+
+- Load assets from cdn.hypothes.is by default.
+
+- Update Showdown (markdown renderer) from 1.3.0 to 1.6.4
+  ([#238](https://github.com/hypothesis/client/pull/238)).
+
+### Fixed
+
+- Don't treat annotation quotes (TextQuoteSelector.exact) as HTML
+  ([#239](https://github.com/hypothesis/client/pull/239)).
+
 ## [0.58.0] - 2017-02-21
 
 ### Fixed
