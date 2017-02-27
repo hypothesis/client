@@ -8,7 +8,7 @@ var TextPositionAnchor = types.TextPositionAnchor;
 // These are primarily basic API tests for the anchoring classes. Tests for
 // anchoring a variety of HTML and PDF content exist in `html-test` and
 // `pdf-test`.
-describe('Anchoring classes', function () {
+describe('types', function () {
   var container;
 
   before(function () {
