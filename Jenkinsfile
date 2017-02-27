@@ -30,8 +30,8 @@ node {
 
         // Upload the contents of the package to an S3 bucket, which it
         // will then be served from.
-        s3publish = docker.image('nickstenning/s3-npm-publish')
-        s3publish.withRun('hypothesis s3://cdn.hypothes.is') { /* empty */ }
+        docker.image('nickstenning/s3-npm-publish')
+              .withRun('', 'hypothesis s3://cdn.hypothes.is') { /* empty */ }
     }
 }
 
