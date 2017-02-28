@@ -7,19 +7,15 @@
 // already has it cached when it encounters the reference in the sidebar
 // application.
 
+// Variables replaced by the build script
+
 /* global __MANIFEST__ */
 
 var boot = require('./boot');
 var settings = require('../shared/settings')(document);
 
-// The `sidebarAppUrl` and `assetRoot` settings are set by the service which is
-// serving the Hypothesis client to tell it where to load the sidebar and assets
-// from.
-
-var defaultAssetRoot = 'https://cdn.hypothes.is/hypothesis/__VERSION__/';
-
 boot(document, {
-  assetRoot: settings.assetRoot || defaultAssetRoot,
-  manifest: __MANIFEST__,  // Replaced by build script
-  sidebarAppUrl: settings.sidebarAppUrl || 'https://hypothes.is/app.html',
+  assetRoot: settings.assetRoot || '__ASSET_ROOT__',
+  manifest: __MANIFEST__,
+  sidebarAppUrl: settings.sidebarAppUrl || '__SIDEBAR_APP_URL__',
 });

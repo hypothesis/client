@@ -10,6 +10,11 @@ function changelogText() {
 }
 
 /**
+ * @typedef Config
+ * @property {string} clientUrl - The URL of the client's boot script
+ */
+
+/**
  * An HTTP and WebSocket server which enables live reloading of the client.
  *
  * A simple HTTP and WebSocket server
@@ -18,12 +23,11 @@ function changelogText() {
  * the client to live-reload.
  *
  * @param {number} port - The port that the test server should listen on.
- * @param {string} appServer - The URL of the Hypothesis service to load
- *                             the client from.
+ * @param {Config} config - Config for the server
  *
  * @constructor
  */
-function LiveReloadServer(port, appServer) {
+function LiveReloadServer(port, config) {
   var connections = [];
 
   function listen() {
@@ -60,7 +64,7 @@ function LiveReloadServer(port, appServer) {
       });
 
       var embedScript = document.createElement('script');
-      embedScript.src = '${appServer}/embed.js'.replace('localhost', appHost);
+      embedScript.src = '${config.clientUrl}';
       document.body.appendChild(embedScript);
       </script>
     </body>

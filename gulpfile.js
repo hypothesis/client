@@ -22,6 +22,7 @@ var through = require('through2');
 
 var createBundle = require('./scripts/gulp/create-bundle');
 var manifest = require('./scripts/gulp/manifest');
+var servePackage = require('./scripts/gulp/serve-package');
 var vendorBundles = require('./scripts/gulp/vendor-bundles');
 
 var IS_PRODUCTION_BUILD = process.env.NODE_ENV === 'production';
@@ -241,14 +242,48 @@ function triggerLiveReload(changedFiles) {
 }
 
 /**
+ * Return the hostname that should be used when generating URLs to the package
+ * content server.
+ *
+ * Customizing this can be useful when testing the client on different devices
+ * than the one the package content server is running on.
+ */
+function packageServerHostname() {
+  return process.env.PACKAGE_SERVER_HOSTNAME || 'localhost';
+}
+
+var isFirstBuild = true;
+
+/**
  * Generates the `build/boot.js` script which serves as the entry point for
  * the Hypothesis client.
  *
  * @param {Object} manifest - Manifest mapping asset paths to cache-busted URLs
  */
 function generateBootScript(manifest) {
+  var { version } = require('./package.json');
+
+  var defaultSidebarAppUrl = process.env.H_SERVICE_URL ?
+    `${process.env.H_SERVICE_URL}/app.html` : 'https://hypothes.is/app.html';
+
+  var defaultAssetRoot;
+
+  if (process.env.NODE_ENV === 'production') {
+    defaultAssetRoot = `https://cdn.hypothes.is/hypothesis/${version}/`;
+  } else {
+    defaultAssetRoot = `http://${packageServerHostname()}:3001/hypothesis/${version}/`;
+  }
+
+  if (isFirstBuild) {
+    gulpUtil.log(`Sidebar app URL: ${defaultSidebarAppUrl}`);
+    gulpUtil.log(`Client asset root URL: ${defaultAssetRoot}`);
+    isFirstBuild = false;
+  }
+
   gulp.src('build/scripts/boot.bundle.js')
     .pipe(replace('__MANIFEST__', JSON.stringify(manifest)))
+    .pipe(replace('__ASSET_ROOT__', defaultAssetRoot))
+    .pipe(replace('__SIDEBAR_APP_URL__', defaultSidebarAppUrl))
     .pipe(rename('boot.js'))
     .pipe(gulp.dest('build/'));
 }
@@ -261,8 +296,6 @@ function generateManifest() {
   gulp.src(MANIFEST_SOURCE_FILES)
     .pipe(manifest({name: 'manifest.json'}))
     .pipe(through.obj(function (file, enc, callback) {
-      gulpUtil.log('Updated asset manifest');
-
       // Trigger a reload of the client in the dev server at localhost:3000
       var newManifest = JSON.parse(file.contents.toString());
       var changed = changedAssets(prevManifest, newManifest);
@@ -286,9 +319,15 @@ gulp.task('watch-manifest', function () {
   }));
 });
 
-gulp.task('start-live-reload-server', function () {
+gulp.task('serve-live-reload', ['serve-package'], function () {
   var LiveReloadServer = require('./scripts/gulp/live-reload-server');
-  liveReloadServer = new LiveReloadServer(3000, 'http://localhost:5000');
+  liveReloadServer = new LiveReloadServer(3000, {
+    clientUrl: `http://${packageServerHostname()}:3001/hypothesis`,
+  });
+});
+
+gulp.task('serve-package', function () {
+  servePackage(3001, packageServerHostname());
 });
 
 gulp.task('build',
@@ -299,7 +338,8 @@ gulp.task('build',
           generateManifest);
 
 gulp.task('watch',
-          ['start-live-reload-server',
+          ['serve-package',
+           'serve-live-reload',
            'watch-js',
            'watch-css',
            'watch-fonts',
