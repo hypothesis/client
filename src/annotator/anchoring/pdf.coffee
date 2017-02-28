@@ -8,8 +8,11 @@ RenderingStates = require('../pdfjs-rendering-states')
 
 # Caches for performance
 
-# Map of page index to Promise<string>
+# Map of page index to page text content as a `Promise<string>`
 pageTextCache = {}
+# Two-dimensional map from `[quote][position]` to `{page, anchor}` intended to
+# optimize re-anchoring of a pair of quote and position selectors if the
+# position selector fails to anchor on its own.
 quotePositionCache = {}
 
 
@@ -132,7 +135,7 @@ anchorByPosition = (page, anchor, options) ->
 # Returns a `Promise<Range>` for the location of the quote.
 findInPages = ([pageIndex, rest...], quote, position) ->
   unless pageIndex?
-    return Promise.reject('quote not found')
+    return Promise.reject(new Error('Quote not found'))
 
   attempt = (info) ->
     # Try to find the quote in the current page.
@@ -151,8 +154,9 @@ findInPages = ([pageIndex, rest...], quote, position) ->
     return findInPages(rest, quote, position)
 
   cacheAndFinish = (anchor) ->
-    quotePositionCache[quote.exact] ?= {}
-    quotePositionCache[quote.exact][position.start] = {page, anchor}
+    if position
+      quotePositionCache[quote.exact] ?= {}
+      quotePositionCache[quote.exact][position.start] = {page, anchor}
     return anchorByPosition(page, anchor)
 
   page = getPage(pageIndex)
@@ -160,8 +164,9 @@ findInPages = ([pageIndex, rest...], quote, position) ->
   offset = getPageOffset(pageIndex)
 
   return Promise.all([page, content, offset])
-  .then(attempt, next)
+  .then(attempt)
   .then(cacheAndFinish)
+  .catch(next)
 
 
 # When a position anchor is available, quote search can prioritize pages by
