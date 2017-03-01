@@ -2,7 +2,7 @@
 
 Hypothesis is comprised of several components:
 
- - A browser-based web app for annotating web pages (this repo)
+ - A browser-based web app for annotating web pages (this repository)
  - A service which stores annotations, user accounts and other data. By default
    the client uses the public service at [hypothes.is](https://hypothes.is).
  - A browser extension which can add the client to web pages.
