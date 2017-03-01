@@ -4,6 +4,25 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+## Changed
+
+- Make boot script load settings from correct config tags
+  ([#243](https://github.com/hypothesis/client/pull/243)).
+
+- Call partner provided login callback
+  ([#260](https://github.com/hypothesis/client/pull/260)).
+
+- Add an express server which serves the package's contents during development.
+  ([#229](https://github.com/hypothesis/client/pull/229)).
+
+## Fixed
+
+- Fix anchoring of annotations in PDFs using quote selector
+  ([#261](https://github.com/hypothesis/client/pull/261),
+   [#262](https://github.com/hypothesis/client/pull/262)).
+
 ## [0.59.0] - 2017-02-27
 
 ### Added
