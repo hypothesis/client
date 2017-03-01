@@ -2,5 +2,11 @@
   "extends": "hypothesis",
   "globals": {
     "Set": false
-  }
+  },
+  "plugins": [
+    "mocha"
+  ],
+  "rules": {
+    "mocha/no-exclusive-tests": "error"
+  },
 }
