@@ -6,6 +6,8 @@ var events = require('./events');
 var parseAccountID = require('./filter/persona').parseAccountID;
 var scopeTimeout = require('./util/scope-timeout');
 var uiConstants = require('./ui-constants');
+var serviceConfig = require('./service-config');
+var bridgeEvents = require('../shared/bridge-events');
 
 function authStateFromUserID(userid) {
   if (userid) {
@@ -24,7 +26,7 @@ function authStateFromUserID(userid) {
 // @ngInject
 module.exports = function AppController(
   $document, $location, $rootScope, $route, $scope,
-  $window, annotationUI, auth, drafts, features, frameSync, groups,
+  $window, annotationUI, auth, bridge, drafts, features, frameSync, groups,
   serviceUrl, session, settings, streamer
 ) {
 
@@ -98,6 +100,11 @@ module.exports = function AppController(
 
   // Start the login flow. This will present the user with the login dialog.
   $scope.login = function () {
+    if (serviceConfig(settings)) {
+      bridge.call(bridgeEvents.DO_LOGIN);
+      return;
+    }
+
     $scope.accountDialog.visible = true;
     scrollToView('login-form');
   };
