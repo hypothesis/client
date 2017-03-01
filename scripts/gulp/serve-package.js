@@ -21,6 +21,13 @@ var { version } = require('../../package.json');
 function servePackage(port, hostname) {
   var app = express();
 
+  // Enable CORS for assets so that cross-origin font loading works.
+  app.use(function (req, res, next) {
+    res.append('Access-Control-Allow-Origin', '*');
+    res.append('Access-Control-Allow-Methods', 'GET');
+    next();
+  });
+
   var serveBootScript = function (req, res) {
     var entryPath = require.resolve('../..');
     var entryScript = readFileSync(entryPath).toString('utf-8');
