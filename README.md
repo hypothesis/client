@@ -23,14 +23,11 @@ be [embedded directly on web pages][embed].
 Development
 -----------
 
-We'll soon be adding instructions on how to set up a development environment for
-the Hypothesis client.
+See the client [Development Guide](/docs/developing.md) for instructions on
+building, testing and contributing to the client.
 
-If you are already clear on the difference between this repository and the
-[`hypothesis/h`](https://github.com/hypothesis/h) repository then in the mean
-time the [Contributor's Guide](https://h.readthedocs.io/en/latest/developing/)
-may be of use. Be aware that many instructions in that guide do not apply to
-this repository.
+If you are also interested in developing the Hypothesis service, please see the service's
+[Contributor Guide](https://h.readthedocs.io/en/latest/developing/).
 
 Community
 ---------
