@@ -9,7 +9,7 @@ Hypothesis is comprised of several components:
 
 In order to develop the client and test out changes you make locally, you will
 need to use either the [browser
-extension](https://github.com/hypothesis/browser-extension) or setup a [a local
+extension](https://github.com/hypothesis/browser-extension) or setup [a local
 install of the Hypothesis
 service](http://h.readthedocs.io/en/latest/developing/) to host the client.
 
