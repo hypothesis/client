@@ -13,9 +13,6 @@ extension](https://github.com/hypothesis/browser-extension) or setup [a local
 install of the Hypothesis
 service](http://h.readthedocs.io/en/latest/developing/) to host the client.
 
-If you are only interested in making changes to the client, developing using
-the browser extension is the easiest method.
-
 ## Prerequisites
 
 You will need:
@@ -32,7 +29,21 @@ sudo npm install -g gulp-cli
 make
 ```
 
-## Developing using the browser extension
+You now have a development client installed. To run your development client in
+a browser you'll need a local copy of either the Hypothesis Chrome extension or
+the Hypothesis web service. Follow either the instructions for
+[Running the client from the browser extension](#running-the-client-from-the-browser-extension)
+or for
+[Running the client from the web service](#running-the-client-from-the-web-service)
+below.
+If you're only interested in making changes to the client (and not to the web
+service) then running the client from the browser extension is easiest.
+
+## Running the client from the browser extension
+
+This is the currently easiest way to get your development client running in a
+browser. It sets you up to make changes to the client and to the Chrome
+extension itself, but not to the web service.
 
 1. Check out the [browser
    extension](https://github.com/hypothesis/browser-extension) and follow the
@@ -54,10 +65,12 @@ make
    Reloader](https://chrome.google.com/webstore/detail/extensions-reloader/fimgfedafeadlieiabdeeaodndnlbhid?hl=en)
    to make this easier.
 
-If you want to use the browser extension together with a local Hypothesis
-service for storing annotations, you should also follow the steps below.
+## Running the client from the web service
 
-## Developing using a local Hypothesis web service
+This takes longer to setup than
+[Running the client from the browser extension](#running-the-client-from-the-browser-extension).
+You should follow these steps if you want to make changes to the Hypothesis
+web service as well as to the client.
 
 Once you have a local install of the Hypothesis service set up, you can
 configure it to use a local build of the client. In the client repository, run:
