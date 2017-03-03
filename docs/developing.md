@@ -20,6 +20,7 @@ the browser extension is the easiest method.
 
 You will need:
 
+* [git](https://git-scm.com/)
 * [Node.js](https://nodejs.org/en/) v6+
 
 ## Installation
