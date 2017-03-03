@@ -16,11 +16,15 @@ service](http://h.readthedocs.io/en/latest/developing/) to host the client.
 If you are only interested in making changes to the client, developing using
 the browser extension is the easiest method.
 
-## Prerequisites and Installation
+## Prerequisites
 
-To develop the client, you will need [Node.js v6](https://nodejs.org/en/) or
-later and [gulp](https://github.com/gulpjs/gulp-cli). To install dependencies
-run:
+You will need:
+
+* [Node.js](https://nodejs.org/en/) v6+
+
+## Installation
+
+To install the client for development:
 
 ```sh
 npm install -g gulp-cli
