@@ -28,7 +28,7 @@ You will need:
 To install the client for development:
 
 ```sh
-npm install -g gulp-cli
+sudo npm install -g gulp-cli
 make
 ```
 
