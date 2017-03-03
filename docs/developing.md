@@ -25,6 +25,8 @@ You will need:
 To install the client for development:
 
 ```sh
+git clone 'https://github.com/hypothesis/client.git'
+cd client
 sudo npm install -g gulp-cli
 make
 ```
