@@ -7,12 +7,6 @@ Hypothesis is comprised of several components:
    the client uses the public service at [hypothes.is](https://hypothes.is).
  - A browser extension which can add the client to web pages.
 
-In order to develop the client and test out changes you make locally, you will
-need to use either the [browser
-extension](https://github.com/hypothesis/browser-extension) or setup [a local
-install of the Hypothesis
-service](http://h.readthedocs.io/en/latest/developing/) to host the client.
-
 ## Prerequisites
 
 You will need:
@@ -74,8 +68,11 @@ This takes longer to setup than
 You should follow these steps if you want to make changes to the Hypothesis
 web service as well as to the client.
 
-Once you have a local install of the Hypothesis service set up, you can
-configure it to use a local build of the client. In the client repository, run:
+First follow the [instructions for setting up a development install of the web
+service](http://h.readthedocs.io/en/latest/developing/).
+Once you have a development install of the Hypothesis service set up, you can
+configure it to use a local build of the client. **In the client repository**,
+run:
 
 ```sh
 export H_SERVICE_URL=http://localhost:5000
@@ -85,7 +82,7 @@ gulp watch
 The `H_SERVICE_URL` env var sets the URL of the service which hosts the HTML
 entry point for the client's sidebar application.
 
-In the `hypothesis/h` repository, set the `CLIENT_URL` env var to tell the
+**In the `hypothesis/h` repository**, set the `CLIENT_URL` env var to tell the
 service where to load the client from, before running `make dev`:
 
 ```sh
