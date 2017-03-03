@@ -100,7 +100,7 @@ You can also load the client into your own web pages by adding:
 <script async src="http://localhost:5000/embed.js"></script>
 ```
 
-To the page's HTML. Note that this will only work in pages served via plain
+to the page's HTML. Note that this will only work in pages served via plain
 HTTP.  If you want to test out the client on pages served via HTTPS then building
 the client into a browser extension is the easiest option.
 
