@@ -48,7 +48,9 @@ Hypothesis service at [hypothes.is](https://hypothes.is).
 
 ### `assetRoot`
 
-_String_. The URL from which client assets are loaded.
+_String_. The root URL from which client assets are loaded. This should be set to
+the root URL where the contents of the client's `build` directory are found, including
+the trailing slash. (Default: _https://cdn.hypothes.is/hypothesis/X.Y.Z/build/_)
 
 ### `sidebarAppUrl`
 
