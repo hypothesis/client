@@ -14,9 +14,9 @@ You will need:
 * [git](https://git-scm.com/)
 * [Node.js](https://nodejs.org/en/) v6+
 
-## Installation
+## Building
 
-To install the client for development:
+To build the client for development:
 
 ```sh
 git clone 'https://github.com/hypothesis/client.git'
@@ -26,7 +26,7 @@ npm install -g gulp-cli  # Tip: if you get a "permission denied" error try
 make
 ```
 
-You now have a development client installed. To run your development client in
+You now have a development client built. To run your development client in
 a browser you'll need a local copy of either the Hypothesis Chrome extension or
 the Hypothesis web service. Follow either the instructions for
 [Running the client from the browser extension](#running-the-client-from-the-browser-extension)
@@ -49,6 +49,7 @@ extension itself, but not to the web service.
    to make it use your local version of the client and the [production
    Hypothesis
    service](https://github.com/hypothesis/browser-extension/blob/master/docs/building.md).
+
 1. Start the client's development server to rebuild the client whenever it
    changes:
 
