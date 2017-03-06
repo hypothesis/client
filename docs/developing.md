@@ -21,7 +21,8 @@ To install the client for development:
 ```sh
 git clone 'https://github.com/hypothesis/client.git'
 cd client
-sudo npm install -g gulp-cli
+npm install -g gulp-cli  # Tip: if you get a "permission denied" error try
+                         # `sudo npm install -g gulp-cli` instead.
 make
 ```
 
