@@ -7,27 +7,40 @@ Hypothesis is comprised of several components:
    the client uses the public service at [hypothes.is](https://hypothes.is).
  - A browser extension which can add the client to web pages.
 
-In order to develop the client and test out changes you make locally, you will
-need to use either the [browser
-extension](https://github.com/hypothesis/browser-extension) or setup a [a local
-install of the Hypothesis
-service](http://h.readthedocs.io/en/latest/developing/) to host the client.
+## Prerequisites
 
-If you are only interested in making changes to the client, developing using
-the browser extension is the easiest method.
+You will need:
 
-## Prerequisites and Installation
+* [git](https://git-scm.com/)
+* [Node.js](https://nodejs.org/en/) v6+
 
-To develop the client, you will need [Node.js v6](https://nodejs.org/en/) or
-later and [gulp](https://github.com/gulpjs/gulp-cli). To install dependencies
-run:
+## Building
+
+To build the client for development:
 
 ```sh
-npm install -g gulp-cli
+git clone 'https://github.com/hypothesis/client.git'
+cd client
+npm install -g gulp-cli  # Tip: if you get a "permission denied" error try
+                         # `sudo npm install -g gulp-cli` instead.
 make
 ```
 
-## Developing using the browser extension
+You now have a development client built. To run your development client in
+a browser you'll need a local copy of either the Hypothesis Chrome extension or
+the Hypothesis web service. Follow either the instructions for
+[Running the client from the browser extension](#running-the-client-from-the-browser-extension)
+or for
+[Running the client from the web service](#running-the-client-from-the-web-service)
+below.
+If you're only interested in making changes to the client (and not to the web
+service) then running the client from the browser extension is easiest.
+
+## Running the client from the browser extension
+
+This is the currently easiest way to get your development client running in a
+browser. It sets you up to make changes to the client and to the Chrome
+extension itself, but not to the web service.
 
 1. Check out the [browser
    extension](https://github.com/hypothesis/browser-extension) and follow the
@@ -36,6 +49,7 @@ make
    to make it use your local version of the client and the [production
    Hypothesis
    service](https://github.com/hypothesis/browser-extension/blob/master/docs/building.md).
+
 1. Start the client's development server to rebuild the client whenever it
    changes:
 
@@ -49,13 +63,18 @@ make
    Reloader](https://chrome.google.com/webstore/detail/extensions-reloader/fimgfedafeadlieiabdeeaodndnlbhid?hl=en)
    to make this easier.
 
-If you want to use the browser extension together with a local Hypothesis
-service for storing annotations, you should also follow the steps below.
+## Running the client from the web service
 
-## Developing using a local Hypothesis web service
+This takes longer to setup than
+[Running the client from the browser extension](#running-the-client-from-the-browser-extension).
+You should follow these steps if you want to make changes to the Hypothesis
+web service as well as to the client.
 
-Once you have a local install of the Hypothesis service set up, you can
-configure it to use a local build of the client. In the client repository, run:
+First follow the [instructions for setting up a development install of the web
+service](http://h.readthedocs.io/en/latest/developing/).
+Once you have a development install of the Hypothesis service set up, you can
+configure it to use a local build of the client. **In the client repository**,
+run:
 
 ```sh
 export H_SERVICE_URL=http://localhost:5000
@@ -65,7 +84,7 @@ gulp watch
 The `H_SERVICE_URL` env var sets the URL of the service which hosts the HTML
 entry point for the client's sidebar application.
 
-In the `hypothesis/h` repository, set the `CLIENT_URL` env var to tell the
+**In the `hypothesis/h` repository**, set the `CLIENT_URL` env var to tell the
 service where to load the client from, before running `make dev`:
 
 ```sh
@@ -83,7 +102,7 @@ You can also load the client into your own web pages by adding:
 <script async src="http://localhost:5000/embed.js"></script>
 ```
 
-To the page's HTML. Note that this will only work in pages served via plain
+to the page's HTML. Note that this will only work in pages served via plain
 HTTP.  If you want to test out the client on pages served via HTTPS then building
 the client into a browser extension is the easiest option.
 
