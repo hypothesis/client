@@ -21,7 +21,7 @@ function injectScript(doc, src) {
 
 function injectAssets(doc, config, assets) {
   assets.forEach(function (path) {
-    var url = config.assetRoot + 'build/' + config.manifest[path];
+    var url = config.assetRoot + config.manifest[path];
     if (url.match(/\.css/)) {
       injectStylesheet(doc, url);
     } else {

@@ -46,15 +46,6 @@ These keys configure which annotation services the client connects to and where
 it loads assets from. By default, the client will connect to the public
 Hypothesis service at [hypothes.is](https://hypothes.is).
 
-### `assetRoot`
-
-_String_. The URL from which client assets are loaded.
-
-### `sidebarAppUrl`
-
-_String_. The URL for the sidebar application which displays annotations
-(Default: _https://hypothes.is/app.html_).
-
 ### `services`
 
 _Array_. A list of additional annotation services which the client should
@@ -67,3 +58,20 @@ Each service description is an object with the keys:
  * `authority` _String_. The domain name which the annotation service is associated with.
  * `grantToken` _String|null_. An OAuth grant token which the client can exchange for an access token in order to make authenticated requests to the service. If _null_, the user will only be able to read rather than create or modify annotations. (Default: _null_)
  * `icon` _String|null_. The URL to an image for the annotation service. This image will appear to the left of the name of the currently selected group. The image should be suitable for display at 16x16px and the recommended format is SVG.
+
+## Asset and sidebar app location
+
+These keys configure where the client's assets are loaded from.
+
+### `assetRoot`
+
+_String_. The root URL from which assets are loaded. This should be set to the
+URL where the contents of the `build` directory are hosted, including the
+trailing slash. (Default: For production builds:
+_https://cdn.hypothes.is/hypothesis/X.Y.Z/build/_, for development builds:
+_http://localhost:3001/hypothesis/X.Y.Z/build/_. _X.Y.Z_ is the package version from `package.json`)
+
+### `sidebarAppUrl`
+
+_String_. The URL for the sidebar application which displays annotations
+(Default: _https://hypothes.is/app.html_ . If the `H_SERVICE_URL` env var is set, defaults to `${H_SERVICE_URL}/app.html`)
