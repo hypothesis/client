@@ -1,8 +1,8 @@
 Configuring the client
 ======================
 
-The Hypothesis client can be configured by providing a settings object in the
-body of the hosting page:
+The Hypothesis client can be configured by providing a JSON config object in
+the body of the hosting page:
 
 ```html
 <script type="application/json" class="js-hypothesis-config">
