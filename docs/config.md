@@ -83,6 +83,10 @@ retrieve annotations from, optionally including information about the identity
 of the user on that service. This list is in addition to the public
 [Hypothesis](https://hypothes.is/) service.
 
+**N.B.** Currently only one additional annotation service is supported - only
+the first item in this `services` array is used, and any further items in the
+array are ignored.
+
 Each service description is an object with the keys:
 
  * `authority` _String_. The domain name which the annotation service is associated with.
