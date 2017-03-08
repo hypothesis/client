@@ -1,6 +1,8 @@
 Configuring the client
 ======================
 
+### Configuring the client using JSON
+
 The Hypothesis client can be configured by providing a JSON config object in
 the body of the hosting page:
 
@@ -13,9 +15,28 @@ the body of the hosting page:
 <script async src="https://hypothes.is/embed.js"></script>
 ```
 
+Not all configuration settings can be set in this way, some must be
+[set using JavaScript](#configuring-the-client-using-javascript) (see below).
+
 **N.B.** The body of the `.js-hypothesis-config` tag must be [valid
 JSON](http://jsonlint.com/) -- invalid JSON will cause the entire config object
 to be ignored.
+
+### Configuring the client using JavaScript
+
+Alternatively, the Hypothesis client can be configured from the hosting page by
+providing a JavaScript function named `window.hypothesisConfig` that returns
+a configuration object. Some configuration settings (for example settings that
+register callback or event handler functions) can _only_ be set from
+JavaScript:
+
+```html
+window.hypothesisConfig = function () {
+  return {
+    "openSidebar": true
+  };
+};
+```
 
 Config keys
 -----------
