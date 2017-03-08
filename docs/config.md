@@ -87,7 +87,8 @@ of the user on that service. This list is in addition to the public
 the first item in this `services` array is used, and any further items in the
 array are ignored.
 
-Each service description is an object with the keys:
+Each item in the array should be an object describing an annotation service,
+with the following keys:
 
  * `authority` _String_. The domain name which the annotation service is associated with.
 
