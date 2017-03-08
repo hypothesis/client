@@ -38,12 +38,12 @@ window.hypothesisConfig = function () {
 };
 ```
 
-Config keys
------------
+Config settings
+---------------
 
 ### Client behavior
 
-These keys configure the behavior and initial state of the client when it
+These settings configure the behavior and initial state of the client when it
 loads.
 
 #### `openLoginForm`
@@ -63,7 +63,7 @@ _Boolean_. Controls whether the in-document highlights are shown by default.
 
 ### Annotation services
 
-These keys configure which annotation services the client connects to and where
+These settings configure which annotation services the client connects to and where
 it loads assets from. By default, the client will connect to the public
 Hypothesis service at [hypothes.is](https://hypothes.is).
 
