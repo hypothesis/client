@@ -1,7 +1,7 @@
-Configuring the sidebar
-=======================
+Configuring the client
+======================
 
-The Hypothesis sidebar can be configured by providing a settings object in the
+The Hypothesis client can be configured by providing a settings object in the
 body of the hosting page:
 
 ```html
