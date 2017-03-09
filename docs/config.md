@@ -63,33 +63,46 @@ _Boolean_. Controls whether the in-document highlights are shown by default.
 
 ### Annotation services
 
-These settings configure which annotation services the client connects to and where
-it loads assets from. By default, the client will connect to the public
-Hypothesis service at [hypothes.is](https://hypothes.is).
+The `services` setting configures which annotation services the client
+connects to (for example to login, retrieve annotations, and save annotations).
+By default, if no `services` setting is given, the client connects to the
+public Hypothesis service at [hypothes.is](https://hypothes.is).
 
 #### `services`
 
-_Array_. A list of additional annotation services which the client should
-retrieve annotations from, optionally including information about the identity
-of the user on that service. This list is in addition to the public
-[Hypothesis](https://hypothes.is/) service.
+_Array_. A list of alternative annotation services which the client should
+connect to instead of connecting the the public Hypothesis service at
+[hypothes.is](https://hypothes.is/).
+May optionally include information (in the form of a grant token) about the
+identity of the user accounts that the client is logged in to on those
+services.
 
-**N.B.** Currently only one additional annotation service is supported - only
-the first item in this `services` array is used, and any further items in the
-array are ignored.
+**N.B.** These settings are currently still experimental and may change without
+warning.
 
-Each item in the array should be an object describing an annotation service,
-with the following keys:
+**N.B.** Currently only one alternative annotation service at a time is
+supported - only the first item in this `services` array is used, and any
+further items in the array are ignored.
 
- * `authority` _String_. The domain name which the annotation service is associated with.
+Each item in the `services` array should be an object describing an annotation
+service, with the following keys:
 
- * `grantToken` _String|null_. An OAuth grant token which the client can exchange for an access token in order to make authenticated requests to the service. If _null_, the user will only be able to read rather than create or modify annotations. (Default: _null_)
+ * `authority` _String_. The domain name which the annotation service is
+   associated with.
 
- * `icon` _String|null_. The URL to an image for the annotation service. This image will appear to the left of the name of the currently selected group. The image should be suitable for display at 16x16px and the recommended format is SVG.
+ * `grantToken` _String|null_. An OAuth 2 grant token which the client can
+   exchange for an access token in order to make authenticated requests to the
+   service. If _null_, the user will be able to read but not create or modify
+   annotations. (Default: _null_)
 
- * `onLoginRequest` _function_. A JavaScript function that the Hypothesis client
-   will call in order to login (for example, when the user clicks a login button
-   in the Hypothesis client's sidebar).
+ * `icon` _String|null_. The URL to an image for the annotation service. This
+   image will appear to the left of the name of the currently selected group.
+   The image should be suitable for display at 16x16px and the recommended
+   format is SVG.
+
+ * `onLoginRequest` _function_. A JavaScript function that the client will
+   call in order to login (for example, when the user clicks a login button in
+   the Hypothesis client's sidebar).
 
    This setting can only be [set using window.hypothesisConfig](#configuring-the-client-using-javascript).
 
