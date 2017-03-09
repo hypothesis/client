@@ -48,17 +48,17 @@ describe 'Sidebar', ->
         assert.called(target)
 
     describe 'on DO_LOGIN event', ->
-      it 'calls the onLogin callback function if one was provided', ->
-        onLogin = sandbox.stub()
-        sidebar = createSidebar(options={services: [{onLogin: onLogin}]})
+      it 'calls the onLoginRequest callback function if one was provided', ->
+        onLoginRequest = sandbox.stub()
+        sidebar = createSidebar(options={services: [{onLoginRequest: onLoginRequest}]})
 
         emitEvent(events.DO_LOGIN)
 
-        assert.called(onLogin)
+        assert.called(onLoginRequest)
 
-      it 'only calls the onLogin callback of the first service', ->
-        # Even though options.services is an array it only calls the onLogin
-        # callback function of the first service. The onLogins of any other
+      it 'only calls the onLoginRequest callback of the first service', ->
+        # Even though options.services is an array it only calls the onLoginRequest
+        # callback function of the first service. The onLoginRequests of any other
         # services are ignored.
         firstOnLogin  = sandbox.stub()
         secondOnLogin = sandbox.stub()
@@ -66,9 +66,9 @@ describe 'Sidebar', ->
         sidebar = createSidebar(
           options={
             services: [
-              {onLogin: firstOnLogin},
-              {onLogin: secondOnLogin},
-              {onLogin: thirdOnLogin},
+              {onLoginRequest: firstOnLogin},
+              {onLoginRequest: secondOnLogin},
+              {onLoginRequest: thirdOnLogin},
             ]
           }
         )
@@ -79,17 +79,17 @@ describe 'Sidebar', ->
         assert.notCalled(secondOnLogin)
         assert.notCalled(thirdOnLogin)
 
-      it 'never calls the onLogin callbacks of further services', ->
-        # Even if the first service doesn't have an onLogin, it still doesn't
-        # call the onLogins of further services.
+      it 'never calls the onLoginRequest callbacks of further services', ->
+        # Even if the first service doesn't have an onLoginRequest, it still doesn't
+        # call the onLoginRequests of further services.
         secondOnLogin = sandbox.stub()
         thirdOnLogin  = sandbox.stub()
         sidebar = createSidebar(
           options={
             services: [
               {},
-              {onLogin: secondOnLogin},
-              {onLogin: thirdOnLogin},
+              {onLoginRequest: secondOnLogin},
+              {onLoginRequest: thirdOnLogin},
             ]
           }
         )
@@ -107,7 +107,7 @@ describe 'Sidebar', ->
         sidebar = createSidebar(options={services: []})
         emitEvent(events.DO_LOGIN)
 
-      it 'does not crash if the first service has no onLogin', ->
+      it 'does not crash if the first service has no onLoginRequest', ->
         sidebar = createSidebar(options={services: [{}]})
         emitEvent(events.DO_LOGIN)
 

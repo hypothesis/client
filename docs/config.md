@@ -96,20 +96,20 @@ with the following keys:
 
  * `icon` _String|null_. The URL to an image for the annotation service. This image will appear to the left of the name of the currently selected group. The image should be suitable for display at 16x16px and the recommended format is SVG.
 
- * `onLogin` _function_. A JavaScript function that the Hypothesis client will
-   call in order to login (for example, when the user clicks a login button in
-   the Hypothesis client's sidebar).
+ * `onLoginRequest` _function_. A JavaScript function that the Hypothesis client
+   will call in order to login (for example, when the user clicks a login button
+   in the Hypothesis client's sidebar).
 
    This setting can only be [set using window.hypothesisConfig](#configuring-the-client-using-javascript).
 
-   If the hosting page provides an `onLogin` function then the Hypothesis client
-   will call this function instead of doing its usual procedure for logging in
-   to the public service at [hypothes.is](https://hypothes.is/).
+   If the hosting page provides an `onLoginRequest` function then the Hypothesis
+   client will call this function instead of doing its usual procedure for
+   logging in to the public service at [hypothes.is](https://hypothes.is/).
 
-   No arguments are passed to the `onLogin` function.
+   No arguments are passed to the `onLoginRequest` function.
 
-   The `onLogin` function should cause a login procedure for the hosting page
-   to be performed - for example by redirecting to a login page, or by opening
-   a popup login window. After a successful login the hosting page should
-   reload the original page with a non-null `grantToken` for the logged-in user
-   in the `services` configuration setting.
+   The `onLoginRequest` function should cause a login procedure for the hosting
+   page to be performed - for example by redirecting to a login page, or by
+   opening a popup login window. After a successful login the hosting page
+   should reload the original page with a non-null `grantToken` for the
+   logged-in user in the `services` configuration setting.
