@@ -286,7 +286,7 @@ function generateBootScript(manifest) {
     .pipe(replace('__SIDEBAR_APP_URL__', defaultSidebarAppUrl))
     // Strip sourcemap link. It will have been invalidated by the previous
     // replacements and the bundle is so small that it isn't really valuable.
-    .pipe(replace(/.*sourceMappingURL.*/,''))
+    .pipe(replace(/^\/\/# sourceMappingURL=[^ ]+$/m,''))
     .pipe(rename('boot.js'))
     .pipe(gulp.dest('build/'));
 }
