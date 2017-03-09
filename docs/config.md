@@ -67,15 +67,6 @@ These settings configure which annotation services the client connects to and wh
 it loads assets from. By default, the client will connect to the public
 Hypothesis service at [hypothes.is](https://hypothes.is).
 
-#### `assetRoot`
-
-_String_. The URL from which client assets are loaded.
-
-#### `sidebarAppUrl`
-
-_String_. The URL for the sidebar application which displays annotations
-(Default: _https://hypothes.is/app.html_).
-
 #### `services`
 
 _Array_. A list of additional annotation services which the client should
@@ -108,8 +99,30 @@ with the following keys:
 
    No arguments are passed to the `onLoginRequest` function.
 
-   The `onLoginRequest` function should cause a login procedure for the hosting
-   page to be performed - for example by redirecting to a login page, or by
-   opening a popup login window. After a successful login the hosting page
-   should reload the original page with a non-null `grantToken` for the
-   logged-in user in the `services` configuration setting.
+   The `onLoginRequest` function should cause a login procedure for the hosting page
+   to be performed - for example by redirecting to a login page, or by opening
+   a popup login window. After a successful login the hosting page should
+   reload the original page with a non-null `grantToken` for the logged-in user
+   in the `services` configuration setting.
+
+### Asset and sidebar app location
+
+These settings configure where the client's assets are loaded from.
+
+**N.B.** These settings are currently still experimental and may change without
+warning.
+
+#### `assetRoot`
+
+_String_. The root URL from which assets are loaded. This should be set to the
+URL where the contents of the `hypothesis` package are hosted, including the
+trailing slash. (Default: For production builds:
+_https://cdn.hypothes.is/hypothesis/X.Y.Z/_, for development builds:
+_http://localhost:3001/hypothesis/X.Y.Z/_. _X.Y.Z_ is the package version from
+`package.json`)
+
+#### `sidebarAppUrl`
+
+_String_. The URL for the sidebar application which displays annotations
+(Default: _https://hypothes.is/app.html_ . If the `H_SERVICE_URL` env var is
+set, defaults to `${H_SERVICE_URL}/app.html`)
