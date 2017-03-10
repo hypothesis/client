@@ -37,7 +37,7 @@ module.exports = class Sidebar extends Host
       this._setupGestures()
 
     # The partner-provided login callback function (if any).
-    @onLogin = options.services?[0]?.onLogin
+    @onLoginRequest = options.services?[0]?.onLoginRequest
 
     this._setupSidebarEvents()
 
@@ -55,8 +55,8 @@ module.exports = class Sidebar extends Host
     @crossframe.on('show', this.show.bind(this))
     @crossframe.on('hide', this.hide.bind(this))
     @crossframe.on(events.DO_LOGIN, =>
-      if @onLogin
-        @onLogin()
+      if @onLoginRequest
+        @onLoginRequest()
     );
 
     # Return this for chaining
