@@ -1,6 +1,6 @@
 'use strict';
 
-var annotationIDs = require('./util/annotation-ids');
+var annotationQuery = require('./util/extract-annotation-query');
 var settings = require('../shared/settings');
 
 var docs = 'https://h.readthedocs.io/en/latest/embedding.html';
@@ -33,7 +33,7 @@ function config(window_) {
     }
   }
 
-  // Extract the direct linked ID from the URL.
+  // Extract the default query from the URL.
   //
   // The Chrome extension or proxy may already have provided this config
   // via a tag injected into the DOM, which avoids the problem where the page's
@@ -41,9 +41,9 @@ function config(window_) {
   //
   // In environments where the config has not been injected into the DOM,
   // we try to retrieve it from the URL here.
-  var directLinkedID = annotationIDs.extractIDFromURL(window_.location.href);
+  var directLinkedID = annotationQuery.extractAnnotationQuery(window_.location.href);
   if (directLinkedID) {
-    options.annotations = directLinkedID;
+    Object.assign(options, directLinkedID);
   }
   return options;
 }

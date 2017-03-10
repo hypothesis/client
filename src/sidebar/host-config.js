@@ -16,6 +16,9 @@ function hostPageConfig(window) {
   var paramWhiteList = [
     // Direct-linked annotation ID
     'annotations',
+                        
+    // Default query passed by url
+    'query',
 
     // Config param added by the extension, Via etc.  indicating how Hypothesis
     // was added to the page.
