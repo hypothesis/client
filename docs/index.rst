@@ -15,3 +15,4 @@ It's used by the
 
    publishers/index
    developers/index
+   documenters/index
