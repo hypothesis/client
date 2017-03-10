@@ -4,6 +4,24 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+### Changed
+
+- Add a guide to developing the Hypothesis client
+  ([#265](https://github.com/hypothesis/client/pull/265)).
+
+- Add overview of client security considerations
+  ([#272](https://github.com/hypothesis/client/pull/272)).
+
+- Rename the onLogin callback to onLoginRequest
+  ([#275](https://github.com/hypothesis/client/pull/275)).
+
+### Fixed
+
+- Fix browser devtools error due to broken sourcemap link in boot script
+  ([#271](https://github.com/hypothesis/client/pull/271)).
+
 ## [1.2.0] - 2017-03-01
 
 ### Changed
