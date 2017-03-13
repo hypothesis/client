@@ -1,3 +1,5 @@
+.. _embedding:
+
 How to Add Hypothesis to Your Website
 =====================================
 
