@@ -94,9 +94,11 @@ module.exports = function createBundle(config, buildOpts) {
       // the `global`, `self` and `window` globals in that order.
       //
       // This can break on web pages which provide their own definition of
-      // `global`. See https://github.com/hypothesis/h/issues/2723
+      // `global` or `self` that is not an alias for `window`. See
+      // https://github.com/hypothesis/h/issues/2723 and
+      // https://github.com/hypothesis/client/issues/277
       global: function () {
-        return 'typeof self !== "undefined" ? self : window';
+        return 'window';
       },
     },
   };
