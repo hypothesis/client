@@ -15,13 +15,14 @@ function extractAnnotationQuery(url) {
     var annotFragmentMatch = url.match(/#annotations:([A-Za-z0-9_-]+)$/);
     var queryFragmentMatch = url.match(/#annotations:(query|q):(.+)$/i);
     if (queryFragmentMatch) {
-      filter.query = queryFragmentMatch[2];
+      filter.query = decodeURI(queryFragmentMatch[2]);
     } else if (annotFragmentMatch) {
       filter.annotations = annotFragmentMatch[1];
     } else {
       filter = null;
     }
   } catch (err) {
+    // URI Error should return the page unfiltered.
     filter = null;
   }
   return filter;

@@ -1,35 +1,38 @@
 'use strict';
 
+var unroll = require('../../../shared/test/util').unroll;
+
 var annotationIds = require('../extract-annotation-query');
 
 describe('annotation queries', function () {
-  var annotation = annotationIds.extractAnnotationQuery('http://localhost:3000#annotations:alphanum3ric_-only');
-  var queryVarA = annotationIds.extractAnnotationQuery('http://localhost:3000#annotations:q:user:USERNAME');
-  var queryVarB = annotationIds.extractAnnotationQuery('http://localhost:3000#annotations:QuerY:user:USERNAME');
-  var invalid = annotationIds.extractAnnotationQuery('http://localhost:3000#annotations:\"TRYINGTOGETIN\";EVILSCRIPT()');
          
-  it ('accepts regular annotation id', function () {
-    assert.equal(annotation.annotations, 'alphanum3ric_-only');
+  it ('returns null on invalid fragment', function () {
+    assert.equal(annotationIds.extractAnnotationQuery(
+      'http://localhost:3000#annotations:\"TRYINGTOGETIN\");EVILSCRIPT()'),
+      null);
   });
          
-  it ('returns null for query when annotation id exists', function() {
-    assert.equal(annotation.query, null);
-  });
-         
-  it ('returns null on invalid query / id', function() {
-    assert.equal(invalid, null);
-  });
-         
-  it ('produces a null annotation when valid query exists', function () {
-    assert.equal(queryVarA.annotations, null);
-  });
-         
-  it ('accepts query style A ("q:")', function () {
-    assert.equal(queryVarA.query, 'user:USERNAME');
-  });
+  unroll('accepts annotation fragment from urls', function (testCase) {
+    assert.equal(annotationIds.extractAnnotationQuery(testCase.url).annotations, testCase.result);
+  }, [{
+    url: 'http://localhost:3000#annotations:alphanum3ric_-only',
+    result: 'alphanum3ric_-only',
+  },
+  ]);
 
-  it ('accepts query style B ("query:")', function () {
-    assert.equal (queryVarB.query, 'user:USERNAME');
-  });
-
+  unroll('accepts query from annotation fragment', function(testCase) {
+    assert.equal(annotationIds.extractAnnotationQuery(testCase.url).query, testCase.result);
+  }, [{
+    url: 'http://localhost:3000#annotations:q:user:USERNAME',
+    result: 'user:USERNAME',
+  },
+  {
+    url: 'http://localhost:3000#annotations:QuerY:user:USERNAME',
+    result: 'user:USERNAME',
+  }, {
+    url: 'http://localhost:3000#annotations:q:user:USERNAME%20tag:KEYWORD',
+    result: 'user:USERNAME tag:KEYWORD',
+  }]);
 });
+
+

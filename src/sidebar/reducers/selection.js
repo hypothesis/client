@@ -16,7 +16,6 @@ var uiConstants = require('../ui-constants');
 
 var util = require('./util');
 
-var validQuery = require('../util/validate-query');
 
 /**
 * Default starting tab.
@@ -42,7 +41,7 @@ TAB_SORTKEYS_AVAILABLE[uiConstants.TAB_ORPHANS] = ['Newest', 'Oldest', 'Location
 
 function initialSelection(settings) {
   var selection = {};
-  if (settings.annotations && !validQuery(settings.query)) {
+  if (settings.annotations && !settings.query) {
     selection[settings.annotations] = true;
   }
   return freeze(selection);
@@ -84,7 +83,7 @@ function init(settings) {
     // IDs of annotations that should be highlighted
     highlighted: [],
 
-    filterQuery: validQuery(settings.query),
+    filterQuery: settings.query,
 
     selectedTab: TAB_DEFAULT,
 
