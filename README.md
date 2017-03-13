@@ -20,7 +20,7 @@ It’s used by the [Hypothesis browser extension][ext], and can also be
 
 [service]: https://github.com/hypothesis/h
 [ext]: https://chrome.google.com/webstore/detail/hypothesis-web-pdf-annota/bjfhmglciegochdpefhhlphglcehbmek
-[embed]: http://h.readthedocs.io/projects/client/en/latest/publishers/embedding/
+[embed]: https://h.readthedocs.io/projects/client/en/latest/publishers/embedding/
 
 Development
 -----------
@@ -28,7 +28,7 @@ Development
 See the client [Development Guide][developers] for instructions on building,
 testing and contributing to the client.
 
-[developers]: http://h.readthedocs.io/projects/client/en/latest/developers/
+[developers]: https://h.readthedocs.io/projects/client/en/latest/developers/
 
 Community
 ---------
