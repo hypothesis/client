@@ -12,22 +12,23 @@ Hypothesis client
 [license]: https://github.com/hypothesis/client/blob/master/LICENSE
 
 The Hypothesis client is a browser-based tool for making annotations on web
-documents. It is used by the [Hypothesis browser extension][ext], and can also
-be [embedded directly on web pages][embed].
+pages. It’s a client for the [Hypothesis web annotation service][service].
+It’s used by the [Hypothesis browser extension][ext], and can also be
+[embedded directly into web pages][embed].
 
 ![Screenshot of Hypothesis client](/images/screenshot.png?raw=true)
 
+[service]: https://github.com/hypothesis/h
 [ext]: https://chrome.google.com/webstore/detail/hypothesis-web-pdf-annota/bjfhmglciegochdpefhhlphglcehbmek
-[embed]: https://hypothes.is/for-publishers/
+[embed]: http://h.readthedocs.io/projects/client/en/latest/publishers/embedding/
 
 Development
 -----------
 
-See the client [Development Guide](/docs/developing.md) for instructions on
-building, testing and contributing to the client.
+See the client [Development Guide][developers] for instructions on building,
+testing and contributing to the client.
 
-If you are also interested in developing the Hypothesis service, please see the service's
-[Contributor Guide](https://h.readthedocs.io/en/latest/developing/).
+[developers]: http://h.readthedocs.io/projects/client/en/latest/developers/
 
 Community
 ---------
