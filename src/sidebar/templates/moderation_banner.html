@@ -1,0 +1,13 @@
+<div class="moderation-banner"
+     ng-if="vm.flagCount() > 0 || vm.isHidden()"
+     ng-class="{'is-flagged': vm.flagCount() > 0, 'is-hidden': vm.isHidden()}">
+  <span ng-if="vm.flagCount() > 0 && !vm.isHidden()">
+    Flagged for review x{{ vm.flagCount() }}
+  </span>
+  <span ng-if="vm.isHidden()">
+    Hidden from users. Was reported x{{ vm.flagCount() }}
+  </span>
+  <span class="u-stretch"></span>
+  <button ng-if="!vm.isHidden()" ng-click="vm.hideAnnotation()">Hide</button>
+  <button ng-if="vm.isHidden()" ng-click="vm.unhideAnnotation()">Undo</button>
+</div>

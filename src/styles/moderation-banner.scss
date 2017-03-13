@@ -1,0 +1,27 @@
+.moderation-banner {
+  left: -15px;
+  padding-bottom: 5px;
+  padding-left: 15px;
+  padding-right: 10px;
+  padding-top: 5px;
+  position: relative;
+  right: -15px;
+  top: -15px;
+  width: calc(100% + 30px);
+
+  border-top-left-radius: 2px;
+  border-top-right-radius: 2px;
+  color: white;
+  display: flex;
+  flex-direction: row;
+  font-size: $normal-font-size;
+  font-weight: bold;
+}
+
+.moderation-banner.is-flagged:not(.is-hidden) {
+  background-color: $brand;
+}
+
+.moderation-banner.is-hidden {
+  background-color: $grey-6;
+}
