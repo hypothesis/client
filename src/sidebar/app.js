@@ -160,6 +160,7 @@ module.exports = angular.module('h', [
   // These should use `component()` but will require some changes.
   .directive('groupList', require('./directive/group-list').directive)
   .directive('markdown', require('./directive/markdown'))
+  .directive('moderationBanner', require('./directive/moderation-banner'))
   .directive('topBar', require('./directive/top-bar'))
 
   .directive('excerpt', require('./directive/excerpt').directive)
