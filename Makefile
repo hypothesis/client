@@ -19,6 +19,10 @@ test: node_modules/.uptodate
 lint: node_modules/.uptodate
 	npm run lint
 
+.PHONY: docs
+docs:
+	cd docs && make livehtml
+
 ################################################################################
 
 build/manifest.json: node_modules/.uptodate
