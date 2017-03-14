@@ -157,17 +157,19 @@ module.exports = angular.module('h', [
   .component('threadList', require('./directive/thread-list'))
   .component('timestamp', require('./directive/timestamp'))
 
+  // These should use `component()` but will require some changes.
+  .directive('groupList', require('./directive/group-list').directive)
+  .directive('markdown', require('./directive/markdown'))
+  .directive('topBar', require('./directive/top-bar'))
+
   .directive('excerpt', require('./directive/excerpt').directive)
   .directive('formInput', require('./directive/form-input'))
   .directive('formValidate', require('./directive/form-validate'))
-  .directive('groupList', require('./directive/group-list').directive)
   .directive('hAutofocus', require('./directive/h-autofocus'))
   .directive('hOnTouch', require('./directive/h-on-touch'))
   .directive('hTooltip', require('./directive/h-tooltip'))
-  .directive('markdown', require('./directive/markdown'))
   .directive('spinner', require('./directive/spinner'))
   .directive('statusButton', require('./directive/status-button'))
-  .directive('topBar', require('./directive/top-bar'))
   .directive('windowScroll', require('./directive/window-scroll'))
 
   .service('analytics', require('./analytics'))
