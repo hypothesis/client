@@ -17,6 +17,13 @@ function init() {
   };
 }
 
+/**
+ * Return a copy of `map` with `key` added or removed.
+ *
+ * @param {Object} map
+ * @param {string} key
+ * @param {boolean} enable
+ */
 function toggle(map, key, enable) {
   var newMap = Object.assign({}, map);
   if (enable) {
@@ -59,6 +66,8 @@ function fetchedFlagCounts(flagCounts) {
 
 /**
  * Update the set of annotations hidden by a moderator.
+ *
+ * @param {string[]} ids
  */
 function fetchedHiddenByModeratorIds(ids) {
   return {
@@ -69,6 +78,9 @@ function fetchedHiddenByModeratorIds(ids) {
 
 /**
  * An annotation was hidden or unhidden by a moderator.
+ *
+ * @param {string} id
+ * @param {boolean} hidden
  */
 function annotationHiddenChanged(id, hidden) {
   return {
@@ -81,6 +93,9 @@ function annotationHiddenChanged(id, hidden) {
 /**
  * Return the number of items an annotation with a given `id` has been flagged
  * by members of the annotation's group.
+ *
+ * @param {Object} state
+ * @param {string} id
  */
 function flagCount(state, id) {
   return state.flagCounts[id] || 0;
@@ -88,6 +103,9 @@ function flagCount(state, id) {
 
 /**
  * Return `true` if an annotation was hidden by a moderator.
+ *
+ * @param {Object} state
+ * @param {string} id
  */
 function isHiddenByModerator(state, id) {
   return !!state.hiddenByModerator[id];
