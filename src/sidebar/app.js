@@ -154,6 +154,7 @@ module.exports = angular.module('h', [
   .component('sortDropdown', require('./directive/sort-dropdown'))
   .component('svgIcon', require('./directive/svg-icon'))
   .component('tagEditor', require('./directive/tag-editor'))
+  .component('threadList', require('./directive/thread-list'))
   .component('timestamp', require('./directive/timestamp'))
 
   .directive('excerpt', require('./directive/excerpt').directive)
@@ -166,7 +167,6 @@ module.exports = angular.module('h', [
   .directive('markdown', require('./directive/markdown'))
   .directive('spinner', require('./directive/spinner'))
   .directive('statusButton', require('./directive/status-button'))
-  .directive('threadList', require('./directive/thread-list'))
   .directive('topBar', require('./directive/top-bar'))
   .directive('windowScroll', require('./directive/window-scroll'))
 

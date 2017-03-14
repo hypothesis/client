@@ -126,31 +126,27 @@ function ThreadListController($scope, VirtualThreadList) {
   };
 }
 
-module.exports = function () {
-  return {
-    bindToController: true,
-    controller: ThreadListController,
-    controllerAs: 'vm',
-    restrict: 'E',
-    scope: {
-      /** The root thread to be displayed by the thread list. */
-      thread: '<',
-      showDocumentInfo: '<',
+module.exports = {
+  controller: ThreadListController,
+  controllerAs: 'vm',
+  bindings: {
+    /** The root thread to be displayed by the thread list. */
+    thread: '<',
+    showDocumentInfo: '<',
 
-      /**
-       * Called when the user clicks a link to show an annotation that does not
-       * match the current filter.
-       */
-      onForceVisible: '&',
-      /** Called when the user focuses an annotation by hovering it. */
-      onFocus: '&',
-      /** Called when a user selects an annotation. */
-      onSelect: '&',
-      /** Called when a user toggles the expansion state of an annotation thread. */
-      onChangeCollapsed: '&',
-      /** Called to clear the current selection. */
-      onClearSelection: '&',
-    },
-    template: require('../templates/thread_list.html'),
-  };
+    /**
+     * Called when the user clicks a link to show an annotation that does not
+     * match the current filter.
+     */
+    onForceVisible: '&',
+    /** Called when the user focuses an annotation by hovering it. */
+    onFocus: '&',
+    /** Called when a user selects an annotation. */
+    onSelect: '&',
+    /** Called when a user toggles the expansion state of an annotation thread. */
+    onChangeCollapsed: '&',
+    /** Called to clear the current selection. */
+    onClearSelection: '&',
+  },
+  template: require('../templates/thread_list.html'),
 };
