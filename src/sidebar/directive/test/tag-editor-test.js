@@ -9,7 +9,7 @@ describe('tagEditor', function () {
 
   before(function () {
     angular.module('app',[])
-      .directive('tagEditor', require('../tag-editor'));
+      .component('tagEditor', require('../tag-editor'));
   });
 
   beforeEach(function () {

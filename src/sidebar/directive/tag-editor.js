@@ -22,16 +22,12 @@ function TagEditorController(tags) {
   };
 }
 
-module.exports = function () {
-  return {
-    bindToController: true,
-    controller: TagEditorController,
-    controllerAs: 'vm',
-    restrict: 'E',
-    scope: {
-      tags: '<',
-      onEditTags: '&',
-    },
-    template: require('../templates/tag_editor.html'),
-  };
+module.exports = {
+  controller: TagEditorController,
+  controllerAs: 'vm',
+  bindings: {
+    tags: '<',
+    onEditTags: '&',
+  },
+  template: require('../templates/tag_editor.html'),
 };
