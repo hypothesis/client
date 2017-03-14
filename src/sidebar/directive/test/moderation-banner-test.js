@@ -46,6 +46,7 @@ describe('moderationBanner', function () {
   });
 
   function createBanner(inputs) {
+    inputs.isReply = inputs.isReply || false;
     var el = util.createDirective(document, 'moderationBanner', inputs);
     bannerEl = el[0];
     return bannerEl;
@@ -62,6 +63,12 @@ describe('moderationBanner', function () {
     fakeAnnotationUI.flagCount.returns(10);
     var banner = createBanner({ annotationId: 'flagged-id' });
     assert.include(banner.textContent, 'Flagged for review x10');
+  });
+
+  it('displays in a more compact form if the annotation is a reply', function () {
+    fakeAnnotationUI.flagCount.returns(1);
+    var banner = createBanner({ annotationId: 'reply-id', isReply: true });
+    assert.ok(banner.querySelector('.is-reply'));
   });
 
   it('reports if the annotation was hidden', function () {
