@@ -1,5 +1,5 @@
-Welcome to Hypothesis Client's documentation!
-=============================================
+Welcome to the Hypothesis Client's Documentation!
+=================================================
 
 The `Hypothesis client <https://github.com/hypothesis/client>`_ is a browser-based tool for making annotations on web
 pages. It's a client for the `Hypothesis web annotation service <http://h.readthedocs.io/>`_.
