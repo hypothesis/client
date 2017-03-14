@@ -7,7 +7,7 @@ var util = require('./util');
 describe('selectionTabs', function () {
   before(function () {
     angular.module('app', [])
-      .directive('selectionTabs', require('../selection-tabs'));
+      .component('selectionTabs', require('../selection-tabs'));
   });
 
   beforeEach(function () {
