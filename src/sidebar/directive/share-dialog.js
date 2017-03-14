@@ -28,15 +28,11 @@ function ShareDialogController($scope, $element, annotationUI) {
     updateViaLink);
 }
 
-module.exports = function () {
-  return {
-    restrict: 'E',
-    bindToController: true,
-    controller: ShareDialogController,
-    controllerAs: 'vm',
-    scope: {
-      onClose: '&',
-    },
-    template: require('../templates/share_dialog.html'),
-  };
+module.exports = {
+  controller: ShareDialogController,
+  controllerAs: 'vm',
+  bindings: {
+    onClose: '&',
+  },
+  template: require('../templates/share_dialog.html'),
 };

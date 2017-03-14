@@ -11,7 +11,7 @@ describe('shareDialog', function () {
     fakeAnnotationUI = { frames: sinon.stub().returns([]) };
 
     angular.module('h', [])
-      .directive('shareDialog', require('../share-dialog'))
+      .component('shareDialog', require('../share-dialog'))
       .value('annotationUI', fakeAnnotationUI)
       .value('urlEncodeFilter', function (val) { return val; });
     angular.mock.module('h');
