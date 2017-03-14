@@ -32,22 +32,17 @@ function SearchInputController($element, $http, $scope) {
   };
 }
 
-// @ngInject
-module.exports = function () {
-  return {
-    bindToController: true,
-    controller: SearchInputController,
-    controllerAs: 'vm',
-    restrict: 'E',
-    scope: {
-      // Specifies whether the search input field should always be expanded,
-      // regardless of whether the it is focused or has an active query.
-      //
-      // If false, it is only expanded when focused or when 'query' is non-empty
-      alwaysExpanded: '<',
-      query: '<',
-      onSearch: '&',
-    },
-    template: require('../templates/search_input.html'),
-  };
+module.exports = {
+  controller: SearchInputController,
+  controllerAs: 'vm',
+  bindings: {
+    // Specifies whether the search input field should always be expanded,
+    // regardless of whether the it is focused or has an active query.
+    //
+    // If false, it is only expanded when focused or when 'query' is non-empty
+    alwaysExpanded: '<',
+    query: '<',
+    onSearch: '&',
+  },
+  template: require('../templates/search_input.html'),
 };
