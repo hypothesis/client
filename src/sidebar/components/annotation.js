@@ -505,6 +505,10 @@ function AnnotationController(
     return streamer.hasPendingDeletion(vm.annotation.id);
   };
 
+  vm.isHiddenByModerator = function () {
+    return annotationUI.isHiddenByModerator(vm.annotation.id);
+  };
+
   vm.isReply = function () {
     return isReply(vm.annotation);
   };

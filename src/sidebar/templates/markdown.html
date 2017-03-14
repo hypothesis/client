@@ -17,6 +17,6 @@
           ng-show="showEditor()"
           ng-click="$event.stopPropagation()"></textarea>
 <div class="markdown-body js-markdown-preview"
-     ng-class="preview && 'markdown-preview'"
+     ng-class="(preview && 'markdown-preview') || textClass"
      ng-dblclick="togglePreview()"
      ng-show="!showEditor()"></div>

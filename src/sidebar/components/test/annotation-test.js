@@ -84,6 +84,7 @@ describe('annotation', function() {
     var $window;
     var fakeAnalytics;
     var fakeAnnotationMapper;
+    var fakeAnnotationUI;
     var fakeDrafts;
     var fakeFlash;
     var fakeGroups;
@@ -116,7 +117,12 @@ describe('annotation', function() {
 
     before(function() {
       angular.module('h', [])
-        .component('annotation', annotationComponent());
+        .component('annotation', annotationComponent())
+        .component('markdown', {
+          bindings: {
+            textClass: '<?',
+          },
+        });
     });
 
     beforeEach(angular.mock.module('h'));
@@ -141,7 +147,9 @@ describe('annotation', function() {
         flagAnnotation: sandbox.stub(),
       };
 
-      var fakeAnnotationUI = {};
+      fakeAnnotationUI = {
+        isHiddenByModerator: sandbox.stub().returns(false),
+      };
 
       fakeDrafts = {
         update: sandbox.stub(),
@@ -1040,6 +1048,17 @@ describe('annotation', function() {
       }];
       var el = createDirective(ann).element;
       assert.equal(el[0].querySelector('blockquote').textContent, '<<-&->>');
+    });
+
+    it('renders hidden annotations with a custom text class', function () {
+      var ann = fixtures.defaultAnnotation();
+      fakeAnnotationUI.isHiddenByModerator.returns(true);
+      var el = createDirective(ann).element;
+      assert.deepEqual(el.find('markdown').controller('markdown'), {
+        textClass: {
+          'annotation-body is-hidden': true,
+        },
+      });
     });
   });
 });
