@@ -147,6 +147,7 @@ module.exports = angular.module('h', [
   .component('loginForm', require('./directive/login-form').component)
   .component('publishAnnotationBtn', require('./directive/publish-annotation-btn'))
   .component('searchStatusBar', require('./directive/search-status-bar'))
+  .component('sidebarTutorial', require('./directive/sidebar-tutorial').component)
   .component('shareDialog', require('./directive/share-dialog'))
   .component('timestamp', require('./directive/timestamp'))
 
@@ -158,7 +159,6 @@ module.exports = angular.module('h', [
   .directive('hOnTouch', require('./directive/h-on-touch'))
   .directive('hTooltip', require('./directive/h-tooltip'))
   .directive('markdown', require('./directive/markdown'))
-  .directive('sidebarTutorial', require('./directive/sidebar-tutorial').directive)
   .directive('searchInput', require('./directive/search-input'))
   .directive('selectionTabs', require('./directive/selection-tabs'))
   .directive('sortDropdown', require('./directive/sort-dropdown'))

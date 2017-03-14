@@ -17,21 +17,16 @@ function SidebarTutorialController(session) {
 }
 
 /**
- * @ngdoc directive
  * @name sidebarTutorial
  * @description Displays a short tutorial in the sidebar.
  */
 // @ngInject
 module.exports = {
-  directive: function () {
-    return {
-      bindToController: true,
-      controller: SidebarTutorialController,
-      controllerAs: 'vm',
-      restrict: 'E',
-      scope: {},
-      template: require('../templates/sidebar_tutorial.html'),
-    };
+  component: {
+    controller: SidebarTutorialController,
+    controllerAs: 'vm',
+    bindings: {},
+    template: require('../templates/sidebar_tutorial.html'),
   },
   Controller: SidebarTutorialController,
 };
