@@ -7,7 +7,6 @@
       ng-click="vm.onSelect({annotation: child.annotation})"
       ng-mouseleave="vm.onFocus({annotation: null})"
       ng-repeat="child in vm.virtualThreadList.visibleThreads track by child.id">
-      <moderation-banner annotation-id="child.id"></moderation-banner>
       <annotation-thread
         thread="child"
         show-document-info="vm.showDocumentInfo"

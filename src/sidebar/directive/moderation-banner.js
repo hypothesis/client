@@ -50,6 +50,10 @@ function moderationBanner() {
        * reflect.
        */
       annotationId: '<',
+      /**
+       * `true` if this annotation is a reply.
+       */
+      isReply: '<',
     },
   };
 }
