@@ -152,6 +152,7 @@ module.exports = angular.module('h', [
   .component('sidebarTutorial', require('./directive/sidebar-tutorial').component)
   .component('shareDialog', require('./directive/share-dialog'))
   .component('sortDropdown', require('./directive/sort-dropdown'))
+  .component('svgIcon', require('./directive/svg-icon'))
   .component('timestamp', require('./directive/timestamp'))
 
   .directive('excerpt', require('./directive/excerpt').directive)
@@ -164,7 +165,6 @@ module.exports = angular.module('h', [
   .directive('markdown', require('./directive/markdown'))
   .directive('spinner', require('./directive/spinner'))
   .directive('statusButton', require('./directive/status-button'))
-  .directive('svgIcon', require('./directive/svg-icon'))
   .directive('tagEditor', require('./directive/tag-editor'))
   .directive('threadList', require('./directive/thread-list'))
   .directive('topBar', require('./directive/top-bar'))
