@@ -31,10 +31,10 @@ To build the client for development:
 
 You now have a development client built. To run your development client in
 a browser you'll need a local copy of either the Hypothesis Chrome extension or
-the Hypothesis web service. Follow either
-:ref:`running-from-browser-ext` or :ref:`running-from-web-service` below.
-If you're only interested in making changes to the client (and not to the web
-service) then running the client from the browser extension is easiest.
+h. Follow either :ref:`running-from-browser-ext` or
+:ref:`running-from-h` below.
+If you're only interested in making changes to the client (and not to h)
+then running the client from the browser extension is easiest.
 
 
 .. _running-from-browser-ext:
@@ -44,7 +44,7 @@ Running the Client from the Browser Extension
 
 This is the currently easiest way to get your development client running in a
 browser. It sets you up to make changes to the client and to the Chrome
-extension itself, but not to the web service.
+extension itself, but not to h.
 
 #. Check out the
    `browser extension <https://github.com/hypothesis/browser-extension>`_
@@ -65,18 +65,18 @@ extension itself, but not to the web service.
    `Extensions Reloader <https://chrome.google.com/webstore/detail/extensions-reloader/fimgfedafeadlieiabdeeaodndnlbhid?hl=en>`_
    to make this easier.
 
-.. _running-from-web-service:
+.. _running-from-h:
 
-Running the Client From the Web Service
----------------------------------------
+Running the Client From h
+-------------------------
 
 This takes longer to setup than :ref:`running-from-browser-ext`.
-You should follow these steps if you want to make changes to the Hypothesis
-web service as well as to the client.
+You should follow these steps if you want to make changes to h as well as to
+the client.
 
 First follow the
-`instructions for setting up a development install of the web service <http://h.readthedocs.io/en/latest/developing/>`_.
-Once you have a development install of the Hypothesis service set up, you can
+`instructions for setting up a development install of h <http://h.readthedocs.io/en/latest/developing/>`_.
+Once you have a development install of h set up, you can
 configure it to use a local build of the client. **In the client repository**,
 run:
 
@@ -86,14 +86,14 @@ run:
    gulp watch
 
 **In the `hypothesis/h` repository**, set the :envvar:`CLIENT_URL` env var to
-tell the service where to load the client from, before running ``make dev``:
+tell h where to load the client from, before running ``make dev``:
 
 .. code-block:: sh
 
    export CLIENT_URL=http://localhost:3001/hypothesis
    make dev
 
-Once the client and service are running, you can test it out by visiting:
+Once the client and h are running, you can test it out by visiting:
 http://localhost:3000 or http://localhost:5000/docs/help in your browser.
 
 You can also load the client into your own web pages by adding:
