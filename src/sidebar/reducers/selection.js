@@ -83,7 +83,7 @@ function init(settings) {
     // IDs of annotations that should be highlighted
     highlighted: [],
 
-    filterQuery: settings.query,
+    filterQuery: settings.query || null,
 
     selectedTab: TAB_DEFAULT,
 
