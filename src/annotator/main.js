@@ -51,10 +51,17 @@ Annotator.noConflict().$.noConflict(true)(function() {
     delete options.constructor;
   }
 
-  window.annotator = new Klass(document.body, options);
-  appLinkEl.addEventListener('destroy', function () {
-    appLinkEl.parentElement.removeChild(appLinkEl);
-    window.annotator.destroy();
-    window.annotator = undefined;
+  // Testing only
+  ReadiumSDK.once(ReadiumSDK.Events.READER_INITIALIZED, function(readium) {
+    readium.once(ReadiumSDK.Events.CONTENT_DOCUMENT_LOADED, function($iframe, spineItem) {
+      var readerDoc = $iframe[0].contentDocument;
+      options.document = readerDoc;
+      window.annotator = new Klass(document.body, options);
+      appLinkEl.addEventListener('destroy', function () {
+          appLinkEl.parentElement.removeChild(appLinkEl);
+          window.annotator.destroy();
+          window.annotator = undefined;
+      });
+    });
   });
 });

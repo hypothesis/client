@@ -42,7 +42,7 @@ module.exports = class Sidebar extends Host
     this._setupSidebarEvents()
 
   _setupDocumentEvents: ->
-    sidebarTrigger(document.body, @show.bind(this))
+    sidebarTrigger(this.document.body, @show.bind(this))
 
     @element.on 'click', (event) =>
       if !@selectedTargets?.length
@@ -50,7 +50,7 @@ module.exports = class Sidebar extends Host
     return this
 
   _setupSidebarEvents: ->
-    annotationCounts(document.body, @crossframe)
+    annotationCounts(this.document.body, @crossframe)
 
     @crossframe.on('show', this.show.bind(this))
     @crossframe.on('hide', this.hide.bind(this))

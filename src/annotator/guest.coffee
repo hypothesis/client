@@ -55,19 +55,21 @@ module.exports = class Guest extends Annotator
     adder: '<hypothesis-adder></hypothesis-adder>';
 
   constructor: (element, options) ->
+    this.document = options.document || document
+    element = this.document.body
     super
 
     self = this
     this.adderCtrl = new adder.Adder(@adder[0], {
       onAnnotate: ->
         self.createAnnotation()
-        Annotator.Util.getGlobal().getSelection().removeAllRanges()
+        self.document.getSelection().removeAllRanges()
       onHighlight: ->
         self.setVisibleHighlights(true)
         self.createHighlight()
-        Annotator.Util.getGlobal().getSelection().removeAllRanges()
+        self.document.getSelection().removeAllRanges()
     })
-    this.selections = selections(document).subscribe
+    this.selections = selections(this.document).subscribe
       next: (range) ->
         if range
           self._onSelection(range)
@@ -365,7 +367,7 @@ module.exports = class Guest extends Annotator
     @crossframe?.call('focusAnnotations', tags)
 
   _onSelection: (range) ->
-    selection = Annotator.Util.getGlobal().getSelection()
+    selection = this.document.getSelection()
     isBackwards = rangeUtil.isSelectionBackwards(selection)
     focusRect = rangeUtil.selectionFocusRect(selection)
     if !focusRect
