@@ -20,7 +20,7 @@ var fakeDocumentMeta = {
 /**
  * Returns the annotation directive with helpers stubbed out.
  */
-function annotationDirective() {
+function annotationComponent() {
   var noop = function () { return ''; };
 
   var annotation = proxyquire('../annotation', {
@@ -35,7 +35,7 @@ function annotationDirective() {
     },
   });
 
-  return annotation.directive;
+  return annotation.component;
 }
 
 describe('annotation', function() {
@@ -116,7 +116,7 @@ describe('annotation', function() {
 
     before(function() {
       angular.module('h', [])
-        .directive('annotation', annotationDirective());
+        .component('annotation', annotationComponent());
     });
 
     beforeEach(angular.mock.module('h'));
