@@ -137,9 +137,9 @@ module.exports = angular.module('h', [
 
   // UI components
   .component('annotationShareDialog', require('./directive/annotation-share-dialog'))
+  .component('annotationThread', require('./directive/annotation-thread'))
 
   .directive('annotation', require('./directive/annotation').directive)
-  .directive('annotationThread', require('./directive/annotation-thread'))
   .directive('dropdownMenuBtn', require('./directive/dropdown-menu-btn'))
   .directive('excerpt', require('./directive/excerpt').directive)
   .directive('formInput', require('./directive/form-input'))

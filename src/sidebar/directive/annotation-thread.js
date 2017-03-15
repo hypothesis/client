@@ -97,28 +97,24 @@ function AnnotationThreadController() {
 /**
  * Renders a thread of annotations.
  */
-module.exports = function () {
-  return {
-    restrict: 'E',
-    bindToController: true,
-    controllerAs: 'vm',
-    controller: AnnotationThreadController,
-    scope: {
-      /** The annotation thread to render. */
-      thread: '<',
-      /**
-       * Specify whether document information should be shown
-       * on annotation cards.
-       */
-      showDocumentInfo: '<',
-      /** Called when the user clicks on the expand/collapse replies toggle. */
-      onChangeCollapsed: '&',
-      /**
-       * Called when the user clicks the button to show this thread or
-       * one of its replies.
-       */
-      onForceVisible: '&',
-    },
-    template: require('../templates/annotation_thread.html'),
-  };
+module.exports = {
+  controllerAs: 'vm',
+  controller: AnnotationThreadController,
+  bindings: {
+    /** The annotation thread to render. */
+    thread: '<',
+    /**
+     * Specify whether document information should be shown
+     * on annotation cards.
+     */
+    showDocumentInfo: '<',
+    /** Called when the user clicks on the expand/collapse replies toggle. */
+    onChangeCollapsed: '&',
+    /**
+     * Called when the user clicks the button to show this thread or
+     * one of its replies.
+     */
+    onForceVisible: '&',
+  },
+  template: require('../templates/annotation_thread.html'),
 };
