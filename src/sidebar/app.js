@@ -139,8 +139,9 @@ module.exports = angular.module('h', [
   .component('annotation', require('./directive/annotation').component)
   .component('annotationShareDialog', require('./directive/annotation-share-dialog'))
   .component('annotationThread', require('./directive/annotation-thread'))
+  .component('dropdownMenuBtn', require('./directive/dropdown-menu-btn'))
+  .component('publishAnnotationBtn', require('./directive/publish-annotation-btn'))
 
-  .directive('dropdownMenuBtn', require('./directive/dropdown-menu-btn'))
   .directive('excerpt', require('./directive/excerpt').directive)
   .directive('formInput', require('./directive/form-input'))
   .directive('formValidate', require('./directive/form-validate'))
@@ -154,7 +155,6 @@ module.exports = angular.module('h', [
   .directive('loginControl', require('./directive/login-control'))
   .directive('loginForm', require('./directive/login-form').directive)
   .directive('markdown', require('./directive/markdown'))
-  .directive('publishAnnotationBtn', require('./directive/publish-annotation-btn'))
   .directive('searchStatusBar', require('./directive/search-status-bar'))
   .directive('shareDialog', require('./directive/share-dialog'))
   .directive('sidebarTutorial', require('./directive/sidebar-tutorial').directive)

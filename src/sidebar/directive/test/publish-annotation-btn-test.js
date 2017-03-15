@@ -17,8 +17,8 @@ var fakeLocalStorage = {
 describe('publishAnnotationBtn', function () {
   before(function () {
     angular.module('app', [])
-      .directive('dropdownMenuBtn', require('../dropdown-menu-btn'))
-      .directive('publishAnnotationBtn', require('../publish-annotation-btn'))
+      .component('dropdownMenuBtn', require('../dropdown-menu-btn'))
+      .component('publishAnnotationBtn', require('../publish-annotation-btn'))
       .factory('localStorage', function () {
         return fakeLocalStorage;
       });
