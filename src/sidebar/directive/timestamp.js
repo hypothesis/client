@@ -42,19 +42,15 @@ function TimestampController($scope, time) {
   };
 }
 
-module.exports = function () {
-  return {
-    bindToController: true,
-    controller: TimestampController,
-    controllerAs: 'vm',
-    restrict: 'E',
-    scope: {
-      className: '<',
-      href: '<',
-      timestamp: '<',
-    },
-    template: ['<a class="{{vm.className}}" target="_blank" ng-title="vm.absoluteTimestamp"',
-               ' href="{{vm.href}}"',
-               '>{{vm.relativeTimestamp}}</a>'].join(''),
-  };
+module.exports = {
+  controller: TimestampController,
+  controllerAs: 'vm',
+  bindings: {
+    className: '<',
+    href: '<',
+    timestamp: '<',
+  },
+  template: ['<a class="{{vm.className}}" target="_blank" ng-title="vm.absoluteTimestamp"',
+             ' href="{{vm.href}}"',
+             '>{{vm.relativeTimestamp}}</a>'].join(''),
 };

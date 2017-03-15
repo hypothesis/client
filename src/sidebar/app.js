@@ -146,6 +146,7 @@ module.exports = angular.module('h', [
   .component('loginControl', require('./directive/login-control'))
   .component('loginForm', require('./directive/login-form').component)
   .component('publishAnnotationBtn', require('./directive/publish-annotation-btn'))
+  .component('timestamp', require('./directive/timestamp'))
 
   .directive('excerpt', require('./directive/excerpt').directive)
   .directive('formInput', require('./directive/form-input'))
@@ -166,7 +167,6 @@ module.exports = angular.module('h', [
   .directive('svgIcon', require('./directive/svg-icon'))
   .directive('tagEditor', require('./directive/tag-editor'))
   .directive('threadList', require('./directive/thread-list'))
-  .directive('timestamp', require('./directive/timestamp'))
   .directive('topBar', require('./directive/top-bar'))
   .directive('windowScroll', require('./directive/window-scroll'))
 
