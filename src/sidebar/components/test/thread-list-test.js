@@ -8,7 +8,7 @@ var immutable = require('seamless-immutable');
 
 var events = require('../../events');
 var threadList = require('../thread-list');
-var util = require('./util');
+var util = require('../../directive/test/util');
 
 var annotFixtures = immutable({
   annotation: {$tag: 't1', id: '1', text: 'text'},

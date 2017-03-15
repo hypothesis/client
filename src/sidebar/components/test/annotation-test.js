@@ -7,7 +7,7 @@ var proxyquire = require('proxyquire');
 var events = require('../../events');
 var fixtures = require('../../test/annotation-fixtures');
 var testUtil = require('../../../shared/test/util');
-var util = require('./util');
+var util = require('../../directive/test/util');
 
 var inject = angular.mock.inject;
 

@@ -2,7 +2,7 @@
 
 var angular = require('angular');
 
-var util = require('./util');
+var util = require('../../directive/test/util');
 
 function PageObject(element) {
   this.unknownLoginText = function () {
