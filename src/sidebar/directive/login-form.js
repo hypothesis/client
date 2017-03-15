@@ -93,18 +93,16 @@ function Controller($scope, $timeout, flash, session, formRespond, serviceUrl) {
   });
 }
 
-module.exports = {
-  directive: function () {
-    return {
-      bindToController: true,
-      controller: Controller,
-      controllerAs: 'vm',
-      restrict: 'E',
-      scope: {
-        onClose: '&',
-      },
-      template: require('../templates/login_form.html'),
-    };
+var component = {
+  controller: Controller,
+  controllerAs: 'vm',
+  bindings: {
+    onClose: '&',
   },
+  template: require('../templates/login_form.html'),
+};
+
+module.exports = {
+  component: component,
   Controller: Controller,
 };
