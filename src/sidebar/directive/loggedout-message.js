@@ -6,7 +6,7 @@ module.exports = {
   controller: function (serviceUrl) {
     this.serviceUrl = serviceUrl;
   },
-  scope: {
+  bindings: {
     /**
      * Called when the user clicks on the "Log in" text.
      */
