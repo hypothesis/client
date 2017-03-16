@@ -2,7 +2,7 @@
 
 var angular = require('angular');
 
-var util = require('./util');
+var util = require('../../directive/test/util');
 var excerpt = require('../excerpt');
 
 describe('excerpt', function () {
