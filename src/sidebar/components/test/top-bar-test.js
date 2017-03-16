@@ -2,7 +2,7 @@
 
 var angular = require('angular');
 
-var util = require('./util');
+var util = require('../../directive/test/util');
 
 describe('topBar', function () {
   before(function () {
