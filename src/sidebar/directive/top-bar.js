@@ -1,26 +1,21 @@
 'use strict';
 
-module.exports = function () {
-  return {
-    controller: function () {},
-    restrict: 'E',
-    scope: {
-      auth: '<',
-      isSidebar: '<',
-      onShowHelpPanel: '&',
-      onLogin: '&',
-      onSignUp: '&',
-      onLogout: '&',
-      onSharePage: '&',
-      searchController: '<',
-      accountDialog: '<',
-      shareDialog: '<',
-      sortKey: '<',
-      sortKeysAvailable: '<',
-      onChangeSortKey: '&',
-      pendingUpdateCount: '<',
-      onApplyPendingUpdates: '&',
-    },
-    template: require('../templates/top_bar.html'),
-  };
+module.exports = {
+  controllerAs: 'vm',
+  bindings: {
+    auth: '<',
+    isSidebar: '<',
+    onShowHelpPanel: '&',
+    onLogin: '&',
+    onLogout: '&',
+    onSharePage: '&',
+    onSignUp: '&',
+    searchController: '<',
+    sortKey: '<',
+    sortKeysAvailable: '<',
+    onChangeSortKey: '&',
+    pendingUpdateCount: '<',
+    onApplyPendingUpdates: '&',
+  },
+  template: require('../templates/top_bar.html'),
 };

@@ -7,7 +7,7 @@ var util = require('./util');
 describe('topBar', function () {
   before(function () {
     angular.module('app', [])
-      .directive('topBar', require('../top-bar'));
+      .component('topBar', require('../top-bar'));
   });
 
   beforeEach(function () {

@@ -2,19 +2,19 @@
 !-->
 <div class="top-bar" ng-class="frame.visible && 'shown'" ng-cloak>
   <!-- Legacy design for top bar, as used in the stream !-->
-  <div class="top-bar__inner content" ng-if="::!isSidebar">
+  <div class="top-bar__inner content" ng-if="::!vm.isSidebar">
     <search-input
       class="search-input"
-      query="searchController.query()"
-      on-search="searchController.update($query)"
+      query="vm.searchController.query()"
+      on-search="vm.searchController.update($query)"
       always-expanded="true">
     </search-input>
     <div class="top-bar__expander"></div>
     <login-control
-      auth="auth"
+      vm.auth="vm.auth"
       new-style="false"
-      on-show-help-panel="onShowHelpPanel()"
-      on-login="onLogin()"
+      on-show-help-panel="vm.onShowHelpPanel()"
+      on-login="vm.onLogin()"
       on-logout="onLogout()">
     </login-control>
   </div>
@@ -23,41 +23,41 @@
        The inner div is styled with 'content' to center it in
        the stream view.
   !-->
-  <div class="top-bar__inner content" ng-if="::isSidebar">
-    <group-list class="group-list" auth="auth"></group-list>
+  <div class="top-bar__inner content" ng-if="::vm.isSidebar">
+    <group-list class="group-list" vm.auth="vm.auth"></group-list>
     <div class="top-bar__expander"></div>
     <a class="top-bar__apply-update-btn"
-       ng-if="pendingUpdateCount > 0"
-       ng-click="onApplyPendingUpdates()"
+       ng-if="vm.pendingUpdateCount > 0"
+       ng-click="vm.onApplyPendingUpdates()"
        h-tooltip
        tooltip-direction="up"
-       aria-label="Show {{pendingUpdateCount}} new/updated annotation(s)">
+       aria-label="Show {{vm.pendingUpdateCount}} new/updated annotation(s)">
        <svg-icon class="top-bar__apply-icon" name="'refresh'"></svg-icon>
     </a>
     <search-input
       class="search-input"
-      query="searchController.query()"
-      on-search="searchController.update($query)"
+      query="vm.searchController.query()"
+      on-search="vm.searchController.update($query)"
       title="Filter the annotation list">
     </search-input>
     <sort-dropdown
-      sort-keys-available="sortKeysAvailable"
-      sort-key="sortKey"
-      on-change-sort-key="onChangeSortKey({sortKey: sortKey})">
+      sort-keys-available="vm.sortKeysAvailable"
+      sort-key="vm.sortKey"
+      on-change-sort-key="vm.onChangeSortKey({vm.sortKey: vm.sortKey})">
     </sort-dropdown>
     <a class="top-bar__btn"
-       ng-click="onSharePage()"
+       ng-click="vm.onSharePage()"
        title="Share this page">
       <i class="h-icon-annotation-share"></i>
     </a>
     <login-control
       class="login-control"
-      auth="auth"
+      vm.auth="vm.auth"
       new-style="true"
-      on-show-help-panel="onShowHelpPanel()"
-      on-login="onLogin()"
-      on-logout="onLogout()"
-      on-sign-up="onSignUp()">
+      on-show-help-panel="vm.onShowHelpPanel()"
+      on-login="vm.onLogin()"
+      on-logout="vm.onLogout()"
+      on-sign-up="vm.onSignUp()">
     </login-control>
   </div>
 </div>
