@@ -202,7 +202,7 @@ module.exports = angular.module('h', [
   .factory('store', require('./store'))
 
   .value('Discovery', require('../shared/discovery'))
-  .value('ExcerptOverflowMonitor', require('./directive/excerpt-overflow-monitor'))
+  .value('ExcerptOverflowMonitor', require('./util/excerpt-overflow-monitor'))
   .value('VirtualThreadList', require('./virtual-thread-list'))
   .value('raven', require('./raven'))
   .value('settings', settings)
