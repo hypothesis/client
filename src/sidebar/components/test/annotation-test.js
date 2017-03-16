@@ -138,6 +138,7 @@ describe('annotation', function() {
           },
         }),
         deleteAnnotation: sandbox.stub(),
+        flagAnnotation: sandbox.stub(),
       };
 
       var fakeAnnotationUI = {};
@@ -686,6 +687,47 @@ describe('annotation', function() {
           done();
         });
         $timeout.flush();
+      });
+    });
+
+    describe('#flag()', function() {
+      beforeEach(function() {
+        fakeAnnotationMapper.flagAnnotation = sandbox.stub();
+      });
+
+      it(
+        'calls annotationMapper.flag() when an annotation is flagged',
+        function(done) {
+          var parts = createDirective();
+          fakeAnnotationMapper.flagAnnotation.returns($q.resolve());
+          parts.controller.flag();
+          assert.calledWith(fakeAnnotationMapper.flagAnnotation,
+              parts.annotation);
+          done();
+        }
+      );
+
+      it('flashes an error if the flag fails', function(done) {
+        var controller = createDirective().controller;
+        fakeAnnotationMapper.flagAnnotation.returns(Promise.reject({
+          status: 500,
+          statusText: 'Server error',
+        }));
+        controller.flag();
+        setTimeout(function () {
+          assert.calledWith(fakeFlash.error, '500 Server error', 'Flagging annotation failed');
+          done();
+        }, 0);
+      });
+
+      it('doesn\'t flash an error if the flag succeeds', function(done) {
+        var controller = createDirective().controller;
+        fakeAnnotationMapper.flagAnnotation.returns($q.resolve());
+        controller.flag();
+        setTimeout(function () {
+          assert.notCalled(fakeFlash.error);
+          done();
+        }, 0);
       });
     });
 

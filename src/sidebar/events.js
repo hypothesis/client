@@ -31,6 +31,9 @@ module.exports = {
   /** An annotation was either deleted or unloaded. */
   ANNOTATION_DELETED: 'annotationDeleted',
 
+  /** An annotation was flagged. */
+  ANNOTATION_FLAGGED: 'annotationFlagged',
+
   /** An annotation has been updated. */
   ANNOTATION_UPDATED: 'annotationUpdated',
 
