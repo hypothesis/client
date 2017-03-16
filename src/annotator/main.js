@@ -23,6 +23,7 @@ Annotator.Guest = require('./guest');
 Annotator.Host = require('./host');
 Annotator.Sidebar = require('./sidebar');
 Annotator.PdfSidebar = require('./pdf-sidebar');
+Annotator.ReadiumSidebar = require('./readium-sidebar');
 
 // UI plugins
 Annotator.Plugin.BucketBar = require('./plugin/bucket-bar');
@@ -30,6 +31,7 @@ Annotator.Plugin.Toolbar = require('./plugin/toolbar');
 
 // Document type plugins
 Annotator.Plugin.PDF = require('./plugin/pdf');
+Annotator.Plugin.Readium = require('./plugin/readium');
 require('./vendor/annotator.document');  // Does not export the plugin :(
 
 // Cross-frame communication
@@ -43,9 +45,13 @@ var appLinkEl =
 var options = require('./config')(window);
 
 Annotator.noConflict().$.noConflict(true)(function() {
-  var Klass = window.PDFViewerApplication ?
-      Annotator.PdfSidebar :
-      Annotator.Sidebar;
+  var Klass = Annotator.Sidebar;
+  if (window.PDFViewerApplication) {
+    Klass = Annotator.PdfSidebar;
+  } else if (window.ReadiumSDK) {
+    Klass = Annotator.ReadiumSidebar;
+  }
+
   if (options.hasOwnProperty('constructor')) {
     Klass = options.constructor;
     delete options.constructor;
