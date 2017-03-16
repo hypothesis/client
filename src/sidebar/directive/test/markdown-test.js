@@ -41,7 +41,7 @@ describe('markdown', function () {
 
   before(function () {
     angular.module('app', ['ngSanitize'])
-      .directive('markdown', proxyquire('../markdown', noCallThru({
+      .component('markdown', proxyquire('../markdown', noCallThru({
         angular: angular,
         katex: {
           renderToString: function (input) {
@@ -217,7 +217,7 @@ describe('markdown', function () {
     }
 
     function isPreviewing() {
-      return editor.isolateScope().preview;
+      return editor.ctrl.preview;
     }
 
     beforeEach(function () {
