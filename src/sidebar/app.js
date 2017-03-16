@@ -140,7 +140,7 @@ module.exports = angular.module('h', [
   .component('annotationShareDialog', require('./components/annotation-share-dialog'))
   .component('annotationThread', require('./components/annotation-thread'))
   .component('dropdownMenuBtn', require('./components/dropdown-menu-btn'))
-  .component('groupList', require('./directive/group-list').component)
+  .component('groupList', require('./components/group-list').component)
   .component('helpLink', require('./components/help-link'))
   .component('helpPanel', require('./components/help-panel'))
   .component('loggedoutMessage', require('./components/loggedout-message'))
