@@ -140,6 +140,7 @@ module.exports = angular.module('h', [
   .component('annotationShareDialog', require('./components/annotation-share-dialog'))
   .component('annotationThread', require('./components/annotation-thread'))
   .component('dropdownMenuBtn', require('./components/dropdown-menu-btn'))
+  .component('excerpt', require('./directive/excerpt').component)
   .component('groupList', require('./components/group-list'))
   .component('helpLink', require('./components/help-link'))
   .component('helpPanel', require('./components/help-panel'))
@@ -163,7 +164,6 @@ module.exports = angular.module('h', [
   .directive('markdown', require('./directive/markdown'))
   .directive('topBar', require('./directive/top-bar'))
 
-  .directive('excerpt', require('./directive/excerpt').directive)
   .directive('formInput', require('./directive/form-input'))
   .directive('formValidate', require('./directive/form-validate'))
   .directive('hAutofocus', require('./directive/h-autofocus'))
