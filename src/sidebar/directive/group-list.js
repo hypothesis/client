@@ -4,12 +4,18 @@ var persona = require('../filter/persona');
 var serviceConfig = require('../service-config');
 
 // @ngInject
-function GroupListController($scope, $window, groups, settings) {
-  $scope.isThirdPartyUser = function () {
-    return persona.isThirdPartyUser($scope.auth.userid, settings.authDomain);
+function GroupListController($window, groups, settings, serviceUrl) {
+  this.groups = groups;
+
+  this.createNewGroup = function() {
+    $window.open(serviceUrl('groups.new'), '_blank');
   };
 
-  $scope.leaveGroup = function (groupId) {
+  this.isThirdPartyUser = function () {
+    return persona.isThirdPartyUser(this.auth.userid, settings.authDomain);
+  };
+
+  this.leaveGroup = function (groupId) {
     var groupName = groups.get(groupId).name;
     var message = 'Are you sure you want to leave the group "' +
       groupName + '"?';
@@ -18,42 +24,26 @@ function GroupListController($scope, $window, groups, settings) {
     }
   };
 
-  $scope.focusGroup = function (groupId) {
+  this.focusGroup = function (groupId) {
     groups.focus(groupId);
   };
 
   var svc = serviceConfig(settings);
   if (svc && svc.icon) {
-    $scope.thirdPartyGroupIcon = svc.icon;
+    this.thirdPartyGroupIcon = svc.icon;
   }
 }
 
-/**
- * @ngdoc directive
- * @name groupList
- * @restrict E
- * @description Displays a list of groups of which the user is a member.
- */
-// @ngInject
-function groupList($window, groups, serviceUrl) {
-  return {
-    controller: GroupListController,
-    link: function ($scope) {
-      $scope.groups = groups;
-
-      $scope.createNewGroup = function() {
-        $window.open(serviceUrl('groups.new'), '_blank');
-      };
-    },
-    restrict: 'E',
-    scope: {
-      auth: '<',
-    },
-    template: require('../templates/group_list.html'),
-  };
-}
+var component = {
+  controller: GroupListController,
+  controllerAs: 'vm',
+  bindings: {
+    auth: '<',
+  },
+  template: require('../templates/group_list.html'),
+};
 
 module.exports = {
-  directive: groupList,
+  component: component,
   Controller: GroupListController,
 };
