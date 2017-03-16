@@ -3,7 +3,7 @@
 var angular = require('angular');
 var proxyquire = require('proxyquire');
 
-var util = require('./util');
+var util = require('../../directive/test/util');
 var noCallThru = require('../../../shared/test/util').noCallThru;
 
 describe('markdown', function () {
