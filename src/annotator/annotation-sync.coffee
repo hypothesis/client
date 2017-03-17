@@ -29,6 +29,17 @@ module.exports = class AnnotationSync
     for method, func of @_channelListeners
       @bridge.on(method, func.bind(this))
 
+  # THESIS TODO: Add support for multiple @_on and @_emit
+  registerMethods: (options, guestId) ->
+    @_on = options.on
+    @_emit = options.emit
+
+    for event, handler of @_eventListeners
+      this._on(event, handler.bind(this))
+
+    for method, func of @_channelListeners
+      @bridge.on(method, func.bind(this), guestId)
+
   sync: (annotations) ->
     annotations = (this._format a for a in annotations)
     @bridge.call 'sync', annotations, (err, annotations = []) =>

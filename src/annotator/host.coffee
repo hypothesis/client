@@ -3,7 +3,9 @@ $ = Annotator.$
 
 Guest = require('./guest')
 
-module.exports = class Host extends Guest
+module.exports = class Host extends Annotator
+  SHOW_HIGHLIGHTS_CLASS = 'annotator-highlights-always-on'
+
   constructor: (element, options) ->
     # Make a copy of all options except `options.app`, the app base URL.
     configParam = 'config=' + encodeURIComponent(
@@ -28,19 +30,38 @@ module.exports = class Host extends Guest
     .addClass('annotator-frame annotator-outer')
     .appendTo(element)
 
-    super
+    super(element, options)
+
+    @guests = {}
+
+    cfOptions =
+      on: (event, handler) =>
+        this.subscribe(event, handler)
+      emit: (event, args...) =>
+        this.publish(event, args)
+
+    this.addPlugin('CrossFrame', cfOptions)
+    @crossframe = this.plugins.CrossFrame
+
+    @crossframe.onConnect(=> this.publish('panelReady'))
+
+    for own name, opts of @options
+      if not @plugins[name] and Annotator.Plugin[name]
+        this.addPlugin(name, opts)
 
     app.appendTo(@frame)
+    @showHighlights = options.showHighlights || true
 
-    this.on 'panelReady', =>
-      # Initialize tool state.
-      if options.showHighlights == undefined
-        # Highlights are on by default.
-        options.showHighlights = true
-      this.setVisibleHighlights(options.showHighlights)
+    # THESIS TODO: Remove this code if it's not needed
+#    this.on 'panelReady', =>
+#      # Initialize tool state.
+#      if options.showHighlights == undefined
+#        # Highlights are on by default.
+#        options.showHighlights = true
+#      this.setVisibleHighlights(options.showHighlights)
 
-      # Show the UI
-      @frame.css('display', '')
+    # Show the UI
+    @frame.css('display', '')
 
     this.on 'beforeAnnotationCreated', (annotation) ->
       # When a new non-highlight annotation is created, focus
@@ -49,6 +70,23 @@ module.exports = class Host extends Guest
       if !annotation.$highlight
         app[0].contentWindow.focus()
 
+  addGuest: (guestElement, guestId, options) ->
+    options = @options
+    options.guestId = guestId
+    options.crossframe = @crossframe
+    guest = new Guest(guestElement, options)
+    guest.setVisibleHighlights(@showHighlights)
+
+    this.guests[guestId] = guest
+
   destroy: ->
     @frame.remove()
-    super
+    @destroyAllGuests()
+
+  destroyAllGuests: ->
+    for guestId, guest of @guests
+      destroyGuest(guestId)
+
+  destroyGuest: (guestId) ->
+    @guests[guestId].destroy()
+    delete @guests[guestId]

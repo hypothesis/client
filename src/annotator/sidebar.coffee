@@ -105,6 +105,16 @@ module.exports = class Sidebar extends Host
         @frame.css('margin-left', "#{m}px")
         if w >= MIN_RESIZE then @frame.css('width', "#{w}px")
 
+  addGuest: (guestElement, guestId) ->
+    super(guestElement, guestId)
+
+    guestEl = @guests[guestId]
+    sidebarTrigger(guestEl.element[0], @show.bind(this))
+
+    guestEl.on 'click', (event) =>
+      if !@selectedTargets?.length
+        this.hide()
+
   onPan: (event) =>
     switch event.type
       when 'panstart'

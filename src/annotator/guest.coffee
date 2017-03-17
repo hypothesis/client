@@ -51,6 +51,7 @@ module.exports = class Guest extends Annotator
   anchors: null
   visibleHighlights: false
   guestDocument: null
+  guestId: null
 
   html: extend {}, Annotator::html,
     adder: '<hypothesis-adder></hypothesis-adder>';
@@ -61,6 +62,7 @@ module.exports = class Guest extends Annotator
 
     self = this
     this.guestDocument = guestElement.ownerDocument
+    this.guestId = options.guestId
 
     this.adderCtrl = new adder.Adder(@adder[0], {
       onAnnotate: ->
@@ -80,18 +82,27 @@ module.exports = class Guest extends Annotator
 
     this.anchors = []
 
+    this._setCrossframe(options.crossframe) unless !options.crossframe
+
+    # THESIS TODO: Do guests need these plugins?
+    # Load plugins
+#    for own name, opts of @options
+#      if not @plugins[name] and Annotator.Plugin[name]
+#        this.addPlugin(name, opts)
+
+  _setCrossframe: (crossframe) ->
     cfOptions =
       on: (event, handler) =>
         this.subscribe(event, handler)
       emit: (event, args...) =>
         this.publish(event, args)
 
-    this.addPlugin('CrossFrame', cfOptions)
-    @crossframe = this.plugins.CrossFrame
+    this.plugins.CrossFrame = @options.crossframe
+    @crossframe = @options.crossframe
 
-    @crossframe.onConnect(=> this.publish('panelReady'))
+    @crossframe.annotationSync.registerMethods(cfOptions, this.guestId)
     this._connectAnnotationSync(@crossframe)
-    this._connectAnnotationUISync(@crossframe)
+    this._connectAnnotationUISync(@crossframe, @guestId)
 
     # Load plugins
     for own name, opts of @options
@@ -127,24 +138,28 @@ module.exports = class Guest extends Annotator
       for annotation in annotations
         this.anchor(annotation)
 
-  _connectAnnotationUISync: (crossframe) ->
+  _connectAnnotationUISync: (crossframe, guestId) ->
     crossframe.on 'focusAnnotations', (tags=[]) =>
       for anchor in @anchors when anchor.highlights?
         toggle = anchor.annotation.$tag in tags
         $(anchor.highlights).toggleClass('annotator-hl-focused', toggle)
+    , guestId
 
     crossframe.on 'scrollToAnnotation', (tag) =>
       for anchor in @anchors when anchor.highlights?
         if anchor.annotation.$tag is tag
           scrollIntoView(anchor.highlights[0])
+    , guestId
 
     crossframe.on 'getDocumentInfo', (cb) =>
       this.getDocumentInfo()
       .then((info) -> cb(null, info))
       .catch((reason) -> cb(reason))
+    , guestId
 
     crossframe.on 'setVisibleHighlights', (state) =>
       this.setVisibleHighlights(state)
+    , guestId
 
   _setupWrapper: ->
     @wrapper = @element
@@ -172,6 +187,7 @@ module.exports = class Guest extends Annotator
       @plugins[name].destroy()
 
     this.removeEvents()
+    @crossframe.removeGuestListener(@guestId)
 
   anchor: (annotation) ->
     self = this

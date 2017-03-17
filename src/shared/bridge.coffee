@@ -11,6 +11,11 @@ module.exports = class Bridge
 
   constructor: ->
     @links = []
+    # THESIS TODO: @guestListeners are currently never used. Figure out where
+    # @channelListeners are used, and add support for @guestListeners
+    @guestListeners = {}
+    # THESIS TODO: FOR DEBUG PURPOSES, REMOVE AT SOME POINT
+    window.guestListeners = @guestListeners
     @channelListeners = {}
     @onConnectListeners = []
 
@@ -36,7 +41,7 @@ module.exports = class Bridge
         cb()
         ready()
 
-    listeners = extend({connect}, @channelListeners)
+    listeners = extend({connect}, @channelListeners, {@guestListeners})
 
     # Set up a channel
     channel = new RPC(window, source, origin, listeners)
@@ -90,15 +95,32 @@ module.exports = class Bridge
 
     return resultPromise
 
-  on: (method, callback) ->
-    if @channelListeners[method]
-      throw new Error("Listener '#{method}' already bound in Bridge")
-    @channelListeners[method] = callback
+  on: (method, callback, guestId) ->
+    # If the guestId is set, place create listeners in the guestListeners object,
+    # Otherwise use channelListeners
+    channelListeners = @channelListeners
+    if guestId
+      @guestListeners[guestId] = {} unless @guestListeners[guestId]
+      channelListeners = @guestListeners[guestId]
+
+    if channelListeners[method]
+      # If the guestId is set, then specify which guest the listener is already bound to
+      withinGuest = if guestId then " within guest '#{guestId}'" else ""
+      errorMessage = "Listener '#{method}'#{withinGuest} already bound in Bridge"
+      throw new Error(errorMessage)
+
+    channelListeners[method] = callback
     return this
 
-  off: (method) ->
-    delete @channelListeners[method]
+  off: (method, guestId) ->
+    channelListeners = @channelListeners
+    if guestId then channelListeners = guestListeners[guestId]
+
+    delete channelListeners[method]
     return this
+
+  removeGuestListener: (guestId) ->
+    delete @guestListeners[guestId]
 
   # Add a function to be called upon a new connection
   onConnect: (callback) ->
