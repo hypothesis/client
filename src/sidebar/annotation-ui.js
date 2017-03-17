@@ -120,6 +120,8 @@ module.exports = function ($rootScope, settings) {
     frames: framesReducer.frames,
     searchUris: framesReducer.searchUris,
 
+    isFeatureEnabled: sessionReducer.isFeatureEnabled,
+
     isSidebar: viewerReducer.isSidebar,
   }, store.getState);
 

@@ -2,6 +2,7 @@
 
 var events = require('./events');
 var bridgeEvents = require('../shared/bridge-events');
+var memoize = require('./util/memoize');
 var metadata = require('./annotation-metadata');
 var uiConstants = require('./ui-constants');
 
@@ -39,10 +40,26 @@ function formatAnnot(ann) {
  * sidebar.
  */
 // @ngInject
-function FrameSync($rootScope, $window, Discovery, annotationUI, bridge) {
+function FrameSync($rootScope, $window, Discovery, annotationUI, bridge,
+                   rootThread) {
 
   // Set of tags of annotations that are currently loaded into the frame
   var inFrame = new Set();
+
+  /**
+   * Return the list of annotations which are currently visible in the sidebar.
+   */
+  var visibleAnnotations = memoize(function (state) {
+    // Generate the same root thread that will be used for rendering the
+    // annotation list in the sidebar. Either this call or the one that happens
+    // when rendering threads should be cheap because `rootThread.thread` is
+    // memoized for a given input state.
+    return rootThread.thread(state).children.map(function (thread) {
+      return thread.annotation;
+    }).filter(function (ann) {
+      return !!ann;
+    });
+  });
 
   /**
    * Watch for changes to the set of annotations displayed in the sidebar and
@@ -56,7 +73,10 @@ function FrameSync($rootScope, $window, Discovery, annotationUI, bridge) {
 
     annotationUI.subscribe(function () {
       var state = annotationUI.getState();
-      if (state.annotations === prevAnnotations &&
+      var visibleAnns = annotationUI.isFeatureEnabled('filter_highlights') ?
+        visibleAnnotations(state) : state.annotations;
+
+      if (visibleAnns === prevAnnotations &&
           state.frames === prevFrames) {
         return;
       }
@@ -65,7 +85,7 @@ function FrameSync($rootScope, $window, Discovery, annotationUI, bridge) {
       var inSidebar = new Set();
       var added = [];
 
-      state.annotations.forEach(function (annot) {
+      visibleAnns.forEach(function (annot) {
         if (metadata.isReply(annot)) {
           // The frame does not need to know about replies
           return;
@@ -83,7 +103,7 @@ function FrameSync($rootScope, $window, Discovery, annotationUI, bridge) {
       var deleted = prevAnnotations.filter(function (annot) {
         return !inSidebar.has(annot.$tag);
       });
-      prevAnnotations = state.annotations;
+      prevAnnotations = visibleAnns;
       prevFrames = state.frames;
 
       // We currently only handle adding and removing annotations from the frame

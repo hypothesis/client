@@ -53,6 +53,7 @@ var fixtures = {
 describe('FrameSync', function () {
   var fakeAnnotationUI;
   var fakeBridge;
+  var fakeRootThread;
   var frameSync;
   var $rootScope;
 
@@ -65,6 +66,7 @@ describe('FrameSync', function () {
     fakeAnnotationUI = fakeStore({annotations: []}, {
       connectFrame: sinon.stub(),
       destroyFrame: sinon.stub(),
+      isFeatureEnabled: sinon.stub().returns(false),
       findIDsForTags: sinon.stub(),
       focusAnnotations: sinon.stub(),
       frames: sinon.stub().returns([fixtures.framesListEntry]),
@@ -86,6 +88,10 @@ describe('FrameSync', function () {
       emit: emitter.emit.bind(emitter),
     };
 
+    fakeRootThread = {
+      thread: sinon.stub(),
+    };
+
     function FakeDiscovery() {
       this.startDiscovery = sinon.stub();
     }
@@ -94,6 +100,7 @@ describe('FrameSync', function () {
       Discovery: FakeDiscovery,
       annotationUI: fakeAnnotationUI,
       bridge: fakeBridge,
+      rootThread: fakeRootThread,
     });
 
     angular.mock.inject(function (_$rootScope_, _frameSync_) {
@@ -129,6 +136,45 @@ describe('FrameSync', function () {
     it('does not send a "loadAnnotations" message for replies', function () {
       fakeAnnotationUI.setState({annotations: [annotationFixtures.newReply()]});
       assert.isFalse(fakeBridge.call.calledWith('loadAnnotations'));
+    });
+  });
+
+  context('when the visible set of annotations changes', function () {
+    beforeEach(function () {
+      // Fake version of `thread` which just shows or hides all annotations
+      // based on a state flag.
+      fakeRootThread.thread = function (state) {
+        var visibleAnns = state.showAll ? state.annotations.map(function (ann) {
+          return { annotation: ann };
+        }) : [];
+
+        return { children: visibleAnns };
+      };
+
+      // Enable the 'filter_highlights' feature flag
+      fakeAnnotationUI.isFeatureEnabled.returns(true);
+
+      fakeAnnotationUI.setState({annotations: [fixtures.ann], showAll: false});
+      fakeBridge.call.reset();
+    });
+
+    it('sends a "loadAnnotations" message for newly visible annotations', function () {
+      fakeAnnotationUI.setState({annotations: [fixtures.ann], showAll: true});
+
+      assert.calledWithMatch(fakeBridge.call, 'loadAnnotations', sinon.match([
+        formatAnnot(fixtures.ann),
+      ]));
+    });
+
+    it('sends a "deleteAnnotation" message for newly hidden annotations', function () {
+      fakeAnnotationUI.setState({annotations: [fixtures.ann], showAll: true});
+      fakeBridge.call.reset();
+
+      fakeAnnotationUI.setState({annotations: [fixtures.ann], showAll: false});
+
+      assert.calledWithMatch(fakeBridge.call, 'deleteAnnotation', sinon.match(
+        formatAnnot(fixtures.ann)
+      ));
     });
   });
 
