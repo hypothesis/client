@@ -21,15 +21,11 @@ function SvgIconController($element) {
   $element[0].innerHTML = icons[this.name];
 }
 
-module.exports = function () {
-  return {
-    bindToController: true,
-    controllerAs: 'vm',
-    restrict: 'E',
-    controller: SvgIconController,
-    scope: {
-      /** The name of the icon to load. */
-      name: '<',
-    },
-  };
+module.exports = {
+  controllerAs: 'vm',
+  controller: SvgIconController,
+  bindings: {
+    /** The name of the icon to load. */
+    name: '<',
+  },
 };

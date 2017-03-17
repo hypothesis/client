@@ -7,7 +7,7 @@ var util = require('./util');
 describe('svgIcon', function () {
   before(function () {
     angular.module('app', [])
-      .directive('svgIcon', require('../svg-icon'));
+      .component('svgIcon', require('../svg-icon'));
   });
 
   beforeEach(function () {

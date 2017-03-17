@@ -11,7 +11,7 @@ describe('timestamp', function () {
 
   before(function () {
     angular.module('app',[])
-      .directive('timestamp', require('../timestamp'));
+      .component('timestamp', require('../timestamp'));
   });
 
   beforeEach(function () {

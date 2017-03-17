@@ -1,31 +1,25 @@
 'use strict';
 
 // @ngInject
-function DropdownMenuBtnController($scope, $timeout) {
-  this.onClick = function () {
-    $scope.onClick();
-  };
-
+function DropdownMenuBtnController($timeout) {
+  var self = this;
   this.toggleDropdown = function($event) {
     $event.stopPropagation();
     $timeout(function () {
-      $scope.onToggleDropdown();
+      self.onToggleDropdown();
     }, 0);
   };
 }
 
-module.exports = function () {
-  return {
-    controller: DropdownMenuBtnController,
-    controllerAs: 'vm',
-    restrict: 'E',
-    scope: {
-      isDisabled: '<',
-      label: '<',
-      dropdownMenuLabel: '@',
-      onClick: '&',
-      onToggleDropdown: '&',
-    },
-    template: require('../templates/dropdown_menu_btn.html'),
-  };
+module.exports = {
+  controller: DropdownMenuBtnController,
+  controllerAs: 'vm',
+  bindings: {
+    isDisabled: '<',
+    label: '<',
+    dropdownMenuLabel: '@',
+    onClick: '&',
+    onToggleDropdown: '&',
+  },
+  template: require('../templates/dropdown_menu_btn.html'),
 };

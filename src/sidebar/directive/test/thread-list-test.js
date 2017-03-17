@@ -84,7 +84,7 @@ describe('threadList', function () {
 
   before(function () {
     angular.module('app', [])
-      .directive('threadList', threadList);
+      .component('threadList', threadList);
   });
 
   beforeEach(function () {

@@ -7,7 +7,7 @@ var util = require('./util');
 describe('sortDropdown', function () {
   before(function () {
     angular.module('app', [])
-      .directive('sortDropdown', require('../sort-dropdown'));
+      .component('sortDropdown', require('../sort-dropdown'));
   });
 
   beforeEach(function () {

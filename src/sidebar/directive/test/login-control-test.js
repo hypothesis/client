@@ -28,7 +28,7 @@ function PageObject(element) {
 describe('loginControl', function () {
   before(function () {
     angular.module('app', [])
-      .directive('loginControl', require('../login-control'));
+      .component('loginControl', require('../login-control'));
   });
 
   beforeEach(function () {

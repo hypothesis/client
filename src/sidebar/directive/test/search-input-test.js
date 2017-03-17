@@ -9,7 +9,7 @@ describe('searchInput', function () {
 
   before(function () {
     angular.module('app', [])
-      .directive('searchInput', require('../search-input'));
+      .component('searchInput', require('../search-input'));
   });
 
   beforeEach(function () {

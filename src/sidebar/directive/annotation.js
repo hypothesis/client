@@ -556,23 +556,18 @@ function AnnotationController(
   init();
 }
 
-// @ngInject
-function annotation() {
-  return {
-    restrict: 'E',
-    bindToController: true,
-    controller: AnnotationController,
-    controllerAs: 'vm',
-    scope: {
-      annotation: '<',
-      showDocumentInfo: '<',
-      onReplyCountClick: '&',
-      replyCount: '<',
-      isCollapsed: '<',
-    },
-    template: require('../templates/annotation.html'),
-  };
-}
+var component = {
+  controller: AnnotationController,
+  controllerAs: 'vm',
+  bindings: {
+    annotation: '<',
+    showDocumentInfo: '<',
+    onReplyCountClick: '&',
+    replyCount: '<',
+    isCollapsed: '<',
+  },
+  template: require('../templates/annotation.html'),
+};
 
 module.exports = {
   // These private helper functions aren't meant to be part of the public
@@ -583,6 +578,6 @@ module.exports = {
   updateModel: updateModel,
 
   // These are meant to be the public API of this module.
-  directive: annotation,
+  component: component,
   Controller: AnnotationController,
 };

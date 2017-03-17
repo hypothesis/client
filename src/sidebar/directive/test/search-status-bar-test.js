@@ -7,7 +7,7 @@ var util = require('./util');
 describe('searchStatusBar', function () {
   before(function () {
     angular.module('app', [])
-      .directive('searchStatusBar', require('../search-status-bar'));
+      .component('searchStatusBar', require('../search-status-bar'));
   });
 
   beforeEach(function () {
