@@ -5,8 +5,9 @@ This section contains documentation for **developers** contributing code to
 the Hypothesis client.
 
 .. toctree::
-   :maxdepth: 3
+   :maxdepth: 2
 
    developing
    security
    envvars
+   arch/index
