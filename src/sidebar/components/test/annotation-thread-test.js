@@ -3,7 +3,7 @@
 var angular = require('angular');
 
 var annotationThread = require('../annotation-thread');
-var util = require('./util');
+var util = require('../../directive/test/util');
 
 function PageObject(element) {
   this.annotations = function () {

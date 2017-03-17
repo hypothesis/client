@@ -3,7 +3,7 @@
 var angular = require('angular');
 var escapeStringRegexp = require('escape-string-regexp');
 
-var util = require('./util');
+var util = require('../../directive/test/util');
 
 describe('timestamp', function () {
   var clock;

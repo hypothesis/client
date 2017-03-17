@@ -27,7 +27,7 @@ describe 'loginForm.Controller', ->
 
   before ->
     angular.module('h', [])
-    .controller('loginFormController', require('../directive/login-form').Controller)
+    .controller('loginFormController', require('../login-form').Controller)
 
   beforeEach module('h')
 
