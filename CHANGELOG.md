@@ -4,6 +4,21 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+### Changed
+
+- Reorganise Hypothesis Client docs and move them to [Read the
+  docs](https://h.readthedocs.io/projects/client/en/latest/)
+  ([#279](https://github.com/hypothesis/client/pull/279)).
+
+- Fix client failing to load on pages that define `self`
+  ([#278](https://github.com/hypothesis/client/pull/278)).
+
+- Support specifying annotation search queries in direct links via
+  `#annotations:query:{query}` syntax
+  ([#254](https://github.com/hypothesis/client/pull/254)).
+
 ## [1.3.0] - 2017-03-10
 
 ### Changed
