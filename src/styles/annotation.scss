@@ -261,3 +261,8 @@
     margin-bottom: $layout-h-margin - 3px;
   }
 }
+
+.annotation--flagged {
+  color: $brand-color;
+  cursor: default;
+}

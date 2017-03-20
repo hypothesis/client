@@ -17,6 +17,9 @@ describe('annotationMapper', function() {
       annotation: {
         delete: sinon.stub().returns(Promise.resolve({})),
       },
+      flag: {
+        create: sinon.stub().returns(Promise.resolve({})),
+      },
     };
     angular.module('app', [])
       .service('annotationMapper', require('../annotation-mapper'))
@@ -121,6 +124,24 @@ describe('annotationMapper', function() {
         id: 1,
         url: 'http://example.com',
       }]);
+    });
+  });
+
+  describe('#flagAnnotation()', function () {
+    it('flags an annotation', function () {
+      var ann = {id: 'test-id'};
+      annotationMapper.flagAnnotation(ann);
+      assert.calledOnce(fakeStore.flag.create);
+      assert.calledWith(fakeStore.flag.create, null, {annotation: ann.id});
+    });
+
+    it('emits the "annotationFlagged" event', function (done) {
+      sandbox.stub($rootScope, '$broadcast');
+      var ann = {id: 'test-id'};
+      annotationMapper.flagAnnotation(ann).then(function () {
+        assert.calledWith($rootScope.$broadcast,
+          events.ANNOTATION_FLAGGED, ann);
+      }).then(done, done);
     });
   });
 

@@ -54,11 +54,21 @@ function annotationMapper($rootScope, annotationUI, store) {
     });
   }
 
+  function flagAnnotation(annot) {
+    return store.flag.create(null,{
+      annotation: annot.id,
+    }).then(function () {
+      $rootScope.$broadcast(events.ANNOTATION_FLAGGED, annot);
+      return annot;
+    });
+  }
+
   return {
     loadAnnotations: loadAnnotations,
     unloadAnnotations: unloadAnnotations,
     createAnnotation: createAnnotation,
     deleteAnnotation: deleteAnnotation,
+    flagAnnotation: flagAnnotation,
   };
 }
 

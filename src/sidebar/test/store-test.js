@@ -67,6 +67,12 @@ describe('store', function () {
             url: 'http://example.com/api/annotations/:id',
           },
         },
+        flag: {
+          create: {
+            method: 'POST',
+            url: 'http://example.com/api/flags',
+          },
+        },
         search: {
           method: 'GET',
           url: 'http://example.com/api/search',
@@ -119,6 +125,18 @@ describe('store', function () {
     $httpBackend.expectDELETE('http://example.com/api/annotations/an-id')
       .respond(function () {
         return [200, {}, {}];
+      });
+    $httpBackend.flush();
+  });
+
+  it('flags an annotation', function (done) {
+    store.flag.create(null, {annotation: 'an-id'}).then(function () {
+      done();
+    });
+
+    $httpBackend.expectPOST('http://example.com/api/flags')
+      .respond(function () {
+        return [204, {}, {}];
       });
     $httpBackend.flush();
   });

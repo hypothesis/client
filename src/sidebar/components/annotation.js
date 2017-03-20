@@ -222,6 +222,22 @@ function AnnotationController(
 
   /**
     * @ngdoc method
+    * @name annotation.AnnotationController#flag
+    * @description Flag the annotation.
+    */
+  vm.flag = function() {
+    var onRejected = function(reason) {
+      flash.error(
+        errorMessage(reason), 'Flagging annotation failed');
+    };
+    annotationMapper.flagAnnotation(vm.annotation).then(function(){
+      analytics.track(analytics.events.ANNOTATION_FLAGGED);
+      vm.isFlagged = true;
+    }, onRejected);
+  };
+
+  /**
+    * @ngdoc method
     * @name annotation.AnnotationController#delete
     * @description Deletes the annotation.
     */

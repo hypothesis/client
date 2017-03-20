@@ -60,6 +60,7 @@ function analytics($analytics, $window, settings) {
     events: {
       ANNOTATION_CREATED: 'annotationCreated',
       ANNOTATION_DELETED: 'annotationDeleted',
+      ANNOTATION_FLAGGED: 'annotationFlagged',
       ANNOTATION_UPDATED: 'annotationUpdated',
       HIGHLIGHT_CREATED: 'highlightCreated',
       HIGHLIGHT_UPDATED: 'highlightUpdated',
