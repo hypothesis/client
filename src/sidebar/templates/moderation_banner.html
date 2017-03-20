@@ -7,9 +7,17 @@
     Flagged for review x{{ vm.flagCount() }}
   </span>
   <span ng-if="vm.isHidden()">
-    Hidden from users. Was reported x{{ vm.flagCount() }}
+    Hidden from users. Flagged x{{ vm.flagCount() }}
   </span>
   <span class="u-stretch"></span>
-  <button ng-if="!vm.isHidden()" ng-click="vm.hideAnnotation()">Hide</button>
-  <button ng-if="vm.isHidden()" ng-click="vm.unhideAnnotation()">Undo</button>
+  <button ng-if="!vm.isHidden()"
+          ng-click="vm.hideAnnotation()"
+          title="Hide this annotation from non-moderators">
+    Hide
+  </button>
+  <button ng-if="vm.isHidden()"
+          ng-click="vm.unhideAnnotation()"
+          title="Make this annotation visible to everyone">
+    Unhide
+  </button>
 </div>
