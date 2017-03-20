@@ -97,7 +97,7 @@ describe('moderationBanner', function () {
     }, 0);
   });
 
-  it('unhides the annotation if "Undo" is clicked', function () {
+  it('unhides the annotation if "Unhide" is clicked', function () {
     fakeAnnotationUI.isHiddenByModerator.returns(true);
     var banner = createBanner({ annotationId: 'hidden-id'} );
 
