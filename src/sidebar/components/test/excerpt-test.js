@@ -25,7 +25,7 @@ describe('excerpt', function () {
 
   before(function () {
     angular.module('app', [])
-      .component('excerpt', excerpt.component);
+      .component('excerpt', excerpt);
   });
 
   beforeEach(function () {

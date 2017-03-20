@@ -131,7 +131,7 @@ function ExcerptController($element, $scope, ExcerptOverflowMonitor) {
  *              specified number of lines and provides controls for expanding
  *              and collapsing the resulting truncated element.
  */
-var component = {
+module.exports = {
   controller: ExcerptController,
   controllerAs: 'vm',
   bindings: {
@@ -176,9 +176,4 @@ var component = {
   },
   transclude: true,
   template: require('../templates/excerpt.html'),
-};
-
-module.exports = {
-  component: component,
-  Controller: ExcerptController,
 };
