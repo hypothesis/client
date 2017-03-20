@@ -2,7 +2,7 @@
 
 var angular = require('angular');
 
-var util = require('./util');
+var util = require('../../directive/test/util');
 
 describe('moderationBanner', function () {
   var bannerEl;
@@ -12,7 +12,7 @@ describe('moderationBanner', function () {
 
   before(function () {
     angular.module('app', [])
-      .directive('moderationBanner', require('../moderation-banner'));
+      .component('moderationBanner', require('../moderation-banner'));
   });
 
   beforeEach(function () {
