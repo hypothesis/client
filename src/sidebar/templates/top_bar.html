@@ -11,11 +11,11 @@
     </search-input>
     <div class="top-bar__expander"></div>
     <login-control
-      vm.auth="vm.auth"
+      auth="vm.auth"
       new-style="false"
       on-show-help-panel="vm.onShowHelpPanel()"
       on-login="vm.onLogin()"
-      on-logout="onLogout()">
+      on-logout="vm.onLogout()">
     </login-control>
   </div>
   <!-- New design for the top bar, as used in the sidebar.
@@ -24,7 +24,7 @@
        the stream view.
   !-->
   <div class="top-bar__inner content" ng-if="::vm.isSidebar">
-    <group-list class="group-list" vm.auth="vm.auth"></group-list>
+    <group-list class="group-list" auth="vm.auth"></group-list>
     <div class="top-bar__expander"></div>
     <a class="top-bar__apply-update-btn"
        ng-if="vm.pendingUpdateCount > 0"
@@ -43,7 +43,7 @@
     <sort-dropdown
       sort-keys-available="vm.sortKeysAvailable"
       sort-key="vm.sortKey"
-      on-change-sort-key="vm.onChangeSortKey({vm.sortKey: vm.sortKey})">
+      on-change-sort-key="vm.onChangeSortKey({sortKey: sortKey})">
     </sort-dropdown>
     <a class="top-bar__btn"
        ng-click="vm.onSharePage()"
@@ -52,7 +52,7 @@
     </a>
     <login-control
       class="login-control"
-      vm.auth="vm.auth"
+      auth="vm.auth"
       new-style="true"
       on-show-help-panel="vm.onShowHelpPanel()"
       on-login="vm.onLogin()"
