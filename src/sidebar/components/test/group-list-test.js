@@ -17,7 +17,7 @@ describe('groupList', function () {
 
   before(function() {
     angular.module('app', [])
-      .component('groupList', groupList.component)
+      .component('groupList', groupList)
       .factory('groups', function () {
         return fakeGroups;
       });

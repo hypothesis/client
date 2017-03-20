@@ -34,16 +34,11 @@ function GroupListController($window, groups, settings, serviceUrl) {
   }
 }
 
-var component = {
+module.exports = {
   controller: GroupListController,
   controllerAs: 'vm',
   bindings: {
     auth: '<',
   },
   template: require('../templates/group_list.html'),
-};
-
-module.exports = {
-  component: component,
-  Controller: GroupListController,
 };
