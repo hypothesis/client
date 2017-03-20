@@ -7,6 +7,7 @@ var mediaEmbedder = require('../media-embedder');
 var renderMarkdown = require('../render-markdown');
 var scopeTimeout = require('../util/scope-timeout');
 
+// @ngInject
 function MarkdownController($element, $sanitize, $scope) {
   var input = $element[0].querySelector('.js-markdown-input');
   var output = $element[0].querySelector('.js-markdown-preview');
