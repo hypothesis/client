@@ -7,17 +7,16 @@ module.exports = class Bridge
   # Connected links to other frames
   links: null
   channelListeners: null
+  guestListeners: null
   onConnectListeners: null
 
   constructor: ->
     @links = []
-    # THESIS TODO: @guestListeners are currently never used. Figure out where
-    # @channelListeners are used, and add support for @guestListeners
     @guestListeners = {}
-    # THESIS TODO: FOR DEBUG PURPOSES, REMOVE AT SOME POINT
-    window.guestListeners = @guestListeners
     @channelListeners = {}
     @onConnectListeners = []
+    # THESIS TODO: FOR DEBUG PURPOSES, REMOVE AT SOME POINT
+    window.guestListeners = @guestListeners
 
   # Tear down the bridge. We destroy each RPC "channel" object we know about.
   # This removes the `onmessage` event listeners, thus removing references to
@@ -121,6 +120,7 @@ module.exports = class Bridge
 
   removeGuestListener: (guestId) ->
     delete @guestListeners[guestId]
+    this
 
   # Add a function to be called upon a new connection
   onConnect: (callback) ->

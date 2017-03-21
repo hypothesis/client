@@ -109,23 +109,28 @@ module.exports = class BucketBar extends Annotator.Plugin
     below = []
 
     # Construct indicator points
-    points = @annotator.anchors.reduce (points, anchor, i) =>
-      unless anchor.highlights?.length
-        return points
+    # THESIS TODO: This 'unless' was put in place to prevent an error
+    # At some point, investigate how plguins work, and how to avoid the error
+    unless @annotator.anchors
+      points = []
+    else
+      points = @annotator.anchors.reduce (points, anchor, i) =>
+        unless anchor.highlights?.length
+          return points
 
-      rect = highlighter.getBoundingClientRect(anchor.highlights)
-      x = rect.top
-      h = rect.bottom - rect.top
+        rect = highlighter.getBoundingClientRect(anchor.highlights)
+        x = rect.top
+        h = rect.bottom - rect.top
 
-      if x < BUCKET_TOP_THRESHOLD
-        if anchor not in above then above.push anchor
-      else if x > window.innerHeight - BUCKET_NAV_SIZE
-        if anchor not in below then below.push anchor
-      else
-        points.push [x, 1, anchor]
-        points.push [x + h, -1, anchor]
-      points
-    , []
+        if x < BUCKET_TOP_THRESHOLD
+          if anchor not in above then above.push anchor
+        else if x > window.innerHeight - BUCKET_NAV_SIZE
+          if anchor not in below then below.push anchor
+        else
+          points.push [x, 1, anchor]
+          points.push [x + h, -1, anchor]
+        points
+      , []
 
     # Accumulate the overlapping annotations into buckets.
     # The algorithm goes like this:

@@ -34,6 +34,9 @@ module.exports = class CrossFrame extends Annotator.Plugin
       bridge.destroy()
       discovery.stopDiscovery()
 
+    this.registerMethods = (options, guestId) ->
+      @annotationSync.registerMethods(options, guestId)
+
     this.sync = (annotations, cb) ->
       @annotationSync.sync(annotations, cb)
 

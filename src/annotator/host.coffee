@@ -74,6 +74,7 @@ module.exports = class Host extends Annotator
     options = @options
     options.guestId = guestId
     options.crossframe = @crossframe
+    options.plugins = @plugins
     guest = new Guest(guestElement, options)
     guest.setVisibleHighlights(@showHighlights)
 

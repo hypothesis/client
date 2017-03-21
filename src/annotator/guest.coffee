@@ -63,6 +63,8 @@ module.exports = class Guest extends Annotator
     self = this
     this.guestDocument = guestElement.ownerDocument
     this.guestId = options.guestId
+    # THESIS TODO: Consider using a trigger instead, via crossframe
+    this.showSidebarCb = options.showSidebarCb
 
     this.adderCtrl = new adder.Adder(@adder[0], {
       onAnnotate: ->
@@ -84,7 +86,8 @@ module.exports = class Guest extends Annotator
 
     this._setCrossframe(options.crossframe) unless !options.crossframe
 
-    # THESIS TODO: Do guests need these plugins?
+    @plugins = @options.plugins
+    # THESIS TODO: Do guests need this code? Currently they're just passed in via options from Host
     # Load plugins
 #    for own name, opts of @options
 #      if not @plugins[name] and Annotator.Plugin[name]
@@ -97,17 +100,11 @@ module.exports = class Guest extends Annotator
       emit: (event, args...) =>
         this.publish(event, args)
 
-    this.plugins.CrossFrame = @options.crossframe
     @crossframe = @options.crossframe
 
-    @crossframe.annotationSync.registerMethods(cfOptions, this.guestId)
+    @crossframe.registerMethods(cfOptions, this.guestId)
     this._connectAnnotationSync(@crossframe)
     this._connectAnnotationUISync(@crossframe, @guestId)
-
-    # Load plugins
-    for own name, opts of @options
-      if not @plugins[name] and Annotator.Plugin[name]
-        this.addPlugin(name, opts)
 
   # Get the document info
   getDocumentInfo: ->
@@ -183,8 +180,8 @@ module.exports = class Guest extends Annotator
 
     @element.data('annotator', null)
 
-    for name, plugin of @plugins
-      @plugins[name].destroy()
+#    for name, plugin of @plugins
+#      @plugins[name].destroy()
 
     this.removeEvents()
     @crossframe.removeGuestListener(@guestId)
@@ -319,6 +316,7 @@ module.exports = class Guest extends Annotator
 
     ranges = @selectedRanges ? []
     @selectedRanges = null
+    @showSidebarCb() unless annotation.$highlight
 
     getSelectors = (range) ->
       options = {
@@ -371,6 +369,7 @@ module.exports = class Guest extends Annotator
   showAnnotations: (annotations) ->
     tags = (a.$tag for a in annotations)
     @crossframe?.call('showAnnotations', tags)
+    @showSidebarCb()
 
   toggleAnnotationSelection: (annotations) ->
     tags = (a.$tag for a in annotations)
