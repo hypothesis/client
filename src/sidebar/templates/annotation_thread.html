@@ -10,6 +10,9 @@
     <div class="annotation-thread__thread-line"></div>
   </div>
   <div class="annotation-thread__content">
+    <moderation-banner is-reply="!vm.isTopLevelThread()"
+                       annotation-id="thread.id">
+    </moderation-banner>
     <annotation ng-class="vm.annotationClasses()"
              annotation="vm.thread.annotation"
              is-collapsed="vm.thread.collapsed"

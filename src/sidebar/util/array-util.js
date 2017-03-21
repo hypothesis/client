@@ -31,7 +31,20 @@ function filterMap(ary, mapFn) {
   }, []);
 }
 
+/**
+ * Convert an array to a set represented as an object.
+ *
+ * @param {string[]} list - List of keys for the set.
+ */
+function toSet(list) {
+  return list.reduce(function (set, key) {
+    set[key] = true;
+    return set;
+  }, {});
+}
+
 module.exports = {
   countIf: countIf,
   filterMap: filterMap,
+  toSet: toSet,
 };

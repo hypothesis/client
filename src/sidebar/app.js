@@ -145,6 +145,7 @@ module.exports = angular.module('h', [
   .component('loggedoutMessage', require('./components/loggedout-message'))
   .component('loginControl', require('./components/login-control'))
   .component('loginForm', require('./components/login-form').component)
+  .component('moderationBanner', require('./components/moderation-banner'))
   .component('publishAnnotationBtn', require('./components/publish-annotation-btn'))
   .component('searchInput', require('./components/search-input'))
   .component('searchStatusBar', require('./components/search-status-bar'))

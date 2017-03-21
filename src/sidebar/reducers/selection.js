@@ -12,6 +12,7 @@
 
 var immutable = require('seamless-immutable');
 
+var toSet = require('../util/array-util').toSet;
 var uiConstants = require('../ui-constants');
 
 var util = require('./util');
@@ -53,13 +54,6 @@ function freeze(selection) {
   } else {
     return null;
   }
-}
-
-function toSet(list) {
-  return list.reduce(function (set, key) {
-    set[key] = true;
-    return set;
-  }, {});
 }
 
 function init(settings) {
