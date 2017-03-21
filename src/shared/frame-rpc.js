@@ -94,8 +94,19 @@ RPC.prototype.apply = function (method, args) {
 RPC.prototype._handle = function (msg) {
     var self = this;
     if (self._destroyed) return;
+    var methodsObject = false;
     if (msg.hasOwnProperty('method')) {
-        if (!this._methods.hasOwnProperty(msg.method)) return;
+        if (!this._methods.hasOwnProperty(msg.method)) {
+            // THESIS TODO: This iterates through all guestListeners as a temporary thing
+            // A guestId will have to be passed in at some point
+            if (!this._methods.guestListeners) return;
+
+            _.each(this._methods.guestListeners, function(guestListener, key) {
+                if (guestListener.hasOwnProperty(msg.method)) methodsObject = guestListener;
+            });
+            if (!methodsObject) return;
+        } else methodsObject = this._methods
+
         var args = msg.arguments.concat(function () {
             self.dst.postMessage({
                 protocol: 'frame-rpc',
@@ -104,7 +115,7 @@ RPC.prototype._handle = function (msg) {
                 arguments: [].slice.call(arguments)
             }, self.origin);
         });
-        this._methods[msg.method].apply(this._methods, args);
+        methodsObject[msg.method].apply(methodsObject, args);
     }
     else if (msg.hasOwnProperty('response')) {
         var cb = this._callbacks[msg.response];
