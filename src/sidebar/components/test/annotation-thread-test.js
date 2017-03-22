@@ -25,7 +25,13 @@ function PageObject(element) {
 describe('annotationThread', function () {
   before(function () {
     angular.module('app', [])
-      .component('annotationThread', annotationThread);
+      .component('annotationThread', annotationThread)
+      .component('moderationBanner', {
+        bindings: {
+          annotationId: '<',
+          isReply: '<',
+        },
+      });
   });
 
   beforeEach(function () {
@@ -174,6 +180,24 @@ describe('annotationThread', function () {
       assert.calledWith(onForceVisible, thread.parent);
       assert.calledWith(onForceVisible, thread);
       assert.calledWith(onForceVisible, thread.children[0]);
+    });
+  });
+
+  it('renders the moderation banner', function () {
+    var thread = {
+      id: '123',
+      parent: null,
+      children: [],
+    };
+    var element = util.createDirective(document, 'annotationThread', {
+      thread: thread,
+    });
+    var moderationBanner = element
+      .find('moderation-banner')
+      .controller('moderationBanner');
+    assert.deepEqual(moderationBanner, {
+      isReply: false,
+      annotationId: '123',
     });
   });
 });
