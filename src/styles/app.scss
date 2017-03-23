@@ -34,15 +34,23 @@ $base-line-height: 20px;
 
 // Top-level styles
 // ----------------
+
 body {
+  @include grey-background;
+
+  font-family: $sans-font-family;
+  font-weight: normal;
+  -webkit-overflow-scrolling: touch;
+}
+
+.app-content-wrapper {
   $sidebar-h-padding: 9px;
 
   @include grey-background;
-  font-family: $sans-font-family;
-  font-weight: normal;
+
+  display: block;
   padding: $sidebar-h-padding;
   padding-top: $sidebar-h-padding + $top-bar-height;
-  -webkit-overflow-scrolling: touch;
 
   @include respond-to(tablets desktops) {
     padding-bottom: 4rem;
