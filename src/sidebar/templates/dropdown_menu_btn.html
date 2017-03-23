@@ -1,14 +1,16 @@
-<div class="dropdown-menu-btn">
+<div class="dropdown-menu-btn" >
   <button
     class="dropdown-menu-btn__btn"
     ng-bind="vm.label"
     ng-click="vm.onClick($event)"
-    ng-disabled="vm.isDisabled">
+    ng-disabled="vm.isDisabled"
+    h-branding="ctaTextColor, ctaBackgroundColor">
   </button>
   <button
     class="dropdown-menu-btn__dropdown-arrow"
     title="{{vm.dropdownMenuLabel}}"
-    ng-click="vm.toggleDropdown($event)">
+    ng-click="vm.toggleDropdown($event)"
+    h-branding="ctaTextColor, ctaBackgroundColor">
     <div class="dropdown-menu-btn__dropdown-arrow-separator"></div>
     <div class="dropdown-menu-btn__dropdown-arrow-indicator">
       <div>▼</div>
