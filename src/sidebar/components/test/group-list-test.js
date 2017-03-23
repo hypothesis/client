@@ -3,7 +3,7 @@
 var angular = require('angular');
 
 var groupList = require('../group-list');
-var util = require('./util');
+var util = require('../../directive/test/util');
 
 describe('groupList', function () {
   var $window;
@@ -17,7 +17,7 @@ describe('groupList', function () {
 
   before(function() {
     angular.module('app', [])
-      .directive('groupList', groupList.directive)
+      .component('groupList', groupList)
       .factory('groups', function () {
         return fakeGroups;
       });
