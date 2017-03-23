@@ -25,11 +25,12 @@ function hostPageConfig(window) {
     'appType',
 
     // Config params documented at
-    // https://github.com/hypothesis/client/blob/master/docs/config.md
+    // https://h.readthedocs.io/projects/client/en/latest/publishers/config/
     'openLoginForm',
     'openSidebar',
     'showHighlights',
     'services',
+    'branding',
   ];
 
   return Object.keys(config).reduce(function (result, key) {
