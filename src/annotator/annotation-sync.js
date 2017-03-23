@@ -1,10 +1,28 @@
 'use strict';
 
-// AnnotationSync listens for messages from the sidebar app indicating that
-// annotations have been added or removed and relays them to Annotator.
-//
-// It also listens for events from Annotator when new annotations are created or
-// annotations successfully anchor and relays these to the sidebar app.
+/**
+ * @class
+ * Syncs annotation events between the sidebar app and Annotator.
+ *
+ * Listens for events from the sidebar app indicating that annotations have
+ * been added or removed and relays them to Annotator.
+ *
+ * Also listens for events from Annotator when new annotations are created
+ * and relays these to the sidebar app.
+ *
+ * @param bridge - The bridge.
+ *
+ * @param {Object} options - A required options object containing two required
+ *   properties `on` and `emit`.
+ *
+ *   `on` must be a callback function that will be called when a new annotion
+ *   is created by the Annotator code.
+ *
+ *   `emit` must be a callback function that will be called when an event
+ *   (such as "annotationDeleted" or "annotationsLoaded") is received from
+ *   the sidebar app.
+ *
+ */
 function AnnotationSync(bridge, options) {
   var event;
   var func;
@@ -28,7 +46,7 @@ function AnnotationSync(bridge, options) {
   this._on = options.on;
   this._emit = options.emit;
 
-  // Listen locally for interesting events
+  // Listen locally for interesting events.
   ref = this._eventListeners;
   for (event in ref) {
     if (Object.prototype.hasOwnProperty.call(ref, event))  {
@@ -37,7 +55,7 @@ function AnnotationSync(bridge, options) {
     }
   }
 
-  // Register remotely invokable methods
+  // Register remotely invokable methods.
   ref1 = this._channelListeners;
   for (method in ref1) {
     if (Object.prototype.hasOwnProperty.call(ref1, method))  {
@@ -47,8 +65,8 @@ function AnnotationSync(bridge, options) {
   }
 }
 
-// Cache of annotations which have crossed the bridge for fast, encapsulated
-// association of annotations received in arguments to window-local copies.
+/** Cache of annotations which have crossed the bridge for fast, encapsulated
+  * association of annotations received in arguments to window-local copies. */
 AnnotationSync.prototype.cache = null;
 
 AnnotationSync.prototype.sync = function(annotations) {
@@ -85,7 +103,10 @@ AnnotationSync.prototype.sync = function(annotations) {
   return this;
 };
 
-// Handlers for messages arriving through a channel
+/** An object mapping event name strings to handler functions.
+ *
+ *  These are the handler functions for events received from the sidebar app.
+ */
 AnnotationSync.prototype._channelListeners = {
   'deleteAnnotation': function(body, cb) {
     var annotation;
@@ -115,7 +136,10 @@ AnnotationSync.prototype._channelListeners = {
   },
 };
 
-// Handlers for events coming from this frame, to send them across the channel
+/** An object mapping event name strings to handler functions.
+ *
+ * These are the handler functions for events received from Annotator.
+ */
 AnnotationSync.prototype._eventListeners = {
   'beforeAnnotationCreated': function(annotation) {
     if (annotation.$tag) {
@@ -128,7 +152,7 @@ AnnotationSync.prototype._eventListeners = {
 AnnotationSync.prototype._mkCallRemotelyAndParseResults = function(method, callBack) {
   return (function(_this) {
     return function(annotation) {
-      // Wrap the callback function to first parse returned items
+      // Wrap the callback function to first parse returned items.
       var wrappedCallback;
       wrappedCallback = function(failure, results) {
         if (failure === null) {
@@ -136,13 +160,17 @@ AnnotationSync.prototype._mkCallRemotelyAndParseResults = function(method, callB
         }
         return typeof callBack === 'function' ? callBack(failure, results) : void 0;
       };
-      // Call the remote method
+      // Call the remote method.
       return _this.bridge.call(method, _this._format(annotation), wrappedCallback);
     };
   })(this);
 };
 
 // Parse returned message bodies to update cache with any changes made remotely
+// When we make a call remotely, we get "results" back.
+// This parses those results.
+// The "results" are a list of "bodies" and this returns the result of parsing
+// each body with _parse() below.
 AnnotationSync.prototype._parseResults = function(results) {
   var bodies;
   var body;
