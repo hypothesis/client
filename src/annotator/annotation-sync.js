@@ -139,19 +139,19 @@ AnnotationSync.prototype._beforeAnnotationCreated = function(annotation) {
 
 
 AnnotationSync.prototype._mkCallRemotelyAndParseResults = function(method) {
-  return (function(_this) {
-    return function(annotation) {
-      // Wrap the callback function to first parse returned items.
-      var wrappedCallback;
-      wrappedCallback = function(failure, results) {
-        if (failure === null) {
-          _this._parseResults(results);
-        }
-      };
-      // Call the remote method.
-      _this.bridge.call(method, _this._format(annotation), wrappedCallback);
+  var that = this;
+
+  return function(annotation) {
+    // Wrap the callback function to first parse returned items.
+    var wrappedCallback;
+    wrappedCallback = function(failure, results) {
+      if (failure === null) {
+        that._parseResults(results);
+      }
     };
-  })(this);
+    // Call the remote method.
+    that.bridge.call(method, that._format(annotation), wrappedCallback);
+  };
 };
 
 // Parse returned message bodies to update cache with any changes made remotely
