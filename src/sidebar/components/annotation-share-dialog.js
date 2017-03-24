@@ -8,7 +8,7 @@ module.exports = {
   controllerAs: 'vm',
   template: require('../templates/annotation_share_dialog.html'),
   // @ngInject
-  controller: function ($scope, $element) {
+  controller: function ($scope, $element, analytics) {
     var shareLinkInput = $element.find('input')[0];
 
     $scope.$watch('vm.isOpen', function (isOpen) {
@@ -61,6 +61,12 @@ module.exports = {
           1000);
       }
     }.bind(this);
+
+    $scope.onShareClick = function(target){
+      if(target){
+        analytics.track(analytics.events.ANNOTATION_SHARED, target);
+      }
+    };
   },
   bindings: {
     group: '<',

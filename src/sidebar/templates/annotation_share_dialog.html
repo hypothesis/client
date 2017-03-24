@@ -4,18 +4,23 @@
     <a href="https://twitter.com/intent/tweet?url={{vm.uri | urlEncode}}&hashtags=annotated"
       target="_blank"
       title="Tweet link"
-      class="annotation-share-dialog-target__icon h-icon-twitter"></a>
+      class="annotation-share-dialog-target__icon h-icon-twitter"
+      ng-click="onShareClick('twitter')"></a>
     <a href="https://www.facebook.com/sharer/sharer.php?u={{vm.uri | urlEncode}}"
       target="_blank"
       title="Share on Facebook"
-      class="annotation-share-dialog-target__icon h-icon-facebook"></a>
+      class="annotation-share-dialog-target__icon h-icon-facebook"
+      ng-click="onShareClick('facebook')"></a>
     <a href="https://plus.google.com/share?url={{vm.uri | urlEncode}}"
       target="_blank"
       title="Post on Google Plus"
-      class="annotation-share-dialog-target__icon h-icon-google-plus"></a>
+      class="annotation-share-dialog-target__icon h-icon-google-plus"
+      ng-click="onShareClick('googlePlus')"></a>
     <a href="mailto:?subject=Let's%20Annotate&amp;body={{vm.uri}}"
+      target="_blank"
       title="Share via email"
-      class="annotation-share-dialog-target__icon h-icon-mail"></a>
+      class="annotation-share-dialog-target__icon h-icon-mail"
+      ng-click="onShareClick('email')"></a>
   </div>
   <div class="annotation-share-dialog-link" type="text">
     <input class="annotation-share-dialog-link__text"

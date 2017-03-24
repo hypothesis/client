@@ -6,15 +6,21 @@ var util = require('../../directive/test/util');
 
 describe('annotationShareDialog', function () {
   var element;
+  var fakeAnalytics;
 
   function getCopyBtn() {
     return element.find('.annotation-share-dialog-link__btn');
   }
 
   before(function () {
+    fakeAnalytics = {
+      track: sinon.stub(),
+      events: {},
+    };
     angular.module('app', [])
       .component('annotationShareDialog',
         require('../annotation-share-dialog'))
+      .value('analytics', fakeAnalytics)
       .value('urlEncodeFilter', function (val) { return val; });
   });
 
@@ -38,6 +44,26 @@ describe('annotationShareDialog', function () {
 
       assert.isNotOk(element.find('.annotation-share-dialog').hasClass('is-open'));
     });
+
+    it('tracks the target being shared', function(){
+      var clickShareIcon = function(iconName){
+        element.find('.' + iconName).click();
+      };
+
+      element = util.createDirective(document, 'annotationShareDialog', {
+        isOpen: true,
+      });
+
+      clickShareIcon('h-icon-twitter');
+      assert.equal(fakeAnalytics.track.args[0][1], 'twitter');
+      clickShareIcon('h-icon-facebook');
+      assert.equal(fakeAnalytics.track.args[1][1], 'facebook');
+      clickShareIcon('h-icon-google-plus');
+      assert.equal(fakeAnalytics.track.args[2][1], 'googlePlus');
+      clickShareIcon('h-icon-mail');
+      assert.equal(fakeAnalytics.track.args[3][1], 'email');
+    });
+
   });
 
   describe('vm.copyToClipboard()', function () {
