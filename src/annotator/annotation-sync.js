@@ -92,7 +92,7 @@ AnnotationSync.prototype._channelListeners = {
     annotation = this._parse(body);
     delete this.cache[annotation.$tag];
     this._emit('annotationDeleted', annotation);
-    return cb(null, this._format(annotation));
+    cb(null, this._format(annotation));
   },
   'loadAnnotations': function(bodies, cb) {
     var a;
@@ -134,10 +134,12 @@ AnnotationSync.prototype._mkCallRemotelyAndParseResults = function(method, callB
         if (failure === null) {
           _this._parseResults(results);
         }
-        return typeof callBack === 'function' ? callBack(failure, results) : void 0;
+        if (typeof callBack === 'function') {
+          callBack(failure, results);
+        }
       };
       // Call the remote method
-      return _this.bridge.call(method, _this._format(annotation), wrappedCallback);
+      _this.bridge.call(method, _this._format(annotation), wrappedCallback);
     };
   })(this);
 };
