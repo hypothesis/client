@@ -9,10 +9,11 @@
   <button
     class="dropdown-menu-btn__dropdown-arrow"
     title="{{vm.dropdownMenuLabel}}"
-    ng-click="vm.toggleDropdown($event)"
-    h-branding="ctaTextColor, ctaBackgroundColor">
+    ng-click="vm.toggleDropdown($event)">
     <div class="dropdown-menu-btn__dropdown-arrow-separator"></div>
-    <div class="dropdown-menu-btn__dropdown-arrow-indicator">
+    <div
+      class="dropdown-menu-btn__dropdown-arrow-indicator"
+      h-branding="ctaTextColor, ctaBackgroundColor">
       <div>▼</div>
     </div>
   </button>
