@@ -10,7 +10,6 @@
 
 <search-status-bar
   ng-show="!isLoading()"
-  ng-if="!isStream"
   filter-active="!!search.query()"
   filter-match-count="visibleCount()"
   on-clear-selection="clearSelection()"
@@ -39,18 +38,16 @@
   </p>
 </div>
 
-<span window-scroll="loadMore(20)">
-  <thread-list
-    on-change-collapsed="setCollapsed(id, collapsed)"
-    on-clear-selection="clearSelection()"
-    on-focus="focus(annotation)"
-    on-force-visible="forceVisible(thread)"
-    on-select="scrollTo(annotation)"
-    show-document-info="::!isSidebar"
-    thread="rootThread">
-  </thread-list>
-</span>
+<thread-list
+  on-change-collapsed="setCollapsed(id, collapsed)"
+  on-clear-selection="clearSelection()"
+  on-focus="focus(annotation)"
+  on-force-visible="forceVisible(thread)"
+  on-select="scrollTo(annotation)"
+  show-document-info="false"
+  thread="rootThread">
+</thread-list>
 
-<loggedout-message ng-if="isSidebar && shouldShowLoggedOutMessage()"
+<loggedout-message ng-if="shouldShowLoggedOutMessage()"
   on-login="login()" ng-cloak>
 </loggedout-message>
