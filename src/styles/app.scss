@@ -34,6 +34,9 @@ $base-line-height: 20px;
 
 // Top-level styles
 // ----------------
+html, body {
+  height: 100%;
+}
 
 body {
   @include grey-background;
@@ -43,12 +46,17 @@ body {
   -webkit-overflow-scrolling: touch;
 }
 
+hypothesis-app {
+  display: block;
+  height: 100%;
+}
+
 .app-content-wrapper {
   $sidebar-h-padding: 9px;
 
   @include grey-background;
 
-  display: block;
+  min-height: 100%;
   padding: $sidebar-h-padding;
   padding-top: $sidebar-h-padding + $top-bar-height;
 
