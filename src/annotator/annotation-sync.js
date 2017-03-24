@@ -138,7 +138,7 @@ AnnotationSync.prototype._beforeAnnotationCreated = function(annotation) {
 }
 
 
-AnnotationSync.prototype._mkCallRemotelyAndParseResults = function(method, callBack) {
+AnnotationSync.prototype._mkCallRemotelyAndParseResults = function(method) {
   return (function(_this) {
     return function(annotation) {
       // Wrap the callback function to first parse returned items.
@@ -146,9 +146,6 @@ AnnotationSync.prototype._mkCallRemotelyAndParseResults = function(method, callB
       wrappedCallback = function(failure, results) {
         if (failure === null) {
           _this._parseResults(results);
-        }
-        if (typeof callBack === 'function') {
-          callBack(failure, results);
         }
       };
       // Call the remote method.
