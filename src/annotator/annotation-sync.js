@@ -132,27 +132,20 @@ AnnotationSync.prototype._channelListeners = {
 
 AnnotationSync.prototype._beforeAnnotationCreated = function(annotation) {
   if (annotation.$tag) {
-    return undefined;
+    return;
   }
-  return this._mkCallRemotelyAndParseResults('beforeCreateAnnotation')(annotation);
-}
 
-
-AnnotationSync.prototype._mkCallRemotelyAndParseResults = function(method) {
-  var that = this;
-
-  return function(annotation) {
-    // Wrap the callback function to first parse returned items.
-    var wrappedCallback;
-    wrappedCallback = function(failure, results) {
-      if (failure === null) {
-        that._parseResults(results);
-      }
-    };
-    // Call the remote method.
-    that.bridge.call(method, that._format(annotation), wrappedCallback);
+  // Wrap the callback function to first parse returned items.
+  var wrappedCallback = function(failure, results) {
+    if (failure === null) {
+      this._parseResults(results);
+    }
   };
-};
+
+  // Call the remote method.
+  this.bridge.call(
+    'beforeCreateAnnotation', this._format(annotation), wrappedCallback);
+}
 
 // Parse returned message bodies to update cache with any changes made remotely
 // When we make a call remotely, we get "results" back.
