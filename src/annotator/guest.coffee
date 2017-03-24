@@ -57,14 +57,15 @@ module.exports = class Guest extends Annotator
     adder: '<hypothesis-adder></hypothesis-adder>';
 
   constructor: (element, options) ->
-    guestElement = options.guestElement || element
-    super(guestElement, options)
+    super(element, options)
+    # If no options is passed, then set it to an empty object to prevent failures
+    if !options then options = {}
 
     self = this
-    this.guestDocument = guestElement.ownerDocument
-    this.guestId = options.guestId
+    this.guestDocument = element.ownerDocument
+    this.guestId = options.guestId || "default"
     # THESIS TODO: Consider using a trigger instead, via crossframe
-    this.showSidebarCb = options.showSidebarCb
+    @showSidebarCb = options.showSidebarCb
 
     this.adderCtrl = new adder.Adder(@adder[0], {
       onAnnotate: ->
@@ -83,15 +84,33 @@ module.exports = class Guest extends Annotator
           self._onClearSelection()
 
     this.anchors = []
+    @plugins = options.hostPlugins unless !options.hostPlugins
 
-    this._setCrossframe(options.crossframe) unless !options.crossframe
+    # If options.crossframe is set, it is assumed that this is NOT the default guest, and
+    # so a crossframe needs to be set
+    if (options.crossframe)
+      this._setCrossframe(options.crossframe)
+    else
+    # Otherwise, the crossframe and plugins have to be instantiated
+      cfOptions =
+        on: (event, handler) =>
+          this.subscribe(event, handler)
+        emit: (event, args...) =>
+          this.publish(event, args)
 
-    @plugins = @options.plugins
-    # THESIS TODO: Do guests need this code? Currently they're just passed in via options from Host
-    # Load plugins
-#    for own name, opts of @options
-#      if not @plugins[name] and Annotator.Plugin[name]
-#        this.addPlugin(name, opts)
+      this.addPlugin('CrossFrame', cfOptions)
+      @crossframe = @plugins.CrossFrame
+
+      for own name, opts of @options
+        if not @plugins[name] and Annotator.Plugin[name]
+          this.addPlugin(name, opts)
+
+      this._connectAnnotationSync(@crossframe)
+      this._connectAnnotationUISync(@crossframe, @guestId)
+
+      # THESIS TODO: Tests require this to be in Guest
+      # Investigate to see if any issues arise
+      @crossframe.onConnect(=> this.publish('panelReady'))
 
   _setCrossframe: (crossframe) ->
     cfOptions =
@@ -102,9 +121,12 @@ module.exports = class Guest extends Annotator
 
     @crossframe = @options.crossframe
 
+    @crossframe.reloadAnnotations()
     @crossframe.registerMethods(cfOptions, this.guestId)
     this._connectAnnotationSync(@crossframe)
     this._connectAnnotationUISync(@crossframe, @guestId)
+
+    if typeof @options.showHighlights == 'boolean' then @setVisibleHighlights(@options.showHighlights)
 
   # Get the document info
   getDocumentInfo: ->
@@ -180,11 +202,11 @@ module.exports = class Guest extends Annotator
 
     @element.data('annotator', null)
 
-#    for name, plugin of @plugins
-#      @plugins[name].destroy()
-
     this.removeEvents()
-    @crossframe.removeGuestListener(@guestId)
+    # THESIS TODO: 'unless' is required to pass certain tests
+    # May be a rise for concern, why doesn't crossframe have these methods during the test?
+    @crossframe.removeGuestListener(@guestId) unless !@crossframe.removeGuestListener
+    @crossframe.removeMethods(@guestId) unless !@crossframe.removeMethods
 
   anchor: (annotation) ->
     self = this
@@ -316,7 +338,7 @@ module.exports = class Guest extends Annotator
 
     ranges = @selectedRanges ? []
     @selectedRanges = null
-    @showSidebarCb() unless annotation.$highlight
+    @showSidebarCb() unless annotation.$highlight || !@showSidebarCb
 
     getSelectors = (range) ->
       options = {
@@ -369,7 +391,7 @@ module.exports = class Guest extends Annotator
   showAnnotations: (annotations) ->
     tags = (a.$tag for a in annotations)
     @crossframe?.call('showAnnotations', tags)
-    @showSidebarCb()
+    @showSidebarCb() unless !@showSidebarCb
 
   toggleAnnotationSelection: (annotations) ->
     tags = (a.$tag for a in annotations)

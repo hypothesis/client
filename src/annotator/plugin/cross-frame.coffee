@@ -20,6 +20,9 @@ module.exports = class CrossFrame extends Annotator.Plugin
 
     bridge = new CrossFrame.Bridge()
 
+    # THESIS TODO: Don't forget to remove this. Debugging only.
+    window.bridge = bridge
+
     opts = extract(options, 'on', 'emit')
     @annotationSync = new CrossFrame.AnnotationSync(bridge, opts)
 
@@ -37,6 +40,9 @@ module.exports = class CrossFrame extends Annotator.Plugin
     this.registerMethods = (options, guestId) ->
       @annotationSync.registerMethods(options, guestId)
 
+    this.removeMethods = (guestId) ->
+      @annotationSync.removeMethods(guestId)
+
     this.sync = (annotations, cb) ->
       @annotationSync.sync(annotations, cb)
 
@@ -45,6 +51,10 @@ module.exports = class CrossFrame extends Annotator.Plugin
 
     this.call = (message, args...) ->
       bridge.call(message, args...)
+
+    # THESIS TODO: Temporary name for function. Will need a more suitable name.
+    this.reloadAnnotations = () ->
+      bridge.call("reloadAnnotations");
 
     this.onConnect = (fn) ->
       bridge.onConnect(fn)

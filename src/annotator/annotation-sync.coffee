@@ -17,28 +17,35 @@ module.exports = class AnnotationSync
       throw new Error('options.emit unspecified for AnnotationSync.')
 
     @cache = {}
+    @_on = {}
+    @_emit = {}
 
-    @_on = options.on
-    @_emit = options.emit
+    defaultId = options.guestId || "default"
+    @_on[defaultId] = options.on
+    @_emit[defaultId] = options.emit
 
     # Listen locally for interesting events
     for event, handler of @_eventListeners
-      this._on(event, handler.bind(this))
+      @_on[defaultId](event, handler.bind(this))
 
     # Register remotely invokable methods
     for method, func of @_channelListeners
       @bridge.on(method, func.bind(this))
 
-  # THESIS TODO: Add support for multiple @_on and @_emit
+  # THESIS TODO: Consider more appropriate names
   registerMethods: (options, guestId) ->
-    @_on = options.on
-    @_emit = options.emit
+    @_on[guestId] = options.on
+    @_emit[guestId] = options.emit
 
     for event, handler of @_eventListeners
-      this._on(event, handler.bind(this))
+      @_on[guestId](event, handler.bind(this))
 
     for method, func of @_channelListeners
       @bridge.on(method, func.bind(this), guestId)
+
+  removeMethods: (guestId) ->
+    delete @_on[guestId]
+    delete @_emit[guestId]
 
   sync: (annotations) ->
     annotations = (this._format a for a in annotations)
@@ -48,16 +55,20 @@ module.exports = class AnnotationSync
     this
 
   # Handlers for messages arriving through a channel
+  # THESIS TODO: all @_emit's are looped over. Eventually, we want a guestId to be passed in,
+  # so that we can avoid such a needless loop
   _channelListeners:
     'deleteAnnotation': (body, cb) ->
       annotation = this._parse(body)
       delete @cache[annotation.$tag]
-      @_emit('annotationDeleted', annotation)
+      for key, emit of @_emit
+        emit('annotationDeleted', annotation)
       cb(null, this._format(annotation))
 
     'loadAnnotations': (bodies, cb) ->
       annotations = (this._parse(a) for a in bodies)
-      @_emit('annotationsLoaded', annotations)
+      for key, emit of @_emit
+        emit('annotationsLoaded', annotations)
       cb(null, annotations)
 
   # Handlers for events coming from this frame, to send them across the channel

@@ -101,9 +101,13 @@ RPC.prototype._handle = function (msg) {
             // A guestId will have to be passed in at some point
             if (!this._methods.guestListeners) return;
 
-            _.each(this._methods.guestListeners, function(guestListener, key) {
-                if (guestListener.hasOwnProperty(msg.method)) methodsObject = guestListener;
-            });
+            var guestListeners = this._methods.guestListeners;
+            for (var key in guestListeners) {
+                if (guestListeners.hasOwnProperty(key)) {
+                    var guestListener = guestListeners[key]
+                    if (guestListener.hasOwnProperty(msg.method)) methodsObject = guestListener;
+                }
+            }
             if (!methodsObject) return;
         } else methodsObject = this._methods
 

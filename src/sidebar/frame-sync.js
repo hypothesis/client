@@ -43,6 +43,9 @@ function FrameSync($rootScope, $window, Discovery, annotationUI, bridge) {
 
   // Set of tags of annotations that are currently loaded into the frame
   var inFrame = new Set();
+  var prevAnnotations = [];
+  var prevFrames = [];
+  var prevPublicAnns = 0;
 
   /**
    * Watch for changes to the set of annotations displayed in the sidebar and
@@ -50,66 +53,66 @@ function FrameSync($rootScope, $window, Discovery, annotationUI, bridge) {
    */
   function setupSyncToFrame() {
     // List of loaded annotations in previous state
-    var prevAnnotations = [];
-    var prevFrames = [];
-    var prevPublicAnns = 0;
+    annotationUI.subscribe(updateAnnotations);
+  }
 
-    annotationUI.subscribe(function () {
-      var state = annotationUI.getState();
-      if (state.annotations === prevAnnotations &&
-          state.frames === prevFrames) {
+  // THESIS TODO: This was put into its own function for debugging, and potential future use. Revert if nothing becomes of it.
+  // prevAnnotations, prevFrames, and prevPublicAnns were located in setupSyncToFrame prior to this
+  function updateAnnotations() {
+    var state = annotationUI.getState();
+    if (state.annotations === prevAnnotations &&
+      state.frames === prevFrames) {
+      return;
+    }
+
+    var publicAnns = 0;
+    var inSidebar = new Set();
+    var added = [];
+
+    state.annotations.forEach(function (annot) {
+      if (metadata.isReply(annot)) {
+        // The frame does not need to know about replies
         return;
       }
 
-      var publicAnns = 0;
-      var inSidebar = new Set();
-      var added = [];
-
-      state.annotations.forEach(function (annot) {
-        if (metadata.isReply(annot)) {
-          // The frame does not need to know about replies
-          return;
-        }
-
-        if (metadata.isPublic(annot)) {
-          ++publicAnns;
-        }
-
-        inSidebar.add(annot.$tag);
-        if (!inFrame.has(annot.$tag)) {
-          added.push(annot);
-        }
-      });
-      var deleted = prevAnnotations.filter(function (annot) {
-        return !inSidebar.has(annot.$tag);
-      });
-      prevAnnotations = state.annotations;
-      prevFrames = state.frames;
-
-      // We currently only handle adding and removing annotations from the frame
-      // when they are added or removed in the sidebar, but not re-anchoring
-      // annotations if their selectors are updated.
-      if (added.length > 0) {
-        bridge.call('loadAnnotations', added.map(formatAnnot));
-        added.forEach(function (annot) {
-          inFrame.add(annot.$tag);
-        });
+      if (metadata.isPublic(annot)) {
+        ++publicAnns;
       }
-      deleted.forEach(function (annot) {
-        bridge.call('deleteAnnotation', formatAnnot(annot));
-        inFrame.delete(annot.$tag);
-      });
 
-      var frames = annotationUI.frames();
-      if (frames.length > 0) {
-        if (frames.every(function (frame) { return frame.isAnnotationFetchComplete; })) {
-          if (publicAnns === 0 || publicAnns !== prevPublicAnns) {
-            bridge.call(bridgeEvents.PUBLIC_ANNOTATION_COUNT_CHANGED, publicAnns);
-            prevPublicAnns = publicAnns;
-          }
-        }
+      inSidebar.add(annot.$tag);
+      if (!inFrame.has(annot.$tag)) {
+        added.push(annot);
       }
     });
+    var deleted = prevAnnotations.filter(function (annot) {
+      return !inSidebar.has(annot.$tag);
+    });
+    prevAnnotations = state.annotations;
+    prevFrames = state.frames;
+
+    // We currently only handle adding and removing annotations from the frame
+    // when they are added or removed in the sidebar, but not re-anchoring
+    // annotations if their selectors are updated.
+    if (added.length > 0) {
+      bridge.call('loadAnnotations', added.map(formatAnnot));
+      added.forEach(function (annot) {
+        inFrame.add(annot.$tag);
+      });
+    }
+    deleted.forEach(function (annot) {
+      bridge.call('deleteAnnotation', formatAnnot(annot));
+      inFrame.delete(annot.$tag);
+    });
+
+    var frames = annotationUI.frames();
+    if (frames.length > 0) {
+      if (frames.every(function (frame) { return frame.isAnnotationFetchComplete; })) {
+        if (publicAnns === 0 || publicAnns !== prevPublicAnns) {
+          bridge.call(bridgeEvents.PUBLIC_ANNOTATION_COUNT_CHANGED, publicAnns);
+          prevPublicAnns = publicAnns;
+        }
+      }
+    }
   }
 
   /**
@@ -189,6 +192,28 @@ function FrameSync($rootScope, $window, Discovery, annotationUI, bridge) {
     var discovery = new Discovery(window, {server: true});
     discovery.startDiscovery(bridge.createChannel.bind(bridge));
     bridge.onConnect(addFrame);
+
+    window.bridge = bridge;
+    window.discovery = discovery;
+    bridge.on('reloadAnnotations', function() {
+      // THESIS TODO: This is all temporary code.
+      // Since frame-sync can't distinguish between different documents, all annotations are
+      // already loaded in. Simply reload these annotations again.
+      prevAnnotations = [];
+      prevFrames = [];
+      prevPublicAnns = 0;
+
+      var state = annotationUI.getState();
+      var added = [];
+      state.annotations.forEach(function (annot) {
+        if (metadata.isReply(annot)) {
+          // The frame does not need to know about replies
+          return;
+        }
+        added.push(annot);
+      });
+      bridge.call('loadAnnotations', added.map(formatAnnot));
+    });
 
     setupSyncToFrame();
     setupSyncFromFrame();

@@ -107,7 +107,7 @@ module.exports = class Sidebar extends Host
 
   addGuest: (guestElement, guestId, options) ->
     options = @options
-    options.showSidebarCb = _.bind(@show, this)
+    options.showSidebarCb = @show.bind(this)
     super(guestElement, guestId, options)
 
     guestEl = @guests[guestId]
