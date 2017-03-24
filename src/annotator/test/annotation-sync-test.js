@@ -46,6 +46,23 @@ describe('AnnotationSync', function() {
   });
 
   describe('#constructor', function() {
+
+    it('throws if no on() function is passed to it', function() {
+      delete options.on;
+
+      assert.throws(
+        createAnnotationSync, Error,
+        'options.on unspecified for AnnotationSync.');
+    });
+
+    it('throws if no emit() function is passed to it', function() {
+      delete options.emit;
+
+      assert.throws(
+        createAnnotationSync, Error,
+        'options.emit unspecified for AnnotationSync.');
+    });
+
     context('when "deleteAnnotation" is published', function() {
       it('calls emit("annotationDeleted")', function() {
         var ann = {id: 1, $tag: 'tag1'};
