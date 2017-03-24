@@ -113,7 +113,7 @@ AnnotationSync.prototype._channelListeners = {
     annotation = this._parse(body);
     delete this.cache[annotation.$tag];
     this._emit('annotationDeleted', annotation);
-    return cb(null, this._format(annotation));
+    cb(null, this._format(annotation));
   },
   'loadAnnotations': function(bodies, cb) {
     var a;
