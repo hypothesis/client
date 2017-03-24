@@ -4,6 +4,23 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+### Changed
+
+- Replace references to "the Hypothesis web service" with "h" in the docs
+  ([#291](https://github.com/hypothesis/client/pull/291)).
+
+- Implement button for users to flag an inappropriate annotation
+  ([#296](https://github.com/hypothesis/client/pull/296)).
+
+- Implement moderation banner for flagged or hidden annotations
+  ([#285](https://github.com/hypothesis/client/pull/285)).
+
+- Add initial work to support styling the sidebar to better integrate with the
+  look of a publisher's site
+  ([#303](https://github.com/hypothesis/client/pull/303)).
+
 ## [1.4.0] - 2017-03-17
 
 ### Changed
