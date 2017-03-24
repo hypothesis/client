@@ -147,7 +147,9 @@ AnnotationSync.prototype._mkCallRemotelyAndParseResults = function(method, callB
         if (failure === null) {
           _this._parseResults(results);
         }
-        return typeof callBack === 'function' ? callBack(failure, results) : void 0;
+        if (typeof callBack === 'function') {
+          callBack(failure, results);
+        }
       };
       // Call the remote method.
       _this.bridge.call(method, _this._format(annotation), wrappedCallback);
