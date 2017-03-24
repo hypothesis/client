@@ -45,8 +45,8 @@ describe('AnnotationSync', function() {
     sandbox.restore();
   });
 
-  describe('channel event handlers', function() {
-    describe('the "deleteAnnotation" event', function() {
+  describe('#constructor', function() {
+    context('when "deleteAnnotation" is published', function() {
       it('broadcasts the "annotationDeleted" event over the local event bus', function() {
         var ann = {id: 1, $tag: 'tag1'};
         var eventStub = sinon.stub();
@@ -90,7 +90,7 @@ describe('AnnotationSync', function() {
       });
     });
 
-    describe('the "loadAnnotations" event', function() {
+    context('when "loadAnnotations" is published', function() {
       it('publishes the "annotationsLoaded" event', function() {
         var annotations = [
           {id: 1, $tag: 'tag1'},
@@ -111,10 +111,8 @@ describe('AnnotationSync', function() {
         assert.calledWith(loadedStub, annotations);
       });
     });
-  });
 
-  describe('event handlers', function() {
-    describe('the "beforeAnnotationCreated" event', function() {
+    context('when "beforeAnnotationCreated" is emitted', function() {
       it('proxies the event over the bridge', function() {
         var ann = {id: 1};
         createAnnotationSync();
