@@ -154,4 +154,82 @@ describe('AnnotationSync', function() {
       });
     });
   });
+
+  describe('#_tag', function () {
+    context('if the annotation already has a $tag', function() {
+      /** Return an annotation that already has a $tag. */
+      function taggedAnnotation() {
+        return {$tag: 'testTag'};
+      }
+
+      /** Return an unmodifiable tagged annotation. */
+      function frozenTaggedAnnotation() {
+        return Object.freeze(taggedAnnotation());
+      }
+
+      it('does not modify the given annotation', function() {
+        createAnnotationSync()._tag(frozenTaggedAnnotation());
+      });
+
+      it('returns the given annotation', function() {
+        var annotation = taggedAnnotation();
+
+        var returned = createAnnotationSync()._tag(annotation);
+
+        assert.isTrue(returned === annotation);
+      });
+
+      it('does not modify the cache', function() {
+        var annotationSync = createAnnotationSync();
+        Object.freeze(annotationSync.cache);
+
+        annotationSync._tag(taggedAnnotation());
+      });
+    });
+
+    context('if the annotation does not yet have a $tag', function() {
+      /** Return an annotation that does not have a $tag. */
+      function unTaggedAnnotation() {
+        return {};
+      }
+
+      context('if a tag argument is given', function() {
+        it('adds the given tag to the annotation', function() {
+          var annotation = unTaggedAnnotation();
+
+          createAnnotationSync()._tag(annotation, 'testTag');
+
+          assert.equal(annotation.$tag, 'testTag');
+        });
+
+        it('caches the annotation using the given tag', function() {
+          var annotationSync = createAnnotationSync();
+          var annotation = unTaggedAnnotation();
+
+          annotationSync._tag(annotation, 'testTag');
+
+          assert.equal(annotationSync.cache.testTag, annotation);
+        });
+      });
+
+      context('if no tag argument is given', function() {
+        it('adds a randomly generated tag to the annotation', function() {
+          var annotation = unTaggedAnnotation();
+
+          createAnnotationSync()._tag(annotation);
+
+          assert.isDefined(annotation.$tag);
+        });
+
+        it('caches the annotation using the generated tag', function() {
+          var annotationSync = createAnnotationSync();
+          var annotation = unTaggedAnnotation();
+
+          annotationSync._tag(annotation);
+
+          assert.equal(annotationSync.cache[annotation.$tag], annotation);
+        });
+      });
+    });
+  });
 });
