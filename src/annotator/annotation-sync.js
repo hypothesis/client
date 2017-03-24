@@ -47,13 +47,7 @@ function AnnotationSync(bridge, options) {
   this._emit = options.emit;
 
   // Listen locally for interesting events.
-  ref = this._eventListeners;
-  for (event in ref) {
-    if (Object.prototype.hasOwnProperty.call(ref, event))  {
-      handler = ref[event];
-      this._on(event, handler.bind(this));
-    }
-  }
+  this._on('beforeAnnotationCreated', this._beforeAnnotationCreated.bind(this));
 
   // Register remotely invokable methods.
   ref1 = this._channelListeners;
@@ -136,18 +130,13 @@ AnnotationSync.prototype._channelListeners = {
   },
 };
 
-/** An object mapping event name strings to handler functions.
- *
- * These are the handler functions for events received from Annotator.
- */
-AnnotationSync.prototype._eventListeners = {
-  'beforeAnnotationCreated': function(annotation) {
-    if (annotation.$tag) {
-      return undefined;
-    }
-    return this._mkCallRemotelyAndParseResults('beforeCreateAnnotation')(annotation);
-  },
-};
+AnnotationSync.prototype._beforeAnnotationCreated = function(annotation) {
+  if (annotation.$tag) {
+    return undefined;
+  }
+  return this._mkCallRemotelyAndParseResults('beforeCreateAnnotation')(annotation);
+}
+
 
 AnnotationSync.prototype._mkCallRemotelyAndParseResults = function(method, callBack) {
   return (function(_this) {
