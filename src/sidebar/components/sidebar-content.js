@@ -4,6 +4,7 @@ var SearchClient = require('../search-client');
 var events = require('../events');
 var memoize = require('../util/memoize');
 var tabs = require('../tabs');
+var uiConstants = require('../ui-constants');
 
 function firstKey(object) {
   for (var k in object) {
@@ -323,6 +324,16 @@ function SidebarContentController(
 
   this.topLevelThreadCount = function () {
     return thread().totalChildren;
+  };
+
+  this.clearSelection = function () {
+    var selectedTab = annotationUI.getState().selectedTab;
+    if (!annotationUI.getState().selectedTab || annotationUI.getState().selectedTab === uiConstants.TAB_ORPHANS) {
+      selectedTab = uiConstants.TAB_ANNOTATIONS;
+    }
+
+    annotationUI.clearSelectedAnnotations();
+    annotationUI.selectTab(selectedTab);
   };
 }
 
