@@ -26,7 +26,7 @@ function authStateFromUserID(userid) {
 // @ngInject
 module.exports = function AppController(
   $document, $location, $rootScope, $route, $scope,
-  $window, annotationUI, auth, bridge, drafts, features, frameSync, groups,
+  $window, analytics, annotationUI, auth, bridge, drafts, features, frameSync, groups,
   serviceUrl, session, settings, streamer
 ) {
 
@@ -107,6 +107,10 @@ module.exports = function AppController(
 
     $scope.accountDialog.visible = true;
     scrollToView('login-form');
+  };
+
+  $scope.signUp = function(){
+    analytics.track(analytics.events.SIGN_UP_REQUESTED);
   };
 
   // Display the dialog for sharing the current page

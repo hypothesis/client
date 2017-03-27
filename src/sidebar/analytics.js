@@ -41,7 +41,7 @@ var globalGAOptions = function(win, settings){
  */
 // @ngInject
 function analytics($analytics, $window, settings) {
-  var options = globalGAOptions($window, settings);
+  var options = $window ? globalGAOptions($window, settings) : {};
 
   return {
 
@@ -67,6 +67,10 @@ function analytics($analytics, $window, settings) {
       HIGHLIGHT_CREATED: 'highlightCreated',
       HIGHLIGHT_UPDATED: 'highlightUpdated',
       HIGHLIGHT_DELETED: 'highlightDeleted',
+      LOGIN_FAILURE: 'loginFailure',
+      LOGIN_SUCCESS: 'loginSuccessful',
+      LOGOUT_FAILURE: 'logoutFailure',
+      LOGOUT_SUCCESS: 'logoutSuccessful',
       PAGE_NOTE_CREATED: 'pageNoteCreated',
       PAGE_NOTE_UPDATED: 'pageNoteUpdated',
       PAGE_NOTE_DELETED: 'pageNoteDeleted',
@@ -74,6 +78,7 @@ function analytics($analytics, $window, settings) {
       REPLY_UPDATED: 'replyUpdated',
       REPLY_DELETED: 'replyDeleted',
       SIDEBAR_OPENED: 'sidebarOpened',
+      SIGN_UP_REQUESTED: 'signUpRequested',
     },
   };
 }

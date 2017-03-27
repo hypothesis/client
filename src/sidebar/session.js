@@ -43,7 +43,7 @@ function sessionActions(options) {
  *
  * @ngInject
  */
-function session($http, $resource, $rootScope, annotationUI, auth,
+function session($http, $q, $resource, $rootScope, analytics, annotationUI, auth,
                  flash, raven, settings, store) {
   // Headers sent by every request made by the session service.
   var headers = {};
@@ -208,9 +208,13 @@ function session($http, $resource, $rootScope, annotationUI, auth,
       auth.clearCache();
     }).catch(function (err) {
       flash.error('Log out failed');
-      throw err;
+      analytics.track(analytics.events.LOGOUT_FAILURE);
+      return $q.reject(new Error(err));
+    }).then(function(){
+      analytics.track(analytics.events.LOGOUT_SUCCESS);
     });
   }
+
 
   return {
     dismissSidebarTutorial: dismissSidebarTutorial,
