@@ -59,26 +59,24 @@ function configureLocation($locationProvider) {
 }
 
 // @ngInject
-var VIEWER_TEMPLATE = require('./templates/viewer.html');
-
 function configureRoutes($routeProvider) {
   $routeProvider.when('/a/:id',
     {
       controller: 'AnnotationViewerController',
-      template: VIEWER_TEMPLATE,
+      template: require('./templates/annotation_viewer_content.html'),
       reloadOnSearch: false,
       resolve: resolve,
     });
   $routeProvider.when('/stream',
     {
       controller: 'StreamController',
-      template: VIEWER_TEMPLATE,
+      template: require('./templates/stream_content.html'),
       reloadOnSearch: false,
       resolve: resolve,
     });
   $routeProvider.otherwise({
     controller: 'WidgetController',
-    template: VIEWER_TEMPLATE,
+    template: require('./templates/sidebar_content.html'),
     reloadOnSearch: false,
     resolve: resolve,
   });
