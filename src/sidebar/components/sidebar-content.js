@@ -1,9 +1,9 @@
 'use strict';
 
-var SearchClient = require('./search-client');
-var events = require('./events');
-var memoize = require('./util/memoize');
-var tabs = require('./tabs');
+var SearchClient = require('../search-client');
+var events = require('../events');
+var memoize = require('../util/memoize');
+var tabs = require('../tabs');
 
 function firstKey(object) {
   for (var k in object) {
@@ -31,10 +31,12 @@ function groupIDFromSelection(selection, results) {
 }
 
 // @ngInject
-module.exports = function WidgetController(
+function SidebarContentController(
   $scope, analytics, annotationUI, annotationMapper, drafts, features, frameSync,
   groups, rootThread, settings, streamer, streamFilter, store
 ) {
+  var self = this;
+
   function thread() {
     return rootThread.thread(annotationUI.getState());
   }
@@ -42,13 +44,13 @@ module.exports = function WidgetController(
   var unsubscribeAnnotationUI = annotationUI.subscribe(function () {
     var state = annotationUI.getState();
 
-    $scope.rootThread = thread();
-    $scope.selectedTab = state.selectedTab;
+    self.rootThread = thread();
+    self.selectedTab = state.selectedTab;
 
     var separateOrphans = tabs.shouldSeparateOrphans(state);
     var counts = tabs.counts(state.annotations, separateOrphans);
 
-    Object.assign($scope, {
+    Object.assign(self, {
       totalNotes: counts.notes,
       totalAnnotations: counts.annotations,
       totalOrphans: counts.orphans,
@@ -210,7 +212,7 @@ module.exports = function WidgetController(
   });
 
   // If the user is logged in, we connect nevertheless
-  if ($scope.auth.status === 'logged-in') {
+  if (this.auth.status === 'logged-in') {
     streamer.connect();
   }
 
@@ -257,21 +259,21 @@ module.exports = function WidgetController(
     });
   }, loadAnnotations, true);
 
-  $scope.setCollapsed = function (id, collapsed) {
+  this.setCollapsed = function (id, collapsed) {
     annotationUI.setCollapsed(id, collapsed);
   };
 
-  $scope.forceVisible = function (thread) {
+  this.forceVisible = function (thread) {
     annotationUI.setForceVisible(thread.id, true);
     if (thread.parent) {
       annotationUI.setCollapsed(thread.parent.id, false);
     }
   };
 
-  $scope.focus = focusAnnotation;
-  $scope.scrollTo = scrollToAnnotation;
+  this.focus = focusAnnotation;
+  this.scrollTo = scrollToAnnotation;
 
-  $scope.selectedAnnotationCount = function () {
+  this.selectedAnnotationCount = function () {
     var selection = annotationUI.getState().selectedAnnotationMap;
     if (!selection) {
       return 0;
@@ -279,16 +281,16 @@ module.exports = function WidgetController(
     return Object.keys(selection).length;
   };
 
-  $scope.selectedAnnotationUnavailable = function () {
+  this.selectedAnnotationUnavailable = function () {
     var selectedID = firstKey(annotationUI.getState().selectedAnnotationMap);
     return !isLoading() &&
            !!selectedID &&
            !annotationUI.annotationExists(selectedID);
   };
 
-  $scope.shouldShowLoggedOutMessage = function () {
+  this.shouldShowLoggedOutMessage = function () {
     // If user is not logged out, don't show CTA.
-    if ($scope.auth.status !== 'logged-out') {
+    if (self.auth.status !== 'logged-out') {
       return false;
     }
 
@@ -307,7 +309,7 @@ module.exports = function WidgetController(
            annotationUI.annotationExists(selectedID);
   };
 
-  $scope.isLoading = isLoading;
+  this.isLoading = isLoading;
 
   var visibleCount = memoize(function (thread) {
     return thread.children.reduce(function (count, child) {
@@ -315,11 +317,21 @@ module.exports = function WidgetController(
     }, thread.visible ? 1 : 0);
   });
 
-  $scope.visibleCount = function () {
+  this.visibleCount = function () {
     return visibleCount(thread());
   };
 
-  $scope.topLevelThreadCount = function () {
+  this.topLevelThreadCount = function () {
     return thread().totalChildren;
   };
+}
+
+module.exports = {
+  controller: SidebarContentController,
+  controllerAs: 'vm',
+  bindings: {
+    auth: '<',
+    search: '<',
+  },
+  template: require('../templates/sidebar_content.html'),
 };
