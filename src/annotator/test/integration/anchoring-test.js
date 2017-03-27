@@ -44,6 +44,9 @@ function FakeCrossFrame() {
   this.onConnect = sinon.stub();
   this.on = sinon.stub();
   this.sync = sinon.stub();
+  this.removeGuestListener = sinon.stub();
+  this.registerMethods = sinon.stub();
+  this.removeMethods = sinon.stub();
 }
 
 describe('anchoring', function () {

@@ -115,7 +115,7 @@ module.exports = class Sidebar extends Host
 
     guestEl.on 'click', (event) =>
       if !@selectedTargets?.length
-        this.hide()
+        @hide()
 
   onPan: (event) =>
     switch event.type
@@ -177,11 +177,3 @@ module.exports = class Sidebar extends Host
       @toolbar.find('[name=sidebar-toggle]')
       .removeClass('h-icon-chevron-right')
       .addClass('h-icon-chevron-left')
-
-  createAnnotation: (annotation = {}) ->
-    super
-    this.show() unless annotation.$highlight
-
-  showAnnotations: (annotations) ->
-    super
-    this.show()

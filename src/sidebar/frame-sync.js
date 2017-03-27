@@ -56,8 +56,6 @@ function FrameSync($rootScope, $window, Discovery, annotationUI, bridge) {
     annotationUI.subscribe(updateAnnotations);
   }
 
-  // THESIS TODO: This was put into its own function for debugging, and potential future use. Revert if nothing becomes of it.
-  // prevAnnotations, prevFrames, and prevPublicAnns were located in setupSyncToFrame prior to this
   function updateAnnotations() {
     var state = annotationUI.getState();
     if (state.annotations === prevAnnotations &&

@@ -62,8 +62,8 @@ module.exports = class Guest extends Annotator
     if !options then options = {}
 
     self = this
-    this.guestDocument = element.ownerDocument
-    this.guestId = options.guestId || "default"
+    @guestDocument = element.ownerDocument
+    @guestId = options.guestId || "default"
     # THESIS TODO: Consider using a trigger instead, via crossframe
     @showSidebarCb = options.showSidebarCb
 
@@ -83,50 +83,45 @@ module.exports = class Guest extends Annotator
         else
           self._onClearSelection()
 
-    this.anchors = []
+    @anchors = []
     @plugins = options.hostPlugins unless !options.hostPlugins
 
     # If options.crossframe is set, it is assumed that this is NOT the default guest, and
     # so a crossframe needs to be set
     if (options.crossframe)
-      this._setCrossframe(options.crossframe)
-    else
-    # Otherwise, the crossframe and plugins have to be instantiated
-      cfOptions =
-        on: (event, handler) =>
-          this.subscribe(event, handler)
-        emit: (event, args...) =>
-          this.publish(event, args)
+      @_setCrossframe(options.crossframe)
+      @setVisibleHighlights(options.showHighlights)
+      @adderCtrl = options.adderCtrl
+    else # Otherwise, the crossframe and plugins have to be initialized
+      @_setupDefaultGuest()
 
-      this.addPlugin('CrossFrame', cfOptions)
-      @crossframe = @plugins.CrossFrame
+  _setupDefaultGuest: ->
+    @_setCrossframe()
 
-      for own name, opts of @options
-        if not @plugins[name] and Annotator.Plugin[name]
-          this.addPlugin(name, opts)
+    for own name, opts of @options
+      if not @plugins[name] and Annotator.Plugin[name]
+        @addPlugin(name, opts)
 
-      this._connectAnnotationSync(@crossframe)
-      this._connectAnnotationUISync(@crossframe, @guestId)
-
-      # THESIS TODO: Tests require this to be in Guest
-      # Investigate to see if any issues arise
-      @crossframe.onConnect(=> this.publish('panelReady'))
+    @crossframe.onConnect(=> @publish('panelReady'))
+    @adderCtrl = new adder.Adder(@adder[0])
 
   _setCrossframe: (crossframe) ->
     cfOptions =
       on: (event, handler) =>
-        this.subscribe(event, handler)
+        @subscribe(event, handler)
       emit: (event, args...) =>
-        this.publish(event, args)
+        @publish(event, args)
 
-    @crossframe = @options.crossframe
+    if (crossframe)
+      @crossframe = @options.crossframe
+      @crossframe.reloadAnnotations()
+      @crossframe.registerMethods(cfOptions, this.guestId)
+    else
+      @addPlugin('CrossFrame', cfOptions)
+      @crossframe = @plugins.CrossFrame
 
-    @crossframe.reloadAnnotations()
-    @crossframe.registerMethods(cfOptions, this.guestId)
-    this._connectAnnotationSync(@crossframe)
-    this._connectAnnotationUISync(@crossframe, @guestId)
-
-    if typeof @options.showHighlights == 'boolean' then @setVisibleHighlights(@options.showHighlights)
+    @_connectAnnotationSync(@crossframe)
+    @_connectAnnotationUISync(@crossframe, @guestId)
 
   # Get the document info
   getDocumentInfo: ->
@@ -203,10 +198,9 @@ module.exports = class Guest extends Annotator
     @element.data('annotator', null)
 
     this.removeEvents()
-    # THESIS TODO: 'unless' is required to pass certain tests
-    # May be a rise for concern, why doesn't crossframe have these methods during the test?
-    @crossframe.removeGuestListener(@guestId) unless !@crossframe.removeGuestListener
-    @crossframe.removeMethods(@guestId) unless !@crossframe.removeMethods
+
+    @crossframe.removeGuestListener(@guestId)
+    @crossframe.removeMethods(@guestId)
 
   anchor: (annotation) ->
     self = this
@@ -469,6 +463,7 @@ module.exports = class Guest extends Annotator
 
   # Pass true to show the highlights in the frame or false to disable.
   setVisibleHighlights: (shouldShowHighlights) ->
+    if typeof shouldShowHighlights == "undefined" then shouldShowHighlights = true
     @crossframe?.call('setVisibleHighlights', shouldShowHighlights)
     this.toggleHighlightClass(shouldShowHighlights)
     this.publish 'setVisibleHighlights', shouldShowHighlights

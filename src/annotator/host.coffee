@@ -36,7 +36,7 @@ module.exports = class Host extends Annotator
 
     for own name, opts of @options
       if not @plugins[name] and Annotator.Plugin[name]
-        this.addPlugin(name, opts)
+        @addPlugin(name, opts)
 
     guest = @addGuest(element, "default", options)
     # @plugins gets passed into the guest, and so crossframe is directly added to the @plugins object
@@ -69,7 +69,7 @@ module.exports = class Host extends Annotator
     options.hostPlugins = @plugins
     guest = new Guest(guestElement, options)
 
-    this.guests[guestId] = guest
+    @guests[guestId] = guest
     return guest
 
   destroy: ->
