@@ -3,7 +3,7 @@
 var VIA_PREFIX = 'https://via.hypothes.is/';
 
 // @ngInject
-function ShareDialogController($scope, $element, annotationUI) {
+function ShareDialogController($scope, $element, analytics, annotationUI) {
   var self = this;
 
   function updateViaLink(frames) {
@@ -26,6 +26,12 @@ function ShareDialogController($scope, $element, annotationUI) {
 
   $scope.$watch(function () { return annotationUI.frames(); },
     updateViaLink);
+
+  $scope.onShareClick = function(target){
+    if(target){
+      analytics.track(analytics.events.DOCUMENT_SHARED, target);
+    }
+  };
 }
 
 module.exports = {
