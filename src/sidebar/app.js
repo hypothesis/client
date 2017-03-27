@@ -75,6 +75,10 @@ function configureRoutes($routeProvider) {
       resolve: resolve,
     });
   $routeProvider.otherwise({
+    // Trivial template for use until the other controllers are also converted
+    // to components and we can remove the router entirely.
+    //
+    // The "search" and "auth" properties are provided by "AppController".
     template: '<sidebar-content search="search" auth="auth"></sidebar-content>',
     reloadOnSearch: false,
     resolve: resolve,
