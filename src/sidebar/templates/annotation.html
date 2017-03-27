@@ -63,6 +63,7 @@
       overflow-hysteresis="20"
       content-data="selector.exact">
       <blockquote class="annotation-quote"
+        h-branding="selectionFontFamily"
         ng-bind="selector.exact"
         ng-repeat="selector in target.selector
           | filter : {'type': 'TextQuoteSelector'}
@@ -106,7 +107,8 @@
     <a class="annotation-link u-strong" ng-show="vm.canCollapseBody"
       ng-click="vm.toggleCollapseBody($event)"
       ng-title="vm.collapseBody ? 'Show the full annotation text' : 'Show the first few lines only'"
-      ng-bind="vm.collapseBody ? 'More' : 'Less'"></a>
+      ng-bind="vm.collapseBody ? 'More' : 'Less'"
+      h-branding="highlightColor"></a>
   </div>
   <!-- / Tags -->
 

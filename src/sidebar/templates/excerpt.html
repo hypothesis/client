@@ -9,11 +9,13 @@
          ng-show="vm.showInlineControls()">
       <span class="excerpt__toggle-link" ng-show="vm.isExpandable()">
         … <a ng-click="vm.toggle($event)"
-            title="Show the full excerpt">More</a>
+            title="Show the full excerpt"
+            h-branding="highlightColor">More</a>
       </span>
       <span class="excerpt__toggle-link" ng-show="vm.isCollapsible()">
         <a ng-click="vm.toggle($event)"
-            title="Show the first few lines only">Less</a>
+            title="Show the first few lines only"
+            h-branding="highlightColor">Less</a>
       </span>
     </div>
   </div>
