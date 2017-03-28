@@ -17,6 +17,10 @@ class MockSession
 
 mockFlash = info: sandbox.spy()
 mockFormRespond = sandbox.spy()
+mockAnalytics = {
+  track: sandbox.stub(),
+  events: require('../../analytics')().events,
+}
 
 describe 'loginForm.Controller', ->
   $scope = null
@@ -33,6 +37,7 @@ describe 'loginForm.Controller', ->
 
   beforeEach module ($provide) ->
     $provide.value '$timeout', sandbox.spy()
+    $provide.value 'analytics', mockAnalytics
     $provide.value 'flash', mockFlash
     $provide.value 'session', new MockSession()
     $provide.value 'formRespond', mockFormRespond
@@ -49,6 +54,7 @@ describe 'loginForm.Controller', ->
 
   afterEach ->
     sandbox.restore()
+    mockAnalytics.track.reset()
 
   describe '#submit()', ->
     it 'should call session methods on submit', ->
@@ -137,6 +143,48 @@ describe 'loginForm.Controller', ->
       sandbox.spy $scope, '$emit'
       $scope.$destroy()
       assert.calledWith $scope.$emit, 'auth', 'cancel'
+
+  describe 'auth analytics', ->
+    it 'should not track login errors for local validation errors', ->
+      auth.submit
+        $name: 'login'
+        $valid: false
+        $setValidity: sandbox.stub()
+
+      assert.notCalled mockAnalytics.track
+
+    it 'should track login error when server sends a reason', ->
+      # Make a mock session that returns an error response with a "reason" but
+      # no "errors" in the JSON object.
+      reason = 'Argh, crashed! :|'
+      myMockSession = new MockSession()
+      myMockSession.register = (data, callback, errback) ->
+        errback({data: {reason: reason}})
+        $promise: {finally: sandbox.stub()}
+
+      # Get an AuthController object with our mock session.
+      authCtrl = $controller(
+        'loginFormController', {$scope:$scope, session:myMockSession})
+
+      form = {$name: 'register', $valid: true}
+
+      authCtrl.submit(form)
+
+      assert.calledOnce(mockAnalytics.track)
+      assert.calledWith(mockAnalytics.track, mockAnalytics.events.LOGIN_FAILURE)
+
+    it 'should emit an auth event once authenticated', ->
+      form =
+        $name: 'login'
+        $valid: true
+        $setValidity: sandbox.stub()
+
+      sandbox.spy $scope, '$emit'
+
+      auth.submit(form)
+
+      assert.calledOnce(mockAnalytics.track)
+      assert.calledWith(mockAnalytics.track, mockAnalytics.events.LOGIN_SUCCESS)
 
   describe 'timeout', ->
     it 'should happen after a period of inactivity', ->

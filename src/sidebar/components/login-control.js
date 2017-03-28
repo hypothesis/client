@@ -25,6 +25,10 @@ module.exports = {
      */
     onLogin: '&',
     /**
+     * Called when the user clicks on the "Sign Up" text.
+     */
+    onSignUp: '&',
+    /**
      * Called when the user clicks on the "Log out" text.
      */
     onLogout: '&',

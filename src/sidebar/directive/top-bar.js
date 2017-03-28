@@ -9,6 +9,7 @@ module.exports = function () {
       isSidebar: '<',
       onShowHelpPanel: '&',
       onLogin: '&',
+      onSignUp: '&',
       onLogout: '&',
       onSharePage: '&',
       searchController: '<',

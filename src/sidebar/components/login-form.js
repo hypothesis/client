@@ -3,13 +3,14 @@
 var angular = require('angular');
 
 // @ngInject
-function Controller($scope, $timeout, flash, session, formRespond, serviceUrl) {
+function Controller($scope, $timeout, analytics, flash, session, formRespond, serviceUrl) {
   var pendingTimeout = null;
 
   function success(data) {
     if (data.userid) {
       $scope.$emit('auth', null, data);
     }
+    analytics.track(analytics.events.LOGIN_SUCCESS);
 
     angular.copy({}, $scope.model);
 
@@ -30,6 +31,8 @@ function Controller($scope, $timeout, flash, session, formRespond, serviceUrl) {
         'Please try again later!';
     }
 
+    analytics.track(analytics.events.LOGIN_FAILURE);
+    
     return formRespond(form, errors, reason);
   }
 

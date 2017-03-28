@@ -69,7 +69,7 @@ describe('AppController', function () {
 
     fakeAnalytics = {
       track: sandbox.stub(),
-      events: {},
+      events: require('../analytics')().events,
     };
 
     fakeAuth = {};
@@ -254,6 +254,12 @@ describe('AppController', function () {
     fakeRoute.reload = sinon.spy();
     $scope.$broadcast(events.USER_CHANGED, {initialLoad: false});
     assert.calledOnce(fakeRoute.reload);
+  });
+
+  it('tracks sign up requests in analytics', function () {
+    createController();
+    $scope.signUp();
+    assert.calledWith(fakeAnalytics.track, fakeAnalytics.events.SIGN_UP_REQUESTED);
   });
 
   describe('#login()', function () {

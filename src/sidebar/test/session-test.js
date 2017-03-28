@@ -10,6 +10,7 @@ describe('session', function () {
   var $httpBackend;
   var $rootScope;
 
+  var fakeAnalytics;
   var fakeAuth;
   var fakeFlash;
   var fakeRaven;
@@ -27,6 +28,10 @@ describe('session', function () {
     sandbox = sinon.sandbox.create();
 
     var state = {};
+    fakeAnalytics = {
+      track: sinon.stub(),
+      events: require('../analytics')().events,
+    };
     var fakeAnnotationUI = {
       getState: function () {
         return {session: state};
@@ -53,6 +58,7 @@ describe('session', function () {
     };
 
     mock.module('h', {
+      analytics: fakeAnalytics,
       annotationUI: fakeAnnotationUI,
       auth: fakeAuth,
       flash: fakeFlash,
@@ -296,9 +302,10 @@ describe('session', function () {
   });
 
   describe('#logout()', function () {
+    var postExpectation;
     beforeEach(function () {
-      var url = 'https://test.hypothes.is/root/app?__formid__=logout';
-      $httpBackend.expectPOST(url).respond(200, {
+      var logoutUrl = 'https://test.hypothes.is/root/app?__formid__=logout';
+      postExpectation = $httpBackend.expectPOST(logoutUrl).respond(200, {
         model: {
           userid: 'logged-out-id',
         },
@@ -316,6 +323,23 @@ describe('session', function () {
       session.logout().then(function () {
         assert.called(fakeAuth.clearCache);
       });
+      $httpBackend.flush();
+    });
+
+    it('tracks successful logout actions in analytics', function () {
+      session.logout().then(function () {
+        assert.calledWith(fakeAnalytics.track, fakeAnalytics.events.LOGOUT_SUCCESS);
+      });
+      $httpBackend.flush();
+    });
+
+    it('tracks unsuccessful logout actions in analytics', function () {
+      postExpectation.respond(500);
+
+      session.logout().catch(function(){
+        assert.calledWith(fakeAnalytics.track, fakeAnalytics.events.LOGOUT_FAILURE);
+      });
+
       $httpBackend.flush();
     });
   });
