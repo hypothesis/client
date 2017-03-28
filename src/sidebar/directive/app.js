@@ -2,11 +2,8 @@
 
 var AppController = require('../app-controller');
 
-module.exports = function () {
-  return {
-    restrict: 'E',
-    controller: AppController,
-    scope: {},
-    template: require('../templates/app.html'),
-  };
+module.exports = {
+  controllerAs: 'vm',
+  controller: AppController,
+  template: require('../templates/app.html'),
 };

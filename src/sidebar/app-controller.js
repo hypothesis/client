@@ -23,54 +23,55 @@ function authStateFromUserID(userid) {
 }
 
 // @ngInject
-module.exports = function AppController(
+function HypothesisAppController(
   $document, $location, $rootScope, $route, $scope,
   $window, analytics, annotationUI, auth, bridge, drafts, features, frameSync, groups,
   serviceUrl, session, settings, streamer
 ) {
+  var self = this;
 
   // This stores information about the current user's authentication status.
   // When the controller instantiates we do not yet know if the user is
   // logged-in or not, so it has an initial status of 'unknown'. This can be
   // used by templates to show an intermediate or loading state.
-  $scope.auth = {status: 'unknown'};
+  this.auth = {status: 'unknown'};
 
   // Allow all child scopes to look up feature flags as:
   //
   //     if ($scope.feature('foo')) { ... }
-  $scope.feature = features.flagEnabled;
+  this.feature = features.flagEnabled;
 
   // Allow all child scopes access to the session
-  $scope.session = session;
+  this.session = session;
 
   // App dialogs
-  $scope.accountDialog = {visible: false};
-  $scope.shareDialog = {visible: false};
-  $scope.helpPanel = {visible: false};
+  this.accountDialog = {visible: false};
+  this.shareDialog = {visible: false};
+  this.helpPanel = {visible: false};
 
   // Check to see if we're in the sidebar, or on a standalone page such as
   // the stream page or an individual annotation page.
-  $scope.isSidebar = $window.top !== $window;
-  if ($scope.isSidebar) {
+  this.isSidebar = $window.top !== $window;
+  if (this.isSidebar) {
     frameSync.connect();
   }
 
-  $scope.serviceUrl = serviceUrl;
+  this.serviceUrl = serviceUrl;
 
-  $scope.sortKey = function () {
+  this.sortKey = function () {
     return annotationUI.getState().sortKey;
   };
 
-  $scope.sortKeysAvailable = function () {
+  this.sortKeysAvailable = function () {
     return annotationUI.getState().sortKeysAvailable;
   };
 
-  $scope.setSortKey = annotationUI.setSortKey;
+  this.setSortKey = annotationUI.setSortKey;
 
   // Reload the view when the user switches accounts
   $scope.$on(events.USER_CHANGED, function (event, data) {
-    $scope.auth = authStateFromUserID(data.userid);
-    $scope.accountDialog.visible = false;
+    self.auth = authStateFromUserID(data.userid);
+    self.accountDialog.visible = false;
 
     if (!data || !data.initialLoad) {
       $route.reload();
@@ -81,10 +82,10 @@ module.exports = function AppController(
     // When the authentication status of the user is known,
     // update the auth info in the top bar and show the login form
     // after first install of the extension.
-    $scope.auth = authStateFromUserID(state.userid);
+    self.auth = authStateFromUserID(state.userid);
 
     if (!state.userid && settings.openLoginForm) {
-      $scope.login();
+      self.login();
     }
   });
 
@@ -98,23 +99,23 @@ module.exports = function AppController(
   }
 
   // Start the login flow. This will present the user with the login dialog.
-  $scope.login = function () {
+  this.login = function () {
     if (serviceConfig(settings)) {
       bridge.call(bridgeEvents.DO_LOGIN);
       return;
     }
 
-    $scope.accountDialog.visible = true;
+    self.accountDialog.visible = true;
     scrollToView('login-form');
   };
 
-  $scope.signUp = function(){
+  this.signUp = function(){
     analytics.track(analytics.events.SIGN_UP_REQUESTED);
   };
 
   // Display the dialog for sharing the current page
-  $scope.share = function () {
-    $scope.shareDialog.visible = true;
+  this.share = function () {
+    this.shareDialog.visible = true;
     scrollToView('share-dialog');
   };
 
@@ -133,7 +134,7 @@ module.exports = function AppController(
   };
 
   // Log the user out.
-  $scope.logout = function () {
+  this.logout = function () {
     if (!promptToLogout()) {
       return;
     }
@@ -141,11 +142,11 @@ module.exports = function AppController(
       $rootScope.$emit(events.ANNOTATION_DELETED, draft);
     });
     drafts.discard();
-    $scope.accountDialog.visible = false;
+    this.accountDialog.visible = false;
     session.logout();
   };
 
-  $scope.search = {
+  this.search = {
     query: function () {
       return annotationUI.getState().filterQuery;
     },
@@ -154,6 +155,12 @@ module.exports = function AppController(
     },
   };
 
-  $scope.countPendingUpdates = streamer.countPendingUpdates;
-  $scope.applyPendingUpdates = streamer.applyPendingUpdates;
+  this.countPendingUpdates = streamer.countPendingUpdates;
+  this.applyPendingUpdates = streamer.applyPendingUpdates;
+}
+
+module.exports = {
+  controller: HypothesisAppController,
+  controllerAs: 'vm',
+  template: require('./templates/app.html'),
 };

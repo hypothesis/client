@@ -7,8 +7,8 @@ var events = require('../events');
 var bridgeEvents = require('../../shared/bridge-events');
 var util = require('../../shared/test/util');
 
-describe('AppController', function () {
-  var $controller = null;
+describe('hypothesisApp', function () {
+  var $componentController = null;
   var $scope = null;
   var $rootScope = null;
   var fakeAnnotationMetadata = null;
@@ -35,7 +35,7 @@ describe('AppController', function () {
   var createController = function (locals) {
     locals = locals || {};
     locals.$scope = $scope;
-    return $controller('AppController', locals);
+    return $componentController('hypothesisApp', locals);
   };
 
   beforeEach(function () {
@@ -49,14 +49,14 @@ describe('AppController', function () {
 
     fakeServiceConfig = sandbox.stub();
 
-    var AppController = proxyquire('../app-controller', util.noCallThru({
+    var component = proxyquire('../app-controller', util.noCallThru({
       'angular': angular,
       './annotation-metadata': fakeAnnotationMetadata,
       './service-config': fakeServiceConfig,
     }));
 
     angular.module('h', [])
-      .controller('AppController', AppController);
+      .component('hypothesisApp', component);
   });
 
   beforeEach(angular.mock.module('h'));
@@ -140,8 +140,8 @@ describe('AppController', function () {
     $provide.value('$window', fakeWindow);
   }));
 
-  beforeEach(angular.mock.inject(function (_$controller_, _$rootScope_) {
-    $controller = _$controller_;
+  beforeEach(angular.mock.inject(function (_$componentController_, _$rootScope_) {
+    $componentController = _$componentController_;
     $rootScope = _$rootScope_;
     $scope = $rootScope.$new();
   }));
@@ -154,14 +154,14 @@ describe('AppController', function () {
 
     it('is false if the window is the top window', function () {
       fakeWindow.top = fakeWindow;
-      createController();
-      assert.isFalse($scope.isSidebar);
+      var ctrl = createController();
+      assert.isFalse(ctrl.isSidebar);
     });
 
     it('is true if the window is not the top window', function () {
       fakeWindow.top = {};
-      createController();
-      assert.isTrue($scope.isSidebar);
+      var ctrl = createController();
+      assert.isTrue(ctrl.isSidebar);
     });
   });
 
@@ -178,14 +178,14 @@ describe('AppController', function () {
   });
 
   it('auth.status is "unknown" on startup', function () {
-    createController();
-    assert.equal($scope.auth.status, 'unknown');
+    var ctrl = createController();
+    assert.equal(ctrl.auth.status, 'unknown');
   });
 
   it('sets auth.status to "logged-out" if userid is null', function () {
-    createController();
+    var ctrl = createController();
     return fakeSession.load().then(function () {
-      assert.equal($scope.auth.status, 'logged-out');
+      assert.equal(ctrl.auth.status, 'logged-out');
     });
   });
 
@@ -193,9 +193,9 @@ describe('AppController', function () {
     fakeSession.load = function () {
       return Promise.resolve({userid: 'acct:jim@hypothes.is'});
     };
-    createController();
+    var ctrl = createController();
     return fakeSession.load().then(function () {
-      assert.equal($scope.auth.status, 'logged-in');
+      assert.equal(ctrl.auth.status, 'logged-in');
     });
   });
 
@@ -203,22 +203,22 @@ describe('AppController', function () {
     fakeSession.load = function () {
       return Promise.resolve({userid: 'acct:jim@hypothes.is'});
     };
-    createController();
+    var ctrl = createController();
     return fakeSession.load().then(function () {
-      assert.equal($scope.auth.userid, 'acct:jim@hypothes.is');
-      assert.equal($scope.auth.username, 'jim');
-      assert.equal($scope.auth.provider, 'hypothes.is');
+      assert.equal(ctrl.auth.userid, 'acct:jim@hypothes.is');
+      assert.equal(ctrl.auth.username, 'jim');
+      assert.equal(ctrl.auth.provider, 'hypothes.is');
     });
   });
 
   it('updates auth when the logged-in user changes', function () {
-    createController();
+    var ctrl = createController();
     return fakeSession.load().then(function () {
       $scope.$broadcast(events.USER_CHANGED, {
         initialLoad: false,
         userid: 'acct:john@hypothes.is',
       });
-      assert.deepEqual($scope.auth, {
+      assert.deepEqual(ctrl.auth, {
         status: 'logged-in',
         userid: 'acct:john@hypothes.is',
         username: 'john',
@@ -227,19 +227,19 @@ describe('AppController', function () {
     });
   });
 
-  it('exposes the serviceUrl on the scope', function () {
-    createController();
-    assert.equal($scope.serviceUrl, fakeServiceUrl);
+  it('exposes the serviceUrl on the controller', function () {
+    var ctrl = createController();
+    assert.equal(ctrl.serviceUrl, fakeServiceUrl);
   });
 
   it('does not show login form for logged in users', function () {
-    createController();
-    assert.isFalse($scope.accountDialog.visible);
+    var ctrl = createController();
+    assert.isFalse(ctrl.accountDialog.visible);
   });
 
   it('does not show the share dialog at start', function () {
-    createController();
-    assert.isFalse($scope.shareDialog.visible);
+    var ctrl = createController();
+    assert.isFalse(ctrl.shareDialog.visible);
   });
 
   it('does not reload the view when the logged-in user changes on first load', function () {
@@ -257,8 +257,8 @@ describe('AppController', function () {
   });
 
   it('tracks sign up requests in analytics', function () {
-    createController();
-    $scope.signUp();
+    var ctrl = createController();
+    ctrl.signUp();
     assert.calledWith(fakeAnalytics.track, fakeAnalytics.events.SIGN_UP_REQUESTED);
   });
 
@@ -266,9 +266,9 @@ describe('AppController', function () {
     it('shows the login dialog if not using a third-party service', function () {
       // If no third-party annotation service is in use then it should show the
       // built-in login dialog.
-      createController();
-      $scope.login();
-      assert.equal($scope.accountDialog.visible, true);
+      var ctrl = createController();
+      ctrl.login();
+      assert.equal(ctrl.accountDialog.visible, true);
     });
 
     it('sends DO_LOGIN if a third-party service is in use', function () {
@@ -277,9 +277,9 @@ describe('AppController', function () {
       // (so that the partner site we're embedded in can do its own login
       // thing).
       fakeServiceConfig.returns({});
-      createController();
+      var ctrl = createController();
 
-      $scope.login();
+      ctrl.login();
 
       assert.equal(fakeBridge.call.callCount, 1);
       assert.isTrue(fakeBridge.call.calledWithExactly(bridgeEvents.DO_LOGIN));
@@ -288,24 +288,24 @@ describe('AppController', function () {
 
   describe('#share()', function () {
     it('shows the share dialog', function () {
-      createController();
-      $scope.share();
-      assert.equal($scope.shareDialog.visible, true);
+      var ctrl = createController();
+      ctrl.share();
+      assert.equal(ctrl.shareDialog.visible, true);
     });
   });
 
   describe('#logout()', function () {
     it('calls session.logout()', function () {
-      createController();
-      $scope.logout();
+      var ctrl = createController();
+      ctrl.logout();
       assert.called(fakeSession.logout);
     });
 
     it('prompts the user if there are drafts', function () {
       fakeDrafts.count.returns(1);
-      createController();
+      var ctrl = createController();
 
-      $scope.logout();
+      ctrl.logout();
 
       assert.equal(fakeWindow.confirm.callCount, 1);
     });
@@ -314,10 +314,10 @@ describe('AppController', function () {
       fakeDrafts.unsaved = sandbox.stub().returns(
         ['draftOne', 'draftTwo', 'draftThree']
       );
-      createController();
+      var ctrl = createController();
       $rootScope.$emit = sandbox.stub();
 
-      $scope.logout();
+      ctrl.logout();
 
       assert($rootScope.$emit.calledThrice);
       assert.deepEqual(
@@ -329,39 +329,39 @@ describe('AppController', function () {
     });
 
     it('discards draft annotations', function () {
-      createController();
+      var ctrl = createController();
 
-      $scope.logout();
+      ctrl.logout();
 
       assert(fakeDrafts.discard.calledOnce);
     });
 
     it('does not emit "annotationDeleted" if the user cancels the prompt', function () {
-      createController();
+      var ctrl = createController();
       fakeDrafts.count.returns(1);
       $rootScope.$emit = sandbox.stub();
       fakeWindow.confirm.returns(false);
 
-      $scope.logout();
+      ctrl.logout();
 
       assert($rootScope.$emit.notCalled);
     });
 
     it('does not discard drafts if the user cancels the prompt', function () {
-      createController();
+      var ctrl = createController();
       fakeDrafts.count.returns(1);
       fakeWindow.confirm.returns(false);
 
-      $scope.logout();
+      ctrl.logout();
 
       assert(fakeDrafts.discard.notCalled);
     });
 
     it('does not prompt if there are no drafts', function () {
-      createController();
+      var ctrl = createController();
       fakeDrafts.count.returns(0);
 
-      $scope.logout();
+      ctrl.logout();
 
       assert.equal(fakeWindow.confirm.callCount, 0);
     });
