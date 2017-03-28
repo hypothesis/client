@@ -1,8 +1,8 @@
-<span window-scroll="loadMore(20)">
+<span window-scroll="vm.loadMore(20)">
   <thread-list
-    on-change-collapsed="setCollapsed(id, collapsed)"
-    on-force-visible="forceVisible(thread)"
+    on-change-collapsed="vm.setCollapsed(id, collapsed)"
+    on-force-visible="vm.forceVisible(thread)"
     show-document-info="true"
-    thread="rootThread">
+    thread="vm.rootThread">
   </thread-list>
 </span>

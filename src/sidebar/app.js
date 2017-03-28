@@ -69,8 +69,7 @@ function configureRoutes($routeProvider) {
     });
   $routeProvider.when('/stream',
     {
-      controller: 'StreamController',
-      template: require('./templates/stream_content.html'),
+      template: '<stream-content search="search"></stream-content>',
       reloadOnSearch: false,
       resolve: resolve,
     });
@@ -130,7 +129,6 @@ module.exports = angular.module('h', [
 ])
 
   .controller('AnnotationViewerController', require('./annotation-viewer-controller'))
-  .controller('StreamController', require('./stream-controller'))
 
   // The root component for the application
   .directive('hypothesisApp', require('./directive/app'))
@@ -156,6 +154,7 @@ module.exports = angular.module('h', [
   .component('sidebarTutorial', require('./components/sidebar-tutorial').component)
   .component('shareDialog', require('./components/share-dialog'))
   .component('sortDropdown', require('./components/sort-dropdown'))
+  .component('streamContent', require('./components/stream-content'))
   .component('svgIcon', require('./components/svg-icon'))
   .component('tagEditor', require('./components/tag-editor'))
   .component('threadList', require('./components/thread-list'))
