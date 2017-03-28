@@ -5,7 +5,6 @@ var scrollIntoView = require('scroll-into-view');
 var events = require('./events');
 var parseAccountID = require('./filter/persona').parseAccountID;
 var scopeTimeout = require('./util/scope-timeout');
-var uiConstants = require('./ui-constants');
 var serviceConfig = require('./service-config');
 var bridgeEvents = require('../shared/bridge-events');
 
@@ -144,16 +143,6 @@ module.exports = function AppController(
     drafts.discard();
     $scope.accountDialog.visible = false;
     session.logout();
-  };
-
-  $scope.clearSelection = function () {
-    var selectedTab = annotationUI.getState().selectedTab;
-    if (!annotationUI.getState().selectedTab || annotationUI.getState().selectedTab === uiConstants.TAB_ORPHANS) {
-      selectedTab = uiConstants.TAB_ANNOTATIONS;
-    }
-
-    annotationUI.clearSelectedAnnotations();
-    annotationUI.selectTab(selectedTab);
   };
 
   $scope.search = {

@@ -5,8 +5,8 @@ var inherits = require('inherits');
 var proxyquire = require('proxyquire');
 var EventEmitter = require('tiny-emitter');
 
-var events = require('../events');
-var noCallThru = require('../../shared/test/util').noCallThru;
+var events = require('../../events');
+var noCallThru = require('../../../shared/test/util').noCallThru;
 
 var searchClients;
 function FakeSearchClient(searchFn, opts) {
@@ -36,10 +36,11 @@ function FakeRootThread() {
 }
 inherits(FakeRootThread, EventEmitter);
 
-describe('WidgetController', function () {
+describe('SidebarContentController', function () {
   var $rootScope;
   var $scope;
   var annotationUI;
+  var ctrl;
   var fakeAnalytics;
   var fakeAnnotationMapper;
   var fakeDrafts;
@@ -55,11 +56,11 @@ describe('WidgetController', function () {
 
   before(function () {
     angular.module('h', [])
-      .service('annotationUI', require('../annotation-ui'))
-      .controller('WidgetController', proxyquire('../widget-controller',
+      .service('annotationUI', require('../../annotation-ui'))
+      .component('sidebarContent', proxyquire('../sidebar-content',
         noCallThru({
           angular: angular,
-          './search-client': FakeSearchClient,
+          '../search-client': FakeSearchClient,
         })
       ));
   });
@@ -135,14 +136,15 @@ describe('WidgetController', function () {
     annotationUI.frames.returns(frames);
   }
 
-  beforeEach(angular.mock.inject(function ($controller, _annotationUI_, _$rootScope_) {
+  beforeEach(angular.mock.inject(function ($componentController, _annotationUI_, _$rootScope_) {
     $rootScope = _$rootScope_;
     $scope = $rootScope.$new();
-    $scope.auth = {'status': 'unknown'};
     annotationUI = _annotationUI_;
     annotationUI.frames = sinon.stub().returns([]);
     annotationUI.updateFrameAnnotationFetchStatus = sinon.stub();
-    $controller('WidgetController', {$scope: $scope});
+    ctrl = $componentController('sidebarContent', { $scope: $scope }, {
+      auth: { status: 'unknown' },
+    });
   }));
 
   afterEach(function () {
@@ -223,7 +225,7 @@ describe('WidgetController', function () {
       });
 
       it('selectedAnnotationCount is > 0', function () {
-        assert.equal($scope.selectedAnnotationCount(), 1);
+        assert.equal(ctrl.selectedAnnotationCount(), 1);
       });
 
       it('switches to the selected annotation\'s group', function () {
@@ -253,7 +255,7 @@ describe('WidgetController', function () {
       });
 
       it('selectedAnnotationCount is 0', function () {
-        assert.equal($scope.selectedAnnotationCount(), 0);
+        assert.equal(ctrl.selectedAnnotationCount(), 0);
       });
 
       it('fetches annotations for the current group', function () {
@@ -338,20 +340,20 @@ describe('WidgetController', function () {
     it('displays a message if the selection is unavailable', function () {
       annotationUI.selectAnnotations(['missing']);
       $scope.$digest();
-      assert.isTrue($scope.selectedAnnotationUnavailable());
+      assert.isTrue(ctrl.selectedAnnotationUnavailable());
     });
 
     it('does not show a message if the selection is available', function () {
       annotationUI.addAnnotations([{id: '123'}]);
       annotationUI.selectAnnotations(['123']);
       $scope.$digest();
-      assert.isFalse($scope.selectedAnnotationUnavailable());
+      assert.isFalse(ctrl.selectedAnnotationUnavailable());
     });
 
     it('does not a show a message if there is no selection', function () {
       annotationUI.selectAnnotations([]);
       $scope.$digest();
-      assert.isFalse($scope.selectedAnnotationUnavailable());
+      assert.isFalse(ctrl.selectedAnnotationUnavailable());
     });
 
     it('doesn\'t show a message if the document isn\'t loaded yet', function () {
@@ -363,56 +365,56 @@ describe('WidgetController', function () {
       setFrames([]);
       $scope.$digest();
 
-      assert.isFalse($scope.selectedAnnotationUnavailable());
+      assert.isFalse(ctrl.selectedAnnotationUnavailable());
     });
 
     it('shows logged out message if selection is available', function () {
-      $scope.auth = {
+      ctrl.auth = {
         status: 'logged-out',
       };
       annotationUI.addAnnotations([{id: '123'}]);
       annotationUI.selectAnnotations(['123']);
       $scope.$digest();
-      assert.isTrue($scope.shouldShowLoggedOutMessage());
+      assert.isTrue(ctrl.shouldShowLoggedOutMessage());
     });
 
     it('does not show loggedout message if selection is unavailable', function () {
-      $scope.auth = {
+      ctrl.auth = {
         status: 'logged-out',
       };
       annotationUI.selectAnnotations(['missing']);
       $scope.$digest();
-      assert.isFalse($scope.shouldShowLoggedOutMessage());
+      assert.isFalse(ctrl.shouldShowLoggedOutMessage());
     });
 
     it('does not show loggedout message if there is no selection', function () {
-      $scope.auth = {
+      ctrl.auth = {
         status: 'logged-out',
       };
       annotationUI.selectAnnotations([]);
       $scope.$digest();
-      assert.isFalse($scope.shouldShowLoggedOutMessage());
+      assert.isFalse(ctrl.shouldShowLoggedOutMessage());
     });
 
     it('does not show loggedout message if user is not logged out', function () {
-      $scope.auth = {
+      ctrl.auth = {
         status: 'logged-in',
       };
       annotationUI.addAnnotations([{id: '123'}]);
       annotationUI.selectAnnotations(['123']);
       $scope.$digest();
-      assert.isFalse($scope.shouldShowLoggedOutMessage());
+      assert.isFalse(ctrl.shouldShowLoggedOutMessage());
     });
 
     it('does not show loggedout message if not a direct link', function () {
-      $scope.auth = {
+      ctrl.auth = {
         status: 'logged-out',
       };
       delete fakeSettings.annotations;
       annotationUI.addAnnotations([{id: '123'}]);
       annotationUI.selectAnnotations(['123']);
       $scope.$digest();
-      assert.isFalse($scope.shouldShowLoggedOutMessage());
+      assert.isFalse(ctrl.shouldShowLoggedOutMessage());
     });
   });
 
@@ -440,7 +442,7 @@ describe('WidgetController', function () {
   describe('#forceVisible', function () {
     it('shows the thread', function () {
       var thread = {id: '1'};
-      $scope.forceVisible(thread);
+      ctrl.forceVisible(thread);
       assert.deepEqual(annotationUI.getState().forceVisible, {1: true});
     });
 
@@ -450,7 +452,7 @@ describe('WidgetController', function () {
         parent: {id: '3'},
       };
       assert.equal(annotationUI.getState().expanded[thread.parent.id], undefined);
-      $scope.forceVisible(thread);
+      ctrl.forceVisible(thread);
       assert.equal(annotationUI.getState().expanded[thread.parent.id], true);
     });
   });
@@ -469,7 +471,7 @@ describe('WidgetController', function () {
         }],
       });
       $scope.$digest();
-      assert.equal($scope.visibleCount(), 2);
+      assert.equal(ctrl.visibleCount(), 2);
     });
   });
 });
