@@ -1,7 +1,5 @@
 'use strict';
 
-var angular = require('angular');
-
 /**
  * Fetch all annotations in the same thread as `id`.
  *
@@ -25,27 +23,25 @@ function fetchThread(store, id) {
 }
 
 // @ngInject
-function AnnotationViewerController (
-  $location, $routeParams, $scope,
-  annotationUI, rootThread, streamer, store, streamFilter, annotationMapper
+function AnnotationViewerContentController (
+  $location, $routeParams, annotationUI, rootThread, streamer, store,
+  streamFilter, annotationMapper
 ) {
+  var self = this;
+
   annotationUI.setAppIsSidebar(false);
 
   var id = $routeParams.id;
 
-  // Provide no-ops until these methods are moved elsewere. They only apply
-  // to annotations loaded into the stream.
-  $scope.focus = angular.noop;
-
-  $scope.search.update = function (query) {
+  this.search.update = function (query) {
     $location.path('/stream').search('q', query);
   };
 
   annotationUI.subscribe(function () {
-    $scope.rootThread = rootThread.thread(annotationUI.getState());
+    self.rootThread = rootThread.thread(annotationUI.getState());
   });
 
-  $scope.setCollapsed = function (id, collapsed) {
+  this.setCollapsed = function (id, collapsed) {
     annotationUI.setCollapsed(id, collapsed);
   };
 
@@ -77,4 +73,11 @@ function AnnotationViewerController (
   });
 }
 
-module.exports = AnnotationViewerController;
+module.exports = {
+  controller: AnnotationViewerContentController,
+  controllerAs: 'vm',
+  bindings: {
+    search: '<',
+  },
+  template: require('../templates/annotation_viewer_content.html'),
+};

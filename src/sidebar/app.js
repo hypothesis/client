@@ -62,8 +62,7 @@ function configureLocation($locationProvider) {
 function configureRoutes($routeProvider) {
   $routeProvider.when('/a/:id',
     {
-      controller: 'AnnotationViewerController',
-      template: require('./templates/annotation_viewer_content.html'),
+      template: '<annotation-viewer-content search="search"></annotation-viewer-content>',
       reloadOnSearch: false,
       resolve: resolve,
     });
@@ -128,8 +127,6 @@ module.exports = angular.module('h', [
   'ngRaven',
 ])
 
-  .controller('AnnotationViewerController', require('./annotation-viewer-controller'))
-
   // The root component for the application
   .directive('hypothesisApp', require('./directive/app'))
 
@@ -137,6 +134,7 @@ module.exports = angular.module('h', [
   .component('annotation', require('./components/annotation').component)
   .component('annotationShareDialog', require('./components/annotation-share-dialog'))
   .component('annotationThread', require('./components/annotation-thread'))
+  .component('annotationViewerContent', require('./components/annotation-viewer-content'))
   .component('dropdownMenuBtn', require('./components/dropdown-menu-btn'))
   .component('excerpt', require('./components/excerpt'))
   .component('groupList', require('./components/group-list'))
