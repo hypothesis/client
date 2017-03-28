@@ -120,7 +120,7 @@ describe('annotation', function() {
         .component('annotation', annotationComponent())
         .component('markdown', {
           bindings: {
-            textClass: '<?',
+            customTextClass: '<?',
           },
         });
     });
@@ -1055,7 +1055,7 @@ describe('annotation', function() {
       fakeAnnotationUI.isHiddenByModerator.returns(true);
       var el = createDirective(ann).element;
       assert.deepEqual(el.find('markdown').controller('markdown'), {
-        textClass: {
+        customTextClass: {
           'annotation-body is-hidden': true,
         },
       });

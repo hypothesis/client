@@ -254,8 +254,8 @@ describe('markdown', function () {
   describe('custom text class', function () {
     it('should apply custom text class to text container', function () {
       var editor = util.createDirective(document, 'markdown', {
+        customTextClass: 'fancy-effect',
         readOnly: true,
-        textClass: 'fancy-effect',
       });
       var viewEl = viewElement(editor);
       assert.include(viewEl.className, 'fancy-effect');

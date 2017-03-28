@@ -165,9 +165,9 @@ module.exports = function($sanitize) {
 
     restrict: 'E',
     scope: {
+      customTextClass: '<?',
       readOnly: '<',
       text: '<?',
-      textClass: '<?',
       onEditText: '&',
     },
     template: require('../templates/markdown.html'),

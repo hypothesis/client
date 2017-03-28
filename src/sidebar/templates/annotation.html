@@ -82,7 +82,7 @@
       overflow-hysteresis="20"
       content-data="vm.state().text">
       <markdown text="vm.state().text"
-                text-class="{'annotation-body is-hidden':vm.isHiddenByModerator()}"
+                custom-text-class="{'annotation-body is-hidden':vm.isHiddenByModerator()}"
                 on-edit-text="vm.setText(text)"
                 read-only="!vm.editing()">
       </markdown>
