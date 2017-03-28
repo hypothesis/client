@@ -19,7 +19,7 @@
           h-branding="annotationFontFamily"
           ></textarea>
 <div class="markdown-body js-markdown-preview"
-     ng-class="preview && 'markdown-preview'"
+     ng-class="(preview && 'markdown-preview') || customTextClass"
      ng-dblclick="togglePreview()"
      ng-show="!showEditor()"
      h-branding="annotationFontFamily"></div>

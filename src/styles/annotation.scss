@@ -102,6 +102,11 @@
   margin-left: 0px;
 }
 
+.annotation-body.is-hidden {
+  text-decoration: line-through;
+  filter: grayscale(100%) contrast(65%);
+}
+
 // the footer at the bottom of an annotation displaying
 // the annotation actions and reply counts
 .annotation-footer {

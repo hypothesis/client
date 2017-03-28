@@ -165,6 +165,7 @@ module.exports = function($sanitize) {
 
     restrict: 'E',
     scope: {
+      customTextClass: '<?',
       readOnly: '<',
       text: '<?',
       onEditText: '&',
