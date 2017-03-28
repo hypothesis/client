@@ -3,9 +3,9 @@
 var angular = require('angular');
 var proxyquire = require('proxyquire');
 
-var events = require('../events');
-var bridgeEvents = require('../../shared/bridge-events');
-var util = require('../../shared/test/util');
+var events = require('../../events');
+var bridgeEvents = require('../../../shared/bridge-events');
+var util = require('../../../shared/test/util');
 
 describe('hypothesisApp', function () {
   var $componentController = null;
@@ -49,10 +49,10 @@ describe('hypothesisApp', function () {
 
     fakeServiceConfig = sandbox.stub();
 
-    var component = proxyquire('../app-controller', util.noCallThru({
+    var component = proxyquire('../hypothesis-app', util.noCallThru({
       'angular': angular,
-      './annotation-metadata': fakeAnnotationMetadata,
-      './service-config': fakeServiceConfig,
+      '../annotation-metadata': fakeAnnotationMetadata,
+      '../service-config': fakeServiceConfig,
     }));
 
     angular.module('h', [])
@@ -69,7 +69,7 @@ describe('hypothesisApp', function () {
 
     fakeAnalytics = {
       track: sandbox.stub(),
-      events: require('../analytics')().events,
+      events: require('../../analytics')().events,
     };
 
     fakeAuth = {};

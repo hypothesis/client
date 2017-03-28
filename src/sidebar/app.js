@@ -126,7 +126,7 @@ module.exports = angular.module('h', [
 ])
 
   // The root component for the application
-  .component('hypothesisApp', require('./app-controller'))
+  .component('hypothesisApp', require('./components/hypothesis-app'))
 
   // UI components
   .component('annotation', require('./components/annotation').component)

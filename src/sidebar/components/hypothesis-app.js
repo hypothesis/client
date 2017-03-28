@@ -2,11 +2,11 @@
 
 var scrollIntoView = require('scroll-into-view');
 
-var events = require('./events');
-var parseAccountID = require('./filter/persona').parseAccountID;
-var scopeTimeout = require('./util/scope-timeout');
-var serviceConfig = require('./service-config');
-var bridgeEvents = require('../shared/bridge-events');
+var events = require('../events');
+var parseAccountID = require('../filter/persona').parseAccountID;
+var scopeTimeout = require('../util/scope-timeout');
+var serviceConfig = require('../service-config');
+var bridgeEvents = require('../../shared/bridge-events');
 
 function authStateFromUserID(userid) {
   if (userid) {
@@ -162,5 +162,5 @@ function HypothesisAppController(
 module.exports = {
   controller: HypothesisAppController,
   controllerAs: 'vm',
-  template: require('./templates/app.html'),
+  template: require('../templates/hypothesis_app.html'),
 };
