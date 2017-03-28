@@ -122,7 +122,7 @@ describe('StreamContentController', function () {
 
     createController();
 
-    Promise.resolve().then(function () {
+    return Promise.resolve().then(function () {
       assert.calledOnce(fakeAnnotationMapper.loadAnnotations);
       assert.calledWith(fakeAnnotationMapper.loadAnnotations,
         ['annotation_1', 'annotation_2'], ['reply_1', 'reply_2', 'reply_3']);
