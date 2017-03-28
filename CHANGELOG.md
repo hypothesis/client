@@ -4,6 +4,19 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+### Changed
+
+- Enable publishers to customize the look of the sidebar
+  ([#306](https://github.com/hypothesis/client/pull/306)).
+
+- Add analytics to social share buttons
+  ([#312](https://github.com/hypothesis/client/pull/312)).
+
+- Add analytics to login, logout and sign-up actions
+  ([#311](https://github.com/hypothesis/client/pull/311)).
+
 ## [1.5.0] - 2017-03-24
 
 ### Changed
