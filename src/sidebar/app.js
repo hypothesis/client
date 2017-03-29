@@ -60,24 +60,22 @@ function configureLocation($locationProvider) {
 
 // @ngInject
 function configureRoutes($routeProvider) {
+  // The `vm.{auth,search}` properties used in these templates come from the
+  // `<hypothesis-app>` component which hosts the router's container element.
   $routeProvider.when('/a/:id',
     {
-      template: '<annotation-viewer-content search="search"></annotation-viewer-content>',
+      template: '<annotation-viewer-content search="vm.search"></annotation-viewer-content>',
       reloadOnSearch: false,
       resolve: resolve,
     });
   $routeProvider.when('/stream',
     {
-      template: '<stream-content search="search"></stream-content>',
+      template: '<stream-content search="vm.search"></stream-content>',
       reloadOnSearch: false,
       resolve: resolve,
     });
   $routeProvider.otherwise({
-    // Trivial template for use until the other controllers are also converted
-    // to components and we can remove the router entirely.
-    //
-    // The "search" and "auth" properties are provided by "AppController".
-    template: '<sidebar-content search="search" auth="auth"></sidebar-content>',
+    template: '<sidebar-content search="vm.search" auth="vm.auth"></sidebar-content>',
     reloadOnSearch: false,
     resolve: resolve,
   });
@@ -128,7 +126,7 @@ module.exports = angular.module('h', [
 ])
 
   // The root component for the application
-  .directive('hypothesisApp', require('./directive/app'))
+  .component('hypothesisApp', require('./components/hypothesis-app'))
 
   // UI components
   .component('annotation', require('./components/annotation').component)

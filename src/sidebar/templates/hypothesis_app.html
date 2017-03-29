@@ -1,0 +1,42 @@
+<div class="app-content-wrapper" h-branding="appBackgroundColor">
+  <top-bar
+    auth="vm.auth"
+    on-login="vm.login()"
+    on-sign-up="vm.signUp()"
+    on-logout="vm.logout()"
+    on-share-page="vm.share()"
+    on-show-help-panel="vm.helpPanel.visible = true"
+    is-sidebar="::vm.isSidebar"
+    pending-update-count="vm.countPendingUpdates()"
+    on-apply-pending-updates="vm.applyPendingUpdates()"
+    search-controller="vm.search"
+    sort-key="vm.sortKey()"
+    sort-keys-available="vm.sortKeysAvailable()"
+    on-change-sort-key="vm.setSortKey(sortKey)">
+  </top-bar>
+
+  <div class="create-account-banner" ng-if="vm.isSidebar && vm.auth.status === 'logged-out'" ng-cloak>
+    To annotate this document
+    <a href="{{ vm.serviceUrl('signup') }}" target="_blank">
+      create a free account
+    </a>
+    or <a href="" ng-click="vm.login()">log in</a>
+  </div>
+
+  <div class="content" ng-cloak>
+    <login-form
+      ng-if="vm.accountDialog.visible"
+      on-close="vm.accountDialog.visible = false">
+    </login-form>
+    <sidebar-tutorial ng-if="vm.isSidebar"></sidebar-tutorial>
+    <share-dialog
+      ng-if="vm.shareDialog.visible"
+      on-close="vm.shareDialog.visible = false">
+    </share-dialog>
+    <help-panel ng-if="vm.helpPanel.visible"
+      on-close="vm.helpPanel.visible = false"
+      auth="vm.auth">
+    </help-panel>
+    <main ng-view=""></main>
+  </div>
+</div>
