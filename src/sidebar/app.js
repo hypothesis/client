@@ -156,9 +156,7 @@ module.exports = angular.module('h', [
   .component('tagEditor', require('./components/tag-editor'))
   .component('threadList', require('./components/thread-list'))
   .component('timestamp', require('./components/timestamp'))
-
-  // These should use `component()` but will require some changes.
-  .directive('topBar', require('./directive/top-bar'))
+  .component('topBar', require('./components/top-bar'))
 
   .directive('formInput', require('./directive/form-input'))
   .directive('formValidate', require('./directive/form-validate'))
