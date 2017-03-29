@@ -28,6 +28,8 @@ class FakeAdder
     this.hide = sinon.stub()
     this.showAt = sinon.stub()
     this.target = sinon.stub()
+    this.setCommands = sinon.stub()
+    this.setGuestElement = sinon.stub()
 
 # A little helper which returns a promise that resolves after a timeout
 timeoutPromise = (millis = 0) ->
