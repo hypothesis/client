@@ -79,7 +79,7 @@ function ThreadListController($scope, VirtualThreadList) {
     // Note: This assumes that the element occupies the entire height of the
     // containing document. It would be preferable if only the contents of the
     // <thread-list> itself scrolled.
-    var maxYOffset = document.body.clientHeight - window.innerHeight;
+    var maxYOffset = document.body.scrollHeight - window.innerHeight;
     return Math.min(maxYOffset, visibleThreads.yOffsetOf(id));
   }
 
