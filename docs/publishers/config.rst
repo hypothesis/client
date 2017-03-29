@@ -114,11 +114,11 @@ loads.
    annotation service, with the following keys:
 
    .. option:: authority
-   
+
       ``String``. The domain name which the annotation service is associated with.
 
    .. option:: grantToken
-   
+
       ``String|null``. An OAuth 2 grant token which the client can send to the
       service in order to get an access token for making authenticated requests
       to the service. If ``null``, the user will not be logged in and will only
@@ -131,14 +131,14 @@ loads.
          tokens for the `hypothes.is <https://hypothes.is/>`_ service.
 
    .. option:: icon
-   
+
       ``String|null``. The URL to an image for the annotation service. This
       image will appear to the left of the name of the currently selected
       group. The image should be suitable for display at 16x16px and the
       recommended format is SVG.
 
    .. option:: onLoginRequest
-   
+
      ``function``. A JavaScript function that the Hypothesis client will
      call in order to login (for example, when the user clicks a login button in
      the Hypothesis client's sidebar).
@@ -158,6 +158,75 @@ loads.
      hosting page should reload the original page with a non-null
      :option:`grantToken` for the logged-in user in the :option:`services`
      configuration setting.
+
+.. option:: branding
+
+  Branding lets you adjust certain aspects of the sidebar's look and feel to better fit your site's own look.
+
+  ``Object``. The key-value pairings used to identify how the brandable elements
+  in the sidebar should be presented. The allowed keys will be described below. The values
+  will be directly mapped to the css styles for the elements which it affects. That means
+  any valid css property for the specified type will work. For example, if the value type is a
+  Color, you can specify any browser supported color value (hex, rgb, rgba, etc.).
+
+  For example:
+
+  .. code-block:: javascript
+
+     window.hypothesisConfig = function () {
+       return {
+         branding: {
+           appBackgroundColor: 'white',
+           ctaBackgroundColor: 'rgba(3, 11, 16, 1)',
+           ctaTextColor: '#eee',
+           selectionFontFamily: 'helvetica, arial, sans serif'
+         }
+       };
+     };
+
+
+  The following keys are supported in the :option:`branding` object.
+  You will also see what value type we are expecting.
+
+  .. warning::
+
+     The :option:`branding` setting is currently still experimental and may
+     change in the future.
+
+  .. option:: highlightColor
+
+    ``Color``. We have several areas in our client that have pops of color
+    that are secondary to the primary call to action elements. Things such as
+    the "more" and "less" links to expand and collapse large annotation bodies.
+
+  .. option:: appBackgroundColor
+
+    ``Color``. This will update the main background color of our app.
+
+  .. option:: ctaBackgroundColor
+
+    ``Color``. This will update the main call-to-action button backgrounds. A
+    call-to-action button example would be our "Post to {Group Name}" button when making
+    an annotation.
+
+  .. option:: ctaTextColor
+
+    ``Color``. This will update the text color inside of the call-to-action buttons.
+
+  .. option:: selectionFontFamily
+
+    ``Font Family``. The selection text is the part of the annotation card that reflects
+    what the user highlighted when they made the annotation. This value will update
+    the font-family of that text.
+
+  .. option:: annotationFontFamily
+
+    ``Font Family``. The annotation text is the actual annotation value that the user
+    writes about the page or selection. This value will set the font-family of that
+    text when it is save as well as the font-family of the editor as the annotation
+    is being written.
+
+
 
 Asset and Sidebar App Location
 ##############################
