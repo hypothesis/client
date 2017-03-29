@@ -4,6 +4,18 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## Unreleased
+
+### Changed
+
+- Strikethrough & apply greyscale/contrast effects to hidden annotations
+  ([#301](https://github.com/hypothesis/client/pull/301)).
+
+### Fixed
+
+- Fix scrolling to new annotations
+  ([#321](https://github.com/hypothesis/client/pull/321)).
+
 ## [1.6.0] - 2017-03-28
 
 ### Changed
