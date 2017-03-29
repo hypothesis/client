@@ -6,6 +6,7 @@
 var fs = require('fs');
 var path = require('path');
 
+var babelify = require('babelify');
 var browserify = require('browserify');
 var coffeeify = require('coffeeify');
 var exorcist = require('exorcist');
@@ -162,6 +163,9 @@ module.exports = function createBundle(config, buildOpts) {
   (config.transforms || []).forEach(function (transform) {
     if (transform === 'coffee') {
       bundle.transform(coffeeify);
+    }
+    if (transform === 'babel') {
+      bundle.transform(babelify);
     }
   });
 

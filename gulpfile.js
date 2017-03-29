@@ -102,17 +102,18 @@ var appBundles = [{
   // by the client.
   name: 'boot',
   entry: './src/boot/index',
+  transforms: ['babel'],
 },{
   // The sidebar application for displaying and editing annotations.
   name: 'app',
-  transforms: ['coffee'],
+  transforms: ['babel', 'coffee'],
   entry: './src/sidebar/app',
 },{
   // The annotation layer which handles displaying highlights, presenting
   // annotation tools on the page and instantiating the sidebar application.
   name: 'injector',
   entry: './src/annotator/main',
-  transforms: ['coffee'],
+  transforms: ['babel', 'coffee'],
 }];
 
 var appBundleConfigs = appBundles.map(function (config) {
