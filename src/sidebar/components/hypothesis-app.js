@@ -36,14 +36,6 @@ function HypothesisAppController(
   // used by templates to show an intermediate or loading state.
   this.auth = {status: 'unknown'};
 
-  // Allow all child scopes to look up feature flags as:
-  //
-  //     if ($scope.feature('foo')) { ... }
-  this.feature = features.flagEnabled;
-
-  // Allow all child scopes access to the session
-  this.session = session;
-
   // App dialogs
   this.accountDialog = {visible: false};
   this.shareDialog = {visible: false};
