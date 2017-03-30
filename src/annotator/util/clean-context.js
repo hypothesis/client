@@ -80,10 +80,14 @@ function reset() {
  *
  */
 function bindHasBeenModified() {
-  var bind = Function.prototype.bind.toString();
-  var call = Function.prototype.bind.call.toString();
+  var bindStr = Function.prototype.bind.toString();
+  var call = Function.prototype.bind.call;
+  var callStr = '';
+  if (call) {
+    callStr = Function.prototype.bind.call.toString();
+  }
 
-  if (bind.indexOf('native code') === -1 || call.indexOf('native code') === -1) {
+  if (bindStr.indexOf('native code') === -1 || callStr.indexOf('native code') === -1) {
     return true;
   } else {
     return false;

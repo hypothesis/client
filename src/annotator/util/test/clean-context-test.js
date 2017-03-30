@@ -39,6 +39,14 @@ describe('clean-context', function() {
 
       assert.equal(document.getElementsByTagName('iframe').length, 1);
     });
+
+    context('if the parent context Function.prototype.bind is not even a function', function() {
+      it('returns a clean copy of Function.prototype.bind()', function() {
+        Function.prototype.bind = 'not_a_function';
+
+        cleanContext.bind.call(function() {}, this);
+      });
+    });
   });
 
   context("if the parent context doesn't overwrite any globals", function() {
