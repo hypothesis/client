@@ -36,16 +36,17 @@ function VirtualThreadList($scope, window_, rootThread, options) {
   this._heights = {};
 
   this.window = window_;
+  this.scrollRoot = this.window.document.querySelector('.app-content-wrapper');
 
   var debouncedUpdate = debounce(function () {
     self._updateVisibleThreads();
     $scope.$digest();
   }, 20);
-  this.window.addEventListener('scroll', debouncedUpdate);
+  this.scrollRoot.addEventListener('scroll', debouncedUpdate);
   this.window.addEventListener('resize', debouncedUpdate);
 
   this._detach = function () {
-    this.window.removeEventListener('scroll', debouncedUpdate);
+    this.scrollRoot.removeEventListener('scroll', debouncedUpdate);
     this.window.removeEventListener('resize', debouncedUpdate);
   };
 }
@@ -153,17 +154,20 @@ VirtualThreadList.prototype._updateVisibleThreads = function () {
   for (var i = 0; i < allThreads.length; i++) {
     thread = allThreads[i];
     var threadHeight = this._height(thread.id);
+
     var added = false;
 
-    if (usedHeight + threadHeight < this.window.pageYOffset - MARGIN_ABOVE) {
+    if (usedHeight + threadHeight < this.scrollRoot.scrollTop - MARGIN_ABOVE) {
       // Thread is above viewport
       offscreenUpperHeight += threadHeight;
     } else if (usedHeight <
-      this.window.pageYOffset + visibleHeight + MARGIN_BELOW) {
+      this.scrollRoot.scrollTop + visibleHeight + MARGIN_BELOW) {
+
       // Thread is either in or close to the viewport
       visibleThreads.push(thread);
       added = true;
     } else {
+
       // Thread is below viewport
       offscreenLowerHeight += threadHeight;
     }
