@@ -333,22 +333,20 @@ gulp.task('serve-package', function () {
   servePackage(3001, packageServerHostname());
 });
 
-gulp.task('build',
-          ['build-js',
-           'build-css',
-           'build-fonts',
-           'build-images'],
+gulp.task('build', ['build-js',
+                    'build-css',
+                    'build-fonts',
+                    'build-images'],
           generateManifest);
 
-gulp.task('watch',
-          ['serve-package',
-           'serve-live-reload',
-           'watch-js',
-           'watch-css',
-           'watch-fonts',
-           'watch-images',
-           'watch-manifest',
-           'watch-templates']);
+gulp.task('watch', ['serve-package',
+                    'serve-live-reload',
+                    'watch-js',
+                    'watch-css',
+                    'watch-fonts',
+                    'watch-images',
+                    'watch-manifest',
+                    'watch-templates']);
 
 function runKarma(baseConfig, opts, done) {
   // See https://github.com/karma-runner/karma-mocha#configuration
