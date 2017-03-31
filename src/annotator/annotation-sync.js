@@ -84,7 +84,6 @@ AnnotationSync.prototype._channelListeners = {
     cb(null, this._format(annotation));
   },
   'loadAnnotations': function(bodies, cb) {
-    var a;
     var annotations;
 
     annotations = (function() {
@@ -92,8 +91,7 @@ AnnotationSync.prototype._channelListeners = {
       var parsedAnnotations = [];
 
       for (i = 0; i < bodies.length; i++) {
-        a = bodies[i];
-        parsedAnnotations.push(this._parse(a));
+        parsedAnnotations.push(this._parse(bodies[i]));
       }
       return parsedAnnotations;
     }).call(this);
