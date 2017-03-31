@@ -43,14 +43,40 @@ var virtualThreadOptions = {
   },
 };
 
+/**
+ * Return the closest ancestor of `el` which is scrollable.
+ *
+ * @param {Element} el
+ */
+function closestScrollableAncestor(el) {
+  var parentEl = el;
+  while (parentEl !== document.body) {
+    var computedStyle = window.getComputedStyle(parentEl);
+    if (computedStyle.overflowY === 'scroll') {
+      return parentEl;
+    }
+    parentEl = parentEl.parentElement;
+  }
+  return parentEl;
+}
+
 // @ngInject
-function ThreadListController($scope, VirtualThreadList) {
+function ThreadListController($element, $scope, VirtualThreadList) {
   // `visibleThreads` keeps track of the subset of all threads matching the
   // current filters which are in or near the viewport and the view then renders
   // only those threads, using placeholders above and below the visible threads
   // to reserve space for threads which are not actually rendered.
   var self = this;
-  var visibleThreads = new VirtualThreadList($scope, window, this.thread, virtualThreadOptions);
+
+  // `scrollRoot` is the `Element` to scroll when scrolling a given thread into
+  // view.
+  this.scrollRoot = closestScrollableAncestor($element[0]);
+
+  var options = Object.assign({
+    scrollRoot: this.scrollRoot,
+  }, virtualThreadOptions);
+
+  var visibleThreads = new VirtualThreadList($scope, window, this.thread, options);
   visibleThreads.on('changed', function (state) {
     self.virtualThreadList = {
       visibleThreads: state.visibleThreads,
@@ -76,17 +102,14 @@ function ThreadListController($scope, VirtualThreadList) {
    * of the view.
    */
   function scrollOffset(id) {
-    // Note: This assumes that the element occupies the entire height of the
-    // containing document. It would be preferable if only the contents of the
-    // <thread-list> itself scrolled.
-    var maxYOffset = document.body.scrollHeight - window.innerHeight;
+    var maxYOffset = self.scrollRoot.scrollHeight - self.scrollRoot.clientHeight;
     return Math.min(maxYOffset, visibleThreads.yOffsetOf(id));
   }
 
   /** Scroll the annotation with a given ID or $tag into view. */
   function scrollIntoView(id) {
     var estimatedYOffset = scrollOffset(id);
-    window.scroll(0, estimatedYOffset);
+    self.scrollRoot.scrollTop = estimatedYOffset;
 
     // As a result of scrolling the sidebar, the target scroll offset for
     // annotation `id` might have changed as a result of:

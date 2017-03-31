@@ -19,6 +19,7 @@ describe('VirtualThreadList', function () {
   };
 
   var fakeScope;
+  var fakeScrollRoot;
   var fakeWindow;
 
   function idRange(start, end) {
@@ -45,6 +46,25 @@ describe('VirtualThreadList', function () {
   beforeEach(function () {
     fakeScope = {$digest: sinon.stub()};
 
+    fakeScrollRoot = {
+      scrollTop: 0,
+      listeners: {},
+      addEventListener: function (event, listener) {
+        this.listeners[event] = this.listeners[event] || [];
+        this.listeners[event].push(listener);
+      },
+      removeEventListener: function (event, listener) {
+        this.listeners[event] = this.listeners[event].filter(function (fn) {
+          return fn !== listener;
+        });
+      },
+      trigger: function (event) {
+        (this.listeners[event] || []).forEach(function (cb) {
+          cb();
+        });
+      },
+    };
+
     fakeWindow = {
       listeners: {},
       addEventListener: function (event, listener) {
@@ -57,15 +77,15 @@ describe('VirtualThreadList', function () {
         });
       },
       trigger: function (event) {
-        this.listeners[event].forEach(function (cb) {
+        (this.listeners[event] || []).forEach(function (cb) {
           cb();
         });
       },
       innerHeight: 100,
-      pageYOffset: 0,
     };
 
     threadOptions.invisibleThreadFilter = sinon.stub().returns(false);
+    threadOptions.scrollRoot = fakeScrollRoot;
 
     var rootThread = {annotation: undefined, children: []};
     threadList = new VirtualThreadList(fakeScope, fakeWindow, rootThread, threadOptions);
@@ -77,7 +97,7 @@ describe('VirtualThreadList', function () {
   unroll('generates expected state when #when', function (testCase) {
     var thread = generateRootThread(testCase.threads);
 
-    fakeWindow.pageYOffset = testCase.scrollOffset;
+    fakeScrollRoot.scrollTop = testCase.scrollOffset;
     fakeWindow.innerHeight = testCase.windowHeight;
 
     // make sure for everything that is not being presented in the
@@ -93,7 +113,7 @@ describe('VirtualThreadList', function () {
     assert.equal(lastState.offscreenUpperHeight, testCase.expectedHeightAbove);
     assert.equal(lastState.offscreenLowerHeight, testCase.expectedHeightBelow);
   },[{
-    when: 'window is scrolled to top of list',
+    when: 'scrollRoot is scrolled to top of list',
     threads: 100,
     scrollOffset: 0,
     windowHeight: 300,
@@ -101,7 +121,7 @@ describe('VirtualThreadList', function () {
     expectedHeightAbove: 0,
     expectedHeightBelow: 18800,
   },{
-    when: 'window is scrolled to middle of list',
+    when: 'scrollRoot is scrolled to middle of list',
     threads: 100,
     scrollOffset: 2000,
     windowHeight: 300,
@@ -109,7 +129,7 @@ describe('VirtualThreadList', function () {
     expectedHeightAbove: 1000,
     expectedHeightBelow: 16800,
   },{
-    when: 'window is scrolled to bottom of list',
+    when: 'scrollRoot is scrolled to bottom of list',
     threads: 100,
     scrollOffset: 18800,
     windowHeight: 300,
@@ -118,15 +138,17 @@ describe('VirtualThreadList', function () {
     expectedHeightBelow: 0,
   }]);
 
-  unroll('recalculates when a window.#event occurs', function (testCase) {
+  it('recalculates when a window.resize occurs', function () {
     lastState = null;
-    fakeWindow.trigger(testCase.event);
+    fakeWindow.trigger('resize');
     assert.ok(lastState);
-  },[{
-    event: 'resize',
-  },{
-    event: 'scroll',
-  }]);
+  });
+
+  it('recalculates when a scrollRoot.scroll occurs', function () {
+    lastState = null;
+    fakeScrollRoot.trigger('scroll');
+    assert.ok(lastState);
+  });
 
   it('recalculates when root thread changes', function () {
     threadList.setRootThread({annotation: undefined, children: []});
@@ -137,7 +159,7 @@ describe('VirtualThreadList', function () {
     unroll('affects visible threads', function (testCase) {
       var thread = generateRootThread(10);
       fakeWindow.innerHeight = 500;
-      fakeWindow.pageYOffset = 0;
+      fakeScrollRoot.scrollTop = 0;
       idRange(0,10).forEach(function (id) {
         threadList.setThreadHeight(id, testCase.threadHeight);
       });
@@ -154,16 +176,18 @@ describe('VirtualThreadList', function () {
   });
 
   describe('#detach', function () {
-    unroll('stops listening to window.#event events', function (testCase) {
+    it('stops listening to window.resize events', function () {
       threadList.detach();
       lastState = null;
-      fakeWindow.trigger(testCase.event);
+      fakeWindow.trigger('resize');
       assert.isNull(lastState);
-    },[{
-      event: 'resize',
-    },{
-      event: 'scroll',
-    }]);
+    });
+    it('stops listening to scrollRoot.scroll events', function () {
+      threadList.detach();
+      lastState = null;
+      fakeScrollRoot.trigger('scroll');
+      assert.isNull(lastState);
+    });
   });
 
   describe('#yOffsetOf', function () {

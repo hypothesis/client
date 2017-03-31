@@ -57,6 +57,9 @@ hypothesis-app {
   @include grey-background;
 
   min-height: 100%;
+  height: 100%;
+  overflow: scroll;
+  -webkit-overflow-scrolling: touch;
   padding: $sidebar-h-padding;
   padding-top: $sidebar-h-padding + $top-bar-height;
 

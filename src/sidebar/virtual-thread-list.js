@@ -5,6 +5,16 @@ var debounce = require('lodash.debounce');
 var inherits = require('inherits');
 
 /**
+ * @typedef Options
+ * @property {Function} [invisibleThreadFilter] - Function used to determine
+ *   whether an off-screen thread should be rendered or not.  Called with a
+ *   `Thread` and if it returns `true`, the thread is rendered even if offscreen.
+ * @property {Element} [scrollRoot] - The scrollable Element which contains the
+ *   thread list. The set of on-screen threads is determined based on the scroll
+ *   position and height of this element.
+ */
+
+/**
  * VirtualThreadList is a helper for virtualizing the annotation thread list.
  *
  * 'Virtualizing' the thread list improves UI performance by only creating
@@ -20,10 +30,7 @@ var inherits = require('inherits');
  * @param {Window} container - The Window displaying the list of annotation threads.
  * @param {Thread} rootThread - The initial Thread object for the top-level
  *        threads.
- * @param {Object} options - The render-time options to help make final adjustments
- *        to what is and is not rendered.
- *        options.invisibleThreadFilter allows integrator to tell us what should be
- *          rerendered but not visible to the user yet.
+ * @param {Options} options
  */
 function VirtualThreadList($scope, window_, rootThread, options) {
   var self = this;
@@ -36,16 +43,17 @@ function VirtualThreadList($scope, window_, rootThread, options) {
   this._heights = {};
 
   this.window = window_;
+  this.scrollRoot = options.scrollRoot || document.body;
 
   var debouncedUpdate = debounce(function () {
     self._updateVisibleThreads();
     $scope.$digest();
   }, 20);
-  this.window.addEventListener('scroll', debouncedUpdate);
+  this.scrollRoot.addEventListener('scroll', debouncedUpdate);
   this.window.addEventListener('resize', debouncedUpdate);
 
   this._detach = function () {
-    this.window.removeEventListener('scroll', debouncedUpdate);
+    this.scrollRoot.removeEventListener('scroll', debouncedUpdate);
     this.window.removeEventListener('resize', debouncedUpdate);
   };
 }
@@ -153,17 +161,20 @@ VirtualThreadList.prototype._updateVisibleThreads = function () {
   for (var i = 0; i < allThreads.length; i++) {
     thread = allThreads[i];
     var threadHeight = this._height(thread.id);
+
     var added = false;
 
-    if (usedHeight + threadHeight < this.window.pageYOffset - MARGIN_ABOVE) {
+    if (usedHeight + threadHeight < this.scrollRoot.scrollTop - MARGIN_ABOVE) {
       // Thread is above viewport
       offscreenUpperHeight += threadHeight;
     } else if (usedHeight <
-      this.window.pageYOffset + visibleHeight + MARGIN_BELOW) {
+      this.scrollRoot.scrollTop + visibleHeight + MARGIN_BELOW) {
+
       // Thread is either in or close to the viewport
       visibleThreads.push(thread);
       added = true;
     } else {
+
       // Thread is below viewport
       offscreenLowerHeight += threadHeight;
     }
