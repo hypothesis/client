@@ -160,13 +160,7 @@ AnnotationSync.prototype._tag = function(ann, tag) {
 
 // Parse a message body from a RPC call with the provided parser.
 AnnotationSync.prototype._parse = function(body) {
-  var local;
-  var merged;
-  var remote;
-
-  local = this.cache[body.tag];
-  remote = body.msg;
-  merged = Object.assign(local || {}, remote);
+  var merged = Object.assign(this.cache[body.tag] || {}, body.msg);
   return this._tag(merged, body.tag);
 };
 
