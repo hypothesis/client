@@ -6,10 +6,7 @@
 // It also listens for events from Annotator when new annotations are created or
 // annotations successfully anchor and relays these to the sidebar app.
 function AnnotationSync(bridge, options) {
-  var event;
-  var func;
-  var handler;
-  var method;
+  var self = this;
 
   this.bridge = bridge;
 
@@ -27,20 +24,20 @@ function AnnotationSync(bridge, options) {
   this._emit = options.emit;
 
   // Listen locally for interesting events
-  for (event in this._eventListeners) {
-    if (Object.prototype.hasOwnProperty.call(this._eventListeners, event))  {
-      handler = this._eventListeners[event];
-      this._on(event, handler.bind(this));
-    }
-  }
+  Object.keys(this._eventListeners).forEach(function(eventName) {
+    var listener = self._eventListeners[eventName];
+    self._on(eventName, function(annotation) {
+      listener.apply(self, [annotation]);
+    });
+  });
 
   // Register remotely invokable methods
-  for (method in this._channelListeners) {
-    if (Object.prototype.hasOwnProperty.call(this._channelListeners, method))  {
-      func = this._channelListeners[method];
-      this.bridge.on(method, func.bind(this));
-    }
-  }
+  Object.keys(this._channelListeners).forEach(function(eventName) {
+    self.bridge.on(eventName, function(data, callbackFunction) {
+      var listener = self._channelListeners[eventName];
+      listener.apply(self, [data, callbackFunction]);
+    });
+  });
 }
 
 // Cache of annotations which have crossed the bridge for fast, encapsulated
