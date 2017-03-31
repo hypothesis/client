@@ -50,11 +50,10 @@ AnnotationSync.prototype.cache = null;
 AnnotationSync.prototype.sync = function(annotations) {
   annotations = (function() {
     var i;
-    var len;
     var results1;
 
     results1 = [];
-    for (i = 0, len = annotations.length; i < len; i++) {
+    for (i = 0; i < annotations.length; i++) {
       results1.push(this._format(annotations[i]));
     }
     return results1;
@@ -62,14 +61,13 @@ AnnotationSync.prototype.sync = function(annotations) {
   this.bridge.call('sync', annotations, (function(_this) {
     return function(err, annotations) {
       var i;
-      var len;
       var results1;
 
       if (annotations === null) {
         annotations = [];
       }
       results1 = [];
-      for (i = 0, len = annotations.length; i < len; i++) {
+      for (i = 0; i < annotations.length; i++) {
         results1.push(_this._parse(annotations[i]));
       }
       return results1;
@@ -93,11 +91,10 @@ AnnotationSync.prototype._channelListeners = {
 
     annotations = (function() {
       var i;
-      var len;
       var results1;
 
       results1 = [];
-      for (i = 0, len = bodies.length; i < len; i++) {
+      for (i = 0; i < bodies.length; i++) {
         a = bodies[i];
         results1.push(this._parse(a));
       }
@@ -143,13 +140,11 @@ AnnotationSync.prototype._parseResults = function(results) {
   var body;
   var i;
   var j;
-  var len;
-  var len1;
 
-  for (i = 0, len = results.length; i < len; i++) {
+  for (i = 0; i < results.length; i++) {
     bodies = results[i];
     bodies = [].concat(bodies);
-    for (j = 0, len1 = bodies.length; j < len1; j++) {
+    for (j = 0; j < bodies.length; j++) {
       body = bodies[j];
       if (body !== null) {
         this._parse(body);
