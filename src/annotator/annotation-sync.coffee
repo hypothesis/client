@@ -22,12 +22,14 @@ module.exports = class AnnotationSync
     @_emit = options.emit
 
     # Listen locally for interesting events
-    for event, handler of @_eventListeners
-      this._on(event, handler.bind(this))
+    Object.keys(@_eventListeners).forEach (event) =>
+      handler = @_eventListeners[event]
+      this._on(event, (a,b,c) => handler.call(this,a,b,c))
 
     # Register remotely invokable methods
-    for method, func of @_channelListeners
-      @bridge.on(method, func.bind(this))
+    Object.keys(@_channelListeners).forEach (method) =>
+      handler = @_channelListeners[method]
+      @bridge.on(method, (a,b,c) => handler.call(this,a,b,c))
 
   sync: (annotations) ->
     annotations = (this._format a for a in annotations)
