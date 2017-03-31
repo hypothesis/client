@@ -61,10 +61,8 @@ AnnotationSync.prototype.sync = function(annotations) {
     return function(err, annotations) {
       var i;
       var parsedAnnotations = [];
+      annotations = annotations || [];
 
-      if (annotations === null) {
-        annotations = [];
-      }
       for (i = 0; i < annotations.length; i++) {
         parsedAnnotations.push(_this._parse(annotations[i]));
       }
