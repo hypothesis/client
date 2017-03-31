@@ -77,16 +77,13 @@ AnnotationSync.prototype.sync = function(annotations) {
 // Handlers for messages arriving through a channel
 AnnotationSync.prototype._channelListeners = {
   'deleteAnnotation': function(body, cb) {
-    var annotation;
-    annotation = this._parse(body);
+    var annotation = this._parse(body);
     delete this.cache[annotation.$tag];
     this._emit('annotationDeleted', annotation);
     cb(null, this._format(annotation));
   },
   'loadAnnotations': function(bodies, cb) {
-    var annotations;
-
-    annotations = (function() {
+    var annotations = (function() {
       var i;
       var parsedAnnotations = [];
 
@@ -114,8 +111,7 @@ AnnotationSync.prototype._mkCallRemotelyAndParseResults = function(method, callB
   return (function(_this) {
     return function(annotation) {
       // Wrap the callback function to first parse returned items
-      var wrappedCallback;
-      wrappedCallback = function(failure, results) {
+      var wrappedCallback = function(failure, results) {
         if (failure === null) {
           _this._parseResults(results);
         }
