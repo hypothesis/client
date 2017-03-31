@@ -10,7 +10,6 @@ function AnnotationSync(bridge, options) {
   var func;
   var handler;
   var method;
-  var ref1;
 
   this.bridge = bridge;
 
@@ -36,10 +35,9 @@ function AnnotationSync(bridge, options) {
   }
 
   // Register remotely invokable methods
-  ref1 = this._channelListeners;
-  for (method in ref1) {
-    if (Object.prototype.hasOwnProperty.call(ref1, method))  {
-      func = ref1[method];
+  for (method in this._channelListeners) {
+    if (Object.prototype.hasOwnProperty.call(this._channelListeners, method))  {
+      func = this._channelListeners[method];
       this.bridge.on(method, func.bind(this));
     }
   }
