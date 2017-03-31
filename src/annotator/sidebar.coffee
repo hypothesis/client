@@ -176,6 +176,9 @@ module.exports = class Sidebar extends Host
       .removeClass('h-icon-chevron-right')
       .addClass('h-icon-chevron-left')
 
+  isOpen: ->
+    !@frame.hasClass('annotator-collapsed')
+
   createAnnotation: (annotation = {}) ->
     super
     this.show() unless annotation.$highlight
