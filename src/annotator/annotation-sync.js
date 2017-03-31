@@ -48,7 +48,6 @@ function AnnotationSync(bridge, options) {
 AnnotationSync.prototype.cache = null;
 
 AnnotationSync.prototype.sync = function(annotations) {
-  var a;
   annotations = (function() {
     var i;
     var len;
@@ -56,8 +55,7 @@ AnnotationSync.prototype.sync = function(annotations) {
 
     results1 = [];
     for (i = 0, len = annotations.length; i < len; i++) {
-      a = annotations[i];
-      results1.push(this._format(a));
+      results1.push(this._format(annotations[i]));
     }
     return results1;
   }).call(this);
@@ -72,8 +70,7 @@ AnnotationSync.prototype.sync = function(annotations) {
       }
       results1 = [];
       for (i = 0, len = annotations.length; i < len; i++) {
-        a = annotations[i];
-        results1.push(_this._parse(a));
+        results1.push(_this._parse(annotations[i]));
       }
       return results1;
     };
