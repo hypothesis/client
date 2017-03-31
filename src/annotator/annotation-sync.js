@@ -50,13 +50,12 @@ AnnotationSync.prototype.cache = null;
 AnnotationSync.prototype.sync = function(annotations) {
   annotations = (function() {
     var i;
-    var results1;
+    var formattedAnnotations = [];
 
-    results1 = [];
     for (i = 0; i < annotations.length; i++) {
-      results1.push(this._format(annotations[i]));
+      formattedAnnotations.push(this._format(annotations[i]));
     }
-    return results1;
+    return formattedAnnotations;
   }).call(this);
   this.bridge.call('sync', annotations, (function(_this) {
     return function(err, annotations) {
