@@ -75,28 +75,23 @@ module.exports = class Guest extends Annotator
           self._onClearSelection()
 
     @anchors = []
-    @plugins = options.hostPlugins unless !options.hostPlugins
 
     # If options.crossframe is set, it is assumed that this is NOT the default guest, and
     # so a crossframe needs to be set
     if (options.crossframe)
-      @_setCrossframe(options.crossframe)
+      @setCrossframe(options.crossframe)
       @setVisibleHighlights(options.showHighlights)
       @adderCtrl = options.adderCtrl
     else # Otherwise, the crossframe and plugins have to be initialized
       @_setupDefaultGuest()
 
-  _setupDefaultGuest: ->
-    @_setCrossframe()
+  getAdder: ->
+    return @adderCtrl
 
-    for own name, opts of @options
-      if not @plugins[name] and Annotator.Plugin[name]
-        @addPlugin(name, opts)
+  getCrossframe: ->
+    return @crossframe
 
-    @crossframe.onConnect(=> @publish('panelReady'))
-    @adderCtrl = new adder.Adder(@adder[0])
-
-  _setCrossframe: (crossframe) ->
+  setCrossframe: (crossframe) ->
     cfOptions =
       on: (event, handler) =>
         @subscribe(event, handler)
@@ -113,6 +108,14 @@ module.exports = class Guest extends Annotator
 
     @_connectAnnotationSync(@crossframe)
     @_connectAnnotationUISync(@crossframe, @guestId)
+
+  setPlugins: ( plugins ) ->
+    @plugins = plugins
+
+    # Add any other plugins we need
+    for own name, opts of @options
+      if not @plugins[name] and Annotator.Plugin[name]
+        @addPlugin(name, opts)
 
   # Get the document info
   getDocumentInfo: ->
@@ -165,6 +168,12 @@ module.exports = class Guest extends Annotator
     crossframe.on 'setVisibleHighlights', (state) =>
       this.setVisibleHighlights(state)
     , guestId
+
+  _setupDefaultGuest: ->
+    @setCrossframe()
+
+    @crossframe.onConnect(=> @publish('panelReady'))
+    @adderCtrl = new adder.Adder(@adder[0])
 
   _setupWrapper: ->
     @wrapper = @element

@@ -39,9 +39,10 @@ module.exports = class Host extends Annotator
         @addPlugin(name, opts)
 
     guest = @addGuest(element, "default", options)
-    # @plugins gets passed into the guest, and so crossframe is directly added to the @plugins object
-    @crossframe = @plugins.CrossFrame
-    @adderCtrl = guest.adderCtrl
+    @crossframe = guest.getCrossframe()
+    @adderCtrl = guest.getAdder()
+    @plugins.CrossFrame = @crossframe
+    guest.setPlugins( @plugins )
 
     app.appendTo(@frame)
 
@@ -66,9 +67,8 @@ module.exports = class Host extends Annotator
   addGuest: (guestElement, guestId, guestOptions) ->
     options = guestOptions
     options.guestId = guestId
-    options.crossframe = @crossframe
-    options.hostPlugins = @plugins
-    options.adderCtrl = @adderCtrl
+    if @crossframe then options.crossframe = @crossframe
+    if @adderCtrl then options.adderCtrl = @adderCtrl
     guest = new Guest(guestElement, options)
 
     @guests[guestId] = guest
