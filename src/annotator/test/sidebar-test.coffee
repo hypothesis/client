@@ -29,6 +29,21 @@ describe 'Sidebar', ->
     sandbox.restore()
     delete Annotator.Plugin.CrossFrame
 
+  describe '#constructor', ->
+    originalBind = Function.prototype.bind
+
+    beforeEach 'replace Function.bind with a crashing version', ->
+      Function.prototype.bind = -> assert.fail()
+
+    afterEach 'put the original Function.bind back', ->
+      Function.prototype.bind = originalBind
+
+    context 'if the parent context has a crashing Function.bind polyfill', ->
+      it "doesn't crash", ->
+        # If the constructor tries to call the parent context's Function.bind
+        # it'll crash.
+        createSidebar()
+
   describe 'crossframe listeners', ->
     emitEvent = (event, args...) ->
       fn(args...) for [evt, fn] in fakeCrossFrame.on.args when event == evt

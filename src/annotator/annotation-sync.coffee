@@ -4,6 +4,8 @@
 # It also listens for events from Annotator when new annotations are created or
 # annotations successfully anchor and relays these to the sidebar app.
 
+cleanContext = require('./util/clean-context')
+
 module.exports = class AnnotationSync
   # Cache of annotations which have crossed the bridge for fast, encapsulated
   # association of annotations received in arguments to window-local copies.
@@ -23,11 +25,11 @@ module.exports = class AnnotationSync
 
     # Listen locally for interesting events
     for event, handler of @_eventListeners
-      this._on(event, handler.bind(this))
+      this._on(event, cleanContext.bind.call(handler, this))
 
     # Register remotely invokable methods
     for method, func of @_channelListeners
-      @bridge.on(method, func.bind(this))
+      @bridge.on(method, cleanContext.bind.call(func, this))
 
   sync: (annotations) ->
     annotations = (this._format a for a in annotations)

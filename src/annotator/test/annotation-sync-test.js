@@ -136,5 +136,24 @@ describe('AnnotationSync', function() {
         });
       });
     });
+
+    context('if the parent context has a crashing Function.bind polyfill', function() {
+
+      var originalBind = Function.prototype.bind;
+
+      beforeEach('replace Function.bind with a crashing version', function() {
+        Function.prototype.bind = function() { assert.fail(); };
+      });
+
+      afterEach('put the original Function.bind back', function() {
+        Function.prototype.bind = originalBind;
+      });
+
+      it("doesn't crash", function() {
+        // If the constructor tries to call the parent context's Function.bind
+        // it'll crash.
+        createAnnotationSync();
+      });
+    });
   });
 });

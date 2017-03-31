@@ -6,6 +6,7 @@ Host = require('./host')
 annotationCounts = require('./annotation-counts')
 sidebarTrigger = require('./sidebar-trigger')
 events = require('../shared/bridge-events');
+cleanContext = require('./util/clean-context')
 
 # Minimum width to which the frame can be resized.
 MIN_RESIZE = 280
@@ -42,7 +43,7 @@ module.exports = class Sidebar extends Host
     this._setupSidebarEvents()
 
   _setupDocumentEvents: ->
-    sidebarTrigger(document.body, @show.bind(this))
+    sidebarTrigger(document.body, cleanContext.bind.call(@show, this))
 
     @element.on 'click', (event) =>
       if !@selectedTargets?.length
@@ -62,8 +63,8 @@ module.exports = class Sidebar extends Host
   _setupSidebarEvents: ->
     annotationCounts(document.body, @crossframe)
 
-    @crossframe.on('show', this.show.bind(this))
-    @crossframe.on('hide', this.hide.bind(this))
+    @crossframe.on('show', cleanContext.bind.call(this.show, this))
+    @crossframe.on('hide', cleanContext.bind.call(this.hide, this))
     @crossframe.on(events.DO_LOGIN, =>
       if @onLoginRequest
         @onLoginRequest()
