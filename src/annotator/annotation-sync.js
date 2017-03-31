@@ -89,14 +89,13 @@ AnnotationSync.prototype._channelListeners = {
 
     annotations = (function() {
       var i;
-      var results1;
+      var parsedAnnotations = [];
 
-      results1 = [];
       for (i = 0; i < bodies.length; i++) {
         a = bodies[i];
-        results1.push(this._parse(a));
+        parsedAnnotations.push(this._parse(a));
       }
-      return results1;
+      return parsedAnnotations;
     }).call(this);
     this._emit('annotationsLoaded', annotations);
     return cb(null, annotations);
