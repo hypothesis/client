@@ -66,6 +66,8 @@ function FakeVirtualThreadList($scope, $window, rootThread) {
 inherits(FakeVirtualThreadList, EventEmitter);
 
 describe('threadList', function () {
+  var threadListContainers;
+
   function createThreadList(inputs) {
     var defaultInputs = {
       thread: threadFixtures.thread,
@@ -76,8 +78,33 @@ describe('threadList', function () {
       onSetCollapsed: sinon.stub(),
     };
 
-    var element = util.createDirective(document, 'threadList',
-      Object.assign({}, defaultInputs, inputs));
+    // Create a scrollable container for the `<thread-list>` so that scrolling
+    // can be tested.
+    var parentEl = document.createElement('div');
+    parentEl.style.overflow = 'scroll';
+    parentEl.style.height = '100px';
+
+    // Add an element inside the scrollable container which is much taller than
+    // the container, so that it actually becomes scrollable.
+    var tallDiv = document.createElement('div');
+    tallDiv.style.height = '1000px';
+    parentEl.appendChild(tallDiv);
+
+    document.body.appendChild(parentEl);
+
+    // Create the `<thread-list>` instance
+    var element = util.createDirective(
+      document,
+      'threadList',
+      Object.assign({}, defaultInputs, inputs),
+      {}, // initialScope
+      '', // initialHtml
+      { parentElement: parentEl }
+    );
+
+    element.parentEl = parentEl;
+
+    threadListContainers.push(parentEl);
 
     return element;
   }
@@ -91,6 +118,13 @@ describe('threadList', function () {
     angular.mock.module('app', {
       VirtualThreadList: FakeVirtualThreadList,
     });
+    threadListContainers = [];
+  });
+
+  afterEach(function () {
+    threadListContainers.forEach(function (el) {
+      el.remove();
+    });
   });
 
   it('displays the children of the root thread', function () {
@@ -102,34 +136,38 @@ describe('threadList', function () {
   });
 
   describe('when a new annotation is created', function () {
-    var scrollSpy;
-    beforeEach(function () {
-      scrollSpy = sinon.stub(window, 'scroll');
-    });
-
-    afterEach(function () {
-      scrollSpy.restore();
-    });
-
     it('scrolls the annotation into view', function () {
       var element = createThreadList();
+      element.parentEl.scrollTop = 500;
+
       var annot = annotFixtures.annotation;
       element.scope.$broadcast(events.BEFORE_ANNOTATION_CREATED, annot);
-      assert.called(scrollSpy);
+
+      // Check that the thread list was scrolled up to make the new annotation
+      // visible.
+      assert.isBelow(element.parentEl.scrollTop, 100);
     });
 
     it('does not scroll the annotation into view if it is a reply', function () {
       var element = createThreadList();
+      element.parentEl.scrollTop = 500;
+
       var reply = annotFixtures.reply;
       element.scope.$broadcast(events.BEFORE_ANNOTATION_CREATED, reply);
-      assert.notCalled(scrollSpy);
+
+      // Check that the thread list was not scrolled
+      assert.equal(element.parentEl.scrollTop, 500);
     });
 
     it('does not scroll the annotation into view if it is a highlight', function () {
       var element = createThreadList();
+      element.parentEl.scrollTop = 500;
+
       var highlight = annotFixtures.highlight;
       element.scope.$broadcast(events.BEFORE_ANNOTATION_CREATED, highlight);
-      assert.notCalled(scrollSpy);
+
+      // Check that the thread list was not scrolled
+      assert.equal(element.parentEl.scrollTop, 500);
     });
 
     it('clears the selection', function () {

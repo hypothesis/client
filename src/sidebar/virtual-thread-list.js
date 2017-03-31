@@ -5,6 +5,16 @@ var debounce = require('lodash.debounce');
 var inherits = require('inherits');
 
 /**
+ * @typedef Options
+ * @property {Function} [invisibleThreadFilter] - Function used to determine
+ *   whether an off-screen thread should be rendered or not.  Called with a
+ *   `Thread` and if it returns `true`, the thread is rendered even if offscreen.
+ * @property {Element} [scrollRoot] - The scrollable Element which contains the
+ *   thread list. The set of on-screen threads is determined based on the scroll
+ *   position and height of this element.
+ */
+
+/**
  * VirtualThreadList is a helper for virtualizing the annotation thread list.
  *
  * 'Virtualizing' the thread list improves UI performance by only creating
@@ -20,10 +30,7 @@ var inherits = require('inherits');
  * @param {Window} container - The Window displaying the list of annotation threads.
  * @param {Thread} rootThread - The initial Thread object for the top-level
  *        threads.
- * @param {Object} options - The render-time options to help make final adjustments
- *        to what is and is not rendered.
- *        options.invisibleThreadFilter allows integrator to tell us what should be
- *          rerendered but not visible to the user yet.
+ * @param {Options} options
  */
 function VirtualThreadList($scope, window_, rootThread, options) {
   var self = this;
@@ -36,7 +43,7 @@ function VirtualThreadList($scope, window_, rootThread, options) {
   this._heights = {};
 
   this.window = window_;
-  this.scrollRoot = this.window.document.querySelector('.app-content-wrapper');
+  this.scrollRoot = options.scrollRoot || document.body;
 
   var debouncedUpdate = debounce(function () {
     self._updateVisibleThreads();

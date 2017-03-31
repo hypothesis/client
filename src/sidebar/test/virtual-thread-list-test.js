@@ -47,7 +47,6 @@ describe('VirtualThreadList', function () {
     fakeScope = {$digest: sinon.stub()};
 
     fakeScrollRoot = {
-      className: 'app-content-wrapper',
       scrollTop: 0,
       listeners: {},
       addEventListener: function (event, listener) {
@@ -83,17 +82,10 @@ describe('VirtualThreadList', function () {
         });
       },
       innerHeight: 100,
-      document: {
-        querySelector: function(selector){
-          if(selector === '.' + fakeScrollRoot.className){
-            return fakeScrollRoot;
-          }
-          return null;
-        },
-      },
     };
 
     threadOptions.invisibleThreadFilter = sinon.stub().returns(false);
+    threadOptions.scrollRoot = fakeScrollRoot;
 
     var rootThread = {annotation: undefined, children: []};
     threadList = new VirtualThreadList(fakeScope, fakeWindow, rootThread, threadOptions);
