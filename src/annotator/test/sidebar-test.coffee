@@ -173,3 +173,16 @@ describe 'Sidebar', ->
       hide = sandbox.stub(sidebar, 'hide')
       sidebar.onSwipe({type: 'swiperight'})
       assert.calledOnce(hide)
+
+  describe 'document events', ->
+
+    sidebar = null
+
+    beforeEach ->
+      sidebar = createSidebar({})
+
+    it 'closes the sidebar when the user taps or clicks in the page', ->
+      for event in ['click', 'touchstart']
+        sidebar.show()
+        sidebar.element.trigger(event)
+        assert.isFalse(sidebar.isOpen())
