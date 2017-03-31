@@ -4,6 +4,17 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+- Fix sidebar not opening when tapping annotations on mobile
+  ([#329](https://github.com/hypothesis/client/pull/329)).
+
+- Fix sidebar not closing when tapping in page on mobile
+  ([#328](https://github.com/hypothesis/client/pull/328)).
+
+- Fix sidebar not scrolling when dragged on iOS
+  ([#327](https://github.com/hypothesis/client/pull/327)).
+
 ## [1.7.0] - 2017-03-29
 
 ### Changed
