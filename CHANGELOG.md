@@ -4,7 +4,7 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
-## [Unreleased]
+## [1.8.0] - 2017-03-31
 
 - Fix sidebar not opening when tapping annotations on mobile
   ([#329](https://github.com/hypothesis/client/pull/329)).
