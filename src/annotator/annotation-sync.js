@@ -60,16 +60,15 @@ AnnotationSync.prototype.sync = function(annotations) {
   this.bridge.call('sync', annotations, (function(_this) {
     return function(err, annotations) {
       var i;
-      var results1;
+      var parsedAnnotations = [];
 
       if (annotations === null) {
         annotations = [];
       }
-      results1 = [];
       for (i = 0; i < annotations.length; i++) {
-        results1.push(_this._parse(annotations[i]));
+        parsedAnnotations.push(_this._parse(annotations[i]));
       }
-      return results1;
+      return parsedAnnotations;
     };
   })(this));
   return this;
