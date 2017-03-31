@@ -10,7 +10,6 @@ function AnnotationSync(bridge, options) {
   var func;
   var handler;
   var method;
-  var ref;
   var ref1;
 
   this.bridge = bridge;
@@ -29,10 +28,9 @@ function AnnotationSync(bridge, options) {
   this._emit = options.emit;
 
   // Listen locally for interesting events
-  ref = this._eventListeners;
-  for (event in ref) {
-    if (Object.prototype.hasOwnProperty.call(ref, event))  {
-      handler = ref[event];
+  for (event in this._eventListeners) {
+    if (Object.prototype.hasOwnProperty.call(this._eventListeners, event))  {
+      handler = this._eventListeners[event];
       this._on(event, handler.bind(this));
     }
   }
