@@ -139,7 +139,7 @@ describe('oauth auth', function () {
             'https://hypothes.is/api/token',
             expectedBody,
             {headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-          });
+            });
         };
       }
 

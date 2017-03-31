@@ -116,8 +116,8 @@ var update = {
   SELECT_TAB: function (state, action) {
     // Do nothing if the "new tab" is not a valid tab.
     if ([uiConstants.TAB_ANNOTATIONS,
-        uiConstants.TAB_NOTES,
-        uiConstants.TAB_ORPHANS].indexOf(action.tab) === -1) {
+         uiConstants.TAB_NOTES,
+         uiConstants.TAB_ORPHANS].indexOf(action.tab) === -1) {
       return {};
     }
     // Shortcut if the tab is already correct, to avoid resetting the sortKey
