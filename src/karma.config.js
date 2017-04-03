@@ -62,6 +62,7 @@ module.exports = function(config) {
       },
 
       transform: [
+        'babelify',
         'coffeeify',
         istanbul({
           ignore: [
