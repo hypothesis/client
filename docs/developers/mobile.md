@@ -6,7 +6,7 @@ If you have made changes to the client that could affect the mobile experience, 
 
 1. Make sure your development system and mobile device are on the same local network.
 1. Configure the "h" service to allow incoming connections from other systems by editing `conf/development-app.ini` and changing the `host` setting from `localhost` to `0.0.0.0`.
-1. Get the IP address or host name of your development system (`$HOSTNAME` in the steps below). You can do this using the `hostname` terminal command on Mac/Linux.
+1. Get the IP address or host name of your development system (`<HOSTNAME>` in the steps below). You can do this using the `hostname` terminal command on Mac/Linux.
 
    **Tip:** _If the output of `hostname` does not include a `.home` or `.local`
    suffix, you may need to append `.local` to get a host name that is accessible from
@@ -19,7 +19,7 @@ If you have made changes to the client that could affect the mobile experience, 
 
    # Configure the URL that the client is loaded from in pages
    # that embed Hypothesis
-   export CLIENT_URL=http://$HOSTNAME:3001/hypothesis
+   export CLIENT_URL=http://<HOSTNAME>:3001/hypothesis
 
    make dev
    ```
@@ -29,11 +29,11 @@ If you have made changes to the client that could affect the mobile experience, 
    # In the "client" repository
 
    # Set URL which sidebar app ("app.html") is loaded from
-   export H_SERVICE_URL=http://$HOSTNAME:5000
+   export H_SERVICE_URL=http://<HOSTNAME>:5000
    # Set hostname used when generating client asset URLs
-   export PACKAGE_SERVER_HOSTNAME=$HOSTNAME
+   export PACKAGE_SERVER_HOSTNAME=<HOSTNAME>
 
    gulp watch
    ```
-   **Tip:** _When `gulp watch` runs, it will print out the URLs used for the "h" service and client assets. These should include `$HOSTNAME` instead of `localhost`._
-1. On your mobile device, go to a page which has the client embedded such as `http://$HOSTNAME:3000` or `http://$HOSTNAME:5000/docs/help`.
+   **Tip:** _When `gulp watch` runs, it will print out the URLs used for the "h" service and client assets. These should include `<HOSTNAME>` instead of `localhost`._
+1. On your mobile device, go to a page which has the client embedded such as `http://<HOSTNAME>:3000` or `http://<HOSTNAME>:5000/docs/help`.
