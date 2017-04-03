@@ -142,9 +142,7 @@ function store($http, $q, auth, settings) {
       delete: apiCall('annotation.delete'),
       get: apiCall('annotation.read'),
       update: apiCall('annotation.update'),
-    },
-    flag: {
-      create: apiCall('flag.create'),
+      flag: apiCall('annotation.flag'),
     },
     profile: {
       read: apiCall('profile.read'),

@@ -66,11 +66,9 @@ describe('store', function () {
             method: 'PUT',
             url: 'http://example.com/api/annotations/:id',
           },
-        },
-        flag: {
-          create: {
-            method: 'POST',
-            url: 'http://example.com/api/flags',
+          flag: {
+            method: 'PUT',
+            url: 'http://example.com/api/annotations/:id/flag',
           },
         },
         search: {
@@ -130,11 +128,11 @@ describe('store', function () {
   });
 
   it('flags an annotation', function (done) {
-    store.flag.create(null, {annotation: 'an-id'}).then(function () {
+    store.annotation.flag({id: 'an-id'}).then(function () {
       done();
     });
 
-    $httpBackend.expectPOST('http://example.com/api/flags')
+    $httpBackend.expectPUT('http://example.com/api/annotations/an-id/flag')
       .respond(function () {
         return [204, {}, {}];
       });

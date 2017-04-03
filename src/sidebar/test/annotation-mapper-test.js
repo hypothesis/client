@@ -16,9 +16,7 @@ describe('annotationMapper', function() {
     fakeStore = {
       annotation: {
         delete: sinon.stub().returns(Promise.resolve({})),
-      },
-      flag: {
-        create: sinon.stub().returns(Promise.resolve({})),
+        flag: sinon.stub().returns(Promise.resolve({})),
       },
     };
     angular.module('app', [])
@@ -131,8 +129,8 @@ describe('annotationMapper', function() {
     it('flags an annotation', function () {
       var ann = {id: 'test-id'};
       annotationMapper.flagAnnotation(ann);
-      assert.calledOnce(fakeStore.flag.create);
-      assert.calledWith(fakeStore.flag.create, null, {annotation: ann.id});
+      assert.calledOnce(fakeStore.annotation.flag);
+      assert.calledWith(fakeStore.annotation.flag, {id: ann.id});
     });
 
     it('emits the "annotationFlagged" event', function (done) {
