@@ -24,3 +24,21 @@ module.exports = class ReadiumSidebar extends Sidebar
         this.destroyGuest(spineItem.href)
       )
     )
+
+    this._shiftNativeElements()
+
+  # THESIS TODO: Placed in ReadiumSidebar to avoid breaking unknown sites
+  # If the solution seems safe, then consider moving it into Sidebar
+  #
+  # Shift the elements native to the website, so that they don't conflict
+  # with our own.
+  _shiftNativeElements: ->
+    annoWrapper = document.getElementsByClassName('annotator-wrapper')[0]
+    offset = this.toolbar.css('width')
+    annoWrapper.style.marginRight += offset
+
+    bucketEl = this.plugins.BucketBar.element[0]
+    bucketStyle = bucketEl.style
+    bucketStyle.width += offset
+    bucketStyle.left += "-" + offset
+    bucketStyle.borderLeft = "1px solid rgba(0,0,0, 0.07)"
