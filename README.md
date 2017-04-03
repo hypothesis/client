@@ -33,8 +33,8 @@ testing and contributing to the client.
 Community
 ---------
 
-Join us in [#hypothes.is][irc] on [freenode](https://freenode.net/) for
-discussion.
+Join us on [Slack](https://slack.hypothes.is) or in [#hypothes.is][irc] on
+[freenode](https://freenode.net/) for discussion.
 
 If you'd like to contribute to the project, you should consider subscribing to
 the [development mailing list][ml], where we can help you plan your
