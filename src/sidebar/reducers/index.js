@@ -19,7 +19,6 @@
 
 var annotations = require('./annotations');
 var frames = require('./frames');
-var moderation = require('./moderation');
 var selection = require('./selection');
 var session = require('./session');
 var viewer = require('./viewer');
@@ -30,7 +29,6 @@ function init(settings) {
     {},
     annotations.init(),
     frames.init(),
-    moderation.init(),
     selection.init(settings),
     session.init(),
     viewer.init()
@@ -40,7 +38,6 @@ function init(settings) {
 var update = util.createReducer(Object.assign(
   annotations.update,
   frames.update,
-  moderation.update,
   selection.update,
   session.update,
   viewer.update
