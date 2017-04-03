@@ -8,6 +8,7 @@ the Hypothesis client.
    :maxdepth: 2
 
    developing
-   security
    envvars
+   mobile
+   security
    arch/index
