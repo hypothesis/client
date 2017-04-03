@@ -29,8 +29,8 @@ describe('AnnotationSync', function() {
     };
 
     options = {
-      on: emitter.on.bind(emitter),
-      emit: emitter.emit.bind(emitter),
+      on: emitter.on.bind(emitter), // eslint-disable-line no-restricted-properties
+      emit: emitter.emit.bind(emitter), // eslint-disable-line no-restricted-properties
     };
 
     publish = function() {
