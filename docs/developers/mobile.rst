@@ -11,7 +11,7 @@ tested with at least current versions of iOS Safari and Chrome for Android.
 #. Make sure your development system and mobile device are on the same local
    network.
 
-#. Configure the "h" service to allow incoming connections from other systems
+#. Configure h to allow incoming connections from other systems
    by editing ``conf/development-app.ini`` and changing the ``host`` setting from
    ``localhost`` to ``0.0.0.0``.
 
@@ -26,12 +26,12 @@ tested with at least current versions of iOS Safari and Chrome for Android.
       accessible from other devices on the network. If you have problems using
       the hostname, try using the IP address instead.
 
-#. Set the :envvar:`CLIENT_URL` environment variable to configure the "h"
-   service to load the client from this host and start the dev server:
+#. Set the :envvar:`CLIENT_URL` environment variable to configure h
+   to load the client from this host and start the dev server:
 
    .. code-block:: sh
 
-      # In the "h" repository
+      # In the h repository
 
       # Configure the URL that the client is loaded from in pages
       # that embed Hypothesis
@@ -45,7 +45,7 @@ tested with at least current versions of iOS Safari and Chrome for Android.
 
    .. code-block:: sh
 
-      # In the "client" repository
+      # In the client repository
 
       # Set URL which sidebar app ("app.html") is loaded from
       export H_SERVICE_URL=http://<HOSTNAME>:5000
@@ -56,8 +56,8 @@ tested with at least current versions of iOS Safari and Chrome for Android.
 
    .. tip::
 
-      When ``gulp watch`` runs, it will print out the URLs used for the "h"
-      service and client assets. These should include ``<HOSTNAME>`` instead of
+      When ``gulp watch`` runs, it will print out the URLs used for h
+      and client assets. These should include ``<HOSTNAME>`` instead of
       ``localhost``.
 
 #. On your mobile device, go to a page which has the client embedded such as
