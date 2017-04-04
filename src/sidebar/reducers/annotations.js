@@ -176,6 +176,36 @@ var update = {
     });
     return {annotations: annotations};
   },
+
+  HIDE_ANNOTATION: function (state, action) {
+    var anns = state.annotations.map(function (ann) {
+      if (ann.id !== action.id) {
+        return ann;
+      }
+      var moderation = Object.assign({}, ann.moderation, {
+        is_hidden: true,
+      });
+      return Object.assign({}, ann, {
+        moderation: moderation,
+      });
+    });
+    return {annotations: anns};
+  },
+
+  UNHIDE_ANNOTATION: function (state, action) {
+    var anns = state.annotations.map(function (ann) {
+      if (ann.id !== action.id) {
+        return ann;
+      }
+      var moderation = Object.assign({}, ann.moderation, {
+        is_hidden: false,
+      });
+      return Object.assign({}, ann, {
+        moderation: moderation,
+      });
+    });
+    return {annotations: anns};
+  },
 };
 
 var actions = util.actionTypes(update);
@@ -283,6 +313,32 @@ function updateAnchorStatus(id, tag, isOrphan) {
 }
 
 /**
+ * Update the local hidden state of an annotation.
+ *
+ * This updates an annotation to reflect the fact that it has been hidden from
+ * non-moderators.
+ */
+function hideAnnotation(id) {
+  return {
+    type: actions.HIDE_ANNOTATION,
+    id: id,
+  };
+}
+
+/**
+ * Update the local hidden state of an annotation.
+ *
+ * This updates an annotation to reflect the fact that it has been made visible
+ * to non-moderators.
+ */
+function unhideAnnotation(id) {
+  return {
+    type: actions.UNHIDE_ANNOTATION,
+    id: id,
+  };
+}
+
+/**
  * Return all loaded annotations which have been saved to the server.
  *
  * @param {state} - The global app state
@@ -319,6 +375,13 @@ function findIDsForTags(state, tags) {
   return ids;
 }
 
+/**
+ * Return the annotation with the given ID.
+ */
+function findAnnotationByID(state, id) {
+  return findByID(state.annotations, id);
+}
+
 module.exports = {
   init: init,
   update: update,
@@ -328,10 +391,13 @@ module.exports = {
     removeAnnotations: removeAnnotations,
     updateAnchorStatus: updateAnchorStatus,
     updateFlagStatus: updateFlagStatus,
+    hideAnnotation: hideAnnotation,
+    unhideAnnotation: unhideAnnotation,
   },
 
   // Selectors
   annotationExists: annotationExists,
+  findAnnotationByID: findAnnotationByID,
   findIDsForTags: findIDsForTags,
   savedAnnotations: savedAnnotations,
 };
