@@ -15,16 +15,16 @@ tested with at least current versions of iOS Safari and Chrome for Android.
    by editing ``conf/development-app.ini`` and changing the ``host`` setting from
    ``localhost`` to ``0.0.0.0``.
 
-#. Get the IP address or host name of your development system (``<HOSTNAME>``
+#. Get the IP address or hostname of your development system (``<HOSTNAME>``
    in the steps below). You can do this using the ``hostname`` terminal command on
    Mac/Linux.
 
    .. tip::
 
       If the output of ``hostname`` does not include a ``.home`` or ``.local``
-      suffix, you may need to append ``.local`` to get a host name that is
+      suffix, you may need to append ``.local`` to get a hostname that is
       accessible from other devices on the network. If you have problems using
-      the host name, try using the IP address instead.
+      the hostname, try using the IP address instead.
 
 #. Configure the "h" service to load the client from this host and start the dev
    server:
