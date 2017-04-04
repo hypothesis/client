@@ -98,7 +98,7 @@ describe('moderationBanner', function () {
     banner.querySelector('button').click();
 
     setTimeout(function () {
-      assert.calledWith(fakeFlash.error, 'Network Error');
+      assert.calledWith(fakeFlash.error, 'Failed to hide annotation');
       done();
     }, 0);
   });
@@ -120,7 +120,7 @@ describe('moderationBanner', function () {
     banner.querySelector('button').click();
 
     setTimeout(function () {
-      assert.calledWith(fakeFlash.error, 'Network Error');
+      assert.calledWith(fakeFlash.error, 'Failed to unhide annotation');
       done();
     }, 0);
   });

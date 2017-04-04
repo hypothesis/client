@@ -32,8 +32,8 @@ function ModerationBannerController(annotationUI, flash, store) {
   this.hideAnnotation = function () {
     store.annotation.hide({id: self.annotation.id}).then(function () {
       annotationUI.hideAnnotation(self.annotation.id);
-    }).catch(function (err) {
-      flash.error(err.message);
+    }).catch(function () {
+      flash.error('Failed to hide annotation');
     });
   };
 
@@ -43,8 +43,8 @@ function ModerationBannerController(annotationUI, flash, store) {
   this.unhideAnnotation = function () {
     store.annotation.unhide({id: self.annotation.id}).then(function () {
       annotationUI.unhideAnnotation(self.annotation.id);
-    }).catch(function (err) {
-      flash.error(err.message);
+    }).catch(function () {
+      flash.error('Failed to unhide annotation');
     });
   };
 }
