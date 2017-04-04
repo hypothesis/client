@@ -26,8 +26,8 @@ tested with at least current versions of iOS Safari and Chrome for Android.
       accessible from other devices on the network. If you have problems using
       the hostname, try using the IP address instead.
 
-#. Configure the "h" service to load the client from this host and start the dev
-   server:
+#. Set the :envvar:`CLIENT_URL` environment variable to configure the "h"
+   service to load the client from this host and start the dev server:
 
    .. code-block:: sh
 
@@ -39,7 +39,8 @@ tested with at least current versions of iOS Safari and Chrome for Android.
 
       make dev
 
-#. Configure the client to load assets from this hostname and start the dev
+#. Set the :envvar:`H_SERVICE_URL` and :envvar:`PACKAGE_SERVER_HOSTNAME`
+   environment variables to load assets from this hostname and start the dev
    server:
 
    .. code-block:: sh
