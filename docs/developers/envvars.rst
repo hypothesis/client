@@ -8,3 +8,7 @@ build tasks.
 
    The URL of the service which hosts the HTML entry point for the client's
    sidebar application.
+
+.. envvar:: PACKAGE_SERVER_HOSTNAME
+
+   The hostname that is used to generate URLs to the package content server.
