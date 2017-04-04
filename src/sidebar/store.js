@@ -171,6 +171,8 @@ function store($http, $q, auth, settings) {
       get: apiCall('annotation.read'),
       update: apiCall('annotation.update'),
       flag: apiCall('annotation.flag'),
+      hide: apiCall('annotation.hide'),
+      unhide: apiCall('annotation.unhide'),
     },
     profile: {
       read: apiCall('profile.read'),

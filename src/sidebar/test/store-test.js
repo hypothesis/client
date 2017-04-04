@@ -51,6 +51,9 @@ describe('store', function () {
     store = _store_;
 
     $httpBackend.expectGET('http://example.com/api').respond({
+      // Return an API route directory.
+      // This should mirror the structure (but not the exact URLs) of
+      // https://hypothes.is/api/.
       links: {
         annotation: {
           create: {
@@ -69,6 +72,14 @@ describe('store', function () {
           flag: {
             method: 'PUT',
             url: 'http://example.com/api/annotations/:id/flag',
+          },
+          hide: {
+            method: 'PUT',
+            url: 'http://example.com/api/annotations/:id/hide',
+          },
+          unhide: {
+            method: 'DELETE',
+            url: 'http://example.com/api/annotations/:id/hide',
           },
         },
         search: {
@@ -133,6 +144,30 @@ describe('store', function () {
     });
 
     $httpBackend.expectPUT('http://example.com/api/annotations/an-id/flag')
+      .respond(function () {
+        return [204, {}, {}];
+      });
+    $httpBackend.flush();
+  });
+
+  it('hides an annotation', function (done) {
+    store.annotation.hide({id: 'an-id'}).then(function () {
+      done();
+    });
+
+    $httpBackend.expectPUT('http://example.com/api/annotations/an-id/hide')
+      .respond(function () {
+        return [204, {}, {}];
+      });
+    $httpBackend.flush();
+  });
+
+  it('unhides an annotation', function (done) {
+    store.annotation.unhide({id: 'an-id'}).then(function () {
+      done();
+    });
+
+    $httpBackend.expectDELETE('http://example.com/api/annotations/an-id/hide')
       .respond(function () {
         return [204, {}, {}];
       });
