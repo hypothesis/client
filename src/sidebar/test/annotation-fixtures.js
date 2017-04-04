@@ -137,9 +137,29 @@ function oldReply() {
   };
 }
 
+/**
+ * @typedef ModerationState
+ * @property {boolean} is_hidden
+ * @property {number} flag_count
+ */
+
+/**
+ * Return an annotation with the given moderation state.
+ *
+ * @param {ModerationState} modInfo
+ */
+function moderatedAnnotation(modInfo) {
+  return Object.assign(defaultAnnotation(), {
+    id: 'ann-id',
+    moderation: modInfo,
+  });
+}
+
+
 module.exports = {
   defaultAnnotation: defaultAnnotation,
   publicAnnotation: publicAnnotation,
+  moderatedAnnotation: moderatedAnnotation,
   newAnnotation: newAnnotation,
   newEmptyAnnotation: newEmptyAnnotation,
   newHighlight: newHighlight,
