@@ -4,20 +4,27 @@ Mobile Development
 Testing the Client on a Mobile Device
 -------------------------------------
 
-If you have made changes to the client that could affect the mobile experience, it is a good idea to test them on a real device. Such changes should ideally be tested with at least current versions of iOS Safari and Chrome for Android.
+If you have made changes to the client that could affect the mobile experience,
+it is a good idea to test them on a real device. Such changes should ideally be
+tested with at least current versions of iOS Safari and Chrome for Android.
 
-#. Make sure your development system and mobile device are on the same local network.
+#. Make sure your development system and mobile device are on the same local
+   network.
 
-#. Configure the "h" service to allow incoming connections from other systems by editing ``conf/development-app.ini`` and changing the ``host`` setting from ``localhost`` to ``0.0.0.0``.
+#. Configure the "h" service to allow incoming connections from other systems
+   by editing ``conf/development-app.ini`` and changing the ``host`` setting from
+   ``localhost`` to ``0.0.0.0``.
 
-#. Get the IP address or host name of your development system (``<HOSTNAME>`` in the steps below). You can do this using the ``hostname`` terminal command on Mac/Linux.
+#. Get the IP address or host name of your development system (``<HOSTNAME>``
+   in the steps below). You can do this using the ``hostname`` terminal command on
+   Mac/Linux.
 
    .. tip::
 
       If the output of ``hostname`` does not include a ``.home`` or ``.local``
-      suffix, you may need to append ``.local`` to get a host name that is accessible from
-      other devices on the network. If you have problems using the host name, try
-      using the IP address instead.
+      suffix, you may need to append ``.local`` to get a host name that is
+      accessible from other devices on the network. If you have problems using
+      the host name, try using the IP address instead.
 
 #. Configure the "h" service to load the client from this host and start the dev
    server:
@@ -48,6 +55,9 @@ If you have made changes to the client that could affect the mobile experience, 
 
    .. tip::
 
-      When ``gulp watch`` runs, it will print out the URLs used for the "h" service and client assets. These should include ``<HOSTNAME>`` instead of ``localhost``.
+      When ``gulp watch`` runs, it will print out the URLs used for the "h"
+      service and client assets. These should include ``<HOSTNAME>`` instead of
+      ``localhost``.
 
-#. On your mobile device, go to a page which has the client embedded such as ``http://<HOSTNAME>:3000`` or ``http://<HOSTNAME>:5000/docs/help``.
+#. On your mobile device, go to a page which has the client embedded such as
+   ``http://<HOSTNAME>:3000`` or ``http://<HOSTNAME>:5000/docs/help``.
