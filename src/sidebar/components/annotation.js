@@ -573,7 +573,7 @@ function AnnotationController(
   init();
 }
 
-var component = {
+module.exports = {
   controller: AnnotationController,
   controllerAs: 'vm',
   bindings: {
@@ -584,17 +584,7 @@ var component = {
     isCollapsed: '<',
   },
   template: require('../templates/annotation.html'),
-};
 
-module.exports = {
-  // These private helper functions aren't meant to be part of the public
-  // interface of this module. They've been exported temporarily to enable them
-  // to be unit tested.
-  // FIXME: The code should be refactored to enable unit testing without having
-  // to do this.
+  // Private helper exposed for use in unit tests.
   updateModel: updateModel,
-
-  // These are meant to be the public API of this module.
-  component: component,
-  Controller: AnnotationController,
 };

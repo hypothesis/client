@@ -1,6 +1,6 @@
 'use strict';
 
-var Controller = require('../sidebar-tutorial').Controller;
+var Controller = require('../sidebar-tutorial').controller;
 
 describe('SidebarTutorialController', function () {
 

@@ -129,7 +129,7 @@ module.exports = angular.module('h', [
   .component('hypothesisApp', require('./components/hypothesis-app'))
 
   // UI components
-  .component('annotation', require('./components/annotation').component)
+  .component('annotation', require('./components/annotation'))
   .component('annotationShareDialog', require('./components/annotation-share-dialog'))
   .component('annotationThread', require('./components/annotation-thread'))
   .component('annotationViewerContent', require('./components/annotation-viewer-content'))
@@ -140,7 +140,7 @@ module.exports = angular.module('h', [
   .component('helpPanel', require('./components/help-panel'))
   .component('loggedoutMessage', require('./components/loggedout-message'))
   .component('loginControl', require('./components/login-control'))
-  .component('loginForm', require('./components/login-form').component)
+  .component('loginForm', require('./components/login-form'))
   .component('markdown', require('./components/markdown'))
   .component('moderationBanner', require('./components/moderation-banner'))
   .component('publishAnnotationBtn', require('./components/publish-annotation-btn'))
@@ -148,7 +148,7 @@ module.exports = angular.module('h', [
   .component('searchStatusBar', require('./components/search-status-bar'))
   .component('selectionTabs', require('./components/selection-tabs'))
   .component('sidebarContent', require('./components/sidebar-content'))
-  .component('sidebarTutorial', require('./components/sidebar-tutorial').component)
+  .component('sidebarTutorial', require('./components/sidebar-tutorial'))
   .component('shareDialog', require('./components/share-dialog'))
   .component('sortDropdown', require('./components/sort-dropdown'))
   .component('streamContent', require('./components/stream-content'))
