@@ -113,9 +113,6 @@ function AnnotationController(
 
     vm.serviceUrl = serviceUrl;
 
-    /** Give the template access to the feature flags. */
-    vm.feature = features.flagEnabled;
-
     /** Determines whether controls to expand/collapse the annotation body
      * are displayed adjacent to the tags field.
      */
