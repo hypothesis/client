@@ -207,7 +207,7 @@ function AnnotationController(
     };
     annotationMapper.flagAnnotation(vm.annotation).then(function(){
       analytics.track(analytics.events.ANNOTATION_FLAGGED);
-      vm.isFlagged = true;
+      annotationUI.updateFlagStatus(vm.annotation.id, true);
     }, onRejected);
   };
 
@@ -480,6 +480,10 @@ function AnnotationController(
 
   vm.isHiddenByModerator = function () {
     return annotationUI.isHiddenByModerator(vm.annotation.id);
+  };
+
+  vm.isFlagged = function() {
+    return vm.annotation.flagged;
   };
 
   vm.isReply = function () {
