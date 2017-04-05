@@ -42,3 +42,4 @@ module.exports = class ReadiumSidebar extends Sidebar
     bucketStyle.width += offset
     bucketStyle.left += "-" + offset
     bucketStyle.borderLeft = "1px solid rgba(0,0,0, 0.07)"
+    bucketStyle.borderRight = "1px solid rgba(0,0,0, 0.03)"
