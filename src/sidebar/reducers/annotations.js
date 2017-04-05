@@ -182,12 +182,7 @@ var update = {
       if (ann.id !== action.id) {
         return ann;
       }
-      var moderation = Object.assign({}, ann.moderation, {
-        is_hidden: true,
-      });
-      return Object.assign({}, ann, {
-        moderation: moderation,
-      });
+      return Object.assign({}, ann, { hidden: true });
     });
     return {annotations: anns};
   },
@@ -197,12 +192,7 @@ var update = {
       if (ann.id !== action.id) {
         return ann;
       }
-      var moderation = Object.assign({}, ann.moderation, {
-        is_hidden: false,
-      });
-      return Object.assign({}, ann, {
-        moderation: moderation,
-      });
+      return Object.assign({}, ann, { hidden: false });
     });
     return {annotations: anns};
   },

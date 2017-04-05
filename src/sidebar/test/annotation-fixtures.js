@@ -139,8 +139,8 @@ function oldReply() {
 
 /**
  * @typedef ModerationState
- * @property {boolean} is_hidden
- * @property {number} flag_count
+ * @property {boolean} hidden
+ * @property {number} flagCount
  */
 
 /**
@@ -151,7 +151,10 @@ function oldReply() {
 function moderatedAnnotation(modInfo) {
   return Object.assign(defaultAnnotation(), {
     id: 'ann-id',
-    moderation: modInfo,
+    hidden: !!modInfo.hidden,
+    moderation: {
+      flag_count: modInfo.flagCount || 0,
+    },
   });
 }
 

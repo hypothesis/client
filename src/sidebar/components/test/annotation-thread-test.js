@@ -183,7 +183,7 @@ describe('annotationThread', function () {
   });
 
   it('renders the moderation banner', function () {
-    var ann = fixtures.moderatedAnnotation({ flag_count: 1 });
+    var ann = fixtures.moderatedAnnotation({ flagCount: 1 });
     var thread = {
       annotation: ann,
       id: '123',

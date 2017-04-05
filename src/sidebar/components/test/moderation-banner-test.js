@@ -58,11 +58,7 @@ describe('moderationBanner', function () {
   });
 
   it('displays the number of flags the annotation has received', function () {
-    var ann = Object.assign(fixtures.defaultAnnotation(), {
-      moderation: {
-        flag_count: 10,
-      },
-    });
+    var ann = fixtures.moderatedAnnotation({ flagCount: 10 });
     var banner = createBanner({ annotation: ann });
     assert.include(banner.textContent, 'Flagged for review x10');
   });
@@ -78,20 +74,20 @@ describe('moderationBanner', function () {
   });
 
   it('reports if the annotation was hidden', function () {
-    var ann = moderatedAnnotation({ is_hidden: true });
+    var ann = moderatedAnnotation({ hidden: true });
     var banner = createBanner({ annotation: ann });
     assert.include(banner.textContent, 'Hidden from users');
   });
 
   it('hides the annotation if "Hide" is clicked', function () {
-    var ann = moderatedAnnotation({ flag_count: 10 });
+    var ann = moderatedAnnotation({ flagCount: 10 });
     var banner = createBanner({ annotation: ann });
     banner.querySelector('button').click();
     assert.calledWith(fakeStore.annotation.hide, {id: 'ann-id'});
   });
 
   it('reports an error if hiding the annotation fails', function (done) {
-    var ann = moderatedAnnotation({ flag_count: 10 });
+    var ann = moderatedAnnotation({ flagCount: 10 });
     var banner = createBanner({ annotation: ann });
     fakeStore.annotation.hide.returns(Promise.reject(new Error('Network Error')));
 
@@ -104,7 +100,7 @@ describe('moderationBanner', function () {
   });
 
   it('unhides the annotation if "Unhide" is clicked', function () {
-    var ann = moderatedAnnotation({ is_hidden: true });
+    var ann = moderatedAnnotation({ hidden: true });
     var banner = createBanner({ annotation: ann });
 
     banner.querySelector('button').click();
@@ -113,7 +109,7 @@ describe('moderationBanner', function () {
   });
 
   it('reports an error if unhiding the annotation fails', function (done) {
-    var ann = moderatedAnnotation({ is_hidden: true });
+    var ann = moderatedAnnotation({ hidden: true });
     var banner = createBanner({ annotation: ann });
     fakeStore.annotation.unhide.returns(Promise.reject(new Error('Network Error')));
 

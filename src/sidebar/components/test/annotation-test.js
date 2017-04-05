@@ -998,7 +998,7 @@ describe('annotation', function() {
     });
 
     it('renders hidden annotations with a custom text class', function () {
-      var ann = fixtures.moderatedAnnotation({ is_hidden: true });
+      var ann = fixtures.moderatedAnnotation({ hidden: true });
       var el = createDirective(ann).element;
       assert.deepEqual(el.find('markdown').controller('markdown'), {
         customTextClass: {

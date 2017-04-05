@@ -56,24 +56,24 @@ describe('annotations reducer', function () {
   });
 
   describe('#hideAnnotation', function () {
-    it('sets the moderation/is_hidden state to `true`', function () {
+    it('sets the `hidden` state to `true`', function () {
       var store = createStore();
-      var ann = fixtures.moderatedAnnotation({ is_hidden: false });
+      var ann = fixtures.moderatedAnnotation({ hidden: false });
       store.dispatch(actions.addAnnotations([ann]));
       store.dispatch(actions.hideAnnotation(ann.id));
       var storeAnn = annotations.findAnnotationByID(store.getState(), ann.id);
-      assert.equal(storeAnn.moderation.is_hidden, true);
+      assert.equal(storeAnn.hidden, true);
     });
   });
 
   describe('#unhideAnnotation', function () {
-    it('sets the moderation/is_hidden state to `false`', function () {
+    it('sets the `hidden` state to `false`', function () {
       var store = createStore();
-      var ann = fixtures.moderatedAnnotation({ is_hidden: true });
+      var ann = fixtures.moderatedAnnotation({ hidden: true });
       store.dispatch(actions.addAnnotations([ann]));
       store.dispatch(actions.unhideAnnotation(ann.id));
       var storeAnn = annotations.findAnnotationByID(store.getState(), ann.id);
-      assert.equal(storeAnn.moderation.is_hidden, false);
+      assert.equal(storeAnn.hidden, false);
     });
   });
 });

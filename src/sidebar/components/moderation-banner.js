@@ -15,11 +15,7 @@ function ModerationBannerController(annotationUI, flash, store) {
   };
 
   this.isHidden = function () {
-    var moderation = self.annotation.moderation;
-    if (!moderation) {
-      return false;
-    }
-    return moderation.is_hidden;
+    return self.annotation.hidden;
   };
 
   this.isReply = function () {
