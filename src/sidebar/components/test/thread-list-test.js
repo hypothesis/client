@@ -82,7 +82,7 @@ describe('threadList', function () {
     // Create a scrollable container for the `<thread-list>` so that scrolling
     // can be tested.
     var parentEl = document.createElement('div');
-    parentEl.classList.add('js-scrollable');
+    parentEl.classList.add('js-thread-list-scroll-root');
     parentEl.style.overflow = 'scroll';
     parentEl.style.height = '100px';
 
@@ -213,15 +213,9 @@ describe('threadList', function () {
       sinon.match(annotFixtures.annotation));
   });
 
-  // See https://github.com/hypothesis/client/issues/341
-  it('finds correct scroll root if `window.getComputedStyle` fails', function () {
-    sinon.stub(window, 'getComputedStyle').returns(null);
-    var element = createThreadList();
-    element.scope.$digest();
-
+  it('uses the correct scroll root', function () {
+    createThreadList();
     var scrollRoot = fakeVirtualThread.options.scrollRoot;
-    assert.isTrue(scrollRoot.classList.contains('js-scrollable'));
-
-    window.getComputedStyle.restore();
+    assert.isTrue(scrollRoot.classList.contains('js-thread-list-scroll-root'));
   });
 });

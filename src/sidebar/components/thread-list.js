@@ -43,39 +43,6 @@ var virtualThreadOptions = {
   },
 };
 
-/**
- * Return true if the given element is scrollable.
- */
-function isScrollable(el) {
-  // Check the computed style to see if this element is marked as scrollable.
-  var computedStyle = window.getComputedStyle(el);
-  if (computedStyle !== null && computedStyle.overflowY === 'scroll') {
-    return true;
-  }
-  // In Firefox, `getComputedStyle` may return `null` if `window` is inside a
-  // non-rendered (`display:none`) iframe. In this case, fall back to requiring
-  // the developer to annotate the element with a special class.
-  // See https://bugzilla.mozilla.org/show_bug.cgi?id=548397 and
-  // https://github.com/w3c/csswg-drafts/issues/572
-  return el.classList.contains('js-scrollable');
-}
-
-/**
- * Return the closest ancestor of `el` which is scrollable.
- *
- * @param {Element} el
- */
-function closestScrollableAncestor(el) {
-  var parentEl = el;
-  while (parentEl !== document.body) {
-    if (isScrollable(parentEl)) {
-      return parentEl;
-    }
-    parentEl = parentEl.parentElement;
-  }
-  return parentEl;
-}
-
 // @ngInject
 function ThreadListController($element, $scope, VirtualThreadList) {
   // `visibleThreads` keeps track of the subset of all threads matching the
@@ -86,7 +53,12 @@ function ThreadListController($element, $scope, VirtualThreadList) {
 
   // `scrollRoot` is the `Element` to scroll when scrolling a given thread into
   // view.
-  this.scrollRoot = closestScrollableAncestor($element[0]);
+  //
+  // For now there is only one `<thread-list>` instance in the whole
+  // application so we simply require the scroll root to be annotated with a
+  // specific class. A more generic mechanism was removed due to issues in
+  // Firefox. See https://github.com/hypothesis/client/issues/341
+  this.scrollRoot = document.querySelector('.js-thread-list-scroll-root');
 
   var options = Object.assign({
     scrollRoot: this.scrollRoot,
