@@ -7,11 +7,7 @@ function ModerationBannerController(annotationUI, flash, store) {
   var self = this;
 
   this.flagCount = function () {
-    var moderation = self.annotation.moderation;
-    if (!moderation) {
-      return 0;
-    }
-    return moderation.flag_count;
+    return annotationMetadata.flagCount(self.annotation);
   };
 
   this.isHidden = function () {
