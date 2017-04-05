@@ -11,27 +11,6 @@ var isNew = annotationMetadata.isNew;
 var isReply = annotationMetadata.isReply;
 var isPageNote = annotationMetadata.isPageNote;
 
-/** Return a human-readable error message for the given server error.
- *
- * @param {object} reason The error object from the server. Should have
- * `status` and, if `status` is not `0`, `statusText` and (optionally)
- * `data.reason` properties.
- *
- * @returns {string}
- */
-function errorMessage(reason) {
-  var message;
-  if (reason.status <= 0) {
-    message = 'Service unreachable.';
-  } else {
-    message = reason.status + ' ' + reason.statusText;
-    if (reason.data && reason.data.reason) {
-      message = message + ': ' + reason.data.reason;
-    }
-  }
-  return message;
-}
-
 /**
  * Return a copy of `annotation` with changes made in the editor applied.
  */
@@ -223,9 +202,8 @@ function AnnotationController(
     * @description Flag the annotation.
     */
   vm.flag = function() {
-    var onRejected = function(reason) {
-      flash.error(
-        errorMessage(reason), 'Flagging annotation failed');
+    var onRejected = function(err) {
+      flash.error(err.message, 'Flagging annotation failed');
     };
     annotationMapper.flagAnnotation(vm.annotation).then(function(){
       analytics.track(analytics.events.ANNOTATION_FLAGGED);
@@ -242,9 +220,8 @@ function AnnotationController(
     return $timeout(function() {  // Don't use confirm inside the digest cycle.
       var msg = 'Are you sure you want to delete this annotation?';
       if ($window.confirm(msg)) {
-        var onRejected = function(reason) {
-          flash.error(
-            errorMessage(reason), 'Deleting annotation failed');
+        var onRejected = function(err) {
+          flash.error(err.message, 'Deleting annotation failed');
         };
         $scope.$apply(function() {
           annotationMapper.deleteAnnotation(vm.annotation).then(function(){
@@ -426,11 +403,10 @@ function AnnotationController(
       drafts.remove(vm.annotation);
 
       $rootScope.$broadcast(event, updatedModel);
-    }).catch(function (reason) {
+    }).catch(function (err) {
       vm.isSaving = false;
       vm.edit();
-      flash.error(
-        errorMessage(reason), 'Saving annotation failed');
+      flash.error(err.message, 'Saving annotation failed');
     });
   };
 

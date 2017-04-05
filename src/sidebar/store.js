@@ -6,6 +6,27 @@ var retryUtil = require('./retry-util');
 var urlUtil = require('./util/url-util');
 
 /**
+ * Translate the response from a failed API call into an Error-like object.
+ *
+ * The details of the response are available on the `response` property of the
+ * error.
+ */
+function translateResponseToError(response) {
+  var message;
+  if (response.status <= 0) {
+    message = 'Service unreachable.';
+  } else {
+    message = response.status + ' ' + response.statusText;
+    if (response.data && response.data.reason) {
+      message = message + ': ' + response.data.reason;
+    }
+  }
+  var err = new Error(message);
+  err.response = response;
+  return err;
+}
+
+/**
  * Return a shallow clone of `obj` with all client-only properties removed.
  * Client-only properties are marked by a '$' prefix.
  */
@@ -111,8 +132,15 @@ function createAPICall($http, $q, links, route, tokenGetter) {
         url: url.url,
       };
       return $http(req);
-    }).then(function (result) {
-      return result.data;
+    }).then(function (response) {
+      return response.data;
+    }).catch(function (response) {
+      // Translate the API result into an `Error` to follow the convention that
+      // Promises should be rejected with an Error or Error-like object.
+      //
+      // Use `$q.reject` rather than just rethrowing the Error here due to
+      // mishandling of errors thrown inside `catch` handlers in Angular < 1.6
+      return $q.reject(translateResponseToError(response));
     });
   };
 }

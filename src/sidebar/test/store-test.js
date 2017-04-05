@@ -190,4 +190,56 @@ describe('store', function () {
       });
     $httpBackend.flush();
   });
+
+  context('when an API calls fail', function () {
+    util.unroll('rejects the call with an Error', function (done, testCase) {
+      store.profile.update({}, {preferences: {}}).catch(function (err) {
+        assert(err instanceof Error);
+        assert.equal(err.message, testCase.expectedMessage);
+        done();
+      });
+      $httpBackend.expectPATCH('http://example.com/api/profile')
+      .respond(function () {
+        return [testCase.status, testCase.body, {}, testCase.statusText];
+      });
+      $httpBackend.flush();
+    }, [{
+      // Network error
+      status: -1,
+      body: null,
+      expectedMessage: 'Service unreachable.',
+    },{
+      // Request failed with an error given in the JSON body
+      status: 404,
+      statusText: 'Not found',
+      body: {
+        reason: 'Thing not found',
+      },
+      expectedMessage: '404 Not found: Thing not found',
+    },{
+      // Request failed with a non-JSON response
+      status: 500,
+      statusText: 'Server Error',
+      body: 'Internal Server Error',
+      expectedMessage: '500 Server Error',
+    }]);
+
+    it("exposes details in the Error's `response` property", function (done) {
+      store.profile.update({}, {preferences: {}}).catch(function (err) {
+        assert.match(err.response, sinon.match({
+          status: 404,
+          statusText: 'Not found',
+          data: {
+            reason: 'User not found',
+          },
+        }));
+        done();
+      });
+      $httpBackend.expectPATCH('http://example.com/api/profile')
+      .respond(function () {
+        return [404, { reason: 'User not found' }, {}, 'Not found'];
+      });
+      $httpBackend.flush();
+    });
+  });
 });

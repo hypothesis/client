@@ -650,31 +650,11 @@ describe('annotation', function() {
         }
       );
 
-      it(
-        'flashes a generic error if the server cannot be reached',
-        function(done) {
-          var controller = createDirective().controller;
-          sandbox.stub($window, 'confirm').returns(true);
-          fakeAnnotationMapper.deleteAnnotation.returns($q.reject({
-            status: 0,
-          }));
-          controller.delete().then(function() {
-            assert.calledWith(fakeFlash.error,
-              'Service unreachable.', 'Deleting annotation failed');
-            done();
-          });
-          $timeout.flush();
-        }
-      );
-
       it('flashes an error if the delete fails on the server', function(done) {
         var controller = createDirective().controller;
         sandbox.stub($window, 'confirm').returns(true);
-        fakeAnnotationMapper.deleteAnnotation.returns($q.reject({
-          status: 500,
-          statusText: 'Server Error',
-          data: {},
-        }));
+        var err = new Error('500 Server Error');
+        fakeAnnotationMapper.deleteAnnotation.returns($q.reject(err));
         controller.delete().then(function() {
           assert.calledWith(fakeFlash.error,
             '500 Server Error', 'Deleting annotation failed');
@@ -714,10 +694,8 @@ describe('annotation', function() {
 
       it('flashes an error if the flag fails', function(done) {
         var controller = createDirective().controller;
-        fakeAnnotationMapper.flagAnnotation.returns(Promise.reject({
-          status: 500,
-          statusText: 'Server error',
-        }));
+        var err = new Error('500 Server error');
+        fakeAnnotationMapper.flagAnnotation.returns(Promise.reject(err));
         controller.flag();
         setTimeout(function () {
           assert.calledWith(fakeFlash.error, '500 Server error', 'Flagging annotation failed');
@@ -811,24 +789,10 @@ describe('annotation', function() {
         });
       });
 
-      it('flashes a generic error if the server can\'t be reached', function() {
-        var controller = createController();
-        fakeStore.annotation.create = sinon.stub().returns(Promise.reject({
-          status: 0,
-        }));
-        return controller.save().then(function() {
-          assert.calledWith(fakeFlash.error,
-            'Service unreachable.', 'Saving annotation failed');
-        });
-      });
-
       it('flashes an error if saving the annotation fails on the server', function() {
         var controller = createController();
-        fakeStore.annotation.create = sinon.stub().returns(Promise.reject({
-          status: 500,
-          statusText: 'Server Error',
-          data: {},
-        }));
+        var err = new Error('500 Server Error');
+        fakeStore.annotation.create = sinon.stub().returns(Promise.reject(err));
         return controller.save().then(function() {
           assert.calledWith(fakeFlash.error,
             '500 Server Error', 'Saving annotation failed');
@@ -885,24 +849,10 @@ describe('annotation', function() {
         return createDirective(annotation).controller;
       }
 
-      it('flashes a generic error if the server cannot be reached', function () {
-        var controller = createController();
-        fakeStore.annotation.update = sinon.stub().returns(Promise.reject({
-          status: -1,
-        }));
-        return controller.save().then(function() {
-          assert.calledWith(fakeFlash.error,
-            'Service unreachable.', 'Saving annotation failed');
-        });
-      });
-
       it('flashes an error if saving the annotation fails on the server', function () {
         var controller = createController();
-        fakeStore.annotation.update = sinon.stub().returns(Promise.reject({
-          status: 500,
-          statusText: 'Server Error',
-          data: {},
-        }));
+        var err = new Error('500 Server Error');
+        fakeStore.annotation.update = sinon.stub().returns(Promise.reject(err));
         return controller.save().then(function() {
           assert.calledWith(fakeFlash.error,
             '500 Server Error', 'Saving annotation failed');
