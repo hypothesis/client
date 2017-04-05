@@ -11,7 +11,7 @@ var scopeTimeout = require('../util/scope-timeout');
 
 /**
  * Returns the height of the thread for an annotation if it exists in the view
- * or undefined otherwise.
+ * or `null` otherwise.
  */
 function getThreadHeight(id) {
   var threadElement = document.getElementById(id);
@@ -19,11 +19,16 @@ function getThreadHeight(id) {
     return null;
   }
 
+  // Note: `getComputedStyle` may return `null` in Firefox if the iframe is
+  // hidden. See https://bugzilla.mozilla.org/show_bug.cgi?id=548397
+  var style = window.getComputedStyle(threadElement);
+  if (!style) {
+    return null;
+  }
+
   // Get the height of the element inside the border-box, excluding
   // top and bottom margins.
   var elementHeight = threadElement.getBoundingClientRect().height;
-
-  var style = window.getComputedStyle(threadElement);
 
   // Get the bottom margin of the element. style.margin{Side} will return
   // values of the form 'Npx', from which we extract 'N'.
