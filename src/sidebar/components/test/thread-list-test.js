@@ -42,12 +42,13 @@ var threadFixtures = immutable({
 
 var fakeVirtualThread;
 
-function FakeVirtualThreadList($scope, $window, rootThread) {
+function FakeVirtualThreadList($scope, $window, rootThread, options) {
 
   fakeVirtualThread = this; // eslint-disable-line consistent-this
 
   var thread = rootThread;
 
+  this.options = options;
   this.setRootThread = function (_thread) {
     thread = _thread;
   };
@@ -81,6 +82,7 @@ describe('threadList', function () {
     // Create a scrollable container for the `<thread-list>` so that scrolling
     // can be tested.
     var parentEl = document.createElement('div');
+    parentEl.classList.add('js-scrollable');
     parentEl.style.overflow = 'scroll';
     parentEl.style.height = '100px';
 
@@ -209,5 +211,17 @@ describe('threadList', function () {
     util.sendEvent(annotation, 'click');
     assert.calledWithMatch(inputs.onSelect.callback,
       sinon.match(annotFixtures.annotation));
+  });
+
+  // See https://github.com/hypothesis/client/issues/341
+  it('finds correct scroll root if `window.getComputedStyle` fails', function () {
+    sinon.stub(window, 'getComputedStyle').returns(null);
+    var element = createThreadList();
+    element.scope.$digest();
+
+    var scrollRoot = fakeVirtualThread.options.scrollRoot;
+    assert.isTrue(scrollRoot.classList.contains('js-scrollable'));
+
+    window.getComputedStyle.restore();
   });
 });

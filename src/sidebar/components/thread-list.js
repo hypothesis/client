@@ -44,6 +44,23 @@ var virtualThreadOptions = {
 };
 
 /**
+ * Return true if the given element is scrollable.
+ */
+function isScrollable(el) {
+  // Check the computed style to see if this element is marked as scrollable.
+  var computedStyle = window.getComputedStyle(el);
+  if (computedStyle !== null && computedStyle.overflowY === 'scroll') {
+    return true;
+  }
+  // In Firefox, `getComputedStyle` may return `null` if `window` is inside a
+  // non-rendered (`display:none`) iframe. In this case, fall back to requiring
+  // the developer to annotate the element with a special class.
+  // See https://bugzilla.mozilla.org/show_bug.cgi?id=548397 and
+  // https://github.com/w3c/csswg-drafts/issues/572
+  return el.classList.contains('js-scrollable');
+}
+
+/**
  * Return the closest ancestor of `el` which is scrollable.
  *
  * @param {Element} el
@@ -51,8 +68,7 @@ var virtualThreadOptions = {
 function closestScrollableAncestor(el) {
   var parentEl = el;
   while (parentEl !== document.body) {
-    var computedStyle = window.getComputedStyle(parentEl);
-    if (computedStyle.overflowY === 'scroll') {
+    if (isScrollable(parentEl)) {
       return parentEl;
     }
     parentEl = parentEl.parentElement;
