@@ -11,7 +11,7 @@ var scopeTimeout = require('../util/scope-timeout');
 
 /**
  * Returns the height of the thread for an annotation if it exists in the view
- * or undefined otherwise.
+ * or `null` otherwise.
  */
 function getThreadHeight(id) {
   var threadElement = document.getElementById(id);
@@ -19,11 +19,16 @@ function getThreadHeight(id) {
     return null;
   }
 
+  // Note: `getComputedStyle` may return `null` in Firefox if the iframe is
+  // hidden. See https://bugzilla.mozilla.org/show_bug.cgi?id=548397
+  var style = window.getComputedStyle(threadElement);
+  if (!style) {
+    return null;
+  }
+
   // Get the height of the element inside the border-box, excluding
   // top and bottom margins.
   var elementHeight = threadElement.getBoundingClientRect().height;
-
-  var style = window.getComputedStyle(threadElement);
 
   // Get the bottom margin of the element. style.margin{Side} will return
   // values of the form 'Npx', from which we extract 'N'.
@@ -43,23 +48,6 @@ var virtualThreadOptions = {
   },
 };
 
-/**
- * Return the closest ancestor of `el` which is scrollable.
- *
- * @param {Element} el
- */
-function closestScrollableAncestor(el) {
-  var parentEl = el;
-  while (parentEl !== document.body) {
-    var computedStyle = window.getComputedStyle(parentEl);
-    if (computedStyle.overflowY === 'scroll') {
-      return parentEl;
-    }
-    parentEl = parentEl.parentElement;
-  }
-  return parentEl;
-}
-
 // @ngInject
 function ThreadListController($element, $scope, VirtualThreadList) {
   // `visibleThreads` keeps track of the subset of all threads matching the
@@ -70,7 +58,12 @@ function ThreadListController($element, $scope, VirtualThreadList) {
 
   // `scrollRoot` is the `Element` to scroll when scrolling a given thread into
   // view.
-  this.scrollRoot = closestScrollableAncestor($element[0]);
+  //
+  // For now there is only one `<thread-list>` instance in the whole
+  // application so we simply require the scroll root to be annotated with a
+  // specific class. A more generic mechanism was removed due to issues in
+  // Firefox. See https://github.com/hypothesis/client/issues/341
+  this.scrollRoot = document.querySelector('.js-thread-list-scroll-root');
 
   var options = Object.assign({
     scrollRoot: this.scrollRoot,
