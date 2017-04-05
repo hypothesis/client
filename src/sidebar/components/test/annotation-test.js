@@ -1,4 +1,3 @@
-/* jshint node: true */
 'use strict';
 
 var angular = require('angular');
@@ -23,7 +22,7 @@ var fakeDocumentMeta = {
 function annotationComponent() {
   var noop = function () { return ''; };
 
-  var annotation = proxyquire('../annotation', {
+  return proxyquire('../annotation', {
     angular: testUtil.noCallThru(angular),
     '../filter/persona': {
       username: noop,
@@ -34,8 +33,6 @@ function annotationComponent() {
       },
     },
   });
-
-  return annotation.component;
 }
 
 describe('annotation', function() {

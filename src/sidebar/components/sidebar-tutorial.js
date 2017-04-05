@@ -22,11 +22,8 @@ function SidebarTutorialController(session) {
  */
 // @ngInject
 module.exports = {
-  component: {
-    controller: SidebarTutorialController,
-    controllerAs: 'vm',
-    bindings: {},
-    template: require('../templates/sidebar_tutorial.html'),
-  },
-  Controller: SidebarTutorialController,
+  controller: SidebarTutorialController,
+  controllerAs: 'vm',
+  bindings: {},
+  template: require('../templates/sidebar_tutorial.html'),
 };

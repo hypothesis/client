@@ -96,16 +96,11 @@ function Controller($scope, $timeout, analytics, flash, session, formRespond, se
   });
 }
 
-var component = {
+module.exports = {
   controller: Controller,
   controllerAs: 'vm',
   bindings: {
     onClose: '&',
   },
   template: require('../templates/login_form.html'),
-};
-
-module.exports = {
-  component: component,
-  Controller: Controller,
 };
