@@ -1036,5 +1036,12 @@ describe('annotation', function() {
       flagBtn.click();
       assert.called(fakeAnnotationMapper.flagAnnotation);
     });
+
+    it('highlights the "Flag" button if the annotation is flagged', function () {
+      var ann = Object.assign(fixtures.defaultAnnotation(), { flagged: true });
+      var el = createDirective(ann).element;
+      var flaggedBtn = el[0].querySelector('button[aria-label="Annotation has been flagged"]');
+      assert.ok(flaggedBtn);
+    });
   });
 });
