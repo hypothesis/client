@@ -479,7 +479,7 @@ function AnnotationController(
   };
 
   vm.isHiddenByModerator = function () {
-    return annotationUI.isHiddenByModerator(vm.annotation.id);
+    return vm.annotation.hidden;
   };
 
   vm.isFlagged = function() {

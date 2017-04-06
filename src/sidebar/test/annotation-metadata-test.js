@@ -316,4 +316,17 @@ describe('annotation-metadata', function () {
       assert.isFalse(isWaitingToAnchor(pending));
     });
   });
+
+  describe('.flagCount', function () {
+    var flagCount = annotationMetadata.flagCount;
+
+    it('returns 0 if the user is not a moderator', function () {
+      assert.equal(flagCount(fixtures.defaultAnnotation()), 0);
+    });
+
+    it('returns the flag count if present', function () {
+      var ann = fixtures.moderatedAnnotation({ flagCount: 10});
+      assert.equal(flagCount(ann), 10);
+    });
+  });
 });

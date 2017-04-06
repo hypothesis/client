@@ -1,23 +1,31 @@
 'use strict';
 
+var annotationMetadata = require('../annotation-metadata');
+
 // @ngInject
 function ModerationBannerController(annotationUI, flash, store) {
+  var self = this;
+
   this.flagCount = function () {
-    return annotationUI.flagCount(this.annotationId);
+    return annotationMetadata.flagCount(self.annotation);
   };
 
   this.isHidden = function () {
-    return annotationUI.isHiddenByModerator(this.annotationId);
+    return self.annotation.hidden;
+  };
+
+  this.isReply = function () {
+    return annotationMetadata.isReply(self.annotation);
   };
 
   /**
    * Hide an annotation from non-moderator users.
    */
   this.hideAnnotation = function () {
-    store.annotation.hide({id: this.annotationId}).then(function () {
-      annotationUI.annotationHiddenChanged(this.annotationId, true);
-    }).catch(function (err) {
-      flash.error(err.message);
+    store.annotation.hide({id: self.annotation.id}).then(function () {
+      annotationUI.hideAnnotation(self.annotation.id);
+    }).catch(function () {
+      flash.error('Failed to hide annotation');
     });
   };
 
@@ -25,10 +33,10 @@ function ModerationBannerController(annotationUI, flash, store) {
    * Un-hide an annotation from non-moderator users.
    */
   this.unhideAnnotation = function () {
-    store.annotation.unhide({id: this.annotationId}).then(function () {
-      annotationUI.annotationHiddenChanged(this.annotationId, false);
-    }).catch(function (err) {
-      flash.error(err.message);
+    store.annotation.unhide({id: self.annotation.id}).then(function () {
+      annotationUI.unhideAnnotation(self.annotation.id);
+    }).catch(function () {
+      flash.error('Failed to unhide annotation');
     });
   };
 }
@@ -42,15 +50,7 @@ module.exports = {
   controller: ModerationBannerController,
   controllerAs: 'vm',
   bindings: {
-    /**
-     * The ID of the annotation whose moderation status the banner should
-     * reflect.
-     */
-    annotationId: '<',
-    /**
-     * `true` if this annotation is a reply.
-     */
-    isReply: '<',
+    annotation: '<',
   },
   template: require('../templates/moderation_banner.html'),
 };

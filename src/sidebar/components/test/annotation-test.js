@@ -145,7 +145,6 @@ describe('annotation', function() {
       };
 
       fakeAnnotationUI = {
-        isHiddenByModerator: sandbox.stub().returns(false),
         updateFlagStatus: sandbox.stub().returns(true),
       };
 
@@ -999,8 +998,7 @@ describe('annotation', function() {
     });
 
     it('renders hidden annotations with a custom text class', function () {
-      var ann = fixtures.defaultAnnotation();
-      fakeAnnotationUI.isHiddenByModerator.returns(true);
+      var ann = fixtures.moderatedAnnotation({ hidden: true });
       var el = createDirective(ann).element;
       assert.deepEqual(el.find('markdown').controller('markdown'), {
         customTextClass: {

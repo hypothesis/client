@@ -3,6 +3,8 @@
 var angular = require('angular');
 
 var annotationThread = require('../annotation-thread');
+var moderationBanner = require('../moderation-banner');
+var fixtures = require('../../test/annotation-fixtures');
 var util = require('../../directive/test/util');
 
 function PageObject(element) {
@@ -27,10 +29,7 @@ describe('annotationThread', function () {
     angular.module('app', [])
       .component('annotationThread', annotationThread)
       .component('moderationBanner', {
-        bindings: {
-          annotationId: '<',
-          isReply: '<',
-        },
+        bindings: moderationBanner.bindings,
       });
   });
 
@@ -184,7 +183,9 @@ describe('annotationThread', function () {
   });
 
   it('renders the moderation banner', function () {
+    var ann = fixtures.moderatedAnnotation({ flagCount: 1 });
     var thread = {
+      annotation: ann,
       id: '123',
       parent: null,
       children: [],
@@ -195,9 +196,6 @@ describe('annotationThread', function () {
     var moderationBanner = element
       .find('moderation-banner')
       .controller('moderationBanner');
-    assert.deepEqual(moderationBanner, {
-      isReply: false,
-      annotationId: '123',
-    });
+    assert.deepEqual(moderationBanner, { annotation: ann });
   });
 });

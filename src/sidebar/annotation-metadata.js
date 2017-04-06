@@ -180,9 +180,21 @@ function location(annotation) {
   return Number.POSITIVE_INFINITY;
 }
 
+/**
+ * Return the number of times the annotation has been flagged
+ * by other users. If moderation data is unavailable, returns 0.
+ */
+function flagCount(ann) {
+  if (!ann.moderation) {
+    return 0;
+  }
+  return ann.moderation.flag_count;
+}
+
 module.exports = {
   documentMetadata: documentMetadata,
   domainAndTitle: domainAndTitle,
+  flagCount: flagCount,
   isAnnotation: isAnnotation,
   isNew: isNew,
   isOrphan: isOrphan,

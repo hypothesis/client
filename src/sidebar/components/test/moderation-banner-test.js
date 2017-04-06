@@ -3,6 +3,9 @@
 var angular = require('angular');
 
 var util = require('../../directive/test/util');
+var fixtures = require('../../test/annotation-fixtures');
+
+var moderatedAnnotation = fixtures.moderatedAnnotation;
 
 describe('moderationBanner', function () {
   var bannerEl;
@@ -17,10 +20,8 @@ describe('moderationBanner', function () {
 
   beforeEach(function () {
     fakeAnnotationUI = {
-      flagCount: sinon.stub().returns(0),
-      isHiddenByModerator: sinon.stub().returns(false),
-
-      annotationHiddenChanged: sinon.stub(),
+      hideAnnotation: sinon.stub(),
+      unhideAnnotation: sinon.stub(),
     };
 
     fakeFlash = {
@@ -46,75 +47,76 @@ describe('moderationBanner', function () {
   });
 
   function createBanner(inputs) {
-    inputs.isReply = inputs.isReply || false;
     var el = util.createDirective(document, 'moderationBanner', inputs);
     bannerEl = el[0];
     return bannerEl;
   }
 
   it('does not display if annotation is not flagged or hidden', function () {
-    fakeAnnotationUI.flagCount.returns(0);
-    fakeAnnotationUI.isHiddenByModerator.returns(false);
-    var banner = createBanner({ annotationId: 'not-flagged-or-hidden-id' });
+    var banner = createBanner({ annotation: fixtures.defaultAnnotation() });
     assert.equal(banner.textContent.trim(), '');
   });
 
   it('displays the number of flags the annotation has received', function () {
-    fakeAnnotationUI.flagCount.returns(10);
-    var banner = createBanner({ annotationId: 'flagged-id' });
+    var ann = fixtures.moderatedAnnotation({ flagCount: 10 });
+    var banner = createBanner({ annotation: ann });
     assert.include(banner.textContent, 'Flagged for review x10');
   });
 
   it('displays in a more compact form if the annotation is a reply', function () {
-    fakeAnnotationUI.flagCount.returns(1);
-    var banner = createBanner({ annotationId: 'reply-id', isReply: true });
+    var ann = Object.assign(fixtures.oldReply(), {
+      moderation: {
+        flag_count: 10,
+      },
+    });
+    var banner = createBanner({ annotation: ann });
     assert.ok(banner.querySelector('.is-reply'));
   });
 
   it('reports if the annotation was hidden', function () {
-    fakeAnnotationUI.isHiddenByModerator.returns(true);
-    var banner = createBanner({ annotationId: 'hidden-id' });
+    var ann = moderatedAnnotation({ hidden: true });
+    var banner = createBanner({ annotation: ann });
     assert.include(banner.textContent, 'Hidden from users');
   });
 
   it('hides the annotation if "Hide" is clicked', function () {
-    fakeAnnotationUI.flagCount.returns(10);
-    var banner = createBanner({ annotationId: 'flagged-id'} );
+    var ann = moderatedAnnotation({ flagCount: 10 });
+    var banner = createBanner({ annotation: ann });
     banner.querySelector('button').click();
-    assert.calledWith(fakeStore.annotation.hide, {id: 'flagged-id'});
+    assert.calledWith(fakeStore.annotation.hide, {id: 'ann-id'});
   });
 
   it('reports an error if hiding the annotation fails', function (done) {
-    fakeAnnotationUI.flagCount.returns(10);
-    var banner = createBanner({ annotationId: 'flagged-id'} );
+    var ann = moderatedAnnotation({ flagCount: 10 });
+    var banner = createBanner({ annotation: ann });
     fakeStore.annotation.hide.returns(Promise.reject(new Error('Network Error')));
 
     banner.querySelector('button').click();
 
     setTimeout(function () {
-      assert.calledWith(fakeFlash.error, 'Network Error');
+      assert.calledWith(fakeFlash.error, 'Failed to hide annotation');
       done();
     }, 0);
   });
 
   it('unhides the annotation if "Unhide" is clicked', function () {
-    fakeAnnotationUI.isHiddenByModerator.returns(true);
-    var banner = createBanner({ annotationId: 'hidden-id'} );
+    var ann = moderatedAnnotation({ hidden: true });
+    var banner = createBanner({ annotation: ann });
 
     banner.querySelector('button').click();
 
-    assert.calledWith(fakeStore.annotation.unhide, {id: 'hidden-id'});
+    assert.calledWith(fakeStore.annotation.unhide, {id: 'ann-id'});
   });
 
   it('reports an error if unhiding the annotation fails', function (done) {
-    fakeAnnotationUI.isHiddenByModerator.returns(true);
-    var banner = createBanner({ annotationId: 'hidden-id'} );
+    var ann = moderatedAnnotation({ hidden: true });
+    var banner = createBanner({ annotation: ann });
     fakeStore.annotation.unhide.returns(Promise.reject(new Error('Network Error')));
 
     banner.querySelector('button').click();
 
     setTimeout(function () {
-      assert.calledWith(fakeFlash.error, 'Network Error');
+      assert.calledWith(fakeFlash.error, 'Failed to unhide annotation');
       done();
     }, 0);
   });
