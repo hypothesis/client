@@ -99,7 +99,7 @@ module.exports = class Guest extends Annotator
         @publish(event, args)
 
     if (crossframe)
-      @crossframe = @options.crossframe
+      @crossframe = crossframe
       @crossframe.reloadAnnotations()
       @crossframe.registerMethods(cfOptions, this.guestId)
     else

@@ -70,6 +70,7 @@ module.exports = class Host extends Annotator
     if @crossframe then options.crossframe = @crossframe
     if @adderCtrl then options.adderCtrl = @adderCtrl
     guest = new Guest(guestElement, options)
+    guest.setPlugins( @plugins )
 
     @guests[guestId] = guest
     return guest
