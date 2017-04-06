@@ -4,6 +4,24 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+### Changed
+
+- Add developer docs explaining how to test the client on a real mobile device
+  ([#330](https://github.com/hypothesis/client/pull/330)).
+
+- Add Slack link to README
+  ([#334](https://github.com/hypothesis/client/pull/334)).
+
+- Add cross references in developer documentation
+  ([#335](https://github.com/hypothesis/client/pull/335)).
+
+### Fixed
+
+- Fix regression where annotations sometimes failed to appear in Firefox
+  ([#342](https://github.com/hypothesis/client/pull/342)).
+
 ## [1.9.0] - 2017-04-03
 
 ### Changed
