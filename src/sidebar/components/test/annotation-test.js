@@ -83,6 +83,7 @@ describe('annotation', function() {
     var fakeAnnotationMapper;
     var fakeAnnotationUI;
     var fakeDrafts;
+    var fakeFeatures;
     var fakeFlash;
     var fakeGroups;
     var fakePermissions;
@@ -155,7 +156,7 @@ describe('annotation', function() {
         get: sandbox.stub(),
       };
 
-      var fakeFeatures = {
+      fakeFeatures = {
         flagEnabled: sandbox.stub().returns(true),
       };
 
@@ -195,7 +196,8 @@ describe('annotation', function() {
       };
 
       fakeSettings = {
-        authDomain: 'example.com',
+        // "localhost" is the host used by 'first party' annotation fixtures
+        authDomain: 'localhost',
       };
 
       fakeStore = {
@@ -764,6 +766,24 @@ describe('annotation', function() {
       });
     });
 
+    describe('#canFlag', function () {
+      it('returns true if the user is a third-party user', function () {
+        var ann = fixtures.thirdPartyAnnotation();
+        var controller = createDirective(ann).controller;
+        assert.isTrue(controller.canFlag());
+      });
+
+      it('returns the value of the `flag_action` feature flag', function () {
+        var controller = createDirective().controller;
+
+        fakeFeatures.flagEnabled.returns(false);
+        assert.equal(controller.canFlag(), false);
+
+        fakeFeatures.flagEnabled.returns(true);
+        assert.equal(controller.canFlag(), true);
+      });
+    });
+
     describe('saving a new annotation', function() {
       var annotation;
 
@@ -1007,6 +1027,14 @@ describe('annotation', function() {
           'annotation-body is-hidden': true,
         },
       });
+    });
+
+    it('flags the annotation when the user clicks the "Flag" button', function () {
+      fakeAnnotationMapper.flagAnnotation.returns(Promise.resolve());
+      var el = createDirective().element;
+      var flagBtn = el[0].querySelector('button[aria-label="Flag"]');
+      flagBtn.click();
+      assert.called(fakeAnnotationMapper.flagAnnotation);
     });
   });
 });

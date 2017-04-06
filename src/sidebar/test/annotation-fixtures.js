@@ -17,6 +17,15 @@ function defaultAnnotation() {
 }
 
 /**
+ * Return a fake annotation created by a third-party user.
+ */
+function thirdPartyAnnotation() {
+  return Object.assign(defaultAnnotation(), {
+    user: 'acct:ben@publisher.org',
+  });
+}
+
+/**
  * Return a fake public annotation with the basic properties filled in.
  */
 function publicAnnotation() {
@@ -148,4 +157,5 @@ module.exports = {
   oldHighlight: oldHighlight,
   oldPageNote: oldPageNote,
   oldReply: oldReply,
+  thirdPartyAnnotation: thirdPartyAnnotation,
 };
