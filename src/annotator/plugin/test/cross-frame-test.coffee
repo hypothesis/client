@@ -22,11 +22,14 @@ describe 'Annotator.Plugin.CrossFrame', ->
       destroy: sandbox.stub()
       createChannel: sandbox.stub()
       onConnect: sandbox.stub()
+      removeGuestListener: sandbox.stub()
       call: sandbox.stub()
       on: sandbox.stub()
 
     fakeAnnotationSync =
       sync: sandbox.stub()
+      registerMethods: sandbox.stub()
+      removeMethods: sandbox.stub()
 
     CrossFrame.AnnotationSync = sandbox.stub().returns(fakeAnnotationSync)
     CrossFrame.Discovery = sandbox.stub().returns(fakeDiscovery)
@@ -82,6 +85,25 @@ describe 'Annotator.Plugin.CrossFrame', ->
       cf = createCrossFrame()
       cf.destroy()
       assert.called(fakeBridge.destroy)
+
+  describe '.removeGuestListener', ->
+    it 'calls removeGuestListener in Bridge', ->
+      cf = createCrossFrame()
+      cf.removeGuestListener()
+      assert.called fakeBridge.removeGuestListener
+
+  describe '.registerMethods', ->
+    it 'calls registerMethods in AnnotationSync', ->
+      cf = createCrossFrame()
+      options = {}
+      cf.registerMethods(options, "guestId")
+      assert.called fakeAnnotationSync.registerMethods
+
+  describe '.removeMethods', ->
+    it 'calls removeMethods in AnnotationSync', ->
+      cf = createCrossFrame()
+      cf.removeMethods()
+      assert.called fakeAnnotationSync.removeMethods
 
   describe '.sync', ->
     it 'syncs the annotations with the other frame', ->

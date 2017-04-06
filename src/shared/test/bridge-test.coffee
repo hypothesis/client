@@ -139,12 +139,35 @@ describe 'Bridge', ->
       assert.throws ->
         bridge.on('message1', sandbox.spy())
 
+    it 'adds a guest method to the guest method registry', ->
+      channel = createChannel()
+      bridge.on('message1', sandbox.spy(), "guestId")
+      assert.isFunction(bridge.guestListeners["guestId"]['message1'])
+
+    it 'Only allows registering the same method once per guest', ->
+      bridge.on('message1', sandbox.spy(), "guestId")
+      assert.throws ->
+        bridge.on('message1', sandbox.spy(), "guestId")
+
   describe '.off', ->
     it 'removes the method from the method registry', ->
       channel = createChannel()
       bridge.on('message1', sandbox.spy())
       bridge.off('message1')
       assert.isUndefined(bridge.channelListeners['message1'])
+
+    it 'removed a guest method from the guest method registry', ->
+      channel = createChannel()
+      bridge.on('message1', sandbox.spy(), 'guestId')
+      bridge.off('message1', "guestId")
+      assert.isUndefined(bridge.guestListeners["guestId"]["message1"])
+
+  describe '.removeGuestListener', ->
+    it 'deletes an entry within guestListeners', ->
+      channel = createChannel()
+      bridge.on('message1', sandbox.spy(), 'guestId')
+      bridge.removeGuestListener('guestId')
+      assert.isUndefined(bridge.guestListeners["guestId"])
 
   describe '.onConnect', ->
     it 'adds a callback that is called when a channel is connected', (done) ->

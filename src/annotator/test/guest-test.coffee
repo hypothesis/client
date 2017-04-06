@@ -68,8 +68,11 @@ describe 'Guest', ->
     })
 
     fakeCrossFrame = {
+      call: sinon.stub()
       onConnect: sinon.stub()
       on: sinon.stub()
+      registerMethods: sinon.stub()
+      reloadAnnotations: sinon.stub()
       sync: sinon.stub()
     }
 
@@ -260,6 +263,36 @@ describe 'Guest', ->
       guest = createGuest()
       selections.next(null)
       assert.called FakeAdder::instance.hide
+
+  describe 'when a second guest is created', ->
+    guestOne = null
+    guestTwo = null
+
+    beforeEach ->
+      guestOne = createGuest()
+
+      options = {
+        adderCtrl: guestOne.adderCtrl,
+        crossframe: guestOne.crossframe,
+        guestId: "guestTwo.html"
+      }
+      guestTwo = createGuest(options)
+      guestTwo.setPlugins(guestOne.plugins)
+
+    it 'shares the same crossframe with the first guest', ->
+      assert.strictEqual guestOne.crossframe, guestTwo.crossframe
+
+    it 'shares the same adderCtrl with the first guest', ->
+      assert.strictEqual guestOne.adderCtrl, guestTwo.adderCtrl
+
+    it 'shares the same plugins with the first guest', ->
+      assert.strictEqual guestOne.plugins, guestTwo.plugins
+
+    it 'calls crossframe\'s registerMethods', ->
+      assert.called guestTwo.crossframe.registerMethods
+
+    it 'has a different guestId', ->
+      assert.notEqual guestTwo.guestId, guestOne.guestId
 
   describe '#getDocumentInfo()', ->
     guest = null

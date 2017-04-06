@@ -124,3 +124,27 @@ describe 'AnnotationSync', ->
         options.emit('beforeAnnotationCreated', ann)
 
         assert.notCalled(fakeBridge.call)
+
+  describe 'registerMethods', ->
+    it 'adds an _emit method for a given guest', ->
+      annSync = createAnnotationSync()
+      annSync.registerMethods(options, "guestId")
+      assert.isFunction(annSync._emit["guestId"])
+
+    it 'adds an _on method for a given guest', ->
+      annSync = createAnnotationSync()
+      annSync.registerMethods(options, "guestId")
+      assert.isFunction(annSync._on["guestId"])
+
+  describe 'removeMethods', ->
+    it 'removes _emit from the guest its associated with', ->
+      annSync = createAnnotationSync()
+      annSync.registerMethods(options, "guestId")
+      annSync.removeMethods("guestId")
+      assert.isUndefined(annSync._emit["guestId"])
+
+    it 'removes _on from the guest its associated with', ->
+      annSync = createAnnotationSync()
+      annSync.registerMethods(options, "guestId")
+      annSync.removeMethods("guestId")
+      assert.isUndefined(annSync._on["guestId"])
