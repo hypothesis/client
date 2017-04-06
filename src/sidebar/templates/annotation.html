@@ -3,55 +3,15 @@
 </header>
 
 <div ng-keydown="vm.onKeydown($event)" ng-if="vm.user()">
-  <header class="annotation-header">
-    <!-- User -->
-    <span ng-if="vm.user()">
-      <a class="annotation-header__user"
-        target="_blank"
-        ng-if="!vm.isThirdPartyUser()"
-        ng-href="{{vm.serviceUrl('user',{user:vm.user()})}}"
-        >{{vm.username()}}</a>
-      <span class="annotation-header__user"
-        ng-if="vm.isThirdPartyUser()"
-        >{{vm.username()}}</span>
-      <span class="annotation-collapsed-replies">
-        <a class="annotation-link" href=""
-          ng-click="vm.onReplyCountClick()"
-          ng-pluralize count="vm.replyCount"
-          when="{'0': '', 'one': '1 reply', 'other': '{} replies'}"></a>
-      </span>
-      <br>
-      <span class="annotation-header__share-info">
-        <a class="annotation-header__group"
-          target="_blank" ng-if="vm.group() && vm.group().url" href="{{vm.group().url}}">
-          <i class="h-icon-group"></i><span class="annotation-header__group-name">{{vm.group().name}}</span>
-        </a>
-        <span ng-show="vm.state().isPrivate"
-          title="This annotation is visible only to you.">
-          <i class="h-icon-lock"></i><span class="annotation-header__group-name" ng-show="!vm.group().url">Only me</span>
-        </span>
-        <i class="h-icon-border-color" ng-show="vm.isHighlight() && !vm.editing()" title="This is a highlight. Click 'edit' to add a note or tag."></i>
-        <span ng-if="::vm.showDocumentInfo">
-          <span class="annotation-citation" ng-if="vm.documentMeta().titleLink">
-            on "<a ng-href="{{vm.documentMeta().titleLink}}">{{vm.documentMeta().titleText}}</a>"
-          </span>
-          <span class="annotation-citation" ng-if="!vm.documentMeta().titleLink">
-            on "{{vm.documentMeta().titleText}}"
-          </span>
-          <span class="annotation-citation-domain"
-                ng-if="vm.documentMeta().domain">({{vm.documentMeta().domain}})</span>
-        </span>
-      </span>
-    </span>
 
-    <span class="u-flex-spacer"></span>
-
-    <timestamp
-      class-name="'annotation-header__timestamp'"
-      timestamp="vm.updated()"
-      href="vm.links().html"
-      ng-if="!vm.editing() && vm.updated()"></timestamp>
-  </header>
+  <annotation-header annotation="vm.annotation"
+                     is-editing="vm.editing()"
+                     is-highlight="vm.isHighlight()"
+                     is-private="vm.state().isPrivate"
+                     on-reply-count-click="vm.onReplyCountClick()"
+                     reply-count="vm.replyCount"
+                     show-document-info="vm.showDocumentInfo">
+  </annotation-header>
 
   <!-- Excerpts -->
   <section class="annotation-quote-list"
@@ -182,7 +142,7 @@
         </button>
         <annotation-share-dialog
           group="vm.group()"
-          uri="vm.links().incontext"
+          uri="vm.incontextLink()"
           is-private="vm.state().isPrivate"
           is-open="vm.showShareDialog"
           on-close="vm.showShareDialog = false">

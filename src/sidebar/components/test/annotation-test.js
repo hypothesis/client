@@ -10,12 +10,6 @@ var util = require('../../directive/test/util');
 
 var inject = angular.mock.inject;
 
-var fakeDocumentMeta = {
-  domain: 'docs.io',
-  titleLink: 'http://docs.io/doc.html',
-  titleText: 'Dummy title',
-};
-
 /**
  * Returns the annotation directive with helpers stubbed out.
  */
@@ -26,11 +20,6 @@ function annotationComponent() {
     angular: testUtil.noCallThru(angular),
     '../filter/persona': {
       username: noop,
-    },
-    '../annotation-metadata': {
-      domainAndTitle: function (annot) { // eslint-disable-line no-unused-vars
-        return fakeDocumentMeta;
-      },
     },
   });
 }
@@ -716,14 +705,6 @@ describe('annotation', function() {
       });
     });
 
-    describe('#documentMeta()', function () {
-      it('returns the domain, title link and text for the annotation', function () {
-        var annot = fixtures.defaultAnnotation();
-        var controller = createDirective(annot).controller;
-        assert.deepEqual(controller.documentMeta(), fakeDocumentMeta);
-      });
-    });
-
     describe('#isDeleted', function () {
       it('returns true if the annotation has been marked as deleted', function () {
         var controller = createDirective().controller;
@@ -965,12 +946,11 @@ describe('annotation', function() {
       it('uses the in-context links when available', function () {
         var annotation = Object.assign({}, fixtures.defaultAnnotation(), {
           links: {
-            html: 'https://test.hypothes.is/a/deadbeef',
             incontext: 'https://hpt.is/deadbeef',
           },
         });
         var controller = createDirective(annotation).controller;
-        assert.equal(controller.links().incontext, annotation.links.incontext);
+        assert.equal(controller.incontextLink(), annotation.links.incontext);
       });
 
       it('falls back to the HTML link when in-context links are missing', function () {
@@ -980,30 +960,13 @@ describe('annotation', function() {
           },
         });
         var controller = createDirective(annotation).controller;
-        assert.equal(controller.links().html, annotation.links.html);
-      });
-
-      it('uses the HTML link when available', function () {
-        var annotation = Object.assign({}, fixtures.defaultAnnotation(), {
-          links: {
-            html: 'https://test.hypothes.is/a/deadbeef',
-            incontext: 'https://hpt.is/deadbeef',
-          },
-        });
-        var controller = createDirective(annotation).controller;
-        assert.equal(controller.links().html, annotation.links.html);
+        assert.equal(controller.incontextLink(), annotation.links.html);
       });
 
       it('in-context link is blank when unknown', function () {
         var annotation = fixtures.defaultAnnotation();
         var controller = createDirective(annotation).controller;
-        assert.equal(controller.links().incontext, '');
-      });
-
-      it('HTML is blank when unknown', function () {
-        var annotation = fixtures.defaultAnnotation();
-        var controller = createDirective(annotation).controller;
-        assert.equal(controller.links().html, '');
+        assert.equal(controller.incontextLink(), '');
       });
     });
 
