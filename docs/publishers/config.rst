@@ -221,10 +221,10 @@ loads.
 
   .. option:: annotationFontFamily
 
-    ``Font Family``. The annotation text is the actual annotation value that the user
-    writes about the page or selection. This value will set the font-family of that
-    text when it is save as well as the font-family of the editor as the annotation
-    is being written.
+    ``Font Family``. The annotation text is the actual annotation value that the
+    user writes about the page or selection. This value will set the font-family
+    of that text when it is being viewed as well as the font-family of the
+    editor as the annotation is being written.
 
 
 
