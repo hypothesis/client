@@ -188,7 +188,7 @@
           on-close="vm.showShareDialog = false">
         </annotation-share-dialog>
       </span>
-      <span ng-if="vm.isThirdPartyUser()">
+      <span ng-if="vm.canFlag()">
         <button class="btn btn-clean annotation-action-btn"
           ng-if="!vm.isFlagged()"
           ng-click="vm.flag()"

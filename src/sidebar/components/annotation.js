@@ -482,6 +482,13 @@ function AnnotationController(
     return vm.annotation.hidden;
   };
 
+  vm.canFlag = function () {
+    if (persona.isThirdPartyUser(vm.annotation.user, settings.authDomain)) {
+      return true;
+    }
+    return features.flagEnabled('flag_action');
+  };
+
   vm.isFlagged = function() {
     return vm.annotation.flagged;
   };
