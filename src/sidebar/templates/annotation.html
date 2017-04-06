@@ -190,7 +190,7 @@
       </span>
       <span ng-if="vm.isThirdPartyUser()">
         <button class="btn btn-clean annotation-action-btn"
-          ng-if="!vm.isFlagged"
+          ng-if="!vm.isFlagged()"
           ng-click="vm.flag()"
           ng-disabled="vm.isDeleted()"
           aria-label="Flag"
@@ -198,7 +198,7 @@
           <i class="h-icon-annotation-flag btn-icon"></i>
         </button>
         <button class="btn btn-clean annotation-action-btn"
-          ng-if="vm.isFlagged"
+          ng-if="vm.isFlagged()"
           ng-disabled="vm.isDeleted()"
           aria-label="Annotation has been flagged"
           h-tooltip>

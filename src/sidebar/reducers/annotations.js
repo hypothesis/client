@@ -146,6 +146,20 @@ var update = {
     return {annotations: []};
   },
 
+  UPDATE_FLAG_STATUS: function (state, action) {
+    var annotations = state.annotations.map(function (annot) {
+      var match = (annot.id && annot.id === action.id);
+      if (match) {
+        return Object.assign({}, annot, {
+          flagged: action.isFlagged,
+        });
+      } else {
+        return annot;
+      }
+    });
+    return {annotations: annotations};
+  },
+
   UPDATE_ANCHOR_STATUS: function (state, action) {
     var annotations = state.annotations.map(function (annot) {
       var match = (annot.id && annot.id === action.id) ||
@@ -165,6 +179,22 @@ var update = {
 };
 
 var actions = util.actionTypes(update);
+
+/**
+ * Updating the flagged status of an annotation.
+ *
+ * @param {string} id - Annotation ID
+ * @param {boolean} isFlagged - The flagged status of the annotation. True if
+ *        the user has flagged the annotation.
+ *
+ */
+function updateFlagStatus(id, isFlagged) {
+  return {
+    type: actions.UPDATE_FLAG_STATUS,
+    id: id,
+    isFlagged: isFlagged,
+  };
+}
 
 /** Add annotations to the currently displayed set. */
 function addAnnotations(annotations, now) {
@@ -297,6 +327,7 @@ module.exports = {
     clearAnnotations: clearAnnotations,
     removeAnnotations: removeAnnotations,
     updateAnchorStatus: updateAnchorStatus,
+    updateFlagStatus: updateFlagStatus,
   },
 
   // Selectors

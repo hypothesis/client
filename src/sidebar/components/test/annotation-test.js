@@ -146,6 +146,7 @@ describe('annotation', function() {
 
       fakeAnnotationUI = {
         isHiddenByModerator: sandbox.stub().returns(false),
+        updateFlagStatus: sandbox.stub().returns(true),
       };
 
       fakeDrafts = {
