@@ -188,7 +188,7 @@ function flagCount(ann) {
   if (!ann.moderation) {
     return 0;
   }
-  return ann.moderation.flag_count;
+  return ann.moderation.flagCount;
 }
 
 module.exports = {

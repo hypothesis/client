@@ -66,7 +66,7 @@ describe('moderationBanner', function () {
   it('displays in a more compact form if the annotation is a reply', function () {
     var ann = Object.assign(fixtures.oldReply(), {
       moderation: {
-        flag_count: 10,
+        flagCount: 10,
       },
     });
     var banner = createBanner({ annotation: ann });

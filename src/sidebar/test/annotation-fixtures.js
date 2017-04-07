@@ -162,7 +162,7 @@ function moderatedAnnotation(modInfo) {
     id: 'ann-id',
     hidden: !!modInfo.hidden,
     moderation: {
-      flag_count: modInfo.flagCount || 0,
+      flagCount: modInfo.flagCount || 0,
     },
   });
 }
