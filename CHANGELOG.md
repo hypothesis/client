@@ -4,6 +4,23 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+### Changed
+
+- Show the flagged status for annotations that user has flagged.
+  ([#340](https://github.com/hypothesis/client/pull/340)).
+
+- Add branding config docs
+  ([#322](https://github.com/hypothesis/client/pull/322)).
+
+- Update client to use newest moderation APIs
+  ([#336](https://github.com/hypothesis/client/pull/336)).
+
+- Enable first-party users to flag annotations if `flag_action`
+  feature flag is enabled
+  ([#343](https://github.com/hypothesis/client/pull/343)).
+
 ## [1.10.0] - 2017-04-06
 
 ### Changed
