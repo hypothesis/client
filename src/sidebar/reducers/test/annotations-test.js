@@ -86,35 +86,51 @@ describe('annotations reducer', function () {
     unroll('updates the flagged status of an annotation', function (testCase) {
       var store = createStore();
       var ann = fixtures.defaultAnnotation();
-      ann.flagged = !testCase.flagged;
+      ann.flagged = testCase.wasFlagged;
+      ann.moderation = testCase.oldModeration;
 
       store.dispatch(actions.addAnnotations([ann]));
-      store.dispatch(actions.updateFlagStatus(ann.id, testCase.flagged));
+      store.dispatch(actions.updateFlagStatus(ann.id, testCase.nowFlagged));
 
       var storeAnn = annotations.findAnnotationByID(store.getState(), ann.id);
-      assert.equal(storeAnn.flagged, testCase.flagged);
-    }, [{ flagged: true}, { flagged: false }]);
-
-    it('does not add moderation info if not present', function () {
-      var store = createStore();
-      var ann = fixtures.defaultAnnotation();
-
-      store.dispatch(actions.addAnnotations([ann]));
-      store.dispatch(actions.updateFlagStatus(ann.id, true));
-
-      var storeAnn = annotations.findAnnotationByID(store.getState(), ann.id);
-      assert.notOk(storeAnn.moderation);
-    });
-
-    it('increments the flag count if moderation info is present', function () {
-      var store = createStore();
-      var ann = fixtures.moderatedAnnotation({ flagCount: 0 });
-
-      store.dispatch(actions.addAnnotations([ann]));
-      store.dispatch(actions.updateFlagStatus(ann.id, true));
-
-      var storeAnn = annotations.findAnnotationByID(store.getState(), ann.id);
-      assert.equal(storeAnn.moderation.flagCount, 1);
-    });
+      assert.equal(storeAnn.flagged, testCase.nowFlagged);
+      assert.deepEqual(storeAnn.moderation, testCase.newModeration);
+    }, [{
+      // Non-moderator flags annotation
+      wasFlagged: false,
+      nowFlagged: true,
+      oldModeration: undefined,
+      newModeration: undefined,
+    }, {
+      // Non-moderator un-flags annotation
+      wasFlagged: true,
+      nowFlagged: false,
+      oldModeration: undefined,
+      newModeration: undefined,
+    },{
+      // Moderator un-flags an already unflagged annotation
+      wasFlagged: false,
+      nowFlagged: false,
+      oldModeration: { flagCount: 1 },
+      newModeration: { flagCount: 1 },
+    },{
+      // Moderator flags an already flagged annotation
+      wasFlagged: true,
+      nowFlagged: true,
+      oldModeration: { flagCount: 1 },
+      newModeration: { flagCount: 1 },
+    },{
+      // Moderator flags annotation
+      wasFlagged: false,
+      nowFlagged: true,
+      oldModeration: { flagCount: 0 },
+      newModeration: { flagCount: 1 },
+    },{
+      // Moderator un-flags annotation
+      wasFlagged: true,
+      nowFlagged: false,
+      oldModeration: { flagCount: 1 },
+      newModeration: { flagCount: 0 },
+    }]);
   });
 });
