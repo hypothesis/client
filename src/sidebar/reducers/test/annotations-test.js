@@ -60,8 +60,10 @@ describe('annotations reducer', function () {
     it('sets the `hidden` state to `true`', function () {
       var store = createStore();
       var ann = fixtures.moderatedAnnotation({ hidden: false });
+
       store.dispatch(actions.addAnnotations([ann]));
       store.dispatch(actions.hideAnnotation(ann.id));
+
       var storeAnn = annotations.findAnnotationByID(store.getState(), ann.id);
       assert.equal(storeAnn.hidden, true);
     });
@@ -71,8 +73,10 @@ describe('annotations reducer', function () {
     it('sets the `hidden` state to `false`', function () {
       var store = createStore();
       var ann = fixtures.moderatedAnnotation({ hidden: true });
+
       store.dispatch(actions.addAnnotations([ann]));
       store.dispatch(actions.unhideAnnotation(ann.id));
+
       var storeAnn = annotations.findAnnotationByID(store.getState(), ann.id);
       assert.equal(storeAnn.hidden, false);
     });
@@ -90,5 +94,27 @@ describe('annotations reducer', function () {
       var storeAnn = annotations.findAnnotationByID(store.getState(), ann.id);
       assert.equal(storeAnn.flagged, testCase.flagged);
     }, [{ flagged: true}, { flagged: false }]);
+
+    it('does not add moderation info if not present', function () {
+      var store = createStore();
+      var ann = fixtures.defaultAnnotation();
+
+      store.dispatch(actions.addAnnotations([ann]));
+      store.dispatch(actions.updateFlagStatus(ann.id, true));
+
+      var storeAnn = annotations.findAnnotationByID(store.getState(), ann.id);
+      assert.notOk(storeAnn.moderation);
+    });
+
+    it('increments the flag count if moderation info is present', function () {
+      var store = createStore();
+      var ann = fixtures.moderatedAnnotation({ flagCount: 0 });
+
+      store.dispatch(actions.addAnnotations([ann]));
+      store.dispatch(actions.updateFlagStatus(ann.id, true));
+
+      var storeAnn = annotations.findAnnotationByID(store.getState(), ann.id);
+      assert.equal(storeAnn.moderation.flagCount, 1);
+    });
   });
 });
