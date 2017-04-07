@@ -507,15 +507,6 @@ describe('annotationUI', function () {
     });
   });
 
-  describe('#updateFlagStatus', function () {
-    it('updates the flaged status of an annotation', function () {
-      var annot = defaultAnnotation();
-      annotationUI.addAnnotations([annot]);
-      annotationUI.updateFlagStatus(annot.id, true);
-      assert.equal(annotationUI.getState().annotations[0].flagged, true);
-    });
-  });
-
   describe('selector functions', function () {
     // The individual state management modules in reducers/*.js define various
     // 'selector' functions for extracting data from the app state. These are

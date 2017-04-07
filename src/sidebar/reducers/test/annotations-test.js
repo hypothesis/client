@@ -7,6 +7,7 @@ var thunk = require('redux-thunk').default;
 var annotations = require('../annotations');
 var fixtures = require('../../test/annotation-fixtures');
 var util = require('../util');
+var unroll = require('../../../shared/test/util').unroll;
 
 var actions = annotations.actions;
 
@@ -75,5 +76,19 @@ describe('annotations reducer', function () {
       var storeAnn = annotations.findAnnotationByID(store.getState(), ann.id);
       assert.equal(storeAnn.hidden, false);
     });
+  });
+
+  describe('#updateFlagStatus', function () {
+    unroll('updates the flagged status of an annotation', function (testCase) {
+      var store = createStore();
+      var ann = fixtures.defaultAnnotation();
+      ann.flagged = !testCase.flagged;
+
+      store.dispatch(actions.addAnnotations([ann]));
+      store.dispatch(actions.updateFlagStatus(ann.id, testCase.flagged));
+
+      var storeAnn = annotations.findAnnotationByID(store.getState(), ann.id);
+      assert.equal(storeAnn.flagged, testCase.flagged);
+    }, [{ flagged: true}, { flagged: false }]);
   });
 });
