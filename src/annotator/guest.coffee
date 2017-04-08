@@ -382,6 +382,9 @@ module.exports = class Guest extends Annotator
 
     annotation
 
+  hasSelection: ->
+    return if @selectedRanges then @selectedRanges[0] != undefined else false
+
   showAnnotations: (annotations) ->
     tags = (a.$tag for a in annotations)
     @crossframe?.call('showAnnotations', tags)

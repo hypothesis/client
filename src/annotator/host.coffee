@@ -75,6 +75,19 @@ module.exports = class Host extends Annotator
     @guests[guestId] = guest
     return guest
 
+  createAnnotation: ->
+    foundSelected = false
+    # Iterate through the guests, and check if any of them have a selection
+    # If so, then create an annotation with said guest
+    for guestId, guest of @guests
+      if guest.hasSelection()
+        guest.createAnnotation()
+        foundSelected = true
+        return
+
+    # If none of the guests have a selection, then we want to make a page note
+    if !foundSelected then @guests["default"].createAnnotation()
+
   destroy: ->
     @frame.remove()
     @destroyAllGuests()
@@ -86,3 +99,9 @@ module.exports = class Host extends Annotator
   destroyGuest: (guestId) ->
     @guests[guestId].destroy()
     delete @guests[guestId]
+
+  setVisibleHighlights: (state) ->
+    @visibleHighlights = state
+
+    for guestId, guest of @guests
+      guest.setVisibleHighlights(state)
