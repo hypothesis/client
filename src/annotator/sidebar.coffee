@@ -41,6 +41,9 @@ module.exports = class Sidebar extends Host
 
     this._setupSidebarEvents()
 
+    if options.shiftNativeElements
+      @_shiftNativeElements()
+
   _setupDocumentEvents: ->
     sidebarTrigger(document.body, @show.bind(this))
 
@@ -83,6 +86,22 @@ module.exports = class Sidebar extends Host
 
     # Return this for chaining
     this
+
+  # THESIS TODO: This modifies the styling of the BucketBar, which isn't ideal.
+  #
+  # Shift the elements native to the website, so that they don't conflict
+  # with our own.
+  _shiftNativeElements: ->
+    annoWrapper = document.getElementsByClassName('annotator-wrapper')[0]
+    offset = this.toolbar.css('width')
+    annoWrapper.style.marginRight += offset
+
+    bucketEl = this.plugins.BucketBar.element[0]
+    bucketStyle = bucketEl.style
+    bucketStyle.width += offset
+    bucketStyle.left += "-" + offset
+    bucketStyle.borderLeft = "1px solid rgba(0,0,0, 0.07)"
+    bucketStyle.borderRight = "1px solid rgba(0,0,0, 0.03)"
 
   _initializeGestureState: ->
     @gestureState =
