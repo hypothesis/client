@@ -159,7 +159,7 @@ var update = {
         });
         if (newAnn.moderation) {
           var countDelta = action.isFlagged ? 1 : -1;
-          newAnn.moderation = Object.assign(annot.moderation, {
+          newAnn.moderation = Object.assign({}, annot.moderation, {
             flagCount: annot.moderation.flagCount + countDelta,
           });
         }
