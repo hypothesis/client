@@ -64,8 +64,9 @@ module.exports = class Guest extends Annotator
     self = this
     @guestDocument = element.ownerDocument
     @guestId = options.guestId || "default"
-    # THESIS TODO: Consider using a trigger instead, via crossframe
-    @showSidebarCb = options.showSidebarCb
+    # THESIS TODO: With great power, comes great responsibility.
+    # This may be too much power... have a discussion about it.
+    @hostCallback = options.hostCallback
 
     this.selections = selections(@guestDocument).subscribe
       next: (range) ->
@@ -275,6 +276,9 @@ module.exports = class Guest extends Annotator
       # Add the anchors for this annotation to instance storage.
       self.anchors = self.anchors.concat(anchors)
 
+      # Tell the host about the new information
+      self.hostCallback('updateAnchors')
+
       # Let plugins know about the new information.
       self.plugins.BucketBar?.update()
       self.plugins.CrossFrame?.sync([annotation])
@@ -332,7 +336,7 @@ module.exports = class Guest extends Annotator
 
     ranges = @selectedRanges ? []
     @selectedRanges = null
-    @showSidebarCb() unless annotation.$highlight || !@showSidebarCb
+    @hostCallback('show') unless annotation.$highlight || !@hostCallback
 
     getSelectors = (range) ->
       options = {
@@ -388,7 +392,7 @@ module.exports = class Guest extends Annotator
   showAnnotations: (annotations) ->
     tags = (a.$tag for a in annotations)
     @crossframe?.call('showAnnotations', tags)
-    @showSidebarCb() unless !@showSidebarCb
+    @hostCallback('show') unless !@hostCallback
 
   toggleAnnotationSelection: (annotations) ->
     tags = (a.$tag for a in annotations)

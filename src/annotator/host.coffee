@@ -67,6 +67,7 @@ module.exports = class Host extends Annotator
   addGuest: (guestElement, guestId, guestOptions) ->
     options = guestOptions
     options.guestId = guestId
+    options.hostCallback = @_hostCallback.bind(this)
     if @crossframe then options.crossframe = @crossframe
     if @adderCtrl then options.adderCtrl = @adderCtrl
     guest = new Guest(guestElement, options)
@@ -100,8 +101,31 @@ module.exports = class Host extends Annotator
     @guests[guestId].destroy()
     delete @guests[guestId]
 
+  getAnchors: ->
+    anchors = []
+    for guestId, guest of @guests
+      anchors = anchors.concat(guest.anchors)
+
+    return anchors
+
+  # THESIS TODO: Investigate how to deal with annotations from multiple guests
+  selectAnnotations: (annotations) ->
+    # guestId = annotations[0].guestId
+    guestId = "default"
+    @guests[guestId].selectAnnotations(annotations)
+
   setVisibleHighlights: (state) ->
     @visibleHighlights = state
 
     for guestId, guest of @guests
       guest.setVisibleHighlights(state)
+
+  # THESIS TODO: Investigate if there are any performance concerns.
+  # This gets called every time a guest updates its anchors object
+  # getAnchors loops through all guests each time
+  updateAnchors: ->
+    @anchors = @getAnchors()
+
+  _hostCallback: (functionName, args...) ->
+    this[functionName].apply(this, args)
+
