@@ -109,37 +109,33 @@
 
     <div class="annotation-actions" ng-if="!vm.isSaving && !vm.editing() && vm.id()">
       <div ng-show="vm.isSaving">Saving…</div>
-      <button class="btn btn-clean annotation-action-btn"
+      <annotation-action-button
+        icon="'h-icon-annotation-edit'"
+        is-disabled="vm.isDeleted()"
+        label="'Edit'"
         ng-show="vm.authorize('update') && !vm.isSaving"
-        ng-click="vm.edit()"
-        ng-disabled="vm.isDeleted()"
-        aria-label="Edit"
-        h-tooltip>
-        <i class="h-icon-annotation-edit btn-icon "></i>
-      </button>
-      <button class="btn btn-clean annotation-action-btn"
+        on-click="vm.edit()"
+      ></annotation-action-button>
+      <annotation-action-button
+        icon="'h-icon-annotation-delete'"
+        is-disabled="vm.isDeleted()"
+        label="'Delete'"
         ng-show="vm.authorize('delete')"
-        ng-click="vm.delete()"
-        ng-disabled="vm.isDeleted()"
-        aria-label="Delete"
-        h-tooltip>
-        <i class="h-icon-annotation-delete btn-icon "></i>
-      </button>
-      <button class="btn btn-clean annotation-action-btn"
-        ng-click="vm.reply()"
-        ng-disabled="vm.isDeleted()"
-        aria-label="Reply"
-        h-tooltip>
-        <i class="h-icon-annotation-reply btn-icon "></i>
-      </button>
+        on-click="vm.delete()"
+      ></annotation-action-button>
+      <annotation-action-button
+        icon="'h-icon-annotation-reply'"
+        is-disabled="vm.isDeleted()"
+        label="'Reply'"
+        on-click="vm.reply()"
+      ></annotation-action-button>
       <span class="annotation-share-dialog-wrapper">
-        <button class="btn btn-clean annotation-action-btn"
-          ng-click="vm.showShareDialog = true"
-          ng-disabled="vm.isDeleted()"
-          aria-label="Share"
-          h-tooltip>
-          <i class="h-icon-annotation-share btn-icon "></i>
-        </button>
+        <annotation-action-button
+         icon="'h-icon-annotation-share'"
+         is-disabled="vm.isDeleted()"
+         label="'Share'"
+         on-click="vm.showShareDialog = true"
+        ></annotation-action-button>
         <annotation-share-dialog
           group="vm.group()"
           uri="vm.incontextLink()"
@@ -149,21 +145,19 @@
         </annotation-share-dialog>
       </span>
       <span ng-if="vm.canFlag()">
-        <button class="btn btn-clean annotation-action-btn"
-          ng-if="!vm.isFlagged()"
-          ng-click="vm.flag()"
-          ng-disabled="vm.isDeleted()"
-          aria-label="Flag"
-          h-tooltip>
-          <i class="h-icon-annotation-flag btn-icon"></i>
-        </button>
-        <button class="btn btn-clean annotation-action-btn"
-          ng-if="vm.isFlagged()"
-          ng-disabled="vm.isDeleted()"
-          aria-label="Annotation has been flagged"
-          h-tooltip>
-          <i class="h-icon-annotation-flag annotation--flagged btn-icon"></i>
-        </button>
+        <annotation-action-button
+         icon="'h-icon-annotation-flag'"
+         is-disabled="vm.isDeleted()"
+         label="'Flag'"
+         ng-if="!vm.isFlagged()"
+         on-click="vm.flag()"
+        ></annotation-action-button>
+        <annotation-action-button
+         icon="'h-icon-annotation-flag annotation--flagged'"
+         is-disabled="vm.isDeleted()"
+         label="'Annotation has been flagged'"
+         ng-if="vm.isFlagged()"
+        ></annotation-action-button>
       </span>
     </div>
   </footer>

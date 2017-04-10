@@ -24,6 +24,21 @@ function annotationComponent() {
   });
 }
 
+/**
+ * Returns the controller for the action button with the given `label`.
+ *
+ * @param {Element} annotationEl - Annotation element
+ * @param {string} label - Button label
+ */
+function findActionButton(annotationEl, label) {
+  var btns = Array.from(annotationEl[0].querySelectorAll('annotation-action-button'));
+  var match = btns.find(function (btn) {
+    var ctrl = angular.element(btn).controller('annotationActionButton');
+    return ctrl.label === label;
+  });
+  return match ? angular.element(match).controller('annotationActionButton') : null;
+}
+
 describe('annotation', function() {
   describe('updateModel()', function() {
     var updateModel = require('../annotation').updateModel;
@@ -105,10 +120,11 @@ describe('annotation', function() {
     before(function() {
       angular.module('h', [])
         .component('annotation', annotationComponent())
+        .component('annotationActionButton', {
+          bindings: require('../annotation-action-button').bindings,
+        })
         .component('markdown', {
-          bindings: {
-            customTextClass: '<?',
-          },
+          bindings: require('../markdown').bindings,
         });
     });
 
@@ -983,25 +999,25 @@ describe('annotation', function() {
     it('renders hidden annotations with a custom text class', function () {
       var ann = fixtures.moderatedAnnotation({ hidden: true });
       var el = createDirective(ann).element;
-      assert.deepEqual(el.find('markdown').controller('markdown'), {
+      assert.match(el.find('markdown').controller('markdown'), sinon.match({
         customTextClass: {
           'annotation-body is-hidden': true,
         },
-      });
+      }));
     });
 
     it('flags the annotation when the user clicks the "Flag" button', function () {
       fakeAnnotationMapper.flagAnnotation.returns(Promise.resolve());
       var el = createDirective().element;
-      var flagBtn = el[0].querySelector('button[aria-label="Flag"]');
-      flagBtn.click();
+      var flagBtn = findActionButton(el, 'Flag');
+      flagBtn.onClick();
       assert.called(fakeAnnotationMapper.flagAnnotation);
     });
 
     it('highlights the "Flag" button if the annotation is flagged', function () {
       var ann = Object.assign(fixtures.defaultAnnotation(), { flagged: true });
       var el = createDirective(ann).element;
-      var flaggedBtn = el[0].querySelector('button[aria-label="Annotation has been flagged"]');
+      var flaggedBtn = findActionButton(el, 'Annotation has been flagged');
       assert.ok(flaggedBtn);
     });
   });
