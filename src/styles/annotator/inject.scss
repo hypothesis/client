@@ -8,15 +8,15 @@ $base-font-size: 14px;
 //HIGHLIGHTS////////////////////////////////
 .annotator-highlights-always-on {
   .annotator-hl {
-    background-color: $highlight-color;
+    background-color: $highlight-color !important;
   }
 
   .annotator-hl .annotator-hl {
-    background-color: $highlight-color-second;
+    background-color: $highlight-color-second !important;
   }
 
   .annotator-hl .annotator-hl .annotator-hl {
-    background-color: $highlight-color-third;
+    background-color: $highlight-color-third !important;
   }
 }
 
