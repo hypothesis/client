@@ -283,14 +283,20 @@ function AnnotationController(
   };
 
   /**
-    * @returns {boolean} True if this annotation has quotes
+    * Return the annotation's quote if it has one or `null` otherwise.
     */
-  vm.hasQuotes = function() {
-    return vm.annotation.target.some(function(target) {
-      return target.selector && target.selector.some(function(selector) {
-        return selector.type === 'TextQuoteSelector';
-      });
+  vm.quote = function() {
+    if (vm.annotation.target.length === 0) {
+      return null;
+    }
+    var target = vm.annotation.target[0];
+    if (!target.selector) {
+      return null;
+    }
+    var quoteSel = target.selector.find(function (sel) {
+      return sel.type === 'TextQuoteSelector';
     });
+    return quoteSel ? quoteSel.exact : null;
   };
 
   vm.id = function() {
