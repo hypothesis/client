@@ -443,10 +443,6 @@ function AnnotationController(
     return serviceUrl('search.tag', {tag: tag});
   };
 
-  vm.target = function() {
-    return vm.annotation.target;
-  };
-
   // Note: We fetch the feature flag outside the `isOrphan` method to avoid a
   // lookup on every $digest cycle
   var indicateOrphans = features.flagEnabled('orphans_tab');
