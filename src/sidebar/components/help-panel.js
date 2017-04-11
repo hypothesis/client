@@ -28,7 +28,7 @@ module.exports = {
       }.bind(this)
     );
   },
-  template: require('../templates/help_panel.html'),
+  template: require('../templates/help-panel.html'),
   bindings: {
     auth: '<',
     onClose: '&',

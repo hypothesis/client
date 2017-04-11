@@ -164,5 +164,5 @@ module.exports = {
     /** Called to clear the current selection. */
     onClearSelection: '&',
   },
-  template: require('../templates/thread_list.html'),
+  template: require('../templates/thread-list.html'),
 };

@@ -17,5 +17,5 @@ module.exports = {
     pendingUpdateCount: '<',
     onApplyPendingUpdates: '&',
   },
-  template: require('../templates/top_bar.html'),
+  template: require('../templates/top-bar.html'),
 };

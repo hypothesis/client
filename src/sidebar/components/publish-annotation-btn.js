@@ -31,5 +31,5 @@ module.exports = {
     onSave: '&',
     onSetPrivacy: '&',
   },
-  template: require('../templates/publish_annotation_btn.html'),
+  template: require('../templates/publish-annotation-btn.html'),
 };

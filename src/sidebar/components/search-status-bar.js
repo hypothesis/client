@@ -19,5 +19,5 @@ module.exports = {
     totalAnnotations: '<',
     totalNotes: '<',
   },
-  template: require('../templates/search_status_bar.html'),
+  template: require('../templates/search-status-bar.html'),
 };

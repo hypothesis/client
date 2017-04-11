@@ -6,7 +6,7 @@ var scopeTimeout = require('../util/scope-timeout');
 
 module.exports = {
   controllerAs: 'vm',
-  template: require('../templates/annotation_share_dialog.html'),
+  template: require('../templates/annotation-share-dialog.html'),
   // @ngInject
   controller: function ($scope, $element, analytics) {
     var shareLinkInput = $element.find('input')[0];

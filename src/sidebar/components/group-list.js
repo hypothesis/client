@@ -40,5 +40,5 @@ module.exports = {
   bindings: {
     auth: '<',
   },
-  template: require('../templates/group_list.html'),
+  template: require('../templates/group-list.html'),
 };

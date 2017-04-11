@@ -12,5 +12,5 @@ module.exports = {
      */
     onLogin: '&',
   },
-  template: require('../templates/loggedout_message.html'),
+  template: require('../templates/loggedout-message.html'),
 };

@@ -40,5 +40,5 @@ module.exports = {
   bindings: {
     onClose: '&',
   },
-  template: require('../templates/share_dialog.html'),
+  template: require('../templates/share-dialog.html'),
 };

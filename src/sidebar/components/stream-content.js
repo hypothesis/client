@@ -87,5 +87,5 @@ module.exports = {
   bindings: {
     search: '<',
   },
-  template: require('../templates/stream_content.html'),
+  template: require('../templates/stream-content.html'),
 };

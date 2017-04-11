@@ -11,5 +11,5 @@ module.exports = {
     /** Called when the user changes the sort key. */
     onChangeSortKey: '&',
   },
-  template: require('../templates/sort_dropdown.html'),
+  template: require('../templates/sort-dropdown.html'),
 };
