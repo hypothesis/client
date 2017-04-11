@@ -21,5 +21,5 @@ module.exports = {
     onClick: '&',
     onToggleDropdown: '&',
   },
-  template: require('../templates/dropdown_menu_btn.html'),
+  template: require('../templates/dropdown-menu-btn.html'),
 };

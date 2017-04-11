@@ -79,5 +79,5 @@ module.exports = {
   bindings: {
     search: '<',
   },
-  template: require('../templates/annotation_viewer_content.html'),
+  template: require('../templates/annotation-viewer-content.html'),
 };

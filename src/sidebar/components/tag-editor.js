@@ -29,5 +29,5 @@ module.exports = {
     tags: '<',
     onEditTags: '&',
   },
-  template: require('../templates/tag_editor.html'),
+  template: require('../templates/tag-editor.html'),
 };

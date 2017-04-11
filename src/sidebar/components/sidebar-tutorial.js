@@ -25,5 +25,5 @@ module.exports = {
   controller: SidebarTutorialController,
   controllerAs: 'vm',
   bindings: {},
-  template: require('../templates/sidebar_tutorial.html'),
+  template: require('../templates/sidebar-tutorial.html'),
 };

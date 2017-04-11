@@ -344,5 +344,5 @@ module.exports = {
     auth: '<',
     search: '<',
   },
-  template: require('../templates/sidebar_content.html'),
+  template: require('../templates/sidebar-content.html'),
 };

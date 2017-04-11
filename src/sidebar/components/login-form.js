@@ -102,5 +102,5 @@ module.exports = {
   bindings: {
     onClose: '&',
   },
-  template: require('../templates/login_form.html'),
+  template: require('../templates/login-form.html'),
 };

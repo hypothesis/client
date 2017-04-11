@@ -154,5 +154,5 @@ function HypothesisAppController(
 module.exports = {
   controller: HypothesisAppController,
   controllerAs: 'vm',
-  template: require('../templates/hypothesis_app.html'),
+  template: require('../templates/hypothesis-app.html'),
 };

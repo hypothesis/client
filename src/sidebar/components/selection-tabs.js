@@ -38,5 +38,5 @@ module.exports = {
     totalNotes: '<',
     totalOrphans: '<',
   },
-  template: require('../templates/selection_tabs.html'),
+  template: require('../templates/selection-tabs.html'),
 };

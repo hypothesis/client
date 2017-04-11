@@ -52,5 +52,5 @@ module.exports = {
   bindings: {
     annotation: '<',
   },
-  template: require('../templates/moderation_banner.html'),
+  template: require('../templates/moderation-banner.html'),
 };

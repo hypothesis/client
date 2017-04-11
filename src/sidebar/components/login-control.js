@@ -39,5 +39,5 @@ module.exports = {
      */
     newStyle: '<',
   },
-  template: require('../templates/login_control.html'),
+  template: require('../templates/login-control.html'),
 };

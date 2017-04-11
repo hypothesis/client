@@ -2,7 +2,7 @@
 
 module.exports = {
   controllerAs: 'vm',
-  template: require('../templates/help_link.html'),
+  template: require('../templates/help-link.html'),
   controller: function () {},
   scope: {
     version: '<',
