@@ -131,6 +131,7 @@ module.exports = angular.module('h', [
   // UI components
   .component('annotation', require('./components/annotation'))
   .component('annotationHeader', require('./components/annotation-header'))
+  .component('annotationActionButton', require('./components/annotation-action-button'))
   .component('annotationShareDialog', require('./components/annotation-share-dialog'))
   .component('annotationThread', require('./components/annotation-thread'))
   .component('annotationViewerContent', require('./components/annotation-viewer-content'))
