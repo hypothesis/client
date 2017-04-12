@@ -4,7 +4,6 @@
 
 var annotationMetadata = require('../annotation-metadata');
 var events = require('../events');
-var memoize = require('../util/memoize');
 var persona = require('../filter/persona');
 
 var isNew = annotationMetadata.isNew;
@@ -89,8 +88,6 @@ function AnnotationController(
   function init() {
     // The remaining properties on vm are read-only properties for the
     // templates.
-
-    vm.serviceUrl = serviceUrl;
 
     /** Determines whether controls to expand/collapse the annotation body
      * are displayed adjacent to the tags field.
@@ -458,20 +455,12 @@ function AnnotationController(
     return vm.annotation.$orphan;
   };
 
-  vm.updated = function() {
-    return vm.annotation.updated;
-  };
-
   vm.user = function() {
     return vm.annotation.user;
   };
 
   vm.isThirdPartyUser = function () {
     return persona.isThirdPartyUser(vm.annotation.user, settings.authDomain);
-  };
-
-  vm.username = function() {
-    return persona.username(vm.annotation.user);
   };
 
   vm.isDeleted = function () {
@@ -497,15 +486,13 @@ function AnnotationController(
     return isReply(vm.annotation);
   };
 
-  vm.links = function () {
+  vm.incontextLink = function () {
     if (vm.annotation.links) {
-      return {incontext: vm.annotation.links.incontext ||
-                         vm.annotation.links.html ||
-                         '',
-              html: vm.annotation.links.html};
-    } else {
-      return {incontext: '', html: ''};
+      return vm.annotation.links.incontext ||
+             vm.annotation.links.html ||
+             '';
     }
+    return '';
   };
 
   /**
@@ -550,11 +537,6 @@ function AnnotationController(
       isPrivate: permissions.isPrivate(vm.annotation.permissions,
         vm.annotation.user),
     };
-  };
-
-  var documentMeta = memoize(annotationMetadata.domainAndTitle);
-  vm.documentMeta = function () {
-    return documentMeta(vm.annotation);
   };
 
   init();
