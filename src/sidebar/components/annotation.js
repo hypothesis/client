@@ -541,6 +541,17 @@ function AnnotationController(
     };
   };
 
+  /**
+   * Return true if the CC 0 license notice should be shown beneath the
+   * annotation body.
+   */
+  vm.shouldShowLicense = function () {
+    if (!vm.editing() || !vm.isShared()) {
+      return false;
+    }
+    return vm.group().public;
+  };
+
   init();
 }
 

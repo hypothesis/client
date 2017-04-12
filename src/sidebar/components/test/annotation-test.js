@@ -9,6 +9,25 @@ var testUtil = require('../../../shared/test/util');
 var util = require('../../directive/test/util');
 
 var inject = angular.mock.inject;
+var unroll = testUtil.unroll;
+
+var draftFixtures = {
+  shared: { text: 'draft', tags: [], isPrivate: false },
+  private: { text: 'draft', tags: [], isPrivate: true },
+};
+
+var groupFixtures = {
+  private: {
+    id: 'private',
+    url: 'https://example.org/g/private',
+    public: false,
+  },
+  public: {
+    id: 'world',
+    url: 'https://example.org/g/public',
+    public: true,
+  },
+};
 
 /**
  * Returns the annotation directive with helpers stubbed out.
@@ -157,7 +176,7 @@ describe('annotation', function() {
       fakeDrafts = {
         update: sandbox.stub(),
         remove: sandbox.stub(),
-        get: sandbox.stub(),
+        get: sandbox.stub().returns(null),
       };
 
       fakeFeatures = {
@@ -193,10 +212,8 @@ describe('annotation', function() {
       fakeServiceUrl = sinon.stub();
 
       fakeGroups = {
-        focused: function() {
-          return {};
-        },
-        get: function() {},
+        focused: sinon.stub().returns(groupFixtures.public),
+        get: sinon.stub().returns(groupFixtures.public),
       };
 
       fakeSettings = {
@@ -789,6 +806,39 @@ describe('annotation', function() {
         fakeFeatures.flagEnabled.returns(true);
         assert.equal(controller.canFlag(), true);
       });
+    });
+
+    describe('#shouldShowLicense', function () {
+      unroll('returns #expected if #case_', function (testCase) {
+        var ann = fixtures.publicAnnotation();
+        ann.group = testCase.group.id;
+        fakeDrafts.get.returns(testCase.draft);
+        fakeGroups.get.returns(testCase.group);
+
+        var controller = createDirective(ann).controller;
+
+        assert.equal(controller.shouldShowLicense(), testCase.expected);
+      }, [{
+        case_: 'the annotation is not being edited',
+        draft: null,
+        group: groupFixtures.public,
+        expected: false,
+      },{
+        case_: 'the draft is private',
+        draft: draftFixtures.private,
+        group: groupFixtures.public,
+        expected: false,
+      },{
+        case_: 'the group is private',
+        draft: draftFixtures.shared,
+        group: groupFixtures.private,
+        expected: false,
+      },{
+        case_: 'the draft is shared and the group is public',
+        draft: draftFixtures.shared,
+        group: groupFixtures.public,
+        expected: true,
+      }]);
     });
 
     describe('saving a new annotation', function() {
