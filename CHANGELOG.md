@@ -4,6 +4,13 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+### Changed
+
+- Only display CC 0 license for shared annotations in public groups
+  ([#354](https://github.com/hypothesis/client/pull/354)).
+
 ## [1.11.0] - 2017-04-07
 
 ### Changed
