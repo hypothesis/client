@@ -178,6 +178,7 @@ function store($http, $q, auth, settings) {
       read: apiCall('profile.read'),
       update: apiCall('profile.update'),
     },
+    links: apiCall('links'),
   };
 }
 
