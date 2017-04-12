@@ -89,6 +89,7 @@ function newHighlight() {
   return {
     id: undefined,
     $highlight: true,
+    target: [{source: 'http://example.org'}],
   };
 }
 
@@ -126,7 +127,7 @@ function oldHighlight() {
 function oldPageNote() {
   return {
     highlight: undefined,
-    target: [],
+    target: [{ source: 'http://example.org' }],
     references: [],
     text: '',
     tags: [],

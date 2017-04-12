@@ -598,29 +598,40 @@ describe('annotation', function() {
       });
     });
 
-    describe('#hasQuotes', function() {
-      it('returns false if the annotation has no quotes', function() {
+    describe('#quote', function() {
+      it('returns `null` if the annotation has no quotes', function() {
         var annotation = fixtures.defaultAnnotation();
         annotation.target = [{}];
         var controller = createDirective(annotation).controller;
 
-        assert.isFalse(controller.hasQuotes());
+        assert.isNull(controller.quote());
       });
 
-      it('returns true if the annotation has quotes', function() {
+      it('returns `null` if the annotation has selectors but no quote selector', function () {
+        var annotation = fixtures.defaultAnnotation();
+        annotation.target = [{
+          selector: [],
+        }];
+        var controller = createDirective(annotation).controller;
+
+        assert.isNull(controller.quote());
+      });
+
+      it("returns the first quote's text if the annotation has quotes", function() {
         var annotation = fixtures.defaultAnnotation();
         annotation.target = [
           {
             selector: [
               {
                 type: 'TextQuoteSelector',
+                exact: 'The text that the user selected',
               },
             ],
           },
         ];
         var controller = createDirective(annotation).controller;
 
-        assert.isTrue(controller.hasQuotes());
+        assert.equal(controller.quote(), 'The text that the user selected');
       });
     });
 
@@ -943,10 +954,9 @@ describe('annotation', function() {
           .withArgs('search.tag', {tag: 'atag'})
           .returns('https://test.hypothes.is/stream?q=tag:atag');
 
-        var directive = createDirective({
-          id: '1234',
+        var directive = createDirective(Object.assign(fixtures.defaultAnnotation(), {
           tags: ['atag'],
-        });
+        }));
         var links = [].slice.apply(directive.element[0].querySelectorAll('a'));
         var tagLinks = links.filter(function (link) {
           return link.textContent === 'atag';
