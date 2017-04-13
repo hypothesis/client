@@ -150,9 +150,20 @@ var update = {
     var annotations = state.annotations.map(function (annot) {
       var match = (annot.id && annot.id === action.id);
       if (match) {
-        return Object.assign({}, annot, {
+        if (annot.flagged === action.isFlagged) {
+          return annot;
+        }
+
+        var newAnn = Object.assign({}, annot, {
           flagged: action.isFlagged,
         });
+        if (newAnn.moderation) {
+          var countDelta = action.isFlagged ? 1 : -1;
+          newAnn.moderation = Object.assign({}, annot.moderation, {
+            flagCount: annot.moderation.flagCount + countDelta,
+          });
+        }
+        return newAnn;
       } else {
         return annot;
       }
