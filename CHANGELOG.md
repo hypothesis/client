@@ -4,6 +4,13 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+### Fixed
+
+- Update flag count after moderator flags an annotation themselves
+  ([#347](https://github.com/hypothesis/client/pull/347)).
+
 ## [1.12.0] - 2017-04-12
 
 ### Changed
