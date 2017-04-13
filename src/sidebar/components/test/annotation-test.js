@@ -841,6 +841,24 @@ describe('annotation', function() {
       }]);
     });
 
+    describe('#authorize', function () {
+      it('passes the current permissions and logged-in user ID to the permissions service', function () {
+        var ann = fixtures.defaultAnnotation();
+        ann.permissions = {
+          read: [fakeSession.state.userid],
+          delete: [fakeSession.state.userid],
+          update: [fakeSession.state.userid],
+        };
+        var controller = createDirective(ann).controller;
+
+        ['update', 'delete'].forEach(function (action) {
+          controller.authorize(action);
+          assert.calledWith(fakePermissions.permits, ann.permissions, action,
+                            fakeSession.state.userid);
+        });
+      });
+    });
+
     describe('saving a new annotation', function() {
       var annotation;
 
