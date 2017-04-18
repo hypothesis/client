@@ -28,7 +28,7 @@ describe('annotationShareDialog', function () {
     angular.mock.module('app');
   });
 
-  describe('The annotation share dialog', function () {
+  describe('the share dialog', function () {
     it('has class is-open set when it is open', function () {
       element = util.createDirective(document, 'annotationShareDialog', {
         isOpen: true,
@@ -66,7 +66,7 @@ describe('annotationShareDialog', function () {
 
   });
 
-  describe('vm.copyToClipboard()', function () {
+  describe('clipboard copy button', function () {
     var stub;
 
     beforeEach(function () {
