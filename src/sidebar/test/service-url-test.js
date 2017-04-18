@@ -39,6 +39,15 @@ function createServiceUrl(linksPromise) {
 }
 
 describe('links', function () {
+
+  beforeEach(function() {
+    sinon.stub(console, 'warn');
+  });
+
+  afterEach(function () {
+    console.warn.restore();
+  });
+
   context('before the API response has been received', function() {
     var serviceUrl;
     var store;
@@ -68,7 +77,7 @@ describe('links', function () {
 
   context('if the API request fails', function() {
     it('just keeps returning empty strings for URLs', function() {
-      var linksPromise = Promise.reject();
+      var linksPromise = Promise.reject(new Error('Oops'));
 
       var serviceUrl = createServiceUrl(linksPromise).serviceUrl;
 

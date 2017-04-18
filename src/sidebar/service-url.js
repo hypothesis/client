@@ -37,10 +37,8 @@ function serviceUrl(annotationUI, store) {
 
   store.links()
     .then(annotationUI.updateLinks)
-    .catch(function() {
-      // We catch rejected promises here in order to silence
-      // 'Unhandled promise rejection' warnings, but we don't do anything if
-      // the promise is rejected.
+    .catch(function(error) {
+      console.warn('The links API request was rejected: ' + error.message);
     });
 
   return function(linkName, params) {
