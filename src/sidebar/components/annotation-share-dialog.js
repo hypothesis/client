@@ -16,22 +16,6 @@ function AnnotationShareDialogController($element, $scope, analytics) {
         shareLinkInput.focus();
         shareLinkInput.select();
       });
-
-      var hideListener = function (event) {
-        $scope.$apply(function () {
-          if (!$element[0].contains(event.target)) {
-            document.removeEventListener('click', hideListener);
-            self.onClose();
-          }
-        });
-      };
-
-      // Stop listening for clicks outside the dialog once it is closed.
-      // The setTimeout() here is to ignore the initial click that opens
-      // the dialog.
-      scopeTimeout($scope, function () {
-        document.addEventListener('click', hideListener);
-      }, 0);
     }
   });
 

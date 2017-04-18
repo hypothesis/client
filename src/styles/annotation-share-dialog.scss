@@ -45,6 +45,19 @@
   }
 }
 
+// Transparent backdrop behind the share dialog which intercepts clicks in order
+// to hide the dialog.
+.annotation-share-dialog__backdrop {
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  background-color: black;
+  opacity: 0.01;
+  z-index: 1;
+}
+
 .annotation-share-dialog-msg {
   color: $gray-light;
   margin: -5px 10px 10px 10px;
