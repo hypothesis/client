@@ -64,6 +64,21 @@ describe('annotationShareDialog', function () {
       assert.equal(fakeAnalytics.track.args[3][1], 'email');
     });
 
+    it('focuses and selects the link when the dialog is opened', function (done) {
+      var uri = 'https://hyp.is/a/foo';
+      element = util.createDirective(document, 'annotationShareDialog', {
+        isOpen: true,
+        uri: uri,
+      });
+
+      setTimeout(function () {
+        var shareLink = element.find('input')[0];
+        assert.equal(document.activeElement, shareLink);
+        assert.equal(shareLink.selectionStart, 0);
+        assert.equal(shareLink.selectionEnd, uri.length);
+        done();
+      }, 1);
+    });
   });
 
   describe('clipboard copy button', function () {
