@@ -4,6 +4,13 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+### Changed
+
+- Use the new `/api/links` resource
+  ([#356](https://github.com/hypothesis/client/pull/356)).
+
 ## [1.12.1] - 2017-04-13
 
 ### Fixed
