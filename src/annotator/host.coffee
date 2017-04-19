@@ -3,7 +3,9 @@ $ = Annotator.$
 
 Guest = require('./guest')
 
-module.exports = class Host extends Guest
+module.exports = class Host extends Annotator
+  SHOW_HIGHLIGHTS_CLASS = 'annotator-highlights-always-on'
+
   constructor: (element, options) ->
     # Make a copy of all options except `options.app`, the app base URL.
     configParam = 'config=' + encodeURIComponent(
@@ -30,6 +32,14 @@ module.exports = class Host extends Guest
 
     super
 
+    for own name, opts of @options
+      if not @plugins[name] and Annotator.Plugin[name]
+        @addPlugin(name, opts)
+
+    @guest = @addGuest(element, options)
+    @crossframe = @guest.getCrossframe()
+    @plugins.CrossFrame = @crossframe
+
     app.appendTo(@frame)
 
     this.on 'panelReady', =>
@@ -49,6 +59,39 @@ module.exports = class Host extends Guest
       if !annotation.$highlight
         app[0].contentWindow.focus()
 
+  addGuest: (guestElement, guestOptions) ->
+    options = guestOptions
+    guest = new Guest(guestElement, options)
+    guest.setPlugins( @plugins )
+    guest.listenTo('anchorsSynced', @updateAnchors.bind(this))
+    guest.listenTo('highlightsRemoved', @updateAnchors.bind(this))
+
+    return guest
+
+  createAnnotation: ->
+    @guest.createAnnotation()
+
   destroy: ->
     @frame.remove()
-    super
+
+    for name, plugin of @plugins
+      @plugins[name].destroy()
+
+  getAnchors: ->
+    anchors = @guest.getAnchors()
+
+    return anchors
+
+  selectAnnotations: (annotations) ->
+    @guest.selectAnnotations(annotations)
+
+  setVisibleHighlights: (state) ->
+    @visibleHighlights = state
+
+    @guest.setVisibleHighlights(state)
+
+  updateAnchors: ->
+    @anchors = @getAnchors()
+
+    return @anchors
+

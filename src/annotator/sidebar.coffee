@@ -115,6 +115,20 @@ module.exports = class Sidebar extends Host
         @frame.css('margin-left', "#{m}px")
         if w >= MIN_RESIZE then @frame.css('width', "#{w}px")
 
+  addGuest: (guestElement, options) ->
+    guest = super
+
+    sidebarTrigger(guestElement, @show.bind(this))
+
+    guest.on 'click', (event) =>
+      if !@selectedTargets?.length
+        @hide()
+
+    guest.listenTo('showAnnotations', @show.bind(this))
+    guest.listenTo('createAnnotation', @annotationCreated.bind(this))
+
+    return guest
+
   onPan: (event) =>
     switch event.type
       when 'panstart'
@@ -179,10 +193,5 @@ module.exports = class Sidebar extends Host
   isOpen: ->
     !@frame.hasClass('annotator-collapsed')
 
-  createAnnotation: (annotation = {}) ->
-    super
+  annotationCreated: (annotation = {}) ->
     this.show() unless annotation.$highlight
-
-  showAnnotations: (annotations) ->
-    super
-    this.show()
