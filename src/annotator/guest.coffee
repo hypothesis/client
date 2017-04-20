@@ -62,7 +62,7 @@ module.exports = class Guest extends Annotator
     if !options then options = {}
 
     self = this
-    this.guestDocument = guestElement.ownerDocument
+    this.guestDocument = element.ownerDocument
 
     this.adderCtrl = new adder.Adder(@adder[0], {
       onAnnotate: ->
