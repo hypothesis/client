@@ -62,17 +62,17 @@ module.exports = class Guest extends Annotator
     if !options then options = {}
 
     self = this
+    this.guestDocument = guestElement.ownerDocument
+
     this.adderCtrl = new adder.Adder(@adder[0], {
       onAnnotate: ->
         self.createAnnotation()
-        Annotator.Util.getGlobal().getSelection().removeAllRanges()
+        self.guestDocument.getSelection().removeAllRanges()
       onHighlight: ->
         self.setVisibleHighlights(true)
         self.createHighlight()
-        Annotator.Util.getGlobal().getSelection().removeAllRanges()
+        self.guestDocument.getSelection().removeAllRanges()
     })
-
-    @guestDocument = element.ownerDocument
     this.selections = selections(@guestDocument).subscribe
       next: (range) ->
         if range
