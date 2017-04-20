@@ -28,7 +28,7 @@ describe('annotationShareDialog', function () {
     angular.mock.module('app');
   });
 
-  describe('The annotation share dialog', function () {
+  describe('the share dialog', function () {
     it('has class is-open set when it is open', function () {
       element = util.createDirective(document, 'annotationShareDialog', {
         isOpen: true,
@@ -64,9 +64,24 @@ describe('annotationShareDialog', function () {
       assert.equal(fakeAnalytics.track.args[3][1], 'email');
     });
 
+    it('focuses and selects the link when the dialog is opened', function (done) {
+      var uri = 'https://hyp.is/a/foo';
+      element = util.createDirective(document, 'annotationShareDialog', {
+        isOpen: true,
+        uri: uri,
+      });
+
+      setTimeout(function () {
+        var shareLink = element.find('input')[0];
+        assert.equal(document.activeElement, shareLink);
+        assert.equal(shareLink.selectionStart, 0);
+        assert.equal(shareLink.selectionEnd, uri.length);
+        done();
+      }, 1);
+    });
   });
 
-  describe('vm.copyToClipboard()', function () {
+  describe('clipboard copy button', function () {
     var stub;
 
     beforeEach(function () {
