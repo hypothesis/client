@@ -1056,15 +1056,33 @@ describe('annotation', function() {
       assert.equal(el[0].querySelector('blockquote').textContent, '<<-&->>');
     });
 
-    it('renders hidden annotations with a custom text class', function () {
-      var ann = fixtures.moderatedAnnotation({ hidden: true });
-      var el = createDirective(ann).element;
+    unroll('renders hidden annotations with a custom text class (#context)', function (testCase) {
+      var el = createDirective(testCase.ann).element;
       assert.match(el.find('markdown').controller('markdown'), sinon.match({
-        customTextClass: {
-          'annotation-body is-hidden': true,
-        },
+        customTextClass: testCase.textClass,
       }));
-    });
+    }, [{
+      context: 'for moderators',
+      ann: Object.assign(fixtures.moderatedAnnotation({ hidden: true }), {
+        // Content still present.
+        text: 'Some offensive content',
+      }),
+      textClass: {
+        'annotation-body is-hidden': true,
+        'has-content': true,
+      },
+    },{
+      context: 'for non-moderators',
+      ann: Object.assign(fixtures.moderatedAnnotation({ hidden: true }), {
+        // Content filtered out by service.
+        tags: [],
+        text: '',
+      }),
+      textClass: {
+        'annotation-body is-hidden': true,
+        'has-content': false,
+      },
+    }]);
 
     it('flags the annotation when the user clicks the "Flag" button', function () {
       fakeAnnotationMapper.flagAnnotation.returns(Promise.resolve());
