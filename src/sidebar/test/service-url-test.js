@@ -75,16 +75,6 @@ describe('links', function () {
     });
   });
 
-  context('if the API request fails', function() {
-    it('just keeps returning empty strings for URLs', function() {
-      var linksPromise = Promise.reject(new Error('Oops'));
-
-      var serviceUrl = createServiceUrl(linksPromise).serviceUrl;
-
-      assert.equal(serviceUrl('second_link'), '');
-    });
-  });
-
   context('after the API response has been received', function() {
     var annotationUI;
     var linksPromise;
