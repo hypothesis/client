@@ -14,12 +14,14 @@ var isPageNote = annotationMetadata.isPageNote;
  * Return a copy of `annotation` with changes made in the editor applied.
  */
 function updateModel(annotation, changes, permissions) {
+  var userid = annotation.user;
+
   return Object.assign({}, annotation, {
     // Apply changes from the draft
     tags: changes.tags,
     text: changes.text,
     permissions: changes.isPrivate ?
-      permissions.private() : permissions.shared(annotation.group),
+      permissions.private(userid) : permissions.shared(userid, annotation.group),
   });
 }
 
@@ -118,7 +120,8 @@ function AnnotationController(
     vm.annotation.user = vm.annotation.user || session.state.userid;
     vm.annotation.group = vm.annotation.group || groups.focused().id;
     if (!vm.annotation.permissions) {
-      vm.annotation.permissions = permissions.default(vm.annotation.group);
+      vm.annotation.permissions = permissions.default(vm.annotation.user,
+                                                      vm.annotation.group);
     }
     vm.annotation.text = vm.annotation.text || '';
     if (!Array.isArray(vm.annotation.tags)) {
@@ -165,7 +168,7 @@ function AnnotationController(
     if (vm.annotation.user) {
       // User is logged in, save to server.
       // Highlights are always private.
-      vm.annotation.permissions = permissions.private();
+      vm.annotation.permissions = permissions.private(vm.annotation.user);
       save(vm.annotation).then(function(model) {
         model.$tag = vm.annotation.$tag;
         $rootScope.$broadcast(events.ANNOTATION_CREATED, model);
@@ -176,21 +179,12 @@ function AnnotationController(
     }
   }
 
-  /**
-    * @ngdoc method
-    * @name annotation.AnnotationController#authorize
-    * @param {string} action The action to authorize.
-    * @returns {boolean} True if the action is authorized for the current user.
-    * @description Checks whether the current user can perform an action on
-    * the annotation.
-    */
   vm.authorize = function(action) {
-    // TODO: this should use auth instead of permissions but we might need
-    // an auth cache or the JWT -> userid decoding might start to be a
-    // performance bottleneck and we would need to get the id token into the
-    // session, which we should probably do anyway (and move to opaque bearer
-    // tokens for the access token).
-    return permissions.permits(action, vm.annotation, session.state.userid);
+    return permissions.permits(
+      vm.annotation.permissions,
+      action,
+      session.state.userid
+    );
   };
 
   /**
@@ -356,9 +350,10 @@ function AnnotationController(
     var references = (vm.annotation.references || []).concat(vm.annotation.id);
     var group = vm.annotation.group;
     var replyPermissions;
-    if (session.state.userid) {
+    var userid = session.state.userid;
+    if (userid) {
       replyPermissions = vm.state().isPrivate ?
-        permissions.private() : permissions.shared(group);
+        permissions.private(userid) : permissions.shared(userid, group);
     }
     annotationMapper.createAnnotation({
       group: group,
@@ -536,8 +531,8 @@ function AnnotationController(
     return {
       tags: vm.annotation.tags,
       text: vm.annotation.text,
-      isPrivate: permissions.isPrivate(vm.annotation.permissions,
-        vm.annotation.user),
+      isPrivate: !permissions.isShared(vm.annotation.permissions,
+                                       vm.annotation.user),
     };
   };
 

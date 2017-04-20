@@ -189,7 +189,6 @@ describe('annotation', function() {
 
       fakePermissions = {
         isShared: sandbox.stub().returns(true),
-        isPrivate: sandbox.stub().returns(false),
         permits: sandbox.stub().returns(true),
         shared: sandbox.stub().returns({
           read: ['everybody'],
@@ -292,14 +291,16 @@ describe('annotation', function() {
         annotation.user = annotation.permissions = undefined;
         annotation.group = '__world__';
         fakeSession.state.userid = 'acct:bill@localhost';
-        fakePermissions.default = function (group) {
-          return 'default permissions for ' + group;
+        fakePermissions.default = function (userid, group) {
+          return {
+            read: [userid, group],
+          };
         };
 
         createDirective(annotation);
 
-        assert.equal(annotation.permissions,
-          'default permissions for __world__');
+        assert.deepEqual(annotation.permissions, fakePermissions.default(
+                         fakeSession.state.userid, annotation.group));
       });
 
       it('sets the tags and text fields for new annotations', function () {
@@ -327,7 +328,6 @@ describe('annotation', function() {
           return 'new permissions';
         };
         fakePermissions.isShared = function () {};
-        fakePermissions.isPrivate = function () {};
         createDirective(annotation);
         assert.deepEqual(annotation.permissions, originalPermissions);
       });
@@ -546,7 +546,7 @@ describe('annotation', function() {
 
       it('makes the reply private if the parent is private', function() {
         var controller = createDirective(annotation).controller;
-        fakePermissions.isPrivate.returns(true);
+        fakePermissions.isShared.returns(false);
         var perms = {read: ['onlyme']};
         fakePermissions.private.returns(perms);
         var reply = sinon.match({permissions: perms});
@@ -839,6 +839,24 @@ describe('annotation', function() {
         group: groupFixtures.public,
         expected: true,
       }]);
+    });
+
+    describe('#authorize', function () {
+      it('passes the current permissions and logged-in user ID to the permissions service', function () {
+        var ann = fixtures.defaultAnnotation();
+        ann.permissions = {
+          read: [fakeSession.state.userid],
+          delete: [fakeSession.state.userid],
+          update: [fakeSession.state.userid],
+        };
+        var controller = createDirective(ann).controller;
+
+        ['update', 'delete'].forEach(function (action) {
+          controller.authorize(action);
+          assert.calledWith(fakePermissions.permits, ann.permissions, action,
+                            fakeSession.state.userid);
+        });
+      });
     });
 
     describe('saving a new annotation', function() {
