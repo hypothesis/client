@@ -320,8 +320,8 @@ describe('annotation-metadata', function () {
   describe('.flagCount', function () {
     var flagCount = annotationMetadata.flagCount;
 
-    it('returns 0 if the user is not a moderator', function () {
-      assert.equal(flagCount(fixtures.defaultAnnotation()), 0);
+    it('returns `null` if the user is not a moderator', function () {
+      assert.equal(flagCount(fixtures.defaultAnnotation()), null);
     });
 
     it('returns the flag count if present', function () {

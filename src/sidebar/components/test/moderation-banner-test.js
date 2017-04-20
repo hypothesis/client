@@ -4,6 +4,7 @@ var angular = require('angular');
 
 var util = require('../../directive/test/util');
 var fixtures = require('../../test/annotation-fixtures');
+var unroll = require('../../../shared/test/util').unroll;
 
 var moderatedAnnotation = fixtures.moderatedAnnotation;
 
@@ -52,10 +53,37 @@ describe('moderationBanner', function () {
     return bannerEl;
   }
 
-  it('does not display if annotation is not flagged or hidden', function () {
-    var banner = createBanner({ annotation: fixtures.defaultAnnotation() });
-    assert.equal(banner.textContent.trim(), '');
-  });
+  unroll('displays if user is a moderator and annotation is hidden or flagged', function (testCase) {
+    var banner = createBanner({ annotation: testCase.ann });
+    if (testCase.expectVisible) {
+      assert.notEqual(banner.textContent.trim(), '');
+    } else {
+      assert.equal(banner.textContent.trim(), '');
+    }
+  },[{
+    // Not hidden or flagged and user is not a moderator
+    ann: fixtures.defaultAnnotation(),
+    expectVisible: false,
+  },{
+    // Hidden, but user is not a moderator
+    ann: Object.assign(fixtures.defaultAnnotation(), {
+      hidden: true,
+    }),
+    expectVisible: false,
+  },{
+    // Not hidden or flagged and user is a moderator
+    ann: fixtures.moderatedAnnotation({ flagCount: 0, hidden: false }),
+    expectVisible: false,
+  },{
+    // Flagged but not hidden
+    ann: fixtures.moderatedAnnotation({ flagCount: 1, hidden: false }),
+    expectVisible: true,
+  },{
+    // Hidden but not flagged. The client only allows moderators to hide flagged
+    // annotations but an unflagged annotation can still be hidden via the API.
+    ann: fixtures.moderatedAnnotation({ flagCount: 0, hidden: true }),
+    expectVisible: true,
+  }]);
 
   it('displays the number of flags the annotation has received', function () {
     var ann = fixtures.moderatedAnnotation({ flagCount: 10 });
@@ -74,7 +102,10 @@ describe('moderationBanner', function () {
   });
 
   it('reports if the annotation was hidden', function () {
-    var ann = moderatedAnnotation({ hidden: true });
+    var ann = moderatedAnnotation({
+      flagCount: 1,
+      hidden: true,
+    });
     var banner = createBanner({ annotation: ann });
     assert.include(banner.textContent, 'Hidden from users');
   });
@@ -100,7 +131,10 @@ describe('moderationBanner', function () {
   });
 
   it('unhides the annotation if "Unhide" is clicked', function () {
-    var ann = moderatedAnnotation({ hidden: true });
+    var ann = moderatedAnnotation({
+      flagCount: 1,
+      hidden: true,
+    });
     var banner = createBanner({ annotation: ann });
 
     banner.querySelector('button').click();
@@ -109,7 +143,10 @@ describe('moderationBanner', function () {
   });
 
   it('reports an error if unhiding the annotation fails', function (done) {
-    var ann = moderatedAnnotation({ hidden: true });
+    var ann = moderatedAnnotation({
+      flagCount: 1,
+      hidden: true,
+    });
     var banner = createBanner({ annotation: ann });
     fakeStore.annotation.unhide.returns(Promise.reject(new Error('Network Error')));
 
