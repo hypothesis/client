@@ -309,11 +309,18 @@ function AnnotationController(
       return false;
     } else {
       // Once an annotation has been saved to the server there's no longer a
-      // simple property that says whether it's a highlight or not.  For
-      // example there's no vm.annotation.highlight: true.  Instead a highlight is
-      // defined as an annotation that isn't a page note or a reply and that
-      // has no text or tags.
-      return (!isPageNote(vm.annotation) && !isReply(vm.annotation) && !vm.hasContent());
+      // simple property that says whether it's a highlight or not. Instead an
+      // annotation is considered a highlight if it has a) content and b) is
+      // linked to a specific part of the document.
+      if (isPageNote(vm.annotation) || isReply(vm.annotation)) {
+        return false;
+      }
+      if (vm.annotation.hidden) {
+        // Annotation has been censored so we have to assume that it had
+        // content.
+        return false;
+      }
+      return !vm.hasContent();
     }
   };
 
