@@ -524,6 +524,9 @@ describe('annotation', function() {
         var controller = createDirective(annotation).controller;
         var reply = sinon.match({
           references: [annotation.id],
+          target: [{
+            source: annotation.target[0].source,
+          }],
           uri: annotation.uri,
         });
         controller.reply();
