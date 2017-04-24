@@ -64,7 +64,12 @@ module.exports = function(config) {
       transform: [
         'coffeeify',
         istanbul({
-          ignore: ['**/node_modules/**', '**/*.html', '**/*.svg'],
+          ignore: [
+            // Third party code
+            '**/node_modules/**', '**/vendor/*',
+            // Non JS modules
+            '**/*.html', '**/*.svg',
+          ],
 
           // There is an outstanding bug with karma-coverage and istanbul
           // in regards to doing source mapping and transpiling CoffeeScript.
