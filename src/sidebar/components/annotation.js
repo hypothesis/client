@@ -359,6 +359,7 @@ function AnnotationController(
       group: group,
       references: references,
       permissions: replyPermissions,
+      target: [{source: vm.annotation.target[0].source}],
       uri: vm.annotation.uri,
     });
   };
