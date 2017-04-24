@@ -74,21 +74,12 @@ function AnnotationController(
   }
 
   /**
-    * Initialize this AnnotationController instance.
+    * Initialize the controller instance.
     *
-    * Initialize the `vm` object and any other variables that it needs,
-    * register event listeners, etc.
-    *
-    * All initialization code intended to run when a new AnnotationController
-    * instance is instantiated should go into this function, except defining
-    * methods on `vm`. This function is called on AnnotationController
-    * instantiation after all of the methods have been defined on `vm`, so it
-    * can call the methods.
+    * All initialization code except for assigning the controller instance's
+    * methods goes here.
     */
   function init() {
-    // The remaining properties on vm are read-only properties for the
-    // templates.
-
     /** Determines whether controls to expand/collapse the annotation body
      * are displayed adjacent to the tags field.
      */
