@@ -487,6 +487,18 @@ describe('annotation', function() {
 
         assert.isTrue(vm.isHighlight());
       });
+
+      it('returns false for censored annotations', function() {
+        var ann = Object.assign(fixtures.oldAnnotation(), {
+          hidden: true,
+          text: '',
+          tags: [],
+        });
+
+        var vm = createDirective(ann).controller;
+
+        assert.isFalse(vm.isHighlight());
+      });
     });
 
     describe('when the annotation is a highlight', function() {
