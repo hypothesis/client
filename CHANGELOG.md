@@ -4,6 +4,21 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+### Changed
+
+- Render "censored text" for hidden annotations
+  ([#362](https://github.com/hypothesis/client/pull/362)).
+
+### Fixed
+
+- Fix error when a thread contains deleted annotations with replies
+  ([#369](https://github.com/hypothesis/client/pull/369)).
+
+- Fix `target` error when creating new replies
+  ([#370](https://github.com/hypothesis/client/pull/370)).
+
 ## [1.13.0] - 2017-04-19
 
 ### Changed
