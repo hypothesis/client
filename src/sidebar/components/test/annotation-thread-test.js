@@ -198,4 +198,18 @@ describe('annotationThread', function () {
       .controller('moderationBanner');
     assert.deepEqual(moderationBanner, { annotation: ann });
   });
+
+  it('does not render the annotation or moderation banner if there is no annotation', function () {
+    var thread = {
+      annotation: null,
+      id: '123',
+      parent: null,
+      children: [],
+    };
+    var element = util.createDirective(document, 'annotationThread', {
+      thread: thread,
+    });
+    assert.notOk(element[0].querySelector('moderation-banner'));
+    assert.notOk(element[0].querySelector('annotation'));
+  });
 });
