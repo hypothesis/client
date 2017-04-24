@@ -14,6 +14,11 @@ function ModerationBannerController(annotationUI, flash, store) {
     return self.annotation.hidden;
   };
 
+  this.isHiddenOrFlagged = function () {
+    var flagCount = self.flagCount();
+    return flagCount !== null && (flagCount > 0 || self.isHidden());
+  };
+
   this.isReply = function () {
     return annotationMetadata.isReply(self.annotation);
   };

@@ -182,11 +182,13 @@ function location(annotation) {
 
 /**
  * Return the number of times the annotation has been flagged
- * by other users. If moderation data is unavailable, returns 0.
+ * by other users. If moderation metadata is not present, returns `null`.
+ *
+ * @return {number|null}
  */
 function flagCount(ann) {
   if (!ann.moderation) {
-    return 0;
+    return null;
   }
   return ann.moderation.flagCount;
 }
