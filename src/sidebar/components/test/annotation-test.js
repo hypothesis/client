@@ -1120,7 +1120,7 @@ describe('annotation', function() {
     it('flags the annotation when the user clicks the "Flag" button', function () {
       fakeAnnotationMapper.flagAnnotation.returns(Promise.resolve());
       var el = createDirective().element;
-      var flagBtn = findActionButton(el, 'Flag');
+      var flagBtn = findActionButton(el, 'Report this annotation to the moderators');
       flagBtn.onClick();
       assert.called(fakeAnnotationMapper.flagAnnotation);
     });
@@ -1128,7 +1128,7 @@ describe('annotation', function() {
     it('highlights the "Flag" button if the annotation is flagged', function () {
       var ann = Object.assign(fixtures.defaultAnnotation(), { flagged: true });
       var el = createDirective(ann).element;
-      var flaggedBtn = findActionButton(el, 'Annotation has been flagged');
+      var flaggedBtn = findActionButton(el, 'Annotation has been reported to the moderators');
       assert.ok(flaggedBtn);
     });
   });

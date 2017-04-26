@@ -145,14 +145,14 @@
         <annotation-action-button
          icon="'h-icon-annotation-flag'"
          is-disabled="vm.isDeleted()"
-         label="'Flag'"
+         label="'Report this annotation to the moderators'"
          ng-if="!vm.isFlagged()"
          on-click="vm.flag()"
         ></annotation-action-button>
         <annotation-action-button
          icon="'h-icon-annotation-flag annotation--flagged'"
          is-disabled="vm.isDeleted()"
-         label="'Annotation has been flagged'"
+         label="'Annotation has been reported to the moderators'"
          ng-if="vm.isFlagged()"
         ></annotation-action-button>
       </span>
