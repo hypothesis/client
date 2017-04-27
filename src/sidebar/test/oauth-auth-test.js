@@ -9,6 +9,7 @@ describe('oauth auth', function () {
   var auth;
   var nowStub;
   var fakeHttp;
+  var fakeFlash;
   var fakeSettings;
   var clock;
 
@@ -27,6 +28,10 @@ describe('oauth auth', function () {
       })),
     };
 
+    fakeFlash = {
+      error: sinon.stub(),
+    };
+
     fakeSettings = {
       apiUrl: 'https://hypothes.is/api/',
       services: [{
@@ -35,7 +40,7 @@ describe('oauth auth', function () {
       }],
     };
 
-    auth = authService(fakeHttp, fakeSettings);
+    auth = authService(fakeHttp, fakeFlash, fakeSettings);
 
     clock = sinon.useFakeTimers();
   });
@@ -104,7 +109,7 @@ describe('oauth auth', function () {
     });
 
     it('should return null if no grant token was provided', function () {
-      var auth = authService(fakeHttp, {
+      var auth = authService(fakeHttp, fakeFlash, {
         services: [{authority: 'publisher.org'}],
       });
       return auth.tokenGetter().then(function (token) {
