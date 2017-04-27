@@ -74,6 +74,16 @@ function auth($http, flash, settings) {
       var tokenInfo = tokenInfoFrom(response);
       refreshAccessTokenBeforeItExpires(tokenInfo);
       accessTokenPromise = Promise.resolve(tokenInfo.accessToken);
+    }).catch(function() {
+      flash.error(
+        'You must reload the page to continue annotating.',
+        'Hypothesis login lost',
+        {
+          extendedTimeOut: 0,
+          tapToDismiss: false,
+          timeOut: 0,
+        }
+      );
     });
   }
 
