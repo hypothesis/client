@@ -82,6 +82,13 @@ function configureRoutes($routeProvider) {
 }
 
 // @ngInject
+function configureToastr(toastrConfig) {
+  angular.extend(toastrConfig, {
+    preventOpenDuplicates: true,
+  });
+}
+
+// @ngInject
 function configureHttp($httpProvider) {
   // Use the Pyramid XSRF header name
   $httpProvider.defaults.xsrfHeaderName = 'X-CSRF-Token';
@@ -208,6 +215,7 @@ module.exports = angular.module('h', [
   .config(configureHttp)
   .config(configureLocation)
   .config(configureRoutes)
+  .config(configureToastr)
 
   .run(setupHttp);
 
