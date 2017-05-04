@@ -182,6 +182,14 @@ function AnnotationController(
     * @description Flag the annotation.
     */
   this.flag = function() {
+    if (!session.state.userid) {
+      flash.error(
+        'You must be logged in to report an annotation to the moderators.',
+        'Login to flag annotations'
+      );
+      return;
+    }
+
     var onRejected = function(err) {
       flash.error(err.message, 'Flagging annotation failed');
     };
