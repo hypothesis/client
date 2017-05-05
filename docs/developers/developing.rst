@@ -14,7 +14,8 @@ Prerequisites
 You will need:
 
 * `git <https://git-scm.com/>`_
-* `Node.js <https://nodejs.org/en/>`_ v6+
+* `Node.js <https://nodejs.org/en/>`_ v6.3+
+* `Yarn <https://yarnpkg.com/lang/en/>`_
 
 Building
 ########
