@@ -111,6 +111,16 @@ describe 'Sidebar', ->
         sidebar = createSidebar(options={services: [{}]})
         emitEvent(events.DO_LOGIN)
 
+    describe 'on DO_SIGNUP event', ->
+      it 'calls the onSignupRequest callback function', ->
+        onSignupRequest = sandbox.stub()
+        sidebar = createSidebar(options={services: [{onSignupRequest: onSignupRequest}]})
+
+        emitEvent(events.DO_SIGNUP)
+
+        assert.called(onSignupRequest)
+
+
   describe 'pan gestures', ->
     sidebar = null
 

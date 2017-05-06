@@ -110,6 +110,7 @@ describe('hypothesisApp', function () {
     fakeWindow = {
       top: {},
       confirm: sandbox.stub(),
+      open: sandbox.stub(),
     };
 
     fakeServiceUrl = sinon.stub();
@@ -256,10 +257,39 @@ describe('hypothesisApp', function () {
     assert.calledOnce(fakeRoute.reload);
   });
 
-  it('tracks sign up requests in analytics', function () {
-    var ctrl = createController();
-    ctrl.signUp();
-    assert.calledWith(fakeAnalytics.track, fakeAnalytics.events.SIGN_UP_REQUESTED);
+  describe('#signUp', function () {
+    it('tracks sign up requests in analytics', function () {
+      var ctrl = createController();
+      ctrl.signUp();
+      assert.calledWith(fakeAnalytics.track, fakeAnalytics.events.SIGN_UP_REQUESTED);
+    });
+
+    context('when using a third-party service', function () {
+      beforeEach(function () {
+        fakeServiceConfig.returns({});
+      });
+
+      it('sends DO_SIGNUP event', function () {
+        var ctrl = createController();
+        ctrl.signUp();
+        assert.calledWith(fakeBridge.call, bridgeEvents.DO_SIGNUP);
+      });
+
+      it('does not open a URL directly', function () {
+        var ctrl = createController();
+        ctrl.signUp();
+        assert.notCalled(fakeWindow.open);
+      });
+    });
+
+    context('when not using a third-party service', function () {
+      it('opens the signup URL in a new tab', function () {
+        fakeServiceUrl.withArgs('signup').returns('https://ann.service/signup');
+        var ctrl = createController();
+        ctrl.signUp();
+        assert.calledWith(fakeWindow.open, 'https://ann.service/signup');
+      });
+    });
   });
 
   describe('#login()', function () {

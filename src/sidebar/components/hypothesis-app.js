@@ -93,6 +93,7 @@ function HypothesisAppController(
   // Start the login flow. This will present the user with the login dialog.
   this.login = function () {
     if (serviceConfig(settings)) {
+      // Let the host page handle the login request
       bridge.call(bridgeEvents.DO_LOGIN);
       return;
     }
@@ -103,6 +104,13 @@ function HypothesisAppController(
 
   this.signUp = function(){
     analytics.track(analytics.events.SIGN_UP_REQUESTED);
+
+    if (serviceConfig(settings)) {
+      // Let the host page handle the signup request
+      bridge.call(bridgeEvents.DO_SIGNUP);
+      return;
+    }
+    $window.open(serviceUrl('signup'));
   };
 
   // Display the dialog for sharing the current page

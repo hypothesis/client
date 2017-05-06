@@ -17,6 +17,11 @@ module.exports = {
    */
   DO_LOGIN: 'doLogin',
 
+  /**
+   * The sidebar is asking the annotator to do a parter site sign-up.
+   */
+  DO_SIGNUP: 'doSignup',
+
   // Events that the annotator sends to the sidebar
   // ----------------------------------------------
 };
