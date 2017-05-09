@@ -32,7 +32,7 @@ var pluginClasses = {
   Document: require('./plugin/document'),
 
   // Cross-frame communication
-  CrossFrame: require('./plugin/cross-frame')
+  CrossFrame: require('./plugin/cross-frame'),
 };
 
 var appLinkEl =
