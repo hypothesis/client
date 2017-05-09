@@ -4,6 +4,25 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+### Changed
+
+- Do not display moderation banner unless moderation metadata is present
+  ([#363](https://github.com/hypothesis/client/pull/363)).
+
+- Do not show highlight indicator for censored annotations
+  ([#365](https://github.com/hypothesis/client/pull/365)).
+
+- Exclude vendor code from coverage metrics
+  ([#366](https://github.com/hypothesis/client/pull/366)).
+
+- Don't show duplicate toasts when API requests fail
+  ([#375](https://github.com/hypothesis/client/pull/375)).
+
+- Improve error when flagging when logged out
+  ([#374](https://github.com/hypothesis/client/pull/374)).
+
 ## [1.14.0] - 2017-04-24
 
 ### Changed
