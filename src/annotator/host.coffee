@@ -4,9 +4,9 @@ Guest = require('./guest')
 
 module.exports = class Host extends Guest
   constructor: (element, options) ->
-    # Make a copy of all options except `options.app`, the app base URL.
+    # Make a copy of all options except `options.app`, the app base URL, and `options.pluginClasses`
     configParam = 'config=' + encodeURIComponent(
-      JSON.stringify(Object.assign({}, options, {app:undefined}))
+      JSON.stringify(Object.assign({}, options, {app:undefined, pluginClasses: undefined }))
     )
     if options.app and '?' in options.app
       options.app += '&' + configParam

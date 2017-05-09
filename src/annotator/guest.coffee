@@ -356,6 +356,20 @@ module.exports = class Guest extends Delegator
 
     annotation
 
+  # Public: Deletes the annotation by removing the highlight from the DOM.
+  # Publishes the 'annotationDeleted' event on completion.
+  #
+  # annotation - An annotation Object to delete.
+  #
+  # Returns deleted annotation.
+  deleteAnnotation: (annotation) ->
+    if annotation.highlights?
+      for h in annotation.highlights when h.parentNode?
+        $(h).replaceWith(h.childNodes)
+
+    this.publish('annotationDeleted', [annotation])
+    annotation
+
   showAnnotations: (annotations) ->
     tags = (a.$tag for a in annotations)
     @crossframe?.call('showAnnotations', tags)

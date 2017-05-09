@@ -40,6 +40,7 @@ module.exports = class Sidebar extends Host
     @onLoginRequest = options.services?[0]?.onLoginRequest
 
     this._setupSidebarEvents()
+    this._setupDocumentEvents()
 
   _setupDocumentEvents: ->
     sidebarTrigger(document.body, => this.show())
