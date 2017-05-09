@@ -1,4 +1,9 @@
-Annotator = require('annotator')
+Plugin = require('../plugin')
+
+AnnotationSync = require('../annotation-sync')
+Bridge = require('../../shared/bridge')
+Discovery = require('../../shared/discovery')
+
 
 # Extracts individual keys from an object and returns a new one.
 extract = extract = (obj, keys...) ->
@@ -11,17 +16,17 @@ extract = extract = (obj, keys...) ->
 # frame acts as the bridge client, the sidebar is the server. This plugin
 # can also be used to send messages through to the sidebar using the
 # call method.
-module.exports = class CrossFrame extends Annotator.Plugin
+module.exports = class CrossFrame extends Plugin
   constructor: (elem, options) ->
     super
 
     opts = extract(options, 'server')
-    discovery = new CrossFrame.Discovery(window, opts)
+    discovery = new Discovery(window, opts)
 
-    bridge = new CrossFrame.Bridge()
+    bridge = new Bridge()
 
     opts = extract(options, 'on', 'emit')
-    annotationSync = new CrossFrame.AnnotationSync(bridge, opts)
+    annotationSync = new AnnotationSync(bridge, opts)
 
     this.pluginInit = ->
       onDiscoveryCallback = (source, origin, token) ->
@@ -30,7 +35,7 @@ module.exports = class CrossFrame extends Annotator.Plugin
 
     this.destroy = ->
       # super doesnt work here :(
-      Annotator.Plugin::destroy.apply(this, arguments)
+      Plugin::destroy.apply(this, arguments)
       bridge.destroy()
       discovery.stopDiscovery()
 

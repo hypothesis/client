@@ -3,8 +3,8 @@ extend = require('extend')
 raf = require('raf')
 scrollIntoView = require('scroll-into-view')
 
-Annotator = require('annotator')
-$ = Annotator.$
+Delegator = require('./delegator')
+$ = require('jquery')
 
 adder = require('./adder')
 highlighter = require('./highlighter')
@@ -31,7 +31,7 @@ normalizeURI = (uri, baseURI) ->
   # See https://github.com/hypothesis/h/issues/3471#issuecomment-226713750
   return url.toString().replace(/#.*/, '');
 
-module.exports = class Guest extends Annotator
+module.exports = class Guest extends Delegator
   SHOW_HIGHLIGHTS_CLASS = 'annotator-highlights-always-on'
 
   # Events to be bound on Annotator#element.
@@ -51,21 +51,39 @@ module.exports = class Guest extends Annotator
   anchors: null
   visibleHighlights: false
 
-  html: extend {}, Annotator::html,
-    adder: '<hypothesis-adder></hypothesis-adder>';
+  html:
+    adder: '<hypothesis-adder></hypothesis-adder>'
+    wrapper: '<div class="annotator-wrapper"></div>'
+
+  plugins: {}
+
+  addPlugin: (name, options) ->
+    if @plugins[name]
+      console.error("You cannot have more than one instance of any plugin.")
+    else
+      klass = @options.pluginClasses[name]
+      if typeof klass is 'function'
+        @plugins[name] = new klass(@element[0], options)
+        @plugins[name].annotator = this
+        @plugins[name].pluginInit?()
+      else
+        console.error("Could not load " + name + " plugin. Have you included the appropriate <script> tag?")
+    this # allow chaining
 
   constructor: (element, options) ->
     super
 
+    this.adder = $(this.html.adder).appendTo(@element).hide()
+    
     self = this
     this.adderCtrl = new adder.Adder(@adder[0], {
       onAnnotate: ->
         self.createAnnotation()
-        Annotator.Util.getGlobal().getSelection().removeAllRanges()
+        document.getSelection().removeAllRanges()
       onHighlight: ->
         self.setVisibleHighlights(true)
         self.createHighlight()
-        Annotator.Util.getGlobal().getSelection().removeAllRanges()
+        document.getSelection().removeAllRanges()
     })
     this.selections = selections(document).subscribe
       next: (range) ->
@@ -91,7 +109,7 @@ module.exports = class Guest extends Annotator
 
     # Load plugins
     for own name, opts of @options
-      if not @plugins[name] and Annotator.Plugin[name]
+      if not @plugins[name] and @options.pluginClasses[name]
         this.addPlugin(name, opts)
 
   # Get the document info
@@ -141,16 +159,6 @@ module.exports = class Guest extends Annotator
 
     crossframe.on 'setVisibleHighlights', (state) =>
       this.setVisibleHighlights(state)
-
-  _setupWrapper: ->
-    @wrapper = @element
-    this
-
-  # These methods aren't used in the iframe-hosted configuration of Annotator.
-  _setupViewer: -> this
-  _setupEditor: -> this
-  _setupDocumentEvents: -> this
-  _setupDynamicStyle: -> this
 
   destroy: ->
     $('#annotator-dynamic-style').remove()
@@ -365,7 +373,7 @@ module.exports = class Guest extends Annotator
     @crossframe?.call('focusAnnotations', tags)
 
   _onSelection: (range) ->
-    selection = Annotator.Util.getGlobal().getSelection()
+    selection = document.getSelection()
     isBackwards = rangeUtil.isSelectionBackwards(selection)
     focusRect = rangeUtil.selectionFocusRect(selection)
     if !focusRect
@@ -375,7 +383,7 @@ module.exports = class Guest extends Annotator
 
     @selectedRanges = [range]
 
-    Annotator.$('.annotator-toolbar .h-icon-note')
+    $('.annotator-toolbar .h-icon-note')
       .attr('title', 'New Annotation')
       .removeClass('h-icon-note')
       .addClass('h-icon-annotate');
@@ -387,7 +395,7 @@ module.exports = class Guest extends Annotator
     this.adderCtrl.hide()
     @selectedRanges = []
 
-    Annotator.$('.annotator-toolbar .h-icon-annotate')
+    $('.annotator-toolbar .h-icon-annotate')
       .attr('title', 'New Page Note')
       .removeClass('h-icon-annotate')
       .addClass('h-icon-note');

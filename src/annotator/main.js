@@ -2,7 +2,6 @@
 
 require('../shared/polyfills');
 
-var Annotator = require('annotator');
 
 // Polyfills
 
@@ -13,43 +12,43 @@ var Annotator = require('annotator');
 if (!window.document.evaluate) {
   require('./vendor/wgxpath.install');
 }
-var g = Annotator.Util.getGlobal();
-if (g.wgxpath) {
-  g.wgxpath.install();
+if (window.wgxpath) {
+  window.wgxpath.install();
 }
 
+var $ = require('jquery');
+
 // Applications
-Annotator.Guest = require('./guest');
-Annotator.Host = require('./host');
-Annotator.Sidebar = require('./sidebar');
-Annotator.PdfSidebar = require('./pdf-sidebar');
+var Sidebar = require('./sidebar');
+var PdfSidebar = require('./pdf-sidebar');
 
-// UI plugins
-Annotator.Plugin.BucketBar = require('./plugin/bucket-bar');
-Annotator.Plugin.Toolbar = require('./plugin/toolbar');
+var pluginClasses = {
+  // UI plugins
+  BucketBar: require('./plugin/bucket-bar'),
+  Toolbar: require('./plugin/toolbar'),
 
-// Document type plugins
-Annotator.Plugin.PDF = require('./plugin/pdf');
-require('./vendor/annotator.document');  // Does not export the plugin :(
+  // Document type plugins
+  PDF: require('./plugin/pdf'),
+  Document: require('./plugin/document'),
 
-// Cross-frame communication
-Annotator.Plugin.CrossFrame = require('./plugin/cross-frame');
-Annotator.Plugin.CrossFrame.AnnotationSync = require('./annotation-sync');
-Annotator.Plugin.CrossFrame.Bridge = require('../shared/bridge');
-Annotator.Plugin.CrossFrame.Discovery = require('../shared/discovery');
+  // Cross-frame communication
+  CrossFrame: require('./plugin/cross-frame')
+};
 
 var appLinkEl =
   document.querySelector('link[type="application/annotator+html"]');
 var options = require('./config')(window);
 
-Annotator.noConflict().$.noConflict(true)(function() {
+$.noConflict(true)(function() {
   var Klass = window.PDFViewerApplication ?
-      Annotator.PdfSidebar :
-      Annotator.Sidebar;
+      PdfSidebar :
+      Sidebar;
   if (options.hasOwnProperty('constructor')) {
     Klass = options.constructor;
     delete options.constructor;
   }
+
+  options.pluginClasses = pluginClasses;
 
   window.annotator = new Klass(document.body, options);
   appLinkEl.addEventListener('destroy', function () {

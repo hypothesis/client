@@ -1,5 +1,4 @@
-Annotator = require('annotator')
-$ = Annotator.$
+$ = require('jquery')
 
 Guest = require('./guest')
 
