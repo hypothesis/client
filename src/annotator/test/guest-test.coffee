@@ -1,11 +1,11 @@
-Annotator = require('annotator')
 proxyquire = require('proxyquire')
 
 adder = require('../adder')
 Observable = require('../util/observable').Observable
 
-$ = Annotator.$
-Annotator['@noCallThru'] = true;
+Delegator = require('../delegator')
+$ = require('jquery')
+Delegator['@noCallThru'] = true
 
 Guest = null
 anchoring = {}
@@ -37,10 +37,12 @@ describe 'Guest', ->
   sandbox = sinon.sandbox.create()
   CrossFrame = null
   fakeCrossFrame = null
+  guestOptions = {pluginClasses: {}}
 
-  createGuest = (options) ->
+  createGuest = (options={}) ->
+    options = Object.assign({}, guestOptions, options)
     element = document.createElement('div')
-    return new Guest(element, options || {})
+    return new Guest(element, options)
 
   beforeEach ->
     FakeAdder::instance = null
@@ -60,7 +62,7 @@ describe 'Guest', ->
           selections = obs
           return () ->
         )
-      'annotator': Annotator,
+      './delegator': Delegator,
       'raf': raf,
       'scroll-into-view': scrollIntoView,
     })
@@ -73,11 +75,10 @@ describe 'Guest', ->
 
     CrossFrame = sandbox.stub()
     CrossFrame.returns(fakeCrossFrame)
-    Annotator.Plugin.CrossFrame = CrossFrame
+    guestOptions.pluginClasses['CrossFrame'] = CrossFrame
 
   afterEach ->
     sandbox.restore()
-    delete Annotator.Plugin.CrossFrame
 
   describe 'cross frame', ->
 

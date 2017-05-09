@@ -1,17 +1,16 @@
-Annotator = require('annotator')
 events = require('../../shared/bridge-events')
 
 proxyquire = require('proxyquire')
-Sidebar = proxyquire('../sidebar', {
-  'annotator': Annotator,
-})
+Sidebar = proxyquire('../sidebar', {})
 
 describe 'Sidebar', ->
   sandbox = sinon.sandbox.create()
   CrossFrame = null
   fakeCrossFrame = null
+  sidebarOptions = {pluginClasses: {}}
 
   createSidebar = (options={}) ->
+    options = Object.assign({}, sidebarOptions, options)
     element = document.createElement('div')
     return new Sidebar(element, options)
 
@@ -23,11 +22,10 @@ describe 'Sidebar', ->
 
     CrossFrame = sandbox.stub()
     CrossFrame.returns(fakeCrossFrame)
-    Annotator.Plugin.CrossFrame = CrossFrame
+    sidebarOptions.pluginClasses['CrossFrame'] = CrossFrame
 
   afterEach ->
     sandbox.restore()
-    delete Annotator.Plugin.CrossFrame
 
   describe 'crossframe listeners', ->
     emitEvent = (event, args...) ->

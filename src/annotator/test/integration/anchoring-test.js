@@ -3,8 +3,6 @@
 
 'use strict';
 
-var Annotator = require('annotator');
-
 var unroll = require('../../../shared/test/util').unroll;
 var Guest = require('../../guest');
 
@@ -48,17 +46,18 @@ function FakeCrossFrame() {
 
 describe('anchoring', function () {
   var guest;
+  var guestOptions;
   var container;
 
   before(function () {
-    Annotator.Plugin.CrossFrame = FakeCrossFrame;
+    guestOptions = {pluginClasses: {CrossFrame: FakeCrossFrame}};
   });
 
   beforeEach(function () {
     container = document.createElement('div');
     container.innerHTML = require('./test-page.html');
     document.body.appendChild(container);
-    guest = new Guest(container);
+    guest = new Guest(container, guestOptions);
   });
 
   afterEach(function () {

@@ -1,9 +1,17 @@
-CrossFrame = require('../cross-frame')
+proxyquire = require('proxyquire')
+
+Plugin = require('../../plugin')
+CrossFrame = null
 
 describe 'Annotator.Plugin.CrossFrame', ->
   fakeDiscovery = null
   fakeBridge = null
   fakeAnnotationSync = null
+
+  proxyDiscovery = null
+  proxyBridge = null
+  proxyAnnotationSync = null
+
   sandbox = sinon.sandbox.create()
 
   createCrossFrame = (options) ->
@@ -28,9 +36,17 @@ describe 'Annotator.Plugin.CrossFrame', ->
     fakeAnnotationSync =
       sync: sandbox.stub()
 
-    CrossFrame.AnnotationSync = sandbox.stub().returns(fakeAnnotationSync)
-    CrossFrame.Discovery = sandbox.stub().returns(fakeDiscovery)
-    CrossFrame.Bridge = sandbox.stub().returns(fakeBridge)
+    proxyAnnotationSync = sandbox.stub().returns(fakeAnnotationSync)
+    proxyDiscovery = sandbox.stub().returns(fakeDiscovery)
+    proxyBridge = sandbox.stub().returns(fakeBridge)
+
+    CrossFrame = proxyquire('../cross-frame', {
+      '../plugin': Plugin,
+      '../annotation-sync': proxyAnnotationSync,
+      '../../shared/bridge': proxyBridge,
+      '../../shared/discovery': proxyDiscovery
+    })
+
 
   afterEach ->
     sandbox.restore()
@@ -38,23 +54,23 @@ describe 'Annotator.Plugin.CrossFrame', ->
   describe 'CrossFrame constructor', ->
     it 'instantiates the Discovery component', ->
       createCrossFrame()
-      assert.calledWith(CrossFrame.Discovery, window)
+      assert.calledWith(proxyDiscovery, window)
 
     it 'passes the options along to the bridge', ->
       createCrossFrame(server: true)
-      assert.calledWith(CrossFrame.Discovery, window, server: true)
+      assert.calledWith(proxyDiscovery, window, server: true)
 
     it 'instantiates the CrossFrame component', ->
       createCrossFrame()
-      assert.calledWith(CrossFrame.Discovery)
+      assert.calledWith(proxyDiscovery)
 
     it 'instantiates the AnnotationSync component', ->
       createCrossFrame()
-      assert.called(CrossFrame.AnnotationSync)
+      assert.called(proxyAnnotationSync)
 
     it 'passes along options to AnnotationSync', ->
       createCrossFrame()
-      assert.calledWith(CrossFrame.AnnotationSync, fakeBridge, {
+      assert.calledWith(proxyAnnotationSync, fakeBridge, {
         on: sinon.match.func
         emit: sinon.match.func
       })
