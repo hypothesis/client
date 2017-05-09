@@ -67,11 +67,11 @@ module.exports = class Sidebar extends Host
 
     @crossframe.on('show', => this.show())
     @crossframe.on('hide', => this.hide())
-    @crossframe.on(events.DO_LOGIN, =>
+    @crossframe.on(events.LOGIN_REQUESTED, =>
       if @onLoginRequest
         @onLoginRequest()
     );
-    @crossframe.on(events.DO_SIGNUP, =>
+    @crossframe.on(events.SIGNUP_REQUESTED, =>
       if @onSignupRequest
         @onSignupRequest()
     );

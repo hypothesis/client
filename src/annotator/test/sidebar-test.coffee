@@ -47,12 +47,12 @@ describe 'Sidebar', ->
         emitEvent('hide')
         assert.called(target)
 
-    describe 'on DO_LOGIN event', ->
+    describe 'on LOGIN_REQUESTED event', ->
       it 'calls the onLoginRequest callback function if one was provided', ->
         onLoginRequest = sandbox.stub()
         sidebar = createSidebar(options={services: [{onLoginRequest: onLoginRequest}]})
 
-        emitEvent(events.DO_LOGIN)
+        emitEvent(events.LOGIN_REQUESTED)
 
         assert.called(onLoginRequest)
 
@@ -73,7 +73,7 @@ describe 'Sidebar', ->
           }
         )
 
-        emitEvent(events.DO_LOGIN)
+        emitEvent(events.LOGIN_REQUESTED)
 
         assert.called(firstOnLogin)
         assert.notCalled(secondOnLogin)
@@ -94,29 +94,29 @@ describe 'Sidebar', ->
           }
         )
 
-        emitEvent(events.DO_LOGIN)
+        emitEvent(events.LOGIN_REQUESTED)
 
         assert.notCalled(secondOnLogin)
         assert.notCalled(thirdOnLogin)
 
       it 'does not crash if there is no services', ->
         sidebar = createSidebar(options={})  # No options.services
-        emitEvent(events.DO_LOGIN)
+        emitEvent(events.LOGIN_REQUESTED)
 
       it 'does not crash if services is an empty array', ->
         sidebar = createSidebar(options={services: []})
-        emitEvent(events.DO_LOGIN)
+        emitEvent(events.LOGIN_REQUESTED)
 
       it 'does not crash if the first service has no onLoginRequest', ->
         sidebar = createSidebar(options={services: [{}]})
-        emitEvent(events.DO_LOGIN)
+        emitEvent(events.LOGIN_REQUESTED)
 
-    describe 'on DO_SIGNUP event', ->
+    describe 'on SIGNUP_REQUESTED event', ->
       it 'calls the onSignupRequest callback function', ->
         onSignupRequest = sandbox.stub()
         sidebar = createSidebar(options={services: [{onSignupRequest: onSignupRequest}]})
 
-        emitEvent(events.DO_SIGNUP)
+        emitEvent(events.SIGNUP_REQUESTED)
 
         assert.called(onSignupRequest)
 

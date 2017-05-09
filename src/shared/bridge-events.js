@@ -15,12 +15,12 @@ module.exports = {
    *  (for example, pop up a login window). This is used when the client is
    *  embedded in a partner site and a login button in the client is clicked.
    */
-  DO_LOGIN: 'doLogin',
+  LOGIN_REQUESTED: 'loginRequested',
 
   /**
    * The sidebar is asking the annotator to do a parter site sign-up.
    */
-  DO_SIGNUP: 'doSignup',
+  SIGNUP_REQUESTED: 'signupRequested',
 
   // Events that the annotator sends to the sidebar
   // ----------------------------------------------

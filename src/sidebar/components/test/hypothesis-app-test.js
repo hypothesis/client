@@ -269,10 +269,10 @@ describe('hypothesisApp', function () {
         fakeServiceConfig.returns({});
       });
 
-      it('sends DO_SIGNUP event', function () {
+      it('sends SIGNUP_REQUESTED event', function () {
         var ctrl = createController();
         ctrl.signUp();
-        assert.calledWith(fakeBridge.call, bridgeEvents.DO_SIGNUP);
+        assert.calledWith(fakeBridge.call, bridgeEvents.SIGNUP_REQUESTED);
       });
 
       it('does not open a URL directly', function () {
@@ -301,9 +301,9 @@ describe('hypothesisApp', function () {
       assert.equal(ctrl.accountDialog.visible, true);
     });
 
-    it('sends DO_LOGIN if a third-party service is in use', function () {
+    it('sends LOGIN_REQUESTED if a third-party service is in use', function () {
       // If the client is using a third-party annotation service then clicking
-      // on a login button should send the DO_LOGIN event over the bridge
+      // on a login button should send the LOGIN_REQUESTED event over the bridge
       // (so that the partner site we're embedded in can do its own login
       // thing).
       fakeServiceConfig.returns({});
@@ -312,7 +312,7 @@ describe('hypothesisApp', function () {
       ctrl.login();
 
       assert.equal(fakeBridge.call.callCount, 1);
-      assert.isTrue(fakeBridge.call.calledWithExactly(bridgeEvents.DO_LOGIN));
+      assert.isTrue(fakeBridge.call.calledWithExactly(bridgeEvents.LOGIN_REQUESTED));
     });
   });
 

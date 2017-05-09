@@ -94,7 +94,7 @@ function HypothesisAppController(
   this.login = function () {
     if (serviceConfig(settings)) {
       // Let the host page handle the login request
-      bridge.call(bridgeEvents.DO_LOGIN);
+      bridge.call(bridgeEvents.LOGIN_REQUESTED);
       return;
     }
 
@@ -107,7 +107,7 @@ function HypothesisAppController(
 
     if (serviceConfig(settings)) {
       // Let the host page handle the signup request
-      bridge.call(bridgeEvents.DO_SIGNUP);
+      bridge.call(bridgeEvents.SIGNUP_REQUESTED);
       return;
     }
     $window.open(serviceUrl('signup'));
