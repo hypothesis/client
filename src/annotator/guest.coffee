@@ -48,14 +48,13 @@ module.exports = class Guest extends Delegator
   anchoring: require('./anchoring/html')
 
   # Internal state
+  plugins: null
   anchors: null
   visibleHighlights: false
 
   html:
     adder: '<hypothesis-adder></hypothesis-adder>'
     wrapper: '<div class="annotator-wrapper"></div>'
-
-  plugins: {}
 
   addPlugin: (name, options) ->
     if @plugins[name]
@@ -92,6 +91,7 @@ module.exports = class Guest extends Delegator
         else
           self._onClearSelection()
 
+    this.plugins = {}
     this.anchors = []
 
     cfOptions =
