@@ -3,8 +3,8 @@
       ng-if="vm.newStyle && vm.auth.status === 'unknown'">⋯</span>
 <span class="login-text"
       ng-if="vm.newStyle && vm.auth.status === 'logged-out'">
-  <a href="{{vm.serviceUrl('signup')}}" ng-click="vm.onSignUp()" target="_blank" h-branding="highlightColor">Sign up</a>
-  / <a href="" ng-click="vm.onLogin()" h-branding="highlightColor">Log in</a>
+  <a href="{{vm.serviceUrl('signup')}}" ng-click="vm.onSignUp()" target="_blank" h-branding="accentColor">Sign up</a>
+  / <a href="" ng-click="vm.onLogin()" h-branding="accentColor">Log in</a>
 </span>
 <div ng-if="vm.newStyle"
      class="pull-right login-control-menu"

@@ -10,8 +10,8 @@ module.exports = [
     expectedPropValue: 'blue',
   },
   {
-    settings: {highlightColor: 'red'},
-    attrs: 'h-branding="highlightColor"',
+    settings: {accentColor: 'red'},
+    attrs: 'h-branding="accentColor"',
     styleChanged: 'color',
     expectedPropValue: 'red',
   },

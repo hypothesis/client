@@ -193,7 +193,7 @@ loads.
      The :option:`branding` setting is currently still experimental and may
      change in the future.
 
-  .. option:: highlightColor
+  .. option:: accentColor
 
     ``Color``. We have several areas in our client that have pops of color
     that are secondary to the primary call to action elements. Things such as

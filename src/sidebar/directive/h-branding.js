@@ -30,7 +30,7 @@ function BrandingDirective(settings) {
   // the type of .style property being set. The types are pretty simple for now
   // and are a one-to-one mapping between the branding type and style property.
   var _supportedPropSettings = {
-    highlightColor: 'color',
+    accentColor: 'color',
     appBackgroundColor: 'backgroundColor',
     ctaBackgroundColor: 'backgroundColor',
     ctaTextColor: 'color',
@@ -40,7 +40,7 @@ function BrandingDirective(settings) {
 
   // filter all attribute values down to the supported
   // branding properties
-  var _getValidBrandingAttribut = function(attrString){
+  var _getValidBrandingAttribute = function(attrString){
     return attrString.split(',').map(function(attr){
       return attr.trim();
     }).filter(function filterAgainstWhitelist(attr){
@@ -53,7 +53,7 @@ function BrandingDirective(settings) {
     restrict: 'A',
     link: function(scope, $elem, attrs) {
       if(_hasBranding){
-        _getValidBrandingAttribut(attrs.hBranding).forEach(function(attr){
+        _getValidBrandingAttribute(attrs.hBranding).forEach(function(attr){
           var propVal = settings.branding[attr];
           if(propVal){
             // the _supportedPropSettings holds the .style property name
