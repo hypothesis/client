@@ -36,8 +36,11 @@ module.exports = class Sidebar extends Host
     if @plugins.Toolbar?
       this._setupGestures()
 
-    # The partner-provided login callback function (if any).
-    @onLoginRequest = options.services?[0]?.onLoginRequest
+    # The partner-provided callback functions.
+    serviceConfig = options.services?[0]
+    if serviceConfig
+      @onLoginRequest = serviceConfig.onLoginRequest
+      @onSignupRequest = serviceConfig.onSignupRequest
 
     this._setupSidebarEvents()
 
@@ -64,9 +67,13 @@ module.exports = class Sidebar extends Host
 
     @crossframe.on('show', => this.show())
     @crossframe.on('hide', => this.hide())
-    @crossframe.on(events.DO_LOGIN, =>
+    @crossframe.on(events.LOGIN_REQUESTED, =>
       if @onLoginRequest
         @onLoginRequest()
+    );
+    @crossframe.on(events.SIGNUP_REQUESTED, =>
+      if @onSignupRequest
+        @onSignupRequest()
     );
 
     # Return this for chaining
