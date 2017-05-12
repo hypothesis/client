@@ -19,6 +19,7 @@ describe 'Sidebar', ->
     fakeCrossFrame.onConnect = sandbox.stub().returns(fakeCrossFrame)
     fakeCrossFrame.on = sandbox.stub().returns(fakeCrossFrame)
     fakeCrossFrame.call = sandbox.spy()
+    fakeCrossFrame.destroy = sandbox.stub()
 
     CrossFrame = sandbox.stub()
     CrossFrame.returns(fakeCrossFrame)
@@ -184,3 +185,14 @@ describe 'Sidebar', ->
         sidebar.show()
         sidebar.element.trigger(event)
         assert.isFalse(sidebar.isOpen())
+
+  describe 'destruction', ->
+    sidebar = null
+
+    beforeEach ->
+      sidebar = createSidebar({})
+
+    it 'the sidebar is destroyed and the frame is detached', ->
+      sidebar.destroy()
+      assert.called(fakeCrossFrame.destroy)
+      assert.equal(sidebar.frame[0].parentElement, null)
