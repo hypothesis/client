@@ -175,7 +175,7 @@ module.exports = class Guest extends Delegator
     for name, plugin of @plugins
       @plugins[name].destroy()
 
-    this.removeEvents()
+    super
 
   anchor: (annotation) ->
     self = this
