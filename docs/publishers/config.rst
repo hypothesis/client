@@ -159,6 +159,14 @@ loads.
      :option:`grantToken` for the logged-in user in the :option:`services`
      configuration setting.
 
+   .. option:: onSignupRequest
+
+     ``function``. A JavaScript function that will be called when the user clicks
+     the "Sign up" link in the sidebar. No arguments are passed and the return
+     value is unused.
+
+     This setting can only be set using :js:func:`window.hypothesisConfig`.
+
 .. option:: branding
 
   Branding lets you adjust certain aspects of the sidebar's look and feel to better fit your site's own look.
