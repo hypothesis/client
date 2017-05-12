@@ -2,6 +2,7 @@ proxyquire = require('proxyquire')
 
 adder = require('../adder')
 Observable = require('../util/observable').Observable
+Plugin = require('../plugin')
 
 Delegator = require('../delegator')
 $ = require('jquery')
@@ -29,6 +30,18 @@ class FakeAdder
     this.showAt = sinon.stub()
     this.target = sinon.stub()
 
+class FakePlugin extends Plugin
+  instance: null
+  events:
+    'customEvent': 'customEventHandler'
+
+  constructor: ->
+    FakePlugin::instance = this
+    super
+
+  pluginInit: sinon.stub()
+  customEventHandler: sinon.stub()
+
 # A little helper which returns a promise that resolves after a timeout
 timeoutPromise = (millis = 0) ->
   new Promise((resolve) -> setTimeout(resolve, millis))
@@ -37,7 +50,7 @@ describe 'Guest', ->
   sandbox = sinon.sandbox.create()
   CrossFrame = null
   fakeCrossFrame = null
-  guestOptions = {pluginClasses: {}}
+  guestOptions = null
 
   createGuest = (options={}) ->
     options = Object.assign({}, guestOptions, options)
@@ -51,6 +64,7 @@ describe 'Guest', ->
       selectionFocusRect: sinon.stub()
     }
     selections = null
+    guestOptions = {pluginClasses: {}}
 
     Guest = proxyquire('../guest', {
       './adder': {Adder: FakeAdder},
@@ -71,14 +85,39 @@ describe 'Guest', ->
       onConnect: sinon.stub()
       on: sinon.stub()
       sync: sinon.stub()
+      destroy: sinon.stub()
     }
 
-    CrossFrame = sandbox.stub()
-    CrossFrame.returns(fakeCrossFrame)
+    CrossFrame = sandbox.stub().returns(fakeCrossFrame)
     guestOptions.pluginClasses['CrossFrame'] = CrossFrame
 
   afterEach ->
     sandbox.restore()
+
+  describe 'plugins', ->
+    fakePlugin = null
+    guest = null
+
+    beforeEach ->
+      FakePlugin::instance = null
+      guestOptions.pluginClasses['FakePlugin'] = FakePlugin
+      guest = createGuest(FakePlugin: {})
+      fakePlugin = FakePlugin::instance
+
+    it 'load and "pluginInit" gets called', ->
+      assert.calledOnce(fakePlugin.pluginInit)
+
+    it 'hold reference to instance', ->
+      assert.equal(fakePlugin.annotator, guest)
+
+    it 'subscribe to events', ->
+      guest.publish('customEvent', ['1', '2'])
+      assert.calledWith(fakePlugin.customEventHandler, '1', '2')
+
+    it 'destroy when instance is destroyed', ->
+      sandbox.spy(fakePlugin, 'destroy')
+      guest.destroy()
+      assert.called(fakePlugin.destroy)
 
   describe 'cross frame', ->
 
