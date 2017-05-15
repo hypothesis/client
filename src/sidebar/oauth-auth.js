@@ -22,6 +22,9 @@ function auth($http, settings) {
    * @property {string} accessToken  - The access token itself.
    * @property {number} expiresIn    - The lifetime of the access token,
    *                                   in seconds.
+   * @property {Date} refreshAfter   - A time before the access token's expiry
+   *                                   time, after which the code should
+   *                                   attempt to refresh the access token.
    * @property {string} refreshToken - The refresh token that can be used to
    *                                   get a new access token.
    */
@@ -37,6 +40,12 @@ function auth($http, settings) {
     return {
       accessToken:  data.access_token,
       expiresIn:    data.expires_in,
+
+      // We actually have to refresh the access token _before_ it expires.
+      // If the access token expires in one hour, this should refresh it in
+      // about 55 mins.
+      refreshAfter: new Date(Date.now() + (data.expires_in * 1000 * 0.91)),
+
       refreshToken: data.refresh_token,
     };
   }
@@ -79,14 +88,23 @@ function auth($http, settings) {
 
   // Set a timeout to refresh the access token a few minutes before it expires.
   function refreshAccessTokenBeforeItExpires(tokenInfo) {
-    var delay = tokenInfo.expiresIn * 1000;
+    // The delay, in milliseconds, before we will poll again to see if it's
+    // time to refresh the access token.
+    var delay = 30000;
 
-    // We actually have to refresh the access token _before_ it expires.
-    // If the access token expires in one hour, this should refresh it in
-    // about 55 mins.
-    delay = Math.floor(delay * 0.91);
+    // If the token info's refreshAfter time will have passed before the next
+    // time we poll, then refresh the token this time.
+    var refreshAfter = tokenInfo.refreshAfter.valueOf() - delay;
 
-    window.setTimeout(refreshAccessToken, delay, tokenInfo.refreshToken);
+    function refreshAccessTokenIfNearExpiry() {
+      if (Date.now() > refreshAfter) {
+        refreshAccessToken(tokenInfo.refreshToken);
+      } else {
+        refreshAccessTokenBeforeItExpires(tokenInfo);
+      }
+    }
+
+    window.setTimeout(refreshAccessTokenIfNearExpiry, delay);
   }
 
   function tokenGetter() {
