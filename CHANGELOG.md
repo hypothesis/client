@@ -4,6 +4,19 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+### Changed
+
+- Allow publishers to customize "Sign up" link handling
+  ([#379](https://github.com/hypothesis/client/pull/379)).
+
+- Changed "highlightColor" to "accentColor" in branding configuration
+  ([#383](https://github.com/hypothesis/client/pull/383)).
+
+- Clarify in tooltip what "Flag" button does
+  ([#373](https://github.com/hypothesis/client/pull/373)).
+
 ## [1.15.0] - 2017-05-09
 
 ### Changed
