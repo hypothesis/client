@@ -12,20 +12,23 @@ describe('oauth auth', function () {
   var fakeFlash;
   var fakeSettings;
   var clock;
+  var successfulFirstAccessTokenPromise;
 
   beforeEach(function () {
     nowStub = sinon.stub(window.performance, 'now');
     nowStub.returns(300);
 
+    successfulFirstAccessTokenPromise = Promise.resolve({
+      status: 200,
+      data: {
+        access_token: 'firstAccessToken',
+        expires_in: DEFAULT_TOKEN_EXPIRES_IN_SECS,
+        refresh_token: 'firstRefreshToken',
+      },
+    });
+
     fakeHttp = {
-      post: sinon.stub().returns(Promise.resolve({
-        status: 200,
-        data: {
-          access_token: 'firstAccessToken',
-          expires_in: DEFAULT_TOKEN_EXPIRES_IN_SECS,
-          refresh_token: 'firstRefreshToken',
-        },
-      })),
+      post: sinon.stub().returns(successfulFirstAccessTokenPromise),
     };
 
     fakeFlash = {
@@ -220,14 +223,7 @@ describe('oauth auth', function () {
           if (queryString.indexOf('refresh_token') !== -1) {
             return Promise.resolve({status: 500});
           }
-          return Promise.resolve({
-            status: 200,
-            data: {
-              access_token: 'firstAccessToken',
-              expires_in: DEFAULT_TOKEN_EXPIRES_IN_SECS,
-              refresh_token: 'firstRefreshToken',
-            },
-          });
+          return Promise.resolve(successfulFirstAccessTokenPromise);
         };
       });
 
