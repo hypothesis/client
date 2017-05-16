@@ -54,26 +54,12 @@ module.exports = class Guest extends Delegator
 
   html:
     adder: '<hypothesis-adder></hypothesis-adder>'
-    wrapper: '<div class="annotator-wrapper"></div>'
-
-  addPlugin: (name, options) ->
-    if @plugins[name]
-      console.error("You cannot have more than one instance of any plugin.")
-    else
-      klass = @options.pluginClasses[name]
-      if typeof klass is 'function'
-        @plugins[name] = new klass(@element[0], options)
-        @plugins[name].annotator = this
-        @plugins[name].pluginInit?()
-      else
-        console.error("Could not load " + name + " plugin. Have you included the appropriate <script> tag?")
-    this # allow chaining
 
   constructor: (element, options) ->
     super
 
     this.adder = $(this.html.adder).appendTo(@element).hide()
-    
+
     self = this
     this.adderCtrl = new adder.Adder(@adder[0], {
       onAnnotate: ->
@@ -111,6 +97,19 @@ module.exports = class Guest extends Delegator
     for own name, opts of @options
       if not @plugins[name] and @options.pluginClasses[name]
         this.addPlugin(name, opts)
+
+  addPlugin: (name, options) ->
+    if @plugins[name]
+      console.error("You cannot have more than one instance of any plugin.")
+    else
+      klass = @options.pluginClasses[name]
+      if typeof klass is 'function'
+        @plugins[name] = new klass(@element[0], options)
+        @plugins[name].annotator = this
+        @plugins[name].pluginInit?()
+      else
+        console.error("Could not load " + name + " plugin. Have you included the appropriate <script> tag?")
+    this # allow chaining
 
   # Get the document info
   getDocumentInfo: ->
