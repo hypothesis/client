@@ -50,49 +50,48 @@ module.exports = class Guest extends Annotator
   # Internal state
   anchors: null
   visibleHighlights: false
+  guestDocument: null
 
   html: extend {}, Annotator::html,
     adder: '<hypothesis-adder></hypothesis-adder>';
 
   constructor: (element, options) ->
     super
+    # If no options are passed, set it to an empty object
+    # Avoids the need to check if options is undefined when checking properties
+    if !options then options = {}
 
     self = this
+    this.guestDocument = element.ownerDocument
+
     this.adderCtrl = new adder.Adder(@adder[0], {
       onAnnotate: ->
         self.createAnnotation()
-        Annotator.Util.getGlobal().getSelection().removeAllRanges()
+        self.guestDocument.getSelection().removeAllRanges()
       onHighlight: ->
         self.setVisibleHighlights(true)
         self.createHighlight()
-        Annotator.Util.getGlobal().getSelection().removeAllRanges()
+        self.guestDocument.getSelection().removeAllRanges()
     })
-    this.selections = selections(document).subscribe
+    this.selections = selections(@guestDocument).subscribe
       next: (range) ->
         if range
           self._onSelection(range)
         else
           self._onClearSelection()
 
+    # Holds events, and the methods associated with these events
+    # Used to call methods outside of this class
+    @_eventListeners = {}
     this.anchors = []
 
-    cfOptions =
-      on: (event, handler) =>
-        this.subscribe(event, handler)
-      emit: (event, args...) =>
-        this.publish(event, args)
+    @_setupDefaultGuest()
 
-    this.addPlugin('CrossFrame', cfOptions)
-    @crossframe = this.plugins.CrossFrame
+  getAnchors: ->
+    return @anchors
 
-    @crossframe.onConnect(=> this.publish('panelReady'))
-    this._connectAnnotationSync(@crossframe)
-    this._connectAnnotationUISync(@crossframe)
-
-    # Load plugins
-    for own name, opts of @options
-      if not @plugins[name] and Annotator.Plugin[name]
-        this.addPlugin(name, opts)
+  getCrossframe: ->
+    return @crossframe
 
   # Get the document info
   getDocumentInfo: ->
@@ -114,6 +113,41 @@ module.exports = class Guest extends Annotator
 
     return Promise.all([metadataPromise, uriPromise]).then ([metadata, href]) ->
       return {uri: normalizeURI(href, baseURI), metadata}
+
+  hasSelection: ->
+    return if @selectedRanges then @selectedRanges[0] != undefined else false
+
+  setCrossframe: (crossframe) ->
+    cfOptions =
+      on: (event, handler) =>
+        this.subscribe(event, handler)
+      emit: (event, args...) =>
+        this.publish(event, args)
+
+    @addPlugin('CrossFrame', cfOptions)
+    @crossframe = @plugins.CrossFrame
+
+    this._connectAnnotationSync(@crossframe)
+    this._connectAnnotationUISync(@crossframe)
+
+  setPlugins: (plugins) ->
+    @plugins = plugins
+
+    # Ensure that we have all the plugins that guest needs
+    for own name, opts of @options
+      if not @plugins[name] and Annotator.Plugin[name]
+        @addPlugin(name, opts)
+
+  trigger: (eventName, args...) ->
+    return unless @_eventListeners[eventName]
+
+    for method in @_eventListeners[eventName]
+      method.apply(this, args)
+
+  listenTo: (eventName, method) ->
+    @_eventListeners[eventName] = [] unless @_eventListeners[eventName]
+
+    @_eventListeners[eventName].push(method)
 
   _connectAnnotationSync: (crossframe) ->
     this.subscribe 'annotationDeleted', (annotation) =>
@@ -142,6 +176,11 @@ module.exports = class Guest extends Annotator
     crossframe.on 'setVisibleHighlights', (state) =>
       this.setVisibleHighlights(state)
 
+  _setupDefaultGuest: ->
+    @setCrossframe()
+
+    @crossframe.onConnect(=> @publish('panelReady'))
+
   _setupWrapper: ->
     @wrapper = @element
     this
@@ -163,9 +202,6 @@ module.exports = class Guest extends Annotator
       $(this).remove()
 
     @element.data('annotator', null)
-
-    for name, plugin of @plugins
-      @plugins[name].destroy()
 
     this.removeEvents()
 
@@ -246,6 +282,7 @@ module.exports = class Guest extends Annotator
       self.plugins.BucketBar?.update()
       self.plugins.CrossFrame?.sync([annotation])
 
+      self.trigger('anchorsSynced')
       return anchors
 
     # Remove all the anchors for this annotation from the instance storage.
@@ -292,6 +329,7 @@ module.exports = class Guest extends Annotator
     raf =>
       highlighter.removeHighlights(unhighlight)
       this.plugins.BucketBar?.update()
+      @trigger('highlightsRemoved')
 
   createAnnotation: (annotation = {}) ->
     self = this
@@ -327,6 +365,7 @@ module.exports = class Guest extends Annotator
     targets.then(-> self.publish('beforeAnnotationCreated', [annotation]))
     targets.then(-> self.anchor(annotation))
 
+    @trigger('createAnnotation', annotation)
     annotation
 
   createHighlight: ->
@@ -351,6 +390,7 @@ module.exports = class Guest extends Annotator
   showAnnotations: (annotations) ->
     tags = (a.$tag for a in annotations)
     @crossframe?.call('showAnnotations', tags)
+    @trigger('showAnnotations')
 
   toggleAnnotationSelection: (annotations) ->
     tags = (a.$tag for a in annotations)
@@ -365,7 +405,7 @@ module.exports = class Guest extends Annotator
     @crossframe?.call('focusAnnotations', tags)
 
   _onSelection: (range) ->
-    selection = Annotator.Util.getGlobal().getSelection()
+    selection = @guestDocument.getSelection()
     isBackwards = rangeUtil.isSelectionBackwards(selection)
     focusRect = rangeUtil.selectionFocusRect(selection)
     if !focusRect
