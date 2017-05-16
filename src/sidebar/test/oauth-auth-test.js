@@ -214,6 +214,39 @@ describe('oauth auth', function () {
           assert.equal(fakeHttp.post.callCount, 1);
         });
     });
+
+    context('when a refresh request fails', function() {
+      beforeEach('make refresh token requests fail', function () {
+        fakeHttp.post = function(url, queryString) {
+          if (queryString.indexOf('refresh_token') !== -1) {
+            return Promise.resolve({status: 500});
+          }
+          return Promise.resolve({
+            status: 200,
+            data: {
+              access_token: 'firstAccessToken',
+              expires_in: DEFAULT_TOKEN_EXPIRES_IN_SECS,
+              refresh_token: 'firstRefreshToken',
+            },
+          });
+        };
+      });
+
+      it('shows an error message to the user', function () {
+        function assertThatErrorMessageWasShown() {
+          assert.calledOnce(fakeFlash.error);
+          assert.equal(
+            fakeFlash.error.firstCall.args[0],
+            'You must reload the page to continue annotating.'
+          );
+        }
+
+        return auth.tokenGetter()
+          .then(expireAccessToken)
+          .then(function () { clock.tick(1); })
+          .then(assertThatErrorMessageWasShown);
+      });
+    });
   });
 
   // Advance time forward so that any current access tokens will have expired.
