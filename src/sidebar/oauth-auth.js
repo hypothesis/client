@@ -17,6 +17,21 @@ function auth($http, flash, settings) {
   var tokenUrl = resolve('token', settings.apiUrl);
 
   /**
+   * Show an error message telling the user that the access token has expired.
+   */
+  function showAccessTokenExpiredErrorMessage(message) {
+    flash.error(
+      message,
+      'Hypothesis login lost',
+      {
+        extendedTimeOut: 0,
+        tapToDismiss: false,
+        timeOut: 0,
+      }
+    );
+  }
+
+  /**
    * An object holding the details of an access token from the tokenUrl endpoint.
    * @typedef {Object} TokenInfo
    * @property {string} accessToken  - The access token itself.
@@ -84,15 +99,8 @@ function auth($http, flash, settings) {
       refreshAccessTokenBeforeItExpires(tokenInfo);
       accessTokenPromise = Promise.resolve(tokenInfo.accessToken);
     }).catch(function() {
-      flash.error(
-        'You must reload the page to continue annotating.',
-        'Hypothesis login lost',
-        {
-          extendedTimeOut: 0,
-          tapToDismiss: false,
-          timeOut: 0,
-        }
-      );
+      showAccessTokenExpiredErrorMessage(
+        'You must reload the page to continue annotating.');
     });
   }
 
@@ -130,15 +138,8 @@ function auth($http, flash, settings) {
           refreshAccessTokenBeforeItExpires(tokenInfo);
           return tokenInfo.accessToken;
         }).catch(function(err) {
-          flash.error(
-            'You must reload the page to annotate.',
-            'Hypothesis login failed',
-            {
-              extendedTimeOut: 0,
-              tapToDismiss: false,
-              timeOut: 0,
-            }
-          );
+          showAccessTokenExpiredErrorMessage(
+            'You must reload the page to annotate.');
           throw err;
         });
       } else {
