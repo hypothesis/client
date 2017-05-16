@@ -9,6 +9,7 @@ describe('oauth auth', function () {
   var auth;
   var nowStub;
   var fakeHttp;
+  var fakeFlash;
   var fakeSettings;
   var clock;
 
@@ -27,6 +28,10 @@ describe('oauth auth', function () {
       })),
     };
 
+    fakeFlash = {
+      error: sinon.stub(),
+    };
+
     fakeSettings = {
       apiUrl: 'https://hypothes.is/api/',
       services: [{
@@ -35,7 +40,7 @@ describe('oauth auth', function () {
       }],
     };
 
-    auth = authService(fakeHttp, fakeSettings);
+    auth = authService(fakeHttp, fakeFlash, fakeSettings);
 
     clock = sinon.useFakeTimers();
   });
@@ -58,16 +63,36 @@ describe('oauth auth', function () {
       });
     });
 
-    it('should raise if an access token request fails', function () {
-      fakeHttp.post.returns(Promise.resolve({status: 500}));
-      return auth.tokenGetter().then(
-        function onResolved () {
-          assert(false, 'The Promise should have been rejected');
-        },
-        function onRejected (error) {
-          assert.equal(error.message, 'Failed to retrieve access token');
-        }
-      );
+    context('when the access token request fails', function() {
+      beforeEach('make access token requests fail', function () {
+        fakeHttp.post.returns(Promise.resolve({status: 500}));
+      });
+
+      it('shows an error message to the user', function () {
+        return auth.tokenGetter().then(
+          function onResolved () {
+            assert(false, 'The Promise should have been rejected');
+          },
+          function onRejected () {
+            assert.calledOnce(fakeFlash.error);
+            assert.equal(
+              fakeFlash.error.firstCall.args[0],
+              'You must reload the page to annotate.'
+            );
+          }
+        );
+      });
+
+      it('returns a rejected promise', function () {
+        return auth.tokenGetter().then(
+          function onResolved () {
+            assert(false, 'The Promise should have been rejected');
+          },
+          function onRejected (error) {
+            assert.equal(error.message, 'Failed to retrieve access token');
+          }
+        );
+      });
     });
 
     it('should cache tokens for future use', function () {
@@ -104,7 +129,7 @@ describe('oauth auth', function () {
     });
 
     it('should return null if no grant token was provided', function () {
-      var auth = authService(fakeHttp, {
+      var auth = authService(fakeHttp, fakeFlash, {
         services: [{authority: 'publisher.org'}],
       });
       return auth.tokenGetter().then(function (token) {
