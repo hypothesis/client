@@ -33,6 +33,12 @@ function config(window_) {
     }
   }
 
+  // Convert legacy keys/values in options to corresponding current
+  // configuration.
+  if (typeof options.showHighlights === 'boolean') {
+    options.showHighlights = options.showHighlights ? 'always' : 'never';
+  }
+
   // Extract the default query from the URL.
   //
   // The Chrome extension or proxy may already have provided this config
