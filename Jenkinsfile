@@ -3,7 +3,7 @@
 node {
     checkout scm
 
-    nodeEnv = docker.image("node:6.2")
+    nodeEnv = docker.image("kkarczmarczyk/node-yarn:7.5")
     workspace = pwd()
 
     stage 'Build'
@@ -24,7 +24,7 @@ node {
                 [$class: 'StringBinding', credentialsId: 'npm-token', variable: 'NPM_TOKEN']]) {
 
                 sh "echo '//registry.npmjs.org/:_authToken=${env.NPM_TOKEN}' >> \$HOME/.npmrc"
-                sh "npm publish"
+                sh "yarn publish"
             }
         }
 

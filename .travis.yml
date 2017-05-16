@@ -1,7 +1,5 @@
 language: node_js
-cache:
-  directories:
-    - node_modules
+cache: yarn
 notifications:
   slack:
     rooms:
@@ -11,9 +9,9 @@ matrix:
     # 'node_js' is listed for each job to ensure that only two builds are run.
     # See https://github.com/hypothesis/client/pull/27#discussion_r70611726
     - env: ACTION=lint
-      node_js: '6.2'
-      script: npm run lint
+      node_js: '6.10'
+      script: yarn run lint
     - env: ACTION=test
-      node_js: '6.2'
+      node_js: '6.10'
       after_success:
-        npm run report-coverage
+        yarn run report-coverage

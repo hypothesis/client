@@ -13,11 +13,11 @@ clean:
 ## Run test suite
 .PHONY: test
 test: node_modules/.uptodate
-	npm test
+	yarn test
 
 .PHONY: lint
 lint: node_modules/.uptodate
-	npm run lint
+	yarn run lint
 
 .PHONY: docs
 docs:
@@ -26,8 +26,8 @@ docs:
 ################################################################################
 
 build/manifest.json: node_modules/.uptodate
-	npm run-script build
+	yarn run build
 
-node_modules/.uptodate: package.json npm-shrinkwrap.json
-	npm run-script deps 2>/dev/null || npm install
+node_modules/.uptodate: package.json yarn.lock
+	yarn run deps 2>/dev/null || yarn install
 	@touch $@

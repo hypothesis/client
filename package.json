@@ -150,6 +150,6 @@
     "preversion": "./scripts/preversion.sh",
     "version": "make clean all && ./scripts/update-changelog.js && git add CHANGELOG.md",
     "postversion": "./scripts/postversion.sh",
-    "prepublish": "npm run-script build"
+    "prepublish": "yarn run build"
   }
 }
