@@ -1,9 +1,9 @@
 'use strict';
 
 // AnnotationSync listens for messages from the sidebar app indicating that
-// annotations have been added or removed and relays them to Annotator.
+// annotations have been added or removed and relays them to Guest.
 //
-// It also listens for events from Annotator when new annotations are created or
+// It also listens for events from Guest when new annotations are created or
 // annotations successfully anchor and relays these to the sidebar app.
 function AnnotationSync(bridge, options) {
   var self = this;

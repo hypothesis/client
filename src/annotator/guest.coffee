@@ -34,7 +34,7 @@ normalizeURI = (uri, baseURI) ->
 module.exports = class Guest extends Delegator
   SHOW_HIGHLIGHTS_CLASS = 'annotator-highlights-always-on'
 
-  # Events to be bound on Annotator#element.
+  # Events to be bound on Delegator#element.
   events:
     ".annotator-hl click":               "onHighlightClick"
     ".annotator-hl mouseover":           "onHighlightMouseover"

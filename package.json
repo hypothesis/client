@@ -126,12 +126,6 @@
     "hammerjs": "./node_modules/hammerjs/hammer.js"
   },
   "browserify-shim": {
-    "annotator": {
-      "exports": "Annotator",
-      "depends": [
-        "jquery:jQuery"
-      ]
-    },
     "angular": {
       "depends": [
         "jquery"
