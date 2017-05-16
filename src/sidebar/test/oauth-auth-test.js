@@ -68,30 +68,29 @@ describe('oauth auth', function () {
         fakeHttp.post.returns(Promise.resolve({status: 500}));
       });
 
-      it('shows an error message to the user', function () {
+      function assertThatAccessTokenPromiseWasRejectedAnd(func) {
         return auth.tokenGetter().then(
           function onResolved () {
             assert(false, 'The Promise should have been rejected');
           },
-          function onRejected () {
-            assert.calledOnce(fakeFlash.error);
-            assert.equal(
-              fakeFlash.error.firstCall.args[0],
-              'You must reload the page to annotate.'
-            );
-          }
+          func
         );
+      }
+
+      it('shows an error message to the user', function () {
+        return assertThatAccessTokenPromiseWasRejectedAnd(function () {
+          assert.calledOnce(fakeFlash.error);
+          assert.equal(
+            fakeFlash.error.firstCall.args[0],
+            'You must reload the page to annotate.'
+          );
+        });
       });
 
       it('returns a rejected promise', function () {
-        return auth.tokenGetter().then(
-          function onResolved () {
-            assert(false, 'The Promise should have been rejected');
-          },
-          function onRejected (error) {
-            assert.equal(error.message, 'Failed to retrieve access token');
-          }
-        );
+        return assertThatAccessTokenPromiseWasRejectedAnd(function(error) {
+          assert.equal(error.message, 'Failed to retrieve access token');
+        });
       });
     });
 
