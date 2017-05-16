@@ -1,17 +1,16 @@
-Annotator = require('annotator')
 events = require('../../shared/bridge-events')
 
 proxyquire = require('proxyquire')
-Sidebar = proxyquire('../sidebar', {
-  'annotator': Annotator,
-})
+Sidebar = proxyquire('../sidebar', {})
 
 describe 'Sidebar', ->
   sandbox = sinon.sandbox.create()
   CrossFrame = null
   fakeCrossFrame = null
+  sidebarOptions = {pluginClasses: {}}
 
   createSidebar = (options={}) ->
+    options = Object.assign({}, sidebarOptions, options)
     element = document.createElement('div')
     return new Sidebar(element, options)
 
@@ -20,14 +19,14 @@ describe 'Sidebar', ->
     fakeCrossFrame.onConnect = sandbox.stub().returns(fakeCrossFrame)
     fakeCrossFrame.on = sandbox.stub().returns(fakeCrossFrame)
     fakeCrossFrame.call = sandbox.spy()
+    fakeCrossFrame.destroy = sandbox.stub()
 
     CrossFrame = sandbox.stub()
     CrossFrame.returns(fakeCrossFrame)
-    Annotator.Plugin.CrossFrame = CrossFrame
+    sidebarOptions.pluginClasses['CrossFrame'] = CrossFrame
 
   afterEach ->
     sandbox.restore()
-    delete Annotator.Plugin.CrossFrame
 
   describe 'crossframe listeners', ->
     emitEvent = (event, args...) ->
@@ -196,3 +195,14 @@ describe 'Sidebar', ->
         sidebar.show()
         sidebar.element.trigger(event)
         assert.isFalse(sidebar.isOpen())
+
+  describe 'destruction', ->
+    sidebar = null
+
+    beforeEach ->
+      sidebar = createSidebar({})
+
+    it 'the sidebar is destroyed and the frame is detached', ->
+      sidebar.destroy()
+      assert.called(fakeCrossFrame.destroy)
+      assert.equal(sidebar.frame[0].parentElement, null)

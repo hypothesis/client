@@ -1,7 +1,7 @@
 raf = require('raf')
 
-Annotator = require('annotator')
-$ = Annotator.$
+$ = require('jquery')
+Plugin = require('../plugin')
 
 scrollIntoView = require('scroll-into-view')
 
@@ -42,7 +42,7 @@ scrollToClosest = (anchors, direction) ->
   scrollIntoView(next.highlights[0])
 
 
-module.exports = class BucketBar extends Annotator.Plugin
+module.exports = class BucketBar extends Plugin
   # svg skeleton
   html: """
         <div class="annotator-bucket-bar">

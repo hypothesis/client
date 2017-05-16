@@ -43,6 +43,7 @@ module.exports = class Sidebar extends Host
       @onSignupRequest = serviceConfig.onSignupRequest
 
     this._setupSidebarEvents()
+    this._setupDocumentEvents()
 
   _setupDocumentEvents: ->
     sidebarTrigger(document.body, => this.show())

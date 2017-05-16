@@ -1,17 +1,14 @@
-Annotator = require('annotator')
-
 proxyquire = require('proxyquire')
-Host = proxyquire('../host', {
-  'annotator': Annotator,
-})
+Host = proxyquire('../host', {})
 
 describe 'Host', ->
   sandbox = sinon.sandbox.create()
   CrossFrame = null
   fakeCrossFrame = null
+  hostOptions = {pluginClasses: {}}
 
   createHost = (options={}, element=null) ->
-    options = Object.assign({app: '/base/annotator/test/empty.html'}, options)
+    options = Object.assign({app: '/base/annotator/test/empty.html'}, hostOptions, options)
     if !element
       element = document.createElement('div')
     return new Host(element, options)
@@ -27,11 +24,10 @@ describe 'Host', ->
 
     CrossFrame = sandbox.stub()
     CrossFrame.returns(fakeCrossFrame)
-    Annotator.Plugin.CrossFrame = CrossFrame
+    hostOptions.pluginClasses['CrossFrame'] = CrossFrame
 
   afterEach ->
     sandbox.restore()
-    delete Annotator.Plugin.CrossFrame
 
   describe 'widget visibility', ->
     it 'starts hidden', ->

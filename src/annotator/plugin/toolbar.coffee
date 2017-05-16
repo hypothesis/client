@@ -1,5 +1,5 @@
-Annotator = require('annotator')
-$ = Annotator.$
+Plugin = require('../plugin')
+$ = require('jquery')
 
 makeButton = (item) ->
   anchor = $('<button></button>')
@@ -12,7 +12,7 @@ makeButton = (item) ->
   button = $('<li></li>').append(anchor)
   return button[0]
 
-module.exports = class Toolbar extends Annotator.Plugin
+module.exports = class Toolbar extends Plugin
   HIDE_CLASS = 'annotator-hide'
 
   events:
