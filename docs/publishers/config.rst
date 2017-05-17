@@ -140,7 +140,7 @@ loads.
    .. option:: onLoginRequest
 
      ``function``. A JavaScript function that the Hypothesis client will
-     call in order to login (for example, when the user clicks a login button in
+     call in order to log in (for example, when the user clicks a log in button in
      the Hypothesis client's sidebar).
 
      This setting can only be set using :js:func:`window.hypothesisConfig`.
@@ -152,9 +152,9 @@ loads.
 
      No arguments are passed to the :option:`onLoginRequest` function.
 
-     The :option:`onLoginRequest` function should cause a login procedure for
-     the hosting page to be performed - for example by redirecting to a login
-     page, or by opening a popup login window. After a successful login the
+     The :option:`onLoginRequest` function should cause a log in procedure for
+     the hosting page to be performed - for example by redirecting to a log in
+     page, or by opening a popup log in window. After a successful log in the
      hosting page should reload the original page with a non-null
      :option:`grantToken` for the logged-in user in the :option:`services`
      configuration setting.
