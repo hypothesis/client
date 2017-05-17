@@ -11,9 +11,9 @@ module.exports = {
   /** The set of annotations was updated. */
   PUBLIC_ANNOTATION_COUNT_CHANGED: 'publicAnnotationCountChanged',
 
-  /** The sidebar is asking the annotator to do a partner site login.
-   *  (for example, pop up a login window). This is used when the client is
-   *  embedded in a partner site and a login button in the client is clicked.
+  /** The sidebar is asking the annotator to do a partner site log in
+   *  (for example, pop up a log in window). This is used when the client is
+   *  embedded in a partner site and a log in button in the client is clicked.
    */
   LOGIN_REQUESTED: 'loginRequested',
 
