@@ -4,6 +4,21 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+### Fixed
+
+- Fix refreshing access tokens when laptop suspends
+  ([#384](https://github.com/hypothesis/client/pull/384)).
+
+### Changed
+
+- Switch package management from npm to Yarn
+  ([#359](https://github.com/hypothesis/client/pull/359)).
+
+- Remove Annotator.js dependency
+  ([#380](https://github.com/hypothesis/client/pull/380)).
+
 ## [1.16.0] - 2017-05-16
 
 ### Changed
