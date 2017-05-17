@@ -18,7 +18,7 @@ module.exports = {
   LOGIN_REQUESTED: 'loginRequested',
 
   /**
-   * The sidebar is asking the annotator to do a parter site sign-up.
+   * The sidebar is asking the annotator to do a partner site sign-up.
    */
   SIGNUP_REQUESTED: 'signupRequested',
 
