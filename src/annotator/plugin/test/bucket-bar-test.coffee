@@ -1,6 +1,6 @@
 BucketBar = require('../bucket-bar')
 
-describe 'Annotator.BucketBar', ->
+describe 'BucketBar', ->
   createBucketBar = (options) ->
     element = document.createElement('div')
     new BucketBar(element, options || {})

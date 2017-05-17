@@ -3,7 +3,7 @@ proxyquire = require('proxyquire')
 Plugin = require('../../plugin')
 CrossFrame = null
 
-describe 'Annotator.Plugin.CrossFrame', ->
+describe 'CrossFrame', ->
   fakeDiscovery = null
   fakeBridge = null
   fakeAnnotationSync = null

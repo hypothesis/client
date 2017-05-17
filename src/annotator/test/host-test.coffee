@@ -14,7 +14,7 @@ describe 'Host', ->
     return new Host(element, options)
 
   beforeEach ->
-    # Disable Annotator's ridiculous logging.
+    # Disable any Host logging.
     sandbox.stub(console, 'log')
 
     fakeCrossFrame = {}
