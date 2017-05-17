@@ -23,8 +23,10 @@ node {
             withCredentials([
                 [$class: 'StringBinding', credentialsId: 'npm-token', variable: 'NPM_TOKEN']]) {
 
+                // Use `npm` rather than `yarn` for publishing.
+                // See https://github.com/yarnpkg/yarn/pull/3391.
                 sh "echo '//registry.npmjs.org/:_authToken=${env.NPM_TOKEN}' >> \$HOME/.npmrc"
-                sh "yarn publish"
+                sh "npm publish"
             }
         }
 
