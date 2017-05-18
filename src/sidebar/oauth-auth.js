@@ -11,10 +11,25 @@ var resolve = require('./util/url-util').resolve;
  * an opaque access token.
  */
 // @ngInject
-function auth($http, settings) {
+function auth($http, flash, settings) {
 
   var accessTokenPromise;
   var tokenUrl = resolve('token', settings.apiUrl);
+
+  /**
+   * Show an error message telling the user that the access token has expired.
+   */
+  function showAccessTokenExpiredErrorMessage(message) {
+    flash.error(
+      message,
+      'Hypothesis login lost',
+      {
+        extendedTimeOut: 0,
+        tapToDismiss: false,
+        timeOut: 0,
+      }
+    );
+  }
 
   /**
    * An object holding the details of an access token from the tokenUrl endpoint.
@@ -83,6 +98,9 @@ function auth($http, settings) {
       var tokenInfo = tokenInfoFrom(response);
       refreshAccessTokenBeforeItExpires(tokenInfo);
       accessTokenPromise = Promise.resolve(tokenInfo.accessToken);
+    }).catch(function() {
+      showAccessTokenExpiredErrorMessage(
+        'You must reload the page to continue annotating.');
     });
   }
 
@@ -119,6 +137,10 @@ function auth($http, settings) {
         accessTokenPromise = exchangeToken(grantToken).then(function (tokenInfo) {
           refreshAccessTokenBeforeItExpires(tokenInfo);
           return tokenInfo.accessToken;
+        }).catch(function(err) {
+          showAccessTokenExpiredErrorMessage(
+            'You must reload the page to annotate.');
+          throw err;
         });
       } else {
         accessTokenPromise = Promise.resolve(null);

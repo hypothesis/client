@@ -9,22 +9,30 @@ describe('oauth auth', function () {
   var auth;
   var nowStub;
   var fakeHttp;
+  var fakeFlash;
   var fakeSettings;
   var clock;
+  var successfulFirstAccessTokenPromise;
 
   beforeEach(function () {
     nowStub = sinon.stub(window.performance, 'now');
     nowStub.returns(300);
 
+    successfulFirstAccessTokenPromise = Promise.resolve({
+      status: 200,
+      data: {
+        access_token: 'firstAccessToken',
+        expires_in: DEFAULT_TOKEN_EXPIRES_IN_SECS,
+        refresh_token: 'firstRefreshToken',
+      },
+    });
+
     fakeHttp = {
-      post: sinon.stub().returns(Promise.resolve({
-        status: 200,
-        data: {
-          access_token: 'firstAccessToken',
-          expires_in: DEFAULT_TOKEN_EXPIRES_IN_SECS,
-          refresh_token: 'firstRefreshToken',
-        },
-      })),
+      post: sinon.stub().returns(successfulFirstAccessTokenPromise),
+    };
+
+    fakeFlash = {
+      error: sinon.stub(),
     };
 
     fakeSettings = {
@@ -35,7 +43,7 @@ describe('oauth auth', function () {
       }],
     };
 
-    auth = authService(fakeHttp, fakeSettings);
+    auth = authService(fakeHttp, fakeFlash, fakeSettings);
 
     clock = sinon.useFakeTimers();
   });
@@ -58,16 +66,35 @@ describe('oauth auth', function () {
       });
     });
 
-    it('should raise if an access token request fails', function () {
-      fakeHttp.post.returns(Promise.resolve({status: 500}));
-      return auth.tokenGetter().then(
-        function onResolved () {
-          assert(false, 'The Promise should have been rejected');
-        },
-        function onRejected (error) {
+    context('when the access token request fails', function() {
+      beforeEach('make access token requests fail', function () {
+        fakeHttp.post.returns(Promise.resolve({status: 500}));
+      });
+
+      function assertThatAccessTokenPromiseWasRejectedAnd(func) {
+        return auth.tokenGetter().then(
+          function onResolved () {
+            assert(false, 'The Promise should have been rejected');
+          },
+          func
+        );
+      }
+
+      it('shows an error message to the user', function () {
+        return assertThatAccessTokenPromiseWasRejectedAnd(function () {
+          assert.calledOnce(fakeFlash.error);
+          assert.equal(
+            fakeFlash.error.firstCall.args[0],
+            'You must reload the page to annotate.'
+          );
+        });
+      });
+
+      it('returns a rejected promise', function () {
+        return assertThatAccessTokenPromiseWasRejectedAnd(function(error) {
           assert.equal(error.message, 'Failed to retrieve access token');
-        }
-      );
+        });
+      });
     });
 
     it('should cache tokens for future use', function () {
@@ -104,7 +131,7 @@ describe('oauth auth', function () {
     });
 
     it('should return null if no grant token was provided', function () {
-      var auth = authService(fakeHttp, {
+      var auth = authService(fakeHttp, fakeFlash, {
         services: [{authority: 'publisher.org'}],
       });
       return auth.tokenGetter().then(function (token) {
@@ -188,6 +215,32 @@ describe('oauth auth', function () {
         .then(function () {
           assert.equal(fakeHttp.post.callCount, 1);
         });
+    });
+
+    context('when a refresh request fails', function() {
+      beforeEach('make refresh token requests fail', function () {
+        fakeHttp.post = function(url, queryString) {
+          if (queryString.indexOf('refresh_token') !== -1) {
+            return Promise.resolve({status: 500});
+          }
+          return Promise.resolve(successfulFirstAccessTokenPromise);
+        };
+      });
+
+      it('shows an error message to the user', function () {
+        function assertThatErrorMessageWasShown() {
+          assert.calledOnce(fakeFlash.error);
+          assert.equal(
+            fakeFlash.error.firstCall.args[0],
+            'You must reload the page to continue annotating.'
+          );
+        }
+
+        return auth.tokenGetter()
+          .then(expireAccessToken)
+          .then(function () { clock.tick(1); })
+          .then(assertThatErrorMessageWasShown);
+      });
     });
   });
 
