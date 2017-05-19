@@ -292,6 +292,67 @@ describe('hypothesisApp', function () {
     });
   });
 
+  describe('#showHelpPanel', function () {
+    context('when using a third-party service', function () {
+      context("when there's no onHelpRequest callback function", function () {
+        beforeEach('configure a service with no onHelpRequest', function () {
+          fakeServiceConfig.returns({});
+        });
+
+        it('does not send an event', function () {
+          createController().showHelpPanel();
+
+          assert.notCalled(fakeBridge.call);
+        });
+
+        it('shows the help panel', function () {
+          var ctrl = createController();
+
+          ctrl.showHelpPanel();
+
+          assert.isTrue(ctrl.helpPanel.visible);
+        });
+      });
+
+      context("when there's an onHelpRequest callback function", function () {
+        beforeEach('provide an onHelpRequest callback', function () {
+          fakeServiceConfig.returns({onHelpRequestProvided: true});
+        });
+
+        it('sends the HELP_REQUESTED event', function () {
+          createController().showHelpPanel();
+
+          assert.calledWith(fakeBridge.call, bridgeEvents.HELP_REQUESTED);
+        });
+
+        it('does not show the help panel', function () {
+          var ctrl = createController();
+
+          ctrl.showHelpPanel();
+
+          assert.isFalse(ctrl.helpPanel.visible);
+        });
+      });
+
+    });
+
+    context('when not using a third-party service', function () {
+      it('does not send an event', function () {
+        createController().showHelpPanel();
+
+        assert.notCalled(fakeBridge.call);
+      });
+
+      it('shows the help panel', function () {
+        var ctrl = createController();
+
+        ctrl.showHelpPanel();
+
+        assert.isTrue(ctrl.helpPanel.visible);
+      });
+    });
+  });
+
   describe('#login()', function () {
     it('shows the login dialog if not using a third-party service', function () {
       // If no third-party annotation service is in use then it should show the

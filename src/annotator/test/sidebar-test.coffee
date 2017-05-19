@@ -137,6 +137,15 @@ describe 'Sidebar', ->
 
         assert.called(onProfileRequest)
 
+    describe 'on HELP_REQUESTED event', ->
+      it 'calls the onHelpRequest callback function', ->
+        onHelpRequest = sandbox.stub()
+        sidebar = createSidebar(options={services: [{onHelpRequest: onHelpRequest}]})
+
+        emitEvent(events.HELP_REQUESTED)
+
+        assert.called(onHelpRequest)
+
   describe 'pan gestures', ->
     sidebar = null
 

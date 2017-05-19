@@ -33,6 +33,11 @@ module.exports = {
    */
   PROFILE_REQUESTED: 'profileRequested',
 
+  /**
+   * The sidebar is asking the annotator to open the partner site help page.
+   */
+  HELP_REQUESTED: 'helpRequested',
+
   // Events that the annotator sends to the sidebar
   // ----------------------------------------------
 };
