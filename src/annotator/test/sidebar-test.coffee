@@ -110,6 +110,15 @@ describe 'Sidebar', ->
         sidebar = createSidebar(options={services: [{}]})
         emitEvent(events.LOGIN_REQUESTED)
 
+    describe 'on LOGOUT_REQUESTED event', ->
+      it 'calls the onLogoutRequest callback function', ->
+        onLogoutRequest = sandbox.stub()
+        sidebar = createSidebar(options={services: [{onLogoutRequest: onLogoutRequest}]})
+
+        emitEvent(events.LOGOUT_REQUESTED)
+
+        assert.called(onLogoutRequest)
+
     describe 'on SIGNUP_REQUESTED event', ->
       it 'calls the onSignupRequest callback function', ->
         onSignupRequest = sandbox.stub()

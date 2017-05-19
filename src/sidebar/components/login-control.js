@@ -1,6 +1,7 @@
 'use strict';
 
 var persona = require('../filter/persona');
+var serviceConfig = require('../service-config');
 
 module.exports = {
   controllerAs: 'vm',
@@ -10,6 +11,18 @@ module.exports = {
     this.isThirdPartyUser = function() {
       return persona.isThirdPartyUser(this.auth.userid, settings.authDomain);
     };
+
+    this.shouldShowLogOutButton = function () {
+      if (this.auth.status !== 'logged-in') {
+        return false;
+      }
+      var service = serviceConfig(settings);
+      if (service && !service.onLogoutRequestProvided) {
+        return false;
+      }
+      return true;
+    };
+
   },
   bindings: {
     /**

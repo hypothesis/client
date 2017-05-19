@@ -1,6 +1,7 @@
 'use strict';
 
 var angular = require('angular');
+var proxyquire = require('proxyquire');
 
 var util = require('../../directive/test/util');
 
@@ -59,9 +60,19 @@ function thirdPartyUserPage() {
 }
 
 describe('loginControl', function () {
+  var fakeBridge;
+  var fakeServiceConfig = sinon.stub();
+  var fakeWindow;
+
   before(function () {
     angular.module('app', [])
-      .component('loginControl', require('../login-control'));
+      .component(
+        'loginControl',
+        proxyquire(
+          '../login-control',
+          {'../service-config': fakeServiceConfig}
+        )
+      );
   });
 
   beforeEach(function () {
@@ -74,6 +85,9 @@ describe('loginControl', function () {
       serviceUrl: fakeServiceUrl,
       settings: fakeSettings,
     });
+
+    fakeServiceConfig.reset();
+    fakeServiceConfig.returns(null);
   });
 
   describe('the user profile button', function() {
@@ -199,8 +213,24 @@ describe('loginControl', function () {
     });
 
     context('when a third-party user is logged in', function () {
-      it('does not show', function () {
-        assert.isNull(thirdPartyUserPage().logOutButton);
+      context("when there's no onLogoutRequest callback", function () {
+        beforeEach('provide a service with no onLogoutRequest', function () {
+          fakeServiceConfig.returns({});
+        });
+
+        it('does not show', function () {
+          assert.isNull(thirdPartyUserPage().logOutButton);
+        });
+      });
+
+      context("when there's an onLogoutRequest callback", function () {
+        beforeEach('provide an onLogoutRequest callback', function () {
+          fakeServiceConfig.returns({onLogoutRequestProvided: true});
+        });
+
+        it('does show', function () {
+          assert.isNotNull(thirdPartyUserPage().logOutButton);
+        });
       });
     });
   });

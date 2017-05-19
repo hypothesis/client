@@ -325,75 +325,113 @@ describe('hypothesisApp', function () {
   });
 
   describe('#logout()', function () {
-    it('calls session.logout()', function () {
-      var ctrl = createController();
-      ctrl.logout();
-      assert.called(fakeSession.logout);
+
+    // Tests shared by both of the contexts below.
+    function doSharedTests() {
+      it('prompts the user if there are drafts', function () {
+        fakeDrafts.count.returns(1);
+        var ctrl = createController();
+
+        ctrl.logout();
+
+        assert.equal(fakeWindow.confirm.callCount, 1);
+      });
+
+      it('emits "annotationDeleted" for each unsaved draft annotation', function () {
+        fakeDrafts.unsaved = sandbox.stub().returns(
+          ['draftOne', 'draftTwo', 'draftThree']
+        );
+        var ctrl = createController();
+        $rootScope.$emit = sandbox.stub();
+
+        ctrl.logout();
+
+        assert($rootScope.$emit.calledThrice);
+        assert.deepEqual(
+          $rootScope.$emit.firstCall.args, ['annotationDeleted', 'draftOne']);
+        assert.deepEqual(
+          $rootScope.$emit.secondCall.args, ['annotationDeleted', 'draftTwo']);
+        assert.deepEqual(
+          $rootScope.$emit.thirdCall.args, ['annotationDeleted', 'draftThree']);
+      });
+
+      it('discards draft annotations', function () {
+        var ctrl = createController();
+
+        ctrl.logout();
+
+        assert(fakeDrafts.discard.calledOnce);
+      });
+
+      it('does not emit "annotationDeleted" if the user cancels the prompt', function () {
+        var ctrl = createController();
+        fakeDrafts.count.returns(1);
+        $rootScope.$emit = sandbox.stub();
+        fakeWindow.confirm.returns(false);
+
+        ctrl.logout();
+
+        assert($rootScope.$emit.notCalled);
+      });
+
+      it('does not discard drafts if the user cancels the prompt', function () {
+        var ctrl = createController();
+        fakeDrafts.count.returns(1);
+        fakeWindow.confirm.returns(false);
+
+        ctrl.logout();
+
+        assert(fakeDrafts.discard.notCalled);
+      });
+
+      it('does not prompt if there are no drafts', function () {
+        var ctrl = createController();
+        fakeDrafts.count.returns(0);
+
+        ctrl.logout();
+
+        assert.equal(fakeWindow.confirm.callCount, 0);
+      });
+    }
+
+    context('when no third-party service is in use', function () {
+      doSharedTests();
+
+      it('calls session.logout()', function () {
+        var ctrl = createController();
+        ctrl.logout();
+        assert.called(fakeSession.logout);
+      });
     });
 
-    it('prompts the user if there are drafts', function () {
-      fakeDrafts.count.returns(1);
-      var ctrl = createController();
+    context('when a third-party service is in use', function () {
+      beforeEach('configure a third-party service to be in use', function() {
+        fakeServiceConfig.returns({});
+      });
 
-      ctrl.logout();
+      doSharedTests();
 
-      assert.equal(fakeWindow.confirm.callCount, 1);
-    });
+      it('sends LOGOUT_REQUESTED if a third-party service is in use', function () {
+        createController().logout();
 
-    it('emits "annotationDeleted" for each unsaved draft annotation', function () {
-      fakeDrafts.unsaved = sandbox.stub().returns(
-        ['draftOne', 'draftTwo', 'draftThree']
-      );
-      var ctrl = createController();
-      $rootScope.$emit = sandbox.stub();
+        assert.calledOnce(fakeBridge.call);
+        assert.calledWithExactly(fakeBridge.call, bridgeEvents.LOGOUT_REQUESTED);
+      });
 
-      ctrl.logout();
+      it('does not send LOGIN_REQUESTED if the user cancels the prompt', function () {
+        fakeDrafts.count.returns(1);
+        fakeWindow.confirm.returns(false);
 
-      assert($rootScope.$emit.calledThrice);
-      assert.deepEqual(
-        $rootScope.$emit.firstCall.args, ['annotationDeleted', 'draftOne']);
-      assert.deepEqual(
-        $rootScope.$emit.secondCall.args, ['annotationDeleted', 'draftTwo']);
-      assert.deepEqual(
-        $rootScope.$emit.thirdCall.args, ['annotationDeleted', 'draftThree']);
-    });
+        createController().logout();
 
-    it('discards draft annotations', function () {
-      var ctrl = createController();
+        assert.notCalled(fakeDrafts.discard);
+      });
 
-      ctrl.logout();
+      it('does not call session.logout()', function () {
+        createController().logout();
 
-      assert(fakeDrafts.discard.calledOnce);
-    });
-
-    it('does not emit "annotationDeleted" if the user cancels the prompt', function () {
-      var ctrl = createController();
-      fakeDrafts.count.returns(1);
-      $rootScope.$emit = sandbox.stub();
-      fakeWindow.confirm.returns(false);
-
-      ctrl.logout();
-
-      assert($rootScope.$emit.notCalled);
-    });
-
-    it('does not discard drafts if the user cancels the prompt', function () {
-      var ctrl = createController();
-      fakeDrafts.count.returns(1);
-      fakeWindow.confirm.returns(false);
-
-      ctrl.logout();
-
-      assert(fakeDrafts.discard.notCalled);
-    });
-
-    it('does not prompt if there are no drafts', function () {
-      var ctrl = createController();
-      fakeDrafts.count.returns(0);
-
-      ctrl.logout();
-
-      assert.equal(fakeWindow.confirm.callCount, 0);
+        assert.notCalled(fakeSession.logout);
+      });
     });
   });
 });

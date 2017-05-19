@@ -40,6 +40,7 @@ module.exports = class Sidebar extends Host
     serviceConfig = options.services?[0]
     if serviceConfig
       @onLoginRequest = serviceConfig.onLoginRequest
+      @onLogoutRequest = serviceConfig.onLogoutRequest
       @onSignupRequest = serviceConfig.onSignupRequest
 
     this._setupSidebarEvents()
@@ -71,6 +72,10 @@ module.exports = class Sidebar extends Host
     @crossframe.on(events.LOGIN_REQUESTED, =>
       if @onLoginRequest
         @onLoginRequest()
+    );
+    @crossframe.on(events.LOGOUT_REQUESTED, =>
+      if @onLogoutRequest
+        @onLogoutRequest()
     );
     @crossframe.on(events.SIGNUP_REQUESTED, =>
       if @onSignupRequest
