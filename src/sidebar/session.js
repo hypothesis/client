@@ -4,6 +4,7 @@ var angular = require('angular');
 
 var events = require('./events');
 var retryUtil = require('./retry-util');
+var serviceConfig = require('./service-config');
 
 var CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
@@ -63,10 +64,11 @@ function session($http, $q, $resource, $rootScope, analytics, annotationUI, auth
   // Return the authority from the first service defined in the settings.
   // Return null if there are no services defined in the settings.
   function getAuthority() {
-    if (Array.isArray(settings.services) && settings.services.length > 0) {
-      return settings.services[0].authority;
+    var service = serviceConfig(settings);
+    if (service === null) {
+      return null;
     }
-    return null;
+    return service.authority;
   }
 
   /**

@@ -1,6 +1,7 @@
 'use strict';
 
 var addAnalytics = require('./ga');
+var serviceConfig = require('./service-config');
 require('../shared/polyfills');
 
 var raven;
@@ -106,7 +107,7 @@ function processAppOpts() {
 }
 
 var authService;
-if (Array.isArray(settings.services)) {
+if (serviceConfig(settings)) {
   authService = require('./oauth-auth');
 } else {
   authService = require('./auth');
