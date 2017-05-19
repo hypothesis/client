@@ -6,25 +6,56 @@ var util = require('../../directive/test/util');
 
 function pageObject(element) {
   return {
-    unknownLoginText: function () {
-      return element[0].querySelector('.login-text').textContent;
-    },
-    loginText: function () {
-      return Array.from(element[0].querySelectorAll('.login-text a'))
-        .map(function (el) { return el.textContent; });
-    },
     menuLinks: function () {
       return Array.from(element[0].querySelectorAll('.login-control-menu .dropdown-menu a'))
                   .map(function (el) { return el.textContent; });
     },
-    disabledMenuItems: function () {
-      return Array.from(element[0].querySelectorAll('.login-control-menu .dropdown-menu__link--disabled'))
-        .map(function (el) { return el.textContent.trim(); });
-    },
     menuText: function () {
       return element[0].querySelector('span').textContent;
     },
+    userProfileButton: element[0].querySelector('.dropdown-menu__user-profile-btn'),
+    disabledUserProfileButton: element[0].querySelector('.dropdown-menu__disabled-user-profile-btn'),
+    accountSettingsButton: element[0].querySelector('.dropdown-menu__account-settings-btn'),
+    helpButton: element[0].querySelector('.dropdown-menu__help-btn'),
+    logOutButton: element[0].querySelector('.dropdown-menu__log-out-btn'),
   };
+}
+
+function createLoginControl(inputs) {
+  return util.createDirective(
+    document, 'loginControl', Object.assign({}, inputs));
+}
+
+function unknownAuthStatusPage() {
+  return pageObject(createLoginControl({
+    auth: {status: 'unknown'},
+    newStyle: true,
+  }));
+}
+
+function loggedOutPage() {
+  return pageObject(createLoginControl({
+    auth: {status: 'logged-out'},
+    newStyle: true,
+  }));
+}
+
+function firstPartyUserPage() {
+  return pageObject(createLoginControl({
+    auth: {username: 'someUsername', status: 'logged-in'},
+    newStyle: true,
+  }));
+}
+
+function thirdPartyUserPage() {
+  return pageObject(createLoginControl({
+    auth: {
+      userid: 'acct:someUsername@anotherFakeDomain',
+      username: 'someUsername',
+      status: 'logged-in',
+    },
+    newStyle: true,
+  }));
 }
 
 describe('loginControl', function () {
@@ -45,73 +76,132 @@ describe('loginControl', function () {
     });
   });
 
-  function createLoginControl(inputs) {
-    var defaultInputs = {};
+  describe('the user profile button', function() {
 
-    return util.createDirective(document, 'loginControl',
-      Object.assign(defaultInputs, inputs));
-  }
+    /**
+     * Return true if the user profile button is enabled, false if it's
+     * disabled, and null if no user profile button is rendered.
+     */
+    function isUserProfileButtonEnabled(page) {
+      var enabledUserProfileButton  = page.userProfileButton;
+      var disabledUserProfileButton = page.disabledUserProfileButton;
 
-  context('when user auth status is unknown', function () {
-    it('only shows the help menu option', function () {
-      var el = createLoginControl({
-        auth: {
-          status: 'unknown',
-        },
-        newStyle: true,
+      assert.isTrue(
+        enabledUserProfileButton === null || disabledUserProfileButton === null,
+        'It should never show both the enabled and disabled buttons at once'
+      );
+
+      if (enabledUserProfileButton) {
+        return true;
+      }
+
+      if (disabledUserProfileButton) {
+        return false;
+      }
+
+      return null;
+    }
+
+    context('when the user auth status is unknown', function () {
+      it('does not show the user profile button', function () {
+        assert.isNull(isUserProfileButtonEnabled(unknownAuthStatusPage()));
       });
-      var page = pageObject(el);
+    });
 
-      assert.equal(page.unknownLoginText(), '⋯');
-      assert.deepEqual(page.menuLinks(), ['Help']);
+    context('when the user is logged out', function () {
+      it('does not show the user profile button', function () {
+        assert.isNull(isUserProfileButtonEnabled(loggedOutPage()));
+      });
+    });
+
+    context('when a first-party user is logged in', function () {
+      it('shows the enabled user profile button', function () {
+        assert.isTrue(isUserProfileButtonEnabled(firstPartyUserPage()));
+      });
+    });
+
+    context('when a third-party user is logged in', function () {
+      it('shows the disabled user profile button', function () {
+        assert.isFalse(isUserProfileButtonEnabled(thirdPartyUserPage()));
+      });
     });
   });
 
-  context('when user is logged out', function () {
-    it('only shows the help menu option', function () {
-      var el = createLoginControl({
-        auth: {
-          status: 'logged-out',
-        },
-        newStyle: true,
+  describe('the account settings button', function () {
+    context('when the user auth status is unknown', function () {
+      it('does not show', function () {
+        assert.isNull(unknownAuthStatusPage().accountSettingsButton);
       });
-      var page = pageObject(el);
+    });
 
-      assert.deepEqual(page.loginText(), ['Sign up', 'Log in']);
-      assert.deepEqual(page.menuLinks(), ['Help']);
+    context('when the user is logged out', function () {
+      it('does not show', function () {
+        assert.isNull(loggedOutPage().accountSettingsButton);
+      });
+    });
+
+    context('when a first-party user is logged in', function () {
+      it('does show', function () {
+        assert.isNotNull(firstPartyUserPage().accountSettingsButton);
+      });
+    });
+
+    context('when a third-party user is logged in', function () {
+      it('does not show', function () {
+        assert.isNull(thirdPartyUserPage().accountSettingsButton);
+      });
     });
   });
 
-  context('when a H user is logged in', function () {
-    it('shows the complete list of menu options', function () {
-      var el = createLoginControl({
-        auth: {
-          username: 'someUsername',
-          status: 'logged-in',
-        },
-        newStyle: true,
+  describe('the help button', function () {
+    context('when the user auth status is unknown', function () {
+      it('does show', function () {
+        assert.isNotNull(unknownAuthStatusPage().helpButton);
       });
-      var page = pageObject(el);
+    });
 
-      assert.deepEqual(page.menuLinks(),
-        ['someUsername', 'Account settings', 'Help', 'Log out']);
+    context('when the user is logged out', function () {
+      it('does show', function () {
+        assert.isNotNull(loggedOutPage().helpButton);
+      });
+    });
+
+    context('when a first-party user is logged in', function () {
+      it('does show', function () {
+        assert.isNotNull(firstPartyUserPage().helpButton);
+      });
+    });
+
+    context('when a third-party user is logged in', function () {
+      it('does show', function () {
+        assert.isNotNull(thirdPartyUserPage().helpButton);
+      });
     });
   });
 
-  context('when a third party user is logged in', function () {
-    it('shows the help menu option and the username', function () {
-      var el = createLoginControl({
-        auth: {
-          userid: 'acct:someUsername@anotherFakeDomain',
-          username: 'someUsername',
-          status: 'logged-in',
-        },
-        newStyle: true,
+  describe('the log out button', function () {
+    context('when the user auth status is unknown', function () {
+      it('does not show', function () {
+        assert.isNull(unknownAuthStatusPage().logOutButton);
       });
-      var page = pageObject(el);
+    });
 
-      assert.deepEqual(page.menuLinks(), ['Help']);
-      assert.deepEqual(page.disabledMenuItems(), ['someUsername']);
+    context('when the user is logged out', function () {
+      it('does not show', function () {
+        assert.isNull(loggedOutPage().logOutButton);
+      });
+    });
+
+    context('when a first-party user is logged in', function () {
+      it('does show', function () {
+        assert.isNotNull(firstPartyUserPage().logOutButton);
+      });
+    });
+
+    context('when a third-party user is logged in', function () {
+      it('does not show', function () {
+        assert.isNull(thirdPartyUserPage().logOutButton);
+      });
     });
   });
 
