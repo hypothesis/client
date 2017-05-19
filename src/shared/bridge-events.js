@@ -28,6 +28,11 @@ module.exports = {
    */
   SIGNUP_REQUESTED: 'signupRequested',
 
+  /**
+   * The sidebar is asking the annotator to open the partner site profile page.
+   */
+  PROFILE_REQUESTED: 'profileRequested',
+
   // Events that the annotator sends to the sidebar
   // ----------------------------------------------
 };

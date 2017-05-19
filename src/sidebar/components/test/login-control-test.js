@@ -3,6 +3,7 @@
 var angular = require('angular');
 var proxyquire = require('proxyquire');
 
+var bridgeEvents = require('../../../shared/bridge-events');
 var util = require('../../directive/test/util');
 
 function pageObject(element) {
@@ -76,14 +77,18 @@ describe('loginControl', function () {
   });
 
   beforeEach(function () {
+    fakeBridge = { call: sinon.stub() };
     var fakeServiceUrl = sinon.stub().returns('someUrl');
     var fakeSettings = {
       authDomain: 'fakeDomain',
     };
+    fakeWindow = { open: sinon.stub() };
 
     angular.mock.module('app', {
+      bridge: fakeBridge,
       serviceUrl: fakeServiceUrl,
       settings: fakeSettings,
+      $window: fakeWindow,
     });
 
     fakeServiceConfig.reset();
@@ -132,11 +137,53 @@ describe('loginControl', function () {
       it('shows the enabled user profile button', function () {
         assert.isTrue(isUserProfileButtonEnabled(firstPartyUserPage()));
       });
+
+      it('does not send any events', function() {
+        firstPartyUserPage().userProfileButton.click();
+
+        assert.notCalled(fakeBridge.call);
+      });
+
+      it('opens a new tab', function() {
+        firstPartyUserPage().userProfileButton.click();
+
+        assert.calledOnce(fakeWindow.open);
+        assert.calledWithExactly(fakeWindow.open, 'someUrl');
+      });
     });
 
     context('when a third-party user is logged in', function () {
-      it('shows the disabled user profile button', function () {
-        assert.isFalse(isUserProfileButtonEnabled(thirdPartyUserPage()));
+      context("when there's no onProfileRequest callback", function () {
+        beforeEach('provide a service with no onProfileRequest', function () {
+          fakeServiceConfig.returns({});
+        });
+
+        it('shows the disabled user profile button', function () {
+          assert.isFalse(isUserProfileButtonEnabled(thirdPartyUserPage()));
+        });
+      });
+
+      context("when there's an onProfileRequest callback", function () {
+        beforeEach('provide an onProfileRequest callback', function () {
+          fakeServiceConfig.returns({onProfileRequestProvided: true});
+        });
+
+        it('shows the enabled user profile button', function () {
+          assert.isTrue(isUserProfileButtonEnabled(thirdPartyUserPage()));
+        });
+
+        it('sends the PROFILE_REQUESTED event', function() {
+          thirdPartyUserPage().userProfileButton.click();
+
+          assert.calledOnce(fakeBridge.call);
+          assert.calledWithExactly(fakeBridge.call, bridgeEvents.PROFILE_REQUESTED);
+        });
+
+        it('does not open a new tab', function() {
+          thirdPartyUserPage().userProfileButton.click();
+
+          assert.notCalled(fakeWindow.open);
+        });
       });
     });
   });

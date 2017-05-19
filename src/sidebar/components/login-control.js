@@ -1,13 +1,16 @@
 'use strict';
 
+var bridgeEvents = require('../../shared/bridge-events');
 var persona = require('../filter/persona');
 var serviceConfig = require('../service-config');
 
 module.exports = {
   controllerAs: 'vm',
+
   //@ngInject
-  controller: function (serviceUrl, settings) {
+  controller: function (bridge, serviceUrl, settings, $window) {
     this.serviceUrl = serviceUrl;
+
     this.isThirdPartyUser = function() {
       return persona.isThirdPartyUser(this.auth.userid, settings.authDomain);
     };
@@ -23,7 +26,23 @@ module.exports = {
       return true;
     };
 
+    this.shouldEnableProfileButton = function () {
+      var service = serviceConfig(settings);
+      if (service) {
+        return service.onProfileRequestProvided;
+      }
+      return true;
+    };
+
+    this.showProfile = function () {
+      if (this.isThirdPartyUser()) {
+        bridge.call(bridgeEvents.PROFILE_REQUESTED);
+        return;
+      }
+      $window.open(this.serviceUrl('user', {user: this.auth.username}));
+    };
   },
+
   bindings: {
     /**
      * An object representing the current authentication status.

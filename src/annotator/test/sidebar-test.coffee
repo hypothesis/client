@@ -128,6 +128,14 @@ describe 'Sidebar', ->
 
         assert.called(onSignupRequest)
 
+    describe 'on PROFILE_REQUESTED event', ->
+      it 'calls the onProfileRequest callback function', ->
+        onProfileRequest = sandbox.stub()
+        sidebar = createSidebar(options={services: [{onProfileRequest: onProfileRequest}]})
+
+        emitEvent(events.PROFILE_REQUESTED)
+
+        assert.called(onProfileRequest)
 
   describe 'pan gestures', ->
     sidebar = null
