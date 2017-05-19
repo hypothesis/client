@@ -4,24 +4,26 @@ var angular = require('angular');
 
 var util = require('../../directive/test/util');
 
-function PageObject(element) {
-  this.unknownLoginText = function () {
-    return element[0].querySelector('.login-text').textContent;
-  };
-  this.loginText = function () {
-    return Array.from(element[0].querySelectorAll('.login-text a'))
-      .map(function (el) { return el.textContent; });
-  };
-  this.menuLinks = function () {
-    return Array.from(element[0].querySelectorAll('.login-control-menu .dropdown-menu a'))
-      .map(function (el) { return el.textContent; });
-  };
-  this.disabledMenuItems = function () {
-    return Array.from(element[0].querySelectorAll('.login-control-menu .dropdown-menu__link--disabled'))
-      .map(function (el) { return el.textContent.trim(); });
-  };
-  this.menuText = function () {
-    return element[0].querySelector('span').textContent;
+function pageObject(element) {
+  return {
+    unknownLoginText: function () {
+      return element[0].querySelector('.login-text').textContent;
+    },
+    loginText: function () {
+      return Array.from(element[0].querySelectorAll('.login-text a'))
+        .map(function (el) { return el.textContent; });
+    },
+    menuLinks: function () {
+      return Array.from(element[0].querySelectorAll('.login-control-menu .dropdown-menu a'))
+                  .map(function (el) { return el.textContent; });
+    },
+    disabledMenuItems: function () {
+      return Array.from(element[0].querySelectorAll('.login-control-menu .dropdown-menu__link--disabled'))
+        .map(function (el) { return el.textContent.trim(); });
+    },
+    menuText: function () {
+      return element[0].querySelector('span').textContent;
+    },
   };
 }
 
@@ -58,10 +60,10 @@ describe('loginControl', function () {
         },
         newStyle: true,
       });
-      var pageObject = new PageObject(el);
+      var page = pageObject(el);
 
-      assert.equal(pageObject.unknownLoginText(), '⋯');
-      assert.deepEqual(pageObject.menuLinks(), ['Help']);
+      assert.equal(page.unknownLoginText(), '⋯');
+      assert.deepEqual(page.menuLinks(), ['Help']);
     });
   });
 
@@ -73,10 +75,10 @@ describe('loginControl', function () {
         },
         newStyle: true,
       });
-      var pageObject = new PageObject(el);
+      var page = pageObject(el);
 
-      assert.deepEqual(pageObject.loginText(), ['Sign up', 'Log in']);
-      assert.deepEqual(pageObject.menuLinks(), ['Help']);
+      assert.deepEqual(page.loginText(), ['Sign up', 'Log in']);
+      assert.deepEqual(page.menuLinks(), ['Help']);
     });
   });
 
@@ -89,9 +91,9 @@ describe('loginControl', function () {
         },
         newStyle: true,
       });
-      var pageObject = new PageObject(el);
+      var page = pageObject(el);
 
-      assert.deepEqual(pageObject.menuLinks(),
+      assert.deepEqual(page.menuLinks(),
         ['someUsername', 'Account settings', 'Help', 'Log out']);
     });
   });
@@ -106,10 +108,10 @@ describe('loginControl', function () {
         },
         newStyle: true,
       });
-      var pageObject = new PageObject(el);
+      var page = pageObject(el);
 
-      assert.deepEqual(pageObject.menuLinks(), ['Help']);
-      assert.deepEqual(pageObject.disabledMenuItems(), ['someUsername']);
+      assert.deepEqual(page.menuLinks(), ['Help']);
+      assert.deepEqual(page.disabledMenuItems(), ['someUsername']);
     });
   });
 
@@ -122,11 +124,11 @@ describe('loginControl', function () {
         },
         newStyle: false,
       });
-      var pageObject = new PageObject(el);
+      var page = pageObject(el);
 
-      assert.deepEqual(pageObject.menuLinks(),
+      assert.deepEqual(page.menuLinks(),
         ['Account', 'Help', 'My Annotations', 'Log out']);
-      assert.include(pageObject.menuText(), 'someUsername');
+      assert.include(page.menuText(), 'someUsername');
     });
   });
 
@@ -138,10 +140,10 @@ describe('loginControl', function () {
         },
         newStyle: false,
       });
-      var pageObject = new PageObject(el);
+      var page = pageObject(el);
 
-      assert.include(pageObject.menuText(), 'Log in');
-      assert.deepEqual(pageObject.menuLinks(), ['Help']);
+      assert.include(page.menuText(), 'Log in');
+      assert.deepEqual(page.menuLinks(), ['Help']);
     });
   });
 
@@ -153,10 +155,10 @@ describe('loginControl', function () {
         },
         newStyle: false,
       });
-      var pageObject = new PageObject(el);
+      var page = pageObject(el);
 
-      assert.equal(pageObject.menuText(), '⋯');
-      assert.deepEqual(pageObject.menuLinks(), ['Help']);
+      assert.equal(page.menuText(), '⋯');
+      assert.deepEqual(page.menuLinks(), ['Help']);
     });
   });
 });
