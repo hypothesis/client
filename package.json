@@ -60,7 +60,7 @@
     "inherits": "^2.0.1",
     "isparta": "^4.0.0",
     "istanbul": "^0.4.5",
-    "jquery": "1.11.1",
+    "jquery": "^3.2.1",
     "js-polyfills": "^0.1.16",
     "karma": "^1.1.0",
     "karma-browserify": "^5.0.5",
@@ -122,7 +122,8 @@
     ]
   },
   "browser": {
-    "hammerjs": "./node_modules/hammerjs/hammer.js"
+    "hammerjs": "./node_modules/hammerjs/hammer.js",
+    "jquery": "./node_modules/jquery/dist/jquery.slim.js"
   },
   "browserify-shim": {
     "angular": {
