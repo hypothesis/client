@@ -4,6 +4,19 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+### Changed
+
+- Do not let authors flag their own annotations.
+  ([#387](https://github.com/hypothesis/client/pull/387)).
+
+- Show an error message to the user when getting or refreshing an OAuth access
+  token fails ([#385](https://github.com/hypothesis/client/pull/385)).
+
+- Allow publishers to customize log out, profile and help links
+  ([#389](https://github.com/hypothesis/client/pull/389)).
+
 ## [1.17.0] - 2017-05-17
 
 ### Fixed
