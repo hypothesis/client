@@ -127,15 +127,15 @@ describe 'Sidebar', ->
       sidebar = createSidebar({})
 
     describe 'panstart event', ->
-      beforeEach ->
-        sandbox.stub(window, 'getComputedStyle').returns({marginLeft: '100px'})
+      it 'disables pointer events and transitions on the widget', ->
         sidebar.onPan({type: 'panstart'})
 
-      it 'disables pointer events and transitions on the widget', ->
         assert.isTrue(sidebar.frame.hasClass('annotator-no-transition'))
         assert.equal(sidebar.frame.css('pointer-events'), 'none')
 
       it 'captures the left margin as the gesture initial state', ->
+        sandbox.stub(window, 'getComputedStyle').returns({marginLeft: '100px'})
+        sidebar.onPan({type: 'panstart'})
         assert.equal(sidebar.gestureState.initial, '100')
 
     describe 'panend event', ->
