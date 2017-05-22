@@ -15,11 +15,11 @@ function pageObject(element) {
     menuText: function () {
       return element[0].querySelector('span').textContent;
     },
-    userProfileButton: element[0].querySelector('.dropdown-menu__user-profile-btn'),
-    disabledUserProfileButton: element[0].querySelector('.dropdown-menu__disabled-user-profile-btn'),
-    accountSettingsButton: element[0].querySelector('.dropdown-menu__account-settings-btn'),
-    helpButton: element[0].querySelector('.dropdown-menu__help-btn'),
-    logOutButton: element[0].querySelector('.dropdown-menu__log-out-btn'),
+    userProfileButton: element[0].querySelector('.js-user-profile-btn'  ),
+    disabledUserProfileButton: element[0].querySelector('.js-disabled-user-profile-btn'),
+    accountSettingsButton: element[0].querySelector('.js-account-settings-btn'),
+    helpButton: element[0].querySelector('.js-help-btn'),
+    logOutButton: element[0].querySelector('.js-log-out-btn'),
   };
 }
 
