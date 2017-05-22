@@ -40,7 +40,10 @@ module.exports = class Sidebar extends Host
     serviceConfig = options.services?[0]
     if serviceConfig
       @onLoginRequest = serviceConfig.onLoginRequest
+      @onLogoutRequest = serviceConfig.onLogoutRequest
       @onSignupRequest = serviceConfig.onSignupRequest
+      @onProfileRequest = serviceConfig.onProfileRequest
+      @onHelpRequest = serviceConfig.onHelpRequest
 
     this._setupSidebarEvents()
     this._setupDocumentEvents()
@@ -72,9 +75,21 @@ module.exports = class Sidebar extends Host
       if @onLoginRequest
         @onLoginRequest()
     );
+    @crossframe.on(events.LOGOUT_REQUESTED, =>
+      if @onLogoutRequest
+        @onLogoutRequest()
+    );
     @crossframe.on(events.SIGNUP_REQUESTED, =>
       if @onSignupRequest
         @onSignupRequest()
+    );
+    @crossframe.on(events.PROFILE_REQUESTED, =>
+      if @onProfileRequest
+        @onProfileRequest()
+    );
+    @crossframe.on(events.HELP_REQUESTED, =>
+      if @onHelpRequest
+        @onHelpRequest()
     );
 
     # Return this for chaining

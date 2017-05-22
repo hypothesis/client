@@ -110,6 +110,15 @@ describe 'Sidebar', ->
         sidebar = createSidebar(options={services: [{}]})
         emitEvent(events.LOGIN_REQUESTED)
 
+    describe 'on LOGOUT_REQUESTED event', ->
+      it 'calls the onLogoutRequest callback function', ->
+        onLogoutRequest = sandbox.stub()
+        sidebar = createSidebar(options={services: [{onLogoutRequest: onLogoutRequest}]})
+
+        emitEvent(events.LOGOUT_REQUESTED)
+
+        assert.called(onLogoutRequest)
+
     describe 'on SIGNUP_REQUESTED event', ->
       it 'calls the onSignupRequest callback function', ->
         onSignupRequest = sandbox.stub()
@@ -119,6 +128,23 @@ describe 'Sidebar', ->
 
         assert.called(onSignupRequest)
 
+    describe 'on PROFILE_REQUESTED event', ->
+      it 'calls the onProfileRequest callback function', ->
+        onProfileRequest = sandbox.stub()
+        sidebar = createSidebar(options={services: [{onProfileRequest: onProfileRequest}]})
+
+        emitEvent(events.PROFILE_REQUESTED)
+
+        assert.called(onProfileRequest)
+
+    describe 'on HELP_REQUESTED event', ->
+      it 'calls the onHelpRequest callback function', ->
+        onHelpRequest = sandbox.stub()
+        sidebar = createSidebar(options={services: [{onHelpRequest: onHelpRequest}]})
+
+        emitEvent(events.HELP_REQUESTED)
+
+        assert.called(onHelpRequest)
 
   describe 'pan gestures', ->
     sidebar = null

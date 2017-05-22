@@ -119,6 +119,17 @@ function HypothesisAppController(
     scrollToView('share-dialog');
   };
 
+  this.showHelpPanel = function () {
+    var service = serviceConfig(settings) || {};
+    if (service.onHelpRequestProvided) {
+      // Let the host page handle the help request.
+      bridge.call(bridgeEvents.HELP_REQUESTED);
+      return;
+    }
+
+    this.helpPanel.visible = true;
+  };
+
   // Prompt to discard any unsaved drafts.
   var promptToLogout = function () {
     // TODO - Replace this with a UI which doesn't look terrible.
@@ -142,6 +153,13 @@ function HypothesisAppController(
       $rootScope.$emit(events.ANNOTATION_DELETED, draft);
     });
     drafts.discard();
+
+    if (serviceConfig(settings)) {
+      // Let the host page handle the signup request
+      bridge.call(bridgeEvents.LOGOUT_REQUESTED);
+      return;
+    }
+
     this.accountDialog.visible = false;
     session.logout();
   };

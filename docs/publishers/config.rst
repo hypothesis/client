@@ -159,10 +159,46 @@ loads.
      :option:`grantToken` for the logged-in user in the :option:`services`
      configuration setting.
 
+   .. option:: onLogoutRequest
+
+     ``function``. A JavaScript function that the Hypothesis client will
+     call in order to log out (for example, when the user clicks a log out
+     button in the Hypothesis client's sidebar).
+
+     This setting can only be set using :js:func:`window.hypothesisConfig`.
+
+     If the hosting page provides an :option:`onLogoutRequest` function then
+     the Hypothesis client will call this function instead of doing its usual
+     procedure for logging out of the public service at
+     `hypothes.is <https://hypothes.is/>`_.
+
+     No arguments are passed to the :option:`onLogoutRequest` function.
+
+     The :option:`onLogoutRequest` function should cause a log out procedure
+     for the hosting page to be performed. After a successful log out the
+     hosting page should reload the original page with no :option:`grantToken`
+     in the :option:`services` configuration setting.
+
    .. option:: onSignupRequest
 
      ``function``. A JavaScript function that will be called when the user clicks
      the "Sign up" link in the sidebar. No arguments are passed and the return
+     value is unused.
+
+     This setting can only be set using :js:func:`window.hypothesisConfig`.
+
+   .. option:: onProfileRequest
+
+     ``function``. A JavaScript function that will be called when the user clicks
+     the user profile (user name) link in the sidebar. No arguments are passed
+     and the return value is unused.
+
+     This setting can only be set using :js:func:`window.hypothesisConfig`.
+
+   .. option:: onHelpRequest
+
+     ``function``. A JavaScript function that will be called when the user clicks
+     the "Help" link in the sidebar. No arguments are passed and the return
      value is unused.
 
      This setting can only be set using :js:func:`window.hypothesisConfig`.

@@ -17,10 +17,26 @@ module.exports = {
    */
   LOGIN_REQUESTED: 'loginRequested',
 
+  /** The sidebar is asking the annotator to do a partner site log out.
+   *  This is used when the client is embedded in a partner site and a log out
+   *  button in the client is clicked.
+   */
+  LOGOUT_REQUESTED: 'logoutRequested',
+
   /**
    * The sidebar is asking the annotator to do a partner site sign-up.
    */
   SIGNUP_REQUESTED: 'signupRequested',
+
+  /**
+   * The sidebar is asking the annotator to open the partner site profile page.
+   */
+  PROFILE_REQUESTED: 'profileRequested',
+
+  /**
+   * The sidebar is asking the annotator to open the partner site help page.
+   */
+  HELP_REQUESTED: 'helpRequested',
 
   // Events that the annotator sends to the sidebar
   // ----------------------------------------------
