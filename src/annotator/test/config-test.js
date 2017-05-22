@@ -1,6 +1,7 @@
 'use strict';
 
 var config = require('../config');
+var unroll = require('../../shared/test/util').unroll;
 
 describe('annotator configuration', function () {
   var fakeScriptConfig;
@@ -71,4 +72,15 @@ describe('annotator configuration', function () {
       annotations: '456',
     });
   });
+
+  unroll('migrates legacy config keys', function (testCase) {
+    fakeScriptConfig = JSON.stringify(testCase.config);
+    assert.deepEqual(config(fakeWindowBase), testCase.expectedConfig);
+  }, [{
+    config: { showHighlights: true },
+    expectedConfig: { app: 'app.html', showHighlights: 'always' },
+  },{
+    config: { showHighlights: false },
+    expectedConfig: { app: 'app.html', showHighlights: 'never' },
+  }]);
 });
