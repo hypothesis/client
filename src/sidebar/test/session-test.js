@@ -1,6 +1,7 @@
 'use strict';
 
 var angular = require('angular');
+var proxyquire = require('proxyquire');
 
 var events = require('../events');
 
@@ -14,6 +15,7 @@ describe('session', function () {
   var fakeAuth;
   var fakeFlash;
   var fakeRaven;
+  var fakeServiceConfig = sinon.stub();
   var fakeSettings;
   var fakeStore;
   var sandbox;
@@ -21,7 +23,10 @@ describe('session', function () {
 
   before(function () {
     angular.module('h', ['ngResource'])
-      .service('session', require('../session'));
+      .service(
+        'session',
+        proxyquire('../session', {'./service-config': fakeServiceConfig})
+      );
   });
 
   beforeEach(function () {
@@ -53,6 +58,8 @@ describe('session', function () {
         update: sandbox.stub().returns(Promise.resolve({})),
       },
     };
+    fakeServiceConfig.reset();
+    fakeServiceConfig.returns(null);
     fakeSettings = {
       serviceUrl: 'https://test.hypothes.is/root/',
     };
@@ -173,10 +180,10 @@ describe('session', function () {
 
     context('when the host page provides an OAuth grant token', function () {
       beforeEach(function () {
-        fakeSettings.services = [{
+        fakeServiceConfig.returns({
           authority: 'publisher.org',
           grantToken: 'a.jwt.token',
-        }];
+        });
         fakeStore.profile.read.returns(Promise.resolve({
           userid: 'acct:user@publisher.org',
         }));
@@ -271,10 +278,10 @@ describe('session', function () {
     });
 
     it('does not clear the access token when the host page provides a grant token', function () {
-      fakeSettings.services = [{
+      fakeServiceConfig.returns({
         authority: 'publisher.org',
         grantToken: 'a.jwt.token',
-      }];
+      });
 
       session.update({userid: 'different-user', csrf: 'dummytoken'});
 

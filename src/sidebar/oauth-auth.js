@@ -3,6 +3,7 @@
 var queryString = require('query-string');
 
 var resolve = require('./util/url-util').resolve;
+var serviceConfig = require('./service-config');
 
 /**
  * OAuth-based authentication service used for publisher accounts.
@@ -127,11 +128,7 @@ function auth($http, flash, settings) {
 
   function tokenGetter() {
     if (!accessTokenPromise) {
-      var grantToken;
-
-      if (Array.isArray(settings.services) && settings.services.length > 0) {
-        grantToken = settings.services[0].grantToken;
-      }
+      var grantToken = (serviceConfig(settings) || {}).grantToken;
 
       if (grantToken) {
         accessTokenPromise = exchangeToken(grantToken).then(function (tokenInfo) {
