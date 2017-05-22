@@ -72,17 +72,20 @@ loads.
 .. option:: showHighlights
 
    ``String|Boolean``. Controls whether the in-document highlights are shown by default.
-   (Default: ``"always"``). Enum with the following values:
+   (Default: ``"always"``).
 
-   ``"always"`` - Highlights are always shown by default.
+   ``true`` or ``"always"`` - Highlights are always shown by default.
 
-   ``"never"`` - Highlights are never shown by default, the user must explicitly
+   ``false`` or ``"never"`` - Highlights are never shown by default, the user must explicitly
    enable them.
 
    ``"whenSidebarOpen"`` - Highlights are only shown when the sidebar is open.
 
-   For backwards compatibility, this value can also be a boolean where ``true``
-   means ``"always"`` and ``false`` means ``"never"``.
+   .. warning::
+
+      The "always", "never" and "whenSidebarOpen" values are currently still
+      experimental and may change in future. ``true`` and ``false`` values
+      are the stable API.
 
 .. option:: services
 
