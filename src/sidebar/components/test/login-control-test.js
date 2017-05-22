@@ -15,8 +15,7 @@ function pageObject(element) {
     menuText: function () {
       return element[0].querySelector('span').textContent;
     },
-    userProfileButton: element[0].querySelector('.js-user-profile-btn'  ),
-    disabledUserProfileButton: element[0].querySelector('.js-disabled-user-profile-btn'),
+    userProfileButton: element[0].querySelector('.js-user-profile-btn'),
     accountSettingsButton: element[0].querySelector('.js-account-settings-btn'),
     helpButton: element[0].querySelector('.js-help-btn'),
     logOutButton: element[0].querySelector('.js-log-out-btn'),
@@ -102,23 +101,15 @@ describe('loginControl', function () {
      * disabled, and null if no user profile button is rendered.
      */
     function isUserProfileButtonEnabled(page) {
-      var enabledUserProfileButton  = page.userProfileButton;
-      var disabledUserProfileButton = page.disabledUserProfileButton;
+      if (page.userProfileButton === null) {
+        return null;
+      }
 
-      assert.isTrue(
-        enabledUserProfileButton === null || disabledUserProfileButton === null,
-        'It should never show both the enabled and disabled buttons at once'
-      );
-
-      if (enabledUserProfileButton) {
+      if (page.userProfileButton.classList.contains('is-enabled')) {
         return true;
       }
 
-      if (disabledUserProfileButton) {
-        return false;
-      }
-
-      return null;
+      return false;
     }
 
     context('when the user auth status is unknown', function () {
