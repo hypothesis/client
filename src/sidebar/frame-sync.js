@@ -177,11 +177,11 @@ function FrameSync($rootScope, $window, Discovery, annotationUI, bridge) {
       // if doi available as highwire or dc meta, include in search
 
       if ( info.metadata && info.metadata.highwire && info.metadata.highwire.doi ) {
-        searchUris = searchUris.concat('doi:' + info.metadata.highwire.doi[0]);
+        searchUris.push('doi:' + info.metadata.highwire.doi[0]);
       }
 
       if ( info.metadata && info.metadata.dc && info.metadata.dc.doi)  {
-        searchUris = searchUris.concat('doi:' + info.metadata.dc.doi[0]);
+        searchUris.push('doi:' + info.metadata.dc.doi[0]);
       }
 
       annotationUI.connectFrame({
