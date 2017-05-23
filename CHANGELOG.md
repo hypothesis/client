@@ -4,6 +4,16 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+### Changed
+
+- Reduce client size slightly by switching to jQuery slim build
+  ([#391](https://github.com/hypothesis/client/pull/391)).
+
+- Add config option to show highlights only when sidebar is open
+  ([#392](https://github.com/hypothesis/client/pull/392)).
+
 ## [1.18.0] - 2017-05-22
 
 ### Changed
