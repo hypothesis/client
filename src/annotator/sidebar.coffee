@@ -190,6 +190,9 @@ module.exports = class Sidebar extends Host
       .removeClass('h-icon-chevron-left')
       .addClass('h-icon-chevron-right')
 
+    if @options.showHighlights == 'whenSidebarOpen'
+      @setVisibleHighlights(true)
+
   hide: ->
     @frame.css 'margin-left': ''
     @frame.addClass 'annotator-collapsed'
@@ -198,6 +201,9 @@ module.exports = class Sidebar extends Host
       @toolbar.find('[name=sidebar-toggle]')
       .removeClass('h-icon-chevron-right')
       .addClass('h-icon-chevron-left')
+
+    if @options.showHighlights == 'whenSidebarOpen'
+      @setVisibleHighlights(false)
 
   isOpen: ->
     !@frame.hasClass('annotator-collapsed')

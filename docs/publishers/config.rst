@@ -71,8 +71,21 @@ loads.
 
 .. option:: showHighlights
 
-   ``Boolean``. Controls whether the in-document highlights are shown by default.
-   (Default: ``true``.)
+   ``String|Boolean``. Controls whether the in-document highlights are shown by default.
+   (Default: ``"always"``).
+
+   ``true`` or ``"always"`` - Highlights are always shown by default.
+
+   ``false`` or ``"never"`` - Highlights are never shown by default, the user must explicitly
+   enable them.
+
+   ``"whenSidebarOpen"`` - Highlights are only shown when the sidebar is open.
+
+   .. warning::
+
+      The "always", "never" and "whenSidebarOpen" values are currently still
+      experimental and may change in future. ``true`` and ``false`` values
+      are the stable API.
 
 .. option:: services
 

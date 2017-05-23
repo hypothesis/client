@@ -53,8 +53,8 @@ module.exports = class Host extends Guest
       # Initialize tool state.
       if options.showHighlights == undefined
         # Highlights are on by default.
-        options.showHighlights = true
-      this.setVisibleHighlights(options.showHighlights)
+        options.showHighlights = 'always'
+      this.setVisibleHighlights(options.showHighlights == 'always')
 
       # Show the UI
       @frame.css('display', '')

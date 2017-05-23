@@ -232,3 +232,27 @@ describe 'Sidebar', ->
       sidebar.destroy()
       assert.called(fakeCrossFrame.destroy)
       assert.equal(sidebar.frame[0].parentElement, null)
+
+  describe '#show', ->
+
+    it 'shows highlights if "showHighlights" is set to "whenSidebarOpen"', ->
+      sidebar = createSidebar({ showHighlights: 'whenSidebarOpen' })
+      assert.isFalse sidebar.visibleHighlights
+      sidebar.show()
+      assert.isTrue sidebar.visibleHighlights
+
+    it 'does not show highlights otherwise', ->
+      sidebar = createSidebar({ showHighlights: 'never' })
+      assert.isFalse sidebar.visibleHighlights
+      sidebar.show()
+      assert.isFalse sidebar.visibleHighlights
+
+  describe '#hide', ->
+
+    it 'hides highlights if "showHighlights" is set to "whenSidebarOpen"', ->
+      sidebar = createSidebar({ showHighlights: 'whenSidebarOpen' })
+
+      sidebar.show()
+      sidebar.hide()
+
+      assert.isFalse sidebar.visibleHighlights
