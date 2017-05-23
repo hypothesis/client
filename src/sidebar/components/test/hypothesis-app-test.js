@@ -472,20 +472,20 @@ describe('hypothesisApp', function () {
 
       doSharedTests();
 
-      it('sends LOGOUT_REQUESTED if a third-party service is in use', function () {
+      it('sends LOGOUT_REQUESTED', function () {
         createController().logout();
 
         assert.calledOnce(fakeBridge.call);
         assert.calledWithExactly(fakeBridge.call, bridgeEvents.LOGOUT_REQUESTED);
       });
 
-      it('does not send LOGIN_REQUESTED if the user cancels the prompt', function () {
+      it('does not send LOGOUT_REQUESTED if the user cancels the prompt', function () {
         fakeDrafts.count.returns(1);
         fakeWindow.confirm.returns(false);
 
         createController().logout();
 
-        assert.notCalled(fakeDrafts.discard);
+        assert.notCalled(fakeBridge.call);
       });
 
       it('does not call session.logout()', function () {
