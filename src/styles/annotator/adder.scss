@@ -1,6 +1,14 @@
 $adder-transition-duration: 80ms;
 
+// Main class for the root element of the "adder" toolbar that appears when the
+// user makes a text selection.
 .annotator-adder {
+
+  // Reset all inherited properties to their initial values. This prevents CSS
+  // property values from the host page being inherited by elements of the
+  // Adder, even when using Shadow DOM.
+  all: initial;
+
   // Adder entry animation settings
   animation-duration: $adder-transition-duration;
   animation-timing-function: ease-in;
