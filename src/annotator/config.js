@@ -10,7 +10,7 @@ var docs = 'https://h.readthedocs.io/en/latest/embedding.html';
  *
  * @param {Window} window_ - The Window object to read config from.
  */
-function config(window_) {
+function configFrom(window_) {
   var options = {
     app: window_.
       document.querySelector('link[type="application/annotator+html"]').href,
@@ -54,4 +54,4 @@ function config(window_) {
   return options;
 }
 
-module.exports = config;
+module.exports = configFrom;
