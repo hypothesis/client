@@ -5,13 +5,13 @@ describe 'Host', ->
   sandbox = sinon.sandbox.create()
   CrossFrame = null
   fakeCrossFrame = null
-  hostOptions = {pluginClasses: {}}
+  hostConfig = {pluginClasses: {}}
 
-  createHost = (options={}, element=null) ->
-    options = Object.assign({app: '/base/annotator/test/empty.html'}, hostOptions, options)
+  createHost = (config={}, element=null) ->
+    config = Object.assign({app: '/base/annotator/test/empty.html'}, hostConfig, config)
     if !element
       element = document.createElement('div')
-    return new Host(element, options)
+    return new Host(element, config)
 
   beforeEach ->
     # Disable any Host logging.
@@ -24,7 +24,7 @@ describe 'Host', ->
 
     CrossFrame = sandbox.stub()
     CrossFrame.returns(fakeCrossFrame)
-    hostOptions.pluginClasses['CrossFrame'] = CrossFrame
+    hostConfig.pluginClasses['CrossFrame'] = CrossFrame
 
   afterEach ->
     sandbox.restore()
@@ -67,7 +67,7 @@ describe 'Host', ->
       }])
       assert.notCalled(frame.contentWindow.focus)
 
-  describe 'options', ->
+  describe 'config', ->
     it 'disables highlighting if showHighlights: false is given', (done) ->
       host = createHost(showHighlights: false)
       host.on 'panelReady', ->
@@ -82,7 +82,7 @@ describe 'Host', ->
         done()
       host.publish('panelReady')
 
-    it 'passes options to the sidebar iframe', ->
+    it 'passes config to the sidebar iframe', ->
       appURL = new URL('/base/annotator/test/empty.html', window.location.href)
       host = createHost({annotations: '1234'})
       configStr = encodeURIComponent(JSON.stringify({annotations: '1234'}))

@@ -52,7 +52,7 @@ describe('annotator.config', function() {
       document.head.removeChild(link);
     });
 
-    it("returns the <link>'s href as options.app", function() {
+    it("returns the <link>'s href as config.app", function() {
       assert.equal(configFrom(window).app, link.href);
     });
   });
@@ -76,14 +76,14 @@ describe('annotator.config', function() {
   });
 
   context('when settings() returns a non-empty object', function() {
-    it('reads the setting into the returned options', function() {
+    it('reads the setting into the returned config', function() {
       // configFrom() just blindly adds any key: value settings that settings()
-      // returns into the returns options object.
+      // returns into the returned config object.
       fakeSettings.returns({foo: 'bar'});
 
-      var options = configFrom(fakeWindow());
+      var config = configFrom(fakeWindow());
 
-      assert.equal(options.foo, 'bar');
+      assert.equal(config.foo, 'bar');
     });
   });
 
@@ -104,13 +104,13 @@ describe('annotator.config', function() {
   });
 
   context("when there's a window.hypothesisConfig() function", function() {
-    it('reads arbitrary settings from hypothesisConfig() into options', function() {
+    it('reads arbitrary settings from hypothesisConfig() into config', function() {
       var window_ = fakeWindow();
       window_.hypothesisConfig = sinon.stub().returns({foo: 'bar'});
 
-      var options = configFrom(window_);
+      var config = configFrom(window_);
 
-      assert.equal(options.foo, 'bar');
+      assert.equal(config.foo, 'bar');
     });
 
     specify('hypothesisConfig() settings override js-hypothesis-config ones', function() {
@@ -119,20 +119,20 @@ describe('annotator.config', function() {
         foo: 'fooFromHypothesisConfigFunc'});
       fakeSettings.returns({foo: 'fooFromJSHypothesisConfigObj'});
 
-      var options = configFrom(window_);
+      var config = configFrom(window_);
 
-      assert.equal(options.foo, 'fooFromHypothesisConfigFunc');
+      assert.equal(config.foo, 'fooFromHypothesisConfigFunc');
     });
 
     context('if hypothesisConfig() returns a non-object value', function() {
-      it("doesn't add anything into the options", function() {
+      it("doesn't add anything into the config", function() {
         var window_ = fakeWindow();
         window_.hypothesisConfig = sinon.stub().returns(42);
 
-        var options = configFrom(window_);
+        var config = configFrom(window_);
 
-        delete options.app; // We don't care about options.app for this test.
-        assert.deepEqual({}, options);
+        delete config.app; // We don't care about config.app for this test.
+        assert.deepEqual({}, config);
       });
     });
   });
@@ -162,7 +162,7 @@ describe('annotator.config', function() {
         out:  'never',
       },
       // It adds any arbitrary string value for showHighlights to the
-      // returned options, unmodified.
+      // returned config, unmodified.
       {
         name: 'passes arbitrary strings through unmodified',
         in:   'foo',
@@ -172,9 +172,9 @@ describe('annotator.config', function() {
       it(test.name, function() {
         fakeSettings.returns({showHighlights: test.in});
 
-        var options = configFrom(fakeWindow());
+        var config = configFrom(fakeWindow());
 
-        assert.equal(options.showHighlights, test.out);
+        assert.equal(config.showHighlights, test.out);
       });
     });
   });
@@ -194,7 +194,7 @@ describe('annotator.config', function() {
       });
     });
 
-    it('blindly adds the properties of the object to the options', function() {
+    it('blindly adds the properties of the object to the config', function() {
       assert.equal(configFrom(fakeWindow()).foo, 'bar');
     });
 

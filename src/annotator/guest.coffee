@@ -55,7 +55,7 @@ module.exports = class Guest extends Delegator
   html:
     adder: '<hypothesis-adder></hypothesis-adder>'
 
-  constructor: (element, options) ->
+  constructor: (element, config) ->
     super
 
     this.adder = $(this.html.adder).appendTo(@element).hide()
