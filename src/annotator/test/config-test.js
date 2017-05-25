@@ -1,86 +1,216 @@
 'use strict';
 
-var config = require('../config');
-var unroll = require('../../shared/test/util').unroll;
+var proxyquire = require('proxyquire');
 
-describe('annotator configuration', function () {
-  var fakeScriptConfig;
+var fakeSettings = sinon.stub();
+var fakeExtractAnnotationQuery = {};
 
-  function fakeQuerySelector(selector) {
-    if (selector === 'link[type="application/annotator+html"]') {
-      return {href: 'app.html'};
-    } else if (selector === 'script.js-hypothesis-config' &&
-               fakeScriptConfig) {
-      return {textContent: fakeScriptConfig};
-    } else {
-      return null;
-    }
-  }
+var config = proxyquire('../config', {
+  '../shared/settings': fakeSettings,
+  './util/extract-annotation-query': fakeExtractAnnotationQuery,
+});
+var sandbox = sinon.sandbox.create();
 
-  var fakeWindowBase = {
+function fakeWindow() {
+  return {
     document: {
-      querySelector: fakeQuerySelector,
-      querySelectorAll: function (selector) {
-        var match = fakeQuerySelector(selector);
-        return match ? [match] : [];
-      },
+      querySelector: sinon.stub().returns({href: 'LINK_HREF'}),
     },
-    location: {hash: ''},
+    location: {href: 'LOCATION_HREF'},
   };
+}
 
-  beforeEach(function () {
-    fakeScriptConfig = '';
+describe('annotator.config', function() {
+  beforeEach('stub console.warn()', function() {
+    sandbox.stub(console, 'warn');
   });
 
-  it('reads the app src from the link tag', function () {
-    var linkEl = document.createElement('link');
-    linkEl.type = 'application/annotator+html';
-    linkEl.href = 'https://test.hypothes.is/app.html';
-    document.head.appendChild(linkEl);
-    assert.deepEqual(config(window), {
-      app: linkEl.href,
-    });
-    document.head.removeChild(linkEl);
+  beforeEach('reset fakeSettings', function() {
+    fakeSettings.reset();
+    fakeSettings.returns({});
   });
 
-  it('reads the #annotation query fragment', function () {
-    var fakeWindow = Object.assign({}, fakeWindowBase, {
-      location: {href:'https://foo.com/#annotations:456'},
+  beforeEach('reset fakeExtractAnnotationQuery', function() {
+    fakeExtractAnnotationQuery.extractAnnotationQuery = sinon.stub();
+  });
+
+  afterEach('reset the sandbox', function() {
+    sandbox.restore();
+  });
+
+  context("when there's an application/annotator+html <link>", function() {
+    var link;
+
+    beforeEach('add an application/annotator+html <link>', function() {
+      link = document.createElement('link');
+      link.type = 'application/annotator+html';
+      link.href = 'http://example.com/link';
+      document.head.appendChild(link);
     });
-    assert.deepEqual(config(fakeWindow), {
-      app: 'app.html',
-      annotations: '456',
+
+    afterEach('tidy up the link', function() {
+      document.head.removeChild(link);
+    });
+
+    it("returns the <link>'s href as options.app", function() {
+      assert.equal(config(window).app, link.href);
     });
   });
 
-  it('merges the config from hypothesisConfig()', function () {
-    var fakeWindow = Object.assign({}, fakeWindowBase, {
-      hypothesisConfig: function () {
-        return {foo: true};
+  context("when there's no application/annotator+html <link>", function() {
+    it('throws a TypeError', function() {
+      var window_ = fakeWindow();
+      window_.document.querySelector.returns(null);
+
+      assert.throws(function() { config(window_); }, TypeError);
+    });
+  });
+
+  it('gets the JSON settings from the document', function() {
+    var window_ = fakeWindow();
+
+    config(window_);
+
+    assert.calledOnce(fakeSettings);
+    assert.calledWithExactly(fakeSettings, window_.document);
+  });
+
+  context('when settings() returns a non-empty object', function() {
+    it('reads the setting into the returned options', function() {
+      // config() just blindly adds any key: value settings that settings()
+      // returns into the returns options object.
+      fakeSettings.returns({foo: 'bar'});
+
+      var options = config(fakeWindow());
+
+      assert.equal(options.foo, 'bar');
+    });
+  });
+
+  context('when settings() throws an error', function() {
+    beforeEach(function() {
+      fakeSettings.throws();
+    });
+
+    it('catches the error', function() {
+      config(fakeWindow());
+    });
+
+    it('logs a warning', function() {
+      config(fakeWindow());
+
+      assert.called(console.warn);
+    });
+  });
+
+  context("when there's a window.hypothesisConfig() function", function() {
+    it('reads arbitrary settings from hypothesisConfig() into options', function() {
+      var window_ = fakeWindow();
+      window_.hypothesisConfig = sinon.stub().returns({foo: 'bar'});
+
+      var options = config(window_);
+
+      assert.equal(options.foo, 'bar');
+    });
+
+    specify('hypothesisConfig() settings override js-hypothesis-config ones', function() {
+      var window_ = fakeWindow();
+      window_.hypothesisConfig = sinon.stub().returns({
+        foo: 'fooFromHypothesisConfigFunc'});
+      fakeSettings.returns({foo: 'fooFromJSHypothesisConfigObj'});
+
+      var options = config(window_);
+
+      assert.equal(options.foo, 'fooFromHypothesisConfigFunc');
+    });
+
+    context('if hypothesisConfig() returns a non-object value', function() {
+      it("doesn't add anything into the options", function() {
+        var window_ = fakeWindow();
+        window_.hypothesisConfig = sinon.stub().returns(42);
+
+        var options = config(window_);
+
+        delete options.app; // We don't care about options.app for this test.
+        assert.deepEqual({}, options);
+      });
+    });
+  });
+
+  context("when window.hypothesisConfig() isn't a function", function() {
+    it('throws a TypeError', function() {
+      var window_ = fakeWindow();
+      window_.hypothesisConfig = 'notAFunction';
+
+      assert.throws(
+        function() { config(window_); }, TypeError,
+        'hypothesisConfig must be a function, see: https://h.readthedocs.io/en/latest/embedding.html'
+      );
+    });
+  });
+
+  describe('showHighlights', function() {
+    [
+      {
+        name: 'changes `true` to `"always"`',
+        in:   true,
+        out:  'always',
       },
-    });
-    assert.deepEqual(config(fakeWindow), {
-      app: 'app.html',
-      foo: true,
+      {
+        name: 'changes `false` to `"never"`',
+        in:   false,
+        out:  'never',
+      },
+      // It adds any arbitrary string value for showHighlights to the
+      // returned options, unmodified.
+      {
+        name: 'passes arbitrary strings through unmodified',
+        in:   'foo',
+        out:  'foo',
+      },
+    ].forEach(function(test) {
+      it(test.name, function() {
+        fakeSettings.returns({showHighlights: test.in});
+
+        var options = config(fakeWindow());
+
+        assert.equal(options.showHighlights, test.out);
+      });
     });
   });
 
-  it('merges the config from the "js-hypothesis-config" <script> tag', function () {
-    fakeScriptConfig = '{"annotations":"456"}';
-    assert.deepEqual(config(fakeWindowBase), {
-      app: 'app.html',
-      annotations: '456',
-    });
+  it("extracts the annotation query from the parent page's URL", function() {
+    config(fakeWindow());
+
+    assert.calledOnce(fakeExtractAnnotationQuery.extractAnnotationQuery);
+    assert.calledWithExactly(
+      fakeExtractAnnotationQuery.extractAnnotationQuery, 'LOCATION_HREF');
   });
 
-  unroll('migrates legacy config keys', function (testCase) {
-    fakeScriptConfig = JSON.stringify(testCase.config);
-    assert.deepEqual(config(fakeWindowBase), testCase.expectedConfig);
-  }, [{
-    config: { showHighlights: true },
-    expectedConfig: { app: 'app.html', showHighlights: 'always' },
-  },{
-    config: { showHighlights: false },
-    expectedConfig: { app: 'app.html', showHighlights: 'never' },
-  }]);
+  context('when extractAnnotationQuery() returns an object', function() {
+    beforeEach(function() {
+      fakeExtractAnnotationQuery.extractAnnotationQuery.returns({
+        foo: 'bar',
+      });
+    });
+
+    it('blindly adds the properties of the object to the options', function() {
+      assert.equal(config(fakeWindow()).foo, 'bar');
+    });
+
+    specify('settings from extractAnnotationQuery override others', function() {
+      // Settings returned by extractAnnotationQuery() override ones from
+      // settings() or from window.hypothesisConfig().
+      var window_ = fakeWindow();
+      fakeExtractAnnotationQuery.extractAnnotationQuery.returns({
+        foo: 'fromExtractAnnotationQuery',
+      });
+      fakeSettings.returns({foo: 'fromSettings'});
+      window_.hypothesisConfig = sinon.stub().returns({
+        foo: 'fromHypothesisConfig',
+      });
+
+      assert.equal(config(window_).foo, 'fromExtractAnnotationQuery');
+    });
+  });
 });
