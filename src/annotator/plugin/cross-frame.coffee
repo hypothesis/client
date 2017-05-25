@@ -39,6 +39,12 @@ module.exports = class CrossFrame extends Plugin
       # Find, and inject Hypothesis into Guest's iframes
       # _discoverOwnFrames()
 
+      # Listen for DOM mutations, to know when iframes are added / removed
+      observer = new MutationObserver(_checkForIFrames)
+      config = {childList: true, subtree: true};
+      # THESIS TODO: Disabled until multi-guest support is fully implemented
+      # observer.observe(elem, config);
+
     this.destroy = ->
       # super doesnt work here :(
       Plugin::destroy.apply(this, arguments)
@@ -61,6 +67,23 @@ module.exports = class CrossFrame extends Plugin
       # Discover existing iframes
       iframes = frameUtil.findIFrames(elem)
       _handleIFrames(iframes)
+
+    _checkForIFrames = (mutations) ->
+      for own key, mutation of mutations
+        addedNodes = mutation.addedNodes
+        removedNodes = mutation.removedNodes
+
+        # Add iframes
+        for own key, node of addedNodes
+          if (node.tagName == 'IFRAME' && node.className != 'h-sidebar-iframe')
+            node.addEventListener 'load', ->
+              bridge.call('addedIFrame')
+              _handleIFrame(node)
+
+        # Remove iframes
+        for own key, node of removedNodes
+          if (node.tagName == 'IFRAME')
+            bridge.call('removedIFrame')
 
     _handleIFrame = (iframe) ->
       if !frameUtil.isAccessible(iframe) then return
