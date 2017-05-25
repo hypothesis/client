@@ -3,6 +3,7 @@ Plugin = require('../plugin')
 AnnotationSync = require('../annotation-sync')
 Bridge = require('../../shared/bridge')
 Discovery = require('../../shared/discovery')
+frameUtil = require('../util/frame-util')
 
 
 # Extracts individual keys from an object and returns a new one.
@@ -33,6 +34,11 @@ module.exports = class CrossFrame extends Plugin
         bridge.createChannel(source, origin, token)
       discovery.startDiscovery(onDiscoveryCallback)
 
+      # THESIS TODO: Disabled until fully implemented.
+      # 
+      # Find, and inject Hypothesis into Guest's iframes
+      # _discoverOwnFrames()
+
     this.destroy = ->
       # super doesnt work here :(
       Plugin::destroy.apply(this, arguments)
@@ -50,3 +56,20 @@ module.exports = class CrossFrame extends Plugin
 
     this.onConnect = (fn) ->
       bridge.onConnect(fn)
+
+    _discoverOwnFrames = () ->
+      # Discover existing iframes
+      iframes = frameUtil.findIFrames(elem)
+      _handleIFrames(iframes)
+
+    _handleIFrame = (iframe) ->
+      if !frameUtil.isAccessible(iframe) then return
+
+      if !frameUtil.hasHypothesis(iframe)
+        frameUtil.injectHypothesis(iframe)
+
+    _handleIFrames = (iframes) ->
+      for own index, iframe of iframes
+        _handleIFrame(iframe)
+
+
