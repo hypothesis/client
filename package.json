@@ -123,6 +123,7 @@
     ]
   },
   "browser": {
+    "dom-anchor-fragment": "./node_modules/dom-anchor-fragment/dist/FragmentAnchor.js",
     "hammerjs": "./node_modules/hammerjs/hammer.js",
     "jquery": "./node_modules/jquery/dist/jquery.slim.js"
   },
