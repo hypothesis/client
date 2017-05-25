@@ -149,6 +149,15 @@ function FrameSync($rootScope, $window, Discovery, annotationUI, bridge) {
     bridge.on('sidebarOpened', function () {
       $rootScope.$broadcast('sidebarOpened');
     });
+
+    // These merely relay calls
+    bridge.on('showSidebar', function () {
+      bridge.call('showSidebar');
+    });
+
+    bridge.on('hideSidebar', function () {
+      bridge.call('hideSidebar');
+    });
   }
 
   /**
