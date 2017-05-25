@@ -4,7 +4,7 @@ var persona = require('../filter/persona');
 var serviceConfig = require('../service-config');
 
 // @ngInject
-function GroupListController($window, groups, settings, serviceUrl) {
+function GroupListController($window, analytics, groups, settings, serviceUrl) {
   this.groups = groups;
 
   this.createNewGroup = function() {
@@ -20,11 +20,17 @@ function GroupListController($window, groups, settings, serviceUrl) {
     var message = 'Are you sure you want to leave the group "' +
       groupName + '"?';
     if ($window.confirm(message)) {
+      analytics.track(analytics.events.GROUP_LEAVE);
       groups.leave(groupId);
     }
   };
 
+  this.viewGroupActivity = function () {
+    analytics.track(analytics.events.GROUP_VIEW_ACTIVITY);
+  };
+
   this.focusGroup = function (groupId) {
+    analytics.track(analytics.events.GROUP_SWITCH);
     groups.focus(groupId);
   };
 

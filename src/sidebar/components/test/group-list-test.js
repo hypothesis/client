@@ -12,6 +12,7 @@ describe('groupList', function () {
 
   var groups;
   var fakeGroups;
+  var fakeAnalytics;
   var fakeServiceUrl;
   var fakeSettings;
 
@@ -24,12 +25,23 @@ describe('groupList', function () {
   });
 
   beforeEach(function () {
+
+    fakeAnalytics = {
+      track: sinon.stub(),
+      events: {
+        GROUP_LEAVE: 'groupLeave',
+        GROUP_SWITCH: 'groupSwitch',
+        GROUP_VIEW_ACTIVITY: 'groupViewActivity',
+      },
+    };
+
     fakeServiceUrl = sinon.stub();
     fakeSettings = {
       authDomain: 'example.com',
     };
 
     angular.mock.module('app', {
+      analytics: fakeAnalytics,
       serviceUrl: fakeServiceUrl,
       settings: fakeSettings,
     });
@@ -88,6 +100,13 @@ describe('groupList', function () {
     assert.equal(link[0].href, GROUP_LINK);
   });
 
+  it('should track metrics when a user attempts to view a groups activity', function () {
+    var element = createGroupList();
+    var link = element.find('.share-link');
+    link.click();
+    assert.calledWith(fakeAnalytics.track, fakeAnalytics.events.GROUP_VIEW_ACTIVITY);
+  });
+
   function clickLeaveIcon(element, acceptPrompt) {
     var leaveLink = element.find('.h-icon-cancel-outline');
 
@@ -102,18 +121,32 @@ describe('groupList', function () {
     var element = createGroupList();
     clickLeaveIcon(element, true);
     assert.ok(fakeGroups.leave.calledWith('h-devs'));
+    assert.calledWith(fakeAnalytics.track, fakeAnalytics.events.GROUP_LEAVE);
   });
 
   it('should not leave group when confirmation is dismissed', function () {
     var element = createGroupList();
     clickLeaveIcon(element, false);
     assert.notCalled(fakeGroups.leave);
+    assert.notCalled(fakeAnalytics.track);
   });
 
   it('should not change the focused group when leaving', function () {
     var element = createGroupList();
     clickLeaveIcon(element, true);
     assert.notCalled(fakeGroups.focus);
+    assert.calledWith(fakeAnalytics.track, fakeAnalytics.events.GROUP_LEAVE);
+  });
+
+  it('should change current group focus when click another group', function () {
+    var element = createGroupList();
+    var groupItems = element.find('.group-item');
+
+    // click the second group
+    groupItems[1].click();
+
+    assert.calledOnce(fakeGroups.focus);
+    assert.calledWith(fakeAnalytics.track, fakeAnalytics.events.GROUP_SWITCH);
   });
 
   it('should open a window when "New Group" is clicked', function () {
@@ -123,6 +156,7 @@ describe('groupList', function () {
 
     var element = createGroupList();
     $window.open = sinon.stub();
+
     var newGroupLink =
       element[0].querySelector('.new-group-btn a');
     angular.element(newGroupLink).click();

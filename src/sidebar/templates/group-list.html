@@ -58,7 +58,10 @@
             </a>
           </div>
           <div class="share-link-container" ng-click="$event.stopPropagation()" ng-if="!group.public">
-            <a class="share-link" href="{{group.url}}" target="_blank">
+            <a class="share-link"
+               href="{{group.url}}"
+               target="_blank"
+               ng-click="vm.viewGroupActivity()">
               View group activity and invite others
             </a>
           </div>
