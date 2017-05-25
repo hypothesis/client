@@ -1,5 +1,6 @@
 'use strict';
 
+var configFrom = require('./config');
 require('../shared/polyfills');
 
 
@@ -37,7 +38,7 @@ var pluginClasses = {
 
 var appLinkEl =
   document.querySelector('link[type="application/annotator+html"]');
-var options = require('./config')(window);
+var options = configFrom(window);
 
 $.noConflict(true)(function() {
   var Klass = window.PDFViewerApplication ?
