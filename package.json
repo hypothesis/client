@@ -37,7 +37,7 @@
     "dom-anchor-fragment": "^1.0.1",
     "dom-anchor-text-position": "^4.0.0",
     "dom-anchor-text-quote": "^4.0.2",
-    "dom-seek": "^1.0.1",
+    "dom-seek": "^4.0.3",
     "end-of-stream": "^1.1.0",
     "escape-html": "^1.0.3",
     "escape-string-regexp": "^1.0.5",

@@ -1829,11 +1829,7 @@ dom-node-iterator@^3.5.0:
   version "3.5.3"
   resolved "https://registry.yarnpkg.com/dom-node-iterator/-/dom-node-iterator-3.5.3.tgz#32b68aa440962f1734487029f544a3db704637b7"
 
-dom-seek@^1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/dom-seek/-/dom-seek-1.0.1.tgz#7311112487e775f45c0acf7f336b2d58d0c232ba"
-
-dom-seek@^4.0.1:
+dom-seek@^4.0.1, dom-seek@^4.0.3:
   version "4.0.3"
   resolved "https://registry.yarnpkg.com/dom-seek/-/dom-seek-4.0.3.tgz#f14dddf04b3fb062d901c7b00b0c142a06e0a94b"
   dependencies:
