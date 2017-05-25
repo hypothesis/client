@@ -174,6 +174,16 @@ function FrameSync($rootScope, $window, Discovery, annotationUI, bridge) {
         });
       }
 
+      // if doi available as highwire or dc meta, include in search
+
+      if ( info.metadata && info.metadata.link ) {
+        info.metadata.link.forEach(function(link) {
+          if ( link.href.startsWith('doi:') ) {
+            searchUris.push(link.href);
+          }
+        });
+      }
+
       annotationUI.connectFrame({
         uri: info.uri,
         searchUris: searchUris,
