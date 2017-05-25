@@ -49,7 +49,7 @@ module.exports = class Toolbar extends Plugin
           event.preventDefault()
           event.stopPropagation()
           state = not @annotator.visibleHighlights
-          @annotator.setVisibleHighlights state
+          @annotator.setAllVisibleHighlights state
     ,
       "title": "New Page Note"
       "class": "h-icon-note"

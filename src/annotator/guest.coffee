@@ -471,9 +471,7 @@ module.exports = class Guest extends Delegator
 
   # Pass true to show the highlights in the frame or false to disable.
   setVisibleHighlights: (shouldShowHighlights) ->
-    @crossframe?.call('setVisibleHighlights', shouldShowHighlights)
     this.toggleHighlightClass(shouldShowHighlights)
-    this.publish 'setVisibleHighlights', shouldShowHighlights
 
   toggleHighlightClass: (shouldShowHighlights) ->
     if shouldShowHighlights

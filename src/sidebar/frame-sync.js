@@ -150,14 +150,17 @@ function FrameSync($rootScope, $window, Discovery, annotationUI, bridge) {
       $rootScope.$broadcast('sidebarOpened');
     });
 
-    // These merely relay calls
+    // These invoke the matching methods by name on the Guests
     bridge.on('showSidebar', function () {
       bridge.call('showSidebar');
     });
-
     bridge.on('hideSidebar', function () {
       bridge.call('hideSidebar');
     });
+    bridge.on('setVisibleHighlights', function (state) {
+      bridge.call('setVisibleHighlights', state);
+    });
+
   }
 
   /**
