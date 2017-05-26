@@ -22,7 +22,7 @@ function assign(dest, src) {
  * @param {Document|Element} document - The root element to search for
  *                                      <script> settings tags.
  */
-function settings(document) {
+function jsonConfigsFrom(document) {
   var settingsElements =
     document.querySelectorAll('script.js-hypothesis-config');
 
@@ -33,4 +33,6 @@ function settings(document) {
   return config;
 }
 
-module.exports = settings;
+module.exports = {
+  jsonConfigsFrom: jsonConfigsFrom,
+};

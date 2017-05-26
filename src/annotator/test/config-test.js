@@ -2,7 +2,9 @@
 
 var proxyquire = require('proxyquire');
 
-var fakeSettings = sinon.stub();
+var fakeSettings = {
+  jsonConfigsFrom: sinon.stub(),
+};
 var fakeExtractAnnotationQuery = {};
 
 var configFrom = proxyquire('../config', {
@@ -26,8 +28,8 @@ describe('annotator.config', function() {
   });
 
   beforeEach('reset fakeSettings', function() {
-    fakeSettings.reset();
-    fakeSettings.returns({});
+    fakeSettings.jsonConfigsFrom.reset();
+    fakeSettings.jsonConfigsFrom.returns({});
   });
 
   beforeEach('reset fakeExtractAnnotationQuery', function() {
@@ -71,15 +73,16 @@ describe('annotator.config', function() {
 
     configFrom(window_);
 
-    assert.calledOnce(fakeSettings);
-    assert.calledWithExactly(fakeSettings, window_.document);
+    assert.calledOnce(fakeSettings.jsonConfigsFrom);
+    assert.calledWithExactly(
+      fakeSettings.jsonConfigsFrom, window_.document);
   });
 
-  context('when settings() returns a non-empty object', function() {
+  context('when jsonConfigsFrom() returns a non-empty object', function() {
     it('reads the setting into the returned config', function() {
-      // configFrom() just blindly adds any key: value settings that settings()
-      // returns into the returned config object.
-      fakeSettings.returns({foo: 'bar'});
+      // configFrom() just blindly adds any key: value settings that
+      // jsonConfigsFrom() returns into the returns options object.
+      fakeSettings.jsonConfigsFrom.returns({foo: 'bar'});
 
       var config = configFrom(fakeWindow());
 
@@ -87,9 +90,9 @@ describe('annotator.config', function() {
     });
   });
 
-  context('when settings() throws an error', function() {
+  context('when jsonConfigsFrom() throws an error', function() {
     beforeEach(function() {
-      fakeSettings.throws();
+      fakeSettings.jsonConfigsFrom.throws();
     });
 
     it('catches the error', function() {
@@ -117,7 +120,9 @@ describe('annotator.config', function() {
       var window_ = fakeWindow();
       window_.hypothesisConfig = sinon.stub().returns({
         foo: 'fooFromHypothesisConfigFunc'});
-      fakeSettings.returns({foo: 'fooFromJSHypothesisConfigObj'});
+      fakeSettings.jsonConfigsFrom.returns({
+        foo: 'fooFromJSHypothesisConfigObj',
+      });
 
       var config = configFrom(window_);
 
@@ -170,7 +175,7 @@ describe('annotator.config', function() {
       },
     ].forEach(function(test) {
       it(test.name, function() {
-        fakeSettings.returns({showHighlights: test.in});
+        fakeSettings.jsonConfigsFrom.returns({showHighlights: test.in});
 
         var config = configFrom(fakeWindow());
 
@@ -200,12 +205,12 @@ describe('annotator.config', function() {
 
     specify('settings from extractAnnotationQuery override others', function() {
       // Settings returned by extractAnnotationQuery() override ones from
-      // settings() or from window.hypothesisConfig().
+      // jsonConfigsFrom() or from window.hypothesisConfig().
       var window_ = fakeWindow();
       fakeExtractAnnotationQuery.extractAnnotationQuery.returns({
         foo: 'fromExtractAnnotationQuery',
       });
-      fakeSettings.returns({foo: 'fromSettings'});
+      fakeSettings.jsonConfigsFrom.returns({foo: 'fromSettings'});
       window_.hypothesisConfig = sinon.stub().returns({
         foo: 'fromHypothesisConfig',
       });

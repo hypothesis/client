@@ -19,16 +19,19 @@ function removeJSONScriptTags() {
 }
 
 describe('settings', function () {
-  afterEach(removeJSONScriptTags);
+  describe('#jsonConfigsFrom', function() {
+    var jsonConfigsFrom = settings.jsonConfigsFrom;
+    afterEach(removeJSONScriptTags);
 
-  it('reads config from .js-hypothesis-config <script> tags', function () {
-    document.body.appendChild(createConfigElement({key:'value'}));
-    assert.deepEqual(settings(document), {key:'value'});
-  });
+    it('reads config from .js-hypothesis-config <script> tags', function () {
+      document.body.appendChild(createConfigElement({key:'value'}));
+      assert.deepEqual(jsonConfigsFrom(document), {key:'value'});
+    });
 
-  it('merges settings from all config <script> tags', function () {
-    document.body.appendChild(createConfigElement({a: 1}));
-    document.body.appendChild(createConfigElement({b: 2}));
-    assert.deepEqual(settings(document), {a: 1, b: 2});
+    it('merges settings from all config <script> tags', function () {
+      document.body.appendChild(createConfigElement({a: 1}));
+      document.body.appendChild(createConfigElement({b: 2}));
+      assert.deepEqual(jsonConfigsFrom(document), {a: 1, b: 2});
+    });
   });
 });
