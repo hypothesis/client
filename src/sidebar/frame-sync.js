@@ -178,10 +178,7 @@ function FrameSync($rootScope, $window, Discovery, annotationUI, bridge) {
 
       if ( info.metadata && info.metadata.link ) {
         info.metadata.link.forEach(function(link) {
-          if ( link.href &&
-               typeof(link.href.startsWith)==='function' &&
-               link.href.startsWith('doi:')
-             ) {
+          if ( link.href && link.href.slice(0,3)==='doi:' ) {
             searchUris.push(link.href);
           }
         });
