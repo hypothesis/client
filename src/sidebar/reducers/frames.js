@@ -17,6 +17,12 @@ var update = {
     return {frames: state.frames.concat(action.frame)};
   },
 
+  DESTROY_FRAME: function (state, action) {
+    var index = state.frames.indexOf(action.frame);
+    if (index >= 0) state.frames.splice(index, 1);
+    return {frames: state.frames};
+  },
+
   UPDATE_FRAME_ANNOTATION_FETCH_STATUS: function (state, action) {
     var frames = state.frames.map(function (frame) {
       var match = (frame.uri && frame.uri === action.uri);
@@ -41,6 +47,13 @@ var actions = util.actionTypes(update);
  */
 function connectFrame(frame) {
   return {type: actions.CONNECT_FRAME, frame: frame};
+}
+
+/**
+ * Remove a frame from the list of frames currently connected to the sidebar app.
+ */
+function destroyFrame(frame) {
+  return {type: actions.DESTROY_FRAME, frame: frame};
 }
 
 /**
@@ -100,6 +113,7 @@ module.exports = {
 
   actions: {
     connectFrame: connectFrame,
+    destroyFrame: destroyFrame,
     updateFrameAnnotationFetchStatus: updateFrameAnnotationFetchStatus,
   },
 

@@ -124,6 +124,10 @@ function FrameSync($rootScope, $window, Discovery, annotationUI, bridge) {
       $rootScope.$broadcast(events.BEFORE_ANNOTATION_CREATED, annot);
     });
 
+    bridge.on('destroyFrame', function (uri) {
+      destroyFrame(uri);
+    });
+
     // Anchoring an annotation in the frame completed
     bridge.on('sync', function (events_) {
       events_.forEach(function (event) {
@@ -179,6 +183,19 @@ function FrameSync($rootScope, $window, Discovery, annotationUI, bridge) {
         uri: info.uri,
       });
     });
+  }
+
+  function destroyFrame(uri) {
+    var frames = annotationUI.frames();
+    var frameToDestroy;
+    for (var i = 0; i < frames.length; i++) {
+      var frame = frames[i];
+      if (frame.uri === uri) {
+        frameToDestroy = frame;
+        break;
+      }
+    }
+    if (frameToDestroy) annotationUI.destroyFrame(frameToDestroy);
   }
 
   /**
