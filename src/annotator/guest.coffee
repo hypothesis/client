@@ -425,12 +425,10 @@ module.exports = class Guest extends Delegator
     else
       this.showAnnotations annotations
 
-  # Moved from Sidebar.coffee to Guest
   onElementClick: (event) ->
     if !@selectedTargets?.length
       @crossframe?.call('hideSidebar')
 
-  # Moved from Sidebar.coffee to Guest
   onElementTouchStart: (event) ->
     # Mobile browsers do not register click events on
     # elements without cursor: pointer. So instead of

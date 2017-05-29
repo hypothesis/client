@@ -84,6 +84,7 @@ describe 'Guest', ->
     fakeCrossFrame = {
       onConnect: sinon.stub()
       on: sinon.stub()
+      call: sinon.stub()
       sync: sinon.stub()
       destroy: sinon.stub()
     }
@@ -276,6 +277,24 @@ describe 'Guest', ->
         guest.plugins.PDF.getMetadata.returns(promise)
 
         emitGuestEvent('getDocumentInfo', assertComplete)
+
+  describe 'document events', ->
+
+    guest = null
+
+    beforeEach ->
+      guest = createGuest()
+
+    it 'emits "hideSidebar" on cross frame when the user taps or clicks in the page', ->
+      methods =
+        'click': 'onElementClick'
+        'touchstart': 'onElementTouchStart'
+
+      for event in ['click', 'touchstart']
+        sandbox.spy(guest, methods[event])
+        guest.element.trigger(event)
+        assert.called(guest[methods[event]])
+        assert.calledWith(guest.plugins.CrossFrame.call, 'hideSidebar')
 
   describe 'when the selection changes', ->
     it 'shows the adder if the selection contains text', ->
