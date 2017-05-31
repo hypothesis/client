@@ -18,7 +18,7 @@ function configFrom(window_) {
 
   // Parse config from `<script class="js-hypothesis-config">` tags
   try {
-    Object.assign(config, settings(window_.document));
+    Object.assign(config, settings.jsonConfigsFrom(window_.document));
   } catch (err) {
     console.warn('Could not parse settings from js-hypothesis-config tags',
       err);

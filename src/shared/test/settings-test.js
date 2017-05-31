@@ -2,33 +2,128 @@
 
 var settings = require('../settings');
 
-function createConfigElement(obj) {
-  var el = document.createElement('script');
-  el.type = 'application/json';
-  el.textContent = JSON.stringify(obj);
-  el.classList.add('js-hypothesis-config');
-  el.classList.add('js-settings-test');
-  return el;
-}
-
-function removeJSONScriptTags() {
-  var elements = document.querySelectorAll('.js-settings-test');
-  for (var i=0; i < elements.length; i++) {
-    elements[i].parentNode.removeChild(elements[i]);
-  }
-}
-
 describe('settings', function () {
-  afterEach(removeJSONScriptTags);
+  describe('#jsonConfigsFrom', function() {
+    var jsonConfigsFrom = settings.jsonConfigsFrom;
 
-  it('reads config from .js-hypothesis-config <script> tags', function () {
-    document.body.appendChild(createConfigElement({key:'value'}));
-    assert.deepEqual(settings(document), {key:'value'});
-  });
+    function appendJSHypothesisConfig(document_, jsonString) {
+      var el = document_.createElement('script');
+      el.type = 'application/json';
+      el.textContent = jsonString;
+      el.classList.add('js-hypothesis-config');
+      el.classList.add('js-settings-test');
+      document_.body.appendChild(el);
+    }
 
-  it('merges settings from all config <script> tags', function () {
-    document.body.appendChild(createConfigElement({a: 1}));
-    document.body.appendChild(createConfigElement({b: 2}));
-    assert.deepEqual(settings(document), {a: 1, b: 2});
+    afterEach('remove js-hypothesis-config tags', function() {
+      var elements = document.querySelectorAll('.js-settings-test');
+      for (var i=0; i < elements.length; i++) {
+        elements[i].remove();
+      }
+    });
+
+    context('when there are no JSON scripts', function() {
+      it('returns {}', function() {
+        assert.deepEqual(jsonConfigsFrom(document), {});
+      });
+    });
+
+    context("when there's JSON scripts with no top-level objects", function() {
+      beforeEach('add JSON scripts with no top-level objects', function() {
+        appendJSHypothesisConfig(document, 'null');
+        appendJSHypothesisConfig(document, '23');
+        appendJSHypothesisConfig(document, 'true');
+      });
+
+      it('ignores them', function() {
+        assert.deepEqual(jsonConfigsFrom(document), {});
+      });
+    });
+
+    context("when there's a JSON script with a top-level array", function() {
+      beforeEach('add a JSON script containing a top-level array', function() {
+        appendJSHypothesisConfig(document, '["a", "b", "c"]');
+      });
+
+      it('returns the array, parsed into an object', function() {
+        assert.deepEqual(
+          jsonConfigsFrom(document),
+          {0: 'a', 1: 'b', 2: 'c'}
+        );
+      });
+    });
+
+    context("when there's a JSON script with a top-level string", function() {
+      beforeEach('add a JSON script with a top-level string', function() {
+        appendJSHypothesisConfig(document, '"hi"');
+      });
+
+      it('returns the string, parsed into an object', function() {
+        assert.deepEqual(jsonConfigsFrom(document), {0: 'h', 1: 'i'});
+      });
+    });
+
+    context("when there's a JSON script containing invalid JSON", function() {
+      beforeEach('add a JSON script containing invalid JSON', function() {
+        appendJSHypothesisConfig(document, 'this is not valid json');
+      });
+
+      it('throws a SyntaxError', function() {
+        assert.throws(
+          function() { jsonConfigsFrom(document); },
+          SyntaxError
+        );
+      });
+    });
+
+    context("when there's a JSON script with an empty object", function() {
+      beforeEach('add a JSON script containing an empty object', function() {
+        appendJSHypothesisConfig(document, '{}');
+      });
+
+      it('ignores it', function() {
+        assert.deepEqual(jsonConfigsFrom(document), {});
+      });
+    });
+
+    context("when there's a JSON script containing some settings", function() {
+      beforeEach('add a JSON script containing some settings', function() {
+        appendJSHypothesisConfig(document, '{"foo": "FOO", "bar": "BAR"}');
+      });
+
+      it('returns the settings', function() {
+        assert.deepEqual(
+          jsonConfigsFrom(document),
+          {foo: 'FOO', bar: 'BAR'}
+        );
+      });
+    });
+
+    context('when there are JSON scripts with different settings', function() {
+      beforeEach('add some JSON scripts with different settings', function() {
+        appendJSHypothesisConfig(document, '{"foo": "FOO"}');
+        appendJSHypothesisConfig(document, '{"bar": "BAR"}');
+        appendJSHypothesisConfig(document, '{"gar": "GAR"}');
+      });
+
+      it('merges them all into one returned object', function() {
+        assert.deepEqual(
+          jsonConfigsFrom(document),
+          {foo: 'FOO', bar: 'BAR', gar: 'GAR'}
+        );
+      });
+    });
+
+    context('when multiple JSON scripts contain the same setting', function() {
+      beforeEach('add some JSON scripts with different settings', function() {
+        appendJSHypothesisConfig(document, '{"foo": "first"}');
+        appendJSHypothesisConfig(document, '{"foo": "second"}');
+        appendJSHypothesisConfig(document, '{"foo": "third"}');
+      });
+
+      specify('settings from later in the page override ones from earlier', function() {
+        assert.equal(jsonConfigsFrom(document).foo, 'third');
+      });
+    });
   });
 });
