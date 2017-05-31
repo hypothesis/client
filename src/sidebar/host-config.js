@@ -39,7 +39,12 @@ function hostPageConfig(window) {
 
   return Object.keys(config).reduce(function (result, key) {
     if (paramWhiteList.indexOf(key) !== -1) {
-      result[key] = config[key];
+      // Ignore `null` values as these indicate a default value.
+      // In this case the config value set in the sidebar app HTML config is
+      // used.
+      if (config[key] !== null) {
+        result[key] = config[key];
+      }
     }
     return result;
   }, {});

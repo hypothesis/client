@@ -44,4 +44,12 @@ describe('hostPageConfig', function () {
 
     assert.deepEqual(hostPageConfig(window_), {});
   });
+
+  it('ignores `null` values in config', function () {
+    var window_ = fakeWindow({
+      oauthEnabled: null,
+    });
+
+    assert.deepEqual(hostPageConfig(window_), {});
+  });
 });

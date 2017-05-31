@@ -18,6 +18,7 @@ describe('hypothesisApp', function () {
   var fakeBridge = null;
   var fakeDrafts = null;
   var fakeFeatures = null;
+  var fakeFlash = null;
   var fakeFrameSync = null;
   var fakeLocation = null;
   var fakeParams = null;
@@ -88,6 +89,10 @@ describe('hypothesisApp', function () {
       flagEnabled: sandbox.stub().returns(false),
     };
 
+    fakeFlash = {
+      error: sandbox.stub(),
+    };
+
     fakeFrameSync = {
       connect: sandbox.spy(),
     };
@@ -101,6 +106,7 @@ describe('hypothesisApp', function () {
     fakeSession = {
       load: sandbox.stub().returns(Promise.resolve({userid: null})),
       logout: sandbox.stub(),
+      reload: sandbox.stub().returns(Promise.resolve({userid: null})),
     };
 
     fakeGroups = {focus: sandbox.spy()};
@@ -128,6 +134,7 @@ describe('hypothesisApp', function () {
     $provide.value('analytics', fakeAnalytics);
     $provide.value('drafts', fakeDrafts);
     $provide.value('features', fakeFeatures);
+    $provide.value('flash', fakeFlash);
     $provide.value('frameSync', fakeFrameSync);
     $provide.value('serviceUrl', fakeServiceUrl);
     $provide.value('session', fakeSession);
@@ -354,12 +361,49 @@ describe('hypothesisApp', function () {
   });
 
   describe('#login()', function () {
-    it('shows the login dialog if not using a third-party service', function () {
-      // If no third-party annotation service is in use then it should show the
-      // built-in login dialog.
-      var ctrl = createController();
-      ctrl.login();
-      assert.equal(ctrl.accountDialog.visible, true);
+    context('when using cookie auth', () => {
+      it('shows the login dialog if not using a third-party service', function () {
+        // If no third-party annotation service is in use then it should show the
+        // built-in login dialog.
+        var ctrl = createController();
+        ctrl.login();
+        assert.equal(ctrl.accountDialog.visible, true);
+      });
+    });
+
+    context('when using OAuth', () => {
+      beforeEach(() => {
+        fakeAuth.login = sinon.stub().returns(Promise.resolve());
+      });
+
+      it('does not show the login dialog', () => {
+        var ctrl = createController();
+        ctrl.login();
+        assert.equal(ctrl.accountDialog.visible, false);
+      });
+
+      it('initiates the OAuth login flow', () => {
+        var ctrl = createController();
+        ctrl.login();
+        assert.called(fakeAuth.login);
+      });
+
+      it('reloads the session when login completes', () => {
+        var ctrl = createController();
+        return ctrl.login().then(() => {
+          assert.called(fakeSession.reload);
+        });
+      });
+
+      it('reports an error if login fails', () => {
+        fakeAuth.login.returns(Promise.reject(new Error('Login failed')));
+
+        var ctrl = createController();
+
+        return ctrl.login().then(null, () => {
+          assert.called(fakeFlash.error);
+        });
+      });
     });
 
     it('sends LOGIN_REQUESTED if a third-party service is in use', function () {

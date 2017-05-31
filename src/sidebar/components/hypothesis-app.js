@@ -25,8 +25,8 @@ function authStateFromUserID(userid) {
 // @ngInject
 function HypothesisAppController(
   $document, $location, $rootScope, $route, $scope,
-  $window, analytics, annotationUI, auth, bridge, drafts, features, frameSync, groups,
-  serviceUrl, session, settings, streamer
+  $window, analytics, annotationUI, auth, bridge, drafts, features,
+  flash, frameSync, groups, serviceUrl, session, settings, streamer
 ) {
   var self = this;
 
@@ -90,16 +90,32 @@ function HypothesisAppController(
     }, 0);
   }
 
-  // Start the login flow. This will present the user with the login dialog.
+  /**
+   * Start the login flow. This will present the user with the login dialog.
+   *
+   * @return {Promise<void>} - A Promise that resolves when the login flow
+   *   completes. For non-OAuth logins, always resolves immediately.
+   */
   this.login = function () {
     if (serviceConfig(settings)) {
       // Let the host page handle the login request
       bridge.call(bridgeEvents.LOGIN_REQUESTED);
-      return;
+      return Promise.resolve();
     }
 
-    self.accountDialog.visible = true;
-    scrollToView('login-form');
+    if (auth.login) {
+      // OAuth-based login 😀
+      return auth.login().then(() => {
+        session.reload();
+      }).catch((err) => {
+        flash.error(err.message);
+      });
+    } else {
+      // Legacy cookie-based login 😔.
+      self.accountDialog.visible = true;
+      scrollToView('login-form');
+      return Promise.resolve();
+    }
   };
 
   this.signUp = function(){

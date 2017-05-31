@@ -109,8 +109,15 @@ function processAppOpts() {
   }
 }
 
+function shouldUseOAuth() {
+  if (serviceConfig(settings)) {
+    return true;
+  }
+  return settings.oauthClientId && settings.oauthEnabled;
+}
+
 var authService;
-if (serviceConfig(settings)) {
+if (shouldUseOAuth()) {
   authService = require('./oauth-auth');
 } else {
   authService = require('./auth');
@@ -211,6 +218,7 @@ module.exports = angular.module('h', [
   .value('Discovery', require('../shared/discovery'))
   .value('ExcerptOverflowMonitor', require('./util/excerpt-overflow-monitor'))
   .value('VirtualThreadList', require('./virtual-thread-list'))
+  .value('random', require('./util/random'))
   .value('raven', require('./raven'))
   .value('serviceConfig', serviceConfig)
   .value('settings', settings)
