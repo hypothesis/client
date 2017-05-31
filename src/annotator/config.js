@@ -10,15 +10,15 @@ var docs = 'https://h.readthedocs.io/en/latest/embedding.html';
  *
  * @param {Window} window_ - The Window object to read config from.
  */
-function config(window_) {
-  var options = {
+function configFrom(window_) {
+  var config = {
     app: window_.
       document.querySelector('link[type="application/annotator+html"]').href,
   };
 
   // Parse config from `<script class="js-hypothesis-config">` tags
   try {
-    Object.assign(options, settings(window_.document));
+    Object.assign(config, settings(window_.document));
   } catch (err) {
     console.warn('Could not parse settings from js-hypothesis-config tags',
       err);
@@ -27,16 +27,16 @@ function config(window_) {
   // Parse config from `window.hypothesisConfig` function
   if (window_.hasOwnProperty('hypothesisConfig')) {
     if (typeof window_.hypothesisConfig === 'function') {
-      Object.assign(options, window_.hypothesisConfig());
+      Object.assign(config, window_.hypothesisConfig());
     } else {
       throw new TypeError('hypothesisConfig must be a function, see: ' + docs);
     }
   }
 
-  // Convert legacy keys/values in options to corresponding current
+  // Convert legacy keys/values in config to corresponding current
   // configuration.
-  if (typeof options.showHighlights === 'boolean') {
-    options.showHighlights = options.showHighlights ? 'always' : 'never';
+  if (typeof config.showHighlights === 'boolean') {
+    config.showHighlights = config.showHighlights ? 'always' : 'never';
   }
 
   // Extract the default query from the URL.
@@ -49,9 +49,9 @@ function config(window_) {
   // we try to retrieve it from the URL here.
   var directLinkedID = annotationQuery.extractAnnotationQuery(window_.location.href);
   if (directLinkedID) {
-    Object.assign(options, directLinkedID);
+    Object.assign(config, directLinkedID);
   }
-  return options;
+  return config;
 }
 
-module.exports = config;
+module.exports = configFrom;

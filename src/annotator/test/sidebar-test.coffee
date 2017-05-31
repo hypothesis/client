@@ -7,12 +7,12 @@ describe 'Sidebar', ->
   sandbox = sinon.sandbox.create()
   CrossFrame = null
   fakeCrossFrame = null
-  sidebarOptions = {pluginClasses: {}}
+  sidebarConfig = {pluginClasses: {}}
 
-  createSidebar = (options={}) ->
-    options = Object.assign({}, sidebarOptions, options)
+  createSidebar = (config={}) ->
+    config = Object.assign({}, sidebarConfig, config)
     element = document.createElement('div')
-    return new Sidebar(element, options)
+    return new Sidebar(element, config)
 
   beforeEach ->
     fakeCrossFrame = {}
@@ -23,7 +23,7 @@ describe 'Sidebar', ->
 
     CrossFrame = sandbox.stub()
     CrossFrame.returns(fakeCrossFrame)
-    sidebarOptions.pluginClasses['CrossFrame'] = CrossFrame
+    sidebarConfig.pluginClasses['CrossFrame'] = CrossFrame
 
   afterEach ->
     sandbox.restore()
@@ -49,21 +49,21 @@ describe 'Sidebar', ->
     describe 'on LOGIN_REQUESTED event', ->
       it 'calls the onLoginRequest callback function if one was provided', ->
         onLoginRequest = sandbox.stub()
-        sidebar = createSidebar(options={services: [{onLoginRequest: onLoginRequest}]})
+        sidebar = createSidebar(config={services: [{onLoginRequest: onLoginRequest}]})
 
         emitEvent(events.LOGIN_REQUESTED)
 
         assert.called(onLoginRequest)
 
       it 'only calls the onLoginRequest callback of the first service', ->
-        # Even though options.services is an array it only calls the onLoginRequest
+        # Even though config.services is an array it only calls the onLoginRequest
         # callback function of the first service. The onLoginRequests of any other
         # services are ignored.
         firstOnLogin  = sandbox.stub()
         secondOnLogin = sandbox.stub()
         thirdOnLogin  = sandbox.stub()
         sidebar = createSidebar(
-          options={
+          config={
             services: [
               {onLoginRequest: firstOnLogin},
               {onLoginRequest: secondOnLogin},
@@ -84,7 +84,7 @@ describe 'Sidebar', ->
         secondOnLogin = sandbox.stub()
         thirdOnLogin  = sandbox.stub()
         sidebar = createSidebar(
-          options={
+          config={
             services: [
               {},
               {onLoginRequest: secondOnLogin},
@@ -99,21 +99,21 @@ describe 'Sidebar', ->
         assert.notCalled(thirdOnLogin)
 
       it 'does not crash if there is no services', ->
-        sidebar = createSidebar(options={})  # No options.services
+        sidebar = createSidebar(config={})  # No config.services
         emitEvent(events.LOGIN_REQUESTED)
 
       it 'does not crash if services is an empty array', ->
-        sidebar = createSidebar(options={services: []})
+        sidebar = createSidebar(config={services: []})
         emitEvent(events.LOGIN_REQUESTED)
 
       it 'does not crash if the first service has no onLoginRequest', ->
-        sidebar = createSidebar(options={services: [{}]})
+        sidebar = createSidebar(config={services: [{}]})
         emitEvent(events.LOGIN_REQUESTED)
 
     describe 'on LOGOUT_REQUESTED event', ->
       it 'calls the onLogoutRequest callback function', ->
         onLogoutRequest = sandbox.stub()
-        sidebar = createSidebar(options={services: [{onLogoutRequest: onLogoutRequest}]})
+        sidebar = createSidebar(config={services: [{onLogoutRequest: onLogoutRequest}]})
 
         emitEvent(events.LOGOUT_REQUESTED)
 
@@ -122,7 +122,7 @@ describe 'Sidebar', ->
     describe 'on SIGNUP_REQUESTED event', ->
       it 'calls the onSignupRequest callback function', ->
         onSignupRequest = sandbox.stub()
-        sidebar = createSidebar(options={services: [{onSignupRequest: onSignupRequest}]})
+        sidebar = createSidebar(config={services: [{onSignupRequest: onSignupRequest}]})
 
         emitEvent(events.SIGNUP_REQUESTED)
 
@@ -131,7 +131,7 @@ describe 'Sidebar', ->
     describe 'on PROFILE_REQUESTED event', ->
       it 'calls the onProfileRequest callback function', ->
         onProfileRequest = sandbox.stub()
-        sidebar = createSidebar(options={services: [{onProfileRequest: onProfileRequest}]})
+        sidebar = createSidebar(config={services: [{onProfileRequest: onProfileRequest}]})
 
         emitEvent(events.PROFILE_REQUESTED)
 
@@ -140,7 +140,7 @@ describe 'Sidebar', ->
     describe 'on HELP_REQUESTED event', ->
       it 'calls the onHelpRequest callback function', ->
         onHelpRequest = sandbox.stub()
-        sidebar = createSidebar(options={services: [{onHelpRequest: onHelpRequest}]})
+        sidebar = createSidebar(config={services: [{onHelpRequest: onHelpRequest}]})
 
         emitEvent(events.HELP_REQUESTED)
 

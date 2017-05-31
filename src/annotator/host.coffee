@@ -3,14 +3,14 @@ $ = require('jquery')
 Guest = require('./guest')
 
 module.exports = class Host extends Guest
-  constructor: (element, options) ->
+  constructor: (element, config) ->
 
-    # Some options' values are not JSON-stringifiable (e.g. JavaScript
-    # functions) and will be omitted when the options are JSON-stringified.
+    # Some config settings are not JSON-stringifiable (e.g. JavaScript
+    # functions) and will be omitted when the config is JSON-stringified.
     # Add a JSON-stringifiable option for each of these so that the sidebar can
     # at least know whether the callback functions were provided or not.
-    if options.services?[0]
-      service = options.services[0]
+    if config.services?[0]
+      service = config.services[0]
       if service.onLoginRequest
         service.onLoginRequestProvided = true
       if service.onLogoutRequest
@@ -22,14 +22,15 @@ module.exports = class Host extends Guest
       if service.onHelpRequest
         service.onHelpRequestProvided = true
 
-    # Make a copy of all options except `options.app`, the app base URL, and `options.pluginClasses`
+    # Make a copy of all config settings except `config.app`, the app base URL,
+    # and `config.pluginClasses`
     configParam = 'config=' + encodeURIComponent(
-      JSON.stringify(Object.assign({}, options, {app:undefined, pluginClasses: undefined }))
+      JSON.stringify(Object.assign({}, config, {app:undefined, pluginClasses: undefined }))
     )
-    if options.app and '?' in options.app
-      options.app += '&' + configParam
+    if config.app and '?' in config.app
+      config.app += '&' + configParam
     else
-      options.app += '?' + configParam
+      config.app += '?' + configParam
 
     # Create the iframe
     app = $('<iframe></iframe>')
@@ -37,7 +38,7 @@ module.exports = class Host extends Guest
     # enable media in annotations to be shown fullscreen
     .attr('allowfullscreen', '')
     .attr('seamless', '')
-    .attr('src', options.app)
+    .attr('src', config.app)
     .addClass('h-sidebar-iframe')
 
     @frame = $('<div></div>')
@@ -51,10 +52,10 @@ module.exports = class Host extends Guest
 
     this.on 'panelReady', =>
       # Initialize tool state.
-      if options.showHighlights == undefined
+      if config.showHighlights == undefined
         # Highlights are on by default.
-        options.showHighlights = 'always'
-      this.setVisibleHighlights(options.showHighlights == 'always')
+        config.showHighlights = 'always'
+      this.setVisibleHighlights(config.showHighlights == 'always')
 
       # Show the UI
       @frame.css('display', '')

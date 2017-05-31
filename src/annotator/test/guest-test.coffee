@@ -50,12 +50,12 @@ describe 'Guest', ->
   sandbox = sinon.sandbox.create()
   CrossFrame = null
   fakeCrossFrame = null
-  guestOptions = null
+  guestConfig = null
 
-  createGuest = (options={}) ->
-    options = Object.assign({}, guestOptions, options)
+  createGuest = (config={}) ->
+    config = Object.assign({}, guestConfig, config)
     element = document.createElement('div')
-    return new Guest(element, options)
+    return new Guest(element, config)
 
   beforeEach ->
     FakeAdder::instance = null
@@ -64,7 +64,7 @@ describe 'Guest', ->
       selectionFocusRect: sinon.stub()
     }
     selections = null
-    guestOptions = {pluginClasses: {}}
+    guestConfig = {pluginClasses: {}}
 
     Guest = proxyquire('../guest', {
       './adder': {Adder: FakeAdder},
@@ -89,7 +89,7 @@ describe 'Guest', ->
     }
 
     CrossFrame = sandbox.stub().returns(fakeCrossFrame)
-    guestOptions.pluginClasses['CrossFrame'] = CrossFrame
+    guestConfig.pluginClasses['CrossFrame'] = CrossFrame
 
   afterEach ->
     sandbox.restore()
@@ -100,7 +100,7 @@ describe 'Guest', ->
 
     beforeEach ->
       FakePlugin::instance = null
-      guestOptions.pluginClasses['FakePlugin'] = FakePlugin
+      guestConfig.pluginClasses['FakePlugin'] = FakePlugin
       guest = createGuest(FakePlugin: {})
       fakePlugin = FakePlugin::instance
 

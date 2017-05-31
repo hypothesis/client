@@ -49,7 +49,7 @@ module.exports = class BucketBar extends Plugin
         </div>
         """
 
-  # Plugin configuration
+  # Plugin options
   options:
     # gapSize parameter is used by the clustering algorithm
     # If an annotation is farther then this gapSize from the next bucket

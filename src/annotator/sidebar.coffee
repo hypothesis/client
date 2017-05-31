@@ -23,11 +23,11 @@ module.exports = class Sidebar extends Host
   renderFrame: null
   gestureState: null
 
-  constructor: (element, options) ->
+  constructor: (element, config) ->
     super
     this.hide()
 
-    if options.openSidebar || options.annotations || options.query
+    if config.openSidebar || config.annotations || config.query
       this.on 'panelReady', => this.show()
 
     if @plugins.BucketBar?
@@ -37,7 +37,7 @@ module.exports = class Sidebar extends Host
       this._setupGestures()
 
     # The partner-provided callback functions.
-    serviceConfig = options.services?[0]
+    serviceConfig = config.services?[0]
     if serviceConfig
       @onLoginRequest = serviceConfig.onLoginRequest
       @onLogoutRequest = serviceConfig.onLogoutRequest

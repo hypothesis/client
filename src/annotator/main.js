@@ -1,5 +1,6 @@
 'use strict';
 
+var configFrom = require('./config');
 require('../shared/polyfills');
 
 
@@ -37,20 +38,20 @@ var pluginClasses = {
 
 var appLinkEl =
   document.querySelector('link[type="application/annotator+html"]');
-var options = require('./config')(window);
+var config = configFrom(window);
 
 $.noConflict(true)(function() {
   var Klass = window.PDFViewerApplication ?
       PdfSidebar :
       Sidebar;
-  if (options.hasOwnProperty('constructor')) {
-    Klass = options.constructor;
-    delete options.constructor;
+  if (config.hasOwnProperty('constructor')) {
+    Klass = config.constructor;
+    delete config.constructor;
   }
 
-  options.pluginClasses = pluginClasses;
+  config.pluginClasses = pluginClasses;
 
-  window.annotator = new Klass(document.body, options);
+  window.annotator = new Klass(document.body, config);
   appLinkEl.addEventListener('destroy', function () {
     appLinkEl.parentElement.removeChild(appLinkEl);
     window.annotator.destroy();

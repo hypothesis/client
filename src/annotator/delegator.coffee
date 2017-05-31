@@ -30,7 +30,7 @@ module.exports = class Delegator
 # hash and extends the @options object.
 #
 # element - The DOM element that this instance represents.
-# options - An Object literal of options.
+# config - An Object literal of config settings.
 #
 # Examples
 #
@@ -40,8 +40,8 @@ module.exports = class Delegator
 #   })
 #
 # Returns a new instance of Delegator.
-  constructor: (element, options) ->
-    @options = $.extend(true, {}, @options, options)
+  constructor: (element, config) ->
+    @options = $.extend(true, {}, @options, config)
     @element = $(element)
 
     # Delegator creates closures for each event it binds. This is a private

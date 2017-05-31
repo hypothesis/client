@@ -5,7 +5,7 @@ var proxyquire = require('proxyquire');
 var fakeSettings = sinon.stub();
 var fakeExtractAnnotationQuery = {};
 
-var config = proxyquire('../config', {
+var configFrom = proxyquire('../config', {
   '../shared/settings': fakeSettings,
   './util/extract-annotation-query': fakeExtractAnnotationQuery,
 });
@@ -52,8 +52,8 @@ describe('annotator.config', function() {
       document.head.removeChild(link);
     });
 
-    it("returns the <link>'s href as options.app", function() {
-      assert.equal(config(window).app, link.href);
+    it("returns the <link>'s href as config.app", function() {
+      assert.equal(configFrom(window).app, link.href);
     });
   });
 
@@ -62,28 +62,28 @@ describe('annotator.config', function() {
       var window_ = fakeWindow();
       window_.document.querySelector.returns(null);
 
-      assert.throws(function() { config(window_); }, TypeError);
+      assert.throws(function() { configFrom(window_); }, TypeError);
     });
   });
 
   it('gets the JSON settings from the document', function() {
     var window_ = fakeWindow();
 
-    config(window_);
+    configFrom(window_);
 
     assert.calledOnce(fakeSettings);
     assert.calledWithExactly(fakeSettings, window_.document);
   });
 
   context('when settings() returns a non-empty object', function() {
-    it('reads the setting into the returned options', function() {
-      // config() just blindly adds any key: value settings that settings()
-      // returns into the returns options object.
+    it('reads the setting into the returned config', function() {
+      // configFrom() just blindly adds any key: value settings that settings()
+      // returns into the returned config object.
       fakeSettings.returns({foo: 'bar'});
 
-      var options = config(fakeWindow());
+      var config = configFrom(fakeWindow());
 
-      assert.equal(options.foo, 'bar');
+      assert.equal(config.foo, 'bar');
     });
   });
 
@@ -93,24 +93,24 @@ describe('annotator.config', function() {
     });
 
     it('catches the error', function() {
-      config(fakeWindow());
+      configFrom(fakeWindow());
     });
 
     it('logs a warning', function() {
-      config(fakeWindow());
+      configFrom(fakeWindow());
 
       assert.called(console.warn);
     });
   });
 
   context("when there's a window.hypothesisConfig() function", function() {
-    it('reads arbitrary settings from hypothesisConfig() into options', function() {
+    it('reads arbitrary settings from hypothesisConfig() into config', function() {
       var window_ = fakeWindow();
       window_.hypothesisConfig = sinon.stub().returns({foo: 'bar'});
 
-      var options = config(window_);
+      var config = configFrom(window_);
 
-      assert.equal(options.foo, 'bar');
+      assert.equal(config.foo, 'bar');
     });
 
     specify('hypothesisConfig() settings override js-hypothesis-config ones', function() {
@@ -119,20 +119,20 @@ describe('annotator.config', function() {
         foo: 'fooFromHypothesisConfigFunc'});
       fakeSettings.returns({foo: 'fooFromJSHypothesisConfigObj'});
 
-      var options = config(window_);
+      var config = configFrom(window_);
 
-      assert.equal(options.foo, 'fooFromHypothesisConfigFunc');
+      assert.equal(config.foo, 'fooFromHypothesisConfigFunc');
     });
 
     context('if hypothesisConfig() returns a non-object value', function() {
-      it("doesn't add anything into the options", function() {
+      it("doesn't add anything into the config", function() {
         var window_ = fakeWindow();
         window_.hypothesisConfig = sinon.stub().returns(42);
 
-        var options = config(window_);
+        var config = configFrom(window_);
 
-        delete options.app; // We don't care about options.app for this test.
-        assert.deepEqual({}, options);
+        delete config.app; // We don't care about config.app for this test.
+        assert.deepEqual({}, config);
       });
     });
   });
@@ -143,7 +143,7 @@ describe('annotator.config', function() {
       window_.hypothesisConfig = 'notAFunction';
 
       assert.throws(
-        function() { config(window_); }, TypeError,
+        function() { configFrom(window_); }, TypeError,
         'hypothesisConfig must be a function, see: https://h.readthedocs.io/en/latest/embedding.html'
       );
     });
@@ -162,7 +162,7 @@ describe('annotator.config', function() {
         out:  'never',
       },
       // It adds any arbitrary string value for showHighlights to the
-      // returned options, unmodified.
+      // returned config, unmodified.
       {
         name: 'passes arbitrary strings through unmodified',
         in:   'foo',
@@ -172,15 +172,15 @@ describe('annotator.config', function() {
       it(test.name, function() {
         fakeSettings.returns({showHighlights: test.in});
 
-        var options = config(fakeWindow());
+        var config = configFrom(fakeWindow());
 
-        assert.equal(options.showHighlights, test.out);
+        assert.equal(config.showHighlights, test.out);
       });
     });
   });
 
   it("extracts the annotation query from the parent page's URL", function() {
-    config(fakeWindow());
+    configFrom(fakeWindow());
 
     assert.calledOnce(fakeExtractAnnotationQuery.extractAnnotationQuery);
     assert.calledWithExactly(
@@ -194,8 +194,8 @@ describe('annotator.config', function() {
       });
     });
 
-    it('blindly adds the properties of the object to the options', function() {
-      assert.equal(config(fakeWindow()).foo, 'bar');
+    it('blindly adds the properties of the object to the config', function() {
+      assert.equal(configFrom(fakeWindow()).foo, 'bar');
     });
 
     specify('settings from extractAnnotationQuery override others', function() {
@@ -210,7 +210,7 @@ describe('annotator.config', function() {
         foo: 'fromHypothesisConfig',
       });
 
-      assert.equal(config(window_).foo, 'fromExtractAnnotationQuery');
+      assert.equal(configFrom(window_).foo, 'fromExtractAnnotationQuery');
     });
   });
 });

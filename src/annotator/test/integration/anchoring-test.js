@@ -46,18 +46,18 @@ function FakeCrossFrame() {
 
 describe('anchoring', function () {
   var guest;
-  var guestOptions;
+  var guestConfig;
   var container;
 
   before(function () {
-    guestOptions = {pluginClasses: {CrossFrame: FakeCrossFrame}};
+    guestConfig = {pluginClasses: {CrossFrame: FakeCrossFrame}};
   });
 
   beforeEach(function () {
     container = document.createElement('div');
     container.innerHTML = require('./test-page.html');
     document.body.appendChild(container);
-    guest = new Guest(container, guestOptions);
+    guest = new Guest(container, guestConfig);
   });
 
   afterEach(function () {
