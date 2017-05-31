@@ -13,10 +13,12 @@ var configFrom = proxyquire('../config', {
 });
 var sandbox = sinon.sandbox.create();
 
-function fakeWindow() {
+function fakeWindow(someHref) {
+  var href = someHref || 'LINK_HREF';
+
   return {
     document: {
-      querySelector: sinon.stub().returns({href: 'LINK_HREF'}),
+      querySelector: sinon.stub().returns({href: href}),
     },
     location: {href: 'LOCATION_HREF'},
   };
@@ -222,6 +224,56 @@ describe('annotator.config', function() {
       it('adds the query to the config', function() {
         assert.equal(configFrom(fakeWindow()).query, 'QUERY');
       });
+    });
+  });
+
+  context('when the client is injected by the browser extension', function() {
+    beforeEach(function() {
+      fakeExtractAnnotationQuery.annotations.returns('SOME_ANNOTATION_ID');
+      fakeSettings.jsonConfigsFrom.returns({foo: 'bar'});
+    });
+
+    it('ignores the host page config on chrome', function() {
+      var window_ = fakeWindow('chrome-extension://abcdef');
+      var currConfig = configFrom(window_);
+
+      assert.equal(currConfig.app, 'chrome-extension://abcdef');
+      assert.equal(currConfig.annotations, 'SOME_ANNOTATION_ID');
+      assert.isUndefined(currConfig.foo);
+    });
+
+    it('ignores the host page config on firefox', function() {
+      var window_ = fakeWindow('moz-extension://abcdef');
+      var currConfig = configFrom(window_);
+
+      assert.equal(currConfig.app, 'moz-extension://abcdef');
+      assert.equal(currConfig.annotations, 'SOME_ANNOTATION_ID');
+      assert.isUndefined(currConfig.foo);
+    });
+
+    it('ignores the host page config on edge', function() {
+      var window_ = fakeWindow('ms-browser-extension://abcdef');
+      var currConfig = configFrom(window_);
+
+      assert.equal(currConfig.app, 'ms-browser-extension://abcdef');
+      assert.equal(currConfig.annotations, 'SOME_ANNOTATION_ID');
+      assert.isUndefined(currConfig.foo);
+    });
+  });
+
+  context('when the client is not injected by the browser extension', function() {
+    beforeEach(function() {
+      fakeExtractAnnotationQuery.annotations.returns('SOME_ANNOTATION_ID');
+      fakeSettings.jsonConfigsFrom.returns({foo: 'bar'});
+    });
+
+    it('does not ignore the host page config', function() {
+      var window_ = fakeWindow('SOME_HREF');
+      var currConfig = configFrom(window_);
+
+      assert.equal(currConfig.app, 'SOME_HREF');
+      assert.equal(currConfig.annotations, 'SOME_ANNOTATION_ID');
+      assert.equal(currConfig.foo, 'bar');
     });
   });
 });

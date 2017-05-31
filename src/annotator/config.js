@@ -15,6 +15,35 @@ function configFrom(window_) {
     app: window_.
       document.querySelector('link[type="application/annotator+html"]').href,
   };
+  var chromeExt = 'chrome-extension://';
+  var mozExt = 'moz-extension://';
+  var edgeExt = 'ms-browser-extension://';
+
+  // Extract the default annotation ID or query from the URL.
+  //
+  // The Chrome extension or proxy may already have provided this config
+  // via a tag injected into the DOM, which avoids the problem where the page's
+  // JS rewrites the URL before Hypothesis loads.
+  //
+  // In environments where the config has not been injected into the DOM,
+  // we try to retrieve it from the URL here.
+  var query = extractAnnotationQuery.query(window_.location.href);
+  if (query) {
+    config.query = query;
+  } else {
+    var annotations = extractAnnotationQuery.annotations(window_.location.href);
+    if (annotations) {
+      config.annotations = annotations;
+    }
+  }
+
+  // If the client is injected by the browser extension, ignore
+  // the rest of the host page config.
+  if (config.app.indexOf(chromeExt) === 0 ||
+    config.app.indexOf(mozExt) === 0||
+    config.app.indexOf(edgeExt) === 0) {
+    return config;
+  }
 
   // Parse config from `<script class="js-hypothesis-config">` tags
   try {
@@ -37,24 +66,6 @@ function configFrom(window_) {
   // configuration.
   if (typeof config.showHighlights === 'boolean') {
     config.showHighlights = config.showHighlights ? 'always' : 'never';
-  }
-
-  // Extract the default annotation ID or query from the URL.
-  //
-  // The Chrome extension or proxy may already have provided this config
-  // via a tag injected into the DOM, which avoids the problem where the page's
-  // JS rewrites the URL before Hypothesis loads.
-  //
-  // In environments where the config has not been injected into the DOM,
-  // we try to retrieve it from the URL here.
-  var query = extractAnnotationQuery.query(window_.location.href);
-  if (query) {
-    config.query = query;
-  } else {
-    var annotations = extractAnnotationQuery.annotations(window_.location.href);
-    if (annotations) {
-      config.annotations = annotations;
-    }
   }
 
   return config;
