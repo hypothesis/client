@@ -18,7 +18,7 @@ describe('settings', function () {
     afterEach('remove js-hypothesis-config tags', function() {
       var elements = document.querySelectorAll('.js-settings-test');
       for (var i=0; i < elements.length; i++) {
-        elements[i].parentNode.removeChild(elements[i]);
+        elements[i].remove();
       }
     });
 
