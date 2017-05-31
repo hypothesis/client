@@ -175,7 +175,6 @@ function FrameSync($rootScope, $window, Discovery, annotationUI, bridge) {
       }
 
       // if doi available as highwire or dc meta, include in search
-
       if ( info.metadata && info.metadata.link ) {
         info.metadata.link.forEach(function(link) {
           if ( link.href && link.href.slice(0,4)==='doi:' ) {
