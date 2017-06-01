@@ -8,9 +8,7 @@
  * @return {Object} - An object with either an annotation ID or a filter string.
  */
 function extractAnnotationQuery(url) {
-  // Annotation IDs are url-safe-base64 identifiers
-  // See https://tools.ietf.org/html/rfc4648#page-7
-  var annotFragmentMatch = url.match(/#annotations:([A-Za-z0-9_-]+)$/);
+  var annotFragmentMatch;
   var queryFragmentMatch = url.match(/#annotations:(query|q):(.+)$/i);
 
   if (queryFragmentMatch) {
@@ -21,6 +19,9 @@ function extractAnnotationQuery(url) {
     }
   }
 
+  // Annotation IDs are url-safe-base64 identifiers
+  // See https://tools.ietf.org/html/rfc4648#page-7
+  annotFragmentMatch = url.match(/#annotations:([A-Za-z0-9_-]+)$/);
   if (annotFragmentMatch) {
     return {annotations: annotFragmentMatch[1]};
   }
