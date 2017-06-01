@@ -5,7 +5,7 @@ var proxyquire = require('proxyquire');
 var fakeSettings = {
   jsonConfigsFrom: sinon.stub(),
 };
-var fakeExtractAnnotationQuery = {};
+var fakeExtractAnnotationQuery = sinon.stub();
 
 var configFrom = proxyquire('../config', {
   '../shared/settings': fakeSettings,
@@ -33,7 +33,8 @@ describe('annotator.config', function() {
   });
 
   beforeEach('reset fakeExtractAnnotationQuery', function() {
-    fakeExtractAnnotationQuery.extractAnnotationQuery = sinon.stub();
+    fakeExtractAnnotationQuery.reset();
+    fakeExtractAnnotationQuery.returns(null);
   });
 
   afterEach('reset the sandbox', function() {
@@ -187,16 +188,13 @@ describe('annotator.config', function() {
   it("extracts the annotation query from the parent page's URL", function() {
     configFrom(fakeWindow());
 
-    assert.calledOnce(fakeExtractAnnotationQuery.extractAnnotationQuery);
-    assert.calledWithExactly(
-      fakeExtractAnnotationQuery.extractAnnotationQuery, 'LOCATION_HREF');
+    assert.calledOnce(fakeExtractAnnotationQuery);
+    assert.calledWithExactly(fakeExtractAnnotationQuery, 'LOCATION_HREF');
   });
 
   context('when extractAnnotationQuery() returns an object', function() {
     beforeEach(function() {
-      fakeExtractAnnotationQuery.extractAnnotationQuery.returns({
-        foo: 'bar',
-      });
+      fakeExtractAnnotationQuery.returns({foo: 'bar'});
     });
 
     it('blindly adds the properties of the object to the config', function() {
@@ -207,9 +205,7 @@ describe('annotator.config', function() {
       // Settings returned by extractAnnotationQuery() override ones from
       // jsonConfigsFrom() or from window.hypothesisConfig().
       var window_ = fakeWindow();
-      fakeExtractAnnotationQuery.extractAnnotationQuery.returns({
-        foo: 'fromExtractAnnotationQuery',
-      });
+      fakeExtractAnnotationQuery.returns({foo: 'fromExtractAnnotationQuery'});
       fakeSettings.jsonConfigsFrom.returns({foo: 'fromSettings'});
       window_.hypothesisConfig = sinon.stub().returns({
         foo: 'fromHypothesisConfig',
