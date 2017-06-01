@@ -5,7 +5,7 @@ var proxyquire = require('proxyquire');
 var fakeSettings = {
   jsonConfigsFrom: sinon.stub(),
 };
-var fakeExtractAnnotationQuery = sinon.stub();
+var fakeExtractAnnotationQuery = {};
 
 var configFrom = proxyquire('../config', {
   '../shared/settings': fakeSettings,
@@ -33,8 +33,8 @@ describe('annotator.config', function() {
   });
 
   beforeEach('reset fakeExtractAnnotationQuery', function() {
-    fakeExtractAnnotationQuery.reset();
-    fakeExtractAnnotationQuery.returns(null);
+    fakeExtractAnnotationQuery.annotations = sinon.stub();
+    fakeExtractAnnotationQuery.query = sinon.stub();
   });
 
   afterEach('reset the sandbox', function() {
@@ -185,33 +185,43 @@ describe('annotator.config', function() {
     });
   });
 
-  it("extracts the annotation query from the parent page's URL", function() {
+  it("extracts the direct-linked annotation ID from the parent page's URL", function() {
     configFrom(fakeWindow());
 
-    assert.calledOnce(fakeExtractAnnotationQuery);
-    assert.calledWithExactly(fakeExtractAnnotationQuery, 'LOCATION_HREF');
+    assert.calledOnce(fakeExtractAnnotationQuery.annotations);
+    assert.calledWithExactly(
+      fakeExtractAnnotationQuery.annotations, 'LOCATION_HREF');
   });
 
-  context('when extractAnnotationQuery() returns an object', function() {
+  context("when there's a direct-linked annotation ID", function() {
     beforeEach(function() {
-      fakeExtractAnnotationQuery.returns({foo: 'bar'});
+      fakeExtractAnnotationQuery.annotations.returns('ANNOTATION_ID');
     });
 
-    it('blindly adds the properties of the object to the config', function() {
-      assert.equal(configFrom(fakeWindow()).foo, 'bar');
+    it('adds the annotation ID to the config', function() {
+      assert.equal(configFrom(fakeWindow()).annotations, 'ANNOTATION_ID');
+    });
+  });
+
+  context("when there's no direct-linked annotation ID", function() {
+    it("doesn't add any .annotations setting to the config", function() {
+      assert.isFalse(configFrom(fakeWindow()).hasOwnProperty('annotations'));
     });
 
-    specify('settings from extractAnnotationQuery override others', function() {
-      // Settings returned by extractAnnotationQuery() override ones from
-      // jsonConfigsFrom() or from window.hypothesisConfig().
-      var window_ = fakeWindow();
-      fakeExtractAnnotationQuery.returns({foo: 'fromExtractAnnotationQuery'});
-      fakeSettings.jsonConfigsFrom.returns({foo: 'fromSettings'});
-      window_.hypothesisConfig = sinon.stub().returns({
-        foo: 'fromHypothesisConfig',
+    context("when there's no annotations query", function() {
+      it("doesn't add any .query setting to the config", function() {
+        assert.isFalse(configFrom(fakeWindow()).hasOwnProperty('query'));
+      });
+    });
+
+    context("when there's an annotations query", function() {
+      beforeEach(function() {
+        fakeExtractAnnotationQuery.query.returns('QUERY');
       });
 
-      assert.equal(configFrom(window_).foo, 'fromExtractAnnotationQuery');
+      it('adds the query to the config', function() {
+        assert.equal(configFrom(fakeWindow()).query, 'QUERY');
+      });
     });
   });
 });
