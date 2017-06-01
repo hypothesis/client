@@ -195,9 +195,7 @@ describe('annotator.config', function() {
 
   context("when there's a direct-linked annotation ID", function() {
     beforeEach(function() {
-      fakeExtractAnnotationQuery.annotations.returns({
-        annotations: 'ANNOTATION_ID',
-      });
+      fakeExtractAnnotationQuery.annotations.returns('ANNOTATION_ID');
     });
 
     it('adds the annotation ID to the config', function() {
@@ -218,7 +216,7 @@ describe('annotator.config', function() {
 
     context("when there's an annotations query", function() {
       beforeEach(function() {
-        fakeExtractAnnotationQuery.query.returns({query: 'QUERY'});
+        fakeExtractAnnotationQuery.query.returns('QUERY');
       });
 
       it('adds the query to the config', function() {

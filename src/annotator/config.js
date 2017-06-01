@@ -49,11 +49,11 @@ function configFrom(window_) {
   // we try to retrieve it from the URL here.
   var query = extractAnnotationQuery.query(window_.location.href);
   if (query) {
-    config.query = query.query;
+    config.query = query;
   } else {
     var annotations = extractAnnotationQuery.annotations(window_.location.href);
     if (annotations) {
-      config.annotations = annotations.annotations;
+      config.annotations = annotations;
     }
   }
 
