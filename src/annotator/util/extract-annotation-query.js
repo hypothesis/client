@@ -8,24 +8,24 @@
  * @return {Object} - An object with either an annotation ID or a filter string.
  */
 function extractAnnotationQuery(url) {
-  var filter = {};
   // Annotation IDs are url-safe-base64 identifiers
   // See https://tools.ietf.org/html/rfc4648#page-7
   var annotFragmentMatch = url.match(/#annotations:([A-Za-z0-9_-]+)$/);
   var queryFragmentMatch = url.match(/#annotations:(query|q):(.+)$/i);
+
   if (queryFragmentMatch) {
     try {
-      filter.query = decodeURI(queryFragmentMatch[2]);
+      return {query: decodeURI(queryFragmentMatch[2])};
     } catch (err) {
       // URI Error should return the page unfiltered.
-      filter = null;
     }
-  } else if (annotFragmentMatch) {
-    filter.annotations = annotFragmentMatch[1];
-  } else {
-    filter = null;
   }
-  return filter;
+
+  if (annotFragmentMatch) {
+    return {annotations: annotFragmentMatch[1]};
+  }
+
+  return null;
 }
 
 module.exports = extractAnnotationQuery;
