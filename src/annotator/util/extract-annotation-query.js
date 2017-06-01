@@ -28,6 +28,4 @@ function extractAnnotationQuery(url) {
   return filter;
 }
 
-module.exports = {
-  extractAnnotationQuery: extractAnnotationQuery,
-};
+module.exports = extractAnnotationQuery;

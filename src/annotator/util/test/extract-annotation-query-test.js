@@ -2,18 +2,18 @@
 
 var unroll = require('../../../shared/test/util').unroll;
 
-var annotationIds = require('../extract-annotation-query');
+var extractAnnotationQuery = require('../extract-annotation-query');
 
 describe('annotation queries', function () {
          
   it ('returns null on invalid fragment', function () {
-    assert.equal(annotationIds.extractAnnotationQuery(
+    assert.equal(extractAnnotationQuery(
       'http://localhost:3000#annotations:\"TRYINGTOGETIN\");EVILSCRIPT()'),
       null);
   });
          
   unroll('accepts annotation fragment from urls', function (testCase) {
-    assert.equal(annotationIds.extractAnnotationQuery(testCase.url).annotations, testCase.result);
+    assert.equal(extractAnnotationQuery(testCase.url).annotations, testCase.result);
   }, [{
     url: 'http://localhost:3000#annotations:alphanum3ric_-only',
     result: 'alphanum3ric_-only',
@@ -21,7 +21,7 @@ describe('annotation queries', function () {
   ]);
 
   unroll('accepts query from annotation fragment', function(testCase) {
-    assert.equal(annotationIds.extractAnnotationQuery(testCase.url).query, testCase.result);
+    assert.equal(extractAnnotationQuery(testCase.url).query, testCase.result);
   }, [{
     url: 'http://localhost:3000#annotations:q:user:USERNAME',
     result: 'user:USERNAME',

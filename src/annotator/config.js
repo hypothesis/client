@@ -1,6 +1,6 @@
 'use strict';
 
-var annotationQuery = require('./util/extract-annotation-query');
+var extractAnnotationQuery = require('./util/extract-annotation-query');
 var settings = require('../shared/settings');
 
 var docs = 'https://h.readthedocs.io/en/latest/embedding.html';
@@ -47,7 +47,7 @@ function configFrom(window_) {
   //
   // In environments where the config has not been injected into the DOM,
   // we try to retrieve it from the URL here.
-  var directLinkedID = annotationQuery.extractAnnotationQuery(window_.location.href);
+  var directLinkedID = extractAnnotationQuery(window_.location.href);
   if (directLinkedID) {
     Object.assign(config, directLinkedID);
   }
