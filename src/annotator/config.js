@@ -39,7 +39,7 @@ function configFrom(window_) {
     config.showHighlights = config.showHighlights ? 'always' : 'never';
   }
 
-  // Extract the default query from the URL.
+  // Extract the default annotation ID or query from the URL.
   //
   // The Chrome extension or proxy may already have provided this config
   // via a tag injected into the DOM, which avoids the problem where the page's
@@ -47,10 +47,16 @@ function configFrom(window_) {
   //
   // In environments where the config has not been injected into the DOM,
   // we try to retrieve it from the URL here.
-  var directLinkedID = extractAnnotationQuery(window_.location.href);
-  if (directLinkedID) {
-    Object.assign(config, directLinkedID);
+  var query = extractAnnotationQuery.query(window_.location.href);
+  if (query) {
+    config.query = query.query;
+  } else {
+    var annotations = extractAnnotationQuery.annotations(window_.location.href);
+    if (annotations) {
+      config.annotations = annotations.annotations;
+    }
   }
+
   return config;
 }
 
