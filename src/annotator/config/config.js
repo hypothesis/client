@@ -13,14 +13,7 @@ function configFrom(window_) {
 
   config.app = settings.iFrameSrc(window_.document);
 
-  // Parse config from `<script class="js-hypothesis-config">` tags
-  try {
-    Object.assign(config, sharedSettings.jsonConfigsFrom(window_.document));
-  } catch (err) {
-    console.warn('Could not parse settings from js-hypothesis-config tags',
-      err);
-  }
-
+  Object.assign(config, sharedSettings.jsonConfigsFrom(window_.document));
   Object.assign(config, settings.configFuncSettingsFrom(window_));
 
   // Convert legacy keys/values in config to corresponding current

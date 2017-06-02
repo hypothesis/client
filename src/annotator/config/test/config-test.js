@@ -2,8 +2,6 @@
 
 var proxyquire = require('proxyquire');
 
-var sandbox = sinon.sandbox.create();
-
 var fakeSettings = {};
 var fakeSharedSettings = {};
 var configFrom = proxyquire('../config', {
@@ -19,10 +17,6 @@ function fakeWindow() {
 }
 
 describe('annotator.config', function() {
-  beforeEach('stub console.warn()', function() {
-    sandbox.stub(console, 'warn');
-  });
-
   beforeEach('reset fakeSettings', function() {
     fakeSettings.iFrameSrc = sinon.stub().returns('IFRAME_URL');
     fakeSettings.annotations = sinon.stub().returns(null);
@@ -32,10 +26,6 @@ describe('annotator.config', function() {
 
   beforeEach('reset fakeSharedSettings', function() {
     fakeSharedSettings.jsonConfigsFrom = sinon.stub().returns({});
-  });
-
-  afterEach('reset the sandbox', function() {
-    sandbox.restore();
   });
 
   context("when there's an application/annotator+html <link>", function() {
@@ -75,22 +65,6 @@ describe('annotator.config', function() {
       var config = configFrom(fakeWindow());
 
       assert.equal(config.foo, 'bar');
-    });
-  });
-
-  context('when jsonConfigsFrom() throws an error', function() {
-    beforeEach(function() {
-      fakeSharedSettings.jsonConfigsFrom.throws();
-    });
-
-    it('catches the error', function() {
-      configFrom(fakeWindow());
-    });
-
-    it('logs a warning', function() {
-      configFrom(fakeWindow());
-
-      assert.called(console.warn);
     });
   });
 
