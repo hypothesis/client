@@ -30,8 +30,12 @@ function configFrom(window_) {
   //
   // In environments where the config has not been injected into the DOM,
   // we try to retrieve it from the URL here.
-  config.query = settings.query(window_.location.href);
-  config.annotations = settings.annotations(window_.location.href);
+  if (!config.query) {
+    config.query = settings.query(window_.location.href);
+  }
+  if (!config.annotations) {
+    config.annotations = settings.annotations(window_.location.href);
+  }
 
   return config;
 }
