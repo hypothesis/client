@@ -2,9 +2,7 @@
 
 var proxyquire = require('proxyquire');
 
-var fakeSharedSettings = {
-  jsonConfigsFrom: sinon.stub(),
-};
+var fakeSharedSettings = {};
 var fakeSettings = {};
 
 var configFrom = proxyquire('../index', {
@@ -30,8 +28,7 @@ describe('annotator.config', function() {
   });
 
   beforeEach('reset fakeSharedSettings', function() {
-    fakeSharedSettings.jsonConfigsFrom.reset();
-    fakeSharedSettings.jsonConfigsFrom.returns({});
+    fakeSharedSettings.jsonConfigsFrom = sinon.stub().returns({});
   });
 
   beforeEach('reset fakeSettings', function() {
