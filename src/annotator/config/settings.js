@@ -1,6 +1,27 @@
 'use strict';
 
 /**
+ * Return the href URL of the annotator `<link>` in the given document.
+ *
+ * This URL is used as the src of the sidebar's `<iframe>`.
+ *
+ * Return the value of the href attribute of the first
+ * `<link type="application/annotator+html" href="...">` element in the given
+ * document, or `null`.
+ *
+ * @param {Document} - The document to search.
+ * @return {string|null} - The URL to use for the sidebar's iframe.
+ *
+ */
+function iFrameSrc(document_) {
+  var link = document_.querySelector('link[type="application/annotator+html"]');
+  if (!link || !link.href) {
+    return null;
+  }
+  return link.href;
+}
+
+/**
  * Return the `#annotations:*` ID from the given URL's fragment.
  *
  * If the URL contains a `#annotations:<ANNOTATION_ID>` fragment then return
@@ -78,6 +99,7 @@ function configFuncSettingsFrom(window_) {
 }
 
 module.exports = {
+  iFrameSrc: iFrameSrc,
   annotations: annotations,
   query: query,
   configFuncSettingsFrom: configFuncSettingsFrom,

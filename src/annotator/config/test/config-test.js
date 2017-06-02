@@ -13,9 +13,7 @@ var sandbox = sinon.sandbox.create();
 
 function fakeWindow() {
   return {
-    document: {
-      querySelector: sinon.stub().returns({href: 'LINK_HREF'}),
-    },
+    document: 'THE_DOCUMENT',
     location: {href: 'LOCATION_HREF'},
   };
 }
@@ -30,6 +28,7 @@ describe('annotator.config', function() {
   });
 
   beforeEach('reset fakeSettings', function() {
+    fakeSettings.iFrameSrc = sinon.stub().returns('IFRAME_URL');
     fakeSettings.annotations = sinon.stub();
     fakeSettings.query = sinon.stub();
     fakeSettings.configFuncSettingsFrom = sinon.stub().returns({});
@@ -40,30 +39,20 @@ describe('annotator.config', function() {
   });
 
   context("when there's an application/annotator+html <link>", function() {
-    var link;
-
-    beforeEach('add an application/annotator+html <link>', function() {
-      link = document.createElement('link');
-      link.type = 'application/annotator+html';
-      link.href = 'http://example.com/link';
-      document.head.appendChild(link);
-    });
-
-    afterEach('tidy up the link', function() {
-      document.head.removeChild(link);
-    });
-
     it("returns the <link>'s href as config.app", function() {
-      assert.equal(configFrom(window).app, link.href);
+      assert.equal(configFrom(window).app, 'IFRAME_URL');
     });
   });
 
   context("when there's no application/annotator+html <link>", function() {
-    it('throws a TypeError', function() {
-      var window_ = fakeWindow();
-      window_.document.querySelector.returns(null);
+    beforeEach('remove the application/annotator+html <link>', function() {
+      fakeSettings.iFrameSrc.returns(null);
+    });
 
-      assert.throws(function() { configFrom(window_); }, TypeError);
+    it('sets config.app to null', function() {
+      var config = configFrom(fakeWindow());
+
+      assert.isNull(config.app);
     });
   });
 

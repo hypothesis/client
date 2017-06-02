@@ -9,10 +9,9 @@ var sharedSettings = require('../../shared/settings');
  * @param {Window} window_ - The Window object to read config from.
  */
 function configFrom(window_) {
-  var config = {
-    app: window_.
-      document.querySelector('link[type="application/annotator+html"]').href,
-  };
+  var config = {};
+
+  config.app = settings.iFrameSrc(window_.document);
 
   // Parse config from `<script class="js-hypothesis-config">` tags
   try {

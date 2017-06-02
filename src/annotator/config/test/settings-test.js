@@ -3,6 +3,75 @@
 var settings = require('../settings');
 
 describe('annotator.settings', function() {
+  describe('#iFrameSrc', function() {
+    function appendLinkToDocument(href) {
+      var link = document.createElement('link');
+      link.type = 'application/annotator+html';
+      if (href) {
+        link.href = href;
+      }
+      document.head.appendChild(link);
+      return link;
+    }
+
+    context("when there's an application/annotator+html link", function() {
+      var link;
+
+      beforeEach('add an application/annotator+html <link>', function() {
+        link = appendLinkToDocument('http://example.com/app.html');
+      });
+
+      afterEach('tidy up the link', function() {
+        document.head.removeChild(link);
+      });
+
+      it('returns the href from the link', function() {
+        assert.equal(settings.iFrameSrc(document), 'http://example.com/app.html');
+      });
+    });
+
+    context('when there are multiple annotator+html links', function() {
+      var link1;
+      var link2;
+
+      beforeEach('add two links to the document', function() {
+        link1 = appendLinkToDocument('http://example.com/app1');
+        link2 = appendLinkToDocument('http://example.com/app2');
+      });
+
+      afterEach('tidy up the links', function() {
+        document.head.removeChild(link1);
+        document.head.removeChild(link2);
+      });
+
+      it('returns the href from the first one', function() {
+        assert.equal(settings.iFrameSrc(document), 'http://example.com/app1');
+      });
+    });
+
+    context('when the annotator+html link has no href', function() {
+      var link;
+
+      beforeEach('add an application/annotator+html <link> with no href', function() {
+        link = appendLinkToDocument();
+      });
+
+      afterEach('tidy up the link', function() {
+        document.head.removeChild(link);
+      });
+
+      it('returns null', function() {
+        assert.isNull(settings.iFrameSrc(document));
+      });
+    });
+
+    context("when there's no annotator+html link", function() {
+      it('returns null', function() {
+        assert.isNull(settings.iFrameSrc(document));
+      });
+    });
+  });
+
   describe('#annotations', function() {
     [
       {
