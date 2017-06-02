@@ -92,10 +92,11 @@ function configFuncSettingsFrom(window_) {
 
   if (typeof window_.hypothesisConfig === 'function') {
     return window_.hypothesisConfig();
-  } else {
-    var docs = 'https://h.readthedocs.io/en/latest/embedding.html';
-    throw new TypeError('hypothesisConfig must be a function, see: ' + docs);
   }
+
+  var docs = 'https://h.readthedocs.io/en/latest/embedding.html';
+  console.warn('hypothesisConfig must be a function, see: ' + docs);
+  return {};
 }
 
 module.exports = {

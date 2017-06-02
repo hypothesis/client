@@ -99,14 +99,6 @@ describe('annotator.config', function() {
     });
   });
 
-  context('when configFuncSettingsFrom() throws an error', function() {
-    it('throws the same error', function() {
-      fakeSettings.configFuncSettingsFrom.throws(new TypeError());
-
-      assert.throws(function() { configFrom(fakeWindow()); }, TypeError);
-    });
-  });
-
   describe('showHighlights', function() {
     [
       {

@@ -2,7 +2,13 @@
 
 var settings = require('../settings');
 
+var sandbox = sinon.sandbox.create();
+
 describe('annotator.settings', function() {
+  afterEach('reset the sandbox', function() {
+    sandbox.restore();
+  });
+
   describe('#iFrameSrc', function() {
     function appendLinkToDocument(href) {
       var link = document.createElement('link');
@@ -191,13 +197,22 @@ describe('annotator.settings', function() {
     });
 
     context("when window.hypothesisConfig() isn't a function", function() {
-      it('throws an error', function() {
-        var fakeWindow = { hypothesisConfig: 42 };
+      beforeEach('stub console.warn()', function() {
+        sandbox.stub(console, 'warn');
+      });
 
-        assert.throws(
-          function() { settings.configFuncSettingsFrom(fakeWindow); },
-          TypeError
-        );
+      function fakeWindow() {
+        return {hypothesisConfig: 42};
+      }
+
+      it('returns {}', function() {
+        assert.deepEqual(settings.configFuncSettingsFrom(fakeWindow()), {});
+      });
+
+      it('logs a warning', function() {
+        settings.configFuncSettingsFrom(fakeWindow());
+
+        assert.called(console.warn);
       });
     });
 
