@@ -2,14 +2,14 @@
 
 var proxyquire = require('proxyquire');
 
+var sandbox = sinon.sandbox.create();
+
 var fakeSettings = {};
 var fakeSharedSettings = {};
-
 var configFrom = proxyquire('../config', {
   './settings': fakeSettings,
   '../../shared/settings': fakeSharedSettings,
 });
-var sandbox = sinon.sandbox.create();
 
 function fakeWindow() {
   return {
@@ -23,15 +23,15 @@ describe('annotator.config', function() {
     sandbox.stub(console, 'warn');
   });
 
-  beforeEach('reset fakeSharedSettings', function() {
-    fakeSharedSettings.jsonConfigsFrom = sinon.stub().returns({});
-  });
-
   beforeEach('reset fakeSettings', function() {
     fakeSettings.iFrameSrc = sinon.stub().returns('IFRAME_URL');
     fakeSettings.annotations = sinon.stub().returns(null);
     fakeSettings.query = sinon.stub().returns(null);
     fakeSettings.configFuncSettingsFrom = sinon.stub().returns({});
+  });
+
+  beforeEach('reset fakeSharedSettings', function() {
+    fakeSharedSettings.jsonConfigsFrom = sinon.stub().returns({});
   });
 
   afterEach('reset the sandbox', function() {
