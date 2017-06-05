@@ -1,7 +1,7 @@
 'use strict';
 
-var extractAnnotationQuery = require('./util/extract-annotation-query');
-var settings = require('../shared/settings');
+var extractAnnotationQuery = require('../util/extract-annotation-query');
+var settings = require('../../shared/settings');
 
 var docs = 'https://h.readthedocs.io/en/latest/embedding.html';
 

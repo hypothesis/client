@@ -8,8 +8,8 @@ var fakeSettings = {
 var fakeExtractAnnotationQuery = {};
 
 var configFrom = proxyquire('../config', {
-  '../shared/settings': fakeSettings,
-  './util/extract-annotation-query': fakeExtractAnnotationQuery,
+  '../../shared/settings': fakeSettings,
+  '../util/extract-annotation-query': fakeExtractAnnotationQuery,
 });
 var sandbox = sinon.sandbox.create();
 
