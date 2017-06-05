@@ -209,19 +209,6 @@ describe('FrameSync', function () {
 
       assert.calledWith(fakeAnnotationUI.connectFrame, {
         metadata: frameInfo.metadata,
-        searchUris: [frameInfo.uri],
-        uri: frameInfo.uri,
-      });
-    });
-
-    it('adds the document fingerprint for PDFs', function () {
-      frameInfo = fixtures.pdfDocumentInfo;
-
-      fakeBridge.emit('connect', fakeChannel);
-
-      assert.calledWith(fakeAnnotationUI.connectFrame, {
-        metadata: frameInfo.metadata,
-        searchUris: [frameInfo.uri, 'urn:1234'],
         uri: frameInfo.uri,
       });
     });

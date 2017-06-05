@@ -133,14 +133,15 @@ describe('SidebarContentController', function () {
   }));
 
   function setFrames(frames) {
-    annotationUI.frames.returns(frames);
+    frames.forEach(function (frame) {
+      annotationUI.connectFrame(frame);
+    });
   }
 
   beforeEach(angular.mock.inject(function ($componentController, _annotationUI_, _$rootScope_) {
     $rootScope = _$rootScope_;
     $scope = $rootScope.$new();
     annotationUI = _annotationUI_;
-    annotationUI.frames = sinon.stub().returns([]);
     annotationUI.updateFrameAnnotationFetchStatus = sinon.stub();
     ctrl = $componentController('sidebarContent', { $scope: $scope }, {
       auth: { status: 'unknown' },
@@ -157,12 +158,12 @@ describe('SidebarContentController', function () {
       // before reloading annotations for each currently-connected client
       annotationUI.addAnnotations([{id: '123'}]);
       var uri1 = 'http://example.com/page-a';
-      var frames = [{uri: uri1, searchUris: [uri1]}];
+      var frames = [{uri: uri1}];
       setFrames(frames);
       $scope.$digest();
       fakeAnnotationMapper.unloadAnnotations = sandbox.spy();
       var uri2 = 'http://example.com/page-b';
-      frames = frames.concat({uri: uri2, searchUris: [uri2]});
+      frames = frames.concat({uri: uri2});
       setFrames(frames);
       $scope.$digest();
       assert.calledWith(fakeAnnotationMapper.unloadAnnotations,
@@ -171,7 +172,7 @@ describe('SidebarContentController', function () {
 
     it('loads all annotations for a frame', function () {
       var uri = 'http://example.com';
-      setFrames([{uri: uri, searchUris: [uri]}]);
+      setFrames([{uri: uri}]);
       $scope.$digest();
       var loadSpy = fakeAnnotationMapper.loadAnnotations;
       assert.calledWith(loadSpy, [sinon.match({id: uri + '123'})]);
@@ -181,9 +182,20 @@ describe('SidebarContentController', function () {
     it('loads all annotations for a frame with multiple urls', function () {
       var uri = 'http://example.com/test.pdf';
       var fingerprint = 'urn:x-pdf:fingerprint';
-      setFrames([{uri: uri, searchUris: [uri, fingerprint]}]);
+      setFrames([{
+        uri: uri,
+        metadata: {
+          documentFingerprint: 'fingerprint',
+          link: [{
+            href: fingerprint,
+          },{
+            href: uri,
+          }],
+        },
+      }]);
       $scope.$digest();
       var loadSpy = fakeAnnotationMapper.loadAnnotations;
+
       assert.calledWith(loadSpy, [sinon.match({id: uri + '123'})]);
       assert.calledWith(loadSpy, [sinon.match({id: fingerprint + '123'})]);
       assert.calledWith(loadSpy, [sinon.match({id: uri + '456'})]);
@@ -193,7 +205,7 @@ describe('SidebarContentController', function () {
     it('loads all annotations for all frames', function () {
       var uris = ['http://example.com', 'http://foobar.com'];
       setFrames(uris.map(function (uri) {
-        return {uri: uri, searchUris: [uri]};
+        return {uri: uri};
       }));
       $scope.$digest();
       var loadSpy = fakeAnnotationMapper.loadAnnotations;
@@ -206,7 +218,7 @@ describe('SidebarContentController', function () {
     it('updates annotation fetch status for all frames', function () {
       var frameUris = ['http://example.com', 'http://foobar.com'];
       setFrames(frameUris.map(function (frameUri) {
-        return {uri: frameUri, searchUris: [frameUri]};
+        return {uri: frameUri};
       }));
       $scope.$digest();
       var updateSpy = annotationUI.updateFrameAnnotationFetchStatus;
@@ -219,7 +231,7 @@ describe('SidebarContentController', function () {
       var id = uri + '123';
 
       beforeEach(function () {
-        setFrames([{uri: uri, searchUris: [uri]}]);
+        setFrames([{uri: uri}]);
         annotationUI.selectAnnotations([id]);
         $scope.$digest();
       });
@@ -249,7 +261,7 @@ describe('SidebarContentController', function () {
       var uri = 'http://example.com';
 
       beforeEach(function () {
-        setFrames([{uri: uri, searchUris: [uri]}]);
+        setFrames([{uri: uri}]);
         fakeGroups.focused = function () { return { id: 'a-group' }; };
         $scope.$digest();
       });
@@ -272,7 +284,7 @@ describe('SidebarContentController', function () {
       var id = uri + 'does-not-exist';
 
       beforeEach(function () {
-        setFrames([{uri: uri, searchUris: [uri]}]);
+        setFrames([{uri: uri}]);
         annotationUI.selectAnnotations([id]);
         fakeGroups.focused = function () { return { id: 'private-group' }; };
         $scope.$digest();
@@ -290,7 +302,7 @@ describe('SidebarContentController', function () {
     it('focuses and scrolls to the annotation if already selected', function () {
       var uri = 'http://example.com';
       annotationUI.selectAnnotations(['123']);
-      setFrames([{uri: uri, searchUris: [uri]}]);
+      setFrames([{uri: uri}]);
       var annot = {
         $tag: 'atag',
         id: '123',
@@ -309,7 +321,7 @@ describe('SidebarContentController', function () {
       annotationUI.addAnnotations([{id: '123'}]);
       annotationUI.addAnnotations = sinon.stub();
       fakeDrafts.unsaved.returns([{id: uri + '123'}, {id: uri + '456'}]);
-      setFrames([{uri: uri, searchUris: [uri]}]);
+      setFrames([{uri: uri}]);
       var loadSpy = fakeAnnotationMapper.loadAnnotations;
 
       $scope.$broadcast(events.GROUP_FOCUSED);
@@ -324,26 +336,34 @@ describe('SidebarContentController', function () {
 
   describe('direct linking messages', function () {
 
-    beforeEach(function () {
-      // The document has finished loading.
-      setFrames([
-        {
-          uri: 'http://www.example.com',
-          searchUris: [],
-        },
-      ]);
+    /**
+     * Connect a frame, indicating that the document has finished initial
+     * loading.
+     *
+     * In the case of an HTML document, this usually happens immediately. For
+     * PDFs, this happens once the entire PDF has been downloaded and the
+     * document's metadata has been read.
+     */
+    function addFrame() {
+      setFrames([{
+        uri: 'http://www.example.com',
+      }]);
+    }
 
+    beforeEach(function () {
       // There is a direct-linked annotation
       fakeSettings.annotations = 'test';
     });
 
     it('displays a message if the selection is unavailable', function () {
+      addFrame();
       annotationUI.selectAnnotations(['missing']);
       $scope.$digest();
       assert.isTrue(ctrl.selectedAnnotationUnavailable());
     });
 
     it('does not show a message if the selection is available', function () {
+      addFrame();
       annotationUI.addAnnotations([{id: '123'}]);
       annotationUI.selectAnnotations(['123']);
       $scope.$digest();
@@ -351,6 +371,7 @@ describe('SidebarContentController', function () {
     });
 
     it('does not a show a message if there is no selection', function () {
+      addFrame();
       annotationUI.selectAnnotations([]);
       $scope.$digest();
       assert.isFalse(ctrl.selectedAnnotationUnavailable());
@@ -361,14 +382,13 @@ describe('SidebarContentController', function () {
       searchClients = [];
       // There is a selection but the selected annotation isn't available.
       annotationUI.selectAnnotations(['missing']);
-      // The document hasn't finished loading.
-      setFrames([]);
       $scope.$digest();
 
       assert.isFalse(ctrl.selectedAnnotationUnavailable());
     });
 
     it('shows logged out message if selection is available', function () {
+      addFrame();
       ctrl.auth = {
         status: 'logged-out',
       };
@@ -379,6 +399,7 @@ describe('SidebarContentController', function () {
     });
 
     it('does not show loggedout message if selection is unavailable', function () {
+      addFrame();
       ctrl.auth = {
         status: 'logged-out',
       };
@@ -388,6 +409,7 @@ describe('SidebarContentController', function () {
     });
 
     it('does not show loggedout message if there is no selection', function () {
+      addFrame();
       ctrl.auth = {
         status: 'logged-out',
       };
@@ -397,6 +419,7 @@ describe('SidebarContentController', function () {
     });
 
     it('does not show loggedout message if user is not logged out', function () {
+      addFrame();
       ctrl.auth = {
         status: 'logged-in',
       };
@@ -407,6 +430,7 @@ describe('SidebarContentController', function () {
     });
 
     it('does not show loggedout message if not a direct link', function () {
+      addFrame();
       ctrl.auth = {
         status: 'logged-out',
       };
