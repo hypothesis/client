@@ -29,7 +29,9 @@ describe('helpPanel', function () {
   it('displays the URL and fingerprint of the first connected frame', function () {
     fakeAnnotationUI.frames.returns([{
       uri: 'https://publisher.org/article.pdf',
-      documentFingerprint: '12345',
+      metadata: {
+        documentFingerprint: '12345',
+      },
     }]);
 
     var $scope = $rootScope.$new();

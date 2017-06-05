@@ -166,18 +166,16 @@ function FrameSync($rootScope, $window, Discovery, annotationUI, bridge) {
         searchUris = [info.uri];
       }
 
-      var documentFingerprint;
       if (info.metadata && info.metadata.documentFingerprint) {
-        documentFingerprint = info.metadata.documentFingerprint;
         searchUris = info.metadata.link.map(function (link) {
           return link.href;
         });
       }
 
       annotationUI.connectFrame({
+        metadata: info.metadata,
         uri: info.uri,
         searchUris: searchUris,
-        documentFingerprint: documentFingerprint,
       });
     });
   }

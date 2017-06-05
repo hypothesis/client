@@ -208,7 +208,7 @@ describe('FrameSync', function () {
       fakeBridge.emit('connect', fakeChannel);
 
       assert.calledWith(fakeAnnotationUI.connectFrame, {
-        documentFingerprint: undefined,
+        metadata: frameInfo.metadata,
         searchUris: [frameInfo.uri],
         uri: frameInfo.uri,
       });
@@ -220,7 +220,7 @@ describe('FrameSync', function () {
       fakeBridge.emit('connect', fakeChannel);
 
       assert.calledWith(fakeAnnotationUI.connectFrame, {
-        documentFingerprint: frameInfo.metadata.documentFingerprint,
+        metadata: frameInfo.metadata,
         searchUris: [frameInfo.uri, 'urn:1234'],
         uri: frameInfo.uri,
       });
