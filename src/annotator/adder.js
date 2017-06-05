@@ -107,7 +107,7 @@ function Adder(container, options) {
   Object.assign(container.style, {
     display: 'block',
 
-    // take position out of flow and off screen initially
+    // take position out of layout flow initially
     position: 'absolute',
     top: 0,
 
