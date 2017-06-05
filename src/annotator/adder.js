@@ -103,12 +103,9 @@ function Adder(container, options) {
   var self = this;
   self.element = createAdderDOM(container);
 
+  // Set initial style
   Object.assign(container.style, {
-    // Set initial style. The adder is hidden using the `visibility`
-    // property rather than `display` so that we can compute its size in order to
-    // position it before display.
     display: 'block',
-    visibility: 'hidden',
 
     // take position out of flow and off screen initially
     position: 'absolute',
@@ -119,7 +116,9 @@ function Adder(container, options) {
     zIndex: 999,
   });
 
-  this.element = element;
+  // The adder is hidden using the `visibility` property rather than `display`
+  // so that we can compute its size in order to position it before display.
+  self.element.style.visibility = 'hidden';
 
   var view = self.element.ownerDocument.defaultView;
   var enterTimeout;
