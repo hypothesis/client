@@ -1,8 +1,8 @@
 'use strict';
 
-var extractAnnotationQuery = require('../extract-annotation-query');
+var settings = require('../settings');
 
-describe('annotation.util.extractAnnotationQuery', function() {
+describe('annotation.config.settings', function() {
   describe('#annotations', function() {
     [
       {
@@ -32,9 +32,7 @@ describe('annotation.util.extractAnnotationQuery', function() {
     ].forEach(function(test) {
       describe(test.describe, function() {
         it(test.it, function() {
-          assert.deepEqual(
-            extractAnnotationQuery.annotations(test.url),
-            test.returns);
+          assert.deepEqual(settings.annotations(test.url), test.returns);
         });
       });
     });
@@ -87,9 +85,7 @@ describe('annotation.util.extractAnnotationQuery', function() {
     ].forEach(function(test) {
       describe(test.describe, function() {
         it(test.it, function() {
-          assert.deepEqual(
-            extractAnnotationQuery.query(test.url),
-            test.returns);
+          assert.deepEqual(settings.query(test.url), test.returns);
         });
       });
     });
@@ -111,7 +107,7 @@ describe('annotation.util.extractAnnotationQuery', function() {
         // query() won't try to URI-decode the fragment.
         var url = 'http://localhost:3000#annotations:query:abc123';
 
-        assert.isNull(extractAnnotationQuery.query(url));
+        assert.isNull(settings.query(url));
       });
     });
   });
