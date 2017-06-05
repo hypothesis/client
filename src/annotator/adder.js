@@ -101,16 +101,13 @@ function createAdderDOM(container) {
 function Adder(container, options) {
 
   var self = this;
-  var element = createAdderDOM(container);
+  self.element = createAdderDOM(container);
 
+  // Set initial style
   Object.assign(container.style, {
-    // Set initial style. The adder is hidden using the `visibility`
-    // property rather than `display` so that we can compute its size in order to
-    // position it before display.
     display: 'block',
-    visibility: 'hidden',
 
-    // take position out of flow and off screen initially
+    // take position out of layout flow initially
     position: 'absolute',
     top: 0,
 
@@ -119,14 +116,16 @@ function Adder(container, options) {
     zIndex: 999,
   });
 
-  this.element = element;
+  // The adder is hidden using the `visibility` property rather than `display`
+  // so that we can compute its size in order to position it before display.
+  self.element.style.visibility = 'hidden';
 
-  var view = element.ownerDocument.defaultView;
+  var view = self.element.ownerDocument.defaultView;
   var enterTimeout;
 
-  element.querySelector(ANNOTATE_BTN_SELECTOR)
+  self.element.querySelector(ANNOTATE_BTN_SELECTOR)
     .addEventListener('click', handleCommand);
-  element.querySelector(HIGHLIGHT_BTN_SELECTOR)
+  self.element.querySelector(HIGHLIGHT_BTN_SELECTOR)
     .addEventListener('click', handleCommand);
 
   function handleCommand(event) {
@@ -145,18 +144,18 @@ function Adder(container, options) {
   }
 
   function width() {
-    return element.getBoundingClientRect().width;
+    return self.element.getBoundingClientRect().width;
   }
 
   function height() {
-    return element.getBoundingClientRect().height;
+    return self.element.getBoundingClientRect().height;
   }
 
   /** Hide the adder */
   this.hide = function () {
     clearTimeout(enterTimeout);
-    element.className = classnames({'annotator-adder': true});
-    container.style.visibility = 'hidden';
+    self.element.className = classnames({'annotator-adder': true});
+    self.element.style.visibility = 'hidden';
   };
 
   /**
@@ -223,7 +222,7 @@ function Adder(container, options) {
    * `arrowDirection`.
    */
   this.showAt = function (left, top, arrowDirection) {
-    element.className = classnames({
+    self.element.className = classnames({
       'annotator-adder': true,
       'annotator-adder--arrow-down': arrowDirection === ARROW_POINTING_DOWN,
       'annotator-adder--arrow-up': arrowDirection === ARROW_POINTING_UP,
@@ -234,18 +233,18 @@ function Adder(container, options) {
     // after use. So we need to make sure the button stays displayed
     // the way it was originally displayed - without the inline styles
     // See: https://github.com/hypothesis/client/issues/137
-    this.element.querySelector(ANNOTATE_BTN_SELECTOR).style.display = '';
-    this.element.querySelector(HIGHLIGHT_BTN_SELECTOR).style.display = '';
+    self.element.querySelector(ANNOTATE_BTN_SELECTOR).style.display = '';
+    self.element.querySelector(HIGHLIGHT_BTN_SELECTOR).style.display = '';
 
     Object.assign(container.style, {
       top: toPx(top),
       left: toPx(left),
-      visibility: 'visible',
     });
+    self.element.style.visibility = 'visible';
 
     clearTimeout(enterTimeout);
     enterTimeout = setTimeout(function () {
-      element.className += ' is-active';
+      self.element.className += ' is-active';
     }, 1);
   };
 }
