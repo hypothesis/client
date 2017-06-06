@@ -1,6 +1,7 @@
 'use strict';
 
 var addAnalytics = require('./ga');
+var getApiUrl = require('./get-api-url');
 var serviceConfig = require('./service-config');
 require('../shared/polyfills');
 
@@ -18,6 +19,8 @@ if (settings.raven) {
 
 var hostPageConfig = require('./host-config');
 Object.assign(settings, hostPageConfig(window));
+
+settings.apiUrl = getApiUrl(settings);
 
 // Disable Angular features that are not compatible with CSP.
 //
