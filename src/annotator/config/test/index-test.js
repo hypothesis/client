@@ -7,7 +7,7 @@ var fakeSharedSettings = {
 };
 var fakeSettings = {};
 
-var configFrom = proxyquire('../config', {
+var configFrom = proxyquire('../index', {
   './settings': fakeSettings,
   '../../shared/settings': fakeSharedSettings,
 });
