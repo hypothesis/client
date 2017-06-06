@@ -7,6 +7,8 @@ require('core-js/fn/array/find');
 require('core-js/fn/array/find-index');
 require('core-js/fn/array/from');
 require('core-js/fn/object/assign');
+require('core-js/fn/string/ends-with');
+require('core-js/fn/string/starts-with');
 
 // ES2017
 require('core-js/fn/object/values');

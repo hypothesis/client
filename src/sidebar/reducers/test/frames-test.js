@@ -1,12 +1,16 @@
 'use strict';
 
 var frames = require('../frames');
+var session = require('../session');
 var util = require('../util');
 var unroll = require('../../../shared/test/util').unroll;
 
-var init = frames.init;
 var actions = frames.actions;
 var update = util.createReducer(frames.update);
+
+function init() {
+  return Object.assign({}, frames.init(), session.init());
+}
 
 describe('frames reducer', function () {
   describe('#connectFrame', function () {
@@ -46,6 +50,9 @@ describe('frames reducer', function () {
   describe('#searchUris', function () {
     unroll('returns the expected search URIs (#when)', function (testCase) {
       var state = init();
+      if (testCase.features) {
+        state.session.features = testCase.features;
+      }
       testCase.frames.forEach(function (frame) {
         state = update(state, actions.connectFrame(frame));
       });
@@ -88,6 +95,39 @@ describe('frames reducer', function () {
       searchUris: [
         'https://publisher.org/article.html',
         'https://publisher.org/article2.html',
+      ],
+    },{
+      when: 'searching for DOIs is enabled',
+      features: {
+        search_for_doi: true,
+      },
+      frames: [{
+        uri: 'https://publisher.org/article.html',
+        metadata: {
+          link: [{
+            href: 'doi:10.1.1/1234',
+          }],
+        },
+      }],
+      searchUris: [
+        'https://publisher.org/article.html',
+        'doi:10.1.1/1234',
+      ],
+    },{
+      when: 'searching for DOIs is disabled',
+      features: {
+        search_for_doi: false,
+      },
+      frames: [{
+        uri: 'https://publisher.org/article.html',
+        metadata: {
+          link: [{
+            href: 'doi:10.1.1/1234',
+          }],
+        },
+      }],
+      searchUris: [
+        'https://publisher.org/article.html',
       ],
     }]);
   });
