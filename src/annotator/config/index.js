@@ -12,9 +12,9 @@ var docs = 'https://h.readthedocs.io/en/latest/embedding.html';
  */
 function configFrom(window_) {
   var config = {
-    app: window_.
-      document.querySelector('link[type="application/annotator+html"]').href,
+    app: settings.app(window_.document),
   };
+
   var chromeExt = 'chrome-extension://';
   var mozExt = 'moz-extension://';
   var edgeExt = 'ms-browser-extension://';

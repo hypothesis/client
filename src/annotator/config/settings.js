@@ -1,6 +1,35 @@
 'use strict';
 
 /**
+ * Return the href URL of the first annotator link in the given document.
+ *
+ * Return the value of the href attribute of the first
+ * `<link type="application/annotator+html">` element in the given document.
+ *
+ * This URL is used as the src of the sidebar's iframe.
+ *
+ * @param {Document} - The document to search.
+ * @return {string} - The URL to use for the sidebar's iframe.
+ *
+ * @throws {Error} - If there's no annotator link or the first annotator has
+ *   no href.
+ *
+ */
+function app(document_) {
+  var link = document_.querySelector('link[type="application/annotator+html"]');
+
+  if (!link) {
+    throw new Error('No application/annotator+html link in the document');
+  }
+
+  if (!link.href) {
+    throw new Error('application/annotator+html link has no href');
+  }
+
+  return link.href;
+}
+
+/**
  * Return the `#annotations:*` ID from the given URL's fragment.
  *
  * If the URL contains a `#annotations:<ANNOTATION_ID>` fragment then return
@@ -42,6 +71,7 @@ function query(url) {
 }
 
 module.exports = {
+  app: app,
   annotations: annotations,
   query: query,
 };
