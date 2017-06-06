@@ -111,4 +111,35 @@ describe('annotation.config.settings', function() {
       });
     });
   });
+
+  describe('#configFuncSettingsFrom', function() {
+    context("when there's no window.hypothesisConfig() function", function() {
+      it('returns {}', function() {
+        var fakeWindow = {};
+
+        assert.deepEqual(settings.configFuncSettingsFrom(fakeWindow), {});
+      });
+    });
+
+    context("when window.hypothesisConfig() isn't a function", function() {
+      it('throws an error', function() {
+        var fakeWindow = { hypothesisConfig: 42 };
+
+        assert.throws(
+          function() { settings.configFuncSettingsFrom(fakeWindow); },
+          TypeError
+        );
+      });
+    });
+
+    context('when window.hypothesisConfig() is a function', function() {
+      it('returns whatever window.hypothesisConfig() returns', function () {
+        // It just blindly returns whatever hypothesisConfig() returns
+        // (even if it's not an object).
+        var fakeWindow = { hypothesisConfig: sinon.stub().returns(42) };
+
+        assert.equal(settings.configFuncSettingsFrom(fakeWindow), 42);
+      });
+    });
+  });
 });

@@ -3,8 +3,6 @@
 var settings = require('./settings');
 var sharedSettings = require('../../shared/settings');
 
-var docs = 'https://h.readthedocs.io/en/latest/embedding.html';
-
 /**
  * Reads the Hypothesis configuration from the environment.
  *
@@ -53,14 +51,7 @@ function configFrom(window_) {
       err);
   }
 
-  // Parse config from `window.hypothesisConfig` function
-  if (window_.hasOwnProperty('hypothesisConfig')) {
-    if (typeof window_.hypothesisConfig === 'function') {
-      Object.assign(config, window_.hypothesisConfig());
-    } else {
-      throw new TypeError('hypothesisConfig must be a function, see: ' + docs);
-    }
-  }
+  Object.assign(config, settings.configFuncSettingsFrom(window_));
 
   // Convert legacy keys/values in config to corresponding current
   // configuration.
