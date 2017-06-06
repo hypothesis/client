@@ -58,6 +58,28 @@ function frames(state) {
   return state.frames;
 }
 
+function searchUrisForFrame(frame) {
+  var uris = [frame.uri];
+
+  if (frame.metadata && frame.metadata.documentFingerprint) {
+    uris = frame.metadata.link.map(function (link) {
+      return link.href;
+    });
+  }
+
+  return uris;
+}
+
+/**
+ * Return the set of URIs that should be used to search for annotations on the
+ * current page.
+ */
+function searchUris(state) {
+  return state.frames.reduce(function (uris, frame) {
+    return uris.concat(searchUrisForFrame(frame));
+  }, []);
+}
+
 module.exports = {
   init: init,
   update: update,
@@ -69,4 +91,5 @@ module.exports = {
 
   // Selectors
   frames: frames,
+  searchUris: searchUris,
 };

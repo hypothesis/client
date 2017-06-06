@@ -118,6 +118,7 @@ module.exports = function ($rootScope, settings) {
     savedAnnotations: annotationsReducer.savedAnnotations,
 
     frames: framesReducer.frames,
+    searchUris: framesReducer.searchUris,
 
     isSidebar: viewerReducer.isSidebar,
   }, store.getState);

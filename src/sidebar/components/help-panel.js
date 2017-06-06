@@ -24,7 +24,7 @@ module.exports = {
           return;
         }
         this.url = frames[0].uri;
-        this.documentFingerprint = frames[0].documentFingerprint;
+        this.documentFingerprint = frames[0].metadata.documentFingerprint;
       }.bind(this)
     );
   },

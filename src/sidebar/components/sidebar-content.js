@@ -172,17 +172,6 @@ function SidebarContentController(
       client.cancel();
     });
 
-    var frames = annotationUI.frames();
-    var searchUris = frames.reduce(function (uris, frame) {
-      for (var i = 0; i < frame.searchUris.length; i++) {
-        var uri = frame.searchUris[i];
-        if (uris.indexOf(uri) === -1) {
-          uris.push(uri);
-        }
-      }
-      return uris;
-    }, []);
-
     // If there is no selection, load annotations only for the focused group.
     //
     // If there is a selection, we load annotations for all groups, find out
@@ -197,6 +186,7 @@ function SidebarContentController(
     var group = annotationUI.hasSelectedAnnotations() ?
       null : groups.focused().id;
 
+    var searchUris = annotationUI.searchUris();
     if (searchUris.length > 0) {
       _loadAnnotationsFor(searchUris, group);
 
