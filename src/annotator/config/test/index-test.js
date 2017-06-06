@@ -1,16 +1,17 @@
 'use strict';
 
 var proxyquire = require('proxyquire');
+var util = require('../../../shared/test/util');
 
 var fakeSharedSettings = {
   jsonConfigsFrom: sinon.stub(),
 };
 var fakeSettings = {};
 
-var configFrom = proxyquire('../index', {
+var configFrom = proxyquire('../index', util.noCallThru({
   './settings': fakeSettings,
   '../../shared/settings': fakeSharedSettings,
-});
+}));
 var sandbox = sinon.sandbox.create();
 
 function fakeWindow() {
