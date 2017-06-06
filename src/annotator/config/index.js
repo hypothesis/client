@@ -25,15 +25,8 @@ function configFrom(window_) {
   //
   // In environments where the config has not been injected into the DOM,
   // we try to retrieve it from the URL here.
-  var query = settings.query(window_.location.href);
-  if (query) {
-    config.query = query;
-  } else {
-    var annotations = settings.annotations(window_.location.href);
-    if (annotations) {
-      config.annotations = annotations;
-    }
-  }
+  config.query = settings.query(window_.location.href);
+  config.annotations = settings.annotations(window_.location.href);
 
   // If the client is injected by the browser extension, ignore
   // the rest of the host page config.
