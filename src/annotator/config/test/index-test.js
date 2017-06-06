@@ -2,14 +2,14 @@
 
 var proxyquire = require('proxyquire');
 
-var fakeSettings = {
+var fakeSharedSettings = {
   jsonConfigsFrom: sinon.stub(),
 };
-var fakeExtractAnnotationQuery = {};
+var fakeSettings = {};
 
-var configFrom = proxyquire('../config', {
-  '../shared/settings': fakeSettings,
-  './util/extract-annotation-query': fakeExtractAnnotationQuery,
+var configFrom = proxyquire('../index', {
+  './settings': fakeSettings,
+  '../../shared/settings': fakeSharedSettings,
 });
 var sandbox = sinon.sandbox.create();
 
@@ -29,14 +29,14 @@ describe('annotator.config', function() {
     sandbox.stub(console, 'warn');
   });
 
-  beforeEach('reset fakeSettings', function() {
-    fakeSettings.jsonConfigsFrom.reset();
-    fakeSettings.jsonConfigsFrom.returns({});
+  beforeEach('reset fakeSharedSettings', function() {
+    fakeSharedSettings.jsonConfigsFrom.reset();
+    fakeSharedSettings.jsonConfigsFrom.returns({});
   });
 
-  beforeEach('reset fakeExtractAnnotationQuery', function() {
-    fakeExtractAnnotationQuery.annotations = sinon.stub();
-    fakeExtractAnnotationQuery.query = sinon.stub();
+  beforeEach('reset fakeSettings', function() {
+    fakeSettings.annotations = sinon.stub();
+    fakeSettings.query = sinon.stub();
   });
 
   afterEach('reset the sandbox', function() {
@@ -76,16 +76,16 @@ describe('annotator.config', function() {
 
     configFrom(window_);
 
-    assert.calledOnce(fakeSettings.jsonConfigsFrom);
+    assert.calledOnce(fakeSharedSettings.jsonConfigsFrom);
     assert.calledWithExactly(
-      fakeSettings.jsonConfigsFrom, window_.document);
+      fakeSharedSettings.jsonConfigsFrom, window_.document);
   });
 
   context('when jsonConfigsFrom() returns a non-empty object', function() {
     it('reads the setting into the returned config', function() {
       // configFrom() just blindly adds any key: value settings that
       // jsonConfigsFrom() returns into the returns options object.
-      fakeSettings.jsonConfigsFrom.returns({foo: 'bar'});
+      fakeSharedSettings.jsonConfigsFrom.returns({foo: 'bar'});
 
       var config = configFrom(fakeWindow());
 
@@ -95,7 +95,7 @@ describe('annotator.config', function() {
 
   context('when jsonConfigsFrom() throws an error', function() {
     beforeEach(function() {
-      fakeSettings.jsonConfigsFrom.throws();
+      fakeSharedSettings.jsonConfigsFrom.throws();
     });
 
     it('catches the error', function() {
@@ -123,7 +123,7 @@ describe('annotator.config', function() {
       var window_ = fakeWindow();
       window_.hypothesisConfig = sinon.stub().returns({
         foo: 'fooFromHypothesisConfigFunc'});
-      fakeSettings.jsonConfigsFrom.returns({
+      fakeSharedSettings.jsonConfigsFrom.returns({
         foo: 'fooFromJSHypothesisConfigObj',
       });
 
@@ -178,7 +178,7 @@ describe('annotator.config', function() {
       },
     ].forEach(function(test) {
       it(test.name, function() {
-        fakeSettings.jsonConfigsFrom.returns({showHighlights: test.in});
+        fakeSharedSettings.jsonConfigsFrom.returns({showHighlights: test.in});
 
         var config = configFrom(fakeWindow());
 
@@ -190,14 +190,14 @@ describe('annotator.config', function() {
   it("extracts the direct-linked annotation ID from the parent page's URL", function() {
     configFrom(fakeWindow());
 
-    assert.calledOnce(fakeExtractAnnotationQuery.annotations);
+    assert.calledOnce(fakeSettings.annotations);
     assert.calledWithExactly(
-      fakeExtractAnnotationQuery.annotations, 'LOCATION_HREF');
+      fakeSettings.annotations, 'LOCATION_HREF');
   });
 
   context("when there's a direct-linked annotation ID", function() {
     beforeEach(function() {
-      fakeExtractAnnotationQuery.annotations.returns('ANNOTATION_ID');
+      fakeSettings.annotations.returns('ANNOTATION_ID');
     });
 
     it('adds the annotation ID to the config', function() {
@@ -218,7 +218,7 @@ describe('annotator.config', function() {
 
     context("when there's an annotations query", function() {
       beforeEach(function() {
-        fakeExtractAnnotationQuery.query.returns('QUERY');
+        fakeSettings.query.returns('QUERY');
       });
 
       it('adds the query to the config', function() {
@@ -229,8 +229,8 @@ describe('annotator.config', function() {
 
   context('when the client is injected by the browser extension', function() {
     beforeEach(function() {
-      fakeExtractAnnotationQuery.annotations.returns('SOME_ANNOTATION_ID');
-      fakeSettings.jsonConfigsFrom.returns({foo: 'bar'});
+      fakeSettings.annotations.returns('SOME_ANNOTATION_ID');
+      fakeSharedSettings.jsonConfigsFrom.returns({foo: 'bar'});
     });
 
     it('ignores the host page config on chrome', function() {
@@ -263,8 +263,8 @@ describe('annotator.config', function() {
 
   context('when the client is not injected by the browser extension', function() {
     beforeEach(function() {
-      fakeExtractAnnotationQuery.annotations.returns('SOME_ANNOTATION_ID');
-      fakeSettings.jsonConfigsFrom.returns({foo: 'bar'});
+      fakeSettings.annotations.returns('SOME_ANNOTATION_ID');
+      fakeSharedSettings.jsonConfigsFrom.returns({foo: 'bar'});
     });
 
     it('does not ignore the host page config', function() {

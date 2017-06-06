@@ -1,6 +1,6 @@
 'use strict';
 
-var configFrom = require('./config');
+var configFrom = require('./config/index');
 require('../shared/polyfills');
 
 

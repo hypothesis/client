@@ -1,7 +1,7 @@
 'use strict';
 
-var extractAnnotationQuery = require('./util/extract-annotation-query');
-var settings = require('../shared/settings');
+var settings = require('./settings');
+var sharedSettings = require('../../shared/settings');
 
 var docs = 'https://h.readthedocs.io/en/latest/embedding.html';
 
@@ -27,11 +27,11 @@ function configFrom(window_) {
   //
   // In environments where the config has not been injected into the DOM,
   // we try to retrieve it from the URL here.
-  var query = extractAnnotationQuery.query(window_.location.href);
+  var query = settings.query(window_.location.href);
   if (query) {
     config.query = query;
   } else {
-    var annotations = extractAnnotationQuery.annotations(window_.location.href);
+    var annotations = settings.annotations(window_.location.href);
     if (annotations) {
       config.annotations = annotations;
     }
@@ -47,7 +47,7 @@ function configFrom(window_) {
 
   // Parse config from `<script class="js-hypothesis-config">` tags
   try {
-    Object.assign(config, settings.jsonConfigsFrom(window_.document));
+    Object.assign(config, sharedSettings.jsonConfigsFrom(window_.document));
   } catch (err) {
     console.warn('Could not parse settings from js-hypothesis-config tags',
       err);
