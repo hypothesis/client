@@ -4,6 +4,38 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+### Changed
+
+- Prevent Adder toolbar from inheriting CSS property values from host page
+  ([#396](https://github.com/hypothesis/client/pull/396)).
+
+- Improve config naming, usage, access and tests.
+  ([#400](https://github.com/hypothesis/client/pull/400)).
+  ([#404](https://github.com/hypothesis/client/pull/404)).
+  ([#406](https://github.com/hypothesis/client/pull/406)).
+  ([#415](https://github.com/hypothesis/client/pull/415)).
+
+- Refactored annotation query extraction
+  ([#411](https://github.com/hypothesis/client/pull/411)).
+  ([#412](https://github.com/hypothesis/client/pull/412)).
+
+- Added group leave, switch, and view activity metrics
+  ([#405](https://github.com/hypothesis/client/pull/405)).
+
+- Extensions now ignore all config other than direct linked ID from host page.
+  ([#410](https://github.com/hypothesis/client/pull/410)).
+
+- Fixed ghost adder ([#419](https://github.com/hypothesis/client/pull/419)).
+
+- Added the ability to search annotations by DOI
+  ([#417](https://github.com/hypothesis/client/pull/417)).
+  ([#418](https://github.com/hypothesis/client/pull/418)).
+
+- Added console log capture to karma tests
+  ([#420](https://github.com/hypothesis/client/pull/420)).
+
 ## [1.19.0] - 2017-05-23
 
 ### Changed
