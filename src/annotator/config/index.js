@@ -11,22 +11,22 @@ var sharedSettings = require('../../shared/settings');
 function configFrom(window_) {
   var config = {
     app: settings.app(window_.document),
+
+    // Extract the default annotation ID or query from the URL.
+    //
+    // The Chrome extension or proxy may already have provided this config via
+    // a tag injected into the DOM, which avoids the problem where the page's
+    // JS rewrites the URL before Hypothesis loads.
+    //
+    // In environments where the config has not been injected into the DOM,
+    // we try to retrieve it from the URL here.
+    query: settings.query(window_.location.href),
+    annotations: settings.annotations(window_.location.href),
   };
 
   var chromeExt = 'chrome-extension://';
   var mozExt = 'moz-extension://';
   var edgeExt = 'ms-browser-extension://';
-
-  // Extract the default annotation ID or query from the URL.
-  //
-  // The Chrome extension or proxy may already have provided this config
-  // via a tag injected into the DOM, which avoids the problem where the page's
-  // JS rewrites the URL before Hypothesis loads.
-  //
-  // In environments where the config has not been injected into the DOM,
-  // we try to retrieve it from the URL here.
-  config.query = settings.query(window_.location.href);
-  config.annotations = settings.annotations(window_.location.href);
 
   // If the client is injected by the browser extension, ignore
   // the rest of the host page config.
