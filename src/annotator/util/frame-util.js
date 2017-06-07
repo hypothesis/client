@@ -1,102 +1,51 @@
 'use strict';
-// THESIS TODO: Once this module is finalized (more or less), then make
-// sure to remove JQuery and refactor.
-var $ = require('jquery');
-
-module.exports = {
-  findIFrames,
-  hasHypothesis,
-  injectHypothesis,
-  isAccessible,
-  isValid,
-};
 
 // Find all iframes within this iframe only
-function findIFrames(iframe) {
-  var iframes = [];
-
-  $('iframe', iframe).each(function(index, iframe) {
-    if ( isValid(iframe) ) {
-      iframes.push(iframe);
-    } 
-  });
-
-  return iframes;
+function findFrames (container) {
+  var frames = Array.from(container.getElementsByTagName('iframe'));
+  return frames.filter(isValid);
 }
 
 // Check if the iframe has already been injected
-function hasHypothesis(iframe) {
-  // THESIS TODO: Are there better identifiers to use?
-  var scripts = {
-    src: [
-      '/hypothesis',
-      '/embed.js',
-    ]
-  };
-
-  var frameBody = iframe.ownerDocument.body;
-  var childNodes = frameBody.childNodes;
-  var hasHypothesis = false;
-  for (var i = 0; i < childNodes.length-1; i++) {
-    var node = childNodes[i];
-    if (node.tagName !== 'SCRIPT') continue; // Skip to next increment
-
-    for (var j = 0; j < scripts.src.length-1; j++) {
-      var src = scripts.src[j];
-      if (node.src.includes(src)) {
-        hasHypothesis = true;
-        return; // Found our answer, stop looping.
-      }
-    }
-  }
-
-  return hasHypothesis;
+function hasHypothesis (iframe) {
+  return iframe.contentWindow.__hypothesis_frame === true;
 }
 
 // Inject embed.js into the iframe
-function injectHypothesis(iframe, i) {
-  if (!iframe) return;
-
-  var iframes;
-  // Support arrays via recursion
-  if (iframe.constructor === Array) {
-    if (!iframe.length) return;
-    iframes = iframe;
-    i = (i != undefined) ? i : 0; // if set, use i. Otherwise, use 0
-    iframe = iframes[i];
-  }
-
+function injectHypothesis (iframe, scriptUrl) {
   var config = document.createElement('script');
-  config.className = "js-hypothesis-config";
-  config.type = "application/json";
-  config.innerText = ' {"constructor": "Guest" }';
+  config.className = 'js-hypothesis-config';
+  config.type = 'application/json';
+  config.innerText = '{"enableMultiFrameSupport": true, "subFrameInstance": true}';
 
-  // THESIS TODO: Temporarily hardcoded
-  var src = 'http://localhost:3001/hypothesis';
+  var src = scriptUrl;
   var embed = document.createElement('script');
   embed.async = true;
   embed.src = src;
 
   iframe.contentDocument.body.appendChild(config);
   iframe.contentDocument.body.appendChild(embed);
-
-  if (iframes && i < iframes.length-1) {
-    this._injectHypothesis(iframes, ++i);
-  }
 }
 
 // Check if we can access this iframe's document
-function isAccessible(iframe) {
+function isAccessible (iframe) {
   try {
-    iframe.contentDocument;
-    return true;
+    return !!iframe.contentDocument;
   } catch (e) {
     return false;
   }
 }
 
 // Check if this is an iframe that we want to inject embed.js into
-function isValid(iframe) {
+function isValid (iframe) {
   // Currently only checks if it's not the h-sidebar
-  return (iframe.className !== 'h-sidebar-iframe');
+  return iframe.className !== 'h-sidebar-iframe';
 }
+
+module.exports = {
+  findFrames: findFrames,
+  hasHypothesis: hasHypothesis,
+  injectHypothesis: injectHypothesis,
+  isAccessible: isAccessible,
+  isValid: isValid,
+};

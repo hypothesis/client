@@ -45,11 +45,19 @@ $.noConflict(true)(function() {
   var Klass = window.PDFViewerApplication ?
       PdfSidebar :
       Sidebar;
+
   if (config.hasOwnProperty('constructor')) {
     Klass = config.constructor;
-    if (Klass === "Guest") Klass = Guest;
-
     delete config.constructor;
+  }
+
+  if (config.enableMultiFrameSupport && config.subFrameInstance) {
+    Klass = Guest;
+
+    // Other modules use this to detect if this
+    // frame context belongs to hypothesis.
+    // Needs to be a global property that's set.
+    window.__hypothesis_frame = true;
   }
 
   config.pluginClasses = pluginClasses;
