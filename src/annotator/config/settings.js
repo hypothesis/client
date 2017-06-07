@@ -70,8 +70,45 @@ function query(url) {
   return null;
 }
 
+/**
+ * Return an object containing config settings from window.hypothesisConfig().
+ *
+ * Return an object containing config settings returned by the
+ * window.hypothesisConfig() function provided by the host page:
+ *
+ *   {
+ *     fooSetting: 'fooValue',
+ *     barSetting: 'barValue',
+ *     ...
+ *   }
+ *
+ * If there's no window.hypothesisConfig() function then return {}.
+ *
+ * If there is a window.hypothesisConfig but it isn't a function then throw an
+ * error.
+ *
+ * @param {Window} window_ - The window to search for a hypothesisConfig() function
+ * @return {Object} - Any config settings returned by hypothesisConfig()
+ *
+ * @throws {TypeError} - If window.hypothesisConfig() isn't a function
+ *
+ */
+function configFuncSettingsFrom(window_) {
+  if (!window_.hasOwnProperty('hypothesisConfig')) {
+    return {};
+  }
+
+  if (typeof window_.hypothesisConfig !== 'function') {
+    var docs = 'https://h.readthedocs.io/projects/client/en/latest/publishers/config/#window.hypothesisConfig';
+    throw new TypeError('hypothesisConfig must be a function, see: ' + docs);
+  }
+
+  return window_.hypothesisConfig();
+}
+
 module.exports = {
   app: app,
   annotations: annotations,
   query: query,
+  configFuncSettingsFrom: configFuncSettingsFrom,
 };

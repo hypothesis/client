@@ -32,6 +32,7 @@ describe('annotator.config', function() {
     fakeSettings.app = sinon.stub().returns('IFRAME_URL');
     fakeSettings.annotations = sinon.stub();
     fakeSettings.query = sinon.stub();
+    fakeSettings.configFuncSettingsFrom = sinon.stub().returns({});
   });
 
   afterEach('reset the sandbox', function() {
@@ -104,51 +105,42 @@ describe('annotator.config', function() {
     });
   });
 
-  context("when there's a window.hypothesisConfig() function", function() {
-    it('reads arbitrary settings from hypothesisConfig() into config', function() {
-      var window_ = fakeWindow();
-      window_.hypothesisConfig = sinon.stub().returns({foo: 'bar'});
+  it('gets config settings from window.hypothesisConfig()', function() {
+    var window_ = fakeWindow();
 
-      var config = configFrom(window_);
+    configFrom(window_);
+
+    assert.calledOnce(fakeSettings.configFuncSettingsFrom);
+    assert.calledWithExactly(fakeSettings.configFuncSettingsFrom, window_);
+  });
+
+  context('when configFuncSettingsFrom() returns an object', function() {
+    it('reads arbitrary settings from configFuncSettingsFrom() into config', function() {
+      fakeSettings.configFuncSettingsFrom.returns({foo: 'bar'});
+
+      var config = configFrom(fakeWindow());
 
       assert.equal(config.foo, 'bar');
     });
 
     specify('hypothesisConfig() settings override js-hypothesis-config ones', function() {
-      var window_ = fakeWindow();
-      window_.hypothesisConfig = sinon.stub().returns({
+      fakeSettings.configFuncSettingsFrom.returns({
         foo: 'fooFromHypothesisConfigFunc'});
       fakeSharedSettings.jsonConfigsFrom.returns({
         foo: 'fooFromJSHypothesisConfigObj',
       });
 
-      var config = configFrom(window_);
+      var config = configFrom(fakeWindow());
 
       assert.equal(config.foo, 'fooFromHypothesisConfigFunc');
     });
-
-    context('if hypothesisConfig() returns a non-object value', function() {
-      it("doesn't add anything into the config", function() {
-        var window_ = fakeWindow();
-        window_.hypothesisConfig = sinon.stub().returns(42);
-
-        var config = configFrom(window_);
-
-        delete config.app; // We don't care about config.app for this test.
-        assert.deepEqual({}, config);
-      });
-    });
   });
 
-  context("when window.hypothesisConfig() isn't a function", function() {
-    it('throws a TypeError', function() {
-      var window_ = fakeWindow();
-      window_.hypothesisConfig = 'notAFunction';
+  context('when configFuncSettingsFrom() throws an error', function() {
+    it('throws the same error', function() {
+      fakeSettings.configFuncSettingsFrom.throws(new TypeError());
 
-      assert.throws(
-        function() { configFrom(window_); }, TypeError,
-        'hypothesisConfig must be a function, see: https://h.readthedocs.io/en/latest/embedding.html'
-      );
+      assert.throws(function() { configFrom(fakeWindow()); }, TypeError);
     });
   });
 
