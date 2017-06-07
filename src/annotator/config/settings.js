@@ -70,7 +70,7 @@ function configFuncSettingsFrom(window_) {
   }
 
   if (typeof window_.hypothesisConfig !== 'function') {
-    var docs = 'https://h.readthedocs.io/en/latest/embedding.html';
+    var docs = 'https://h.readthedocs.io/projects/client/en/latest/publishers/config/#window.hypothesisConfig';
     throw new TypeError('hypothesisConfig must be a function, see: ' + docs);
   }
 
