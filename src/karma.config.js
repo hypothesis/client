@@ -62,7 +62,6 @@ module.exports = function(config) {
       },
 
       transform: [
-        'babelify',
         'coffeeify',
         istanbul({
           ignore: [
@@ -80,6 +79,7 @@ module.exports = function(config) {
           // https://github.com/karma-runner/karma-coverage/issues/157
           instrumenter: require('isparta'),
         }),
+        'babelify',
       ],
     },
 
