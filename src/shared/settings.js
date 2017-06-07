@@ -28,13 +28,21 @@ function assign(dest, src) {
  * @param {Document|Element} document - The root element to search.
  */
 function jsonConfigsFrom(document) {
+  var config = {};
   var settingsElements =
     document.querySelectorAll('script.js-hypothesis-config');
 
-  var config = {};
   for (var i=0; i < settingsElements.length; i++) {
-    assign(config, JSON.parse(settingsElements[i].textContent));
+    var settings;
+    try {
+      settings = JSON.parse(settingsElements[i].textContent);
+    } catch (err) {
+      console.warn('Could not parse settings from js-hypothesis-config tags', err);
+      settings = {};
+    }
+    assign(config, settings);
   }
+
   return config;
 }
 

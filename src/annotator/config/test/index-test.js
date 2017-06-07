@@ -10,7 +10,6 @@ var configFrom = proxyquire('../index', util.noCallThru({
   './settings': fakeSettings,
   '../../shared/settings': fakeSharedSettings,
 }));
-var sandbox = sinon.sandbox.create();
 
 function fakeWindow() {
   return {
@@ -20,10 +19,6 @@ function fakeWindow() {
 }
 
 describe('annotator.config', function() {
-  beforeEach('stub console.warn()', function() {
-    sandbox.stub(console, 'warn');
-  });
-
   beforeEach('reset fakeSharedSettings', function() {
     fakeSharedSettings.jsonConfigsFrom = sinon.stub().returns({});
   });
@@ -33,10 +28,6 @@ describe('annotator.config', function() {
     fakeSettings.annotations = sinon.stub();
     fakeSettings.query = sinon.stub();
     fakeSettings.configFuncSettingsFrom = sinon.stub().returns({});
-  });
-
-  afterEach('reset the sandbox', function() {
-    sandbox.restore();
   });
 
   it('gets the config.app setting', function() {
@@ -86,22 +77,6 @@ describe('annotator.config', function() {
       var config = configFrom(fakeWindow());
 
       assert.equal(config.foo, 'bar');
-    });
-  });
-
-  context('when jsonConfigsFrom() throws an error', function() {
-    beforeEach(function() {
-      fakeSharedSettings.jsonConfigsFrom.throws();
-    });
-
-    it('catches the error', function() {
-      configFrom(fakeWindow());
-    });
-
-    it('logs a warning', function() {
-      configFrom(fakeWindow());
-
-      assert.called(console.warn);
     });
   });
 

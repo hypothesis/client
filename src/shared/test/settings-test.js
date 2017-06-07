@@ -2,7 +2,14 @@
 
 var settings = require('../settings');
 
+var sandbox = sinon.sandbox.create();
+
 describe('settings', function () {
+
+  afterEach('reset the sandbox', function() {
+    sandbox.restore();
+  });
+
   describe('#jsonConfigsFrom', function() {
     var jsonConfigsFrom = settings.jsonConfigsFrom;
 
@@ -64,15 +71,28 @@ describe('settings', function () {
     });
 
     context("when there's a JSON script containing invalid JSON", function() {
+      beforeEach('stub console.warn()', function() {
+        sandbox.stub(console, 'warn');
+      });
+
       beforeEach('add a JSON script containing invalid JSON', function() {
         appendJSHypothesisConfig(document, 'this is not valid json');
       });
 
-      it('throws a SyntaxError', function() {
-        assert.throws(
-          function() { jsonConfigsFrom(document); },
-          SyntaxError
-        );
+      it('logs a warning', function() {
+        jsonConfigsFrom(document);
+
+        assert.called(console.warn);
+      });
+
+      it('returns {}', function() {
+        assert.deepEqual(jsonConfigsFrom(document), {});
+      });
+
+      it('still returns settings from other JSON scripts', function() {
+        appendJSHypothesisConfig(document, '{"foo": "FOO", "bar": "BAR"}');
+
+        assert.deepEqual(jsonConfigsFrom(document), {foo: 'FOO', bar: 'BAR'});
       });
     });
 
