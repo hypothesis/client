@@ -1,23 +1,20 @@
 'use strict';
 
 var proxyquire = require('proxyquire');
+var util = require('../../../shared/test/util');
 
 var fakeSharedSettings = {};
 var fakeSettings = {};
 
-var configFrom = proxyquire('../index', {
+var configFrom = proxyquire('../index', util.noCallThru({
   './settings': fakeSettings,
   '../../shared/settings': fakeSharedSettings,
-});
+}));
 var sandbox = sinon.sandbox.create();
 
-function fakeWindow(someHref) {
-  var href = someHref || 'LINK_HREF';
-
+function fakeWindow() {
   return {
-    document: {
-      querySelector: sinon.stub().returns({href: href}),
-    },
+    document: 'THE_DOCUMENT',
     location: {href: 'LOCATION_HREF'},
   };
 }
@@ -32,6 +29,7 @@ describe('annotator.config', function() {
   });
 
   beforeEach('reset fakeSettings', function() {
+    fakeSettings.app = sinon.stub().returns('IFRAME_URL');
     fakeSettings.annotations = sinon.stub();
     fakeSettings.query = sinon.stub();
   });
@@ -40,31 +38,31 @@ describe('annotator.config', function() {
     sandbox.restore();
   });
 
+  it('gets the config.app setting', function() {
+    var window_ = fakeWindow();
+
+    configFrom(window_);
+
+    assert.calledOnce(fakeSettings.app);
+    assert.calledWith(fakeSettings.app, window_.document);
+  });
+
   context("when there's an application/annotator+html <link>", function() {
-    var link;
-
-    beforeEach('add an application/annotator+html <link>', function() {
-      link = document.createElement('link');
-      link.type = 'application/annotator+html';
-      link.href = 'http://example.com/link';
-      document.head.appendChild(link);
-    });
-
-    afterEach('tidy up the link', function() {
-      document.head.removeChild(link);
-    });
-
     it("returns the <link>'s href as config.app", function() {
-      assert.equal(configFrom(window).app, link.href);
+      assert.equal(configFrom(fakeWindow()).app, 'IFRAME_URL');
     });
   });
 
   context("when there's no application/annotator+html <link>", function() {
-    it('throws a TypeError', function() {
-      var window_ = fakeWindow();
-      window_.document.querySelector.returns(null);
+    beforeEach('remove the application/annotator+html <link>', function() {
+      fakeSettings.app.throws(new Error("there's no link"));
+    });
 
-      assert.throws(function() { configFrom(window_); }, TypeError);
+    it('throws an error', function() {
+      assert.throws(
+        function() { configFrom(fakeWindow()); },
+        "there's no link"
+      );
     });
   });
 
@@ -231,46 +229,50 @@ describe('annotator.config', function() {
     });
 
     it('ignores the host page config on chrome', function() {
-      var window_ = fakeWindow('chrome-extension://abcdef');
-      var currConfig = configFrom(window_);
+      fakeSettings.app.returns('chrome-extension://abcdef');
 
-      assert.equal(currConfig.app, 'chrome-extension://abcdef');
-      assert.equal(currConfig.annotations, 'SOME_ANNOTATION_ID');
-      assert.isUndefined(currConfig.foo);
+      var config = configFrom(fakeWindow());
+
+      assert.equal(config.app, 'chrome-extension://abcdef');
+      assert.equal(config.annotations, 'SOME_ANNOTATION_ID');
+      assert.isUndefined(config.foo);
     });
 
     it('ignores the host page config on firefox', function() {
-      var window_ = fakeWindow('moz-extension://abcdef');
-      var currConfig = configFrom(window_);
+      fakeSettings.app.returns('moz-extension://abcdef');
 
-      assert.equal(currConfig.app, 'moz-extension://abcdef');
-      assert.equal(currConfig.annotations, 'SOME_ANNOTATION_ID');
-      assert.isUndefined(currConfig.foo);
+      var config = configFrom(fakeWindow());
+
+      assert.equal(config.app, 'moz-extension://abcdef');
+      assert.equal(config.annotations, 'SOME_ANNOTATION_ID');
+      assert.isUndefined(config.foo);
     });
 
     it('ignores the host page config on edge', function() {
-      var window_ = fakeWindow('ms-browser-extension://abcdef');
-      var currConfig = configFrom(window_);
+      fakeSettings.app.returns('ms-browser-extension://abcdef');
 
-      assert.equal(currConfig.app, 'ms-browser-extension://abcdef');
-      assert.equal(currConfig.annotations, 'SOME_ANNOTATION_ID');
-      assert.isUndefined(currConfig.foo);
+      var config = configFrom(fakeWindow());
+
+      assert.equal(config.app, 'ms-browser-extension://abcdef');
+      assert.equal(config.annotations, 'SOME_ANNOTATION_ID');
+      assert.isUndefined(config.foo);
     });
   });
 
   context('when the client is not injected by the browser extension', function() {
-    beforeEach(function() {
-      fakeSettings.annotations.returns('SOME_ANNOTATION_ID');
-      fakeSharedSettings.jsonConfigsFrom.returns({foo: 'bar'});
+    beforeEach('configure an embedded client', function() {
+      fakeSettings.app.returns('https://hypothes.is/app.html');
     });
 
     it('does not ignore the host page config', function() {
-      var window_ = fakeWindow('SOME_HREF');
-      var currConfig = configFrom(window_);
+      fakeSettings.annotations.returns('SOME_ANNOTATION_ID');
+      fakeSharedSettings.jsonConfigsFrom.returns({foo: 'bar'});
 
-      assert.equal(currConfig.app, 'SOME_HREF');
-      assert.equal(currConfig.annotations, 'SOME_ANNOTATION_ID');
-      assert.equal(currConfig.foo, 'bar');
+      var config = configFrom(fakeWindow());
+
+      assert.equal(config.app, 'https://hypothes.is/app.html');
+      assert.equal(config.annotations, 'SOME_ANNOTATION_ID');
+      assert.equal(config.foo, 'bar');
     });
   });
 });
