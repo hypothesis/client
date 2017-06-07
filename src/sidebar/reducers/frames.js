@@ -19,7 +19,9 @@ var update = {
 
   DESTROY_FRAME: function (state, action) {
     var index = state.frames.indexOf(action.frame);
-    if (index >= 0) state.frames.splice(index, 1);
+    if (index >= 0) {
+      state.frames.splice(index, 1);
+    }
     return {frames: state.frames};
   },
 

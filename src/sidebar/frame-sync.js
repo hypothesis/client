@@ -187,15 +187,12 @@ function FrameSync($rootScope, $window, Discovery, annotationUI, bridge) {
 
   function destroyFrame(uri) {
     var frames = annotationUI.frames();
-    var frameToDestroy;
-    for (var i = 0; i < frames.length; i++) {
-      var frame = frames[i];
-      if (frame.uri === uri) {
-        frameToDestroy = frame;
-        break;
-      }
+    var frameToDestroy = frames.find(function (frame) {
+      return frame.uri === uri;
+    });
+    if (frameToDestroy) {
+      annotationUI.destroyFrame(frameToDestroy);
     }
-    if (frameToDestroy) annotationUI.destroyFrame(frameToDestroy);
   }
 
   /**
