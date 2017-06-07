@@ -3,8 +3,9 @@ Plugin = require('../plugin')
 AnnotationSync = require('../annotation-sync')
 Bridge = require('../../shared/bridge')
 Discovery = require('../../shared/discovery')
-frameUtil = require('../util/frame-util')
+FrameUtil = require('../util/frame-util')
 
+debounce = require('lodash.debounce')
 
 # Extracts individual keys from an object and returns a new one.
 extract = extract = (obj, keys...) ->
@@ -12,11 +13,17 @@ extract = extract = (obj, keys...) ->
   ret[key] = obj[key] for key in keys when obj.hasOwnProperty(key)
   ret
 
+
+# Find difference of two arrays
+difference = (arrayA, arrayB) ->
+  arrayA.filter (x) -> !arrayB.includes(x)
+
 # Class for establishing a messaging connection to the parent sidebar as well
 # as keeping the annotation state in sync with the sidebar application, this
 # frame acts as the bridge client, the sidebar is the server. This plugin
 # can also be used to send messages through to the sidebar using the
-# call method.
+# call method. This plugin also enables the discovery and management of
+# not yet known frames in a multiple frame scenario.
 module.exports = class CrossFrame extends Plugin
   constructor: (elem, options) ->
     super
@@ -29,21 +36,15 @@ module.exports = class CrossFrame extends Plugin
     opts = extract(options, 'on', 'emit')
     annotationSync = new AnnotationSync(bridge, opts)
 
+    handledFrames = []
+
     this.pluginInit = ->
       onDiscoveryCallback = (source, origin, token) ->
         bridge.createChannel(source, origin, token)
       discovery.startDiscovery(onDiscoveryCallback)
 
-      # THESIS TODO: Disabled until fully implemented.
-      # 
-      # Find, and inject Hypothesis into Guest's iframes
-      # _discoverOwnFrames()
-
-      # Listen for DOM mutations, to know when iframes are added / removed
-      observer = new MutationObserver(_checkForIFrames)
-      config = {childList: true, subtree: true};
-      # THESIS TODO: Disabled until multi-guest support is fully implemented
-      # observer.observe(elem, config);
+      if options.enableMultiFrameSupport
+        _setupFrameDetection()
 
     this.destroy = ->
       # super doesnt work here :(
@@ -63,36 +64,39 @@ module.exports = class CrossFrame extends Plugin
     this.onConnect = (fn) ->
       bridge.onConnect(fn)
 
-    _discoverOwnFrames = () ->
-      # Discover existing iframes
-      iframes = frameUtil.findIFrames(elem)
-      _handleIFrames(iframes)
+    _setupFrameDetection = ->
+      _discoverOwnFrames()
 
-    _checkForIFrames = (mutations) ->
-      for own key, mutation of mutations
-        addedNodes = mutation.addedNodes
-        removedNodes = mutation.removedNodes
+      # Listen for DOM mutations, to know when frames are added / removed
+      observer = new MutationObserver(debounce(_discoverOwnFrames, 300))
+      observer.observe(elem, {childList: true, subtree: true});
 
-        # Add iframes
-        for own key, node of addedNodes
-          if (node.tagName == 'IFRAME' && node.className != 'h-sidebar-iframe')
-            node.addEventListener 'load', ->
-              bridge.call('addedIFrame')
-              _handleIFrame(node)
+    _discoverOwnFrames = ->
+      frames = FrameUtil.findFrames(elem)
+      for frame in frames
+        if frame not in handledFrames
+          _handleFrame(frame)
+          handledFrames.push(frame)
 
-        # Remove iframes
-        for own key, node of removedNodes
-          if (node.tagName == 'IFRAME')
-            bridge.call('removedIFrame')
+      for frame, i in difference(handledFrames, frames)
+        _iframeUnloaded(frame)
+        delete handledFrames[i]
 
-    _handleIFrame = (iframe) ->
-      if !frameUtil.isAccessible(iframe) then return
+    _injectToFrame = (frame) ->
+      if !FrameUtil.hasHypothesis(frame)
+        FrameUtil.injectHypothesis(frame, options.embedScriptUrl)
+        frame.contentWindow.addEventListener 'unload', ->
+          _iframeUnloaded(frame)
 
-      if !frameUtil.hasHypothesis(iframe)
-        frameUtil.injectHypothesis(iframe)
+    _handleFrame = (frame) ->
+      if !FrameUtil.isAccessible(frame) then return
+      if frame.contentDocument.readyState != 'complete'
+        frame.addEventListener 'load', ->
+          _injectToFrame(frame)
+      else
+        _injectToFrame(frame)
 
-    _handleIFrames = (iframes) ->
-      for own index, iframe of iframes
-        _handleIFrame(iframe)
-
+    _iframeUnloaded = (frame) ->
+      bridge.call('destroyFrame', frame.src);
+      
 
