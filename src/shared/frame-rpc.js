@@ -52,7 +52,7 @@ function RPC (src, dst, origin, methods) {
     
     this._onmessage = function (ev) {
         if (self._destroyed) return;
-        if (self.dst != ev.source) return;
+        if (self.dst !== ev.source) return;
         if (self.origin !== '*' && ev.origin !== self.origin) return;
         if (!ev.data || typeof ev.data !== 'object') return;
         if (ev.data.protocol !== 'frame-rpc') return;
