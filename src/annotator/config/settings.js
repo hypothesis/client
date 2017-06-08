@@ -111,13 +111,7 @@ function configFuncSettingsFrom(window_) {
  *
  */
 function isBrowserExtension(config) {
-  if (config.app.indexOf('chrome-extension://') === 0 ||
-    config.app.indexOf('moz-extension://') === 0 ||
-    config.app.indexOf('ms-browser-extension://') === 0) {
-    return true;
-  }
-
-  return false;
+  return !(config.app.startsWith('http://') || config.app.startsWith('https://'));
 }
 
 module.exports = {

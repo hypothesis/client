@@ -259,9 +259,10 @@ describe('annotation.config.settings', function() {
         url: 'https://partner.org',
         returns: false,
       },
+      // It considers anything not http(s) to be a browser extension.
       {
         url: 'ftp://partner.org',
-        returns: false,
+        returns: true,
       },
     ].forEach(function(test) {
       it('returns ' + test.returns + ' for ' + test.url, function() {
