@@ -30,8 +30,8 @@ describe('annotator.config', function() {
 
   beforeEach('reset fakeSettings', function() {
     fakeSettings.app = sinon.stub().returns('IFRAME_URL');
-    fakeSettings.annotations = sinon.stub();
-    fakeSettings.query = sinon.stub();
+    fakeSettings.annotations = sinon.stub().returns(null);
+    fakeSettings.query = sinon.stub().returns(null);
     fakeSettings.configFuncSettingsFrom = sinon.stub().returns({});
   });
 
@@ -178,8 +178,7 @@ describe('annotator.config', function() {
     configFrom(fakeWindow());
 
     assert.calledOnce(fakeSettings.annotations);
-    assert.calledWithExactly(
-      fakeSettings.annotations, 'LOCATION_HREF');
+    assert.calledWithExactly(fakeSettings.annotations, 'LOCATION_HREF');
   });
 
   context("when there's a direct-linked annotation ID", function() {
@@ -193,24 +192,31 @@ describe('annotator.config', function() {
   });
 
   context("when there's no direct-linked annotation ID", function() {
-    it("doesn't add any .annotations setting to the config", function() {
-      assert.isFalse(configFrom(fakeWindow()).hasOwnProperty('annotations'));
+    it('sets config.annotations to null', function() {
+      assert.isNull(configFrom(fakeWindow()).annotations);
+    });
+  });
+
+  it("extracts the query from the parent page's URL", function() {
+    configFrom(fakeWindow());
+
+    assert.calledOnce(fakeSettings.query);
+    assert.calledWithExactly(fakeSettings.query, 'LOCATION_HREF');
+  });
+
+  context("when there's no annotations query", function() {
+    it('sets config.query to null', function() {
+      assert.isNull(configFrom(fakeWindow()).query);
+    });
+  });
+
+  context("when there's an annotations query", function() {
+    beforeEach(function() {
+      fakeSettings.query.returns('QUERY');
     });
 
-    context("when there's no annotations query", function() {
-      it("doesn't add any .query setting to the config", function() {
-        assert.isFalse(configFrom(fakeWindow()).hasOwnProperty('query'));
-      });
-    });
-
-    context("when there's an annotations query", function() {
-      beforeEach(function() {
-        fakeSettings.query.returns('QUERY');
-      });
-
-      it('adds the query to the config', function() {
-        assert.equal(configFrom(fakeWindow()).query, 'QUERY');
-      });
+    it('adds the query to the config', function() {
+      assert.equal(configFrom(fakeWindow()).query, 'QUERY');
     });
   });
 
