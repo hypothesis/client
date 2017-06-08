@@ -102,9 +102,22 @@ function configFuncSettingsFrom(window_) {
   return window_.hypothesisConfig();
 }
 
+/**
+ * Return true if the client is from a browser extension.
+ *
+ * @returns {boolean} true if this instance of the Hypothesis client is one
+ *   distributed in a browser extension, false if it's one embedded in a
+ *   website.
+ *
+ */
+function isBrowserExtension(config) {
+  return !(config.app.startsWith('http://') || config.app.startsWith('https://'));
+}
+
 module.exports = {
   app: app,
   annotations: annotations,
   query: query,
   configFuncSettingsFrom: configFuncSettingsFrom,
+  isBrowserExtension: isBrowserExtension,
 };

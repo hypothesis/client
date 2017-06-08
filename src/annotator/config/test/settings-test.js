@@ -4,7 +4,7 @@ var settings = require('../settings');
 
 var sandbox = sinon.sandbox.create();
 
-describe('annotation.config.settings', function() {
+describe('annotator.config.settings', function() {
 
   afterEach('reset the sandbox', function() {
     sandbox.restore();
@@ -233,6 +233,42 @@ describe('annotation.config.settings', function() {
         var fakeWindow = { hypothesisConfig: sinon.stub().returns(42) };
 
         assert.equal(settings.configFuncSettingsFrom(fakeWindow), 42);
+      });
+    });
+  });
+
+  describe('#isBrowserExtension', function() {
+    [
+      {
+        url: 'chrome-extension://abcxyz',
+        returns: true,
+      },
+      {
+        url: 'moz-extension://abcxyz',
+        returns: true,
+      },
+      {
+        url: 'ms-browser-extension://abcxyz',
+        returns: true,
+      },
+      {
+        url: 'http://partner.org',
+        returns: false,
+      },
+      {
+        url: 'https://partner.org',
+        returns: false,
+      },
+      // It considers anything not http(s) to be a browser extension.
+      {
+        url: 'ftp://partner.org',
+        returns: true,
+      },
+    ].forEach(function(test) {
+      it('returns ' + test.returns + ' for ' + test.url, function() {
+        assert.equal(
+          settings.isBrowserExtension({app: test.url}),
+          test.returns);
       });
     });
   });
