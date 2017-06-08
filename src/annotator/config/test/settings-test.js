@@ -4,7 +4,7 @@ var settings = require('../settings');
 
 var sandbox = sinon.sandbox.create();
 
-describe('annotation.config.settings', function() {
+describe('annotator.config.settings', function() {
 
   afterEach('reset the sandbox', function() {
     sandbox.restore();
