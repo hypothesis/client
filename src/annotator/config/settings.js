@@ -84,13 +84,8 @@ function query(url) {
  *
  * If there's no window.hypothesisConfig() function then return {}.
  *
- * If there is a window.hypothesisConfig but it isn't a function then throw an
- * error.
- *
  * @param {Window} window_ - The window to search for a hypothesisConfig() function
  * @return {Object} - Any config settings returned by hypothesisConfig()
- *
- * @throws {TypeError} - If window.hypothesisConfig() isn't a function
  *
  */
 function configFuncSettingsFrom(window_) {
@@ -100,7 +95,8 @@ function configFuncSettingsFrom(window_) {
 
   if (typeof window_.hypothesisConfig !== 'function') {
     var docs = 'https://h.readthedocs.io/projects/client/en/latest/publishers/config/#window.hypothesisConfig';
-    throw new TypeError('hypothesisConfig must be a function, see: ' + docs);
+    console.warn('hypothesisConfig must be a function, see: ' + docs);
+    return {};
   }
 
   return window_.hypothesisConfig();
