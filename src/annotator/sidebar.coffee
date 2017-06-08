@@ -5,11 +5,11 @@ Hammer = require('hammerjs')
 Host = require('./host')
 annotationCounts = require('./annotation-counts')
 sidebarTrigger = require('./sidebar-trigger')
-events = require('../shared/bridge-events');
+smartInitialWidth = require('./smart-initial-width')
+events = require('../shared/bridge-events')
 
 # Minimum width to which the frame can be resized.
 MIN_RESIZE = 280
-
 
 module.exports = class Sidebar extends Host
   options:
@@ -133,10 +133,12 @@ module.exports = class Sidebar extends Host
 
       # Process the resize gesture
       if @gestureState.final isnt @gestureState.initial
-        m = @gestureState.final
-        w = -m
-        @frame.css('margin-left', "#{m}px")
-        if w >= MIN_RESIZE then @frame.css('width', "#{w}px")
+        @_setSidebarWidth(-@gestureState.final)
+
+  _setSidebarWidth: (width) ->
+    margin = -width
+    @frame.css('margin-left', "#{margin}px")
+    if width >= MIN_RESIZE then @frame.css('width', "#{width}px")
 
   onPan: (event) =>
     switch event.type
@@ -182,7 +184,12 @@ module.exports = class Sidebar extends Host
   show: ->
     @crossframe.call('sidebarOpened')
 
-    @frame.css 'margin-left': "#{-1 * @frame.width()}px"
+    initialWidth = smartInitialWidth({ min: MIN_RESIZE, max: 428 })
+    if initialWidth
+      @_setSidebarWidth(initialWidth)
+    else
+      @frame.css 'margin-left': "#{-1 * @frame.width()}px"
+
     @frame.removeClass 'annotator-collapsed'
 
     if @toolbar?
