@@ -18,7 +18,7 @@ function fakeWindow() {
   };
 }
 
-describe('annotator.config', function() {
+describe('annotator.config.index', function() {
   beforeEach('reset fakeSharedSettings', function() {
     fakeSharedSettings.jsonConfigsFrom = sinon.stub().returns({});
   });
