@@ -39,6 +39,17 @@ var fixtures = {
       link: [{href: 'http://example.org/paper.pdf'}, {href:'urn:1234'}],
     },
   },
+
+  // Response to the `getDocumentInfo` channel message for a frame displaying
+  // a document with a doi: url in its link array
+  doiDocumentInfo: {
+    uri: 'http://example.org/paper.html',
+    metadata: {
+      link: [{href: 'http://example.org/paper.html'}, {href:'doi:1234'}],
+    },
+  },
+
+
 };
 
 describe('FrameSync', function () {
@@ -212,6 +223,19 @@ describe('FrameSync', function () {
         uri: frameInfo.uri,
       });
     });
+
+    it('adds the doi url to the searchUris list', function () {
+      frameInfo = fixtures.doiDocumentInfo;
+
+      fakeBridge.emit('connect', fakeChannel);
+
+      assert.calledWith(fakeAnnotationUI.connectFrame, {
+        documentFingerprint: undefined,
+        searchUris: [frameInfo.uri, 'doi:1234'],
+        uri: frameInfo.uri,
+      });
+    });
+
   });
 
   describe('on "showAnnotations" message', function () {
