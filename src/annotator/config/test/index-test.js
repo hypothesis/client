@@ -28,6 +28,7 @@ describe('annotator.config', function() {
     fakeSettings.annotations = sinon.stub().returns(null);
     fakeSettings.query = sinon.stub().returns(null);
     fakeSettings.configFuncSettingsFrom = sinon.stub().returns({});
+    fakeSettings.isBrowserExtension = sinon.stub().returns(false);
   });
 
   it('gets the config.app setting', function() {
@@ -188,39 +189,38 @@ describe('annotator.config', function() {
   });
 
   context('when the client is injected by the browser extension', function() {
-    beforeEach(function() {
+    beforeEach('configure a browser extension client', function() {
+      fakeSettings.isBrowserExtension.returns(true);
+    });
+
+    it('still reads the config.app setting from the host page', function() {
+      fakeSettings.app.returns('SOME_APP_URL');
+
+      assert.equal(configFrom(fakeWindow()).app, fakeSettings.app());
+    });
+
+    it('still reads the config.query setting from the host page', function() {
+      fakeSettings.query.returns('SOME_QUERY');
+
+      assert.equal(configFrom(fakeWindow()).query, fakeSettings.query());
+    });
+
+    it('still reads the config.annotations setting from the host page', function() {
       fakeSettings.annotations.returns('SOME_ANNOTATION_ID');
+
+      assert.equal(configFrom(fakeWindow()).annotations, fakeSettings.annotations());
+    });
+
+    it('ignores settings from JSON objects in the host page', function() {
       fakeSharedSettings.jsonConfigsFrom.returns({foo: 'bar'});
+
+      assert.isUndefined(configFrom(fakeWindow()).foo);
     });
 
-    it('ignores the host page config on chrome', function() {
-      fakeSettings.app.returns('chrome-extension://abcdef');
+    it('ignores settings from the hypothesisConfig() function in the host page', function() {
+      fakeSettings.configFuncSettingsFrom.returns({foo: 'bar'});
 
-      var config = configFrom(fakeWindow());
-
-      assert.equal(config.app, 'chrome-extension://abcdef');
-      assert.equal(config.annotations, 'SOME_ANNOTATION_ID');
-      assert.isUndefined(config.foo);
-    });
-
-    it('ignores the host page config on firefox', function() {
-      fakeSettings.app.returns('moz-extension://abcdef');
-
-      var config = configFrom(fakeWindow());
-
-      assert.equal(config.app, 'moz-extension://abcdef');
-      assert.equal(config.annotations, 'SOME_ANNOTATION_ID');
-      assert.isUndefined(config.foo);
-    });
-
-    it('ignores the host page config on edge', function() {
-      fakeSettings.app.returns('ms-browser-extension://abcdef');
-
-      var config = configFrom(fakeWindow());
-
-      assert.equal(config.app, 'ms-browser-extension://abcdef');
-      assert.equal(config.annotations, 'SOME_ANNOTATION_ID');
-      assert.isUndefined(config.foo);
+      assert.isUndefined(configFrom(fakeWindow()).foo);
     });
   });
 

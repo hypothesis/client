@@ -24,15 +24,7 @@ function configFrom(window_) {
     annotations: settings.annotations(window_.location.href),
   };
 
-  var chromeExt = 'chrome-extension://';
-  var mozExt = 'moz-extension://';
-  var edgeExt = 'ms-browser-extension://';
-
-  // If the client is injected by the browser extension, ignore
-  // the rest of the host page config.
-  if (config.app.indexOf(chromeExt) === 0 ||
-    config.app.indexOf(mozExt) === 0||
-    config.app.indexOf(edgeExt) === 0) {
+  if (settings.isBrowserExtension(config)) {
     return config;
   }
 
