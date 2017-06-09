@@ -2,6 +2,7 @@
 
 var settings = require('./settings');
 var sharedSettings = require('../../shared/settings');
+var isBrowserExtension = require('./is-browser-extension');
 
 /**
  * Reads the Hypothesis configuration from the environment.
@@ -24,7 +25,7 @@ function configFrom(window_) {
     annotations: settings.annotations(window_.location.href),
   };
 
-  if (settings.isBrowserExtension(config)) {
+  if (isBrowserExtension(config)) {
     return config;
   }
 

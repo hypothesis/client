@@ -5,9 +5,11 @@ var util = require('../../../shared/test/util');
 
 var fakeSharedSettings = {};
 var fakeSettings = {};
+var fakeIsBrowserExtension = sinon.stub();
 
 var configFrom = proxyquire('../index', util.noCallThru({
   './settings': fakeSettings,
+  './is-browser-extension': fakeIsBrowserExtension,
   '../../shared/settings': fakeSharedSettings,
 }));
 
@@ -28,7 +30,11 @@ describe('annotator.config.index', function() {
     fakeSettings.annotations = sinon.stub().returns(null);
     fakeSettings.query = sinon.stub().returns(null);
     fakeSettings.configFuncSettingsFrom = sinon.stub().returns({});
-    fakeSettings.isBrowserExtension = sinon.stub().returns(false);
+  });
+
+  beforeEach('reset fakeIsBrowserExtension()', function() {
+    fakeIsBrowserExtension.reset();
+    fakeIsBrowserExtension.returns(false);
   });
 
   it('gets the config.app setting', function() {
@@ -190,7 +196,7 @@ describe('annotator.config.index', function() {
 
   context('when the client is injected by the browser extension', function() {
     beforeEach('configure a browser extension client', function() {
-      fakeSettings.isBrowserExtension.returns(true);
+      fakeIsBrowserExtension.returns(true);
     });
 
     it('still reads the config.app setting from the host page', function() {
