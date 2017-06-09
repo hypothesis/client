@@ -8,8 +8,8 @@
  *   website.
  *
  */
-function isBrowserExtension(config) {
-  return !(config.app.startsWith('http://') || config.app.startsWith('https://'));
+function isBrowserExtension(app) {
+  return !(app.startsWith('http://') || app.startsWith('https://'));
 }
 
 module.exports = isBrowserExtension;

@@ -31,7 +31,7 @@ describe('annotator.config.isBrowserExtension', function() {
     },
   ].forEach(function(test) {
     it('returns ' + test.returns + ' for ' + test.url, function() {
-      assert.equal(isBrowserExtension({app: test.url}), test.returns);
+      assert.equal(isBrowserExtension(test.url), test.returns);
     });
   });
 });

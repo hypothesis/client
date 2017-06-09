@@ -25,7 +25,7 @@ function configFrom(window_) {
     annotations: settings.annotations(window_.location.href),
   };
 
-  if (isBrowserExtension(config)) {
+  if (isBrowserExtension(config.app)) {
     return config;
   }
 
