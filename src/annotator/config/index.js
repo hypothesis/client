@@ -1,6 +1,6 @@
 'use strict';
 
-var settings = require('./settings');
+var settingsFrom = require('./settings');
 var sharedSettings = require('../../shared/settings');
 var isBrowserExtension = require('./is-browser-extension');
 var configFuncSettingsFrom = require('./config-func-settings-from');
@@ -11,8 +11,10 @@ var configFuncSettingsFrom = require('./config-func-settings-from');
  * @param {Window} window_ - The Window object to read config from.
  */
 function configFrom(window_) {
+  var settings = settingsFrom(window_);
+
   var config = {
-    app: settings.app(window_.document),
+    app: settings.app,
 
     // Extract the default annotation ID or query from the URL.
     //
@@ -22,8 +24,8 @@ function configFrom(window_) {
     //
     // In environments where the config has not been injected into the DOM,
     // we try to retrieve it from the URL here.
-    query: settings.query(window_.location.href),
-    annotations: settings.annotations(window_.location.href),
+    query: settings.query,
+    annotations: settings.annotations,
   };
 
   if (isBrowserExtension(config.app)) {
