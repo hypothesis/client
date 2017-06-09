@@ -124,7 +124,7 @@ function LiveReloadServer(port, config) {
               if (!iframeIsAdded) {
                 var iframe1 = document.querySelector('#iframe1');
                 var iframeNew = iframe1.cloneNode();
-                iframeNew.srcdoc = "/document/changelog";
+                iframeNew.src = "/document/changelog";
                 iframeNew.id = "iframe2";
                 iframeIsAdded = true;
                 document.querySelector('#iframe2-container').appendChild(iframeNew);
