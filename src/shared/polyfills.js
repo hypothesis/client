@@ -6,6 +6,7 @@ require('core-js/es6/set');
 require('core-js/fn/array/find');
 require('core-js/fn/array/find-index');
 require('core-js/fn/array/from');
+require('core-js/fn/array/includes');
 require('core-js/fn/object/assign');
 
 // ES2017
