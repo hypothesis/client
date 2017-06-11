@@ -20,6 +20,7 @@ function injectHypothesis (iframe, scriptUrl) {
 
   var src = scriptUrl;
   var embed = document.createElement('script');
+  embed.className = 'js-hypothesis-embed';
   embed.async = true;
   embed.src = src;
 
