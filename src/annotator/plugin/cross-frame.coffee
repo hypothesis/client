@@ -90,10 +90,7 @@ module.exports = class CrossFrame extends Plugin
 
     _handleFrame = (frame) ->
       if !FrameUtil.isAccessible(frame) then return
-      if frame.contentDocument.readyState != 'complete'
-        frame.addEventListener 'load', ->
-          _injectToFrame(frame)
-      else
+      FrameUtil.isLoaded frame, () ->
         _injectToFrame(frame)
 
     _iframeUnloaded = (frame) ->
