@@ -1,6 +1,13 @@
 'use strict';
 
+var configFuncSettingsFrom = require('./config-func-settings-from');
+var isBrowserExtension = require('./is-browser-extension');
+var sharedSettings = require('../../shared/settings');
+
 function settingsFrom(window_) {
+
+  var jsonConfigs = sharedSettings.jsonConfigsFrom(window_.document);
+  var configFuncSettings = configFuncSettingsFrom(window_);
 
   /**
    * Return the href URL of the first annotator link in the given document.
@@ -69,10 +76,23 @@ function settingsFrom(window_) {
     return null;
   }
 
+  function hostPageSetting(name) {
+    if (isBrowserExtension(app())) {
+      return null;
+    }
+
+    if (configFuncSettings.hasOwnProperty(name)) {
+      return configFuncSettings[name];
+    }
+
+    return jsonConfigs[name];
+  }
+
   return {
     get app() { return app(); },
     get annotations() { return annotations(); },
     get query() { return query(); },
+    hostPageSetting: hostPageSetting,
   };
 }
 

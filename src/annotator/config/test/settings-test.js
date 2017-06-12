@@ -1,8 +1,33 @@
 'use strict';
 
-var settingsFrom = require('../settings');
+var proxyquire = require('proxyquire');
+var util = require('../../../shared/test/util');
+
+var fakeConfigFuncSettingsFrom = sinon.stub();
+var fakeIsBrowserExtension = sinon.stub();
+var fakeSharedSettings = {};
+
+var settingsFrom = proxyquire('../settings', util.noCallThru({
+  './config-func-settings-from': fakeConfigFuncSettingsFrom,
+  './is-browser-extension': fakeIsBrowserExtension,
+  '../../shared/settings': fakeSharedSettings,
+}));
 
 describe('annotator.config.settingsFrom', function() {
+
+  beforeEach('reset fakeConfigFuncSettingsFrom', function() {
+    fakeConfigFuncSettingsFrom.reset();
+    fakeConfigFuncSettingsFrom.returns({});
+  });
+
+  beforeEach('reset fakeIsBrowserExtension', function() {
+    fakeIsBrowserExtension.reset();
+    fakeIsBrowserExtension.returns(false);
+  });
+
+  beforeEach('reset fakeSharedSettings', function() {
+    fakeSharedSettings.jsonConfigsFrom = sinon.stub().returns({});
+  });
 
   describe('#app', function() {
     function appendLinkToDocument(href) {
@@ -87,6 +112,9 @@ describe('annotator.config.settingsFrom', function() {
     return {
       location: {
         href: href,
+      },
+      document: {
+        querySelector: sinon.stub().returns({href: 'hi'}),
       },
     };
   }
@@ -198,6 +226,73 @@ describe('annotator.config.settingsFrom', function() {
         var url = 'http://localhost:3000#annotations:query:abc123';
 
         assert.isNull(settingsFrom(fakeWindow(url)).query);
+      });
+    });
+  });
+
+  describe('#hostPageSetting', function() {
+    context('when the client is from a browser extension', function() {
+      beforeEach('configure a browser extension client', function() {
+        fakeIsBrowserExtension.returns(true);
+      });
+
+      it('always returns null', function() {
+        // These settings in the host page should be ignored.
+        fakeConfigFuncSettingsFrom.returns({foo: 'bar'});
+        fakeSharedSettings.jsonConfigsFrom.returns({foo: 'bar'});
+
+        assert.isNull(settingsFrom(fakeWindow()).hostPageSetting('foo'));
+      });
+    });
+
+    context('when the client is embedded in a web page', function() {
+      beforeEach('configure an embedded client', function() {
+        fakeIsBrowserExtension.returns(false);
+      });
+
+      it('returns setting values from window.hypothesisConfig()', function() {
+        fakeConfigFuncSettingsFrom.returns({foo: 'bar'});
+
+        assert.equal(settingsFrom(fakeWindow()).hostPageSetting('foo'), 'bar');
+      });
+
+      it('returns setting values from js-hypothesis-config scripts', function() {
+        fakeSharedSettings.jsonConfigsFrom.returns({foo: 'bar'});
+
+        assert.equal(settingsFrom(fakeWindow()).hostPageSetting('foo'), 'bar');
+      });
+
+      specify('hypothesisConfig() overrides js-hypothesis-config', function() {
+        fakeConfigFuncSettingsFrom.returns({
+          foo: 'fooFromHypothesisConfig',
+        });
+        fakeSharedSettings.jsonConfigsFrom.returns({
+          foo: 'fooFromJsHypothesisConfigScript',
+        });
+
+        assert.equal(
+          settingsFrom(fakeWindow()).hostPageSetting('foo'),
+          'fooFromHypothesisConfig'
+        );
+      });
+
+      [
+        null,
+        undefined,
+      ].forEach(function(returnValue) {
+        specify('even a ' + returnValue + ' from hypothesisConfig() overrides js-hypothesis-configs', function() {
+          fakeConfigFuncSettingsFrom.returns({foo: returnValue});
+          fakeSharedSettings.jsonConfigsFrom.returns({foo: 'bar'});
+
+          assert.equal(settingsFrom(fakeWindow()).hostPageSetting('foo'), returnValue);
+        });
+      });
+
+      it("returns undefined if the setting isn't defined anywhere", function() {
+        fakeConfigFuncSettingsFrom.returns({});
+        fakeSharedSettings.jsonConfigsFrom.returns({});
+
+        assert.isUndefined(settingsFrom(fakeWindow()).hostPageSetting('foo'));
       });
     });
   });
