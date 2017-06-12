@@ -94,6 +94,5 @@ module.exports = class CrossFrame extends Plugin
         _injectToFrame(frame)
 
     _iframeUnloaded = (frame) ->
+      # TODO: Bridge call here not yet implemented, placeholder for now
       bridge.call('destroyFrame', frame.src);
-      
-
