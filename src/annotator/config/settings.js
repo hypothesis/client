@@ -46,13 +46,19 @@ function settingsFrom(window_) {
    * @return {string|null} - The extracted ID, or null.
    */
   function annotations() {
-    // Annotation IDs are url-safe-base64 identifiers
-    // See https://tools.ietf.org/html/rfc4648#page-7
-    var annotFragmentMatch = window_.location.href.match(/#annotations:([A-Za-z0-9_-]+)$/);
-    if (annotFragmentMatch) {
-      return annotFragmentMatch[1];
+
+    /** Return the annotations from the URL, or null. */
+    function annotationsFromURL() {
+      // Annotation IDs are url-safe-base64 identifiers
+      // See https://tools.ietf.org/html/rfc4648#page-7
+      var annotFragmentMatch = window_.location.href.match(/#annotations:([A-Za-z0-9_-]+)$/);
+      if (annotFragmentMatch) {
+        return annotFragmentMatch[1];
+      }
+      return null;
     }
-    return null;
+
+    return jsonConfigs.annotations || annotationsFromURL();
   }
 
   /**

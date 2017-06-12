@@ -120,6 +120,24 @@ describe('annotator.config.settingsFrom', function() {
   }
 
   describe('#annotations', function() {
+    context('when the host page has a js-hypothesis-config with an annotations setting', function() {
+      beforeEach('add a js-hypothesis-config annotations setting', function() {
+        fakeSharedSettings.jsonConfigsFrom.returns({annotations: 'annotationsFromJSON'});
+      });
+
+      it('returns the annotations from the js-hypothesis-config script', function() {
+        assert.equal(settingsFrom(fakeWindow()).annotations, 'annotationsFromJSON');
+      });
+
+      context("when there's also an annotations in the URL fragment", function() {
+        specify('js-hypothesis-config annotations override URL ones', function() {
+          var window_ = fakeWindow('http://localhost:3000#annotations:annotationsFromURL');
+
+          assert.equal(settingsFrom(window_).annotations, 'annotationsFromJSON');
+        });
+      });
+    });
+
     [
       {
         describe: "when there's a valid #annotations:<ID> fragment",
