@@ -86,6 +86,11 @@ module.exports = class Discovery
   _onMessage: (event) =>
     {source, origin, data} = event
 
+    uri = null
+    if (data.type)
+      uri = data.uri
+      data = data.type
+
     # If `origin` is 'null' the source frame is a file URL or loaded over some
     # other scheme for which the `origin` is undefined. In this case, the only
     # way to ensure the message arrives is to use the wildcard origin. See:
@@ -111,10 +116,14 @@ module.exports = class Discovery
     {reply, discovered, token} = this._processMessage(messageType, token, origin)
 
     if reply
-      source.postMessage '__cross_frame_dhcp_' + reply, origin
+      message =
+        type: '__cross_frame_dhcp_' + reply
+        uri: window.location.href # TODO: Get this from Document plugin (or similar plugin)
+
+      source.postMessage message, origin
 
     if discovered
-      @onDiscovery.call(null, source, origin, token)
+      @onDiscovery.call(null, source, origin, token, uri)
 
     return
 
