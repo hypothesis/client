@@ -156,6 +156,24 @@ describe('annotator.config.settingsFrom', function() {
   });
 
   describe('#query', function() {
+    context('when the host page has a js-hypothesis-config with a query setting', function() {
+      beforeEach('add a js-hypothesis-config query setting', function() {
+        fakeSharedSettings.jsonConfigsFrom.returns({query: 'queryFromJSON'});
+      });
+
+      it('returns the query from the js-hypothesis-config script', function() {
+        assert.equal(settingsFrom(fakeWindow()).query, 'queryFromJSON');
+      });
+
+      context("when there's also a query in the URL fragment", function() {
+        specify('js-hypothesis-config queries override URL ones', function() {
+          var window_ = fakeWindow('http://localhost:3000#annotations:query:queryFromUrl');
+
+          assert.equal(settingsFrom(window_).query, 'queryFromJSON');
+        });
+      });
+    });
+
     [
       {
         describe: "when there's a #annotations:query:<QUERY> fragment",

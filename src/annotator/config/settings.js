@@ -56,24 +56,34 @@ function settingsFrom(window_) {
   }
 
   /**
-   * Return the `#annotations:query:*` query from the given URL's fragment.
+   * Return the config.query setting from the host page or from the URL.
    *
-   * If the URL contains a `#annotations:query:*` (or `#annotatons:q:*`) fragment
-   * then return a the query part extracted from the fragment.
-   * Otherwise return `null`.
+   * If the host page contains a js-hypothesis-config script containing a
+   * query setting then return that.
    *
-   * @return {string|null} - The extracted query, or null.
+   * Otherwise if the host page's URL has a `#annotations:query:*` (or
+   * `#annotations:q:*`) fragment then return the query value from that.
+   *
+   * Otherwise return null.
+   *
+   * @return {string|null} - The config.query setting, or null.
    */
   function query() {
-    var queryFragmentMatch = window_.location.href.match(/#annotations:(query|q):(.+)$/i);
-    if (queryFragmentMatch) {
-      try {
-        return decodeURI(queryFragmentMatch[2]);
-      } catch (err) {
-        // URI Error should return the page unfiltered.
+
+    /** Return the query from the URL, or null. */
+    function queryFromURL() {
+      var queryFragmentMatch = window_.location.href.match(/#annotations:(query|q):(.+)$/i);
+      if (queryFragmentMatch) {
+        try {
+          return decodeURI(queryFragmentMatch[2]);
+        } catch (err) {
+          // URI Error should return the page unfiltered.
+        }
       }
+      return null;
     }
-    return null;
+
+    return jsonConfigs.query || queryFromURL();
   }
 
   function hostPageSetting(name) {
