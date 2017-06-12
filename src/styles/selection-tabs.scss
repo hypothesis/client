@@ -12,12 +12,14 @@
   height: 30px;
   width: 106px;
 
-  background-color: #fff;
+  font-weight: bold;
 
-  border: 1px solid #d3d3d3;
+  color: #626262;
+  background-color: rgb(236, 236, 236);
+  transition: background-color 100ms linear;
+
+  border: 1px solid #626262;
   border-right-width: 0;
-
-  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
 
   padding-left: 12px;
   padding-right: calc(12px - 7px);
@@ -34,20 +36,20 @@
 }
 
 .selection-tabs__type:first-child {
-  border-top-left-radius: 4px;
-  border-bottom-left-radius: 4px;
+  border-top-left-radius: 2px;
+  border-bottom-left-radius: 2px;
 }
 
 .selection-tabs__type:last-child {
-  border-right-color: #ccc;
-  border-top-right-radius: 4px;
-  border-bottom-right-radius: 4px;
+  border-top-right-radius: 2px;
+  border-bottom-right-radius: 2px;
   border-right-width: 1px;
 }
 
 .selection-tabs__type:hover,
 .selection-tabs__type.is-selected {
-  background-color: #e6e6e6;
+  color: #f1f1f1;
+  background-color: #626262;
 }
 
 .selection-tabs__label {
