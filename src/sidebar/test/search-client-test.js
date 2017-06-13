@@ -2,7 +2,7 @@
 
 var SearchClient = require('../search-client');
 
-function await(emitter, event) {
+function awaitEvent(emitter, event) {
   return new Promise(function (resolve) {
     emitter.on(event, resolve);
   });
@@ -33,7 +33,7 @@ describe('SearchClient', function () {
     var onResults = sinon.stub();
     client.on('results', onResults);
     client.get({uri: 'http://example.com'});
-    return await(client, 'end').then(function () {
+    return awaitEvent(client, 'end').then(function () {
       assert.calledWith(onResults, RESULTS);
     });
   });
@@ -43,7 +43,7 @@ describe('SearchClient', function () {
     var onResults = sinon.stub();
     client.on('results', onResults);
     client.get({uri: 'http://example.com'});
-    return await(client, 'end').then(function () {
+    return awaitEvent(client, 'end').then(function () {
       assert.calledWith(onResults, RESULTS.slice(0,2));
       assert.calledWith(onResults, RESULTS.slice(2,4));
     });
@@ -67,7 +67,7 @@ describe('SearchClient', function () {
 
     client.get({uri: 'http://example.com'});
 
-    return await(client, 'end').then(function () {
+    return awaitEvent(client, 'end').then(function () {
       assert.calledWith(onResults, []);
       assert.calledOnce(fakeSearchFn);
     });
@@ -79,7 +79,7 @@ describe('SearchClient', function () {
     var onResults = sinon.stub();
     client.on('results', onResults);
     client.get({uri: 'http://example.com'});
-    return await(client, 'end').then(function () {
+    return awaitEvent(client, 'end').then(function () {
       assert.calledOnce(onResults);
       assert.calledWith(onResults, RESULTS);
     });
@@ -108,7 +108,7 @@ describe('SearchClient', function () {
     var onError = sinon.stub();
     client.on('error', onError);
     client.get({uri: 'http://example.com'});
-    return await(client, 'end').then(function () {
+    return awaitEvent(client, 'end').then(function () {
       assert.calledWith(onError, err);
     });
   });

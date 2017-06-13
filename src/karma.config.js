@@ -79,6 +79,7 @@ module.exports = function(config) {
           // https://github.com/karma-runner/karma-coverage/issues/157
           instrumenter: require('isparta'),
         }),
+        'babelify',
       ],
     },
 

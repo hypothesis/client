@@ -17,7 +17,8 @@
     "angulartics": "0.17.2",
     "autofill-event": "0.0.1",
     "autoprefixer": "^6.0.3",
-    "babelify": "^6.1.3",
+    "babel-preset-es2015": "^6.24.0",
+    "babelify": "^7.3.0",
     "browserify": "^13.0.0",
     "browserify-istanbul": "^2.0.0",
     "browserify-ngannotate": "^1.0.1",
@@ -36,7 +37,7 @@
     "dom-anchor-fragment": "^1.0.1",
     "dom-anchor-text-position": "^4.0.0",
     "dom-anchor-text-quote": "^4.0.2",
-    "dom-seek": "^1.0.1",
+    "dom-seek": "^4.0.3",
     "end-of-stream": "^1.1.0",
     "escape-html": "^1.0.3",
     "escape-string-regexp": "^1.0.5",
@@ -122,6 +123,7 @@
     ]
   },
   "browser": {
+    "dom-anchor-fragment": "./node_modules/dom-anchor-fragment/dist/FragmentAnchor.js",
     "hammerjs": "./node_modules/hammerjs/hammer.js",
     "jquery": "./node_modules/jquery/dist/jquery.slim.js"
   },
