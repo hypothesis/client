@@ -20,6 +20,7 @@ if (window.wgxpath) {
 var $ = require('jquery');
 
 // Applications
+var Guest = require('./guest');
 var Sidebar = require('./sidebar');
 var PdfSidebar = require('./pdf-sidebar');
 
@@ -44,9 +45,19 @@ $.noConflict(true)(function() {
   var Klass = window.PDFViewerApplication ?
       PdfSidebar :
       Sidebar;
+
   if (config.hasOwnProperty('constructor')) {
     Klass = config.constructor;
     delete config.constructor;
+  }
+
+  if (config.enableMultiFrameSupport && config.subFrameInstance) {
+    Klass = Guest;
+
+    // Other modules use this to detect if this
+    // frame context belongs to hypothesis.
+    // Needs to be a global property that's set.
+    window.__hypothesis_frame = true;
   }
 
   config.pluginClasses = pluginClasses;

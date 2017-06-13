@@ -81,6 +81,8 @@ module.exports = class Guest extends Delegator
     this.anchors = []
 
     cfOptions =
+      enableMultiFrameSupport: config.enableMultiFrameSupport
+      embedScriptUrl: config.embedScriptUrl
       on: (event, handler) =>
         this.subscribe(event, handler)
       emit: (event, args...) =>

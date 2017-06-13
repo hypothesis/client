@@ -160,6 +160,7 @@ describe 'Bridge', ->
       }
 
       event = {
+        source: fakeWindow
         origin: 'http://example.com'
         data: data
       }
@@ -182,6 +183,7 @@ describe 'Bridge', ->
       }
 
       event = {
+        source: fakeWindow
         origin: 'http://example.com'
         data: data
       }
