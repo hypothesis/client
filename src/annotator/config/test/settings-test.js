@@ -1,8 +1,8 @@
 'use strict';
 
-var settings = require('../settings');
+var settingsFrom = require('../settings');
 
-describe('annotator.config.settings', function() {
+describe('annotator.config.settingsFrom', function() {
 
   describe('#app', function() {
     function appendLinkToDocument(href) {
@@ -27,7 +27,7 @@ describe('annotator.config.settings', function() {
       });
 
       it('returns the href from the link', function() {
-        assert.equal(settings.app(document), 'http://example.com/app.html');
+        assert.equal(settingsFrom(window).app, 'http://example.com/app.html');
       });
     });
 
@@ -46,7 +46,7 @@ describe('annotator.config.settings', function() {
       });
 
       it('returns the href from the first one', function() {
-        assert.equal(settings.app(document), 'http://example.com/app1');
+        assert.equal(settingsFrom(window).app, 'http://example.com/app1');
       });
     });
 
@@ -63,7 +63,9 @@ describe('annotator.config.settings', function() {
 
       it('throws an error', function() {
         assert.throws(
-          function() { settings.app(document); },
+          function() {
+            settingsFrom(window).app; // eslint-disable-line no-unused-expressions
+          },
           'application/annotator+html link has no href'
         );
       });
@@ -72,12 +74,22 @@ describe('annotator.config.settings', function() {
     context("when there's no annotator+html link", function() {
       it('throws an error', function() {
         assert.throws(
-          function() { settings.app(document); },
+          function() {
+            settingsFrom(window).app; // eslint-disable-line no-unused-expressions
+          },
           'No application/annotator+html link in the document'
         );
       });
     });
   });
+
+  function fakeWindow(href) {
+    return {
+      location: {
+        href: href,
+      },
+    };
+  }
 
   describe('#annotations', function() {
     [
@@ -108,7 +120,8 @@ describe('annotator.config.settings', function() {
     ].forEach(function(test) {
       describe(test.describe, function() {
         it(test.it, function() {
-          assert.deepEqual(settings.annotations(test.url), test.returns);
+          assert.deepEqual(
+            settingsFrom(fakeWindow(test.url)).annotations, test.returns);
         });
       });
     });
@@ -161,7 +174,8 @@ describe('annotator.config.settings', function() {
     ].forEach(function(test) {
       describe(test.describe, function() {
         it(test.it, function() {
-          assert.deepEqual(settings.query(test.url), test.returns);
+          assert.deepEqual(
+            settingsFrom(fakeWindow(test.url)).query, test.returns);
         });
       });
     });
@@ -183,7 +197,7 @@ describe('annotator.config.settings', function() {
         // query() won't try to URI-decode the fragment.
         var url = 'http://localhost:3000#annotations:query:abc123';
 
-        assert.isNull(settings.query(url));
+        assert.isNull(settingsFrom(fakeWindow(url)).query);
       });
     });
   });

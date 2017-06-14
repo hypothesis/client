@@ -4,12 +4,12 @@ var proxyquire = require('proxyquire');
 var util = require('../../../shared/test/util');
 
 var fakeSharedSettings = {};
-var fakeSettings = {};
+var fakeSettingsFrom = sinon.stub();
 var fakeConfigFuncSettingsFrom = sinon.stub();
 var fakeIsBrowserExtension = sinon.stub();
 
 var configFrom = proxyquire('../index', util.noCallThru({
-  './settings': fakeSettings,
+  './settings': fakeSettingsFrom,
   './is-browser-extension': fakeIsBrowserExtension,
   './config-func-settings-from': fakeConfigFuncSettingsFrom,
   '../../shared/settings': fakeSharedSettings,
@@ -27,10 +27,9 @@ describe('annotator.config.index', function() {
     fakeSharedSettings.jsonConfigsFrom = sinon.stub().returns({});
   });
 
-  beforeEach('reset fakeSettings', function() {
-    fakeSettings.app = sinon.stub().returns('IFRAME_URL');
-    fakeSettings.annotations = sinon.stub().returns(null);
-    fakeSettings.query = sinon.stub().returns(null);
+  beforeEach('reset fakeSettingsFrom', function() {
+    fakeSettingsFrom.reset();
+    fakeSettingsFrom.returns({});
   });
 
   beforeEach('reset fakeIsBrowserExtension()', function() {
@@ -43,24 +42,39 @@ describe('annotator.config.index', function() {
     fakeConfigFuncSettingsFrom.returns({});
   });
 
-  it('gets the config.app setting', function() {
+  it('gets the settings from the window', function() {
     var window_ = fakeWindow();
 
     configFrom(window_);
 
-    assert.calledOnce(fakeSettings.app);
-    assert.calledWith(fakeSettings.app, window_.document);
+    assert.calledOnce(fakeSettingsFrom);
+    assert.calledWithExactly(fakeSettingsFrom, window_);
   });
 
-  context("when there's an application/annotator+html <link>", function() {
-    it("returns the <link>'s href as config.app", function() {
-      assert.equal(configFrom(fakeWindow()).app, 'IFRAME_URL');
+  [
+    'app',
+    'query',
+    'annotations',
+  ].forEach(function(settingName) {
+    it('returns the ' + settingName + ' setting', function() {
+      fakeSettingsFrom()[settingName] = 'SETTING_VALUE';
+
+      var config = configFrom(fakeWindow());
+
+      assert.equal(config[settingName], 'SETTING_VALUE');
     });
   });
 
+
   context("when there's no application/annotator+html <link>", function() {
     beforeEach('remove the application/annotator+html <link>', function() {
-      fakeSettings.app.throws(new Error("there's no link"));
+      Object.defineProperty(
+        fakeSettingsFrom(),
+        'app',
+        {
+          get: sinon.stub().throws(new Error("there's no link")),
+        }
+      );
     });
 
     it('throws an error', function() {
@@ -154,73 +168,27 @@ describe('annotator.config.index', function() {
     });
   });
 
-  it("extracts the direct-linked annotation ID from the parent page's URL", function() {
-    configFrom(fakeWindow());
-
-    assert.calledOnce(fakeSettings.annotations);
-    assert.calledWithExactly(fakeSettings.annotations, 'LOCATION_HREF');
-  });
-
-  context("when there's a direct-linked annotation ID", function() {
-    beforeEach(function() {
-      fakeSettings.annotations.returns('ANNOTATION_ID');
-    });
-
-    it('adds the annotation ID to the config', function() {
-      assert.equal(configFrom(fakeWindow()).annotations, 'ANNOTATION_ID');
-    });
-  });
-
-  context("when there's no direct-linked annotation ID", function() {
-    it('sets config.annotations to null', function() {
-      assert.isNull(configFrom(fakeWindow()).annotations);
-    });
-  });
-
-  it("extracts the query from the parent page's URL", function() {
-    configFrom(fakeWindow());
-
-    assert.calledOnce(fakeSettings.query);
-    assert.calledWithExactly(fakeSettings.query, 'LOCATION_HREF');
-  });
-
-  context("when there's no annotations query", function() {
-    it('sets config.query to null', function() {
-      assert.isNull(configFrom(fakeWindow()).query);
-    });
-  });
-
-  context("when there's an annotations query", function() {
-    beforeEach(function() {
-      fakeSettings.query.returns('QUERY');
-    });
-
-    it('adds the query to the config', function() {
-      assert.equal(configFrom(fakeWindow()).query, 'QUERY');
-    });
-  });
-
   context('when the client is injected by the browser extension', function() {
     beforeEach('configure a browser extension client', function() {
       fakeIsBrowserExtension.returns(true);
     });
 
     it('still reads the config.app setting from the host page', function() {
-      fakeSettings.app.returns('SOME_APP_URL');
+      fakeSettingsFrom().app = 'SOME_APP_URL';
 
-      assert.equal(configFrom(fakeWindow()).app, fakeSettings.app());
+      assert.equal(configFrom(fakeWindow()).app, 'SOME_APP_URL');
     });
 
     it('still reads the config.query setting from the host page', function() {
-      fakeSettings.query.returns('SOME_QUERY');
+      fakeSettingsFrom().query = 'SOME_QUERY';
 
-      assert.equal(configFrom(fakeWindow()).query, fakeSettings.query());
+      assert.equal(configFrom(fakeWindow()).query, 'SOME_QUERY');
     });
 
     it('still reads the config.annotations setting from the host page', function() {
-      fakeSettings.annotations.returns('SOME_ANNOTATION_ID');
+      fakeSettingsFrom().annotations = 'SOME_ANNOTATION_ID';
 
-      assert.equal(configFrom(fakeWindow()).annotations, fakeSettings.annotations());
+      assert.equal(configFrom(fakeWindow()).annotations, 'SOME_ANNOTATION_ID');
     });
 
     it('ignores settings from JSON objects in the host page', function() {
@@ -238,11 +206,11 @@ describe('annotator.config.index', function() {
 
   context('when the client is not injected by the browser extension', function() {
     beforeEach('configure an embedded client', function() {
-      fakeSettings.app.returns('https://hypothes.is/app.html');
+      fakeSettingsFrom().app = 'https://hypothes.is/app.html';
     });
 
     it('does not ignore the host page config', function() {
-      fakeSettings.annotations.returns('SOME_ANNOTATION_ID');
+      fakeSettingsFrom().annotations = 'SOME_ANNOTATION_ID';
       fakeSharedSettings.jsonConfigsFrom.returns({foo: 'bar'});
 
       var config = configFrom(fakeWindow());
