@@ -69,8 +69,6 @@ module.exports = class Sidebar extends Host
   _setupSidebarEvents: ->
     annotationCounts(document.body, @crossframe)
 
-    @crossframe.on('show', => this.show())
-    @crossframe.on('hide', => this.hide())
     @crossframe.on(events.LOGIN_REQUESTED, =>
       if @onLoginRequest
         @onLoginRequest()

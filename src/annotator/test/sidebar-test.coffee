@@ -32,20 +32,6 @@ describe 'Sidebar', ->
     emitEvent = (event, args...) ->
       fn(args...) for [evt, fn] in fakeCrossFrame.on.args when event == evt
 
-    describe 'on "show" event', ->
-      it 'shows the frame', ->
-        target = sandbox.stub(Sidebar.prototype, 'show')
-        sidebar = createSidebar()
-        emitEvent('show')
-        assert.called(target)
-
-    describe 'on "hide" event', ->
-      it 'hides the frame', ->
-        target = sandbox.stub(Sidebar.prototype, 'hide')
-        sidebar = createSidebar()
-        emitEvent('hide')
-        assert.called(target)
-
     describe 'on LOGIN_REQUESTED event', ->
       it 'calls the onLoginRequest callback function if one was provided', ->
         onLoginRequest = sandbox.stub()
