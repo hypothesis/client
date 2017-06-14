@@ -3,6 +3,7 @@
 var settings = require('./settings');
 var sharedSettings = require('../../shared/settings');
 var isBrowserExtension = require('./is-browser-extension');
+var configFuncSettingsFrom = require('./config-func-settings-from');
 
 /**
  * Reads the Hypothesis configuration from the environment.
@@ -30,7 +31,7 @@ function configFrom(window_) {
   }
 
   Object.assign(config, sharedSettings.jsonConfigsFrom(window_.document));
-  Object.assign(config, settings.configFuncSettingsFrom(window_));
+  Object.assign(config, configFuncSettingsFrom(window_));
 
   // Convert legacy keys/values in config to corresponding current
   // configuration.

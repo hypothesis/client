@@ -5,11 +5,13 @@ var util = require('../../../shared/test/util');
 
 var fakeSharedSettings = {};
 var fakeSettings = {};
+var fakeConfigFuncSettingsFrom = sinon.stub();
 var fakeIsBrowserExtension = sinon.stub();
 
 var configFrom = proxyquire('../index', util.noCallThru({
   './settings': fakeSettings,
   './is-browser-extension': fakeIsBrowserExtension,
+  './config-func-settings-from': fakeConfigFuncSettingsFrom,
   '../../shared/settings': fakeSharedSettings,
 }));
 
@@ -29,12 +31,16 @@ describe('annotator.config.index', function() {
     fakeSettings.app = sinon.stub().returns('IFRAME_URL');
     fakeSettings.annotations = sinon.stub().returns(null);
     fakeSettings.query = sinon.stub().returns(null);
-    fakeSettings.configFuncSettingsFrom = sinon.stub().returns({});
   });
 
   beforeEach('reset fakeIsBrowserExtension()', function() {
     fakeIsBrowserExtension.reset();
     fakeIsBrowserExtension.returns(false);
+  });
+
+  beforeEach('reset fakeConfigFuncSettingsFrom()', function() {
+    fakeConfigFuncSettingsFrom.reset();
+    fakeConfigFuncSettingsFrom.returns({});
   });
 
   it('gets the config.app setting', function() {
@@ -92,13 +98,13 @@ describe('annotator.config.index', function() {
 
     configFrom(window_);
 
-    assert.calledOnce(fakeSettings.configFuncSettingsFrom);
-    assert.calledWithExactly(fakeSettings.configFuncSettingsFrom, window_);
+    assert.calledOnce(fakeConfigFuncSettingsFrom);
+    assert.calledWithExactly(fakeConfigFuncSettingsFrom, window_);
   });
 
   context('when configFuncSettingsFrom() returns an object', function() {
     it('reads arbitrary settings from configFuncSettingsFrom() into config', function() {
-      fakeSettings.configFuncSettingsFrom.returns({foo: 'bar'});
+      fakeConfigFuncSettingsFrom.returns({foo: 'bar'});
 
       var config = configFrom(fakeWindow());
 
@@ -106,7 +112,7 @@ describe('annotator.config.index', function() {
     });
 
     specify('hypothesisConfig() settings override js-hypothesis-config ones', function() {
-      fakeSettings.configFuncSettingsFrom.returns({
+      fakeConfigFuncSettingsFrom.returns({
         foo: 'fooFromHypothesisConfigFunc'});
       fakeSharedSettings.jsonConfigsFrom.returns({
         foo: 'fooFromJSHypothesisConfigObj',
@@ -224,7 +230,7 @@ describe('annotator.config.index', function() {
     });
 
     it('ignores settings from the hypothesisConfig() function in the host page', function() {
-      fakeSettings.configFuncSettingsFrom.returns({foo: 'bar'});
+      fakeConfigFuncSettingsFrom.returns({foo: 'bar'});
 
       assert.isUndefined(configFrom(fakeWindow()).foo);
     });

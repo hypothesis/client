@@ -2,13 +2,7 @@
 
 var settings = require('../settings');
 
-var sandbox = sinon.sandbox.create();
-
 describe('annotator.config.settings', function() {
-
-  afterEach('reset the sandbox', function() {
-    sandbox.restore();
-  });
 
   describe('#app', function() {
     function appendLinkToDocument(href) {
@@ -190,49 +184,6 @@ describe('annotator.config.settings', function() {
         var url = 'http://localhost:3000#annotations:query:abc123';
 
         assert.isNull(settings.query(url));
-      });
-    });
-  });
-
-  describe('#configFuncSettingsFrom', function() {
-    context("when there's no window.hypothesisConfig() function", function() {
-      it('returns {}', function() {
-        var fakeWindow = {};
-
-        assert.deepEqual(settings.configFuncSettingsFrom(fakeWindow), {});
-      });
-    });
-
-    context("when window.hypothesisConfig() isn't a function", function() {
-      beforeEach('stub console.warn()', function() {
-        sandbox.stub(console, 'warn');
-      });
-
-      function fakeWindow() {
-        return {hypothesisConfig: 42};
-      }
-
-      it('returns {}', function() {
-        assert.deepEqual(settings.configFuncSettingsFrom(fakeWindow()), {});
-      });
-
-      it('logs a warning', function() {
-        settings.configFuncSettingsFrom(fakeWindow());
-
-        assert.calledOnce(console.warn);
-        assert.isTrue(console.warn.firstCall.args[0].startsWith(
-          'hypothesisConfig must be a function'
-        ));
-      });
-    });
-
-    context('when window.hypothesisConfig() is a function', function() {
-      it('returns whatever window.hypothesisConfig() returns', function () {
-        // It just blindly returns whatever hypothesisConfig() returns
-        // (even if it's not an object).
-        var fakeWindow = { hypothesisConfig: sinon.stub().returns(42) };
-
-        assert.equal(settings.configFuncSettingsFrom(fakeWindow), 42);
       });
     });
   });
