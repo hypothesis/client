@@ -95,45 +95,48 @@ function LiveReloadServer(port, config) {
             <pre style="margin: 20px 75px 75px 75px;">${readmeText()}</pre>
             <script>
             var appHost = document.location.hostname;
-      
+
             window.hypothesisConfig = function () {
               return {
                 liveReloadServer: 'ws://' + appHost + ':${port}',
-      
+
                 // Open the sidebar when the page loads
                 openSidebar: true,
-                
+
                 // Needed for multi frame support
                 enableMultiFrameSupport: ${config.enableMultiFrameSupport},
                 embedScriptUrl: '${config.clientUrl}'
               };
             };
-      
+
             window.addEventListener('message', function (event) {
               if (event.data.type && event.data.type === 'reloadrequest') {
                 window.location.reload();
               }
             });
-      
+
             var embedScript = document.createElement('script');
             embedScript.src = '${config.clientUrl}';
             document.body.appendChild(embedScript);
-            
+
             var iframeIsAdded = false;
-            document.querySelector('#add-test').addEventListener('click', function() {
-              if (!iframeIsAdded) {
-                var iframe1 = document.querySelector('#iframe1');
-                var iframeNew = iframe1.cloneNode();
-                iframeNew.src = "/document/changelog";
-                iframeNew.id = "iframe2";
-                iframeIsAdded = true;
-                document.querySelector('#iframe2-container').appendChild(iframeNew);
-              } else {
-                var iframe2 = document.querySelector('#iframe2');
-                iframe2.parentNode.removeChild(iframe2);
-                iframeIsAdded = false;
-              }
-            });
+            var addIframeBtn = document.querySelector('#add-test');
+            if(addIframeBtn){
+              addIframeBtn.addEventListener('click', function() {
+                if (!iframeIsAdded) {
+                  var iframe1 = document.querySelector('#iframe1');
+                  var iframeNew = iframe1.cloneNode();
+                  iframeNew.src = "/document/changelog";
+                  iframeNew.id = "iframe2";
+                  iframeIsAdded = true;
+                  document.querySelector('#iframe2-container').appendChild(iframeNew);
+                } else {
+                  var iframe2 = document.querySelector('#iframe2');
+                  iframe2.parentNode.removeChild(iframe2);
+                  iframeIsAdded = false;
+                }
+              });
+            }
             </script>
           </body>
           </html>
