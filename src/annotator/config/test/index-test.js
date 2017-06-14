@@ -194,6 +194,25 @@ describe('annotator.config.index', function() {
     [
       'openLoginForm',
       'openSidebar',
+    ].forEach(function(setting) {
+      it('still reads the ' + setting + ' setting from the JSON objects in the host page', function() {
+        var sharedSettings = {};
+        sharedSettings[setting] = 'bar';
+        fakeSharedSettings.jsonConfigsFrom.returns(sharedSettings);
+
+        assert.equal(configFrom(fakeWindow())[setting], 'bar');
+      });
+
+      it('still reads the ' + setting + ' setting from the hypothesisConfig() function in the host page', function() {
+        var configFuncSettings = {};
+        configFuncSettings[setting] = 'bar';
+        fakeConfigFuncSettingsFrom.returns(configFuncSettings);
+
+        assert.equal(configFrom(fakeWindow())[setting], 'bar');
+      });
+    });
+
+    [
       'showHighlights',
       'branding',
       'assetRoot',

@@ -13,6 +13,9 @@ var configFuncSettingsFrom = require('./config-func-settings-from');
 function configFrom(window_) {
   var settings = settingsFrom(window_);
 
+  var hostPageSettings = sharedSettings.jsonConfigsFrom(window_.document);
+  Object.assign(hostPageSettings, configFuncSettingsFrom(window_));
+
   var config = {
     app: settings.app,
 
@@ -26,14 +29,16 @@ function configFrom(window_) {
     // we try to retrieve it from the URL here.
     query: settings.query,
     annotations: settings.annotations,
+
+    openLoginForm: hostPageSettings.openLoginForm,
+    openSidebar: hostPageSettings.openSidebar,
   };
 
   if (isBrowserExtension(config.app)) {
     return config;
   }
 
-  Object.assign(config, sharedSettings.jsonConfigsFrom(window_.document));
-  Object.assign(config, configFuncSettingsFrom(window_));
+  Object.assign(config, hostPageSettings);
 
   // Convert legacy keys/values in config to corresponding current
   // configuration.
