@@ -192,7 +192,6 @@ module.exports = angular.module('h', [
   .service('formRespond', require('./form-respond'))
   .service('frameSync', require('./frame-sync').default)
   .service('groups', require('./groups'))
-  .service('host', require('./host'))
   .service('localStorage', require('./local-storage'))
   .service('permissions', require('./permissions'))
   .service('queryParser', require('./query-parser'))
