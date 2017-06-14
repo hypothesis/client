@@ -191,16 +191,30 @@ describe('annotator.config.index', function() {
       assert.equal(configFrom(fakeWindow()).annotations, 'SOME_ANNOTATION_ID');
     });
 
-    it('ignores settings from JSON objects in the host page', function() {
-      fakeSharedSettings.jsonConfigsFrom.returns({foo: 'bar'});
+    [
+      'openLoginForm',
+      'openSidebar',
+      'showHighlights',
+      'branding',
+      'assetRoot',
+      'sidebarAppUrl',
+      'services',
+    ].forEach(function(setting) {
+      it('ignores the ' + setting + ' setting from JSON objects in the host page', function() {
+        var sharedSettings = {};
+        sharedSettings[setting] = 'bar';
+        fakeSharedSettings.jsonConfigsFrom.returns(sharedSettings);
 
-      assert.isUndefined(configFrom(fakeWindow()).foo);
-    });
+        assert.isUndefined(configFrom(fakeWindow())[setting]);
+      });
 
-    it('ignores settings from the hypothesisConfig() function in the host page', function() {
-      fakeConfigFuncSettingsFrom.returns({foo: 'bar'});
+      it('ignores the ' + setting + ' setting from the hypothesisConfig() function in the host page', function() {
+        var configFuncSettings = {};
+        configFuncSettings[setting] = 'bar';
+        fakeConfigFuncSettingsFrom.returns(configFuncSettings);
 
-      assert.isUndefined(configFrom(fakeWindow()).foo);
+        assert.isUndefined(configFrom(fakeWindow())[setting]);
+      });
     });
   });
 
