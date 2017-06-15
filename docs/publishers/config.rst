@@ -102,6 +102,7 @@ loads.
       window.hypothesisConfig = function () {
         return {
           services: [{
+            apiUrl: 'https://hypothes.is/api',
             authority: 'partner.org',
             grantToken: '***',
             icon: 'https://openclipart.org/download/272629/sihouette-animaux-10.svg'
@@ -125,6 +126,10 @@ loads.
 
    Each item in the :option:`services` array should be an object describing an
    annotation service, with the following keys:
+
+   .. option:: apiUrl
+
+      ``String``. The base URL of the service API.
 
    .. option:: authority
 
