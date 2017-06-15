@@ -29,5 +29,5 @@ build/manifest.json: node_modules/.uptodate
 	yarn run build
 
 node_modules/.uptodate: package.json yarn.lock
-	yarn run deps 2>/dev/null || yarn install --force
+	yarn run deps 2>/dev/null || yarn install
 	@touch $@
