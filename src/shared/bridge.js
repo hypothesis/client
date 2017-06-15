@@ -4,30 +4,38 @@ var extend = require('extend');
 
 var RPC = require('./frame-rpc');
 
-// The Bridge service sets up a channel between frames
-// and provides an events API on top of it.
+/**
+ * The Bridge service sets up a channel between frames and provides an events
+ * API on top of it.
+ */
 class Bridge {
-  static initClass() {
-    // Connected links to other frames
-    this.prototype.links = null;
-    this.prototype.channelListeners = null;
-    this.prototype.onConnectListeners = null;
-  }
-
   constructor() {
     this.links = [];
     this.channelListeners = {};
     this.onConnectListeners = [];
   }
 
-  // Tear down the bridge. We destroy each RPC "channel" object we know about.
-  // This removes the `onmessage` event listeners, thus removing references to
-  // any listeners and allowing them to be garbage collected.
+  /**
+   * Destroy all channels created with `createChannel`.
+   *
+   * This removes the event listeners for messages arriving from other windows.
+   */
   destroy() {
-    return Array.from(this.links).map((link) =>
+    Array.from(this.links).map((link) =>
       link.channel.destroy());
   }
 
+  /**
+   * Create a communication channel between this window and `source`.
+   *
+   * The created channel is added to the list of channels which `call`
+   * and `on` send and receive messages over.
+   *
+   * @param {Window} source - The source window.
+   * @param {string} origin - The origin of the document in `source`.
+   * @param {string} token
+   * @return {RPC} - Channel for communicating with the window.
+   */
   createChannel(source, origin, token) {
     var channel = null;
     var connected = false;
@@ -64,11 +72,14 @@ class Bridge {
     return channel;
   }
 
-  // Make a method call on all links, collect the results and pass them to a
-  // callback when all results are collected. Parameters:
-  // - method (required): name of remote method to call
-  // - args...: parameters to pass to remote method
-  // - callback: (optional) called with error, if any, and an Array of results
+  /**
+   * Make a method call on all channels, collect the results and pass them to a
+   * callback when all results are collected.
+   *
+   * @param {string} method - Name of remote method to call.
+   * @param {any[]} args - Arguments to method.
+   * @param [Function] callback - Called with an array of results.
+   */
   call(method, ...args) {
     var cb;
     if (typeof(args[args.length - 1]) === 'function') {
@@ -113,6 +124,13 @@ class Bridge {
     return resultPromise;
   }
 
+  /**
+   * Register a callback to be invoked when any connected channel sends a
+   * message to this `Bridge`.
+   *
+   * @param {string} method
+   * @param {Function} callback
+   */
   on(method, callback) {
     if (this.channelListeners[method]) {
       throw new Error(`Listener '${method}' already bound in Bridge`);
@@ -121,17 +139,25 @@ class Bridge {
     return this;
   }
 
+  /**
+   * Unregister any callbacks registered with `on`.
+   *
+   * @param {string} method
+   */
   off(method) {
     delete this.channelListeners[method];
     return this;
   }
 
-  // Add a function to be called upon a new connection
+  /**
+   * Add a function to be called upon a new connection.
+   *
+   * @param {Function} callback
+   */
   onConnect(callback) {
     this.onConnectListeners.push(callback);
     return this;
   }
 }
-Bridge.initClass();
 
 module.exports = Bridge;
