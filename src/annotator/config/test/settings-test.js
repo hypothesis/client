@@ -324,6 +324,24 @@ describe('annotator.config.settingsFrom', function() {
         jsonSettings: {foo: 'jsonValue'},
         expected: null,
       },
+      {
+        when: 'the client is in a browser extension and allowInBrowserExt: true is given',
+        specify: 'it returns settings from window.hypothesisConfig()',
+        isBrowserExtension: true,
+        allowInBrowserExt: true,
+        configFuncSettings: {foo: 'configFuncValue'},
+        jsonSettings: {},
+        expected: 'configFuncValue',
+      },
+      {
+        when: 'the client is in a browser extension and allowInBrowserExt: true is given',
+        specify: 'it returns settings from js-hypothesis-configs',
+        isBrowserExtension: true,
+        allowInBrowserExt: true,
+        configFuncSettings: {},
+        jsonSettings: {foo: 'jsonValue'},
+        expected: 'jsonValue',
+      },
     ].forEach(function(test) {
       context(test.when, function() {
         specify(test.specify, function() {
@@ -332,7 +350,10 @@ describe('annotator.config.settingsFrom', function() {
           fakeSharedSettings.jsonConfigsFrom.returns(test.jsonSettings);
           var settings = settingsFrom(fakeWindow());
 
-          var setting = settings.hostPageSetting('foo');
+          var setting = settings.hostPageSetting(
+            'foo',
+            {allowInBrowserExt: test.allowInBrowserExt || false}
+          );
 
           assert.equal(setting, test.expected);
         });
