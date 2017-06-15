@@ -22,15 +22,15 @@ module.exports = class Host extends Guest
       if service.onHelpRequest
         service.onHelpRequestProvided = true
 
-    # Make a copy of all config settings except `config.app`, the app base URL,
+    # Make a copy of all config settings except `config.sidebarAppUrl`, the app base URL,
     # and `config.pluginClasses`
     configParam = 'config=' + encodeURIComponent(
-      JSON.stringify(Object.assign({}, config, {app:undefined, pluginClasses: undefined }))
+      JSON.stringify(Object.assign({}, config, {sidebarAppUrl: undefined, pluginClasses: undefined }))
     )
-    if config.app and '?' in config.app
-      config.app += '&' + configParam
+    if config.sidebarAppUrl and '?' in config.sidebarAppUrl
+      config.sidebarAppUrl += '&' + configParam
     else
-      config.app += '?' + configParam
+      config.sidebarAppUrl += '?' + configParam
 
     # Create the iframe
     app = $('<iframe></iframe>')
@@ -38,7 +38,7 @@ module.exports = class Host extends Guest
     # enable media in annotations to be shown fullscreen
     .attr('allowfullscreen', '')
     .attr('seamless', '')
-    .attr('src', config.app)
+    .attr('src', config.sidebarAppUrl)
     .addClass('h-sidebar-iframe')
 
     @frame = $('<div></div>')
