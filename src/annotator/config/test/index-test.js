@@ -3,52 +3,26 @@
 var proxyquire = require('proxyquire');
 var util = require('../../../shared/test/util');
 
-var fakeSharedSettings = {};
 var fakeSettingsFrom = sinon.stub();
-var fakeConfigFuncSettingsFrom = sinon.stub();
-var fakeIsBrowserExtension = sinon.stub();
 
 var configFrom = proxyquire('../index', util.noCallThru({
   './settings': fakeSettingsFrom,
-  './is-browser-extension': fakeIsBrowserExtension,
-  './config-func-settings-from': fakeConfigFuncSettingsFrom,
-  '../../shared/settings': fakeSharedSettings,
 }));
 
-function fakeWindow() {
-  return {
-    document: 'THE_DOCUMENT',
-    location: {href: 'LOCATION_HREF'},
-  };
-}
-
 describe('annotator.config.index', function() {
-  beforeEach('reset fakeSharedSettings', function() {
-    fakeSharedSettings.jsonConfigsFrom = sinon.stub().returns({});
-  });
 
   beforeEach('reset fakeSettingsFrom', function() {
     fakeSettingsFrom.reset();
-    fakeSettingsFrom.returns({});
+    fakeSettingsFrom.returns({
+      hostPageSetting: sinon.stub(),
+    });
   });
 
-  beforeEach('reset fakeIsBrowserExtension()', function() {
-    fakeIsBrowserExtension.reset();
-    fakeIsBrowserExtension.returns(false);
-  });
-
-  beforeEach('reset fakeConfigFuncSettingsFrom()', function() {
-    fakeConfigFuncSettingsFrom.reset();
-    fakeConfigFuncSettingsFrom.returns({});
-  });
-
-  it('gets the settings from the window', function() {
-    var window_ = fakeWindow();
-
-    configFrom(window_);
+  it('gets the configuration settings', function() {
+    configFrom('WINDOW');
 
     assert.calledOnce(fakeSettingsFrom);
-    assert.calledWithExactly(fakeSettingsFrom, window_);
+    assert.calledWithExactly(fakeSettingsFrom, 'WINDOW');
   });
 
   [
@@ -59,12 +33,11 @@ describe('annotator.config.index', function() {
     it('returns the ' + settingName + ' setting', function() {
       fakeSettingsFrom()[settingName] = 'SETTING_VALUE';
 
-      var config = configFrom(fakeWindow());
+      var config = configFrom('WINDOW');
 
       assert.equal(config[settingName], 'SETTING_VALUE');
     });
   });
-
 
   context("when there's no application/annotator+html <link>", function() {
     beforeEach('remove the application/annotator+html <link>', function() {
@@ -79,62 +52,44 @@ describe('annotator.config.index', function() {
 
     it('throws an error', function() {
       assert.throws(
-        function() { configFrom(fakeWindow()); },
+        function() { configFrom('WINDOW'); },
         "there's no link"
       );
     });
   });
 
-  it('gets the JSON settings from the document', function() {
-    var window_ = fakeWindow();
+  [
+    'openLoginForm',
+    'openSidebar',
+    'showHighlights',
+    'branding',
+    'assetRoot',
+    'sidebarAppUrl',
+    'services',
+  ].forEach(function(settingName) {
+    it('makes a hostPageSetting for ' + settingName, function() {
+      configFrom('WINDOW');
 
-    configFrom(window_);
-
-    assert.calledOnce(fakeSharedSettings.jsonConfigsFrom);
-    assert.calledWithExactly(
-      fakeSharedSettings.jsonConfigsFrom, window_.document);
-  });
-
-  context('when jsonConfigsFrom() returns a non-empty object', function() {
-    it('reads the setting into the returned config', function() {
-      // configFrom() just blindly adds any key: value settings that
-      // jsonConfigsFrom() returns into the returns options object.
-      fakeSharedSettings.jsonConfigsFrom.returns({foo: 'bar'});
-
-      var config = configFrom(fakeWindow());
-
-      assert.equal(config.foo, 'bar');
-    });
-  });
-
-  it('gets config settings from window.hypothesisConfig()', function() {
-    var window_ = fakeWindow();
-
-    configFrom(window_);
-
-    assert.calledOnce(fakeConfigFuncSettingsFrom);
-    assert.calledWithExactly(fakeConfigFuncSettingsFrom, window_);
-  });
-
-  context('when configFuncSettingsFrom() returns an object', function() {
-    it('reads arbitrary settings from configFuncSettingsFrom() into config', function() {
-      fakeConfigFuncSettingsFrom.returns({foo: 'bar'});
-
-      var config = configFrom(fakeWindow());
-
-      assert.equal(config.foo, 'bar');
+      assert.calledWithExactly(fakeSettingsFrom().hostPageSetting, settingName);
     });
 
-    specify('hypothesisConfig() settings override js-hypothesis-config ones', function() {
-      fakeConfigFuncSettingsFrom.returns({
-        foo: 'fooFromHypothesisConfigFunc'});
-      fakeSharedSettings.jsonConfigsFrom.returns({
-        foo: 'fooFromJSHypothesisConfigObj',
-      });
+    it('returns the ' + settingName + ' value from the host page', function() {
+      var settings = {
+        'openLoginForm': 'OPEN_LOGIN_FORM_SETTING',
+        'openSidebar': 'OPEN_SIDEBAR_SETTING',
+        'showHighlights': 'SHOW_HIGHLIGHTS_SETTING',
+        'branding': 'BRANDING_SETTING',
+        'assetRoot': 'ASSET_ROOT_SETTING',
+        'sidebarAppUrl': 'SIDEBAR_APP_URL_SETTING',
+        'services': 'SERVICES_SETTING',
+      };
+      fakeSettingsFrom().hostPageSetting = function(settingName) {
+        return settings[settingName];
+      };  
 
-      var config = configFrom(fakeWindow());
+      var settingValue = configFrom('WINDOW')[settingName];
 
-      assert.equal(config.foo, 'fooFromHypothesisConfigFunc');
+      assert.equal(settingValue, settings[settingName]);
     });
   });
 
@@ -142,82 +97,31 @@ describe('annotator.config.index', function() {
     [
       {
         name: 'changes `true` to `"always"`',
-        in:   true,
-        out:  'always',
+        input:   true,
+        output:  'always',
       },
       {
         name: 'changes `false` to `"never"`',
-        in:   false,
-        out:  'never',
+        input:   false,
+        output:  'never',
       },
       // It adds any arbitrary string value for showHighlights to the
       // returned config, unmodified.
       {
         name: 'passes arbitrary strings through unmodified',
-        in:   'foo',
-        out:  'foo',
+        input:   'foo',
+        output:  'foo',
       },
     ].forEach(function(test) {
       it(test.name, function() {
-        fakeSharedSettings.jsonConfigsFrom.returns({showHighlights: test.in});
+        fakeSettingsFrom().hostPageSetting = function (settingName) {
+          return {'showHighlights': test.input}[settingName];
+        };
 
-        var config = configFrom(fakeWindow());
+        var config = configFrom('WINDOW');
 
-        assert.equal(config.showHighlights, test.out);
+        assert.equal(config.showHighlights, test.output);
       });
-    });
-  });
-
-  context('when the client is injected by the browser extension', function() {
-    beforeEach('configure a browser extension client', function() {
-      fakeIsBrowserExtension.returns(true);
-    });
-
-    it('still reads the config.app setting from the host page', function() {
-      fakeSettingsFrom().app = 'SOME_APP_URL';
-
-      assert.equal(configFrom(fakeWindow()).app, 'SOME_APP_URL');
-    });
-
-    it('still reads the config.query setting from the host page', function() {
-      fakeSettingsFrom().query = 'SOME_QUERY';
-
-      assert.equal(configFrom(fakeWindow()).query, 'SOME_QUERY');
-    });
-
-    it('still reads the config.annotations setting from the host page', function() {
-      fakeSettingsFrom().annotations = 'SOME_ANNOTATION_ID';
-
-      assert.equal(configFrom(fakeWindow()).annotations, 'SOME_ANNOTATION_ID');
-    });
-
-    it('ignores settings from JSON objects in the host page', function() {
-      fakeSharedSettings.jsonConfigsFrom.returns({foo: 'bar'});
-
-      assert.isUndefined(configFrom(fakeWindow()).foo);
-    });
-
-    it('ignores settings from the hypothesisConfig() function in the host page', function() {
-      fakeConfigFuncSettingsFrom.returns({foo: 'bar'});
-
-      assert.isUndefined(configFrom(fakeWindow()).foo);
-    });
-  });
-
-  context('when the client is not injected by the browser extension', function() {
-    beforeEach('configure an embedded client', function() {
-      fakeSettingsFrom().app = 'https://hypothes.is/app.html';
-    });
-
-    it('does not ignore the host page config', function() {
-      fakeSettingsFrom().annotations = 'SOME_ANNOTATION_ID';
-      fakeSharedSettings.jsonConfigsFrom.returns({foo: 'bar'});
-
-      var config = configFrom(fakeWindow());
-
-      assert.equal(config.app, 'https://hypothes.is/app.html');
-      assert.equal(config.annotations, 'SOME_ANNOTATION_ID');
-      assert.equal(config.foo, 'bar');
     });
   });
 });

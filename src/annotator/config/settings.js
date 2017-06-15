@@ -1,6 +1,13 @@
 'use strict';
 
+var configFuncSettingsFrom = require('./config-func-settings-from');
+var isBrowserExtension = require('./is-browser-extension');
+var sharedSettings = require('../../shared/settings');
+
 function settingsFrom(window_) {
+
+  var jsonConfigs = sharedSettings.jsonConfigsFrom(window_.document);
+  var configFuncSettings = configFuncSettingsFrom(window_);
 
   /**
    * Return the href URL of the first annotator link in the given document.
@@ -39,40 +46,69 @@ function settingsFrom(window_) {
    * @return {string|null} - The extracted ID, or null.
    */
   function annotations() {
-    // Annotation IDs are url-safe-base64 identifiers
-    // See https://tools.ietf.org/html/rfc4648#page-7
-    var annotFragmentMatch = window_.location.href.match(/#annotations:([A-Za-z0-9_-]+)$/);
-    if (annotFragmentMatch) {
-      return annotFragmentMatch[1];
+
+    /** Return the annotations from the URL, or null. */
+    function annotationsFromURL() {
+      // Annotation IDs are url-safe-base64 identifiers
+      // See https://tools.ietf.org/html/rfc4648#page-7
+      var annotFragmentMatch = window_.location.href.match(/#annotations:([A-Za-z0-9_-]+)$/);
+      if (annotFragmentMatch) {
+        return annotFragmentMatch[1];
+      }
+      return null;
     }
-    return null;
+
+    return jsonConfigs.annotations || annotationsFromURL();
   }
 
   /**
-   * Return the `#annotations:query:*` query from the given URL's fragment.
+   * Return the config.query setting from the host page or from the URL.
    *
-   * If the URL contains a `#annotations:query:*` (or `#annotatons:q:*`) fragment
-   * then return a the query part extracted from the fragment.
-   * Otherwise return `null`.
+   * If the host page contains a js-hypothesis-config script containing a
+   * query setting then return that.
    *
-   * @return {string|null} - The extracted query, or null.
+   * Otherwise if the host page's URL has a `#annotations:query:*` (or
+   * `#annotations:q:*`) fragment then return the query value from that.
+   *
+   * Otherwise return null.
+   *
+   * @return {string|null} - The config.query setting, or null.
    */
   function query() {
-    var queryFragmentMatch = window_.location.href.match(/#annotations:(query|q):(.+)$/i);
-    if (queryFragmentMatch) {
-      try {
-        return decodeURI(queryFragmentMatch[2]);
-      } catch (err) {
-        // URI Error should return the page unfiltered.
+
+    /** Return the query from the URL, or null. */
+    function queryFromURL() {
+      var queryFragmentMatch = window_.location.href.match(/#annotations:(query|q):(.+)$/i);
+      if (queryFragmentMatch) {
+        try {
+          return decodeURI(queryFragmentMatch[2]);
+        } catch (err) {
+          // URI Error should return the page unfiltered.
+        }
       }
+      return null;
     }
-    return null;
+
+    return jsonConfigs.query || queryFromURL();
+  }
+
+  function hostPageSetting(name) {
+    if (isBrowserExtension(app())) {
+      return null;
+    }
+
+    if (configFuncSettings.hasOwnProperty(name)) {
+      return configFuncSettings[name];
+    }
+
+    return jsonConfigs[name];
   }
 
   return {
     get app() { return app(); },
     get annotations() { return annotations(); },
     get query() { return query(); },
+    hostPageSetting: hostPageSetting,
   };
 }
 
