@@ -4,6 +4,66 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+### Changed
+
+- When embedded in a page read the URL of the annotation API to talk to from
+  the page's `services` setting
+  ([#426](https://github.com/hypothesis/client/pull/426)).
+
+  This has also been documented
+  ([#450](https://github.com/hypothesis/client/pull/450)).
+
+  This also means that if the host page of an embedded client contains a
+  `services` setting then the `services[].apiUrl` sub-setting is mandatory,
+  otherwise the client will crash on load.
+
+- Support JavaScript ES2015 code in the client
+  ([#421](https://github.com/hypothesis/client/pull/421)).
+
+- Add Symbol polyfill (needed for some ES2015 language constructs)
+  ([#442](https://github.com/hypothesis/client/pull/442)).
+
+- Multiple frame detection and injection
+  ([#430](https://github.com/hypothesis/client/pull/430)).
+
+- Config code refactoring
+  ([#422](https://github.com/hypothesis/client/pull/422),
+  [#423](https://github.com/hypothesis/client/pull/423),
+  [#424](https://github.com/hypothesis/client/pull/424),
+  [#425](https://github.com/hypothesis/client/pull/425),
+  [#432](https://github.com/hypothesis/client/pull/432),
+  [#435](https://github.com/hypothesis/client/pull/435),
+  [#436](https://github.com/hypothesis/client/pull/436),
+  [#437](https://github.com/hypothesis/client/pull/437),
+  [#438](https://github.com/hypothesis/client/pull/438)).
+
+- Convert tags service to JS
+  ([#431](https://github.com/hypothesis/client/pull/431)).
+
+### Fixed
+
+- Don't crash if a page contains a js-hypothesis-config script containing
+  invalid JSON, instead log a warning and continue ignoring the invalid JSON
+  ([#427](https://github.com/hypothesis/client/pull/427)).
+
+- Don't crash if the page contains a `window.hypothesisConfig` that isn't a
+  function, instead log a warning and continue ignoring
+  `window.hypothesisConfig`
+  ([#428](https://github.com/hypothesis/client/pull/428)).
+
+- Fix dev environment JavaScript error on localhost:3000 page
+  ([#445](https://github.com/hypothesis/client/pull/445)).
+
+- Re-enable reading openLoginForm and openSidebar from the host page
+  (fixes the sidebar not auto-opening on the /welcome page after you install
+  the Chrome extension)
+  ([#447](https://github.com/hypothesis/client/pull/447)).
+
+- Upgrade gulp-sass (fixes a build error with Node v8)
+  ([#441](https://github.com/hypothesis/client/pull/441)).
+
 ## [1.20.0] - 2017-06-06
 
 ### Changed
