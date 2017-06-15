@@ -18,8 +18,6 @@ function configFrom(window_) {
     openSidebar: settings.hostPageSetting('openSidebar', {allowInBrowserExt: true}),
     showHighlights: settings.hostPageSetting('showHighlights'),
     branding: settings.hostPageSetting('branding'),
-    assetRoot: settings.hostPageSetting('assetRoot'),
-    sidebarAppUrl: settings.hostPageSetting('sidebarAppUrl'),
     services: settings.hostPageSetting('services'),
   };
 
