@@ -61,18 +61,40 @@ describe('annotator.config.index', function() {
   [
     'openLoginForm',
     'openSidebar',
+  ].forEach(function(settingName) {
+    it('reads ' + settingName + ' from the host page, even when in a browser extension', function() {
+      configFrom('WINDOW');
+
+      assert.calledWithExactly(
+        fakeSettingsFrom().hostPageSetting,
+        settingName, {allowInBrowserExt: true}
+      );
+    });
+  });
+
+  [
     'showHighlights',
     'branding',
     'assetRoot',
     'sidebarAppUrl',
     'services',
   ].forEach(function(settingName) {
-    it('makes a hostPageSetting for ' + settingName, function() {
+    it('reads ' + settingName + ' from the host page only when in an embedded client', function() {
       configFrom('WINDOW');
 
       assert.calledWithExactly(fakeSettingsFrom().hostPageSetting, settingName);
     });
+  });
 
+  [
+    'openLoginForm',
+    'openSidebar',
+    'showHighlights',
+    'branding',
+    'assetRoot',
+    'sidebarAppUrl',
+    'services',
+  ].forEach(function(settingName) {
     it('returns the ' + settingName + ' value from the host page', function() {
       var settings = {
         'openLoginForm': 'OPEN_LOGIN_FORM_SETTING',

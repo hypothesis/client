@@ -92,8 +92,10 @@ function settingsFrom(window_) {
     return jsonConfigs.query || queryFromURL();
   }
 
-  function hostPageSetting(name) {
-    if (isBrowserExtension(app())) {
+  function hostPageSetting(name, options = {}) {
+    var allowInBrowserExt = options.allowInBrowserExt || false;
+
+    if (!allowInBrowserExt && isBrowserExtension(app())) {
       return null;
     }
 

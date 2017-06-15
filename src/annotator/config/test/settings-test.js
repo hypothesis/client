@@ -267,68 +267,96 @@ describe('annotator.config.settingsFrom', function() {
   });
 
   describe('#hostPageSetting', function() {
-    context('when the client is from a browser extension', function() {
-      beforeEach('configure a browser extension client', function() {
-        fakeIsBrowserExtension.returns(true);
-      });
+    [
+      {
+        when: 'the client is embedded in a web page',
+        specify: 'it returns setting values from window.hypothesisConfig()',
+        isBrowserExtension: false,
+        configFuncSettings: {foo: 'configFuncValue'},
+        jsonSettings: {},
+        expected: 'configFuncValue',
+      },
+      {
+        when: 'the client is embedded in a web page',
+        specify: 'it returns setting values from js-hypothesis-config objects',
+        isBrowserExtension: false,
+        configFuncSettings: {},
+        jsonSettings: {foo: 'jsonValue'},
+        expected: 'jsonValue',
+      },
+      {
+        when: 'the client is embedded in a web page',
+        specify: 'hypothesisConfig() settings override js-hypothesis-config ones',
+        isBrowserExtension: false,
+        configFuncSettings: {foo: 'configFuncValue'},
+        jsonSettings: {foo: 'jsonValue'},
+        expected: 'configFuncValue',
+      },
+      {
+        when: 'the client is embedded in a web page',
+        specify: 'even a null from hypothesisConfig() overrides js-hypothesis-config',
+        isBrowserExtension: false,
+        configFuncSettings: {foo: null},
+        jsonSettings: {foo: 'jsonValue'},
+        expected: null,
+      },
+      {
+        when: 'the client is embedded in a web page',
+        specify: 'even an undefined from hypothesisConfig() overrides js-hypothesis-config',
+        isBrowserExtension: false,
+        configFuncSettings: {foo: undefined},
+        jsonSettings: {foo: 'jsonValue'},
+        expected: undefined,
+      },
+      {
+        when: 'the client is embedded in a web page',
+        specify: "it returns undefined if the setting isn't defined anywhere",
+        isBrowserExtension: false,
+        configFuncSettings: {},
+        jsonSettings: {},
+        expected: undefined,
+      },
+      {
+        when: 'the client is in a browser extension',
+        specify: 'it always returns null',
+        isBrowserExtension: true,
+        configFuncSettings: {foo: 'configFuncValue'},
+        jsonSettings: {foo: 'jsonValue'},
+        expected: null,
+      },
+      {
+        when: 'the client is in a browser extension and allowInBrowserExt: true is given',
+        specify: 'it returns settings from window.hypothesisConfig()',
+        isBrowserExtension: true,
+        allowInBrowserExt: true,
+        configFuncSettings: {foo: 'configFuncValue'},
+        jsonSettings: {},
+        expected: 'configFuncValue',
+      },
+      {
+        when: 'the client is in a browser extension and allowInBrowserExt: true is given',
+        specify: 'it returns settings from js-hypothesis-configs',
+        isBrowserExtension: true,
+        allowInBrowserExt: true,
+        configFuncSettings: {},
+        jsonSettings: {foo: 'jsonValue'},
+        expected: 'jsonValue',
+      },
+    ].forEach(function(test) {
+      context(test.when, function() {
+        specify(test.specify, function() {
+          fakeIsBrowserExtension.returns(test.isBrowserExtension);
+          fakeConfigFuncSettingsFrom.returns(test.configFuncSettings);
+          fakeSharedSettings.jsonConfigsFrom.returns(test.jsonSettings);
+          var settings = settingsFrom(fakeWindow());
 
-      it('always returns null', function() {
-        // These settings in the host page should be ignored.
-        fakeConfigFuncSettingsFrom.returns({foo: 'bar'});
-        fakeSharedSettings.jsonConfigsFrom.returns({foo: 'bar'});
+          var setting = settings.hostPageSetting(
+            'foo',
+            {allowInBrowserExt: test.allowInBrowserExt || false}
+          );
 
-        assert.isNull(settingsFrom(fakeWindow()).hostPageSetting('foo'));
-      });
-    });
-
-    context('when the client is embedded in a web page', function() {
-      beforeEach('configure an embedded client', function() {
-        fakeIsBrowserExtension.returns(false);
-      });
-
-      it('returns setting values from window.hypothesisConfig()', function() {
-        fakeConfigFuncSettingsFrom.returns({foo: 'bar'});
-
-        assert.equal(settingsFrom(fakeWindow()).hostPageSetting('foo'), 'bar');
-      });
-
-      it('returns setting values from js-hypothesis-config scripts', function() {
-        fakeSharedSettings.jsonConfigsFrom.returns({foo: 'bar'});
-
-        assert.equal(settingsFrom(fakeWindow()).hostPageSetting('foo'), 'bar');
-      });
-
-      specify('hypothesisConfig() overrides js-hypothesis-config', function() {
-        fakeConfigFuncSettingsFrom.returns({
-          foo: 'fooFromHypothesisConfig',
+          assert.equal(setting, test.expected);
         });
-        fakeSharedSettings.jsonConfigsFrom.returns({
-          foo: 'fooFromJsHypothesisConfigScript',
-        });
-
-        assert.equal(
-          settingsFrom(fakeWindow()).hostPageSetting('foo'),
-          'fooFromHypothesisConfig'
-        );
-      });
-
-      [
-        null,
-        undefined,
-      ].forEach(function(returnValue) {
-        specify('even a ' + returnValue + ' from hypothesisConfig() overrides js-hypothesis-configs', function() {
-          fakeConfigFuncSettingsFrom.returns({foo: returnValue});
-          fakeSharedSettings.jsonConfigsFrom.returns({foo: 'bar'});
-
-          assert.equal(settingsFrom(fakeWindow()).hostPageSetting('foo'), returnValue);
-        });
-      });
-
-      it("returns undefined if the setting isn't defined anywhere", function() {
-        fakeConfigFuncSettingsFrom.returns({});
-        fakeSharedSettings.jsonConfigsFrom.returns({});
-
-        assert.isUndefined(settingsFrom(fakeWindow()).hostPageSetting('foo'));
       });
     });
   });
