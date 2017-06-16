@@ -4,6 +4,11 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+- No changes, re-running the release script after releasing 1.21.0 partially
+  succeeded.
+
 ## [1.21.0] - 2017-06-15
 
 ### Changed
