@@ -266,6 +266,110 @@ describe('annotator.config.settingsFrom', function() {
     });
   });
 
+  describe('#showHighlights', function() {
+    [
+      {
+        it: 'returns an "always" setting from the host page unmodified',
+        input: 'always',
+        output: 'always',
+      },
+      {
+        it: 'returns a "never" setting from the host page unmodified',
+        input: 'never',
+        output: 'never',
+      },
+      {
+        it: 'returns a "whenSidebarOpen" setting from the host page unmodified',
+        input: 'whenSidebarOpen',
+        output: 'whenSidebarOpen',
+      },
+      {
+        it: 'changes true to "always"',
+        input: true,
+        output: 'always',
+      },
+      {
+        it: 'changes false to "never"',
+        input: false,
+        output: 'never',
+      },
+      {
+        it: 'passes invalid string values through unmodified',
+        input: 'invalid',
+        output: 'invalid',
+      },
+      {
+        it: 'passes numbers through unmodified',
+        input: 42,
+        output: 42,
+      },
+      {
+        it: 'passes null through unmodified',
+        input: null,
+        output: null,
+      },
+      {
+        it: 'passes undefined through unmodified',
+        input: undefined,
+        output: undefined,
+      },
+      {
+        it: 'passes arrays through unmodified',
+        input: [1, 2, 3],
+        output: [1, 2, 3],
+      },
+      {
+        it: 'passes objects through unmodified',
+        input: {foo: 'bar'},
+        output: {foo: 'bar'},
+      },
+      {
+        it: 'passes regular expressions through unmodified',
+        input: /regex/,
+        output: /regex/,
+      },
+    ].forEach(function(test) {
+      it(test.it, function() {
+        fakeSharedSettings.jsonConfigsFrom.returns({
+          'showHighlights': test.input,
+        });
+        var settings = settingsFrom(fakeWindow());
+
+        assert.deepEqual(settings.showHighlights, test.output);
+      });
+
+      it(test.it, function() {
+        fakeConfigFuncSettingsFrom.returns({
+          'showHighlights': test.input,
+        });
+        var settings = settingsFrom(fakeWindow());
+
+        assert.deepEqual(settings.showHighlights, test.output);
+      });
+    });
+
+    it("returns undefined if there's no showHighlights setting in the host page", function() {
+      assert.isUndefined(settingsFrom(fakeWindow()).showHighlights);
+    });
+
+    context('when the client is in a browser extension', function() {
+      beforeEach('configure a browser extension client', function() {
+        fakeIsBrowserExtension.returns(true);
+      });
+
+      it("doesn't read the setting from the host page", function() {
+        fakeSharedSettings.jsonConfigsFrom.returns({
+          'showHighlights': 'always',
+        });
+        fakeConfigFuncSettingsFrom.returns({
+          'showHighlights': 'always',
+        });
+
+        assert.isNull(settingsFrom(fakeWindow()).showHighlights);
+      });
+    });
+  });
+
   describe('#hostPageSetting', function() {
     [
       {
