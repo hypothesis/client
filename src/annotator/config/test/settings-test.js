@@ -459,7 +459,7 @@ describe('annotator.config.settingsFrom', function() {
             {allowInBrowserExt: test.allowInBrowserExt || false}
           );
 
-          assert.equal(setting, test.expected);
+          assert.strictEqual(setting, test.expected);
         });
       });
     });
