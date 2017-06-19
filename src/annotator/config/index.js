@@ -9,25 +9,16 @@ var settingsFrom = require('./settings');
  */
 function configFrom(window_) {
   var settings = settingsFrom(window_);
-
-  var config = {
+  return {
     app: settings.app,
     query: settings.query,
     annotations: settings.annotations,
+    showHighlights: settings.showHighlights,
     openLoginForm: settings.hostPageSetting('openLoginForm', {allowInBrowserExt: true}),
     openSidebar: settings.hostPageSetting('openSidebar', {allowInBrowserExt: true}),
-    showHighlights: settings.hostPageSetting('showHighlights'),
     branding: settings.hostPageSetting('branding'),
     services: settings.hostPageSetting('services'),
   };
-
-  // Convert legacy keys/values in config to corresponding current
-  // configuration.
-  if (typeof config.showHighlights === 'boolean') {
-    config.showHighlights = config.showHighlights ? 'always' : 'never';
-  }
-
-  return config;
 }
 
 module.exports = configFrom;

@@ -61,6 +61,21 @@ function settingsFrom(window_) {
     return jsonConfigs.annotations || annotationsFromURL();
   }
 
+  function showHighlights() {
+    var showHighlights_ = hostPageSetting('showHighlights');
+
+    if (showHighlights_ === null) {
+      showHighlights_ = 'always';  // The default value is 'always'.
+    }
+
+    // Convert legacy keys/values to corresponding current configuration.
+    if (typeof showHighlights_ === 'boolean') {
+      return showHighlights_ ? 'always' : 'never';
+    }
+
+    return showHighlights_;
+  }
+
   /**
    * Return the config.query setting from the host page or from the URL.
    *
@@ -103,12 +118,17 @@ function settingsFrom(window_) {
       return configFuncSettings[name];
     }
 
-    return jsonConfigs[name];
+    if (jsonConfigs.hasOwnProperty(name)) {
+      return jsonConfigs[name];
+    }
+
+    return null;
   }
 
   return {
     get app() { return app(); },
     get annotations() { return annotations(); },
+    get showHighlights() { return showHighlights(); },
     get query() { return query(); },
     hostPageSetting: hostPageSetting,
   };

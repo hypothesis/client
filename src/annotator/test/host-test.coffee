@@ -75,13 +75,6 @@ describe 'Host', ->
         done()
       host.publish('panelReady')
 
-    it 'enables highlighting when no showHighlights option is given', (done) ->
-      host = createHost({})
-      host.on 'panelReady', ->
-        assert.isTrue(host.visibleHighlights)
-        done()
-      host.publish('panelReady')
-
     it 'passes config to the sidebar iframe', ->
       appURL = new URL('/base/annotator/test/empty.html', window.location.href)
       host = createHost({annotations: '1234'})

@@ -29,6 +29,7 @@ describe('annotator.config.index', function() {
     'app',
     'query',
     'annotations',
+    'showHighlights',
   ].forEach(function(settingName) {
     it('returns the ' + settingName + ' setting', function() {
       fakeSettingsFrom()[settingName] = 'SETTING_VALUE';
@@ -73,7 +74,6 @@ describe('annotator.config.index', function() {
   });
 
   [
-    'showHighlights',
     'branding',
     'services',
   ].forEach(function(settingName) {
@@ -87,7 +87,6 @@ describe('annotator.config.index', function() {
   [
     'openLoginForm',
     'openSidebar',
-    'showHighlights',
     'branding',
     'services',
   ].forEach(function(settingName) {
@@ -95,7 +94,6 @@ describe('annotator.config.index', function() {
       var settings = {
         'openLoginForm': 'OPEN_LOGIN_FORM_SETTING',
         'openSidebar': 'OPEN_SIDEBAR_SETTING',
-        'showHighlights': 'SHOW_HIGHLIGHTS_SETTING',
         'branding': 'BRANDING_SETTING',
         'services': 'SERVICES_SETTING',
       };
@@ -106,38 +104,6 @@ describe('annotator.config.index', function() {
       var settingValue = configFrom('WINDOW')[settingName];
 
       assert.equal(settingValue, settings[settingName]);
-    });
-  });
-
-  describe('showHighlights', function() {
-    [
-      {
-        name: 'changes `true` to `"always"`',
-        input:   true,
-        output:  'always',
-      },
-      {
-        name: 'changes `false` to `"never"`',
-        input:   false,
-        output:  'never',
-      },
-      // It adds any arbitrary string value for showHighlights to the
-      // returned config, unmodified.
-      {
-        name: 'passes arbitrary strings through unmodified',
-        input:   'foo',
-        output:  'foo',
-      },
-    ].forEach(function(test) {
-      it(test.name, function() {
-        fakeSettingsFrom().hostPageSetting = function (settingName) {
-          return {'showHighlights': test.input}[settingName];
-        };
-
-        var config = configFrom('WINDOW');
-
-        assert.equal(config.showHighlights, test.output);
-      });
     });
   });
 });

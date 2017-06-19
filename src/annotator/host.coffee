@@ -52,9 +52,6 @@ module.exports = class Host extends Guest
 
     this.on 'panelReady', =>
       # Initialize tool state.
-      if config.showHighlights == undefined
-        # Highlights are on by default.
-        config.showHighlights = 'always'
       this.setVisibleHighlights(config.showHighlights == 'always')
 
       # Show the UI

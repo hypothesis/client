@@ -266,6 +266,113 @@ describe('annotator.config.settingsFrom', function() {
     });
   });
 
+  describe('#showHighlights', function() {
+    [
+      {
+        it: 'returns an "always" setting from the host page unmodified',
+        input: 'always',
+        output: 'always',
+      },
+      {
+        it: 'returns a "never" setting from the host page unmodified',
+        input: 'never',
+        output: 'never',
+      },
+      {
+        it: 'returns a "whenSidebarOpen" setting from the host page unmodified',
+        input: 'whenSidebarOpen',
+        output: 'whenSidebarOpen',
+      },
+      {
+        it: 'changes true to "always"',
+        input: true,
+        output: 'always',
+      },
+      {
+        it: 'changes false to "never"',
+        input: false,
+        output: 'never',
+      },
+      {
+        it: 'passes invalid string values through unmodified',
+        input: 'invalid',
+        output: 'invalid',
+      },
+      {
+        it: 'passes numbers through unmodified',
+        input: 42,
+        output: 42,
+      },
+      // If the host page sets showHighlights to null this will be mistaken
+      // for the host page not containing a showHighlights setting at all and
+      // showHighlights will be set to 'always'.
+      {
+        it: 'defaults to "always"',
+        input: null,
+        output: 'always',
+      },
+      {
+        it: 'passes undefined through unmodified',
+        input: undefined,
+        output: undefined,
+      },
+      {
+        it: 'passes arrays through unmodified',
+        input: [1, 2, 3],
+        output: [1, 2, 3],
+      },
+      {
+        it: 'passes objects through unmodified',
+        input: {foo: 'bar'},
+        output: {foo: 'bar'},
+      },
+      {
+        it: 'passes regular expressions through unmodified',
+        input: /regex/,
+        output: /regex/,
+      },
+    ].forEach(function(test) {
+      it(test.it, function() {
+        fakeSharedSettings.jsonConfigsFrom.returns({
+          'showHighlights': test.input,
+        });
+        var settings = settingsFrom(fakeWindow());
+
+        assert.deepEqual(settings.showHighlights, test.output);
+      });
+
+      it(test.it, function() {
+        fakeConfigFuncSettingsFrom.returns({
+          'showHighlights': test.input,
+        });
+        var settings = settingsFrom(fakeWindow());
+
+        assert.deepEqual(settings.showHighlights, test.output);
+      });
+    });
+
+    it("defaults to 'always' if there's no showHighlights setting in the host page", function() {
+      assert.equal(settingsFrom(fakeWindow()).showHighlights, 'always');
+    });
+
+    context('when the client is in a browser extension', function() {
+      beforeEach('configure a browser extension client', function() {
+        fakeIsBrowserExtension.returns(true);
+      });
+
+      it("doesn't read the setting from the host page, defaults to 'always'", function() {
+        fakeSharedSettings.jsonConfigsFrom.returns({
+          'showHighlights': 'never',
+        });
+        fakeConfigFuncSettingsFrom.returns({
+          'showHighlights': 'never',
+        });
+
+        assert.equal(settingsFrom(fakeWindow()).showHighlights, 'always');
+      });
+    });
+  });
+
   describe('#hostPageSetting', function() {
     [
       {
@@ -310,11 +417,11 @@ describe('annotator.config.settingsFrom', function() {
       },
       {
         when: 'the client is embedded in a web page',
-        specify: "it returns undefined if the setting isn't defined anywhere",
+        specify: "it returns null if the setting isn't defined anywhere",
         isBrowserExtension: false,
         configFuncSettings: {},
         jsonSettings: {},
-        expected: undefined,
+        expected: null,
       },
       {
         when: 'the client is in a browser extension',
@@ -355,7 +462,7 @@ describe('annotator.config.settingsFrom', function() {
             {allowInBrowserExt: test.allowInBrowserExt || false}
           );
 
-          assert.equal(setting, test.expected);
+          assert.strictEqual(setting, test.expected);
         });
       });
     });
