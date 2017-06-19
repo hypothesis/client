@@ -114,7 +114,11 @@ function settingsFrom(window_) {
       return configFuncSettings[name];
     }
 
-    return jsonConfigs[name];
+    if (jsonConfigs.hasOwnProperty(name)) {
+      return jsonConfigs[name];
+    }
+
+    return null;
   }
 
   return {

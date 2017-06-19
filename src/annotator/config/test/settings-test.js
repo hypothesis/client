@@ -348,8 +348,8 @@ describe('annotator.config.settingsFrom', function() {
       });
     });
 
-    it("returns undefined if there's no showHighlights setting in the host page", function() {
-      assert.isUndefined(settingsFrom(fakeWindow()).showHighlights);
+    it("returns null if there's no showHighlights setting in the host page", function() {
+      assert.isNull(settingsFrom(fakeWindow()).showHighlights);
     });
 
     context('when the client is in a browser extension', function() {
@@ -414,11 +414,11 @@ describe('annotator.config.settingsFrom', function() {
       },
       {
         when: 'the client is embedded in a web page',
-        specify: "it returns undefined if the setting isn't defined anywhere",
+        specify: "it returns null if the setting isn't defined anywhere",
         isBrowserExtension: false,
         configFuncSettings: {},
         jsonSettings: {},
-        expected: undefined,
+        expected: null,
       },
       {
         when: 'the client is in a browser extension',
