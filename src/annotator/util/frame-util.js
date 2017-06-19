@@ -43,6 +43,16 @@ function isValid (iframe) {
   return iframe.className !== 'h-sidebar-iframe';
 }
 
+function isReady (iframe, callback) {
+  if (iframe.contentDocument.readyState === 'loading') {
+    iframe.contentDocument.addEventListener('DOMContentLoaded', function () {
+      callback();
+    });
+  } else {
+    callback();
+  }
+}
+
 function isLoaded (iframe, callback) {
   if (iframe.contentDocument.readyState !== 'complete') {
     iframe.addEventListener('load', function () {
@@ -60,4 +70,5 @@ module.exports = {
   isAccessible: isAccessible,
   isValid: isValid,
   isLoaded: isLoaded,
+  isReady: isReady,
 };
