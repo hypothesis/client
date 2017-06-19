@@ -39,7 +39,7 @@ tested with at least current versions of iOS Safari and Chrome for Android.
 
       make dev
 
-#. Set the :envvar:`H_SERVICE_URL` and :envvar:`PACKAGE_SERVER_HOSTNAME`
+#. Set the :envvar:`SIDEBAR_APP_URL` and :envvar:`PACKAGE_SERVER_HOSTNAME`
    environment variables to load assets from this hostname and start the dev
    server:
 
@@ -48,7 +48,7 @@ tested with at least current versions of iOS Safari and Chrome for Android.
       # In the client repository
 
       # Set URL which sidebar app ("app.html") is loaded from
-      export H_SERVICE_URL=http://<HOSTNAME>:5000
+      export SIDEBAR_APP_URL=http://<HOSTNAME>:5000/app.html
       # Set hostname used when generating client asset URLs
       export PACKAGE_SERVER_HOSTNAME=<HOSTNAME>
 
