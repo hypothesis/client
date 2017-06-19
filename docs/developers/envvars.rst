@@ -4,10 +4,12 @@ Environment Variables
 This section documents all the environment variables supported by the client's
 build tasks.
 
-.. envvar:: H_SERVICE_URL
+.. envvar:: SIDEBAR_APP_URL
 
-   The URL of the service which hosts the HTML entry point for the client's
-   sidebar application.
+   The default value for the :option:`sidebarAppUrl` config setting (the URL of
+   the sidebar app's iframe), used when the host page does not contain a
+   :option:`sidebarAppUrl` setting.
+   ``https://hypothes.is/app.html`` by default.
 
 .. envvar:: PACKAGE_SERVER_HOSTNAME
 

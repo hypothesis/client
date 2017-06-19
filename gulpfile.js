@@ -264,8 +264,8 @@ var isFirstBuild = true;
 function generateBootScript(manifest) {
   var { version } = require('./package.json');
 
-  var defaultSidebarAppUrl = process.env.H_SERVICE_URL ?
-    `${process.env.H_SERVICE_URL}/app.html` : 'https://hypothes.is/app.html';
+  var defaultSidebarAppUrl = process.env.SIDEBAR_APP_URL ?
+    `${process.env.SIDEBAR_APP_URL}` : 'https://hypothes.is/app.html';
 
   var defaultAssetRoot;
 

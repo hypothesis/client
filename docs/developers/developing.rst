@@ -83,7 +83,7 @@ run:
 
 .. code-block:: sh
 
-   export H_SERVICE_URL=http://localhost:5000
+   export SIDEBAR_APP_URL=http://localhost:5000/app.html
    gulp watch
 
 **In the `hypothesis/h` repository**, set the :envvar:`CLIENT_URL` env var to
