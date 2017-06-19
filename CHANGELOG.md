@@ -4,6 +4,32 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+### Changed
+
+- Fixes always off highlighting issue.
+  Add showHighlights() settings function.
+  ([#455](https://github.com/hypothesis/client/pull/455)).
+
+- Convert localStorage service from CoffeeScript to JS
+  ([#443](https://github.com/hypothesis/client/pull/443)).
+
+- Fix warning about loading Angular twice in tests
+  ([#448](https://github.com/hypothesis/client/pull/448)).
+
+- Convert shared Bridge class to JS
+  ([#449](https://github.com/hypothesis/client/pull/449)).
+
+- Remove assetRoot and sidebarAppUrl from annotator
+  ([#452](https://github.com/hypothesis/client/pull/452)).
+
+- Rename H_SERVICE_URL to SIDEBAR_APP_URL
+  ([#454](https://github.com/hypothesis/client/pull/454)).
+
+- Remove unused "host" service
+  ([#446](https://github.com/hypothesis/client/pull/446)).
+
 ## [1.22.0] - 2017-06-16
 
 - No changes, re-running the release script after releasing 1.21.0 partially
