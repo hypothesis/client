@@ -4,7 +4,6 @@ var angular = require('angular');
 
 var events = require('./events');
 var retryUtil = require('./retry-util');
-var serviceConfig = require('./service-config');
 
 var CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
@@ -45,7 +44,7 @@ function sessionActions(options) {
  * @ngInject
  */
 function session($http, $q, $resource, $rootScope, analytics, annotationUI, auth,
-                 flash, raven, settings, store) {
+                 flash, raven, settings, serviceConfig, store) {
   // Headers sent by every request made by the session service.
   var headers = {};
   var actions = sessionActions({

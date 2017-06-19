@@ -1,7 +1,6 @@
 'use strict';
 
 var angular = require('angular');
-var proxyquire = require('proxyquire');
 
 var events = require('../events');
 
@@ -15,7 +14,7 @@ describe('session', function () {
   var fakeAuth;
   var fakeFlash;
   var fakeRaven;
-  var fakeServiceConfig = sinon.stub();
+  var fakeServiceConfig;
   var fakeSettings;
   var fakeStore;
   var sandbox;
@@ -23,10 +22,7 @@ describe('session', function () {
 
   before(function () {
     angular.module('h', ['ngResource'])
-      .service(
-        'session',
-        proxyquire('../session', {'./service-config': fakeServiceConfig})
-      );
+      .service('session', require('../session'));
   });
 
   beforeEach(function () {
@@ -58,8 +54,7 @@ describe('session', function () {
         update: sandbox.stub().returns(Promise.resolve({})),
       },
     };
-    fakeServiceConfig.reset();
-    fakeServiceConfig.returns(null);
+    fakeServiceConfig = sinon.stub().returns(null);
     fakeSettings = {
       serviceUrl: 'https://test.hypothes.is/root/',
     };
@@ -71,6 +66,7 @@ describe('session', function () {
       flash: fakeFlash,
       raven: fakeRaven,
       settings: fakeSettings,
+      serviceConfig: fakeServiceConfig,
       store: fakeStore,
     });
   });
