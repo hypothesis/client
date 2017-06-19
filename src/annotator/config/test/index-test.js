@@ -75,8 +75,6 @@ describe('annotator.config.index', function() {
   [
     'showHighlights',
     'branding',
-    'assetRoot',
-    'sidebarAppUrl',
     'services',
   ].forEach(function(settingName) {
     it('reads ' + settingName + ' from the host page only when in an embedded client', function() {
@@ -91,8 +89,6 @@ describe('annotator.config.index', function() {
     'openSidebar',
     'showHighlights',
     'branding',
-    'assetRoot',
-    'sidebarAppUrl',
     'services',
   ].forEach(function(settingName) {
     it('returns the ' + settingName + ' value from the host page', function() {
@@ -101,8 +97,6 @@ describe('annotator.config.index', function() {
         'openSidebar': 'OPEN_SIDEBAR_SETTING',
         'showHighlights': 'SHOW_HIGHLIGHTS_SETTING',
         'branding': 'BRANDING_SETTING',
-        'assetRoot': 'ASSET_ROOT_SETTING',
-        'sidebarAppUrl': 'SIDEBAR_APP_URL_SETTING',
         'services': 'SERVICES_SETTING',
       };
       fakeSettingsFrom().hostPageSetting = function(settingName) {
