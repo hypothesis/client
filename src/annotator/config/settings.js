@@ -64,6 +64,10 @@ function settingsFrom(window_) {
   function showHighlights() {
     var showHighlights_ = hostPageSetting('showHighlights');
 
+    if (showHighlights_ === null) {
+      showHighlights_ = 'always';  // The default value is 'always'.
+    }
+
     // Convert legacy keys/values to corresponding current configuration.
     if (typeof showHighlights_ === 'boolean') {
       return showHighlights_ ? 'always' : 'never';

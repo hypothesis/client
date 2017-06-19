@@ -303,10 +303,13 @@ describe('annotator.config.settingsFrom', function() {
         input: 42,
         output: 42,
       },
+      // If the host page sets showHighlights to null this will be mistaken
+      // for the host page not containing a showHighlights setting at all and
+      // showHighlights will be set to 'always'.
       {
-        it: 'passes null through unmodified',
+        it: 'defaults to "always"',
         input: null,
-        output: null,
+        output: 'always',
       },
       {
         it: 'passes undefined through unmodified',
@@ -348,8 +351,8 @@ describe('annotator.config.settingsFrom', function() {
       });
     });
 
-    it("returns null if there's no showHighlights setting in the host page", function() {
-      assert.isNull(settingsFrom(fakeWindow()).showHighlights);
+    it("defaults to 'always' if there's no showHighlights setting in the host page", function() {
+      assert.equal(settingsFrom(fakeWindow()).showHighlights, 'always');
     });
 
     context('when the client is in a browser extension', function() {
@@ -357,15 +360,15 @@ describe('annotator.config.settingsFrom', function() {
         fakeIsBrowserExtension.returns(true);
       });
 
-      it("doesn't read the setting from the host page", function() {
+      it("doesn't read the setting from the host page, defaults to 'always'", function() {
         fakeSharedSettings.jsonConfigsFrom.returns({
-          'showHighlights': 'always',
+          'showHighlights': 'never',
         });
         fakeConfigFuncSettingsFrom.returns({
-          'showHighlights': 'always',
+          'showHighlights': 'never',
         });
 
-        assert.isNull(settingsFrom(fakeWindow()).showHighlights);
+        assert.equal(settingsFrom(fakeWindow()).showHighlights, 'always');
       });
     });
   });
