@@ -18,6 +18,11 @@ function configFrom(window_) {
     openSidebar: settings.hostPageSetting('openSidebar', {allowInBrowserExt: true}),
     branding: settings.hostPageSetting('branding'),
     services: settings.hostPageSetting('services'),
+
+    // Needed by the multi-frame feature for now
+    enableMultiFrameSupport: settings.hostPageSetting('enableMultiFrameSupport'),
+    embedScriptUrl: settings.hostPageSetting('embedScriptUrl'),
+    subFrameInstance: settings.hostPageSetting('subFrameInstance'),
   };
 }
 
