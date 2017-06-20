@@ -26,7 +26,7 @@ describe('annotator.config.index', function() {
   });
 
   [
-    'app',
+    'sidebarAppUrl',
     'query',
     'annotations',
     'showHighlights',
@@ -44,7 +44,7 @@ describe('annotator.config.index', function() {
     beforeEach('remove the application/annotator+html <link>', function() {
       Object.defineProperty(
         fakeSettingsFrom(),
-        'app',
+        'sidebarAppUrl',
         {
           get: sinon.stub().throws(new Error("there's no link")),
         }

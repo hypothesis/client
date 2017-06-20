@@ -10,7 +10,7 @@ var settingsFrom = require('./settings');
 function configFrom(window_) {
   var settings = settingsFrom(window_);
   return {
-    app: settings.app,
+    sidebarAppUrl: settings.sidebarAppUrl,
     query: settings.query,
     annotations: settings.annotations,
     showHighlights: settings.showHighlights,

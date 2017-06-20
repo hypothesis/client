@@ -29,7 +29,7 @@ describe('annotator.config.settingsFrom', function() {
     fakeSharedSettings.jsonConfigsFrom = sinon.stub().returns({});
   });
 
-  describe('#app', function() {
+  describe('#sidebarAppUrl', function() {
     function appendLinkToDocument(href) {
       var link = document.createElement('link');
       link.type = 'application/annotator+html';
@@ -52,7 +52,7 @@ describe('annotator.config.settingsFrom', function() {
       });
 
       it('returns the href from the link', function() {
-        assert.equal(settingsFrom(window).app, 'http://example.com/app.html');
+        assert.equal(settingsFrom(window).sidebarAppUrl, 'http://example.com/app.html');
       });
     });
 
@@ -71,7 +71,7 @@ describe('annotator.config.settingsFrom', function() {
       });
 
       it('returns the href from the first one', function() {
-        assert.equal(settingsFrom(window).app, 'http://example.com/app1');
+        assert.equal(settingsFrom(window).sidebarAppUrl, 'http://example.com/app1');
       });
     });
 
@@ -89,7 +89,7 @@ describe('annotator.config.settingsFrom', function() {
       it('throws an error', function() {
         assert.throws(
           function() {
-            settingsFrom(window).app; // eslint-disable-line no-unused-expressions
+            settingsFrom(window).sidebarAppUrl; // eslint-disable-line no-unused-expressions
           },
           'application/annotator+html link has no href'
         );
@@ -100,7 +100,7 @@ describe('annotator.config.settingsFrom', function() {
       it('throws an error', function() {
         assert.throws(
           function() {
-            settingsFrom(window).app; // eslint-disable-line no-unused-expressions
+            settingsFrom(window).sidebarAppUrl; // eslint-disable-line no-unused-expressions
           },
           'No application/annotator+html link in the document'
         );

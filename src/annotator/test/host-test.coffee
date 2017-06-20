@@ -8,7 +8,7 @@ describe 'Host', ->
   hostConfig = {pluginClasses: {}}
 
   createHost = (config={}, element=null) ->
-    config = Object.assign({app: '/base/annotator/test/empty.html'}, hostConfig, config)
+    config = Object.assign({sidebarAppUrl: '/base/annotator/test/empty.html'}, hostConfig, config)
     if !element
       element = document.createElement('div')
     return new Host(element, config)
