@@ -238,7 +238,7 @@ describe 'Guest', ->
       guest = null
 
       beforeEach ->
-        sandbox.stub(document, 'title', 'hi')
+        document.title = 'hi'
         guest = createGuest()
         guest.plugins.PDF =
           uri: sandbox.stub().returns(window.location.href)
