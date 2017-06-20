@@ -255,8 +255,8 @@ describe('oauth auth', function () {
     fakeHttp.post.returns(new Promise(function () {}));
   }
 
-  // Reset fakeHttp.post.callCount and other fields.
+  // Reset fakeHttp's spy history (.called, .callCount, etc).
   function resetHttpSpy () {
-    fakeHttp.post.reset();
+    fakeHttp.post.resetHistory();
   }
 });
