@@ -36,7 +36,7 @@ class Bridge {
    * @param {string} token
    * @return {RPC} - Channel for communicating with the window.
    */
-  createChannel(source, origin, token) {
+  createChannel(source, origin, token, options) {
     var channel = null;
     var connected = false;
 
@@ -58,7 +58,7 @@ class Bridge {
     var listeners = extend({connect}, this.channelListeners);
 
     // Set up a channel
-    channel = new RPC(window, source, origin, listeners);
+    channel = new RPC(window, source, origin, listeners, options);
 
     // Fire off a connection attempt
     channel.call('connect', token, ready);
@@ -82,9 +82,17 @@ class Bridge {
    */
   call(method, ...args) {
     var cb;
-    if (typeof(args[args.length - 1]) === 'function') {
-      cb = args[args.length - 1];
+    var lastParam = args[args.length - 1];
+    if (typeof(lastParam) === 'function') {
+      cb = lastParam;
       args = args.slice(0, -1);
+    }
+
+    var firstParam = method;
+    var scope;
+    if (typeof(firstParam) === 'object') {
+      method = firstParam.method;
+      scope = new Set( firstParam.scope );
     }
 
     var _makeDestroyFn = c => {
@@ -96,6 +104,10 @@ class Bridge {
     };
 
     var promises = this.links.map(function(l) {
+      if (scope && !scope.has(l.channel.uri) ) {
+        return false;
+      }
+
       var p = new Promise(function(resolve, reject) {
         var timeout = setTimeout((() => resolve(null)), 1000);
         try {
