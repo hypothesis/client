@@ -1,7 +1,7 @@
-Range = require('../anchoring/range')
+Range = require('../../anchoring/range')
 $ = require('jquery')
 
-highlighter = require('../highlighter')
+highlighter = require('./index')
 
 describe "highlightRange", ->
   it 'wraps a highlight span around the given range', ->
