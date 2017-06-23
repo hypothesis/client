@@ -6,6 +6,7 @@ Host = require('./host')
 annotationCounts = require('./annotation-counts')
 sidebarTrigger = require('./sidebar-trigger')
 events = require('../shared/bridge-events');
+features = require('./features');
 
 # Minimum width to which the frame can be resized.
 MIN_RESIZE = 280
@@ -89,7 +90,6 @@ module.exports = class Sidebar extends Host
       if @onHelpRequest
         @onHelpRequest()
     );
-
     # Return this for chaining
     this
 

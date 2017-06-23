@@ -5,6 +5,10 @@
  * on $rootScope
  */
 module.exports = {
+
+  // Internal state changes
+  FRAME_CONNECTED: 'frameConnected',
+
   // Session state changes
 
   /** The list of groups changed */

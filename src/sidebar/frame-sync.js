@@ -163,6 +163,8 @@ function FrameSync($rootScope, $window, Discovery, annotationUI, bridge) {
         return;
       }
 
+      $rootScope.$broadcast(events.FRAME_CONNECTED);
+
       annotationUI.connectFrame({
         metadata: info.metadata,
         uri: info.uri,
