@@ -1,14 +1,34 @@
 'use strict';
 
 var angular = require('angular');
+var service = require('../local-storage');
 
 describe('sidebar.localStorage', () => {
   var fakeWindow;
 
   before(() =>
     angular.module('h', [])
-      .service('localStorage', require('../local-storage'))
+      .service('localStorage', service)
   );
+
+  context('when accessing localStorage throws an Error', () => {
+    it('returns the fallback implementation', () => {
+      var badWindow = {};
+      var fakeWindow = {};
+
+      Object.defineProperty(badWindow, 'localStorage', {
+        get: () => {
+          throw Error('denied');
+        },
+      });
+
+      var prototypes = [badWindow, fakeWindow]
+          .map(service)
+          .map(Object.getPrototypeOf)
+      ;
+      assert.strictEqual(prototypes[0], prototypes[1]);
+    });
+  });
 
   context('when browser localStorage is *not* accessible', () => {
     var localStorage = null;

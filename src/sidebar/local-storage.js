@@ -28,14 +28,15 @@ class InMemoryStorage {
  */
 // @ngInject
 function localStorage($window) {
-  var storage = $window.localStorage;
+  let storage;
+  let testKey = 'hypothesis.testKey';
 
   try {
     // Test whether we can read/write localStorage.
-    var key = 'hypothesis.testKey';
-    $window.localStorage.setItem(key, key);
-    $window.localStorage.getItem(key);
-    $window.localStorage.removeItem(key);
+    storage = $window.localStorage;
+    $window.localStorage.setItem(testKey, testKey);
+    $window.localStorage.getItem(testKey);
+    $window.localStorage.removeItem(testKey);
   } catch (e) {
     storage = new InMemoryStorage();
   }
