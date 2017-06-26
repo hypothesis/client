@@ -4,6 +4,16 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+### Changed
+
+- Enable feature flagging in the annotation layer
+  ([#440](https://github.com/hypothesis/client/pull/440)).
+
+- Fix sidebar app failing to load in Firefox extension.
+  ([#460](https://github.com/hypothesis/client/pull/460)).
+
 ## [1.23.0] - 2017-06-19
 
 ### Changed
