@@ -249,4 +249,18 @@ describe('FrameSync', function () {
       assert.called(onSidebarOpened);
     });
   });
+
+  describe ('on a relayed bridge call', function() {
+    it ('calls "showSidebar"', function() {
+      fakeBridge.emit('showSidebar');
+
+      assert.calledWith(fakeBridge.call, 'showSidebar');
+    });
+
+    it ('calls "hideSidebar"', function() {
+      fakeBridge.emit('hideSidebar');
+
+      assert.calledWith(fakeBridge.call, 'hideSidebar');
+    });
+  });
 });

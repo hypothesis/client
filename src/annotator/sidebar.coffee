@@ -47,30 +47,14 @@ module.exports = class Sidebar extends Host
       @onHelpRequest = serviceConfig.onHelpRequest
 
     this._setupSidebarEvents()
-    this._setupDocumentEvents()
-
-  _setupDocumentEvents: ->
-    sidebarTrigger(document.body, => this.show())
-
-    @element.on 'click', (event) =>
-      if !@selectedTargets?.length
-        this.hide()
-
-    # Mobile browsers do not register click events on
-    # elements without cursor: pointer. So instead of
-    # adding that to every element, we can add the initial
-    # touchstart event which is always registered to
-    # make up for the lack of click support for all elements.
-    @element.on 'touchstart', (event) =>
-      if !@selectedTargets?.length
-        this.hide()
-
-    return this
 
   _setupSidebarEvents: ->
     annotationCounts(document.body, @crossframe)
-    features.init(@crossframe);
+    sidebarTrigger(document.body, => this.show())
+    features.init(@crossframe)
 
+    @crossframe.on('showSidebar', => this.show())
+    @crossframe.on('hideSidebar', => this.hide())
     @crossframe.on(events.LOGIN_REQUESTED, =>
       if @onLoginRequest
         @onLoginRequest()
@@ -206,11 +190,3 @@ module.exports = class Sidebar extends Host
 
   isOpen: ->
     !@frame.hasClass('annotator-collapsed')
-
-  createAnnotation: (annotation = {}) ->
-    super
-    this.show() unless annotation.$highlight
-
-  showAnnotations: (annotations) ->
-    super
-    this.show()

@@ -32,6 +32,20 @@ describe 'Sidebar', ->
     emitEvent = (event, args...) ->
       fn(args...) for [evt, fn] in fakeCrossFrame.on.args when event == evt
 
+    describe 'on "show" event', ->
+      it 'shows the frame', ->
+        target = sandbox.stub(Sidebar.prototype, 'show')
+        sidebar = createSidebar()
+        emitEvent('showSidebar')
+        assert.called(target)
+
+    describe 'on "hide" event', ->
+      it 'hides the frame', ->
+        target = sandbox.stub(Sidebar.prototype, 'hide')
+        sidebar = createSidebar()
+        emitEvent('hideSidebar')
+        assert.called(target)
+
     describe 'on LOGIN_REQUESTED event', ->
       it 'calls the onLoginRequest callback function if one was provided', ->
         onLoginRequest = sandbox.stub()
@@ -194,19 +208,6 @@ describe 'Sidebar', ->
       hide = sandbox.stub(sidebar, 'hide')
       sidebar.onSwipe({type: 'swiperight'})
       assert.calledOnce(hide)
-
-  describe 'document events', ->
-
-    sidebar = null
-
-    beforeEach ->
-      sidebar = createSidebar({})
-
-    it 'closes the sidebar when the user taps or clicks in the page', ->
-      for event in ['click', 'touchstart']
-        sidebar.show()
-        sidebar.element.trigger(event)
-        assert.isFalse(sidebar.isOpen())
 
   describe 'destruction', ->
     sidebar = null
