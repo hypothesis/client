@@ -69,6 +69,7 @@ module.exports = class Sidebar extends Host
 
   _setupSidebarEvents: ->
     annotationCounts(document.body, @crossframe)
+    features.init(@crossframe);
 
     @crossframe.on(events.LOGIN_REQUESTED, =>
       if @onLoginRequest

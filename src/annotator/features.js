@@ -14,7 +14,7 @@ module.exports = {
   init: function(crossframe) {
     crossframe.on(events.FEATURE_FLAGS_UPDATED, _set);
   },
-  
+
   reset: function() {
     _set({});
   },
