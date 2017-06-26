@@ -58,6 +58,8 @@ describe 'Guest', ->
     return new Guest(element, config)
 
   beforeEach ->
+    sinon.stub(console, 'warn')
+
     FakeAdder::instance = null
     rangeUtil = {
       isSelectionBackwards: sinon.stub()
@@ -94,6 +96,7 @@ describe 'Guest', ->
 
   afterEach ->
     sandbox.restore()
+    console.warn.restore()
 
   describe 'plugins', ->
     fakePlugin = null

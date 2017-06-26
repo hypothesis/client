@@ -51,6 +51,7 @@ module.exports = class Sidebar extends Host
   _setupSidebarEvents: ->
     annotationCounts(document.body, @crossframe)
     sidebarTrigger(document.body, => this.show())
+    features.init(@crossframe)
 
     @crossframe.on('showSidebar', => this.show())
     @crossframe.on('hideSidebar', => this.hide())

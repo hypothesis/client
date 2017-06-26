@@ -54,6 +54,7 @@ describe('anchoring', function () {
   });
 
   beforeEach(function () {
+    sinon.stub(console, 'warn');
     container = document.createElement('div');
     container.innerHTML = require('./test-page.html');
     document.body.appendChild(container);
@@ -63,6 +64,7 @@ describe('anchoring', function () {
   afterEach(function () {
     guest.destroy();
     container.parentNode.removeChild(container);
+    console.warn.restore();
   });
 
   unroll('should highlight #tag when annotations are loaded', function (testCase) {
