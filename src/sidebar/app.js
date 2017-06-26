@@ -225,5 +225,16 @@ module.exports = angular.module('h', [
 
 processAppOpts();
 
+// Work around a check in Angular's $sniffer service that causes it to
+// incorrectly determine that Firefox extensions are Chrome Packaged Apps which
+// do not support the HTML 5 History API. This results Angular redirecting the
+// browser on startup and thus the app fails to load.
+// See https://github.com/angular/angular.js/blob/a03b75c6a812fcc2f616fc05c0f1710e03fca8e9/src/ng/sniffer.js#L30
+if (window.chrome && !window.chrome.app) {
+  window.chrome.app = {
+    dummyAddedByHypothesisClient: true,
+  };
+}
+
 var appEl = document.querySelector('hypothesis-app');
 angular.bootstrap(appEl, ['h'], {strictDi: true});
