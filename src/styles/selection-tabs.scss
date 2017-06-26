@@ -1,45 +1,68 @@
 .selection-tabs {
-
   display: flex;
-  flex-direction: row;
-  color: $grey-5;
-  @include font-normal;
+  justify-content: center;
 
-  &:hover {
-    color: $grey-6;
-  }
-
-  padding-bottom: 10px;
+  margin-top: 1px;
+  margin-bottom: 6px;
 }
 
 .selection-tabs__type {
-  color: $grey-6;
-  margin-right: 20px;
+  display: flex;
+  justify-content: center;
+  height: 30px;
+  width: 106px;
+
+  font-weight: bold;
+
+  color: #626262;
+  background-color: rgb(236, 236, 236);
+  transition: background-color 100ms linear;
+
+  border: 1px solid #626262;
+  border-right-width: 0;
+
+  padding-left: 12px;
+  padding-right: calc(12px - 7px);
+
+  touch-action: manipulation;
   cursor: pointer;
-  min-width: 85px;
-  min-height: 18px;
-
-  // Disable focus ring for selected tab
-  outline: none;
-
   user-select: none;
+
+  -webkit-appearance: button;
 }
 
+.selection-tabs__type:focus {
+  outline:0 !important;
+}
+
+.selection-tabs__type:first-child {
+  border-top-left-radius: 2px;
+  border-bottom-left-radius: 2px;
+}
+
+.selection-tabs__type:last-child {
+  border-top-right-radius: 2px;
+  border-bottom-right-radius: 2px;
+  border-right-width: 1px;
+}
+
+.selection-tabs__type:hover,
 .selection-tabs__type.is-selected {
-  font-weight: bold;
+  color: #f1f1f1;
+  background-color: #626262;
+}
+
+.selection-tabs__label {
+  flex-basis: 200px;
 }
 
 .selection-tabs__count {
-  position: relative;
-  bottom: 3px;
-  font-size: 10px;
+  flex-basis: 21px;
+  padding-left: 7px;
+  padding-right: 7px;
 }
 
 .selection-tabs__empty-message {
   position: relative;
   top: 10px;
-}
-
-.selection-tabs__type--orphan {
-  margin-left: -5px;
 }
