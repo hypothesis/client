@@ -4,19 +4,13 @@ AnnotationSync = require('../annotation-sync')
 Bridge = require('../../shared/bridge')
 Discovery = require('../../shared/discovery')
 FrameUtil = require('../util/frame-util')
-
-debounce = require('lodash.debounce')
+FrameObserver = require('../frame-observer')
 
 # Extracts individual keys from an object and returns a new one.
 extract = extract = (obj, keys...) ->
   ret = {}
   ret[key] = obj[key] for key in keys when obj.hasOwnProperty(key)
   ret
-
-
-# Find difference of two arrays
-difference = (arrayA, arrayB) ->
-  arrayA.filter (x) -> !arrayB.includes(x)
 
 # Class for establishing a messaging connection to the parent sidebar as well
 # as keeping the annotation state in sync with the sidebar application, this
@@ -35,8 +29,7 @@ module.exports = class CrossFrame extends Plugin
 
     opts = extract(options, 'on', 'emit')
     annotationSync = new AnnotationSync(bridge, opts)
-
-    handledFrames = []
+    frameObserver = new FrameObserver(elem)
 
     this.pluginInit = ->
       onDiscoveryCallback = (source, origin, token) ->
@@ -44,13 +37,14 @@ module.exports = class CrossFrame extends Plugin
       discovery.startDiscovery(onDiscoveryCallback)
 
       if options.enableMultiFrameSupport
-        _setupFrameDetection()
+        frameObserver.observe(_injectToFrame, _iframeUnloaded);
 
     this.destroy = ->
       # super doesnt work here :(
       Plugin::destroy.apply(this, arguments)
       bridge.destroy()
       discovery.stopDiscovery()
+      frameObserver.disconnect()
 
     this.sync = (annotations, cb) ->
       annotationSync.sync(annotations, cb)
@@ -64,34 +58,10 @@ module.exports = class CrossFrame extends Plugin
     this.onConnect = (fn) ->
       bridge.onConnect(fn)
 
-    _setupFrameDetection = ->
-      _discoverOwnFrames()
-
-      # Listen for DOM mutations, to know when frames are added / removed
-      observer = new MutationObserver(debounce(_discoverOwnFrames, 300, leading: true))
-      observer.observe(elem, {childList: true, subtree: true});
-
-    _discoverOwnFrames = ->
-      frames = FrameUtil.findFrames(elem)
-      for frame in frames
-        if frame not in handledFrames
-          _handleFrame(frame)
-          handledFrames.push(frame)
-
-      for frame, i in difference(handledFrames, frames)
-        _iframeUnloaded(frame)
-        delete handledFrames[i]
-
     _injectToFrame = (frame) ->
       if !FrameUtil.hasHypothesis(frame)
-        FrameUtil.injectHypothesis(frame, options.embedScriptUrl)
-        frame.contentWindow.addEventListener 'unload', ->
-          _iframeUnloaded(frame)
-
-    _handleFrame = (frame) ->
-      if !FrameUtil.isAccessible(frame) then return
-      FrameUtil.isLoaded frame, () ->
-        _injectToFrame(frame)
+        FrameUtil.isLoaded frame, () ->
+          FrameUtil.injectHypothesis(frame, options.embedScriptUrl)
 
     _iframeUnloaded = (frame) ->
       # TODO: Bridge call here not yet implemented, placeholder for now

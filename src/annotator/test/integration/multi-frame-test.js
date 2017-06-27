@@ -1,7 +1,9 @@
 'use strict';
 
 var proxyquire = require('proxyquire');
-var isLoaded = require('../../util/frame-util.js').isLoaded;
+var isLoaded = require('../../util/frame-util').isLoaded;
+
+var FRAME_ADD_WAIT = require('../../frame-observer').DEBOUNCE_WAIT + 10;
 
 describe('CrossFrame multi-frame scenario', function () {
   var fakeAnnotationSync;
@@ -143,7 +145,7 @@ describe('CrossFrame multi-frame scenario', function () {
             'expected dynamically added frame to be modified');
           resolve();
         });
-      }, 0);
+      }, FRAME_ADD_WAIT);
     });
   });
 
@@ -166,6 +168,77 @@ describe('CrossFrame multi-frame scenario', function () {
           resolve();
         }, 0);
       }, 0);
+    });
+  });
+
+  it('detects a frame dynamically removed, and added again', function () {
+    // Create a frame before initializing
+    var frame = document.createElement('iframe');
+    container.appendChild(frame);
+
+    // Now initialize
+    crossFrame.pluginInit();
+
+    return new Promise(function (resolve) {
+
+      isLoaded(frame, function () {
+        assert(frame.contentDocument.body.hasChildNodes(),
+          'expected initial frame to be modified');
+
+        frame.remove();
+
+        // Yield to let the DOM and CrossFrame catch up
+        setTimeout(function () {
+          // Add the frame again
+          container.appendChild(frame);
+
+          // Yield again
+          setTimeout(function () {
+            isLoaded(frame, function () {
+              assert(frame.contentDocument.body.hasChildNodes(),
+                'expected dynamically added frame to be modified');
+              resolve();
+            });
+          }, FRAME_ADD_WAIT);
+        }, 0);
+      });
+    });
+  });
+
+  it('detects a frame dynamically added, removed, and added again', function () {
+
+    // Initialize with no initial frame
+    crossFrame.pluginInit();
+
+    // Add a frame to the DOM
+    var frame = document.createElement('iframe');
+    container.appendChild(frame);
+
+    return new Promise(function (resolve) {
+      // Yield to let the DOM and CrossFrame catch up
+      setTimeout(function () {
+        isLoaded(frame, function () {
+          assert(frame.contentDocument.body.hasChildNodes(),
+            'expected dynamically added frame to be modified');
+
+          frame.remove();
+
+          // Yield again
+          setTimeout(function () {
+            // Add the frame again
+            container.appendChild(frame);
+
+            // Yield
+            setTimeout(function () {
+              isLoaded(frame, function () {
+                assert(frame.contentDocument.body.hasChildNodes(),
+                  'expected dynamically added frame to be modified');
+                resolve();
+              });
+            }, FRAME_ADD_WAIT);
+          }, 0);
+        });
+      }, FRAME_ADD_WAIT);
     });
   });
 
