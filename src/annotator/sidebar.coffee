@@ -190,3 +190,9 @@ module.exports = class Sidebar extends Host
 
   isOpen: ->
     !@frame.hasClass('annotator-collapsed')
+
+  setAllVisibleHighlights: (shouldShowHighlights) ->
+    @crossframe.call('setVisibleHighlights', shouldShowHighlights)
+
+    # Let the Toolbar know about this event
+    this.publish 'setVisibleHighlights', shouldShowHighlights

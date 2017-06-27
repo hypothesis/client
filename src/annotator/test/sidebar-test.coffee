@@ -243,3 +243,13 @@ describe 'Sidebar', ->
       sidebar.hide()
 
       assert.isFalse sidebar.visibleHighlights
+
+  describe '#setAllVisibleHighlights', ->
+
+    it 'sets the state through crossframe and emits', ->
+      sidebar = createSidebar({})
+      sandbox.stub(sidebar, 'publish')
+      sidebar.setAllVisibleHighlights(true)
+      assert.calledWith(fakeCrossFrame.call, 'setVisibleHighlights', true)
+      assert.calledWith(sidebar.publish, 'setVisibleHighlights', true)
+
