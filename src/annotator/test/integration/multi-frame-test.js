@@ -3,7 +3,7 @@
 var proxyquire = require('proxyquire');
 var isLoaded = require('../../util/frame-util').isLoaded;
 
-var FRAME_ADD_WAIT = require('../../frame-observer').DEBOUNCE_WAIT + 10;
+var FRAME_DEBOUNCE_WAIT = require('../../frame-observer').DEBOUNCE_WAIT + 10;
 
 describe('CrossFrame multi-frame scenario', function () {
   var fakeAnnotationSync;
@@ -15,6 +15,10 @@ describe('CrossFrame multi-frame scenario', function () {
   var options;
 
   var sandbox = sinon.sandbox.create();
+
+  var waitForFrameObserver = function(cb){
+    return setTimeout(cb, FRAME_DEBOUNCE_WAIT);
+  };
 
   beforeEach(function () {
     fakeBridge = {
@@ -139,13 +143,13 @@ describe('CrossFrame multi-frame scenario', function () {
 
     return new Promise(function (resolve) {
       // Yield to let the DOM and CrossFrame catch up
-      setTimeout(function () {
+      waitForFrameObserver(function () {
         isLoaded(frame, function () {
           assert(frame.contentDocument.body.hasChildNodes(),
             'expected dynamically added frame to be modified');
           resolve();
         });
-      }, FRAME_ADD_WAIT);
+      });
     });
   });
 
@@ -159,15 +163,15 @@ describe('CrossFrame multi-frame scenario', function () {
 
     return new Promise(function (resolve) {
       // Yield to let the DOM and CrossFrame catch up
-      setTimeout(function () {
+      waitForFrameObserver(function () {
         frame.remove();
 
         // Yield again
-        setTimeout(function () {
+        waitForFrameObserver(function () {
           assert.calledWith(fakeBridge.call, 'destroyFrame');
           resolve();
-        }, 0);
-      }, 0);
+        });
+      });
     });
   });
 
@@ -188,19 +192,21 @@ describe('CrossFrame multi-frame scenario', function () {
         frame.remove();
 
         // Yield to let the DOM and CrossFrame catch up
-        setTimeout(function () {
+        waitForFrameObserver(function () {
+
           // Add the frame again
           container.appendChild(frame);
 
           // Yield again
-          setTimeout(function () {
+          waitForFrameObserver(function () {
+
             isLoaded(frame, function () {
               assert(frame.contentDocument.body.hasChildNodes(),
                 'expected dynamically added frame to be modified');
               resolve();
             });
-          }, FRAME_ADD_WAIT);
-        }, 0);
+          });
+        });
       });
     });
   });
@@ -216,7 +222,7 @@ describe('CrossFrame multi-frame scenario', function () {
 
     return new Promise(function (resolve) {
       // Yield to let the DOM and CrossFrame catch up
-      setTimeout(function () {
+      waitForFrameObserver(function () {
         isLoaded(frame, function () {
           assert(frame.contentDocument.body.hasChildNodes(),
             'expected dynamically added frame to be modified');
@@ -224,21 +230,21 @@ describe('CrossFrame multi-frame scenario', function () {
           frame.remove();
 
           // Yield again
-          setTimeout(function () {
+          waitForFrameObserver(function () {
             // Add the frame again
             container.appendChild(frame);
 
             // Yield
-            setTimeout(function () {
+            waitForFrameObserver(function () {
               isLoaded(frame, function () {
                 assert(frame.contentDocument.body.hasChildNodes(),
                   'expected dynamically added frame to be modified');
                 resolve();
               });
-            }, FRAME_ADD_WAIT);
-          }, 0);
+            });
+          });
         });
-      }, FRAME_ADD_WAIT);
+      });
     });
   });
 
