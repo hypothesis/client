@@ -12,20 +12,21 @@ function hasHypothesis (iframe) {
 }
 
 // Inject embed.js into the iframe
-function injectHypothesis (iframe, scriptUrl) {
-  var config = document.createElement('script');
-  config.className = 'js-hypothesis-config';
-  config.type = 'application/json';
-  config.innerText = '{"enableMultiFrameSupport": true, "subFrameInstance": true}';
+function injectHypothesis (iframe, scriptUrl, config) {
+  var configElement = document.createElement('script');
+  configElement.className = 'js-hypothesis-config';
+  configElement.type = 'application/json';
+  var configObject = Object.assign({}, config, {subFrameInstance: true});
+  configElement.innerText = JSON.stringify(configObject);
 
   var src = scriptUrl;
-  var embed = document.createElement('script');
-  embed.className = 'js-hypothesis-embed';
-  embed.async = true;
-  embed.src = src;
+  var embedElement = document.createElement('script');
+  embedElement.className = 'js-hypothesis-embed';
+  embedElement.async = true;
+  embedElement.src = src;
 
-  iframe.contentDocument.body.appendChild(config);
-  iframe.contentDocument.body.appendChild(embed);
+  iframe.contentDocument.body.appendChild(configElement);
+  iframe.contentDocument.body.appendChild(embedElement);
 }
 
 // Check if we can access this iframe's document
