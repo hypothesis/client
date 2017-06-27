@@ -28,9 +28,9 @@ module.exports = class Host extends Guest
       JSON.stringify(Object.assign({}, config, {sidebarAppUrl: undefined, pluginClasses: undefined }))
     )
     if config.sidebarAppUrl and '?' in config.sidebarAppUrl
-      config.sidebarAppUrl += '&' + configParam
+      sidebarAppSrc = config.sidebarAppUrl + '&' + configParam
     else
-      config.sidebarAppUrl += '?' + configParam
+      sidebarAppSrc = config.sidebarAppUrl + '?' + configParam
 
     # Create the iframe
     app = $('<iframe></iframe>')
@@ -38,7 +38,7 @@ module.exports = class Host extends Guest
     # enable media in annotations to be shown fullscreen
     .attr('allowfullscreen', '')
     .attr('seamless', '')
-    .attr('src', config.sidebarAppUrl)
+    .attr('src', sidebarAppSrc)
     .addClass('h-sidebar-iframe')
 
     @frame = $('<div></div>')
