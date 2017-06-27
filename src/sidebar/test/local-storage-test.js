@@ -3,6 +3,28 @@
 var angular = require('angular');
 var service = require('../local-storage');
 
+function windowWithLocalStoragePropertyThatThrows() {
+  var win = {};
+  Object.defineProperty(win, 'localStorage', {
+    get() {
+      throw Error('denied');
+    },
+  });
+  return win;
+}
+
+function windowWithLocalStorageMethodsThatThrow() {
+  var throwErr = sinon.stub.throws(new Error('Denied'));
+
+  return {
+    localStorage: {
+      getItem: throwErr,
+      removeItem: throwErr,
+      setItem: throwErr,
+    },
+  };
+}
+
 describe('sidebar.localStorage', () => {
   var fakeWindow;
 
@@ -11,64 +33,48 @@ describe('sidebar.localStorage', () => {
       .service('localStorage', service)
   );
 
-  context('when accessing localStorage throws an Error', () => {
-    it('returns the fallback implementation', () => {
-      var badWindow = {};
-      var fakeWindow = {};
+  [
+    windowWithLocalStorageMethodsThatThrow(),
+    windowWithLocalStoragePropertyThatThrows(),
+  ].forEach(($window) => {
+    context('when browser localStorage is *not* accessible', () => {
+      var localStorage = null;
+      var key = null;
 
-      Object.defineProperty(badWindow, 'localStorage', {
-        get: () => {
-          throw Error('denied');
-        },
+      beforeEach(() => {
+        angular.mock.module('h', {
+          $window,
+        });
       });
 
-      var prototypes = [badWindow, fakeWindow]
-          .map(service)
-          .map(Object.getPrototypeOf)
-      ;
-      assert.strictEqual(prototypes[0], prototypes[1]);
-    });
-  });
+      beforeEach(angular.mock.inject((_localStorage_) => {
+        localStorage = _localStorage_;
+        key = 'test.memory.key';
+      }));
 
-  context('when browser localStorage is *not* accessible', () => {
-    var localStorage = null;
-    var key = null;
-
-    beforeEach(() => {
-      angular.mock.module('h', {
-        $window: {
-          localStorage: {},
-        },
+      it('sets/gets Item', () => {
+        var value = 'What shall we do with a drunken sailor?';
+        localStorage.setItem(key, value);
+        var actual = localStorage.getItem(key);
+        assert.equal(value, actual);
       });
-    });
 
-    beforeEach(angular.mock.inject((_localStorage_) => {
-      localStorage = _localStorage_;
-      key = 'test.memory.key';
-    }));
+      it('removes item', () => {
+        localStorage.setItem(key, '');
+        localStorage.removeItem(key);
+        var result = localStorage.getItem(key);
+        assert.isNull(result);
+      });
 
-    it('sets/gets Item', () => {
-      var value = 'What shall we do with a drunken sailor?';
-      localStorage.setItem(key, value);
-      var actual = localStorage.getItem(key);
-      assert.equal(value, actual);
-    });
+      it('sets/gets Object', () => {
+        var data = {'foo': 'bar'};
+        localStorage.setObject(key, data);
+        var stringified = localStorage.getItem(key);
+        assert.equal(stringified, JSON.stringify(data));
 
-    it('removes item', () => {
-      localStorage.setItem(key, '');
-      localStorage.removeItem(key);
-      var result = localStorage.getItem(key);
-      assert.isNull(result);
-    });
-
-    it('sets/gets Object', () => {
-      var data = {'foo': 'bar'};
-      localStorage.setObject(key, data);
-      var stringified = localStorage.getItem(key);
-      assert.equal(stringified, JSON.stringify(data));
-
-      var actual = localStorage.getObject(key);
-      assert.deepEqual(actual, data);
+        var actual = localStorage.getObject(key);
+        assert.deepEqual(actual, data);
+      });
     });
   });
 
