@@ -43,7 +43,7 @@ function isValid (iframe) {
   return iframe.className !== 'h-sidebar-iframe';
 }
 
-function isReady (iframe, callback) {
+function isDocumentReady (iframe, callback) {
   if (iframe.contentDocument.readyState === 'loading') {
     iframe.contentDocument.addEventListener('DOMContentLoaded', function () {
       callback();
@@ -70,5 +70,5 @@ module.exports = {
   isAccessible: isAccessible,
   isValid: isValid,
   isLoaded: isLoaded,
-  isReady: isReady,
+  isDocumentReady: isDocumentReady,
 };

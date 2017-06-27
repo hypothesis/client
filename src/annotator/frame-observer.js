@@ -38,7 +38,7 @@ class FrameObserver {
 
   _addFrame (frame) {
     if (FrameUtil.isAccessible(frame)) {
-      FrameUtil.isReady(frame, () => {
+      FrameUtil.isDocumentReady(frame, () => {
         frame.contentWindow.addEventListener('unload', () => {
           this._removeFrame(frame);
         });
