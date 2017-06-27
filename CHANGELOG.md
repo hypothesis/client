@@ -4,6 +4,13 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+### Changed
+
+- Fix failure to start when browser blocks access to localStorage
+  ([#464](https://github.com/hypothesis/client/pull/464)).
+
 ## [1.24.0] - 2017-06-26
 
 ### Changed
