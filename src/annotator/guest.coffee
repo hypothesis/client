@@ -92,7 +92,7 @@ module.exports = class Guest extends Delegator
     this.addPlugin('CrossFrame', cfOptions)
     @crossframe = this.plugins.CrossFrame
 
-    @crossframe.onConnect(=> this.publish('panelReady'))
+    @crossframe.onConnect(=> this._setupInitialState(config))
     this._connectAnnotationSync(@crossframe)
     this._connectAnnotationUISync(@crossframe)
 
@@ -134,6 +134,10 @@ module.exports = class Guest extends Delegator
 
     return Promise.all([metadataPromise, uriPromise]).then ([metadata, href]) ->
       return {uri: normalizeURI(href, baseURI), metadata}
+
+  _setupInitialState: (config) ->
+    this.publish('panelReady')
+    this.setVisibleHighlights(config.showHighlights == 'always')
 
   _connectAnnotationSync: (crossframe) ->
     this.subscribe 'annotationDeleted', (annotation) =>

@@ -51,9 +51,6 @@ module.exports = class Host extends Guest
     app.appendTo(@frame)
 
     this.on 'panelReady', =>
-      # Initialize tool state.
-      this.setVisibleHighlights(config.showHighlights == 'always')
-
       # Show the UI
       @frame.css('display', '')
 
