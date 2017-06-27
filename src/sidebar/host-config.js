@@ -16,7 +16,7 @@ function hostPageConfig(window) {
   var paramWhiteList = [
     // Direct-linked annotation ID
     'annotations',
-                        
+
     // Default query passed by url
     'query',
 
@@ -31,6 +31,10 @@ function hostPageConfig(window) {
     'showHighlights',
     'services',
     'branding',
+
+    // OAuth feature flag override.
+    // This should be removed once OAuth is enabled for first party accounts.
+    'oauthEnabled',
   ];
 
   return Object.keys(config).reduce(function (result, key) {

@@ -15,6 +15,7 @@ describe('hostPageConfig', function () {
     var window_ = fakeWindow({
       annotations: '1234',
       appType: 'bookmarklet',
+      oauthEnabled: true,
       openSidebar: true,
       openLoginForm: true,
       showHighlights: true,
@@ -26,6 +27,7 @@ describe('hostPageConfig', function () {
     assert.deepEqual(hostPageConfig(window_), {
       annotations: '1234',
       appType: 'bookmarklet',
+      oauthEnabled: true,
       openSidebar: true,
       openLoginForm: true,
       showHighlights: true,
