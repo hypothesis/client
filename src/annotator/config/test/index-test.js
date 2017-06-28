@@ -94,6 +94,7 @@ describe('annotator.config.index', function() {
       var settings = {
         'openLoginForm': 'OPEN_LOGIN_FORM_SETTING',
         'openSidebar': 'OPEN_SIDEBAR_SETTING',
+        'oauthEnabled': true,
         'branding': 'BRANDING_SETTING',
         'services': 'SERVICES_SETTING',
       };

@@ -23,6 +23,9 @@ function configFrom(window_) {
     enableMultiFrameSupport: settings.hostPageSetting('enableMultiFrameSupport'),
     embedScriptUrl: settings.hostPageSetting('embedScriptUrl'),
     subFrameInstance: settings.hostPageSetting('subFrameInstance'),
+
+    // Temporary feature flag override for 1st-party OAuth
+    oauthEnabled: settings.hostPageSetting('oauthEnabled'),
   };
 }
 
