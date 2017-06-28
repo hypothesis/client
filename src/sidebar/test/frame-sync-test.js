@@ -39,6 +39,12 @@ var fixtures = {
       link: [{href: 'http://example.org/paper.pdf'}, {href:'urn:1234'}],
     },
   },
+
+  // The entry in the list of frames currently connected
+  framesListEntry: {
+    uri: 'http://example.com',
+    isAnnotationFetchComplete: true,
+  },
 };
 
 describe('FrameSync', function () {
@@ -55,9 +61,10 @@ describe('FrameSync', function () {
   beforeEach(function () {
     fakeAnnotationUI = fakeStore({annotations: []}, {
       connectFrame: sinon.stub(),
+      destroyFrame: sinon.stub(),
       findIDsForTags: sinon.stub(),
       focusAnnotations: sinon.stub(),
-      frames: sinon.stub().returns([{uri: 'http://example.com', isAnnotationFetchComplete: true }]),
+      frames: sinon.stub().returns([fixtures.framesListEntry]),
       selectAnnotations: sinon.stub(),
       selectTab: sinon.stub(),
       toggleSelectedAnnotations: sinon.stub(),
@@ -211,6 +218,16 @@ describe('FrameSync', function () {
         metadata: frameInfo.metadata,
         uri: frameInfo.uri,
       });
+    });
+  });
+
+  context('when a frame is destroyed', function () {
+    var frameUri = fixtures.framesListEntry.uri;
+
+    it("adds the page's metadata to the frames list", function () {
+      fakeBridge.emit('destroyFrame', frameUri);
+
+      assert.calledWith(fakeAnnotationUI.destroyFrame, fixtures.framesListEntry);
     });
   });
 
