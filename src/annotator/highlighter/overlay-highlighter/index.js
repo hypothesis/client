@@ -41,9 +41,15 @@ module.exports = {
     return highlight.getHighlightReferences();
   },
 
-  removeHighlights: () => {
-    // eslint-disable-next-line no-console
-    console.log('removeHighlights not implemented');
+  removeHighlights: (highlights) => {
+    // Note for overlay highlighting we are deleting the
+    // <rect /> elements here and could eventually remove
+    // all of them for a range. This will leave <svg> and <g>
+    // elements remaining. At this point, those artifacts
+    // should have no effects by staying around after.
+    highlights.forEach((el)=>{
+      el.remove();
+    });
   },
 
   onHighlightsChanged: (cb) => {
