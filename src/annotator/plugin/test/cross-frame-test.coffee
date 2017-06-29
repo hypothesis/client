@@ -16,6 +16,7 @@ describe 'CrossFrame', ->
 
   createCrossFrame = (options) ->
     defaults =
+      config: {}
       on: sandbox.stub()
       emit: sandbox.stub()
     element = document.createElement('div')

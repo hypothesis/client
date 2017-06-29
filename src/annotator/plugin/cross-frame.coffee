@@ -22,6 +22,7 @@ module.exports = class CrossFrame extends Plugin
   constructor: (elem, options) ->
     super
 
+    config = options.config
     opts = extract(options, 'server')
     discovery = new Discovery(window, opts)
 
@@ -36,7 +37,7 @@ module.exports = class CrossFrame extends Plugin
         bridge.createChannel(source, origin, token)
       discovery.startDiscovery(onDiscoveryCallback)
 
-      if options.enableMultiFrameSupport
+      if config.enableMultiFrameSupport
         frameObserver.observe(_injectToFrame, _iframeUnloaded);
 
     this.destroy = ->
@@ -60,8 +61,11 @@ module.exports = class CrossFrame extends Plugin
 
     _injectToFrame = (frame) ->
       if !FrameUtil.hasHypothesis(frame)
+        # Take the embed script location from the config
+        # until an alternative solution comes around.
+        embedScriptUrl = config.embedScriptUrl
         FrameUtil.isLoaded frame, () ->
-          FrameUtil.injectHypothesis(frame, options.embedScriptUrl)
+          FrameUtil.injectHypothesis(frame, embedScriptUrl, config)
 
     _iframeUnloaded = (frame) ->
       # TODO: Bridge call here not yet implemented, placeholder for now

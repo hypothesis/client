@@ -262,5 +262,11 @@ describe('FrameSync', function () {
 
       assert.calledWith(fakeBridge.call, 'hideSidebar');
     });
+
+    it ('calls "setVisibleHighlights"', function() {
+      fakeBridge.emit('setVisibleHighlights');
+
+      assert.calledWith(fakeBridge.call, 'setVisibleHighlights');
+    });
   });
 });
