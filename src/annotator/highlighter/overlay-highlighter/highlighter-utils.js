@@ -21,5 +21,4 @@ module.exports = {
     el.style.height = `${coords.height}px`;
     el.style.width = `${coords.width}px`;
   },
-
 };

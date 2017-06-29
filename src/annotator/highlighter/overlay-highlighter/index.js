@@ -35,30 +35,10 @@ module.exports = {
 
     highlight.render();
 
-    // save highlight reference so we can redraw
-    _highlights.push(highlight);
-
     return highlight.getHighlightReferences();
-  },
-
-  removeHighlights: (highlights) => {
-    // Note for overlay highlighting we are deleting the
-    // <rect /> elements here and could eventually remove
-    // all of them for a range. This will leave <svg> and <g>
-    // elements remaining. At this point, those artifacts
-    // should have no effects by staying around after.
-    highlights.forEach((el)=>{
-      el.remove();
-    });
   },
 
   onHighlightsChanged: (cb) => {
     _highlightsChangedListeners.push(cb);
-  },
-
-  toggleFocusForHighlights: (highlights = [], focusOn = false) => {
-    highlights.forEach((el)=>{
-      el.classList.toggle('annotator-hl-focused', focusOn);
-    });
   },
 };

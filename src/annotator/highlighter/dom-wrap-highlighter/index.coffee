@@ -4,11 +4,11 @@ $ = require('jquery')
 # element of the specified class and returns the highlight Elements.
 #
 # normedRange - A NormalizedRange to be highlighted.
-# cssClass - A CSS class to use for the highlight (default: 'annotator-hl')
 #
 # Returns an array of highlight Elements.
-exports.highlightRange = (normedRange, cssClass='annotator-hl') ->
+exports.highlightRange = (normedRange) ->
   white = /^\s*$/
+  cssClass = 'annotator-hl'
 
   # A custom element name is used here rather than `<span>` to reduce the
   # likelihood of highlights being hidden by page styling.
@@ -22,13 +22,3 @@ exports.highlightRange = (normedRange, cssClass='annotator-hl') ->
   nodes = $(normedRange.textNodes()).filter((i) -> not white.test @nodeValue)
 
   return nodes.wrap(hl).parent().toArray()
-
-
-exports.removeHighlights = (highlights) ->
-  for h in highlights when h.parentNode?
-    $(h).replaceWith(h.childNodes)
-
-exports.onHighlightsChanged = () -> {}
-
-exports.toggleFocusForHighlights = (highlights, toggle) ->
-  $(highlights).toggleClass('annotator-hl-focused', toggle)

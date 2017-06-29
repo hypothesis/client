@@ -2,17 +2,6 @@
 
 const highlighterUtils = require('./highlighter-utils');
 
-
-/**
- * issues to solve:
- *  - Client is heavily dependent on using the DOM to interact and lookup highlights
- *  - highlights are created using the client rects of the ranges.
- *      The highlight elements are stored as anchors elsewhere. The client
- *      rects change when the page is resized. So the number of rects decreases
- *      and thus the # of dom nodes. Since the highlights refrences are cached
- *      that means they become hard to account for
- */
-
 class OverlayHighlight {
 
   constructor(normedRange, target = document.body){
@@ -98,7 +87,6 @@ class OverlayHighlight {
   }
 
   getHighlightReferences() {
-
 
     return this.highlightElementRefs.map((ref)=>{
 
