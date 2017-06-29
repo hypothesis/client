@@ -20,7 +20,7 @@ scrollToClosest = (anchors, direction) ->
       return acc
 
     {start, next} = acc
-    rect = highlighter.getBoundingClientRect(anchor.highlights)
+    rect = anchor.range.getBoundingClientRect()
 
     # Ignore if it's not in the right direction.
     if (dir is 1 and rect.top >= BUCKET_TOP_THRESHOLD)
@@ -113,7 +113,7 @@ module.exports = class BucketBar extends Plugin
       unless anchor.highlights?.length
         return points
 
-      rect = highlighter.getBoundingClientRect(anchor.highlights)
+      rect = anchor.range.getBoundingClientRect()
       x = rect.top
       h = rect.bottom - rect.top
 
