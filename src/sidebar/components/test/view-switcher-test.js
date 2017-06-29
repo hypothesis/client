@@ -30,7 +30,7 @@ describe('viewSwitcher', function () {
         totalNotes: '456',
       });
 
-      var tabs = elem[0].querySelectorAll('a');
+      var tabs = elem[0].querySelectorAll('button');
 
       assert.include(tabs[0].textContent, 'Annotations');
       assert.include(tabs[1].textContent, 'Notes');
@@ -39,24 +39,24 @@ describe('viewSwitcher', function () {
     });
 
     it('should display annotations tab as selected', function () {
-      var elem = util.createDirective(document, 'selectionTabs', {
+      var elem = util.createDirective(document, 'viewSwitcher', {
         selectedTab: 'annotation',
         totalAnnotations: '123',
         totalNotes: '456',
       });
 
-      var tabs = elem[0].querySelectorAll('a');
+      var tabs = elem[0].querySelectorAll('button');
       assert.isTrue(tabs[0].classList.contains('is-selected'));
     });
 
     it('should display notes tab as selected', function () {
-      var elem = util.createDirective(document, 'selectionTabs', {
+      var elem = util.createDirective(document, 'viewSwitcher', {
         selectedTab: 'note',
         totalAnnotations: '123',
         totalNotes: '456',
       });
 
-      var tabs = elem[0].querySelectorAll('a');
+      var tabs = elem[0].querySelectorAll('button');
       assert.isTrue(tabs[1].classList.contains('is-selected'));
     });
   });
