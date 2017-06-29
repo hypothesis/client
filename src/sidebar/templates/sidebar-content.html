@@ -1,5 +1,5 @@
 <selection-tabs
-  ng-if="!vm.search.query() && vm.selectedAnnotationCount() === 0"
+  ng-if="!vm.viewSwitcherEnabled && !vm.search.query() && vm.selectedAnnotationCount() === 0"
   is-waiting-to-anchor-annotations="vm.waitingToAnchorAnnotations"
   is-loading="vm.isLoading"
   selected-tab="vm.selectedTab"
@@ -7,6 +7,15 @@
   total-notes="vm.totalNotes"
   total-orphans="vm.totalOrphans">
 </selection-tabs>
+<view-switcher
+  ng-if="vm.viewSwitcherEnabled && !vm.search.query() && vm.selectedAnnotationCount() === 0"
+  is-waiting-to-anchor-annotations="vm.waitingToAnchorAnnotations"
+  is-loading="vm.isLoading"
+  selected-tab="vm.selectedTab"
+  total-annotations="vm.totalAnnotations"
+  total-notes="vm.totalNotes"
+  total-orphans="vm.totalOrphans">
+</view-switcher>
 
 <search-status-bar
   ng-show="!vm.isLoading()"

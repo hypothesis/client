@@ -55,6 +55,7 @@ function SidebarContentController(
       totalNotes: counts.notes,
       totalAnnotations: counts.annotations,
       totalOrphans: counts.orphans,
+      viewSwitcherEnabled: features.flagEnabled('view-switcher'),
       waitingToAnchorAnnotations: counts.anchoring > 0,
     });
   });
