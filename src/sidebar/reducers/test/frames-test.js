@@ -21,6 +21,19 @@ describe('frames reducer', function () {
     });
   });
 
+  describe('#destroyFrame', function () {
+    it('removes the frame from the list of connected frames', function () {
+      var frameList = [{uri: 'http://example.com'}, {uri: 'http://example.org'}];
+      var state = init();
+      frameList.forEach(function (frame) {
+        state = update(state, actions.connectFrame(frame));
+      });
+      assert.deepEqual(frames.frames(state), frameList);
+      var updatedState = update(state, actions.destroyFrame(frameList[0]));
+      assert.deepEqual(frames.frames(updatedState), [frameList[1]]);
+    });
+  });
+
   describe('#updateFrameAnnotationFetchStatus', function () {
     it('updates the isAnnotationFetchComplete status of the frame', function () {
       var frame = {

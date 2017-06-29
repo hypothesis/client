@@ -68,5 +68,4 @@ module.exports = class CrossFrame extends Plugin
           FrameUtil.injectHypothesis(frame, embedScriptUrl, config)
 
     _iframeUnloaded = (frame) ->
-      # TODO: Bridge call here not yet implemented, placeholder for now
       bridge.call('destroyFrame', frame.src);
