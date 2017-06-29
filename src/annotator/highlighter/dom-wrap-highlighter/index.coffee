@@ -29,3 +29,6 @@ exports.removeHighlights = (highlights) ->
     $(h).replaceWith(h.childNodes)
 
 exports.onHighlightsChanged = () -> {}
+
+exports.toggleFocusForHighlights = (highlights, toggle) ->
+  $(highlights).toggleClass('annotator-hl-focused', toggle)

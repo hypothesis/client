@@ -30,7 +30,6 @@ class OverlayHighlight {
     this.container.style.mixBlendMode = 'multiply';
 
     this.element = highlightEl;
-    this.element.setAttribute('fill', 'rgba(255, 255, 60, 0.3)');
 
     highlightContainer.appendChild(highlightEl);
 
@@ -76,6 +75,7 @@ class OverlayHighlight {
       el.setAttribute('y', rect.top - offset.top);
       el.setAttribute('height', rect.height);
       el.setAttribute('width', rect.width);
+      el.classList.add('annotator-hl');
       this.element.appendChild(el);
       return el;
     });
@@ -99,7 +99,7 @@ class OverlayHighlight {
 
   getHighlightReferences() {
 
-    
+
     return this.highlightElementRefs.map((ref)=>{
 
       // extend the element object to also include

@@ -49,4 +49,10 @@ module.exports = {
   onHighlightsChanged: (cb) => {
     _highlightsChangedListeners.push(cb);
   },
+
+  toggleFocusForHighlights: (highlights = [], focusOn = false) => {
+    highlights.forEach((el)=>{
+      el.classList.toggle('annotator-hl-focused', focusOn);
+    });
+  },
 };

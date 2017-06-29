@@ -230,13 +230,13 @@ module.exports = class BucketBar extends Plugin
         bucket = @tabs.index(event.currentTarget)
         for anchor in @annotator.anchors
           toggle = anchor in @buckets[bucket]
-          $(anchor.highlights).toggleClass('annotator-hl-focused', toggle)
+          highlighter.toggleFocusForHighlights(anchor.highlights, toggle)
 
       # Gets rid of them after
       .on 'mouseout', (event) =>
         bucket = @tabs.index(event.currentTarget)
         for anchor in @buckets[bucket]
-          $(anchor.highlights).removeClass('annotator-hl-focused')
+          highlighter.toggleFocusForHighlights(anchor.highlights, false)
 
       # Does one of a few things when a tab is clicked depending on type
       .on 'click', (event) =>

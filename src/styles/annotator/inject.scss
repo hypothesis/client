@@ -9,6 +9,7 @@ $base-font-size: 14px;
 .annotator-highlights-always-on {
   .annotator-hl {
     background-color: $highlight-color;
+    fill: $highlight-color;
 
     // cursor pointer gives mobile devices click
     // event support. Using the pointer:coarse gives
@@ -20,18 +21,22 @@ $base-font-size: 14px;
 
   .annotator-hl .annotator-hl {
     background-color: $highlight-color-second;
+    fill: $highlight-color-second;
   }
 
   .annotator-hl .annotator-hl .annotator-hl {
     background-color: $highlight-color-third;
+    fill: $highlight-color-third;
   }
 }
 
 .annotator-hl.annotator-hl-focused {
   background-color: $highlight-color-focus !important;
+  fill: $highlight-color-focus !important;
 
   .annotator-hl {
     background-color: transparent !important;
+    fill: transparent !important;
   }
 }
 
