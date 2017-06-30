@@ -4,6 +4,28 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+### Changed
+
+- Progress towards making the Hypothesis client able to annotate content inside
+  iframes
+  ([#457](https://github.com/hypothesis/client/pull/457),
+  [#469](https://github.com/hypothesis/client/pull/469),
+  [#472](https://github.com/hypothesis/client/pull/472),
+  [#467](https://github.com/hypothesis/client/pull/467)).
+
+- Progress towards using OAuth tokens, rather than cookies, to authenticate the
+  Hypothesis client to the Hypothesis API - allow "oauthEnabled" setting to be
+  overridden in client config
+  ([#470](https://github.com/hypothesis/client/pull/470)).
+
+- A UI enhancement: Replace "selection tabs" with "view switcher" (feature flagged)
+  ([#465](https://github.com/hypothesis/client/pull/465)).
+
+- Convert unicode service & tests to JavaScript
+  ([#475](https://github.com/hypothesis/client/pull/475)).
+
 ## [1.24.1] - 2017-06-27
 
 ### Changed
