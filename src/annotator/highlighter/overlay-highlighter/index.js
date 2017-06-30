@@ -35,6 +35,9 @@ module.exports = {
 
     highlight.render();
 
+    // save highlight reference so we can redraw on viewport changes
+    _highlights.push(highlight);
+
     return highlight.getHighlightReferences();
   },
 
