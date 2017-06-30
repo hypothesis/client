@@ -22,7 +22,7 @@ function configFrom(window_) {
     // Needed by the multi-frame feature for now
     enableMultiFrameSupport: settings.hostPageSetting('enableMultiFrameSupport'),
     embedScriptUrl: settings.hostPageSetting('embedScriptUrl'),
-    subFrameInstance: settings.hostPageSetting('subFrameInstance'),
+    subFrameIdentifier: settings.hostPageSetting('subFrameIdentifier'),
 
     // Temporary feature flag override for 1st-party OAuth
     oauthEnabled: settings.hostPageSetting('oauthEnabled'),

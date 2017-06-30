@@ -28,6 +28,7 @@ var fixtures = {
     metadata: {
       link: [],
     },
+    frameIdentifier: null,
   },
 
   // Response to the `getDocumentInfo` channel message for a frame displaying
@@ -38,10 +39,12 @@ var fixtures = {
       documentFingerprint: '1234',
       link: [{href: 'http://example.org/paper.pdf'}, {href:'urn:1234'}],
     },
+    frameIdentifier: null,
   },
 
   // The entry in the list of frames currently connected
   framesListEntry: {
+    id: 'abc',
     uri: 'http://example.com',
     isAnnotationFetchComplete: true,
   },
@@ -215,6 +218,7 @@ describe('FrameSync', function () {
       fakeBridge.emit('connect', fakeChannel);
 
       assert.calledWith(fakeAnnotationUI.connectFrame, {
+        id: frameInfo.frameIdentifier,
         metadata: frameInfo.metadata,
         uri: frameInfo.uri,
       });
@@ -222,10 +226,10 @@ describe('FrameSync', function () {
   });
 
   context('when a frame is destroyed', function () {
-    var frameUri = fixtures.framesListEntry.uri;
+    var frameId = fixtures.framesListEntry.id;
 
-    it("adds the page's metadata to the frames list", function () {
-      fakeBridge.emit('destroyFrame', frameUri);
+    it('removes the frame from the frames list', function () {
+      fakeBridge.emit('destroyFrame', frameId);
 
       assert.calledWith(fakeAnnotationUI.destroyFrame, fixtures.framesListEntry);
     });

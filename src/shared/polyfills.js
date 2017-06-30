@@ -2,6 +2,7 @@
 
 // ES2015 polyfills
 require('core-js/es6/promise');
+require('core-js/es6/map');
 require('core-js/es6/set');
 require('core-js/es6/symbol');
 require('core-js/fn/array/find');
