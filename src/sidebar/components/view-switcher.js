@@ -19,6 +19,14 @@ module.exports = {
       return features.flagEnabled('orphans_tab');
     };
 
+    this.showViewSwitcher = function() {
+      var frame = annotationUI.getState().frames[0];
+      if (frame && frame.isAnnotationFetchComplete) {
+        return true;
+      }
+      return false;
+    };
+
     this.showAnnotationsUnavailableMessage = function () {
       return this.selectedTab === this.TAB_ANNOTATIONS &&
         this.totalAnnotations === 0 &&
