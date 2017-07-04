@@ -220,8 +220,8 @@ describe('annotator.config.settingsFrom', function() {
       {
         describe: 'when the query contains URI escape sequences',
         it: 'decodes the escape sequences',
-        url: 'http://localhost:3000#annotations:query:foo%20bar',
-        returns: 'foo bar',
+        url: 'http://localhost:3000#annotations:query:user%3Ajsmith%20bar',
+        returns: 'user:jsmith bar',
       },
       {
         describe: "when there's an unrecognised URL fragment",
@@ -245,21 +245,12 @@ describe('annotator.config.settingsFrom', function() {
     });
 
     describe('when the URL contains an invalid fragment', function() {
-      var decodeURI;
-
-      beforeEach('make decodeURI throw an error', function() {
-        decodeURI = sinon.stub(window, 'decodeURI').throws();
-      });
-
-      afterEach('reset decodeURI', function() {
-        decodeURI.reset();
-      });
-
       it('returns null', function() {
-        // Note: we need a #annotations:query:* fragment here, not just a
-        // #annotations:* one or an unrecognised one, otherwise
-        // query() won't try to URI-decode the fragment.
-        var url = 'http://localhost:3000#annotations:query:abc123';
+        // An invalid escape sequence which will cause decodeURIComponent() to
+        // throw a URIError.
+        var invalidFrag = '%aaaaa';
+
+        var url = 'http://localhost:3000#annotations:query:' + invalidFrag;
 
         assert.isNull(settingsFrom(fakeWindow(url)).query);
       });

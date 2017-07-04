@@ -96,7 +96,7 @@ function settingsFrom(window_) {
       var queryFragmentMatch = window_.location.href.match(/#annotations:(query|q):(.+)$/i);
       if (queryFragmentMatch) {
         try {
-          return decodeURI(queryFragmentMatch[2]);
+          return decodeURIComponent(queryFragmentMatch[2]);
         } catch (err) {
           // URI Error should return the page unfiltered.
         }
