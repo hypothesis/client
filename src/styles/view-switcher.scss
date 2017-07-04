@@ -21,6 +21,10 @@
   background: $white;
   transition: background-color .1s linear;
 
+  // This fixes the tabs flashing gray for a moment each time you tap on one
+  // in iOS Safari.
+  -webkit-tap-highlight-color: rgba(0,0,0,0);
+
   border: 1px solid $gray-lighter;
 
   cursor: pointer;
