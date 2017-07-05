@@ -1,6 +1,8 @@
 $ = require('jquery')
 Plugin = require('../plugin')
 
+baseURI = require('document-base-uri')
+
 ###
 ** Adapted from:
 ** https://github.com/openannotation/annotator/blob/v1.2.x/src/plugin/document.coffee
@@ -24,7 +26,7 @@ module.exports = class Document extends Plugin
 # returns the primary URI for the document being annotated
 
   uri: =>
-    uri = decodeURIComponent document.location.href
+    uri = decodeURIComponent(this._getDocumentHref())
     for link in @metadata.link
       if link.rel == "canonical"
         uri = link.href
@@ -111,7 +113,7 @@ module.exports = class Document extends Plugin
 
   _getLinks: =>
 # we know our current location is a link for the document
-    @metadata.link = [href: document.location.href]
+    @metadata.link = [href: this._getDocumentHref()]
 
     # look for some relevant link relations
     for link in $("link")
@@ -168,3 +170,14 @@ module.exports = class Document extends Plugin
     d = document.createElement('a')
     d.href = url
     d.href
+
+# get the true URI record when it's masked via a different protocol.
+# this happens when an href is set with a uri using the 'blob:' protocol
+# but the document can set a different uri through a <base> tag.
+
+  _getDocumentHref: ->
+    href = document.location.href
+    if new URL(href).protocol != new URL(baseURI).protocol
+      # use the baseURI instead since it's likely what's intended
+      href = baseURI
+    return href
