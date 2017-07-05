@@ -51,7 +51,7 @@ $.noConflict(true)(function() {
     delete config.constructor;
   }
 
-  if (config.enableMultiFrameSupport && config.subFrameInstance) {
+  if (config.enableMultiFrameSupport && config.subFrameIdentifier) {
     Klass = Guest;
 
     // Other modules use this to detect if this

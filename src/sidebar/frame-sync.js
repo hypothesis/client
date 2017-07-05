@@ -124,9 +124,7 @@ function FrameSync($rootScope, $window, Discovery, annotationUI, bridge) {
       $rootScope.$broadcast(events.BEFORE_ANNOTATION_CREATED, annot);
     });
 
-    bridge.on('destroyFrame', function (uri) {
-      destroyFrame(uri);
-    });
+    bridge.on('destroyFrame', destroyFrame.bind(this));
 
     // Anchoring an annotation in the frame completed
     bridge.on('sync', function (events_) {
@@ -182,16 +180,17 @@ function FrameSync($rootScope, $window, Discovery, annotationUI, bridge) {
       $rootScope.$broadcast(events.FRAME_CONNECTED);
 
       annotationUI.connectFrame({
+        id: info.frameIdentifier,
         metadata: info.metadata,
         uri: info.uri,
       });
     });
   }
 
-  function destroyFrame(uri) {
+  function destroyFrame(frameIdentifier) {
     var frames = annotationUI.frames();
     var frameToDestroy = frames.find(function (frame) {
-      return frame.uri === uri;
+      return frame.id === frameIdentifier;
     });
     if (frameToDestroy) {
       annotationUI.destroyFrame(frameToDestroy);

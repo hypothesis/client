@@ -31,6 +31,7 @@ module.exports = class CrossFrame extends Plugin
     opts = extract(options, 'on', 'emit')
     annotationSync = new AnnotationSync(bridge, opts)
     frameObserver = new FrameObserver(elem)
+    frameIdentifiers = new Map()
 
     this.pluginInit = ->
       onDiscoveryCallback = (source, origin, token) ->
@@ -64,8 +65,14 @@ module.exports = class CrossFrame extends Plugin
         # Take the embed script location from the config
         # until an alternative solution comes around.
         embedScriptUrl = config.embedScriptUrl
+
         FrameUtil.isLoaded frame, () ->
-          FrameUtil.injectHypothesis(frame, embedScriptUrl, config)
+          subFrameIdentifier = discovery._generateToken()
+          frameIdentifiers.set(frame, subFrameIdentifier)
+          injectedConfig = Object.assign({}, config, {subFrameIdentifier})
+
+          FrameUtil.injectHypothesis(frame, embedScriptUrl, injectedConfig)
 
     _iframeUnloaded = (frame) ->
-      bridge.call('destroyFrame', frame.src);
+      bridge.call('destroyFrame', frameIdentifiers.get(frame))
+      frameIdentifiers.delete(frame)

@@ -53,6 +53,7 @@ module.exports = class Guest extends Delegator
   plugins: null
   anchors: null
   visibleHighlights: false
+  frameIdentifier: null
 
   html:
     adder: '<hypothesis-adder></hypothesis-adder>'
@@ -81,6 +82,10 @@ module.exports = class Guest extends Delegator
 
     this.plugins = {}
     this.anchors = []
+
+    # Set the frame identifier if it's available.
+    # The "top" guest instance will have this as null since it's in a top frame not a sub frame
+    this.frameIdentifier = config.subFrameIdentifier || null
 
     cfOptions =
       config: config
@@ -132,8 +137,12 @@ module.exports = class Guest extends Delegator
       link: [{href: decodeURIComponent(window.location.href)}]
     })
 
-    return Promise.all([metadataPromise, uriPromise]).then ([metadata, href]) ->
-      return {uri: normalizeURI(href, baseURI), metadata}
+    return Promise.all([metadataPromise, uriPromise]).then ([metadata, href]) =>
+      return {
+        uri: normalizeURI(href, baseURI),
+        metadata,
+        frameIdentifier: this.frameIdentifier
+      }
 
   _setupInitialState: (config) ->
     this.publish('panelReady')

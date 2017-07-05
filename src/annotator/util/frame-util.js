@@ -16,8 +16,7 @@ function injectHypothesis (iframe, scriptUrl, config) {
   var configElement = document.createElement('script');
   configElement.className = 'js-hypothesis-config';
   configElement.type = 'application/json';
-  var configObject = Object.assign({}, config, {subFrameInstance: true});
-  configElement.innerText = JSON.stringify(configObject);
+  configElement.innerText = JSON.stringify(config);
 
   var src = scriptUrl;
   var embedElement = document.createElement('script');
