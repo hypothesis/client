@@ -165,7 +165,14 @@ module.exports = class Guest extends Delegator
     crossframe.on 'scrollToAnnotation', (tag) =>
       for anchor in @anchors when anchor.highlights?
         if anchor.annotation.$tag is tag
-          scrollIntoView(anchor.highlights[0])
+          event = new CustomEvent('scrollToRange', {
+            bubbles: true
+            cancelable: true
+            detail: anchor.range
+          })
+          defaultNotPrevented = @element[0].dispatchEvent(event)
+          if defaultNotPrevented
+            scrollIntoView(anchor.highlights[0])
 
     crossframe.on 'getDocumentInfo', (cb) =>
       this.getDocumentInfo()
