@@ -11,7 +11,17 @@ describe('viewSwitcher', function () {
   });
 
   beforeEach(function () {
-    var fakeAnnotationUI = {};
+    var fakeAnnotationUI = {
+      getState: sinon.stub().returns({
+        frames: [
+          {
+            // The view switcher only shows after the first batch of
+            // annotations have been fetched.
+            isAnnotationFetchComplete: true,
+          },
+        ],
+      }),
+    };
     var fakeFeatures = {
       flagEnabled: sinon.stub().returns(true),
     };

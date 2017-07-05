@@ -1,4 +1,4 @@
-<div class="view-switcher">
+<div class="view-switcher" ng-if="vm.showViewSwitcher()">
   <button class="view-switcher__tab"
           ng-class="{'is-selected': vm.selectedTab === vm.TAB_ANNOTATIONS}"
           h-on-touch="vm.selectTab(vm.TAB_ANNOTATIONS)">
