@@ -4,6 +4,26 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+### Changed
+
+- Fix view switcher flash on iOS
+  ([#482](https://github.com/hypothesis/client/pull/482)).
+
+- Fix decoding of the query section in "#annotations" fragments
+  ([#483](https://github.com/hypothesis/client/pull/483)).
+
+- Get document URL from `<base>` tag for iframes with `blob:` URLs
+  ([#474](https://github.com/hypothesis/client/pull/474)).
+
+- Improve handling of iframe removal when multiple iframes have
+  same `src` URL
+  ([#478](https://github.com/hypothesis/client/pull/478)).
+
+- Don't show view switcher until annotations received
+  ([#481](https://github.com/hypothesis/client/pull/481)).
+
 ## [1.25.0] - 2017-06-30
 
 ### Changed
