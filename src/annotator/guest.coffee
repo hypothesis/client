@@ -2,6 +2,7 @@ baseURI = require('document-base-uri')
 extend = require('extend')
 raf = require('raf')
 scrollIntoView = require('scroll-into-view')
+CustomEvent = require('custom-event')
 
 Delegator = require('./delegator')
 $ = require('jquery')

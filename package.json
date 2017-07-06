@@ -31,6 +31,7 @@
     "coffeeify": "^1.0.0",
     "commander": "^2.9.0",
     "core-js": "^1.2.5",
+    "custom-event": "^1.0.1",
     "diff": "^2.2.2",
     "diff-match-patch": "^1.0.0",
     "document-base-uri": "^1.0.0",
