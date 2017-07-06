@@ -214,6 +214,12 @@ function Adder(container, options) {
     top = Math.max(top, view.pageYOffset);
     top = Math.min(top, view.pageYOffset + view.innerHeight - height());
 
+    // Offset the adder position, to handle situations where the document is larger than the screen
+    var bodyOffset = document.body.getBoundingClientRect();
+    if (bodyOffset.left < 0) {
+      left = left - bodyOffset.left;
+    }
+
     return {top: top, left: left, arrowDirection: arrowDirection};
   };
 
