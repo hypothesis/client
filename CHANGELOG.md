@@ -4,6 +4,14 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+### Changed
+
+- Allow integrators to customize behavior of scrolling to
+  highlights by intercepting the "scrolltorange" event
+  ([#484](https://github.com/hypothesis/client/pull/484)).
+
 ## [1.26.0] - 2017-07-05
 
 ### Changed
