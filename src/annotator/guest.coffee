@@ -2,6 +2,7 @@ baseURI = require('document-base-uri')
 extend = require('extend')
 raf = require('raf')
 scrollIntoView = require('scroll-into-view')
+CustomEvent = require('custom-event')
 
 Delegator = require('./delegator')
 $ = require('jquery')
@@ -165,7 +166,14 @@ module.exports = class Guest extends Delegator
     crossframe.on 'scrollToAnnotation', (tag) =>
       for anchor in @anchors when anchor.highlights?
         if anchor.annotation.$tag is tag
-          scrollIntoView(anchor.highlights[0])
+          event = new CustomEvent('scrolltorange', {
+            bubbles: true
+            cancelable: true
+            detail: anchor.range
+          })
+          defaultNotPrevented = @element[0].dispatchEvent(event)
+          if defaultNotPrevented
+            scrollIntoView(anchor.highlights[0])
 
     crossframe.on 'getDocumentInfo', (cb) =>
       this.getDocumentInfo()

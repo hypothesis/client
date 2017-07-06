@@ -238,6 +238,36 @@ describe 'Guest', ->
         assert.called(scrollIntoView)
         assert.calledWith(scrollIntoView, highlight[0])
 
+      context 'when dispatching the "scrolltorange" event', ->
+
+        it 'emits with the range', ->
+          highlight = $('<span></span>')
+          guest = createGuest()
+          fakeRange = sinon.stub()
+          guest.anchors = [
+            {annotation: {$tag: 'tag1'}, highlights: highlight.toArray(), range: fakeRange}
+          ]
+
+          return new Promise (resolve) ->
+            guest.element.on 'scrolltorange', (event) ->
+              assert.equal(event.detail, fakeRange)
+              resolve()
+
+            emitGuestEvent('scrollToAnnotation', 'tag1')
+
+        it 'allows the default scroll behaviour to be prevented', ->
+          highlight = $('<span></span>')
+          guest = createGuest()
+          fakeRange = sinon.stub()
+          guest.anchors = [
+            {annotation: {$tag: 'tag1'}, highlights: highlight.toArray(), range: fakeRange}
+          ]
+
+          guest.element.on 'scrolltorange', (event) -> event.preventDefault()
+          emitGuestEvent('scrollToAnnotation', 'tag1')
+          assert.notCalled(scrollIntoView)
+
+
     describe 'on "getDocumentInfo" event', ->
       guest = null
 

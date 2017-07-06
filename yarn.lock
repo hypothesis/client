@@ -1571,7 +1571,7 @@ currently-unhandled@^0.4.1:
   dependencies:
     array-find-index "^1.0.1"
 
-custom-event@~1.0.0:
+custom-event@^1.0.1, custom-event@~1.0.0:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/custom-event/-/custom-event-1.0.1.tgz#5d02a46850adf1b4a317946a3928fccb5bfd0425"
 
@@ -5254,9 +5254,9 @@ sass-graph@^2.1.1:
     scss-tokenizer "^0.2.1"
     yargs "^6.6.0"
 
-scroll-into-view@^1.3.1:
-  version "1.8.0"
-  resolved "https://registry.yarnpkg.com/scroll-into-view/-/scroll-into-view-1.8.0.tgz#47e8c64aba25c80d1123cf1a2144c68eb0069110"
+scroll-into-view@^1.8.2:
+  version "1.8.2"
+  resolved "https://registry.yarnpkg.com/scroll-into-view/-/scroll-into-view-1.8.2.tgz#6c5b613553ee853cf7592f4d3b5e4c000f14282d"
   dependencies:
     raf "^3.1.0"
 
