@@ -238,7 +238,7 @@ describe 'Guest', ->
         assert.called(scrollIntoView)
         assert.calledWith(scrollIntoView, highlight[0])
 
-      context 'when dispatching the "scrollToRange" event', ->
+      context 'when dispatching the "scrolltorange" event', ->
 
         it 'emits with the range', ->
           highlight = $('<span></span>')
@@ -249,7 +249,7 @@ describe 'Guest', ->
           ]
 
           return new Promise (resolve) ->
-            guest.element.on 'scrollToRange', (event) ->
+            guest.element.on 'scrolltorange', (event) ->
               assert.equal(event.detail, fakeRange)
               resolve()
 
@@ -263,7 +263,7 @@ describe 'Guest', ->
             {annotation: {$tag: 'tag1'}, highlights: highlight.toArray(), range: fakeRange}
           ]
 
-          guest.element.on 'scrollToRange', (event) -> event.preventDefault()
+          guest.element.on 'scrolltorange', (event) -> event.preventDefault()
           emitGuestEvent('scrollToAnnotation', 'tag1')
           assert.notCalled(scrollIntoView)
 

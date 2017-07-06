@@ -166,7 +166,7 @@ module.exports = class Guest extends Delegator
     crossframe.on 'scrollToAnnotation', (tag) =>
       for anchor in @anchors when anchor.highlights?
         if anchor.annotation.$tag is tag
-          event = new CustomEvent('scrollToRange', {
+          event = new CustomEvent('scrolltorange', {
             bubbles: true
             cancelable: true
             detail: anchor.range
