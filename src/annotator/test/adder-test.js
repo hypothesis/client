@@ -7,16 +7,36 @@ function rect(left, top, width, height) {
   return {left: left, top: top, width: width, height: height};
 }
 
-describe('adder', function () {
+/**
+ * Offset an `Element` from its default position.
+ */
+function offsetElement(el) {
+  el.style.position = 'relative';
+  el.style.left = '-200px';
+  el.style.top = '-200px';
+}
+
+/**
+ * Reset an element back to its default position.
+ */
+function revertOffsetElement(el) {
+  el.style.position = 'static';
+  el.style.left = '0';
+  el.style.top = '0';
+}
+
+
+describe('annotator.adder', function () {
   var adderCtrl;
   var adderCallbacks;
+  var adderEl;
 
   beforeEach(function () {
     adderCallbacks = {
       onAnnotate: sinon.stub(),
       onHighlight: sinon.stub(),
     };
-    var adderEl = document.createElement('div');
+    adderEl = document.createElement('div');
     document.body.appendChild(adderEl);
 
     adderCtrl = new adder.Adder(adderEl, adderCallbacks);
@@ -24,7 +44,7 @@ describe('adder', function () {
 
   afterEach(function () {
     adderCtrl.hide();
-    adderCtrl.element.parentNode.removeChild(adderCtrl.element);
+    adderEl.remove();
   });
 
   function windowSize() {
@@ -109,6 +129,54 @@ describe('adder', function () {
     it('does not positon the adder beyond the left edge of the viewport', function () {
       var target = adderCtrl.target(rect(-100,100,10,10), false);
       assert.isAtLeast(target.left, 0);
+    });
+  });
+
+  describe('#showAt', () => {
+    context('when the document and body elements have no offset', () => {
+      it('shows adder at target position', () => {
+        adderCtrl.showAt(100, 100, adder.ARROW_POINTING_UP);
+
+        var { left, top } = adderEl.getBoundingClientRect();
+        assert.equal(left, 100);
+        assert.equal(top, 100);
+      });
+    });
+
+    context('when the body element is offset', () => {
+      beforeEach(() => {
+        offsetElement(document.body);
+      });
+
+      afterEach(() => {
+        revertOffsetElement(document.body);
+      });
+
+      it('shows adder at target position', () => {
+        adderCtrl.showAt(100, 100, adder.ARROW_POINTING_UP);
+
+        var { left, top } = adderEl.getBoundingClientRect();
+        assert.equal(left, 100);
+        assert.equal(top, 100);
+      });
+    });
+
+    context('when the document element is offset', () => {
+      beforeEach(() => {
+        offsetElement(document.documentElement);
+      });
+
+      afterEach(() => {
+        revertOffsetElement(document.documentElement);
+      });
+
+      it('shows adder at target position when document element is offset', () => {
+        adderCtrl.showAt(100, 100, adder.ARROW_POINTING_UP);
+
+        var { left, top } = adderEl.getBoundingClientRect();
+        assert.equal(left, 100);
+        assert.equal(top, 100);
+      });
     });
   });
 });

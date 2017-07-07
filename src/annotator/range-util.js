@@ -1,20 +1,5 @@
 'use strict';
 
-function translate(rect, x, y) {
-  return {
-    left: rect.left + x,
-    top: rect.top + y,
-    width: rect.width,
-    height: rect.height,
-  };
-}
-
-function mapViewportRectToDocument(window, rect) {
-  // `pageXOffset` and `pageYOffset` are used rather than `scrollX`
-  // and `scrollY` for IE 10/11 compatibility.
-  return translate(rect, window.pageXOffset, window.pageYOffset);
-}
-
 /**
  * Returns true if the start point of a selection occurs after the end point,
  * in document order.
@@ -79,7 +64,7 @@ function forEachNodeInRange(range, callback) {
  * Returns the bounding rectangles of non-whitespace text nodes in `range`.
  *
  * @param {Range} range
- * @return {Array<Rect>} Array of bounding rects in document coordinates.
+ * @return {Array<Rect>} Array of bounding rects in viewport coordinates.
  */
 function getTextBoundingBoxes(range) {
   var whitespaceOnly = /^\s*$/;
@@ -110,21 +95,19 @@ function getTextBoundingBoxes(range) {
     // Measure the range and translate from viewport to document coordinates
     var viewportRects = Array.from(nodeRange.getClientRects());
     nodeRange.detach();
-    rects = rects.concat(viewportRects.map(function (rect) {
-      return mapViewportRectToDocument(node.ownerDocument.defaultView, rect);
-    }));
+    rects = rects.concat(viewportRects);
   });
   return rects;
 }
 
 /**
- * Returns the rectangle, in document coordinates, for the line of text
+ * Returns the rectangle, in viewport coordinates, for the line of text
  * containing the focus point of a Selection.
  *
  * Returns null if the selection is empty.
  *
  * @param {Selection} selection
- * @return {Rect?}
+ * @return {Rect|null}
  */
 function selectionFocusRect(selection) {
   if (selection.isCollapsed) {

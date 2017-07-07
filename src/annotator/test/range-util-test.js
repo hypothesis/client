@@ -9,7 +9,21 @@ function createRange(node, start, end) {
   return range;
 }
 
-describe('range-util', function () {
+/**
+ * Round coordinates in `rect` to nearest integer values.
+ */
+function roundCoords(rect) {
+  return {
+    bottom: Math.round(rect.bottom),
+    height: Math.round(rect.height),
+    left: Math.round(rect.left),
+    right: Math.round(rect.right),
+    top: Math.round(rect.top),
+    width: Math.round(rect.width),
+  };
+}
+
+describe('annotator.range-util', function () {
   var selection;
   var testNode;
 
@@ -62,8 +76,26 @@ describe('range-util', function () {
     it('gets the bounding box of a range containing a text node', function () {
       testNode.innerHTML = 'plain text';
       var rng = createRange(testNode, 0, 1);
+
       var boxes = rangeUtil.getTextBoundingBoxes(rng);
-      assert.ok(boxes.length);
+
+      assert.match(boxes, [sinon.match({
+        left: sinon.match.number,
+        top: sinon.match.number,
+        width: sinon.match.number,
+        height: sinon.match.number,
+        bottom: sinon.match.number,
+        right: sinon.match.number,
+      })]);
+    });
+
+    it('returns the bounding box in viewport coordinates', function () {
+      testNode.innerHTML = 'plain text';
+      var rng = createRange(testNode, 0, 1);
+
+      var [rect] = rangeUtil.getTextBoundingBoxes(rng);
+
+      assert.deepEqual(roundCoords(rect), roundCoords(testNode.getBoundingClientRect()));
     });
   });
 
