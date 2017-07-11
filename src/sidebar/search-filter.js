@@ -146,12 +146,12 @@ function generateFacetedFilter(searchtext) {
           let time = term.slice(6).toLowerCase();
           if (time.match(/^\d+$/)) {
             // Only digits, assuming seconds
-            since.push(time);
+            since.push(time * 1);
           }
           if (time.match(/^\d+sec$/)) {
             // Time given in seconds
             t = /^(\d+)sec$/.exec(time)[1];
-            since.push(t);
+            since.push(t * 1);
           }
           if (time.match(/^\d+min$/)) {
             // Time given in minutes

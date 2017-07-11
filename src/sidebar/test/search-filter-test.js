@@ -56,4 +56,102 @@ describe('sidebar.search-filter', function() {
       assert.equal(result.any[3], 'a:bc');
     });
   });
+
+  describe('#generateFacetedFilter', () => {
+    [{
+      query: 'one two three',
+      expectedFilter: {
+        any: {
+          operator: 'and',
+          terms: ['one', 'two', 'three'],
+        },
+      },
+    },{
+      query: 'tag:foo tag:bar',
+      expectedFilter: {
+        tag: {
+          operator: 'and',
+          terms: ['foo', 'bar'],
+        },
+      },
+    },{
+      query: 'quote:inthequote text:inthetext',
+      expectedFilter: {
+        quote: {
+          operator: 'and',
+          terms: ['inthequote'],
+        },
+        text: {
+          operator: 'and',
+          terms: ['inthetext'],
+        },
+      },
+    },{
+      query: 'user:john user:james',
+      expectedFilter: {
+        user: {
+          operator: 'or',
+          terms: ['john', 'james'],
+        },
+      },
+    },{
+      query: 'uri:https://example.org/article.html',
+      expectedFilter: {
+        uri: {
+          operator: 'or',
+          terms: ['https://example.org/article.html'],
+        },
+      },
+    }].forEach(({ query, expectedFilter }) => {
+      it('parses a search query', () => {
+        var filter = searchFilter.generateFacetedFilter(query);
+
+        // Remove empty facets.
+        Object.keys(filter).forEach((k) => {
+          if (filter[k].terms.length === 0) {
+            delete filter[k];
+          }
+        });
+
+        assert.deepEqual(filter, expectedFilter);
+      });
+    });
+
+    [{
+      timeExpr: '8sec',
+      expectedSecs: 8,
+    },{
+      timeExpr: '7min',
+      expectedSecs: 420,
+    },{
+      timeExpr: '7hour',
+      expectedSecs: 7 * 60 * 60,
+    },{
+      timeExpr: '4day',
+      expectedSecs: 4 * 60 * 60 * 24,
+    },{
+      timeExpr: '1week',
+      expectedSecs: 1 * 60 * 60 * 24 * 7,
+    },{
+      timeExpr: '2month',
+      expectedSecs: 2 * 60 * 60 * 24 * 30,
+    },{
+      timeExpr: '2year',
+      expectedSecs: 2 * 60 * 60 * 24 * 365,
+    },{
+      timeExpr: '5wibble',
+      expectedSecs: null,
+    }].forEach(({ timeExpr, expectedSecs }) => {
+      it('parses a "since:" query', () => {
+        var query = `since:${timeExpr}`;
+        var filter = searchFilter.generateFacetedFilter(query);
+
+        if (expectedSecs === null) {
+          assert.deepEqual(filter.since.terms, []);
+        } else {
+          assert.deepEqual(filter.since.terms, [expectedSecs]);
+        }
+      });
+    });
+  });
 });
