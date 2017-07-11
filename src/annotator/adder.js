@@ -10,6 +10,13 @@ var ANNOTATE_BTN_SELECTOR = '.js-annotate-btn';
 var HIGHLIGHT_BTN_SELECTOR = '.js-highlight-btn';
 
 /**
+ * @typedef Target
+ * @prop {number} left - Offset from left edge of viewport.
+ * @prop {number} top - Offset from top edge of viewport.
+ * @prop {number} arrowDirection - Direction of the adder's arrow.
+ */
+
+/**
  * Show the adder above the selection with an arrow pointing down at the
  * selected text.
  */
@@ -41,6 +48,25 @@ function attachShadow(element) {
   } else {
     return null;
   }
+}
+
+/**
+ * Return the closest ancestor of `el` which has been positioned.
+ *
+ * If no ancestor has been positioned, returns the root element.
+ *
+ * @param {Element} el
+ * @return {Element}
+ */
+function nearestPositionedAncestor(el) {
+  var parentEl = el.parentElement;
+  while (parentEl.parentElement) {
+    if (getComputedStyle(parentEl).position !== 'static') {
+      break;
+    }
+    parentEl = parentEl.parentElement;
+  }
+  return parentEl;
 }
 
 /**
@@ -162,11 +188,12 @@ function Adder(container, options) {
    * Return the best position to show the adder in order to target the
    * selected text in `targetRect`.
    *
-   * @param {Rect} targetRect - The rect of text to target, in document
+   * @param {Rect} targetRect - The rect of text to target, in viewport
    *        coordinates.
    * @param {boolean} isSelectionBackwards - True if the selection was made
    *        backwards, such that the focus point is mosty likely at the top-left
    *        edge of `targetRect`.
+   * @return {Target}
    */
   this.target = function (targetRect, isSelectionBackwards) {
     // Set the initial arrow direction based on whether the selection was made
@@ -191,13 +218,10 @@ function Adder(container, options) {
 
     // Flip arrow direction if adder would appear above the top or below the
     // bottom of the viewport.
-    //
-    // Note: `pageYOffset` is used instead of `scrollY` here for IE
-    // compatibility
-    if (targetRect.top - height() < view.pageYOffset &&
+    if (targetRect.top - height() < 0 &&
         arrowDirection === ARROW_POINTING_DOWN) {
       arrowDirection = ARROW_POINTING_UP;
-    } else if (targetRect.top + height() > view.pageYOffset + view.innerHeight) {
+    } else if (targetRect.top + height() > view.innerHeight) {
       arrowDirection = ARROW_POINTING_DOWN;
     }
 
@@ -208,18 +232,21 @@ function Adder(container, options) {
     }
 
     // Constrain the adder to the viewport.
-    left = Math.max(left, view.pageXOffset);
-    left = Math.min(left, view.pageXOffset + view.innerWidth - width());
+    left = Math.max(left, 0);
+    left = Math.min(left, view.innerWidth - width());
 
-    top = Math.max(top, view.pageYOffset);
-    top = Math.min(top, view.pageYOffset + view.innerHeight - height());
+    top = Math.max(top, 0);
+    top = Math.min(top, view.innerHeight - height());
 
-    return {top: top, left: left, arrowDirection: arrowDirection};
+    return {top, left, arrowDirection};
   };
 
   /**
    * Show the adder at the given position and with the arrow pointing in
    * `arrowDirection`.
+   *
+   * @param {number} left - Horizontal offset from left edge of viewport.
+   * @param {number} top - Vertical offset from top edge of viewport.
    */
   this.showAt = function (left, top, arrowDirection) {
     self.element.className = classnames({
@@ -236,9 +263,18 @@ function Adder(container, options) {
     self.element.querySelector(ANNOTATE_BTN_SELECTOR).style.display = '';
     self.element.querySelector(HIGHLIGHT_BTN_SELECTOR).style.display = '';
 
+    // Translate the (left, top) viewport coordinates into positions relative to
+    // the adder's nearest positioned ancestor (NPA).
+    //
+    // Typically the adder is a child of the `<body>` and the NPA is the root
+    // `<html>` element. However page styling may make the `<body>` positioned.
+    // See https://github.com/hypothesis/client/issues/487.
+    var positionedAncestor = nearestPositionedAncestor(container);
+    var parentRect = positionedAncestor.getBoundingClientRect();
+
     Object.assign(container.style, {
-      top: toPx(top),
-      left: toPx(left),
+      top: toPx(top - parentRect.top),
+      left: toPx(left - parentRect.left),
     });
     self.element.style.visibility = 'visible';
 
