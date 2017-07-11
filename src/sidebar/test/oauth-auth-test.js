@@ -76,7 +76,7 @@ describe('sidebar.oauth-auth', function () {
     };
 
     fakeRandom = {
-      hexString: sinon.stub().returns('notrandom'),
+      generateHexString: sinon.stub().returns('notrandom'),
     };
 
     fakeSettings = {

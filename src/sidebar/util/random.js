@@ -13,12 +13,12 @@ function byteToHex(val) {
  * @param {number} - An even-numbered length string to generate.
  * @return {string}
  */
-function hexString(len) {
+function generateHexString(len) {
   var bytes = new Uint8Array(len / 2);
   crypto.getRandomValues(bytes);
   return Array.from(bytes).map(byteToHex).join('');
 }
 
 module.exports = {
-  hexString,
+  generateHexString,
 };

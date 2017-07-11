@@ -177,7 +177,7 @@ function auth($http, $window, flash, random, settings) {
   function login() {
     // Random state string used to check that auth messages came from the popup
     // window that we opened.
-    var state = random.hexString(16);
+    var state = random.generateHexString(16);
 
     // Promise which resolves or rejects when the user accepts or closes the
     // auth popup.
