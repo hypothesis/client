@@ -6,14 +6,24 @@ var resolve = require('./util/url-util').resolve;
 var serviceConfig = require('./service-config');
 
 /**
- * OAuth-based authentication service used for publisher accounts.
+ * OAuth-based authorization service.
  *
  * A grant token embedded on the page by the publisher is exchanged for
  * an opaque access token.
  */
 // @ngInject
-function auth($http, flash, settings) {
+function auth($http, $window, flash, random, settings) {
 
+  /**
+   * Authorization code from auth popup window.
+   * @type {string}
+   */
+  var authCode;
+
+  /**
+   * Access token retrieved via `POST /token` endpoint.
+   * @type {Promise<string>}
+   */
   var accessTokenPromise;
   var tokenUrl = resolve('token', settings.apiUrl);
 
@@ -80,6 +90,9 @@ function auth($http, flash, settings) {
   // See https://tools.ietf.org/html/rfc7523#section-4
   function exchangeToken(grantToken) {
     var data = {
+      // FIXME: This should be set to the appropriate grant type if we are
+      //        exchanging an authorization code for a grant token, which
+      //        is the case for first-party accounts.
       grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer',
       assertion: grantToken,
     };
@@ -128,7 +141,7 @@ function auth($http, flash, settings) {
 
   function tokenGetter() {
     if (!accessTokenPromise) {
-      var grantToken = (serviceConfig(settings) || {}).grantToken;
+      var grantToken = (serviceConfig(settings) || {}).grantToken || authCode;
 
       if (grantToken) {
         accessTokenPromise = exchangeToken(grantToken).then(function (tokenInfo) {
@@ -154,9 +167,76 @@ function auth($http, flash, settings) {
   function clearCache() {
   }
 
+  /**
+   * Login to the annotation service using OAuth.
+   *
+   * This displays a popup window which allows the user to login to the service
+   * (if necessary) and then responds with an auth code which the client can
+   * then exchange for access and refresh tokens.
+   */
+  function login() {
+    // Random state string used to check that auth messages came from the popup
+    // window that we opened.
+    var state = random.generateHexString(16);
+
+    // Promise which resolves or rejects when the user accepts or closes the
+    // auth popup.
+    var authResponse = new Promise((resolve, reject) => {
+      function authRespListener(event) {
+        if (typeof event.data !== 'object') {
+          return;
+        }
+
+        if (event.data.state !== state) {
+          // This message came from a different popup window.
+          return;
+        }
+
+        if (event.data.type === 'authorization_response') {
+          resolve(event.data);
+        }
+        if (event.data.type === 'authorization_canceled') {
+          reject(new Error('Authorization window was closed'));
+        }
+        $window.removeEventListener('message', authRespListener);
+      }
+      $window.addEventListener('message', authRespListener);
+    });
+
+    // Authorize user and retrieve grant token
+    var width  = 400;
+    var height = 400;
+    var left   = $window.screen.width / 2 - width / 2;
+    var top    = $window.screen.height /2 - height / 2;
+
+    var authUrl = settings.oauthAuthorizeUrl;
+    authUrl += '?' + queryString.stringify({
+      client_id: settings.oauthClientId,
+      origin: $window.location.origin,
+      response_mode: 'web_message',
+      response_type: 'code',
+      state: state,
+    });
+    var authWindowSettings = queryString.stringify({
+      left: left,
+      top: top,
+      width: width,
+      height: height,
+    }).replace(/&/g, ',');
+    $window.open(authUrl, 'Login to Hypothesis', authWindowSettings);
+
+    return authResponse.then((resp) => {
+      // Save the auth code. It will be exchanged for an access token when the
+      // next API request is made.
+      authCode = resp.code;
+      accessTokenPromise = null;
+    });
+  }
+
   return {
-    clearCache: clearCache,
-    tokenGetter: tokenGetter,
+    clearCache,
+    login,
+    tokenGetter,
   };
 }
 

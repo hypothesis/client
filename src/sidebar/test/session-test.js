@@ -43,6 +43,7 @@ describe('session', function () {
     };
     fakeAuth = {
       clearCache: sandbox.spy(),
+      login: null, // Use cookie-based auth
     };
     fakeFlash = {error: sandbox.spy()};
     fakeRaven = {
@@ -198,6 +199,27 @@ describe('session', function () {
       });
     });
 
+    context('when using OAuth for first-party accounts', () => {
+      beforeEach(() => {
+        fakeAuth.login = sinon.stub().returns(Promise.resolve());
+        fakeStore.profile.read.returns(Promise.resolve({
+          userid: 'acct:user@hypothes.is',
+        }));
+      });
+
+      it('should fetch profile data from the API', () => {
+        return session.load().then(() => {
+          assert.calledWith(fakeStore.profile.read);
+        });
+      });
+
+      it('should update the session with the profile data from the API', () => {
+        return session.load().then(function () {
+          assert.equal(session.state.userid, 'acct:user@hypothes.is');
+        });
+      });
+    });
+
     it('should cache the session data', function () {
       $httpBackend.expectGET(url).respond({});
       session.load();
@@ -300,6 +322,29 @@ describe('session', function () {
     it('should update the session with the response from the API', function () {
       return session.dismissSidebarTutorial().then(function () {
         assert.isNotOk(session.state.preferences.show_sidebar_tutorial);
+      });
+    });
+  });
+
+  describe('#reload', () => {
+    beforeEach(() => {
+      // Use OAuth
+      fakeAuth.login = sinon.stub().returns(Promise.resolve());
+
+      // Load the initial profile data, as the client will do on startup.
+      fakeStore.profile.read.returns(Promise.resolve({
+        userid: 'acct:user_a@hypothes.is',
+      }));
+      return session.load();
+    });
+
+    it('should clear cached data and reload', () => {
+      fakeStore.profile.read.returns(Promise.resolve({
+        userid: 'acct:user_b@hypothes.is',
+      }));
+
+      return session.reload().then(() => {
+        assert.equal(session.state.userid, 'acct:user_b@hypothes.is');
       });
     });
   });

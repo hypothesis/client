@@ -1,15 +1,55 @@
 'use strict';
 
+var { stringify } = require('query-string');
+
 var authService = require('../oauth-auth');
 
 var DEFAULT_TOKEN_EXPIRES_IN_SECS = 1000;
 
-describe('oauth auth', function () {
+class FakeWindow {
+  constructor() {
+    this.callbacks = [];
+
+    this.location = {
+      origin: 'client.hypothes.is',
+    };
+
+    this.screen = {
+      width: 1024,
+      height: 768,
+    };
+
+    this.open = sinon.stub();
+  }
+
+  addEventListener(event, callback) {
+    this.callbacks.push({event, callback});
+  }
+
+  removeEventListener(event, callback) {
+    this.callbacks = this.callbacks.filter((cb) =>
+      cb.event === event && cb.callback === callback
+    );
+  }
+
+  sendMessage(data) {
+    var evt = new MessageEvent('message', { data });
+    this.callbacks.forEach(({event, callback}) => {
+      if (event === 'message') {
+        callback(evt);
+      }
+    });
+  }
+}
+
+describe('sidebar.oauth-auth', function () {
 
   var auth;
   var nowStub;
   var fakeHttp;
   var fakeFlash;
+  var fakeRandom;
+  var fakeWindow;
   var fakeSettings;
   var clock;
   var successfulFirstAccessTokenPromise;
@@ -35,15 +75,29 @@ describe('oauth auth', function () {
       error: sinon.stub(),
     };
 
+    fakeRandom = {
+      generateHexString: sinon.stub().returns('notrandom'),
+    };
+
     fakeSettings = {
       apiUrl: 'https://hypothes.is/api/',
+      oauthAuthorizeUrl: 'https://hypothes.is/oauth/authorize/',
+      oauthClientId: 'the-client-id',
       services: [{
         authority: 'publisher.org',
         grantToken: 'a.jwt.token',
       }],
     };
 
-    auth = authService(fakeHttp, fakeFlash, fakeSettings);
+    fakeWindow = new FakeWindow();
+
+    auth = authService(
+      fakeHttp,
+      fakeWindow,
+      fakeFlash,
+      fakeRandom,
+      fakeSettings
+    );
 
     clock = sinon.useFakeTimers();
   });
@@ -131,9 +185,7 @@ describe('oauth auth', function () {
     });
 
     it('should return null if no grant token was provided', function () {
-      var auth = authService(fakeHttp, fakeFlash, {
-        services: [{authority: 'publisher.org'}],
-      });
+      fakeSettings.services = [{ authority: 'publisher.org' }];
       return auth.tokenGetter().then(function (token) {
         assert.notCalled(fakeHttp.post);
         assert.equal(token, null);
@@ -240,6 +292,91 @@ describe('oauth auth', function () {
           .then(expireAccessToken)
           .then(function () { clock.tick(1); })
           .then(assertThatErrorMessageWasShown);
+      });
+    });
+  });
+
+  describe('#login', () => {
+
+    beforeEach(() => {
+      // login() is only currently used when using the public
+      // Hypothesis service.
+      fakeSettings.services = [];
+    });
+
+    it('opens the auth endpoint in a popup window', () => {
+      auth.login();
+
+      var params = {
+        client_id: fakeSettings.oauthClientId,
+        origin: 'client.hypothes.is',
+        response_mode: 'web_message',
+        response_type: 'code',
+        state: 'notrandom',
+      };
+      var expectedAuthUrl = `${fakeSettings.oauthAuthorizeUrl}?${stringify(params)}`;
+      assert.calledWith(
+        fakeWindow.open,
+        expectedAuthUrl,
+        'Login to Hypothesis',
+        'height=400,left=312,top=184,width=400'
+      );
+    });
+
+    it('ignores auth responses if the state does not match', () => {
+      var loggedIn = false;
+
+      auth.login().then(() => {
+        loggedIn = true;
+      });
+
+      fakeWindow.sendMessage({
+        // Successful response with wrong state
+        type: 'authorization_response',
+        code: 'acode',
+        state: 'wrongstate',
+      });
+
+      return Promise.resolve().then(() => {
+        assert.isFalse(loggedIn);
+      });
+    });
+
+    it('resolves when auth completes successfully', () => {
+      var loggedIn = auth.login();
+
+      fakeWindow.sendMessage({
+        // Successful response
+        type: 'authorization_response',
+        code: 'acode',
+        state: 'notrandom',
+      });
+
+      // 1. Verify that login completes.
+      return loggedIn.then(() => {
+        return auth.tokenGetter();
+      }).then(() => {
+        // 2. Verify that auth code is exchanged for access & refresh tokens.
+        var expectedBody =
+          'assertion=acode' +
+          '&grant_type=urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Ajwt-bearer';
+        assert.calledWith(fakeHttp.post, 'https://hypothes.is/api/token', expectedBody, {
+          headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        });
+      });
+    });
+
+    it('rejects when auth is canceled', () => {
+      var loggedIn = auth.login();
+
+      fakeWindow.sendMessage({
+        // Error response
+        type: 'authorization_canceled',
+        state: 'notrandom',
+      });
+
+      return loggedIn.catch((err) => {
+        assert.equal(err.message, 'Authorization window was closed');
       });
     });
   });
