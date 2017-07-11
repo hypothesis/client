@@ -245,8 +245,8 @@ function Adder(container, options) {
    * Show the adder at the given position and with the arrow pointing in
    * `arrowDirection`.
    *
-   * @param {number} left - Horizontal offset of from left edge of viewport.
-   * @param {number} top - Vertical offset of from top edge of viewport.
+   * @param {number} left - Horizontal offset from left edge of viewport.
+   * @param {number} top - Vertical offset from top edge of viewport.
    */
   this.showAt = function (left, top, arrowDirection) {
     self.element.className = classnames({
