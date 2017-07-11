@@ -4,6 +4,16 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+### Changed
+
+- Use OAuth for first party login if feature flag enabled.
+  ([#476](https://github.com/hypothesis/client/pull/476)).
+
+- Fix adder position when document or body position is offset.
+  ([#493](https://github.com/hypothesis/client/pull/493)).
+
 ## [1.27.0] - 2017-07-06
 
 ### Changed
