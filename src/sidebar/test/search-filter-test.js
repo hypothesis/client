@@ -2,15 +2,15 @@
 
 var searchFilter = require('../search-filter')();
 
-describe('sidebar.search-filter', function() {
-  describe('#toObject', function() {
-    it('puts a simple search string under the any filter', function() {
+describe('sidebar.search-filter', () => {
+  describe('#toObject', () => {
+    it('puts a simple search string under the any filter', () => {
       var query = 'foo';
       var result = searchFilter.toObject(query);
       assert.equal(result.any[0], query);
     });
 
-    it('uses the filters as keys in the result object', function() {
+    it('uses the filters as keys in the result object', () => {
       var query = 'user:john text:foo quote:bar group:agroup other';
       var result = searchFilter.toObject(query);
 
@@ -21,7 +21,7 @@ describe('sidebar.search-filter', function() {
       assert.equal(result.group[0], 'agroup');
     });
 
-    it('collects the same filters into a list', function() {
+    it('collects the same filters into a list', () => {
       var query = 'user:john text:foo quote:bar other user:doe text:fuu text:fii';
       var result = searchFilter.toObject(query);
 
@@ -34,13 +34,13 @@ describe('sidebar.search-filter', function() {
       assert.equal(result.quote[0], 'bar');
     });
 
-    it('preserves data with semicolon characters', function() {
+    it('preserves data with semicolon characters', () => {
       var query = 'uri:http://test.uri';
       var result = searchFilter.toObject(query);
       assert.equal(result.uri[0], 'http://test.uri');
     });
 
-    it('collects valid filters and puts invalid into the "any" category', function() {
+    it('collects valid filters and puts invalid into the "any" category', () => {
       var query = 'uri:test foo:bar text:hey john:doe quote:according hi-fi a:bc';
       var result = searchFilter.toObject(query);
 
