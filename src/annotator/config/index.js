@@ -18,10 +18,10 @@ function configFrom(window_) {
     openSidebar: settings.hostPageSetting('openSidebar', {allowInBrowserExt: true}),
     branding: settings.hostPageSetting('branding'),
     services: settings.hostPageSetting('services'),
-
-    // Needed by the multi-frame feature for now
-    enableMultiFrameSupport: settings.hostPageSetting('enableMultiFrameSupport'),
     embedScriptUrl: settings.hostPageSetting('embedScriptUrl'),
+
+    // Subframe identifier given when a frame is being embedded into
+    // by a top level client
     subFrameIdentifier: settings.hostPageSetting('subFrameIdentifier'),
 
     // Temporary feature flag override for 1st-party OAuth

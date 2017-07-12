@@ -327,7 +327,6 @@ gulp.task('serve-live-reload', ['serve-package'], function () {
   var LiveReloadServer = require('./scripts/gulp/live-reload-server');
   liveReloadServer = new LiveReloadServer(3000, {
     clientUrl: `http://${packageServerHostname()}:3001/hypothesis`,
-    enableMultiFrameSupport: !!process.env.MULTI_FRAME_SUPPORT,
   });
 });
 

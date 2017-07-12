@@ -40,7 +40,6 @@ describe('CrossFrame multi-frame scenario', function () {
 
     options = {
       config: {
-        enableMultiFrameSupport: true,
         embedScriptUrl: 'data:,', // empty data uri
       },
       on: sandbox.stub(),

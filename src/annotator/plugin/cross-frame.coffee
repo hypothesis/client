@@ -36,10 +36,10 @@ module.exports = class CrossFrame extends Plugin
     this.pluginInit = ->
       onDiscoveryCallback = (source, origin, token) ->
         bridge.createChannel(source, origin, token)
+
       discovery.startDiscovery(onDiscoveryCallback)
 
-      if config.enableMultiFrameSupport
-        frameObserver.observe(_injectToFrame, _iframeUnloaded);
+      frameObserver.observe(_injectToFrame, _iframeUnloaded);
 
     this.destroy = ->
       # super doesnt work here :(
