@@ -37,8 +37,7 @@ var pluginClasses = {
   CrossFrame: require('./plugin/cross-frame'),
 };
 
-var appLinkEl =
-  document.querySelector('link[type="application/annotator+html"]');
+var appLinkEl = document.querySelector('link[type="application/annotator+html"][rel="sidebar"]');
 var config = configFrom(window);
 
 $.noConflict(true)(function() {

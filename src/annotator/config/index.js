@@ -10,19 +10,20 @@ var settingsFrom = require('./settings');
 function configFrom(window_) {
   var settings = settingsFrom(window_);
   return {
-    sidebarAppUrl: settings.sidebarAppUrl,
-    query: settings.query,
     annotations: settings.annotations,
-    showHighlights: settings.showHighlights,
-    openLoginForm: settings.hostPageSetting('openLoginForm', {allowInBrowserExt: true}),
-    openSidebar: settings.hostPageSetting('openSidebar', {allowInBrowserExt: true}),
     branding: settings.hostPageSetting('branding'),
+    clientUrl: settings.clientUrl,
     services: settings.hostPageSetting('services'),
-    embedScriptUrl: settings.hostPageSetting('embedScriptUrl'),
+    showHighlights: settings.showHighlights,
+    sidebarAppUrl: settings.sidebarAppUrl,
 
     // Subframe identifier given when a frame is being embedded into
     // by a top level client
     subFrameIdentifier: settings.hostPageSetting('subFrameIdentifier'),
+
+    openLoginForm: settings.hostPageSetting('openLoginForm', {allowInBrowserExt: true}),
+    openSidebar: settings.hostPageSetting('openSidebar', {allowInBrowserExt: true}),
+    query: settings.query,
 
     // Temporary feature flag override for 1st-party OAuth
     oauthEnabled: settings.hostPageSetting('oauthEnabled'),
