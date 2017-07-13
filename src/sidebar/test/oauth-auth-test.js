@@ -4,6 +4,7 @@ var angular = require('angular');
 var { stringify } = require('query-string');
 
 var DEFAULT_TOKEN_EXPIRES_IN_SECS = 1000;
+var TOKEN_KEY = 'hypothesis.oauth.hypothes%2Eis.token';
 
 class FakeWindow {
   constructor() {
@@ -339,7 +340,7 @@ describe('sidebar.oauth-auth', function () {
       return login().then(() => {
         return auth.tokenGetter();
       }).then(() => {
-        assert.calledWith(fakeLocalStorage.setObject, 'hypothesis.oauth.default.token', {
+        assert.calledWith(fakeLocalStorage.setObject, TOKEN_KEY, {
           accessToken: 'firstAccessToken',
           refreshToken: 'firstRefreshToken',
           expiresAt: 910000,
@@ -366,7 +367,7 @@ describe('sidebar.oauth-auth', function () {
         return auth.tokenGetter();
       }).then(() => {
         // 3. Check that updated token was persisted to storage.
-        assert.calledWith(fakeLocalStorage.setObject, 'hypothesis.oauth.default.token', {
+        assert.calledWith(fakeLocalStorage.setObject, TOKEN_KEY, {
           accessToken: 'secondToken',
           refreshToken: 'secondRefreshToken',
           expiresAt: 1910000,
@@ -375,7 +376,7 @@ describe('sidebar.oauth-auth', function () {
     });
 
     it('loads and uses tokens from storage', () => {
-      fakeLocalStorage.getObject.withArgs('hypothesis.oauth.default.token').returns({
+      fakeLocalStorage.getObject.withArgs(TOKEN_KEY).returns({
         accessToken: 'foo',
         refreshToken: 'bar',
         expiresAt: 123,
@@ -389,7 +390,7 @@ describe('sidebar.oauth-auth', function () {
     it('refreshes the token if it expired after loading from storage', () => {
       // Store an expired access token.
       clock.tick(200);
-      fakeLocalStorage.getObject.withArgs('hypothesis.oauth.default.token').returns({
+      fakeLocalStorage.getObject.withArgs(TOKEN_KEY).returns({
         accessToken: 'foo',
         refreshToken: 'bar',
         expiresAt: 123,
@@ -409,7 +410,7 @@ describe('sidebar.oauth-auth', function () {
         assert.equal(token, 'secondToken');
         assert.calledWith(
           fakeLocalStorage.setObject,
-          'hypothesis.oauth.default.token',
+          TOKEN_KEY,
           {
             accessToken: 'secondToken',
             refreshToken: 'secondRefreshToken',

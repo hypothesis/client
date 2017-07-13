@@ -11,19 +11,6 @@ var serviceConfig = require('./service-config');
  *   use in future sessions.
  */
 
-function getAuthority(settings) {
-  var cfg = serviceConfig(settings);
-  return cfg ? cfg.authority : 'default';
-}
-
-/**
- * Return the storage key used for storing access/refresh token data for a given
- * annotation service.
- */
-function storageKey(authority) {
-  return `hypothesis.oauth.${authority}.token`;
-}
-
 /**
  * OAuth-based authorization service.
  *
@@ -108,11 +95,28 @@ function auth($http, $window, flash, localStorage, random, settings) {
   }
 
   /**
+   * Return the storage key used for storing access/refresh token data for a given
+   * annotation service.
+   */
+  function storageKey() {
+    // Use a unique key per annotation service. Currently OAuth tokens are only
+    // persisted for the default annotation service. If in future we support
+    // logging into other services from the client, this function will need to
+    // take the API URL as an argument.
+    var apiDomain = new URL(settings.apiUrl).hostname;
+
+    // Percent-encode periods to avoid conflict with section delimeters.
+    apiDomain = apiDomain.replace(/\./g, '%2E');
+
+    return `hypothesis.oauth.${apiDomain}.token`;
+  }
+
+  /**
    * Fetch the last-saved access/refresh tokens for `authority` from local
    * storage.
    */
-  function loadToken(authority) {
-    var token = localStorage.getObject(storageKey(authority));
+  function loadToken() {
+    var token = localStorage.getObject(storageKey());
 
     if (!token ||
         typeof token.accessToken !== 'string' ||
@@ -132,8 +136,7 @@ function auth($http, $window, flash, localStorage, random, settings) {
    * Persist access & refresh tokens for future use.
    */
   function saveToken(token) {
-    var authority = getAuthority(settings);
-    localStorage.setObject(storageKey(authority), token);
+    localStorage.setObject(storageKey(), token);
   }
 
   // Exchange the JWT grant token for an access token.
@@ -241,8 +244,7 @@ function auth($http, $window, flash, localStorage, random, settings) {
         });
       } else {
         // Attempt to load the tokens from the previous session.
-        var authority = getAuthority(settings);
-        var tokenInfo = loadToken(authority);
+        var tokenInfo = loadToken();
         if (!tokenInfo) {
           // No token. The user will need to log in.
           accessTokenPromise = Promise.resolve(null);
