@@ -19,7 +19,7 @@ function configFrom(window_) {
 
     // Subframe identifier given when a frame is being embedded into
     // by a top level client
-    subFrameIdentifier: settings.hostPageSetting('subFrameIdentifier'),
+    subFrameIdentifier: settings.hostPageSetting('subFrameIdentifier', {allowInBrowserExt: true}),
 
     openLoginForm: settings.hostPageSetting('openLoginForm', {allowInBrowserExt: true}),
     openSidebar: settings.hostPageSetting('openSidebar', {allowInBrowserExt: true}),
