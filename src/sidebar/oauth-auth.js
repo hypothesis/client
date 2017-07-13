@@ -108,9 +108,10 @@ function auth($http, $window, flash, localStorage, random, settings) {
   }
 
   /**
-   * Read the last-saved access/refresh tokens for `authority`.
+   * Fetch the last-saved access/refresh tokens for `authority` from local
+   * storage.
    */
-  function readLastUsedToken(authority) {
+  function loadToken(authority) {
     var token = localStorage.getObject(storageKey(authority));
 
     if (!token ||
@@ -241,7 +242,7 @@ function auth($http, $window, flash, localStorage, random, settings) {
       } else {
         // Attempt to load the tokens from the previous session.
         var authority = getAuthority(settings);
-        var tokenInfo = readLastUsedToken(authority);
+        var tokenInfo = loadToken(authority);
         if (!tokenInfo) {
           // No token. The user will need to log in.
           accessTokenPromise = Promise.resolve(null);
