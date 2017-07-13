@@ -159,6 +159,22 @@ module.exports = class Document extends Plugin
           if id[0..3] == "doi:"
             @metadata.link.push(href: id)
 
+    # look for a link to identify the resource in dublincore data
+    dcMetaConcat = []
+    # sort by name for a consistent ordering of the concatenated metadata
+    for name in Object.keys(@metadata.dc).sort()
+      # right now only look for these two terms
+      if name == 'source' || name == 'identifier'
+        values = @metadata.dc[name].sort().map (v) -> encodeURIComponent(v)
+        dcMetaConcat.push(name + ':' + values.join(','))
+
+    dcMetaUrn = 'urn:x-dc-meta:' + dcMetaConcat.join('/')
+    if dcMetaConcat.length == 2
+      # only do this if both terms are provided, for now
+      @metadata.link.push(href: dcMetaUrn)
+      # set this as the documentFingerprint as a hint to include this in search queries
+      @metadata.documentFingerprint = dcMetaUrn
+
   _getFavicon: =>
     for link in $("link")
       if $(link).prop("rel") in ["shortcut icon", "icon"]

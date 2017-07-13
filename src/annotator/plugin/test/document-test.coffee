@@ -42,6 +42,7 @@ describe 'Document', ->
     head.append('<meta name="citation_pdf_url" content="foo.pdf">')
     head.append('<meta name="dc.identifier" content="doi:10.1175/JCLI-D-11-00015.1">')
     head.append('<meta name="dc:identifier" content="isbn:123456789">')
+    head.append('<meta name="dc:source" content="urn:example:abcxyz">')
     head.append('<meta name="DC.type" content="Article">')
     head.append('<meta property="og:url" content="http://example.com">')
     head.append('<meta name="twitter:site" content="@okfn">')
@@ -65,7 +66,7 @@ describe 'Document', ->
 
     it 'should have links with absolute hrefs and types', ->
       assert.ok(metadata.link)
-      assert.equal(metadata.link.length, 9)
+      assert.equal(metadata.link.length, 10)
       assert.match(metadata.link[0].href, docBaseUri)
       assert.equal(metadata.link[1].rel, "alternate")
       assert.match(metadata.link[1].href, /^.+foo\.pdf$/)
@@ -84,8 +85,16 @@ describe 'Document', ->
       assert.equal(metadata.link[7].type, "application/pdf")
       assert.equal(metadata.link[8].href, "doi:10.1175/JCLI-D-11-00015.1")
 
+      # link derived from dc resource identifiers
+      # should be in the form of `urn:x-dc-meta: identifier: <doi>,<isbn> / source: <example>`
+      # it's a comma separated list for when there's multiple identifiers
+      assert.equal(
+        metadata.link[9].href
+        "urn:x-dc-meta:identifier:doi%3A10.1175%2FJCLI-D-11-00015.1,isbn%3A123456789/source:urn%3Aexample%3Aabcxyz"
+      )
+
     it 'should ignore atom and RSS feeds and alternate languages', ->
-      assert.equal(metadata.link.length, 9)
+      assert.equal(metadata.link.length, 10)
 
     it 'should have highwire metadata', ->
       assert.ok(metadata.highwire)
@@ -96,6 +105,7 @@ describe 'Document', ->
     it 'should have dublincore metadata', ->
       assert.ok(metadata.dc)
       assert.deepEqual(metadata.dc.identifier, ["doi:10.1175/JCLI-D-11-00015.1", "isbn:123456789"])
+      assert.deepEqual(metadata.dc.source, ["urn:example:abcxyz"])
       assert.deepEqual(metadata.dc.type, ["Article"])
 
     it 'should have facebook metadata', ->
@@ -116,7 +126,7 @@ describe 'Document', ->
 
     it 'should have unique uris', ->
       uris = testDocument.uris()
-      assert.equal(uris.length, 7)
+      assert.equal(uris.length, 8)
 
     it 'uri() returns the canonical uri', ->
       uri = testDocument.uri()
@@ -127,6 +137,10 @@ describe 'Document', ->
         metadata.favicon
         'http://example.com/images/icon.ico'
       )
+
+    it 'should have a documentFingerprint as the dc resource identifiers URN href', ->
+      assert.equal(metadata.documentFingerprint, metadata.link[9].href)
+
 
   describe '#_absoluteUrl', ->
 
