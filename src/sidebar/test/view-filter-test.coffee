@@ -49,7 +49,7 @@ describe 'viewFilter', ->
           operator: 'and'
 
       viewFilter.filter [], filters
-      assert.calledWith fakeUnicode.fold, 'tiger'
+      assert.calledWith fakeUnicode.fold, 'Tiger'
 
     describe 'filter operators', ->
       annotations = null
@@ -165,9 +165,9 @@ describe 'viewFilter', ->
               "type": "TextQuoteSelector",
               "exact": "The Tiger by William Blake",
             }]
+          ]
           user: "acct:poe@edgar.com"
           tags: ["poem", "Blake", "Tiger"]
-          ]
 
         filters =
           any:

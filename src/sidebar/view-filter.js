@@ -2,89 +2,97 @@
 
 // @ngInject
 function viewFilter(unicode) {
-  function _normalize(e) {
-    if (typeof e === 'string') {
-      var normed = unicode.normalize(e);
-      return unicode.fold(normed);
-    } else {
-      return e;
+  /**
+   * Normalize a field value or query term for comparison.
+   */
+  function normalize(val) {
+    if (typeof val !== 'string') {
+      return val;
+    }
+    return unicode.fold(unicode.normalize(val)).toLowerCase();
+  }
+
+  /**
+   * Filter that matches annotations against a single field & term.
+   *
+   * eg. "quote:foo" or "text:bar"
+   */
+  class TermFilter {
+    /**
+     * @param {string} field - Name of field to match
+     * @param {string} term - Query term
+     * @param {Checker} checker - Functions for extracting term values from
+     *   an annotation and checking whether they match a query term.
+     */
+    constructor(field, term, checker) {
+      this.field = field;
+      this.term = term;
+      this.checker = checker;
+    }
+
+    matches(ann) {
+      var checker = this.checker;
+      if (checker.autofalse && checker.autofalse(ann)) {
+        return false;
+      }
+
+      var value = checker.value(ann);
+      if (Array.isArray(value)) {
+        value = value.map(normalize);
+      } else {
+        value = normalize(value);
+      }
+      return checker.match(this.term, value);
     }
   }
 
-  function _matches(filter, value, match) {
-    var matches = true;
+  /**
+   * Filter that combines other filters using AND or OR combinators.
+   */
+  class BinaryOpFilter {
+    /**
+     * @param {'and'|'or'} op - Binary operator
+     * @param {Filter[]} - Array of filters to test against
+     */
+    constructor(op, filters) {
+      this.operator = op;
+      this.filters = filters;
+    }
 
-    for (var term of filter.terms) {
-      if (!match(term, value)) {
-        matches = false;
-        if (filter.operator === 'and') {
-          break;
-        }
+    matches(ann) {
+      if (this.operator === 'and') {
+        return this.filters.every(filter => filter.matches(ann));
       } else {
-        matches = true;
-        if (filter.operator === 'or') {
-          break;
-        }
+        return this.filters.some(filter => filter.matches(ann));
       }
     }
-    return matches;
   }
 
-  function _arrayMatches(filter, value, match) {
-    var matches = true;
-    // Make copy for filtering
-    var copy = filter.terms.slice();
-
-    copy = copy.filter(e => match(value, e));
-
-    if (((filter.operator === 'and') && (copy.length < filter.terms.length)) ||
-        ((filter.operator === 'or') && !copy.length)) {
-      matches = false;
-    }
-    return matches;
-  }
-
-  function _checkMatch(filter, annotation, checker) {
-    var autofalsefn = checker.autofalse;
-    if (autofalsefn && autofalsefn(annotation)) {
-      return false;
-    }
-
-    var value = checker.value(annotation);
-    if (Array.isArray(value)) {
-      value = value.map(e => e.toLowerCase());
-      value = value.map(e => _normalize(e));
-      return _arrayMatches(filter, value, checker.match);
-    } else {
-      value = value.toLowerCase();
-      value = _normalize(value);
-      return _matches(filter, value, checker.match);
-    }
-  }
-
-  // The field configuration
-  //
-  // [facet_name]:
-  //   autofalse: a function for a preliminary false match result
-  //   value: a function to extract to facet value for the annotation.
-  //   match: a function to check if the extracted value matches the facet value
+  /**
+   * Functions for extracting field values from annotations and testing whether
+   * they match a query term.
+   *
+   * [facet_name]:
+   *   autofalse: a function for a preliminary false match result
+   *   value: a function to extract to facet value for the annotation.
+   *   match: a function to check if the extracted value matches the facet value
+   */
   this.fields = {
     quote: {
-      autofalse: ann => !Array.isArray(ann.references),
+      autofalse: ann => (ann.references || []).length > 0,
       value(annotation) {
-        var quotes = (annotation.target || []).map((t) =>
-          (() => {
-            var result = [];
-            for (var s of (t.selector || [])) {
-              if (s.type === 'TextQuoteSelector') {
-                if (!s.exact) { continue; }
-                result.push(s.exact);
-              }
-            }
-            return result;
-          })());
-        quotes = Array.prototype.concat(...quotes);
-        return quotes.join('\n');
+        if (!annotation.target) {
+          // FIXME: All annotations *must* have a target, so this check should
+          // not be required.
+          return '';
+        }
+        var target = annotation.target[0];
+        var selectors = target.selector || [];
+
+        return selectors
+          .filter(s => s.type === 'TextQuoteSelector')
+          .map(s => s.exact)
+          .join('\n');
       },
       match: (term, value) => value.indexOf(term) > -1,
     },
@@ -99,7 +107,7 @@ function viewFilter(unicode) {
     tag: {
       autofalse: ann => !Array.isArray(ann.tags),
       value: ann => ann.tags,
-      match: (term, value) => term.includes(value),
+      match: (term, value) => value.includes(term),
     },
     text: {
       autofalse: ann => typeof ann.text !== 'string',
@@ -116,9 +124,6 @@ function viewFilter(unicode) {
       value: ann => ann.user,
       match: (term, value) => value.indexOf(term) > -1,
     },
-    any: {
-      fields: ['quote', 'text', 'tag', 'user'],
-    },
   };
 
   /**
@@ -130,63 +135,33 @@ function viewFilter(unicode) {
    * @return {string[]} IDs of matching annotations.
    */
   this.filter = (annotations, filters) => {
-    var filter;
-    var limit = Math.min(...((filters.result ? filters.result.terms : undefined) || []) || []);
-    var count = 0;
-
-    // Normalizing the filters, need to do only once.
-    for (var f in filters) {
-      if (!filters.hasOwnProperty(f)) {
-        continue;
-      }
-
-      filter = filters[f];
-      if (filter.terms) {
-        filter.terms = filter.terms.map(e => {
-          e = e.toLowerCase();
-          e = _normalize(e);
-          return e;
-        });
-      }
+    var limit = annotations.length;
+    if (filters.result) {
+      limit = Math.min(...filters.result.terms.map(parseInt));
     }
 
-    var result = [];
-    for (var annotation of annotations) {
-      if (count >= limit) { break; }
-
-      var match = true;
-      for (var category in filters) {
-        if (!filters.hasOwnProperty(category)) {
-          continue;
-        }
-        filter = filters[category];
-        if (!match) { break; }
-        if (!filter.terms.length) { continue; }
-
-        switch (category) {
-        case 'any':
-          var categoryMatch = false;
-          for (var field of this.fields.any.fields) {
-            for (var term of filter.terms) {
-              var termFilter = {terms: [term], operator: 'and'};
-              if (_checkMatch(termFilter, annotation, this.fields[field])) {
-                categoryMatch = true;
-                break;
-              }
-            }
-          }
-          match = categoryMatch;
-          break;
-        default:
-          match = _checkMatch(filter, annotation, this.fields[category]);
-        }
+    // Convert the input filter object into a filter tree, expanding "any"
+    // filters.
+    var fieldFilters = Object.entries(filters).map(([field, filter]) => {
+      var terms = filter.terms.map(normalize);
+      var termFilters;
+      if (field === 'any') {
+        var anyFields = ['quote', 'text', 'tag', 'user'];
+        termFilters = terms.map(term => new BinaryOpFilter('or', anyFields.map(field =>
+          new TermFilter(field, term, this.fields[field])
+        )));
+      } else {
+        termFilters = terms.map(term => new TermFilter(field, term, this.fields[field]));
       }
+      return new BinaryOpFilter(filter.operator, termFilters);
+    });
 
-      if (!match) { continue; }
-      count++;
-      result.push(annotation.id);
-    }
-    return result;
+    var rootFilter = new BinaryOpFilter('and', fieldFilters);
+
+    return annotations
+      .filter(ann => rootFilter.matches(ann))
+      .slice(0, limit)
+      .map(ann => ann.id);
   };
 }
 
