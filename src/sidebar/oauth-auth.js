@@ -6,13 +6,19 @@ var resolve = require('./util/url-util').resolve;
 var serviceConfig = require('./service-config');
 
 /**
+ * @typedef RefreshOptions
+ * @property {boolean} persist - True if access tokens should be persisted for
+ *   use in future sessions.
+ */
+
+/**
  * OAuth-based authorization service.
  *
  * A grant token embedded on the page by the publisher is exchanged for
  * an opaque access token.
  */
 // @ngInject
-function auth($http, $window, flash, random, settings) {
+function auth($http, $window, flash, localStorage, random, settings) {
 
   /**
    * Authorization code from auth popup window.
@@ -46,11 +52,7 @@ function auth($http, $window, flash, random, settings) {
    * An object holding the details of an access token from the tokenUrl endpoint.
    * @typedef {Object} TokenInfo
    * @property {string} accessToken  - The access token itself.
-   * @property {number} expiresIn    - The lifetime of the access token,
-   *                                   in seconds.
-   * @property {Date} refreshAfter   - A time before the access token's expiry
-   *                                   time, after which the code should
-   *                                   attempt to refresh the access token.
+   * @property {number} expiresAt    - The date when the timestamp will expire.
    * @property {string} refreshToken - The refresh token that can be used to
    *                                   get a new access token.
    */
@@ -65,12 +67,10 @@ function auth($http, $window, flash, random, settings) {
     var data = response.data;
     return {
       accessToken:  data.access_token,
-      expiresIn:    data.expires_in,
 
-      // We actually have to refresh the access token _before_ it expires.
-      // If the access token expires in one hour, this should refresh it in
-      // about 55 mins.
-      refreshAfter: new Date(Date.now() + (data.expires_in * 1000 * 0.91)),
+      // Set the expiry date to some time before the actual expiry date so that
+      // we will refresh it before it actually expires.
+      expiresAt: Date.now() + (data.expires_in * 1000 * 0.91),
 
       refreshToken: data.refresh_token,
     };
@@ -84,6 +84,59 @@ function auth($http, $window, flash, random, settings) {
       headers: {'Content-Type': 'application/x-www-form-urlencoded'},
     };
     return $http.post(tokenUrl, data, requestConfig);
+  }
+
+  function grantTokenFromHostPage() {
+    var cfg = serviceConfig(settings);
+    if (!cfg) {
+      return null;
+    }
+    return cfg.grantToken;
+  }
+
+  /**
+   * Return the storage key used for storing access/refresh token data for a given
+   * annotation service.
+   */
+  function storageKey() {
+    // Use a unique key per annotation service. Currently OAuth tokens are only
+    // persisted for the default annotation service. If in future we support
+    // logging into other services from the client, this function will need to
+    // take the API URL as an argument.
+    var apiDomain = new URL(settings.apiUrl).hostname;
+
+    // Percent-encode periods to avoid conflict with section delimeters.
+    apiDomain = apiDomain.replace(/\./g, '%2E');
+
+    return `hypothesis.oauth.${apiDomain}.token`;
+  }
+
+  /**
+   * Fetch the last-saved access/refresh tokens for `authority` from local
+   * storage.
+   */
+  function loadToken() {
+    var token = localStorage.getObject(storageKey());
+
+    if (!token ||
+        typeof token.accessToken !== 'string' ||
+        typeof token.refreshToken !== 'string' ||
+        typeof token.expiresAt !== 'number') {
+      return null;
+    }
+
+    return {
+      accessToken: token.accessToken,
+      refreshToken: token.refreshToken,
+      expiresAt: token.expiresAt,
+    };
+  }
+
+  /**
+   * Persist access & refresh tokens for future use.
+   */
+  function saveToken(token) {
+    localStorage.setObject(storageKey(), token);
   }
 
   // Exchange the JWT grant token for an access token.
@@ -104,56 +157,107 @@ function auth($http, $window, flash, random, settings) {
     });
   }
 
-  // Exchange the refresh token for a new access token and refresh token pair.
-  // See https://tools.ietf.org/html/rfc6749#section-6
-  function refreshAccessToken(refreshToken) {
-    var data = {grant_type: 'refresh_token', refresh_token: refreshToken};
-    postToTokenUrl(data).then(function (response) {
+  /**
+   * Exchange the refresh token for a new access token and refresh token pair.
+   * See https://tools.ietf.org/html/rfc6749#section-6
+   *
+   * @param {string} refreshToken
+   * @param {RefreshOptions} options
+   * @return {Promise<string|null>} Promise for the new access token
+   */
+  function refreshAccessToken(refreshToken, options) {
+    var data = { grant_type: 'refresh_token', refresh_token: refreshToken };
+    return postToTokenUrl(data).then((response) => {
       var tokenInfo = tokenInfoFrom(response);
-      refreshAccessTokenBeforeItExpires(tokenInfo);
+
+      if (options.persist) {
+        saveToken(tokenInfo);
+      }
+
+      refreshAccessTokenBeforeItExpires(tokenInfo, {
+        persist: options.persist,
+      });
       accessTokenPromise = Promise.resolve(tokenInfo.accessToken);
+
+      return tokenInfo.accessToken;
     }).catch(function() {
       showAccessTokenExpiredErrorMessage(
         'You must reload the page to continue annotating.');
+      return null;
     });
   }
 
-  // Set a timeout to refresh the access token a few minutes before it expires.
-  function refreshAccessTokenBeforeItExpires(tokenInfo) {
+  /**
+   * Schedule a refresh of an access token a few minutes before it expires.
+   *
+   * @param {TokenInfo} tokenInfo
+   * @param {RefreshOptions} options
+   */
+  function refreshAccessTokenBeforeItExpires(tokenInfo, options) {
     // The delay, in milliseconds, before we will poll again to see if it's
     // time to refresh the access token.
     var delay = 30000;
 
     // If the token info's refreshAfter time will have passed before the next
     // time we poll, then refresh the token this time.
-    var refreshAfter = tokenInfo.refreshAfter.valueOf() - delay;
+    var refreshAfter = tokenInfo.expiresAt - delay;
 
     function refreshAccessTokenIfNearExpiry() {
       if (Date.now() > refreshAfter) {
-        refreshAccessToken(tokenInfo.refreshToken);
+        refreshAccessToken(tokenInfo.refreshToken, {
+          persist: options.persist,
+        });
       } else {
-        refreshAccessTokenBeforeItExpires(tokenInfo);
+        refreshAccessTokenBeforeItExpires(tokenInfo, options);
       }
     }
 
     window.setTimeout(refreshAccessTokenIfNearExpiry, delay);
   }
 
+  /**
+   * Retrieve an access token for the API.
+   *
+   * @return {Promise<string>} The API access token.
+   */
   function tokenGetter() {
     if (!accessTokenPromise) {
-      var grantToken = (serviceConfig(settings) || {}).grantToken || authCode;
+      var grantToken = grantTokenFromHostPage();
 
       if (grantToken) {
+        // Exchange host-page provided grant token for a new access token.
         accessTokenPromise = exchangeToken(grantToken).then(function (tokenInfo) {
-          refreshAccessTokenBeforeItExpires(tokenInfo);
+          refreshAccessTokenBeforeItExpires(tokenInfo, { persist: false });
           return tokenInfo.accessToken;
         }).catch(function(err) {
           showAccessTokenExpiredErrorMessage(
             'You must reload the page to annotate.');
           throw err;
         });
+      } else if (authCode) {
+        // Exchange authorization code retrieved from login popup for a new
+        // access token.
+        accessTokenPromise = exchangeToken(authCode).then((tokenInfo) => {
+          saveToken(tokenInfo);
+          refreshAccessTokenBeforeItExpires(tokenInfo, { persist: true });
+          return tokenInfo.accessToken;
+        });
       } else {
-        accessTokenPromise = Promise.resolve(null);
+        // Attempt to load the tokens from the previous session.
+        var tokenInfo = loadToken();
+        if (!tokenInfo) {
+          // No token. The user will need to log in.
+          accessTokenPromise = Promise.resolve(null);
+        } else if (Date.now() > tokenInfo.expiresAt) {
+          // Token has expired. Attempt to refresh it.
+          accessTokenPromise = refreshAccessToken(tokenInfo.refreshToken, {
+            persist: true,
+          });
+        } else {
+          // Token still valid, but schedule a refresh.
+          refreshAccessTokenBeforeItExpires(tokenInfo, { persist: true });
+          accessTokenPromise = Promise.resolve(tokenInfo.accessToken);
+        }
       }
     }
 
