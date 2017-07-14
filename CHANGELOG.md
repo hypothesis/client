@@ -4,6 +4,19 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+### Changed
+
+- Remove need to set feature flag to enable iframe support
+  ([#496](https://github.com/hypothesis/client/pull/496)).
+
+- Do not inject client into small or hidden iframes
+  ([#497](https://github.com/hypothesis/client/pull/497)).
+
+- Persist login between sessions when using OAuth
+  ([#494](https://github.com/hypothesis/client/pull/494)).
+
 ## [1.28.0] - 2017-07-11
 
 ### Changed
