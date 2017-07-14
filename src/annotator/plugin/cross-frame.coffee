@@ -64,14 +64,14 @@ module.exports = class CrossFrame extends Plugin
       if !FrameUtil.hasHypothesis(frame)
         # Take the embed script location from the config
         # until an alternative solution comes around.
-        embedScriptUrl = config.embedScriptUrl
+        clientUrl = config.clientUrl
 
         FrameUtil.isLoaded frame, () ->
           subFrameIdentifier = discovery._generateToken()
           frameIdentifiers.set(frame, subFrameIdentifier)
           injectedConfig = Object.assign({}, config, {subFrameIdentifier})
 
-          FrameUtil.injectHypothesis(frame, embedScriptUrl, injectedConfig)
+          FrameUtil.injectHypothesis(frame, clientUrl, injectedConfig)
 
     _iframeUnloaded = (frame) ->
       bridge.call('destroyFrame', frameIdentifiers.get(frame))

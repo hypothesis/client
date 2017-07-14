@@ -99,9 +99,6 @@ function LiveReloadServer(port, config) {
 
                 // Open the sidebar when the page loads
                 openSidebar: true,
-
-                // Subframe client embed code reference
-                embedScriptUrl: '${config.clientUrl}'
               };
             };
 
