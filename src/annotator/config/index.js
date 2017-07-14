@@ -10,9 +10,15 @@ var settingsFrom = require('./settings');
 function configFrom(window_) {
   var settings = settingsFrom(window_);
   return {
+    // URL where client assets are served from. Used when injecting the client
+    // into child iframes.
+    assetRoot: settings.hostPageSetting('assetRoot', {allowInBrowserExt: true}),
+    // URL of the client's boot script. Used when injecting the client into
+    // child iframes.
+    clientUrl: settings.clientUrl,
+
     annotations: settings.annotations,
     branding: settings.hostPageSetting('branding'),
-    clientUrl: settings.clientUrl,
     services: settings.hostPageSetting('services'),
     showHighlights: settings.showHighlights,
     sidebarAppUrl: settings.sidebarAppUrl,
