@@ -4,6 +4,13 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+### Changed
+
+- Enable annotating in iframes which have the same origin as the top-level page
+  ([#498](https://github.com/hypothesis/client/pull/498)).
+
 ## [1.29.0] - 2017-07-14
 
 ### Changed
