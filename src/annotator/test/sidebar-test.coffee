@@ -1,7 +1,11 @@
 events = require('../../shared/bridge-events')
 
 proxyquire = require('proxyquire')
-Sidebar = proxyquire('../sidebar', {})
+
+rafStub = (fn) ->
+  fn()
+
+Sidebar = proxyquire('../sidebar', { raf: rafStub })
 
 describe 'Sidebar', ->
   sandbox = sinon.sandbox.create()
@@ -253,3 +257,67 @@ describe 'Sidebar', ->
       assert.calledWith(fakeCrossFrame.call, 'setVisibleHighlights', true)
       assert.calledWith(sidebar.publish, 'setVisibleHighlights', true)
 
+  describe 'layout change notifier', ->
+
+    layoutChangeHandlerSpy = null
+    sidebar = null
+    frame = null
+    DEFAULT_WIDTH = 350
+    DEFAULT_HEIGHT = 600
+
+    assertLayoutValues = (args, expectations) ->
+      expected = Object.assign {
+          width: DEFAULT_WIDTH,
+          height: DEFAULT_HEIGHT,
+          expanded: true
+        }, expectations
+
+      assert.deepEqual args, expected
+
+    beforeEach ->
+      layoutChangeHandlerSpy = sandbox.spy()
+      sidebar = createSidebar { onLayoutChange: layoutChangeHandlerSpy, sidebarAppUrl: '/' }
+
+      # remove info about call that happens on creation of sidebar
+      layoutChangeHandlerSpy.reset()
+
+      frame = sidebar.frame[0]
+      Object.assign frame.style, {
+        display: 'block',
+        width: DEFAULT_WIDTH + 'px',
+        height: DEFAULT_HEIGHT + 'px',
+
+        # width is based on left position of the window,
+        # we need to apply the css that puts the frame in the
+        # correct position
+        position: 'fixed',
+        top: 0,
+        left: '100%',
+      }
+
+      document.body.appendChild frame
+
+    afterEach ->
+      frame.remove()
+
+    it 'notifies when sidebar changes expanded state', ->
+      sidebar.show()
+      assert.calledOnce layoutChangeHandlerSpy
+      assertLayoutValues layoutChangeHandlerSpy.lastCall.args[0], {expanded: true}
+
+      sidebar.hide()
+      assert.calledTwice layoutChangeHandlerSpy
+      assertLayoutValues layoutChangeHandlerSpy.lastCall.args[0], {
+        expanded: false,
+        width: 0,
+      }
+
+    it 'notifies when sidebar is panned left', ->
+      sidebar.gestureState = { initial: -DEFAULT_WIDTH }
+      sidebar.onPan({type: 'panleft', deltaX: -50})
+      assertLayoutValues layoutChangeHandlerSpy.lastCall.args[0], { width: 400 }
+
+    it 'notifies when sidebar is panned right', ->
+      sidebar.gestureState = { initial: -DEFAULT_WIDTH }
+      sidebar.onPan({type: 'panright', deltaX: 50})
+      assertLayoutValues layoutChangeHandlerSpy.lastCall.args[0], { width: 300 }
