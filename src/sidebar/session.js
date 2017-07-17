@@ -150,7 +150,12 @@ function session($http, $q, $resource, $rootScope, analytics, annotationUI, auth
     lastLoadTime = Date.now();
 
     if (userChanged) {
-      if (!getAuthority()) {
+      if (!auth.login) {
+        // When using cookie-based auth, notify the auth service that the current
+        // login has changed and API tokens need to be invalidated.
+        //
+        // This is not needed for OAuth-based auth because all login/logout
+        // activities happen through the auth service itself.
         auth.clearCache();
       }
 
@@ -223,12 +228,17 @@ function session($http, $q, $resource, $rootScope, analytics, annotationUI, auth
         return reload();
       });
     } else {
-      loggedOut = resource.logout().$promise;
+      loggedOut = resource.logout().$promise.then(() => {
+        // When using cookie-based auth, notify the auth service that the current
+        // login has changed and API tokens need to be invalidated.
+        //
+        // This is not needed for OAuth-based auth because all login/logout
+        // activities happen through the auth service itself.
+        auth.clearCache();
+      });
     }
 
-    return loggedOut.then(function () {
-      auth.clearCache();
-    }).catch(function (err) {
+    return loggedOut.catch(function (err) {
       flash.error('Log out failed');
       analytics.track(analytics.events.LOGOUT_FAILURE);
       return $q.reject(new Error(err));

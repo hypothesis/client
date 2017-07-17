@@ -295,11 +295,8 @@ describe('session', function () {
       });
     });
 
-    it('does not clear the access token when the host page provides a grant token', function () {
-      fakeServiceConfig.returns({
-        authority: 'publisher.org',
-        grantToken: 'a.jwt.token',
-      });
+    it('does not clear the access token when using OAuth-based authorization', function () {
+      fakeAuth.login = Promise.resolve();
 
       session.update({userid: 'different-user', csrf: 'dummytoken'});
 
