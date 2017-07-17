@@ -208,8 +208,25 @@ function session($http, $q, $resource, $rootScope, analytics, annotationUI, auth
     return update(model);
   }
 
+  /**
+   * Log the user out of the current session.
+   */
   function logout() {
-    return resource.logout().$promise.then(function () {
+    var loggedOut;
+
+    if (auth.logout) {
+      loggedOut = auth.logout().then(() => {
+        // When using OAuth, we have to explicitly re-fetch the logged-out
+        // user's profile.
+        // When using cookie-based auth, `resource.logout()` handles this
+        // automatically.
+        return reload();
+      });
+    } else {
+      loggedOut = resource.logout().$promise;
+    }
+
+    return loggedOut.then(function () {
       auth.clearCache();
     }).catch(function (err) {
       flash.error('Log out failed');

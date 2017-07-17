@@ -34,6 +34,11 @@ function auth($http, $window, flash, localStorage, random, settings) {
   var tokenUrl = resolve('token', settings.apiUrl);
 
   /**
+   * Timer ID of the current access token refresh timer.
+   */
+  var refreshTimer;
+
+  /**
    * Show an error message telling the user that the access token has expired.
    */
   function showAccessTokenExpiredErrorMessage(message) {
@@ -227,7 +232,7 @@ function auth($http, $window, flash, localStorage, random, settings) {
       }
     }
 
-    window.setTimeout(refreshAccessTokenIfNearExpiry, delay);
+    refreshTimer = $window.setTimeout(refreshAccessTokenIfNearExpiry, delay);
   }
 
   /**
@@ -279,11 +284,15 @@ function auth($http, $window, flash, localStorage, random, settings) {
     return accessTokenPromise;
   }
 
-  // clearCache() isn't implemented (or needed) yet for OAuth.
-  // In the future, for example when OAuth-authenticated users can login and
-  // logout of the client, this clearCache() will need to clear the access
-  // token and cancel any scheduled refresh token requests.
+  /**
+   * Forget any cached credentials.
+   */
   function clearCache() {
+    // Once cookie auth has been removed, the `clearCache` method can be removed
+    // from the public API of this service in favor of `logout`.
+    accessTokenPromise = Promise.resolve(null);
+    localStorage.removeItem(storageKey());
+    $window.clearTimeout(refreshTimer);
   }
 
   /**
@@ -352,9 +361,22 @@ function auth($http, $window, flash, localStorage, random, settings) {
     });
   }
 
+  /**
+   * Log the user out of the service.
+   *
+   * Currently this just forgets any API authz credentials which the client has.
+   * When the service provides a means to revoke credentials, this method should
+   * use it.
+   */
+  function logout() {
+    clearCache();
+    return Promise.resolve(null);
+  }
+
   return {
     clearCache,
     login,
+    logout,
     tokenGetter,
   };
 }

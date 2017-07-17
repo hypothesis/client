@@ -349,46 +349,84 @@ describe('session', function () {
     });
   });
 
-  describe('#logout()', function () {
-    var postExpectation;
-    beforeEach(function () {
-      var logoutUrl = 'https://test.hypothes.is/root/app?__formid__=logout';
-      postExpectation = $httpBackend.expectPOST(logoutUrl).respond(200, {
-        model: {
-          userid: 'logged-out-id',
-        },
+  describe('#logout', function () {
+    context('when using cookie auth', () => {
+      var postExpectation;
+      beforeEach(function () {
+        var logoutUrl = 'https://test.hypothes.is/root/app?__formid__=logout';
+        postExpectation = $httpBackend.expectPOST(logoutUrl).respond(200, {
+          model: {
+            userid: 'logged-out-id',
+          },
+        });
+      });
+
+      it('logs the user out on the service and updates the session', function () {
+        session.logout().then(function () {
+          assert.equal(session.state.userid, 'logged-out-id');
+        });
+        $httpBackend.flush();
+      });
+
+      it('clears the API access token cache', function () {
+        session.logout().then(function () {
+          assert.called(fakeAuth.clearCache);
+        });
+        $httpBackend.flush();
+      });
+
+      it('tracks successful logout actions in analytics', function () {
+        session.logout().then(function () {
+          assert.calledWith(fakeAnalytics.track, fakeAnalytics.events.LOGOUT_SUCCESS);
+        });
+        $httpBackend.flush();
+      });
+
+      it('tracks unsuccessful logout actions in analytics', function () {
+        postExpectation.respond(500);
+
+        session.logout().catch(function(){
+          assert.calledWith(fakeAnalytics.track, fakeAnalytics.events.LOGOUT_FAILURE);
+        });
+
+        $httpBackend.flush();
       });
     });
 
-    it('logs the user out on the service and updates the session', function () {
-      session.logout().then(function () {
-        assert.equal(session.state.userid, 'logged-out-id');
-      });
-      $httpBackend.flush();
-    });
+    context('when using OAuth', () => {
+      beforeEach(() => {
+        var loggedIn = true;
 
-    it('clears the API access token cache', function () {
-      session.logout().then(function () {
-        assert.called(fakeAuth.clearCache);
-      });
-      $httpBackend.flush();
-    });
+        fakeAuth.login = sinon.stub().returns(Promise.resolve());
+        fakeAuth.logout = sinon.spy(() => {
+          loggedIn = false;
+          return Promise.resolve();
+        });
 
-    it('tracks successful logout actions in analytics', function () {
-      session.logout().then(function () {
-        assert.calledWith(fakeAnalytics.track, fakeAnalytics.events.LOGOUT_SUCCESS);
-      });
-      $httpBackend.flush();
-    });
-
-    it('tracks unsuccessful logout actions in analytics', function () {
-      postExpectation.respond(500);
-
-      session.logout().catch(function(){
-        assert.calledWith(fakeAnalytics.track, fakeAnalytics.events.LOGOUT_FAILURE);
+        // Fake profile response after logout.
+        fakeStore.profile.read = () => Promise.resolve({
+          userid: null,
+          loggedIn,
+        });
       });
 
-      $httpBackend.flush();
+      it('logs the user out', () => {
+        return session.logout().then(() => {
+          assert.called(fakeAuth.logout);
+        });
+      });
+
+      it('tracks successful logout actions in analytics', () => {
+        return session.logout().then(() => {
+          assert.calledWith(fakeAnalytics.track, fakeAnalytics.events.LOGOUT_SUCCESS);
+        });
+      });
+
+      it('updates the profile after logging out', () => {
+        return session.logout().then(() => {
+          assert.isFalse(session.state.loggedIn);
+        });
+      });
     });
   });
 });
