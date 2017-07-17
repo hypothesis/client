@@ -4,6 +4,13 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+### Changed
+
+- Add mechanism for publishers to react to changes in the width and expanded
+  state of the sidebar ([#499](https://github.com/hypothesis/client/pull/499)).
+
 ## [1.30.0] - 2017-07-14
 
 ### Changed
