@@ -128,8 +128,24 @@ module.exports = class Sidebar extends Host
         if w >= MIN_RESIZE then @frame.css('width', "#{w}px")
         this._notifyOfLayoutChange()
 
+  ###*
+  # Notify integrator when sidebar layout changes via `onLayoutChange` callback.
+  #
+  # @param [boolean] explicitExpandedState - `true` or `false` if the sidebar
+  #   is being directly opened or closed, as opposed to being resized via
+  #   the sidebar's drag handles.
+  ###
   _notifyOfLayoutChange: (explicitExpandedState) =>
     toolbarWidth = @toolbarWidth || 0
+
+    # The sidebar structure is:
+    #
+    # [ Toolbar    ][                                   ]
+    # [ ---------- ][ Sidebar iframe container (@frame) ]
+    # [ Bucket Bar ][                                   ]
+    #
+    # The sidebar iframe is hidden or shown by adjusting the left margin of its
+    # container.
 
     if @onLayoutChange
       rect = @frame[0].getBoundingClientRect()
@@ -137,33 +153,33 @@ module.exports = class Sidebar extends Host
       width = parseInt(computedStyle.width)
       leftMargin = parseInt(computedStyle.marginLeft)
 
-      # the lowest bound still shows the toolbar so setting the default/lower
-      # bound to the width of the toolbar and expand the width form here
-      frameVisbileWidth = toolbarWidth
+      # The width of the sidebar that is visible on screen, including the
+      # toolbar, which is always visible.
+      frameVisibleWidth = toolbarWidth
 
       if explicitExpandedState?
         # When we are explicitly saying to open or close, jump
         # straight to the upper and lower bounding widths.
         if explicitExpandedState
-          frameVisbileWidth += width
+          frameVisibleWidth += width
       else
         if leftMargin < MIN_RESIZE
           # When the width hits its threshold of MIN_RESIZE,
           # the left margin continues to push the sidebar off screen.
           # So it's the best indicator of width when we get below that threshold.
           # Note: when we hit the right edge, it will be -0
-          frameVisbileWidth += -leftMargin
+          frameVisibleWidth += -leftMargin
         else
-          frameVisbileWidth += width
+          frameVisibleWidth += width
 
-      # Since we have added logic on if this is a expclicit show/hide
+      # Since we have added logic on if this is an explicit show/hide
       # and applied proper width to the visible value above, we can infer
       # expanded state on that width value vs the lower bound
-      expanded = frameVisbileWidth > toolbarWidth
+      expanded = frameVisibleWidth > toolbarWidth
 
       @onLayoutChange({
         expanded: expanded,
-        width: if expanded then frameVisbileWidth else toolbarWidth,
+        width: if expanded then frameVisibleWidth else toolbarWidth,
         height: rect.height,
       })
 
