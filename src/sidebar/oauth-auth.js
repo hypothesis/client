@@ -2,6 +2,7 @@
 
 var queryString = require('query-string');
 
+var events = require('./events');
 var resolve = require('./util/url-util').resolve;
 var serviceConfig = require('./service-config');
 
@@ -27,7 +28,7 @@ var serviceConfig = require('./service-config');
  * an opaque access token.
  */
 // @ngInject
-function auth($http, $window, flash, localStorage, random, settings) {
+function auth($http, $rootScope, $window, flash, localStorage, random, settings) {
 
   /**
    * Authorization code from auth popup window.
@@ -214,6 +215,7 @@ function auth($http, $window, flash, localStorage, random, settings) {
         // Reset cached token information. Tokens will be reloaded from storage
         // on the next call to `tokenGetter()`.
         tokenInfoPromise = null;
+        $rootScope.$broadcast(events.OAUTH_TOKENS_CHANGED);
       }
     });
   }
