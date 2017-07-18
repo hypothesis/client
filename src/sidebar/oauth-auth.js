@@ -205,6 +205,20 @@ function auth($http, $window, flash, localStorage, random, settings) {
   }
 
   /**
+   * Listen for updated access & refresh tokens saved by other instances of the
+   * client.
+   */
+  function listenForTokenStorageEvents() {
+    $window.addEventListener('storage', ({ key }) => {
+      if (key === storageKey()) {
+        // Reset cached token information. Tokens will be reloaded from storage
+        // on the next call to `tokenGetter()`.
+        tokenInfoPromise = null;
+      }
+    });
+  }
+
+  /**
    * Retrieve an access token for the API.
    *
    * @return {Promise<string>} The API access token.
@@ -356,6 +370,8 @@ function auth($http, $window, flash, localStorage, random, settings) {
       clearCache();
     });
   }
+
+  listenForTokenStorageEvents();
 
   return {
     clearCache,
