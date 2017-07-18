@@ -18,7 +18,7 @@ var serviceConfig = require('./service-config');
  * an opaque access token.
  */
 // @ngInject
-function auth($http, $window, flash, localStorage, random, settings) {
+function auth($http, $window, flash, localStorage, mutex, random, settings) {
 
   /**
    * Authorization code from auth popup window.
@@ -181,25 +181,60 @@ function auth($http, $window, flash, localStorage, random, settings) {
    * @return {Promise<string|null>} Promise for the new access token
    */
   function refreshAccessToken(refreshToken, options) {
-    var data = { grant_type: 'refresh_token', refresh_token: refreshToken };
-    return postToTokenUrl(data).then((response) => {
-      var tokenInfo = tokenInfoFrom(response);
+    function performRefresh() {
+      var data = { grant_type: 'refresh_token', refresh_token: refreshToken };
+      return postToTokenUrl(data).then((response) => {
+        var tokenInfo = tokenInfoFrom(response);
 
-      if (options.persist) {
-        saveToken(tokenInfo);
-      }
+        if (options.persist) {
+          saveToken(tokenInfo);
+        }
 
-      refreshAccessTokenBeforeItExpires(tokenInfo, {
-        persist: options.persist,
+        refreshAccessTokenBeforeItExpires(tokenInfo, {
+          persist: options.persist,
+        });
+
+        return tokenInfo.accessToken;
+      }).catch(function() {
+        showAccessTokenExpiredErrorMessage(
+          'You must reload the page to continue annotating.');
+        return null;
       });
-      accessTokenPromise = Promise.resolve(tokenInfo.accessToken);
+    }
 
-      return tokenInfo.accessToken;
-    }).catch(function() {
-      showAccessTokenExpiredErrorMessage(
-        'You must reload the page to continue annotating.');
-      return null;
+    var lockKey = 'oauth.token-refresh';
+    var lock;
+
+    if (options.persist) {
+      // When refreshing credentials that are shared between client instances,
+      // acquire an exclusive lock so that only one client tries to refresh at a
+      // time.
+      lock = mutex.lock(lockKey, 10 * 1000);
+    } else {
+      // If each client instance is using its own credentials, no lock is
+      // required.
+      lock = Promise.resolve();
+    }
+
+    // Assign to `accessTokenPromise` here so that any calls to `tokenGetter`
+    // during the refresh will wait until it completes.
+    accessTokenPromise = lock.then(() => {
+      var currentToken = loadToken();
+      if (currentToken && currentToken.refreshToken !== refreshToken) {
+        // Another client refreshed the token while we were waiting for the
+        // ticket.
+        return currentToken.accessToken;
+      } else {
+        return performRefresh();
+      }
+    }).then(accessToken => {
+      if (options.persist) {
+        mutex.unlock(lockKey);
+      }
+      return accessToken;
     });
+
+    return accessTokenPromise;
   }
 
   /**
