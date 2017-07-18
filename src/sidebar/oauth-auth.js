@@ -133,6 +133,26 @@ function auth($http, $window, flash, localStorage, mutex, random, settings) {
   }
 
   /**
+   * Attempt to load and use tokens from the previous session.
+   */
+  function loadAndUseToken() {
+    var tokenInfo = loadToken();
+    if (!tokenInfo) {
+      // No token. The user will need to log in.
+      accessTokenPromise = Promise.resolve(null);
+    } else if (Date.now() > tokenInfo.expiresAt) {
+      // Token has expired. Attempt to refresh it.
+      accessTokenPromise = refreshAccessToken(tokenInfo.refreshToken, {
+        persist: true,
+      });
+    } else {
+      // Token still valid, but schedule a refresh.
+      refreshAccessTokenBeforeItExpires(tokenInfo, { persist: true });
+      accessTokenPromise = Promise.resolve(tokenInfo.accessToken);
+    }
+  }
+
+  /**
    * Persist access & refresh tokens for future use.
    */
   function saveToken(token) {
@@ -266,6 +286,18 @@ function auth($http, $window, flash, localStorage, mutex, random, settings) {
   }
 
   /**
+   * Listen for updated access & refresh tokens saved by other instances of the
+   * client.
+   */
+  function listenForTokenStorageEvents() {
+    $window.addEventListener('storage', ({ key }) => {
+      if (key === storageKey()) {
+        loadAndUseToken();
+      }
+    });
+  }
+
+  /**
    * Retrieve an access token for the API.
    *
    * @return {Promise<string>} The API access token.
@@ -293,21 +325,7 @@ function auth($http, $window, flash, localStorage, mutex, random, settings) {
           return tokenInfo.accessToken;
         });
       } else {
-        // Attempt to load the tokens from the previous session.
-        var tokenInfo = loadToken();
-        if (!tokenInfo) {
-          // No token. The user will need to log in.
-          accessTokenPromise = Promise.resolve(null);
-        } else if (Date.now() > tokenInfo.expiresAt) {
-          // Token has expired. Attempt to refresh it.
-          accessTokenPromise = refreshAccessToken(tokenInfo.refreshToken, {
-            persist: true,
-          });
-        } else {
-          // Token still valid, but schedule a refresh.
-          refreshAccessTokenBeforeItExpires(tokenInfo, { persist: true });
-          accessTokenPromise = Promise.resolve(tokenInfo.accessToken);
-        }
+        loadAndUseToken();
       }
     }
 
@@ -386,6 +404,8 @@ function auth($http, $window, flash, localStorage, mutex, random, settings) {
       accessTokenPromise = null;
     });
   }
+
+  listenForTokenStorageEvents();
 
   return {
     clearCache,

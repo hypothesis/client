@@ -28,17 +28,21 @@ class FakeWindow {
 
   removeEventListener(event, callback) {
     this.callbacks = this.callbacks.filter((cb) =>
-      cb.event === event && cb.callback === callback
+      !(cb.event === event && cb.callback === callback)
     );
+  }
+
+  trigger(event) {
+    this.callbacks.forEach((cb) => {
+      if (cb.event === event.type) {
+        cb.callback(event);
+      }
+    });
   }
 
   sendMessage(data) {
     var evt = new MessageEvent('message', { data });
-    this.callbacks.forEach(({event, callback}) => {
-      if (event === 'message') {
-        callback(evt);
-      }
-    });
+    this.trigger(evt);
   }
 }
 
@@ -416,6 +420,30 @@ describe('sidebar.oauth-auth', function () {
             assert.equal(token, null);
           });
         });
+      });
+    });
+
+    it('reloads tokens when refreshed by another client instance', () => {
+      return login().then(() => {
+        return auth.tokenGetter();
+      }).then(token => {
+        assert.equal(token, 'firstAccessToken');
+
+        // Trigger "storage" event as if another client refreshed the token.
+        var storageEvent = new Event('storage');
+        storageEvent.key = TOKEN_KEY;
+
+        fakeLocalStorage.getObject.returns({
+          accessToken: 'storedAccessToken',
+          refreshToken: 'storedRefreshToken',
+          expiresAt: Date.now() + 100,
+        });
+
+        fakeWindow.trigger(storageEvent);
+
+        return auth.tokenGetter();
+      }).then(token => {
+        assert.equal(token, 'storedAccessToken');
       });
     });
   });
