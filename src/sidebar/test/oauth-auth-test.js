@@ -3,6 +3,8 @@
 var angular = require('angular');
 var { stringify } = require('query-string');
 
+var events = require('../events');
+
 var DEFAULT_TOKEN_EXPIRES_IN_SECS = 1000;
 var TOKEN_KEY = 'hypothesis.oauth.hypothes%2Eis.token';
 
@@ -48,6 +50,7 @@ class FakeWindow {
 
 describe('sidebar.oauth-auth', function () {
 
+  var $rootScope;
   var auth;
   var nowStub;
   var fakeHttp;
@@ -122,8 +125,9 @@ describe('sidebar.oauth-auth', function () {
       settings: fakeSettings,
     });
 
-    angular.mock.inject((_auth_) => {
+    angular.mock.inject((_auth_, _$rootScope_) => {
       auth = _auth_;
+      $rootScope = _$rootScope_;
     });
 
     clock = sinon.useFakeTimers();
@@ -423,12 +427,8 @@ describe('sidebar.oauth-auth', function () {
       });
     });
 
-    it('reloads tokens when refreshed by another client instance', () => {
-      return login().then(() => {
-        return auth.tokenGetter();
-      }).then(token => {
-        assert.equal(token, 'firstAccessToken');
-
+    context('when another client instance saves new tokens', () => {
+      function notifyStoredTokenChange() {
         // Trigger "storage" event as if another client refreshed the token.
         var storageEvent = new Event('storage');
         storageEvent.key = TOKEN_KEY;
@@ -440,10 +440,29 @@ describe('sidebar.oauth-auth', function () {
         });
 
         fakeWindow.trigger(storageEvent);
+      }
 
-        return auth.tokenGetter();
-      }).then(token => {
-        assert.equal(token, 'storedAccessToken');
+      it('reloads tokens from storage', () => {
+        return login().then(() => {
+          return auth.tokenGetter();
+        }).then(token => {
+          assert.equal(token, 'firstAccessToken');
+
+          notifyStoredTokenChange();
+
+          return auth.tokenGetter();
+        }).then(token => {
+          assert.equal(token, 'storedAccessToken');
+        });
+      });
+
+      it('notifies other services about the change', () => {
+        var onTokenChange = sinon.stub();
+        $rootScope.$on(events.OAUTH_TOKENS_CHANGED, onTokenChange);
+
+        notifyStoredTokenChange();
+
+        assert.called(onTokenChange);
       });
     });
   });
