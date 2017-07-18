@@ -288,6 +288,31 @@ loads.
     of that text when it is being viewed as well as the font-family of the
     editor as the annotation is being written.
 
+.. option:: onLayoutChange
+
+  ``function``. This function will be a registered callback to be invoked when the sidebar
+  layout changes. Changes to the layout occur on load, when the sidebar is toggled to
+  show and hide, and when the user adjusts the sidebar manually.
+
+  This setting can only be set using :js:func:`window.hypothesisConfig`.
+
+  When a layout change happens the registered :option:`onLayoutChange` function will
+  receive a single ``Object`` as it's argument. This object details the layout parameters
+  after the change.
+
+  Layout object available fields:
+
+  .. option:: expanded
+
+    ``Boolean``. If the sidebar is open, this value will be true.
+
+  .. option:: height
+
+    ``Number``. The current visible height of the sidebar.
+
+  .. option:: width
+
+    ``Number``. The current visible width of the sidebar.
 
 
 Asset and Sidebar App Location
