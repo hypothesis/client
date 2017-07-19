@@ -159,21 +159,20 @@ module.exports = class Document extends Plugin
           if id[0..3] == "doi:"
             @metadata.link.push(href: id)
 
-    # look for a link to identify the resource in dublincore data
-    dcMetaConcat = []
-    # sort by name for a consistent ordering of the concatenated metadata
-    for name in Object.keys(@metadata.dc).sort()
-      # right now only look for these two terms
-      if name == 'source' || name == 'identifier'
-        values = @metadata.dc[name].sort().map (v) -> encodeURIComponent(v)
-        dcMetaConcat.push(name + ':' + values.join(','))
-
-    dcMetaUrn = 'urn:x-dc-meta:' + dcMetaConcat.join('/')
-    if dcMetaConcat.length == 2
-      # only do this if both terms are provided, for now
-      @metadata.link.push(href: dcMetaUrn)
+    # look for a link to identify the resource in dublincore metadata
+    dcRelationValues = @metadata.dc['relation.ispartof']
+    dcIdentifierValues = @metadata.dc['identifier']
+    if dcRelationValues && dcIdentifierValues
+      dcUrnRelationComponent =
+        dcRelationValues[dcRelationValues.length - 1]
+      dcUrnIdentifierComponent =
+        dcIdentifierValues[dcIdentifierValues.length - 1]
+      dcUrn = 'urn:x-dc:' +
+        encodeURIComponent(dcUrnRelationComponent) + '/' +
+        encodeURIComponent(dcUrnIdentifierComponent)
+      @metadata.link.push(href: dcUrn)
       # set this as the documentFingerprint as a hint to include this in search queries
-      @metadata.documentFingerprint = dcMetaUrn
+      @metadata.documentFingerprint = dcUrn
 
   _getFavicon: =>
     for link in $("link")

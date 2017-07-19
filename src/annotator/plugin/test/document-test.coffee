@@ -41,8 +41,8 @@ describe 'Document', ->
     head.append('<meta name="citation_title" content="Foo">')
     head.append('<meta name="citation_pdf_url" content="foo.pdf">')
     head.append('<meta name="dc.identifier" content="doi:10.1175/JCLI-D-11-00015.1">')
-    head.append('<meta name="dc:identifier" content="isbn:123456789">')
-    head.append('<meta name="dc:source" content="urn:example:abcxyz">')
+    head.append('<meta name="dc:identifier" content="foobar-abcxyz">')
+    head.append('<meta name="dc.relation.ispartof" content="isbn:123456789">')
     head.append('<meta name="DC.type" content="Article">')
     head.append('<meta property="og:url" content="http://example.com">')
     head.append('<meta name="twitter:site" content="@okfn">')
@@ -85,12 +85,12 @@ describe 'Document', ->
       assert.equal(metadata.link[7].type, "application/pdf")
       assert.equal(metadata.link[8].href, "doi:10.1175/JCLI-D-11-00015.1")
 
-      # link derived from dc resource identifiers
-      # should be in the form of `urn:x-dc-meta: identifier: <doi>,<isbn> / source: <example>`
-      # it's a comma separated list for when there's multiple identifiers
+      # Link derived from dc resource identifiers in the form of urn:x-dc:<container>/<identifier>
+      # Where <container> is the percent-encoded value of the last dc.relation.ispartof meta element
+      # and <identifier> is the percent-encoded value of the last dc.identifier meta element.
       assert.equal(
         metadata.link[9].href
-        "urn:x-dc-meta:identifier:doi%3A10.1175%2FJCLI-D-11-00015.1,isbn%3A123456789/source:urn%3Aexample%3Aabcxyz"
+        "urn:x-dc:isbn%3A123456789/foobar-abcxyz"
       )
 
     it 'should ignore atom and RSS feeds and alternate languages', ->
@@ -104,8 +104,8 @@ describe 'Document', ->
 
     it 'should have dublincore metadata', ->
       assert.ok(metadata.dc)
-      assert.deepEqual(metadata.dc.identifier, ["doi:10.1175/JCLI-D-11-00015.1", "isbn:123456789"])
-      assert.deepEqual(metadata.dc.source, ["urn:example:abcxyz"])
+      assert.deepEqual(metadata.dc.identifier, ["doi:10.1175/JCLI-D-11-00015.1", "foobar-abcxyz"])
+      assert.deepEqual(metadata.dc['relation.ispartof'], ["isbn:123456789"])
       assert.deepEqual(metadata.dc.type, ["Article"])
 
     it 'should have facebook metadata', ->
