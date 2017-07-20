@@ -91,7 +91,7 @@ describe('sidebar.oauth-auth', function () {
 
     fakeMutex = {
       lock: () => Promise.resolve(),
-      unlock: sinon.stub(),
+      unlock: () => Promise.resolve(),
     };
 
     fakeRandom = {

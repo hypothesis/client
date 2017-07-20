@@ -2,89 +2,94 @@
 
 var mutex = require('../mutex');
 
-class FakeLocalStorage {
-  constructor() {
-    this._store = {};
-  }
-
-  setObject(key, obj) {
-    assert.isObject(obj);
-    this._store[key] = obj;
-  }
-
-  getObject(key) {
-    return this._store[key] || null;
-  }
-
-  removeItem(key) {
-    delete this._store[key];
-  }
-}
-
+// The tests for the mutex service are designed to be generic enough that we
+// could swap out the underlying mutex implementation in future, eg. if browsers
+// provide better primitives for this, and continue to re-use the same tests.
 describe('sidebar.mutex', () => {
-  var fakeLocalStorage;
+  var mutexes;
 
-  function createMutex(id) {
-    var fakeRandom = {
-      generateHexString: () => id,
-    };
-
-    var mtx = mutex(fakeLocalStorage, fakeRandom);
+  function createMutex() {
+    var mu = mutex();
 
     // Reduce spin delay to speed up tests.
-    mtx.setSpinDelay(5);
+    mu.setSpinDelay(5);
 
-    return mtx;
+    // Save this mutex so we can unlock it after the test completes.
+    mutexes.push(mu);
+
+    return mu;
   }
 
   beforeEach(() => {
-    fakeLocalStorage = new FakeLocalStorage;
+    mutexes = [];
+  });
+
+  afterEach(() => {
+    return Promise.all(mutexes.map(mu => mu.unlock()));
   });
 
   describe('#lock', () => {
     it('locks the mutex', () => {
-      var mtx = createMutex('id');
-      return mtx.lock('foo').then(() => {
-        assert.isObject(fakeLocalStorage.getObject('hypothesis.mutex.foo'));
+      var mtxA = createMutex();
+      var mtxB = createMutex();
+
+      var aIsLocked = false;
+      var bIsLocked = false;
+
+      var aLocked = mtxA.lock().then(() => aIsLocked = true);
+      var bLocked = mtxB.lock().then(() => bIsLocked = true);
+
+      return Promise.race([aLocked, bLocked]).then(() => {
+        // Check that only one lock was acquired.
+        assert.isTrue(aIsLocked !== bIsLocked);
+
+        // Now let the other `lock()` complete before the test finishes.
+        mtxA.unlock();
+        mtxB.unlock();
+
+        return Promise.all([aLocked, bLocked]);
       });
     });
 
     it('waits until the mutex is unlocked', () => {
-      var mtxA = createMutex('a');
-      var mtxB = createMutex('b');
+      var mtxA = createMutex();
+      var mtxB = createMutex();
 
       var lockTimeA;
       var lockTimeB;
 
-      var lockedA = mtxA.lock('foo').then(() => {
+      var lockedA = mtxA.lock().then(() => {
         lockTimeA = Date.now();
+        setTimeout(() => {
+          mtxA.unlock();
+        }, 50);
       });
-      var lockedB = mtxB.lock('foo').then(() => {
+      var lockedB = mtxB.lock().then(() => {
         lockTimeB = Date.now();
       });
 
-      setTimeout(() => {
-        mtxA.unlock('foo');
-      }, 50);
-
       return Promise.all([lockedA, lockedB]).then(() => {
         var delta = lockTimeB - lockTimeA;
-        assert.isAbove(delta, 50);
+
+        assert.isAbove(delta, 45);
       });
     });
 
     context('if another client fails to unlock the mutex', () => {
       it('waits until the mutex expires', () => {
-        var mtxA = createMutex('a');
-        var mtxB = createMutex('b');
+        var mtxA = createMutex();
+        var mtxB = createMutex();
+
+        mtxA.setExpiry(50);
+        mtxB.setExpiry(50);
 
         var lockTimeA;
         var lockTimeB;
 
-        var lockedA = mtxA.lock('foo', 50).then(() => {
+        var lockedA = mtxA.lock().then(() => {
           lockTimeA = Date.now();
         });
-        var lockedB = mtxB.lock('foo', 50).then(() => {
+        var lockedB = mtxB.lock().then(() => {
           lockTimeB = Date.now();
         });
 
@@ -97,30 +102,13 @@ describe('sidebar.mutex', () => {
   });
 
   describe('#unlock', () => {
-    it('throws an error if the mutex is not locked', () => {
-      var mtx = createMutex('id');
-      assert.throws(() => {
-        return mtx.unlock('foo');
-      });
-    });
-
-    it('throws an error if a different client locked the mutex', () => {
-      var mtxA = createMutex('a');
-      var mtxB = createMutex('b');
-
-      return mtxA.lock('foo').then(() => {
-        assert.throws(() => {
-          mtxB.unlock('foo');
-        });
-      });
-    });
-
     it('unlocks the mutex', () => {
-      var mtx = createMutex('id');
-      return mtx.lock('foo').then(() => {
-        mtx.unlock('foo');
+      var mtxA = createMutex();
+      var mtxB = createMutex();
 
-        assert.isNull(fakeLocalStorage.getObject('hypothesis.mutex.foo'));
+      return mtxA.lock().then(() => {
+        // Unlock `mtxA`, allowing `mtxB` to acquire the lock.
+        return Promise.all([mtxA.unlock(), mtxB.lock()]);
       });
     });
   });

@@ -223,23 +223,22 @@ function auth($http, $rootScope, $window, flash, localStorage, mutex, random, se
       });
     }
 
-    var lockKey = 'oauth.token-refresh';
-    var lock;
+    var locked;
 
     if (options.persist) {
       // When refreshing credentials that are shared between client instances,
       // acquire an exclusive lock so that only one client tries to refresh at a
       // time.
-      lock = mutex.lock(lockKey, 10 * 1000);
+      locked = mutex.lock();
     } else {
       // If each client instance is using its own credentials, no lock is
       // required.
-      lock = Promise.resolve();
+      locked = Promise.resolve();
     }
 
     // Assign to `accessTokenPromise` here so that any calls to `tokenGetter`
     // during the refresh will wait until it completes.
-    accessTokenPromise = lock.then(() => {
+    accessTokenPromise = locked.then(() => {
       var currentToken = loadToken();
       if (currentToken && currentToken.refreshToken !== refreshToken) {
         // Another client refreshed the token while we were waiting for the
@@ -250,7 +249,7 @@ function auth($http, $rootScope, $window, flash, localStorage, mutex, random, se
       }
     }).then(accessToken => {
       if (options.persist) {
-        mutex.unlock(lockKey);
+        mutex.unlock();
       }
       return accessToken;
     });
