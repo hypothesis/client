@@ -90,6 +90,32 @@ describe('media-embedder', function () {
     });
   });
 
+  it('replaces mp3 links with html5 audio elements', function() {
+    var urls = [
+      'https://archive.org/download/testmp3testfile/mpthreetest.mp3',
+      'https://archive.org/download/testmp3testfile/mpthreetest.mp3#fragment',
+      'https://archive.org/download/testmp3testfile/mpthreetest.mp3?q=foo&id=bar',
+    ];
+    urls.forEach(function (url) {
+      var element = domElement('<a href="' + url + '">' + url + '</a>');
+
+      mediaEmbedder.replaceLinksWithEmbeds(element);
+
+      assert.equal(element.childElementCount, 1);
+      assert.equal(element.children[0].tagName, 'AUDIO');
+      assert.equal(
+        element.children[0].src, 'https://archive.org/download/testmp3testfile/mpthreetest.mp3'); //not sure if this is correct
+    });
+    }); 
+  })
+
+/**  it('replaces H5P activity links with iframes', function(){
+*    var urls = [
+*      'https://h5p.org/h5p/embed/617'
+*    ]
+*  }
+*/
+
   it('does not replace links if the link text is different', function () {
     var url = 'https://youtu.be/QCkm0lL-6lc';
     var element = domElement('<a href="' + url + '">different label</a>');

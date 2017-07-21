@@ -1,6 +1,19 @@
 'use strict';
 
 /**
+* Return an HTML5 audio player with the given src URL.
+*/
+
+function mp3audio(src) {
+   var html5audio = document.createElement('audio');
+   html5audio.id       = 'audio-player';
+   html5audio.controls = 'controls';
+   html5audio.src      =  src;
+   html5audio.type     = 'audio/mpeg';
+   return html5audio;
+}
+
+/**
  * Return an iframe DOM element with the given src URL.
  */
 function iframe(src) {
@@ -24,8 +37,8 @@ function vimeoEmbed(id) {
 }
 
 /**
- * A list of functions that return an "embed" DOM element (e.g. an <iframe>)
- * for a given link.
+ * A list of functions that return an "embed" DOM element (e.g. an <iframe> or
+ * an html5 <audio> element) for a given link.
  *
  * Each function either returns `undefined` if it can't generate an embed for
  * the link, or a DOM element if it can.
@@ -88,6 +101,20 @@ var embedGenerators = [
     }
     return null;
   },
+
+  function html5audioFromMp3Link(link) {
+	if (link.href.toLowerCase().indexOf('.mp3') !== -1) {
+	  return mp3audio(link.href);
+    }
+   return null;
+  },
+
+  function h5pFromEmbedLink(link) {
+  	if (link.href.toLowerCase().indexOf('admin-ajax.php?action=h5p_embed&id=') !== -1) {
+  		return iframe(link.href);
+  	}
+  	return null;
+  }
 ];
 
 /**
@@ -115,7 +142,7 @@ function embedForLink(link) {
  *
  * If the given link element is a link to an embeddable media and if its link
  * text is the same as its href then it will be replaced in the DOM with an
- * embed (e.g. an <iframe>) of the same media.
+ * embed (e.g. an <iframe> or html5 <audio> element) of the same media.
  *
  * If the link text is different from the href, then the link will be left
  * untouched. We want to convert links like these from the Markdown source into
@@ -138,13 +165,11 @@ function replaceLinkWithEmbed(link) {
   if (link.href !== link.textContent) {
     return;
   }
-
   var embed = embedForLink(link);
-  if (embed) {
+  if (embed){
     link.parentElement.replaceChild(embed, link);
   }
 }
-
 
 /**
  * Replace all embeddable link elements beneath the given element with embeds.
