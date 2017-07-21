@@ -70,16 +70,6 @@ function LiveReloadServer(port, config) {
           </html>
         `;
       } else {
-        var multiFrameContent = config.enableMultiFrameSupport ? `
-          <div style="margin: 10px 0 0 75px;">
-            <button id="add-test" style="padding: 0.6em; font-size: 0.75em">Toggle 2nd Frame</button>
-          </div>
-          <div style="margin: 10px 0 0 75px;">
-            <iframe id="iframe1" src="/document/license" style="width: 50%;height: 300px;"></iframe>
-          </div>
-          <div id="iframe2-container" style="margin: 10px 0 0 75px;">
-          </div>` : '';
-
         content = `
           <html>
           <head>
@@ -91,7 +81,14 @@ function LiveReloadServer(port, config) {
               Number of annotations:
               <span data-hypothesis-annotation-count>...</span>
             </div>
-            ${multiFrameContent}
+            <div style="margin: 10px 0 0 75px;">
+              <button id="add-test" style="padding: 0.6em; font-size: 0.75em">Toggle 2nd Frame</button>
+            </div>
+            <div style="margin: 10px 0 0 75px;">
+              <iframe id="iframe1" src="/document/license" style="width: 50%;height: 300px;"></iframe>
+            </div>
+            <div id="iframe2-container" style="margin: 10px 0 0 75px;">
+            </div>
             <pre style="margin: 20px 75px 75px 75px;">${readmeText()}</pre>
             <script>
             var appHost = document.location.hostname;
@@ -102,10 +99,6 @@ function LiveReloadServer(port, config) {
 
                 // Open the sidebar when the page loads
                 openSidebar: true,
-
-                // Needed for multi frame support
-                enableMultiFrameSupport: ${config.enableMultiFrameSupport},
-                embedScriptUrl: '${config.clientUrl}'
               };
             };
 

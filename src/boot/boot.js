@@ -45,11 +45,19 @@ function bootHypothesisClient(doc, config) {
   // Register the URL of the sidebar app which the Hypothesis client should load.
   // The <link> tag is also used by browser extensions etc. to detect the
   // presence of the Hypothesis client on the page.
-  var baseUrl = doc.createElement('link');
-  baseUrl.rel = 'sidebar';
-  baseUrl.href = config.sidebarAppUrl;
-  baseUrl.type = 'application/annotator+html';
-  doc.head.appendChild(baseUrl);
+  var sidebarUrl = doc.createElement('link');
+  sidebarUrl.rel = 'sidebar';
+  sidebarUrl.href = config.sidebarAppUrl;
+  sidebarUrl.type = 'application/annotator+html';
+  doc.head.appendChild(sidebarUrl);
+
+  // Register the URL of the annotation client which is currently being used to drive
+  // annotation interactions.
+  var clientUrl = doc.createElement('link');
+  clientUrl.rel = 'hypothesis-client';
+  clientUrl.href = config.assetRoot + 'build/boot.js';
+  clientUrl.type = 'application/annotator+javascript';
+  doc.head.appendChild(clientUrl);
 
   injectAssets(doc, config, [
     // Vendor code and polyfills

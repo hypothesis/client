@@ -2,7 +2,7 @@
 
 // Find all iframes within this iframe only
 function findFrames (container) {
-  var frames = Array.from(container.getElementsByTagName('iframe'));
+  const frames = Array.from(container.getElementsByTagName('iframe'));
   return frames.filter(isValid);
 }
 
@@ -13,13 +13,13 @@ function hasHypothesis (iframe) {
 
 // Inject embed.js into the iframe
 function injectHypothesis (iframe, scriptUrl, config) {
-  var configElement = document.createElement('script');
+  const configElement = document.createElement('script');
   configElement.className = 'js-hypothesis-config';
   configElement.type = 'application/json';
   configElement.innerText = JSON.stringify(config);
 
-  var src = scriptUrl;
-  var embedElement = document.createElement('script');
+  const src = scriptUrl;
+  const embedElement = document.createElement('script');
   embedElement.className = 'js-hypothesis-embed';
   embedElement.async = true;
   embedElement.src = src;
@@ -37,10 +37,27 @@ function isAccessible (iframe) {
   }
 }
 
-// Check if this is an iframe that we want to inject embed.js into
+
+/**
+ * Check if the frame elements being considered for injection have the
+ * basic heuristics for content that a user might want to annotate.
+ *  Rules:
+ *    - avoid our client iframe
+ *    - iframe should be sizeable - to avoid the small advertisement and social plugins
+ *
+ * @param  {HTMLIFrameElement} iframe the frame being checked
+ * @returns {boolean}   result of our validity checks
+ */
 function isValid (iframe) {
-  // Currently only checks if it's not the h-sidebar
-  return iframe.className !== 'h-sidebar-iframe';
+
+  const isNotClientFrame = !iframe.classList.contains('h-sidebar-iframe');
+
+  const frameRect = iframe.getBoundingClientRect();
+  const MIN_WIDTH = 150;
+  const MIN_HEIGHT = 150;
+  const hasSizableContainer = frameRect.width > MIN_WIDTH && frameRect.height > MIN_HEIGHT;
+
+  return isNotClientFrame && hasSizableContainer;
 }
 
 function isDocumentReady (iframe, callback) {
@@ -68,7 +85,6 @@ module.exports = {
   hasHypothesis: hasHypothesis,
   injectHypothesis: injectHypothesis,
   isAccessible: isAccessible,
-  isValid: isValid,
   isLoaded: isLoaded,
   isDocumentReady: isDocumentReady,
 };

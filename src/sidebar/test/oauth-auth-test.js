@@ -1,10 +1,10 @@
 'use strict';
 
+var angular = require('angular');
 var { stringify } = require('query-string');
 
-var authService = require('../oauth-auth');
-
 var DEFAULT_TOKEN_EXPIRES_IN_SECS = 1000;
+var TOKEN_KEY = 'hypothesis.oauth.hypothes%2Eis.token';
 
 class FakeWindow {
   constructor() {
@@ -48,11 +48,17 @@ describe('sidebar.oauth-auth', function () {
   var nowStub;
   var fakeHttp;
   var fakeFlash;
+  var fakeLocalStorage;
   var fakeRandom;
   var fakeWindow;
   var fakeSettings;
   var clock;
   var successfulFirstAccessTokenPromise;
+
+  before(() => {
+    angular.module('app', [])
+      .service('auth', require('../oauth-auth'));
+  });
 
   beforeEach(function () {
     nowStub = sinon.stub(window.performance, 'now');
@@ -91,13 +97,23 @@ describe('sidebar.oauth-auth', function () {
 
     fakeWindow = new FakeWindow();
 
-    auth = authService(
-      fakeHttp,
-      fakeWindow,
-      fakeFlash,
-      fakeRandom,
-      fakeSettings
-    );
+    fakeLocalStorage = {
+      getObject: sinon.stub().returns(null),
+      setObject: sinon.stub(),
+    };
+
+    angular.mock.module('app', {
+      $http: fakeHttp,
+      $window: fakeWindow,
+      flash: fakeFlash,
+      localStorage: fakeLocalStorage,
+      random: fakeRandom,
+      settings: fakeSettings,
+    });
+
+    angular.mock.inject((_auth_) => {
+      auth = _auth_;
+    });
 
     clock = sinon.useFakeTimers();
   });
@@ -117,6 +133,12 @@ describe('sidebar.oauth-auth', function () {
           headers: {'Content-Type': 'application/x-www-form-urlencoded'},
         });
         assert.equal(token, 'firstAccessToken');
+      });
+    });
+
+    it('should not persist access tokens fetched using a grant token', function () {
+      return auth.tokenGetter().then(() => {
+        assert.notCalled(fakeLocalStorage.setObject);
       });
     });
 
@@ -292,6 +314,132 @@ describe('sidebar.oauth-auth', function () {
           .then(expireAccessToken)
           .then(function () { clock.tick(1); })
           .then(assertThatErrorMessageWasShown);
+      });
+    });
+  });
+
+  describe('persistence of tokens to storage', () => {
+    /**
+     * Login and retrieve an auth code.
+     */
+    function login() {
+      var loggedIn = auth.login();
+      fakeWindow.sendMessage({
+        type: 'authorization_response',
+        code: 'acode',
+        state: 'notrandom',
+      });
+      return loggedIn;
+    }
+
+    beforeEach(() => {
+      fakeSettings.services = [];
+    });
+
+    it('persists tokens retrieved via auth code exchanges to storage', () => {
+      return login().then(() => {
+        return auth.tokenGetter();
+      }).then(() => {
+        assert.calledWith(fakeLocalStorage.setObject, TOKEN_KEY, {
+          accessToken: 'firstAccessToken',
+          refreshToken: 'firstRefreshToken',
+          expiresAt: 910000,
+        });
+      });
+    });
+
+    it('persists refreshed tokens to storage', () => {
+      // 1. Perform initial token exchange.
+      return login().then(() => {
+        return auth.tokenGetter();
+      }).then(() => {
+        // 2. Refresh access token.
+        fakeLocalStorage.setObject.reset();
+        fakeHttp.post.returns(Promise.resolve({
+          status: 200,
+          data: {
+            access_token: 'secondToken',
+            expires_in: DEFAULT_TOKEN_EXPIRES_IN_SECS,
+            refresh_token: 'secondRefreshToken',
+          },
+        }));
+        expireAccessToken();
+        return auth.tokenGetter();
+      }).then(() => {
+        // 3. Check that updated token was persisted to storage.
+        assert.calledWith(fakeLocalStorage.setObject, TOKEN_KEY, {
+          accessToken: 'secondToken',
+          refreshToken: 'secondRefreshToken',
+          expiresAt: 1910000,
+        });
+      });
+    });
+
+    it('loads and uses tokens from storage', () => {
+      fakeLocalStorage.getObject.withArgs(TOKEN_KEY).returns({
+        accessToken: 'foo',
+        refreshToken: 'bar',
+        expiresAt: 123,
+      });
+
+      return auth.tokenGetter().then((token) => {
+        assert.equal(token, 'foo');
+      });
+    });
+
+    it('refreshes the token if it expired after loading from storage', () => {
+      // Store an expired access token.
+      clock.tick(200);
+      fakeLocalStorage.getObject.withArgs(TOKEN_KEY).returns({
+        accessToken: 'foo',
+        refreshToken: 'bar',
+        expiresAt: 123,
+      });
+      fakeHttp.post.returns(Promise.resolve({
+        status: 200,
+        data: {
+          access_token: 'secondToken',
+          expires_in: DEFAULT_TOKEN_EXPIRES_IN_SECS,
+          refresh_token: 'secondRefreshToken',
+        },
+      }));
+
+      // Fetch the token again from the service and check that it gets
+      // refreshed.
+      return auth.tokenGetter().then((token) => {
+        assert.equal(token, 'secondToken');
+        assert.calledWith(
+          fakeLocalStorage.setObject,
+          TOKEN_KEY,
+          {
+            accessToken: 'secondToken',
+            refreshToken: 'secondRefreshToken',
+            expiresAt: 910200,
+          }
+        );
+      });
+    });
+
+    [{
+      when: 'keys are missing',
+      data: {
+        accessToken: 'foo',
+      },
+    },{
+      when: 'data types are wrong',
+      data: {
+        accessToken: 123,
+        expiresAt: 'notanumber',
+        refreshToken: null,
+      },
+    }].forEach(({ when, data }) => {
+      context(when, () => {
+        it('ignores invalid tokens in storage', () => {
+          fakeLocalStorage.getObject.withArgs('foo').returns(data);
+          return auth.tokenGetter().then((token) => {
+            assert.equal(token, null);
+          });
+        });
       });
     });
   });

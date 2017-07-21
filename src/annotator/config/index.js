@@ -10,22 +10,26 @@ var settingsFrom = require('./settings');
 function configFrom(window_) {
   var settings = settingsFrom(window_);
   return {
-    sidebarAppUrl: settings.sidebarAppUrl,
-    query: settings.query,
     annotations: settings.annotations,
-    showHighlights: settings.showHighlights,
-    openLoginForm: settings.hostPageSetting('openLoginForm', {allowInBrowserExt: true}),
-    openSidebar: settings.hostPageSetting('openSidebar', {allowInBrowserExt: true}),
+    // URL where client assets are served from. Used when injecting the client
+    // into child iframes.
+    assetRoot: settings.hostPageSetting('assetRoot', {allowInBrowserExt: true}),
     branding: settings.hostPageSetting('branding'),
-    services: settings.hostPageSetting('services'),
-
-    // Needed by the multi-frame feature for now
-    enableMultiFrameSupport: settings.hostPageSetting('enableMultiFrameSupport'),
-    embedScriptUrl: settings.hostPageSetting('embedScriptUrl'),
-    subFrameIdentifier: settings.hostPageSetting('subFrameIdentifier'),
-
+    // URL of the client's boot script. Used when injecting the client into
+    // child iframes.
+    clientUrl: settings.clientUrl,
     // Temporary feature flag override for 1st-party OAuth
     oauthEnabled: settings.hostPageSetting('oauthEnabled'),
+    onLayoutChange: settings.hostPageSetting('onLayoutChange'),
+    openLoginForm: settings.hostPageSetting('openLoginForm', {allowInBrowserExt: true}),
+    openSidebar: settings.hostPageSetting('openSidebar', {allowInBrowserExt: true}),
+    query: settings.query,
+    services: settings.hostPageSetting('services'),
+    showHighlights: settings.showHighlights,
+    sidebarAppUrl: settings.sidebarAppUrl,
+    // Subframe identifier given when a frame is being embedded into
+    // by a top level client
+    subFrameIdentifier: settings.hostPageSetting('subFrameIdentifier', {allowInBrowserExt: true}),
   };
 }
 

@@ -40,8 +40,7 @@ describe('CrossFrame multi-frame scenario', function () {
 
     options = {
       config: {
-        enableMultiFrameSupport: true,
-        embedScriptUrl: 'data:,', // empty data uri
+        clientUrl: 'data:,', // empty data uri
       },
       on: sandbox.stub(),
       emit: sandbox.stub(),
@@ -112,7 +111,7 @@ describe('CrossFrame multi-frame scenario', function () {
       isLoaded(frame, function () {
         var scriptElement = frame.contentDocument.querySelector('script[src]');
         assert(scriptElement, 'expected embed script to be injected');
-        assert.equal(scriptElement.src, options.config.embedScriptUrl,
+        assert.equal(scriptElement.src, options.config.clientUrl,
           'unexpected embed script source');
         resolve();
       });
