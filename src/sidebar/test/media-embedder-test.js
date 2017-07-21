@@ -109,13 +109,6 @@ describe('media-embedder', function () {
     }); 
   })
 
-/**  it('replaces H5P activity links with iframes', function(){
-*    var urls = [
-*      'https://h5p.org/h5p/embed/617'
-*    ]
-*  }
-*/
-
   it('does not replace links if the link text is different', function () {
     var url = 'https://youtu.be/QCkm0lL-6lc';
     var element = domElement('<a href="' + url + '">different label</a>');
@@ -169,4 +162,4 @@ describe('media-embedder', function () {
     assert.equal(
       element.children[1].src, 'https://www.youtube.com/embed/abcdefg');
   });
-});
+};

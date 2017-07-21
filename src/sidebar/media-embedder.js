@@ -102,6 +102,7 @@ var embedGenerators = [
     return null;
   },
 
+  // Matches URLs that have .mp3 in them (assumed to be audio files)
   function html5audioFromMp3Link(link) {
 	if (link.href.toLowerCase().indexOf('.mp3') !== -1) {
 	  return mp3audio(link.href);
@@ -109,12 +110,6 @@ var embedGenerators = [
    return null;
   },
 
-  function h5pFromEmbedLink(link) {
-  	if (link.href.toLowerCase().indexOf('admin-ajax.php?action=h5p_embed&id=') !== -1) {
-  		return iframe(link.href);
-  	}
-  	return null;
-  }
 ];
 
 /**
