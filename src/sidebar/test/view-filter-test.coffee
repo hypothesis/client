@@ -177,3 +177,17 @@ describe 'viewFilter', ->
         result = viewFilter.filter [annotation], filters
         assert.equal result.length, 1
         assert.equal result[0], 1
+
+  it 'ignores filters with no terms in the query', ->
+    ann = { id: 1, tags: ['foo'] }
+    filters =
+      any:
+        terms: ['foo']
+        operator: 'and'
+      tag:
+        terms: []
+        operator: 'and'
+
+    result = viewFilter.filter [ann], filters
+
+    assert.deepEqual result, [1]

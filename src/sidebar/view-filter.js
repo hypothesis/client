@@ -146,7 +146,9 @@ function viewFilter(unicode) {
 
     // Convert the input filter object into a filter tree, expanding "any"
     // filters.
-    var fieldFilters = Object.entries(filters).map(([field, filter]) => {
+    var fieldFilters = Object.entries(filters).filter(([, filter]) =>
+      filter.terms.length > 0)
+    .map(([field, filter]) => {
       var terms = filter.terms.map(normalize);
       var termFilters;
       if (field === 'any') {
