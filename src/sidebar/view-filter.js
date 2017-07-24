@@ -1,5 +1,9 @@
 'use strict';
 
+// Prevent Babel inserting helper code after `@ngInject` comment below which
+// breaks browserify-ngannotate.
+var unused; // eslint-disable-line
+
 // @ngInject
 function viewFilter(unicode) {
   /**
