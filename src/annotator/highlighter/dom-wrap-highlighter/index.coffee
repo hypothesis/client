@@ -22,3 +22,16 @@ exports.highlightRange = (normedRange) ->
   nodes = $(normedRange.textNodes()).filter((i) -> not white.test @nodeValue)
 
   return nodes.wrap(hl).parent().toArray()
+
+
+# Given the events we care about, attach proper listeners and
+# invoke the provided event handler callback.
+#
+# @param Object eventHandlers is a key-value object where the key represents
+#  the event we are binding to (like 'click' or 'mouseover') and the value is
+#  the callback function to be invoked when the respective event occurs
+# @param Element scopeTo defines where our event delegation should be scoped to
+exports.registerEventHandlers = (eventHandlers, scopeTo) ->
+  $elementScope = $ scopeTo
+  Object.keys(eventHandlers).forEach (eventName) ->
+    $elementScope.delegate('.annotator-hl', eventName, eventHandlers[eventName])

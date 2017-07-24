@@ -37,9 +37,6 @@ module.exports = class Guest extends Delegator
 
   # Events to be bound on Delegator#element.
   events:
-    ".annotator-hl click":               "onHighlightClick"
-    ".annotator-hl mouseover":           "onHighlightMouseover"
-    ".annotator-hl mouseout":            "onHighlightMouseout"
     "click":                             "onElementClick"
     "touchstart":                        "onElementTouchStart"
 
@@ -63,6 +60,12 @@ module.exports = class Guest extends Delegator
     super
 
     this.adder = $(this.html.adder).appendTo(@element).hide()
+
+    highlighter.registerEventHandlers({
+      click: this.onHighlightClick.bind(this),
+      mouseover: this.onHighlightMouseover.bind(this),
+      mouseout: this.onHighlightMouseout.bind(this),
+    });
 
     self = this
     this.adderCtrl = new adder.Adder(@adder[0], {
@@ -184,8 +187,6 @@ module.exports = class Guest extends Delegator
       this.setVisibleHighlights(state)
 
   destroy: ->
-    $('#annotator-dynamic-style').remove()
-
     this.selections.unsubscribe()
     @adder.remove()
 

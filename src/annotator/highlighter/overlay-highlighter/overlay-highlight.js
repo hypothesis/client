@@ -1,6 +1,6 @@
 'use strict';
 
-const highlighterUtils = require('./highlighter-utils');
+const overlayUtils = require('./overlay-utils');
 
 class OverlayHighlight {
 
@@ -9,11 +9,12 @@ class OverlayHighlight {
     this.range = normedRange.toRange();
     this.target = target;
 
-    const highlightContainer = highlighterUtils.createSVGElement('svg');
-    const highlightEl = highlighterUtils.createSVGElement('g');
+    const highlightContainer = overlayUtils.createSVGElement('svg');
+    const highlightEl = overlayUtils.createSVGElement('g');
 
     this.container = highlightContainer;
     this.container.style.position = 'absolute';
+
     // Disable pointer events
     this.container.setAttribute('pointer-events', 'none');
     this.container.style.mixBlendMode = 'multiply';
@@ -28,7 +29,7 @@ class OverlayHighlight {
   render() {
 
     // update the container position
-    highlighterUtils.setCoords(this.container, highlighterUtils.getCoords(this.target));
+    overlayUtils.setCoords(this.container, overlayUtils.getCoords(this.target));
 
     // Empty element
     while (this.element.firstChild) {
@@ -59,12 +60,13 @@ class OverlayHighlight {
     const offset = this.element.getBoundingClientRect();
 
     this.highlightElementRefs = this.filteredRangeRects.map((rect) => {
-      const el = highlighterUtils.createSVGElement('rect');
+      const el = overlayUtils.createSVGElement('rect');
       el.setAttribute('x', rect.left - offset.left);
       el.setAttribute('y', rect.top - offset.top);
       el.setAttribute('height', rect.height);
       el.setAttribute('width', rect.width);
       el.classList.add('annotator-hl');
+
       this.element.appendChild(el);
       return el;
     });
@@ -73,7 +75,7 @@ class OverlayHighlight {
   reposition() {
 
     // update the container position
-    highlighterUtils.setCoords(this.container, highlighterUtils.getCoords(this.target));
+    overlayUtils.setCoords(this.container, overlayUtils.getCoords(this.target));
 
     const offset = this.element.getBoundingClientRect();
 
@@ -87,17 +89,7 @@ class OverlayHighlight {
   }
 
   getHighlightReferences() {
-
-    return this.highlightElementRefs.map((ref)=>{
-
-      // extend the element object to also include
-      // the range that it was originally created
-      // to highlight. Allowing us to pickup the
-      // correct references later on
-      ref.basedOnRange = this.range;
-
-      return ref;
-    });
+    return this.highlightElementRefs;
   }
 }
 

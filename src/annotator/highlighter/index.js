@@ -17,6 +17,16 @@ const _getCurrentHighlighter = () => {
   return overlayFlagEnabled ? overlayHighlighter : domWrapHighlighter;
 };
 
+let _readyForEvents = false;
+let _eventBindingAttrs;
+
+const _bindingReady = () => {
+  _readyForEvents = true;
+  if(_eventBindingAttrs){
+    _getCurrentHighlighter().registerEventHandlers(_eventBindingAttrs.eventHandlers, _eventBindingAttrs.scopeTo);
+  }
+};
+
 module.exports = {
 
   /**
@@ -30,6 +40,9 @@ module.exports = {
    *  @returns Array of HTMLElement references.
    */
   highlightRange: (normedRange) => {
+    if(!_readyForEvents){
+      _bindingReady();
+    }
     return _getCurrentHighlighter().highlightRange(normedRange);
   },
 
@@ -79,5 +92,25 @@ module.exports = {
     highlights.forEach((el)=>{
       el.classList.toggle('annotator-hl-focused', focusOn);
     });
+  },
+
+
+  /**
+   * Given the events we care about, attach proper listeners and
+   *  invoke the provided event handler callback.
+   *
+   * @param Object eventHandlers is a key value pair object where the key represents
+   *  the event we are binding to (like 'click' or 'mouseover') and the value is
+   *  the callback function to be invoked when the respective event occurs
+   * @param Element scopeTo defines where our event delegation should be scoped to
+   */
+  registerEventHandlers: (eventHandlers, scopeTo = document.body) => {
+    // Note: we will bind the events when the highlights
+    // are actually created
+    _eventBindingAttrs = {eventHandlers, scopeTo};
+
+    if(_readyForEvents){
+      _bindingReady();
+    }
   },
 };

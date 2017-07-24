@@ -74,6 +74,7 @@
     "karma-sinon": "^1.0.5",
     "katex": "^0.7.1",
     "lodash.debounce": "^4.0.3",
+    "lodash.throttle": "^4.1.1",
     "lodash.get": "^4.3.0",
     "mkdirp": "^0.5.1",
     "mocha": "^2.4.5",
