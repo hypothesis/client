@@ -102,9 +102,9 @@ function viewFilter(unicode) {
     },
     since: {
       autofalse: ann => typeof ann.updated !== 'string',
-      value: ann => ann.updated,
+      value: ann => new Date(ann.updated),
       match(term, value) {
-        var delta = Math.round((+new Date - new Date(value)) / 1000);
+        var delta = (Date.now() - value) / 1000;
         return delta <= term;
       },
     },
