@@ -139,11 +139,6 @@ function viewFilter(unicode) {
    * @return {string[]} IDs of matching annotations.
    */
   this.filter = (annotations, filters) => {
-    var limit = annotations.length;
-    if (filters.result) {
-      limit = Math.min(...filters.result.terms.map(parseInt));
-    }
-
     // Convert the input filter object into a filter tree, expanding "any"
     // filters.
     var fieldFilters = Object.entries(filters).filter(([, filter]) =>
@@ -166,7 +161,6 @@ function viewFilter(unicode) {
 
     return annotations
       .filter(ann => rootFilter.matches(ann))
-      .slice(0, limit)
       .map(ann => ann.id);
   };
 }
