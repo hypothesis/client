@@ -4,6 +4,13 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [1.32.1] - 2017-07-25
+
+### Changed
+
+- Fix IE 10/11 regression in documents without a `<base>` element.
+  ([#507](https://github.com/hypothesis/client/pull/507)).
+
 ## [1.32.0] - 2017-07-20
 
 ### Changed
