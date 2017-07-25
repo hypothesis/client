@@ -106,8 +106,43 @@ describe('media-embedder', function () {
       assert.equal(
         element.children[0].src, 'https://archive.org/download/testmp3testfile/mpthreetest.mp3'); //not sure if this is correct
     });
-    }); 
-  })
+  });
+
+  it('replaces ogg links with html5 audio elements', function() {
+    var urls = [
+      'https://www.w3schools.com/html/horse.ogg',
+      'https://www.w3schools.com/html/horse.ogg#fragment',
+      'https://www.w3schools.com/html/horse.ogg?q=foo&id=bar',
+    ];
+    urls.forEach(function (url) {
+      var element = domElement('<a href="' + url + '">' + url + '</a>');
+
+      mediaEmbedder.replaceLinksWithEmbeds(element);
+
+      assert.equal(element.childElementCount, 1);
+      assert.equal(element.children[0].tagName, 'AUDIO');
+      assert.equal(
+        element.children[0].src, 'https://www.w3schools.com/html/horse.ogg'); //not sure if this is correct
+    });
+  });
+
+  it('replaces wav links with html5 audio elements', function() {
+    var urls = [
+      'http://freewavesamples.com/files/Kurzweil-K2000-Dual-Bass-C1.wav',
+      'http://freewavesamples.com/files/Kurzweil-K2000-Dual-Bass-C1.wav#fragment',
+      'http://freewavesamples.com/files/Kurzweil-K2000-Dual-Bass-C1.wav?q=foo&id=bar',
+    ];
+    urls.forEach(function (url) {
+      var element = domElement('<a href="' + url + '">' + url + '</a>');
+
+      mediaEmbedder.replaceLinksWithEmbeds(element);
+
+      assert.equal(element.childElementCount, 1);
+      assert.equal(element.children[0].tagName, 'AUDIO');
+      assert.equal(
+        element.children[0].src, 'http://freewavesamples.com/files/Kurzweil-K2000-Dual-Bass-C1.wav'); //not sure if this is correct
+    });
+  });
 
   it('does not replace links if the link text is different', function () {
     var url = 'https://youtu.be/QCkm0lL-6lc';
@@ -162,4 +197,4 @@ describe('media-embedder', function () {
     assert.equal(
       element.children[1].src, 'https://www.youtube.com/embed/abcdefg');
   });
-};
+});
