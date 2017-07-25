@@ -4,13 +4,12 @@
 * Return an HTML5 audio player with the given src URL.
 */
 
-function mp3audio(src) {
-   var html5audio = document.createElement('audio');
-   html5audio.id       = 'audio-player';
-   html5audio.controls = 'controls';
-   html5audio.src      =  src;
-   html5audio.type     = 'audio/mpeg';
-   return html5audio;
+function audioElement(src) {
+  var html5audio = document.createElement('audio');
+  html5audio.id       = 'audio-player';
+  html5audio.controls = 'controls';
+  html5audio.src      =  src;
+  return html5audio;
 }
 
 /**
@@ -102,12 +101,12 @@ var embedGenerators = [
     return null;
   },
 
-  // Matches URLs that have .mp3 in them (assumed to be audio files)
+  // Matches URLs that end with .mp3, .ogg, or .wav (assumed to be audio files)
   function html5audioFromMp3Link(link) {
-	if (link.href.toLowerCase().indexOf('.mp3') !== -1) {
-	  return mp3audio(link.href);
+    if (link.pathname.endsWith('.mp3') || link.pathname.endsWith('.ogg') || link.pathname.endsWith('.wav')) {
+      return audioElement(link.href);
     }
-   return null;
+    return null;
   },
 
 ];
