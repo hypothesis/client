@@ -1,6 +1,5 @@
 $ = require('jquery')
-proxyquire = require('proxyquire')
-Document = null
+Document = require('../document')
 
 ###
 ** Adapted from:
@@ -17,20 +16,15 @@ Document = null
 describe 'Document', ->
   testDocument = null
 
-# stub the baseURI for the following testing setup
-  docBaseUri = 'https://example.com/a_document.html'
-
   beforeEach ->
-    Document = proxyquire('../document', {
-      'document-base-uri': docBaseUri
-    })
     testDocument = new Document($('<div></div>')[0], {})
+    testDocument.pluginInit()
 
   afterEach ->
     $(document).unbind()
 
   describe 'annotation should have some metadata', ->
-# add some metadata to the page
+    # Add some metadata to the page
     head = $("head")
     head.append('<link rel="alternate" href="foo.pdf" type="application/pdf"></link>')
     head.append('<link rel="alternate" href="foo.doc" type="application/msword"></link>')
@@ -55,7 +49,6 @@ describe 'Document', ->
     metadata = null
 
     beforeEach ->
-      testDocument.pluginInit()
       metadata = testDocument.metadata
 
     it 'should have metadata', ->
@@ -67,7 +60,6 @@ describe 'Document', ->
     it 'should have links with absolute hrefs and types', ->
       assert.ok(metadata.link)
       assert.equal(metadata.link.length, 10)
-      assert.match(metadata.link[0].href, docBaseUri)
       assert.equal(metadata.link[1].rel, "alternate")
       assert.match(metadata.link[1].href, /^.+foo\.pdf$/)
       assert.equal(metadata.link[1].type, "application/pdf")
@@ -172,14 +164,62 @@ describe 'Document', ->
       )
       assert.equal(result, expected)
 
-  describe '#_getDocumentHref', ->
+  describe '#uri', ->
 
-    it 'should use the baseURI for the current testing setup', ->
-      assert.equal(testDocument._getDocumentHref(), docBaseUri)
+    beforeEach ->
+      # Remove any existing canonical links which would otherwise override the
+      # document's own location.
+      canonicalLink = document.querySelector('link[rel="canonical"]')
+      if canonicalLink
+        canonicalLink.remove()
 
-    it 'should use the test page href in a different case', ->
-      Document = proxyquire('../document', {
-        'document-base-uri': document.location.href
+    createDoc = (href, baseURI) ->
+      fakeDocument =
+        createElement: document.createElement.bind(document),
+        location:
+          href: href
+      doc = new Document($('<div></div>')[0], {
+        document: fakeDocument,
+        baseURI: baseURI,
       })
-      altDocument = new Document($('<div></div>')[0], {})
-      assert.equal(altDocument._getDocumentHref(), document.location.href)
+      doc.pluginInit()
+      doc
+
+    [
+      'http://publisher.org/book',
+      'https://publisher.org/book',
+      'file:///Users/jim/book',
+    ].forEach (href) ->
+      it "should return the document's URL if it has an allowed scheme", ->
+        baseURI = 'https://publisher.org/'
+        doc = createDoc(href, baseURI)
+        assert.equal(doc.uri(), href)
+
+    it "should return the baseURI if the document's URL does not have an allowed scheme", ->
+      href = 'blob:1234-5678'
+      baseURI = 'https://publisher.org/book'
+      doc = createDoc(href, baseURI)
+      assert.equal(doc.uri(), baseURI)
+
+    [
+      # The base URI is not available in IE if the document has no `<base>`
+      # tags. This is a limitation of `document-base-uri`.
+      ['https://publisher.org/article', undefined],
+      # Ignore base URIs with non-HTTP/HTTPS/file protocols, which can be
+      # created by a `<base>` tag.
+      ['blob:1234', 'doi:foo'],
+      ['chrome://foo', 'chrome://blah'],
+    ].forEach ([href, baseURI]) ->
+      it "should return the document's URL if it and the baseURI do not have an allowed scheme", ->
+        doc = createDoc(href, baseURI)
+        assert.equal(doc.uri(), href)
+
+    it 'returns the canonical URI if present', ->
+      canonicalLink = document.createElement('link')
+      canonicalLink.rel = 'canonical'
+      canonicalLink.href = 'https://publisher.org/canonical'
+      document.head.appendChild(canonicalLink)
+
+      doc = createDoc('https://publisher.org/not-canonical', null)
+
+      assert.equal doc.uri(), canonicalLink.href
