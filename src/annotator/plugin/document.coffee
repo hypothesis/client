@@ -21,6 +21,10 @@ module.exports = class Document extends Plugin
     'beforeAnnotationCreated': 'beforeAnnotationCreated'
 
   pluginInit: ->
+    # Test seams.
+    @baseURI = @options.baseURI or baseURI
+    @document = @options.document or document
+
     this.getDocumentMetadata()
 
 # returns the primary URI for the document being annotated
@@ -179,20 +183,27 @@ module.exports = class Document extends Plugin
       if $(link).prop("rel") in ["shortcut icon", "icon"]
         @metadata["favicon"] = this._absoluteUrl(link.href)
 
-# hack to get a absolute url from a possibly relative one
-
+  # Hack to get a absolute url from a possibly relative one
   _absoluteUrl: (url) ->
-    d = document.createElement('a')
+    d = @document.createElement('a')
     d.href = url
     d.href
 
-# get the true URI record when it's masked via a different protocol.
-# this happens when an href is set with a uri using the 'blob:' protocol
-# but the document can set a different uri through a <base> tag.
-
+  # Get the true URI record when it's masked via a different protocol.
+  # This happens when an href is set with a uri using the 'blob:' protocol
+  # but the document can set a different uri through a <base> tag.
   _getDocumentHref: ->
-    href = document.location.href
-    if new URL(href).protocol != new URL(baseURI).protocol
-      # use the baseURI instead since it's likely what's intended
-      href = baseURI
+    href = @document.location.href
+    allowedSchemes = ['http:', 'https:', 'file:']
+
+    # Use the current document location if it has a recognized scheme.
+    if new URL(href).protocol in allowedSchemes
+      return href
+
+    # Otherwise, try using the location specified by the <base> element.
+    if @baseURI and (new URL(@baseURI).protocol in allowedSchemes)
+      return @baseURI
+
+    # Fall back to returning the document URI, even though the scheme is not
+    # in the allowed list.
     return href
