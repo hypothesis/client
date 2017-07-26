@@ -248,7 +248,21 @@ module.exports = class Guest extends Delegator
       return animationPromise ->
         range = xpathRange.sniff(anchor.range)
         normedRange = range.normalize(root)
-        highlights = highlighter.highlightRange(normedRange)
+
+        titleText = 'user: ' + annotation['user'].replace('acct:', '')
+        if annotation['text']
+          text = annotation['text']
+          text = text.replace('\'', '&#39;')
+          text = text.replace('\n', ' ')
+          limit = 140
+        if text.length > limit
+          text = text.slice(0, limit) + ' ...'
+        titleText += '&#010;' + 'text: ' + text
+
+        if annotation['tags'].length
+          titleText += '&#010;' + 'tags: ' + annotation['tags']
+
+        highlights = highlighter.highlightRange(normedRange, null, titleText)
 
         $(highlights).data('annotation', anchor.annotation)
         anchor.highlights = highlights

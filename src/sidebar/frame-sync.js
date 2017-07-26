@@ -29,6 +29,9 @@ function formatAnnot(ann) {
       document: ann.document,
       target: ann.target,
       uri: ann.uri,
+      text: ann.text,
+      tags: ann.tags,
+      user: ann.user
     },
   };
 }
