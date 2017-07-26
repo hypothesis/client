@@ -93,8 +93,8 @@ describe('media-embedder', function () {
   it('replaces mp3 links with html5 audio elements', function() {
     var urls = [
       'https://archive.org/download/testmp3testfile/mpthreetest.mp3',
-      'https://archive.org/download/testmp3testfile/mpthreetest.mp3#fragment',
       'https://archive.org/download/testmp3testfile/mpthreetest.mp3?q=foo&id=bar',
+      'https://archive.org/download/testmp3testfile/mpthreetest.mp3?foo=bar&id=1'
     ];
     urls.forEach(function (url) {
       var element = domElement('<a href="' + url + '">' + url + '</a>');
@@ -111,8 +111,8 @@ describe('media-embedder', function () {
   it('replaces ogg links with html5 audio elements', function() {
     var urls = [
       'https://www.w3schools.com/html/horse.ogg',
-      'https://www.w3schools.com/html/horse.ogg#fragment',
       'https://www.w3schools.com/html/horse.ogg?q=foo&id=bar',
+      'https://www.w3schools.com/html/horse.ogg?foo=bar&id=1',
     ];
     urls.forEach(function (url) {
       var element = domElement('<a href="' + url + '">' + url + '</a>');
@@ -129,8 +129,8 @@ describe('media-embedder', function () {
   it('replaces wav links with html5 audio elements', function() {
     var urls = [
       'http://freewavesamples.com/files/Kurzweil-K2000-Dual-Bass-C1.wav',
-      'http://freewavesamples.com/files/Kurzweil-K2000-Dual-Bass-C1.wav#fragment',
       'http://freewavesamples.com/files/Kurzweil-K2000-Dual-Bass-C1.wav?q=foo&id=bar',
+      'http://freewavesamples.com/files/Kurzweil-K2000-Dual-Bass-C1.wav?foo=bar&id=1',
     ];
     urls.forEach(function (url) {
       var element = domElement('<a href="' + url + '">' + url + '</a>');
