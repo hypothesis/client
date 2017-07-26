@@ -1,12 +1,15 @@
 'use strict';
 
+const $ = require('jquery');
 const overlayUtils = require('./overlay-utils');
+
 
 class OverlayHighlight {
 
-  constructor(normedRange, target = document.body){
+  constructor(normedRange, annotation = null, target = document.body){
     this.normedRange = normedRange;
     this.range = normedRange.toRange();
+    this.annotation = annotation;
     this.target = target;
 
     const highlightContainer = overlayUtils.createSVGElement('svg');
@@ -68,23 +71,14 @@ class OverlayHighlight {
       el.classList.add('annotator-hl');
 
       this.element.appendChild(el);
+
+      // Bind the annotation data to the highlight elements so the elements
+      // themselves can be used to directly look up the annotation being referenced
+      if(this.annotation){
+        $(el).data('annotation', this.annotation);
+      }
+
       return el;
-    });
-  }
-
-  reposition() {
-
-    // update the container position
-    overlayUtils.setCoords(this.container, overlayUtils.getCoords(this.target));
-
-    const offset = this.element.getBoundingClientRect();
-
-    this.highlightElementRefs.forEach((el, index) => {
-      const rect = this.filteredRangeRects[index];
-      el.setAttribute('x', rect.left - offset.left);
-      el.setAttribute('y', rect.top - offset.top);
-      el.setAttribute('height', rect.height);
-      el.setAttribute('width', rect.width);
     });
   }
 

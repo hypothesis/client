@@ -4,9 +4,10 @@ $ = require('jquery')
 # element of the specified class and returns the highlight Elements.
 #
 # normedRange - A NormalizedRange to be highlighted.
+# annotation - The annotation that the highlights are bound to.
 #
 # Returns an array of highlight Elements.
-exports.highlightRange = (normedRange) ->
+exports.highlightRange = (normedRange, annotation) ->
   white = /^\s*$/
   cssClass = 'annotator-hl'
 
@@ -21,7 +22,14 @@ exports.highlightRange = (normedRange) ->
   # but better than breaking table layouts.
   nodes = $(normedRange.textNodes()).filter((i) -> not white.test @nodeValue)
 
-  return nodes.wrap(hl).parent().toArray()
+  highlights = nodes.wrap(hl).parent().toArray()
+
+  # Bind the annotation data to the highlight elements so the elements
+  # themselves can be used to directly look up the annotation being referenced
+  if annotation
+    $(highlights).data('annotation', annotation);
+
+  return highlights
 
 
 # Given the events we care about, attach proper listeners and

@@ -37,13 +37,15 @@ module.exports = {
    *  highlighters
    *
    *  @param normedRange A NormalizedRange to be highlighted.
+   *  @param annotation Optionally, you can pass the annotation you would like to
+   *    apply a data reference to.
    *  @returns Array of HTMLElement references.
    */
-  highlightRange: (normedRange) => {
+  highlightRange: (normedRange, annotation) => {
     if(!_readyForEvents){
       _bindingReady();
     }
-    return _getCurrentHighlighter().highlightRange(normedRange);
+    return _getCurrentHighlighter().highlightRange(normedRange, annotation);
   },
 
   /**

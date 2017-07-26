@@ -27,13 +27,13 @@ let _resizeListener;
 
 module.exports = {
 
-  highlightRange: (normedRange) => {
+  highlightRange: (normedRange, annotation) => {
 
     if(!_resizeListener){
       _resizeListener = window.addEventListener('resize', debounce(_redrawHighlights, DEBOUNCE_WAIT), /*useCapture*/false);
     }
 
-    const highlight = new OverlayHighlight(normedRange);
+    const highlight = new OverlayHighlight(normedRange, annotation);
 
     highlight.render();
 
