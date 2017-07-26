@@ -89,6 +89,9 @@ SearchClient.prototype._getBatch = function (query, offset) {
  */
 SearchClient.prototype.get = function (query) {
   this._results = [];
+  this._group = query.group;
+  delete query.group;
+//  console.log('query', JSON.stringify(query));
   this._getBatch(query, 0);
 };
 

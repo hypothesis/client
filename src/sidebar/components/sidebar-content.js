@@ -100,6 +100,38 @@ function SidebarContentController(
     annotationMapper.unloadAnnotations(annotationUI.savedAnnotations());
   }
 
+  function _showGroupActivity(results) {
+    console.log('_showGroupActivity', results);
+    var counts = {};
+    results.forEach(function(r) {
+      if ( counts[r.group] ) {
+        counts[r.group] += 1;
+      }
+      else {
+        counts[r.group] = 1;
+      }
+    });
+
+    var scopeSelectorNodes = Array.prototype.slice.call(document.querySelectorAll('.group-id'));
+//    scopeSelectorNodes = scopeSelectorNodes.slice(0, scopeSelectorNodes.length-1);
+    console.log (scopeSelectorNodes);
+
+    scopeSelectorNodes.forEach( function (n) {
+      var groupId = n.innerHTML.replace(/\s/g,'');
+      console.log('counts', counts);
+      console.log('counts[groupId]', counts[groupId]);
+
+
+      if ( counts[groupId] ) {
+          console.log( '(' + counts[groupId] + ')' );
+          n.parentNode.querySelector('.group-count').innerHTML =  '(' + counts[groupId] + ')';
+        }
+      else {
+          n.parentNode.querySelector('.group-count').innerHTML = '';
+        }
+    });
+  }
+
   function _loadAnnotationsFor(uris, group) {
     var searchClient = new SearchClient(store.search, {
       // If no group is specified, we are fetching annotations from
@@ -110,6 +142,15 @@ function SidebarContentController(
     });
     searchClients.push(searchClient);
     searchClient.on('results', function (results) {
+
+      _showGroupActivity(results);
+
+      results = results.filter( function(x) {
+        return x.group === searchClient._group;
+      });
+
+//      console.log('group-filtered results', results);
+
       if (annotationUI.hasSelectedAnnotations()) {
         // Focus the group containing the selected annotation and filter
         // annotations to those from this group
