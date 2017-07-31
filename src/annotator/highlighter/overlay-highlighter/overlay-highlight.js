@@ -4,6 +4,9 @@ const $ = require('jquery');
 const overlayUtils = require('./overlay-utils');
 const rangeUtils = require('../../../annotator/range-util');
 
+/**
+ * A highlight for a single range.
+ */
 class OverlayHighlight {
 
   constructor(normedRange, annotation = null, target = document.body){
@@ -34,6 +37,10 @@ class OverlayHighlight {
     highlightContainer.appendChild(highlightEl);
 
     target.appendChild(this.container);
+  }
+
+  remove() {
+    this.element.remove();
   }
 
   render() {

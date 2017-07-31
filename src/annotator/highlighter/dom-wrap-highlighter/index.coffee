@@ -1,5 +1,9 @@
 $ = require('jquery')
 
+exports.dispose = () ->
+  highlights = Array.from(document.querySelectorAll('hypothesis-highlight'))
+  highlights.forEach (hl) -> hl.remove()
+
 # Public: Wraps the DOM Nodes within the provided range with a highlight
 # element of the specified class and returns the highlight Elements.
 #

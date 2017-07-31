@@ -2,35 +2,36 @@
 
 const debounce = require('lodash.debounce');
 const OverlayHighlight = require('./overlay-highlight');
-const overlayEvents = require('./overlay-events');
+const EventHandler = require('./overlay-events');
 
 const DEBOUNCE_WAIT = 50;
-const _highlights = [];
-const _highlightsChangedListeners = [];
-let _boundOverlayEventBubbling = false;
 
-const _notifyHighlightsChange = (highlights) => {
-  _highlightsChangedListeners.forEach((cb)=>{
-    cb(highlights);
-  });
-};
+class OverlayHighlighter {
+  constructor() {
+    this._highlights = [];
+    this._highlightsChangedListeners = [];
 
-const _redrawHighlights = () => {
-  _highlights.forEach( ( highlight ) => {
-    highlight.render();
-    _notifyHighlightsChange(highlight.getHighlightReferences());
-  });
-};
+    this._notifyHighlightsChange = (highlights) => {
+      this._highlightsChangedListeners.forEach((cb)=>{
+        cb(highlights);
+      });
+    };
 
+    this._redrawHighlights = () => {
+      this._highlights.forEach( ( highlight ) => {
+        highlight.render();
+        this._notifyHighlightsChange(highlight.getHighlightReferences());
+      });
+    };
 
-let _resizeListener;
+    this._resizeListener = null;
+    this._eventHandler = null;
+  }
 
-module.exports = {
+  highlightRange(normedRange, annotation) {
 
-  highlightRange: (normedRange, annotation) => {
-
-    if(!_resizeListener){
-      _resizeListener = window.addEventListener('resize', debounce(_redrawHighlights, DEBOUNCE_WAIT), /*useCapture*/false);
+    if(!this._resizeListener){
+      this._resizeListener = window.addEventListener('resize', debounce(this._redrawHighlights, DEBOUNCE_WAIT), /*useCapture*/false);
     }
 
     const highlight = new OverlayHighlight(normedRange, annotation);
@@ -38,14 +39,21 @@ module.exports = {
     highlight.render();
 
     // save highlight reference so we can redraw on viewport changes
-    _highlights.push(highlight);
+    this._highlights.push(highlight);
 
     return highlight.getHighlightReferences();
-  },
+  }
 
-  onHighlightsChanged: (cb) => {
-    _highlightsChangedListeners.push(cb);
-  },
+  onHighlightsChanged(cb) {
+    this._highlightsChangedListeners.push(cb);
+  }
+
+  dispose() {
+    if (this._eventHandler) {
+      this._eventHandler.dispose();
+    }
+    this._highlights.forEach(hl => hl.remove());
+  }
 
   /**
    * Given the events we care about, attach proper listeners and
@@ -58,10 +66,11 @@ module.exports = {
    *  the callback function to be invoked when the respective event occurs
    * @param Element scopeTo defines where our event delegation should be scoped to
    */
-  registerEventHandlers: (events, scopedTo) => {
-    if(!_boundOverlayEventBubbling){
-      _boundOverlayEventBubbling = true;
-      overlayEvents.bindEvents(events, scopedTo, _highlights);
+  registerEventHandlers(events, scopedTo) {
+    if (!this._eventHandler) {
+      this._eventHandler = new EventHandler(events, scopedTo, this._highlights);
     }
-  },
-};
+  }
+}
+
+module.exports = OverlayHighlighter;

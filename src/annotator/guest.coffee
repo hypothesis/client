@@ -8,10 +8,12 @@ Delegator = require('./delegator')
 $ = require('jquery')
 
 adder = require('./adder')
-highlighter = require('./highlighter')
+{ createHighlighter } = require('./highlighter')
 rangeUtil = require('./range-util')
 selections = require('./selections')
 xpathRange = require('./anchoring/range')
+
+highlighter = createHighlighter()
 
 animationPromise = (fn) ->
   return new Promise (resolve, reject) ->
