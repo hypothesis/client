@@ -528,6 +528,24 @@ describe('sidebar.oauth-auth', function () {
         assert.equal(err.message, 'Authorization window was closed');
       });
     });
+
+    it('rejects if auth code exchange fails', () => {
+      var loggedIn = auth.login();
+
+      // Successful response from authz popup.
+      fakeWindow.sendMessage({
+        type: 'authorization_response',
+        code: 'acode',
+        state: 'notrandom',
+      });
+
+      // Error response from auth code => token exchange.
+      fakeHttp.post.returns(Promise.resolve({status: 400}));
+
+      return loggedIn.catch(err => {
+        assert.equal(err.message, 'Authorization code exchange failed');
+      });
+    });
   });
 
   // Advance time forward so that any current access tokens will have expired.
