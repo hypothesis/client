@@ -4,6 +4,16 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+### Changed
+
+- Add onLayoutChange documentation
+  ([#503](https://github.com/hypothesis/client/pull/503)).
+
+- Remove the alternate tab switcher design
+  ([#513](https://github.com/hypothesis/client/pull/513)).
+
 ## [1.32.1] - 2017-07-25
 
 ### Changed
