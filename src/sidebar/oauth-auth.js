@@ -141,17 +141,32 @@ function auth($http, $window, flash, localStorage, random, settings) {
 
   // Exchange the JWT grant token for an access token.
   // See https://tools.ietf.org/html/rfc7523#section-4
-  function exchangeToken(grantToken) {
+  function exchangeJWT(grantToken) {
     var data = {
-      // FIXME: This should be set to the appropriate grant type if we are
-      //        exchanging an authorization code for a grant token, which
-      //        is the case for first-party accounts.
       grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer',
       assertion: grantToken,
     };
     return postToTokenUrl(data).then(function (response) {
       if (response.status !== 200) {
         throw new Error('Failed to retrieve access token');
+      }
+      return tokenInfoFrom(response);
+    });
+  }
+
+  /**
+   * Exchange an authorization code from the `/oauth/authorize` endpoint for
+   * access and refresh tokens.
+   */
+  function exchangeAuthCode(code) {
+    var data = {
+      client_id: settings.oauthClientId,
+      grant_type: 'authorization_code',
+      code,
+    };
+    return postToTokenUrl(data).then((response) => {
+      if (response.status !== 200) {
+        throw new Error('Authorization code exchange failed');
       }
       return tokenInfoFrom(response);
     });
@@ -226,7 +241,7 @@ function auth($http, $window, flash, localStorage, random, settings) {
 
       if (grantToken) {
         // Exchange host-page provided grant token for a new access token.
-        accessTokenPromise = exchangeToken(grantToken).then(function (tokenInfo) {
+        accessTokenPromise = exchangeJWT(grantToken).then((tokenInfo) => {
           refreshAccessTokenBeforeItExpires(tokenInfo, { persist: false });
           return tokenInfo.accessToken;
         }).catch(function(err) {
@@ -237,7 +252,7 @@ function auth($http, $window, flash, localStorage, random, settings) {
       } else if (authCode) {
         // Exchange authorization code retrieved from login popup for a new
         // access token.
-        accessTokenPromise = exchangeToken(authCode).then((tokenInfo) => {
+        accessTokenPromise = exchangeAuthCode(authCode).then((tokenInfo) => {
           saveToken(tokenInfo);
           refreshAccessTokenBeforeItExpires(tokenInfo, { persist: true });
           return tokenInfo.accessToken;

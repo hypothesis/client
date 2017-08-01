@@ -506,8 +506,9 @@ describe('sidebar.oauth-auth', function () {
       }).then(() => {
         // 2. Verify that auth code is exchanged for access & refresh tokens.
         var expectedBody =
-          'assertion=acode' +
-          '&grant_type=urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Ajwt-bearer';
+          'client_id=the-client-id' +
+          '&code=acode' +
+          '&grant_type=authorization_code';
         assert.calledWith(fakeHttp.post, 'https://hypothes.is/api/token', expectedBody, {
           headers: {'Content-Type': 'application/x-www-form-urlencoded'},
         });
