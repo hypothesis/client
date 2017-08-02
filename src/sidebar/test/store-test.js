@@ -29,7 +29,7 @@ describe('store', function () {
 
     angular.mock.module('h', {
       auth: fakeAuth,
-      settings: {apiUrl: 'http://example.com/api'},
+      settings: {apiUrl: 'http://example.com/api/'},
     });
 
     angular.mock.inject(function (_$q_) {
@@ -50,7 +50,7 @@ describe('store', function () {
     $httpBackend = _$httpBackend_;
     store = _store_;
 
-    $httpBackend.expectGET('http://example.com/api').respond({
+    $httpBackend.expectGET('http://example.com/api/').respond({
       // Return an API route directory.
       // This should mirror the structure (but not the exact URLs) of
       // https://hypothes.is/api/.
