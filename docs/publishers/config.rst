@@ -102,7 +102,7 @@ loads.
       window.hypothesisConfig = function () {
         return {
           services: [{
-            apiUrl: 'https://hypothes.is/api',
+            apiUrl: 'https://hypothes.is/api/',
             authority: 'partner.org',
             grantToken: '***',
             icon: 'https://openclipart.org/download/272629/sihouette-animaux-10.svg'
