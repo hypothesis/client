@@ -6,8 +6,7 @@
 
 function audioElement(src) {
   var html5audio = document.createElement('audio');
-  html5audio.id       = 'audio-player';
-  html5audio.controls = 'controls';
+  html5audio.controls = true;
   html5audio.src      =  src;
   return html5audio;
 }
