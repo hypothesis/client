@@ -109,7 +109,7 @@ describe('media-embedder', function () {
 
       assert.equal(element.childElementCount, 1);
       assert.equal(element.children[0].tagName, 'AUDIO');
-      assert.equal(element.children[0].src, url);
+      assert.equal(element.children[0].src, url.toLowerCase());
     });
   });
 
