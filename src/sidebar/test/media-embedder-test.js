@@ -90,27 +90,17 @@ describe('media-embedder', function () {
     });
   });
 
-  it('replaces mp3 links with html5 audio elements', function() {
+  it('replaces audio links with html5 audio elements', function() {
     var urls = [
       'https://archive.org/download/testmp3testfile/mpthreetest.mp3',
+      'https://archive.org/download/testmp3testfile/mpthreetest.mp3#fragment',
       'https://archive.org/download/testmp3testfile/mpthreetest.mp3?foo=bar&id=1',
-    ];
-    urls.forEach(function (url) {
-      var element = domElement('<a href="' + url + '">' + url + '</a>');
-
-      mediaEmbedder.replaceLinksWithEmbeds(element);
-
-      assert.equal(element.childElementCount, 1);
-      assert.equal(element.children[0].tagName, 'AUDIO');
-      assert.equal(
-        element.children[0].src, 'https://archive.org/download/testmp3testfile/mpthreetest.mp3'); //not sure if this is correct
-    });
-  });
-
-  it('replaces ogg links with html5 audio elements', function() {
-    var urls = [
+      'http://www.music.helsinki.fi/tmt/opetus/uusmedia/esim/a2002011001-e02.wav',
+      'http://www.music.helsinki.fi/tmt/opetus/uusmedia/esim/a2002011001-e02.wav#fragment',
+      'http://www.music.helsinki.fi/tmt/opetus/uusmedia/esim/a2002011001-e02.wav?foo=bar&id=4',
       'https://www.w3schools.com/html/horse.ogg',
-      'https://www.w3schools.com/html/horse.ogg?foo=bar&id=1',
+      'https://www.w3schools.com/html/horse.ogg#fragment',
+      'https://www.w3schools.com/html/horse.ogg?foo=bar&id=31',
     ];
     urls.forEach(function (url) {
       var element = domElement('<a href="' + url + '">' + url + '</a>');
@@ -119,25 +109,7 @@ describe('media-embedder', function () {
 
       assert.equal(element.childElementCount, 1);
       assert.equal(element.children[0].tagName, 'AUDIO');
-      assert.equal(
-        element.children[0].src, 'https://www.w3schools.com/html/horse.ogg'); //not sure if this is correct
-    });
-  });
-
-  it('replaces wav links with html5 audio elements', function() {
-    var urls = [
-      'http://freewavesamples.com/files/Kurzweil-K2000-Dual-Bass-C1.wav',
-      'http://freewavesamples.com/files/Kurzweil-K2000-Dual-Bass-C1.wav?foo=bar&id=1',
-    ];
-    urls.forEach(function (url) {
-      var element = domElement('<a href="' + url + '">' + url + '</a>');
-
-      mediaEmbedder.replaceLinksWithEmbeds(element);
-
-      assert.equal(element.childElementCount, 1);
-      assert.equal(element.children[0].tagName, 'AUDIO');
-      assert.equal(
-        element.children[0].src, 'http://freewavesamples.com/files/Kurzweil-K2000-Dual-Bass-C1.wav'); //not sure if this is correct
+      assert.equal(element.children[0].src, url);
     });
   });
 
