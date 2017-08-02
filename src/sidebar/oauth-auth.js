@@ -81,14 +81,12 @@ function auth($http, $window, flash, localStorage, random, settings) {
     };
   }
 
-  // Post the given data to the tokenUrl endpoint as a form submission.
-  // Return a Promise for the access token response.
-  function postToTokenUrl(data) {
+  function formPost(url, data) {
     data = queryString.stringify(data);
     var requestConfig = {
       headers: {'Content-Type': 'application/x-www-form-urlencoded'},
     };
-    return $http.post(tokenUrl, data, requestConfig);
+    return $http.post(url, data, requestConfig);
   }
 
   function grantTokenFromHostPage() {
@@ -151,7 +149,7 @@ function auth($http, $window, flash, localStorage, random, settings) {
       grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer',
       assertion: grantToken,
     };
-    return postToTokenUrl(data).then(function (response) {
+    return formPost(tokenUrl, data).then(function (response) {
       if (response.status !== 200) {
         throw new Error('Failed to retrieve access token');
       }
@@ -169,7 +167,7 @@ function auth($http, $window, flash, localStorage, random, settings) {
       grant_type: 'authorization_code',
       code,
     };
-    return postToTokenUrl(data).then((response) => {
+    return formPost(tokenUrl, data).then((response) => {
       if (response.status !== 200) {
         throw new Error('Authorization code exchange failed');
       }
@@ -187,7 +185,7 @@ function auth($http, $window, flash, localStorage, random, settings) {
    */
   function refreshAccessToken(refreshToken, options) {
     var data = { grant_type: 'refresh_token', refresh_token: refreshToken };
-    return postToTokenUrl(data).then((response) => {
+    return formPost(tokenUrl, data).then((response) => {
       var tokenInfo = tokenInfoFrom(response);
 
       if (options.persist) {
@@ -369,8 +367,13 @@ function auth($http, $window, flash, localStorage, random, settings) {
    * use it.
    */
   function logout() {
-    clearCache();
-    return Promise.resolve(null);
+    return accessTokenPromise.then(accessToken => {
+      return formPost(settings.oauthRevokeUrl, {
+        token: accessToken,
+      });
+    }).then(() => {
+      clearCache();
+    });
   }
 
   return {

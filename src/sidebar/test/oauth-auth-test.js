@@ -109,6 +109,7 @@ describe('sidebar.oauth-auth', function () {
       apiUrl: 'https://hypothes.is/api/',
       oauthAuthorizeUrl: 'https://hypothes.is/oauth/authorize/',
       oauthClientId: 'the-client-id',
+      oauthRevokeUrl: 'https://hypothes.is/oauth/revoke/',
       services: [{
         authority: 'publisher.org',
         grantToken: 'a.jwt.token',
@@ -564,6 +565,8 @@ describe('sidebar.oauth-auth', function () {
         return auth.tokenGetter();
       }).then(token => {
         assert.notEqual(token, null);
+
+        fakeHttp.post.reset();
       });
     });
 
@@ -578,6 +581,15 @@ describe('sidebar.oauth-auth', function () {
     it('removes cached tokens', () => {
       return auth.logout().then(() => {
         assert.calledWith(fakeLocalStorage.removeItem, TOKEN_KEY);
+      });
+    });
+
+    it('revokes tokens', () => {
+      return auth.logout().then(() => {
+        var expectedBody = 'token=firstAccessToken';
+        assert.calledWith(fakeHttp.post, 'https://hypothes.is/oauth/revoke/', expectedBody, {
+          headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        });
       });
     });
   });
