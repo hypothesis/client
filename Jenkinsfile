@@ -41,6 +41,7 @@ node {
 
 boolean isTag() {
     try {
+        sh 'git fetch --tags'
         sh 'git describe --exact-match --tags'
         return true
     } catch (Exception e) {

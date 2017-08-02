@@ -39,7 +39,7 @@ describe('hostPageConfig', function () {
 
   it('ignores non-whitelisted config params', function () {
     var window_ = fakeWindow({
-      apiUrl: 'https://not-the-hypothesis/api',
+      apiUrl: 'https://not-the-hypothesis/api/',
     });
 
     assert.deepEqual(hostPageConfig(window_), {});
