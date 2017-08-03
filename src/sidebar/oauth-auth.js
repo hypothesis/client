@@ -12,6 +12,15 @@ var serviceConfig = require('./service-config');
  */
 
 /**
+ * An object holding the details of an access token from the tokenUrl endpoint.
+ * @typedef {Object} TokenInfo
+ * @property {string} accessToken  - The access token itself.
+ * @property {number} expiresAt    - The date when the timestamp will expire.
+ * @property {string} refreshToken - The refresh token that can be used to
+ *                                   get a new access token.
+ */
+
+/**
  * OAuth-based authorization service.
  *
  * A grant token embedded on the page by the publisher is exchanged for
@@ -27,10 +36,17 @@ function auth($http, $window, flash, localStorage, random, settings) {
   var authCode;
 
   /**
-   * Access token retrieved via `POST /token` endpoint.
-   * @type {Promise<string>}
+   * Token info retrieved via `POST /api/token` endpoint.
+   *
+   * Resolves to `null` if the user is not logged in.
+   *
+   * @type {Promise<TokenInfo|null>}
    */
-  var accessTokenPromise;
+  var tokenInfoPromise;
+
+  /**
+   * Absolute URL of the `/api/token` endpoint.
+   */
   var tokenUrl = resolve('token', settings.apiUrl);
 
   /**
@@ -54,15 +70,6 @@ function auth($http, $window, flash, localStorage, random, settings) {
   }
 
   /**
-   * An object holding the details of an access token from the tokenUrl endpoint.
-   * @typedef {Object} TokenInfo
-   * @property {string} accessToken  - The access token itself.
-   * @property {number} expiresAt    - The date when the timestamp will expire.
-   * @property {string} refreshToken - The refresh token that can be used to
-   *                                   get a new access token.
-   */
-
-  /**
    * Return a new TokenInfo object from the given tokenUrl endpoint response.
    * @param {Object} response - The HTTP response from a POST to the tokenUrl
    *                            endpoint (an Angular $http response object).
@@ -73,9 +80,10 @@ function auth($http, $window, flash, localStorage, random, settings) {
     return {
       accessToken:  data.access_token,
 
-      // Set the expiry date to some time before the actual expiry date so that
-      // we will refresh it before it actually expires.
-      expiresAt: Date.now() + (data.expires_in * 1000 * 0.91),
+      // Set the expiry date to some time slightly before that implied by
+      // `expires_in` to account for the delay in the client receiving the
+      // response.
+      expiresAt: Date.now() + ((data.expires_in - 10) * 1000),
 
       refreshToken: data.refresh_token,
     };
@@ -181,7 +189,7 @@ function auth($http, $window, flash, localStorage, random, settings) {
    *
    * @param {string} refreshToken
    * @param {RefreshOptions} options
-   * @return {Promise<string|null>} Promise for the new access token
+   * @return {Promise<TokenInfo>} Promise for the new access token
    */
   function refreshAccessToken(refreshToken, options) {
     var data = { grant_type: 'refresh_token', refresh_token: refreshToken };
@@ -192,45 +200,8 @@ function auth($http, $window, flash, localStorage, random, settings) {
         saveToken(tokenInfo);
       }
 
-      refreshAccessTokenBeforeItExpires(tokenInfo, {
-        persist: options.persist,
-      });
-      accessTokenPromise = Promise.resolve(tokenInfo.accessToken);
-
-      return tokenInfo.accessToken;
-    }).catch(function() {
-      showAccessTokenExpiredErrorMessage(
-        'You must reload the page to continue annotating.');
-      return null;
+      return tokenInfo;
     });
-  }
-
-  /**
-   * Schedule a refresh of an access token a few minutes before it expires.
-   *
-   * @param {TokenInfo} tokenInfo
-   * @param {RefreshOptions} options
-   */
-  function refreshAccessTokenBeforeItExpires(tokenInfo, options) {
-    // The delay, in milliseconds, before we will poll again to see if it's
-    // time to refresh the access token.
-    var delay = 30000;
-
-    // If the token info's refreshAfter time will have passed before the next
-    // time we poll, then refresh the token this time.
-    var refreshAfter = tokenInfo.expiresAt - delay;
-
-    function refreshAccessTokenIfNearExpiry() {
-      if (Date.now() > refreshAfter) {
-        refreshAccessToken(tokenInfo.refreshToken, {
-          persist: options.persist,
-        });
-      } else {
-        refreshAccessTokenBeforeItExpires(tokenInfo, options);
-      }
-    }
-
-    refreshTimer = $window.setTimeout(refreshAccessTokenIfNearExpiry, delay);
   }
 
   /**
@@ -239,14 +210,13 @@ function auth($http, $window, flash, localStorage, random, settings) {
    * @return {Promise<string>} The API access token.
    */
   function tokenGetter() {
-    if (!accessTokenPromise) {
+    if (!tokenInfoPromise) {
       var grantToken = grantTokenFromHostPage();
 
       if (grantToken) {
         // Exchange host-page provided grant token for a new access token.
-        accessTokenPromise = exchangeJWT(grantToken).then((tokenInfo) => {
-          refreshAccessTokenBeforeItExpires(tokenInfo, { persist: false });
-          return tokenInfo.accessToken;
+        tokenInfoPromise = exchangeJWT(grantToken).then((tokenInfo) => {
+          return tokenInfo;
         }).catch(function(err) {
           showAccessTokenExpiredErrorMessage(
             'You must reload the page to annotate.');
@@ -255,31 +225,44 @@ function auth($http, $window, flash, localStorage, random, settings) {
       } else if (authCode) {
         // Exchange authorization code retrieved from login popup for a new
         // access token.
-        accessTokenPromise = exchangeAuthCode(authCode).then((tokenInfo) => {
+        tokenInfoPromise = exchangeAuthCode(authCode).then((tokenInfo) => {
           saveToken(tokenInfo);
-          refreshAccessTokenBeforeItExpires(tokenInfo, { persist: true });
-          return tokenInfo.accessToken;
+          return tokenInfo;
         });
       } else {
         // Attempt to load the tokens from the previous session.
-        var tokenInfo = loadToken();
-        if (!tokenInfo) {
-          // No token. The user will need to log in.
-          accessTokenPromise = Promise.resolve(null);
-        } else if (Date.now() > tokenInfo.expiresAt) {
-          // Token has expired. Attempt to refresh it.
-          accessTokenPromise = refreshAccessToken(tokenInfo.refreshToken, {
-            persist: true,
-          });
-        } else {
-          // Token still valid, but schedule a refresh.
-          refreshAccessTokenBeforeItExpires(tokenInfo, { persist: true });
-          accessTokenPromise = Promise.resolve(tokenInfo.accessToken);
-        }
+        tokenInfoPromise = Promise.resolve(loadToken());
       }
     }
 
-    return accessTokenPromise;
+    var origToken = tokenInfoPromise;
+
+    return tokenInfoPromise.then(token => {
+      if (!token) {
+        // No token available. User will need to log in.
+        return null;
+      }
+
+      if (origToken !== tokenInfoPromise) {
+        // A token refresh has been initiated via a call to `refreshAccessToken`
+        // below since `tokenGetter()` was called.
+        return tokenGetter();
+      }
+
+      if (Date.now() > token.expiresAt) {
+        // Token expired. Attempt to refresh.
+        tokenInfoPromise = refreshAccessToken(token.refreshToken, {
+          persist: true,
+        }).catch(() => {
+          // If refreshing the token fails, the user is simply logged out.
+          return null;
+        });
+
+        return tokenGetter();
+      } else {
+        return token.accessToken;
+      }
+    });
   }
 
   /**
@@ -288,7 +271,7 @@ function auth($http, $window, flash, localStorage, random, settings) {
   function clearCache() {
     // Once cookie auth has been removed, the `clearCache` method can be removed
     // from the public API of this service in favor of `logout`.
-    accessTokenPromise = Promise.resolve(null);
+    tokenInfoPromise = Promise.resolve(null);
     localStorage.removeItem(storageKey());
     $window.clearTimeout(refreshTimer);
   }
@@ -355,7 +338,7 @@ function auth($http, $window, flash, localStorage, random, settings) {
       // Save the auth code. It will be exchanged for an access token when the
       // next API request is made.
       authCode = resp.code;
-      accessTokenPromise = null;
+      tokenInfoPromise = null;
     });
   }
 
@@ -365,9 +348,9 @@ function auth($http, $window, flash, localStorage, random, settings) {
    * This revokes and then forgets any OAuth credentials that the user has.
    */
   function logout() {
-    return accessTokenPromise.then(accessToken => {
+    return tokenInfoPromise.then(token => {
       return formPost(settings.oauthRevokeUrl, {
-        token: accessToken,
+        token: token.accessToken,
       });
     }).then(() => {
       clearCache();
