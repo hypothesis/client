@@ -360,11 +360,9 @@ function auth($http, $window, flash, localStorage, random, settings) {
   }
 
   /**
-   * Log the user out of the service.
+   * Log out of the service (in the client only).
    *
-   * Currently this just forgets any API authz credentials which the client has.
-   * When the service provides a means to revoke credentials, this method should
-   * use it.
+   * This revokes and then forgets any OAuth credentials that the user has.
    */
   function logout() {
     return accessTokenPromise.then(accessToken => {
