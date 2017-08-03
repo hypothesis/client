@@ -200,6 +200,7 @@ module.exports = angular.module('h', [
   .service('frameSync', require('./frame-sync').default)
   .service('groups', require('./groups'))
   .service('localStorage', require('./local-storage'))
+  .service('mutex', require('./mutex'))
   .service('permissions', require('./permissions'))
   .service('queryParser', require('./query-parser'))
   .service('rootThread', require('./root-thread'))

@@ -2,6 +2,7 @@
 
 var queryString = require('query-string');
 
+var events = require('./events');
 var resolve = require('./util/url-util').resolve;
 var serviceConfig = require('./service-config');
 
@@ -18,7 +19,7 @@ var serviceConfig = require('./service-config');
  * an opaque access token.
  */
 // @ngInject
-function auth($http, $window, flash, localStorage, random, settings) {
+function auth($http, $rootScope, $window, flash, localStorage, mutex, random, settings) {
 
   /**
    * Authorization code from auth popup window.
@@ -133,6 +134,26 @@ function auth($http, $window, flash, localStorage, random, settings) {
   }
 
   /**
+   * Attempt to load and use tokens from the previous session.
+   */
+  function loadAndUseToken() {
+    var tokenInfo = loadToken();
+    if (!tokenInfo) {
+      // No token. The user will need to log in.
+      accessTokenPromise = Promise.resolve(null);
+    } else if (Date.now() > tokenInfo.expiresAt) {
+      // Token has expired. Attempt to refresh it.
+      accessTokenPromise = refreshAccessToken(tokenInfo.refreshToken, {
+        persist: true,
+      });
+    } else {
+      // Token still valid, but schedule a refresh.
+      refreshAccessTokenBeforeItExpires(tokenInfo, { persist: true });
+      accessTokenPromise = Promise.resolve(tokenInfo.accessToken);
+    }
+  }
+
+  /**
    * Persist access & refresh tokens for future use.
    */
   function saveToken(token) {
@@ -181,25 +202,59 @@ function auth($http, $window, flash, localStorage, random, settings) {
    * @return {Promise<string|null>} Promise for the new access token
    */
   function refreshAccessToken(refreshToken, options) {
-    var data = { grant_type: 'refresh_token', refresh_token: refreshToken };
-    return postToTokenUrl(data).then((response) => {
-      var tokenInfo = tokenInfoFrom(response);
+    function performRefresh() {
+      var data = { grant_type: 'refresh_token', refresh_token: refreshToken };
+      return postToTokenUrl(data).then((response) => {
+        var tokenInfo = tokenInfoFrom(response);
 
-      if (options.persist) {
-        saveToken(tokenInfo);
-      }
+        if (options.persist) {
+          saveToken(tokenInfo);
+        }
 
-      refreshAccessTokenBeforeItExpires(tokenInfo, {
-        persist: options.persist,
+        refreshAccessTokenBeforeItExpires(tokenInfo, {
+          persist: options.persist,
+        });
+
+        return tokenInfo.accessToken;
+      }).catch(function() {
+        showAccessTokenExpiredErrorMessage(
+          'You must reload the page to continue annotating.');
+        return null;
       });
-      accessTokenPromise = Promise.resolve(tokenInfo.accessToken);
+    }
 
-      return tokenInfo.accessToken;
-    }).catch(function() {
-      showAccessTokenExpiredErrorMessage(
-        'You must reload the page to continue annotating.');
-      return null;
+    var locked;
+
+    if (options.persist) {
+      // When refreshing credentials that are shared between client instances,
+      // acquire an exclusive lock so that only one client tries to refresh at a
+      // time.
+      locked = mutex.lock();
+    } else {
+      // If each client instance is using its own credentials, no lock is
+      // required.
+      locked = Promise.resolve();
+    }
+
+    // Assign to `accessTokenPromise` here so that any calls to `tokenGetter`
+    // during the refresh will wait until it completes.
+    accessTokenPromise = locked.then(() => {
+      var currentToken = loadToken();
+      if (currentToken && currentToken.refreshToken !== refreshToken) {
+        // Another client refreshed the token while we were waiting for the
+        // ticket.
+        return currentToken.accessToken;
+      } else {
+        return performRefresh();
+      }
+    }).then(accessToken => {
+      if (options.persist) {
+        mutex.unlock();
+      }
+      return accessToken;
     });
+
+    return accessTokenPromise;
   }
 
   /**
@@ -231,6 +286,19 @@ function auth($http, $window, flash, localStorage, random, settings) {
   }
 
   /**
+   * Listen for updated access & refresh tokens saved by other instances of the
+   * client.
+   */
+  function listenForTokenStorageEvents() {
+    $window.addEventListener('storage', ({ key }) => {
+      if (key === storageKey()) {
+        loadAndUseToken();
+        $rootScope.$broadcast(events.OAUTH_TOKENS_CHANGED);
+      }
+    });
+  }
+
+  /**
    * Retrieve an access token for the API.
    *
    * @return {Promise<string>} The API access token.
@@ -258,21 +326,7 @@ function auth($http, $window, flash, localStorage, random, settings) {
           return tokenInfo.accessToken;
         });
       } else {
-        // Attempt to load the tokens from the previous session.
-        var tokenInfo = loadToken();
-        if (!tokenInfo) {
-          // No token. The user will need to log in.
-          accessTokenPromise = Promise.resolve(null);
-        } else if (Date.now() > tokenInfo.expiresAt) {
-          // Token has expired. Attempt to refresh it.
-          accessTokenPromise = refreshAccessToken(tokenInfo.refreshToken, {
-            persist: true,
-          });
-        } else {
-          // Token still valid, but schedule a refresh.
-          refreshAccessTokenBeforeItExpires(tokenInfo, { persist: true });
-          accessTokenPromise = Promise.resolve(tokenInfo.accessToken);
-        }
+        loadAndUseToken();
       }
     }
 
@@ -351,6 +405,8 @@ function auth($http, $window, flash, localStorage, random, settings) {
       accessTokenPromise = null;
     });
   }
+
+  listenForTokenStorageEvents();
 
   return {
     clearCache,

@@ -3,6 +3,8 @@
 var angular = require('angular');
 var { stringify } = require('query-string');
 
+var events = require('../events');
+
 var DEFAULT_TOKEN_EXPIRES_IN_SECS = 1000;
 var TOKEN_KEY = 'hypothesis.oauth.hypothes%2Eis.token';
 
@@ -28,27 +30,33 @@ class FakeWindow {
 
   removeEventListener(event, callback) {
     this.callbacks = this.callbacks.filter((cb) =>
-      cb.event === event && cb.callback === callback
+      !(cb.event === event && cb.callback === callback)
     );
+  }
+
+  trigger(event) {
+    this.callbacks.forEach((cb) => {
+      if (cb.event === event.type) {
+        cb.callback(event);
+      }
+    });
   }
 
   sendMessage(data) {
     var evt = new MessageEvent('message', { data });
-    this.callbacks.forEach(({event, callback}) => {
-      if (event === 'message') {
-        callback(evt);
-      }
-    });
+    this.trigger(evt);
   }
 }
 
 describe('sidebar.oauth-auth', function () {
 
+  var $rootScope;
   var auth;
   var nowStub;
   var fakeHttp;
   var fakeFlash;
   var fakeLocalStorage;
+  var fakeMutex;
   var fakeRandom;
   var fakeWindow;
   var fakeSettings;
@@ -81,6 +89,11 @@ describe('sidebar.oauth-auth', function () {
       error: sinon.stub(),
     };
 
+    fakeMutex = {
+      lock: () => Promise.resolve(),
+      unlock: () => Promise.resolve(),
+    };
+
     fakeRandom = {
       generateHexString: sinon.stub().returns('notrandom'),
     };
@@ -107,12 +120,14 @@ describe('sidebar.oauth-auth', function () {
       $window: fakeWindow,
       flash: fakeFlash,
       localStorage: fakeLocalStorage,
+      mutex: fakeMutex,
       random: fakeRandom,
       settings: fakeSettings,
     });
 
-    angular.mock.inject((_auth_) => {
+    angular.mock.inject((_auth_, _$rootScope_) => {
       auth = _auth_;
+      $rootScope = _$rootScope_;
     });
 
     clock = sinon.useFakeTimers();
@@ -252,43 +267,12 @@ describe('sidebar.oauth-auth', function () {
 
       return callTokenGetter()
         .then(resetHttpSpy)
-        .then(expireAccessToken)
+        .then(expireAndRefreshAccessToken)
         .then(assertRefreshTokenWasUsed('firstRefreshToken'))
         .then(resetHttpSpy)
         .then(assertThatTokenGetterNowReturnsNewAccessToken)
-        .then(expireAccessToken)
+        .then(expireAndRefreshAccessToken)
         .then(assertRefreshTokenWasUsed('secondRefreshToken'));
-    });
-
-    // While a refresh token HTTP request is in-flight, calls to tokenGetter()
-    // should just return the old access token immediately.
-    it('returns the access token while a refresh is in-flight', function() {
-      return auth.tokenGetter().then(function(firstAccessToken) {
-        makeServerUnresponsive();
-
-        expireAccessToken();
-
-        // The refresh token request will still be in-flight, but tokenGetter()
-        // should still return a Promise for the old access token.
-        return auth.tokenGetter().then(function(secondAccessToken) {
-          assert.equal(firstAccessToken, secondAccessToken);
-        });
-      });
-    });
-
-    // It only sends one refresh request, even if tokenGetter() is called
-    // multiple times and the refresh response hasn't come back yet.
-    it('does not send more than one refresh request', function () {
-      return auth.tokenGetter()
-        .then(resetHttpSpy) // Reset fakeHttp.post.callCount to 0 so that the
-                            // initial access token request isn't counted.
-        .then(auth.tokenGetter)
-        .then(makeServerUnresponsive)
-        .then(auth.tokenGetter)
-        .then(expireAccessToken)
-        .then(function () {
-          assert.equal(fakeHttp.post.callCount, 1);
-        });
     });
 
     context('when a refresh request fails', function() {
@@ -311,7 +295,7 @@ describe('sidebar.oauth-auth', function () {
         }
 
         return auth.tokenGetter()
-          .then(expireAccessToken)
+          .then(expireAndRefreshAccessToken)
           .then(function () { clock.tick(1); })
           .then(assertThatErrorMessageWasShown);
       });
@@ -363,7 +347,7 @@ describe('sidebar.oauth-auth', function () {
             refresh_token: 'secondRefreshToken',
           },
         }));
-        expireAccessToken();
+        expireAndRefreshAccessToken();
         return auth.tokenGetter();
       }).then(() => {
         // 3. Check that updated token was persisted to storage.
@@ -440,6 +424,45 @@ describe('sidebar.oauth-auth', function () {
             assert.equal(token, null);
           });
         });
+      });
+    });
+
+    context('when another client instance saves new tokens', () => {
+      function notifyStoredTokenChange() {
+        // Trigger "storage" event as if another client refreshed the token.
+        var storageEvent = new Event('storage');
+        storageEvent.key = TOKEN_KEY;
+
+        fakeLocalStorage.getObject.returns({
+          accessToken: 'storedAccessToken',
+          refreshToken: 'storedRefreshToken',
+          expiresAt: Date.now() + 100,
+        });
+
+        fakeWindow.trigger(storageEvent);
+      }
+
+      it('reloads tokens from storage', () => {
+        return login().then(() => {
+          return auth.tokenGetter();
+        }).then(token => {
+          assert.equal(token, 'firstAccessToken');
+
+          notifyStoredTokenChange();
+
+          return auth.tokenGetter();
+        }).then(token => {
+          assert.equal(token, 'storedAccessToken');
+        });
+      });
+
+      it('notifies other services about the change', () => {
+        var onTokenChange = sinon.stub();
+        $rootScope.$on(events.OAUTH_TOKENS_CHANGED, onTokenChange);
+
+        notifyStoredTokenChange();
+
+        assert.called(onTokenChange);
       });
     });
   });
@@ -549,8 +572,11 @@ describe('sidebar.oauth-auth', function () {
   });
 
   // Advance time forward so that any current access tokens will have expired.
-  function expireAccessToken () {
+  function expireAndRefreshAccessToken () {
     clock.tick(DEFAULT_TOKEN_EXPIRES_IN_SECS * 1000);
+
+    // Wait for token refresh to complete.
+    return auth.tokenGetter();
   }
 
   // Make $http.post() return a pending Promise (simulates a still in-flight

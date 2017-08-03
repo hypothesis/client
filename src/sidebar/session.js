@@ -231,6 +231,10 @@ function session($http, $q, $resource, $rootScope, analytics, annotationUI, auth
     return resource.load();
   }
 
+  $rootScope.$on(events.OAUTH_TOKENS_CHANGED, () => {
+    reload();
+  });
+
   return {
     dismissSidebarTutorial: dismissSidebarTutorial,
     load: resource.load,

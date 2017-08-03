@@ -59,6 +59,7 @@
     "gulp-sourcemaps": "^1.6.0",
     "gulp-util": "^3.0.7",
     "hammerjs": "^2.0.4",
+    "idb-mutex": "^0.11.0",
     "inherits": "^2.0.1",
     "isparta": "^4.0.0",
     "istanbul": "^0.4.5",
