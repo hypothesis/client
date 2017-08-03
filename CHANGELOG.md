@@ -8,6 +8,9 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 ### Changed
 
+- Make login work when using OAuth following recent changes to the service's
+  OAuth implementation ([#514](https://github.com/hypothesis/client/pull/514)).
+
 - Automatically convert links ending with audio extensions (mp3, ogg, wav) to
   embedded audio players ([#508](https://github.com/hypothesis/client/pull/508)).
 
