@@ -4,6 +4,13 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+### Changed
+
+- Automatically convert links ending with audio extensions (mp3, ogg, wav) to
+  embedded audio players ([#508](https://github.com/hypothesis/client/pull/508)).
+
 ## [1.33.0] - 2017-08-01
 
 ### Changed
