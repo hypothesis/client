@@ -20,6 +20,9 @@ class FakeWindow {
     };
 
     this.open = sinon.stub();
+
+    this.setTimeout = window.setTimeout.bind(window);
+    this.clearTimeout = window.clearTimeout.bind(window);
   }
 
   addEventListener(event, callback) {
@@ -55,12 +58,29 @@ describe('sidebar.oauth-auth', function () {
   var clock;
   var successfulFirstAccessTokenPromise;
 
+  /**
+   * Login and retrieve an auth code.
+   */
+  function login() {
+    var loggedIn = auth.login();
+    fakeWindow.sendMessage({
+      type: 'authorization_response',
+      code: 'acode',
+      state: 'notrandom',
+    });
+    return loggedIn;
+  }
+
   before(() => {
     angular.module('app', [])
       .service('auth', require('../oauth-auth'));
   });
 
   beforeEach(function () {
+    // Setup fake clock. This has to be done before setting up the `window`
+    // fake which makes use of timers.
+    clock = sinon.useFakeTimers();
+
     nowStub = sinon.stub(window.performance, 'now');
     nowStub.returns(300);
 
@@ -89,6 +109,7 @@ describe('sidebar.oauth-auth', function () {
       apiUrl: 'https://hypothes.is/api/',
       oauthAuthorizeUrl: 'https://hypothes.is/oauth/authorize/',
       oauthClientId: 'the-client-id',
+      oauthRevokeUrl: 'https://hypothes.is/oauth/revoke/',
       services: [{
         authority: 'publisher.org',
         grantToken: 'a.jwt.token',
@@ -100,6 +121,7 @@ describe('sidebar.oauth-auth', function () {
     fakeLocalStorage = {
       getObject: sinon.stub().returns(null),
       setObject: sinon.stub(),
+      removeItem: sinon.stub(),
     };
 
     angular.mock.module('app', {
@@ -114,8 +136,6 @@ describe('sidebar.oauth-auth', function () {
     angular.mock.inject((_auth_) => {
       auth = _auth_;
     });
-
-    clock = sinon.useFakeTimers();
   });
 
   afterEach(function () {
@@ -319,19 +339,6 @@ describe('sidebar.oauth-auth', function () {
   });
 
   describe('persistence of tokens to storage', () => {
-    /**
-     * Login and retrieve an auth code.
-     */
-    function login() {
-      var loggedIn = auth.login();
-      fakeWindow.sendMessage({
-        type: 'authorization_response',
-        code: 'acode',
-        state: 'notrandom',
-      });
-      return loggedIn;
-    }
-
     beforeEach(() => {
       fakeSettings.services = [];
     });
@@ -544,6 +551,45 @@ describe('sidebar.oauth-auth', function () {
 
       return loggedIn.catch(err => {
         assert.equal(err.message, 'Authorization code exchange failed');
+      });
+    });
+  });
+
+  describe('#logout', () => {
+    beforeEach(() => {
+      // logout() is only currently used when using the public
+      // Hypothesis service.
+      fakeSettings.services = [];
+
+      return login().then(() => {
+        return auth.tokenGetter();
+      }).then(token => {
+        assert.notEqual(token, null);
+
+        fakeHttp.post.reset();
+      });
+    });
+
+    it('forgets access tokens', () => {
+      return auth.logout().then(() => {
+        return auth.tokenGetter();
+      }).then(token => {
+        assert.equal(token, null);
+      });
+    });
+
+    it('removes cached tokens', () => {
+      return auth.logout().then(() => {
+        assert.calledWith(fakeLocalStorage.removeItem, TOKEN_KEY);
+      });
+    });
+
+    it('revokes tokens', () => {
+      return auth.logout().then(() => {
+        var expectedBody = 'token=firstAccessToken';
+        assert.calledWith(fakeHttp.post, 'https://hypothes.is/oauth/revoke/', expectedBody, {
+          headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        });
       });
     });
   });
