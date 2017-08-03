@@ -506,8 +506,9 @@ describe('sidebar.oauth-auth', function () {
       }).then(() => {
         // 2. Verify that auth code is exchanged for access & refresh tokens.
         var expectedBody =
-          'assertion=acode' +
-          '&grant_type=urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Ajwt-bearer';
+          'client_id=the-client-id' +
+          '&code=acode' +
+          '&grant_type=authorization_code';
         assert.calledWith(fakeHttp.post, 'https://hypothes.is/api/token', expectedBody, {
           headers: {'Content-Type': 'application/x-www-form-urlencoded'},
         });
@@ -525,6 +526,24 @@ describe('sidebar.oauth-auth', function () {
 
       return loggedIn.catch((err) => {
         assert.equal(err.message, 'Authorization window was closed');
+      });
+    });
+
+    it('rejects if auth code exchange fails', () => {
+      var loggedIn = auth.login();
+
+      // Successful response from authz popup.
+      fakeWindow.sendMessage({
+        type: 'authorization_response',
+        code: 'acode',
+        state: 'notrandom',
+      });
+
+      // Error response from auth code => token exchange.
+      fakeHttp.post.returns(Promise.resolve({status: 400}));
+
+      return loggedIn.catch(err => {
+        assert.equal(err.message, 'Authorization code exchange failed');
       });
     });
   });
