@@ -90,6 +90,29 @@ describe('media-embedder', function () {
     });
   });
 
+  it('replaces audio links with html5 audio elements', function() {
+    var urls = [
+      'https://archive.org/download/testmp3testfile/mpthreetest.mp3',
+      'https://archive.org/download/testmp3testfile/mpthreetest.mp3#fragment',
+      'https://archive.org/download/testmp3testfile/mpthreetest.mp3?foo=bar&id=1',
+      'http://www.music.helsinki.fi/tmt/opetus/uusmedia/esim/a2002011001-e02.wav',
+      'http://www.music.helsinki.fi/tmt/opetus/uusmedia/esim/a2002011001-e02.wav#fragment',
+      'http://www.music.helsinki.fi/tmt/opetus/uusmedia/esim/a2002011001-e02.wav?foo=bar&id=4',
+      'https://www.w3schools.com/html/horse.ogg',
+      'https://www.w3schools.com/html/horse.ogg#fragment',
+      'https://www.w3schools.com/html/horse.ogg?foo=bar&id=31',
+    ];
+    urls.forEach(function (url) {
+      var element = domElement('<a href="' + url + '">' + url + '</a>');
+
+      mediaEmbedder.replaceLinksWithEmbeds(element);
+
+      assert.equal(element.childElementCount, 1);
+      assert.equal(element.children[0].tagName, 'AUDIO');
+      assert.equal(element.children[0].src, url.toLowerCase());
+    });
+  });
+
   it('does not replace links if the link text is different', function () {
     var url = 'https://youtu.be/QCkm0lL-6lc';
     var element = domElement('<a href="' + url + '">different label</a>');
