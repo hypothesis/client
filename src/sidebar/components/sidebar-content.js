@@ -125,12 +125,9 @@ function SidebarContentController(
      // intialize all group counts in state
      annotationUI.addGroupAnnotations(annotationUI.getState().groups, results);
 
-//    console.log('annotationUI in _loadAnno', annotationUI.showGroupActivity);
-//    annotationUI.showGroupActivity(annotationUI.getState().groups);
-
     // then filter to just this group
       results = results.filter(function (x) {
-        return x.group === searchClient._group;
+        return x.group === searchClient._group; // remembered by search client
       });
 
       if (annotationUI.hasSelectedAnnotations()) {
