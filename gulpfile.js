@@ -81,7 +81,7 @@ gulp.task('build-vendor-js', function () {
     finished.push(createBundle({
       name: name,
       require: vendorBundles.bundles[name],
-      minify: false,
+      minify: IS_PRODUCTION_BUILD,
       path: SCRIPT_DIR,
       noParse: vendorBundles.noParseModules,
     }));
@@ -92,7 +92,7 @@ gulp.task('build-vendor-js', function () {
 var appBundleBaseConfig = {
   path: SCRIPT_DIR,
   external: vendorModules,
-  minify: false,
+  minify: IS_PRODUCTION_BUID,
   noParse: vendorBundles.noParseModules,
 };
 
@@ -265,15 +265,15 @@ function generateBootScript(manifest) {
   var { version } = require('./package.json');
 
   var defaultSidebarAppUrl = process.env.SIDEBAR_APP_URL ?
-    `${process.env.SIDEBAR_APP_URL}` : 'https://hyp.jonudell.info/app.html';
+    `${process.env.SIDEBAR_APP_URL}` : 'https://hypothes.is/app.html';
 
-    var defaultAssetRoot = 'https://hyp.jonudell.info/';
+    var defaultAssetRoot;
 
-/*  if (process.env.NODE_ENV === 'production') {
+    if (process.env.NODE_ENV === 'production') {
     defaultAssetRoot = `https://cdn.hypothes.is/hypothesis/${version}/`;
   } else {
     defaultAssetRoot = `http://${packageServerHostname()}:3001/hypothesis/${version}/`;
-  }*/
+  }
 
   if (isFirstBuild) {
     gulpUtil.log(`Sidebar app URL: ${defaultSidebarAppUrl}`);
