@@ -92,7 +92,7 @@ gulp.task('build-vendor-js', function () {
 var appBundleBaseConfig = {
   path: SCRIPT_DIR,
   external: vendorModules,
-  minify: IS_PRODUCTION_BUID,
+  minify: IS_PRODUCTION_BUILD,
   noParse: vendorBundles.noParseModules,
 };
 
@@ -267,9 +267,9 @@ function generateBootScript(manifest) {
   var defaultSidebarAppUrl = process.env.SIDEBAR_APP_URL ?
     `${process.env.SIDEBAR_APP_URL}` : 'https://hypothes.is/app.html';
 
-    var defaultAssetRoot;
+  var defaultAssetRoot;
 
-    if (process.env.NODE_ENV === 'production') {
+  if (process.env.NODE_ENV === 'production') {
     defaultAssetRoot = `https://cdn.hypothes.is/hypothesis/${version}/`;
   } else {
     defaultAssetRoot = `http://${packageServerHostname()}:3001/hypothesis/${version}/`;
