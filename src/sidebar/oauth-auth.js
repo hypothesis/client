@@ -241,7 +241,9 @@ function auth($http, $rootScope, $window, flash, localStorage, random, settings)
       } else if (authCode) {
         // Exchange authorization code retrieved from login popup for a new
         // access token.
-        tokenInfoPromise = exchangeAuthCode(authCode).then((tokenInfo) => {
+        var code = authCode;
+        authCode = null; // Auth codes can only be used once.
+        tokenInfoPromise = exchangeAuthCode(code).then((tokenInfo) => {
           saveToken(tokenInfo);
           return tokenInfo;
         });
