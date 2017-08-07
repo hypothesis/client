@@ -61,6 +61,18 @@ function SidebarContentController(
 
   $scope.$on('$destroy', unsubscribeAnnotationUI);
 
+  $scope.$root.$on(events.ANNOTATION_CREATED, function(event, ann) {
+    console.log('created');
+    var groups = annotationUI.getState().groups;
+    annotationUI.addGroupAnnotation(groups, ann);
+  });
+
+  $scope.$root.$on(events.ANNOTATION_DELETED, function(event, ann) {
+    console.log('deleted');
+    var groups = annotationUI.getState().groups;
+    annotationUI.removeGroupAnnotation(groups, ann);
+  });
+
   function focusAnnotation(annotation) {
     var highlights = [];
     if (annotation) {
@@ -99,38 +111,6 @@ function SidebarContentController(
     annotationMapper.unloadAnnotations(annotationUI.savedAnnotations());
   }
 
-  function _showGroupActivity(results) {
-    console.log('_showGroupActivity', results);
-    var counts = {};
-    results.forEach(function(r) {
-      if ( counts[r.group] ) {
-        counts[r.group] += 1;
-      }
-      else {
-        counts[r.group] = 1;
-      }
-    });
-
-    var scopeSelectorNodes = Array.prototype.slice.call(document.querySelectorAll('.group-id'));
-//    scopeSelectorNodes = scopeSelectorNodes.slice(0, scopeSelectorNodes.length-1);
-    console.log (scopeSelectorNodes);
-
-    scopeSelectorNodes.forEach( function (n) {
-      var groupId = n.innerHTML.replace(/\s/g,'');
-      console.log('counts', counts);
-      console.log('counts[groupId]', counts[groupId]);
-
-
-      if ( counts[groupId] ) {
-          console.log( '(' + counts[groupId] + ')' );
-          n.parentNode.querySelector('.group-count').innerHTML =  '(' + counts[groupId] + ')';
-        }
-      else {
-          n.parentNode.querySelector('.group-count').innerHTML = '';
-        }
-    });
-  }
-
   function _loadAnnotationsFor(uris, group) {
     var searchClient = new SearchClient(store.search, {
       // If no group is specified, we are fetching annotations from
@@ -142,13 +122,16 @@ function SidebarContentController(
     searchClients.push(searchClient);
     searchClient.on('results', function (results) {
 
-      _showGroupActivity(results);
+     // intialize all group counts in state
+     annotationUI.addGroupAnnotations(annotationUI.getState().groups, results);
 
-      results = results.filter( function(x) {
+//    console.log('annotationUI in _loadAnno', annotationUI.showGroupActivity);
+//    annotationUI.showGroupActivity(annotationUI.getState().groups);
+
+    // then filter to just this group
+      results = results.filter(function (x) {
         return x.group === searchClient._group;
       });
-
-//      console.log('group-filtered results', results);
 
       if (annotationUI.hasSelectedAnnotations()) {
         // Focus the group containing the selected annotation and filter
