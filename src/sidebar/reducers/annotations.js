@@ -73,8 +73,7 @@ function initializeAnnot(annotation, tag) {
 function init() {
   return {
     annotations: [],
-
-    groups: {},  // track groups found in ids in unfiltered search results
+    groups: {},
 
     // The local tag to assign to the next annotation that is loaded into the
     // app
@@ -84,27 +83,29 @@ function init() {
 
 var update = {
 
-  ADD_GROUP_ANNOTATION: function ADD_GROUP_ANNOTATION(state, action) {
-    var groups = state.groups;
-    console.log('ADD_GROUP_ANNOTATION action', action);
+  ADD_GROUP_ANNOTATIONS: function ADD_GROUP_ANNOTATIONS(state, action) {
+    state.groups = Object.assign(state.groups, action.groups);
+    _showGroupActivity(state.groups);
     return {
-      groups: groups
+      groups: state.groups,
     };
   },
 
-  ADD_GROUP_ANNOTATIONS: function ADD_GROUP_ANNOTATIONS(state, action) {
-    var groups = state.groups;
-    console.log('ADD_GROUP_ANNOTATIONS action', action);
+  ADD_GROUP_ANNOTATION: function ADD_GROUP_ANNOTATION(state, action) {
+    var ann = action.annotation;
+    state.groups[ann.group][ann.id] = null;
+    _showGroupActivity(state.groups);
     return {
-      groups: groups
+      groups: state.groups,
     };
   },
 
   REMOVE_GROUP_ANNOTATION: function REMOVE_GROUP_ANNOTATION(state, action) {
-    var groups = state.groups;
-    console.log('REMOVE_GROUP_ANNOTATION action', action);
+    var ann = action.annotation;
+    delete state.groups[ann.group][ann.id];
+    _showGroupActivity(state.groups);
     return {
-      groups: groups
+      groups: state.groups,
     };
   },
 
@@ -254,89 +255,47 @@ function updateFlagStatus(id, isFlagged) {
   };
 }
 
-/**
- * Add a new annotation to the app state's group model,
- * and update the scope control.
- */
-function addGroupAnnotation(groups, annot) {
-  console.log('addGroupAnnotation', 'groups', groups, 'annot', annot, 'annot.group', annot.group);
-
-  var group = annot.group;
-
-  if ( ! groups[group] ) {
-    groups[group] = {};
-  }
-
-  groups[group][annot.id] = null;
-
-  _showGroupActivity(groups);
-
+function addGroupAnnotation(ann) {
   return {
     type: actions.ADD_GROUP_ANNOTATION,
-    groups: groups
+    annotation: ann,
   };
-
 }
 
-/**
- * Add initial search results to the app state's group model,
- * and update the scope control
- */
-function addGroupAnnotations(groups, annotations) {
-  console.log('addGroupAnnotations', 'groups', groups, 'annotations', annotations);
+function addGroupAnnotations(annotations) {
+  var groups = {};
 
-  annotations.forEach(function(annot) {
-  var group = annot.group;
+  annotations.forEach(function (annot) {
+    var group = annot.group;
 
-  if ( ! groups[group] ) {
-    groups[group] = {};
-  }
+    if (!groups[group]) {
+      groups[group] = {};
+    }
 
-  groups[group][annot.id] = null;
+    groups[group][annot.id] = null;
   });
-
-  _showGroupActivity(groups);
 
   return {
     type: actions.ADD_GROUP_ANNOTATIONS,
-    groups: groups
+    groups: groups,
   };
-
 }
 
-/*
- * Remove a deleted annotation from the app state's group model,
- * and update the scope control
- */
-function removeGroupAnnotation(groups, annot) {
-  console.log('removeGroupAnnotation', 'groups', groups, 'annot', annot, 'annot.group', annot.group);
-
-  var group = annot.group;
-
-  if ( groups[group] ) {
-    delete groups[group][annot.id];
-  }
-
-  _showGroupActivity(groups);
-
+function removeGroupAnnotation(ann) {
   return {
     type: actions.REMOVE_GROUP_ANNOTATION,
-    groups: groups
+    annotation: ann,
   };
-
 }
 
-
-/**
- * Update the scope control from the app state's group model
- */
 function _showGroupActivity(groups) {
   var scopeSelectorNodes = Array.prototype.slice.call(document.querySelectorAll('.group-list li'));
   scopeSelectorNodes.forEach(function (li) {
     var groupId = li.querySelector('.group-id');
-	if (! groupId ) return;
 
-	groupId = groupId.innerHTML.replace(/\s/g, '');
+    if (! groupId) { return; }
+
+    groupId = groupId.innerHTML.replace(/\s/g, '');
 
     var count = 0;
 

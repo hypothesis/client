@@ -62,15 +62,11 @@ function SidebarContentController(
   $scope.$on('$destroy', unsubscribeAnnotationUI);
 
   $scope.$root.$on(events.ANNOTATION_CREATED, function(event, ann) {
-    console.log('created');
-    var groups = annotationUI.getState().groups;
-    annotationUI.addGroupAnnotation(groups, ann);
+    annotationUI.addGroupAnnotation(ann);
   });
 
   $scope.$root.$on(events.ANNOTATION_DELETED, function(event, ann) {
-    console.log('deleted');
-    var groups = annotationUI.getState().groups;
-    annotationUI.removeGroupAnnotation(groups, ann);
+    annotationUI.removeGroupAnnotation(ann);
   });
 
   function focusAnnotation(annotation) {
@@ -122,10 +118,10 @@ function SidebarContentController(
     searchClients.push(searchClient);
     searchClient.on('results', function (results) {
 
-     // intialize all group counts in state
-     annotationUI.addGroupAnnotations(annotationUI.getState().groups, results);
+      // intialize all group counts in state
+      annotationUI.addGroupAnnotations(results);
 
-    // then filter to just this group
+      // then filter to just this group
       results = results.filter(function (x) {
         return x.group === searchClient._group; // remembered by search client
       });
