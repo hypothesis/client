@@ -4,6 +4,13 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+### Changed
+
+- Implement logout when using OAuth
+  ([#501](https://github.com/hypothesis/client/pull/501)).
+
 ## [1.34.0] - 2017-08-03
 
 ### Changed
