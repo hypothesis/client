@@ -76,7 +76,7 @@ function HypothesisAppController(
     // after first install of the extension.
     self.auth = authStateFromUserID(state.userid);
 
-    if (!state.userid && settings.openLoginForm) {
+    if (!state.userid && settings.openLoginForm && !auth.login) {
       self.login();
     }
   });
