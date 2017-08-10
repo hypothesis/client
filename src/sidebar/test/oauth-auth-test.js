@@ -56,6 +56,7 @@ describe('sidebar.oauth-auth', function () {
   var $rootScope;
   var auth;
   var nowStub;
+  var fakeApiRoutes;
   var fakeHttp;
   var fakeFlash;
   var fakeLocalStorage;
@@ -104,6 +105,13 @@ describe('sidebar.oauth-auth', function () {
       post: sinon.stub().returns(successfulFirstAccessTokenPromise),
     };
 
+    fakeApiRoutes = {
+      links: sinon.stub().returns(Promise.resolve({
+        'oauth.authorize': 'https://hypothes.is/oauth/authorize/',
+        'oauth.revoke': 'https://hypothes.is/oauth/revoke/',
+      })),
+    };
+
     fakeFlash = {
       error: sinon.stub(),
     };
@@ -114,9 +122,7 @@ describe('sidebar.oauth-auth', function () {
 
     fakeSettings = {
       apiUrl: 'https://hypothes.is/api/',
-      oauthAuthorizeUrl: 'https://hypothes.is/oauth/authorize/',
       oauthClientId: 'the-client-id',
-      oauthRevokeUrl: 'https://hypothes.is/oauth/revoke/',
       services: [{
         authority: 'publisher.org',
         grantToken: 'a.jwt.token',
@@ -134,6 +140,7 @@ describe('sidebar.oauth-auth', function () {
     angular.mock.module('app', {
       $http: fakeHttp,
       $window: fakeWindow,
+      apiRoutes: fakeApiRoutes,
       flash: fakeFlash,
       localStorage: fakeLocalStorage,
       random: fakeRandom,
@@ -500,20 +507,23 @@ describe('sidebar.oauth-auth', function () {
     it('opens the auth endpoint in a popup window', () => {
       auth.login();
 
-      var params = {
-        client_id: fakeSettings.oauthClientId,
-        origin: 'client.hypothes.is',
-        response_mode: 'web_message',
-        response_type: 'code',
-        state: 'notrandom',
-      };
-      var expectedAuthUrl = `${fakeSettings.oauthAuthorizeUrl}?${stringify(params)}`;
-      assert.calledWith(
-        fakeWindow.open,
-        expectedAuthUrl,
-        'Login to Hypothesis',
-        'height=400,left=312,top=184,width=400'
-      );
+      return fakeApiRoutes.links().then((links) => {
+        var authUrl = links['oauth.authorize'];
+        var params = {
+          client_id: fakeSettings.oauthClientId,
+          origin: 'client.hypothes.is',
+          response_mode: 'web_message',
+          response_type: 'code',
+          state: 'notrandom',
+        };
+        var expectedAuthUrl = `${authUrl}?${stringify(params)}`;
+        assert.calledWith(
+          fakeWindow.open,
+          expectedAuthUrl,
+          'Login to Hypothesis',
+          'height=400,left=312,top=184,width=400'
+        );
+      });
     });
 
     it('ignores auth responses if the state does not match', () => {

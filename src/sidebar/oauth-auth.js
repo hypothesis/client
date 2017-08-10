@@ -28,7 +28,8 @@ var serviceConfig = require('./service-config');
  * an opaque access token.
  */
 // @ngInject
-function auth($http, $rootScope, $window, flash, localStorage, random, settings) {
+function auth($http, $rootScope, $window,
+              apiRoutes, flash, localStorage, random, settings) {
 
   /**
    * Authorization code from auth popup window.
@@ -336,23 +337,25 @@ function auth($http, $rootScope, $window, flash, localStorage, random, settings)
     var left   = $window.screen.width / 2 - width / 2;
     var top    = $window.screen.height /2 - height / 2;
 
-    var authUrl = settings.oauthAuthorizeUrl;
-    authUrl += '?' + queryString.stringify({
-      client_id: settings.oauthClientId,
-      origin: $window.location.origin,
-      response_mode: 'web_message',
-      response_type: 'code',
-      state: state,
-    });
-    var authWindowSettings = queryString.stringify({
-      left: left,
-      top: top,
-      width: width,
-      height: height,
-    }).replace(/&/g, ',');
-    $window.open(authUrl, 'Login to Hypothesis', authWindowSettings);
+    return apiRoutes.links().then(links => {
+      var authUrl = links['oauth.authorize'];
+      authUrl += '?' + queryString.stringify({
+        client_id: settings.oauthClientId,
+        origin: $window.location.origin,
+        response_mode: 'web_message',
+        response_type: 'code',
+        state: state,
+      });
+      var authWindowSettings = queryString.stringify({
+        left: left,
+        top: top,
+        width: width,
+        height: height,
+      }).replace(/&/g, ',');
+      $window.open(authUrl, 'Login to Hypothesis', authWindowSettings);
 
-    return authResponse.then((resp) => {
+      return authResponse;
+    }).then((resp) => {
       // Save the auth code. It will be exchanged for an access token when the
       // next API request is made.
       authCode = resp.code;
@@ -366,13 +369,15 @@ function auth($http, $rootScope, $window, flash, localStorage, random, settings)
    * This revokes and then forgets any OAuth credentials that the user has.
    */
   function logout() {
-    return tokenInfoPromise.then(token => {
-      return formPost(settings.oauthRevokeUrl, {
-        token: token.accessToken,
+    return Promise.all([tokenInfoPromise, apiRoutes.links()])
+      .then(([token, links]) => {
+        var revokeUrl = links['oauth.revoke'];
+        return formPost(revokeUrl, {
+          token: token.accessToken,
+        });
+      }).then(() => {
+        clearCache();
       });
-    }).then(() => {
-      clearCache();
-    });
   }
 
   listenForTokenStorageEvents();
