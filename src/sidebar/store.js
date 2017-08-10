@@ -2,7 +2,6 @@
 
 var get = require('lodash.get');
 
-var retryUtil = require('./retry-util');
 var urlUtil = require('./util/url-util');
 
 /**
@@ -150,15 +149,15 @@ function createAPICall($http, $q, links, route, tokenGetter) {
  *
  * Returns an object that with keys that match the routes in
  * the Hypothesis API (see http://h.readthedocs.io/en/latest/api/).
+ *
+ * This service handles authenticated calls to the API, using the `auth` service
+ * to get auth tokens. The URLs for API endpoints are fetched from the `/api`
+ * endpoint, a responsibility delegated to the `apiRoutes` service which does
+ * not use authentication.
  */
 // @ngInject
-function store($http, $q, auth, settings) {
-  var links = retryUtil.retryPromiseOperation(function () {
-    return $http.get(settings.apiUrl);
-  }).then(function (response) {
-    return response.data.links;
-  });
-
+function store($http, $q, apiRoutes, auth) {
+  var links = apiRoutes.routes();
   function apiCall(route) {
     return createAPICall($http, $q, links, route, auth.tokenGetter);
   }
@@ -178,7 +177,9 @@ function store($http, $q, auth, settings) {
       read: apiCall('profile.read'),
       update: apiCall('profile.update'),
     },
-    links: apiCall('links'),
+
+    // The `links` endpoint is not included here. Clients should fetch these
+    // from the `apiRoutes` service.
   };
 }
 

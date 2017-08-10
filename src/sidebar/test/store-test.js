@@ -5,13 +5,60 @@ var proxyquire = require('proxyquire');
 
 var util = require('../../shared/test/util');
 
-describe('store', function () {
+// API route directory.
+// This should mirror the structure (but not the exact URLs) of
+// https://hypothes.is/api/.
+var routes = {
+  annotation: {
+    create: {
+      method: 'POST',
+      url: 'http://example.com/api/annotations',
+    },
+    delete: {
+      method: 'DELETE',
+      url: 'http://example.com/api/annotations/:id',
+    },
+    read: {},
+    update: {
+      method: 'PUT',
+      url: 'http://example.com/api/annotations/:id',
+    },
+    flag: {
+      method: 'PUT',
+      url: 'http://example.com/api/annotations/:id/flag',
+    },
+    hide: {
+      method: 'PUT',
+      url: 'http://example.com/api/annotations/:id/hide',
+    },
+    unhide: {
+      method: 'DELETE',
+      url: 'http://example.com/api/annotations/:id/hide',
+    },
+  },
+  search: {
+    method: 'GET',
+    url: 'http://example.com/api/search',
+  },
+  profile: {
+    read: {
+      method: 'GET',
+      url: 'http://example.com/api/profile',
+    },
+    update: {
+      method: 'PATCH',
+      url: 'http://example.com/api/profile',
+    },
+  },
+};
+
+describe('sidebar.store', function () {
   var $httpBackend = null;
   var sandbox = null;
   var store = null;
 
   before(function () {
-    angular.module('h')
+    angular.module('h', [])
       .service('store', proxyquire('../store', util.noCallThru({
         angular: angular,
         './retry-util': {
@@ -25,9 +72,14 @@ describe('store', function () {
   beforeEach(function () {
     sandbox = sinon.sandbox.create();
 
+    var fakeApiRoutes = {
+      links: sinon.stub(),
+      routes: sinon.stub(),
+    };
     var fakeAuth = {};
 
     angular.mock.module('h', {
+      apiRoutes: fakeApiRoutes,
       auth: fakeAuth,
       settings: {apiUrl: 'http://example.com/api/'},
     });
@@ -37,6 +89,8 @@ describe('store', function () {
       fakeAuth.tokenGetter = function () {
         return $q.resolve('faketoken');
       };
+
+      fakeApiRoutes.routes.returns($q.resolve(routes));
     });
   });
 
@@ -49,56 +103,6 @@ describe('store', function () {
   beforeEach(angular.mock.inject(function (_$httpBackend_, _store_) {
     $httpBackend = _$httpBackend_;
     store = _store_;
-
-    $httpBackend.expectGET('http://example.com/api/').respond({
-      // Return an API route directory.
-      // This should mirror the structure (but not the exact URLs) of
-      // https://hypothes.is/api/.
-      links: {
-        annotation: {
-          create: {
-            method: 'POST',
-            url: 'http://example.com/api/annotations',
-          },
-          delete: {
-            method: 'DELETE',
-            url: 'http://example.com/api/annotations/:id',
-          },
-          read: {},
-          update: {
-            method: 'PUT',
-            url: 'http://example.com/api/annotations/:id',
-          },
-          flag: {
-            method: 'PUT',
-            url: 'http://example.com/api/annotations/:id/flag',
-          },
-          hide: {
-            method: 'PUT',
-            url: 'http://example.com/api/annotations/:id/hide',
-          },
-          unhide: {
-            method: 'DELETE',
-            url: 'http://example.com/api/annotations/:id/hide',
-          },
-        },
-        search: {
-          method: 'GET',
-          url: 'http://example.com/api/search',
-        },
-        profile: {
-          read: {
-            method: 'GET',
-            url: 'http://example.com/api/profile',
-          },
-          update: {
-            method: 'PATCH',
-            url: 'http://example.com/api/profile',
-          },
-        },
-      },
-    });
-    $httpBackend.flush();
   }));
 
   it('saves a new annotation', function (done) {
