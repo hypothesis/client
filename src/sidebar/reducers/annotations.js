@@ -95,6 +95,7 @@ var update = {
     var ann = action.annotation;
     if (! state.groups[ann.group] ) {
       state.groups[ann.group] = {};
+    }
     state.groups[ann.group][ann.id] = null;
     _showGroupActivity(state.groups);
     return {
