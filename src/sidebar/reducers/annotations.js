@@ -93,6 +93,8 @@ var update = {
 
   ADD_GROUP_ANNOTATION: function ADD_GROUP_ANNOTATION(state, action) {
     var ann = action.annotation;
+    if (! state.groups[ann.group] ) {
+      state.groups[ann.group] = {};
     state.groups[ann.group][ann.id] = null;
     _showGroupActivity(state.groups);
     return {
