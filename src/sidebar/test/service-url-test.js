@@ -26,19 +26,19 @@ function createServiceUrl(linksPromise) {
 
   var annotationUI = fakeAnnotationUI();
 
-  var store = {
+  var apiRoutes = {
     links: sinon.stub().returns(linksPromise),
   };
 
   return {
     annotationUI: annotationUI,
-    store: store,
-    serviceUrl: serviceUrlFactory(annotationUI, store),
+    apiRoutes,
+    serviceUrl: serviceUrlFactory(annotationUI, apiRoutes),
     replaceURLParams: replaceURLParams,
   };
 }
 
-describe('links', function () {
+describe('sidebar.service-url', function () {
 
   beforeEach(function() {
     sinon.stub(console, 'warn');
@@ -50,7 +50,7 @@ describe('links', function () {
 
   context('before the API response has been received', function() {
     var serviceUrl;
-    var store;
+    var apiRoutes;
 
     beforeEach(function() {
       // Create a serviceUrl function with an unresolved Promise that will
@@ -58,12 +58,12 @@ describe('links', function () {
       var parts = createServiceUrl(new Promise(function() {}));
 
       serviceUrl = parts.serviceUrl;
-      store = parts.store;
+      apiRoutes = parts.apiRoutes;
     });
 
     it('sends one API request for the links at boot time', function() {
-      assert.calledOnce(store.links);
-      assert.isTrue(store.links.calledWithExactly());
+      assert.calledOnce(apiRoutes.links);
+      assert.isTrue(apiRoutes.links.calledWithExactly());
     });
 
     it('returns an empty string for any link', function() {

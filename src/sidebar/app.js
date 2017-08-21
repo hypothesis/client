@@ -191,6 +191,7 @@ module.exports = angular.module('h', [
   .service('analytics', require('./analytics'))
   .service('annotationMapper', require('./annotation-mapper'))
   .service('annotationUI', require('./annotation-ui'))
+  .service('apiRoutes', require('./api-routes'))
   .service('auth', authService)
   .service('bridge', require('../shared/bridge'))
   .service('drafts', require('./drafts'))
