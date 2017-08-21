@@ -2,6 +2,7 @@
 
 var queryString = require('query-string');
 
+var events = require('./events');
 var resolve = require('./util/url-util').resolve;
 var serviceConfig = require('./service-config');
 
@@ -27,7 +28,7 @@ var serviceConfig = require('./service-config');
  * an opaque access token.
  */
 // @ngInject
-function auth($http, $window, flash, localStorage, random, settings) {
+function auth($http, $rootScope, $window, flash, localStorage, random, settings) {
 
   /**
    * Authorization code from auth popup window.
@@ -205,6 +206,21 @@ function auth($http, $window, flash, localStorage, random, settings) {
   }
 
   /**
+   * Listen for updated access & refresh tokens saved by other instances of the
+   * client.
+   */
+  function listenForTokenStorageEvents() {
+    $window.addEventListener('storage', ({ key }) => {
+      if (key === storageKey()) {
+        // Reset cached token information. Tokens will be reloaded from storage
+        // on the next call to `tokenGetter()`.
+        tokenInfoPromise = null;
+        $rootScope.$broadcast(events.OAUTH_TOKENS_CHANGED);
+      }
+    });
+  }
+
+  /**
    * Retrieve an access token for the API.
    *
    * @return {Promise<string>} The API access token.
@@ -225,7 +241,9 @@ function auth($http, $window, flash, localStorage, random, settings) {
       } else if (authCode) {
         // Exchange authorization code retrieved from login popup for a new
         // access token.
-        tokenInfoPromise = exchangeAuthCode(authCode).then((tokenInfo) => {
+        var code = authCode;
+        authCode = null; // Auth codes can only be used once.
+        tokenInfoPromise = exchangeAuthCode(code).then((tokenInfo) => {
           saveToken(tokenInfo);
           return tokenInfo;
         });
@@ -356,6 +374,8 @@ function auth($http, $window, flash, localStorage, random, settings) {
       clearCache();
     });
   }
+
+  listenForTokenStorageEvents();
 
   return {
     clearCache,

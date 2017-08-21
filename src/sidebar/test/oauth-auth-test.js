@@ -3,6 +3,8 @@
 var angular = require('angular');
 var { stringify } = require('query-string');
 
+var events = require('../events');
+
 var DEFAULT_TOKEN_EXPIRES_IN_SECS = 1000;
 var TOKEN_KEY = 'hypothesis.oauth.hypothes%2Eis.token';
 
@@ -31,22 +33,27 @@ class FakeWindow {
 
   removeEventListener(event, callback) {
     this.callbacks = this.callbacks.filter((cb) =>
-      cb.event === event && cb.callback === callback
+      !(cb.event === event && cb.callback === callback)
     );
+  }
+
+  trigger(event) {
+    this.callbacks.forEach((cb) => {
+      if (cb.event === event.type) {
+        cb.callback(event);
+      }
+    });
   }
 
   sendMessage(data) {
     var evt = new MessageEvent('message', { data });
-    this.callbacks.forEach(({event, callback}) => {
-      if (event === 'message') {
-        callback(evt);
-      }
-    });
+    this.trigger(evt);
   }
 }
 
 describe('sidebar.oauth-auth', function () {
 
+  var $rootScope;
   var auth;
   var nowStub;
   var fakeHttp;
@@ -133,8 +140,9 @@ describe('sidebar.oauth-auth', function () {
       settings: fakeSettings,
     });
 
-    angular.mock.inject((_auth_) => {
+    angular.mock.inject((_auth_, _$rootScope_) => {
       auth = _auth_;
+      $rootScope = _$rootScope_;
     });
   });
 
@@ -438,6 +446,45 @@ describe('sidebar.oauth-auth', function () {
             assert.equal(token, null);
           });
         });
+      });
+    });
+
+    context('when another client instance saves new tokens', () => {
+      function notifyStoredTokenChange() {
+        // Trigger "storage" event as if another client refreshed the token.
+        var storageEvent = new Event('storage');
+        storageEvent.key = TOKEN_KEY;
+
+        fakeLocalStorage.getObject.returns({
+          accessToken: 'storedAccessToken',
+          refreshToken: 'storedRefreshToken',
+          expiresAt: Date.now() + 100,
+        });
+
+        fakeWindow.trigger(storageEvent);
+      }
+
+      it('reloads tokens from storage', () => {
+        return login().then(() => {
+          return auth.tokenGetter();
+        }).then(token => {
+          assert.equal(token, 'firstAccessToken');
+
+          notifyStoredTokenChange();
+
+          return auth.tokenGetter();
+        }).then(token => {
+          assert.equal(token, 'storedAccessToken');
+        });
+      });
+
+      it('notifies other services about the change', () => {
+        var onTokenChange = sinon.stub();
+        $rootScope.$on(events.OAUTH_TOKENS_CHANGED, onTokenChange);
+
+        notifyStoredTokenChange();
+
+        assert.called(onTokenChange);
       });
     });
   });

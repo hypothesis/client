@@ -15,6 +15,11 @@ module.exports = {
   GROUPS_CHANGED: 'groupsChanged',
   /** The logged-in user changed */
   USER_CHANGED: 'userChanged',
+  /**
+   * API tokens were fetched and saved to local storage by another client
+   * instance.
+   */
+  OAUTH_TOKENS_CHANGED: 'oauthTokensChanged',
 
   // UI state changes
 
