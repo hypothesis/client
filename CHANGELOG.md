@@ -4,6 +4,22 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+### Changed
+
+- Refresh OAuth tokens "on demand" when making API calls
+  ([#517](https://github.com/hypothesis/client/pull/517)).
+
+- Reload OAuth tokens and profile when tokens are changed by another client
+  instance ([#518](https://github.com/hypothesis/client/pull/518)).
+
+- Deprecate "openLoginForm" setting and make a no-op when using OAuth
+  ([#524](https://github.com/hypothesis/client/pull/524)).
+
+- Get OAuth endpoints from the service's `/api/links` endpoint
+  ([#525](https://github.com/hypothesis/client/pull/525)).
+
 ## [1.35.0] - 2017-08-09
 
 ### Changed
