@@ -208,22 +208,27 @@ describe('sidebar.oauth-auth', function () {
     // the pending Promise for the first request again (and not send a second
     // concurrent HTTP request).
     it('should not make two concurrent access token requests', function () {
-      makeServerUnresponsive();
+      var respond;
+      fakeHttp.post.returns(new Promise(resolve => {
+        respond = resolve;
+      }));
 
       // The first time tokenGetter() is called it sends the access token HTTP
       // request and returns a Promise for the access token.
-      var firstAccessTokenPromise = auth.tokenGetter();
+      var tokens = [auth.tokenGetter(), auth.tokenGetter()];
 
-      // No matter how many times it's called while there's an HTTP request
-      // in-flight, tokenGetter() never sends a second concurrent HTTP request.
-      auth.tokenGetter();
-      auth.tokenGetter();
-
-      // It just keeps on returning the same Promise for the access token.
-      var accessTokenPromise = auth.tokenGetter();
-
-      assert.strictEqual(accessTokenPromise, firstAccessTokenPromise);
       assert.equal(fakeHttp.post.callCount, 1);
+
+      // Resolve the initial request for an access token in exchange for a JWT.
+      respond({
+        status: 200,
+        data: {
+          access_token: 'foo',
+          refresh_token: 'bar',
+          expires_in: 3600,
+        },
+      });
+      return Promise.all(tokens);
     });
 
     it('should return null if no grant token was provided', function () {
@@ -234,7 +239,7 @@ describe('sidebar.oauth-auth', function () {
       });
     });
 
-    it('should refresh the access token before it expires', function () {
+    it('should refresh the access token if it expired', function () {
       function callTokenGetter () {
         var tokenPromise = auth.tokenGetter();
 
@@ -264,49 +269,42 @@ describe('sidebar.oauth-auth', function () {
         };
       }
 
-      function assertThatTokenGetterNowReturnsNewAccessToken () {
-        return auth.tokenGetter().then(function (token) {
-          assert.equal(token, 'secondAccessToken');
-        });
-      }
-
       return callTokenGetter()
         .then(resetHttpSpy)
         .then(expireAccessToken)
-        .then(assertRefreshTokenWasUsed('firstRefreshToken'))
-        .then(resetHttpSpy)
-        .then(assertThatTokenGetterNowReturnsNewAccessToken)
-        .then(expireAccessToken)
-        .then(assertRefreshTokenWasUsed('secondRefreshToken'));
-    });
-
-    // While a refresh token HTTP request is in-flight, calls to tokenGetter()
-    // should just return the old access token immediately.
-    it('returns the access token while a refresh is in-flight', function() {
-      return auth.tokenGetter().then(function(firstAccessToken) {
-        makeServerUnresponsive();
-
-        expireAccessToken();
-
-        // The refresh token request will still be in-flight, but tokenGetter()
-        // should still return a Promise for the old access token.
-        return auth.tokenGetter().then(function(secondAccessToken) {
-          assert.equal(firstAccessToken, secondAccessToken);
-        });
-      });
+        .then(() => auth.tokenGetter())
+        .then(token => assert.equal(token, 'secondAccessToken'))
+        .then(assertRefreshTokenWasUsed('firstRefreshToken'));
     });
 
     // It only sends one refresh request, even if tokenGetter() is called
     // multiple times and the refresh response hasn't come back yet.
     it('does not send more than one refresh request', function () {
+      // Perform an initial token fetch which will exchange the JWT grant for an
+      // access token.
       return auth.tokenGetter()
-        .then(resetHttpSpy) // Reset fakeHttp.post.callCount to 0 so that the
-                            // initial access token request isn't counted.
-        .then(auth.tokenGetter)
-        .then(makeServerUnresponsive)
-        .then(auth.tokenGetter)
-        .then(expireAccessToken)
-        .then(function () {
+        .then(() => {
+          // Expire the access token to trigger a refresh request on the next
+          // token fetch.
+          fakeHttp.post.reset();
+          expireAccessToken();
+
+          // Delay the response to the refresh request.
+          var respond;
+          fakeHttp.post.returns(new Promise(resolve => {
+            respond = resolve;
+          }));
+
+          // Request an auth token multiple times.
+          var tokens = Promise.all([auth.tokenGetter(), auth.tokenGetter()]);
+
+          // Finally, respond to the refresh request.
+          respond({ access_token: 'a_new_token', refresh_token: 'a_delayed_token', expires_in: 3600 });
+
+          return tokens;
+        })
+        .then(() => {
+          // Check that only one refresh request was made.
           assert.equal(fakeHttp.post.callCount, 1);
         });
     });
@@ -321,19 +319,12 @@ describe('sidebar.oauth-auth', function () {
         };
       });
 
-      it('shows an error message to the user', function () {
-        function assertThatErrorMessageWasShown() {
-          assert.calledOnce(fakeFlash.error);
-          assert.equal(
-            fakeFlash.error.firstCall.args[0],
-            'You must reload the page to continue annotating.'
-          );
-        }
+      it('logs the user out', function () {
+        expireAccessToken();
 
-        return auth.tokenGetter()
-          .then(expireAccessToken)
-          .then(function () { clock.tick(1); })
-          .then(assertThatErrorMessageWasShown);
+        return auth.tokenGetter(token => {
+          assert.equal(token, null);
+        });
       });
     });
   });
@@ -350,7 +341,7 @@ describe('sidebar.oauth-auth', function () {
         assert.calledWith(fakeLocalStorage.setObject, TOKEN_KEY, {
           accessToken: 'firstAccessToken',
           refreshToken: 'firstRefreshToken',
-          expiresAt: 910000,
+          expiresAt: 990000,
         });
       });
     });
@@ -377,7 +368,7 @@ describe('sidebar.oauth-auth', function () {
         assert.calledWith(fakeLocalStorage.setObject, TOKEN_KEY, {
           accessToken: 'secondToken',
           refreshToken: 'secondRefreshToken',
-          expiresAt: 1910000,
+          expiresAt: 1990000,
         });
       });
     });
@@ -421,7 +412,7 @@ describe('sidebar.oauth-auth', function () {
           {
             accessToken: 'secondToken',
             refreshToken: 'secondRefreshToken',
-            expiresAt: 910200,
+            expiresAt: 990200,
           }
         );
       });
@@ -597,12 +588,6 @@ describe('sidebar.oauth-auth', function () {
   // Advance time forward so that any current access tokens will have expired.
   function expireAccessToken () {
     clock.tick(DEFAULT_TOKEN_EXPIRES_IN_SECS * 1000);
-  }
-
-  // Make $http.post() return a pending Promise (simulates a still in-flight
-  // HTTP request).
-  function makeServerUnresponsive () {
-    fakeHttp.post.returns(new Promise(function () {}));
   }
 
   // Reset fakeHttp's spy history (.called, .callCount, etc).
