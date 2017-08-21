@@ -7,7 +7,7 @@ var events = require('../../events');
 var bridgeEvents = require('../../../shared/bridge-events');
 var util = require('../../../shared/test/util');
 
-describe('hypothesisApp', function () {
+describe('sidebar.components.hypothesis-app', function () {
   var $componentController = null;
   var $scope = null;
   var $rootScope = null;
@@ -158,7 +158,7 @@ describe('hypothesisApp', function () {
     sandbox.restore();
   });
 
-  describe('isSidebar property', function () {
+  describe('#isSidebar', function () {
 
     it('is false if the window is the top window', function () {
       fakeWindow.top = fakeWindow;
@@ -262,6 +262,27 @@ describe('hypothesisApp', function () {
     fakeRoute.reload = sinon.spy();
     $scope.$broadcast(events.USER_CHANGED, {initialLoad: false});
     assert.calledOnce(fakeRoute.reload);
+  });
+
+  context('when the "openLoginForm" setting is enabled', () => {
+    beforeEach(() => {
+      fakeSettings.openLoginForm = true;
+    });
+
+    it('shows the login form if not using OAuth', () => {
+      var ctrl = createController();
+      return fakeSession.load().then(() => {
+        assert.isTrue(ctrl.accountDialog.visible);
+      });
+    });
+
+    it('does not show the login form if using OAuth', () => {
+      fakeAuth.login = sandbox.stub();
+      var ctrl = createController();
+      return fakeSession.load().then(() => {
+        assert.isFalse(ctrl.accountDialog.visible);
+      });
+    });
   });
 
   describe('#signUp', function () {
