@@ -36,6 +36,14 @@ var routes = {
       url: 'http://example.com/api/annotations/:id/hide',
     },
   },
+  group: {
+    member: {
+      delete: {
+        method: 'DELETE',
+        url: 'http://example.com/api/groups/:pubid/members/:user',
+      },
+    },
+  },
   search: {
     method: 'GET',
     url: 'http://example.com/api/search',
@@ -176,6 +184,20 @@ describe('sidebar.store', function () {
         return [204, {}, {}];
       });
     $httpBackend.flush();
+  });
+
+  describe('#group.member.delete', () => {
+    it('removes current user from a group', (done) => {
+      store.group.member.delete({pubid: 'an-id', user: 'me'}).then(function () {
+        done();
+      });
+
+      $httpBackend.expectDELETE('http://example.com/api/groups/an-id/members/me')
+        .respond(() => {
+          return [204, {}, {}];
+        });
+      $httpBackend.flush();
+    });
   });
 
   it('removes internal properties before sending data to the server', function (done) {

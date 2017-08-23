@@ -173,6 +173,11 @@ function store($http, $q, apiRoutes, auth) {
       hide: apiCall('annotation.hide'),
       unhide: apiCall('annotation.unhide'),
     },
+    group: {
+      member: {
+        delete: apiCall('group.member.delete'),
+      },
+    },
     profile: {
       read: apiCall('profile.read'),
       update: apiCall('profile.update'),
