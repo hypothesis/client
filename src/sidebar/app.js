@@ -109,10 +109,24 @@ function processAppOpts() {
   }
 }
 
+function canSetCookies() {
+  // Try to add a short-lived cookie. Note the `document.cookie` setter has
+  // unusual semantics, this doesn't overwrite other cookies.
+  document.cookie = 'cookie-setter-test=1;max-age=5';
+  return document.cookie.indexOf('cookie-setter-test=1') !== -1;
+}
+
 function shouldUseOAuth() {
   if (serviceConfig(settings)) {
+    // If the host page supplies annotation service configuration, including a
+    // grant token, use OAuth.
     return true;
   }
+  if (!canSetCookies()) {
+    // If cookie storage is blocked by the browser, we have to use OAuth.
+    return true;
+  }
+  // Otherwise, use OAuth only if the feature flag is enabled.
   return settings.oauthClientId && settings.oauthEnabled;
 }
 
