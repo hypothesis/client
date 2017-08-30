@@ -46,16 +46,15 @@ function createHighlighter(type) {
 
   var highlighter = {
     /**
-     *  Given an normalized range, create all of the highlight elements
-     *  that create the full highlight effect for an anchor.
+     * Given an normalized range, create all of the highlight elements
+     * that create the full highlight effect for an anchor.
      *
-     *  Note: this is a required function to be implemented by the different
-     *  highlighters
+     * Note: this is a required function to be implemented by the different
+     * highlighters
      *
-     *  @param normedRange A NormalizedRange to be highlighted.
-     *  @param annotation Optionally, you can pass the annotation you would like to
-     *    apply a data reference to.
-     *  @returns Array of HTMLElement references.
+     * @param {NormalizedRange} normedRange Range to highlight.
+     * @param [any] annotation - Object to associate with the highlight.
+     * @return {HTMLElement[]}
      */
     highlightRange: (normedRange, annotation) => {
       if(!_readyForEvents){
@@ -65,16 +64,16 @@ function createHighlighter(type) {
     },
 
     /**
-     *  Register a callback to be notified when a set of highlights changes
-     *  for a range. This could happen in situations where the page size changes
-     *  resulting in more or less highlight elements needed to accomplish the
-     *  full highlight.
+     * Register a callback to be notified when a set of highlights changes
+     * for a range. This could happen in situations where the page size changes
+     * resulting in more or less highlight elements needed to accomplish the
+     * full highlight.
      *
-     *  Note: this is optional to be implemented by the different highlighters.
-     *    If not implemented, it will do nothing.
+     * Note: this is optional to be implemented by the different highlighters.
+     *   If not implemented, it will do nothing.
      *
-     *  @param cb callback to be invoked when a change in highlight
-     *    elements happens.
+     * @param {Function} cb - Callback to be invoked when a change in highlight
+     *   elements happens.
      */
     onHighlightsChanged: (cb) => {
       const highlighter = _getCurrentHighlighter();
@@ -86,7 +85,7 @@ function createHighlighter(type) {
     /**
      * Remove a set of highlights from the page.
      *
-     * @param highlights An Array of HTMLElements that need to be removed.
+     * @param {HTMLElement[]} highlights - Highlight elements to remove.
      */
     removeHighlights: (highlights = []) => {
       // Note for overlay highlighting we are deleting the
@@ -110,8 +109,8 @@ function createHighlighter(type) {
      *  Given a set of highlights, toggle the necesssary levers to
      *    make the highlight look focused or unfocused.
      *
-     *  @param highlights Array of highlight elements to toggle focus state
-     *  @param focusOn boolean to decide if focus should be applied or taken
+     *  @param {HTMLElement[]} highlights
+     *  @param {boolean} focusOn - Specifies if focus should be applied or taken
      */
     toggleFocusForHighlights: (highlights = [], focusOn = false) => {
       highlights.forEach((el)=>{
@@ -124,10 +123,10 @@ function createHighlighter(type) {
      * Given the events we care about, attach proper listeners and
      *  invoke the provided event handler callback.
      *
-     * @param Object eventHandlers is a key value pair object where the key represents
+     * @param {Object} eventHandlers - A key value pair object where the key represents
      *  the event we are binding to (like 'click' or 'mouseover') and the value is
      *  the callback function to be invoked when the respective event occurs
-     * @param Element scopeTo defines where our event delegation should be scoped to
+     * @param {Element} scopeTo - Element which event listeners are attached to.
      */
     registerEventHandlers: (eventHandlers, scopeTo = document.body) => {
       // Note: we will bind the events when the highlights
