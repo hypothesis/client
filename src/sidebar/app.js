@@ -1,6 +1,7 @@
 'use strict';
 
 var addAnalytics = require('./ga');
+var disableOpenerForExternalLinks = require('./util/disable-opener-for-external-links');
 var getApiUrl = require('./get-api-url');
 var serviceConfig = require('./service-config');
 require('../shared/polyfills');
@@ -29,6 +30,9 @@ settings.apiUrl = getApiUrl(settings);
 // The `ng-csp` attribute must be set on some HTML element in the document
 // _before_ Angular is require'd for the first time.
 document.body.setAttribute('ng-csp', '');
+
+// Prevent tab-jacking.
+disableOpenerForExternalLinks(document.body);
 
 var angular = require('angular');
 
