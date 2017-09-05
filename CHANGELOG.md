@@ -4,6 +4,13 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+### Changed
+
+- Work around Chrome bug causing sidebar to become invisible
+  ([#523](https://github.com/hypothesis/client/pull/523)).
+
 ## [1.37.0] - 2017-09-04
 
 ### Changed
