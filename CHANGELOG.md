@@ -4,6 +4,13 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+### Changed
+
+- Always use OAuth if cookie storage is blocked
+  ([#529](https://github.com/hypothesis/client/pull/529)).
+
 ## [1.38.0] - 2017-09-05
 
 ### Changed
