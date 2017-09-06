@@ -98,12 +98,6 @@ function configureToastr(toastrConfig) {
 }
 
 // @ngInject
-function configureHttp($httpProvider) {
-  // Use the Pyramid XSRF header name
-  $httpProvider.defaults.xsrfHeaderName = 'X-CSRF-Token';
-}
-
-// @ngInject
 function setupHttp($http, streamer) {
   $http.defaults.headers.common['X-Client-Id'] = streamer.clientId;
 }
@@ -215,7 +209,6 @@ module.exports = angular.module('h', [
   .value('time', require('./time'))
   .value('urlEncodeFilter', require('./filter/url').encode)
 
-  .config(configureHttp)
   .config(configureLocation)
   .config(configureRoutes)
   .config(configureToastr)

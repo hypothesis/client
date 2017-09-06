@@ -135,7 +135,6 @@ describe('sidebar.session', function () {
         groups: [{
           id: 'groupid',
         }],
-        csrf: 'dummytoken',
       });
       assert.calledOnce(groupChangeCallback);
     });
@@ -145,7 +144,6 @@ describe('sidebar.session', function () {
       $rootScope.$on(events.USER_CHANGED, userChangeCallback);
       session.update({
         userid: 'fred',
-        csrf: 'dummytoken',
       });
       assert.calledOnce(userChangeCallback);
     });
@@ -153,7 +151,6 @@ describe('sidebar.session', function () {
     it('updates the user ID for Sentry error reports', function () {
       session.update({
         userid: 'anne',
-        csrf: 'dummytoken',
       });
       assert.calledWith(fakeRaven.setUserInfo, {
         id: 'anne',
