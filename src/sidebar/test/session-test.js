@@ -7,7 +7,6 @@ var events = require('../events');
 var mock = angular.mock;
 
 describe('sidebar.session', function () {
-  var $httpBackend;
   var $rootScope;
 
   var fakeAnalytics;
@@ -21,7 +20,7 @@ describe('sidebar.session', function () {
   var session;
 
   before(function () {
-    angular.module('h', ['ngResource'])
+    angular.module('h', [])
       .service('session', require('../session'));
   });
 
@@ -74,107 +73,15 @@ describe('sidebar.session', function () {
 
 
   beforeEach(mock.inject(function (_$httpBackend_, _$rootScope_, _session_) {
-    $httpBackend = _$httpBackend_;
     session = _session_;
     $rootScope = _$rootScope_;
   }));
 
   afterEach(function () {
-    $httpBackend.verifyNoOutstandingExpectation();
-    $httpBackend.verifyNoOutstandingRequest();
     sandbox.restore();
   });
 
-  // There's little point testing every single route here, as they're
-  // declarative and ultimately we'd be testing ngResource.
-  describe('#login()', function () {
-    var url = 'https://test.hypothes.is/root/app?__formid__=login';
-
-    it('should send an HTTP POST to the action', function () {
-      $httpBackend.expectPOST(url, {code: 123}).respond({});
-      session.login({code: 123});
-      $httpBackend.flush();
-    });
-
-    it('should invoke the flash service with any flash messages', function () {
-      var response = {
-        flash: {
-          error: ['fail'],
-        },
-      };
-      $httpBackend.expectPOST(url).respond(response);
-      session.login({});
-      $httpBackend.flush();
-      assert.calledWith(fakeFlash.error, 'fail');
-    });
-
-    it('should assign errors and status reasons to the model', function () {
-      var response = {
-        model: {
-          userid: 'alice',
-        },
-        errors: {
-          password: 'missing',
-        },
-        reason: 'bad credentials',
-      };
-      $httpBackend.expectPOST(url).respond(response);
-      var result = session.login({});
-      $httpBackend.flush();
-      assert.match(result, response.model, 'the model is present');
-      assert.match(result.errors, response.errors, 'the errors are present');
-      assert.match(result.reason, response.reason, 'the reason is present');
-    });
-
-    it('should capture and send the xsrf token', function () {
-      var token = 'deadbeef';
-      var headers = {
-        'Accept': 'application/json, text/plain, */*',
-        'Content-Type': 'application/json;charset=utf-8',
-        'X-XSRF-TOKEN': token,
-      };
-      var model = {csrf: token};
-      $httpBackend.expectPOST(url).respond({model: model});
-      session.login({});
-      $httpBackend.flush();
-      assert.equal(session.state.csrf, token);
-
-      $httpBackend.expectPOST(url, {}, headers).respond({});
-      session.login({});
-      $httpBackend.flush();
-    });
-
-    it('should expose the model as session.state', function () {
-      var response = {
-        model: {
-          userid: 'alice',
-        },
-      };
-      assert.deepEqual(session.state, {});
-      $httpBackend.expectPOST(url).respond(response);
-      session.login({});
-      $httpBackend.flush();
-      assert.deepEqual(session.state, response.model);
-    });
-
-    it('an immediately-following call to #load() should not trigger a new request', function () {
-      $httpBackend.expectPOST(url).respond({});
-      session.login();
-      $httpBackend.flush();
-
-      session.load();
-    });
-  });
-
   describe('#load()', function () {
-    var url = 'https://test.hypothes.is/root/app';
-
-    it('should fetch the session data', function () {
-      $httpBackend.expectGET(url).respond({});
-      session.load();
-      $httpBackend.flush();
-    });
-
     context('when the host page provides an OAuth grant token', function () {
       beforeEach(function () {
         fakeServiceConfig.returns({
@@ -217,42 +124,6 @@ describe('sidebar.session', function () {
         return session.load().then(function () {
           assert.equal(session.state.userid, 'acct:user@hypothes.is');
         });
-      });
-    });
-
-    it('should cache the session data', function () {
-      $httpBackend.expectGET(url).respond({});
-      session.load();
-      session.load();
-      $httpBackend.flush();
-    });
-
-    it('should eventually expire the cache', function () {
-      var clock = sandbox.useFakeTimers();
-      $httpBackend.expectGET(url).respond({});
-      session.load();
-      $httpBackend.flush();
-
-      clock.tick(301 * 1000);
-
-      $httpBackend.expectGET(url).respond({});
-      session.load();
-      $httpBackend.flush();
-    });
-
-    var failedRequestCases = [{
-      status: -1,
-      body: null,
-    },{
-      status: 504,
-      body: 'Gateway Timeout',
-    }];
-
-    failedRequestCases.forEach(function (testCase) {
-      it('should tolerate failed requests', function () {
-        $httpBackend.expectGET(url).respond(testCase.status, testCase.body);
-        session.load();
-        $httpBackend.flush();
       });
     });
   });
@@ -347,82 +218,37 @@ describe('sidebar.session', function () {
   });
 
   describe('#logout', function () {
-    context('when using cookie auth', () => {
-      var postExpectation;
-      beforeEach(function () {
-        var logoutUrl = 'https://test.hypothes.is/root/app?__formid__=logout';
-        postExpectation = $httpBackend.expectPOST(logoutUrl).respond(200, {
-          model: {
-            userid: 'logged-out-id',
-          },
-        });
+    beforeEach(() => {
+      var loggedIn = true;
+
+      fakeAuth.login = sinon.stub().returns(Promise.resolve());
+      fakeAuth.logout = sinon.spy(() => {
+        loggedIn = false;
+        return Promise.resolve();
       });
 
-      it('logs the user out on the service and updates the session', function () {
-        session.logout().then(function () {
-          assert.equal(session.state.userid, 'logged-out-id');
-        });
-        $httpBackend.flush();
-      });
-
-      it('clears the API access token cache', function () {
-        session.logout().then(function () {
-          assert.called(fakeAuth.clearCache);
-        });
-        $httpBackend.flush();
-      });
-
-      it('tracks successful logout actions in analytics', function () {
-        session.logout().then(function () {
-          assert.calledWith(fakeAnalytics.track, fakeAnalytics.events.LOGOUT_SUCCESS);
-        });
-        $httpBackend.flush();
-      });
-
-      it('tracks unsuccessful logout actions in analytics', function () {
-        postExpectation.respond(500);
-
-        session.logout().catch(function(){
-          assert.calledWith(fakeAnalytics.track, fakeAnalytics.events.LOGOUT_FAILURE);
-        });
-
-        $httpBackend.flush();
+      // Fake profile response after logout.
+      fakeStore.profile.read = () => Promise.resolve({
+        userid: null,
+        loggedIn,
       });
     });
 
-    context('when using OAuth', () => {
-      beforeEach(() => {
-        var loggedIn = true;
-
-        fakeAuth.login = sinon.stub().returns(Promise.resolve());
-        fakeAuth.logout = sinon.spy(() => {
-          loggedIn = false;
-          return Promise.resolve();
-        });
-
-        // Fake profile response after logout.
-        fakeStore.profile.read = () => Promise.resolve({
-          userid: null,
-          loggedIn,
-        });
+    it('logs the user out', () => {
+      return session.logout().then(() => {
+        assert.called(fakeAuth.logout);
       });
+    });
 
-      it('logs the user out', () => {
-        return session.logout().then(() => {
-          assert.called(fakeAuth.logout);
-        });
+    it('tracks successful logout actions in analytics', () => {
+      return session.logout().then(() => {
+        assert.calledWith(fakeAnalytics.track, fakeAnalytics.events.LOGOUT_SUCCESS);
       });
+    });
 
-      it('tracks successful logout actions in analytics', () => {
-        return session.logout().then(() => {
-          assert.calledWith(fakeAnalytics.track, fakeAnalytics.events.LOGOUT_SUCCESS);
-        });
-      });
-
-      it('updates the profile after logging out', () => {
-        return session.logout().then(() => {
-          assert.isFalse(session.state.loggedIn);
-        });
+    it('updates the profile after logging out', () => {
+      return session.logout().then(() => {
+        assert.isFalse(session.state.loggedIn);
       });
     });
   });
