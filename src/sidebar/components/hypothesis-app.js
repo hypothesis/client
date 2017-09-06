@@ -74,15 +74,8 @@ function HypothesisAppController(
     self.auth = authStateFromProfile(data.profile);
   });
 
-  session.load().then(function (profile) {
-    // When the authentication status of the user is known,
-    // update the auth info in the top bar and show the login form
-    // after first install of the extension.
+  session.load().then(profile => {
     self.auth = authStateFromProfile(profile);
-
-    if (!profile.userid && settings.openLoginForm && !auth.login) {
-      self.login();
-    }
   });
 
   /** Scroll to the view to the element matching the given selector */

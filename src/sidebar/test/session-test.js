@@ -41,8 +41,7 @@ describe('sidebar.session', function () {
       },
     };
     fakeAuth = {
-      clearCache: sandbox.spy(),
-      login: null, // Use cookie-based auth
+      login: sandbox.stub().returns(Promise.resolve()),
     };
     fakeFlash = {error: sandbox.spy()};
     fakeRaven = {
@@ -72,7 +71,7 @@ describe('sidebar.session', function () {
   });
 
 
-  beforeEach(mock.inject(function (_$httpBackend_, _$rootScope_, _session_) {
+  beforeEach(mock.inject(function (_$rootScope_, _session_) {
     session = _session_;
     $rootScope = _$rootScope_;
   }));
@@ -151,11 +150,6 @@ describe('sidebar.session', function () {
       assert.calledOnce(userChangeCallback);
     });
 
-    it('clears the API token cache when the user changes', function () {
-      session.update({userid: 'different-user', csrf: 'dummytoken'});
-      assert.called(fakeAuth.clearCache);
-    });
-
     it('updates the user ID for Sentry error reports', function () {
       session.update({
         userid: 'anne',
@@ -164,14 +158,6 @@ describe('sidebar.session', function () {
       assert.calledWith(fakeRaven.setUserInfo, {
         id: 'anne',
       });
-    });
-
-    it('does not clear the access token when using OAuth-based authorization', function () {
-      fakeAuth.login = Promise.resolve();
-
-      session.update({userid: 'different-user', csrf: 'dummytoken'});
-
-      assert.notCalled(fakeAuth.clearCache);
     });
   });
 
