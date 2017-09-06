@@ -151,7 +151,6 @@ module.exports = angular.module('h', [
   .component('helpPanel', require('./components/help-panel'))
   .component('loggedoutMessage', require('./components/loggedout-message'))
   .component('loginControl', require('./components/login-control'))
-  .component('loginForm', require('./components/login-form'))
   .component('markdown', require('./components/markdown'))
   .component('moderationBanner', require('./components/moderation-banner'))
   .component('publishAnnotationBtn', require('./components/publish-annotation-btn'))

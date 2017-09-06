@@ -24,10 +24,6 @@
   </div>
 
   <div class="content">
-    <login-form
-      ng-if="vm.accountDialog.visible"
-      on-close="vm.accountDialog.visible = false">
-    </login-form>
     <sidebar-tutorial ng-if="vm.isSidebar"></sidebar-tutorial>
     <share-dialog
       ng-if="vm.shareDialog.visible"
