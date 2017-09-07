@@ -107,7 +107,6 @@ describe('sidebar.session', function () {
 
     context('when using OAuth for first-party accounts', () => {
       beforeEach(() => {
-        fakeAuth.login = sinon.stub().returns(Promise.resolve());
         fakeStore.profile.read.returns(Promise.resolve({
           userid: 'acct:user@hypothes.is',
         }));
@@ -179,9 +178,6 @@ describe('sidebar.session', function () {
 
   describe('#reload', () => {
     beforeEach(() => {
-      // Use OAuth
-      fakeAuth.login = sinon.stub().returns(Promise.resolve());
-
       // Load the initial profile data, as the client will do on startup.
       fakeStore.profile.read.returns(Promise.resolve({
         userid: 'acct:user_a@hypothes.is',
@@ -204,7 +200,6 @@ describe('sidebar.session', function () {
     beforeEach(() => {
       var loggedIn = true;
 
-      fakeAuth.login = sinon.stub().returns(Promise.resolve());
       fakeAuth.logout = sinon.spy(() => {
         loggedIn = false;
         return Promise.resolve();
@@ -238,7 +233,6 @@ describe('sidebar.session', function () {
 
   context('when another client changes the current login', () => {
     it('reloads the profile', () => {
-      fakeAuth.login = sinon.stub().returns(Promise.resolve());
       fakeStore.profile.read.returns(Promise.resolve({
         userid: 'acct:initial_user@hypothes.is',
       }));
