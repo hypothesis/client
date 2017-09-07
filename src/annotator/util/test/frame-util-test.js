@@ -2,13 +2,14 @@
 
 const frameUtil = require('../frame-util');
 
-describe('frameUtil', function () {
+describe('annotator.util.frame-util', function () {
   describe('findFrames', function () {
 
     let container;
 
     const _addFrameToContainer = (options={})=>{
       const frame = document.createElement('iframe');
+      frame.setAttribute('enable-annotation', '');
       frame.className = options.className || '';
       frame.style.height = `${(options.height || 150)}px`;
       frame.style.width = `${(options.width || 150)}px`;
@@ -25,7 +26,7 @@ describe('frameUtil', function () {
       container.remove();
     });
 
-    it('should find valid frames', function () {
+    it('should return valid frames', function () {
 
       let foundFrames = frameUtil.findFrames(container);
 
@@ -39,8 +40,7 @@ describe('frameUtil', function () {
       assert.deepEqual(foundFrames, [frame1, frame2], 'appended frames should be found');
     });
 
-    it('should not find small frames', function () {
-
+    it('should not return small frames', function () {
       // add frames that are small in both demensions
       _addFrameToContainer({width: 140});
       _addFrameToContainer({height: 140});
@@ -50,7 +50,16 @@ describe('frameUtil', function () {
       assert.lengthOf(foundFrames, 0, 'frames with small demensions should not be found');
     });
 
-    it('should not find hypothesis frames', function () {
+    it('should not return frames that have not opted into annotation', () => {
+      const frame = _addFrameToContainer();
+
+      frame.removeAttribute('enable-annotation');
+
+      const foundFrames = frameUtil.findFrames(container);
+      assert.lengthOf(foundFrames, 0);
+    });
+
+    it('should not return the Hypothesis sidebar', function () {
 
       _addFrameToContainer({className: 'h-sidebar-iframe other-class-too'});
 

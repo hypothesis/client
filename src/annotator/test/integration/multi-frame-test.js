@@ -58,6 +58,7 @@ describe('CrossFrame multi-frame scenario', function () {
   it('detects frames on page', function () {
     // Create a frame before initializing
     var validFrame = document.createElement('iframe');
+    validFrame.setAttribute('enable-annotation', '');
     container.appendChild(validFrame);
 
     // Create another that mimics the sidebar frame
@@ -90,6 +91,7 @@ describe('CrossFrame multi-frame scenario', function () {
   it('detects removed frames', function () {
     // Create a frame before initializing
     var frame = document.createElement('iframe');
+    frame.setAttribute('enable-annotation', '');
     container.appendChild(frame);
 
     // Now initialize
@@ -103,6 +105,7 @@ describe('CrossFrame multi-frame scenario', function () {
 
   it('injects embed script in frame', function () {
     var frame = document.createElement('iframe');
+    frame.setAttribute('enable-annotation', '');
     container.appendChild(frame);
 
     crossFrame.pluginInit();
@@ -120,6 +123,7 @@ describe('CrossFrame multi-frame scenario', function () {
 
   it('excludes injection from already injected frames', function () {
     var frame = document.createElement('iframe');
+    frame.setAttribute('enable-annotation', '');
     frame.srcdoc = '<script>window.__hypothesis_frame = true;</script>';
     container.appendChild(frame);
 
@@ -140,6 +144,7 @@ describe('CrossFrame multi-frame scenario', function () {
 
     // Add a frame to the DOM
     var frame = document.createElement('iframe');
+    frame.setAttribute('enable-annotation', '');
     container.appendChild(frame);
 
     return new Promise(function (resolve) {
@@ -157,6 +162,7 @@ describe('CrossFrame multi-frame scenario', function () {
   it('detects dynamically removed frames', function () {
     // Create a frame before initializing
     var frame = document.createElement('iframe');
+    frame.setAttribute('enable-annotation', '');
     container.appendChild(frame);
 
     // Now initialize
@@ -179,6 +185,7 @@ describe('CrossFrame multi-frame scenario', function () {
   it('detects a frame dynamically removed, and added again', function () {
     // Create a frame before initializing
     var frame = document.createElement('iframe');
+    frame.setAttribute('enable-annotation', '');
     container.appendChild(frame);
 
     // Now initialize
@@ -219,6 +226,7 @@ describe('CrossFrame multi-frame scenario', function () {
 
     // Add a frame to the DOM
     var frame = document.createElement('iframe');
+    frame.setAttribute('enable-annotation', '');
     container.appendChild(frame);
 
     return new Promise(function (resolve) {

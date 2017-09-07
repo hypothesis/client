@@ -1,9 +1,14 @@
 'use strict';
 
-// Find all iframes within this iframe only
+/**
+ * Return all `<iframe>` elements under `container` which are annotate-able.
+ *
+ * @param {Element} container
+ * @return {HTMLIFrameElement[]}
+ */
 function findFrames(container) {
   const frames = Array.from(container.getElementsByTagName('iframe'));
-  return frames.filter(isValid);
+  return frames.filter(shouldEnableAnnotation);
 }
 
 // Check if the iframe has already been injected
@@ -38,25 +43,32 @@ function isAccessible(iframe) {
 }
 
 /**
- * Check if the frame elements being considered for injection have the
- * basic heuristics for content that a user might want to annotate.
- *  Rules:
- *    - avoid our client iframe
- *    - iframe should be sizeable - to avoid the small advertisement and social plugins
+ * Return `true` if an iframe should be made annotate-able.
+ *
+ * To enable annotation, an iframe must be opted-in by adding the
+ * "enable-annotation" attribute and must be visible.
  *
  * @param  {HTMLIFrameElement} iframe the frame being checked
  * @returns {boolean}   result of our validity checks
  */
-function isValid(iframe) {
+function shouldEnableAnnotation(iframe) {
+  // Ignore the Hypothesis sidebar.
   const isNotClientFrame = !iframe.classList.contains('h-sidebar-iframe');
 
+  // Ignore hidden or very small iframes.
   const frameRect = iframe.getBoundingClientRect();
   const MIN_WIDTH = 150;
   const MIN_HEIGHT = 150;
   const hasSizableContainer =
     frameRect.width > MIN_WIDTH && frameRect.height > MIN_HEIGHT;
 
-  return isNotClientFrame && hasSizableContainer;
+  // Ignore frames which have not opted into annotation support.
+  // Eventually we would like iframe annotation to be enabled by default,
+  // however we need to resolve a number of issues with iframe support before we
+  // can do that. See https://github.com/hypothesis/client/issues/530
+  const enabled = iframe.hasAttribute('enable-annotation');
+
+  return isNotClientFrame && hasSizableContainer && enabled;
 }
 
 function isDocumentReady(iframe, callback) {
