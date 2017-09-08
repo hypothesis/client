@@ -4,6 +4,60 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [1.39.0] - 2017-09-06
+
+### Changed
+
+- Always use OAuth if cookie storage is blocked
+  ([#529](https://github.com/hypothesis/client/pull/529)).
+
+## [1.38.0] - 2017-09-05
+
+### Changed
+
+- Work around Chrome bug causing sidebar to become invisible
+  ([#523](https://github.com/hypothesis/client/pull/523)).
+
+## [1.37.0] - 2017-09-04
+
+### Changed
+
+- Use public, documented API method to leave groups
+  ([#528](https://github.com/hypothesis/client/pull/528)).
+
+## [1.36.0] - 2017-08-21
+
+### Changed
+
+- Refresh OAuth tokens "on demand" when making API calls
+  ([#517](https://github.com/hypothesis/client/pull/517)).
+
+- Reload OAuth tokens and profile when tokens are changed by another client
+  instance ([#518](https://github.com/hypothesis/client/pull/518)).
+
+- Deprecate "openLoginForm" setting and make a no-op when using OAuth
+  ([#524](https://github.com/hypothesis/client/pull/524)).
+
+- Get OAuth endpoints from the service's `/api/links` endpoint
+  ([#525](https://github.com/hypothesis/client/pull/525)).
+
+## [1.35.0] - 2017-08-09
+
+### Changed
+
+- Implement logout when using OAuth
+  ([#501](https://github.com/hypothesis/client/pull/501)).
+
+## [1.34.0] - 2017-08-03
+
+### Changed
+
+- Make login work when using OAuth following recent changes to the service's
+  OAuth implementation ([#514](https://github.com/hypothesis/client/pull/514)).
+
+- Automatically convert links ending with audio extensions (mp3, ogg, wav) to
+  embedded audio players ([#508](https://github.com/hypothesis/client/pull/508)).
+
 ## [1.33.0] - 2017-08-01
 
 ### Changed

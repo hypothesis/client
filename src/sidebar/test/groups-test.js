@@ -18,9 +18,9 @@ var sessionWithThreeGroups = function() {
 
 describe('groups', function() {
   var fakeSession;
+  var fakeStore;
   var fakeLocalStorage;
   var fakeRootScope;
-  var fakeHttp;
   var fakeServiceUrl;
   var sandbox;
 
@@ -43,7 +43,13 @@ describe('groups', function() {
         }
       },
     };
-    fakeHttp = sandbox.stub();
+    fakeStore = {
+      group: {
+        member: {
+          delete: sandbox.stub().returns(Promise.resolve()),
+        },
+      },
+    };
     fakeServiceUrl = sandbox.stub();
   });
 
@@ -53,7 +59,7 @@ describe('groups', function() {
 
   function service() {
     return groups(fakeLocalStorage, fakeServiceUrl, fakeSession,
-      fakeRootScope, fakeHttp);
+      fakeRootScope, fakeStore);
   }
 
   describe('.all()', function() {
@@ -171,15 +177,13 @@ describe('groups', function() {
   });
 
   describe('.leave()', function () {
-    it('should call the /groups/<id>/leave service', function () {
+    it('should call the group leave API', function () {
       var s = service();
-      fakeServiceUrl
-        .withArgs('groups.leave', {id: 'id2'})
-        .returns('https://hyp.is/groups/leave');
-      s.leave('id2');
-      assert.calledWithMatch(fakeHttp, {
-        url: 'https://hyp.is/groups/leave',
-        method: 'POST',
+      return s.leave('id2').then(() => {
+        assert.calledWithMatch(fakeStore.group.member.delete, {
+          pubid: 'id2',
+          user: 'me',
+        });
       });
     });
   });

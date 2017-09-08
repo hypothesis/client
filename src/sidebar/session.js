@@ -150,7 +150,12 @@ function session($http, $q, $resource, $rootScope, analytics, annotationUI, auth
     lastLoadTime = Date.now();
 
     if (userChanged) {
-      if (!getAuthority()) {
+      if (!auth.login) {
+        // When using cookie-based auth, notify the auth service that the current
+        // login has changed and API tokens need to be invalidated.
+        //
+        // This is not needed for OAuth-based auth because all login/logout
+        // activities happen through the auth service itself.
         auth.clearCache();
       }
 
@@ -208,10 +213,32 @@ function session($http, $q, $resource, $rootScope, analytics, annotationUI, auth
     return update(model);
   }
 
+  /**
+   * Log the user out of the current session.
+   */
   function logout() {
-    return resource.logout().$promise.then(function () {
-      auth.clearCache();
-    }).catch(function (err) {
+    var loggedOut;
+
+    if (auth.logout) {
+      loggedOut = auth.logout().then(() => {
+        // When using OAuth, we have to explicitly re-fetch the logged-out
+        // user's profile.
+        // When using cookie-based auth, `resource.logout()` handles this
+        // automatically.
+        return reload();
+      });
+    } else {
+      loggedOut = resource.logout().$promise.then(() => {
+        // When using cookie-based auth, notify the auth service that the current
+        // login has changed and API tokens need to be invalidated.
+        //
+        // This is not needed for OAuth-based auth because all login/logout
+        // activities happen through the auth service itself.
+        auth.clearCache();
+      });
+    }
+
+    return loggedOut.catch(function (err) {
       flash.error('Log out failed');
       analytics.track(analytics.events.LOGOUT_FAILURE);
       return $q.reject(new Error(err));
@@ -230,6 +257,10 @@ function session($http, $q, $resource, $rootScope, analytics, annotationUI, auth
     lastLoadTime = null;
     return resource.load();
   }
+
+  $rootScope.$on(events.OAUTH_TOKENS_CHANGED, () => {
+    reload();
+  });
 
   return {
     dismissSidebarTutorial: dismissSidebarTutorial,

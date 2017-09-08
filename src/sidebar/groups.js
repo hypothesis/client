@@ -16,7 +16,7 @@ var STORAGE_KEY = 'hypothesis.groups.focus';
 var events = require('./events');
 
 // @ngInject
-function groups(localStorage, serviceUrl, session, $rootScope, $http) {
+function groups(localStorage, serviceUrl, session, $rootScope, store) {
   // The currently focused group. This is the group that's shown as selected in
   // the groups dropdown, the annotations displayed are filtered to only ones
   // that belong to this group, and any new annotations that the user creates
@@ -38,20 +38,18 @@ function groups(localStorage, serviceUrl, session, $rootScope, $http) {
     return null;
   }
 
-  /** Leave the group with the given ID.
+  /**
+   * Leave the group with the given ID.
    * Returns a promise which resolves when the action completes.
    */
   function leave(id) {
-    var response = $http({
-      method: 'POST',
-      url: serviceUrl('groups.leave', {id: id}),
-    });
-
-    // the groups list will be updated in response to a session state
+    // The groups list will be updated in response to a session state
     // change notification from the server. We could improve the UX here
     // by optimistically updating the session state
-
-    return response;
+    return store.group.member.delete({
+      pubid: id,
+      user: 'me',
+    });
   }
 
 
