@@ -4,6 +4,10 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+### Changed
+
 - Fix OAuth popup window failing to load in IE 11
   ([#538](https://github.com/hypothesis/client/pull/538)).
 
