@@ -4,6 +4,12 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+- Fix OAuth popup window failing to load in IE 11
+  ([#538](https://github.com/hypothesis/client/pull/538)).
+
+- Fix OAuth popup being blocked by pop-up blocker in Firefox and IE
+  ([#537](https://github.com/hypothesis/client/pull/537)).
+
 ## [1.40.0] - 2017-09-11
 
 ### Changed
