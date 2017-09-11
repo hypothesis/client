@@ -85,7 +85,7 @@ function LiveReloadServer(port, config) {
               <button id="add-test" style="padding: 0.6em; font-size: 0.75em">Toggle 2nd Frame</button>
             </div>
             <div style="margin: 10px 0 0 75px;">
-              <iframe id="iframe1" src="/document/license" style="width: 50%;height: 300px;"></iframe>
+              <iframe enable-annotation id="iframe1" src="/document/license" style="width: 50%;height: 300px;"></iframe>
             </div>
             <div id="iframe2-container" style="margin: 10px 0 0 75px;">
             </div>
