@@ -337,6 +337,8 @@ function auth($http, $rootScope, $window,
     var left   = $window.screen.width / 2 - width / 2;
     var top    = $window.screen.height /2 - height / 2;
 
+    // Generate settings for `window.open` in the required comma-separated
+    // key=value format.
     var authWindowSettings = queryString.stringify({
       left: left,
       top: top,
