@@ -4,6 +4,13 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+### Changed
+
+- Make annotation of iframes require opt-in by adding an "enable-annotation"
+  attribute ([#533](https://github.com/hypothesis/client/pull/533)).
+
 ## [1.39.0] - 2017-09-06
 
 ### Changed
