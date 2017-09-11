@@ -331,6 +331,29 @@ function auth($http, $rootScope, $window,
     var left   = $window.screen.width / 2 - width / 2;
     var top    = $window.screen.height /2 - height / 2;
 
+    // Generate settings for `window.open` in the required comma-separated
+    // key=value format.
+    var authWindowSettings = queryString.stringify({
+      left: left,
+      top: top,
+      width: width,
+      height: height,
+    }).replace(/&/g, ',');
+
+    // Open the auth window before fetching the `oauth.authorize` URL to ensure
+    // that the `window.open` call happens in the same turn of the event loop
+    // that was initiated by the user clicking the "Log in" link.
+    //
+    // Otherwise the `window.open` call is not deemed to be in response to a
+    // user gesture in Firefox & IE 11 and their popup blocking heuristics will
+    // prevent the window being opened. See
+    // https://github.com/hypothesis/client/issues/534 and
+    // https://github.com/hypothesis/client/issues/535.
+    //
+    // Chrome, Safari & Edge have different heuristics and are not affected by
+    // this problem.
+    var authWindow = $window.open('about:blank', 'Login to Hypothesis', authWindowSettings);
+
     return apiRoutes.links().then(links => {
       var authUrl = links['oauth.authorize'];
       authUrl += '?' + queryString.stringify({
@@ -340,13 +363,7 @@ function auth($http, $rootScope, $window,
         response_type: 'code',
         state: state,
       });
-      var authWindowSettings = queryString.stringify({
-        left: left,
-        top: top,
-        width: width,
-        height: height,
-      }).replace(/&/g, ',');
-      $window.open(authUrl, 'Login to Hypothesis', authWindowSettings);
+      authWindow.location = authUrl;
 
       return authResponse;
     }).then((resp) => {

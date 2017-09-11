@@ -12,19 +12,29 @@ class FakeWindow {
   constructor() {
     this.callbacks = [];
 
-    this.location = {
-      origin: 'client.hypothes.is',
-    };
-
     this.screen = {
       width: 1024,
       height: 768,
     };
 
-    this.open = sinon.stub();
+
+    this.location = 'https://client.hypothes.is/app.html';
+    this.open = sinon.spy(href => {
+      var win = new FakeWindow;
+      win.location = href;
+      return win;
+    });
 
     this.setTimeout = window.setTimeout.bind(window);
     this.clearTimeout = window.clearTimeout.bind(window);
+  }
+
+  get location() {
+    return this.url;
+  }
+
+  set location(href) {
+    this.url = new URL(href);
   }
 
   addEventListener(event, callback) {
@@ -511,18 +521,24 @@ describe('sidebar.oauth-auth', function () {
         var authUrl = links['oauth.authorize'];
         var params = {
           client_id: fakeSettings.oauthClientId,
-          origin: 'client.hypothes.is',
+          origin: 'https://client.hypothes.is',
           response_mode: 'web_message',
           response_type: 'code',
           state: 'notrandom',
         };
         var expectedAuthUrl = `${authUrl}?${stringify(params)}`;
+
+        // Check that the auth window was opened and then set to the expected
+        // location. The final URL is not passed to `window.open` to work around
+        // a pop-up blocker issue.
         assert.calledWith(
           fakeWindow.open,
-          expectedAuthUrl,
+          'about:blank',
           'Login to Hypothesis',
           'height=400,left=312,top=184,width=400'
         );
+        var authPopup = fakeWindow.open.returnValues[0];
+        assert.equal(authPopup.location.href, expectedAuthUrl);
       });
     });
 
