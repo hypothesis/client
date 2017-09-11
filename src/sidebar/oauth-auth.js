@@ -52,11 +52,6 @@ function auth($http, $rootScope, $window,
   var tokenUrl = resolve('token', settings.apiUrl);
 
   /**
-   * Timer ID of the current access token refresh timer.
-   */
-  var refreshTimer;
-
-  /**
    * Show an error message telling the user that the access token has expired.
    */
   function showAccessTokenExpiredErrorMessage(message) {
@@ -292,7 +287,6 @@ function auth($http, $rootScope, $window,
     // from the public API of this service in favor of `logout`.
     tokenInfoPromise = Promise.resolve(null);
     localStorage.removeItem(storageKey());
-    $window.clearTimeout(refreshTimer);
   }
 
   /**
