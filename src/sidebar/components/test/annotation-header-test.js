@@ -11,7 +11,7 @@ var fakeDocumentMeta = {
   titleText: 'Dummy title',
 };
 
-describe('annotationHeader', function () {
+describe('sidebar.components.annotation-header', function () {
   var $componentController;
   var fakeGroups;
   var fakeSettings;
@@ -70,6 +70,27 @@ describe('annotationHeader', function () {
           annotation: ann,
         });
         assert.deepEqual(ctrl.documentMeta(), fakeDocumentMeta);
+      });
+    });
+
+    describe('#displayName', () => {
+      it('returns the username if no display name is set', () => {
+        var ann = fixtures.defaultAnnotation();
+        var ctrl = $componentController('annotationHeader', {}, {
+          annotation: ann,
+        });
+        assert.deepEqual(ctrl.displayName(), 'bill');
+      });
+
+      it('returns the display name if set', () => {
+        var ann = fixtures.defaultAnnotation();
+        ann.user_info = {
+          display_name: 'Bill Jones',
+        };
+        var ctrl = $componentController('annotationHeader', {}, {
+          annotation: ann,
+        });
+        assert.deepEqual(ctrl.displayName(), 'Bill Jones');
       });
     });
   });
