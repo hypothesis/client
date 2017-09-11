@@ -5,10 +5,12 @@ var uiConstants = require('../ui-constants');
 module.exports = {
   controllerAs: 'vm',
   //@ngInject
-  controller: function ($element, annotationUI, features) {
+  controller: function ($element, annotationUI, features, settings) {
     this.TAB_ANNOTATIONS = uiConstants.TAB_ANNOTATIONS;
     this.TAB_NOTES = uiConstants.TAB_NOTES;
     this.TAB_ORPHANS = uiConstants.TAB_ORPHANS;
+
+    this.isThemeClean = settings.theme === 'clean';
 
     this.selectTab = function (type) {
       annotationUI.clearSelectedAnnotations();

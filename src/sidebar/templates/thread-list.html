@@ -1,18 +1,22 @@
 <ul class="thread-list">
   <li class="thread-list__spacer"
       ng-style="{height: vm.virtualThreadList.offscreenUpperHeight}"></li>
-  <li id="{{child.id}}"
-      class="thread-list__card"
-      ng-mouseenter="vm.onFocus({annotation: child.annotation})"
-      ng-click="vm.onSelect({annotation: child.annotation})"
-      ng-mouseleave="vm.onFocus({annotation: null})"
-      ng-repeat="child in vm.virtualThreadList.visibleThreads track by child.id">
-      <annotation-thread
-        thread="child"
-        show-document-info="vm.showDocumentInfo"
-        on-change-collapsed="vm.onChangeCollapsed({id: id, collapsed: collapsed})"
-        on-force-visible="vm.onForceVisible({thread: thread})">
-      </annotation-thread>
+  <li ng-repeat="child in vm.virtualThreadList.visibleThreads track by child.id">
+    <div id="{{child.id}}"
+        class="thread-list__card"
+        ng-mouseenter="vm.onFocus({annotation: child.annotation})"
+        ng-class="{'thread-list__card--theme-clean' : vm.isThemeClean }"
+        ng-click="vm.onSelect({annotation: child.annotation})"
+        ng-mouseleave="vm.onFocus({annotation: null})">
+        <annotation-thread
+          thread="child"
+          show-document-info="vm.showDocumentInfo"
+          on-change-collapsed="vm.onChangeCollapsed({id: id, collapsed: collapsed})"
+          on-force-visible="vm.onForceVisible({thread: thread})">
+        </annotation-thread>
+    </div>
+    <hr ng-if="vm.isThemeClean"
+        class="thread-list__separator--theme-clean" />
   </li>
   <li id="{{child.id}}"
       ng-show="false"

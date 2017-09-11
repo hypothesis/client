@@ -19,15 +19,34 @@ describe 'Sidebar', ->
     return new Sidebar(element, config)
 
   beforeEach ->
+    sandbox.stub(Sidebar.prototype, '_setupGestures')
+
     fakeCrossFrame = {}
     fakeCrossFrame.onConnect = sandbox.stub().returns(fakeCrossFrame)
     fakeCrossFrame.on = sandbox.stub().returns(fakeCrossFrame)
     fakeCrossFrame.call = sandbox.spy()
     fakeCrossFrame.destroy = sandbox.stub()
 
+    fakeToolbar = {}
+    fakeToolbar.disableMinimizeBtn = sandbox.spy()
+    fakeToolbar.disableHighlightsBtn = sandbox.spy()
+    fakeToolbar.disableNewNoteBtn = sandbox.spy()
+    fakeToolbar.disableCloseBtn = sandbox.spy()
+    fakeToolbar.hideCloseBtn = sandbox.spy()
+    fakeToolbar.showCloseBtn = sandbox.spy()
+    fakeToolbar.showExpandSidebarBtn = sandbox.spy()
+    fakeToolbar.showCollapseSidebarBtn = sandbox.spy()
+    fakeToolbar.getWidth = sandbox.stub()
+    fakeToolbar.destroy = sandbox.stub()
+
     CrossFrame = sandbox.stub()
     CrossFrame.returns(fakeCrossFrame)
+
+    Toolbar = sandbox.stub()
+    Toolbar.returns(fakeToolbar)
+
     sidebarConfig.pluginClasses['CrossFrame'] = CrossFrame
+    sidebarConfig.pluginClasses['Toolbar'] = Toolbar
 
   afterEach ->
     sandbox.restore()
@@ -256,6 +275,29 @@ describe 'Sidebar', ->
       sidebar.setAllVisibleHighlights(true)
       assert.calledWith(fakeCrossFrame.call, 'setVisibleHighlights', true)
       assert.calledWith(sidebar.publish, 'setVisibleHighlights', true)
+
+  context 'Hide toolbar buttons', ->
+
+    it 'disables minimize btn', ->
+      sidebar = createSidebar(config={disableToolbarMinimizeBtn: true})
+
+      assert.called(sidebar.plugins.Toolbar.disableMinimizeBtn)
+
+    it 'disables minimize btn', ->
+      sidebar = createSidebar(config={disableToolbarHighlightsBtn: true})
+
+      assert.called(sidebar.plugins.Toolbar.disableHighlightsBtn)
+
+    it 'disables minimize btn', ->
+      sidebar = createSidebar(config={disableToolbarNewNoteBtn: true})
+
+      assert.called(sidebar.plugins.Toolbar.disableNewNoteBtn)
+
+    it 'disables minimize btn', ->
+      sidebar = createSidebar(config={disableToolbarCloseBtn: true})
+
+      assert.called(sidebar.plugins.Toolbar.disableCloseBtn)
+
 
   describe 'layout change notifier', ->
 

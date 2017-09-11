@@ -148,6 +148,20 @@ $base-font-size: 14px;
     // to match the height of the top bar
     height: 40px;
   }
+
+  .annotator-frame-button--sidebar_close {
+    box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.5);
+    border-radius: 0px;
+    border-style: solid none solid solid;
+    width: 27px;
+    margin-top: 140px;
+    margin-left: 6px;
+    height: 27px;
+  }
+}
+
+.annotator-frame--drop-shadow-enabled {
+  box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.5);
 }
 
 .annotator-placeholder {

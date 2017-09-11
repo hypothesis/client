@@ -17,6 +17,10 @@
   transform: translate3d(0,0,0);
 }
 
+.top-bar--theme-clean {
+  border-bottom: none;
+}
+
 .top-bar__inner {
   // the edges of the top-bar's contents should be aligned
   // with the edges of annotation cards displayed below

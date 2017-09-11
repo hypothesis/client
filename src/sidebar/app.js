@@ -182,6 +182,7 @@ module.exports = angular.module('h', [
   .component('loginForm', require('./components/login-form'))
   .component('markdown', require('./components/markdown'))
   .component('moderationBanner', require('./components/moderation-banner'))
+  .component('newNoteBtn', require('./components/new-note-btn'))
   .component('publishAnnotationBtn', require('./components/publish-annotation-btn'))
   .component('searchInput', require('./components/search-input'))
   .component('searchStatusBar', require('./components/search-status-bar'))

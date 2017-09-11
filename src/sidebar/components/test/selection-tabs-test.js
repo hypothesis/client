@@ -15,10 +15,12 @@ describe('selectionTabs', function () {
     var fakeFeatures = {
       flagEnabled: sinon.stub().returns(true),
     };
+    var fakeSettings = {};
 
     angular.mock.module('app', {
       annotationUI: fakeAnnotationUI,
       features: fakeFeatures,
+      settings: fakeSettings,
     });
   });
 
@@ -58,6 +60,53 @@ describe('selectionTabs', function () {
 
       var tabs = elem[0].querySelectorAll('a');
       assert.isTrue(tabs[1].classList.contains('is-selected'));
+    });
+
+    it('should not show the clean theme when settings does not contain the clean theme option', function () {
+      var elem = util.createDirective(document, 'selectionTabs', {
+        selectedTab: 'annotation',
+        totalAnnotations: '123',
+        totalNotes: '456',
+      });
+      assert.isFalse(elem[0].querySelectorAll('.selection-tabs')[0].classList.contains('selection-tabs--theme-clean'));
+    });
+
+    it('should show the clean theme when settings contains the clean theme option', function () {
+      angular.mock.module('app', {
+        annotationUI: {},
+        features: {
+          flagEnabled: sinon.stub().returns(true),
+        },
+        settings: { theme: 'clean'},
+      });
+
+      var elem = util.createDirective(document, 'selectionTabs', {
+        selectedTab: 'annotation',
+        totalAnnotations: '123',
+        totalNotes: '456',
+      });
+      assert.isTrue(elem[0].querySelectorAll('.selection-tabs')[0].classList.contains('selection-tabs--theme-clean'));
+    });
+
+    it('should display the new note button when the notes tab is active', function () {
+      var elem = util.createDirective(document, 'selectionTabs', {
+        selectedTab: 'note',
+        totalAnnotations: '123',
+        totalNotes: '456',
+      });
+      var newNoteElem = elem[0].querySelectorAll('new-note-btn');
+      assert.equal(newNoteElem.length, 1);
+    });
+
+    it('should not display the new new note button when the annotations tab is active', function () {
+      var elem = util.createDirective(document, 'selectionTabs', {
+        selectedTab: 'annotation',
+        totalAnnotations: '123',
+        totalNotes: '456',
+      });
+
+      var newNoteElem = elem[0].querySelectorAll('new-note-btn');
+      assert.equal(newNoteElem.length, 0);
     });
   });
 });

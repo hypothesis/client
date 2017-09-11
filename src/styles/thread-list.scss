@@ -17,9 +17,23 @@
   }
 }
 
+.thread-list__card--theme-clean {
+  box-shadow: none;
+
+  &:hover {
+    box-shadow: none;
+  }
+}
+
 .thread-list__spacer {
   // This is a hidden element which is used to reserve space for off-screen
   // threads, so it should not occupy any space other than that set via its
   // 'height' inline style property.
   margin: 0;
+}
+
+.thread-list__separator--theme-clean {
+  border: 0;
+  border-top: 1px solid #E1E1E1;
+  margin: -8px 15px 10px 15px;
 }

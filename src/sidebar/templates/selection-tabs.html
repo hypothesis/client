@@ -1,5 +1,6 @@
 <!-- Tabbed display of annotations and notes. -->
-<div class="selection-tabs">
+<div class="selection-tabs"
+  ng-class="{'selection-tabs--theme-clean' : vm.isThemeClean }">
   <a class="selection-tabs__type"
      href="#"
      ng-class="{'is-selected': vm.selectedTab === vm.TAB_ANNOTATIONS}"
@@ -32,6 +33,9 @@
     </span>
   </a>
 </div>
+<new-note-btn
+  ng-if="vm.selectedTab === vm.TAB_NOTES">
+</new-note-btn>
 <div ng-if="!vm.isLoading()" class="selection-tabs__empty-message">
   <div ng-if="vm.showNotesUnavailableMessage()"  class="annotation-unavailable-message">
     <p class="annotation-unavailable-message__label">

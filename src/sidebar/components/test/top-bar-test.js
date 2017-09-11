@@ -5,6 +5,8 @@ var angular = require('angular');
 var util = require('../../directive/test/util');
 
 describe('topBar', function () {
+  var fakeSettings = {};
+
   before(function () {
     angular.module('app', [])
       .component('topBar', require('../top-bar'))
@@ -20,7 +22,9 @@ describe('topBar', function () {
   });
 
   beforeEach(function () {
-    angular.mock.module('app');
+    angular.mock.module('app', {
+      settings: fakeSettings,
+    });
   });
 
   function applyUpdateBtn(el) {
@@ -124,5 +128,14 @@ describe('topBar', function () {
 
     sortDropdown.onChangeSortKey({sortKey: 'Oldest'});
     assert.calledWith(onChangeSortKey, 'Oldest');
+  });
+
+  it('shows the clean theme when settings contains the clean theme option', function () {
+    angular.mock.module('app', {
+      settings: { theme: 'clean' },
+    });
+
+    var el = createTopBar();
+    assert.ok(el[0].querySelector('.top-bar--theme-clean'));
   });
 });
