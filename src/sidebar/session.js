@@ -57,8 +57,9 @@ function session($q, $rootScope, analytics, annotationUI, auth,
         if (authority) {
           opts.authority = authority;
         }
-        return store.profile.read(opts).then(update);
+        return store.profile.read(opts);
       }).then(function (session) {
+        update(session);
         lastLoadTime = Date.now();
         return session;
       }).catch(function (err) {
