@@ -32,6 +32,9 @@ function session($q, $rootScope, analytics, annotationUI, auth,
     return service.authority;
   }
 
+  // Options to pass to `retry.operation` when fetching the user's profile.
+  var profileFetchRetryOpts = {};
+
   /**
    * @name session.load()
    * @description Fetches the session data from the server.
@@ -58,7 +61,7 @@ function session($q, $rootScope, analytics, annotationUI, auth,
           opts.authority = authority;
         }
         return store.profile.read(opts);
-      }).then(function (session) {
+      }, profileFetchRetryOpts).then(function (session) {
         update(session);
         lastLoadTime = Date.now();
         return session;
@@ -153,6 +156,9 @@ function session($q, $rootScope, analytics, annotationUI, auth,
     load,
     logout,
     reload,
+
+    // Exposed for use in tests
+    profileFetchRetryOpts,
 
     // For the moment, we continue to expose the session state as a property on
     // this service. In future, other services which access the session state

@@ -92,7 +92,7 @@ describe('sidebar.session', function () {
         }));
       });
 
-      it('should fetch profile data from the API', function () {
+      it('should pass the "authority" param when fetching the profile', function () {
         return session.load().then(function () {
           assert.calledWith(fakeStore.profile.read, {authority: 'publisher.org'});
         });
@@ -105,7 +105,7 @@ describe('sidebar.session', function () {
       });
     });
 
-    context('when using OAuth for first-party accounts', () => {
+    context('when using a first party account', () => {
       beforeEach(() => {
         fakeStore.profile.read.returns(Promise.resolve({
           userid: 'acct:user@hypothes.is',
@@ -118,9 +118,45 @@ describe('sidebar.session', function () {
         });
       });
 
+      it('should retry the profile fetch if it fails', () => {
+        fakeStore.profile.read.onCall(0).returns(
+          Promise.reject(new Error('Server error'))
+        );
+        fakeStore.profile.read.onCall(1).returns(
+          Promise.resolve({userid: 'acct:user@hypothes.is', groups: []})
+        );
+
+        // Shorten the delay before retrying the fetch.
+        session.profileFetchRetryOpts.minTimeout = 50;
+
+        return session.load().then(() => {
+          assert.equal(session.state.userid, 'acct:user@hypothes.is');
+        });
+      });
+
       it('should update the session with the profile data from the API', () => {
         return session.load().then(function () {
           assert.equal(session.state.userid, 'acct:user@hypothes.is');
+        });
+      });
+
+      it('should cache the returned profile data', () => {
+        return session.load().then(() => {
+          return session.load();
+        }).then(() => {
+          assert.calledOnce(fakeStore.profile.read);
+        });
+      });
+
+      it('should eventually expire the cache', () => {
+        var clock = sinon.useFakeTimers();
+        var CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+
+        return session.load().then(() => {
+          clock.tick(CACHE_TTL * 2);
+          return session.load();
+        }).then(() => {
+          assert.calledTwice(fakeStore.profile.read);
         });
       });
     });
