@@ -245,6 +245,7 @@ describe('sidebar.session', function () {
         }));
         $rootScope.$broadcast(events.OAUTH_TOKENS_CHANGED);
 
+        return session.load();
       }).then(() => {
         assert.equal(session.state.userid, 'acct:different_user@hypothes.is');
       });
