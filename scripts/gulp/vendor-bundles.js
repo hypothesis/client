@@ -12,8 +12,6 @@ module.exports = {
     polyfills: [require.resolve('../../src/shared/polyfills')],
     angular: [
       'angular',
-      'angular-jwt',
-      'angular-resource',
       'angular-route',
       'angular-sanitize',
       'ng-tags-input',

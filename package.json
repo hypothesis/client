@@ -8,9 +8,7 @@
   "repository": "hypothesis/client",
   "devDependencies": {
     "angular": "~1.5.6",
-    "angular-jwt": "0.0.9",
     "angular-mocks": "~1.5.6",
-    "angular-resource": "~1.5.6",
     "angular-route": "~1.5.6",
     "angular-sanitize": "~1.5.6",
     "angular-toastr": "^1.7.0",
