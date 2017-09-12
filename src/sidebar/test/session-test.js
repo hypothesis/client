@@ -106,10 +106,18 @@ describe('sidebar.session', function () {
     });
 
     context('when using a first party account', () => {
+      var clock;
+
       beforeEach(() => {
         fakeStore.profile.read.returns(Promise.resolve({
           userid: 'acct:user@hypothes.is',
         }));
+      });
+
+      afterEach(() => {
+        if (clock) {
+          clock.restore();
+        }
       });
 
       it('should fetch profile data from the API', () => {
@@ -149,7 +157,7 @@ describe('sidebar.session', function () {
       });
 
       it('should eventually expire the cache', () => {
-        var clock = sinon.useFakeTimers();
+        clock = sinon.useFakeTimers();
         var CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
         return session.load().then(() => {
