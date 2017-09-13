@@ -160,8 +160,6 @@ module.exports = angular.module('h', [
   .component('timestamp', require('./components/timestamp'))
   .component('topBar', require('./components/top-bar'))
 
-  .directive('formInput', require('./directive/form-input'))
-  .directive('formValidate', require('./directive/form-validate'))
   .directive('hAutofocus', require('./directive/h-autofocus'))
   .directive('hBranding', require('./directive/h-branding'))
   .directive('hOnTouch', require('./directive/h-on-touch'))
