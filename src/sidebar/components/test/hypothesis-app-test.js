@@ -207,15 +207,43 @@ describe('sidebar.components.hypothesis-app', function () {
     });
   });
 
-  it('sets userid, username, and provider properties at login', function () {
-    fakeSession.load = function () {
-      return Promise.resolve({userid: 'acct:jim@hypothes.is'});
-    };
-    var ctrl = createController();
-    return fakeSession.load().then(function () {
-      assert.equal(ctrl.auth.userid, 'acct:jim@hypothes.is');
-      assert.equal(ctrl.auth.username, 'jim');
-      assert.equal(ctrl.auth.provider, 'hypothes.is');
+  [{
+    // User who has set a display name
+    profile: {
+      userid: 'acct:jim@hypothes.is',
+      user_info: {
+        display_name: 'Jim Smith',
+      },
+    },
+    expectedAuth: {
+      status: 'logged-in',
+      userid: 'acct:jim@hypothes.is',
+      username: 'jim',
+      provider: 'hypothes.is',
+      displayName: 'Jim Smith',
+    },
+  },{
+    // User who has not set a display name
+    profile: {
+      userid: 'acct:jim@hypothes.is',
+      user_info: {
+        display_name: null,
+      },
+    },
+    expectedAuth: {
+      status: 'logged-in',
+      userid: 'acct:jim@hypothes.is',
+      username: 'jim',
+      provider: 'hypothes.is',
+      displayName: 'jim',
+    },
+  }].forEach(({ profile, expectedAuth }) => {
+    it('sets `auth` properties when profile has loaded', () => {
+      fakeSession.load = () => Promise.resolve(profile);
+      var ctrl = createController();
+      return fakeSession.load().then(() => {
+        assert.deepEqual(ctrl.auth, expectedAuth);
+      });
     });
   });
 
@@ -224,10 +252,13 @@ describe('sidebar.components.hypothesis-app', function () {
     return fakeSession.load().then(function () {
       $scope.$broadcast(events.USER_CHANGED, {
         initialLoad: false,
-        userid: 'acct:john@hypothes.is',
+        profile: {
+          userid: 'acct:john@hypothes.is',
+        },
       });
       assert.deepEqual(ctrl.auth, {
         status: 'logged-in',
+        displayName: 'john',
         userid: 'acct:john@hypothes.is',
         username: 'john',
         provider: 'hypothes.is',
@@ -251,16 +282,22 @@ describe('sidebar.components.hypothesis-app', function () {
   });
 
   it('does not reload the view when the logged-in user changes on first load', function () {
+    var profile = { userid: 'acct:jim@hypothes.is' };
     createController();
     fakeRoute.reload = sinon.spy();
-    $scope.$broadcast(events.USER_CHANGED, {initialLoad: true});
+
+    $scope.$broadcast(events.USER_CHANGED, { initialLoad: true, profile });
+
     assert.notCalled(fakeRoute.reload);
   });
 
   it('reloads the view when the logged-in user changes after first load', function () {
+    var profile = { userid: 'acct:jim@hypothes.is' };
     createController();
     fakeRoute.reload = sinon.spy();
-    $scope.$broadcast(events.USER_CHANGED, {initialLoad: false});
+
+    $scope.$broadcast(events.USER_CHANGED, { initialLoad: false, profile });
+
     assert.calledOnce(fakeRoute.reload);
   });
 
