@@ -276,10 +276,16 @@ describe('annotation', function() {
         var annotation = fixtures.newAnnotation();
         annotation.user = undefined;
         fakeSession.state.userid = 'acct:bill@localhost';
+        fakeSession.state.user_info = {
+          display_name: 'Bill Jones',
+        };
 
         createDirective(annotation);
 
         assert.equal(annotation.user, 'acct:bill@localhost');
+        assert.deepEqual(annotation.user_info, {
+          display_name: 'Bill Jones',
+        });
       });
 
       it('sets the permissions of new annotations', function() {
