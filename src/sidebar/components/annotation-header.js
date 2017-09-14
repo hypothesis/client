@@ -12,8 +12,12 @@ function AnnotationHeaderController(groups, settings, serviceUrl) {
     return self.annotation.user;
   };
 
-  this.username = function () {
-    return persona.username(self.annotation.user);
+  this.displayName = () => {
+    var userInfo = this.annotation.user_info;
+    if (userInfo && userInfo.display_name) {
+      return userInfo.display_name;
+    }
+    return persona.username(this.annotation.user);
   };
 
   this.isThirdPartyUser = function () {
