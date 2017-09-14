@@ -535,7 +535,7 @@ describe('sidebar.oauth-auth', function () {
           fakeWindow.open,
           'about:blank',
           'Login to Hypothesis',
-          'height=400,left=312,top=184,width=400'
+          'height=430,left=274.5,top=169,width=475'
         );
         var authPopup = fakeWindow.open.returnValues[0];
         assert.equal(authPopup.location.href, expectedAuthUrl);
