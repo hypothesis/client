@@ -50,7 +50,7 @@ module.exports = {
     href: '<',
     timestamp: '<',
   },
-  template: ['<a class="{{vm.className}}" target="_blank" ng-title="vm.absoluteTimestamp"',
-             ' href="{{vm.href}}"',
-             '>{{vm.relativeTimestamp}}</a>'].join(''),
+  template: `<a class="{{ vm.className }}" target="_blank"
+                title="{{ vm.absoluteTimestamp }}"
+                href="{{ vm.href }}">{{ vm.relativeTimestamp }}</a>`,
 };
