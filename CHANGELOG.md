@@ -4,6 +4,16 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+### Changed
+
+- Render display name instead of username in existing annotations
+  ([#541](https://github.com/hypothesis/client/pull/541)).
+
+- Render display name instead of username in new annotations
+  ([#545](https://github.com/hypothesis/client/pull/545)).
+
 ## [1.41.0] - 2017-09-11
 
 ### Changed
