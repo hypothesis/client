@@ -4,6 +4,16 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+### Changed
+
+- Use profile display name in account menu
+  ([#544](https://github.com/hypothesis/client/pull/544)).
+
+- Fix handling of query terms without fields specified in client-side search
+  ([#505](https://github.com/hypothesis/client/pull/505)).
+
 ## [1.42.0] - 2017-09-15
 
 ### Changed
