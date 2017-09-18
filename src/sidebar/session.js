@@ -161,7 +161,7 @@ function session($http, $q, $resource, $rootScope, analytics, annotationUI, auth
 
       $rootScope.$broadcast(events.USER_CHANGED, {
         initialLoad: isInitialLoad,
-        userid: model.userid,
+        profile: model,
       });
 
       // associate error reports with the current user in Sentry
