@@ -4,6 +4,7 @@ var addAnalytics = require('./ga');
 var disableOpenerForExternalLinks = require('./util/disable-opener-for-external-links');
 var getApiUrl = require('./get-api-url');
 var serviceConfig = require('./service-config');
+var crossOriginRPC = require('./cross-origin-rpc.js');
 require('../shared/polyfills');
 
 var raven;
@@ -248,7 +249,8 @@ module.exports = angular.module('h', [
   .config(configureRoutes)
   .config(configureToastr)
 
-  .run(setupHttp);
+  .run(setupHttp)
+  .run(crossOriginRPC.server.start);
 
 processAppOpts();
 
