@@ -326,8 +326,15 @@ function auth($http, $rootScope, $window,
     });
 
     // Authorize user and retrieve grant token
-    var width  = 400;
-    var height = 400;
+
+    // In Chrome & Firefox the sizes passed to `window.open` are used for the
+    // viewport size. In Safari the size is used for the window size including
+    // title bar etc. There is enough vertical space at the bottom to allow for
+    // this.
+    //
+    // See https://bugs.webkit.org/show_bug.cgi?id=143678
+    var width  = 475;
+    var height = 430;
     var left   = $window.screen.width / 2 - width / 2;
     var top    = $window.screen.height /2 - height / 2;
 
