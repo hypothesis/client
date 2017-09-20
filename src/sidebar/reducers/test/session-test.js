@@ -8,12 +8,20 @@ var init = session.init;
 var actions = session.actions;
 var update = util.createReducer(session.update);
 
-describe('session reducer', function () {
+describe('sidebar.reducers.session', function () {
   describe('#updateSession', function () {
     it('updates the session state', function () {
       var newSession = Object.assign(init(), {userid: 'john'});
       var state = update(init(), actions.updateSession(newSession));
       assert.deepEqual(state.session, newSession);
+    });
+  });
+
+  describe('#profile', () => {
+    it("returns the user's profile", () => {
+      var newSession = Object.assign(init(), {userid: 'john'});
+      var state = update(init(), actions.updateSession(newSession));
+      assert.equal(session.profile(state), newSession);
     });
   });
 });

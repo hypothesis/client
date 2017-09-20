@@ -121,6 +121,9 @@ module.exports = function ($rootScope, settings) {
     searchUris: framesReducer.searchUris,
 
     isSidebar: viewerReducer.isSidebar,
+
+    isFeatureEnabled: sessionReducer.isFeatureEnabled,
+    profile: sessionReducer.profile,
   }, store.getState);
 
   return Object.assign(store, actionCreators, selectors);

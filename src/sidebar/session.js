@@ -132,9 +132,6 @@ function session($http, $q, $resource, $rootScope, analytics, annotationUI, auth
    */
   function update(model) {
     var prevSession = annotationUI.getState().session;
-
-    var isInitialLoad = !prevSession.csrf;
-
     var userChanged = model.userid !== prevSession.userid;
     var groupsChanged = !angular.equals(model.groups, prevSession.groups);
 
@@ -160,7 +157,6 @@ function session($http, $q, $resource, $rootScope, analytics, annotationUI, auth
       }
 
       $rootScope.$broadcast(events.USER_CHANGED, {
-        initialLoad: isInitialLoad,
         profile: model,
       });
 
@@ -175,9 +171,7 @@ function session($http, $q, $resource, $rootScope, analytics, annotationUI, auth
     }
 
     if (groupsChanged) {
-      $rootScope.$broadcast(events.GROUPS_CHANGED, {
-        initialLoad: isInitialLoad,
-      });
+      $rootScope.$broadcast(events.GROUPS_CHANGED);
     }
 
     // Return the model

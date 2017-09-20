@@ -36,7 +36,7 @@ function FakeRootThread() {
 }
 inherits(FakeRootThread, EventEmitter);
 
-describe('SidebarContentController', function () {
+describe('sidebar.components.sidebar-content', function () {
   var $rootScope;
   var $scope;
   var annotationUI;
@@ -152,7 +152,7 @@ describe('SidebarContentController', function () {
     return sandbox.restore();
   });
 
-  describe('loadAnnotations', function () {
+  describe('#loadAnnotations', function () {
     it('unloads any existing annotations', function () {
       // When new clients connect, all existing annotations should be unloaded
       // before reloading annotations for each currently-connected client
@@ -295,6 +295,52 @@ describe('SidebarContentController', function () {
         assert.calledWith(fakeAnnotationMapper.loadAnnotations,
           [{group: 'private-group', id: 'http://example.com456'}]);
       });
+    });
+  });
+
+  function connectFrameAndPerformInitialFetch() {
+    setFrames([{ uri: 'https://a-page.com' }]);
+    $scope.$digest();
+    fakeAnnotationMapper.loadAnnotations.reset();
+  }
+
+  context('when the search URIs of connected frames change', () => {
+    beforeEach(connectFrameAndPerformInitialFetch);
+
+    it('reloads annotations', () => {
+      setFrames([{ uri: 'https://new-frame.com' }]);
+
+      $scope.$digest();
+
+      assert.called(fakeAnnotationMapper.loadAnnotations);
+    });
+  });
+
+  context('when the profile changes', () => {
+    beforeEach(connectFrameAndPerformInitialFetch);
+
+    it('reloads annotations if the user ID changed', () => {
+      var newProfile = Object.assign({}, annotationUI.profile(), {
+        userid: 'different-user@hypothes.is',
+      });
+
+      annotationUI.updateSession(newProfile);
+      $scope.$digest();
+
+      assert.called(fakeAnnotationMapper.loadAnnotations);
+    });
+
+    it('does not reload annotations if the user ID is the same', () => {
+      var newProfile = Object.assign({}, annotationUI.profile(), {
+        user_info: {
+          display_name: 'New display name',
+        },
+      });
+
+      annotationUI.updateSession(newProfile);
+      $scope.$digest();
+
+      assert.notCalled(fakeAnnotationMapper.loadAnnotations);
     });
   });
 

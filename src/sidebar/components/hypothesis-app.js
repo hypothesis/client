@@ -74,10 +74,6 @@ function HypothesisAppController(
   $scope.$on(events.USER_CHANGED, function (event, data) {
     self.auth = authStateFromProfile(data.profile);
     self.accountDialog.visible = false;
-
-    if (!data || !data.initialLoad) {
-      $route.reload();
-    }
   });
 
   session.load().then(function (profile) {

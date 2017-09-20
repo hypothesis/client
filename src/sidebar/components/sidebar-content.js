@@ -243,12 +243,11 @@ function SidebarContentController(
     loadAnnotations();
   });
 
-  // Watch anything that may require us to reload annotations.
-  $scope.$watch(function () {
-    return annotationUI.frames().map(function(frame) {
-      return frame.uri;
-    });
-  }, loadAnnotations, true);
+  // Re-fetch annotations when logged-in user or connected frames change.
+  $scope.$watch(() => ([
+    annotationUI.profile().userid,
+    ...annotationUI.searchUris(),
+  ]), loadAnnotations, true);
 
   this.setCollapsed = function (id, collapsed) {
     annotationUI.setCollapsed(id, collapsed);
