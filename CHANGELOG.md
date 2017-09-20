@@ -4,6 +4,13 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+### Changed
+
+- Fix timestamp tooltips in annotation cards
+  ([#546](https://github.com/hypothesis/client/pull/546)).
+
 ## [1.43.0] - 2017-09-18
 
 ### Changed
