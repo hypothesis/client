@@ -4,6 +4,13 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+### Changed
+
+- Re-fetch annotations when logging in or out when using OAuth
+  ([#552](https://github.com/hypothesis/client/pull/552)).
+
 ## [1.45.0] - 2017-09-22
 
 ### Changed
