@@ -231,23 +231,27 @@ function SidebarContentController(
     annotationUI.selectTab(tabs.tabForAnnotation(selectedAnnot, separateOrphans));
   });
 
-  $scope.$on(events.GROUP_FOCUSED, function () {
-    // The focused group may be changed during loading annotations as a result
-    // of switching to the group containing a direct-linked annotation.
-    //
-    // In that case, we don't want to trigger reloading annotations again.
-    if (isLoading()) {
-      return;
-    }
-    annotationUI.clearSelectedAnnotations();
-    loadAnnotations();
-  });
-
-  // Re-fetch annotations when logged-in user or connected frames change.
+  // Re-fetch annotations when focused group, logged-in user or connected frames
+  // change.
   $scope.$watch(() => ([
+    groups.focused().id,
     annotationUI.profile().userid,
     ...annotationUI.searchUris(),
-  ]), loadAnnotations, true);
+  ]), ([currentGroupId], [prevGroupId]) => {
+
+    if (currentGroupId !== prevGroupId) {
+      // The focused group may be changed during loading annotations as a result
+      // of switching to the group containing a direct-linked annotation.
+      //
+      // In that case, we don't want to trigger reloading annotations again.
+      if (isLoading()) {
+        return;
+      }
+      annotationUI.clearSelectedAnnotations();
+    }
+
+    loadAnnotations();
+  }, true);
 
   this.setCollapsed = function (id, collapsed) {
     annotationUI.setCollapsed(id, collapsed);

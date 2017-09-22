@@ -107,7 +107,7 @@ describe('sidebar.components.sidebar-content', function () {
     };
 
     fakeGroups = {
-      focused: function () { return {id: 'foo'}; },
+      focused: sinon.stub().returns({id: 'foo'}),
       focus: sinon.stub(),
     };
 
@@ -262,7 +262,7 @@ describe('sidebar.components.sidebar-content', function () {
 
       beforeEach(function () {
         setFrames([{uri: uri}]);
-        fakeGroups.focused = function () { return { id: 'a-group' }; };
+        fakeGroups.focused.returns({ id: 'a-group' });
         $scope.$digest();
       });
 
@@ -286,7 +286,7 @@ describe('sidebar.components.sidebar-content', function () {
       beforeEach(function () {
         setFrames([{uri: uri}]);
         annotationUI.selectAnnotations([id]);
-        fakeGroups.focused = function () { return { id: 'private-group' }; };
+        fakeGroups.focused.returns({ id: 'private-group' });
         $scope.$digest();
       });
 
@@ -361,22 +361,42 @@ describe('sidebar.components.sidebar-content', function () {
     });
   });
 
-  describe('when the focused group changes', function () {
-    it('should load annotations for the new group', function () {
-      var uri = 'http://example.com';
+  describe('when the focused group changes', () => {
+    var uri = 'http://example.com';
+
+    beforeEach(() => {
+      // Setup an initial state with frames connected, a group focused and some
+      // annotations loaded.
       annotationUI.addAnnotations([{id: '123'}]);
       annotationUI.addAnnotations = sinon.stub();
       fakeDrafts.unsaved.returns([{id: uri + '123'}, {id: uri + '456'}]);
       setFrames([{uri: uri}]);
+      $scope.$digest();
+    });
+
+    function changeGroup() {
+      fakeGroups.focused.returns({ id: 'different-group' });
+      $scope.$digest();
+    }
+
+    it('should load annotations for the new group', () => {
       var loadSpy = fakeAnnotationMapper.loadAnnotations;
 
-      $scope.$broadcast(events.GROUP_FOCUSED);
+      changeGroup();
 
       assert.calledWith(fakeAnnotationMapper.unloadAnnotations,
         [sinon.match({id: '123'})]);
       $scope.$digest();
       assert.calledWith(loadSpy, [sinon.match({id: uri + '123'})]);
       assert.calledWith(loadSpy, [sinon.match({id: uri + '456'})]);
+    });
+
+    it('should clear the selection', () => {
+      annotationUI.selectAnnotations(['123']);
+
+      changeGroup();
+
+      assert.isFalse(annotationUI.hasSelectedAnnotations());
     });
   });
 
