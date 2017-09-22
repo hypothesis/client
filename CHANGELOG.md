@@ -4,6 +4,19 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+### Changed
+
+- Adjust the preferred initial size of the login window.
+  ([#547](https://github.com/hypothesis/client/pull/547)).
+
+- Stop exporting the main annotation layer object as `window.annotator`
+  ([#549](https://github.com/hypothesis/client/pull/549)).
+
+- Remove iframe size check
+  ([#551](https://github.com/hypothesis/client/pull/551)).
+
 ## [1.44.0] - 2017-09-20
 
 ### Changed
