@@ -40,16 +40,6 @@ describe('annotator.util.frame-util', function () {
       assert.deepEqual(foundFrames, [frame1, frame2], 'appended frames should be found');
     });
 
-    it('should not return small frames', function () {
-      // add frames that are small in both demensions
-      _addFrameToContainer({width: 140});
-      _addFrameToContainer({height: 140});
-
-      const foundFrames = frameUtil.findFrames(container);
-
-      assert.lengthOf(foundFrames, 0, 'frames with small demensions should not be found');
-    });
-
     it('should not return frames that have not opted into annotation', () => {
       const frame = _addFrameToContainer();
 

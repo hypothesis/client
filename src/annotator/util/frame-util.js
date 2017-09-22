@@ -55,20 +55,14 @@ function shouldEnableAnnotation(iframe) {
   // Ignore the Hypothesis sidebar.
   const isNotClientFrame = !iframe.classList.contains('h-sidebar-iframe');
 
-  // Ignore hidden or very small iframes.
-  const frameRect = iframe.getBoundingClientRect();
-  const MIN_WIDTH = 150;
-  const MIN_HEIGHT = 150;
-  const hasSizableContainer =
-    frameRect.width > MIN_WIDTH && frameRect.height > MIN_HEIGHT;
-
-  // Ignore frames which have not opted into annotation support.
-  // Eventually we would like iframe annotation to be enabled by default,
-  // however we need to resolve a number of issues with iframe support before we
+  // Require iframes to opt into annotation support.
+  //
+  // Eventually we may want annotation to be enabled by default for iframes that
+  // pass certain tests. However we need to resolve a number of issues before we
   // can do that. See https://github.com/hypothesis/client/issues/530
   const enabled = iframe.hasAttribute('enable-annotation');
 
-  return isNotClientFrame && hasSizableContainer && enabled;
+  return isNotClientFrame && enabled;
 }
 
 function isDocumentReady(iframe, callback) {
