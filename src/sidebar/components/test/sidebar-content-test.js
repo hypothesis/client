@@ -36,7 +36,7 @@ function FakeRootThread() {
 }
 inherits(FakeRootThread, EventEmitter);
 
-describe('SidebarContentController', function () {
+describe('sidebar.components.sidebar-content', function () {
   var $rootScope;
   var $scope;
   var annotationUI;
@@ -107,7 +107,7 @@ describe('SidebarContentController', function () {
     };
 
     fakeGroups = {
-      focused: function () { return {id: 'foo'}; },
+      focused: sinon.stub().returns({id: 'foo'}),
       focus: sinon.stub(),
     };
 
@@ -152,7 +152,7 @@ describe('SidebarContentController', function () {
     return sandbox.restore();
   });
 
-  describe('loadAnnotations', function () {
+  describe('#loadAnnotations', function () {
     it('unloads any existing annotations', function () {
       // When new clients connect, all existing annotations should be unloaded
       // before reloading annotations for each currently-connected client
@@ -262,7 +262,7 @@ describe('SidebarContentController', function () {
 
       beforeEach(function () {
         setFrames([{uri: uri}]);
-        fakeGroups.focused = function () { return { id: 'a-group' }; };
+        fakeGroups.focused.returns({ id: 'a-group' });
         $scope.$digest();
       });
 
@@ -286,7 +286,7 @@ describe('SidebarContentController', function () {
       beforeEach(function () {
         setFrames([{uri: uri}]);
         annotationUI.selectAnnotations([id]);
-        fakeGroups.focused = function () { return { id: 'private-group' }; };
+        fakeGroups.focused.returns({ id: 'private-group' });
         $scope.$digest();
       });
 
@@ -295,6 +295,52 @@ describe('SidebarContentController', function () {
         assert.calledWith(fakeAnnotationMapper.loadAnnotations,
           [{group: 'private-group', id: 'http://example.com456'}]);
       });
+    });
+  });
+
+  function connectFrameAndPerformInitialFetch() {
+    setFrames([{ uri: 'https://a-page.com' }]);
+    $scope.$digest();
+    fakeAnnotationMapper.loadAnnotations.reset();
+  }
+
+  context('when the search URIs of connected frames change', () => {
+    beforeEach(connectFrameAndPerformInitialFetch);
+
+    it('reloads annotations', () => {
+      setFrames([{ uri: 'https://new-frame.com' }]);
+
+      $scope.$digest();
+
+      assert.called(fakeAnnotationMapper.loadAnnotations);
+    });
+  });
+
+  context('when the profile changes', () => {
+    beforeEach(connectFrameAndPerformInitialFetch);
+
+    it('reloads annotations if the user ID changed', () => {
+      var newProfile = Object.assign({}, annotationUI.profile(), {
+        userid: 'different-user@hypothes.is',
+      });
+
+      annotationUI.updateSession(newProfile);
+      $scope.$digest();
+
+      assert.called(fakeAnnotationMapper.loadAnnotations);
+    });
+
+    it('does not reload annotations if the user ID is the same', () => {
+      var newProfile = Object.assign({}, annotationUI.profile(), {
+        user_info: {
+          display_name: 'New display name',
+        },
+      });
+
+      annotationUI.updateSession(newProfile);
+      $scope.$digest();
+
+      assert.notCalled(fakeAnnotationMapper.loadAnnotations);
     });
   });
 
@@ -315,22 +361,42 @@ describe('SidebarContentController', function () {
     });
   });
 
-  describe('when the focused group changes', function () {
-    it('should load annotations for the new group', function () {
-      var uri = 'http://example.com';
+  describe('when the focused group changes', () => {
+    var uri = 'http://example.com';
+
+    beforeEach(() => {
+      // Setup an initial state with frames connected, a group focused and some
+      // annotations loaded.
       annotationUI.addAnnotations([{id: '123'}]);
       annotationUI.addAnnotations = sinon.stub();
       fakeDrafts.unsaved.returns([{id: uri + '123'}, {id: uri + '456'}]);
       setFrames([{uri: uri}]);
+      $scope.$digest();
+    });
+
+    function changeGroup() {
+      fakeGroups.focused.returns({ id: 'different-group' });
+      $scope.$digest();
+    }
+
+    it('should load annotations for the new group', () => {
       var loadSpy = fakeAnnotationMapper.loadAnnotations;
 
-      $scope.$broadcast(events.GROUP_FOCUSED);
+      changeGroup();
 
       assert.calledWith(fakeAnnotationMapper.unloadAnnotations,
         [sinon.match({id: '123'})]);
       $scope.$digest();
       assert.calledWith(loadSpy, [sinon.match({id: uri + '123'})]);
       assert.calledWith(loadSpy, [sinon.match({id: uri + '456'})]);
+    });
+
+    it('should clear the selection', () => {
+      annotationUI.selectAnnotations(['123']);
+
+      changeGroup();
+
+      assert.isFalse(annotationUI.hasSelectedAnnotations());
     });
   });
 

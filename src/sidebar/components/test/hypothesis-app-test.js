@@ -251,7 +251,6 @@ describe('sidebar.components.hypothesis-app', function () {
     var ctrl = createController();
     return fakeSession.load().then(function () {
       $scope.$broadcast(events.USER_CHANGED, {
-        initialLoad: false,
         profile: {
           userid: 'acct:john@hypothes.is',
         },
@@ -279,26 +278,6 @@ describe('sidebar.components.hypothesis-app', function () {
   it('does not show the share dialog at start', function () {
     var ctrl = createController();
     assert.isFalse(ctrl.shareDialog.visible);
-  });
-
-  it('does not reload the view when the logged-in user changes on first load', function () {
-    var profile = { userid: 'acct:jim@hypothes.is' };
-    createController();
-    fakeRoute.reload = sinon.spy();
-
-    $scope.$broadcast(events.USER_CHANGED, { initialLoad: true, profile });
-
-    assert.notCalled(fakeRoute.reload);
-  });
-
-  it('reloads the view when the logged-in user changes after first load', function () {
-    var profile = { userid: 'acct:jim@hypothes.is' };
-    createController();
-    fakeRoute.reload = sinon.spy();
-
-    $scope.$broadcast(events.USER_CHANGED, { initialLoad: false, profile });
-
-    assert.calledOnce(fakeRoute.reload);
   });
 
   context('when the "openLoginForm" setting is enabled', () => {
