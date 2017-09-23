@@ -165,7 +165,6 @@ module.exports = angular.module('h', [
   .directive('hOnTouch', require('./directive/h-on-touch'))
   .directive('hTooltip', require('./directive/h-tooltip'))
   .directive('spinner', require('./directive/spinner'))
-  .directive('statusButton', require('./directive/status-button'))
   .directive('windowScroll', require('./directive/window-scroll'))
 
   .service('analytics', require('./analytics'))
