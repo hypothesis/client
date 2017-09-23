@@ -177,7 +177,6 @@ module.exports = angular.module('h', [
   .service('drafts', require('./drafts'))
   .service('features', require('./features'))
   .service('flash', require('./flash'))
-  .service('formRespond', require('./form-respond'))
   .service('frameSync', require('./frame-sync').default)
   .service('groups', require('./groups'))
   .service('localStorage', require('./local-storage'))
