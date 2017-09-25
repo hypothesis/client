@@ -833,40 +833,15 @@ describe('annotation', function() {
     });
 
     describe('#canFlag', function () {
-      it('returns true if the user is a third-party user', function () {
-        var ann = fixtures.thirdPartyAnnotation();
-        var controller = createDirective(ann).controller;
-        assert.isTrue(controller.canFlag());
-      });
-
-      it('returns the value of the `flag_action` feature flag', function () {
-        var ann = fixtures.defaultAnnotation();
-        var controller = createDirective(ann).controller;
-
-        ann.user = 'acct:notCurrentUser@localhost';
-
-        fakeFeatures.flagEnabled.returns(false);
-        assert.equal(controller.canFlag(), false);
-
-        fakeFeatures.flagEnabled.returns(true);
-        assert.equal(controller.canFlag(), true);
-      });
-
       it('returns false if the user signed in is the same as the author of the annotation', function () {
         var ann = fixtures.defaultAnnotation();
         var controller = createDirective(ann).controller;
-
-        fakeFeatures.flagEnabled.returns(true);
-
         assert.isFalse(controller.canFlag());
       });
 
       it('returns true if the user signed in is different from the author of the annotation', function () {
         var ann = fixtures.thirdPartyAnnotation();
         var controller = createDirective(ann).controller;
-
-        fakeFeatures.flagEnabled.returns(true);
-
         assert.isTrue(controller.canFlag());
       });
     });
