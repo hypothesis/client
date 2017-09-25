@@ -5,17 +5,7 @@
 
 var countIf = require('./util/array-util').countIf;
 var metadata = require('./annotation-metadata');
-var session = require('./reducers/session');
 var uiConstants = require('./ui-constants');
-
-/**
- * Return true if Annotations and Orphans should be displayed in separate tabs.
- *
- * @param {object} state - The current application state.
- */
-function shouldSeparateOrphans(state) {
-  return session.isFeatureEnabled(state, 'orphans_tab');
-}
 
 /**
  * Return the tab in which an annotation should be displayed.
@@ -78,7 +68,6 @@ function counts(annotations, separateOrphans) {
 
 module.exports = {
   counts: counts,
-  shouldSeparateOrphans: shouldSeparateOrphans,
   shouldShowInTab: shouldShowInTab,
   tabForAnnotation: tabForAnnotation,
 };

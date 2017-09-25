@@ -19,10 +19,6 @@ module.exports = {
       annotationUI.selectTab(type);
     };
 
-    this.orphansTabFlagEnabled = function () {
-      return features.flagEnabled('orphans_tab');
-    };
-
     this.showAnnotationsUnavailableMessage = function () {
       return this.selectedTab === this.TAB_ANNOTATIONS &&
         this.totalAnnotations === 0 &&

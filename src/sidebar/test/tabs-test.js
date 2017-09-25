@@ -6,26 +6,6 @@ var tabs = require('../tabs');
 var unroll = require('../../shared/test/util').unroll;
 
 describe('tabs', function () {
-  describe('shouldSeparateOrphans', function () {
-    it('returns true if the "orphans_tab" flag is enabled', function () {
-      var state = {
-        session: {
-          features: {'orphans_tab': true},
-        },
-      };
-      assert.isTrue(tabs.shouldSeparateOrphans(state));
-    });
-
-    it('returns false if the "orphans_tab" flag is not enabled', function () {
-      var state = {
-        session: {
-          features: {'orphans_tab': false},
-        },
-      };
-      assert.isFalse(tabs.shouldSeparateOrphans(state));
-    });
-  });
-
   describe('tabForAnnotation', function () {
     unroll('shows annotation in correct tab', function (testCase) {
       var ann = testCase.ann;
