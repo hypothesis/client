@@ -10,7 +10,7 @@ describe('tabs', function () {
     unroll('shows annotation in correct tab', function (testCase) {
       var ann = testCase.ann;
       var expectedTab = testCase.expectedTab;
-      assert.equal(tabs.tabForAnnotation(ann, true /* separateOrphans */), expectedTab);
+      assert.equal(tabs.tabForAnnotation(ann), expectedTab);
     }, [{
       ann: fixtures.defaultAnnotation(),
       expectedTab: uiConstants.TAB_ANNOTATIONS,
@@ -29,58 +29,33 @@ describe('tabs', function () {
       ann.$anchorTimeout = testCase.anchorTimeout;
       ann.$orphan = testCase.orphan;
 
-      assert.equal(tabs.shouldShowInTab(ann, uiConstants.TAB_ANNOTATIONS,
-        testCase.separateOrphans), testCase.expectedTab === uiConstants.TAB_ANNOTATIONS);
-      assert.equal(tabs.shouldShowInTab(ann, uiConstants.TAB_ORPHANS,
-        testCase.separateOrphans), testCase.expectedTab === uiConstants.TAB_ORPHANS);
+      assert.equal(tabs.shouldShowInTab(ann, uiConstants.TAB_ANNOTATIONS), testCase.expectedTab === uiConstants.TAB_ANNOTATIONS);
+      assert.equal(tabs.shouldShowInTab(ann, uiConstants.TAB_ORPHANS), testCase.expectedTab === uiConstants.TAB_ORPHANS);
     }, [{
-      // Orphans tab disabled, anchoring in progress.
+      // Anchoring in progress.
       anchorTimeout: false,
       orphan: undefined,
-      separateOrphans: false,
-      expectedTab: uiConstants.TAB_ANNOTATIONS,
-    },{
-      // Orphans tab disabled, anchoring succeeded.
-      anchorTimeout: false,
-      orphan: false,
-      separateOrphans: false,
-      expectedTab: uiConstants.TAB_ANNOTATIONS,
-    },{
-      // Orphans tab disabled, anchoring failed
-      anchorTimeout: false,
-      orphan: true,
-      separateOrphans: false,
-      expectedTab: uiConstants.TAB_ANNOTATIONS,
-    },{
-      // Orphans tab enabled, anchoring in progress.
-      anchorTimeout: false,
-      orphan: undefined,
-      separateOrphans: true,
       expectedTab: null,
     },{
-      // Orphans tab enabled, anchoring succeeded.
+      // Anchoring succeeded.
       anchorTimeout: false,
       orphan: false,
-      separateOrphans: true,
       expectedTab: uiConstants.TAB_ANNOTATIONS,
     },{
-      // Orphans tab enabled, anchoring failed.
+      // Anchoring failed.
       anchorTimeout: false,
       orphan: true,
-      separateOrphans: true,
       expectedTab: uiConstants.TAB_ORPHANS,
     },{
-      // Orphans tab enabled, anchoring timed out.
+      // Anchoring timed out.
       anchorTimeout: true,
       orphan: undefined,
-      separateOrphans: true,
       expectedTab: uiConstants.TAB_ANNOTATIONS,
     },{
-      // Orphans tab enabled, anchoring initially timed out but eventually
+      // Anchoring initially timed out but eventually
       // failed.
       anchorTimeout: true,
       orphan: true,
-      separateOrphans: true,
       expectedTab: uiConstants.TAB_ORPHANS,
     }]);
   });
@@ -89,16 +64,7 @@ describe('tabs', function () {
     var annotation = Object.assign(fixtures.defaultAnnotation(), {$orphan:false});
     var orphan = Object.assign(fixtures.defaultAnnotation(), {$orphan:true});
 
-    it('counts Annotations and Orphans together when the Orphans tab is not enabled', function () {
-      assert.deepEqual(tabs.counts([annotation, orphan], false), {
-        anchoring: 0,
-        annotations: 2,
-        notes: 0,
-        orphans: 0,
-      });
-    });
-
-    it('counts Annotations and Orphans separately when the Orphans tab is enabled', function () {
+    it('counts Annotations and Orphans separately', function () {
       assert.deepEqual(tabs.counts([annotation, orphan], true), {
         anchoring: 0,
         annotations: 1,

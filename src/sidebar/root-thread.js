@@ -66,8 +66,7 @@ function RootThread($rootScope, annotationUI, drafts, searchFilter, viewFilter) 
           return false;
         }
 
-        return tabs.shouldShowInTab(thread.annotation, state.selectedTab,
-          true /* separate orphans */);
+        return tabs.shouldShowInTab(thread.annotation, state.selectedTab);
       };
     }
 

@@ -11,11 +11,9 @@ var uiConstants = require('./ui-constants');
  * Return the tab in which an annotation should be displayed.
  *
  * @param {Annotation} ann
- * @param {boolean} separateOrphans - True if orphans should be displayed in a
- *        separate tab.
  */
-function tabForAnnotation(ann, separateOrphans) {
-  if (metadata.isOrphan(ann) && separateOrphans) {
+function tabForAnnotation(ann) {
+  if (metadata.isOrphan(ann)) {
     return uiConstants.TAB_ORPHANS;
   } else if (metadata.isPageNote(ann)) {
     return uiConstants.TAB_NOTES;
@@ -29,26 +27,22 @@ function tabForAnnotation(ann, separateOrphans) {
  *
  * @param {Annotation} ann
  * @param {number} tab - The TAB_* value indicating the tab
- * @param {boolean} separateOrphans - True if orphans should be separated into
- *        their own tab.
  */
-function shouldShowInTab(ann, tab, separateOrphans) {
-  if (metadata.isWaitingToAnchor(ann) && separateOrphans) {
+function shouldShowInTab(ann, tab) {
+  if (metadata.isWaitingToAnchor(ann)) {
     // Until this annotation anchors or fails to anchor, we do not know which
     // tab it should be displayed in.
     return false;
   }
-  return tabForAnnotation(ann, separateOrphans) === tab;
+  return tabForAnnotation(ann) === tab;
 }
 
 /**
  * Return the counts for the headings of different tabs.
  *
  * @param {Annotation[]} annotations - List of annotations to display
- * @param {boolean} separateOrphans - True if orphans should be displayed in a
- *        separate tab.
  */
-function counts(annotations, separateOrphans) {
+function counts(annotations) {
   var counts = {
     notes: countIf(annotations, metadata.isPageNote),
     annotations: countIf(annotations, metadata.isAnnotation),
@@ -56,14 +50,7 @@ function counts(annotations, separateOrphans) {
     anchoring: countIf(annotations, metadata.isWaitingToAnchor),
   };
 
-  if (separateOrphans) {
-    return counts;
-  } else {
-    return Object.assign({}, counts, {
-      annotations: counts.annotations + counts.orphans,
-      orphans: 0,
-    });
-  }
+  return counts;
 }
 
 module.exports = {
