@@ -90,6 +90,24 @@ describe('media-embedder', function () {
     });
   });
 
+  it('replaces internet archive links with iframes', function () {
+    var urls = [
+      'https://archive.org/details/WHDH_20151121_043400_The_Tonight_Show_Starring_Jimmy_Fallon/start/360/end/420.3',
+      'https://archive.org/embed/WHDH_20151121_043400_The_Tonight_Show_Starring_Jimmy_Fallon?start=360&end=420.3',
+    ];
+    urls.forEach(function (url) {
+      var element = domElement('<a href="' + url + '">' + url + '</a>');
+
+      mediaEmbedder.replaceLinksWithEmbeds(element);
+
+      assert.equal(element.childElementCount, 1);
+      assert.equal(element.children[0].tagName, 'IFRAME');
+      assert.equal(
+        element.children[0].src, 'https://archive.org/embed/WHDH_20151121_043400_The_Tonight_Show_Starring_Jimmy_Fallon?start=360&end=420.3');
+    });
+  });
+
+
   it('replaces audio links with html5 audio elements', function() {
     var urls = [
       'https://archive.org/download/testmp3testfile/mpthreetest.mp3',

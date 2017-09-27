@@ -34,6 +34,11 @@ function vimeoEmbed(id) {
   return iframe('https://player.vimeo.com/video/' + id);
 }
 
+function internetArchiveEmbed(path) {
+  return iframe('https://archive.org/embed/' + path);
+}
+
+
 /**
  * A list of functions that return an "embed" DOM element (e.g. an <iframe> or
  * an html5 <audio> element) for a given link.
@@ -99,6 +104,23 @@ var embedGenerators = [
     }
     return null;
   },
+
+  // Match Internet Archive URLs
+  function iFrameFromInternetArchiveLink(link) {
+    if (link.hostname !== 'archive.org') {
+      return null;
+    }
+
+    var groups = /(embed|details)\/(.+)$/.exec(link.href);
+    if (groups) {
+      var path = groups[2];
+      path = path.replace('/start/', '?start=');
+      path = path.replace('/end/', '&end=');
+      return internetArchiveEmbed(path);
+    }
+    return null;
+  },
+
 
   // Matches URLs that end with .mp3, .ogg, or .wav (assumed to be audio files)
   function html5audioFromMp3Link(link) {
