@@ -4,6 +4,13 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+### Changed
+
+- Send search URIs to other frames by postMessage()
+  ([#550](https://github.com/hypothesis/client/pull/550)).
+
 ## [1.46.0] - 2017-09-22
 
 ### Changed
