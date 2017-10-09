@@ -34,10 +34,6 @@ function vimeoEmbed(id) {
   return iframe('https://player.vimeo.com/video/' + id);
 }
 
-function internetArchiveEmbed(path) {
-  return iframe('https://archive.org/embed/' + path);
-}
-
 
 /**
  * A list of functions that return an "embed" DOM element (e.g. an <iframe> or
@@ -105,18 +101,24 @@ var embedGenerators = [
     return null;
   },
 
-  // Match Internet Archive URLs
+/** Match Internet Archive URLs
+ *  The patterns are:
+ *  1. https://archive.org/embed/WHDH_20151121_043400_The_Tonight_Show_Starring_Jimmy_Fallon?start=360&end=420.3
+ *  2. https://archive.org/embed/WHDH_20151121_043400_The_Tonight_Show_Starring_Jimmy_Fallon?start=360&end=420.3
+ *  The patterns are invariant, start and stop are always present.
+ */
   function iFrameFromInternetArchiveLink(link) {
     if (link.hostname !== 'archive.org') {
       return null;
     }
 
     var groups = /(embed|details)\/(.+)$/.exec(link.href);
-    if (groups) {
-      var path = groups[2];
+    if (groups) {           // group 1 is 'embed' or 'details'
+      var path = groups[2]; // group 2 is the path
       path = path.replace('/start/', '?start=');
       path = path.replace('/end/', '&end=');
-      return internetArchiveEmbed(path);
+      // the iframed url is always the embed flavor
+      return iframe('https://archive.org/embed/' + path);
     }
     return null;
   },
