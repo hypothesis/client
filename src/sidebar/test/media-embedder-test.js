@@ -92,18 +92,22 @@ describe('media-embedder', function () {
 
   it('replaces internet archive links with iframes', function () {
     var urls = [
-      'https://archive.org/details/WHDH_20151121_043400_The_Tonight_Show_Starring_Jimmy_Fallon/start/360/end/420.3',
-      'https://archive.org/embed/WHDH_20151121_043400_The_Tonight_Show_Starring_Jimmy_Fallon?start=360&end=420.3',
+      'https://archive.org/details/PATH/start/360/end/420.3',
+      'https://archive.org/embed/PATH?start=360&end=420.3',
     ];
     urls.forEach(function (url) {
       var element = domElement('<a href="' + url + '">' + url + '</a>');
 
       mediaEmbedder.replaceLinksWithEmbeds(element);
 
-      assert.equal(element.childElementCount, 1);
       assert.equal(element.children[0].tagName, 'IFRAME');
-      assert.equal(
-        element.children[0].src, 'https://archive.org/embed/WHDH_20151121_043400_The_Tonight_Show_Starring_Jimmy_Fallon?start=360&end=420.3');
+
+      // For both url flavors the expected result is the same.
+      // details flavor: we match, transform, and iframe
+      // embed flavor: we just match and iframe
+      var actual = element.children[0].src;
+      var expected = 'https://archive.org/embed/PATH?start=360&end=420.3';
+      assert.equal(actual, expected);
     });
   });
 
