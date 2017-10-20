@@ -104,7 +104,7 @@ var embedGenerators = [
 /** Match Internet Archive URLs
  *  The patterns are:
  *  1. https://archive.org/embed/WHDH_20151121_043400_The_Tonight_Show_Starring_Jimmy_Fallon?start=360&end=420.3
- *  2. https://archive.org/embed/WHDH_20151121_043400_The_Tonight_Show_Starring_Jimmy_Fallon?start=360&end=420.3
+ *  2. https://archive.org/details/WHDH_20151121_043400_The_Tonight_Show_Starring_Jimmy_Fallon/start/360/end/420.3
  *  The patterns are invariant, start and stop are always present.
  */
   function iFrameFromInternetArchiveLink(link) {
