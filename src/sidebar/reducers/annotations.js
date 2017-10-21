@@ -173,13 +173,15 @@ var update = {
 
   UPDATE_ANCHOR_STATUS: function (state, action) {
     var annotations = state.annotations.map(function (annot) {
-      if (annot.$tag === action.tag) {
-        return Object.assign({}, annot, {
-          $anchorTimeout: action.anchorTimeout || annot.$anchorTimeout,
-          $orphan: action.isOrphan,
-        });
-      } else {
+      if (!action.statusUpdates.hasOwnProperty(annot.$tag)) {
         return annot;
+      }
+
+      var state = action.statusUpdates[annot.$tag];
+      if (state === 'timeout') {
+        return Object.assign({}, annot, { $anchorTimeout: true });
+      } else {
+        return Object.assign({}, annot, { $orphan: state === 'orphan' });
       }
     });
     return {annotations: annotations};
@@ -262,18 +264,16 @@ function addAnnotations(annotations, now) {
     var anchoringAnnots = added.filter(metadata.isWaitingToAnchor);
     if (anchoringAnnots.length) {
       setTimeout(function () {
-        arrayUtil
+        var statusUpdates = arrayUtil
           .filterMap(anchoringAnnots, function (annot) {
             return findByID(getState().annotations, annot.id);
           })
           .filter(metadata.isWaitingToAnchor)
-          .forEach(function (orphan) {
-            dispatch({
-              type: actions.UPDATE_ANCHOR_STATUS,
-              anchorTimeout: true,
-              tag: orphan.$tag,
-            });
-          });
+          .reduce((statusUpdates, orphan) => {
+            statusUpdates[orphan.$tag] = 'timeout';
+            return statusUpdates;
+          }, {});
+        dispatch(updateAnchorStatus(statusUpdates));
       }, ANCHORING_TIMEOUT);
     }
   };
@@ -295,14 +295,12 @@ function clearAnnotations() {
 /**
  * Update the anchoring status of an annotation.
  *
- * @param {string} tag - The annotation's local tag
- * @param {boolean} isOrphan - True if the annotation failed to anchor
+ * @param {{ [tag: string]: 'anchored'|'orphan'|'timeout'} } statusUpdates - A map of annotation tag to orphan status
  */
-function updateAnchorStatus(tag, isOrphan) {
+function updateAnchorStatus(statusUpdates) {
   return {
     type: actions.UPDATE_ANCHOR_STATUS,
-    tag,
-    isOrphan,
+    statusUpdates,
   };
 }
 

@@ -145,7 +145,7 @@ describe('annotationUI', function () {
     it('preserves anchoring status of updated annotations', function () {
       var annot = defaultAnnotation();
       annotationUI.addAnnotations([annot]);
-      annotationUI.updateAnchorStatus(tagForID(annot.id), false /* not an orphan */);
+      annotationUI.updateAnchorStatus({ [tagForID(annot.id)]: 'anchored' });
 
       var update = Object.assign({}, defaultAnnotation(), {text: 'update'});
       annotationUI.addAnnotations([update]);
@@ -166,7 +166,7 @@ describe('annotationUI', function () {
     it('does not set the timeout flag on annotations that do anchor within a time limit', function () {
       var annot = defaultAnnotation();
       annotationUI.addAnnotations([annot]);
-      annotationUI.updateAnchorStatus(tagForID(annot.id), false);
+      annotationUI.updateAnchorStatus({ [tagForID(annot.id)]: 'anchored' });
 
       clock.tick(ANCHOR_TIME_LIMIT);
 
@@ -176,7 +176,7 @@ describe('annotationUI', function () {
     it('does not attempt to modify orphan status if annotations are removed before anchoring timeout expires', function () {
       var annot = defaultAnnotation();
       annotationUI.addAnnotations([annot]);
-      annotationUI.updateAnchorStatus(tagForID(annot.id), false);
+      annotationUI.updateAnchorStatus({ [tagForID(annot.id)]: 'anchored' });
       annotationUI.removeAnnotations([annot]);
 
       assert.doesNotThrow(function () {
@@ -494,7 +494,7 @@ describe('annotationUI', function () {
     it("updates the annotation's orphan flag", function () {
       var annot = defaultAnnotation();
       annotationUI.addAnnotations([annot]);
-      annotationUI.updateAnchorStatus(tagForID(annot.id), true);
+      annotationUI.updateAnchorStatus({ [tagForID(annot.id)]: 'orphan' });
       assert.equal(annotationUI.getState().annotations[0].$orphan, true);
     });
   });
