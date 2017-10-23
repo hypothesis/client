@@ -90,6 +90,28 @@ describe('media-embedder', function () {
     });
   });
 
+  it('replaces internet archive links with iframes', function () {
+    var urls = [
+      'https://archive.org/details/PATH/start/360/end/420.3',
+      'https://archive.org/embed/PATH?start=360&end=420.3',
+    ];
+    urls.forEach(function (url) {
+      var element = domElement('<a href="' + url + '">' + url + '</a>');
+
+      mediaEmbedder.replaceLinksWithEmbeds(element);
+
+      assert.equal(element.children[0].tagName, 'IFRAME');
+
+      // For both url flavors the expected result is the same.
+      // details flavor: we match, transform, and iframe
+      // embed flavor: we just match and iframe
+      var actual = element.children[0].src;
+      var expected = 'https://archive.org/embed/PATH?start=360&end=420.3';
+      assert.equal(actual, expected);
+    });
+  });
+
+
   it('replaces audio links with html5 audio elements', function() {
     var urls = [
       'https://archive.org/download/testmp3testfile/mpthreetest.mp3',
