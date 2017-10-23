@@ -101,26 +101,44 @@ var embedGenerators = [
     return null;
   },
 
-/** Match Internet Archive URLs
- *  The patterns are:
- *  1. https://archive.org/embed/WHDH_20151121_043400_The_Tonight_Show_Starring_Jimmy_Fallon?start=360&end=420.3
- *  2. https://archive.org/details/WHDH_20151121_043400_The_Tonight_Show_Starring_Jimmy_Fallon/start/360/end/420.3
- *  The patterns are invariant, start and stop are always present.
- */
+  /**
+   * Match Internet Archive URLs
+   *
+   *  The patterns are:
+   *
+   *  1. https://archive.org/embed/{slug}?start={startTime}&end={endTime}
+   *     (Embed links)
+   *
+   *  2. https://archive.org/details/{slug}?start={startTime}&end={endTime}
+   *     (Video page links for most videos)
+   *
+   *  3. https://archive.org/details/{slug}/start/{startTime}/end/{endTime}
+   *     (Video page links for the TV News Archive [1])
+   *
+   *  (2) and (3) allow users to copy and paste URLs from archive.org video
+   *  details pages directly into the sidebar to generate video embeds.
+   *
+   *  [1] https://archive.org/details/tv
+   */
   function iFrameFromInternetArchiveLink(link) {
     if (link.hostname !== 'archive.org') {
       return null;
     }
 
     var groups = /(embed|details)\/(.+)$/.exec(link.href);
-    if (groups) {           // group 1 is 'embed' or 'details'
-      var path = groups[2]; // group 2 is the path
-      path = path.replace('/start/', '?start=');
-      path = path.replace('/end/', '&end=');
-      // the iframed url is always the embed flavor
-      return iframe('https://archive.org/embed/' + path);
+    if (!groups) {
+      return null;
     }
-    return null;
+
+    var path = groups[2]; // group 2 is the path
+
+    // Convert `/details` paths to `/embed` paths. TV News Archive links put
+    // the start & end times in the paths whereas the embed links always use
+    // "start" and "end" query params.
+    path = path.replace('/start/', '?start=');
+    path = path.replace('/end/', '&end=');
+
+    return iframe('https://archive.org/embed/' + path);
   },
 
 
