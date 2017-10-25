@@ -311,7 +311,8 @@ module.exports = {
     toggleSelectedAnnotations: toggleSelectedAnnotations,
   },
 
-  // Selectors
-  hasSelectedAnnotations: hasSelectedAnnotations,
-  isAnnotationSelected: isAnnotationSelected,
+  selectors: {
+    hasSelectedAnnotations,
+    isAnnotationSelected,
+  },
 };

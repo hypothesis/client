@@ -111,7 +111,8 @@ module.exports = {
     updateFrameAnnotationFetchStatus: updateFrameAnnotationFetchStatus,
   },
 
-  // Selectors
-  frames: frames,
-  searchUris: searchUris,
+  selectors: {
+    frames,
+    searchUris,
+  },
 };
