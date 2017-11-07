@@ -89,7 +89,8 @@ run:
 Next, you'll need to create an OAuth client which enables the Hypothesis client
 to request an access token from the service in order to make API calls.
 
-1. Go to http://localhost:5000/admin/oauthclients
+1. Go to http://localhost:5000/admin/oauthclients (you'll need to be logged
+   in to h as an admin user)
 2. Select "Register a new OAuth client"
 3. Choose a name (eg. "Client") and set the redirect URL to
    http://localhost:5000/app.html. Leave the other settings at their default values.
