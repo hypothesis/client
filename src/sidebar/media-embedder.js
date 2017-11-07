@@ -1,5 +1,7 @@
 'use strict';
 
+var queryString = require('query-string');
+
 /**
 * Return an HTML5 audio player with the given src URL.
 */
@@ -125,20 +127,44 @@ var embedGenerators = [
       return null;
     }
 
-    var groups = /(embed|details)\/(.+)$/.exec(link.href);
-    if (!groups) {
+    // Extract the unique slug from the path.
+    var slugMatch = /^\/(embed|details)\/(.+)/.exec(link.pathname);
+    if (!slugMatch) {
       return null;
     }
 
-    var path = groups[2]; // group 2 is the path
+    // Extract start and end times, which may appear either as query string
+    // params or path params.
+    var slug = slugMatch[2];
+    var linkParams = queryString.parse(link.search);
+    var startTime = linkParams.start;
+    var endTime = linkParams.end;
 
-    // Convert `/details` paths to `/embed` paths. TV News Archive links put
-    // the start & end times in the paths whereas the embed links always use
-    // "start" and "end" query params.
-    path = path.replace('/start/', '?start=');
-    path = path.replace('/end/', '&end=');
+    if (!startTime) {
+      var startPathParam = slug.match(/\/start\/([^\/]+)/);
+      if (startPathParam) {
+        startTime = startPathParam[1];
+        slug = slug.replace(startPathParam[0], '');
+      }
+    }
 
-    return iframe('https://archive.org/embed/' + path);
+    if (!endTime) {
+      var endPathParam = slug.match(/\/end\/([^\/]+)/);
+      if (endPathParam) {
+        endTime = endPathParam[1];
+        slug = slug.replace(endPathParam[0], '');
+      }
+    }
+
+    // Generate embed URL.
+    var iframeUrl = new URL(`https://archive.org/embed/${slug}`);
+    if (startTime) {
+      iframeUrl.searchParams.append('start', startTime);
+    }
+    if (endTime) {
+      iframeUrl.searchParams.append('end', endTime);
+    }
+    return iframe(iframeUrl.href);
   },
 
 
