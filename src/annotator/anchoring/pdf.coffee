@@ -97,7 +97,8 @@ findPage = (offset) ->
   #    150    | 2
   #
   count = (textContent) ->
-    if total + textContent.length > offset
+    lastPageIndex = PDFViewerApplication.pdfViewer.pagesCount - 1
+    if total + textContent.length > offset or index == lastPageIndex
       offset = total
       return Promise.resolve({index, offset, textContent})
     else

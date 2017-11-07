@@ -35,7 +35,7 @@ var fixtures = {
   ],
 };
 
-describe('PDF anchoring', function () {
+describe('annotator.anchoring.pdf', function () {
   var container;
   var viewer;
 
@@ -166,39 +166,30 @@ describe('PDF anchoring', function () {
       });
     });
 
-    it('anchors using a quote if the position anchor fails', function () {
-      viewer.setCurrentPage(0);
-      var range = findText(container, 'Pride And Prejudice');
-      return pdfAnchoring.describe(container, range).then(function (selectors) {
-        var position = selectors[0];
-        var quote = selectors[1];
+    [{
+      // Position on same page as quote but different text.
+      offset: 5,
+    },{
+      // Position on a different page to the quote.
+      offset: fixtures.pdfPages[0].length + 10,
+    },{
+      // Position invalid for document.
+      offset: 100000,
+    }].forEach(({ offset }) => {
+      it('anchors using a quote if the position selector fails', function () {
+        viewer.setCurrentPage(0);
+        var range = findText(container, 'Pride And Prejudice');
+        return pdfAnchoring.describe(container, range).then(function (selectors) {
+          var position = selectors[0];
+          var quote = selectors[1];
 
-        // Manipulate the position selector so that it is no longer valid.
-        // Anchoring should fall back to the quote selector instead.
-        position.start += 5;
-        position.end += 5;
+          position.start += offset;
+          position.end += offset;
 
-        return pdfAnchoring.anchor(container, [position, quote]);
-      }).then(function (range) {
-        assert.equal(range.toString(), 'Pride And Prejudice');
-      });
-    });
-
-    it('anchors using a quote if the position selector refers to the wrong page', function () {
-      viewer.setCurrentPage(0);
-      var range = findText(container, 'Pride And Prejudice');
-      return pdfAnchoring.describe(container, range).then(function (selectors) {
-        var position = selectors[0];
-        var quote = selectors[1];
-
-        // Manipulate the position selector so that it refers to a location
-        // a long way away, on a different page, than the quote.
-        position.start += fixtures.pdfPages[0].length + 10;
-        position.end += fixtures.pdfPages[0].length + 10;
-
-        return pdfAnchoring.anchor(container, [position, quote]);
-      }).then(function (range) {
-        assert.equal(range.toString(), 'Pride And Prejudice');
+          return pdfAnchoring.anchor(container, [position, quote]);
+        }).then(range => {
+          assert.equal(range.toString(), 'Pride And Prejudice');
+        });
       });
     });
 
