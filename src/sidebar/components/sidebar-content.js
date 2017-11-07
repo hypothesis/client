@@ -61,6 +61,14 @@ function SidebarContentController(
 
   $scope.$on('$destroy', unsubscribeAnnotationUI);
 
+  $scope.$root.$on(events.ANNOTATION_CREATED, function(event, ann) {
+    annotationUI.addGroupAnnotation(ann);
+  });
+
+  $scope.$root.$on(events.ANNOTATION_DELETED, function(event, ann) {
+    annotationUI.removeGroupAnnotation(ann);
+  });
+
   function focusAnnotation(annotation) {
     var highlights = [];
     if (annotation) {
@@ -109,6 +117,15 @@ function SidebarContentController(
     });
     searchClients.push(searchClient);
     searchClient.on('results', function (results) {
+
+      // intialize all group counts in state
+      annotationUI.addGroupAnnotations(results);
+
+      // then filter to just this group
+      results = results.filter(function (x) {
+        return x.group === searchClient._group; // remembered by search client
+      });
+
       if (annotationUI.hasSelectedAnnotations()) {
         // Focus the group containing the selected annotation and filter
         // annotations to those from this group

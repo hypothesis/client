@@ -56,7 +56,9 @@
                title="{{ group.public ? 'Show public annotations' : 'Show and create annotations in ' + group.name }}">
                {{group.name}}
             </a>
+          <span class="group-count"></span>
           </div>
+          <span class="group-id">{{ group.id }}</span>
           <div class="share-link-container" ng-click="$event.stopPropagation()" ng-if="!group.public">
             <a class="share-link"
                href="{{group.url}}"

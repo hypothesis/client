@@ -3,6 +3,10 @@
 $group-list-width: 270px;
 $group-list-spacing-below: 50px;
 
+.group-id {
+  display: none;
+  }
+
 .group-list {
   .dropdown {
     white-space: nowrap;

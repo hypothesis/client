@@ -73,6 +73,7 @@ function initializeAnnot(annotation, tag) {
 function init() {
   return {
     annotations: [],
+    groups: {},
 
     // The local tag to assign to the next annotation that is loaded into the
     // app
@@ -81,6 +82,36 @@ function init() {
 }
 
 var update = {
+
+  ADD_GROUP_ANNOTATIONS: function ADD_GROUP_ANNOTATIONS(state, action) {
+    state.groups = Object.assign(state.groups, action.groups);
+    _showGroupActivity(state.groups);
+    return {
+      groups: state.groups,
+    };
+  },
+
+  ADD_GROUP_ANNOTATION: function ADD_GROUP_ANNOTATION(state, action) {
+    var ann = action.annotation;
+    if (! state.groups[ann.group] ) {
+      state.groups[ann.group] = {};
+    }
+    state.groups[ann.group][ann.id] = null;
+    _showGroupActivity(state.groups);
+    return {
+      groups: state.groups,
+    };
+  },
+
+  REMOVE_GROUP_ANNOTATION: function REMOVE_GROUP_ANNOTATION(state, action) {
+    var ann = action.annotation;
+    delete state.groups[ann.group][ann.id];
+    _showGroupActivity(state.groups);
+    return {
+      groups: state.groups,
+    };
+  },
+
   ADD_ANNOTATIONS: function (state, action) {
     var updatedIDs = {};
     var updatedTags = {};
@@ -226,6 +257,68 @@ function updateFlagStatus(id, isFlagged) {
     isFlagged: isFlagged,
   };
 }
+
+function addGroupAnnotation(ann) {
+  return {
+    type: actions.ADD_GROUP_ANNOTATION,
+    annotation: ann,
+  };
+}
+
+function addGroupAnnotations(annotations) {
+  var groups = {};
+
+  annotations.forEach(function (annot) {
+    var group = annot.group;
+
+    if (!groups[group]) {
+      groups[group] = {};
+    }
+
+    groups[group][annot.id] = null;
+  });
+
+  return {
+    type: actions.ADD_GROUP_ANNOTATIONS,
+    groups: groups,
+  };
+}
+
+function removeGroupAnnotation(ann) {
+  return {
+    type: actions.REMOVE_GROUP_ANNOTATION,
+    annotation: ann,
+  };
+}
+
+function _showGroupActivity(groups) {
+  var scopeSelectorNodes = Array.prototype.slice.call(document.querySelectorAll('.group-list li'));
+  scopeSelectorNodes.forEach(function (li) {
+    var groupId = li.querySelector('.group-id');
+
+    if (! groupId) { return; }
+
+    groupId = groupId.innerHTML.replace(/\s/g, '');
+
+    var count = 0;
+
+    if (groups[groupId]) {
+      count = Object.keys(groups[groupId]).length;
+    }
+
+    var iconContainer = li.querySelector('.group-icon-container');
+
+    if (count > 0) {
+      iconContainer.style.color = 'red';
+      li.querySelector('.group-count').innerHTML = '(' + count + ')';
+    } else {
+      iconContainer.style.color = '';
+      li.querySelector('.group-count').innerHTML = '';
+    }
+
+  });
+}
+
 
 /** Add annotations to the currently displayed set. */
 function addAnnotations(annotations, now) {
@@ -388,6 +481,9 @@ module.exports = {
   update: update,
   actions: {
     addAnnotations: addAnnotations,
+    addGroupAnnotation: addGroupAnnotation,
+    addGroupAnnotations: addGroupAnnotations,
+    removeGroupAnnotation: removeGroupAnnotation,
     clearAnnotations: clearAnnotations,
     removeAnnotations: removeAnnotations,
     updateAnchorStatus: updateAnchorStatus,
