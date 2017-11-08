@@ -261,19 +261,21 @@ function addAnnotations(annotations, now) {
     // successfully anchor then the status will be updated.
     var ANCHORING_TIMEOUT = 500;
 
-    var anchoringAnnots = added.filter(metadata.isWaitingToAnchor);
-    if (anchoringAnnots.length) {
-      setTimeout(function () {
-        var statusUpdates = arrayUtil
-          .filterMap(anchoringAnnots, function (annot) {
-            return findByID(getState().annotations, annot.id);
-          })
-          .filter(metadata.isWaitingToAnchor)
-          .reduce((statusUpdates, orphan) => {
-            statusUpdates[orphan.$tag] = 'timeout';
-            return statusUpdates;
-          }, {});
-        dispatch(updateAnchorStatus(statusUpdates));
+    var anchoringIDs = added.filter(metadata.isWaitingToAnchor)
+                            .map(ann => ann.id);
+    if (anchoringIDs.length > 0) {
+      setTimeout(() => {
+        // Find annotations which haven't yet been anchored in the document.
+        var anns = getState().annotations;
+        var annsStillAnchoring = anchoringIDs.map(id => findByID(anns, id))
+                                             .filter(ann => ann && metadata.isWaitingToAnchor(ann));
+
+        // Mark anchoring as timed-out for these annotations.
+        var anchorStatusUpdates = annsStillAnchoring.reduce((updates, ann) => {
+          updates[ann.$tag] = 'timeout';
+          return updates;
+        }, {});
+        dispatch(updateAnchorStatus(anchorStatusUpdates));
       }, ANCHORING_TIMEOUT);
     }
   };
