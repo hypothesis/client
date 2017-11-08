@@ -130,7 +130,7 @@ function FrameSync($rootScope, $window, Discovery, annotationUI, bridge) {
     bridge.on('sync', function (events_) {
       events_.forEach(function (event) {
         inFrame.add(event.tag);
-        annotationUI.updateAnchorStatus(null, event.tag, event.msg.$orphan);
+        annotationUI.updateAnchorStatus(event.tag, event.msg.$orphan);
         $rootScope.$broadcast(events.ANNOTATIONS_SYNCED, [event.tag]);
       });
     });

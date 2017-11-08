@@ -173,13 +173,10 @@ var update = {
 
   UPDATE_ANCHOR_STATUS: function (state, action) {
     var annotations = state.annotations.map(function (annot) {
-      var match = (annot.id && annot.id === action.id) ||
-                  (annot.$tag && annot.$tag === action.tag);
-      if (match) {
+      if (annot.$tag === action.tag) {
         return Object.assign({}, annot, {
           $anchorTimeout: action.anchorTimeout || annot.$anchorTimeout,
           $orphan: action.isOrphan,
-          $tag: action.tag,
         });
       } else {
         return annot;
@@ -274,7 +271,6 @@ function addAnnotations(annotations, now) {
             dispatch({
               type: actions.UPDATE_ANCHOR_STATUS,
               anchorTimeout: true,
-              id: orphan.id,
               tag: orphan.$tag,
             });
           });
@@ -297,19 +293,16 @@ function clearAnnotations() {
 }
 
 /**
- * Updating the local tag and anchoring status of an annotation.
+ * Update the anchoring status of an annotation.
  *
- * @param {string|null} id - Annotation ID
- * @param {string} tag - The local tag assigned to this annotation to link
- *        the object in the page and the annotation in the sidebar
+ * @param {string} tag - The annotation's local tag
  * @param {boolean} isOrphan - True if the annotation failed to anchor
  */
-function updateAnchorStatus(id, tag, isOrphan) {
+function updateAnchorStatus(tag, isOrphan) {
   return {
     type: actions.UPDATE_ANCHOR_STATUS,
-    id: id,
-    tag: tag,
-    isOrphan: isOrphan,
+    tag,
+    isOrphan,
   };
 }
 

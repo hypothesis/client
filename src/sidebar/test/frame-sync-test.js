@@ -191,7 +191,7 @@ describe('FrameSync', function () {
   context('when anchoring completes', function () {
     it('updates the anchoring status for the annotation', function () {
       fakeBridge.emit('sync', [{tag: 't1', msg: {$orphan: false}}]);
-      assert.calledWith(fakeAnnotationUI.updateAnchorStatus, null, 't1', false);
+      assert.calledWith(fakeAnnotationUI.updateAnchorStatus, 't1', false);
     });
 
     it('emits an ANNOTATIONS_SYNCED event', function () {
