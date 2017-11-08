@@ -21,7 +21,6 @@ function configFrom(window_) {
     // Temporary feature flag override for 1st-party OAuth
     oauthEnabled: settings.hostPageSetting('oauthEnabled'),
     onLayoutChange: settings.hostPageSetting('onLayoutChange'),
-    openLoginForm: settings.hostPageSetting('openLoginForm', {allowInBrowserExt: true}),
     openSidebar: settings.hostPageSetting('openSidebar', {allowInBrowserExt: true}),
     query: settings.query,
     services: settings.hostPageSetting('services'),

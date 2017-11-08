@@ -58,17 +58,6 @@ Client Behavior
 These settings configure the behavior and initial state of the client when it
 loads.
 
-.. option:: openLoginForm
-
-   ``Boolean``. Controls whether the login panel is automatically opened on
-   startup, as if the user had clicked "Log in" themselves.
-   (Default: ``false``.)
-
-   .. warning::
-
-      This option is deprecated and has no effect when the client is using OAuth
-      for authorization.
-
 .. option:: openSidebar
 
    ``Boolean``. Controls whether the sidebar opens automatically on startup.
