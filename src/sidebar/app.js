@@ -160,14 +160,11 @@ module.exports = angular.module('h', [
   .component('timestamp', require('./components/timestamp'))
   .component('topBar', require('./components/top-bar'))
 
-  .directive('formInput', require('./directive/form-input'))
-  .directive('formValidate', require('./directive/form-validate'))
   .directive('hAutofocus', require('./directive/h-autofocus'))
   .directive('hBranding', require('./directive/h-branding'))
   .directive('hOnTouch', require('./directive/h-on-touch'))
   .directive('hTooltip', require('./directive/h-tooltip'))
   .directive('spinner', require('./directive/spinner'))
-  .directive('statusButton', require('./directive/status-button'))
   .directive('windowScroll', require('./directive/window-scroll'))
 
   .service('analytics', require('./analytics'))
@@ -179,7 +176,6 @@ module.exports = angular.module('h', [
   .service('drafts', require('./drafts'))
   .service('features', require('./features'))
   .service('flash', require('./flash'))
-  .service('formRespond', require('./form-respond'))
   .service('frameSync', require('./frame-sync').default)
   .service('groups', require('./groups'))
   .service('localStorage', require('./local-storage'))
