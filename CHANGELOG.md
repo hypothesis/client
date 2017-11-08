@@ -4,6 +4,22 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+### Changed
+
+- Add OAuth client registration steps to developer docs
+  ([#567](https://github.com/hypothesis/client/pull/567)).
+
+- Strip unknown query params when generating Internet Archive embed URLs
+  ([#561](https://github.com/hypothesis/client/pull/561)).
+
+- Fix a cause of unexpected anchoring failures in PDFs
+  ([#563](https://github.com/hypothesis/client/pull/563)).
+
+- Remove support for cookie-based authentication
+  ([#542](https://github.com/hypothesis/client/pull/542)).
+
 ## [1.48.0] - 2017-10-23
 
 ### Changed
