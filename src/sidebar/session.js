@@ -8,11 +8,17 @@ var retryUtil = require('./retry-util');
 var CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
 /**
- * Access to the user profile and account actions. This service gives
- * other parts of the application access to the user's profile.
+ * @typedef Profile
  *
- * In addition, this service also provides helper methods for logging in and
- * out.
+ * An object returned by the API (`GET /api/profile`) containing profile data
+ * for the current user.
+ */
+
+/**
+ * This service handles fetching the user's profile, updating profile settings
+ * and logging out.
+ *
+ * Access to the current profile is exposed via the `state` property.
  *
  * @ngInject
  */
@@ -36,14 +42,12 @@ function session($q, $rootScope, analytics, annotationUI, auth,
   var profileFetchRetryOpts = {};
 
   /**
-   * @name session.load()
-   * @description Fetches the session data from the server.
-   * @returns A promise for the session data.
+   * Fetch the user's profile from the annotation service.
    *
-   * The data is cached for CACHE_TTL across all actions of the session
-   * service: that is, a call to login() will update the session data and a call
-   * within CACHE_TTL milliseconds to load() will return that data rather than
-   * triggering a new request.
+   * If the profile has been previously fetched within `CACHE_TTL` ms, then this
+   * method returns a cached profile instead of triggering another fetch.
+   *
+   * @return {Promise<Profile>} A promise for the user's profile data.
    */
   function load() {
     if (!lastLoadTime || (Date.now() - lastLoadTime) > CACHE_TTL) {
@@ -75,14 +79,20 @@ function session($q, $rootScope, analytics, annotationUI, auth,
 
   /**
    * Store the preference server-side that the user dismissed the sidebar
-   * tutorial, and then updates the session state.
+   * tutorial and then update the local profile data.
    */
   function dismissSidebarTutorial() {
     return store.profile.update({}, {preferences: {show_sidebar_tutorial: false}}).then(update);
   }
 
   /**
-   * Update the profile using the provided data.
+   * Update the local profile data.
+   *
+   * This method can be used to update the profile data in the client when new
+   * data is pushed from the server via the real-time API.
+   *
+   * @param {Profile} model
+   * @return {Profile} The updated profile data
    */
   function update(model) {
     var prevSession = annotationUI.getState().session;
@@ -100,7 +110,7 @@ function session($q, $rootScope, analytics, annotationUI, auth,
         profile: model,
       });
 
-      // associate error reports with the current user in Sentry
+      // Associate error reports with the current user in Sentry.
       if (model.userid) {
         raven.setUserInfo({
           id: model.userid,
@@ -140,6 +150,8 @@ function session($q, $rootScope, analytics, annotationUI, auth,
    * Clear the cached profile information and re-fetch it from the server.
    *
    * This can be used to refresh the user's profile state after logging in.
+   *
+   * @return {Promise<Profile>}
    */
   function reload() {
     lastLoad = null;
