@@ -50,7 +50,7 @@ var fixtures = {
   },
 };
 
-describe('FrameSync', function () {
+describe('sidebar.frame-sync', function () {
   var fakeAnnotationUI;
   var fakeBridge;
   var frameSync;
@@ -189,9 +189,40 @@ describe('FrameSync', function () {
   });
 
   context('when anchoring completes', function () {
+    var clock = sinon.stub();
+
+    beforeEach(() => {
+      clock = sinon.useFakeTimers();
+    });
+
+    afterEach(() => {
+      clock.restore();
+    });
+
+    function expireDebounceTimeout() {
+      // "Wait" for debouncing timeout to expire and pending anchoring status
+      // updates to be applied.
+      clock.tick(20);
+    }
+
     it('updates the anchoring status for the annotation', function () {
       fakeBridge.emit('sync', [{tag: 't1', msg: {$orphan: false}}]);
-      assert.calledWith(fakeAnnotationUI.updateAnchorStatus, null, 't1', false);
+
+      expireDebounceTimeout();
+
+      assert.calledWith(fakeAnnotationUI.updateAnchorStatus, { t1: 'anchored' });
+    });
+
+    it('coalesces multiple "sync" messages', () => {
+      fakeBridge.emit('sync', [{tag: 't1', msg: {$orphan: false}}]);
+      fakeBridge.emit('sync', [{tag: 't2', msg: {$orphan: true}}]);
+
+      expireDebounceTimeout();
+
+      assert.calledWith(fakeAnnotationUI.updateAnchorStatus, {
+        t1: 'anchored',
+        t2: 'orphan',
+      });
     });
 
     it('emits an ANNOTATIONS_SYNCED event', function () {
@@ -199,6 +230,7 @@ describe('FrameSync', function () {
       $rootScope.$on(events.ANNOTATIONS_SYNCED, onSync);
 
       fakeBridge.emit('sync', [{tag: 't1', msg: {$orphan: false}}]);
+      expireDebounceTimeout();
 
       assert.calledWithMatch(onSync, sinon.match.any, sinon.match(['t1']));
     });

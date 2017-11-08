@@ -173,16 +173,15 @@ var update = {
 
   UPDATE_ANCHOR_STATUS: function (state, action) {
     var annotations = state.annotations.map(function (annot) {
-      var match = (annot.id && annot.id === action.id) ||
-                  (annot.$tag && annot.$tag === action.tag);
-      if (match) {
-        return Object.assign({}, annot, {
-          $anchorTimeout: action.anchorTimeout || annot.$anchorTimeout,
-          $orphan: action.isOrphan,
-          $tag: action.tag,
-        });
-      } else {
+      if (!action.statusUpdates.hasOwnProperty(annot.$tag)) {
         return annot;
+      }
+
+      var state = action.statusUpdates[annot.$tag];
+      if (state === 'timeout') {
+        return Object.assign({}, annot, { $anchorTimeout: true });
+      } else {
+        return Object.assign({}, annot, { $orphan: state === 'orphan' });
       }
     });
     return {annotations: annotations};
@@ -262,22 +261,21 @@ function addAnnotations(annotations, now) {
     // successfully anchor then the status will be updated.
     var ANCHORING_TIMEOUT = 500;
 
-    var anchoringAnnots = added.filter(metadata.isWaitingToAnchor);
-    if (anchoringAnnots.length) {
-      setTimeout(function () {
-        arrayUtil
-          .filterMap(anchoringAnnots, function (annot) {
-            return findByID(getState().annotations, annot.id);
-          })
-          .filter(metadata.isWaitingToAnchor)
-          .forEach(function (orphan) {
-            dispatch({
-              type: actions.UPDATE_ANCHOR_STATUS,
-              anchorTimeout: true,
-              id: orphan.id,
-              tag: orphan.$tag,
-            });
-          });
+    var anchoringIDs = added.filter(metadata.isWaitingToAnchor)
+                            .map(ann => ann.id);
+    if (anchoringIDs.length > 0) {
+      setTimeout(() => {
+        // Find annotations which haven't yet been anchored in the document.
+        var anns = getState().annotations;
+        var annsStillAnchoring = anchoringIDs.map(id => findByID(anns, id))
+                                             .filter(ann => ann && metadata.isWaitingToAnchor(ann));
+
+        // Mark anchoring as timed-out for these annotations.
+        var anchorStatusUpdates = annsStillAnchoring.reduce((updates, ann) => {
+          updates[ann.$tag] = 'timeout';
+          return updates;
+        }, {});
+        dispatch(updateAnchorStatus(anchorStatusUpdates));
       }, ANCHORING_TIMEOUT);
     }
   };
@@ -297,19 +295,14 @@ function clearAnnotations() {
 }
 
 /**
- * Updating the local tag and anchoring status of an annotation.
+ * Update the anchoring status of an annotation.
  *
- * @param {string|null} id - Annotation ID
- * @param {string} tag - The local tag assigned to this annotation to link
- *        the object in the page and the annotation in the sidebar
- * @param {boolean} isOrphan - True if the annotation failed to anchor
+ * @param {{ [tag: string]: 'anchored'|'orphan'|'timeout'} } statusUpdates - A map of annotation tag to orphan status
  */
-function updateAnchorStatus(id, tag, isOrphan) {
+function updateAnchorStatus(statusUpdates) {
   return {
     type: actions.UPDATE_ANCHOR_STATUS,
-    id: id,
-    tag: tag,
-    isOrphan: isOrphan,
+    statusUpdates,
   };
 }
 
