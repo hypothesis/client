@@ -26,7 +26,6 @@ function hostPageConfig(window) {
 
     // Config params documented at
     // https://h.readthedocs.io/projects/client/en/latest/publishers/config/
-    'openLoginForm',
     'openSidebar',
     'showHighlights',
     'services',

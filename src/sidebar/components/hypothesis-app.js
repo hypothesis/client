@@ -47,7 +47,6 @@ function HypothesisAppController(
   this.auth = {status: 'unknown'};
 
   // App dialogs
-  this.accountDialog = {visible: false};
   this.shareDialog = {visible: false};
   this.helpPanel = {visible: false};
 
@@ -73,18 +72,10 @@ function HypothesisAppController(
   // Reload the view when the user switches accounts
   $scope.$on(events.USER_CHANGED, function (event, data) {
     self.auth = authStateFromProfile(data.profile);
-    self.accountDialog.visible = false;
   });
 
-  session.load().then(function (profile) {
-    // When the authentication status of the user is known,
-    // update the auth info in the top bar and show the login form
-    // after first install of the extension.
+  session.load().then(profile => {
     self.auth = authStateFromProfile(profile);
-
-    if (!profile.userid && settings.openLoginForm && !auth.login) {
-      self.login();
-    }
   });
 
   /** Scroll to the view to the element matching the given selector */
@@ -109,19 +100,11 @@ function HypothesisAppController(
       return Promise.resolve();
     }
 
-    if (auth.login) {
-      // OAuth-based login 😀
-      return auth.login().then(() => {
-        session.reload();
-      }).catch((err) => {
-        flash.error(err.message);
-      });
-    } else {
-      // Legacy cookie-based login 😔.
-      self.accountDialog.visible = true;
-      scrollToView('login-form');
-      return Promise.resolve();
-    }
+    return auth.login().then(() => {
+      session.reload();
+    }).catch((err) => {
+      flash.error(err.message);
+    });
   };
 
   this.signUp = function(){
@@ -182,7 +165,6 @@ function HypothesisAppController(
       return;
     }
 
-    this.accountDialog.visible = false;
     session.logout();
   };
 

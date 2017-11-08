@@ -280,16 +280,6 @@ function auth($http, $rootScope, $window,
   }
 
   /**
-   * Forget any cached credentials.
-   */
-  function clearCache() {
-    // Once cookie auth has been removed, the `clearCache` method can be removed
-    // from the public API of this service in favor of `logout`.
-    tokenInfoPromise = Promise.resolve(null);
-    localStorage.removeItem(storageKey());
-  }
-
-  /**
    * Login to the annotation service using OAuth.
    *
    * This displays a popup window which allows the user to login to the service
@@ -394,14 +384,14 @@ function auth($http, $rootScope, $window,
           token: token.accessToken,
         });
       }).then(() => {
-        clearCache();
+        tokenInfoPromise = Promise.resolve(null);
+        localStorage.removeItem(storageKey());
       });
   }
 
   listenForTokenStorageEvents();
 
   return {
-    clearCache,
     login,
     logout,
     tokenGetter,

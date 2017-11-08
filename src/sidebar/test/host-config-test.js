@@ -17,7 +17,6 @@ describe('hostPageConfig', function () {
       appType: 'bookmarklet',
       oauthEnabled: true,
       openSidebar: true,
-      openLoginForm: true,
       showHighlights: true,
       services: [{
         authority: 'hypothes.is',
@@ -29,7 +28,6 @@ describe('hostPageConfig', function () {
       appType: 'bookmarklet',
       oauthEnabled: true,
       openSidebar: true,
-      openLoginForm: true,
       showHighlights: true,
       services: [{
         authority: 'hypothes.is',

@@ -7,7 +7,6 @@ var events = require('../events');
 var mock = angular.mock;
 
 describe('sidebar.session', function () {
-  var $httpBackend;
   var $rootScope;
 
   var fakeAnalytics;
@@ -21,7 +20,7 @@ describe('sidebar.session', function () {
   var session;
 
   before(function () {
-    angular.module('h', ['ngResource'])
+    angular.module('h', [])
       .service('session', require('../session'));
   });
 
@@ -42,8 +41,7 @@ describe('sidebar.session', function () {
       },
     };
     fakeAuth = {
-      clearCache: sandbox.spy(),
-      login: null, // Use cookie-based auth
+      login: sandbox.stub().returns(Promise.resolve()),
     };
     fakeFlash = {error: sandbox.spy()};
     fakeRaven = {
@@ -73,108 +71,16 @@ describe('sidebar.session', function () {
   });
 
 
-  beforeEach(mock.inject(function (_$httpBackend_, _$rootScope_, _session_) {
-    $httpBackend = _$httpBackend_;
+  beforeEach(mock.inject(function (_$rootScope_, _session_) {
     session = _session_;
     $rootScope = _$rootScope_;
   }));
 
   afterEach(function () {
-    $httpBackend.verifyNoOutstandingExpectation();
-    $httpBackend.verifyNoOutstandingRequest();
     sandbox.restore();
   });
 
-  // There's little point testing every single route here, as they're
-  // declarative and ultimately we'd be testing ngResource.
-  describe('#login()', function () {
-    var url = 'https://test.hypothes.is/root/app?__formid__=login';
-
-    it('should send an HTTP POST to the action', function () {
-      $httpBackend.expectPOST(url, {code: 123}).respond({});
-      session.login({code: 123});
-      $httpBackend.flush();
-    });
-
-    it('should invoke the flash service with any flash messages', function () {
-      var response = {
-        flash: {
-          error: ['fail'],
-        },
-      };
-      $httpBackend.expectPOST(url).respond(response);
-      session.login({});
-      $httpBackend.flush();
-      assert.calledWith(fakeFlash.error, 'fail');
-    });
-
-    it('should assign errors and status reasons to the model', function () {
-      var response = {
-        model: {
-          userid: 'alice',
-        },
-        errors: {
-          password: 'missing',
-        },
-        reason: 'bad credentials',
-      };
-      $httpBackend.expectPOST(url).respond(response);
-      var result = session.login({});
-      $httpBackend.flush();
-      assert.match(result, response.model, 'the model is present');
-      assert.match(result.errors, response.errors, 'the errors are present');
-      assert.match(result.reason, response.reason, 'the reason is present');
-    });
-
-    it('should capture and send the xsrf token', function () {
-      var token = 'deadbeef';
-      var headers = {
-        'Accept': 'application/json, text/plain, */*',
-        'Content-Type': 'application/json;charset=utf-8',
-        'X-XSRF-TOKEN': token,
-      };
-      var model = {csrf: token};
-      $httpBackend.expectPOST(url).respond({model: model});
-      session.login({});
-      $httpBackend.flush();
-      assert.equal(session.state.csrf, token);
-
-      $httpBackend.expectPOST(url, {}, headers).respond({});
-      session.login({});
-      $httpBackend.flush();
-    });
-
-    it('should expose the model as session.state', function () {
-      var response = {
-        model: {
-          userid: 'alice',
-        },
-      };
-      assert.deepEqual(session.state, {});
-      $httpBackend.expectPOST(url).respond(response);
-      session.login({});
-      $httpBackend.flush();
-      assert.deepEqual(session.state, response.model);
-    });
-
-    it('an immediately-following call to #load() should not trigger a new request', function () {
-      $httpBackend.expectPOST(url).respond({});
-      session.login();
-      $httpBackend.flush();
-
-      session.load();
-    });
-  });
-
   describe('#load()', function () {
-    var url = 'https://test.hypothes.is/root/app';
-
-    it('should fetch the session data', function () {
-      $httpBackend.expectGET(url).respond({});
-      session.load();
-      $httpBackend.flush();
-    });
-
     context('when the host page provides an OAuth grant token', function () {
       beforeEach(function () {
         fakeServiceConfig.returns({
@@ -186,7 +92,7 @@ describe('sidebar.session', function () {
         }));
       });
 
-      it('should fetch profile data from the API', function () {
+      it('should pass the "authority" param when fetching the profile', function () {
         return session.load().then(function () {
           assert.calledWith(fakeStore.profile.read, {authority: 'publisher.org'});
         });
@@ -199,12 +105,19 @@ describe('sidebar.session', function () {
       });
     });
 
-    context('when using OAuth for first-party accounts', () => {
+    context('when using a first party account', () => {
+      var clock;
+
       beforeEach(() => {
-        fakeAuth.login = sinon.stub().returns(Promise.resolve());
         fakeStore.profile.read.returns(Promise.resolve({
           userid: 'acct:user@hypothes.is',
         }));
+      });
+
+      afterEach(() => {
+        if (clock) {
+          clock.restore();
+        }
       });
 
       it('should fetch profile data from the API', () => {
@@ -213,46 +126,46 @@ describe('sidebar.session', function () {
         });
       });
 
+      it('should retry the profile fetch if it fails', () => {
+        fakeStore.profile.read.onCall(0).returns(
+          Promise.reject(new Error('Server error'))
+        );
+        fakeStore.profile.read.onCall(1).returns(
+          Promise.resolve({userid: 'acct:user@hypothes.is', groups: []})
+        );
+
+        // Shorten the delay before retrying the fetch.
+        session.profileFetchRetryOpts.minTimeout = 50;
+
+        return session.load().then(() => {
+          assert.equal(session.state.userid, 'acct:user@hypothes.is');
+        });
+      });
+
       it('should update the session with the profile data from the API', () => {
         return session.load().then(function () {
           assert.equal(session.state.userid, 'acct:user@hypothes.is');
         });
       });
-    });
 
-    it('should cache the session data', function () {
-      $httpBackend.expectGET(url).respond({});
-      session.load();
-      session.load();
-      $httpBackend.flush();
-    });
+      it('should cache the returned profile data', () => {
+        return session.load().then(() => {
+          return session.load();
+        }).then(() => {
+          assert.calledOnce(fakeStore.profile.read);
+        });
+      });
 
-    it('should eventually expire the cache', function () {
-      var clock = sandbox.useFakeTimers();
-      $httpBackend.expectGET(url).respond({});
-      session.load();
-      $httpBackend.flush();
+      it('should eventually expire the cache', () => {
+        clock = sinon.useFakeTimers();
+        var CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
-      clock.tick(301 * 1000);
-
-      $httpBackend.expectGET(url).respond({});
-      session.load();
-      $httpBackend.flush();
-    });
-
-    var failedRequestCases = [{
-      status: -1,
-      body: null,
-    },{
-      status: 504,
-      body: 'Gateway Timeout',
-    }];
-
-    failedRequestCases.forEach(function (testCase) {
-      it('should tolerate failed requests', function () {
-        $httpBackend.expectGET(url).respond(testCase.status, testCase.body);
-        session.load();
-        $httpBackend.flush();
+        return session.load().then(() => {
+          clock.tick(CACHE_TTL * 2);
+          return session.load();
+        }).then(() => {
+          assert.calledTwice(fakeStore.profile.read);
+        });
       });
     });
   });
@@ -265,7 +178,6 @@ describe('sidebar.session', function () {
         groups: [{
           id: 'groupid',
         }],
-        csrf: 'dummytoken',
       });
       assert.calledOnce(groupChangeCallback);
     });
@@ -275,32 +187,17 @@ describe('sidebar.session', function () {
       $rootScope.$on(events.USER_CHANGED, userChangeCallback);
       session.update({
         userid: 'fred',
-        csrf: 'dummytoken',
       });
       assert.calledOnce(userChangeCallback);
-    });
-
-    it('clears the API token cache when the user changes', function () {
-      session.update({userid: 'different-user', csrf: 'dummytoken'});
-      assert.called(fakeAuth.clearCache);
     });
 
     it('updates the user ID for Sentry error reports', function () {
       session.update({
         userid: 'anne',
-        csrf: 'dummytoken',
       });
       assert.calledWith(fakeRaven.setUserInfo, {
         id: 'anne',
       });
-    });
-
-    it('does not clear the access token when using OAuth-based authorization', function () {
-      fakeAuth.login = Promise.resolve();
-
-      session.update({userid: 'different-user', csrf: 'dummytoken'});
-
-      assert.notCalled(fakeAuth.clearCache);
     });
   });
 
@@ -325,9 +222,6 @@ describe('sidebar.session', function () {
 
   describe('#reload', () => {
     beforeEach(() => {
-      // Use OAuth
-      fakeAuth.login = sinon.stub().returns(Promise.resolve());
-
       // Load the initial profile data, as the client will do on startup.
       fakeStore.profile.read.returns(Promise.resolve({
         userid: 'acct:user_a@hypothes.is',
@@ -347,89 +241,42 @@ describe('sidebar.session', function () {
   });
 
   describe('#logout', function () {
-    context('when using cookie auth', () => {
-      var postExpectation;
-      beforeEach(function () {
-        var logoutUrl = 'https://test.hypothes.is/root/app?__formid__=logout';
-        postExpectation = $httpBackend.expectPOST(logoutUrl).respond(200, {
-          model: {
-            userid: 'logged-out-id',
-          },
-        });
+    beforeEach(() => {
+      var loggedIn = true;
+
+      fakeAuth.logout = sinon.spy(() => {
+        loggedIn = false;
+        return Promise.resolve();
       });
 
-      it('logs the user out on the service and updates the session', function () {
-        session.logout().then(function () {
-          assert.equal(session.state.userid, 'logged-out-id');
-        });
-        $httpBackend.flush();
-      });
-
-      it('clears the API access token cache', function () {
-        session.logout().then(function () {
-          assert.called(fakeAuth.clearCache);
-        });
-        $httpBackend.flush();
-      });
-
-      it('tracks successful logout actions in analytics', function () {
-        session.logout().then(function () {
-          assert.calledWith(fakeAnalytics.track, fakeAnalytics.events.LOGOUT_SUCCESS);
-        });
-        $httpBackend.flush();
-      });
-
-      it('tracks unsuccessful logout actions in analytics', function () {
-        postExpectation.respond(500);
-
-        session.logout().catch(function(){
-          assert.calledWith(fakeAnalytics.track, fakeAnalytics.events.LOGOUT_FAILURE);
-        });
-
-        $httpBackend.flush();
+      // Fake profile response after logout.
+      fakeStore.profile.read = () => Promise.resolve({
+        userid: null,
+        loggedIn,
       });
     });
 
-    context('when using OAuth', () => {
-      beforeEach(() => {
-        var loggedIn = true;
-
-        fakeAuth.login = sinon.stub().returns(Promise.resolve());
-        fakeAuth.logout = sinon.spy(() => {
-          loggedIn = false;
-          return Promise.resolve();
-        });
-
-        // Fake profile response after logout.
-        fakeStore.profile.read = () => Promise.resolve({
-          userid: null,
-          loggedIn,
-        });
+    it('logs the user out', () => {
+      return session.logout().then(() => {
+        assert.called(fakeAuth.logout);
       });
+    });
 
-      it('logs the user out', () => {
-        return session.logout().then(() => {
-          assert.called(fakeAuth.logout);
-        });
+    it('tracks successful logout actions in analytics', () => {
+      return session.logout().then(() => {
+        assert.calledWith(fakeAnalytics.track, fakeAnalytics.events.LOGOUT_SUCCESS);
       });
+    });
 
-      it('tracks successful logout actions in analytics', () => {
-        return session.logout().then(() => {
-          assert.calledWith(fakeAnalytics.track, fakeAnalytics.events.LOGOUT_SUCCESS);
-        });
-      });
-
-      it('updates the profile after logging out', () => {
-        return session.logout().then(() => {
-          assert.isFalse(session.state.loggedIn);
-        });
+    it('updates the profile after logging out', () => {
+      return session.logout().then(() => {
+        assert.isFalse(session.state.loggedIn);
       });
     });
   });
 
   context('when another client changes the current login', () => {
     it('reloads the profile', () => {
-      fakeAuth.login = sinon.stub().returns(Promise.resolve());
       fakeStore.profile.read.returns(Promise.resolve({
         userid: 'acct:initial_user@hypothes.is',
       }));
@@ -442,6 +289,7 @@ describe('sidebar.session', function () {
         }));
         $rootScope.$broadcast(events.OAUTH_TOKENS_CHANGED);
 
+        return session.load();
       }).then(() => {
         assert.equal(session.state.userid, 'acct:different_user@hypothes.is');
       });

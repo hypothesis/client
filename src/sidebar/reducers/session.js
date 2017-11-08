@@ -11,12 +11,6 @@ function init() {
      * groups they are a member of.
      */
     session: {
-      /**
-       * The CSRF token for requests to API endpoints that use cookie
-       * authentication.
-       */
-      csrf: null,
-
       /** A map of features that are enabled for the current user. */
       features: {},
       /** List of groups that the current user is a member of. */
