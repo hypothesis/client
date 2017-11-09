@@ -94,14 +94,6 @@ function auth($http, $rootScope, $window,
     return $http.post(url, data, requestConfig);
   }
 
-  function grantTokenFromHostPage() {
-    var cfg = serviceConfig(settings);
-    if (!cfg) {
-      return null;
-    }
-    return cfg.grantToken;
-  }
-
   /**
    * Return the storage key used for storing access/refresh token data for a given
    * annotation service.
@@ -223,17 +215,25 @@ function auth($http, $rootScope, $window,
    */
   function tokenGetter() {
     if (!tokenInfoPromise) {
-      var grantToken = grantTokenFromHostPage();
+      var cfg = serviceConfig(settings);
 
-      if (grantToken) {
-        // Exchange host-page provided grant token for a new access token.
-        tokenInfoPromise = exchangeJWT(grantToken).then((tokenInfo) => {
-          return tokenInfo;
-        }).catch(function(err) {
-          showAccessTokenExpiredErrorMessage(
-            'You must reload the page to annotate.');
-          throw err;
-        });
+      // Check if automatic login is being used, indicated by the presence of
+      // the 'grantToken' property in the service configuration.
+      if (cfg && typeof cfg.grantToken !== 'undefined') {
+        if (cfg.grantToken) {
+          // User is logged-in on the publisher's website.
+          // Exchange the grant token for a new access token.
+          tokenInfoPromise = exchangeJWT(cfg.grantToken).then((tokenInfo) => {
+            return tokenInfo;
+          }).catch(function(err) {
+            showAccessTokenExpiredErrorMessage(
+              'You must reload the page to annotate.');
+            throw err;
+          });
+        } else {
+          // User is anonymous on the publisher's website.
+          tokenInfoPromise = Promise.resolve(null);
+        }
       } else if (authCode) {
         // Exchange authorization code retrieved from login popup for a new
         // access token.

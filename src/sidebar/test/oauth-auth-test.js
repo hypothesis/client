@@ -181,12 +181,6 @@ describe('sidebar.oauth-auth', function () {
       });
     });
 
-    it('should not persist access tokens fetched using a grant token', function () {
-      return auth.tokenGetter().then(() => {
-        assert.notCalled(fakeLocalStorage.setObject);
-      });
-    });
-
     context('when the access token request fails', function() {
       beforeEach('make access token requests fail', function () {
         fakeHttp.post.returns(Promise.resolve({status: 500}));
@@ -349,6 +343,33 @@ describe('sidebar.oauth-auth', function () {
 
         return auth.tokenGetter(token => {
           assert.equal(token, null);
+        });
+      });
+    });
+
+    [{
+      // User is logged-in on the publisher's website.
+      authority: 'publisher.org',
+      grantToken: 'a.jwt.token',
+      expectedToken: 'firstAccessToken',
+    },{
+      // User is anonymous on the publisher's website.
+      authority: 'publisher.org',
+      grantToken: null,
+      expectedToken: null,
+    }].forEach(({ authority, grantToken, expectedToken }) => {
+      it('should not persist access tokens if a grant token was provided', () => {
+        fakeSettings.services = [{ authority, grantToken }];
+        return auth.tokenGetter().then(() => {
+          assert.notCalled(fakeLocalStorage.setObject);
+        });
+      });
+
+      it('should not read persisted access tokens if a grant token was set', () => {
+        fakeSettings.services = [{ authority, grantToken }];
+        return auth.tokenGetter().then(token => {
+          assert.equal(token, expectedToken);
+          assert.notCalled(fakeLocalStorage.getObject);
         });
       });
     });
