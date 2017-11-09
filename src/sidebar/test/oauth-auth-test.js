@@ -388,6 +388,20 @@ describe('sidebar.oauth-auth', function () {
       });
     });
 
+    function expireAndRefreshAccessToken() {
+      fakeLocalStorage.setObject.reset();
+      fakeHttp.post.returns(Promise.resolve({
+        status: 200,
+        data: {
+          access_token: 'secondToken',
+          expires_in: DEFAULT_TOKEN_EXPIRES_IN_SECS,
+          refresh_token: 'secondRefreshToken',
+        },
+      }));
+      expireAccessToken();
+      return auth.tokenGetter();
+    }
+
     it('persists refreshed tokens to storage', () => {
       fakeSettings.services = [];
 
@@ -396,17 +410,7 @@ describe('sidebar.oauth-auth', function () {
         return auth.tokenGetter();
       }).then(() => {
         // 2. Refresh access token.
-        fakeLocalStorage.setObject.reset();
-        fakeHttp.post.returns(Promise.resolve({
-          status: 200,
-          data: {
-            access_token: 'secondToken',
-            expires_in: DEFAULT_TOKEN_EXPIRES_IN_SECS,
-            refresh_token: 'secondRefreshToken',
-          },
-        }));
-        expireAccessToken();
-        return auth.tokenGetter();
+        return expireAndRefreshAccessToken();
       }).then(() => {
         // 3. Check that updated token was persisted to storage.
         assert.calledWith(fakeLocalStorage.setObject, TOKEN_KEY, {
@@ -417,9 +421,19 @@ describe('sidebar.oauth-auth', function () {
       });
     });
 
+    it('does not persist refreshed tokens if the original token was temporary', () => {
+      fakeSettings.services = [{ authority: 'publisher.org', grantToken: 'a.jwt.token' }];
+
+      return auth.tokenGetter().then(() => {
+        return expireAndRefreshAccessToken();
+      }).then(() => {
+        // Check that updated token was not persisted to storage.
+        assert.notCalled(fakeLocalStorage.setObject);
+      });
+    });
+
     it('fetches and returns tokens from storage', () => {
       fakeSettings.services = [];
-
       fakeLocalStorage.getObject.withArgs(TOKEN_KEY).returns({
         accessToken: 'foo',
         refreshToken: 'bar',

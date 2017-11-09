@@ -264,9 +264,18 @@ function auth($http, $rootScope, $window,
       }
 
       if (Date.now() > token.expiresAt) {
+        var shouldPersist = true;
+
+        // If we are using automatic login via a grant token, do not persist the
+        // initial access token or refreshed tokens.
+        var cfg = serviceConfig(settings);
+        if (cfg && typeof cfg.grantToken !== 'undefined') {
+          shouldPersist = false;
+        }
+
         // Token expired. Attempt to refresh.
         tokenInfoPromise = refreshAccessToken(token.refreshToken, {
-          persist: true,
+          persist: shouldPersist,
         }).catch(() => {
           // If refreshing the token fails, the user is simply logged out.
           return null;
