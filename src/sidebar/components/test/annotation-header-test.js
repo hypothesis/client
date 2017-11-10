@@ -14,7 +14,7 @@ var fakeDocumentMeta = {
 describe('sidebar.components.annotation-header', function () {
   var $componentController;
   var fakeGroups;
-  var fakeSettings;
+  var fakeSettings = { usernameUrl: 'http://www.example.org/' };
   var fakeServiceUrl;
 
   before(function () {
@@ -91,6 +91,32 @@ describe('sidebar.components.annotation-header', function () {
           annotation: ann,
         });
         assert.deepEqual(ctrl.displayName(), 'Bill Jones');
+      });
+    });
+
+    describe('#thirdPartyUsernameLink', () => {
+      it('returns the custom username link if set', () => {
+        var ann;
+        var ctrl;
+
+        fakeSettings.usernameUrl = 'http://www.example.org/';
+        ann = fixtures.defaultAnnotation();
+        ctrl = $componentController('annotationHeader', {}, {
+          annotation: ann,
+        });
+        assert.deepEqual(ctrl.thirdPartyUsernameLink(), 'http://www.example.org/bill');
+      });
+
+      it('returns null if no custom username link is set in the settings object', () => {
+        var ann;
+        var ctrl;
+
+        fakeSettings.usernameUrl = null;
+        ann = fixtures.defaultAnnotation();
+        ctrl = $componentController('annotationHeader', {}, {
+          annotation: ann,
+        });
+        assert.deepEqual(ctrl.thirdPartyUsernameLink(), null);
       });
     });
   });

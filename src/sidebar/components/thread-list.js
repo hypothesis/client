@@ -49,7 +49,7 @@ var virtualThreadOptions = {
 };
 
 // @ngInject
-function ThreadListController($element, $scope, VirtualThreadList) {
+function ThreadListController($element, $scope, settings, VirtualThreadList) {
   // `visibleThreads` keeps track of the subset of all threads matching the
   // current filters which are in or near the viewport and the view then renders
   // only those threads, using placeholders above and below the visible threads
@@ -64,6 +64,8 @@ function ThreadListController($element, $scope, VirtualThreadList) {
   // specific class. A more generic mechanism was removed due to issues in
   // Firefox. See https://github.com/hypothesis/client/issues/341
   this.scrollRoot = document.querySelector('.js-thread-list-scroll-root');
+
+  this.isThemeClean = settings.theme === 'clean';
 
   var options = Object.assign({
     scrollRoot: this.scrollRoot,

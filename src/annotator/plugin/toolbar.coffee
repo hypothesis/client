@@ -28,6 +28,16 @@ module.exports = class Toolbar extends Plugin
       $(@element).append @toolbar
 
     items = [
+      "title": "Close Sidebar"
+      "class": "annotator-frame-button--sidebar_close h-icon-close"
+      "name": "sidebar-close"
+      "on":
+        "click": (event) =>
+          event.preventDefault()
+          event.stopPropagation()
+          @annotator.hide()
+          @toolbar.find('[name=sidebar-close]').hide();
+    ,
       "title": "Toggle or Resize Sidebar"
       "class": "annotator-frame-button--sidebar_toggle h-icon-chevron-left"
       "name": "sidebar-toggle"
@@ -83,3 +93,34 @@ module.exports = class Toolbar extends Plugin
       .removeClass('h-icon-visibility')
       .addClass('h-icon-visibility-off')
       .prop('title', 'Show Highlights');
+
+  disableMinimizeBtn: () ->
+    $('[name=sidebar-toggle]').remove();
+
+  disableHighlightsBtn: () ->
+    $('[name=highlight-visibility]').remove();
+
+  disableNewNoteBtn: () ->
+    $('[name=insert-comment]').remove();
+
+  disableCloseBtn: () ->
+    $('[name=sidebar-close]').remove();
+
+  getWidth: () ->
+    return parseInt(window.getComputedStyle(this.toolbar[0]).width)
+
+  hideCloseBtn: () ->
+    $('[name=sidebar-close]').hide();
+
+  showCloseBtn: () ->
+    $('[name=sidebar-close]').show();
+
+  showCollapseSidebarBtn: () ->
+    $('[name=sidebar-toggle]')
+    .removeClass('h-icon-chevron-left')
+    .addClass('h-icon-chevron-right')
+
+  showExpandSidebarBtn: () ->
+    $('[name=sidebar-toggle]')
+    .removeClass('h-icon-chevron-right')
+    .addClass('h-icon-chevron-left')

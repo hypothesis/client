@@ -24,6 +24,12 @@ function AnnotationHeaderController(groups, settings, serviceUrl) {
     return persona.isThirdPartyUser(self.annotation.user, settings.authDomain);
   };
 
+  this.thirdPartyUsernameLink = function () {
+    return settings.usernameUrl ?
+      settings.usernameUrl + persona.username(this.annotation.user):
+      null;
+  };
+
   this.serviceUrl = serviceUrl;
 
   this.group = function () {

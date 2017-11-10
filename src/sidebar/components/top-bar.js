@@ -2,6 +2,14 @@
 
 module.exports = {
   controllerAs: 'vm',
+  //@ngInject
+  controller: function (settings) {
+    if (settings.theme && settings.theme === 'clean') {
+      this.isThemeClean = true;
+    } else {
+      this.isThemeClean = false;
+    }
+  },
   bindings: {
     auth: '<',
     isSidebar: '<',

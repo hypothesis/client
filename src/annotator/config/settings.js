@@ -152,6 +152,10 @@ function settingsFrom(window_) {
       return jsonConfigs[name];
     }
 
+    if (typeof options.defaultValue !== 'undefined') {
+      return options.defaultValue;
+    }
+
     return null;
   }
 
