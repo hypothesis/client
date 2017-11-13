@@ -16,12 +16,15 @@
   margin-left: 15px;
 }
 
+.selection-tabs__types {
+  flex: 1;
+  margin-bottom: 3px;
+}
+
 .selection-tabs__type {
   color: $grey-6;
-  margin-right: 20px;
+  margin-right: 13px;
   cursor: pointer;
-  min-width: 85px;
-  min-height: 18px;
 
   // Disable focus ring for selected tab
   outline: none;
@@ -42,8 +45,4 @@
 .selection-tabs__empty-message {
   position: relative;
   top: 10px;
-}
-
-.selection-tabs__type--orphan {
-  margin-left: -5px;
 }

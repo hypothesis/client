@@ -1,41 +1,42 @@
 <!-- Tabbed display of annotations and notes. -->
 <div class="selection-tabs"
   ng-class="{'selection-tabs--theme-clean' : vm.isThemeClean }">
-  <a class="selection-tabs__type"
-     href="#"
-     ng-class="{'is-selected': vm.selectedTab === vm.TAB_ANNOTATIONS}"
-     h-on-touch="vm.selectTab(vm.TAB_ANNOTATIONS)">
-    Annotations
-    <span class="selection-tabs__count"
-      ng-if="vm.totalAnnotations > 0 && !vm.isWaitingToAnchorAnnotations">
-      {{ vm.totalAnnotations }}
-    </span>
-  </a>
-  <a class="selection-tabs__type"
-     href="#"
-     ng-class="{'is-selected': vm.selectedTab === vm.TAB_NOTES}"
-     h-on-touch="vm.selectTab(vm.TAB_NOTES)">
-    Page Notes
-    <span class="selection-tabs__count"
-      ng-if="vm.totalNotes > 0 && !vm.isWaitingToAnchorAnnotations">
-      {{ vm.totalNotes }}
-    </span>
-  </a>
-  <a class="selection-tabs__type selection-tabs__type--orphan"
-    ng-if="vm.orphansTabFlagEnabled() && vm.totalOrphans > 0"
-    href="#"
-    ng-class="{'is-selected': vm.selectedTab === vm.TAB_ORPHANS}"
-    h-on-touch="vm.selectTab(vm.TAB_ORPHANS)">
-    Orphans
-    <span class="selection-tabs__count"
-      ng-if="vm.totalOrphans > 0 && !vm.isWaitingToAnchorAnnotations">
-      {{ vm.totalOrphans }}
-    </span>
-  </a>
+  <div class="selection-tabs__types">
+    <a class="selection-tabs__type"
+       href="#"
+       ng-class="{'is-selected': vm.selectedTab === vm.TAB_ANNOTATIONS}"
+       h-on-touch="vm.selectTab(vm.TAB_ANNOTATIONS)">
+      Annotations
+      <span class="selection-tabs__count"
+        ng-if="vm.totalAnnotations > 0 && !vm.isWaitingToAnchorAnnotations">
+        {{ vm.totalAnnotations }}
+      </span>
+    </a>
+    <a class="selection-tabs__type"
+       href="#"
+       ng-class="{'is-selected': vm.selectedTab === vm.TAB_NOTES}"
+       h-on-touch="vm.selectTab(vm.TAB_NOTES)">
+      Notes
+      <span class="selection-tabs__count"
+        ng-if="vm.totalNotes > 0 && !vm.isWaitingToAnchorAnnotations">
+        {{ vm.totalNotes }}
+      </span>
+    </a>
+    <a class="selection-tabs__type"
+      href="#"
+      ng-class="{'is-selected': vm.selectedTab === vm.TAB_ORPHANS}"
+      h-on-touch="vm.selectTab(vm.TAB_ORPHANS)">
+      Orphans
+      <span class="selection-tabs__count"
+        ng-if="vm.totalOrphans > 0 && !vm.isWaitingToAnchorAnnotations">
+        {{ vm.totalOrphans }}
+      </span>
+    </a>
+  </div>
+  <new-note-btn
+    ng-if="vm.selectedTab === vm.TAB_NOTES">
+  </new-note-btn>
 </div>
-<new-note-btn
-  ng-if="vm.selectedTab === vm.TAB_NOTES">
-</new-note-btn>
 <div ng-if="!vm.isLoading()" class="selection-tabs__empty-message">
   <div ng-if="vm.showNotesUnavailableMessage()"  class="annotation-unavailable-message">
     <p class="annotation-unavailable-message__label">
