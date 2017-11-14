@@ -4,6 +4,14 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+### Changed
+
+- Implement new customisation options for the sidebar’s display.
+  ([#555](https://github.com/hypothesis/client/pull/555)).
+  ([#573](https://github.com/hypothesis/client/pull/573)).
+
 ## [1.50.0] - 2017-11-08
 
 ### Changed
