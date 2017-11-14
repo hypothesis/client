@@ -74,23 +74,33 @@ describe('sidebar.components.annotation-header', function () {
     });
 
     describe('#displayName', () => {
-      it('returns the username if no display name is set', () => {
-        var ann = fixtures.defaultAnnotation();
-        var ctrl = $componentController('annotationHeader', {}, {
-          annotation: ann,
-        });
-        assert.deepEqual(ctrl.displayName(), 'bill');
-      });
+      [
+        {
+          context: 'when the api_render_user_info feature flag is turned off in h',
+          it: 'returns the username',
+          user_info: undefined,
+          expectedResult: 'bill',
+        },
+        {
+          context: 'when the api_render_user_info feature flag is on and ' +
+                   "the user has a display_name",
+          it: 'returns the display_name',
+          user_info: { display_name: 'Bill Jones' },
+          expectedResult: 'Bill Jones',
+        },
+      ].forEach(function(test) {
+        context(test.context, function() {
+          it(test.it, function() {
+            var ann = fixtures.defaultAnnotation();
+            ann.user_info = test.user_info;
 
-      it('returns the display name if set', () => {
-        var ann = fixtures.defaultAnnotation();
-        ann.user_info = {
-          display_name: 'Bill Jones',
-        };
-        var ctrl = $componentController('annotationHeader', {}, {
-          annotation: ann,
+            var ctrl = $componentController('annotationHeader', {}, {
+              annotation: ann,
+            });
+
+            assert.equal(ctrl.displayName(), test.expectedResult);
+          });
         });
-        assert.deepEqual(ctrl.displayName(), 'Bill Jones');
       });
     });
 
