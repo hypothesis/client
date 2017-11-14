@@ -12,6 +12,8 @@ module.exports = {
 
     this.isThemeClean = settings.theme === 'clean';
 
+    this.enableExperimentalNewNoteButton = settings.enableExperimentalNewNoteButton;
+
     this.selectTab = function (type) {
       annotationUI.clearSelectedAnnotations();
       annotationUI.selectTab(type);

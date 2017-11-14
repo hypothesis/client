@@ -31,6 +31,10 @@ function hostPageConfig(window) {
     'services',
     'branding',
 
+    // New note button override.
+    // This should be removed once new note button is enabled for everybody.
+    'enableExperimentalNewNoteButton',
+
     // OAuth feature flag override.
     // This should be removed once OAuth is enabled for first party accounts.
     'oauthEnabled',
