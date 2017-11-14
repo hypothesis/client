@@ -23,6 +23,7 @@ function configFrom(window_) {
     disableToolbarHighlightsBtn: settings.hostPageSetting('disableToolbarHighlightsBtn'),
     disableToolbarNewNoteBtn: settings.hostPageSetting('disableToolbarNewNoteBtn'),
     disableBucketBar: settings.hostPageSetting('disableBucketBar'),
+    enableExperimentalNewNoteButton: settings.hostPageSetting('enableExperimentalNewNoteButton'),
     enableSidebarDropShadow: settings.hostPageSetting('enableSidebarDropShadow'),
     theme: settings.hostPageSetting('theme'),
     usernameUrl: settings.hostPageSetting('usernameUrl'),

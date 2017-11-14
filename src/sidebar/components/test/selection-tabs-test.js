@@ -15,7 +15,9 @@ describe('selectionTabs', function () {
     var fakeFeatures = {
       flagEnabled: sinon.stub().returns(true),
     };
-    var fakeSettings = {};
+    var fakeSettings = {
+      enableExperimentalNewNoteButton: true,
+    };
 
     angular.mock.module('app', {
       annotationUI: fakeAnnotationUI,

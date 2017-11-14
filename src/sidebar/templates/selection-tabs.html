@@ -34,7 +34,7 @@
   </a>
 </div>
 <new-note-btn
-  ng-if="vm.selectedTab === vm.TAB_NOTES">
+  ng-if="vm.selectedTab === vm.TAB_NOTES && vm.enableExperimentalNewNoteButton">
 </new-note-btn>
 <div ng-if="!vm.isLoading()" class="selection-tabs__empty-message">
   <div ng-if="vm.showNotesUnavailableMessage()"  class="annotation-unavailable-message">
