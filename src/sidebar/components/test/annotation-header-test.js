@@ -82,6 +82,13 @@ describe('sidebar.components.annotation-header', function () {
           expectedResult: 'bill',
         },
         {
+          context: 'when the api_render_user_info feature flag is on but ' +
+                   "the user doesn't have a display_name in h",
+          it: 'returns the username',
+          user_info: { display_name: null },
+          expectedResult: 'bill',
+        },
+        {
           context: 'when the api_render_user_info feature flag is on and ' +
                    "the user has a display_name",
           it: 'returns the display_name',
