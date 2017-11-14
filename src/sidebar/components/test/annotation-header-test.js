@@ -13,6 +13,7 @@ var fakeDocumentMeta = {
 
 describe('sidebar.components.annotation-header', function () {
   var $componentController;
+  var fakeFeatures;
   var fakeGroups;
   var fakeSettings = { usernameUrl: 'http://www.example.org/' };
   var fakeServiceUrl;
@@ -31,7 +32,12 @@ describe('sidebar.components.annotation-header', function () {
   });
 
   beforeEach(function () {
+    fakeFeatures = {
+      flagEnabled: sinon.stub().returns(false),
+    };
+
     angular.mock.module('app', {
+      features: fakeFeatures,
       groups: fakeGroups,
       settings: fakeSettings,
       serviceUrl: fakeServiceUrl,
@@ -79,25 +85,55 @@ describe('sidebar.components.annotation-header', function () {
           context: 'when the api_render_user_info feature flag is turned off in h',
           it: 'returns the username',
           user_info: undefined,
+          client_display_names: false,
           expectedResult: 'bill',
         },
         {
-          context: 'when the api_render_user_info feature flag is on but ' +
-                   "the user doesn't have a display_name in h",
+          context: 'when the api_render_user_info feature flag is turned off in h',
+          it: 'returns the username even if the client_display_names feature flag is on',
+          user_info: undefined,
+          client_display_names: true,
+          expectedResult: 'bill',
+        },
+        {
+          context: 'when the client_display_names feature flag is off in h',
           it: 'returns the username',
           user_info: { display_name: null },
+          client_display_names: false,
           expectedResult: 'bill',
         },
         {
-          context: 'when the api_render_user_info feature flag is on and ' +
-                   "the user has a display_name",
-          it: 'returns the display_name',
+          context: 'when the client_display_names feature flag is off in h',
+          it: 'returns the username even if the user has a display name',
           user_info: { display_name: 'Bill Jones' },
+          client_display_names: false,
+          expectedResult: 'bill',
+        },
+        {
+          context: 'when both feature flags api_render_user_info and ' +
+                   'client_display_names are on',
+          it: 'returns the username, if the user has no display_name',
+          user_info: { display_name: null },
+          client_display_names: true,
+          expectedResult: 'bill',
+        },
+        {
+          context: 'when both feature flags api_render_user_info and ' +
+                   'client_display_names are on',
+          it: 'returns the display_name, if the user has one',
+          user_info: { display_name: 'Bill Jones' },
+          client_display_names: true,
           expectedResult: 'Bill Jones',
         },
-      ].forEach(function(test) {
-        context(test.context, function() {
-          it(test.it, function() {
+      ].forEach((test) => {
+        context(test.context, () => {
+          it(test.it, () => {
+            fakeFeatures.flagEnabled = (flag) => {
+              if (flag === 'client_display_names') {
+                return test.client_display_names;
+              }
+              return false;
+            };
             var ann = fixtures.defaultAnnotation();
             ann.user_info = test.user_info;
 
