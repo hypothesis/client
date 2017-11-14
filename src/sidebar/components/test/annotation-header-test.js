@@ -42,7 +42,7 @@ describe('sidebar.components.annotation-header', function () {
     });
   });
 
-  describe('controller', function () {
+  describe('sidebar.components.AnnotationHeaderController', function () {
     describe('#htmlLink()', function () {
       it('returns the HTML link when available', function () {
         var ann = fixtures.defaultAnnotation();
