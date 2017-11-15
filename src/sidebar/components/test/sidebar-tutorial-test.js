@@ -5,6 +5,8 @@ var Controller = require('../sidebar-tutorial').controller;
 describe('SidebarTutorialController', function () {
 
   describe('showSidebarTutorial', function () {
+    var settings = { enableCleanOnboardingTheme: true };
+
     it('returns true if show_sidebar_tutorial is true', function () {
       var session = {
         state: {
@@ -13,7 +15,7 @@ describe('SidebarTutorialController', function () {
           },
         },
       };
-      var controller = new Controller(session);
+      var controller = new Controller(session, settings);
 
       var result = controller.showSidebarTutorial();
 
@@ -28,7 +30,7 @@ describe('SidebarTutorialController', function () {
           },
         },
       };
-      var controller = new Controller(session);
+      var controller = new Controller(session, settings);
 
       var result = controller.showSidebarTutorial();
 
@@ -37,7 +39,7 @@ describe('SidebarTutorialController', function () {
 
     it('returns false if show_sidebar_tutorial is missing', function () {
       var session = {state: {preferences: {}}};
-      var controller = new Controller(session);
+      var controller = new Controller(session, settings);
 
       var result = controller.showSidebarTutorial();
 
@@ -46,7 +48,7 @@ describe('SidebarTutorialController', function () {
 
     it('returns false if session.state is {}', function () {
       var session = {state: {}};
-      var controller = new Controller(session);
+      var controller = new Controller(session, settings);
 
       var result = controller.showSidebarTutorial();
 

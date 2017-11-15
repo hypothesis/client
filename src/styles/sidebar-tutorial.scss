@@ -4,6 +4,16 @@
   font-weight: $title-font-weight;
 }
 
+.sidebar-tutorial__header-annotate {
+  position: relative;
+  top: 2px;
+}
+
+.sidebar-tutorial__header--is-theme-clean {
+  color: $gray-dark;
+  font-size: 16px;
+}
+
 /* We want an ordered list in which the numbers are aligned with the text
    above (not indented or dedented), and wrapped lines in list items are
    aligned with the first character of the list item (not the number, i.e
@@ -44,10 +54,56 @@
   color: $gray-light;
 }
 
+.sidebar-tutorial__list-item--is-theme-clean {
+  font-size: 14px;
+}
+
+.sidebar-tutorial__list-item--is-theme-clean::before {
+  color: $gray-dark;
+}
+
 .sidebar-tutorial__list-item-content {
   margin-top: 1em; /* Put vertical space in-between list items, equal to the
                       space between normal paragraphs.
                       Note: This also puts the same amount of space above the
                       first list item (i.e. between the list and whatever's
                       above it). */
+}
+
+.sidebar-tutorial__list-item-annotate {
+  background-color: $highlight-color-focus;
+  padding: 0px 3px;
+}
+
+.sidebar-tutorial__list-item-new-note-btn {
+  background-color: #626262;
+  border: none;
+  border-radius: 3px;
+  color: #fff;
+  font-weight: 500;
+  text-align: center;
+  margin-left: 2px;
+}
+
+.sidebar-tutorial__list-item-drop-down {
+  margin-left: -5px;
+}
+
+.sidebar-tutorial__list-item-cursor {
+  position: relative;
+  top: 3px;
+  margin-left: -10px;
+}
+
+.sidebar-tutorial__list-item-cursor svg {
+  width: 12px;
+  height: 17px;
+}
+
+.sidebar-tutorial__list-item-content {
+  margin-top: 16px;
+}
+
+.sidebar-tutorial__list-item-profile {
+  margin-left: 4px;
 }
