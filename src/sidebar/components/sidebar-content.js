@@ -48,8 +48,7 @@ function SidebarContentController(
     self.rootThread = thread();
     self.selectedTab = state.selectedTab;
 
-    var separateOrphans = tabs.shouldSeparateOrphans(state);
-    var counts = tabs.counts(state.annotations, separateOrphans);
+    var counts = tabs.counts(state.annotations);
 
     Object.assign(self, {
       totalNotes: counts.notes,
@@ -227,8 +226,7 @@ function SidebarContentController(
     focusAnnotation(selectedAnnot);
     scrollToAnnotation(selectedAnnot);
 
-    var separateOrphans = tabs.shouldSeparateOrphans(annotationUI.getState());
-    annotationUI.selectTab(tabs.tabForAnnotation(selectedAnnot, separateOrphans));
+    annotationUI.selectTab(tabs.tabForAnnotation(selectedAnnot));
   });
 
   // Re-fetch annotations when focused group, logged-in user or connected frames

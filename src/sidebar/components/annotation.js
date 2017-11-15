@@ -447,14 +447,7 @@ function AnnotationController(
     return serviceUrl('search.tag', {tag: tag});
   };
 
-  // Note: We fetch the feature flag outside the `isOrphan` method to avoid a
-  // lookup on every $digest cycle
-  var indicateOrphans = features.flagEnabled('orphans_tab');
-
   this.isOrphan = function() {
-    if (!indicateOrphans) {
-      return false;
-    }
     if (typeof self.annotation.$orphan === 'undefined') {
       return self.annotation.$anchorTimeout;
     }

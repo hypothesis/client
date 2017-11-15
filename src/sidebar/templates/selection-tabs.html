@@ -22,7 +22,7 @@
     </span>
   </a>
   <a class="selection-tabs__type selection-tabs__type--orphan"
-    ng-if="vm.orphansTabFlagEnabled() && vm.totalOrphans > 0"
+    ng-if="vm.totalOrphans > 0"
     href="#"
     ng-class="{'is-selected': vm.selectedTab === vm.TAB_ORPHANS}"
     h-on-touch="vm.selectTab(vm.TAB_ORPHANS)">

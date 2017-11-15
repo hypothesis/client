@@ -46,7 +46,7 @@ describe('rootThread', function () {
         isSidebar: true,
         selectedAnnotationMap: null,
         session: {
-          features: {'orphans_tab': true},
+          features: {},
         },
         sortKey: 'Location',
         sortKeysAvailable: ['Location'],
