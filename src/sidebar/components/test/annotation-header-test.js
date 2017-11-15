@@ -15,8 +15,15 @@ describe('sidebar.components.annotation-header', function () {
   var $componentController;
   var fakeFeatures;
   var fakeGroups;
+  var fakePersona;
   var fakeSettings = { usernameUrl: 'http://www.example.org/' };
   var fakeServiceUrl;
+
+  beforeEach('Initialize fakePersona', () => {
+    fakePersona = {
+      username: sinon.stub().returns('TEST_USERNAME'),
+    };
+  });
 
   beforeEach('Import and register the annotationHeader component', function () {
     var annotationHeader = proxyquire('../annotation-header', {
@@ -25,9 +32,7 @@ describe('sidebar.components.annotation-header', function () {
           return fakeDocumentMeta;
         },
       },
-      '../filter/persona': {
-        username: sinon.stub().returns('TEST_USERNAME'),
-      },
+      '../filter/persona': fakePersona,
       '@noCallThru': true,
     });
 
