@@ -21,6 +21,7 @@ describe('sidebar.components.annotation-header', function () {
 
   beforeEach('Initialize fakePersona', () => {
     fakePersona = {
+      isThirdPartyUser: sinon.stub().returns(false),
       username: sinon.stub().returns('TEST_USERNAME'),
     };
   });
@@ -95,6 +96,7 @@ describe('sidebar.components.annotation-header', function () {
           it: 'returns the username',
           user_info: undefined,
           client_display_names: false,
+          isThirdPartyUser: false,
           expectedResult: 'TEST_USERNAME',
         },
         {
@@ -102,6 +104,7 @@ describe('sidebar.components.annotation-header', function () {
           it: 'returns the username even if the client_display_names feature flag is on',
           user_info: undefined,
           client_display_names: true,
+          isThirdPartyUser: false,
           expectedResult: 'TEST_USERNAME',
         },
         {
@@ -109,6 +112,7 @@ describe('sidebar.components.annotation-header', function () {
           it: 'returns the username',
           user_info: { display_name: null },
           client_display_names: false,
+          isThirdPartyUser: false,
           expectedResult: 'TEST_USERNAME',
         },
         {
@@ -116,6 +120,7 @@ describe('sidebar.components.annotation-header', function () {
           it: 'returns the username even if the user has a display name',
           user_info: { display_name: 'Bill Jones' },
           client_display_names: false,
+          isThirdPartyUser: false,
           expectedResult: 'TEST_USERNAME',
         },
         {
@@ -124,6 +129,7 @@ describe('sidebar.components.annotation-header', function () {
           it: 'returns the username, if the user has no display_name',
           user_info: { display_name: null },
           client_display_names: true,
+          isThirdPartyUser: false,
           expectedResult: 'TEST_USERNAME',
         },
         {
@@ -132,6 +138,7 @@ describe('sidebar.components.annotation-header', function () {
           it: 'returns the display_name, if the user has one',
           user_info: { display_name: 'Bill Jones' },
           client_display_names: true,
+          isThirdPartyUser: false,
           expectedResult: 'Bill Jones',
         },
       ].forEach((test) => {
@@ -145,6 +152,11 @@ describe('sidebar.components.annotation-header', function () {
               }
               return false;
             };
+
+            // Make persona.isThirdPartyUser() return true or false,
+            // depending on the test case.
+            fakePersona.isThirdPartyUser.returns(test.isThirdPartyUser);
+
             var ann = fixtures.defaultAnnotation();
             ann.user_info = test.user_info;
 
