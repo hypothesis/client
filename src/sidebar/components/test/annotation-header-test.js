@@ -137,6 +137,8 @@ describe('sidebar.components.annotation-header', function () {
       ].forEach((test) => {
         context(test.context, () => {
           it(test.it, () => {
+            // Make features.flagEnabled('client_display_names') return true
+            // or false, depending on the test case.
             fakeFeatures.flagEnabled = (flag) => {
               if (flag === 'client_display_names') {
                 return test.client_display_names;
