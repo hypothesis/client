@@ -13,25 +13,41 @@ var fakeDocumentMeta = {
 
 describe('sidebar.components.annotation-header', function () {
   var $componentController;
+  var fakeFeatures;
   var fakeGroups;
+  var fakePersona;
   var fakeSettings = { usernameUrl: 'http://www.example.org/' };
   var fakeServiceUrl;
 
-  before(function () {
+  beforeEach('Initialize fakePersona', () => {
+    fakePersona = {
+      isThirdPartyUser: sinon.stub().returns(false),
+      username: sinon.stub().returns('TEST_USERNAME'),
+    };
+  });
+
+  beforeEach('Import and register the annotationHeader component', function () {
     var annotationHeader = proxyquire('../annotation-header', {
       '../annotation-metadata': {
         domainAndTitle: function (ann) { // eslint-disable-line no-unused-vars
           return fakeDocumentMeta;
         },
       },
+      '../filter/persona': fakePersona,
+      '@noCallThru': true,
     });
 
     angular.module('app', [])
       .component('annotationHeader', annotationHeader);
   });
 
-  beforeEach(function () {
+  beforeEach('Initialize and register fake AngularJS dependencies', function () {
+    fakeFeatures = {
+      flagEnabled: sinon.stub().returns(false),
+    };
+
     angular.mock.module('app', {
+      features: fakeFeatures,
       groups: fakeGroups,
       settings: fakeSettings,
       serviceUrl: fakeServiceUrl,
@@ -42,7 +58,7 @@ describe('sidebar.components.annotation-header', function () {
     });
   });
 
-  describe('controller', function () {
+  describe('sidebar.components.AnnotationHeaderController', function () {
     describe('#htmlLink()', function () {
       it('returns the HTML link when available', function () {
         var ann = fixtures.defaultAnnotation();
@@ -74,23 +90,119 @@ describe('sidebar.components.annotation-header', function () {
     });
 
     describe('#displayName', () => {
-      it('returns the username if no display name is set', () => {
-        var ann = fixtures.defaultAnnotation();
-        var ctrl = $componentController('annotationHeader', {}, {
-          annotation: ann,
-        });
-        assert.deepEqual(ctrl.displayName(), 'bill');
-      });
+      [
+        {
+          context: 'when the api_render_user_info feature flag is turned off in h',
+          it: 'returns the username',
+          user_info: undefined,
+          client_display_names: false,
+          isThirdPartyUser: false,
+          expectedResult: 'TEST_USERNAME',
+        },
+        {
+          context: 'when the api_render_user_info feature flag is turned off in h',
+          it: 'returns the username even if the client_display_names feature flag is on',
+          user_info: undefined,
+          client_display_names: true,
+          isThirdPartyUser: false,
+          expectedResult: 'TEST_USERNAME',
+        },
+        {
+          context: 'when the client_display_names feature flag is off in h',
+          it: 'returns the username',
+          user_info: { display_name: null },
+          client_display_names: false,
+          isThirdPartyUser: false,
+          expectedResult: 'TEST_USERNAME',
+        },
+        {
+          context: 'when the client_display_names feature flag is off in h',
+          it: 'returns the username even if the user has a display name',
+          user_info: { display_name: 'Bill Jones' },
+          client_display_names: false,
+          isThirdPartyUser: false,
+          expectedResult: 'TEST_USERNAME',
+        },
+        {
+          context: 'when both feature flags api_render_user_info and ' +
+                   'client_display_names are on',
+          it: 'returns the username, if the user has no display_name',
+          user_info: { display_name: null },
+          client_display_names: true,
+          isThirdPartyUser: false,
+          expectedResult: 'TEST_USERNAME',
+        },
+        {
+          context: 'when both feature flags api_render_user_info and ' +
+                   'client_display_names are on',
+          it: 'returns the display_name, if the user has one',
+          user_info: { display_name: 'Bill Jones' },
+          client_display_names: true,
+          isThirdPartyUser: false,
+          expectedResult: 'Bill Jones',
+        },
+        {
+          context: 'when the client_display_names feature flag is off but ' +
+                   'the user is a third-party user',
+          it: 'returns display_name even though client_display_names is off',
+          user_info: { display_name: 'Bill Jones' },
+          client_display_names: false,
+          isThirdPartyUser: true,
+          expectedResult: 'Bill Jones',
+        },
+        {
+          context: 'when client_display_names is on and the user is a ' +
+                   'third-party user',
+          it: 'returns the display_name',
+          user_info: { display_name: 'Bill Jones' },
+          client_display_names: true,
+          isThirdPartyUser: true,
+          expectedResult: 'Bill Jones',
+        },
+        {
+          context: 'when the user is a third-party user but the ' +
+                   'api_render_user_info feature flag is turned off in h',
+          it: 'returns the username',
+          user_info: undefined,
+          client_display_names: true,
+          isThirdPartyUser: true,
+          expectedResult: 'TEST_USERNAME',
+        },
+        {
+          context: "when the user is a third-party user but doesn't have a " +
+                   'display_name',
+          it: 'returns the username',
+          user_info: { display_name: null},
+          client_display_names: true,
+          isThirdPartyUser: true,
+          expectedResult: 'TEST_USERNAME',
+        },
+      ].forEach((test) => {
+        context(test.context, () => {
+          it(test.it, () => {
+            // Make features.flagEnabled('client_display_names') return true
+            // or false, depending on the test case.
+            fakeFeatures.flagEnabled = (flag) => {
+              if (flag === 'client_display_names') {
+                return test.client_display_names;
+              }
+              return false;
+            };
 
-      it('returns the display name if set', () => {
-        var ann = fixtures.defaultAnnotation();
-        ann.user_info = {
-          display_name: 'Bill Jones',
-        };
-        var ctrl = $componentController('annotationHeader', {}, {
-          annotation: ann,
+            // Make persona.isThirdPartyUser() return true or false,
+            // depending on the test case.
+            fakePersona.isThirdPartyUser.returns(test.isThirdPartyUser);
+
+            var ann = fixtures.defaultAnnotation();
+            ann.user_info = test.user_info;
+
+            var ctrl = $componentController('annotationHeader', {}, {
+              annotation: ann,
+            });
+
+            assert.equal(ctrl.displayName(), test.expectedResult);
+          });
         });
-        assert.deepEqual(ctrl.displayName(), 'Bill Jones');
       });
     });
 
@@ -104,7 +216,7 @@ describe('sidebar.components.annotation-header', function () {
         ctrl = $componentController('annotationHeader', {}, {
           annotation: ann,
         });
-        assert.deepEqual(ctrl.thirdPartyUsernameLink(), 'http://www.example.org/bill');
+        assert.deepEqual(ctrl.thirdPartyUsernameLink(), 'http://www.example.org/TEST_USERNAME');
       });
 
       it('returns null if no custom username link is set in the settings object', () => {
