@@ -14,7 +14,8 @@ function AnnotationHeaderController(features, groups, settings, serviceUrl) {
 
   this.displayName = () => {
     var userInfo = this.annotation.user_info;
-    if (features.flagEnabled('client_display_names')) {
+    var isThirdPartyUser = persona.isThirdPartyUser(this.annotation.user, settings.authDomain);
+    if (features.flagEnabled('client_display_names') || isThirdPartyUser) {
       // userInfo is undefined if the api_render_user_info feature flag is off.
       if (userInfo) {
         // display_name is null if the user doesn't have a display name.

@@ -141,6 +141,42 @@ describe('sidebar.components.annotation-header', function () {
           isThirdPartyUser: false,
           expectedResult: 'Bill Jones',
         },
+        {
+          context: 'when the client_display_names feature flag is off but ' +
+                   'the user is a third-party user',
+          it: 'returns display_name even though client_display_names is off',
+          user_info: { display_name: 'Bill Jones' },
+          client_display_names: false,
+          isThirdPartyUser: true,
+          expectedResult: 'Bill Jones',
+        },
+        {
+          context: 'when client_display_names is on and the user is a ' +
+                   'third-party user',
+          it: 'returns the display_name',
+          user_info: { display_name: 'Bill Jones' },
+          client_display_names: true,
+          isThirdPartyUser: true,
+          expectedResult: 'Bill Jones',
+        },
+        {
+          context: 'when the user is a third-party user but the ' +
+                   'api_render_user_info feature flag is turned off in h',
+          it: 'returns the username',
+          user_info: undefined,
+          client_display_names: true,
+          isThirdPartyUser: true,
+          expectedResult: 'TEST_USERNAME',
+        },
+        {
+          context: "when the user is a third-party user but doesn't have a " +
+                   'display_name',
+          it: 'returns the username',
+          user_info: { display_name: null},
+          client_display_names: true,
+          isThirdPartyUser: true,
+          expectedResult: 'TEST_USERNAME',
+        },
       ].forEach((test) => {
         context(test.context, () => {
           it(test.it, () => {
