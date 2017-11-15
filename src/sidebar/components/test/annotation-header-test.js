@@ -18,7 +18,7 @@ describe('sidebar.components.annotation-header', function () {
   var fakeSettings = { usernameUrl: 'http://www.example.org/' };
   var fakeServiceUrl;
 
-  before(function () {
+  beforeEach('Import and register the annotationHeader component', function () {
     var annotationHeader = proxyquire('../annotation-header', {
       '../annotation-metadata': {
         domainAndTitle: function (ann) { // eslint-disable-line no-unused-vars
@@ -35,7 +35,7 @@ describe('sidebar.components.annotation-header', function () {
       .component('annotationHeader', annotationHeader);
   });
 
-  beforeEach(function () {
+  beforeEach('Initialize and register fake AngularJS dependencies', function () {
     fakeFeatures = {
       flagEnabled: sinon.stub().returns(false),
     };
