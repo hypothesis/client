@@ -25,6 +25,10 @@ describe('sidebar.components.annotation-header', function () {
           return fakeDocumentMeta;
         },
       },
+      '../filter/persona': {
+        username: sinon.stub().returns('TEST_USERNAME'),
+      },
+      '@noCallThru': true,
     });
 
     angular.module('app', [])
@@ -86,28 +90,28 @@ describe('sidebar.components.annotation-header', function () {
           it: 'returns the username',
           user_info: undefined,
           client_display_names: false,
-          expectedResult: 'bill',
+          expectedResult: 'TEST_USERNAME',
         },
         {
           context: 'when the api_render_user_info feature flag is turned off in h',
           it: 'returns the username even if the client_display_names feature flag is on',
           user_info: undefined,
           client_display_names: true,
-          expectedResult: 'bill',
+          expectedResult: 'TEST_USERNAME',
         },
         {
           context: 'when the client_display_names feature flag is off in h',
           it: 'returns the username',
           user_info: { display_name: null },
           client_display_names: false,
-          expectedResult: 'bill',
+          expectedResult: 'TEST_USERNAME',
         },
         {
           context: 'when the client_display_names feature flag is off in h',
           it: 'returns the username even if the user has a display name',
           user_info: { display_name: 'Bill Jones' },
           client_display_names: false,
-          expectedResult: 'bill',
+          expectedResult: 'TEST_USERNAME',
         },
         {
           context: 'when both feature flags api_render_user_info and ' +
@@ -115,7 +119,7 @@ describe('sidebar.components.annotation-header', function () {
           it: 'returns the username, if the user has no display_name',
           user_info: { display_name: null },
           client_display_names: true,
-          expectedResult: 'bill',
+          expectedResult: 'TEST_USERNAME',
         },
         {
           context: 'when both feature flags api_render_user_info and ' +
@@ -157,7 +161,7 @@ describe('sidebar.components.annotation-header', function () {
         ctrl = $componentController('annotationHeader', {}, {
           annotation: ann,
         });
-        assert.deepEqual(ctrl.thirdPartyUsernameLink(), 'http://www.example.org/bill');
+        assert.deepEqual(ctrl.thirdPartyUsernameLink(), 'http://www.example.org/TEST_USERNAME');
       });
 
       it('returns null if no custom username link is set in the settings object', () => {
