@@ -1,7 +1,9 @@
 'use strict';
 
 // @ngInject
-function SidebarTutorialController(session) {
+function SidebarTutorialController(session, settings) {
+  this.cleanOnboardingThemeEnabled = settings.enableCleanOnboardingTheme;
+
   this.showSidebarTutorial = function () {
     if (session.state.preferences) {
       if (session.state.preferences.show_sidebar_tutorial) {

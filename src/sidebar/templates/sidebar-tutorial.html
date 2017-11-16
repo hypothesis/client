@@ -1,4 +1,4 @@
-<div class="sheet" ng-if="vm.showSidebarTutorial()">
+<div class="sheet" ng-if="vm.showSidebarTutorial() &&  !vm.cleanOnboardingThemeEnabled">
   <i class="close h-icon-close" role="button" title="Close"
      ng-click="vm.dismiss()"></i>
   <h1 class="sidebar-tutorial__header">How to get started</h1>
@@ -38,6 +38,39 @@
         To create a private group, select <strong>Public</strong>,
         open the dropdown, click&nbsp;<strong>+&nbsp;New&nbsp;group</strong>.
       </p>
+    </li>
+  </ol>
+</div>
+<div class="sheet sheet--is-theme-clean" ng-if="vm.showSidebarTutorial() && vm.cleanOnboardingThemeEnabled">
+  <i class="close h-icon-close" role="button" title="Close"
+     ng-click="vm.dismiss()"></i>
+  <h1 class="sidebar-tutorial__header sidebar-tutorial__header--is-theme-clean">
+    <i class="h-icon-annotate sidebar-tutorial__header-annotate" h-branding="accentColor"></i>
+    Start annotating
+  </h1>
+  <ol class="sidebar-tutorial__list">
+    <li class="sidebar-tutorial__list-item sidebar-tutorial__list-item--is-theme-clean">
+      <div class="sidebar-tutorial__list-item-content">
+        Select some text to
+          <span class="sidebar-tutorial__list-item-annotate">annotate</span>
+          <svg-icon class="sidebar-tutorial__list-item-cursor" name="'cursor'"></svg-icon>
+        or highlight.
+      </div>
+    </li>
+    <li class="sidebar-tutorial__list-item sidebar-tutorial__list-item--is-theme-clean">
+      <div class="sidebar-tutorial__list-item-content sidebar-tutorial__list-item-content--is-theme-clean">
+        Create page level notes
+        <button class="sidebar-tutorial__list-item-new-note-btn" h-branding="ctaBackgroundColor">
+          + New note
+        </button>
+      </div>
+    </li>
+    <li class="sidebar-tutorial__list-item sidebar-tutorial__list-item--is-theme-clean">
+      <div class="sidebar-tutorial__list-item-content">
+        View annotations through your profile
+        <i class="h-icon-account sidebar-tutorial__list-item-profile"></i>
+        <i class="h-icon-arrow-drop-down sidebar-tutorial__list-item-drop-down"></i>
+      </div>
     </li>
   </ol>
 </div>
