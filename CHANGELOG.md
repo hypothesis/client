@@ -4,6 +4,20 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+### Changed
+
+- Only show display names on annotation cards if the new `client_display_names`
+  feature flag is on _or_ if the annotation's creator is a third-party user
+  ([#579](https://github.com/hypothesis/client/pull/579)).
+
+- Add a new config option that enables a new-style for the sidebar tutorial
+  card ([#580](https://github.com/hypothesis/client/pull/580)).
+
+- Remove no-longer-used orphans tab feature flag checks
+  ([#578](https://github.com/hypothesis/client/pull/578)).
+
 ## [1.51.0] - 2017-11-14
 
 ### Changed
