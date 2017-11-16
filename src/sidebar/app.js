@@ -196,6 +196,7 @@ module.exports = angular.module('h', [
 
   .value('Discovery', require('../shared/discovery'))
   .value('ExcerptOverflowMonitor', require('./util/excerpt-overflow-monitor'))
+  .value('OAuthClient', require('./util/oauth-client'))
   .value('VirtualThreadList', require('./virtual-thread-list'))
   .value('random', require('./util/random'))
   .value('raven', require('./raven'))
