@@ -22,12 +22,16 @@ describe('groups', function() {
   var fakeLocalStorage;
   var fakeRootScope;
   var fakeServiceUrl;
+  var fakeSettings;
   var sandbox;
 
   beforeEach(function() {
     sandbox = sinon.sandbox.create();
 
     fakeSession = sessionWithThreeGroups();
+    fakeSettings = {
+      pageGroups: ['http://h.hypothesis:5000/groups/MGkYz9j2/http-test-localhost'],
+    };
     fakeLocalStorage = {
       getItem: sandbox.stub(),
       setItem: sandbox.stub(),
@@ -48,6 +52,7 @@ describe('groups', function() {
         member: {
           delete: sandbox.stub().returns(Promise.resolve()),
         },
+        read: sandbox.stub().returns(Promise.resolve({})),
       },
     };
     fakeServiceUrl = sandbox.stub();
@@ -59,7 +64,7 @@ describe('groups', function() {
 
   function service() {
     return groups(fakeLocalStorage, fakeServiceUrl, fakeSession,
-      fakeRootScope, fakeStore);
+      fakeRootScope, fakeStore, fakeSettings);
   }
 
   describe('.all()', function() {
@@ -183,6 +188,21 @@ describe('groups', function() {
         assert.calledWithMatch(fakeStore.group.member.delete, {
           pubid: 'id2',
           user: 'me',
+        });
+      });
+    });
+  });
+
+  describe('.pageGroups()', function () {
+    it('should fetch each group via store.group.read', function () {
+      var s = service();
+      return s.pageGroups().then((pageGroups) => {
+        assert(Array.isArray(pageGroups), 'pageGroups() promised value is array');
+        assert.equal(pageGroups.length, fakeSettings.pageGroups.length);
+        assert(pageGroups.every(o => typeof o === 'object'), 'each item in promised array is an object');
+        // read each url
+        fakeSettings.pageGroups.forEach((groupUrl) => {
+          assert.calledWith(fakeStore.group.read, groupUrl);
         });
       });
     });
