@@ -35,6 +35,8 @@ function hostPageConfig(window) {
     // OAuth feature flag override.
     // This should be removed once OAuth is enabled for first party accounts.
     'oauthEnabled',
+
+    'pageGroups',
   ];
 
   return Object.keys(config).reduce(function (result, key) {

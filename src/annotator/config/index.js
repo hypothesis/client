@@ -23,6 +23,7 @@ function configFrom(window_) {
     onLayoutChange: settings.hostPageSetting('onLayoutChange'),
     openLoginForm: settings.hostPageSetting('openLoginForm', {allowInBrowserExt: true}),
     openSidebar: settings.hostPageSetting('openSidebar', {allowInBrowserExt: true}),
+    pageGroups: settings.hostPageSetting('pageGroups'),
     query: settings.query,
     services: settings.hostPageSetting('services'),
     showHighlights: settings.showHighlights,

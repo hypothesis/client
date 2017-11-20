@@ -16,7 +16,7 @@ var STORAGE_KEY = 'hypothesis.groups.focus';
 var events = require('./events');
 
 // @ngInject
-function groups(localStorage, serviceUrl, session, $rootScope, store) {
+function groups(localStorage, serviceUrl, session, $rootScope, store, settings) {
   // The currently focused group. This is the group that's shown as selected in
   // the groups dropdown, the annotations displayed are filtered to only ones
   // that belong to this group, and any new annotations that the user creates
@@ -82,6 +82,13 @@ function groups(localStorage, serviceUrl, session, $rootScope, store) {
     }
   }
 
+  function pageGroups() {
+    console.log('settings.pageGroups', settings.pageGroups)
+    return (settings.pageGroups || []).map(function (group) {
+      return store.group.read(group)
+    })
+  }
+
   // reset the focused group if the user leaves it
   $rootScope.$on(events.GROUPS_CHANGED, function () {
     if (focusedGroup) {
@@ -95,6 +102,7 @@ function groups(localStorage, serviceUrl, session, $rootScope, store) {
   return {
     all: all,
     get: get,
+    pageGroups: pageGroups,
 
     leave: leave,
 
