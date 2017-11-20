@@ -40,6 +40,9 @@ function hostPageConfig(window) {
     'theme',
 
     'usernameUrl',
+
+    // Configure extra h groups that should appear in the client because the page admin wants them to be
+    'pageGroups',
   ];
 
   return Object.keys(config).reduce(function (result, key) {

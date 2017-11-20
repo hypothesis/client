@@ -114,8 +114,10 @@ function createAPICall($http, $q, links, route, tokenGetter) {
       var links = linksAndToken[0];
       var token = linksAndToken[1];
 
-      var descriptor = get(links, route);
-      var url = urlUtil.replaceURLParams(descriptor.url, params);
+      var descriptor = typeof route === 'string' && get(links, route)
+      var urlAndParams = descriptor && descriptor.url && urlUtil.replaceURLParams(descriptor.url, params)
+                      || (route.url && typeof params === 'string') && { url: params, params: {} }
+
       var headers = {};
 
       if (token) {
@@ -125,10 +127,10 @@ function createAPICall($http, $q, links, route, tokenGetter) {
       var req = {
         data: data ? stripInternalProperties(data) : null,
         headers: headers,
-        method: descriptor.method,
-        params: url.params,
+        method: descriptor && descriptor.method || 'GET',
+        params: urlAndParams.params,
         paramSerializer: serializeParams,
-        url: url.url,
+        url: urlAndParams.url,
       };
       return $http(req);
     }).then(function (response) {
@@ -174,6 +176,7 @@ function store($http, $q, apiRoutes, auth) {
       unhide: apiCall('annotation.unhide'),
     },
     group: {
+      read: apiCall({ url: true }),
       member: {
         delete: apiCall('group.member.delete'),
       },

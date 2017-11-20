@@ -1,0 +1,89 @@
+<span ng-if="vm.auth.status === 'logged-out'"
+      ng-switch on="vm.groups.focused().public">
+  <img class="group-list-label__icon group-list-label__icon--third-party"
+    ng-src="{{ vm.thirdPartyGroupIcon }}"
+    ng-if="vm.thirdPartyGroupIcon"
+    ng-switch-when="true"><!-- nospace
+  !--><i class="group-list-label__icon h-icon-public"
+    ng-if="!vm.thirdPartyGroupIcon"
+    ng-switch-when="true"></i><!-- nospace
+  !--><i class="group-list-label__icon h-icon-group" ng-switch-default></i>
+  <span class="group-list-label__label">{{vm.groups.focused().name}}</span>
+</span>
+
+<div class="pull-right"
+     ng-if="vm.auth.status === 'logged-in'"
+     dropdown
+     keyboard-nav>
+  <div class="dropdown-toggle"
+        dropdown-toggle
+        data-toggle="dropdown"
+        role="button"
+        ng-switch on="vm.groups.focused().public"
+        title="Change the selected group">
+    <img class="group-list-label__icon group-list-label__icon--third-party"
+         ng-src="{{ vm.thirdPartyGroupIcon }}"
+         ng-if="vm.thirdPartyGroupIcon"
+         ng-switch-when="true"><!-- nospace
+    !--><i class="group-list-label__icon h-icon-public"
+           ng-switch-when="true"
+           ng-if="!vm.thirdPartyGroupIcon"></i><!-- nospace
+    !--><i class="group-list-label__icon h-icon-group"
+           ng-switch-default></i>
+    <span class="group-list-label__label">{{vm.groups.focused().name}}</span><!-- nospace
+    !--><i class="h-icon-arrow-drop-down"></i>
+  </div>
+  <div class="dropdown-menu__top-arrow"></div>
+  <ul class="dropdown-menu pull-none" role="menu">
+    <li class="dropdown-menu__row dropdown-menu__row--unpadded "
+        ng-repeat="group in vm.groups.all()">
+      <div ng-class="{'group-item': true, selected: group.id == vm.groups.focused().id}"
+           ng-click="vm.focusGroup(group.id)">
+        <!-- the group icon !-->
+        <div class="group-icon-container" ng-switch on="group.public">
+          <img class="group-list-label__icon group-list-label__icon--third-party"
+               ng-src="{{ vm.thirdPartyGroupIcon }}"
+               ng-if="vm.thirdPartyGroupIcon"
+               ng-switch-when="true">
+          <i class="h-icon-public" ng-if="!vm.thirdPartyGroupIcon" ng-switch-when="true"></i>
+          <i class="h-icon-group" ng-switch-default></i>
+        </div>
+        <!-- the group name and share link !-->
+        <div class="group-details">
+          <div class="group-name-container">
+            <a class="group-name-link"
+               href=""
+               title="{{ group.public ? 'Show public annotations' : 'Show and create annotations in ' + group.name }}">
+               {{group.name}}
+            </a>
+          </div>
+          <div class="share-link-container" ng-click="$event.stopPropagation()" ng-if="!group.public">
+            <a class="share-link"
+               href="{{group.url}}"
+               target="_blank"
+               ng-click="vm.viewGroupActivity()">
+              View group activity and invite others
+            </a>
+          </div>
+        </div>
+        <!-- the 'Leave group' icon !-->
+        <div class="group-cancel-icon-container" ng-click="$event.stopPropagation()">
+          <i class="h-icon-cancel-outline btn--cancel"
+             ng-if="!group.public"
+             ng-click="vm.leaveGroup(group.id)"
+             title="Leave '{{group.name}}'"></i>
+        </div>
+      </div>
+    </li>
+    <li ng-if="!vm.isThirdPartyUser()" class="dropdown-menu__row dropdown-menu__row--unpadded new-group-btn">
+      <div class="group-item" ng-click="vm.createNewGroup()">
+        <div class="group-icon-container"><i class="h-icon-add"></i></div>
+        <div class="group-details">
+          <a href="" class="group-name-link" title="Create a new group to share annotations">
+            New group
+          </a>
+        </div>
+      </div>
+    </li>
+  </ul>
+</div>
