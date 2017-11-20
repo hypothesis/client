@@ -45,6 +45,7 @@ module.exports = {
   controllerAs: 'vm',
   bindings: {
     auth: '<',
+    groups: '<',
   },
   template: require('../templates/new-group-list.html'),
 };

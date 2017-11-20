@@ -82,10 +82,36 @@ function groups(localStorage, serviceUrl, session, $rootScope, store, settings) 
     }
   }
 
+  /**
+   * Get an array of group objects representing groups that this page has explicitly opted into showing
+   */
   function pageGroups() {
-    return Promise.all((settings.pageGroups || []).map(function (group) {
-      return store.group.read(group);
-    }));
+    return Promise.all((settings.pageGroups || []).map(function (groupUrl) {
+      return store.group.read(groupUrl).catch((error) => {
+        console.error('error fetching pageGroup for url', groupUrl, error);
+      });
+    }))
+    .then(groups => groups.filter(Boolean));
+  }
+
+  /**
+   * Wrap an async function such that it is only called once and the result is cached and promised on subsequent calls.
+   * @param {Function<any, Promise<any>} fetch - Go fetch some value
+   * @param {Function<any, any>} withResult - Function call with the reuslt the first time it's fetched. `this` will be same as `this` in cached() call
+   */
+  function cached(fetch, withResult) {
+    var result = false;
+    var fetching = false;
+    return function (...args) {
+      if ( ! result && ! fetching) {
+        fetching = true;
+        result = Promise.resolve(fetch(...args)).then(fetched => {
+          result = fetched;
+          return Promise.resolve(withResult.call(this, result)).then(() => result);
+        });
+      }
+      return result;
+    };
   }
 
   // reset the focused group if the user leaves it
@@ -98,16 +124,22 @@ function groups(localStorage, serviceUrl, session, $rootScope, store, settings) 
     }
   });
 
-  return {
+  var service = {
     all: all,
     get: get,
-    pageGroups: pageGroups,
-
+    pageGroups: cached(pageGroups, function (fetchedPageGroups) {
+      // `this` is `service`
+      return $rootScope.$apply(() => {
+        this.pageGroups = () => fetchedPageGroups;
+      });
+    }),
     leave: leave,
 
     focused: focused,
     focus: focus,
   };
+
+  return service;
 }
 
 module.exports = groups;

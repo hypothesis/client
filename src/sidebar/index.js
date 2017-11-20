@@ -12,8 +12,6 @@ var raven;
 // Read settings rendered into sidebar app HTML by service/extension.
 var settings = require('../shared/settings').jsonConfigsFrom(document);
 
-console.log('sidebar settings', settings)
-
 if (settings.raven) {
   // Initialize Raven. This is required at the top of this file
   // so that it happens early in the app's startup flow
@@ -60,10 +58,6 @@ var resolve = {
   // @ngInject
   sessionState: function (session) {
     return session.load();
-  },
-  // @ngInject
-  pageGroups: function (groups) {
-    return groups.pageGroups();
   },
 };
 
@@ -211,7 +205,8 @@ module.exports = angular.module('h', [
   .value('settings', settings)
   .value('time', require('./time'))
   .value('urlEncodeFilter', require('./filter/url').encode)
-
+  .value('debugFilter', require('./filter/debug').debug)
+  
   .config(configureLocation)
   .config(configureRoutes)
   .config(configureToastr)
