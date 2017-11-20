@@ -114,9 +114,9 @@ function createAPICall($http, $q, links, route, tokenGetter) {
       var links = linksAndToken[0];
       var token = linksAndToken[1];
 
-      var descriptor = typeof route === 'string' && get(links, route)
+      var descriptor = typeof route === 'string' && get(links, route);
       var urlAndParams = descriptor && descriptor.url && urlUtil.replaceURLParams(descriptor.url, params)
-                      || (route.url && typeof params === 'string') && { url: params, params: {} }
+                      || (route.url && typeof params === 'string') && { url: params, params: {} };
 
       var headers = {};
 

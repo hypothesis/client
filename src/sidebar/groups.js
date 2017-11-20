@@ -83,10 +83,9 @@ function groups(localStorage, serviceUrl, session, $rootScope, store, settings) 
   }
 
   function pageGroups() {
-    console.log('settings.pageGroups', settings.pageGroups)
-    return (settings.pageGroups || []).map(function (group) {
-      return store.group.read(group)
-    })
+    return Promise.all((settings.pageGroups || []).map(function (group) {
+      return store.group.read(group);
+    }));
   }
 
   // reset the focused group if the user leaves it
