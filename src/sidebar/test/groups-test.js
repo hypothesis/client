@@ -39,8 +39,11 @@ describe('groups', function() {
     fakeRootScope = {
       eventCallbacks: [],
 
+      $apply: (doStuff) => {
+        if (typeof doStuff === 'function') { doStuff.call(this); }
+      },
       $broadcast: sandbox.stub(),
-
+      
       $on: function(event, callback) {
         if (event === events.GROUPS_CHANGED) {
           this.eventCallbacks.push(callback);
