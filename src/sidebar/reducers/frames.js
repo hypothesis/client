@@ -1,9 +1,6 @@
 'use strict';
 
-var session = require('./session');
 var util = require('./util');
-
-var isFeatureEnabled = session.isFeatureEnabled;
 
 function init() {
   return {
@@ -74,7 +71,7 @@ function frames(state) {
   return state.frames;
 }
 
-function searchUrisForFrame(frame, includeDoi) {
+function searchUrisForFrame(frame) {
   var uris = [frame.uri];
 
   if (frame.metadata && frame.metadata.documentFingerprint) {
@@ -83,14 +80,12 @@ function searchUrisForFrame(frame, includeDoi) {
     });
   }
 
-  if (includeDoi) {
-    if (frame.metadata && frame.metadata.link) {
-      frame.metadata.link.forEach(function (link) {
-        if (link.href.startsWith('doi:')) {
-          uris.push(link.href);
-        }
-      });
-    }
+  if (frame.metadata && frame.metadata.link) {
+    frame.metadata.link.forEach(function (link) {
+      if (link.href.startsWith('doi:')) {
+        uris.push(link.href);
+      }
+    });
   }
 
   return uris;
@@ -101,9 +96,8 @@ function searchUrisForFrame(frame, includeDoi) {
  * current page.
  */
 function searchUris(state) {
-  var includeDoi = isFeatureEnabled(state, 'search_for_doi');
   return state.frames.reduce(function (uris, frame) {
-    return uris.concat(searchUrisForFrame(frame, includeDoi));
+    return uris.concat(searchUrisForFrame(frame));
   }, []);
 }
 
