@@ -110,10 +110,7 @@ describe('frames reducer', function () {
         'https://publisher.org/article2.html',
       ],
     },{
-      when: 'searching for DOIs is enabled',
-      features: {
-        search_for_doi: true,
-      },
+      when: 'the document metadata includes a DOI',
       frames: [{
         uri: 'https://publisher.org/article.html',
         metadata: {
@@ -125,22 +122,6 @@ describe('frames reducer', function () {
       searchUris: [
         'https://publisher.org/article.html',
         'doi:10.1.1/1234',
-      ],
-    },{
-      when: 'searching for DOIs is disabled',
-      features: {
-        search_for_doi: false,
-      },
-      frames: [{
-        uri: 'https://publisher.org/article.html',
-        metadata: {
-          link: [{
-            href: 'doi:10.1.1/1234',
-          }],
-        },
-      }],
-      searchUris: [
-        'https://publisher.org/article.html',
       ],
     }]);
   });
