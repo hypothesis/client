@@ -4,6 +4,14 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+### Changed
+
+- Fix issue that could lead to user being logged into normal Hypothesis account
+  on websites using third-party accounts
+  ([#572](https://github.com/hypothesis/client/pull/572)).
+
 ## [1.53.0] - 2017-11-16
 
 ### Changed
