@@ -26,7 +26,7 @@ function updateModel(annotation, changes, permissions) {
 // @ngInject
 function AnnotationController(
   $document, $rootScope, $scope, $timeout, $window, analytics, annotationUI,
-  annotationMapper, drafts, flash, features, groups, permissions, serviceUrl,
+  annotationMapper, drafts, flash, groups, permissions, serviceUrl,
   session, settings, store, streamer) {
 
   var self = this;
@@ -471,13 +471,8 @@ function AnnotationController(
   };
 
   this.canFlag = function () {
-    if (session.state.userid === self.annotation.user) {
-      return false;
-    }
-    if (persona.isThirdPartyUser(self.annotation.user, settings.authDomain)) {
-      return true;
-    }
-    return features.flagEnabled('flag_action');
+    // Users can flag any annotations except their own.
+    return session.state.userid !== self.annotation.user;
   };
 
   this.isFlagged = function() {
