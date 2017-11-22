@@ -26,7 +26,7 @@ function updateModel(annotation, changes, permissions) {
 // @ngInject
 function AnnotationController(
   $document, $rootScope, $scope, $timeout, $window, analytics, annotationUI,
-  annotationMapper, drafts, flash, features, groups, permissions, serviceUrl,
+  annotationMapper, drafts, flash, groups, permissions, serviceUrl,
   session, settings, store, streamer) {
 
   var self = this;

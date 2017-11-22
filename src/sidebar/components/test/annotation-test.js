@@ -106,7 +106,6 @@ describe('annotation', function() {
     var fakeAnnotationMapper;
     var fakeAnnotationUI;
     var fakeDrafts;
-    var fakeFeatures;
     var fakeFlash;
     var fakeGroups;
     var fakePermissions;
@@ -179,10 +178,6 @@ describe('annotation', function() {
         get: sandbox.stub().returns(null),
       };
 
-      fakeFeatures = {
-        flagEnabled: sandbox.stub().returns(true),
-      };
-
       fakeFlash = {
         error: sandbox.stub(),
       };
@@ -239,7 +234,6 @@ describe('annotation', function() {
       $provide.value('annotationMapper', fakeAnnotationMapper);
       $provide.value('annotationUI', fakeAnnotationUI);
       $provide.value('drafts', fakeDrafts);
-      $provide.value('features', fakeFeatures);
       $provide.value('flash', fakeFlash);
       $provide.value('groups', fakeGroups);
       $provide.value('permissions', fakePermissions);
