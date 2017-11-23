@@ -5,6 +5,15 @@ var queryString = require('query-string');
 var random = require('./random');
 
 /**
+ * An object holding the details of an access token from the tokenUrl endpoint.
+ * @typedef {Object} TokenInfo
+ * @property {string} accessToken  - The access token itself.
+ * @property {number} expiresAt    - The date when the timestamp will expire.
+ * @property {string} refreshToken - The refresh token that can be used to
+ *                                   get a new access token.
+ */
+
+/**
  * Return a new TokenInfo object from the given tokenUrl endpoint response.
  * @param {Object} response - The HTTP response from a POST to the tokenUrl
  *                            endpoint (an Angular $http response object).

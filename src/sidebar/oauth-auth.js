@@ -11,15 +11,6 @@ var serviceConfig = require('./service-config');
  */
 
 /**
- * An object holding the details of an access token from the tokenUrl endpoint.
- * @typedef {Object} TokenInfo
- * @property {string} accessToken  - The access token itself.
- * @property {number} expiresAt    - The date when the timestamp will expire.
- * @property {string} refreshToken - The refresh token that can be used to
- *                                   get a new access token.
- */
-
-/**
  * OAuth-based authorization service.
  *
  * A grant token embedded on the page by the publisher is exchanged for
