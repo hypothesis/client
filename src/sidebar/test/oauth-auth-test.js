@@ -21,7 +21,6 @@ describe('sidebar.oauth-auth', function () {
   var fakeWindow;
   var fakeSettings;
   var clock;
-  var successfulFirstAccessTokenPromise;
 
   /**
    * Login and retrieve an auth code.
@@ -175,8 +174,8 @@ describe('sidebar.oauth-auth', function () {
         respond = resolve;
       }));
 
-      // The first time tokenGetter() is called it sends the access token HTTP
-      // request and returns a Promise for the access token.
+      // The first time tokenGetter() is called it makes an `exchangeGrantToken`
+      // call and caches the resulting Promise.
       var tokens = [auth.tokenGetter(), auth.tokenGetter()];
 
       // Resolve the initial request for an access token in exchange for a JWT.
@@ -229,9 +228,10 @@ describe('sidebar.oauth-auth', function () {
     // It only sends one refresh request, even if tokenGetter() is called
     // multiple times and the refresh response hasn't come back yet.
     it('does not send more than one refresh request', function () {
+      fakeClient.exchangeGrantToken.returns(Promise.resolve(successfulTokenResponse));
+
       // Perform an initial token fetch which will exchange the JWT grant for an
       // access token.
-      fakeClient.exchangeGrantToken.returns(Promise.resolve(successfulTokenResponse));
       return auth.tokenGetter()
         .then(() => {
           // Expire the access token to trigger a refresh request on the next
@@ -263,7 +263,7 @@ describe('sidebar.oauth-auth', function () {
     context('when a refresh request fails', function() {
       beforeEach('make refresh token requests fail', function () {
         fakeClient.refreshToken.returns(Promise.reject(new Error('failed')));
-        fakeClient.exchangeGrantToken.returns(successfulFirstAccessTokenPromise);
+        fakeClient.exchangeGrantToken.returns(successfulTokenResponse);
       });
 
       it('logs the user out', function () {
