@@ -11,10 +11,17 @@ var serviceConfig = require('./service-config');
  */
 
 /**
- * OAuth-based authorization service.
+ * Authorization service.
  *
- * A grant token embedded on the page by the publisher is exchanged for
- * an opaque access token.
+ * This service is responsible for acquiring access tokens for making API
+ * requests and making them available via the `tokenGetter()` method.
+ *
+ * Access tokens are acquired via the OAuth authorization flow, loading valid
+ * tokens from a previous session or, on some websites, by exchanging a grant
+ * token provided by the host page.
+ *
+ * Interaction with OAuth endpoints in the annotation service is delegated to
+ * the `OAuthClient` class.
  */
 // @ngInject
 function auth($http, $rootScope, $window, OAuthClient,
