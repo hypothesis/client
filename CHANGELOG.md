@@ -4,6 +4,16 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+### Changed
+
+- Remove checks for `search_for_doi` feature flag
+  ([#598](https://github.com/hypothesis/client/pull/598)).
+
+- Remove checks for `flag_action` feature flag.
+  ([#597](https://github.com/hypothesis/client/pull/597)).
+
 ## [1.54.0] - 2017-11-22
 
 ### Changed
