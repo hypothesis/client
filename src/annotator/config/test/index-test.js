@@ -95,7 +95,6 @@ describe('annotator.config.index', function() {
       var settings = {
         'assetRoot': 'chrome-extension://1234/client/',
         'openSidebar': 'OPEN_SIDEBAR_SETTING',
-        'oauthEnabled': true,
         'branding': 'BRANDING_SETTING',
         'services': 'SERVICES_SETTING',
       };
