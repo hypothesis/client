@@ -17,6 +17,7 @@ describe('sidebar.oauth-auth', function () {
   var fakeApiRoutes;
   var fakeClient;
   var fakeFlash;
+  var fakeHttp;
   var fakeLocalStorage;
   var fakeWindow;
   var fakeSettings;
@@ -84,14 +85,20 @@ describe('sidebar.oauth-auth', function () {
 
     fakeWindow = new FakeWindow;
 
+    fakeHttp = {};
+
     angular.mock.module('app', {
-      $http: {},
+      $http: fakeHttp,
       $window: fakeWindow,
       apiRoutes: fakeApiRoutes,
       flash: fakeFlash,
       localStorage: fakeLocalStorage,
       settings: fakeSettings,
-      OAuthClient: () => fakeClient,
+      OAuthClient: ($http, config) => {
+        fakeClient.$http = $http;
+        fakeClient.config = config;
+        return fakeClient;
+      },
     });
 
     angular.mock.inject((_auth_, _$rootScope_) => {
@@ -103,6 +110,19 @@ describe('sidebar.oauth-auth', function () {
   afterEach(function () {
     performance.now.restore();
     clock.restore();
+  });
+
+  it('configures an OAuthClient correctly', () => {
+    // Call a method which will trigger construction of the `OAuthClient`.
+    return auth.tokenGetter().then(() => {
+      assert.equal(fakeClient.$http, fakeHttp);
+      assert.deepEqual(fakeClient.config, {
+        clientId: 'the-client-id',
+        tokenEndpoint: 'https://hypothes.is/api/token',
+        authorizationEndpoint: 'https://hypothes.is/oauth/authorize/',
+        revokeEndpoint: 'https://hypothes.is/oauth/revoke/',
+      });
+    });
   });
 
   describe('#tokenGetter', function () {
