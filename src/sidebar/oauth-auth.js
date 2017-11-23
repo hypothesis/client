@@ -230,6 +230,13 @@ function auth($http, $rootScope, $window, OAuthClient,
         // Token expired. Attempt to refresh.
         tokenInfoPromise = refreshAccessToken(token.refreshToken, {
           persist: shouldPersist,
+        }).then(token => {
+          // Sanity check that prevents an infinite loop. Mostly useful in
+          // tests.
+          if (Date.now() > token.expiresAt) {
+            throw new Error('Refreshed token expired in the past');
+          }
+          return token;
         }).catch(() => {
           // If refreshing the token fails, the user is simply logged out.
           return null;
