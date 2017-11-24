@@ -28,8 +28,6 @@ function configFrom(window_) {
     enableSidebarDropShadow: settings.hostPageSetting('enableSidebarDropShadow'),
     theme: settings.hostPageSetting('theme'),
     usernameUrl: settings.hostPageSetting('usernameUrl'),
-    // Temporary feature flag override for 1st-party OAuth
-    oauthEnabled: settings.hostPageSetting('oauthEnabled'),
     onLayoutChange: settings.hostPageSetting('onLayoutChange'),
     openSidebar: settings.hostPageSetting('openSidebar', {allowInBrowserExt: true}),
     query: settings.query,

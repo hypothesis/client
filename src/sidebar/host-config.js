@@ -38,10 +38,6 @@ function hostPageConfig(window) {
     // New onboarding theme override.
     'enableCleanOnboardingTheme',
 
-    // OAuth feature flag override.
-    // This should be removed once OAuth is enabled for first party accounts.
-    'oauthEnabled',
-
     // Theme which can either be specified as 'clean'.
     // If nothing is the specified the classic look is applied.
     'theme',
