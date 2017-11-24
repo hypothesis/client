@@ -35,7 +35,17 @@ module.exports = class Sidebar extends Host
       @plugins.BucketBar.element.on 'click', (event) => this.show()
 
     if @plugins.Toolbar?
-      @toolbarWidth = parseInt(window.getComputedStyle(this.plugins.Toolbar.toolbar[0]).width)
+      @toolbarWidth = @plugins.Toolbar.getWidth()
+
+      if config.disableToolbarMinimizeBtn
+        @plugins.Toolbar.disableMinimizeBtn()
+      if config.disableToolbarHighlightsBtn
+        @plugins.Toolbar.disableHighlightsBtn()
+      if config.disableToolbarNewNoteBtn
+        @plugins.Toolbar.disableNewNoteBtn()
+      if config.disableToolbarCloseBtn
+        @plugins.Toolbar.disableCloseBtn()
+
       this._setupGestures()
 
     # The partner-provided callback functions.
@@ -87,24 +97,25 @@ module.exports = class Sidebar extends Host
   _setupGestures: ->
     $toggle = @toolbar.find('[name=sidebar-toggle]')
 
-    # Prevent any default gestures on the handle
-    $toggle.on('touchmove', (event) -> event.preventDefault())
+    if $toggle[0]
+      # Prevent any default gestures on the handle
+      $toggle.on('touchmove', (event) -> event.preventDefault())
 
-    # Set up the Hammer instance and handlers
-    mgr = new Hammer.Manager($toggle[0])
-    .on('panstart panend panleft panright', this.onPan)
-    .on('swipeleft swiperight', this.onSwipe)
+      # Set up the Hammer instance and handlers
+      mgr = new Hammer.Manager($toggle[0])
+      .on('panstart panend panleft panright', this.onPan)
+      .on('swipeleft swiperight', this.onSwipe)
 
-    # Set up the gesture recognition
-    pan = mgr.add(new Hammer.Pan({direction: Hammer.DIRECTION_HORIZONTAL}))
-    swipe = mgr.add(new Hammer.Swipe({direction: Hammer.DIRECTION_HORIZONTAL}))
-    swipe.recognizeWith(pan)
+      # Set up the gesture recognition
+      pan = mgr.add(new Hammer.Pan({direction: Hammer.DIRECTION_HORIZONTAL}))
+      swipe = mgr.add(new Hammer.Swipe({direction: Hammer.DIRECTION_HORIZONTAL}))
+      swipe.recognizeWith(pan)
 
-    # Set up the initial state
-    this._initializeGestureState()
+      # Set up the initial state
+      this._initializeGestureState()
 
-    # Return this for chaining
-    this
+      # Return this for chaining
+      this
 
   _initializeGestureState: ->
     @gestureState =
@@ -230,10 +241,10 @@ module.exports = class Sidebar extends Host
     @frame.css 'margin-left': "#{-1 * @frame.width()}px"
     @frame.removeClass 'annotator-collapsed'
 
-    if @toolbar?
-      @toolbar.find('[name=sidebar-toggle]')
-      .removeClass('h-icon-chevron-left')
-      .addClass('h-icon-chevron-right')
+    if @plugins.Toolbar?
+      @plugins.Toolbar.showCollapseSidebarBtn();
+      @plugins.Toolbar.showCloseBtn();
+
 
     if @options.showHighlights == 'whenSidebarOpen'
       @setVisibleHighlights(true)
@@ -244,10 +255,10 @@ module.exports = class Sidebar extends Host
     @frame.css 'margin-left': ''
     @frame.addClass 'annotator-collapsed'
 
-    if @toolbar?
-      @toolbar.find('[name=sidebar-toggle]')
-      .removeClass('h-icon-chevron-right')
-      .addClass('h-icon-chevron-left')
+    @plugins.Toolbar.hideCloseBtn();
+
+    if @plugins.Toolbar?
+      @plugins.Toolbar.showExpandSidebarBtn();
 
     if @options.showHighlights == 'whenSidebarOpen'
       @setVisibleHighlights(false)

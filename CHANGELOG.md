@@ -4,6 +4,154 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [1.55.0] - 2017-11-23
+
+### Changed
+
+- Remove checks for `search_for_doi` feature flag
+  ([#598](https://github.com/hypothesis/client/pull/598)).
+
+- Remove checks for `flag_action` feature flag.
+  ([#597](https://github.com/hypothesis/client/pull/597)).
+
+## [1.54.0] - 2017-11-22
+
+### Changed
+
+- Fix issue that could lead to user being logged into normal Hypothesis account
+  on websites using third-party accounts
+  ([#572](https://github.com/hypothesis/client/pull/572)).
+
+## [1.53.0] - 2017-11-16
+
+### Changed
+
+- Fix default values for settings not being used in the browser extension
+  ([#581](https://github.com/hypothesis/client/pull/581)).
+
+## [1.52.0] - 2017-11-16
+
+### Changed
+
+- Only show display names on annotation cards if the new `client_display_names`
+  feature flag is on _or_ if the annotation's creator is a third-party user
+  ([#579](https://github.com/hypothesis/client/pull/579)).
+
+- Add a new config option that enables a new-style for the sidebar tutorial
+  card ([#580](https://github.com/hypothesis/client/pull/580)).
+
+- Remove no-longer-used orphans tab feature flag checks
+  ([#578](https://github.com/hypothesis/client/pull/578)).
+
+## [1.51.0] - 2017-11-14
+
+### Changed
+
+- Implement new customisation options for the sidebar’s display.
+  ([#555](https://github.com/hypothesis/client/pull/555)).
+  ([#573](https://github.com/hypothesis/client/pull/573)).
+
+## [1.50.0] - 2017-11-08
+
+### Changed
+
+- Improve performance on pages with very large numbers of annotations
+  ([#559](https://github.com/hypothesis/client/pull/559)).
+
+## [1.49.0] - 2017-11-08
+
+### Changed
+
+- Add OAuth client registration steps to developer docs
+  ([#567](https://github.com/hypothesis/client/pull/567)).
+
+- Strip unknown query params when generating Internet Archive embed URLs
+  ([#561](https://github.com/hypothesis/client/pull/561)).
+
+- Fix a cause of unexpected anchoring failures in PDFs
+  ([#563](https://github.com/hypothesis/client/pull/563)).
+
+- Remove support for cookie-based authentication
+  ([#542](https://github.com/hypothesis/client/pull/542)).
+
+## [1.48.0] - 2017-10-23
+
+### Changed
+
+- Support Internet Archive video embeds
+  ([#554](https://github.com/hypothesis/client/pull/554)).
+
+## [1.47.0] - 2017-10-03
+
+### Changed
+
+- Send search URIs to other frames by postMessage()
+  ([#550](https://github.com/hypothesis/client/pull/550)).
+
+## [1.46.0] - 2017-09-22
+
+### Changed
+
+- Re-fetch annotations when logging in or out when using OAuth
+  ([#552](https://github.com/hypothesis/client/pull/552)).
+
+## [1.45.0] - 2017-09-22
+
+### Changed
+
+- Adjust the preferred initial size of the login window.
+  ([#547](https://github.com/hypothesis/client/pull/547)).
+
+- Stop exporting the main annotation layer object as `window.annotator`
+  ([#549](https://github.com/hypothesis/client/pull/549)).
+
+- Remove iframe size check
+  ([#551](https://github.com/hypothesis/client/pull/551)).
+
+## [1.44.0] - 2017-09-20
+
+### Changed
+
+- Fix timestamp tooltips in annotation cards
+  ([#546](https://github.com/hypothesis/client/pull/546)).
+
+## [1.43.0] - 2017-09-18
+
+### Changed
+
+- Use profile display name in account menu
+  ([#544](https://github.com/hypothesis/client/pull/544)).
+
+- Fix handling of query terms without fields specified in client-side search
+  ([#505](https://github.com/hypothesis/client/pull/505)).
+
+## [1.42.0] - 2017-09-15
+
+### Changed
+
+- Render display name instead of username in existing annotations
+  ([#541](https://github.com/hypothesis/client/pull/541)).
+
+- Render display name instead of username in new annotations
+  ([#545](https://github.com/hypothesis/client/pull/545)).
+
+## [1.41.0] - 2017-09-11
+
+### Changed
+
+- Fix OAuth popup window failing to load in IE 11
+  ([#538](https://github.com/hypothesis/client/pull/538)).
+
+- Fix OAuth popup being blocked by pop-up blocker in Firefox and IE
+  ([#537](https://github.com/hypothesis/client/pull/537)).
+
+## [1.40.0] - 2017-09-11
+
+### Changed
+
+- Make annotation of iframes require opt-in by adding an "enable-annotation"
+  attribute ([#533](https://github.com/hypothesis/client/pull/533)).
+
 ## [1.39.0] - 2017-09-06
 
 ### Changed

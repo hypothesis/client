@@ -86,11 +86,23 @@ run:
    export SIDEBAR_APP_URL=http://localhost:5000/app.html
    gulp watch
 
-**In the `hypothesis/h` repository**, set the :envvar:`CLIENT_URL` env var to
-tell h where to load the client from, before running ``make dev``:
+Next, you'll need to create an OAuth client which enables the Hypothesis client
+to request an access token from the service in order to make API calls.
+
+1. Go to http://localhost:5000/admin/oauthclients (you'll need to be logged
+   in to h as an admin user)
+2. Select "Register a new OAuth client"
+3. Choose a name (eg. "Client") and set the redirect URL to
+   http://localhost:5000/app.html. Leave the other settings at their default values.
+4. After creating the client, make a note of the randomly generated client ID.
+
+**In the `hypothesis/h` repository**, set the :envvar:`CLIENT_URL` and
+:envvar:`CLIENT_OAUTH_ID` env vars to tell h where to load the client from and
+what OAuth client to use, before running ``make dev``:
 
 .. code-block:: sh
 
+   export CLIENT_OAUTH_ID={ OAuth client ID from step above }
    export CLIENT_URL=http://localhost:3001/hypothesis
    make dev
 

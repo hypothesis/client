@@ -18,10 +18,17 @@ function configFrom(window_) {
     // URL of the client's boot script. Used when injecting the client into
     // child iframes.
     clientUrl: settings.clientUrl,
-    // Temporary feature flag override for 1st-party OAuth
-    oauthEnabled: settings.hostPageSetting('oauthEnabled'),
+    disableToolbarCloseBtn:settings.hostPageSetting('disableToolbarCloseBtn', {defaultValue: true}),
+    disableToolbarMinimizeBtn: settings.hostPageSetting('disableToolbarMinimizeBtn'),
+    disableToolbarHighlightsBtn: settings.hostPageSetting('disableToolbarHighlightsBtn'),
+    disableToolbarNewNoteBtn: settings.hostPageSetting('disableToolbarNewNoteBtn'),
+    disableBucketBar: settings.hostPageSetting('disableBucketBar'),
+    enableCleanOnboardingTheme: settings.hostPageSetting('enableCleanOnboardingTheme'),
+    enableExperimentalNewNoteButton: settings.hostPageSetting('enableExperimentalNewNoteButton'),
+    enableSidebarDropShadow: settings.hostPageSetting('enableSidebarDropShadow'),
+    theme: settings.hostPageSetting('theme'),
+    usernameUrl: settings.hostPageSetting('usernameUrl'),
     onLayoutChange: settings.hostPageSetting('onLayoutChange'),
-    openLoginForm: settings.hostPageSetting('openLoginForm', {allowInBrowserExt: true}),
     openSidebar: settings.hostPageSetting('openSidebar', {allowInBrowserExt: true}),
     query: settings.query,
     services: settings.hostPageSetting('services'),

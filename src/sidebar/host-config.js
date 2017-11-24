@@ -26,15 +26,23 @@ function hostPageConfig(window) {
 
     // Config params documented at
     // https://h.readthedocs.io/projects/client/en/latest/publishers/config/
-    'openLoginForm',
     'openSidebar',
     'showHighlights',
     'services',
     'branding',
 
-    // OAuth feature flag override.
-    // This should be removed once OAuth is enabled for first party accounts.
-    'oauthEnabled',
+    // New note button override.
+    // This should be removed once new note button is enabled for everybody.
+    'enableExperimentalNewNoteButton',
+
+    // New onboarding theme override.
+    'enableCleanOnboardingTheme',
+
+    // Theme which can either be specified as 'clean'.
+    // If nothing is the specified the classic look is applied.
+    'theme',
+
+    'usernameUrl',
   ];
 
   return Object.keys(config).reduce(function (result, key) {

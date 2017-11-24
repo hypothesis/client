@@ -11,12 +11,6 @@ function init() {
      * groups they are a member of.
      */
     session: {
-      /**
-       * The CSRF token for requests to API endpoints that use cookie
-       * authentication.
-       */
-      csrf: null,
-
       /** A map of features that are enabled for the current user. */
       features: {},
       /** List of groups that the current user is a member of. */
@@ -60,14 +54,24 @@ function isFeatureEnabled(state, feature) {
   return !!state.session.features[feature];
 }
 
+/**
+ * Return the user's profile.
+ *
+ * Returns the current user's profile fetched from the `/api/profile` endpoint.
+ */
+function profile(state) {
+  return state.session;
+}
+
 module.exports = {
-  init: init,
-  update: update,
+  init,
+  update,
 
   actions: {
-    updateSession: updateSession,
+    updateSession,
   },
 
   // Selectors
-  isFeatureEnabled: isFeatureEnabled,
+  isFeatureEnabled,
+  profile,
 };

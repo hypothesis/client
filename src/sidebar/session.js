@@ -7,58 +7,26 @@ var retryUtil = require('./retry-util');
 
 var CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
-function sessionActions(options) {
-  var actions = {
-    login: {
-      method: 'POST',
-      params: { __formid__: 'login' },
-    },
-
-    logout: {
-      method: 'POST',
-      params: { __formid__: 'logout' },
-    },
-
-    _load: { method: 'GET' },
-  };
-
-  Object.keys(actions).forEach(function (action) {
-    Object.assign(actions[action], options);
-  });
-
-  return actions;
-}
-
+/**
+ * @typedef Profile
+ *
+ * An object returned by the API (`GET /api/profile`) containing profile data
+ * for the current user.
+ */
 
 /**
- * @ngdoc service
- * @name session
- * @description
- * Access to the application session and account actions. This service gives
- * other parts of the application access to parts of the server-side session
- * state (such as current authenticated userid, CSRF token, etc.).
+ * This service handles fetching the user's profile, updating profile settings
+ * and logging out.
  *
- * In addition, this service also provides helper methods for mutating the
- * session state, by, e.g. logging in, logging out, etc.
+ * Access to the current profile is exposed via the `state` property.
  *
  * @ngInject
  */
-function session($http, $q, $resource, $rootScope, analytics, annotationUI, auth,
+function session($q, $rootScope, analytics, annotationUI, auth,
                  flash, raven, settings, serviceConfig, store) {
-  // Headers sent by every request made by the session service.
-  var headers = {};
-  var actions = sessionActions({
-    headers: headers,
-    transformResponse: process,
-    withCredentials: true,
-  });
-  var endpoint = new URL('app/:path', settings.serviceUrl).href;
-  var resource = $resource(endpoint, {}, actions);
-
-  // Cache the result of _load()
+  // Cache the result of load()
   var lastLoad;
   var lastLoadTime;
-
 
   // Return the authority from the first service defined in the settings.
   // Return null if there are no services defined in the settings.
@@ -70,17 +38,18 @@ function session($http, $q, $resource, $rootScope, analytics, annotationUI, auth
     return service.authority;
   }
 
+  // Options to pass to `retry.operation` when fetching the user's profile.
+  var profileFetchRetryOpts = {};
+
   /**
-   * @name session.load()
-   * @description Fetches the session data from the server.
-   * @returns A promise for the session data.
+   * Fetch the user's profile from the annotation service.
    *
-   * The data is cached for CACHE_TTL across all actions of the session
-   * service: that is, a call to login() will update the session data and a call
-   * within CACHE_TTL milliseconds to load() will return that data rather than
-   * triggering a new request.
+   * If the profile has been previously fetched within `CACHE_TTL` ms, then this
+   * method returns a cached profile instead of triggering another fetch.
+   *
+   * @return {Promise<Profile>} A promise for the user's profile data.
    */
-  resource.load = function () {
+  function load() {
     if (!lastLoadTime || (Date.now() - lastLoadTime) > CACHE_TTL) {
 
       // The load attempt is automatically retried with a backoff.
@@ -91,16 +60,13 @@ function session($http, $q, $resource, $rootScope, analytics, annotationUI, auth
       lastLoadTime = Date.now();
       lastLoad = retryUtil.retryPromiseOperation(function () {
         var authority = getAuthority();
-        if (auth.login || authority) {
-          var opts = {};
-          if (authority) {
-            opts.authority = authority;
-          }
-          return store.profile.read(opts).then(update);
-        } else {
-          return resource._load().$promise;
+        var opts = {};
+        if (authority) {
+          opts.authority = authority;
         }
-      }).then(function (session) {
+        return store.profile.read(opts);
+      }, profileFetchRetryOpts).then(function (session) {
+        update(session);
         lastLoadTime = Date.now();
         return session;
       }).catch(function (err) {
@@ -109,62 +75,42 @@ function session($http, $q, $resource, $rootScope, analytics, annotationUI, auth
       });
     }
     return lastLoad;
-  };
+  }
 
   /**
-   * @name session.dismissSidebarTutorial()
-   *
-   * @description Stores the preference server-side that the user dismissed
-   *              the sidebar tutorial, and then updates the session state.
+   * Store the preference server-side that the user dismissed the sidebar
+   * tutorial and then update the local profile data.
    */
   function dismissSidebarTutorial() {
     return store.profile.update({}, {preferences: {show_sidebar_tutorial: false}}).then(update);
   }
 
   /**
-   * @name session.update()
+   * Update the local profile data.
    *
-   * @description Update the session state using the provided data.
-   *              This is a counterpart to load(). Whereas load() makes
-   *              a call to the server and then updates itself from
-   *              the response, update() can be used to update the client
-   *              when new state has been pushed to it by the server.
+   * This method can be used to update the profile data in the client when new
+   * data is pushed from the server via the real-time API.
+   *
+   * @param {Profile} model
+   * @return {Profile} The updated profile data
    */
   function update(model) {
     var prevSession = annotationUI.getState().session;
-
-    var isInitialLoad = !prevSession.csrf;
-
     var userChanged = model.userid !== prevSession.userid;
     var groupsChanged = !angular.equals(model.groups, prevSession.groups);
 
     // Update the session model used by the application
     annotationUI.updateSession(model);
 
-    // Set up subsequent requests to send the CSRF token in the headers.
-    if (model.csrf) {
-      headers[$http.defaults.xsrfHeaderName] = model.csrf;
-    }
-
     lastLoad = Promise.resolve(model);
     lastLoadTime = Date.now();
 
     if (userChanged) {
-      if (!auth.login) {
-        // When using cookie-based auth, notify the auth service that the current
-        // login has changed and API tokens need to be invalidated.
-        //
-        // This is not needed for OAuth-based auth because all login/logout
-        // activities happen through the auth service itself.
-        auth.clearCache();
-      }
-
       $rootScope.$broadcast(events.USER_CHANGED, {
-        initialLoad: isInitialLoad,
-        userid: model.userid,
+        profile: model,
       });
 
-      // associate error reports with the current user in Sentry
+      // Associate error reports with the current user in Sentry.
       if (model.userid) {
         raven.setUserInfo({
           id: model.userid,
@@ -175,68 +121,21 @@ function session($http, $q, $resource, $rootScope, analytics, annotationUI, auth
     }
 
     if (groupsChanged) {
-      $rootScope.$broadcast(events.GROUPS_CHANGED, {
-        initialLoad: isInitialLoad,
-      });
+      $rootScope.$broadcast(events.GROUPS_CHANGED);
     }
 
     // Return the model
     return model;
   }
 
-  function process(data, headersGetter, status) {
-    if (status < 200 || status >= 500) {
-      return null;
-    }
-
-    data = angular.fromJson(data);
-
-    // Lift response data
-    var model = data.model || {};
-    if (typeof data.errors !== 'undefined') {
-      model.errors = data.errors;
-    }
-    if (typeof data.reason !== 'undefined') {
-      model.reason = data.reason;
-    }
-
-    // Fire flash messages.
-    for (var type in data.flash) {
-      if (data.flash.hasOwnProperty(type)) {
-        var msgs = data.flash[type];
-        for (var i = 0, len = msgs.length; i < len; i++) {
-          flash[type](msgs[i]);
-        }
-      }
-    }
-
-    return update(model);
-  }
-
   /**
    * Log the user out of the current session.
    */
   function logout() {
-    var loggedOut;
-
-    if (auth.logout) {
-      loggedOut = auth.logout().then(() => {
-        // When using OAuth, we have to explicitly re-fetch the logged-out
-        // user's profile.
-        // When using cookie-based auth, `resource.logout()` handles this
-        // automatically.
-        return reload();
-      });
-    } else {
-      loggedOut = resource.logout().$promise.then(() => {
-        // When using cookie-based auth, notify the auth service that the current
-        // login has changed and API tokens need to be invalidated.
-        //
-        // This is not needed for OAuth-based auth because all login/logout
-        // activities happen through the auth service itself.
-        auth.clearCache();
-      });
-    }
+    var loggedOut = auth.logout().then(() => {
+      // Re-fetch the logged-out user's profile.
+      return reload();
+    });
 
     return loggedOut.catch(function (err) {
       flash.error('Log out failed');
@@ -251,11 +150,13 @@ function session($http, $q, $resource, $rootScope, analytics, annotationUI, auth
    * Clear the cached profile information and re-fetch it from the server.
    *
    * This can be used to refresh the user's profile state after logging in.
+   *
+   * @return {Promise<Profile>}
    */
   function reload() {
     lastLoad = null;
     lastLoadTime = null;
-    return resource.load();
+    return load();
   }
 
   $rootScope.$on(events.OAUTH_TOKENS_CHANGED, () => {
@@ -263,11 +164,13 @@ function session($http, $q, $resource, $rootScope, analytics, annotationUI, auth
   });
 
   return {
-    dismissSidebarTutorial: dismissSidebarTutorial,
-    load: resource.load,
-    login: resource.login,
-    logout: logout,
-    reload: reload,
+    dismissSidebarTutorial,
+    load,
+    logout,
+    reload,
+
+    // Exposed for use in tests
+    profileFetchRetryOpts,
 
     // For the moment, we continue to expose the session state as a property on
     // this service. In future, other services which access the session state
@@ -276,7 +179,7 @@ function session($http, $q, $resource, $rootScope, analytics, annotationUI, auth
       return annotationUI.getState().session;
     },
 
-    update: update,
+    update,
   };
 }
 

@@ -5,10 +5,15 @@
       target="_blank"
       ng-if="!vm.isThirdPartyUser()"
       ng-href="{{vm.serviceUrl('user',{user:vm.user()})}}"
-      >{{vm.username()}}</a>
+      >{{vm.displayName()}}</a>
+    <a class="annotation-header__user"
+      target="_blank"
+      ng-if="vm.isThirdPartyUser() && vm.thirdPartyUsernameLink()"
+      href="{{ vm.thirdPartyUsernameLink() }}"
+      >{{vm.displayName()}}</a>
     <span class="annotation-header__user"
-      ng-if="vm.isThirdPartyUser()"
-      >{{vm.username()}}</span>
+      ng-if="vm.isThirdPartyUser() && !vm.thirdPartyUsernameLink()"
+      >{{vm.displayName()}}</span>
     <span class="annotation-collapsed-replies">
       <a class="annotation-link" href=""
         ng-click="vm.onReplyCountClick()"

@@ -15,9 +15,7 @@ describe('hostPageConfig', function () {
     var window_ = fakeWindow({
       annotations: '1234',
       appType: 'bookmarklet',
-      oauthEnabled: true,
       openSidebar: true,
-      openLoginForm: true,
       showHighlights: true,
       services: [{
         authority: 'hypothes.is',
@@ -27,9 +25,7 @@ describe('hostPageConfig', function () {
     assert.deepEqual(hostPageConfig(window_), {
       annotations: '1234',
       appType: 'bookmarklet',
-      oauthEnabled: true,
       openSidebar: true,
-      openLoginForm: true,
       showHighlights: true,
       services: [{
         authority: 'hypothes.is',
@@ -47,7 +43,7 @@ describe('hostPageConfig', function () {
 
   it('ignores `null` values in config', function () {
     var window_ = fakeWindow({
-      oauthEnabled: null,
+      openSidebar: null,
     });
 
     assert.deepEqual(hostPageConfig(window_), {});

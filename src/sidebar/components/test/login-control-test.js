@@ -43,7 +43,11 @@ function loggedOutPage() {
 
 function firstPartyUserPage() {
   return pageObject(createLoginControl({
-    auth: {username: 'someUsername', status: 'logged-in'},
+    auth: {
+      displayName: 'Jim Smith',
+      username: 'someUsername',
+      status: 'logged-in',
+    },
     newStyle: true,
   }));
 }
@@ -127,6 +131,11 @@ describe('loginControl', function () {
     context('when a first-party user is logged in', function () {
       it('shows the enabled user profile button', function () {
         assert.isTrue(isUserProfileButtonEnabled(firstPartyUserPage()));
+      });
+
+      it('displays the display name', () => {
+        var profileBtn = firstPartyUserPage().userProfileButton;
+        assert.equal(profileBtn.textContent, 'Jim Smith');
       });
 
       it('does not send any events', function() {

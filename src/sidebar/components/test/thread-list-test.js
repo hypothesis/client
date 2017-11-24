@@ -41,6 +41,7 @@ var threadFixtures = immutable({
 });
 
 var fakeVirtualThread;
+var fakeSettings = {};
 
 function FakeVirtualThreadList($scope, $window, rootThread, options) {
 
@@ -119,6 +120,7 @@ describe('threadList', function () {
   beforeEach(function () {
     angular.mock.module('app', {
       VirtualThreadList: FakeVirtualThreadList,
+      settings: fakeSettings,
     });
     threadListContainers = [];
   });
@@ -127,6 +129,17 @@ describe('threadList', function () {
     threadListContainers.forEach(function (el) {
       el.remove();
     });
+  });
+
+  it('shows the clean theme when settings contains the clean theme option', function () {
+    angular.mock.module('app', {
+      VirtualThreadList: FakeVirtualThreadList,
+      settings: { theme: 'clean'},
+    });
+    var element = createThreadList();
+    fakeVirtualThread.notify();
+    element.scope.$digest();
+    assert.equal(element[0].querySelectorAll('.thread-list__card--theme-clean').length, element[0].querySelectorAll('annotation-thread').length);
   });
 
   it('displays the children of the root thread', function () {

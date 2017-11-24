@@ -1,5 +1,7 @@
 'use strict';
 
+var queryString = require('query-string');
+
 /**
 * Return an HTML5 audio player with the given src URL.
 */
@@ -33,6 +35,7 @@ function youTubeEmbed(id) {
 function vimeoEmbed(id) {
   return iframe('https://player.vimeo.com/video/' + id);
 }
+
 
 /**
  * A list of functions that return an "embed" DOM element (e.g. an <iframe> or
@@ -99,6 +102,71 @@ var embedGenerators = [
     }
     return null;
   },
+
+  /**
+   * Match Internet Archive URLs
+   *
+   *  The patterns are:
+   *
+   *  1. https://archive.org/embed/{slug}?start={startTime}&end={endTime}
+   *     (Embed links)
+   *
+   *  2. https://archive.org/details/{slug}?start={startTime}&end={endTime}
+   *     (Video page links for most videos)
+   *
+   *  3. https://archive.org/details/{slug}/start/{startTime}/end/{endTime}
+   *     (Video page links for the TV News Archive [1])
+   *
+   *  (2) and (3) allow users to copy and paste URLs from archive.org video
+   *  details pages directly into the sidebar to generate video embeds.
+   *
+   *  [1] https://archive.org/details/tv
+   */
+  function iFrameFromInternetArchiveLink(link) {
+    if (link.hostname !== 'archive.org') {
+      return null;
+    }
+
+    // Extract the unique slug from the path.
+    var slugMatch = /^\/(embed|details)\/(.+)/.exec(link.pathname);
+    if (!slugMatch) {
+      return null;
+    }
+
+    // Extract start and end times, which may appear either as query string
+    // params or path params.
+    var slug = slugMatch[2];
+    var linkParams = queryString.parse(link.search);
+    var startTime = linkParams.start;
+    var endTime = linkParams.end;
+
+    if (!startTime) {
+      var startPathParam = slug.match(/\/start\/([^\/]+)/);
+      if (startPathParam) {
+        startTime = startPathParam[1];
+        slug = slug.replace(startPathParam[0], '');
+      }
+    }
+
+    if (!endTime) {
+      var endPathParam = slug.match(/\/end\/([^\/]+)/);
+      if (endPathParam) {
+        endTime = endPathParam[1];
+        slug = slug.replace(endPathParam[0], '');
+      }
+    }
+
+    // Generate embed URL.
+    var iframeUrl = new URL(`https://archive.org/embed/${slug}`);
+    if (startTime) {
+      iframeUrl.searchParams.append('start', startTime);
+    }
+    if (endTime) {
+      iframeUrl.searchParams.append('end', endTime);
+    }
+    return iframe(iframeUrl.href);
+  },
+
 
   // Matches URLs that end with .mp3, .ogg, or .wav (assumed to be audio files)
   function html5audioFromMp3Link(link) {

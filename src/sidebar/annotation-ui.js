@@ -114,6 +114,7 @@ module.exports = function ($rootScope, settings) {
     hasSelectedAnnotations: selectionReducer.hasSelectedAnnotations,
 
     annotationExists: annotationsReducer.annotationExists,
+    findAnnotationByID: annotationsReducer.findAnnotationByID,
     findIDsForTags: annotationsReducer.findIDsForTags,
     savedAnnotations: annotationsReducer.savedAnnotations,
 
@@ -121,6 +122,9 @@ module.exports = function ($rootScope, settings) {
     searchUris: framesReducer.searchUris,
 
     isSidebar: viewerReducer.isSidebar,
+
+    isFeatureEnabled: sessionReducer.isFeatureEnabled,
+    profile: sessionReducer.profile,
   }, store.getState);
 
   return Object.assign(store, actionCreators, selectors);

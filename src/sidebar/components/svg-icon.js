@@ -11,6 +11,7 @@
 // The list of supported icons
 var icons = {
   refresh: require('../../images/icons/refresh.svg'),
+  cursor: require('../../images/icons/cursor.svg'),
 };
 
 // @ngInject

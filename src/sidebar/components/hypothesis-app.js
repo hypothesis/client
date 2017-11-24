@@ -8,12 +8,22 @@ var scopeTimeout = require('../util/scope-timeout');
 var serviceConfig = require('../service-config');
 var bridgeEvents = require('../../shared/bridge-events');
 
-function authStateFromUserID(userid) {
-  if (userid) {
-    var parsed = parseAccountID(userid);
+/**
+ * Return the user's authentication status from their profile.
+ *
+ * @param {Profile} profile - The profile object from the API.
+ */
+function authStateFromProfile(profile) {
+  if (profile.userid) {
+    var parsed = parseAccountID(profile.userid);
+    var displayName = parsed.username;
+    if (profile.user_info && profile.user_info.display_name) {
+      displayName = profile.user_info.display_name;
+    }
     return {
       status: 'logged-in',
-      userid: userid,
+      displayName,
+      userid: profile.userid,
       username: parsed.username,
       provider: parsed.provider,
     };
@@ -37,7 +47,6 @@ function HypothesisAppController(
   this.auth = {status: 'unknown'};
 
   // App dialogs
-  this.accountDialog = {visible: false};
   this.shareDialog = {visible: false};
   this.helpPanel = {visible: false};
 
@@ -62,23 +71,11 @@ function HypothesisAppController(
 
   // Reload the view when the user switches accounts
   $scope.$on(events.USER_CHANGED, function (event, data) {
-    self.auth = authStateFromUserID(data.userid);
-    self.accountDialog.visible = false;
-
-    if (!data || !data.initialLoad) {
-      $route.reload();
-    }
+    self.auth = authStateFromProfile(data.profile);
   });
 
-  session.load().then(function (state) {
-    // When the authentication status of the user is known,
-    // update the auth info in the top bar and show the login form
-    // after first install of the extension.
-    self.auth = authStateFromUserID(state.userid);
-
-    if (!state.userid && settings.openLoginForm && !auth.login) {
-      self.login();
-    }
+  session.load().then(profile => {
+    self.auth = authStateFromProfile(profile);
   });
 
   /** Scroll to the view to the element matching the given selector */
@@ -103,19 +100,11 @@ function HypothesisAppController(
       return Promise.resolve();
     }
 
-    if (auth.login) {
-      // OAuth-based login 😀
-      return auth.login().then(() => {
-        session.reload();
-      }).catch((err) => {
-        flash.error(err.message);
-      });
-    } else {
-      // Legacy cookie-based login 😔.
-      self.accountDialog.visible = true;
-      scrollToView('login-form');
-      return Promise.resolve();
-    }
+    return auth.login().then(() => {
+      session.reload();
+    }).catch((err) => {
+      flash.error(err.message);
+    });
   };
 
   this.signUp = function(){
@@ -176,7 +165,6 @@ function HypothesisAppController(
       return;
     }
 
-    this.accountDialog.visible = false;
     session.logout();
   };
 

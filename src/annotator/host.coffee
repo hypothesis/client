@@ -44,7 +44,11 @@ module.exports = class Host extends Guest
     @frame = $('<div></div>')
     .css('display', 'none')
     .addClass('annotator-frame annotator-outer')
-    .appendTo(element)
+
+    if config.enableSidebarDropShadow
+      @frame.addClass('annotator-frame--drop-shadow-enabled')
+
+    @frame.appendTo(element)
 
     super
 

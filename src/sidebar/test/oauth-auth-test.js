@@ -12,19 +12,29 @@ class FakeWindow {
   constructor() {
     this.callbacks = [];
 
-    this.location = {
-      origin: 'client.hypothes.is',
-    };
-
     this.screen = {
       width: 1024,
       height: 768,
     };
 
-    this.open = sinon.stub();
+
+    this.location = 'https://client.hypothes.is/app.html';
+    this.open = sinon.spy(href => {
+      var win = new FakeWindow;
+      win.location = href;
+      return win;
+    });
 
     this.setTimeout = window.setTimeout.bind(window);
     this.clearTimeout = window.clearTimeout.bind(window);
+  }
+
+  get location() {
+    return this.url;
+  }
+
+  set location(href) {
+    this.url = new URL(href);
   }
 
   addEventListener(event, callback) {
@@ -159,7 +169,7 @@ describe('sidebar.oauth-auth', function () {
   });
 
   describe('#tokenGetter', function () {
-    it('should request an access token if a grant token was provided', function () {
+    it('exchanges the grant token for an access token if provided', function () {
       return auth.tokenGetter().then(function (token) {
         var expectedBody =
           'assertion=a.jwt.token' +
@@ -168,12 +178,6 @@ describe('sidebar.oauth-auth', function () {
           headers: {'Content-Type': 'application/x-www-form-urlencoded'},
         });
         assert.equal(token, 'firstAccessToken');
-      });
-    });
-
-    it('should not persist access tokens fetched using a grant token', function () {
-      return auth.tokenGetter().then(() => {
-        assert.notCalled(fakeLocalStorage.setObject);
       });
     });
 
@@ -246,7 +250,7 @@ describe('sidebar.oauth-auth', function () {
       return Promise.all(tokens);
     });
 
-    it('should return null if no grant token was provided', function () {
+    it('should not attempt to exchange a grant token if none was provided', function () {
       fakeSettings.services = [{ authority: 'publisher.org' }];
       return auth.tokenGetter().then(function (token) {
         assert.notCalled(fakeHttp.post);
@@ -342,14 +346,37 @@ describe('sidebar.oauth-auth', function () {
         });
       });
     });
-  });
 
-  describe('persistence of tokens to storage', () => {
-    beforeEach(() => {
-      fakeSettings.services = [];
+    [{
+      // User is logged-in on the publisher's website.
+      authority: 'publisher.org',
+      grantToken: 'a.jwt.token',
+      expectedToken: 'firstAccessToken',
+    },{
+      // User is anonymous on the publisher's website.
+      authority: 'publisher.org',
+      grantToken: null,
+      expectedToken: null,
+    }].forEach(({ authority, grantToken, expectedToken }) => {
+      it('should not persist access tokens if a grant token was provided', () => {
+        fakeSettings.services = [{ authority, grantToken }];
+        return auth.tokenGetter().then(() => {
+          assert.notCalled(fakeLocalStorage.setObject);
+        });
+      });
+
+      it('should not read persisted access tokens if a grant token was set', () => {
+        fakeSettings.services = [{ authority, grantToken }];
+        return auth.tokenGetter().then(token => {
+          assert.equal(token, expectedToken);
+          assert.notCalled(fakeLocalStorage.getObject);
+        });
+      });
     });
 
     it('persists tokens retrieved via auth code exchanges to storage', () => {
+      fakeSettings.services = [];
+
       return login().then(() => {
         return auth.tokenGetter();
       }).then(() => {
@@ -361,23 +388,29 @@ describe('sidebar.oauth-auth', function () {
       });
     });
 
+    function expireAndRefreshAccessToken() {
+      fakeLocalStorage.setObject.reset();
+      fakeHttp.post.returns(Promise.resolve({
+        status: 200,
+        data: {
+          access_token: 'secondToken',
+          expires_in: DEFAULT_TOKEN_EXPIRES_IN_SECS,
+          refresh_token: 'secondRefreshToken',
+        },
+      }));
+      expireAccessToken();
+      return auth.tokenGetter();
+    }
+
     it('persists refreshed tokens to storage', () => {
+      fakeSettings.services = [];
+
       // 1. Perform initial token exchange.
       return login().then(() => {
         return auth.tokenGetter();
       }).then(() => {
         // 2. Refresh access token.
-        fakeLocalStorage.setObject.reset();
-        fakeHttp.post.returns(Promise.resolve({
-          status: 200,
-          data: {
-            access_token: 'secondToken',
-            expires_in: DEFAULT_TOKEN_EXPIRES_IN_SECS,
-            refresh_token: 'secondRefreshToken',
-          },
-        }));
-        expireAccessToken();
-        return auth.tokenGetter();
+        return expireAndRefreshAccessToken();
       }).then(() => {
         // 3. Check that updated token was persisted to storage.
         assert.calledWith(fakeLocalStorage.setObject, TOKEN_KEY, {
@@ -388,7 +421,19 @@ describe('sidebar.oauth-auth', function () {
       });
     });
 
-    it('loads and uses tokens from storage', () => {
+    it('does not persist refreshed tokens if the original token was temporary', () => {
+      fakeSettings.services = [{ authority: 'publisher.org', grantToken: 'a.jwt.token' }];
+
+      return auth.tokenGetter().then(() => {
+        return expireAndRefreshAccessToken();
+      }).then(() => {
+        // Check that updated token was not persisted to storage.
+        assert.notCalled(fakeLocalStorage.setObject);
+      });
+    });
+
+    it('fetches and returns tokens from storage', () => {
+      fakeSettings.services = [];
       fakeLocalStorage.getObject.withArgs(TOKEN_KEY).returns({
         accessToken: 'foo',
         refreshToken: 'bar',
@@ -400,7 +445,9 @@ describe('sidebar.oauth-auth', function () {
       });
     });
 
-    it('refreshes the token if it expired after loading from storage', () => {
+    it('refreshes expired tokens loaded from storage', () => {
+      fakeSettings.services = [];
+
       // Store an expired access token.
       clock.tick(200);
       fakeLocalStorage.getObject.withArgs(TOKEN_KEY).returns({
@@ -448,6 +495,7 @@ describe('sidebar.oauth-auth', function () {
     }].forEach(({ when, data }) => {
       context(when, () => {
         it('ignores invalid tokens in storage', () => {
+          fakeSettings.services = [];
           fakeLocalStorage.getObject.withArgs('foo').returns(data);
           return auth.tokenGetter().then((token) => {
             assert.equal(token, null);
@@ -455,49 +503,52 @@ describe('sidebar.oauth-auth', function () {
         });
       });
     });
+  });
 
-    context('when another client instance saves new tokens', () => {
-      function notifyStoredTokenChange() {
-        // Trigger "storage" event as if another client refreshed the token.
-        var storageEvent = new Event('storage');
-        storageEvent.key = TOKEN_KEY;
+  context('when another client instance saves new tokens', () => {
+    beforeEach(() => {
+      fakeSettings.services = [];
+    });
 
-        fakeLocalStorage.getObject.returns({
-          accessToken: 'storedAccessToken',
-          refreshToken: 'storedRefreshToken',
-          expiresAt: Date.now() + 100,
-        });
+    function notifyStoredTokenChange() {
+      // Trigger "storage" event as if another client refreshed the token.
+      var storageEvent = new Event('storage');
+      storageEvent.key = TOKEN_KEY;
 
-        fakeWindow.trigger(storageEvent);
-      }
-
-      it('reloads tokens from storage', () => {
-        return login().then(() => {
-          return auth.tokenGetter();
-        }).then(token => {
-          assert.equal(token, 'firstAccessToken');
-
-          notifyStoredTokenChange();
-
-          return auth.tokenGetter();
-        }).then(token => {
-          assert.equal(token, 'storedAccessToken');
-        });
+      fakeLocalStorage.getObject.returns({
+        accessToken: 'storedAccessToken',
+        refreshToken: 'storedRefreshToken',
+        expiresAt: Date.now() + 100,
       });
 
-      it('notifies other services about the change', () => {
-        var onTokenChange = sinon.stub();
-        $rootScope.$on(events.OAUTH_TOKENS_CHANGED, onTokenChange);
+      fakeWindow.trigger(storageEvent);
+    }
+
+    it('reloads tokens from storage', () => {
+      return login().then(() => {
+        return auth.tokenGetter();
+      }).then(token => {
+        assert.equal(token, 'firstAccessToken');
 
         notifyStoredTokenChange();
 
-        assert.called(onTokenChange);
+        return auth.tokenGetter();
+      }).then(token => {
+        assert.equal(token, 'storedAccessToken');
       });
+    });
+
+    it('notifies other services about the change', () => {
+      var onTokenChange = sinon.stub();
+      $rootScope.$on(events.OAUTH_TOKENS_CHANGED, onTokenChange);
+
+      notifyStoredTokenChange();
+
+      assert.called(onTokenChange);
     });
   });
 
   describe('#login', () => {
-
     beforeEach(() => {
       // login() is only currently used when using the public
       // Hypothesis service.
@@ -511,18 +562,24 @@ describe('sidebar.oauth-auth', function () {
         var authUrl = links['oauth.authorize'];
         var params = {
           client_id: fakeSettings.oauthClientId,
-          origin: 'client.hypothes.is',
+          origin: 'https://client.hypothes.is',
           response_mode: 'web_message',
           response_type: 'code',
           state: 'notrandom',
         };
         var expectedAuthUrl = `${authUrl}?${stringify(params)}`;
+
+        // Check that the auth window was opened and then set to the expected
+        // location. The final URL is not passed to `window.open` to work around
+        // a pop-up blocker issue.
         assert.calledWith(
           fakeWindow.open,
-          expectedAuthUrl,
+          'about:blank',
           'Login to Hypothesis',
-          'height=400,left=312,top=184,width=400'
+          'height=430,left=274.5,top=169,width=475'
         );
+        var authPopup = fakeWindow.open.returnValues[0];
+        assert.equal(authPopup.location.href, expectedAuthUrl);
       });
     });
 

@@ -14,6 +14,7 @@ function byteToHex(val) {
  * @return {string}
  */
 function generateHexString(len) {
+  var crypto = window.crypto || window.msCrypto /* IE 11 */;
   var bytes = new Uint8Array(len / 2);
   crypto.getRandomValues(bytes);
   return Array.from(bytes).map(byteToHex).join('');

@@ -139,9 +139,10 @@ function settingsFrom(window_) {
 
   function hostPageSetting(name, options = {}) {
     var allowInBrowserExt = options.allowInBrowserExt || false;
+    var hasDefaultValue = typeof options.defaultValue !== 'undefined';
 
     if (!allowInBrowserExt && isBrowserExtension(sidebarAppUrl())) {
-      return null;
+      return hasDefaultValue ? options.defaultValue : null;
     }
 
     if (configFuncSettings.hasOwnProperty(name)) {
@@ -150,6 +151,10 @@ function settingsFrom(window_) {
 
     if (jsonConfigs.hasOwnProperty(name)) {
       return jsonConfigs[name];
+    }
+
+    if (hasDefaultValue) {
+      return options.defaultValue;
     }
 
     return null;

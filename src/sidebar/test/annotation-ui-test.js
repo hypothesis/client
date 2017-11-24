@@ -26,6 +26,14 @@ describe('annotationUI', function () {
   var annotationUI;
   var fakeRootScope;
 
+  function tagForID(id) {
+    var storeAnn = annotationUI.findAnnotationByID(id);
+    if (!storeAnn) {
+      throw new Error(`No annotation with ID ${id}`);
+    }
+    return storeAnn.$tag;
+  }
+
   beforeEach(function () {
     fakeRootScope = {$applyAsync: sinon.stub()};
     annotationUI = annotationUIFactory(fakeRootScope, {});
@@ -137,7 +145,7 @@ describe('annotationUI', function () {
     it('preserves anchoring status of updated annotations', function () {
       var annot = defaultAnnotation();
       annotationUI.addAnnotations([annot]);
-      annotationUI.updateAnchorStatus(annot.id, null, false /* not an orphan */);
+      annotationUI.updateAnchorStatus({ [tagForID(annot.id)]: 'anchored' });
 
       var update = Object.assign({}, defaultAnnotation(), {text: 'update'});
       annotationUI.addAnnotations([update]);
@@ -158,7 +166,7 @@ describe('annotationUI', function () {
     it('does not set the timeout flag on annotations that do anchor within a time limit', function () {
       var annot = defaultAnnotation();
       annotationUI.addAnnotations([annot]);
-      annotationUI.updateAnchorStatus(annot.id, 'atag', false);
+      annotationUI.updateAnchorStatus({ [tagForID(annot.id)]: 'anchored' });
 
       clock.tick(ANCHOR_TIME_LIMIT);
 
@@ -168,7 +176,7 @@ describe('annotationUI', function () {
     it('does not attempt to modify orphan status if annotations are removed before anchoring timeout expires', function () {
       var annot = defaultAnnotation();
       annotationUI.addAnnotations([annot]);
-      annotationUI.updateAnchorStatus(annot.id, 'atag', false);
+      annotationUI.updateAnchorStatus({ [tagForID(annot.id)]: 'anchored' });
       annotationUI.removeAnnotations([annot]);
 
       assert.doesNotThrow(function () {
@@ -483,27 +491,11 @@ describe('annotationUI', function () {
   });
 
   describe('#updatingAnchorStatus', function () {
-    it("updates the annotation's tag", function () {
-      var annot = defaultAnnotation();
-      annotationUI.addAnnotations([annot]);
-      annotationUI.updateAnchorStatus(annot.id, 'atag', true);
-      assert.equal(annotationUI.getState().annotations[0].$tag, 'atag');
-    });
-
     it("updates the annotation's orphan flag", function () {
       var annot = defaultAnnotation();
       annotationUI.addAnnotations([annot]);
-      annotationUI.updateAnchorStatus(annot.id, 'atag', true);
+      annotationUI.updateAnchorStatus({ [tagForID(annot.id)]: 'orphan' });
       assert.equal(annotationUI.getState().annotations[0].$orphan, true);
-    });
-
-    it('updates annotations by tag', function () {
-      annotationUI.addAnnotations(fixtures.newPair);
-      annotationUI.updateAnchorStatus(null, 't2', true);
-
-      var annots = annotationUI.getState().annotations;
-      assert.isFalse(annots[0].$orphan);
-      assert.isTrue(annots[1].$orphan);
     });
   });
 

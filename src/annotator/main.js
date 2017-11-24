@@ -59,12 +59,15 @@ $.noConflict(true)(function() {
     window.__hypothesis_frame = true;
   }
 
+  if(config.disableBucketBar) {
+    delete pluginClasses.BucketBar;
+  }
+
   config.pluginClasses = pluginClasses;
 
-  window.annotator = new Klass(document.body, config);
+  var annotator = new Klass(document.body, config);
   appLinkEl.addEventListener('destroy', function () {
     appLinkEl.parentElement.removeChild(appLinkEl);
-    window.annotator.destroy();
-    window.annotator = undefined;
+    annotator.destroy();
   });
 });

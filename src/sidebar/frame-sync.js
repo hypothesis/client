@@ -1,5 +1,7 @@
 'use strict';
 
+var debounce = require('lodash.debounce');
+
 var events = require('./events');
 var bridgeEvents = require('../shared/bridge-events');
 var metadata = require('./annotation-metadata');
@@ -126,12 +128,24 @@ function FrameSync($rootScope, $window, Discovery, annotationUI, bridge) {
 
     bridge.on('destroyFrame', destroyFrame.bind(this));
 
+    // Map of annotation tag to anchoring status
+    // ('anchored'|'orphan'|'timeout').
+    //
+    // Updates are coalesced to reduce the overhead from processing
+    // triggered by each `UPDATE_ANCHOR_STATUS` action that is dispatched.
+    var anchoringStatusUpdates = {};
+    var scheduleAnchoringStatusUpdate = debounce(() => {
+      annotationUI.updateAnchorStatus(anchoringStatusUpdates);
+      $rootScope.$broadcast(events.ANNOTATIONS_SYNCED, Object.keys(anchoringStatusUpdates));
+      anchoringStatusUpdates = {};
+    }, 10);
+
     // Anchoring an annotation in the frame completed
     bridge.on('sync', function (events_) {
       events_.forEach(function (event) {
         inFrame.add(event.tag);
-        annotationUI.updateAnchorStatus(null, event.tag, event.msg.$orphan);
-        $rootScope.$broadcast(events.ANNOTATIONS_SYNCED, [event.tag]);
+        anchoringStatusUpdates[event.tag] = event.msg.$orphan ? 'orphan' : 'anchored';
+        scheduleAnchoringStatusUpdate();
       });
     });
 

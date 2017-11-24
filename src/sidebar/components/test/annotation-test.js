@@ -106,7 +106,6 @@ describe('annotation', function() {
     var fakeAnnotationMapper;
     var fakeAnnotationUI;
     var fakeDrafts;
-    var fakeFeatures;
     var fakeFlash;
     var fakeGroups;
     var fakePermissions;
@@ -179,10 +178,6 @@ describe('annotation', function() {
         get: sandbox.stub().returns(null),
       };
 
-      fakeFeatures = {
-        flagEnabled: sandbox.stub().returns(true),
-      };
-
       fakeFlash = {
         error: sandbox.stub(),
       };
@@ -239,7 +234,6 @@ describe('annotation', function() {
       $provide.value('annotationMapper', fakeAnnotationMapper);
       $provide.value('annotationUI', fakeAnnotationUI);
       $provide.value('drafts', fakeDrafts);
-      $provide.value('features', fakeFeatures);
       $provide.value('flash', fakeFlash);
       $provide.value('groups', fakeGroups);
       $provide.value('permissions', fakePermissions);
@@ -276,10 +270,16 @@ describe('annotation', function() {
         var annotation = fixtures.newAnnotation();
         annotation.user = undefined;
         fakeSession.state.userid = 'acct:bill@localhost';
+        fakeSession.state.user_info = {
+          display_name: 'Bill Jones',
+        };
 
         createDirective(annotation);
 
         assert.equal(annotation.user, 'acct:bill@localhost');
+        assert.deepEqual(annotation.user_info, {
+          display_name: 'Bill Jones',
+        });
       });
 
       it('sets the permissions of new annotations', function() {
@@ -827,40 +827,15 @@ describe('annotation', function() {
     });
 
     describe('#canFlag', function () {
-      it('returns true if the user is a third-party user', function () {
-        var ann = fixtures.thirdPartyAnnotation();
-        var controller = createDirective(ann).controller;
-        assert.isTrue(controller.canFlag());
-      });
-
-      it('returns the value of the `flag_action` feature flag', function () {
-        var ann = fixtures.defaultAnnotation();
-        var controller = createDirective(ann).controller;
-
-        ann.user = 'acct:notCurrentUser@localhost';
-
-        fakeFeatures.flagEnabled.returns(false);
-        assert.equal(controller.canFlag(), false);
-
-        fakeFeatures.flagEnabled.returns(true);
-        assert.equal(controller.canFlag(), true);
-      });
-
       it('returns false if the user signed in is the same as the author of the annotation', function () {
         var ann = fixtures.defaultAnnotation();
         var controller = createDirective(ann).controller;
-
-        fakeFeatures.flagEnabled.returns(true);
-
         assert.isFalse(controller.canFlag());
       });
 
       it('returns true if the user signed in is different from the author of the annotation', function () {
         var ann = fixtures.thirdPartyAnnotation();
         var controller = createDirective(ann).controller;
-
-        fakeFeatures.flagEnabled.returns(true);
-
         assert.isTrue(controller.canFlag());
       });
     });

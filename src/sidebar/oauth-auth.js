@@ -52,11 +52,6 @@ function auth($http, $rootScope, $window,
   var tokenUrl = resolve('token', settings.apiUrl);
 
   /**
-   * Timer ID of the current access token refresh timer.
-   */
-  var refreshTimer;
-
-  /**
    * Show an error message telling the user that the access token has expired.
    */
   function showAccessTokenExpiredErrorMessage(message) {
@@ -97,14 +92,6 @@ function auth($http, $rootScope, $window,
       headers: {'Content-Type': 'application/x-www-form-urlencoded'},
     };
     return $http.post(url, data, requestConfig);
-  }
-
-  function grantTokenFromHostPage() {
-    var cfg = serviceConfig(settings);
-    if (!cfg) {
-      return null;
-    }
-    return cfg.grantToken;
   }
 
   /**
@@ -228,17 +215,25 @@ function auth($http, $rootScope, $window,
    */
   function tokenGetter() {
     if (!tokenInfoPromise) {
-      var grantToken = grantTokenFromHostPage();
+      var cfg = serviceConfig(settings);
 
-      if (grantToken) {
-        // Exchange host-page provided grant token for a new access token.
-        tokenInfoPromise = exchangeJWT(grantToken).then((tokenInfo) => {
-          return tokenInfo;
-        }).catch(function(err) {
-          showAccessTokenExpiredErrorMessage(
-            'You must reload the page to annotate.');
-          throw err;
-        });
+      // Check if automatic login is being used, indicated by the presence of
+      // the 'grantToken' property in the service configuration.
+      if (cfg && typeof cfg.grantToken !== 'undefined') {
+        if (cfg.grantToken) {
+          // User is logged-in on the publisher's website.
+          // Exchange the grant token for a new access token.
+          tokenInfoPromise = exchangeJWT(cfg.grantToken).then((tokenInfo) => {
+            return tokenInfo;
+          }).catch(function(err) {
+            showAccessTokenExpiredErrorMessage(
+              'You must reload the page to annotate.');
+            throw err;
+          });
+        } else {
+          // User is anonymous on the publisher's website.
+          tokenInfoPromise = Promise.resolve(null);
+        }
       } else if (authCode) {
         // Exchange authorization code retrieved from login popup for a new
         // access token.
@@ -269,9 +264,18 @@ function auth($http, $rootScope, $window,
       }
 
       if (Date.now() > token.expiresAt) {
+        var shouldPersist = true;
+
+        // If we are using automatic login via a grant token, do not persist the
+        // initial access token or refreshed tokens.
+        var cfg = serviceConfig(settings);
+        if (cfg && typeof cfg.grantToken !== 'undefined') {
+          shouldPersist = false;
+        }
+
         // Token expired. Attempt to refresh.
         tokenInfoPromise = refreshAccessToken(token.refreshToken, {
-          persist: true,
+          persist: shouldPersist,
         }).catch(() => {
           // If refreshing the token fails, the user is simply logged out.
           return null;
@@ -282,17 +286,6 @@ function auth($http, $rootScope, $window,
         return token.accessToken;
       }
     });
-  }
-
-  /**
-   * Forget any cached credentials.
-   */
-  function clearCache() {
-    // Once cookie auth has been removed, the `clearCache` method can be removed
-    // from the public API of this service in favor of `logout`.
-    tokenInfoPromise = Promise.resolve(null);
-    localStorage.removeItem(storageKey());
-    $window.clearTimeout(refreshTimer);
   }
 
   /**
@@ -332,10 +325,40 @@ function auth($http, $rootScope, $window,
     });
 
     // Authorize user and retrieve grant token
-    var width  = 400;
-    var height = 400;
+
+    // In Chrome & Firefox the sizes passed to `window.open` are used for the
+    // viewport size. In Safari the size is used for the window size including
+    // title bar etc. There is enough vertical space at the bottom to allow for
+    // this.
+    //
+    // See https://bugs.webkit.org/show_bug.cgi?id=143678
+    var width  = 475;
+    var height = 430;
     var left   = $window.screen.width / 2 - width / 2;
     var top    = $window.screen.height /2 - height / 2;
+
+    // Generate settings for `window.open` in the required comma-separated
+    // key=value format.
+    var authWindowSettings = queryString.stringify({
+      left: left,
+      top: top,
+      width: width,
+      height: height,
+    }).replace(/&/g, ',');
+
+    // Open the auth window before fetching the `oauth.authorize` URL to ensure
+    // that the `window.open` call happens in the same turn of the event loop
+    // that was initiated by the user clicking the "Log in" link.
+    //
+    // Otherwise the `window.open` call is not deemed to be in response to a
+    // user gesture in Firefox & IE 11 and their popup blocking heuristics will
+    // prevent the window being opened. See
+    // https://github.com/hypothesis/client/issues/534 and
+    // https://github.com/hypothesis/client/issues/535.
+    //
+    // Chrome, Safari & Edge have different heuristics and are not affected by
+    // this problem.
+    var authWindow = $window.open('about:blank', 'Login to Hypothesis', authWindowSettings);
 
     return apiRoutes.links().then(links => {
       var authUrl = links['oauth.authorize'];
@@ -346,13 +369,7 @@ function auth($http, $rootScope, $window,
         response_type: 'code',
         state: state,
       });
-      var authWindowSettings = queryString.stringify({
-        left: left,
-        top: top,
-        width: width,
-        height: height,
-      }).replace(/&/g, ',');
-      $window.open(authUrl, 'Login to Hypothesis', authWindowSettings);
+      authWindow.location = authUrl;
 
       return authResponse;
     }).then((resp) => {
@@ -376,14 +393,14 @@ function auth($http, $rootScope, $window,
           token: token.accessToken,
         });
       }).then(() => {
-        clearCache();
+        tokenInfoPromise = Promise.resolve(null);
+        localStorage.removeItem(storageKey());
       });
   }
 
   listenForTokenStorageEvents();
 
   return {
-    clearCache,
     login,
     logout,
     tokenGetter,

@@ -26,7 +26,7 @@ function updateModel(annotation, changes, permissions) {
 // @ngInject
 function AnnotationController(
   $document, $rootScope, $scope, $timeout, $window, analytics, annotationUI,
-  annotationMapper, drafts, flash, features, groups, permissions, serviceUrl,
+  annotationMapper, drafts, flash, groups, permissions, serviceUrl,
   session, settings, store, streamer) {
 
   var self = this;
@@ -106,7 +106,11 @@ function AnnotationController(
 
     // New annotations (just created locally by the client, rather then
     // received from the server) have some fields missing. Add them.
+    //
+    // FIXME: This logic should go in the `addAnnotations` Redux action once all
+    // required state is in the store.
     self.annotation.user = self.annotation.user || session.state.userid;
+    self.annotation.user_info = self.annotation.user_info || session.state.user_info;
     self.annotation.group = self.annotation.group || groups.focused().id;
     if (!self.annotation.permissions) {
       self.annotation.permissions = permissions.default(self.annotation.user,
@@ -443,14 +447,7 @@ function AnnotationController(
     return serviceUrl('search.tag', {tag: tag});
   };
 
-  // Note: We fetch the feature flag outside the `isOrphan` method to avoid a
-  // lookup on every $digest cycle
-  var indicateOrphans = features.flagEnabled('orphans_tab');
-
   this.isOrphan = function() {
-    if (!indicateOrphans) {
-      return false;
-    }
     if (typeof self.annotation.$orphan === 'undefined') {
       return self.annotation.$anchorTimeout;
     }
@@ -474,13 +471,8 @@ function AnnotationController(
   };
 
   this.canFlag = function () {
-    if (session.state.userid === self.annotation.user) {
-      return false;
-    }
-    if (persona.isThirdPartyUser(self.annotation.user, settings.authDomain)) {
-      return true;
-    }
-    return features.flagEnabled('flag_action');
+    // Users can flag any annotations except their own.
+    return session.state.userid !== self.annotation.user;
   };
 
   this.isFlagged = function() {

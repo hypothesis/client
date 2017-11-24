@@ -1,5 +1,9 @@
 {module, inject} = angular.mock
 
+# Return an ISO date string for a `Date` that is `age` seconds ago.
+isoDateWithAge = (age) ->
+  new Date(Date.now() - age * 1000).toISOString()
+
 poem =
   tiger: 'Tiger! Tiger! burning bright
           In the forest of the night
@@ -49,7 +53,7 @@ describe 'viewFilter', ->
           operator: 'and'
 
       viewFilter.filter [], filters
-      assert.calledWith fakeUnicode.fold, 'tiger'
+      assert.calledWith fakeUnicode.fold, 'Tiger'
 
     describe 'filter operators', ->
       annotations = null
@@ -165,9 +169,9 @@ describe 'viewFilter', ->
               "type": "TextQuoteSelector",
               "exact": "The Tiger by William Blake",
             }]
+          ]
           user: "acct:poe@edgar.com"
           tags: ["poem", "Blake", "Tiger"]
-          ]
 
         filters =
           any:
@@ -177,3 +181,58 @@ describe 'viewFilter', ->
         result = viewFilter.filter [annotation], filters
         assert.equal result.length, 1
         assert.equal result[0], 1
+
+    describe '"uri" field', ->
+      it "matches if the query occurs in the annotation's URI", ->
+        ann =
+          id: 1
+          uri: 'https://publisher.org/article'
+        filters =
+          uri:
+            terms: ['publisher']
+            operator: 'or'
+
+        result = viewFilter.filter [ann], filters
+
+        assert.deepEqual result, [1]
+
+    describe '"since" field', ->
+      it 'matches if the annotation is newer than the query', ->
+        ann =
+          id: 1
+          updated: isoDateWithAge(50)
+        filters =
+          since:
+            terms: [100]
+            operator: 'and'
+
+        result = viewFilter.filter [ann], filters
+
+        assert.deepEqual result, [1]
+
+      it 'does not match if the annotation is older than the query', ->
+        ann =
+          id: 1
+          updated: isoDateWithAge(150)
+        filters =
+          since:
+            terms: [100]
+            operator: 'and'
+
+        result = viewFilter.filter [ann], filters
+
+        assert.deepEqual result, []
+
+  it 'ignores filters with no terms in the query', ->
+    ann = { id: 1, tags: ['foo'] }
+    filters =
+      any:
+        terms: ['foo']
+        operator: 'and'
+      tag:
+        terms: []
+        operator: 'and'
+
+    result = viewFilter.filter [ann], filters
+
+    assert.deepEqual result, [1]

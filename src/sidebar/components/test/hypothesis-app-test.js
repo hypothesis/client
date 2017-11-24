@@ -207,15 +207,43 @@ describe('sidebar.components.hypothesis-app', function () {
     });
   });
 
-  it('sets userid, username, and provider properties at login', function () {
-    fakeSession.load = function () {
-      return Promise.resolve({userid: 'acct:jim@hypothes.is'});
-    };
-    var ctrl = createController();
-    return fakeSession.load().then(function () {
-      assert.equal(ctrl.auth.userid, 'acct:jim@hypothes.is');
-      assert.equal(ctrl.auth.username, 'jim');
-      assert.equal(ctrl.auth.provider, 'hypothes.is');
+  [{
+    // User who has set a display name
+    profile: {
+      userid: 'acct:jim@hypothes.is',
+      user_info: {
+        display_name: 'Jim Smith',
+      },
+    },
+    expectedAuth: {
+      status: 'logged-in',
+      userid: 'acct:jim@hypothes.is',
+      username: 'jim',
+      provider: 'hypothes.is',
+      displayName: 'Jim Smith',
+    },
+  },{
+    // User who has not set a display name
+    profile: {
+      userid: 'acct:jim@hypothes.is',
+      user_info: {
+        display_name: null,
+      },
+    },
+    expectedAuth: {
+      status: 'logged-in',
+      userid: 'acct:jim@hypothes.is',
+      username: 'jim',
+      provider: 'hypothes.is',
+      displayName: 'jim',
+    },
+  }].forEach(({ profile, expectedAuth }) => {
+    it('sets `auth` properties when profile has loaded', () => {
+      fakeSession.load = () => Promise.resolve(profile);
+      var ctrl = createController();
+      return fakeSession.load().then(() => {
+        assert.deepEqual(ctrl.auth, expectedAuth);
+      });
     });
   });
 
@@ -223,11 +251,13 @@ describe('sidebar.components.hypothesis-app', function () {
     var ctrl = createController();
     return fakeSession.load().then(function () {
       $scope.$broadcast(events.USER_CHANGED, {
-        initialLoad: false,
-        userid: 'acct:john@hypothes.is',
+        profile: {
+          userid: 'acct:john@hypothes.is',
+        },
       });
       assert.deepEqual(ctrl.auth, {
         status: 'logged-in',
+        displayName: 'john',
         userid: 'acct:john@hypothes.is',
         username: 'john',
         provider: 'hypothes.is',
@@ -240,49 +270,9 @@ describe('sidebar.components.hypothesis-app', function () {
     assert.equal(ctrl.serviceUrl, fakeServiceUrl);
   });
 
-  it('does not show login form for logged in users', function () {
-    var ctrl = createController();
-    assert.isFalse(ctrl.accountDialog.visible);
-  });
-
   it('does not show the share dialog at start', function () {
     var ctrl = createController();
     assert.isFalse(ctrl.shareDialog.visible);
-  });
-
-  it('does not reload the view when the logged-in user changes on first load', function () {
-    createController();
-    fakeRoute.reload = sinon.spy();
-    $scope.$broadcast(events.USER_CHANGED, {initialLoad: true});
-    assert.notCalled(fakeRoute.reload);
-  });
-
-  it('reloads the view when the logged-in user changes after first load', function () {
-    createController();
-    fakeRoute.reload = sinon.spy();
-    $scope.$broadcast(events.USER_CHANGED, {initialLoad: false});
-    assert.calledOnce(fakeRoute.reload);
-  });
-
-  context('when the "openLoginForm" setting is enabled', () => {
-    beforeEach(() => {
-      fakeSettings.openLoginForm = true;
-    });
-
-    it('shows the login form if not using OAuth', () => {
-      var ctrl = createController();
-      return fakeSession.load().then(() => {
-        assert.isTrue(ctrl.accountDialog.visible);
-      });
-    });
-
-    it('does not show the login form if using OAuth', () => {
-      fakeAuth.login = sandbox.stub();
-      var ctrl = createController();
-      return fakeSession.load().then(() => {
-        assert.isFalse(ctrl.accountDialog.visible);
-      });
-    });
   });
 
   describe('#signUp', function () {
@@ -382,48 +372,30 @@ describe('sidebar.components.hypothesis-app', function () {
   });
 
   describe('#login()', function () {
-    context('when using cookie auth', () => {
-      it('shows the login dialog if not using a third-party service', function () {
-        // If no third-party annotation service is in use then it should show the
-        // built-in login dialog.
-        var ctrl = createController();
-        ctrl.login();
-        assert.equal(ctrl.accountDialog.visible, true);
+    beforeEach(() => {
+      fakeAuth.login = sinon.stub().returns(Promise.resolve());
+    });
+
+    it('initiates the OAuth login flow', () => {
+      var ctrl = createController();
+      ctrl.login();
+      assert.called(fakeAuth.login);
+    });
+
+    it('reloads the session when login completes', () => {
+      var ctrl = createController();
+      return ctrl.login().then(() => {
+        assert.called(fakeSession.reload);
       });
     });
 
-    context('when using OAuth', () => {
-      beforeEach(() => {
-        fakeAuth.login = sinon.stub().returns(Promise.resolve());
-      });
+    it('reports an error if login fails', () => {
+      fakeAuth.login.returns(Promise.reject(new Error('Login failed')));
 
-      it('does not show the login dialog', () => {
-        var ctrl = createController();
-        ctrl.login();
-        assert.equal(ctrl.accountDialog.visible, false);
-      });
+      var ctrl = createController();
 
-      it('initiates the OAuth login flow', () => {
-        var ctrl = createController();
-        ctrl.login();
-        assert.called(fakeAuth.login);
-      });
-
-      it('reloads the session when login completes', () => {
-        var ctrl = createController();
-        return ctrl.login().then(() => {
-          assert.called(fakeSession.reload);
-        });
-      });
-
-      it('reports an error if login fails', () => {
-        fakeAuth.login.returns(Promise.reject(new Error('Login failed')));
-
-        var ctrl = createController();
-
-        return ctrl.login().then(null, () => {
-          assert.called(fakeFlash.error);
-        });
+      return ctrl.login().then(null, () => {
+        assert.called(fakeFlash.error);
       });
     });
 

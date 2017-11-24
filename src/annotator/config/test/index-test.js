@@ -62,7 +62,6 @@ describe('annotator.config.index', function() {
   [
     'assetRoot',
     'subFrameIdentifier',
-    'openLoginForm',
     'openSidebar',
   ].forEach(function(settingName) {
     it('reads ' + settingName + ' from the host page, even when in a browser extension', function() {
@@ -88,7 +87,6 @@ describe('annotator.config.index', function() {
 
   [
     'assetRoot',
-    'openLoginForm',
     'openSidebar',
     'branding',
     'services',
@@ -96,9 +94,7 @@ describe('annotator.config.index', function() {
     it('returns the ' + settingName + ' value from the host page', function() {
       var settings = {
         'assetRoot': 'chrome-extension://1234/client/',
-        'openLoginForm': 'OPEN_LOGIN_FORM_SETTING',
         'openSidebar': 'OPEN_SIDEBAR_SETTING',
-        'oauthEnabled': true,
         'branding': 'BRANDING_SETTING',
         'services': 'SERVICES_SETTING',
       };

@@ -488,14 +488,6 @@ describe('annotator.config.settingsFrom', function() {
         expected: undefined,
       },
       {
-        when: 'the client is embedded in a web page',
-        specify: "it returns null if the setting isn't defined anywhere",
-        isBrowserExtension: false,
-        configFuncSettings: {},
-        jsonSettings: {},
-        expected: null,
-      },
-      {
         when: 'the client is in a browser extension',
         specify: 'it always returns null',
         isBrowserExtension: true,
@@ -521,6 +513,46 @@ describe('annotator.config.settingsFrom', function() {
         jsonSettings: {foo: 'jsonValue'},
         expected: 'jsonValue',
       },
+      {
+        when: 'no default value is provided',
+        specify: 'it returns null',
+        isBrowserExtension: false,
+        allowInBrowserExt: false,
+        configFuncSettings: {},
+        jsonSettings: {},
+        defaultValue: undefined,
+        expected: null,
+      },
+      {
+        when: 'a default value is provided',
+        specify: 'it returns that default value',
+        isBrowserExtension: false,
+        allowInBrowserExt: false,
+        configFuncSettings: {},
+        jsonSettings: {},
+        defaultValue: 'test value',
+        expected: 'test value',
+      },
+      {
+        when: 'a default value is provided but it is overridden',
+        specify: 'it returns the overridden value',
+        isBrowserExtension: false,
+        allowInBrowserExt: false,
+        configFuncSettings: { foo: 'not the default value' },
+        jsonSettings: {},
+        defaultValue: 'the default value',
+        expected: 'not the default value',
+      },
+      {
+        when: 'the client is in a browser extension and a default value is provided',
+        specify: 'it returns the default value',
+        isBrowserExtension: true,
+        allowInBrowserExt: false,
+        configFuncSettings: { foo: 'ignore me' },
+        jsonSettings: { foo: 'also ignore me' },
+        defaultValue: 'the default value',
+        expected: 'the default value',
+      },
     ].forEach(function(test) {
       context(test.when, function() {
         specify(test.specify, function() {
@@ -531,7 +563,10 @@ describe('annotator.config.settingsFrom', function() {
 
           var setting = settings.hostPageSetting(
             'foo',
-            {allowInBrowserExt: test.allowInBrowserExt || false}
+            {
+              allowInBrowserExt: test.allowInBrowserExt || false,
+              defaultValue: test.defaultValue || null,
+            }
           );
 
           assert.strictEqual(setting, test.expected);
