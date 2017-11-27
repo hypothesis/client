@@ -3,7 +3,10 @@
 var persona = require('../filter/persona');
 var serviceConfig = require('../service-config');
 
-// @ngInject
+/**
+ * Controller for new-group-list - https://docs.google.com/presentation/d/1ESiIotb91xJnUj9v6M2R2qW0o7akT1MbwsIMPjab6Ho/edit#slide=id.g2576362aea_1_2
+ * @ngInject
+ */
 function NewGroupListController($window, analytics, groups, settings, serviceUrl) {
   this.groups = groups;
 
