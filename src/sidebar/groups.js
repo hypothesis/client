@@ -96,10 +96,10 @@ function groups(localStorage, serviceUrl, session, $rootScope, store, settings) 
 
   /**
    * Wrap an async function such that it is only called once and the result is cached and promised on subsequent calls.
-   * @param {Function<any, Promise<any>} fetch - Go fetch some value
-   * @param {Function<any, any>} withResult - Function call with the reuslt the first time it's fetched. `this` will be same as `this` in cached() call
+   * @param {(...args: any) => any} fetch - Go fetch some value. Will be Promise.resolved
+   * @param {(...args: any) => any} [withResult] - Function call with the reuslt the first time it's fetched. `this` will be same as `this` in cached() call. Will be Promise.resolved and awaited.
    */
-  function cached(fetch, withResult) {
+  function cached(fetch, withResult=()=>{}) {
     var result = false;
     var fetching = false;
     return function (...args) {
