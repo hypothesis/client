@@ -33,15 +33,38 @@ function tokenInfoFrom(response) {
   };
 }
 
+/**
+ * Generate a short random string suitable for use as the "state" param in
+ * authorization requests.
+ *
+ * See https://tools.ietf.org/html/rfc6749#section-4.1.1.
+ */
 function generateState() {
   return random.generateHexString(16);
 }
+
+/**
+ * OAuthClient configuration.
+ *
+ * @typedef {Object} Config
+ * @property {string} clientId - OAuth client ID
+ * @property {string} tokenEndpoint - OAuth token exchange/refresh endpoint
+ * @property {string} authorizationEndpoint - OAuth authorization endpoint
+ * @property {string} revokeEndpoint - RFC 7009 token revocation endpoint
+ * @property {() => string} [generateState] - Authorization "state" parameter generator
+ */
 
 /**
  * OAuthClient handles interaction with the annotation service's OAuth
  * endpoints.
  */
 class OAuthClient {
+  /**
+   * Create a new OAuthClient
+   *
+   * @param {Object} $http - HTTP client
+   * @param {Config} config
+   */
   constructor($http, config) {
     this.$http = $http;
 
@@ -56,6 +79,9 @@ class OAuthClient {
 
   /**
    * Exchange an authorization code for access and refresh tokens.
+   *
+   * @param {string} code
+   * @return {Promise<TokenInfo>}
    */
   exchangeAuthCode(code) {
     var data = {
@@ -75,6 +101,9 @@ class OAuthClient {
    * Exchange a grant token for access and refresh tokens.
    *
    * See https://tools.ietf.org/html/rfc7523#section-4
+   *
+   * @param {string} token
+   * @return {Promise<TokenInfo>}
    */
   exchangeGrantToken(token) {
     var data = {
@@ -93,6 +122,9 @@ class OAuthClient {
    * Refresh an access and refresh token pair.
    *
    * See https://tools.ietf.org/html/rfc6749#section-6
+   *
+   * @param {string} refreshToken
+   * @return {Promise<TokenInfo>}
    */
   refreshToken(refreshToken) {
     var data = { grant_type: 'refresh_token', refresh_token: refreshToken };
@@ -106,6 +138,9 @@ class OAuthClient {
 
   /**
    * Revoke an access and refresh token pair.
+   *
+   * @param {string} accessToken
+   * @return {Promise}
    */
   revokeToken(accessToken) {
     return this._formPost(this.revokeEndpoint, { token: accessToken });
@@ -115,6 +150,9 @@ class OAuthClient {
    * Prompt the user for permission to access their data.
    *
    * Returns an authorization code which can be passed to `exchangeAuthCode`.
+   *
+   * @param {Window} $window
+   * @return {Promise<string>}
    */
   authorize($window) {
     // Random state string used to check that auth messages came from the popup
@@ -196,6 +234,9 @@ class OAuthClient {
 
   /**
    * Make an `application/x-www-form-urlencoded` POST request.
+   *
+   * @param {string} url
+   * @param {Object} data - Parameter dictionary
    */
   _formPost(url, data) {
     data = queryString.stringify(data);
