@@ -4,6 +4,13 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+### Changed
+
+- Remove `oauthEnabled` client config setting
+  ([#604](https://github.com/hypothesis/client/pull/604)).
+
 ## [1.55.0] - 2017-11-23
 
 ### Changed
