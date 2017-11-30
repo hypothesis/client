@@ -45,14 +45,5 @@ describe('SidebarTutorialController', function () {
 
       assert.equal(result, false);
     });
-
-    it('returns false if session.state is {}', function () {
-      var session = {state: {}};
-      var controller = new Controller(session, settings);
-
-      var result = controller.showSidebarTutorial();
-
-      assert.equal(result, false);
-    });
   });
 });
