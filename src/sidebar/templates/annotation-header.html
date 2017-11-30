@@ -7,7 +7,6 @@
       ng-href="{{vm.serviceUrl('user',{user:vm.user()})}}"
       >{{vm.displayName()}}</a>
     <a class="annotation-header__user"
-      target="_blank"
       ng-if="vm.isThirdPartyUser() && vm.thirdPartyUsernameLink()"
       href="{{ vm.thirdPartyUsernameLink() }}"
       >{{vm.displayName()}}</a>
