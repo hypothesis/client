@@ -126,7 +126,7 @@
         label="'Reply'"
         on-click="vm.reply()"
       ></annotation-action-button>
-      <span class="annotation-share-dialog-wrapper">
+      <span class="annotation-share-dialog-wrapper" ng-if="vm.incontextLink()">
         <annotation-action-button
          icon="'h-icon-annotation-share'"
          is-disabled="vm.isDeleted()"
