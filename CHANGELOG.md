@@ -4,6 +4,19 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+### Changed
+
+- Make the "New note" button "image" in the tutorial pane look & behave less
+  like an actual button ([#582](https://github.com/hypothesis/client/pull/582)).
+
+- Do not hyperlink annotation timestamps when the annotation has no href
+  ([#617](https://github.com/hypothesis/client/pull/617)).
+
+- Do not show share dialog if no incontext link
+  ([#618](https://github.com/hypothesis/client/pull/618)).
+
 ## [1.56.0] - 2017-11-29
 
 ### Changed
