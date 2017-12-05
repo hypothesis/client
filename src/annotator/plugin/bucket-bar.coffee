@@ -20,7 +20,7 @@ scrollToClosest = (anchors, direction) ->
       return acc
 
     {start, next} = acc
-    rect = highlighter.getBoundingClientRect(anchor.highlights)
+    rect = anchor.range.getBoundingClientRect()
 
     # Ignore if it's not in the right direction.
     if (dir is 1 and rect.top >= BUCKET_TOP_THRESHOLD)
@@ -113,7 +113,7 @@ module.exports = class BucketBar extends Plugin
       unless anchor.highlights?.length
         return points
 
-      rect = highlighter.getBoundingClientRect(anchor.highlights)
+      rect = anchor.range.getBoundingClientRect()
       x = rect.top
       h = rect.bottom - rect.top
 
@@ -230,13 +230,13 @@ module.exports = class BucketBar extends Plugin
         bucket = @tabs.index(event.currentTarget)
         for anchor in @annotator.anchors
           toggle = anchor in @buckets[bucket]
-          $(anchor.highlights).toggleClass('annotator-hl-focused', toggle)
+          highlighter.toggleFocusForHighlights(anchor.highlights, toggle)
 
       # Gets rid of them after
       .on 'mouseout', (event) =>
         bucket = @tabs.index(event.currentTarget)
         for anchor in @buckets[bucket]
-          $(anchor.highlights).removeClass('annotator-hl-focused')
+          highlighter.toggleFocusForHighlights(anchor.highlights, false)
 
       # Does one of a few things when a tab is clicked depending on type
       .on 'click', (event) =>
