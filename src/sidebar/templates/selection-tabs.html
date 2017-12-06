@@ -41,17 +41,21 @@
     <p class="annotation-unavailable-message__label">
       There are no page notes in this group.
       <br />
-      Create one by clicking the
-      <i class="help-icon h-icon-note"></i>
-      button.
+      <div ng-if="!vm.enableExperimentalNewNoteButton && !vm.showSidebarTutorial()" class="annotation-unavailable-message__tutorial">
+        Create one by clicking the
+        <i class="help-icon h-icon-note"></i>
+        button.
+      </div>
     </p>
   </div>
   <div ng-if="vm.showAnnotationsUnavailableMessage()"  class="annotation-unavailable-message">
     <p class="annotation-unavailable-message__label">
       There are no annotations in this group.
       <br />
-      Create one by selecting some text and clicking the
-      <i class="help-icon h-icon-annotate"></i> button.
+      <div ng-if="!vm.showSidebarTutorial()" class="annotation-unavailable-message__tutorial">
+        Create one by selecting some text and clicking the
+        <i class="help-icon h-icon-annotate"></i> button.
+      </div>
     </p>
   </div>
 </div>

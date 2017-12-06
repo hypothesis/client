@@ -1,11 +1,12 @@
 'use strict';
 
+var sessionUtil = require('../util/session-util');
 var uiConstants = require('../ui-constants');
 
 module.exports = {
   controllerAs: 'vm',
   //@ngInject
-  controller: function ($element, annotationUI, features, settings) {
+  controller: function ($element, annotationUI, features, session, settings) {
     this.TAB_ANNOTATIONS = uiConstants.TAB_ANNOTATIONS;
     this.TAB_NOTES = uiConstants.TAB_NOTES;
     this.TAB_ORPHANS = uiConstants.TAB_ORPHANS;
@@ -28,6 +29,10 @@ module.exports = {
     this.showNotesUnavailableMessage = function () {
       return this.selectedTab === this.TAB_NOTES &&
         this.totalNotes === 0;
+    };
+
+    this.showSidebarTutorial = function () {
+      return sessionUtil.shouldShowSidebarTutorial(session.state);
     };
   },
   bindings: {
