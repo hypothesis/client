@@ -37,7 +37,7 @@ function annotationComponent() {
 
   return proxyquire('../annotation', {
     angular: testUtil.noCallThru(angular),
-    '../filter/persona': {
+    '../util/account-id': {
       username: noop,
     },
   });

@@ -189,7 +189,7 @@ describe('sidebar.components.annotation-header', function () {
               return false;
             };
 
-            // Make persona.isThirdPartyUser() return true or false,
+            // Make isThirdPartyUser() return true or false,
             // depending on the test case.
             fakeAccountID.isThirdPartyUser.returns(test.isThirdPartyUser);
 
