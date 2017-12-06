@@ -30,20 +30,6 @@ var groupFixtures = {
 };
 
 /**
- * Returns the annotation directive with helpers stubbed out.
- */
-function annotationComponent() {
-  var noop = function () { return ''; };
-
-  return proxyquire('../annotation', {
-    angular: testUtil.noCallThru(angular),
-    '../util/account-id': {
-      username: noop,
-    },
-  });
-}
-
-/**
  * Returns the controller for the action button with the given `label`.
  *
  * @param {Element} annotationEl - Annotation element
@@ -115,6 +101,20 @@ describe('annotation', function() {
     var fakeStore;
     var fakeStreamer;
     var sandbox;
+
+    /**
+     * Returns the annotation directive with helpers stubbed out.
+     */
+    function annotationComponent() {
+      var noop = function () { return ''; };
+
+      return proxyquire('../annotation', {
+        angular: testUtil.noCallThru(angular),
+        '../util/account-id': {
+          username: noop,
+        },
+      });
+    }
 
     function createDirective(annotation) {
       annotation = annotation || fixtures.defaultAnnotation();
