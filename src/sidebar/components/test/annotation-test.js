@@ -1068,22 +1068,57 @@ describe('annotation', function() {
     });
 
     describe('tag display', function () {
-      it('displays links to tags on the stream', function () {
+      beforeEach('make serviceUrl() return a URL for the tag', function() {
         fakeServiceUrl
           .withArgs('search.tag', {tag: 'atag'})
           .returns('https://test.hypothes.is/stream?q=tag:atag');
+      });
 
-        var directive = createDirective(Object.assign(fixtures.defaultAnnotation(), {
+      /*
+       * Return an annotation directive with a single tag.
+       */
+      function annotationWithOneTag() {
+        return createDirective(Object.assign(fixtures.defaultAnnotation(), {
           tags: ['atag'],
         }));
+      }
+
+      /**
+       * Return the one tag link element from the given annotation directive.
+       */
+      function tagLinkFrom(directive) {
         var links = [].slice.apply(directive.element[0].querySelectorAll('a'));
         var tagLinks = links.filter(function (link) {
           return link.textContent === 'atag';
         });
-
         assert.equal(tagLinks.length, 1);
-        assert.equal(tagLinks[0].href,
-                     'https://test.hypothes.is/stream?q=tag:atag');
+        return tagLinks[0];
+      }
+
+      context('when the annotation is first-party', function() {
+        beforeEach('configure a first-party annotation', function() {
+          fakeAccountID.isThirdPartyUser.returns(false);
+        });
+
+        it('displays links to tags on the stream', function () {
+          var tagLink = tagLinkFrom(annotationWithOneTag());
+
+          assert.equal(tagLink.href, 'https://test.hypothes.is/stream?q=tag:atag');
+        });
+      });
+
+      context('when the annotation is third-party', function() {
+        beforeEach('configure a third-party annotation', function() {
+          fakeAccountID.isThirdPartyUser.returns(true);
+        });
+
+        it("doesn't link tags for third-party annotations", function () {
+          // Tag search pages aren't supported for third-party annotations in
+          // h, so we don't link to them in the client.
+          var tagLink = tagLinkFrom(annotationWithOneTag());
+
+          assert.isFalse(tagLink.hasAttribute('href'));
+        });
       });
     });
 

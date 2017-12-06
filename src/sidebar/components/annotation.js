@@ -444,6 +444,9 @@ function AnnotationController(
   };
 
   this.tagSearchURL = function(tag) {
+    if (this.isThirdPartyUser()) {
+      return null;
+    }
     return serviceUrl('search.tag', {tag: tag});
   };
 
