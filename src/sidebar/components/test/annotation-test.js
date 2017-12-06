@@ -30,20 +30,6 @@ var groupFixtures = {
 };
 
 /**
- * Returns the annotation directive with helpers stubbed out.
- */
-function annotationComponent() {
-  var noop = function () { return ''; };
-
-  return proxyquire('../annotation', {
-    angular: testUtil.noCallThru(angular),
-    '../util/account-id': {
-      username: noop,
-    },
-  });
-}
-
-/**
  * Returns the controller for the action button with the given `label`.
  *
  * @param {Element} annotationEl - Annotation element
@@ -102,6 +88,12 @@ describe('annotation', function() {
     var $scope;
     var $timeout;
     var $window;
+    // Unfortunately fakeAccountID needs to be initialised here because it
+    // gets passed into proxyquire() _before_ the beforeEach() that initializes
+    // the rest of the fakes runs.
+    var fakeAccountID = {
+      isThirdPartyUser: sinon.stub(),
+    };
     var fakeAnalytics;
     var fakeAnnotationMapper;
     var fakeAnnotationUI;
@@ -115,6 +107,17 @@ describe('annotation', function() {
     var fakeStore;
     var fakeStreamer;
     var sandbox;
+
+    /**
+     * Returns the annotation directive with helpers stubbed out.
+     */
+    function annotationComponent() {
+      return proxyquire('../annotation', {
+        angular: testUtil.noCallThru(angular),
+        '../util/account-id': fakeAccountID,
+        '@noCallThru': true,
+      });
+    }
 
     function createDirective(annotation) {
       annotation = annotation || fixtures.defaultAnnotation();
@@ -181,6 +184,9 @@ describe('annotation', function() {
       fakeFlash = {
         error: sandbox.stub(),
       };
+
+      fakeAccountID.isThirdPartyUser.reset();
+      fakeAccountID.isThirdPartyUser.returns(false);
 
       fakePermissions = {
         isShared: sandbox.stub().returns(true),
@@ -782,6 +788,19 @@ describe('annotation', function() {
             done();
           }, 0);
         });
+      });
+    });
+
+    describe('#isThirdPartyUser', function() {
+      it('returns whether the user is a third party user', function() {
+        var { annotation, controller } = createDirective();
+
+        var returned = controller.isThirdPartyUser();
+
+        assert.calledOnce(fakeAccountID.isThirdPartyUser);
+        assert.alwaysCalledWithExactly(
+          fakeAccountID.isThirdPartyUser, annotation.user, fakeSettings.authDomain);
+        assert.equal(returned, fakeAccountID.isThirdPartyUser());
       });
     });
 
