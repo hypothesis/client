@@ -1,5 +1,7 @@
 'use strict';
 
+var isThirdPartyService = require('../util/is-third-party-service');
+
 module.exports = {
   controllerAs: 'vm',
   //@ngInject
@@ -9,6 +11,10 @@ module.exports = {
     } else {
       this.isThemeClean = false;
     }
+
+    this.showSharePageButton = function () {
+      return !isThirdPartyService(settings);
+    };
   },
   bindings: {
     auth: '<',
