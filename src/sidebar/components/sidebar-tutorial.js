@@ -2,7 +2,7 @@
 
 // @ngInject
 function SidebarTutorialController(session, settings) {
-  this.cleanOnboardingThemeEnabled = settings.enableCleanOnboardingTheme;
+  this.isThemeClean = settings.theme === 'clean';
 
   this.showSidebarTutorial = function () {
     if (session.state.preferences) {

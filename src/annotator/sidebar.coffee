@@ -36,15 +36,10 @@ module.exports = class Sidebar extends Host
 
     if @plugins.Toolbar?
       @toolbarWidth = @plugins.Toolbar.getWidth()
-
-      if config.disableToolbarMinimizeBtn
+      if config.theme == 'clean'
         @plugins.Toolbar.disableMinimizeBtn()
-      if config.disableToolbarHighlightsBtn
         @plugins.Toolbar.disableHighlightsBtn()
-      if config.disableToolbarNewNoteBtn
         @plugins.Toolbar.disableNewNoteBtn()
-      if config.disableToolbarCloseBtn
-        @plugins.Toolbar.disableCloseBtn()
 
       this._setupGestures()
 

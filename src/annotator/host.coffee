@@ -45,7 +45,7 @@ module.exports = class Host extends Guest
     .css('display', 'none')
     .addClass('annotator-frame annotator-outer')
 
-    if config.enableSidebarDropShadow
+    if config.theme == 'clean'
       @frame.addClass('annotator-frame--drop-shadow-enabled')
 
     @frame.appendTo(element)

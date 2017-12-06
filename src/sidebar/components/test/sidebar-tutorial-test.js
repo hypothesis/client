@@ -5,7 +5,7 @@ var Controller = require('../sidebar-tutorial').controller;
 describe('SidebarTutorialController', function () {
 
   describe('showSidebarTutorial', function () {
-    var settings = { enableCleanOnboardingTheme: true };
+    var settings = { theme: 'theme' };
 
     it('returns true if show_sidebar_tutorial is true', function () {
       var session = {
