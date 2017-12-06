@@ -4,7 +4,7 @@ var sessionUtil = require('../util/session-util');
 
 // @ngInject
 function SidebarTutorialController(session, settings) {
-  this.cleanOnboardingThemeEnabled = settings.enableCleanOnboardingTheme;
+  this.isThemeClean = settings.theme === 'clean';
 
   this.showSidebarTutorial = function () {
     return sessionUtil.shouldShowSidebarTutorial(session.state);

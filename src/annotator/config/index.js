@@ -18,14 +18,7 @@ function configFrom(window_) {
     // URL of the client's boot script. Used when injecting the client into
     // child iframes.
     clientUrl: settings.clientUrl,
-    disableToolbarCloseBtn:settings.hostPageSetting('disableToolbarCloseBtn', {defaultValue: true}),
-    disableToolbarMinimizeBtn: settings.hostPageSetting('disableToolbarMinimizeBtn'),
-    disableToolbarHighlightsBtn: settings.hostPageSetting('disableToolbarHighlightsBtn'),
-    disableToolbarNewNoteBtn: settings.hostPageSetting('disableToolbarNewNoteBtn'),
-    disableBucketBar: settings.hostPageSetting('disableBucketBar'),
-    enableCleanOnboardingTheme: settings.hostPageSetting('enableCleanOnboardingTheme'),
     enableExperimentalNewNoteButton: settings.hostPageSetting('enableExperimentalNewNoteButton'),
-    enableSidebarDropShadow: settings.hostPageSetting('enableSidebarDropShadow'),
     theme: settings.hostPageSetting('theme'),
     usernameUrl: settings.hostPageSetting('usernameUrl'),
     onLayoutChange: settings.hostPageSetting('onLayoutChange'),
