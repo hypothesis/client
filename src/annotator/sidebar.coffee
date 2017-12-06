@@ -40,6 +40,8 @@ module.exports = class Sidebar extends Host
         @plugins.Toolbar.disableMinimizeBtn()
         @plugins.Toolbar.disableHighlightsBtn()
         @plugins.Toolbar.disableNewNoteBtn()
+      else
+        @plugins.Toolbar.disableCloseBtn()
 
       this._setupGestures()
 

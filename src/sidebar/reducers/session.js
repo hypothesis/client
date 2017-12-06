@@ -15,6 +15,8 @@ function init() {
       features: {},
       /** List of groups that the current user is a member of. */
       groups: [],
+      /** A map of preference names and values. */
+      preferences: {},
       /**
        * The authenticated user ID or null if the user is not logged in.
        */
