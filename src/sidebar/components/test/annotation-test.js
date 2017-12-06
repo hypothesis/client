@@ -1071,10 +1071,10 @@ describe('annotation', function() {
       beforeEach('make serviceUrl() return a URL for the tag', function() {
         fakeServiceUrl
           .withArgs('search.tag', {tag: 'atag'})
-          .returns('https://test.hypothes.is/stream?q=tag:atag');
+          .returns('https://hypothes.is/search?q=tag:atag');
       });
 
-      /*
+      /**
        * Return an annotation directive with a single tag.
        */
       function annotationWithOneTag() {
@@ -1100,10 +1100,10 @@ describe('annotation', function() {
           fakeAccountID.isThirdPartyUser.returns(false);
         });
 
-        it('displays links to tags on the stream', function () {
+        it('displays links to tag search pages', function () {
           var tagLink = tagLinkFrom(annotationWithOneTag());
 
-          assert.equal(tagLink.href, 'https://test.hypothes.is/stream?q=tag:atag');
+          assert.equal(tagLink.href, 'https://hypothes.is/search?q=tag:atag');
         });
       });
 
