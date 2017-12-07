@@ -15,13 +15,9 @@
     on-change-sort-key="vm.setSortKey(sortKey)">
   </top-bar>
 
-  <div class="create-account-banner" ng-if="vm.isSidebar && vm.auth.status === 'logged-out'">
-    To annotate this document
-    <a href="{{ vm.serviceUrl('signup') }}" target="_blank">
-      create a free account
-    </a>
-    or <a href="" ng-click="vm.login()">log in</a>
-  </div>
+  <create-account-banner
+    ng-if="vm.isSidebar && vm.auth.status === 'logged-out'"
+    on-login="vm.login()"></create-account-banner>
 
   <div class="content">
     <sidebar-tutorial ng-if="vm.isSidebar"></sidebar-tutorial>
