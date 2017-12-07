@@ -184,6 +184,9 @@ function HypothesisAppController(
     if (!this.isSidebar || this.auth.status === 'logged-in') {
       return false;
     }
+    if (serviceConfig(settings)) {
+      return false;
+    }
     return true;
   };
 }

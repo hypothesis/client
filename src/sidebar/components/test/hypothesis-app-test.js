@@ -558,5 +558,16 @@ describe('sidebar.components.hypothesis-app', function () {
         assert.isFalse(ctrl.shouldShowBanner());
       });
     });
+
+    it('returns false when the annotation service uses third-party accounts', () => {
+      fakeServiceConfig.returns({});
+      fakeSession.load = () => Promise.resolve({ userid: null });
+
+      var ctrl = createController();
+
+      return fakeSession.load().then(() => {
+        assert.isFalse(ctrl.shouldShowBanner());
+      });
+    });
   });
 });
