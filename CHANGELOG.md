@@ -4,6 +4,25 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+### Changed
+
+- Don't show page share button on eLife pages
+  ([#620](https://github.com/hypothesis/client/pull/620)).
+
+- Don’t link tags to activity pages on eLife
+  ([#623](https://github.com/hypothesis/client/pull/623)).
+
+- Show the shorter version of the empty annotations/notes message when …
+  ([#611](https://github.com/hypothesis/client/pull/611)).
+
+- Bundle the clean theme related config options into the theme = 'clean…
+  ([#624](https://github.com/hypothesis/client/pull/624)).
+
+- Disable close btn when the classic theme is on. Also fix errors with …
+  ([#626](https://github.com/hypothesis/client/pull/626)).
+
 ## [1.57.0] - 2017-12-04
 
 ### Changed
