@@ -179,6 +179,13 @@ function HypothesisAppController(
 
   this.countPendingUpdates = streamer.countPendingUpdates;
   this.applyPendingUpdates = streamer.applyPendingUpdates;
+
+  this.shouldShowBanner = () => {
+    if (!this.isSidebar || this.auth.status === 'logged-in') {
+      return false;
+    }
+    return true;
+  };
 }
 
 module.exports = {

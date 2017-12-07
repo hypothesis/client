@@ -16,7 +16,7 @@
   </top-bar>
 
   <create-account-banner
-    ng-if="vm.isSidebar && vm.auth.status === 'logged-out'"
+    ng-if="vm.shouldShowBanner()"
     on-login="vm.login()"></create-account-banner>
 
   <div class="content">
