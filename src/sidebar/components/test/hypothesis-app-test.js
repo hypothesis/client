@@ -265,11 +265,6 @@ describe('sidebar.components.hypothesis-app', function () {
     });
   });
 
-  it('exposes the serviceUrl on the controller', function () {
-    var ctrl = createController();
-    assert.equal(ctrl.serviceUrl, fakeServiceUrl);
-  });
-
   it('does not show the share dialog at start', function () {
     var ctrl = createController();
     assert.isFalse(ctrl.shareDialog.visible);

@@ -57,8 +57,6 @@ function HypothesisAppController(
     frameSync.connect();
   }
 
-  this.serviceUrl = serviceUrl;
-
   this.sortKey = function () {
     return annotationUI.getState().sortKey;
   };
