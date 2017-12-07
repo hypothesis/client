@@ -136,6 +136,7 @@ module.exports = angular.module('h', [
   .component('annotationShareDialog', require('./components/annotation-share-dialog'))
   .component('annotationThread', require('./components/annotation-thread'))
   .component('annotationViewerContent', require('./components/annotation-viewer-content'))
+  .component('createAccountBanner', require('./components/create-account-banner'))
   .component('dropdownMenuBtn', require('./components/dropdown-menu-btn'))
   .component('excerpt', require('./components/excerpt'))
   .component('groupList', require('./components/group-list'))

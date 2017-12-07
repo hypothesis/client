@@ -532,4 +532,31 @@ describe('sidebar.components.hypothesis-app', function () {
       });
     });
   });
+
+  describe('#shouldShowBanner', () => {
+    it('returns false in the stream', () => {
+      fakeWindow.top = fakeWindow;
+      fakeSession.load = () => Promise.resolve({ userid: null });
+      var ctrl = createController();
+      return fakeSession.load().then(() => {
+        assert.isFalse(ctrl.shouldShowBanner());
+      });
+    });
+
+    it('returns true if user is logged out', () => {
+      fakeSession.load = () => Promise.resolve({ userid: null });
+      var ctrl = createController();
+      return fakeSession.load().then(() => {
+        assert.isTrue(ctrl.shouldShowBanner());
+      });
+    });
+
+    it('returns false if user is logged in', () => {
+      fakeSession.load = () => Promise.resolve({ userid: 'acct:jim@hypothes.is' });
+      var ctrl = createController();
+      return fakeSession.load().then(() => {
+        assert.isFalse(ctrl.shouldShowBanner());
+      });
+    });
+  });
 });
