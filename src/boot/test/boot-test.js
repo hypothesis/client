@@ -37,7 +37,7 @@ describe('bootstrap', function () {
       'styles/angular-toastr.css',
       'styles/icomoon.css',
       'styles/katex.min.css',
-      'styles/app.css',
+      'styles/sidebar.css',
     ];
 
     var manifest = assetNames.reduce(function (manifest, path) {
@@ -127,9 +127,9 @@ describe('bootstrap', function () {
         'scripts/unorm.bundle.1234.js',
         'styles/angular-csp.1234.css',
         'styles/angular-toastr.1234.css',
-        'styles/app.1234.css',
         'styles/icomoon.1234.css',
         'styles/katex.min.1234.css',
+        'styles/sidebar.1234.css',
       ].map(function (url) {
         return 'https://marginal.ly/client/build/' + url;
       });

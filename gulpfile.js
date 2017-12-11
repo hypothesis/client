@@ -136,7 +136,7 @@ var styleFiles = [
   // H
   './src/styles/annotator/inject.scss',
   './src/styles/annotator/pdfjs-overrides.scss',
-  './src/styles/app.scss',
+  './src/styles/sidebar/sidebar.scss',
 
   // Vendor
   './src/styles/vendor/angular-csp.css',

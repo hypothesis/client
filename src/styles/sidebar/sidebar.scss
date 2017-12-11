@@ -1,37 +1,38 @@
 $base-font-size: 12px;
 $base-line-height: 20px;
 
-@import './variables';
-@import './reset';
+@import '../variables';
+@import '../reset';
+
 @import './elements';
 @import './common';
 
 // Components
 // ----------
-@import './annotation';
-@import './annotation-share-dialog';
-@import './annotation-thread';
-@import './dropdown-menu-btn';
-@import './excerpt';
-@import './group-list';
-@import './help-panel';
-@import './loggedout-message';
-@import './login-control';
-@import './markdown';
-@import './moderation-banner';
-@import './new-note';
-@import './primary-action-btn';
-@import './publish-annotation-btn';
-@import './search-status-bar';
-@import './selection-tabs';
-@import './share-link';
-@import './sidebar-tutorial';
-@import './simple-search';
-@import './spinner';
-@import './tags-input';
-@import './thread-list';
-@import './tooltip';
-@import './top-bar';
+@import './components/annotation';
+@import './components/annotation-share-dialog';
+@import './components/annotation-thread';
+@import './components/dropdown-menu-btn';
+@import './components/excerpt';
+@import './components/group-list';
+@import './components/help-panel';
+@import './components/loggedout-message';
+@import './components/login-control';
+@import './components/markdown';
+@import './components/moderation-banner';
+@import './components/new-note';
+@import './components/primary-action-btn';
+@import './components/publish-annotation-btn';
+@import './components/search-status-bar';
+@import './components/selection-tabs';
+@import './components/share-link';
+@import './components/sidebar-tutorial';
+@import './components/simple-search';
+@import './components/spinner';
+@import './components/tags-input';
+@import './components/thread-list';
+@import './components/tooltip';
+@import './components/top-bar';
 
 // Top-level styles
 // ----------------
