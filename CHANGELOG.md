@@ -4,6 +4,13 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+### Changed
+
+- Remove create account banner
+  ([#630](https://github.com/hypothesis/client/pull/630)).
+
 ## [1.58.0] - 2017-12-07
 
 ### Changed
