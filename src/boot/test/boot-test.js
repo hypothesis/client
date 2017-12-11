@@ -20,8 +20,8 @@ describe('bootstrap', function () {
       'scripts/polyfills.bundle.js',
       'scripts/jquery.bundle.js',
       'scripts/injector.bundle.js',
+      'styles/annotator.css',
       'styles/icomoon.css',
-      'styles/inject.css',
       'styles/pdfjs-overrides.css',
 
       // Sidebar app
@@ -73,8 +73,8 @@ describe('bootstrap', function () {
         'scripts/injector.bundle.1234.js',
         'scripts/jquery.bundle.1234.js',
         'scripts/polyfills.bundle.1234.js',
+        'styles/annotator.1234.css',
         'styles/icomoon.1234.css',
-        'styles/inject.1234.css',
         'styles/pdfjs-overrides.1234.css',
       ].map(function (url) {
         return 'https://marginal.ly/client/build/' + url;

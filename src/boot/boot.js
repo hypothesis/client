@@ -68,7 +68,7 @@ function bootHypothesisClient(doc, config) {
     'scripts/injector.bundle.js',
 
     'styles/icomoon.css',
-    'styles/inject.css',
+    'styles/annotator.css',
     'styles/pdfjs-overrides.css',
   ]);
 }
