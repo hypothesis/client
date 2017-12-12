@@ -81,6 +81,43 @@ loads.
       experimental and may change in future. ``true`` and ``false`` values
       are the stable API.
 
+.. option:: theme
+
+   ``String``. Controls the overall look of the sidebar.(Default: ``classic``).
+
+   ``"classic"`` - Enables the card view for annotations, the bucket bar, the sidebar minimize
+   button, the highlights button and the new note button in the toolbar. It also disables the
+   close button in the toolbar. The classic theme is enabled by default.
+
+   ``"clean"`` - Enables the clean view for annotations in the sidebar, disables the bucket bar,
+   the sidebar minimize button, the highlights button and the new note button in the toolbar and enables the
+   close button in the toolbar. It will also show a cleaner and more minimal onboarding tutorial.
+
+.. option:: enableExperimentalNewNoteButton
+
+   ``Boolean`` - Controls whether the experimental New Note button should be shown in the
+   notes tab in the sidebar. (Default: ``false``).
+
+   ``true`` - The button is shown.
+
+   ``false`` - The button is not shown.
+
+.. option:: usernameUrl
+
+   ``String``. This allows you to specify a URL to direct a user to, in a new tab when they
+   click on the annotation author link in the header of an annotation. The username is appended to the end
+   of `usernameUrl`.
+
+   For example:
+
+   .. code-block:: javascript
+
+      window.hypothesisConfig = function () {
+        return {
+          usernameUrl: 'https://partner.org/user/',
+        };
+      };
+
 .. option:: services
 
    ``Array``. A list of alternative annotation services which the client should
