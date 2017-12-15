@@ -162,6 +162,20 @@ describe('sidebar.util.oauth-client', () => {
     });
   });
 
+  describe('.createLoginPopupWindow', () => {
+    it('creates and returns the popup window', () => {
+      var fakeWindow = new FakeWindow;
+      var popupWindow = OAuthClient.createLoginPopupWindow(fakeWindow);
+      assert.equal(popupWindow, fakeWindow.open.returnValues[0]);
+      assert.calledWith(
+        fakeWindow.open,
+        'about:blank',
+        'Login to Hypothesis',
+        'height=430,left=274.5,top=169,width=475'
+      );
+    });
+  });
+
   describe('#authorize', () => {
     var fakeWindow;
 
@@ -169,8 +183,14 @@ describe('sidebar.util.oauth-client', () => {
       fakeWindow = new FakeWindow;
     });
 
-    it('opens a popup window at the authorization URL', () => {
-      var authorized = client.authorize(fakeWindow);
+    function authorize() {
+      var popupWindow = OAuthClient.createLoginPopupWindow(fakeWindow);
+      var authorized = client.authorize(fakeWindow, popupWindow);
+      return { authorized, popupWindow };
+    }
+
+    it('navigates the popup window to the authorization URL', () => {
+      var { authorized, popupWindow } = authorize();
 
       fakeWindow.sendMessage({
         type: 'authorization_response',
@@ -187,22 +207,12 @@ describe('sidebar.util.oauth-client', () => {
           state: 'notrandom',
         };
         var expectedAuthUrl = `${config.authorizationEndpoint}?${stringify(params)}`;
-        // Check that the auth window was opened and then set to the expected
-        // location. The final URL is not passed to `window.open` to work around
-        // a pop-up blocker issue.
-        assert.calledWith(
-          fakeWindow.open,
-          'about:blank',
-          'Login to Hypothesis',
-          'height=430,left=274.5,top=169,width=475'
-        );
-        var authPopup = fakeWindow.open.returnValues[0];
-        assert.equal(authPopup.location.href, expectedAuthUrl);
+        assert.equal(popupWindow.location.href, expectedAuthUrl);
       });
     });
 
     it('resolves with an auth code if successful', () => {
-      var authorized = client.authorize(fakeWindow);
+      var { authorized } = authorize();
 
       fakeWindow.sendMessage({
         type: 'authorization_response',
@@ -216,7 +226,7 @@ describe('sidebar.util.oauth-client', () => {
     });
 
     it('rejects with an error if canceled', () => {
-      var authorized = client.authorize(fakeWindow);
+      var { authorized } = authorize();
 
       fakeWindow.sendMessage({
         type: 'authorization_canceled',
@@ -229,7 +239,7 @@ describe('sidebar.util.oauth-client', () => {
     });
 
     it('ignores responses with incorrect "state" values', () => {
-      var authorized = client.authorize(fakeWindow);
+      var { authorized } = authorize();
 
       fakeWindow.sendMessage({
         type: 'authorization_response',

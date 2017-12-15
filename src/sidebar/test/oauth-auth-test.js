@@ -12,6 +12,7 @@ var TOKEN_KEY = 'hypothesis.oauth.hypothes%2Eis.token';
 describe('sidebar.oauth-auth', function () {
 
   var $rootScope;
+  var FakeOAuthClient;
   var auth;
   var nowStub;
   var fakeApiRoutes;
@@ -83,6 +84,13 @@ describe('sidebar.oauth-auth', function () {
       authorize: sinon.stub().returns(Promise.resolve(null)),
     };
 
+    FakeOAuthClient = ($http, config) => {
+      fakeClient.$http = $http;
+      fakeClient.config = config;
+      return fakeClient;
+    };
+    FakeOAuthClient.createLoginPopupWindow = sinon.stub();
+
     fakeWindow = new FakeWindow;
 
     fakeHttp = {};
@@ -94,11 +102,7 @@ describe('sidebar.oauth-auth', function () {
       flash: fakeFlash,
       localStorage: fakeLocalStorage,
       settings: fakeSettings,
-      OAuthClient: ($http, config) => {
-        fakeClient.$http = $http;
-        fakeClient.config = config;
-        return fakeClient;
-      },
+      OAuthClient: FakeOAuthClient,
     });
 
     angular.mock.inject((_auth_, _$rootScope_) => {
@@ -499,8 +503,10 @@ describe('sidebar.oauth-auth', function () {
     });
 
     it('calls OAuthClient#authorize', () => {
+      var fakePopup = {};
+      FakeOAuthClient.createLoginPopupWindow.returns(fakePopup);
       return auth.login().then(() => {
-        assert.calledWith(fakeClient.authorize, fakeWindow);
+        assert.calledWith(fakeClient.authorize, fakeWindow, fakePopup);
       });
     });
 

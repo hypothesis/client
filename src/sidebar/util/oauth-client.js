@@ -151,10 +151,12 @@ class OAuthClient {
    *
    * Returns an authorization code which can be passed to `exchangeAuthCode`.
    *
-   * @param {Window} $window
+   * @param {Window} $window - Window which will receive the auth response.
+   * @param {Window} authWindow - Popup window where the login prompt will be shown.
+   *   This should be created using `createLoginPopupWindow`.
    * @return {Promise<string>}
    */
-  authorize($window) {
+  authorize($window, authWindow) {
     // Random state string used to check that auth messages came from the popup
     // window that we opened.
     var state = this.generateState();
@@ -184,41 +186,6 @@ class OAuthClient {
     });
 
     // Authorize user and retrieve grant token
-
-    // In Chrome & Firefox the sizes passed to `window.open` are used for the
-    // viewport size. In Safari the size is used for the window size including
-    // title bar etc. There is enough vertical space at the bottom to allow for
-    // this.
-    //
-    // See https://bugs.webkit.org/show_bug.cgi?id=143678
-    var width  = 475;
-    var height = 430;
-    var left   = $window.screen.width / 2 - width / 2;
-    var top    = $window.screen.height /2 - height / 2;
-
-    // Generate settings for `window.open` in the required comma-separated
-    // key=value format.
-    var authWindowSettings = queryString.stringify({
-      left: left,
-      top: top,
-      width: width,
-      height: height,
-    }).replace(/&/g, ',');
-
-    // Open the auth window before fetching the `oauth.authorize` URL to ensure
-    // that the `window.open` call happens in the same turn of the event loop
-    // that was initiated by the user clicking the "Log in" link.
-    //
-    // Otherwise the `window.open` call is not deemed to be in response to a
-    // user gesture in Firefox & IE 11 and their popup blocking heuristics will
-    // prevent the window being opened. See
-    // https://github.com/hypothesis/client/issues/534 and
-    // https://github.com/hypothesis/client/issues/535.
-    //
-    // Chrome, Safari & Edge have different heuristics and are not affected by
-    // this problem.
-    var authWindow = $window.open('about:blank', 'Login to Hypothesis', authWindowSettings);
-
     var authUrl = this.authorizationEndpoint;
     authUrl += '?' + queryString.stringify({
       client_id: this.clientId,
@@ -244,6 +211,41 @@ class OAuthClient {
       headers: {'Content-Type': 'application/x-www-form-urlencoded'},
     };
     return this.$http.post(url, data, requestConfig);
+  }
+
+  /**
+   * Create a pop-up window for use with `OAuthClient#authorize`.
+   *
+   * This function _must_ be called in the same turn of the event loop as the
+   * button or link which initiates login to avoid triggering the popup blocker
+   * in certain browsers. See https://github.com/hypothesis/client/issues/534
+   * and https://github.com/hypothesis/client/issues/535.
+   *
+   * @param {Window} $window - The parent of the popup window.
+   * @return {Window}
+   */
+  static createLoginPopupWindow($window) {
+    // In Chrome & Firefox the sizes passed to `window.open` are used for the
+    // viewport size. In Safari the size is used for the window size including
+    // title bar etc. There is enough vertical space at the bottom to allow for
+    // this.
+    //
+    // See https://bugs.webkit.org/show_bug.cgi?id=143678
+    var width  = 475;
+    var height = 430;
+    var left   = $window.screen.width / 2 - width / 2;
+    var top    = $window.screen.height /2 - height / 2;
+
+    // Generate settings for `window.open` in the required comma-separated
+    // key=value format.
+    var authWindowSettings = queryString.stringify({
+      left: left,
+      top: top,
+      width: width,
+      height: height,
+    }).replace(/&/g, ',');
+
+    return $window.open('about:blank', 'Login to Hypothesis', authWindowSettings);
   }
 }
 

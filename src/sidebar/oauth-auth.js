@@ -255,8 +255,9 @@ function auth($http, $rootScope, $window, OAuthClient,
    * then exchange for access and refresh tokens.
    */
   function login() {
+    var authWindow = OAuthClient.createLoginPopupWindow($window);
     return oauthClient().then(client => {
-      return client.authorize($window);
+      return client.authorize($window, authWindow);
     }).then(code => {
       // Save the auth code. It will be exchanged for an access token when the
       // next API request is made.
