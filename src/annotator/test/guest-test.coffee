@@ -196,6 +196,29 @@ describe 'Guest', ->
         assert.calledWith(fooHandler, '1', '2')
         assert.calledWith(barHandler, '1', '2')
 
+      context 'when targeting only sub frames', ->
+        it 'does not anchor annotations on "annotationsLoaded", for the top frame', ->
+          guest = createGuest({onlySubFrameAnnotations: true})
+          options = CrossFrame.lastCall.args[1]
+          
+          ann1 = {id: 1, $tag: 'tag1'}
+          ann2 = {id: 2, $tag: 'tag2'}
+          sandbox.stub(guest, 'anchor')
+          options.emit('annotationsLoaded', [ann1, ann2])
+          assert.notCalled(guest.anchor)
+
+        it 'does anchor annotations on "annotationsLoaded", for the sub frame', ->
+          guest = createGuest({onlySubFrameAnnotations: true, subFrameIdentifier: 123})
+          options = CrossFrame.lastCall.args[1]
+
+          ann1 = {id: 1, $tag: 'tag1'}
+          ann2 = {id: 2, $tag: 'tag2'}
+          sandbox.stub(guest, 'anchor')
+          options.emit('annotationsLoaded', [ann1, ann2])
+          assert.calledTwice(guest.anchor)
+          assert.calledWith(guest.anchor, ann1)
+          assert.calledWith(guest.anchor, ann2)
+
   describe 'annotation UI events', ->
     emitGuestEvent = (event, args...) ->
       fn(args...) for [evt, fn] in fakeCrossFrame.on.args when event == evt
@@ -350,6 +373,21 @@ describe 'Guest', ->
       guest = createGuest()
       selections.next(null)
       assert.called FakeAdder::instance.hide
+
+    context 'when only targetting sub frames', ->
+      it 'does not show the adder on selection, for the top frame', ->
+        guest = createGuest({onlySubFrameAnnotations: true})
+        selections.next({})
+        assert.notCalled FakeAdder::instance.showAt
+
+      it 'does show the adder on selection, for the sub frame', ->
+        guest = createGuest({onlySubFrameAnnotations: true, subFrameIdentifier: 123})
+        rangeUtil.selectionFocusRect.returns({left: 0, top: 0, width: 5, height: 5})
+        FakeAdder::instance.target.returns({
+          left: 0, top: 0, arrowDirection: adder.ARROW_POINTING_UP
+        })
+        selections.next({})
+        assert.called FakeAdder::instance.showAt
 
   describe '#getDocumentInfo()', ->
     guest = null
