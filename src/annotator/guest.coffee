@@ -55,6 +55,7 @@ module.exports = class Guest extends Delegator
   anchors: null
   visibleHighlights: false
   frameIdentifier: null
+  onlyTargetsSubFrame: false
 
   html:
     adder: '<hypothesis-adder></hypothesis-adder>'
@@ -88,6 +89,8 @@ module.exports = class Guest extends Delegator
     # The "top" guest instance will have this as null since it's in a top frame not a sub frame
     this.frameIdentifier = config.subFrameIdentifier || null
 
+    this.onlyTargetsSubFrame = !config.subFrameIdentifier && config.onlySubFrameAnnotations
+
     cfOptions =
       config: config
       on: (event, handler) =>
@@ -99,7 +102,10 @@ module.exports = class Guest extends Delegator
     @crossframe = this.plugins.CrossFrame
 
     @crossframe.onConnect(=> this._setupInitialState(config))
-    this._connectAnnotationSync(@crossframe)
+
+    if !this.onlyTargetsSubFrame
+      this._connectAnnotationSync(@crossframe)
+
     this._connectAnnotationUISync(@crossframe)
 
     # Load plugins
@@ -412,6 +418,9 @@ module.exports = class Guest extends Delegator
     @crossframe?.call('focusAnnotations', tags)
 
   _onSelection: (range) ->
+    if this.onlyTargetsSubFrame 
+      return
+      
     selection = document.getSelection()
     isBackwards = rangeUtil.isSelectionBackwards(selection)
     focusRect = rangeUtil.selectionFocusRect(selection)
