@@ -4,6 +4,16 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+### Changed
+
+- Rename the main JS bundles that make up the client
+  ([#633](https://github.com/hypothesis/client/pull/633)).
+
+- Fix broken adder toolbar styling
+  ([#642](https://github.com/hypothesis/client/pull/642)).
+
 ## [1.60.0] - 2017-12-19
 
 ### Changed
