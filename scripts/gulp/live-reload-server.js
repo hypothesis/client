@@ -99,11 +99,6 @@ function LiveReloadServer(port, config) {
 
                 // Open the sidebar when the page loads
                 openSidebar: true,
-                pageGroups: [
-                  // "http://h.hypothesis:5000/groups/MGkYz9j2/http-test-localhost", // will 404
-                  "http://h.hypothesis:5000/groups/2JKqAjYE/scipub-com-open-group",
-                  "http://h.hypothesis:5000/groups/wg54vyqQ/h-hypothesis-open",
-                ]
               };
             };
 
