@@ -4,6 +4,18 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+### Changed
+
+- Update the docs for config options available to third party publishers.
+  ([#636](https://github.com/hypothesis/client/pull/636)).
+
+- Some internal restructuring of the client
+  ([#632](https://github.com/hypothesis/client/pull/632),
+   [#634](https://github.com/hypothesis/client/pull/634),
+   [#635](https://github.com/hypothesis/client/pull/635))
+
 ## [1.59.0] - 2017-12-11
 
 ### Changed
