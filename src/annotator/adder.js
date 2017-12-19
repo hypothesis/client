@@ -90,7 +90,7 @@ function createAdderDOM(container) {
     var adderStyles = Array.from(document.styleSheets).map(function (sheet) {
       return sheet.href;
     }).filter(function (url) {
-      return (url || '').match(/(icomoon|inject)\.css/);
+      return (url || '').match(/(icomoon|annotator)\.css/);
     });
 
     // Stylesheet <link> elements are inert inside shadow roots [1]. Until
