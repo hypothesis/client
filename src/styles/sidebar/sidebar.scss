@@ -20,6 +20,7 @@ $base-line-height: 20px;
 @import './components/login-control';
 @import './components/markdown';
 @import './components/moderation-banner';
+@import './components/new-group-list';
 @import './components/new-note';
 @import './components/primary-action-btn';
 @import './components/publish-annotation-btn';
@@ -33,7 +34,6 @@ $base-line-height: 20px;
 @import './components/thread-list';
 @import './components/tooltip';
 @import './components/top-bar';
-@import './new-group-list';
 
 // Top-level styles
 // ----------------
