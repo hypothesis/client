@@ -134,7 +134,7 @@ gulp.task('watch-js', ['build-vendor-js'], function () {
 
 var styleFiles = [
   // H
-  './src/styles/annotator/inject.scss',
+  './src/styles/annotator/annotator.scss',
   './src/styles/annotator/pdfjs-overrides.scss',
   './src/styles/sidebar/sidebar.scss',
 
