@@ -107,12 +107,12 @@ var appBundles = [{
   // The sidebar application for displaying and editing annotations.
   name: 'app',
   transforms: ['babel', 'coffee'],
-  entry: './src/sidebar/app',
+  entry: './src/sidebar/index',
 },{
   // The annotation layer which handles displaying highlights, presenting
   // annotation tools on the page and instantiating the sidebar application.
   name: 'injector',
-  entry: './src/annotator/main',
+  entry: './src/annotator/index',
   transforms: ['babel', 'coffee'],
 }];
 
