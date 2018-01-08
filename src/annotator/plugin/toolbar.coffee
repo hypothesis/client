@@ -50,26 +50,26 @@ module.exports = class Toolbar extends Plugin
             @annotator.show()
           else
             @annotator.hide()
-    ,
-      "title": "Hide Highlights"
-      "class": "h-icon-visibility"
-      "name": "highlight-visibility"
-      "on":
-        "click": (event) =>
-          event.preventDefault()
-          event.stopPropagation()
-          state = not @annotator.visibleHighlights
-          @annotator.setAllVisibleHighlights state
-    ,
-      "title": "New Page Note"
-      "class": "h-icon-note"
-      "name": "insert-comment"
-      "on":
-        "click": (event) =>
-          event.preventDefault()
-          event.stopPropagation()
-          @annotator.createAnnotation()
-          @annotator.show()
+    # ,
+    #   "title": "Hide Highlights"
+    #   "class": "h-icon-visibility"
+    #   "name": "highlight-visibility"
+    #   "on":
+    #     "click": (event) =>
+    #       event.preventDefault()
+    #       event.stopPropagation()
+    #       state = not @annotator.visibleHighlights
+    #       @annotator.setAllVisibleHighlights state
+    # ,
+    #   "title": "New Page Note"
+    #   "class": "h-icon-note"
+    #   "name": "insert-comment"
+    #   "on":
+    #     "click": (event) =>
+    #       event.preventDefault()
+    #       event.stopPropagation()
+    #       @annotator.createAnnotation()
+    #       @annotator.show()
     ]
     @buttons = $(makeButton(item) for item in items)
 

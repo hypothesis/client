@@ -95,46 +95,46 @@ describe('topBar', function () {
     assert.called(onLogout);
   });
 
-  it("checks whether we're using a third-party service", function () {
-    createTopBar();
+  // it("checks whether we're using a third-party service", function () {
+  //   createTopBar();
 
-    assert.called(fakeIsThirdPartyService);
-    assert.alwaysCalledWithExactly(fakeIsThirdPartyService, fakeSettings);
-  });
+  //   assert.called(fakeIsThirdPartyService);
+  //   assert.alwaysCalledWithExactly(fakeIsThirdPartyService, fakeSettings);
+  // });
 
-  context('when using a first-party service', function () {
-    it('shows the share page button', function () {
-      var el = createTopBar();
-      // I want the DOM element, not AngularJS's annoying angular.element
-      // wrapper object.
-      el = el [0];
+  // context('when using a first-party service', function () {
+  //   it('shows the share page button', function () {
+  //     var el = createTopBar();
+  //     // I want the DOM element, not AngularJS's annoying angular.element
+  //     // wrapper object.
+  //     el = el [0];
 
-      assert.isNotNull(el.querySelector('[title="Share this page"]'));
-    });
-  });
+  //     assert.isNotNull(el.querySelector('[title="Share this page"]'));
+  //   });
+  // });
 
-  context('when using a third-party service', function () {
-    beforeEach(function() {
-      fakeIsThirdPartyService.returns(true);
-    });
+  // context('when using a third-party service', function () {
+  //   beforeEach(function() {
+  //     fakeIsThirdPartyService.returns(true);
+  //   });
 
-    it("doesn't show the share page button", function () {
-      var el = createTopBar();
-      // I want the DOM element, not AngularJS's annoying angular.element
-      // wrapper object.
-      el = el [0];
+  //   it("doesn't show the share page button", function () {
+  //     var el = createTopBar();
+  //     // I want the DOM element, not AngularJS's annoying angular.element
+  //     // wrapper object.
+  //     el = el [0];
 
-      assert.isNull(el.querySelector('[title="Share this page"]'));
-    });
-  });
+  //     assert.isNull(el.querySelector('[title="Share this page"]'));
+  //   });
+  // });
 
-  it('displays the share page when "Share this page" is clicked', function () {
-    var onSharePage = sinon.stub();
-    var el = createTopBar({ onSharePage: onSharePage });
-    el.find('[title="Share this page"]').click();
+  // it('displays the share page when "Share this page" is clicked', function () {
+  //   var onSharePage = sinon.stub();
+  //   var el = createTopBar({ onSharePage: onSharePage });
+  //   el.find('[title="Share this page"]').click();
 
-    assert.called(onSharePage);
-  });
+  //   assert.called(onSharePage);
+  // });
 
   it('displays the search input and propagates query changes', function () {
     var onSearch = sinon.stub();
@@ -152,24 +152,24 @@ describe('topBar', function () {
     assert.calledWith(onSearch, 'new-query');
   });
 
-  it('displays the sort dropdown and propagates sort key changes', function () {
-    var onChangeSortKey = sinon.stub();
-    var el = createTopBar({
-      sortKeysAvailable: ['Newest', 'Oldest'],
-      sortKey: 'Newest',
-      onChangeSortKey: {
-        args: ['sortKey'],
-        callback: onChangeSortKey,
-      },
-    });
-    var sortDropdown = el.find('sort-dropdown').controller('sortDropdown');
+  // it('displays the sort dropdown and propagates sort key changes', function () {
+  //   var onChangeSortKey = sinon.stub();
+  //   var el = createTopBar({
+  //     sortKeysAvailable: ['Newest', 'Oldest'],
+  //     sortKey: 'Newest',
+  //     onChangeSortKey: {
+  //       args: ['sortKey'],
+  //       callback: onChangeSortKey,
+  //     },
+  //   });
+  //   var sortDropdown = el.find('sort-dropdown').controller('sortDropdown');
 
-    assert.deepEqual(sortDropdown.sortKeysAvailable, ['Newest', 'Oldest']);
-    assert.deepEqual(sortDropdown.sortKey, 'Newest');
+  //   assert.deepEqual(sortDropdown.sortKeysAvailable, ['Newest', 'Oldest']);
+  //   assert.deepEqual(sortDropdown.sortKey, 'Newest');
 
-    sortDropdown.onChangeSortKey({sortKey: 'Oldest'});
-    assert.calledWith(onChangeSortKey, 'Oldest');
-  });
+  //   sortDropdown.onChangeSortKey({sortKey: 'Oldest'});
+  //   assert.calledWith(onChangeSortKey, 'Oldest');
+  // });
 
   it('shows the clean theme when settings contains the clean theme option', function () {
     angular.mock.module('app', {

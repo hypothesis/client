@@ -11,7 +11,7 @@
       {{ vm.totalAnnotations }}
     </span>
   </a>
-  <a class="selection-tabs__type"
+  <!-- <a class="selection-tabs__type"
      href="#"
      ng-class="{'is-selected': vm.selectedTab === vm.TAB_NOTES}"
      h-on-touch="vm.selectTab(vm.TAB_NOTES)">
@@ -20,8 +20,8 @@
       ng-if="vm.totalNotes > 0 && !vm.isWaitingToAnchorAnnotations">
       {{ vm.totalNotes }}
     </span>
-  </a>
-  <a class="selection-tabs__type selection-tabs__type--orphan"
+  </a> -->
+  <!-- <a class="selection-tabs__type selection-tabs__type--orphan"
     ng-if="vm.totalOrphans > 0"
     href="#"
     ng-class="{'is-selected': vm.selectedTab === vm.TAB_ORPHANS}"
@@ -31,13 +31,13 @@
       ng-if="vm.totalOrphans > 0 && !vm.isWaitingToAnchorAnnotations">
       {{ vm.totalOrphans }}
     </span>
-  </a>
+  </a> -->
 </div>
 <new-note-btn
   ng-if="vm.selectedTab === vm.TAB_NOTES && vm.enableExperimentalNewNoteButton">
 </new-note-btn>
 <div ng-if="!vm.isLoading()" class="selection-tabs__empty-message">
-  <div ng-if="vm.showNotesUnavailableMessage()"  class="annotation-unavailable-message">
+  <!-- <div ng-if="vm.showNotesUnavailableMessage()"  class="annotation-unavailable-message">
     <p class="annotation-unavailable-message__label">
       There are no page notes in this group.
       <br />
@@ -47,7 +47,7 @@
         button.
       </div>
     </p>
-  </div>
+  </div> -->
   <div ng-if="vm.showAnnotationsUnavailableMessage()"  class="annotation-unavailable-message">
     <p class="annotation-unavailable-message__label">
       There are no annotations in this group.

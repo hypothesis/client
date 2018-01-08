@@ -40,7 +40,7 @@ module.exports = class Guest extends Delegator
     ".annotator-hl click":               "onHighlightClick"
     ".annotator-hl mouseover":           "onHighlightMouseover"
     ".annotator-hl mouseout":            "onHighlightMouseout"
-    "click":                             "onElementClick"
+    # "click":                             "onElementClick"
     "touchstart":                        "onElementTouchStart"
 
   options:
@@ -445,18 +445,19 @@ module.exports = class Guest extends Delegator
     else
       this.showAnnotations annotations
 
-  onElementClick: (event) ->
-    if !@selectedTargets?.length
-      @crossframe?.call('hideSidebar')
+  # onElementClick: (event) ->
+  #   if !@selectedTargets?.length
+  #     console.log("element click")
+  #     @crossframe?.call('hideSidebar')
 
-  onElementTouchStart: (event) ->
-    # Mobile browsers do not register click events on
-    # elements without cursor: pointer. So instead of
-    # adding that to every element, we can add the initial
-    # touchstart event which is always registered to
-    # make up for the lack of click support for all elements.
-    if !@selectedTargets?.length
-      @crossframe?.call('hideSidebar')
+  # onElementTouchStart: (event) ->
+  #   # Mobile browsers do not register click events on
+  #   # elements without cursor: pointer. So instead of
+  #   # adding that to every element, we can add the initial
+  #   # touchstart event which is always registered to
+  #   # make up for the lack of click support for all elements.
+  #   if !@selectedTargets?.length
+  #     @crossframe?.call('hideSidebar')
 
   onHighlightMouseover: (event) ->
     return unless @visibleHighlights
