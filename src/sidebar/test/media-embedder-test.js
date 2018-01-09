@@ -72,41 +72,39 @@ describe('media-embedder', function () {
     });
   });
 
-  it('translates YouTube `t` param values to seconds', function () {
-    var urls = [
-      'https://www.youtube.com/watch?v=QCkm0lL-6lc&t=5m',
-      'https://www.youtube.com/watch?v=QCkm0lL-6lc&t=1h5m15s',
-      'https://www.youtube.com/watch?v=QCkm0lL-6lc&t=20m10s',
-      'https://www.youtube.com/watch?v=QCkm0lL-6lc&t=h20m10s',
-      'https://www.youtube.com/watch?v=QCkm0lL-6lc&t=1h20s',
-      'https://www.youtube.com/watch?v=QCkm0lL-6lc&t=1h20ss',
-      'https://www.youtube.com/watch/?v=QCkm0lL-6lc&t=5s',
-      'https://www.youtube.com/watch/?v=QCkm0lL-6lc&t=0m5s',
-      'https://www.youtube.com/watch/?v=QCkm0lL-6lc&t=m5s',
-      'https://www.youtube.com/watch/?v=QCkm0lL-6lc&t=10',
+  it('parses YouTube `t` param values into seconds', function () {
+    var cases = [
+      ['https://www.youtube.com/watch?v=QCkm0lL-6lc&t=5m',
+       'https://www.youtube.com/embed/QCkm0lL-6lc?start=300'],
+      ['https://www.youtube.com/watch?v=QCkm0lL-6lc&t=1h5m15s',
+       'https://www.youtube.com/embed/QCkm0lL-6lc?start=3915'],
+      ['https://www.youtube.com/watch?v=QCkm0lL-6lc&t=20m10s',
+       'https://www.youtube.com/embed/QCkm0lL-6lc?start=1210'],
+      ['https://www.youtube.com/watch?v=QCkm0lL-6lc&t=h20m10s',
+       'https://www.youtube.com/embed/QCkm0lL-6lc?start=1210'],
+      ['https://www.youtube.com/watch?v=QCkm0lL-6lc&t=1h20s',
+       'https://www.youtube.com/embed/QCkm0lL-6lc?start=3620'],
+      ['https://www.youtube.com/watch?v=QCkm0lL-6lc&t=1h20ss',
+       'https://www.youtube.com/embed/QCkm0lL-6lc?start=3620'],
+      ['https://www.youtube.com/watch/?v=QCkm0lL-6lc&t=5s',
+       'https://www.youtube.com/embed/QCkm0lL-6lc?start=5'],
+      ['https://www.youtube.com/watch/?v=QCkm0lL-6lc&t=0m5s',
+       'https://www.youtube.com/embed/QCkm0lL-6lc?start=5'],
+      ['https://www.youtube.com/watch/?v=QCkm0lL-6lc&t=m5s',
+       'https://www.youtube.com/embed/QCkm0lL-6lc?start=5'],
+      ['https://www.youtube.com/watch/?v=QCkm0lL-6lc&t=10',
+       'https://www.youtube.com/embed/QCkm0lL-6lc?start=10'],
     ];
-    var expected = [
-      'https://www.youtube.com/embed/QCkm0lL-6lc?start=300',
-      'https://www.youtube.com/embed/QCkm0lL-6lc?start=3915',
-      'https://www.youtube.com/embed/QCkm0lL-6lc?start=1210',
-      'https://www.youtube.com/embed/QCkm0lL-6lc?start=1210',
-      'https://www.youtube.com/embed/QCkm0lL-6lc?start=3620',
-      'https://www.youtube.com/embed/QCkm0lL-6lc?start=3620',
-      'https://www.youtube.com/embed/QCkm0lL-6lc?start=5',
-      'https://www.youtube.com/embed/QCkm0lL-6lc?start=5',
-      'https://www.youtube.com/embed/QCkm0lL-6lc?start=5',
-      'https://www.youtube.com/embed/QCkm0lL-6lc?start=10',
-    ];
-    urls.forEach(function (url, idx) {
-      var element = domElement('<a href="' + url + '">' + url + '</a>');
+    cases.forEach(function (url) {
+      var element = domElement('<a href="' + url[0] + '">' + url[0] + '</a>');
 
       mediaEmbedder.replaceLinksWithEmbeds(element);
 
       assert.equal(element.childElementCount, 1);
-      assert.equal(element.children[0].tagName, 'IFRAME', url);
+      assert.equal(element.children[0].tagName, 'IFRAME', url[0]);
       assert.equal(
         element.children[0].src,
-        expected[idx]);
+        url[1]);
     });
   });
 

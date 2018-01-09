@@ -38,7 +38,7 @@ function iframe(src) {
  * formatYouTubeTime('1h1s'); // returns '3601'
  * formatYouTubeTime('10'); // returns '10'
  **/
-function formatYouTubeTime (timeValue) {
+function parseTimeString (timeValue) {
   var timePattern = /(\d+)([hms]?)/g;
   const multipliers = {
     h: 60 * 60,
@@ -90,7 +90,7 @@ function youTubeQueryParams(link) {
         // `t` is not supported in embeds; `start` is
         // `t` accepts more formats than `start`; start must be in seconds
         // so, format it as seconds first
-        filteredQuery.start = formatYouTubeTime(linkParams[key]);
+        filteredQuery.start = parseTimeString(linkParams[key]);
       } else {
         filteredQuery[key] = linkParams[key];
       }
