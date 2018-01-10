@@ -4,6 +4,13 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+### Changed
+
+- Allow whitelisted URL params in YouTube embeds
+  ([#646](https://github.com/hypothesis/client/pull/646)).
+
 ## [1.61.0] - 2017-12-19
 
 ### Changed
