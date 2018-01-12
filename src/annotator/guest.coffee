@@ -73,6 +73,8 @@ module.exports = class Guest extends Delegator
         self.setVisibleHighlights(true)
         self.createHighlight()
         document.getSelection().removeAllRanges()
+      isHighlighBtnVisible: ->
+        false
     })
     this.selections = selections(document).subscribe
       next: (range) ->

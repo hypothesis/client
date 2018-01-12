@@ -7,7 +7,7 @@ var template = require('./adder.html');
 var ANNOTATE_BTN_CLASS = 'js-annotate-btn';
 var ANNOTATE_BTN_SELECTOR = '.js-annotate-btn';
 
-// var HIGHLIGHT_BTN_SELECTOR = '.js-highlight-btn';
+var HIGHLIGHT_BTN_SELECTOR = '.js-highlight-btn';
 
 /**
  * @typedef Target
@@ -127,6 +127,7 @@ function createAdderDOM(container) {
 function Adder(container, options) {
 
   var self = this;
+  var isHighlightBtnVisible = options.isHighlightBtnVisible;
   self.element = createAdderDOM(container);
 
   // Set initial style
@@ -151,8 +152,14 @@ function Adder(container, options) {
 
   self.element.querySelector(ANNOTATE_BTN_SELECTOR)
     .addEventListener('click', handleCommand);
-  // self.element.querySelector(HIGHLIGHT_BTN_SELECTOR)
-  //   .addEventListener('click', handleCommand);
+
+  if (isHighlightBtnVisible) {
+    self.element.querySelector(HIGHLIGHT_BTN_SELECTOR)
+    .addEventListener('click', handleCommand);
+  } else {
+    self.element.querySelector(HIGHLIGHT_BTN_SELECTOR).style.display = 'none';
+  }
+
 
   function handleCommand(event) {
     event.preventDefault();
