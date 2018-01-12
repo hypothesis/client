@@ -1,6 +1,6 @@
 'use strict';
 
-var persona = require('../filter/persona');
+var { isThirdPartyUser } = require('../util/account-id');
 var serviceConfig = require('../service-config');
 
 // @ngInject
@@ -12,7 +12,7 @@ function GroupListController($window, analytics, groups, settings, serviceUrl) {
   };
 
   this.isThirdPartyUser = function () {
-    return persona.isThirdPartyUser(this.auth.userid, settings.authDomain);
+    return isThirdPartyUser(this.auth.userid, settings.authDomain);
   };
 
   this.leaveGroup = function (groupId) {

@@ -65,10 +65,10 @@ function bootHypothesisClient(doc, config) {
     'scripts/jquery.bundle.js',
 
     // Main entry point for the client
-    'scripts/injector.bundle.js',
+    'scripts/annotator.bundle.js',
 
     'styles/icomoon.css',
-    'styles/inject.css',
+    'styles/annotator.css',
     'styles/pdfjs-overrides.css',
   ]);
 }
@@ -87,13 +87,13 @@ function bootSidebarApp(doc, config) {
     'scripts/unorm.bundle.js',
 
     // The sidebar app
-    'scripts/app.bundle.js',
+    'scripts/sidebar.bundle.js',
 
     'styles/angular-csp.css',
     'styles/angular-toastr.css',
     'styles/icomoon.css',
     'styles/katex.min.css',
-    'styles/app.css',
+    'styles/sidebar.css',
   ]);
 }
 

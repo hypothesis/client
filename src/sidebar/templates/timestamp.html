@@ -1,0 +1,14 @@
+<div ng-switch="vm.href">
+  <span ng-switch-when=""
+        class="{{ vm.className }}"
+        title="{{ vm.absoluteTimestamp }}">
+    {{ vm.relativeTimestamp }}
+  </span>
+  <a ng-switch-default
+     class="{{ vm.className }}"
+     target="_blank"
+     title="{{ vm.absoluteTimestamp }}"
+     href="{{ vm.href }}">
+     {{ vm.relativeTimestamp }}
+  </a>
+</div>

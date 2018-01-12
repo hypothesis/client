@@ -59,7 +59,7 @@ $.noConflict(true)(function() {
     window.__hypothesis_frame = true;
   }
 
-  if(config.disableBucketBar) {
+  if(config.theme === 'clean') {
     delete pluginClasses.BucketBar;
   }
 

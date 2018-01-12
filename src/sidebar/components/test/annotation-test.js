@@ -30,20 +30,6 @@ var groupFixtures = {
 };
 
 /**
- * Returns the annotation directive with helpers stubbed out.
- */
-function annotationComponent() {
-  var noop = function () { return ''; };
-
-  return proxyquire('../annotation', {
-    angular: testUtil.noCallThru(angular),
-    '../filter/persona': {
-      username: noop,
-    },
-  });
-}
-
-/**
  * Returns the controller for the action button with the given `label`.
  *
  * @param {Element} annotationEl - Annotation element
@@ -102,6 +88,12 @@ describe('annotation', function() {
     var $scope;
     var $timeout;
     var $window;
+    // Unfortunately fakeAccountID needs to be initialised here because it
+    // gets passed into proxyquire() _before_ the beforeEach() that initializes
+    // the rest of the fakes runs.
+    var fakeAccountID = {
+      isThirdPartyUser: sinon.stub(),
+    };
     var fakeAnalytics;
     var fakeAnnotationMapper;
     var fakeAnnotationUI;
@@ -115,6 +107,17 @@ describe('annotation', function() {
     var fakeStore;
     var fakeStreamer;
     var sandbox;
+
+    /**
+     * Returns the annotation directive with helpers stubbed out.
+     */
+    function annotationComponent() {
+      return proxyquire('../annotation', {
+        angular: testUtil.noCallThru(angular),
+        '../util/account-id': fakeAccountID,
+        '@noCallThru': true,
+      });
+    }
 
     function createDirective(annotation) {
       annotation = annotation || fixtures.defaultAnnotation();
@@ -181,6 +184,9 @@ describe('annotation', function() {
       fakeFlash = {
         error: sandbox.stub(),
       };
+
+      fakeAccountID.isThirdPartyUser.reset();
+      fakeAccountID.isThirdPartyUser.returns(false);
 
       fakePermissions = {
         isShared: sandbox.stub().returns(true),
@@ -785,6 +791,19 @@ describe('annotation', function() {
       });
     });
 
+    describe('#isThirdPartyUser', function() {
+      it('returns whether the user is a third party user', function() {
+        var { annotation, controller } = createDirective();
+
+        var returned = controller.isThirdPartyUser();
+
+        assert.calledOnce(fakeAccountID.isThirdPartyUser);
+        assert.alwaysCalledWithExactly(
+          fakeAccountID.isThirdPartyUser, annotation.user, fakeSettings.authDomain);
+        assert.equal(returned, fakeAccountID.isThirdPartyUser());
+      });
+    });
+
     describe('#isDeleted', function () {
       it('returns true if the annotation has been marked as deleted', function () {
         var controller = createDirective().controller;
@@ -1049,22 +1068,57 @@ describe('annotation', function() {
     });
 
     describe('tag display', function () {
-      it('displays links to tags on the stream', function () {
+      beforeEach('make serviceUrl() return a URL for the tag', function() {
         fakeServiceUrl
           .withArgs('search.tag', {tag: 'atag'})
-          .returns('https://test.hypothes.is/stream?q=tag:atag');
+          .returns('https://hypothes.is/search?q=tag:atag');
+      });
 
-        var directive = createDirective(Object.assign(fixtures.defaultAnnotation(), {
+      /**
+       * Return an annotation directive with a single tag.
+       */
+      function annotationWithOneTag() {
+        return createDirective(Object.assign(fixtures.defaultAnnotation(), {
           tags: ['atag'],
         }));
+      }
+
+      /**
+       * Return the one tag link element from the given annotation directive.
+       */
+      function tagLinkFrom(directive) {
         var links = [].slice.apply(directive.element[0].querySelectorAll('a'));
         var tagLinks = links.filter(function (link) {
           return link.textContent === 'atag';
         });
-
         assert.equal(tagLinks.length, 1);
-        assert.equal(tagLinks[0].href,
-                     'https://test.hypothes.is/stream?q=tag:atag');
+        return tagLinks[0];
+      }
+
+      context('when the annotation is first-party', function() {
+        beforeEach('configure a first-party annotation', function() {
+          fakeAccountID.isThirdPartyUser.returns(false);
+        });
+
+        it('displays links to tag search pages', function () {
+          var tagLink = tagLinkFrom(annotationWithOneTag());
+
+          assert.equal(tagLink.href, 'https://hypothes.is/search?q=tag:atag');
+        });
+      });
+
+      context('when the annotation is third-party', function() {
+        beforeEach('configure a third-party annotation', function() {
+          fakeAccountID.isThirdPartyUser.returns(true);
+        });
+
+        it("doesn't link tags for third-party annotations", function () {
+          // Tag search pages aren't supported for third-party annotations in
+          // h, so we don't link to them in the client.
+          var tagLink = tagLinkFrom(annotationWithOneTag());
+
+          assert.isFalse(tagLink.hasAttribute('href'));
+        });
       });
     });
 

@@ -2,7 +2,7 @@
 
 var annotationMetadata = require('../annotation-metadata');
 var events = require('../events');
-var persona = require('../filter/persona');
+var { isThirdPartyUser } = require('../util/account-id');
 
 var isNew = annotationMetadata.isNew;
 var isReply = annotationMetadata.isReply;
@@ -444,6 +444,9 @@ function AnnotationController(
   };
 
   this.tagSearchURL = function(tag) {
+    if (this.isThirdPartyUser()) {
+      return null;
+    }
     return serviceUrl('search.tag', {tag: tag});
   };
 
@@ -459,7 +462,7 @@ function AnnotationController(
   };
 
   this.isThirdPartyUser = function () {
-    return persona.isThirdPartyUser(self.annotation.user, settings.authDomain);
+    return isThirdPartyUser(self.annotation.user, settings.authDomain);
   };
 
   this.isDeleted = function () {

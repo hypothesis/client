@@ -30,6 +30,104 @@ describe('media-embedder', function () {
     });
   });
 
+  it('allows whitelisted parameters in YouTube watch URLs', function () {
+    var urls = [
+      'https://www.youtube.com/watch?v=QCkm0lL-6lc&start=5&end=10',
+      'https://www.youtube.com/watch?v=QCkm0lL-6lc&end=10&start=5',
+      'https://www.youtube.com/watch/?v=QCkm0lL-6lc&end=10&start=5',
+    ];
+    urls.forEach(function (url) {
+      var element = domElement('<a href="' + url + '">' + url + '</a>');
+
+      mediaEmbedder.replaceLinksWithEmbeds(element);
+
+      assert.equal(element.childElementCount, 1);
+      assert.equal(element.children[0].tagName, 'IFRAME', url);
+      // queryString's #stringify sorts keys, so resulting query string
+      // will be reliably as follows, regardless of original ordering
+      // Note also `v` param is handled elsewhere and is not "allowed" in
+      // queryString.
+      assert.equal(
+        element.children[0].src,
+        'https://www.youtube.com/embed/QCkm0lL-6lc?end=10&start=5');
+    });
+  });
+
+  it('translates YouTube watch `t` param to `start` for embed', function () {
+    var urls = [
+      'https://www.youtube.com/watch?v=QCkm0lL-6lc&t=5&end=10',
+      'https://www.youtube.com/watch?v=QCkm0lL-6lc&end=10&t=5',
+      'https://www.youtube.com/watch/?v=QCkm0lL-6lc&end=10&t=5',
+    ];
+    urls.forEach(function (url) {
+      var element = domElement('<a href="' + url + '">' + url + '</a>');
+
+      mediaEmbedder.replaceLinksWithEmbeds(element);
+
+      assert.equal(element.childElementCount, 1);
+      assert.equal(element.children[0].tagName, 'IFRAME', url);
+      assert.equal(
+        element.children[0].src,
+        'https://www.youtube.com/embed/QCkm0lL-6lc?end=10&start=5');
+    });
+  });
+
+  it('parses YouTube `t` param values into seconds', function () {
+    var cases = [
+      ['https://www.youtube.com/watch?v=QCkm0lL-6lc&t=5m',
+       'https://www.youtube.com/embed/QCkm0lL-6lc?start=300'],
+      ['https://www.youtube.com/watch?v=QCkm0lL-6lc&t=1h5m15s',
+       'https://www.youtube.com/embed/QCkm0lL-6lc?start=3915'],
+      ['https://www.youtube.com/watch?v=QCkm0lL-6lc&t=20m10s',
+       'https://www.youtube.com/embed/QCkm0lL-6lc?start=1210'],
+      ['https://www.youtube.com/watch?v=QCkm0lL-6lc&t=h20m10s',
+       'https://www.youtube.com/embed/QCkm0lL-6lc?start=1210'],
+      ['https://www.youtube.com/watch?v=QCkm0lL-6lc&t=1h20s',
+       'https://www.youtube.com/embed/QCkm0lL-6lc?start=3620'],
+      ['https://www.youtube.com/watch?v=QCkm0lL-6lc&t=1h20ss',
+       'https://www.youtube.com/embed/QCkm0lL-6lc?start=3620'],
+      ['https://www.youtube.com/watch/?v=QCkm0lL-6lc&t=5s',
+       'https://www.youtube.com/embed/QCkm0lL-6lc?start=5'],
+      ['https://www.youtube.com/watch/?v=QCkm0lL-6lc&t=0m5s',
+       'https://www.youtube.com/embed/QCkm0lL-6lc?start=5'],
+      ['https://www.youtube.com/watch/?v=QCkm0lL-6lc&t=m5s',
+       'https://www.youtube.com/embed/QCkm0lL-6lc?start=5'],
+      ['https://www.youtube.com/watch/?v=QCkm0lL-6lc&t=10',
+       'https://www.youtube.com/embed/QCkm0lL-6lc?start=10'],
+    ];
+    cases.forEach(function (url) {
+      var element = domElement('<a href="' + url[0] + '">' + url[0] + '</a>');
+
+      mediaEmbedder.replaceLinksWithEmbeds(element);
+
+      assert.equal(element.childElementCount, 1);
+      assert.equal(element.children[0].tagName, 'IFRAME', url[0]);
+      assert.equal(
+        element.children[0].src,
+        url[1]);
+    });
+  });
+
+  it ('excludes non-whitelisted params in YouTube watch links', function () {
+    var urls = [
+      'https://www.youtube.com/watch?v=QCkm0lL-6lc&start=5&end=10&baz=dingdong',
+      'https://www.youtube.com/watch/?v=QCkm0lL-6lc&autoplay=1&end=10&start=5',
+    ];
+    urls.forEach(function (url) {
+      var element = domElement('<a href="' + url + '">' + url + '</a>');
+
+      mediaEmbedder.replaceLinksWithEmbeds(element);
+
+      assert.equal(element.childElementCount, 1);
+      assert.equal(element.children[0].tagName, 'IFRAME');
+      // queryString's #stringify sorts keys, so resulting query string
+      // will be reliably as follows, regardless of original ordering
+      assert.equal(
+        element.children[0].src,
+        'https://www.youtube.com/embed/QCkm0lL-6lc?end=10&start=5');
+    });
+  });
+
   it('replaces YouTube share links with iframes', function () {
     var urls = [
       'https://youtu.be/QCkm0lL-6lc',
@@ -44,6 +142,64 @@ describe('media-embedder', function () {
       assert.equal(element.children[0].tagName, 'IFRAME');
       assert.equal(
         element.children[0].src, 'https://www.youtube.com/embed/QCkm0lL-6lc');
+    });
+  });
+
+  it ('allows whitelisted parameters in YouTube share links', function () {
+    var urls = [
+      'https://youtu.be/QCkm0lL-6lc?start=5&end=10',
+      'https://youtu.be/QCkm0lL-6lc/?end=10&start=5',
+    ];
+    urls.forEach(function (url) {
+      var element = domElement('<a href="' + url + '">' + url + '</a>');
+
+      mediaEmbedder.replaceLinksWithEmbeds(element);
+
+      assert.equal(element.childElementCount, 1);
+      assert.equal(element.children[0].tagName, 'IFRAME');
+      // queryString's #stringify sorts keys, so resulting query string
+      // will be reliably as follows, regardless of original ordering
+      assert.equal(
+        element.children[0].src,
+        'https://www.youtube.com/embed/QCkm0lL-6lc?end=10&start=5');
+    });
+  });
+
+  it('translates YouTube share URL `t` param to `start` for embed', function () {
+    var urls = [
+      'https://youtu.be/QCkm0lL-6lc?t=5&end=10',
+      'https://youtu.be/QCkm0lL-6lc/?end=10&t=5',
+    ];
+    urls.forEach(function (url) {
+      var element = domElement('<a href="' + url + '">' + url + '</a>');
+
+      mediaEmbedder.replaceLinksWithEmbeds(element);
+
+      assert.equal(element.childElementCount, 1);
+      assert.equal(element.children[0].tagName, 'IFRAME', url);
+      assert.equal(
+        element.children[0].src,
+        'https://www.youtube.com/embed/QCkm0lL-6lc?end=10&start=5');
+    });
+  });
+
+  it ('excludes non-whitelisted params in YouTube share links', function () {
+    var urls = [
+      'https://youtu.be/QCkm0lL-6lc?foo=bar&t=5&end=10&baz=dingdong',
+      'https://youtu.be/QCkm0lL-6lc/?autoplay=1&end=10&t=5',
+    ];
+    urls.forEach(function (url) {
+      var element = domElement('<a href="' + url + '">' + url + '</a>');
+
+      mediaEmbedder.replaceLinksWithEmbeds(element);
+
+      assert.equal(element.childElementCount, 1);
+      assert.equal(element.children[0].tagName, 'IFRAME');
+      // queryString's #stringify sorts keys, so resulting query string
+      // will be reliably as follows, regardless of original ordering
+      assert.equal(
+        element.children[0].src,
+        'https://www.youtube.com/embed/QCkm0lL-6lc?end=10&start=5');
     });
   });
 

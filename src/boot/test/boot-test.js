@@ -19,9 +19,9 @@ describe('bootstrap', function () {
       // Annotation layer
       'scripts/polyfills.bundle.js',
       'scripts/jquery.bundle.js',
-      'scripts/injector.bundle.js',
+      'scripts/annotator.bundle.js',
+      'styles/annotator.css',
       'styles/icomoon.css',
-      'styles/inject.css',
       'styles/pdfjs-overrides.css',
 
       // Sidebar app
@@ -31,13 +31,13 @@ describe('bootstrap', function () {
       'scripts/showdown.bundle.js',
       'scripts/polyfills.bundle.js',
       'scripts/unorm.bundle.js',
-      'scripts/app.bundle.js',
+      'scripts/sidebar.bundle.js',
 
       'styles/angular-csp.css',
       'styles/angular-toastr.css',
       'styles/icomoon.css',
       'styles/katex.min.css',
-      'styles/app.css',
+      'styles/sidebar.css',
     ];
 
     var manifest = assetNames.reduce(function (manifest, path) {
@@ -70,11 +70,11 @@ describe('bootstrap', function () {
     it('loads assets for the annotation layer', function () {
       runBoot();
       var expectedAssets = [
-        'scripts/injector.bundle.1234.js',
+        'scripts/annotator.bundle.1234.js',
         'scripts/jquery.bundle.1234.js',
         'scripts/polyfills.bundle.1234.js',
+        'styles/annotator.1234.css',
         'styles/icomoon.1234.css',
-        'styles/inject.1234.css',
         'styles/pdfjs-overrides.1234.css',
       ].map(function (url) {
         return 'https://marginal.ly/client/build/' + url;
@@ -119,17 +119,17 @@ describe('bootstrap', function () {
       runBoot();
       var expectedAssets = [
         'scripts/angular.bundle.1234.js',
-        'scripts/app.bundle.1234.js',
         'scripts/katex.bundle.1234.js',
         'scripts/polyfills.bundle.1234.js',
         'scripts/raven.bundle.1234.js',
         'scripts/showdown.bundle.1234.js',
+        'scripts/sidebar.bundle.1234.js',
         'scripts/unorm.bundle.1234.js',
         'styles/angular-csp.1234.css',
         'styles/angular-toastr.1234.css',
-        'styles/app.1234.css',
         'styles/icomoon.1234.css',
         'styles/katex.min.1234.css',
+        'styles/sidebar.1234.css',
       ].map(function (url) {
         return 'https://marginal.ly/client/build/' + url;
       });

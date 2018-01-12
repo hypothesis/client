@@ -35,9 +35,6 @@ function hostPageConfig(window) {
     // This should be removed once new note button is enabled for everybody.
     'enableExperimentalNewNoteButton',
 
-    // New onboarding theme override.
-    'enableCleanOnboardingTheme',
-
     // Theme which can either be specified as 'clean'.
     // If nothing is the specified the classic look is applied.
     'theme',

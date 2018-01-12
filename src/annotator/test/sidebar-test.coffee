@@ -278,25 +278,20 @@ describe 'Sidebar', ->
 
   context 'Hide toolbar buttons', ->
 
-    it 'disables minimize btn', ->
-      sidebar = createSidebar(config={disableToolbarMinimizeBtn: true})
+    it 'disables minimize btn for the clean theme', ->
+      sidebar = createSidebar(config={theme: 'clean'})
 
       assert.called(sidebar.plugins.Toolbar.disableMinimizeBtn)
 
-    it 'disables minimize btn', ->
-      sidebar = createSidebar(config={disableToolbarHighlightsBtn: true})
+    it 'disables toolbar highlights btn for the clean theme', ->
+      sidebar = createSidebar(config={theme: 'clean'})
 
       assert.called(sidebar.plugins.Toolbar.disableHighlightsBtn)
 
-    it 'disables minimize btn', ->
-      sidebar = createSidebar(config={disableToolbarNewNoteBtn: true})
+    it 'disables new note btn for the clean theme', ->
+      sidebar = createSidebar(config={theme: 'clean'})
 
       assert.called(sidebar.plugins.Toolbar.disableNewNoteBtn)
-
-    it 'disables minimize btn', ->
-      sidebar = createSidebar(config={disableToolbarCloseBtn: true})
-
-      assert.called(sidebar.plugins.Toolbar.disableCloseBtn)
 
 
   describe 'layout change notifier', ->

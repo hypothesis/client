@@ -105,14 +105,14 @@ var appBundles = [{
   transforms: ['babel'],
 },{
   // The sidebar application for displaying and editing annotations.
-  name: 'app',
+  name: 'sidebar',
   transforms: ['babel', 'coffee'],
-  entry: './src/sidebar/app',
+  entry: './src/sidebar/index',
 },{
   // The annotation layer which handles displaying highlights, presenting
   // annotation tools on the page and instantiating the sidebar application.
-  name: 'injector',
-  entry: './src/annotator/main',
+  name: 'annotator',
+  entry: './src/annotator/index',
   transforms: ['babel', 'coffee'],
 }];
 
@@ -134,9 +134,9 @@ gulp.task('watch-js', ['build-vendor-js'], function () {
 
 var styleFiles = [
   // H
-  './src/styles/annotator/inject.scss',
+  './src/styles/annotator/annotator.scss',
   './src/styles/annotator/pdfjs-overrides.scss',
-  './src/styles/app.scss',
+  './src/styles/sidebar/sidebar.scss',
 
   // Vendor
   './src/styles/vendor/angular-csp.css',

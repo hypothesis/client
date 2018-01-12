@@ -26,10 +26,87 @@ function iframe(src) {
 }
 
 /**
+ * Return timeValue as a value in seconds, supporting `t` param's optional
+ * '\dh\dm\ds' format. If `timeValue` is numeric (only),
+ * it's assumed to be seconds and is left alone.
+ *
+ * @param {string} timeValue - value of `t` or `start` param in YouTube URL
+ * @returns {string} timeValue in seconds
+ * @example
+ * formatYouTubeTime('5m'); // returns '300'
+ * formatYouTubeTime('20m10s'); // returns '1210'
+ * formatYouTubeTime('1h1s'); // returns '3601'
+ * formatYouTubeTime('10'); // returns '10'
+ **/
+function parseTimeString (timeValue) {
+  var timePattern = /(\d+)([hms]?)/g;
+  const multipliers = {
+    h: 60 * 60,
+    m: 60,
+    s: 1,
+  };
+  var seconds = 0;
+  var match;
+  // match[1] - Numeric value
+  // match[2] - Unit (e.g. 'h','m','s', or empty)
+  while ((match = timePattern.exec(timeValue)) !== null) {
+    if (match[2]) {
+      seconds += match[1] * multipliers[match[2]];
+    } else {
+      seconds += +match[1]; // Treat values missing units as seconds
+    }
+  }
+  return seconds.toString();
+}
+
+/**
+ * Return a YouTube URL query string containing (only) whitelisted params.
+ * See https://developers.google.com/youtube/player_parameters for
+ * all parameter possibilities.
+ *
+ * @returns {string} formatted filtered URL query string, e.g. '?start=90'
+ * @example
+ * // returns '?end=10&start=5'
+ * youTubeQueryParams(link); // where `link.search` = '?t=5&baz=foo&end=10'
+ * // - `t` is translated to `start`
+ * // - `baz` is not allowed param
+ * // - param keys are sorted
+ */
+function youTubeQueryParams(link) {
+  var query;
+  const allowedParams = [
+    'end',
+    'start',
+    't',                // will be translated to `start`
+  ];
+  const linkParams = queryString.parse(link.search);
+  const filteredQuery = {};
+  // Filter linkParams for allowed keys and build those entries
+  // into the filteredQuery object
+  Object.keys(linkParams)
+    .filter(key => allowedParams.includes(key))
+    .forEach(key => {
+      if (key === 't') {
+        // `t` is not supported in embeds; `start` is
+        // `t` accepts more formats than `start`; start must be in seconds
+        // so, format it as seconds first
+        filteredQuery.start = parseTimeString(linkParams[key]);
+      } else {
+        filteredQuery[key] = linkParams[key];
+      }
+    });
+  query = queryString.stringify(filteredQuery);
+  if (query) {
+    query = `?${query}`;
+  }
+  return query;
+}
+/**
  * Return a YouTube embed (<iframe>) DOM element for the given video ID.
  */
-function youTubeEmbed(id) {
-  return iframe('https://www.youtube.com/embed/' + id);
+function youTubeEmbed(id, link) {
+  const query  = youTubeQueryParams(link);
+  return iframe(`https://www.youtube.com/embed/${id}${query}`);
 }
 
 function vimeoEmbed(id) {
@@ -59,7 +136,7 @@ var embedGenerators = [
 
     var groups = /[&\?]v=([^&#]+)/.exec(link.search);
     if (groups) {
-      return youTubeEmbed(groups[1]);
+      return youTubeEmbed(groups[1], link);
     }
     return null;
   },
@@ -70,9 +147,10 @@ var embedGenerators = [
       return null;
     }
 
+    // extract video ID from URL
     var groups = /^\/([^\/]+)\/?$/.exec(link.pathname);
     if (groups) {
-      return youTubeEmbed(groups[1]);
+      return youTubeEmbed(groups[1], link);
     }
     return null;
   },

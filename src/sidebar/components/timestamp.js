@@ -50,7 +50,5 @@ module.exports = {
     href: '<',
     timestamp: '<',
   },
-  template: `<a class="{{ vm.className }}" target="_blank"
-                title="{{ vm.absoluteTimestamp }}"
-                href="{{ vm.href }}">{{ vm.relativeTimestamp }}</a>`,
+  template: require('../templates/timestamp.html'),
 };

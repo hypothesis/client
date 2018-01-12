@@ -81,6 +81,6 @@ describe 'Host', ->
       configStr = encodeURIComponent(JSON.stringify({annotations: '1234'}))
       assert.equal(host.frame[0].children[0].src, appURL + '?config=' + configStr)
 
-    it 'adds drop shadow if in enableSidebarDropShadow', ->
-      host = createHost({enableSidebarDropShadow: true})
+    it 'adds drop shadow if the clean theme is enabled', ->
+      host = createHost({theme: 'clean'})
       assert.isTrue(host.frame.hasClass('annotator-frame--drop-shadow-enabled'))

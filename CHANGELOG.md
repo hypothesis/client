@@ -4,6 +4,81 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [1.62.0] - 2018-01-10
+
+### Changed
+
+- Allow whitelisted URL params in YouTube embeds
+  ([#646](https://github.com/hypothesis/client/pull/646)).
+
+## [1.61.0] - 2017-12-19
+
+### Changed
+
+- Rename the main JS bundles that make up the client
+  ([#633](https://github.com/hypothesis/client/pull/633)).
+
+- Fix broken adder toolbar styling
+  ([#642](https://github.com/hypothesis/client/pull/642)).
+
+## [1.60.0] - 2017-12-19
+
+### Changed
+
+- Update the docs for config options available to third party publishers.
+  ([#636](https://github.com/hypothesis/client/pull/636)).
+
+- Some internal restructuring of the client
+  ([#632](https://github.com/hypothesis/client/pull/632),
+   [#634](https://github.com/hypothesis/client/pull/634),
+   [#635](https://github.com/hypothesis/client/pull/635))
+
+## [1.59.0] - 2017-12-11
+
+### Changed
+
+- Remove create account banner
+  ([#630](https://github.com/hypothesis/client/pull/630)).
+
+## [1.58.0] - 2017-12-07
+
+### Changed
+
+- Don't show page share button on eLife pages
+  ([#620](https://github.com/hypothesis/client/pull/620)).
+
+- Don’t link tags to activity pages on eLife
+  ([#623](https://github.com/hypothesis/client/pull/623)).
+
+- Show the shorter version of the empty annotations/notes message when …
+  ([#611](https://github.com/hypothesis/client/pull/611)).
+
+- Bundle the clean theme related config options into the theme = 'clean…
+  ([#624](https://github.com/hypothesis/client/pull/624)).
+
+- Disable close btn when the classic theme is on. Also fix errors with …
+  ([#626](https://github.com/hypothesis/client/pull/626)).
+
+## [1.57.0] - 2017-12-04
+
+### Changed
+
+- Make the "New note" button "image" in the tutorial pane look & behave less
+  like an actual button ([#582](https://github.com/hypothesis/client/pull/582)).
+
+- Do not hyperlink annotation timestamps when the annotation has no href
+  ([#617](https://github.com/hypothesis/client/pull/617)).
+
+- Do not show share dialog if no incontext link
+  ([#618](https://github.com/hypothesis/client/pull/618)).
+
+## [1.56.0] - 2017-11-29
+
+### Changed
+
+- Remove `oauthEnabled` client config setting
+  ([#604](https://github.com/hypothesis/client/pull/604)).
+
 ## [1.55.0] - 2017-11-23
 
 ### Changed

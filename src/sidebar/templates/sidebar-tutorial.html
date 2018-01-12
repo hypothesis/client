@@ -1,4 +1,4 @@
-<div class="sheet" ng-if="vm.showSidebarTutorial() &&  !vm.cleanOnboardingThemeEnabled">
+<div class="sheet" ng-if="vm.showSidebarTutorial() &&  !vm.isThemeClean">
   <i class="close h-icon-close" role="button" title="Close"
      ng-click="vm.dismiss()"></i>
   <h1 class="sidebar-tutorial__header">How to get started</h1>
@@ -41,7 +41,7 @@
     </li>
   </ol>
 </div>
-<div class="sheet sheet--is-theme-clean" ng-if="vm.showSidebarTutorial() && vm.cleanOnboardingThemeEnabled">
+<div class="sheet sheet--is-theme-clean" ng-if="vm.showSidebarTutorial() && vm.isThemeClean">
   <i class="close h-icon-close" role="button" title="Close"
      ng-click="vm.dismiss()"></i>
   <h1 class="sidebar-tutorial__header sidebar-tutorial__header--is-theme-clean">
@@ -60,9 +60,9 @@
     <li class="sidebar-tutorial__list-item sidebar-tutorial__list-item--is-theme-clean">
       <div class="sidebar-tutorial__list-item-content sidebar-tutorial__list-item-content--is-theme-clean">
         Create page level notes
-        <button class="sidebar-tutorial__list-item-new-note-btn" h-branding="ctaBackgroundColor">
+        <span class="sidebar-tutorial__list-item-new-note-btn" h-branding="ctaBackgroundColor">
           + New note
-        </button>
+        </span>
       </div>
     </li>
     <li class="sidebar-tutorial__list-item sidebar-tutorial__list-item--is-theme-clean">

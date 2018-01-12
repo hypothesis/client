@@ -15,12 +15,12 @@ describe('sidebar.components.annotation-header', function () {
   var $componentController;
   var fakeFeatures;
   var fakeGroups;
-  var fakePersona;
+  var fakeAccountID;
   var fakeSettings = { usernameUrl: 'http://www.example.org/' };
   var fakeServiceUrl;
 
-  beforeEach('Initialize fakePersona', () => {
-    fakePersona = {
+  beforeEach('Initialize fakeAccountID', () => {
+    fakeAccountID = {
       isThirdPartyUser: sinon.stub().returns(false),
       username: sinon.stub().returns('TEST_USERNAME'),
     };
@@ -33,7 +33,7 @@ describe('sidebar.components.annotation-header', function () {
           return fakeDocumentMeta;
         },
       },
-      '../filter/persona': fakePersona,
+      '../util/account-id': fakeAccountID,
       '@noCallThru': true,
     });
 
@@ -189,9 +189,9 @@ describe('sidebar.components.annotation-header', function () {
               return false;
             };
 
-            // Make persona.isThirdPartyUser() return true or false,
+            // Make isThirdPartyUser() return true or false,
             // depending on the test case.
-            fakePersona.isThirdPartyUser.returns(test.isThirdPartyUser);
+            fakeAccountID.isThirdPartyUser.returns(test.isThirdPartyUser);
 
             var ann = fixtures.defaultAnnotation();
             ann.user_info = test.user_info;
