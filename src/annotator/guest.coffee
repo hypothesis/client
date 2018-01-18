@@ -40,7 +40,7 @@ module.exports = class Guest extends Delegator
     ".annotator-hl click":               "onHighlightClick"
     ".annotator-hl mouseover":           "onHighlightMouseover"
     ".annotator-hl mouseout":            "onHighlightMouseout"
-    # "click":                             "onElementClick"
+    "click":                             "onElementClick"
     "touchstart":                        "onElementTouchStart"
 
   options:
@@ -55,6 +55,7 @@ module.exports = class Guest extends Delegator
   anchors: null
   visibleHighlights: false
   frameIdentifier: null
+  enableClick: false
 
   html:
     adder: '<hypothesis-adder></hypothesis-adder>'
@@ -73,8 +74,9 @@ module.exports = class Guest extends Delegator
         self.setVisibleHighlights(true)
         self.createHighlight()
         document.getSelection().removeAllRanges()
-      isHighlighBtnVisible: ->
-        false
+      # Managing the visibility of highlight Button in the adder.
+      isHighlightBtnVisible: ->
+        return config.isHighlightBtnVisible
     })
     this.selections = selections(document).subscribe
       next: (range) ->
@@ -89,6 +91,10 @@ module.exports = class Guest extends Delegator
     # Set the frame identifier if it's available.
     # The "top" guest instance will have this as null since it's in a top frame not a sub frame
     this.frameIdentifier = config.subFrameIdentifier || null
+
+    # When enableClick is false, clicking (or tabbing around on mobile)
+    # outside of the elements on the guest page doesn't close the sidebar
+    this.enableClick = config.onElementClick || false ;
 
     cfOptions =
       config: config
@@ -447,19 +453,18 @@ module.exports = class Guest extends Delegator
     else
       this.showAnnotations annotations
 
-  # onElementClick: (event) ->
-  #   if !@selectedTargets?.length
-  #     console.log("element click")
-  #     @crossframe?.call('hideSidebar')
+  onElementClick: (event) ->
+    if (this.enableClick && !@selectedTargets?.length)
+      @crossframe?.call('hideSidebar')
 
-  # onElementTouchStart: (event) ->
-  #   # Mobile browsers do not register click events on
-  #   # elements without cursor: pointer. So instead of
-  #   # adding that to every element, we can add the initial
-  #   # touchstart event which is always registered to
-  #   # make up for the lack of click support for all elements.
-  #   if !@selectedTargets?.length
-  #     @crossframe?.call('hideSidebar')
+  onElementTouchStart: (event) ->
+    # Mobile browsers do not register click events on
+    # elements without cursor: pointer. So instead of
+    # adding that to every element, we can add the initial
+    # touchstart event which is always registered to
+    # make up for the lack of click support for all elements.
+    if (this.enableClick && !@selectedTargets?.length)
+      @crossframe?.call('hideSidebar')
 
   onHighlightMouseover: (event) ->
     return unless @visibleHighlights

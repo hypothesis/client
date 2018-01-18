@@ -35,7 +35,7 @@ describe('annotator.adder', function () {
     adderCallbacks = {
       onAnnotate: sinon.stub(),
       onHighlight: sinon.stub(),
-      isHighlighBtnVisible: sinon.stub(),
+      isHighlightBtnVisible: sinon.stub(),
     };
     adderEl = document.createElement('div');
     document.body.appendChild(adderEl);
@@ -85,7 +85,7 @@ describe('annotator.adder', function () {
   describe('button handling', function () {
     it('calls onHighlight callback when Highlight button is clicked', function () {
       var highlightBtn = adderCtrl.element.querySelector('.js-highlight-btn');
-      if (!adderCallbacks.isHighlighBtnVisible) {
+      if (!adderCallbacks.isHighlightBtnVisible) {
         highlightBtn.dispatchEvent(new Event('click'));
         assert.called(adderCallbacks.onHighlight);
       }

@@ -30,6 +30,10 @@ function configFrom(window_) {
     // Subframe identifier given when a frame is being embedded into
     // by a top level client
     subFrameIdentifier: settings.hostPageSetting('subFrameIdentifier', {allowInBrowserExt: true}),
+    // When onElementClick is false, clicking (or tabbing around on mobile)
+    // outside of the elements on the guest page doesn't close the sidebar
+    onElementClick: settings.hostPageSetting('onElementClick', {allowInBrowserExt: true}),
+    isHighlightBtnVisible: settings.hostPageSetting('isHighlightBtnVisible', {allowInBrowserExt:true}),
   };
 }
 

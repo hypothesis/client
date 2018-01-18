@@ -41,17 +41,18 @@
       on-search="vm.searchController.update($query)"
       title="Filter the annotation list">
     </search-input>
-    <!-- <sort-dropdown
+    <sort-dropdown
+      ng-if="!vm.isThemeCustom"
       sort-keys-available="vm.sortKeysAvailable"
       sort-key="vm.sortKey"
       on-change-sort-key="vm.onChangeSortKey({sortKey: sortKey})">
     </sort-dropdown>
     <a class="top-bar__btn"
        ng-click="vm.onSharePage()"
-       ng-if="vm.showSharePageButton()"
+       ng-if="vm.showSharePageButton() && !vm.isThemeCustom"
        title="Share this page">
       <i class="h-icon-annotation-share"></i>
-    </a> -->
+    </a>
     <login-control
       class="login-control"
       auth="vm.auth"

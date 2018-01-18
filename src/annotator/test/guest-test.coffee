@@ -315,19 +315,32 @@ describe 'Guest', ->
 
     guest = null
 
-    beforeEach ->
-      guest = createGuest()
+    it 'emits "hideSidebar" on cross frame when onElementClick is true in the config and the user taps or clicks in the page', ->
 
-    # it 'emits "hideSidebar" on cross frame when the user taps or clicks in the page', ->
-    #   methods =
-    #     'click': 'onElementClick'
-    #     'touchstart': 'onElementTouchStart'
+      guest = createGuest({onElementClick:true})
+      methods =
+        'click': 'onElementClick'
+        'touchstart': 'onElementTouchStart'
 
-    #   for event in ['click', 'touchstart']
-    #     sandbox.spy(guest, methods[event])
-    #     guest.element.trigger(event)
-    #     assert.called(guest[methods[event]])
-    #     assert.calledWith(guest.plugins.CrossFrame.call, 'hideSidebar')
+      for event in ['click', 'touchstart']
+        sandbox.spy(guest, methods[event])
+        guest.element.trigger(event)
+        assert.called(guest[methods[event]])
+        assert.calledWith(guest.plugins.CrossFrame.call, 'hideSidebar')
+    
+    it 'do not emit a cross frame call if the user taps or clicks in the page when onElementClick is false in the config', ->
+
+      guest = createGuest({onElementClick:false})
+      methods =
+        'click': 'onElementClick'
+        'touchstart': 'onElementTouchStart'
+
+      for event in ['click', 'touchstart']
+        sandbox.spy(guest, methods[event])
+        guest.element.trigger(event)
+        assert.called(guest[methods[event]])
+        # TO DO: You might want to narrow this assert to notcalledwith (hideSidebar) with a spy  
+        assert.notCalled(guest.plugins.CrossFrame.call)
 
   describe 'when the selection changes', ->
     it 'shows the adder if the selection contains text', ->

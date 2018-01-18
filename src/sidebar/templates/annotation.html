@@ -49,13 +49,13 @@
   <!-- / Body -->
 
   <!-- Tags -->
-  <!-- <div class="annotation-body form-field" ng-if="vm.editing()">
+  <div class="annotation-body form-field" ng-if="vm.editing() && !vm.isThemeCustom">
     <tag-editor tags="vm.state().tags"
                 on-edit-tags="vm.setTags(tags)"></tag-editor>
-  </div> -->
+  </div>
 
-  <!-- <div class="annotation-body u-layout-row tags tags-read-only"
-       ng-if="(vm.canCollapseBody || vm.state().tags.length) && !vm.editing()">
+  <div class="annotation-body u-layout-row tags tags-read-only"
+       ng-if="(vm.canCollapseBody || vm.state().tags.length) && !vm.editing() && !vm.isThemeCustom">
     <ul class="tag-list">
       <li class="tag-item" ng-repeat="tag in vm.state().tags">
         <a ng-href="{{vm.tagSearchURL(tag)}}" target="_blank">{{tag}}</a>
@@ -67,7 +67,7 @@
       ng-title="vm.collapseBody ? 'Show the full annotation text' : 'Show the first few lines only'"
       ng-bind="vm.collapseBody ? 'More' : 'Less'"
       h-branding="accentColor"></a>
-  </div> -->
+  </div>
   <!-- / Tags -->
 
   <footer class="annotation-footer">
@@ -120,13 +120,18 @@
         ng-show="vm.authorize('delete')"
         on-click="vm.delete()"
       ></annotation-action-button>
-      <!-- <annotation-action-button
+
+      <!-- Reply Button - is only visible if the theme is not custom -->
+      <annotation-action-button
+        ng-if="!vm.isThemeCustom"
         icon="'h-icon-annotation-reply'"
         is-disabled="vm.isDeleted()"
         label="'Reply'"
         on-click="vm.reply()"
-      ></annotation-action-button> -->
-      <!-- <span class="annotation-share-dialog-wrapper" ng-if="vm.incontextLink()">
+      ></annotation-action-button>
+
+       <!-- Share - is only visible if the theme is not custom -->
+      <span class="annotation-share-dialog-wrapper" ng-if="vm.incontextLink() && !vm.isThemeCustom">
         <annotation-action-button
          icon="'h-icon-annotation-share'"
          is-disabled="vm.isDeleted()"
@@ -140,8 +145,10 @@
           is-open="vm.showShareDialog"
           on-close="vm.showShareDialog = false">
         </annotation-share-dialog>
-      </span> -->
-      <!-- <span ng-if="vm.canFlag()">
+      </span>
+
+      <!-- Flag - is only visible if the theme is not custom -->
+      <span ng-if="vm.canFlag() && !vm.isThemeCustom">
         <annotation-action-button
          icon="'h-icon-annotation-flag'"
          is-disabled="vm.isDeleted()"
@@ -155,7 +162,7 @@
          label="'Annotation has been reported to the moderators'"
          ng-if="vm.isFlagged()"
         ></annotation-action-button>
-      </span> -->
+      </span>
     </div>
   </footer>
 </div>

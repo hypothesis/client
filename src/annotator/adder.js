@@ -127,7 +127,8 @@ function createAdderDOM(container) {
 function Adder(container, options) {
 
   var self = this;
-  var isHighlightBtnVisible = options.isHighlightBtnVisible;
+  // Flag to manage the visibility of Highlight Button
+  var isHighlightBtnVisible = options.isHighlightBtnVisible();
   self.element = createAdderDOM(container);
 
   // Set initial style
@@ -152,7 +153,7 @@ function Adder(container, options) {
 
   self.element.querySelector(ANNOTATE_BTN_SELECTOR)
     .addEventListener('click', handleCommand);
-
+  
   if (isHighlightBtnVisible) {
     self.element.querySelector(HIGHLIGHT_BTN_SELECTOR)
     .addEventListener('click', handleCommand);

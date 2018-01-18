@@ -30,6 +30,8 @@ function hostPageConfig(window) {
     'showHighlights',
     'services',
     'branding',
+    'onElementClick',
+    'isHighlightBtnVisible',
 
     // New note button override.
     // This should be removed once new note button is enabled for everybody.

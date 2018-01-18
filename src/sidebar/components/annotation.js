@@ -31,6 +31,7 @@ function AnnotationController(
 
   var self = this;
   var newlyCreatedByHighlightButton;
+  this.isThemeCustom = settings.theme === 'custom';
 
   /** Save an annotation to the server. */
   function save(annot) {
