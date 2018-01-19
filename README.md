@@ -33,7 +33,7 @@ testing and contributing to the client.
 Community
 ---------
 
-Join us on [Slack](https://slack.hypothes.is) or in [#hypothes.is][irc] on
+Join us on Slack - [request an invite](https://slack.hypothes.is) or [log in once you've already created an account](https://hypothesis-open.slack.com/) - or in [#hypothes.is][irc] on
 [freenode](https://freenode.net/) for discussion.
 
 If you'd like to contribute to the project, you should consider subscribing to
