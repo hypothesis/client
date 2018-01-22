@@ -46,6 +46,33 @@ function jsonConfigsFrom(document) {
   return config;
 }
 
+/**
+ * Returns a `hypothesisConfig` object from the window, or `{}`.
+ *
+ * Find the `window.hypothesisConfig` object and merge the properties
+ * of it onto the config parameter passed in.
+ *
+ * If the `config` param doesn't exist, instantiate a new object.
+ *
+ * If the `window.hypothesisConfig` exists as a function and returns an
+ * object containing properties, add it to the return object.
+ *
+ * @param {HypothesisConfig} config - an existing config object.
+ * @returns {HypothesisConfig} - an updated config object.
+ */
+function jsonConfigsFromWindow(config) {
+  var config = config || {};
+
+  if (window && typeof window.hypothesisConfig === 'function') {
+    var windowConfig = window.hypothesisConfig();
+
+    if (windowConfig) assign(config, windowConfig);
+  }
+
+  return config;
+}
+
 module.exports = {
   jsonConfigsFrom: jsonConfigsFrom,
+  jsonConfigsFromWindow: jsonConfigsFromWindow
 };

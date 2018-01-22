@@ -12,10 +12,12 @@
 /* global __MANIFEST__ */
 
 var boot = require('./boot');
-var settings = require('../shared/settings').jsonConfigsFrom(document);
+var settings = require('../shared/settings');
+
+var config = settings.jsonConfigsFromWindow(settings.jsonConfigsFrom(document));
 
 boot(document, {
-  assetRoot: settings.assetRoot || '__ASSET_ROOT__',
+  assetRoot: config.assetRoot || '__ASSET_ROOT__',
   manifest: __MANIFEST__,
-  sidebarAppUrl: settings.sidebarAppUrl || '__SIDEBAR_APP_URL__',
+  sidebarAppUrl: config.sidebarAppUrl || '__SIDEBAR_APP_URL__',
 });
