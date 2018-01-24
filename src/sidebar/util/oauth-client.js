@@ -153,7 +153,7 @@ class OAuthClient {
    *
    * @param {Window} $window - Window which will receive the auth response.
    * @param {Window} authWindow - Popup window where the login prompt will be shown.
-   *   This should be created using `createLoginPopupWindow`.
+   *   This should be created using `openAuthPopupWindow`.
    * @return {Promise<string>}
    */
   authorize($window, authWindow) {
@@ -214,17 +214,17 @@ class OAuthClient {
   }
 
   /**
-   * Create a pop-up window for use with `OAuthClient#authorize`.
+   * Create and show a pop-up window for use with `OAuthClient#authorize`.
    *
    * This function _must_ be called in the same turn of the event loop as the
    * button or link which initiates login to avoid triggering the popup blocker
    * in certain browsers. See https://github.com/hypothesis/client/issues/534
    * and https://github.com/hypothesis/client/issues/535.
    *
-   * @param {Window} $window - The parent of the popup window.
-   * @return {Window}
+   * @param {Window} $window - The parent of the created window.
+   * @return {Window} The new popup window.
    */
-  static createLoginPopupWindow($window) {
+  static openAuthPopupWindow($window) {
     // In Chrome & Firefox the sizes passed to `window.open` are used for the
     // viewport size. In Safari the size is used for the window size including
     // title bar etc. There is enough vertical space at the bottom to allow for

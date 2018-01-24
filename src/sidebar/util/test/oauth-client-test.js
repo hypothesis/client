@@ -162,10 +162,10 @@ describe('sidebar.util.oauth-client', () => {
     });
   });
 
-  describe('.createLoginPopupWindow', () => {
-    it('creates and returns the popup window', () => {
+  describe('.openAuthPopupWindow', () => {
+    it('opens a popup window', () => {
       var fakeWindow = new FakeWindow;
-      var popupWindow = OAuthClient.createLoginPopupWindow(fakeWindow);
+      var popupWindow = OAuthClient.openAuthPopupWindow(fakeWindow);
       assert.equal(popupWindow, fakeWindow.open.returnValues[0]);
       assert.calledWith(
         fakeWindow.open,
@@ -184,7 +184,7 @@ describe('sidebar.util.oauth-client', () => {
     });
 
     function authorize() {
-      var popupWindow = OAuthClient.createLoginPopupWindow(fakeWindow);
+      var popupWindow = OAuthClient.openAuthPopupWindow(fakeWindow);
       var authorized = client.authorize(fakeWindow, popupWindow);
       return { authorized, popupWindow };
     }

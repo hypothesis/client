@@ -89,7 +89,7 @@ describe('sidebar.oauth-auth', function () {
       fakeClient.config = config;
       return fakeClient;
     };
-    FakeOAuthClient.createLoginPopupWindow = sinon.stub();
+    FakeOAuthClient.openAuthPopupWindow = sinon.stub();
 
     fakeWindow = new FakeWindow;
 
@@ -504,7 +504,7 @@ describe('sidebar.oauth-auth', function () {
 
     it('calls OAuthClient#authorize', () => {
       var fakePopup = {};
-      FakeOAuthClient.createLoginPopupWindow.returns(fakePopup);
+      FakeOAuthClient.openAuthPopupWindow.returns(fakePopup);
       return auth.login().then(() => {
         assert.calledWith(fakeClient.authorize, fakeWindow, fakePopup);
       });
