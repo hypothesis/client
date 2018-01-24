@@ -170,7 +170,7 @@ describe('sidebar.util.oauth-client', () => {
       assert.calledWith(
         fakeWindow.open,
         'about:blank',
-        'Login to Hypothesis',
+        'Log in to Hypothesis',
         'height=430,left=274.5,top=169,width=475'
       );
     });

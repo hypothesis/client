@@ -245,7 +245,7 @@ class OAuthClient {
       height: height,
     }).replace(/&/g, ',');
 
-    return $window.open('about:blank', 'Login to Hypothesis', authWindowSettings);
+    return $window.open('about:blank', 'Log in to Hypothesis', authWindowSettings);
   }
 }
 
