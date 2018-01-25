@@ -4,6 +4,13 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+### Changed
+
+- Fix login flow triggering popup blocker in Firefox and IE
+  ([#651](https://github.com/hypothesis/client/pull/651)).
+
 ## [1.62.0] - 2018-01-10
 
 ### Changed
