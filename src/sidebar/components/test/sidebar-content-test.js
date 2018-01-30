@@ -506,6 +506,17 @@ describe('sidebar.components.sidebar-content', function () {
       $scope.$digest();
       assert.isFalse(ctrl.shouldShowLoggedOutMessage());
     });
+
+    it('does not show loggedout message if using third-party accounts', function () {
+      fakeSettings.services = [{ authority: 'publisher.com' }];
+      addFrame();
+      ctrl.auth = { status: 'logged-out' };
+      annotationUI.addAnnotations([{id: '123'}]);
+      annotationUI.selectAnnotations(['123']);
+      $scope.$digest();
+
+      assert.isFalse(ctrl.shouldShowLoggedOutMessage());
+    });
   });
 
   describe('deferred websocket connection', function () {

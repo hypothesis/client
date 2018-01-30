@@ -2,6 +2,7 @@
 
 var SearchClient = require('../search-client');
 var events = require('../events');
+var isThirdPartyService = require('../util/is-third-party-service');
 var memoize = require('../util/memoize');
 var tabs = require('../tabs');
 var uiConstants = require('../ui-constants');
@@ -289,6 +290,12 @@ function SidebarContentController(
     // If user has not landed on a direct linked annotation
     // don't show the CTA.
     if (!settings.annotations) {
+      return false;
+    }
+
+    // The CTA text and links are only applicable when using Hypothesis
+    // accounts.
+    if (isThirdPartyService(settings)) {
       return false;
     }
 
