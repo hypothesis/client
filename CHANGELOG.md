@@ -4,6 +4,13 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+### Changed
+
+- Hide the direct-link call-to-action for third party accounts
+  ([#658](https://github.com/hypothesis/client/pull/658)).
+
 ## [1.63.0] - 2018-01-25
 
 ### Changed
