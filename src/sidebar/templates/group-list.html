@@ -20,7 +20,7 @@
         data-toggle="dropdown"
         role="button"
         ng-switch on="vm.groups.focused().public"
-        title="Change the selected group">
+        title="{{'Change the selected group' | translate}}">
     <img class="group-list-label__icon group-list-label__icon--third-party"
          ng-src="{{ vm.thirdPartyGroupIcon }}"
          ng-if="vm.thirdPartyGroupIcon"
@@ -53,7 +53,7 @@
           <div class="group-name-container">
             <a class="group-name-link"
                href=""
-               title="{{ group.public ? 'Show public annotations' : 'Show and create annotations in ' + group.name }}">
+               title="{{ group.public ? ('Show public annotations' | translate ) : ('Show and create annotations in ' | translate) + group.name  }}">
                {{group.name}}
             </a>
           </div>
@@ -62,7 +62,7 @@
                href="{{group.url}}"
                target="_blank"
                ng-click="vm.viewGroupActivity()">
-              View group activity and invite others
+              {{'View group activity and invite others' | translate}}
             </a>
           </div>
         </div>
@@ -71,7 +71,7 @@
           <i class="h-icon-cancel-outline btn--cancel"
              ng-if="!group.public"
              ng-click="vm.leaveGroup(group.id)"
-             title="Leave '{{group.name}}'"></i>
+             title="'Leave' | translate '{{group.name}}'"></i>
         </div>
       </div>
     </li>
@@ -79,8 +79,8 @@
       <div class="group-item" ng-click="vm.createNewGroup()">
         <div class="group-icon-container"><i class="h-icon-add"></i></div>
         <div class="group-details">
-          <a href="" class="group-name-link" title="Create a new group to share annotations">
-            New group
+          <a href="" class="group-name-link" title="{{'Create a new group to share annotations' | translate}}">
+            {{'New group' | translate}}
           </a>
         </div>
       </div>

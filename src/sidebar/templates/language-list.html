@@ -1,0 +1,34 @@
+<div class="pull-right"
+     ng-if="vm.auth.status === 'logged-in'"
+     dropdown
+     keyboard-nav>
+  <div class="dropdown-toggle"
+        dropdown-toggle
+        data-toggle="dropdown"
+        role="button"
+        title="{{'Change the language' | translate}}">
+    <i class="group-list-label__icon h-icon-public"></i>
+    <span class="group-list-label__label">{{vm.languages.selected().name}}</span><!-- nospace
+    !--><i class="h-icon-arrow-drop-down"></i>
+  </div>
+  <div class="dropdown-menu__top-arrow"></div>
+  <ul class="dropdown-menu pull-none" role="menu">
+    <li class="dropdown-menu__row dropdown-menu__row--unpadded "
+        ng-repeat="language in vm.languages.all()">
+      <div ng-class="{'group-item': true, selected: language.id == vm.languages.selected().id}"
+           ng-click="vm.focusGroup(group.id)">
+        <!-- Language !-->
+        <div class="group-details">
+          <div class="group-name-container">
+            <a class="group-name-link"
+               href="" target="_blank"
+               ng-click="vm.selectLanguage(language.id)"
+               title="{{'Select the language' | translate}}">
+               {{language.name}}
+            </a>
+          </div>
+        </div>
+      </div>
+    </li>
+  </ul>
+</div>

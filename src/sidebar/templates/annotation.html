@@ -1,5 +1,5 @@
 <header class="annotation-header" ng-if="!vm.user()">
-  <strong>You must be logged in to create annotations.</strong>
+  <strong>{{'You must be logged in to leave feedback.' | translate}}</strong>
 </header>
 
 <div ng-keydown="vm.onKeydown($event)" ng-if="vm.user()">
@@ -64,8 +64,8 @@
     <div class="u-stretch"></div>
     <a class="annotation-link u-strong" ng-show="vm.canCollapseBody"
       ng-click="vm.toggleCollapseBody($event)"
-      ng-title="vm.collapseBody ? 'Show the full annotation text' : 'Show the first few lines only'"
-      ng-bind="vm.collapseBody ? 'More' : 'Less'"
+      ng-title="vm.collapseBody ? ('Show the full annotation text' | translate): ('Show the first few lines only' | translate)"
+      ng-bind="vm.collapseBody ? ('More' | translate) : ('Less' | translate)"
       h-branding="accentColor"></a>
   </div>
   <!-- / Tags -->
@@ -85,38 +85,38 @@
     <div class="annotation-section annotation-license"
          ng-show="vm.shouldShowLicense()">
       <a class="annotation-license__link" href="http://creativecommons.org/publicdomain/zero/1.0/"
-        title="View more information about the Creative Commons Public Domain dedication"
+        title="{{'View more information about the Creative Commons Public Domain dedication' | translate}}"
         target="_blank">
         <i class="h-icon-cc-logo"></i><i class="h-icon-cc-zero"></i>
-        Annotations can be freely reused by anyone for any purpose.
+        {{'Feedback can be freely reused by anyone for any purpose.' | translate}}
       </a>
     </div>
 
     <div class="annotation-replies" ng-if="!vm.isReply() && vm.replyCount > 0">
       <a href=""
         ng-click="vm.onReplyCountClick()">
-        <span class="annotation-replies__link">{{ vm.isCollapsed ? 'Show replies' : 'Hide replies' }}</span>
+        <span class="annotation-replies__link">{{ vm.isCollapsed ? ('Show replies' | translate) : ('Hide replies' | translate)}}</span>
         <span class="annotation-replies__count">({{ vm.replyCount }})</span>
       </a>
     </div>
 
     <div class="annotation-actions" ng-if="vm.isSaving">
-      Saving...
+      {{'Saving...' | translate}}
     </div>
 
     <div class="annotation-actions" ng-if="!vm.isSaving && !vm.editing() && vm.id()">
-      <div ng-show="vm.isSaving">Saving…</div>
+      <div ng-show="vm.isSaving">{{'Saving...' | translate}}</div>
       <annotation-action-button
         icon="'h-icon-annotation-edit'"
         is-disabled="vm.isDeleted()"
-        label="'Edit'"
+        label="'Edit' | translate"
         ng-show="vm.authorize('update') && !vm.isSaving"
         on-click="vm.edit()"
       ></annotation-action-button>
       <annotation-action-button
         icon="'h-icon-annotation-delete'"
         is-disabled="vm.isDeleted()"
-        label="'Delete'"
+        label="'Delete' | translate"
         ng-show="vm.authorize('delete')"
         on-click="vm.delete()"
       ></annotation-action-button>
@@ -126,7 +126,7 @@
         ng-if="!vm.isThemeCustom"
         icon="'h-icon-annotation-reply'"
         is-disabled="vm.isDeleted()"
-        label="'Reply'"
+        label="'Reply' | translate"
         on-click="vm.reply()"
       ></annotation-action-button>
 
@@ -135,7 +135,7 @@
         <annotation-action-button
          icon="'h-icon-annotation-share'"
          is-disabled="vm.isDeleted()"
-         label="'Share'"
+         label="'Share' | translate"
          on-click="vm.showShareDialog = true"
         ></annotation-action-button>
         <annotation-share-dialog
@@ -148,20 +148,21 @@
       </span>
 
       <!-- Flag - is only visible if the theme is not custom -->
-      <span ng-if="vm.canFlag() && !vm.isThemeCustom">
+      <span ng-if="!vm.isThemeCustom">
         <annotation-action-button
          icon="'h-icon-annotation-flag'"
          is-disabled="vm.isDeleted()"
-         label="'Report this annotation to the moderators'"
+         label="'Report this annotation to the moderators' | translate"
          ng-if="!vm.isFlagged()"
          on-click="vm.flag()"
         ></annotation-action-button>
         <annotation-action-button
          icon="'h-icon-annotation-flag annotation--flagged'"
          is-disabled="vm.isDeleted()"
-         label="'Annotation has been reported to the moderators'"
+         label="'Feedback has been reported to the moderators' | translate"
          ng-if="vm.isFlagged()"
-        ></annotation-action-button>
+         ></annotation-action-button>
+        </annotation-action-button>
       </span>
     </div>
   </footer>

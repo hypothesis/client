@@ -27,10 +27,10 @@
         <i class="h-icon-group"></i><span class="annotation-header__group-name">{{vm.group().name}}</span>
       </a>
       <span ng-show="vm.isPrivate"
-        title="This annotation is visible only to you.">
-        <i class="h-icon-lock"></i><span class="annotation-header__group-name" ng-show="!vm.group().url">Only me</span>
+        title="{{'This feedback is visible only to you.' | translate}}">
+        <i class="h-icon-lock"></i><span class="annotation-header__group-name" ng-show="!vm.group().url">{{'Only me' | translate}}</span>
       </span>
-      <i class="h-icon-border-color" ng-show="vm.isHighlight && !vm.isEditing" title="This is a highlight. Click 'edit' to add a note or tag."></i>
+      <i class="h-icon-border-color" ng-show="vm.isHighlight && !vm.isEditing" title="{{'This is a highlight. Click \'edit\' to add a note or tag.'| translate}}"></i>
       <span ng-if="::vm.showDocumentInfo">
         <span class="annotation-citation" ng-if="vm.documentMeta().titleLink">
           on "<a ng-href="{{vm.documentMeta().titleLink}}">{{vm.documentMeta().titleText}}</a>"

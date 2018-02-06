@@ -4,7 +4,7 @@
   <input class="simple-search-input"
          type="text"
          name="query"
-         placeholder="{{vm.loading && 'Loading' || 'Search'}}…"
+         placeholder="{{vm.loading && ('Loading' | translate) || ('Search' | translate) }}…"
          ng-disabled="vm.loading"
          ng-class="vm.inputClasses()"/>
   <button type="button" class="simple-search-icon top-bar__btn" ng-hide="vm.loading">
