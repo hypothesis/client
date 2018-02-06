@@ -40,6 +40,10 @@ module.exports = class Sidebar extends Host
         @plugins.Toolbar.disableMinimizeBtn()
         @plugins.Toolbar.disableHighlightsBtn()
         @plugins.Toolbar.disableNewNoteBtn()
+      else if config.theme == 'custom'
+        @plugins.Toolbar.disableHighlightsBtn()
+        @plugins.Toolbar.disableNewNoteBtn()
+        @plugins.Toolbar.disableCloseBtn()
       else
         @plugins.Toolbar.disableCloseBtn()
 

@@ -293,6 +293,12 @@ describe 'Sidebar', ->
 
       assert.called(sidebar.plugins.Toolbar.disableNewNoteBtn)
 
+    it 'disables toolbar highlights btn, new note btn and close button for the custom theme', ->
+      sidebar = createSidebar(config={theme: 'custom'})
+
+      assert.called(sidebar.plugins.Toolbar.disableCloseBtn)
+      assert.called(sidebar.plugins.Toolbar.disableHighlightsBtn)
+      assert.called(sidebar.plugins.Toolbar.disableNewNoteBtn)
 
   describe 'layout change notifier', ->
 

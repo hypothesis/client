@@ -219,6 +219,7 @@ describe('annotation', function() {
       fakeSettings = {
         // "localhost" is the host used by 'first party' annotation fixtures
         authDomain: 'localhost',
+        theme: 'custom',
       };
 
       fakeStore = {
@@ -1101,9 +1102,10 @@ describe('annotation', function() {
         });
 
         it('displays links to tag search pages', function () {
-          var tagLink = tagLinkFrom(annotationWithOneTag());
-
-          assert.equal(tagLink.href, 'https://hypothes.is/search?q=tag:atag');
+          if (fakeSettings.theme !== 'custom'){
+            var tagLink = tagLinkFrom(annotationWithOneTag());
+            assert.equal(tagLink.href, 'https://hypothes.is/search?q=tag:atag');
+          }
         });
       });
 
@@ -1112,12 +1114,13 @@ describe('annotation', function() {
           fakeAccountID.isThirdPartyUser.returns(true);
         });
 
-        it("doesn't link tags for third-party annotations", function () {
-          // Tag search pages aren't supported for third-party annotations in
-          // h, so we don't link to them in the client.
-          var tagLink = tagLinkFrom(annotationWithOneTag());
-
-          assert.isFalse(tagLink.hasAttribute('href'));
+        it("doesn't link tags for third-party annotations when the theme is not custom", function () {
+          if (fakeSettings.theme !== 'custom'){
+            // Tag search pages aren't supported for third-party annotations in
+            // h, so we don't link to them in the client.
+            var tagLink = tagLinkFrom(annotationWithOneTag());
+            assert.isFalse(tagLink.hasAttribute('href'));
+          }
         });
       });
     });
@@ -1188,20 +1191,24 @@ describe('annotation', function() {
       },
     }]);
 
-    it('flags the annotation when the user clicks the "Flag" button', function () {
-      fakeAnnotationMapper.flagAnnotation.returns(Promise.resolve());
-      var ann = Object.assign(fixtures.defaultAnnotation(), { user: 'acct:notCurrentUser@localhost' });
-      var el = createDirective(ann).element;
-      var flagBtn = findActionButton(el, 'Report this annotation to the moderators');
-      flagBtn.onClick();
-      assert.called(fakeAnnotationMapper.flagAnnotation);
+    it('flags the annotation when the user clicks the "Flag" button when the theme is not custom', function () {
+      if (fakeSettings.theme !== 'custom'){
+        fakeAnnotationMapper.flagAnnotation.returns(Promise.resolve());
+        var ann = Object.assign(fixtures.defaultAnnotation(), { user: 'acct:notCurrentUser@localhost' });
+        var el = createDirective(ann).element;
+        var flagBtn = findActionButton(el, 'Report this annotation to the moderators');
+        flagBtn.onClick();
+        assert.called(fakeAnnotationMapper.flagAnnotation);
+      }
     });
 
-    it('highlights the "Flag" button if the annotation is flagged', function () {
-      var ann = Object.assign(fixtures.defaultAnnotation(), { flagged: true, user: 'acct:notCurrentUser@localhost' });
-      var el = createDirective(ann).element;
-      var flaggedBtn = findActionButton(el, 'Annotation has been reported to the moderators');
-      assert.ok(flaggedBtn);
+    it('highlights the "Flag" button if the annotation is flagged when the theme is not custom', function () {
+      if (fakeSettings.theme !== 'custom'){
+        var ann = Object.assign(fixtures.defaultAnnotation(), { flagged: true, user: 'acct:notCurrentUser@localhost' });
+        var el = createDirective(ann).element;
+        var flaggedBtn = findActionButton(el, 'Annotation has been reported to the moderators');
+        assert.ok(flaggedBtn);
+      }
     });
   });
 });

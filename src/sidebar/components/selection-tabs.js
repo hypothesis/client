@@ -13,6 +13,8 @@ module.exports = {
 
     this.isThemeClean = settings.theme === 'clean';
 
+    this.isThemeCustom = settings.theme === 'custom';
+
     this.enableExperimentalNewNoteButton = settings.enableExperimentalNewNoteButton;
 
     this.selectTab = function (type) {

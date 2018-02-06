@@ -6,10 +6,12 @@ module.exports = {
   controllerAs: 'vm',
   //@ngInject
   controller: function (settings) {
-    if (settings.theme && settings.theme === 'clean') {
-      this.isThemeClean = true;
+    if (settings.theme){
+      this.isThemeClean = settings.theme === 'clean';
+      this.isThemeCustom = settings.theme === 'custom';
     } else {
       this.isThemeClean = false;
+      this.isThemeCustom = false;
     }
 
     this.showSharePageButton = function () {

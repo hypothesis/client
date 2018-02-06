@@ -63,6 +63,8 @@ describe('annotator.config.index', function() {
     'assetRoot',
     'subFrameIdentifier',
     'openSidebar',
+    'onElementClick',
+    'isHighlightBtnVisible',
   ].forEach(function(settingName) {
     it('reads ' + settingName + ' from the host page, even when in a browser extension', function() {
       configFrom('WINDOW');
@@ -90,6 +92,8 @@ describe('annotator.config.index', function() {
     'openSidebar',
     'branding',
     'services',
+    'onElementClick',
+    'isHighlightBtnVisible',
   ].forEach(function(settingName) {
     it('returns the ' + settingName + ' value from the host page', function() {
       var settings = {
@@ -97,6 +101,8 @@ describe('annotator.config.index', function() {
         'openSidebar': 'OPEN_SIDEBAR_SETTING',
         'branding': 'BRANDING_SETTING',
         'services': 'SERVICES_SETTING',
+        'onElementClick' : 'ELEMENT_CLICK_SETTING',
+        'isHighlightBtnVisible': 'HIGHLIGHT_BTN_VISIBILITY',
       };
       fakeSettingsFrom().hostPageSetting = function(settingName) {
         return settings[settingName];

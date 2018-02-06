@@ -270,7 +270,8 @@ function generateBootScript(manifest) {
   var defaultAssetRoot;
 
   if (process.env.NODE_ENV === 'production') {
-    defaultAssetRoot = `https://cdn.hypothes.is/hypothesis/${version}/`;
+    defaultAssetRoot = process.env.ASSET_URL ?
+      `${process.env.ASSET_URL}` : `https://cdn.hypothes.is/hypothesis/${version}/`;
   } else {
     defaultAssetRoot = `http://${packageServerHostname()}:3001/hypothesis/${version}/`;
   }

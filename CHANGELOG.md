@@ -4,6 +4,27 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [1.64.0] - 2018-01-30
+
+### Changed
+
+- Hide the direct-link call-to-action for third party accounts
+  ([#658](https://github.com/hypothesis/client/pull/658)).
+
+## [1.63.0] - 2018-01-25
+
+### Changed
+
+- Fix login flow triggering popup blocker in Firefox and IE
+  ([#651](https://github.com/hypothesis/client/pull/651)).
+
+## [1.62.0] - 2018-01-10
+
+### Changed
+
+- Allow whitelisted URL params in YouTube embeds
+  ([#646](https://github.com/hypothesis/client/pull/646)).
+
 ## [1.61.0] - 2017-12-19
 
 ### Changed
