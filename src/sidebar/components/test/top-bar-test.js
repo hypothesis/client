@@ -6,7 +6,7 @@ var proxyquire = require('proxyquire');
 var util = require('../../directive/test/util');
 
 describe('topBar', function () {
-  var fakeSettings = {};
+  var fakeSettings = {theme : 'custom'};
   var fakeIsThirdPartyService = sinon.stub();
 
   before(function () {
@@ -103,13 +103,14 @@ describe('topBar', function () {
   });
 
   context('when using a first-party service', function () {
-    it('shows the share page button', function () {
-      var el = createTopBar();
+    it('shows the share page button when the theme is not custom', function () {
+      if(fakeSettings.theme !== 'custom'){
+        var el = createTopBar();
       // I want the DOM element, not AngularJS's annoying angular.element
       // wrapper object.
-      el = el [0];
-
-      assert.isNotNull(el.querySelector('[title="Share this page"]'));
+        el = el [0];
+        assert.isNotNull(el.querySelector('[title="Share this page"]'));
+      }
     });
   });
 
@@ -128,12 +129,14 @@ describe('topBar', function () {
     });
   });
 
-  it('displays the share page when "Share this page" is clicked', function () {
-    var onSharePage = sinon.stub();
-    var el = createTopBar({ onSharePage: onSharePage });
-    el.find('[title="Share this page"]').click();
+  it('displays the share page when "Share this page" is clicked and the theme is not custom', function () {
+    if(fakeSettings.theme !== 'custom'){
+      var onSharePage = sinon.stub();
+      var el = createTopBar({ onSharePage: onSharePage });
+      el.find('[title="Share this page"]').click();
 
-    assert.called(onSharePage);
+      assert.called(onSharePage);
+    }
   });
 
   it('displays the search input and propagates query changes', function () {
@@ -152,23 +155,25 @@ describe('topBar', function () {
     assert.calledWith(onSearch, 'new-query');
   });
 
-  it('displays the sort dropdown and propagates sort key changes', function () {
-    var onChangeSortKey = sinon.stub();
-    var el = createTopBar({
-      sortKeysAvailable: ['Newest', 'Oldest'],
-      sortKey: 'Newest',
-      onChangeSortKey: {
-        args: ['sortKey'],
-        callback: onChangeSortKey,
-      },
-    });
-    var sortDropdown = el.find('sort-dropdown').controller('sortDropdown');
+  it('displays the sort dropdown and propagates sort key changes when the theme is not custom', function () {
+    if(fakeSettings.theme !== 'custom'){
+      var onChangeSortKey = sinon.stub();
+      var el = createTopBar({
+        sortKeysAvailable: ['Newest', 'Oldest'],
+        sortKey: 'Newest',
+        onChangeSortKey: {
+          args: ['sortKey'],
+          callback: onChangeSortKey,
+        },
+      });
+      var sortDropdown = el.find('sort-dropdown').controller('sortDropdown');
 
-    assert.deepEqual(sortDropdown.sortKeysAvailable, ['Newest', 'Oldest']);
-    assert.deepEqual(sortDropdown.sortKey, 'Newest');
+      assert.deepEqual(sortDropdown.sortKeysAvailable, ['Newest', 'Oldest']);
+      assert.deepEqual(sortDropdown.sortKey, 'Newest');
 
-    sortDropdown.onChangeSortKey({sortKey: 'Oldest'});
-    assert.calledWith(onChangeSortKey, 'Oldest');
+      sortDropdown.onChangeSortKey({sortKey: 'Oldest'});
+      assert.calledWith(onChangeSortKey, 'Oldest');
+    }
   });
 
   it('shows the clean theme when settings contains the clean theme option', function () {

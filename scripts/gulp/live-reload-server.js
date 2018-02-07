@@ -99,6 +99,10 @@ function LiveReloadServer(port, config) {
 
                 // Open the sidebar when the page loads
                 openSidebar: true,
+                // Disable the click on the guest page outerside of the elements
+                onElementClick: false,
+                // Disable the highlight button
+                isHighlightBtnVisible: false,
               };
             };
 

@@ -127,6 +127,8 @@ function createAdderDOM(container) {
 function Adder(container, options) {
 
   var self = this;
+  // Flag to manage the visibility of Highlight Button
+  var isHighlightBtnVisible = options.isHighlightBtnVisible();
   self.element = createAdderDOM(container);
 
   // Set initial style
@@ -151,8 +153,14 @@ function Adder(container, options) {
 
   self.element.querySelector(ANNOTATE_BTN_SELECTOR)
     .addEventListener('click', handleCommand);
-  self.element.querySelector(HIGHLIGHT_BTN_SELECTOR)
+  
+  if (isHighlightBtnVisible) {
+    self.element.querySelector(HIGHLIGHT_BTN_SELECTOR)
     .addEventListener('click', handleCommand);
+  } else {
+    self.element.querySelector(HIGHLIGHT_BTN_SELECTOR).style.display = 'none';
+  }
+
 
   function handleCommand(event) {
     event.preventDefault();
@@ -261,7 +269,7 @@ function Adder(container, options) {
     // the way it was originally displayed - without the inline styles
     // See: https://github.com/hypothesis/client/issues/137
     self.element.querySelector(ANNOTATE_BTN_SELECTOR).style.display = '';
-    self.element.querySelector(HIGHLIGHT_BTN_SELECTOR).style.display = '';
+    // self.element.querySelector(HIGHLIGHT_BTN_SELECTOR).style.display = '';
 
     // Translate the (left, top) viewport coordinates into positions relative to
     // the adder's nearest positioned ancestor (NPA).

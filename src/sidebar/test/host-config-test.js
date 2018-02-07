@@ -20,6 +20,8 @@ describe('hostPageConfig', function () {
       services: [{
         authority: 'hypothes.is',
       }],
+      onElementClick : false,
+      isHighlightBtnVisible: false,
     });
 
     assert.deepEqual(hostPageConfig(window_), {
@@ -30,6 +32,8 @@ describe('hostPageConfig', function () {
       services: [{
         authority: 'hypothes.is',
       }],
+      onElementClick : false,
+      isHighlightBtnVisible: false,
     });
   });
 
@@ -44,6 +48,8 @@ describe('hostPageConfig', function () {
   it('ignores `null` values in config', function () {
     var window_ = fakeWindow({
       openSidebar: null,
+      onElementClick : null,
+      isHighlightBtnVisible: null,
     });
 
     assert.deepEqual(hostPageConfig(window_), {});
