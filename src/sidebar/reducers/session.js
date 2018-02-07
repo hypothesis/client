@@ -13,8 +13,6 @@ function init() {
     session: {
       /** A map of features that are enabled for the current user. */
       features: {},
-      /** List of groups that the current user is a member of. */
-      groups: [],
       /** A map of preference names and values. */
       preferences: {},
       /**

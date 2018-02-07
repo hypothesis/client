@@ -124,6 +124,7 @@ describe('Streamer', function () {
 
     fakeGroups = {
       focused: sinon.stub().returns({id: 'public'}),
+      load: sinon.stub(),
     };
 
     fakeSession = {
@@ -416,6 +417,7 @@ describe('Streamer', function () {
           model: model,
         });
         assert.ok(fakeSession.update.calledWith(model));
+        assert.calledOnce(fakeGroups.load);
       });
     });
   });
