@@ -14,6 +14,7 @@ module.exports = {
       'angular',
       'angular-route',
       'angular-sanitize',
+      'angular-translate',
       'ng-tags-input',
       'angular-toastr',
       'angulartics/src/angulartics',
