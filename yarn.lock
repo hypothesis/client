@@ -98,25 +98,25 @@ ancestors@0.0.3:
   version "0.0.3"
   resolved "https://registry.yarnpkg.com/ancestors/-/ancestors-0.0.3.tgz#124eb944447d68b302057047d15d077a9da5179d"
 
-angular-mocks@~1.5.6:
-  version "1.5.11"
-  resolved "https://registry.yarnpkg.com/angular-mocks/-/angular-mocks-1.5.11.tgz#a0e1dd0ea55fd77ee7a757d75536c5e964c86f81"
+angular-mocks@^1.6.9:
+  version "1.6.9"
+  resolved "https://registry.yarnpkg.com/angular-mocks/-/angular-mocks-1.6.9.tgz#4fed8c8293a5080e0919a7ff0dcf0f704864b7ba"
 
-angular-route@~1.5.6:
-  version "1.5.11"
-  resolved "https://registry.yarnpkg.com/angular-route/-/angular-route-1.5.11.tgz#49614f3a167f54291e449fe8ba05d39c58924b83"
+angular-route@^1.6.9:
+  version "1.6.9"
+  resolved "https://registry.yarnpkg.com/angular-route/-/angular-route-1.6.9.tgz#73c63cec6a8a6b924698aec635eac32aa41f5e2b"
 
-angular-sanitize@~1.5.6:
-  version "1.5.11"
-  resolved "https://registry.yarnpkg.com/angular-sanitize/-/angular-sanitize-1.5.11.tgz#ebfb3f343e543f9b2ef050fb4c2e9ee048d1772f"
+angular-sanitize@^1.6.9:
+  version "1.6.9"
+  resolved "https://registry.yarnpkg.com/angular-sanitize/-/angular-sanitize-1.6.9.tgz#1adba33f6f513e5f93e3aca8071bef53666739ea"
 
 angular-toastr@^1.7.0:
   version "1.7.0"
   resolved "https://registry.yarnpkg.com/angular-toastr/-/angular-toastr-1.7.0.tgz#7fdf9ef61cb4abee7a8818eb3d9798c057d4eb7f"
 
-angular@~1.5.6:
-  version "1.5.11"
-  resolved "https://registry.yarnpkg.com/angular/-/angular-1.5.11.tgz#8c5ba7386f15965c9acf3429f6881553aada30d6"
+angular@^1.6.9:
+  version "1.6.9"
+  resolved "https://registry.yarnpkg.com/angular/-/angular-1.6.9.tgz#bc812932e18909038412d594a5990f4bb66c0619"
 
 angulartics@0.17.2:
   version "0.17.2"

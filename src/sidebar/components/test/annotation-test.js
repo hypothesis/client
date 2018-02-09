@@ -146,7 +146,8 @@ describe('annotation', function() {
         })
         .component('markdown', {
           bindings: require('../markdown').bindings,
-        });
+        })
+        .config(($compileProvider) => $compileProvider.preAssignBindingsEnabled(true));
     });
 
     beforeEach(angular.mock.module('h'));

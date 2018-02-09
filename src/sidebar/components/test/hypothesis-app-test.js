@@ -57,7 +57,8 @@ describe('sidebar.components.hypothesis-app', function () {
     }));
 
     angular.module('h', [])
-      .component('hypothesisApp', component);
+      .component('hypothesisApp', component)
+      .config(($compileProvider) => $compileProvider.preAssignBindingsEnabled(true));
   });
 
   beforeEach(angular.mock.module('h'));
