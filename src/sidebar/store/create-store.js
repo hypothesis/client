@@ -25,7 +25,7 @@ const { createReducer, bindSelectors } = require('./util');
  * @param {any[]} initArgs - Arguments to pass to each state module's `init` function
  * @param [any[]] middleware - List of additional Redux middlewares to use.
  */
-function createStore(modules, initArgs, middleware = []) {
+function createStore(modules, initArgs = [], middleware = []) {
   // Create the initial state and state update function.
   const initialState = Object.assign({}, ...modules.map(m => m.init(...initArgs)));
   const reducer = createReducer(...modules.map(m => m.update));

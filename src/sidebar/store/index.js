@@ -37,6 +37,7 @@ var debugMiddleware = require('./debug-middleware');
 var annotations = require('./modules/annotations');
 var frames = require('./modules/frames');
 var links = require('./modules/links');
+var groups = require('./modules/groups');
 var selection= require('./modules/selection');
 var session = require('./modules/session');
 var viewer = require('./modules/viewer');
@@ -85,6 +86,7 @@ function store($rootScope, settings) {
     annotations,
     frames,
     links,
+    groups,
     selection,
     session,
     viewer,
