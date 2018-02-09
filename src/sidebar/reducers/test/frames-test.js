@@ -7,6 +7,7 @@ var unroll = require('../../../shared/test/util').unroll;
 
 var actions = frames.actions;
 var update = util.createReducer(frames.update);
+var selectors = frames.selectors;
 
 function init() {
   return Object.assign({}, frames.init(), session.init());
@@ -17,7 +18,7 @@ describe('frames reducer', function () {
     it('adds the frame to the list of connected frames', function () {
       var frame = {uri: 'http://example.com'};
       var state = update(init(), actions.connectFrame(frame));
-      assert.deepEqual(frames.frames(state), [frame]);
+      assert.deepEqual(selectors.frames(state), [frame]);
     });
   });
 
@@ -28,9 +29,9 @@ describe('frames reducer', function () {
       frameList.forEach(function (frame) {
         state = update(state, actions.connectFrame(frame));
       });
-      assert.deepEqual(frames.frames(state), frameList);
+      assert.deepEqual(selectors.frames(state), frameList);
       var updatedState = update(state, actions.destroyFrame(frameList[0]));
-      assert.deepEqual(frames.frames(updatedState), [frameList[1]]);
+      assert.deepEqual(selectors.frames(updatedState), [frameList[1]]);
     });
   });
 
@@ -46,7 +47,7 @@ describe('frames reducer', function () {
       var connectedState = update(init(), actions.connectFrame(frame));
       var updatedState = update(connectedState,
         actions.updateFrameAnnotationFetchStatus(frame.uri, true));
-      assert.deepEqual(frames.frames(updatedState), [expectedFrame]);
+      assert.deepEqual(selectors.frames(updatedState), [expectedFrame]);
     });
 
     it('does not update the isAnnotationFetchComplete status of the wrong frame', function () {
@@ -56,7 +57,7 @@ describe('frames reducer', function () {
       var connectedState = update(init(), actions.connectFrame(frame));
       var updatedState = update(connectedState,
         actions.updateFrameAnnotationFetchStatus('http://anotherexample.com', true));
-      assert.deepEqual(frames.frames(updatedState), [frame]);
+      assert.deepEqual(selectors.frames(updatedState), [frame]);
     });
   });
 
@@ -69,7 +70,7 @@ describe('frames reducer', function () {
       testCase.frames.forEach(function (frame) {
         state = update(state, actions.connectFrame(frame));
       });
-      assert.deepEqual(frames.searchUris(state), testCase.searchUris);
+      assert.deepEqual(selectors.searchUris(state), testCase.searchUris);
     },[{
       when: 'one HTML frame',
       frames: [{

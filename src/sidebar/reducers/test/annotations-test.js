@@ -9,7 +9,7 @@ var fixtures = require('../../test/annotation-fixtures');
 var util = require('../util');
 var unroll = require('../../../shared/test/util').unroll;
 
-var actions = annotations.actions;
+var { actions, selectors } = annotations;
 
 /**
  * Create a Redux store which only handles annotation actions.
@@ -26,7 +26,7 @@ function createStore() {
 
 describe('annotations reducer', function () {
   describe('#savedAnnotations', function () {
-    var savedAnnotations = annotations.savedAnnotations;
+    var savedAnnotations = selectors.savedAnnotations;
 
     it('returns annotations which are saved', function () {
       var state = {
@@ -37,7 +37,7 @@ describe('annotations reducer', function () {
   });
 
   describe('#findIDsForTags', function () {
-    var findIDsForTags = annotations.findIDsForTags;
+    var findIDsForTags = selectors.findIDsForTags;
 
     it('returns the IDs corresponding to the provided local tags', function () {
       var ann = fixtures.defaultAnnotation();
@@ -64,7 +64,7 @@ describe('annotations reducer', function () {
       store.dispatch(actions.addAnnotations([ann]));
       store.dispatch(actions.hideAnnotation(ann.id));
 
-      var storeAnn = annotations.findAnnotationByID(store.getState(), ann.id);
+      var storeAnn = selectors.findAnnotationByID(store.getState(), ann.id);
       assert.equal(storeAnn.hidden, true);
     });
   });
@@ -77,7 +77,7 @@ describe('annotations reducer', function () {
       store.dispatch(actions.addAnnotations([ann]));
       store.dispatch(actions.unhideAnnotation(ann.id));
 
-      var storeAnn = annotations.findAnnotationByID(store.getState(), ann.id);
+      var storeAnn = selectors.findAnnotationByID(store.getState(), ann.id);
       assert.equal(storeAnn.hidden, false);
     });
   });
@@ -92,7 +92,7 @@ describe('annotations reducer', function () {
       store.dispatch(actions.addAnnotations([ann]));
       store.dispatch(actions.updateFlagStatus(ann.id, testCase.nowFlagged));
 
-      var storeAnn = annotations.findAnnotationByID(store.getState(), ann.id);
+      var storeAnn = selectors.findAnnotationByID(store.getState(), ann.id);
       assert.equal(storeAnn.flagged, testCase.nowFlagged);
       assert.deepEqual(storeAnn.moderation, testCase.newModeration);
     }, [{

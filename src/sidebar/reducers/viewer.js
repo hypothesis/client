@@ -57,6 +57,7 @@ module.exports = {
     setShowHighlights: setShowHighlights,
   },
 
-  // Selectors
-  isSidebar: isSidebar,
+  selectors: {
+    isSidebar,
+  },
 };

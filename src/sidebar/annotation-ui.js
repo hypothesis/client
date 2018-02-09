@@ -109,23 +109,14 @@ module.exports = function ($rootScope, settings) {
   //   selection.isAnnotationSelected(annotationUI.getState(), id)
   // You can use:
   //   annotationUI.isAnnotationSelected(id)
-  var selectors = util.bindSelectors({
-    isAnnotationSelected: selectionReducer.isAnnotationSelected,
-    hasSelectedAnnotations: selectionReducer.hasSelectedAnnotations,
-
-    annotationExists: annotationsReducer.annotationExists,
-    findAnnotationByID: annotationsReducer.findAnnotationByID,
-    findIDsForTags: annotationsReducer.findIDsForTags,
-    savedAnnotations: annotationsReducer.savedAnnotations,
-
-    frames: framesReducer.frames,
-    searchUris: framesReducer.searchUris,
-
-    isSidebar: viewerReducer.isSidebar,
-
-    isFeatureEnabled: sessionReducer.isFeatureEnabled,
-    profile: sessionReducer.profile,
-  }, store.getState);
+  var selectors = util.bindSelectors(Object.assign({},
+    annotationsReducer.selectors,
+    framesReducer.selectors,
+    linksReducer.selectors,
+    selectionReducer.selectors,
+    sessionReducer.selectors,
+    viewerReducer.selectors
+  ), store.getState);
 
   return Object.assign(store, actionCreators, selectors);
 };

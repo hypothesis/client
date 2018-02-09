@@ -24,4 +24,5 @@ module.exports = {
   init:    init,
   update:  { UPDATE_LINKS: updateLinks },
   actions: { updateLinks: updateLinksAction },
+  selectors: {},
 };

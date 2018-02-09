@@ -4,8 +4,7 @@ var session = require('../session');
 
 var util = require('../util');
 
-var init = session.init;
-var actions = session.actions;
+var { init, actions, selectors } = session;
 var update = util.createReducer(session.update);
 
 describe('sidebar.reducers.session', function () {
@@ -21,7 +20,7 @@ describe('sidebar.reducers.session', function () {
     it("returns the user's profile", () => {
       var newSession = Object.assign(init(), {userid: 'john'});
       var state = update(init(), actions.updateSession(newSession));
-      assert.equal(session.profile(state), newSession);
+      assert.equal(selectors.profile(state), newSession);
     });
   });
 });
