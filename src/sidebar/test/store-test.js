@@ -200,6 +200,20 @@ describe('sidebar.store', function () {
     });
   });
 
+  describe('#group.read', () => {
+    it('reads a group by url', (done) => {
+      var groupUrl = 'http://h.hypothesis:5000/groups/MGkYz9j2/http-test-localhost';
+      var group = {pubid: '2JKqAjYE', description: null, name: 'SciPub.com Open Group'};
+      store.group.read(groupUrl).then(function (group_) {
+        assert.deepEqual(group_, group);
+        done();
+      });
+      $httpBackend.expectGET(groupUrl)
+        .respond(function () { return [200, group, {}]; });
+      $httpBackend.flush();
+    });
+  });
+
   it('removes internal properties before sending data to the server', function (done) {
     var annotation = {
       $highlight: true,

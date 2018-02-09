@@ -16,7 +16,7 @@ var STORAGE_KEY = 'hypothesis.groups.focus';
 var events = require('./events');
 
 // @ngInject
-function groups(localStorage, serviceUrl, session, $rootScope, store) {
+function groups(localStorage, serviceUrl, session, $rootScope, store, settings) {
   // The currently focused group. This is the group that's shown as selected in
   // the groups dropdown, the annotations displayed are filtered to only ones
   // that belong to this group, and any new annotations that the user creates
@@ -82,6 +82,38 @@ function groups(localStorage, serviceUrl, session, $rootScope, store) {
     }
   }
 
+  /**
+   * Get an array of group objects representing groups that this page has explicitly opted into showing
+   */
+  function pageGroups() {
+    return Promise.all((settings.pageGroups || []).map(function (groupUrl) {
+      return store.group.read(groupUrl).catch((error) => {
+        console.error('error fetching pageGroup for url', groupUrl, error);
+      });
+    }))
+    .then(groups => groups.filter(Boolean));
+  }
+
+  /**
+   * Wrap an async function such that it is only called once and the result is cached and promised on subsequent calls.
+   * @param {(...args: any) => any} fetch - Go fetch some value. Will be Promise.resolved
+   * @param {(...args: any) => any} [withResult] - Function call with the reuslt the first time it's fetched. `this` will be same as `this` in cached() call. Will be Promise.resolved and awaited.
+   */
+  function cached(fetch, withResult=()=>{}) {
+    var result = false;
+    var fetching = false;
+    return function (...args) {
+      if ( ! result && ! fetching) {
+        fetching = true;
+        result = Promise.resolve(fetch(...args)).then(fetched => {
+          result = fetched;
+          return Promise.resolve(withResult.call(this, result)).then(() => result);
+        });
+      }
+      return result;
+    };
+  }
+
   // reset the focused group if the user leaves it
   $rootScope.$on(events.GROUPS_CHANGED, function () {
     if (focusedGroup) {
@@ -92,15 +124,22 @@ function groups(localStorage, serviceUrl, session, $rootScope, store) {
     }
   });
 
-  return {
+  var service = {
     all: all,
     get: get,
-
+    pageGroups: cached(pageGroups, function (fetchedPageGroups) {
+      // `this` is `service`
+      return $rootScope.$apply(() => {
+        this.pageGroups = () => fetchedPageGroups;
+      });
+    }),
     leave: leave,
 
     focused: focused,
     focus: focus,
   };
+
+  return service;
 }
 
 module.exports = groups;

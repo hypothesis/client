@@ -23,6 +23,7 @@ function configFrom(window_) {
     usernameUrl: settings.hostPageSetting('usernameUrl'),
     onLayoutChange: settings.hostPageSetting('onLayoutChange'),
     openSidebar: settings.hostPageSetting('openSidebar', {allowInBrowserExt: true}),
+    pageGroups: settings.hostPageSetting('pageGroups'),
     query: settings.query,
     services: settings.hostPageSetting('services'),
     showHighlights: settings.showHighlights,

@@ -139,6 +139,7 @@ module.exports = angular.module('h', [
   .component('dropdownMenuBtn', require('./components/dropdown-menu-btn'))
   .component('excerpt', require('./components/excerpt'))
   .component('groupList', require('./components/group-list'))
+  .component('newGroupList', require('./components/new-group-list'))
   .component('helpLink', require('./components/help-link'))
   .component('helpPanel', require('./components/help-panel'))
   .component('loggedoutMessage', require('./components/loggedout-message'))
@@ -204,7 +205,8 @@ module.exports = angular.module('h', [
   .value('settings', settings)
   .value('time', require('./time'))
   .value('urlEncodeFilter', require('./filter/url').encode)
-
+  .value('debugFilter', require('./filter/debug').debug)
+  
   .config(configureLocation)
   .config(configureRoutes)
   .config(configureToastr)
