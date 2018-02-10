@@ -160,6 +160,7 @@ function startAngularApp(config) {
   .component('sidebarTutorial', require('./components/sidebar-tutorial'))
   .component('shareDialog', require('./components/share-dialog'))
   .component('sortDropdown', require('./components/sort-dropdown'))
+  .component('spinner', require('./components/spinner'))
   .component('streamContent', require('./components/stream-content'))
   .component('svgIcon', require('./components/svg-icon'))
   .component('tagEditor', require('./components/tag-editor'))
@@ -171,7 +172,6 @@ function startAngularApp(config) {
   .directive('hBranding', require('./directive/h-branding'))
   .directive('hOnTouch', require('./directive/h-on-touch'))
   .directive('hTooltip', require('./directive/h-tooltip'))
-  .directive('spinner', require('./directive/spinner'))
   .directive('windowScroll', require('./directive/window-scroll'))
 
   .service('analytics', require('./services/analytics'))
