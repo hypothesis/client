@@ -710,8 +710,13 @@ describe('annotation', function() {
       it('flashes an error if the delete fails on the server', function(done) {
         var controller = createDirective().controller;
         sandbox.stub($window, 'confirm').returns(true);
-        var err = new Error('500 Server Error');
-        fakeAnnotationMapper.deleteAnnotation.returns($q.reject(err));
+
+        fakeAnnotationMapper.deleteAnnotation = sinon.spy(() => {
+          // nb. we only instantiate the rejected promise when
+          // `deleteAnnotation` is called to avoid triggering `$q`'s unhandled
+          // promise rejection handler during the `$timeout.flush()` call.
+          return $q.reject(new Error('500 Server Error'));
+        });
         controller.delete().then(function() {
           assert.calledWith(fakeFlash.error,
             '500 Server Error', 'Deleting annotation failed');
