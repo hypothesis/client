@@ -26,6 +26,7 @@
   !-->
   <div class="top-bar__inner content" ng-if="::vm.isSidebar">
     <group-list class="group-list" auth="vm.auth"></group-list>
+    <language-list class="group-list" auth="vm.auth"></language-list>
     <div class="top-bar__expander"></div>
     <a class="top-bar__apply-update-btn"
        ng-if="vm.pendingUpdateCount > 0"
@@ -39,7 +40,7 @@
       class="search-input"
       query="vm.searchController.query()"
       on-search="vm.searchController.update($query)"
-      title="Filter the annotation list">
+      title="{{'Filter the feedback list' | translate}}">
     </search-input>
     <sort-dropdown
       ng-if="!vm.isThemeCustom"
@@ -50,7 +51,7 @@
     <a class="top-bar__btn"
        ng-click="vm.onSharePage()"
        ng-if="vm.showSharePageButton() && !vm.isThemeCustom"
-       title="Share this page">
+       title="{{'Share this page' | translate}}">
       <i class="h-icon-annotation-share"></i>
     </a>
     <login-control

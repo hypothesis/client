@@ -1,10 +1,10 @@
 <div dropdown="" class="publish-annotation-btn__btn" is-open="vm.showDropdown" keyboard-nav>
   <dropdown-menu-btn
-    label="'Post to ' + vm.publishDestination()"
+    label="('Post to ' | translate) + vm.publishDestination()"
     on-click="vm.onSave()"
     on-toggle-dropdown="vm.showDropdown = !vm.showDropdown"
-    title="Publish this annotation to {{vm.publishDestination()}}"
-    dropdown-menu-label="Change annotation sharing setting"
+    title="{{'Publish this feedback to' | translate}} {{vm.publishDestination()}}"
+    dropdown-menu-label="{{'Change annotation sharing setting' | translate}}"
     is-disabled="!vm.canPost">
   </dropdown-menu-btn>
   <div class="publish-annotation-btn__dropdown-container">
@@ -38,7 +38,7 @@
 </div>
 <button class="publish-annotation-cancel-btn btn-clean"
         ng-click="vm.onCancel()"
-        title="Cancel changes to this annotation"
+        title="{{'Cancel changes to this feedback' | translate}}"
         >
-  <i class="h-icon-cancel-outline publish-annotation-cancel-btn__icon btn-icon"></i> Cancel
+  <i class="h-icon-cancel-outline publish-annotation-cancel-btn__icon btn-icon"></i> {{'Cancel' | translate}}
 </button>

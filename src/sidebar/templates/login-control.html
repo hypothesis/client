@@ -3,8 +3,8 @@
       ng-if="vm.newStyle && vm.auth.status === 'unknown'">⋯</span>
 <span class="login-text"
       ng-if="vm.newStyle && vm.auth.status === 'logged-out'">
-  <a href="" ng-click="vm.onSignUp()" target="_blank" h-branding="accentColor">Sign up</a>
-  / <a href="" ng-click="vm.onLogin()" h-branding="accentColor">Log in</a>
+  <a href="" ng-click="vm.onSignUp()" target="_blank" h-branding="accentColor">{{'Sign up' | translate}}</a>
+  / <a href="" ng-click="vm.onLogin()" h-branding="accentColor">{{'Log in' | translate}}</a>
 </span>
 <div ng-if="vm.newStyle"
      class="pull-right login-control-menu"
@@ -26,18 +26,18 @@
       <a ng-if="vm.shouldEnableProfileButton()"
          ng-click="vm.showProfile()"
          class="dropdown-menu__link js-user-profile-btn is-enabled"
-         title="View all your annotations"
+         title="{{'View all your annotations' | translate}}"
          target="_blank">{{vm.auth.displayName}}</a>
     </li>
     <li class="dropdown-menu__row" ng-if="vm.auth.status === 'logged-in' && !vm.isThirdPartyUser()">
-      <a class="dropdown-menu__link js-account-settings-btn" href="{{vm.serviceUrl('account.settings')}}" target="_blank">Account settings</a>
+      <a class="dropdown-menu__link js-account-settings-btn" href="{{vm.serviceUrl('account.settings')}}" target="_blank">{{'Account settings' | translate}}</a>
     </li>
     <li class="dropdown-menu__row">
-      <a class="dropdown-menu__link js-help-btn" ng-click="vm.onShowHelpPanel()">Help</a>
+      <a class="dropdown-menu__link js-help-btn" ng-click="vm.onShowHelpPanel()">{{'Help' | translate}}</a>
     </li>
     <li class="dropdown-menu__row" ng-if="vm.shouldShowLogOutButton()">
       <a class="dropdown-menu__link dropdown-menu__link--subtle js-log-out-btn"
-         href="" ng-click="vm.onLogout()">Log out</a>
+         href="" ng-click="vm.onLogout()">{{'Log out' | translate}}</a>
     </li>
   </ul>
 </div>
@@ -45,7 +45,7 @@
 <!-- Old controls -->
 <span ng-if="!vm.newStyle && vm.auth.status === 'unknown'">⋯</span>
 <span ng-if="!vm.newStyle && vm.auth.status === 'logged-out'">
-  <a href="" ng-click="vm.onLogin()">Log in</a>
+  <a href="" ng-click="vm.onLogin()">{{'Log in' | translate}}</a>
 </span>
 <div ng-if="!vm.newStyle"
      class="pull-right login-control-menu"
@@ -59,17 +59,17 @@
   </span>
   <ul class="dropdown-menu pull-right" role="menu">
     <li class="dropdown-menu__row" ng-if="vm.auth.status === 'logged-in'">
-      <a class="dropdown-menu__link" href="{{vm.serviceUrl('account.settings')}}" target="_blank">Account</a>
+      <a class="dropdown-menu__link" href="{{vm.serviceUrl('account.settings')}}" target="_blank">{{'Account' | translate}}</a>
     </li>
     <li class="dropdown-menu__row" >
-      <a class="dropdown-menu__link" ng-click="vm.onShowHelpPanel()">Help</a>
+      <a class="dropdown-menu__link" ng-click="vm.onShowHelpPanel()">{{'Help' | translate}}</a>
     </li>
     <li class="dropdown-menu__row" ng-if="vm.auth.status === 'logged-in'">
       <a class="dropdown-menu__link" href="{{vm.serviceUrl('user',{user: vm.auth.username})}}"
-         target="_blank">My Annotations</a>
+         target="_blank">{{'My Annotations' | translate}}</a>
     </li>
     <li class="dropdown-menu__row" ng-if="vm.auth.status === 'logged-in'">
-      <a class="dropdown-menu__link" href="" ng-click="vm.onLogout()">Log out</a>
+      <a class="dropdown-menu__link" href="" ng-click="vm.onLogout()">{{'Log out' | translate}}</a>
     </li>
   </ul>
 </div>

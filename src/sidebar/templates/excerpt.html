@@ -4,18 +4,18 @@
     <div ng-transclude></div>
     <div ng-click="vm.expand()"
          ng-class="vm.bottomShadowStyles()"
-         title="Show the full excerpt"></div>
+         title="{{'Show the full excerpt' | translate}}"></div>
     <div class="excerpt__inline-controls"
          ng-show="vm.showInlineControls()">
       <span class="excerpt__toggle-link" ng-show="vm.isExpandable()">
         … <a ng-click="vm.toggle($event)"
-            title="Show the full excerpt"
-            h-branding="accentColor, selectionFontFamily">More</a>
+            title="{{'Show the full excerpt' | translate}}"
+            h-branding="accentColor, selectionFontFamily">{{'More' | translate}}</a>
       </span>
       <span class="excerpt__toggle-link" ng-show="vm.isCollapsible()">
         <a ng-click="vm.toggle($event)"
-            title="Show the first few lines only"
-            h-branding="accentColor, selectionFontFamily">Less</a>
+            title="{{'Show the first few lines only' | translate}}"
+            h-branding="accentColor, selectionFontFamily">{{'Less' | translate}}</a>
       </span>
     </div>
   </div>

@@ -25,7 +25,7 @@ var serviceConfig = require('./service-config');
  */
 // @ngInject
 function auth($http, $rootScope, $window, OAuthClient,
-              apiRoutes, flash, localStorage, settings) {
+              apiRoutes, flash, localStorage, settings, $filter) {
 
   /**
    * Authorization code from auth popup window.
@@ -54,9 +54,9 @@ function auth($http, $rootScope, $window, OAuthClient,
    * Show an error message telling the user that the access token has expired.
    */
   function showAccessTokenExpiredErrorMessage(message) {
+    var msg = $filter('translate')('Hypothesis login lost');
     flash.error(
-      message,
-      'Hypothesis login lost',
+      message, msg,
       {
         extendedTimeOut: 0,
         tapToDismiss: false,

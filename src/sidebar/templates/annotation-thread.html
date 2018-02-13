@@ -2,7 +2,7 @@
   <div class="annotation-thread__thread-edge" ng-if="!vm.isTopLevelThread()">
     <a href=""
        ng-class="vm.threadToggleClasses()"
-       title="{{vm.thread.collapsed && 'Expand' || 'Collapse'}}"
+       title="{{(vm.thread.collapsed && 'Expand' | translate) || ('Collapse' | translate)}}"
        ng-click="vm.toggleCollapsed()">
        <span ng-class="{'h-icon-arrow-right': vm.thread.collapsed,
                         'h-icon-arrow-drop-down': !vm.thread.collapsed}"></span>
@@ -27,7 +27,7 @@
     </annotation>
 
     <div ng-if="!vm.thread.annotation" class="thread-deleted">
-      <p><em>Message not available.</em></p>
+      <p><em>{{'Message not available.' | translate}}</em></p>
     </div>
 
     <div ng-if="vm.hiddenCount() > 0">

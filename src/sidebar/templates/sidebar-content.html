@@ -26,14 +26,12 @@
   <div class="annotation-unavailable-message__icon"></div>
   <p class="annotation-unavailable-message__label">
     <span ng-if="vm.auth.status === 'logged-out'">
-      This annotation is not available.
+      {{'This feedback is not available.' | translate}}
       <br>
-      You may need to
-      <a class="loggedout-message__link" href="" ng-click="vm.login()">log in</a>
-      to see it.
+      <p ng-bind-html="'You may need to <a class=\'loggedout-message__link\' href=\'\' ng-click=\'vm.login()\'>log in</a> to see it.' | translate"></p>
     </span>
     <span ng-if="vm.auth.status === 'logged-in'">
-      You do not have permission to view this annotation.
+      {{'You do not have permission to view this feedback.' | translate}}
     </span>
   </p>
 </div>

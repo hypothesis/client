@@ -3,25 +3,25 @@
      ng-click="vm.onClose()"></div>
 <div class="annotation-share-dialog" ng-class="{'is-open': vm.isOpen}">
   <div class="annotation-share-dialog-target">
-    <span class="annotation-share-dialog-target__label">Share:</span>
+    <span class="annotation-share-dialog-target__label">{{'Share' | translate}}:</span>
     <a href="https://twitter.com/intent/tweet?url={{vm.uri | urlEncode}}&hashtags=annotated"
       target="_blank"
-      title="Tweet link"
+      title="{{'Tweet link' | translate}}"
       class="annotation-share-dialog-target__icon h-icon-twitter"
       ng-click="vm.onShareClick('twitter')"></a>
     <a href="https://www.facebook.com/sharer/sharer.php?u={{vm.uri | urlEncode}}"
       target="_blank"
-      title="Share on Facebook"
+      title="{{'Share on Facebook' | translate}}"
       class="annotation-share-dialog-target__icon h-icon-facebook"
       ng-click="vm.onShareClick('facebook')"></a>
     <a href="https://plus.google.com/share?url={{vm.uri | urlEncode}}"
       target="_blank"
-      title="Post on Google Plus"
+      title="{{'Post on Google Plus' | translate}}"
       class="annotation-share-dialog-target__icon h-icon-google-plus"
       ng-click="vm.onShareClick('googlePlus')"></a>
     <a href="mailto:?subject=Let's%20Annotate&amp;body={{vm.uri}}"
       target="_blank"
-      title="Share via email"
+      title="{{'Share via email' | translate}}"
       class="annotation-share-dialog-target__icon h-icon-mail"
       ng-click="vm.onShareClick('email')"></a>
   </div>
@@ -38,14 +38,14 @@
   </div>
   <div class="annotation-share-dialog-msg" ng-if="vm.group && !vm.group.public && !vm.isPrivate">
     <span class="annotation-share-dialog-msg__audience">
-      Group.
+      {{'Group.' | translate}}
     </span>
-    Only group members will be able to view this annotation.
+    {{'Only group members will be able to view this annotation.' | translate}}
   </div>
   <div class="annotation-share-dialog-msg" ng-if="vm.isPrivate">
     <span class="annotation-share-dialog-msg__audience">
-      Only me.
+      {{'Only me.' | translate}}
     </span>
-    No one else will be able to view this annotation.
+    {{'No one else will be able to view this annotation.' | translate}}
   </div>
 </div>

@@ -27,7 +27,7 @@ function updateModel(annotation, changes, permissions) {
 function AnnotationController(
   $document, $rootScope, $scope, $timeout, $window, analytics, annotationUI,
   annotationMapper, drafts, flash, groups, permissions, serviceUrl,
-  session, settings, store, streamer) {
+  session, settings, store, streamer, $filter) {
 
   var self = this;
   var newlyCreatedByHighlightButton;
@@ -188,15 +188,14 @@ function AnnotationController(
     */
   this.flag = function() {
     if (!session.state.userid) {
-      flash.error(
-        'You must be logged in to report an annotation to the moderators.',
-        'Login to flag annotations'
-      );
+      var msg = $filter('translate')('You must be logged in to report an annotation to the moderators. Login to flag annotations');
+      flash.error(msg);
       return;
     }
 
     var onRejected = function(err) {
-      flash.error(err.message, 'Flagging annotation failed');
+      var msg = $filter('translate')('Flagging annotation failed');
+      flash.error(err.message, msg);
     };
     annotationMapper.flagAnnotation(self.annotation).then(function(){
       analytics.track(analytics.events.ANNOTATION_FLAGGED);
@@ -211,10 +210,12 @@ function AnnotationController(
     */
   this.delete = function() {
     return $timeout(function() {  // Don't use confirm inside the digest cycle.
-      var msg = 'Are you sure you want to delete this annotation?';
+      var msg = $filter('translate')('Are you sure you want to delete this annotation?');
       if ($window.confirm(msg)) {
+
         var onRejected = function(err) {
-          flash.error(err.message, 'Deleting annotation failed');
+          var msg = $filter('translate')('Deleting annotation failed');
+          flash.error(err.message, msg);
         };
         $scope.$apply(function() {
           annotationMapper.deleteAnnotation(self.annotation).then(function(){
@@ -386,12 +387,15 @@ function AnnotationController(
   };
 
   this.save = function() {
+    var info_message;
     if (!self.annotation.user) {
-      flash.info('Please log in to save your annotations.');
+      info_message = $filter('translate')('Please log in to save your annotations.');
+      flash.info(info_message);
       return Promise.resolve();
     }
     if (!self.hasContent() && self.isShared()) {
-      flash.info('Please add text or a tag before publishing.');
+      info_message = $filter('translate')('Please add text or a tag before publishing.');
+      flash.info(info_message);
       return Promise.resolve();
     }
 
@@ -414,7 +418,8 @@ function AnnotationController(
     }).catch(function (err) {
       self.isSaving = false;
       self.edit();
-      flash.error(err.message, 'Saving annotation failed');
+      var msg = $filter('translate')('Saving annotation failed');
+      flash.error(err.message, msg);
     });
   };
 

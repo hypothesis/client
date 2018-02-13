@@ -5,7 +5,7 @@
      href="#"
      ng-class="{'is-selected': vm.selectedTab === vm.TAB_ANNOTATIONS}"
      h-on-touch="vm.selectTab(vm.TAB_ANNOTATIONS)">
-    Annotations
+     {{'Feedback' | translate}}
     <span class="selection-tabs__count"
       ng-if="vm.totalAnnotations > 0 && !vm.isWaitingToAnchorAnnotations">
       {{ vm.totalAnnotations }}
@@ -16,7 +16,7 @@
      href="#"
      ng-class="{'is-selected': vm.selectedTab === vm.TAB_NOTES}"
      h-on-touch="vm.selectTab(vm.TAB_NOTES)">
-    Page Notes
+     {{'Page Notes' | translate}}
     <span class="selection-tabs__count"
       ng-if="vm.totalNotes > 0 && !vm.isWaitingToAnchorAnnotations">
       {{ vm.totalNotes }}
@@ -27,7 +27,7 @@
     href="#"
     ng-class="{'is-selected': vm.selectedTab === vm.TAB_ORPHANS}"
     h-on-touch="vm.selectTab(vm.TAB_ORPHANS)">
-    Orphans
+    {{'Orphans' | translate}}
     <span class="selection-tabs__count"
       ng-if="vm.totalOrphans > 0 && !vm.isWaitingToAnchorAnnotations">
       {{ vm.totalOrphans }}
@@ -40,22 +40,19 @@
 <div ng-if="!vm.isLoading()" class="selection-tabs__empty-message">
   <div ng-if="vm.showNotesUnavailableMessage() && !vm.isThemeCustom"  class="annotation-unavailable-message">
     <p class="annotation-unavailable-message__label">
-      There are no page notes in this group.
+        {{'There are no page notes in this group.' | translate}}
       <br />
       <div ng-if="!vm.enableExperimentalNewNoteButton && !vm.showSidebarTutorial()" class="annotation-unavailable-message__tutorial">
-        Create one by clicking the
-        <i class="help-icon h-icon-note"></i>
-        button.
+        <p ng-bind-html="'Create one by clicking the <i class=\'help-icon h-icon-note\'></i> button' | translate"></p>
       </div>
     </p>
   </div>
   <div ng-if="vm.showAnnotationsUnavailableMessage()"  class="annotation-unavailable-message">
     <p class="annotation-unavailable-message__label">
-      There are no annotations in this group.
+      {{'There is no feedback in this group.' | translate}}
       <br />
       <div ng-if="!vm.showSidebarTutorial()" class="annotation-unavailable-message__tutorial">
-        Create one by selecting some text and clicking the
-        <i class="help-icon h-icon-annotate"></i> button.
+          <p ng-bind-html="'Create one by selecting some text and clicking the <i class=\'help-icon h-icon-annotate\'></i> button' | translate"></p>
       </div>
     </p>
   </div>
