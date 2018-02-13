@@ -11,7 +11,7 @@ $container-height: $container-width;
 $part-width: .1em;
 $part-height: 3 * $part-width;
 
-@keyframes(spin) {
+@keyframes spin {
   to { transform: rotate(1turn); }
 }
 
