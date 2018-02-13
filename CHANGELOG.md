@@ -4,6 +4,15 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+### Changed
+
+- Fix spinner animation ([#667](https://github.com/hypothesis/client/pull/667)).
+
+- Update to Angular 1.6.9
+  ([#668](https://github.com/hypothesis/client/pull/668)).
+
 ## [1.64.0] - 2018-01-30
 
 ### Changed
