@@ -51,22 +51,19 @@ describe('publishAnnotationBtn', function () {
   });
 
   it('should display "Post to Research Lab"', function () {
-    element.link({
-      group: {
-        name: 'Research Lab',
-        type: 'group',
-      },
-      isShared: true,
-    });
+    element.ctrl.group = {
+      name: 'Research Lab',
+      type: 'group',
+    };
+    element.ctrl.isShared = true;
+    element.scope.$digest();
     var buttons = element.find('button');
     assert.equal(buttons[0].innerHTML, 'Post to Research Lab');
   });
 
   it('should save when "Post..." is clicked', function () {
     var savedSpy = sinon.spy();
-    element.link({
-      onSave: savedSpy,
-    });
+    element.ctrl.onSave = savedSpy;
     assert.ok(!savedSpy.called);
     angular.element(element.find('button')[0]).click();
     assert.ok(savedSpy.calledOnce);
@@ -74,11 +71,9 @@ describe('publishAnnotationBtn', function () {
 
   it('should change privacy when privacy option selected', function () {
     var privacyChangedSpy = sinon.spy();
-    element.link({
-      // for existing annotations, the privacy should not be changed
-      // unless the user makes a choice from the list
-      onSetPrivacy: privacyChangedSpy,
-    });
+    // for existing annotations, the privacy should not be changed
+    // unless the user makes a choice from the list
+    element.ctrl.onSetPrivacy = privacyChangedSpy;
 
     assert.ok(!privacyChangedSpy.called);
     var privateOption = element.find('li')[1];
@@ -90,25 +85,22 @@ describe('publishAnnotationBtn', function () {
   });
 
   it('should disable post buttons when posting is not possible', function () {
-    element.link({
-      canPost: false,
-    });
+    element.ctrl.canPost = false;
+    element.scope.$digest();
     var disabledBtns = element.find('button[disabled]');
     assert.equal(disabledBtns.length, 1);
 
     // check that buttons are enabled when posting is possible
-    element.link({
-      canPost: true,
-    });
+    element.ctrl.canPost = true;
+    element.scope.$digest();
     disabledBtns = element.find('button[disabled]');
     assert.equal(disabledBtns.length, 0);
   });
 
   it('should revert changes when cancel is clicked', function () {
     var cancelSpy = sinon.spy();
-    element.link({
-      onCancel: cancelSpy,
-    });
+    element.ctrl.onCancel = cancelSpy;
+    element.scope.$digest();
     var cancelBtn = element.find('.publish-annotation-cancel-btn');
     assert.equal(cancelBtn.length, 1);
     angular.element(cancelBtn).click();

@@ -147,7 +147,6 @@ function createDirective(document, name, attrs, initialScope, initialHtml, opts)
     var childScope = $scope.$new();
     angular.extend(childScope, props);
     var element = linkFn(childScope);
-    element.link = linkDirective;
     element.scope = childScope;
     childScope.$digest();
     element.ctrl = element.controller(name);
