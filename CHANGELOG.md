@@ -4,6 +4,13 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+### Changed
+
+- Get the list of groups from the new endpoint and update it where applicable
+  ([#665](https://github.com/hypothesis/client/pull/665)).
+
 ## [1.65.0] - 2018-02-13
 
 ### Changed
