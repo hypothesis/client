@@ -4,6 +4,13 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+### Changed
+
+- Fix stream and single annotation routes
+  ([#674](https://github.com/hypothesis/client/pull/674)).
+
 ## [1.66.0] - 2018-02-16
 
 ### Changed
