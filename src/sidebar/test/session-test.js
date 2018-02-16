@@ -171,17 +171,6 @@ describe('sidebar.session', function () {
   });
 
   describe('#update()', function () {
-    it('broadcasts GROUPS_CHANGED when the groups change', function () {
-      var groupChangeCallback = sinon.stub();
-      $rootScope.$on(events.GROUPS_CHANGED, groupChangeCallback);
-      session.update({
-        groups: [{
-          id: 'groupid',
-        }],
-      });
-      assert.calledOnce(groupChangeCallback);
-    });
-
     it('broadcasts USER_CHANGED when the user changes', function () {
       var userChangeCallback = sinon.stub();
       $rootScope.$on(events.USER_CHANGED, userChangeCallback);

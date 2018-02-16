@@ -1,7 +1,5 @@
 'use strict';
 
-var angular = require('angular');
-
 var events = require('./events');
 var retryUtil = require('./retry-util');
 
@@ -97,7 +95,6 @@ function session($q, $rootScope, analytics, annotationUI, auth,
   function update(model) {
     var prevSession = annotationUI.getState().session;
     var userChanged = model.userid !== prevSession.userid;
-    var groupsChanged = !angular.equals(model.groups, prevSession.groups);
 
     // Update the session model used by the application
     annotationUI.updateSession(model);
@@ -118,10 +115,6 @@ function session($q, $rootScope, analytics, annotationUI, auth,
       } else {
         raven.setUserInfo(undefined);
       }
-    }
-
-    if (groupsChanged) {
-      $rootScope.$broadcast(events.GROUPS_CHANGED);
     }
 
     // Return the model

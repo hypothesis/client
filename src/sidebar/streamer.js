@@ -92,6 +92,7 @@ function Streamer($rootScope, annotationMapper, annotationUI, auth,
 
   function handleSessionChangeNotification(message) {
     session.update(message.model);
+    groups.load();
   }
 
   function handleSocketOnError (event) {

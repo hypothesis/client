@@ -14,17 +14,59 @@
 var STORAGE_KEY = 'hypothesis.groups.focus';
 
 var events = require('./events');
+var { awaitStateChange } = require('./util/state-util');
 
 // @ngInject
-function groups(localStorage, serviceUrl, session, $rootScope, store) {
+function groups(annotationUI, localStorage, serviceUrl, session, $rootScope, store) {
   // The currently focused group. This is the group that's shown as selected in
   // the groups dropdown, the annotations displayed are filtered to only ones
   // that belong to this group, and any new annotations that the user creates
   // will be created in this group.
-  var focusedGroup;
+  var focusedGroupId;
+  var groups = [];
+  var documentUri;
+
+  function getDocumentUriForGroupSearch() {
+    function mainUri() {
+      var uris = annotationUI.searchUris();
+      if (uris.length === 0) {
+        return null;
+      }
+
+      // We get the first HTTP URL here on the assumption that group scopes must
+      // be domains (+paths)? and therefore we need to look up groups based on
+      // HTTP URLs (so eg. we cannot use a "file:" URL or PDF fingerprint).
+      return uris.find(uri => uri.startsWith('http'));
+    }
+    return awaitStateChange(annotationUI, mainUri);
+  }
+
+  /**
+   * Fetch the list of applicable groups from the API.
+   *
+   * The list of applicable groups depends on the current userid and the URI of
+   * the attached frames.
+   */
+  function load() {
+    return getDocumentUriForGroupSearch().then(uri => {
+      return store.groups.list({ document_uri: uri });
+    }).then(gs => {
+      $rootScope.$apply(() => {
+        var focGroup = focused();
+        if (focGroup) {
+          var focusedGroupInFetchedList = gs.some(g => g.id === focGroup.id);
+          if (!focusedGroupInFetchedList) {
+            focus(gs[0].id);
+          }
+        }
+        groups = gs;
+      });
+      return gs;
+    });
+  }
 
   function all() {
-    return session.state.groups || [];
+    return groups;
   }
 
   // Return the full object for the group with the given id.
@@ -58,14 +100,16 @@ function groups(localStorage, serviceUrl, session, $rootScope, store) {
    * a previous session. Lastly, we fall back to the first group available.
    */
   function focused() {
-    if (focusedGroup) {
-      return focusedGroup;
+    if (focusedGroupId) {
+      return get(focusedGroupId);
     }
+
     var fromStorage = get(localStorage.getItem(STORAGE_KEY));
     if (fromStorage) {
-      focusedGroup = fromStorage;
-      return focusedGroup;
+      focusedGroupId = fromStorage.id;
+      return fromStorage;
     }
+
     return all()[0];
   }
 
@@ -74,22 +118,37 @@ function groups(localStorage, serviceUrl, session, $rootScope, store) {
     var prevFocused = focused();
     var g = get(id);
     if (g) {
-      focusedGroup = g;
+      focusedGroupId = g.id;
       localStorage.setItem(STORAGE_KEY, g.id);
       if (prevFocused.id !== g.id) {
         $rootScope.$broadcast(events.GROUP_FOCUSED, g.id);
       }
     }
   }
-
+  
   // reset the focused group if the user leaves it
   $rootScope.$on(events.GROUPS_CHANGED, function () {
-    if (focusedGroup) {
-      focusedGroup = get(focusedGroup.id);
-      if (!focusedGroup) {
-        $rootScope.$broadcast(events.GROUP_FOCUSED, focused());
+    // return for use in test
+    return load();
+  });
+
+  // refetch the list of groups when user changes
+  $rootScope.$on(events.USER_CHANGED, () => {
+    // FIXME Makes a second api call on page load. better way?
+    // return for use in test
+    return load();
+  });
+
+  // refetch the list of groups when document url changes
+  $rootScope.$on(events.FRAME_CONNECTED, () => {
+    // FIXME Makes a third api call on page load. better way?
+    // return for use in test
+    return getDocumentUriForGroupSearch().then(uri => {
+      if (documentUri !== uri) {
+        documentUri = uri;
+        load();
       }
-    }
+    });
   });
 
   return {
@@ -97,6 +156,7 @@ function groups(localStorage, serviceUrl, session, $rootScope, store) {
     get: get,
 
     leave: leave,
+    load: load,
 
     focused: focused,
     focus: focus,

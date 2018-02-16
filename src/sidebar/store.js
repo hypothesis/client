@@ -178,7 +178,11 @@ function store($http, $q, apiRoutes, auth) {
         delete: apiCall('group.member.delete'),
       },
     },
+    groups: {
+      list: apiCall('groups.read'),
+    },
     profile: {
+      groups: apiCall('profile.groups'),
       read: apiCall('profile.read'),
       update: apiCall('profile.update'),
     },
