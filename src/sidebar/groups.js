@@ -17,7 +17,7 @@ var events = require('./events');
 var { awaitStateChange } = require('./util/state-util');
 
 // @ngInject
-function groups(annotationUI, localStorage, serviceUrl, session, $rootScope, store) {
+function groups(annotationUI, isSidebar, localStorage, serviceUrl, session, $rootScope, store) {
   // The currently focused group. This is the group that's shown as selected in
   // the groups dropdown, the annotations displayed are filtered to only ones
   // that belong to this group, and any new annotations that the user creates
@@ -48,8 +48,16 @@ function groups(annotationUI, localStorage, serviceUrl, session, $rootScope, sto
    * the attached frames.
    */
   function load() {
-    return getDocumentUriForGroupSearch().then(uri => {
-      return store.groups.list({ document_uri: uri });
+    var uri = Promise.resolve(null);
+    if (isSidebar) {
+      uri = getDocumentUriForGroupSearch();
+    }
+    return uri.then(uri => {
+      var params = {};
+      if (uri) {
+        params.document_uri = uri;
+      }
+      return store.groups.list(params);
     }).then(gs => {
       $rootScope.$apply(() => {
         var focGroup = focused();

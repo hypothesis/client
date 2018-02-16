@@ -61,6 +61,9 @@ var resolve = {
   },
 };
 
+var isSidebar = !(window.location.pathname.startsWith('/stream') ||
+                  window.location.pathname.startsWith('/a/'));
+
 // @ngInject
 function configureLocation($locationProvider) {
   // Use HTML5 history
@@ -211,6 +214,7 @@ module.exports = angular.module('h', [
   .value('ExcerptOverflowMonitor', require('./util/excerpt-overflow-monitor'))
   .value('OAuthClient', require('./util/oauth-client'))
   .value('VirtualThreadList', require('./virtual-thread-list'))
+  .value('isSidebar', isSidebar)
   .value('random', require('./util/random'))
   .value('raven', require('./raven'))
   .value('serviceConfig', serviceConfig)
