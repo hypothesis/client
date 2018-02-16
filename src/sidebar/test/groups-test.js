@@ -1,6 +1,7 @@
 'use strict';
 
 var events = require('../events');
+var fakeReduxStore = require('./fake-redux-store');
 var groups = require('../groups');
 var unroll = require('../../shared/test/util').unroll;
 
@@ -13,6 +14,7 @@ var sessionWithThreeGroups = function() {
 
 describe('groups', function() {
   var fakeAnnotationUI;
+  var fakeIsSidebar;
   var fakeSession;
   var fakeStore;
   var fakeLocalStorage;
@@ -23,10 +25,15 @@ describe('groups', function() {
   beforeEach(function() {
     sandbox = sinon.sandbox.create();
 
-    fakeAnnotationUI = {
-      searchUris: sinon.stub().returns(['http://example.org']),
-    };
+    fakeAnnotationUI = fakeReduxStore({
+      searchUris: ['http://example.org'],
+    },{
+      searchUris() {
+        return this.getState().searchUris;
+      },
+    });
     fakeSession = sessionWithThreeGroups();
+    fakeIsSidebar = true;
     fakeLocalStorage = {
       getItem: sandbox.stub(),
       setItem: sandbox.stub(),
@@ -68,7 +75,7 @@ describe('groups', function() {
   });
 
   function service() {
-    return groups(fakeAnnotationUI, fakeLocalStorage, fakeServiceUrl, fakeSession,
+    return groups(fakeAnnotationUI, fakeIsSidebar, fakeLocalStorage, fakeServiceUrl, fakeSession,
       fakeRootScope, fakeStore);
   }
 
@@ -118,6 +125,34 @@ describe('groups', function() {
         return svc.load();
       }).then(() => {
         assert.equal(svc.focused().id, 'id3');
+      });
+    });
+
+    context('in the sidebar', () => {
+      it('waits for the document URL to be determined', () => {
+        var svc = service();
+
+        fakeAnnotationUI.setState({ searchUris: [] });
+        var loaded = svc.load();
+        fakeAnnotationUI.setState({ searchUris: ['https://asite.com'] });
+
+        return loaded.then(() => {
+          assert.calledWith(fakeStore.groups.list, { document_uri: 'https://asite.com' });
+        });
+      });
+    });
+
+    context('in the stream and single annotation page', () => {
+      beforeEach(() => {
+        fakeIsSidebar = false;
+      });
+
+      it('does not wait for the document URL', () => {
+        fakeAnnotationUI.setState({ searchUris: [] });
+        var svc = service();
+        return svc.load().then(() => {
+          assert.calledWith(fakeStore.groups.list, {});
+        });
       });
     });
   });

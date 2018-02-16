@@ -10,7 +10,10 @@ var util = require('./util');
 function init() {
   return {
     // Flag that indicates whether the app is the sidebar and connected to
-    // a page where annotations are being shown in context
+    // a page where annotations are being shown in context.
+    //
+    // Note that this flag is not available early in the lifecycle of the
+    // application.
     isSidebar: true,
 
     visibleHighlights: false,
