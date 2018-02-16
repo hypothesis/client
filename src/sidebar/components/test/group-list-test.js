@@ -9,6 +9,7 @@ describe('groupList', function () {
   var $window;
 
   var GROUP_LINK = 'https://hypothes.is/groups/hdevs';
+  var PUBLIC_GROUP_LINK = 'https://hypothes.is/groups/pub';
 
   var groups;
   var fakeGroups;
@@ -53,9 +54,12 @@ describe('groupList', function () {
     groups = [{
       id: 'public',
       public: true,
+      type: 'open',
+      url: PUBLIC_GROUP_LINK,
     },{
       id: 'h-devs',
       name: 'Hypothesis Developers',
+      type: 'private',
       url: GROUP_LINK,
     }];
 
@@ -93,11 +97,12 @@ describe('groupList', function () {
   it('should render share links', function () {
     var element = createGroupList();
     var shareLinks = element.find('.share-link-container');
-    assert.equal(shareLinks.length, 1);
+    assert.equal(shareLinks.length, 2);
 
     var link = element.find('.share-link');
-    assert.equal(link.length, 1);
-    assert.equal(link[0].href, GROUP_LINK);
+    assert.equal(link.length, 2);
+    assert.equal(link[0].href, PUBLIC_GROUP_LINK);
+    assert.equal(link[1].href, GROUP_LINK);
   });
 
   it('should track metrics when a user attempts to view a groups activity', function () {
