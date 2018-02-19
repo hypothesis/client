@@ -79,11 +79,11 @@ describe('groupList', function () {
     };
   }));
 
-  function createGroupList() {
+  function createGroupList({ userid } = { userid: 'acct:person@example.com' }) {
     return util.createDirective(document, 'groupList', {
       auth: {
-        status: 'logged-in',
-        userid: 'acct:person@example.com',
+        status: userid ? 'logged-in' : 'logged-out',
+        userid,
       },
     });
   }
@@ -103,6 +103,30 @@ describe('groupList', function () {
     assert.equal(link.length, 2);
     assert.equal(link[0].href, PUBLIC_GROUP_LINK);
     assert.equal(link[1].href, GROUP_LINK);
+  });
+
+  [{
+    // Logged-in third party user.
+    firstPartyAuthDomain: 'example.com',
+    authDomain: 'publisher.org',
+    userid: 'acct:person@publisher.org',
+  },{
+    // Logged-out third party user.
+    firstPartyAuthDomain: 'example.com',
+    authDomain: 'publisher.org',
+    userid: null,
+  }].forEach(({ firstPartyAuthDomain, authDomain, userid }) => {
+    it('should not render share links for third-party groups', () => {
+      fakeSettings.authDomain = firstPartyAuthDomain;
+      fakeSettings.services = [{
+        authority: authDomain,
+      }];
+
+      var element = createGroupList({ userid });
+      var shareLinks = element.find('.share-link-container');
+
+      assert.equal(shareLinks.length, 0);
+    });
   });
 
   it('should track metrics when a user attempts to view a groups activity', function () {
