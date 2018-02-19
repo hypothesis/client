@@ -4,6 +4,13 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+### Changed
+
+- Show groups dropdown list to logged out users and link to group pages for open
+  groups ([#673](https://github.com/hypothesis/client/pull/673)).
+
 ## [1.67.0] - 2018-02-16
 
 ### Changed
