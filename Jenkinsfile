@@ -5,9 +5,14 @@ node {
 
     nodeEnv = docker.image("kkarczmarczyk/node-yarn:7.5")
     workspace = pwd()
+    pkgVersion = sh (
+      script: 'cat package.json | jq -r .version',
+      returnStdout: true
+    ).trim()
 
     stage 'Build'
     nodeEnv.inside("-e HOME=${workspace}") {
+        sh "echo Building Hypothesis client \"${pkgVersion}\""
         sh 'make clean'
         sh 'make'
     }
@@ -33,7 +38,7 @@ node {
         // Upload the contents of the package to an S3 bucket, which it
         // will then be served from.
         docker.image('nickstenning/s3-npm-publish')
-              .withRun('', 'hypothesis s3://cdn.hypothes.is') { c ->
+              .withRun('', "hypothesis@${pkgVersion} s3://cdn.hypothes.is") { c ->
                 sh "docker logs --follow ${c.id}"
               }
     }
