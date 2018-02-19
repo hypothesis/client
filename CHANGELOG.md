@@ -4,6 +4,13 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+### Changed
+
+- Display correct groups when using third-party accounts if logged-out
+  ([#676](https://github.com/hypothesis/client/pull/676)).
+
 ## [1.68.0] - 2018-02-19
 
 ### Changed
