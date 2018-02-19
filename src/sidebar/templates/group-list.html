@@ -1,18 +1,4 @@
-<span ng-if="vm.auth.status === 'logged-out'"
-      ng-switch on="vm.groups.focused().public">
-  <img class="group-list-label__icon group-list-label__icon--third-party"
-    ng-src="{{ vm.thirdPartyGroupIcon }}"
-    ng-if="vm.thirdPartyGroupIcon"
-    ng-switch-when="true"><!-- nospace
-  !--><i class="group-list-label__icon h-icon-public"
-    ng-if="!vm.thirdPartyGroupIcon"
-    ng-switch-when="true"></i><!-- nospace
-  !--><i class="group-list-label__icon h-icon-group" ng-switch-default></i>
-  <span class="group-list-label__label">{{vm.groups.focused().name}}</span>
-</span>
-
 <div class="pull-right"
-     ng-if="vm.auth.status === 'logged-in'"
      dropdown
      keyboard-nav>
   <div class="dropdown-toggle"
@@ -57,25 +43,28 @@
                {{group.name}}
             </a>
           </div>
-          <div class="share-link-container" ng-click="$event.stopPropagation()" ng-if="!group.public">
+          <div class="share-link-container" ng-click="$event.stopPropagation()">
             <a class="share-link"
                href="{{group.url}}"
                target="_blank"
                ng-click="vm.viewGroupActivity()">
-              View group activity and invite others
+              View group activity
+              <span ng-if="group.type === 'private'">
+                and invite others
+              </span>
             </a>
           </div>
         </div>
         <!-- the 'Leave group' icon !-->
         <div class="group-cancel-icon-container" ng-click="$event.stopPropagation()">
           <i class="h-icon-cancel-outline btn--cancel"
-             ng-if="!group.public"
+             ng-if="group.type === 'private'"
              ng-click="vm.leaveGroup(group.id)"
              title="Leave '{{group.name}}'"></i>
         </div>
       </div>
     </li>
-    <li ng-if="!vm.isThirdPartyUser()" class="dropdown-menu__row dropdown-menu__row--unpadded new-group-btn">
+    <li ng-if="vm.auth.status === 'logged-in' && !vm.isThirdPartyUser()" class="dropdown-menu__row dropdown-menu__row--unpadded new-group-btn">
       <div class="group-item" ng-click="vm.createNewGroup()">
         <div class="group-icon-container"><i class="h-icon-add"></i></div>
         <div class="group-details">
