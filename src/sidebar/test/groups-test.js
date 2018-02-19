@@ -16,6 +16,7 @@ describe('groups', function() {
   var fakeAnnotationUI;
   var fakeIsSidebar;
   var fakeSession;
+  var fakeSettings;
   var fakeStore;
   var fakeLocalStorage;
   var fakeRootScope;
@@ -68,6 +69,7 @@ describe('groups', function() {
       },
     };
     fakeServiceUrl = sandbox.stub();
+    fakeSettings = {};
   });
 
   afterEach(function () {
@@ -76,7 +78,7 @@ describe('groups', function() {
 
   function service() {
     return groups(fakeAnnotationUI, fakeIsSidebar, fakeLocalStorage, fakeServiceUrl, fakeSession,
-      fakeRootScope, fakeStore);
+      fakeSettings, fakeRootScope, fakeStore);
   }
 
   describe('#all()', function() {
@@ -153,6 +155,14 @@ describe('groups', function() {
         return svc.load().then(() => {
           assert.calledWith(fakeStore.groups.list, {});
         });
+      });
+    });
+
+    it('passes authority argument when using a third-party authority', () => {
+      fakeSettings.services = [{ authority: 'publisher.org' }];
+      var svc = service();
+      return svc.load().then(() => {
+        assert.calledWith(fakeStore.groups.list, sinon.match({ authority: 'publisher.org' }));
       });
     });
   });
