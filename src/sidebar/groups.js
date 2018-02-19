@@ -15,9 +15,11 @@ var STORAGE_KEY = 'hypothesis.groups.focus';
 
 var events = require('./events');
 var { awaitStateChange } = require('./util/state-util');
+var serviceConfig = require('./service-config');
 
 // @ngInject
-function groups(annotationUI, isSidebar, localStorage, serviceUrl, session, $rootScope, store) {
+function groups(annotationUI, isSidebar, localStorage, serviceUrl, session,
+                settings, $rootScope, store) {
   // The currently focused group. This is the group that's shown as selected in
   // the groups dropdown, the annotations displayed are filtered to only ones
   // that belong to this group, and any new annotations that the user creates
@@ -25,6 +27,9 @@ function groups(annotationUI, isSidebar, localStorage, serviceUrl, session, $roo
   var focusedGroupId;
   var groups = [];
   var documentUri;
+
+  var svc = serviceConfig(settings);
+  var authority = svc ? svc.authority : null;
 
   function getDocumentUriForGroupSearch() {
     function mainUri() {
@@ -54,6 +59,9 @@ function groups(annotationUI, isSidebar, localStorage, serviceUrl, session, $roo
     }
     return uri.then(uri => {
       var params = {};
+      if (authority) {
+        params.authority = authority;
+      }
       if (uri) {
         params.document_uri = uri;
       }
