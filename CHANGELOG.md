@@ -4,6 +4,14 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+### Changed
+
+- Remove activity page links for third-party open groups
+  as they are not yet supported in h
+  ([#675](https://github.com/hypothesis/client/pull/675)).
+
 ## [1.70.0] - 2018-02-20
 
 ### Changed
