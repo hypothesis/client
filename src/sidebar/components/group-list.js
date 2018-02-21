@@ -1,6 +1,7 @@
 'use strict';
 
 var { isThirdPartyUser } = require('../util/account-id');
+var isThirdPartyService = require('../util/is-third-party-service');
 var serviceConfig = require('../service-config');
 
 // @ngInject
@@ -38,6 +39,8 @@ function GroupListController($window, analytics, groups, settings, serviceUrl) {
   if (svc && svc.icon) {
     this.thirdPartyGroupIcon = svc.icon;
   }
+
+  this.isThirdPartyService = isThirdPartyService(settings);
 }
 
 module.exports = {

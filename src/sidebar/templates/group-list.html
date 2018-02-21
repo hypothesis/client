@@ -43,7 +43,7 @@
                {{group.name}}
             </a>
           </div>
-          <div class="share-link-container" ng-click="$event.stopPropagation()">
+          <div class="share-link-container" ng-click="$event.stopPropagation()" ng-if="!vm.isThirdPartyService">
             <a class="share-link"
                href="{{group.url}}"
                target="_blank"
