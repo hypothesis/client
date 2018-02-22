@@ -5,6 +5,7 @@ var disableOpenerForExternalLinks = require('./util/disable-opener-for-external-
 var getApiUrl = require('./get-api-url');
 var serviceConfig = require('./service-config');
 var crossOriginRPC = require('./cross-origin-rpc.js');
+var translateProvider = require('./translate-provider.js');
 require('../shared/polyfills');
 
 var raven;
@@ -100,6 +101,11 @@ function configureToastr(toastrConfig) {
   });
 }
 
+//@ngInject
+function configureTranslate($translateProvider) {
+  translateProvider.translate($translateProvider);
+}
+
 // @ngInject
 function configureCompile($compileProvider) {
   // Make component bindings available in controller constructor. When
@@ -130,6 +136,7 @@ module.exports = angular.module('h', [
   require('angular-route'),
   require('angular-sanitize'),
   require('angular-toastr'),
+  require('angular-translate'),
 
   // Angular addons which do not export the Angular module
   // name via module.exports
@@ -176,6 +183,7 @@ module.exports = angular.module('h', [
   .component('threadList', require('./components/thread-list'))
   .component('timestamp', require('./components/timestamp'))
   .component('topBar', require('./components/top-bar'))
+  .component('languageList', require('./components/language-list'))
 
   .directive('hAutofocus', require('./directive/h-autofocus'))
   .directive('hBranding', require('./directive/h-branding'))
@@ -207,6 +215,7 @@ module.exports = angular.module('h', [
   .service('tags', require('./tags'))
   .service('unicode', require('./unicode'))
   .service('viewFilter', require('./view-filter'))
+  .service('locals', require('./locals'))
 
   .factory('store', require('./store'))
 
@@ -226,6 +235,7 @@ module.exports = angular.module('h', [
   .config(configureLocation)
   .config(configureRoutes)
   .config(configureToastr)
+  .config(configureTranslate)
 
   .run(setupHttp)
   .run(crossOriginRPC.server.start);

@@ -26,6 +26,7 @@
   !-->
   <div class="top-bar__inner content" ng-if="::vm.isSidebar">
     <group-list class="group-list" auth="vm.auth"></group-list>
+    <language-list class="group-list" auth="vm.auth"></language-list>
     <div class="top-bar__expander"></div>
     <a class="top-bar__apply-update-btn"
        ng-if="vm.pendingUpdateCount > 0"

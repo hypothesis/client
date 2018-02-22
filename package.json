@@ -12,6 +12,7 @@
     "angular-route": "^1.6.9",
     "angular-sanitize": "^1.6.9",
     "angular-toastr": "^1.7.0",
+    "angular-translate": "^2.17.0",
     "angulartics": "0.17.2",
     "autofill-event": "0.0.1",
     "autoprefixer": "^6.0.3",

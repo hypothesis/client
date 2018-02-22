@@ -5,7 +5,7 @@
      href="#"
      ng-class="{'is-selected': vm.selectedTab === vm.TAB_ANNOTATIONS}"
      h-on-touch="vm.selectTab(vm.TAB_ANNOTATIONS)">
-    Annotations
+     {{'Annotations' | translate}}
     <span class="selection-tabs__count"
       ng-if="vm.totalAnnotations > 0 && !vm.isWaitingToAnchorAnnotations">
       {{ vm.totalAnnotations }}
