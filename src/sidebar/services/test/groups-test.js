@@ -12,6 +12,12 @@ var sessionWithThreeGroups = function() {
   };
 };
 
+var dummyGroups = [
+  { name: 'Group 1', id: 'id1'},
+  { name: 'Group 2', id: 'id2'},
+  { name: 'Group 3', id: 'id3'},
+];
+
 describe('groups', function() {
   var fakeStore;
   var fakeIsSidebar;
@@ -28,7 +34,18 @@ describe('groups', function() {
 
     fakeStore = fakeReduxStore({
       searchUris: ['http://example.org'],
+      focusedGroup: null,
+      groups: [],
     },{
+      focusGroup: sinon.stub(),
+      getGroup: sinon.stub(),
+      loadGroups: sinon.stub(),
+      allGroups() {
+        return this.getState().groups;
+      },
+      focusedGroup() {
+        return this.getState().focusedGroup;
+      },
       searchUris() {
         return this.getState().searchUris;
       },
@@ -61,11 +78,7 @@ describe('groups', function() {
         },
       },
       groups: {
-        list: sandbox.stub().returns(Promise.resolve([
-          {name: 'Group 1', id: 'id1'},
-          {name: 'Group 2', id: 'id2'},
-          {name: 'Group 3', id: 'id3'},
-        ])),
+        list: sandbox.stub().returns(Promise.resolve(dummyGroups)),
       },
     };
     fakeServiceUrl = sandbox.stub();
@@ -81,36 +94,20 @@ describe('groups', function() {
       fakeSession, fakeSettings);
   }
 
-  describe('#all()', function() {
-    it('returns no groups if there are none in the session', function() {
-      fakeSession = {state: {}};
-
-      var groups = service().all();
-
-      assert.equal(groups.length, 0);
-    });
-
-    it('returns the groups when there are some', function() {
+  describe('#all', function() {
+    it('returns all groups', function() {
       var svc = service();
-
-      return svc.load().then(() => {
-        var groups = svc.all();
-        assert.equal(groups.length, 3);
-        assert.deepEqual(groups, [
-          {name: 'Group 1', id: 'id1'},
-          {name: 'Group 2', id: 'id2'},
-          {name: 'Group 3', id: 'id3'},
-        ]);
-      });
+      fakeStore.setState({ groups: dummyGroups });
+      assert.deepEqual(svc.all(), dummyGroups);
     });
   });
 
-  describe('#load() method', function() {
+  describe('#load', function() {
     it('loads all available groups', function() {
       var svc = service();
 
       return svc.load().then(() => {
-        assert.equal(svc.all().length, 3);
+        assert.calledWith(fakeStore.loadGroups, dummyGroups);
       });
     });
 
@@ -123,19 +120,11 @@ describe('groups', function() {
       });
     });
 
-    it('focuses on the first in the list of groups if user leaves the focused group', function () {
-      var svc = service();
-
+    it('sets the focused group from the value saved in local storage', () => {
+      var svc  = service();
+      fakeLocalStorage.getItem.returns(dummyGroups[1].id);
       return svc.load().then(() => {
-        svc.focus('id2');
-      }).then(() => {
-        fakeApi.groups.list = sandbox.stub().returns(Promise.resolve([
-          {name: 'Group 3', id: 'id3'},
-          {name: 'Group 1', id: 'id1'},
-        ]));
-        return svc.load();
-      }).then(() => {
-        assert.equal(svc.focused().id, 'id3');
+        assert.calledWith(fakeStore.focusGroup, dummyGroups[1].id);
       });
     });
 
@@ -181,106 +170,50 @@ describe('groups', function() {
     });
   });
 
-  describe('#get() method', function() {
+  describe('#get', function() {
     it('returns the requested group', function() {
       var svc = service();
+      fakeStore.getGroup.withArgs('foo').returns(dummyGroups[1]);
 
-      return svc.load().then(() => {
-        var group = svc.get('id2');
-        assert.equal(group.id, 'id2');
-      });
-    });
-
-    it("returns null if the group doesn't exist", function() {
-      var svc = service();
-
-      return svc.load().then(() => {
-        var group = svc.get('foobar');
-        assert.isNull(group);
-      });
+      assert.equal(svc.get('foo'), dummyGroups[1]);
     });
   });
 
-  describe('#focused() method', function() {
+  describe('#focused', function() {
     it('returns the focused group', function() {
       var svc = service();
-
-      return svc.load().then(() => {
-        svc.focus('id2');
-        assert.equal(svc.focused().id, 'id2');
-      });
-    });
-
-    it('returns the first group initially', function() {
-      var svc = service();
-
-      return svc.load().then(() => {
-        assert.equal(svc.focused().id, 'id1');
-      });
-    });
-
-    it('returns the group selected in localStorage if available', function() {
-      fakeLocalStorage.getItem.returns('id3');
-      var svc = service();
-
-      return svc.load().then(() => {
-        assert.equal(svc.focused().id, 'id3');
-      });
+      fakeStore.setState({ groups: dummyGroups, focusedGroup: dummyGroups[2] });
+      assert.equal(svc.focused(), dummyGroups[2]);
     });
   });
 
-  describe('#focus()', function() {
+  describe('#focus', function() {
     it('sets the focused group to the named group', function() {
       var svc = service();
-
-      return svc.load().then(() => {
-        svc.focus('id2');
-
-        assert.equal(svc.focused().id, 'id2');
-      });
+      svc.focus('foo');
+      assert.calledWith(fakeStore.focusGroup, 'foo');
     });
+  });
 
-    it('does nothing if the named group isn\'t recognised', function() {
-      var svc = service();
-
-      return svc.load().then(() => {
-        svc.focus('foobar');
-
-        assert.equal(svc.focused().id, 'id1');
-      });
-    });
-
+  context('when the focused group changes', () => {
     it('stores the focused group id in localStorage', function() {
-      var svc = service();
+      service();
 
-      return svc.load().then(() => {
-        svc.focus('id3');
+      fakeStore.setState({ groups: dummyGroups, focusedGroup: dummyGroups[1] });
 
-        assert.calledWithMatch(fakeLocalStorage.setItem, sinon.match.any, 'id3');
-      });
+      assert.calledWithMatch(fakeLocalStorage.setItem, sinon.match.any, dummyGroups[1].id);
     });
 
     it('emits the GROUP_FOCUSED event if the focused group changed', function () {
-      var svc = service();
+      service();
 
-      return svc.load().then(() => {
-        svc.focus('id3');
-        assert.calledWith(fakeRootScope.$broadcast, events.GROUP_FOCUSED, 'id3');
-      });
-    });
+      fakeStore.setState({ groups: dummyGroups, focusedGroup: dummyGroups[1] });
 
-    it('does not emit GROUP_FOCUSED if the focused group did not change', function () {
-      var svc = service();
-      return svc.load().then(() => {
-        svc.focus('id3');
-        fakeRootScope.$broadcast = sinon.stub();
-        svc.focus('id3');
-        assert.notCalled(fakeRootScope.$broadcast);
-      });
+      assert.calledWith(fakeRootScope.$broadcast, events.GROUP_FOCUSED, dummyGroups[1].id);
     });
   });
 
-  describe('#leave()', function () {
+  describe('#leave', function () {
     it('should call the group leave API', function () {
       var s = service();
       return s.leave('id2').then(() => {
