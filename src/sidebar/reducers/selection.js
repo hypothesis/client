@@ -14,6 +14,7 @@ var immutable = require('seamless-immutable');
 
 var toSet = require('../util/array-util').toSet;
 var uiConstants = require('../ui-constants');
+var tabs = require('../tabs');
 
 var util = require('./util');
 
@@ -130,6 +131,17 @@ var update = {
       sortKey: TAB_SORTKEY_DEFAULT[action.tab],
       sortKeysAvailable: TAB_SORTKEYS_AVAILABLE[action.tab],
     };
+  },
+
+  ADD_ANNOTATIONS(state, action) {
+    var counts = tabs.counts(action.annotations);
+    // If there are no annotations at all, ADD_ANNOTATIONS will not be called.
+    var haveOnlyPageNotes = counts.notes === action.annotations.length;
+    // If this is the init phase and there are only page notes, select the page notes tab.
+    if (state.annotations.length === 0 && haveOnlyPageNotes){
+      return {selectedTab: uiConstants.TAB_NOTES};
+    }
+    return {};
   },
 
   SET_FILTER_QUERY: function (state, action) {
