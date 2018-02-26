@@ -37,14 +37,14 @@ function init(settings) {
   );
 }
 
-var update = util.createReducer(Object.assign(
+var update = util.createReducer(...[
   annotations.update,
   frames.update,
   links.update,
   selection.update,
   session.update,
-  viewer.update
-));
+  viewer.update,
+]);
 
 module.exports = {
   init: init,

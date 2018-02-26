@@ -68,6 +68,26 @@ describe('reducer utils', function () {
         annotations: [{id: 1}],
       });
     });
+
+    it('applies update functions from each input object', () => {
+      var firstCounterActions = {
+        INCREMENT_COUNTER(state) {
+          return { firstCounter: state.firstCounter + 1 };
+        },
+      };
+      var secondCounterActions = {
+        INCREMENT_COUNTER(state) {
+          return { secondCounter: state.secondCounter + 1 };
+        },
+      };
+      var reducer = util.createReducer(firstCounterActions, secondCounterActions);
+
+      var state =  { firstCounter: 5, secondCounter: 10 };
+      var action = { type: 'INCREMENT_COUNTER' };
+      var newState = reducer(state, action);
+
+      assert.deepEqual(newState, { firstCounter: 6, secondCounter: 11 });
+    });
   });
 
   describe('#bindSelectors', function () {
