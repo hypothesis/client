@@ -77,6 +77,7 @@
     "mkdirp": "^0.5.1",
     "mocha": "^2.4.5",
     "ng-tags-input": "^3.1.1",
+    "node-polyglot": "^2.2.2",
     "node-uuid": "^1.4.3",
     "postcss": "^5.0.6",
     "postcss-url": "^5.1.1",
