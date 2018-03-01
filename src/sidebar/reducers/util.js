@@ -11,16 +11,28 @@ function actionTypes(updateFns) {
 }
 
 /**
- * Given an object which maps action names to update functions, this returns
- * a reducer function that can be passed to the redux `createStore` function.
+ * Given objects which map action names to update functions, this returns a
+ * reducer function that can be passed to the redux `createStore` function.
+ *
+ * @param {Object[]} actionToUpdateFn - Objects mapping action names to update
+ *                                      functions.
  */
-function createReducer(updateFns) {
-  return function (state, action) {
-    var fn = updateFns[action.type];
-    if (!fn) {
+function createReducer(...actionToUpdateFn) {
+  // Combine the (action name => update function) maps together into a single
+  // (action name => update functions) map.
+  var actionToUpdateFns = {};
+  actionToUpdateFn.forEach(map => {
+    Object.keys(map).forEach(k => {
+      actionToUpdateFns[k] = (actionToUpdateFns[k] || []).concat(map[k]);
+    });
+  });
+
+  return (state, action) => {
+    var fns = actionToUpdateFns[action.type];
+    if (!fns) {
       return state;
     }
-    return Object.assign({}, state, fn(state, action));
+    return Object.assign({}, state, ...fns.map(f => f(state, action)));
   };
 }
 
