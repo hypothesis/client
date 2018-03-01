@@ -7,6 +7,8 @@ scrollIntoView = require('scroll-into-view')
 
 highlighter = require('../highlighter')
 
+polyglot = require('../../shared/polyglot');
+
 BUCKET_SIZE = 16                              # Regular bucket size
 BUCKET_NAV_SIZE = BUCKET_SIZE + 6             # Bucket plus arrow (up/down)
 BUCKET_TOP_THRESHOLD = 115 + BUCKET_NAV_SIZE  # Toolbar
@@ -262,10 +264,7 @@ module.exports = class BucketBar extends Plugin
       bucket = @buckets[d]
       bucketLength = bucket?.length
 
-      title = if bucketLength != 1
-        "Show #{bucketLength} annotations"
-      else if bucketLength > 0
-        'Show one annotation'
+      title = polyglot().t("Show feedback", {bucketLength: bucketLength});
 
       el.attr('title', title)
       el.toggleClass('upper', @isUpper(d))

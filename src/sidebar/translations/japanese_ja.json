@@ -89,5 +89,8 @@
     "Create page level notes": "Create page level notes",
     "View feedback through your profile": "View feedback through your profile",
     "Sort by": "Sort by",
-    "Share this page": "Share this page"
+    "Share this page": "Share this page",
+    "Show one annotation": "1つの注釈を表示する",
+    "Show feedback": "%{bucketLength} つのフィードバックを表示",
+    "Toggle or Resize Sidebar":"サイドバーの表示/非表示"
 }

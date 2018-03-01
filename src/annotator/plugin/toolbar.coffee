@@ -1,5 +1,6 @@
 Plugin = require('../plugin')
 $ = require('jquery')
+polyglot = require('../../shared/polyglot');
 
 makeButton = (item) ->
   anchor = $('<button></button>')
@@ -28,7 +29,7 @@ module.exports = class Toolbar extends Plugin
       $(@element).append @toolbar
 
     items = [
-      "title": "Close Sidebar"
+      "title": polyglot().t("Close Sidebar")
       "class": "annotator-frame-button--sidebar_close h-icon-close"
       "name": "sidebar-close"
       "on":
@@ -38,7 +39,7 @@ module.exports = class Toolbar extends Plugin
           @annotator.hide()
           @toolbar.find('[name=sidebar-close]').hide();
     ,
-      "title": "Toggle or Resize Sidebar"
+      "title": polyglot().t("Toggle or Resize Sidebar")
       "class": "annotator-frame-button--sidebar_toggle h-icon-chevron-left"
       "name": "sidebar-toggle"
       "on":
@@ -51,7 +52,7 @@ module.exports = class Toolbar extends Plugin
           else
             @annotator.hide()
     ,
-      "title": "Hide Highlights"
+      "title": polyglot().t("Hide Highlights")
       "class": "h-icon-visibility"
       "name": "highlight-visibility"
       "on":
@@ -61,7 +62,7 @@ module.exports = class Toolbar extends Plugin
           state = not @annotator.visibleHighlights
           @annotator.setAllVisibleHighlights state
     ,
-      "title": "New Page Note"
+      "title": polyglot().t("New Page Note")
       "class": "h-icon-note"
       "name": "insert-comment"
       "on":

@@ -100,8 +100,11 @@ function configureToastr(toastrConfig) {
 
 //@ngInject
 function configureTranslate($translateProvider) {
-
   translateProvider.translate($translateProvider);
+  // NOTE: Would it be enough if we change the prefered language? If so, we don't need an angular service at all! Easy!
+  // CONCERN: When the page is refreshed because the language is changed, is here going to be triggered? 
+  // As far as I understand, yes it is going to be triggered.
+  $translateProvider.preferredLanguage(settings.locale);
   
 }
 // @ngInject
@@ -168,7 +171,6 @@ module.exports = angular.module('h', [
   .component('threadList', require('./components/thread-list'))
   .component('timestamp', require('./components/timestamp'))
   .component('topBar', require('./components/top-bar'))
-  .component('languageList', require('./components/language-list'))
 
   .directive('hAutofocus', require('./directive/h-autofocus'))
   .directive('hBranding', require('./directive/h-branding'))
@@ -200,7 +202,6 @@ module.exports = angular.module('h', [
   .service('tags', require('./tags'))
   .service('unicode', require('./unicode'))
   .service('viewFilter', require('./view-filter'))
-  .service('locals', require('./locals'))
 
   .factory('store', require('./store'))
 
