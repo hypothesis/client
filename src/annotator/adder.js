@@ -131,6 +131,9 @@ function Adder(container, options) {
   var isHighlightBtnVisible = options.isHighlightBtnVisible();
   self.element = createAdderDOM(container);
 
+  var feedBackBtn = options.traslatedBtnStrings().AnnotateBtn;
+  var HighlightBtn = options.traslatedBtnStrings().HighlightBtn;
+
   // Set initial style
   Object.assign(container.style, {
     display: 'block',
@@ -153,10 +156,14 @@ function Adder(container, options) {
 
   self.element.querySelector(ANNOTATE_BTN_SELECTOR)
     .addEventListener('click', handleCommand);
+  self.element.querySelector(ANNOTATE_BTN_SELECTOR).children[0]
+    .innerHTML = feedBackBtn;
   
   if (isHighlightBtnVisible) {
     self.element.querySelector(HIGHLIGHT_BTN_SELECTOR)
     .addEventListener('click', handleCommand);
+    self.element.querySelector(HIGHLIGHT_BTN_SELECTOR)
+    .innerHTML = HighlightBtn;
   } else {
     self.element.querySelector(HIGHLIGHT_BTN_SELECTOR).style.display = 'none';
   }

@@ -32,6 +32,7 @@ function hostPageConfig(window) {
     'branding',
     'onElementClick',
     'isHighlightBtnVisible',
+    'locale',
 
     // New note button override.
     // This should be removed once new note button is enabled for everybody.

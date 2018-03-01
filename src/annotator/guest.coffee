@@ -13,6 +13,8 @@ rangeUtil = require('./range-util')
 selections = require('./selections')
 xpathRange = require('./anchoring/range')
 
+polyglot = require('../shared/polyglot');
+
 animationPromise = (fn) ->
   return new Promise (resolve, reject) ->
     raf ->
@@ -77,6 +79,8 @@ module.exports = class Guest extends Delegator
       # Managing the visibility of highlight Button in the adder.
       isHighlightBtnVisible: ->
         return config.isHighlightBtnVisible
+      traslatedBtnStrings: ->
+        return {'AnnotateBtn' : polyglot().t('Feedback'), 'HighlightBtn': polyglot().t('Highlight')}
     })
     this.selections = selections(document).subscribe
       next: (range) ->

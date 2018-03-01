@@ -34,6 +34,8 @@ function configFrom(window_) {
     // outside of the elements on the guest page doesn't close the sidebar
     onElementClick: settings.hostPageSetting('onElementClick', {allowInBrowserExt: true}),
     isHighlightBtnVisible: settings.hostPageSetting('isHighlightBtnVisible', {allowInBrowserExt:true}),
+    // The locale is going to come from cookies, this is a temporary solution.
+    locale: settings.hostPageSetting('locale', {allowInBrowserExt:true}),
   };
 }
 
