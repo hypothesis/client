@@ -52,6 +52,9 @@ describe 'Guest', ->
   fakeCrossFrame = null
   guestConfig = null
 
+  # Observable of current URL
+  historyObserver = null
+
   createGuest = (config={}) ->
     config = Object.assign({}, guestConfig, config)
     element = document.createElement('div')
@@ -66,6 +69,7 @@ describe 'Guest', ->
       selectionFocusRect: sinon.stub()
     }
     selections = null
+    historyObserver = null
     guestConfig = {pluginClasses: {}}
 
     Guest = proxyquire('../guest', {
@@ -79,6 +83,12 @@ describe 'Guest', ->
           return () ->
         )
       './delegator': Delegator,
+      './util/history-observable': () ->
+        new Observable((obs) ->
+          historyObserver = obs
+          return () ->
+            historyObserver = null
+        )
       'raf': raf,
       'scroll-into-view': scrollIntoView,
     })
@@ -350,6 +360,24 @@ describe 'Guest', ->
       guest = createGuest()
       selections.next(null)
       assert.called FakeAdder::instance.hide
+
+  context 'when the document URI changes', ->
+    it 'notifies the sidebar with an "updateFrame" event', ->
+      guest = createGuest()
+      uri = 'http://example.com/new-url'
+      guest.plugins.Document =
+        uri: -> uri
+        metadata: {}
+      crossFrameCalled = new Promise((resolve) ->
+        fakeCrossFrame.call = (event, arg) -> resolve([event, arg])
+      )
+
+      historyObserver.next(guest.plugins.Document.uri())
+
+      return crossFrameCalled.then(([event, arg]) ->
+        assert.equal(event, 'updateFrame')
+        assert.deepEqual(arg, { frameIdentifier: null, uri: uri, metadata: {} })
+      )
 
   describe '#getDocumentInfo()', ->
     guest = null
@@ -648,3 +676,10 @@ describe 'Guest', ->
 
       assert.calledOnce(removeHighlights)
       assert.calledWith(removeHighlights, highlights)
+
+  describe '#destroy', ->
+
+    it 'removes URL change listeners', ->
+      guest = createGuest()
+      guest.destroy()
+      assert.equal historyObserver, null
