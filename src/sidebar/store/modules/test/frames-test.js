@@ -13,7 +13,7 @@ function init() {
   return Object.assign({}, frames.init(), session.init());
 }
 
-describe('frames reducer', function () {
+describe('sidebar.reducers.frames', function () {
   describe('#connectFrame', function () {
     it('adds the frame to the list of connected frames', function () {
       var frame = {uri: 'http://example.com'};
@@ -32,6 +32,26 @@ describe('frames reducer', function () {
       assert.deepEqual(selectors.frames(state), frameList);
       var updatedState = update(state, actions.destroyFrame(frameList[0]));
       assert.deepEqual(selectors.frames(updatedState), [frameList[1]]);
+    });
+  });
+
+  describe('#updateFrame', () => {
+    it('updates the metadata and URI of frames with a matching ID', () => {
+      var frameList = [{
+        id: null,
+        uri: 'http://example.com',
+        metadata: {
+          title: 'First Page',
+        },
+      }];
+      var state = init();
+      frameList.forEach(frame => state = update(state, actions.connectFrame(frame)));
+
+      var metadata = { title: 'Second Page' };
+      var uri = 'http://example.com/foo';
+      var updatedState = update(state, actions.updateFrame({ id: null, uri, metadata }));
+
+      assert.deepEqual(selectors.frames(updatedState), [{ id: null, uri, metadata }]);
     });
   });
 

@@ -20,6 +20,17 @@ var update = {
     };
   },
 
+  UPDATE_FRAME: function (state, { id, metadata, uri }) {
+    return {
+      frames: state.frames.map(frame => {
+        if (frame.id !== id) {
+          return frame;
+        }
+        return Object.assign({}, frame, { id, metadata, uri });
+      }),
+    };
+  },
+
   UPDATE_FRAME_ANNOTATION_FETCH_STATUS: function (state, action) {
     var frames = state.frames.map(function (frame) {
       var match = (frame.uri && frame.uri === action.uri);
@@ -51,6 +62,13 @@ function connectFrame(frame) {
  */
 function destroyFrame(frame) {
   return {type: actions.DESTROY_FRAME, frame: frame};
+}
+
+/**
+ * Update the metadata and/or URI for a frame.
+ */
+function updateFrame({ id, metadata, uri }) {
+  return { type: actions.UPDATE_FRAME, id: id || null, metadata, uri };
 }
 
 /**
@@ -108,6 +126,7 @@ module.exports = {
   actions: {
     connectFrame: connectFrame,
     destroyFrame: destroyFrame,
+    updateFrame: updateFrame,
     updateFrameAnnotationFetchStatus: updateFrameAnnotationFetchStatus,
   },
 
