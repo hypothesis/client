@@ -96,6 +96,8 @@ module.exports = class Guest extends Delegator
     # `window.history.{pushState, replaceState, popState}` in SPAs and web pages
     # using PJAX.
     @historyChanges = historyObservable().subscribe(=>
+      # Clear cached metadata
+      this.plugins.Document?.refreshMetadata()
       this.getDocumentInfo().then((info) =>
         @crossframe.call('updateFrame', info)
       )

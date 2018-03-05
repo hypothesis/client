@@ -35,7 +35,7 @@ class DocumentMeta extends Plugin {
     this.baseURI = this.options.baseURI || baseURI;
     this.document = this.options.document || document;
 
-    this.getDocumentMetadata();
+    this.refreshMetadata();
   }
 
   /**
@@ -77,7 +77,7 @@ class DocumentMeta extends Plugin {
   /**
    * Return metadata for the current page.
    */
-  getDocumentMetadata() {
+  refreshMetadata() {
     this.metadata = {};
 
     // first look for some common metadata types

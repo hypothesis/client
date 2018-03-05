@@ -362,21 +362,34 @@ describe 'Guest', ->
       assert.called FakeAdder::instance.hide
 
   context 'when the document URI changes', ->
-    it 'notifies the sidebar with an "updateFrame" event', ->
+    crossFrameCalled = null
+    guest = null
+    uri = 'http://example.com/new-url'
+
+    beforeEach ->
       guest = createGuest()
-      uri = 'http://example.com/new-url'
       guest.plugins.Document =
         uri: -> uri
         metadata: {}
+        refreshMetadata: sinon.stub()
       crossFrameCalled = new Promise((resolve) ->
         fakeCrossFrame.call = (event, arg) -> resolve([event, arg])
       )
+      return null
 
+    it 'notifies the sidebar with an "updateFrame" event', ->
       historyObserver.next(guest.plugins.Document.uri())
 
       return crossFrameCalled.then(([event, arg]) ->
         assert.equal(event, 'updateFrame')
         assert.deepEqual(arg, { frameIdentifier: null, uri: uri, metadata: {} })
+      )
+
+    it 'clears the document metadata cache', ->
+      historyObserver.next(guest.plugins.Document.uri())
+
+      return crossFrameCalled.then(->
+        assert.called(guest.plugins.Document.refreshMetadata)
       )
 
   describe '#getDocumentInfo()', ->
