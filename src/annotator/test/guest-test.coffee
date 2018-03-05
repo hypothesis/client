@@ -1,7 +1,7 @@
 proxyquire = require('proxyquire')
 
 adder = require('../adder')
-Observable = require('../util/observable').Observable
+{ buffer, merge, Observable } = require('../util/observable')
 Plugin = require('../plugin')
 
 Delegator = require('../delegator')
@@ -54,6 +54,8 @@ describe 'Guest', ->
 
   # Observable of current URL
   historyObserver = null
+  # Observable of metadata for current document
+  metaObserver = null
 
   createGuest = (config={}) ->
     config = Object.assign({}, guestConfig, config)
@@ -83,12 +85,23 @@ describe 'Guest', ->
           return () ->
         )
       './delegator': Delegator,
+      './util/document-meta-observable': () ->
+        new Observable((obs) ->
+          metaObserver = obs
+          return () ->
+            metaObserver = null
+        )
       './util/history-observable': () ->
         new Observable((obs) ->
           historyObserver = obs
           return () ->
             historyObserver = null
         )
+      './util/obervable': {
+        # Shorten the delay when buffering subscriptions to speed up tests.
+        buffer: (delay, src) -> buffer(1, src),
+        merge: merge,
+      }
       'raf': raf,
       'scroll-into-view': scrollIntoView,
     })
@@ -361,7 +374,7 @@ describe 'Guest', ->
       selections.next(null)
       assert.called FakeAdder::instance.hide
 
-  context 'when the document URI changes', ->
+  context 'when the document URL or metadata changes', ->
     crossFrameCalled = null
     guest = null
     uri = 'http://example.com/new-url'
@@ -377,20 +390,38 @@ describe 'Guest', ->
       )
       return null
 
-    it 'notifies the sidebar with an "updateFrame" event', ->
-      historyObserver.next(guest.plugins.Document.uri())
+    context 'when the document URL changes', ->
+      it 'notifies the sidebar with an "updateFrame" event', ->
+        historyObserver.next(guest.plugins.Document.uri())
 
-      return crossFrameCalled.then(([event, arg]) ->
-        assert.equal(event, 'updateFrame')
-        assert.deepEqual(arg, { frameIdentifier: null, uri: uri, metadata: {} })
-      )
+        return crossFrameCalled.then(([event, arg]) ->
+          assert.equal(event, 'updateFrame')
+          assert.deepEqual(arg, { frameIdentifier: null, uri: uri, metadata: {} })
+        )
 
-    it 'clears the document metadata cache', ->
-      historyObserver.next(guest.plugins.Document.uri())
+      it 'clears the document metadata cache', ->
+        historyObserver.next(guest.plugins.Document.uri())
 
-      return crossFrameCalled.then(->
-        assert.called(guest.plugins.Document.refreshMetadata)
-      )
+        return crossFrameCalled.then(->
+          assert.called(guest.plugins.Document.refreshMetadata)
+        )
+
+    context 'when document metadata changes', ->
+      it 'notifies the sidebar with an "updateFrame" event', ->
+        metaObserver.next({})
+
+        return crossFrameCalled.then(([event, arg]) ->
+          assert.equal(event, 'updateFrame')
+          assert.deepEqual(arg, { frameIdentifier: null, uri: uri, metadata: {} })
+        )
+
+      it 'clears the document metadata cache', ->
+        metaObserver.next({})
+
+        return crossFrameCalled.then(->
+          assert.called(guest.plugins.Document.refreshMetadata)
+        )
+
 
   describe '#getDocumentInfo()', ->
     guest = null
@@ -696,3 +727,8 @@ describe 'Guest', ->
       guest = createGuest()
       guest.destroy()
       assert.equal historyObserver, null
+
+    it 'removes metadata change observers', ->
+      guest = createGuest()
+      guest.destroy()
+      assert.equal metaObserver, null
