@@ -14,3 +14,5 @@ for more details.
    :maxdepth: 1
 
    adr-001
+   adr-002
+   adr-003
