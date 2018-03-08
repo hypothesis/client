@@ -80,7 +80,7 @@ describe('annotationUI', function () {
         [sinon.match(annot)]);
     });
 
-    it('does not change selectedTab state if annotations are already loaded', function () {
+    it('does not change `selectedTab` state if annotations are already loaded', function () {
       var annot = defaultAnnotation();
       annotationUI.addAnnotations([annot]);
       var page = oldPageNote();
@@ -88,13 +88,13 @@ describe('annotationUI', function () {
       assert.equal(annotationUI.getState().selectedTab, uiConstants.TAB_ANNOTATIONS);
     });
 
-    it('sets the selectedTab to page if only page notes are present', function () {
+    it('sets `selectedTab` to "note" if only page notes are present', function () {
       var page = oldPageNote();
       annotationUI.addAnnotations([page]);
       assert.equal(annotationUI.getState().selectedTab, uiConstants.TAB_NOTES);
     });
 
-    it('leaves the selectedTab as annotation if annotations and/or page notes are present', function () {
+    it('leaves `selectedTab` as "annotation" if annotations and/or page notes are present', function () {
       var page = oldPageNote();
       var annot = defaultAnnotation();
       annotationUI.addAnnotations([annot, page]);
