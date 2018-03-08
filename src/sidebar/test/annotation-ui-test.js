@@ -10,6 +10,7 @@ var uiConstants = require('../ui-constants');
 
 var defaultAnnotation = annotationFixtures.defaultAnnotation;
 var newAnnotation = annotationFixtures.newAnnotation;
+var oldPageNote = annotationFixtures.oldPageNote;
 
 var fixtures = immutable({
   pair: [
@@ -77,6 +78,27 @@ describe('annotationUI', function () {
       annotationUI.addAnnotations([annot]);
       assert.match(annotationUI.getState().annotations,
         [sinon.match(annot)]);
+    });
+
+    it('does not change `selectedTab` state if annotations are already loaded', function () {
+      var annot = defaultAnnotation();
+      annotationUI.addAnnotations([annot]);
+      var page = oldPageNote();
+      annotationUI.addAnnotations([page]);
+      assert.equal(annotationUI.getState().selectedTab, uiConstants.TAB_ANNOTATIONS);
+    });
+
+    it('sets `selectedTab` to "note" if only page notes are present', function () {
+      var page = oldPageNote();
+      annotationUI.addAnnotations([page]);
+      assert.equal(annotationUI.getState().selectedTab, uiConstants.TAB_NOTES);
+    });
+
+    it('leaves `selectedTab` as "annotation" if annotations and/or page notes are present', function () {
+      var page = oldPageNote();
+      var annot = defaultAnnotation();
+      annotationUI.addAnnotations([annot, page]);
+      assert.equal(annotationUI.getState().selectedTab, uiConstants.TAB_ANNOTATIONS);
     });
 
     it('assigns a local tag to annotations', function () {
