@@ -4,6 +4,13 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+### Changed
+
+- Default to Notes tab when only notes are present
+  ([#686](https://github.com/hypothesis/client/pull/686)).
+
 ## [1.71.0] - 2018-02-21
 
 ### Changed
