@@ -1,11 +1,56 @@
 
+//temp remove top-bar
+
+.app-content-wrapper {
+  padding-top: 9px;
+}
+
+//card states
 .thread-list {
 
+  //default layout
+  .thread-list__card {
+
+    .annotation-header {
+      display: inline-block;
+    }
+
+    //hiding this for now
+    .annotation-header__share-info {
+      display: none;
+    }
+
+    .annotation-footer {
+      display: none;
+      margin-top: 0;
+      float: right;
+    }
+
+  }
+
+  .thread-list__card:hover {
+
+    .annotation-footer{
+      display: inline-block;
+    }
+        
+  }
+
+  //default card
+  .default__card-selected {
+    border-left: 5px solid #e9d633;
+  }
+
+  //private card
   .private__card {
     border: 1px solid #c00;
   }
 
-  .thread-hightlight{
+  &.private__card-selected {
+    border-left: 5px solid #c00;
+  }
+
+  .thread-hightlight {
     background-color: rgba(255, 255, 60, 0.3);;
   }
 }
