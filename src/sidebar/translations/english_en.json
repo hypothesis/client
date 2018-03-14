@@ -90,5 +90,10 @@
     "Sort by": "Sort by",
     "Filter the feedback list": "Filter the feedback list",
     "Share this page": "Share this page",
-    "Show one annotation": "Show one annotation"
+    "Show feedback": "Show %{bucketLength} feedback",
+    "Toggle or Resize Sidebar":"Toggle or Resize Sidebar",
+    "Close Sidebar":"Close Sidebar",
+    "Hide Highlights":"Hide Highlights",
+    "Highlight": "Highlight",
+    "New Page Note": "New Page Note"
 }
