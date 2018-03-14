@@ -3,7 +3,7 @@
 // @ngInject
 function StreamContentController(
   $scope, $location, $route, $routeParams, annotationMapper, annotationUI,
-  queryParser, rootThread, searchFilter, store, streamFilter, streamer
+  api, queryParser, rootThread, searchFilter, streamFilter, streamer
 ) {
   var self = this;
 
@@ -28,7 +28,7 @@ function StreamContentController(
       limit: limit,
     }, searchFilter.toObject($routeParams.q));
 
-    store.search(query)
+    api.search(query)
       .then(load)
       .catch(function (err) {
         console.error(err);

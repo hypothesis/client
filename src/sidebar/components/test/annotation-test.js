@@ -104,7 +104,7 @@ describe('annotation', function() {
     var fakeServiceUrl;
     var fakeSession;
     var fakeSettings;
-    var fakeStore;
+    var fakeApi;
     var fakeStreamer;
     var sandbox;
 
@@ -222,7 +222,7 @@ describe('annotation', function() {
         authDomain: 'localhost',
       };
 
-      fakeStore = {
+      fakeApi = {
         annotation: {
           create: sinon.spy(function (annot) {
             return Promise.resolve(Object.assign({}, annot));
@@ -240,6 +240,7 @@ describe('annotation', function() {
       $provide.value('analytics', fakeAnalytics);
       $provide.value('annotationMapper', fakeAnnotationMapper);
       $provide.value('annotationUI', fakeAnnotationUI);
+      $provide.value('api', fakeApi);
       $provide.value('drafts', fakeDrafts);
       $provide.value('flash', fakeFlash);
       $provide.value('groups', fakeGroups);
@@ -247,7 +248,6 @@ describe('annotation', function() {
       $provide.value('session', fakeSession);
       $provide.value('serviceUrl', fakeServiceUrl);
       $provide.value('settings', fakeSettings);
-      $provide.value('store', fakeStore);
       $provide.value('streamer', fakeStreamer);
     }));
 
@@ -345,7 +345,7 @@ describe('annotation', function() {
         annotation.user = fakeSession.state.userid = 'acct:bill@localhost';
         createDirective(annotation);
 
-        assert.called(fakeStore.annotation.create);
+        assert.called(fakeApi.annotation.create);
       });
 
       it('saves new highlights to drafts if not logged in', function() {
@@ -355,7 +355,7 @@ describe('annotation', function() {
 
         createDirective(annotation);
 
-        assert.notCalled(fakeStore.annotation.create);
+        assert.notCalled(fakeApi.annotation.create);
         assert.called(fakeDrafts.update);
       });
 
@@ -364,7 +364,7 @@ describe('annotation', function() {
 
         createDirective(annotation);
 
-        assert.notCalled(fakeStore.annotation.create);
+        assert.notCalled(fakeApi.annotation.create);
       });
 
       it('does not save old highlights on initialization', function() {
@@ -372,7 +372,7 @@ describe('annotation', function() {
 
         createDirective(annotation);
 
-        assert.notCalled(fakeStore.annotation.create);
+        assert.notCalled(fakeApi.annotation.create);
       });
 
       it('does not save old annotations on initialization', function() {
@@ -380,7 +380,7 @@ describe('annotation', function() {
 
         createDirective(annotation);
 
-        assert.notCalled(fakeStore.annotation.create);
+        assert.notCalled(fakeApi.annotation.create);
       });
 
       it('creates drafts for new annotations on initialization', function() {
@@ -945,7 +945,7 @@ describe('annotation', function() {
       it('flashes an error if saving the annotation fails on the server', function() {
         var controller = createController();
         var err = new Error('500 Server Error');
-        fakeStore.annotation.create = sinon.stub().returns(Promise.reject(err));
+        fakeApi.annotation.create = sinon.stub().returns(Promise.reject(err));
         return controller.save().then(function() {
           assert.calledWith(fakeFlash.error,
             '500 Server Error', 'Saving annotation failed');
@@ -962,7 +962,7 @@ describe('annotation', function() {
       it('shows a saving indicator when saving an annotation', function() {
         var controller = createController();
         var create;
-        fakeStore.annotation.create = sinon.stub().returns(new Promise(function (resolve) {
+        fakeApi.annotation.create = sinon.stub().returns(new Promise(function (resolve) {
           create = resolve;
         }));
         var saved = controller.save();
@@ -975,7 +975,7 @@ describe('annotation', function() {
 
       it('does not remove the draft if saving fails', function () {
         var controller = createController();
-        fakeStore.annotation.create = sinon.stub().returns(Promise.reject({status: -1}));
+        fakeApi.annotation.create = sinon.stub().returns(Promise.reject({status: -1}));
         return controller.save().then(function () {
           assert.notCalled(fakeDrafts.remove);
         });
@@ -1005,7 +1005,7 @@ describe('annotation', function() {
       it('flashes an error if saving the annotation fails on the server', function () {
         var controller = createController();
         var err = new Error('500 Server Error');
-        fakeStore.annotation.update = sinon.stub().returns(Promise.reject(err));
+        fakeApi.annotation.update = sinon.stub().returns(Promise.reject(err));
         return controller.save().then(function() {
           assert.calledWith(fakeFlash.error,
             '500 Server Error', 'Saving annotation failed');

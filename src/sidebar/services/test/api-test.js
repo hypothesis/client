@@ -3,7 +3,7 @@
 var angular = require('angular');
 var proxyquire = require('proxyquire');
 
-var util = require('../../shared/test/util');
+var util = require('../../../shared/test/util');
 
 // API route directory.
 // This should mirror the structure (but not the exact URLs) of
@@ -60,14 +60,14 @@ var routes = {
   },
 };
 
-describe('sidebar.store', function () {
+describe('sidebar.services.api', function () {
   var $httpBackend = null;
   var sandbox = null;
-  var store = null;
+  var api = null;
 
   before(function () {
     angular.module('h', [])
-      .service('store', proxyquire('../store', util.noCallThru({
+      .service('api', proxyquire('../api', util.noCallThru({
         angular: angular,
         './retry-util': {
           retryPromiseOperation: function (fn) {
@@ -108,13 +108,13 @@ describe('sidebar.store', function () {
     sandbox.restore();
   });
 
-  beforeEach(angular.mock.inject(function (_$httpBackend_, _store_) {
+  beforeEach(angular.mock.inject(function (_$httpBackend_, _api_) {
     $httpBackend = _$httpBackend_;
-    store = _store_;
+    api = _api_;
   }));
 
   it('saves a new annotation', function (done) {
-    store.annotation.create({}, {}).then(function (saved) {
+    api.annotation.create({}, {}).then(function (saved) {
       assert.isNotNull(saved.id);
       done();
     });
@@ -127,7 +127,7 @@ describe('sidebar.store', function () {
   });
 
   it('updates an annotation', function (done) {
-    store.annotation.update({id: 'an-id'}, {text: 'updated'}).then(function () {
+    api.annotation.update({id: 'an-id'}, {text: 'updated'}).then(function () {
       done();
     });
 
@@ -139,7 +139,7 @@ describe('sidebar.store', function () {
   });
 
   it('deletes an annotation', function (done) {
-    store.annotation.delete({id: 'an-id'}, {}).then(function () {
+    api.annotation.delete({id: 'an-id'}, {}).then(function () {
       done();
     });
 
@@ -151,7 +151,7 @@ describe('sidebar.store', function () {
   });
 
   it('flags an annotation', function (done) {
-    store.annotation.flag({id: 'an-id'}).then(function () {
+    api.annotation.flag({id: 'an-id'}).then(function () {
       done();
     });
 
@@ -163,7 +163,7 @@ describe('sidebar.store', function () {
   });
 
   it('hides an annotation', function (done) {
-    store.annotation.hide({id: 'an-id'}).then(function () {
+    api.annotation.hide({id: 'an-id'}).then(function () {
       done();
     });
 
@@ -175,7 +175,7 @@ describe('sidebar.store', function () {
   });
 
   it('unhides an annotation', function (done) {
-    store.annotation.unhide({id: 'an-id'}).then(function () {
+    api.annotation.unhide({id: 'an-id'}).then(function () {
       done();
     });
 
@@ -188,7 +188,7 @@ describe('sidebar.store', function () {
 
   describe('#group.member.delete', () => {
     it('removes current user from a group', (done) => {
-      store.group.member.delete({pubid: 'an-id', user: 'me'}).then(function () {
+      api.group.member.delete({pubid: 'an-id', user: 'me'}).then(function () {
         done();
       });
 
@@ -206,7 +206,7 @@ describe('sidebar.store', function () {
       $notme: 'nooooo!',
       allowed: 123,
     };
-    store.annotation.create({}, annotation).then(function () {
+    api.annotation.create({}, annotation).then(function () {
       done();
     });
 
@@ -220,7 +220,7 @@ describe('sidebar.store', function () {
   // Our backend service interprets semicolons as query param delimiters, so we
   // must ensure to encode them in the query string.
   it('encodes semicolons in query parameters', function (done) {
-    store.search({'uri': 'http://example.com/?foo=bar;baz=qux'}).then(function () {
+    api.search({'uri': 'http://example.com/?foo=bar;baz=qux'}).then(function () {
       done();
     });
 
@@ -231,7 +231,7 @@ describe('sidebar.store', function () {
 
   it("fetches the user's profile", function (done) {
     var profile = {userid: 'acct:user@publisher.org'};
-    store.profile.read({authority: 'publisher.org'}).then(function (profile_) {
+    api.profile.read({authority: 'publisher.org'}).then(function (profile_) {
       assert.deepEqual(profile_, profile);
       done();
     });
@@ -241,7 +241,7 @@ describe('sidebar.store', function () {
   });
 
   it("updates a user's profile", function (done) {
-    store.profile.update({}, {preferences: {}}).then(function () {
+    api.profile.update({}, {preferences: {}}).then(function () {
       done();
     });
 
@@ -254,7 +254,7 @@ describe('sidebar.store', function () {
 
   context('when an API calls fail', function () {
     util.unroll('rejects the call with an Error', function (done, testCase) {
-      store.profile.update({}, {preferences: {}}).catch(function (err) {
+      api.profile.update({}, {preferences: {}}).catch(function (err) {
         assert(err instanceof Error);
         assert.equal(err.message, testCase.expectedMessage);
         done();
@@ -286,7 +286,7 @@ describe('sidebar.store', function () {
     }]);
 
     it("exposes details in the Error's `response` property", function (done) {
-      store.profile.update({}, {preferences: {}}).catch(function (err) {
+      api.profile.update({}, {preferences: {}}).catch(function (err) {
         assert.match(err.response, sinon.match({
           status: 404,
           statusText: 'Not found',
