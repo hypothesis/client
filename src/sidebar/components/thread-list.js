@@ -125,6 +125,51 @@ function ThreadListController($element, $scope, settings, VirtualThreadList) {
     }, 200);
   }
 
+  /**
+  * Listen the SHOW_BUCKET_LIST event from crossframe call
+  * every time the event happens, clear the existing highlights in the sidebar,
+  * highlight the selected feedback in the sidebar and scroll the panel.
+  */
+  var lengthOfPreviousFeedbackList = 0;
+
+  $scope.$on(events.SHOW_BUCKET_LIST, function (event, IDs) {
+    // TODO: Figure out how to get to the first item (not last entered, the one that is on top of the paragraph) on the doc
+
+    // Find the whole list of feedback
+    var feedback_list = [];
+    document.querySelectorAll('.thread-list__card').forEach(function(feedback){
+      feedback_list.push(feedback.id);
+    });
+
+    var otherFeedback = feedback_list.filter((item) => {
+      return !IDs.includes(item);
+    });
+
+    manageHighlights(IDs, otherFeedback);
+
+  });
+
+  function manageHighlights(selectedFeedback, otherFeedback){
+    // find the elements that has selected and remove the thread class from the other ones
+
+    var lengthOfCurrentFeedbackList = selectedFeedback.length;
+    otherFeedback.forEach(function(feedback){
+      document.getElementById(feedback).classList.remove('thread-hightlight');
+
+    });
+
+    selectedFeedback.forEach(function(feedback){
+      if (lengthOfCurrentFeedbackList !== lengthOfPreviousFeedbackList){
+        document.getElementById(feedback).classList.add('thread-hightlight');
+      }
+      else{
+        document.getElementById(feedback).classList.toggle('thread-hightlight');
+      }
+    });
+
+    lengthOfPreviousFeedbackList = lengthOfCurrentFeedbackList;
+  }
+
   $scope.$on(events.BEFORE_ANNOTATION_CREATED, function (event, annotation) {
     if (annotation.$highlight || metadata.isReply(annotation)) {
       return;

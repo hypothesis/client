@@ -7,11 +7,13 @@ $ = require('jquery')
 # cssClass - A CSS class to use for the highlight (default: 'annotator-hl')
 #
 # Returns an array of highlight Elements.
-exports.highlightRange = (normedRange, cssClass='annotator-hl') ->
+exports.highlightRange = (normedRange, newAnnotation, cssClass='annotator-hl') ->
   white = /^\s*$/
 
   # A custom element name is used here rather than `<span>` to reduce the
   # likelihood of highlights being hidden by page styling.
+  if newAnnotation
+    cssClass= "annotator-hl annotator-hl-focused"
   hl = $("<hypothesis-highlight class='#{cssClass}'></hypothesis-highlight>")
 
   # Ignore text nodes that contain only whitespace characters. This prevents

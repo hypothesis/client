@@ -224,26 +224,44 @@ module.exports = class BucketBar extends Plugin
 
       @tabs.push(div[0])
 
+      lengthOfPreviousBucket = 0;
       div.addClass('annotator-bucket-indicator')
 
+      # TO DO : Use config custom theme to disable this
       # Focus corresponding highlights bucket when mouse is hovered
       # TODO: This should use event delegation on the container.
-      .on 'mousemove', (event) =>
-        bucket = @tabs.index(event.currentTarget)
-        for anchor in @annotator.anchors
-          toggle = anchor in @buckets[bucket]
-          $(anchor.highlights).toggleClass('annotator-hl-focused', toggle)
+      # .on 'mousemove', (event) =>
+      #   bucket = @tabs.index(event.currentTarget)
+      #   for anchor in @annotator.anchors
+      #     toggle = anchor in @buckets[bucket]
+      #     $(anchor.highlights).toggleClass('annotator-hl-focused', toggle)
 
-      # Gets rid of them after
-      .on 'mouseout', (event) =>
-        bucket = @tabs.index(event.currentTarget)
-        for anchor in @buckets[bucket]
-          $(anchor.highlights).removeClass('annotator-hl-focused')
+      # # Gets rid of them after
+      # .on 'mouseout', (event) =>
+      #   bucket = @tabs.index(event.currentTarget)
+      #   for anchor in @buckets[bucket]
+      #     $(anchor.highlights).removeClass('annotator-hl-focused')
 
       # Does one of a few things when a tab is clicked depending on type
       .on 'click', (event) =>
         bucket = @tabs.index(event.currentTarget)
         event.stopPropagation()
+        feedbackListInBucket = []
+
+        # Populate the highlights in the bucket in an array and remove other highlights from the page.
+        for anchor in @annotator.anchors
+          if anchor in @buckets[bucket]
+            feedbackListInBucket.push($(anchor.highlights))
+          else
+            $(anchor.highlights).removeClass('annotator-hl-focused')
+
+        lengthOfCurrentBucket = feedbackListInBucket.length;
+
+        for feedback in feedbackListInBucket
+          if lengthOfCurrentBucket != lengthOfPreviousBucket
+            feedback.addClass('annotator-hl-focused');
+          else
+            feedback.toggleClass('annotator-hl-focused')
 
         # If it's the upper tab, scroll to next anchor above
         if (@isUpper bucket)
@@ -251,10 +269,14 @@ module.exports = class BucketBar extends Plugin
         # If it's the lower tab, scroll to next anchor below
         else if (@isLower bucket)
           scrollToClosest(@buckets[bucket], 'down')
-        else
-          annotations = (anchor.annotation for anchor in @buckets[bucket])
-          annotator.selectAnnotations annotations,
-            (event.ctrlKey or event.metaKey),
+
+        # TO DO : Use config custom theme to disable this
+        # else
+        #   annotations = (anchor.annotation for anchor in @buckets[bucket])
+        #   @annotator.selectAnnotations annotations,
+        #     (event.ctrlKey or event.metaKey),
+        # previousBucket = feedbackListInBucket;
+        lengthOfPreviousBucket = lengthOfCurrentBucket;
 
     this._buildTabs(@tabs, @buckets)
 

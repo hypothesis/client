@@ -1,6 +1,7 @@
 extend = require('extend')
 raf = require('raf')
 Hammer = require('hammerjs')
+$ = require('jquery')
 
 Host = require('./host')
 annotationCounts = require('./annotation-counts')
@@ -32,7 +33,7 @@ module.exports = class Sidebar extends Host
       this.on 'panelReady', => this.show()
 
     if @plugins.BucketBar?
-      @plugins.BucketBar.element.on 'click', (event) => this.show()
+      @plugins.BucketBar.element.on 'mouseup', (event) => this.showBucketList()
 
     if @plugins.Toolbar?
       @toolbarWidth = @plugins.Toolbar.getWidth()
@@ -274,3 +275,13 @@ module.exports = class Sidebar extends Host
 
     # Let the Toolbar know about this event
     this.publish 'setVisibleHighlights', shouldShowHighlights
+
+  showBucketList: ->
+    [tabs,buckets] = [@plugins.BucketBar.tabs, @plugins.BucketBar.buckets]
+    bucket = tabs.index($(event.target).parent())
+    [tags, annotations] = [[], []]
+    for anchor in buckets[bucket]
+      tags.push(anchor.annotation.$tag)
+    event.stopPropagation()
+    @crossframe?.call('showBucketList', tags);
+

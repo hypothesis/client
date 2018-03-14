@@ -154,6 +154,13 @@ function FrameSync($rootScope, $window, Discovery, annotationUI, bridge) {
       annotationUI.selectTab(uiConstants.TAB_ANNOTATIONS);
     });
 
+    bridge.on('showBucketList', function (tags) {
+      // highlight the annotations on the document
+      //bridge.call('showBucketList', tags);
+      // scroll the panel
+      $rootScope.$broadcast(events.SHOW_BUCKET_LIST, annotationUI.findIDsForTags(tags));
+    });
+
     bridge.on('focusAnnotations', function (tags) {
       annotationUI.focusAnnotations(tags || []);
     });

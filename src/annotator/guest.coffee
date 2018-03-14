@@ -195,6 +195,15 @@ module.exports = class Guest extends Delegator
     crossframe.on 'setVisibleHighlights', (state) =>
       this.setVisibleHighlights(state)
 
+    # crossframe.on 'showBucketList', (tags) =>
+    #   for anchor in @anchors when anchor.highlights?
+    #     toggle = anchor.annotation.$tag in tags
+    #     $(anchor.highlights).toggleClass('annotator-hl-highlighted', toggle)
+    #   # this.highlightAllselectedFeedback(anchor.highlights)
+
+    #   # crossframe.on 'clickBucketBar', (tags) =>
+    #   #   this.clickBucketBar(tags);
+
   destroy: ->
     $('#annotator-dynamic-style').remove()
 
@@ -212,7 +221,7 @@ module.exports = class Guest extends Delegator
 
     super
 
-  anchor: (annotation) ->
+  anchor: (annotation, newAnnotation) ->
     self = this
     root = @element[0]
 
@@ -260,7 +269,7 @@ module.exports = class Guest extends Delegator
       return animationPromise ->
         range = xpathRange.sniff(anchor.range)
         normedRange = range.normalize(root)
-        highlights = highlighter.highlightRange(normedRange)
+        highlights = highlighter.highlightRange(normedRange, newAnnotation)
 
         $(highlights).data('annotation', anchor.annotation)
         anchor.highlights = highlights
@@ -339,6 +348,7 @@ module.exports = class Guest extends Delegator
   createAnnotation: (annotation = {}) ->
     self = this
     root = @element[0]
+    newAnnotation = true
 
     ranges = @selectedRanges ? []
     @selectedRanges = null
@@ -368,7 +378,7 @@ module.exports = class Guest extends Delegator
     targets = Promise.all([info, selectors]).then(setTargets)
 
     targets.then(-> self.publish('beforeAnnotationCreated', [annotation]))
-    targets.then(-> self.anchor(annotation))
+    targets.then(-> self.anchor(annotation, newAnnotation))
 
     @crossframe?.call('showSidebar') unless annotation.$highlight
     annotation
