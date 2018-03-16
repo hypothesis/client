@@ -4,6 +4,13 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+### Changed
+
+- Show the world icon only for open groups in the groups dropdown
+  ([#685](https://github.com/hypothesis/client/pull/685)).
+
 ## [1.72.0] - 2018-03-08
 
 ### Changed
