@@ -25,7 +25,12 @@ describe('StreamContentController', function () {
 
 
   before(function () {
-    angular.module('h', [])
+    angular.module('h', ['pascalprecht.translate'], function($translateProvider){
+      $translateProvider.translations('en', {
+        'Feedback' : 'Feedback',
+      });
+      $translateProvider.preferredLanguage('en');
+    })
       .component('streamContent', require('../stream-content'));
   });
 

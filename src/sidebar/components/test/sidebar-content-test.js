@@ -55,7 +55,12 @@ describe('sidebar.components.sidebar-content', function () {
   var sandbox;
 
   before(function () {
-    angular.module('h', [])
+    angular.module('h', ['pascalprecht.translate'], function($translateProvider){
+      $translateProvider.translations('en', {
+        'Feedback' : 'Feedback',
+      });
+      $translateProvider.preferredLanguage('en');
+    })
       .service('annotationUI', require('../../annotation-ui'))
       .component('sidebarContent', proxyquire('../sidebar-content',
         noCallThru({

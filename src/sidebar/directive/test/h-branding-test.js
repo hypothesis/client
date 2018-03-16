@@ -15,7 +15,13 @@ describe('BrandingDirective', function () {
   // to be initialized for the test
   var setSettingsAndBootApp = function(){
 
-    angular.module('app', [])
+    angular.module('app', ['pascalprecht.translate'], function($translateProvider){
+      $translateProvider.translations('en', {
+        'Feedback' : 'Feedback',
+      });
+      $translateProvider.preferredLanguage('en');
+
+    })
       .directive('hBranding', require('../h-branding'));
 
     angular.mock.module('app', {

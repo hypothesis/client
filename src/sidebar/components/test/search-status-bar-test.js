@@ -6,7 +6,13 @@ var util = require('../../directive/test/util');
 
 describe('searchStatusBar', function () {
   before(function () {
-    angular.module('app', [])
+    angular.module('app', ['pascalprecht.translate'], function($translateProvider){
+      $translateProvider.translations('en', {
+        'Feedback' : 'Feedback',
+      });
+      $translateProvider.preferredLanguage('en');
+
+    })
       .component('searchStatusBar', require('../search-status-bar'));
   });
 
@@ -25,8 +31,8 @@ describe('searchStatusBar', function () {
   });
 
   context('when there is a selection', function () {
-    it('should display the "Show all annotations (2)" message when there are 2 annotations', function () {
-      var msg = 'Show all annotations';
+    it('should display the "Show all feedback (2)" message when there are 2 annotations', function () {
+      var msg = 'Show all feedback';
       var msgCount = '(2)';
       var elem = util.createDirective(document, 'searchStatusBar', {
         selectionCount: 1,

@@ -24,7 +24,12 @@ describe('sidebar.tags', () => {
   var tags;
 
   before(() => {
-    angular.module('h', [])
+    angular.module('h', ['pascalprecht.translate'], function($translateProvider){
+      $translateProvider.translations('en', {
+        'Feedback' : 'Feedback',
+      });
+      $translateProvider.preferredLanguage('en');
+    })
            .service('tags', require('../tags'));
   });
 

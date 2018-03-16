@@ -18,7 +18,13 @@ describe('selectionTabs', function () {
   };
 
   before(function () {
-    angular.module('app', [])
+    angular.module('app', ['pascalprecht.translate'], function($translateProvider){
+      $translateProvider.translations('en', {
+        'Feedback' : 'Feedback',
+      });
+      $translateProvider.preferredLanguage('en');
+
+    })
       .component('selectionTabs', require('../selection-tabs'));
   });
 

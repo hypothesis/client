@@ -19,7 +19,12 @@ describe('annotationMapper', function() {
         flag: sinon.stub().returns(Promise.resolve({})),
       },
     };
-    angular.module('app', [])
+    angular.module('app', ['pascalprecht.translate'], function($translateProvider){
+      $translateProvider.translations('en', {
+        'Feedback' : 'Feedback',
+      });
+      $translateProvider.preferredLanguage('en');
+    })
       .service('annotationMapper', require('../annotation-mapper'))
       .service('annotationUI', require('../annotation-ui'))
       .value('settings', {})

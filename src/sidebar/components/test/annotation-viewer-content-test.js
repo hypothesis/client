@@ -33,7 +33,12 @@ function FakeStore(annots) {
 describe('annotationViewerContent', function () {
 
   before(function () {
-    angular.module('h', [])
+    angular.module('h', ['pascalprecht.translate'], function($translateProvider){
+      $translateProvider.translations('en', {
+        'Feedback' : 'Feedback',
+      });
+      $translateProvider.preferredLanguage('en');
+    })
       .component('annotationViewerContent',
         require('../annotation-viewer-content'));
   });

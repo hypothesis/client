@@ -66,7 +66,12 @@ describe('sidebar.store', function () {
   var store = null;
 
   before(function () {
-    angular.module('h', [])
+    angular.module('h', ['pascalprecht.translate'], function($translateProvider){
+      $translateProvider.translations('en', {
+        'Feedback' : 'Feedback',
+      });
+      $translateProvider.preferredLanguage('en');
+    })
       .service('store', proxyquire('../store', util.noCallThru({
         angular: angular,
         './retry-util': {

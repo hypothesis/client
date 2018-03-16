@@ -24,7 +24,13 @@ describe('hOnTouch', function () {
   var testEl;
 
   before(function () {
-    angular.module('app', [])
+    angular.module('app', ['pascalprecht.translate'], function($translateProvider){
+      $translateProvider.translations('en', {
+        'Feedback' : 'Feedback',
+      });
+      $translateProvider.preferredLanguage('en');
+
+    })
       .directive('hOnTouch', require('../h-on-touch'))
       .directive('test', testComponent);
   });

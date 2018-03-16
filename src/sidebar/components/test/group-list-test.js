@@ -17,7 +17,13 @@ describe('groupList', function () {
   var fakeSettings;
 
   before(function() {
-    angular.module('app', [])
+    angular.module('app', ['pascalprecht.translate'], function($translateProvider){
+      $translateProvider.translations('en', {
+        'Feedback' : 'Feedback',
+      });
+      $translateProvider.preferredLanguage('en');
+
+    })
       .component('groupList', groupList)
       .factory('groups', function () {
         return fakeGroups;

@@ -12,7 +12,12 @@ describe('helpPanel', function () {
       frames: sinon.stub().returns([]),
     };
 
-    angular.module('h', [])
+    angular.module('h', ['pascalprecht.translate'], function($translateProvider){
+      $translateProvider.translations('en', {
+        'Feedback' : 'Feedback',
+      });
+      $translateProvider.preferredLanguage('en');
+    })
       .component('helpPanel', require('../help-panel'));
 
     angular.mock.module('h', {

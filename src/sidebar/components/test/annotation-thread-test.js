@@ -26,7 +26,13 @@ function PageObject(element) {
 
 describe('annotationThread', function () {
   before(function () {
-    angular.module('app', [])
+    angular.module('app', ['pascalprecht.translate'], function($translateProvider){
+      $translateProvider.translations('en', {
+        'Feedback' : 'Feedback',
+      });
+      $translateProvider.preferredLanguage('en');
+
+    })
       .component('annotationThread', annotationThread)
       .component('moderationBanner', {
         bindings: moderationBanner.bindings,

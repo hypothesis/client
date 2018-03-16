@@ -40,7 +40,13 @@ describe('markdown', function () {
   }
 
   before(function () {
-    angular.module('app', ['ngSanitize'])
+    angular.module('app', ['ngSanitize', 'pascalprecht.translate'], function($translateProvider){
+      $translateProvider.translations('en', {
+        'Feedback' : 'Feedback',
+      });
+      $translateProvider.preferredLanguage('en');
+
+    })
       .component('markdown', proxyquire('../markdown', noCallThru({
         angular: angular,
         katex: {

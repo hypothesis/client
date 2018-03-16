@@ -17,7 +17,13 @@ describe('h-tooltip', function () {
   var tooltipEl;
 
   before(function () {
-    angular.module('app', [])
+    angular.module('app', ['pascalprecht.translate'], function($translateProvider){
+      $translateProvider.translations('en', {
+        'Feedback' : 'Feedback',
+      });
+      $translateProvider.preferredLanguage('en');
+
+    })
       .directive('hTooltip', require('../h-tooltip'))
       .directive('test', testComponent);
   });

@@ -36,6 +36,7 @@ describe('annotator.adder', function () {
       onAnnotate: sinon.stub(),
       onHighlight: sinon.stub(),
       isHighlightBtnVisible: sinon.stub(),
+      traslatedBtnStrings: sinon.stub(),
     };
     adderEl = document.createElement('div');
     document.body.appendChild(adderEl);

@@ -15,7 +15,12 @@ describe('shareDialog', function () {
     };
     fakeAnnotationUI = { frames: sinon.stub().returns([]) };
 
-    angular.module('h', [])
+    angular.module('h', ['pascalprecht.translate'], function($translateProvider){
+      $translateProvider.translations('en', {
+        'Feedback' : 'Feedback',
+      });
+      $translateProvider.preferredLanguage('en');
+    })
       .component('shareDialog', require('../share-dialog'))
       .value('analytics', fakeAnalytics)
       .value('annotationUI', fakeAnnotationUI)

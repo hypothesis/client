@@ -43,7 +43,13 @@ describe('annotation threading', function () {
       flagEnabled: sinon.stub().returns(true),
     };
 
-    angular.module('app', [])
+    angular.module('app', ['pascalprecht.translate'], function($translateProvider){
+      $translateProvider.translations('en', {
+        'Feedback' : 'Feedback',
+      });
+      $translateProvider.preferredLanguage('en');
+
+    })
       .service('annotationUI', require('../../annotation-ui'))
       .service('drafts', require('../../drafts'))
       .service('rootThread', require('../../root-thread'))

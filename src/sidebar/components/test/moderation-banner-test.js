@@ -15,7 +15,13 @@ describe('moderationBanner', function () {
   var fakeStore;
 
   before(function () {
-    angular.module('app', [])
+    angular.module('app', ['pascalprecht.translate'], function($translateProvider){
+      $translateProvider.translations('en', {
+        'Feedback' : 'Feedback',
+      });
+      $translateProvider.preferredLanguage('en');
+
+    })
       .component('moderationBanner', require('../moderation-banner'));
   });
 

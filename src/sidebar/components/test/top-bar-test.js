@@ -3,6 +3,7 @@
 var angular = require('angular');
 var proxyquire = require('proxyquire');
 
+
 var util = require('../../directive/test/util');
 
 describe('topBar', function () {
@@ -10,7 +11,13 @@ describe('topBar', function () {
   var fakeIsThirdPartyService = sinon.stub();
 
   before(function () {
-    angular.module('app', [])
+    angular.module('app', ['pascalprecht.translate'], function($translateProvider){
+      $translateProvider.translations('en', {
+        'Feedback' : 'Feedback',
+      });
+      $translateProvider.preferredLanguage('en');
+
+    })
       .component('topBar', proxyquire('../top-bar', {
         '../util/is-third-party-service': fakeIsThirdPartyService,
         '@noCallThru': true,
@@ -24,7 +31,15 @@ describe('topBar', function () {
       .component('sortDropdown', {
         bindings: require('../sort-dropdown').bindings,
       });
+
   });
+
+  // beforeEach(module('angular-translate', function ($translateProvider) {
+  //   $translateProvider.translations('en', {
+  //     'Feedback' : 'Feedback',
+  //   });
+  //   $translateProvider.preferredLanguage('en');
+  // }));
 
   beforeEach(function () {
     angular.mock.module('app', {

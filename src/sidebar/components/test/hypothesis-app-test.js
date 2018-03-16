@@ -56,7 +56,12 @@ describe('sidebar.components.hypothesis-app', function () {
       '../service-config': fakeServiceConfig,
     }));
 
-    angular.module('h', [])
+    angular.module('h', ['pascalprecht.translate'], function($translateProvider){
+      $translateProvider.translations('en', {
+        'Feedback' : 'Feedback',
+      });
+      $translateProvider.preferredLanguage('en');
+    })
       .component('hypothesisApp', component);
   });
 

@@ -1,6 +1,6 @@
 <div dropdown="" class="publish-annotation-btn__btn" is-open="vm.showDropdown" keyboard-nav>
   <dropdown-menu-btn
-    label="('Post to ' | translate) + vm.publishDestination()"
+    label="('Post to' | translate) + ' ' + vm.publishDestination()"
     on-click="vm.onSave()"
     on-toggle-dropdown="vm.showDropdown = !vm.showDropdown"
     title="{{'Publish this feedback to' | translate}} {{vm.publishDestination()}}"

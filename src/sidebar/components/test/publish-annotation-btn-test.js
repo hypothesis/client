@@ -16,7 +16,12 @@ var fakeLocalStorage = {
 
 describe('publishAnnotationBtn', function () {
   before(function () {
-    angular.module('app', [])
+    angular.module('app', ['pascalprecht.translate'], function($translateProvider){
+      $translateProvider.translations('en', {
+        'Feedback' : 'Feedback',
+      });
+      $translateProvider.preferredLanguage('en');
+    })
       .component('dropdownMenuBtn', require('../dropdown-menu-btn'))
       .component('publishAnnotationBtn', require('../publish-annotation-btn'))
       .factory('localStorage', function () {

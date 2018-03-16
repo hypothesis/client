@@ -17,7 +17,12 @@ describe('annotationShareDialog', function () {
       track: sinon.stub(),
       events: {},
     };
-    angular.module('app', [])
+    angular.module('app', ['pascalprecht.translate'], function($translateProvider){
+      $translateProvider.translations('en', {
+        'Feedback' : 'Feedback',
+      });
+      $translateProvider.preferredLanguage('en');
+    })
       .component('annotationShareDialog',
         require('../annotation-share-dialog'))
       .value('analytics', fakeAnalytics)

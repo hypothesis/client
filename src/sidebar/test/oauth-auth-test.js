@@ -38,7 +38,13 @@ describe('sidebar.oauth-auth', function () {
   }
 
   before(() => {
-    angular.module('app', [])
+    angular.module('app', ['pascalprecht.translate'], function($translateProvider){
+      $translateProvider.translations('en', {
+        'Feedback' : 'Feedback',
+      });
+      $translateProvider.preferredLanguage('en');
+
+    })
       .service('auth', require('../oauth-auth'));
   });
 

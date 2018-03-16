@@ -78,7 +78,13 @@ describe('rootThread', function () {
       filter: sinon.stub(),
     };
 
-    angular.module('app', [])
+    angular.module('app', ['pascalprecht.translate'], function($translateProvider){
+      $translateProvider.translations('en', {
+        'Feedback' : 'Feedback',
+      });
+      $translateProvider.preferredLanguage('en');
+
+    })
       .value('annotationUI', fakeAnnotationUI)
       .value('drafts', fakeDrafts)
       .value('searchFilter', fakeSearchFilter)
