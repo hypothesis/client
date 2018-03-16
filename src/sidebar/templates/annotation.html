@@ -4,14 +4,7 @@
 
 <div ng-keydown="vm.onKeydown($event)" ng-if="vm.user()">
 
-  <annotation-header annotation="vm.annotation"
-                     is-editing="vm.editing()"
-                     is-highlight="vm.isHighlight()"
-                     is-private="vm.state().isPrivate"
-                     on-reply-count-click="vm.onReplyCountClick()"
-                     reply-count="vm.replyCount"
-                     show-document-info="vm.showDocumentInfo">
-  </annotation-header>
+
 
   <!-- Excerpts -->
   <section class="annotation-quote-list"
@@ -47,6 +40,14 @@
     </excerpt>
   </section>
   <!-- / Body -->
+  <annotation-header annotation="vm.annotation"
+                     is-editing="vm.editing()"
+                     is-highlight="vm.isHighlight()"
+                     is-private="vm.state().isPrivate"
+                     on-reply-count-click="vm.onReplyCountClick()"
+                     reply-count="vm.replyCount"
+                     show-document-info="vm.showDocumentInfo">
+  </annotation-header>
 
   <!-- Tags -->
   <div class="annotation-body form-field" ng-if="vm.editing() && !vm.isThemeCustom">
