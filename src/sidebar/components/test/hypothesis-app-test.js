@@ -71,7 +71,7 @@ describe('sidebar.components.hypothesis-app', function () {
 
     fakeAnalytics = {
       track: sandbox.stub(),
-      events: require('../../analytics')().events,
+      events: require('../../services/analytics')().events,
     };
 
     fakeAuth = {};

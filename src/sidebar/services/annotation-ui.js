@@ -36,16 +36,16 @@ var redux = require('redux');
 // `.default` is needed because 'redux-thunk' is built as an ES2015 module
 var thunk = require('redux-thunk').default;
 
-var reducers = require('./reducers');
-var annotationsReducer = require('./reducers/annotations');
-var framesReducer = require('./reducers/frames');
-var linksReducer = require('./reducers/links');
-var selectionReducer = require('./reducers/selection');
-var sessionReducer = require('./reducers/session');
-var viewerReducer = require('./reducers/viewer');
-var util = require('./reducers/util');
+var reducers = require('../reducers');
+var annotationsReducer = require('../reducers/annotations');
+var framesReducer = require('../reducers/frames');
+var linksReducer = require('../reducers/links');
+var selectionReducer = require('../reducers/selection');
+var sessionReducer = require('../reducers/session');
+var viewerReducer = require('../reducers/viewer');
+var util = require('../reducers/util');
 
-var debugMiddleware = require('./reducers/debug-middleware');
+var debugMiddleware = require('../reducers/debug-middleware');
 
 /**
  * Redux middleware which triggers an Angular change-detection cycle

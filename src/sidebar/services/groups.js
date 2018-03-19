@@ -13,9 +13,9 @@
 
 var STORAGE_KEY = 'hypothesis.groups.focus';
 
-var events = require('./events');
-var { awaitStateChange } = require('./util/state-util');
-var serviceConfig = require('./service-config');
+var events = require('../events');
+var { awaitStateChange } = require('../util/state-util');
+var serviceConfig = require('../service-config');
 
 // @ngInject
 function groups($rootScope, annotationUI, api, isSidebar, localStorage, serviceUrl, session,

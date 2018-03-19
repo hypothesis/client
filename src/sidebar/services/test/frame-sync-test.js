@@ -3,12 +3,12 @@
 var angular = require('angular');
 var EventEmitter = require('tiny-emitter');
 
-var annotationFixtures = require('./annotation-fixtures');
-var events = require('../events');
+var annotationFixtures = require('../../test/annotation-fixtures');
+var events = require('../../events');
 var FrameSync = require('../frame-sync').default;
-var fakeStore = require('./fake-redux-store');
+var fakeStore = require('../../test/fake-redux-store');
 var formatAnnot = require('../frame-sync').formatAnnot;
-var uiConstants = require('../ui-constants');
+var uiConstants = require('../../ui-constants');
 
 var fixtures = {
   ann: Object.assign({$tag: 't1'}, annotationFixtures.defaultAnnotation()),

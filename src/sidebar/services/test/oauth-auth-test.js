@@ -2,9 +2,9 @@
 
 var angular = require('angular');
 
-var events = require('../events');
+var events = require('../../events');
 
-var FakeWindow = require('../util/test/fake-window');
+var FakeWindow = require('../../util/test/fake-window');
 
 var DEFAULT_TOKEN_EXPIRES_IN_SECS = 1000;
 var TOKEN_KEY = 'hypothesis.oauth.hypothes%2Eis.token';

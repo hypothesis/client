@@ -1,8 +1,8 @@
 'use strict';
 
 var features = require('../features');
-var events = require('../events');
-var bridgeEvents = require('../../shared/bridge-events');
+var events = require('../../events');
+var bridgeEvents = require('../../../shared/bridge-events');
 
 describe('h:features - sidebar layer', function () {
 

@@ -3,10 +3,10 @@
 var immutable = require('seamless-immutable');
 
 var annotationUIFactory = require('../annotation-ui');
-var annotationFixtures = require('./annotation-fixtures');
-var metadata = require('../annotation-metadata');
-var unroll = require('../../shared/test/util').unroll;
-var uiConstants = require('../ui-constants');
+var annotationFixtures = require('../../test/annotation-fixtures');
+var metadata = require('../../annotation-metadata');
+var unroll = require('../../../shared/test/util').unroll;
+var uiConstants = require('../../ui-constants');
 
 var defaultAnnotation = annotationFixtures.defaultAnnotation;
 var newAnnotation = annotationFixtures.newAnnotation;

@@ -2,10 +2,10 @@
 
 var debounce = require('lodash.debounce');
 
-var events = require('./events');
-var bridgeEvents = require('../shared/bridge-events');
-var metadata = require('./annotation-metadata');
-var uiConstants = require('./ui-constants');
+var events = require('../events');
+var bridgeEvents = require('../../shared/bridge-events');
+var metadata = require('../annotation-metadata');
+var uiConstants = require('../ui-constants');
 
 /**
  * @typedef FrameInfo

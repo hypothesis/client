@@ -1,6 +1,6 @@
 'use strict';
 
-var { retryPromiseOperation } = require('./retry-util');
+var { retryPromiseOperation } = require('../retry-util');
 
 /**
  * A service which fetches and caches API route metadata.
