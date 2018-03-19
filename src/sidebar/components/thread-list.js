@@ -154,16 +154,16 @@ function ThreadListController($element, $scope, settings, VirtualThreadList) {
 
     var lengthOfCurrentFeedbackList = selectedFeedback.length;
     otherFeedback.forEach(function(feedback){
-      document.getElementById(feedback).classList.remove('thread-hightlight');
+      document.getElementById(feedback).classList.remove('default__card-selected');
 
     });
 
     selectedFeedback.forEach(function(feedback){
       if (lengthOfCurrentFeedbackList !== lengthOfPreviousFeedbackList){
-        document.getElementById(feedback).classList.add('thread-hightlight');
+        document.getElementById(feedback).classList.add('default__card-selected');
       }
       else{
-        document.getElementById(feedback).classList.toggle('thread-hightlight');
+        document.getElementById(feedback).classList.toggle('default__card-selected');
       }
     });
 

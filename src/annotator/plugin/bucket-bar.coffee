@@ -9,6 +9,8 @@ highlighter = require('../highlighter')
 
 polyglot = require('../../shared/polyglot');
 
+configFrom = require('../config/index');
+
 BUCKET_SIZE = 16                              # Regular bucket size
 BUCKET_NAV_SIZE = BUCKET_SIZE + 6             # Bucket plus arrow (up/down)
 BUCKET_TOP_THRESHOLD = 115 + BUCKET_NAV_SIZE  # Toolbar
@@ -227,20 +229,21 @@ module.exports = class BucketBar extends Plugin
       lengthOfPreviousBucket = 0;
       div.addClass('annotator-bucket-indicator')
 
-      # TO DO : Use config custom theme to disable this
       # Focus corresponding highlights bucket when mouse is hovered
       # TODO: This should use event delegation on the container.
-      # .on 'mousemove', (event) =>
-      #   bucket = @tabs.index(event.currentTarget)
-      #   for anchor in @annotator.anchors
-      #     toggle = anchor in @buckets[bucket]
-      #     $(anchor.highlights).toggleClass('annotator-hl-focused', toggle)
+      .on 'mousemove', (event) =>
+        if configFrom(window).theme != 'custom'
+          bucket = @tabs.index(event.currentTarget)
+          for anchor in @annotator.anchors
+            toggle = anchor in @buckets[bucket]
+            $(anchor.highlights).toggleClass('annotator-hl-focused', toggle)
 
       # # Gets rid of them after
-      # .on 'mouseout', (event) =>
-      #   bucket = @tabs.index(event.currentTarget)
-      #   for anchor in @buckets[bucket]
-      #     $(anchor.highlights).removeClass('annotator-hl-focused')
+      .on 'mouseout', (event) =>
+        if configFrom(window).theme != 'custom'
+          bucket = @tabs.index(event.currentTarget)
+          for anchor in @buckets[bucket]
+            $(anchor.highlights).removeClass('annotator-hl-focused')
 
       # Does one of a few things when a tab is clicked depending on type
       .on 'click', (event) =>
@@ -269,13 +272,13 @@ module.exports = class BucketBar extends Plugin
         # If it's the lower tab, scroll to next anchor below
         else if (@isLower bucket)
           scrollToClosest(@buckets[bucket], 'down')
+        else
+          if configFrom(window).theme != 'custom'
+            annotations = (anchor.annotation for anchor in @buckets[bucket])
+            @annotator.selectAnnotations annotations,
+              (event.ctrlKey or event.metaKey),
 
-        # TO DO : Use config custom theme to disable this
-        # else
-        #   annotations = (anchor.annotation for anchor in @buckets[bucket])
-        #   @annotator.selectAnnotations annotations,
-        #     (event.ctrlKey or event.metaKey),
-        # previousBucket = feedbackListInBucket;
+        previousBucket = feedbackListInBucket;
         lengthOfPreviousBucket = lengthOfCurrentBucket;
 
     this._buildTabs(@tabs, @buckets)

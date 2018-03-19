@@ -278,7 +278,8 @@ module.exports = class Sidebar extends Host
 
   showBucketList: ->
     [tabs,buckets] = [@plugins.BucketBar.tabs, @plugins.BucketBar.buckets]
-    bucket = tabs.index($(event.target).parent())
+    index = if $(event.target)[0].className.includes('annotator-bucket-indicator') then $(event.target) else $(event.target).parent()
+    bucket = tabs.index(index)
     [tags, annotations] = [[], []]
     for anchor in buckets[bucket]
       tags.push(anchor.annotation.$tag)
