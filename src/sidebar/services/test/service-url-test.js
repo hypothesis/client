@@ -21,7 +21,7 @@ function createServiceUrl(linksPromise) {
   );
 
   var serviceUrlFactory = proxyquire('../service-url', {
-    './util/url-util': { replaceURLParams: replaceURLParams },
+    '../util/url-util': { replaceURLParams: replaceURLParams },
   });
 
   var annotationUI = fakeAnnotationUI();

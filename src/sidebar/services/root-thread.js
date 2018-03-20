@@ -1,11 +1,11 @@
 'use strict';
 
-var buildThread = require('./build-thread');
-var events = require('./events');
-var memoize = require('./util/memoize');
-var metadata = require('./annotation-metadata');
-var tabs = require('./tabs');
-var uiConstants = require('./ui-constants');
+var buildThread = require('../build-thread');
+var events = require('../events');
+var memoize = require('../util/memoize');
+var metadata = require('../annotation-metadata');
+var tabs = require('../tabs');
+var uiConstants = require('../ui-constants');
 
 function truthyKeys(map) {
   return Object.keys(map).filter(function (k) {

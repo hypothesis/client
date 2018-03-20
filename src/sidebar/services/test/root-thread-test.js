@@ -4,10 +4,10 @@ var angular = require('angular');
 var proxyquire = require('proxyquire');
 var immutable = require('seamless-immutable');
 
-var annotationFixtures = require('./annotation-fixtures');
-var events = require('../events');
-var uiConstants = require('../ui-constants');
-var util = require('../../shared/test/util');
+var annotationFixtures = require('../../test/annotation-fixtures');
+var events = require('../../events');
+var uiConstants = require('../../ui-constants');
+var util = require('../../../shared/test/util');
 
 var unroll = util.unroll;
 
@@ -84,7 +84,7 @@ describe('rootThread', function () {
       .value('searchFilter', fakeSearchFilter)
       .value('viewFilter', fakeViewFilter)
       .service('rootThread', proxyquire('../root-thread', {
-        './build-thread': util.noCallThru(fakeBuildThread),
+        '../build-thread': util.noCallThru(fakeBuildThread),
       }));
 
     angular.mock.module('app');

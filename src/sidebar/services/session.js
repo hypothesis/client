@@ -1,7 +1,7 @@
 'use strict';
 
-var events = require('./events');
-var retryUtil = require('./retry-util');
+var events = require('../events');
+var retryUtil = require('../retry-util');
 
 var CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 

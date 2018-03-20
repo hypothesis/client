@@ -3,7 +3,7 @@
 var angular = require('angular');
 var immutable = require('seamless-immutable');
 
-var events = require('../events');
+var events = require('../../events');
 
 describe('annotationMapper', function() {
   var sandbox = sinon.sandbox.create();

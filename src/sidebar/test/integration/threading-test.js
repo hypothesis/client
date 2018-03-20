@@ -44,11 +44,11 @@ describe('annotation threading', function () {
     };
 
     angular.module('app', [])
-      .service('annotationUI', require('../../annotation-ui'))
-      .service('drafts', require('../../drafts'))
-      .service('rootThread', require('../../root-thread'))
-      .service('searchFilter', require('../../search-filter'))
-      .service('viewFilter', require('../../view-filter'))
+      .service('annotationUI', require('../../services/annotation-ui'))
+      .service('drafts', require('../../services/drafts'))
+      .service('rootThread', require('../../services/root-thread'))
+      .service('searchFilter', require('../../services/search-filter'))
+      .service('viewFilter', require('../../services/view-filter'))
       .value('features', fakeFeatures)
       .value('settings', {})
       .value('unicode', fakeUnicode);

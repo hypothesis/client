@@ -4,8 +4,8 @@ var EventEmitter = require('tiny-emitter');
 var inherits = require('inherits');
 var proxyquire = require('proxyquire');
 
-var events = require('../events');
-var unroll = require('../../shared/test/util').unroll;
+var events = require('../../events');
+var unroll = require('../../../shared/test/util').unroll;
 
 var fixtures = {
   createNotification: {
@@ -136,7 +136,7 @@ describe('Streamer', function () {
     };
 
     Streamer = proxyquire('../streamer', {
-      './websocket': FakeSocket,
+      '../websocket': FakeSocket,
     });
   });
 

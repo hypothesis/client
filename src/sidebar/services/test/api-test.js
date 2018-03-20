@@ -69,7 +69,7 @@ describe('sidebar.services.api', function () {
     angular.module('h', [])
       .service('api', proxyquire('../api', util.noCallThru({
         angular: angular,
-        './retry-util': {
+        '../retry-util': {
           retryPromiseOperation: function (fn) {
             return fn();
           },
