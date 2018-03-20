@@ -73,6 +73,14 @@ function SidebarContentController(
     if (!annotation) {
       return;
     }
+
+    document.getElementById(annotation.id).classList.toggle('default__card-selected');
+
+    document.querySelectorAll('.default__card-selected').forEach(function(card){
+      if (card.id !== annotation.id){
+        document.getElementById(card.id).classList.remove('default__card-selected');
+      }
+    });
     frameSync.scrollToAnnotation(annotation.$tag);
   }
 

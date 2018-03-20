@@ -170,14 +170,17 @@ module.exports = class Guest extends Delegator
         this.anchor(annotation)
 
   _connectAnnotationUISync: (crossframe) ->
-    crossframe.on 'focusAnnotations', (tags=[]) =>
-      for anchor in @anchors when anchor.highlights?
-        toggle = anchor.annotation.$tag in tags
-        $(anchor.highlights).toggleClass('annotator-hl-focused', toggle)
+    # crossframe.on 'focusAnnotations', (tags=[]) =>
+    #   for anchor in @anchors when anchor.highlights?
+    #     toggle = anchor.annotation.$tag in tags
+    #     $(anchor.highlights).toggleClass('annotator-hl-focused', toggle)
 
     crossframe.on 'scrollToAnnotation', (tag) =>
       for anchor in @anchors when anchor.highlights?
         if anchor.annotation.$tag is tag
+          # highlight the feedback on the doc
+          $(anchor.highlights).toggleClass('annotator-hl-focused')
+          # scroll to feedback
           event = new CustomEvent('scrolltorange', {
             bubbles: true
             cancelable: true
@@ -186,6 +189,10 @@ module.exports = class Guest extends Delegator
           defaultNotPrevented = @element[0].dispatchEvent(event)
           if defaultNotPrevented
             scrollIntoView(anchor.highlights[0])
+        else
+          # clear all feedback highlights except for the selected one
+          $(anchor.highlights).removeClass('annotator-hl-focused')
+
 
     crossframe.on 'getDocumentInfo', (cb) =>
       this.getDocumentInfo()
