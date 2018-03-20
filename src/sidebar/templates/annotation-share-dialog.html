@@ -36,7 +36,7 @@
       <i class="h-icon-clipboard btn-icon"></i>
     </button>
   </div>
-  <div class="annotation-share-dialog-msg" ng-if="vm.group && !vm.group.public && !vm.isPrivate">
+  <div class="annotation-share-dialog-msg" ng-if="vm.group && vm.group.type === 'private' && !vm.isPrivate">
     <span class="annotation-share-dialog-msg__audience">
       Group.
     </span>
