@@ -39,7 +39,7 @@
           <div class="group-name-container">
             <a class="group-name-link"
                href=""
-               title="{{ group.public ? 'Show public annotations' : 'Show and create annotations in ' + group.name }}">
+               title="{{ group.type === 'private' ? 'Show and create annotations in ' + group.name : 'Show public annotations'  }}">
                {{group.name}}
             </a>
           </div>
