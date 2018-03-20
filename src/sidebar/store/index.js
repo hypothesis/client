@@ -1,8 +1,8 @@
 'use strict';
 
 /**
- * AnnotationUI is the central store of state for the sidebar application,
- * managed using [Redux](http://redux.js.org/).
+ * Central store of state for the sidebar application, managed using
+ * [Redux](http://redux.js.org/).
  *
  * State management in Redux apps work as follows:
  *
@@ -36,16 +36,16 @@ var redux = require('redux');
 // `.default` is needed because 'redux-thunk' is built as an ES2015 module
 var thunk = require('redux-thunk').default;
 
-var reducers = require('../reducers');
-var annotationsReducer = require('./modules/annotations');
-var framesReducer = require('./modules/frames');
-var linksReducer = require('./modules/links');
-var selectionReducer = require('./modules/selection');
-var sessionReducer = require('./modules/session');
-var viewerReducer = require('./modules/viewer');
-var util = require('./util');
+var modules = require('./modules');
+var annotationsModule = require('./modules/annotations');
+var framesModule = require('./modules/frames');
+var linksModule = require('./modules/links');
+var selectionModule = require('./modules/selection');
+var sessionModule = require('./modules/session');
+var viewerModule = require('./modules/viewer');
 
 var debugMiddleware = require('./debug-middleware');
+var util = require('./util');
 
 /**
  * Redux middleware which triggers an Angular change-detection cycle
@@ -85,7 +85,7 @@ function store($rootScope, settings) {
     debugMiddleware,
     angularDigestMiddleware.bind(null, $rootScope)
   );
-  var store = redux.createStore(reducers.update, reducers.init(settings),
+  var store = redux.createStore(modules.update, modules.init(settings),
     enhancer);
 
   // Expose helper functions that create actions as methods of the
@@ -97,12 +97,12 @@ function store($rootScope, settings) {
   //   annotationUI.addAnnotations(annotations)
   //
   var actionCreators = redux.bindActionCreators(Object.assign({},
-    annotationsReducer.actions,
-    framesReducer.actions,
-    linksReducer.actions,
-    selectionReducer.actions,
-    sessionReducer.actions,
-    viewerReducer.actions
+    annotationsModule.actions,
+    framesModule.actions,
+    linksModule.actions,
+    selectionModule.actions,
+    sessionModule.actions,
+    viewerModule.actions
   ), store.dispatch);
 
   // Expose selectors as methods of the `annotationUI` to make using them easier
@@ -113,12 +113,12 @@ function store($rootScope, settings) {
   // You can use:
   //   annotationUI.isAnnotationSelected(id)
   var selectors = util.bindSelectors(Object.assign({},
-    annotationsReducer.selectors,
-    framesReducer.selectors,
-    linksReducer.selectors,
-    selectionReducer.selectors,
-    sessionReducer.selectors,
-    viewerReducer.selectors
+    annotationsModule.selectors,
+    framesModule.selectors,
+    linksModule.selectors,
+    selectionModule.selectors,
+    sessionModule.selectors,
+    viewerModule.selectors
   ), store.getState);
 
   return Object.assign(store, actionCreators, selectors);
