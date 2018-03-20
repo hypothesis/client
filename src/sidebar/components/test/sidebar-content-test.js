@@ -49,7 +49,7 @@ describe('sidebar.components.sidebar-content', function () {
   var fakeGroups;
   var fakeRootThread;
   var fakeSettings;
-  var fakeStore;
+  var fakeApi;
   var fakeStreamer;
   var fakeStreamFilter;
   var sandbox;
@@ -116,17 +116,17 @@ describe('sidebar.components.sidebar-content', function () {
 
     fakeSettings = {};
 
-    fakeStore = {
+    fakeApi = {
       search: sinon.stub(),
     };
 
     $provide.value('analytics', fakeAnalytics);
     $provide.value('annotationMapper', fakeAnnotationMapper);
+    $provide.value('api', fakeApi);
     $provide.value('drafts', fakeDrafts);
     $provide.value('features', fakeFeatures);
     $provide.value('frameSync', fakeFrameSync);
     $provide.value('rootThread', fakeRootThread);
-    $provide.value('store', fakeStore);
     $provide.value('streamer', fakeStreamer);
     $provide.value('streamFilter', fakeStreamFilter);
     $provide.value('groups', fakeGroups);

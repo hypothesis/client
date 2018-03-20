@@ -19,7 +19,7 @@ describe('StreamContentController', function () {
   var fakeQueryParser;
   var fakeRootThread;
   var fakeSearchFilter;
-  var fakeStore;
+  var fakeApi;
   var fakeStreamer;
   var fakeStreamFilter;
 
@@ -59,7 +59,7 @@ describe('StreamContentController', function () {
       toObject: sinon.stub().returns({}),
     };
 
-    fakeStore = {
+    fakeApi = {
       search: sinon.spy(function () {
         return Promise.resolve({rows: [], total: 0});
       }),
@@ -85,10 +85,10 @@ describe('StreamContentController', function () {
       $routeParams: fakeRouteParams,
       annotationMapper: fakeAnnotationMapper,
       annotationUI: fakeAnnotationUI,
+      api: fakeApi,
       queryParser: fakeQueryParser,
       rootThread: fakeRootThread,
       searchFilter: fakeSearchFilter,
-      store: fakeStore,
       streamFilter: fakeStreamFilter,
       streamer: fakeStreamer,
     });
@@ -110,11 +110,11 @@ describe('StreamContentController', function () {
 
   it('calls the search API with `_separate_replies: true`', function () {
     createController();
-    assert.equal(fakeStore.search.firstCall.args[0]._separate_replies, true);
+    assert.equal(fakeApi.search.firstCall.args[0]._separate_replies, true);
   });
 
   it('passes the annotations and replies from search to loadAnnotations()', function () {
-    fakeStore.search = function () {
+    fakeApi.search = function () {
       return Promise.resolve({
         'rows': ['annotation_1', 'annotation_2'],
         'replies': ['reply_1', 'reply_2', 'reply_3'],

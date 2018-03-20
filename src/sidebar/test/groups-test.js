@@ -17,7 +17,7 @@ describe('groups', function() {
   var fakeIsSidebar;
   var fakeSession;
   var fakeSettings;
-  var fakeStore;
+  var fakeApi;
   var fakeLocalStorage;
   var fakeRootScope;
   var fakeServiceUrl;
@@ -54,7 +54,7 @@ describe('groups', function() {
 
       $broadcast: sandbox.stub(),
     };
-    fakeStore = {
+    fakeApi = {
       group: {
         member: {
           delete: sandbox.stub().returns(Promise.resolve()),
@@ -77,8 +77,8 @@ describe('groups', function() {
   });
 
   function service() {
-    return groups(fakeAnnotationUI, fakeIsSidebar, fakeLocalStorage, fakeServiceUrl, fakeSession,
-      fakeSettings, fakeRootScope, fakeStore);
+    return groups(fakeRootScope, fakeAnnotationUI, fakeApi, fakeIsSidebar, fakeLocalStorage, fakeServiceUrl,
+      fakeSession, fakeSettings);
   }
 
   describe('#all()', function() {
@@ -120,7 +120,7 @@ describe('groups', function() {
       return svc.load().then(() => {
         svc.focus('id2');
       }).then(() => {
-        fakeStore.groups.list = sandbox.stub().returns(Promise.resolve([
+        fakeApi.groups.list = sandbox.stub().returns(Promise.resolve([
           {name: 'Group 3', id: 'id3'},
           {name: 'Group 1', id: 'id1'},
         ]));
@@ -139,7 +139,7 @@ describe('groups', function() {
         fakeAnnotationUI.setState({ searchUris: ['https://asite.com'] });
 
         return loaded.then(() => {
-          assert.calledWith(fakeStore.groups.list, { document_uri: 'https://asite.com' });
+          assert.calledWith(fakeApi.groups.list, { document_uri: 'https://asite.com' });
         });
       });
     });
@@ -153,7 +153,7 @@ describe('groups', function() {
         fakeAnnotationUI.setState({ searchUris: [] });
         var svc = service();
         return svc.load().then(() => {
-          assert.calledWith(fakeStore.groups.list, {});
+          assert.calledWith(fakeApi.groups.list, {});
         });
       });
     });
@@ -162,7 +162,7 @@ describe('groups', function() {
       fakeSettings.services = [{ authority: 'publisher.org' }];
       var svc = service();
       return svc.load().then(() => {
-        assert.calledWith(fakeStore.groups.list, sinon.match({ authority: 'publisher.org' }));
+        assert.calledWith(fakeApi.groups.list, sinon.match({ authority: 'publisher.org' }));
       });
     });
   });
@@ -270,7 +270,7 @@ describe('groups', function() {
     it('should call the group leave API', function () {
       var s = service();
       return s.leave('id2').then(() => {
-        assert.calledWithMatch(fakeStore.group.member.delete, {
+        assert.calledWithMatch(fakeApi.group.member.delete, {
           pubid: 'id2',
           user: 'me',
         });
@@ -289,7 +289,7 @@ describe('groups', function() {
       service();
 
       return fakeRootScope.eventCallbacks[testCase.event]().then(() => {
-        assert.calledOnce(fakeStore.groups.list);
+        assert.calledOnce(fakeApi.groups.list);
       });
     }, changeEvents);
   });

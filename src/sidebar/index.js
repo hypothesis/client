@@ -187,6 +187,7 @@ module.exports = angular.module('h', [
   .service('analytics', require('./analytics'))
   .service('annotationMapper', require('./annotation-mapper'))
   .service('annotationUI', require('./annotation-ui'))
+  .service('api', require('./services/api'))
   .service('apiRoutes', require('./api-routes'))
   .service('auth', require('./oauth-auth'))
   .service('bridge', require('../shared/bridge'))
@@ -207,8 +208,6 @@ module.exports = angular.module('h', [
   .service('tags', require('./tags'))
   .service('unicode', require('./unicode'))
   .service('viewFilter', require('./view-filter'))
-
-  .factory('store', require('./store'))
 
   .value('Discovery', require('../shared/discovery'))
   .value('ExcerptOverflowMonitor', require('./util/excerpt-overflow-monitor'))

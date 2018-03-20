@@ -2,7 +2,7 @@
 
 var get = require('lodash.get');
 
-var urlUtil = require('./util/url-util');
+var urlUtil = require('../util/url-util');
 
 /**
  * Translate the response from a failed API call into an Error-like object.
@@ -156,7 +156,7 @@ function createAPICall($http, $q, links, route, tokenGetter) {
  * not use authentication.
  */
 // @ngInject
-function store($http, $q, apiRoutes, auth) {
+function api($http, $q, apiRoutes, auth) {
   var links = apiRoutes.routes();
   function apiCall(route) {
     return createAPICall($http, $q, links, route, auth.tokenGetter);
@@ -192,4 +192,4 @@ function store($http, $q, apiRoutes, auth) {
   };
 }
 
-module.exports = store;
+module.exports = api;

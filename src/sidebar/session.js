@@ -20,8 +20,8 @@ var CACHE_TTL = 5 * 60 * 1000; // 5 minutes
  *
  * @ngInject
  */
-function session($q, $rootScope, analytics, annotationUI, auth,
-                 flash, raven, settings, serviceConfig, store) {
+function session($q, $rootScope, analytics, annotationUI, api, auth,
+                 flash, raven, settings, serviceConfig) {
   // Cache the result of load()
   var lastLoad;
   var lastLoadTime;
@@ -62,7 +62,7 @@ function session($q, $rootScope, analytics, annotationUI, auth,
         if (authority) {
           opts.authority = authority;
         }
-        return store.profile.read(opts);
+        return api.profile.read(opts);
       }, profileFetchRetryOpts).then(function (session) {
         update(session);
         lastLoadTime = Date.now();
@@ -80,7 +80,7 @@ function session($q, $rootScope, analytics, annotationUI, auth,
    * tutorial and then update the local profile data.
    */
   function dismissSidebarTutorial() {
-    return store.profile.update({}, {preferences: {show_sidebar_tutorial: false}}).then(update);
+    return api.profile.update({}, {preferences: {show_sidebar_tutorial: false}}).then(update);
   }
 
   /**

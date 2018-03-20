@@ -4,7 +4,7 @@ var angular = require('angular');
 
 // Fake implementation of the API for fetching annotations and replies to
 // annotations.
-function FakeStore(annots) {
+function FakeApi(annots) {
   this.annots = annots;
 
   this.annotation = {
@@ -51,12 +51,12 @@ describe('annotationViewerContent', function () {
         highlightAnnotations: sinon.stub(),
         subscribe: sinon.stub(),
       },
+      api: opts.api,
       rootThread: {thread: sinon.stub()},
       streamer: {
         setConfig: function () {},
         connect: function () {},
       },
-      store: opts.store,
       streamFilter: {
         setMatchPolicyIncludeAny: function () {
           return {
@@ -86,24 +86,24 @@ describe('annotationViewerContent', function () {
 
   describe('the standalone view for a top-level annotation', function () {
     it('loads the annotation and all replies', function () {
-      var fakeStore = new FakeStore([
+      var fakeApi = new FakeApi([
         {id: 'test_annotation_id'},
         {id: 'test_reply_id', references: ['test_annotation_id']},
       ]);
-      var controller = createController({store: fakeStore});
+      var controller = createController({api: fakeApi});
       return controller.ctrl.ready.then(function () {
         assert.calledOnce(controller.annotationMapper.loadAnnotations);
         assert.calledWith(controller.annotationMapper.loadAnnotations,
-          sinon.match(fakeStore.annots));
+          sinon.match(fakeApi.annots));
       });
     });
 
     it('does not highlight any annotations', function () {
-      var fakeStore = new FakeStore([
+      var fakeApi = new FakeApi([
         {id: 'test_annotation_id'},
         {id: 'test_reply_id', references: ['test_annotation_id']},
       ]);
-      var controller = createController({store: fakeStore});
+      var controller = createController({api: fakeApi});
       return controller.ctrl.ready.then(function () {
         assert.notCalled(controller.annotationUI.highlightAnnotations);
       });
@@ -112,23 +112,23 @@ describe('annotationViewerContent', function () {
 
   describe('the standalone view for a reply', function () {
     it('loads the top-level annotation and all replies', function () {
-      var fakeStore = new FakeStore([
+      var fakeApi = new FakeApi([
         {id: 'parent_id'},
         {id: 'test_annotation_id', references: ['parent_id']},
       ]);
-      var controller = createController({store: fakeStore});
+      var controller = createController({api: fakeApi});
       return controller.ctrl.ready.then(function () {
         assert.calledWith(controller.annotationMapper.loadAnnotations,
-          sinon.match(fakeStore.annots));
+          sinon.match(fakeApi.annots));
       });
     });
 
     it('expands the thread', function () {
-      var fakeStore = new FakeStore([
+      var fakeApi = new FakeApi([
         {id: 'parent_id'},
         {id: 'test_annotation_id', references: ['parent_id']},
       ]);
-      var controller = createController({store: fakeStore});
+      var controller = createController({api: fakeApi});
       return controller.ctrl.ready.then(function () {
         assert.calledWith(controller.annotationUI.setCollapsed, 'parent_id', false);
         assert.calledWith(controller.annotationUI.setCollapsed, 'test_annotation_id', false);
@@ -136,11 +136,11 @@ describe('annotationViewerContent', function () {
     });
 
     it('highlights the reply', function () {
-      var fakeStore = new FakeStore([
+      var fakeApi = new FakeApi([
         {id: 'parent_id'},
         {id: 'test_annotation_id', references: ['parent_id']},
       ]);
-      var controller = createController({store: fakeStore});
+      var controller = createController({api: fakeApi});
       return controller.ctrl.ready.then(function () {
         assert.calledWith(controller.annotationUI.highlightAnnotations,
           sinon.match(['test_annotation_id']));

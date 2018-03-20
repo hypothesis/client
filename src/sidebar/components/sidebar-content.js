@@ -34,8 +34,8 @@ function groupIDFromSelection(selection, results) {
 
 // @ngInject
 function SidebarContentController(
-  $scope, analytics, annotationUI, annotationMapper, drafts, features, frameSync,
-  groups, rootThread, settings, streamer, streamFilter, store
+  $scope, analytics, annotationUI, annotationMapper, api, drafts, features, frameSync,
+  groups, rootThread, settings, streamer, streamFilter
 ) {
   var self = this;
 
@@ -100,7 +100,7 @@ function SidebarContentController(
   }
 
   function _loadAnnotationsFor(uris, group) {
-    var searchClient = new SearchClient(store.search, {
+    var searchClient = new SearchClient(api.search, {
       // If no group is specified, we are fetching annotations from
       // all groups in order to find out which group contains the selected
       // annotation, therefore we need to load all chunks before processing

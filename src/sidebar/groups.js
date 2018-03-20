@@ -18,8 +18,8 @@ var { awaitStateChange } = require('./util/state-util');
 var serviceConfig = require('./service-config');
 
 // @ngInject
-function groups(annotationUI, isSidebar, localStorage, serviceUrl, session,
-                settings, $rootScope, store) {
+function groups($rootScope, annotationUI, api, isSidebar, localStorage, serviceUrl, session,
+                settings) {
   // The currently focused group. This is the group that's shown as selected in
   // the groups dropdown, the annotations displayed are filtered to only ones
   // that belong to this group, and any new annotations that the user creates
@@ -65,7 +65,7 @@ function groups(annotationUI, isSidebar, localStorage, serviceUrl, session,
       if (uri) {
         params.document_uri = uri;
       }
-      return store.groups.list(params);
+      return api.groups.list(params);
     }).then(gs => {
       $rootScope.$apply(() => {
         var focGroup = focused();
@@ -104,7 +104,7 @@ function groups(annotationUI, isSidebar, localStorage, serviceUrl, session,
     // The groups list will be updated in response to a session state
     // change notification from the server. We could improve the UX here
     // by optimistically updating the session state
-    return store.group.member.delete({
+    return api.group.member.delete({
       pubid: id,
       user: 'me',
     });
