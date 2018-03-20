@@ -21,7 +21,7 @@ describe('annotationMapper', function() {
     };
     angular.module('app', [])
       .service('annotationMapper', require('../annotation-mapper'))
-      .service('annotationUI', require('../annotation-ui'))
+      .service('annotationUI', require('../../store'))
       .value('api', fakeApi)
       .value('settings', {});
     angular.mock.module('app');

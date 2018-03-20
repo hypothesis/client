@@ -184,9 +184,10 @@ module.exports = angular.module('h', [
   .directive('spinner', require('./directive/spinner'))
   .directive('windowScroll', require('./directive/window-scroll'))
 
+  .service('annotationUI', require('./store'))
+
   .service('analytics', require('./services/analytics'))
   .service('annotationMapper', require('./services/annotation-mapper'))
-  .service('annotationUI', require('./services/annotation-ui'))
   .service('api', require('./services/api'))
   .service('apiRoutes', require('./services/api-routes'))
   .service('auth', require('./services/oauth-auth'))

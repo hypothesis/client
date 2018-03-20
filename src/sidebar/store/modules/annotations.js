@@ -5,12 +5,12 @@
 
 'use strict';
 
-var arrayUtil = require('../util/array-util');
-var metadata = require('../annotation-metadata');
-var uiConstants = require('../ui-constants');
+var arrayUtil = require('../../util/array-util');
+var metadata = require('../../annotation-metadata');
+var uiConstants = require('../../ui-constants');
 
 var selection = require('./selection');
-var util = require('./util');
+var util = require('../util');
 
 /**
  * Return a copy of `current` with all matching annotations in `annotations`

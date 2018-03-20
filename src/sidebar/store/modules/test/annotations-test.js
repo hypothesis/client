@@ -5,9 +5,9 @@ var redux = require('redux');
 var thunk = require('redux-thunk').default;
 
 var annotations = require('../annotations');
-var fixtures = require('../../test/annotation-fixtures');
-var util = require('../util');
-var unroll = require('../../../shared/test/util').unroll;
+var fixtures = require('../../../test/annotation-fixtures');
+var util = require('../../util');
+var unroll = require('../../../../shared/test/util').unroll;
 
 var { actions, selectors } = annotations;
 

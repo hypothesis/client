@@ -12,11 +12,11 @@
 
 var immutable = require('seamless-immutable');
 
-var toSet = require('../util/array-util').toSet;
-var uiConstants = require('../ui-constants');
-var tabs = require('../tabs');
+var toSet = require('../../util/array-util').toSet;
+var uiConstants = require('../../ui-constants');
+var tabs = require('../../tabs');
 
-var util = require('./util');
+var util = require('../util');
 
 
 /**

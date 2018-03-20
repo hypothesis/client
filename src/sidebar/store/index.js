@@ -37,15 +37,15 @@ var redux = require('redux');
 var thunk = require('redux-thunk').default;
 
 var reducers = require('../reducers');
-var annotationsReducer = require('../reducers/annotations');
-var framesReducer = require('../reducers/frames');
-var linksReducer = require('../reducers/links');
-var selectionReducer = require('../reducers/selection');
-var sessionReducer = require('../reducers/session');
-var viewerReducer = require('../reducers/viewer');
-var util = require('../reducers/util');
+var annotationsReducer = require('./modules/annotations');
+var framesReducer = require('./modules/frames');
+var linksReducer = require('./modules/links');
+var selectionReducer = require('./modules/selection');
+var sessionReducer = require('./modules/session');
+var viewerReducer = require('./modules/viewer');
+var util = require('./util');
 
-var debugMiddleware = require('../reducers/debug-middleware');
+var debugMiddleware = require('./debug-middleware');
 
 /**
  * Redux middleware which triggers an Angular change-detection cycle
@@ -72,8 +72,11 @@ function angularDigestMiddleware($rootScope) {
   };
 }
 
+/**
+ * Create the Redux store for the application.
+ */
 // @ngInject
-module.exports = function ($rootScope, settings) {
+function store($rootScope, settings) {
   var enhancer = redux.applyMiddleware(
     // The `thunk` middleware handles actions which are functions.
     // This is used to implement actions which have side effects or are
@@ -119,4 +122,6 @@ module.exports = function ($rootScope, settings) {
   ), store.getState);
 
   return Object.assign(store, actionCreators, selectors);
-};
+}
+
+module.exports = store;
