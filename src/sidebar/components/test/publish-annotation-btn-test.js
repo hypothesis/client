@@ -50,7 +50,7 @@ describe('publishAnnotationBtn', function () {
     },
     {
       groupType: 'restricted',
-      expectedIcon: 'public',
+      expectedIcon: 'group',
     },
     {
       groupType: 'private',

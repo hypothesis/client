@@ -15,7 +15,7 @@ module.exports = {
     };
 
     this.groupCategory = function () {
-      return this.group.type === 'private' ? 'group' : 'public';
+      return this.group.type === 'open' ? 'public' : 'group';
     };
 
     this.setPrivacy = function (level) {
