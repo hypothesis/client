@@ -84,7 +84,7 @@ describe('StreamContentController', function () {
       $route: fakeRoute,
       $routeParams: fakeRouteParams,
       annotationMapper: fakeAnnotationMapper,
-      annotationUI: fakeAnnotationUI,
+      store: fakeAnnotationUI,
       api: fakeApi,
       queryParser: fakeQueryParser,
       rootThread: fakeRootThread,

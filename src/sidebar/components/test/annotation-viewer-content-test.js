@@ -45,7 +45,7 @@ describe('annotationViewerContent', function () {
     var locals = {
       $location: {},
       $routeParams: { id: 'test_annotation_id' },
-      annotationUI: {
+      store: {
         setAppIsSidebar: sinon.stub(),
         setCollapsed: sinon.stub(),
         highlightAnnotations: sinon.stub(),
@@ -105,7 +105,7 @@ describe('annotationViewerContent', function () {
       ]);
       var controller = createController({api: fakeApi});
       return controller.ctrl.ready.then(function () {
-        assert.notCalled(controller.annotationUI.highlightAnnotations);
+        assert.notCalled(controller.store.highlightAnnotations);
       });
     });
   });
@@ -130,8 +130,8 @@ describe('annotationViewerContent', function () {
       ]);
       var controller = createController({api: fakeApi});
       return controller.ctrl.ready.then(function () {
-        assert.calledWith(controller.annotationUI.setCollapsed, 'parent_id', false);
-        assert.calledWith(controller.annotationUI.setCollapsed, 'test_annotation_id', false);
+        assert.calledWith(controller.store.setCollapsed, 'parent_id', false);
+        assert.calledWith(controller.store.setCollapsed, 'test_annotation_id', false);
       });
     });
 
@@ -142,7 +142,7 @@ describe('annotationViewerContent', function () {
       ]);
       var controller = createController({api: fakeApi});
       return controller.ctrl.ready.then(function () {
-        assert.calledWith(controller.annotationUI.highlightAnnotations,
+        assert.calledWith(controller.store.highlightAnnotations,
           sinon.match(['test_annotation_id']));
       });
     });

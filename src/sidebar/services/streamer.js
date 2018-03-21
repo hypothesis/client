@@ -20,7 +20,7 @@ var Socket = require('../websocket');
  * @param settings - Application settings
  */
 // @ngInject
-function Streamer($rootScope, annotationMapper, annotationUI, auth,
+function Streamer($rootScope, annotationMapper, store, auth,
                   groups, session, settings) {
   // The randomly generated session UUID
   var clientId = uuid.v4();
@@ -37,7 +37,7 @@ function Streamer($rootScope, annotationMapper, annotationUI, auth,
   // app.
   //
   // This state should be managed as part of the global app state in
-  // annotationUI, but that is currently difficult because applying updates
+  // store, but that is currently difficult because applying updates
   // requires filtering annotations against the focused group (information not
   // currently stored in the app state) and triggering events in order to update
   // the annotations displayed in the page.
@@ -62,7 +62,7 @@ function Streamer($rootScope, annotationMapper, annotationUI, auth,
         // focused group, since we only display annotations from the focused
         // group and reload all annotations and discard pending updates
         // when switching groups.
-        if (ann.group === groups.focused().id || !annotationUI.isSidebar()) {
+        if (ann.group === groups.focused().id || !store.isSidebar()) {
           pendingUpdates[ann.id] = ann;
         }
       });
@@ -78,14 +78,14 @@ function Streamer($rootScope, annotationMapper, annotationUI, auth,
         // even if the annotation is from the current group, it might be for a
         // new annotation (saved in pendingUpdates and removed above), that has
         // not yet been loaded.
-        if (annotationUI.annotationExists(ann.id)) {
+        if (store.annotationExists(ann.id)) {
           pendingDeletions[ann.id] = true;
         }
       });
       break;
     }
 
-    if (!annotationUI.isSidebar()) {
+    if (!store.isSidebar()) {
       applyPendingUpdates();
     }
   }
@@ -125,7 +125,7 @@ function Streamer($rootScope, annotationMapper, annotationUI, auth,
       } else if (message.type === 'session-change') {
         handleSessionChangeNotification(message);
       } else if (message.type === 'whoyouare') {
-        var userid = annotationUI.getState().session.userid;
+        var userid = store.getState().session.userid;
         if (message.userid !== userid) {
           console.warn('WebSocket user ID "%s" does not match logged-in ID "%s"', message.userid, userid);
         }

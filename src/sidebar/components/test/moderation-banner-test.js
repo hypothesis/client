@@ -37,7 +37,7 @@ describe('moderationBanner', function () {
     };
 
     angular.mock.module('app', {
-      annotationUI: fakeAnnotationUI,
+      store: fakeAnnotationUI,
       api: fakeApi,
       flash: fakeFlash,
     });

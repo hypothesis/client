@@ -25,7 +25,7 @@ function updateModel(annotation, changes, permissions) {
 
 // @ngInject
 function AnnotationController(
-  $document, $rootScope, $scope, $timeout, $window, analytics, annotationUI,
+  $document, $rootScope, $scope, $timeout, $window, analytics, store,
   annotationMapper, api, drafts, flash, groups, permissions, serviceUrl,
   session, settings, streamer) {
 
@@ -199,7 +199,7 @@ function AnnotationController(
     };
     annotationMapper.flagAnnotation(self.annotation).then(function(){
       analytics.track(analytics.events.ANNOTATION_FLAGGED);
-      annotationUI.updateFlagStatus(self.annotation.id, true);
+      store.updateFlagStatus(self.annotation.id, true);
     }, onRejected);
   };
 

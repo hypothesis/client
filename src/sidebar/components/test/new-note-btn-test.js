@@ -25,7 +25,7 @@ describe('newNoteBtn', function () {
     var fakeSettings = { theme: 'clean' };
 
     angular.mock.module('app', {
-      annotationUI: fakeAnnotationUI,
+      store: fakeAnnotationUI,
       features: fakeFeatures,
       settings: fakeSettings,
     });
@@ -45,7 +45,7 @@ describe('newNoteBtn', function () {
       uri: 'www.example.org',
     };
     var elem = util.createDirective(document, 'newNoteBtn', {
-      annotationUI: fakeAnnotationUI,
+      store: fakeAnnotationUI,
     });
     sandbox.spy($rootScope, '$broadcast');
     elem.ctrl.onNewNoteBtnClick();

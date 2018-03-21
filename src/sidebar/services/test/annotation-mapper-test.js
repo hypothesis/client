@@ -8,7 +8,7 @@ var events = require('../../events');
 describe('annotationMapper', function() {
   var sandbox = sinon.sandbox.create();
   var $rootScope;
-  var annotationUI;
+  var store;
   var fakeApi;
   var annotationMapper;
 
@@ -21,15 +21,15 @@ describe('annotationMapper', function() {
     };
     angular.module('app', [])
       .service('annotationMapper', require('../annotation-mapper'))
-      .service('annotationUI', require('../../store'))
+      .service('store', require('../../store'))
       .value('api', fakeApi)
       .value('settings', {});
     angular.mock.module('app');
 
-    angular.mock.inject(function (_$rootScope_, _annotationUI_, _annotationMapper_) {
+    angular.mock.inject(function (_$rootScope_, _store_, _annotationMapper_) {
       $rootScope = _$rootScope_;
       annotationMapper = _annotationMapper_;
-      annotationUI = _annotationUI_;
+      store = _store_;
     });
   });
 
@@ -60,7 +60,7 @@ describe('annotationMapper', function() {
     it('triggers the annotationUpdated event for each loaded annotation', function () {
       sandbox.stub($rootScope, '$broadcast');
       var annotations = immutable([{id: 1}, {id: 2}, {id: 3}]);
-      annotationUI.addAnnotations(angular.copy(annotations));
+      store.addAnnotations(angular.copy(annotations));
 
       annotationMapper.loadAnnotations(annotations);
       assert.called($rootScope.$broadcast);
@@ -72,7 +72,7 @@ describe('annotationMapper', function() {
       sandbox.stub($rootScope, '$broadcast');
       var annotations = [{id: 1}];
       var replies = [{id: 2}, {id: 3}, {id: 4}];
-      annotationUI.addAnnotations([{id:3}]);
+      store.addAnnotations([{id:3}]);
 
       annotationMapper.loadAnnotations(annotations, replies);
       assert($rootScope.$broadcast.calledWith(events.ANNOTATION_UPDATED,
@@ -82,7 +82,7 @@ describe('annotationMapper', function() {
     it('replaces the properties on the cached annotation with those from the loaded one', function () {
       sandbox.stub($rootScope, '$broadcast');
       var annotations = [{id: 1, url: 'http://example.com'}];
-      annotationUI.addAnnotations([{id:1, $tag: 'tag1'}]);
+      store.addAnnotations([{id:1, $tag: 'tag1'}]);
 
       annotationMapper.loadAnnotations(annotations);
       assert.called($rootScope.$broadcast);
@@ -95,7 +95,7 @@ describe('annotationMapper', function() {
     it('excludes cached annotations from the annotationLoaded event', function () {
       sandbox.stub($rootScope, '$broadcast');
       var annotations = [{id: 1, url: 'http://example.com'}];
-      annotationUI.addAnnotations([{id: 1, $tag: 'tag1'}]);
+      store.addAnnotations([{id: 1, $tag: 'tag1'}]);
 
       annotationMapper.loadAnnotations(annotations);
       assert.called($rootScope.$broadcast);
@@ -115,7 +115,7 @@ describe('annotationMapper', function() {
     it('replaces the properties on the cached annotation with those from the deleted one', function () {
       sandbox.stub($rootScope, '$broadcast');
       var annotations = [{id: 1, url: 'http://example.com'}];
-      annotationUI.addAnnotations([{id: 1, $tag: 'tag1'}]);
+      store.addAnnotations([{id: 1, $tag: 'tag1'}]);
 
       annotationMapper.unloadAnnotations(annotations);
       assert.calledWith($rootScope.$broadcast, events.ANNOTATIONS_UNLOADED, [{

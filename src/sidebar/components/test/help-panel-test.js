@@ -16,7 +16,7 @@ describe('helpPanel', function () {
       .component('helpPanel', require('../help-panel'));
 
     angular.mock.module('h', {
-      annotationUI: fakeAnnotationUI,
+      store: fakeAnnotationUI,
       serviceUrl: sinon.stub(),
     });
 

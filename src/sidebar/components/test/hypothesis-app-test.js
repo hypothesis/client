@@ -130,7 +130,7 @@ describe('sidebar.components.hypothesis-app', function () {
       call: sandbox.stub(),
     };
 
-    $provide.value('annotationUI', fakeAnnotationUI);
+    $provide.value('store', fakeAnnotationUI);
     $provide.value('auth', fakeAuth);
     $provide.value('analytics', fakeAnalytics);
     $provide.value('drafts', fakeDrafts);

@@ -18,7 +18,7 @@ describe('shareDialog', function () {
     angular.module('h', [])
       .component('shareDialog', require('../share-dialog'))
       .value('analytics', fakeAnalytics)
-      .value('annotationUI', fakeAnnotationUI)
+      .value('store', fakeAnnotationUI)
       .value('urlEncodeFilter', function (val) { return val; });
     angular.mock.module('h');
   });

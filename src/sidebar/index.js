@@ -209,7 +209,7 @@ module.exports = angular.module('h', [
   .service('viewFilter', require('./services/view-filter'))
 
   // Redux store
-  .service('annotationUI', require('./store'))
+  .service('store', require('./store'))
 
   // Utilities
   .value('Discovery', require('../shared/discovery'))

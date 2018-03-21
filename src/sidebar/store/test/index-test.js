@@ -2,7 +2,7 @@
 
 var immutable = require('seamless-immutable');
 
-var annotationUIFactory = require('../index');
+var storeFactory = require('../index');
 var annotationFixtures = require('../../test/annotation-fixtures');
 var metadata = require('../../annotation-metadata');
 var unroll = require('../../../shared/test/util').unroll;
@@ -23,12 +23,12 @@ var fixtures = immutable({
   ],
 });
 
-describe('annotationUI', function () {
-  var annotationUI;
+describe('store', function () {
+  var store;
   var fakeRootScope;
 
   function tagForID(id) {
-    var storeAnn = annotationUI.findAnnotationByID(id);
+    var storeAnn = store.findAnnotationByID(id);
     if (!storeAnn) {
       throw new Error(`No annotation with ID ${id}`);
     }
@@ -37,25 +37,25 @@ describe('annotationUI', function () {
 
   beforeEach(function () {
     fakeRootScope = {$applyAsync: sinon.stub()};
-    annotationUI = annotationUIFactory(fakeRootScope, {});
+    store = storeFactory(fakeRootScope, {});
   });
 
   describe('initialization', function () {
     it('does not set a selection when settings.annotations is null', function () {
-      assert.isFalse(annotationUI.hasSelectedAnnotations());
-      assert.equal(Object.keys(annotationUI.getState().expanded).length, 0);
+      assert.isFalse(store.hasSelectedAnnotations());
+      assert.equal(Object.keys(store.getState().expanded).length, 0);
     });
 
     it('sets the selection when settings.annotations is set', function () {
-      annotationUI = annotationUIFactory(fakeRootScope, {annotations: 'testid'});
-      assert.deepEqual(annotationUI.getState().selectedAnnotationMap, {
+      store = storeFactory(fakeRootScope, {annotations: 'testid'});
+      assert.deepEqual(store.getState().selectedAnnotationMap, {
         testid: true,
       });
     });
 
     it('expands the selected annotations when settings.annotations is set', function () {
-      annotationUI = annotationUIFactory(fakeRootScope, {annotations: 'testid'});
-      assert.deepEqual(annotationUI.getState().expanded, {
+      store = storeFactory(fakeRootScope, {annotations: 'testid'});
+      assert.deepEqual(store.getState().expanded, {
         testid: true,
       });
     });
@@ -75,39 +75,39 @@ describe('annotationUI', function () {
 
     it('adds annotations not in the store', function () {
       var annot = defaultAnnotation();
-      annotationUI.addAnnotations([annot]);
-      assert.match(annotationUI.getState().annotations,
+      store.addAnnotations([annot]);
+      assert.match(store.getState().annotations,
         [sinon.match(annot)]);
     });
 
     it('does not change `selectedTab` state if annotations are already loaded', function () {
       var annot = defaultAnnotation();
-      annotationUI.addAnnotations([annot]);
+      store.addAnnotations([annot]);
       var page = oldPageNote();
-      annotationUI.addAnnotations([page]);
-      assert.equal(annotationUI.getState().selectedTab, uiConstants.TAB_ANNOTATIONS);
+      store.addAnnotations([page]);
+      assert.equal(store.getState().selectedTab, uiConstants.TAB_ANNOTATIONS);
     });
 
     it('sets `selectedTab` to "note" if only page notes are present', function () {
       var page = oldPageNote();
-      annotationUI.addAnnotations([page]);
-      assert.equal(annotationUI.getState().selectedTab, uiConstants.TAB_NOTES);
+      store.addAnnotations([page]);
+      assert.equal(store.getState().selectedTab, uiConstants.TAB_NOTES);
     });
 
     it('leaves `selectedTab` as "annotation" if annotations and/or page notes are present', function () {
       var page = oldPageNote();
       var annot = defaultAnnotation();
-      annotationUI.addAnnotations([annot, page]);
-      assert.equal(annotationUI.getState().selectedTab, uiConstants.TAB_ANNOTATIONS);
+      store.addAnnotations([annot, page]);
+      assert.equal(store.getState().selectedTab, uiConstants.TAB_ANNOTATIONS);
     });
 
     it('assigns a local tag to annotations', function () {
       var annotA = Object.assign(defaultAnnotation(), {id: 'a1'});
       var annotB = Object.assign(defaultAnnotation(), {id: 'a2'});
 
-      annotationUI.addAnnotations([annotA, annotB]);
+      store.addAnnotations([annotA, annotB]);
 
-      var tags = annotationUI.getState().annotations.map(function (a) {
+      var tags = store.getState().annotations.map(function (a) {
         return a.$tag;
       });
 
@@ -116,23 +116,23 @@ describe('annotationUI', function () {
 
     it('updates annotations with matching IDs in the store', function () {
       var annot = defaultAnnotation();
-      annotationUI.addAnnotations([annot]);
+      store.addAnnotations([annot]);
       var update = Object.assign({}, defaultAnnotation(), {text: 'update'});
-      annotationUI.addAnnotations([update]);
+      store.addAnnotations([update]);
 
-      var updatedAnnot = annotationUI.getState().annotations[0];
+      var updatedAnnot = store.getState().annotations[0];
       assert.equal(updatedAnnot.text, 'update');
     });
 
     it('updates annotations with matching tags in the store', function () {
       var annot = newAnnotation();
       annot.$tag = 'local-tag';
-      annotationUI.addAnnotations([annot]);
+      store.addAnnotations([annot]);
 
       var saved = Object.assign({}, annot, {id: 'server-id'});
-      annotationUI.addAnnotations([saved]);
+      store.addAnnotations([saved]);
 
-      var annots = annotationUI.getState().annotations;
+      var annots = store.getState().annotations;
       assert.equal(annots.length, 1);
       assert.equal(annots[0].id, 'server-id');
     });
@@ -144,8 +144,8 @@ describe('annotationUI', function () {
       var now = new Date();
       var nowStr = now.toISOString();
 
-      annotationUI.addAnnotations([newAnnotation()], now);
-      var annot = annotationUI.getState().annotations[0];
+      store.addAnnotations([newAnnotation()], now);
+      var annot = store.getState().annotations[0];
 
       assert.equal(annot.created, nowStr);
       assert.equal(annot.updated, nowStr);
@@ -157,8 +157,8 @@ describe('annotationUI', function () {
       annot.created = '2000-01-01T01:02:03Z';
       annot.updated = '2000-01-01T04:05:06Z';
 
-      annotationUI.addAnnotations([annot], now);
-      var result = annotationUI.getState().annotations[0];
+      store.addAnnotations([annot], now);
+      var result = store.getState().annotations[0];
 
       assert.equal(result.created, annot.created);
       assert.equal(result.updated, annot.updated);
@@ -166,40 +166,40 @@ describe('annotationUI', function () {
 
     it('preserves anchoring status of updated annotations', function () {
       var annot = defaultAnnotation();
-      annotationUI.addAnnotations([annot]);
-      annotationUI.updateAnchorStatus({ [tagForID(annot.id)]: 'anchored' });
+      store.addAnnotations([annot]);
+      store.updateAnchorStatus({ [tagForID(annot.id)]: 'anchored' });
 
       var update = Object.assign({}, defaultAnnotation(), {text: 'update'});
-      annotationUI.addAnnotations([update]);
+      store.addAnnotations([update]);
 
-      var updatedAnnot = annotationUI.getState().annotations[0];
+      var updatedAnnot = store.getState().annotations[0];
       assert.isFalse(updatedAnnot.$orphan);
     });
 
     it('sets the timeout flag on annotations that fail to anchor within a time limit', function () {
       var annot = defaultAnnotation();
-      annotationUI.addAnnotations([annot]);
+      store.addAnnotations([annot]);
 
       clock.tick(ANCHOR_TIME_LIMIT);
 
-      assert.isTrue(annotationUI.getState().annotations[0].$anchorTimeout);
+      assert.isTrue(store.getState().annotations[0].$anchorTimeout);
     });
 
     it('does not set the timeout flag on annotations that do anchor within a time limit', function () {
       var annot = defaultAnnotation();
-      annotationUI.addAnnotations([annot]);
-      annotationUI.updateAnchorStatus({ [tagForID(annot.id)]: 'anchored' });
+      store.addAnnotations([annot]);
+      store.updateAnchorStatus({ [tagForID(annot.id)]: 'anchored' });
 
       clock.tick(ANCHOR_TIME_LIMIT);
 
-      assert.isFalse(annotationUI.getState().annotations[0].$anchorTimeout);
+      assert.isFalse(store.getState().annotations[0].$anchorTimeout);
     });
 
     it('does not attempt to modify orphan status if annotations are removed before anchoring timeout expires', function () {
       var annot = defaultAnnotation();
-      annotationUI.addAnnotations([annot]);
-      annotationUI.updateAnchorStatus({ [tagForID(annot.id)]: 'anchored' });
-      annotationUI.removeAnnotations([annot]);
+      store.addAnnotations([annot]);
+      store.updateAnchorStatus({ [tagForID(annot.id)]: 'anchored' });
+      store.removeAnnotations([annot]);
 
       assert.doesNotThrow(function () {
         clock.tick(ANCHOR_TIME_LIMIT);
@@ -208,12 +208,12 @@ describe('annotationUI', function () {
 
     it('does not expect annotations to anchor on the stream', function () {
       var isOrphan = function () {
-        return !!metadata.isOrphan(annotationUI.getState().annotations[0]);
+        return !!metadata.isOrphan(store.getState().annotations[0]);
       };
 
       var annot = defaultAnnotation();
-      annotationUI.setAppIsSidebar(false);
-      annotationUI.addAnnotations([annot]);
+      store.setAppIsSidebar(false);
+      store.addAnnotations([annot]);
 
       clock.tick(ANCHOR_TIME_LIMIT);
 
@@ -221,41 +221,41 @@ describe('annotationUI', function () {
     });
 
     it('initializes the $orphan field for new annotations', function () {
-      annotationUI.addAnnotations([newAnnotation()]);
-      assert.isFalse(annotationUI.getState().annotations[0].$orphan);
+      store.addAnnotations([newAnnotation()]);
+      assert.isFalse(store.getState().annotations[0].$orphan);
     });
 
     it('adds multiple new annotations', function () {
-      annotationUI.addAnnotations([fixtures.newPair[0]]);
-      annotationUI.addAnnotations([fixtures.newPair[1]]);
+      store.addAnnotations([fixtures.newPair[0]]);
+      store.addAnnotations([fixtures.newPair[1]]);
 
-      assert.equal(annotationUI.getState().annotations.length, 2);
+      assert.equal(store.getState().annotations.length, 2);
     });
   });
 
   describe('#removeAnnotations()', function () {
     it('removes annotations from the current state', function () {
       var annot = defaultAnnotation();
-      annotationUI.addAnnotations([annot]);
-      annotationUI.removeAnnotations([annot]);
-      assert.deepEqual(annotationUI.getState().annotations, []);
+      store.addAnnotations([annot]);
+      store.removeAnnotations([annot]);
+      assert.deepEqual(store.getState().annotations, []);
     });
 
     it('matches annotations to remove by ID', function () {
-      annotationUI.addAnnotations(fixtures.pair);
-      annotationUI.removeAnnotations([{id: fixtures.pair[0].id}]);
+      store.addAnnotations(fixtures.pair);
+      store.removeAnnotations([{id: fixtures.pair[0].id}]);
 
-      var ids = annotationUI.getState().annotations.map(function (a) {
+      var ids = store.getState().annotations.map(function (a) {
         return a.id;
       });
       assert.deepEqual(ids, [fixtures.pair[1].id]);
     });
 
     it('matches annotations to remove by tag', function () {
-      annotationUI.addAnnotations(fixtures.pair);
-      annotationUI.removeAnnotations([{$tag: fixtures.pair[0].$tag}]);
+      store.addAnnotations(fixtures.pair);
+      store.removeAnnotations([{$tag: fixtures.pair[0].$tag}]);
 
-      var tags = annotationUI.getState().annotations.map(function (a) {
+      var tags = store.getState().annotations.map(function (a) {
         return a.$tag;
       });
       assert.deepEqual(tags, [fixtures.pair[1].$tag]);
@@ -263,26 +263,26 @@ describe('annotationUI', function () {
 
     it('switches back to the Annotations tab when the last orphan is removed', function () {
       var orphan = Object.assign(defaultAnnotation(), {$orphan: true});
-      annotationUI.addAnnotations([orphan]);
-      annotationUI.selectTab(uiConstants.TAB_ORPHANS);
-      annotationUI.removeAnnotations([orphan]);
-      assert.equal(annotationUI.getState().selectedTab, uiConstants.TAB_ANNOTATIONS);
+      store.addAnnotations([orphan]);
+      store.selectTab(uiConstants.TAB_ORPHANS);
+      store.removeAnnotations([orphan]);
+      assert.equal(store.getState().selectedTab, uiConstants.TAB_ANNOTATIONS);
     });
   });
 
   describe('#clearAnnotations()', function () {
     it('removes all annotations', function () {
       var annot = defaultAnnotation();
-      annotationUI.addAnnotations([annot]);
-      annotationUI.clearAnnotations();
-      assert.deepEqual(annotationUI.getState().annotations, []);
+      store.addAnnotations([annot]);
+      store.clearAnnotations();
+      assert.deepEqual(store.getState().annotations, []);
     });
   });
 
   describe('#setShowHighlights()', function () {
     unroll('sets the visibleHighlights state flag to #state', function (testCase) {
-      annotationUI.setShowHighlights(testCase.state);
-      assert.equal(annotationUI.getState().visibleHighlights, testCase.state);
+      store.setShowHighlights(testCase.state);
+      assert.equal(store.getState().visibleHighlights, testCase.state);
     }, [
       {state: true},
       {state: false},
@@ -292,239 +292,239 @@ describe('annotationUI', function () {
   describe('#subscribe()', function () {
     it('notifies subscribers when the UI state changes', function () {
       var listener = sinon.stub();
-      annotationUI.subscribe(listener);
-      annotationUI.addAnnotations([annotationFixtures.defaultAnnotation()]);
+      store.subscribe(listener);
+      store.addAnnotations([annotationFixtures.defaultAnnotation()]);
       assert.called(listener);
     });
   });
 
   describe('#setForceVisible()', function () {
     it('sets the visibility of the annotation', function () {
-      annotationUI.setForceVisible('id1', true);
-      assert.deepEqual(annotationUI.getState().forceVisible, {id1:true});
+      store.setForceVisible('id1', true);
+      assert.deepEqual(store.getState().forceVisible, {id1:true});
     });
   });
 
   describe('#setCollapsed()', function () {
     it('sets the expanded state of the annotation', function () {
-      annotationUI.setCollapsed('parent_id', false);
-      assert.deepEqual(annotationUI.getState().expanded, {'parent_id': true});
+      store.setCollapsed('parent_id', false);
+      assert.deepEqual(store.getState().expanded, {'parent_id': true});
     });
   });
 
   describe('#focusAnnotations()', function () {
     it('adds the passed annotations to the focusedAnnotationMap', function () {
-      annotationUI.focusAnnotations([1, 2, 3]);
-      assert.deepEqual(annotationUI.getState().focusedAnnotationMap, {
+      store.focusAnnotations([1, 2, 3]);
+      assert.deepEqual(store.getState().focusedAnnotationMap, {
         1: true, 2: true, 3: true,
       });
     });
 
     it('replaces any annotations originally in the map', function () {
-      annotationUI.focusAnnotations([1]);
-      annotationUI.focusAnnotations([2, 3]);
-      assert.deepEqual(annotationUI.getState().focusedAnnotationMap, {
+      store.focusAnnotations([1]);
+      store.focusAnnotations([2, 3]);
+      assert.deepEqual(store.getState().focusedAnnotationMap, {
         2: true, 3: true,
       });
     });
 
     it('nulls the map if no annotations are focused', function () {
-      annotationUI.focusAnnotations([1]);
-      annotationUI.focusAnnotations([]);
-      assert.isNull(annotationUI.getState().focusedAnnotationMap);
+      store.focusAnnotations([1]);
+      store.focusAnnotations([]);
+      assert.isNull(store.getState().focusedAnnotationMap);
     });
   });
 
   describe('#hasSelectedAnnotations', function () {
     it('returns true if there are any selected annotations', function () {
-      annotationUI.selectAnnotations([1]);
-      assert.isTrue(annotationUI.hasSelectedAnnotations());
+      store.selectAnnotations([1]);
+      assert.isTrue(store.hasSelectedAnnotations());
     });
 
     it('returns false if there are no selected annotations', function () {
-      assert.isFalse(annotationUI.hasSelectedAnnotations());
+      assert.isFalse(store.hasSelectedAnnotations());
     });
   });
 
   describe('#isAnnotationSelected', function () {
     it('returns true if the id provided is selected', function () {
-      annotationUI.selectAnnotations([1]);
-      assert.isTrue(annotationUI.isAnnotationSelected(1));
+      store.selectAnnotations([1]);
+      assert.isTrue(store.isAnnotationSelected(1));
     });
 
     it('returns false if the id provided is not selected', function () {
-      annotationUI.selectAnnotations([1]);
-      assert.isFalse(annotationUI.isAnnotationSelected(2));
+      store.selectAnnotations([1]);
+      assert.isFalse(store.isAnnotationSelected(2));
     });
 
     it('returns false if there are no selected annotations', function () {
-      assert.isFalse(annotationUI.isAnnotationSelected(1));
+      assert.isFalse(store.isAnnotationSelected(1));
     });
   });
 
   describe('#selectAnnotations()', function () {
     it('adds the passed annotations to the selectedAnnotationMap', function () {
-      annotationUI.selectAnnotations([1, 2, 3]);
-      assert.deepEqual(annotationUI.getState().selectedAnnotationMap, {
+      store.selectAnnotations([1, 2, 3]);
+      assert.deepEqual(store.getState().selectedAnnotationMap, {
         1: true, 2: true, 3: true,
       });
     });
 
     it('replaces any annotations originally in the map', function () {
-      annotationUI.selectAnnotations([1]);
-      annotationUI.selectAnnotations([2, 3]);
-      assert.deepEqual(annotationUI.getState().selectedAnnotationMap, {
+      store.selectAnnotations([1]);
+      store.selectAnnotations([2, 3]);
+      assert.deepEqual(store.getState().selectedAnnotationMap, {
         2: true, 3: true,
       });
     });
 
     it('nulls the map if no annotations are selected', function () {
-      annotationUI.selectAnnotations([1]);
-      annotationUI.selectAnnotations([]);
-      assert.isNull(annotationUI.getState().selectedAnnotationMap);
+      store.selectAnnotations([1]);
+      store.selectAnnotations([]);
+      assert.isNull(store.getState().selectedAnnotationMap);
     });
   });
 
   describe('#toggleSelectedAnnotations()', function () {
     it('adds annotations missing from the selectedAnnotationMap', function () {
-      annotationUI.selectAnnotations([1, 2]);
-      annotationUI.toggleSelectedAnnotations([3, 4]);
-      assert.deepEqual(annotationUI.getState().selectedAnnotationMap, {
+      store.selectAnnotations([1, 2]);
+      store.toggleSelectedAnnotations([3, 4]);
+      assert.deepEqual(store.getState().selectedAnnotationMap, {
         1: true, 2: true, 3: true, 4: true,
       });
     });
 
     it('removes annotations already in the selectedAnnotationMap', function () {
-      annotationUI.selectAnnotations([1, 3]);
-      annotationUI.toggleSelectedAnnotations([1, 2]);
-      assert.deepEqual(annotationUI.getState().selectedAnnotationMap, { 2: true, 3: true });
+      store.selectAnnotations([1, 3]);
+      store.toggleSelectedAnnotations([1, 2]);
+      assert.deepEqual(store.getState().selectedAnnotationMap, { 2: true, 3: true });
     });
 
     it('nulls the map if no annotations are selected', function () {
-      annotationUI.selectAnnotations([1]);
-      annotationUI.toggleSelectedAnnotations([1]);
-      assert.isNull(annotationUI.getState().selectedAnnotationMap);
+      store.selectAnnotations([1]);
+      store.toggleSelectedAnnotations([1]);
+      assert.isNull(store.getState().selectedAnnotationMap);
     });
   });
 
   describe('#removeSelectedAnnotation()', function () {
     it('removes an annotation from the selectedAnnotationMap', function () {
-      annotationUI.selectAnnotations([1, 2, 3]);
-      annotationUI.removeSelectedAnnotation(2);
-      assert.deepEqual(annotationUI.getState().selectedAnnotationMap, {
+      store.selectAnnotations([1, 2, 3]);
+      store.removeSelectedAnnotation(2);
+      assert.deepEqual(store.getState().selectedAnnotationMap, {
         1: true, 3: true,
       });
     });
 
     it('nulls the map if no annotations are selected', function () {
-      annotationUI.selectAnnotations([1]);
-      annotationUI.removeSelectedAnnotation(1);
-      assert.isNull(annotationUI.getState().selectedAnnotationMap);
+      store.selectAnnotations([1]);
+      store.removeSelectedAnnotation(1);
+      assert.isNull(store.getState().selectedAnnotationMap);
     });
   });
 
   describe('#clearSelectedAnnotations()', function () {
     it('removes all annotations from the selection', function () {
-      annotationUI.selectAnnotations([1]);
-      annotationUI.clearSelectedAnnotations();
-      assert.isNull(annotationUI.getState().selectedAnnotationMap);
+      store.selectAnnotations([1]);
+      store.clearSelectedAnnotations();
+      assert.isNull(store.getState().selectedAnnotationMap);
     });
 
     it('clears the current search query', function () {
-      annotationUI.setFilterQuery('foo');
-      annotationUI.clearSelectedAnnotations();
-      assert.isNull(annotationUI.getState().filterQuery);
+      store.setFilterQuery('foo');
+      store.clearSelectedAnnotations();
+      assert.isNull(store.getState().filterQuery);
     });
   });
 
   describe('#setFilterQuery()', function () {
     it('sets the filter query', function () {
-      annotationUI.setFilterQuery('a-query');
-      assert.equal(annotationUI.getState().filterQuery, 'a-query');
+      store.setFilterQuery('a-query');
+      assert.equal(store.getState().filterQuery, 'a-query');
     });
 
     it('resets the force-visible and expanded sets', function () {
-      annotationUI.setForceVisible('123', true);
-      annotationUI.setCollapsed('456', false);
-      annotationUI.setFilterQuery('some-query');
-      assert.deepEqual(annotationUI.getState().forceVisible, {});
-      assert.deepEqual(annotationUI.getState().expanded, {});
+      store.setForceVisible('123', true);
+      store.setCollapsed('456', false);
+      store.setFilterQuery('some-query');
+      assert.deepEqual(store.getState().forceVisible, {});
+      assert.deepEqual(store.getState().expanded, {});
     });
   });
 
   describe('#highlightAnnotations()', function () {
     it('sets the highlighted annotations', function () {
-      annotationUI.highlightAnnotations(['id1', 'id2']);
-      assert.deepEqual(annotationUI.getState().highlighted, ['id1', 'id2']);
+      store.highlightAnnotations(['id1', 'id2']);
+      assert.deepEqual(store.getState().highlighted, ['id1', 'id2']);
     });
   });
 
   describe('#selectTab()', function () {
     it('sets the selected tab', function () {
-      annotationUI.selectTab(uiConstants.TAB_ANNOTATIONS);
-      assert.equal(annotationUI.getState().selectedTab, uiConstants.TAB_ANNOTATIONS);
+      store.selectTab(uiConstants.TAB_ANNOTATIONS);
+      assert.equal(store.getState().selectedTab, uiConstants.TAB_ANNOTATIONS);
     });
 
     it('ignores junk tag names', function () {
-      annotationUI.selectTab('flibbertigibbert');
-      assert.equal(annotationUI.getState().selectedTab, uiConstants.TAB_ANNOTATIONS);
+      store.selectTab('flibbertigibbert');
+      assert.equal(store.getState().selectedTab, uiConstants.TAB_ANNOTATIONS);
     });
 
     it('allows sorting annotations by time and document location', function () {
-      annotationUI.selectTab(uiConstants.TAB_ANNOTATIONS);
-      assert.deepEqual(annotationUI.getState().sortKeysAvailable, ['Newest', 'Oldest', 'Location']);
+      store.selectTab(uiConstants.TAB_ANNOTATIONS);
+      assert.deepEqual(store.getState().sortKeysAvailable, ['Newest', 'Oldest', 'Location']);
     });
 
     it('allows sorting page notes by time', function () {
-      annotationUI.selectTab(uiConstants.TAB_NOTES);
-      assert.deepEqual(annotationUI.getState().sortKeysAvailable, ['Newest', 'Oldest']);
+      store.selectTab(uiConstants.TAB_NOTES);
+      assert.deepEqual(store.getState().sortKeysAvailable, ['Newest', 'Oldest']);
     });
 
     it('allows sorting orphans by time and document location', function () {
-      annotationUI.selectTab(uiConstants.TAB_ORPHANS);
-      assert.deepEqual(annotationUI.getState().sortKeysAvailable, ['Newest', 'Oldest', 'Location']);
+      store.selectTab(uiConstants.TAB_ORPHANS);
+      assert.deepEqual(store.getState().sortKeysAvailable, ['Newest', 'Oldest', 'Location']);
     });
 
     it('sorts annotations by document location by default', function () {
-      annotationUI.selectTab(uiConstants.TAB_ANNOTATIONS);
-      assert.deepEqual(annotationUI.getState().sortKey, 'Location');
+      store.selectTab(uiConstants.TAB_ANNOTATIONS);
+      assert.deepEqual(store.getState().sortKey, 'Location');
     });
 
     it('sorts page notes from oldest to newest by default', function () {
-      annotationUI.selectTab(uiConstants.TAB_NOTES);
-      assert.deepEqual(annotationUI.getState().sortKey, 'Oldest');
+      store.selectTab(uiConstants.TAB_NOTES);
+      assert.deepEqual(store.getState().sortKey, 'Oldest');
     });
 
     it('sorts orphans by document location by default', function () {
-      annotationUI.selectTab(uiConstants.TAB_ORPHANS);
-      assert.deepEqual(annotationUI.getState().sortKey, 'Location');
+      store.selectTab(uiConstants.TAB_ORPHANS);
+      assert.deepEqual(store.getState().sortKey, 'Location');
     });
 
     it('does not reset the sort key unless necessary', function () {
       // Select the tab, setting sort key to 'Oldest', and then manually
       // override the sort key.
-      annotationUI.selectTab(uiConstants.TAB_NOTES);
-      annotationUI.setSortKey('Newest');
+      store.selectTab(uiConstants.TAB_NOTES);
+      store.setSortKey('Newest');
 
-      annotationUI.selectTab(uiConstants.TAB_NOTES);
+      store.selectTab(uiConstants.TAB_NOTES);
 
-      assert.equal(annotationUI.getState().sortKey, 'Newest');
+      assert.equal(store.getState().sortKey, 'Newest');
     });
   });
 
   describe('#updatingAnchorStatus', function () {
     it("updates the annotation's orphan flag", function () {
       var annot = defaultAnnotation();
-      annotationUI.addAnnotations([annot]);
-      annotationUI.updateAnchorStatus({ [tagForID(annot.id)]: 'orphan' });
-      assert.equal(annotationUI.getState().annotations[0].$orphan, true);
+      store.addAnnotations([annot]);
+      store.updateAnchorStatus({ [tagForID(annot.id)]: 'orphan' });
+      assert.equal(store.getState().annotations[0].$orphan, true);
     });
   });
 
   describe('selector functions', function () {
     // The individual state management modules in reducers/*.js define various
     // 'selector' functions for extracting data from the app state. These are
-    // then re-exported on the annotationUI module.
+    // then re-exported on the store module.
     it('re-exports selectors from reducers', function () {
       var selectors = [
         // Selection
@@ -541,7 +541,7 @@ describe('annotationUI', function () {
       ];
 
       selectors.forEach(function (fnName) {
-        assert.equal(typeof annotationUI[fnName], 'function', fnName + ' was exported');
+        assert.equal(typeof store[fnName], 'function', fnName + ' was exported');
       });
     });
   });

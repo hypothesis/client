@@ -244,7 +244,7 @@ describe('annotation', function() {
 
       $provide.value('analytics', fakeAnalytics);
       $provide.value('annotationMapper', fakeAnnotationMapper);
-      $provide.value('annotationUI', fakeAnnotationUI);
+      $provide.value('store', fakeAnnotationUI);
       $provide.value('api', fakeApi);
       $provide.value('drafts', fakeDrafts);
       $provide.value('flash', fakeFlash);

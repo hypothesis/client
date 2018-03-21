@@ -89,12 +89,12 @@ function store($rootScope, settings) {
     enhancer);
 
   // Expose helper functions that create actions as methods of the
-  // `annotationUI` service to make using them easier from app code. eg.
+  // `store` service to make using them easier from app code. eg.
   //
   // Instead of:
-  //   annotationUI.dispatch(annotations.actions.addAnnotations(annotations))
+  //   store.dispatch(annotations.actions.addAnnotations(annotations))
   // You can use:
-  //   annotationUI.addAnnotations(annotations)
+  //   store.addAnnotations(annotations)
   //
   var actionCreators = redux.bindActionCreators(Object.assign({},
     annotationsModule.actions,
@@ -105,13 +105,13 @@ function store($rootScope, settings) {
     viewerModule.actions
   ), store.dispatch);
 
-  // Expose selectors as methods of the `annotationUI` to make using them easier
+  // Expose selectors as methods of the `store` to make using them easier
   // from app code.
   //
   // eg. Instead of:
-  //   selection.isAnnotationSelected(annotationUI.getState(), id)
+  //   selection.isAnnotationSelected(store.getState(), id)
   // You can use:
-  //   annotationUI.isAnnotationSelected(id)
+  //   store.isAnnotationSelected(id)
   var selectors = util.bindSelectors(Object.assign({},
     annotationsModule.selectors,
     framesModule.selectors,

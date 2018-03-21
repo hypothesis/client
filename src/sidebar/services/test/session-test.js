@@ -60,7 +60,7 @@ describe('sidebar.session', function () {
 
     mock.module('h', {
       analytics: fakeAnalytics,
-      annotationUI: fakeAnnotationUI,
+      store: fakeAnnotationUI,
       api: fakeApi,
       auth: fakeAuth,
       flash: fakeFlash,

@@ -79,7 +79,7 @@ describe('rootThread', function () {
     };
 
     angular.module('app', [])
-      .value('annotationUI', fakeAnnotationUI)
+      .value('store', fakeAnnotationUI)
       .value('drafts', fakeDrafts)
       .value('searchFilter', fakeSearchFilter)
       .value('viewFilter', fakeViewFilter)

@@ -92,7 +92,7 @@ describe('sidebar.frame-sync', function () {
 
     angular.mock.module('app', {
       Discovery: FakeDiscovery,
-      annotationUI: fakeAnnotationUI,
+      store: fakeAnnotationUI,
       bridge: fakeBridge,
     });
 
