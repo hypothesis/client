@@ -547,7 +547,7 @@ function AnnotationController(
     if (!self.editing() || !self.isShared()) {
       return false;
     }
-    return self.group().public;
+    return self.group().type !== 'private';
   };
 
   init();
