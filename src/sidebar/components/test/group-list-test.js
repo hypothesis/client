@@ -8,8 +8,9 @@ var util = require('../../directive/test/util');
 describe('groupList', function () {
   var $window;
 
-  var GROUP_LINK = 'https://hypothes.is/groups/hdevs';
-  var PUBLIC_GROUP_LINK = 'https://hypothes.is/groups/pub';
+  var PRIVATE_GROUP_LINK = 'https://hypothes.is/groups/hdevs';
+  var OPEN_GROUP_LINK = 'https://hypothes.is/groups/pub';
+  var RESTRICTED_GROUP_LINK = 'https://hypothes.is/groups/restricto';
 
   var groups;
   var fakeGroups;
@@ -53,14 +54,19 @@ describe('groupList', function () {
 
     groups = [{
       id: 'public',
-      public: true,
+      name: 'Public Group',
       type: 'open',
-      url: PUBLIC_GROUP_LINK,
+      url: OPEN_GROUP_LINK,
     },{
       id: 'h-devs',
       name: 'Hypothesis Developers',
       type: 'private',
-      url: GROUP_LINK,
+      url: PRIVATE_GROUP_LINK,
+    }, {
+      id: 'restricto',
+      name: 'Hello Restricted',
+      type: 'restricted',
+      url: RESTRICTED_GROUP_LINK,
     }];
 
     fakeGroups = {
@@ -94,15 +100,27 @@ describe('groupList', function () {
     assert.equal(groupItems.length, groups.length + 1);
   });
 
+  it('should render appropriate group name link title per group type', function() {
+    var element = createGroupList();
+    var nameLinks = element.find('.group-name-link');
+    assert.equal(nameLinks.length, groups.length + 1);
+
+    assert.include(nameLinks[0].title, 'Show public annotations'); // Open
+    assert.include(nameLinks[1].title, 'Show and create annotations in'); // Private
+    assert.include(nameLinks[2].title, 'Show public annotations'); // Restricted
+  });
+
   it('should render share links', function () {
     var element = createGroupList();
     var shareLinks = element.find('.share-link-container');
-    assert.equal(shareLinks.length, 2);
+    assert.equal(shareLinks.length, groups.length);
 
     var link = element.find('.share-link');
-    assert.equal(link.length, 2);
-    assert.equal(link[0].href, PUBLIC_GROUP_LINK);
-    assert.equal(link[1].href, GROUP_LINK);
+    assert.equal(link.length, groups.length);
+
+    assert.equal(link[0].href, OPEN_GROUP_LINK);
+    assert.equal(link[1].href, PRIVATE_GROUP_LINK);
+    assert.equal(link[2].href, RESTRICTED_GROUP_LINK);
   });
 
   [{

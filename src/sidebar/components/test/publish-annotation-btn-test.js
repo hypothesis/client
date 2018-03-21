@@ -34,13 +34,37 @@ describe('publishAnnotationBtn', function () {
     element = util.createDirective(document, 'publishAnnotationBtn', {
       group: {
         name: 'Public',
-        type: 'public',
       },
       canPost: true,
       isShared: false,
       onSave: function () {},
       onSetPrivacy: function () {},
       onCancel: function () {},
+    });
+  });
+
+  [
+    {
+      groupType: 'open',
+      expectedIcon: 'public',
+    },
+    {
+      groupType: 'restricted',
+      expectedIcon: 'public',
+    },
+    {
+      groupType: 'private',
+      expectedIcon: 'group',
+    },
+  ].forEach(({ groupType, expectedIcon }) => {
+    it('should set the correct group-type icon class', function () {
+      element.ctrl.group = {
+        name: 'My Group',
+        type: groupType,
+      };
+      element.scope.$digest();
+      var iconElement = element.find('.group-icon-container > i');
+      assert.isTrue(iconElement.hasClass(`h-icon-${expectedIcon}`));
     });
   });
 
@@ -53,7 +77,6 @@ describe('publishAnnotationBtn', function () {
   it('should display "Post to Research Lab"', function () {
     element.ctrl.group = {
       name: 'Research Lab',
-      type: 'group',
     };
     element.ctrl.isShared = true;
     element.scope.$digest();
