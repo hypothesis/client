@@ -35,6 +35,17 @@ function GroupListController($window, analytics, groups, settings, serviceUrl) {
     groups.focus(groupId);
   };
 
+  /**
+   * Show the share link for the group if it is not a third-party group
+   * AND if the URL needed is present in the group object. We should be able
+   * to simplify this once the API is adjusted only to return the link
+   * when applicable.
+   */
+  this.shouldShowActivityLink = function (groupId) {
+    const group = groups.get(groupId);
+    return group.links && group.links.html && !this.isThirdPartyService;
+  };
+
   var svc = serviceConfig(settings);
   if (svc && svc.icon) {
     this.thirdPartyGroupIcon = svc.icon;

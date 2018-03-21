@@ -129,6 +129,22 @@ describe('groupList', function () {
     assert.equal(link[2].href, RESTRICTED_GROUP_LINK);
   });
 
+  it('should not render share links if they are not present', function () {
+    groups = [
+      {
+        type: 'private',
+      },
+      {
+        id: 'anOpenGroup',
+        type: 'open',
+        links: {},
+      },
+    ];
+    var element = createGroupList();
+    var links = element.find('.share-link-container');
+    assert.equal(links.length, 0);
+  });
+
   [{
     // Logged-in third party user.
     firstPartyAuthDomain: 'example.com',
