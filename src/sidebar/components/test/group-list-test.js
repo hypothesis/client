@@ -54,19 +54,25 @@ describe('groupList', function () {
 
     groups = [{
       id: 'public',
+      links: {
+        html: OPEN_GROUP_LINK,
+      },
       name: 'Public Group',
       type: 'open',
-      url: OPEN_GROUP_LINK,
     },{
       id: 'h-devs',
+      links: {
+        html: PRIVATE_GROUP_LINK,
+      },
       name: 'Hypothesis Developers',
       type: 'private',
-      url: PRIVATE_GROUP_LINK,
     }, {
       id: 'restricto',
+      links: {
+        html: RESTRICTED_GROUP_LINK,
+      },
       name: 'Hello Restricted',
       type: 'restricted',
-      url: RESTRICTED_GROUP_LINK,
     }];
 
     fakeGroups = {
