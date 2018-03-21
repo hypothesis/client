@@ -32,7 +32,7 @@ describe('sidebar.session', function () {
       track: sinon.stub(),
       events: require('../analytics')().events,
     };
-    var fakeAnnotationUI = {
+    var fakeStore = {
       getState: function () {
         return {session: state};
       },
@@ -60,7 +60,7 @@ describe('sidebar.session', function () {
 
     mock.module('h', {
       analytics: fakeAnalytics,
-      store: fakeAnnotationUI,
+      store: fakeStore,
       api: fakeApi,
       auth: fakeAuth,
       flash: fakeFlash,

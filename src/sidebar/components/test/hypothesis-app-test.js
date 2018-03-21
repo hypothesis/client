@@ -12,7 +12,7 @@ describe('sidebar.components.hypothesis-app', function () {
   var $scope = null;
   var $rootScope = null;
   var fakeAnnotationMetadata = null;
-  var fakeAnnotationUI = null;
+  var fakeStore = null;
   var fakeAnalytics = null;
   var fakeAuth = null;
   var fakeBridge = null;
@@ -64,7 +64,7 @@ describe('sidebar.components.hypothesis-app', function () {
   beforeEach(angular.mock.module('h'));
 
   beforeEach(angular.mock.module(function ($provide) {
-    fakeAnnotationUI = {
+    fakeStore = {
       tool: 'comment',
       clearSelectedAnnotations: sandbox.spy(),
     };
@@ -130,7 +130,7 @@ describe('sidebar.components.hypothesis-app', function () {
       call: sandbox.stub(),
     };
 
-    $provide.value('store', fakeAnnotationUI);
+    $provide.value('store', fakeStore);
     $provide.value('auth', fakeAuth);
     $provide.value('analytics', fakeAnalytics);
     $provide.value('drafts', fakeDrafts);

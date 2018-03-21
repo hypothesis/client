@@ -101,7 +101,7 @@ describe('annotation', function() {
     };
     var fakeAnalytics;
     var fakeAnnotationMapper;
-    var fakeAnnotationUI;
+    var fakeStore;
     var fakeDrafts;
     var fakeFlash;
     var fakeGroups;
@@ -177,7 +177,7 @@ describe('annotation', function() {
         flagAnnotation: sandbox.stub(),
       };
 
-      fakeAnnotationUI = {
+      fakeStore = {
         updateFlagStatus: sandbox.stub().returns(true),
       };
 
@@ -244,7 +244,7 @@ describe('annotation', function() {
 
       $provide.value('analytics', fakeAnalytics);
       $provide.value('annotationMapper', fakeAnnotationMapper);
-      $provide.value('store', fakeAnnotationUI);
+      $provide.value('store', fakeStore);
       $provide.value('api', fakeApi);
       $provide.value('drafts', fakeDrafts);
       $provide.value('flash', fakeFlash);

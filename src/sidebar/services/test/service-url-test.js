@@ -3,7 +3,7 @@
 var proxyquire = require('proxyquire');
 
 /** Return a fake store object. */
-function fakeAnnotationUI() {
+function fakeStore() {
   var links = null;
   return {
     updateLinks: function(newLinks) {
@@ -24,7 +24,7 @@ function createServiceUrl(linksPromise) {
     '../util/url-util': { replaceURLParams: replaceURLParams },
   });
 
-  var store = fakeAnnotationUI();
+  var store = fakeStore();
 
   var apiRoutes = {
     links: sinon.stub().returns(linksPromise),

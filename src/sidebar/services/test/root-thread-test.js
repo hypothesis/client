@@ -24,7 +24,7 @@ var fixtures = immutable({
 });
 
 describe('rootThread', function () {
-  var fakeAnnotationUI;
+  var fakeStore;
   var fakeBuildThread;
   var fakeDrafts;
   var fakeSearchFilter;
@@ -35,7 +35,7 @@ describe('rootThread', function () {
   var rootThread;
 
   beforeEach(function () {
-    fakeAnnotationUI = {
+    fakeStore = {
       state: {
         annotations: [],
         expanded: {},
@@ -79,7 +79,7 @@ describe('rootThread', function () {
     };
 
     angular.module('app', [])
-      .value('store', fakeAnnotationUI)
+      .value('store', fakeStore)
       .value('drafts', fakeDrafts)
       .value('searchFilter', fakeSearchFilter)
       .value('viewFilter', fakeViewFilter)
@@ -97,53 +97,53 @@ describe('rootThread', function () {
 
   describe('#thread', function () {
     it('returns the result of buildThread()', function() {
-      assert.equal(rootThread.thread(fakeAnnotationUI.state), fixtures.emptyThread);
+      assert.equal(rootThread.thread(fakeStore.state), fixtures.emptyThread);
     });
 
     it('passes loaded annotations to buildThread()', function () {
       var annotation = annotationFixtures.defaultAnnotation();
-      fakeAnnotationUI.state = Object.assign({}, fakeAnnotationUI.state, {
+      fakeStore.state = Object.assign({}, fakeStore.state, {
         annotations: [annotation],
       });
-      rootThread.thread(fakeAnnotationUI.state);
+      rootThread.thread(fakeStore.state);
       assert.calledWith(fakeBuildThread, sinon.match([annotation]));
     });
 
     it('passes the current selection to buildThread()', function () {
-      fakeAnnotationUI.state = Object.assign({}, fakeAnnotationUI.state, {
+      fakeStore.state = Object.assign({}, fakeStore.state, {
         selectedAnnotationMap: {id1: true, id2: true},
       });
-      rootThread.thread(fakeAnnotationUI.state);
+      rootThread.thread(fakeStore.state);
       assert.calledWith(fakeBuildThread, [], sinon.match({
         selected: ['id1', 'id2'],
       }));
     });
 
     it('passes the current expanded set to buildThread()', function () {
-      fakeAnnotationUI.state = Object.assign({}, fakeAnnotationUI.state, {
+      fakeStore.state = Object.assign({}, fakeStore.state, {
         expanded: {id1: true, id2: true},
       });
-      rootThread.thread(fakeAnnotationUI.state);
+      rootThread.thread(fakeStore.state);
       assert.calledWith(fakeBuildThread, [], sinon.match({
         expanded: {id1: true, id2: true},
       }));
     });
 
     it('passes the current force-visible set to buildThread()', function () {
-      fakeAnnotationUI.state = Object.assign({}, fakeAnnotationUI.state, {
+      fakeStore.state = Object.assign({}, fakeStore.state, {
         forceVisible: {id1: true, id2: true},
       });
-      rootThread.thread(fakeAnnotationUI.state);
+      rootThread.thread(fakeStore.state);
       assert.calledWith(fakeBuildThread, [], sinon.match({
         forceVisible: ['id1', 'id2'],
       }));
     });
 
     it('passes the highlighted set to buildThread()', function () {
-      fakeAnnotationUI.state = Object.assign({}, fakeAnnotationUI.state, {
+      fakeStore.state = Object.assign({}, fakeStore.state, {
         highlighted: ['id1', 'id2'],
       });
-      rootThread.thread(fakeAnnotationUI.state);
+      rootThread.thread(fakeStore.state);
       assert.calledWith(fakeBuildThread, [], sinon.match({
         highlighted: ['id1', 'id2'],
       }));
@@ -179,11 +179,11 @@ describe('rootThread', function () {
       }];
 
       fakeBuildThread.reset();
-      fakeAnnotationUI.state = Object.assign({}, fakeAnnotationUI.state, {
+      fakeStore.state = Object.assign({}, fakeStore.state, {
         sortKey: testCase.order,
         sortKeysAvailable: [testCase.order],
       });
-      rootThread.thread(fakeAnnotationUI.state);
+      rootThread.thread(fakeStore.state);
       var sortCompareFn = fakeBuildThread.args[0][1].sortCompareFn;
       var actualOrder = sortBy(annotations, sortCompareFn).map(function (annot) {
         return annotations.indexOf(annot);
@@ -200,10 +200,10 @@ describe('rootThread', function () {
     it('filter matches only annotations when Annotations tab is selected', function () {
       fakeBuildThread.reset();
 
-      fakeAnnotationUI.state = Object.assign({}, fakeAnnotationUI.state,
+      fakeStore.state = Object.assign({}, fakeStore.state,
         {selectedTab: uiConstants.TAB_ANNOTATIONS});
 
-      rootThread.thread(fakeAnnotationUI.state);
+      rootThread.thread(fakeStore.state);
       var threadFilterFn = fakeBuildThread.args[0][1].threadFilterFn;
 
       var annotation = {target: [{ selector: {} }]};
@@ -213,10 +213,10 @@ describe('rootThread', function () {
     it('filter matches only notes when Notes tab is selected', function () {
       fakeBuildThread.reset();
 
-      fakeAnnotationUI.state = Object.assign({}, fakeAnnotationUI.state,
+      fakeStore.state = Object.assign({}, fakeStore.state,
         {selectedTab: uiConstants.TAB_NOTES});
 
-      rootThread.thread(fakeAnnotationUI.state);
+      rootThread.thread(fakeStore.state);
       var threadFilterFn = fakeBuildThread.args[0][1].threadFilterFn;
 
       assert.isTrue(threadFilterFn({annotation: {target: [{}]}}));
@@ -225,10 +225,10 @@ describe('rootThread', function () {
     it('filter matches only orphans when Orphans tab is selected', function () {
       fakeBuildThread.reset();
 
-      fakeAnnotationUI.state = Object.assign({}, fakeAnnotationUI.state,
+      fakeStore.state = Object.assign({}, fakeStore.state,
         {selectedTab: uiConstants.TAB_ORPHANS});
 
-      rootThread.thread(fakeAnnotationUI.state);
+      rootThread.thread(fakeStore.state);
       var threadFilterFn = fakeBuildThread.args[0][1].threadFilterFn;
 
       var orphan = Object.assign(annotationFixtures.defaultAnnotation(),
@@ -240,10 +240,10 @@ describe('rootThread', function () {
     it('filter does not match notes when Annotations tab is selected', function () {
       fakeBuildThread.reset();
 
-      fakeAnnotationUI.state = Object.assign({}, fakeAnnotationUI.state,
+      fakeStore.state = Object.assign({}, fakeStore.state,
         {selectedTab: uiConstants.TAB_ANNOTATIONS});
 
-      rootThread.thread(fakeAnnotationUI.state);
+      rootThread.thread(fakeStore.state);
       var threadFilterFn = fakeBuildThread.args[0][1].threadFilterFn;
 
       assert.isFalse(threadFilterFn({annotation: {target: [{}]}}));
@@ -252,10 +252,10 @@ describe('rootThread', function () {
     it('filter does not match orphans when Annotations tab is selected', function () {
       fakeBuildThread.reset();
 
-      fakeAnnotationUI.state = Object.assign({}, fakeAnnotationUI.state,
+      fakeStore.state = Object.assign({}, fakeStore.state,
         {selectedTab: uiConstants.TAB_ANNOTATIONS});
 
-      rootThread.thread(fakeAnnotationUI.state);
+      rootThread.thread(fakeStore.state);
       var threadFilterFn = fakeBuildThread.args[0][1].threadFilterFn;
 
       assert.isFalse(threadFilterFn({annotation: {$orphan: true}}));
@@ -263,10 +263,10 @@ describe('rootThread', function () {
 
     it('does not filter annotations when not in the sidebar', function () {
       fakeBuildThread.reset();
-      fakeAnnotationUI.state = Object.assign({}, fakeAnnotationUI.state,
+      fakeStore.state = Object.assign({}, fakeStore.state,
         {isSidebar: false});
 
-      rootThread.thread(fakeAnnotationUI.state);
+      rootThread.thread(fakeStore.state);
       var threadFilterFn = fakeBuildThread.args[0][1].threadFilterFn;
 
       // There should be no thread filter function on the stream and standalone
@@ -281,9 +281,9 @@ describe('rootThread', function () {
       var filters = [{any: {terms: ['queryterm']}}];
       var annotation = annotationFixtures.defaultAnnotation();
       fakeSearchFilter.generateFacetedFilter.returns(filters);
-      fakeAnnotationUI.state = Object.assign({}, fakeAnnotationUI.state,
+      fakeStore.state = Object.assign({}, fakeStore.state,
         {filterQuery: 'queryterm'});
-      rootThread.thread(fakeAnnotationUI.state);
+      rootThread.thread(fakeStore.state);
       var filterFn = fakeBuildThread.args[0][1].filterFn;
 
       fakeViewFilter.filter.returns([annotation]);
@@ -299,8 +299,8 @@ describe('rootThread', function () {
     unroll('adds or updates annotations when #event event occurs', function (testCase) {
       $rootScope.$broadcast(testCase.event, testCase.annotations);
       var annotations = [].concat(testCase.annotations);
-      assert.notCalled(fakeAnnotationUI.removeAnnotations);
-      assert.calledWith(fakeAnnotationUI.addAnnotations, sinon.match(annotations));
+      assert.notCalled(fakeStore.removeAnnotations);
+      assert.calledWith(fakeStore.addAnnotations, sinon.match(annotations));
     }, [
       {event: events.BEFORE_ANNOTATION_CREATED, annotations: annot},
       {event: events.ANNOTATION_CREATED, annotations: annot},
@@ -311,13 +311,13 @@ describe('rootThread', function () {
     it('expands the parents of new annotations', function () {
       var reply = annotationFixtures.oldReply();
       $rootScope.$broadcast(events.BEFORE_ANNOTATION_CREATED, reply);
-      assert.calledWith(fakeAnnotationUI.setCollapsed, reply.references[0], false);
+      assert.calledWith(fakeStore.setCollapsed, reply.references[0], false);
     });
 
     unroll('removes annotations when #event event occurs', function (testCase) {
       $rootScope.$broadcast(testCase.event, testCase.annotations);
       var annotations = [].concat(testCase.annotations);
-      assert.calledWith(fakeAnnotationUI.removeAnnotations, sinon.match(annotations));
+      assert.calledWith(fakeStore.removeAnnotations, sinon.match(annotations));
     }, [
       {event: events.ANNOTATION_DELETED, annotations: annot},
       {event: events.ANNOTATIONS_UNLOADED, annotations: [annot]},
@@ -325,7 +325,7 @@ describe('rootThread', function () {
 
     it('deselects deleted annotations', function () {
       $rootScope.$broadcast(events.ANNOTATION_DELETED, annot);
-      assert.calledWith(fakeAnnotationUI.removeSelectedAnnotation, annot.id);
+      assert.calledWith(fakeStore.removeSelectedAnnotation, annot.id);
     });
 
     describe('when a new annotation is created', function () {
@@ -336,7 +336,7 @@ describe('rootThread', function () {
         $rootScope.$on(events.ANNOTATION_DELETED, onDelete);
 
         existingNewAnnot = {$tag: 'a-new-tag'};
-        fakeAnnotationUI.state.annotations.push(existingNewAnnot);
+        fakeStore.state.annotations.push(existingNewAnnot);
       });
 
       it('removes drafts for new and empty annotations', function () {
@@ -371,7 +371,7 @@ describe('rootThread', function () {
 
       it('does not remove saved annotations', function () {
         var ann = annotationFixtures.defaultAnnotation();
-        fakeAnnotationUI.state.annotations = [ann];
+        fakeStore.state.annotations = [ann];
 
         $rootScope.$broadcast(events.BEFORE_ANNOTATION_CREATED,
           annotationFixtures.newAnnotation());
@@ -384,30 +384,30 @@ describe('rootThread', function () {
 
   describe('when the focused group changes', function () {
     it('moves new annotations to the focused group', function () {
-      fakeAnnotationUI.state.annotations = [{$tag: 'a-tag'}];
+      fakeStore.state.annotations = [{$tag: 'a-tag'}];
 
       $rootScope.$broadcast(events.GROUP_FOCUSED, 'private-group');
 
-      assert.calledWith(fakeAnnotationUI.addAnnotations, sinon.match([{
+      assert.calledWith(fakeStore.addAnnotations, sinon.match([{
         $tag: 'a-tag',
         group: 'private-group',
       }]));
     });
 
     it('does not move replies to the new group', function () {
-      fakeAnnotationUI.state.annotations = [annotationFixtures.newReply()];
+      fakeStore.state.annotations = [annotationFixtures.newReply()];
 
       $rootScope.$broadcast(events.GROUP_FOCUSED, 'private-group');
 
-      assert.notCalled(fakeAnnotationUI.addAnnotations);
+      assert.notCalled(fakeStore.addAnnotations);
     });
 
     it('does not move saved annotations to the new group', function () {
-      fakeAnnotationUI.state.annotations = [annotationFixtures.defaultAnnotation()];
+      fakeStore.state.annotations = [annotationFixtures.defaultAnnotation()];
 
       $rootScope.$broadcast(events.GROUP_FOCUSED, 'private-group');
 
-      assert.notCalled(fakeAnnotationUI.addAnnotations);
+      assert.notCalled(fakeStore.addAnnotations);
     });
   });
 });

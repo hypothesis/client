@@ -10,7 +10,7 @@ var moderatedAnnotation = fixtures.moderatedAnnotation;
 
 describe('moderationBanner', function () {
   var bannerEl;
-  var fakeAnnotationUI;
+  var fakeStore;
   var fakeFlash;
   var fakeApi;
 
@@ -20,7 +20,7 @@ describe('moderationBanner', function () {
   });
 
   beforeEach(function () {
-    fakeAnnotationUI = {
+    fakeStore = {
       hideAnnotation: sinon.stub(),
       unhideAnnotation: sinon.stub(),
     };
@@ -37,7 +37,7 @@ describe('moderationBanner', function () {
     };
 
     angular.mock.module('app', {
-      store: fakeAnnotationUI,
+      store: fakeStore,
       api: fakeApi,
       flash: fakeFlash,
     });

@@ -13,7 +13,7 @@ var sessionWithThreeGroups = function() {
 };
 
 describe('groups', function() {
-  var fakeAnnotationUI;
+  var fakeStore;
   var fakeIsSidebar;
   var fakeSession;
   var fakeSettings;
@@ -26,7 +26,7 @@ describe('groups', function() {
   beforeEach(function() {
     sandbox = sinon.sandbox.create();
 
-    fakeAnnotationUI = fakeReduxStore({
+    fakeStore = fakeReduxStore({
       searchUris: ['http://example.org'],
     },{
       searchUris() {
@@ -77,7 +77,7 @@ describe('groups', function() {
   });
 
   function service() {
-    return groups(fakeRootScope, fakeAnnotationUI, fakeApi, fakeIsSidebar, fakeLocalStorage, fakeServiceUrl,
+    return groups(fakeRootScope, fakeStore, fakeApi, fakeIsSidebar, fakeLocalStorage, fakeServiceUrl,
       fakeSession, fakeSettings);
   }
 
@@ -134,9 +134,9 @@ describe('groups', function() {
       it('waits for the document URL to be determined', () => {
         var svc = service();
 
-        fakeAnnotationUI.setState({ searchUris: [] });
+        fakeStore.setState({ searchUris: [] });
         var loaded = svc.load();
-        fakeAnnotationUI.setState({ searchUris: ['https://asite.com'] });
+        fakeStore.setState({ searchUris: ['https://asite.com'] });
 
         return loaded.then(() => {
           assert.calledWith(fakeApi.groups.list, { document_uri: 'https://asite.com' });
@@ -150,7 +150,7 @@ describe('groups', function() {
       });
 
       it('does not wait for the document URL', () => {
-        fakeAnnotationUI.setState({ searchUris: [] });
+        fakeStore.setState({ searchUris: [] });
         var svc = service();
         return svc.load().then(() => {
           assert.calledWith(fakeApi.groups.list, {});

@@ -8,7 +8,7 @@ var util = require('../../directive/test/util');
 describe('newNoteBtn', function () {
   var $rootScope;
   var sandbox = sinon.sandbox.create();
-  var fakeAnnotationUI = {
+  var fakeStore = {
     frames: sinon.stub().returns([{ id: null, uri: 'www.example.org'}, { id: '1', uri: 'www.example.org'}]),
   };
 
@@ -25,7 +25,7 @@ describe('newNoteBtn', function () {
     var fakeSettings = { theme: 'clean' };
 
     angular.mock.module('app', {
-      store: fakeAnnotationUI,
+      store: fakeStore,
       features: fakeFeatures,
       settings: fakeSettings,
     });
@@ -45,7 +45,7 @@ describe('newNoteBtn', function () {
       uri: 'www.example.org',
     };
     var elem = util.createDirective(document, 'newNoteBtn', {
-      store: fakeAnnotationUI,
+      store: fakeStore,
     });
     sandbox.spy($rootScope, '$broadcast');
     elem.ctrl.onNewNoteBtnClick();
