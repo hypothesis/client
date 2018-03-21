@@ -6,7 +6,7 @@ var EventEmitter = require('tiny-emitter');
 var annotationFixtures = require('../../test/annotation-fixtures');
 var events = require('../../events');
 var FrameSync = require('../frame-sync').default;
-var fakeStore = require('../../test/fake-redux-store');
+var createFakeStore = require('../../test/fake-redux-store');
 var formatAnnot = require('../frame-sync').formatAnnot;
 var uiConstants = require('../../ui-constants');
 
@@ -62,7 +62,7 @@ describe('sidebar.frame-sync', function () {
   });
 
   beforeEach(function () {
-    fakeStore = fakeStore({annotations: []}, {
+    fakeStore = createFakeStore({annotations: []}, {
       connectFrame: sinon.stub(),
       destroyFrame: sinon.stub(),
       findIDsForTags: sinon.stub(),
