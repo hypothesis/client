@@ -2,7 +2,7 @@
 
 var viewer = require('../viewer');
 
-var util = require('../util');
+var util = require('../../util');
 
 var { init, actions, selectors } = viewer;
 var update = util.createReducer(viewer.update);

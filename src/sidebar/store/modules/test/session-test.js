@@ -2,7 +2,7 @@
 
 var session = require('../session');
 
-var util = require('../util');
+var util = require('../../util');
 
 var { init, actions, selectors } = session;
 var update = util.createReducer(session.update);

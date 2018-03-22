@@ -2,8 +2,8 @@
 
 var frames = require('../frames');
 var session = require('../session');
-var util = require('../util');
-var unroll = require('../../../shared/test/util').unroll;
+var util = require('../../util');
+var unroll = require('../../../../shared/test/util').unroll;
 
 var actions = frames.actions;
 var update = util.createReducer(frames.update);

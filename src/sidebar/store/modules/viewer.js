@@ -1,6 +1,6 @@
 'use strict';
 
-var util = require('./util');
+var util = require('../util');
 
 /**
  * This module defines actions and state related to the display mode of the

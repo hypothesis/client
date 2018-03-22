@@ -3,7 +3,7 @@
 /**
  * This module defines the main update function (or 'reducer' in Redux's
  * terminology) that handles app state updates. For an overview of how state
- * management in Redux works, see the comments at the top of `annotation-ui.js`
+ * management in Redux works, see the comments at the top of `store/index.js`
  *
  * Each sub-module in this folder defines:
  *
@@ -23,7 +23,7 @@ var links = require('./links');
 var selection = require('./selection');
 var session = require('./session');
 var viewer = require('./viewer');
-var util = require('./util');
+var util = require('../util');
 
 function init(settings) {
   return Object.assign(

@@ -56,7 +56,7 @@ describe('sidebar.components.sidebar-content', function () {
 
   before(function () {
     angular.module('h', [])
-      .service('annotationUI', require('../../services/annotation-ui'))
+      .service('annotationUI', require('../../store'))
       .component('sidebarContent', proxyquire('../sidebar-content',
         noCallThru({
           angular: angular,

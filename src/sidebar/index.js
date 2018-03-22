@@ -186,7 +186,6 @@ module.exports = angular.module('h', [
 
   .service('analytics', require('./services/analytics'))
   .service('annotationMapper', require('./services/annotation-mapper'))
-  .service('annotationUI', require('./services/annotation-ui'))
   .service('api', require('./services/api'))
   .service('apiRoutes', require('./services/api-routes'))
   .service('auth', require('./services/oauth-auth'))
@@ -209,6 +208,10 @@ module.exports = angular.module('h', [
   .service('unicode', require('./services/unicode'))
   .service('viewFilter', require('./services/view-filter'))
 
+  // Redux store
+  .service('annotationUI', require('./store'))
+
+  // Utilities
   .value('Discovery', require('../shared/discovery'))
   .value('ExcerptOverflowMonitor', require('./util/excerpt-overflow-monitor'))
   .value('OAuthClient', require('./util/oauth-client'))
