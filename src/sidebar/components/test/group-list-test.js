@@ -54,19 +54,25 @@ describe('groupList', function () {
 
     groups = [{
       id: 'public',
+      links: {
+        html: OPEN_GROUP_LINK,
+      },
       name: 'Public Group',
       type: 'open',
-      url: OPEN_GROUP_LINK,
     },{
       id: 'h-devs',
+      links: {
+        html: PRIVATE_GROUP_LINK,
+      },
       name: 'Hypothesis Developers',
       type: 'private',
-      url: PRIVATE_GROUP_LINK,
     }, {
       id: 'restricto',
+      links: {
+        html: RESTRICTED_GROUP_LINK,
+      },
       name: 'Hello Restricted',
       type: 'restricted',
-      url: RESTRICTED_GROUP_LINK,
     }];
 
     fakeGroups = {
@@ -121,6 +127,22 @@ describe('groupList', function () {
     assert.equal(link[0].href, OPEN_GROUP_LINK);
     assert.equal(link[1].href, PRIVATE_GROUP_LINK);
     assert.equal(link[2].href, RESTRICTED_GROUP_LINK);
+  });
+
+  it('should not render share links if they are not present', function () {
+    groups = [
+      {
+        type: 'private',
+      },
+      {
+        id: 'anOpenGroup',
+        type: 'open',
+        links: {},
+      },
+    ];
+    var element = createGroupList();
+    var links = element.find('.share-link-container');
+    assert.equal(links.length, 0);
   });
 
   [{

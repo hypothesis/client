@@ -43,9 +43,9 @@
                {{group.name}}
             </a>
           </div>
-          <div class="share-link-container" ng-click="$event.stopPropagation()" ng-if="!vm.isThirdPartyService">
+          <div class="share-link-container" ng-click="$event.stopPropagation()" ng-if="vm.shouldShowActivityLink(group.id)">
             <a class="share-link"
-               href="{{group.url}}"
+               href="{{group.links.html}}"
                target="_blank"
                ng-click="vm.viewGroupActivity()">
               View group activity
