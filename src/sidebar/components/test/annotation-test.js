@@ -20,12 +20,17 @@ var groupFixtures = {
   private: {
     id: 'private',
     url: 'https://example.org/g/private',
-    public: false,
+    type: 'private',
   },
-  public: {
+  open: {
     id: 'world',
-    url: 'https://example.org/g/public',
-    public: true,
+    url: 'https://example.org/g/open',
+    type: 'open',
+  },
+  restricted: {
+    id: 'restricto',
+    url: 'https://example.org/g/restricto',
+    type: 'restricted',
   },
 };
 
@@ -213,8 +218,8 @@ describe('annotation', function() {
       fakeServiceUrl = sinon.stub();
 
       fakeGroups = {
-        focused: sinon.stub().returns(groupFixtures.public),
-        get: sinon.stub().returns(groupFixtures.public),
+        focused: sinon.stub().returns(groupFixtures.open),
+        get: sinon.stub().returns(groupFixtures.open),
       };
 
       fakeSettings = {
@@ -878,12 +883,12 @@ describe('annotation', function() {
       }, [{
         case_: 'the annotation is not being edited',
         draft: null,
-        group: groupFixtures.public,
+        group: groupFixtures.open,
         expected: false,
       },{
         case_: 'the draft is private',
         draft: draftFixtures.private,
-        group: groupFixtures.public,
+        group: groupFixtures.open,
         expected: false,
       },{
         case_: 'the group is private',
@@ -891,9 +896,14 @@ describe('annotation', function() {
         group: groupFixtures.private,
         expected: false,
       },{
-        case_: 'the draft is shared and the group is public',
+        case_: 'the draft is shared and the group is open',
         draft: draftFixtures.shared,
-        group: groupFixtures.public,
+        group: groupFixtures.open,
+        expected: true,
+      },{
+        case_: 'the draft is shared and the group is restricted',
+        draft: draftFixtures.shared,
+        group: groupFixtures.restricted,
         expected: true,
       }]);
     });
