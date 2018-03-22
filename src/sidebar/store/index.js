@@ -31,21 +31,18 @@
  *  3. Checking that the UI correctly presents a given state.
  */
 
-var redux = require('redux');
-
 // `.default` is needed because 'redux-thunk' is built as an ES2015 module
 var thunk = require('redux-thunk').default;
 
-var modules = require('./modules');
-var annotationsModule = require('./modules/annotations');
-var framesModule = require('./modules/frames');
-var linksModule = require('./modules/links');
-var selectionModule = require('./modules/selection');
-var sessionModule = require('./modules/session');
-var viewerModule = require('./modules/viewer');
-
+var createStore = require('./create-store');
 var debugMiddleware = require('./debug-middleware');
-var util = require('./util');
+
+var annotations = require('./modules/annotations');
+var frames = require('./modules/frames');
+var links = require('./modules/links');
+var selection= require('./modules/selection');
+var session = require('./modules/session');
+var viewer = require('./modules/viewer');
 
 /**
  * Redux middleware which triggers an Angular change-detection cycle
@@ -73,55 +70,33 @@ function angularDigestMiddleware($rootScope) {
 }
 
 /**
- * Create the Redux store for the application.
+ * Factory which creates the sidebar app's state store.
+ *
+ * Returns a Redux store augmented with methods for each action and selector in
+ * the individual state modules. ie. `store.actionName(args)` dispatches an
+ * action through the store and `store.selectorName(args)` invokes a selector
+ * passing the current state of the store.
  */
 // @ngInject
 function store($rootScope, settings) {
-  var enhancer = redux.applyMiddleware(
+  var middleware = [
     // The `thunk` middleware handles actions which are functions.
     // This is used to implement actions which have side effects or are
     // asynchronous (see https://github.com/gaearon/redux-thunk#motivation)
     thunk,
     debugMiddleware,
-    angularDigestMiddleware.bind(null, $rootScope)
-  );
-  var store = redux.createStore(modules.update, modules.init(settings),
-    enhancer);
+    angularDigestMiddleware.bind(null, $rootScope),
+  ];
 
-  // Expose helper functions that create actions as methods of the
-  // `store` service to make using them easier from app code. eg.
-  //
-  // Instead of:
-  //   store.dispatch(annotations.actions.addAnnotations(annotations))
-  // You can use:
-  //   store.addAnnotations(annotations)
-  //
-  var actionCreators = redux.bindActionCreators(Object.assign({},
-    annotationsModule.actions,
-    framesModule.actions,
-    linksModule.actions,
-    selectionModule.actions,
-    sessionModule.actions,
-    viewerModule.actions
-  ), store.dispatch);
-
-  // Expose selectors as methods of the `store` to make using them easier
-  // from app code.
-  //
-  // eg. Instead of:
-  //   selection.isAnnotationSelected(store.getState(), id)
-  // You can use:
-  //   store.isAnnotationSelected(id)
-  var selectors = util.bindSelectors(Object.assign({},
-    annotationsModule.selectors,
-    framesModule.selectors,
-    linksModule.selectors,
-    selectionModule.selectors,
-    sessionModule.selectors,
-    viewerModule.selectors
-  ), store.getState);
-
-  return Object.assign(store, actionCreators, selectors);
+  var modules = [
+    annotations,
+    frames,
+    links,
+    selection,
+    session,
+    viewer,
+  ];
+  return createStore(modules, [settings], middleware);
 }
 
 module.exports = store;

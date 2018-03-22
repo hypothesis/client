@@ -1,0 +1,73 @@
+'use strict';
+
+const createStore = require('../create-store');
+
+const counterModule = {
+  init(value = 0) {
+    return { count: value };
+  },
+
+  update: {
+    ['INCREMENT_COUNTER'](state, action) {
+      return { count: state.count + action.amount };
+    },
+  },
+
+  actions: {
+    increment(amount) {
+      return { type: 'INCREMENT_COUNTER', amount };
+    },
+  },
+
+  selectors: {
+    getCount(state) {
+      return state.count;
+    },
+  },
+};
+
+function counterStore(initArgs = [], middleware = []) {
+  return createStore([counterModule], initArgs, middleware);
+}
+
+describe('sidebar.store.create-store', () => {
+  it('returns a working Redux store', () => {
+    const store = counterStore();
+    store.dispatch(counterModule.actions.increment(5));
+    assert.equal(store.getState().count, 5);
+  });
+
+  it('passes initial state args to `init` function', () => {
+    const store = counterStore([21]);
+    assert.equal(store.getState().count, 21);
+  });
+
+  it('adds actions as methods to the store', () => {
+    const store = counterStore();
+    store.increment(5);
+    assert.equal(store.getState().count, 5);
+  });
+
+  it('adds selectors as methods to the store', () => {
+    const store = counterStore();
+    store.dispatch(counterModule.actions.increment(5));
+    assert.equal(store.getCount(), 5);
+  });
+
+  it('applies middleware', () => {
+    const actions = [];
+    const middleware = () => {
+      return next => {
+        return action => {
+          actions.push(action);
+          return next(action);
+        };
+      };
+    };
+    const store = counterStore([], [middleware]);
+
+    store.increment(5);
+
+    assert.deepEqual(actions, [{ type: 'INCREMENT_COUNTER', amount: 5 }]);
+  });
+});
