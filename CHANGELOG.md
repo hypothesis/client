@@ -4,6 +4,34 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+### Changed
+
+- Rename src/sidebar/{store => services/api}
+  ([#691](https://github.com/hypothesis/client/pull/691)).
+
+- Move sidebar services to src/sidebar/services/
+  ([#692](https://github.com/hypothesis/client/pull/692)).
+
+- Move away from `public` property in application components
+  ([#693](https://github.com/hypothesis/client/pull/693)).
+
+- Update icon for restricted groups in publish-annotation-button
+  ([#699](https://github.com/hypothesis/client/pull/699)).
+
+- Remove `group.public` property from annotation component
+  ([#697](https://github.com/hypothesis/client/pull/697)).
+
+- Remove reference to `group.url`
+  ([#698](https://github.com/hypothesis/client/pull/698)).
+
+- Changed background to selected element in PDF.js to visualize the searched
+  content ([#696](https://github.com/hypothesis/client/pull/696)).
+
+- Move Redux modules and entry point to `store/` directory
+  ([#694](https://github.com/hypothesis/client/pull/694)).
+
 ## [1.73.0] - 2018-03-16
 
 ### Changed
