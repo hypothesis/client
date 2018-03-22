@@ -6,3 +6,8 @@
   ::selection { background: rgba(0, 0, 255, .2); }
   ::-moz-selection { background: rgba(0 , 0 , 255, .2); }
 }
+
+// When using search funcionality of PDF.js the matches should highlight the content but not cover it. Fix for #648
+.textLayer .highlight.selected {
+  background-color: rgba(0, 100, 0, 0.5);
+}
