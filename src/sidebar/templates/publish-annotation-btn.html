@@ -1,3 +1,9 @@
+<button class="publish-annotation-cancel-btn btn-clean"
+        ng-click="vm.onCancel()"
+        title="{{'Cancel changes to this feedback' | translate}}"
+        >
+  <i class="h-icon-cancel-outline publish-annotation-cancel-btn__icon btn-icon"></i> {{'Cancel' | translate}}
+</button>
 <div dropdown="" class="publish-annotation-btn__btn" is-open="vm.showDropdown" keyboard-nav>
   <dropdown-menu-btn
     label="('Post to' | translate) + ' ' + vm.publishDestination()"
@@ -36,9 +42,3 @@
     </ul>
   </div>
 </div>
-<button class="publish-annotation-cancel-btn btn-clean"
-        ng-click="vm.onCancel()"
-        title="{{'Cancel changes to this feedback' | translate}}"
-        >
-  <i class="h-icon-cancel-outline publish-annotation-cancel-btn__icon btn-icon"></i> {{'Cancel' | translate}}
-</button>
