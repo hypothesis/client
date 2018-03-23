@@ -3,16 +3,47 @@
 
 .app-content-wrapper {
   padding-top: 9px;
+  background-color: #ededed !important;
+
+//sidebar header
+.selection-tabs{
+
+  padding-top: 45px; //remove once topbar is gone
+
+  .selection-tabs__count {
+    display: none;
+  }
 }
 
-//card states
+
+//card formatting
 .thread-list {
 
-  //default layout
+  //base card styles
   .thread-list__card {
 
+    box-shadow: none;
+    border-radius: none;
+
+    .h-icon-visibility-off {
+      display: none;
+    }
+
+    .annotation-quote {
+      border-left: 2px solid #d3d3d3;
+    }
+
+    .excerpt__toggle-link a {
+      color: #4589db;
+    }
+
+    .publish-annotation-cancel-btn {
+      color: #3e87d7;
+    }
+
     .annotation-header {
-      display: inline-block;
+      display: inline-flex;
+      flex-direction: column;
     }
 
     //hiding this for now
@@ -21,32 +52,58 @@
     }
 
     .annotation-footer {
-      display: none;
       margin-top: 0;
       float: right;
+
+      .annotation-actions {
+        padding-top: 5px;
+      }
+
+      .h-icon-cancel-outline:before {
+        content: "";
+      }
     }
 
+    textarea {
+      resize: none;
+    }
   }
 
+  //default hover states
   .thread-list__card:hover {
 
-    .annotation-footer{
-      display: inline-block;
+    box-shadow: none;
+
+    // .annotation-actions {
+    //   display: inline-block;
+    // }
+
+    .annotation-quote {
+      border-left: 2px solid #d3d3d3;
     }
-        
   }
 
-  //default card
+
+//card states
+
+  //default card selected state
   .default__card-selected {
     border-left: 5px solid #e9d633;
   }
 
-  //private card
+  //default private card
   .private__card {
     border: 1px solid #c00;
+
+    .h-icon-visibility-off {
+      display: inline;
+      margin-right: 5px;
+      color: #c00;
+    }
   }
 
-  &.private__card-selected {
+  //if private, apply this selected class instead
+  .private__card-selected {
     border-left: 5px solid #c00;
   }
 
@@ -61,4 +118,6 @@
   .annotator-hl {
     background-color: transparent !important;
   }
+  }
+
 }

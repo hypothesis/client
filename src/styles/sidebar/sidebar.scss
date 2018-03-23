@@ -35,8 +35,7 @@ $base-line-height: 20px;
 @import './components/top-bar';
 
 
-// DDF overrides
-@import './ddf-override';
+
 
 // Top-level styles
 // ----------------
@@ -145,3 +144,6 @@ hypothesis-app {
     height: 48px;
   }
 }
+
+// DDF overrides
+@import './ddf-override';
