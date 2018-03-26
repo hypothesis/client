@@ -112,7 +112,7 @@ module.exports = class Guest extends Delegator
 
     @crossframe.onConnect(=> this._setupInitialState(config))
     this._connectAnnotationSync(@crossframe)
-    this._connectAnnotationUISync(@crossframe)
+    this._connectAnnotationUISync(@crossframe, config)
 
     # Load plugins
     for own name, opts of @options
@@ -169,17 +169,25 @@ module.exports = class Guest extends Delegator
       for annotation in annotations
         this.anchor(annotation)
 
-  _connectAnnotationUISync: (crossframe) ->
-    # crossframe.on 'focusAnnotations', (tags=[]) =>
-    #   for anchor in @anchors when anchor.highlights?
-    #     toggle = anchor.annotation.$tag in tags
-    #     $(anchor.highlights).toggleClass('annotator-hl-focused', toggle)
+  _connectAnnotationUISync: (crossframe, config) ->
+    crossframe.on 'focusAnnotations', (tags=[]) =>
+      # Focus annotations on the doc when the theme is not custom
+      if config.theme != 'custom'
+        for anchor in @anchors when anchor.highlights?
+          toggle = anchor.annotation.$tag in tags
+          $(anchor.highlights).toggleClass('annotator-hl-focused', toggle)
 
     crossframe.on 'scrollToAnnotation', (tag) =>
+      selectedFeedbackNumber = $('.annotator-hl-focused').length
       for anchor in @anchors when anchor.highlights?
+        console.log(anchor)
         if anchor.annotation.$tag is tag
-          # highlight the feedback on the doc
-          $(anchor.highlights).toggleClass('annotator-hl-focused')
+          # highlight/unhighlight the feedback on the doc
+          # If there is already more than 1 selected feedback, keep the selected one highlighted, remove the other highlights
+          if selectedFeedbackNumber != 1
+            $(anchor.highlights).addClass('annotator-hl-focused')
+          else
+            $(anchor.highlights).toggleClass('annotator-hl-focused')
           # scroll to feedback
           event = new CustomEvent('scrolltorange', {
             bubbles: true

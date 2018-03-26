@@ -74,8 +74,18 @@ function SidebarContentController(
       return;
     }
 
-    document.getElementById(annotation.id).classList.toggle('default__card-selected');
+    // Manage highlighting/unhighlighting the selected feedback on the sidebar
+    // see how many selected feedback in the sidebar
+    var selectedFeedbackNumber = document.querySelectorAll('.default__card-selected').length;
 
+    // If there is already more than 1 selected feedback, keep the selected one highlighted, remove the other highlights
+    if(selectedFeedbackNumber !== 1){
+      document.getElementById(annotation.id).classList.add('default__card-selected');
+    }
+    else{
+      document.getElementById(annotation.id).classList.toggle('default__card-selected');
+    }
+    // clear all other feedback highlights
     document.querySelectorAll('.default__card-selected').forEach(function(card){
       if (card.id !== annotation.id){
         document.getElementById(card.id).classList.remove('default__card-selected');

@@ -227,6 +227,7 @@ module.exports = class BucketBar extends Plugin
       @tabs.push(div[0])
 
       lengthOfPreviousBucket = 0;
+      lengthOfHighlightedFeedback = 0;
       div.addClass('annotator-bucket-indicator')
 
       # Focus corresponding highlights bucket when mouse is hovered
@@ -250,6 +251,7 @@ module.exports = class BucketBar extends Plugin
         bucket = @tabs.index(event.currentTarget)
         event.stopPropagation()
         feedbackListInBucket = []
+        lengthOfHighlightedFeedback = $('.annotator-hl-focused').length
 
         # Populate the highlights in the bucket in an array and remove other highlights from the page.
         for anchor in @annotator.anchors
@@ -258,13 +260,16 @@ module.exports = class BucketBar extends Plugin
           else
             $(anchor.highlights).removeClass('annotator-hl-focused')
 
-        lengthOfCurrentBucket = feedbackListInBucket.length;
+        lengthOfCurrentBucket = feedbackListInBucket.length
 
         for feedback in feedbackListInBucket
           if lengthOfCurrentBucket != lengthOfPreviousBucket
             feedback.addClass('annotator-hl-focused');
           else
-            feedback.toggleClass('annotator-hl-focused')
+            if lengthOfCurrentBucket != lengthOfHighlightedFeedback
+              feedback.addClass('annotator-hl-focused')
+            else
+              feedback.toggleClass('annotator-hl-focused')
 
         # If it's the upper tab, scroll to next anchor above
         if (@isUpper bucket)
