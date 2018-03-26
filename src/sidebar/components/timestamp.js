@@ -1,6 +1,6 @@
 'use strict';
 
-var dateUtil = require('../date-util');
+var dateUtil = require('../util/date');
 
 // @ngInject
 function TimestampController($scope, time) {
