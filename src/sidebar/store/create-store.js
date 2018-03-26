@@ -1,6 +1,9 @@
 'use strict';
 
 const redux = require('redux');
+// `.default` is needed because 'redux-thunk' is built as an ES2015 module
+const thunk = require('redux-thunk').default;
+
 const { createReducer, bindSelectors } = require('./util');
 
 /**
@@ -20,7 +23,7 @@ const { createReducer, bindSelectors } = require('./util');
  *
  * @param {Object[]} modules
  * @param {any[]} initArgs - Arguments to pass to each state module's `init` function
- * @param [any[]] middleware - List of Redux middlewares to use.
+ * @param [any[]] middleware - List of additional Redux middlewares to use.
  */
 function createStore(modules, initArgs, middleware = []) {
   // Create the initial state and state update function.
@@ -28,7 +31,13 @@ function createStore(modules, initArgs, middleware = []) {
   const reducer = createReducer(...modules.map(m => m.update));
 
   // Create the store.
-  const enhancer = redux.applyMiddleware(...middleware);
+  const defaultMiddleware = [
+    // The `thunk` middleware handles actions which are functions.
+    // This is used to implement actions which have side effects or are
+    // asynchronous (see https://github.com/gaearon/redux-thunk#motivation)
+    thunk,
+  ];
+  const enhancer = redux.applyMiddleware(...defaultMiddleware, ...middleware);
   const store = redux.createStore(reducer, initialState, enhancer);
 
   // Add actions and selectors as methods to the store.

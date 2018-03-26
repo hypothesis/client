@@ -54,7 +54,19 @@ describe('sidebar.store.create-store', () => {
     assert.equal(store.getCount(), 5);
   });
 
-  it('applies middleware', () => {
+  it('applies `thunk` middleware by default', () => {
+    const store = counterStore();
+    const doubleAction = (dispatch, getState) => {
+      dispatch(counterModule.actions.increment(getState().count));
+    };
+
+    store.increment(5);
+    store.dispatch(doubleAction);
+
+    assert.equal(store.getCount(), 10);
+  });
+
+  it('applies additional middleware', () => {
     const actions = [];
     const middleware = () => {
       return next => {

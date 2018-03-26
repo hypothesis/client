@@ -31,9 +31,6 @@
  *  3. Checking that the UI correctly presents a given state.
  */
 
-// `.default` is needed because 'redux-thunk' is built as an ES2015 module
-var thunk = require('redux-thunk').default;
-
 var createStore = require('./create-store');
 var debugMiddleware = require('./debug-middleware');
 
@@ -80,10 +77,6 @@ function angularDigestMiddleware($rootScope) {
 // @ngInject
 function store($rootScope, settings) {
   var middleware = [
-    // The `thunk` middleware handles actions which are functions.
-    // This is used to implement actions which have side effects or are
-    // asynchronous (see https://github.com/gaearon/redux-thunk#motivation)
-    thunk,
     debugMiddleware,
     angularDigestMiddleware.bind(null, $rootScope),
   ];
