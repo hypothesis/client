@@ -131,7 +131,6 @@ function ThreadListController($element, $scope, settings, VirtualThreadList) {
   * highlight the selected feedback in the sidebar and scroll the panel.
   */
   var lengthOfPreviousFeedbackList = 0;
-  var lengthOfSelectedFeedback = 0;
 
   $scope.$on(events.SHOW_BUCKET_LIST, function (event, IDs) {
     // TODO: Figure out how to get to the first item (not last entered, the one that is on top of the paragraph) on the doc
@@ -147,6 +146,7 @@ function ThreadListController($element, $scope, settings, VirtualThreadList) {
     });
 
     manageHighlights(IDs, otherFeedback);
+    // scrollPanel(IDs[0]);
 
   });
 
@@ -176,6 +176,33 @@ function ThreadListController($element, $scope, settings, VirtualThreadList) {
     lengthOfPreviousFeedbackList = lengthOfCurrentFeedbackList;
   }
 
+  /** Scroll the panel to the position that the feedback with a given ID or $tag is on top */
+  function scrollPanel(id) {
+
+    //  Find how much it can be scrolled
+    var maxScroll = self.scrollRoot.scrollHeight - self.scrollRoot.clientHeight;
+    // Find how much the item is far from top
+    var yOffsetOfID = visibleThreads.yOffsetOf(id);
+    // Find the hight of the item
+    var heightOfID = visibleThreads._height(id);
+
+    if ((yOffsetOfID > maxScroll + heightOfID) || (yOffsetOfID === maxScroll + heightOfID)){
+      // Find how much space for scrolling you need
+      var height = self.scrollRoot.clientHeight - (visibleThreads._height(id));
+      // create an empty div and append it to the mail thread
+      var div = document.createElement('div');
+      div.style.height =  height.toString() + 'px';
+      self.scrollRoot.appendChild(div);
+      // Scroll
+      self.scrollRoot.scrollTop = height;
+      // Re-assign the max scrollable heigh
+      self.maxScroll = self.maxScroll + height;
+    }
+    else{
+      self.scrollRoot.scrollTop = yOffsetOfID;
+    }
+
+  }
   $scope.$on(events.BEFORE_ANNOTATION_CREATED, function (event, annotation) {
     if (annotation.$highlight || metadata.isReply(annotation)) {
       return;

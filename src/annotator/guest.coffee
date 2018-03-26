@@ -180,7 +180,6 @@ module.exports = class Guest extends Delegator
     crossframe.on 'scrollToAnnotation', (tag) =>
       selectedFeedbackNumber = $('.annotator-hl-focused').length
       for anchor in @anchors when anchor.highlights?
-        console.log(anchor)
         if anchor.annotation.$tag is tag
           # highlight/unhighlight the feedback on the doc
           # If there is already more than 1 selected feedback, keep the selected one highlighted, remove the other highlights
