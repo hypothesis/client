@@ -39,7 +39,7 @@ inherits(FakeRootThread, EventEmitter);
 describe('sidebar.components.sidebar-content', function () {
   var $rootScope;
   var $scope;
-  var annotationUI;
+  var store;
   var ctrl;
   var fakeAnalytics;
   var fakeAnnotationMapper;
@@ -56,7 +56,7 @@ describe('sidebar.components.sidebar-content', function () {
 
   before(function () {
     angular.module('h', [])
-      .service('annotationUI', require('../../store'))
+      .service('store', require('../../store'))
       .component('sidebarContent', proxyquire('../sidebar-content',
         noCallThru({
           angular: angular,
@@ -135,15 +135,15 @@ describe('sidebar.components.sidebar-content', function () {
 
   function setFrames(frames) {
     frames.forEach(function (frame) {
-      annotationUI.connectFrame(frame);
+      store.connectFrame(frame);
     });
   }
 
-  beforeEach(angular.mock.inject(function ($componentController, _annotationUI_, _$rootScope_) {
+  beforeEach(angular.mock.inject(function ($componentController, _store_, _$rootScope_) {
     $rootScope = _$rootScope_;
     $scope = $rootScope.$new();
-    annotationUI = _annotationUI_;
-    annotationUI.updateFrameAnnotationFetchStatus = sinon.stub();
+    store = _store_;
+    store.updateFrameAnnotationFetchStatus = sinon.stub();
     ctrl = $componentController('sidebarContent', { $scope: $scope }, {
       auth: { status: 'unknown' },
     });
@@ -157,7 +157,7 @@ describe('sidebar.components.sidebar-content', function () {
     it('unloads any existing annotations', function () {
       // When new clients connect, all existing annotations should be unloaded
       // before reloading annotations for each currently-connected client
-      annotationUI.addAnnotations([{id: '123'}]);
+      store.addAnnotations([{id: '123'}]);
       var uri1 = 'http://example.com/page-a';
       var frames = [{uri: uri1}];
       setFrames(frames);
@@ -168,7 +168,7 @@ describe('sidebar.components.sidebar-content', function () {
       setFrames(frames);
       $scope.$digest();
       assert.calledWith(fakeAnnotationMapper.unloadAnnotations,
-        annotationUI.getState().annotations);
+        store.getState().annotations);
     });
 
     it('loads all annotations for a frame', function () {
@@ -222,7 +222,7 @@ describe('sidebar.components.sidebar-content', function () {
         return {uri: frameUri};
       }));
       $scope.$digest();
-      var updateSpy = annotationUI.updateFrameAnnotationFetchStatus;
+      var updateSpy = store.updateFrameAnnotationFetchStatus;
       assert.isTrue(updateSpy.calledWith(frameUris[0], true));
       assert.isTrue(updateSpy.calledWith(frameUris[1], true));
     });
@@ -233,7 +233,7 @@ describe('sidebar.components.sidebar-content', function () {
 
       beforeEach(function () {
         setFrames([{uri: uri}]);
-        annotationUI.selectAnnotations([id]);
+        store.selectAnnotations([id]);
         $scope.$digest();
       });
 
@@ -286,7 +286,7 @@ describe('sidebar.components.sidebar-content', function () {
 
       beforeEach(function () {
         setFrames([{uri: uri}]);
-        annotationUI.selectAnnotations([id]);
+        store.selectAnnotations([id]);
         fakeGroups.focused.returns({ id: 'private-group' });
         $scope.$digest();
       });
@@ -321,24 +321,24 @@ describe('sidebar.components.sidebar-content', function () {
     beforeEach(connectFrameAndPerformInitialFetch);
 
     it('reloads annotations if the user ID changed', () => {
-      var newProfile = Object.assign({}, annotationUI.profile(), {
+      var newProfile = Object.assign({}, store.profile(), {
         userid: 'different-user@hypothes.is',
       });
 
-      annotationUI.updateSession(newProfile);
+      store.updateSession(newProfile);
       $scope.$digest();
 
       assert.called(fakeAnnotationMapper.loadAnnotations);
     });
 
     it('does not reload annotations if the user ID is the same', () => {
-      var newProfile = Object.assign({}, annotationUI.profile(), {
+      var newProfile = Object.assign({}, store.profile(), {
         user_info: {
           display_name: 'New display name',
         },
       });
 
-      annotationUI.updateSession(newProfile);
+      store.updateSession(newProfile);
       $scope.$digest();
 
       assert.notCalled(fakeAnnotationMapper.loadAnnotations);
@@ -348,13 +348,13 @@ describe('sidebar.components.sidebar-content', function () {
   describe('when an annotation is anchored', function () {
     it('focuses and scrolls to the annotation if already selected', function () {
       var uri = 'http://example.com';
-      annotationUI.selectAnnotations(['123']);
+      store.selectAnnotations(['123']);
       setFrames([{uri: uri}]);
       var annot = {
         $tag: 'atag',
         id: '123',
       };
-      annotationUI.addAnnotations([annot]);
+      store.addAnnotations([annot]);
       $scope.$digest();
       $rootScope.$broadcast(events.ANNOTATIONS_SYNCED, ['atag']);
       assert.calledWith(fakeFrameSync.focusAnnotations, ['atag']);
@@ -368,8 +368,8 @@ describe('sidebar.components.sidebar-content', function () {
     beforeEach(() => {
       // Setup an initial state with frames connected, a group focused and some
       // annotations loaded.
-      annotationUI.addAnnotations([{id: '123'}]);
-      annotationUI.addAnnotations = sinon.stub();
+      store.addAnnotations([{id: '123'}]);
+      store.addAnnotations = sinon.stub();
       fakeDrafts.unsaved.returns([{id: uri + '123'}, {id: uri + '456'}]);
       setFrames([{uri: uri}]);
       $scope.$digest();
@@ -393,11 +393,11 @@ describe('sidebar.components.sidebar-content', function () {
     });
 
     it('should clear the selection', () => {
-      annotationUI.selectAnnotations(['123']);
+      store.selectAnnotations(['123']);
 
       changeGroup();
 
-      assert.isFalse(annotationUI.hasSelectedAnnotations());
+      assert.isFalse(store.hasSelectedAnnotations());
     });
   });
 
@@ -424,22 +424,22 @@ describe('sidebar.components.sidebar-content', function () {
 
     it('displays a message if the selection is unavailable', function () {
       addFrame();
-      annotationUI.selectAnnotations(['missing']);
+      store.selectAnnotations(['missing']);
       $scope.$digest();
       assert.isTrue(ctrl.selectedAnnotationUnavailable());
     });
 
     it('does not show a message if the selection is available', function () {
       addFrame();
-      annotationUI.addAnnotations([{id: '123'}]);
-      annotationUI.selectAnnotations(['123']);
+      store.addAnnotations([{id: '123'}]);
+      store.selectAnnotations(['123']);
       $scope.$digest();
       assert.isFalse(ctrl.selectedAnnotationUnavailable());
     });
 
     it('does not a show a message if there is no selection', function () {
       addFrame();
-      annotationUI.selectAnnotations([]);
+      store.selectAnnotations([]);
       $scope.$digest();
       assert.isFalse(ctrl.selectedAnnotationUnavailable());
     });
@@ -448,7 +448,7 @@ describe('sidebar.components.sidebar-content', function () {
       // No search requests have been sent yet.
       searchClients = [];
       // There is a selection but the selected annotation isn't available.
-      annotationUI.selectAnnotations(['missing']);
+      store.selectAnnotations(['missing']);
       $scope.$digest();
 
       assert.isFalse(ctrl.selectedAnnotationUnavailable());
@@ -459,8 +459,8 @@ describe('sidebar.components.sidebar-content', function () {
       ctrl.auth = {
         status: 'logged-out',
       };
-      annotationUI.addAnnotations([{id: '123'}]);
-      annotationUI.selectAnnotations(['123']);
+      store.addAnnotations([{id: '123'}]);
+      store.selectAnnotations(['123']);
       $scope.$digest();
       assert.isTrue(ctrl.shouldShowLoggedOutMessage());
     });
@@ -470,7 +470,7 @@ describe('sidebar.components.sidebar-content', function () {
       ctrl.auth = {
         status: 'logged-out',
       };
-      annotationUI.selectAnnotations(['missing']);
+      store.selectAnnotations(['missing']);
       $scope.$digest();
       assert.isFalse(ctrl.shouldShowLoggedOutMessage());
     });
@@ -480,7 +480,7 @@ describe('sidebar.components.sidebar-content', function () {
       ctrl.auth = {
         status: 'logged-out',
       };
-      annotationUI.selectAnnotations([]);
+      store.selectAnnotations([]);
       $scope.$digest();
       assert.isFalse(ctrl.shouldShowLoggedOutMessage());
     });
@@ -490,8 +490,8 @@ describe('sidebar.components.sidebar-content', function () {
       ctrl.auth = {
         status: 'logged-in',
       };
-      annotationUI.addAnnotations([{id: '123'}]);
-      annotationUI.selectAnnotations(['123']);
+      store.addAnnotations([{id: '123'}]);
+      store.selectAnnotations(['123']);
       $scope.$digest();
       assert.isFalse(ctrl.shouldShowLoggedOutMessage());
     });
@@ -502,8 +502,8 @@ describe('sidebar.components.sidebar-content', function () {
         status: 'logged-out',
       };
       delete fakeSettings.annotations;
-      annotationUI.addAnnotations([{id: '123'}]);
-      annotationUI.selectAnnotations(['123']);
+      store.addAnnotations([{id: '123'}]);
+      store.selectAnnotations(['123']);
       $scope.$digest();
       assert.isFalse(ctrl.shouldShowLoggedOutMessage());
     });
@@ -512,8 +512,8 @@ describe('sidebar.components.sidebar-content', function () {
       fakeSettings.services = [{ authority: 'publisher.com' }];
       addFrame();
       ctrl.auth = { status: 'logged-out' };
-      annotationUI.addAnnotations([{id: '123'}]);
-      annotationUI.selectAnnotations(['123']);
+      store.addAnnotations([{id: '123'}]);
+      store.selectAnnotations(['123']);
       $scope.$digest();
 
       assert.isFalse(ctrl.shouldShowLoggedOutMessage());
@@ -545,7 +545,7 @@ describe('sidebar.components.sidebar-content', function () {
     it('shows the thread', function () {
       var thread = {id: '1'};
       ctrl.forceVisible(thread);
-      assert.deepEqual(annotationUI.getState().forceVisible, {1: true});
+      assert.deepEqual(store.getState().forceVisible, {1: true});
     });
 
     it('uncollapses the parent', function () {
@@ -553,9 +553,9 @@ describe('sidebar.components.sidebar-content', function () {
         id: '2',
         parent: {id: '3'},
       };
-      assert.equal(annotationUI.getState().expanded[thread.parent.id], undefined);
+      assert.equal(store.getState().expanded[thread.parent.id], undefined);
       ctrl.forceVisible(thread);
-      assert.equal(annotationUI.getState().expanded[thread.parent.id], true);
+      assert.equal(store.getState().expanded[thread.parent.id], true);
     });
   });
 

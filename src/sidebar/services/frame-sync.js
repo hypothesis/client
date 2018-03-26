@@ -41,7 +41,7 @@ function formatAnnot(ann) {
  * sidebar.
  */
 // @ngInject
-function FrameSync($rootScope, $window, Discovery, annotationUI, bridge) {
+function FrameSync($rootScope, $window, Discovery, store, bridge) {
 
   // Set of tags of annotations that are currently loaded into the frame
   var inFrame = new Set();
@@ -56,8 +56,8 @@ function FrameSync($rootScope, $window, Discovery, annotationUI, bridge) {
     var prevFrames = [];
     var prevPublicAnns = 0;
 
-    annotationUI.subscribe(function () {
-      var state = annotationUI.getState();
+    store.subscribe(function () {
+      var state = store.getState();
       if (state.annotations === prevAnnotations &&
           state.frames === prevFrames) {
         return;
@@ -102,7 +102,7 @@ function FrameSync($rootScope, $window, Discovery, annotationUI, bridge) {
         inFrame.delete(annot.$tag);
       });
 
-      var frames = annotationUI.frames();
+      var frames = store.frames();
       if (frames.length > 0) {
         if (frames.every(function (frame) { return frame.isAnnotationFetchComplete; })) {
           if (publicAnns === 0 || publicAnns !== prevPublicAnns) {
@@ -135,7 +135,7 @@ function FrameSync($rootScope, $window, Discovery, annotationUI, bridge) {
     // triggered by each `UPDATE_ANCHOR_STATUS` action that is dispatched.
     var anchoringStatusUpdates = {};
     var scheduleAnchoringStatusUpdate = debounce(() => {
-      annotationUI.updateAnchorStatus(anchoringStatusUpdates);
+      store.updateAnchorStatus(anchoringStatusUpdates);
       $rootScope.$broadcast(events.ANNOTATIONS_SYNCED, Object.keys(anchoringStatusUpdates));
       anchoringStatusUpdates = {};
     }, 10);
@@ -150,16 +150,16 @@ function FrameSync($rootScope, $window, Discovery, annotationUI, bridge) {
     });
 
     bridge.on('showAnnotations', function (tags) {
-      annotationUI.selectAnnotations(annotationUI.findIDsForTags(tags));
-      annotationUI.selectTab(uiConstants.TAB_ANNOTATIONS);
+      store.selectAnnotations(store.findIDsForTags(tags));
+      store.selectTab(uiConstants.TAB_ANNOTATIONS);
     });
 
     bridge.on('focusAnnotations', function (tags) {
-      annotationUI.focusAnnotations(tags || []);
+      store.focusAnnotations(tags || []);
     });
 
     bridge.on('toggleAnnotationSelection', function (tags) {
-      annotationUI.toggleSelectedAnnotations(annotationUI.findIDsForTags(tags));
+      store.toggleSelectedAnnotations(store.findIDsForTags(tags));
     });
 
     bridge.on('sidebarOpened', function () {
@@ -192,7 +192,7 @@ function FrameSync($rootScope, $window, Discovery, annotationUI, bridge) {
       }
 
       $rootScope.$broadcast(events.FRAME_CONNECTED);
-      annotationUI.connectFrame({
+      store.connectFrame({
         id: info.frameIdentifier,
         metadata: info.metadata,
         uri: info.uri,
@@ -201,12 +201,12 @@ function FrameSync($rootScope, $window, Discovery, annotationUI, bridge) {
   }
 
   function destroyFrame(frameIdentifier) {
-    var frames = annotationUI.frames();
+    var frames = store.frames();
     var frameToDestroy = frames.find(function (frame) {
       return frame.id === frameIdentifier;
     });
     if (frameToDestroy) {
-      annotationUI.destroyFrame(frameToDestroy);
+      store.destroyFrame(frameToDestroy);
     }
   }
 

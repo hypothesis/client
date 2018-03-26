@@ -6,7 +6,7 @@ var uiConstants = require('../ui-constants');
 module.exports = {
   controllerAs: 'vm',
   //@ngInject
-  controller: function ($element, annotationUI, features, session, settings) {
+  controller: function ($element, store, features, session, settings) {
     this.TAB_ANNOTATIONS = uiConstants.TAB_ANNOTATIONS;
     this.TAB_NOTES = uiConstants.TAB_NOTES;
     this.TAB_ORPHANS = uiConstants.TAB_ORPHANS;
@@ -16,8 +16,8 @@ module.exports = {
     this.enableExperimentalNewNoteButton = settings.enableExperimentalNewNoteButton;
 
     this.selectTab = function (type) {
-      annotationUI.clearSelectedAnnotations();
-      annotationUI.selectTab(type);
+      store.clearSelectedAnnotations();
+      store.selectTab(type);
     };
 
     this.showAnnotationsUnavailableMessage = function () {

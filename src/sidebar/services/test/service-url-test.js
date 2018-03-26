@@ -2,8 +2,8 @@
 
 var proxyquire = require('proxyquire');
 
-/** Return a fake annotationUI object. */
-function fakeAnnotationUI() {
+/** Return a fake store object. */
+function fakeStore() {
   var links = null;
   return {
     updateLinks: function(newLinks) {
@@ -24,16 +24,16 @@ function createServiceUrl(linksPromise) {
     '../util/url-util': { replaceURLParams: replaceURLParams },
   });
 
-  var annotationUI = fakeAnnotationUI();
+  var store = fakeStore();
 
   var apiRoutes = {
     links: sinon.stub().returns(linksPromise),
   };
 
   return {
-    annotationUI: annotationUI,
+    store: store,
     apiRoutes,
-    serviceUrl: serviceUrlFactory(annotationUI, apiRoutes),
+    serviceUrl: serviceUrlFactory(store, apiRoutes),
     replaceURLParams: replaceURLParams,
   };
 }
@@ -76,7 +76,7 @@ describe('sidebar.service-url', function () {
   });
 
   context('after the API response has been received', function() {
-    var annotationUI;
+    var store;
     var linksPromise;
     var replaceURLParams;
     var serviceUrl;
@@ -90,14 +90,14 @@ describe('sidebar.service-url', function () {
 
       var parts = createServiceUrl(linksPromise);
 
-      annotationUI = parts.annotationUI;
+      store = parts.store;
       serviceUrl = parts.serviceUrl;
       replaceURLParams = parts.replaceURLParams;
     });
 
-    it('updates annotationUI with the real links', function() {
+    it('updates store with the real links', function() {
       return linksPromise.then(function(links) {
-        assert.deepEqual(annotationUI.getState(), {links: links});
+        assert.deepEqual(store.getState(), {links: links});
       });
     });
 

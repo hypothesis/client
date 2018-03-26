@@ -34,17 +34,17 @@ function groupIDFromSelection(selection, results) {
 
 // @ngInject
 function SidebarContentController(
-  $scope, analytics, annotationUI, annotationMapper, api, drafts, features, frameSync,
+  $scope, analytics, store, annotationMapper, api, drafts, features, frameSync,
   groups, rootThread, settings, streamer, streamFilter
 ) {
   var self = this;
 
   function thread() {
-    return rootThread.thread(annotationUI.getState());
+    return rootThread.thread(store.getState());
   }
 
-  var unsubscribeAnnotationUI = annotationUI.subscribe(function () {
-    var state = annotationUI.getState();
+  var unsubscribeAnnotationUI = store.subscribe(function () {
+    var state = store.getState();
 
     self.rootThread = thread();
     self.selectedTab = state.selectedTab;
@@ -79,13 +79,13 @@ function SidebarContentController(
   /**
    * Returns the Annotation object for the first annotation in the
    * selected annotation set. Note that 'first' refers to the order
-   * of annotations passed to annotationUI when selecting annotations,
+   * of annotations passed to store when selecting annotations,
    * not the order in which they appear in the document.
    */
   function firstSelectedAnnotation() {
-    if (annotationUI.getState().selectedAnnotationMap) {
-      var id = Object.keys(annotationUI.getState().selectedAnnotationMap)[0];
-      return annotationUI.getState().annotations.find(function (annot) {
+    if (store.getState().selectedAnnotationMap) {
+      var id = Object.keys(store.getState().selectedAnnotationMap)[0];
+      return store.getState().annotations.find(function (annot) {
         return annot.id === id;
       });
     } else {
@@ -96,7 +96,7 @@ function SidebarContentController(
   var searchClients = [];
 
   function _resetAnnotations() {
-    annotationMapper.unloadAnnotations(annotationUI.savedAnnotations());
+    annotationMapper.unloadAnnotations(store.savedAnnotations());
   }
 
   function _loadAnnotationsFor(uris, group) {
@@ -109,11 +109,11 @@ function SidebarContentController(
     });
     searchClients.push(searchClient);
     searchClient.on('results', function (results) {
-      if (annotationUI.hasSelectedAnnotations()) {
+      if (store.hasSelectedAnnotations()) {
         // Focus the group containing the selected annotation and filter
         // annotations to those from this group
         var groupID = groupIDFromSelection(
-          annotationUI.getState().selectedAnnotationMap, results);
+          store.getState().selectedAnnotationMap, results);
         if (!groupID) {
           // If the selected annotation is not available, fall back to
           // loading annotations for the currently focused group
@@ -139,9 +139,9 @@ function SidebarContentController(
         searchClients.splice(searchClients.indexOf(searchClient), 1);
       });
 
-      annotationUI.frames().forEach(function (frame) {
+      store.frames().forEach(function (frame) {
         if (0 <= uris.indexOf(frame.uri)) {
-          annotationUI.updateFrameAnnotationFetchStatus(frame.uri, true);
+          store.updateFrameAnnotationFetchStatus(frame.uri, true);
         }
       });
     });
@@ -149,7 +149,7 @@ function SidebarContentController(
   }
 
   function isLoading() {
-    if (!annotationUI.frames().some(function (frame) { return frame.uri; })) {
+    if (!store.frames().some(function (frame) { return frame.uri; })) {
       // The document's URL isn't known so the document must still be loading.
       return true;
     }
@@ -183,10 +183,10 @@ function SidebarContentController(
     // the batch size, this saves an extra roundtrip to the server
     // to fetch the selected annotation in order to determine which group
     // it is in before fetching the remaining annotations.
-    var group = annotationUI.hasSelectedAnnotations() ?
+    var group = store.hasSelectedAnnotations() ?
       null : groups.focused().id;
 
-    var searchUris = annotationUI.searchUris();
+    var searchUris = store.searchUris();
     if (searchUris.length > 0) {
       _loadAnnotationsFor(searchUris, group);
 
@@ -227,15 +227,15 @@ function SidebarContentController(
     focusAnnotation(selectedAnnot);
     scrollToAnnotation(selectedAnnot);
 
-    annotationUI.selectTab(tabs.tabForAnnotation(selectedAnnot));
+    store.selectTab(tabs.tabForAnnotation(selectedAnnot));
   });
 
   // Re-fetch annotations when focused group, logged-in user or connected frames
   // change.
   $scope.$watch(() => ([
     groups.focused().id,
-    annotationUI.profile().userid,
-    ...annotationUI.searchUris(),
+    store.profile().userid,
+    ...store.searchUris(),
   ]), ([currentGroupId], [prevGroupId]) => {
 
     if (currentGroupId !== prevGroupId) {
@@ -246,20 +246,20 @@ function SidebarContentController(
       if (isLoading()) {
         return;
       }
-      annotationUI.clearSelectedAnnotations();
+      store.clearSelectedAnnotations();
     }
 
     loadAnnotations();
   }, true);
 
   this.setCollapsed = function (id, collapsed) {
-    annotationUI.setCollapsed(id, collapsed);
+    store.setCollapsed(id, collapsed);
   };
 
   this.forceVisible = function (thread) {
-    annotationUI.setForceVisible(thread.id, true);
+    store.setForceVisible(thread.id, true);
     if (thread.parent) {
-      annotationUI.setCollapsed(thread.parent.id, false);
+      store.setCollapsed(thread.parent.id, false);
     }
   };
 
@@ -267,7 +267,7 @@ function SidebarContentController(
   this.scrollTo = scrollToAnnotation;
 
   this.selectedAnnotationCount = function () {
-    var selection = annotationUI.getState().selectedAnnotationMap;
+    var selection = store.getState().selectedAnnotationMap;
     if (!selection) {
       return 0;
     }
@@ -275,10 +275,10 @@ function SidebarContentController(
   };
 
   this.selectedAnnotationUnavailable = function () {
-    var selectedID = firstKey(annotationUI.getState().selectedAnnotationMap);
+    var selectedID = firstKey(store.getState().selectedAnnotationMap);
     return !isLoading() &&
            !!selectedID &&
-           !annotationUI.annotationExists(selectedID);
+           !store.annotationExists(selectedID);
   };
 
   this.shouldShowLoggedOutMessage = function () {
@@ -302,10 +302,10 @@ function SidebarContentController(
     // The user is logged out and has landed on a direct linked
     // annotation. If there is an annotation selection and that
     // selection is available to the user, show the CTA.
-    var selectedID = firstKey(annotationUI.getState().selectedAnnotationMap);
+    var selectedID = firstKey(store.getState().selectedAnnotationMap);
     return !isLoading() &&
            !!selectedID &&
-           annotationUI.annotationExists(selectedID);
+           store.annotationExists(selectedID);
   };
 
   this.isLoading = isLoading;
@@ -325,13 +325,13 @@ function SidebarContentController(
   };
 
   this.clearSelection = function () {
-    var selectedTab = annotationUI.getState().selectedTab;
-    if (!annotationUI.getState().selectedTab || annotationUI.getState().selectedTab === uiConstants.TAB_ORPHANS) {
+    var selectedTab = store.getState().selectedTab;
+    if (!store.getState().selectedTab || store.getState().selectedTab === uiConstants.TAB_ORPHANS) {
       selectedTab = uiConstants.TAB_ANNOTATIONS;
     }
 
-    annotationUI.clearSelectedAnnotations();
-    annotationUI.selectTab(selectedTab);
+    store.clearSelectedAnnotations();
+    store.selectTab(selectedTab);
   };
 }
 

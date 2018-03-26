@@ -35,7 +35,7 @@ function authStateFromProfile(profile) {
 // @ngInject
 function HypothesisAppController(
   $document, $location, $rootScope, $route, $scope,
-  $window, analytics, annotationUI, auth, bridge, drafts, features,
+  $window, analytics, store, auth, bridge, drafts, features,
   flash, frameSync, groups, serviceUrl, session, settings, streamer
 ) {
   var self = this;
@@ -58,14 +58,14 @@ function HypothesisAppController(
   }
 
   this.sortKey = function () {
-    return annotationUI.getState().sortKey;
+    return store.getState().sortKey;
   };
 
   this.sortKeysAvailable = function () {
-    return annotationUI.getState().sortKeysAvailable;
+    return store.getState().sortKeysAvailable;
   };
 
-  this.setSortKey = annotationUI.setSortKey;
+  this.setSortKey = store.setSortKey;
 
   // Reload the view when the user switches accounts
   $scope.$on(events.USER_CHANGED, function (event, data) {
@@ -168,10 +168,10 @@ function HypothesisAppController(
 
   this.search = {
     query: function () {
-      return annotationUI.getState().filterQuery;
+      return store.getState().filterQuery;
     },
     update: function (query) {
-      annotationUI.setFilterQuery(query);
+      store.setFilterQuery(query);
     },
   };
 

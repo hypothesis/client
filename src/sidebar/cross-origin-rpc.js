@@ -21,7 +21,7 @@
  *
  */
 // @ngInject
-function start(annotationUI, settings, $window) {
+function start(store, settings, $window) {
   $window.addEventListener('message', function receiveMessage(event) {
     let allowedOrigins = settings.rpcAllowedOrigins || [];
 
@@ -40,7 +40,7 @@ function start(annotationUI, settings, $window) {
   function jsonRpcResponse(request) {
     // The set of methods that clients can call.
     let methods = {
-      'searchUris': annotationUI.searchUris,
+      'searchUris': store.searchUris,
     };
 
     let method = methods[request.method];

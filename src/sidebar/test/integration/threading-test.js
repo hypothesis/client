@@ -30,7 +30,7 @@ var fixtures = immutable({
 });
 
 describe('annotation threading', function () {
-  var annotationUI;
+  var store;
   var rootThread;
 
   beforeEach(function () {
@@ -44,7 +44,7 @@ describe('annotation threading', function () {
     };
 
     angular.module('app', [])
-      .service('annotationUI', require('../../store'))
+      .service('store', require('../../store'))
       .service('drafts', require('../../services/drafts'))
       .service('rootThread', require('../../services/root-thread'))
       .service('searchFilter', require('../../services/search-filter'))
@@ -55,34 +55,34 @@ describe('annotation threading', function () {
 
     angular.mock.module('app');
 
-    angular.mock.inject(function (_annotationUI_, _rootThread_) {
-      annotationUI = _annotationUI_;
+    angular.mock.inject(function (_store_, _rootThread_) {
+      store = _store_;
       rootThread = _rootThread_;
     });
   });
 
   it('should display newly loaded annotations', function () {
-    annotationUI.addAnnotations(fixtures.annotations);
-    assert.equal(rootThread.thread(annotationUI.getState()).children.length, 2);
+    store.addAnnotations(fixtures.annotations);
+    assert.equal(rootThread.thread(store.getState()).children.length, 2);
   });
 
   it('should not display unloaded annotations', function () {
-    annotationUI.addAnnotations(fixtures.annotations);
-    annotationUI.removeAnnotations(fixtures.annotations);
-    assert.equal(rootThread.thread(annotationUI.getState()).children.length, 0);
+    store.addAnnotations(fixtures.annotations);
+    store.removeAnnotations(fixtures.annotations);
+    assert.equal(rootThread.thread(store.getState()).children.length, 0);
   });
 
   it('should filter annotations when a search is set', function () {
-    annotationUI.addAnnotations(fixtures.annotations);
-    annotationUI.setFilterQuery('second');
-    assert.equal(rootThread.thread(annotationUI.getState()).children.length, 1);
-    assert.equal(rootThread.thread(annotationUI.getState()).children[0].id, '2');
+    store.addAnnotations(fixtures.annotations);
+    store.setFilterQuery('second');
+    assert.equal(rootThread.thread(store.getState()).children.length, 1);
+    assert.equal(rootThread.thread(store.getState()).children[0].id, '2');
   });
 
   unroll('should sort annotations by #mode', function (testCase) {
-    annotationUI.addAnnotations(fixtures.annotations);
-    annotationUI.setSortKey(testCase.sortKey);
-    var actualOrder = rootThread.thread(annotationUI.getState()).children.map(function (thread) {
+    store.addAnnotations(fixtures.annotations);
+    store.setSortKey(testCase.sortKey);
+    var actualOrder = rootThread.thread(store.getState()).children.map(function (thread) {
       return thread.annotation.id;
     });
     assert.deepEqual(actualOrder, testCase.expectedOrder);

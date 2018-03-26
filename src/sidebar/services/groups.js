@@ -18,7 +18,7 @@ var { awaitStateChange } = require('../util/state-util');
 var serviceConfig = require('../service-config');
 
 // @ngInject
-function groups($rootScope, annotationUI, api, isSidebar, localStorage, serviceUrl, session,
+function groups($rootScope, store, api, isSidebar, localStorage, serviceUrl, session,
                 settings) {
   // The currently focused group. This is the group that's shown as selected in
   // the groups dropdown, the annotations displayed are filtered to only ones
@@ -33,7 +33,7 @@ function groups($rootScope, annotationUI, api, isSidebar, localStorage, serviceU
 
   function getDocumentUriForGroupSearch() {
     function mainUri() {
-      var uris = annotationUI.searchUris();
+      var uris = store.searchUris();
       if (uris.length === 0) {
         return null;
       }
@@ -43,7 +43,7 @@ function groups($rootScope, annotationUI, api, isSidebar, localStorage, serviceU
       // HTTP URLs (so eg. we cannot use a "file:" URL or PDF fingerprint).
       return uris.find(uri => uri.startsWith('http'));
     }
-    return awaitStateChange(annotationUI, mainUri);
+    return awaitStateChange(store, mainUri);
   }
 
   /**

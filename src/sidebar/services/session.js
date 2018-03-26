@@ -20,7 +20,7 @@ var CACHE_TTL = 5 * 60 * 1000; // 5 minutes
  *
  * @ngInject
  */
-function session($q, $rootScope, analytics, annotationUI, api, auth,
+function session($q, $rootScope, analytics, store, api, auth,
                  flash, raven, settings, serviceConfig) {
   // Cache the result of load()
   var lastLoad;
@@ -93,11 +93,11 @@ function session($q, $rootScope, analytics, annotationUI, api, auth,
    * @return {Profile} The updated profile data
    */
   function update(model) {
-    var prevSession = annotationUI.getState().session;
+    var prevSession = store.getState().session;
     var userChanged = model.userid !== prevSession.userid;
 
     // Update the session model used by the application
-    annotationUI.updateSession(model);
+    store.updateSession(model);
 
     lastLoad = Promise.resolve(model);
     lastLoadTime = Date.now();
@@ -167,9 +167,9 @@ function session($q, $rootScope, analytics, annotationUI, api, auth,
 
     // For the moment, we continue to expose the session state as a property on
     // this service. In future, other services which access the session state
-    // will do so directly from annotationUI or via selector functions
+    // will do so directly from store or via selector functions
     get state() {
-      return annotationUI.getState().session;
+      return store.getState().session;
     },
 
     update,
