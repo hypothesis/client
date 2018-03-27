@@ -4,6 +4,13 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+### Changed
+
+- Support annotation of PDFs hosted inside iframes using PDF.js
+  ([#681](https://github.com/hypothesis/client/pull/681)).
+
 ## [1.75.0] - 2018-03-22
 
 ### Changed
