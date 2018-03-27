@@ -221,7 +221,7 @@ module.exports = angular.module('h', [
   .value('raven', require('./raven'))
   .value('serviceConfig', serviceConfig)
   .value('settings', settings)
-  .value('time', require('./time'))
+  .value('time', require('./util/time'))
   .value('urlEncodeFilter', require('./filter/url').encode)
 
   .config(configureCompile)

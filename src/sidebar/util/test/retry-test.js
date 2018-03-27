@@ -1,9 +1,9 @@
 'use strict';
 
-var retryUtil = require('../retry-util');
-var toResult = require('../../shared/test/promise-util').toResult;
+var retryUtil = require('../retry');
+var toResult = require('../../../shared/test/promise-util').toResult;
 
-describe('retry-util', function () {
+describe('sidebar.util.retry', function () {
   describe('.retryPromiseOperation', function () {
     it('should return the result of the operation function', function () {
       var operation = sinon.stub().returns(Promise.resolve(42));

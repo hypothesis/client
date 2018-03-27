@@ -38,7 +38,7 @@ var FIXTURES_NEXT_FUZZY_UPDATE = [
   [8 * year, null],
 ];
 
-describe('time', function () {
+describe('sidebar.util.time', function () {
   var sandbox;
 
   beforeEach(function () {
