@@ -1,4 +1,4 @@
-<div ng-if="!vm.readOnly" class="markdown-tools" ng-class="vm.preview && 'disable'">
+<div ng-if="!vm.readOnly && !vm.isThemeCustom" class="markdown-tools" ng-class="vm.preview && 'disable'">
   <span class="markdown-preview-toggle">
     <a class="markdown-tools-badge h-icon-markdown" href="https://help.github.com/articles/markdown-basics" title="{{'Parsed as Markdown' | translate}}" target="_blank"></a>
     <a href="" class="markdown-tools-toggle" ng-click="vm.togglePreview()"
