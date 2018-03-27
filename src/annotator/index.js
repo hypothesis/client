@@ -51,6 +51,10 @@ $.noConflict(true)(function() {
   }
 
   if (config.subFrameIdentifier) {
+    // Make sure the PDF plugin is loaded if the subframe contains the PDF.js viewer.
+    if (typeof window.PDFViewerApplication !== 'undefined') {
+      config.PDF = {};
+    }
     Klass = Guest;
 
     // Other modules use this to detect if this
