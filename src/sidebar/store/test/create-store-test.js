@@ -37,6 +37,16 @@ describe('sidebar.store.create-store', () => {
     assert.equal(store.getState().count, 5);
   });
 
+  it('notifies subscribers when state changes', () => {
+    const store = counterStore();
+    const subscriber = sinon.spy(() => assert.equal(store.getCount(), 1));
+
+    store.subscribe(subscriber);
+    store.increment(1);
+
+    assert.calledWith(subscriber);
+  });
+
   it('passes initial state args to `init` function', () => {
     const store = counterStore([21]);
     assert.equal(store.getState().count, 21);
