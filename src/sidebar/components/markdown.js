@@ -8,11 +8,13 @@ var renderMarkdown = require('../render-markdown');
 var scopeTimeout = require('../util/scope-timeout');
 
 // @ngInject
-function MarkdownController($element, $sanitize, $scope) {
+function MarkdownController($element, $sanitize, $scope, settings) {
   var input = $element[0].querySelector('.js-markdown-input');
   var output = $element[0].querySelector('.js-markdown-preview');
 
   var self = this;
+  self.isThemeCustom = settings.theme === 'custom';
+
 
   /**
    * Transform the editor's input field with an editor command.

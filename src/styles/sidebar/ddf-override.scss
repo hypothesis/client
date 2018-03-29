@@ -15,6 +15,18 @@
   }
 }
 
+.sidebar__header {
+
+  border-bottom: 1px solid #dadada;
+  margin-bottom: 15px;
+
+  .sidebar__header-title {
+    padding-top: 40px;
+    marign-left: 5px;
+    font-size: 16px;
+    font-weight: 400;
+  }
+}
 
 //card formatting
 .thread-list {
@@ -23,7 +35,7 @@
   .thread-list__card {
 
     box-shadow: none;
-    border-radius: none;
+    border-radius: 0;
 
     .h-icon-visibility-off {
       display: none;
@@ -56,7 +68,13 @@
       float: right;
 
       .annotation-actions {
-        padding-top: 5px;
+        padding: 5px;
+        display: none;
+
+        .annotation-action-btn {
+          color: #0076e0;
+        }
+
       }
 
       .h-icon-cancel-outline:before {
@@ -74,9 +92,9 @@
 
     box-shadow: none;
 
-    // .annotation-actions {
-    //   display: inline-block;
-    // }
+    .annotation-actions {
+      display: flex;
+    }
 
     .annotation-quote {
       border-left: 2px solid #d3d3d3;
@@ -102,7 +120,14 @@
     }
   }
 
-  //if private, apply this selected class instead
+  //apply if the currently selected card is the logged in users own feedback
+  //this will get applied in conjunction with the private card class and will override border styles when card is selected
+  .users__card-selected {
+    border: none;
+    border-left: 5px solid #AED581 !important;
+  }
+
+  //if private, apply this selected state (unless, as a user, the selected card is your own. In that case apply the 'users__card-selected class')
   .private__card-selected {
     border-left: 5px solid #c00;
   }

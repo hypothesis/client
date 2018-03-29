@@ -1,5 +1,6 @@
 <!-- Tabbed display of annotations and notes. -->
 <div class="selection-tabs"
+  ng-if="!vm.isThemeCustom"
   ng-class="{'selection-tabs--theme-clean' : vm.isThemeClean }">
   <a class="selection-tabs__type"
      href="#"
@@ -21,7 +22,7 @@
       ng-if="vm.totalNotes > 0 && !vm.isWaitingToAnchorAnnotations">
       {{ vm.totalNotes }}
     </span>
-  </a> 
+  </a>
   <a class="selection-tabs__type selection-tabs__type--orphan"
     ng-if="vm.totalOrphans > 0 && !vm.isThemeCustom"
     href="#"
