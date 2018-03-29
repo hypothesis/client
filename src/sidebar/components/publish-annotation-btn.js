@@ -6,9 +6,12 @@
  */
 // @ngInject
 module.exports = {
-  controller: function () {
+  controller: function (settings) {
     this.showDropdown = false;
     this.privateLabel = 'Only Me';
+    this.isThemeCustom = settings.theme === 'custom';
+    this.private = false;
+    this.onSetPrivacy({level: 'shared'});
 
     this.publishDestination = function () {
       return this.isShared ? this.group.name : this.privateLabel;
@@ -18,8 +21,10 @@ module.exports = {
       return this.group.public ? 'public' : 'group';
     };
 
-    this.setPrivacy = function (level) {
-      this.onSetPrivacy({level: level});
+    this.setPrivacy = function (isPrivate) {
+      if(isPrivate){
+        this.onSetPrivacy({level: 'private'});
+      }
     };
   },
   controllerAs: 'vm',

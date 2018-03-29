@@ -1,10 +1,20 @@
+<input type="checkbox" name="private-feedback" ng-model="vm.private" ng-change="vm.setPrivacy(vm.private)"> Private
+<button class="publish-annotation-cancel-btn btn-clean"
+        ng-click="vm.onSave()"
+        title="{{'Submit' | translate}}"
+        >
+  <i class="h-icon-cancel-outline publish-annotation-cancel-btn__icon btn-icon"></i> {{'Submit' | translate}}
+</button>
+
 <button class="publish-annotation-cancel-btn btn-clean"
         ng-click="vm.onCancel()"
         title="{{'Cancel changes to this feedback' | translate}}"
         >
   <i class="h-icon-cancel-outline publish-annotation-cancel-btn__icon btn-icon"></i> {{'Cancel' | translate}}
 </button>
-<div dropdown="" class="publish-annotation-btn__btn" is-open="vm.showDropdown" keyboard-nav>
+
+<!-- If the theme is not custom -->
+<div ng-if="!vm.isThemeCustom" dropdown="" class="publish-annotation-btn__btn" is-open="vm.showDropdown" keyboard-nav>
   <dropdown-menu-btn
     label="('Post to' | translate) + ' ' + vm.publishDestination()"
     on-click="vm.onSave()"
