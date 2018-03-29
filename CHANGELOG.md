@@ -4,6 +4,12 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+### Changed
+
+- Some minor internal changes.
+
 ## [1.76.0] - 2018-03-27
 
 ### Changed
