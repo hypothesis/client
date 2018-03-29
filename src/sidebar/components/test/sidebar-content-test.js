@@ -1,7 +1,6 @@
 'use strict';
 
 var angular = require('angular');
-var inherits = require('inherits');
 var proxyquire = require('proxyquire');
 var EventEmitter = require('tiny-emitter');
 
@@ -9,32 +8,38 @@ var events = require('../../events');
 var noCallThru = require('../../../shared/test/util').noCallThru;
 
 var searchClients;
-function FakeSearchClient(searchFn, opts) {
-  assert.ok(searchFn);
-  searchClients.push(this);
-  this.cancel = sinon.stub();
-  this.incremental = !!opts.incremental;
 
-  this.get = sinon.spy(function (query) {
-    assert.ok(query.uri);
+class FakeSearchClient extends EventEmitter {
+  constructor(searchFn, opts) {
+    super();
 
-    for (var i = 0; i < query.uri.length; i++) {
-      var uri = query.uri[i];
-      this.emit('results', [{id: uri + '123', group: '__world__'}]);
-      this.emit('results', [{id: uri + '456', group: 'private-group'}]);
-    }
+    assert.ok(searchFn);
+    searchClients.push(this);
+    this.cancel = sinon.stub();
+    this.incremental = !!opts.incremental;
 
-    this.emit('end');
-  });
+    this.get = sinon.spy(function (query) {
+      assert.ok(query.uri);
+
+      for (var i = 0; i < query.uri.length; i++) {
+        var uri = query.uri[i];
+        this.emit('results', [{id: uri + '123', group: '__world__'}]);
+        this.emit('results', [{id: uri + '456', group: 'private-group'}]);
+      }
+
+      this.emit('end');
+    });
+  }
 }
-inherits(FakeSearchClient, EventEmitter);
 
-function FakeRootThread() {
-  this.thread = sinon.stub().returns({
-    totalChildren: 0,
-  });
+class FakeRootThread extends EventEmitter {
+  constructor() {
+    super();
+    this.thread = sinon.stub().returns({
+      totalChildren: 0,
+    });
+  }
 }
-inherits(FakeRootThread, EventEmitter);
 
 describe('sidebar.components.sidebar-content', function () {
   var $rootScope;

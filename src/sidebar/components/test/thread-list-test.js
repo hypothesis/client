@@ -3,7 +3,6 @@
 var angular = require('angular');
 
 var EventEmitter = require('tiny-emitter');
-var inherits = require('inherits');
 var immutable = require('seamless-immutable');
 
 var events = require('../../events');
@@ -43,29 +42,31 @@ var threadFixtures = immutable({
 var fakeVirtualThread;
 var fakeSettings = {};
 
-function FakeVirtualThreadList($scope, $window, rootThread, options) {
+class FakeVirtualThreadList extends EventEmitter {
+  constructor($scope, $window, rootThread, options) {
+    super();
 
-  fakeVirtualThread = this; // eslint-disable-line consistent-this
+    fakeVirtualThread = this; // eslint-disable-line consistent-this
 
-  var thread = rootThread;
+    var thread = rootThread;
 
-  this.options = options;
-  this.setRootThread = function (_thread) {
-    thread = _thread;
-  };
-  this.notify = function () {
-    this.emit('changed', {
-      offscreenLowerHeight: 10,
-      offscreenUpperHeight: 20,
-      visibleThreads: thread.children,
-    });
-  };
-  this.detach = sinon.stub();
-  this.yOffsetOf = function () {
-    return 42;
-  };
+    this.options = options;
+    this.setRootThread = function (_thread) {
+      thread = _thread;
+    };
+    this.notify = function () {
+      this.emit('changed', {
+        offscreenLowerHeight: 10,
+        offscreenUpperHeight: 20,
+        visibleThreads: thread.children,
+      });
+    };
+    this.detach = sinon.stub();
+    this.yOffsetOf = function () {
+      return 42;
+    };
+  }
 }
-inherits(FakeVirtualThreadList, EventEmitter);
 
 describe('threadList', function () {
   var threadListContainers;
