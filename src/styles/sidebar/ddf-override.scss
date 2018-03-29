@@ -38,7 +38,9 @@
     border-radius: 0;
 
     .h-icon-visibility-off {
-      display: none;
+      display: inline;
+      margin-right: 5px;
+      color: #c00;
     }
 
     .annotation-quote {
