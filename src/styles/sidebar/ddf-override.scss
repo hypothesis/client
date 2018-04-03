@@ -1,12 +1,10 @@
 
-//temp remove top-bar
-
 .app-content-wrapper {
   padding-top: 9px;
   background-color: #ededed !important;
 
 //sidebar header
-.selection-tabs{
+.selection-tabs {
 
   padding-top: 45px; //remove once topbar is gone
 
@@ -22,7 +20,7 @@
 
   .sidebar__header-title {
     padding-top: 40px;
-    marign-left: 5px;
+    margin-left: 5px;
     font-size: 16px;
     font-weight: 400;
   }
@@ -79,6 +77,29 @@
 
       }
 
+      .publish-annotation-btn {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+
+        .publish-annotation-cancel-btn {
+          margin-left: auto;
+          margin-right: 5px;
+        }
+
+        .privateFeedbackInput {
+          margin-bottom: 15px;
+
+          input {
+            margin-right: 8px;
+          }
+
+          .h-icon-visibility-off {
+            color: #7A7A7A;
+          }
+        }
+      }
+
       .h-icon-cancel-outline:before {
         content: "";
       }
@@ -86,6 +107,27 @@
 
     textarea {
       resize: none;
+    }
+
+    //button styles
+
+    .btn-app {
+
+      height: auto;
+      font-family: $overpass-font;
+      font-size: 14px;
+      font-weight: 400;
+      padding: 6px 14px;
+      box-shadow: none;
+      border-radius: 0;
+      text-shadow: none;
+      text-transform: none;
+    }
+
+    .btn-update {
+      background: #0088ce;
+      border-color: #0088ce;
+      color: #fff;
     }
   }
 
@@ -146,5 +188,6 @@
     background-color: transparent !important;
   }
   }
+
 
 }

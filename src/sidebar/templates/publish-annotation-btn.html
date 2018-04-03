@@ -1,17 +1,20 @@
-<input type="checkbox" name="private-feedback" ng-model="vm.private" ng-change="vm.setPrivacy(vm.private)"> Private
-<button class="publish-annotation-cancel-btn btn-clean"
-        ng-click="vm.onSave()"
-        title="{{'Submit' | translate}}"
-        >
-  <i class="h-icon-cancel-outline publish-annotation-cancel-btn__icon btn-icon"></i> {{'Submit' | translate}}
-</button>
-
+<div class="privateFeedbackInput"><input type="checkbox" id="privateCheckbox" name="private-feedback" ng-model="vm.private" ng-change="vm.setPrivacy(vm.private)"><label for="privateCheckbox"><i class="h-icon-visibility-off"></i>Private - visible to Red Hat only</label></div>
 <button class="publish-annotation-cancel-btn btn-clean"
         ng-click="vm.onCancel()"
         title="{{'Cancel changes to this feedback' | translate}}"
         >
-  <i class="h-icon-cancel-outline publish-annotation-cancel-btn__icon btn-icon"></i> {{'Cancel' | translate}}
+  <!-- <i class="h-icon-cancel-outline publish-annotation-cancel-btn__icon btn-icon"></i> -->
+  {{'Cancel' | translate}}
 </button>
+<button class="btn-app btn-update"
+        ng-click="vm.onSave()"
+        title="{{'Submit' | translate}}"
+        >
+  <!-- <i class="h-icon-cancel-outline publish-annotation-cancel-btn__icon btn-icon"></i> -->
+  {{'Submit' | translate}}
+</button>
+
+
 
 <!-- If the theme is not custom -->
 <div ng-if="!vm.isThemeCustom" dropdown="" class="publish-annotation-btn__btn" is-open="vm.showDropdown" keyboard-nav>
