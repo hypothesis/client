@@ -48,7 +48,7 @@ module.exports = class Host extends Guest
     if config.theme == 'clean'
       @frame.addClass('annotator-frame--drop-shadow-enabled')
 
-    @frame.appendTo(element)
+    @frame.appendTo(".rh_docs")
 
     super
 
