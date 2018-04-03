@@ -317,6 +317,11 @@ module.exports = class BucketBar extends Plugin
   isUpper:   (i) -> i == 1
   isLower:   (i) -> i == @index.length - 2
 
+  showBucketBar: () ->
+    $('[class=annotator-bucket-bar]').show();
+
+  hideBucketBar: () ->
+    $('[class=annotator-bucket-bar]').hide();
 
 # Export constants
 BucketBar.BUCKET_SIZE = BUCKET_SIZE

@@ -247,6 +247,8 @@ module.exports = class Sidebar extends Host
       @plugins.Toolbar.showCollapseSidebarBtn();
       @plugins.Toolbar.showCloseBtn();
 
+    if @plugins.BucketBar?
+      @plugins.BucketBar.showBucketBar();
 
     if @options.showHighlights == 'whenSidebarOpen'
       @setVisibleHighlights(true)
@@ -261,6 +263,8 @@ module.exports = class Sidebar extends Host
 
     if @plugins.Toolbar?
       @plugins.Toolbar.showExpandSidebarBtn();
+    if @plugins.BucketBar?
+      @plugins.BucketBar.hideBucketBar();
 
     if @options.showHighlights == 'whenSidebarOpen'
       @setVisibleHighlights(false)
@@ -285,4 +289,3 @@ module.exports = class Sidebar extends Host
       tags.push(anchor.annotation.$tag)
     event.stopPropagation()
     @crossframe?.call('showBucketList', tags);
-
