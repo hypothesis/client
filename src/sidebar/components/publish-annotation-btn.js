@@ -22,9 +22,8 @@ module.exports = {
     };
 
     this.setPrivacy = function (isPrivate) {
-      if(isPrivate){
-        this.onSetPrivacy({level: 'private'});
-      }
+      var level = isPrivate ? 'private' : 'shared';
+      this.onSetPrivacy({level: level});
     };
   },
   controllerAs: 'vm',
