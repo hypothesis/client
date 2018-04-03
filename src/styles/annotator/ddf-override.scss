@@ -6,3 +6,57 @@
     background-color: transparent !important;
   }
 }
+
+.annotator-frame {
+
+.annotator-bucket-bar {
+
+  background: none !important;
+  left: -44px;
+
+}
+}
+  // .annotator-bucket-indicator {
+  //   background-color: #ededed;
+  //   border: 1px solid #ededed;
+  //   border-radius: 0;
+  //   height: 20px;
+  //   width: 36px;
+  //
+  //   &:before, &:after {
+  //     display: none;
+  //   }
+  //
+  //   &.upper,
+  //   &.lower {
+  //     border-radius: 0;
+  //   }
+  //
+  //   .label {
+  //     color: #000;
+  //     line-height: 17px;
+  //
+  //     &:before {
+  //
+  //     }
+  //   }
+  //
+  //
+  //   //when a feedback-indicator has been selected, all others will recieve this class
+  //   &.indicator-disabled {
+  //     background-color: #fff;
+  //     opacity: .5;
+  //   }
+  //
+  // }
+
+
+
+
+
+@media screen and (min-width: 37.5em) {
+  .annotator-frame {
+    width: 300px;
+    margin-left: -300px;
+  }
+}
