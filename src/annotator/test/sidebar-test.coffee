@@ -7,6 +7,8 @@ rafStub = (fn) ->
 
 Sidebar = proxyquire('../sidebar', { raf: rafStub })
 
+EXTERNAL_CONTAINER_SELECTOR = 'test-external-container'
+
 describe 'Sidebar', ->
   sandbox = sinon.sandbox.create()
   CrossFrame = null
@@ -39,14 +41,22 @@ describe 'Sidebar', ->
     fakeToolbar.getWidth = sandbox.stub()
     fakeToolbar.destroy = sandbox.stub()
 
+    fakeBucketBar = {}
+    fakeBucketBar.element = {on: sandbox.stub()}
+    fakeBucketBar.destroy = sandbox.stub()
+
     CrossFrame = sandbox.stub()
     CrossFrame.returns(fakeCrossFrame)
 
     Toolbar = sandbox.stub()
     Toolbar.returns(fakeToolbar)
 
+    BucketBar = sandbox.stub()
+    BucketBar.returns(fakeBucketBar)
+
     sidebarConfig.pluginClasses['CrossFrame'] = CrossFrame
     sidebarConfig.pluginClasses['Toolbar'] = Toolbar
+    sidebarConfig.pluginClasses['BucketBar'] = BucketBar
 
   afterEach ->
     sandbox.restore()
@@ -358,3 +368,13 @@ describe 'Sidebar', ->
       sidebar.gestureState = { initial: -DEFAULT_WIDTH }
       sidebar.onPan({type: 'panright', deltaX: 50})
       assertLayoutValues layoutChangeHandlerSpy.lastCall.args[0], { width: 300 }
+
+  describe 'config', ->
+    it 'does not have the BucketBar plugin if the clean theme is enabled', ->
+      sidebar = createSidebar({ theme: 'clean' })
+      assert.isUndefined(sidebar.plugins.BucketBar)
+
+    it 'does not have the BucketBar or Toolbar plugin if an external container is provided', ->
+      sidebar = createSidebar({ externalContainerSelector: '.' + EXTERNAL_CONTAINER_SELECTOR })
+      assert.isUndefined(sidebar.plugins.BucketBar)
+      assert.isUndefined(sidebar.plugins.Toolbar)

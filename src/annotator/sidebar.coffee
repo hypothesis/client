@@ -25,7 +25,13 @@ module.exports = class Sidebar extends Host
   gestureState: null
 
   constructor: (element, config) ->
+    if config.theme == 'clean' || config.externalContainerSelector
+      delete config.pluginClasses.BucketBar
+    if config.externalContainerSelector
+      delete config.pluginClasses.Toolbar
+
     super
+
     this.hide()
 
     if config.openSidebar || config.annotations || config.query
@@ -252,9 +258,9 @@ module.exports = class Sidebar extends Host
     @frame.css 'margin-left': ''
     @frame.addClass 'annotator-collapsed'
 
-    @plugins.Toolbar.hideCloseBtn();
 
     if @plugins.Toolbar?
+      @plugins.Toolbar.hideCloseBtn();
       @plugins.Toolbar.showExpandSidebarBtn();
 
     if @options.showHighlights == 'whenSidebarOpen'
