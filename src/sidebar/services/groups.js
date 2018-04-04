@@ -58,7 +58,9 @@ function groups($rootScope, store, api, isSidebar, localStorage, serviceUrl, ses
       uri = getDocumentUriForGroupSearch();
     }
     return uri.then(uri => {
-      var params = {};
+      var params = {
+        expand: 'organization',
+      };
       if (authority) {
         params.authority = authority;
       }
@@ -141,7 +143,7 @@ function groups($rootScope, store, api, isSidebar, localStorage, serviceUrl, ses
       }
     }
   }
-  
+
   // reset the focused group if the user leaves it
   $rootScope.$on(events.GROUPS_CHANGED, function () {
     // return for use in test

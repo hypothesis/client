@@ -114,6 +114,15 @@ describe('groups', function() {
       });
     });
 
+    it('always sends the `expand` parameter', function () {
+      const svc = service();
+      return svc.load().then(() => {
+        const call = fakeApi.groups.list.getCall(0);
+        assert.isObject(call.args[0]);
+        assert.equal(call.args[0].expand, 'organization');
+      });
+    });
+
     it('focuses on the first in the list of groups if user leaves the focused group', function () {
       var svc = service();
 
@@ -139,7 +148,10 @@ describe('groups', function() {
         fakeStore.setState({ searchUris: ['https://asite.com'] });
 
         return loaded.then(() => {
-          assert.calledWith(fakeApi.groups.list, { document_uri: 'https://asite.com' });
+          assert.calledWith(fakeApi.groups.list, {
+            document_uri: 'https://asite.com',
+            expand: 'organization',
+          });
         });
       });
     });
@@ -153,7 +165,9 @@ describe('groups', function() {
         fakeStore.setState({ searchUris: [] });
         var svc = service();
         return svc.load().then(() => {
-          assert.calledWith(fakeApi.groups.list, {});
+          assert.calledWith(fakeApi.groups.list, {
+            expand: 'organization',
+          });
         });
       });
     });
