@@ -30,6 +30,7 @@ function configFrom(window_) {
     // Subframe identifier given when a frame is being embedded into
     // by a top level client
     subFrameIdentifier: settings.hostPageSetting('subFrameIdentifier', {allowInBrowserExt: true}),
+    externalContainerSelector: settings.hostPageSetting('externalContainerSelector'),
   };
 }
 
