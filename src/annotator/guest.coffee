@@ -171,22 +171,22 @@ module.exports = class Guest extends Delegator
 
   _connectAnnotationUISync: (crossframe, config) ->
     crossframe.on 'focusAnnotations', (tags=[]) =>
-      # Focus annotations on the doc when the theme is not custom
-      if config.theme != 'custom'
-        for anchor in @anchors when anchor.highlights?
-          toggle = anchor.annotation.$tag in tags
-          $(anchor.highlights).toggleClass('annotator-hl-focused', toggle)
+      for anchor in @anchors when anchor.highlights?
+        toggle = anchor.annotation.$tag in tags
+        # If the text is already selected, don't do anything, if not, highlights it with the lighter color
+        if !$(anchor.highlights).hasClass('annotator-hl annotator-hl-selected-public')
+          $(anchor.highlights).toggleClass('annotator-hl-hover-public', toggle)
 
     crossframe.on 'scrollToAnnotation', (tag) =>
-      selectedFeedbackNumber = $('.annotator-hl-focused').length
+      selectedFeedbackNumber = $('.annotator-hl-selected-public').length
       for anchor in @anchors when anchor.highlights?
         if anchor.annotation.$tag is tag
           # highlight/unhighlight the feedback on the doc
           # If there is already more than 1 selected feedback, keep the selected one highlighted, remove the other highlights
           if selectedFeedbackNumber != 1
-            $(anchor.highlights).addClass('annotator-hl-focused')
+            $(anchor.highlights).addClass('annotator-hl-selected-public')
           else
-            $(anchor.highlights).toggleClass('annotator-hl-focused')
+            $(anchor.highlights).toggleClass('annotator-hl-selected-public')
           # scroll to feedback
           event = new CustomEvent('scrolltorange', {
             bubbles: true
@@ -198,7 +198,7 @@ module.exports = class Guest extends Delegator
             scrollIntoView(anchor.highlights[0])
         else
           # clear all feedback highlights except for the selected one
-          $(anchor.highlights).removeClass('annotator-hl-focused')
+          $(anchor.highlights).removeClass('annotator-hl-selected-public')
 
 
     crossframe.on 'getDocumentInfo', (cb) =>

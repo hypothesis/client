@@ -1,16 +1,54 @@
-
-.annotator-hl.annotator-hl-focused {
-  background-color: $highlight-color !important;
+/////////////////////////////////////////////////////
+// ALERT! : ARMAGAN'S CSS BEGIN!!!
+////////////////////////////////////////////////////
+// Public comments
+.annotator-hl.annotator-hl-selected-public {
+  background-color: #FFD54F !important;
 
   .annotator-hl {
     background-color: transparent !important;
   }
 }
 
+//  Your comments
+.annotator-hl.annotator-hl-selected-yours {
+  background-color: #AED581 !important;
+
+  .annotator-hl {
+    background-color: transparent !important;
+  }
+}
+
+// Private comments
+
+.annotator-hl.annotator-hl-selected-private {
+  background-color: #FF8A65 !important;
+
+  .annotator-hl {
+    background-color: transparent !important;
+  }
+}
+
+// Hover public comments
+
+.annotator-hl.annotator-hl-hover-public {
+  background-color: #FFECB3;
+
+  .annotator-hl {
+    background-color: transparent !important;
+  }
+}
+
+/////////////////////////////////////////////////////
+// ALERT! : ARMAGAN'S CSS FINISH!!!
+////////////////////////////////////////////////////
+
 .annotator-frame {
 
 .annotator-bucket-bar {
 
+  // Disabling the BucketBar
+  display:none;
   background: none !important;
   left: -44px;
 

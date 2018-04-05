@@ -247,8 +247,10 @@ module.exports = class Sidebar extends Host
       @plugins.Toolbar.showCollapseSidebarBtn();
       @plugins.Toolbar.showCloseBtn();
 
-    if @plugins.BucketBar?
-      @plugins.BucketBar.showBucketBar();
+    # This piece of code enables the BucketBar when toggled. It is commented out now,
+    # Because BucketBar is going to be hidden in phase 1.
+    # if @plugins.BucketBar?
+    #   @plugins.BucketBar.showBucketBar();
 
     if @options.showHighlights == 'whenSidebarOpen'
       @setVisibleHighlights(true)
@@ -263,8 +265,11 @@ module.exports = class Sidebar extends Host
 
     if @plugins.Toolbar?
       @plugins.Toolbar.showExpandSidebarBtn();
-    if @plugins.BucketBar?
-      @plugins.BucketBar.hideBucketBar();
+
+    # This piece of code disables the BucketBar when toggled. It is commented out now,
+    # Because BucketBar is going to be hidden in phase 1.
+    # if @plugins.BucketBar?
+    #   @plugins.BucketBar.hideBucketBar();
 
     if @options.showHighlights == 'whenSidebarOpen'
       @setVisibleHighlights(false)
