@@ -176,70 +176,70 @@ class Adder {
 
     this._width = () => this.element.getBoundingClientRect().width;
     this._height = () => this.element.getBoundingClientRect().height;
+  }
 
-    /** Hide the adder */
-    this.hide = () => {
-      clearTimeout(this._enterTimeout);
-      this.element.className = classnames({'annotator-adder': true});
-      this.element.style.visibility = 'hidden';
-    };
+  /** Hide the adder */
+  hide() {
+    clearTimeout(this._enterTimeout);
+    this.element.className = classnames({'annotator-adder': true});
+    this.element.style.visibility = 'hidden';
+  }
 
-    /**
-     * Return the best position to show the adder in order to target the
-     * selected text in `targetRect`.
-     *
-     * @param {Rect} targetRect - The rect of text to target, in viewport
-     *        coordinates.
-     * @param {boolean} isSelectionBackwards - True if the selection was made
-     *        backwards, such that the focus point is mosty likely at the top-left
-     *        edge of `targetRect`.
-     * @return {Target}
-     */
-    this.target = (targetRect, isSelectionBackwards) => {
-      // Set the initial arrow direction based on whether the selection was made
-      // forwards/upwards or downwards/backwards.
-      var arrowDirection;
-      if (isSelectionBackwards) {
-        arrowDirection = ARROW_POINTING_DOWN;
-      } else {
-        arrowDirection = ARROW_POINTING_UP;
-      }
-      var top;
-      var left;
+  /**
+   * Return the best position to show the adder in order to target the
+   * selected text in `targetRect`.
+   *
+   * @param {Rect} targetRect - The rect of text to target, in viewport
+   *        coordinates.
+   * @param {boolean} isSelectionBackwards - True if the selection was made
+   *        backwards, such that the focus point is mosty likely at the top-left
+   *        edge of `targetRect`.
+   * @return {Target}
+   */
+  target(targetRect, isSelectionBackwards) {
+    // Set the initial arrow direction based on whether the selection was made
+    // forwards/upwards or downwards/backwards.
+    var arrowDirection;
+    if (isSelectionBackwards) {
+      arrowDirection = ARROW_POINTING_DOWN;
+    } else {
+      arrowDirection = ARROW_POINTING_UP;
+    }
+    var top;
+    var left;
 
-      // Position the adder such that the arrow it is above or below the selection
-      // and close to the end.
-      var hMargin = Math.min(ARROW_H_MARGIN, targetRect.width);
-      if (isSelectionBackwards) {
-        left = targetRect.left - this._width() / 2 + hMargin;
-      } else {
-        left = targetRect.left + targetRect.width - this._width() / 2 - hMargin;
-      }
+    // Position the adder such that the arrow it is above or below the selection
+    // and close to the end.
+    var hMargin = Math.min(ARROW_H_MARGIN, targetRect.width);
+    if (isSelectionBackwards) {
+      left = targetRect.left - this._width() / 2 + hMargin;
+    } else {
+      left = targetRect.left + targetRect.width - this._width() / 2 - hMargin;
+    }
 
-      // Flip arrow direction if adder would appear above the top or below the
-      // bottom of the viewport.
-      if (targetRect.top - this._height() < 0 &&
-          arrowDirection === ARROW_POINTING_DOWN) {
-        arrowDirection = ARROW_POINTING_UP;
-      } else if (targetRect.top + this._height() > this._view.innerHeight) {
-        arrowDirection = ARROW_POINTING_DOWN;
-      }
+    // Flip arrow direction if adder would appear above the top or below the
+    // bottom of the viewport.
+    if (targetRect.top - this._height() < 0 &&
+        arrowDirection === ARROW_POINTING_DOWN) {
+      arrowDirection = ARROW_POINTING_UP;
+    } else if (targetRect.top + this._height() > this._view.innerHeight) {
+      arrowDirection = ARROW_POINTING_DOWN;
+    }
 
-      if (arrowDirection === ARROW_POINTING_UP) {
-        top = targetRect.top + targetRect.height + ARROW_HEIGHT;
-      } else {
-        top = targetRect.top - this._height() - ARROW_HEIGHT;
-      }
+    if (arrowDirection === ARROW_POINTING_UP) {
+      top = targetRect.top + targetRect.height + ARROW_HEIGHT;
+    } else {
+      top = targetRect.top - this._height() - ARROW_HEIGHT;
+    }
 
-      // Constrain the adder to the viewport.
-      left = Math.max(left, 0);
-      left = Math.min(left, this._view.innerWidth - this._width());
+    // Constrain the adder to the viewport.
+    left = Math.max(left, 0);
+    left = Math.min(left, this._view.innerWidth - this._width());
 
-      top = Math.max(top, 0);
-      top = Math.min(top, this._view.innerHeight - this._height());
+    top = Math.max(top, 0);
+    top = Math.min(top, this._view.innerHeight - this._height());
 
-      return {top, left, arrowDirection};
-    };
+    return {top, left, arrowDirection};
   }
 
   /**
