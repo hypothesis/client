@@ -131,8 +131,7 @@ class Adder {
    *        event handlers.
    */
   constructor(container, options) {
-    var self = this;
-    self.element = createAdderDOM(container);
+    this.element = createAdderDOM(container);
 
     // Set initial style
     Object.assign(container.style, {
@@ -149,21 +148,16 @@ class Adder {
 
     // The adder is hidden using the `visibility` property rather than `display`
     // so that we can compute its size in order to position it before display.
-    self.element.style.visibility = 'hidden';
+    this.element.style.visibility = 'hidden';
 
-    var view = self.element.ownerDocument.defaultView;
+    var view = this.element.ownerDocument.defaultView;
     var enterTimeout;
 
-    self.element.querySelector(ANNOTATE_BTN_SELECTOR)
-      .addEventListener('click', handleCommand);
-    self.element.querySelector(HIGHLIGHT_BTN_SELECTOR)
-      .addEventListener('click', handleCommand);
-
-    function handleCommand(event) {
+    var handleCommand = (event) => {
       event.preventDefault();
       event.stopPropagation();
 
-      var isAnnotateCommand = this.classList.contains(ANNOTATE_BTN_CLASS);
+      var isAnnotateCommand = event.target.classList.contains(ANNOTATE_BTN_CLASS);
 
       if (isAnnotateCommand) {
         options.onAnnotate();
@@ -171,22 +165,22 @@ class Adder {
         options.onHighlight();
       }
 
-      self.hide();
-    }
+      this.hide();
+    };
 
-    function width() {
-      return self.element.getBoundingClientRect().width;
-    }
+    this.element.querySelector(ANNOTATE_BTN_SELECTOR)
+      .addEventListener('click', handleCommand);
+    this.element.querySelector(HIGHLIGHT_BTN_SELECTOR)
+      .addEventListener('click', handleCommand);
 
-    function height() {
-      return self.element.getBoundingClientRect().height;
-    }
+    var width = () => this.element.getBoundingClientRect().width;
+    var height = () => this.element.getBoundingClientRect().height;
 
     /** Hide the adder */
-    this.hide = function () {
+    this.hide = () => {
       clearTimeout(enterTimeout);
-      self.element.className = classnames({'annotator-adder': true});
-      self.element.style.visibility = 'hidden';
+      this.element.className = classnames({'annotator-adder': true});
+      this.element.style.visibility = 'hidden';
     };
 
     /**
@@ -200,7 +194,7 @@ class Adder {
      *        edge of `targetRect`.
      * @return {Target}
      */
-    this.target = function (targetRect, isSelectionBackwards) {
+    this.target = (targetRect, isSelectionBackwards) => {
       // Set the initial arrow direction based on whether the selection was made
       // forwards/upwards or downwards/backwards.
       var arrowDirection;
@@ -253,8 +247,8 @@ class Adder {
      * @param {number} left - Horizontal offset from left edge of viewport.
      * @param {number} top - Vertical offset from top edge of viewport.
      */
-    this.showAt = function (left, top, arrowDirection) {
-      self.element.className = classnames({
+    this.showAt = (left, top, arrowDirection) => {
+      this.element.className = classnames({
         'annotator-adder': true,
         'annotator-adder--arrow-down': arrowDirection === ARROW_POINTING_DOWN,
         'annotator-adder--arrow-up': arrowDirection === ARROW_POINTING_UP,
@@ -265,8 +259,8 @@ class Adder {
       // after use. So we need to make sure the button stays displayed
       // the way it was originally displayed - without the inline styles
       // See: https://github.com/hypothesis/client/issues/137
-      self.element.querySelector(ANNOTATE_BTN_SELECTOR).style.display = '';
-      self.element.querySelector(HIGHLIGHT_BTN_SELECTOR).style.display = '';
+      this.element.querySelector(ANNOTATE_BTN_SELECTOR).style.display = '';
+      this.element.querySelector(HIGHLIGHT_BTN_SELECTOR).style.display = '';
 
       // Translate the (left, top) viewport coordinates into positions relative to
       // the adder's nearest positioned ancestor (NPA).
@@ -281,11 +275,11 @@ class Adder {
         top: toPx(top - parentRect.top),
         left: toPx(left - parentRect.left),
       });
-      self.element.style.visibility = 'visible';
+      this.element.style.visibility = 'visible';
 
       clearTimeout(enterTimeout);
-      enterTimeout = setTimeout(function () {
-        self.element.className += ' is-active';
+      enterTimeout = setTimeout(() => {
+        this.element.className += ' is-active';
       }, 1);
     };
   }
