@@ -240,49 +240,49 @@ class Adder {
 
       return {top, left, arrowDirection};
     };
+  }
 
-    /**
-     * Show the adder at the given position and with the arrow pointing in
-     * `arrowDirection`.
-     *
-     * @param {number} left - Horizontal offset from left edge of viewport.
-     * @param {number} top - Vertical offset from top edge of viewport.
-     */
-    this.showAt = (left, top, arrowDirection) => {
-      this.element.className = classnames({
-        'annotator-adder': true,
-        'annotator-adder--arrow-down': arrowDirection === ARROW_POINTING_DOWN,
-        'annotator-adder--arrow-up': arrowDirection === ARROW_POINTING_UP,
-      });
+  /**
+   * Show the adder at the given position and with the arrow pointing in
+   * `arrowDirection`.
+   *
+   * @param {number} left - Horizontal offset from left edge of viewport.
+   * @param {number} top - Vertical offset from top edge of viewport.
+   */
+  showAt(left, top, arrowDirection) {
+    this.element.className = classnames({
+      'annotator-adder': true,
+      'annotator-adder--arrow-down': arrowDirection === ARROW_POINTING_DOWN,
+      'annotator-adder--arrow-up': arrowDirection === ARROW_POINTING_UP,
+    });
 
-      // Some sites make big assumptions about interactive
-      // elements on the page. Some want to hide interactive elements
-      // after use. So we need to make sure the button stays displayed
-      // the way it was originally displayed - without the inline styles
-      // See: https://github.com/hypothesis/client/issues/137
-      this.element.querySelector(ANNOTATE_BTN_SELECTOR).style.display = '';
-      this.element.querySelector(HIGHLIGHT_BTN_SELECTOR).style.display = '';
+    // Some sites make big assumptions about interactive
+    // elements on the page. Some want to hide interactive elements
+    // after use. So we need to make sure the button stays displayed
+    // the way it was originally displayed - without the inline styles
+    // See: https://github.com/hypothesis/client/issues/137
+    this.element.querySelector(ANNOTATE_BTN_SELECTOR).style.display = '';
+    this.element.querySelector(HIGHLIGHT_BTN_SELECTOR).style.display = '';
 
-      // Translate the (left, top) viewport coordinates into positions relative to
-      // the adder's nearest positioned ancestor (NPA).
-      //
-      // Typically the adder is a child of the `<body>` and the NPA is the root
-      // `<html>` element. However page styling may make the `<body>` positioned.
-      // See https://github.com/hypothesis/client/issues/487.
-      var positionedAncestor = nearestPositionedAncestor(this._container);
-      var parentRect = positionedAncestor.getBoundingClientRect();
+    // Translate the (left, top) viewport coordinates into positions relative to
+    // the adder's nearest positioned ancestor (NPA).
+    //
+    // Typically the adder is a child of the `<body>` and the NPA is the root
+    // `<html>` element. However page styling may make the `<body>` positioned.
+    // See https://github.com/hypothesis/client/issues/487.
+    var positionedAncestor = nearestPositionedAncestor(this._container);
+    var parentRect = positionedAncestor.getBoundingClientRect();
 
-      Object.assign(this._container.style, {
-        top: toPx(top - parentRect.top),
-        left: toPx(left - parentRect.left),
-      });
-      this.element.style.visibility = 'visible';
+    Object.assign(this._container.style, {
+      top: toPx(top - parentRect.top),
+      left: toPx(left - parentRect.left),
+    });
+    this.element.style.visibility = 'visible';
 
-      clearTimeout(this._enterTimeout);
-      this._enterTimeout = setTimeout(() => {
-        this.element.className += ' is-active';
-      }, 1);
-    };
+    clearTimeout(this._enterTimeout);
+    this._enterTimeout = setTimeout(() => {
+      this.element.className += ' is-active';
+    }, 1);
   }
 }
 
