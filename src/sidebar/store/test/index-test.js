@@ -289,15 +289,6 @@ describe('store', function () {
     ]);
   });
 
-  describe('#subscribe()', function () {
-    it('notifies subscribers when the UI state changes', function () {
-      var listener = sinon.stub();
-      store.subscribe(listener);
-      store.addAnnotations([annotationFixtures.defaultAnnotation()]);
-      assert.called(listener);
-    });
-  });
-
   describe('#setForceVisible()', function () {
     it('sets the visibility of the annotation', function () {
       store.setForceVisible('id1', true);
@@ -518,31 +509,6 @@ describe('store', function () {
       store.addAnnotations([annot]);
       store.updateAnchorStatus({ [tagForID(annot.id)]: 'orphan' });
       assert.equal(store.getState().annotations[0].$orphan, true);
-    });
-  });
-
-  describe('selector functions', function () {
-    // The individual state management modules in reducers/*.js define various
-    // 'selector' functions for extracting data from the app state. These are
-    // then re-exported on the store module.
-    it('re-exports selectors from reducers', function () {
-      var selectors = [
-        // Selection
-        'hasSelectedAnnotations',
-        'isAnnotationSelected',
-
-        // Annotations
-        'annotationExists',
-        'findIDsForTags',
-        'savedAnnotations',
-
-        // App Status
-        'isSidebar',
-      ];
-
-      selectors.forEach(function (fnName) {
-        assert.equal(typeof store[fnName], 'function', fnName + ' was exported');
-      });
     });
   });
 });
