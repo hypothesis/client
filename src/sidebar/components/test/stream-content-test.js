@@ -1,13 +1,14 @@
 'use strict';
 
 var angular = require('angular');
-var inherits = require('inherits');
 var EventEmitter = require('tiny-emitter');
 
-function FakeRootThread() {
-  this.thread = sinon.stub();
+class FakeRootThread extends EventEmitter {
+  constructor() {
+    super();
+    this.thread = sinon.stub();
+  }
 }
-inherits(FakeRootThread, EventEmitter);
 
 describe('StreamContentController', function () {
   var $componentController;

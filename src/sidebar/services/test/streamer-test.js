@@ -1,7 +1,6 @@
 'use strict';
 
 var EventEmitter = require('tiny-emitter');
-var inherits = require('inherits');
 var proxyquire = require('proxyquire');
 
 var events = require('../../events');
@@ -42,28 +41,31 @@ var fixtures = {
 // the most recently created FakeSocket instance
 var fakeWebSocket = null;
 
-function FakeSocket(url) {
-  fakeWebSocket = this; // eslint-disable-line consistent-this
+class FakeSocket extends EventEmitter {
+  constructor(url) {
+    super();
 
-  this.url = url;
-  this.messages = [];
-  this.didClose = false;
+    fakeWebSocket = this; // eslint-disable-line consistent-this
 
-  this.isConnected = sinon.stub().returns(true);
+    this.url = url;
+    this.messages = [];
+    this.didClose = false;
 
-  this.send = function (message) {
-    this.messages.push(message);
-  };
+    this.isConnected = sinon.stub().returns(true);
 
-  this.notify = function (message) {
-    this.emit('message', {data: JSON.stringify(message)});
-  };
+    this.send = function (message) {
+      this.messages.push(message);
+    };
 
-  this.close = function () {
-    this.didClose = true;
-  };
+    this.notify = function (message) {
+      this.emit('message', {data: JSON.stringify(message)});
+    };
+
+    this.close = function () {
+      this.didClose = true;
+    };
+  }
 }
-inherits(FakeSocket, EventEmitter);
 
 describe('Streamer', function () {
   var fakeAnnotationMapper;
