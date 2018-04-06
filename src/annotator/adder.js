@@ -132,6 +132,7 @@ class Adder {
    */
   constructor(container, options) {
     this.element = createAdderDOM(container);
+    this._container = container;
 
     // Set initial style
     Object.assign(container.style, {
@@ -151,7 +152,7 @@ class Adder {
     this.element.style.visibility = 'hidden';
 
     var view = this.element.ownerDocument.defaultView;
-    var enterTimeout;
+    this._enterTimeout = null;
 
     var handleCommand = (event) => {
       event.preventDefault();
@@ -178,7 +179,7 @@ class Adder {
 
     /** Hide the adder */
     this.hide = () => {
-      clearTimeout(enterTimeout);
+      clearTimeout(this._enterTimeout);
       this.element.className = classnames({'annotator-adder': true});
       this.element.style.visibility = 'hidden';
     };
@@ -268,17 +269,17 @@ class Adder {
       // Typically the adder is a child of the `<body>` and the NPA is the root
       // `<html>` element. However page styling may make the `<body>` positioned.
       // See https://github.com/hypothesis/client/issues/487.
-      var positionedAncestor = nearestPositionedAncestor(container);
+      var positionedAncestor = nearestPositionedAncestor(this._container);
       var parentRect = positionedAncestor.getBoundingClientRect();
 
-      Object.assign(container.style, {
+      Object.assign(this._container.style, {
         top: toPx(top - parentRect.top),
         left: toPx(left - parentRect.left),
       });
       this.element.style.visibility = 'visible';
 
-      clearTimeout(enterTimeout);
-      enterTimeout = setTimeout(() => {
+      clearTimeout(this._enterTimeout);
+      this._enterTimeout = setTimeout(() => {
         this.element.className += ' is-active';
       }, 1);
     };
