@@ -151,7 +151,7 @@ class Adder {
     // so that we can compute its size in order to position it before display.
     this.element.style.visibility = 'hidden';
 
-    var view = this.element.ownerDocument.defaultView;
+    this._view = this.element.ownerDocument.defaultView;
     this._enterTimeout = null;
 
     var handleCommand = (event) => {
@@ -174,8 +174,8 @@ class Adder {
     this.element.querySelector(HIGHLIGHT_BTN_SELECTOR)
       .addEventListener('click', handleCommand);
 
-    var width = () => this.element.getBoundingClientRect().width;
-    var height = () => this.element.getBoundingClientRect().height;
+    this._width = () => this.element.getBoundingClientRect().width;
+    this._height = () => this.element.getBoundingClientRect().height;
 
     /** Hide the adder */
     this.hide = () => {
@@ -211,32 +211,32 @@ class Adder {
       // and close to the end.
       var hMargin = Math.min(ARROW_H_MARGIN, targetRect.width);
       if (isSelectionBackwards) {
-        left = targetRect.left - width() / 2 + hMargin;
+        left = targetRect.left - this._width() / 2 + hMargin;
       } else {
-        left = targetRect.left + targetRect.width - width() / 2 - hMargin;
+        left = targetRect.left + targetRect.width - this._width() / 2 - hMargin;
       }
 
       // Flip arrow direction if adder would appear above the top or below the
       // bottom of the viewport.
-      if (targetRect.top - height() < 0 &&
+      if (targetRect.top - this._height() < 0 &&
           arrowDirection === ARROW_POINTING_DOWN) {
         arrowDirection = ARROW_POINTING_UP;
-      } else if (targetRect.top + height() > view.innerHeight) {
+      } else if (targetRect.top + this._height() > this._view.innerHeight) {
         arrowDirection = ARROW_POINTING_DOWN;
       }
 
       if (arrowDirection === ARROW_POINTING_UP) {
         top = targetRect.top + targetRect.height + ARROW_HEIGHT;
       } else {
-        top = targetRect.top - height() - ARROW_HEIGHT;
+        top = targetRect.top - this._height() - ARROW_HEIGHT;
       }
 
       // Constrain the adder to the viewport.
       left = Math.max(left, 0);
-      left = Math.min(left, view.innerWidth - width());
+      left = Math.min(left, this._view.innerWidth - this._width());
 
       top = Math.max(top, 0);
-      top = Math.min(top, view.innerHeight - height());
+      top = Math.min(top, this._view.innerHeight - this._height());
 
       return {top, left, arrowDirection};
     };
