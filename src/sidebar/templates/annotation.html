@@ -4,8 +4,6 @@
 
 <div ng-keydown="vm.onKeydown($event)" ng-if="vm.user()">
 
-
-
   <!-- Excerpts -->
   <section class="annotation-quote-list"
     ng-class="{'is-orphan' : vm.isOrphan()}"
@@ -41,6 +39,7 @@
   </section>
   <!-- / Body -->
   <annotation-header annotation="vm.annotation"
+                    ng-hide="vm.editing()"
                      is-editing="vm.editing()"
                      is-highlight="vm.isHighlight()"
                      is-private="vm.state().isPrivate"
