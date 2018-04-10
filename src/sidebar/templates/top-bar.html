@@ -1,7 +1,8 @@
 <!-- top bar for the sidebar and the stream.
 !-->
 <div class="top-bar"
-  ng-class="{'top-bar--theme-clean' : vm.isThemeClean }">
+  ng-class="{'top-bar--theme-clean' : vm.isThemeClean }"
+  ng-if="!vm.isThemeCustom">
   <!-- Legacy design for top bar, as used in the stream !-->
   <div class="top-bar__inner content" ng-if="::!vm.isSidebar">
     <search-input
