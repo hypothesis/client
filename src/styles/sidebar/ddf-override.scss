@@ -19,10 +19,21 @@
   margin-bottom: 15px;
 
   .sidebar__header-title {
-    padding-top: 40px;
     margin-left: 5px;
-    font-size: 16px;
+    font-size: 18px;
     font-weight: 400;
+    display: inline-block;
+  }
+
+  .sidebar-close {
+    float: right;
+    margin-top: 16px;
+    margin-right: 5px;
+    background: none;
+    border: none;
+    color: #585858;
+    font-size: 18px;
+
   }
 }
 
