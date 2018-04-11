@@ -59,11 +59,10 @@ describe('group-organizations', function () {
 
       const sortedGroups = groupsByOrganization(groups);
 
-      assert(typeof sortedGroups[0].logo === 'string');
+      assert(sortedGroups[0].logo === org.logo);
       assert(typeof sortedGroups[1].logo === 'undefined');
-      assert(typeof sortedGroups[2].logo === 'string');
+      assert(sortedGroups[2].logo === org2.logo);
       assert(typeof sortedGroups[3].logo === 'undefined');
-
     });
   });
 
@@ -140,35 +139,20 @@ describe('group-organizations', function () {
 
   context('when building data structures', function () {
 
-    it ('should deep-clone group objects', function () {
+    it ('returned group objects should be immutable', function () {
       const group = orgFixtures.expandedGroup({name: 'Halfnium'});
       const groups = [group];
 
       const sortedGroups = groupsByOrganization(groups);
-      sortedGroups[0].name = 'Something Else';
-      sortedGroups[0].links.html = 'foobar';
-
-      assert(sortedGroups[0] !== group);
-      assert(group.name === 'Halfnium');
-      assert(group.links.html !== sortedGroups[0].links.html);
-
-    });
-
-
-    it ('should shallow-clone organization objects', function () {
-      const org = orgFixtures.organization({ name: 'Lanthanum' });
-      const group = orgFixtures.expandedGroup({
-        name: 'Halfnium',
-        organization: org,
+      assert.throws(() => {
+        sortedGroups[0].name = 'Something Else';
       });
-      const groups = [group];
+      assert.throws(() => {
+        sortedGroups[0].links.html = 'dingdong';
+      });
 
-      const sortedGroups = groupsByOrganization(groups);
-      sortedGroups[0].organization.name = 'Tantalum';
-
-      assert(sortedGroups[0].organization !== org);
-      assert(org.name !== 'Tantalum');
+      assert(group.name !== 'Something Else');
+      assert(group.links.html !== 'dingdong');
     });
-
   });
 });

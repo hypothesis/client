@@ -1,5 +1,7 @@
 'use strict';
 
+const immutable = require('seamless-immutable');
+
  // TODO: Update when this is a property available on the API response
 const DEFAULT_ORG_ID = '__default__';
 
@@ -25,18 +27,18 @@ function orgKey (organization) {
  */
 function addGroup (group, organization) {
   // Object.assign won't suffice because of nested objects on groups
-  const groupObj = JSON.parse(JSON.stringify(group));
+  const groupObj = Object.assign({}, group);
   const groupList = organization.groups;
 
   if (!groupList.length && group.organization.logo) {
     groupObj.logo = group.organization.logo;
   }
 
-  groupList.push(groupObj);
+  groupList.push(immutable(groupObj));
 }
 
 /**
- * Iterate over groups and located unique organizations. Slot groups into
+ * Iterate over groups and locate unique organizations. Slot groups into
  * their appropriate "parent" organizations.
  *
  * @param {Array<Group>} groups
