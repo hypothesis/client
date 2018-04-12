@@ -8,11 +8,11 @@ describe('sidebarTrigger', function () {
 
   beforeEach(function () {
     triggerEl1 = document.createElement('button');
-    triggerEl1.setAttribute('data-hypothesis-trigger');
+    triggerEl1.setAttribute('data-hypothesis-trigger', '');
     document.body.appendChild(triggerEl1);
 
     triggerEl2 = document.createElement('button');
-    triggerEl2.setAttribute('data-hypothesis-trigger');
+    triggerEl2.setAttribute('data-hypothesis-trigger', '');
     document.body.appendChild(triggerEl2);
   });
 

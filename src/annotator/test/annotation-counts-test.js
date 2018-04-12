@@ -15,15 +15,15 @@ describe('annotationCounts', function () {
     sandbox = sinon.sandbox.create();
 
     countEl1 = document.createElement('button');
-    countEl1.setAttribute('data-hypothesis-annotation-count');
+    countEl1.setAttribute('data-hypothesis-annotation-count', '');
     document.body.appendChild(countEl1);
 
     countEl2 = document.createElement('button');
-    countEl2.setAttribute('data-hypothesis-annotation-count');
+    countEl2.setAttribute('data-hypothesis-annotation-count', '');
     document.body.appendChild(countEl2);
 
     fakeCrossFrame.on = sandbox.stub().returns(fakeCrossFrame);
-    
+
     CrossFrame = sandbox.stub();
     CrossFrame.returns(fakeCrossFrame);
   });
