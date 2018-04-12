@@ -58,9 +58,14 @@ describe('annotator.adder', function () {
   }
 
   context('when Shadow DOM is supported', function () {
-    unroll('creates the adder DOM in a shadow root', function (testCase) {
+    unroll('creates the adder DOM in a shadow root (using #attachFn)', function (testCase) {
       var adderEl = document.createElement('div');
       var shadowEl;
+
+      // Disable use of native Shadow DOM for this element, if supported.
+      adderEl.createShadowRoot = null;
+      adderEl.attachShadow = null;
+
       adderEl[testCase.attachFn] = sinon.spy(function () {
         shadowEl = document.createElement('shadow-root');
         adderEl.appendChild(shadowEl);
