@@ -1,4 +1,3 @@
-baseURI = require('document-base-uri')
 extend = require('extend')
 raf = require('raf')
 scrollIntoView = require('scroll-into-view')
@@ -12,6 +11,7 @@ highlighter = require('./highlighter')
 rangeUtil = require('./range-util')
 selections = require('./selections')
 xpathRange = require('./anchoring/range')
+{ normalizeURI } = require('./util/url')
 
 animationPromise = (fn) ->
   return new Promise (resolve, reject) ->
@@ -20,17 +20,6 @@ animationPromise = (fn) ->
         resolve(fn())
       catch error
         reject(error)
-
-# Normalize the URI for an annotation. This makes it absolute and strips
-# the fragment identifier.
-normalizeURI = (uri, baseURI) ->
-  # Convert to absolute URL
-  url = new URL(uri, baseURI)
-  # Remove the fragment identifier.
-  # This is done on the serialized URL rather than modifying `url.hash` due
-  # to a bug in Safari.
-  # See https://github.com/hypothesis/h/issues/3471#issuecomment-226713750
-  return url.toString().replace(/#.*/, '');
 
 module.exports = class Guest extends Delegator
   SHOW_HIGHLIGHTS_CLASS = 'annotator-highlights-always-on'
@@ -140,7 +129,7 @@ module.exports = class Guest extends Delegator
 
     return Promise.all([metadataPromise, uriPromise]).then ([metadata, href]) =>
       return {
-        uri: normalizeURI(href, baseURI),
+        uri: normalizeURI(href),
         metadata,
         frameIdentifier: this.frameIdentifier
       }
