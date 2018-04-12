@@ -1,8 +1,8 @@
 'use strict';
 
 var angular = require('angular');
-var escapeStringRegexp = require('escape-string-regexp');
 
+var dateUtil = require('../../util/date');
 var util = require('../../directive/test/util');
 
 describe('timestamp', function () {
@@ -83,8 +83,7 @@ describe('timestamp', function () {
 
       // The exact format of the result will depend on the current locale,
       // but check that at least the current year and time are present
-      assert.match(element.ctrl.absoluteTimestamp, new RegExp('.*2016.*' +
-        escapeStringRegexp(expectedDate.toLocaleTimeString())));
+      assert.match(element.ctrl.absoluteTimestamp, dateUtil.format(expectedDate));
     });
   });
 });
