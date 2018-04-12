@@ -124,15 +124,15 @@ describe('CrossFrame multi-frame scenario', function () {
   it('excludes injection from already injected frames', function () {
     var frame = document.createElement('iframe');
     frame.setAttribute('enable-annotation', '');
-    frame.srcdoc = '<script>window.__hypothesis_frame = true;</script>';
     container.appendChild(frame);
+    frame.contentWindow.eval('window.__hypothesis_frame = true');
 
     crossFrame.pluginInit();
 
     return new Promise(function (resolve) {
       isLoaded(frame, function () {
         var scriptElement = frame.contentDocument.querySelector('script[src]');
-        assert(!scriptElement, 'expected embed script to not be injected');
+        assert.isNull(scriptElement, 'expected embed script to not be injected');
         resolve();
       });
     });
