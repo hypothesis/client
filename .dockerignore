@@ -1,0 +1,7 @@
+# Exclude large local dirs from the Docker build context to make the image build
+# faster.
+
+.git/
+build/
+coverage/
+node_modules/
