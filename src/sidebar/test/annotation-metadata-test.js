@@ -94,6 +94,7 @@ describe('annotation-metadata', function () {
     context('when an annotation has a direct link', function () {
       it('returns the direct link as a title link', function () {
         var model = {
+          uri: 'https://annotatedsite.com/',
           links: {
             incontext: 'https://example.com',
           },
@@ -116,6 +117,7 @@ describe('annotation-metadata', function () {
     context('when the annotation title is shorter than 30 characters', function () {
       it('returns the annotation title as title text', function () {
         var model = {
+          uri: 'https://annotatedsite.com/',
           document: {
             title: ['A Short Document Title'],
           },
@@ -170,6 +172,7 @@ describe('annotation-metadata', function () {
     context('when the document has no domain', function () {
       it('returns an empty domain text string', function() {
         var model = {
+          uri: 'doi:10.1234/5678',
           document : {
             title: ['example.com'],
           },
