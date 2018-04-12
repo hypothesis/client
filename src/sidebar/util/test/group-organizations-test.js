@@ -59,10 +59,10 @@ describe('group-organizations', function () {
 
       const sortedGroups = groupsByOrganization(groups);
 
-      assert(sortedGroups[0].logo === org.logo);
-      assert(typeof sortedGroups[1].logo === 'undefined');
-      assert(sortedGroups[2].logo === org2.logo);
-      assert(typeof sortedGroups[3].logo === 'undefined');
+      assert.equal(sortedGroups[0].logo, org.logo);
+      assert.equal(typeof sortedGroups[1].logo, 'undefined');
+      assert.equal(sortedGroups[2].logo, org2.logo);
+      assert.equal(typeof sortedGroups[3].logo, 'undefined');
     });
   });
 
@@ -132,7 +132,7 @@ describe('group-organizations', function () {
       const sortedGroups = groupsByOrganization(groups);
 
       sortedGroups.forEach(group => {
-        assert(typeof group.logo === 'undefined');
+        assert.equal(typeof group.logo, 'undefined');
       });
     });
   });
@@ -151,8 +151,8 @@ describe('group-organizations', function () {
         sortedGroups[0].links.html = 'dingdong';
       });
 
-      assert(group.name !== 'Something Else');
-      assert(group.links.html !== 'dingdong');
+      assert.notEqual(group.name, 'Something Else');
+      assert.notEqual(group.links.html, 'dingdong');
     });
   });
 });
