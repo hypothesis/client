@@ -4,6 +4,16 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+### Changed
+
+- Resolve relative URLs when getting PDF URL from PDF.js
+  ([#716](https://github.com/hypothesis/client/pull/716)).
+
+- Add organization logos to groups menu
+  ([#718](https://github.com/hypothesis/client/pull/718)).
+
 ## [1.77.0] - 2018-03-29
 
 ### Changed
