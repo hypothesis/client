@@ -5,6 +5,8 @@ var angular = require('angular');
 var groupList = require('../group-list');
 var util = require('../../directive/test/util');
 
+var groupFixtures = require('../../test/group-fixtures');
+
 describe('groupList', function () {
   var $window;
 
@@ -58,6 +60,7 @@ describe('groupList', function () {
         html: OPEN_GROUP_LINK,
       },
       name: 'Public Group',
+      organization: groupFixtures.defaultOrganization(),
       type: 'open',
     },{
       id: 'h-devs',
@@ -65,6 +68,7 @@ describe('groupList', function () {
         html: PRIVATE_GROUP_LINK,
       },
       name: 'Hypothesis Developers',
+      organization: groupFixtures.defaultOrganization(),
       type: 'private',
     }, {
       id: 'restricto',
@@ -72,6 +76,7 @@ describe('groupList', function () {
         html: RESTRICTED_GROUP_LINK,
       },
       name: 'Hello Restricted',
+      organization: groupFixtures.defaultOrganization(),
       type: 'restricted',
     }];
 
@@ -114,6 +119,101 @@ describe('groupList', function () {
     assert.include(nameLinks[0].title, 'Show public annotations'); // Open
     assert.include(nameLinks[1].title, 'Show and create annotations in'); // Private
     assert.include(nameLinks[2].title, 'Show public annotations'); // Restricted
+  });
+
+  it('should render organization logo for focused group', function () {
+    const org = groupFixtures.organization({ logo: 'http://www.example.com/foobar' });
+    const group = groupFixtures.expandedGroup({
+      organization: org,
+    });
+    fakeGroups.focused = () => { return group; };
+
+    const element = createGroupList();
+    const imgEl = element.find('.dropdown-toggle > img.group-list-label__icon');
+
+    assert.equal(imgEl[0].src, org.logo);
+  });
+
+  it('should render fallback icon for focused group when no logo (private)', function () {
+    const org = groupFixtures.organization({ logo: null });
+    const group = groupFixtures.expandedGroup({
+      organization: org,
+      type: 'private',
+    });
+    fakeGroups.focused = () => { return group; };
+
+    const element = createGroupList();
+    const iconEl = element.find('.dropdown-toggle > i.h-icon-group');
+
+    assert.ok(iconEl[0]);
+  });
+
+  it('should render fallback icon for focused group when no logo (restricted)', function () {
+    const org = groupFixtures.organization({ logo: null });
+    const group = groupFixtures.expandedGroup({
+      organization: org,
+      type: 'restricted',
+    });
+    fakeGroups.focused = () => { return group; };
+
+    const element = createGroupList();
+    const iconEl = element.find('.dropdown-toggle > i.h-icon-public');
+
+    assert.ok(iconEl[0]);
+  });
+
+  it('should render fallback icon for focused group when no logo (open)', function () {
+    const org = groupFixtures.organization({ logo: null });
+    const group = groupFixtures.expandedGroup({
+      organization: org,
+      type: 'open',
+    });
+    fakeGroups.focused = () => { return group; };
+
+    const element = createGroupList();
+    const iconEl = element.find('.dropdown-toggle > i.h-icon-public');
+
+    assert.ok(iconEl[0]);
+  });
+
+  it('should render organization icons for first group in each organization', function () {
+    const orgs = [
+      groupFixtures.defaultOrganization(),
+      groupFixtures.organization(),
+    ];
+    groups = [
+      groupFixtures.expandedGroup({ organization: orgs[0] }),
+      groupFixtures.expandedGroup({ organization: orgs[0] }),
+      groupFixtures.expandedGroup({ organization: orgs[1] }),
+      groupFixtures.expandedGroup({ organization: orgs[1] }),
+    ];
+
+    const element = createGroupList();
+    const iconContainers = element.find('.group-menu-icon-container');
+    const iconImages = element.find('.group-menu-icon-container > img');
+
+    assert.lengthOf(iconContainers, groups.length);
+    assert.lengthOf(iconImages, orgs.length);
+  });
+
+  it('should not render organization icons for menu groups if missing', function () {
+    const orgs = [
+      groupFixtures.organization({ logo: null }),
+      groupFixtures.organization({ logo: null }),
+    ];
+    groups = [
+      groupFixtures.expandedGroup({ organization: orgs[0] }),
+      groupFixtures.expandedGroup({ organization: orgs[0] }),
+      groupFixtures.expandedGroup({ organization: orgs[1] }),
+      groupFixtures.expandedGroup({ organization: orgs[1] }),
+    ];
+
+    const element = createGroupList();
+    const iconContainers = element.find('.group-menu-icon-container');
+    const iconImages = element.find('.group-menu-icon-container > img');
+
+    assert.lengthOf(iconContainers, groups.length);
+    assert.lengthOf(iconImages, 0);
   });
 
   it('should render share links', function () {

@@ -47,6 +47,12 @@ $group-list-spacing-below: 50px;
     margin-right: 10px;
   }
 
+  .group-menu-icon-container {
+    margin-right: 10px;
+    width: 15px;
+    height: 15px;
+  }
+
   .group-cancel-icon-container {
     // the 'Leave group' icon is shifted down slightly
     // so that it lines up vertically with the 'chat heads' icon on the
@@ -88,7 +94,7 @@ $group-list-spacing-below: 50px;
   transform: translateY(1px);
 }
 
-.group-list-label__icon--third-party {
+.group-list-label__icon--organization {
   height: 15px;
   width: 15px;
   top: 2px;
