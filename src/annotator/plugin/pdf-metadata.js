@@ -1,5 +1,7 @@
 'use strict';
 
+const { normalizeURI } = require('../util/url');
+
 /**
  * This PDFMetadata service extracts metadata about a loading/loaded PDF
  * document from a PDF.js PDFViewerApplication object.
@@ -74,11 +76,13 @@ function fingerprintToURN(fingerprint) {
 }
 
 function getPDFURL(app) {
+  const url = normalizeURI(app.url);
+
   // Local file:// URLs should not be saved in document metadata.
   // Entries in document.link should be URIs. In the case of
   // local files, omit the URL.
-  if (app.url.indexOf('file://') !== 0) {
-    return app.url;
+  if (url.indexOf('file://') !== 0) {
+    return url;
   }
 
   return null;
