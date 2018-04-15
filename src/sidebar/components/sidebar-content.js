@@ -3,6 +3,7 @@
 var SearchClient = require('../search-client');
 var events = require('../events');
 var isThirdPartyService = require('../util/is-third-party-service');
+var getProperClassName = require('../../shared/util/get-proper-classname');
 var memoize = require('../util/memoize');
 var tabs = require('../tabs');
 var uiConstants = require('../ui-constants');
@@ -66,7 +67,8 @@ function SidebarContentController(
     if (annotation) {
       highlights = [annotation.$tag];
     }
-    frameSync.focusAnnotations(highlights);
+    // Manage highlighting/unhighlighting the text of the corresponding hovered feedback in the sidebar
+    frameSync.focusAnnotations(highlights, annotation.user, this.auth.userid, 'hover');
   }
 
   function scrollToAnnotation(annotation) {
@@ -74,24 +76,22 @@ function SidebarContentController(
       return;
     }
 
-    // Manage highlighting/unhighlighting the selected feedback on the sidebar
-    // see how many selected feedback in the sidebar
-    var selectedFeedbackNumber = document.querySelectorAll('.default__card-selected').length;
+    // Manage highlighting/unhighlighting the selected feedback in the sidebar
+    var className = getProperClassName(annotation.user, this.auth.userid, 'card');
+    document.getElementById(annotation.id).classList.toggle(className);
 
-    // If there is already more than 1 selected feedback, keep the selected one highlighted, remove the other highlights
-    if(selectedFeedbackNumber !== 1){
-      document.getElementById(annotation.id).classList.add('default__card-selected');
-    }
-    else{
-      document.getElementById(annotation.id).classList.toggle('default__card-selected');
-    }
-    // clear all other feedback highlights
-    document.querySelectorAll('.default__card-selected').forEach(function(card){
+    // ** Clear all other feedback highlights **
+    // See if there is already selected feedback in the sidebar. It has to be max one selected feedback in the case that we do not have the bucket bar!
+    var allFeedbackOnThePage = document.querySelectorAll('.default__card-selected, .users__card-selected');
+    allFeedbackOnThePage.forEach(function(card){
       if (card.id !== annotation.id){
-        document.getElementById(card.id).classList.remove('default__card-selected');
+        //  Remove the possible existing classes if the feedback is not the one selected
+        document.getElementById(card.id).classList.remove('default__card-selected', 'users__card-selected');
       }
     });
-    frameSync.scrollToAnnotation(annotation.$tag);
+
+    // Manage highlighting/unhighlighting the text of the corresponding selected feedback in the sidebar
+    frameSync.scrollToAnnotation(annotation.$tag, annotation.user, this.auth.userid, 'text');
   }
 
   /**

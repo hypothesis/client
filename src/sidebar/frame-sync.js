@@ -238,8 +238,8 @@ function FrameSync($rootScope, $window, Discovery, annotationUI, bridge) {
    *
    * @param {string[]} tags
    */
-  this.focusAnnotations = function (tags) {
-    bridge.call('focusAnnotations', tags);
+  this.focusAnnotations = function (tags, feedback_user, user_id, type) {
+    bridge.call('focusAnnotations', tags, feedback_user, user_id, type);
   };
 
   /**
@@ -247,8 +247,8 @@ function FrameSync($rootScope, $window, Discovery, annotationUI, bridge) {
    *
    * @param {string} tag
    */
-  this.scrollToAnnotation = function (tag) {
-    bridge.call('scrollToAnnotation', tag);
+  this.scrollToAnnotation = function (tag, feedback_user, user_id, type) {
+    bridge.call('scrollToAnnotation', tag, feedback_user, user_id, type);
   };
 }
 

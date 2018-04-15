@@ -15,6 +15,8 @@ xpathRange = require('./anchoring/range')
 
 polyglot = require('../shared/polyglot');
 
+getProperClassName = require('../shared/util/get-proper-classname');
+
 animationPromise = (fn) ->
   return new Promise (resolve, reject) ->
     raf ->
@@ -170,24 +172,33 @@ module.exports = class Guest extends Delegator
         this.anchor(annotation)
 
   _connectAnnotationUISync: (crossframe, config) ->
-    crossframe.on 'focusAnnotations', (tags=[]) =>
+    crossframe.on 'focusAnnotations', (tags=[], feedback_user, user_id, type) =>
+      className = getProperClassName(feedback_user, user_id, type)
+      selectedClassNames = 'annotator-hl-selected-public annotator-hl-selected-yours'
+      hoverClassNames = 'annotator-hl-hover-public annotator-hl-hover-yours'
       for anchor in @anchors when anchor.highlights?
         toggle = anchor.annotation.$tag in tags
-        # If the text is already selected, don't do anything, if not, highlights it with the lighter color
-        if !$(anchor.highlights).hasClass('annotator-hl annotator-hl-selected-public')
-          $(anchor.highlights).toggleClass('annotator-hl-hover-public', toggle)
+        if toggle
+          # If the text is already selected, don't do anything, if not, highlights it with the lighter color
+          if !$(anchor.highlights).hasClass(selectedClassNames)
+            $(anchor.highlights).toggleClass(className)
+        else
+          # If the feedback is not hovered over and has one of the hover class, clear it.
+          $(anchor.highlights).removeClass(hoverClassNames)
 
-    crossframe.on 'scrollToAnnotation', (tag) =>
-      selectedFeedbackNumber = $('.annotator-hl-selected-public').length
+
+    crossframe.on 'scrollToAnnotation', (tag, feedback_user, user_id, type) =>
+      # Get the class name according to the given parameteres
+      className = getProperClassName(feedback_user, user_id, type)
+      selectedClassNames = 'annotator-hl-selected-public annotator-hl-selected-yours'
+
       for anchor in @anchors when anchor.highlights?
+        # If the feedback is the selected feedback
         if anchor.annotation.$tag is tag
           # highlight/unhighlight the feedback on the doc
-          # If there is already more than 1 selected feedback, keep the selected one highlighted, remove the other highlights
-          if selectedFeedbackNumber != 1
-            $(anchor.highlights).addClass('annotator-hl-selected-public')
-          else
-            $(anchor.highlights).toggleClass('annotator-hl-selected-public')
-          # scroll to feedback
+          $(anchor.highlights).toggleClass(className)
+
+          # scroll to the feedback
           event = new CustomEvent('scrolltorange', {
             bubbles: true
             cancelable: true
@@ -197,9 +208,8 @@ module.exports = class Guest extends Delegator
           if defaultNotPrevented
             scrollIntoView(anchor.highlights[0])
         else
-          # clear all feedback highlights except for the selected one
-          $(anchor.highlights).removeClass('annotator-hl-selected-public')
-
+          # If the feedback is not selected and has one of the selected class, clear it.
+          $(anchor.highlights).removeClass(selectedClassNames)
 
     crossframe.on 'getDocumentInfo', (cb) =>
       this.getDocumentInfo()

@@ -39,23 +39,23 @@
   }
 }
 
-//  Hover your comments
-.annotator-hl.annotator-hl-hover-selected-yours {
-  background-color: #DCEDC8 !important;
-
-  .annotator-hl {
-    background-color: transparent !important;
-  }
-}
-
 //  Hover private comments
 .annotator-hl.annotator-hl-hover-private {
-  background-color: #FFCCBC !important;
+  background-color: #FFCCBC;
 
   .annotator-hl {
     background-color: transparent !important;
   }
 }
+
+.annotator-hl.annotator-hl-hover-yours {
+  background-color: #DCEDC8;
+
+  .annotator-hl {
+    background-color: transparent !important;
+  }
+}
+
 /////////////////////////////////////////////////////
 // ALERT! : ARMAGAN'S CSS FINISH!!!
 ////////////////////////////////////////////////////

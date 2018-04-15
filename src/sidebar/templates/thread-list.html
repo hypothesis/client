@@ -7,7 +7,7 @@
         ng-mouseenter="vm.onFocus({annotation: child.annotation})"
         ng-class="{'thread-list__card--theme-clean' : vm.isThemeClean}"
         ng-click="vm.onSelect({annotation: child.annotation})"
-        ng-mouseleave="vm.onFocus({annotation: null})">
+        ng-mouseleave="vm.onFocus({annotation: child.annotation})">
         <annotation-thread
           thread="child"
           show-document-info="vm.showDocumentInfo"
