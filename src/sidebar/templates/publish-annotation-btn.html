@@ -1,4 +1,4 @@
-<div class="privateFeedbackInput"><input type="checkbox" id="privateCheckbox" name="private-feedback" ng-model="vm.private" ng-change="vm.setPrivacy(vm.private)"><label for="privateCheckbox"><i class="h-icon-visibility-off"></i>Private - visible to Red Hat only</label></div>
+<div ng-if="!vm.isThemeCustom" class="privateFeedbackInput"><input type="checkbox" id="privateCheckbox"  name="private-feedback" ng-model="vm.private" ng-change="vm.setPrivacy(vm.private)"><label for="privateCheckbox"><i class="h-icon-visibility-off"></i>Private - visible to Red Hat only</label></div>
 <button class="publish-annotation-cancel-btn btn-clean"
         ng-click="vm.onCancel()"
         title="{{'Cancel changes to this feedback' | translate}}"
