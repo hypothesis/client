@@ -58,6 +58,12 @@ module.exports = class Host extends Guest
       # Show the UI
       @frame.css('display', '')
 
+      $(window).scroll =>
+        if $(window).scrollTop() > 245
+          @frame.css({'position': 'fixed', 'top': '0', 'left': '80.62%'})
+        if $(window).scrollTop() < 245
+          @frame.css({'position': 'absolute','top': '', 'left': ''})
+
     this.on 'beforeAnnotationCreated', (annotation) ->
       # When a new non-highlight annotation is created, focus
       # the sidebar so that the text editor can be focused as
