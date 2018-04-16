@@ -1,16 +1,56 @@
 
 .app-content-wrapper {
-  padding-top: 9px;
   background-color: #ededed !important;
+  padding: 11px;
+  padding-top: 9px;
+
+
+  selection-tabs {
+
+    .annotation-unavailable-message {
+      border: none;
+      padding: 15px;
+
+      .annotation-unavailable-message__label {
+        font-size: 18px;
+        font-weight: 500;
+      }
+
+      .annotation-unavailable-message__tutorial {
+        position: relative;
+        text-align: center;
+
+
+        .annotation-unavailable-message__tutorial-highlight {
+          background-color: #AED581;
+          padding: 1px 4px;
+        }
+
+        .sidebar-tutorial-svg_cursor {
+          position: absolute;
+          display: inline;
+          top: 32px;
+          right: 46px;
+          width: 30px;
+        }
+
+
+        p {
+          font-size: 14px;
+          display: inline;
+          hyphens: none;
+        }
+      }
+    }
+  }
 
 //sidebar header
 .selection-tabs {
 
-  padding-top: 45px; //remove once topbar is gone
-
   .selection-tabs__count {
     display: none;
   }
+
 }
 
 .sidebar__header {
@@ -20,7 +60,7 @@
 
   .sidebar__header-title {
     margin-left: 5px;
-    font-size: 18px;
+    font-size: 20px;
     font-weight: 400;
     display: inline-block;
   }
@@ -40,6 +80,14 @@
 //card formatting
 .thread-list {
 
+  li {
+    margin-bottom: 1.15em;
+  }
+
+  .thread-list__spacer {
+    margin-bottom: 0;
+  }
+
   //base card styles
   .thread-list__card {
 
@@ -54,6 +102,10 @@
 
     .annotation-quote {
       border-left: 2px solid #d3d3d3;
+    }
+
+    .annotation-body {
+      margin-top: 14px;
     }
 
     .excerpt__toggle-link a {
