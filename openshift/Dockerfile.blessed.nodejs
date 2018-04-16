@@ -24,7 +24,7 @@ ARG ASSET_URL
 RUN echo "source /opt/rh/rh-nodejs8/enable" >> /etc/profile
 RUN source scl_source enable rh-nodejs8
 
-RUN useradd -d /opt/app-root node
+RUN useradd -u 1001 -d /opt/app-root node
 
 # Copy over the source folder and set perms
 COPY . /opt/app-root
@@ -43,7 +43,7 @@ RUN npm install -g yarn gulp gulp-cli
 EXPOSE 8080
 
 # Run as the node user
-USER node
+USER 1001
 
 # Run the build scripts to apply environment config
 RUN make clean && make
