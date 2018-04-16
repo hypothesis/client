@@ -1,0 +1,1 @@
+window.scrollIntoView = require('./scrollIntoView');

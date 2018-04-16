@@ -1,0 +1,9 @@
+.git-crypt
+.gitattributes
+.gitignore
+.travis.yml
+coverage
+karma.conf.js
+sauce.json
+src
+test

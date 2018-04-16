@@ -1,0 +1,43 @@
+FROM registry.paas.redhat.com/itpaas-blessed-images/rhel7-platops
+USER root
+ARG BUILD_NUMBER
+ARG BUILD_HOST
+LABEL Build_Host=${BUILD_HOST}
+LABEL Build_Version=${BUILD_NUMBER}
+ENV BUILD_NUMBER=${BUILD_NUMBER}
+
+RUN yum-config-manager --enable rhel-7-server-optional-rpms
+RUN yum-config-manager --enable rhel-server-rhscl-7-rpms
+
+RUN yum install -y \
+    gcc \
+    bzip2 \
+    rh-nodejs8 \
+    rh-nodejs8-npm \
+    rh-nodejs8-nodejs-nodemon \
+    nss_wrapper
+
+ARG SIDEBAR_APP_URL
+ARG CLIENT_URL
+ARG ASSET_URL
+
+RUN echo "source /opt/rh/rh-nodejs8/enable" >> /etc/profile
+RUN source scl_source enable rh-nodejs8
+
+RUN useradd -d /opt/app-root node
+
+# Apply environment config for scl nodejs
+ENV PATH=/opt/rh/rh-nodejs8/root/usr/bin:$PATH
+ENV LD_LIBRARY_PATH=/opt/rh/rh-nodejs8/root/usr/lib64:$LD_LIBRARY_PATH
+ENV PYTHONPATH=/opt/rh/rh-nodejs8/root/usr/lib/python2.7/site-packages:$PYTHONPATH
+ENV MANPATH=/opt/rh/rh-nodejs8/root/usr/share/man:$MANPATH
+
+RUN npm install -g yarn gulp gulp-cli
+
+# Install node deps
+WORKDIR /opt/app-root
+
+EXPOSE 8080
+
+# Run as the node user
+USER node

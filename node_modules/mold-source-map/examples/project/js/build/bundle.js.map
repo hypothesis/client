@@ -1,0 +1,17 @@
+{
+  "version": 3,
+  "file": "generated.js",
+  "sources": [
+    " js/main.js",
+    " js/foo.js",
+    " js/wunder/bar.js"
+  ],
+  "names": [],
+  "mappings": ";AAAA;AACA;AACA;AACA;AACA;;ACJA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;;ACPA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA",
+  "sourcesContent": [
+    "console.log('main line 1');\nvar foo = require('./foo.js');\n\nfoo();\n",
+    "console.log('foo line 1');\nvar bar = require('./wunder/bar');\n\nmodule.exports = function foo() {\n  console.log('hello from foo line 5');\n  bar();\n};\n",
+    "console.log('bar line 1');\n'use strict';\n\n// this is a meaningless comment to add some lines\n\nmodule.exports = function bar() {\n  console.log('hello from bar line 7');\n};\n"
+  ],
+  "sourceRoot": "file://"
+}

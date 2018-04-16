@@ -7,8 +7,7 @@ ARG SIDEBAR_APP_URL
 ARG CLIENT_URL
 ARG ASSET_URL
 
-# Copy the source files.
-COPY . .
+COPY package.json .
 
 # Ensure directories writeable by unprivileged user.
 #RUN chown -R hypothesis:hypothesis *
@@ -19,6 +18,8 @@ RUN node --max_semi_space_size=1 --max_old_space_size=198 --optimize_for_size `w
 
 RUN npm install -g gulp-cli
 
+# Copy the source files.
+COPY . .
 RUN make
 
 #USER hypothesis
