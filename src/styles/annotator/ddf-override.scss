@@ -105,7 +105,59 @@
   //
   // }
 
+  //style annotation adder
+  .annotator-adder {
 
+    background: #0076e0;
+
+    .annotator-adder-actions__button {
+
+      flex-direction: row;
+      padding-top: 6px;
+
+      .annotator-adder-actions__label {
+        color: #fff !important;
+        font-size: 12px;
+        letter-spacing: .5px;
+        font-weight: 600;
+        min-width: 100px;
+      }
+    }
+
+
+    .annotator-adder-actions__button:hover > .annotator-adder-actions__label
+     {
+      color: #fff !important;
+    }
+
+    .h-icon-annotate:before {
+      color: #fff;
+      padding-right: 4px;
+      height: 11px;
+      width: 18px;
+      font-size: 14px;
+    }
+  }
+
+  .annotator-adder:hover
+  {
+    background: #06c;
+  }
+
+  .annotator-adder--arrow-down:before {
+    background: #0076e0;
+  }
+  .annotator-adder--arrow-down:hover:before{
+    background: #06c;
+  }
+
+  .annotator-adder--arrow-up:before {
+    background: #0076e0;
+  }
+
+  .annotator-adder--arrow-up:hover:before {
+    background: #06c;
+  }
 
 
 
