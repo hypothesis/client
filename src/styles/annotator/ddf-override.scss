@@ -139,23 +139,20 @@
     }
   }
 
-  .annotator-adder:hover
+
+  .annotator-adder--arrow-down:before,
+  .annotator-adder--arrow-up:before
+   {
+    background: #0076e0;
+    height: 9px;
+    width: 9px;
+    bottom: -6px;
+  }
+
+  .annotator-adder:hover,
+  .annotator-adder--arrow-down:hover:before,
+  .annotator-adder--arrow-up:hover:before
   {
-    background: #06c;
-  }
-
-  .annotator-adder--arrow-down:before {
-    background: #0076e0;
-  }
-  .annotator-adder--arrow-down:hover:before{
-    background: #06c;
-  }
-
-  .annotator-adder--arrow-up:before {
-    background: #0076e0;
-  }
-
-  .annotator-adder--arrow-up:hover:before {
     background: #06c;
   }
 
