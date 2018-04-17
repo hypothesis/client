@@ -1,78 +1,9071 @@
 require=(function(){function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s}return e})()({1:[function(require,module,exports){
-function Lexer(e){this.input=e,this.pos=0}function Token(e,t,r,n){this.text=e,this.start=t,this.end=r,this.lexer=n}var matchAt=require("match-at"),ParseError=require("./ParseError");Token.prototype.range=function(e,t){return e.lexer!==this.lexer?new Token(t):new Token(t,this.start,e.end,this.lexer)};var tokenRegex=new RegExp("([ \r\n\t]+)|([!-\\[\\]-‧‪-퟿豈-￿]|[�-�][�-�]|\\\\(?:[a-zA-Z]+|[^�-�]))");Lexer.prototype.lex=function(){var e=this.input,t=this.pos;if(t===e.length)return new Token("EOF",t,t,this);var r=matchAt(tokenRegex,e,t);if(null===r)throw new ParseError("Unexpected character: '"+e[t]+"'",new Token(e[t],t,t+1,this));var n=r[2]||" ",o=this.pos;return this.pos+=r[0].length,new Token(n,o,this.pos,this)},module.exports=Lexer;
+/**
+ * The Lexer class handles tokenizing the input in various ways. Since our
+ * parser expects us to be able to backtrack, the lexer allows lexing from any
+ * given starting point.
+ *
+ * Its main exposed function is the `lex` function, which takes a position to
+ * lex from and a type of token to lex. It defers to the appropriate `_innerLex`
+ * function.
+ *
+ * The various `_innerLex` functions perform the actual lexing of different
+ * kinds.
+ */
+
+var matchAt = require("match-at");
+
+var ParseError = require("./ParseError");
+
+// The main lexer class
+function Lexer(input) {
+    this.input = input;
+    this.pos = 0;
+}
+
+/**
+ * The resulting token returned from `lex`.
+ *
+ * It consists of the token text plus some position information.
+ * The position information is essentially a range in an input string,
+ * but instead of referencing the bare input string, we refer to the lexer.
+ * That way it is possible to attach extra metadata to the input string,
+ * like for example a file name or similar.
+ *
+ * The position information (all three parameters) is optional,
+ * so it is OK to construct synthetic tokens if appropriate.
+ * Not providing available position information may lead to
+ * degraded error reporting, though.
+ *
+ * @param {string}  text   the text of this token
+ * @param {number=} start  the start offset, zero-based inclusive
+ * @param {number=} end    the end offset, zero-based exclusive
+ * @param {Lexer=}  lexer  the lexer which in turn holds the input string
+ */
+function Token(text, start, end, lexer) {
+    this.text = text;
+    this.start = start;
+    this.end = end;
+    this.lexer = lexer;
+}
+
+/**
+ * Given a pair of tokens (this and endToken), compute a “Token” encompassing
+ * the whole input range enclosed by these two.
+ *
+ * @param {Token}  endToken  last token of the range, inclusive
+ * @param {string} text      the text of the newly constructed token
+ */
+Token.prototype.range = function(endToken, text) {
+    if (endToken.lexer !== this.lexer) {
+        return new Token(text); // sorry, no position information available
+    }
+    return new Token(text, this.start, endToken.end, this.lexer);
+};
+
+/* The following tokenRegex
+ * - matches typical whitespace (but not NBSP etc.) using its first group
+ * - does not match any control character \x00-\x1f except whitespace
+ * - does not match a bare backslash
+ * - matches any ASCII character except those just mentioned
+ * - does not match the BMP private use area \uE000-\uF8FF
+ * - does not match bare surrogate code units
+ * - matches any BMP character except for those just described
+ * - matches any valid Unicode surrogate pair
+ * - matches a backslash followed by one or more letters
+ * - matches a backslash followed by any BMP character, including newline
+ * Just because the Lexer matches something doesn't mean it's valid input:
+ * If there is no matching function or symbol definition, the Parser will
+ * still reject the input.
+ */
+var tokenRegex = new RegExp(
+    "([ \r\n\t]+)|" +                                 // whitespace
+    "([!-\\[\\]-\u2027\u202A-\uD7FF\uF900-\uFFFF]" +  // single codepoint
+    "|[\uD800-\uDBFF][\uDC00-\uDFFF]" +               // surrogate pair
+    "|\\\\(?:[a-zA-Z]+|[^\uD800-\uDFFF])" +           // function name
+    ")"
+);
+
+/**
+ * This function lexes a single token.
+ */
+Lexer.prototype.lex = function() {
+    var input = this.input;
+    var pos = this.pos;
+    if (pos === input.length) {
+        return new Token("EOF", pos, pos, this);
+    }
+    var match = matchAt(tokenRegex, input, pos);
+    if (match === null) {
+        throw new ParseError(
+            "Unexpected character: '" + input[pos] + "'",
+            new Token(input[pos], pos, pos + 1, this));
+    }
+    var text = match[2] || " ";
+    var start = this.pos;
+    this.pos += match[0].length;
+    var end = this.pos;
+    return new Token(text, start, end, this);
+};
+
+module.exports = Lexer;
 
 },{"./ParseError":4,"match-at":24}],2:[function(require,module,exports){
-function MacroExpander(t,e){this.lexer=new Lexer(t),this.macros=e,this.stack=[],this.discardedWhiteSpace=[]}var Lexer=require("./Lexer");MacroExpander.prototype.nextToken=function(){for(;;){0===this.stack.length&&this.stack.push(this.lexer.lex());var t=this.stack.pop(),e=t.text;if("\\"!==e.charAt(0)||!this.macros.hasOwnProperty(e))return t;var r=this.macros[e];if("string"==typeof r){var s=new Lexer(r);r=[];for(var a=s.lex();"EOF"!==a.text;)r.push(a),a=s.lex();r.reverse(),this.macros[e]=r}this.stack=this.stack.concat(r)}},MacroExpander.prototype.get=function(t){this.discardedWhiteSpace=[];var e=this.nextToken();if(t)for(;" "===e.text;)this.discardedWhiteSpace.push(e),e=this.nextToken();return e},MacroExpander.prototype.unget=function(t){for(this.stack.push(t);0!==this.discardedWhiteSpace.length;)this.stack.push(this.discardedWhiteSpace.pop())},module.exports=MacroExpander;
+/**
+ * This file contains the “gullet” where macros are expanded
+ * until only non-macro tokens remain.
+ */
+
+var Lexer = require("./Lexer");
+
+function MacroExpander(input, macros) {
+    this.lexer = new Lexer(input);
+    this.macros = macros;
+    this.stack = []; // contains tokens in REVERSE order
+    this.discardedWhiteSpace = [];
+}
+
+/**
+ * Recursively expand first token, then return first non-expandable token.
+ */
+MacroExpander.prototype.nextToken = function() {
+    for (;;) {
+        if (this.stack.length === 0) {
+            this.stack.push(this.lexer.lex());
+        }
+        var topToken = this.stack.pop();
+        var name = topToken.text;
+        if (!(name.charAt(0) === "\\" && this.macros.hasOwnProperty(name))) {
+            return topToken;
+        }
+        var expansion = this.macros[name];
+        if (typeof expansion === "string") {
+            var bodyLexer = new Lexer(expansion);
+            expansion = [];
+            var tok = bodyLexer.lex();
+            while (tok.text !== "EOF") {
+                expansion.push(tok);
+                tok = bodyLexer.lex();
+            }
+            expansion.reverse(); // to fit in with stack using push and pop
+            this.macros[name] = expansion;
+        }
+        this.stack = this.stack.concat(expansion);
+    }
+};
+
+MacroExpander.prototype.get = function(ignoreSpace) {
+    this.discardedWhiteSpace = [];
+    var token = this.nextToken();
+    if (ignoreSpace) {
+        while (token.text === " ") {
+            this.discardedWhiteSpace.push(token);
+            token = this.nextToken();
+        }
+    }
+    return token;
+};
+
+/**
+ * Undo the effect of the preceding call to the get method.
+ * A call to this method MUST be immediately preceded and immediately followed
+ * by a call to get.  Only used during mode switching, i.e. after one token
+ * was got in the old mode but should get got again in a new mode
+ * with possibly different whitespace handling.
+ */
+MacroExpander.prototype.unget = function(token) {
+    this.stack.push(token);
+    while (this.discardedWhiteSpace.length !== 0) {
+        this.stack.push(this.discardedWhiteSpace.pop());
+    }
+};
+
+module.exports = MacroExpander;
 
 },{"./Lexer":1}],3:[function(require,module,exports){
-function Options(t){this.style=t.style,this.color=t.color,this.size=t.size,this.phantom=t.phantom,this.font=t.font,void 0===t.parentStyle?this.parentStyle=t.style:this.parentStyle=t.parentStyle,void 0===t.parentSize?this.parentSize=t.size:this.parentSize=t.parentSize}Options.prototype.extend=function(t){var e={style:this.style,size:this.size,color:this.color,parentStyle:this.style,parentSize:this.size,phantom:this.phantom,font:this.font};for(var a in t)t.hasOwnProperty(a)&&(e[a]=t[a]);return new Options(e)},Options.prototype.withStyle=function(t){return this.extend({style:t})},Options.prototype.withSize=function(t){return this.extend({size:t})},Options.prototype.withColor=function(t){return this.extend({color:t})},Options.prototype.withPhantom=function(){return this.extend({phantom:!0})},Options.prototype.withFont=function(t){return this.extend({font:t||this.font})},Options.prototype.reset=function(){return this.extend({})};var colorMap={"katex-blue":"#6495ed","katex-orange":"#ffa500","katex-pink":"#ff00af","katex-red":"#df0030","katex-green":"#28ae7b","katex-gray":"gray","katex-purple":"#9d38bd","katex-blueA":"#ccfaff","katex-blueB":"#80f6ff","katex-blueC":"#63d9ea","katex-blueD":"#11accd","katex-blueE":"#0c7f99","katex-tealA":"#94fff5","katex-tealB":"#26edd5","katex-tealC":"#01d1c1","katex-tealD":"#01a995","katex-tealE":"#208170","katex-greenA":"#b6ffb0","katex-greenB":"#8af281","katex-greenC":"#74cf70","katex-greenD":"#1fab54","katex-greenE":"#0d923f","katex-goldA":"#ffd0a9","katex-goldB":"#ffbb71","katex-goldC":"#ff9c39","katex-goldD":"#e07d10","katex-goldE":"#a75a05","katex-redA":"#fca9a9","katex-redB":"#ff8482","katex-redC":"#f9685d","katex-redD":"#e84d39","katex-redE":"#bc2612","katex-maroonA":"#ffbde0","katex-maroonB":"#ff92c6","katex-maroonC":"#ed5fa6","katex-maroonD":"#ca337c","katex-maroonE":"#9e034e","katex-purpleA":"#ddd7ff","katex-purpleB":"#c6b9fc","katex-purpleC":"#aa87ff","katex-purpleD":"#7854ab","katex-purpleE":"#543b78","katex-mintA":"#f5f9e8","katex-mintB":"#edf2df","katex-mintC":"#e0e5cc","katex-grayA":"#f6f7f7","katex-grayB":"#f0f1f2","katex-grayC":"#e3e5e6","katex-grayD":"#d6d8da","katex-grayE":"#babec2","katex-grayF":"#888d93","katex-grayG":"#626569","katex-grayH":"#3b3e40","katex-grayI":"#21242c","katex-kaBlue":"#314453","katex-kaGreen":"#71B307"};Options.prototype.getColor=function(){return this.phantom?"transparent":colorMap[this.color]||this.color},module.exports=Options;
+/**
+ * This file contains information about the options that the Parser carries
+ * around with it while parsing. Data is held in an `Options` object, and when
+ * recursing, a new `Options` object can be created with the `.with*` and
+ * `.reset` functions.
+ */
+
+/**
+ * This is the main options class. It contains the style, size, color, and font
+ * of the current parse level. It also contains the style and size of the parent
+ * parse level, so size changes can be handled efficiently.
+ *
+ * Each of the `.with*` and `.reset` functions passes its current style and size
+ * as the parentStyle and parentSize of the new options class, so parent
+ * handling is taken care of automatically.
+ */
+function Options(data) {
+    this.style = data.style;
+    this.color = data.color;
+    this.size = data.size;
+    this.phantom = data.phantom;
+    this.font = data.font;
+
+    if (data.parentStyle === undefined) {
+        this.parentStyle = data.style;
+    } else {
+        this.parentStyle = data.parentStyle;
+    }
+
+    if (data.parentSize === undefined) {
+        this.parentSize = data.size;
+    } else {
+        this.parentSize = data.parentSize;
+    }
+}
+
+/**
+ * Returns a new options object with the same properties as "this".  Properties
+ * from "extension" will be copied to the new options object.
+ */
+Options.prototype.extend = function(extension) {
+    var data = {
+        style: this.style,
+        size: this.size,
+        color: this.color,
+        parentStyle: this.style,
+        parentSize: this.size,
+        phantom: this.phantom,
+        font: this.font
+    };
+
+    for (var key in extension) {
+        if (extension.hasOwnProperty(key)) {
+            data[key] = extension[key];
+        }
+    }
+
+    return new Options(data);
+};
+
+/**
+ * Create a new options object with the given style.
+ */
+Options.prototype.withStyle = function(style) {
+    return this.extend({
+        style: style
+    });
+};
+
+/**
+ * Create a new options object with the given size.
+ */
+Options.prototype.withSize = function(size) {
+    return this.extend({
+        size: size
+    });
+};
+
+/**
+ * Create a new options object with the given color.
+ */
+Options.prototype.withColor = function(color) {
+    return this.extend({
+        color: color
+    });
+};
+
+/**
+ * Create a new options object with "phantom" set to true.
+ */
+Options.prototype.withPhantom = function() {
+    return this.extend({
+        phantom: true
+    });
+};
+
+/**
+ * Create a new options objects with the give font.
+ */
+Options.prototype.withFont = function(font) {
+    return this.extend({
+        font: font || this.font
+    });
+};
+
+/**
+ * Create a new options object with the same style, size, and color. This is
+ * used so that parent style and size changes are handled correctly.
+ */
+Options.prototype.reset = function() {
+    return this.extend({});
+};
+
+/**
+ * A map of color names to CSS colors.
+ * TODO(emily): Remove this when we have real macros
+ */
+var colorMap = {
+    "katex-blue": "#6495ed",
+    "katex-orange": "#ffa500",
+    "katex-pink": "#ff00af",
+    "katex-red": "#df0030",
+    "katex-green": "#28ae7b",
+    "katex-gray": "gray",
+    "katex-purple": "#9d38bd",
+    "katex-blueA": "#ccfaff",
+    "katex-blueB": "#80f6ff",
+    "katex-blueC": "#63d9ea",
+    "katex-blueD": "#11accd",
+    "katex-blueE": "#0c7f99",
+    "katex-tealA": "#94fff5",
+    "katex-tealB": "#26edd5",
+    "katex-tealC": "#01d1c1",
+    "katex-tealD": "#01a995",
+    "katex-tealE": "#208170",
+    "katex-greenA": "#b6ffb0",
+    "katex-greenB": "#8af281",
+    "katex-greenC": "#74cf70",
+    "katex-greenD": "#1fab54",
+    "katex-greenE": "#0d923f",
+    "katex-goldA": "#ffd0a9",
+    "katex-goldB": "#ffbb71",
+    "katex-goldC": "#ff9c39",
+    "katex-goldD": "#e07d10",
+    "katex-goldE": "#a75a05",
+    "katex-redA": "#fca9a9",
+    "katex-redB": "#ff8482",
+    "katex-redC": "#f9685d",
+    "katex-redD": "#e84d39",
+    "katex-redE": "#bc2612",
+    "katex-maroonA": "#ffbde0",
+    "katex-maroonB": "#ff92c6",
+    "katex-maroonC": "#ed5fa6",
+    "katex-maroonD": "#ca337c",
+    "katex-maroonE": "#9e034e",
+    "katex-purpleA": "#ddd7ff",
+    "katex-purpleB": "#c6b9fc",
+    "katex-purpleC": "#aa87ff",
+    "katex-purpleD": "#7854ab",
+    "katex-purpleE": "#543b78",
+    "katex-mintA": "#f5f9e8",
+    "katex-mintB": "#edf2df",
+    "katex-mintC": "#e0e5cc",
+    "katex-grayA": "#f6f7f7",
+    "katex-grayB": "#f0f1f2",
+    "katex-grayC": "#e3e5e6",
+    "katex-grayD": "#d6d8da",
+    "katex-grayE": "#babec2",
+    "katex-grayF": "#888d93",
+    "katex-grayG": "#626569",
+    "katex-grayH": "#3b3e40",
+    "katex-grayI": "#21242c",
+    "katex-kaBlue": "#314453",
+    "katex-kaGreen": "#71B307"
+};
+
+/**
+ * Gets the CSS color of the current options object, accounting for the
+ * `colorMap`.
+ */
+Options.prototype.getColor = function() {
+    if (this.phantom) {
+        return "transparent";
+    } else {
+        return colorMap[this.color] || this.color;
+    }
+};
+
+module.exports = Options;
 
 },{}],4:[function(require,module,exports){
-function ParseError(r,e){var o,t,a="KaTeX parse error: "+r;if(e&&e.lexer&&e.start<=e.end){var s=e.lexer.input;o=e.start,t=e.end,o===s.length?a+=" at end of input: ":a+=" at position "+(o+1)+": ";var p,n=s.slice(o,t).replace(/[^]/g,"$&̲");p=o>15?"…"+s.slice(o-15,o):s.slice(0,o);var i;i=t+15<s.length?s.slice(t,t+15)+"…":s.slice(t),a+=p+n+i}var l=new Error(a);return l.name="ParseError",l.__proto__=ParseError.prototype,l.position=o,l}ParseError.prototype.__proto__=Error.prototype,module.exports=ParseError;
+/**
+ * This is the ParseError class, which is the main error thrown by KaTeX
+ * functions when something has gone wrong. This is used to distinguish internal
+ * errors from errors in the expression that the user provided.
+ *
+ * If possible, a caller should provide a Token or ParseNode with information
+ * about where in the source string the problem occurred.
+ *
+ * @param {string} message  The error message
+ * @param {(Token|ParseNode)=} token  An object providing position information
+ */
+function ParseError(message, token) {
+    var error = "KaTeX parse error: " + message;
+    var start;
+    var end;
+
+    if (token && token.lexer && token.start <= token.end) {
+        // If we have the input and a position, make the error a bit fancier
+
+        // Get the input
+        var input = token.lexer.input;
+
+        // Prepend some information
+        start = token.start;
+        end = token.end;
+        if (start === input.length) {
+            error += " at end of input: ";
+        } else {
+            error += " at position " + (start + 1) + ": ";
+        }
+
+        // Underline token in question using combining underscores
+        var underlined = input.slice(start, end).replace(/[^]/g, "$&\u0332");
+
+        // Extract some context from the input and add it to the error
+        var left;
+        if (start > 15) {
+            left = "…" + input.slice(start - 15, start);
+        } else {
+            left = input.slice(0, start);
+        }
+        var right;
+        if (end + 15 < input.length) {
+            right = input.slice(end, end + 15) + "…";
+        } else {
+            right = input.slice(end);
+        }
+        error += left + underlined + right;
+    }
+
+    // Some hackery to make ParseError a prototype of Error
+    // See http://stackoverflow.com/a/8460753
+    var self = new Error(error);
+    self.name = "ParseError";
+    self.__proto__ = ParseError.prototype;
+
+    self.position = start;
+    return self;
+}
+
+// More hackery
+ParseError.prototype.__proto__ = Error.prototype;
+
+module.exports = ParseError;
 
 },{}],5:[function(require,module,exports){
-function Parser(e,t){this.gullet=new MacroExpander(e,t.macros),this.settings=t,this.leftrightDepth=0}function ParseFuncOrArgument(e,t,r){this.result=e,this.isFunction=t,this.token=r}var functions=require("./functions"),environments=require("./environments"),MacroExpander=require("./MacroExpander"),symbols=require("./symbols"),utils=require("./utils"),cjkRegex=require("./unicodeRegexes").cjkRegex,parseData=require("./parseData"),ParseError=require("./ParseError"),ParseNode=parseData.ParseNode;Parser.prototype.expect=function(e,t){if(this.nextToken.text!==e)throw new ParseError("Expected '"+e+"', got '"+this.nextToken.text+"'",this.nextToken);!1!==t&&this.consume()},Parser.prototype.consume=function(){this.nextToken=this.gullet.get("math"===this.mode)},Parser.prototype.switchMode=function(e){this.gullet.unget(this.nextToken),this.mode=e,this.consume()},Parser.prototype.parse=function(){return this.mode="math",this.consume(),this.parseInput()},Parser.prototype.parseInput=function(){var e=this.parseExpression(!1);return this.expect("EOF",!1),e};var endOfExpression=["}","\\end","\\right","&","\\\\","\\cr"];Parser.prototype.parseExpression=function(e,t){for(var r=[];;){var s=this.nextToken;if(-1!==endOfExpression.indexOf(s.text))break;if(t&&s.text===t)break;if(e&&functions[s.text]&&functions[s.text].infix)break;var n=this.parseAtom();if(!n){if(!this.settings.throwOnError&&"\\"===s.text[0]){var o=this.handleUnsupportedCmd();r.push(o);continue}break}r.push(n)}return this.handleInfixNodes(r)},Parser.prototype.handleInfixNodes=function(e){for(var t,r=-1,s=0;s<e.length;s++){var n=e[s];if("infix"===n.type){if(-1!==r)throw new ParseError("only one infix operator per group",n.value.token);r=s,t=n.value.replaceWith}}if(-1!==r){var o,i,a=e.slice(0,r),u=e.slice(r+1);o=1===a.length&&"ordgroup"===a[0].type?a[0]:new ParseNode("ordgroup",a,this.mode),i=1===u.length&&"ordgroup"===u[0].type?u[0]:new ParseNode("ordgroup",u,this.mode);var p=this.callFunction(t,[o,i],null);return[new ParseNode(p.type,p,this.mode)]}return e};var SUPSUB_GREEDINESS=1;Parser.prototype.handleSupSubscript=function(e){var t=this.nextToken,r=t.text;this.consume();var s=this.parseGroup();if(s){if(s.isFunction){if(functions[s.result].greediness>SUPSUB_GREEDINESS)return this.parseFunction(s);throw new ParseError("Got function '"+s.result+"' with no arguments as "+e,t)}return s.result}if(this.settings.throwOnError||"\\"!==this.nextToken.text[0])throw new ParseError("Expected group after '"+r+"'",t);return this.handleUnsupportedCmd()},Parser.prototype.handleUnsupportedCmd=function(){for(var e=this.nextToken.text,t=[],r=0;r<e.length;r++)t.push(new ParseNode("textord",e[r],"text"));var s=new ParseNode("text",{body:t,type:"text"},this.mode),n=new ParseNode("color",{color:this.settings.errorColor,value:[s],type:"color"},this.mode);return this.consume(),n},Parser.prototype.parseAtom=function(){var e=this.parseImplicitGroup();if("text"===this.mode)return e;for(var t,r;;){var s=this.nextToken;if("\\limits"===s.text||"\\nolimits"===s.text){if(!e||"op"!==e.type)throw new ParseError("Limit controls must follow a math operator",s);var n="\\limits"===s.text;e.value.limits=n,e.value.alwaysHandleSupSub=!0,this.consume()}else if("^"===s.text){if(t)throw new ParseError("Double superscript",s);t=this.handleSupSubscript("superscript")}else if("_"===s.text){if(r)throw new ParseError("Double subscript",s);r=this.handleSupSubscript("subscript")}else{if("'"!==s.text)break;var o=new ParseNode("textord","\\prime",this.mode),i=[o];for(this.consume();"'"===this.nextToken.text;)i.push(o),this.consume();t=new ParseNode("ordgroup",i,this.mode)}}return t||r?new ParseNode("supsub",{base:e,sup:t,sub:r},this.mode):e};var sizeFuncs=["\\tiny","\\scriptsize","\\footnotesize","\\small","\\normalsize","\\large","\\Large","\\LARGE","\\huge","\\Huge"],styleFuncs=["\\displaystyle","\\textstyle","\\scriptstyle","\\scriptscriptstyle"];Parser.prototype.parseImplicitGroup=function(){var e=this.parseSymbol();if(null==e)return this.parseFunction();var t,r=e.result;if("\\left"===r){var s=this.parseFunction(e);++this.leftrightDepth,t=this.parseExpression(!1),--this.leftrightDepth,this.expect("\\right",!1);var n=this.parseFunction();return new ParseNode("leftright",{body:t,left:s.value.value,right:n.value.value},this.mode)}if("\\begin"===r){var o=this.parseFunction(e),i=o.value.name;if(!environments.hasOwnProperty(i))throw new ParseError("No such environment: "+i,o.value.nameGroup);var a=environments[i],u=this.parseArguments("\\begin{"+i+"}",a),p={mode:this.mode,envName:i,parser:this,positions:u.pop()},h=a.handler(p,u);this.expect("\\end",!1);var l=this.nextToken,c=this.parseFunction();if(c.value.name!==i)throw new ParseError("Mismatch: \\begin{"+i+"} matched by \\end{"+c.value.name+"}",l);return h.position=c.position,h}return utils.contains(sizeFuncs,r)?(t=this.parseExpression(!1),new ParseNode("sizing",{size:"size"+(utils.indexOf(sizeFuncs,r)+1),value:t},this.mode)):utils.contains(styleFuncs,r)?(t=this.parseExpression(!0),new ParseNode("styling",{style:r.slice(1,r.length-5),value:t},this.mode)):this.parseFunction(e)},Parser.prototype.parseFunction=function(e){if(e||(e=this.parseGroup()),e){if(e.isFunction){var t=e.result,r=functions[t];if("text"===this.mode&&!r.allowedInText)throw new ParseError("Can't use function '"+t+"' in text mode",e.token);var s=this.parseArguments(t,r),n=e.token,o=this.callFunction(t,s,s.pop(),n);return new ParseNode(o.type,o,this.mode)}return e.result}return null},Parser.prototype.callFunction=function(e,t,r,s){var n={funcName:e,parser:this,positions:r,token:s};return functions[e].handler(n,t)},Parser.prototype.parseArguments=function(e,t){var r=t.numArgs+t.numOptionalArgs;if(0===r)return[[this.pos]];for(var s=t.greediness,n=[this.pos],o=[],i=0;i<r;i++){var a,u=this.nextToken,p=t.argTypes&&t.argTypes[i];if(i<t.numOptionalArgs){if(!(a=p?this.parseGroupOfType(p,!0):this.parseGroup(!0))){o.push(null),n.push(this.pos);continue}}else if(!(a=p?this.parseGroupOfType(p):this.parseGroup())){if(this.settings.throwOnError||"\\"!==this.nextToken.text[0])throw new ParseError("Expected group after '"+e+"'",u);a=new ParseFuncOrArgument(this.handleUnsupportedCmd(this.nextToken.text),!1)}var h;if(a.isFunction){if(!(functions[a.result].greediness>s))throw new ParseError("Got function '"+a.result+"' as argument to '"+e+"'",u);h=this.parseFunction(a)}else h=a.result;o.push(h),n.push(this.pos)}return o.push(n),o},Parser.prototype.parseGroupOfType=function(e,t){var r=this.mode;if("original"===e&&(e=r),"color"===e)return this.parseColorGroup(t);if("size"===e)return this.parseSizeGroup(t);if(this.switchMode(e),"text"===e)for(;" "===this.nextToken.text;)this.consume();var s=this.parseGroup(t);return this.switchMode(r),s},Parser.prototype.parseStringGroup=function(e,t){if(t&&"["!==this.nextToken.text)return null;var r=this.mode;this.mode="text",this.expect(t?"[":"{");for(var s="",n=this.nextToken,o=n;this.nextToken.text!==(t?"]":"}");){if("EOF"===this.nextToken.text)throw new ParseError("Unexpected end of input in "+e,n.range(this.nextToken,s));o=this.nextToken,s+=o.text,this.consume()}return this.mode=r,this.expect(t?"]":"}"),n.range(o,s)},Parser.prototype.parseRegexGroup=function(e,t){var r=this.mode;this.mode="text";for(var s=this.nextToken,n=s,o="";"EOF"!==this.nextToken.text&&e.test(o+this.nextToken.text);)n=this.nextToken,o+=n.text,this.consume();if(""===o)throw new ParseError("Invalid "+t+": '"+s.text+"'",s);return this.mode=r,s.range(n,o)},Parser.prototype.parseColorGroup=function(e){var t=this.parseStringGroup("color",e);if(!t)return null;var r=/^(#[a-z0-9]+|[a-z]+)$/i.exec(t.text);if(!r)throw new ParseError("Invalid color: '"+t.text+"'",t);return new ParseFuncOrArgument(new ParseNode("color",r[0],this.mode),!1)},Parser.prototype.parseSizeGroup=function(e){var t;if(!(t=e||"{"===this.nextToken.text?this.parseStringGroup("size",e):this.parseRegexGroup(/^[-+]? *(?:$|\d+|\d+\.\d*|\.\d*) *[a-z]{0,2}$/,"size")))return null;var r=/([-+]?) *(\d+(?:\.\d*)?|\.\d+) *([a-z]{2})/.exec(t.text);if(!r)throw new ParseError("Invalid size: '"+t.text+"'",t);var s={number:+(r[1]+r[2]),unit:r[3]};if("em"!==s.unit&&"ex"!==s.unit&&"mu"!==s.unit)throw new ParseError("Invalid unit: '"+s.unit+"'",t);return new ParseFuncOrArgument(new ParseNode("color",s,this.mode),!1)},Parser.prototype.parseGroup=function(e){var t=this.nextToken;if(this.nextToken.text===(e?"[":"{")){this.consume();var r=this.parseExpression(!1,e?"]":null),s=this.nextToken;return this.expect(e?"]":"}"),"text"===this.mode&&this.formLigatures(r),new ParseFuncOrArgument(new ParseNode("ordgroup",r,this.mode,t,s),!1)}return e?null:this.parseSymbol()},Parser.prototype.formLigatures=function(e){var t,r=e.length-1;for(t=0;t<r;++t){var s=e[t],n=s.value;"-"===n&&"-"===e[t+1].value&&(t+1<r&&"-"===e[t+2].value?(e.splice(t,3,new ParseNode("textord","---","text",s,e[t+2])),r-=2):(e.splice(t,2,new ParseNode("textord","--","text",s,e[t+1])),r-=1)),"'"!==n&&"`"!==n||e[t+1].value!==n||(e.splice(t,2,new ParseNode("textord",n+n,"text",s,e[t+1])),r-=1)}},Parser.prototype.parseSymbol=function(){var e=this.nextToken;return functions[e.text]?(this.consume(),new ParseFuncOrArgument(e.text,!0,e)):symbols[this.mode][e.text]?(this.consume(),new ParseFuncOrArgument(new ParseNode(symbols[this.mode][e.text].group,e.text,this.mode,e),!1,e)):"text"===this.mode&&cjkRegex.test(e.text)?(this.consume(),new ParseFuncOrArgument(new ParseNode("textord",e.text,this.mode,e),!1,e)):null},Parser.prototype.ParseNode=ParseNode,module.exports=Parser;
+/* eslint no-constant-condition:0 */
+var functions = require("./functions");
+var environments = require("./environments");
+var MacroExpander = require("./MacroExpander");
+var symbols = require("./symbols");
+var utils = require("./utils");
+var cjkRegex = require("./unicodeRegexes").cjkRegex;
+
+var parseData = require("./parseData");
+var ParseError = require("./ParseError");
+
+/**
+ * This file contains the parser used to parse out a TeX expression from the
+ * input. Since TeX isn't context-free, standard parsers don't work particularly
+ * well.
+ *
+ * The strategy of this parser is as such:
+ *
+ * The main functions (the `.parse...` ones) take a position in the current
+ * parse string to parse tokens from. The lexer (found in Lexer.js, stored at
+ * this.lexer) also supports pulling out tokens at arbitrary places. When
+ * individual tokens are needed at a position, the lexer is called to pull out a
+ * token, which is then used.
+ *
+ * The parser has a property called "mode" indicating the mode that
+ * the parser is currently in. Currently it has to be one of "math" or
+ * "text", which denotes whether the current environment is a math-y
+ * one or a text-y one (e.g. inside \text). Currently, this serves to
+ * limit the functions which can be used in text mode.
+ *
+ * The main functions then return an object which contains the useful data that
+ * was parsed at its given point, and a new position at the end of the parsed
+ * data. The main functions can call each other and continue the parsing by
+ * using the returned position as a new starting point.
+ *
+ * There are also extra `.handle...` functions, which pull out some reused
+ * functionality into self-contained functions.
+ *
+ * The earlier functions return ParseNodes.
+ * The later functions (which are called deeper in the parse) sometimes return
+ * ParseFuncOrArgument, which contain a ParseNode as well as some data about
+ * whether the parsed object is a function which is missing some arguments, or a
+ * standalone object which can be used as an argument to another function.
+ */
+
+/**
+ * Main Parser class
+ */
+function Parser(input, settings) {
+    // Create a new macro expander (gullet) and (indirectly via that) also a
+    // new lexer (mouth) for this parser (stomach, in the language of TeX)
+    this.gullet = new MacroExpander(input, settings.macros);
+    // Store the settings for use in parsing
+    this.settings = settings;
+    // Count leftright depth (for \middle errors)
+    this.leftrightDepth = 0;
+}
+
+var ParseNode = parseData.ParseNode;
+
+/**
+ * An initial function (without its arguments), or an argument to a function.
+ * The `result` argument should be a ParseNode.
+ */
+function ParseFuncOrArgument(result, isFunction, token) {
+    this.result = result;
+    // Is this a function (i.e. is it something defined in functions.js)?
+    this.isFunction = isFunction;
+    this.token = token;
+}
+
+/**
+ * Checks a result to make sure it has the right type, and throws an
+ * appropriate error otherwise.
+ *
+ * @param {boolean=} consume whether to consume the expected token,
+ *                           defaults to true
+ */
+Parser.prototype.expect = function(text, consume) {
+    if (this.nextToken.text !== text) {
+        throw new ParseError(
+            "Expected '" + text + "', got '" + this.nextToken.text + "'",
+            this.nextToken
+        );
+    }
+    if (consume !== false) {
+        this.consume();
+    }
+};
+
+/**
+ * Considers the current look ahead token as consumed,
+ * and fetches the one after that as the new look ahead.
+ */
+Parser.prototype.consume = function() {
+    this.nextToken = this.gullet.get(this.mode === "math");
+};
+
+Parser.prototype.switchMode = function(newMode) {
+    this.gullet.unget(this.nextToken);
+    this.mode = newMode;
+    this.consume();
+};
+
+/**
+ * Main parsing function, which parses an entire input.
+ *
+ * @return {?Array.<ParseNode>}
+ */
+Parser.prototype.parse = function() {
+    // Try to parse the input
+    this.mode = "math";
+    this.consume();
+    var parse = this.parseInput();
+    return parse;
+};
+
+/**
+ * Parses an entire input tree.
+ */
+Parser.prototype.parseInput = function() {
+    // Parse an expression
+    var expression = this.parseExpression(false);
+    // If we succeeded, make sure there's an EOF at the end
+    this.expect("EOF", false);
+    return expression;
+};
+
+var endOfExpression = ["}", "\\end", "\\right", "&", "\\\\", "\\cr"];
+
+/**
+ * Parses an "expression", which is a list of atoms.
+ *
+ * @param {boolean} breakOnInfix  Should the parsing stop when we hit infix
+ *                  nodes? This happens when functions have higher precendence
+ *                  than infix nodes in implicit parses.
+ *
+ * @param {?string} breakOnTokenText  The text of the token that the expression
+ *                  should end with, or `null` if something else should end the
+ *                  expression.
+ *
+ * @return {ParseNode}
+ */
+Parser.prototype.parseExpression = function(breakOnInfix, breakOnTokenText) {
+    var body = [];
+    // Keep adding atoms to the body until we can't parse any more atoms (either
+    // we reached the end, a }, or a \right)
+    while (true) {
+        var lex = this.nextToken;
+        if (endOfExpression.indexOf(lex.text) !== -1) {
+            break;
+        }
+        if (breakOnTokenText && lex.text === breakOnTokenText) {
+            break;
+        }
+        if (breakOnInfix && functions[lex.text] && functions[lex.text].infix) {
+            break;
+        }
+        var atom = this.parseAtom();
+        if (!atom) {
+            if (!this.settings.throwOnError && lex.text[0] === "\\") {
+                var errorNode = this.handleUnsupportedCmd();
+                body.push(errorNode);
+                continue;
+            }
+
+            break;
+        }
+        body.push(atom);
+    }
+    return this.handleInfixNodes(body);
+};
+
+/**
+ * Rewrites infix operators such as \over with corresponding commands such
+ * as \frac.
+ *
+ * There can only be one infix operator per group.  If there's more than one
+ * then the expression is ambiguous.  This can be resolved by adding {}.
+ *
+ * @returns {Array}
+ */
+Parser.prototype.handleInfixNodes = function(body) {
+    var overIndex = -1;
+    var funcName;
+
+    for (var i = 0; i < body.length; i++) {
+        var node = body[i];
+        if (node.type === "infix") {
+            if (overIndex !== -1) {
+                throw new ParseError(
+                    "only one infix operator per group",
+                    node.value.token);
+            }
+            overIndex = i;
+            funcName = node.value.replaceWith;
+        }
+    }
+
+    if (overIndex !== -1) {
+        var numerNode;
+        var denomNode;
+
+        var numerBody = body.slice(0, overIndex);
+        var denomBody = body.slice(overIndex + 1);
+
+        if (numerBody.length === 1 && numerBody[0].type === "ordgroup") {
+            numerNode = numerBody[0];
+        } else {
+            numerNode = new ParseNode("ordgroup", numerBody, this.mode);
+        }
+
+        if (denomBody.length === 1 && denomBody[0].type === "ordgroup") {
+            denomNode = denomBody[0];
+        } else {
+            denomNode = new ParseNode("ordgroup", denomBody, this.mode);
+        }
+
+        var value = this.callFunction(
+            funcName, [numerNode, denomNode], null);
+        return [new ParseNode(value.type, value, this.mode)];
+    } else {
+        return body;
+    }
+};
+
+// The greediness of a superscript or subscript
+var SUPSUB_GREEDINESS = 1;
+
+/**
+ * Handle a subscript or superscript with nice errors.
+ */
+Parser.prototype.handleSupSubscript = function(name) {
+    var symbolToken = this.nextToken;
+    var symbol = symbolToken.text;
+    this.consume();
+    var group = this.parseGroup();
+
+    if (!group) {
+        if (!this.settings.throwOnError && this.nextToken.text[0] === "\\") {
+            return this.handleUnsupportedCmd();
+        } else {
+            throw new ParseError(
+                "Expected group after '" + symbol + "'",
+                symbolToken
+            );
+        }
+    } else if (group.isFunction) {
+        // ^ and _ have a greediness, so handle interactions with functions'
+        // greediness
+        var funcGreediness = functions[group.result].greediness;
+        if (funcGreediness > SUPSUB_GREEDINESS) {
+            return this.parseFunction(group);
+        } else {
+            throw new ParseError(
+                "Got function '" + group.result + "' with no arguments " +
+                    "as " + name, symbolToken);
+        }
+    } else {
+        return group.result;
+    }
+};
+
+/**
+ * Converts the textual input of an unsupported command into a text node
+ * contained within a color node whose color is determined by errorColor
+ */
+Parser.prototype.handleUnsupportedCmd = function() {
+    var text = this.nextToken.text;
+    var textordArray = [];
+
+    for (var i = 0; i < text.length; i++) {
+        textordArray.push(new ParseNode("textord", text[i], "text"));
+    }
+
+    var textNode = new ParseNode(
+        "text",
+        {
+            body: textordArray,
+            type: "text"
+        },
+        this.mode);
+
+    var colorNode = new ParseNode(
+        "color",
+        {
+            color: this.settings.errorColor,
+            value: [textNode],
+            type: "color"
+        },
+        this.mode);
+
+    this.consume();
+    return colorNode;
+};
+
+/**
+ * Parses a group with optional super/subscripts.
+ *
+ * @return {?ParseNode}
+ */
+Parser.prototype.parseAtom = function() {
+    // The body of an atom is an implicit group, so that things like
+    // \left(x\right)^2 work correctly.
+    var base = this.parseImplicitGroup();
+
+    // In text mode, we don't have superscripts or subscripts
+    if (this.mode === "text") {
+        return base;
+    }
+
+    // Note that base may be empty (i.e. null) at this point.
+
+    var superscript;
+    var subscript;
+    while (true) {
+        // Lex the first token
+        var lex = this.nextToken;
+
+        if (lex.text === "\\limits" || lex.text === "\\nolimits") {
+            // We got a limit control
+            if (!base || base.type !== "op") {
+                throw new ParseError(
+                    "Limit controls must follow a math operator",
+                    lex);
+            } else {
+                var limits = lex.text === "\\limits";
+                base.value.limits = limits;
+                base.value.alwaysHandleSupSub = true;
+            }
+            this.consume();
+        } else if (lex.text === "^") {
+            // We got a superscript start
+            if (superscript) {
+                throw new ParseError("Double superscript", lex);
+            }
+            superscript = this.handleSupSubscript("superscript");
+        } else if (lex.text === "_") {
+            // We got a subscript start
+            if (subscript) {
+                throw new ParseError("Double subscript", lex);
+            }
+            subscript = this.handleSupSubscript("subscript");
+        } else if (lex.text === "'") {
+            // We got a prime
+            var prime = new ParseNode("textord", "\\prime", this.mode);
+
+            // Many primes can be grouped together, so we handle this here
+            var primes = [prime];
+            this.consume();
+            // Keep lexing tokens until we get something that's not a prime
+            while (this.nextToken.text === "'") {
+                // For each one, add another prime to the list
+                primes.push(prime);
+                this.consume();
+            }
+            // Put them into an ordgroup as the superscript
+            superscript = new ParseNode("ordgroup", primes, this.mode);
+        } else {
+            // If it wasn't ^, _, or ', stop parsing super/subscripts
+            break;
+        }
+    }
+
+    if (superscript || subscript) {
+        // If we got either a superscript or subscript, create a supsub
+        return new ParseNode("supsub", {
+            base: base,
+            sup: superscript,
+            sub: subscript
+        }, this.mode);
+    } else {
+        // Otherwise return the original body
+        return base;
+    }
+};
+
+// A list of the size-changing functions, for use in parseImplicitGroup
+var sizeFuncs = [
+    "\\tiny", "\\scriptsize", "\\footnotesize", "\\small", "\\normalsize",
+    "\\large", "\\Large", "\\LARGE", "\\huge", "\\Huge"
+];
+
+// A list of the style-changing functions, for use in parseImplicitGroup
+var styleFuncs = [
+    "\\displaystyle", "\\textstyle", "\\scriptstyle", "\\scriptscriptstyle"
+];
+
+/**
+ * Parses an implicit group, which is a group that starts at the end of a
+ * specified, and ends right before a higher explicit group ends, or at EOL. It
+ * is used for functions that appear to affect the current style, like \Large or
+ * \textrm, where instead of keeping a style we just pretend that there is an
+ * implicit grouping after it until the end of the group. E.g.
+ *   small text {\Large large text} small text again
+ * It is also used for \left and \right to get the correct grouping.
+ *
+ * @return {?ParseNode}
+ */
+Parser.prototype.parseImplicitGroup = function() {
+    var start = this.parseSymbol();
+
+    if (start == null) {
+        // If we didn't get anything we handle, fall back to parseFunction
+        return this.parseFunction();
+    }
+
+    var func = start.result;
+    var body;
+
+    if (func === "\\left") {
+        // If we see a left:
+        // Parse the entire left function (including the delimiter)
+        var left = this.parseFunction(start);
+        // Parse out the implicit body
+        ++this.leftrightDepth;
+        body = this.parseExpression(false);
+        --this.leftrightDepth;
+        // Check the next token
+        this.expect("\\right", false);
+        var right = this.parseFunction();
+        return new ParseNode("leftright", {
+            body: body,
+            left: left.value.value,
+            right: right.value.value
+        }, this.mode);
+    } else if (func === "\\begin") {
+        // begin...end is similar to left...right
+        var begin = this.parseFunction(start);
+        var envName = begin.value.name;
+        if (!environments.hasOwnProperty(envName)) {
+            throw new ParseError(
+                "No such environment: " + envName, begin.value.nameGroup);
+        }
+        // Build the environment object. Arguments and other information will
+        // be made available to the begin and end methods using properties.
+        var env = environments[envName];
+        var args = this.parseArguments("\\begin{" + envName + "}", env);
+        var context = {
+            mode: this.mode,
+            envName: envName,
+            parser: this,
+            positions: args.pop()
+        };
+        var result = env.handler(context, args);
+        this.expect("\\end", false);
+        var endNameToken = this.nextToken;
+        var end = this.parseFunction();
+        if (end.value.name !== envName) {
+            throw new ParseError(
+                "Mismatch: \\begin{" + envName + "} matched " +
+                "by \\end{" + end.value.name + "}",
+                endNameToken);
+        }
+        result.position = end.position;
+        return result;
+    } else if (utils.contains(sizeFuncs, func)) {
+        // If we see a sizing function, parse out the implict body
+        body = this.parseExpression(false);
+        return new ParseNode("sizing", {
+            // Figure out what size to use based on the list of functions above
+            size: "size" + (utils.indexOf(sizeFuncs, func) + 1),
+            value: body
+        }, this.mode);
+    } else if (utils.contains(styleFuncs, func)) {
+        // If we see a styling function, parse out the implict body
+        body = this.parseExpression(true);
+        return new ParseNode("styling", {
+            // Figure out what style to use by pulling out the style from
+            // the function name
+            style: func.slice(1, func.length - 5),
+            value: body
+        }, this.mode);
+    } else {
+        // Defer to parseFunction if it's not a function we handle
+        return this.parseFunction(start);
+    }
+};
+
+/**
+ * Parses an entire function, including its base and all of its arguments.
+ * The base might either have been parsed already, in which case
+ * it is provided as an argument, or it's the next group in the input.
+ *
+ * @param {ParseFuncOrArgument=} baseGroup optional as described above
+ * @return {?ParseNode}
+ */
+Parser.prototype.parseFunction = function(baseGroup) {
+    if (!baseGroup) {
+        baseGroup = this.parseGroup();
+    }
+
+    if (baseGroup) {
+        if (baseGroup.isFunction) {
+            var func = baseGroup.result;
+            var funcData = functions[func];
+            if (this.mode === "text" && !funcData.allowedInText) {
+                throw new ParseError(
+                    "Can't use function '" + func + "' in text mode",
+                    baseGroup.token);
+            }
+
+            var args = this.parseArguments(func, funcData);
+            var token = baseGroup.token;
+            var result = this.callFunction(func, args, args.pop(), token);
+            return new ParseNode(result.type, result, this.mode);
+        } else {
+            return baseGroup.result;
+        }
+    } else {
+        return null;
+    }
+};
+
+/**
+ * Call a function handler with a suitable context and arguments.
+ */
+Parser.prototype.callFunction = function(name, args, positions, token) {
+    var context = {
+        funcName: name,
+        parser: this,
+        positions: positions,
+        token: token
+    };
+    return functions[name].handler(context, args);
+};
+
+/**
+ * Parses the arguments of a function or environment
+ *
+ * @param {string} func  "\name" or "\begin{name}"
+ * @param {{numArgs:number,numOptionalArgs:number|undefined}} funcData
+ * @return the array of arguments, with the list of positions as last element
+ */
+Parser.prototype.parseArguments = function(func, funcData) {
+    var totalArgs = funcData.numArgs + funcData.numOptionalArgs;
+    if (totalArgs === 0) {
+        return [[this.pos]];
+    }
+
+    var baseGreediness = funcData.greediness;
+    var positions = [this.pos];
+    var args = [];
+
+    for (var i = 0; i < totalArgs; i++) {
+        var nextToken = this.nextToken;
+        var argType = funcData.argTypes && funcData.argTypes[i];
+        var arg;
+        if (i < funcData.numOptionalArgs) {
+            if (argType) {
+                arg = this.parseGroupOfType(argType, true);
+            } else {
+                arg = this.parseGroup(true);
+            }
+            if (!arg) {
+                args.push(null);
+                positions.push(this.pos);
+                continue;
+            }
+        } else {
+            if (argType) {
+                arg = this.parseGroupOfType(argType);
+            } else {
+                arg = this.parseGroup();
+            }
+            if (!arg) {
+                if (!this.settings.throwOnError &&
+                    this.nextToken.text[0] === "\\") {
+                    arg = new ParseFuncOrArgument(
+                        this.handleUnsupportedCmd(this.nextToken.text),
+                        false);
+                } else {
+                    throw new ParseError(
+                        "Expected group after '" + func + "'", nextToken);
+                }
+            }
+        }
+        var argNode;
+        if (arg.isFunction) {
+            var argGreediness =
+                functions[arg.result].greediness;
+            if (argGreediness > baseGreediness) {
+                argNode = this.parseFunction(arg);
+            } else {
+                throw new ParseError(
+                    "Got function '" + arg.result + "' as " +
+                    "argument to '" + func + "'", nextToken);
+            }
+        } else {
+            argNode = arg.result;
+        }
+        args.push(argNode);
+        positions.push(this.pos);
+    }
+
+    args.push(positions);
+
+    return args;
+};
+
+
+/**
+ * Parses a group when the mode is changing.
+ *
+ * @return {?ParseFuncOrArgument}
+ */
+Parser.prototype.parseGroupOfType = function(innerMode, optional) {
+    var outerMode = this.mode;
+    // Handle `original` argTypes
+    if (innerMode === "original") {
+        innerMode = outerMode;
+    }
+
+    if (innerMode === "color") {
+        return this.parseColorGroup(optional);
+    }
+    if (innerMode === "size") {
+        return this.parseSizeGroup(optional);
+    }
+
+    this.switchMode(innerMode);
+    if (innerMode === "text") {
+        // text mode is special because it should ignore the whitespace before
+        // it
+        while (this.nextToken.text === " ") {
+            this.consume();
+        }
+    }
+    // By the time we get here, innerMode is one of "text" or "math".
+    // We switch the mode of the parser, recurse, then restore the old mode.
+    var res = this.parseGroup(optional);
+    this.switchMode(outerMode);
+    return res;
+};
+
+/**
+ * Parses a group, essentially returning the string formed by the
+ * brace-enclosed tokens plus some position information.
+ *
+ * @param {string} modeName  Used to describe the mode in error messages
+ * @param {boolean=} optional  Whether the group is optional or required
+ */
+Parser.prototype.parseStringGroup = function(modeName, optional) {
+    if (optional && this.nextToken.text !== "[") {
+        return null;
+    }
+    var outerMode = this.mode;
+    this.mode = "text";
+    this.expect(optional ? "[" : "{");
+    var str = "";
+    var firstToken = this.nextToken;
+    var lastToken = firstToken;
+    while (this.nextToken.text !== (optional ? "]" : "}")) {
+        if (this.nextToken.text === "EOF") {
+            throw new ParseError(
+                "Unexpected end of input in " + modeName,
+                firstToken.range(this.nextToken, str));
+        }
+        lastToken = this.nextToken;
+        str += lastToken.text;
+        this.consume();
+    }
+    this.mode = outerMode;
+    this.expect(optional ? "]" : "}");
+    return firstToken.range(lastToken, str);
+};
+
+/**
+ * Parses a regex-delimited group: the largest sequence of tokens
+ * whose concatenated strings match `regex`. Returns the string
+ * formed by the tokens plus some position information.
+ *
+ * @param {RegExp} regex
+ * @param {string} modeName  Used to describe the mode in error messages
+ */
+Parser.prototype.parseRegexGroup = function(regex, modeName) {
+    var outerMode = this.mode;
+    this.mode = "text";
+    var firstToken = this.nextToken;
+    var lastToken = firstToken;
+    var str = "";
+    while (this.nextToken.text !== "EOF"
+           && regex.test(str + this.nextToken.text)) {
+        lastToken = this.nextToken;
+        str += lastToken.text;
+        this.consume();
+    }
+    if (str === "") {
+        throw new ParseError(
+            "Invalid " + modeName + ": '" + firstToken.text + "'",
+            firstToken);
+    }
+    this.mode = outerMode;
+    return firstToken.range(lastToken, str);
+};
+
+/**
+ * Parses a color description.
+ */
+Parser.prototype.parseColorGroup = function(optional) {
+    var res = this.parseStringGroup("color", optional);
+    if (!res) {
+        return null;
+    }
+    var match = (/^(#[a-z0-9]+|[a-z]+)$/i).exec(res.text);
+    if (!match) {
+        throw new ParseError("Invalid color: '" + res.text + "'", res);
+    }
+    return new ParseFuncOrArgument(
+        new ParseNode("color", match[0], this.mode),
+        false);
+};
+
+/**
+ * Parses a size specification, consisting of magnitude and unit.
+ */
+Parser.prototype.parseSizeGroup = function(optional) {
+    var res;
+    if (!optional && this.nextToken.text !== "{") {
+        res = this.parseRegexGroup(
+            /^[-+]? *(?:$|\d+|\d+\.\d*|\.\d*) *[a-z]{0,2}$/, "size");
+    } else {
+        res = this.parseStringGroup("size", optional);
+    }
+    if (!res) {
+        return null;
+    }
+    var match = (/([-+]?) *(\d+(?:\.\d*)?|\.\d+) *([a-z]{2})/).exec(res.text);
+    if (!match) {
+        throw new ParseError("Invalid size: '" + res.text + "'", res);
+    }
+    var data = {
+        number: +(match[1] + match[2]), // sign + magnitude, cast to number
+        unit: match[3]
+    };
+    if (data.unit !== "em" && data.unit !== "ex" && data.unit !== "mu") {
+        throw new ParseError("Invalid unit: '" + data.unit + "'", res);
+    }
+    return new ParseFuncOrArgument(
+        new ParseNode("color", data, this.mode),
+        false);
+};
+
+/**
+ * If the argument is false or absent, this parses an ordinary group,
+ * which is either a single nucleus (like "x") or an expression
+ * in braces (like "{x+y}").
+ * If the argument is true, it parses either a bracket-delimited expression
+ * (like "[x+y]") or returns null to indicate the absence of a
+ * bracket-enclosed group.
+ *
+ * @param {boolean=} optional  Whether the group is optional or required
+ * @return {?ParseFuncOrArgument}
+ */
+Parser.prototype.parseGroup = function(optional) {
+    var firstToken = this.nextToken;
+    // Try to parse an open brace
+    if (this.nextToken.text === (optional ? "[" : "{")) {
+        // If we get a brace, parse an expression
+        this.consume();
+        var expression = this.parseExpression(false, optional ? "]" : null);
+        var lastToken = this.nextToken;
+        // Make sure we get a close brace
+        this.expect(optional ? "]" : "}");
+        if (this.mode === "text") {
+            this.formLigatures(expression);
+        }
+        return new ParseFuncOrArgument(
+            new ParseNode("ordgroup", expression, this.mode,
+                          firstToken, lastToken),
+            false);
+    } else {
+        // Otherwise, just return a nucleus, or nothing for an optional group
+        return optional ? null : this.parseSymbol();
+    }
+};
+
+/**
+ * Form ligature-like combinations of characters for text mode.
+ * This includes inputs like "--", "---", "``" and "''".
+ * The result will simply replace multiple textord nodes with a single
+ * character in each value by a single textord node having multiple
+ * characters in its value.  The representation is still ASCII source.
+ *
+ * @param {Array.<ParseNode>} group  the nodes of this group,
+ *                                   list will be moified in place
+ */
+Parser.prototype.formLigatures = function(group) {
+    var i;
+    var n = group.length - 1;
+    for (i = 0; i < n; ++i) {
+        var a = group[i];
+        var v = a.value;
+        if (v === "-" && group[i + 1].value === "-") {
+            if (i + 1 < n && group[i + 2].value === "-") {
+                group.splice(i, 3, new ParseNode(
+                    "textord", "---", "text", a, group[i + 2]));
+                n -= 2;
+            } else {
+                group.splice(i, 2, new ParseNode(
+                    "textord", "--", "text", a, group[i + 1]));
+                n -= 1;
+            }
+        }
+        if ((v === "'" || v === "`") && group[i + 1].value === v) {
+            group.splice(i, 2, new ParseNode(
+                "textord", v + v, "text", a, group[i + 1]));
+            n -= 1;
+        }
+    }
+};
+
+/**
+ * Parse a single symbol out of the string. Here, we handle both the functions
+ * we have defined, as well as the single character symbols
+ *
+ * @return {?ParseFuncOrArgument}
+ */
+Parser.prototype.parseSymbol = function() {
+    var nucleus = this.nextToken;
+
+    if (functions[nucleus.text]) {
+        this.consume();
+        // If there exists a function with this name, we return the function and
+        // say that it is a function.
+        return new ParseFuncOrArgument(
+            nucleus.text,
+            true, nucleus);
+    } else if (symbols[this.mode][nucleus.text]) {
+        this.consume();
+        // Otherwise if this is a no-argument function, find the type it
+        // corresponds to in the symbols map
+        return new ParseFuncOrArgument(
+            new ParseNode(symbols[this.mode][nucleus.text].group,
+                          nucleus.text, this.mode, nucleus),
+            false, nucleus);
+    } else if (this.mode === "text" && cjkRegex.test(nucleus.text)) {
+        this.consume();
+        return new ParseFuncOrArgument(
+            new ParseNode("textord", nucleus.text, this.mode, nucleus),
+            false, nucleus);
+    } else {
+        return null;
+    }
+};
+
+Parser.prototype.ParseNode = ParseNode;
+
+module.exports = Parser;
 
 },{"./MacroExpander":2,"./ParseError":4,"./environments":14,"./functions":17,"./parseData":19,"./symbols":21,"./unicodeRegexes":22,"./utils":23}],6:[function(require,module,exports){
-function get(r,o){return void 0===r?o:r}function Settings(r){r=r||{},this.displayMode=get(r.displayMode,!1),this.throwOnError=get(r.throwOnError,!0),this.errorColor=get(r.errorColor,"#cc0000"),this.macros=r.macros||{}}module.exports=Settings;
+/**
+ * This is a module for storing settings passed into KaTeX. It correctly handles
+ * default settings.
+ */
+
+/**
+ * Helper function for getting a default value if the value is undefined
+ */
+function get(option, defaultValue) {
+    return option === undefined ? defaultValue : option;
+}
+
+/**
+ * The main Settings object
+ *
+ * The current options stored are:
+ *  - displayMode: Whether the expression should be typeset by default in
+ *                 textstyle or displaystyle (default false)
+ */
+function Settings(options) {
+    // allow null options
+    options = options || {};
+    this.displayMode = get(options.displayMode, false);
+    this.throwOnError = get(options.throwOnError, true);
+    this.errorColor = get(options.errorColor, "#cc0000");
+    this.macros = options.macros || {};
+}
+
+module.exports = Settings;
 
 },{}],7:[function(require,module,exports){
-function Style(t,e,s,S){this.id=t,this.size=e,this.cramped=S,this.sizeMultiplier=s,this.metrics=metrics[e>0?e-1:0]}var sigmas=require("./fontMetrics.js").sigmas,metrics=[{},{},{}],i;for(var key in sigmas)if(sigmas.hasOwnProperty(key))for(i=0;i<3;i++)metrics[i][key]=sigmas[key][i];for(i=0;i<3;i++)metrics[i].emPerEx=sigmas.xHeight[i]/sigmas.quad[i];Style.prototype.sup=function(){return styles[sup[this.id]]},Style.prototype.sub=function(){return styles[sub[this.id]]},Style.prototype.fracNum=function(){return styles[fracNum[this.id]]},Style.prototype.fracDen=function(){return styles[fracDen[this.id]]},Style.prototype.cramp=function(){return styles[cramp[this.id]]},Style.prototype.cls=function(){return sizeNames[this.size]+(this.cramped?" cramped":" uncramped")},Style.prototype.reset=function(){return resetNames[this.size]},Style.prototype.isTight=function(){return this.size>=2};var D=0,Dc=1,T=2,Tc=3,S=4,Sc=5,SS=6,SSc=7,sizeNames=["displaystyle textstyle","textstyle","scriptstyle","scriptscriptstyle"],resetNames=["reset-textstyle","reset-textstyle","reset-scriptstyle","reset-scriptscriptstyle"],styles=[new Style(D,0,1,!1),new Style(Dc,0,1,!0),new Style(T,1,1,!1),new Style(Tc,1,1,!0),new Style(S,2,.7,!1),new Style(Sc,2,.7,!0),new Style(SS,3,.5,!1),new Style(SSc,3,.5,!0)],sup=[S,Sc,S,Sc,SS,SSc,SS,SSc],sub=[Sc,Sc,Sc,Sc,SSc,SSc,SSc,SSc],fracNum=[T,Tc,S,Sc,SS,SSc,SS,SSc],fracDen=[Tc,Tc,Sc,Sc,SSc,SSc,SSc,SSc],cramp=[Dc,Dc,Tc,Tc,Sc,Sc,SSc,SSc];module.exports={DISPLAY:styles[D],TEXT:styles[T],SCRIPT:styles[S],SCRIPTSCRIPT:styles[SS]};
+/**
+ * This file contains information and classes for the various kinds of styles
+ * used in TeX. It provides a generic `Style` class, which holds information
+ * about a specific style. It then provides instances of all the different kinds
+ * of styles possible, and provides functions to move between them and get
+ * information about them.
+ */
+
+var sigmas = require("./fontMetrics.js").sigmas;
+
+var metrics = [{}, {}, {}];
+var i;
+for (var key in sigmas) {
+    if (sigmas.hasOwnProperty(key)) {
+        for (i = 0; i < 3; i++) {
+            metrics[i][key] = sigmas[key][i];
+        }
+    }
+}
+for (i = 0; i < 3; i++) {
+    metrics[i].emPerEx = sigmas.xHeight[i] / sigmas.quad[i];
+}
+
+/**
+ * The main style class. Contains a unique id for the style, a size (which is
+ * the same for cramped and uncramped version of a style), a cramped flag, and a
+ * size multiplier, which gives the size difference between a style and
+ * textstyle.
+ */
+function Style(id, size, multiplier, cramped) {
+    this.id = id;
+    this.size = size;
+    this.cramped = cramped;
+    this.sizeMultiplier = multiplier;
+    this.metrics = metrics[size > 0 ? size - 1 : 0];
+}
+
+/**
+ * Get the style of a superscript given a base in the current style.
+ */
+Style.prototype.sup = function() {
+    return styles[sup[this.id]];
+};
+
+/**
+ * Get the style of a subscript given a base in the current style.
+ */
+Style.prototype.sub = function() {
+    return styles[sub[this.id]];
+};
+
+/**
+ * Get the style of a fraction numerator given the fraction in the current
+ * style.
+ */
+Style.prototype.fracNum = function() {
+    return styles[fracNum[this.id]];
+};
+
+/**
+ * Get the style of a fraction denominator given the fraction in the current
+ * style.
+ */
+Style.prototype.fracDen = function() {
+    return styles[fracDen[this.id]];
+};
+
+/**
+ * Get the cramped version of a style (in particular, cramping a cramped style
+ * doesn't change the style).
+ */
+Style.prototype.cramp = function() {
+    return styles[cramp[this.id]];
+};
+
+/**
+ * HTML class name, like "displaystyle cramped"
+ */
+Style.prototype.cls = function() {
+    return sizeNames[this.size] + (this.cramped ? " cramped" : " uncramped");
+};
+
+/**
+ * HTML Reset class name, like "reset-textstyle"
+ */
+Style.prototype.reset = function() {
+    return resetNames[this.size];
+};
+
+/**
+ * Return if this style is tightly spaced (scriptstyle/scriptscriptstyle)
+ */
+Style.prototype.isTight = function() {
+    return this.size >= 2;
+};
+
+// IDs of the different styles
+var D = 0;
+var Dc = 1;
+var T = 2;
+var Tc = 3;
+var S = 4;
+var Sc = 5;
+var SS = 6;
+var SSc = 7;
+
+// String names for the different sizes
+var sizeNames = [
+    "displaystyle textstyle",
+    "textstyle",
+    "scriptstyle",
+    "scriptscriptstyle"
+];
+
+// Reset names for the different sizes
+var resetNames = [
+    "reset-textstyle",
+    "reset-textstyle",
+    "reset-scriptstyle",
+    "reset-scriptscriptstyle"
+];
+
+// Instances of the different styles
+var styles = [
+    new Style(D, 0, 1.0, false),
+    new Style(Dc, 0, 1.0, true),
+    new Style(T, 1, 1.0, false),
+    new Style(Tc, 1, 1.0, true),
+    new Style(S, 2, 0.7, false),
+    new Style(Sc, 2, 0.7, true),
+    new Style(SS, 3, 0.5, false),
+    new Style(SSc, 3, 0.5, true)
+];
+
+// Lookup tables for switching from one style to another
+var sup = [S, Sc, S, Sc, SS, SSc, SS, SSc];
+var sub = [Sc, Sc, Sc, Sc, SSc, SSc, SSc, SSc];
+var fracNum = [T, Tc, S, Sc, SS, SSc, SS, SSc];
+var fracDen = [Tc, Tc, Sc, Sc, SSc, SSc, SSc, SSc];
+var cramp = [Dc, Dc, Tc, Tc, Sc, Sc, SSc, SSc];
+
+// We only export some of the styles. Also, we don't export the `Style` class so
+// no more styles can be generated.
+module.exports = {
+    DISPLAY: styles[D],
+    TEXT: styles[T],
+    SCRIPT: styles[S],
+    SCRIPTSCRIPT: styles[SS]
+};
 
 },{"./fontMetrics.js":15}],8:[function(require,module,exports){
-var domTree=require("./domTree"),fontMetrics=require("./fontMetrics"),symbols=require("./symbols"),utils=require("./utils"),greekCapitals=["\\Gamma","\\Delta","\\Theta","\\Lambda","\\Xi","\\Pi","\\Sigma","\\Upsilon","\\Phi","\\Psi","\\Omega"],mainitLetters=["ı","ȷ","£"],makeSymbol=function(e,t,a,i,r){symbols[a][e]&&symbols[a][e].replace&&(e=symbols[a][e].replace);var n,m=fontMetrics.getCharacterMetrics(e,t);if(m){var s=m.italic;"text"===a&&(s=0),n=new domTree.symbolNode(e,m.height,m.depth,s,m.skew,r)}else"undefined"!=typeof console&&console.warn("No character metrics for '"+e+"' in style '"+t+"'"),n=new domTree.symbolNode(e,0,0,0,0,r);return i&&(i.style.isTight()&&n.classes.push("mtight"),i.getColor()&&(n.style.color=i.getColor())),n},mathsym=function(e,t,a,i){return"\\"===e||"main"===symbols[t][e].font?makeSymbol(e,"Main-Regular",t,a,i):makeSymbol(e,"AMS-Regular",t,a,i.concat(["amsrm"]))},mathDefault=function(e,t,a,i,r){if("mathord"===r)return mathit(e,t,a,i);if("textord"===r)return makeSymbol(e,"Main-Regular",t,a,i.concat(["mathrm"]));throw new Error("unexpected type: "+r+" in mathDefault")},mathit=function(e,t,a,i){return/[0-9]/.test(e.charAt(0))||utils.contains(mainitLetters,e)||utils.contains(greekCapitals,e)?makeSymbol(e,"Main-Italic",t,a,i.concat(["mainit"])):makeSymbol(e,"Math-Italic",t,a,i.concat(["mathit"]))},makeOrd=function(e,t,a){var i=e.mode,r=e.value;symbols[i][r]&&symbols[i][r].replace&&(r=symbols[i][r].replace);var n=["mord"],m=t.font;if(m){if("mathit"===m||utils.contains(mainitLetters,r))return mathit(r,i,t,n);var s=fontMap[m].fontName;return fontMetrics.getCharacterMetrics(r,s)?makeSymbol(r,s,i,t,n.concat([m])):mathDefault(r,i,t,n,a)}return mathDefault(r,i,t,n,a)},sizeElementFromChildren=function(e){var t=0,a=0,i=0;if(e.children)for(var r=0;r<e.children.length;r++)e.children[r].height>t&&(t=e.children[r].height),e.children[r].depth>a&&(a=e.children[r].depth),e.children[r].maxFontSize>i&&(i=e.children[r].maxFontSize);e.height=t,e.depth=a,e.maxFontSize=i},makeSpan=function(e,t,a){var i=new domTree.span(e,t,a);return sizeElementFromChildren(i),i},prependChildren=function(e,t){e.children=t.concat(e.children),sizeElementFromChildren(e)},makeFragment=function(e){var t=new domTree.documentFragment(e);return sizeElementFromChildren(t),t},makeFontSizer=function(e,t){var a=makeSpan([],[new domTree.symbolNode("​")]);return a.style.fontSize=t/e.style.sizeMultiplier+"em",makeSpan(["fontsize-ensurer","reset-"+e.size,"size5"],[a])},makeVList=function(e,t,a,i){var r,n,m;if("individualShift"===t){var s=e;for(e=[s[0]],r=-s[0].shift-s[0].elem.depth,n=r,m=1;m<s.length;m++){var l=-s[m].shift-n-s[m].elem.depth,o=l-(s[m-1].elem.height+s[m-1].elem.depth);n+=l,e.push({type:"kern",size:o}),e.push(s[m])}}else if("top"===t){var h=a;for(m=0;m<e.length;m++)"kern"===e[m].type?h-=e[m].size:h-=e[m].elem.height+e[m].elem.depth;r=h}else r="bottom"===t?-a:"shift"===t?-e[0].elem.depth-a:"firstBaseline"===t?-e[0].elem.depth:0;var c=0;for(m=0;m<e.length;m++)"elem"===e[m].type&&(c=Math.max(c,e[m].elem.maxFontSize));var p=makeFontSizer(i,c),u=[];for(n=r,m=0;m<e.length;m++)if("kern"===e[m].type)n+=e[m].size;else{var d=e[m].elem,f=-d.depth-n;n+=d.height+d.depth;var g=makeSpan([],[p,d]);g.height-=f,g.depth+=f,g.style.top=f+"em",u.push(g)}var k=makeSpan(["baseline-fix"],[p,new domTree.symbolNode("​")]);u.push(k);var y=makeSpan(["vlist"],u);return y.height=Math.max(n,y.height),y.depth=Math.max(-r,y.depth),y},sizingMultiplier={size1:.5,size2:.7,size3:.8,size4:.9,size5:1,size6:1.2,size7:1.44,size8:1.73,size9:2.07,size10:2.49},spacingFunctions={"\\qquad":{size:"2em",className:"qquad"},"\\quad":{size:"1em",className:"quad"},"\\enspace":{size:"0.5em",className:"enspace"},"\\;":{size:"0.277778em",className:"thickspace"},"\\:":{size:"0.22222em",className:"mediumspace"},"\\,":{size:"0.16667em",className:"thinspace"},"\\!":{size:"-0.16667em",className:"negativethinspace"}},fontMap={mathbf:{variant:"bold",fontName:"Main-Bold"},mathrm:{variant:"normal",fontName:"Main-Regular"},textit:{variant:"italic",fontName:"Main-Italic"},mathbb:{variant:"double-struck",fontName:"AMS-Regular"},mathcal:{variant:"script",fontName:"Caligraphic-Regular"},mathfrak:{variant:"fraktur",fontName:"Fraktur-Regular"},mathscr:{variant:"script",fontName:"Script-Regular"},mathsf:{variant:"sans-serif",fontName:"SansSerif-Regular"},mathtt:{variant:"monospace",fontName:"Typewriter-Regular"}};module.exports={fontMap:fontMap,makeSymbol:makeSymbol,mathsym:mathsym,makeSpan:makeSpan,makeFragment:makeFragment,makeVList:makeVList,makeOrd:makeOrd,prependChildren:prependChildren,sizingMultiplier:sizingMultiplier,spacingFunctions:spacingFunctions};
+/* eslint no-console:0 */
+/**
+ * This module contains general functions that can be used for building
+ * different kinds of domTree nodes in a consistent manner.
+ */
+
+var domTree = require("./domTree");
+var fontMetrics = require("./fontMetrics");
+var symbols = require("./symbols");
+var utils = require("./utils");
+
+var greekCapitals = [
+    "\\Gamma",
+    "\\Delta",
+    "\\Theta",
+    "\\Lambda",
+    "\\Xi",
+    "\\Pi",
+    "\\Sigma",
+    "\\Upsilon",
+    "\\Phi",
+    "\\Psi",
+    "\\Omega"
+];
+
+// The following have to be loaded from Main-Italic font, using class mainit
+var mainitLetters = [
+    "\u0131",   // dotless i, \imath
+    "\u0237",   // dotless j, \jmath
+    "\u00a3"   // \pounds
+];
+
+/**
+ * Makes a symbolNode after translation via the list of symbols in symbols.js.
+ * Correctly pulls out metrics for the character, and optionally takes a list of
+ * classes to be attached to the node.
+ *
+ * TODO: make argument order closer to makeSpan
+ * TODO: add a separate argument for math class (e.g. `mop`, `mbin`), which
+ * should if present come first in `classes`.
+ */
+var makeSymbol = function(value, fontFamily, mode, options, classes) {
+    // Replace the value with its replaced value from symbol.js
+    if (symbols[mode][value] && symbols[mode][value].replace) {
+        value = symbols[mode][value].replace;
+    }
+
+    var metrics = fontMetrics.getCharacterMetrics(value, fontFamily);
+
+    var symbolNode;
+    if (metrics) {
+        var italic = metrics.italic;
+        if (mode === "text") {
+            italic = 0;
+        }
+        symbolNode = new domTree.symbolNode(
+            value, metrics.height, metrics.depth, italic, metrics.skew,
+            classes);
+    } else {
+        // TODO(emily): Figure out a good way to only print this in development
+        typeof console !== "undefined" && console.warn(
+            "No character metrics for '" + value + "' in style '" +
+                fontFamily + "'");
+        symbolNode = new domTree.symbolNode(value, 0, 0, 0, 0, classes);
+    }
+
+    if (options) {
+        if (options.style.isTight()) {
+            symbolNode.classes.push("mtight");
+        }
+        if (options.getColor()) {
+            symbolNode.style.color = options.getColor();
+        }
+    }
+
+    return symbolNode;
+};
+
+/**
+ * Makes a symbol in Main-Regular or AMS-Regular.
+ * Used for rel, bin, open, close, inner, and punct.
+ */
+var mathsym = function(value, mode, options, classes) {
+    // Decide what font to render the symbol in by its entry in the symbols
+    // table.
+    // Have a special case for when the value = \ because the \ is used as a
+    // textord in unsupported command errors but cannot be parsed as a regular
+    // text ordinal and is therefore not present as a symbol in the symbols
+    // table for text
+    if (value === "\\" || symbols[mode][value].font === "main") {
+        return makeSymbol(value, "Main-Regular", mode, options, classes);
+    } else {
+        return makeSymbol(
+            value, "AMS-Regular", mode, options, classes.concat(["amsrm"]));
+    }
+};
+
+/**
+ * Makes a symbol in the default font for mathords and textords.
+ */
+var mathDefault = function(value, mode, options, classes, type) {
+    if (type === "mathord") {
+        return mathit(value, mode, options, classes);
+    } else if (type === "textord") {
+        return makeSymbol(
+            value, "Main-Regular", mode, options, classes.concat(["mathrm"]));
+    } else {
+        throw new Error("unexpected type: " + type + " in mathDefault");
+    }
+};
+
+/**
+ * Makes a symbol in the italic math font.
+ */
+var mathit = function(value, mode, options, classes) {
+    if (/[0-9]/.test(value.charAt(0)) ||
+            // glyphs for \imath and \jmath do not exist in Math-Italic so we
+            // need to use Main-Italic instead
+            utils.contains(mainitLetters, value) ||
+            utils.contains(greekCapitals, value)) {
+        return makeSymbol(
+            value, "Main-Italic", mode, options, classes.concat(["mainit"]));
+    } else {
+        return makeSymbol(
+            value, "Math-Italic", mode, options, classes.concat(["mathit"]));
+    }
+};
+
+/**
+ * Makes either a mathord or textord in the correct font and color.
+ */
+var makeOrd = function(group, options, type) {
+    var mode = group.mode;
+    var value = group.value;
+    if (symbols[mode][value] && symbols[mode][value].replace) {
+        value = symbols[mode][value].replace;
+    }
+
+    var classes = ["mord"];
+
+    var font = options.font;
+    if (font) {
+        if (font === "mathit" || utils.contains(mainitLetters, value)) {
+            return mathit(value, mode, options, classes);
+        } else {
+            var fontName = fontMap[font].fontName;
+            if (fontMetrics.getCharacterMetrics(value, fontName)) {
+                return makeSymbol(
+                    value, fontName, mode, options, classes.concat([font]));
+            } else {
+                return mathDefault(value, mode, options, classes, type);
+            }
+        }
+    } else {
+        return mathDefault(value, mode, options, classes, type);
+    }
+};
+
+/**
+ * Calculate the height, depth, and maxFontSize of an element based on its
+ * children.
+ */
+var sizeElementFromChildren = function(elem) {
+    var height = 0;
+    var depth = 0;
+    var maxFontSize = 0;
+
+    if (elem.children) {
+        for (var i = 0; i < elem.children.length; i++) {
+            if (elem.children[i].height > height) {
+                height = elem.children[i].height;
+            }
+            if (elem.children[i].depth > depth) {
+                depth = elem.children[i].depth;
+            }
+            if (elem.children[i].maxFontSize > maxFontSize) {
+                maxFontSize = elem.children[i].maxFontSize;
+            }
+        }
+    }
+
+    elem.height = height;
+    elem.depth = depth;
+    elem.maxFontSize = maxFontSize;
+};
+
+/**
+ * Makes a span with the given list of classes, list of children, and options.
+ *
+ * TODO: Ensure that `options` is always provided (currently some call sites
+ * don't pass it).
+ * TODO: add a separate argument for math class (e.g. `mop`, `mbin`), which
+ * should if present come first in `classes`.
+ */
+var makeSpan = function(classes, children, options) {
+    var span = new domTree.span(classes, children, options);
+
+    sizeElementFromChildren(span);
+
+    return span;
+};
+
+/**
+ * Prepends the given children to the given span, updating height, depth, and
+ * maxFontSize.
+ */
+var prependChildren = function(span, children) {
+    span.children = children.concat(span.children);
+
+    sizeElementFromChildren(span);
+};
+
+/**
+ * Makes a document fragment with the given list of children.
+ */
+var makeFragment = function(children) {
+    var fragment = new domTree.documentFragment(children);
+
+    sizeElementFromChildren(fragment);
+
+    return fragment;
+};
+
+/**
+ * Makes an element placed in each of the vlist elements to ensure that each
+ * element has the same max font size. To do this, we create a zero-width space
+ * with the correct font size.
+ */
+var makeFontSizer = function(options, fontSize) {
+    var fontSizeInner = makeSpan([], [new domTree.symbolNode("\u200b")]);
+    fontSizeInner.style.fontSize =
+        (fontSize / options.style.sizeMultiplier) + "em";
+
+    var fontSizer = makeSpan(
+        ["fontsize-ensurer", "reset-" + options.size, "size5"],
+        [fontSizeInner]);
+
+    return fontSizer;
+};
+
+/**
+ * Makes a vertical list by stacking elements and kerns on top of each other.
+ * Allows for many different ways of specifying the positioning method.
+ *
+ * Arguments:
+ *  - children: A list of child or kern nodes to be stacked on top of each other
+ *              (i.e. the first element will be at the bottom, and the last at
+ *              the top). Element nodes are specified as
+ *                {type: "elem", elem: node}
+ *              while kern nodes are specified as
+ *                {type: "kern", size: size}
+ *  - positionType: The method by which the vlist should be positioned. Valid
+ *                  values are:
+ *                   - "individualShift": The children list only contains elem
+ *                                        nodes, and each node contains an extra
+ *                                        "shift" value of how much it should be
+ *                                        shifted (note that shifting is always
+ *                                        moving downwards). positionData is
+ *                                        ignored.
+ *                   - "top": The positionData specifies the topmost point of
+ *                            the vlist (note this is expected to be a height,
+ *                            so positive values move up)
+ *                   - "bottom": The positionData specifies the bottommost point
+ *                               of the vlist (note this is expected to be a
+ *                               depth, so positive values move down
+ *                   - "shift": The vlist will be positioned such that its
+ *                              baseline is positionData away from the baseline
+ *                              of the first child. Positive values move
+ *                              downwards.
+ *                   - "firstBaseline": The vlist will be positioned such that
+ *                                      its baseline is aligned with the
+ *                                      baseline of the first child.
+ *                                      positionData is ignored. (this is
+ *                                      equivalent to "shift" with
+ *                                      positionData=0)
+ *  - positionData: Data used in different ways depending on positionType
+ *  - options: An Options object
+ *
+ */
+var makeVList = function(children, positionType, positionData, options) {
+    var depth;
+    var currPos;
+    var i;
+    if (positionType === "individualShift") {
+        var oldChildren = children;
+        children = [oldChildren[0]];
+
+        // Add in kerns to the list of children to get each element to be
+        // shifted to the correct specified shift
+        depth = -oldChildren[0].shift - oldChildren[0].elem.depth;
+        currPos = depth;
+        for (i = 1; i < oldChildren.length; i++) {
+            var diff = -oldChildren[i].shift - currPos -
+                oldChildren[i].elem.depth;
+            var size = diff -
+                (oldChildren[i - 1].elem.height +
+                 oldChildren[i - 1].elem.depth);
+
+            currPos = currPos + diff;
+
+            children.push({type: "kern", size: size});
+            children.push(oldChildren[i]);
+        }
+    } else if (positionType === "top") {
+        // We always start at the bottom, so calculate the bottom by adding up
+        // all the sizes
+        var bottom = positionData;
+        for (i = 0; i < children.length; i++) {
+            if (children[i].type === "kern") {
+                bottom -= children[i].size;
+            } else {
+                bottom -= children[i].elem.height + children[i].elem.depth;
+            }
+        }
+        depth = bottom;
+    } else if (positionType === "bottom") {
+        depth = -positionData;
+    } else if (positionType === "shift") {
+        depth = -children[0].elem.depth - positionData;
+    } else if (positionType === "firstBaseline") {
+        depth = -children[0].elem.depth;
+    } else {
+        depth = 0;
+    }
+
+    // Make the fontSizer
+    var maxFontSize = 0;
+    for (i = 0; i < children.length; i++) {
+        if (children[i].type === "elem") {
+            maxFontSize = Math.max(maxFontSize, children[i].elem.maxFontSize);
+        }
+    }
+    var fontSizer = makeFontSizer(options, maxFontSize);
+
+    // Create a new list of actual children at the correct offsets
+    var realChildren = [];
+    currPos = depth;
+    for (i = 0; i < children.length; i++) {
+        if (children[i].type === "kern") {
+            currPos += children[i].size;
+        } else {
+            var child = children[i].elem;
+
+            var shift = -child.depth - currPos;
+            currPos += child.height + child.depth;
+
+            var childWrap = makeSpan([], [fontSizer, child]);
+            childWrap.height -= shift;
+            childWrap.depth += shift;
+            childWrap.style.top = shift + "em";
+
+            realChildren.push(childWrap);
+        }
+    }
+
+    // Add in an element at the end with no offset to fix the calculation of
+    // baselines in some browsers (namely IE, sometimes safari)
+    var baselineFix = makeSpan(
+        ["baseline-fix"], [fontSizer, new domTree.symbolNode("\u200b")]);
+    realChildren.push(baselineFix);
+
+    var vlist = makeSpan(["vlist"], realChildren);
+    // Fix the final height and depth, in case there were kerns at the ends
+    // since the makeSpan calculation won't take that in to account.
+    vlist.height = Math.max(currPos, vlist.height);
+    vlist.depth = Math.max(-depth, vlist.depth);
+    return vlist;
+};
+
+// A table of size -> font size for the different sizing functions
+var sizingMultiplier = {
+    size1: 0.5,
+    size2: 0.7,
+    size3: 0.8,
+    size4: 0.9,
+    size5: 1.0,
+    size6: 1.2,
+    size7: 1.44,
+    size8: 1.73,
+    size9: 2.07,
+    size10: 2.49
+};
+
+// A map of spacing functions to their attributes, like size and corresponding
+// CSS class
+var spacingFunctions = {
+    "\\qquad": {
+        size: "2em",
+        className: "qquad"
+    },
+    "\\quad": {
+        size: "1em",
+        className: "quad"
+    },
+    "\\enspace": {
+        size: "0.5em",
+        className: "enspace"
+    },
+    "\\;": {
+        size: "0.277778em",
+        className: "thickspace"
+    },
+    "\\:": {
+        size: "0.22222em",
+        className: "mediumspace"
+    },
+    "\\,": {
+        size: "0.16667em",
+        className: "thinspace"
+    },
+    "\\!": {
+        size: "-0.16667em",
+        className: "negativethinspace"
+    }
+};
+
+/**
+ * Maps TeX font commands to objects containing:
+ * - variant: string used for "mathvariant" attribute in buildMathML.js
+ * - fontName: the "style" parameter to fontMetrics.getCharacterMetrics
+ */
+// A map between tex font commands an MathML mathvariant attribute values
+var fontMap = {
+    // styles
+    "mathbf": {
+        variant: "bold",
+        fontName: "Main-Bold"
+    },
+    "mathrm": {
+        variant: "normal",
+        fontName: "Main-Regular"
+    },
+    "textit": {
+        variant: "italic",
+        fontName: "Main-Italic"
+    },
+
+    // "mathit" is missing because it requires the use of two fonts: Main-Italic
+    // and Math-Italic.  This is handled by a special case in makeOrd which ends
+    // up calling mathit.
+
+    // families
+    "mathbb": {
+        variant: "double-struck",
+        fontName: "AMS-Regular"
+    },
+    "mathcal": {
+        variant: "script",
+        fontName: "Caligraphic-Regular"
+    },
+    "mathfrak": {
+        variant: "fraktur",
+        fontName: "Fraktur-Regular"
+    },
+    "mathscr": {
+        variant: "script",
+        fontName: "Script-Regular"
+    },
+    "mathsf": {
+        variant: "sans-serif",
+        fontName: "SansSerif-Regular"
+    },
+    "mathtt": {
+        variant: "monospace",
+        fontName: "Typewriter-Regular"
+    }
+};
+
+module.exports = {
+    fontMap: fontMap,
+    makeSymbol: makeSymbol,
+    mathsym: mathsym,
+    makeSpan: makeSpan,
+    makeFragment: makeFragment,
+    makeVList: makeVList,
+    makeOrd: makeOrd,
+    prependChildren: prependChildren,
+    sizingMultiplier: sizingMultiplier,
+    spacingFunctions: spacingFunctions
+};
 
 },{"./domTree":13,"./fontMetrics":15,"./symbols":21,"./utils":23}],9:[function(require,module,exports){
-var ParseError=require("./ParseError"),Style=require("./Style"),buildCommon=require("./buildCommon"),delimiter=require("./delimiter"),domTree=require("./domTree"),fontMetrics=require("./fontMetrics"),utils=require("./utils"),makeSpan=buildCommon.makeSpan,isSpace=function(e){return e instanceof domTree.span&&"mspace"===e.classes[0]},isBin=function(e){return e&&"mbin"===e.classes[0]},isBinLeftCanceller=function(e,t){return e?utils.contains(["mbin","mopen","mrel","mop","mpunct"],e.classes[0]):t},isBinRightCanceller=function(e,t){return e?utils.contains(["mrel","mclose","mpunct"],e.classes[0]):t},buildExpression=function(e,t,i){for(var l=[],a=0;a<e.length;a++){var r=e[a],s=buildGroup(r,t);s instanceof domTree.documentFragment?Array.prototype.push.apply(l,s.children):l.push(s)}var m=null;for(a=0;a<l.length;a++)isSpace(l[a])?(m=m||[],m.push(l[a]),l.splice(a,1),a--):m&&(l[a]instanceof domTree.symbolNode&&(l[a]=makeSpan([].concat(l[a].classes),[l[a]])),buildCommon.prependChildren(l[a],m),m=null);for(m&&Array.prototype.push.apply(l,m),a=0;a<l.length;a++)isBin(l[a])&&(isBinLeftCanceller(l[a-1],i)||isBinRightCanceller(l[a+1],i))&&(l[a].classes[0]="mord");return l},getTypeOfDomTree=function(e){if(e instanceof domTree.documentFragment){if(e.children.length)return getTypeOfDomTree(e.children[e.children.length-1])}else if(utils.contains(["mord","mop","mbin","mrel","mopen","mclose","mpunct","minner"],e.classes[0]))return e.classes[0];return null},shouldHandleSupSub=function(e,t){return!!e&&("op"===e.type?e.value.limits&&(t.style.size===Style.DISPLAY.size||e.value.alwaysHandleSupSub):"accent"===e.type?isCharacterBox(e.value.base):null)},getBaseElem=function(e){return!!e&&("ordgroup"===e.type?1===e.value.length?getBaseElem(e.value[0]):e:"color"===e.type?1===e.value.value.length?getBaseElem(e.value.value[0]):e:"font"===e.type?getBaseElem(e.value.body):e)},isCharacterBox=function(e){var t=getBaseElem(e);return"mathord"===t.type||"textord"===t.type||"bin"===t.type||"rel"===t.type||"inner"===t.type||"open"===t.type||"close"===t.type||"punct"===t.type},makeNullDelimiter=function(e,t){return makeSpan(t.concat(["sizing","reset-"+e.size,"size5",e.style.reset(),Style.TEXT.cls(),"nulldelimiter"]))},groupTypes={};groupTypes.mathord=function(e,t){return buildCommon.makeOrd(e,t,"mathord")},groupTypes.textord=function(e,t){return buildCommon.makeOrd(e,t,"textord")},groupTypes.bin=function(e,t){return buildCommon.mathsym(e.value,e.mode,t,["mbin"])},groupTypes.rel=function(e,t){return buildCommon.mathsym(e.value,e.mode,t,["mrel"])},groupTypes.open=function(e,t){return buildCommon.mathsym(e.value,e.mode,t,["mopen"])},groupTypes.close=function(e,t){return buildCommon.mathsym(e.value,e.mode,t,["mclose"])},groupTypes.inner=function(e,t){return buildCommon.mathsym(e.value,e.mode,t,["minner"])},groupTypes.punct=function(e,t){return buildCommon.mathsym(e.value,e.mode,t,["mpunct"])},groupTypes.ordgroup=function(e,t){return makeSpan(["mord",t.style.cls()],buildExpression(e.value,t.reset(),!0),t)},groupTypes.text=function(e,t){for(var i=t.withFont(e.value.style),l=buildExpression(e.value.body,i,!0),a=0;a<l.length-1;a++)l[a].tryCombine(l[a+1])&&(l.splice(a+1,1),a--);return makeSpan(["mord","text",i.style.cls()],l,i)},groupTypes.color=function(e,t){var i=buildExpression(e.value.value,t.withColor(e.value.color),!1);return new buildCommon.makeFragment(i)},groupTypes.supsub=function(e,t){if(shouldHandleSupSub(e.value.base,t))return groupTypes[e.value.base.type](e,t);var i,l,a,r,s,m=buildGroup(e.value.base,t.reset()),n=t.style;e.value.sup&&(s=t.withStyle(n.sup()),a=buildGroup(e.value.sup,s),i=makeSpan([n.reset(),n.sup().cls()],[a],s)),e.value.sub&&(s=t.withStyle(n.sub()),r=buildGroup(e.value.sub,s),l=makeSpan([n.reset(),n.sub().cls()],[r],s));var u,p;isCharacterBox(e.value.base)?(u=0,p=0):(u=m.height-n.metrics.supDrop,p=m.depth+n.metrics.subDrop);var o;o=n===Style.DISPLAY?n.metrics.sup1:n.cramped?n.metrics.sup3:n.metrics.sup2;var d,h=Style.TEXT.sizeMultiplier*n.sizeMultiplier,c=.5/fontMetrics.metrics.ptPerEm/h+"em";if(e.value.sup)if(e.value.sub){u=Math.max(u,o,a.depth+.25*n.metrics.xHeight),p=Math.max(p,n.metrics.sub2);var y=fontMetrics.metrics.defaultRuleThickness;if(u-a.depth-(r.height-p)<4*y){p=4*y-(u-a.depth)+r.height;var v=.8*n.metrics.xHeight-(u-a.depth);v>0&&(u+=v,p-=v)}d=buildCommon.makeVList([{type:"elem",elem:l,shift:p},{type:"elem",elem:i,shift:-u}],"individualShift",null,t),m instanceof domTree.symbolNode&&(d.children[0].style.marginLeft=-m.italic+"em"),d.children[0].style.marginRight=c,d.children[1].style.marginRight=c}else u=Math.max(u,o,a.depth+.25*n.metrics.xHeight),d=buildCommon.makeVList([{type:"elem",elem:i}],"shift",-u,t),d.children[0].style.marginRight=c;else p=Math.max(p,n.metrics.sub1,r.height-.8*n.metrics.xHeight),d=buildCommon.makeVList([{type:"elem",elem:l}],"shift",p,t),d.children[0].style.marginRight=c,m instanceof domTree.symbolNode&&(d.children[0].style.marginLeft=-m.italic+"em");var g=getTypeOfDomTree(m)||"mord";return makeSpan([g],[m,makeSpan(["msupsub"],[d])],t)},groupTypes.genfrac=function(e,t){var i=t.style;"display"===e.value.size?i=Style.DISPLAY:"text"===e.value.size&&(i=Style.TEXT);var l,a=i.fracNum(),r=i.fracDen();l=t.withStyle(a);var s=buildGroup(e.value.numer,l),m=makeSpan([i.reset(),a.cls()],[s],l);l=t.withStyle(r);var n,u=buildGroup(e.value.denom,l),p=makeSpan([i.reset(),r.cls()],[u],l);n=e.value.hasBarLine?fontMetrics.metrics.defaultRuleThickness/t.style.sizeMultiplier:0;var o,d,h;i.size===Style.DISPLAY.size?(o=i.metrics.num1,d=n>0?3*n:7*fontMetrics.metrics.defaultRuleThickness,h=i.metrics.denom1):(n>0?(o=i.metrics.num2,d=n):(o=i.metrics.num3,d=3*fontMetrics.metrics.defaultRuleThickness),h=i.metrics.denom2);var c;if(0===n){var y=o-s.depth-(u.height-h);y<d&&(o+=.5*(d-y),h+=.5*(d-y)),c=buildCommon.makeVList([{type:"elem",elem:p,shift:h},{type:"elem",elem:m,shift:-o}],"individualShift",null,t)}else{var v=i.metrics.axisHeight;o-s.depth-(v+.5*n)<d&&(o+=d-(o-s.depth-(v+.5*n))),v-.5*n-(u.height-h)<d&&(h+=d-(v-.5*n-(u.height-h)));var g=makeSpan([t.style.reset(),Style.TEXT.cls(),"frac-line"]);g.height=n;var f=-(v-.5*n);c=buildCommon.makeVList([{type:"elem",elem:p,shift:h},{type:"elem",elem:g,shift:f},{type:"elem",elem:m,shift:-o}],"individualShift",null,t)}c.height*=i.sizeMultiplier/t.style.sizeMultiplier,c.depth*=i.sizeMultiplier/t.style.sizeMultiplier;var S;S=i.size===Style.DISPLAY.size?i.metrics.delim1:i.metrics.delim2;var b,k;return b=null==e.value.leftDelim?makeNullDelimiter(t,["mopen"]):delimiter.customSizedDelim(e.value.leftDelim,S,!0,t.withStyle(i),e.mode,["mopen"]),k=null==e.value.rightDelim?makeNullDelimiter(t,["mclose"]):delimiter.customSizedDelim(e.value.rightDelim,S,!0,t.withStyle(i),e.mode,["mclose"]),makeSpan(["mord",t.style.reset(),i.cls()],[b,makeSpan(["mfrac"],[c]),k],t)};var calculateSize=function(e,t){var i=e.number;return"ex"===e.unit?i*=t.metrics.emPerEx:"mu"===e.unit&&(i/=18),i};groupTypes.array=function(e,t){var i,l,a=e.value.body.length,r=0,s=new Array(a),m=t.style,n=1/fontMetrics.metrics.ptPerEm,u=5*n,p=12*n,o=utils.deflt(e.value.arraystretch,1),d=o*p,h=.7*d,c=.3*d,y=0;for(i=0;i<e.value.body.length;++i){var v=e.value.body[i],g=h,f=c;r<v.length&&(r=v.length);var S=new Array(v.length);for(l=0;l<v.length;++l){var b=buildGroup(v[l],t);f<b.depth&&(f=b.depth),g<b.height&&(g=b.height),S[l]=b}var k=0;e.value.rowGaps[i]&&(k=calculateSize(e.value.rowGaps[i].value,m))>0&&(k+=c,f<k&&(f=k),k=0),S.height=g,S.depth=f,y+=g,S.pos=y,y+=f+k,s[i]=S}var T,z,C=y/2+m.metrics.axisHeight,M=e.value.cols||[],x=[];for(l=0,z=0;l<r||z<M.length;++l,++z){for(var w=M[z]||{},E=!0;"separator"===w.type;){if(E||(T=makeSpan(["arraycolsep"],[]),T.style.width=fontMetrics.metrics.doubleRuleSep+"em",x.push(T)),"|"!==w.separator)throw new ParseError("Invalid separator type: "+w.separator);var L=makeSpan(["vertical-separator"],[]);L.style.height=y+"em",L.style.verticalAlign=-(y-C)+"em",x.push(L),z++,w=M[z]||{},E=!1}if(!(l>=r)){var D;(l>0||e.value.hskipBeforeAndAfter)&&0!==(D=utils.deflt(w.pregap,u))&&(T=makeSpan(["arraycolsep"],[]),T.style.width=D+"em",x.push(T));var R=[];for(i=0;i<a;++i){var G=s[i],P=G[l];if(P){var A=G.pos-C;P.depth=G.depth,P.height=G.height,R.push({type:"elem",elem:P,shift:A})}}R=buildCommon.makeVList(R,"individualShift",null,t),R=makeSpan(["col-align-"+(w.align||"c")],[R]),x.push(R),(l<r-1||e.value.hskipBeforeAndAfter)&&0!==(D=utils.deflt(w.postgap,u))&&(T=makeSpan(["arraycolsep"],[]),T.style.width=D+"em",x.push(T))}}return s=makeSpan(["mtable"],x),makeSpan(["mord"],[s],t)},groupTypes.spacing=function(e,t){return"\\ "===e.value||"\\space"===e.value||" "===e.value||"~"===e.value?"text"===e.mode?buildCommon.makeOrd(e,t,"textord"):makeSpan(["mspace"],[buildCommon.mathsym(e.value,e.mode,t)],t):makeSpan(["mspace",buildCommon.spacingFunctions[e.value].className],[],t)},groupTypes.llap=function(e,t){var i=makeSpan(["inner"],[buildGroup(e.value.body,t.reset())]),l=makeSpan(["fix"],[]);return makeSpan(["mord","llap",t.style.cls()],[i,l],t)},groupTypes.rlap=function(e,t){var i=makeSpan(["inner"],[buildGroup(e.value.body,t.reset())]),l=makeSpan(["fix"],[]);return makeSpan(["mord","rlap",t.style.cls()],[i,l],t)},groupTypes.op=function(e,t){var i,l,a=!1;"supsub"===e.type&&(i=e.value.sup,l=e.value.sub,e=e.value.base,a=!0);var r=t.style,s=["\\smallint"],m=!1;r.size===Style.DISPLAY.size&&e.value.symbol&&!utils.contains(s,e.value.body)&&(m=!0);var n,u=0,p=0;if(e.value.symbol){var o=m?"Size2-Regular":"Size1-Regular";n=buildCommon.makeSymbol(e.value.body,o,"math",t,["mop","op-symbol",m?"large-op":"small-op"]),u=(n.height-n.depth)/2-r.metrics.axisHeight*r.sizeMultiplier,p=n.italic}else if(e.value.value){var d=buildExpression(e.value.value,t,!0);n=makeSpan(["mop"],d,t)}else{for(var h=[],c=1;c<e.value.body.length;c++)h.push(buildCommon.mathsym(e.value.body[c],e.mode));n=makeSpan(["mop"],h,t)}if(a){n=makeSpan([],[n]);var y,v,g,f,S;if(i){S=t.withStyle(r.sup());var b=buildGroup(i,S);y=makeSpan([r.reset(),r.sup().cls()],[b],S),v=Math.max(fontMetrics.metrics.bigOpSpacing1,fontMetrics.metrics.bigOpSpacing3-b.depth)}if(l){S=t.withStyle(r.sub());var k=buildGroup(l,S);g=makeSpan([r.reset(),r.sub().cls()],[k],S),f=Math.max(fontMetrics.metrics.bigOpSpacing2,fontMetrics.metrics.bigOpSpacing4-k.height)}var T,z,C;if(i)if(l){if(!i&&!l)return n;C=fontMetrics.metrics.bigOpSpacing5+g.height+g.depth+f+n.depth+u,T=buildCommon.makeVList([{type:"kern",size:fontMetrics.metrics.bigOpSpacing5},{type:"elem",elem:g},{type:"kern",size:f},{type:"elem",elem:n},{type:"kern",size:v},{type:"elem",elem:y},{type:"kern",size:fontMetrics.metrics.bigOpSpacing5}],"bottom",C,t),T.children[0].style.marginLeft=-p+"em",T.children[2].style.marginLeft=p+"em"}else C=n.depth+u,T=buildCommon.makeVList([{type:"elem",elem:n},{type:"kern",size:v},{type:"elem",elem:y},{type:"kern",size:fontMetrics.metrics.bigOpSpacing5}],"bottom",C,t),T.children[1].style.marginLeft=p+"em";else z=n.height-u,T=buildCommon.makeVList([{type:"kern",size:fontMetrics.metrics.bigOpSpacing5},{type:"elem",elem:g},{type:"kern",size:f},{type:"elem",elem:n}],"top",z,t),T.children[0].style.marginLeft=-p+"em";return makeSpan(["mop","op-limits"],[T],t)}return e.value.symbol&&(n.style.top=u+"em"),n},groupTypes.mod=function(e,t){var i=[];if("bmod"===e.value.modType?(t.style.isTight()||i.push(makeSpan(["mspace","negativemediumspace"],[],t)),i.push(makeSpan(["mspace","thickspace"],[],t))):t.style.size===Style.DISPLAY.size?i.push(makeSpan(["mspace","quad"],[],t)):"mod"===e.value.modType?i.push(makeSpan(["mspace","twelvemuspace"],[],t)):i.push(makeSpan(["mspace","eightmuspace"],[],t)),"pod"!==e.value.modType&&"pmod"!==e.value.modType||i.push(buildCommon.mathsym("(",e.mode)),"pod"!==e.value.modType){var l=[buildCommon.mathsym("m",e.mode),buildCommon.mathsym("o",e.mode),buildCommon.mathsym("d",e.mode)];"bmod"===e.value.modType?(i.push(makeSpan(["mbin"],l,t)),i.push(makeSpan(["mspace","thickspace"],[],t)),t.style.isTight()||i.push(makeSpan(["mspace","negativemediumspace"],[],t))):(Array.prototype.push.apply(i,l),i.push(makeSpan(["mspace","sixmuspace"],[],t)))}return e.value.value&&Array.prototype.push.apply(i,buildExpression(e.value.value,t,!1)),"pod"!==e.value.modType&&"pmod"!==e.value.modType||i.push(buildCommon.mathsym(")",e.mode)),buildCommon.makeFragment(i)},groupTypes.katex=function(e,t){var i=makeSpan(["k"],[buildCommon.mathsym("K",e.mode)],t),l=makeSpan(["a"],[buildCommon.mathsym("A",e.mode)],t);l.height=.75*(l.height+.2),l.depth=.75*(l.height-.2);var a=makeSpan(["t"],[buildCommon.mathsym("T",e.mode)],t),r=makeSpan(["e"],[buildCommon.mathsym("E",e.mode)],t);r.height=r.height-.2155,r.depth=r.depth+.2155;var s=makeSpan(["x"],[buildCommon.mathsym("X",e.mode)],t);return makeSpan(["mord","katex-logo"],[i,l,a,r,s],t)},groupTypes.overline=function(e,t){var i=t.style,l=buildGroup(e.value.body,t.withStyle(i.cramp())),a=fontMetrics.metrics.defaultRuleThickness/i.sizeMultiplier,r=makeSpan([i.reset(),Style.TEXT.cls(),"overline-line"]);r.height=a,r.maxFontSize=1;var s=buildCommon.makeVList([{type:"elem",elem:l},{type:"kern",size:3*a},{type:"elem",elem:r},{type:"kern",size:a}],"firstBaseline",null,t);return makeSpan(["mord","overline"],[s],t)},groupTypes.underline=function(e,t){var i=t.style,l=buildGroup(e.value.body,t),a=fontMetrics.metrics.defaultRuleThickness/i.sizeMultiplier,r=makeSpan([i.reset(),Style.TEXT.cls(),"underline-line"]);r.height=a,r.maxFontSize=1;var s=buildCommon.makeVList([{type:"kern",size:a},{type:"elem",elem:r},{type:"kern",size:3*a},{type:"elem",elem:l}],"top",l.height,t);return makeSpan(["mord","underline"],[s],t)},groupTypes.sqrt=function(e,t){var i=t.style,l=buildGroup(e.value.body,t.withStyle(i.cramp())),a=fontMetrics.metrics.defaultRuleThickness/i.sizeMultiplier,r=makeSpan([i.reset(),Style.TEXT.cls(),"sqrt-line"],[],t);r.height=a,r.maxFontSize=1;var s=a;i.id<Style.TEXT.id&&(s=i.metrics.xHeight);var m=a+s/4,n=(l.height+l.depth)*i.sizeMultiplier,u=n+m+a,p=makeSpan(["sqrt-sign"],[delimiter.customSizedDelim("\\surd",u,!1,t,e.mode)],t),o=p.height+p.depth-a;o>l.height+l.depth+m&&(m=(m+o-l.height-l.depth)/2);var d=-(l.height+m+a)+p.height;p.style.top=d+"em",p.height-=d,p.depth+=d;var h;if(h=0===l.height&&0===l.depth?makeSpan():buildCommon.makeVList([{type:"elem",elem:l},{type:"kern",size:m},{type:"elem",elem:r},{type:"kern",size:a}],"firstBaseline",null,t),e.value.index){var c=t.withStyle(Style.SCRIPTSCRIPT),y=buildGroup(e.value.index,c),v=makeSpan([i.reset(),Style.SCRIPTSCRIPT.cls()],[y],c),g=Math.max(p.height,h.height),f=Math.max(p.depth,h.depth),S=.6*(g-f),b=buildCommon.makeVList([{type:"elem",elem:v}],"shift",-S,t),k=makeSpan(["root"],[b]);return makeSpan(["mord","sqrt"],[k,p,h],t)}return makeSpan(["mord","sqrt"],[p,h],t)},groupTypes.sizing=function(e,t){var i=buildExpression(e.value.value,t.withSize(e.value.size),!1),l=t.style,a=buildCommon.sizingMultiplier[e.value.size];a*=l.sizeMultiplier;for(var r=0;r<i.length;r++){var s=utils.indexOf(i[r].classes,"sizing");s<0?(i[r].classes.push("sizing","reset-"+t.size,e.value.size,l.cls()),i[r].maxFontSize=a):i[r].classes[s+1]==="reset-"+e.value.size&&(i[r].classes[s+1]="reset-"+t.size)}return buildCommon.makeFragment(i)},groupTypes.styling=function(e,t){for(var i={display:Style.DISPLAY,text:Style.TEXT,script:Style.SCRIPT,scriptscript:Style.SCRIPTSCRIPT},l=i[e.value.style],a=t.withStyle(l),r=buildExpression(e.value.value,a,!1),s=0;s<r.length;s++){var m=utils.indexOf(r[s].classes,l.reset());m<0?r[s].classes.push(t.style.reset(),l.cls()):r[s].classes[m]=t.style.reset()}return new buildCommon.makeFragment(r)},groupTypes.font=function(e,t){var i=e.value.font;return buildGroup(e.value.body,t.withFont(i))},groupTypes.delimsizing=function(e,t){var i=e.value.value;return"."===i?makeSpan([e.value.mclass]):delimiter.sizedDelim(i,e.value.size,t,e.mode,[e.value.mclass])},groupTypes.leftright=function(e,t){for(var i=buildExpression(e.value.body,t.reset(),!0),l=0,a=0,r=!1,s=0;s<i.length;s++)i[s].isMiddle?r=!0:(l=Math.max(i[s].height,l),a=Math.max(i[s].depth,a));var m=t.style;l*=m.sizeMultiplier,a*=m.sizeMultiplier;var n;if(n="."===e.value.left?makeNullDelimiter(t,["mopen"]):delimiter.leftRightDelim(e.value.left,l,a,t,e.mode,["mopen"]),i.unshift(n),r)for(s=1;s<i.length;s++)i[s].isMiddle&&(i[s]=delimiter.leftRightDelim(i[s].isMiddle.value,l,a,i[s].isMiddle.options,e.mode,[]));var u;return u="."===e.value.right?makeNullDelimiter(t,["mclose"]):delimiter.leftRightDelim(e.value.right,l,a,t,e.mode,["mclose"]),i.push(u),makeSpan(["minner",m.cls()],i,t)},groupTypes.middle=function(e,t){var i;return"."===e.value.value?i=makeNullDelimiter(t,[]):(i=delimiter.sizedDelim(e.value.value,1,t,e.mode,[]),i.isMiddle={value:e.value.value,options:t}),i},groupTypes.rule=function(e,t){var i=makeSpan(["mord","rule"],[],t),l=t.style,a=0;e.value.shift&&(a=calculateSize(e.value.shift,l));var r=calculateSize(e.value.width,l),s=calculateSize(e.value.height,l);return a/=l.sizeMultiplier,r/=l.sizeMultiplier,s/=l.sizeMultiplier,i.style.borderRightWidth=r+"em",i.style.borderTopWidth=s+"em",i.style.bottom=a+"em",i.width=r,i.height=s+a,i.depth=-a,i},groupTypes.kern=function(e,t){var i=makeSpan(["mord","rule"],[],t),l=t.style,a=0;return e.value.dimension&&(a=calculateSize(e.value.dimension,l)),a/=l.sizeMultiplier,i.style.marginLeft=a+"em",i},groupTypes.accent=function(e,t){var i,l=e.value.base,a=t.style;if("supsub"===e.type){var r=e;e=r.value.base,l=e.value.base,r.value.base=l,i=buildGroup(r,t.reset())}var s,m=buildGroup(l,t.withStyle(a.cramp()));if(isCharacterBox(l)){var n=getBaseElem(l);s=buildGroup(n,t.withStyle(a.cramp())).skew}else s=0;var u=Math.min(m.height,a.metrics.xHeight),p=buildCommon.makeSymbol(e.value.accent,"Main-Regular","math",t);p.italic=0;var o="\\vec"===e.value.accent?"accent-vec":null,d=makeSpan(["accent-body",o],[makeSpan([],[p])]);d=buildCommon.makeVList([{type:"elem",elem:m},{type:"kern",size:-u},{type:"elem",elem:d}],"firstBaseline",null,t),d.children[1].style.marginLeft=2*s+"em";var h=makeSpan(["mord","accent"],[d],t);return i?(i.children[0]=h,i.height=Math.max(h.height,i.height),i.classes[0]="mord",i):h},groupTypes.phantom=function(e,t){var i=buildExpression(e.value.value,t.withPhantom(),!1);return new buildCommon.makeFragment(i)},groupTypes.mclass=function(e,t){var i=buildExpression(e.value.value,t,!0);return makeSpan([e.value.mclass],i,t)};var buildGroup=function(e,t){if(!e)return makeSpan();if(groupTypes[e.type]){var i,l=groupTypes[e.type](e,t);return t.style!==t.parentStyle&&(i=t.style.sizeMultiplier/t.parentStyle.sizeMultiplier,l.height*=i,l.depth*=i),t.size!==t.parentSize&&(i=buildCommon.sizingMultiplier[t.size]/buildCommon.sizingMultiplier[t.parentSize],l.height*=i,l.depth*=i),l}throw new ParseError("Got group of unknown type: '"+e.type+"'")},buildHTML=function(e,t){e=JSON.parse(JSON.stringify(e));var i=buildExpression(e,t,!0),l=makeSpan(["base",t.style.cls()],i,t),a=makeSpan(["strut"]),r=makeSpan(["strut","bottom"]);a.style.height=l.height+"em",r.style.height=l.height+l.depth+"em",r.style.verticalAlign=-l.depth+"em";var s=makeSpan(["katex-html"],[a,r,l]);return s.setAttribute("aria-hidden","true"),s};module.exports=buildHTML;
+/* eslint no-console:0 */
+/**
+ * This file does the main work of building a domTree structure from a parse
+ * tree. The entry point is the `buildHTML` function, which takes a parse tree.
+ * Then, the buildExpression, buildGroup, and various groupTypes functions are
+ * called, to produce a final HTML tree.
+ */
+
+var ParseError = require("./ParseError");
+var Style = require("./Style");
+
+var buildCommon = require("./buildCommon");
+var delimiter = require("./delimiter");
+var domTree = require("./domTree");
+var fontMetrics = require("./fontMetrics");
+var utils = require("./utils");
+
+var makeSpan = buildCommon.makeSpan;
+
+var isSpace = function(node) {
+    return node instanceof domTree.span && node.classes[0] === "mspace";
+};
+
+// Binary atoms (first class `mbin`) change into ordinary atoms (`mord`)
+// depending on their surroundings. See TeXbook pg. 442-446, Rules 5 and 6,
+// and the text before Rule 19.
+
+var isBin = function(node) {
+    return node && node.classes[0] === "mbin";
+};
+
+var isBinLeftCanceller = function(node, isRealGroup) {
+    // TODO: This code assumes that a node's math class is the first element
+    // of its `classes` array. A later cleanup should ensure this, for
+    // instance by changing the signature of `makeSpan`.
+    if (node) {
+        return utils.contains(["mbin", "mopen", "mrel", "mop", "mpunct"],
+                              node.classes[0]);
+    } else {
+        return isRealGroup;
+    }
+};
+
+var isBinRightCanceller = function(node, isRealGroup) {
+    if (node) {
+        return utils.contains(["mrel", "mclose", "mpunct"], node.classes[0]);
+    } else {
+        return isRealGroup;
+    }
+};
+
+/**
+ * Take a list of nodes, build them in order, and return a list of the built
+ * nodes. documentFragments are flattened into their contents, so the
+ * returned list contains no fragments. `isRealGroup` is true if `expression`
+ * is a real group (no atoms will be added on either side), as opposed to
+ * a partial group (e.g. one created by \color).
+ */
+var buildExpression = function(expression, options, isRealGroup) {
+    // Parse expressions into `groups`.
+    var groups = [];
+    for (var i = 0; i < expression.length; i++) {
+        var group = expression[i];
+        var output = buildGroup(group, options);
+        if (output instanceof domTree.documentFragment) {
+            Array.prototype.push.apply(groups, output.children);
+        } else {
+            groups.push(output);
+        }
+    }
+    // At this point `groups` consists entirely of `symbolNode`s and `span`s.
+
+    // Explicit spaces (e.g., \;, \,) should be ignored with respect to atom
+    // spacing (e.g., "add thick space between mord and mrel"). Since CSS
+    // adjacency rules implement atom spacing, spaces should be invisible to
+    // CSS. So we splice them out of `groups` and into the atoms themselves.
+    var spaces = null;
+    for (i = 0; i < groups.length; i++) {
+        if (isSpace(groups[i])) {
+            spaces = spaces || [];
+            spaces.push(groups[i]);
+            groups.splice(i, 1);
+            i--;
+        } else if (spaces) {
+            if (groups[i] instanceof domTree.symbolNode) {
+                groups[i] = makeSpan([].concat(groups[i].classes), [groups[i]]);
+            }
+            buildCommon.prependChildren(groups[i], spaces);
+            spaces = null;
+        }
+    }
+    if (spaces) {
+        Array.prototype.push.apply(groups, spaces);
+    }
+
+    // Binary operators change to ordinary symbols in some contexts.
+    for (i = 0; i < groups.length; i++) {
+        if (isBin(groups[i])
+            && (isBinLeftCanceller(groups[i - 1], isRealGroup)
+                || isBinRightCanceller(groups[i + 1], isRealGroup))) {
+            groups[i].classes[0] = "mord";
+        }
+    }
+
+    return groups;
+};
+
+// Return math atom class (mclass) of a domTree.
+var getTypeOfDomTree = function(node) {
+    if (node instanceof domTree.documentFragment) {
+        if (node.children.length) {
+            return getTypeOfDomTree(
+                node.children[node.children.length - 1]);
+        }
+    } else {
+        if (utils.contains(["mord", "mop", "mbin", "mrel", "mopen", "mclose",
+            "mpunct", "minner"], node.classes[0])) {
+            return node.classes[0];
+        }
+    }
+    return null;
+};
+
+/**
+ * Sometimes, groups perform special rules when they have superscripts or
+ * subscripts attached to them. This function lets the `supsub` group know that
+ * its inner element should handle the superscripts and subscripts instead of
+ * handling them itself.
+ */
+var shouldHandleSupSub = function(group, options) {
+    if (!group) {
+        return false;
+    } else if (group.type === "op") {
+        // Operators handle supsubs differently when they have limits
+        // (e.g. `\displaystyle\sum_2^3`)
+        return group.value.limits &&
+            (options.style.size === Style.DISPLAY.size ||
+            group.value.alwaysHandleSupSub);
+    } else if (group.type === "accent") {
+        return isCharacterBox(group.value.base);
+    } else {
+        return null;
+    }
+};
+
+/**
+ * Sometimes we want to pull out the innermost element of a group. In most
+ * cases, this will just be the group itself, but when ordgroups and colors have
+ * a single element, we want to pull that out.
+ */
+var getBaseElem = function(group) {
+    if (!group) {
+        return false;
+    } else if (group.type === "ordgroup") {
+        if (group.value.length === 1) {
+            return getBaseElem(group.value[0]);
+        } else {
+            return group;
+        }
+    } else if (group.type === "color") {
+        if (group.value.value.length === 1) {
+            return getBaseElem(group.value.value[0]);
+        } else {
+            return group;
+        }
+    } else if (group.type === "font") {
+        return getBaseElem(group.value.body);
+    } else {
+        return group;
+    }
+};
+
+/**
+ * TeXbook algorithms often reference "character boxes", which are simply groups
+ * with a single character in them. To decide if something is a character box,
+ * we find its innermost group, and see if it is a single character.
+ */
+var isCharacterBox = function(group) {
+    var baseElem = getBaseElem(group);
+
+    // These are all they types of groups which hold single characters
+    return baseElem.type === "mathord" ||
+        baseElem.type === "textord" ||
+        baseElem.type === "bin" ||
+        baseElem.type === "rel" ||
+        baseElem.type === "inner" ||
+        baseElem.type === "open" ||
+        baseElem.type === "close" ||
+        baseElem.type === "punct";
+};
+
+var makeNullDelimiter = function(options, classes) {
+    return makeSpan(classes.concat([
+        "sizing", "reset-" + options.size, "size5",
+        options.style.reset(), Style.TEXT.cls(),
+        "nulldelimiter"]));
+};
+
+/**
+ * This is a map of group types to the function used to handle that type.
+ * Simpler types come at the beginning, while complicated types come afterwards.
+ */
+var groupTypes = {};
+
+groupTypes.mathord = function(group, options) {
+    return buildCommon.makeOrd(group, options, "mathord");
+};
+
+groupTypes.textord = function(group, options) {
+    return buildCommon.makeOrd(group, options, "textord");
+};
+
+groupTypes.bin = function(group, options) {
+    return buildCommon.mathsym(
+        group.value, group.mode, options, ["mbin"]);
+};
+
+groupTypes.rel = function(group, options) {
+    return buildCommon.mathsym(
+        group.value, group.mode, options, ["mrel"]);
+};
+
+groupTypes.open = function(group, options) {
+    return buildCommon.mathsym(
+        group.value, group.mode, options, ["mopen"]);
+};
+
+groupTypes.close = function(group, options) {
+    return buildCommon.mathsym(
+        group.value, group.mode, options, ["mclose"]);
+};
+
+groupTypes.inner = function(group, options) {
+    return buildCommon.mathsym(
+        group.value, group.mode, options, ["minner"]);
+};
+
+groupTypes.punct = function(group, options) {
+    return buildCommon.mathsym(
+        group.value, group.mode, options, ["mpunct"]);
+};
+
+groupTypes.ordgroup = function(group, options) {
+    return makeSpan(
+        ["mord", options.style.cls()],
+        buildExpression(group.value, options.reset(), true),
+        options
+    );
+};
+
+groupTypes.text = function(group, options) {
+    var newOptions = options.withFont(group.value.style);
+    var inner = buildExpression(group.value.body, newOptions, true);
+    for (var i = 0; i < inner.length - 1; i++) {
+        if (inner[i].tryCombine(inner[i + 1])) {
+            inner.splice(i + 1, 1);
+            i--;
+        }
+    }
+    return makeSpan(["mord", "text", newOptions.style.cls()],
+        inner, newOptions);
+};
+
+groupTypes.color = function(group, options) {
+    var elements = buildExpression(
+        group.value.value,
+        options.withColor(group.value.color),
+        false
+    );
+
+    // \color isn't supposed to affect the type of the elements it contains.
+    // To accomplish this, we wrap the results in a fragment, so the inner
+    // elements will be able to directly interact with their neighbors. For
+    // example, `\color{red}{2 +} 3` has the same spacing as `2 + 3`
+    return new buildCommon.makeFragment(elements);
+};
+
+groupTypes.supsub = function(group, options) {
+    // Superscript and subscripts are handled in the TeXbook on page
+    // 445-446, rules 18(a-f).
+
+    // Here is where we defer to the inner group if it should handle
+    // superscripts and subscripts itself.
+    if (shouldHandleSupSub(group.value.base, options)) {
+        return groupTypes[group.value.base.type](group, options);
+    }
+
+    var base = buildGroup(group.value.base, options.reset());
+    var supmid;
+    var submid;
+    var sup;
+    var sub;
+
+    var style = options.style;
+    var newOptions;
+
+    if (group.value.sup) {
+        newOptions = options.withStyle(style.sup());
+        sup = buildGroup(group.value.sup, newOptions);
+        supmid = makeSpan([style.reset(), style.sup().cls()],
+            [sup], newOptions);
+    }
+
+    if (group.value.sub) {
+        newOptions = options.withStyle(style.sub());
+        sub = buildGroup(group.value.sub, newOptions);
+        submid = makeSpan([style.reset(), style.sub().cls()],
+            [sub], newOptions);
+    }
+
+    // Rule 18a
+    var supShift;
+    var subShift;
+    if (isCharacterBox(group.value.base)) {
+        supShift = 0;
+        subShift = 0;
+    } else {
+        supShift = base.height - style.metrics.supDrop;
+        subShift = base.depth + style.metrics.subDrop;
+    }
+
+    // Rule 18c
+    var minSupShift;
+    if (style === Style.DISPLAY) {
+        minSupShift = style.metrics.sup1;
+    } else if (style.cramped) {
+        minSupShift = style.metrics.sup3;
+    } else {
+        minSupShift = style.metrics.sup2;
+    }
+
+    // scriptspace is a font-size-independent size, so scale it
+    // appropriately
+    var multiplier = Style.TEXT.sizeMultiplier *
+            style.sizeMultiplier;
+    var scriptspace =
+        (0.5 / fontMetrics.metrics.ptPerEm) / multiplier + "em";
+
+    var supsub;
+    if (!group.value.sup) {
+        // Rule 18b
+        subShift = Math.max(
+            subShift, style.metrics.sub1,
+            sub.height - 0.8 * style.metrics.xHeight);
+
+        supsub = buildCommon.makeVList([
+            {type: "elem", elem: submid}
+        ], "shift", subShift, options);
+
+        supsub.children[0].style.marginRight = scriptspace;
+
+        // Subscripts shouldn't be shifted by the base's italic correction.
+        // Account for that by shifting the subscript back the appropriate
+        // amount. Note we only do this when the base is a single symbol.
+        if (base instanceof domTree.symbolNode) {
+            supsub.children[0].style.marginLeft = -base.italic + "em";
+        }
+    } else if (!group.value.sub) {
+        // Rule 18c, d
+        supShift = Math.max(supShift, minSupShift,
+            sup.depth + 0.25 * style.metrics.xHeight);
+
+        supsub = buildCommon.makeVList([
+            {type: "elem", elem: supmid}
+        ], "shift", -supShift, options);
+
+        supsub.children[0].style.marginRight = scriptspace;
+    } else {
+        supShift = Math.max(
+            supShift, minSupShift, sup.depth + 0.25 * style.metrics.xHeight);
+        subShift = Math.max(subShift, style.metrics.sub2);
+
+        var ruleWidth = fontMetrics.metrics.defaultRuleThickness;
+
+        // Rule 18e
+        if ((supShift - sup.depth) - (sub.height - subShift) <
+                4 * ruleWidth) {
+            subShift = 4 * ruleWidth - (supShift - sup.depth) + sub.height;
+            var psi = 0.8 * style.metrics.xHeight - (supShift - sup.depth);
+            if (psi > 0) {
+                supShift += psi;
+                subShift -= psi;
+            }
+        }
+
+        supsub = buildCommon.makeVList([
+            {type: "elem", elem: submid, shift: subShift},
+            {type: "elem", elem: supmid, shift: -supShift}
+        ], "individualShift", null, options);
+
+        // See comment above about subscripts not being shifted
+        if (base instanceof domTree.symbolNode) {
+            supsub.children[0].style.marginLeft = -base.italic + "em";
+        }
+
+        supsub.children[0].style.marginRight = scriptspace;
+        supsub.children[1].style.marginRight = scriptspace;
+    }
+
+    // We ensure to wrap the supsub vlist in a span.msupsub to reset text-align
+    var mclass = getTypeOfDomTree(base) || "mord";
+    return makeSpan([mclass],
+        [base, makeSpan(["msupsub"], [supsub])],
+        options);
+};
+
+groupTypes.genfrac = function(group, options) {
+    // Fractions are handled in the TeXbook on pages 444-445, rules 15(a-e).
+    // Figure out what style this fraction should be in based on the
+    // function used
+    var style = options.style;
+    if (group.value.size === "display") {
+        style = Style.DISPLAY;
+    } else if (group.value.size === "text") {
+        style = Style.TEXT;
+    }
+
+    var nstyle = style.fracNum();
+    var dstyle = style.fracDen();
+    var newOptions;
+
+    newOptions = options.withStyle(nstyle);
+    var numer = buildGroup(group.value.numer, newOptions);
+    var numerreset = makeSpan([style.reset(), nstyle.cls()],
+        [numer], newOptions);
+
+    newOptions = options.withStyle(dstyle);
+    var denom = buildGroup(group.value.denom, newOptions);
+    var denomreset = makeSpan([style.reset(), dstyle.cls()],
+        [denom], newOptions);
+
+    var ruleWidth;
+    if (group.value.hasBarLine) {
+        ruleWidth = fontMetrics.metrics.defaultRuleThickness /
+            options.style.sizeMultiplier;
+    } else {
+        ruleWidth = 0;
+    }
+
+    // Rule 15b
+    var numShift;
+    var clearance;
+    var denomShift;
+    if (style.size === Style.DISPLAY.size) {
+        numShift = style.metrics.num1;
+        if (ruleWidth > 0) {
+            clearance = 3 * ruleWidth;
+        } else {
+            clearance = 7 * fontMetrics.metrics.defaultRuleThickness;
+        }
+        denomShift = style.metrics.denom1;
+    } else {
+        if (ruleWidth > 0) {
+            numShift = style.metrics.num2;
+            clearance = ruleWidth;
+        } else {
+            numShift = style.metrics.num3;
+            clearance = 3 * fontMetrics.metrics.defaultRuleThickness;
+        }
+        denomShift = style.metrics.denom2;
+    }
+
+    var frac;
+    if (ruleWidth === 0) {
+        // Rule 15c
+        var candidateClearance =
+            (numShift - numer.depth) - (denom.height - denomShift);
+        if (candidateClearance < clearance) {
+            numShift += 0.5 * (clearance - candidateClearance);
+            denomShift += 0.5 * (clearance - candidateClearance);
+        }
+
+        frac = buildCommon.makeVList([
+            {type: "elem", elem: denomreset, shift: denomShift},
+            {type: "elem", elem: numerreset, shift: -numShift}
+        ], "individualShift", null, options);
+    } else {
+        // Rule 15d
+        var axisHeight = style.metrics.axisHeight;
+
+        if ((numShift - numer.depth) - (axisHeight + 0.5 * ruleWidth) <
+                clearance) {
+            numShift +=
+                clearance - ((numShift - numer.depth) -
+                             (axisHeight + 0.5 * ruleWidth));
+        }
+
+        if ((axisHeight - 0.5 * ruleWidth) - (denom.height - denomShift) <
+                clearance) {
+            denomShift +=
+                clearance - ((axisHeight - 0.5 * ruleWidth) -
+                             (denom.height - denomShift));
+        }
+
+        var mid = makeSpan(
+            [options.style.reset(), Style.TEXT.cls(), "frac-line"]);
+        // Manually set the height of the line because its height is
+        // created in CSS
+        mid.height = ruleWidth;
+
+        var midShift = -(axisHeight - 0.5 * ruleWidth);
+
+        frac = buildCommon.makeVList([
+            {type: "elem", elem: denomreset, shift: denomShift},
+            {type: "elem", elem: mid,        shift: midShift},
+            {type: "elem", elem: numerreset, shift: -numShift}
+        ], "individualShift", null, options);
+    }
+
+    // Since we manually change the style sometimes (with \dfrac or \tfrac),
+    // account for the possible size change here.
+    frac.height *= style.sizeMultiplier / options.style.sizeMultiplier;
+    frac.depth *= style.sizeMultiplier / options.style.sizeMultiplier;
+
+    // Rule 15e
+    var delimSize;
+    if (style.size === Style.DISPLAY.size) {
+        delimSize = style.metrics.delim1;
+    } else {
+        delimSize = style.metrics.delim2;
+    }
+
+    var leftDelim;
+    var rightDelim;
+    if (group.value.leftDelim == null) {
+        leftDelim = makeNullDelimiter(options, ["mopen"]);
+    } else {
+        leftDelim = delimiter.customSizedDelim(
+            group.value.leftDelim, delimSize, true,
+            options.withStyle(style), group.mode, ["mopen"]);
+    }
+    if (group.value.rightDelim == null) {
+        rightDelim = makeNullDelimiter(options, ["mclose"]);
+    } else {
+        rightDelim = delimiter.customSizedDelim(
+            group.value.rightDelim, delimSize, true,
+            options.withStyle(style), group.mode, ["mclose"]);
+    }
+
+    return makeSpan(
+        ["mord", options.style.reset(), style.cls()],
+        [leftDelim, makeSpan(["mfrac"], [frac]), rightDelim],
+        options);
+};
+
+var calculateSize = function(sizeValue, style) {
+    var x = sizeValue.number;
+    if (sizeValue.unit === "ex") {
+        x *= style.metrics.emPerEx;
+    } else if (sizeValue.unit === "mu") {
+        x /= 18;
+    }
+    return x;
+};
+
+groupTypes.array = function(group, options) {
+    var r;
+    var c;
+    var nr = group.value.body.length;
+    var nc = 0;
+    var body = new Array(nr);
+
+    var style = options.style;
+
+    // Horizontal spacing
+    var pt = 1 / fontMetrics.metrics.ptPerEm;
+    var arraycolsep = 5 * pt; // \arraycolsep in article.cls
+
+    // Vertical spacing
+    var baselineskip = 12 * pt; // see size10.clo
+    // Default \arraystretch from lttab.dtx
+    // TODO(gagern): may get redefined once we have user-defined macros
+    var arraystretch = utils.deflt(group.value.arraystretch, 1);
+    var arrayskip = arraystretch * baselineskip;
+    var arstrutHeight = 0.7 * arrayskip; // \strutbox in ltfsstrc.dtx and
+    var arstrutDepth = 0.3 * arrayskip;  // \@arstrutbox in lttab.dtx
+
+    var totalHeight = 0;
+    for (r = 0; r < group.value.body.length; ++r) {
+        var inrow = group.value.body[r];
+        var height = arstrutHeight; // \@array adds an \@arstrut
+        var depth = arstrutDepth;   // to each tow (via the template)
+
+        if (nc < inrow.length) {
+            nc = inrow.length;
+        }
+
+        var outrow = new Array(inrow.length);
+        for (c = 0; c < inrow.length; ++c) {
+            var elt = buildGroup(inrow[c], options);
+            if (depth < elt.depth) {
+                depth = elt.depth;
+            }
+            if (height < elt.height) {
+                height = elt.height;
+            }
+            outrow[c] = elt;
+        }
+
+        var gap = 0;
+        if (group.value.rowGaps[r]) {
+            gap = calculateSize(group.value.rowGaps[r].value, style);
+            if (gap > 0) { // \@argarraycr
+                gap += arstrutDepth;
+                if (depth < gap) {
+                    depth = gap; // \@xargarraycr
+                }
+                gap = 0;
+            }
+        }
+
+        outrow.height = height;
+        outrow.depth = depth;
+        totalHeight += height;
+        outrow.pos = totalHeight;
+        totalHeight += depth + gap; // \@yargarraycr
+        body[r] = outrow;
+    }
+
+    var offset = totalHeight / 2 + style.metrics.axisHeight;
+    var colDescriptions = group.value.cols || [];
+    var cols = [];
+    var colSep;
+    var colDescrNum;
+    for (c = 0, colDescrNum = 0;
+         // Continue while either there are more columns or more column
+         // descriptions, so trailing separators don't get lost.
+         c < nc || colDescrNum < colDescriptions.length;
+         ++c, ++colDescrNum) {
+
+        var colDescr = colDescriptions[colDescrNum] || {};
+
+        var firstSeparator = true;
+        while (colDescr.type === "separator") {
+            // If there is more than one separator in a row, add a space
+            // between them.
+            if (!firstSeparator) {
+                colSep = makeSpan(["arraycolsep"], []);
+                colSep.style.width =
+                    fontMetrics.metrics.doubleRuleSep + "em";
+                cols.push(colSep);
+            }
+
+            if (colDescr.separator === "|") {
+                var separator = makeSpan(
+                    ["vertical-separator"],
+                    []);
+                separator.style.height = totalHeight + "em";
+                separator.style.verticalAlign =
+                    -(totalHeight - offset) + "em";
+
+                cols.push(separator);
+            } else {
+                throw new ParseError(
+                    "Invalid separator type: " + colDescr.separator);
+            }
+
+            colDescrNum++;
+            colDescr = colDescriptions[colDescrNum] || {};
+            firstSeparator = false;
+        }
+
+        if (c >= nc) {
+            continue;
+        }
+
+        var sepwidth;
+        if (c > 0 || group.value.hskipBeforeAndAfter) {
+            sepwidth = utils.deflt(colDescr.pregap, arraycolsep);
+            if (sepwidth !== 0) {
+                colSep = makeSpan(["arraycolsep"], []);
+                colSep.style.width = sepwidth + "em";
+                cols.push(colSep);
+            }
+        }
+
+        var col = [];
+        for (r = 0; r < nr; ++r) {
+            var row = body[r];
+            var elem = row[c];
+            if (!elem) {
+                continue;
+            }
+            var shift = row.pos - offset;
+            elem.depth = row.depth;
+            elem.height = row.height;
+            col.push({type: "elem", elem: elem, shift: shift});
+        }
+
+        col = buildCommon.makeVList(col, "individualShift", null, options);
+        col = makeSpan(
+            ["col-align-" + (colDescr.align || "c")],
+            [col]);
+        cols.push(col);
+
+        if (c < nc - 1 || group.value.hskipBeforeAndAfter) {
+            sepwidth = utils.deflt(colDescr.postgap, arraycolsep);
+            if (sepwidth !== 0) {
+                colSep = makeSpan(["arraycolsep"], []);
+                colSep.style.width = sepwidth + "em";
+                cols.push(colSep);
+            }
+        }
+    }
+    body = makeSpan(["mtable"], cols);
+    return makeSpan(["mord"], [body], options);
+};
+
+groupTypes.spacing = function(group, options) {
+    if (group.value === "\\ " || group.value === "\\space" ||
+        group.value === " " || group.value === "~") {
+        // Spaces are generated by adding an actual space. Each of these
+        // things has an entry in the symbols table, so these will be turned
+        // into appropriate outputs.
+        if (group.mode === "text") {
+            return buildCommon.makeOrd(group, options, "textord");
+        } else {
+            return makeSpan(["mspace"],
+                [buildCommon.mathsym(group.value, group.mode, options)],
+                options);
+        }
+    } else {
+        // Other kinds of spaces are of arbitrary width. We use CSS to
+        // generate these.
+        return makeSpan(
+            ["mspace",
+                buildCommon.spacingFunctions[group.value].className],
+            [], options);
+    }
+};
+
+groupTypes.llap = function(group, options) {
+    var inner = makeSpan(
+        ["inner"], [buildGroup(group.value.body, options.reset())]);
+    var fix = makeSpan(["fix"], []);
+    return makeSpan(
+        ["mord", "llap", options.style.cls()], [inner, fix], options);
+};
+
+groupTypes.rlap = function(group, options) {
+    var inner = makeSpan(
+        ["inner"], [buildGroup(group.value.body, options.reset())]);
+    var fix = makeSpan(["fix"], []);
+    return makeSpan(
+        ["mord", "rlap", options.style.cls()], [inner, fix], options);
+};
+
+groupTypes.op = function(group, options) {
+    // Operators are handled in the TeXbook pg. 443-444, rule 13(a).
+    var supGroup;
+    var subGroup;
+    var hasLimits = false;
+    if (group.type === "supsub") {
+        // If we have limits, supsub will pass us its group to handle. Pull
+        // out the superscript and subscript and set the group to the op in
+        // its base.
+        supGroup = group.value.sup;
+        subGroup = group.value.sub;
+        group = group.value.base;
+        hasLimits = true;
+    }
+
+    var style = options.style;
+
+    // Most operators have a large successor symbol, but these don't.
+    var noSuccessor = [
+        "\\smallint"
+    ];
+
+    var large = false;
+    if (style.size === Style.DISPLAY.size &&
+        group.value.symbol &&
+        !utils.contains(noSuccessor, group.value.body)) {
+
+        // Most symbol operators get larger in displaystyle (rule 13)
+        large = true;
+    }
+
+    var base;
+    var baseShift = 0;
+    var slant = 0;
+    if (group.value.symbol) {
+        // If this is a symbol, create the symbol.
+        var fontName = large ? "Size2-Regular" : "Size1-Regular";
+        base = buildCommon.makeSymbol(
+            group.value.body, fontName, "math", options,
+            ["mop", "op-symbol", large ? "large-op" : "small-op"]);
+
+        // Shift the symbol so its center lies on the axis (rule 13). It
+        // appears that our fonts have the centers of the symbols already
+        // almost on the axis, so these numbers are very small. Note we
+        // don't actually apply this here, but instead it is used either in
+        // the vlist creation or separately when there are no limits.
+        baseShift = (base.height - base.depth) / 2 -
+            style.metrics.axisHeight * style.sizeMultiplier;
+
+        // The slant of the symbol is just its italic correction.
+        slant = base.italic;
+    } else if (group.value.value) {
+        // If this is a list, compose that list.
+        var inner = buildExpression(group.value.value, options, true);
+
+        base = makeSpan(["mop"], inner, options);
+    } else {
+        // Otherwise, this is a text operator. Build the text from the
+        // operator's name.
+        // TODO(emily): Add a space in the middle of some of these
+        // operators, like \limsup
+        var output = [];
+        for (var i = 1; i < group.value.body.length; i++) {
+            output.push(buildCommon.mathsym(group.value.body[i], group.mode));
+        }
+        base = makeSpan(["mop"], output, options);
+    }
+
+    if (hasLimits) {
+        // IE 8 clips \int if it is in a display: inline-block. We wrap it
+        // in a new span so it is an inline, and works.
+        base = makeSpan([], [base]);
+
+        var supmid;
+        var supKern;
+        var submid;
+        var subKern;
+        var newOptions;
+        // We manually have to handle the superscripts and subscripts. This,
+        // aside from the kern calculations, is copied from supsub.
+        if (supGroup) {
+            newOptions = options.withStyle(style.sup());
+            var sup = buildGroup(supGroup, newOptions);
+            supmid = makeSpan([style.reset(), style.sup().cls()],
+                [sup], newOptions);
+
+            supKern = Math.max(
+                fontMetrics.metrics.bigOpSpacing1,
+                fontMetrics.metrics.bigOpSpacing3 - sup.depth);
+        }
+
+        if (subGroup) {
+            newOptions = options.withStyle(style.sub());
+            var sub = buildGroup(subGroup, newOptions);
+            submid = makeSpan([style.reset(), style.sub().cls()],
+                [sub], newOptions);
+
+            subKern = Math.max(
+                fontMetrics.metrics.bigOpSpacing2,
+                fontMetrics.metrics.bigOpSpacing4 - sub.height);
+        }
+
+        // Build the final group as a vlist of the possible subscript, base,
+        // and possible superscript.
+        var finalGroup;
+        var top;
+        var bottom;
+        if (!supGroup) {
+            top = base.height - baseShift;
+
+            finalGroup = buildCommon.makeVList([
+                {type: "kern", size: fontMetrics.metrics.bigOpSpacing5},
+                {type: "elem", elem: submid},
+                {type: "kern", size: subKern},
+                {type: "elem", elem: base}
+            ], "top", top, options);
+
+            // Here, we shift the limits by the slant of the symbol. Note
+            // that we are supposed to shift the limits by 1/2 of the slant,
+            // but since we are centering the limits adding a full slant of
+            // margin will shift by 1/2 that.
+            finalGroup.children[0].style.marginLeft = -slant + "em";
+        } else if (!subGroup) {
+            bottom = base.depth + baseShift;
+
+            finalGroup = buildCommon.makeVList([
+                {type: "elem", elem: base},
+                {type: "kern", size: supKern},
+                {type: "elem", elem: supmid},
+                {type: "kern", size: fontMetrics.metrics.bigOpSpacing5}
+            ], "bottom", bottom, options);
+
+            // See comment above about slants
+            finalGroup.children[1].style.marginLeft = slant + "em";
+        } else if (!supGroup && !subGroup) {
+            // This case probably shouldn't occur (this would mean the
+            // supsub was sending us a group with no superscript or
+            // subscript) but be safe.
+            return base;
+        } else {
+            bottom = fontMetrics.metrics.bigOpSpacing5 +
+                submid.height + submid.depth +
+                subKern +
+                base.depth + baseShift;
+
+            finalGroup = buildCommon.makeVList([
+                {type: "kern", size: fontMetrics.metrics.bigOpSpacing5},
+                {type: "elem", elem: submid},
+                {type: "kern", size: subKern},
+                {type: "elem", elem: base},
+                {type: "kern", size: supKern},
+                {type: "elem", elem: supmid},
+                {type: "kern", size: fontMetrics.metrics.bigOpSpacing5}
+            ], "bottom", bottom, options);
+
+            // See comment above about slants
+            finalGroup.children[0].style.marginLeft = -slant + "em";
+            finalGroup.children[2].style.marginLeft = slant + "em";
+        }
+
+        return makeSpan(["mop", "op-limits"], [finalGroup], options);
+    } else {
+        if (group.value.symbol) {
+            base.style.top = baseShift + "em";
+        }
+
+        return base;
+    }
+};
+
+groupTypes.mod = function(group, options) {
+    var inner = [];
+
+    if (group.value.modType === "bmod") {
+        // “\nonscript\mskip-\medmuskip\mkern5mu”
+        if (!options.style.isTight()) {
+            inner.push(makeSpan(
+                ["mspace", "negativemediumspace"], [], options));
+        }
+        inner.push(makeSpan(["mspace", "thickspace"], [], options));
+    } else if (options.style.size === Style.DISPLAY.size) {
+        inner.push(makeSpan(["mspace", "quad"], [], options));
+    } else if (group.value.modType === "mod") {
+        inner.push(makeSpan(["mspace", "twelvemuspace"], [], options));
+    } else {
+        inner.push(makeSpan(["mspace", "eightmuspace"], [], options));
+    }
+
+    if (group.value.modType === "pod" || group.value.modType === "pmod") {
+        inner.push(buildCommon.mathsym("(", group.mode));
+    }
+
+    if (group.value.modType !== "pod") {
+        var modInner = [
+            buildCommon.mathsym("m", group.mode),
+            buildCommon.mathsym("o", group.mode),
+            buildCommon.mathsym("d", group.mode)];
+        if (group.value.modType === "bmod") {
+            inner.push(makeSpan(["mbin"], modInner, options));
+            // “\mkern5mu\nonscript\mskip-\medmuskip”
+            inner.push(makeSpan(["mspace", "thickspace"], [], options));
+            if (!options.style.isTight()) {
+                inner.push(makeSpan(
+                    ["mspace", "negativemediumspace"], [], options));
+            }
+        } else {
+            Array.prototype.push.apply(inner, modInner);
+            inner.push(makeSpan(["mspace", "sixmuspace"], [], options));
+        }
+    }
+
+    if (group.value.value) {
+        Array.prototype.push.apply(inner,
+            buildExpression(group.value.value, options, false));
+    }
+
+    if (group.value.modType === "pod" || group.value.modType === "pmod") {
+        inner.push(buildCommon.mathsym(")", group.mode));
+    }
+
+    return buildCommon.makeFragment(inner);
+};
+
+groupTypes.katex = function(group, options) {
+    // The KaTeX logo. The offsets for the K and a were chosen to look
+    // good, but the offsets for the T, E, and X were taken from the
+    // definition of \TeX in TeX (see TeXbook pg. 356)
+    var k = makeSpan(
+        ["k"], [buildCommon.mathsym("K", group.mode)], options);
+    var a = makeSpan(
+        ["a"], [buildCommon.mathsym("A", group.mode)], options);
+
+    a.height = (a.height + 0.2) * 0.75;
+    a.depth = (a.height - 0.2) * 0.75;
+
+    var t = makeSpan(
+        ["t"], [buildCommon.mathsym("T", group.mode)], options);
+    var e = makeSpan(
+        ["e"], [buildCommon.mathsym("E", group.mode)], options);
+
+    e.height = (e.height - 0.2155);
+    e.depth = (e.depth + 0.2155);
+
+    var x = makeSpan(
+        ["x"], [buildCommon.mathsym("X", group.mode)], options);
+
+    return makeSpan(
+        ["mord", "katex-logo"], [k, a, t, e, x], options);
+};
+
+groupTypes.overline = function(group, options) {
+    // Overlines are handled in the TeXbook pg 443, Rule 9.
+    var style = options.style;
+
+    // Build the inner group in the cramped style.
+    var innerGroup = buildGroup(group.value.body,
+            options.withStyle(style.cramp()));
+
+    var ruleWidth = fontMetrics.metrics.defaultRuleThickness /
+        style.sizeMultiplier;
+
+    // Create the line above the body
+    var line = makeSpan(
+        [style.reset(), Style.TEXT.cls(), "overline-line"]);
+    line.height = ruleWidth;
+    line.maxFontSize = 1.0;
+
+    // Generate the vlist, with the appropriate kerns
+    var vlist = buildCommon.makeVList([
+        {type: "elem", elem: innerGroup},
+        {type: "kern", size: 3 * ruleWidth},
+        {type: "elem", elem: line},
+        {type: "kern", size: ruleWidth}
+    ], "firstBaseline", null, options);
+
+    return makeSpan(["mord", "overline"], [vlist], options);
+};
+
+groupTypes.underline = function(group, options) {
+    // Underlines are handled in the TeXbook pg 443, Rule 10.
+    var style = options.style;
+
+    // Build the inner group.
+    var innerGroup = buildGroup(group.value.body, options);
+
+    var ruleWidth = fontMetrics.metrics.defaultRuleThickness /
+        style.sizeMultiplier;
+
+    // Create the line above the body
+    var line = makeSpan([style.reset(), Style.TEXT.cls(), "underline-line"]);
+    line.height = ruleWidth;
+    line.maxFontSize = 1.0;
+
+    // Generate the vlist, with the appropriate kerns
+    var vlist = buildCommon.makeVList([
+        {type: "kern", size: ruleWidth},
+        {type: "elem", elem: line},
+        {type: "kern", size: 3 * ruleWidth},
+        {type: "elem", elem: innerGroup}
+    ], "top", innerGroup.height, options);
+
+    return makeSpan(["mord", "underline"], [vlist], options);
+};
+
+groupTypes.sqrt = function(group, options) {
+    // Square roots are handled in the TeXbook pg. 443, Rule 11.
+    var style = options.style;
+
+    // First, we do the same steps as in overline to build the inner group
+    // and line
+    var inner = buildGroup(group.value.body, options.withStyle(style.cramp()));
+
+    var ruleWidth = fontMetrics.metrics.defaultRuleThickness /
+        style.sizeMultiplier;
+
+    var line = makeSpan(
+        [style.reset(), Style.TEXT.cls(), "sqrt-line"], [],
+        options);
+    line.height = ruleWidth;
+    line.maxFontSize = 1.0;
+
+    var phi = ruleWidth;
+    if (style.id < Style.TEXT.id) {
+        phi = style.metrics.xHeight;
+    }
+
+    // Calculate the clearance between the body and line
+    var lineClearance = ruleWidth + phi / 4;
+
+    var innerHeight = (inner.height + inner.depth) * style.sizeMultiplier;
+    var minDelimiterHeight = innerHeight + lineClearance + ruleWidth;
+
+    // Create a \surd delimiter of the required minimum size
+    var delim = makeSpan(["sqrt-sign"], [
+        delimiter.customSizedDelim("\\surd", minDelimiterHeight,
+                                   false, options, group.mode)],
+                         options);
+
+    var delimDepth = (delim.height + delim.depth) - ruleWidth;
+
+    // Adjust the clearance based on the delimiter size
+    if (delimDepth > inner.height + inner.depth + lineClearance) {
+        lineClearance =
+            (lineClearance + delimDepth - inner.height - inner.depth) / 2;
+    }
+
+    // Shift the delimiter so that its top lines up with the top of the line
+    var delimShift = -(inner.height + lineClearance + ruleWidth) + delim.height;
+    delim.style.top = delimShift + "em";
+    delim.height -= delimShift;
+    delim.depth += delimShift;
+
+    // We add a special case here, because even when `inner` is empty, we
+    // still get a line. So, we use a simple heuristic to decide if we
+    // should omit the body entirely. (note this doesn't work for something
+    // like `\sqrt{\rlap{x}}`, but if someone is doing that they deserve for
+    // it not to work.
+    var body;
+    if (inner.height === 0 && inner.depth === 0) {
+        body = makeSpan();
+    } else {
+        body = buildCommon.makeVList([
+            {type: "elem", elem: inner},
+            {type: "kern", size: lineClearance},
+            {type: "elem", elem: line},
+            {type: "kern", size: ruleWidth}
+        ], "firstBaseline", null, options);
+    }
+
+    if (!group.value.index) {
+        return makeSpan(["mord", "sqrt"], [delim, body], options);
+    } else {
+        // Handle the optional root index
+
+        // The index is always in scriptscript style
+        var newOptions = options.withStyle(Style.SCRIPTSCRIPT);
+        var root = buildGroup(group.value.index, newOptions);
+        var rootWrap = makeSpan(
+            [style.reset(), Style.SCRIPTSCRIPT.cls()],
+            [root],
+            newOptions);
+
+        // Figure out the height and depth of the inner part
+        var innerRootHeight = Math.max(delim.height, body.height);
+        var innerRootDepth = Math.max(delim.depth, body.depth);
+
+        // The amount the index is shifted by. This is taken from the TeX
+        // source, in the definition of `\r@@t`.
+        var toShift = 0.6 * (innerRootHeight - innerRootDepth);
+
+        // Build a VList with the superscript shifted up correctly
+        var rootVList = buildCommon.makeVList(
+            [{type: "elem", elem: rootWrap}],
+            "shift", -toShift, options);
+        // Add a class surrounding it so we can add on the appropriate
+        // kerning
+        var rootVListWrap = makeSpan(["root"], [rootVList]);
+
+        return makeSpan(["mord", "sqrt"],
+            [rootVListWrap, delim, body], options);
+    }
+};
+
+groupTypes.sizing = function(group, options) {
+    // Handle sizing operators like \Huge. Real TeX doesn't actually allow
+    // these functions inside of math expressions, so we do some special
+    // handling.
+    var inner = buildExpression(group.value.value,
+            options.withSize(group.value.size), false);
+
+    // Compute the correct maxFontSize.
+    var style = options.style;
+    var fontSize = buildCommon.sizingMultiplier[group.value.size];
+    fontSize = fontSize * style.sizeMultiplier;
+
+    // Add size-resetting classes to the inner list and set maxFontSize
+    // manually. Handle nested size changes.
+    for (var i = 0; i < inner.length; i++) {
+        var pos = utils.indexOf(inner[i].classes, "sizing");
+        if (pos < 0) {
+            inner[i].classes.push("sizing", "reset-" + options.size,
+                                  group.value.size, style.cls());
+            inner[i].maxFontSize = fontSize;
+        } else if (inner[i].classes[pos + 1] === "reset-" + group.value.size) {
+            // This is a nested size change: e.g., inner[i] is the "b" in
+            // `\Huge a \small b`. Override the old size (the `reset-` class)
+            // but not the new size.
+            inner[i].classes[pos + 1] = "reset-" + options.size;
+        }
+    }
+
+    return buildCommon.makeFragment(inner);
+};
+
+groupTypes.styling = function(group, options) {
+    // Style changes are handled in the TeXbook on pg. 442, Rule 3.
+
+    // Figure out what style we're changing to.
+    var styleMap = {
+        "display": Style.DISPLAY,
+        "text": Style.TEXT,
+        "script": Style.SCRIPT,
+        "scriptscript": Style.SCRIPTSCRIPT
+    };
+
+    var newStyle = styleMap[group.value.style];
+    var newOptions = options.withStyle(newStyle);
+
+    // Build the inner expression in the new style.
+    var inner = buildExpression(
+        group.value.value, newOptions, false);
+
+    // Add style-resetting classes to the inner list. Handle nested changes.
+    for (var i = 0; i < inner.length; i++) {
+        var pos = utils.indexOf(inner[i].classes, newStyle.reset());
+        if (pos < 0) {
+            inner[i].classes.push(options.style.reset(), newStyle.cls());
+        } else {
+            // This is a nested style change, as `\textstyle a\scriptstyle b`.
+            // Only override the old style (the reset class).
+            inner[i].classes[pos] = options.style.reset();
+        }
+    }
+
+    return new buildCommon.makeFragment(inner);
+};
+
+groupTypes.font = function(group, options) {
+    var font = group.value.font;
+    return buildGroup(group.value.body, options.withFont(font));
+};
+
+groupTypes.delimsizing = function(group, options) {
+    var delim = group.value.value;
+
+    if (delim === ".") {
+        // Empty delimiters still count as elements, even though they don't
+        // show anything.
+        return makeSpan([group.value.mclass]);
+    }
+
+    // Use delimiter.sizedDelim to generate the delimiter.
+    return delimiter.sizedDelim(
+            delim, group.value.size, options, group.mode,
+            [group.value.mclass]);
+};
+
+groupTypes.leftright = function(group, options) {
+    // Build the inner expression
+    var inner = buildExpression(group.value.body, options.reset(), true);
+
+    var innerHeight = 0;
+    var innerDepth = 0;
+    var hadMiddle = false;
+
+    // Calculate its height and depth
+    for (var i = 0; i < inner.length; i++) {
+        if (inner[i].isMiddle) {
+            hadMiddle = true;
+        } else {
+            innerHeight = Math.max(inner[i].height, innerHeight);
+            innerDepth = Math.max(inner[i].depth, innerDepth);
+        }
+    }
+
+    var style = options.style;
+
+    // The size of delimiters is the same, regardless of what style we are
+    // in. Thus, to correctly calculate the size of delimiter we need around
+    // a group, we scale down the inner size based on the size.
+    innerHeight *= style.sizeMultiplier;
+    innerDepth *= style.sizeMultiplier;
+
+    var leftDelim;
+    if (group.value.left === ".") {
+        // Empty delimiters in \left and \right make null delimiter spaces.
+        leftDelim = makeNullDelimiter(options, ["mopen"]);
+    } else {
+        // Otherwise, use leftRightDelim to generate the correct sized
+        // delimiter.
+        leftDelim = delimiter.leftRightDelim(
+            group.value.left, innerHeight, innerDepth, options,
+            group.mode, ["mopen"]);
+    }
+    // Add it to the beginning of the expression
+    inner.unshift(leftDelim);
+
+    // Handle middle delimiters
+    if (hadMiddle) {
+        for (i = 1; i < inner.length; i++) {
+            if (inner[i].isMiddle) {
+                // Apply the options that were active when \middle was called
+                inner[i] = delimiter.leftRightDelim(
+                    inner[i].isMiddle.value, innerHeight, innerDepth,
+                    inner[i].isMiddle.options, group.mode, []);
+            }
+        }
+    }
+
+    var rightDelim;
+    // Same for the right delimiter
+    if (group.value.right === ".") {
+        rightDelim = makeNullDelimiter(options, ["mclose"]);
+    } else {
+        rightDelim = delimiter.leftRightDelim(
+            group.value.right, innerHeight, innerDepth, options,
+            group.mode, ["mclose"]);
+    }
+    // Add it to the end of the expression.
+    inner.push(rightDelim);
+
+    return makeSpan(
+        ["minner", style.cls()], inner, options);
+};
+
+groupTypes.middle = function(group, options) {
+    var middleDelim;
+    if (group.value.value === ".") {
+        middleDelim = makeNullDelimiter(options, []);
+    } else {
+        middleDelim = delimiter.sizedDelim(
+            group.value.value, 1, options,
+            group.mode, []);
+        middleDelim.isMiddle = {value: group.value.value, options: options};
+    }
+    return middleDelim;
+};
+
+groupTypes.rule = function(group, options) {
+    // Make an empty span for the rule
+    var rule = makeSpan(["mord", "rule"], [], options);
+    var style = options.style;
+
+    // Calculate the shift, width, and height of the rule, and account for units
+    var shift = 0;
+    if (group.value.shift) {
+        shift = calculateSize(group.value.shift, style);
+    }
+
+    var width = calculateSize(group.value.width, style);
+    var height = calculateSize(group.value.height, style);
+
+    // The sizes of rules are absolute, so make it larger if we are in a
+    // smaller style.
+    shift /= style.sizeMultiplier;
+    width /= style.sizeMultiplier;
+    height /= style.sizeMultiplier;
+
+    // Style the rule to the right size
+    rule.style.borderRightWidth = width + "em";
+    rule.style.borderTopWidth = height + "em";
+    rule.style.bottom = shift + "em";
+
+    // Record the height and width
+    rule.width = width;
+    rule.height = height + shift;
+    rule.depth = -shift;
+
+    return rule;
+};
+
+groupTypes.kern = function(group, options) {
+    // Make an empty span for the rule
+    var rule = makeSpan(["mord", "rule"], [], options);
+    var style = options.style;
+
+    var dimension = 0;
+    if (group.value.dimension) {
+        dimension = calculateSize(group.value.dimension, style);
+    }
+
+    dimension /= style.sizeMultiplier;
+
+    rule.style.marginLeft = dimension + "em";
+
+    return rule;
+};
+
+groupTypes.accent = function(group, options) {
+    // Accents are handled in the TeXbook pg. 443, rule 12.
+    var base = group.value.base;
+    var style = options.style;
+
+    var supsubGroup;
+    if (group.type === "supsub") {
+        // If our base is a character box, and we have superscripts and
+        // subscripts, the supsub will defer to us. In particular, we want
+        // to attach the superscripts and subscripts to the inner body (so
+        // that the position of the superscripts and subscripts won't be
+        // affected by the height of the accent). We accomplish this by
+        // sticking the base of the accent into the base of the supsub, and
+        // rendering that, while keeping track of where the accent is.
+
+        // The supsub group is the group that was passed in
+        var supsub = group;
+        // The real accent group is the base of the supsub group
+        group = supsub.value.base;
+        // The character box is the base of the accent group
+        base = group.value.base;
+        // Stick the character box into the base of the supsub group
+        supsub.value.base = base;
+
+        // Rerender the supsub group with its new base, and store that
+        // result.
+        supsubGroup = buildGroup(
+            supsub, options.reset());
+    }
+
+    // Build the base group
+    var body = buildGroup(
+        base, options.withStyle(style.cramp()));
+
+    // Calculate the skew of the accent. This is based on the line "If the
+    // nucleus is not a single character, let s = 0; otherwise set s to the
+    // kern amount for the nucleus followed by the \skewchar of its font."
+    // Note that our skew metrics are just the kern between each character
+    // and the skewchar.
+    var skew;
+    if (isCharacterBox(base)) {
+        // If the base is a character box, then we want the skew of the
+        // innermost character. To do that, we find the innermost character:
+        var baseChar = getBaseElem(base);
+        // Then, we render its group to get the symbol inside it
+        var baseGroup = buildGroup(
+            baseChar, options.withStyle(style.cramp()));
+        // Finally, we pull the skew off of the symbol.
+        skew = baseGroup.skew;
+        // Note that we now throw away baseGroup, because the layers we
+        // removed with getBaseElem might contain things like \color which
+        // we can't get rid of.
+        // TODO(emily): Find a better way to get the skew
+    } else {
+        skew = 0;
+    }
+
+    // calculate the amount of space between the body and the accent
+    var clearance = Math.min(
+        body.height,
+        style.metrics.xHeight);
+
+    // Build the accent
+    var accent = buildCommon.makeSymbol(
+        group.value.accent, "Main-Regular", "math", options);
+    // Remove the italic correction of the accent, because it only serves to
+    // shift the accent over to a place we don't want.
+    accent.italic = 0;
+
+    // The \vec character that the fonts use is a combining character, and
+    // thus shows up much too far to the left. To account for this, we add a
+    // specific class which shifts the accent over to where we want it.
+    // TODO(emily): Fix this in a better way, like by changing the font
+    var vecClass = group.value.accent === "\\vec" ? "accent-vec" : null;
+
+    var accentBody = makeSpan(["accent-body", vecClass], [
+        makeSpan([], [accent])]);
+
+    accentBody = buildCommon.makeVList([
+        {type: "elem", elem: body},
+        {type: "kern", size: -clearance},
+        {type: "elem", elem: accentBody}
+    ], "firstBaseline", null, options);
+
+    // Shift the accent over by the skew. Note we shift by twice the skew
+    // because we are centering the accent, so by adding 2*skew to the left,
+    // we shift it to the right by 1*skew.
+    accentBody.children[1].style.marginLeft = 2 * skew + "em";
+
+    var accentWrap = makeSpan(["mord", "accent"], [accentBody], options);
+
+    if (supsubGroup) {
+        // Here, we replace the "base" child of the supsub with our newly
+        // generated accent.
+        supsubGroup.children[0] = accentWrap;
+
+        // Since we don't rerun the height calculation after replacing the
+        // accent, we manually recalculate height.
+        supsubGroup.height = Math.max(accentWrap.height, supsubGroup.height);
+
+        // Accents should always be ords, even when their innards are not.
+        supsubGroup.classes[0] = "mord";
+
+        return supsubGroup;
+    } else {
+        return accentWrap;
+    }
+};
+
+groupTypes.phantom = function(group, options) {
+    var elements = buildExpression(
+        group.value.value,
+        options.withPhantom(),
+        false
+    );
+
+    // \phantom isn't supposed to affect the elements it contains.
+    // See "color" for more details.
+    return new buildCommon.makeFragment(elements);
+};
+
+groupTypes.mclass = function(group, options) {
+    var elements = buildExpression(group.value.value, options, true);
+
+    return makeSpan([group.value.mclass], elements, options);
+};
+
+/**
+ * buildGroup is the function that takes a group and calls the correct groupType
+ * function for it. It also handles the interaction of size and style changes
+ * between parents and children.
+ */
+var buildGroup = function(group, options) {
+    if (!group) {
+        return makeSpan();
+    }
+
+    if (groupTypes[group.type]) {
+        // Call the groupTypes function
+        var groupNode = groupTypes[group.type](group, options);
+        var multiplier;
+
+        // If the style changed between the parent and the current group,
+        // account for the size difference
+        if (options.style !== options.parentStyle) {
+            multiplier = options.style.sizeMultiplier /
+                    options.parentStyle.sizeMultiplier;
+
+            groupNode.height *= multiplier;
+            groupNode.depth *= multiplier;
+        }
+
+        // If the size changed between the parent and the current group, account
+        // for that size difference.
+        if (options.size !== options.parentSize) {
+            multiplier = buildCommon.sizingMultiplier[options.size] /
+                    buildCommon.sizingMultiplier[options.parentSize];
+
+            groupNode.height *= multiplier;
+            groupNode.depth *= multiplier;
+        }
+
+        return groupNode;
+    } else {
+        throw new ParseError(
+            "Got group of unknown type: '" + group.type + "'");
+    }
+};
+
+/**
+ * Take an entire parse tree, and build it into an appropriate set of HTML
+ * nodes.
+ */
+var buildHTML = function(tree, options) {
+    // buildExpression is destructive, so we need to make a clone
+    // of the incoming tree so that it isn't accidentally changed
+    tree = JSON.parse(JSON.stringify(tree));
+
+    // Build the expression contained in the tree
+    var expression = buildExpression(tree, options, true);
+    var body = makeSpan(["base", options.style.cls()], expression, options);
+
+    // Add struts, which ensure that the top of the HTML element falls at the
+    // height of the expression, and the bottom of the HTML element falls at the
+    // depth of the expression.
+    var topStrut = makeSpan(["strut"]);
+    var bottomStrut = makeSpan(["strut", "bottom"]);
+
+    topStrut.style.height = body.height + "em";
+    bottomStrut.style.height = (body.height + body.depth) + "em";
+    // We'd like to use `vertical-align: top` but in IE 9 this lowers the
+    // baseline of the box to the bottom of this strut (instead staying in the
+    // normal place) so we use an absolute value for vertical-align instead
+    bottomStrut.style.verticalAlign = -body.depth + "em";
+
+    // Wrap the struts and body together
+    var htmlNode = makeSpan(["katex-html"], [topStrut, bottomStrut, body]);
+
+    htmlNode.setAttribute("aria-hidden", "true");
+
+    return htmlNode;
+};
+
+module.exports = buildHTML;
 
 },{"./ParseError":4,"./Style":7,"./buildCommon":8,"./delimiter":12,"./domTree":13,"./fontMetrics":15,"./utils":23}],10:[function(require,module,exports){
-var buildCommon=require("./buildCommon"),fontMetrics=require("./fontMetrics"),mathMLTree=require("./mathMLTree"),ParseError=require("./ParseError"),symbols=require("./symbols"),utils=require("./utils"),makeSpan=buildCommon.makeSpan,fontMap=buildCommon.fontMap,makeText=function(e,t){return symbols[t][e]&&symbols[t][e].replace&&(e=symbols[t][e].replace),new mathMLTree.TextNode(e)},getVariant=function(e,t){var r=t.font;if(!r)return null;var a=e.mode;if("mathit"===r)return"italic";var u=e.value;if(utils.contains(["\\imath","\\jmath"],u))return null;symbols[a][u]&&symbols[a][u].replace&&(u=symbols[a][u].replace);var o=fontMap[r].fontName;return fontMetrics.getCharacterMetrics(u,o)?fontMap[t.font].variant:null},groupTypes={};groupTypes.mathord=function(e,t){var r=new mathMLTree.MathNode("mi",[makeText(e.value,e.mode)]),a=getVariant(e,t);return a&&r.setAttribute("mathvariant",a),r},groupTypes.textord=function(e,t){var r,a=makeText(e.value,e.mode),u=getVariant(e,t)||"normal";return/[0-9]/.test(e.value)?(r=new mathMLTree.MathNode("mn",[a]),t.font&&r.setAttribute("mathvariant",u)):(r=new mathMLTree.MathNode("mi",[a]),r.setAttribute("mathvariant",u)),r},groupTypes.bin=function(e){return new mathMLTree.MathNode("mo",[makeText(e.value,e.mode)])},groupTypes.rel=function(e){return new mathMLTree.MathNode("mo",[makeText(e.value,e.mode)])},groupTypes.open=function(e){return new mathMLTree.MathNode("mo",[makeText(e.value,e.mode)])},groupTypes.close=function(e){return new mathMLTree.MathNode("mo",[makeText(e.value,e.mode)])},groupTypes.inner=function(e){return new mathMLTree.MathNode("mo",[makeText(e.value,e.mode)])},groupTypes.punct=function(e){var t=new mathMLTree.MathNode("mo",[makeText(e.value,e.mode)]);return t.setAttribute("separator","true"),t},groupTypes.ordgroup=function(e,t){var r=buildExpression(e.value,t);return new mathMLTree.MathNode("mrow",r)},groupTypes.text=function(e,t){var r=buildExpression(e.value.body,t);return new mathMLTree.MathNode("mtext",r)},groupTypes.color=function(e,t){var r=buildExpression(e.value.value,t),a=new mathMLTree.MathNode("mstyle",r);return a.setAttribute("mathcolor",e.value.color),a},groupTypes.supsub=function(e,t){var r=[buildGroup(e.value.base,t)];e.value.sub&&r.push(buildGroup(e.value.sub,t)),e.value.sup&&r.push(buildGroup(e.value.sup,t));var a;return a=e.value.sub?e.value.sup?"msubsup":"msub":"msup",new mathMLTree.MathNode(a,r)},groupTypes.genfrac=function(e,t){var r=new mathMLTree.MathNode("mfrac",[buildGroup(e.value.numer,t),buildGroup(e.value.denom,t)]);if(e.value.hasBarLine||r.setAttribute("linethickness","0px"),null!=e.value.leftDelim||null!=e.value.rightDelim){var a=[];if(null!=e.value.leftDelim){var u=new mathMLTree.MathNode("mo",[new mathMLTree.TextNode(e.value.leftDelim)]);u.setAttribute("fence","true"),a.push(u)}if(a.push(r),null!=e.value.rightDelim){var o=new mathMLTree.MathNode("mo",[new mathMLTree.TextNode(e.value.rightDelim)]);o.setAttribute("fence","true"),a.push(o)}return new mathMLTree.MathNode("mrow",a)}return r},groupTypes.array=function(e,t){return new mathMLTree.MathNode("mtable",e.value.body.map(function(e){return new mathMLTree.MathNode("mtr",e.map(function(e){return new mathMLTree.MathNode("mtd",[buildGroup(e,t)])}))}))},groupTypes.sqrt=function(e,t){return e.value.index?new mathMLTree.MathNode("mroot",[buildGroup(e.value.body,t),buildGroup(e.value.index,t)]):new mathMLTree.MathNode("msqrt",[buildGroup(e.value.body,t)])},groupTypes.leftright=function(e,t){var r=buildExpression(e.value.body,t);if("."!==e.value.left){var a=new mathMLTree.MathNode("mo",[makeText(e.value.left,e.mode)]);a.setAttribute("fence","true"),r.unshift(a)}if("."!==e.value.right){var u=new mathMLTree.MathNode("mo",[makeText(e.value.right,e.mode)]);u.setAttribute("fence","true"),r.push(u)}return new mathMLTree.MathNode("mrow",r)},groupTypes.middle=function(e,t){var r=new mathMLTree.MathNode("mo",[makeText(e.value.middle,e.mode)]);return r.setAttribute("fence","true"),r},groupTypes.accent=function(e,t){var r=new mathMLTree.MathNode("mo",[makeText(e.value.accent,e.mode)]),a=new mathMLTree.MathNode("mover",[buildGroup(e.value.base,t),r]);return a.setAttribute("accent","true"),a},groupTypes.spacing=function(e){var t;return"\\ "===e.value||"\\space"===e.value||" "===e.value||"~"===e.value?t=new mathMLTree.MathNode("mtext",[new mathMLTree.TextNode(" ")]):(t=new mathMLTree.MathNode("mspace"),t.setAttribute("width",buildCommon.spacingFunctions[e.value].size)),t},groupTypes.op=function(e,t){return e.value.symbol?new mathMLTree.MathNode("mo",[makeText(e.value.body,e.mode)]):e.value.value?new mathMLTree.MathNode("mo",buildExpression(e.value.value,t)):new mathMLTree.MathNode("mi",[new mathMLTree.TextNode(e.value.body.slice(1))])},groupTypes.mod=function(e,t){var r=[];if("pod"!==e.value.modType&&"pmod"!==e.value.modType||r.push(new mathMLTree.MathNode("mo",[makeText("(",e.mode)])),"pod"!==e.value.modType&&r.push(new mathMLTree.MathNode("mo",[makeText("mod",e.mode)])),e.value.value){var a=new mathMLTree.MathNode("mspace");a.setAttribute("width","0.333333em"),r.push(a),r=r.concat(buildExpression(e.value.value,t))}return"pod"!==e.value.modType&&"pmod"!==e.value.modType||r.push(new mathMLTree.MathNode("mo",[makeText(")",e.mode)])),new mathMLTree.MathNode("mo",r)},groupTypes.katex=function(e){return new mathMLTree.MathNode("mtext",[new mathMLTree.TextNode("KaTeX")])},groupTypes.font=function(e,t){var r=e.value.font;return buildGroup(e.value.body,t.withFont(r))},groupTypes.delimsizing=function(e){var t=[];"."!==e.value.value&&t.push(makeText(e.value.value,e.mode));var r=new mathMLTree.MathNode("mo",t);return"mopen"===e.value.mclass||"mclose"===e.value.mclass?r.setAttribute("fence","true"):r.setAttribute("fence","false"),r},groupTypes.styling=function(e,t){var r=buildExpression(e.value.value,t),a=new mathMLTree.MathNode("mstyle",r),u={display:["0","true"],text:["0","false"],script:["1","false"],scriptscript:["2","false"]},o=u[e.value.style];return a.setAttribute("scriptlevel",o[0]),a.setAttribute("displaystyle",o[1]),a},groupTypes.sizing=function(e,t){var r=buildExpression(e.value.value,t),a=new mathMLTree.MathNode("mstyle",r);return a.setAttribute("mathsize",buildCommon.sizingMultiplier[e.value.size]+"em"),a},groupTypes.overline=function(e,t){var r=new mathMLTree.MathNode("mo",[new mathMLTree.TextNode("‾")]);r.setAttribute("stretchy","true");var a=new mathMLTree.MathNode("mover",[buildGroup(e.value.body,t),r]);return a.setAttribute("accent","true"),a},groupTypes.underline=function(e,t){var r=new mathMLTree.MathNode("mo",[new mathMLTree.TextNode("‾")]);r.setAttribute("stretchy","true");var a=new mathMLTree.MathNode("munder",[buildGroup(e.value.body,t),r]);return a.setAttribute("accentunder","true"),a},groupTypes.rule=function(e){return new mathMLTree.MathNode("mrow")},groupTypes.kern=function(e){return new mathMLTree.MathNode("mrow")},groupTypes.llap=function(e,t){var r=new mathMLTree.MathNode("mpadded",[buildGroup(e.value.body,t)]);return r.setAttribute("lspace","-1width"),r.setAttribute("width","0px"),r},groupTypes.rlap=function(e,t){var r=new mathMLTree.MathNode("mpadded",[buildGroup(e.value.body,t)]);return r.setAttribute("width","0px"),r},groupTypes.phantom=function(e,t){var r=buildExpression(e.value.value,t);return new mathMLTree.MathNode("mphantom",r)},groupTypes.mclass=function(e,t){var r=buildExpression(e.value.value,t);return new mathMLTree.MathNode("mstyle",r)};var buildExpression=function(e,t){for(var r=[],a=0;a<e.length;a++){var u=e[a];r.push(buildGroup(u,t))}return r},buildGroup=function(e,t){if(!e)return new mathMLTree.MathNode("mrow");if(groupTypes[e.type])return groupTypes[e.type](e,t);throw new ParseError("Got group of unknown type: '"+e.type+"'")},buildMathML=function(e,t,r){var a=buildExpression(e,r),u=new mathMLTree.MathNode("mrow",a),o=new mathMLTree.MathNode("annotation",[new mathMLTree.TextNode(t)]);o.setAttribute("encoding","application/x-tex");var n=new mathMLTree.MathNode("semantics",[u,o]),m=new mathMLTree.MathNode("math",[n]);return makeSpan(["katex-mathml"],[m])};module.exports=buildMathML;
+/**
+ * This file converts a parse tree into a cooresponding MathML tree. The main
+ * entry point is the `buildMathML` function, which takes a parse tree from the
+ * parser.
+ */
+
+var buildCommon = require("./buildCommon");
+var fontMetrics = require("./fontMetrics");
+var mathMLTree = require("./mathMLTree");
+var ParseError = require("./ParseError");
+var symbols = require("./symbols");
+var utils = require("./utils");
+
+var makeSpan = buildCommon.makeSpan;
+var fontMap = buildCommon.fontMap;
+
+/**
+ * Takes a symbol and converts it into a MathML text node after performing
+ * optional replacement from symbols.js.
+ */
+var makeText = function(text, mode) {
+    if (symbols[mode][text] && symbols[mode][text].replace) {
+        text = symbols[mode][text].replace;
+    }
+
+    return new mathMLTree.TextNode(text);
+};
+
+/**
+ * Returns the math variant as a string or null if none is required.
+ */
+var getVariant = function(group, options) {
+    var font = options.font;
+    if (!font) {
+        return null;
+    }
+
+    var mode = group.mode;
+    if (font === "mathit") {
+        return "italic";
+    }
+
+    var value = group.value;
+    if (utils.contains(["\\imath", "\\jmath"], value)) {
+        return null;
+    }
+
+    if (symbols[mode][value] && symbols[mode][value].replace) {
+        value = symbols[mode][value].replace;
+    }
+
+    var fontName = fontMap[font].fontName;
+    if (fontMetrics.getCharacterMetrics(value, fontName)) {
+        return fontMap[options.font].variant;
+    }
+
+    return null;
+};
+
+/**
+ * Functions for handling the different types of groups found in the parse
+ * tree. Each function should take a parse group and return a MathML node.
+ */
+var groupTypes = {};
+
+groupTypes.mathord = function(group, options) {
+    var node = new mathMLTree.MathNode(
+        "mi",
+        [makeText(group.value, group.mode)]);
+
+    var variant = getVariant(group, options);
+    if (variant) {
+        node.setAttribute("mathvariant", variant);
+    }
+    return node;
+};
+
+groupTypes.textord = function(group, options) {
+    var text = makeText(group.value, group.mode);
+
+    var variant = getVariant(group, options) || "normal";
+
+    var node;
+    if (/[0-9]/.test(group.value)) {
+        // TODO(kevinb) merge adjacent <mn> nodes
+        // do it as a post processing step
+        node = new mathMLTree.MathNode("mn", [text]);
+        if (options.font) {
+            node.setAttribute("mathvariant", variant);
+        }
+    } else {
+        node = new mathMLTree.MathNode("mi", [text]);
+        node.setAttribute("mathvariant", variant);
+    }
+
+    return node;
+};
+
+groupTypes.bin = function(group) {
+    var node = new mathMLTree.MathNode(
+        "mo", [makeText(group.value, group.mode)]);
+
+    return node;
+};
+
+groupTypes.rel = function(group) {
+    var node = new mathMLTree.MathNode(
+        "mo", [makeText(group.value, group.mode)]);
+
+    return node;
+};
+
+groupTypes.open = function(group) {
+    var node = new mathMLTree.MathNode(
+        "mo", [makeText(group.value, group.mode)]);
+
+    return node;
+};
+
+groupTypes.close = function(group) {
+    var node = new mathMLTree.MathNode(
+        "mo", [makeText(group.value, group.mode)]);
+
+    return node;
+};
+
+groupTypes.inner = function(group) {
+    var node = new mathMLTree.MathNode(
+        "mo", [makeText(group.value, group.mode)]);
+
+    return node;
+};
+
+groupTypes.punct = function(group) {
+    var node = new mathMLTree.MathNode(
+        "mo", [makeText(group.value, group.mode)]);
+
+    node.setAttribute("separator", "true");
+
+    return node;
+};
+
+groupTypes.ordgroup = function(group, options) {
+    var inner = buildExpression(group.value, options);
+
+    var node = new mathMLTree.MathNode("mrow", inner);
+
+    return node;
+};
+
+groupTypes.text = function(group, options) {
+    var inner = buildExpression(group.value.body, options);
+
+    var node = new mathMLTree.MathNode("mtext", inner);
+
+    return node;
+};
+
+groupTypes.color = function(group, options) {
+    var inner = buildExpression(group.value.value, options);
+
+    var node = new mathMLTree.MathNode("mstyle", inner);
+
+    node.setAttribute("mathcolor", group.value.color);
+
+    return node;
+};
+
+groupTypes.supsub = function(group, options) {
+    var children = [buildGroup(group.value.base, options)];
+
+    if (group.value.sub) {
+        children.push(buildGroup(group.value.sub, options));
+    }
+
+    if (group.value.sup) {
+        children.push(buildGroup(group.value.sup, options));
+    }
+
+    var nodeType;
+    if (!group.value.sub) {
+        nodeType = "msup";
+    } else if (!group.value.sup) {
+        nodeType = "msub";
+    } else {
+        nodeType = "msubsup";
+    }
+
+    var node = new mathMLTree.MathNode(nodeType, children);
+
+    return node;
+};
+
+groupTypes.genfrac = function(group, options) {
+    var node = new mathMLTree.MathNode(
+        "mfrac",
+        [buildGroup(group.value.numer, options),
+            buildGroup(group.value.denom, options)]);
+
+    if (!group.value.hasBarLine) {
+        node.setAttribute("linethickness", "0px");
+    }
+
+    if (group.value.leftDelim != null || group.value.rightDelim != null) {
+        var withDelims = [];
+
+        if (group.value.leftDelim != null) {
+            var leftOp = new mathMLTree.MathNode(
+                "mo", [new mathMLTree.TextNode(group.value.leftDelim)]);
+
+            leftOp.setAttribute("fence", "true");
+
+            withDelims.push(leftOp);
+        }
+
+        withDelims.push(node);
+
+        if (group.value.rightDelim != null) {
+            var rightOp = new mathMLTree.MathNode(
+                "mo", [new mathMLTree.TextNode(group.value.rightDelim)]);
+
+            rightOp.setAttribute("fence", "true");
+
+            withDelims.push(rightOp);
+        }
+
+        var outerNode = new mathMLTree.MathNode("mrow", withDelims);
+
+        return outerNode;
+    }
+
+    return node;
+};
+
+groupTypes.array = function(group, options) {
+    return new mathMLTree.MathNode(
+        "mtable", group.value.body.map(function(row) {
+            return new mathMLTree.MathNode(
+                "mtr", row.map(function(cell) {
+                    return new mathMLTree.MathNode(
+                        "mtd", [buildGroup(cell, options)]);
+                }));
+        }));
+};
+
+groupTypes.sqrt = function(group, options) {
+    var node;
+    if (group.value.index) {
+        node = new mathMLTree.MathNode(
+            "mroot", [
+                buildGroup(group.value.body, options),
+                buildGroup(group.value.index, options)
+            ]);
+    } else {
+        node = new mathMLTree.MathNode(
+            "msqrt", [buildGroup(group.value.body, options)]);
+    }
+
+    return node;
+};
+
+groupTypes.leftright = function(group, options) {
+    var inner = buildExpression(group.value.body, options);
+
+    if (group.value.left !== ".") {
+        var leftNode = new mathMLTree.MathNode(
+            "mo", [makeText(group.value.left, group.mode)]);
+
+        leftNode.setAttribute("fence", "true");
+
+        inner.unshift(leftNode);
+    }
+
+    if (group.value.right !== ".") {
+        var rightNode = new mathMLTree.MathNode(
+            "mo", [makeText(group.value.right, group.mode)]);
+
+        rightNode.setAttribute("fence", "true");
+
+        inner.push(rightNode);
+    }
+
+    var outerNode = new mathMLTree.MathNode("mrow", inner);
+
+    return outerNode;
+};
+
+groupTypes.middle = function(group, options) {
+    var middleNode = new mathMLTree.MathNode(
+        "mo", [makeText(group.value.middle, group.mode)]);
+    middleNode.setAttribute("fence", "true");
+    return middleNode;
+};
+
+groupTypes.accent = function(group, options) {
+    var accentNode = new mathMLTree.MathNode(
+        "mo", [makeText(group.value.accent, group.mode)]);
+
+    var node = new mathMLTree.MathNode(
+        "mover",
+        [buildGroup(group.value.base, options),
+            accentNode]);
+
+    node.setAttribute("accent", "true");
+
+    return node;
+};
+
+groupTypes.spacing = function(group) {
+    var node;
+
+    if (group.value === "\\ " || group.value === "\\space" ||
+        group.value === " " || group.value === "~") {
+        node = new mathMLTree.MathNode(
+            "mtext", [new mathMLTree.TextNode("\u00a0")]);
+    } else {
+        node = new mathMLTree.MathNode("mspace");
+
+        node.setAttribute(
+            "width", buildCommon.spacingFunctions[group.value].size);
+    }
+
+    return node;
+};
+
+groupTypes.op = function(group, options) {
+    var node;
+
+    // TODO(emily): handle big operators using the `largeop` attribute
+
+    if (group.value.symbol) {
+        // This is a symbol. Just add the symbol.
+        node = new mathMLTree.MathNode(
+            "mo", [makeText(group.value.body, group.mode)]);
+    } else if (group.value.value) {
+        // This is an operator with children. Add them.
+        node = new mathMLTree.MathNode(
+            "mo", buildExpression(group.value.value, options));
+    } else {
+        // This is a text operator. Add all of the characters from the
+        // operator's name.
+        // TODO(emily): Add a space in the middle of some of these
+        // operators, like \limsup.
+        node = new mathMLTree.MathNode(
+            "mi", [new mathMLTree.TextNode(group.value.body.slice(1))]);
+    }
+
+    return node;
+};
+
+groupTypes.mod = function(group, options) {
+    var inner = [];
+
+    if (group.value.modType === "pod" || group.value.modType === "pmod") {
+        inner.push(new mathMLTree.MathNode(
+            "mo", [makeText("(", group.mode)]));
+    }
+    if (group.value.modType !== "pod") {
+        inner.push(new mathMLTree.MathNode(
+            "mo", [makeText("mod", group.mode)]));
+    }
+    if (group.value.value) {
+        var space = new mathMLTree.MathNode("mspace");
+        space.setAttribute("width", "0.333333em");
+        inner.push(space);
+        inner = inner.concat(buildExpression(group.value.value, options));
+    }
+    if (group.value.modType === "pod" || group.value.modType === "pmod") {
+        inner.push(new mathMLTree.MathNode(
+            "mo", [makeText(")", group.mode)]));
+    }
+
+    return new mathMLTree.MathNode("mo", inner);
+};
+
+groupTypes.katex = function(group) {
+    var node = new mathMLTree.MathNode(
+        "mtext", [new mathMLTree.TextNode("KaTeX")]);
+
+    return node;
+};
+
+groupTypes.font = function(group, options) {
+    var font = group.value.font;
+    return buildGroup(group.value.body, options.withFont(font));
+};
+
+groupTypes.delimsizing = function(group) {
+    var children = [];
+
+    if (group.value.value !== ".") {
+        children.push(makeText(group.value.value, group.mode));
+    }
+
+    var node = new mathMLTree.MathNode("mo", children);
+
+    if (group.value.mclass === "mopen" ||
+        group.value.mclass === "mclose") {
+        // Only some of the delimsizing functions act as fences, and they
+        // return "mopen" or "mclose" mclass.
+        node.setAttribute("fence", "true");
+    } else {
+        // Explicitly disable fencing if it's not a fence, to override the
+        // defaults.
+        node.setAttribute("fence", "false");
+    }
+
+    return node;
+};
+
+groupTypes.styling = function(group, options) {
+    var inner = buildExpression(group.value.value, options);
+
+    var node = new mathMLTree.MathNode("mstyle", inner);
+
+    var styleAttributes = {
+        "display": ["0", "true"],
+        "text": ["0", "false"],
+        "script": ["1", "false"],
+        "scriptscript": ["2", "false"]
+    };
+
+    var attr = styleAttributes[group.value.style];
+
+    node.setAttribute("scriptlevel", attr[0]);
+    node.setAttribute("displaystyle", attr[1]);
+
+    return node;
+};
+
+groupTypes.sizing = function(group, options) {
+    var inner = buildExpression(group.value.value, options);
+
+    var node = new mathMLTree.MathNode("mstyle", inner);
+
+    // TODO(emily): This doesn't produce the correct size for nested size
+    // changes, because we don't keep state of what style we're currently
+    // in, so we can't reset the size to normal before changing it.  Now
+    // that we're passing an options parameter we should be able to fix
+    // this.
+    node.setAttribute(
+        "mathsize", buildCommon.sizingMultiplier[group.value.size] + "em");
+
+    return node;
+};
+
+groupTypes.overline = function(group, options) {
+    var operator = new mathMLTree.MathNode(
+        "mo", [new mathMLTree.TextNode("\u203e")]);
+    operator.setAttribute("stretchy", "true");
+
+    var node = new mathMLTree.MathNode(
+        "mover",
+        [buildGroup(group.value.body, options),
+            operator]);
+    node.setAttribute("accent", "true");
+
+    return node;
+};
+
+groupTypes.underline = function(group, options) {
+    var operator = new mathMLTree.MathNode(
+        "mo", [new mathMLTree.TextNode("\u203e")]);
+    operator.setAttribute("stretchy", "true");
+
+    var node = new mathMLTree.MathNode(
+        "munder",
+        [buildGroup(group.value.body, options),
+            operator]);
+    node.setAttribute("accentunder", "true");
+
+    return node;
+};
+
+groupTypes.rule = function(group) {
+    // TODO(emily): Figure out if there's an actual way to draw black boxes
+    // in MathML.
+    var node = new mathMLTree.MathNode("mrow");
+
+    return node;
+};
+
+groupTypes.kern = function(group) {
+    // TODO(kevin): Figure out if there's a way to add space in MathML
+    var node = new mathMLTree.MathNode("mrow");
+
+    return node;
+};
+
+groupTypes.llap = function(group, options) {
+    var node = new mathMLTree.MathNode(
+        "mpadded", [buildGroup(group.value.body, options)]);
+
+    node.setAttribute("lspace", "-1width");
+    node.setAttribute("width", "0px");
+
+    return node;
+};
+
+groupTypes.rlap = function(group, options) {
+    var node = new mathMLTree.MathNode(
+        "mpadded", [buildGroup(group.value.body, options)]);
+
+    node.setAttribute("width", "0px");
+
+    return node;
+};
+
+groupTypes.phantom = function(group, options) {
+    var inner = buildExpression(group.value.value, options);
+    return new mathMLTree.MathNode("mphantom", inner);
+};
+
+groupTypes.mclass = function(group, options) {
+    var inner = buildExpression(group.value.value, options);
+    return new mathMLTree.MathNode("mstyle", inner);
+};
+
+/**
+ * Takes a list of nodes, builds them, and returns a list of the generated
+ * MathML nodes. A little simpler than the HTML version because we don't do any
+ * previous-node handling.
+ */
+var buildExpression = function(expression, options) {
+    var groups = [];
+    for (var i = 0; i < expression.length; i++) {
+        var group = expression[i];
+        groups.push(buildGroup(group, options));
+    }
+    return groups;
+};
+
+/**
+ * Takes a group from the parser and calls the appropriate groupTypes function
+ * on it to produce a MathML node.
+ */
+var buildGroup = function(group, options) {
+    if (!group) {
+        return new mathMLTree.MathNode("mrow");
+    }
+
+    if (groupTypes[group.type]) {
+        // Call the groupTypes function
+        return groupTypes[group.type](group, options);
+    } else {
+        throw new ParseError(
+            "Got group of unknown type: '" + group.type + "'");
+    }
+};
+
+/**
+ * Takes a full parse tree and settings and builds a MathML representation of
+ * it. In particular, we put the elements from building the parse tree into a
+ * <semantics> tag so we can also include that TeX source as an annotation.
+ *
+ * Note that we actually return a domTree element with a `<math>` inside it so
+ * we can do appropriate styling.
+ */
+var buildMathML = function(tree, texExpression, options) {
+    var expression = buildExpression(tree, options);
+
+    // Wrap up the expression in an mrow so it is presented in the semantics
+    // tag correctly.
+    var wrapper = new mathMLTree.MathNode("mrow", expression);
+
+    // Build a TeX annotation of the source
+    var annotation = new mathMLTree.MathNode(
+        "annotation", [new mathMLTree.TextNode(texExpression)]);
+
+    annotation.setAttribute("encoding", "application/x-tex");
+
+    var semantics = new mathMLTree.MathNode(
+        "semantics", [wrapper, annotation]);
+
+    var math = new mathMLTree.MathNode("math", [semantics]);
+
+    // You can't style <math> nodes, so we wrap the node in a span.
+    return makeSpan(["katex-mathml"], [math]);
+};
+
+module.exports = buildMathML;
 
 },{"./ParseError":4,"./buildCommon":8,"./fontMetrics":15,"./mathMLTree":18,"./symbols":21,"./utils":23}],11:[function(require,module,exports){
-var buildHTML=require("./buildHTML"),buildMathML=require("./buildMathML"),buildCommon=require("./buildCommon"),Options=require("./Options"),Settings=require("./Settings"),Style=require("./Style"),makeSpan=buildCommon.makeSpan,buildTree=function(e,i,t){t=t||new Settings({});var l=Style.TEXT;t.displayMode&&(l=Style.DISPLAY);var r=new Options({style:l,size:"size5"}),u=buildMathML(e,i,r),a=buildHTML(e,r),n=makeSpan(["katex"],[u,a]);return t.displayMode?makeSpan(["katex-display"],[n]):n};module.exports=buildTree;
+var buildHTML = require("./buildHTML");
+var buildMathML = require("./buildMathML");
+var buildCommon = require("./buildCommon");
+var Options = require("./Options");
+var Settings = require("./Settings");
+var Style = require("./Style");
+
+var makeSpan = buildCommon.makeSpan;
+
+var buildTree = function(tree, expression, settings) {
+    settings = settings || new Settings({});
+
+    var startStyle = Style.TEXT;
+    if (settings.displayMode) {
+        startStyle = Style.DISPLAY;
+    }
+
+    // Setup the default options
+    var options = new Options({
+        style: startStyle,
+        size: "size5"
+    });
+
+    // `buildHTML` sometimes messes with the parse tree (like turning bins ->
+    // ords), so we build the MathML version first.
+    var mathMLNode = buildMathML(tree, expression, options);
+    var htmlNode = buildHTML(tree, options);
+
+    var katexNode = makeSpan(["katex"], [
+        mathMLNode, htmlNode
+    ]);
+
+    if (settings.displayMode) {
+        return makeSpan(["katex-display"], [katexNode]);
+    } else {
+        return katexNode;
+    }
+};
+
+module.exports = buildTree;
 
 },{"./Options":3,"./Settings":6,"./Style":7,"./buildCommon":8,"./buildHTML":9,"./buildMathML":10}],12:[function(require,module,exports){
-var ParseError=require("./ParseError"),Style=require("./Style"),buildCommon=require("./buildCommon"),fontMetrics=require("./fontMetrics"),symbols=require("./symbols"),utils=require("./utils"),makeSpan=buildCommon.makeSpan,getMetrics=function(e,r){return symbols.math[e]&&symbols.math[e].replace?fontMetrics.getCharacterMetrics(symbols.math[e].replace,r):fontMetrics.getCharacterMetrics(e,r)},mathrmSize=function(e,r,t,l){return buildCommon.makeSymbol(e,"Size"+r+"-Regular",t,l)},styleWrap=function(e,r,t,l){l=l||[];var i=makeSpan(l.concat(["style-wrap",t.style.reset(),r.cls()]),[e],t),a=r.sizeMultiplier/t.style.sizeMultiplier;return i.height*=a,i.depth*=a,i.maxFontSize=r.sizeMultiplier,i},makeSmallDelim=function(e,r,t,l,i,a){var s=buildCommon.makeSymbol(e,"Main-Regular",i,l),m=styleWrap(s,r,l,a);if(t){var n=(1-l.style.sizeMultiplier/r.sizeMultiplier)*l.style.metrics.axisHeight;m.style.top=n+"em",m.height-=n,m.depth+=n}return m},makeLargeDelim=function(e,r,t,l,i,a){var s=mathrmSize(e,r,i,l),m=styleWrap(makeSpan(["delimsizing","size"+r],[s],l),Style.TEXT,l,a);if(t){var n=(1-l.style.sizeMultiplier)*l.style.metrics.axisHeight;m.style.top=n+"em",m.height-=n,m.depth+=n}return m},makeInner=function(e,r,t){var l;return"Size1-Regular"===r?l="delim-size1":"Size4-Regular"===r&&(l="delim-size4"),{type:"elem",elem:makeSpan(["delimsizinginner",l],[makeSpan([],[buildCommon.makeSymbol(e,r,t)])])}},makeStackedDelim=function(e,r,t,l,i,a){var s,m,n,u;s=n=u=e,m=null;var o="Size1-Regular";"\\uparrow"===e?n=u="⏐":"\\Uparrow"===e?n=u="‖":"\\downarrow"===e?s=n="⏐":"\\Downarrow"===e?s=n="‖":"\\updownarrow"===e?(s="\\uparrow",n="⏐",u="\\downarrow"):"\\Updownarrow"===e?(s="\\Uparrow",n="‖",u="\\Downarrow"):"["===e||"\\lbrack"===e?(s="⎡",n="⎢",u="⎣",o="Size4-Regular"):"]"===e||"\\rbrack"===e?(s="⎤",n="⎥",u="⎦",o="Size4-Regular"):"\\lfloor"===e?(n=s="⎢",u="⎣",o="Size4-Regular"):"\\lceil"===e?(s="⎡",n=u="⎢",o="Size4-Regular"):"\\rfloor"===e?(n=s="⎥",u="⎦",o="Size4-Regular"):"\\rceil"===e?(s="⎤",n=u="⎥",o="Size4-Regular"):"("===e?(s="⎛",n="⎜",u="⎝",o="Size4-Regular"):")"===e?(s="⎞",n="⎟",u="⎠",o="Size4-Regular"):"\\{"===e||"\\lbrace"===e?(s="⎧",m="⎨",u="⎩",n="⎪",o="Size4-Regular"):"\\}"===e||"\\rbrace"===e?(s="⎫",m="⎬",u="⎭",n="⎪",o="Size4-Regular"):"\\lgroup"===e?(s="⎧",u="⎩",n="⎪",o="Size4-Regular"):"\\rgroup"===e?(s="⎫",u="⎭",n="⎪",o="Size4-Regular"):"\\lmoustache"===e?(s="⎧",u="⎭",n="⎪",o="Size4-Regular"):"\\rmoustache"===e?(s="⎫",u="⎩",n="⎪",o="Size4-Regular"):"\\surd"===e&&(s="",u="⎷",n="",o="Size4-Regular");var c=getMetrics(s,o),g=c.height+c.depth,p=getMetrics(n,o),y=p.height+p.depth,S=getMetrics(u,o),k=S.height+S.depth,z=0,h=1;if(null!==m){var d=getMetrics(m,o);z=d.height+d.depth,h=2}var f=g+k+z,D=Math.ceil((r-f)/(h*y)),R=f+D*h*y,w=l.style.metrics.axisHeight;t&&(w*=l.style.sizeMultiplier);var v=R/2-w,M=[];M.push(makeInner(u,o,i));var b;if(null===m)for(b=0;b<D;b++)M.push(makeInner(n,o,i));else{for(b=0;b<D;b++)M.push(makeInner(n,o,i));for(M.push(makeInner(m,o,i)),b=0;b<D;b++)M.push(makeInner(n,o,i))}M.push(makeInner(s,o,i));var T=buildCommon.makeVList(M,"bottom",v,l);return styleWrap(makeSpan(["delimsizing","mult"],[T],l),Style.TEXT,l,a)},stackLargeDelimiters=["(",")","[","\\lbrack","]","\\rbrack","\\{","\\lbrace","\\}","\\rbrace","\\lfloor","\\rfloor","\\lceil","\\rceil","\\surd"],stackAlwaysDelimiters=["\\uparrow","\\downarrow","\\updownarrow","\\Uparrow","\\Downarrow","\\Updownarrow","|","\\|","\\vert","\\Vert","\\lvert","\\rvert","\\lVert","\\rVert","\\lgroup","\\rgroup","\\lmoustache","\\rmoustache"],stackNeverDelimiters=["<",">","\\langle","\\rangle","/","\\backslash","\\lt","\\gt"],sizeToMaxHeight=[0,1.2,1.8,2.4,3],makeSizedDelim=function(e,r,t,l,i){if("<"===e||"\\lt"===e?e="\\langle":">"!==e&&"\\gt"!==e||(e="\\rangle"),utils.contains(stackLargeDelimiters,e)||utils.contains(stackNeverDelimiters,e))return makeLargeDelim(e,r,!1,t,l,i);if(utils.contains(stackAlwaysDelimiters,e))return makeStackedDelim(e,sizeToMaxHeight[r],!1,t,l,i);throw new ParseError("Illegal delimiter: '"+e+"'")},stackNeverDelimiterSequence=[{type:"small",style:Style.SCRIPTSCRIPT},{type:"small",style:Style.SCRIPT},{type:"small",style:Style.TEXT},{type:"large",size:1},{type:"large",size:2},{type:"large",size:3},{type:"large",size:4}],stackAlwaysDelimiterSequence=[{type:"small",style:Style.SCRIPTSCRIPT},{type:"small",style:Style.SCRIPT},{type:"small",style:Style.TEXT},{type:"stack"}],stackLargeDelimiterSequence=[{type:"small",style:Style.SCRIPTSCRIPT},{type:"small",style:Style.SCRIPT},{type:"small",style:Style.TEXT},{type:"large",size:1},{type:"large",size:2},{type:"large",size:3},{type:"large",size:4},{type:"stack"}],delimTypeToFont=function(e){return"small"===e.type?"Main-Regular":"large"===e.type?"Size"+e.size+"-Regular":"stack"===e.type?"Size4-Regular":void 0},traverseSequence=function(e,r,t,l){for(var i=Math.min(2,3-l.style.size),a=i;a<t.length&&"stack"!==t[a].type;a++){var s=getMetrics(e,delimTypeToFont(t[a])),m=s.height+s.depth;if("small"===t[a].type&&(m*=t[a].style.sizeMultiplier),m>r)return t[a]}return t[t.length-1]},makeCustomSizedDelim=function(e,r,t,l,i,a){"<"===e||"\\lt"===e?e="\\langle":">"!==e&&"\\gt"!==e||(e="\\rangle");var s;s=utils.contains(stackNeverDelimiters,e)?stackNeverDelimiterSequence:utils.contains(stackLargeDelimiters,e)?stackLargeDelimiterSequence:stackAlwaysDelimiterSequence;var m=traverseSequence(e,r,s,l);return"small"===m.type?makeSmallDelim(e,m.style,t,l,i,a):"large"===m.type?makeLargeDelim(e,m.size,t,l,i,a):"stack"===m.type?makeStackedDelim(e,r,t,l,i,a):void 0},makeLeftRightDelim=function(e,r,t,l,i,a){var s=l.style.metrics.axisHeight*l.style.sizeMultiplier,m=5/fontMetrics.metrics.ptPerEm,n=Math.max(r-s,t+s),u=Math.max(n/500*901,2*n-m);return makeCustomSizedDelim(e,u,!0,l,i,a)};module.exports={sizedDelim:makeSizedDelim,customSizedDelim:makeCustomSizedDelim,leftRightDelim:makeLeftRightDelim};
+/**
+ * This file deals with creating delimiters of various sizes. The TeXbook
+ * discusses these routines on page 441-442, in the "Another subroutine sets box
+ * x to a specified variable delimiter" paragraph.
+ *
+ * There are three main routines here. `makeSmallDelim` makes a delimiter in the
+ * normal font, but in either text, script, or scriptscript style.
+ * `makeLargeDelim` makes a delimiter in textstyle, but in one of the Size1,
+ * Size2, Size3, or Size4 fonts. `makeStackedDelim` makes a delimiter out of
+ * smaller pieces that are stacked on top of one another.
+ *
+ * The functions take a parameter `center`, which determines if the delimiter
+ * should be centered around the axis.
+ *
+ * Then, there are three exposed functions. `sizedDelim` makes a delimiter in
+ * one of the given sizes. This is used for things like `\bigl`.
+ * `customSizedDelim` makes a delimiter with a given total height+depth. It is
+ * called in places like `\sqrt`. `leftRightDelim` makes an appropriate
+ * delimiter which surrounds an expression of a given height an depth. It is
+ * used in `\left` and `\right`.
+ */
+
+var ParseError = require("./ParseError");
+var Style = require("./Style");
+
+var buildCommon = require("./buildCommon");
+var fontMetrics = require("./fontMetrics");
+var symbols = require("./symbols");
+var utils = require("./utils");
+
+var makeSpan = buildCommon.makeSpan;
+
+/**
+ * Get the metrics for a given symbol and font, after transformation (i.e.
+ * after following replacement from symbols.js)
+ */
+var getMetrics = function(symbol, font) {
+    if (symbols.math[symbol] && symbols.math[symbol].replace) {
+        return fontMetrics.getCharacterMetrics(
+            symbols.math[symbol].replace, font);
+    } else {
+        return fontMetrics.getCharacterMetrics(
+            symbol, font);
+    }
+};
+
+/**
+ * Builds a symbol in the given font size (note size is an integer)
+ */
+var mathrmSize = function(value, size, mode, options) {
+    return buildCommon.makeSymbol(value, "Size" + size + "-Regular",
+        mode, options);
+};
+
+/**
+ * Puts a delimiter span in a given style, and adds appropriate height, depth,
+ * and maxFontSizes.
+ */
+var styleWrap = function(delim, toStyle, options, classes) {
+    classes = classes || [];
+    var span = makeSpan(
+        classes.concat(["style-wrap", options.style.reset(), toStyle.cls()]),
+        [delim], options);
+
+    var multiplier = toStyle.sizeMultiplier / options.style.sizeMultiplier;
+
+    span.height *= multiplier;
+    span.depth *= multiplier;
+    span.maxFontSize = toStyle.sizeMultiplier;
+
+    return span;
+};
+
+/**
+ * Makes a small delimiter. This is a delimiter that comes in the Main-Regular
+ * font, but is restyled to either be in textstyle, scriptstyle, or
+ * scriptscriptstyle.
+ */
+var makeSmallDelim = function(delim, style, center, options, mode, classes) {
+    var text = buildCommon.makeSymbol(delim, "Main-Regular", mode, options);
+
+    var span = styleWrap(text, style, options, classes);
+
+    if (center) {
+        var shift =
+            (1 - options.style.sizeMultiplier / style.sizeMultiplier) *
+            options.style.metrics.axisHeight;
+
+        span.style.top = shift + "em";
+        span.height -= shift;
+        span.depth += shift;
+    }
+
+    return span;
+};
+
+/**
+ * Makes a large delimiter. This is a delimiter that comes in the Size1, Size2,
+ * Size3, or Size4 fonts. It is always rendered in textstyle.
+ */
+var makeLargeDelim = function(delim, size, center, options, mode, classes) {
+    var inner = mathrmSize(delim, size, mode, options);
+
+    var span = styleWrap(
+        makeSpan(["delimsizing", "size" + size], [inner], options),
+        Style.TEXT, options, classes);
+
+    if (center) {
+        var shift = (1 - options.style.sizeMultiplier) *
+            options.style.metrics.axisHeight;
+
+        span.style.top = shift + "em";
+        span.height -= shift;
+        span.depth += shift;
+    }
+
+    return span;
+};
+
+/**
+ * Make an inner span with the given offset and in the given font. This is used
+ * in `makeStackedDelim` to make the stacking pieces for the delimiter.
+ */
+var makeInner = function(symbol, font, mode) {
+    var sizeClass;
+    // Apply the correct CSS class to choose the right font.
+    if (font === "Size1-Regular") {
+        sizeClass = "delim-size1";
+    } else if (font === "Size4-Regular") {
+        sizeClass = "delim-size4";
+    }
+
+    var inner = makeSpan(
+        ["delimsizinginner", sizeClass],
+        [makeSpan([], [buildCommon.makeSymbol(symbol, font, mode)])]);
+
+    // Since this will be passed into `makeVList` in the end, wrap the element
+    // in the appropriate tag that VList uses.
+    return {type: "elem", elem: inner};
+};
+
+/**
+ * Make a stacked delimiter out of a given delimiter, with the total height at
+ * least `heightTotal`. This routine is mentioned on page 442 of the TeXbook.
+ */
+var makeStackedDelim = function(delim, heightTotal, center, options, mode,
+                                classes) {
+    // There are four parts, the top, an optional middle, a repeated part, and a
+    // bottom.
+    var top;
+    var middle;
+    var repeat;
+    var bottom;
+    top = repeat = bottom = delim;
+    middle = null;
+    // Also keep track of what font the delimiters are in
+    var font = "Size1-Regular";
+
+    // We set the parts and font based on the symbol. Note that we use
+    // '\u23d0' instead of '|' and '\u2016' instead of '\\|' for the
+    // repeats of the arrows
+    if (delim === "\\uparrow") {
+        repeat = bottom = "\u23d0";
+    } else if (delim === "\\Uparrow") {
+        repeat = bottom = "\u2016";
+    } else if (delim === "\\downarrow") {
+        top = repeat = "\u23d0";
+    } else if (delim === "\\Downarrow") {
+        top = repeat = "\u2016";
+    } else if (delim === "\\updownarrow") {
+        top = "\\uparrow";
+        repeat = "\u23d0";
+        bottom = "\\downarrow";
+    } else if (delim === "\\Updownarrow") {
+        top = "\\Uparrow";
+        repeat = "\u2016";
+        bottom = "\\Downarrow";
+    } else if (delim === "[" || delim === "\\lbrack") {
+        top = "\u23a1";
+        repeat = "\u23a2";
+        bottom = "\u23a3";
+        font = "Size4-Regular";
+    } else if (delim === "]" || delim === "\\rbrack") {
+        top = "\u23a4";
+        repeat = "\u23a5";
+        bottom = "\u23a6";
+        font = "Size4-Regular";
+    } else if (delim === "\\lfloor") {
+        repeat = top = "\u23a2";
+        bottom = "\u23a3";
+        font = "Size4-Regular";
+    } else if (delim === "\\lceil") {
+        top = "\u23a1";
+        repeat = bottom = "\u23a2";
+        font = "Size4-Regular";
+    } else if (delim === "\\rfloor") {
+        repeat = top = "\u23a5";
+        bottom = "\u23a6";
+        font = "Size4-Regular";
+    } else if (delim === "\\rceil") {
+        top = "\u23a4";
+        repeat = bottom = "\u23a5";
+        font = "Size4-Regular";
+    } else if (delim === "(") {
+        top = "\u239b";
+        repeat = "\u239c";
+        bottom = "\u239d";
+        font = "Size4-Regular";
+    } else if (delim === ")") {
+        top = "\u239e";
+        repeat = "\u239f";
+        bottom = "\u23a0";
+        font = "Size4-Regular";
+    } else if (delim === "\\{" || delim === "\\lbrace") {
+        top = "\u23a7";
+        middle = "\u23a8";
+        bottom = "\u23a9";
+        repeat = "\u23aa";
+        font = "Size4-Regular";
+    } else if (delim === "\\}" || delim === "\\rbrace") {
+        top = "\u23ab";
+        middle = "\u23ac";
+        bottom = "\u23ad";
+        repeat = "\u23aa";
+        font = "Size4-Regular";
+    } else if (delim === "\\lgroup") {
+        top = "\u23a7";
+        bottom = "\u23a9";
+        repeat = "\u23aa";
+        font = "Size4-Regular";
+    } else if (delim === "\\rgroup") {
+        top = "\u23ab";
+        bottom = "\u23ad";
+        repeat = "\u23aa";
+        font = "Size4-Regular";
+    } else if (delim === "\\lmoustache") {
+        top = "\u23a7";
+        bottom = "\u23ad";
+        repeat = "\u23aa";
+        font = "Size4-Regular";
+    } else if (delim === "\\rmoustache") {
+        top = "\u23ab";
+        bottom = "\u23a9";
+        repeat = "\u23aa";
+        font = "Size4-Regular";
+    } else if (delim === "\\surd") {
+        top = "\ue001";
+        bottom = "\u23b7";
+        repeat = "\ue000";
+        font = "Size4-Regular";
+    }
+
+    // Get the metrics of the four sections
+    var topMetrics = getMetrics(top, font);
+    var topHeightTotal = topMetrics.height + topMetrics.depth;
+    var repeatMetrics = getMetrics(repeat, font);
+    var repeatHeightTotal = repeatMetrics.height + repeatMetrics.depth;
+    var bottomMetrics = getMetrics(bottom, font);
+    var bottomHeightTotal = bottomMetrics.height + bottomMetrics.depth;
+    var middleHeightTotal = 0;
+    var middleFactor = 1;
+    if (middle !== null) {
+        var middleMetrics = getMetrics(middle, font);
+        middleHeightTotal = middleMetrics.height + middleMetrics.depth;
+        middleFactor = 2; // repeat symmetrically above and below middle
+    }
+
+    // Calcuate the minimal height that the delimiter can have.
+    // It is at least the size of the top, bottom, and optional middle combined.
+    var minHeight = topHeightTotal + bottomHeightTotal + middleHeightTotal;
+
+    // Compute the number of copies of the repeat symbol we will need
+    var repeatCount = Math.ceil(
+        (heightTotal - minHeight) / (middleFactor * repeatHeightTotal));
+
+    // Compute the total height of the delimiter including all the symbols
+    var realHeightTotal =
+        minHeight + repeatCount * middleFactor * repeatHeightTotal;
+
+    // The center of the delimiter is placed at the center of the axis. Note
+    // that in this context, "center" means that the delimiter should be
+    // centered around the axis in the current style, while normally it is
+    // centered around the axis in textstyle.
+    var axisHeight = options.style.metrics.axisHeight;
+    if (center) {
+        axisHeight *= options.style.sizeMultiplier;
+    }
+    // Calculate the depth
+    var depth = realHeightTotal / 2 - axisHeight;
+
+    // Now, we start building the pieces that will go into the vlist
+
+    // Keep a list of the inner pieces
+    var inners = [];
+
+    // Add the bottom symbol
+    inners.push(makeInner(bottom, font, mode));
+
+    var i;
+    if (middle === null) {
+        // Add that many symbols
+        for (i = 0; i < repeatCount; i++) {
+            inners.push(makeInner(repeat, font, mode));
+        }
+    } else {
+        // When there is a middle bit, we need the middle part and two repeated
+        // sections
+        for (i = 0; i < repeatCount; i++) {
+            inners.push(makeInner(repeat, font, mode));
+        }
+        inners.push(makeInner(middle, font, mode));
+        for (i = 0; i < repeatCount; i++) {
+            inners.push(makeInner(repeat, font, mode));
+        }
+    }
+
+    // Add the top symbol
+    inners.push(makeInner(top, font, mode));
+
+    // Finally, build the vlist
+    var inner = buildCommon.makeVList(inners, "bottom", depth, options);
+
+    return styleWrap(
+        makeSpan(["delimsizing", "mult"], [inner], options),
+        Style.TEXT, options, classes);
+};
+
+// There are three kinds of delimiters, delimiters that stack when they become
+// too large
+var stackLargeDelimiters = [
+    "(", ")", "[", "\\lbrack", "]", "\\rbrack",
+    "\\{", "\\lbrace", "\\}", "\\rbrace",
+    "\\lfloor", "\\rfloor", "\\lceil", "\\rceil",
+    "\\surd"
+];
+
+// delimiters that always stack
+var stackAlwaysDelimiters = [
+    "\\uparrow", "\\downarrow", "\\updownarrow",
+    "\\Uparrow", "\\Downarrow", "\\Updownarrow",
+    "|", "\\|", "\\vert", "\\Vert",
+    "\\lvert", "\\rvert", "\\lVert", "\\rVert",
+    "\\lgroup", "\\rgroup", "\\lmoustache", "\\rmoustache"
+];
+
+// and delimiters that never stack
+var stackNeverDelimiters = [
+    "<", ">", "\\langle", "\\rangle", "/", "\\backslash", "\\lt", "\\gt"
+];
+
+// Metrics of the different sizes. Found by looking at TeX's output of
+// $\bigl| // \Bigl| \biggl| \Biggl| \showlists$
+// Used to create stacked delimiters of appropriate sizes in makeSizedDelim.
+var sizeToMaxHeight = [0, 1.2, 1.8, 2.4, 3.0];
+
+/**
+ * Used to create a delimiter of a specific size, where `size` is 1, 2, 3, or 4.
+ */
+var makeSizedDelim = function(delim, size, options, mode, classes) {
+    // < and > turn into \langle and \rangle in delimiters
+    if (delim === "<" || delim === "\\lt") {
+        delim = "\\langle";
+    } else if (delim === ">" || delim === "\\gt") {
+        delim = "\\rangle";
+    }
+
+    // Sized delimiters are never centered.
+    if (utils.contains(stackLargeDelimiters, delim) ||
+        utils.contains(stackNeverDelimiters, delim)) {
+        return makeLargeDelim(delim, size, false, options, mode, classes);
+    } else if (utils.contains(stackAlwaysDelimiters, delim)) {
+        return makeStackedDelim(
+            delim, sizeToMaxHeight[size], false, options, mode, classes);
+    } else {
+        throw new ParseError("Illegal delimiter: '" + delim + "'");
+    }
+};
+
+/**
+ * There are three different sequences of delimiter sizes that the delimiters
+ * follow depending on the kind of delimiter. This is used when creating custom
+ * sized delimiters to decide whether to create a small, large, or stacked
+ * delimiter.
+ *
+ * In real TeX, these sequences aren't explicitly defined, but are instead
+ * defined inside the font metrics. Since there are only three sequences that
+ * are possible for the delimiters that TeX defines, it is easier to just encode
+ * them explicitly here.
+ */
+
+// Delimiters that never stack try small delimiters and large delimiters only
+var stackNeverDelimiterSequence = [
+    {type: "small", style: Style.SCRIPTSCRIPT},
+    {type: "small", style: Style.SCRIPT},
+    {type: "small", style: Style.TEXT},
+    {type: "large", size: 1},
+    {type: "large", size: 2},
+    {type: "large", size: 3},
+    {type: "large", size: 4}
+];
+
+// Delimiters that always stack try the small delimiters first, then stack
+var stackAlwaysDelimiterSequence = [
+    {type: "small", style: Style.SCRIPTSCRIPT},
+    {type: "small", style: Style.SCRIPT},
+    {type: "small", style: Style.TEXT},
+    {type: "stack"}
+];
+
+// Delimiters that stack when large try the small and then large delimiters, and
+// stack afterwards
+var stackLargeDelimiterSequence = [
+    {type: "small", style: Style.SCRIPTSCRIPT},
+    {type: "small", style: Style.SCRIPT},
+    {type: "small", style: Style.TEXT},
+    {type: "large", size: 1},
+    {type: "large", size: 2},
+    {type: "large", size: 3},
+    {type: "large", size: 4},
+    {type: "stack"}
+];
+
+/**
+ * Get the font used in a delimiter based on what kind of delimiter it is.
+ */
+var delimTypeToFont = function(type) {
+    if (type.type === "small") {
+        return "Main-Regular";
+    } else if (type.type === "large") {
+        return "Size" + type.size + "-Regular";
+    } else if (type.type === "stack") {
+        return "Size4-Regular";
+    }
+};
+
+/**
+ * Traverse a sequence of types of delimiters to decide what kind of delimiter
+ * should be used to create a delimiter of the given height+depth.
+ */
+var traverseSequence = function(delim, height, sequence, options) {
+    // Here, we choose the index we should start at in the sequences. In smaller
+    // sizes (which correspond to larger numbers in style.size) we start earlier
+    // in the sequence. Thus, scriptscript starts at index 3-3=0, script starts
+    // at index 3-2=1, text starts at 3-1=2, and display starts at min(2,3-0)=2
+    var start = Math.min(2, 3 - options.style.size);
+    for (var i = start; i < sequence.length; i++) {
+        if (sequence[i].type === "stack") {
+            // This is always the last delimiter, so we just break the loop now.
+            break;
+        }
+
+        var metrics = getMetrics(delim, delimTypeToFont(sequence[i]));
+        var heightDepth = metrics.height + metrics.depth;
+
+        // Small delimiters are scaled down versions of the same font, so we
+        // account for the style change size.
+
+        if (sequence[i].type === "small") {
+            heightDepth *= sequence[i].style.sizeMultiplier;
+        }
+
+        // Check if the delimiter at this size works for the given height.
+        if (heightDepth > height) {
+            return sequence[i];
+        }
+    }
+
+    // If we reached the end of the sequence, return the last sequence element.
+    return sequence[sequence.length - 1];
+};
+
+/**
+ * Make a delimiter of a given height+depth, with optional centering. Here, we
+ * traverse the sequences, and create a delimiter that the sequence tells us to.
+ */
+var makeCustomSizedDelim = function(delim, height, center, options, mode,
+                                    classes) {
+    if (delim === "<" || delim === "\\lt") {
+        delim = "\\langle";
+    } else if (delim === ">" || delim === "\\gt") {
+        delim = "\\rangle";
+    }
+
+    // Decide what sequence to use
+    var sequence;
+    if (utils.contains(stackNeverDelimiters, delim)) {
+        sequence = stackNeverDelimiterSequence;
+    } else if (utils.contains(stackLargeDelimiters, delim)) {
+        sequence = stackLargeDelimiterSequence;
+    } else {
+        sequence = stackAlwaysDelimiterSequence;
+    }
+
+    // Look through the sequence
+    var delimType = traverseSequence(delim, height, sequence, options);
+
+    // Depending on the sequence element we decided on, call the appropriate
+    // function.
+    if (delimType.type === "small") {
+        return makeSmallDelim(delim, delimType.style, center, options, mode,
+                              classes);
+    } else if (delimType.type === "large") {
+        return makeLargeDelim(delim, delimType.size, center, options, mode,
+                              classes);
+    } else if (delimType.type === "stack") {
+        return makeStackedDelim(delim, height, center, options, mode, classes);
+    }
+};
+
+/**
+ * Make a delimiter for use with `\left` and `\right`, given a height and depth
+ * of an expression that the delimiters surround.
+ */
+var makeLeftRightDelim = function(delim, height, depth, options, mode,
+                                  classes) {
+    // We always center \left/\right delimiters, so the axis is always shifted
+    var axisHeight =
+        options.style.metrics.axisHeight * options.style.sizeMultiplier;
+
+    // Taken from TeX source, tex.web, function make_left_right
+    var delimiterFactor = 901;
+    var delimiterExtend = 5.0 / fontMetrics.metrics.ptPerEm;
+
+    var maxDistFromAxis = Math.max(
+        height - axisHeight, depth + axisHeight);
+
+    var totalHeight = Math.max(
+        // In real TeX, calculations are done using integral values which are
+        // 65536 per pt, or 655360 per em. So, the division here truncates in
+        // TeX but doesn't here, producing different results. If we wanted to
+        // exactly match TeX's calculation, we could do
+        //   Math.floor(655360 * maxDistFromAxis / 500) *
+        //    delimiterFactor / 655360
+        // (To see the difference, compare
+        //    x^{x^{\left(\rule{0.1em}{0.68em}\right)}}
+        // in TeX and KaTeX)
+        maxDistFromAxis / 500 * delimiterFactor,
+        2 * maxDistFromAxis - delimiterExtend);
+
+    // Finally, we defer to `makeCustomSizedDelim` with our calculated total
+    // height
+    return makeCustomSizedDelim(delim, totalHeight, true, options, mode,
+                                classes);
+};
+
+module.exports = {
+    sizedDelim: makeSizedDelim,
+    customSizedDelim: makeCustomSizedDelim,
+    leftRightDelim: makeLeftRightDelim
+};
 
 },{"./ParseError":4,"./Style":7,"./buildCommon":8,"./fontMetrics":15,"./symbols":21,"./utils":23}],13:[function(require,module,exports){
-function span(t,e,s){this.classes=t||[],this.children=e||[],this.height=0,this.depth=0,this.maxFontSize=0,this.style={},this.attributes={},s&&(s.style.isTight()&&this.classes.push("mtight"),s.getColor()&&(this.style.color=s.getColor()))}function documentFragment(t){this.children=t||[],this.height=0,this.depth=0,this.maxFontSize=0}function symbolNode(t,e,s,i,a,r,h){this.value=t||"",this.height=e||0,this.depth=s||0,this.italic=i||0,this.skew=a||0,this.classes=r||[],this.style=h||{},this.maxFontSize=0,unicodeRegexes.cjkRegex.test(t)&&(unicodeRegexes.hangulRegex.test(t)?this.classes.push("hangul_fallback"):this.classes.push("cjk_fallback")),/[îïíì]/.test(this.value)&&(this.value=iCombinations[this.value])}var unicodeRegexes=require("./unicodeRegexes"),utils=require("./utils"),createClass=function(t){t=t.slice();for(var e=t.length-1;e>=0;e--)t[e]||t.splice(e,1);return t.join(" ")};span.prototype.setAttribute=function(t,e){this.attributes[t]=e},span.prototype.tryCombine=function(t){return!1},span.prototype.toNode=function(){var t=document.createElement("span");t.className=createClass(this.classes);for(var e in this.style)Object.prototype.hasOwnProperty.call(this.style,e)&&(t.style[e]=this.style[e]);for(var s in this.attributes)Object.prototype.hasOwnProperty.call(this.attributes,s)&&t.setAttribute(s,this.attributes[s]);for(var i=0;i<this.children.length;i++)t.appendChild(this.children[i].toNode());return t},span.prototype.toMarkup=function(){var t="<span";this.classes.length&&(t+=' class="',t+=utils.escape(createClass(this.classes)),t+='"');var e="";for(var s in this.style)this.style.hasOwnProperty(s)&&(e+=utils.hyphenate(s)+":"+this.style[s]+";");e&&(t+=' style="'+utils.escape(e)+'"');for(var i in this.attributes)Object.prototype.hasOwnProperty.call(this.attributes,i)&&(t+=" "+i+'="',t+=utils.escape(this.attributes[i]),t+='"');t+=">";for(var a=0;a<this.children.length;a++)t+=this.children[a].toMarkup();return t+="</span>"},documentFragment.prototype.toNode=function(){for(var t=document.createDocumentFragment(),e=0;e<this.children.length;e++)t.appendChild(this.children[e].toNode());return t},documentFragment.prototype.toMarkup=function(){for(var t="",e=0;e<this.children.length;e++)t+=this.children[e].toMarkup();return t};var iCombinations={"î":"ı̂","ï":"ı̈","í":"ı́","ì":"ı̀"};symbolNode.prototype.tryCombine=function(t){if(!t||!(t instanceof symbolNode)||this.italic>0||createClass(this.classes)!==createClass(t.classes)||this.skew!==t.skew||this.maxFontSize!==t.maxFontSize)return!1;for(var e in this.style)if(this.style.hasOwnProperty(e)&&this.style[e]!==t.style[e])return!1;for(e in t.style)if(t.style.hasOwnProperty(e)&&this.style[e]!==t.style[e])return!1;return this.value+=t.value,this.height=Math.max(this.height,t.height),this.depth=Math.max(this.depth,t.depth),this.italic=t.italic,!0},symbolNode.prototype.toNode=function(){var t=document.createTextNode(this.value),e=null;this.italic>0&&(e=document.createElement("span"),e.style.marginRight=this.italic+"em"),this.classes.length>0&&(e=e||document.createElement("span"),e.className=createClass(this.classes));for(var s in this.style)this.style.hasOwnProperty(s)&&(e=e||document.createElement("span"),e.style[s]=this.style[s]);return e?(e.appendChild(t),e):t},symbolNode.prototype.toMarkup=function(){var t=!1,e="<span";this.classes.length&&(t=!0,e+=' class="',e+=utils.escape(createClass(this.classes)),e+='"');var s="";this.italic>0&&(s+="margin-right:"+this.italic+"em;");for(var i in this.style)this.style.hasOwnProperty(i)&&(s+=utils.hyphenate(i)+":"+this.style[i]+";");s&&(t=!0,e+=' style="'+utils.escape(s)+'"');var a=utils.escape(this.value);return t?(e+=">",e+=a,e+="</span>"):a},module.exports={span:span,documentFragment:documentFragment,symbolNode:symbolNode};
+/**
+ * These objects store the data about the DOM nodes we create, as well as some
+ * extra data. They can then be transformed into real DOM nodes with the
+ * `toNode` function or HTML markup using `toMarkup`. They are useful for both
+ * storing extra properties on the nodes, as well as providing a way to easily
+ * work with the DOM.
+ *
+ * Similar functions for working with MathML nodes exist in mathMLTree.js.
+ */
+var unicodeRegexes = require("./unicodeRegexes");
+var utils = require("./utils");
+
+/**
+ * Create an HTML className based on a list of classes. In addition to joining
+ * with spaces, we also remove null or empty classes.
+ */
+var createClass = function(classes) {
+    classes = classes.slice();
+    for (var i = classes.length - 1; i >= 0; i--) {
+        if (!classes[i]) {
+            classes.splice(i, 1);
+        }
+    }
+
+    return classes.join(" ");
+};
+
+/**
+ * This node represents a span node, with a className, a list of children, and
+ * an inline style. It also contains information about its height, depth, and
+ * maxFontSize.
+ */
+function span(classes, children, options) {
+    this.classes = classes || [];
+    this.children = children || [];
+    this.height = 0;
+    this.depth = 0;
+    this.maxFontSize = 0;
+    this.style = {};
+    this.attributes = {};
+    if (options) {
+        if (options.style.isTight()) {
+            this.classes.push("mtight");
+        }
+        if (options.getColor()) {
+            this.style.color = options.getColor();
+        }
+    }
+}
+
+/**
+ * Sets an arbitrary attribute on the span. Warning: use this wisely. Not all
+ * browsers support attributes the same, and having too many custom attributes
+ * is probably bad.
+ */
+span.prototype.setAttribute = function(attribute, value) {
+    this.attributes[attribute] = value;
+};
+
+span.prototype.tryCombine = function(sibling) {
+    return false;
+};
+
+/**
+ * Convert the span into an HTML node
+ */
+span.prototype.toNode = function() {
+    var span = document.createElement("span");
+
+    // Apply the class
+    span.className = createClass(this.classes);
+
+    // Apply inline styles
+    for (var style in this.style) {
+        if (Object.prototype.hasOwnProperty.call(this.style, style)) {
+            span.style[style] = this.style[style];
+        }
+    }
+
+    // Apply attributes
+    for (var attr in this.attributes) {
+        if (Object.prototype.hasOwnProperty.call(this.attributes, attr)) {
+            span.setAttribute(attr, this.attributes[attr]);
+        }
+    }
+
+    // Append the children, also as HTML nodes
+    for (var i = 0; i < this.children.length; i++) {
+        span.appendChild(this.children[i].toNode());
+    }
+
+    return span;
+};
+
+/**
+ * Convert the span into an HTML markup string
+ */
+span.prototype.toMarkup = function() {
+    var markup = "<span";
+
+    // Add the class
+    if (this.classes.length) {
+        markup += " class=\"";
+        markup += utils.escape(createClass(this.classes));
+        markup += "\"";
+    }
+
+    var styles = "";
+
+    // Add the styles, after hyphenation
+    for (var style in this.style) {
+        if (this.style.hasOwnProperty(style)) {
+            styles += utils.hyphenate(style) + ":" + this.style[style] + ";";
+        }
+    }
+
+    if (styles) {
+        markup += " style=\"" + utils.escape(styles) + "\"";
+    }
+
+    // Add the attributes
+    for (var attr in this.attributes) {
+        if (Object.prototype.hasOwnProperty.call(this.attributes, attr)) {
+            markup += " " + attr + "=\"";
+            markup += utils.escape(this.attributes[attr]);
+            markup += "\"";
+        }
+    }
+
+    markup += ">";
+
+    // Add the markup of the children, also as markup
+    for (var i = 0; i < this.children.length; i++) {
+        markup += this.children[i].toMarkup();
+    }
+
+    markup += "</span>";
+
+    return markup;
+};
+
+/**
+ * This node represents a document fragment, which contains elements, but when
+ * placed into the DOM doesn't have any representation itself. Thus, it only
+ * contains children and doesn't have any HTML properties. It also keeps track
+ * of a height, depth, and maxFontSize.
+ */
+function documentFragment(children) {
+    this.children = children || [];
+    this.height = 0;
+    this.depth = 0;
+    this.maxFontSize = 0;
+}
+
+/**
+ * Convert the fragment into a node
+ */
+documentFragment.prototype.toNode = function() {
+    // Create a fragment
+    var frag = document.createDocumentFragment();
+
+    // Append the children
+    for (var i = 0; i < this.children.length; i++) {
+        frag.appendChild(this.children[i].toNode());
+    }
+
+    return frag;
+};
+
+/**
+ * Convert the fragment into HTML markup
+ */
+documentFragment.prototype.toMarkup = function() {
+    var markup = "";
+
+    // Simply concatenate the markup for the children together
+    for (var i = 0; i < this.children.length; i++) {
+        markup += this.children[i].toMarkup();
+    }
+
+    return markup;
+};
+
+var iCombinations = {
+    'î': '\u0131\u0302',
+    'ï': '\u0131\u0308',
+    'í': '\u0131\u0301',
+    // 'ī': '\u0131\u0304', // enable when we add Extended Latin
+    'ì': '\u0131\u0300'
+};
+
+/**
+ * A symbol node contains information about a single symbol. It either renders
+ * to a single text node, or a span with a single text node in it, depending on
+ * whether it has CSS classes, styles, or needs italic correction.
+ */
+function symbolNode(value, height, depth, italic, skew, classes, style) {
+    this.value = value || "";
+    this.height = height || 0;
+    this.depth = depth || 0;
+    this.italic = italic || 0;
+    this.skew = skew || 0;
+    this.classes = classes || [];
+    this.style = style || {};
+    this.maxFontSize = 0;
+
+    // Mark CJK characters with specific classes so that we can specify which
+    // fonts to use.  This allows us to render these characters with a serif
+    // font in situations where the browser would either default to a sans serif
+    // or render a placeholder character.
+    if (unicodeRegexes.cjkRegex.test(value)) {
+        // I couldn't find any fonts that contained Hangul as well as all of
+        // the other characters we wanted to test there for it gets its own
+        // CSS class.
+        if (unicodeRegexes.hangulRegex.test(value)) {
+            this.classes.push('hangul_fallback');
+        } else {
+            this.classes.push('cjk_fallback');
+        }
+    }
+
+    if (/[îïíì]/.test(this.value)) {    // add ī when we add Extended Latin
+        this.value = iCombinations[this.value];
+    }
+}
+
+symbolNode.prototype.tryCombine = function(sibling) {
+    if (!sibling
+        || !(sibling instanceof symbolNode)
+        || this.italic > 0
+        || createClass(this.classes) !== createClass(sibling.classes)
+        || this.skew !== sibling.skew
+        || this.maxFontSize !== sibling.maxFontSize) {
+        return false;
+    }
+    for (var style in this.style) {
+        if (this.style.hasOwnProperty(style)
+            && this.style[style] !== sibling.style[style]) {
+            return false;
+        }
+    }
+    for (style in sibling.style) {
+        if (sibling.style.hasOwnProperty(style)
+            && this.style[style] !== sibling.style[style]) {
+            return false;
+        }
+    }
+    this.value += sibling.value;
+    this.height = Math.max(this.height, sibling.height);
+    this.depth = Math.max(this.depth, sibling.depth);
+    this.italic = sibling.italic;
+    return true;
+};
+
+/**
+ * Creates a text node or span from a symbol node. Note that a span is only
+ * created if it is needed.
+ */
+symbolNode.prototype.toNode = function() {
+    var node = document.createTextNode(this.value);
+    var span = null;
+
+    if (this.italic > 0) {
+        span = document.createElement("span");
+        span.style.marginRight = this.italic + "em";
+    }
+
+    if (this.classes.length > 0) {
+        span = span || document.createElement("span");
+        span.className = createClass(this.classes);
+    }
+
+    for (var style in this.style) {
+        if (this.style.hasOwnProperty(style)) {
+            span = span || document.createElement("span");
+            span.style[style] = this.style[style];
+        }
+    }
+
+    if (span) {
+        span.appendChild(node);
+        return span;
+    } else {
+        return node;
+    }
+};
+
+/**
+ * Creates markup for a symbol node.
+ */
+symbolNode.prototype.toMarkup = function() {
+    // TODO(alpert): More duplication than I'd like from
+    // span.prototype.toMarkup and symbolNode.prototype.toNode...
+    var needsSpan = false;
+
+    var markup = "<span";
+
+    if (this.classes.length) {
+        needsSpan = true;
+        markup += " class=\"";
+        markup += utils.escape(createClass(this.classes));
+        markup += "\"";
+    }
+
+    var styles = "";
+
+    if (this.italic > 0) {
+        styles += "margin-right:" + this.italic + "em;";
+    }
+    for (var style in this.style) {
+        if (this.style.hasOwnProperty(style)) {
+            styles += utils.hyphenate(style) + ":" + this.style[style] + ";";
+        }
+    }
+
+    if (styles) {
+        needsSpan = true;
+        markup += " style=\"" + utils.escape(styles) + "\"";
+    }
+
+    var escaped = utils.escape(this.value);
+    if (needsSpan) {
+        markup += ">";
+        markup += escaped;
+        markup += "</span>";
+        return markup;
+    } else {
+        return escaped;
+    }
+};
+
+module.exports = {
+    span: span,
+    documentFragment: documentFragment,
+    symbolNode: symbolNode
+};
 
 },{"./unicodeRegexes":22,"./utils":23}],14:[function(require,module,exports){
-function parseArray(r,e){for(var a=[],n=[a],t=[];;){var o=r.parseExpression(!1,null);a.push(new ParseNode("ordgroup",o,r.mode));var i=r.nextToken.text;if("&"===i)r.consume();else{if("\\end"===i)break;if("\\\\"!==i&&"\\cr"!==i)throw new ParseError("Expected & or \\\\ or \\end",r.nextToken);var s=r.parseFunction();t.push(s.value.size),a=[],n.push(a)}}return e.body=n,e.rowGaps=t,new ParseNode(e.type,e,r.mode)}function defineEnvironment(r,e,a){"string"==typeof r&&(r=[r]),"number"==typeof e&&(e={numArgs:e});for(var n={numArgs:e.numArgs||0,argTypes:e.argTypes,greediness:1,allowedInText:!!e.allowedInText,numOptionalArgs:e.numOptionalArgs||0,handler:a},t=0;t<r.length;++t)module.exports[r[t]]=n}var parseData=require("./parseData"),ParseError=require("./ParseError"),Style=require("./Style"),ParseNode=parseData.ParseNode;defineEnvironment("array",{numArgs:1},function(r,e){var a=e[0];a=a.value.map?a.value:[a];var n=a.map(function(r){var e=r.value;if(-1!=="lcr".indexOf(e))return{type:"align",align:e};if("|"===e)return{type:"separator",separator:"|"};throw new ParseError("Unknown column alignment: "+r.value,r)}),t={type:"array",cols:n,hskipBeforeAndAfter:!0};return t=parseArray(r.parser,t)}),defineEnvironment(["matrix","pmatrix","bmatrix","Bmatrix","vmatrix","Vmatrix"],{},function(r){var e={matrix:null,pmatrix:["(",")"],bmatrix:["[","]"],Bmatrix:["\\{","\\}"],vmatrix:["|","|"],Vmatrix:["\\Vert","\\Vert"]}[r.envName],a={type:"array",hskipBeforeAndAfter:!1};return a=parseArray(r.parser,a),e&&(a=new ParseNode("leftright",{body:[a],left:e[0],right:e[1]},r.mode)),a}),defineEnvironment("cases",{},function(r){var e={type:"array",arraystretch:1.2,cols:[{type:"align",align:"l",pregap:0,postgap:Style.TEXT.metrics.quad},{type:"align",align:"l",pregap:0,postgap:0}]};return e=parseArray(r.parser,e),e=new ParseNode("leftright",{body:[e],left:"\\{",right:"."},r.mode)}),defineEnvironment("aligned",{},function(r){var e={type:"array",cols:[]};e=parseArray(r.parser,e);var a=new ParseNode("ordgroup",[],r.mode),n=0;e.value.body.forEach(function(r){var e;for(e=1;e<r.length;e+=2)r[e].value.unshift(a);n<r.length&&(n=r.length)});for(var t=0;t<n;++t){var o="r",i=0;t%2==1?o="l":t>0&&(i=2),e.value.cols[t]={type:"align",align:o,pregap:i,postgap:0}}return e});
+/* eslint no-constant-condition:0 */
+var parseData = require("./parseData");
+var ParseError = require("./ParseError");
+var Style = require("./Style");
+
+var ParseNode = parseData.ParseNode;
+
+/**
+ * Parse the body of the environment, with rows delimited by \\ and
+ * columns delimited by &, and create a nested list in row-major order
+ * with one group per cell.
+ */
+function parseArray(parser, result) {
+    var row = [];
+    var body = [row];
+    var rowGaps = [];
+    while (true) {
+        var cell = parser.parseExpression(false, null);
+        row.push(new ParseNode("ordgroup", cell, parser.mode));
+        var next = parser.nextToken.text;
+        if (next === "&") {
+            parser.consume();
+        } else if (next === "\\end") {
+            break;
+        } else if (next === "\\\\" || next === "\\cr") {
+            var cr = parser.parseFunction();
+            rowGaps.push(cr.value.size);
+            row = [];
+            body.push(row);
+        } else {
+            throw new ParseError("Expected & or \\\\ or \\end",
+                                 parser.nextToken);
+        }
+    }
+    result.body = body;
+    result.rowGaps = rowGaps;
+    return new ParseNode(result.type, result, parser.mode);
+}
+
+/*
+ * An environment definition is very similar to a function definition:
+ * it is declared with a name or a list of names, a set of properties
+ * and a handler containing the actual implementation.
+ *
+ * The properties include:
+ *  - numArgs: The number of arguments after the \begin{name} function.
+ *  - argTypes: (optional) Just like for a function
+ *  - allowedInText: (optional) Whether or not the environment is allowed inside
+ *                   text mode (default false) (not enforced yet)
+ *  - numOptionalArgs: (optional) Just like for a function
+ * A bare number instead of that object indicates the numArgs value.
+ *
+ * The handler function will receive two arguments
+ *  - context: information and references provided by the parser
+ *  - args: an array of arguments passed to \begin{name}
+ * The context contains the following properties:
+ *  - envName: the name of the environment, one of the listed names.
+ *  - parser: the parser object
+ *  - lexer: the lexer object
+ *  - positions: the positions associated with these arguments from args.
+ * The handler must return a ParseResult.
+ */
+
+function defineEnvironment(names, props, handler) {
+    if (typeof names === "string") {
+        names = [names];
+    }
+    if (typeof props === "number") {
+        props = { numArgs: props };
+    }
+    // Set default values of environments
+    var data = {
+        numArgs: props.numArgs || 0,
+        argTypes: props.argTypes,
+        greediness: 1,
+        allowedInText: !!props.allowedInText,
+        numOptionalArgs: props.numOptionalArgs || 0,
+        handler: handler
+    };
+    for (var i = 0; i < names.length; ++i) {
+        module.exports[names[i]] = data;
+    }
+}
+
+// Arrays are part of LaTeX, defined in lttab.dtx so its documentation
+// is part of the source2e.pdf file of LaTeX2e source documentation.
+defineEnvironment("array", {
+    numArgs: 1
+}, function(context, args) {
+    var colalign = args[0];
+    colalign = colalign.value.map ? colalign.value : [colalign];
+    var cols = colalign.map(function(node) {
+        var ca = node.value;
+        if ("lcr".indexOf(ca) !== -1) {
+            return {
+                type: "align",
+                align: ca
+            };
+        } else if (ca === "|") {
+            return {
+                type: "separator",
+                separator: "|"
+            };
+        }
+        throw new ParseError(
+            "Unknown column alignment: " + node.value,
+            node);
+    });
+    var res = {
+        type: "array",
+        cols: cols,
+        hskipBeforeAndAfter: true // \@preamble in lttab.dtx
+    };
+    res = parseArray(context.parser, res);
+    return res;
+});
+
+// The matrix environments of amsmath builds on the array environment
+// of LaTeX, which is discussed above.
+defineEnvironment([
+    "matrix",
+    "pmatrix",
+    "bmatrix",
+    "Bmatrix",
+    "vmatrix",
+    "Vmatrix"
+], {
+}, function(context) {
+    var delimiters = {
+        "matrix": null,
+        "pmatrix": ["(", ")"],
+        "bmatrix": ["[", "]"],
+        "Bmatrix": ["\\{", "\\}"],
+        "vmatrix": ["|", "|"],
+        "Vmatrix": ["\\Vert", "\\Vert"]
+    }[context.envName];
+    var res = {
+        type: "array",
+        hskipBeforeAndAfter: false // \hskip -\arraycolsep in amsmath
+    };
+    res = parseArray(context.parser, res);
+    if (delimiters) {
+        res = new ParseNode("leftright", {
+            body: [res],
+            left: delimiters[0],
+            right: delimiters[1]
+        }, context.mode);
+    }
+    return res;
+});
+
+// A cases environment (in amsmath.sty) is almost equivalent to
+// \def\arraystretch{1.2}%
+// \left\{\begin{array}{@{}l@{\quad}l@{}} … \end{array}\right.
+defineEnvironment("cases", {
+}, function(context) {
+    var res = {
+        type: "array",
+        arraystretch: 1.2,
+        cols: [{
+            type: "align",
+            align: "l",
+            pregap: 0,
+            // TODO(kevinb) get the current style.
+            // For now we use the metrics for TEXT style which is what we were
+            // doing before.  Before attempting to get the current style we
+            // should look at TeX's behavior especially for \over and matrices.
+            postgap: Style.TEXT.metrics.quad
+        }, {
+            type: "align",
+            align: "l",
+            pregap: 0,
+            postgap: 0
+        }]
+    };
+    res = parseArray(context.parser, res);
+    res = new ParseNode("leftright", {
+        body: [res],
+        left: "\\{",
+        right: "."
+    }, context.mode);
+    return res;
+});
+
+// An aligned environment is like the align* environment
+// except it operates within math mode.
+// Note that we assume \nomallineskiplimit to be zero,
+// so that \strut@ is the same as \strut.
+defineEnvironment("aligned", {
+}, function(context) {
+    var res = {
+        type: "array",
+        cols: []
+    };
+    res = parseArray(context.parser, res);
+    var emptyGroup = new ParseNode("ordgroup", [], context.mode);
+    var numCols = 0;
+    res.value.body.forEach(function(row) {
+        var i;
+        for (i = 1; i < row.length; i += 2) {
+            row[i].value.unshift(emptyGroup);
+        }
+        if (numCols < row.length) {
+            numCols = row.length;
+        }
+    });
+    for (var i = 0; i < numCols; ++i) {
+        var align = "r";
+        var pregap = 0;
+        if (i % 2 === 1) {
+            align = "l";
+        } else if (i > 0) {
+            pregap = 2; // one \qquad between columns
+        }
+        res.value.cols[i] = {
+            type: "align",
+            align: align,
+            pregap: pregap,
+            postgap: 0
+        };
+    }
+    return res;
+});
 
 },{"./ParseError":4,"./Style":7,"./parseData":19}],15:[function(require,module,exports){
-var Style=require("./Style"),cjkRegex=require("./unicodeRegexes").cjkRegex,sigmas={slant:[.25,.25,.25],space:[0,0,0],stretch:[0,0,0],shrink:[0,0,0],xHeight:[.431,.431,.431],quad:[1,1.171,1.472],extraSpace:[0,0,0],num1:[.677,.732,.925],num2:[.394,.384,.387],num3:[.444,.471,.504],denom1:[.686,.752,1.025],denom2:[.345,.344,.532],sup1:[.413,.503,.504],sup2:[.363,.431,.404],sup3:[.289,.286,.294],sub1:[.15,.143,.2],sub2:[.247,.286,.4],supDrop:[.386,.353,.494],subDrop:[.05,.071,.1],delim1:[2.39,1.7,1.98],delim2:[1.01,1.157,1.42],axisHeight:[.25,.25,.25]},xi1=0,xi2=0,xi3=0,xi4=0,xi5=.431,xi6=1,xi7=0,xi8=.04,xi9=.111,xi10=.166,xi11=.2,xi12=.6,xi13=.1,ptPerEm=10,doubleRuleSep=2/ptPerEm,metrics={defaultRuleThickness:xi8,bigOpSpacing1:xi9,bigOpSpacing2:xi10,bigOpSpacing3:xi11,bigOpSpacing4:xi12,bigOpSpacing5:xi13,ptPerEm:ptPerEm,doubleRuleSep:doubleRuleSep},metricMap=require("./fontMetricsData"),extraCharacterMap={"À":"A","Á":"A","Â":"A","Ã":"A","Ä":"A","Å":"A","Æ":"A","Ç":"C","È":"E","É":"E","Ê":"E","Ë":"E","Ì":"I","Í":"I","Î":"I","Ï":"I","Ð":"D","Ñ":"N","Ò":"O","Ó":"O","Ô":"O","Õ":"O","Ö":"O","Ø":"O","Ù":"U","Ú":"U","Û":"U","Ü":"U","Ý":"Y","Þ":"o","ß":"B","à":"a","á":"a","â":"a","ã":"a","ä":"a","å":"a","æ":"a","ç":"c","è":"e","é":"e","ê":"e","ë":"e","ì":"i","í":"i","î":"i","ï":"i","ð":"d","ñ":"n","ò":"o","ó":"o","ô":"o","õ":"o","ö":"o","ø":"o","ù":"u","ú":"u","û":"u","ü":"u","ý":"y","þ":"o","ÿ":"y","А":"A","Б":"B","В":"B","Г":"F","Д":"A","Е":"E","Ж":"K","З":"3","И":"N","Й":"N","К":"K","Л":"N","М":"M","Н":"H","О":"O","П":"N","Р":"P","С":"C","Т":"T","У":"y","Ф":"O","Х":"X","Ц":"U","Ч":"h","Ш":"W","Щ":"W","Ъ":"B","Ы":"X","Ь":"B","Э":"3","Ю":"X","Я":"R","а":"a","б":"b","в":"a","г":"r","д":"y","е":"e","ж":"m","з":"e","и":"n","й":"n","к":"n","л":"n","м":"m","н":"n","о":"o","п":"n","р":"p","с":"c","т":"o","у":"y","ф":"b","х":"x","ц":"n","ч":"n","ш":"w","щ":"w","ъ":"a","ы":"m","ь":"a","э":"e","ю":"m","я":"r"},getCharacterMetrics=function(e,i){var a=e.charCodeAt(0);e[0]in extraCharacterMap?a=extraCharacterMap[e[0]].charCodeAt(0):cjkRegex.test(e[0])&&(a="M".charCodeAt(0));var r=metricMap[i][a];if(r)return{depth:r[0],height:r[1],italic:r[2],skew:r[3],width:r[4]}};module.exports={metrics:metrics,sigmas:sigmas,getCharacterMetrics:getCharacterMetrics};
+/* eslint no-unused-vars:0 */
+
+var Style = require("./Style");
+var cjkRegex = require("./unicodeRegexes").cjkRegex;
+
+/**
+ * This file contains metrics regarding fonts and individual symbols. The sigma
+ * and xi variables, as well as the metricMap map contain data extracted from
+ * TeX, TeX font metrics, and the TTF files. These data are then exposed via the
+ * `metrics` variable and the getCharacterMetrics function.
+ */
+
+// In TeX, there are actually three sets of dimensions, one for each of
+// textstyle, scriptstyle, and scriptscriptstyle.  These are provided in the
+// the arrays below, in that order.
+//
+// The font metrics are stored in fonts cmsy10, cmsy7, and cmsy5 respsectively.
+// This was determined by running the folllowing script:
+//
+//     latex -interaction=nonstopmode \
+//     '\documentclass{article}\usepackage{amsmath}\begin{document}' \
+//     '$a$ \expandafter\show\the\textfont2' \
+//     '\expandafter\show\the\scriptfont2' \
+//     '\expandafter\show\the\scriptscriptfont2' \
+//     '\stop'
+//
+// The metrics themselves were retreived using the following commands:
+//
+//     tftopl cmsy10
+//     tftopl cmsy7
+//     tftopl cmsy5
+//
+// The output of each of these commands is quite lengthy.  The only part we
+// care about is the FONTDIMEN section. Each value is measured in EMs.
+var sigmas = {
+    slant: [0.250, 0.250, 0.250],       // sigma1
+    space: [0.000, 0.000, 0.000],       // sigma2
+    stretch: [0.000, 0.000, 0.000],     // sigma3
+    shrink: [0.000, 0.000, 0.000],      // sigma4
+    xHeight: [0.431, 0.431, 0.431],     // sigma5
+    quad: [1.000, 1.171, 1.472],        // sigma6
+    extraSpace: [0.000, 0.000, 0.000],  // sigma7
+    num1: [0.677, 0.732, 0.925],        // sigma8
+    num2: [0.394, 0.384, 0.387],        // sigma9
+    num3: [0.444, 0.471, 0.504],        // sigma10
+    denom1: [0.686, 0.752, 1.025],      // sigma11
+    denom2: [0.345, 0.344, 0.532],      // sigma12
+    sup1: [0.413, 0.503, 0.504],        // sigma13
+    sup2: [0.363, 0.431, 0.404],        // sigma14
+    sup3: [0.289, 0.286, 0.294],        // sigma15
+    sub1: [0.150, 0.143, 0.200],        // sigma16
+    sub2: [0.247, 0.286, 0.400],        // sigma17
+    supDrop: [0.386, 0.353, 0.494],     // sigma18
+    subDrop: [0.050, 0.071, 0.100],     // sigma19
+    delim1: [2.390, 1.700, 1.980],      // sigma20
+    delim2: [1.010, 1.157, 1.420],      // sigma21
+    axisHeight: [0.250, 0.250, 0.250]  // sigma22
+};
+
+// These font metrics are extracted from TeX by using
+// \font\a=cmex10
+// \showthe\fontdimenX\a
+// where X is the corresponding variable number. These correspond to the font
+// parameters of the extension fonts (family 3). See the TeXbook, page 441.
+var xi1 = 0;
+var xi2 = 0;
+var xi3 = 0;
+var xi4 = 0;
+var xi5 = 0.431;
+var xi6 = 1;
+var xi7 = 0;
+var xi8 = 0.04;
+var xi9 = 0.111;
+var xi10 = 0.166;
+var xi11 = 0.2;
+var xi12 = 0.6;
+var xi13 = 0.1;
+
+// This value determines how large a pt is, for metrics which are defined in
+// terms of pts.
+// This value is also used in katex.less; if you change it make sure the values
+// match.
+var ptPerEm = 10.0;
+
+// The space between adjacent `|` columns in an array definition. From
+// `\showthe\doublerulesep` in LaTeX.
+var doubleRuleSep = 2.0 / ptPerEm;
+
+/**
+ * This is just a mapping from common names to real metrics
+ */
+var metrics = {
+    defaultRuleThickness: xi8,
+    bigOpSpacing1: xi9,
+    bigOpSpacing2: xi10,
+    bigOpSpacing3: xi11,
+    bigOpSpacing4: xi12,
+    bigOpSpacing5: xi13,
+    ptPerEm: ptPerEm,
+    doubleRuleSep: doubleRuleSep
+};
+
+// This map contains a mapping from font name and character code to character
+// metrics, including height, depth, italic correction, and skew (kern from the
+// character to the corresponding \skewchar)
+// This map is generated via `make metrics`. It should not be changed manually.
+var metricMap = require("./fontMetricsData");
+
+// These are very rough approximations.  We default to Times New Roman which
+// should have Latin-1 and Cyrillic characters, but may not depending on the
+// operating system.  The metrics do not account for extra height from the
+// accents.  In the case of Cyrillic characters which have both ascenders and
+// descenders we prefer approximations with ascenders, primarily to prevent
+// the fraction bar or root line from intersecting the glyph.
+// TODO(kevinb) allow union of multiple glyph metrics for better accuracy.
+var extraCharacterMap = {
+    // Latin-1
+    'À': 'A',
+    'Á': 'A',
+    'Â': 'A',
+    'Ã': 'A',
+    'Ä': 'A',
+    'Å': 'A',
+    'Æ': 'A',
+    'Ç': 'C',
+    'È': 'E',
+    'É': 'E',
+    'Ê': 'E',
+    'Ë': 'E',
+    'Ì': 'I',
+    'Í': 'I',
+    'Î': 'I',
+    'Ï': 'I',
+    'Ð': 'D',
+    'Ñ': 'N',
+    'Ò': 'O',
+    'Ó': 'O',
+    'Ô': 'O',
+    'Õ': 'O',
+    'Ö': 'O',
+    'Ø': 'O',
+    'Ù': 'U',
+    'Ú': 'U',
+    'Û': 'U',
+    'Ü': 'U',
+    'Ý': 'Y',
+    'Þ': 'o',
+    'ß': 'B',
+    'à': 'a',
+    'á': 'a',
+    'â': 'a',
+    'ã': 'a',
+    'ä': 'a',
+    'å': 'a',
+    'æ': 'a',
+    'ç': 'c',
+    'è': 'e',
+    'é': 'e',
+    'ê': 'e',
+    'ë': 'e',
+    'ì': 'i',
+    'í': 'i',
+    'î': 'i',
+    'ï': 'i',
+    'ð': 'd',
+    'ñ': 'n',
+    'ò': 'o',
+    'ó': 'o',
+    'ô': 'o',
+    'õ': 'o',
+    'ö': 'o',
+    'ø': 'o',
+    'ù': 'u',
+    'ú': 'u',
+    'û': 'u',
+    'ü': 'u',
+    'ý': 'y',
+    'þ': 'o',
+    'ÿ': 'y',
+
+    // Cyrillic
+    'А': 'A',
+    'Б': 'B',
+    'В': 'B',
+    'Г': 'F',
+    'Д': 'A',
+    'Е': 'E',
+    'Ж': 'K',
+    'З': '3',
+    'И': 'N',
+    'Й': 'N',
+    'К': 'K',
+    'Л': 'N',
+    'М': 'M',
+    'Н': 'H',
+    'О': 'O',
+    'П': 'N',
+    'Р': 'P',
+    'С': 'C',
+    'Т': 'T',
+    'У': 'y',
+    'Ф': 'O',
+    'Х': 'X',
+    'Ц': 'U',
+    'Ч': 'h',
+    'Ш': 'W',
+    'Щ': 'W',
+    'Ъ': 'B',
+    'Ы': 'X',
+    'Ь': 'B',
+    'Э': '3',
+    'Ю': 'X',
+    'Я': 'R',
+    'а': 'a',
+    'б': 'b',
+    'в': 'a',
+    'г': 'r',
+    'д': 'y',
+    'е': 'e',
+    'ж': 'm',
+    'з': 'e',
+    'и': 'n',
+    'й': 'n',
+    'к': 'n',
+    'л': 'n',
+    'м': 'm',
+    'н': 'n',
+    'о': 'o',
+    'п': 'n',
+    'р': 'p',
+    'с': 'c',
+    'т': 'o',
+    'у': 'y',
+    'ф': 'b',
+    'х': 'x',
+    'ц': 'n',
+    'ч': 'n',
+    'ш': 'w',
+    'щ': 'w',
+    'ъ': 'a',
+    'ы': 'm',
+    'ь': 'a',
+    'э': 'e',
+    'ю': 'm',
+    'я': 'r'
+};
+
+/**
+ * This function is a convenience function for looking up information in the
+ * metricMap table. It takes a character as a string, and a style.
+ *
+ * Note: the `width` property may be undefined if fontMetricsData.js wasn't
+ * built using `Make extended_metrics`.
+ */
+var getCharacterMetrics = function(character, style) {
+    var ch = character.charCodeAt(0);
+    if (character[0] in extraCharacterMap) {
+        ch = extraCharacterMap[character[0]].charCodeAt(0);
+    } else if (cjkRegex.test(character[0])) {
+        ch = 'M'.charCodeAt(0);
+    }
+    var metrics = metricMap[style][ch];
+    if (metrics) {
+        return {
+            depth: metrics[0],
+            height: metrics[1],
+            italic: metrics[2],
+            skew: metrics[3],
+            width: metrics[4]
+        };
+    }
+};
+
+module.exports = {
+    metrics: metrics,
+    sigmas: sigmas,
+    getCharacterMetrics: getCharacterMetrics
+};
 
 },{"./Style":7,"./fontMetricsData":16,"./unicodeRegexes":22}],16:[function(require,module,exports){
-module.exports={"AMS-Regular":{65:[0,.68889,0,0],66:[0,.68889,0,0],67:[0,.68889,0,0],68:[0,.68889,0,0],69:[0,.68889,0,0],70:[0,.68889,0,0],71:[0,.68889,0,0],72:[0,.68889,0,0],73:[0,.68889,0,0],74:[.16667,.68889,0,0],75:[0,.68889,0,0],76:[0,.68889,0,0],77:[0,.68889,0,0],78:[0,.68889,0,0],79:[.16667,.68889,0,0],80:[0,.68889,0,0],81:[.16667,.68889,0,0],82:[0,.68889,0,0],83:[0,.68889,0,0],84:[0,.68889,0,0],85:[0,.68889,0,0],86:[0,.68889,0,0],87:[0,.68889,0,0],88:[0,.68889,0,0],89:[0,.68889,0,0],90:[0,.68889,0,0],107:[0,.68889,0,0],165:[0,.675,.025,0],174:[.15559,.69224,0,0],240:[0,.68889,0,0],295:[0,.68889,0,0],710:[0,.825,0,0],732:[0,.9,0,0],770:[0,.825,0,0],771:[0,.9,0,0],989:[.08167,.58167,0,0],1008:[0,.43056,.04028,0],8245:[0,.54986,0,0],8463:[0,.68889,0,0],8487:[0,.68889,0,0],8498:[0,.68889,0,0],8502:[0,.68889,0,0],8503:[0,.68889,0,0],8504:[0,.68889,0,0],8513:[0,.68889,0,0],8592:[-.03598,.46402,0,0],8594:[-.03598,.46402,0,0],8602:[-.13313,.36687,0,0],8603:[-.13313,.36687,0,0],8606:[.01354,.52239,0,0],8608:[.01354,.52239,0,0],8610:[.01354,.52239,0,0],8611:[.01354,.52239,0,0],8619:[0,.54986,0,0],8620:[0,.54986,0,0],8621:[-.13313,.37788,0,0],8622:[-.13313,.36687,0,0],8624:[0,.69224,0,0],8625:[0,.69224,0,0],8630:[0,.43056,0,0],8631:[0,.43056,0,0],8634:[.08198,.58198,0,0],8635:[.08198,.58198,0,0],8638:[.19444,.69224,0,0],8639:[.19444,.69224,0,0],8642:[.19444,.69224,0,0],8643:[.19444,.69224,0,0],8644:[.1808,.675,0,0],8646:[.1808,.675,0,0],8647:[.1808,.675,0,0],8648:[.19444,.69224,0,0],8649:[.1808,.675,0,0],8650:[.19444,.69224,0,0],8651:[.01354,.52239,0,0],8652:[.01354,.52239,0,0],8653:[-.13313,.36687,0,0],8654:[-.13313,.36687,0,0],8655:[-.13313,.36687,0,0],8666:[.13667,.63667,0,0],8667:[.13667,.63667,0,0],8669:[-.13313,.37788,0,0],8672:[-.064,.437,0,0],8674:[-.064,.437,0,0],8705:[0,.825,0,0],8708:[0,.68889,0,0],8709:[.08167,.58167,0,0],8717:[0,.43056,0,0],8722:[-.03598,.46402,0,0],8724:[.08198,.69224,0,0],8726:[.08167,.58167,0,0],8733:[0,.69224,0,0],8736:[0,.69224,0,0],8737:[0,.69224,0,0],8738:[.03517,.52239,0,0],8739:[.08167,.58167,0,0],8740:[.25142,.74111,0,0],8741:[.08167,.58167,0,0],8742:[.25142,.74111,0,0],8756:[0,.69224,0,0],8757:[0,.69224,0,0],8764:[-.13313,.36687,0,0],8765:[-.13313,.37788,0,0],8769:[-.13313,.36687,0,0],8770:[-.03625,.46375,0,0],8774:[.30274,.79383,0,0],8776:[-.01688,.48312,0,0],8778:[.08167,.58167,0,0],8782:[.06062,.54986,0,0],8783:[.06062,.54986,0,0],8785:[.08198,.58198,0,0],8786:[.08198,.58198,0,0],8787:[.08198,.58198,0,0],8790:[0,.69224,0,0],8791:[.22958,.72958,0,0],8796:[.08198,.91667,0,0],8806:[.25583,.75583,0,0],8807:[.25583,.75583,0,0],8808:[.25142,.75726,0,0],8809:[.25142,.75726,0,0],8812:[.25583,.75583,0,0],8814:[.20576,.70576,0,0],8815:[.20576,.70576,0,0],8816:[.30274,.79383,0,0],8817:[.30274,.79383,0,0],8818:[.22958,.72958,0,0],8819:[.22958,.72958,0,0],8822:[.1808,.675,0,0],8823:[.1808,.675,0,0],8828:[.13667,.63667,0,0],8829:[.13667,.63667,0,0],8830:[.22958,.72958,0,0],8831:[.22958,.72958,0,0],8832:[.20576,.70576,0,0],8833:[.20576,.70576,0,0],8840:[.30274,.79383,0,0],8841:[.30274,.79383,0,0],8842:[.13597,.63597,0,0],8843:[.13597,.63597,0,0],8847:[.03517,.54986,0,0],8848:[.03517,.54986,0,0],8858:[.08198,.58198,0,0],8859:[.08198,.58198,0,0],8861:[.08198,.58198,0,0],8862:[0,.675,0,0],8863:[0,.675,0,0],8864:[0,.675,0,0],8865:[0,.675,0,0],8872:[0,.69224,0,0],8873:[0,.69224,0,0],8874:[0,.69224,0,0],8876:[0,.68889,0,0],8877:[0,.68889,0,0],8878:[0,.68889,0,0],8879:[0,.68889,0,0],8882:[.03517,.54986,0,0],8883:[.03517,.54986,0,0],8884:[.13667,.63667,0,0],8885:[.13667,.63667,0,0],8888:[0,.54986,0,0],8890:[.19444,.43056,0,0],8891:[.19444,.69224,0,0],8892:[.19444,.69224,0,0],8901:[0,.54986,0,0],8903:[.08167,.58167,0,0],8905:[.08167,.58167,0,0],8906:[.08167,.58167,0,0],8907:[0,.69224,0,0],8908:[0,.69224,0,0],8909:[-.03598,.46402,0,0],8910:[0,.54986,0,0],8911:[0,.54986,0,0],8912:[.03517,.54986,0,0],8913:[.03517,.54986,0,0],8914:[0,.54986,0,0],8915:[0,.54986,0,0],8916:[0,.69224,0,0],8918:[.0391,.5391,0,0],8919:[.0391,.5391,0,0],8920:[.03517,.54986,0,0],8921:[.03517,.54986,0,0],8922:[.38569,.88569,0,0],8923:[.38569,.88569,0,0],8926:[.13667,.63667,0,0],8927:[.13667,.63667,0,0],8928:[.30274,.79383,0,0],8929:[.30274,.79383,0,0],8934:[.23222,.74111,0,0],8935:[.23222,.74111,0,0],8936:[.23222,.74111,0,0],8937:[.23222,.74111,0,0],8938:[.20576,.70576,0,0],8939:[.20576,.70576,0,0],8940:[.30274,.79383,0,0],8941:[.30274,.79383,0,0],8994:[.19444,.69224,0,0],8995:[.19444,.69224,0,0],9416:[.15559,.69224,0,0],9484:[0,.69224,0,0],9488:[0,.69224,0,0],9492:[0,.37788,0,0],9496:[0,.37788,0,0],9585:[.19444,.68889,0,0],9586:[.19444,.74111,0,0],9632:[0,.675,0,0],9633:[0,.675,0,0],9650:[0,.54986,0,0],9651:[0,.54986,0,0],9654:[.03517,.54986,0,0],9660:[0,.54986,0,0],9661:[0,.54986,0,0],9664:[.03517,.54986,0,0],9674:[.11111,.69224,0,0],9733:[.19444,.69224,0,0],10003:[0,.69224,0,0],10016:[0,.69224,0,0],10731:[.11111,.69224,0,0],10846:[.19444,.75583,0,0],10877:[.13667,.63667,0,0],10878:[.13667,.63667,0,0],10885:[.25583,.75583,0,0],10886:[.25583,.75583,0,0],10887:[.13597,.63597,0,0],10888:[.13597,.63597,0,0],10889:[.26167,.75726,0,0],10890:[.26167,.75726,0,0],10891:[.48256,.98256,0,0],10892:[.48256,.98256,0,0],10901:[.13667,.63667,0,0],10902:[.13667,.63667,0,0],10933:[.25142,.75726,0,0],10934:[.25142,.75726,0,0],10935:[.26167,.75726,0,0],10936:[.26167,.75726,0,0],10937:[.26167,.75726,0,0],10938:[.26167,.75726,0,0],10949:[.25583,.75583,0,0],10950:[.25583,.75583,0,0],10955:[.28481,.79383,0,0],10956:[.28481,.79383,0,0],57350:[.08167,.58167,0,0],57351:[.08167,.58167,0,0],57352:[.08167,.58167,0,0],57353:[0,.43056,.04028,0],57356:[.25142,.75726,0,0],57357:[.25142,.75726,0,0],57358:[.41951,.91951,0,0],57359:[.30274,.79383,0,0],57360:[.30274,.79383,0,0],57361:[.41951,.91951,0,0],57366:[.25142,.75726,0,0],57367:[.25142,.75726,0,0],57368:[.25142,.75726,0,0],57369:[.25142,.75726,0,0],57370:[.13597,.63597,0,0],57371:[.13597,.63597,0,0]},"Caligraphic-Regular":{48:[0,.43056,0,0],49:[0,.43056,0,0],50:[0,.43056,0,0],51:[.19444,.43056,0,0],52:[.19444,.43056,0,0],53:[.19444,.43056,0,0],54:[0,.64444,0,0],55:[.19444,.43056,0,0],56:[0,.64444,0,0],57:[.19444,.43056,0,0],65:[0,.68333,0,.19445],66:[0,.68333,.03041,.13889],67:[0,.68333,.05834,.13889],68:[0,.68333,.02778,.08334],69:[0,.68333,.08944,.11111],70:[0,.68333,.09931,.11111],71:[.09722,.68333,.0593,.11111],72:[0,.68333,.00965,.11111],73:[0,.68333,.07382,0],74:[.09722,.68333,.18472,.16667],75:[0,.68333,.01445,.05556],76:[0,.68333,0,.13889],77:[0,.68333,0,.13889],78:[0,.68333,.14736,.08334],79:[0,.68333,.02778,.11111],80:[0,.68333,.08222,.08334],81:[.09722,.68333,0,.11111],82:[0,.68333,0,.08334],83:[0,.68333,.075,.13889],84:[0,.68333,.25417,0],85:[0,.68333,.09931,.08334],86:[0,.68333,.08222,0],87:[0,.68333,.08222,.08334],88:[0,.68333,.14643,.13889],89:[.09722,.68333,.08222,.08334],90:[0,.68333,.07944,.13889]},"Fraktur-Regular":{33:[0,.69141,0,0],34:[0,.69141,0,0],38:[0,.69141,0,0],39:[0,.69141,0,0],40:[.24982,.74947,0,0],41:[.24982,.74947,0,0],42:[0,.62119,0,0],43:[.08319,.58283,0,0],44:[0,.10803,0,0],45:[.08319,.58283,0,0],46:[0,.10803,0,0],47:[.24982,.74947,0,0],48:[0,.47534,0,0],49:[0,.47534,0,0],50:[0,.47534,0,0],51:[.18906,.47534,0,0],52:[.18906,.47534,0,0],53:[.18906,.47534,0,0],54:[0,.69141,0,0],55:[.18906,.47534,0,0],56:[0,.69141,0,0],57:[.18906,.47534,0,0],58:[0,.47534,0,0],59:[.12604,.47534,0,0],61:[-.13099,.36866,0,0],63:[0,.69141,0,0],65:[0,.69141,0,0],66:[0,.69141,0,0],67:[0,.69141,0,0],68:[0,.69141,0,0],69:[0,.69141,0,0],70:[.12604,.69141,0,0],71:[0,.69141,0,0],72:[.06302,.69141,0,0],73:[0,.69141,0,0],74:[.12604,.69141,0,0],75:[0,.69141,0,0],76:[0,.69141,0,0],77:[0,.69141,0,0],78:[0,.69141,0,0],79:[0,.69141,0,0],80:[.18906,.69141,0,0],81:[.03781,.69141,0,0],82:[0,.69141,0,0],83:[0,.69141,0,0],84:[0,.69141,0,0],85:[0,.69141,0,0],86:[0,.69141,0,0],87:[0,.69141,0,0],88:[0,.69141,0,0],89:[.18906,.69141,0,0],90:[.12604,.69141,0,0],91:[.24982,.74947,0,0],93:[.24982,.74947,0,0],94:[0,.69141,0,0],97:[0,.47534,0,0],98:[0,.69141,0,0],99:[0,.47534,0,0],100:[0,.62119,0,0],101:[0,.47534,0,0],102:[.18906,.69141,0,0],103:[.18906,.47534,0,0],104:[.18906,.69141,0,0],105:[0,.69141,0,0],106:[0,.69141,0,0],107:[0,.69141,0,0],108:[0,.69141,0,0],109:[0,.47534,0,0],110:[0,.47534,0,0],111:[0,.47534,0,0],112:[.18906,.52396,0,0],113:[.18906,.47534,0,0],114:[0,.47534,0,0],115:[0,.47534,0,0],116:[0,.62119,0,0],117:[0,.47534,0,0],118:[0,.52396,0,0],119:[0,.52396,0,0],120:[.18906,.47534,0,0],121:[.18906,.47534,0,0],122:[.18906,.47534,0,0],8216:[0,.69141,0,0],8217:[0,.69141,0,0],58112:[0,.62119,0,0],58113:[0,.62119,0,0],58114:[.18906,.69141,0,0],58115:[.18906,.69141,0,0],58116:[.18906,.47534,0,0],58117:[0,.69141,0,0],58118:[0,.62119,0,0],58119:[0,.47534,0,0]},"Main-Bold":{33:[0,.69444,0,0],34:[0,.69444,0,0],35:[.19444,.69444,0,0],36:[.05556,.75,0,0],37:[.05556,.75,0,0],38:[0,.69444,0,0],39:[0,.69444,0,0],40:[.25,.75,0,0],41:[.25,.75,0,0],42:[0,.75,0,0],43:[.13333,.63333,0,0],44:[.19444,.15556,0,0],45:[0,.44444,0,0],46:[0,.15556,0,0],47:[.25,.75,0,0],48:[0,.64444,0,0],49:[0,.64444,0,0],50:[0,.64444,0,0],51:[0,.64444,0,0],52:[0,.64444,0,0],53:[0,.64444,0,0],54:[0,.64444,0,0],55:[0,.64444,0,0],56:[0,.64444,0,0],57:[0,.64444,0,0],58:[0,.44444,0,0],59:[.19444,.44444,0,0],60:[.08556,.58556,0,0],61:[-.10889,.39111,0,0],62:[.08556,.58556,0,0],63:[0,.69444,0,0],64:[0,.69444,0,0],65:[0,.68611,0,0],66:[0,.68611,0,0],67:[0,.68611,0,0],68:[0,.68611,0,0],69:[0,.68611,0,0],70:[0,.68611,0,0],71:[0,.68611,0,0],72:[0,.68611,0,0],73:[0,.68611,0,0],74:[0,.68611,0,0],75:[0,.68611,0,0],76:[0,.68611,0,0],77:[0,.68611,0,0],78:[0,.68611,0,0],79:[0,.68611,0,0],80:[0,.68611,0,0],81:[.19444,.68611,0,0],82:[0,.68611,0,0],83:[0,.68611,0,0],84:[0,.68611,0,0],85:[0,.68611,0,0],86:[0,.68611,.01597,0],87:[0,.68611,.01597,0],88:[0,.68611,0,0],89:[0,.68611,.02875,0],90:[0,.68611,0,0],91:[.25,.75,0,0],92:[.25,.75,0,0],93:[.25,.75,0,0],94:[0,.69444,0,0],95:[.31,.13444,.03194,0],96:[0,.69444,0,0],97:[0,.44444,0,0],98:[0,.69444,0,0],99:[0,.44444,0,0],100:[0,.69444,0,0],101:[0,.44444,0,0],102:[0,.69444,.10903,0],103:[.19444,.44444,.01597,0],104:[0,.69444,0,0],105:[0,.69444,0,0],106:[.19444,.69444,0,0],107:[0,.69444,0,0],108:[0,.69444,0,0],109:[0,.44444,0,0],110:[0,.44444,0,0],111:[0,.44444,0,0],112:[.19444,.44444,0,0],113:[.19444,.44444,0,0],114:[0,.44444,0,0],115:[0,.44444,0,0],116:[0,.63492,0,0],117:[0,.44444,0,0],118:[0,.44444,.01597,0],119:[0,.44444,.01597,0],120:[0,.44444,0,0],121:[.19444,.44444,.01597,0],122:[0,.44444,0,0],123:[.25,.75,0,0],124:[.25,.75,0,0],125:[.25,.75,0,0],126:[.35,.34444,0,0],168:[0,.69444,0,0],172:[0,.44444,0,0],175:[0,.59611,0,0],176:[0,.69444,0,0],177:[.13333,.63333,0,0],180:[0,.69444,0,0],215:[.13333,.63333,0,0],247:[.13333,.63333,0,0],305:[0,.44444,0,0],567:[.19444,.44444,0,0],710:[0,.69444,0,0],711:[0,.63194,0,0],713:[0,.59611,0,0],714:[0,.69444,0,0],715:[0,.69444,0,0],728:[0,.69444,0,0],729:[0,.69444,0,0],730:[0,.69444,0,0],732:[0,.69444,0,0],768:[0,.69444,0,0],769:[0,.69444,0,0],770:[0,.69444,0,0],771:[0,.69444,0,0],772:[0,.59611,0,0],774:[0,.69444,0,0],775:[0,.69444,0,0],776:[0,.69444,0,0],778:[0,.69444,0,0],779:[0,.69444,0,0],780:[0,.63194,0,0],824:[.19444,.69444,0,0],915:[0,.68611,0,0],916:[0,.68611,0,0],920:[0,.68611,0,0],923:[0,.68611,0,0],926:[0,.68611,0,0],928:[0,.68611,0,0],931:[0,.68611,0,0],933:[0,.68611,0,0],934:[0,.68611,0,0],936:[0,.68611,0,0],937:[0,.68611,0,0],8211:[0,.44444,.03194,0],8212:[0,.44444,.03194,0],8216:[0,.69444,0,0],8217:[0,.69444,0,0],8220:[0,.69444,0,0],8221:[0,.69444,0,0],8224:[.19444,.69444,0,0],8225:[.19444,.69444,0,0],8242:[0,.55556,0,0],8407:[0,.72444,.15486,0],8463:[0,.69444,0,0],8465:[0,.69444,0,0],8467:[0,.69444,0,0],8472:[.19444,.44444,0,0],8476:[0,.69444,0,0],8501:[0,.69444,0,0],8592:[-.10889,.39111,0,0],8593:[.19444,.69444,0,0],8594:[-.10889,.39111,0,0],8595:[.19444,.69444,0,0],8596:[-.10889,.39111,0,0],8597:[.25,.75,0,0],8598:[.19444,.69444,0,0],8599:[.19444,.69444,0,0],8600:[.19444,.69444,0,0],8601:[.19444,.69444,0,0],8636:[-.10889,.39111,0,0],8637:[-.10889,.39111,0,0],8640:[-.10889,.39111,0,0],8641:[-.10889,.39111,0,0],8656:[-.10889,.39111,0,0],8657:[.19444,.69444,0,0],8658:[-.10889,.39111,0,0],8659:[.19444,.69444,0,0],8660:[-.10889,.39111,0,0],8661:[.25,.75,0,0],8704:[0,.69444,0,0],8706:[0,.69444,.06389,0],8707:[0,.69444,0,0],8709:[.05556,.75,0,0],8711:[0,.68611,0,0],8712:[.08556,.58556,0,0],8715:[.08556,.58556,0,0],8722:[.13333,.63333,0,0],8723:[.13333,.63333,0,0],8725:[.25,.75,0,0],8726:[.25,.75,0,0],8727:[-.02778,.47222,0,0],8728:[-.02639,.47361,0,0],8729:[-.02639,.47361,0,0],8730:[.18,.82,0,0],8733:[0,.44444,0,0],8734:[0,.44444,0,0],8736:[0,.69224,0,0],8739:[.25,.75,0,0],8741:[.25,.75,0,0],8743:[0,.55556,0,0],8744:[0,.55556,0,0],8745:[0,.55556,0,0],8746:[0,.55556,0,0],8747:[.19444,.69444,.12778,0],8764:[-.10889,.39111,0,0],8768:[.19444,.69444,0,0],8771:[.00222,.50222,0,0],8776:[.02444,.52444,0,0],8781:[.00222,.50222,0,0],8801:[.00222,.50222,0,0],8804:[.19667,.69667,0,0],8805:[.19667,.69667,0,0],8810:[.08556,.58556,0,0],8811:[.08556,.58556,0,0],8826:[.08556,.58556,0,0],8827:[.08556,.58556,0,0],8834:[.08556,.58556,0,0],8835:[.08556,.58556,0,0],8838:[.19667,.69667,0,0],8839:[.19667,.69667,0,0],8846:[0,.55556,0,0],8849:[.19667,.69667,0,0],8850:[.19667,.69667,0,0],8851:[0,.55556,0,0],8852:[0,.55556,0,0],8853:[.13333,.63333,0,0],8854:[.13333,.63333,0,0],8855:[.13333,.63333,0,0],8856:[.13333,.63333,0,0],8857:[.13333,.63333,0,0],8866:[0,.69444,0,0],8867:[0,.69444,0,0],8868:[0,.69444,0,0],8869:[0,.69444,0,0],8900:[-.02639,.47361,0,0],8901:[-.02639,.47361,0,0],8902:[-.02778,.47222,0,0],8968:[.25,.75,0,0],8969:[.25,.75,0,0],8970:[.25,.75,0,0],8971:[.25,.75,0,0],8994:[-.13889,.36111,0,0],8995:[-.13889,.36111,0,0],9651:[.19444,.69444,0,0],9657:[-.02778,.47222,0,0],9661:[.19444,.69444,0,0],9667:[-.02778,.47222,0,0],9711:[.19444,.69444,0,0],9824:[.12963,.69444,0,0],9825:[.12963,.69444,0,0],9826:[.12963,.69444,0,0],9827:[.12963,.69444,0,0],9837:[0,.75,0,0],9838:[.19444,.69444,0,0],9839:[.19444,.69444,0,0],10216:[.25,.75,0,0],10217:[.25,.75,0,0],10815:[0,.68611,0,0],10927:[.19667,.69667,0,0],10928:[.19667,.69667,0,0]},"Main-Italic":{33:[0,.69444,.12417,0],34:[0,.69444,.06961,0],35:[.19444,.69444,.06616,0],37:[.05556,.75,.13639,0],38:[0,.69444,.09694,0],39:[0,.69444,.12417,0],40:[.25,.75,.16194,0],41:[.25,.75,.03694,0],42:[0,.75,.14917,0],43:[.05667,.56167,.03694,0],44:[.19444,.10556,0,0],45:[0,.43056,.02826,0],46:[0,.10556,0,0],47:[.25,.75,.16194,0],48:[0,.64444,.13556,0],49:[0,.64444,.13556,0],50:[0,.64444,.13556,0],51:[0,.64444,.13556,0],52:[.19444,.64444,.13556,0],53:[0,.64444,.13556,0],54:[0,.64444,.13556,0],55:[.19444,.64444,.13556,0],56:[0,.64444,.13556,0],57:[0,.64444,.13556,0],58:[0,.43056,.0582,0],59:[.19444,.43056,.0582,0],61:[-.13313,.36687,.06616,0],63:[0,.69444,.1225,0],64:[0,.69444,.09597,0],65:[0,.68333,0,0],66:[0,.68333,.10257,0],67:[0,.68333,.14528,0],68:[0,.68333,.09403,0],69:[0,.68333,.12028,0],70:[0,.68333,.13305,0],71:[0,.68333,.08722,0],72:[0,.68333,.16389,0],73:[0,.68333,.15806,0],74:[0,.68333,.14028,0],75:[0,.68333,.14528,0],76:[0,.68333,0,0],77:[0,.68333,.16389,0],78:[0,.68333,.16389,0],79:[0,.68333,.09403,0],80:[0,.68333,.10257,0],81:[.19444,.68333,.09403,0],82:[0,.68333,.03868,0],83:[0,.68333,.11972,0],84:[0,.68333,.13305,0],85:[0,.68333,.16389,0],86:[0,.68333,.18361,0],87:[0,.68333,.18361,0],88:[0,.68333,.15806,0],89:[0,.68333,.19383,0],90:[0,.68333,.14528,0],91:[.25,.75,.1875,0],93:[.25,.75,.10528,0],94:[0,.69444,.06646,0],95:[.31,.12056,.09208,0],97:[0,.43056,.07671,0],98:[0,.69444,.06312,0],99:[0,.43056,.05653,0],100:[0,.69444,.10333,0],101:[0,.43056,.07514,0],102:[.19444,.69444,.21194,0],103:[.19444,.43056,.08847,0],104:[0,.69444,.07671,0],105:[0,.65536,.1019,0],106:[.19444,.65536,.14467,0],107:[0,.69444,.10764,0],108:[0,.69444,.10333,0],109:[0,.43056,.07671,0],110:[0,.43056,.07671,0],111:[0,.43056,.06312,0],112:[.19444,.43056,.06312,0],113:[.19444,.43056,.08847,0],114:[0,.43056,.10764,0],115:[0,.43056,.08208,0],116:[0,.61508,.09486,0],117:[0,.43056,.07671,0],118:[0,.43056,.10764,0],119:[0,.43056,.10764,0],120:[0,.43056,.12042,0],121:[.19444,.43056,.08847,0],122:[0,.43056,.12292,0],126:[.35,.31786,.11585,0],163:[0,.69444,0,0],305:[0,.43056,0,.02778],567:[.19444,.43056,0,.08334],768:[0,.69444,0,0],769:[0,.69444,.09694,0],770:[0,.69444,.06646,0],771:[0,.66786,.11585,0],772:[0,.56167,.10333,0],774:[0,.69444,.10806,0],775:[0,.66786,.11752,0],776:[0,.66786,.10474,0],778:[0,.69444,0,0],779:[0,.69444,.1225,0],780:[0,.62847,.08295,0],915:[0,.68333,.13305,0],916:[0,.68333,0,0],920:[0,.68333,.09403,0],923:[0,.68333,0,0],926:[0,.68333,.15294,0],928:[0,.68333,.16389,0],931:[0,.68333,.12028,0],933:[0,.68333,.11111,0],934:[0,.68333,.05986,0],936:[0,.68333,.11111,0],937:[0,.68333,.10257,0],8211:[0,.43056,.09208,0],8212:[0,.43056,.09208,0],8216:[0,.69444,.12417,0],8217:[0,.69444,.12417,0],8220:[0,.69444,.1685,0],8221:[0,.69444,.06961,0],8463:[0,.68889,0,0]},"Main-Regular":{32:[0,0,0,0],33:[0,.69444,0,0],34:[0,.69444,0,0],35:[.19444,.69444,0,0],36:[.05556,.75,0,0],37:[.05556,.75,0,0],38:[0,.69444,0,0],39:[0,.69444,0,0],40:[.25,.75,0,0],41:[.25,.75,0,0],42:[0,.75,0,0],43:[.08333,.58333,0,0],44:[.19444,.10556,0,0],45:[0,.43056,0,0],46:[0,.10556,0,0],47:[.25,.75,0,0],48:[0,.64444,0,0],49:[0,.64444,0,0],50:[0,.64444,0,0],51:[0,.64444,0,0],52:[0,.64444,0,0],53:[0,.64444,0,0],54:[0,.64444,0,0],55:[0,.64444,0,0],56:[0,.64444,0,0],57:[0,.64444,0,0],58:[0,.43056,0,0],59:[.19444,.43056,0,0],60:[.0391,.5391,0,0],61:[-.13313,.36687,0,0],62:[.0391,.5391,0,0],63:[0,.69444,0,0],64:[0,.69444,0,0],65:[0,.68333,0,0],66:[0,.68333,0,0],67:[0,.68333,0,0],68:[0,.68333,0,0],69:[0,.68333,0,0],70:[0,.68333,0,0],71:[0,.68333,0,0],72:[0,.68333,0,0],73:[0,.68333,0,0],74:[0,.68333,0,0],75:[0,.68333,0,0],76:[0,.68333,0,0],77:[0,.68333,0,0],78:[0,.68333,0,0],79:[0,.68333,0,0],80:[0,.68333,0,0],81:[.19444,.68333,0,0],82:[0,.68333,0,0],83:[0,.68333,0,0],84:[0,.68333,0,0],85:[0,.68333,0,0],86:[0,.68333,.01389,0],87:[0,.68333,.01389,0],88:[0,.68333,0,0],89:[0,.68333,.025,0],90:[0,.68333,0,0],91:[.25,.75,0,0],92:[.25,.75,0,0],93:[.25,.75,0,0],94:[0,.69444,0,0],95:[.31,.12056,.02778,0],96:[0,.69444,0,0],97:[0,.43056,0,0],98:[0,.69444,0,0],99:[0,.43056,0,0],100:[0,.69444,0,0],101:[0,.43056,0,0],102:[0,.69444,.07778,0],103:[.19444,.43056,.01389,0],104:[0,.69444,0,0],105:[0,.66786,0,0],106:[.19444,.66786,0,0],107:[0,.69444,0,0],108:[0,.69444,0,0],109:[0,.43056,0,0],110:[0,.43056,0,0],111:[0,.43056,0,0],112:[.19444,.43056,0,0],113:[.19444,.43056,0,0],114:[0,.43056,0,0],115:[0,.43056,0,0],116:[0,.61508,0,0],117:[0,.43056,0,0],118:[0,.43056,.01389,0],119:[0,.43056,.01389,0],120:[0,.43056,0,0],121:[.19444,.43056,.01389,0],122:[0,.43056,0,0],123:[.25,.75,0,0],124:[.25,.75,0,0],125:[.25,.75,0,0],126:[.35,.31786,0,0],160:[0,0,0,0],168:[0,.66786,0,0],172:[0,.43056,0,0],175:[0,.56778,0,0],176:[0,.69444,0,0],177:[.08333,.58333,0,0],180:[0,.69444,0,0],215:[.08333,.58333,0,0],247:[.08333,.58333,0,0],305:[0,.43056,0,0],567:[.19444,.43056,0,0],710:[0,.69444,0,0],711:[0,.62847,0,0],713:[0,.56778,0,0],714:[0,.69444,0,0],715:[0,.69444,0,0],728:[0,.69444,0,0],729:[0,.66786,0,0],730:[0,.69444,0,0],732:[0,.66786,0,0],768:[0,.69444,0,0],769:[0,.69444,0,0],770:[0,.69444,0,0],771:[0,.66786,0,0],772:[0,.56778,0,0],774:[0,.69444,0,0],775:[0,.66786,0,0],776:[0,.66786,0,0],778:[0,.69444,0,0],779:[0,.69444,0,0],780:[0,.62847,0,0],824:[.19444,.69444,0,0],915:[0,.68333,0,0],916:[0,.68333,0,0],920:[0,.68333,0,0],923:[0,.68333,0,0],926:[0,.68333,0,0],928:[0,.68333,0,0],931:[0,.68333,0,0],933:[0,.68333,0,0],934:[0,.68333,0,0],936:[0,.68333,0,0],937:[0,.68333,0,0],8211:[0,.43056,.02778,0],8212:[0,.43056,.02778,0],8216:[0,.69444,0,0],8217:[0,.69444,0,0],8220:[0,.69444,0,0],8221:[0,.69444,0,0],8224:[.19444,.69444,0,0],8225:[.19444,.69444,0,0],8230:[0,.12,0,0],8242:[0,.55556,0,0],8407:[0,.71444,.15382,0],8463:[0,.68889,0,0],8465:[0,.69444,0,0],8467:[0,.69444,0,.11111],8472:[.19444,.43056,0,.11111],8476:[0,.69444,0,0],8501:[0,.69444,0,0],8592:[-.13313,.36687,0,0],8593:[.19444,.69444,0,0],8594:[-.13313,.36687,0,0],8595:[.19444,.69444,0,0],8596:[-.13313,.36687,0,0],8597:[.25,.75,0,0],8598:[.19444,.69444,0,0],8599:[.19444,.69444,0,0],8600:[.19444,.69444,0,0],8601:[.19444,.69444,0,0],8614:[.011,.511,0,0],8617:[.011,.511,0,0],8618:[.011,.511,0,0],8636:[-.13313,.36687,0,0],8637:[-.13313,.36687,0,0],8640:[-.13313,.36687,0,0],8641:[-.13313,.36687,0,0],8652:[.011,.671,0,0],8656:[-.13313,.36687,0,0],8657:[.19444,.69444,0,0],8658:[-.13313,.36687,0,0],8659:[.19444,.69444,0,0],8660:[-.13313,.36687,0,0],8661:[.25,.75,0,0],8704:[0,.69444,0,0],8706:[0,.69444,.05556,.08334],8707:[0,.69444,0,0],8709:[.05556,.75,0,0],8711:[0,.68333,0,0],8712:[.0391,.5391,0,0],8715:[.0391,.5391,0,0],8722:[.08333,.58333,0,0],8723:[.08333,.58333,0,0],8725:[.25,.75,0,0],8726:[.25,.75,0,0],8727:[-.03472,.46528,0,0],8728:[-.05555,.44445,0,0],8729:[-.05555,.44445,0,0],8730:[.2,.8,0,0],8733:[0,.43056,0,0],8734:[0,.43056,0,0],8736:[0,.69224,0,0],8739:[.25,.75,0,0],8741:[.25,.75,0,0],8743:[0,.55556,0,0],8744:[0,.55556,0,0],8745:[0,.55556,0,0],8746:[0,.55556,0,0],8747:[.19444,.69444,.11111,0],8764:[-.13313,.36687,0,0],8768:[.19444,.69444,0,0],8771:[-.03625,.46375,0,0],8773:[-.022,.589,0,0],8776:[-.01688,.48312,0,0],8781:[-.03625,.46375,0,0],8784:[-.133,.67,0,0],8800:[.215,.716,0,0],8801:[-.03625,.46375,0,0],8804:[.13597,.63597,0,0],8805:[.13597,.63597,0,0],8810:[.0391,.5391,0,0],8811:[.0391,.5391,0,0],8826:[.0391,.5391,0,0],8827:[.0391,.5391,0,0],8834:[.0391,.5391,0,0],8835:[.0391,.5391,0,0],8838:[.13597,.63597,0,0],8839:[.13597,.63597,0,0],8846:[0,.55556,0,0],8849:[.13597,.63597,0,0],8850:[.13597,.63597,0,0],8851:[0,.55556,0,0],8852:[0,.55556,0,0],8853:[.08333,.58333,0,0],8854:[.08333,.58333,0,0],8855:[.08333,.58333,0,0],8856:[.08333,.58333,0,0],8857:[.08333,.58333,0,0],8866:[0,.69444,0,0],8867:[0,.69444,0,0],8868:[0,.69444,0,0],8869:[0,.69444,0,0],8872:[.249,.75,0,0],8900:[-.05555,.44445,0,0],8901:[-.05555,.44445,0,0],8902:[-.03472,.46528,0,0],8904:[.005,.505,0,0],8942:[.03,.9,0,0],8943:[-.19,.31,0,0],8945:[-.1,.82,0,0],8968:[.25,.75,0,0],8969:[.25,.75,0,0],8970:[.25,.75,0,0],8971:[.25,.75,0,0],8994:[-.14236,.35764,0,0],8995:[-.14236,.35764,0,0],9136:[.244,.744,0,0],9137:[.244,.744,0,0],9651:[.19444,.69444,0,0],9657:[-.03472,.46528,0,0],9661:[.19444,.69444,0,0],9667:[-.03472,.46528,0,0],9711:[.19444,.69444,0,0],9824:[.12963,.69444,0,0],9825:[.12963,.69444,0,0],9826:[.12963,.69444,0,0],9827:[.12963,.69444,0,0],9837:[0,.75,0,0],9838:[.19444,.69444,0,0],9839:[.19444,.69444,0,0],10216:[.25,.75,0,0],10217:[.25,.75,0,0],10222:[.244,.744,0,0],10223:[.244,.744,0,0],10229:[.011,.511,0,0],10230:[.011,.511,0,0],10231:[.011,.511,0,0],10232:[.024,.525,0,0],10233:[.024,.525,0,0],10234:[.024,.525,0,0],10236:[.011,.511,0,0],10815:[0,.68333,0,0],10927:[.13597,.63597,0,0],10928:[.13597,.63597,0,0]},"Math-BoldItalic":{47:[.19444,.69444,0,0],65:[0,.68611,0,0],66:[0,.68611,.04835,0],67:[0,.68611,.06979,0],68:[0,.68611,.03194,0],69:[0,.68611,.05451,0],70:[0,.68611,.15972,0],71:[0,.68611,0,0],72:[0,.68611,.08229,0],73:[0,.68611,.07778,0],74:[0,.68611,.10069,0],75:[0,.68611,.06979,0],76:[0,.68611,0,0],77:[0,.68611,.11424,0],78:[0,.68611,.11424,0],79:[0,.68611,.03194,0],80:[0,.68611,.15972,0],81:[.19444,.68611,0,0],82:[0,.68611,.00421,0],83:[0,.68611,.05382,0],84:[0,.68611,.15972,0],85:[0,.68611,.11424,0],86:[0,.68611,.25555,0],87:[0,.68611,.15972,0],88:[0,.68611,.07778,0],89:[0,.68611,.25555,0],90:[0,.68611,.06979,0],97:[0,.44444,0,0],98:[0,.69444,0,0],99:[0,.44444,0,0],100:[0,.69444,0,0],101:[0,.44444,0,0],102:[.19444,.69444,.11042,0],103:[.19444,.44444,.03704,0],104:[0,.69444,0,0],105:[0,.69326,0,0],106:[.19444,.69326,.0622,0],107:[0,.69444,.01852,0],108:[0,.69444,.0088,0],109:[0,.44444,0,0],110:[0,.44444,0,0],111:[0,.44444,0,0],112:[.19444,.44444,0,0],113:[.19444,.44444,.03704,0],114:[0,.44444,.03194,0],115:[0,.44444,0,0],116:[0,.63492,0,0],117:[0,.44444,0,0],118:[0,.44444,.03704,0],119:[0,.44444,.02778,0],120:[0,.44444,0,0],121:[.19444,.44444,.03704,0],122:[0,.44444,.04213,0],915:[0,.68611,.15972,0],916:[0,.68611,0,0],920:[0,.68611,.03194,0],923:[0,.68611,0,0],926:[0,.68611,.07458,0],928:[0,.68611,.08229,0],931:[0,.68611,.05451,0],933:[0,.68611,.15972,0],934:[0,.68611,0,0],936:[0,.68611,.11653,0],937:[0,.68611,.04835,0],945:[0,.44444,0,0],946:[.19444,.69444,.03403,0],947:[.19444,.44444,.06389,0],948:[0,.69444,.03819,0],949:[0,.44444,0,0],950:[.19444,.69444,.06215,0],951:[.19444,.44444,.03704,0],952:[0,.69444,.03194,0],953:[0,.44444,0,0],954:[0,.44444,0,0],955:[0,.69444,0,0],956:[.19444,.44444,0,0],957:[0,.44444,.06898,0],958:[.19444,.69444,.03021,0],959:[0,.44444,0,0],960:[0,.44444,.03704,0],961:[.19444,.44444,0,0],962:[.09722,.44444,.07917,0],963:[0,.44444,.03704,0],964:[0,.44444,.13472,0],965:[0,.44444,.03704,0],966:[.19444,.44444,0,0],967:[.19444,.44444,0,0],968:[.19444,.69444,.03704,0],969:[0,.44444,.03704,0],977:[0,.69444,0,0],981:[.19444,.69444,0,0],982:[0,.44444,.03194,0],1009:[.19444,.44444,0,0],1013:[0,.44444,0,0]},"Math-Italic":{47:[.19444,.69444,0,0],65:[0,.68333,0,.13889],66:[0,.68333,.05017,.08334],67:[0,.68333,.07153,.08334],68:[0,.68333,.02778,.05556],69:[0,.68333,.05764,.08334],70:[0,.68333,.13889,.08334],71:[0,.68333,0,.08334],72:[0,.68333,.08125,.05556],73:[0,.68333,.07847,.11111],74:[0,.68333,.09618,.16667],75:[0,.68333,.07153,.05556],76:[0,.68333,0,.02778],77:[0,.68333,.10903,.08334],78:[0,.68333,.10903,.08334],79:[0,.68333,.02778,.08334],80:[0,.68333,.13889,.08334],81:[.19444,.68333,0,.08334],82:[0,.68333,.00773,.08334],83:[0,.68333,.05764,.08334],84:[0,.68333,.13889,.08334],85:[0,.68333,.10903,.02778],86:[0,.68333,.22222,0],87:[0,.68333,.13889,0],88:[0,.68333,.07847,.08334],89:[0,.68333,.22222,0],90:[0,.68333,.07153,.08334],97:[0,.43056,0,0],98:[0,.69444,0,0],99:[0,.43056,0,.05556],100:[0,.69444,0,.16667],101:[0,.43056,0,.05556],102:[.19444,.69444,.10764,.16667],103:[.19444,.43056,.03588,.02778],104:[0,.69444,0,0],105:[0,.65952,0,0],106:[.19444,.65952,.05724,0],107:[0,.69444,.03148,0],108:[0,.69444,.01968,.08334],109:[0,.43056,0,0],110:[0,.43056,0,0],111:[0,.43056,0,.05556],112:[.19444,.43056,0,.08334],113:[.19444,.43056,.03588,.08334],114:[0,.43056,.02778,.05556],115:[0,.43056,0,.05556],116:[0,.61508,0,.08334],117:[0,.43056,0,.02778],118:[0,.43056,.03588,.02778],119:[0,.43056,.02691,.08334],120:[0,.43056,0,.02778],121:[.19444,.43056,.03588,.05556],122:[0,.43056,.04398,.05556],915:[0,.68333,.13889,.08334],916:[0,.68333,0,.16667],920:[0,.68333,.02778,.08334],923:[0,.68333,0,.16667],926:[0,.68333,.07569,.08334],928:[0,.68333,.08125,.05556],931:[0,.68333,.05764,.08334],933:[0,.68333,.13889,.05556],934:[0,.68333,0,.08334],936:[0,.68333,.11,.05556],937:[0,.68333,.05017,.08334],945:[0,.43056,.0037,.02778],946:[.19444,.69444,.05278,.08334],947:[.19444,.43056,.05556,0],948:[0,.69444,.03785,.05556],949:[0,.43056,0,.08334],950:[.19444,.69444,.07378,.08334],951:[.19444,.43056,.03588,.05556],952:[0,.69444,.02778,.08334],953:[0,.43056,0,.05556],954:[0,.43056,0,0],955:[0,.69444,0,0],956:[.19444,.43056,0,.02778],957:[0,.43056,.06366,.02778],958:[.19444,.69444,.04601,.11111],959:[0,.43056,0,.05556],960:[0,.43056,.03588,0],961:[.19444,.43056,0,.08334],962:[.09722,.43056,.07986,.08334],963:[0,.43056,.03588,0],964:[0,.43056,.1132,.02778],965:[0,.43056,.03588,.02778],966:[.19444,.43056,0,.08334],967:[.19444,.43056,0,.05556],968:[.19444,.69444,.03588,.11111],969:[0,.43056,.03588,0],977:[0,.69444,0,.08334],981:[.19444,.69444,0,.08334],982:[0,.43056,.02778,0],1009:[.19444,.43056,0,.08334],1013:[0,.43056,0,.05556]},"Math-Regular":{65:[0,.68333,0,.13889],66:[0,.68333,.05017,.08334],67:[0,.68333,.07153,.08334],68:[0,.68333,.02778,.05556],69:[0,.68333,.05764,.08334],70:[0,.68333,.13889,.08334],71:[0,.68333,0,.08334],72:[0,.68333,.08125,.05556],73:[0,.68333,.07847,.11111],74:[0,.68333,.09618,.16667],75:[0,.68333,.07153,.05556],76:[0,.68333,0,.02778],77:[0,.68333,.10903,.08334],78:[0,.68333,.10903,.08334],79:[0,.68333,.02778,.08334],80:[0,.68333,.13889,.08334],81:[.19444,.68333,0,.08334],82:[0,.68333,.00773,.08334],83:[0,.68333,.05764,.08334],84:[0,.68333,.13889,.08334],85:[0,.68333,.10903,.02778],86:[0,.68333,.22222,0],87:[0,.68333,.13889,0],88:[0,.68333,.07847,.08334],89:[0,.68333,.22222,0],90:[0,.68333,.07153,.08334],97:[0,.43056,0,0],98:[0,.69444,0,0],99:[0,.43056,0,.05556],100:[0,.69444,0,.16667],101:[0,.43056,0,.05556],102:[.19444,.69444,.10764,.16667],103:[.19444,.43056,.03588,.02778],104:[0,.69444,0,0],105:[0,.65952,0,0],106:[.19444,.65952,.05724,0],107:[0,.69444,.03148,0],108:[0,.69444,.01968,.08334],109:[0,.43056,0,0],110:[0,.43056,0,0],111:[0,.43056,0,.05556],112:[.19444,.43056,0,.08334],113:[.19444,.43056,.03588,.08334],114:[0,.43056,.02778,.05556],115:[0,.43056,0,.05556],116:[0,.61508,0,.08334],117:[0,.43056,0,.02778],118:[0,.43056,.03588,.02778],119:[0,.43056,.02691,.08334],120:[0,.43056,0,.02778],121:[.19444,.43056,.03588,.05556],122:[0,.43056,.04398,.05556],915:[0,.68333,.13889,.08334],916:[0,.68333,0,.16667],920:[0,.68333,.02778,.08334],923:[0,.68333,0,.16667],926:[0,.68333,.07569,.08334],928:[0,.68333,.08125,.05556],931:[0,.68333,.05764,.08334],933:[0,.68333,.13889,.05556],934:[0,.68333,0,.08334],936:[0,.68333,.11,.05556],937:[0,.68333,.05017,.08334],945:[0,.43056,.0037,.02778],946:[.19444,.69444,.05278,.08334],947:[.19444,.43056,.05556,0],948:[0,.69444,.03785,.05556],949:[0,.43056,0,.08334],950:[.19444,.69444,.07378,.08334],951:[.19444,.43056,.03588,.05556],952:[0,.69444,.02778,.08334],953:[0,.43056,0,.05556],954:[0,.43056,0,0],955:[0,.69444,0,0],956:[.19444,.43056,0,.02778],957:[0,.43056,.06366,.02778],958:[.19444,.69444,.04601,.11111],959:[0,.43056,0,.05556],960:[0,.43056,.03588,0],961:[.19444,.43056,0,.08334],962:[.09722,.43056,.07986,.08334],963:[0,.43056,.03588,0],964:[0,.43056,.1132,.02778],965:[0,.43056,.03588,.02778],966:[.19444,.43056,0,.08334],967:[.19444,.43056,0,.05556],968:[.19444,.69444,.03588,.11111],969:[0,.43056,.03588,0],977:[0,.69444,0,.08334],981:[.19444,.69444,0,.08334],982:[0,.43056,.02778,0],1009:[.19444,.43056,0,.08334],1013:[0,.43056,0,.05556]},"SansSerif-Regular":{33:[0,.69444,0,0],34:[0,.69444,0,0],35:[.19444,.69444,0,0],36:[.05556,.75,0,0],37:[.05556,.75,0,0],38:[0,.69444,0,0],39:[0,.69444,0,0],40:[.25,.75,0,0],41:[.25,.75,0,0],42:[0,.75,0,0],43:[.08333,.58333,0,0],44:[.125,.08333,0,0],45:[0,.44444,0,0],46:[0,.08333,0,0],47:[.25,.75,0,0],48:[0,.65556,0,0],49:[0,.65556,0,0],50:[0,.65556,0,0],51:[0,.65556,0,0],52:[0,.65556,0,0],53:[0,.65556,0,0],54:[0,.65556,0,0],55:[0,.65556,0,0],56:[0,.65556,0,0],57:[0,.65556,0,0],58:[0,.44444,0,0],59:[.125,.44444,0,0],61:[-.13,.37,0,0],63:[0,.69444,0,0],64:[0,.69444,0,0],65:[0,.69444,0,0],66:[0,.69444,0,0],67:[0,.69444,0,0],68:[0,.69444,0,0],69:[0,.69444,0,0],70:[0,.69444,0,0],71:[0,.69444,0,0],72:[0,.69444,0,0],73:[0,.69444,0,0],74:[0,.69444,0,0],75:[0,.69444,0,0],76:[0,.69444,0,0],77:[0,.69444,0,0],78:[0,.69444,0,0],79:[0,.69444,0,0],80:[0,.69444,0,0],81:[.125,.69444,0,0],82:[0,.69444,0,0],83:[0,.69444,0,0],84:[0,.69444,0,0],85:[0,.69444,0,0],86:[0,.69444,.01389,0],87:[0,.69444,.01389,0],88:[0,.69444,0,0],89:[0,.69444,.025,0],90:[0,.69444,0,0],91:[.25,.75,0,0],93:[.25,.75,0,0],94:[0,.69444,0,0],95:[.35,.09444,.02778,0],97:[0,.44444,0,0],98:[0,.69444,0,0],99:[0,.44444,0,0],100:[0,.69444,0,0],101:[0,.44444,0,0],102:[0,.69444,.06944,0],103:[.19444,.44444,.01389,0],104:[0,.69444,0,0],105:[0,.67937,0,0],106:[.19444,.67937,0,0],107:[0,.69444,0,0],108:[0,.69444,0,0],109:[0,.44444,0,0],110:[0,.44444,0,0],111:[0,.44444,0,0],112:[.19444,.44444,0,0],113:[.19444,.44444,0,0],114:[0,.44444,.01389,0],115:[0,.44444,0,0],116:[0,.57143,0,0],117:[0,.44444,0,0],118:[0,.44444,.01389,0],119:[0,.44444,.01389,0],120:[0,.44444,0,0],121:[.19444,.44444,.01389,0],122:[0,.44444,0,0],126:[.35,.32659,0,0],305:[0,.44444,0,0],567:[.19444,.44444,0,0],768:[0,.69444,0,0],769:[0,.69444,0,0],770:[0,.69444,0,0],771:[0,.67659,0,0],772:[0,.60889,0,0],774:[0,.69444,0,0],775:[0,.67937,0,0],776:[0,.67937,0,0],778:[0,.69444,0,0],
-779:[0,.69444,0,0],780:[0,.63194,0,0],915:[0,.69444,0,0],916:[0,.69444,0,0],920:[0,.69444,0,0],923:[0,.69444,0,0],926:[0,.69444,0,0],928:[0,.69444,0,0],931:[0,.69444,0,0],933:[0,.69444,0,0],934:[0,.69444,0,0],936:[0,.69444,0,0],937:[0,.69444,0,0],8211:[0,.44444,.02778,0],8212:[0,.44444,.02778,0],8216:[0,.69444,0,0],8217:[0,.69444,0,0],8220:[0,.69444,0,0],8221:[0,.69444,0,0]},"Script-Regular":{65:[0,.7,.22925,0],66:[0,.7,.04087,0],67:[0,.7,.1689,0],68:[0,.7,.09371,0],69:[0,.7,.18583,0],70:[0,.7,.13634,0],71:[0,.7,.17322,0],72:[0,.7,.29694,0],73:[0,.7,.19189,0],74:[.27778,.7,.19189,0],75:[0,.7,.31259,0],76:[0,.7,.19189,0],77:[0,.7,.15981,0],78:[0,.7,.3525,0],79:[0,.7,.08078,0],80:[0,.7,.08078,0],81:[0,.7,.03305,0],82:[0,.7,.06259,0],83:[0,.7,.19189,0],84:[0,.7,.29087,0],85:[0,.7,.25815,0],86:[0,.7,.27523,0],87:[0,.7,.27523,0],88:[0,.7,.26006,0],89:[0,.7,.2939,0],90:[0,.7,.24037,0]},"Size1-Regular":{40:[.35001,.85,0,0],41:[.35001,.85,0,0],47:[.35001,.85,0,0],91:[.35001,.85,0,0],92:[.35001,.85,0,0],93:[.35001,.85,0,0],123:[.35001,.85,0,0],125:[.35001,.85,0,0],710:[0,.72222,0,0],732:[0,.72222,0,0],770:[0,.72222,0,0],771:[0,.72222,0,0],8214:[-99e-5,.601,0,0],8593:[1e-5,.6,0,0],8595:[1e-5,.6,0,0],8657:[1e-5,.6,0,0],8659:[1e-5,.6,0,0],8719:[.25001,.75,0,0],8720:[.25001,.75,0,0],8721:[.25001,.75,0,0],8730:[.35001,.85,0,0],8739:[-.00599,.606,0,0],8741:[-.00599,.606,0,0],8747:[.30612,.805,.19445,0],8748:[.306,.805,.19445,0],8749:[.306,.805,.19445,0],8750:[.30612,.805,.19445,0],8896:[.25001,.75,0,0],8897:[.25001,.75,0,0],8898:[.25001,.75,0,0],8899:[.25001,.75,0,0],8968:[.35001,.85,0,0],8969:[.35001,.85,0,0],8970:[.35001,.85,0,0],8971:[.35001,.85,0,0],9168:[-99e-5,.601,0,0],10216:[.35001,.85,0,0],10217:[.35001,.85,0,0],10752:[.25001,.75,0,0],10753:[.25001,.75,0,0],10754:[.25001,.75,0,0],10756:[.25001,.75,0,0],10758:[.25001,.75,0,0]},"Size2-Regular":{40:[.65002,1.15,0,0],41:[.65002,1.15,0,0],47:[.65002,1.15,0,0],91:[.65002,1.15,0,0],92:[.65002,1.15,0,0],93:[.65002,1.15,0,0],123:[.65002,1.15,0,0],125:[.65002,1.15,0,0],710:[0,.75,0,0],732:[0,.75,0,0],770:[0,.75,0,0],771:[0,.75,0,0],8719:[.55001,1.05,0,0],8720:[.55001,1.05,0,0],8721:[.55001,1.05,0,0],8730:[.65002,1.15,0,0],8747:[.86225,1.36,.44445,0],8748:[.862,1.36,.44445,0],8749:[.862,1.36,.44445,0],8750:[.86225,1.36,.44445,0],8896:[.55001,1.05,0,0],8897:[.55001,1.05,0,0],8898:[.55001,1.05,0,0],8899:[.55001,1.05,0,0],8968:[.65002,1.15,0,0],8969:[.65002,1.15,0,0],8970:[.65002,1.15,0,0],8971:[.65002,1.15,0,0],10216:[.65002,1.15,0,0],10217:[.65002,1.15,0,0],10752:[.55001,1.05,0,0],10753:[.55001,1.05,0,0],10754:[.55001,1.05,0,0],10756:[.55001,1.05,0,0],10758:[.55001,1.05,0,0]},"Size3-Regular":{40:[.95003,1.45,0,0],41:[.95003,1.45,0,0],47:[.95003,1.45,0,0],91:[.95003,1.45,0,0],92:[.95003,1.45,0,0],93:[.95003,1.45,0,0],123:[.95003,1.45,0,0],125:[.95003,1.45,0,0],710:[0,.75,0,0],732:[0,.75,0,0],770:[0,.75,0,0],771:[0,.75,0,0],8730:[.95003,1.45,0,0],8968:[.95003,1.45,0,0],8969:[.95003,1.45,0,0],8970:[.95003,1.45,0,0],8971:[.95003,1.45,0,0],10216:[.95003,1.45,0,0],10217:[.95003,1.45,0,0]},"Size4-Regular":{40:[1.25003,1.75,0,0],41:[1.25003,1.75,0,0],47:[1.25003,1.75,0,0],91:[1.25003,1.75,0,0],92:[1.25003,1.75,0,0],93:[1.25003,1.75,0,0],123:[1.25003,1.75,0,0],125:[1.25003,1.75,0,0],710:[0,.825,0,0],732:[0,.825,0,0],770:[0,.825,0,0],771:[0,.825,0,0],8730:[1.25003,1.75,0,0],8968:[1.25003,1.75,0,0],8969:[1.25003,1.75,0,0],8970:[1.25003,1.75,0,0],8971:[1.25003,1.75,0,0],9115:[.64502,1.155,0,0],9116:[1e-5,.6,0,0],9117:[.64502,1.155,0,0],9118:[.64502,1.155,0,0],9119:[1e-5,.6,0,0],9120:[.64502,1.155,0,0],9121:[.64502,1.155,0,0],9122:[-99e-5,.601,0,0],9123:[.64502,1.155,0,0],9124:[.64502,1.155,0,0],9125:[-99e-5,.601,0,0],9126:[.64502,1.155,0,0],9127:[1e-5,.9,0,0],9128:[.65002,1.15,0,0],9129:[.90001,0,0,0],9130:[0,.3,0,0],9131:[1e-5,.9,0,0],9132:[.65002,1.15,0,0],9133:[.90001,0,0,0],9143:[.88502,.915,0,0],10216:[1.25003,1.75,0,0],10217:[1.25003,1.75,0,0],57344:[-.00499,.605,0,0],57345:[-.00499,.605,0,0],57680:[0,.12,0,0],57681:[0,.12,0,0],57682:[0,.12,0,0],57683:[0,.12,0,0]},"Typewriter-Regular":{33:[0,.61111,0,0],34:[0,.61111,0,0],35:[0,.61111,0,0],36:[.08333,.69444,0,0],37:[.08333,.69444,0,0],38:[0,.61111,0,0],39:[0,.61111,0,0],40:[.08333,.69444,0,0],41:[.08333,.69444,0,0],42:[0,.52083,0,0],43:[-.08056,.53055,0,0],44:[.13889,.125,0,0],45:[-.08056,.53055,0,0],46:[0,.125,0,0],47:[.08333,.69444,0,0],48:[0,.61111,0,0],49:[0,.61111,0,0],50:[0,.61111,0,0],51:[0,.61111,0,0],52:[0,.61111,0,0],53:[0,.61111,0,0],54:[0,.61111,0,0],55:[0,.61111,0,0],56:[0,.61111,0,0],57:[0,.61111,0,0],58:[0,.43056,0,0],59:[.13889,.43056,0,0],60:[-.05556,.55556,0,0],61:[-.19549,.41562,0,0],62:[-.05556,.55556,0,0],63:[0,.61111,0,0],64:[0,.61111,0,0],65:[0,.61111,0,0],66:[0,.61111,0,0],67:[0,.61111,0,0],68:[0,.61111,0,0],69:[0,.61111,0,0],70:[0,.61111,0,0],71:[0,.61111,0,0],72:[0,.61111,0,0],73:[0,.61111,0,0],74:[0,.61111,0,0],75:[0,.61111,0,0],76:[0,.61111,0,0],77:[0,.61111,0,0],78:[0,.61111,0,0],79:[0,.61111,0,0],80:[0,.61111,0,0],81:[.13889,.61111,0,0],82:[0,.61111,0,0],83:[0,.61111,0,0],84:[0,.61111,0,0],85:[0,.61111,0,0],86:[0,.61111,0,0],87:[0,.61111,0,0],88:[0,.61111,0,0],89:[0,.61111,0,0],90:[0,.61111,0,0],91:[.08333,.69444,0,0],92:[.08333,.69444,0,0],93:[.08333,.69444,0,0],94:[0,.61111,0,0],95:[.09514,0,0,0],96:[0,.61111,0,0],97:[0,.43056,0,0],98:[0,.61111,0,0],99:[0,.43056,0,0],100:[0,.61111,0,0],101:[0,.43056,0,0],102:[0,.61111,0,0],103:[.22222,.43056,0,0],104:[0,.61111,0,0],105:[0,.61111,0,0],106:[.22222,.61111,0,0],107:[0,.61111,0,0],108:[0,.61111,0,0],109:[0,.43056,0,0],110:[0,.43056,0,0],111:[0,.43056,0,0],112:[.22222,.43056,0,0],113:[.22222,.43056,0,0],114:[0,.43056,0,0],115:[0,.43056,0,0],116:[0,.55358,0,0],117:[0,.43056,0,0],118:[0,.43056,0,0],119:[0,.43056,0,0],120:[0,.43056,0,0],121:[.22222,.43056,0,0],122:[0,.43056,0,0],123:[.08333,.69444,0,0],124:[.08333,.69444,0,0],125:[.08333,.69444,0,0],126:[0,.61111,0,0],127:[0,.61111,0,0],305:[0,.43056,0,0],567:[.22222,.43056,0,0],768:[0,.61111,0,0],769:[0,.61111,0,0],770:[0,.61111,0,0],771:[0,.61111,0,0],772:[0,.56555,0,0],774:[0,.61111,0,0],776:[0,.61111,0,0],778:[0,.61111,0,0],780:[0,.56597,0,0],915:[0,.61111,0,0],916:[0,.61111,0,0],920:[0,.61111,0,0],923:[0,.61111,0,0],926:[0,.61111,0,0],928:[0,.61111,0,0],931:[0,.61111,0,0],933:[0,.61111,0,0],934:[0,.61111,0,0],936:[0,.61111,0,0],937:[0,.61111,0,0],2018:[0,.61111,0,0],2019:[0,.61111,0,0],8242:[0,.61111,0,0]}};
+module.exports = {
+    "AMS-Regular": {
+        "65": [0, 0.68889, 0, 0],
+        "66": [0, 0.68889, 0, 0],
+        "67": [0, 0.68889, 0, 0],
+        "68": [0, 0.68889, 0, 0],
+        "69": [0, 0.68889, 0, 0],
+        "70": [0, 0.68889, 0, 0],
+        "71": [0, 0.68889, 0, 0],
+        "72": [0, 0.68889, 0, 0],
+        "73": [0, 0.68889, 0, 0],
+        "74": [0.16667, 0.68889, 0, 0],
+        "75": [0, 0.68889, 0, 0],
+        "76": [0, 0.68889, 0, 0],
+        "77": [0, 0.68889, 0, 0],
+        "78": [0, 0.68889, 0, 0],
+        "79": [0.16667, 0.68889, 0, 0],
+        "80": [0, 0.68889, 0, 0],
+        "81": [0.16667, 0.68889, 0, 0],
+        "82": [0, 0.68889, 0, 0],
+        "83": [0, 0.68889, 0, 0],
+        "84": [0, 0.68889, 0, 0],
+        "85": [0, 0.68889, 0, 0],
+        "86": [0, 0.68889, 0, 0],
+        "87": [0, 0.68889, 0, 0],
+        "88": [0, 0.68889, 0, 0],
+        "89": [0, 0.68889, 0, 0],
+        "90": [0, 0.68889, 0, 0],
+        "107": [0, 0.68889, 0, 0],
+        "165": [0, 0.675, 0.025, 0],
+        "174": [0.15559, 0.69224, 0, 0],
+        "240": [0, 0.68889, 0, 0],
+        "295": [0, 0.68889, 0, 0],
+        "710": [0, 0.825, 0, 0],
+        "732": [0, 0.9, 0, 0],
+        "770": [0, 0.825, 0, 0],
+        "771": [0, 0.9, 0, 0],
+        "989": [0.08167, 0.58167, 0, 0],
+        "1008": [0, 0.43056, 0.04028, 0],
+        "8245": [0, 0.54986, 0, 0],
+        "8463": [0, 0.68889, 0, 0],
+        "8487": [0, 0.68889, 0, 0],
+        "8498": [0, 0.68889, 0, 0],
+        "8502": [0, 0.68889, 0, 0],
+        "8503": [0, 0.68889, 0, 0],
+        "8504": [0, 0.68889, 0, 0],
+        "8513": [0, 0.68889, 0, 0],
+        "8592": [-0.03598, 0.46402, 0, 0],
+        "8594": [-0.03598, 0.46402, 0, 0],
+        "8602": [-0.13313, 0.36687, 0, 0],
+        "8603": [-0.13313, 0.36687, 0, 0],
+        "8606": [0.01354, 0.52239, 0, 0],
+        "8608": [0.01354, 0.52239, 0, 0],
+        "8610": [0.01354, 0.52239, 0, 0],
+        "8611": [0.01354, 0.52239, 0, 0],
+        "8619": [0, 0.54986, 0, 0],
+        "8620": [0, 0.54986, 0, 0],
+        "8621": [-0.13313, 0.37788, 0, 0],
+        "8622": [-0.13313, 0.36687, 0, 0],
+        "8624": [0, 0.69224, 0, 0],
+        "8625": [0, 0.69224, 0, 0],
+        "8630": [0, 0.43056, 0, 0],
+        "8631": [0, 0.43056, 0, 0],
+        "8634": [0.08198, 0.58198, 0, 0],
+        "8635": [0.08198, 0.58198, 0, 0],
+        "8638": [0.19444, 0.69224, 0, 0],
+        "8639": [0.19444, 0.69224, 0, 0],
+        "8642": [0.19444, 0.69224, 0, 0],
+        "8643": [0.19444, 0.69224, 0, 0],
+        "8644": [0.1808, 0.675, 0, 0],
+        "8646": [0.1808, 0.675, 0, 0],
+        "8647": [0.1808, 0.675, 0, 0],
+        "8648": [0.19444, 0.69224, 0, 0],
+        "8649": [0.1808, 0.675, 0, 0],
+        "8650": [0.19444, 0.69224, 0, 0],
+        "8651": [0.01354, 0.52239, 0, 0],
+        "8652": [0.01354, 0.52239, 0, 0],
+        "8653": [-0.13313, 0.36687, 0, 0],
+        "8654": [-0.13313, 0.36687, 0, 0],
+        "8655": [-0.13313, 0.36687, 0, 0],
+        "8666": [0.13667, 0.63667, 0, 0],
+        "8667": [0.13667, 0.63667, 0, 0],
+        "8669": [-0.13313, 0.37788, 0, 0],
+        "8672": [-0.064, 0.437, 0, 0],
+        "8674": [-0.064, 0.437, 0, 0],
+        "8705": [0, 0.825, 0, 0],
+        "8708": [0, 0.68889, 0, 0],
+        "8709": [0.08167, 0.58167, 0, 0],
+        "8717": [0, 0.43056, 0, 0],
+        "8722": [-0.03598, 0.46402, 0, 0],
+        "8724": [0.08198, 0.69224, 0, 0],
+        "8726": [0.08167, 0.58167, 0, 0],
+        "8733": [0, 0.69224, 0, 0],
+        "8736": [0, 0.69224, 0, 0],
+        "8737": [0, 0.69224, 0, 0],
+        "8738": [0.03517, 0.52239, 0, 0],
+        "8739": [0.08167, 0.58167, 0, 0],
+        "8740": [0.25142, 0.74111, 0, 0],
+        "8741": [0.08167, 0.58167, 0, 0],
+        "8742": [0.25142, 0.74111, 0, 0],
+        "8756": [0, 0.69224, 0, 0],
+        "8757": [0, 0.69224, 0, 0],
+        "8764": [-0.13313, 0.36687, 0, 0],
+        "8765": [-0.13313, 0.37788, 0, 0],
+        "8769": [-0.13313, 0.36687, 0, 0],
+        "8770": [-0.03625, 0.46375, 0, 0],
+        "8774": [0.30274, 0.79383, 0, 0],
+        "8776": [-0.01688, 0.48312, 0, 0],
+        "8778": [0.08167, 0.58167, 0, 0],
+        "8782": [0.06062, 0.54986, 0, 0],
+        "8783": [0.06062, 0.54986, 0, 0],
+        "8785": [0.08198, 0.58198, 0, 0],
+        "8786": [0.08198, 0.58198, 0, 0],
+        "8787": [0.08198, 0.58198, 0, 0],
+        "8790": [0, 0.69224, 0, 0],
+        "8791": [0.22958, 0.72958, 0, 0],
+        "8796": [0.08198, 0.91667, 0, 0],
+        "8806": [0.25583, 0.75583, 0, 0],
+        "8807": [0.25583, 0.75583, 0, 0],
+        "8808": [0.25142, 0.75726, 0, 0],
+        "8809": [0.25142, 0.75726, 0, 0],
+        "8812": [0.25583, 0.75583, 0, 0],
+        "8814": [0.20576, 0.70576, 0, 0],
+        "8815": [0.20576, 0.70576, 0, 0],
+        "8816": [0.30274, 0.79383, 0, 0],
+        "8817": [0.30274, 0.79383, 0, 0],
+        "8818": [0.22958, 0.72958, 0, 0],
+        "8819": [0.22958, 0.72958, 0, 0],
+        "8822": [0.1808, 0.675, 0, 0],
+        "8823": [0.1808, 0.675, 0, 0],
+        "8828": [0.13667, 0.63667, 0, 0],
+        "8829": [0.13667, 0.63667, 0, 0],
+        "8830": [0.22958, 0.72958, 0, 0],
+        "8831": [0.22958, 0.72958, 0, 0],
+        "8832": [0.20576, 0.70576, 0, 0],
+        "8833": [0.20576, 0.70576, 0, 0],
+        "8840": [0.30274, 0.79383, 0, 0],
+        "8841": [0.30274, 0.79383, 0, 0],
+        "8842": [0.13597, 0.63597, 0, 0],
+        "8843": [0.13597, 0.63597, 0, 0],
+        "8847": [0.03517, 0.54986, 0, 0],
+        "8848": [0.03517, 0.54986, 0, 0],
+        "8858": [0.08198, 0.58198, 0, 0],
+        "8859": [0.08198, 0.58198, 0, 0],
+        "8861": [0.08198, 0.58198, 0, 0],
+        "8862": [0, 0.675, 0, 0],
+        "8863": [0, 0.675, 0, 0],
+        "8864": [0, 0.675, 0, 0],
+        "8865": [0, 0.675, 0, 0],
+        "8872": [0, 0.69224, 0, 0],
+        "8873": [0, 0.69224, 0, 0],
+        "8874": [0, 0.69224, 0, 0],
+        "8876": [0, 0.68889, 0, 0],
+        "8877": [0, 0.68889, 0, 0],
+        "8878": [0, 0.68889, 0, 0],
+        "8879": [0, 0.68889, 0, 0],
+        "8882": [0.03517, 0.54986, 0, 0],
+        "8883": [0.03517, 0.54986, 0, 0],
+        "8884": [0.13667, 0.63667, 0, 0],
+        "8885": [0.13667, 0.63667, 0, 0],
+        "8888": [0, 0.54986, 0, 0],
+        "8890": [0.19444, 0.43056, 0, 0],
+        "8891": [0.19444, 0.69224, 0, 0],
+        "8892": [0.19444, 0.69224, 0, 0],
+        "8901": [0, 0.54986, 0, 0],
+        "8903": [0.08167, 0.58167, 0, 0],
+        "8905": [0.08167, 0.58167, 0, 0],
+        "8906": [0.08167, 0.58167, 0, 0],
+        "8907": [0, 0.69224, 0, 0],
+        "8908": [0, 0.69224, 0, 0],
+        "8909": [-0.03598, 0.46402, 0, 0],
+        "8910": [0, 0.54986, 0, 0],
+        "8911": [0, 0.54986, 0, 0],
+        "8912": [0.03517, 0.54986, 0, 0],
+        "8913": [0.03517, 0.54986, 0, 0],
+        "8914": [0, 0.54986, 0, 0],
+        "8915": [0, 0.54986, 0, 0],
+        "8916": [0, 0.69224, 0, 0],
+        "8918": [0.0391, 0.5391, 0, 0],
+        "8919": [0.0391, 0.5391, 0, 0],
+        "8920": [0.03517, 0.54986, 0, 0],
+        "8921": [0.03517, 0.54986, 0, 0],
+        "8922": [0.38569, 0.88569, 0, 0],
+        "8923": [0.38569, 0.88569, 0, 0],
+        "8926": [0.13667, 0.63667, 0, 0],
+        "8927": [0.13667, 0.63667, 0, 0],
+        "8928": [0.30274, 0.79383, 0, 0],
+        "8929": [0.30274, 0.79383, 0, 0],
+        "8934": [0.23222, 0.74111, 0, 0],
+        "8935": [0.23222, 0.74111, 0, 0],
+        "8936": [0.23222, 0.74111, 0, 0],
+        "8937": [0.23222, 0.74111, 0, 0],
+        "8938": [0.20576, 0.70576, 0, 0],
+        "8939": [0.20576, 0.70576, 0, 0],
+        "8940": [0.30274, 0.79383, 0, 0],
+        "8941": [0.30274, 0.79383, 0, 0],
+        "8994": [0.19444, 0.69224, 0, 0],
+        "8995": [0.19444, 0.69224, 0, 0],
+        "9416": [0.15559, 0.69224, 0, 0],
+        "9484": [0, 0.69224, 0, 0],
+        "9488": [0, 0.69224, 0, 0],
+        "9492": [0, 0.37788, 0, 0],
+        "9496": [0, 0.37788, 0, 0],
+        "9585": [0.19444, 0.68889, 0, 0],
+        "9586": [0.19444, 0.74111, 0, 0],
+        "9632": [0, 0.675, 0, 0],
+        "9633": [0, 0.675, 0, 0],
+        "9650": [0, 0.54986, 0, 0],
+        "9651": [0, 0.54986, 0, 0],
+        "9654": [0.03517, 0.54986, 0, 0],
+        "9660": [0, 0.54986, 0, 0],
+        "9661": [0, 0.54986, 0, 0],
+        "9664": [0.03517, 0.54986, 0, 0],
+        "9674": [0.11111, 0.69224, 0, 0],
+        "9733": [0.19444, 0.69224, 0, 0],
+        "10003": [0, 0.69224, 0, 0],
+        "10016": [0, 0.69224, 0, 0],
+        "10731": [0.11111, 0.69224, 0, 0],
+        "10846": [0.19444, 0.75583, 0, 0],
+        "10877": [0.13667, 0.63667, 0, 0],
+        "10878": [0.13667, 0.63667, 0, 0],
+        "10885": [0.25583, 0.75583, 0, 0],
+        "10886": [0.25583, 0.75583, 0, 0],
+        "10887": [0.13597, 0.63597, 0, 0],
+        "10888": [0.13597, 0.63597, 0, 0],
+        "10889": [0.26167, 0.75726, 0, 0],
+        "10890": [0.26167, 0.75726, 0, 0],
+        "10891": [0.48256, 0.98256, 0, 0],
+        "10892": [0.48256, 0.98256, 0, 0],
+        "10901": [0.13667, 0.63667, 0, 0],
+        "10902": [0.13667, 0.63667, 0, 0],
+        "10933": [0.25142, 0.75726, 0, 0],
+        "10934": [0.25142, 0.75726, 0, 0],
+        "10935": [0.26167, 0.75726, 0, 0],
+        "10936": [0.26167, 0.75726, 0, 0],
+        "10937": [0.26167, 0.75726, 0, 0],
+        "10938": [0.26167, 0.75726, 0, 0],
+        "10949": [0.25583, 0.75583, 0, 0],
+        "10950": [0.25583, 0.75583, 0, 0],
+        "10955": [0.28481, 0.79383, 0, 0],
+        "10956": [0.28481, 0.79383, 0, 0],
+        "57350": [0.08167, 0.58167, 0, 0],
+        "57351": [0.08167, 0.58167, 0, 0],
+        "57352": [0.08167, 0.58167, 0, 0],
+        "57353": [0, 0.43056, 0.04028, 0],
+        "57356": [0.25142, 0.75726, 0, 0],
+        "57357": [0.25142, 0.75726, 0, 0],
+        "57358": [0.41951, 0.91951, 0, 0],
+        "57359": [0.30274, 0.79383, 0, 0],
+        "57360": [0.30274, 0.79383, 0, 0],
+        "57361": [0.41951, 0.91951, 0, 0],
+        "57366": [0.25142, 0.75726, 0, 0],
+        "57367": [0.25142, 0.75726, 0, 0],
+        "57368": [0.25142, 0.75726, 0, 0],
+        "57369": [0.25142, 0.75726, 0, 0],
+        "57370": [0.13597, 0.63597, 0, 0],
+        "57371": [0.13597, 0.63597, 0, 0]
+    },
+    "Caligraphic-Regular": {
+        "48": [0, 0.43056, 0, 0],
+        "49": [0, 0.43056, 0, 0],
+        "50": [0, 0.43056, 0, 0],
+        "51": [0.19444, 0.43056, 0, 0],
+        "52": [0.19444, 0.43056, 0, 0],
+        "53": [0.19444, 0.43056, 0, 0],
+        "54": [0, 0.64444, 0, 0],
+        "55": [0.19444, 0.43056, 0, 0],
+        "56": [0, 0.64444, 0, 0],
+        "57": [0.19444, 0.43056, 0, 0],
+        "65": [0, 0.68333, 0, 0.19445],
+        "66": [0, 0.68333, 0.03041, 0.13889],
+        "67": [0, 0.68333, 0.05834, 0.13889],
+        "68": [0, 0.68333, 0.02778, 0.08334],
+        "69": [0, 0.68333, 0.08944, 0.11111],
+        "70": [0, 0.68333, 0.09931, 0.11111],
+        "71": [0.09722, 0.68333, 0.0593, 0.11111],
+        "72": [0, 0.68333, 0.00965, 0.11111],
+        "73": [0, 0.68333, 0.07382, 0],
+        "74": [0.09722, 0.68333, 0.18472, 0.16667],
+        "75": [0, 0.68333, 0.01445, 0.05556],
+        "76": [0, 0.68333, 0, 0.13889],
+        "77": [0, 0.68333, 0, 0.13889],
+        "78": [0, 0.68333, 0.14736, 0.08334],
+        "79": [0, 0.68333, 0.02778, 0.11111],
+        "80": [0, 0.68333, 0.08222, 0.08334],
+        "81": [0.09722, 0.68333, 0, 0.11111],
+        "82": [0, 0.68333, 0, 0.08334],
+        "83": [0, 0.68333, 0.075, 0.13889],
+        "84": [0, 0.68333, 0.25417, 0],
+        "85": [0, 0.68333, 0.09931, 0.08334],
+        "86": [0, 0.68333, 0.08222, 0],
+        "87": [0, 0.68333, 0.08222, 0.08334],
+        "88": [0, 0.68333, 0.14643, 0.13889],
+        "89": [0.09722, 0.68333, 0.08222, 0.08334],
+        "90": [0, 0.68333, 0.07944, 0.13889]
+    },
+    "Fraktur-Regular": {
+        "33": [0, 0.69141, 0, 0],
+        "34": [0, 0.69141, 0, 0],
+        "38": [0, 0.69141, 0, 0],
+        "39": [0, 0.69141, 0, 0],
+        "40": [0.24982, 0.74947, 0, 0],
+        "41": [0.24982, 0.74947, 0, 0],
+        "42": [0, 0.62119, 0, 0],
+        "43": [0.08319, 0.58283, 0, 0],
+        "44": [0, 0.10803, 0, 0],
+        "45": [0.08319, 0.58283, 0, 0],
+        "46": [0, 0.10803, 0, 0],
+        "47": [0.24982, 0.74947, 0, 0],
+        "48": [0, 0.47534, 0, 0],
+        "49": [0, 0.47534, 0, 0],
+        "50": [0, 0.47534, 0, 0],
+        "51": [0.18906, 0.47534, 0, 0],
+        "52": [0.18906, 0.47534, 0, 0],
+        "53": [0.18906, 0.47534, 0, 0],
+        "54": [0, 0.69141, 0, 0],
+        "55": [0.18906, 0.47534, 0, 0],
+        "56": [0, 0.69141, 0, 0],
+        "57": [0.18906, 0.47534, 0, 0],
+        "58": [0, 0.47534, 0, 0],
+        "59": [0.12604, 0.47534, 0, 0],
+        "61": [-0.13099, 0.36866, 0, 0],
+        "63": [0, 0.69141, 0, 0],
+        "65": [0, 0.69141, 0, 0],
+        "66": [0, 0.69141, 0, 0],
+        "67": [0, 0.69141, 0, 0],
+        "68": [0, 0.69141, 0, 0],
+        "69": [0, 0.69141, 0, 0],
+        "70": [0.12604, 0.69141, 0, 0],
+        "71": [0, 0.69141, 0, 0],
+        "72": [0.06302, 0.69141, 0, 0],
+        "73": [0, 0.69141, 0, 0],
+        "74": [0.12604, 0.69141, 0, 0],
+        "75": [0, 0.69141, 0, 0],
+        "76": [0, 0.69141, 0, 0],
+        "77": [0, 0.69141, 0, 0],
+        "78": [0, 0.69141, 0, 0],
+        "79": [0, 0.69141, 0, 0],
+        "80": [0.18906, 0.69141, 0, 0],
+        "81": [0.03781, 0.69141, 0, 0],
+        "82": [0, 0.69141, 0, 0],
+        "83": [0, 0.69141, 0, 0],
+        "84": [0, 0.69141, 0, 0],
+        "85": [0, 0.69141, 0, 0],
+        "86": [0, 0.69141, 0, 0],
+        "87": [0, 0.69141, 0, 0],
+        "88": [0, 0.69141, 0, 0],
+        "89": [0.18906, 0.69141, 0, 0],
+        "90": [0.12604, 0.69141, 0, 0],
+        "91": [0.24982, 0.74947, 0, 0],
+        "93": [0.24982, 0.74947, 0, 0],
+        "94": [0, 0.69141, 0, 0],
+        "97": [0, 0.47534, 0, 0],
+        "98": [0, 0.69141, 0, 0],
+        "99": [0, 0.47534, 0, 0],
+        "100": [0, 0.62119, 0, 0],
+        "101": [0, 0.47534, 0, 0],
+        "102": [0.18906, 0.69141, 0, 0],
+        "103": [0.18906, 0.47534, 0, 0],
+        "104": [0.18906, 0.69141, 0, 0],
+        "105": [0, 0.69141, 0, 0],
+        "106": [0, 0.69141, 0, 0],
+        "107": [0, 0.69141, 0, 0],
+        "108": [0, 0.69141, 0, 0],
+        "109": [0, 0.47534, 0, 0],
+        "110": [0, 0.47534, 0, 0],
+        "111": [0, 0.47534, 0, 0],
+        "112": [0.18906, 0.52396, 0, 0],
+        "113": [0.18906, 0.47534, 0, 0],
+        "114": [0, 0.47534, 0, 0],
+        "115": [0, 0.47534, 0, 0],
+        "116": [0, 0.62119, 0, 0],
+        "117": [0, 0.47534, 0, 0],
+        "118": [0, 0.52396, 0, 0],
+        "119": [0, 0.52396, 0, 0],
+        "120": [0.18906, 0.47534, 0, 0],
+        "121": [0.18906, 0.47534, 0, 0],
+        "122": [0.18906, 0.47534, 0, 0],
+        "8216": [0, 0.69141, 0, 0],
+        "8217": [0, 0.69141, 0, 0],
+        "58112": [0, 0.62119, 0, 0],
+        "58113": [0, 0.62119, 0, 0],
+        "58114": [0.18906, 0.69141, 0, 0],
+        "58115": [0.18906, 0.69141, 0, 0],
+        "58116": [0.18906, 0.47534, 0, 0],
+        "58117": [0, 0.69141, 0, 0],
+        "58118": [0, 0.62119, 0, 0],
+        "58119": [0, 0.47534, 0, 0]
+    },
+    "Main-Bold": {
+        "33": [0, 0.69444, 0, 0],
+        "34": [0, 0.69444, 0, 0],
+        "35": [0.19444, 0.69444, 0, 0],
+        "36": [0.05556, 0.75, 0, 0],
+        "37": [0.05556, 0.75, 0, 0],
+        "38": [0, 0.69444, 0, 0],
+        "39": [0, 0.69444, 0, 0],
+        "40": [0.25, 0.75, 0, 0],
+        "41": [0.25, 0.75, 0, 0],
+        "42": [0, 0.75, 0, 0],
+        "43": [0.13333, 0.63333, 0, 0],
+        "44": [0.19444, 0.15556, 0, 0],
+        "45": [0, 0.44444, 0, 0],
+        "46": [0, 0.15556, 0, 0],
+        "47": [0.25, 0.75, 0, 0],
+        "48": [0, 0.64444, 0, 0],
+        "49": [0, 0.64444, 0, 0],
+        "50": [0, 0.64444, 0, 0],
+        "51": [0, 0.64444, 0, 0],
+        "52": [0, 0.64444, 0, 0],
+        "53": [0, 0.64444, 0, 0],
+        "54": [0, 0.64444, 0, 0],
+        "55": [0, 0.64444, 0, 0],
+        "56": [0, 0.64444, 0, 0],
+        "57": [0, 0.64444, 0, 0],
+        "58": [0, 0.44444, 0, 0],
+        "59": [0.19444, 0.44444, 0, 0],
+        "60": [0.08556, 0.58556, 0, 0],
+        "61": [-0.10889, 0.39111, 0, 0],
+        "62": [0.08556, 0.58556, 0, 0],
+        "63": [0, 0.69444, 0, 0],
+        "64": [0, 0.69444, 0, 0],
+        "65": [0, 0.68611, 0, 0],
+        "66": [0, 0.68611, 0, 0],
+        "67": [0, 0.68611, 0, 0],
+        "68": [0, 0.68611, 0, 0],
+        "69": [0, 0.68611, 0, 0],
+        "70": [0, 0.68611, 0, 0],
+        "71": [0, 0.68611, 0, 0],
+        "72": [0, 0.68611, 0, 0],
+        "73": [0, 0.68611, 0, 0],
+        "74": [0, 0.68611, 0, 0],
+        "75": [0, 0.68611, 0, 0],
+        "76": [0, 0.68611, 0, 0],
+        "77": [0, 0.68611, 0, 0],
+        "78": [0, 0.68611, 0, 0],
+        "79": [0, 0.68611, 0, 0],
+        "80": [0, 0.68611, 0, 0],
+        "81": [0.19444, 0.68611, 0, 0],
+        "82": [0, 0.68611, 0, 0],
+        "83": [0, 0.68611, 0, 0],
+        "84": [0, 0.68611, 0, 0],
+        "85": [0, 0.68611, 0, 0],
+        "86": [0, 0.68611, 0.01597, 0],
+        "87": [0, 0.68611, 0.01597, 0],
+        "88": [0, 0.68611, 0, 0],
+        "89": [0, 0.68611, 0.02875, 0],
+        "90": [0, 0.68611, 0, 0],
+        "91": [0.25, 0.75, 0, 0],
+        "92": [0.25, 0.75, 0, 0],
+        "93": [0.25, 0.75, 0, 0],
+        "94": [0, 0.69444, 0, 0],
+        "95": [0.31, 0.13444, 0.03194, 0],
+        "96": [0, 0.69444, 0, 0],
+        "97": [0, 0.44444, 0, 0],
+        "98": [0, 0.69444, 0, 0],
+        "99": [0, 0.44444, 0, 0],
+        "100": [0, 0.69444, 0, 0],
+        "101": [0, 0.44444, 0, 0],
+        "102": [0, 0.69444, 0.10903, 0],
+        "103": [0.19444, 0.44444, 0.01597, 0],
+        "104": [0, 0.69444, 0, 0],
+        "105": [0, 0.69444, 0, 0],
+        "106": [0.19444, 0.69444, 0, 0],
+        "107": [0, 0.69444, 0, 0],
+        "108": [0, 0.69444, 0, 0],
+        "109": [0, 0.44444, 0, 0],
+        "110": [0, 0.44444, 0, 0],
+        "111": [0, 0.44444, 0, 0],
+        "112": [0.19444, 0.44444, 0, 0],
+        "113": [0.19444, 0.44444, 0, 0],
+        "114": [0, 0.44444, 0, 0],
+        "115": [0, 0.44444, 0, 0],
+        "116": [0, 0.63492, 0, 0],
+        "117": [0, 0.44444, 0, 0],
+        "118": [0, 0.44444, 0.01597, 0],
+        "119": [0, 0.44444, 0.01597, 0],
+        "120": [0, 0.44444, 0, 0],
+        "121": [0.19444, 0.44444, 0.01597, 0],
+        "122": [0, 0.44444, 0, 0],
+        "123": [0.25, 0.75, 0, 0],
+        "124": [0.25, 0.75, 0, 0],
+        "125": [0.25, 0.75, 0, 0],
+        "126": [0.35, 0.34444, 0, 0],
+        "168": [0, 0.69444, 0, 0],
+        "172": [0, 0.44444, 0, 0],
+        "175": [0, 0.59611, 0, 0],
+        "176": [0, 0.69444, 0, 0],
+        "177": [0.13333, 0.63333, 0, 0],
+        "180": [0, 0.69444, 0, 0],
+        "215": [0.13333, 0.63333, 0, 0],
+        "247": [0.13333, 0.63333, 0, 0],
+        "305": [0, 0.44444, 0, 0],
+        "567": [0.19444, 0.44444, 0, 0],
+        "710": [0, 0.69444, 0, 0],
+        "711": [0, 0.63194, 0, 0],
+        "713": [0, 0.59611, 0, 0],
+        "714": [0, 0.69444, 0, 0],
+        "715": [0, 0.69444, 0, 0],
+        "728": [0, 0.69444, 0, 0],
+        "729": [0, 0.69444, 0, 0],
+        "730": [0, 0.69444, 0, 0],
+        "732": [0, 0.69444, 0, 0],
+        "768": [0, 0.69444, 0, 0],
+        "769": [0, 0.69444, 0, 0],
+        "770": [0, 0.69444, 0, 0],
+        "771": [0, 0.69444, 0, 0],
+        "772": [0, 0.59611, 0, 0],
+        "774": [0, 0.69444, 0, 0],
+        "775": [0, 0.69444, 0, 0],
+        "776": [0, 0.69444, 0, 0],
+        "778": [0, 0.69444, 0, 0],
+        "779": [0, 0.69444, 0, 0],
+        "780": [0, 0.63194, 0, 0],
+        "824": [0.19444, 0.69444, 0, 0],
+        "915": [0, 0.68611, 0, 0],
+        "916": [0, 0.68611, 0, 0],
+        "920": [0, 0.68611, 0, 0],
+        "923": [0, 0.68611, 0, 0],
+        "926": [0, 0.68611, 0, 0],
+        "928": [0, 0.68611, 0, 0],
+        "931": [0, 0.68611, 0, 0],
+        "933": [0, 0.68611, 0, 0],
+        "934": [0, 0.68611, 0, 0],
+        "936": [0, 0.68611, 0, 0],
+        "937": [0, 0.68611, 0, 0],
+        "8211": [0, 0.44444, 0.03194, 0],
+        "8212": [0, 0.44444, 0.03194, 0],
+        "8216": [0, 0.69444, 0, 0],
+        "8217": [0, 0.69444, 0, 0],
+        "8220": [0, 0.69444, 0, 0],
+        "8221": [0, 0.69444, 0, 0],
+        "8224": [0.19444, 0.69444, 0, 0],
+        "8225": [0.19444, 0.69444, 0, 0],
+        "8242": [0, 0.55556, 0, 0],
+        "8407": [0, 0.72444, 0.15486, 0],
+        "8463": [0, 0.69444, 0, 0],
+        "8465": [0, 0.69444, 0, 0],
+        "8467": [0, 0.69444, 0, 0],
+        "8472": [0.19444, 0.44444, 0, 0],
+        "8476": [0, 0.69444, 0, 0],
+        "8501": [0, 0.69444, 0, 0],
+        "8592": [-0.10889, 0.39111, 0, 0],
+        "8593": [0.19444, 0.69444, 0, 0],
+        "8594": [-0.10889, 0.39111, 0, 0],
+        "8595": [0.19444, 0.69444, 0, 0],
+        "8596": [-0.10889, 0.39111, 0, 0],
+        "8597": [0.25, 0.75, 0, 0],
+        "8598": [0.19444, 0.69444, 0, 0],
+        "8599": [0.19444, 0.69444, 0, 0],
+        "8600": [0.19444, 0.69444, 0, 0],
+        "8601": [0.19444, 0.69444, 0, 0],
+        "8636": [-0.10889, 0.39111, 0, 0],
+        "8637": [-0.10889, 0.39111, 0, 0],
+        "8640": [-0.10889, 0.39111, 0, 0],
+        "8641": [-0.10889, 0.39111, 0, 0],
+        "8656": [-0.10889, 0.39111, 0, 0],
+        "8657": [0.19444, 0.69444, 0, 0],
+        "8658": [-0.10889, 0.39111, 0, 0],
+        "8659": [0.19444, 0.69444, 0, 0],
+        "8660": [-0.10889, 0.39111, 0, 0],
+        "8661": [0.25, 0.75, 0, 0],
+        "8704": [0, 0.69444, 0, 0],
+        "8706": [0, 0.69444, 0.06389, 0],
+        "8707": [0, 0.69444, 0, 0],
+        "8709": [0.05556, 0.75, 0, 0],
+        "8711": [0, 0.68611, 0, 0],
+        "8712": [0.08556, 0.58556, 0, 0],
+        "8715": [0.08556, 0.58556, 0, 0],
+        "8722": [0.13333, 0.63333, 0, 0],
+        "8723": [0.13333, 0.63333, 0, 0],
+        "8725": [0.25, 0.75, 0, 0],
+        "8726": [0.25, 0.75, 0, 0],
+        "8727": [-0.02778, 0.47222, 0, 0],
+        "8728": [-0.02639, 0.47361, 0, 0],
+        "8729": [-0.02639, 0.47361, 0, 0],
+        "8730": [0.18, 0.82, 0, 0],
+        "8733": [0, 0.44444, 0, 0],
+        "8734": [0, 0.44444, 0, 0],
+        "8736": [0, 0.69224, 0, 0],
+        "8739": [0.25, 0.75, 0, 0],
+        "8741": [0.25, 0.75, 0, 0],
+        "8743": [0, 0.55556, 0, 0],
+        "8744": [0, 0.55556, 0, 0],
+        "8745": [0, 0.55556, 0, 0],
+        "8746": [0, 0.55556, 0, 0],
+        "8747": [0.19444, 0.69444, 0.12778, 0],
+        "8764": [-0.10889, 0.39111, 0, 0],
+        "8768": [0.19444, 0.69444, 0, 0],
+        "8771": [0.00222, 0.50222, 0, 0],
+        "8776": [0.02444, 0.52444, 0, 0],
+        "8781": [0.00222, 0.50222, 0, 0],
+        "8801": [0.00222, 0.50222, 0, 0],
+        "8804": [0.19667, 0.69667, 0, 0],
+        "8805": [0.19667, 0.69667, 0, 0],
+        "8810": [0.08556, 0.58556, 0, 0],
+        "8811": [0.08556, 0.58556, 0, 0],
+        "8826": [0.08556, 0.58556, 0, 0],
+        "8827": [0.08556, 0.58556, 0, 0],
+        "8834": [0.08556, 0.58556, 0, 0],
+        "8835": [0.08556, 0.58556, 0, 0],
+        "8838": [0.19667, 0.69667, 0, 0],
+        "8839": [0.19667, 0.69667, 0, 0],
+        "8846": [0, 0.55556, 0, 0],
+        "8849": [0.19667, 0.69667, 0, 0],
+        "8850": [0.19667, 0.69667, 0, 0],
+        "8851": [0, 0.55556, 0, 0],
+        "8852": [0, 0.55556, 0, 0],
+        "8853": [0.13333, 0.63333, 0, 0],
+        "8854": [0.13333, 0.63333, 0, 0],
+        "8855": [0.13333, 0.63333, 0, 0],
+        "8856": [0.13333, 0.63333, 0, 0],
+        "8857": [0.13333, 0.63333, 0, 0],
+        "8866": [0, 0.69444, 0, 0],
+        "8867": [0, 0.69444, 0, 0],
+        "8868": [0, 0.69444, 0, 0],
+        "8869": [0, 0.69444, 0, 0],
+        "8900": [-0.02639, 0.47361, 0, 0],
+        "8901": [-0.02639, 0.47361, 0, 0],
+        "8902": [-0.02778, 0.47222, 0, 0],
+        "8968": [0.25, 0.75, 0, 0],
+        "8969": [0.25, 0.75, 0, 0],
+        "8970": [0.25, 0.75, 0, 0],
+        "8971": [0.25, 0.75, 0, 0],
+        "8994": [-0.13889, 0.36111, 0, 0],
+        "8995": [-0.13889, 0.36111, 0, 0],
+        "9651": [0.19444, 0.69444, 0, 0],
+        "9657": [-0.02778, 0.47222, 0, 0],
+        "9661": [0.19444, 0.69444, 0, 0],
+        "9667": [-0.02778, 0.47222, 0, 0],
+        "9711": [0.19444, 0.69444, 0, 0],
+        "9824": [0.12963, 0.69444, 0, 0],
+        "9825": [0.12963, 0.69444, 0, 0],
+        "9826": [0.12963, 0.69444, 0, 0],
+        "9827": [0.12963, 0.69444, 0, 0],
+        "9837": [0, 0.75, 0, 0],
+        "9838": [0.19444, 0.69444, 0, 0],
+        "9839": [0.19444, 0.69444, 0, 0],
+        "10216": [0.25, 0.75, 0, 0],
+        "10217": [0.25, 0.75, 0, 0],
+        "10815": [0, 0.68611, 0, 0],
+        "10927": [0.19667, 0.69667, 0, 0],
+        "10928": [0.19667, 0.69667, 0, 0]
+    },
+    "Main-Italic": {
+        "33": [0, 0.69444, 0.12417, 0],
+        "34": [0, 0.69444, 0.06961, 0],
+        "35": [0.19444, 0.69444, 0.06616, 0],
+        "37": [0.05556, 0.75, 0.13639, 0],
+        "38": [0, 0.69444, 0.09694, 0],
+        "39": [0, 0.69444, 0.12417, 0],
+        "40": [0.25, 0.75, 0.16194, 0],
+        "41": [0.25, 0.75, 0.03694, 0],
+        "42": [0, 0.75, 0.14917, 0],
+        "43": [0.05667, 0.56167, 0.03694, 0],
+        "44": [0.19444, 0.10556, 0, 0],
+        "45": [0, 0.43056, 0.02826, 0],
+        "46": [0, 0.10556, 0, 0],
+        "47": [0.25, 0.75, 0.16194, 0],
+        "48": [0, 0.64444, 0.13556, 0],
+        "49": [0, 0.64444, 0.13556, 0],
+        "50": [0, 0.64444, 0.13556, 0],
+        "51": [0, 0.64444, 0.13556, 0],
+        "52": [0.19444, 0.64444, 0.13556, 0],
+        "53": [0, 0.64444, 0.13556, 0],
+        "54": [0, 0.64444, 0.13556, 0],
+        "55": [0.19444, 0.64444, 0.13556, 0],
+        "56": [0, 0.64444, 0.13556, 0],
+        "57": [0, 0.64444, 0.13556, 0],
+        "58": [0, 0.43056, 0.0582, 0],
+        "59": [0.19444, 0.43056, 0.0582, 0],
+        "61": [-0.13313, 0.36687, 0.06616, 0],
+        "63": [0, 0.69444, 0.1225, 0],
+        "64": [0, 0.69444, 0.09597, 0],
+        "65": [0, 0.68333, 0, 0],
+        "66": [0, 0.68333, 0.10257, 0],
+        "67": [0, 0.68333, 0.14528, 0],
+        "68": [0, 0.68333, 0.09403, 0],
+        "69": [0, 0.68333, 0.12028, 0],
+        "70": [0, 0.68333, 0.13305, 0],
+        "71": [0, 0.68333, 0.08722, 0],
+        "72": [0, 0.68333, 0.16389, 0],
+        "73": [0, 0.68333, 0.15806, 0],
+        "74": [0, 0.68333, 0.14028, 0],
+        "75": [0, 0.68333, 0.14528, 0],
+        "76": [0, 0.68333, 0, 0],
+        "77": [0, 0.68333, 0.16389, 0],
+        "78": [0, 0.68333, 0.16389, 0],
+        "79": [0, 0.68333, 0.09403, 0],
+        "80": [0, 0.68333, 0.10257, 0],
+        "81": [0.19444, 0.68333, 0.09403, 0],
+        "82": [0, 0.68333, 0.03868, 0],
+        "83": [0, 0.68333, 0.11972, 0],
+        "84": [0, 0.68333, 0.13305, 0],
+        "85": [0, 0.68333, 0.16389, 0],
+        "86": [0, 0.68333, 0.18361, 0],
+        "87": [0, 0.68333, 0.18361, 0],
+        "88": [0, 0.68333, 0.15806, 0],
+        "89": [0, 0.68333, 0.19383, 0],
+        "90": [0, 0.68333, 0.14528, 0],
+        "91": [0.25, 0.75, 0.1875, 0],
+        "93": [0.25, 0.75, 0.10528, 0],
+        "94": [0, 0.69444, 0.06646, 0],
+        "95": [0.31, 0.12056, 0.09208, 0],
+        "97": [0, 0.43056, 0.07671, 0],
+        "98": [0, 0.69444, 0.06312, 0],
+        "99": [0, 0.43056, 0.05653, 0],
+        "100": [0, 0.69444, 0.10333, 0],
+        "101": [0, 0.43056, 0.07514, 0],
+        "102": [0.19444, 0.69444, 0.21194, 0],
+        "103": [0.19444, 0.43056, 0.08847, 0],
+        "104": [0, 0.69444, 0.07671, 0],
+        "105": [0, 0.65536, 0.1019, 0],
+        "106": [0.19444, 0.65536, 0.14467, 0],
+        "107": [0, 0.69444, 0.10764, 0],
+        "108": [0, 0.69444, 0.10333, 0],
+        "109": [0, 0.43056, 0.07671, 0],
+        "110": [0, 0.43056, 0.07671, 0],
+        "111": [0, 0.43056, 0.06312, 0],
+        "112": [0.19444, 0.43056, 0.06312, 0],
+        "113": [0.19444, 0.43056, 0.08847, 0],
+        "114": [0, 0.43056, 0.10764, 0],
+        "115": [0, 0.43056, 0.08208, 0],
+        "116": [0, 0.61508, 0.09486, 0],
+        "117": [0, 0.43056, 0.07671, 0],
+        "118": [0, 0.43056, 0.10764, 0],
+        "119": [0, 0.43056, 0.10764, 0],
+        "120": [0, 0.43056, 0.12042, 0],
+        "121": [0.19444, 0.43056, 0.08847, 0],
+        "122": [0, 0.43056, 0.12292, 0],
+        "126": [0.35, 0.31786, 0.11585, 0],
+        "163": [0, 0.69444, 0, 0],
+        "305": [0, 0.43056, 0, 0.02778],
+        "567": [0.19444, 0.43056, 0, 0.08334],
+        "768": [0, 0.69444, 0, 0],
+        "769": [0, 0.69444, 0.09694, 0],
+        "770": [0, 0.69444, 0.06646, 0],
+        "771": [0, 0.66786, 0.11585, 0],
+        "772": [0, 0.56167, 0.10333, 0],
+        "774": [0, 0.69444, 0.10806, 0],
+        "775": [0, 0.66786, 0.11752, 0],
+        "776": [0, 0.66786, 0.10474, 0],
+        "778": [0, 0.69444, 0, 0],
+        "779": [0, 0.69444, 0.1225, 0],
+        "780": [0, 0.62847, 0.08295, 0],
+        "915": [0, 0.68333, 0.13305, 0],
+        "916": [0, 0.68333, 0, 0],
+        "920": [0, 0.68333, 0.09403, 0],
+        "923": [0, 0.68333, 0, 0],
+        "926": [0, 0.68333, 0.15294, 0],
+        "928": [0, 0.68333, 0.16389, 0],
+        "931": [0, 0.68333, 0.12028, 0],
+        "933": [0, 0.68333, 0.11111, 0],
+        "934": [0, 0.68333, 0.05986, 0],
+        "936": [0, 0.68333, 0.11111, 0],
+        "937": [0, 0.68333, 0.10257, 0],
+        "8211": [0, 0.43056, 0.09208, 0],
+        "8212": [0, 0.43056, 0.09208, 0],
+        "8216": [0, 0.69444, 0.12417, 0],
+        "8217": [0, 0.69444, 0.12417, 0],
+        "8220": [0, 0.69444, 0.1685, 0],
+        "8221": [0, 0.69444, 0.06961, 0],
+        "8463": [0, 0.68889, 0, 0]
+    },
+    "Main-Regular": {
+        "32": [0, 0, 0, 0],
+        "33": [0, 0.69444, 0, 0],
+        "34": [0, 0.69444, 0, 0],
+        "35": [0.19444, 0.69444, 0, 0],
+        "36": [0.05556, 0.75, 0, 0],
+        "37": [0.05556, 0.75, 0, 0],
+        "38": [0, 0.69444, 0, 0],
+        "39": [0, 0.69444, 0, 0],
+        "40": [0.25, 0.75, 0, 0],
+        "41": [0.25, 0.75, 0, 0],
+        "42": [0, 0.75, 0, 0],
+        "43": [0.08333, 0.58333, 0, 0],
+        "44": [0.19444, 0.10556, 0, 0],
+        "45": [0, 0.43056, 0, 0],
+        "46": [0, 0.10556, 0, 0],
+        "47": [0.25, 0.75, 0, 0],
+        "48": [0, 0.64444, 0, 0],
+        "49": [0, 0.64444, 0, 0],
+        "50": [0, 0.64444, 0, 0],
+        "51": [0, 0.64444, 0, 0],
+        "52": [0, 0.64444, 0, 0],
+        "53": [0, 0.64444, 0, 0],
+        "54": [0, 0.64444, 0, 0],
+        "55": [0, 0.64444, 0, 0],
+        "56": [0, 0.64444, 0, 0],
+        "57": [0, 0.64444, 0, 0],
+        "58": [0, 0.43056, 0, 0],
+        "59": [0.19444, 0.43056, 0, 0],
+        "60": [0.0391, 0.5391, 0, 0],
+        "61": [-0.13313, 0.36687, 0, 0],
+        "62": [0.0391, 0.5391, 0, 0],
+        "63": [0, 0.69444, 0, 0],
+        "64": [0, 0.69444, 0, 0],
+        "65": [0, 0.68333, 0, 0],
+        "66": [0, 0.68333, 0, 0],
+        "67": [0, 0.68333, 0, 0],
+        "68": [0, 0.68333, 0, 0],
+        "69": [0, 0.68333, 0, 0],
+        "70": [0, 0.68333, 0, 0],
+        "71": [0, 0.68333, 0, 0],
+        "72": [0, 0.68333, 0, 0],
+        "73": [0, 0.68333, 0, 0],
+        "74": [0, 0.68333, 0, 0],
+        "75": [0, 0.68333, 0, 0],
+        "76": [0, 0.68333, 0, 0],
+        "77": [0, 0.68333, 0, 0],
+        "78": [0, 0.68333, 0, 0],
+        "79": [0, 0.68333, 0, 0],
+        "80": [0, 0.68333, 0, 0],
+        "81": [0.19444, 0.68333, 0, 0],
+        "82": [0, 0.68333, 0, 0],
+        "83": [0, 0.68333, 0, 0],
+        "84": [0, 0.68333, 0, 0],
+        "85": [0, 0.68333, 0, 0],
+        "86": [0, 0.68333, 0.01389, 0],
+        "87": [0, 0.68333, 0.01389, 0],
+        "88": [0, 0.68333, 0, 0],
+        "89": [0, 0.68333, 0.025, 0],
+        "90": [0, 0.68333, 0, 0],
+        "91": [0.25, 0.75, 0, 0],
+        "92": [0.25, 0.75, 0, 0],
+        "93": [0.25, 0.75, 0, 0],
+        "94": [0, 0.69444, 0, 0],
+        "95": [0.31, 0.12056, 0.02778, 0],
+        "96": [0, 0.69444, 0, 0],
+        "97": [0, 0.43056, 0, 0],
+        "98": [0, 0.69444, 0, 0],
+        "99": [0, 0.43056, 0, 0],
+        "100": [0, 0.69444, 0, 0],
+        "101": [0, 0.43056, 0, 0],
+        "102": [0, 0.69444, 0.07778, 0],
+        "103": [0.19444, 0.43056, 0.01389, 0],
+        "104": [0, 0.69444, 0, 0],
+        "105": [0, 0.66786, 0, 0],
+        "106": [0.19444, 0.66786, 0, 0],
+        "107": [0, 0.69444, 0, 0],
+        "108": [0, 0.69444, 0, 0],
+        "109": [0, 0.43056, 0, 0],
+        "110": [0, 0.43056, 0, 0],
+        "111": [0, 0.43056, 0, 0],
+        "112": [0.19444, 0.43056, 0, 0],
+        "113": [0.19444, 0.43056, 0, 0],
+        "114": [0, 0.43056, 0, 0],
+        "115": [0, 0.43056, 0, 0],
+        "116": [0, 0.61508, 0, 0],
+        "117": [0, 0.43056, 0, 0],
+        "118": [0, 0.43056, 0.01389, 0],
+        "119": [0, 0.43056, 0.01389, 0],
+        "120": [0, 0.43056, 0, 0],
+        "121": [0.19444, 0.43056, 0.01389, 0],
+        "122": [0, 0.43056, 0, 0],
+        "123": [0.25, 0.75, 0, 0],
+        "124": [0.25, 0.75, 0, 0],
+        "125": [0.25, 0.75, 0, 0],
+        "126": [0.35, 0.31786, 0, 0],
+        "160": [0, 0, 0, 0],
+        "168": [0, 0.66786, 0, 0],
+        "172": [0, 0.43056, 0, 0],
+        "175": [0, 0.56778, 0, 0],
+        "176": [0, 0.69444, 0, 0],
+        "177": [0.08333, 0.58333, 0, 0],
+        "180": [0, 0.69444, 0, 0],
+        "215": [0.08333, 0.58333, 0, 0],
+        "247": [0.08333, 0.58333, 0, 0],
+        "305": [0, 0.43056, 0, 0],
+        "567": [0.19444, 0.43056, 0, 0],
+        "710": [0, 0.69444, 0, 0],
+        "711": [0, 0.62847, 0, 0],
+        "713": [0, 0.56778, 0, 0],
+        "714": [0, 0.69444, 0, 0],
+        "715": [0, 0.69444, 0, 0],
+        "728": [0, 0.69444, 0, 0],
+        "729": [0, 0.66786, 0, 0],
+        "730": [0, 0.69444, 0, 0],
+        "732": [0, 0.66786, 0, 0],
+        "768": [0, 0.69444, 0, 0],
+        "769": [0, 0.69444, 0, 0],
+        "770": [0, 0.69444, 0, 0],
+        "771": [0, 0.66786, 0, 0],
+        "772": [0, 0.56778, 0, 0],
+        "774": [0, 0.69444, 0, 0],
+        "775": [0, 0.66786, 0, 0],
+        "776": [0, 0.66786, 0, 0],
+        "778": [0, 0.69444, 0, 0],
+        "779": [0, 0.69444, 0, 0],
+        "780": [0, 0.62847, 0, 0],
+        "824": [0.19444, 0.69444, 0, 0],
+        "915": [0, 0.68333, 0, 0],
+        "916": [0, 0.68333, 0, 0],
+        "920": [0, 0.68333, 0, 0],
+        "923": [0, 0.68333, 0, 0],
+        "926": [0, 0.68333, 0, 0],
+        "928": [0, 0.68333, 0, 0],
+        "931": [0, 0.68333, 0, 0],
+        "933": [0, 0.68333, 0, 0],
+        "934": [0, 0.68333, 0, 0],
+        "936": [0, 0.68333, 0, 0],
+        "937": [0, 0.68333, 0, 0],
+        "8211": [0, 0.43056, 0.02778, 0],
+        "8212": [0, 0.43056, 0.02778, 0],
+        "8216": [0, 0.69444, 0, 0],
+        "8217": [0, 0.69444, 0, 0],
+        "8220": [0, 0.69444, 0, 0],
+        "8221": [0, 0.69444, 0, 0],
+        "8224": [0.19444, 0.69444, 0, 0],
+        "8225": [0.19444, 0.69444, 0, 0],
+        "8230": [0, 0.12, 0, 0],
+        "8242": [0, 0.55556, 0, 0],
+        "8407": [0, 0.71444, 0.15382, 0],
+        "8463": [0, 0.68889, 0, 0],
+        "8465": [0, 0.69444, 0, 0],
+        "8467": [0, 0.69444, 0, 0.11111],
+        "8472": [0.19444, 0.43056, 0, 0.11111],
+        "8476": [0, 0.69444, 0, 0],
+        "8501": [0, 0.69444, 0, 0],
+        "8592": [-0.13313, 0.36687, 0, 0],
+        "8593": [0.19444, 0.69444, 0, 0],
+        "8594": [-0.13313, 0.36687, 0, 0],
+        "8595": [0.19444, 0.69444, 0, 0],
+        "8596": [-0.13313, 0.36687, 0, 0],
+        "8597": [0.25, 0.75, 0, 0],
+        "8598": [0.19444, 0.69444, 0, 0],
+        "8599": [0.19444, 0.69444, 0, 0],
+        "8600": [0.19444, 0.69444, 0, 0],
+        "8601": [0.19444, 0.69444, 0, 0],
+        "8614": [0.011, 0.511, 0, 0],
+        "8617": [0.011, 0.511, 0, 0],
+        "8618": [0.011, 0.511, 0, 0],
+        "8636": [-0.13313, 0.36687, 0, 0],
+        "8637": [-0.13313, 0.36687, 0, 0],
+        "8640": [-0.13313, 0.36687, 0, 0],
+        "8641": [-0.13313, 0.36687, 0, 0],
+        "8652": [0.011, 0.671, 0, 0],
+        "8656": [-0.13313, 0.36687, 0, 0],
+        "8657": [0.19444, 0.69444, 0, 0],
+        "8658": [-0.13313, 0.36687, 0, 0],
+        "8659": [0.19444, 0.69444, 0, 0],
+        "8660": [-0.13313, 0.36687, 0, 0],
+        "8661": [0.25, 0.75, 0, 0],
+        "8704": [0, 0.69444, 0, 0],
+        "8706": [0, 0.69444, 0.05556, 0.08334],
+        "8707": [0, 0.69444, 0, 0],
+        "8709": [0.05556, 0.75, 0, 0],
+        "8711": [0, 0.68333, 0, 0],
+        "8712": [0.0391, 0.5391, 0, 0],
+        "8715": [0.0391, 0.5391, 0, 0],
+        "8722": [0.08333, 0.58333, 0, 0],
+        "8723": [0.08333, 0.58333, 0, 0],
+        "8725": [0.25, 0.75, 0, 0],
+        "8726": [0.25, 0.75, 0, 0],
+        "8727": [-0.03472, 0.46528, 0, 0],
+        "8728": [-0.05555, 0.44445, 0, 0],
+        "8729": [-0.05555, 0.44445, 0, 0],
+        "8730": [0.2, 0.8, 0, 0],
+        "8733": [0, 0.43056, 0, 0],
+        "8734": [0, 0.43056, 0, 0],
+        "8736": [0, 0.69224, 0, 0],
+        "8739": [0.25, 0.75, 0, 0],
+        "8741": [0.25, 0.75, 0, 0],
+        "8743": [0, 0.55556, 0, 0],
+        "8744": [0, 0.55556, 0, 0],
+        "8745": [0, 0.55556, 0, 0],
+        "8746": [0, 0.55556, 0, 0],
+        "8747": [0.19444, 0.69444, 0.11111, 0],
+        "8764": [-0.13313, 0.36687, 0, 0],
+        "8768": [0.19444, 0.69444, 0, 0],
+        "8771": [-0.03625, 0.46375, 0, 0],
+        "8773": [-0.022, 0.589, 0, 0],
+        "8776": [-0.01688, 0.48312, 0, 0],
+        "8781": [-0.03625, 0.46375, 0, 0],
+        "8784": [-0.133, 0.67, 0, 0],
+        "8800": [0.215, 0.716, 0, 0],
+        "8801": [-0.03625, 0.46375, 0, 0],
+        "8804": [0.13597, 0.63597, 0, 0],
+        "8805": [0.13597, 0.63597, 0, 0],
+        "8810": [0.0391, 0.5391, 0, 0],
+        "8811": [0.0391, 0.5391, 0, 0],
+        "8826": [0.0391, 0.5391, 0, 0],
+        "8827": [0.0391, 0.5391, 0, 0],
+        "8834": [0.0391, 0.5391, 0, 0],
+        "8835": [0.0391, 0.5391, 0, 0],
+        "8838": [0.13597, 0.63597, 0, 0],
+        "8839": [0.13597, 0.63597, 0, 0],
+        "8846": [0, 0.55556, 0, 0],
+        "8849": [0.13597, 0.63597, 0, 0],
+        "8850": [0.13597, 0.63597, 0, 0],
+        "8851": [0, 0.55556, 0, 0],
+        "8852": [0, 0.55556, 0, 0],
+        "8853": [0.08333, 0.58333, 0, 0],
+        "8854": [0.08333, 0.58333, 0, 0],
+        "8855": [0.08333, 0.58333, 0, 0],
+        "8856": [0.08333, 0.58333, 0, 0],
+        "8857": [0.08333, 0.58333, 0, 0],
+        "8866": [0, 0.69444, 0, 0],
+        "8867": [0, 0.69444, 0, 0],
+        "8868": [0, 0.69444, 0, 0],
+        "8869": [0, 0.69444, 0, 0],
+        "8872": [0.249, 0.75, 0, 0],
+        "8900": [-0.05555, 0.44445, 0, 0],
+        "8901": [-0.05555, 0.44445, 0, 0],
+        "8902": [-0.03472, 0.46528, 0, 0],
+        "8904": [0.005, 0.505, 0, 0],
+        "8942": [0.03, 0.9, 0, 0],
+        "8943": [-0.19, 0.31, 0, 0],
+        "8945": [-0.1, 0.82, 0, 0],
+        "8968": [0.25, 0.75, 0, 0],
+        "8969": [0.25, 0.75, 0, 0],
+        "8970": [0.25, 0.75, 0, 0],
+        "8971": [0.25, 0.75, 0, 0],
+        "8994": [-0.14236, 0.35764, 0, 0],
+        "8995": [-0.14236, 0.35764, 0, 0],
+        "9136": [0.244, 0.744, 0, 0],
+        "9137": [0.244, 0.744, 0, 0],
+        "9651": [0.19444, 0.69444, 0, 0],
+        "9657": [-0.03472, 0.46528, 0, 0],
+        "9661": [0.19444, 0.69444, 0, 0],
+        "9667": [-0.03472, 0.46528, 0, 0],
+        "9711": [0.19444, 0.69444, 0, 0],
+        "9824": [0.12963, 0.69444, 0, 0],
+        "9825": [0.12963, 0.69444, 0, 0],
+        "9826": [0.12963, 0.69444, 0, 0],
+        "9827": [0.12963, 0.69444, 0, 0],
+        "9837": [0, 0.75, 0, 0],
+        "9838": [0.19444, 0.69444, 0, 0],
+        "9839": [0.19444, 0.69444, 0, 0],
+        "10216": [0.25, 0.75, 0, 0],
+        "10217": [0.25, 0.75, 0, 0],
+        "10222": [0.244, 0.744, 0, 0],
+        "10223": [0.244, 0.744, 0, 0],
+        "10229": [0.011, 0.511, 0, 0],
+        "10230": [0.011, 0.511, 0, 0],
+        "10231": [0.011, 0.511, 0, 0],
+        "10232": [0.024, 0.525, 0, 0],
+        "10233": [0.024, 0.525, 0, 0],
+        "10234": [0.024, 0.525, 0, 0],
+        "10236": [0.011, 0.511, 0, 0],
+        "10815": [0, 0.68333, 0, 0],
+        "10927": [0.13597, 0.63597, 0, 0],
+        "10928": [0.13597, 0.63597, 0, 0]
+    },
+    "Math-BoldItalic": {
+        "47": [0.19444, 0.69444, 0, 0],
+        "65": [0, 0.68611, 0, 0],
+        "66": [0, 0.68611, 0.04835, 0],
+        "67": [0, 0.68611, 0.06979, 0],
+        "68": [0, 0.68611, 0.03194, 0],
+        "69": [0, 0.68611, 0.05451, 0],
+        "70": [0, 0.68611, 0.15972, 0],
+        "71": [0, 0.68611, 0, 0],
+        "72": [0, 0.68611, 0.08229, 0],
+        "73": [0, 0.68611, 0.07778, 0],
+        "74": [0, 0.68611, 0.10069, 0],
+        "75": [0, 0.68611, 0.06979, 0],
+        "76": [0, 0.68611, 0, 0],
+        "77": [0, 0.68611, 0.11424, 0],
+        "78": [0, 0.68611, 0.11424, 0],
+        "79": [0, 0.68611, 0.03194, 0],
+        "80": [0, 0.68611, 0.15972, 0],
+        "81": [0.19444, 0.68611, 0, 0],
+        "82": [0, 0.68611, 0.00421, 0],
+        "83": [0, 0.68611, 0.05382, 0],
+        "84": [0, 0.68611, 0.15972, 0],
+        "85": [0, 0.68611, 0.11424, 0],
+        "86": [0, 0.68611, 0.25555, 0],
+        "87": [0, 0.68611, 0.15972, 0],
+        "88": [0, 0.68611, 0.07778, 0],
+        "89": [0, 0.68611, 0.25555, 0],
+        "90": [0, 0.68611, 0.06979, 0],
+        "97": [0, 0.44444, 0, 0],
+        "98": [0, 0.69444, 0, 0],
+        "99": [0, 0.44444, 0, 0],
+        "100": [0, 0.69444, 0, 0],
+        "101": [0, 0.44444, 0, 0],
+        "102": [0.19444, 0.69444, 0.11042, 0],
+        "103": [0.19444, 0.44444, 0.03704, 0],
+        "104": [0, 0.69444, 0, 0],
+        "105": [0, 0.69326, 0, 0],
+        "106": [0.19444, 0.69326, 0.0622, 0],
+        "107": [0, 0.69444, 0.01852, 0],
+        "108": [0, 0.69444, 0.0088, 0],
+        "109": [0, 0.44444, 0, 0],
+        "110": [0, 0.44444, 0, 0],
+        "111": [0, 0.44444, 0, 0],
+        "112": [0.19444, 0.44444, 0, 0],
+        "113": [0.19444, 0.44444, 0.03704, 0],
+        "114": [0, 0.44444, 0.03194, 0],
+        "115": [0, 0.44444, 0, 0],
+        "116": [0, 0.63492, 0, 0],
+        "117": [0, 0.44444, 0, 0],
+        "118": [0, 0.44444, 0.03704, 0],
+        "119": [0, 0.44444, 0.02778, 0],
+        "120": [0, 0.44444, 0, 0],
+        "121": [0.19444, 0.44444, 0.03704, 0],
+        "122": [0, 0.44444, 0.04213, 0],
+        "915": [0, 0.68611, 0.15972, 0],
+        "916": [0, 0.68611, 0, 0],
+        "920": [0, 0.68611, 0.03194, 0],
+        "923": [0, 0.68611, 0, 0],
+        "926": [0, 0.68611, 0.07458, 0],
+        "928": [0, 0.68611, 0.08229, 0],
+        "931": [0, 0.68611, 0.05451, 0],
+        "933": [0, 0.68611, 0.15972, 0],
+        "934": [0, 0.68611, 0, 0],
+        "936": [0, 0.68611, 0.11653, 0],
+        "937": [0, 0.68611, 0.04835, 0],
+        "945": [0, 0.44444, 0, 0],
+        "946": [0.19444, 0.69444, 0.03403, 0],
+        "947": [0.19444, 0.44444, 0.06389, 0],
+        "948": [0, 0.69444, 0.03819, 0],
+        "949": [0, 0.44444, 0, 0],
+        "950": [0.19444, 0.69444, 0.06215, 0],
+        "951": [0.19444, 0.44444, 0.03704, 0],
+        "952": [0, 0.69444, 0.03194, 0],
+        "953": [0, 0.44444, 0, 0],
+        "954": [0, 0.44444, 0, 0],
+        "955": [0, 0.69444, 0, 0],
+        "956": [0.19444, 0.44444, 0, 0],
+        "957": [0, 0.44444, 0.06898, 0],
+        "958": [0.19444, 0.69444, 0.03021, 0],
+        "959": [0, 0.44444, 0, 0],
+        "960": [0, 0.44444, 0.03704, 0],
+        "961": [0.19444, 0.44444, 0, 0],
+        "962": [0.09722, 0.44444, 0.07917, 0],
+        "963": [0, 0.44444, 0.03704, 0],
+        "964": [0, 0.44444, 0.13472, 0],
+        "965": [0, 0.44444, 0.03704, 0],
+        "966": [0.19444, 0.44444, 0, 0],
+        "967": [0.19444, 0.44444, 0, 0],
+        "968": [0.19444, 0.69444, 0.03704, 0],
+        "969": [0, 0.44444, 0.03704, 0],
+        "977": [0, 0.69444, 0, 0],
+        "981": [0.19444, 0.69444, 0, 0],
+        "982": [0, 0.44444, 0.03194, 0],
+        "1009": [0.19444, 0.44444, 0, 0],
+        "1013": [0, 0.44444, 0, 0]
+    },
+    "Math-Italic": {
+        "47": [0.19444, 0.69444, 0, 0],
+        "65": [0, 0.68333, 0, 0.13889],
+        "66": [0, 0.68333, 0.05017, 0.08334],
+        "67": [0, 0.68333, 0.07153, 0.08334],
+        "68": [0, 0.68333, 0.02778, 0.05556],
+        "69": [0, 0.68333, 0.05764, 0.08334],
+        "70": [0, 0.68333, 0.13889, 0.08334],
+        "71": [0, 0.68333, 0, 0.08334],
+        "72": [0, 0.68333, 0.08125, 0.05556],
+        "73": [0, 0.68333, 0.07847, 0.11111],
+        "74": [0, 0.68333, 0.09618, 0.16667],
+        "75": [0, 0.68333, 0.07153, 0.05556],
+        "76": [0, 0.68333, 0, 0.02778],
+        "77": [0, 0.68333, 0.10903, 0.08334],
+        "78": [0, 0.68333, 0.10903, 0.08334],
+        "79": [0, 0.68333, 0.02778, 0.08334],
+        "80": [0, 0.68333, 0.13889, 0.08334],
+        "81": [0.19444, 0.68333, 0, 0.08334],
+        "82": [0, 0.68333, 0.00773, 0.08334],
+        "83": [0, 0.68333, 0.05764, 0.08334],
+        "84": [0, 0.68333, 0.13889, 0.08334],
+        "85": [0, 0.68333, 0.10903, 0.02778],
+        "86": [0, 0.68333, 0.22222, 0],
+        "87": [0, 0.68333, 0.13889, 0],
+        "88": [0, 0.68333, 0.07847, 0.08334],
+        "89": [0, 0.68333, 0.22222, 0],
+        "90": [0, 0.68333, 0.07153, 0.08334],
+        "97": [0, 0.43056, 0, 0],
+        "98": [0, 0.69444, 0, 0],
+        "99": [0, 0.43056, 0, 0.05556],
+        "100": [0, 0.69444, 0, 0.16667],
+        "101": [0, 0.43056, 0, 0.05556],
+        "102": [0.19444, 0.69444, 0.10764, 0.16667],
+        "103": [0.19444, 0.43056, 0.03588, 0.02778],
+        "104": [0, 0.69444, 0, 0],
+        "105": [0, 0.65952, 0, 0],
+        "106": [0.19444, 0.65952, 0.05724, 0],
+        "107": [0, 0.69444, 0.03148, 0],
+        "108": [0, 0.69444, 0.01968, 0.08334],
+        "109": [0, 0.43056, 0, 0],
+        "110": [0, 0.43056, 0, 0],
+        "111": [0, 0.43056, 0, 0.05556],
+        "112": [0.19444, 0.43056, 0, 0.08334],
+        "113": [0.19444, 0.43056, 0.03588, 0.08334],
+        "114": [0, 0.43056, 0.02778, 0.05556],
+        "115": [0, 0.43056, 0, 0.05556],
+        "116": [0, 0.61508, 0, 0.08334],
+        "117": [0, 0.43056, 0, 0.02778],
+        "118": [0, 0.43056, 0.03588, 0.02778],
+        "119": [0, 0.43056, 0.02691, 0.08334],
+        "120": [0, 0.43056, 0, 0.02778],
+        "121": [0.19444, 0.43056, 0.03588, 0.05556],
+        "122": [0, 0.43056, 0.04398, 0.05556],
+        "915": [0, 0.68333, 0.13889, 0.08334],
+        "916": [0, 0.68333, 0, 0.16667],
+        "920": [0, 0.68333, 0.02778, 0.08334],
+        "923": [0, 0.68333, 0, 0.16667],
+        "926": [0, 0.68333, 0.07569, 0.08334],
+        "928": [0, 0.68333, 0.08125, 0.05556],
+        "931": [0, 0.68333, 0.05764, 0.08334],
+        "933": [0, 0.68333, 0.13889, 0.05556],
+        "934": [0, 0.68333, 0, 0.08334],
+        "936": [0, 0.68333, 0.11, 0.05556],
+        "937": [0, 0.68333, 0.05017, 0.08334],
+        "945": [0, 0.43056, 0.0037, 0.02778],
+        "946": [0.19444, 0.69444, 0.05278, 0.08334],
+        "947": [0.19444, 0.43056, 0.05556, 0],
+        "948": [0, 0.69444, 0.03785, 0.05556],
+        "949": [0, 0.43056, 0, 0.08334],
+        "950": [0.19444, 0.69444, 0.07378, 0.08334],
+        "951": [0.19444, 0.43056, 0.03588, 0.05556],
+        "952": [0, 0.69444, 0.02778, 0.08334],
+        "953": [0, 0.43056, 0, 0.05556],
+        "954": [0, 0.43056, 0, 0],
+        "955": [0, 0.69444, 0, 0],
+        "956": [0.19444, 0.43056, 0, 0.02778],
+        "957": [0, 0.43056, 0.06366, 0.02778],
+        "958": [0.19444, 0.69444, 0.04601, 0.11111],
+        "959": [0, 0.43056, 0, 0.05556],
+        "960": [0, 0.43056, 0.03588, 0],
+        "961": [0.19444, 0.43056, 0, 0.08334],
+        "962": [0.09722, 0.43056, 0.07986, 0.08334],
+        "963": [0, 0.43056, 0.03588, 0],
+        "964": [0, 0.43056, 0.1132, 0.02778],
+        "965": [0, 0.43056, 0.03588, 0.02778],
+        "966": [0.19444, 0.43056, 0, 0.08334],
+        "967": [0.19444, 0.43056, 0, 0.05556],
+        "968": [0.19444, 0.69444, 0.03588, 0.11111],
+        "969": [0, 0.43056, 0.03588, 0],
+        "977": [0, 0.69444, 0, 0.08334],
+        "981": [0.19444, 0.69444, 0, 0.08334],
+        "982": [0, 0.43056, 0.02778, 0],
+        "1009": [0.19444, 0.43056, 0, 0.08334],
+        "1013": [0, 0.43056, 0, 0.05556]
+    },
+    "Math-Regular": {
+        "65": [0, 0.68333, 0, 0.13889],
+        "66": [0, 0.68333, 0.05017, 0.08334],
+        "67": [0, 0.68333, 0.07153, 0.08334],
+        "68": [0, 0.68333, 0.02778, 0.05556],
+        "69": [0, 0.68333, 0.05764, 0.08334],
+        "70": [0, 0.68333, 0.13889, 0.08334],
+        "71": [0, 0.68333, 0, 0.08334],
+        "72": [0, 0.68333, 0.08125, 0.05556],
+        "73": [0, 0.68333, 0.07847, 0.11111],
+        "74": [0, 0.68333, 0.09618, 0.16667],
+        "75": [0, 0.68333, 0.07153, 0.05556],
+        "76": [0, 0.68333, 0, 0.02778],
+        "77": [0, 0.68333, 0.10903, 0.08334],
+        "78": [0, 0.68333, 0.10903, 0.08334],
+        "79": [0, 0.68333, 0.02778, 0.08334],
+        "80": [0, 0.68333, 0.13889, 0.08334],
+        "81": [0.19444, 0.68333, 0, 0.08334],
+        "82": [0, 0.68333, 0.00773, 0.08334],
+        "83": [0, 0.68333, 0.05764, 0.08334],
+        "84": [0, 0.68333, 0.13889, 0.08334],
+        "85": [0, 0.68333, 0.10903, 0.02778],
+        "86": [0, 0.68333, 0.22222, 0],
+        "87": [0, 0.68333, 0.13889, 0],
+        "88": [0, 0.68333, 0.07847, 0.08334],
+        "89": [0, 0.68333, 0.22222, 0],
+        "90": [0, 0.68333, 0.07153, 0.08334],
+        "97": [0, 0.43056, 0, 0],
+        "98": [0, 0.69444, 0, 0],
+        "99": [0, 0.43056, 0, 0.05556],
+        "100": [0, 0.69444, 0, 0.16667],
+        "101": [0, 0.43056, 0, 0.05556],
+        "102": [0.19444, 0.69444, 0.10764, 0.16667],
+        "103": [0.19444, 0.43056, 0.03588, 0.02778],
+        "104": [0, 0.69444, 0, 0],
+        "105": [0, 0.65952, 0, 0],
+        "106": [0.19444, 0.65952, 0.05724, 0],
+        "107": [0, 0.69444, 0.03148, 0],
+        "108": [0, 0.69444, 0.01968, 0.08334],
+        "109": [0, 0.43056, 0, 0],
+        "110": [0, 0.43056, 0, 0],
+        "111": [0, 0.43056, 0, 0.05556],
+        "112": [0.19444, 0.43056, 0, 0.08334],
+        "113": [0.19444, 0.43056, 0.03588, 0.08334],
+        "114": [0, 0.43056, 0.02778, 0.05556],
+        "115": [0, 0.43056, 0, 0.05556],
+        "116": [0, 0.61508, 0, 0.08334],
+        "117": [0, 0.43056, 0, 0.02778],
+        "118": [0, 0.43056, 0.03588, 0.02778],
+        "119": [0, 0.43056, 0.02691, 0.08334],
+        "120": [0, 0.43056, 0, 0.02778],
+        "121": [0.19444, 0.43056, 0.03588, 0.05556],
+        "122": [0, 0.43056, 0.04398, 0.05556],
+        "915": [0, 0.68333, 0.13889, 0.08334],
+        "916": [0, 0.68333, 0, 0.16667],
+        "920": [0, 0.68333, 0.02778, 0.08334],
+        "923": [0, 0.68333, 0, 0.16667],
+        "926": [0, 0.68333, 0.07569, 0.08334],
+        "928": [0, 0.68333, 0.08125, 0.05556],
+        "931": [0, 0.68333, 0.05764, 0.08334],
+        "933": [0, 0.68333, 0.13889, 0.05556],
+        "934": [0, 0.68333, 0, 0.08334],
+        "936": [0, 0.68333, 0.11, 0.05556],
+        "937": [0, 0.68333, 0.05017, 0.08334],
+        "945": [0, 0.43056, 0.0037, 0.02778],
+        "946": [0.19444, 0.69444, 0.05278, 0.08334],
+        "947": [0.19444, 0.43056, 0.05556, 0],
+        "948": [0, 0.69444, 0.03785, 0.05556],
+        "949": [0, 0.43056, 0, 0.08334],
+        "950": [0.19444, 0.69444, 0.07378, 0.08334],
+        "951": [0.19444, 0.43056, 0.03588, 0.05556],
+        "952": [0, 0.69444, 0.02778, 0.08334],
+        "953": [0, 0.43056, 0, 0.05556],
+        "954": [0, 0.43056, 0, 0],
+        "955": [0, 0.69444, 0, 0],
+        "956": [0.19444, 0.43056, 0, 0.02778],
+        "957": [0, 0.43056, 0.06366, 0.02778],
+        "958": [0.19444, 0.69444, 0.04601, 0.11111],
+        "959": [0, 0.43056, 0, 0.05556],
+        "960": [0, 0.43056, 0.03588, 0],
+        "961": [0.19444, 0.43056, 0, 0.08334],
+        "962": [0.09722, 0.43056, 0.07986, 0.08334],
+        "963": [0, 0.43056, 0.03588, 0],
+        "964": [0, 0.43056, 0.1132, 0.02778],
+        "965": [0, 0.43056, 0.03588, 0.02778],
+        "966": [0.19444, 0.43056, 0, 0.08334],
+        "967": [0.19444, 0.43056, 0, 0.05556],
+        "968": [0.19444, 0.69444, 0.03588, 0.11111],
+        "969": [0, 0.43056, 0.03588, 0],
+        "977": [0, 0.69444, 0, 0.08334],
+        "981": [0.19444, 0.69444, 0, 0.08334],
+        "982": [0, 0.43056, 0.02778, 0],
+        "1009": [0.19444, 0.43056, 0, 0.08334],
+        "1013": [0, 0.43056, 0, 0.05556]
+    },
+    "SansSerif-Regular": {
+        "33": [0, 0.69444, 0, 0],
+        "34": [0, 0.69444, 0, 0],
+        "35": [0.19444, 0.69444, 0, 0],
+        "36": [0.05556, 0.75, 0, 0],
+        "37": [0.05556, 0.75, 0, 0],
+        "38": [0, 0.69444, 0, 0],
+        "39": [0, 0.69444, 0, 0],
+        "40": [0.25, 0.75, 0, 0],
+        "41": [0.25, 0.75, 0, 0],
+        "42": [0, 0.75, 0, 0],
+        "43": [0.08333, 0.58333, 0, 0],
+        "44": [0.125, 0.08333, 0, 0],
+        "45": [0, 0.44444, 0, 0],
+        "46": [0, 0.08333, 0, 0],
+        "47": [0.25, 0.75, 0, 0],
+        "48": [0, 0.65556, 0, 0],
+        "49": [0, 0.65556, 0, 0],
+        "50": [0, 0.65556, 0, 0],
+        "51": [0, 0.65556, 0, 0],
+        "52": [0, 0.65556, 0, 0],
+        "53": [0, 0.65556, 0, 0],
+        "54": [0, 0.65556, 0, 0],
+        "55": [0, 0.65556, 0, 0],
+        "56": [0, 0.65556, 0, 0],
+        "57": [0, 0.65556, 0, 0],
+        "58": [0, 0.44444, 0, 0],
+        "59": [0.125, 0.44444, 0, 0],
+        "61": [-0.13, 0.37, 0, 0],
+        "63": [0, 0.69444, 0, 0],
+        "64": [0, 0.69444, 0, 0],
+        "65": [0, 0.69444, 0, 0],
+        "66": [0, 0.69444, 0, 0],
+        "67": [0, 0.69444, 0, 0],
+        "68": [0, 0.69444, 0, 0],
+        "69": [0, 0.69444, 0, 0],
+        "70": [0, 0.69444, 0, 0],
+        "71": [0, 0.69444, 0, 0],
+        "72": [0, 0.69444, 0, 0],
+        "73": [0, 0.69444, 0, 0],
+        "74": [0, 0.69444, 0, 0],
+        "75": [0, 0.69444, 0, 0],
+        "76": [0, 0.69444, 0, 0],
+        "77": [0, 0.69444, 0, 0],
+        "78": [0, 0.69444, 0, 0],
+        "79": [0, 0.69444, 0, 0],
+        "80": [0, 0.69444, 0, 0],
+        "81": [0.125, 0.69444, 0, 0],
+        "82": [0, 0.69444, 0, 0],
+        "83": [0, 0.69444, 0, 0],
+        "84": [0, 0.69444, 0, 0],
+        "85": [0, 0.69444, 0, 0],
+        "86": [0, 0.69444, 0.01389, 0],
+        "87": [0, 0.69444, 0.01389, 0],
+        "88": [0, 0.69444, 0, 0],
+        "89": [0, 0.69444, 0.025, 0],
+        "90": [0, 0.69444, 0, 0],
+        "91": [0.25, 0.75, 0, 0],
+        "93": [0.25, 0.75, 0, 0],
+        "94": [0, 0.69444, 0, 0],
+        "95": [0.35, 0.09444, 0.02778, 0],
+        "97": [0, 0.44444, 0, 0],
+        "98": [0, 0.69444, 0, 0],
+        "99": [0, 0.44444, 0, 0],
+        "100": [0, 0.69444, 0, 0],
+        "101": [0, 0.44444, 0, 0],
+        "102": [0, 0.69444, 0.06944, 0],
+        "103": [0.19444, 0.44444, 0.01389, 0],
+        "104": [0, 0.69444, 0, 0],
+        "105": [0, 0.67937, 0, 0],
+        "106": [0.19444, 0.67937, 0, 0],
+        "107": [0, 0.69444, 0, 0],
+        "108": [0, 0.69444, 0, 0],
+        "109": [0, 0.44444, 0, 0],
+        "110": [0, 0.44444, 0, 0],
+        "111": [0, 0.44444, 0, 0],
+        "112": [0.19444, 0.44444, 0, 0],
+        "113": [0.19444, 0.44444, 0, 0],
+        "114": [0, 0.44444, 0.01389, 0],
+        "115": [0, 0.44444, 0, 0],
+        "116": [0, 0.57143, 0, 0],
+        "117": [0, 0.44444, 0, 0],
+        "118": [0, 0.44444, 0.01389, 0],
+        "119": [0, 0.44444, 0.01389, 0],
+        "120": [0, 0.44444, 0, 0],
+        "121": [0.19444, 0.44444, 0.01389, 0],
+        "122": [0, 0.44444, 0, 0],
+        "126": [0.35, 0.32659, 0, 0],
+        "305": [0, 0.44444, 0, 0],
+        "567": [0.19444, 0.44444, 0, 0],
+        "768": [0, 0.69444, 0, 0],
+        "769": [0, 0.69444, 0, 0],
+        "770": [0, 0.69444, 0, 0],
+        "771": [0, 0.67659, 0, 0],
+        "772": [0, 0.60889, 0, 0],
+        "774": [0, 0.69444, 0, 0],
+        "775": [0, 0.67937, 0, 0],
+        "776": [0, 0.67937, 0, 0],
+        "778": [0, 0.69444, 0, 0],
+        "779": [0, 0.69444, 0, 0],
+        "780": [0, 0.63194, 0, 0],
+        "915": [0, 0.69444, 0, 0],
+        "916": [0, 0.69444, 0, 0],
+        "920": [0, 0.69444, 0, 0],
+        "923": [0, 0.69444, 0, 0],
+        "926": [0, 0.69444, 0, 0],
+        "928": [0, 0.69444, 0, 0],
+        "931": [0, 0.69444, 0, 0],
+        "933": [0, 0.69444, 0, 0],
+        "934": [0, 0.69444, 0, 0],
+        "936": [0, 0.69444, 0, 0],
+        "937": [0, 0.69444, 0, 0],
+        "8211": [0, 0.44444, 0.02778, 0],
+        "8212": [0, 0.44444, 0.02778, 0],
+        "8216": [0, 0.69444, 0, 0],
+        "8217": [0, 0.69444, 0, 0],
+        "8220": [0, 0.69444, 0, 0],
+        "8221": [0, 0.69444, 0, 0]
+    },
+    "Script-Regular": {
+        "65": [0, 0.7, 0.22925, 0],
+        "66": [0, 0.7, 0.04087, 0],
+        "67": [0, 0.7, 0.1689, 0],
+        "68": [0, 0.7, 0.09371, 0],
+        "69": [0, 0.7, 0.18583, 0],
+        "70": [0, 0.7, 0.13634, 0],
+        "71": [0, 0.7, 0.17322, 0],
+        "72": [0, 0.7, 0.29694, 0],
+        "73": [0, 0.7, 0.19189, 0],
+        "74": [0.27778, 0.7, 0.19189, 0],
+        "75": [0, 0.7, 0.31259, 0],
+        "76": [0, 0.7, 0.19189, 0],
+        "77": [0, 0.7, 0.15981, 0],
+        "78": [0, 0.7, 0.3525, 0],
+        "79": [0, 0.7, 0.08078, 0],
+        "80": [0, 0.7, 0.08078, 0],
+        "81": [0, 0.7, 0.03305, 0],
+        "82": [0, 0.7, 0.06259, 0],
+        "83": [0, 0.7, 0.19189, 0],
+        "84": [0, 0.7, 0.29087, 0],
+        "85": [0, 0.7, 0.25815, 0],
+        "86": [0, 0.7, 0.27523, 0],
+        "87": [0, 0.7, 0.27523, 0],
+        "88": [0, 0.7, 0.26006, 0],
+        "89": [0, 0.7, 0.2939, 0],
+        "90": [0, 0.7, 0.24037, 0]
+    },
+    "Size1-Regular": {
+        "40": [0.35001, 0.85, 0, 0],
+        "41": [0.35001, 0.85, 0, 0],
+        "47": [0.35001, 0.85, 0, 0],
+        "91": [0.35001, 0.85, 0, 0],
+        "92": [0.35001, 0.85, 0, 0],
+        "93": [0.35001, 0.85, 0, 0],
+        "123": [0.35001, 0.85, 0, 0],
+        "125": [0.35001, 0.85, 0, 0],
+        "710": [0, 0.72222, 0, 0],
+        "732": [0, 0.72222, 0, 0],
+        "770": [0, 0.72222, 0, 0],
+        "771": [0, 0.72222, 0, 0],
+        "8214": [-0.00099, 0.601, 0, 0],
+        "8593": [1e-05, 0.6, 0, 0],
+        "8595": [1e-05, 0.6, 0, 0],
+        "8657": [1e-05, 0.6, 0, 0],
+        "8659": [1e-05, 0.6, 0, 0],
+        "8719": [0.25001, 0.75, 0, 0],
+        "8720": [0.25001, 0.75, 0, 0],
+        "8721": [0.25001, 0.75, 0, 0],
+        "8730": [0.35001, 0.85, 0, 0],
+        "8739": [-0.00599, 0.606, 0, 0],
+        "8741": [-0.00599, 0.606, 0, 0],
+        "8747": [0.30612, 0.805, 0.19445, 0],
+        "8748": [0.306, 0.805, 0.19445, 0],
+        "8749": [0.306, 0.805, 0.19445, 0],
+        "8750": [0.30612, 0.805, 0.19445, 0],
+        "8896": [0.25001, 0.75, 0, 0],
+        "8897": [0.25001, 0.75, 0, 0],
+        "8898": [0.25001, 0.75, 0, 0],
+        "8899": [0.25001, 0.75, 0, 0],
+        "8968": [0.35001, 0.85, 0, 0],
+        "8969": [0.35001, 0.85, 0, 0],
+        "8970": [0.35001, 0.85, 0, 0],
+        "8971": [0.35001, 0.85, 0, 0],
+        "9168": [-0.00099, 0.601, 0, 0],
+        "10216": [0.35001, 0.85, 0, 0],
+        "10217": [0.35001, 0.85, 0, 0],
+        "10752": [0.25001, 0.75, 0, 0],
+        "10753": [0.25001, 0.75, 0, 0],
+        "10754": [0.25001, 0.75, 0, 0],
+        "10756": [0.25001, 0.75, 0, 0],
+        "10758": [0.25001, 0.75, 0, 0]
+    },
+    "Size2-Regular": {
+        "40": [0.65002, 1.15, 0, 0],
+        "41": [0.65002, 1.15, 0, 0],
+        "47": [0.65002, 1.15, 0, 0],
+        "91": [0.65002, 1.15, 0, 0],
+        "92": [0.65002, 1.15, 0, 0],
+        "93": [0.65002, 1.15, 0, 0],
+        "123": [0.65002, 1.15, 0, 0],
+        "125": [0.65002, 1.15, 0, 0],
+        "710": [0, 0.75, 0, 0],
+        "732": [0, 0.75, 0, 0],
+        "770": [0, 0.75, 0, 0],
+        "771": [0, 0.75, 0, 0],
+        "8719": [0.55001, 1.05, 0, 0],
+        "8720": [0.55001, 1.05, 0, 0],
+        "8721": [0.55001, 1.05, 0, 0],
+        "8730": [0.65002, 1.15, 0, 0],
+        "8747": [0.86225, 1.36, 0.44445, 0],
+        "8748": [0.862, 1.36, 0.44445, 0],
+        "8749": [0.862, 1.36, 0.44445, 0],
+        "8750": [0.86225, 1.36, 0.44445, 0],
+        "8896": [0.55001, 1.05, 0, 0],
+        "8897": [0.55001, 1.05, 0, 0],
+        "8898": [0.55001, 1.05, 0, 0],
+        "8899": [0.55001, 1.05, 0, 0],
+        "8968": [0.65002, 1.15, 0, 0],
+        "8969": [0.65002, 1.15, 0, 0],
+        "8970": [0.65002, 1.15, 0, 0],
+        "8971": [0.65002, 1.15, 0, 0],
+        "10216": [0.65002, 1.15, 0, 0],
+        "10217": [0.65002, 1.15, 0, 0],
+        "10752": [0.55001, 1.05, 0, 0],
+        "10753": [0.55001, 1.05, 0, 0],
+        "10754": [0.55001, 1.05, 0, 0],
+        "10756": [0.55001, 1.05, 0, 0],
+        "10758": [0.55001, 1.05, 0, 0]
+    },
+    "Size3-Regular": {
+        "40": [0.95003, 1.45, 0, 0],
+        "41": [0.95003, 1.45, 0, 0],
+        "47": [0.95003, 1.45, 0, 0],
+        "91": [0.95003, 1.45, 0, 0],
+        "92": [0.95003, 1.45, 0, 0],
+        "93": [0.95003, 1.45, 0, 0],
+        "123": [0.95003, 1.45, 0, 0],
+        "125": [0.95003, 1.45, 0, 0],
+        "710": [0, 0.75, 0, 0],
+        "732": [0, 0.75, 0, 0],
+        "770": [0, 0.75, 0, 0],
+        "771": [0, 0.75, 0, 0],
+        "8730": [0.95003, 1.45, 0, 0],
+        "8968": [0.95003, 1.45, 0, 0],
+        "8969": [0.95003, 1.45, 0, 0],
+        "8970": [0.95003, 1.45, 0, 0],
+        "8971": [0.95003, 1.45, 0, 0],
+        "10216": [0.95003, 1.45, 0, 0],
+        "10217": [0.95003, 1.45, 0, 0]
+    },
+    "Size4-Regular": {
+        "40": [1.25003, 1.75, 0, 0],
+        "41": [1.25003, 1.75, 0, 0],
+        "47": [1.25003, 1.75, 0, 0],
+        "91": [1.25003, 1.75, 0, 0],
+        "92": [1.25003, 1.75, 0, 0],
+        "93": [1.25003, 1.75, 0, 0],
+        "123": [1.25003, 1.75, 0, 0],
+        "125": [1.25003, 1.75, 0, 0],
+        "710": [0, 0.825, 0, 0],
+        "732": [0, 0.825, 0, 0],
+        "770": [0, 0.825, 0, 0],
+        "771": [0, 0.825, 0, 0],
+        "8730": [1.25003, 1.75, 0, 0],
+        "8968": [1.25003, 1.75, 0, 0],
+        "8969": [1.25003, 1.75, 0, 0],
+        "8970": [1.25003, 1.75, 0, 0],
+        "8971": [1.25003, 1.75, 0, 0],
+        "9115": [0.64502, 1.155, 0, 0],
+        "9116": [1e-05, 0.6, 0, 0],
+        "9117": [0.64502, 1.155, 0, 0],
+        "9118": [0.64502, 1.155, 0, 0],
+        "9119": [1e-05, 0.6, 0, 0],
+        "9120": [0.64502, 1.155, 0, 0],
+        "9121": [0.64502, 1.155, 0, 0],
+        "9122": [-0.00099, 0.601, 0, 0],
+        "9123": [0.64502, 1.155, 0, 0],
+        "9124": [0.64502, 1.155, 0, 0],
+        "9125": [-0.00099, 0.601, 0, 0],
+        "9126": [0.64502, 1.155, 0, 0],
+        "9127": [1e-05, 0.9, 0, 0],
+        "9128": [0.65002, 1.15, 0, 0],
+        "9129": [0.90001, 0, 0, 0],
+        "9130": [0, 0.3, 0, 0],
+        "9131": [1e-05, 0.9, 0, 0],
+        "9132": [0.65002, 1.15, 0, 0],
+        "9133": [0.90001, 0, 0, 0],
+        "9143": [0.88502, 0.915, 0, 0],
+        "10216": [1.25003, 1.75, 0, 0],
+        "10217": [1.25003, 1.75, 0, 0],
+        "57344": [-0.00499, 0.605, 0, 0],
+        "57345": [-0.00499, 0.605, 0, 0],
+        "57680": [0, 0.12, 0, 0],
+        "57681": [0, 0.12, 0, 0],
+        "57682": [0, 0.12, 0, 0],
+        "57683": [0, 0.12, 0, 0]
+    },
+    "Typewriter-Regular": {
+        "33": [0, 0.61111, 0, 0],
+        "34": [0, 0.61111, 0, 0],
+        "35": [0, 0.61111, 0, 0],
+        "36": [0.08333, 0.69444, 0, 0],
+        "37": [0.08333, 0.69444, 0, 0],
+        "38": [0, 0.61111, 0, 0],
+        "39": [0, 0.61111, 0, 0],
+        "40": [0.08333, 0.69444, 0, 0],
+        "41": [0.08333, 0.69444, 0, 0],
+        "42": [0, 0.52083, 0, 0],
+        "43": [-0.08056, 0.53055, 0, 0],
+        "44": [0.13889, 0.125, 0, 0],
+        "45": [-0.08056, 0.53055, 0, 0],
+        "46": [0, 0.125, 0, 0],
+        "47": [0.08333, 0.69444, 0, 0],
+        "48": [0, 0.61111, 0, 0],
+        "49": [0, 0.61111, 0, 0],
+        "50": [0, 0.61111, 0, 0],
+        "51": [0, 0.61111, 0, 0],
+        "52": [0, 0.61111, 0, 0],
+        "53": [0, 0.61111, 0, 0],
+        "54": [0, 0.61111, 0, 0],
+        "55": [0, 0.61111, 0, 0],
+        "56": [0, 0.61111, 0, 0],
+        "57": [0, 0.61111, 0, 0],
+        "58": [0, 0.43056, 0, 0],
+        "59": [0.13889, 0.43056, 0, 0],
+        "60": [-0.05556, 0.55556, 0, 0],
+        "61": [-0.19549, 0.41562, 0, 0],
+        "62": [-0.05556, 0.55556, 0, 0],
+        "63": [0, 0.61111, 0, 0],
+        "64": [0, 0.61111, 0, 0],
+        "65": [0, 0.61111, 0, 0],
+        "66": [0, 0.61111, 0, 0],
+        "67": [0, 0.61111, 0, 0],
+        "68": [0, 0.61111, 0, 0],
+        "69": [0, 0.61111, 0, 0],
+        "70": [0, 0.61111, 0, 0],
+        "71": [0, 0.61111, 0, 0],
+        "72": [0, 0.61111, 0, 0],
+        "73": [0, 0.61111, 0, 0],
+        "74": [0, 0.61111, 0, 0],
+        "75": [0, 0.61111, 0, 0],
+        "76": [0, 0.61111, 0, 0],
+        "77": [0, 0.61111, 0, 0],
+        "78": [0, 0.61111, 0, 0],
+        "79": [0, 0.61111, 0, 0],
+        "80": [0, 0.61111, 0, 0],
+        "81": [0.13889, 0.61111, 0, 0],
+        "82": [0, 0.61111, 0, 0],
+        "83": [0, 0.61111, 0, 0],
+        "84": [0, 0.61111, 0, 0],
+        "85": [0, 0.61111, 0, 0],
+        "86": [0, 0.61111, 0, 0],
+        "87": [0, 0.61111, 0, 0],
+        "88": [0, 0.61111, 0, 0],
+        "89": [0, 0.61111, 0, 0],
+        "90": [0, 0.61111, 0, 0],
+        "91": [0.08333, 0.69444, 0, 0],
+        "92": [0.08333, 0.69444, 0, 0],
+        "93": [0.08333, 0.69444, 0, 0],
+        "94": [0, 0.61111, 0, 0],
+        "95": [0.09514, 0, 0, 0],
+        "96": [0, 0.61111, 0, 0],
+        "97": [0, 0.43056, 0, 0],
+        "98": [0, 0.61111, 0, 0],
+        "99": [0, 0.43056, 0, 0],
+        "100": [0, 0.61111, 0, 0],
+        "101": [0, 0.43056, 0, 0],
+        "102": [0, 0.61111, 0, 0],
+        "103": [0.22222, 0.43056, 0, 0],
+        "104": [0, 0.61111, 0, 0],
+        "105": [0, 0.61111, 0, 0],
+        "106": [0.22222, 0.61111, 0, 0],
+        "107": [0, 0.61111, 0, 0],
+        "108": [0, 0.61111, 0, 0],
+        "109": [0, 0.43056, 0, 0],
+        "110": [0, 0.43056, 0, 0],
+        "111": [0, 0.43056, 0, 0],
+        "112": [0.22222, 0.43056, 0, 0],
+        "113": [0.22222, 0.43056, 0, 0],
+        "114": [0, 0.43056, 0, 0],
+        "115": [0, 0.43056, 0, 0],
+        "116": [0, 0.55358, 0, 0],
+        "117": [0, 0.43056, 0, 0],
+        "118": [0, 0.43056, 0, 0],
+        "119": [0, 0.43056, 0, 0],
+        "120": [0, 0.43056, 0, 0],
+        "121": [0.22222, 0.43056, 0, 0],
+        "122": [0, 0.43056, 0, 0],
+        "123": [0.08333, 0.69444, 0, 0],
+        "124": [0.08333, 0.69444, 0, 0],
+        "125": [0.08333, 0.69444, 0, 0],
+        "126": [0, 0.61111, 0, 0],
+        "127": [0, 0.61111, 0, 0],
+        "305": [0, 0.43056, 0, 0],
+        "567": [0.22222, 0.43056, 0, 0],
+        "768": [0, 0.61111, 0, 0],
+        "769": [0, 0.61111, 0, 0],
+        "770": [0, 0.61111, 0, 0],
+        "771": [0, 0.61111, 0, 0],
+        "772": [0, 0.56555, 0, 0],
+        "774": [0, 0.61111, 0, 0],
+        "776": [0, 0.61111, 0, 0],
+        "778": [0, 0.61111, 0, 0],
+        "780": [0, 0.56597, 0, 0],
+        "915": [0, 0.61111, 0, 0],
+        "916": [0, 0.61111, 0, 0],
+        "920": [0, 0.61111, 0, 0],
+        "923": [0, 0.61111, 0, 0],
+        "926": [0, 0.61111, 0, 0],
+        "928": [0, 0.61111, 0, 0],
+        "931": [0, 0.61111, 0, 0],
+        "933": [0, 0.61111, 0, 0],
+        "934": [0, 0.61111, 0, 0],
+        "936": [0, 0.61111, 0, 0],
+        "937": [0, 0.61111, 0, 0],
+        "2018": [0, 0.61111, 0, 0],
+        "2019": [0, 0.61111, 0, 0],
+        "8242": [0, 0.61111, 0, 0]
+    }
+};
 
 },{}],17:[function(require,module,exports){
-function defineFunction(e,n,r){"string"==typeof e&&(e=[e]),"number"==typeof n&&(n={numArgs:n});for(var t={numArgs:n.numArgs,argTypes:n.argTypes,greediness:void 0===n.greediness?1:n.greediness,allowedInText:!!n.allowedInText,numOptionalArgs:n.numOptionalArgs||0,infix:!!n.infix,handler:r},i=0;i<e.length;++i)module.exports[e[i]]=t}var utils=require("./utils"),ParseError=require("./ParseError"),parseData=require("./parseData"),ParseNode=parseData.ParseNode,ordargument=function(e){return"ordgroup"===e.type?e.value:[e]};defineFunction("\\sqrt",{numArgs:1,numOptionalArgs:1},function(e,n){var r=n[0];return{type:"sqrt",body:n[1],index:r}});var textFunctionStyles={"\\text":void 0,"\\textrm":"mathrm","\\textsf":"mathsf","\\texttt":"mathtt","\\textnormal":"mathrm","\\textbf":"mathbf","\\textit":"textit"};defineFunction(["\\text","\\textrm","\\textsf","\\texttt","\\textnormal","\\textbf","\\textit"],{numArgs:1,argTypes:["text"],greediness:2,allowedInText:!0},function(e,n){var r=n[0];return{type:"text",body:ordargument(r),style:textFunctionStyles[e.funcName]}}),defineFunction("\\color",{numArgs:2,allowedInText:!0,greediness:3,argTypes:["color","original"]},function(e,n){var r=n[0],t=n[1];return{type:"color",color:r.value,value:ordargument(t)}}),defineFunction("\\overline",{numArgs:1},function(e,n){return{type:"overline",body:n[0]}}),defineFunction("\\underline",{numArgs:1},function(e,n){return{type:"underline",body:n[0]}}),defineFunction("\\rule",{numArgs:2,numOptionalArgs:1,argTypes:["size","size","size"]},function(e,n){var r=n[0],t=n[1],i=n[2];return{type:"rule",shift:r&&r.value,width:t.value,height:i.value}}),defineFunction(["\\kern","\\mkern"],{numArgs:1,argTypes:["size"]},function(e,n){return{type:"kern",dimension:n[0].value}}),defineFunction("\\KaTeX",{numArgs:0},function(e){return{type:"katex"}}),defineFunction("\\phantom",{numArgs:1},function(e,n){var r=n[0];return{type:"phantom",value:ordargument(r)}}),defineFunction(["\\mathord","\\mathbin","\\mathrel","\\mathopen","\\mathclose","\\mathpunct","\\mathinner"],{numArgs:1},function(e,n){var r=n[0];return{type:"mclass",mclass:"m"+e.funcName.substr(5),value:ordargument(r)}}),defineFunction("\\stackrel",{numArgs:2},function(e,n){var r=n[0],t=n[1],i=new ParseNode("op",{type:"op",limits:!0,alwaysHandleSupSub:!0,symbol:!1,value:ordargument(t)},t.mode);return{type:"mclass",mclass:"mrel",value:[new ParseNode("supsub",{base:i,sup:r,sub:null},r.mode)]}}),defineFunction("\\bmod",{numArgs:0},function(e,n){return{type:"mod",modType:"bmod",value:null}}),defineFunction(["\\pod","\\pmod","\\mod"],{numArgs:1},function(e,n){var r=n[0];return{type:"mod",modType:e.funcName.substr(1),value:ordargument(r)}});var delimiterSizes={"\\bigl":{mclass:"mopen",size:1},"\\Bigl":{mclass:"mopen",size:2},"\\biggl":{mclass:"mopen",size:3},"\\Biggl":{mclass:"mopen",size:4},"\\bigr":{mclass:"mclose",size:1},"\\Bigr":{mclass:"mclose",size:2},"\\biggr":{mclass:"mclose",size:3},"\\Biggr":{mclass:"mclose",size:4},"\\bigm":{mclass:"mrel",size:1},"\\Bigm":{mclass:"mrel",size:2},"\\biggm":{mclass:"mrel",size:3},"\\Biggm":{mclass:"mrel",size:4},"\\big":{mclass:"mord",size:1},"\\Big":{mclass:"mord",size:2},"\\bigg":{mclass:"mord",size:3},"\\Bigg":{mclass:"mord",size:4}},delimiters=["(",")","[","\\lbrack","]","\\rbrack","\\{","\\lbrace","\\}","\\rbrace","\\lfloor","\\rfloor","\\lceil","\\rceil","<",">","\\langle","\\rangle","\\lt","\\gt","\\lvert","\\rvert","\\lVert","\\rVert","\\lgroup","\\rgroup","\\lmoustache","\\rmoustache","/","\\backslash","|","\\vert","\\|","\\Vert","\\uparrow","\\Uparrow","\\downarrow","\\Downarrow","\\updownarrow","\\Updownarrow","."],fontAliases={"\\Bbb":"\\mathbb","\\bold":"\\mathbf","\\frak":"\\mathfrak"};defineFunction(["\\blue","\\orange","\\pink","\\red","\\green","\\gray","\\purple","\\blueA","\\blueB","\\blueC","\\blueD","\\blueE","\\tealA","\\tealB","\\tealC","\\tealD","\\tealE","\\greenA","\\greenB","\\greenC","\\greenD","\\greenE","\\goldA","\\goldB","\\goldC","\\goldD","\\goldE","\\redA","\\redB","\\redC","\\redD","\\redE","\\maroonA","\\maroonB","\\maroonC","\\maroonD","\\maroonE","\\purpleA","\\purpleB","\\purpleC","\\purpleD","\\purpleE","\\mintA","\\mintB","\\mintC","\\grayA","\\grayB","\\grayC","\\grayD","\\grayE","\\grayF","\\grayG","\\grayH","\\grayI","\\kaBlue","\\kaGreen"],{numArgs:1,allowedInText:!0,greediness:3},function(e,n){var r=n[0];return{type:"color",color:"katex-"+e.funcName.slice(1),value:ordargument(r)}}),defineFunction(["\\arcsin","\\arccos","\\arctan","\\arg","\\cos","\\cosh","\\cot","\\coth","\\csc","\\deg","\\dim","\\exp","\\hom","\\ker","\\lg","\\ln","\\log","\\sec","\\sin","\\sinh","\\tan","\\tanh"],{numArgs:0},function(e){return{type:"op",limits:!1,symbol:!1,body:e.funcName}}),defineFunction(["\\det","\\gcd","\\inf","\\lim","\\liminf","\\limsup","\\max","\\min","\\Pr","\\sup"],{numArgs:0},function(e){return{type:"op",limits:!0,symbol:!1,body:e.funcName}}),defineFunction(["\\int","\\iint","\\iiint","\\oint"],{numArgs:0},function(e){return{type:"op",limits:!1,symbol:!0,body:e.funcName}}),defineFunction(["\\coprod","\\bigvee","\\bigwedge","\\biguplus","\\bigcap","\\bigcup","\\intop","\\prod","\\sum","\\bigotimes","\\bigoplus","\\bigodot","\\bigsqcup","\\smallint"],{numArgs:0},function(e){return{type:"op",limits:!0,symbol:!0,body:e.funcName}}),defineFunction("\\mathop",{numArgs:1},function(e,n){var r=n[0];return{type:"op",limits:!1,symbol:!1,value:ordargument(r)}}),defineFunction(["\\dfrac","\\frac","\\tfrac","\\dbinom","\\binom","\\tbinom","\\\\atopfrac"],{numArgs:2,greediness:2},function(e,n){var r,t=n[0],i=n[1],a=null,o=null,s="auto";switch(e.funcName){case"\\dfrac":case"\\frac":case"\\tfrac":r=!0;break;case"\\\\atopfrac":r=!1;break;case"\\dbinom":case"\\binom":case"\\tbinom":r=!1,a="(",o=")";break;default:throw new Error("Unrecognized genfrac command")}switch(e.funcName){case"\\dfrac":case"\\dbinom":s="display";break;case"\\tfrac":case"\\tbinom":s="text"}return{type:"genfrac",numer:t,denom:i,hasBarLine:r,leftDelim:a,rightDelim:o,size:s}}),defineFunction(["\\llap","\\rlap"],{numArgs:1,allowedInText:!0},function(e,n){var r=n[0];return{type:e.funcName.slice(1),body:r}});var checkDelimiter=function(e,n){if(utils.contains(delimiters,e.value))return e;throw new ParseError("Invalid delimiter: '"+e.value+"' after '"+n.funcName+"'",e)};defineFunction(["\\bigl","\\Bigl","\\biggl","\\Biggl","\\bigr","\\Bigr","\\biggr","\\Biggr","\\bigm","\\Bigm","\\biggm","\\Biggm","\\big","\\Big","\\bigg","\\Bigg"],{numArgs:1},function(e,n){var r=checkDelimiter(n[0],e);return{type:"delimsizing",size:delimiterSizes[e.funcName].size,mclass:delimiterSizes[e.funcName].mclass,value:r.value}}),defineFunction(["\\left","\\right"],{numArgs:1},function(e,n){return{type:"leftright",value:checkDelimiter(n[0],e).value}}),defineFunction("\\middle",{numArgs:1},function(e,n){var r=checkDelimiter(n[0],e);if(!e.parser.leftrightDepth)throw new ParseError("\\middle without preceding \\left",r);return{type:"middle",value:r.value}}),defineFunction(["\\tiny","\\scriptsize","\\footnotesize","\\small","\\normalsize","\\large","\\Large","\\LARGE","\\huge","\\Huge"],0,null),defineFunction(["\\displaystyle","\\textstyle","\\scriptstyle","\\scriptscriptstyle"],0,null),defineFunction(["\\mathrm","\\mathit","\\mathbf","\\mathbb","\\mathcal","\\mathfrak","\\mathscr","\\mathsf","\\mathtt","\\Bbb","\\bold","\\frak"],{numArgs:1,greediness:2},function(e,n){var r=n[0],t=e.funcName;return t in fontAliases&&(t=fontAliases[t]),{type:"font",font:t.slice(1),body:r}}),defineFunction(["\\acute","\\grave","\\ddot","\\tilde","\\bar","\\breve","\\check","\\hat","\\vec","\\dot"],{numArgs:1},function(e,n){var r=n[0];return{type:"accent",accent:e.funcName,base:r}}),defineFunction(["\\over","\\choose","\\atop"],{numArgs:0,infix:!0},function(e){var n;switch(e.funcName){case"\\over":n="\\frac";break;case"\\choose":n="\\binom";break;case"\\atop":n="\\\\atopfrac";break;default:throw new Error("Unrecognized infix genfrac command")}return{type:"infix",replaceWith:n,token:e.token}}),defineFunction(["\\\\","\\cr"],{numArgs:0,numOptionalArgs:1,argTypes:["size"]},function(e,n){return{type:"cr",size:n[0]}}),defineFunction(["\\begin","\\end"],{numArgs:1,argTypes:["text"]},function(e,n){var r=n[0];if("ordgroup"!==r.type)throw new ParseError("Invalid environment name",r);for(var t="",i=0;i<r.value.length;++i)t+=r.value[i].value;return{type:"environment",name:t,nameGroup:r}});
+var utils = require("./utils");
+var ParseError = require("./ParseError");
+var parseData = require("./parseData");
+var ParseNode = parseData.ParseNode;
+
+/* This file contains a list of functions that we parse, identified by
+ * the calls to defineFunction.
+ *
+ * The first argument to defineFunction is a single name or a list of names.
+ * All functions named in such a list will share a single implementation.
+ *
+ * Each declared function can have associated properties, which
+ * include the following:
+ *
+ *  - numArgs: The number of arguments the function takes.
+ *             If this is the only property, it can be passed as a number
+ *             instead of an element of a properties object.
+ *  - argTypes: (optional) An array corresponding to each argument of the
+ *              function, giving the type of argument that should be parsed. Its
+ *              length should be equal to `numArgs + numOptionalArgs`. Valid
+ *              types:
+ *               - "size": A size-like thing, such as "1em" or "5ex"
+ *               - "color": An html color, like "#abc" or "blue"
+ *               - "original": The same type as the environment that the
+ *                             function being parsed is in (e.g. used for the
+ *                             bodies of functions like \color where the first
+ *                             argument is special and the second argument is
+ *                             parsed normally)
+ *              Other possible types (probably shouldn't be used)
+ *               - "text": Text-like (e.g. \text)
+ *               - "math": Normal math
+ *              If undefined, this will be treated as an appropriate length
+ *              array of "original" strings
+ *  - greediness: (optional) The greediness of the function to use ungrouped
+ *                arguments.
+ *
+ *                E.g. if you have an expression
+ *                  \sqrt \frac 1 2
+ *                since \frac has greediness=2 vs \sqrt's greediness=1, \frac
+ *                will use the two arguments '1' and '2' as its two arguments,
+ *                then that whole function will be used as the argument to
+ *                \sqrt. On the other hand, the expressions
+ *                  \frac \frac 1 2 3
+ *                and
+ *                  \frac \sqrt 1 2
+ *                will fail because \frac and \frac have equal greediness
+ *                and \sqrt has a lower greediness than \frac respectively. To
+ *                make these parse, we would have to change them to:
+ *                  \frac {\frac 1 2} 3
+ *                and
+ *                  \frac {\sqrt 1} 2
+ *
+ *                The default value is `1`
+ *  - allowedInText: (optional) Whether or not the function is allowed inside
+ *                   text mode (default false)
+ *  - numOptionalArgs: (optional) The number of optional arguments the function
+ *                     should parse. If the optional arguments aren't found,
+ *                     `null` will be passed to the handler in their place.
+ *                     (default 0)
+ *  - infix: (optional) Must be true if the function is an infix operator.
+ *
+ * The last argument is that implementation, the handler for the function(s).
+ * It is called to handle these functions and their arguments.
+ * It receives two arguments:
+ *  - context contains information and references provided by the parser
+ *  - args is an array of arguments obtained from TeX input
+ * The context contains the following properties:
+ *  - funcName: the text (i.e. name) of the function, including \
+ *  - parser: the parser object
+ *  - lexer: the lexer object
+ *  - positions: the positions in the overall string of the function
+ *               and the arguments.
+ * The latter three should only be used to produce error messages.
+ *
+ * The function should return an object with the following keys:
+ *  - type: The type of element that this is. This is then used in
+ *          buildHTML/buildMathML to determine which function
+ *          should be called to build this node into a DOM node
+ * Any other data can be added to the object, which will be passed
+ * in to the function in buildHTML/buildMathML as `group.value`.
+ */
+
+function defineFunction(names, props, handler) {
+    if (typeof names === "string") {
+        names = [names];
+    }
+    if (typeof props === "number") {
+        props = { numArgs: props };
+    }
+    // Set default values of functions
+    var data = {
+        numArgs: props.numArgs,
+        argTypes: props.argTypes,
+        greediness: (props.greediness === undefined) ? 1 : props.greediness,
+        allowedInText: !!props.allowedInText,
+        numOptionalArgs: props.numOptionalArgs || 0,
+        infix: !!props.infix,
+        handler: handler
+    };
+    for (var i = 0; i < names.length; ++i) {
+        module.exports[names[i]] = data;
+    }
+}
+
+// Since the corresponding buildHTML/buildMathML function expects a
+// list of elements, we normalize for different kinds of arguments
+var ordargument = function(arg) {
+    if (arg.type === "ordgroup") {
+        return arg.value;
+    } else {
+        return [arg];
+    }
+};
+
+// A normal square root
+defineFunction("\\sqrt", {
+    numArgs: 1,
+    numOptionalArgs: 1
+}, function(context, args) {
+    var index = args[0];
+    var body = args[1];
+    return {
+        type: "sqrt",
+        body: body,
+        index: index
+    };
+});
+
+// Non-mathy text, possibly in a font
+var textFunctionStyles = {
+    "\\text": undefined, "\\textrm": "mathrm", "\\textsf": "mathsf",
+    "\\texttt": "mathtt", "\\textnormal": "mathrm", "\\textbf": "mathbf",
+    "\\textit": "textit"
+};
+
+defineFunction([
+    "\\text", "\\textrm", "\\textsf", "\\texttt", "\\textnormal",
+    "\\textbf", "\\textit"
+], {
+    numArgs: 1,
+    argTypes: ["text"],
+    greediness: 2,
+    allowedInText: true
+}, function(context, args) {
+    var body = args[0];
+    return {
+        type: "text",
+        body: ordargument(body),
+        style: textFunctionStyles[context.funcName]
+    };
+});
+
+// A two-argument custom color
+defineFunction("\\color", {
+    numArgs: 2,
+    allowedInText: true,
+    greediness: 3,
+    argTypes: ["color", "original"]
+}, function(context, args) {
+    var color = args[0];
+    var body = args[1];
+    return {
+        type: "color",
+        color: color.value,
+        value: ordargument(body)
+    };
+});
+
+// An overline
+defineFunction("\\overline", {
+    numArgs: 1
+}, function(context, args) {
+    var body = args[0];
+    return {
+        type: "overline",
+        body: body
+    };
+});
+
+// An underline
+defineFunction("\\underline", {
+    numArgs: 1
+}, function(context, args) {
+    var body = args[0];
+    return {
+        type: "underline",
+        body: body
+    };
+});
+
+// A box of the width and height
+defineFunction("\\rule", {
+    numArgs: 2,
+    numOptionalArgs: 1,
+    argTypes: ["size", "size", "size"]
+}, function(context, args) {
+    var shift = args[0];
+    var width = args[1];
+    var height = args[2];
+    return {
+        type: "rule",
+        shift: shift && shift.value,
+        width: width.value,
+        height: height.value
+    };
+});
+
+// TODO: In TeX, \mkern only accepts mu-units, and \kern does not accept
+// mu-units. In current KaTeX we relax this; both commands accept any unit.
+defineFunction(["\\kern", "\\mkern"], {
+    numArgs: 1,
+    argTypes: ["size"]
+}, function(context, args) {
+    return {
+        type: "kern",
+        dimension: args[0].value
+    };
+});
+
+// A KaTeX logo
+defineFunction("\\KaTeX", {
+    numArgs: 0
+}, function(context) {
+    return {
+        type: "katex"
+    };
+});
+
+defineFunction("\\phantom", {
+    numArgs: 1
+}, function(context, args) {
+    var body = args[0];
+    return {
+        type: "phantom",
+        value: ordargument(body)
+    };
+});
+
+// Math class commands except \mathop
+defineFunction([
+    "\\mathord", "\\mathbin", "\\mathrel", "\\mathopen",
+    "\\mathclose", "\\mathpunct", "\\mathinner"
+], {
+    numArgs: 1
+}, function(context, args) {
+    var body = args[0];
+    return {
+        type: "mclass",
+        mclass: "m" + context.funcName.substr(5),
+        value: ordargument(body)
+    };
+});
+
+// Build a relation by placing one symbol on top of another
+defineFunction("\\stackrel", {
+    numArgs: 2
+}, function(context, args) {
+    var top = args[0];
+    var bottom = args[1];
+
+    var bottomop = new ParseNode("op", {
+        type: "op",
+        limits: true,
+        alwaysHandleSupSub: true,
+        symbol: false,
+        value: ordargument(bottom)
+    }, bottom.mode);
+
+    var supsub = new ParseNode("supsub", {
+        base: bottomop,
+        sup: top,
+        sub: null
+    }, top.mode);
+
+    return {
+        type: "mclass",
+        mclass: "mrel",
+        value: [supsub]
+    };
+});
+
+// \mod-type functions
+defineFunction("\\bmod", {
+    numArgs: 0
+}, function(context, args) {
+    return {
+        type: "mod",
+        modType: "bmod",
+        value: null
+    };
+});
+
+defineFunction(["\\pod", "\\pmod", "\\mod"], {
+    numArgs: 1
+}, function(context, args) {
+    var body = args[0];
+    return {
+        type: "mod",
+        modType: context.funcName.substr(1),
+        value: ordargument(body)
+    };
+});
+
+// Extra data needed for the delimiter handler down below
+var delimiterSizes = {
+    "\\bigl" : {mclass: "mopen",    size: 1},
+    "\\Bigl" : {mclass: "mopen",    size: 2},
+    "\\biggl": {mclass: "mopen",    size: 3},
+    "\\Biggl": {mclass: "mopen",    size: 4},
+    "\\bigr" : {mclass: "mclose",   size: 1},
+    "\\Bigr" : {mclass: "mclose",   size: 2},
+    "\\biggr": {mclass: "mclose",   size: 3},
+    "\\Biggr": {mclass: "mclose",   size: 4},
+    "\\bigm" : {mclass: "mrel",     size: 1},
+    "\\Bigm" : {mclass: "mrel",     size: 2},
+    "\\biggm": {mclass: "mrel",     size: 3},
+    "\\Biggm": {mclass: "mrel",     size: 4},
+    "\\big"  : {mclass: "mord",     size: 1},
+    "\\Big"  : {mclass: "mord",     size: 2},
+    "\\bigg" : {mclass: "mord",     size: 3},
+    "\\Bigg" : {mclass: "mord",     size: 4}
+};
+
+var delimiters = [
+    "(", ")", "[", "\\lbrack", "]", "\\rbrack",
+    "\\{", "\\lbrace", "\\}", "\\rbrace",
+    "\\lfloor", "\\rfloor", "\\lceil", "\\rceil",
+    "<", ">", "\\langle", "\\rangle", "\\lt", "\\gt",
+    "\\lvert", "\\rvert", "\\lVert", "\\rVert",
+    "\\lgroup", "\\rgroup", "\\lmoustache", "\\rmoustache",
+    "/", "\\backslash",
+    "|", "\\vert", "\\|", "\\Vert",
+    "\\uparrow", "\\Uparrow",
+    "\\downarrow", "\\Downarrow",
+    "\\updownarrow", "\\Updownarrow",
+    "."
+];
+
+var fontAliases = {
+    "\\Bbb": "\\mathbb",
+    "\\bold": "\\mathbf",
+    "\\frak": "\\mathfrak"
+};
+
+// Single-argument color functions
+defineFunction([
+    "\\blue", "\\orange", "\\pink", "\\red",
+    "\\green", "\\gray", "\\purple",
+    "\\blueA", "\\blueB", "\\blueC", "\\blueD", "\\blueE",
+    "\\tealA", "\\tealB", "\\tealC", "\\tealD", "\\tealE",
+    "\\greenA", "\\greenB", "\\greenC", "\\greenD", "\\greenE",
+    "\\goldA", "\\goldB", "\\goldC", "\\goldD", "\\goldE",
+    "\\redA", "\\redB", "\\redC", "\\redD", "\\redE",
+    "\\maroonA", "\\maroonB", "\\maroonC", "\\maroonD", "\\maroonE",
+    "\\purpleA", "\\purpleB", "\\purpleC", "\\purpleD", "\\purpleE",
+    "\\mintA", "\\mintB", "\\mintC",
+    "\\grayA", "\\grayB", "\\grayC", "\\grayD", "\\grayE",
+    "\\grayF", "\\grayG", "\\grayH", "\\grayI",
+    "\\kaBlue", "\\kaGreen"
+], {
+    numArgs: 1,
+    allowedInText: true,
+    greediness: 3
+}, function(context, args) {
+    var body = args[0];
+    return {
+        type: "color",
+        color: "katex-" + context.funcName.slice(1),
+        value: ordargument(body)
+    };
+});
+
+// There are 2 flags for operators; whether they produce limits in
+// displaystyle, and whether they are symbols and should grow in
+// displaystyle. These four groups cover the four possible choices.
+
+// No limits, not symbols
+defineFunction([
+    "\\arcsin", "\\arccos", "\\arctan", "\\arg", "\\cos", "\\cosh",
+    "\\cot", "\\coth", "\\csc", "\\deg", "\\dim", "\\exp", "\\hom",
+    "\\ker", "\\lg", "\\ln", "\\log", "\\sec", "\\sin", "\\sinh",
+    "\\tan", "\\tanh"
+], {
+    numArgs: 0
+}, function(context) {
+    return {
+        type: "op",
+        limits: false,
+        symbol: false,
+        body: context.funcName
+    };
+});
+
+// Limits, not symbols
+defineFunction([
+    "\\det", "\\gcd", "\\inf", "\\lim", "\\liminf", "\\limsup", "\\max",
+    "\\min", "\\Pr", "\\sup"
+], {
+    numArgs: 0
+}, function(context) {
+    return {
+        type: "op",
+        limits: true,
+        symbol: false,
+        body: context.funcName
+    };
+});
+
+// No limits, symbols
+defineFunction([
+    "\\int", "\\iint", "\\iiint", "\\oint"
+], {
+    numArgs: 0
+}, function(context) {
+    return {
+        type: "op",
+        limits: false,
+        symbol: true,
+        body: context.funcName
+    };
+});
+
+// Limits, symbols
+defineFunction([
+    "\\coprod", "\\bigvee", "\\bigwedge", "\\biguplus", "\\bigcap",
+    "\\bigcup", "\\intop", "\\prod", "\\sum", "\\bigotimes",
+    "\\bigoplus", "\\bigodot", "\\bigsqcup", "\\smallint"
+], {
+    numArgs: 0
+}, function(context) {
+    return {
+        type: "op",
+        limits: true,
+        symbol: true,
+        body: context.funcName
+    };
+});
+
+// \mathop class command
+defineFunction("\\mathop", {
+    numArgs: 1
+}, function(context, args) {
+    var body = args[0];
+    return {
+        type: "op",
+        limits: false,
+        symbol: false,
+        value: ordargument(body)
+    };
+});
+
+// Fractions
+defineFunction([
+    "\\dfrac", "\\frac", "\\tfrac",
+    "\\dbinom", "\\binom", "\\tbinom",
+    "\\\\atopfrac" // can’t be entered directly
+], {
+    numArgs: 2,
+    greediness: 2
+}, function(context, args) {
+    var numer = args[0];
+    var denom = args[1];
+    var hasBarLine;
+    var leftDelim = null;
+    var rightDelim = null;
+    var size = "auto";
+
+    switch (context.funcName) {
+        case "\\dfrac":
+        case "\\frac":
+        case "\\tfrac":
+            hasBarLine = true;
+            break;
+        case "\\\\atopfrac":
+            hasBarLine = false;
+            break;
+        case "\\dbinom":
+        case "\\binom":
+        case "\\tbinom":
+            hasBarLine = false;
+            leftDelim = "(";
+            rightDelim = ")";
+            break;
+        default:
+            throw new Error("Unrecognized genfrac command");
+    }
+
+    switch (context.funcName) {
+        case "\\dfrac":
+        case "\\dbinom":
+            size = "display";
+            break;
+        case "\\tfrac":
+        case "\\tbinom":
+            size = "text";
+            break;
+    }
+
+    return {
+        type: "genfrac",
+        numer: numer,
+        denom: denom,
+        hasBarLine: hasBarLine,
+        leftDelim: leftDelim,
+        rightDelim: rightDelim,
+        size: size
+    };
+});
+
+// Left and right overlap functions
+defineFunction(["\\llap", "\\rlap"], {
+    numArgs: 1,
+    allowedInText: true
+}, function(context, args) {
+    var body = args[0];
+    return {
+        type: context.funcName.slice(1),
+        body: body
+    };
+});
+
+// Delimiter functions
+var checkDelimiter = function(delim, context) {
+    if (utils.contains(delimiters, delim.value)) {
+        return delim;
+    } else {
+        throw new ParseError(
+            "Invalid delimiter: '" + delim.value + "' after '" +
+            context.funcName + "'", delim);
+    }
+};
+
+defineFunction([
+    "\\bigl", "\\Bigl", "\\biggl", "\\Biggl",
+    "\\bigr", "\\Bigr", "\\biggr", "\\Biggr",
+    "\\bigm", "\\Bigm", "\\biggm", "\\Biggm",
+    "\\big",  "\\Big",  "\\bigg",  "\\Bigg"
+], {
+    numArgs: 1
+}, function(context, args) {
+    var delim = checkDelimiter(args[0], context);
+
+    return {
+        type: "delimsizing",
+        size: delimiterSizes[context.funcName].size,
+        mclass: delimiterSizes[context.funcName].mclass,
+        value: delim.value
+    };
+});
+
+defineFunction([
+    "\\left", "\\right"
+], {
+    numArgs: 1
+}, function(context, args) {
+    var delim = checkDelimiter(args[0], context);
+
+    // \left and \right are caught somewhere in Parser.js, which is
+    // why this data doesn't match what is in buildHTML.
+    return {
+        type: "leftright",
+        value: delim.value
+    };
+});
+
+defineFunction("\\middle", {
+    numArgs: 1
+}, function(context, args) {
+    var delim = checkDelimiter(args[0], context);
+    if (!context.parser.leftrightDepth) {
+        throw new ParseError("\\middle without preceding \\left", delim);
+    }
+
+    return {
+        type: "middle",
+        value: delim.value
+    };
+});
+
+// Sizing functions (handled in Parser.js explicitly, hence no handler)
+defineFunction([
+    "\\tiny", "\\scriptsize", "\\footnotesize", "\\small",
+    "\\normalsize", "\\large", "\\Large", "\\LARGE", "\\huge", "\\Huge"
+], 0, null);
+
+// Style changing functions (handled in Parser.js explicitly, hence no
+// handler)
+defineFunction([
+    "\\displaystyle", "\\textstyle", "\\scriptstyle",
+    "\\scriptscriptstyle"
+], 0, null);
+
+defineFunction([
+    // styles
+    "\\mathrm", "\\mathit", "\\mathbf",
+
+    // families
+    "\\mathbb", "\\mathcal", "\\mathfrak", "\\mathscr", "\\mathsf",
+    "\\mathtt",
+
+    // aliases
+    "\\Bbb", "\\bold", "\\frak"
+], {
+    numArgs: 1,
+    greediness: 2
+}, function(context, args) {
+    var body = args[0];
+    var func = context.funcName;
+    if (func in fontAliases) {
+        func = fontAliases[func];
+    }
+    return {
+        type: "font",
+        font: func.slice(1),
+        body: body
+    };
+});
+
+// Accents
+defineFunction([
+    "\\acute", "\\grave", "\\ddot", "\\tilde", "\\bar", "\\breve",
+    "\\check", "\\hat", "\\vec", "\\dot"
+    // We don't support expanding accents yet
+    // "\\widetilde", "\\widehat"
+], {
+    numArgs: 1
+}, function(context, args) {
+    var base = args[0];
+    return {
+        type: "accent",
+        accent: context.funcName,
+        base: base
+    };
+});
+
+// Infix generalized fractions
+defineFunction(["\\over", "\\choose", "\\atop"], {
+    numArgs: 0,
+    infix: true
+}, function(context) {
+    var replaceWith;
+    switch (context.funcName) {
+        case "\\over":
+            replaceWith = "\\frac";
+            break;
+        case "\\choose":
+            replaceWith = "\\binom";
+            break;
+        case "\\atop":
+            replaceWith = "\\\\atopfrac";
+            break;
+        default:
+            throw new Error("Unrecognized infix genfrac command");
+    }
+    return {
+        type: "infix",
+        replaceWith: replaceWith,
+        token: context.token
+    };
+});
+
+// Row breaks for aligned data
+defineFunction(["\\\\", "\\cr"], {
+    numArgs: 0,
+    numOptionalArgs: 1,
+    argTypes: ["size"]
+}, function(context, args) {
+    var size = args[0];
+    return {
+        type: "cr",
+        size: size
+    };
+});
+
+// Environment delimiters
+defineFunction(["\\begin", "\\end"], {
+    numArgs: 1,
+    argTypes: ["text"]
+}, function(context, args) {
+    var nameGroup = args[0];
+    if (nameGroup.type !== "ordgroup") {
+        throw new ParseError("Invalid environment name", nameGroup);
+    }
+    var name = "";
+    for (var i = 0; i < nameGroup.value.length; ++i) {
+        name += nameGroup.value[i].value;
+    }
+    return {
+        type: "environment",
+        name: name,
+        nameGroup: nameGroup
+    };
+});
 
 },{"./ParseError":4,"./parseData":19,"./utils":23}],18:[function(require,module,exports){
-function MathNode(t,e){this.type=t,this.attributes={},this.children=e||[]}function TextNode(t){this.text=t}var utils=require("./utils");MathNode.prototype.setAttribute=function(t,e){this.attributes[t]=e},MathNode.prototype.toNode=function(){var t=document.createElementNS("http://www.w3.org/1998/Math/MathML",this.type);for(var e in this.attributes)Object.prototype.hasOwnProperty.call(this.attributes,e)&&t.setAttribute(e,this.attributes[e]);for(var r=0;r<this.children.length;r++)t.appendChild(this.children[r].toNode());return t},MathNode.prototype.toMarkup=function(){var t="<"+this.type;for(var e in this.attributes)Object.prototype.hasOwnProperty.call(this.attributes,e)&&(t+=" "+e+'="',t+=utils.escape(this.attributes[e]),t+='"');t+=">";for(var r=0;r<this.children.length;r++)t+=this.children[r].toMarkup();return t+="</"+this.type+">"},TextNode.prototype.toNode=function(){return document.createTextNode(this.text)},TextNode.prototype.toMarkup=function(){return utils.escape(this.text)},module.exports={MathNode:MathNode,TextNode:TextNode};
+/**
+ * These objects store data about MathML nodes. This is the MathML equivalent
+ * of the types in domTree.js. Since MathML handles its own rendering, and
+ * since we're mainly using MathML to improve accessibility, we don't manage
+ * any of the styling state that the plain DOM nodes do.
+ *
+ * The `toNode` and `toMarkup` functions work simlarly to how they do in
+ * domTree.js, creating namespaced DOM nodes and HTML text markup respectively.
+ */
+
+var utils = require("./utils");
+
+/**
+ * This node represents a general purpose MathML node of any type. The
+ * constructor requires the type of node to create (for example, `"mo"` or
+ * `"mspace"`, corresponding to `<mo>` and `<mspace>` tags).
+ */
+function MathNode(type, children) {
+    this.type = type;
+    this.attributes = {};
+    this.children = children || [];
+}
+
+/**
+ * Sets an attribute on a MathML node. MathML depends on attributes to convey a
+ * semantic content, so this is used heavily.
+ */
+MathNode.prototype.setAttribute = function(name, value) {
+    this.attributes[name] = value;
+};
+
+/**
+ * Converts the math node into a MathML-namespaced DOM element.
+ */
+MathNode.prototype.toNode = function() {
+    var node = document.createElementNS(
+        "http://www.w3.org/1998/Math/MathML", this.type);
+
+    for (var attr in this.attributes) {
+        if (Object.prototype.hasOwnProperty.call(this.attributes, attr)) {
+            node.setAttribute(attr, this.attributes[attr]);
+        }
+    }
+
+    for (var i = 0; i < this.children.length; i++) {
+        node.appendChild(this.children[i].toNode());
+    }
+
+    return node;
+};
+
+/**
+ * Converts the math node into an HTML markup string.
+ */
+MathNode.prototype.toMarkup = function() {
+    var markup = "<" + this.type;
+
+    // Add the attributes
+    for (var attr in this.attributes) {
+        if (Object.prototype.hasOwnProperty.call(this.attributes, attr)) {
+            markup += " " + attr + "=\"";
+            markup += utils.escape(this.attributes[attr]);
+            markup += "\"";
+        }
+    }
+
+    markup += ">";
+
+    for (var i = 0; i < this.children.length; i++) {
+        markup += this.children[i].toMarkup();
+    }
+
+    markup += "</" + this.type + ">";
+
+    return markup;
+};
+
+/**
+ * This node represents a piece of text.
+ */
+function TextNode(text) {
+    this.text = text;
+}
+
+/**
+ * Converts the text node into a DOM text node.
+ */
+TextNode.prototype.toNode = function() {
+    return document.createTextNode(this.text);
+};
+
+/**
+ * Converts the text node into HTML markup (which is just the text itself).
+ */
+TextNode.prototype.toMarkup = function() {
+    return utils.escape(this.text);
+};
+
+module.exports = {
+    MathNode: MathNode,
+    TextNode: TextNode
+};
 
 },{"./utils":23}],19:[function(require,module,exports){
-function ParseNode(e,t,s,r,d){this.type=e,this.value=t,this.mode=s,!r||d&&d.lexer!==r.lexer||(this.lexer=r.lexer,this.start=r.start,this.end=(d||r).end)}module.exports={ParseNode:ParseNode};
+/**
+ * The resulting parse tree nodes of the parse tree.
+ *
+ * It is possible to provide position information, so that a ParseNode can
+ * fulfil a role similar to a Token in error reporting.
+ * For details on the corresponding properties see Token constructor.
+ * Providing such information can lead to better error reporting.
+ *
+ * @param {string}  type       type of node, like e.g. "ordgroup"
+ * @param {?object} value      type-specific representation of the node
+ * @param {string}  mode       parse mode in action for this node,
+ *                             "math" or "text"
+ * @param {Token=} firstToken  first token of the input for this node,
+ *                             will omit position information if unset
+ * @param {Token=} lastToken   last token of the input for this node,
+ *                             will default to firstToken if unset
+ */
+function ParseNode(type, value, mode, firstToken, lastToken) {
+    this.type = type;
+    this.value = value;
+    this.mode = mode;
+    if (firstToken && (!lastToken || lastToken.lexer === firstToken.lexer)) {
+        this.lexer = firstToken.lexer;
+        this.start = firstToken.start;
+        this.end = (lastToken || firstToken).end;
+    }
+}
+
+module.exports = {
+    ParseNode: ParseNode
+};
+
 
 },{}],20:[function(require,module,exports){
-var Parser=require("./Parser"),parseTree=function(r,e){if(!("string"==typeof r||r instanceof String))throw new TypeError("KaTeX can only parse string typed expression");return new Parser(r,e).parse()};module.exports=parseTree;
+/**
+ * Provides a single function for parsing an expression using a Parser
+ * TODO(emily): Remove this
+ */
+
+var Parser = require("./Parser");
+
+/**
+ * Parses an expression using a Parser, then returns the parsed result.
+ */
+var parseTree = function(toParse, settings) {
+    if (!(typeof toParse === 'string' || toParse instanceof String)) {
+        throw new TypeError('KaTeX can only parse string typed expression');
+    }
+    var parser = new Parser(toParse, settings);
+
+    return parser.parse();
+};
+
+module.exports = parseTree;
 
 },{"./Parser":5}],21:[function(require,module,exports){
-function defineSymbol(e,m,a,t,n){module.exports[e][n]={font:m,group:a,replace:t}}module.exports={math:{},text:{}};var math="math",text="text",main="main",ams="ams",accent="accent",bin="bin",close="close",inner="inner",mathord="mathord",op="op",open="open",punct="punct",rel="rel",spacing="spacing",textord="textord";defineSymbol(math,main,rel,"≡","\\equiv"),defineSymbol(math,main,rel,"≺","\\prec"),defineSymbol(math,main,rel,"≻","\\succ"),defineSymbol(math,main,rel,"∼","\\sim"),defineSymbol(math,main,rel,"⊥","\\perp"),defineSymbol(math,main,rel,"⪯","\\preceq"),defineSymbol(math,main,rel,"⪰","\\succeq"),defineSymbol(math,main,rel,"≃","\\simeq"),defineSymbol(math,main,rel,"∣","\\mid"),defineSymbol(math,main,rel,"≪","\\ll"),defineSymbol(math,main,rel,"≫","\\gg"),defineSymbol(math,main,rel,"≍","\\asymp"),defineSymbol(math,main,rel,"∥","\\parallel"),defineSymbol(math,main,rel,"⋈","\\bowtie"),defineSymbol(math,main,rel,"⌣","\\smile"),defineSymbol(math,main,rel,"⊑","\\sqsubseteq"),defineSymbol(math,main,rel,"⊒","\\sqsupseteq"),defineSymbol(math,main,rel,"≐","\\doteq"),defineSymbol(math,main,rel,"⌢","\\frown"),defineSymbol(math,main,rel,"∋","\\ni"),defineSymbol(math,main,rel,"∝","\\propto"),defineSymbol(math,main,rel,"⊢","\\vdash"),defineSymbol(math,main,rel,"⊣","\\dashv"),defineSymbol(math,main,rel,"∋","\\owns"),defineSymbol(math,main,punct,".","\\ldotp"),defineSymbol(math,main,punct,"⋅","\\cdotp"),defineSymbol(math,main,textord,"#","\\#"),defineSymbol(text,main,textord,"#","\\#"),defineSymbol(math,main,textord,"&","\\&"),defineSymbol(text,main,textord,"&","\\&"),defineSymbol(math,main,textord,"ℵ","\\aleph"),defineSymbol(math,main,textord,"∀","\\forall"),defineSymbol(math,main,textord,"ℏ","\\hbar"),defineSymbol(math,main,textord,"∃","\\exists"),defineSymbol(math,main,textord,"∇","\\nabla"),defineSymbol(math,main,textord,"♭","\\flat"),defineSymbol(math,main,textord,"ℓ","\\ell"),defineSymbol(math,main,textord,"♮","\\natural"),defineSymbol(math,main,textord,"♣","\\clubsuit"),defineSymbol(math,main,textord,"℘","\\wp"),defineSymbol(math,main,textord,"♯","\\sharp"),defineSymbol(math,main,textord,"♢","\\diamondsuit"),defineSymbol(math,main,textord,"ℜ","\\Re"),defineSymbol(math,main,textord,"♡","\\heartsuit"),defineSymbol(math,main,textord,"ℑ","\\Im"),defineSymbol(math,main,textord,"♠","\\spadesuit"),defineSymbol(math,main,textord,"†","\\dag"),defineSymbol(math,main,textord,"‡","\\ddag"),defineSymbol(math,main,close,"⎱","\\rmoustache"),defineSymbol(math,main,open,"⎰","\\lmoustache"),defineSymbol(math,main,close,"⟯","\\rgroup"),defineSymbol(math,main,open,"⟮","\\lgroup"),defineSymbol(math,main,bin,"∓","\\mp"),defineSymbol(math,main,bin,"⊖","\\ominus"),defineSymbol(math,main,bin,"⊎","\\uplus"),defineSymbol(math,main,bin,"⊓","\\sqcap"),defineSymbol(math,main,bin,"∗","\\ast"),defineSymbol(math,main,bin,"⊔","\\sqcup"),defineSymbol(math,main,bin,"◯","\\bigcirc"),defineSymbol(math,main,bin,"∙","\\bullet"),defineSymbol(math,main,bin,"‡","\\ddagger"),defineSymbol(math,main,bin,"≀","\\wr"),defineSymbol(math,main,bin,"⨿","\\amalg"),defineSymbol(math,main,rel,"⟵","\\longleftarrow"),defineSymbol(math,main,rel,"⇐","\\Leftarrow"),defineSymbol(math,main,rel,"⟸","\\Longleftarrow"),defineSymbol(math,main,rel,"⟶","\\longrightarrow"),defineSymbol(math,main,rel,"⇒","\\Rightarrow"),defineSymbol(math,main,rel,"⟹","\\Longrightarrow"),defineSymbol(math,main,rel,"↔","\\leftrightarrow"),defineSymbol(math,main,rel,"⟷","\\longleftrightarrow"),defineSymbol(math,main,rel,"⇔","\\Leftrightarrow"),defineSymbol(math,main,rel,"⟺","\\Longleftrightarrow"),defineSymbol(math,main,rel,"↦","\\mapsto"),defineSymbol(math,main,rel,"⟼","\\longmapsto"),defineSymbol(math,main,rel,"↗","\\nearrow"),defineSymbol(math,main,rel,"↩","\\hookleftarrow"),defineSymbol(math,main,rel,"↪","\\hookrightarrow"),defineSymbol(math,main,rel,"↘","\\searrow"),defineSymbol(math,main,rel,"↼","\\leftharpoonup"),defineSymbol(math,main,rel,"⇀","\\rightharpoonup"),defineSymbol(math,main,rel,"↙","\\swarrow"),defineSymbol(math,main,rel,"↽","\\leftharpoondown"),defineSymbol(math,main,rel,"⇁","\\rightharpoondown"),defineSymbol(math,main,rel,"↖","\\nwarrow"),defineSymbol(math,main,rel,"⇌","\\rightleftharpoons"),defineSymbol(math,ams,rel,"≮","\\nless"),defineSymbol(math,ams,rel,"","\\nleqslant"),defineSymbol(math,ams,rel,"","\\nleqq"),defineSymbol(math,ams,rel,"⪇","\\lneq"),defineSymbol(math,ams,rel,"≨","\\lneqq"),defineSymbol(math,ams,rel,"","\\lvertneqq"),defineSymbol(math,ams,rel,"⋦","\\lnsim"),defineSymbol(math,ams,rel,"⪉","\\lnapprox"),defineSymbol(math,ams,rel,"⊀","\\nprec"),defineSymbol(math,ams,rel,"⋠","\\npreceq"),defineSymbol(math,ams,rel,"⋨","\\precnsim"),defineSymbol(math,ams,rel,"⪹","\\precnapprox"),defineSymbol(math,ams,rel,"≁","\\nsim"),defineSymbol(math,ams,rel,"","\\nshortmid"),defineSymbol(math,ams,rel,"∤","\\nmid"),defineSymbol(math,ams,rel,"⊬","\\nvdash"),defineSymbol(math,ams,rel,"⊭","\\nvDash"),defineSymbol(math,ams,rel,"⋪","\\ntriangleleft"),defineSymbol(math,ams,rel,"⋬","\\ntrianglelefteq"),defineSymbol(math,ams,rel,"⊊","\\subsetneq"),defineSymbol(math,ams,rel,"","\\varsubsetneq"),defineSymbol(math,ams,rel,"⫋","\\subsetneqq"),defineSymbol(math,ams,rel,"","\\varsubsetneqq"),defineSymbol(math,ams,rel,"≯","\\ngtr"),defineSymbol(math,ams,rel,"","\\ngeqslant"),defineSymbol(math,ams,rel,"","\\ngeqq"),defineSymbol(math,ams,rel,"⪈","\\gneq"),defineSymbol(math,ams,rel,"≩","\\gneqq"),defineSymbol(math,ams,rel,"","\\gvertneqq"),defineSymbol(math,ams,rel,"⋧","\\gnsim"),defineSymbol(math,ams,rel,"⪊","\\gnapprox"),defineSymbol(math,ams,rel,"⊁","\\nsucc"),defineSymbol(math,ams,rel,"⋡","\\nsucceq"),defineSymbol(math,ams,rel,"⋩","\\succnsim"),defineSymbol(math,ams,rel,"⪺","\\succnapprox"),defineSymbol(math,ams,rel,"≆","\\ncong"),defineSymbol(math,ams,rel,"","\\nshortparallel"),defineSymbol(math,ams,rel,"∦","\\nparallel"),defineSymbol(math,ams,rel,"⊯","\\nVDash"),defineSymbol(math,ams,rel,"⋫","\\ntriangleright"),defineSymbol(math,ams,rel,"⋭","\\ntrianglerighteq"),defineSymbol(math,ams,rel,"","\\nsupseteqq"),defineSymbol(math,ams,rel,"⊋","\\supsetneq"),defineSymbol(math,ams,rel,"","\\varsupsetneq"),defineSymbol(math,ams,rel,"⫌","\\supsetneqq"),defineSymbol(math,ams,rel,"","\\varsupsetneqq"),defineSymbol(math,ams,rel,"⊮","\\nVdash"),defineSymbol(math,ams,rel,"⪵","\\precneqq"),defineSymbol(math,ams,rel,"⪶","\\succneqq"),defineSymbol(math,ams,rel,"","\\nsubseteqq"),defineSymbol(math,ams,bin,"⊴","\\unlhd"),defineSymbol(math,ams,bin,"⊵","\\unrhd"),defineSymbol(math,ams,rel,"↚","\\nleftarrow"),defineSymbol(math,ams,rel,"↛","\\nrightarrow"),defineSymbol(math,ams,rel,"⇍","\\nLeftarrow"),defineSymbol(math,ams,rel,"⇏","\\nRightarrow"),defineSymbol(math,ams,rel,"↮","\\nleftrightarrow"),defineSymbol(math,ams,rel,"⇎","\\nLeftrightarrow"),defineSymbol(math,ams,rel,"△","\\vartriangle"),defineSymbol(math,ams,textord,"ℏ","\\hslash"),defineSymbol(math,ams,textord,"▽","\\triangledown"),defineSymbol(math,ams,textord,"◊","\\lozenge"),defineSymbol(math,ams,textord,"Ⓢ","\\circledS"),defineSymbol(math,ams,textord,"®","\\circledR"),defineSymbol(math,ams,textord,"∡","\\measuredangle"),defineSymbol(math,ams,textord,"∄","\\nexists"),defineSymbol(math,ams,textord,"℧","\\mho"),defineSymbol(math,ams,textord,"Ⅎ","\\Finv"),defineSymbol(math,ams,textord,"⅁","\\Game"),defineSymbol(math,ams,textord,"k","\\Bbbk"),defineSymbol(math,ams,textord,"‵","\\backprime"),defineSymbol(math,ams,textord,"▲","\\blacktriangle"),defineSymbol(math,ams,textord,"▼","\\blacktriangledown"),defineSymbol(math,ams,textord,"■","\\blacksquare"),defineSymbol(math,ams,textord,"⧫","\\blacklozenge"),defineSymbol(math,ams,textord,"★","\\bigstar"),defineSymbol(math,ams,textord,"∢","\\sphericalangle"),defineSymbol(math,ams,textord,"∁","\\complement"),defineSymbol(math,ams,textord,"ð","\\eth"),defineSymbol(math,ams,textord,"╱","\\diagup"),defineSymbol(math,ams,textord,"╲","\\diagdown"),defineSymbol(math,ams,textord,"□","\\square"),defineSymbol(math,ams,textord,"□","\\Box"),defineSymbol(math,ams,textord,"◊","\\Diamond"),defineSymbol(math,ams,textord,"¥","\\yen"),defineSymbol(math,ams,textord,"✓","\\checkmark"),defineSymbol(math,ams,textord,"ℶ","\\beth"),defineSymbol(math,ams,textord,"ℸ","\\daleth"),defineSymbol(math,ams,textord,"ℷ","\\gimel"),defineSymbol(math,ams,textord,"ϝ","\\digamma"),defineSymbol(math,ams,textord,"ϰ","\\varkappa"),defineSymbol(math,ams,open,"┌","\\ulcorner"),defineSymbol(math,ams,close,"┐","\\urcorner"),defineSymbol(math,ams,open,"└","\\llcorner"),defineSymbol(math,ams,close,"┘","\\lrcorner"),defineSymbol(math,ams,rel,"≦","\\leqq"),defineSymbol(math,ams,rel,"⩽","\\leqslant"),defineSymbol(math,ams,rel,"⪕","\\eqslantless"),defineSymbol(math,ams,rel,"≲","\\lesssim"),defineSymbol(math,ams,rel,"⪅","\\lessapprox"),defineSymbol(math,ams,rel,"≊","\\approxeq"),defineSymbol(math,ams,bin,"⋖","\\lessdot"),defineSymbol(math,ams,rel,"⋘","\\lll"),defineSymbol(math,ams,rel,"≶","\\lessgtr"),defineSymbol(math,ams,rel,"⋚","\\lesseqgtr"),defineSymbol(math,ams,rel,"⪋","\\lesseqqgtr"),defineSymbol(math,ams,rel,"≑","\\doteqdot"),defineSymbol(math,ams,rel,"≓","\\risingdotseq"),defineSymbol(math,ams,rel,"≒","\\fallingdotseq"),defineSymbol(math,ams,rel,"∽","\\backsim"),defineSymbol(math,ams,rel,"⋍","\\backsimeq"),defineSymbol(math,ams,rel,"⫅","\\subseteqq"),defineSymbol(math,ams,rel,"⋐","\\Subset"),defineSymbol(math,ams,rel,"⊏","\\sqsubset");defineSymbol(math,ams,rel,"≼","\\preccurlyeq"),defineSymbol(math,ams,rel,"⋞","\\curlyeqprec"),defineSymbol(math,ams,rel,"≾","\\precsim"),defineSymbol(math,ams,rel,"⪷","\\precapprox"),defineSymbol(math,ams,rel,"⊲","\\vartriangleleft"),defineSymbol(math,ams,rel,"⊴","\\trianglelefteq"),defineSymbol(math,ams,rel,"⊨","\\vDash"),defineSymbol(math,ams,rel,"⊪","\\Vvdash"),defineSymbol(math,ams,rel,"⌣","\\smallsmile"),defineSymbol(math,ams,rel,"⌢","\\smallfrown"),defineSymbol(math,ams,rel,"≏","\\bumpeq"),defineSymbol(math,ams,rel,"≎","\\Bumpeq"),defineSymbol(math,ams,rel,"≧","\\geqq"),defineSymbol(math,ams,rel,"⩾","\\geqslant"),defineSymbol(math,ams,rel,"⪖","\\eqslantgtr"),defineSymbol(math,ams,rel,"≳","\\gtrsim"),defineSymbol(math,ams,rel,"⪆","\\gtrapprox"),defineSymbol(math,ams,bin,"⋗","\\gtrdot"),defineSymbol(math,ams,rel,"⋙","\\ggg"),defineSymbol(math,ams,rel,"≷","\\gtrless"),defineSymbol(math,ams,rel,"⋛","\\gtreqless"),defineSymbol(math,ams,rel,"⪌","\\gtreqqless"),defineSymbol(math,ams,rel,"≖","\\eqcirc"),defineSymbol(math,ams,rel,"≗","\\circeq"),defineSymbol(math,ams,rel,"≜","\\triangleq"),defineSymbol(math,ams,rel,"∼","\\thicksim"),defineSymbol(math,ams,rel,"≈","\\thickapprox"),defineSymbol(math,ams,rel,"⫆","\\supseteqq"),defineSymbol(math,ams,rel,"⋑","\\Supset"),defineSymbol(math,ams,rel,"⊐","\\sqsupset"),defineSymbol(math,ams,rel,"≽","\\succcurlyeq"),defineSymbol(math,ams,rel,"⋟","\\curlyeqsucc"),defineSymbol(math,ams,rel,"≿","\\succsim"),defineSymbol(math,ams,rel,"⪸","\\succapprox"),defineSymbol(math,ams,rel,"⊳","\\vartriangleright"),defineSymbol(math,ams,rel,"⊵","\\trianglerighteq"),defineSymbol(math,ams,rel,"⊩","\\Vdash"),defineSymbol(math,ams,rel,"∣","\\shortmid"),defineSymbol(math,ams,rel,"∥","\\shortparallel"),defineSymbol(math,ams,rel,"≬","\\between"),defineSymbol(math,ams,rel,"⋔","\\pitchfork"),defineSymbol(math,ams,rel,"∝","\\varpropto"),defineSymbol(math,ams,rel,"◀","\\blacktriangleleft"),defineSymbol(math,ams,rel,"∴","\\therefore"),defineSymbol(math,ams,rel,"∍","\\backepsilon"),defineSymbol(math,ams,rel,"▶","\\blacktriangleright"),defineSymbol(math,ams,rel,"∵","\\because"),defineSymbol(math,ams,rel,"⋘","\\llless"),defineSymbol(math,ams,rel,"⋙","\\gggtr"),defineSymbol(math,ams,bin,"⊲","\\lhd"),defineSymbol(math,ams,bin,"⊳","\\rhd"),defineSymbol(math,ams,rel,"≂","\\eqsim"),defineSymbol(math,main,rel,"⋈","\\Join"),defineSymbol(math,ams,rel,"≑","\\Doteq"),defineSymbol(math,ams,bin,"∔","\\dotplus"),defineSymbol(math,ams,bin,"∖","\\smallsetminus"),defineSymbol(math,ams,bin,"⋒","\\Cap"),defineSymbol(math,ams,bin,"⋓","\\Cup"),defineSymbol(math,ams,bin,"⩞","\\doublebarwedge"),defineSymbol(math,ams,bin,"⊟","\\boxminus"),defineSymbol(math,ams,bin,"⊞","\\boxplus"),defineSymbol(math,ams,bin,"⋇","\\divideontimes"),defineSymbol(math,ams,bin,"⋉","\\ltimes"),defineSymbol(math,ams,bin,"⋊","\\rtimes"),defineSymbol(math,ams,bin,"⋋","\\leftthreetimes"),defineSymbol(math,ams,bin,"⋌","\\rightthreetimes"),defineSymbol(math,ams,bin,"⋏","\\curlywedge"),defineSymbol(math,ams,bin,"⋎","\\curlyvee"),defineSymbol(math,ams,bin,"⊝","\\circleddash"),defineSymbol(math,ams,bin,"⊛","\\circledast"),defineSymbol(math,ams,bin,"⋅","\\centerdot"),defineSymbol(math,ams,bin,"⊺","\\intercal"),defineSymbol(math,ams,bin,"⋒","\\doublecap"),defineSymbol(math,ams,bin,"⋓","\\doublecup"),defineSymbol(math,ams,bin,"⊠","\\boxtimes"),defineSymbol(math,ams,rel,"⇢","\\dashrightarrow"),defineSymbol(math,ams,rel,"⇠","\\dashleftarrow"),defineSymbol(math,ams,rel,"⇇","\\leftleftarrows"),defineSymbol(math,ams,rel,"⇆","\\leftrightarrows"),defineSymbol(math,ams,rel,"⇚","\\Lleftarrow"),defineSymbol(math,ams,rel,"↞","\\twoheadleftarrow"),defineSymbol(math,ams,rel,"↢","\\leftarrowtail"),defineSymbol(math,ams,rel,"↫","\\looparrowleft"),defineSymbol(math,ams,rel,"⇋","\\leftrightharpoons"),defineSymbol(math,ams,rel,"↶","\\curvearrowleft"),defineSymbol(math,ams,rel,"↺","\\circlearrowleft"),defineSymbol(math,ams,rel,"↰","\\Lsh"),defineSymbol(math,ams,rel,"⇈","\\upuparrows"),defineSymbol(math,ams,rel,"↿","\\upharpoonleft"),defineSymbol(math,ams,rel,"⇃","\\downharpoonleft"),defineSymbol(math,ams,rel,"⊸","\\multimap"),defineSymbol(math,ams,rel,"↭","\\leftrightsquigarrow"),defineSymbol(math,ams,rel,"⇉","\\rightrightarrows"),defineSymbol(math,ams,rel,"⇄","\\rightleftarrows"),defineSymbol(math,ams,rel,"↠","\\twoheadrightarrow"),defineSymbol(math,ams,rel,"↣","\\rightarrowtail"),defineSymbol(math,ams,rel,"↬","\\looparrowright"),defineSymbol(math,ams,rel,"↷","\\curvearrowright"),defineSymbol(math,ams,rel,"↻","\\circlearrowright"),defineSymbol(math,ams,rel,"↱","\\Rsh"),defineSymbol(math,ams,rel,"⇊","\\downdownarrows"),defineSymbol(math,ams,rel,"↾","\\upharpoonright"),defineSymbol(math,ams,rel,"⇂","\\downharpoonright"),defineSymbol(math,ams,rel,"⇝","\\rightsquigarrow"),defineSymbol(math,ams,rel,"⇝","\\leadsto"),defineSymbol(math,ams,rel,"⇛","\\Rrightarrow"),defineSymbol(math,ams,rel,"↾","\\restriction"),defineSymbol(math,main,textord,"‘","`"),defineSymbol(math,main,textord,"$","\\$"),defineSymbol(text,main,textord,"$","\\$"),defineSymbol(math,main,textord,"%","\\%"),defineSymbol(text,main,textord,"%","\\%"),defineSymbol(math,main,textord,"_","\\_"),defineSymbol(text,main,textord,"_","\\_"),defineSymbol(math,main,textord,"∠","\\angle"),defineSymbol(math,main,textord,"∞","\\infty"),defineSymbol(math,main,textord,"′","\\prime"),defineSymbol(math,main,textord,"△","\\triangle"),defineSymbol(math,main,textord,"Γ","\\Gamma"),defineSymbol(math,main,textord,"Δ","\\Delta"),defineSymbol(math,main,textord,"Θ","\\Theta"),defineSymbol(math,main,textord,"Λ","\\Lambda"),defineSymbol(math,main,textord,"Ξ","\\Xi"),defineSymbol(math,main,textord,"Π","\\Pi"),defineSymbol(math,main,textord,"Σ","\\Sigma"),defineSymbol(math,main,textord,"Υ","\\Upsilon"),defineSymbol(math,main,textord,"Φ","\\Phi"),defineSymbol(math,main,textord,"Ψ","\\Psi"),defineSymbol(math,main,textord,"Ω","\\Omega"),defineSymbol(math,main,textord,"¬","\\neg"),defineSymbol(math,main,textord,"¬","\\lnot"),defineSymbol(math,main,textord,"⊤","\\top"),defineSymbol(math,main,textord,"⊥","\\bot"),defineSymbol(math,main,textord,"∅","\\emptyset"),defineSymbol(math,ams,textord,"∅","\\varnothing"),defineSymbol(math,main,mathord,"α","\\alpha"),defineSymbol(math,main,mathord,"β","\\beta"),defineSymbol(math,main,mathord,"γ","\\gamma"),defineSymbol(math,main,mathord,"δ","\\delta"),defineSymbol(math,main,mathord,"ϵ","\\epsilon"),defineSymbol(math,main,mathord,"ζ","\\zeta"),defineSymbol(math,main,mathord,"η","\\eta"),defineSymbol(math,main,mathord,"θ","\\theta"),defineSymbol(math,main,mathord,"ι","\\iota"),defineSymbol(math,main,mathord,"κ","\\kappa"),defineSymbol(math,main,mathord,"λ","\\lambda"),defineSymbol(math,main,mathord,"μ","\\mu"),defineSymbol(math,main,mathord,"ν","\\nu"),defineSymbol(math,main,mathord,"ξ","\\xi"),defineSymbol(math,main,mathord,"o","\\omicron"),defineSymbol(math,main,mathord,"π","\\pi"),defineSymbol(math,main,mathord,"ρ","\\rho"),defineSymbol(math,main,mathord,"σ","\\sigma"),defineSymbol(math,main,mathord,"τ","\\tau"),defineSymbol(math,main,mathord,"υ","\\upsilon"),defineSymbol(math,main,mathord,"ϕ","\\phi"),defineSymbol(math,main,mathord,"χ","\\chi"),defineSymbol(math,main,mathord,"ψ","\\psi"),defineSymbol(math,main,mathord,"ω","\\omega"),defineSymbol(math,main,mathord,"ε","\\varepsilon"),defineSymbol(math,main,mathord,"ϑ","\\vartheta"),defineSymbol(math,main,mathord,"ϖ","\\varpi"),defineSymbol(math,main,mathord,"ϱ","\\varrho"),defineSymbol(math,main,mathord,"ς","\\varsigma"),defineSymbol(math,main,mathord,"φ","\\varphi"),defineSymbol(math,main,bin,"∗","*"),defineSymbol(math,main,bin,"+","+"),defineSymbol(math,main,bin,"−","-"),defineSymbol(math,main,bin,"⋅","\\cdot"),defineSymbol(math,main,bin,"∘","\\circ"),defineSymbol(math,main,bin,"÷","\\div"),defineSymbol(math,main,bin,"±","\\pm"),defineSymbol(math,main,bin,"×","\\times"),defineSymbol(math,main,bin,"∩","\\cap"),defineSymbol(math,main,bin,"∪","\\cup"),defineSymbol(math,main,bin,"∖","\\setminus"),defineSymbol(math,main,bin,"∧","\\land"),defineSymbol(math,main,bin,"∨","\\lor"),defineSymbol(math,main,bin,"∧","\\wedge"),defineSymbol(math,main,bin,"∨","\\vee"),defineSymbol(math,main,textord,"√","\\surd"),defineSymbol(math,main,open,"(","("),defineSymbol(math,main,open,"[","["),defineSymbol(math,main,open,"⟨","\\langle"),defineSymbol(math,main,open,"∣","\\lvert"),defineSymbol(math,main,open,"∥","\\lVert"),defineSymbol(math,main,close,")",")"),defineSymbol(math,main,close,"]","]"),defineSymbol(math,main,close,"?","?"),defineSymbol(math,main,close,"!","!"),defineSymbol(math,main,close,"⟩","\\rangle"),defineSymbol(math,main,close,"∣","\\rvert"),defineSymbol(math,main,close,"∥","\\rVert"),defineSymbol(math,main,rel,"=","="),defineSymbol(math,main,rel,"<","<"),defineSymbol(math,main,rel,">",">"),defineSymbol(math,main,rel,":",":"),defineSymbol(math,main,rel,"≈","\\approx"),defineSymbol(math,main,rel,"≅","\\cong"),defineSymbol(math,main,rel,"≥","\\ge");defineSymbol(math,main,rel,"≥","\\geq"),defineSymbol(math,main,rel,"←","\\gets"),defineSymbol(math,main,rel,">","\\gt"),defineSymbol(math,main,rel,"∈","\\in"),defineSymbol(math,main,rel,"∉","\\notin"),defineSymbol(math,main,rel,"⊂","\\subset"),defineSymbol(math,main,rel,"⊃","\\supset"),defineSymbol(math,main,rel,"⊆","\\subseteq"),defineSymbol(math,main,rel,"⊇","\\supseteq"),defineSymbol(math,ams,rel,"⊈","\\nsubseteq"),defineSymbol(math,ams,rel,"⊉","\\nsupseteq"),defineSymbol(math,main,rel,"⊨","\\models"),defineSymbol(math,main,rel,"←","\\leftarrow"),defineSymbol(math,main,rel,"≤","\\le"),defineSymbol(math,main,rel,"≤","\\leq"),defineSymbol(math,main,rel,"<","\\lt"),defineSymbol(math,main,rel,"≠","\\ne"),defineSymbol(math,main,rel,"≠","\\neq"),defineSymbol(math,main,rel,"→","\\rightarrow"),defineSymbol(math,main,rel,"→","\\to"),defineSymbol(math,ams,rel,"≱","\\ngeq"),defineSymbol(math,ams,rel,"≰","\\nleq"),defineSymbol(math,main,spacing,null,"\\!"),defineSymbol(math,main,spacing," ","\\ "),defineSymbol(math,main,spacing," ","~"),defineSymbol(math,main,spacing,null,"\\,"),defineSymbol(math,main,spacing,null,"\\:"),defineSymbol(math,main,spacing,null,"\\;"),defineSymbol(math,main,spacing,null,"\\enspace"),defineSymbol(math,main,spacing,null,"\\qquad"),defineSymbol(math,main,spacing,null,"\\quad"),defineSymbol(math,main,spacing," ","\\space"),defineSymbol(math,main,punct,",",","),defineSymbol(math,main,punct,";",";"),defineSymbol(math,main,punct,":","\\colon"),defineSymbol(math,ams,bin,"⊼","\\barwedge"),defineSymbol(math,ams,bin,"⊻","\\veebar"),defineSymbol(math,main,bin,"⊙","\\odot"),defineSymbol(math,main,bin,"⊕","\\oplus"),defineSymbol(math,main,bin,"⊗","\\otimes"),defineSymbol(math,main,textord,"∂","\\partial"),defineSymbol(math,main,bin,"⊘","\\oslash"),defineSymbol(math,ams,bin,"⊚","\\circledcirc"),defineSymbol(math,ams,bin,"⊡","\\boxdot"),defineSymbol(math,main,bin,"△","\\bigtriangleup"),defineSymbol(math,main,bin,"▽","\\bigtriangledown"),defineSymbol(math,main,bin,"†","\\dagger"),defineSymbol(math,main,bin,"⋄","\\diamond"),defineSymbol(math,main,bin,"⋆","\\star"),defineSymbol(math,main,bin,"◃","\\triangleleft"),defineSymbol(math,main,bin,"▹","\\triangleright"),defineSymbol(math,main,open,"{","\\{"),defineSymbol(text,main,textord,"{","\\{"),defineSymbol(math,main,close,"}","\\}"),defineSymbol(text,main,textord,"}","\\}"),defineSymbol(math,main,open,"{","\\lbrace"),defineSymbol(math,main,close,"}","\\rbrace"),defineSymbol(math,main,open,"[","\\lbrack"),defineSymbol(math,main,close,"]","\\rbrack"),defineSymbol(math,main,open,"⌊","\\lfloor"),defineSymbol(math,main,close,"⌋","\\rfloor"),defineSymbol(math,main,open,"⌈","\\lceil"),defineSymbol(math,main,close,"⌉","\\rceil"),defineSymbol(math,main,textord,"\\","\\backslash"),defineSymbol(math,main,textord,"∣","|"),defineSymbol(math,main,textord,"∣","\\vert"),defineSymbol(math,main,textord,"∥","\\|"),defineSymbol(math,main,textord,"∥","\\Vert"),defineSymbol(math,main,rel,"↑","\\uparrow"),defineSymbol(math,main,rel,"⇑","\\Uparrow"),defineSymbol(math,main,rel,"↓","\\downarrow"),defineSymbol(math,main,rel,"⇓","\\Downarrow"),defineSymbol(math,main,rel,"↕","\\updownarrow"),defineSymbol(math,main,rel,"⇕","\\Updownarrow"),defineSymbol(math,math,op,"∐","\\coprod"),defineSymbol(math,math,op,"⋁","\\bigvee"),defineSymbol(math,math,op,"⋀","\\bigwedge"),defineSymbol(math,math,op,"⨄","\\biguplus"),defineSymbol(math,math,op,"⋂","\\bigcap"),defineSymbol(math,math,op,"⋃","\\bigcup"),defineSymbol(math,math,op,"∫","\\int"),defineSymbol(math,math,op,"∫","\\intop"),defineSymbol(math,math,op,"∬","\\iint"),defineSymbol(math,math,op,"∭","\\iiint"),defineSymbol(math,math,op,"∏","\\prod"),defineSymbol(math,math,op,"∑","\\sum"),defineSymbol(math,math,op,"⨂","\\bigotimes"),defineSymbol(math,math,op,"⨁","\\bigoplus"),defineSymbol(math,math,op,"⨀","\\bigodot"),defineSymbol(math,math,op,"∮","\\oint"),defineSymbol(math,math,op,"⨆","\\bigsqcup"),defineSymbol(math,math,op,"∫","\\smallint"),defineSymbol(text,main,inner,"…","\\textellipsis"),defineSymbol(math,main,inner,"…","\\mathellipsis"),defineSymbol(text,main,inner,"…","\\ldots"),defineSymbol(math,main,inner,"…","\\ldots"),defineSymbol(math,main,inner,"⋯","\\cdots"),defineSymbol(math,main,inner,"⋱","\\ddots"),defineSymbol(math,main,textord,"⋮","\\vdots"),defineSymbol(math,main,accent,"´","\\acute"),defineSymbol(math,main,accent,"`","\\grave"),defineSymbol(math,main,accent,"¨","\\ddot"),defineSymbol(math,main,accent,"~","\\tilde"),defineSymbol(math,main,accent,"¯","\\bar"),defineSymbol(math,main,accent,"˘","\\breve"),defineSymbol(math,main,accent,"ˇ","\\check"),defineSymbol(math,main,accent,"^","\\hat"),defineSymbol(math,main,accent,"⃗","\\vec"),defineSymbol(math,main,accent,"˙","\\dot"),defineSymbol(math,main,mathord,"ı","\\imath"),defineSymbol(math,main,mathord,"ȷ","\\jmath"),defineSymbol(text,main,textord,"–","--"),defineSymbol(text,main,textord,"—","---"),defineSymbol(text,main,textord,"‘","`"),defineSymbol(text,main,textord,"’","'"),defineSymbol(text,main,textord,"“","``"),defineSymbol(text,main,textord,"”","''"),defineSymbol(math,main,textord,"°","\\degree"),defineSymbol(text,main,textord,"°","\\degree"),defineSymbol(math,main,mathord,"£","\\pounds"),defineSymbol(math,ams,textord,"✠","\\maltese"),defineSymbol(text,ams,textord,"✠","\\maltese"),defineSymbol(text,main,spacing," ","\\ "),defineSymbol(text,main,spacing," "," "),defineSymbol(text,main,spacing," ","~");var i,ch,mathTextSymbols='0123456789/@."';for(i=0;i<mathTextSymbols.length;i++)ch=mathTextSymbols.charAt(i),defineSymbol(math,main,textord,ch,ch);var textSymbols='0123456789!@*()-=+[]";:?/.,';for(i=0;i<textSymbols.length;i++)ch=textSymbols.charAt(i),defineSymbol(text,main,textord,ch,ch);var letters="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";for(i=0;i<letters.length;i++)ch=letters.charAt(i),defineSymbol(math,main,mathord,ch,ch),defineSymbol(text,main,textord,ch,ch);for(i=192;i<=214;i++)ch=String.fromCharCode(i),defineSymbol(text,main,textord,ch,ch);for(i=216;i<=246;i++)ch=String.fromCharCode(i),defineSymbol(text,main,textord,ch,ch);for(i=248;i<=255;i++)ch=String.fromCharCode(i),defineSymbol(text,main,textord,ch,ch);for(i=1040;i<=1103;i++)ch=String.fromCharCode(i),defineSymbol(text,main,textord,ch,ch);defineSymbol(text,main,textord,"–","–"),defineSymbol(text,main,textord,"—","—"),defineSymbol(text,main,textord,"‘","‘"),defineSymbol(text,main,textord,"’","’"),defineSymbol(text,main,textord,"“","“"),defineSymbol(text,main,textord,"”","”");
+/**
+ * This file holds a list of all no-argument functions and single-character
+ * symbols (like 'a' or ';').
+ *
+ * For each of the symbols, there are three properties they can have:
+ * - font (required): the font to be used for this symbol. Either "main" (the
+     normal font), or "ams" (the ams fonts).
+ * - group (required): the ParseNode group type the symbol should have (i.e.
+     "textord", "mathord", etc).
+     See https://github.com/Khan/KaTeX/wiki/Examining-TeX#group-types
+ * - replace: the character that this symbol or function should be
+ *   replaced with (i.e. "\phi" has a replace value of "\u03d5", the phi
+ *   character in the main font).
+ *
+ * The outermost map in the table indicates what mode the symbols should be
+ * accepted in (e.g. "math" or "text").
+ */
+
+module.exports = {
+    math: {},
+    text: {}
+};
+
+function defineSymbol(mode, font, group, replace, name) {
+    module.exports[mode][name] = {
+        font: font,
+        group: group,
+        replace: replace
+    };
+}
+
+// Some abbreviations for commonly used strings.
+// This helps minify the code, and also spotting typos using jshint.
+
+// modes:
+var math = "math";
+var text = "text";
+
+// fonts:
+var main = "main";
+var ams = "ams";
+
+// groups:
+var accent = "accent";
+var bin = "bin";
+var close = "close";
+var inner = "inner";
+var mathord = "mathord";
+var op = "op";
+var open = "open";
+var punct = "punct";
+var rel = "rel";
+var spacing = "spacing";
+var textord = "textord";
+
+// Now comes the symbol table
+
+// Relation Symbols
+defineSymbol(math, main, rel, "\u2261", "\\equiv");
+defineSymbol(math, main, rel, "\u227a", "\\prec");
+defineSymbol(math, main, rel, "\u227b", "\\succ");
+defineSymbol(math, main, rel, "\u223c", "\\sim");
+defineSymbol(math, main, rel, "\u22a5", "\\perp");
+defineSymbol(math, main, rel, "\u2aaf", "\\preceq");
+defineSymbol(math, main, rel, "\u2ab0", "\\succeq");
+defineSymbol(math, main, rel, "\u2243", "\\simeq");
+defineSymbol(math, main, rel, "\u2223", "\\mid");
+defineSymbol(math, main, rel, "\u226a", "\\ll");
+defineSymbol(math, main, rel, "\u226b", "\\gg");
+defineSymbol(math, main, rel, "\u224d", "\\asymp");
+defineSymbol(math, main, rel, "\u2225", "\\parallel");
+defineSymbol(math, main, rel, "\u22c8", "\\bowtie");
+defineSymbol(math, main, rel, "\u2323", "\\smile");
+defineSymbol(math, main, rel, "\u2291", "\\sqsubseteq");
+defineSymbol(math, main, rel, "\u2292", "\\sqsupseteq");
+defineSymbol(math, main, rel, "\u2250", "\\doteq");
+defineSymbol(math, main, rel, "\u2322", "\\frown");
+defineSymbol(math, main, rel, "\u220b", "\\ni");
+defineSymbol(math, main, rel, "\u221d", "\\propto");
+defineSymbol(math, main, rel, "\u22a2", "\\vdash");
+defineSymbol(math, main, rel, "\u22a3", "\\dashv");
+defineSymbol(math, main, rel, "\u220b", "\\owns");
+
+// Punctuation
+defineSymbol(math, main, punct, "\u002e", "\\ldotp");
+defineSymbol(math, main, punct, "\u22c5", "\\cdotp");
+
+// Misc Symbols
+defineSymbol(math, main, textord, "\u0023", "\\#");
+defineSymbol(text, main, textord, "\u0023", "\\#");
+defineSymbol(math, main, textord, "\u0026", "\\&");
+defineSymbol(text, main, textord, "\u0026", "\\&");
+defineSymbol(math, main, textord, "\u2135", "\\aleph");
+defineSymbol(math, main, textord, "\u2200", "\\forall");
+defineSymbol(math, main, textord, "\u210f", "\\hbar");
+defineSymbol(math, main, textord, "\u2203", "\\exists");
+defineSymbol(math, main, textord, "\u2207", "\\nabla");
+defineSymbol(math, main, textord, "\u266d", "\\flat");
+defineSymbol(math, main, textord, "\u2113", "\\ell");
+defineSymbol(math, main, textord, "\u266e", "\\natural");
+defineSymbol(math, main, textord, "\u2663", "\\clubsuit");
+defineSymbol(math, main, textord, "\u2118", "\\wp");
+defineSymbol(math, main, textord, "\u266f", "\\sharp");
+defineSymbol(math, main, textord, "\u2662", "\\diamondsuit");
+defineSymbol(math, main, textord, "\u211c", "\\Re");
+defineSymbol(math, main, textord, "\u2661", "\\heartsuit");
+defineSymbol(math, main, textord, "\u2111", "\\Im");
+defineSymbol(math, main, textord, "\u2660", "\\spadesuit");
+
+// Math and Text
+defineSymbol(math, main, textord, "\u2020", "\\dag");
+defineSymbol(math, main, textord, "\u2021", "\\ddag");
+
+// Large Delimiters
+defineSymbol(math, main, close, "\u23b1", "\\rmoustache");
+defineSymbol(math, main, open, "\u23b0", "\\lmoustache");
+defineSymbol(math, main, close, "\u27ef", "\\rgroup");
+defineSymbol(math, main, open, "\u27ee", "\\lgroup");
+
+// Binary Operators
+defineSymbol(math, main, bin, "\u2213", "\\mp");
+defineSymbol(math, main, bin, "\u2296", "\\ominus");
+defineSymbol(math, main, bin, "\u228e", "\\uplus");
+defineSymbol(math, main, bin, "\u2293", "\\sqcap");
+defineSymbol(math, main, bin, "\u2217", "\\ast");
+defineSymbol(math, main, bin, "\u2294", "\\sqcup");
+defineSymbol(math, main, bin, "\u25ef", "\\bigcirc");
+defineSymbol(math, main, bin, "\u2219", "\\bullet");
+defineSymbol(math, main, bin, "\u2021", "\\ddagger");
+defineSymbol(math, main, bin, "\u2240", "\\wr");
+defineSymbol(math, main, bin, "\u2a3f", "\\amalg");
+
+// Arrow Symbols
+defineSymbol(math, main, rel, "\u27f5", "\\longleftarrow");
+defineSymbol(math, main, rel, "\u21d0", "\\Leftarrow");
+defineSymbol(math, main, rel, "\u27f8", "\\Longleftarrow");
+defineSymbol(math, main, rel, "\u27f6", "\\longrightarrow");
+defineSymbol(math, main, rel, "\u21d2", "\\Rightarrow");
+defineSymbol(math, main, rel, "\u27f9", "\\Longrightarrow");
+defineSymbol(math, main, rel, "\u2194", "\\leftrightarrow");
+defineSymbol(math, main, rel, "\u27f7", "\\longleftrightarrow");
+defineSymbol(math, main, rel, "\u21d4", "\\Leftrightarrow");
+defineSymbol(math, main, rel, "\u27fa", "\\Longleftrightarrow");
+defineSymbol(math, main, rel, "\u21a6", "\\mapsto");
+defineSymbol(math, main, rel, "\u27fc", "\\longmapsto");
+defineSymbol(math, main, rel, "\u2197", "\\nearrow");
+defineSymbol(math, main, rel, "\u21a9", "\\hookleftarrow");
+defineSymbol(math, main, rel, "\u21aa", "\\hookrightarrow");
+defineSymbol(math, main, rel, "\u2198", "\\searrow");
+defineSymbol(math, main, rel, "\u21bc", "\\leftharpoonup");
+defineSymbol(math, main, rel, "\u21c0", "\\rightharpoonup");
+defineSymbol(math, main, rel, "\u2199", "\\swarrow");
+defineSymbol(math, main, rel, "\u21bd", "\\leftharpoondown");
+defineSymbol(math, main, rel, "\u21c1", "\\rightharpoondown");
+defineSymbol(math, main, rel, "\u2196", "\\nwarrow");
+defineSymbol(math, main, rel, "\u21cc", "\\rightleftharpoons");
+
+// AMS Negated Binary Relations
+defineSymbol(math, ams, rel, "\u226e", "\\nless");
+defineSymbol(math, ams, rel, "\ue010", "\\nleqslant");
+defineSymbol(math, ams, rel, "\ue011", "\\nleqq");
+defineSymbol(math, ams, rel, "\u2a87", "\\lneq");
+defineSymbol(math, ams, rel, "\u2268", "\\lneqq");
+defineSymbol(math, ams, rel, "\ue00c", "\\lvertneqq");
+defineSymbol(math, ams, rel, "\u22e6", "\\lnsim");
+defineSymbol(math, ams, rel, "\u2a89", "\\lnapprox");
+defineSymbol(math, ams, rel, "\u2280", "\\nprec");
+defineSymbol(math, ams, rel, "\u22e0", "\\npreceq");
+defineSymbol(math, ams, rel, "\u22e8", "\\precnsim");
+defineSymbol(math, ams, rel, "\u2ab9", "\\precnapprox");
+defineSymbol(math, ams, rel, "\u2241", "\\nsim");
+defineSymbol(math, ams, rel, "\ue006", "\\nshortmid");
+defineSymbol(math, ams, rel, "\u2224", "\\nmid");
+defineSymbol(math, ams, rel, "\u22ac", "\\nvdash");
+defineSymbol(math, ams, rel, "\u22ad", "\\nvDash");
+defineSymbol(math, ams, rel, "\u22ea", "\\ntriangleleft");
+defineSymbol(math, ams, rel, "\u22ec", "\\ntrianglelefteq");
+defineSymbol(math, ams, rel, "\u228a", "\\subsetneq");
+defineSymbol(math, ams, rel, "\ue01a", "\\varsubsetneq");
+defineSymbol(math, ams, rel, "\u2acb", "\\subsetneqq");
+defineSymbol(math, ams, rel, "\ue017", "\\varsubsetneqq");
+defineSymbol(math, ams, rel, "\u226f", "\\ngtr");
+defineSymbol(math, ams, rel, "\ue00f", "\\ngeqslant");
+defineSymbol(math, ams, rel, "\ue00e", "\\ngeqq");
+defineSymbol(math, ams, rel, "\u2a88", "\\gneq");
+defineSymbol(math, ams, rel, "\u2269", "\\gneqq");
+defineSymbol(math, ams, rel, "\ue00d", "\\gvertneqq");
+defineSymbol(math, ams, rel, "\u22e7", "\\gnsim");
+defineSymbol(math, ams, rel, "\u2a8a", "\\gnapprox");
+defineSymbol(math, ams, rel, "\u2281", "\\nsucc");
+defineSymbol(math, ams, rel, "\u22e1", "\\nsucceq");
+defineSymbol(math, ams, rel, "\u22e9", "\\succnsim");
+defineSymbol(math, ams, rel, "\u2aba", "\\succnapprox");
+defineSymbol(math, ams, rel, "\u2246", "\\ncong");
+defineSymbol(math, ams, rel, "\ue007", "\\nshortparallel");
+defineSymbol(math, ams, rel, "\u2226", "\\nparallel");
+defineSymbol(math, ams, rel, "\u22af", "\\nVDash");
+defineSymbol(math, ams, rel, "\u22eb", "\\ntriangleright");
+defineSymbol(math, ams, rel, "\u22ed", "\\ntrianglerighteq");
+defineSymbol(math, ams, rel, "\ue018", "\\nsupseteqq");
+defineSymbol(math, ams, rel, "\u228b", "\\supsetneq");
+defineSymbol(math, ams, rel, "\ue01b", "\\varsupsetneq");
+defineSymbol(math, ams, rel, "\u2acc", "\\supsetneqq");
+defineSymbol(math, ams, rel, "\ue019", "\\varsupsetneqq");
+defineSymbol(math, ams, rel, "\u22ae", "\\nVdash");
+defineSymbol(math, ams, rel, "\u2ab5", "\\precneqq");
+defineSymbol(math, ams, rel, "\u2ab6", "\\succneqq");
+defineSymbol(math, ams, rel, "\ue016", "\\nsubseteqq");
+defineSymbol(math, ams, bin, "\u22b4", "\\unlhd");
+defineSymbol(math, ams, bin, "\u22b5", "\\unrhd");
+
+// AMS Negated Arrows
+defineSymbol(math, ams, rel, "\u219a", "\\nleftarrow");
+defineSymbol(math, ams, rel, "\u219b", "\\nrightarrow");
+defineSymbol(math, ams, rel, "\u21cd", "\\nLeftarrow");
+defineSymbol(math, ams, rel, "\u21cf", "\\nRightarrow");
+defineSymbol(math, ams, rel, "\u21ae", "\\nleftrightarrow");
+defineSymbol(math, ams, rel, "\u21ce", "\\nLeftrightarrow");
+
+// AMS Misc
+defineSymbol(math, ams, rel, "\u25b3", "\\vartriangle");
+defineSymbol(math, ams, textord, "\u210f", "\\hslash");
+defineSymbol(math, ams, textord, "\u25bd", "\\triangledown");
+defineSymbol(math, ams, textord, "\u25ca", "\\lozenge");
+defineSymbol(math, ams, textord, "\u24c8", "\\circledS");
+defineSymbol(math, ams, textord, "\u00ae", "\\circledR");
+defineSymbol(math, ams, textord, "\u2221", "\\measuredangle");
+defineSymbol(math, ams, textord, "\u2204", "\\nexists");
+defineSymbol(math, ams, textord, "\u2127", "\\mho");
+defineSymbol(math, ams, textord, "\u2132", "\\Finv");
+defineSymbol(math, ams, textord, "\u2141", "\\Game");
+defineSymbol(math, ams, textord, "\u006b", "\\Bbbk");
+defineSymbol(math, ams, textord, "\u2035", "\\backprime");
+defineSymbol(math, ams, textord, "\u25b2", "\\blacktriangle");
+defineSymbol(math, ams, textord, "\u25bc", "\\blacktriangledown");
+defineSymbol(math, ams, textord, "\u25a0", "\\blacksquare");
+defineSymbol(math, ams, textord, "\u29eb", "\\blacklozenge");
+defineSymbol(math, ams, textord, "\u2605", "\\bigstar");
+defineSymbol(math, ams, textord, "\u2222", "\\sphericalangle");
+defineSymbol(math, ams, textord, "\u2201", "\\complement");
+defineSymbol(math, ams, textord, "\u00f0", "\\eth");
+defineSymbol(math, ams, textord, "\u2571", "\\diagup");
+defineSymbol(math, ams, textord, "\u2572", "\\diagdown");
+defineSymbol(math, ams, textord, "\u25a1", "\\square");
+defineSymbol(math, ams, textord, "\u25a1", "\\Box");
+defineSymbol(math, ams, textord, "\u25ca", "\\Diamond");
+defineSymbol(math, ams, textord, "\u00a5", "\\yen");
+defineSymbol(math, ams, textord, "\u2713", "\\checkmark");
+
+// AMS Hebrew
+defineSymbol(math, ams, textord, "\u2136", "\\beth");
+defineSymbol(math, ams, textord, "\u2138", "\\daleth");
+defineSymbol(math, ams, textord, "\u2137", "\\gimel");
+
+// AMS Greek
+defineSymbol(math, ams, textord, "\u03dd", "\\digamma");
+defineSymbol(math, ams, textord, "\u03f0", "\\varkappa");
+
+// AMS Delimiters
+defineSymbol(math, ams, open, "\u250c", "\\ulcorner");
+defineSymbol(math, ams, close, "\u2510", "\\urcorner");
+defineSymbol(math, ams, open, "\u2514", "\\llcorner");
+defineSymbol(math, ams, close, "\u2518", "\\lrcorner");
+
+// AMS Binary Relations
+defineSymbol(math, ams, rel, "\u2266", "\\leqq");
+defineSymbol(math, ams, rel, "\u2a7d", "\\leqslant");
+defineSymbol(math, ams, rel, "\u2a95", "\\eqslantless");
+defineSymbol(math, ams, rel, "\u2272", "\\lesssim");
+defineSymbol(math, ams, rel, "\u2a85", "\\lessapprox");
+defineSymbol(math, ams, rel, "\u224a", "\\approxeq");
+defineSymbol(math, ams, bin, "\u22d6", "\\lessdot");
+defineSymbol(math, ams, rel, "\u22d8", "\\lll");
+defineSymbol(math, ams, rel, "\u2276", "\\lessgtr");
+defineSymbol(math, ams, rel, "\u22da", "\\lesseqgtr");
+defineSymbol(math, ams, rel, "\u2a8b", "\\lesseqqgtr");
+defineSymbol(math, ams, rel, "\u2251", "\\doteqdot");
+defineSymbol(math, ams, rel, "\u2253", "\\risingdotseq");
+defineSymbol(math, ams, rel, "\u2252", "\\fallingdotseq");
+defineSymbol(math, ams, rel, "\u223d", "\\backsim");
+defineSymbol(math, ams, rel, "\u22cd", "\\backsimeq");
+defineSymbol(math, ams, rel, "\u2ac5", "\\subseteqq");
+defineSymbol(math, ams, rel, "\u22d0", "\\Subset");
+defineSymbol(math, ams, rel, "\u228f", "\\sqsubset");
+defineSymbol(math, ams, rel, "\u227c", "\\preccurlyeq");
+defineSymbol(math, ams, rel, "\u22de", "\\curlyeqprec");
+defineSymbol(math, ams, rel, "\u227e", "\\precsim");
+defineSymbol(math, ams, rel, "\u2ab7", "\\precapprox");
+defineSymbol(math, ams, rel, "\u22b2", "\\vartriangleleft");
+defineSymbol(math, ams, rel, "\u22b4", "\\trianglelefteq");
+defineSymbol(math, ams, rel, "\u22a8", "\\vDash");
+defineSymbol(math, ams, rel, "\u22aa", "\\Vvdash");
+defineSymbol(math, ams, rel, "\u2323", "\\smallsmile");
+defineSymbol(math, ams, rel, "\u2322", "\\smallfrown");
+defineSymbol(math, ams, rel, "\u224f", "\\bumpeq");
+defineSymbol(math, ams, rel, "\u224e", "\\Bumpeq");
+defineSymbol(math, ams, rel, "\u2267", "\\geqq");
+defineSymbol(math, ams, rel, "\u2a7e", "\\geqslant");
+defineSymbol(math, ams, rel, "\u2a96", "\\eqslantgtr");
+defineSymbol(math, ams, rel, "\u2273", "\\gtrsim");
+defineSymbol(math, ams, rel, "\u2a86", "\\gtrapprox");
+defineSymbol(math, ams, bin, "\u22d7", "\\gtrdot");
+defineSymbol(math, ams, rel, "\u22d9", "\\ggg");
+defineSymbol(math, ams, rel, "\u2277", "\\gtrless");
+defineSymbol(math, ams, rel, "\u22db", "\\gtreqless");
+defineSymbol(math, ams, rel, "\u2a8c", "\\gtreqqless");
+defineSymbol(math, ams, rel, "\u2256", "\\eqcirc");
+defineSymbol(math, ams, rel, "\u2257", "\\circeq");
+defineSymbol(math, ams, rel, "\u225c", "\\triangleq");
+defineSymbol(math, ams, rel, "\u223c", "\\thicksim");
+defineSymbol(math, ams, rel, "\u2248", "\\thickapprox");
+defineSymbol(math, ams, rel, "\u2ac6", "\\supseteqq");
+defineSymbol(math, ams, rel, "\u22d1", "\\Supset");
+defineSymbol(math, ams, rel, "\u2290", "\\sqsupset");
+defineSymbol(math, ams, rel, "\u227d", "\\succcurlyeq");
+defineSymbol(math, ams, rel, "\u22df", "\\curlyeqsucc");
+defineSymbol(math, ams, rel, "\u227f", "\\succsim");
+defineSymbol(math, ams, rel, "\u2ab8", "\\succapprox");
+defineSymbol(math, ams, rel, "\u22b3", "\\vartriangleright");
+defineSymbol(math, ams, rel, "\u22b5", "\\trianglerighteq");
+defineSymbol(math, ams, rel, "\u22a9", "\\Vdash");
+defineSymbol(math, ams, rel, "\u2223", "\\shortmid");
+defineSymbol(math, ams, rel, "\u2225", "\\shortparallel");
+defineSymbol(math, ams, rel, "\u226c", "\\between");
+defineSymbol(math, ams, rel, "\u22d4", "\\pitchfork");
+defineSymbol(math, ams, rel, "\u221d", "\\varpropto");
+defineSymbol(math, ams, rel, "\u25c0", "\\blacktriangleleft");
+defineSymbol(math, ams, rel, "\u2234", "\\therefore");
+defineSymbol(math, ams, rel, "\u220d", "\\backepsilon");
+defineSymbol(math, ams, rel, "\u25b6", "\\blacktriangleright");
+defineSymbol(math, ams, rel, "\u2235", "\\because");
+defineSymbol(math, ams, rel, "\u22d8", "\\llless");
+defineSymbol(math, ams, rel, "\u22d9", "\\gggtr");
+defineSymbol(math, ams, bin, "\u22b2", "\\lhd");
+defineSymbol(math, ams, bin, "\u22b3", "\\rhd");
+defineSymbol(math, ams, rel, "\u2242", "\\eqsim");
+defineSymbol(math, main, rel, "\u22c8", "\\Join");
+defineSymbol(math, ams, rel, "\u2251", "\\Doteq");
+
+// AMS Binary Operators
+defineSymbol(math, ams, bin, "\u2214", "\\dotplus");
+defineSymbol(math, ams, bin, "\u2216", "\\smallsetminus");
+defineSymbol(math, ams, bin, "\u22d2", "\\Cap");
+defineSymbol(math, ams, bin, "\u22d3", "\\Cup");
+defineSymbol(math, ams, bin, "\u2a5e", "\\doublebarwedge");
+defineSymbol(math, ams, bin, "\u229f", "\\boxminus");
+defineSymbol(math, ams, bin, "\u229e", "\\boxplus");
+defineSymbol(math, ams, bin, "\u22c7", "\\divideontimes");
+defineSymbol(math, ams, bin, "\u22c9", "\\ltimes");
+defineSymbol(math, ams, bin, "\u22ca", "\\rtimes");
+defineSymbol(math, ams, bin, "\u22cb", "\\leftthreetimes");
+defineSymbol(math, ams, bin, "\u22cc", "\\rightthreetimes");
+defineSymbol(math, ams, bin, "\u22cf", "\\curlywedge");
+defineSymbol(math, ams, bin, "\u22ce", "\\curlyvee");
+defineSymbol(math, ams, bin, "\u229d", "\\circleddash");
+defineSymbol(math, ams, bin, "\u229b", "\\circledast");
+defineSymbol(math, ams, bin, "\u22c5", "\\centerdot");
+defineSymbol(math, ams, bin, "\u22ba", "\\intercal");
+defineSymbol(math, ams, bin, "\u22d2", "\\doublecap");
+defineSymbol(math, ams, bin, "\u22d3", "\\doublecup");
+defineSymbol(math, ams, bin, "\u22a0", "\\boxtimes");
+
+// AMS Arrows
+defineSymbol(math, ams, rel, "\u21e2", "\\dashrightarrow");
+defineSymbol(math, ams, rel, "\u21e0", "\\dashleftarrow");
+defineSymbol(math, ams, rel, "\u21c7", "\\leftleftarrows");
+defineSymbol(math, ams, rel, "\u21c6", "\\leftrightarrows");
+defineSymbol(math, ams, rel, "\u21da", "\\Lleftarrow");
+defineSymbol(math, ams, rel, "\u219e", "\\twoheadleftarrow");
+defineSymbol(math, ams, rel, "\u21a2", "\\leftarrowtail");
+defineSymbol(math, ams, rel, "\u21ab", "\\looparrowleft");
+defineSymbol(math, ams, rel, "\u21cb", "\\leftrightharpoons");
+defineSymbol(math, ams, rel, "\u21b6", "\\curvearrowleft");
+defineSymbol(math, ams, rel, "\u21ba", "\\circlearrowleft");
+defineSymbol(math, ams, rel, "\u21b0", "\\Lsh");
+defineSymbol(math, ams, rel, "\u21c8", "\\upuparrows");
+defineSymbol(math, ams, rel, "\u21bf", "\\upharpoonleft");
+defineSymbol(math, ams, rel, "\u21c3", "\\downharpoonleft");
+defineSymbol(math, ams, rel, "\u22b8", "\\multimap");
+defineSymbol(math, ams, rel, "\u21ad", "\\leftrightsquigarrow");
+defineSymbol(math, ams, rel, "\u21c9", "\\rightrightarrows");
+defineSymbol(math, ams, rel, "\u21c4", "\\rightleftarrows");
+defineSymbol(math, ams, rel, "\u21a0", "\\twoheadrightarrow");
+defineSymbol(math, ams, rel, "\u21a3", "\\rightarrowtail");
+defineSymbol(math, ams, rel, "\u21ac", "\\looparrowright");
+defineSymbol(math, ams, rel, "\u21b7", "\\curvearrowright");
+defineSymbol(math, ams, rel, "\u21bb", "\\circlearrowright");
+defineSymbol(math, ams, rel, "\u21b1", "\\Rsh");
+defineSymbol(math, ams, rel, "\u21ca", "\\downdownarrows");
+defineSymbol(math, ams, rel, "\u21be", "\\upharpoonright");
+defineSymbol(math, ams, rel, "\u21c2", "\\downharpoonright");
+defineSymbol(math, ams, rel, "\u21dd", "\\rightsquigarrow");
+defineSymbol(math, ams, rel, "\u21dd", "\\leadsto");
+defineSymbol(math, ams, rel, "\u21db", "\\Rrightarrow");
+defineSymbol(math, ams, rel, "\u21be", "\\restriction");
+
+defineSymbol(math, main, textord, "\u2018", "`");
+defineSymbol(math, main, textord, "$", "\\$");
+defineSymbol(text, main, textord, "$", "\\$");
+defineSymbol(math, main, textord, "%", "\\%");
+defineSymbol(text, main, textord, "%", "\\%");
+defineSymbol(math, main, textord, "_", "\\_");
+defineSymbol(text, main, textord, "_", "\\_");
+defineSymbol(math, main, textord, "\u2220", "\\angle");
+defineSymbol(math, main, textord, "\u221e", "\\infty");
+defineSymbol(math, main, textord, "\u2032", "\\prime");
+defineSymbol(math, main, textord, "\u25b3", "\\triangle");
+defineSymbol(math, main, textord, "\u0393", "\\Gamma");
+defineSymbol(math, main, textord, "\u0394", "\\Delta");
+defineSymbol(math, main, textord, "\u0398", "\\Theta");
+defineSymbol(math, main, textord, "\u039b", "\\Lambda");
+defineSymbol(math, main, textord, "\u039e", "\\Xi");
+defineSymbol(math, main, textord, "\u03a0", "\\Pi");
+defineSymbol(math, main, textord, "\u03a3", "\\Sigma");
+defineSymbol(math, main, textord, "\u03a5", "\\Upsilon");
+defineSymbol(math, main, textord, "\u03a6", "\\Phi");
+defineSymbol(math, main, textord, "\u03a8", "\\Psi");
+defineSymbol(math, main, textord, "\u03a9", "\\Omega");
+defineSymbol(math, main, textord, "\u00ac", "\\neg");
+defineSymbol(math, main, textord, "\u00ac", "\\lnot");
+defineSymbol(math, main, textord, "\u22a4", "\\top");
+defineSymbol(math, main, textord, "\u22a5", "\\bot");
+defineSymbol(math, main, textord, "\u2205", "\\emptyset");
+defineSymbol(math, ams, textord, "\u2205", "\\varnothing");
+defineSymbol(math, main, mathord, "\u03b1", "\\alpha");
+defineSymbol(math, main, mathord, "\u03b2", "\\beta");
+defineSymbol(math, main, mathord, "\u03b3", "\\gamma");
+defineSymbol(math, main, mathord, "\u03b4", "\\delta");
+defineSymbol(math, main, mathord, "\u03f5", "\\epsilon");
+defineSymbol(math, main, mathord, "\u03b6", "\\zeta");
+defineSymbol(math, main, mathord, "\u03b7", "\\eta");
+defineSymbol(math, main, mathord, "\u03b8", "\\theta");
+defineSymbol(math, main, mathord, "\u03b9", "\\iota");
+defineSymbol(math, main, mathord, "\u03ba", "\\kappa");
+defineSymbol(math, main, mathord, "\u03bb", "\\lambda");
+defineSymbol(math, main, mathord, "\u03bc", "\\mu");
+defineSymbol(math, main, mathord, "\u03bd", "\\nu");
+defineSymbol(math, main, mathord, "\u03be", "\\xi");
+defineSymbol(math, main, mathord, "o", "\\omicron");
+defineSymbol(math, main, mathord, "\u03c0", "\\pi");
+defineSymbol(math, main, mathord, "\u03c1", "\\rho");
+defineSymbol(math, main, mathord, "\u03c3", "\\sigma");
+defineSymbol(math, main, mathord, "\u03c4", "\\tau");
+defineSymbol(math, main, mathord, "\u03c5", "\\upsilon");
+defineSymbol(math, main, mathord, "\u03d5", "\\phi");
+defineSymbol(math, main, mathord, "\u03c7", "\\chi");
+defineSymbol(math, main, mathord, "\u03c8", "\\psi");
+defineSymbol(math, main, mathord, "\u03c9", "\\omega");
+defineSymbol(math, main, mathord, "\u03b5", "\\varepsilon");
+defineSymbol(math, main, mathord, "\u03d1", "\\vartheta");
+defineSymbol(math, main, mathord, "\u03d6", "\\varpi");
+defineSymbol(math, main, mathord, "\u03f1", "\\varrho");
+defineSymbol(math, main, mathord, "\u03c2", "\\varsigma");
+defineSymbol(math, main, mathord, "\u03c6", "\\varphi");
+defineSymbol(math, main, bin, "\u2217", "*");
+defineSymbol(math, main, bin, "+", "+");
+defineSymbol(math, main, bin, "\u2212", "-");
+defineSymbol(math, main, bin, "\u22c5", "\\cdot");
+defineSymbol(math, main, bin, "\u2218", "\\circ");
+defineSymbol(math, main, bin, "\u00f7", "\\div");
+defineSymbol(math, main, bin, "\u00b1", "\\pm");
+defineSymbol(math, main, bin, "\u00d7", "\\times");
+defineSymbol(math, main, bin, "\u2229", "\\cap");
+defineSymbol(math, main, bin, "\u222a", "\\cup");
+defineSymbol(math, main, bin, "\u2216", "\\setminus");
+defineSymbol(math, main, bin, "\u2227", "\\land");
+defineSymbol(math, main, bin, "\u2228", "\\lor");
+defineSymbol(math, main, bin, "\u2227", "\\wedge");
+defineSymbol(math, main, bin, "\u2228", "\\vee");
+defineSymbol(math, main, textord, "\u221a", "\\surd");
+defineSymbol(math, main, open, "(", "(");
+defineSymbol(math, main, open, "[", "[");
+defineSymbol(math, main, open, "\u27e8", "\\langle");
+defineSymbol(math, main, open, "\u2223", "\\lvert");
+defineSymbol(math, main, open, "\u2225", "\\lVert");
+defineSymbol(math, main, close, ")", ")");
+defineSymbol(math, main, close, "]", "]");
+defineSymbol(math, main, close, "?", "?");
+defineSymbol(math, main, close, "!", "!");
+defineSymbol(math, main, close, "\u27e9", "\\rangle");
+defineSymbol(math, main, close, "\u2223", "\\rvert");
+defineSymbol(math, main, close, "\u2225", "\\rVert");
+defineSymbol(math, main, rel, "=", "=");
+defineSymbol(math, main, rel, "<", "<");
+defineSymbol(math, main, rel, ">", ">");
+defineSymbol(math, main, rel, ":", ":");
+defineSymbol(math, main, rel, "\u2248", "\\approx");
+defineSymbol(math, main, rel, "\u2245", "\\cong");
+defineSymbol(math, main, rel, "\u2265", "\\ge");
+defineSymbol(math, main, rel, "\u2265", "\\geq");
+defineSymbol(math, main, rel, "\u2190", "\\gets");
+defineSymbol(math, main, rel, ">", "\\gt");
+defineSymbol(math, main, rel, "\u2208", "\\in");
+defineSymbol(math, main, rel, "\u2209", "\\notin");
+defineSymbol(math, main, rel, "\u2282", "\\subset");
+defineSymbol(math, main, rel, "\u2283", "\\supset");
+defineSymbol(math, main, rel, "\u2286", "\\subseteq");
+defineSymbol(math, main, rel, "\u2287", "\\supseteq");
+defineSymbol(math, ams, rel, "\u2288", "\\nsubseteq");
+defineSymbol(math, ams, rel, "\u2289", "\\nsupseteq");
+defineSymbol(math, main, rel, "\u22a8", "\\models");
+defineSymbol(math, main, rel, "\u2190", "\\leftarrow");
+defineSymbol(math, main, rel, "\u2264", "\\le");
+defineSymbol(math, main, rel, "\u2264", "\\leq");
+defineSymbol(math, main, rel, "<", "\\lt");
+defineSymbol(math, main, rel, "\u2260", "\\ne");
+defineSymbol(math, main, rel, "\u2260", "\\neq");
+defineSymbol(math, main, rel, "\u2192", "\\rightarrow");
+defineSymbol(math, main, rel, "\u2192", "\\to");
+defineSymbol(math, ams, rel, "\u2271", "\\ngeq");
+defineSymbol(math, ams, rel, "\u2270", "\\nleq");
+defineSymbol(math, main, spacing, null, "\\!");
+defineSymbol(math, main, spacing, "\u00a0", "\\ ");
+defineSymbol(math, main, spacing, "\u00a0", "~");
+defineSymbol(math, main, spacing, null, "\\,");
+defineSymbol(math, main, spacing, null, "\\:");
+defineSymbol(math, main, spacing, null, "\\;");
+defineSymbol(math, main, spacing, null, "\\enspace");
+defineSymbol(math, main, spacing, null, "\\qquad");
+defineSymbol(math, main, spacing, null, "\\quad");
+defineSymbol(math, main, spacing, "\u00a0", "\\space");
+defineSymbol(math, main, punct, ",", ",");
+defineSymbol(math, main, punct, ";", ";");
+defineSymbol(math, main, punct, ":", "\\colon");
+defineSymbol(math, ams, bin, "\u22bc", "\\barwedge");
+defineSymbol(math, ams, bin, "\u22bb", "\\veebar");
+defineSymbol(math, main, bin, "\u2299", "\\odot");
+defineSymbol(math, main, bin, "\u2295", "\\oplus");
+defineSymbol(math, main, bin, "\u2297", "\\otimes");
+defineSymbol(math, main, textord, "\u2202", "\\partial");
+defineSymbol(math, main, bin, "\u2298", "\\oslash");
+defineSymbol(math, ams, bin, "\u229a", "\\circledcirc");
+defineSymbol(math, ams, bin, "\u22a1", "\\boxdot");
+defineSymbol(math, main, bin, "\u25b3", "\\bigtriangleup");
+defineSymbol(math, main, bin, "\u25bd", "\\bigtriangledown");
+defineSymbol(math, main, bin, "\u2020", "\\dagger");
+defineSymbol(math, main, bin, "\u22c4", "\\diamond");
+defineSymbol(math, main, bin, "\u22c6", "\\star");
+defineSymbol(math, main, bin, "\u25c3", "\\triangleleft");
+defineSymbol(math, main, bin, "\u25b9", "\\triangleright");
+defineSymbol(math, main, open, "{", "\\{");
+defineSymbol(text, main, textord, "{", "\\{");
+defineSymbol(math, main, close, "}", "\\}");
+defineSymbol(text, main, textord, "}", "\\}");
+defineSymbol(math, main, open, "{", "\\lbrace");
+defineSymbol(math, main, close, "}", "\\rbrace");
+defineSymbol(math, main, open, "[", "\\lbrack");
+defineSymbol(math, main, close, "]", "\\rbrack");
+defineSymbol(math, main, open, "\u230a", "\\lfloor");
+defineSymbol(math, main, close, "\u230b", "\\rfloor");
+defineSymbol(math, main, open, "\u2308", "\\lceil");
+defineSymbol(math, main, close, "\u2309", "\\rceil");
+defineSymbol(math, main, textord, "\\", "\\backslash");
+defineSymbol(math, main, textord, "\u2223", "|");
+defineSymbol(math, main, textord, "\u2223", "\\vert");
+defineSymbol(math, main, textord, "\u2225", "\\|");
+defineSymbol(math, main, textord, "\u2225", "\\Vert");
+defineSymbol(math, main, rel, "\u2191", "\\uparrow");
+defineSymbol(math, main, rel, "\u21d1", "\\Uparrow");
+defineSymbol(math, main, rel, "\u2193", "\\downarrow");
+defineSymbol(math, main, rel, "\u21d3", "\\Downarrow");
+defineSymbol(math, main, rel, "\u2195", "\\updownarrow");
+defineSymbol(math, main, rel, "\u21d5", "\\Updownarrow");
+defineSymbol(math, math, op, "\u2210", "\\coprod");
+defineSymbol(math, math, op, "\u22c1", "\\bigvee");
+defineSymbol(math, math, op, "\u22c0", "\\bigwedge");
+defineSymbol(math, math, op, "\u2a04", "\\biguplus");
+defineSymbol(math, math, op, "\u22c2", "\\bigcap");
+defineSymbol(math, math, op, "\u22c3", "\\bigcup");
+defineSymbol(math, math, op, "\u222b", "\\int");
+defineSymbol(math, math, op, "\u222b", "\\intop");
+defineSymbol(math, math, op, "\u222c", "\\iint");
+defineSymbol(math, math, op, "\u222d", "\\iiint");
+defineSymbol(math, math, op, "\u220f", "\\prod");
+defineSymbol(math, math, op, "\u2211", "\\sum");
+defineSymbol(math, math, op, "\u2a02", "\\bigotimes");
+defineSymbol(math, math, op, "\u2a01", "\\bigoplus");
+defineSymbol(math, math, op, "\u2a00", "\\bigodot");
+defineSymbol(math, math, op, "\u222e", "\\oint");
+defineSymbol(math, math, op, "\u2a06", "\\bigsqcup");
+defineSymbol(math, math, op, "\u222b", "\\smallint");
+defineSymbol(text, main, inner, "\u2026", "\\textellipsis");
+defineSymbol(math, main, inner, "\u2026", "\\mathellipsis");
+defineSymbol(text, main, inner, "\u2026", "\\ldots");
+defineSymbol(math, main, inner, "\u2026", "\\ldots");
+defineSymbol(math, main, inner, "\u22ef", "\\cdots");
+defineSymbol(math, main, inner, "\u22f1", "\\ddots");
+defineSymbol(math, main, textord, "\u22ee", "\\vdots");
+defineSymbol(math, main, accent, "\u00b4", "\\acute");
+defineSymbol(math, main, accent, "\u0060", "\\grave");
+defineSymbol(math, main, accent, "\u00a8", "\\ddot");
+defineSymbol(math, main, accent, "\u007e", "\\tilde");
+defineSymbol(math, main, accent, "\u00af", "\\bar");
+defineSymbol(math, main, accent, "\u02d8", "\\breve");
+defineSymbol(math, main, accent, "\u02c7", "\\check");
+defineSymbol(math, main, accent, "\u005e", "\\hat");
+defineSymbol(math, main, accent, "\u20d7", "\\vec");
+defineSymbol(math, main, accent, "\u02d9", "\\dot");
+defineSymbol(math, main, mathord, "\u0131", "\\imath");
+defineSymbol(math, main, mathord, "\u0237", "\\jmath");
+
+defineSymbol(text, main, textord, "\u2013", "--");
+defineSymbol(text, main, textord, "\u2014", "---");
+defineSymbol(text, main, textord, "\u2018", "`");
+defineSymbol(text, main, textord, "\u2019", "'");
+defineSymbol(text, main, textord, "\u201c", "``");
+defineSymbol(text, main, textord, "\u201d", "''");
+defineSymbol(math, main, textord, "\u00b0", "\\degree");
+defineSymbol(text, main, textord, "\u00b0", "\\degree");
+defineSymbol(math, main, mathord, "\u00a3", "\\pounds");
+defineSymbol(math, ams, textord, "\u2720", "\\maltese");
+defineSymbol(text, ams, textord, "\u2720", "\\maltese");
+
+defineSymbol(text, main, spacing, "\u00a0", "\\ ");
+defineSymbol(text, main, spacing, "\u00a0", " ");
+defineSymbol(text, main, spacing, "\u00a0", "~");
+
+// There are lots of symbols which are the same, so we add them in afterwards.
+var i;
+var ch;
+
+// All of these are textords in math mode
+var mathTextSymbols = "0123456789/@.\"";
+for (i = 0; i < mathTextSymbols.length; i++) {
+    ch = mathTextSymbols.charAt(i);
+    defineSymbol(math, main, textord, ch, ch);
+}
+
+// All of these are textords in text mode
+var textSymbols = "0123456789!@*()-=+[]\";:?/.,";
+for (i = 0; i < textSymbols.length; i++) {
+    ch = textSymbols.charAt(i);
+    defineSymbol(text, main, textord, ch, ch);
+}
+
+// All of these are textords in text mode, and mathords in math mode
+var letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+for (i = 0; i < letters.length; i++) {
+    ch = letters.charAt(i);
+    defineSymbol(math, main, mathord, ch, ch);
+    defineSymbol(text, main, textord, ch, ch);
+}
+
+// Latin-1 letters
+for (i = 0x00C0; i <= 0x00D6; i++) {
+    ch = String.fromCharCode(i);
+    defineSymbol(text, main, textord, ch, ch);
+}
+
+for (i = 0x00D8; i <= 0x00F6; i++) {
+    ch = String.fromCharCode(i);
+    defineSymbol(text, main, textord, ch, ch);
+}
+
+for (i = 0x00F8; i <= 0x00FF; i++) {
+    ch = String.fromCharCode(i);
+    defineSymbol(text, main, textord, ch, ch);
+}
+
+// Cyrillic
+for (i = 0x0410; i <= 0x044F; i++) {
+    ch = String.fromCharCode(i);
+    defineSymbol(text, main, textord, ch, ch);
+}
+
+// Unicode versions of existing characters
+defineSymbol(text, main, textord, "\u2013", "–");
+defineSymbol(text, main, textord, "\u2014", "—");
+defineSymbol(text, main, textord, "\u2018", "‘");
+defineSymbol(text, main, textord, "\u2019", "’");
+defineSymbol(text, main, textord, "\u201c", "“");
+defineSymbol(text, main, textord, "\u201d", "”");
 
 },{}],22:[function(require,module,exports){
-var hangulRegex=/[\uAC00-\uD7AF]/,cjkRegex=/[\u3040-\u309F]|[\u30A0-\u30FF]|[\u4E00-\u9FAF]|[\uAC00-\uD7AF]/;module.exports={cjkRegex:cjkRegex,hangulRegex:hangulRegex};
+var hangulRegex = /[\uAC00-\uD7AF]/;
+
+// This regex combines
+// - Hiragana: [\u3040-\u309F]
+// - Katakana: [\u30A0-\u30FF]
+// - CJK ideograms: [\u4E00-\u9FAF]
+// - Hangul syllables: [\uAC00-\uD7AF]
+// Notably missing are halfwidth Katakana and Romanji glyphs.
+var cjkRegex =
+    /[\u3040-\u309F]|[\u30A0-\u30FF]|[\u4E00-\u9FAF]|[\uAC00-\uD7AF]/;
+
+module.exports = {
+    cjkRegex: cjkRegex,
+    hangulRegex: hangulRegex
+};
 
 },{}],23:[function(require,module,exports){
-function escaper(e){return ESCAPE_LOOKUP[e]}function escape(e){return(""+e).replace(ESCAPE_REGEX,escaper)}function clearNode(e){setTextContent(e,"")}var nativeIndexOf=Array.prototype.indexOf,indexOf=function(e,t){if(null==e)return-1;if(nativeIndexOf&&e.indexOf===nativeIndexOf)return e.indexOf(t);for(var n=0,r=e.length;n<r;n++)if(e[n]===t)return n;return-1},contains=function(e,t){return-1!==indexOf(e,t)},deflt=function(e,t){return void 0===e?t:e},uppercase=/([A-Z])/g,hyphenate=function(e){return e.replace(uppercase,"-$1").toLowerCase()},ESCAPE_LOOKUP={"&":"&amp;",">":"&gt;","<":"&lt;",'"':"&quot;","'":"&#x27;"},ESCAPE_REGEX=/[&><"']/g,setTextContent;if("undefined"!=typeof document){var testNode=document.createElement("span");setTextContent="textContent"in testNode?function(e,t){e.textContent=t}:function(e,t){e.innerText=t}}module.exports={contains:contains,deflt:deflt,escape:escape,hyphenate:hyphenate,indexOf:indexOf,setTextContent:setTextContent,clearNode:clearNode};
+/**
+ * This file contains a list of utility functions which are useful in other
+ * files.
+ */
+
+/**
+ * Provide an `indexOf` function which works in IE8, but defers to native if
+ * possible.
+ */
+var nativeIndexOf = Array.prototype.indexOf;
+var indexOf = function(list, elem) {
+    if (list == null) {
+        return -1;
+    }
+    if (nativeIndexOf && list.indexOf === nativeIndexOf) {
+        return list.indexOf(elem);
+    }
+    var i = 0;
+    var l = list.length;
+    for (; i < l; i++) {
+        if (list[i] === elem) {
+            return i;
+        }
+    }
+    return -1;
+};
+
+/**
+ * Return whether an element is contained in a list
+ */
+var contains = function(list, elem) {
+    return indexOf(list, elem) !== -1;
+};
+
+/**
+ * Provide a default value if a setting is undefined
+ */
+var deflt = function(setting, defaultIfUndefined) {
+    return setting === undefined ? defaultIfUndefined : setting;
+};
+
+// hyphenate and escape adapted from Facebook's React under Apache 2 license
+
+var uppercase = /([A-Z])/g;
+var hyphenate = function(str) {
+    return str.replace(uppercase, "-$1").toLowerCase();
+};
+
+var ESCAPE_LOOKUP = {
+    "&": "&amp;",
+    ">": "&gt;",
+    "<": "&lt;",
+    "\"": "&quot;",
+    "'": "&#x27;"
+};
+
+var ESCAPE_REGEX = /[&><"']/g;
+
+function escaper(match) {
+    return ESCAPE_LOOKUP[match];
+}
+
+/**
+ * Escapes text to prevent scripting attacks.
+ *
+ * @param {*} text Text value to escape.
+ * @return {string} An escaped string.
+ */
+function escape(text) {
+    return ("" + text).replace(ESCAPE_REGEX, escaper);
+}
+
+/**
+ * A function to set the text content of a DOM element in all supported
+ * browsers. Note that we don't define this if there is no document.
+ */
+var setTextContent;
+if (typeof document !== "undefined") {
+    var testNode = document.createElement("span");
+    if ("textContent" in testNode) {
+        setTextContent = function(node, text) {
+            node.textContent = text;
+        };
+    } else {
+        setTextContent = function(node, text) {
+            node.innerText = text;
+        };
+    }
+}
+
+/**
+ * A function to clear a node.
+ */
+function clearNode(node) {
+    setTextContent(node, "");
+}
+
+module.exports = {
+    contains: contains,
+    deflt: deflt,
+    escape: escape,
+    hyphenate: hyphenate,
+    indexOf: indexOf,
+    setTextContent: setTextContent,
+    clearNode: clearNode
+};
 
 },{}],24:[function(require,module,exports){
-function getRelocatable(e){if(!e.__matchAtRelocatable){var t=e.source+"|()",l="g"+(e.ignoreCase?"i":"")+(e.multiline?"m":"")+(e.unicode?"u":"");e.__matchAtRelocatable=new RegExp(t,l)}return e.__matchAtRelocatable}function matchAt(e,t,l){if(e.global||e.sticky)throw new Error("matchAt(...): Only non-global regexes are supported");var a=getRelocatable(e);a.lastIndex=l;var n=a.exec(t);return null==n[n.length-1]?(n.length=n.length-1,n):null}module.exports=matchAt;
+function getRelocatable(re) {
+  // In the future, this could use a WeakMap instead of an expando.
+  if (!re.__matchAtRelocatable) {
+    // Disjunctions are the lowest-precedence operator, so we can make any
+    // pattern match the empty string by appending `|()` to it:
+    // https://people.mozilla.org/~jorendorff/es6-draft.html#sec-patterns
+    var source = re.source + '|()';
 
+    // We always make the new regex global.
+    var flags = 'g' + (re.ignoreCase ? 'i' : '') + (re.multiline ? 'm' : '') + (re.unicode ? 'u' : '')
+    // sticky (/.../y) doesn't make sense in conjunction with our relocation
+    // logic, so we ignore it here.
+    ;
+
+    re.__matchAtRelocatable = new RegExp(source, flags);
+  }
+  return re.__matchAtRelocatable;
+}
+
+function matchAt(re, str, pos) {
+  if (re.global || re.sticky) {
+    throw new Error('matchAt(...): Only non-global regexes are supported');
+  }
+  var reloc = getRelocatable(re);
+  reloc.lastIndex = pos;
+  var match = reloc.exec(str);
+  // Last capturing group is our sentinel that indicates whether the regex
+  // matched at the given location.
+  if (match[match.length - 1] == null) {
+    // Original regex matched.
+    match.length = match.length - 1;
+    return match;
+  } else {
+    return null;
+  }
+}
+
+module.exports = matchAt;
 },{}],"katex":[function(require,module,exports){
-var ParseError=require("./src/ParseError"),Settings=require("./src/Settings"),buildTree=require("./src/buildTree"),parseTree=require("./src/parseTree"),utils=require("./src/utils"),render=function(e,r,n){utils.clearNode(r);var t=new Settings(n),o=parseTree(e,t),s=buildTree(o,e,t).toNode();r.appendChild(s)};"undefined"!=typeof document&&"CSS1Compat"!==document.compatMode&&("undefined"!=typeof console&&console.warn("Warning: KaTeX doesn't work in quirks mode. Make sure your website has a suitable doctype."),render=function(){throw new ParseError("KaTeX doesn't work in quirks mode.")});var renderToString=function(e,r){var n=new Settings(r),t=parseTree(e,n);return buildTree(t,e,n).toMarkup()},generateParseTree=function(e,r){var n=new Settings(r);return parseTree(e,n)};module.exports={render:render,renderToString:renderToString,__parse:generateParseTree,ParseError:ParseError};
+/* eslint no-console:0 */
+/**
+ * This is the main entry point for KaTeX. Here, we expose functions for
+ * rendering expressions either to DOM nodes or to markup strings.
+ *
+ * We also expose the ParseError class to check if errors thrown from KaTeX are
+ * errors in the expression, or errors in javascript handling.
+ */
+
+var ParseError = require("./src/ParseError");
+var Settings = require("./src/Settings");
+
+var buildTree = require("./src/buildTree");
+var parseTree = require("./src/parseTree");
+var utils = require("./src/utils");
+
+/**
+ * Parse and build an expression, and place that expression in the DOM node
+ * given.
+ */
+var render = function(expression, baseNode, options) {
+    utils.clearNode(baseNode);
+
+    var settings = new Settings(options);
+
+    var tree = parseTree(expression, settings);
+    var node = buildTree(tree, expression, settings).toNode();
+
+    baseNode.appendChild(node);
+};
+
+// KaTeX's styles don't work properly in quirks mode. Print out an error, and
+// disable rendering.
+if (typeof document !== "undefined") {
+    if (document.compatMode !== "CSS1Compat") {
+        typeof console !== "undefined" && console.warn(
+            "Warning: KaTeX doesn't work in quirks mode. Make sure your " +
+                "website has a suitable doctype.");
+
+        render = function() {
+            throw new ParseError("KaTeX doesn't work in quirks mode.");
+        };
+    }
+}
+
+/**
+ * Parse and build an expression, and return the markup for that.
+ */
+var renderToString = function(expression, options) {
+    var settings = new Settings(options);
+
+    var tree = parseTree(expression, settings);
+    return buildTree(tree, expression, settings).toMarkup();
+};
+
+/**
+ * Parse an expression and return the parse tree.
+ */
+var generateParseTree = function(expression, options) {
+    var settings = new Settings(options);
+    return parseTree(expression, settings);
+};
+
+module.exports = {
+    render: render,
+    renderToString: renderToString,
+    /**
+     * NOTE: This method is not currently recommended for public use.
+     * The internal tree representation is unstable and is very likely
+     * to change. Use at your own risk.
+     */
+    __parse: generateParseTree,
+    ParseError: ParseError
+};
 
 },{"./src/ParseError":4,"./src/Settings":6,"./src/buildTree":11,"./src/parseTree":20,"./src/utils":23}]},{},[])
 //# sourceMappingURL=katex.bundle.js.map
