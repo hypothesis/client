@@ -1,0 +1,461 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for sidebar/websocket.js</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../prettify.css" />
+    <link rel="stylesheet" href="../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../index.html">all files</a> / <a href="index.html">sidebar/</a> websocket.js
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">86.21% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>50/58</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">50% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>5/10</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">85.71% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>12/14</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">86.21% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>50/58</span>
+      </div>
+    </div>
+  </div>
+  <div class='status-line high'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">38×</span>
+<span class="cline-any cline-yes">38×</span>
+<span class="cline-any cline-yes">38×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">38×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">38×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">38×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">38×</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">'use strict';
+&nbsp;
+var retry = require('retry');
+var EventEmitter = require('tiny-emitter');
+var inherits = require('inherits');
+&nbsp;
+// see https://developer.mozilla.org/en-US/docs/Web/API/CloseEvent
+var CLOSE_NORMAL = 1000;
+&nbsp;
+// Minimum delay, in ms, before reconnecting after an abnormal connection close.
+var RECONNECT_MIN_DELAY = 1000;
+&nbsp;
+/**
+ * Socket is a minimal wrapper around WebSocket which provides:
+ *
+ * - Automatic reconnection in the event of an abnormal close
+ * - Queuing of messages passed to send() whilst the socket is
+ *   connecting
+ * - Uses the standard EventEmitter API for reporting open, close, error
+ *   and message events.
+ */
+function Socket(url) {
+  var self = this;
+&nbsp;
+  // queue of JSON objects which have not yet been submitted
+  var messageQueue = [];
+&nbsp;
+  // the current WebSocket instance
+  var socket;
+&nbsp;
+  // a pending operation to connect a WebSocket
+  var operation;
+&nbsp;
+  function sendMessages() {
+    while (messageQueue.length &gt; 0) {
+      var messageString = JSON.stringify(messageQueue.shift());
+      socket.send(messageString);
+    }
+  }
+&nbsp;
+  // Connect the websocket immediately. If a connection attempt is already in
+  // progress, do nothing.
+  function connect() {
+    <span class="missing-if-branch" title="if path not taken" >I</span>if (operation) {
+<span class="cstat-no" title="statement not covered" >      r</span>eturn;
+    }
+&nbsp;
+    operation = retry.operation({
+      minTimeout: RECONNECT_MIN_DELAY * 2,
+      // Don't retry forever -- fail permanently after 10 retries
+      retries: 10,
+      // Randomize retry times to minimise the thundering herd effect
+      randomize: true,
+    });
+&nbsp;
+    operation.attempt(function () {
+      socket = new WebSocket(url);
+      socket.onopen = function (event) {
+        onOpen();
+        self.emit('open', event);
+      };
+      socket.onclose = function (event) {
+        <span class="missing-if-branch" title="if path not taken" >I</span>if (event.code === CLOSE_NORMAL) {
+<span class="cstat-no" title="statement not covered" >          s</span>elf.emit('close', event);
+<span class="cstat-no" title="statement not covered" >          r</span>eturn;
+        }
+        var err = new Error('WebSocket closed abnormally, code: ' + event.code);
+        console.warn(err);
+        onAbnormalClose(err);
+      };
+      socket.onerror = <span class="fstat-no" title="function not covered" >function (event) {</span>
+<span class="cstat-no" title="statement not covered" >        s</span>elf.emit('error', event);
+      };
+      socket.onmessage = <span class="fstat-no" title="function not covered" >function (event) {</span>
+<span class="cstat-no" title="statement not covered" >        s</span>elf.emit('message', event);
+      };
+    });
+  }
+&nbsp;
+  // onOpen is called when a websocket connection is successfully established.
+  function onOpen() {
+    operation = null;
+    sendMessages();
+  }
+&nbsp;
+  // onAbnormalClose is called when a websocket connection closes abnormally.
+  // This may be the result of a failure to connect, or an abnormal close after
+  // a previous successful connection.
+  function onAbnormalClose(error) {
+    // If we're already in a reconnection loop, trigger a retry...
+    <span class="missing-if-branch" title="if path not taken" >I</span>if (operation) {
+<span class="cstat-no" title="statement not covered" >      if (!operation.retry(error)) {</span>
+<span class="cstat-no" title="statement not covered" >        c</span>onsole.error('reached max retries attempting to reconnect websocket');
+      }
+<span class="cstat-no" title="statement not covered" >      r</span>eturn;
+    }
+    // ...otherwise reconnect the websocket after a short delay.
+    var delay = RECONNECT_MIN_DELAY;
+    delay += Math.floor(Math.random() * delay);
+    operation = setTimeout(function () {
+      operation = null;
+      connect();
+    }, delay);
+  }
+&nbsp;
+  /** Close the underlying WebSocket connection */
+  this.close = function () {
+    socket.close();
+  };
+&nbsp;
+  /**
+   * Send a JSON object via the WebSocket connection, or queue it
+   * for later delivery if not currently connected.
+   */
+  this.send = function (message) {
+    messageQueue.push(message);
+    if (this.isConnected()) {
+      sendMessages();
+    }
+  };
+&nbsp;
+  /** Returns true if the WebSocket is currently connected. */
+  this.isConnected = function () {
+    return socket.readyState === WebSocket.OPEN;
+  };
+&nbsp;
+  connect();
+}
+&nbsp;
+inherits(Socket, EventEmitter);
+&nbsp;
+module.exports = Socket;
+&nbsp;</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Fri Mar 16 2018 04:28:39 GMT+0000 (UTC)
+</div>
+</div>
+<script src="../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../sorter.js"></script>
+</body>
+</html>

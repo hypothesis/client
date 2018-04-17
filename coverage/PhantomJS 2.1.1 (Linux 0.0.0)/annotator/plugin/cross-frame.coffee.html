@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for annotator/plugin/cross-frame.coffee</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../prettify.css" />
+    <link rel="stylesheet" href="../../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../../index.html">all files</a> / <a href="index.html">annotator/plugin/</a> cross-frame.coffee
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">100% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>73/73</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">80% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>8/10</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">100% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>15/15</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">100% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>32/32</span>
+      </div>
+      <div class='fl pad1y'>
+        <span class="strong">1 branch</span>
+        <span class="quiet">Ignored</span>  &nbsp;&nbsp;&nbsp;&nbsp;
+      </div>
+    </div>
+  </div>
+  <div class='status-line high'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79</td><td class="line-coverage quiet"><span class="cline-any cline-yes">21×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">21×</span>
+<span class="cline-any cline-yes">21×</span>
+<span class="cline-any cline-yes">21×</span>
+<span class="cline-any cline-yes">21×</span>
+<span class="cline-any cline-yes">21×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">42×</span>
+<span class="cline-any cline-yes">42×</span>
+<span class="cline-any cline-yes">43×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">21×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">21×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">21×</span>
+<span class="cline-any cline-yes">21×</span>
+<span class="cline-any cline-yes">21×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">21×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">21×</span>
+<span class="cline-any cline-yes">21×</span>
+<span class="cline-any cline-yes">21×</span>
+<span class="cline-any cline-yes">21×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">9×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">9×</span>
+<span class="cline-any cline-yes">9×</span>
+<span class="cline-any cline-yes">9×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">21×</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">Plugin = require('../plugin')
+&nbsp;
+AnnotationSync = require('../annotation-sync')
+Bridge = require('../../shared/bridge')
+Discovery = require('../../shared/discovery')
+FrameUtil = require('../util/frame-util')
+FrameObserver = require('../frame-observer')
+&nbsp;
+# Extracts individual keys from an object and returns a new one.
+extract = extract = (obj, <span class="branch-1 cbranch-no" title="branch not covered" >k</span>eys...) -&gt;
+  ret = {}
+  ret[key] = obj[key] for key in keys when obj.hasOwnProperty(key)
+  ret
+&nbsp;
+# Class for establishing a messaging connection to the parent sidebar as well
+# as keeping the annotation state in sync with the sidebar application, this
+# frame acts as the bridge client, the sidebar is the server. This plugin
+# can also be used to send messages through to the sidebar using the
+# call method. This plugin also enables the discovery and management of
+# not yet known frames in a multiple frame scenario.
+module.exports = class CrossFrame extends Plugin
+  constructor: (elem, options) -&gt;
+    super
+&nbsp;
+    config = options.config
+    opts = extract(options, 'server')
+    discovery = new Discovery(window, opts)
+&nbsp;
+    bridge = new Bridge()
+&nbsp;
+    opts = extract(options, 'on', 'emit')
+    annotationSync = new AnnotationSync(bridge, opts)
+    frameObserver = new FrameObserver(elem)
+    frameIdentifiers = new Map()
+&nbsp;
+    this.pluginInit = -&gt;
+      onDiscoveryCallback = (source, origin, token) -&gt;
+        bridge.createChannel(source, origin, token)
+&nbsp;
+      discovery.startDiscovery(onDiscoveryCallback)
+&nbsp;
+      frameObserver.observe(_injectToFrame, _iframeUnloaded);
+&nbsp;
+    this.destroy = -&gt;
+      # super doesnt work here :(
+      Plugin::destroy.apply(this, arguments)
+      bridge.destroy()
+      discovery.stopDiscovery()
+      frameObserver.disconnect()
+&nbsp;
+    this.sync = (annotations, cb) -&gt;
+      annotationSync.sync(annotations, cb)
+&nbsp;
+    this.on = (event, fn) -&gt;
+      bridge.on(event, fn)
+&nbsp;
+    this.call = (message, <span class="branch-1 cbranch-no" title="branch not covered" >a</span>rgs...) -&gt;
+      bridge.call(message, args...)
+&nbsp;
+    this.onConnect = (fn) -&gt;
+      bridge.onConnect(fn)
+&nbsp;
+    _injectToFrame = (frame) -&gt;
+      if !FrameUtil.hasHypothesis(frame)
+        # Take the embed script location from the config
+        # until an alternative solution comes around.
+        clientUrl = config.clientUrl
+&nbsp;
+        FrameUtil.isLoaded frame, () -&gt;
+          subFrameIdentifier = discovery._generateToken()
+          frameIdentifiers.set(frame, subFrameIdentifier)
+          injectedConfig = Object.assign({}, config, {subFrameIdentifier})
+&nbsp;
+          FrameUtil.injectHypothesis(frame, clientUrl, injectedConfig)
+&nbsp;
+    _iframeUnloaded = (frame) -&gt;
+      bridge.call('destroyFrame', frameIdentifiers.get(frame))
+      frameIdentifiers.delete(frame)
+&nbsp;</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Fri Mar 16 2018 04:28:39 GMT+0000 (UTC)
+</div>
+</div>
+<script src="../../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../../sorter.js"></script>
+</body>
+</html>

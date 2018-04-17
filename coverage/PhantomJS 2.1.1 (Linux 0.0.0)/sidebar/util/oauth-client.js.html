@@ -1,0 +1,825 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for sidebar/util/oauth-client.js</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../prettify.css" />
+    <link rel="stylesheet" href="../../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../../index.html">all files</a> / <a href="index.html">sidebar/util/</a> oauth-client.js
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">97.59% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>81/83</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">94.44% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>34/36</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">95.65% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>22/23</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">96.55% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>56/58</span>
+      </div>
+      <div class='fl pad1y'>
+        <span class="strong">2 statements, 1 function, 11 branches</span>
+        <span class="quiet">Ignored</span>  &nbsp;&nbsp;&nbsp;&nbsp;
+      </div>
+    </div>
+  </div>
+  <div class='status-line high'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194
+195
+196
+197
+198
+199
+200
+201
+202
+203
+204
+205
+206
+207
+208
+209
+210
+211
+212
+213
+214
+215
+216
+217
+218
+219
+220
+221
+222
+223
+224
+225
+226
+227
+228
+229
+230
+231
+232
+233
+234
+235
+236
+237
+238
+239
+240
+241
+242
+243
+244
+245
+246
+247
+248
+249
+250
+251
+252
+253</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">17×</span>
+<span class="cline-any cline-yes">17×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">17×</span>
+<span class="cline-any cline-yes">17×</span>
+<span class="cline-any cline-yes">17×</span>
+<span class="cline-any cline-yes">17×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">17×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">12×</span>
+<span class="cline-any cline-yes">12×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">12×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">'use strict';
+&nbsp;
+var queryString = require('query-string');
+&nbsp;
+var random = require('./random');
+&nbsp;
+/**
+ * An object holding the details of an access token from the tokenUrl endpoint.
+ * @typedef {Object} TokenInfo
+ * @property {string} accessToken  - The access token itself.
+ * @property {number} expiresAt    - The date when the timestamp will expire.
+ * @property {string} refreshToken - The refresh token that can be used to
+ *                                   get a new access token.
+ */
+&nbsp;
+/**
+ * Return a new TokenInfo object from the given tokenUrl endpoint response.
+ * @param {Object} response - The HTTP response from a POST to the tokenUrl
+ *                            endpoint (an Angular $http response object).
+ * @returns {TokenInfo}
+ */
+function tokenInfoFrom(response) {
+  var data = response.data;
+  return {
+    accessToken:  data.access_token,
+&nbsp;
+    // Set the expiry date to some time slightly before that implied by
+    // `expires_in` to account for the delay in the client receiving the
+    // response.
+    expiresAt: Date.now() + ((data.expires_in - 10) * 1000),
+&nbsp;
+    refreshToken: data.refresh_token,
+  };
+}
+&nbsp;
+/**
+ * Generate a short random string suitable for use as the "state" param in
+ * authorization requests.
+ *
+ * See https://tools.ietf.org/html/rfc6749#section-4.1.1.
+ */
+<span class="fstat-no" title="function not covered" >function generateState() {</span>
+<span class="cstat-no" title="statement not covered" >  r</span>eturn random.generateHexString(16);
+}
+&nbsp;
+/**
+ * OAuthClient configuration.
+ *
+ * @typedef {Object} Config
+ * @property {string} clientId - OAuth client ID
+ * @property {string} tokenEndpoint - OAuth token exchange/refresh endpoint
+ * @property {string} authorizationEndpoint - OAuth authorization endpoint
+ * @property {string} revokeEndpoint - RFC 7009 token revocation endpoint
+ * @property {() =&gt; string} [generateState] - Authorization "state" parameter generator
+ */
+&nbsp;
+/**
+ * OAuthClient handles interaction with the annotation service's OAuth
+ * endpoints.
+ */
+class OAuthClient {
+  /**
+   * Create a new OAuthClient
+   *
+   * @param {Object} $http - HTTP client
+   * @param {Config} config
+   */
+  constructor($http, config) {
+    this.$http = $http;
+&nbsp;
+    this.clientId = config.clientId;
+    this.tokenEndpoint = config.tokenEndpoint;
+    this.authorizationEndpoint = config.authorizationEndpoint;
+    this.revokeEndpoint = config.revokeEndpoint;
+&nbsp;
+    // Test seam
+    t</span>his.generateState = config.generateState || <span class="branch-1 cbranch-no" title="branch not covered" >generateState;
+  }
+&nbsp;
+  /**
+   * Exchange an authorization code for access and refresh tokens.
+   *
+   * @param {string} code
+   * @return {Promise&lt;TokenInfo&gt;}
+   */
+  exchangeAuthCode(code) {
+    var data = {
+      client_id: this.clientId,
+      grant_type: 'authorization_code',
+      code,
+    };
+    return this._formPost(this.tokenEndpoint, data).then((response) =&gt; {
+      if (response.status !== 200) {
+        throw new Error('Authorization code exchange failed');
+      }
+      return tokenInfoFrom(response);
+    });
+  }
+&nbsp;
+  /**
+   * Exchange a grant token for access and refresh tokens.
+   *
+   * See https://tools.ietf.org/html/rfc7523#section-4
+   *
+   * @param {string} token
+   * @return {Promise&lt;TokenInfo&gt;}
+   */
+  exchangeGrantToken(token) {
+    var data = {
+      grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+      assertion: token,
+    };
+    return this._formPost(this.tokenEndpoint, data).then(response =&gt; {
+      if (response.status !== 200) {
+        throw new Error('Failed to retrieve access token');
+      }
+      return tokenInfoFrom(response);
+    });
+  }
+&nbsp;
+  /**
+   * Refresh an access and refresh token pair.
+   *
+   * See https://tools.ietf.org/html/rfc6749#section-6
+   *
+   * @param {string} refreshToken
+   * @return {Promise&lt;TokenInfo&gt;}
+   */
+  refreshToken(refreshToken) {
+    var data = { grant_type: 'refresh_token', refresh_token: refreshToken };
+    return this._formPost(this.tokenEndpoint, data).then((response) =&gt; {
+      if (response.status !== 200) {
+        throw new Error('Failed to refresh access token');
+      }
+      return tokenInfoFrom(response);
+    });
+  }
+&nbsp;
+  /**
+   * Revoke an access and refresh token pair.
+   *
+   * @param {string} accessToken
+   * @return {Promise}
+   */
+  revokeToken(accessToken) {
+    return this._formPost(this.revokeEndpoint, { token: accessToken });
+  }
+&nbsp;
+  /**
+   * Prompt the user for permission to access their data.
+   *
+   * Returns an authorization code which can be passed to `exchangeAuthCode`.
+   *
+   * @param {Window} $window - Window which will receive the auth response.
+   * @param {Window} authWindow - Popup window where the login prompt will be shown.
+   *   This should be created using `openAuthPopupWindow`.
+   * @return {Promise&lt;string&gt;}
+   */
+  authorize($window, authWindow) {
+    // Random state string used to check that auth messages came from the popup
+    // window that we opened.
+    var state = this.generateState();
+&nbsp;
+    // Promise which resolves or rejects when the user accepts or closes the
+    // auth popup.
+    var authResponse = new Promise((resolve, reject) =&gt; {
+      function authRespListener(event) {
+        <span class="missing-if-branch" title="if path not taken" >I</span>if (typeof event.data !== 'object') {
+<span class="cstat-no" title="statement not covered" >          r</span>eturn;
+        }
+&nbsp;
+        if (event.data.state !== state) {
+          // This message came from a different popup window.
+          return;
+        }
+&nbsp;
+        if (event.data.type === 'authorization_response') {
+          resolve(event.data);
+        }
+        if (event.data.type === 'authorization_canceled') {
+          reject(new Error('Authorization window was closed'));
+        }
+        $window.removeEventListener('message', authRespListener);
+      }
+      $window.addEventListener('message', authRespListener);
+    });
+&nbsp;
+    // Authorize user and retrieve grant token
+    var authUrl = this.authorizationEndpoint;
+    authUrl += '?' + queryString.stringify({
+      client_id: this.clientId,
+      origin: $window.location.origin,
+      response_mode: 'web_message',
+      response_type: 'code',
+      state: state,
+    });
+    authWindow.location = authUrl;
+&nbsp;
+    return authResponse.then(rsp =&gt; rsp.code);
+  }
+&nbsp;
+  /**
+   * Make an `application/x-www-form-urlencoded` POST request.
+   *
+   * @param {string} url
+   * @param {Object} data - Parameter dictionary
+   */
+  _formPost(url, data) {
+    data = queryString.stringify(data);
+    var requestConfig = {
+      headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+    };
+    return this.$http.post(url, data, requestConfig);
+  }
+&nbsp;
+  /**
+   * Create and show a pop-up window for use with `OAuthClient#authorize`.
+   *
+   * This function _must_ be called in the same turn of the event loop as the
+   * button or link which initiates login to avoid triggering the popup blocker
+   * in certain browsers. See https://github.com/hypothesis/client/issues/534
+   * and https://github.com/hypothesis/client/issues/535.
+   *
+   * @param {Window} $window - The parent of the created window.
+   * @return {Window} The new popup window.
+   */
+  static openAuthPopupWindow($window) {
+    // In Chrome &amp; Firefox the sizes passed to `window.open` are used for the
+    // viewport size. In Safari the size is used for the window size including
+    // title bar etc. There is enough vertical space at the bottom to allow for
+    // this.
+    //
+    // See https://bugs.webkit.org/show_bug.cgi?id=143678
+    var width  = 475;
+    var height = 430;
+    var left   = $window.screen.width / 2 - width / 2;
+    var top    = $window.screen.height /2 - height / 2;
+&nbsp;
+    // Generate settings for `window.open` in the required comma-separated
+    // key=value format.
+    var authWindowSettings = queryString.stringify({
+      left: left,
+      top: top,
+      width: width,
+      height: height,
+    }).replace(/&amp;/g, ',');
+&nbsp;
+    return $window.open('about:blank', 'Log in to Hypothesis', authWindowSettings);
+  }
+}
+&nbsp;
+module.exports = OAuthClient;
+&nbsp;</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Fri Mar 16 2018 04:28:39 GMT+0000 (UTC)
+</div>
+</div>
+<script src="../../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../../sorter.js"></script>
+</body>
+</html>

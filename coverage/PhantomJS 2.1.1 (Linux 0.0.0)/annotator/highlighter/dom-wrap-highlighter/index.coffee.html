@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for annotator/highlighter/dom-wrap-highlighter/index.coffee</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../../prettify.css" />
+    <link rel="stylesheet" href="../../../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../../../index.html">all files</a> / <a href="index.html">annotator/highlighter/dom-wrap-highlighter/</a> index.coffee
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">92.59% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>25/27</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">83.33% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>5/6</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">50% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>3/6</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">75% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>6/8</span>
+      </div>
+      <div class='fl pad1y'>
+        <span class="strong">7 statements, 3 branches</span>
+        <span class="quiet">Ignored</span>  &nbsp;&nbsp;&nbsp;&nbsp;
+      </div>
+    </div>
+  </div>
+  <div class='status-line high'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46</td><td class="line-coverage quiet"><span class="cline-any cline-yes">49×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">$ = require('jquery')
+&nbsp;
+# Public: Wraps the DOM Nodes within the provided range with a highlight
+# element of the specified class and returns the highlight Elements.
+#
+# normedRange - A NormalizedRange to be highlighted.
+# cssClass - A CSS class to use for the highlight (default: 'annotator-hl')
+#
+# Returns an array of highlight Elements.
+exports.highlightRange = (normedRange, newAnnotation, cssClass='annotator-hl') -&gt;
+  white = /^\s*$/
+&nbsp;
+  # A custom element name is used here rather than `&lt;span&gt;` to reduce the
+  # likelihood of highlights being hidden by page styling.
+  <span class="missing-if-branch" title="if path not taken" >I</span>if newAnnotation
+<span class="cstat-no" title="statement not covered" >    cssClass= "annotator-hl annotator-hl-focused"</span>
+  hl = $("&lt;hypothesis-highlight class='#{cssClass}'&gt;&lt;/hypothesis-highlight&gt;")
+&nbsp;
+  # Ignore text nodes that contain only whitespace characters. This prevents
+  # spans being injected between elements that can only contain a restricted
+  # subset of nodes such as table rows and lists. This does mean that there
+  # may be the odd abandoned whitespace node in a paragraph that is skipped
+  # but better than breaking table layouts.
+  nodes = $(normedRange.textNodes()).filter((i) -&gt; not white.test @nodeValue)
+&nbsp;
+  return nodes.wrap(hl).parent().toArray()
+&nbsp;
+&nbsp;
+exports.removeHighlights = (highlights) -&gt;
+  for h in highlights when h.parentNode?
+    $(h).replaceWith(h.childNodes)
+&nbsp;
+&nbsp;
+# Get the bounding client rectangle of a collection in viewport coordinates.
+# Unfortunately, Chrome has issues[1] with Range.getBoundingClient rect or we
+# could just use that.
+# [1] https://code.google.com/p/chromium/issues/detail?id=324437
+exports.getBoundingClientRect = <span class="fstat-no" title="function not covered" >(collection) -&gt;</span>
+  # Reduce the client rectangles of the highlights to a bounding box
+<span class="cstat-no" title="statement not covered" >  rects = c</span>ollection.map(<span class="fstat-no" title="function not covered" >(</span>n) -&gt; n.getBoundingClientRect())
+  return rects.reduce <span class="fstat-no" title="function not covered" >(</span>acc, r) -&gt;
+    top: Math.min(acc.top, r.top)
+    left: Math.min(acc.left, r.left)
+    bottom: Math.max(acc.bottom, r.bottom)
+    right: Math.max(acc.right, r.right)
+&nbsp;</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Fri Mar 16 2018 04:28:39 GMT+0000 (UTC)
+</div>
+</div>
+<script src="../../../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../../../sorter.js"></script>
+</body>
+</html>

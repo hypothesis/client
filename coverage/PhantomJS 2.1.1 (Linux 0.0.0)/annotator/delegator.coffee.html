@@ -1,0 +1,864 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for annotator/delegator.coffee</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../prettify.css" />
+    <link rel="stylesheet" href="../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../index.html">all files</a> / <a href="index.html">annotator/</a> delegator.coffee
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">100% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>86/86</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">100% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>12/12</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">100% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>17/17</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">100% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>24/24</span>
+      </div>
+      <div class='fl pad1y'>
+        <span class="strong">1 statement, 1 branch</span>
+        <span class="quiet">Ignored</span>  &nbsp;&nbsp;&nbsp;&nbsp;
+      </div>
+    </div>
+  </div>
+  <div class='status-line high'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194
+195
+196
+197
+198
+199
+200
+201
+202
+203
+204
+205
+206
+207
+208
+209
+210
+211
+212
+213
+214
+215
+216
+217
+218
+219
+220
+221
+222
+223
+224
+225
+226
+227
+228
+229
+230
+231
+232
+233
+234
+235
+236
+237
+238
+239
+240
+241
+242
+243
+244
+245
+246
+247
+248
+249
+250
+251
+252
+253
+254
+255
+256
+257
+258
+259
+260
+261
+262
+263
+264
+265
+266</td><td class="line-coverage quiet"><span class="cline-any cline-yes">22×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">107×</span>
+<span class="cline-any cline-yes">107×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">107×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">107×</span>
+<span class="cline-any cline-yes">107×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">282×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">86×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">196×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">282×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">15×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">189×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">189×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">119×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">288×</span>
+<span class="cline-any cline-yes">288×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">22×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">138×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">$ = require('jquery')
+&nbsp;
+###
+** Adapted from:
+** https://github.com/openannotation/annotator/blob/v1.2.x/src/class.coffee
+**
+** Annotator v1.2.10
+** https://github.com/openannotation/annotator
+**
+** Copyright 2015, the Annotator project contributors.
+** Dual licensed under the MIT and GPLv3 licenses.
+** https://github.com/openannotation/annotator/blob/master/LICENSE
+###
+&nbsp;
+# Public: Delegator is the base class that all of Annotators objects inherit
+# from. It provides basic functionality such as instance options, event
+# delegation and pub/sub methods.
+module.exports = class Delegator
+  # Public: Events object. This contains a key/pair hash of events/methods that
+  # should be bound. See Delegator#addEvents() for usage.
+  events: {}
+&nbsp;
+# Public: Options object. Extended on initialisation.
+  options: {}
+&nbsp;
+# A jQuery object wrapping the DOM Element provided on initialisation.
+  element: null
+&nbsp;
+# Public: Constructor function that sets up the instance. Binds the @events
+# hash and extends the @options object.
+#
+# element - The DOM element that this instance represents.
+# config - An Object literal of config settings.
+#
+# Examples
+#
+#   element  = document.getElementById('my-element')
+#   instance = new Delegator(element, {
+#     option: 'my-option'
+#   })
+#
+# Returns a new instance of Delegator.
+  constructor: (element, config) -&gt;
+    @options = $.extend(true, {}, @options, config)
+    @element = $(element)
+&nbsp;
+    # Delegator creates closures for each event it binds. This is a private
+    # registry of created closures, used to enable event unbinding.
+    @_closures = {}
+&nbsp;
+    this.on = this.subscribe
+    this.addEvents()
+&nbsp;
+# Public: Destroy the instance, unbinding all events.
+#
+# Returns nothing.
+  destroy: -&gt;
+    this.removeEvents()
+&nbsp;
+# Public: binds the function names in the @events Object to their events.
+#
+# The @events Object should be a set of key/value pairs where the key is the
+# event name with optional CSS selector. The value should be a String method
+# name on the current class.
+#
+# This is called by the default Delegator constructor and so shouldn't usually
+# need to be called by the user.
+#
+# Examples
+#
+#   # This will bind the clickedElement() method to the click event on @element.
+#   @options = {"click": "clickedElement"}
+#
+#   # This will delegate the submitForm() method to the submit event on the
+#   # form within the @element.
+#   @options = {"form submit": "submitForm"}
+#
+#   # This will bind the updateAnnotationStore() method to the custom
+#   # annotation:save event. NOTE: Because this is a custom event the
+#   # Delegator#subscribe() method will be used and updateAnnotationStore()
+#   # will not receive an event parameter like the previous two examples.
+#   @options = {"annotation:save": "updateAnnotationStore"}
+#
+# Returns nothing.
+  addEvents: -&gt;
+    for event in Delegator._parseEvents(@events)
+      this._addEvent event.selector, event.event, event.functionName
+&nbsp;
+# Public: unbinds functions previously bound to events by addEvents().
+#
+# The @events Object should be a set of key/value pairs where the key is the
+# event name with optional CSS selector. The value should be a String method
+# name on the current class.
+#
+# Returns nothing.
+  removeEvents: -&gt;
+    for event in Delegator._parseEvents(@events)
+      this._removeEvent event.selector, event.event, event.functionName
+&nbsp;
+# Binds an event to a callback function represented by a String. A selector
+# can be provided in order to watch for events on a child element.
+#
+# The event can be any standard event supported by jQuery or a custom String.
+# If a custom string is used the callback function will not recieve an
+# event object as it's first parameter.
+#
+# selector     - Selector String matching child elements. (default: '')
+# event        - The event to listen for.
+# functionName - A String function name to bind to the event.
+#
+# Examples
+#
+#   # Listens for all click events on instance.element.
+#   instance._addEvent('', 'click', 'onClick')
+#
+#   # Delegates the instance.onInputFocus() method to focus events on all
+#   # form inputs within instance.element.
+#   instance._addEvent('form :input', 'focus', 'onInputFocus')
+#
+# Returns itself.
+  _addEvent: (selector, event, functionName) -&gt;
+    closure = =&gt; this[functionName].apply(this, arguments)
+&nbsp;
+    if selector == '' and Delegator._isCustomEvent(event)
+      this.subscribe(event, closure)
+    else
+      @element.delegate(selector, event, closure)
+&nbsp;
+    @_closures["#{selector}/#{event}/#{functionName}"] = closure
+&nbsp;
+    this
+&nbsp;
+# Unbinds a function previously bound to an event by the _addEvent method.
+#
+# Takes the same arguments as _addEvent(), and an event will only be
+# successfully unbound if the arguments to removeEvent() are exactly the same
+# as the original arguments to _addEvent(). This would usually be called by
+# _removeEvents().
+#
+# selector     - Selector String matching child elements. (default: '')
+# event        - The event to listen for.
+# functionName - A String function name to bind to the event.
+#
+# Returns itself.
+  _removeEvent: (selector, event, functionName) -&gt;
+    closure = @_closures["#{selector}/#{event}/#{functionName}"]
+&nbsp;
+    if selector == '' and Delegator._isCustomEvent(event)
+      this.unsubscribe(event, closure)
+    else
+      @element.undelegate(selector, event, closure)
+&nbsp;
+    delete @_closures["#{selector}/#{event}/#{functionName}"]
+&nbsp;
+    this
+&nbsp;
+&nbsp;
+# Public: Fires an event and calls all subscribed callbacks with any parameters
+# provided. This is essentially an alias of @element.triggerHandler() but
+# should be used to fire custom events.
+#
+# NOTE: Events fired using .publish() will not bubble up the DOM.
+#
+# event  - A String event name.
+# params - An Array of parameters to provide to callbacks.
+#
+# Examples
+#
+#   instance.subscribe('annotation:save', (msg) -&gt; console.log(msg))
+#   instance.publish('annotation:save', ['Hello World'])
+#   # =&gt; Outputs "Hello World"
+#
+# Returns itself.
+  publish: () -&gt;
+    @element.triggerHandler.apply @element, arguments
+    this
+&nbsp;
+# Public: Listens for custom event which when published will call the provided
+# callback. This is essentially a wrapper around @element.bind() but removes
+# the event parameter that jQuery event callbacks always recieve. These
+# parameters are unnessecary for custom events.
+#
+# event    - A String event name.
+# callback - A callback function called when the event is published.
+#
+# Examples
+#
+#   instance.subscribe('annotation:save', (msg) -&gt; console.log(msg))
+#   instance.publish('annotation:save', ['Hello World'])
+#   # =&gt; Outputs "Hello World"
+#
+# Returns itself.
+  subscribe: (event, callback) -&gt;
+    closure = -&gt; callback.apply(this, [].slice.call(arguments, 1))
+&nbsp;
+    # Ensure both functions have the same unique id so that jQuery will accept
+    # callback when unbinding closure.
+    closure.guid = callback.guid = ($.guid += 1)
+&nbsp;
+    @element.bind event, closure
+    this
+&nbsp;
+# Public: Unsubscribes a callback from an event. The callback will no longer
+# be called when the event is published.
+#
+# event    - A String event name.
+# callback - A callback function to be removed.
+#
+# Examples
+#
+#   callback = (msg) -&gt; console.log(msg)
+#   instance.subscribe('annotation:save', callback)
+#   instance.publish('annotation:save', ['Hello World'])
+#   # =&gt; Outputs "Hello World"
+#
+#   instance.unsubscribe('annotation:save', callback)
+#   instance.publish('annotation:save', ['Hello Again'])
+#   # =&gt; No output.
+#
+# Returns itself.
+  unsubscribe: -&gt;
+    @element.unbind.apply @element, arguments
+    this
+&nbsp;
+&nbsp;
+# Parse the @events object of a Delegator into an array of objects containing
+# string-valued "selector", "event", and "func" keys.
+Delegator._parseEvents = (eventsObj) -&gt;
+  events = []
+  for sel, functionName of eventsObj
+    [selector..., event] = sel.split ' '
+    events.push({
+      selector: selector.join(' '),
+      event: event,
+      functionName: functionName
+    })
+  return events
+&nbsp;
+&nbsp;
+# Native jQuery events that should recieve an event object. Plugins can
+# add their own methods to this if required.
+Delegator.natives = do -&gt;
+  specials = (key for own key, val of $.event.special)
+  """
+  blur focus focusin focusout load resize scroll unload click dblclick
+  mousedown mouseup mousemove mouseover mouseout mouseenter mouseleave
+  change select submit keydown keypress keyup error
+  """.split(/[^a-z]+/).concat(specials)
+&nbsp;
+&nbsp;
+# Checks to see if the provided event is a DOM event supported by jQuery or
+# a custom user event.
+#
+# event - String event name.
+#
+# Examples
+#
+#   Delegator._isCustomEvent('click')              # =&gt; false
+#   Delegator._isCustomEvent('mousedown')          # =&gt; false
+#   Delegator._isCustomEvent('annotation:created') # =&gt; true
+#
+# Returns true if event is a custom user event.
+Delegator._isCustomEvent = (event) -&gt;
+  [event] = event.split('.')
+  $.inArray(event, Delegator.natives) == -1
+&nbsp;</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Fri Mar 16 2018 04:28:39 GMT+0000 (UTC)
+</div>
+</div>
+<script src="../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../sorter.js"></script>
+</body>
+</html>

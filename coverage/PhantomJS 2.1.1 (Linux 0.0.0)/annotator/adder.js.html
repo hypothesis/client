@@ -1,0 +1,989 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for annotator/adder.js</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../prettify.css" />
+    <link rel="stylesheet" href="../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../index.html">all files</a> / <a href="index.html">annotator/</a> adder.js
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">29.25% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>31/106</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">11.54% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>3/26</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">20% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>3/15</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">29.25% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>31/106</span>
+      </div>
+    </div>
+  </div>
+  <div class='status-line low'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194
+195
+196
+197
+198
+199
+200
+201
+202
+203
+204
+205
+206
+207
+208
+209
+210
+211
+212
+213
+214
+215
+216
+217
+218
+219
+220
+221
+222
+223
+224
+225
+226
+227
+228
+229
+230
+231
+232
+233
+234
+235
+236
+237
+238
+239
+240
+241
+242
+243
+244
+245
+246
+247
+248
+249
+250
+251
+252
+253
+254
+255
+256
+257
+258
+259
+260
+261
+262
+263
+264
+265
+266
+267
+268
+269
+270
+271
+272
+273
+274
+275
+276
+277
+278
+279
+280
+281
+282
+283
+284
+285
+286
+287
+288
+289
+290
+291
+292
+293
+294
+295
+296
+297
+298
+299
+300
+301
+302
+303
+304
+305
+306
+307
+308
+309</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">49×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">49×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">49×</span>
+<span class="cline-any cline-yes">49×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">49×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">49×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">49×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">49×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">49×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">49×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">'use strict';
+&nbsp;
+var classnames = require('classnames');
+&nbsp;
+var template = require('./adder.html');
+&nbsp;
+var ANNOTATE_BTN_CLASS = 'js-annotate-btn';
+var ANNOTATE_BTN_SELECTOR = '.js-annotate-btn';
+&nbsp;
+var HIGHLIGHT_BTN_SELECTOR = '.js-highlight-btn';
+&nbsp;
+/**
+ * @typedef Target
+ * @prop {number} left - Offset from left edge of viewport.
+ * @prop {number} top - Offset from top edge of viewport.
+ * @prop {number} arrowDirection - Direction of the adder's arrow.
+ */
+&nbsp;
+/**
+ * Show the adder above the selection with an arrow pointing down at the
+ * selected text.
+ */
+var ARROW_POINTING_DOWN = 1;
+&nbsp;
+/**
+ * Show the adder above the selection with an arrow pointing up at the
+ * selected text.
+ */
+var ARROW_POINTING_UP = 2;
+&nbsp;
+<span class="fstat-no" title="function not covered" >function toPx(pixels) {</span>
+<span class="cstat-no" title="statement not covered" >  r</span>eturn pixels.toString() + 'px';
+}
+&nbsp;
+var ARROW_HEIGHT = 10;
+&nbsp;
+// The preferred gap between the end of the text selection and the adder's
+// arrow position.
+var ARROW_H_MARGIN = 20;
+&nbsp;
+function attachShadow(element) {
+  <span class="missing-if-branch" title="if path not taken" >I</span>if (element.attachShadow) {
+    // Shadow DOM v1 (Chrome v53, Safari 10)
+<span class="cstat-no" title="statement not covered" >    r</span>eturn element.attachShadow({mode: 'open'});
+  } else <span class="missing-if-branch" title="if path not taken" >I</span>if (element.createShadowRoot) {
+    // Shadow DOM v0 (Chrome ~35-52)
+<span class="cstat-no" title="statement not covered" >    r</span>eturn element.createShadowRoot();
+  } else {
+    return null;
+  }
+}
+&nbsp;
+/**
+ * Return the closest ancestor of `el` which has been positioned.
+ *
+ * If no ancestor has been positioned, returns the root element.
+ *
+ * @param {Element} el
+ * @return {Element}
+ */
+<span class="fstat-no" title="function not covered" >function nearestPositionedAncestor(el) {</span>
+<span class="cstat-no" title="statement not covered" >  v</span>ar parentEl = el.parentElement;
+<span class="cstat-no" title="statement not covered" >  while (parentEl.parentElement) {</span>
+<span class="cstat-no" title="statement not covered" >    if (getComputedStyle(parentEl).position !== 'static') {</span>
+<span class="cstat-no" title="statement not covered" >      b</span>reak;
+    }
+<span class="cstat-no" title="statement not covered" >    p</span>arentEl = parentEl.parentElement;
+  }
+<span class="cstat-no" title="statement not covered" >  r</span>eturn parentEl;
+}
+&nbsp;
+/**
+ * Create the DOM structure for the Adder.
+ *
+ * Returns the root DOM node for the adder, which may be in a shadow tree.
+ */
+function createAdderDOM(container) {
+  var element;
+&nbsp;
+  // If the browser supports Shadow DOM, use it to isolate the adder
+  // from the page's CSS
+  //
+  // See https://developers.google.com/web/fundamentals/primers/shadowdom/
+  var shadowRoot = attachShadow(container);
+  <span class="missing-if-branch" title="if path not taken" >I</span>if (shadowRoot) {
+<span class="cstat-no" title="statement not covered" >    s</span>hadowRoot.innerHTML = template;
+<span class="cstat-no" title="statement not covered" >    e</span>lement = shadowRoot.querySelector('.js-adder');
+&nbsp;
+    // Load stylesheets required by adder into shadow DOM element
+<span class="cstat-no" title="statement not covered" >    v</span>ar adderStyles = Array.from(document.styleSheets).map(<span class="fstat-no" title="function not covered" >function (sheet) {</span>
+<span class="cstat-no" title="statement not covered" >      r</span>eturn sheet.href;
+    }).filter(<span class="fstat-no" title="function not covered" >function (url) {</span>
+<span class="cstat-no" title="statement not covered" >      r</span>eturn (url || '').match(/(icomoon|annotator)\.css/);
+    });
+&nbsp;
+    // Stylesheet &lt;link&gt; elements are inert inside shadow roots [1]. Until
+    // Shadow DOM implementations support external stylesheets [2], grab the
+    // relevant CSS files from the current page and `@import` them.
+    //
+    // [1] http://stackoverflow.com/questions/27746590
+    // [2] https://github.com/w3c/webcomponents/issues/530
+    //
+    // This will unfortunately break if the page blocks inline stylesheets via
+    // CSP, but that appears to be rare and if this happens, the user will still
+    // get a usable adder, albeit one that uses browser default styles for the
+    // toolbar.
+<span class="cstat-no" title="statement not covered" >    v</span>ar styleEl = document.createElement('style');
+<span class="cstat-no" title="statement not covered" >    s</span>tyleEl.textContent = adderStyles.map(<span class="fstat-no" title="function not covered" >function (url) {</span>
+<span class="cstat-no" title="statement not covered" >      r</span>eturn '@import "' + url + '";';
+    }).join('\n');
+<span class="cstat-no" title="statement not covered" >    s</span>hadowRoot.appendChild(styleEl);
+  } else {
+    container.innerHTML = template;
+    element = container.querySelector('.js-adder');
+  }
+  return element;
+}
+&nbsp;
+/**
+ * Annotation 'adder' toolbar which appears next to the selection
+ * and provides controls for the user to create new annotations.
+ *
+ * @param {Element} container - The DOM element into which the adder will be created
+ * @param {Object} options - Options object specifying `onAnnotate` and `onHighlight`
+ *        event handlers.
+ */
+function Adder(container, options) {
+&nbsp;
+  var self = this;
+  // Flag to manage the visibility of Highlight Button
+  var isHighlightBtnVisible = options.isHighlightBtnVisible();
+  self.element = createAdderDOM(container);
+&nbsp;
+  var feedBackBtn = options.traslatedBtnStrings().AnnotateBtn;
+<span class="cstat-no" title="statement not covered" >  v</span>ar HighlightBtn = options.traslatedBtnStrings().HighlightBtn;
+&nbsp;
+  // Set initial style
+<span class="cstat-no" title="statement not covered" >  O</span>bject.assign(container.style, {
+    display: 'block',
+&nbsp;
+    // take position out of layout flow initially
+    position: 'absolute',
+    top: 0,
+&nbsp;
+    // Assign a high Z-index so that the adder shows above any content on the
+    // page
+    zIndex: 999,
+  });
+&nbsp;
+  // The adder is hidden using the `visibility` property rather than `display`
+  // so that we can compute its size in order to position it before display.
+<span class="cstat-no" title="statement not covered" >  s</span>elf.element.style.visibility = 'hidden';
+&nbsp;
+<span class="cstat-no" title="statement not covered" >  v</span>ar view = self.element.ownerDocument.defaultView;
+<span class="cstat-no" title="statement not covered" >  v</span>ar enterTimeout;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >  s</span>elf.element.querySelector(ANNOTATE_BTN_SELECTOR)
+    .addEventListener('click', handleCommand);
+<span class="cstat-no" title="statement not covered" >  s</span>elf.element.querySelector(ANNOTATE_BTN_SELECTOR).children[0]
+    .innerHTML = feedBackBtn;
+  
+<span class="cstat-no" title="statement not covered" >  if (isHighlightBtnVisible) {</span>
+<span class="cstat-no" title="statement not covered" >    s</span>elf.element.querySelector(HIGHLIGHT_BTN_SELECTOR)
+    .addEventListener('click', handleCommand);
+<span class="cstat-no" title="statement not covered" >    s</span>elf.element.querySelector(HIGHLIGHT_BTN_SELECTOR)
+    .innerHTML = HighlightBtn;
+  } else {
+<span class="cstat-no" title="statement not covered" >    s</span>elf.element.querySelector(HIGHLIGHT_BTN_SELECTOR).style.display = 'none';
+  }
+&nbsp;
+&nbsp;
+<span class="fstat-no" title="function not covered" >  function handleCommand(event) {</span>
+<span class="cstat-no" title="statement not covered" >    e</span>vent.preventDefault();
+<span class="cstat-no" title="statement not covered" >    e</span>vent.stopPropagation();
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    v</span>ar isAnnotateCommand = this.classList.contains(ANNOTATE_BTN_CLASS);
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    if (isAnnotateCommand) {</span>
+<span class="cstat-no" title="statement not covered" >      o</span>ptions.onAnnotate();
+    } else {
+<span class="cstat-no" title="statement not covered" >      o</span>ptions.onHighlight();
+    }
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    s</span>elf.hide();
+  }
+&nbsp;
+<span class="fstat-no" title="function not covered" >  function width() {</span>
+<span class="cstat-no" title="statement not covered" >    r</span>eturn self.element.getBoundingClientRect().width;
+  }
+&nbsp;
+<span class="fstat-no" title="function not covered" >  function height() {</span>
+<span class="cstat-no" title="statement not covered" >    r</span>eturn self.element.getBoundingClientRect().height;
+  }
+&nbsp;
+  /** Hide the adder */
+<span class="cstat-no" title="statement not covered" >  t</span>his.hide = <span class="fstat-no" title="function not covered" >function () {</span>
+<span class="cstat-no" title="statement not covered" >    c</span>learTimeout(enterTimeout);
+<span class="cstat-no" title="statement not covered" >    s</span>elf.element.className = classnames({'annotator-adder': true});
+<span class="cstat-no" title="statement not covered" >    s</span>elf.element.style.visibility = 'hidden';
+  };
+&nbsp;
+  /**
+   * Return the best position to show the adder in order to target the
+   * selected text in `targetRect`.
+   *
+   * @param {Rect} targetRect - The rect of text to target, in viewport
+   *        coordinates.
+   * @param {boolean} isSelectionBackwards - True if the selection was made
+   *        backwards, such that the focus point is mosty likely at the top-left
+   *        edge of `targetRect`.
+   * @return {Target}
+   */
+<span class="cstat-no" title="statement not covered" >  t</span>his.target = <span class="fstat-no" title="function not covered" >function (targetRect, isSelectionBackwards) {</span>
+    // Set the initial arrow direction based on whether the selection was made
+    // forwards/upwards or downwards/backwards.
+<span class="cstat-no" title="statement not covered" >    v</span>ar arrowDirection;
+<span class="cstat-no" title="statement not covered" >    if (isSelectionBackwards) {</span>
+<span class="cstat-no" title="statement not covered" >      a</span>rrowDirection = ARROW_POINTING_DOWN;
+    } else {
+<span class="cstat-no" title="statement not covered" >      a</span>rrowDirection = ARROW_POINTING_UP;
+    }
+<span class="cstat-no" title="statement not covered" >    v</span>ar top;
+<span class="cstat-no" title="statement not covered" >    v</span>ar left;
+&nbsp;
+    // Position the adder such that the arrow it is above or below the selection
+    // and close to the end.
+<span class="cstat-no" title="statement not covered" >    v</span>ar hMargin = Math.min(ARROW_H_MARGIN, targetRect.width);
+<span class="cstat-no" title="statement not covered" >    if (isSelectionBackwards) {</span>
+<span class="cstat-no" title="statement not covered" >      l</span>eft = targetRect.left - width() / 2 + hMargin;
+    } else {
+<span class="cstat-no" title="statement not covered" >      l</span>eft = targetRect.left + targetRect.width - width() / 2 - hMargin;
+    }
+&nbsp;
+    // Flip arrow direction if adder would appear above the top or below the
+    // bottom of the viewport.
+<span class="cstat-no" title="statement not covered" >    if (targetRect.top - height() &lt; 0 &amp;&amp;</span>
+        arrowDirection === ARROW_POINTING_DOWN) {
+<span class="cstat-no" title="statement not covered" >      a</span>rrowDirection = ARROW_POINTING_UP;
+    } else <span class="cstat-no" title="statement not covered" >if (targetRect.top + height() &gt; view.innerHeight) {</span>
+<span class="cstat-no" title="statement not covered" >      a</span>rrowDirection = ARROW_POINTING_DOWN;
+    }
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    if (arrowDirection === ARROW_POINTING_UP) {</span>
+<span class="cstat-no" title="statement not covered" >      t</span>op = targetRect.top + targetRect.height + ARROW_HEIGHT;
+    } else {
+<span class="cstat-no" title="statement not covered" >      t</span>op = targetRect.top - height() - ARROW_HEIGHT;
+    }
+&nbsp;
+    // Constrain the adder to the viewport.
+<span class="cstat-no" title="statement not covered" >    l</span>eft = Math.max(left, 0);
+<span class="cstat-no" title="statement not covered" >    l</span>eft = Math.min(left, view.innerWidth - width());
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    t</span>op = Math.max(top, 0);
+<span class="cstat-no" title="statement not covered" >    t</span>op = Math.min(top, view.innerHeight - height());
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    r</span>eturn {top, left, arrowDirection};
+  };
+&nbsp;
+  /**
+   * Show the adder at the given position and with the arrow pointing in
+   * `arrowDirection`.
+   *
+   * @param {number} left - Horizontal offset from left edge of viewport.
+   * @param {number} top - Vertical offset from top edge of viewport.
+   */
+<span class="cstat-no" title="statement not covered" >  t</span>his.showAt = <span class="fstat-no" title="function not covered" >function (left, top, arrowDirection) {</span>
+<span class="cstat-no" title="statement not covered" >    s</span>elf.element.className = classnames({
+      'annotator-adder': true,
+      'annotator-adder--arrow-down': arrowDirection === ARROW_POINTING_DOWN,
+      'annotator-adder--arrow-up': arrowDirection === ARROW_POINTING_UP,
+    });
+&nbsp;
+    // Some sites make big assumptions about interactive
+    // elements on the page. Some want to hide interactive elements
+    // after use. So we need to make sure the button stays displayed
+    // the way it was originally displayed - without the inline styles
+    // See: https://github.com/hypothesis/client/issues/137
+<span class="cstat-no" title="statement not covered" >    s</span>elf.element.querySelector(ANNOTATE_BTN_SELECTOR).style.display = '';
+    // self.element.querySelector(HIGHLIGHT_BTN_SELECTOR).style.display = '';
+&nbsp;
+    // Translate the (left, top) viewport coordinates into positions relative to
+    // the adder's nearest positioned ancestor (NPA).
+    //
+    // Typically the adder is a child of the `&lt;body&gt;` and the NPA is the root
+    // `&lt;html&gt;` element. However page styling may make the `&lt;body&gt;` positioned.
+    // See https://github.com/hypothesis/client/issues/487.
+<span class="cstat-no" title="statement not covered" >    v</span>ar positionedAncestor = nearestPositionedAncestor(container);
+<span class="cstat-no" title="statement not covered" >    v</span>ar parentRect = positionedAncestor.getBoundingClientRect();
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    O</span>bject.assign(container.style, {
+      top: toPx(top - parentRect.top),
+      left: toPx(left - parentRect.left),
+    });
+<span class="cstat-no" title="statement not covered" >    s</span>elf.element.style.visibility = 'visible';
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    c</span>learTimeout(enterTimeout);
+<span class="cstat-no" title="statement not covered" >    e</span>nterTimeout = setTimeout(<span class="fstat-no" title="function not covered" >function () {</span>
+<span class="cstat-no" title="statement not covered" >      s</span>elf.element.className += ' is-active';
+    }, 1);
+  };
+}
+&nbsp;
+module.exports = {
+  ARROW_POINTING_DOWN: ARROW_POINTING_DOWN,
+  ARROW_POINTING_UP: ARROW_POINTING_UP,
+&nbsp;
+  Adder: Adder,
+};
+&nbsp;</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Fri Mar 16 2018 04:28:39 GMT+0000 (UTC)
+</div>
+</div>
+<script src="../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../sorter.js"></script>
+</body>
+</html>

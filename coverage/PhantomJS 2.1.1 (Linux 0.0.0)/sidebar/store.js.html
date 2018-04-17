@@ -1,0 +1,642 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for sidebar/store.js</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../prettify.css" />
+    <link rel="stylesheet" href="../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../index.html">all files</a> / <a href="index.html">sidebar/</a> store.js
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">92.19% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>59/64</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">78.95% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>30/38</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">94.12% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>16/17</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">91.94% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>57/62</span>
+      </div>
+      <div class='fl pad1y'>
+        <span class="strong">1 statement, 1 function, 7 branches</span>
+        <span class="quiet">Ignored</span>  &nbsp;&nbsp;&nbsp;&nbsp;
+      </div>
+    </div>
+  </div>
+  <div class='status-line high'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">9×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">9×</span>
+<span class="cline-any cline-yes">9×</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">9×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">15×</span>
+<span class="cline-any cline-yes">15×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">15×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">15×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">15×</span>
+<span class="cline-any cline-yes">15×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">15×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">165×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">15×</span>
+<span class="cline-any cline-yes">15×</span>
+<span class="cline-any cline-yes">15×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">15×</span>
+<span class="cline-any cline-yes">15×</span>
+<span class="cline-any cline-yes">15×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">15×</span>
+<span class="cline-any cline-yes">15×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">15×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">15×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">11×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">15×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">165×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">15×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">'use strict';
+&nbsp;
+var get = require('lodash.get');
+&nbsp;
+var urlUtil = require('./util/url-util');
+&nbsp;
+/**
+ * Translate the response from a failed API call into an Error-like object.
+ *
+ * The details of the response are available on the `response` property of the
+ * error.
+ */
+function translateResponseToError(response) {
+  var message;
+  if (response.status &lt;= 0) {
+    message = 'Service unreachable.';
+  } else {
+    message = response.status + ' ' + response.statusText;
+    if (response.data &amp;&amp; response.data.reason) {
+      message = message + ': ' + response.data.reason;
+    }
+  }
+  var err = new Error(message);
+  err.response = response;
+  return err;
+}
+&nbsp;
+/**
+ * Return a shallow clone of `obj` with all client-only properties removed.
+ * Client-only properties are marked by a '$' prefix.
+ */
+function stripInternalProperties(obj) {
+  var result = {};
+&nbsp;
+  for (var k in obj) {
+    if (obj.hasOwnProperty(k) &amp;&amp; k[0] !== '$') {
+      result[k] = obj[k];
+    }
+  }
+&nbsp;
+  return result;
+}
+&nbsp;
+&nbsp;
+function forEachSorted(obj, iterator, context) {
+  var keys = Object.keys(obj).sort();
+  for (var i = 0; i &lt; keys.length; i++) {
+    iterator.call(context, obj[keys[i]], keys[i]);
+  }
+  return keys;
+}
+&nbsp;
+&nbsp;
+function serializeValue(v) {
+  <span class="missing-if-branch" title="if path not taken" >I</span>if (<span class="branch-0 cbranch-no" title="branch not covered" >t</span>ypeof v === 'object') {
+<span class="cstat-no" title="statement not covered" >    r</span>eturn v instanceof Date ? v.toISOString() : JSON.stringify(v);
+  }
+  return v;
+}
+&nbsp;
+&nbsp;
+function encodeUriQuery(val) {
+  return encodeURIComponent(val).replace(/%20/g, '+');
+}
+&nbsp;
+&nbsp;
+// Serialize an object containing parameters into a form suitable for a query
+// string.
+//
+// This is an almost identical copy of the default Angular parameter serializer
+// ($httpParamSerializer), with one important change. In Angular 1.4.x
+// semicolons are not encoded in query parameter values. This is a problem for
+// us as URIs around the web may well contain semicolons, which our backend will
+// then proceed to parse as a delimiter in the query string. To avoid this
+// problem we use a very conservative encoder, found above.
+function serializeParams(params) {
+  <span class="missing-if-branch" title="if path not taken" >I</span>if (!params) {
+<span class="cstat-no" title="statement not covered" >    r</span>eturn '';
+  }
+  var parts = [];
+  forEachSorted(params, function(value, key) {
+    <span class="missing-if-branch" title="if path not taken" >I</span>if (value === null || typeof value === 'undefined') {
+<span class="cstat-no" title="statement not covered" >      r</span>eturn;
+    }
+    <span class="missing-if-branch" title="if path not taken" >I</span>if (Array.isArray(value)) {
+<span class="cstat-no" title="statement not covered" >      v</span>alue.forEach(<span class="fstat-no" title="function not covered" >function(v) {</span>
+<span class="cstat-no" title="statement not covered" >        p</span>arts.push(encodeUriQuery(key)  + '=' + encodeUriQuery(serializeValue(v)));
+      });
+    } else {
+      parts.push(encodeUriQuery(key) + '=' + encodeUriQuery(serializeValue(value)));
+    }
+  });
+&nbsp;
+  return parts.join('&amp;');
+}
+&nbsp;
+/**
+ * Creates a function that will make an API call to a named route.
+ *
+ * @param $http - The Angular HTTP service
+ * @param $q - The Angular Promises ($q) service.
+ * @param links - Object or promise for an object mapping named API routes to
+ *                URL templates and methods
+ * @param route - The dotted path of the named API route (eg. `annotation.create`)
+ * @param {Function} tokenGetter - Function which returns a Promise for an
+ *                   access token for the API.
+ */
+function createAPICall($http, $q, links, route, tokenGetter) {
+  return function (params, data) {
+    // `$q.all` is used here rather than `Promise.all` because testing code that
+    // mixes native Promises with the `$q` promises returned by `$http`
+    // functions gets awkward in tests.
+    return $q.all([links, tokenGetter()]).then(function (linksAndToken) {
+      var links = linksAndToken[0];
+      var token = linksAndToken[1];
+&nbsp;
+      var descriptor = get(links, route);
+      var url = urlUtil.replaceURLParams(descriptor.url, params);
+      var headers = {};
+&nbsp;
+      <span class="missing-if-branch" title="else path not taken" >E</span>if (token) {
+        headers.Authorization = 'Bearer ' + token;
+      }
+&nbsp;
+      var req = {
+        data: data ? stripInternalProperties(data) : null,
+        headers: headers,
+        method: descriptor.method,
+        params: url.params,
+        paramSerializer: serializeParams,
+        url: url.url,
+      };
+      return $http(req);
+    }).then(function (response) {
+      return response.data;
+    }).catch(function (response) {
+      // Translate the API result into an `Error` to follow the convention that
+      // Promises should be rejected with an Error or Error-like object.
+      //
+      // Use `$q.reject` rather than just rethrowing the Error here due to
+      // mishandling of errors thrown inside `catch` handlers in Angular &lt; 1.6
+      return $q.reject(translateResponseToError(response));
+    });
+  };
+}
+&nbsp;
+/**
+ * API client for the Hypothesis REST API.
+ *
+ * Returns an object that with keys that match the routes in
+ * the Hypothesis API (see http://h.readthedocs.io/en/latest/api/).
+ *
+ * This service handles authenticated calls to the API, using the `auth` service
+ * to get auth tokens. The URLs for API endpoints are fetched from the `/api`
+ * endpoint, a responsibility delegated to the `apiRoutes` service which does
+ * not use authentication.
+ */
+// @ngInject
+function store($http, $q, apiRoutes, auth) {
+  var links = apiRoutes.routes();
+  function apiCall(route) {
+    return createAPICall($http, $q, links, route, auth.tokenGetter);
+  }
+&nbsp;
+  return {
+    search: apiCall('search'),
+    annotation: {
+      create: apiCall('annotation.create'),
+      delete: apiCall('annotation.delete'),
+      get: apiCall('annotation.read'),
+      update: apiCall('annotation.update'),
+      flag: apiCall('annotation.flag'),
+      hide: apiCall('annotation.hide'),
+      unhide: apiCall('annotation.unhide'),
+    },
+    group: {
+      member: {
+        delete: apiCall('group.member.delete'),
+      },
+    },
+    profile: {
+      read: apiCall('profile.read'),
+      update: apiCall('profile.update'),
+    },
+&nbsp;
+    // The `links` endpoint is not included here. Clients should fetch these
+    // from the `apiRoutes` service.
+  };
+}
+&nbsp;
+module.exports = store;
+&nbsp;</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Fri Mar 16 2018 04:28:39 GMT+0000 (UTC)
+</div>
+</div>
+<script src="../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../sorter.js"></script>
+</body>
+</html>

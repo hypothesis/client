@@ -1,0 +1,387 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for annotator/anchoring/xpath.coffee</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../prettify.css" />
+    <link rel="stylesheet" href="../../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../../index.html">all files</a> / <a href="index.html">annotator/anchoring/</a> xpath.coffee
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">70.83% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>51/72</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">33.33% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>6/18</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">22.22% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>2/9</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">34.38% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>11/32</span>
+      </div>
+      <div class='fl pad1y'>
+        <span class="strong">30 statements, 3 branches</span>
+        <span class="quiet">Ignored</span>  &nbsp;&nbsp;&nbsp;&nbsp;
+      </div>
+    </div>
+  </div>
+  <div class='status-line medium'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">49×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">66×</span>
+<span class="cline-any cline-yes">66×</span>
+<span class="cline-any cline-yes">66×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">104×</span>
+<span class="cline-any cline-yes">104×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">104×</span>
+<span class="cline-any cline-yes">104×</span>
+<span class="cline-any cline-yes">104×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">49×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js"># Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+# THE SOFTWARE.
+#
+# This is a modified copy of
+# https://github.com/openannotation/annotator/blob/v1.2.x/src/xpath.coffee
+&nbsp;
+$ = require('jquery')
+&nbsp;
+# A simple XPath evaluator using jQuery which can evaluate queries of
+simpleXPathJQuery = (relativeRoot) -&gt;
+  jq = this.map -&gt;
+    path = ''
+    elem = this
+&nbsp;
+    while e</span>lem?.<span class="branch-1 cbranch-no" title="branch not covered" >nodeType == Node.ELEMENT_NODE and elem isnt relativeRoot
+      tagName = elem.tagName.replace(":", "\\:")
+      idx = $(elem.parentNode).children(tagName).index(elem) + 1
+&nbsp;
+      idx  = "[#{idx}]"
+      path = "/" + elem.tagName.toLowerCase() + idx + path
+      elem = elem.parentNode
+&nbsp;
+    path
+&nbsp;
+  jq.get()
+&nbsp;
+# A simple XPath evaluator using only standard DOM methods which can
+# evaluate queries of the form /tag[index]/tag[index].
+simpleXPathPure = <span class="fstat-no" title="function not covered" >(relativeRoot) -&gt;</span>
+&nbsp;
+  getPathSegment = <span class="fstat-no" title="function not covered" >(node) -&gt;</span>
+<span class="cstat-no" title="statement not covered" >    name = g</span>etNodeName node
+<span class="cstat-no" title="statement not covered" >    pos = g</span>etNodePosition node
+    "#{name}[#{pos}]"
+&nbsp;
+<span class="cstat-no" title="statement not covered" >  rootNode = r</span>elativeRoot
+&nbsp;
+  getPathTo = <span class="fstat-no" title="function not covered" >(node) -&gt;</span>
+<span class="cstat-no" title="statement not covered" >    xpath = '</span>';
+    while node != rootNode
+      unless node?
+        throw new Error "Called getPathTo on a node which was not a descendant of @rootNode. " + rootNode
+<span class="cstat-no" title="statement not covered" >      xpath = (getPathSegment node) + '/' + x</span>path
+<span class="cstat-no" title="statement not covered" >      node = node.parentNode</span>
+<span class="cstat-no" title="statement not covered" >    xpath = '/' + x</span>path
+<span class="cstat-no" title="statement not covered" >    xpath = x</span>path.replace /\/$/, ''
+    xpath
+&nbsp;
+<span class="cstat-no" title="statement not covered" >  jq = t</span>his.map <span class="fstat-no" title="function not covered" >-&gt;</span>
+<span class="cstat-no" title="statement not covered" >    path = g</span>etPathTo this
+&nbsp;
+    path
+&nbsp;
+  jq.get()
+&nbsp;
+findChild = <span class="fstat-no" title="function not covered" >(node, type, index) -&gt;</span>
+  unless node.hasChildNodes()
+    throw new Error "XPath error: node has no children!"
+<span class="cstat-no" title="statement not covered" >  children = node.c</span>hildNodes
+<span class="cstat-no" title="statement not covered" >  found = 0</span>
+  for child in children
+<span class="cstat-no" title="statement not covered" >    name = g</span>etNodeName child
+<span class="cstat-no" title="statement not covered" >    if name is type</span>
+<span class="cstat-no" title="statement not covered" >      found += 1</span>
+<span class="cstat-no" title="statement not covered" >      if found is index</span>
+        return child
+  throw new Error "XPath error: wanted child not found."
+&nbsp;
+# Get the node name for use in generating an xpath expression.
+getNodeName = <span class="fstat-no" title="function not covered" >(node) -&gt;</span>
+<span class="cstat-no" title="statement not covered" >    nodeName = n</span>ode.nodeName.toLowerCase()
+    switch nodeName
+      when "#text" then return "text()"
+      when "#comment" then return "comment()"
+      when "#cdata-section" then return "cdata-section()"
+      else return nodeName
+&nbsp;
+# Get the index of the node as it appears in its parent's child list
+getNodePosition = <span class="fstat-no" title="function not covered" >(node) -&gt;</span>
+<span class="cstat-no" title="statement not covered" >  pos = 0</span>
+<span class="cstat-no" title="statement not covered" >  tmp = n</span>ode
+  while tmp
+<span class="cstat-no" title="statement not covered" >    i</span>f tmp.nodeName is node.nodeName
+      pos++
+<span class="cstat-no" title="statement not covered" >    tmp = tmp.previousSibling</span>
+  pos
+&nbsp;
+module.exports = {
+  simpleXPathJQuery,
+  simpleXPathPure,
+}
+&nbsp;</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Fri Mar 16 2018 04:28:39 GMT+0000 (UTC)
+</div>
+</div>
+<script src="../../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../../sorter.js"></script>
+</body>
+</html>

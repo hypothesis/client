@@ -1,0 +1,792 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for sidebar/search-filter.js</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../prettify.css" />
+    <link rel="stylesheet" href="../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../index.html">all files</a> / <a href="index.html">sidebar/</a> search-filter.js
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">90.6% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>135/149</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">79.45% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>58/73</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">100% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>11/11</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">94.62% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>88/93</span>
+      </div>
+      <div class='fl pad1y'>
+        <span class="strong">20 statements, 1 function, 13 branches</span>
+        <span class="quiet">Ignored</span>  &nbsp;&nbsp;&nbsp;&nbsp;
+      </div>
+    </div>
+  </div>
+  <div class='status-line high'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194
+195
+196
+197
+198
+199
+200
+201
+202
+203
+204
+205
+206
+207
+208
+209
+210
+211
+212
+213
+214
+215
+216
+217
+218
+219
+220
+221
+222
+223
+224
+225
+226
+227
+228
+229
+230
+231
+232
+233
+234
+235
+236
+237
+238
+239
+240
+241
+242</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">61×</span>
+<span class="cline-any cline-yes">61×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">61×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">43×</span>
+<span class="cline-any cline-yes">43×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">18×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">19×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">19×</span>
+<span class="cline-any cline-yes">69×</span>
+<span class="cline-any cline-yes">69×</span>
+<span class="cline-any cline-yes">69×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">69×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">19×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">19×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">40×</span>
+<span class="cline-any cline-yes">40×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">40×</span>
+<span class="cline-any cline-yes">29×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">19×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">21×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">21×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">15×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">21×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">21×</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">21×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">14×</span>
+<span class="cline-any cline-yes">14×</span>
+<span class="cline-any cline-yes">14×</span>
+<span class="cline-any cline-yes">14×</span>
+<span class="cline-any cline-yes">14×</span>
+<span class="cline-any cline-yes">14×</span>
+<span class="cline-any cline-yes">14×</span>
+<span class="cline-any cline-yes">14×</span>
+<span class="cline-any cline-yes">14×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">14×</span>
+<span class="cline-any cline-yes">14×</span>
+<span class="cline-any cline-yes">19×</span>
+<span class="cline-any cline-yes">19×</span>
+<span class="cline-any cline-yes">19×</span>
+<span class="cline-any cline-yes">19×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">14×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">'use strict';
+&nbsp;
+/**
+ * Splits a search term into filter and data.
+ *
+ * ie. 'user:johndoe' -&gt; ['user', 'johndoe']
+ *     'example:text' -&gt; [null, 'example:text']
+ */
+function splitTerm(term) {
+  var filter = term.slice(0, term.indexOf(':'));
+  <span class="missing-if-branch" title="if path not taken" >I</span>if (!filter) {
+    // The whole term is data
+<span class="cstat-no" title="statement not covered" >    r</span>eturn [null, term];
+  }
+&nbsp;
+  if (['group', 'quote', 'result', 'since',
+       'tag', 'text', 'uri', 'user'].includes(filter)) {
+    var data = term.slice(filter.length+1);
+    return [filter, data];
+  } else {
+    // The filter is not a power search filter, so the whole term is data
+    return [null, term];
+  }
+}
+&nbsp;
+/**
+ * Tokenize a search query.
+ *
+ * Splits `searchtext` into tokens, separated by spaces.
+ * Quoted phrases in `searchtext` are returned as a single token.
+ */
+function tokenize(searchtext) {
+  <span class="missing-if-branch" title="if path not taken" >I</span>if (!searchtext) { <span class="cstat-no" title="statement not covered" >r</span>eturn []; }
+&nbsp;
+  // Small helper function for removing quote characters
+  // from the beginning- and end of a string, if the
+  // quote characters are the same.
+  // I.e.
+  //   'foo' -&gt; foo
+  //   "bar" -&gt; bar
+  //   'foo" -&gt; 'foo"
+  //   bar"  -&gt; bar"
+  var _removeQuoteCharacter = function(text) {
+    var start = text.slice(0,1);
+    var end = text.slice(-1);
+    <span class="missing-if-branch" title="if path not taken" >I</span>i</span>f (((start === '"') || (start === "'")) &amp;&amp; (<span class="branch-2 cbranch-no" title="branch not covered" >start === end)) {
+<span class="cstat-no" title="statement not covered" >      t</span>ext = text.slice(1, text.length - 1);
+    }
+    return text;
+  };
+&nbsp;
+  var tokens = searchtext.match(/(?:[^\s"']+|"[^"]*"|'[^']*')+/g);
+&nbsp;
+  // Cut the opening and closing quote characters
+  tokens = tokens.map(_removeQuoteCharacter);
+&nbsp;
+  // Remove quotes for power search.
+  // I.e. 'tag:"foo bar"' -&gt; 'tag:foo bar'
+  for (var index = 0; index &lt; tokens.length; index++) {
+    var token = tokens[index];
+    var [filter, data] = splitTerm(token);
+    if (filter) {
+      tokens[index] = filter + ':' + (_removeQuoteCharacter(data));
+    }
+  }
+&nbsp;
+  return tokens;
+}
+&nbsp;
+/**
+ * Parse a search query into a map of search field to term.
+ *
+ * @param {string} searchtext
+ * @return {Object}
+ */
+function toObject(searchtext) {
+  var obj = {};
+  var backendFilter = f =&gt; f</span> === 'tag' ? <span class="branch-0 cbranch-no" title="branch not covered" >'tags' : f;
+&nbsp;
+  var addToObj = function(key, data) {
+    if (obj[key]) {
+      return obj[key].push(data);
+    } else {
+      return obj[key] = [data];
+    }
+  };
+&nbsp;
+  <span class="missing-if-branch" title="else path not taken" >E</span>if (searchtext) <span class="cstat-no" title="statement not covered" ><span class="cstat-no" title="statement not covered" ><span class="cstat-no" title="statement not covered" ><span class="cstat-no" title="statement not covered" ><span class="missing-if-branch" title="if path not taken" >I</span><span class="branch-1 cbranch-no" title="branch not covered" ><span class="missing-if-branch" title="if path not taken" >I</span>{</span></span></span></span></span>
+    var terms = tokenize(searchtext);
+    for (var term of terms) {
+      var [filter, data] = splitTerm(term);
+      if (!filter) {
+        filter = 'any';
+        data = term;
+      }
+      addToObj(backendFilter(filter), data);
+    }
+  }
+  return obj;
+}
+&nbsp;
+/**
+ * @typedef Facet
+ * @property {'and'|'or'|'min'} operator
+ * @property {boolean} lowercase
+ * @property {string[]} terms
+ */
+&nbsp;
+/**
+ * Parse a search query into a map of filters.
+ *
+ * Returns an object mapping facet names to Facet.
+ *
+ * Terms that are not associated with a particular facet are stored in the "any"
+ * facet.
+ *
+ * @param {string} searchtext
+ * @return {Object}
+ */
+function generateFacetedFilter(searchtext) {
+  var terms;
+  var any = [];
+  var quote = [];
+  var result = [];
+  var since = [];
+  var tag = [];
+  var text = [];
+  var uri = [];
+  var user = [];
+&nbsp;
+  <span class="missing-if-branch" title="else path not taken" >E</span>if (searchtext) <span class="cstat-no" title="statement not covered" ><span class="cstat-no" title="statement not covered" ><span class="cstat-no" title="statement not covered" ><span class="cstat-no" title="statement not covered" ><span class="missing-if-branch" title="if path not taken" >I</span><span class="branch-1 cbranch-no" title="branch not covered" ><span class="missing-if-branch" title="if path not taken" >I</span>{</span></span></span></span></span>
+    terms = tokenize(searchtext);
+    for (var term of terms) {
+      var t;
+      var filter = term.slice(0, term.indexOf(':'));
+      switch (filter) {
+      case 'quote':
+        quote.push(term.slice(6));
+        break;
+<span class="branch-1 cbranch-no" title="branch not covered" >      case 'result':</span>
+<span class="cstat-no" title="statement not covered" >        r</span>esult.push(term.slice(7));
+<span class="cstat-no" title="statement not covered" >        b</span>reak;
+      case 'since':
+        {
+          // We'll turn this into seconds
+          let time = term.slice(6).toLowerCase();
+          <span class="missing-if-branch" title="if path not taken" >I</span>if (time.match(/^\d+$/)) {
+            // Only digits, assuming seconds
+<span class="cstat-no" title="statement not covered" >            s</span>ince.push(time * 1);
+          }
+          if (time.match(/^\d+sec$/)) {
+            // Time given in seconds
+            t = /^(\d+)sec$/.exec(time)[1];
+            since.push(t * 1);
+          }
+          if (time.match(/^\d+min$/)) {
+            // Time given in minutes
+            t = /^(\d+)min$/.exec(time)[1];
+            since.push(t * 60);
+          }
+          if (time.match(/^\d+hour$/)) {
+            // Time given in hours
+            t = /^(\d+)hour$/.exec(time)[1];
+            since.push(t * 60 * 60);
+          }
+          if (time.match(/^\d+day$/)) {
+            // Time given in days
+            t = /^(\d+)day$/.exec(time)[1];
+            since.push(t * 60 * 60 * 24);
+          }
+          if (time.match(/^\d+week$/)) {
+            // Time given in week
+            t = /^(\d+)week$/.exec(time)[1];
+            since.push(t * 60 * 60 * 24 * 7);
+          }
+          if (time.match(/^\d+month$/)) {
+            // Time given in month
+            t = /^(\d+)month$/.exec(time)[1];
+            since.push(t * 60 * 60 * 24 * 30);
+          }
+          if (time.match(/^\d+year$/)) {
+            // Time given in year
+            t = /^(\d+)year$/.exec(time)[1];
+            since.push(t * 60 * 60 * 24 * 365);
+          }
+        }
+        break;
+      case 'tag': tag.push(term.slice(4)); break;
+      case 'text': text.push(term.slice(5)); break;
+      case 'uri': uri.push(term.slice(4)); break;
+      case 'user': user.push(term.slice(5)); break;
+      default: any.push(term);
+      }
+    }
+  }
+&nbsp;
+  return {
+    any: {
+      terms: any,
+      operator: 'and',
+    },
+    quote: {
+      terms: quote,
+      operator: 'and',
+    },
+    result: {
+      terms: result,
+      operator: 'min',
+    },
+    since: {
+      terms: since,
+      operator: 'and',
+    },
+    tag: {
+      terms: tag,
+      operator: 'and',
+    },
+    text: {
+      terms: text,
+      operator: 'and',
+    },
+    uri: {
+      terms: uri,
+      operator: 'or',
+    },
+    user: {
+      terms: user,
+      operator: 'or',
+    },
+  };
+}
+&nbsp;
+// @ngInject
+function searchFilter() {
+  return {
+    toObject,
+    generateFacetedFilter,
+  };
+}
+&nbsp;
+module.exports = searchFilter;
+&nbsp;</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Fri Mar 16 2018 04:28:39 GMT+0000 (UTC)
+</div>
+</div>
+<script src="../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../sorter.js"></script>
+</body>
+</html>

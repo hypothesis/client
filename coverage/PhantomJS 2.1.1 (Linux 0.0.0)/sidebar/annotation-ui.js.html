@@ -1,0 +1,458 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for sidebar/annotation-ui.js</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../prettify.css" />
+    <link rel="stylesheet" href="../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../index.html">all files</a> / <a href="index.html">sidebar/</a> annotation-ui.js
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">100% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>23/23</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">100% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>2/2</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">80% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>4/5</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">100% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>23/23</span>
+      </div>
+    </div>
+  </div>
+  <div class='status-line high'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">115×</span>
+<span class="cline-any cline-yes">115×</span>
+<span class="cline-any cline-yes">173×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">173×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">171×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">115×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">115×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">115×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">115×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">115×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">'use strict';
+&nbsp;
+/**
+ * AnnotationUI is the central store of state for the sidebar application,
+ * managed using [Redux](http://redux.js.org/).
+ *
+ * State management in Redux apps work as follows:
+ *
+ *  1. All important application state is stored in a single, immutable object.
+ *  2. The user interface is a presentation of this state. Interaction with the
+ *     UI triggers updates by creating `actions`.
+ *  3. Actions are plain JS objects which describe some event that happened in
+ *     the application. Updates happen by passing actions to a `reducer`
+ *     function which takes the current application state, the action and
+ *     returns the new application state.
+ *
+ *     The process of updating the app state using an action is known as
+ *     'dispatching' the action.
+ *  4. Other parts of the app can subscribe to changes in the app state.
+ *     This is used to to update the UI etc.
+ *
+ * "middleware" functions can wrap the dispatch process in order to implement
+ *  logging, trigger side effects etc.
+ *
+ * Tests for a given action consist of:
+ *
+ *  1. Checking that the UI (or other event source) dispatches the correct
+ *     action when something happens.
+ *  2. Checking that given an initial state, and an action, a reducer returns
+ *     the correct resulting state.
+ *  3. Checking that the UI correctly presents a given state.
+ */
+&nbsp;
+var redux = require('redux');
+&nbsp;
+// `.default` is needed because 'redux-thunk' is built as an ES2015 module
+var thunk = require('redux-thunk').default;
+&nbsp;
+var reducers = require('./reducers');
+var annotationsReducer = require('./reducers/annotations');
+var framesReducer = require('./reducers/frames');
+var linksReducer = require('./reducers/links');
+var selectionReducer = require('./reducers/selection');
+var sessionReducer = require('./reducers/session');
+var viewerReducer = require('./reducers/viewer');
+var util = require('./reducers/util');
+&nbsp;
+var debugMiddleware = require('./reducers/debug-middleware');
+&nbsp;
+/**
+ * Redux middleware which triggers an Angular change-detection cycle
+ * if no cycle is currently in progress.
+ *
+ * This ensures that Angular UI components are updated after the UI
+ * state changes in response to external inputs (eg. WebSocket messages,
+ * messages arriving from other frames in the page, async network responses).
+ *
+ * See http://redux.js.org/docs/advanced/Middleware.html
+ */
+function angularDigestMiddleware($rootScope) {
+  return function (next) {
+    return function (action) {
+      next(action);
+&nbsp;
+      // '$$phase' is set if Angular is in the middle of a digest cycle already
+      if (!$rootScope.$$phase) {
+        // $applyAsync() is similar to $apply() but provides debouncing.
+        // See http://stackoverflow.com/questions/30789177
+        $rootScope.$applyAsync(<span class="fstat-no" title="function not covered" >function () {</span>});
+      }
+    };
+  };
+}
+&nbsp;
+// @ngInject
+module.exports = function ($rootScope, settings) {
+  var enhancer = redux.applyMiddleware(
+    // The `thunk` middleware handles actions which are functions.
+    // This is used to implement actions which have side effects or are
+    // asynchronous (see https://github.com/gaearon/redux-thunk#motivation)
+    thunk,
+    debugMiddleware,
+    angularDigestMiddleware.bind(null, $rootScope)
+  );
+  var store = redux.createStore(reducers.update, reducers.init(settings),
+    enhancer);
+&nbsp;
+  // Expose helper functions that create actions as methods of the
+  // `annotationUI` service to make using them easier from app code. eg.
+  //
+  // Instead of:
+  //   annotationUI.dispatch(annotations.actions.addAnnotations(annotations))
+  // You can use:
+  //   annotationUI.addAnnotations(annotations)
+  //
+  var actionCreators = redux.bindActionCreators(Object.assign({},
+    annotationsReducer.actions,
+    framesReducer.actions,
+    linksReducer.actions,
+    selectionReducer.actions,
+    sessionReducer.actions,
+    viewerReducer.actions
+  ), store.dispatch);
+&nbsp;
+  // Expose selectors as methods of the `annotationUI` to make using them easier
+  // from app code.
+  //
+  // eg. Instead of:
+  //   selection.isAnnotationSelected(annotationUI.getState(), id)
+  // You can use:
+  //   annotationUI.isAnnotationSelected(id)
+  var selectors = util.bindSelectors({
+    isAnnotationSelected: selectionReducer.isAnnotationSelected,
+    hasSelectedAnnotations: selectionReducer.hasSelectedAnnotations,
+&nbsp;
+    annotationExists: annotationsReducer.annotationExists,
+    findAnnotationByID: annotationsReducer.findAnnotationByID,
+    findIDsForTags: annotationsReducer.findIDsForTags,
+    savedAnnotations: annotationsReducer.savedAnnotations,
+&nbsp;
+    frames: framesReducer.frames,
+    searchUris: framesReducer.searchUris,
+&nbsp;
+    isSidebar: viewerReducer.isSidebar,
+&nbsp;
+    isFeatureEnabled: sessionReducer.isFeatureEnabled,
+    profile: sessionReducer.profile,
+  }, store.getState);
+&nbsp;
+  return Object.assign(store, actionCreators, selectors);
+};
+&nbsp;</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Fri Mar 16 2018 04:28:39 GMT+0000 (UTC)
+</div>
+</div>
+<script src="../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../sorter.js"></script>
+</body>
+</html>

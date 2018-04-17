@@ -1,0 +1,696 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for annotator/plugin/document.coffee</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../prettify.css" />
+    <link rel="stylesheet" href="../../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../../index.html">all files</a> / <a href="index.html">annotator/plugin/</a> document.coffee
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">97.42% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>189/194</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">80.56% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>58/72</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">96% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>24/25</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">94.03% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>63/67</span>
+      </div>
+      <div class='fl pad1y'>
+        <span class="strong">11 statements, 1 function, 6 branches</span>
+        <span class="quiet">Ignored</span>  &nbsp;&nbsp;&nbsp;&nbsp;
+      </div>
+    </div>
+  </div>
+  <div class='status-line high'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194
+195
+196
+197
+198
+199
+200
+201
+202
+203
+204
+205
+206
+207
+208
+209
+210</td><td class="line-coverage quiet"><span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">33×</span>
+<span class="cline-any cline-yes">33×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">9×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">83×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">33×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">33×</span>
+<span class="cline-any cline-yes">33×</span>
+<span class="cline-any cline-yes">33×</span>
+<span class="cline-any cline-yes">33×</span>
+<span class="cline-any cline-yes">33×</span>
+<span class="cline-any cline-yes">33×</span>
+<span class="cline-any cline-yes">33×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">33×</span>
+<span class="cline-any cline-yes">33×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">198×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2574×</span>
+<span class="cline-any cline-yes">2574×</span>
+<span class="cline-any cline-yes">2574×</span>
+<span class="cline-any cline-yes">1848×</span>
+<span class="cline-any cline-yes">1848×</span>
+<span class="cline-any cline-yes">363×</span>
+<span class="cline-any cline-yes">363×</span>
+<span class="cline-any cline-yes">33×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">330×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">33×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">33×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">283×</span>
+<span class="cline-any cline-yes">283×</span>
+<span class="cline-any cline-yes">283×</span>
+<span class="cline-any cline-yes">283×</span>
+<span class="cline-any cline-yes">283×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">66×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">33×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">99×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">151×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">33×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">99×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">33×</span>
+<span class="cline-any cline-yes">33×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">99×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">66×</span>
+<span class="cline-any cline-yes">33×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">33×</span>
+<span class="cline-any cline-yes">33×</span>
+<span class="cline-any cline-yes">33×</span>
+<span class="cline-any cline-yes">33×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">33×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">33×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">33×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">283×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">353×</span>
+<span class="cline-any cline-yes">353×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">42×</span>
+<span class="cline-any cline-yes">42×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">$ = require('jquery')
+Plugin = require('../plugin')
+&nbsp;
+baseURI = require('document-base-uri')
+&nbsp;
+###
+** Adapted from:
+** https://github.com/openannotation/annotator/blob/v1.2.x/src/plugin/document.coffee
+**
+** Annotator v1.2.10
+** https://github.com/openannotation/annotator
+**
+** Copyright 2015, the Annotator project contributors.
+** Dual licensed under the MIT and GPLv3 licenses.
+** https://github.com/openannotation/annotator/blob/master/LICENSE
+###
+&nbsp;
+module.exports = class Document extends Plugin
+&nbsp;
+  events:
+    'beforeAnnotationCreated': 'beforeAnnotationCreated'
+&nbsp;
+  pluginInit: -&gt;
+    # Test seams.
+    @baseURI = @options.baseURI or baseURI
+    @document = @options.document or document
+&nbsp;
+    this.getDocumentMetadata()
+&nbsp;
+# returns the primary URI for the document being annotated
+&nbsp;
+  uri: =&gt;
+    uri = decodeURIComponent(this._getDocumentHref())
+    for link in @metadata.link
+      if link.rel == "canonical"
+        uri = link.href
+    return uri
+&nbsp;
+# returns all uris for the document being annotated
+&nbsp;
+  uris: =&gt;
+    uniqueUrls = {}
+    for link in @metadata.link
+      <span class="missing-if-branch" title="else path not taken" >E</span>uniqueUrls[link.href] = true if link.href
+    return (href for href of uniqueUrls)
+&nbsp;
+  beforeAnnotationCreated: <span class="fstat-no" title="function not covered" >(</span>annotation) =&gt;
+    annotation.document = @metadata
+&nbsp;
+  getDocumentMetadata: =&gt;
+    @metadata = {}
+&nbsp;
+    # first look for some common metadata types
+    # TODO: look for microdata/rdfa?
+    this._getHighwire()
+    this._getDublinCore()
+    this._getFacebook()
+    this._getEprints()
+    this._getPrism()
+    this._getTwitter()
+    this._getFavicon()
+&nbsp;
+    # extract out/normalize some things
+    this._getTitle()
+    this._getLinks()
+&nbsp;
+    return @metadata
+&nbsp;
+  _getHighwire: =&gt;
+    return @metadata.highwire = this._getMetaTags("citation", "name", "_")
+&nbsp;
+  _getFacebook: =&gt;
+    return @metadata.facebook = this._getMetaTags("og", "property", ":")
+&nbsp;
+  _getTwitter: =&gt;
+    return @metadata.twitter = this._getMetaTags("twitter", "name", ":")
+&nbsp;
+  _getDublinCore: =&gt;
+    return @metadata.dc = this._getMetaTags("dc", "name", ".")
+&nbsp;
+  _getPrism: =&gt;
+    return @metadata.prism = this._getMetaTags("prism", "name", ".")
+&nbsp;
+  _getEprints: =&gt;
+    return @metadata.eprints = this._getMetaTags("eprints", "name", ".")
+&nbsp;
+  _getMetaTags: (prefix, attribute, delimiter) =&gt;
+    tags = {}
+    for meta in $("meta")
+      name = $(meta).attr(attribute)
+      content = $(meta).prop("content")
+      if name
+        match = name.match(RegExp("^#{prefix}#{delimiter}(.+)$", "i"))
+        if match
+          n = match[1]
+          if tags[n]
+            tags[n].push(content)
+          else
+            tags[n] = [content]
+    return tags
+&nbsp;
+  _getTitle: =&gt;
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="else path not taken" >E</span>if @metadata.highwire.title</span>
+      @metadata.title = @metadata.highwire.title[0]
+    else <span class="cstat-no" title="statement not covered" >if @metadata.eprints.title</span>
+      @metadata.title = @metadata.eprints.title[0]
+    else <span class="cstat-no" title="statement not covered" >if @metadata.prism.title</span>
+      @metadata.title = @metadata.prism.title[0]
+    else <span class="cstat-no" title="statement not covered" >if @metadata.facebook.title</span>
+      @metadata.title = @metadata.facebook.title[0]
+    else <span class="cstat-no" title="statement not covered" >if @metadata.twitter.title</span>
+      @metadata.title = @metadata.twitter.title[0]
+    else if @metadata.dc.title
+      @metadata.title = @metadata.dc.title[0]
+    else
+      @metadata.title = $("head title").text()
+&nbsp;
+  _getLinks: =&gt;
+# we know our current location is a link for the document
+    @metadata.link = [href: this._getDocumentHref()]
+&nbsp;
+    # look for some relevant link relations
+    for link in $("link")
+      l = $(link)
+      href = this._absoluteUrl(l.prop('href')) # get absolute url
+      rel = l.prop('rel')
+      type = l.prop('type')
+      lang = l.prop('hreflang')
+&nbsp;
+      if rel not in ["alternate", "canonical", "bookmark", "shortlink"] then continue
+&nbsp;
+      if rel is 'alternate'
+# Ignore feeds resources
+        if type and type.match /^application\/(rss|atom)\+xml/ then continue
+        # Ignore alternate languages
+        if lang then continue
+&nbsp;
+      @metadata.link.push(href: href, rel: rel, type: type)
+&nbsp;
+    # look for links in scholar metadata
+    for name, values of @metadata.highwire
+&nbsp;
+      if name == "pdf_url"
+        for url in values
+          @metadata.link.push
+            href: this._absoluteUrl(url)
+            type: "application/pdf"
+&nbsp;
+      # kind of a hack to express DOI identifiers as links but it's a
+      # convenient place to look them up later, and somewhat sane since
+      # they don't have a type
+&nbsp;
+      if name == "doi"
+        for doi in values
+          <span class="missing-if-branch" title="else path not taken" >E</span>if doi[0..3] != "doi:"
+            doi = "doi:" + doi
+          @metadata.link.push(href: doi)
+&nbsp;
+    # look for links in dublincore data
+    for name, values of @metadata.dc
+      if name == "identifier"
+        for id in values
+          if id[0..3] == "doi:"
+            @metadata.link.push(href: id)
+&nbsp;
+    # look for a link to identify the resource in dublincore metadata
+    dcRelationValues = @metadata.dc['relation.ispartof']
+    dcIdentifierValues = @metadata.dc['identifier']
+    <span class="missing-if-branch" title="else path not taken" >E</span>if dcRelationValues &amp;&amp; dcIdentifierValues
+      dcUrnRelationComponent =
+        dcRelationValues[dcRelationValues.length - 1]
+      dcUrnIdentifierComponent =
+        dcIdentifierValues[dcIdentifierValues.length - 1]
+      dcUrn = 'urn:x-dc:' +
+        encodeURIComponent(dcUrnRelationComponent) + '/' +
+        encodeURIComponent(dcUrnIdentifierComponent)
+      @metadata.link.push(href: dcUrn)
+      # set this as the documentFingerprint as a hint to include this in search queries
+      @metadata.documentFingerprint = dcUrn
+&nbsp;
+  _getFavicon: =&gt;
+    for link in $("link")
+      if $(link).prop("rel") in ["shortcut icon", "icon"]
+        @metadata["favicon"] = this._absoluteUrl(link.href)
+&nbsp;
+  # Hack to get a absolute url from a possibly relative one
+  _absoluteUrl: (url) -&gt;
+    d = @document.createElement('a')
+    d.href = url
+    d.href
+&nbsp;
+  # Get the true URI record when it's masked via a different protocol.
+  # This happens when an href is set with a uri using the 'blob:' protocol
+  # but the document can set a different uri through a &lt;base&gt; tag.
+  _getDocumentHref: -&gt;
+    href = @document.location.href
+    allowedSchemes = ['http:', 'https:', 'file:']
+&nbsp;
+    # Use the current document location if it has a recognized scheme.
+    if new URL(href).protocol in allowedSchemes
+      return href
+&nbsp;
+    # Otherwise, try using the location specified by the &lt;base&gt; element.
+    if @baseURI and (new URL(@baseURI).protocol in allowedSchemes)
+      return @baseURI
+&nbsp;
+    # Fall back to returning the document URI, even though the scheme is not
+    # in the allowed list.
+    return href
+&nbsp;</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Fri Mar 16 2018 04:28:39 GMT+0000 (UTC)
+</div>
+</div>
+<script src="../../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../../sorter.js"></script>
+</body>
+</html>

@@ -1,0 +1,578 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for annotator/annotation-sync.js</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../prettify.css" />
+    <link rel="stylesheet" href="../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../index.html">all files</a> / <a href="index.html">annotator/</a> annotation-sync.js
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">63.22% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>55/87</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">50% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>10/20</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">71.43% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>15/21</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">63.22% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>55/87</span>
+      </div>
+    </div>
+  </div>
+  <div class='status-line medium'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-yes">14×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">22×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">22×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">22×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">22×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">22×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">22×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">22×</span>
+<span class="cline-any cline-yes">12×</span>
+<span class="cline-any cline-yes">11×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">22×</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">22×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">22×</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">'use strict';
+&nbsp;
+// AnnotationSync listens for messages from the sidebar app indicating that
+// annotations have been added or removed and relays them to Guest.
+//
+// It also listens for events from Guest when new annotations are created or
+// annotations successfully anchor and relays these to the sidebar app.
+function AnnotationSync(bridge, options) {
+  var self = this;
+&nbsp;
+  this.bridge = bridge;
+&nbsp;
+  <span class="missing-if-branch" title="if path not taken" >I</span>if (!options.on) {
+<span class="cstat-no" title="statement not covered" >    t</span>hrow new Error('options.on unspecified for AnnotationSync.');
+  }
+&nbsp;
+  <span class="missing-if-branch" title="if path not taken" >I</span>if (!options.emit) {
+<span class="cstat-no" title="statement not covered" >    t</span>hrow new Error('options.emit unspecified for AnnotationSync.');
+  }
+&nbsp;
+  this.cache = {};
+&nbsp;
+  this._on = options.on;
+  this._emit = options.emit;
+&nbsp;
+  // Listen locally for interesting events
+  Object.keys(this._eventListeners).forEach(function(eventName) {
+    var listener = self._eventListeners[eventName];
+    self._on(eventName, function(annotation) {
+      listener.apply(self, [annotation]);
+    });
+  });
+&nbsp;
+  // Register remotely invokable methods
+  Object.keys(this._channelListeners).forEach(function(eventName) {
+    self.bridge.on(eventName, function(data, callbackFunction) {
+      var listener = self._channelListeners[eventName];
+      listener.apply(self, [data, callbackFunction]);
+    });
+  });
+}
+&nbsp;
+// Cache of annotations which have crossed the bridge for fast, encapsulated
+// association of annotations received in arguments to window-local copies.
+AnnotationSync.prototype.cache = null;
+&nbsp;
+AnnotationSync.prototype.sync = <span class="fstat-no" title="function not covered" >function(annotations) {</span>
+<span class="cstat-no" title="statement not covered" >  a</span>nnotations = (<span class="fstat-no" title="function not covered" >function() {</span>
+<span class="cstat-no" title="statement not covered" >    v</span>ar i;
+<span class="cstat-no" title="statement not covered" >    v</span>ar formattedAnnotations = [];
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    for (i = 0; i &lt; annotations.length; i++) {</span>
+<span class="cstat-no" title="statement not covered" >      f</span>ormattedAnnotations.push(this._format(annotations[i]));
+    }
+<span class="cstat-no" title="statement not covered" >    r</span>eturn formattedAnnotations;
+  }).call(this);
+<span class="cstat-no" title="statement not covered" >  t</span>his.bridge.call('sync', annotations, (<span class="fstat-no" title="function not covered" >function(_this) {</span>
+<span class="cstat-no" title="statement not covered" >    r</span>eturn <span class="fstat-no" title="function not covered" >function(err, annotations) {</span>
+<span class="cstat-no" title="statement not covered" >      v</span>ar i;
+<span class="cstat-no" title="statement not covered" >      v</span>ar parsedAnnotations = [];
+<span class="cstat-no" title="statement not covered" >      a</span>nnotations = annotations || [];
+&nbsp;
+<span class="cstat-no" title="statement not covered" >      for (i = 0; i &lt; annotations.length; i++) {</span>
+<span class="cstat-no" title="statement not covered" >        p</span>arsedAnnotations.push(_this._parse(annotations[i]));
+      }
+<span class="cstat-no" title="statement not covered" >      r</span>eturn parsedAnnotations;
+    };
+  })(this));
+<span class="cstat-no" title="statement not covered" >  r</span>eturn this;
+};
+&nbsp;
+// Handlers for messages arriving through a channel
+AnnotationSync.prototype._channelListeners = {
+  'deleteAnnotation': function(body, cb) {
+    var annotation = this._parse(body);
+    delete this.cache[annotation.$tag];
+    this._emit('annotationDeleted', annotation);
+    cb(null, this._format(annotation));
+  },
+  'loadAnnotations': function(bodies, cb) {
+    var annotations = (function() {
+      var i;
+      var parsedAnnotations = [];
+&nbsp;
+      for (i = 0; i &lt; bodies.length; i++) {
+        parsedAnnotations.push(this._parse(bodies[i]));
+      }
+      return parsedAnnotations;
+    }).call(this);
+    this._emit('annotationsLoaded', annotations);
+    return cb(null, annotations);
+  },
+};
+&nbsp;
+// Handlers for events coming from this frame, to send them across the channel
+AnnotationSync.prototype._eventListeners = {
+  'beforeAnnotationCreated': function(annotation) {
+    if (annotation.$tag) {
+      return undefined;
+    }
+    return this._mkCallRemotelyAndParseResults('beforeCreateAnnotation')(annotation);
+  },
+};
+&nbsp;
+AnnotationSync.prototype._mkCallRemotelyAndParseResults = function(method, callBack) {
+  return (function(_this) {
+    return function(annotation) {
+      // Wrap the callback function to first parse returned items
+      var wrappedCallback = <span class="fstat-no" title="function not covered" >function(failure, results) {</span>
+<span class="cstat-no" title="statement not covered" >        if (failure === null) {</span>
+<span class="cstat-no" title="statement not covered" >          _</span>this._parseResults(results);
+        }
+<span class="cstat-no" title="statement not covered" >        if (typeof callBack === 'function') {</span>
+<span class="cstat-no" title="statement not covered" >          c</span>allBack(failure, results);
+        }
+      };
+      // Call the remote method
+      _this.bridge.call(method, _this._format(annotation), wrappedCallback);
+    };
+  })(this);
+};
+&nbsp;
+// Parse returned message bodies to update cache with any changes made remotely
+AnnotationSync.prototype._parseResults = <span class="fstat-no" title="function not covered" >function(results) {</span>
+<span class="cstat-no" title="statement not covered" >  v</span>ar bodies;
+<span class="cstat-no" title="statement not covered" >  v</span>ar body;
+<span class="cstat-no" title="statement not covered" >  v</span>ar i;
+<span class="cstat-no" title="statement not covered" >  v</span>ar j;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >  for (i = 0; i &lt; results.length; i++) {</span>
+<span class="cstat-no" title="statement not covered" >    b</span>odies = results[i];
+<span class="cstat-no" title="statement not covered" >    b</span>odies = [].concat(bodies);
+<span class="cstat-no" title="statement not covered" >    for (j = 0; j &lt; bodies.length; j++) {</span>
+<span class="cstat-no" title="statement not covered" >      b</span>ody = bodies[j];
+<span class="cstat-no" title="statement not covered" >      if (body !== null) {</span>
+<span class="cstat-no" title="statement not covered" >        t</span>his._parse(body);
+      }
+    }
+  }
+};
+&nbsp;
+// Assign a non-enumerable tag to objects which cross the bridge.
+// This tag is used to identify the objects between message.
+AnnotationSync.prototype._tag = function(ann, tag) {
+  if (ann.$tag) {
+    return ann;
+  }
+  tag = tag || window.btoa(Math.random());
+  Object.defineProperty(ann, '$tag', {
+    value: tag,
+  });
+  this.cache[tag] = ann;
+  return ann;
+};
+&nbsp;
+// Parse a message body from a RPC call with the provided parser.
+AnnotationSync.prototype._parse = function(body) {
+  var merged = Object.assign(this.cache[body.tag] || {}, body.msg);
+  return this._tag(merged, body.tag);
+};
+&nbsp;
+// Format an annotation into an RPC message body with the provided formatter.
+AnnotationSync.prototype._format = function(ann) {
+  this._tag(ann);
+  return {
+    tag: ann.$tag,
+    msg: ann,
+  };
+};
+&nbsp;
+module.exports = AnnotationSync;
+&nbsp;</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Fri Mar 16 2018 04:28:39 GMT+0000 (UTC)
+</div>
+</div>
+<script src="../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../sorter.js"></script>
+</body>
+</html>

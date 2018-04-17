@@ -1,0 +1,602 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for sidebar/components/excerpt.js</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../prettify.css" />
+    <link rel="stylesheet" href="../../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../../index.html">all files</a> / <a href="index.html">sidebar/components/</a> excerpt.js
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">96% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>48/50</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">85% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>17/20</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">100% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>13/13</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">96% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>48/50</span>
+      </div>
+    </div>
+  </div>
+  <div class='status-line high'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">17×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">17×</span>
+<span class="cline-any cline-yes">17×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">17×</span>
+<span class="cline-any cline-yes">16×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">17×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">17×</span>
+<span class="cline-any cline-yes">102×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">17×</span>
+<span class="cline-any cline-yes">50×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">17×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">17×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">17×</span>
+<span class="cline-any cline-yes">49×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">17×</span>
+<span class="cline-any cline-yes">51×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">56×</span>
+<span class="cline-any cline-yes">56×</span>
+<span class="cline-any cline-yes">164×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">162×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">54×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">17×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">17×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">17×</span>
+<span class="cline-any cline-yes">17×</span>
+<span class="cline-any cline-yes">17×</span>
+<span class="cline-any cline-yes">17×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">17×</span>
+<span class="cline-any cline-yes">19×</span>
+<span class="cline-any cline-yes">18×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">17×</span>
+<span class="cline-any cline-yes">17×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">17×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">'use strict';
+&nbsp;
+// @ngInject
+function ExcerptController($element, $scope, ExcerptOverflowMonitor) {
+  var self = this;
+&nbsp;
+  <span class="missing-if-branch" title="else path not taken" >E</span>if (this.collapse === undefined) {
+    this.collapse = true;
+  }
+&nbsp;
+  if (this.animate === undefined) {
+    this.animate = true;
+  }
+&nbsp;
+  <span class="missing-if-branch" title="if path not taken" >I</span>if (this.enabled === undefined) {
+<span class="cstat-no" title="statement not covered" >    t</span>his.enabled = true;
+  }
+&nbsp;
+  this.isExpandable = function () {
+    return this.overflowing &amp;&amp; this.collapse;
+  };
+&nbsp;
+  this.isCollapsible = function () {
+    return this.overflowing &amp;&amp; !this.collapse;
+  };
+&nbsp;
+  this.toggle = function (event) {
+    // When the user clicks a link explicitly to toggle the collapsed state,
+    // the event is not propagated.
+    event.stopPropagation();
+    this.collapse = !this.collapse;
+  };
+&nbsp;
+  this.expand = function () {
+    // When the user expands the excerpt 'implicitly' by clicking at the bottom
+    // of the collapsed excerpt, the event is allowed to propagate. For
+    // annotation cards, this causes clicking on a quote to scroll the view to
+    // the selected annotation.
+    this.collapse = false;
+  };
+&nbsp;
+  this.showInlineControls = function () {
+    return this.overflowing &amp;&amp; this.inlineControls;
+  };
+&nbsp;
+  this.bottomShadowStyles = function () {
+    return {
+      'excerpt__shadow': true,
+      'excerpt__shadow--transparent': this.inlineControls,
+      'is-hidden': !this.isExpandable(),
+    };
+  };
+&nbsp;
+  // Test if the element or any of its parents have been hidden by
+  // an 'ng-show' directive
+  function isElementHidden() {
+    var el = $element[0];
+    while (el) {
+      if (el.classList.contains('ng-hide')) {
+        return true;
+      }
+      el = el.parentElement;
+    }
+    return false;
+  }
+&nbsp;
+  var overflowMonitor = new ExcerptOverflowMonitor({
+    getState: function () {
+      return {
+        enabled: self.enabled,
+        animate: self.animate,
+        collapsedHeight: self.collapsedHeight,
+        collapse: self.collapse,
+        overflowHysteresis: self.overflowHysteresis,
+      };
+    },
+    contentHeight: function () {
+      var contentElem = $element[0].querySelector('.excerpt');
+      <span class="missing-if-branch" title="if path not taken" >I</span>if (!contentElem) {
+<span class="cstat-no" title="statement not covered" >        r</span>eturn null;
+      }
+      return contentElem.scrollHeight;
+    },
+    onOverflowChanged: function (overflowing) {
+      self.overflowing = overflowing;
+      if (self.onCollapsibleChanged) {
+        self.onCollapsibleChanged({collapsible: overflowing});
+      }
+      // Even though this change happens outside the framework, we use
+      // $digest() rather than $apply() here to avoid a large number of full
+      // digest cycles if many excerpts update their overflow state at the
+      // same time. The onCollapsibleChanged() handler, if any, is
+      // responsible for triggering any necessary digests in parent scopes.
+      $scope.$digest();
+    },
+  }, window.requestAnimationFrame);
+&nbsp;
+  this.contentStyle = overflowMonitor.contentStyle;
+&nbsp;
+  // Listen for document events which might affect whether the excerpt
+  // is overflowing, even if its content has not changed.
+  $element[0].addEventListener('load', overflowMonitor.check, false /* capture */);
+  window.addEventListener('resize', overflowMonitor.check);
+  $scope.$on('$destroy', function () {
+    window.removeEventListener('resize', overflowMonitor.check);
+  });
+&nbsp;
+  // Watch for changes to the visibility of the excerpt.
+  // Unfortunately there is no DOM API for this, so we rely on a digest
+  // being triggered after the visibility changes.
+  $scope.$watch(isElementHidden, function (hidden) {
+    if (!hidden) {
+      overflowMonitor.check();
+    }
+  });
+&nbsp;
+  // Watch input properties which may affect the overflow state
+  $scope.$watch('vm.contentData', overflowMonitor.check);
+  $scope.$watch('vm.enabled', overflowMonitor.check);
+&nbsp;
+  // Trigger an initial calculation of the overflow state.
+  //
+  // This is performed asynchronously so that the content of the &lt;excerpt&gt;
+  // has settled - ie. all Angular directives have been fully applied and
+  // the DOM has stopped changing. This may take several $digest cycles.
+  overflowMonitor.check();
+}
+&nbsp;
+/**
+ * @description This component truncates the height of its contents to a
+ *              specified number of lines and provides controls for expanding
+ *              and collapsing the resulting truncated element.
+ */
+module.exports = {
+  controller: ExcerptController,
+  controllerAs: 'vm',
+  bindings: {
+    /** Whether or not expansion should be animated. Defaults to true. */
+    animate: '&lt;?',
+    /**
+     * The data which is used to generate the excerpt's content.
+     * When this changes, the excerpt will recompute whether the content
+     * is overflowing.
+     */
+    contentData: '&lt;',
+    /** Whether or not truncation should be enabled */
+    enabled: '&lt;?',
+    /**
+     * Specifies whether controls to expand and collapse
+     * the excerpt should be shown inside the &lt;excerpt&gt; component.
+     * If false, external controls can expand/collapse the excerpt by
+     * setting the 'collapse' property.
+     */
+    inlineControls: '&lt;',
+    /** Sets whether or not the excerpt is collapsed. */
+    collapse: '=?',
+    /**
+     * Called when the collapsibility of the excerpt (that is, whether or
+     * not the content height exceeds the collapsed height), changes.
+     *
+     * Note: This function is *not* called from inside a digest cycle,
+     * the caller is responsible for triggering any necessary digests.
+     */
+    onCollapsibleChanged: '&amp;?',
+    /** The height of this container in pixels when collapsed.
+     */
+    collapsedHeight: '&lt;',
+    /**
+     * The number of pixels by which the height of the excerpt's content
+     * must extend beyond the collapsed height in order for truncation to
+     * be activated. This prevents the 'More' link from being shown to expand
+     * the excerpt if it has only been truncated by a very small amount, such
+     * that expanding the excerpt would reveal no extra lines of text.
+     */
+    overflowHysteresis: '&lt;?',
+  },
+  transclude: true,
+  template: require('../templates/excerpt.html'),
+};
+&nbsp;</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Fri Mar 16 2018 04:28:39 GMT+0000 (UTC)
+</div>
+</div>
+<script src="../../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../../sorter.js"></script>
+</body>
+</html>

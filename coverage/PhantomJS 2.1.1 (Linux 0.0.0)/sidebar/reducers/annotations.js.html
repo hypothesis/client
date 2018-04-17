@@ -1,0 +1,1256 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for sidebar/reducers/annotations.js</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../prettify.css" />
+    <link rel="stylesheet" href="../../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../../index.html">all files</a> / <a href="index.html">sidebar/reducers/</a> annotations.js
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">97.93% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>142/145</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">92.19% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>59/64</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">100% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>44/44</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">97.9% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>140/143</span>
+      </div>
+    </div>
+  </div>
+  <div class='status-line high'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194
+195
+196
+197
+198
+199
+200
+201
+202
+203
+204
+205
+206
+207
+208
+209
+210
+211
+212
+213
+214
+215
+216
+217
+218
+219
+220
+221
+222
+223
+224
+225
+226
+227
+228
+229
+230
+231
+232
+233
+234
+235
+236
+237
+238
+239
+240
+241
+242
+243
+244
+245
+246
+247
+248
+249
+250
+251
+252
+253
+254
+255
+256
+257
+258
+259
+260
+261
+262
+263
+264
+265
+266
+267
+268
+269
+270
+271
+272
+273
+274
+275
+276
+277
+278
+279
+280
+281
+282
+283
+284
+285
+286
+287
+288
+289
+290
+291
+292
+293
+294
+295
+296
+297
+298
+299
+300
+301
+302
+303
+304
+305
+306
+307
+308
+309
+310
+311
+312
+313
+314
+315
+316
+317
+318
+319
+320
+321
+322
+323
+324
+325
+326
+327
+328
+329
+330
+331
+332
+333
+334
+335
+336
+337
+338
+339
+340
+341
+342
+343
+344
+345
+346
+347
+348
+349
+350
+351
+352
+353
+354
+355
+356
+357
+358
+359
+360
+361
+362
+363
+364
+365
+366
+367
+368
+369
+370
+371
+372
+373
+374
+375
+376
+377
+378
+379
+380
+381
+382
+383
+384
+385
+386
+387
+388
+389
+390
+391
+392
+393
+394
+395
+396
+397
+398</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">149×</span>
+<span class="cline-any cline-yes">27×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">14×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">63×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">63×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">63×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">123×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">51×</span>
+<span class="cline-any cline-yes">51×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">51×</span>
+<span class="cline-any cline-yes">51×</span>
+<span class="cline-any cline-yes">51×</span>
+<span class="cline-any cline-yes">51×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">51×</span>
+<span class="cline-any cline-yes">66×</span>
+<span class="cline-any cline-yes">66×</span>
+<span class="cline-any cline-yes">60×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">66×</span>
+<span class="cline-any cline-yes">12×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">66×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">63×</span>
+<span class="cline-any cline-yes">63×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">51×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">51×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">13×</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">13×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">51×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">51×</span>
+<span class="cline-any cline-yes">66×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">51×</span>
+<span class="cline-any cline-yes">51×</span>
+<span class="cline-any cline-yes">66×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">51×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">51×</span>
+<span class="cline-any cline-yes">9×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">42×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">42×</span>
+<span class="cline-any cline-yes">16×</span>
+<span class="cline-any cline-yes">42×</span>
+<span class="cline-any cline-yes">13×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">9×</span>
+<span class="cline-any cline-yes">11×</span>
+<span class="cline-any cline-yes">11×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">9×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">9×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">13×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">36×</span>
+<span class="cline-any cline-yes">14×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">12×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
+ * State management for the set of annotations currently loaded into the
+ * sidebar.
+ */
+&nbsp;
+'use strict';
+&nbsp;
+var arrayUtil = require('../util/array-util');
+var metadata = require('../annotation-metadata');
+var uiConstants = require('../ui-constants');
+&nbsp;
+var selection = require('./selection');
+var util = require('./util');
+&nbsp;
+/**
+ * Return a copy of `current` with all matching annotations in `annotations`
+ * removed.
+ */
+function excludeAnnotations(current, annotations) {
+  var ids = {};
+  var tags = {};
+  annotations.forEach(function (annot) {
+    if (annot.id) {
+      ids[annot.id] = true;
+    }
+    if (annot.$tag) {
+      tags[annot.$tag] = true;
+    }
+  });
+  return current.filter(function (annot) {
+    var shouldRemove = (annot.id &amp;&amp; (annot.id in ids)) ||
+                       (annot.$tag &amp;&amp; (annot.$tag in tags));
+    return !shouldRemove;
+  });
+}
+&nbsp;
+function findByID(annotations, id) {
+  return annotations.find(function (annot) {
+    return annot.id === id;
+  });
+}
+&nbsp;
+function findByTag(annotations, tag) {
+  return annotations.find(function (annot) {
+    return annot.$tag === tag;
+  });
+}
+&nbsp;
+/**
+ * Initialize the status flags and properties of a new annotation.
+ */
+function initializeAnnot(annotation, tag) {
+  var orphan = annotation.$orphan;
+&nbsp;
+  if (!annotation.id) {
+    // Currently the user ID, permissions and group of new annotations are
+    // initialized in the &lt;annotation&gt; component controller because the session
+    // state and focused group are not stored in the Redux store. Once they are,
+    // that initialization should be moved here.
+&nbsp;
+    // New annotations must be anchored
+    orphan = false;
+  }
+&nbsp;
+  return Object.assign({}, annotation, {
+    // Flag indicating whether waiting for the annotation to anchor timed out.
+    $anchorTimeout: false,
+    $tag: annotation.$tag || tag,
+    $orphan: orphan,
+  });
+}
+&nbsp;
+function init() {
+  return {
+    annotations: [],
+&nbsp;
+    // The local tag to assign to the next annotation that is loaded into the
+    // app
+    nextTag: 1,
+  };
+}
+&nbsp;
+var update = {
+  ADD_ANNOTATIONS: function (state, action) {
+    var updatedIDs = {};
+    var updatedTags = {};
+&nbsp;
+    var added = [];
+    var unchanged = [];
+    var updated = [];
+    var nextTag = state.nextTag;
+&nbsp;
+    action.annotations.forEach(function (annot) {
+      var existing;
+      if (annot.id) {
+        existing = findByID(state.annotations, annot.id);
+      }
+      if (!existing &amp;&amp; annot.$tag) {
+        existing = findByTag(state.annotations, annot.$tag);
+      }
+&nbsp;
+      if (existing) {
+        // Merge the updated annotation with the private fields from the local
+        // annotation
+        updated.push(Object.assign({}, existing, annot));
+        <span class="missing-if-branch" title="else path not taken" >E</span>if (annot.id) {
+          updatedIDs[annot.id] = true;
+        }
+        <span class="missing-if-branch" title="else path not taken" >E</span>if (existing.$tag) {
+          updatedTags[existing.$tag] = true;
+        }
+      } else {
+        added.push(initializeAnnot(annot, 't' + nextTag));
+        ++nextTag;
+      }
+    });
+&nbsp;
+    state.annotations.forEach(function (annot) {
+      if (!updatedIDs[annot.id] &amp;&amp; !updatedTags[annot.$tag]) {
+        unchanged.push(annot);
+      }
+    });
+&nbsp;
+    return {
+      annotations: added.concat(updated).concat(unchanged),
+      nextTag: nextTag,
+    };
+  },
+&nbsp;
+  REMOVE_ANNOTATIONS: function (state, action) {
+    var annots = excludeAnnotations(state.annotations, action.annotations);
+    var selectedTab = state.selectedTab;
+    if (selectedTab === uiConstants.TAB_ORPHANS &amp;&amp;
+        arrayUtil.countIf(annots, metadata.isOrphan) === 0) {
+      selectedTab = uiConstants.TAB_ANNOTATIONS;
+    }
+&nbsp;
+    var tabUpdateFn = selection.update.SELECT_TAB;
+    return Object.assign(
+      {annotations: annots},
+      tabUpdateFn(state, selection.actions.selectTab(selectedTab))
+    );
+  },
+&nbsp;
+  CLEAR_ANNOTATIONS: function () {
+    return {annotations: []};
+  },
+&nbsp;
+  UPDATE_FLAG_STATUS: function (state, action) {
+    var annotations = state.annotations.map(function (annot) {
+      var match = (annot.id &amp;&amp; annot.id === action.id);
+      <span class="missing-if-branch" title="else path not taken" >E</span>if (match) {
+        if (annot.flagged === action.isFlagged) {
+          return annot;
+        }
+&nbsp;
+        var newAnn = Object.assign({}, annot, {
+          flagged: action.isFlagged,
+        });
+        if (newAnn.moderation) {
+          var countDelta = action.isFlagged ? 1 : -1;
+          newAnn.moderation = Object.assign({}, annot.moderation, {
+            flagCount: annot.moderation.flagCount + countDelta,
+          });
+        }
+        return newAnn;
+      } else {
+<span class="cstat-no" title="statement not covered" >        r</span>eturn annot;
+      }
+    });
+    return {annotations: annotations};
+  },
+&nbsp;
+  UPDATE_ANCHOR_STATUS: function (state, action) {
+    var annotations = state.annotations.map(function (annot) {
+      if (!action.statusUpdates.hasOwnProperty(annot.$tag)) {
+        return annot;
+      }
+&nbsp;
+      var state = action.statusUpdates[annot.$tag];
+      if (state === 'timeout') {
+        return Object.assign({}, annot, { $anchorTimeout: true });
+      } else {
+        return Object.assign({}, annot, { $orphan: state === 'orphan' });
+      }
+    });
+    return {annotations: annotations};
+  },
+&nbsp;
+  HIDE_ANNOTATION: function (state, action) {
+    var anns = state.annotations.map(function (ann) {
+      <span class="missing-if-branch" title="if path not taken" >I</span>if (ann.id !== action.id) {
+<span class="cstat-no" title="statement not covered" >        r</span>eturn ann;
+      }
+      return Object.assign({}, ann, { hidden: true });
+    });
+    return {annotations: anns};
+  },
+&nbsp;
+  UNHIDE_ANNOTATION: function (state, action) {
+    var anns = state.annotations.map(function (ann) {
+      <span class="missing-if-branch" title="if path not taken" >I</span>if (ann.id !== action.id) {
+<span class="cstat-no" title="statement not covered" >        r</span>eturn ann;
+      }
+      return Object.assign({}, ann, { hidden: false });
+    });
+    return {annotations: anns};
+  },
+};
+&nbsp;
+var actions = util.actionTypes(update);
+&nbsp;
+/**
+ * Updating the flagged status of an annotation.
+ *
+ * @param {string} id - Annotation ID
+ * @param {boolean} isFlagged - The flagged status of the annotation. True if
+ *        the user has flagged the annotation.
+ *
+ */
+function updateFlagStatus(id, isFlagged) {
+  return {
+    type: actions.UPDATE_FLAG_STATUS,
+    id: id,
+    isFlagged: isFlagged,
+  };
+}
+&nbsp;
+/** Add annotations to the currently displayed set. */
+function addAnnotations(annotations, now) {
+  now = now || new Date();
+&nbsp;
+  // Add dates to new annotations. These are ignored by the server but used
+  // when sorting unsaved annotation cards.
+  annotations = annotations.map(function (annot) {
+    if (annot.id) { return annot; }
+    return Object.assign({
+      // Date.prototype.toISOString returns a 0-offset (UTC) ISO8601
+      // datetime.
+      created: now.toISOString(),
+      updated: now.toISOString(),
+    }, annot);
+  });
+&nbsp;
+  return function (dispatch, getState) {
+    var added = annotations.filter(function (annot) {
+      return !findByID(getState().annotations, annot.id);
+    });
+&nbsp;
+    dispatch({
+      type: actions.ADD_ANNOTATIONS,
+      annotations: annotations,
+    });
+&nbsp;
+    if (!getState().isSidebar) {
+      return;
+    }
+&nbsp;
+    // If anchoring fails to complete in a reasonable amount of time, then
+    // we assume that the annotation failed to anchor. If it does later
+    // successfully anchor then the status will be updated.
+    var ANCHORING_TIMEOUT = 500;
+&nbsp;
+    var anchoringIDs = added.filter(metadata.isWaitingToAnchor)
+                            .map(ann =&gt; ann.id);
+    if (anchoringIDs.length &gt; 0) {
+      setTimeout(() =&gt; {
+        // Find annotations which haven't yet been anchored in the document.
+        var anns = getState().annotations;
+        var annsStillAnchoring = anchoringIDs.map(id =&gt; findByID(anns, id))
+                                             .filter(ann =&gt; ann &amp;&amp; metadata.isWaitingToAnchor(ann));
+&nbsp;
+        // Mark anchoring as timed-out for these annotations.
+        var anchorStatusUpdates = annsStillAnchoring.reduce((updates, ann) =&gt; {
+          updates[ann.$tag] = 'timeout';
+          return updates;
+        }, {});
+        dispatch(updateAnchorStatus(anchorStatusUpdates));
+      }, ANCHORING_TIMEOUT);
+    }
+  };
+}
+&nbsp;
+/** Remove annotations from the currently displayed set. */
+function removeAnnotations(annotations) {
+  return {
+    type: actions.REMOVE_ANNOTATIONS,
+    annotations: annotations,
+  };
+}
+&nbsp;
+/** Set the currently displayed annotations to the empty set. */
+function clearAnnotations() {
+  return {type: actions.CLEAR_ANNOTATIONS};
+}
+&nbsp;
+/**
+ * Update the anchoring status of an annotation.
+ *
+ * @param {{ [tag: string]: 'anchored'|'orphan'|'timeout'} } statusUpdates - A map of annotation tag to orphan status
+ */
+function updateAnchorStatus(statusUpdates) {
+  return {
+    type: actions.UPDATE_ANCHOR_STATUS,
+    statusUpdates,
+  };
+}
+&nbsp;
+/**
+ * Update the local hidden state of an annotation.
+ *
+ * This updates an annotation to reflect the fact that it has been hidden from
+ * non-moderators.
+ */
+function hideAnnotation(id) {
+  return {
+    type: actions.HIDE_ANNOTATION,
+    id: id,
+  };
+}
+&nbsp;
+/**
+ * Update the local hidden state of an annotation.
+ *
+ * This updates an annotation to reflect the fact that it has been made visible
+ * to non-moderators.
+ */
+function unhideAnnotation(id) {
+  return {
+    type: actions.UNHIDE_ANNOTATION,
+    id: id,
+  };
+}
+&nbsp;
+/**
+ * Return all loaded annotations which have been saved to the server.
+ *
+ * @param {state} - The global app state
+ */
+function savedAnnotations(state) {
+  return state.annotations.filter(function (ann) {
+    return !metadata.isNew(ann);
+  });
+}
+&nbsp;
+/** Return true if the annotation with a given ID is currently loaded. */
+function annotationExists(state, id) {
+  return state.annotations.some(function (annot) {
+    return annot.id === id;
+  });
+}
+&nbsp;
+/**
+ * Return the IDs of annotations that correspond to `tags`.
+ *
+ * If an annotation does not have an ID because it has not been created on
+ * the server, there will be no entry for it in the returned array.
+ *
+ * @param {string[]} Local tags of annotations to look up
+ */
+function findIDsForTags(state, tags) {
+  var ids = [];
+  tags.forEach(function (tag) {
+    var annot = findByTag(state.annotations, tag);
+    if (annot &amp;&amp; annot.id) {
+      ids.push(annot.id);
+    }
+  });
+  return ids;
+}
+&nbsp;
+/**
+ * Return the annotation with the given ID.
+ */
+function findAnnotationByID(state, id) {
+  return findByID(state.annotations, id);
+}
+&nbsp;
+module.exports = {
+  init: init,
+  update: update,
+  actions: {
+    addAnnotations: addAnnotations,
+    clearAnnotations: clearAnnotations,
+    removeAnnotations: removeAnnotations,
+    updateAnchorStatus: updateAnchorStatus,
+    updateFlagStatus: updateFlagStatus,
+    hideAnnotation: hideAnnotation,
+    unhideAnnotation: unhideAnnotation,
+  },
+&nbsp;
+  // Selectors
+  annotationExists: annotationExists,
+  findAnnotationByID: findAnnotationByID,
+  findIDsForTags: findIDsForTags,
+  savedAnnotations: savedAnnotations,
+};
+&nbsp;</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Fri Mar 16 2018 04:28:39 GMT+0000 (UTC)
+</div>
+</div>
+<script src="../../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../../sorter.js"></script>
+</body>
+</html>

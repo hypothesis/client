@@ -1,0 +1,1157 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for sidebar/build-thread.js</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../prettify.css" />
+    <link rel="stylesheet" href="../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../index.html">all files</a> / <a href="index.html">sidebar/</a> build-thread.js
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">96.77% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>90/93</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">88.14% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>52/59</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">100% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>25/25</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">96.77% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>90/93</span>
+      </div>
+    </div>
+  </div>
+  <div class='status-line high'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194
+195
+196
+197
+198
+199
+200
+201
+202
+203
+204
+205
+206
+207
+208
+209
+210
+211
+212
+213
+214
+215
+216
+217
+218
+219
+220
+221
+222
+223
+224
+225
+226
+227
+228
+229
+230
+231
+232
+233
+234
+235
+236
+237
+238
+239
+240
+241
+242
+243
+244
+245
+246
+247
+248
+249
+250
+251
+252
+253
+254
+255
+256
+257
+258
+259
+260
+261
+262
+263
+264
+265
+266
+267
+268
+269
+270
+271
+272
+273
+274
+275
+276
+277
+278
+279
+280
+281
+282
+283
+284
+285
+286
+287
+288
+289
+290
+291
+292
+293
+294
+295
+296
+297
+298
+299
+300
+301
+302
+303
+304
+305
+306
+307
+308
+309
+310
+311
+312
+313
+314
+315
+316
+317
+318
+319
+320
+321
+322
+323
+324
+325
+326
+327
+328
+329
+330
+331
+332
+333
+334
+335
+336
+337
+338
+339
+340
+341
+342
+343
+344
+345
+346
+347
+348
+349
+350
+351
+352
+353
+354
+355
+356
+357
+358
+359
+360
+361
+362
+363
+364
+365</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">235×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">72×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">43×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">29×</span>
+<span class="cline-any cline-yes">29×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">29×</span>
+<span class="cline-any cline-yes">29×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">28×</span>
+<span class="cline-any cline-yes">28×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">29×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">29×</span>
+<span class="cline-any cline-yes">75×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">29×</span>
+<span class="cline-any cline-yes">75×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">70×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">29×</span>
+<span class="cline-any cline-yes">29×</span>
+<span class="cline-any cline-yes">77×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">49×</span>
+<span class="cline-any cline-yes">49×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">29×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">29×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">210×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">152×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">100×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">16×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">16×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">13×</span>
+<span class="cline-any cline-yes">12×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">100×</span>
+<span class="cline-any cline-yes">71×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">100×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">100×</span>
+<span class="cline-any cline-yes">71×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">100×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">71×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">26×</span>
+<span class="cline-any cline-yes">12×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">22×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">29×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">29×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">29×</span>
+<span class="cline-any cline-yes">74×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">73×</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">66×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">29×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">29×</span>
+<span class="cline-any cline-yes">105×</span>
+<span class="cline-any cline-yes">105×</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">105×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">29×</span>
+<span class="cline-any cline-yes">105×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">105×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">103×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">103×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">29×</span>
+<span class="cline-any cline-yes">48×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">29×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">29×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">29×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">29×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">'use strict';
+&nbsp;
+/** Default state for new threads, before applying filters etc. */
+var DEFAULT_THREAD_STATE = {
+  /**
+   * The ID of this thread. This will be the same as the annotation ID for
+   * created annotations or the `$tag` property for new annotations.
+   */
+  id: undefined,
+  /**
+   * The Annotation which is displayed by this thread.
+   *
+   * This may be null if the existence of an annotation is implied by the
+   * `references` field in an annotation but the referenced parent annotation
+   * does not exist.
+   */
+  annotation: undefined,
+  /** The parent thread ID */
+  parent: undefined,
+  /** True if this thread is collapsed, hiding replies to this annotation. */
+  collapsed: false,
+  /** True if this annotation matches the current filters. */
+  visible: true,
+  /** Replies to this annotation. */
+  children: [],
+  /**
+    * The total number of children of this annotation,
+    * including any which have been hidden by filters.
+    */
+  totalChildren: 0,
+  /**
+   * The highlight state of this annotation:
+   *  undefined - Do not (de-)emphasize this annotation
+   *  'dim' - De-emphasize this annotation
+   *  'highlight' - Emphasize this annotation
+   */
+  highlightState: undefined,
+};
+&nbsp;
+/**
+ * Returns a persistent identifier for an Annotation.
+ * If the Annotation has been created on the server, it will have
+ * an ID assigned, otherwise we fall back to the local-only '$tag'
+ * property.
+ */
+function id(annotation) {
+  return annotation.id || annotation.$tag;
+}
+&nbsp;
+/**
+ * Link the annotation with ID `id` to its parent thread.
+ *
+ * @param {string} id
+ * @param {Array&lt;string&gt;} parents - IDs of parent annotations, from the
+ *        annotation's `references` field.
+ */
+function setParentID(threads, id, parents) {
+  if (threads[id].parent || !parents.length) {
+    // Parent already assigned, do not try to change it.
+    return;
+  }
+  var parentID = parents[parents.length-1];
+  if (!threads[parentID]) {
+    // Parent does not exist. This may be a reply to an annotation which has
+    // been deleted. Create a placeholder Thread with no annotation to
+    // represent the missing annotation.
+    threads[parentID] = Object.assign({}, DEFAULT_THREAD_STATE, {
+      id: parentID,
+      children: [],
+    });
+    setParentID(threads, parentID, parents.slice(0,-1));
+  }
+&nbsp;
+  var grandParentID = threads[parentID].parent;
+  while (grandParentID) {
+    if (grandParentID === id) {
+      // There is a loop in the `references` field, abort.
+      return;
+    } else {
+      grandParentID = threads[grandParentID].parent;
+    }
+  }
+&nbsp;
+  threads[id].parent = parentID;
+  threads[parentID].children.push(threads[id]);
+}
+&nbsp;
+/**
+ * Creates a thread of annotations from a list of annotations.
+ *
+ * Given a flat list of annotations and replies, this generates a hierarchical
+ * thread, using the `references` field of an annotation to link together
+ * annotations and their replies. The `references` field is a possibly
+ * incomplete ordered list of the parents of an annotation, from furthest to
+ * nearest ancestor.
+ *
+ * @param {Array&lt;Annotation&gt;} annotations - The input annotations to thread.
+ * @return {Thread} - The input annotations threaded into a tree structure.
+ */
+function threadAnnotations(annotations) {
+  // Map of annotation ID -&gt; container
+  var threads = {};
+&nbsp;
+  // Build mapping of annotation ID -&gt; thread
+  annotations.forEach(function (annotation) {
+    threads[id(annotation)] = Object.assign({}, DEFAULT_THREAD_STATE, {
+      id: id(annotation),
+      annotation: annotation,
+      children: [],
+    });
+  });
+&nbsp;
+  // Set each thread's parent based on the references field
+  annotations.forEach(function (annotation) {
+    if (!annotation.references) {
+      return;
+    }
+    setParentID(threads, id(annotation), annotation.references);
+  });
+&nbsp;
+  // Collect the set of threads which have no parent as
+  // children of the thread root
+  var roots = [];
+  Object.keys(threads).forEach(function (id) {
+    if (!threads[id].parent) {
+      // Top-level threads are collapsed by default
+      threads[id].collapsed = true;
+      roots.push(threads[id]);
+    }
+  });
+&nbsp;
+  var root = {
+    annotation: undefined,
+    children: roots,
+    visible: true,
+    collapsed: false,
+    totalChildren: roots.length,
+  };
+&nbsp;
+  return root;
+}
+&nbsp;
+/**
+ * Returns a copy of `thread` with the thread
+ * and each of its children transformed by mapFn(thread).
+ *
+ * @param {Thread} thread
+ * @param {(Thread) =&gt; Thread} mapFn
+ */
+function mapThread(thread, mapFn) {
+  return Object.assign({}, mapFn(thread), {
+    children: thread.children.map(function (child) {
+      return mapThread(child, mapFn);
+    }),
+  });
+}
+&nbsp;
+/**
+ * Return a sorted copy of an array of threads.
+ *
+ * @param {Array&lt;Thread&gt;} threads - The list of threads to sort
+ * @param {(Annotation,Annotation) =&gt; boolean} compareFn
+ * @return {Array&lt;Thread&gt;} Sorted list of threads
+ */
+function sort(threads, compareFn) {
+  return threads.slice().sort(function (a, b) {
+    // Threads with no annotation always sort to the top
+    <span class="missing-if-branch" title="if path not taken" >I</span>if (!a.annotation || !b.annotation) {
+<span class="cstat-no" title="statement not covered" >      if (!a.annotation &amp;&amp; !b.annotation) {</span>
+<span class="cstat-no" title="statement not covered" >        r</span>eturn 0;
+      } else {
+<span class="cstat-no" title="statement not covered" >        r</span>eturn !a.annotation ? -1 : 1;
+      }
+    }
+&nbsp;
+    if (compareFn(a.annotation, b.annotation)) {
+      return -1;
+    } else if (compareFn(b.annotation, a.annotation)) {
+      return 1;
+    } else {
+      return 0;
+    }
+  });
+}
+&nbsp;
+/**
+ * Return a copy of `thread` with siblings of the top-level thread sorted according
+ * to `compareFn` and replies sorted by `replyCompareFn`.
+ */
+function sortThread(thread, compareFn, replyCompareFn) {
+  var children = thread.children.map(function (child) {
+    return sortThread(child, replyCompareFn, replyCompareFn);
+  });
+&nbsp;
+  return Object.assign({}, thread, {
+    children: sort(children, compareFn),
+  });
+}
+&nbsp;
+/**
+ * Return a copy of @p thread with the `replyCount` and `depth` properties
+ * updated.
+ */
+function countRepliesAndDepth(thread, depth) {
+  var children = thread.children.map(function (c) {
+    return countRepliesAndDepth(c, depth + 1);
+  });
+  return Object.assign({}, thread, {
+    children: children,
+    depth: depth,
+    replyCount: children.reduce(function (total, child) {
+      return total + 1 + child.replyCount;
+    }, 0),
+  });
+}
+&nbsp;
+/** Return true if a thread has any visible children. */
+function hasVisibleChildren(thread) {
+  return thread.children.some(function (child) {
+    return child.visible || hasVisibleChildren(child);
+  });
+}
+&nbsp;
+/**
+ * Default options for buildThread()
+ */
+var defaultOpts = {
+  /** List of currently selected annotation IDs */
+  selected: [],
+  /**
+   * List of IDs of annotations that should be shown even if they
+   * do not match the current filter.
+   */
+  forceVisible: undefined,
+  /**
+   * Predicate function that returns true if an annotation should be
+   * displayed.
+   */
+  filterFn: undefined,
+  /**
+   * A filter function which should return true if a given annotation and
+   * its replies should be displayed.
+   */
+  threadFilterFn: undefined,
+  /**
+   * Mapping of annotation IDs to expansion states.
+   */
+  expanded: {},
+  /** List of highlighted annotation IDs */
+  highlighted: [],
+  /**
+   * Less-than comparison function used to compare annotations in order to sort
+   * the top-level thread.
+   */
+  sortCompareFn: function (a, b) {
+    return a.id &lt; b.id;
+  },
+  /**
+   * Less-than comparison function used to compare annotations in order to sort
+   * replies.
+   */
+  replySortCompareFn: function (a, b) {
+    return a.created &lt; b.created;
+  },
+};
+&nbsp;
+/**
+ * Project, filter and sort a list of annotations into a thread structure for
+ * display by the &lt;annotation-thread&gt; directive.
+ *
+ * buildThread() takes as inputs a flat list of annotations,
+ * the current visibility filters and sort function and returns
+ * the thread structure that should be rendered.
+ *
+ * @param {Array&lt;Annotation&gt;} annotations - A list of annotations and replies
+ * @param {Options} opts
+ * @return {Thread} - The root thread, whose children are the top-level
+ *                    annotations to display.
+ */
+function buildThread(annotations, opts) {
+  opts = Object.assign({}, defaultOpts, opts);
+&nbsp;
+  var thread = threadAnnotations(annotations);
+&nbsp;
+  // Mark annotations as visible or hidden depending on whether
+  // they are being edited and whether they match the current filter
+  // criteria
+  var shouldShowThread = function (annotation) {
+    if (opts.forceVisible &amp;&amp; opts.forceVisible.indexOf(id(annotation)) !== -1) {
+      return true;
+    }
+    if (opts.filterFn &amp;&amp; !opts.filterFn(annotation)) {
+      return false;
+    }
+    return true;
+  };
+&nbsp;
+  // When there is a selection, only include top-level threads (annotations)
+  // that are selected
+  if (opts.selected.length &gt; 0) {
+    thread = Object.assign({}, thread, {
+      children: thread.children.filter(function (child) {
+        return opts.selected.indexOf(child.id) !== -1;
+      }),
+    });
+  }
+&nbsp;
+  // Set the visibility and highlight states of threads
+  thread = mapThread(thread, function (thread) {
+    var highlightState;
+    if (opts.highlighted.length &gt; 0) {
+      var isHighlighted = thread.annotation &amp;&amp;
+        opts.highlighted.indexOf(thread.id) !== -1;
+      highlightState = isHighlighted ? 'highlight' : 'dim';
+    }
+&nbsp;
+    return Object.assign({}, thread, {
+      highlightState: highlightState,
+      visible: thread.visible &amp;&amp;
+               thread.annotation &amp;&amp;
+               shouldShowThread(thread.annotation),
+    });
+  });
+&nbsp;
+  // Expand any threads which:
+  // 1) Have been explicitly expanded OR
+  // 2) Have children matching the filter
+  thread = mapThread(thread, function (thread) {
+    var id = thread.id;
+&nbsp;
+    // If the thread was explicitly expanded or collapsed, respect that option
+    if (opts.expanded.hasOwnProperty(id)) {
+      return Object.assign({}, thread, {collapsed: !opts.expanded[id]});
+    }
+&nbsp;
+    var hasUnfilteredChildren = opts.filterFn &amp;&amp; hasVisibleChildren(thread);
+&nbsp;
+    return Object.assign({}, thread, {
+      collapsed: thread.collapsed &amp;&amp;
+                 !hasUnfilteredChildren,
+    });
+  });
+&nbsp;
+  // Remove top-level threads which contain no visible annotations
+  thread.children = thread.children.filter(function (child) {
+    return child.visible || hasVisibleChildren(child);
+  });
+&nbsp;
+  // Get annotations which are of type notes or annotations depending
+  // on the filter.
+  if (opts.threadFilterFn) {
+    thread.children = thread.children.filter(opts.threadFilterFn);
+  }
+&nbsp;
+  // Sort the root thread according to the current search criteria
+  thread = sortThread(thread, opts.sortCompareFn, opts.replySortCompareFn);
+&nbsp;
+  // Update `replyCount` and `depth` properties
+  thread = countRepliesAndDepth(thread, -1);
+&nbsp;
+  return thread;
+}
+&nbsp;
+module.exports = buildThread;
+&nbsp;</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Fri Mar 16 2018 04:28:39 GMT+0000 (UTC)
+</div>
+</div>
+<script src="../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../sorter.js"></script>
+</body>
+</html>

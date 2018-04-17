@@ -1,0 +1,674 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for sidebar/virtual-thread-list.js</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../prettify.css" />
+    <link rel="stylesheet" href="../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../index.html">all files</a> / <a href="index.html">sidebar/</a> virtual-thread-list.js
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">95.59% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>65/68</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">80.95% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>17/21</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">100% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>11/11</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">95.59% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>65/68</span>
+      </div>
+    </div>
+  </div>
+  <div class='status-line high'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194
+195
+196
+197
+198
+199
+200
+201
+202
+203
+204</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">13×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">13×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">13×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">13×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">13×</span>
+<span class="cline-any cline-yes">13×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">13×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">13×</span>
+<span class="cline-any cline-yes">13×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">13×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">9×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">9×</span>
+<span class="cline-any cline-yes">9×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">55×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">55×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">360×</span>
+<span class="cline-any cline-yes">360×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">13×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">11×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">11×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">11×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">11×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">11×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">11×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">11×</span>
+<span class="cline-any cline-yes">11×</span>
+<span class="cline-any cline-yes">11×</span>
+<span class="cline-any cline-yes">11×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">11×</span>
+<span class="cline-any cline-yes">350×</span>
+<span class="cline-any cline-yes">350×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">350×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">350×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">94×</span>
+<span class="cline-any cline-yes">256×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">50×</span>
+<span class="cline-any cline-yes">50×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">206×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">350×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">272×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">350×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">11×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">'use strict';
+&nbsp;
+var EventEmitter = require('tiny-emitter');
+var debounce = require('lodash.debounce');
+var inherits = require('inherits');
+&nbsp;
+/**
+ * @typedef Options
+ * @property {Function} [invisibleThreadFilter] - Function used to determine
+ *   whether an off-screen thread should be rendered or not.  Called with a
+ *   `Thread` and if it returns `true`, the thread is rendered even if offscreen.
+ * @property {Element} [scrollRoot] - The scrollable Element which contains the
+ *   thread list. The set of on-screen threads is determined based on the scroll
+ *   position and height of this element.
+ */
+&nbsp;
+/**
+ * VirtualThreadList is a helper for virtualizing the annotation thread list.
+ *
+ * 'Virtualizing' the thread list improves UI performance by only creating
+ * annotation cards for annotations which are either in or near the viewport.
+ *
+ * Reducing the number of annotation cards that are actually created optimizes
+ * the initial population of the list, since annotation cards are big components
+ * that are expensive to create and consume a lot of memory. For Angular
+ * applications this also helps significantly with UI responsiveness by limiting
+ * the number of watchers (functions created by template expressions or
+ * '$scope.$watch' calls) that have to be run on every '$scope.$digest()' cycle.
+ *
+ * @param {Window} container - The Window displaying the list of annotation threads.
+ * @param {Thread} rootThread - The initial Thread object for the top-level
+ *        threads.
+ * @param {Options} options
+ */
+function VirtualThreadList($scope, window_, rootThread, options) {
+  var self = this;
+&nbsp;
+  this._rootThread = rootThread;
+&nbsp;
+  this._options = Object.assign({}, options);
+&nbsp;
+  // Cache of thread ID -&gt; last-seen height
+  this._heights = {};
+&nbsp;
+  this.window = window_;
+  t</span>his.scrollRoot = options.scrollRoot || <span class="branch-1 cbranch-no" title="branch not covered" >document.body;
+&nbsp;
+  var debouncedUpdate = debounce(function () {
+    self._updateVisibleThreads();
+    $scope.$digest();
+  }, 20);
+  this.scrollRoot.addEventListener('scroll', debouncedUpdate);
+  this.window.addEventListener('resize', debouncedUpdate);
+&nbsp;
+  this._detach = function () {
+    this.scrollRoot.removeEventListener('scroll', debouncedUpdate);
+    this.window.removeEventListener('resize', debouncedUpdate);
+  };
+}
+inherits(VirtualThreadList, EventEmitter);
+&nbsp;
+/**
+ * Detach event listeners and clear any pending timeouts.
+ *
+ * This should be invoked when the UI view presenting the virtual thread list
+ * is torn down.
+ */
+VirtualThreadList.prototype.detach = function () {
+  this._detach();
+};
+&nbsp;
+/**
+ * Sets the root thread containing all conversations matching the current
+ * filters.
+ *
+ * This should be called with the current Thread object whenever the set of
+ * matching annotations changes.
+ */
+VirtualThreadList.prototype.setRootThread = function (thread) {
+  <span class="missing-if-branch" title="if path not taken" >I</span>if (thread === this._rootThread) {
+<span class="cstat-no" title="statement not covered" >    r</span>eturn;
+  }
+  this._rootThread = thread;
+  this._updateVisibleThreads();
+};
+&nbsp;
+/**
+ * Sets the actual height for a thread.
+ *
+ * When calculating the amount of space required for offscreen threads,
+ * the actual or 'last-seen' height is used if known. Otherwise an estimate
+ * is used.
+ *
+ * @param {string} id - The annotation ID or $tag
+ * @param {number} height - The height of the annotation thread.
+ */
+VirtualThreadList.prototype.setThreadHeight = function (id, height) {
+  <span class="missing-if-branch" title="if path not taken" >I</span>if (isNaN(height) || height &lt;= 0) {
+<span class="cstat-no" title="statement not covered" >    t</span>hrow new Error('Invalid thread height %d', height);
+  }
+  this._heights[id] = height;
+};
+&nbsp;
+VirtualThreadList.prototype._height = function (id) {
+  // Default guess of the height required for a threads that have not been
+  // measured
+  var DEFAULT_HEIGHT = 200;
+  return this._heights[id] || DEFAULT_HEIGHT;
+};
+&nbsp;
+/** Return the vertical offset of an annotation card from the top of the list. */
+VirtualThreadList.prototype.yOffsetOf = function (id) {
+  var self = this;
+  var allThreads = this._rootThread.children;
+  var matchIndex = allThreads.findIndex(function (thread) {
+    return thread.id === id;
+  });
+  <span class="missing-if-branch" title="if path not taken" >I</span>if (matchIndex === -1) {
+<span class="cstat-no" title="statement not covered" >    r</span>eturn 0;
+  }
+  return allThreads.slice(0, matchIndex).reduce(function (offset, thread) {
+    return offset + self._height(thread.id);
+  }, 0);
+};
+&nbsp;
+/**
+ * Recalculates the set of visible threads and estimates of the amount of space
+ * required for offscreen threads above and below the viewport.
+ *
+ * Emits a `changed` event with the recalculated set of visible threads.
+ */
+VirtualThreadList.prototype._updateVisibleThreads = function () {
+  // Space above the viewport in pixels which should be considered 'on-screen'
+  // when calculating the set of visible threads
+  var MARGIN_ABOVE = 800;
+  // Same as MARGIN_ABOVE but for the space below the viewport
+  var MARGIN_BELOW = 800;
+&nbsp;
+  // Estimated height in pixels of annotation cards which are below the
+  // viewport and not actually created. This is used to create an empty spacer
+  // element below visible cards in order to give the list's scrollbar the
+  // correct dimensions.
+  var offscreenLowerHeight = 0;
+  // Same as offscreenLowerHeight but for cards above the viewport.
+  var offscreenUpperHeight = 0;
+  // List of annotations which are in or near the viewport and need to
+  // actually be created.
+  var visibleThreads = [];
+&nbsp;
+  // List of annotations which are required to be rendered but we do not
+  // want them visible. This is to ensure that we allow items to be rendered
+  // and initialized (for saving purposes) without having them be presented
+  // in out of context scenarios (i.e. in wrong order for sort)
+  var invisibleThreads = [];
+&nbsp;
+  var allThreads = this._rootThread.children;
+  var visibleHeight = this.window.innerHeight;
+  var usedHeight = 0;
+  var thread;
+&nbsp;
+  for (var i = 0; i &lt; allThreads.length; i++) {
+    thread = allThreads[i];
+    var threadHeight = this._height(thread.id);
+&nbsp;
+    var added = false;
+&nbsp;
+    if (usedHeight + threadHeight &lt; this.scrollRoot.scrollTop - MARGIN_ABOVE) {
+      // Thread is above viewport
+      offscreenUpperHeight += threadHeight;
+    } else if (usedHeight &lt;
+      this.scrollRoot.scrollTop + visibleHeight + MARGIN_BELOW) {
+&nbsp;
+      // Thread is either in or close to the viewport
+      visibleThreads.push(thread);
+      added = true;
+    } else {
+&nbsp;
+      // Thread is below viewport
+      offscreenLowerHeight += threadHeight;
+    }
+&nbsp;
+    // any thread that is not going to go through the render process
+    // because it is already outside of the viewport should be checked
+    // to see if it needs to be added as an invisible render. So it will
+    // be available to go through rendering but not visible to the user
+    if(!added &amp;&amp;
+        this._options.invisibleThreadFilter &amp;&amp;
+        this._options.invisibleThreadFilter(thread)){
+      invisibleThreads.push(thread);
+    }
+&nbsp;
+    usedHeight += threadHeight;
+  }
+&nbsp;
+  this.emit('changed', {
+    offscreenLowerHeight: offscreenLowerHeight,
+    offscreenUpperHeight: offscreenUpperHeight,
+    visibleThreads: visibleThreads,
+    invisibleThreads: invisibleThreads,
+  });
+};
+&nbsp;
+module.exports = VirtualThreadList;
+&nbsp;</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Fri Mar 16 2018 04:28:39 GMT+0000 (UTC)
+</div>
+</div>
+<script src="../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../sorter.js"></script>
+</body>
+</html>

@@ -1,0 +1,845 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for sidebar/markdown-commands.js</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../prettify.css" />
+    <link rel="stylesheet" href="../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../index.html">all files</a> / <a href="index.html">sidebar/</a> markdown-commands.js
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">90.32% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>84/93</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">68.75% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>33/48</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">100% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>10/10</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">90.32% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>84/93</span>
+      </div>
+    </div>
+  </div>
+  <div class='status-line high'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194
+195
+196
+197
+198
+199
+200
+201
+202
+203
+204
+205
+206
+207
+208
+209
+210
+211
+212
+213
+214
+215
+216
+217
+218
+219
+220
+221
+222
+223
+224
+225
+226
+227
+228
+229
+230
+231
+232
+233
+234
+235
+236
+237
+238
+239
+240
+241
+242
+243
+244
+245
+246
+247
+248
+249
+250
+251
+252
+253
+254
+255
+256
+257
+258
+259
+260
+261</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">22×</span>
+<span class="cline-any cline-yes">22×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">22×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-yes">14×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">22×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">50×</span>
+<span class="cline-any cline-yes">50×</span>
+<span class="cline-any cline-yes">18×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">32×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-yes">14×</span>
+<span class="cline-any cline-yes">14×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">14×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">14×</span>
+<span class="cline-any cline-yes">14×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">14×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">'use strict';
+&nbsp;
+/**
+ * Commands for toggling markdown formatting of a selection
+ * in an input field.
+ *
+ * All of the functions in this module take as input the current state
+ * of the input field, parameters for the operation to perform and return the
+ * new state of the input field.
+ */
+&nbsp;
+/**
+ * Describes the state of a plain text input field.
+ *
+ * interface EditorState {
+ *   text: string;
+ *   selectionStart: number;
+ *   selectionEnd: number;
+ * }
+ */
+&nbsp;
+/**
+ * Types of Markdown link that can be inserted with
+ * convertSelectionToLink()
+ */
+var LinkType = {
+  ANCHOR_LINK: 0,
+  IMAGE_LINK: 1,
+};
+&nbsp;
+/**
+ * Replace text in an input field and return the new state.
+ *
+ * @param {EditorState} state - The state of the input field.
+ * @param {number} pos - The start position of the text to remove.
+ * @param {number} length - The number of characters to remove.
+ * @param {string} text - The replacement text to insert at `pos`.
+ * @return {EditorState} - The new state of the input field.
+ */
+function replaceText(state, pos, length, text) {
+  var newSelectionStart = state.selectionStart;
+  var newSelectionEnd = state.selectionEnd;
+&nbsp;
+  if (newSelectionStart &gt;= pos + length) {
+    // 1. Selection is after replaced text:
+    //    Increment (start, end) by difference in length between original and
+    //    replaced text
+    newSelectionStart += text.length - length;
+    newSelectionEnd += text.length - length;
+  } else if (newSelectionEnd &lt;= pos) {
+    // 2. Selection is before replaced text: Leave selection unchanged
+  } else <span class="missing-if-branch" title="else path not taken" >E</span>if (newSelectionStart &lt;= pos &amp;&amp;
+             newSelectionEnd &gt;= pos + length) {
+    // 3. Selection fully contains replaced text:
+    //    Increment end by difference in length between original and replaced
+    //    text
+    newSelectionEnd += text.length - length;
+  } else <span class="cstat-no" title="statement not covered" >if (newSelectionStart &lt; pos &amp;&amp;</span>
+             newSelectionEnd &lt; pos + length) {
+    // 4. Selection overlaps start but not end of replaced text:
+    //    Decrement start to start of replacement text
+<span class="cstat-no" title="statement not covered" >    n</span>ewSelectionStart = pos;
+  } else <span class="cstat-no" title="statement not covered" >if (newSelectionStart &lt; pos + length &amp;&amp;</span>
+             newSelectionEnd &gt; pos + length) {
+    // 5. Selection overlaps end but not start of replaced text:
+    //    Increment end by difference in length between original and replaced
+    //    text
+<span class="cstat-no" title="statement not covered" >    n</span>ewSelectionEnd += text.length - length;
+  } else <span class="cstat-no" title="statement not covered" >if (pos &lt; newSelectionStart &amp;&amp;</span>
+             pos + length &gt; newSelectionEnd) {
+    // 6. Replaced text fully contains selection:
+    //    Expand selection to replaced text
+<span class="cstat-no" title="statement not covered" >    n</span>ewSelectionStart = pos;
+<span class="cstat-no" title="statement not covered" >    n</span>ewSelectionEnd = pos + length;
+  }
+&nbsp;
+  return {
+    text: state.text.slice(0, pos) + text + state.text.slice(pos + length),
+    selectionStart: newSelectionStart,
+    selectionEnd: newSelectionEnd,
+  };
+}
+&nbsp;
+/**
+ * Convert the selected text into a Markdown link.
+ *
+ * @param {EditorState} state - The current state of the input field.
+ * @param {LinkType} linkType - The type of link to insert.
+ * @return {EditorState} - The new state of the input field.
+ */
+function convertSelectionToLink(state, linkType) {
+  if (typeof linkType === 'undefined') {
+    linkType = LinkType.ANCHOR_LINK;
+  }
+&nbsp;
+  var selection = state.text.slice(state.selectionStart, state.selectionEnd);
+&nbsp;
+  var linkPrefix = '';
+  if (linkType === LinkType.IMAGE_LINK) {
+    linkPrefix = '!';
+  }
+&nbsp;
+  var newState;
+  if (selection.match(/[a-z]+:\/\/.*/)) {
+    // Selection is a URL, wrap it with a link and use the selection as
+    // the target.
+    var dummyLabel = 'Description';
+    newState = replaceText(state, state.selectionStart, selection.length,
+      linkPrefix + '[' + dummyLabel + '](' + selection + ')');
+    newState.selectionStart = state.selectionStart + linkPrefix.length + 1;
+    newState.selectionEnd = newState.selectionStart + dummyLabel.length;
+    return newState;
+  } else {
+    // Selection is not a URL, wrap it with a link and use the selection as
+    // the label. Change the selection to the dummy link.
+    var beforeURL = linkPrefix + '[' + selection + '](';
+    var dummyLink = 'http://insert-your-link-here.com';
+    newState = replaceText(state, state.selectionStart, selection.length,
+      beforeURL + dummyLink + ')');
+    newState.selectionStart = state.selectionStart + beforeURL.length;
+    newState.selectionEnd = newState.selectionStart + dummyLink.length;
+    return newState;
+  }
+}
+&nbsp;
+/**
+ * Toggle Markdown-style formatting around a span of text.
+ *
+ * @param {EditorState} state - The current state of the input field.
+ * @param {string} prefix - The prefix to add or remove
+ *                          before the selection.
+ * @param {string?} suffix - The suffix to add or remove after the selection,
+ *                           defaults to being the same as the prefix.
+ * @param {string} placeholder - The text to insert between 'prefix' and
+ *                               'suffix' if the input text is empty.
+ * @return {EditorState} The new state of the input field.
+ */
+function toggleSpanStyle(state, prefix, suffix, placeholder) {
+  <span class="missing-if-branch" title="if path not taken" >I</span>if (typeof suffix === 'undefined') {
+<span class="cstat-no" title="statement not covered" >    s</span>uffix = prefix;
+  }
+&nbsp;
+  var selectionPrefix = state.text.slice(state.selectionStart - prefix.length,
+    state.selectionStart);
+  var selectionSuffix = state.text.slice(state.selectionEnd,
+    state.selectionEnd + prefix.length);
+  var newState = state;
+&nbsp;
+  if (state.selectionStart === state.selectionEnd &amp;&amp; placeholder) {
+    newState = replaceText(state, state.selectionStart, 0, placeholder);
+    newState.selectionStart = newState.selectionEnd - placeholder.length;
+  }
+&nbsp;
+  if (selectionPrefix === prefix &amp;&amp; selectionSuffix === suffix) {
+    newState = replaceText(newState, newState.selectionStart - prefix.length,
+                           prefix.length, '');
+    newState = replaceText(newState, newState.selectionEnd, suffix.length, '');
+  } else {
+    newState = replaceText(newState, newState.selectionStart, 0, prefix);
+    newState = replaceText(newState, newState.selectionEnd, 0, suffix);
+  }
+&nbsp;
+  return newState;
+}
+&nbsp;
+function startOfLine(str, pos) {
+  var start = str.lastIndexOf('\n', pos);
+  if (start &lt; 0) {
+    return 0;
+  } else {
+    return start + 1;
+  }
+}
+&nbsp;
+function endOfLine(str, pos) {
+  var end = str.indexOf('\n', pos);
+  if (end &lt; 0) {
+    return str.length;
+  } else {
+    return end;
+  }
+}
+&nbsp;
+/**
+ * Transform lines between two positions in an input field.
+ *
+ * @param {EditorState} state - The initial state of the input field
+ * @param {number} start - The start position within the input text
+ * @param {number} end - The end position within the input text
+ * @param {(EditorState, number) =&gt; EditorState} callback
+ *  - Callback which is invoked with the current state of the input and
+ *    the start of the current line and returns the new state of the input.
+ */
+function transformLines(state, start, end, callback) {
+  var lineStart = startOfLine(state.text, start);
+  var lineEnd = endOfLine(state.text, start);
+&nbsp;
+  while (lineEnd &lt;= endOfLine(state.text, end)) {
+    var isLastLine = lineEnd === state.text.length;
+    var currentLineLength = lineEnd - lineStart;
+&nbsp;
+    state = callback(state, lineStart, lineEnd);
+&nbsp;
+    var newLineLength = endOfLine(state.text, lineStart) - lineStart;
+    end += newLineLength - currentLineLength;
+&nbsp;
+    if (isLastLine) {
+      break;
+    }
+    lineStart = lineStart + newLineLength + 1;
+    lineEnd = endOfLine(state.text, lineStart);
+  }
+  return state;
+}
+&nbsp;
+/**
+ * Toggle Markdown-style formatting around a block of text.
+ *
+ * @param {EditorState} state - The current state of the input field.
+ * @param {string} prefix - The prefix to add or remove before each line
+ *                          of the selection.
+ * @return {EditorState} - The new state of the input field.
+ */
+function toggleBlockStyle(state, prefix) {
+  var start = state.selectionStart;
+  var end = state.selectionEnd;
+&nbsp;
+  // Test whether all lines in the selected range already have the style
+  // applied
+  var blockHasStyle = true;
+  transformLines(state, start, end, function (state, lineStart) {
+    if (state.text.slice(lineStart, lineStart + prefix.length) !== prefix) {
+      blockHasStyle = false;
+    }
+    return state;
+  });
+&nbsp;
+  if (blockHasStyle) {
+    // Remove the formatting.
+    return transformLines(state, start, end, function (state, lineStart) {
+      return replaceText(state, lineStart, prefix.length, '');
+    });
+  } else {
+    // Add the block style to any lines which do not already have it applied
+    return transformLines(state, start, end, function (state, lineStart) {
+      <span class="missing-if-branch" title="if path not taken" >I</span>if (state.text.slice(lineStart, lineStart + prefix.length) === prefix) {
+<span class="cstat-no" title="statement not covered" >        r</span>eturn state;
+      } else {
+        return replaceText(state, lineStart, 0, prefix);
+      }
+    });
+  }
+}
+&nbsp;
+module.exports = {
+  toggleSpanStyle: toggleSpanStyle,
+  toggleBlockStyle: toggleBlockStyle,
+  convertSelectionToLink: convertSelectionToLink,
+  LinkType: LinkType,
+};
+&nbsp;</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Fri Mar 16 2018 04:28:39 GMT+0000 (UTC)
+</div>
+</div>
+<script src="../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../sorter.js"></script>
+</body>
+</html>

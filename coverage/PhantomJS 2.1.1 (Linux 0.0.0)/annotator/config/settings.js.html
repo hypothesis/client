@@ -1,0 +1,584 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for annotator/config/settings.js</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../prettify.css" />
+    <link rel="stylesheet" href="../../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../../index.html">all files</a> / <a href="index.html">annotator/config/</a> settings.js
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">100% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>62/62</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">100% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>40/40</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">100% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>14/14</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">100% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>61/61</span>
+      </div>
+    </div>
+  </div>
+  <div class='status-line high'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">50×</span>
+<span class="cline-any cline-yes">50×</span>
+<span class="cline-any cline-yes">50×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">63×</span>
+<span class="cline-any cline-yes">63×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">41×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">41×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">39×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">38×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">26×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">26×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">26×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">22×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">40×</span>
+<span class="cline-any cline-yes">40×</span>
+<span class="cline-any cline-yes">40×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">40×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">36×</span>
+<span class="cline-any cline-yes">18×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">18×</span>
+<span class="cline-any cline-yes">14×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">63×</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">26×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">50×</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">'use strict';
+&nbsp;
+var configFuncSettingsFrom = require('./config-func-settings-from');
+var isBrowserExtension = require('./is-browser-extension');
+var sharedSettings = require('../../shared/settings');
+&nbsp;
+function settingsFrom(window_) {
+&nbsp;
+  var jsonConfigs = sharedSettings.jsonConfigsFrom(window_.document);
+  var configFuncSettings = configFuncSettingsFrom(window_);
+&nbsp;
+  /**
+   * Return the href URL of the first annotator sidebar link in the given document.
+   *
+   * Return the value of the href attribute of the first
+   * `&lt;link type="application/annotator+html" rel="sidebar"&gt;` element in the given document.
+   *
+   * This URL is used as the src of the sidebar's iframe.
+   *
+   * @return {string} - The URL to use for the sidebar's iframe.
+   *
+   * @throws {Error} - If there's no annotator link or the first annotator has
+   *   no href.
+   *
+   */
+  function sidebarAppUrl() {
+    var link = window_.document.querySelector('link[type="application/annotator+html"][rel="sidebar"]');
+&nbsp;
+    if (!link) {
+      throw new Error('No application/annotator+html (rel="sidebar") link in the document');
+    }
+&nbsp;
+    if (!link.href) {
+      throw new Error('application/annotator+html (rel="sidebar") link has no href');
+    }
+&nbsp;
+    return link.href;
+  }
+&nbsp;
+&nbsp;
+  /**
+   * Return the href URL of the first annotator client link in the given document.
+   *
+   * Return the value of the href attribute of the first
+   * `&lt;link type="application/annotator+html" rel="hypothesis-client"&gt;` element in the given document.
+   *
+   * This URL is used to identify where the client is from and what url should be
+   *    used inside of subframes
+   *
+   * @return {string} - The URL that the client is hosted from
+   *
+   * @throws {Error} - If there's no annotator link or the first annotator has
+   *   no href.
+   *
+   */
+  function clientUrl() {
+    var link = window_.document.querySelector('link[type="application/annotator+javascript"][rel="hypothesis-client"]');
+&nbsp;
+    if (!link) {
+      throw new Error('No application/annotator+javascript (rel="hypothesis-client") link in the document');
+    }
+&nbsp;
+    if (!link.href) {
+      throw new Error('application/annotator+javascript (rel="hypothesis-client") link has no href');
+    }
+&nbsp;
+    return link.href;
+  }
+&nbsp;
+  /**
+   * Return the `#annotations:*` ID from the given URL's fragment.
+   *
+   * If the URL contains a `#annotations:&lt;ANNOTATION_ID&gt;` fragment then return
+   * the annotation ID extracted from the fragment. Otherwise return `null`.
+   *
+   * @return {string|null} - The extracted ID, or null.
+   */
+  function annotations() {
+&nbsp;
+    /** Return the annotations from the URL, or null. */
+    function annotationsFromURL() {
+      // Annotation IDs are url-safe-base64 identifiers
+      // See https://tools.ietf.org/html/rfc4648#page-7
+      var annotFragmentMatch = window_.location.href.match(/#annotations:([A-Za-z0-9_-]+)$/);
+      if (annotFragmentMatch) {
+        return annotFragmentMatch[1];
+      }
+      return null;
+    }
+&nbsp;
+    return jsonConfigs.annotations || annotationsFromURL();
+  }
+&nbsp;
+  function showHighlights() {
+    var showHighlights_ = hostPageSetting('showHighlights');
+&nbsp;
+    if (showHighlights_ === null) {
+      showHighlights_ = 'always';  // The default value is 'always'.
+    }
+&nbsp;
+    // Convert legacy keys/values to corresponding current configuration.
+    if (typeof showHighlights_ === 'boolean') {
+      return showHighlights_ ? 'always' : 'never';
+    }
+&nbsp;
+    return showHighlights_;
+  }
+&nbsp;
+  /**
+   * Return the config.query setting from the host page or from the URL.
+   *
+   * If the host page contains a js-hypothesis-config script containing a
+   * query setting then return that.
+   *
+   * Otherwise if the host page's URL has a `#annotations:query:*` (or
+   * `#annotations:q:*`) fragment then return the query value from that.
+   *
+   * Otherwise return null.
+   *
+   * @return {string|null} - The config.query setting, or null.
+   */
+  function query() {
+&nbsp;
+    /** Return the query from the URL, or null. */
+    function queryFromURL() {
+      var queryFragmentMatch = window_.location.href.match(/#annotations:(query|q):(.+)$/i);
+      if (queryFragmentMatch) {
+        try {
+          return decodeURIComponent(queryFragmentMatch[2]);
+        } catch (err) {
+          // URI Error should return the page unfiltered.
+        }
+      }
+      return null;
+    }
+&nbsp;
+    return jsonConfigs.query || queryFromURL();
+  }
+&nbsp;
+  function hostPageSetting(name, options = {}) {
+    var allowInBrowserExt = options.allowInBrowserExt || false;
+    var hasDefaultValue = typeof options.defaultValue !== 'undefined';
+&nbsp;
+    if (!allowInBrowserExt &amp;&amp; isBrowserExtension(sidebarAppUrl())) {
+      return hasDefaultValue ? options.defaultValue : null;
+    }
+&nbsp;
+    if (configFuncSettings.hasOwnProperty(name)) {
+      return configFuncSettings[name];
+    }
+&nbsp;
+    if (jsonConfigs.hasOwnProperty(name)) {
+      return jsonConfigs[name];
+    }
+&nbsp;
+    if (hasDefaultValue) {
+      return options.defaultValue;
+    }
+&nbsp;
+    return null;
+  }
+&nbsp;
+  return {
+    get annotations() { return annotations(); },
+    get clientUrl() { return clientUrl(); },
+    get showHighlights() { return showHighlights(); },
+    get sidebarAppUrl() { return sidebarAppUrl(); },
+    get query() { return query(); },
+    hostPageSetting: hostPageSetting,
+  };
+}
+&nbsp;
+module.exports = settingsFrom;
+&nbsp;</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Fri Mar 16 2018 04:28:39 GMT+0000 (UTC)
+</div>
+</div>
+<script src="../../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../../sorter.js"></script>
+</body>
+</html>

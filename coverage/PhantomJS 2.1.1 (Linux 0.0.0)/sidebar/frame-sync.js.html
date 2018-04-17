@@ -1,0 +1,839 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for sidebar/frame-sync.js</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../prettify.css" />
+    <link rel="stylesheet" href="../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../index.html">all files</a> / <a href="index.html">sidebar/</a> frame-sync.js
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">94.17% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>97/103</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">78.57% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>22/28</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">89.66% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>26/29</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">94.12% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>96/102</span>
+      </div>
+    </div>
+  </div>
+  <div class='status-line high'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194
+195
+196
+197
+198
+199
+200
+201
+202
+203
+204
+205
+206
+207
+208
+209
+210
+211
+212
+213
+214
+215
+216
+217
+218
+219
+220
+221
+222
+223
+224
+225
+226
+227
+228
+229
+230
+231
+232
+233
+234
+235
+236
+237
+238
+239
+240
+241
+242
+243
+244
+245
+246
+247
+248
+249
+250
+251
+252
+253
+254
+255
+256
+257
+258
+259</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">12×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">21×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">21×</span>
+<span class="cline-any cline-yes">21×</span>
+<span class="cline-any cline-yes">21×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">21×</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">9×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">9×</span>
+<span class="cline-any cline-yes">9×</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-yes">9×</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">21×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">21×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">21×</span>
+<span class="cline-any cline-yes">21×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">21×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">21×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">21×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">21×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">21×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">21×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">21×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">21×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">21×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">21×</span>
+<span class="cline-any cline-yes">21×</span>
+<span class="cline-any cline-yes">21×</span>
+<span class="cline-any cline-yes">21×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">21×</span>
+<span class="cline-any cline-yes">21×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">21×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">21×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">'use strict';
+&nbsp;
+var debounce = require('lodash.debounce');
+&nbsp;
+var events = require('./events');
+var bridgeEvents = require('../shared/bridge-events');
+var metadata = require('./annotation-metadata');
+var uiConstants = require('./ui-constants');
+&nbsp;
+/**
+ * @typedef FrameInfo
+ * @property {string} uri - Current primary URI of the document being displayed
+ * @property {string[]} searchUris - List of URIs that should be passed to the
+ *           search API when searching for annotations on this document.
+ * @property {string} documentFingerprint - Fingerprint of the document, used
+ *                    for PDFs
+ */
+&nbsp;
+ /**
+  * Return a minimal representation of an annotation that can be sent from the
+  * sidebar app to a connected frame.
+  *
+  * Because this representation will be exposed to untrusted third-party
+  * JavaScript, it includes only the information needed to uniquely identify it
+  * within the current session and anchor it in the document.
+  */
+function formatAnnot(ann) {
+  return {
+    tag: ann.$tag,
+    msg: {
+      document: ann.document,
+      target: ann.target,
+      uri: ann.uri,
+    },
+  };
+}
+&nbsp;
+/**
+ * This service runs in the sidebar and is responsible for keeping the set of
+ * annotations displayed in connected frames in sync with the set shown in the
+ * sidebar.
+ */
+// @ngInject
+function FrameSync($rootScope, $window, Discovery, annotationUI, bridge) {
+&nbsp;
+  // Set of tags of annotations that are currently loaded into the frame
+  var inFrame = new Set();
+&nbsp;
+  /**
+   * Watch for changes to the set of annotations displayed in the sidebar and
+   * notify connected frames about new/updated/deleted annotations.
+   */
+  function setupSyncToFrame() {
+    // List of loaded annotations in previous state
+    var prevAnnotations = [];
+    var prevFrames = [];
+    var prevPublicAnns = 0;
+&nbsp;
+    annotationUI.subscribe(function () {
+      var state = annotationUI.getState();
+      <span class="missing-if-branch" title="if path not taken" >I</span>if (state.annotations === prevAnnotations &amp;&amp;
+<span class="branch-1 cbranch-no" title="branch not covered" >          state.frames === prevFrames) {</span>
+<span class="cstat-no" title="statement not covered" >        r</span>eturn;
+      }
+&nbsp;
+      var publicAnns = 0;
+      var inSidebar = new Set();
+      var added = [];
+&nbsp;
+      state.annotations.forEach(function (annot) {
+        if (metadata.isReply(annot)) {
+          // The frame does not need to know about replies
+          return;
+        }
+&nbsp;
+        if (metadata.isPublic(annot)) {
+          ++publicAnns;
+        }
+&nbsp;
+        inSidebar.add(annot.$tag);
+        if (!inFrame.has(annot.$tag)) {
+          added.push(annot);
+        }
+      });
+      var deleted = prevAnnotations.filter(function (annot) {
+        return !inSidebar.has(annot.$tag);
+      });
+      prevAnnotations = state.annotations;
+      prevFrames = state.frames;
+&nbsp;
+      // We currently only handle adding and removing annotations from the frame
+      // when they are added or removed in the sidebar, but not re-anchoring
+      // annotations if their selectors are updated.
+      if (added.length &gt; 0) {
+        bridge.call('loadAnnotations', added.map(formatAnnot));
+        added.forEach(function (annot) {
+          inFrame.add(annot.$tag);
+        });
+      }
+      deleted.forEach(function (annot) {
+        bridge.call('deleteAnnotation', formatAnnot(annot));
+        inFrame.delete(annot.$tag);
+      });
+&nbsp;
+      var frames = annotationUI.frames();
+      if (frames.length &gt; 0) {
+        if (frames.every(function (frame) { return frame.isAnnotationFetchComplete; })) {
+          <span class="missing-if-branch" title="else path not taken" >E</span>if (publicAnns === 0 || publicAnns !== prevPublicAnns) {
+            bridge.call(bridgeEvents.PUBLIC_ANNOTATION_COUNT_CHANGED, publicAnns);
+            prevPublicAnns = publicAnns;
+          }
+        }
+      }
+    });
+  }
+&nbsp;
+  /**
+   * Listen for messages coming in from connected frames and add new annotations
+   * to the sidebar.
+   */
+  function setupSyncFromFrame() {
+    // A new annotation, note or highlight was created in the frame
+    bridge.on('beforeCreateAnnotation', function (event) {
+      inFrame.add(event.tag);
+      var annot = Object.assign({}, event.msg, {$tag: event.tag});
+      $rootScope.$broadcast(events.BEFORE_ANNOTATION_CREATED, annot);
+    });
+&nbsp;
+    bridge.on('destroyFrame', destroyFrame.bind(this));
+&nbsp;
+    // Map of annotation tag to anchoring status
+    // ('anchored'|'orphan'|'timeout').
+    //
+    // Updates are coalesced to reduce the overhead from processing
+    // triggered by each `UPDATE_ANCHOR_STATUS` action that is dispatched.
+    var anchoringStatusUpdates = {};
+    var scheduleAnchoringStatusUpdate = debounce(() =&gt; {
+      annotationUI.updateAnchorStatus(anchoringStatusUpdates);
+      $rootScope.$broadcast(events.ANNOTATIONS_SYNCED, Object.keys(anchoringStatusUpdates));
+      anchoringStatusUpdates = {};
+    }, 10);
+&nbsp;
+    // Anchoring an annotation in the frame completed
+    bridge.on('sync', function (events_) {
+      events_.forEach(function (event) {
+        inFrame.add(event.tag);
+        anchoringStatusUpdates[event.tag] = event.msg.$orphan ? 'orphan' : 'anchored';
+        scheduleAnchoringStatusUpdate();
+      });
+    });
+&nbsp;
+    bridge.on('showAnnotations', function (tags) {
+      annotationUI.selectAnnotations(annotationUI.findIDsForTags(tags));
+      annotationUI.selectTab(uiConstants.TAB_ANNOTATIONS);
+    });
+&nbsp;
+    bridge.on('showBucketList', <span class="fstat-no" title="function not covered" >function (tags) {</span>
+      // highlight the annotations on the document
+      //bridge.call('showBucketList', tags);
+      // scroll the panel
+<span class="cstat-no" title="statement not covered" >      $</span>rootScope.$broadcast(events.SHOW_BUCKET_LIST, annotationUI.findIDsForTags(tags));
+    });
+&nbsp;
+    bridge.on('focusAnnotations', function (tags) {
+      a</span>nnotationUI.focusAnnotations(tags || <span class="branch-1 cbranch-no" title="branch not covered" >[]);
+    });
+&nbsp;
+    bridge.on('toggleAnnotationSelection', function (tags) {
+      annotationUI.toggleSelectedAnnotations(annotationUI.findIDsForTags(tags));
+    });
+&nbsp;
+    bridge.on('sidebarOpened', function () {
+      $rootScope.$broadcast('sidebarOpened');
+    });
+&nbsp;
+    // These invoke the matching methods by name on the Guests
+    bridge.on('showSidebar', function () {
+      bridge.call('showSidebar');
+    });
+    bridge.on('hideSidebar', function () {
+      bridge.call('hideSidebar');
+    });
+    bridge.on('setVisibleHighlights', function (state) {
+      bridge.call('setVisibleHighlights', state);
+    });
+&nbsp;
+  }
+&nbsp;
+  /**
+   * Query the Hypothesis annotation client in a frame for the URL and metadata
+   * of the document that is currently loaded and add the result to the set of
+   * connected frames.
+   */
+  function addFrame(channel) {
+    channel.call('getDocumentInfo', function (err, info) {
+      <span class="missing-if-branch" title="if path not taken" >I</span>if (err) {
+<span class="cstat-no" title="statement not covered" >        c</span>hannel.destroy();
+<span class="cstat-no" title="statement not covered" >        r</span>eturn;
+      }
+&nbsp;
+      $rootScope.$broadcast(events.FRAME_CONNECTED);
+&nbsp;
+      annotationUI.connectFrame({
+        id: info.frameIdentifier,
+        metadata: info.metadata,
+        uri: info.uri,
+      });
+    });
+  }
+&nbsp;
+  function destroyFrame(frameIdentifier) {
+    var frames = annotationUI.frames();
+    var frameToDestroy = frames.find(function (frame) {
+      return frame.id === frameIdentifier;
+    });
+    <span class="missing-if-branch" title="else path not taken" >E</span>if (frameToDestroy) {
+      annotationUI.destroyFrame(frameToDestroy);
+    }
+  }
+&nbsp;
+  /**
+   * Find and connect to Hypothesis clients in the current window.
+   */
+  this.connect = function () {
+    var discovery = new Discovery(window, {server: true});
+    discovery.startDiscovery(bridge.createChannel.bind(bridge));
+    bridge.onConnect(addFrame);
+&nbsp;
+    setupSyncToFrame();
+    setupSyncFromFrame();
+  };
+&nbsp;
+  /**
+   * Focus annotations with the given tags.
+   *
+   * This is used to indicate the highlight in the document that corresponds to
+   * a given annotation in the sidebar.
+   *
+   * @param {string[]} tags
+   */
+  this.focusAnnotations = <span class="fstat-no" title="function not covered" >function (tags) {</span>
+<span class="cstat-no" title="statement not covered" >    b</span>ridge.call('focusAnnotations', tags);
+  };
+&nbsp;
+  /**
+   * Scroll the frame to the highlight for an annotation with a given tag.
+   *
+   * @param {string} tag
+   */
+  this.scrollToAnnotation = <span class="fstat-no" title="function not covered" >function (tag) {</span>
+<span class="cstat-no" title="statement not covered" >    b</span>ridge.call('scrollToAnnotation', tag);
+  };
+}
+&nbsp;
+module.exports = {
+  default: FrameSync,
+  formatAnnot: formatAnnot,
+};
+&nbsp;</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Fri Mar 16 2018 04:28:39 GMT+0000 (UTC)
+</div>
+</div>
+<script src="../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../sorter.js"></script>
+</body>
+</html>

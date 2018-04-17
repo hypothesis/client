@@ -1,0 +1,930 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for annotator/sidebar.coffee</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../prettify.css" />
+    <link rel="stylesheet" href="../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../index.html">all files</a> / <a href="index.html">annotator/</a> sidebar.coffee
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">54.23% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>109/201</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">11.59% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>8/69</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">14.63% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>6/41</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">12.38% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>13/105</span>
+      </div>
+      <div class='fl pad1y'>
+        <span class="strong">64 statements, 1 function, 7 branches</span>
+        <span class="quiet">Ignored</span>  &nbsp;&nbsp;&nbsp;&nbsp;
+      </div>
+    </div>
+  </div>
+  <div class='status-line medium'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194
+195
+196
+197
+198
+199
+200
+201
+202
+203
+204
+205
+206
+207
+208
+209
+210
+211
+212
+213
+214
+215
+216
+217
+218
+219
+220
+221
+222
+223
+224
+225
+226
+227
+228
+229
+230
+231
+232
+233
+234
+235
+236
+237
+238
+239
+240
+241
+242
+243
+244
+245
+246
+247
+248
+249
+250
+251
+252
+253
+254
+255
+256
+257
+258
+259
+260
+261
+262
+263
+264
+265
+266
+267
+268
+269
+270
+271
+272
+273
+274
+275
+276
+277
+278
+279
+280
+281
+282
+283
+284
+285
+286
+287
+288</td><td class="line-coverage quiet"><span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">24×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">extend = require('extend')
+raf = require('raf')
+Hammer = require('hammerjs')
+$ = require('jquery')
+&nbsp;
+Host = require('./host')
+annotationCounts = require('./annotation-counts')
+sidebarTrigger = require('./sidebar-trigger')
+events = require('../shared/bridge-events')
+features = require('./features')
+&nbsp;
+# Minimum width to which the frame can be resized.
+MIN_RESIZE = 280
+&nbsp;
+&nbsp;
+module.exports = class Sidebar extends Host
+  options:
+    Document: {}
+    TextSelection: {}
+    BucketBar:
+      container: '.annotator-frame'
+    Toolbar:
+      container: '.annotator-frame'
+&nbsp;
+  renderFrame: null
+  gestureState: null
+&nbsp;
+  constructor: (element, config) -&gt;
+    super
+<span class="cstat-no" title="statement not covered" >    t</span>his.hide()
+&nbsp;
+    if config.openSidebar || config.annotations || config.query
+<span class="cstat-no" title="statement not covered" >      this.on 'panelReady', <span class="fstat-no" title="function not covered" ><span class="fstat-no" title="function not covered" >=</span></span>&gt; this.show()</span>
+&nbsp;
+    if @plugins.BucketBar?
+<span class="cstat-no" title="statement not covered" >      @plugins.BucketBar.element.on 'mouseup', <span class="fstat-no" title="function not covered" ><span class="fstat-no" title="function not covered" >(</span></span>event) =&gt; this.showBucketList()</span>
+&nbsp;
+    if @plugins.Toolbar?
+<span class="cstat-no" title="statement not covered" >      @toolbarWidth = @</span>plugins.Toolbar.getWidth()
+      if config.theme == 'clean'
+<span class="cstat-no" title="statement not covered" >        @</span>plugins.Toolbar.disableMinimizeBtn()
+<span class="cstat-no" title="statement not covered" >        @</span>plugins.Toolbar.disableHighlightsBtn()
+<span class="cstat-no" title="statement not covered" >        @plugins.Toolbar.disableNewNoteBtn()</span>
+      else if config.theme == 'custom'
+<span class="cstat-no" title="statement not covered" >        @</span>plugins.Toolbar.disableHighlightsBtn()
+<span class="cstat-no" title="statement not covered" >        @</span>plugins.Toolbar.disableNewNoteBtn()
+<span class="cstat-no" title="statement not covered" >        @plugins.Toolbar.disableCloseBtn()</span>
+      else
+<span class="cstat-no" title="statement not covered" >        @plugins.Toolbar.disableCloseBtn()</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >      this._setupGestures()</span>
+&nbsp;
+    # The partner-provided callback functions.
+<span class="cstat-no" title="statement not covered" >    serviceConfig = config.services?[0</span>]
+    if serviceConfig
+<span class="cstat-no" title="statement not covered" >      @onLoginRequest = serviceConfig.o</span>nLoginRequest
+<span class="cstat-no" title="statement not covered" >      @onLogoutRequest = serviceConfig.o</span>nLogoutRequest
+<span class="cstat-no" title="statement not covered" >      @onSignupRequest = serviceConfig.o</span>nSignupRequest
+<span class="cstat-no" title="statement not covered" >      @onProfileRequest = serviceConfig.o</span>nProfileRequest
+<span class="cstat-no" title="statement not covered" >      @onHelpRequest = serviceConfig.onHelpRequest</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    @onLayoutChange = config.o</span>nLayoutChange
+&nbsp;
+    # initial layout notification
+<span class="cstat-no" title="statement not covered" >    t</span>his._notifyOfLayoutChange(false)
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    this._setupSidebarEvents()</span>
+&nbsp;
+  _setupSidebarEvents: <span class="fstat-no" title="function not covered" >-</span>&gt;
+<span class="cstat-no" title="statement not covered" >    a</span>nnotationCounts(document.body, @crossframe)
+<span class="cstat-no" title="statement not covered" >    s</span>idebarTrigger(document.body, <span class="fstat-no" title="function not covered" ><span class="fstat-no" title="function not covered" >=</span></span>&gt; this.show())
+<span class="cstat-no" title="statement not covered" >    f</span>eatures.init(@crossframe)
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    @</span>crossframe.on('showSidebar', <span class="fstat-no" title="function not covered" ><span class="fstat-no" title="function not covered" >=</span></span>&gt; this.show())
+<span class="cstat-no" title="statement not covered" >    @</span>crossframe.on('hideSidebar', <span class="fstat-no" title="function not covered" ><span class="fstat-no" title="function not covered" >=</span></span>&gt; this.hide())
+<span class="cstat-no" title="statement not covered" >    @</span>crossframe.on(events.LOGIN_REQUESTED, <span class="fstat-no" title="function not covered" ><span class="fstat-no" title="function not covered" >=</span></span>&gt;
+<span class="cstat-no" title="statement not covered" >      if @onLoginRequest</span>
+        @onLoginRequest()
+    )
+<span class="cstat-no" title="statement not covered" >    @</span>crossframe.on(events.LOGOUT_REQUESTED, <span class="fstat-no" title="function not covered" ><span class="fstat-no" title="function not covered" >=</span></span>&gt;
+<span class="cstat-no" title="statement not covered" >      if @onLogoutRequest</span>
+        @onLogoutRequest()
+    )
+<span class="cstat-no" title="statement not covered" >    @</span>crossframe.on(events.SIGNUP_REQUESTED, <span class="fstat-no" title="function not covered" ><span class="fstat-no" title="function not covered" >=</span></span>&gt;
+<span class="cstat-no" title="statement not covered" >      if @onSignupRequest</span>
+        @onSignupRequest()
+    )
+<span class="cstat-no" title="statement not covered" >    @</span>crossframe.on(events.PROFILE_REQUESTED, <span class="fstat-no" title="function not covered" ><span class="fstat-no" title="function not covered" >=</span></span>&gt;
+<span class="cstat-no" title="statement not covered" >      if @onProfileRequest</span>
+        @onProfileRequest()
+    )
+<span class="cstat-no" title="statement not covered" >    @</span>crossframe.on(events.HELP_REQUESTED, <span class="fstat-no" title="function not covered" ><span class="fstat-no" title="function not covered" >=</span></span>&gt;
+<span class="cstat-no" title="statement not covered" >      if @onHelpRequest</span>
+        @onHelpRequest()
+    )
+    # Return this for chaining
+    this
+&nbsp;
+  _setupGestures: <span class="fstat-no" title="function not covered" >-&gt;</span>
+<span class="cstat-no" title="statement not covered" >    $toggle = @</span>toolbar.find('[name=sidebar-toggle]')
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    if $toggle[0]</span>
+      # Prevent any default gestures on the handle
+<span class="cstat-no" title="statement not covered" >      $</span>toggle.on('touchmove', <span class="fstat-no" title="function not covered" >(</span>event) -&gt; event.preventDefault())
+&nbsp;
+      # Set up the Hammer instance and handlers
+<span class="cstat-no" title="statement not covered" >      mgr = n</span>ew Hammer.Manager($toggle[0])
+      .on('panstart panend panleft panright', this.onPan)
+      .on('swipeleft swiperight', this.onSwipe)
+&nbsp;
+      # Set up the gesture recognition
+<span class="cstat-no" title="statement not covered" >      pan = m</span>gr.add(new Hammer.Pan({direction: Hammer.DIRECTION_HORIZONTAL}))
+<span class="cstat-no" title="statement not covered" >      swipe = m</span>gr.add(new Hammer.Swipe({direction: Hammer.DIRECTION_HORIZONTAL}))
+<span class="cstat-no" title="statement not covered" >      s</span>wipe.recognizeWith(pan)
+&nbsp;
+      # Set up the initial state
+<span class="cstat-no" title="statement not covered" >      t</span>his._initializeGestureState()
+&nbsp;
+      # Return this for chaining
+      this
+&nbsp;
+  _initializeGestureState: <span class="fstat-no" title="function not covered" >-</span>&gt;
+    @gestureState =
+      initial: null
+      final: null
+&nbsp;
+  # Schedule any changes needed to update the sidebar layout.
+  _updateLayout: <span class="fstat-no" title="function not covered" >-</span>&gt;
+    # Only schedule one frame at a time
+<span class="cstat-no" title="statement not covered" >    r</span>eturn if @renderFrame
+&nbsp;
+    # Schedule a frame
+    @renderFrame = raf <span class="fstat-no" title="function not covered" ><span class="fstat-no" title="function not covered" >=</span>&gt;</span>
+<span class="cstat-no" title="statement not covered" >      @renderFrame = n</span>ull  # Clear the schedule
+&nbsp;
+      # Process the resize gesture
+<span class="cstat-no" title="statement not covered" >      if @gestureState.final isnt @gestureState.initial</span>
+<span class="cstat-no" title="statement not covered" >        m = @gestureState.f</span>inal
+<span class="cstat-no" title="statement not covered" >        w = -m</span>
+<span class="cstat-no" title="statement not covered" >        @</span>frame.css('margin-left', "#{m}px")
+        i</span>f w &gt;= MIN_RESIZE then <span class="cstat-no" title="statement not covered" >@frame.css('width', "#{w}px")
+        this._notifyOfLayoutChange()
+&nbsp;
+  ###*
+  # Notify integrator when sidebar layout changes via `onLayoutChange` callback.
+  #
+  # @param [boolean] explicitExpandedState - `true` or `false` if the sidebar
+  #   is being directly opened or closed, as opposed to being resized via
+  #   the sidebar's drag handles.
+  ###
+  _notifyOfLayoutChange: <span class="fstat-no" title="function not covered" >(explicitExpandedState) =&gt;</span>
+<span class="cstat-no" title="statement not covered" >    toolbarWidth = @toolbarWidth || 0</span>
+&nbsp;
+    # The sidebar structure is:
+    #
+    # [ Toolbar    ][                                   ]
+    # [ ---------- ][ Sidebar iframe container (@frame) ]
+    # [ Bucket Bar ][                                   ]
+    #
+    # The sidebar iframe is hidden or shown by adjusting the left margin of its
+    # container.
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    if @onLayoutChange</span>
+<span class="cstat-no" title="statement not covered" >      rect = @</span>frame[0].getBoundingClientRect()
+<span class="cstat-no" title="statement not covered" >      computedStyle = w</span>indow.getComputedStyle(@frame[0])
+<span class="cstat-no" title="statement not covered" >      width = p</span>arseInt(computedStyle.width)
+<span class="cstat-no" title="statement not covered" >      leftMargin = p</span>arseInt(computedStyle.marginLeft)
+&nbsp;
+      # The width of the sidebar that is visible on screen, including the
+      # toolbar, which is always visible.
+<span class="cstat-no" title="statement not covered" >      frameVisibleWidth = t</span>oolbarWidth
+&nbsp;
+      if explicitExpandedState?
+        # When we are explicitly saying to open or close, jump
+        # straight to the upper and lower bounding widths.
+<span class="cstat-no" title="statement not covered" >        if explicitExpandedState</span>
+<span class="cstat-no" title="statement not covered" >          frameVisibleWidth += width</span>
+      else
+<span class="cstat-no" title="statement not covered" >        if leftMargin &lt; MIN_RESIZE</span>
+          # When the width hits its threshold of MIN_RESIZE,
+          # the left margin continues to push the sidebar off screen.
+          # So it's the best indicator of width when we get below that threshold.
+          # Note: when we hit the right edge, it will be -0
+<span class="cstat-no" title="statement not covered" >          frameVisibleWidth += -leftMargin</span>
+        else
+<span class="cstat-no" title="statement not covered" >          frameVisibleWidth += width</span>
+&nbsp;
+      # Since we have added logic on if this is an explicit show/hide
+      # and applied proper width to the visible value above, we can infer
+      # expanded state on that width value vs the lower bound
+<span class="cstat-no" title="statement not covered" >      expanded = frameVisibleWidth &gt; t</span>oolbarWidth
+&nbsp;
+      @onLayoutChange({
+        expanded: expanded,
+        width: if expanded then frameVisibleWidth else toolbarWidth,
+        height: rect.height,
+      })
+&nbsp;
+  onPan: <span class="fstat-no" title="function not covered" >(event) =&gt;</span>
+    switch event.type
+      when 'panstart'
+        # Initialize the gesture state
+<span class="cstat-no" title="statement not covered" >        t</span>his._initializeGestureState()
+        # Immadiate response
+<span class="cstat-no" title="statement not covered" >        @</span>frame.addClass 'annotator-no-transition'
+        # Escape iframe capture
+<span class="cstat-no" title="statement not covered" >        @</span>frame.css('pointer-events', 'none')
+        # Set origin margin
+        @gestureState.initial = parseInt(getComputedStyle(@frame[0]).marginLeft)
+&nbsp;
+      when 'panend'
+        # Re-enable transitions
+<span class="cstat-no" title="statement not covered" >        @</span>frame.removeClass 'annotator-no-transition'
+        # Re-enable iframe events
+<span class="cstat-no" title="statement not covered" >        @</span>frame.css('pointer-events', '')
+        # Snap open or closed
+        if @gestureState.final &lt;= -MIN_RESIZE
+<span class="cstat-no" title="statement not covered" >          this.show()</span>
+        else
+<span class="cstat-no" title="statement not covered" >          this.hide()</span>
+        # Reset the gesture state
+        this._initializeGestureState()
+&nbsp;
+      when 'panleft', 'panright'
+<span class="cstat-no" title="statement not covered" >        r</span>eturn unless @gestureState.initial?
+        # Compute new margin from delta and initial conditions
+<span class="cstat-no" title="statement not covered" >        m = @gestureState.i</span>nitial
+<span class="cstat-no" title="statement not covered" >        d = event.d</span>eltaX
+<span class="cstat-no" title="statement not covered" >        @gestureState.final = M</span>ath.min(Math.round(m + d), 0)
+        # Start updating
+        this._updateLayout()
+&nbsp;
+  onSwipe: <span class="fstat-no" title="function not covered" >(event) =&gt;</span>
+    switch event.type
+      when 'swipeleft'
+        this.show()
+      when 'swiperight'
+        this.hide()
+&nbsp;
+  show: <span class="fstat-no" title="function not covered" >-</span>&gt;
+<span class="cstat-no" title="statement not covered" >    @</span>crossframe.call('sidebarOpened')
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    @frame.css '</span>margin-left': "#{-1 * @frame.width()}px"
+<span class="cstat-no" title="statement not covered" >    @</span>frame.removeClass 'annotator-collapsed'
+&nbsp;
+    if @plugins.Toolbar?
+<span class="cstat-no" title="statement not covered" >      @</span>plugins.Toolbar.showCollapseSidebarBtn();
+<span class="cstat-no" title="statement not covered" >      @plugins.Toolbar.showCloseBtn();</span>
+&nbsp;
+&nbsp;
+    if @options.showHighlights == 'whenSidebarOpen'
+<span class="cstat-no" title="statement not covered" >      @setVisibleHighlights(true)</span>
+&nbsp;
+    this._notifyOfLayoutChange(true)
+&nbsp;
+  hide: <span class="fstat-no" title="function not covered" >-</span>&gt;
+<span class="cstat-no" title="statement not covered" >    @frame.css '</span>margin-left': ''
+<span class="cstat-no" title="statement not covered" >    @</span>frame.addClass 'annotator-collapsed'
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    @</span>plugins.Toolbar.hideCloseBtn();
+&nbsp;
+    if @plugins.Toolbar?
+<span class="cstat-no" title="statement not covered" >      @plugins.Toolbar.showExpandSidebarBtn();</span>
+&nbsp;
+    if @options.showHighlights == 'whenSidebarOpen'
+<span class="cstat-no" title="statement not covered" >      @setVisibleHighlights(false)</span>
+&nbsp;
+    this._notifyOfLayoutChange(false)
+&nbsp;
+  isOpen: <span class="fstat-no" title="function not covered" >-</span>&gt;
+    !@frame.hasClass('annotator-collapsed')
+&nbsp;
+  setAllVisibleHighlights: <span class="fstat-no" title="function not covered" >(</span>shouldShowHighlights) -&gt;
+<span class="cstat-no" title="statement not covered" >    @</span>crossframe.call('setVisibleHighlights', shouldShowHighlights)
+&nbsp;
+    # Let the Toolbar know about this event
+    this.publish 'setVisibleHighlights', shouldShowHighlights
+&nbsp;
+  showBucketList: <span class="fstat-no" title="function not covered" >-&gt;</span>
+<span class="cstat-no" title="statement not covered" >    [tabs,b</span>uckets] = [@plugins.BucketBar.tabs, @plugins.BucketBar.buckets]
+<span class="cstat-no" title="statement not covered" >    bucket = t</span>abs.index($(event.target).parent())
+<span class="cstat-no" title="statement not covered" >    [tags, annotations] = [[], []]</span>
+    for anchor in buckets[bucket]
+<span class="cstat-no" title="statement not covered" >      tags.push(anchor.annotation.$tag)</span>
+<span class="cstat-no" title="statement not covered" >    e</span>vent.stopPropagation()
+    @crossframe?.call('showBucketList', tags);
+&nbsp;
+&nbsp;</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Thu Mar 15 2018 23:02:00 GMT+0000 (UTC)
+</div>
+</div>
+<script src="../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../sorter.js"></script>
+</body>
+</html>

@@ -1,0 +1,1793 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for sidebar/components/annotation.js</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../prettify.css" />
+    <link rel="stylesheet" href="../../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../../index.html">all files</a> / <a href="index.html">sidebar/components/</a> annotation.js
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">87.1% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>189/217</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">78.81% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>93/118</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">85.71% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>42/49</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">87.1% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>189/217</span>
+      </div>
+    </div>
+  </div>
+  <div class='status-line high'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194
+195
+196
+197
+198
+199
+200
+201
+202
+203
+204
+205
+206
+207
+208
+209
+210
+211
+212
+213
+214
+215
+216
+217
+218
+219
+220
+221
+222
+223
+224
+225
+226
+227
+228
+229
+230
+231
+232
+233
+234
+235
+236
+237
+238
+239
+240
+241
+242
+243
+244
+245
+246
+247
+248
+249
+250
+251
+252
+253
+254
+255
+256
+257
+258
+259
+260
+261
+262
+263
+264
+265
+266
+267
+268
+269
+270
+271
+272
+273
+274
+275
+276
+277
+278
+279
+280
+281
+282
+283
+284
+285
+286
+287
+288
+289
+290
+291
+292
+293
+294
+295
+296
+297
+298
+299
+300
+301
+302
+303
+304
+305
+306
+307
+308
+309
+310
+311
+312
+313
+314
+315
+316
+317
+318
+319
+320
+321
+322
+323
+324
+325
+326
+327
+328
+329
+330
+331
+332
+333
+334
+335
+336
+337
+338
+339
+340
+341
+342
+343
+344
+345
+346
+347
+348
+349
+350
+351
+352
+353
+354
+355
+356
+357
+358
+359
+360
+361
+362
+363
+364
+365
+366
+367
+368
+369
+370
+371
+372
+373
+374
+375
+376
+377
+378
+379
+380
+381
+382
+383
+384
+385
+386
+387
+388
+389
+390
+391
+392
+393
+394
+395
+396
+397
+398
+399
+400
+401
+402
+403
+404
+405
+406
+407
+408
+409
+410
+411
+412
+413
+414
+415
+416
+417
+418
+419
+420
+421
+422
+423
+424
+425
+426
+427
+428
+429
+430
+431
+432
+433
+434
+435
+436
+437
+438
+439
+440
+441
+442
+443
+444
+445
+446
+447
+448
+449
+450
+451
+452
+453
+454
+455
+456
+457
+458
+459
+460
+461
+462
+463
+464
+465
+466
+467
+468
+469
+470
+471
+472
+473
+474
+475
+476
+477
+478
+479
+480
+481
+482
+483
+484
+485
+486
+487
+488
+489
+490
+491
+492
+493
+494
+495
+496
+497
+498
+499
+500
+501
+502
+503
+504
+505
+506
+507
+508
+509
+510
+511
+512
+513
+514
+515
+516
+517
+518
+519
+520
+521
+522
+523
+524
+525
+526
+527
+528
+529
+530
+531
+532
+533
+534
+535
+536
+537
+538
+539
+540
+541
+542
+543
+544
+545
+546
+547
+548
+549
+550
+551
+552
+553
+554
+555
+556
+557
+558
+559
+560
+561
+562
+563
+564
+565
+566
+567
+568
+569
+570
+571
+572
+573
+574
+575
+576
+577</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">12×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">12×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">82×</span>
+<span class="cline-any cline-yes">82×</span>
+<span class="cline-any cline-yes">82×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">13×</span>
+<span class="cline-any cline-yes">13×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">13×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">13×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-yes">100×</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">82×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">82×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">82×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">82×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">82×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">82×</span>
+<span class="cline-any cline-yes">82×</span>
+<span class="cline-any cline-yes">82×</span>
+<span class="cline-any cline-yes">82×</span>
+<span class="cline-any cline-yes">73×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">82×</span>
+<span class="cline-any cline-yes">82×</span>
+<span class="cline-any cline-yes">55×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">82×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">82×</span>
+<span class="cline-any cline-yes">77×</span>
+<span class="cline-any cline-yes">26×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">82×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">59×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">23×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">18×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">82×</span>
+<span class="cline-any cline-yes">220×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">82×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">82×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">82×</span>
+<span class="cline-any cline-yes">33×</span>
+<span class="cline-any cline-yes">24×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">82×</span>
+<span class="cline-any cline-yes">974×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">82×</span>
+<span class="cline-any cline-yes">16×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">82×</span>
+<span class="cline-any cline-yes">268×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">82×</span>
+<span class="cline-any cline-yes">176×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">176×</span>
+<span class="cline-any cline-yes">176×</span>
+<span class="cline-any cline-yes">49×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">127×</span>
+<span class="cline-any cline-yes">9×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">127×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">82×</span>
+<span class="cline-any cline-yes">153×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">82×</span>
+<span class="cline-any cline-yes">43×</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-yes">33×</span>
+<span class="cline-any cline-yes">25×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">82×</span>
+<span class="cline-any cline-yes">19×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">82×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">82×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">82×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">82×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">82×</span>
+<span class="cline-any cline-yes">9×</span>
+<span class="cline-any cline-yes">9×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">9×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">9×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">9×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">9×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">82×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">82×</span>
+<span class="cline-any cline-yes">99×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">99×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">82×</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">82×</span>
+<span class="cline-any cline-yes">342×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">82×</span>
+<span class="cline-any cline-yes">100×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">82×</span>
+<span class="cline-any cline-yes">322×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">82×</span>
+<span class="cline-any cline-yes">250×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">82×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">82×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">82×</span>
+<span class="cline-any cline-yes">181×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">82×</span>
+<span class="cline-any cline-yes">112×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">106×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">82×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">82×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">82×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">82×</span>
+<span class="cline-any cline-yes">967×</span>
+<span class="cline-any cline-yes">967×</span>
+<span class="cline-any cline-yes">93×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">874×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">82×</span>
+<span class="cline-any cline-yes">173×</span>
+<span class="cline-any cline-yes">157×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">16×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">82×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">'use strict';
+&nbsp;
+var annotationMetadata = require('../annotation-metadata');
+var events = require('../events');
+var { isThirdPartyUser } = require('../util/account-id');
+&nbsp;
+var isNew = annotationMetadata.isNew;
+var isReply = annotationMetadata.isReply;
+var isPageNote = annotationMetadata.isPageNote;
+&nbsp;
+/**
+ * Return a copy of `annotation` with changes made in the editor applied.
+ */
+function updateModel(annotation, changes, permissions) {
+  var userid = annotation.user;
+&nbsp;
+  return Object.assign({}, annotation, {
+    // Apply changes from the draft
+    tags: changes.tags,
+    text: changes.text,
+    permissions: changes.isPrivate ?
+      permissions.private(userid) : permissions.shared(userid, annotation.group),
+  });
+}
+&nbsp;
+// @ngInject
+function AnnotationController(
+  $document, $rootScope, $scope, $timeout, $window, analytics, annotationUI,
+  annotationMapper, drafts, flash, groups, permissions, serviceUrl,
+  session, settings, store, streamer, $filter) {
+&nbsp;
+  var self = this;
+  var newlyCreatedByHighlightButton;
+  this.isThemeCustom = settings.theme === 'custom';
+&nbsp;
+  /** Save an annotation to the server. */
+  function save(annot) {
+    var saved;
+    var updating = !!annot.id;
+&nbsp;
+    if (updating) {
+      saved = store.annotation.update({id: annot.id}, annot);
+    } else {
+      saved = store.annotation.create({}, annot);
+    }
+&nbsp;
+    return saved.then(function (savedAnnot) {
+&nbsp;
+      var event;
+&nbsp;
+      // Copy across internal properties which are not part of the annotation
+      // model saved on the server
+      savedAnnot.$tag = annot.$tag;
+      Object.keys(annot).forEach(function (k) {
+        if (k[0] === '$') {
+          savedAnnot[k] = annot[k];
+        }
+      });
+&nbsp;
+&nbsp;
+      <span class="missing-if-branch" title="if path not taken" >I</span>if(self.isReply()){
+<span class="cstat-no" title="statement not covered" >        e</span>vent = updating ? analytics.events.REPLY_UPDATED : analytics.events.REPLY_CREATED;
+      }else if(self.isHighlight()){
+        event = u</span>pdating ? <span class="branch-0 cbranch-no" title="branch not covered" >analytics.events.HIGHLIGHT_UPDATED : analytics.events.HIGHLIGHT_CREATED;
+      }else if(isPageNote(self.annotation)) {
+        event = u</span>pdating ? <span class="branch-0 cbranch-no" title="branch not covered" >analytics.events.PAGE_NOTE_UPDATED : analytics.events.PAGE_NOTE_CREATED;
+      }else {
+        e</span>vent = updating ? analytics.events.ANNOTATION_UPDATED : <span class="branch-1 cbranch-no" title="branch not covered" >analytics.events.ANNOTATION_CREATED;
+      }
+&nbsp;
+      analytics.track(event);
+&nbsp;
+      return savedAnnot;
+    });
+  }
+&nbsp;
+  /**
+    * Initialize the controller instance.
+    *
+    * All initialization code except for assigning the controller instance's
+    * methods goes here.
+    */
+  function init() {
+    /** Determines whether controls to expand/collapse the annotation body
+     * are displayed adjacent to the tags field.
+     */
+    self.canCollapseBody = false;
+&nbsp;
+    /** Determines whether the annotation body should be collapsed. */
+    self.collapseBody = true;
+&nbsp;
+    /** True if the annotation is currently being saved. */
+    self.isSaving = false;
+&nbsp;
+    /** True if the 'Share' dialog for this annotation is currently open. */
+    self.showShareDialog = false;
+&nbsp;
+    /**
+      * `true` if this AnnotationController instance was created as a result of
+      * the highlight button being clicked.
+      *
+      * `false` if the annotation button was clicked, or if this is a highlight
+      * or annotation that was fetched from the server (as opposed to created
+      * new client-side).
+      */
+    newlyCreatedByHighlightButton = self.annotation.$highlight || false;
+&nbsp;
+    // New annotations (just created locally by the client, rather then
+    // received from the server) have some fields missing. Add them.
+    //
+    // FIXME: This logic should go in the `addAnnotations` Redux action once all
+    // required state is in the store.
+    self.annotation.user = self.annotation.user || session.state.userid;
+    self.annotation.user_info = self.annotation.user_info || session.state.user_info;
+    self.annotation.group = self.annotation.group || groups.focused().id;
+    if (!self.annotation.permissions) {
+      self.annotation.permissions = permissions.default(self.annotation.user,
+                                                      self.annotation.group);
+    }
+    self.annotation.text = self.annotation.text || '';
+    if (!Array.isArray(self.annotation.tags)) {
+      self.annotation.tags = [];
+    }
+&nbsp;
+    // Automatically save new highlights to the server when they're created.
+    // Note that this line also gets called when the user logs in (since
+    // AnnotationController instances are re-created on login) so serves to
+    // automatically save highlights that were created while logged out when you
+    // log in.
+    saveNewHighlight();
+&nbsp;
+    // If this annotation is not a highlight and if it's new (has just been
+    // created by the annotate button) or it has edits not yet saved to the
+    // server - then open the editor on AnnotationController instantiation.
+    if (!newlyCreatedByHighlightButton) {
+      if (isNew(self.annotation) || drafts.get(self.annotation)) {
+        self.edit();
+      }
+    }
+  }
+&nbsp;
+  /** Save this annotation if it's a new highlight.
+   *
+   * The highlight will be saved to the server if the user is logged in,
+   * saved to drafts if they aren't.
+   *
+   * If the annotation is not new (it has already been saved to the server) or
+   * is not a highlight then nothing will happen.
+   *
+   */
+  function saveNewHighlight() {
+    if (!isNew(self.annotation)) {
+      // Already saved.
+      return;
+    }
+&nbsp;
+    if (!self.isHighlight()) {
+      // Not a highlight,
+      return;
+    }
+&nbsp;
+    if (self.annotation.user) {
+      // User is logged in, save to server.
+      // Highlights are always private.
+      self.annotation.permissions = permissions.private(self.annotation.user);
+      save(self.annotation).then(function(model) {
+        model.$tag = self.annotation.$tag;
+        $rootScope.$broadcast(events.ANNOTATION_CREATED, model);
+      });
+    } else {
+      // User isn't logged in, save to drafts.
+      drafts.update(self.annotation, self.state());
+    }
+  }
+&nbsp;
+  this.authorize = function(action) {
+    return permissions.permits(
+      self.annotation.permissions,
+      action,
+      session.state.userid
+    );
+  };
+&nbsp;
+  /**
+    * @ngdoc method
+    * @name annotation.AnnotationController#flag
+    * @description Flag the annotation.
+    */
+  this.flag = function() {
+    if (!session.state.userid) {
+      var msg = $filter('translate')('You must be logged in to report an annotation to the moderators. Login to flag annotations');
+      flash.error(msg);
+      return;
+    }
+&nbsp;
+    var onRejected = function(err) {
+      var msg = $filter('translate')('Flagging annotation failed');
+      flash.error(err.message, msg);
+    };
+    annotationMapper.flagAnnotation(self.annotation).then(<span class="fstat-no" title="function not covered" >function(){</span>
+<span class="cstat-no" title="statement not covered" >      a</span>nalytics.track(analytics.events.ANNOTATION_FLAGGED);
+<span class="cstat-no" title="statement not covered" >      a</span>nnotationUI.updateFlagStatus(self.annotation.id, true);
+    }, onRejected);
+  };
+&nbsp;
+  /**
+    * @ngdoc method
+    * @name annotation.AnnotationController#delete
+    * @description Deletes the annotation.
+    */
+  this.delete = function() {
+    return $timeout(function() {  // Don't use confirm inside the digest cycle.
+      var msg = $filter('translate')('Are you sure you want to delete this annotation?');
+      if ($window.confirm(msg)) {
+&nbsp;
+        var onRejected = function(err) {
+          var msg = $filter('translate')('Deleting annotation failed');
+          flash.error(err.message, msg);
+        };
+        $scope.$apply(function() {
+          annotationMapper.deleteAnnotation(self.annotation).then(function(){
+            var event;
+&nbsp;
+            <span class="missing-if-branch" title="if path not taken" >I</span>if(self.isReply()){
+<span class="cstat-no" title="statement not covered" >              e</span>vent = analytics.events.REPLY_DELETED;
+            }else <span class="missing-if-branch" title="else path not taken" >E</span>if(self.isHighlight()){
+              event = analytics.events.HIGHLIGHT_DELETED;
+            }else <span class="cstat-no" title="statement not covered" >if(isPageNote(self.annotation)){</span>
+<span class="cstat-no" title="statement not covered" >              e</span>vent = analytics.events.PAGE_NOTE_DELETED;
+            }else {
+<span class="cstat-no" title="statement not covered" >              e</span>vent = analytics.events.ANNOTATION_DELETED;
+            }
+&nbsp;
+            analytics.track(event);
+&nbsp;
+          }, onRejected);
+        });
+      }
+    }, true);
+  };
+&nbsp;
+  /**
+    * @ngdoc method
+    * @name annotation.AnnotationController#edit
+    * @description Switches the view to an editor.
+    */
+  this.edit = function() {
+    if (!drafts.get(self.annotation)) {
+      drafts.update(self.annotation, self.state());
+    }
+  };
+&nbsp;
+  /**
+   * @ngdoc method
+   * @name annotation.AnnotationController#editing.
+   * @returns {boolean} `true` if this annotation is currently being edited
+   *   (i.e. the annotation editor form should be open), `false` otherwise.
+   */
+  this.editing = function() {
+    return drafts.get(self.annotation) &amp;&amp; !self.isSaving;
+  };
+&nbsp;
+  /**
+    * @ngdoc method
+    * @name annotation.AnnotationController#group.
+    * @returns {Object} The full group object associated with the annotation.
+    */
+  this.group = function() {
+    return groups.get(self.annotation.group);
+  };
+&nbsp;
+  /**
+    * @ngdoc method
+    * @name annotation.AnnotaitonController#hasContent
+    * @returns {boolean} `true` if this annotation has content, `false`
+    *   otherwise.
+    */
+  this.hasContent = function() {
+    return self.state().text.length &gt; 0 || self.state().tags.length &gt; 0;
+  };
+&nbsp;
+  /**
+    * Return the annotation's quote if it has one or `null` otherwise.
+    */
+  this.quote = function() {
+    <span class="missing-if-branch" title="if path not taken" >I</span>if (self.annotation.target.length === 0) {
+<span class="cstat-no" title="statement not covered" >      r</span>eturn null;
+    }
+    var target = self.annotation.target[0];
+    if (!target.selector) {
+      return null;
+    }
+    var quoteSel = target.selector.find(function (sel) {
+      return sel.type === 'TextQuoteSelector';
+    });
+    return quoteSel ? quoteSel.exact : null;
+  };
+&nbsp;
+  this.id = function() {
+    return self.annotation.id;
+  };
+&nbsp;
+  /**
+    * @ngdoc method
+    * @name annotation.AnnotationController#isHighlight.
+    * @returns {boolean} true if the annotation is a highlight, false otherwise
+    */
+  this.isHighlight = function() {
+    if (newlyCreatedByHighlightButton) {
+      return true;
+    } else if (isNew(self.annotation)) {
+      return false;
+    } else {
+      // Once an annotation has been saved to the server there's no longer a
+      // simple property that says whether it's a highlight or not. Instead an
+      // annotation is considered a highlight if it has a) content and b) is
+      // linked to a specific part of the document.
+      <span class="missing-if-branch" title="if path not taken" >I</span>if (isPageNote(self.annotation) || isReply(self.annotation)) {
+<span class="cstat-no" title="statement not covered" >        r</span>eturn false;
+      }
+      if (self.annotation.hidden) {
+        // Annotation has been censored so we have to assume that it had
+        // content.
+        return false;
+      }
+      return !self.hasContent();
+    }
+  };
+&nbsp;
+  /**
+    * @ngdoc method
+    * @name annotation.AnnotationController#isShared
+    * @returns {boolean} True if the annotation is shared (either with the
+    * current group or with everyone).
+    */
+  this.isShared = function() {
+    return !self.state().isPrivate;
+  };
+&nbsp;
+  // Save on Meta + Enter or Ctrl + Enter.
+  this.onKeydown = <span class="fstat-no" title="function not covered" >function (event) {</span>
+<span class="cstat-no" title="statement not covered" >    if (event.keyCode === 13 &amp;&amp; (event.metaKey || event.ctrlKey)) {</span>
+<span class="cstat-no" title="statement not covered" >      e</span>vent.preventDefault();
+<span class="cstat-no" title="statement not covered" >      s</span>elf.save();
+    }
+  };
+&nbsp;
+  this.toggleCollapseBody = <span class="fstat-no" title="function not covered" >function(event) {</span>
+<span class="cstat-no" title="statement not covered" >    e</span>vent.stopPropagation();
+<span class="cstat-no" title="statement not covered" >    s</span>elf.collapseBody = !self.collapseBody;
+  };
+&nbsp;
+  /**
+    * @ngdoc method
+    * @name annotation.AnnotationController#reply
+    * @description
+    * Creates a new message in reply to this annotation.
+    */
+  this.reply = function() {
+    var references = (self.annotation.references || []).concat(self.annotation.id);
+    var group = self.annotation.group;
+    var replyPermissions;
+    var userid = session.state.userid;
+    <span class="missing-if-branch" title="else path not taken" >E</span>if (userid) {
+      replyPermissions = self.state().isPrivate ?
+        permissions.private(userid) : permissions.shared(userid, group);
+    }
+    annotationMapper.createAnnotation({
+      group: group,
+      references: references,
+      permissions: replyPermissions,
+      target: [{source: self.annotation.target[0].source}],
+      uri: self.annotation.uri,
+    });
+  };
+&nbsp;
+  /**
+    * @ngdoc method
+    * @name annotation.AnnotationController#revert
+    * @description Reverts an edit in progress and returns to the viewer.
+    */
+  this.revert = function() {
+    drafts.remove(self.annotation);
+    if (isNew(self.annotation)) {
+      $rootScope.$broadcast(events.ANNOTATION_DELETED, self.annotation);
+    }
+  };
+&nbsp;
+  this.save = function() {
+    var info_message;
+    <span class="missing-if-branch" title="if path not taken" >I</span>if (!self.annotation.user) {
+<span class="cstat-no" title="statement not covered" >      i</span>nfo_message = $filter('translate')('Please log in to save your annotations.');
+<span class="cstat-no" title="statement not covered" >      f</span>lash.info(info_message);
+<span class="cstat-no" title="statement not covered" >      r</span>eturn Promise.resolve();
+    }
+    <span class="missing-if-branch" title="if path not taken" >I</span>i</span>f (!self.hasContent() &amp;&amp; <span class="branch-1 cbranch-no" title="branch not covered" >self.isShared()) {
+<span class="cstat-no" title="statement not covered" >      i</span>nfo_message = $filter('translate')('Please add text or a tag before publishing.');
+<span class="cstat-no" title="statement not covered" >      f</span>lash.info(info_message);
+<span class="cstat-no" title="statement not covered" >      r</span>eturn Promise.resolve();
+    }
+&nbsp;
+    var updatedModel = updateModel(self.annotation, self.state(), permissions);
+&nbsp;
+    // Optimistically switch back to view mode and display the saving
+    // indicator
+    self.isSaving = true;
+&nbsp;
+    return save(updatedModel).then(function (model) {
+      Object.assign(updatedModel, model);
+&nbsp;
+      self.isSaving = false;
+&nbsp;
+      var event = isNew(self.annotation) ?
+        events.ANNOTATION_CREATED : events.ANNOTATION_UPDATED;
+      drafts.remove(self.annotation);
+&nbsp;
+      $rootScope.$broadcast(event, updatedModel);
+    }).catch(function (err) {
+      self.isSaving = false;
+      self.edit();
+      var msg = $filter('translate')('Saving annotation failed');
+      flash.error(err.message, msg);
+    });
+  };
+&nbsp;
+  /**
+    * @ngdoc method
+    * @name annotation.AnnotationController#setPrivacy
+    *
+    * Set the privacy settings on the annotation to a predefined
+    * level. The supported levels are 'private' which makes the annotation
+    * visible only to its creator and 'shared' which makes the annotation
+    * visible to everyone in the group.
+    *
+    * The changes take effect when the annotation is saved
+    */
+  this.setPrivacy = function(privacy) {
+    // When the user changes the privacy level of an annotation they're
+    // creating or editing, we cache that and use the same privacy level the
+    // next time they create an annotation.
+    // But _don't_ cache it when they change the privacy level of a reply.
+    if (!isReply(self.annotation)) {
+      permissions.setDefault(privacy);
+    }
+    drafts.update(self.annotation, {
+      tags: self.state().tags,
+      text: self.state().text,
+      isPrivate: privacy === 'private',
+    });
+  };
+&nbsp;
+  this.tagSearchURL = function(tag) {
+    <span class="missing-if-branch" title="if path not taken" >I</span>if (this.isThirdPartyUser()) {
+<span class="cstat-no" title="statement not covered" >      r</span>eturn null;
+    }
+    return serviceUrl('search.tag', {tag: tag});
+  };
+&nbsp;
+  this.isOrphan = function() {
+    if (typeof self.annotation.$orphan === 'undefined') {
+      return self.annotation.$anchorTimeout;
+    }
+    return self.annotation.$orphan;
+  };
+&nbsp;
+  this.user = function() {
+    return self.annotation.user;
+  };
+&nbsp;
+  this.isThirdPartyUser = function () {
+    return isThirdPartyUser(self.annotation.user, settings.authDomain);
+  };
+&nbsp;
+  this.isDeleted = function () {
+    return streamer.hasPendingDeletion(self.annotation.id);
+  };
+&nbsp;
+  this.isHiddenByModerator = function () {
+    return self.annotation.hidden;
+  };
+&nbsp;
+  this.canFlag = function () {
+    // Users can flag any annotations except their own.
+    return session.state.userid !== self.annotation.user;
+  };
+&nbsp;
+  this.isFlagged = <span class="fstat-no" title="function not covered" >function() {</span>
+<span class="cstat-no" title="statement not covered" >    r</span>eturn self.annotation.flagged;
+  };
+&nbsp;
+  this.isReply = function () {
+    return isReply(self.annotation);
+  };
+&nbsp;
+  this.incontextLink = function () {
+    if (self.annotation.links) {
+      return self.annotation.links.incontext ||
+             self.annotation.links.html ||
+<span class="branch-2 cbranch-no" title="branch not covered" >             '';</span>
+    }
+    return '';
+  };
+&nbsp;
+  /**
+   * Sets whether or not the controls for expanding/collapsing the body of
+   * lengthy annotations should be shown.
+   */
+  this.setBodyCollapsible = <span class="fstat-no" title="function not covered" >function (canCollapse) {</span>
+<span class="cstat-no" title="statement not covered" >    if (canCollapse === self.canCollapseBody) {</span>
+<span class="cstat-no" title="statement not covered" >      r</span>eturn;
+    }
+<span class="cstat-no" title="statement not covered" >    s</span>elf.canCollapseBody = canCollapse;
+&nbsp;
+    // This event handler is called from outside the digest cycle, so
+    // explicitly trigger a digest.
+<span class="cstat-no" title="statement not covered" >    $</span>scope.$digest();
+  };
+&nbsp;
+  this.setText = <span class="fstat-no" title="function not covered" >function (text) {</span>
+<span class="cstat-no" title="statement not covered" >    d</span>rafts.update(self.annotation, {
+      isPrivate: self.state().isPrivate,
+      tags: self.state().tags,
+      text: text,
+    });
+  };
+&nbsp;
+  this.setTags = <span class="fstat-no" title="function not covered" >function (tags) {</span>
+<span class="cstat-no" title="statement not covered" >    d</span>rafts.update(self.annotation, {
+      isPrivate: self.state().isPrivate,
+      tags: tags,
+      text: self.state().text,
+    });
+  };
+&nbsp;
+  this.state = function () {
+    var draft = drafts.get(self.annotation);
+    if (draft) {
+      return draft;
+    }
+    return {
+      tags: self.annotation.tags,
+      text: self.annotation.text,
+      isPrivate: !permissions.isShared(self.annotation.permissions,
+                                       self.annotation.user),
+    };
+  };
+&nbsp;
+  /**
+   * Return true if the CC 0 license notice should be shown beneath the
+   * annotation body.
+   */
+  this.shouldShowLicense = function () {
+    if (!self.editing() || !self.isShared()) {
+      return false;
+    }
+    return self.group().public;
+  };
+&nbsp;
+  init();
+}
+&nbsp;
+module.exports = {
+  controller: AnnotationController,
+  controllerAs: 'vm',
+  bindings: {
+    annotation: '&lt;',
+    showDocumentInfo: '&lt;',
+    onReplyCountClick: '&amp;',
+    replyCount: '&lt;',
+    isCollapsed: '&lt;',
+  },
+  template: require('../templates/annotation.html'),
+&nbsp;
+  // Private helper exposed for use in unit tests.
+  updateModel: updateModel,
+};
+&nbsp;</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Fri Mar 16 2018 04:28:39 GMT+0000 (UTC)
+</div>
+</div>
+<script src="../../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../../sorter.js"></script>
+</body>
+</html>

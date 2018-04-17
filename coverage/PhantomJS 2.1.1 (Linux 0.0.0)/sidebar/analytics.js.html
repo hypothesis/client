@@ -1,0 +1,332 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for sidebar/analytics.js</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../prettify.css" />
+    <link rel="stylesheet" href="../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../index.html">all files</a> / <a href="index.html">sidebar/</a> analytics.js
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">100% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>18/18</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">100% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>16/16</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">100% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>3/3</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">100% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>18/18</span>
+      </div>
+    </div>
+  </div>
+  <div class='status-line high'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">11×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">11×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">11×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">11×</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">11×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">70×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">70×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">11×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">'use strict';
+&nbsp;
+var VIA_REFERRER = /^https:\/\/(qa-)?via.hypothes.is\//;
+&nbsp;
+var globalGAOptions = function(win, settings){
+&nbsp;
+  settings = settings || {};
+&nbsp;
+  var globalOpts = {
+    category: '',
+  };
+&nbsp;
+  var validTypes = ['chrome-extension', 'firefox-extension', 'embed', 'bookmarklet', 'via'];
+&nbsp;
+  // The preferred method for deciding what type of app is running is
+  // through the setting of the appType to one of the valid types above.
+  // However, we also want to capture app types where we were not given
+  // the appType setting explicitly - these are the app types that were
+  // added before we added the analytics logic
+  if(validTypes.indexOf((settings.appType || '').toLowerCase()) &gt; -1){
+    globalOpts.category = settings.appType.toLowerCase();
+  }else if(win.location.protocol === 'chrome-extension:'){
+    globalOpts.category = 'chrome-extension';
+  }else if(VIA_REFERRER.test(win.document.referrer)){
+    globalOpts.category = 'via';
+  }else {
+    globalOpts.category = 'embed';
+  }
+&nbsp;
+  return globalOpts;
+};
+&nbsp;
+/**
+ * Analytics API to simplify and standardize the values that we
+ * pass to the Angulartics service.
+ *
+ * These analytics are based on google analytics and need to conform to its
+ * requirements. Specifically, we are required to send the event and a category.
+ *
+ * We will standardize the category to be the appType of the client settings
+ */
+// @ngInject
+function analytics($analytics, $window, settings) {
+  var options = $window ? globalGAOptions($window, settings) : {};
+&nbsp;
+  return {
+&nbsp;
+    /**
+     * @param  {string} event This is the event name that we are capturing
+     *  in our analytics. Example: 'sidebarOpened'. Use camelCase to track multiple
+     *  words.
+     */
+    track: function(event, label, metricValue){
+      $analytics.eventTrack(event, Object.assign({}, {
+        label: label || undefined,
+        metricValue: isNaN(metricValue) ? undefined : metricValue,
+      }, options));
+    },
+&nbsp;
+    events: {
+      ANNOTATION_CREATED: 'annotationCreated',
+      ANNOTATION_DELETED: 'annotationDeleted',
+      ANNOTATION_FLAGGED: 'annotationFlagged',
+      ANNOTATION_SHARED: 'annotationShared',
+      ANNOTATION_UPDATED: 'annotationUpdated',
+      DOCUMENT_SHARED: 'documentShared',
+      GROUP_LEAVE: 'groupLeave',
+      GROUP_SWITCH: 'groupSwitch',
+      GROUP_VIEW_ACTIVITY: 'groupViewActivity',
+      HIGHLIGHT_CREATED: 'highlightCreated',
+      HIGHLIGHT_UPDATED: 'highlightUpdated',
+      HIGHLIGHT_DELETED: 'highlightDeleted',
+      LOGIN_FAILURE: 'loginFailure',
+      LOGIN_SUCCESS: 'loginSuccessful',
+      LOGOUT_FAILURE: 'logoutFailure',
+      LOGOUT_SUCCESS: 'logoutSuccessful',
+      PAGE_NOTE_CREATED: 'pageNoteCreated',
+      PAGE_NOTE_UPDATED: 'pageNoteUpdated',
+      PAGE_NOTE_DELETED: 'pageNoteDeleted',
+      REPLY_CREATED: 'replyCreated',
+      REPLY_UPDATED: 'replyUpdated',
+      REPLY_DELETED: 'replyDeleted',
+      SIDEBAR_OPENED: 'sidebarOpened',
+      SIGN_UP_REQUESTED: 'signUpRequested',
+    },
+  };
+}
+&nbsp;
+module.exports = analytics;
+&nbsp;</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Fri Mar 16 2018 04:28:39 GMT+0000 (UTC)
+</div>
+</div>
+<script src="../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../sorter.js"></script>
+</body>
+</html>

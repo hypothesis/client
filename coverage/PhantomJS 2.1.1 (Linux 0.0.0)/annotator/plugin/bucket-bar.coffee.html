@@ -1,0 +1,1017 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for annotator/plugin/bucket-bar.coffee</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../prettify.css" />
+    <link rel="stylesheet" href="../../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../../index.html">all files</a> / <a href="index.html">annotator/plugin/</a> bucket-bar.coffee
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">63.03% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>133/211</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">18.09% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>17/94</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">35.71% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>10/28</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">22.11% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>21/95</span>
+      </div>
+      <div class='fl pad1y'>
+        <span class="strong">81 statements, 2 functions, 12 branches</span>
+        <span class="quiet">Ignored</span>  &nbsp;&nbsp;&nbsp;&nbsp;
+      </div>
+    </div>
+  </div>
+  <div class='status-line medium'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194
+195
+196
+197
+198
+199
+200
+201
+202
+203
+204
+205
+206
+207
+208
+209
+210
+211
+212
+213
+214
+215
+216
+217
+218
+219
+220
+221
+222
+223
+224
+225
+226
+227
+228
+229
+230
+231
+232
+233
+234
+235
+236
+237
+238
+239
+240
+241
+242
+243
+244
+245
+246
+247
+248
+249
+250
+251
+252
+253
+254
+255
+256
+257
+258
+259
+260
+261
+262
+263
+264
+265
+266
+267
+268
+269
+270
+271
+272
+273
+274
+275
+276
+277
+278
+279
+280
+281
+282
+283
+284
+285
+286
+287
+288
+289
+290
+291
+292
+293
+294
+295
+296
+297
+298
+299
+300
+301
+302
+303
+304
+305
+306
+307
+308
+309
+310
+311
+312
+313
+314
+315
+316
+317</td><td class="line-coverage quiet"><span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">raf = require('raf')
+&nbsp;
+$ = require('jquery')
+Plugin = require('../plugin')
+&nbsp;
+scrollIntoView = require('scroll-into-view')
+&nbsp;
+highlighter = require('../highlighter')
+&nbsp;
+polyglot = require('../../shared/polyglot');
+&nbsp;
+BUCKET_SIZE = 16                              # Regular bucket size
+BUCKET_NAV_SIZE = BUCKET_SIZE + 6             # Bucket plus arrow (up/down)
+BUCKET_TOP_THRESHOLD = 115 + BUCKET_NAV_SIZE  # Toolbar
+&nbsp;
+&nbsp;
+# Scroll to the next closest anchor off screen in the given direction.
+scrollToClosest = <span class="fstat-no" title="function not covered" >(anchors, direction) -&gt;</span>
+<span class="cstat-no" title="statement not covered" >  dir = if direction is "up" then +1 else -1</span>
+  {<span class="cstat-no" title="statement not covered" >next} = a</span>nchors.reduce <span class="fstat-no" title="function not covered" >(acc, anchor) -&gt;</span>
+    unless anchor.highlights?.length
+      return acc
+&nbsp;
+    {<span class="cstat-no" title="statement not covered" >start, n</span>ext} = acc
+<span class="cstat-no" title="statement not covered" >    rect = h</span>ighlighter.getBoundingClientRect(anchor.highlights)
+&nbsp;
+    # Ignore if it's not in the right direction.
+    if (dir is 1 and rect.top &gt;= BUCKET_TOP_THRESHOLD)
+      return acc
+    else if (dir is -1 and rect.top &lt;= window.innerHeight - BUCKET_NAV_SIZE)
+      return acc
+&nbsp;
+    # Select the closest to carry forward
+<span class="cstat-no" title="statement not covered" ><span class="cstat-no" title="statement not covered" >    if not next?</span></span>
+      start: rect.top
+      next: anchor
+    else if start * dir &lt; rect.top * dir
+      start: rect.top
+      next: anchor
+    else
+        acc
+  , {}
+&nbsp;
+  scrollIntoView(next.highlights[0])
+&nbsp;
+&nbsp;
+module.exports = class BucketBar extends Plugin
+  # svg skeleton
+  html: """
+        &lt;div class="annotator-bucket-bar"&gt;
+        &lt;/div&gt;
+        """
+&nbsp;
+  # Plugin options
+  options:
+    # gapSize parameter is used by the clustering algorithm
+    # If an annotation is farther then this gapSize from the next bucket
+    # then that annotation will not be merged into the bucket
+    gapSize: 60
+&nbsp;
+    # Selectors for the scrollable elements on the page
+    scrollables: ['body']
+&nbsp;
+  # buckets of annotations that overlap
+  buckets: []
+&nbsp;
+  # index for fast hit detection in the buckets
+  index: []
+&nbsp;
+  # tab elements
+  tabs: null
+&nbsp;
+  constructor: (element, options) -&gt;
+    super $(@html), options
+&nbsp;
+    <span class="missing-if-branch" title="if path not taken" >I</span>if @options.container?
+<span class="cstat-no" title="statement not covered" >      $(@options.container).append @element</span>
+    else
+      $(element).append @element
+&nbsp;
+  pluginInit: <span class="fstat-no" title="function not covered" >-&gt;</span>
+<span class="cstat-no" title="statement not covered" >    $</span>(window).on 'resize scroll', @update
+&nbsp;
+    for scrollable in @options.scrollables ? []
+      $(scrollable).on 'resize scroll', @update
+&nbsp;
+  destroy: <span class="fstat-no" title="function not covered" >-&gt;</span>
+<span class="cstat-no" title="statement not covered" >    $</span>(window).off 'resize scroll', @update
+&nbsp;
+    for scrollable in @options.scrollables ? []
+      $(scrollable).off 'resize scroll', @update
+&nbsp;
+  _collate: <span class="fstat-no" title="function not covered" >(a, b) -&gt;</span>
+    for i in [0..a.length-1]
+      if a[i] &lt; b[i]
+        return -1
+<span class="cstat-no" title="statement not covered" >      if a[i] &gt; b[i]</span>
+        return 1
+    return 0
+&nbsp;
+  # Update sometime soon
+  update: <span class="fstat-no" title="function not covered" >=</span>&gt;
+<span class="cstat-no" title="statement not covered" >    r</span>eturn if @_updatePending?
+    @_updatePending = raf <span class="fstat-no" title="function not covered" ><span class="fstat-no" title="function not covered" >=</span></span>&gt;
+<span class="cstat-no" title="statement not covered" >      delete @_</span>updatePending
+      @_update()
+&nbsp;
+  _update: <span class="fstat-no" title="function not covered" >-&gt;</span>
+    # Keep track of buckets of annotations above and below the viewport
+<span class="cstat-no" title="statement not covered" >    above = [</span>]
+<span class="cstat-no" title="statement not covered" >    below = [</span>]
+&nbsp;
+    # Construct indicator points
+<span class="cstat-no" title="statement not covered" >    points = @</span>annotator.anchors.reduce <span class="fstat-no" title="function not covered" ><span class="fstat-no" title="function not covered" >(</span>points, anchor, i) =&gt;</span>
+      unless anchor.highlights?.length
+        return points
+&nbsp;
+<span class="cstat-no" title="statement not covered" >      rect = h</span>ighlighter.getBoundingClientRect(anchor.highlights)
+<span class="cstat-no" title="statement not covered" >      x = rect.t</span>op
+<span class="cstat-no" title="statement not covered" >      h = rect.bottom - rect.t</span>op
+&nbsp;
+      if x &lt; BUCKET_TOP_THRESHOLD
+<span class="cstat-no" title="statement not covered" >        i</span>f anchor not in above then <span class="cstat-no" title="statement not covered" >above.push anchor</span>
+      else if x &gt; window.innerHeight - BUCKET_NAV_SIZE
+<span class="cstat-no" title="statement not covered" >        i</span>f anchor not in below then <span class="cstat-no" title="statement not covered" >below.push anchor</span>
+      else
+<span class="cstat-no" title="statement not covered" >        p</span>oints.push [x, 1, anchor]
+<span class="cstat-no" title="statement not covered" >        points.push [x + h, -1, anchor]</span>
+      points
+    , []
+&nbsp;
+    # Accumulate the overlapping annotations into buckets.
+    # The algorithm goes like this:
+    # - Collate the points by sorting on position then delta (+1 or -1)
+    # - Reduce over the sorted points
+    #   - For +1 points, add the annotation at this point to an array of
+    #     "carried" annotations. If it already exists, increase the
+    #     corresponding value in an array of counts which maintains the
+    #     number of points that include this annotation.
+    #   - For -1 points, decrement the value for the annotation at this point
+    #     in the carried array of counts. If the count is now zero, remove the
+    #     annotation from the carried array of annotations.
+    #   - If this point is the first, last, sufficiently far from the previous,
+    #     or there are no more carried annotations, add a bucket marker at this
+    #     point.
+    #   - Otherwise, if the last bucket was not isolated (the one before it
+    #     has at least one annotation) then remove it and ensure that its
+    #     annotations and the carried annotations are merged into the previous
+    #     bucket.
+<span class="cstat-no" title="statement not covered" >    {@buckets, @i</span>ndex} = points
+    .sort(this._collate)
+    .reduce <span class="fstat-no" title="function not covered" ><span class="fstat-no" title="function not covered" >(</span>{<span class="cstat-no" title="statement not covered" >buckets, index, c</span>arry}, [<span class="cstat-no" title="statement not covered" >x, d, a</span>], i, points) =&gt;</span>
+      if d &gt; 0                                            # Add annotation
+<span class="cstat-no" title="statement not covered" >        if (j = carry.anchors.indexOf a) &lt; 0</span>
+<span class="cstat-no" title="statement not covered" >          c</span>arry.anchors.unshift a
+<span class="cstat-no" title="statement not covered" >          carry.counts.unshift 1</span>
+        else
+<span class="cstat-no" title="statement not covered" >          carry.counts[j]++</span>
+      else                                                # Remove annotation
+<span class="cstat-no" title="statement not covered" >        j = c</span>arry.anchors.indexOf a                       # XXX: assert(i &gt;= 0)
+<span class="cstat-no" title="statement not covered" >        if --carry.counts[j] is 0</span>
+<span class="cstat-no" title="statement not covered" >          c</span>arry.anchors.splice j, 1
+<span class="cstat-no" title="statement not covered" >          carry.counts.splice j, 1</span>
+&nbsp;
+      if (
+        (index.length is 0 or i is points.length - 1) or  # First or last?
+        carry.anchors.length is 0 or                      # A zero marker?
+        x - index[index.length-1] &gt; @options.gapSize      # A large gap?
+      )                                                   # Mark a new bucket.
+<span class="cstat-no" title="statement not covered" >        b</span>uckets.push carry.anchors.slice()
+<span class="cstat-no" title="statement not covered" >        index.push x</span>
+      else
+        # Merge the previous bucket, making sure its predecessor contains
+        # all the carried annotations and the annotations in the previous
+        # bucket.
+<span class="cstat-no" title="statement not covered" >        if buckets[buckets.length-2]?.length</span>
+<span class="cstat-no" title="statement not covered" >          last = buckets[b</span>uckets.length-2]
+<span class="cstat-no" title="statement not covered" >          toMerge = b</span>uckets.pop()
+<span class="cstat-no" title="statement not covered" >          index.pop()</span>
+        else
+<span class="cstat-no" title="statement not covered" >          last = buckets[b</span>uckets.length-1]
+<span class="cstat-no" title="statement not covered" >          toMerge = []</span>
+<span class="cstat-no" title="statement not covered" >        l</span>ast.push a0 for a0 in carry.anchors when a0 not in last
+<span class="cstat-no" title="statement not covered" >        l</span>ast.push a0 for a0 in toMerge when a0 not in last
+&nbsp;
+      {buckets, index, carry}
+    ,
+      buckets: []
+      index: []
+      carry:
+        anchors: []
+        counts: []
+        latest: 0
+&nbsp;
+    # Scroll up
+<span class="cstat-no" title="statement not covered" >    @</span>buckets.unshift [], above, []
+<span class="cstat-no" title="statement not covered" >    @</span>index.unshift 0, BUCKET_TOP_THRESHOLD - 1, BUCKET_TOP_THRESHOLD
+&nbsp;
+    # Scroll down
+<span class="cstat-no" title="statement not covered" >    @</span>buckets.push [], below, []
+<span class="cstat-no" title="statement not covered" >    @</span>index.push window.innerHeight - BUCKET_NAV_SIZE,
+      window.innerHeight - BUCKET_NAV_SIZE + 1,
+      window.innerHeight
+&nbsp;
+    # Calculate the total count for each bucket (without replies) and the
+    # maximum count.
+<span class="cstat-no" title="statement not covered" >    max = 0</span>
+    for b in @buckets
+<span class="cstat-no" title="statement not covered" >      max = Math.max max, b.length</span>
+&nbsp;
+    # Update the data bindings
+<span class="cstat-no" title="statement not covered" >    element = @e</span>lement
+&nbsp;
+    # Keep track of tabs to keep element creation to a minimum.
+<span class="cstat-no" title="statement not covered" >    @tabs ||= $</span>([])
+&nbsp;
+    # Remove any extra tabs and update @tabs.
+<span class="cstat-no" title="statement not covered" >    @</span>tabs.slice(@buckets.length).remove()
+<span class="cstat-no" title="statement not covered" >    @tabs = @</span>tabs.slice(0, @buckets.length)
+&nbsp;
+    # Create any new tabs if needed.
+<span class="cstat-no" title="statement not covered" >    $</span>.each @buckets.slice(@tabs.length), <span class="fstat-no" title="function not covered" ><span class="fstat-no" title="function not covered" >=</span>&gt;</span>
+<span class="cstat-no" title="statement not covered" >      div = $</span>('&lt;div/&gt;').appendTo(element)
+&nbsp;
+<span class="cstat-no" title="statement not covered" >      @</span>tabs.push(div[0])
+&nbsp;
+<span class="cstat-no" title="statement not covered" >      lengthOfPreviousBucket = 0</span>;
+      div.addClass('annotator-bucket-indicator')
+&nbsp;
+      # TO DO : Use config custom theme to disable this
+      # Focus corresponding highlights bucket when mouse is hovered
+      # TODO: This should use event delegation on the container.
+      # .on 'mousemove', (event) =&gt;
+      #   bucket = @tabs.index(event.currentTarget)
+      #   for anchor in @annotator.anchors
+      #     toggle = anchor in @buckets[bucket]
+      #     $(anchor.highlights).toggleClass('annotator-hl-focused', toggle)
+&nbsp;
+      # # Gets rid of them after
+      # .on 'mouseout', (event) =&gt;
+      #   bucket = @tabs.index(event.currentTarget)
+      #   for anchor in @buckets[bucket]
+      #     $(anchor.highlights).removeClass('annotator-hl-focused')
+&nbsp;
+      # Does one of a few things when a tab is clicked depending on type
+      .on 'click', <span class="fstat-no" title="function not covered" >(event) =&gt;</span>
+<span class="cstat-no" title="statement not covered" >        bucket = @</span>tabs.index(event.currentTarget)
+<span class="cstat-no" title="statement not covered" >        e</span>vent.stopPropagation()
+<span class="cstat-no" title="statement not covered" >        feedbackListInBucket = [</span>]
+&nbsp;
+        # Populate the highlights in the bucket in an array and remove other highlights from the page.
+        for anchor in @annotator.anchors
+<span class="cstat-no" title="statement not covered" >          if anchor in @buckets[bucket]</span>
+<span class="cstat-no" title="statement not covered" >            feedbackListInBucket.push($(anchor.highlights))</span>
+          else
+<span class="cstat-no" title="statement not covered" >            $(anchor.highlights).removeClass('annotator-hl-focused')</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        lengthOfCurrentBucket = feedbackListInBucket.l</span>ength;
+&nbsp;
+        for feedback in feedbackListInBucket
+<span class="cstat-no" title="statement not covered" >          if lengthOfCurrentBucket != lengthOfPreviousBucket</span>
+<span class="cstat-no" title="statement not covered" >            feedback.addClass('annotator-hl-focused');</span>
+          else
+<span class="cstat-no" title="statement not covered" >            feedback.toggleClass('annotator-hl-focused')</span>
+&nbsp;
+        # If it's the upper tab, scroll to next anchor above
+        if (@isUpper bucket)
+<span class="cstat-no" title="statement not covered" >          scrollToClosest(@buckets[bucket], 'up')</span>
+        # If it's the lower tab, scroll to next anchor below
+        else if (@isLower bucket)
+<span class="cstat-no" title="statement not covered" >          scrollToClosest(@buckets[bucket], 'down')</span>
+&nbsp;
+        # TO DO : Use config custom theme to disable this
+        # else
+        #   annotations = (anchor.annotation for anchor in @buckets[bucket])
+        #   @annotator.selectAnnotations annotations,
+        #     (event.ctrlKey or event.metaKey),
+        # previousBucket = feedbackListInBucket;
+        lengthOfPreviousBucket = lengthOfCurrentBucket;
+&nbsp;
+    this._buildTabs(@tabs, @buckets)
+&nbsp;
+  _buildTabs: -&gt;
+    @tabs.each (d, el) =&gt;
+      el = $(el)
+      bucket = @buckets[d]
+      bucketLength = bucket?.length
+&nbsp;
+      title = polyglot().t("Show feedback", {bucketLength: bucketLength});
+&nbsp;
+<span class="cstat-no" title="statement not covered" >      e</span>l.attr('title', title)
+<span class="cstat-no" title="statement not covered" >      e</span>l.toggleClass('upper', @isUpper(d))
+<span class="cstat-no" title="statement not covered" >      e</span>l.toggleClass('lower', @isLower(d))
+&nbsp;
+      if @isUpper(d) or @isLower(d)
+<span class="cstat-no" title="statement not covered" >        bucketSize = BUCKET_NAV_SIZE</span>
+      else
+<span class="cstat-no" title="statement not covered" >        bucketSize = BUCKET_SIZE</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >      el.css({</span>
+        top: (@index[d] + @index[d+1]) / 2
+        marginTop: -bucketSize / 2
+        display: unless bucketLength then 'none' else ''
+      })
+&nbsp;
+<span class="cstat-no" title="statement not covered" >      if bucket</span>
+        el.html("&lt;div class='label'&gt;#{bucketLength}&lt;/div&gt;")
+&nbsp;
+  isUpper:   <span class="fstat-no" title="function not covered" >(</span>i) -&gt; i == 1
+  isLower:   <span class="fstat-no" title="function not covered" >(</span>i) -&gt; i == @index.length - 2
+&nbsp;
+&nbsp;
+# Export constants
+BucketBar.BUCKET_SIZE = BUCKET_SIZE
+BucketBar.BUCKET_NAV_SIZE = BUCKET_NAV_SIZE
+BucketBar.BUCKET_TOP_THRESHOLD = BUCKET_TOP_THRESHOLD
+&nbsp;</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Thu Mar 15 2018 22:59:52 GMT+0000 (UTC)
+</div>
+</div>
+<script src="../../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../../sorter.js"></script>
+</body>
+</html>
