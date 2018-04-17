@@ -105,10 +105,6 @@ function youTubeQueryParams(link) {
  * Return a YouTube embed (<iframe>) DOM element for the given video ID.
  */
 function youTubeEmbed(id, link) {
-  const now = new Date();
-  if (now.getFullYear() === 2018 && now.getMonth() === 3 && now.getDate() === 1) {
-    id = 'dQw4w9WgXcQ';
-  }
   const query  = youTubeQueryParams(link);
   return iframe(`https://www.youtube.com/embed/${id}${query}`);
 }

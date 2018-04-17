@@ -362,15 +362,4 @@ describe('media-embedder', function () {
     assert.equal(
       element.children[1].src, 'https://www.youtube.com/embed/abcdefg');
   });
-
-  it('never gives you up', () => {
-    var url = 'https://www.youtube.com/watch?v=deadbeef';
-    var element = domElement(`<a href="${url}">${url}</a>`);
-
-    clock.tick(new Date('2018-04-01').getTime());
-    mediaEmbedder.replaceLinksWithEmbeds(element);
-
-    assert.equal(element.children[0].tagName, 'IFRAME');
-    assert.equal(element.children[0].src, 'https://www.youtube.com/embed/dQw4w9WgXcQ');
-  });
 });
