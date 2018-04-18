@@ -11145,7 +11145,7 @@ module.exports = Guest = (function(superClass) {
 
   Guest.prototype._setupInitialState = function(config) {
     this.publish('panelReady');
-    return this.setVisibleHighlights(config.showHighlights === 'always');
+    return this.setVisibleHighlights(false);
   };
 
   Guest.prototype._connectAnnotationSync = function(crossframe) {
@@ -11240,7 +11240,8 @@ module.exports = Guest = (function(superClass) {
     })(this));
     return crossframe.on('setVisibleHighlights', (function(_this) {
       return function(state) {
-        return _this.setVisibleHighlights(state);
+        _this.visibleHighlights = !_this.visibleHighlights;
+        return _this.setVisibleHighlights(_this.visibleHighlights);
       };
     })(this));
   };
@@ -11810,22 +11811,7 @@ module.exports = Host = (function(superClass) {
     this.on('panelReady', (function(_this) {
       return function() {
         _this.frame.css('display', '');
-        return $(window).scroll(function() {
-          if ($(window).scrollTop() > 245) {
-            _this.frame.css({
-              'position': 'fixed',
-              'top': '0',
-              'left': '80.62%'
-            });
-          }
-          if ($(window).scrollTop() < 245) {
-            return _this.frame.css({
-              'position': 'absolute',
-              'top': '',
-              'left': ''
-            });
-          }
-        });
+        return app.css('display', 'none');
       };
     })(this));
     this.on('beforeAnnotationCreated', function(annotation) {
@@ -12976,6 +12962,7 @@ polyglot = require('../../shared/polyglot');
 makeButton = function(item) {
   var anchor, button;
   anchor = $('<button></button>').attr('href', '').attr('title', item.title).attr('name', item.name).on(item.on).addClass('annotator-frame-button').addClass(item["class"]);
+  anchor.text(item.title);
   button = $('<li></li>').append(anchor);
   return button[0];
 };
@@ -13021,21 +13008,15 @@ module.exports = Toolbar = (function(superClass) {
           })(this)
         }
       }, {
-        "title": polyglot().t("Toggle or Resize Sidebar"),
+        "title": polyglot().t("Feedback"),
         "class": "annotator-frame-button--sidebar_toggle h-icon-chevron-left",
         "name": "sidebar-toggle",
         "on": {
           "click": (function(_this) {
             return function(event) {
-              var collapsed;
               event.preventDefault();
               event.stopPropagation();
-              collapsed = _this.annotator.frame.hasClass('annotator-collapsed');
-              if (collapsed) {
-                return _this.annotator.show();
-              } else {
-                return _this.annotator.hide();
-              }
+              return _this.annotator.show();
             };
           })(this)
         }
@@ -13633,32 +13614,27 @@ module.exports = Sidebar = (function(superClass) {
 
   Sidebar.prototype.show = function() {
     this.crossframe.call('sidebarOpened');
-    this.frame.css({
-      'margin-left': (-1 * this.frame.width()) + "px"
+    this.toolbar = this.frame.find('.annotator-toolbar');
+    this.toolbar.css({
+      'display': 'none'
     });
-    this.frame.removeClass('annotator-collapsed');
-    if (this.plugins.Toolbar != null) {
-      this.plugins.Toolbar.showCollapseSidebarBtn();
-      this.plugins.Toolbar.showCloseBtn();
-    }
-    if (this.options.showHighlights === 'whenSidebarOpen') {
-      this.setVisibleHighlights(true);
-    }
+    this.feedbackpanel = this.frame.find('[name=hyp_sidebar_frame]');
+    this.feedbackpanel.css({
+      'display': ''
+    });
     return this._notifyOfLayoutChange(true);
   };
 
   Sidebar.prototype.hide = function() {
-    this.frame.css({
-      'margin-left': ''
+    this.toolbar = this.frame.find('.annotator-toolbar');
+    this.toolbar.css({
+      'display': ''
     });
-    this.frame.addClass('annotator-collapsed');
-    this.plugins.Toolbar.hideCloseBtn();
-    if (this.plugins.Toolbar != null) {
-      this.plugins.Toolbar.showExpandSidebarBtn();
-    }
-    if (this.options.showHighlights === 'whenSidebarOpen') {
-      this.setVisibleHighlights(false);
-    }
+    this.feedbackpanel = this.frame.find('[name=hyp_sidebar_frame]');
+    this.feedbackpanel.css({
+      'display': 'none'
+    });
+    this.setVisibleHighlights(false);
     return this._notifyOfLayoutChange(false);
   };
 

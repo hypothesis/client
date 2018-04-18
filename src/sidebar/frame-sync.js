@@ -177,6 +177,7 @@ function FrameSync($rootScope, $window, Discovery, annotationUI, bridge) {
     bridge.on('showSidebar', function () {
       bridge.call('showSidebar');
     });
+    // Currently we do not listen any hideSidebar or setVisibleHighlights calls in DDF.
     bridge.on('hideSidebar', function () {
       bridge.call('hideSidebar');
     });
@@ -249,6 +250,14 @@ function FrameSync($rootScope, $window, Discovery, annotationUI, bridge) {
    */
   this.scrollToAnnotation = function (tag, feedback_user, user_id, type) {
     bridge.call('scrollToAnnotation', tag, feedback_user, user_id, type);
+  };
+
+  this.hideSidebar = function(){
+    bridge.call('hideSidebar');
+  };
+
+  this.setVisibleHighlights = function(){
+    bridge.call('setVisibleHighlights');
   };
 }
 

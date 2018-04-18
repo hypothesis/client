@@ -238,41 +238,52 @@ module.exports = class Sidebar extends Host
         this.hide()
 
   show: ->
+    # It is only for analitics
     @crossframe.call('sidebarOpened')
 
-    @frame.css 'margin-left': "#{-1 * @frame.width()}px"
-    @frame.removeClass 'annotator-collapsed'
+    # Making the feedback button disabled and iframe enabled.
+    @toolbar = @frame.find('.annotator-toolbar')
+    @toolbar.css 'display': 'none'
+    @feedbackpanel = @frame.find('[name=hyp_sidebar_frame]')
+    @feedbackpanel.css 'display': ''
 
-    if @plugins.Toolbar?
-      @plugins.Toolbar.showCollapseSidebarBtn();
-      @plugins.Toolbar.showCloseBtn();
+    # The original code from Hypothesis. They changes the margin to make it enabled/disabled
+    # @frame.css 'margin-left': "#{-1 * @frame.width()}px"
+    # @frame.removeClass 'annotator-collapsed'
+    # if @plugins.Toolbar?
+    #   @plugins.Toolbar.showCollapseSidebarBtn();
+    #   @plugins.Toolbar.showCloseBtn();
 
     # This piece of code enables the BucketBar when toggled. It is commented out now,
     # Because BucketBar is going to be hidden in phase 1.
     # if @plugins.BucketBar?
     #   @plugins.BucketBar.showBucketBar();
 
-    if @options.showHighlights == 'whenSidebarOpen'
-      @setVisibleHighlights(true)
+    # if @options.showHighlights == 'whenSidebarOpen'
+      # @setVisibleHighlights(false)
 
     this._notifyOfLayoutChange(true)
 
   hide: ->
-    @frame.css 'margin-left': ''
-    @frame.addClass 'annotator-collapsed'
+    @toolbar = @frame.find('.annotator-toolbar')
+    @toolbar.css 'display': ''
+    @feedbackpanel = @frame.find('[name=hyp_sidebar_frame]')
+    @feedbackpanel.css 'display': 'none'
+    @setVisibleHighlights(false)
 
-    @plugins.Toolbar.hideCloseBtn();
-
-    if @plugins.Toolbar?
-      @plugins.Toolbar.showExpandSidebarBtn();
-
+    # The original code from Hypothesis. They changes the margin to make it enabled/disabled
+    # @frame.css 'margin-left': ''
+    # @frame.addClass 'annotator-collapsed'
+    # @plugins.Toolbar.hideCloseBtn();
+    # if @plugins.Toolbar?
+    #   @plugins.Toolbar.showExpandSidebarBtn();
     # This piece of code disables the BucketBar when toggled. It is commented out now,
     # Because BucketBar is going to be hidden in phase 1.
     # if @plugins.BucketBar?
     #   @plugins.BucketBar.hideBucketBar();
 
-    if @options.showHighlights == 'whenSidebarOpen'
-      @setVisibleHighlights(false)
+    # if @options.showHighlights == 'whenSidebarOpen'
+    #   @setVisibleHighlights(false)
 
     this._notifyOfLayoutChange(false)
 

@@ -161,7 +161,9 @@ module.exports = class Guest extends Delegator
 
   _setupInitialState: (config) ->
     this.publish('panelReady')
-    this.setVisibleHighlights(config.showHighlights == 'always')
+    # this.setVisibleHighlights(config.showHighlights == 'always')
+    # We load the page highlights off
+    this.setVisibleHighlights(false)
 
   _connectAnnotationSync: (crossframe) ->
     this.subscribe 'annotationDeleted', (annotation) =>
@@ -217,7 +219,9 @@ module.exports = class Guest extends Delegator
       .catch((reason) -> cb(reason))
 
     crossframe.on 'setVisibleHighlights', (state) =>
-      this.setVisibleHighlights(state)
+      # @visibleHighlights is false when the page is loaded. Then toggle it.
+      @visibleHighlights = !@visibleHighlights
+      this.setVisibleHighlights(@visibleHighlights)
 
     # crossframe.on 'showBucketList', (tags) =>
     #   for anchor in @anchors when anchor.highlights?

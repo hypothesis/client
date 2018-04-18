@@ -57,12 +57,8 @@ module.exports = class Host extends Guest
     this.on 'panelReady', =>
       # Show the UI
       @frame.css('display', '')
-
-      $(window).scroll =>
-        if $(window).scrollTop() > 245
-          @frame.css({'position': 'fixed', 'top': '0', 'left': '80.62%'})
-        if $(window).scrollTop() < 245
-          @frame.css({'position': 'absolute','top': '', 'left': ''})
+      # Load the page iframe hidden
+      app.css('display', 'none')
 
     this.on 'beforeAnnotationCreated', (annotation) ->
       # When a new non-highlight annotation is created, focus

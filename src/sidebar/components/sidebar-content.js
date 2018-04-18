@@ -351,6 +351,30 @@ function SidebarContentController(
     annotationUI.clearSelectedAnnotations();
     annotationUI.selectTab(selectedTab);
   };
+
+  // Managing the class and the title of highlight button.
+  this.visibility = 'h-icon-visibility-off';
+  this.visibilityTitle = 'Show Highlights';
+
+  this.disableSidebar = function(){
+    frameSync.hideSidebar();
+    this.visibility = 'h-icon-visibility-off';
+    this.visibilityTitle = 'Show Highlights';
+  };
+
+
+  this.setVisibleHighlights = function(){
+    frameSync.setVisibleHighlights();
+    // Toggle
+    if(this.visibility === 'h-icon-visibility-off'){
+      this.visibility = 'h-icon-visibility';
+      this.visibilityTitle = 'Hide Highlights';
+    }
+    else{
+      this.visibility = 'h-icon-visibility-off';
+      this.visibilityTitle = 'Show Highlights';
+    }
+  };
 }
 
 module.exports = {

@@ -9459,6 +9459,28 @@ function SidebarContentController($scope, analytics, annotationUI, annotationMap
     annotationUI.clearSelectedAnnotations();
     annotationUI.selectTab(selectedTab);
   };
+
+  // Managing the class and the title of highlight button.
+  this.visibility = 'h-icon-visibility-off';
+  this.visibilityTitle = 'Show Highlights';
+
+  this.disableSidebar = function () {
+    frameSync.hideSidebar();
+    this.visibility = 'h-icon-visibility-off';
+    this.visibilityTitle = 'Show Highlights';
+  };
+
+  this.setVisibleHighlights = function () {
+    frameSync.setVisibleHighlights();
+    // Toggle
+    if (this.visibility === 'h-icon-visibility-off') {
+      this.visibility = 'h-icon-visibility';
+      this.visibilityTitle = 'Hide Highlights';
+    } else {
+      this.visibility = 'h-icon-visibility-off';
+      this.visibilityTitle = 'Show Highlights';
+    }
+  };
 }
 
 module.exports = {
@@ -10905,6 +10927,7 @@ function FrameSync($rootScope, $window, Discovery, annotationUI, bridge) {
     bridge.on('showSidebar', function () {
       bridge.call('showSidebar');
     });
+    // Currently we do not listen any hideSidebar or setVisibleHighlights calls in DDF.
     bridge.on('hideSidebar', function () {
       bridge.call('hideSidebar');
     });
@@ -10976,6 +10999,14 @@ function FrameSync($rootScope, $window, Discovery, annotationUI, bridge) {
    */
   this.scrollToAnnotation = function (tag, feedback_user, user_id, type) {
     bridge.call('scrollToAnnotation', tag, feedback_user, user_id, type);
+  };
+
+  this.hideSidebar = function () {
+    bridge.call('hideSidebar');
+  };
+
+  this.setVisibleHighlights = function () {
+    bridge.call('setVisibleHighlights');
   };
 }
 
@@ -15857,7 +15888,7 @@ module.exports = "<!-- Tabbed display of annotations and notes. -->\n<div class=
 module.exports = "<div class=\"sheet\">\n  <i class=\"close h-icon-close\"\n     role=\"button\"\n     title=\"{{'Close' | translate}}\"\n     ng-click=\"vm.onClose()\"></i>\n  <div class=\"form-vertical\">\n    <ul class=\"nav nav-tabs\">\n      <li class=\"active\"><a href=\"\">{{'Share' | translate}}</a></li>\n    </ul>\n    <div class=\"tab-content\">\n      <p>{{'Share the link below to show anyone these annotations and invite them to contribute their own.' | translate}}</p>\n      <p><input class=\"js-via form-input\"\n          type=\"text\"\n          ng-value=\"vm.viaPageLink\"\n          readonly /></p>\n      <p class=\"share-link-icons\">\n      <a href=\"https://twitter.com/intent/tweet?url={{vm.viaPageLink | urlEncode}}&hashtags=annotated\"\n         target=\"_blank\"\n         title=\"{{'Tweet link' | translate}}\"\n         class=\"share-link-icon h-icon-twitter\"\n         ng-click=\"onShareClick('twitter')\"></a>\n      <a href=\"https://www.facebook.com/sharer/sharer.php?u={{vm.viaPageLink | urlEncode}}\"\n         target=\"_blank\"\n         title=\"{{'Share on Facebook' | translate}}\"\n         class=\"share-link-icon h-icon-facebook\"\n         ng-click=\"onShareClick('facebook')\"></a>\n      <a href=\"https://plus.google.com/share?url={{vm.viaPageLink | urlEncode}}\"\n         target=\"_blank\"\n         title=\"{{'Post on Google Plus' | translate}}\"\n         class=\"share-link-icon h-icon-google-plus\"\n         ng-click=\"onShareClick('googlePlus')\"></a>\n      <a href=\"mailto:?subject=Let's%20Annotate&amp;body={{vm.viaPageLink}}\"\n         target=\"_blank\"\n         title=\"{{'Share via email' | translate}}\"\n         class=\"share-link-icon h-icon-mail\"\n         ng-click=\"onShareClick('email')\"></a>\n      </p>\n    </div>\n  </div>\n</div>\n";
 
 },{}],159:[function(require,module,exports){
-module.exports = "<div class=\"sidebar__header\">\n  <h3 class=\"sidebar__header-title\">Feedback</h3>\n  <!--add close button here-->\n  <button id=\"sidebar-toggle-close\" class=\"sidebar-close\">x</button>\n</div>\n<selection-tabs\n  ng-if=\"!vm.search.query() && vm.selectedAnnotationCount() === 0\"\n  is-waiting-to-anchor-annotations=\"vm.waitingToAnchorAnnotations\"\n  is-loading=\"vm.isLoading\"\n  selected-tab=\"vm.selectedTab\"\n  total-annotations=\"vm.totalAnnotations\"\n  total-notes=\"vm.totalNotes\"\n  total-orphans=\"vm.totalOrphans\">\n</selection-tabs>\n\n<search-status-bar\n  ng-show=\"!vm.isLoading()\"\n  filter-active=\"!!vm.search.query()\"\n  filter-match-count=\"vm.visibleCount()\"\n  on-clear-selection=\"vm.clearSelection()\"\n  search-query=\"vm.search ? vm.search.query : ''\"\n  selection-count=\"vm.selectedAnnotationCount()\"\n  total-count=\"vm.topLevelThreadCount()\"\n  selected-tab=\"vm.selectedTab\"\n  total-annotations=\"vm.totalAnnotations\"\n  total-notes=\"vm.totalNotes\">\n</search-status-bar>\n\n<div class=\"annotation-unavailable-message\"\n    ng-if=\"vm.selectedAnnotationUnavailable()\">\n  <div class=\"annotation-unavailable-message__icon\"></div>\n  <p class=\"annotation-unavailable-message__label\">\n    <span ng-if=\"vm.auth.status === 'logged-out'\">\n      {{'This feedback is not available.' | translate}}\n      <br>\n      <p ng-bind-html=\"'You may need to <a class=\\'loggedout-message__link\\' href=\\'\\' ng-click=\\'vm.login()\\'>log in</a> to see it.' | translate\"></p>\n    </span>\n    <span ng-if=\"vm.auth.status === 'logged-in'\">\n      {{'You do not have permission to view this feedback.' | translate}}\n    </span>\n  </p>\n</div>\n<thread-list\n  on-change-collapsed=\"vm.setCollapsed(id, collapsed)\"\n  on-clear-selection=\"vm.clearSelection()\"\n  on-focus=\"vm.focus(annotation)\"\n  on-force-visible=\"vm.forceVisible(thread)\"\n  on-select=\"vm.scrollTo(annotation)\"\n  show-document-info=\"false\"\n  thread=\"vm.rootThread\">\n</thread-list>\n\n<loggedout-message ng-if=\"vm.shouldShowLoggedOutMessage()\" on-login=\"vm.login()\">\n</loggedout-message>\n";
+module.exports = "<div class=\"sidebar__header\">\n  <h3 class=\"sidebar__header-title\">Feedback</h3>\n  <!--add close button here-->\n  <button id=\"sidebar-toggle-close\" class=\"sidebar-close\" ng-click=\"vm.disableSidebar()\">x</button>\n  <button id=\"highlight-visibility\" class=\"{{vm.visibility}}\" title=\"{{vm.visibilityTitle}}\" ng-click=\"vm.setVisibleHighlights()\"></button>\n</div>\n<selection-tabs\n  ng-if=\"!vm.search.query() && vm.selectedAnnotationCount() === 0\"\n  is-waiting-to-anchor-annotations=\"vm.waitingToAnchorAnnotations\"\n  is-loading=\"vm.isLoading\"\n  selected-tab=\"vm.selectedTab\"\n  total-annotations=\"vm.totalAnnotations\"\n  total-notes=\"vm.totalNotes\"\n  total-orphans=\"vm.totalOrphans\">\n</selection-tabs>\n\n<search-status-bar\n  ng-show=\"!vm.isLoading()\"\n  filter-active=\"!!vm.search.query()\"\n  filter-match-count=\"vm.visibleCount()\"\n  on-clear-selection=\"vm.clearSelection()\"\n  search-query=\"vm.search ? vm.search.query : ''\"\n  selection-count=\"vm.selectedAnnotationCount()\"\n  total-count=\"vm.topLevelThreadCount()\"\n  selected-tab=\"vm.selectedTab\"\n  total-annotations=\"vm.totalAnnotations\"\n  total-notes=\"vm.totalNotes\">\n</search-status-bar>\n\n<div class=\"annotation-unavailable-message\"\n    ng-if=\"vm.selectedAnnotationUnavailable()\">\n  <div class=\"annotation-unavailable-message__icon\"></div>\n  <p class=\"annotation-unavailable-message__label\">\n    <span ng-if=\"vm.auth.status === 'logged-out'\">\n      {{'This feedback is not available.' | translate}}\n      <br>\n      <p ng-bind-html=\"'You may need to <a class=\\'loggedout-message__link\\' href=\\'\\' ng-click=\\'vm.login()\\'>log in</a> to see it.' | translate\"></p>\n    </span>\n    <span ng-if=\"vm.auth.status === 'logged-in'\">\n      {{'You do not have permission to view this feedback.' | translate}}\n    </span>\n  </p>\n</div>\n<thread-list\n  on-change-collapsed=\"vm.setCollapsed(id, collapsed)\"\n  on-clear-selection=\"vm.clearSelection()\"\n  on-focus=\"vm.focus(annotation)\"\n  on-force-visible=\"vm.forceVisible(thread)\"\n  on-select=\"vm.scrollTo(annotation)\"\n  show-document-info=\"false\"\n  thread=\"vm.rootThread\">\n</thread-list>\n\n<loggedout-message ng-if=\"vm.shouldShowLoggedOutMessage()\" on-login=\"vm.login()\">\n</loggedout-message>\n";
 
 },{}],160:[function(require,module,exports){
 module.exports = "<div class=\"sheet\" ng-if=\"vm.showSidebarTutorial() &&  !vm.isThemeClean\">\n  <i class=\"close h-icon-close\" role=\"button\" title=\"Close\"\n     ng-click=\"vm.dismiss()\"></i>\n  <h1 class=\"sidebar-tutorial__header\">{{'How to get started' | translate}}</h1>\n  <ol class=\"sidebar-tutorial__list\">\n    <li class=\"sidebar-tutorial__list-item\">\n      <p class=\"sidebar-tutorial__list-item-content\" \n        ng-bind-html=\"'To create an annotation, select text and click the <i class=\\'h-icon-annotate\\'></i> button.' | translate\">\n      </p>\n    </li>\n    <li class=\"sidebar-tutorial__list-item\">\n      <p class=\"sidebar-tutorial__list-item-content\"\n        ng-bind-html=\"'To add a note to the page you are viewing, click the <i class=\\'h-icon-note\\'></i> button.' | translate\">\n      </p>\n    </li>\n    <li class=\"sidebar-tutorial__list-item\">\n      <p class=\"sidebar-tutorial__list-item-content\"\n        ng-bind-html=\"'To create a highlight, select text and click the <i class=\\'h-icon-highlight\\'></i> button.' | translate\">\n      </p>\n    </li>\n    <li class=\"sidebar-tutorial__list-item\">\n      <p class=\"sidebar-tutorial__list-item-content\"\n          ng-bind-html=\"'To reply to an annotation, click the <i class=\\'h-icon-annotation-reply\\'></i> button. <strong>Reply</strong> link.' | translate\">\n      </p>\n    </li>\n    <li class=\"sidebar-tutorial__list-item\">\n      <p class=\"sidebar-tutorial__list-item-content\"\n          ng-bind-html=\"'To share an annotated page, click the <i class=\\'h-icon-annotation-share\\'></i> button at the top.' | translate\">\n      </p>\n    </li>\n    <li class=\"sidebar-tutorial__list-item\">\n      <p class=\"sidebar-tutorial__list-item-content\"\n      ng-bind-html=\"'To create a private group, select <strong>Public</strong>, open the dropdown, click <strong>+ New group</strong>.' | translate\">\n      </p>\n    </li>\n  </ol>\n</div>\n<div class=\"sheet sheet--is-theme-clean\" ng-if=\"vm.showSidebarTutorial() && vm.isThemeClean\">\n  <i class=\"close h-icon-close\" role=\"button\" title=\"Close\"\n     ng-click=\"vm.dismiss()\"></i>\n  <h1 class=\"sidebar-tutorial__header sidebar-tutorial__header--is-theme-clean\">\n    <i class=\"h-icon-annotate sidebar-tutorial__header-annotate\" h-branding=\"accentColor\"></i>\n    {{'Start annotating' | translate}}\n  </h1>\n  <ol class=\"sidebar-tutorial__list\">\n    <li class=\"sidebar-tutorial__list-item sidebar-tutorial__list-item--is-theme-clean\">\n      <div class=\"sidebar-tutorial__list-item-content\">\n        <p ng-html-bind=\"'Select some text to\n          <span class=\\'sidebar-tutorial__list-item-annotate\\'> leave feedback </span>\n          <svg-icon class=\\'sidebar-tutorial__list-item-cursor\\' name=\\'\\'cursor\\'\\'></svg-icon>\n        or highlight.' | translate\">\n      </p>\n      </div>\n    </li>\n    <li class=\"sidebar-tutorial__list-item sidebar-tutorial__list-item--is-theme-clean\">\n      <div class=\"sidebar-tutorial__list-item-content sidebar-tutorial__list-item-content--is-theme-clean\">\n        {{'Create page level notes' | translate}}\n        <span class=\"sidebar-tutorial__list-item-new-note-btn\" h-branding=\"ctaBackgroundColor\">\n          + {{'New note' | translate}}\n        </span>\n      </div>\n    </li>\n    <li class=\"sidebar-tutorial__list-item sidebar-tutorial__list-item--is-theme-clean\">\n      <div class=\"sidebar-tutorial__list-item-content\">\n        {{'View feedback through your profile' | translate}}\n        <i class=\"h-icon-account sidebar-tutorial__list-item-profile\"></i>\n        <i class=\"h-icon-arrow-drop-down sidebar-tutorial__list-item-drop-down\"></i>\n      </div>\n    </li>\n  </ol>\n</div>\n";

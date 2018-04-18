@@ -1,7 +1,8 @@
 <div class="sidebar__header">
   <h3 class="sidebar__header-title">Feedback</h3>
   <!--add close button here-->
-  <button id="sidebar-toggle-close" class="sidebar-close">x</button>
+  <button id="sidebar-toggle-close" class="sidebar-close" ng-click="vm.disableSidebar()">x</button>
+  <button id="highlight-visibility" class="{{vm.visibility}}" title="{{vm.visibilityTitle}}" ng-click="vm.setVisibleHighlights()"></button>
 </div>
 <selection-tabs
   ng-if="!vm.search.query() && vm.selectedAnnotationCount() === 0"

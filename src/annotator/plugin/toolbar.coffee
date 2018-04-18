@@ -10,6 +10,7 @@ makeButton = (item) ->
   .on(item.on)
   .addClass('annotator-frame-button')
   .addClass(item.class)
+  anchor.text(item.title)
   button = $('<li></li>').append(anchor)
   return button[0]
 
@@ -39,18 +40,16 @@ module.exports = class Toolbar extends Plugin
           @annotator.hide()
           @toolbar.find('[name=sidebar-close]').hide();
     ,
-      "title": polyglot().t("Toggle or Resize Sidebar")
+      "title": polyglot().t("Feedback")
       "class": "annotator-frame-button--sidebar_toggle h-icon-chevron-left"
       "name": "sidebar-toggle"
       "on":
         "click": (event) =>
           event.preventDefault()
           event.stopPropagation()
-          collapsed = @annotator.frame.hasClass('annotator-collapsed')
-          if collapsed
-            @annotator.show()
-          else
-            @annotator.hide()
+          # Sidebar is loaded as hidden. @annotator.show() is for making it visible.
+          @annotator.show()
+
     ,
       "title": polyglot().t("Hide Highlights")
       "class": "h-icon-visibility"
