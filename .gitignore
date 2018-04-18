@@ -1,2 +1,4 @@
 .bash_history
 /node_modules/phantomjs-prebuilt/
+/coverage
+/build
