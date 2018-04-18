@@ -13626,6 +13626,7 @@ module.exports = Sidebar = (function(superClass) {
   };
 
   Sidebar.prototype.hide = function() {
+    var allFeedbackOnThePage, feedback, i, len;
     this.toolbar = this.frame.find('.annotator-toolbar');
     this.toolbar.css({
       'display': ''
@@ -13635,6 +13636,11 @@ module.exports = Sidebar = (function(superClass) {
       'display': 'none'
     });
     this.setVisibleHighlights(false);
+    allFeedbackOnThePage = document.querySelectorAll('.annotator-hl-selected-public, .annotator-hl-selected-yours');
+    for (i = 0, len = allFeedbackOnThePage.length; i < len; i++) {
+      feedback = allFeedbackOnThePage[i];
+      feedback.classList.remove('annotator-hl-selected-public', 'annotator-hl-selected-yours');
+    }
     return this._notifyOfLayoutChange(false);
   };
 

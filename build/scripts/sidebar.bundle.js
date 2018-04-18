@@ -9468,6 +9468,12 @@ function SidebarContentController($scope, analytics, annotationUI, annotationMap
     frameSync.hideSidebar();
     this.visibility = 'h-icon-visibility-off';
     this.visibilityTitle = 'Show Highlights';
+
+    // Clear the selected card before closing the sidebar
+    var allFeedbackOnThePage = document.querySelectorAll('.default__card-selected, .users__card-selected');
+    allFeedbackOnThePage.forEach(function (card) {
+      document.getElementById(card.id).classList.remove('default__card-selected', 'users__card-selected');
+    });
   };
 
   this.setVisibleHighlights = function () {

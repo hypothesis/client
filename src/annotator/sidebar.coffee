@@ -269,7 +269,12 @@ module.exports = class Sidebar extends Host
     @toolbar.css 'display': ''
     @feedbackpanel = @frame.find('[name=hyp_sidebar_frame]')
     @feedbackpanel.css 'display': 'none'
+    # Clear existing highlights
     @setVisibleHighlights(false)
+    # Clear any selected text on the doc
+    allFeedbackOnThePage = document.querySelectorAll('.annotator-hl-selected-public, .annotator-hl-selected-yours');
+    for feedback in allFeedbackOnThePage
+      feedback.classList.remove('annotator-hl-selected-public', 'annotator-hl-selected-yours');
 
     # The original code from Hypothesis. They changes the margin to make it enabled/disabled
     # @frame.css 'margin-left': ''
