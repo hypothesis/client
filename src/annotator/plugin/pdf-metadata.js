@@ -19,6 +19,13 @@ const { normalizeURI } = require('../util/url');
 /**
  * PDFMetadata extracts metadata about a loading/loaded PDF document from a
  * PDF.js PDFViewerApplication object.
+ *
+ * @example
+ * // Invoke in a PDF.js viewer, before or after the PDF has finished loading.
+ * const meta = new PDFMetadata(window.PDFViewerApplication)
+ * meta.getUri().then(uri => {
+ *    // Do something with the URL of the PDF.
+ * })
  */
 class PDFMetadata {
   /**
