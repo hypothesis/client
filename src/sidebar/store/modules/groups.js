@@ -14,31 +14,31 @@ function init() {
      * ID of currently selected group.
      * @type {string|null}
      */
-    focusedGroup: null,
+    focusedGroupId: null,
   };
 }
 
 const update = {
   FOCUS_GROUP(state, action) {
-    const g = state.groups.find(g => g.id === action.id);
-    return { focusedGroup: g ? action.id : null };
+    const group = state.groups.find(g => g.id === action.id);
+    return { focusedGroupId: group ? action.id : null };
   },
 
   LOAD_GROUPS(state, action) {
     const groups = action.groups;
-    let focusedGroup = state.focusedGroup;
+    let focusedGroupId = state.focusedGroupId;
 
     // Reset focused group if not in the new set of groups.
-    if (state.focusedGroup === null || !groups.find(g => g.id === state.focusedGroup)) {
+    if (state.focusedGroupId === null || !groups.find(g => g.id === state.focusedGroupId)) {
       if (groups.length > 0) {
-        focusedGroup = groups[0].id;
+        focusedGroupId = groups[0].id;
       } else {
-        focusedGroup = null;
+        focusedGroupId = null;
       }
     }
 
     return {
-      focusedGroup,
+      focusedGroupId,
       groups: action.groups,
     };
   },
@@ -76,10 +76,10 @@ function loadGroups(groups) {
  * @return {Group|null}
  */
 function focusedGroup(state) {
-  if (!state.focusedGroup) {
+  if (!state.focusedGroupId) {
     return null;
   }
-  return getGroup(state, state.focusedGroup);
+  return getGroup(state, state.focusedGroupId);
 }
 
 /**
