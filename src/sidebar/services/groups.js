@@ -20,12 +20,6 @@ var serviceConfig = require('../service-config');
 // @ngInject
 function groups($rootScope, store, api, isSidebar, localStorage, serviceUrl, session,
                 settings) {
-  // The currently focused group. This is the group that's shown as selected in
-  // the groups dropdown, the annotations displayed are filtered to only ones
-  // that belong to this group, and any new annotations that the user creates
-  // will be created in this group.
-  var focusedGroupId;
-  var groups = [];
   var documentUri;
 
   var svc = serviceConfig(settings);
@@ -69,33 +63,25 @@ function groups($rootScope, store, api, isSidebar, localStorage, serviceUrl, ses
       }
       return api.groups.list(params);
     }).then(gs => {
-      $rootScope.$apply(() => {
-        var focGroup = focused();
-        if (focGroup) {
-          var focusedGroupInFetchedList = gs.some(g => g.id === focGroup.id);
-          if (!focusedGroupInFetchedList) {
-            focus(gs[0].id);
-          }
-        }
-        groups = gs;
-      });
-      return gs;
+      var isFirstLoad = store.allGroups().length === 0;
+      var prevFocusedGroup = localStorage.getItem(STORAGE_KEY);
+
+      store.loadGroups(gs);
+      if (isFirstLoad) {
+        store.focusGroup(prevFocusedGroup);
+      }
+
+      return store.allGroups();
     });
   }
 
   function all() {
-    return groups;
+    return store.allGroups();
   }
 
   // Return the full object for the group with the given id.
   function get(id) {
-    var gs = all();
-    for (var i = 0, max = gs.length; i < max; i++) {
-      if (gs[i].id === id) {
-        return gs[i];
-      }
-    }
-    return null;
+    return store.getGroup(id);
   }
 
   /**
@@ -118,31 +104,25 @@ function groups($rootScope, store, api, isSidebar, localStorage, serviceUrl, ses
    * a previous session. Lastly, we fall back to the first group available.
    */
   function focused() {
-    if (focusedGroupId) {
-      return get(focusedGroupId);
-    }
-
-    var fromStorage = get(localStorage.getItem(STORAGE_KEY));
-    if (fromStorage) {
-      focusedGroupId = fromStorage.id;
-      return fromStorage;
-    }
-
-    return all()[0];
+    return store.focusedGroup();
   }
 
   /** Set the group with the passed id as the currently focused group. */
   function focus(id) {
-    var prevFocused = focused();
-    var g = get(id);
-    if (g) {
-      focusedGroupId = g.id;
-      localStorage.setItem(STORAGE_KEY, g.id);
-      if (prevFocused.id !== g.id) {
-        $rootScope.$broadcast(events.GROUP_FOCUSED, g.id);
-      }
-    }
+    store.focusGroup(id);
   }
+
+  // Persist the focused group to storage when it changes.
+  var prevFocused = store.focusedGroup();
+  store.subscribe(() => {
+    var focused = store.focusedGroup();
+    if (focused && focused !== prevFocused) {
+      localStorage.setItem(STORAGE_KEY, focused.id);
+
+      // Emit the `GROUP_FOCUSED` event for code that still relies on it.
+      $rootScope.$broadcast(events.GROUP_FOCUSED, focused.id);
+    }
+  });
 
   // reset the focused group if the user leaves it
   $rootScope.$on(events.GROUPS_CHANGED, function () {
