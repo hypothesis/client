@@ -4,6 +4,12 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+### Changed
+
+- Internal refactoring and dependency updates.
+
 ## [1.79.0] - 2018-04-17
 
 ### Changed
