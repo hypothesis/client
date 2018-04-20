@@ -4,6 +4,13 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+### Changed
+
+- Fix regression making it impossible to create annotations in v1.80.0
+  ([#724](https://github.com/hypothesis/client/pull/724)).
+
 ## [1.80.0] - 2018-04-20
 
 ### Changed
