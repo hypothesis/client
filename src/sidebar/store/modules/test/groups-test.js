@@ -82,4 +82,16 @@ describe('sidebar.store.modules.groups', () => {
       assert.deepEqual(store.focusedGroup(), privateGroup);
     });
   });
+
+  describe('focusedGroupId', () => {
+    it('returns `null` if no group is focused', () => {
+      assert.equal(store.focusedGroupId(), null);
+    });
+
+    it('returns the focused group ID if a group has been focused', () => {
+      store.loadGroups([privateGroup]);
+      store.focusGroup(privateGroup.id);
+      assert.equal(store.focusedGroupId(), privateGroup.id);
+    });
+  });
 });
