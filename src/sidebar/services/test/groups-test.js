@@ -49,6 +49,10 @@ describe('groups', function() {
       searchUris() {
         return this.getState().searchUris;
       },
+      focusedGroupId() {
+        var group = this.getState().focusedGroup;
+        return group ? group.id : null;
+      },
     });
     fakeSession = sessionWithThreeGroups();
     fakeIsSidebar = true;
@@ -210,6 +214,16 @@ describe('groups', function() {
       fakeStore.setState({ groups: dummyGroups, focusedGroup: dummyGroups[1] });
 
       assert.calledWith(fakeRootScope.$broadcast, events.GROUP_FOCUSED, dummyGroups[1].id);
+    });
+
+    it('does not emit GROUP_FOCUSED if the focused group did not change', () => {
+      service();
+
+      fakeStore.setState({ groups: dummyGroups, focusedGroup: dummyGroups[1] });
+      fakeRootScope.$broadcast.reset();
+      fakeStore.setState({ groups: dummyGroups, focusedGroup: dummyGroups[1] });
+
+      assert.notCalled(fakeRootScope.$broadcast);
     });
   });
 

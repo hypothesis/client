@@ -113,14 +113,16 @@ function groups($rootScope, store, api, isSidebar, localStorage, serviceUrl, ses
   }
 
   // Persist the focused group to storage when it changes.
-  var prevFocused = store.focusedGroup();
+  var prevFocusedId = store.focusedGroupId();
   store.subscribe(() => {
-    var focused = store.focusedGroup();
-    if (focused && focused !== prevFocused) {
-      localStorage.setItem(STORAGE_KEY, focused.id);
+    var focusedId = store.focusedGroupId();
+    if (focusedId !== prevFocusedId) {
+      prevFocusedId = focusedId;
+
+      localStorage.setItem(STORAGE_KEY, focusedId);
 
       // Emit the `GROUP_FOCUSED` event for code that still relies on it.
-      $rootScope.$broadcast(events.GROUP_FOCUSED, focused.id);
+      $rootScope.$broadcast(events.GROUP_FOCUSED, focusedId);
     }
   });
 

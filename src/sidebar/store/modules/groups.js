@@ -83,6 +83,15 @@ function focusedGroup(state) {
 }
 
 /**
+ * Return the current focused group ID or `null`.
+ *
+ * @return {string|null}
+ */
+function focusedGroupId(state) {
+  return state.focusedGroupId;
+}
+
+/**
  * Return the list of all groups.
  *
  * @return {Group[]}
@@ -111,5 +120,6 @@ module.exports = {
     allGroups,
     getGroup,
     focusedGroup,
+    focusedGroupId,
   },
 };
