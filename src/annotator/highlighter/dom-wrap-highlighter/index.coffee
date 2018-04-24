@@ -13,7 +13,7 @@ exports.highlightRange = (normedRange, newAnnotation, cssClass='annotator-hl') -
   # A custom element name is used here rather than `<span>` to reduce the
   # likelihood of highlights being hidden by page styling.
   if newAnnotation
-    cssClass= "annotator-hl annotator-hl-focused"
+    cssClass= "annotator-hl annotator-hl-selected-yours"
   hl = $("<hypothesis-highlight class='#{cssClass}'></hypothesis-highlight>")
 
   # Ignore text nodes that contain only whitespace characters. This prevents
