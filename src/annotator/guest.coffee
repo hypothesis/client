@@ -198,7 +198,7 @@ module.exports = class Guest extends Delegator
         # If the feedback is the selected feedback
         if anchor.annotation.$tag is tag
           # highlight/unhighlight the feedback on the doc
-          $(anchor.highlights).toggleClass(className)
+          $(anchor.highlights).toggleClass(className) unless type is 'action'
 
           # scroll to the feedback
           event = new CustomEvent('scrolltorange', {

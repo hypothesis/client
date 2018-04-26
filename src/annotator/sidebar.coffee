@@ -246,6 +246,11 @@ module.exports = class Sidebar extends Host
     @toolbar.css 'display': 'none'
     @feedbackpanel = @frame.find('[name=hyp_sidebar_frame]')
     @feedbackpanel.css 'display': ''
+    # Close the table content when sidebar is open
+    @tocToggleS = $('.toc-toggle.toc-show');
+    @tocToggleS.addClass('collapsed')
+    @tocMain = $('.toc-main')
+    @tocMain.removeClass('in')
 
     # The original code from Hypothesis. They changes the margin to make it enabled/disabled
     # @frame.css 'margin-left': "#{-1 * @frame.width()}px"
@@ -275,6 +280,14 @@ module.exports = class Sidebar extends Host
     allFeedbackOnThePage = document.querySelectorAll('.annotator-hl-selected-public, .annotator-hl-selected-yours');
     for feedback in allFeedbackOnThePage
       feedback.classList.remove('annotator-hl-selected-public', 'annotator-hl-selected-yours');
+    # Manages the visibility of sidebar and table content on the page
+    @tocToggleS = $('.toc-toggle.toc-show');
+    #  if it is already collapsed don't do anything; if not, open the table content when sidebar is closed
+    isAlreadyCollapsed = @tocToggleS.hasClass('collapsed')
+    if not isAlreadyCollapsed
+      @tocToggleS.removeClass('collapsed')
+      @tocMain = $('.toc-main')
+      @tocMain.addClass('in')
 
     # The original code from Hypothesis. They changes the margin to make it enabled/disabled
     # @frame.css 'margin-left': ''

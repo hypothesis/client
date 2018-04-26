@@ -5,8 +5,8 @@
     <div id="{{child.id}}"
         class="thread-list__card"
         ng-mouseenter="vm.onFocus({annotation: child.annotation})"
-        ng-class="{'thread-list__card--theme-clean' : vm.isThemeClean}"
-        ng-click="vm.onSelect({annotation: child.annotation})"
+        ng-class="{'users__card-selected' : child.annotation.text === ''}"
+        ng-click="vm.onSelect({annotation: child.annotation, event: $event})"
         ng-mouseleave="vm.onFocus({annotation: child.annotation})">
         <annotation-thread
           thread="child"

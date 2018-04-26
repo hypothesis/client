@@ -70,6 +70,23 @@
   left: -44px;
 
 }
+
+.annotator-frame-button--sidebar_toggle {
+  font-family: 'Overpass' !important;
+  position: absolute;
+  width: auto;
+  background: #F4F4F4;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 6px 14px;
+  border: none;
+  color: #000;
+  right: -300px;
+}
+
+.annotator-frame-button--sidebar_toggle::before {
+  content: '';
+}
 }
   // .annotator-bucket-indicator {
   //   background-color: #ededed;

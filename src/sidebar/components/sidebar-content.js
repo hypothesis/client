@@ -71,27 +71,32 @@ function SidebarContentController(
     frameSync.focusAnnotations(highlights, annotation.user, this.auth.userid, 'hover');
   }
 
-  function scrollToAnnotation(annotation) {
+  function scrollToAnnotation(annotation, event) {
     if (!annotation) {
       return;
     }
 
-    // Manage highlighting/unhighlighting the selected feedback in the sidebar
     var className = getProperClassName(annotation.user, this.auth.userid, 'card');
-    document.getElementById(annotation.id).classList.toggle(className);
+    if(event.srcElement.className === 'h-icon-annotation-edit btn-icon' || event.srcElement.className === 'publish-annotation-cancel-btn btn-clean ng-binding' || event.srcElement.className ===  'btn-app btn-update ng-binding' || event.srcElement.className === 'h-icon-annotation-delete btn-icon'){
+      // If the click is edit or delete or submit or cancel, just scroll the page, don't touch the highlight color.
+      frameSync.scrollToAnnotation(annotation.$tag, annotation.user, this.auth.userid, 'action');
+    }
+    else{
+      // Manage highlighting/unhighlighting the selected feedback in the sidebar
+      document.getElementById(annotation.id).classList.toggle(className);
+      // ** Clear all other feedback highlights **
+      // See if there is already selected feedback in the sidebar. It has to be max one selected feedback in the case that we do not have the bucket bar!
+      var allFeedbackOnThePage = document.querySelectorAll('.default__card-selected, .users__card-selected');
+      allFeedbackOnThePage.forEach(function(card){
+        if (card.id !== annotation.id){
+          //  Remove the possible existing classes if the feedback is not the one selected
+          document.getElementById(card.id).classList.remove('default__card-selected', 'users__card-selected');
+        }
+      });
+      // Manage highlighting/unhighlighting the text of the corresponding selected feedback in the sidebar
+      frameSync.scrollToAnnotation(annotation.$tag, annotation.user, this.auth.userid, 'text');
 
-    // ** Clear all other feedback highlights **
-    // See if there is already selected feedback in the sidebar. It has to be max one selected feedback in the case that we do not have the bucket bar!
-    var allFeedbackOnThePage = document.querySelectorAll('.default__card-selected, .users__card-selected');
-    allFeedbackOnThePage.forEach(function(card){
-      if (card.id !== annotation.id){
-        //  Remove the possible existing classes if the feedback is not the one selected
-        document.getElementById(card.id).classList.remove('default__card-selected', 'users__card-selected');
-      }
-    });
-
-    // Manage highlighting/unhighlighting the text of the corresponding selected feedback in the sidebar
-    frameSync.scrollToAnnotation(annotation.$tag, annotation.user, this.auth.userid, 'text');
+    }
   }
 
   /**
