@@ -1,5 +1,6 @@
 'use strict';
 
+var https = require('https');
 var { readFileSync } = require('fs');
 
 var express = require('express');
@@ -43,6 +44,19 @@ function servePackage(port, hostname) {
   app.listen(port, function () {
     log(`Package served at http://${hostname}:${port}/hypothesis`);
   });
+
+  try {
+    https.createServer(
+      {
+         key: readFileSync("/etc/pki/tls/private/localhost.key"),
+         cert: readFileSync("/etc/pki/tls/certs/localhost.crt")
+       },
+      app
+    ).listen(4443);
+  }
+  catch (e) {
+    log(`notice: SSL cert not found, TLS will not be used.`);
+  }
 }
 
 module.exports = servePackage;
