@@ -48,8 +48,8 @@ function servePackage(port, hostname) {
   try {
     https.createServer(
       {
-         key: readFileSync("/etc/pki/tls/private/localhost.key"),
-         cert: readFileSync("/etc/pki/tls/certs/localhost.crt")
+         key: readFileSync("/opt/ssl/client-ssl.key"),
+         cert: readFileSync("/opt/ssl/client-ssl.crt")
        },
       app
     ).listen(4443);
