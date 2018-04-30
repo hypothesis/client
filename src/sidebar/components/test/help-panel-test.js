@@ -3,12 +3,12 @@
 var angular = require('angular');
 
 describe('helpPanel', function () {
-  var fakeAnnotationUI;
+  var fakeStore;
   var $componentController;
   var $rootScope;
 
   beforeEach(function () {
-    fakeAnnotationUI = {
+    fakeStore = {
       frames: sinon.stub().returns([]),
     };
 
@@ -16,7 +16,7 @@ describe('helpPanel', function () {
       .component('helpPanel', require('../help-panel'));
 
     angular.mock.module('h', {
-      annotationUI: fakeAnnotationUI,
+      store: fakeStore,
       serviceUrl: sinon.stub(),
     });
 
@@ -27,7 +27,7 @@ describe('helpPanel', function () {
   });
 
   it('displays the URL and fingerprint of the first connected frame', function () {
-    fakeAnnotationUI.frames.returns([{
+    fakeStore.frames.returns([{
       uri: 'https://publisher.org/article.pdf',
       metadata: {
         documentFingerprint: '12345',

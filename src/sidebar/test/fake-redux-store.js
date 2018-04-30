@@ -16,7 +16,7 @@ var redux = require('redux');
 function fakeStore(initialState, methods) {
   function update(state, action) {
     if (action.state) {
-      return action.state;
+      return Object.assign({}, state, action.state);
     } else {
       return state;
     }

@@ -10,9 +10,9 @@ var moderatedAnnotation = fixtures.moderatedAnnotation;
 
 describe('moderationBanner', function () {
   var bannerEl;
-  var fakeAnnotationUI;
-  var fakeFlash;
   var fakeStore;
+  var fakeFlash;
+  var fakeApi;
 
   before(function () {
     angular.module('app', [])
@@ -20,7 +20,7 @@ describe('moderationBanner', function () {
   });
 
   beforeEach(function () {
-    fakeAnnotationUI = {
+    fakeStore = {
       hideAnnotation: sinon.stub(),
       unhideAnnotation: sinon.stub(),
     };
@@ -29,7 +29,7 @@ describe('moderationBanner', function () {
       error: sinon.stub(),
     };
 
-    fakeStore = {
+    fakeApi = {
       annotation: {
         hide: sinon.stub().returns(Promise.resolve()),
         unhide: sinon.stub().returns(Promise.resolve()),
@@ -37,9 +37,9 @@ describe('moderationBanner', function () {
     };
 
     angular.mock.module('app', {
-      annotationUI: fakeAnnotationUI,
-      flash: fakeFlash,
       store: fakeStore,
+      api: fakeApi,
+      flash: fakeFlash,
     });
   });
 
@@ -114,13 +114,13 @@ describe('moderationBanner', function () {
     var ann = moderatedAnnotation({ flagCount: 10 });
     var banner = createBanner({ annotation: ann });
     banner.querySelector('button').click();
-    assert.calledWith(fakeStore.annotation.hide, {id: 'ann-id'});
+    assert.calledWith(fakeApi.annotation.hide, {id: 'ann-id'});
   });
 
   it('reports an error if hiding the annotation fails', function (done) {
     var ann = moderatedAnnotation({ flagCount: 10 });
     var banner = createBanner({ annotation: ann });
-    fakeStore.annotation.hide.returns(Promise.reject(new Error('Network Error')));
+    fakeApi.annotation.hide.returns(Promise.reject(new Error('Network Error')));
 
     banner.querySelector('button').click();
 
@@ -139,7 +139,7 @@ describe('moderationBanner', function () {
 
     banner.querySelector('button').click();
 
-    assert.calledWith(fakeStore.annotation.unhide, {id: 'ann-id'});
+    assert.calledWith(fakeApi.annotation.unhide, {id: 'ann-id'});
   });
 
   it('reports an error if unhiding the annotation fails', function (done) {
@@ -148,7 +148,7 @@ describe('moderationBanner', function () {
       hidden: true,
     });
     var banner = createBanner({ annotation: ann });
-    fakeStore.annotation.unhide.returns(Promise.reject(new Error('Network Error')));
+    fakeApi.annotation.unhide.returns(Promise.reject(new Error('Network Error')));
 
     banner.querySelector('button').click();
 

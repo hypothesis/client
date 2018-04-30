@@ -25,9 +25,9 @@ function updateModel(annotation, changes, permissions) {
 
 // @ngInject
 function AnnotationController(
-  $document, $rootScope, $scope, $timeout, $window, analytics, annotationUI,
-  annotationMapper, drafts, flash, groups, permissions, serviceUrl,
-  session, settings, store, streamer) {
+  $document, $rootScope, $scope, $timeout, $window, analytics, store,
+  annotationMapper, api, drafts, flash, groups, permissions, serviceUrl,
+  session, settings, streamer) {
 
   var self = this;
   var newlyCreatedByHighlightButton;
@@ -38,9 +38,9 @@ function AnnotationController(
     var updating = !!annot.id;
 
     if (updating) {
-      saved = store.annotation.update({id: annot.id}, annot);
+      saved = api.annotation.update({id: annot.id}, annot);
     } else {
-      saved = store.annotation.create({}, annot);
+      saved = api.annotation.create({}, annot);
     }
 
     return saved.then(function (savedAnnot) {
@@ -199,7 +199,7 @@ function AnnotationController(
     };
     annotationMapper.flagAnnotation(self.annotation).then(function(){
       analytics.track(analytics.events.ANNOTATION_FLAGGED);
-      annotationUI.updateFlagStatus(self.annotation.id, true);
+      store.updateFlagStatus(self.annotation.id, true);
     }, onRejected);
   };
 
@@ -547,7 +547,7 @@ function AnnotationController(
     if (!self.editing() || !self.isShared()) {
       return false;
     }
-    return self.group().public;
+    return self.group().type !== 'private';
   };
 
   init();

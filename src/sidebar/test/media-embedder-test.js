@@ -9,6 +9,16 @@ describe('media-embedder', function () {
     return element;
   }
 
+  var clock;
+
+  beforeEach(() => {
+    clock = sinon.useFakeTimers();
+  });
+
+  afterEach(() => {
+    clock.restore();
+  });
+
   it('replaces YouTube watch links with iframes', function () {
     var urls = [
       'https://www.youtube.com/watch?v=QCkm0lL-6lc',

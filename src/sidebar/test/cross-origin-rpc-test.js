@@ -5,13 +5,13 @@ var crossOriginRPC = require('../cross-origin-rpc');
 describe('crossOriginRPC', function() {
   describe('server', function() {
     let addedListener;  // The postMessage() listener that the server adds.
-    let fakeAnnotationUI;
+    let fakeStore;
     let fakeWindow;
     let settings;
     let source;
 
     beforeEach(function() {
-      fakeAnnotationUI = {
+      fakeStore = {
         searchUris: sinon.stub().returns('THE_SEARCH_URIS'),
       };
 
@@ -40,14 +40,14 @@ describe('crossOriginRPC', function() {
     }
 
     it('adds a postMessage() event listener function', function() {
-      crossOriginRPC.server.start(fakeAnnotationUI, {}, fakeWindow);
+      crossOriginRPC.server.start(fakeStore, {}, fakeWindow);
 
       assert.isTrue(fakeWindow.addEventListener.calledOnce);
       assert.isTrue(fakeWindow.addEventListener.calledWith('message'));
     });
 
     it('sends a response with the result from the called method', function() {
-      crossOriginRPC.server.start(fakeAnnotationUI, settings, fakeWindow);
+      crossOriginRPC.server.start(fakeStore, settings, fakeWindow);
 
       postMessage({
         data: { method: 'searchUris', id: 42 },
@@ -72,7 +72,7 @@ describe('crossOriginRPC', function() {
       { rpcAllowedOrigins: ['https://allowed1.com', 'https://allowed2.com'] },
     ].forEach(function(settings) {
       it("doesn't respond if the origin isn't allowed", function() {
-        crossOriginRPC.server.start(fakeAnnotationUI, settings, fakeWindow);
+        crossOriginRPC.server.start(fakeStore, settings, fakeWindow);
 
         postMessage({
           origin: 'https://notallowed.com',
@@ -85,7 +85,7 @@ describe('crossOriginRPC', function() {
     });
 
     it("responds with an error if there's no method", function() {
-      crossOriginRPC.server.start(fakeAnnotationUI, settings, fakeWindow);
+      crossOriginRPC.server.start(fakeStore, settings, fakeWindow);
       let jsonRpcRequest = { id: 42 };  // No "method" member.
 
       postMessage({
@@ -113,7 +113,7 @@ describe('crossOriginRPC', function() {
       null,
     ].forEach(function(method) {
       it('responds with an error if the method is unknown', function() {
-        crossOriginRPC.server.start(fakeAnnotationUI, settings, fakeWindow);
+        crossOriginRPC.server.start(fakeStore, settings, fakeWindow);
 
         postMessage({
           origin: 'https://allowed1.com',

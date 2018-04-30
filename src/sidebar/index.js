@@ -53,13 +53,16 @@ if(settings.googleAnalytics){
 }
 
 // Fetch external state that the app needs before it can run. This includes the
-// authenticated user state, the API endpoint URLs and WebSocket connection.
+// user's profile and list of groups.
 var resolve = {
   // @ngInject
-  sessionState: function (session) {
-    return session.load();
+  state: function (groups, session) {
+    return Promise.all([groups.load(), session.load()]);
   },
 };
+
+var isSidebar = !(window.location.pathname.startsWith('/stream') ||
+                  window.location.pathname.startsWith('/a/'));
 
 // @ngInject
 function configureLocation($locationProvider) {
@@ -95,6 +98,19 @@ function configureToastr(toastrConfig) {
   angular.extend(toastrConfig, {
     preventOpenDuplicates: true,
   });
+}
+
+// @ngInject
+function configureCompile($compileProvider) {
+  // Make component bindings available in controller constructor. When
+  // pre-assigned bindings is off, as it is by default in Angular >= 1.6.0,
+  // bindings are only available during and after the controller's `$onInit`
+  // method.
+  //
+  // This migration helper is being removed in Angular 1.7.0. To see which
+  // components need updating, look for uses of `preAssignBindingsEnabled` in
+  // tests.
+  $compileProvider.preAssignBindingsEnabled(true);
 }
 
 // @ngInject
@@ -168,43 +184,47 @@ module.exports = angular.module('h', [
   .directive('spinner', require('./directive/spinner'))
   .directive('windowScroll', require('./directive/window-scroll'))
 
-  .service('analytics', require('./analytics'))
-  .service('annotationMapper', require('./annotation-mapper'))
-  .service('annotationUI', require('./annotation-ui'))
-  .service('apiRoutes', require('./api-routes'))
-  .service('auth', require('./oauth-auth'))
+  .service('analytics', require('./services/analytics'))
+  .service('annotationMapper', require('./services/annotation-mapper'))
+  .service('api', require('./services/api'))
+  .service('apiRoutes', require('./services/api-routes'))
+  .service('auth', require('./services/oauth-auth'))
   .service('bridge', require('../shared/bridge'))
-  .service('drafts', require('./drafts'))
-  .service('features', require('./features'))
-  .service('flash', require('./flash'))
-  .service('frameSync', require('./frame-sync').default)
-  .service('groups', require('./groups'))
-  .service('localStorage', require('./local-storage'))
-  .service('permissions', require('./permissions'))
-  .service('queryParser', require('./query-parser'))
-  .service('rootThread', require('./root-thread'))
-  .service('searchFilter', require('./search-filter'))
-  .service('serviceUrl', require('./service-url'))
-  .service('session', require('./session'))
-  .service('streamer', require('./streamer'))
-  .service('streamFilter', require('./stream-filter'))
-  .service('tags', require('./tags'))
-  .service('unicode', require('./unicode'))
-  .service('viewFilter', require('./view-filter'))
+  .service('drafts', require('./services/drafts'))
+  .service('features', require('./services/features'))
+  .service('flash', require('./services/flash'))
+  .service('frameSync', require('./services/frame-sync').default)
+  .service('groups', require('./services/groups'))
+  .service('localStorage', require('./services/local-storage'))
+  .service('permissions', require('./services/permissions'))
+  .service('queryParser', require('./services/query-parser'))
+  .service('rootThread', require('./services/root-thread'))
+  .service('searchFilter', require('./services/search-filter'))
+  .service('serviceUrl', require('./services/service-url'))
+  .service('session', require('./services/session'))
+  .service('streamer', require('./services/streamer'))
+  .service('streamFilter', require('./services/stream-filter'))
+  .service('tags', require('./services/tags'))
+  .service('unicode', require('./services/unicode'))
+  .service('viewFilter', require('./services/view-filter'))
 
-  .factory('store', require('./store'))
+  // Redux store
+  .service('store', require('./store'))
 
+  // Utilities
   .value('Discovery', require('../shared/discovery'))
   .value('ExcerptOverflowMonitor', require('./util/excerpt-overflow-monitor'))
   .value('OAuthClient', require('./util/oauth-client'))
   .value('VirtualThreadList', require('./virtual-thread-list'))
+  .value('isSidebar', isSidebar)
   .value('random', require('./util/random'))
   .value('raven', require('./raven'))
   .value('serviceConfig', serviceConfig)
   .value('settings', settings)
-  .value('time', require('./time'))
+  .value('time', require('./util/time'))
   .value('urlEncodeFilter', require('./filter/url').encode)
 
+  .config(configureCompile)
   .config(configureLocation)
   .config(configureRoutes)
   .config(configureToastr)

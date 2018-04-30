@@ -5,18 +5,18 @@
  *
  * @return Promise<Array<Annotation>>
  */
-function fetchThread(store, id) {
+function fetchThread(api, id) {
   var annot;
-  return store.annotation.get({id: id}).then(function (annot) {
+  return api.annotation.get({id: id}).then(function (annot) {
     if (annot.references && annot.references.length) {
       // This is a reply, fetch the top-level annotation
-      return store.annotation.get({id: annot.references[0]});
+      return api.annotation.get({id: annot.references[0]});
     } else {
       return annot;
     }
   }).then(function (annot_) {
     annot = annot_;
-    return store.search({references: annot.id});
+    return api.search({references: annot.id});
   }).then(function (searchResult) {
     return [annot].concat(searchResult.rows);
   });
@@ -24,12 +24,12 @@ function fetchThread(store, id) {
 
 // @ngInject
 function AnnotationViewerContentController (
-  $location, $routeParams, annotationUI, rootThread, streamer, store,
+  $location, $routeParams, store, api, rootThread, streamer,
   streamFilter, annotationMapper
 ) {
   var self = this;
 
-  annotationUI.setAppIsSidebar(false);
+  store.setAppIsSidebar(false);
 
   var id = $routeParams.id;
 
@@ -37,15 +37,15 @@ function AnnotationViewerContentController (
     $location.path('/stream').search('q', query);
   };
 
-  annotationUI.subscribe(function () {
-    self.rootThread = rootThread.thread(annotationUI.getState());
+  store.subscribe(function () {
+    self.rootThread = rootThread.thread(store.getState());
   });
 
   this.setCollapsed = function (id, collapsed) {
-    annotationUI.setCollapsed(id, collapsed);
+    store.setCollapsed(id, collapsed);
   };
 
-  this.ready = fetchThread(store, id).then(function (annots) {
+  this.ready = fetchThread(api, id).then(function (annots) {
     annotationMapper.loadAnnotations(annots);
 
     var topLevelAnnot = annots.filter(function (annot) {
@@ -64,11 +64,11 @@ function AnnotationViewerContentController (
     streamer.connect();
 
     annots.forEach(function (annot) {
-      annotationUI.setCollapsed(annot.id, false);
+      store.setCollapsed(annot.id, false);
     });
 
     if (topLevelAnnot.id !== id) {
-      annotationUI.highlightAnnotations([id]);
+      store.highlightAnnotations([id]);
     }
   });
 }

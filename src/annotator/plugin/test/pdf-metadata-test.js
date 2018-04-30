@@ -14,7 +14,7 @@ describe('pdf-metadata', function () {
     window.dispatchEvent(event);
 
     return pdfMetadata.getUri().then(function (uri) {
-      assert.equal(uri, 'http://fake.com');
+      assert.equal(uri, 'http://fake.com/');
     });
   });
 
@@ -25,7 +25,7 @@ describe('pdf-metadata', function () {
     };
     var pdfMetadata = new PDFMetadata(fakePDFViewerApplication);
     return pdfMetadata.getUri().then(function (uri) {
-      assert.equal(uri, 'http://fake.com');
+      assert.equal(uri, 'http://fake.com/');
     });
   });
 
@@ -41,7 +41,7 @@ describe('pdf-metadata', function () {
           'dc:title': 'fakeTitle',
         },
       },
-      url: 'http://fake.com',
+      url: 'http://fake.com/',
     };
 
     beforeEach(function () {
@@ -51,7 +51,7 @@ describe('pdf-metadata', function () {
     describe('#getUri', function () {
       it('returns the non-file URI', function() {
         return pdfMetadata.getUri().then(function (uri) {
-          assert.equal(uri, 'http://fake.com');
+          assert.equal(uri, 'http://fake.com/');
         });
       });
 
@@ -64,6 +64,20 @@ describe('pdf-metadata', function () {
 
         return pdfMetadata.getUri().then(function (uri) {
           assert.equal(uri, 'urn:x-pdf:fakeFingerprint');
+        });
+      });
+
+      it('resolves relative URLs', () => {
+        var fakePDFViewerApplication = {
+          url: 'index.php?action=download&file_id=wibble',
+          documentFingerprint: 'fakeFingerprint',
+        };
+        var pdfMetadata = new PDFMetadata(fakePDFViewerApplication);
+
+        return pdfMetadata.getUri().then(uri => {
+          var expected = new URL(fakePDFViewerApplication.url,
+                                 document.location.href).toString();
+          assert.equal(uri, expected);
         });
       });
     });
@@ -81,7 +95,7 @@ describe('pdf-metadata', function () {
         fakePDFViewerApplication.metadata.get = sinon.stub().returns('dcTitle');
 
         return pdfMetadata.getMetadata().then(function (actualMetadata) {
-          assert.deepEqual(expectedMetadata, actualMetadata);
+          assert.deepEqual(actualMetadata, expectedMetadata);
         });
       });
 

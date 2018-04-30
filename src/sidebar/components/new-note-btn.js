@@ -5,9 +5,9 @@ var events = require('../events');
 module.exports = {
   controllerAs: 'vm',
   //@ngInject
-  controller: function ($rootScope, annotationUI) {
+  controller: function ($rootScope, store) {
     this.onNewNoteBtnClick = function(){
-      var topLevelFrame = annotationUI.frames().find(f=>!f.id);
+      var topLevelFrame = store.frames().find(f=>!f.id);
       var annot = {
         target: [],
         uri: topLevelFrame.uri,

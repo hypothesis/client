@@ -1,13 +1,14 @@
 'use strict';
 
 var angular = require('angular');
-var inherits = require('inherits');
 var EventEmitter = require('tiny-emitter');
 
-function FakeRootThread() {
-  this.thread = sinon.stub();
+class FakeRootThread extends EventEmitter {
+  constructor() {
+    super();
+    this.thread = sinon.stub();
+  }
 }
-inherits(FakeRootThread, EventEmitter);
 
 describe('StreamContentController', function () {
   var $componentController;
@@ -15,18 +16,19 @@ describe('StreamContentController', function () {
   var fakeRoute;
   var fakeRouteParams;
   var fakeAnnotationMapper;
-  var fakeAnnotationUI;
+  var fakeStore;
   var fakeQueryParser;
   var fakeRootThread;
   var fakeSearchFilter;
-  var fakeStore;
+  var fakeApi;
   var fakeStreamer;
   var fakeStreamFilter;
 
 
   before(function () {
     angular.module('h', [])
-      .component('streamContent', require('../stream-content'));
+      .component('streamContent', require('../stream-content'))
+      .config(($compileProvider) => $compileProvider.preAssignBindingsEnabled(true));
   });
 
   beforeEach(function () {
@@ -34,7 +36,7 @@ describe('StreamContentController', function () {
       loadAnnotations: sinon.spy(),
     };
 
-    fakeAnnotationUI = {
+    fakeStore = {
       clearAnnotations: sinon.spy(),
       setAppIsSidebar: sinon.spy(),
       setCollapsed: sinon.spy(),
@@ -58,7 +60,7 @@ describe('StreamContentController', function () {
       toObject: sinon.stub().returns({}),
     };
 
-    fakeStore = {
+    fakeApi = {
       search: sinon.spy(function () {
         return Promise.resolve({rows: [], total: 0});
       }),
@@ -83,11 +85,11 @@ describe('StreamContentController', function () {
       $route: fakeRoute,
       $routeParams: fakeRouteParams,
       annotationMapper: fakeAnnotationMapper,
-      annotationUI: fakeAnnotationUI,
+      store: fakeStore,
+      api: fakeApi,
       queryParser: fakeQueryParser,
       rootThread: fakeRootThread,
       searchFilter: fakeSearchFilter,
-      store: fakeStore,
       streamFilter: fakeStreamFilter,
       streamer: fakeStreamer,
     });
@@ -109,11 +111,11 @@ describe('StreamContentController', function () {
 
   it('calls the search API with `_separate_replies: true`', function () {
     createController();
-    assert.equal(fakeStore.search.firstCall.args[0]._separate_replies, true);
+    assert.equal(fakeApi.search.firstCall.args[0]._separate_replies, true);
   });
 
   it('passes the annotations and replies from search to loadAnnotations()', function () {
-    fakeStore.search = function () {
+    fakeApi.search = function () {
       return Promise.resolve({
         'rows': ['annotation_1', 'annotation_2'],
         'replies': ['reply_1', 'reply_2', 'reply_3'],
@@ -135,7 +137,7 @@ describe('StreamContentController', function () {
       createController();
       fakeRouteParams.q = 'new query';
       $rootScope.$broadcast('$routeUpdate');
-      assert.called(fakeAnnotationUI.clearAnnotations);
+      assert.called(fakeStore.clearAnnotations);
       assert.calledOnce(fakeRoute.reload);
     });
 
@@ -143,7 +145,7 @@ describe('StreamContentController', function () {
       fakeRouteParams.q = 'test query';
       createController();
       $rootScope.$broadcast('$routeUpdate');
-      assert.notCalled(fakeAnnotationUI.clearAnnotations);
+      assert.notCalled(fakeStore.clearAnnotations);
       assert.notCalled(fakeRoute.reload);
     });
   });

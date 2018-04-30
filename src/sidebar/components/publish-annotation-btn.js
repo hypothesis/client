@@ -14,8 +14,8 @@ module.exports = {
       return this.isShared ? this.group.name : this.privateLabel;
     };
 
-    this.groupType = function () {
-      return this.group.public ? 'public' : 'group';
+    this.groupCategory = function () {
+      return this.group.type === 'open' ? 'public' : 'group';
     };
 
     this.setPrivacy = function (level) {

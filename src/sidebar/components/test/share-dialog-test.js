@@ -6,33 +6,33 @@ var util = require('../../directive/test/util');
 
 describe('shareDialog', function () {
   var fakeAnalytics;
-  var fakeAnnotationUI;
+  var fakeStore;
 
   beforeEach(function () {
     fakeAnalytics = {
       track: sinon.stub(),
       events: {},
     };
-    fakeAnnotationUI = { frames: sinon.stub().returns([]) };
+    fakeStore = { frames: sinon.stub().returns([]) };
 
     angular.module('h', [])
       .component('shareDialog', require('../share-dialog'))
       .value('analytics', fakeAnalytics)
-      .value('annotationUI', fakeAnnotationUI)
+      .value('store', fakeStore)
       .value('urlEncodeFilter', function (val) { return val; });
     angular.mock.module('h');
   });
 
   it('generates new via link', function () {
     var element = util.createDirective(document, 'shareDialog', {});
-    fakeAnnotationUI.frames.returns([{ uri: 'http://example.com' }]);
+    fakeStore.frames.returns([{ uri: 'http://example.com' }]);
     element.scope.$digest();
     assert.equal(element.ctrl.viaPageLink, 'https://via.hypothes.is/http://example.com');
   });
 
   it('does not generate new via link if already on via', function () {
     var element = util.createDirective(document, 'shareDialog', {});
-    fakeAnnotationUI.frames.returns([{
+    fakeStore.frames.returns([{
       uri: 'https://via.hypothes.is/http://example.com',
     }]);
     element.scope.$digest();

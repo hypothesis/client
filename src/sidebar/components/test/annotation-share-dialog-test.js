@@ -91,8 +91,7 @@ describe('annotationShareDialog', function () {
         {
           group: {
             name: 'Public',
-            type: 'public',
-            public: true,
+            type: 'open',
           },
           uri: 'fakeURI',
           isPrivate: false,
@@ -142,7 +141,7 @@ describe('annotationShareDialog', function () {
     it('is available to a group', function () {
       element = util.createDirective(document, 'annotationShareDialog', {
         group: {
-          public: false,
+          type: 'private',
         },
         isPrivate: false,
       });

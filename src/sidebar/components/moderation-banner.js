@@ -3,7 +3,7 @@
 var annotationMetadata = require('../annotation-metadata');
 
 // @ngInject
-function ModerationBannerController(annotationUI, flash, store) {
+function ModerationBannerController(store, flash, api) {
   var self = this;
 
   this.flagCount = function () {
@@ -27,8 +27,8 @@ function ModerationBannerController(annotationUI, flash, store) {
    * Hide an annotation from non-moderator users.
    */
   this.hideAnnotation = function () {
-    store.annotation.hide({id: self.annotation.id}).then(function () {
-      annotationUI.hideAnnotation(self.annotation.id);
+    api.annotation.hide({id: self.annotation.id}).then(function () {
+      store.hideAnnotation(self.annotation.id);
     }).catch(function () {
       flash.error('Failed to hide annotation');
     });
@@ -38,8 +38,8 @@ function ModerationBannerController(annotationUI, flash, store) {
    * Un-hide an annotation from non-moderator users.
    */
   this.unhideAnnotation = function () {
-    store.annotation.unhide({id: self.annotation.id}).then(function () {
-      annotationUI.unhideAnnotation(self.annotation.id);
+    api.annotation.unhide({id: self.annotation.id}).then(function () {
+      store.unhideAnnotation(self.annotation.id);
     }).catch(function () {
       flash.error('Failed to unhide annotation');
     });

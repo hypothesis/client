@@ -119,70 +119,71 @@ function createAdderDOM(container) {
 /**
  * Annotation 'adder' toolbar which appears next to the selection
  * and provides controls for the user to create new annotations.
- *
- * @param {Element} container - The DOM element into which the adder will be created
- * @param {Object} options - Options object specifying `onAnnotate` and `onHighlight`
- *        event handlers.
  */
-function Adder(container, options) {
+class Adder {
+  /**
+   * Construct the toolbar and populate the UI.
+   *
+   * The adder is initially hidden.
+   *
+   * @param {Element} container - The DOM element into which the adder will be created
+   * @param {Object} options - Options object specifying `onAnnotate` and `onHighlight`
+   *        event handlers.
+   */
+  constructor(container, options) {
+    this.element = createAdderDOM(container);
+    this._container = container;
 
-  var self = this;
-  self.element = createAdderDOM(container);
+    // Set initial style
+    Object.assign(container.style, {
+      display: 'block',
 
-  // Set initial style
-  Object.assign(container.style, {
-    display: 'block',
+      // take position out of layout flow initially
+      position: 'absolute',
+      top: 0,
 
-    // take position out of layout flow initially
-    position: 'absolute',
-    top: 0,
+      // Assign a high Z-index so that the adder shows above any content on the
+      // page
+      zIndex: 999,
+    });
 
-    // Assign a high Z-index so that the adder shows above any content on the
-    // page
-    zIndex: 999,
-  });
+    // The adder is hidden using the `visibility` property rather than `display`
+    // so that we can compute its size in order to position it before display.
+    this.element.style.visibility = 'hidden';
 
-  // The adder is hidden using the `visibility` property rather than `display`
-  // so that we can compute its size in order to position it before display.
-  self.element.style.visibility = 'hidden';
+    this._view = this.element.ownerDocument.defaultView;
+    this._enterTimeout = null;
 
-  var view = self.element.ownerDocument.defaultView;
-  var enterTimeout;
+    var handleCommand = (event) => {
+      event.preventDefault();
+      event.stopPropagation();
 
-  self.element.querySelector(ANNOTATE_BTN_SELECTOR)
-    .addEventListener('click', handleCommand);
-  self.element.querySelector(HIGHLIGHT_BTN_SELECTOR)
-    .addEventListener('click', handleCommand);
+      var isAnnotateCommand = event.target.classList.contains(ANNOTATE_BTN_CLASS);
 
-  function handleCommand(event) {
-    event.preventDefault();
-    event.stopPropagation();
+      if (isAnnotateCommand) {
+        options.onAnnotate();
+      } else {
+        options.onHighlight();
+      }
 
-    var isAnnotateCommand = this.classList.contains(ANNOTATE_BTN_CLASS);
+      this.hide();
+    };
 
-    if (isAnnotateCommand) {
-      options.onAnnotate();
-    } else {
-      options.onHighlight();
-    }
+    this.element.querySelector(ANNOTATE_BTN_SELECTOR)
+      .addEventListener('click', handleCommand);
+    this.element.querySelector(HIGHLIGHT_BTN_SELECTOR)
+      .addEventListener('click', handleCommand);
 
-    self.hide();
-  }
-
-  function width() {
-    return self.element.getBoundingClientRect().width;
-  }
-
-  function height() {
-    return self.element.getBoundingClientRect().height;
+    this._width = () => this.element.getBoundingClientRect().width;
+    this._height = () => this.element.getBoundingClientRect().height;
   }
 
   /** Hide the adder */
-  this.hide = function () {
-    clearTimeout(enterTimeout);
-    self.element.className = classnames({'annotator-adder': true});
-    self.element.style.visibility = 'hidden';
-  };
+  hide() {
+    clearTimeout(this._enterTimeout);
+    this.element.className = classnames({'annotator-adder': true});
+    this.element.style.visibility = 'hidden';
+  }
 
   /**
    * Return the best position to show the adder in order to target the
@@ -195,7 +196,7 @@ function Adder(container, options) {
    *        edge of `targetRect`.
    * @return {Target}
    */
-  this.target = function (targetRect, isSelectionBackwards) {
+  target(targetRect, isSelectionBackwards) {
     // Set the initial arrow direction based on whether the selection was made
     // forwards/upwards or downwards/backwards.
     var arrowDirection;
@@ -211,35 +212,35 @@ function Adder(container, options) {
     // and close to the end.
     var hMargin = Math.min(ARROW_H_MARGIN, targetRect.width);
     if (isSelectionBackwards) {
-      left = targetRect.left - width() / 2 + hMargin;
+      left = targetRect.left - this._width() / 2 + hMargin;
     } else {
-      left = targetRect.left + targetRect.width - width() / 2 - hMargin;
+      left = targetRect.left + targetRect.width - this._width() / 2 - hMargin;
     }
 
     // Flip arrow direction if adder would appear above the top or below the
     // bottom of the viewport.
-    if (targetRect.top - height() < 0 &&
+    if (targetRect.top - this._height() < 0 &&
         arrowDirection === ARROW_POINTING_DOWN) {
       arrowDirection = ARROW_POINTING_UP;
-    } else if (targetRect.top + height() > view.innerHeight) {
+    } else if (targetRect.top + this._height() > this._view.innerHeight) {
       arrowDirection = ARROW_POINTING_DOWN;
     }
 
     if (arrowDirection === ARROW_POINTING_UP) {
       top = targetRect.top + targetRect.height + ARROW_HEIGHT;
     } else {
-      top = targetRect.top - height() - ARROW_HEIGHT;
+      top = targetRect.top - this._height() - ARROW_HEIGHT;
     }
 
     // Constrain the adder to the viewport.
     left = Math.max(left, 0);
-    left = Math.min(left, view.innerWidth - width());
+    left = Math.min(left, this._view.innerWidth - this._width());
 
     top = Math.max(top, 0);
-    top = Math.min(top, view.innerHeight - height());
+    top = Math.min(top, this._view.innerHeight - this._height());
 
     return {top, left, arrowDirection};
-  };
+  }
 
   /**
    * Show the adder at the given position and with the arrow pointing in
@@ -248,8 +249,8 @@ function Adder(container, options) {
    * @param {number} left - Horizontal offset from left edge of viewport.
    * @param {number} top - Vertical offset from top edge of viewport.
    */
-  this.showAt = function (left, top, arrowDirection) {
-    self.element.className = classnames({
+  showAt(left, top, arrowDirection) {
+    this.element.className = classnames({
       'annotator-adder': true,
       'annotator-adder--arrow-down': arrowDirection === ARROW_POINTING_DOWN,
       'annotator-adder--arrow-up': arrowDirection === ARROW_POINTING_UP,
@@ -260,8 +261,8 @@ function Adder(container, options) {
     // after use. So we need to make sure the button stays displayed
     // the way it was originally displayed - without the inline styles
     // See: https://github.com/hypothesis/client/issues/137
-    self.element.querySelector(ANNOTATE_BTN_SELECTOR).style.display = '';
-    self.element.querySelector(HIGHLIGHT_BTN_SELECTOR).style.display = '';
+    this.element.querySelector(ANNOTATE_BTN_SELECTOR).style.display = '';
+    this.element.querySelector(HIGHLIGHT_BTN_SELECTOR).style.display = '';
 
     // Translate the (left, top) viewport coordinates into positions relative to
     // the adder's nearest positioned ancestor (NPA).
@@ -269,20 +270,20 @@ function Adder(container, options) {
     // Typically the adder is a child of the `<body>` and the NPA is the root
     // `<html>` element. However page styling may make the `<body>` positioned.
     // See https://github.com/hypothesis/client/issues/487.
-    var positionedAncestor = nearestPositionedAncestor(container);
+    var positionedAncestor = nearestPositionedAncestor(this._container);
     var parentRect = positionedAncestor.getBoundingClientRect();
 
-    Object.assign(container.style, {
+    Object.assign(this._container.style, {
       top: toPx(top - parentRect.top),
       left: toPx(left - parentRect.left),
     });
-    self.element.style.visibility = 'visible';
+    this.element.style.visibility = 'visible';
 
-    clearTimeout(enterTimeout);
-    enterTimeout = setTimeout(function () {
-      self.element.className += ' is-active';
+    clearTimeout(this._enterTimeout);
+    this._enterTimeout = setTimeout(() => {
+      this.element.className += ' is-active';
     }, 1);
-  };
+  }
 }
 
 module.exports = {

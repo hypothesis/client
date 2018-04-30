@@ -22,13 +22,13 @@ describe('selectionTabs', function () {
   });
 
   beforeEach(function () {
-    var fakeAnnotationUI = {};
+    var fakeStore = {};
     var fakeFeatures = {
       flagEnabled: sinon.stub().returns(true),
     };
 
     angular.mock.module('app', {
-      annotationUI: fakeAnnotationUI,
+      store: fakeStore,
       features: fakeFeatures,
       session: fakeSession,
       settings: fakeSettings,
@@ -84,7 +84,7 @@ describe('selectionTabs', function () {
 
     it('should show the clean theme when settings contains the clean theme option', function () {
       angular.mock.module('app', {
-        annotationUI: {},
+        store: {},
         features: {
           flagEnabled: sinon.stub().returns(true),
         },

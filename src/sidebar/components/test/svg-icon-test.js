@@ -7,7 +7,8 @@ var util = require('../../directive/test/util');
 describe('svgIcon', function () {
   before(function () {
     angular.module('app', [])
-      .component('svgIcon', require('../svg-icon'));
+      .component('svgIcon', require('../svg-icon'))
+      .config(($compileProvider) => $compileProvider.preAssignBindingsEnabled(true));
   });
 
   beforeEach(function () {

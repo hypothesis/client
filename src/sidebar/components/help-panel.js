@@ -9,7 +9,7 @@
 module.exports = {
   controllerAs: 'vm',
   // @ngInject
-  controller: function ($scope, $window, annotationUI, serviceUrl) {
+  controller: function ($scope, $window, store, serviceUrl) {
     this.userAgent = $window.navigator.userAgent;
     this.version = '__VERSION__';  // replaced by versionify
     this.dateTime = new Date();
@@ -17,7 +17,7 @@ module.exports = {
 
     $scope.$watch(
       function () {
-        return annotationUI.frames();
+        return store.frames();
       },
       function (frames) {
         if (frames.length === 0) {

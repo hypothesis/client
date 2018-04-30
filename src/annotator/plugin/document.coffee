@@ -1,7 +1,8 @@
 $ = require('jquery')
-Plugin = require('../plugin')
-
 baseURI = require('document-base-uri')
+
+Plugin = require('../plugin')
+{ normalizeURI } = require('../util/url')
 
 ###
 ** Adapted from:
@@ -185,9 +186,7 @@ module.exports = class Document extends Plugin
 
   # Hack to get a absolute url from a possibly relative one
   _absoluteUrl: (url) ->
-    d = @document.createElement('a')
-    d.href = url
-    d.href
+    normalizeURI(url, @baseURI)
 
   # Get the true URI record when it's masked via a different protocol.
   # This happens when an href is set with a uri using the 'blob:' protocol

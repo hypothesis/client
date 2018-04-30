@@ -20,12 +20,17 @@ var groupFixtures = {
   private: {
     id: 'private',
     url: 'https://example.org/g/private',
-    public: false,
+    type: 'private',
   },
-  public: {
+  open: {
     id: 'world',
-    url: 'https://example.org/g/public',
-    public: true,
+    url: 'https://example.org/g/open',
+    type: 'open',
+  },
+  restricted: {
+    id: 'restricto',
+    url: 'https://example.org/g/restricto',
+    type: 'restricted',
   },
 };
 
@@ -96,7 +101,7 @@ describe('annotation', function() {
     };
     var fakeAnalytics;
     var fakeAnnotationMapper;
-    var fakeAnnotationUI;
+    var fakeStore;
     var fakeDrafts;
     var fakeFlash;
     var fakeGroups;
@@ -104,7 +109,7 @@ describe('annotation', function() {
     var fakeServiceUrl;
     var fakeSession;
     var fakeSettings;
-    var fakeStore;
+    var fakeApi;
     var fakeStreamer;
     var sandbox;
 
@@ -146,7 +151,8 @@ describe('annotation', function() {
         })
         .component('markdown', {
           bindings: require('../markdown').bindings,
-        });
+        })
+        .config(($compileProvider) => $compileProvider.preAssignBindingsEnabled(true));
     });
 
     beforeEach(angular.mock.module('h'));
@@ -171,7 +177,7 @@ describe('annotation', function() {
         flagAnnotation: sandbox.stub(),
       };
 
-      fakeAnnotationUI = {
+      fakeStore = {
         updateFlagStatus: sandbox.stub().returns(true),
       };
 
@@ -212,8 +218,8 @@ describe('annotation', function() {
       fakeServiceUrl = sinon.stub();
 
       fakeGroups = {
-        focused: sinon.stub().returns(groupFixtures.public),
-        get: sinon.stub().returns(groupFixtures.public),
+        focused: sinon.stub().returns(groupFixtures.open),
+        get: sinon.stub().returns(groupFixtures.open),
       };
 
       fakeSettings = {
@@ -221,7 +227,7 @@ describe('annotation', function() {
         authDomain: 'localhost',
       };
 
-      fakeStore = {
+      fakeApi = {
         annotation: {
           create: sinon.spy(function (annot) {
             return Promise.resolve(Object.assign({}, annot));
@@ -238,7 +244,8 @@ describe('annotation', function() {
 
       $provide.value('analytics', fakeAnalytics);
       $provide.value('annotationMapper', fakeAnnotationMapper);
-      $provide.value('annotationUI', fakeAnnotationUI);
+      $provide.value('store', fakeStore);
+      $provide.value('api', fakeApi);
       $provide.value('drafts', fakeDrafts);
       $provide.value('flash', fakeFlash);
       $provide.value('groups', fakeGroups);
@@ -246,7 +253,6 @@ describe('annotation', function() {
       $provide.value('session', fakeSession);
       $provide.value('serviceUrl', fakeServiceUrl);
       $provide.value('settings', fakeSettings);
-      $provide.value('store', fakeStore);
       $provide.value('streamer', fakeStreamer);
     }));
 
@@ -344,7 +350,7 @@ describe('annotation', function() {
         annotation.user = fakeSession.state.userid = 'acct:bill@localhost';
         createDirective(annotation);
 
-        assert.called(fakeStore.annotation.create);
+        assert.called(fakeApi.annotation.create);
       });
 
       it('saves new highlights to drafts if not logged in', function() {
@@ -354,7 +360,7 @@ describe('annotation', function() {
 
         createDirective(annotation);
 
-        assert.notCalled(fakeStore.annotation.create);
+        assert.notCalled(fakeApi.annotation.create);
         assert.called(fakeDrafts.update);
       });
 
@@ -363,7 +369,7 @@ describe('annotation', function() {
 
         createDirective(annotation);
 
-        assert.notCalled(fakeStore.annotation.create);
+        assert.notCalled(fakeApi.annotation.create);
       });
 
       it('does not save old highlights on initialization', function() {
@@ -371,7 +377,7 @@ describe('annotation', function() {
 
         createDirective(annotation);
 
-        assert.notCalled(fakeStore.annotation.create);
+        assert.notCalled(fakeApi.annotation.create);
       });
 
       it('does not save old annotations on initialization', function() {
@@ -379,7 +385,7 @@ describe('annotation', function() {
 
         createDirective(annotation);
 
-        assert.notCalled(fakeStore.annotation.create);
+        assert.notCalled(fakeApi.annotation.create);
       });
 
       it('creates drafts for new annotations on initialization', function() {
@@ -709,8 +715,13 @@ describe('annotation', function() {
       it('flashes an error if the delete fails on the server', function(done) {
         var controller = createDirective().controller;
         sandbox.stub($window, 'confirm').returns(true);
-        var err = new Error('500 Server Error');
-        fakeAnnotationMapper.deleteAnnotation.returns($q.reject(err));
+
+        fakeAnnotationMapper.deleteAnnotation = sinon.spy(() => {
+          // nb. we only instantiate the rejected promise when
+          // `deleteAnnotation` is called to avoid triggering `$q`'s unhandled
+          // promise rejection handler during the `$timeout.flush()` call.
+          return $q.reject(new Error('500 Server Error'));
+        });
         controller.delete().then(function() {
           assert.calledWith(fakeFlash.error,
             '500 Server Error', 'Deleting annotation failed');
@@ -872,12 +883,12 @@ describe('annotation', function() {
       }, [{
         case_: 'the annotation is not being edited',
         draft: null,
-        group: groupFixtures.public,
+        group: groupFixtures.open,
         expected: false,
       },{
         case_: 'the draft is private',
         draft: draftFixtures.private,
-        group: groupFixtures.public,
+        group: groupFixtures.open,
         expected: false,
       },{
         case_: 'the group is private',
@@ -885,9 +896,14 @@ describe('annotation', function() {
         group: groupFixtures.private,
         expected: false,
       },{
-        case_: 'the draft is shared and the group is public',
+        case_: 'the draft is shared and the group is open',
         draft: draftFixtures.shared,
-        group: groupFixtures.public,
+        group: groupFixtures.open,
+        expected: true,
+      },{
+        case_: 'the draft is shared and the group is restricted',
+        draft: draftFixtures.shared,
+        group: groupFixtures.restricted,
         expected: true,
       }]);
     });
@@ -939,7 +955,7 @@ describe('annotation', function() {
       it('flashes an error if saving the annotation fails on the server', function() {
         var controller = createController();
         var err = new Error('500 Server Error');
-        fakeStore.annotation.create = sinon.stub().returns(Promise.reject(err));
+        fakeApi.annotation.create = sinon.stub().returns(Promise.reject(err));
         return controller.save().then(function() {
           assert.calledWith(fakeFlash.error,
             '500 Server Error', 'Saving annotation failed');
@@ -956,7 +972,7 @@ describe('annotation', function() {
       it('shows a saving indicator when saving an annotation', function() {
         var controller = createController();
         var create;
-        fakeStore.annotation.create = sinon.stub().returns(new Promise(function (resolve) {
+        fakeApi.annotation.create = sinon.stub().returns(new Promise(function (resolve) {
           create = resolve;
         }));
         var saved = controller.save();
@@ -969,7 +985,7 @@ describe('annotation', function() {
 
       it('does not remove the draft if saving fails', function () {
         var controller = createController();
-        fakeStore.annotation.create = sinon.stub().returns(Promise.reject({status: -1}));
+        fakeApi.annotation.create = sinon.stub().returns(Promise.reject({status: -1}));
         return controller.save().then(function () {
           assert.notCalled(fakeDrafts.remove);
         });
@@ -999,7 +1015,7 @@ describe('annotation', function() {
       it('flashes an error if saving the annotation fails on the server', function () {
         var controller = createController();
         var err = new Error('500 Server Error');
-        fakeStore.annotation.update = sinon.stub().returns(Promise.reject(err));
+        fakeApi.annotation.update = sinon.stub().returns(Promise.reject(err));
         return controller.save().then(function() {
           assert.calledWith(fakeFlash.error,
             '500 Server Error', 'Saving annotation failed');

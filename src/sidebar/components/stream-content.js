@@ -2,12 +2,12 @@
 
 // @ngInject
 function StreamContentController(
-  $scope, $location, $route, $routeParams, annotationMapper, annotationUI,
-  queryParser, rootThread, searchFilter, store, streamFilter, streamer
+  $scope, $location, $route, $routeParams, annotationMapper, store,
+  api, queryParser, rootThread, searchFilter, streamFilter, streamer
 ) {
   var self = this;
 
-  annotationUI.setAppIsSidebar(false);
+  store.setAppIsSidebar(false);
 
   /** `offset` parameter for the next search API call. */
   var offset = 0;
@@ -28,7 +28,7 @@ function StreamContentController(
       limit: limit,
     }, searchFilter.toObject($routeParams.q));
 
-    store.search(query)
+    api.search(query)
       .then(load)
       .catch(function (err) {
         console.error(err);
@@ -39,7 +39,7 @@ function StreamContentController(
   var lastQuery = $routeParams.q;
   $scope.$on('$routeUpdate', function () {
     if ($routeParams.q !== lastQuery) {
-      annotationUI.clearAnnotations();
+      store.clearAnnotations();
       $route.reload();
     }
   });
@@ -57,9 +57,9 @@ function StreamContentController(
   // Perform the initial search
   fetch(20);
 
-  this.setCollapsed = annotationUI.setCollapsed;
+  this.setCollapsed = store.setCollapsed;
   this.forceVisible = function (id) {
-    annotationUI.setForceVisible(id, true);
+    store.setForceVisible(id, true);
   };
 
   Object.assign(this.search, {
@@ -71,12 +71,12 @@ function StreamContentController(
     },
   });
 
-  annotationUI.subscribe(function () {
-    self.rootThread = rootThread.thread(annotationUI.getState());
+  store.subscribe(function () {
+    self.rootThread = rootThread.thread(store.getState());
   });
 
   // Sort the stream so that the newest annotations are at the top
-  annotationUI.setSortKey('Newest');
+  store.setSortKey('Newest');
 
   this.loadMore = fetch;
 }

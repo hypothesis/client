@@ -4,6 +4,156 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [1.81.0] - 2018-04-20
+
+### Changed
+
+- Fix regression making it impossible to create annotations in v1.80.0
+  ([#724](https://github.com/hypothesis/client/pull/724)).
+
+## [1.80.0] - 2018-04-20
+
+### Changed
+
+- Internal refactoring and dependency updates.
+
+## [1.79.0] - 2018-04-17
+
+### Changed
+
+- Some minor internal changes.
+
+## [1.78.0] - 2018-04-13
+
+### Changed
+
+- Resolve relative URLs when getting PDF URL from PDF.js
+  ([#716](https://github.com/hypothesis/client/pull/716)).
+
+- Add organization logos to groups menu
+  ([#718](https://github.com/hypothesis/client/pull/718)).
+
+## [1.77.0] - 2018-03-29
+
+### Changed
+
+- Some minor internal changes.
+
+## [1.76.0] - 2018-03-27
+
+### Changed
+
+- Support annotation of PDFs hosted inside iframes using PDF.js
+  ([#681](https://github.com/hypothesis/client/pull/681)).
+
+## [1.75.0] - 2018-03-22
+
+### Changed
+
+- Rename src/sidebar/{store => services/api}
+  ([#691](https://github.com/hypothesis/client/pull/691)).
+
+- Move sidebar services to src/sidebar/services/
+  ([#692](https://github.com/hypothesis/client/pull/692)).
+
+- Move away from `public` property in application components
+  ([#693](https://github.com/hypothesis/client/pull/693)).
+
+- Update icon for restricted groups in publish-annotation-button
+  ([#699](https://github.com/hypothesis/client/pull/699)).
+
+- Remove `group.public` property from annotation component
+  ([#697](https://github.com/hypothesis/client/pull/697)).
+
+- Remove reference to `group.url`
+  ([#698](https://github.com/hypothesis/client/pull/698)).
+
+- Changed background to selected element in PDF.js to visualize the searched
+  content ([#696](https://github.com/hypothesis/client/pull/696)).
+
+- Move Redux modules and entry point to `store/` directory
+  ([#694](https://github.com/hypothesis/client/pull/694)).
+
+## [1.73.0] - 2018-03-16
+
+### Changed
+
+- Show the world icon only for open groups in the groups dropdown
+  ([#685](https://github.com/hypothesis/client/pull/685)).
+
+## [1.72.0] - 2018-03-08
+
+### Changed
+
+- Default to Notes tab when only notes are present
+  ([#686](https://github.com/hypothesis/client/pull/686)).
+
+## [1.71.0] - 2018-02-21
+
+### Changed
+
+- Remove activity page links for third-party open groups
+  as they are not yet supported in h
+  ([#675](https://github.com/hypothesis/client/pull/675)).
+
+## [1.70.0] - 2018-02-20
+
+### Changed
+
+- Attempt to fix an occasional issue with the release process
+  ([#677](https://github.com/hypothesis/client/pull/677)).
+
+## [1.69.0] - 2018-02-19
+
+### Changed
+
+- Display correct groups when using third-party accounts if logged-out
+  ([#676](https://github.com/hypothesis/client/pull/676)).
+
+## [1.68.0] - 2018-02-19
+
+### Changed
+
+- Show groups dropdown list to logged out users and link to group pages for open
+  groups ([#673](https://github.com/hypothesis/client/pull/673)).
+
+## [1.67.0] - 2018-02-16
+
+### Changed
+
+- Fix stream and single annotation routes
+  ([#674](https://github.com/hypothesis/client/pull/674)).
+
+## [1.66.0] - 2018-02-16
+
+### Changed
+
+- Get the list of groups from the new endpoint and update it where applicable
+  ([#665](https://github.com/hypothesis/client/pull/665)).
+
+## [1.65.0] - 2018-02-13
+
+### Changed
+
+- Fix spinner animation ([#667](https://github.com/hypothesis/client/pull/667)).
+
+- Update to Angular 1.6.9
+  ([#668](https://github.com/hypothesis/client/pull/668)).
+
+## [1.64.0] - 2018-01-30
+
+### Changed
+
+- Hide the direct-link call-to-action for third party accounts
+  ([#658](https://github.com/hypothesis/client/pull/658)).
+
+## [1.63.0] - 2018-01-25
+
+### Changed
+
+- Fix login flow triggering popup blocker in Firefox and IE
+  ([#651](https://github.com/hypothesis/client/pull/651)).
+
 ## [1.62.0] - 2018-01-10
 
 ### Changed

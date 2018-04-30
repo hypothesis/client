@@ -5,10 +5,14 @@ var angular = require('angular');
 var groupList = require('../group-list');
 var util = require('../../directive/test/util');
 
+var groupFixtures = require('../../test/group-fixtures');
+
 describe('groupList', function () {
   var $window;
 
-  var GROUP_LINK = 'https://hypothes.is/groups/hdevs';
+  var PRIVATE_GROUP_LINK = 'https://hypothes.is/groups/hdevs';
+  var OPEN_GROUP_LINK = 'https://hypothes.is/groups/pub';
+  var RESTRICTED_GROUP_LINK = 'https://hypothes.is/groups/restricto';
 
   var groups;
   var fakeGroups;
@@ -52,11 +56,28 @@ describe('groupList', function () {
 
     groups = [{
       id: 'public',
-      public: true,
+      links: {
+        html: OPEN_GROUP_LINK,
+      },
+      name: 'Public Group',
+      organization: groupFixtures.defaultOrganization(),
+      type: 'open',
     },{
       id: 'h-devs',
+      links: {
+        html: PRIVATE_GROUP_LINK,
+      },
       name: 'Hypothesis Developers',
-      url: GROUP_LINK,
+      organization: groupFixtures.defaultOrganization(),
+      type: 'private',
+    }, {
+      id: 'restricto',
+      links: {
+        html: RESTRICTED_GROUP_LINK,
+      },
+      name: 'Hello Restricted',
+      organization: groupFixtures.defaultOrganization(),
+      type: 'restricted',
     }];
 
     fakeGroups = {
@@ -75,11 +96,11 @@ describe('groupList', function () {
     };
   }));
 
-  function createGroupList() {
+  function createGroupList({ userid } = { userid: 'acct:person@example.com' }) {
     return util.createDirective(document, 'groupList', {
       auth: {
-        status: 'logged-in',
-        userid: 'acct:person@example.com',
+        status: userid ? 'logged-in' : 'logged-out',
+        userid,
       },
     });
   }
@@ -90,14 +111,162 @@ describe('groupList', function () {
     assert.equal(groupItems.length, groups.length + 1);
   });
 
+  it('should render appropriate group name link title per group type', function() {
+    var element = createGroupList();
+    var nameLinks = element.find('.group-name-link');
+    assert.equal(nameLinks.length, groups.length + 1);
+
+    assert.include(nameLinks[0].title, 'Show public annotations'); // Open
+    assert.include(nameLinks[1].title, 'Show and create annotations in'); // Private
+    assert.include(nameLinks[2].title, 'Show public annotations'); // Restricted
+  });
+
+  it('should render organization logo for focused group', function () {
+    const org = groupFixtures.organization({ logo: 'http://www.example.com/foobar' });
+    const group = groupFixtures.expandedGroup({
+      organization: org,
+    });
+    fakeGroups.focused = () => { return group; };
+
+    const element = createGroupList();
+    const imgEl = element.find('.dropdown-toggle > img.group-list-label__icon');
+
+    assert.equal(imgEl[0].src, org.logo);
+  });
+
+  it('should render fallback icon for focused group when no logo (private)', function () {
+    const org = groupFixtures.organization({ logo: null });
+    const group = groupFixtures.expandedGroup({
+      organization: org,
+      type: 'private',
+    });
+    fakeGroups.focused = () => { return group; };
+
+    const element = createGroupList();
+    const iconEl = element.find('.dropdown-toggle > i.h-icon-group');
+
+    assert.ok(iconEl[0]);
+  });
+
+  it('should render fallback icon for focused group when no logo (restricted)', function () {
+    const org = groupFixtures.organization({ logo: null });
+    const group = groupFixtures.expandedGroup({
+      organization: org,
+      type: 'restricted',
+    });
+    fakeGroups.focused = () => { return group; };
+
+    const element = createGroupList();
+    const iconEl = element.find('.dropdown-toggle > i.h-icon-public');
+
+    assert.ok(iconEl[0]);
+  });
+
+  it('should render fallback icon for focused group when no logo (open)', function () {
+    const org = groupFixtures.organization({ logo: null });
+    const group = groupFixtures.expandedGroup({
+      organization: org,
+      type: 'open',
+    });
+    fakeGroups.focused = () => { return group; };
+
+    const element = createGroupList();
+    const iconEl = element.find('.dropdown-toggle > i.h-icon-public');
+
+    assert.ok(iconEl[0]);
+  });
+
+  it('should render organization icons for first group in each organization', function () {
+    const orgs = [
+      groupFixtures.defaultOrganization(),
+      groupFixtures.organization(),
+    ];
+    groups = [
+      groupFixtures.expandedGroup({ organization: orgs[0] }),
+      groupFixtures.expandedGroup({ organization: orgs[0] }),
+      groupFixtures.expandedGroup({ organization: orgs[1] }),
+      groupFixtures.expandedGroup({ organization: orgs[1] }),
+    ];
+
+    const element = createGroupList();
+    const iconContainers = element.find('.group-menu-icon-container');
+    const iconImages = element.find('.group-menu-icon-container > img');
+
+    assert.lengthOf(iconContainers, groups.length);
+    assert.lengthOf(iconImages, orgs.length);
+  });
+
+  it('should not render organization icons for menu groups if missing', function () {
+    const orgs = [
+      groupFixtures.organization({ logo: null }),
+      groupFixtures.organization({ logo: null }),
+    ];
+    groups = [
+      groupFixtures.expandedGroup({ organization: orgs[0] }),
+      groupFixtures.expandedGroup({ organization: orgs[0] }),
+      groupFixtures.expandedGroup({ organization: orgs[1] }),
+      groupFixtures.expandedGroup({ organization: orgs[1] }),
+    ];
+
+    const element = createGroupList();
+    const iconContainers = element.find('.group-menu-icon-container');
+    const iconImages = element.find('.group-menu-icon-container > img');
+
+    assert.lengthOf(iconContainers, groups.length);
+    assert.lengthOf(iconImages, 0);
+  });
+
   it('should render share links', function () {
     var element = createGroupList();
     var shareLinks = element.find('.share-link-container');
-    assert.equal(shareLinks.length, 1);
+    assert.equal(shareLinks.length, groups.length);
 
     var link = element.find('.share-link');
-    assert.equal(link.length, 1);
-    assert.equal(link[0].href, GROUP_LINK);
+    assert.equal(link.length, groups.length);
+
+    assert.equal(link[0].href, OPEN_GROUP_LINK);
+    assert.equal(link[1].href, PRIVATE_GROUP_LINK);
+    assert.equal(link[2].href, RESTRICTED_GROUP_LINK);
+  });
+
+  it('should not render share links if they are not present', function () {
+    groups = [
+      {
+        type: 'private',
+      },
+      {
+        id: 'anOpenGroup',
+        type: 'open',
+        links: {},
+      },
+    ];
+    var element = createGroupList();
+    var links = element.find('.share-link-container');
+    assert.equal(links.length, 0);
+  });
+
+  [{
+    // Logged-in third party user.
+    firstPartyAuthDomain: 'example.com',
+    authDomain: 'publisher.org',
+    userid: 'acct:person@publisher.org',
+  },{
+    // Logged-out third party user.
+    firstPartyAuthDomain: 'example.com',
+    authDomain: 'publisher.org',
+    userid: null,
+  }].forEach(({ firstPartyAuthDomain, authDomain, userid }) => {
+    it('should not render share links for third-party groups', () => {
+      fakeSettings.authDomain = firstPartyAuthDomain;
+      fakeSettings.services = [{
+        authority: authDomain,
+      }];
+
+      var element = createGroupList({ userid });
+      var shareLinks = element.find('.share-link-container');
+
+      assert.equal(shareLinks.length, 0);
+    });
   });
 
   it('should track metrics when a user attempts to view a groups activity', function () {
