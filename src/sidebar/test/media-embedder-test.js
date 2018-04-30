@@ -297,15 +297,26 @@ describe('media-embedder', function () {
       'https://www.w3schools.com/html/horse.ogg',
       'https://www.w3schools.com/html/horse.ogg#fragment',
       'https://www.w3schools.com/html/horse.ogg?foo=bar&id=31',
+      'https://wisc.pb.unizin.org/frenchcscr/wp-content/uploads/sites/208/2018/03/6Léry_Conclusion.mp3',
+      'https://wisc.pb.unizin.org/frenchcscr/wp-content/uploads/sites/208/2018/03/6L%25C3%25A9ry_Conclusion.mp3',
     ];
     urls.forEach(function (url) {
       var element = domElement('<a href="' + url + '">' + url + '</a>');
 
       mediaEmbedder.replaceLinksWithEmbeds(element);
 
+      let encodedURL;
+      if (decodeURI(url) !== url) {
+        // Test URL is already percent-encoded.
+        encodedURL = url;
+      } else {
+        // Test URL needs percent-encoding.
+        encodedURL = encodeURI(url);
+      }
+
       assert.equal(element.childElementCount, 1);
       assert.equal(element.children[0].tagName, 'AUDIO');
-      assert.equal(element.children[0].src, url.toLowerCase());
+      assert.equal(element.children[0].src, encodedURL);
     });
   });
 

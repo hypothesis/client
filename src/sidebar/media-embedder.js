@@ -301,7 +301,10 @@ function embedForLink(link) {
  *
  */
 function replaceLinkWithEmbed(link) {
-  if (link.href !== link.textContent) {
+  // The link's text may or may not be percent encoded. The `link.href` property
+  // will always be percent encoded. When comparing the two we need to be
+  // agnostic as to which representation is used.
+  if (link.href !== link.textContent && decodeURI(link.href) !== link.textContent) {
     return;
   }
   var embed = embedForLink(link);
