@@ -301,7 +301,7 @@ function embedForLink(link) {
  *
  */
 function replaceLinkWithEmbed(link) {
-  if (decodeURI(link.href) !== link.textContent) {
+  if (link.href !== link.textContent || decodeURI(link.href) !== link.textContent){
     return;
   }
   var embed = embedForLink(link);

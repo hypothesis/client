@@ -297,6 +297,8 @@ describe('media-embedder', function () {
       'https://www.w3schools.com/html/horse.ogg',
       'https://www.w3schools.com/html/horse.ogg#fragment',
       'https://www.w3schools.com/html/horse.ogg?foo=bar&id=31',
+      'https://wisc.pb.unizin.org/frenchcscr/wp-content/uploads/sites/208/2018/03/6Léry_Conclusion.mp3,'
+      'https://wisc.pb.unizin.org%2Ffrenchcscr%2Fwp-content%2Fuploads%2Fsites%2F208%2F2018%2F03%2F6L%25C3%25A9ry_Conclusion.mp3'
     ];
     urls.forEach(function (url) {
       var element = domElement('<a href="' + url + '">' + url + '</a>');
