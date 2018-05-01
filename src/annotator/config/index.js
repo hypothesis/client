@@ -36,6 +36,7 @@ function configFrom(window_) {
     isHighlightBtnVisible: settings.hostPageSetting('isHighlightBtnVisible', {allowInBrowserExt:true}),
     // The locale is going to come from cookies, this is a temporary solution.
     locale: settings.hostPageSetting('locale', {allowInBrowserExt:true}),
+    injectSidebar: settings.hostPageSetting('injectSidebar', {allowInBrowserExt: true})
   };
 }
 

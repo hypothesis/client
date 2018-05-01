@@ -33,6 +33,7 @@ function hostPageConfig(window) {
     'onElementClick',
     'isHighlightBtnVisible',
     'locale',
+    'injectSidebar',
 
     // New note button override.
     // This should be removed once new note button is enabled for everybody.
