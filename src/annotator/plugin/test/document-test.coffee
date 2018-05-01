@@ -176,6 +176,7 @@ describe 'Document', ->
     createDoc = (href, baseURI) ->
       fakeDocument =
         createElement: document.createElement.bind(document),
+        querySelectorAll: document.querySelectorAll.bind(document),
         location:
           href: href
       doc = new Document($('<div></div>')[0], {
