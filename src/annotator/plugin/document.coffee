@@ -28,8 +28,7 @@ module.exports = class Document extends Plugin
 
     this.getDocumentMetadata()
 
-# returns the primary URI for the document being annotated
-
+  # Returns the primary URI for the document being annotated
   uri: =>
     uri = decodeURIComponent(this._getDocumentHref())
     for link in @metadata.link
@@ -37,8 +36,7 @@ module.exports = class Document extends Plugin
         uri = link.href
     return uri
 
-# returns all uris for the document being annotated
-
+  # Returns all uris for the document being annotated
   uris: =>
     uniqueUrls = {}
     for link in @metadata.link
@@ -117,7 +115,7 @@ module.exports = class Document extends Plugin
       @metadata.title = $("head title").text()
 
   _getLinks: =>
-# we know our current location is a link for the document
+    # we know our current location is a link for the document
     @metadata.link = [href: this._getDocumentHref()]
 
     # look for some relevant link relations
@@ -131,7 +129,7 @@ module.exports = class Document extends Plugin
       if rel not in ["alternate", "canonical", "bookmark", "shortlink"] then continue
 
       if rel is 'alternate'
-# Ignore feeds resources
+        # Ignore feeds resources
         if type and type.match /^application\/(rss|atom)\+xml/ then continue
         # Ignore alternate languages
         if lang then continue
@@ -150,7 +148,6 @@ module.exports = class Document extends Plugin
       # kind of a hack to express DOI identifiers as links but it's a
       # convenient place to look them up later, and somewhat sane since
       # they don't have a type
-
       if name == "doi"
         for doi in values
           if doi[0..3] != "doi:"
