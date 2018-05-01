@@ -23,6 +23,7 @@ var $ = require('jquery');
 var Guest = require('./guest');
 var Sidebar = require('./sidebar');
 var PdfSidebar = require('./pdf-sidebar');
+var Sticky = require('./sticky')
 
 var pluginClasses = {
   // UI plugins
