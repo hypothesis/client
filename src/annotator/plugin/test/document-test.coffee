@@ -173,10 +173,19 @@ describe 'Document', ->
       if canonicalLink
         canonicalLink.remove()
 
-    createDoc = (href, baseURI) ->
+    # Create a blank HTML document with a faked `href` and `baseURI` and
+    # return a `Document` instance which reads metadata from it.
+    createDoc = (href, baseURI, htmlDoc) ->
+      if !htmlDoc
+        # Create a blank DOM Document
+        htmlDoc = document.implementation.createHTMLDocument()
+
+      # `Document.location` is not overridable. In order to fake the
+      # location in tests, create a proxy object in front of our blank HTML
+      # document.
       fakeDocument =
-        createElement: document.createElement.bind(document),
-        querySelectorAll: document.querySelectorAll.bind(document),
+        createElement: htmlDoc.createElement.bind(htmlDoc),
+        querySelectorAll: htmlDoc.querySelectorAll.bind(htmlDoc),
         location:
           href: href
       doc = new Document($('<div></div>')[0], {
@@ -216,11 +225,12 @@ describe 'Document', ->
         assert.equal(doc.uri(), href)
 
     it 'returns the canonical URI if present', ->
-      canonicalLink = document.createElement('link')
+      htmlDoc = document.implementation.createHTMLDocument()
+      canonicalLink = htmlDoc.createElement('link')
       canonicalLink.rel = 'canonical'
       canonicalLink.href = 'https://publisher.org/canonical'
-      document.head.appendChild(canonicalLink)
+      htmlDoc.head.appendChild(canonicalLink)
 
-      doc = createDoc('https://publisher.org/not-canonical', null)
+      doc = createDoc('https://publisher.org/not-canonical', null, htmlDoc)
 
       assert.equal doc.uri(), canonicalLink.href
