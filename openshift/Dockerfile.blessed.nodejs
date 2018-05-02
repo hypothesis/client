@@ -15,7 +15,8 @@ RUN yum install -y \
     rh-nodejs8 \
     rh-nodejs8-npm \
     rh-nodejs8-nodejs-nodemon \
-    nss_wrapper
+    nss_wrapper \
+ && yum clean all
 
 ARG SIDEBAR_APP_URL
 ARG CLIENT_URL
