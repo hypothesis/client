@@ -55,7 +55,7 @@ function servePackage(port, hostname) {
     ).listen(4443);
   }
   catch (e) {
-    log(`notice: SSL cert not found, TLS will not be used.`);
+    log(`notice: SSL cert not found, TLS will not be used. exc: ` + e);
   }
 }
 

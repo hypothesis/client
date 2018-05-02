@@ -41,7 +41,7 @@ ENV MANPATH=/opt/rh/rh-nodejs8/root/usr/share/man:$MANPATH
 WORKDIR /opt/app-root
 RUN npm install -g yarn gulp gulp-cli
 
-EXPOSE 8080
+EXPOSE 4443
 
 # Run as the node user
 USER 1001
