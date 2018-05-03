@@ -202,7 +202,6 @@ function AnnotationController(
       annotationUI.updateFlagStatus(self.annotation.id, true);
     }, onRejected);
   };
-
   /**
     * @ngdoc method
     * @name annotation.AnnotationController#delete
@@ -210,32 +209,28 @@ function AnnotationController(
     */
   this.delete = function() {
     return $timeout(function() {  // Don't use confirm inside the digest cycle.
-      var msg = $filter('translate')('Are you sure you want to delete this annotation?');
-      if ($window.confirm(msg)) {
+      var onRejected = function(err) {
+        var msg = $filter('translate')('Deleting annotation failed');
+        flash.error(err.message, msg);
+      };
+      $scope.$apply(function() {
+        annotationMapper.deleteAnnotation(self.annotation).then(function(){
+          var event;
 
-        var onRejected = function(err) {
-          var msg = $filter('translate')('Deleting annotation failed');
-          flash.error(err.message, msg);
-        };
-        $scope.$apply(function() {
-          annotationMapper.deleteAnnotation(self.annotation).then(function(){
-            var event;
+          if(self.isReply()){
+            event = analytics.events.REPLY_DELETED;
+          }else if(self.isHighlight()){
+            event = analytics.events.HIGHLIGHT_DELETED;
+          }else if(isPageNote(self.annotation)){
+            event = analytics.events.PAGE_NOTE_DELETED;
+          }else {
+            event = analytics.events.ANNOTATION_DELETED;
+          }
 
-            if(self.isReply()){
-              event = analytics.events.REPLY_DELETED;
-            }else if(self.isHighlight()){
-              event = analytics.events.HIGHLIGHT_DELETED;
-            }else if(isPageNote(self.annotation)){
-              event = analytics.events.PAGE_NOTE_DELETED;
-            }else {
-              event = analytics.events.ANNOTATION_DELETED;
-            }
+          analytics.track(event);
 
-            analytics.track(event);
-
-          }, onRejected);
-        });
-      }
+        }, onRejected);
+      });
     }, true);
   };
 

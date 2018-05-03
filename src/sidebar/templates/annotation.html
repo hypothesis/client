@@ -39,7 +39,7 @@
   </section>
   <!-- / Body -->
   <annotation-header annotation="vm.annotation"
-                    ng-hide="vm.editing()"
+                     ng-hide="vm.editing() || vm.deleteConfirmation"
                      is-editing="vm.editing()"
                      is-highlight="vm.isHighlight()"
                      is-private="vm.state().isPrivate"
@@ -47,6 +47,12 @@
                      reply-count="vm.replyCount"
                      show-document-info="vm.showDocumentInfo">
   </annotation-header>
+
+  <div ng-if="vm.deleteConfirmation" class="delete-confirmation">
+    Are you sure?
+    <button ng-click="vm.deleteConfirmation=false;">X</button>
+    <button ng-click="vm.delete()">Delete</button>
+  </div>
 
   <!-- Tags -->
   <div class="annotation-body form-field" ng-if="vm.editing() && !vm.isThemeCustom">
@@ -119,7 +125,7 @@
         is-disabled="vm.isDeleted()"
         label="'Delete' | translate"
         ng-show="vm.authorize('delete')"
-        on-click="vm.delete()"
+        on-click="vm.deleteConfirmation=true;"
       ></annotation-action-button>
 
       <!-- Reply Button - is only visible if the theme is not custom -->
