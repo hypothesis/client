@@ -15,7 +15,8 @@ RUN yum install -y \
     rh-nodejs8 \
     rh-nodejs8-npm \
     rh-nodejs8-nodejs-nodemon \
-    nss_wrapper
+    nss_wrapper \
+ && yum clean all
 
 ARG SIDEBAR_APP_URL
 ARG CLIENT_URL
@@ -40,7 +41,7 @@ ENV MANPATH=/opt/rh/rh-nodejs8/root/usr/share/man:$MANPATH
 WORKDIR /opt/app-root
 RUN npm install -g yarn gulp gulp-cli
 
-EXPOSE 8080
+EXPOSE 4443
 
 # Run as the node user
 USER 1001
