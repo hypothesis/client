@@ -50,8 +50,8 @@
 
   <div ng-if="vm.deleteConfirmation" class="delete-confirmation">
     Are you sure?
-    <button ng-click="vm.deleteConfirmation=false;">X</button>
-    <button ng-click="vm.delete()">Delete</button>
+    <button class="delete-cancel" ng-click="vm.deleteConfirmation=false;">X</button>
+    <button class="delete-confirmation-yes" ng-click="vm.delete()">Delete</button>
   </div>
 
   <!-- Tags -->
@@ -111,7 +111,7 @@
       {{'Saving...' | translate}}
     </div>
 
-    <div class="annotation-actions" ng-if="!vm.isSaving && !vm.editing() && vm.id()">
+    <div class="annotation-actions" ng-if="!vm.isSaving && !vm.editing() && vm.id() && !vm.deleteConfirmation">
       <div ng-show="vm.isSaving">{{'Saving...' | translate}}</div>
       <annotation-action-button
         icon="'h-icon-annotation-edit'"

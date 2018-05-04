@@ -40,6 +40,10 @@ function SidebarContentController(
 ) {
   var self = this;
 
+  var title = document.querySelector('.pane-page-title');
+
+  console.log(title)
+
   function thread() {
     return rootThread.thread(annotationUI.getState());
   }
@@ -77,9 +81,13 @@ function SidebarContentController(
     }
 
     var className = getProperClassName(annotation.user, this.auth.userid, 'card');
-    if(event.srcElement.className === 'h-icon-annotation-edit btn-icon' || event.srcElement.className === 'publish-annotation-cancel-btn btn-clean ng-binding' || event.srcElement.className ===  'btn-app btn-update ng-binding' || event.srcElement.className === 'h-icon-annotation-delete btn-icon'){
-      // If the click is edit or delete or submit or cancel, just scroll the page, don't touch the highlight color.
+    // If the click is edit, scroll the page but do not touch the text highlight color
+    if(event.srcElement.className === event.srcElement.className === 'h-icon-annotation-edit btn-icon'){
       frameSync.scrollToAnnotation(annotation.$tag, annotation.user, this.auth.userid, 'action');
+    }
+    else if(event.srcElement.className === 'h-icon-annotation-delete btn-icon' || event.srcElement.className === 'delete-confirmation-yes' || event.srcElement.className === 'delete-cancel' || event.srcElement.className === 'publish-annotation-cancel-btn btn-clean ng-binding' || event.srcElement.className ===  'btn-app btn-update ng-binding'){
+      // If the click is delete or submit or cancel, do not scroll and do not touch the highlight color.
+      return;
     }
     else{
       // Manage highlighting/unhighlighting the selected feedback in the sidebar
