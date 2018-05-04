@@ -123,7 +123,9 @@ function MarkdownController($element, $sanitize, $scope, settings) {
 
   this.preview = false;
   this.togglePreview = function () {
-    self.preview = !self.preview;
+    if (!self.isThemeCustom){
+      self.preview = !self.preview;
+    }
   };
 
   var handleInputChange = debounce(function () {
