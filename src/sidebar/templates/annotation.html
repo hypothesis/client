@@ -49,9 +49,11 @@
   </annotation-header>
 
   <div ng-if="vm.deleteConfirmation" class="delete-confirmation">
-    Are you sure?
-    <button class="delete-cancel" ng-click="vm.deleteConfirmation=false;">X</button>
-    <button class="delete-confirmation-yes" ng-click="vm.delete()">Delete</button>
+    <p>Are you sure?<p>
+  <div>
+    <button class="delete-cancel btn-clean btn-cancel" ng-click="vm.deleteConfirmation=false;">Cancel</button>
+    <button class="delete-confirmation-yes btn-app btn-delete" ng-click="vm.delete()">Delete</button>
+  </div>
   </div>
 
   <!-- Tags -->

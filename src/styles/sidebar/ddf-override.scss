@@ -1,9 +1,17 @@
+@font-face {
+  font-family: 'Overpass';
+  src: url("https://overpass-30e2.kxcdn.com/overpass.css");
+}
+$shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.16), 0 2px 8px 0 rgba(0, 0, 0, 0.12);
+$ddf-blue: #0076e0;
 
 .app-content-wrapper {
   background-color: #ededed !important;
-  padding: 11px;
-  padding-top: 9px;
+  padding: 9px 11px 11px;
 
+  * {
+    font-family: 'Overpass';
+  }
 
   selection-tabs {
 
@@ -20,7 +28,6 @@
         position: relative;
         text-align: center;
 
-
         .annotation-unavailable-message__tutorial-highlight {
           background-color: #AED581;
           padding: 1px 4px;
@@ -34,7 +41,6 @@
           width: 30px;
         }
 
-
         p {
           font-size: 14px;
           display: inline;
@@ -44,212 +50,338 @@
     }
   }
 
-//sidebar header
-.selection-tabs {
-
-  .selection-tabs__count {
-    display: none;
-  }
-
-}
-
-.sidebar__header {
-
-  border-bottom: 1px solid #dadada;
-  margin-bottom: 15px;
-
-  .sidebar__header-title {
-    margin-left: 5px;
-    font-size: 20px;
-    font-weight: 400;
-    display: inline-block;
-  }
-
-  .sidebar-close {
-    float: right;
-    margin-top: 16px;
-    margin-right: 5px;
-    background: none;
-    border: none;
-    color: #585858;
-    font-size: 18px;
-
-  }
-}
-
-//card formatting
-.thread-list {
-
-  li {
-    margin-bottom: 1.15em;
-  }
-
-  .thread-list__spacer {
-    margin-bottom: 0;
-  }
-
-  //base card styles
-  .thread-list__card {
-
-    box-shadow: none;
-    border-radius: 0;
-
-    .h-icon-visibility-off {
-      display: inline;
-      margin-right: 5px;
-      color: #c00;
-    }
-
-    .annotation-quote {
-      border-left: 2px solid #d3d3d3;
-    }
-
-    .annotation-body {
-      margin-top: 14px;
-    }
-
-    .excerpt__toggle-link a {
-      color: #4589db;
-    }
-
-    .publish-annotation-cancel-btn {
-      color: #3e87d7;
-    }
-
-    .annotation-header {
-      display: inline-flex;
-      flex-direction: column;
-    }
-
-    //hiding this for now
-    .annotation-header__share-info {
+  //sidebar header
+  .selection-tabs {
+    .selection-tabs__count {
       display: none;
     }
+  }
 
-    .annotation-footer {
-      margin-top: 0;
-      float: right;
+  .sidebar__header {
+    border-bottom: 1px solid #dadada;
+    margin-bottom: 15px;
 
-      .annotation-actions {
-        padding: 5px;
-        display: none;
-
-        .annotation-action-btn {
-          color: #0076e0;
-        }
-
-      }
-
-      .publish-annotation-btn {
-        display: flex;
-        flex-direction: row;
-        flex-wrap: wrap;
-
-        .publish-annotation-cancel-btn {
-          margin-left: auto;
-          margin-right: 5px;
-        }
-
-        .privateFeedbackInput {
-          margin-bottom: 15px;
-
-          input {
-            margin-right: 8px;
-          }
-
-          .h-icon-visibility-off {
-            color: #7A7A7A;
-          }
-        }
-      }
-
-      .h-icon-cancel-outline:before {
-        content: "";
-      }
-    }
-
-    textarea {
-      resize: none;
-    }
-
-    //button styles
-
-    .btn-app {
-
-      height: auto;
-      font-size: 14px;
+    .sidebar__header-title {
+      margin-left: 5px;
+      font-size: 23px;
       font-weight: 400;
-      padding: 6px 14px;
+      margin-top: 14px;
+      display: inline-block;
+    }
+
+    #sidebar-toggle-close:after {
+      display: inline-block;
+      content: "\00d7";
+      font-size: 23px;
+      font-weight: 400;
+    }
+
+    .ddf-kebab {
+      float: right;
+      position: relative;
+      cursor: pointer;
+      display: inline-block;
+      margin-top: 15px;
+      padding: 2px 5px;
+
+      figure {
+        height: 3px;
+        width: 3px;
+        border-radius: 100%;
+        background: #585858;
+        margin: 2px 0;
+      }
+
+      .ddf-kebab-dropdown {
+        position: absolute;
+        right: -20px;
+        top: 3em;
+        transition: all 0.25s ease-out;
+        transform: scale(0);
+        transform-origin: 80% 0;
+        box-shadow: $shadow;
+        padding-left: 0;
+        z-index: 1000;
+
+        li {
+          list-style: none;
+          display: block;
+          width: 100%;
+          background: #fff;
+
+          button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            padding: 1em 18px;
+            font-size: 14px;
+            font-family: 'Overpass' !important;
+            font-weight: 600;
+            text-align: left;
+
+            &::before {
+              font-family: 'h';
+              margin-right: 5px;
+              font-weight: normal;
+              display: inline-block;
+              vertical-align: middle;
+            }
+          }
+
+          a {
+            width: 100%;
+            padding: 1em 18px;
+            display: inline-block;
+            white-space: pre;
+            box-sizing: border-box;
+            text-decoration: none;
+            font-size: 14px;
+            color: #000;
+            font-family: 'Overpass';
+            text-align: left;
+
+            &:after {
+              display: inline-block;
+              content: "";
+              margin-left: 10px;
+              border-top: 5px solid transparent;
+              border-bottom: 5px solid transparent;
+              border-left: 5px solid $ddf-blue;
+            }
+          }
+
+          &:first-child {
+            border-bottom: 1px solid #ededed;
+          }
+
+          //fix this
+          &:hover {
+            a,
+            button {
+              color: #0076e0;
+            }
+          }
+        }
+      }
+
+      .ddf-kebab-dropdown.active {
+        transform: scale(1);
+
+        &:after {
+          content: "";
+          position: absolute;
+          top: -26px;
+          right: 12px;
+          z-index: 1;
+          border: solid 15px transparent;
+          border-bottom-color: #FFF;
+        }
+      }
+    }
+
+    .sidebar-close {
+      float: right;
+      margin-top: 7px;
+      margin-right: 5px;
+      background: none;
+      border: none;
+      color: #585858;
+    }
+  }
+
+  //card formatting
+  .thread-list {
+    li {
+      margin-bottom: 1.15em;
+    }
+
+    .thread-list__spacer {
+      margin-bottom: 0;
+    }
+    //base card styles
+    .thread-list__card {
       box-shadow: none;
       border-radius: 0;
-      text-shadow: none;
-      text-transform: none;
+
+      .h-icon-visibility-off {
+        display: inline;
+        margin-right: 5px;
+        color: #c00;
+      }
+
+      .annotation-quote {
+        border-left: 2px solid #d3d3d3;
+      }
+
+      .annotation-body {
+        margin-top: 14px;
+      }
+
+      .excerpt__toggle-link a {
+        color: #4589db;
+      }
+
+      .publish-annotation-cancel-btn {
+        margin-left: auto;
+        margin-right: 5px;
+        color: #3e87d7;
+      }
+
+      .delete-confirmation {
+        position: relative;
+        display: flex;
+        font-size: 13px;
+        margin-bottom: 10px;
+        width: 100%;
+        height: auto;
+        align-items: center;
+
+        p {
+          display: inline-block;
+          font-weight: 600;
+          line-height: auto;
+        }
+
+        div {
+          display: inline-block;
+          margin-left: auto;
+        }
+
+        .btn-cancel {
+          color: #3e87d7;
+          margin-right: 5px;
+        }
+      }
+
+      .annotation-header {
+        display: inline-flex;
+        flex-direction: column;
+      }
+      //hiding this for now
+      .annotation-header__share-info {
+        display: none;
+      }
+
+      .annotation-footer {
+        margin-top: 0;
+        float: right;
+
+        .annotation-actions {
+          padding: 5px;
+          display: none;
+
+          .annotation-action-btn {
+            color: #0076e0;
+          }
+        }
+
+        .publish-annotation-btn {
+          display: flex;
+          flex-direction: row;
+          flex-wrap: wrap;
+
+          .publish-annotation-cancel-btn {
+            margin-left: auto;
+            margin-right: 5px;
+          }
+
+          .privateFeedbackInput {
+            margin-bottom: 15px;
+
+            input {
+              margin-right: 8px;
+            }
+
+            .h-icon-visibility-off {
+              color: #7A7A7A;
+            }
+          }
+        }
+
+        .h-icon-cancel-outline:before {
+          content: "";
+        }
+      }
+
+      textarea {
+        resize: none;
+      }
+
+
+      //button styles
+      .btn-app {
+        height: auto;
+        font-size: 14px;
+        font-weight: 400;
+        padding: 6px 14px;
+        box-shadow: none;
+        border-radius: 0;
+        text-shadow: none;
+        text-transform: none;
+        line-height: 17px;
+
+        &.btn-update {
+          background: #0088ce;
+          border-color: #0088ce;
+          color: #fff;
+        }
+
+        &.btn-delete {
+          background: #a30000;
+          border-color: #a30000;
+          color: #fff;
+        }
+      }
     }
 
-    .btn-update {
-      background: #0088ce;
-      border-color: #0088ce;
-      color: #fff;
+    //default hover states
+    .thread-list__card:hover {
+      box-shadow: none;
+
+      .annotation-actions {
+        display: flex;
+      }
+
+      .annotation-quote {
+        border-left: 2px solid #d3d3d3;
+      }
+    }
+    //card states
+    //default card selected state
+    .default__card-selected {
+      border-left: 5px solid #e9d633;
+    }
+    //default private card
+    // .private__card {
+    //   border: 1px solid #c00;
+    //
+    //   .h-icon-visibility-off {
+    //     display: inline;
+    //     margin-right: 5px;
+    //     color: #c00;
+    //   }
+    // }
+    //apply if the currently selected card is the logged in users own feedback
+    //this will get applied in conjunction with the private card class and will override border styles when card is selected
+    .users__card-selected {
+      border: none;
+      border-left: 5px solid #AED581 !important;
+    }
+    //if private, apply this selected state (unless, as a user, the selected card is your own. In that case apply the 'users__card-selected class')
+    // .private__card-selected {
+    //   border-left: 5px solid #c00;
+    // }
+    .thread-hightlight {
+      background-color: rgba(255, 255, 60, 0.3);
     }
   }
 
-  //default hover states
-  .thread-list__card:hover {
+  .annotator-hl.annotator-hl-focused {
+    background-color: $highlight-color !important;
 
-    box-shadow: none;
-
-    .annotation-actions {
-      display: flex;
-    }
-
-    .annotation-quote {
-      border-left: 2px solid #d3d3d3;
+    .annotator-hl {
+      background-color: transparent !important;
     }
   }
-
-
-//card states
-
-  //default card selected state
-  .default__card-selected {
-    border-left: 5px solid #e9d633;
-  }
-
-  //default private card
-  .private__card {
-    border: 1px solid #c00;
-
-    .h-icon-visibility-off {
-      display: inline;
-      margin-right: 5px;
-      color: #c00;
-    }
-  }
-
-  //apply if the currently selected card is the logged in users own feedback
-  //this will get applied in conjunction with the private card class and will override border styles when card is selected
-  .users__card-selected {
-    border: none;
-    border-left: 5px solid #AED581 !important;
-  }
-
-  //if private, apply this selected state (unless, as a user, the selected card is your own. In that case apply the 'users__card-selected class')
-  .private__card-selected {
-    border-left: 5px solid #c00;
-  }
-
-  .thread-hightlight {
-    background-color: rgba(255, 255, 60, 0.3);;
-  }
-}
-
-.annotator-hl.annotator-hl-focused {
-  background-color: $highlight-color !important;
-
-  .annotator-hl {
-    background-color: transparent !important;
-  }
-  }
-
-
 }

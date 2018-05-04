@@ -39,6 +39,8 @@ function SidebarContentController(
   groups, rootThread, settings, streamer, streamFilter, store
 ) {
   var self = this;
+  var ddfKebab = document.querySelector('.ddf-kebab');
+  var kebabDropdown = document.querySelector('.ddf-kebab-dropdown');
 
   var title = document.querySelector('.pane-page-title');
 
@@ -85,7 +87,7 @@ function SidebarContentController(
     if(event.srcElement.className === event.srcElement.className === 'h-icon-annotation-edit btn-icon'){
       frameSync.scrollToAnnotation(annotation.$tag, annotation.user, this.auth.userid, 'action');
     }
-    else if(event.srcElement.className === 'h-icon-annotation-delete btn-icon' || event.srcElement.className === 'delete-confirmation-yes' || event.srcElement.className === 'delete-cancel' || event.srcElement.className === 'publish-annotation-cancel-btn btn-clean ng-binding' || event.srcElement.className ===  'btn-app btn-update ng-binding'){
+    else if(event.srcElement.className === 'h-icon-annotation-delete btn-icon' || event.srcElement.className === 'delete-confirmation-yes btn-app btn-delete' || event.srcElement.className === 'delete-cancel btn-clean btn-cancel' || event.srcElement.className === 'publish-annotation-cancel-btn btn-clean ng-binding' || event.srcElement.className ===  'btn-app btn-update ng-binding'){
       // If the click is delete or submit or cancel, do not scroll and do not touch the highlight color.
       return;
     }
@@ -394,6 +396,11 @@ function SidebarContentController(
       this.visibilityTitle = 'Show Highlights';
     }
   };
+
+  this.toggleKebab = function(){
+    kebabDropdown.classList.toggle('active');
+  }
+
 }
 
 module.exports = {

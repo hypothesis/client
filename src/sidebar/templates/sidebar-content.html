@@ -1,8 +1,18 @@
 <div class="sidebar__header">
   <h3 class="sidebar__header-title">Feedback</h3>
   <!--add close button here-->
-  <button id="sidebar-toggle-close" class="sidebar-close" ng-click="vm.disableSidebar()">x</button>
-  <button id="highlight-visibility" ng-class="vm.totalAnnotations > 0 ? vm.visibility : 'h-icon-visibility-off disabled'" title="{{vm.visibilityTitle}}" ng-click="vm.setVisibleHighlights()"></button>
+  <button id="sidebar-toggle-close" class="sidebar-close" ng-click="vm.disableSidebar()"></button>
+
+  <div class="ddf-kebab"  ng-click="vm.toggleKebab()">
+  <figure></figure>
+  <figure></figure>
+  <figure></figure>
+  <ul class="ddf-kebab-dropdown">
+    <!-- <li><button>Toggle highlights</button></li> -->
+    <li><button id="highlight-visibility" class="{{vm.visibility}}" title="{{vm.visibilityTitle}}" ng-click="vm.setVisibleHighlights()">Toggle highlights</button><li>
+    <li><a href="#">How are we doing?</a></li>
+  </ul>
+</div>
 </div>
 <selection-tabs
   ng-if="!vm.search.query() && vm.selectedAnnotationCount() === 0"
