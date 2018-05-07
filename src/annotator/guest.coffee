@@ -82,7 +82,7 @@ module.exports = class Guest extends Delegator
       isHighlightBtnVisible: ->
         return config.isHighlightBtnVisible
       traslatedBtnStrings: ->
-        return {'AnnotateBtn' : polyglot().t('Add Comment'), 'HighlightBtn': polyglot().t('Highlight')}
+        return {'AnnotateBtn' : polyglot().t('Add Feedback'), 'HighlightBtn': polyglot().t('Highlight')}
     })
     this.selections = selections(document).subscribe
       next: (range) ->
