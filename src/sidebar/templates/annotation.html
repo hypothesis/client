@@ -35,8 +35,14 @@
                 on-edit-text="vm.setText(text)"
                 read-only="!vm.editing()">
       </markdown>
+        <div class="excerpt__inline-controls" ng-show="vm.canCollapseBody">
+          <span class="excerpt__toggle-link">
+          … <a class="ng-binding" ng-show="vm.canCollapseBody" ng-click="vm.toggleCollapseBody($event)" ng-title="vm.collapseBody ? ('Show the full annotation text' | translate): ('Show the first few lines only' | translate)" ng-bind="vm.collapseBody ? ('More' | translate) : ('Less' | translate)" h-branding="accentColor" style="font-size: 12px;">More</a>
+        </span>
+      </div>
     </excerpt>
   </section>
+
   <!-- / Body -->
   <annotation-header annotation="vm.annotation"
                      ng-hide="vm.editing() || vm.deleteConfirmation"
@@ -70,7 +76,7 @@
       </li>
     </ul>
     <div class="u-stretch"></div>
-    <a class="annotation-link u-strong" ng-show="vm.canCollapseBody"
+    <a class="annotation-link u-strong" ng-if="vm.isThemeCustom()" ng-show="vm.canCollapseBody"
       ng-click="vm.toggleCollapseBody($event)"
       ng-title="vm.collapseBody ? ('Show the full annotation text' | translate): ('Show the first few lines only' | translate)"
       ng-bind="vm.collapseBody ? ('More' | translate) : ('Less' | translate)"
