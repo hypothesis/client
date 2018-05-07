@@ -69,7 +69,7 @@
   </div>
 
   <div class="annotation-body u-layout-row tags tags-read-only"
-       ng-if="(vm.canCollapseBody || vm.state().tags.length) && !vm.editing()">
+       ng-if="vm.isThemeCustom()" ng-if="(vm.canCollapseBody || vm.state().tags.length) && !vm.editing()">
     <ul class="tag-list" ng-if="vm.isThemeCustom">
       <li class="tag-item" ng-repeat="tag in vm.state().tags">
         <a ng-href="{{vm.tagSearchURL(tag)}}" target="_blank">{{tag}}</a>
