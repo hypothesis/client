@@ -5,6 +5,36 @@
   font-style: normal;
 }
 
+@font-face {
+  font-family: 'overpass';
+  src: url('../fonts/overpass-light.woff') format('woff');
+  font-weight: 300;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'overpass';
+  src: url('../fonts/overpass.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'overpass';
+  src: url('../fonts/overpass-semibold.woff') format('woff');
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'overpass';
+  src: url('../fonts/overpass-bold.woff') format('woff');
+  font-weight: 600;
+  font-style: normal;
+}
+
+
+
 [class^="h-icon-"], [class*=" h-icon-"] {
   /* use !important to prevent issues with browser extensions that change fonts */
   font-family: 'h' !important;
@@ -206,4 +236,3 @@
 .h-icon-mail:before {
   content: "\e62a";
 }
-
