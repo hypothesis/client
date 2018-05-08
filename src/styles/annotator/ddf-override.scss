@@ -1,180 +1,136 @@
-/////////////////////////////////////////////////////
-// ALERT! : ARMAGAN'S CSS BEGIN!!!
-////////////////////////////////////////////////////
-// Public comments
-.annotator-hl.annotator-hl-selected-public {
-  background-color: #FFD54F !important;
 
-  .annotator-hl {
-    background-color: transparent !important;
+////////////////////////////////
+//feedback highlighting
+///////////////////////////////
+
+//highlight colors
+
+$public-highlight: #FFD54F;
+$public-hover: #FFECB3;
+$yours-highlight: #AED581;
+$yours-hover: #DCEDC8;
+$private-highlight: #FF8A65;
+$private-hover: #FFCCBC;
+
+
+.annotator-hl {
+  background-color: transparent !important;
+
+
+  &.annotator-hl-selected-public {
+    background-color: $public-highlight !important;
   }
+
+  &.annotator-hl-selected-yours {
+    background-color: $yours-highlight !important;
+  }
+
+  //private feedback disabled
+  // &.annotator-hl-selected-private {
+  //   background-color: $private-highlight !important;
+  // }
+
+
 }
 
-//  Your comments
-.annotator-hl.annotator-hl-selected-yours {
-  background-color: #AED581 !important;
-
-  .annotator-hl {
-    background-color: transparent !important;
-  }
+.annotator-hl-hover-public {
+  background-color: $public-hover !important;
 }
 
-// Private comments
-
-.annotator-hl.annotator-hl-selected-private {
-  background-color: #FF8A65 !important;
-
-  .annotator-hl {
-    background-color: transparent !important;
-  }
+.annotator-hl-hover-yours {
+  background-color: $yours-hover !important;
 }
 
-// Hover public comments
+  //private feedback disabled
+  // &.annotator-hl-hover-private {
+  //   background-color: $private-hover !important;
+  // }
 
-.annotator-hl.annotator-hl-hover-public {
-  background-color: #FFECB3;
 
-  .annotator-hl {
-    background-color: transparent !important;
-  }
-}
 
-//  Hover private comments
-.annotator-hl.annotator-hl-hover-private {
-  background-color: #FFCCBC;
-
-  .annotator-hl {
-    background-color: transparent !important;
-  }
-}
-
-.annotator-hl.annotator-hl-hover-yours {
-  background-color: #DCEDC8;
-
-  .annotator-hl {
-    background-color: transparent !important;
-  }
-}
-
-/////////////////////////////////////////////////////
-// ALERT! : ARMAGAN'S CSS FINISH!!!
-////////////////////////////////////////////////////
+////////////////////////////////
+//frame styles outside iframe
+////////////////////////////////
 
 .annotator-frame {
 
-.annotator-bucket-bar {
-
   // Disabling the BucketBar
-  display:none;
-  background: none !important;
-  left: -44px;
+  .annotator-bucket-bar {
+    display:none;
+    left: -44px;
+    background: none !important;
+  }
 
-}
+  .annotator-frame-button--sidebar_toggle {
+    position: absolute;
+    right: -300px;
+    padding: 6px 14px;
+    width: auto;
+    font-family: 'Overpass' !important;
+    font-size: 14px;
+    font-weight: 600;
+    color: #000;
+    background: #F4F4F4;
+    border: none;
 
-.annotator-frame-button--sidebar_toggle {
-  font-family: 'Overpass' !important;
-  position: absolute;
-  width: auto;
-  background: #F4F4F4;
-  font-size: 14px;
-  font-weight: 600;
-  padding: 6px 14px;
-  border: none;
-  color: #000;
-  right: -300px;
-}
-
-.annotator-frame-button--sidebar_toggle::before {
-  content: '';
-}
-}
-  // .annotator-bucket-indicator {
-  //   background-color: #ededed;
-  //   border: 1px solid #ededed;
-  //   border-radius: 0;
-  //   height: 20px;
-  //   width: 36px;
-  //
-  //   &:before, &:after {
-  //     display: none;
-  //   }
-  //
-  //   &.upper,
-  //   &.lower {
-  //     border-radius: 0;
-  //   }
-  //
-  //   .label {
-  //     color: #000;
-  //     line-height: 17px;
-  //
-  //     &:before {
-  //
-  //     }
-  //   }
-  //
-  //
-  //   //when a feedback-indicator has been selected, all others will recieve this class
-  //   &.indicator-disabled {
-  //     background-color: #fff;
-  //     opacity: .5;
-  //   }
-  //
-  // }
-
-  //style annotation adder
-  .annotator-adder {
-
-    background: #0076e0;
-
-    .annotator-adder-actions__button {
-
-      flex-direction: row;
-      padding-top: 6px;
-
-      .annotator-adder-actions__label {
-        color: #fff !important;
-        font-size: 12px;
-        letter-spacing: .5px;
-        font-weight: 600;
-        min-width: 100px;
-      }
+    &:before {
+      content: '';
     }
+  }
+}
 
+////////////////////////////
+//annotation adder styles
+////////////////////////////
 
-    .annotator-adder-actions__button:hover > .annotator-adder-actions__label
-     {
+.annotator-adder {
+  background: #0076e0;
+
+  .annotator-adder-actions__button {
+    flex-direction: row;
+    padding-top: 6px;
+
+    .annotator-adder-actions__label {
+      min-width: 100px;
       color: #fff !important;
-    }
-
-    .h-icon-annotate:before {
-      color: #fff;
-      padding-right: 4px;
-      height: 11px;
-      width: 18px;
-      font-size: 14px;
+      font-size: 12px;
+      letter-spacing: .5px;
+      font-weight: 600;
     }
   }
 
 
-  .annotator-adder--arrow-down:before,
-  .annotator-adder--arrow-up:before
+  .annotator-adder-actions__button:hover > .annotator-adder-actions__label
    {
-    background: #0076e0;
-    height: 9px;
-    width: 9px;
-    bottom: -6px;
+    color: #fff !important;
   }
 
-  .annotator-adder:hover,
-  .annotator-adder--arrow-down:hover:before,
-  .annotator-adder--arrow-up:hover:before
-  {
-    background: #06c;
+  .h-icon-annotate:before {
+    color: #fff;
+    padding-right: 4px;
+    height: 11px;
+    width: 18px;
+    font-size: 14px;
   }
 
+}
+
+.annotator-adder--arrow-down:before,
+.annotator-adder--arrow-up:before {
+  bottom: -6px;
+  background: #0076e0;
+  height: 9px;
+  width: 9px;
+}
+
+.annotator-adder:hover,
+.annotator-adder--arrow-down:hover:before,
+.annotator-adder--arrow-up:hover:before {
+  background: #06c;
+}
 
 
+//handle mobile
 @media screen and (min-width: 37.5em) {
   .annotator-frame {
     width: 300px;

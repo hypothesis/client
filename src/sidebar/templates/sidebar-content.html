@@ -1,7 +1,7 @@
 <div class="sidebar__header">
   <h3 class="sidebar__header-title">Feedback</h3>
   <!--add close button here-->
-  <button id="sidebar-toggle-close" class="sidebar-close" ng-click="vm.disableSidebar()"></button>
+
 
   <div class="ddf-kebab"  ng-click="vm.toggleKebab()">
   <figure></figure>
@@ -13,6 +13,7 @@
     <li><a href="#">How are we doing?</a></li>
   </ul>
 </div>
+<button id="sidebar-toggle-close" class="sidebar-close" ng-click="vm.disableSidebar()"></button>
 </div>
 <selection-tabs
   ng-if="!vm.search.query() && vm.selectedAnnotationCount() === 0"
