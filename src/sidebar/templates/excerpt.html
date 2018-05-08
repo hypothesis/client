@@ -2,8 +2,7 @@
 <div class="excerpt__container" ng-if="vm.enabled">
   <div class="excerpt" ng-style="vm.contentStyle()">
     <div ng-transclude></div>
-    <div ng-if="vm.isThemeCustom()"
-         ng-click="vm.expand()"
+    <div ng-if="vm.isThemeCustom" ng-click="vm.expand()"
          ng-class="vm.bottomShadowStyles()"
          title="{{'Show the full excerpt' | translate}}"></div>
     <div class="excerpt__inline-controls"
@@ -11,7 +10,7 @@
       <span class="excerpt__toggle-link" ng-show="vm.isExpandable()">
         … <a ng-click="vm.toggle($event)"
             title="{{'Show the full excerpt' | translate}}"
-            >{{'More' | translate}}</a>
+            h-branding="accentColor, selectionFontFamily">{{'More' | translate}}</a>
       </span>
       <span class="excerpt__toggle-link" ng-show="vm.isCollapsible()">
         <a ng-click="vm.toggle($event)"
