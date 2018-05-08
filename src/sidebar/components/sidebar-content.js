@@ -385,8 +385,12 @@ function SidebarContentController(
 
 
   this.setVisibleHighlights = function(){
+    // If there is no annotation, do not do anything
+    if(self.totalAnnotations = 0){
+      return;
+    }
     frameSync.setVisibleHighlights();
-    // Toggle
+    // Toggle the title and the class
     if(this.visibility === 'h-icon-visibility-off'){
       this.visibility = 'h-icon-visibility';
       this.visibilityTitle = 'Hide Highlights';

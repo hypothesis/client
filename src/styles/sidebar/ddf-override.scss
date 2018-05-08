@@ -103,6 +103,10 @@ $ddf-blue: #0076e0;
         padding-left: 0;
         z-index: 1000;
 
+        .disabled{
+          opacity: 0.2;
+        }
+
         li {
           list-style: none;
           display: block;
