@@ -130,10 +130,15 @@ $private-hover: #FFCCBC;
 }
 
 
-//handle mobile
 @media screen and (min-width: 37.5em) {
   .annotator-frame {
     width: 300px;
     margin-left: -300px;
+  }
+}
+
+@media screen and (max-width: 992px) {
+  .annotator-frame {
+    display: none;
   }
 }
