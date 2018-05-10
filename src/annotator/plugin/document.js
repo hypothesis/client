@@ -18,8 +18,8 @@ const { normalizeURI } = require('../util/url');
 */
 
 class DocumentMeta extends Plugin {
-  constructor(...args) {
-    super(...args);
+  constructor(element, options) {
+    super(element, options);
 
     this.events = {
       'beforeAnnotationCreated': 'beforeAnnotationCreated',
