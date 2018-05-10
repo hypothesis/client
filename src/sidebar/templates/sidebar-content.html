@@ -9,7 +9,7 @@
   <figure></figure>
   <ul class="ddf-kebab-dropdown">
     <!-- <li><button>Toggle highlights</button></li> -->
-    <li><button id="highlight-visibility" ng-class="vm.totalAnnotations > 0 ? vm.visibility : 'h-icon-visibility-off disabled'" title="{{vm.visibilityTitle}}" ng-click="vm.setVisibleHighlights()">Toggle highlights</button><li>
+    <li><button ng-disabled="vm.totalAnnotations === 0" id="highlight-visibility" class="{{vm.visibility}}" title="{{vm.visibilityTitle}}" ng-click="vm.setVisibleHighlights()">Toggle highlights</button><li>
     <li><a href="#">How are we doing?</a></li>
   </ul>
 </div>

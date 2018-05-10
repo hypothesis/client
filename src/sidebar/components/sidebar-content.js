@@ -42,10 +42,6 @@ function SidebarContentController(
   var ddfKebab = document.querySelector('.ddf-kebab');
   var kebabDropdown = document.querySelector('.ddf-kebab-dropdown');
 
-  var title = document.querySelector('.pane-page-title');
-
-  console.log(title)
-
   function thread() {
     return rootThread.thread(annotationUI.getState());
   }
@@ -84,7 +80,7 @@ function SidebarContentController(
 
     var className = getProperClassName(annotation.user, this.auth.userid, 'card');
     // If the click is edit, scroll the page but do not touch the text highlight color
-    if(event.srcElement.className === event.srcElement.className === 'h-icon-annotation-edit btn-icon'){
+    if(event.srcElement.className === 'h-icon-annotation-edit btn-icon'){
       frameSync.scrollToAnnotation(annotation.$tag, annotation.user, this.auth.userid, 'action');
     }
     else if(event.srcElement.className === 'h-icon-annotation-delete btn-icon' || event.srcElement.className === 'delete-confirmation-yes btn-app btn-delete' || event.srcElement.className === 'delete-cancel btn-clean btn-cancel' || event.srcElement.className === 'publish-annotation-cancel-btn btn-clean ng-binding' || event.srcElement.className ===  'btn-app btn-update ng-binding'){
@@ -385,10 +381,6 @@ function SidebarContentController(
 
 
   this.setVisibleHighlights = function(){
-    // If there is no annotation, do not do anything
-    if(self.totalAnnotations = 0){
-      return;
-    }
     frameSync.setVisibleHighlights();
     // Toggle the title and the class
     if(this.visibility === 'h-icon-visibility-off'){
