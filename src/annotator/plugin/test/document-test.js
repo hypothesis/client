@@ -1,14 +1,7 @@
 'use strict';
 
-/*
- * decaffeinate suggestions:
- * DS101: Remove unnecessary use of Array.from
- * DS102: Remove unnecessary code created because of implicit returns
- * DS201: Simplify complex destructure assignments
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
- */
 const $ = require('jquery');
-const Document = require('../document');
+const DocumentMeta = require('../document');
 
 /*
 ** Adapted from:
@@ -22,12 +15,12 @@ const Document = require('../document');
 ** https://github.com/openannotation/annotator/blob/master/LICENSE
 */
 
-describe('Document', function() {
+describe('DocumentMeta', function() {
   let testDocument = null;
 
   beforeEach(function() {
-    testDocument = new Document($('<div></div>')[0], {});
-    return testDocument.pluginInit();
+    testDocument = new DocumentMeta($('<div></div>')[0], {});
+    testDocument.pluginInit();
   });
 
   afterEach(() => $(document).unbind());
@@ -86,7 +79,7 @@ describe('Document', function() {
       // Link derived from dc resource identifiers in the form of urn:x-dc:<container>/<identifier>
       // Where <container> is the percent-encoded value of the last dc.relation.ispartof meta element
       // and <identifier> is the percent-encoded value of the last dc.identifier meta element.
-      return assert.equal(
+      assert.equal(
         metadata.link[9].href,
         'urn:x-dc:isbn%3A123456789/foobar-abcxyz'
       );
@@ -98,44 +91,44 @@ describe('Document', function() {
       assert.ok(metadata.highwire);
       assert.deepEqual(metadata.highwire.pdf_url, ['foo.pdf']);
       assert.deepEqual(metadata.highwire.doi, ['10.1175/JCLI-D-11-00015.1']);
-      return assert.deepEqual(metadata.highwire.title, ['Foo']);
+      assert.deepEqual(metadata.highwire.title, ['Foo']);
     });
 
     it('should have dublincore metadata', function() {
       assert.ok(metadata.dc);
       assert.deepEqual(metadata.dc.identifier, ['doi:10.1175/JCLI-D-11-00015.1', 'foobar-abcxyz']);
       assert.deepEqual(metadata.dc['relation.ispartof'], ['isbn:123456789']);
-      return assert.deepEqual(metadata.dc.type, ['Article']);
+      assert.deepEqual(metadata.dc.type, ['Article']);
     });
 
     it('should have facebook metadata', function() {
       assert.ok(metadata.facebook);
-      return assert.deepEqual(metadata.facebook.url, ['http://example.com']);
+      assert.deepEqual(metadata.facebook.url, ['http://example.com']);
     });
 
     it('should have eprints metadata', function() {
       assert.ok(metadata.eprints);
-      return assert.deepEqual(metadata.eprints.title, ['Computer Lib / Dream Machines']);
+      assert.deepEqual(metadata.eprints.title, ['Computer Lib / Dream Machines']);
     });
 
     it('should have prism metadata', function() {
       assert.ok(metadata.prism);
       assert.deepEqual(metadata.prism.title, ['Literary Machines']);
 
-      return it('should have twitter card metadata', function() {
+      it('should have twitter card metadata', function() {
         assert.ok(metadata.twitter);
-        return assert.deepEqual(metadata.twitter.site, ['@okfn']);
+        assert.deepEqual(metadata.twitter.site, ['@okfn']);
       });
     });
 
     it('should have unique uris', function() {
       const uris = testDocument.uris();
-      return assert.equal(uris.length, 8);
+      assert.equal(uris.length, 8);
     });
 
     it('uri() returns the canonical uri', function() {
       const uri = testDocument.uri();
-      return assert.equal(uri, metadata.link[5].href);
+      assert.equal(uri, metadata.link[5].href);
     });
 
     it('should have a favicon', () =>
@@ -145,7 +138,7 @@ describe('Document', function() {
       )
     );
 
-    return it('should have a documentFingerprint as the dc resource identifiers URN href', () => assert.equal(metadata.documentFingerprint, metadata.link[9].href));
+    it('should have a documentFingerprint as the dc resource identifiers URN href', () => assert.equal(metadata.documentFingerprint, metadata.link[9].href));
   });
 
 
@@ -154,12 +147,12 @@ describe('Document', function() {
     it('should add the protocol when the url starts with two slashes', function() {
       const result = testDocument._absoluteUrl('//example.com/');
       const expected = `${document.location.protocol}//example.com/`;
-      return assert.equal(result, expected);
+      assert.equal(result, expected);
     });
 
     it('should add a trailing slash when given an empty path', function() {
       const result = testDocument._absoluteUrl('http://example.com');
-      return assert.equal(result, 'http://example.com/');
+      assert.equal(result, 'http://example.com/');
     });
 
     it('should make a relative path into an absolute url', function() {
@@ -170,50 +163,50 @@ describe('Document', function() {
           document.location.pathname.replace(/[^\/]+$/, '') +
           'path'
       );
-      return assert.equal(result, expected);
+      assert.equal(result, expected);
     });
 
-    return it('should make an absolute path into an absolute url', function() {
+    it('should make an absolute path into an absolute url', function() {
       const result = testDocument._absoluteUrl('/path');
       const expected = (
         document.location.protocol + '//' +
           document.location.host +
           '/path'
       );
-      return assert.equal(result, expected);
+      assert.equal(result, expected);
     });
   });
 
-  return describe('#uri', function() {
+  describe('#uri', function() {
 
     beforeEach(function() {
       // Remove any existing canonical links which would otherwise override the
       // document's own location.
       const canonicalLink = document.querySelector('link[rel="canonical"]');
       if (canonicalLink) {
-        return canonicalLink.remove();
+        canonicalLink.remove();
       }
     });
 
     // Create a blank HTML document with a faked `href` and `baseURI` and
-    // return a `Document` instance which reads metadata from it.
+    // return a `DocumentMeta` instance which reads metadata from it.
     const createDoc = function(href, baseURI, htmlDoc) {
       if (!htmlDoc) {
-        // Create a blank DOM Document
+        // Create a blank DOM DocumentMeta
         htmlDoc = document.implementation.createHTMLDocument();
       }
 
-      // `Document.location` is not overridable. In order to fake the
+      // `DocumentMeta.location` is not overridable. In order to fake the
       // location in tests, create a proxy object in front of our blank HTML
       // document.
       const fakeDocument = {
-        createElement: htmlDoc.createElement.bind(htmlDoc),
-        querySelectorAll: htmlDoc.querySelectorAll.bind(htmlDoc),
+        createElement: htmlDoc.createElement.bind(htmlDoc), // eslint-disable-line no-restricted-properties
+        querySelectorAll: htmlDoc.querySelectorAll.bind(htmlDoc),  // eslint-disable-line no-restricted-properties
         location: {
           href,
         },
       };
-      const doc = new Document($('<div></div>')[0], {
+      const doc = new DocumentMeta($('<div></div>')[0], {
         document: fakeDocument,
         baseURI,
       });
@@ -229,7 +222,7 @@ describe('Document', function() {
       it("should return the document's URL if it has an allowed scheme", function() {
         const baseURI = 'https://publisher.org/';
         const doc = createDoc(href, baseURI);
-        return assert.equal(doc.uri(), href);
+        assert.equal(doc.uri(), href);
       })
     );
 
@@ -237,7 +230,7 @@ describe('Document', function() {
       const href = 'blob:1234-5678';
       const baseURI = 'https://publisher.org/book';
       const doc = createDoc(href, baseURI);
-      return assert.equal(doc.uri(), baseURI);
+      assert.equal(doc.uri(), baseURI);
     });
 
     [
@@ -250,13 +243,13 @@ describe('Document', function() {
       ['chrome://foo', 'chrome://blah'],
     ].forEach(function(...args) {
       const [href, baseURI] = Array.from(args[0]);
-      return it("should return the document's URL if it and the baseURI do not have an allowed scheme", function() {
+      it("should return the document's URL if it and the baseURI do not have an allowed scheme", function() {
         const doc = createDoc(href, baseURI);
-        return assert.equal(doc.uri(), href);
+        assert.equal(doc.uri(), href);
       });
     });
 
-    return it('returns the canonical URI if present', function() {
+    it('returns the canonical URI if present', function() {
       const htmlDoc = document.implementation.createHTMLDocument();
       const canonicalLink = htmlDoc.createElement('link');
       canonicalLink.rel = 'canonical';
@@ -265,7 +258,7 @@ describe('Document', function() {
 
       const doc = createDoc('https://publisher.org/not-canonical', null, htmlDoc);
 
-      return assert.equal(doc.uri(), canonicalLink.href);
+      assert.equal(doc.uri(), canonicalLink.href);
     });
   });
 });
