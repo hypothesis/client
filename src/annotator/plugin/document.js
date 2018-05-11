@@ -1,10 +1,5 @@
 'use strict';
 
-const baseURI = require('document-base-uri');
-
-const Plugin = require('../plugin');
-const { normalizeURI } = require('../util/url');
-
 /*
 ** Adapted from:
 ** https://github.com/openannotation/annotator/blob/v1.2.x/src/plugin/document.coffee
@@ -17,6 +12,15 @@ const { normalizeURI } = require('../util/url');
 ** https://github.com/openannotation/annotator/blob/master/LICENSE
 */
 
+const baseURI = require('document-base-uri');
+
+const Plugin = require('../plugin');
+const { normalizeURI } = require('../util/url');
+
+/**
+ * DocumentMeta reads metadata/links from the current HTML document and
+ * populates the `document` property of new annotations.
+ */
 class DocumentMeta extends Plugin {
   constructor(element, options) {
     super(element, options);
@@ -34,7 +38,11 @@ class DocumentMeta extends Plugin {
     this.getDocumentMetadata();
   }
 
-  // Returns the primary URI for the document being annotated
+  /**
+   * Returns the primary URI for the document being annotated
+   *
+   * @return {string}
+   */
   uri() {
     let uri = decodeURIComponent(this._getDocumentHref());
     for (let link of this.metadata.link) {
@@ -45,7 +53,11 @@ class DocumentMeta extends Plugin {
     return uri;
   }
 
-  // Returns all uris for the document being annotated
+  /**
+   * Returns all uris for the document being annotated
+   *
+   * @return {string[]}
+   */
   uris() {
     const uniqueUrls = {};
     for (let link of this.metadata.link) {
@@ -54,10 +66,17 @@ class DocumentMeta extends Plugin {
     return Object.keys(uniqueUrls);
   }
 
+  /**
+   * Hook that augments new annotations with metadata about the document they
+   * came from.
+   */
   beforeAnnotationCreated(annotation) {
     annotation.document = this.metadata;
   }
 
+  /**
+   * Return metadata for the current page.
+   */
   getDocumentMetadata() {
     this.metadata = {};
 

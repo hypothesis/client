@@ -1,8 +1,5 @@
 'use strict';
 
-const $ = require('jquery');
-const DocumentMeta = require('../document');
-
 /*
 ** Adapted from:
 ** https://github.com/openannotation/annotator/blob/v1.2.x/test/spec/plugin/document_spec.coffee
@@ -14,6 +11,10 @@ const DocumentMeta = require('../document');
 ** Dual licensed under the MIT and GPLv3 licenses.
 ** https://github.com/openannotation/annotator/blob/master/LICENSE
 */
+
+const $ = require('jquery');
+
+const DocumentMeta = require('../document');
 
 describe('DocumentMeta', function() {
   let testDocument = null;
