@@ -55,7 +55,9 @@ describe('DocumentMeta', function() {
 
     it('should have metadata', () => assert.ok(metadata));
 
-    it('should have a title, derived from highwire metadata if possible', () => assert.equal(metadata.title, 'Foo'));
+    it('should have a title, derived from highwire metadata if possible', () => {
+      assert.equal(metadata.title, 'Foo');
+    });
 
     it('should have links with absolute hrefs and types', function() {
       assert.ok(metadata.link);
@@ -86,7 +88,9 @@ describe('DocumentMeta', function() {
       );
     });
 
-    it('should ignore atom and RSS feeds and alternate languages', () => assert.equal(metadata.link.length, 10));
+    it('should ignore atom and RSS feeds and alternate languages', () => {
+      assert.equal(metadata.link.length, 10);
+    });
 
     it('should have highwire metadata', function() {
       assert.ok(metadata.highwire);
@@ -139,7 +143,9 @@ describe('DocumentMeta', function() {
       )
     );
 
-    it('should have a documentFingerprint as the dc resource identifiers URN href', () => assert.equal(metadata.documentFingerprint, metadata.link[9].href));
+    it('should have a documentFingerprint as the dc resource identifiers URN href', () => {
+      assert.equal(metadata.documentFingerprint, metadata.link[9].href);
+    });
   });
 
 
