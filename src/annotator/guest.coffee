@@ -435,7 +435,7 @@ module.exports = class Guest extends Delegator
       this.showAnnotations annotations
 
   onElementClick: (event) ->
-    if !@selectedTargets?.length
+    if !@selectedTargets?.length && !@crossframe.options.config.alwaysOpen
       @crossframe?.call('hideSidebar')
 
   onElementTouchStart: (event) ->
@@ -444,7 +444,7 @@ module.exports = class Guest extends Delegator
     # adding that to every element, we can add the initial
     # touchstart event which is always registered to
     # make up for the lack of click support for all elements.
-    if !@selectedTargets?.length
+    if !@selectedTargets?.length && !@crossframe.options.config.alwaysOpen
       @crossframe?.call('hideSidebar')
 
   onHighlightMouseover: (event) ->
