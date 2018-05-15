@@ -129,6 +129,7 @@ function AnnotationController(
     // log in.
     saveNewHighlight();
 
+
     // If this annotation is not a highlight and if it's new (has just been
     // created by the annotate button) or it has edits not yet saved to the
     // server - then open the editor on AnnotationController instantiation.
@@ -460,6 +461,15 @@ function AnnotationController(
 
   this.user = function() {
     return self.annotation.user;
+  };
+
+  this.isFeedbackOnDoc = function(){
+    var isFeedbackOnDoc = true;
+    var divPath = self.annotation.target[0].selector[0].startContainer;
+    if(isNew(self.annotation) && divPath !== undefined && divPath !== ''){
+      isFeedbackOnDoc = divPath.includes('article');
+    }
+    return isFeedbackOnDoc;
   };
 
   this.isThirdPartyUser = function () {
