@@ -162,6 +162,10 @@ $ddf-sidebar-text: #585858;
           a, button {
             color: #06c;
           }
+          
+          button#highlight-visibility[disabled="disabled"] {
+            color: rgb(127,127,127);
+          }
         }
       }
     }
@@ -238,6 +242,10 @@ $ddf-sidebar-text: #585858;
 
         .markdown-body p {
           margin: 17px 0;
+        }
+
+        .markdown-body p:only-child {
+          margin: .618em 0;
         }
       }
     }
