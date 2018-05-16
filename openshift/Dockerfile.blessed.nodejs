@@ -50,4 +50,4 @@ USER 1001
 RUN make clean && make
 
 # Run server
-CMD gulp serve-package
+CMD ["gulp", "build", "serve-package"]

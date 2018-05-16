@@ -24,4 +24,4 @@ RUN make
 
 #USER hypothesis
 
-CMD ["gulp", "serve-package"]
+CMD ["gulp", "build", "serve-package"]
