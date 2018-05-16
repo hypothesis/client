@@ -1,45 +1,45 @@
-
-////////////////////////////////
-//feedback highlighting
-///////////////////////////////
-
-//highlight colors
-
-$public-highlight: #FFD54F;
-$public-hover: #FFECB3;
-$yours-highlight: #AED581;
-$yours-hover: #DCEDC8;
-$private-highlight: #FF8A65;
-$private-hover: #FFCCBC;
-
-
-.annotator-hl {
-  background-color: transparent !important;
-
-
-  &.annotator-hl-selected-public {
-    background-color: $public-highlight !important;
-  }
-
-  &.annotator-hl-selected-yours {
-    background-color: $yours-highlight !important;
-  }
-
-  //private feedback disabled
-  // &.annotator-hl-selected-private {
-  //   background-color: $private-highlight !important;
-  // }
-
-
-}
-
-.annotator-hl-hover-public {
-  background-color: $public-hover !important;
-}
-
-.annotator-hl-hover-yours {
-  background-color: $yours-hover !important;
-}
+// 
+// ////////////////////////////////
+// //feedback highlighting
+// ///////////////////////////////
+//
+// //highlight colors
+//
+// $public-highlight: #FFD54F;
+// $public-hover: #FFECB3;
+// $yours-highlight: #AED581;
+// $yours-hover: #DCEDC8;
+// $private-highlight: #FF8A65;
+// $private-hover: #FFCCBC;
+//
+//
+// .annotator-hl {
+//   background-color: transparent !important;
+//
+//
+//   &.annotator-hl-selected-public {
+//     background-color: $public-highlight !important;
+//   }
+//
+//   &.annotator-hl-selected-yours {
+//     background-color: $yours-highlight !important;
+//   }
+//
+//   //private feedback disabled
+//   // &.annotator-hl-selected-private {
+//   //   background-color: $private-highlight !important;
+//   // }
+//
+//
+// }
+//
+// .annotator-hl-hover-public {
+//   background-color: $public-hover !important;
+// }
+//
+// .annotator-hl-hover-yours {
+//   background-color: $yours-hover !important;
+// }
 
   //private feedback disabled
   // &.annotator-hl-hover-private {
@@ -142,3 +142,66 @@ $private-hover: #FFCCBC;
     display: none;
   }
 }
+
+
+/////////////////////////////////////////////////////
+// ALERT! : ARMAGAN'S CSS BEGIN!!!
+////////////////////////////////////////////////////
+// Public comments
+.annotator-hl.annotator-hl-selected-public {
+  background-color: #FFD54F !important;
+
+  .annotator-hl {
+    background-color: transparent !important;
+  }
+}
+
+//  Your comments
+.annotator-hl.annotator-hl-selected-yours {
+  background-color: #AED581 !important;
+
+  .annotator-hl {
+    background-color: transparent !important;
+  }
+}
+
+// Private comments
+
+.annotator-hl.annotator-hl-selected-private {
+  background-color: #FF8A65 !important;
+
+  .annotator-hl {
+    background-color: transparent !important;
+  }
+}
+
+// Hover public comments
+
+.annotator-hl.annotator-hl-hover-public {
+  background-color: #FFECB3;
+
+  .annotator-hl {
+    background-color: transparent !important;
+  }
+}
+
+//  Hover private comments
+.annotator-hl.annotator-hl-hover-private {
+  background-color: #FFCCBC;
+
+  .annotator-hl {
+    background-color: transparent !important;
+  }
+}
+
+.annotator-hl.annotator-hl-hover-yours {
+  background-color: #DCEDC8;
+
+  .annotator-hl {
+    background-color: transparent !important;
+  }
+}
+
+/////////////////////////////////////////////////////
+// ALERT! : ARMAGAN'S CSS FINISH!!!
+////////////////////////////////////////////////////
