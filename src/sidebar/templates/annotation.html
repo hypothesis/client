@@ -2,11 +2,7 @@
   <strong>{{'You must be logged in to leave feedback.' | translate}}</strong>
 </header>
 
-<header class="annotation-header" ng-if="!vm.isFeedbackOnDoc()">
-  <strong>{{'You can leave feedback only on the documentation.' | translate}}</strong>
-</header>
-
-<div ng-keydown="vm.onKeydown($event)" ng-if="vm.user() && vm.isFeedbackOnDoc()">
+<div ng-keydown="vm.onKeydown($event)" ng-if="vm.user()">
 
   <!-- Excerpts -->
   <section class="annotation-quote-list"

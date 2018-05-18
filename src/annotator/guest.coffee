@@ -470,6 +470,15 @@ module.exports = class Guest extends Delegator
       this._onClearSelection()
       return
 
+    rh_docs = $('.rh_docs')[0]
+    selectedTextParent = selection.extentNode.parentElement.offsetParent
+    isFeedbackOnDoc = $.contains(rh_docs, selectedTextParent)
+
+    if !isFeedbackOnDoc
+      # If the selected text is not on the doc
+      this._onClearSelection()
+      return
+
     @selectedRanges = [range]
 
     $('.annotator-toolbar .h-icon-note')

@@ -463,15 +463,6 @@ function AnnotationController(
     return self.annotation.user;
   };
 
-  this.isFeedbackOnDoc = function(){
-    var isFeedbackOnDoc = true;
-    var divPath = self.annotation.target[0].selector[0].startContainer;
-    if(isNew(self.annotation) && divPath !== undefined && divPath !== ''){
-      isFeedbackOnDoc = divPath.includes('article');
-    }
-    return isFeedbackOnDoc;
-  };
-
   this.isThirdPartyUser = function () {
     return isThirdPartyUser(self.annotation.user, settings.authDomain);
   };
