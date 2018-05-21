@@ -1,4 +1,4 @@
-// 
+//
 // ////////////////////////////////
 // //feedback highlighting
 // ///////////////////////////////
@@ -76,6 +76,10 @@
     &:before {
       content: '';
     }
+
+    &:focus {
+      outline: -webkit-focus-ring-color auto 5px;
+    }
   }
 }
 
@@ -85,6 +89,7 @@
 
 .annotator-adder {
   background: #0076e0;
+  border-radius: 2px;
 
   .annotator-adder-actions__button {
     flex-direction: row;
