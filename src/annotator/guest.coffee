@@ -470,9 +470,9 @@ module.exports = class Guest extends Delegator
       this._onClearSelection()
       return
 
-    rh_docs = $('.rh_docs')[0]
+    doc_content = $('.rh_docs > .container > .row')[0]
     selectedTextParent = selection.extentNode.parentElement.offsetParent
-    isFeedbackOnDoc = $.contains(rh_docs, selectedTextParent)
+    isFeedbackOnDoc = $.contains(doc_content, selectedTextParent)
 
     if !isFeedbackOnDoc
       # If the selected text is not on the doc
