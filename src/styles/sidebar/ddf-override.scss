@@ -82,12 +82,19 @@ $ddf-sidebar-text: #585858;
     padding: 10px 8px;
     cursor: pointer;
 
-    figure {
-      margin: 2px 0;
-      height: 3px;
-      width: 3px;
-      border-radius: 100%;
-      background: $ddf-sidebar-text;
+    .ddf-kebab-dropdown_toggle {
+      display: inherit;
+      padding: 0;
+      background: none;
+      border: 0;
+
+      figure {
+        margin: 2px 0;
+        height: 3px;
+        width: 3px;
+        border-radius: 100%;
+        background: $ddf-sidebar-text;
+      }
     }
 
     .ddf-kebab-dropdown {
@@ -162,7 +169,7 @@ $ddf-sidebar-text: #585858;
           a, button {
             color: #06c;
           }
-          
+
           button#highlight-visibility[disabled="disabled"] {
             color: rgb(127,127,127);
           }

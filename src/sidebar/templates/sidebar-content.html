@@ -4,14 +4,16 @@
 
 
   <div class="ddf-kebab"  ng-click="vm.toggleKebab()">
-  <figure></figure>
-  <figure></figure>
-  <figure></figure>
-  <ul class="ddf-kebab-dropdown">
-    <!-- <li><button>Toggle highlights</button></li> -->
-    <li><button ng-disabled="vm.totalAnnotations === 0" id="highlight-visibility" class="{{vm.visibility}}" title="{{vm.visibilityTitle}}" ng-click="vm.setVisibleHighlights()">Toggle highlights</button><li>
-    <li><a href="#">How are we doing?</a></li>
-  </ul>
+    <button class="ddf-kebab-dropdown_toggle" aria-label="Toggle Feedback Options">
+      <figure></figure>
+      <figure></figure>
+      <figure></figure>
+    </button>
+    <ul class="ddf-kebab-dropdown">
+      <!-- <li><button>Toggle highlights</button></li> -->
+      <li><button ng-disabled="vm.totalAnnotations === 0" id="highlight-visibility" class="{{vm.visibility}}" title="{{vm.visibilityTitle}}" ng-click="vm.setVisibleHighlights()">Toggle highlights</button><li>
+      <li><a href="https://access.qa.redhat.com/eform/submit/direct-docs-feedback">How are we doing?</a></li>
+    </ul>
 </div>
 <button id="sidebar-toggle-close" class="sidebar-close" ng-click="vm.disableSidebar()"></button>
 </div>
