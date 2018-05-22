@@ -539,6 +539,12 @@ module.exports = class Guest extends Delegator
     annotation = $(event.currentTarget).data('annotation')
     annotations = event.annotations ?= []
     annotations.push(annotation)
+    #  Clear all highlights on the doc when user clicks on an highlight
+    selectedClassNames = 'annotator-hl-selected-public annotator-hl-selected-yours'
+    for anchor in @anchors when anchor.highlights?
+      #  if the clicked feedback is not the selected one, remove the highlight
+      if not (anchor.annotation.$tag is annotation.$tag)
+        $(anchor.highlights).removeClass(selectedClassNames)
 
     # See the comment in onHighlightMouseover
     if event.target is event.currentTarget
