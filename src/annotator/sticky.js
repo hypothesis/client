@@ -46,7 +46,7 @@ setTimeout(function () {
       return;
     }
 
-    var $marginRight = $container.css('marginRight');
+    var $marginRight = $container.offset().left;
 
     if (window.scrollY >= getTop()) {
       $hypothesis.css({
