@@ -34,6 +34,7 @@ function hostPageConfig(window) {
     'isHighlightBtnVisible',
     'locale',
     'injectSidebar',
+    'FeedbackDivLimitation',
 
     // New note button override.
     // This should be removed once new note button is enabled for everybody.

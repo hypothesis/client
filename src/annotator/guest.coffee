@@ -87,7 +87,7 @@ module.exports = class Guest extends Delegator
     this.selections = selections(document).subscribe
       next: (range) ->
         if range
-          self._onSelection(range)
+          self._onSelection(range, config)
         else
           self._onClearSelection()
 
@@ -461,7 +461,7 @@ module.exports = class Guest extends Delegator
     tags = (a.$tag for a in annotations)
     @crossframe?.call('focusAnnotations', tags)
 
-  _onSelection: (range) ->
+  _onSelection: (range, config) ->
     selection = document.getSelection()
     isBackwards = rangeUtil.isSelectionBackwards(selection)
     focusRect = rangeUtil.selectionFocusRect(selection)
@@ -470,14 +470,15 @@ module.exports = class Guest extends Delegator
       this._onClearSelection()
       return
 
-    doc_content = $('.rh_docs > .container > .row')[0]
-    selectedTextParent = selection.extentNode.parentElement.offsetParent
-    isFeedbackOnDoc = $.contains(doc_content, selectedTextParent)
+    for div in config.FeedbackDivLimitation
+      doc_content = $(div)[0]
+      selectedTextParent = selection.extentNode.parentElement
+      isFeedbackOnDoc = $.contains(doc_content, selectedTextParent)
 
-    if !isFeedbackOnDoc
-      # If the selected text is not on the doc
-      this._onClearSelection()
-      return
+      if !isFeedbackOnDoc
+        # If the selected text is not on the doc
+        this._onClearSelection()
+        return
 
     @selectedRanges = [range]
 
