@@ -30,6 +30,7 @@ setTimeout(function () {
   var docWrapperHeight = $docWrapper.height();
 
   function init() {
+    var windowHeight = $(window).height() - offsetBuffer * 2;
     if (windowHeight < docWrapperHeight) {
       $hypothesis.css({
         height: windowHeight
@@ -85,7 +86,7 @@ setTimeout(function () {
   });
 
   $(window).on('scroll', _.throttle(scrollHandler.bind(this), 20));
-  $(window).on('resize', _.throttle(init.bind(this)));
+  $(window).on('resize', _.throttle(scrollHandler.bind(this)), _.throttle(init.bind(this)));
   init();
   scrollHandler();
 }, 1000);
