@@ -472,8 +472,9 @@ module.exports = class Guest extends Delegator
 
     for div in config.FeedbackDivLimitation
       doc_content = $(div)[0]
-      selectedTextParent = selection.extentNode.parentElement
-      isFeedbackOnDoc = $.contains(doc_content, selectedTextParent)
+      selectedTextParentStart = selection.anchorNode.parentElement
+      selectedTextParentFinish = selection.focusNode.parentElement
+      isFeedbackOnDoc = ($.contains(doc_content, selectedTextParentStart) && $.contains(doc_content, selectedTextParentFinish) )
 
       if !isFeedbackOnDoc
         # If the selected text is not on the doc
