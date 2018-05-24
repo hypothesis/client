@@ -1,12 +1,15 @@
 
 $ddf-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.16), 0 2px 8px 0 rgba(0, 0, 0, 0.12);
+$ddf-app-background: #ededed;
 $ddf-blue: #0076e0;
 $ddf-sidebar-text: #585858;
 
 
 .app-content-wrapper {
 
-  background-color: #ededed !important;
+  border-top: 1px solid $ddf-app-background;
+  border-bottom: 1px solid $ddf-app-background;
+  background-color: $ddf-app-background !important;
   padding: 9px 11px 11px;
 
   * {
@@ -162,7 +165,7 @@ $ddf-sidebar-text: #585858;
         }
 
         &:first-child {
-          border-bottom: 1px solid #ededed;
+          border-bottom: 1px solid $ddf-app-background;
         }
 
         &:hover {
@@ -206,6 +209,14 @@ $ddf-sidebar-text: #585858;
       content: "\00d7";
     }
   }
+
+  @-moz-document url-prefix() {
+   #sidebar-toggle-close {
+     padding: 0;
+     padding-top: 4px;
+     height: 36px
+   }
+ }
 }
 
 // /////////////////////////
