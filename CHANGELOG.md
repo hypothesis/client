@@ -4,6 +4,22 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+### Changed
+
+- Updated several support links in Help panel
+  ([#726](https://github.com/hypothesis/client/pull/726)).
+
+- Fix project build with Node v10
+  ([#728](https://github.com/hypothesis/client/pull/728)).
+
+- Fix error when building project on Windows
+  ([#733](https://github.com/hypothesis/client/pull/733)).
+
+- Enable IP address anonymization for Google Analytics
+  ([#736](https://github.com/hypothesis/client/pull/736)).
+
 ## [1.81.0] - 2018-04-20
 
 ### Changed
