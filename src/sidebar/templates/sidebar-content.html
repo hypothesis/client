@@ -11,7 +11,7 @@
     </button>
     <ul class="ddf-kebab-dropdown">
       <!-- <li><button>Toggle highlights</button></li> -->
-      <li><button ng-disabled="vm.totalAnnotations === 0" id="highlight-visibility" class="{{vm.visibility}}" title="{{vm.visibilityTitle}}" ng-click="vm.setVisibleHighlights()">Toggle highlights</button><li>
+      <li><button ng-disabled="vm.totalAnnotations === 0" id="highlight-visibility" class="{{vm.visibility}}" title="{{vm.totalAnnotations === 0 ? '' : vm.visibilityTitle}}" ng-click="vm.setVisibleHighlights()">Toggle highlights</button><li>
       <li><a href="https://access.qa.redhat.com/eform/submit/direct-docs-feedback">How are we doing?</a></li>
     </ul>
 </div>

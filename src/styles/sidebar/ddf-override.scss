@@ -176,6 +176,7 @@ $ddf-sidebar-text: #585858;
 
           button#highlight-visibility[disabled="disabled"] {
             color: rgb(127,127,127);
+            cursor: default;
           }
         }
       }
