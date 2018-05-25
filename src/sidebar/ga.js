@@ -28,6 +28,10 @@ module.exports = function(trackingId){
   // anywhere else as well.
   // https://developers.google.com/analytics/devguides/collection/analyticsjs/tasks#disabling
   ga('set', 'checkProtocolTask', null);
+  
+  // anonymize collected IP addresses for GDPR
+  // https://developers.google.com/analytics/devguides/collection/analyticsjs/ip-anonymization
+  ga('set', 'anonymizeIp', true);
 
   /* eslint-enable */
 };
