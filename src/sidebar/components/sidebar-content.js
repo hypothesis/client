@@ -79,12 +79,15 @@ function SidebarContentController(
     }
 
     var className = getProperClassName(annotation.user, this.auth.userid, 'card');
+    var target = event.target || event.srcElement; // event.srcElement returns undefined in Firefox.
+    var listOfSpecialActions = ['h-icon-annotation-delete btn-icon' , 'delete-confirmation-yes btn-app btn-delete', 'delete-cancel btn-clean btn-cancel', 'publish-annotation-cancel-btn btn-clean ng-binding', 'btn-app btn-update ng-binding', 'btn btn-clean annotation-action-btn'];
+    var isSpecialAction = listOfSpecialActions.indexOf(target.className) !== -1 ;
     // If the click is edit, scroll the page but do not touch the text highlight color
-    if(event.srcElement.className === 'h-icon-annotation-edit btn-icon'){
+    if(target.className === 'h-icon-annotation-edit btn-icon' || target.className === 'btn btn-clean annotation-action-btn' || target.className === 'h-icon-annotation-delete btn-icon'){
       frameSync.scrollToAnnotation(annotation.$tag, annotation.user, this.auth.userid, 'action');
     }
-    else if(event.srcElement.className === 'h-icon-annotation-delete btn-icon' || event.srcElement.className === 'delete-confirmation-yes btn-app btn-delete' || event.srcElement.className === 'delete-cancel btn-clean btn-cancel' || event.srcElement.className === 'publish-annotation-cancel-btn btn-clean ng-binding' || event.srcElement.className ===  'btn-app btn-update ng-binding'){
-      // If the click is delete or submit or cancel, do not scroll and do not touch the highlight color.
+    else if(isSpecialAction){
+    // If the click is delete or submit or cancel, do not scroll and do not touch the highlight color.
       return;
     }
     else{
@@ -101,7 +104,6 @@ function SidebarContentController(
       });
       // Manage highlighting/unhighlighting the text of the corresponding selected feedback in the sidebar
       frameSync.scrollToAnnotation(annotation.$tag, annotation.user, this.auth.userid, 'text');
-
     }
   }
 
