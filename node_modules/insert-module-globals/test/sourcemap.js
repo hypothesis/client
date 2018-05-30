@@ -15,7 +15,7 @@ test('sourcemap', function (t) {
         var src = row.source;
         
         var sm = convert.fromSource(src).toObject();
-        t.deepEqual(sm.sources, [ path.join('test', 'sourcemap', 'main_es6.js')]);
+        t.deepEqual(sm.sources, [ 'test/sourcemap/main_es6.js' ]);
         t.deepEqual(sm.sourcesContent, [ 'console.log(`${__dirname}`, `${__filename}`);\n' ]);
         t.deepEqual(sm.mappings, ';AAAA,OAAO,CAAC,GAAG,MAAI,SAAS,OAAO,UAAU,CAAG,CAAC');
         

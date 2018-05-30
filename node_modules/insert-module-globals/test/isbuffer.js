@@ -15,7 +15,7 @@ test('isbuffer', function (t) {
         t.equal(c.require('main')(Buffer('wow')), true, 'is a buffer');
         t.equal(c.require('main')('wow'), false, 'not a buffer (string)');
         t.equal(c.require('main')({}), false, 'not a buffer (object)');
-        t.notOk(/require("buffer")/.test(src), 'buffer not required in source')
+        t.notOk(/require\("buffer"\)/.test(src), 'buffer not required in source')
         t.notOk(/require\("\//.test(src), 'absolute path not required in source')
     }));
     deps.write({ transform: inserter, global: true });

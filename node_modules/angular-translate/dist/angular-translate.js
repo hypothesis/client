@@ -1,7 +1,7 @@
 /*!
- * angular-translate - v2.17.0 - 2017-12-21
+ * angular-translate - v2.18.1 - 2018-05-19
  * 
- * Copyright (c) 2017 The angular-translate team, Pascal Precht; Licensed MIT
+ * Copyright (c) 2018 The angular-translate team, Pascal Precht; Licensed MIT
  */
 (function (root, factory) {
   if (typeof define === 'function' && define.amd) {
@@ -472,7 +472,7 @@ function $translate($STORAGE_KEY, $windowProvider, $translateSanitizationProvide
       }
     };
 
-  var version = '2.17.0';
+  var version = '2.18.1';
 
   // tries to determine the browsers language
   var getFirstBrowserLanguage = function () {
@@ -3520,7 +3520,7 @@ angular.module('pascalprecht.translate')
  *
  * @description
  * Translates given translation id either through attribute or DOM content.
- * Internally it uses `translate` filter to translate translation id. It possible to
+ * Internally it uses `translate` filter to translate translation id. It is possible to
  * pass an optional `translate-values` object literal as string into translation id.
  *
  * @param {string=} translate namespace name which could be either string or interpolated string.
@@ -3574,7 +3574,7 @@ function translateNamespaceDirective() {
     compile: function () {
       return {
         pre: function (scope, iElement, iAttrs) {
-          scope.translateNamespace = getTranslateNamespace(scope);
+          scope.translateNamespace = _getTranslateNamespace(scope);
 
           if (scope.translateNamespace && iAttrs.translateNamespace.charAt(0) === '.') {
             scope.translateNamespace += iAttrs.translateNamespace;
@@ -3593,13 +3593,13 @@ function translateNamespaceDirective() {
  * @param scope
  * @returns {string}
  */
-function getTranslateNamespace(scope) {
+function _getTranslateNamespace(scope) {
   'use strict';
   if (scope.translateNamespace) {
     return scope.translateNamespace;
   }
   if (scope.$parent) {
-    return getTranslateNamespace(scope.$parent);
+    return _getTranslateNamespace(scope.$parent);
   }
 }
 

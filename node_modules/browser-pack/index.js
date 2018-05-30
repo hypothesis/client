@@ -55,7 +55,7 @@ module.exports = function (opts) {
         
         if (row.sourceFile && !row.nomap) {
             if (!sourcemap) {
-                sourcemap = combineSourceMap.create();
+                sourcemap = combineSourceMap.create(null, opts.sourceRoot);
                 sourcemap.addFile(
                     { sourceFile: preludePath, source: prelude },
                     { line: 0 }

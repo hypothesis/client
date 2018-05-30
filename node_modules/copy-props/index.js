@@ -186,9 +186,15 @@ function _setDeep(obj, keyElems, depth, valueCreator) {
   var key = keyElems.shift();
   if (!keyElems.length) {
     var value = valueCreator(obj, key, depth);
-    if (value !== undefined) {
-      obj[key] = value;
+    if (value === undefined) {
+      return;
     }
+    if (isObject(value)) { // value is always an empty object.
+      if (isObject(obj[key])) {
+        return;
+      }
+    }
+    obj[key] = value;
     return;
   }
 

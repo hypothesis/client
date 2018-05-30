@@ -67,9 +67,9 @@ Optionally takes a callback to call when async tasks are complete.
 * `Promise` returned
   - Completion: [onFulfilled][promise-onfulfilled] method called
   - Error: [onRejected][promise-onrejected] method called
-* `Observable` returned
-  - Completion: [onCompleted][observable-subscribe] method called
-  - Error: [onError][observable-subscribe] method called
+* `Observable` (e.g. from [RxJS v5][rxjs5-observable] or [RxJS v4][rxjs5-observable]) returned
+  - Completion: [complete][rxjs5-subscriber-complete] method called
+  - Error: [error][rxjs5-subscriber-error] method called
 
 __Warning:__ Sync tasks are __not supported__ and your function will never complete if the one of the above strategies is not used to signal completion. However, thrown errors will be caught by the domain.
 
@@ -96,7 +96,10 @@ MIT
 [event-stream]: https://github.com/dominictarr/event-stream
 [promise-onfulfilled]: http://promisesaplus.com/#point-26
 [promise-onrejected]: http://promisesaplus.com/#point-30
-[observable-subscribe]: https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/core/operators/subscribe.md
+[rx4-observable]: https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/core/observable.md
+[rxjs5-observable]: http://reactivex.io/rxjs/class/es6/Observable.js~Observable.html
+[rxjs5-observer-complete]: http://reactivex.io/rxjs/class/es6/MiscJSDoc.js~ObserverDoc.html#instance-method-complete
+[rxjs5-observer-error]: http://reactivex.io/rxjs/class/es6/MiscJSDoc.js~ObserverDoc.html#instance-method-error
 
 [downloads-image]: http://img.shields.io/npm/dm/async-done.svg
 [npm-url]: https://www.npmjs.com/package/async-done

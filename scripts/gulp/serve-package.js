@@ -1,5 +1,4 @@
 'use strict';
-
 var https = require('https');
 var { readFileSync } = require('fs');
 
@@ -7,6 +6,9 @@ var express = require('express');
 var { log } = require('gulp-util');
 
 var { version } = require('../../package.json');
+
+const spdy = require('spdy');
+var compression = require('compression')
 
 /**
  * An express server which serves the contents of the package.
@@ -21,6 +23,9 @@ var { version } = require('../../package.json');
  */
 function servePackage(port, hostname) {
   var app = express();
+
+  // Deflate responses when able.
+  app.use(compression())
 
   // Enable CORS for assets so that cross-origin font loading works.
   app.use(function (req, res, next) {
@@ -42,11 +47,11 @@ function servePackage(port, hostname) {
   app.use(`/hypothesis/${version}/`, express.static('.'));
 
   app.listen(port, function () {
-    log(`Package served at http://${hostname}:${port}/hypothesis`);
+    log(`Package served at http://${hostname}:${port}/hypothesis - compression enabled`);
   });
 
   try {
-    https.createServer(
+    spdy.createServer(
       {
          key: readFileSync("/opt/ssl/client-ssl.key"),
          cert: readFileSync("/opt/ssl/client-ssl.crt")

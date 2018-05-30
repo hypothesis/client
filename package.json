@@ -150,7 +150,9 @@
     "prepublish": "yarn run build"
   },
   "dependencies": {
+    "compression": "^1.7.2",
     "gulp-cli": "^2.0.1",
+    "spdy": "^3.4.7",
     "yarn": "^1.6.0"
   }
 }

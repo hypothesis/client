@@ -60,6 +60,9 @@ written to it instead of expecting a stream of json text it will need to parse.
 If `opts.sourceMapPrefix` is given and source maps are computed, the
 `opts.sourceMapPrefix` string will be used instead of `//#`.
 
+If `opts.sourceRoot` is given and source maps are computed, the root for the
+output source map will be defined. (default is no root)
+
 Additionally, rows with a truthy `entry` may have an `order` field that
 determines the numeric index to execute the entries in.
 

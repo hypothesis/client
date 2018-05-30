@@ -193,3 +193,29 @@ test('custom sourceMapPrefix for //@', function (t) {
     ]));
 });
 
+test('custom sourceRoot', function (t) {
+  t.plan(1);
+
+  var p = pack({ sourceRoot: '/custom-root' });
+  var src = '';
+  p.on('data', function (buf) { src += buf });
+  p.on('end', function () {
+      var lastLine = grabLastLine(src);
+      var sm = grabSourceMap(lastLine);
+      t.equal(sm.sourceRoot, '/custom-root', 'sets a custom source root' );
+  });
+
+  p.end(JSON.stringify([
+      {
+          id: 'abc',
+          source: 'T.equal(require("./xyz")(3), 333)',
+          entry: true,
+          deps: { './xyz': 'xyz' }
+      },
+      {
+          id: 'xyz',
+          source: 'T.ok(true);\nmodule.exports=function(n){\n return n*111 \n}',
+          sourceFile: 'foo.js'
+      }
+  ]));
+});
