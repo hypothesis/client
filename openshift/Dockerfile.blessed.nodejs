@@ -18,6 +18,7 @@ RUN yum install -y \
     nss_wrapper \
  && yum clean all
 
+ARG NODE_ENV
 ARG SIDEBAR_APP_URL
 ARG CLIENT_URL
 ARG ASSET_URL
@@ -40,6 +41,7 @@ ENV MANPATH=/opt/rh/rh-nodejs8/root/usr/share/man:$MANPATH
 # Install node deps
 WORKDIR /opt/app-root
 RUN npm install -g yarn gulp gulp-cli
+RUN npm install
 
 EXPOSE 4443
 

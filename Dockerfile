@@ -3,6 +3,7 @@ FROM node:carbon
 #RUN addgroup -S hypothesis && adduser -S -G hypothesis -h /usr/src/app hypothesis
 WORKDIR /usr/src/app
 
+ARG NODE_ENV
 ARG SIDEBAR_APP_URL
 ARG CLIENT_URL
 ARG ASSET_URL
