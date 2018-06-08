@@ -4,6 +4,13 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+### Changed
+
+- Handle non percent-encoded URLs when replacing links with media embeds
+  ([#738](https://github.com/hypothesis/client/pull/738)).
+
 ## [1.82.0] - 2018-05-25
 
 ### Changed
