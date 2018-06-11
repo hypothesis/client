@@ -40,7 +40,9 @@
           <a class="ng-binding" ng-show="vm.canCollapseBody" ng-click="vm.toggleCollapseBody($event)" ng-title="vm.collapseBody ? ('Show the full annotation text' | translate): ('Show the first few lines only' | translate)" ng-bind="vm.collapseBody ? ('… More' | translate) : ('Less' | translate)" h-branding="accentColor" style="font-size: 12px;">More</a>
         </span>
       </div>
+
     </excerpt>
+    <p ng-if="vm.editing()" style="font-size:11px;">Your feedback will be visible to other users and an issue will be opened for the documentation team.</p>
   </section>
 
   <!-- / Body -->
