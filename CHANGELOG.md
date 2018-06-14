@@ -4,6 +4,13 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+### Changed
+
+- Fix "No results for {query}" message
+  ([#742](https://github.com/hypothesis/client/pull/742)).
+
 ## [1.83.0] - 2018-06-08
 
 ### Changed
