@@ -29,7 +29,7 @@ describe('annotator.range-util', function () {
 
   beforeEach(function () {
     selection = window.getSelection();
-    selection.collapse();
+    selection.collapse(null);
 
     testNode = document.createElement('span');
     testNode.innerHTML = 'Some text <br>content here';
