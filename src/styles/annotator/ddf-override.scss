@@ -53,6 +53,7 @@
 ////////////////////////////////
 
 .annotator-frame {
+  z-index: 1 !important;
 
   // Disabling the BucketBar
   .annotator-bucket-bar {
