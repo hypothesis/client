@@ -41,22 +41,31 @@ module.exports = class Host extends Guest
     .attr('src', sidebarAppSrc)
     .addClass('h-sidebar-iframe')
 
-    @frame = $('<div></div>')
-    .css('display', 'none')
-    .addClass('annotator-frame annotator-outer')
+    externalContainer = null
 
-    if config.theme == 'clean'
-      @frame.addClass('annotator-frame--drop-shadow-enabled')
+    if config.externalContainerSelector
+      # Use the native method to also validate the input
+      externalContainer = document.querySelector(config.externalContainerSelector)
 
-    @frame.appendTo(element)
+    if externalContainer
+      @externalFrame = $(externalContainer)
+    else
+      @frame = $('<div></div>')
+      .css('display', 'none')
+      .addClass('annotator-frame annotator-outer')
+
+      if config.theme == 'clean'
+        @frame.addClass('annotator-frame--drop-shadow-enabled')
+
+      @frame.appendTo(element)
 
     super
 
-    app.appendTo(@frame)
+    app.appendTo(@frame || @externalFrame)
 
     this.on 'panelReady', =>
       # Show the UI
-      @frame.css('display', '')
+      @frame?.css('display', '')
 
     this.on 'beforeAnnotationCreated', (annotation) ->
       # When a new non-highlight annotation is created, focus
@@ -66,5 +75,5 @@ module.exports = class Host extends Guest
         app[0].contentWindow.focus()
 
   destroy: ->
-    @frame.remove()
+    @frame?.remove()
     super

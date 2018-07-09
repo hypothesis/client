@@ -7,6 +7,10 @@ rafStub = (fn) ->
 
 Sidebar = proxyquire('../sidebar', { raf: rafStub })
 
+DEFAULT_WIDTH = 350
+DEFAULT_HEIGHT = 600
+EXTERNAL_CONTAINER_SELECTOR = 'test-external-container'
+
 describe 'Sidebar', ->
   sandbox = sinon.sandbox.create()
   CrossFrame = null
@@ -17,6 +21,11 @@ describe 'Sidebar', ->
     config = Object.assign({}, sidebarConfig, config)
     element = document.createElement('div')
     return new Sidebar(element, config)
+
+  createExternalContainer = ->
+    externalFrame = $('<div class="' + EXTERNAL_CONTAINER_SELECTOR + '"></div>')
+    externalFrame.width(DEFAULT_WIDTH).height(DEFAULT_HEIGHT)
+    return externalFrame[0]
 
   beforeEach ->
     sandbox.stub(Sidebar.prototype, '_setupGestures')
@@ -39,14 +48,22 @@ describe 'Sidebar', ->
     fakeToolbar.getWidth = sandbox.stub()
     fakeToolbar.destroy = sandbox.stub()
 
+    fakeBucketBar = {}
+    fakeBucketBar.element = {on: sandbox.stub()}
+    fakeBucketBar.destroy = sandbox.stub()
+
     CrossFrame = sandbox.stub()
     CrossFrame.returns(fakeCrossFrame)
 
     Toolbar = sandbox.stub()
     Toolbar.returns(fakeToolbar)
 
+    BucketBar = sandbox.stub()
+    BucketBar.returns(fakeBucketBar)
+
     sidebarConfig.pluginClasses['CrossFrame'] = CrossFrame
     sidebarConfig.pluginClasses['Toolbar'] = Toolbar
+    sidebarConfig.pluginClasses['BucketBar'] = BucketBar
 
   afterEach ->
     sandbox.restore()
@@ -297,10 +314,6 @@ describe 'Sidebar', ->
   describe 'layout change notifier', ->
 
     layoutChangeHandlerSpy = null
-    sidebar = null
-    frame = null
-    DEFAULT_WIDTH = 350
-    DEFAULT_HEIGHT = 600
 
     assertLayoutValues = (args, expectations) ->
       expected = Object.assign {
@@ -311,50 +324,124 @@ describe 'Sidebar', ->
 
       assert.deepEqual args, expected
 
+    describe 'with the frame set up as default', ->
+      sidebar = null
+      frame = null
+      beforeEach ->
+        layoutChangeHandlerSpy = sandbox.spy()
+        sidebar = createSidebar { onLayoutChange: layoutChangeHandlerSpy, sidebarAppUrl: '/' }
+
+        # remove info about call that happens on creation of sidebar
+        layoutChangeHandlerSpy.reset()
+
+        frame = sidebar.frame[0]
+        Object.assign frame.style, {
+          display: 'block',
+          width: DEFAULT_WIDTH + 'px',
+          height: DEFAULT_HEIGHT + 'px',
+
+          # width is based on left position of the window,
+          # we need to apply the css that puts the frame in the
+          # correct position
+          position: 'fixed',
+          top: 0,
+          left: '100%',
+        }
+
+        document.body.appendChild frame
+
+      afterEach ->
+        frame.remove()
+
+      it 'notifies when sidebar changes expanded state', ->
+        sidebar.show()
+        assert.calledOnce layoutChangeHandlerSpy
+        assertLayoutValues layoutChangeHandlerSpy.lastCall.args[0], {expanded: true}
+
+        sidebar.hide()
+        assert.calledTwice layoutChangeHandlerSpy
+        assertLayoutValues layoutChangeHandlerSpy.lastCall.args[0], {
+          expanded: false,
+          width: 0,
+        }
+
+      it 'notifies when sidebar is panned left', ->
+        sidebar.gestureState = { initial: -DEFAULT_WIDTH }
+        sidebar.onPan({type: 'panleft', deltaX: -50})
+        assertLayoutValues layoutChangeHandlerSpy.lastCall.args[0], { width: 400 }
+
+      it 'notifies when sidebar is panned right', ->
+        sidebar.gestureState = { initial: -DEFAULT_WIDTH }
+        sidebar.onPan({type: 'panright', deltaX: 50})
+        assertLayoutValues layoutChangeHandlerSpy.lastCall.args[0], { width: 300 }
+
+    describe 'with the frame in an external container', ->
+      sidebar = null
+      externalFrame = null
+
+      beforeEach ->
+        externalFrame = createExternalContainer()
+        Object.assign externalFrame.style, {
+          display: 'block',
+          width: DEFAULT_WIDTH + 'px',
+          height: DEFAULT_HEIGHT + 'px',
+          position: 'fixed',
+          top: 0,
+          left: 0,
+        }
+        document.body.appendChild externalFrame
+
+        layoutChangeHandlerSpy = sandbox.spy()
+        layoutChangeExternalConfig = {
+          onLayoutChange: layoutChangeHandlerSpy,
+          sidebarAppUrl: '/',
+          externalContainerSelector: '.' + EXTERNAL_CONTAINER_SELECTOR,
+        }
+        sidebar = createSidebar layoutChangeExternalConfig
+
+        # remove info about call that happens on creation of sidebar
+        layoutChangeHandlerSpy.reset()
+
+      afterEach ->
+        externalFrame.remove()
+
+      it 'notifies when sidebar changes expanded state', ->
+        sidebar.show()
+        assert.calledOnce layoutChangeHandlerSpy
+        assertLayoutValues layoutChangeHandlerSpy.lastCall.args[0], {expanded: true}
+
+        sidebar.hide()
+        assert.calledTwice layoutChangeHandlerSpy
+        assertLayoutValues layoutChangeHandlerSpy.lastCall.args[0], {
+          expanded: false,
+          width: 0,
+        }
+
+  describe 'sidebar frame in an external container', ->
+    sidebar = null
+    externalFrame = null
+
     beforeEach ->
-      layoutChangeHandlerSpy = sandbox.spy()
-      sidebar = createSidebar { onLayoutChange: layoutChangeHandlerSpy, sidebarAppUrl: '/' }
+      externalFrame = createExternalContainer()
+      document.body.appendChild externalFrame
 
-      # remove info about call that happens on creation of sidebar
-      layoutChangeHandlerSpy.reset()
-
-      frame = sidebar.frame[0]
-      Object.assign frame.style, {
-        display: 'block',
-        width: DEFAULT_WIDTH + 'px',
-        height: DEFAULT_HEIGHT + 'px',
-
-        # width is based on left position of the window,
-        # we need to apply the css that puts the frame in the
-        # correct position
-        position: 'fixed',
-        top: 0,
-        left: '100%',
-      }
-
-      document.body.appendChild frame
+      sidebar = createSidebar { externalContainerSelector: '.' + EXTERNAL_CONTAINER_SELECTOR }
 
     afterEach ->
-      frame.remove()
+      externalFrame.remove()
 
-    it 'notifies when sidebar changes expanded state', ->
-      sidebar.show()
-      assert.calledOnce layoutChangeHandlerSpy
-      assertLayoutValues layoutChangeHandlerSpy.lastCall.args[0], {expanded: true}
+    it 'uses the configured external container as the frame', ->
+      assert.equal(sidebar.frame, undefined)
+      assert.isDefined(sidebar.externalFrame)
+      assert.equal(sidebar.externalFrame[0], externalFrame)
+      assert.equal(externalFrame.childNodes.length, 1)
 
-      sidebar.hide()
-      assert.calledTwice layoutChangeHandlerSpy
-      assertLayoutValues layoutChangeHandlerSpy.lastCall.args[0], {
-        expanded: false,
-        width: 0,
-      }
+  describe 'config', ->
+    it 'does not have the BucketBar plugin if the clean theme is enabled', ->
+      sidebar = createSidebar({ theme: 'clean' })
+      assert.isUndefined(sidebar.plugins.BucketBar)
 
-    it 'notifies when sidebar is panned left', ->
-      sidebar.gestureState = { initial: -DEFAULT_WIDTH }
-      sidebar.onPan({type: 'panleft', deltaX: -50})
-      assertLayoutValues layoutChangeHandlerSpy.lastCall.args[0], { width: 400 }
-
-    it 'notifies when sidebar is panned right', ->
-      sidebar.gestureState = { initial: -DEFAULT_WIDTH }
-      sidebar.onPan({type: 'panright', deltaX: 50})
-      assertLayoutValues layoutChangeHandlerSpy.lastCall.args[0], { width: 300 }
+    it 'does not have the BucketBar or Toolbar plugin if an external container is provided', ->
+      sidebar = createSidebar({ externalContainerSelector: '.' + EXTERNAL_CONTAINER_SELECTOR })
+      assert.isUndefined(sidebar.plugins.BucketBar)
+      assert.isUndefined(sidebar.plugins.Toolbar)

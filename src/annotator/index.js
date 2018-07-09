@@ -63,10 +63,6 @@ $.noConflict(true)(function() {
     window.__hypothesis_frame = true;
   }
 
-  if(config.theme === 'clean') {
-    delete pluginClasses.BucketBar;
-  }
-
   config.pluginClasses = pluginClasses;
 
   var annotator = new Klass(document.body, config);

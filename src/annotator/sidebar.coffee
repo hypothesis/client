@@ -25,7 +25,13 @@ module.exports = class Sidebar extends Host
   gestureState: null
 
   constructor: (element, config) ->
+    if config.theme == 'clean' || config.externalContainerSelector
+      delete config.pluginClasses.BucketBar
+    if config.externalContainerSelector
+      delete config.pluginClasses.Toolbar
+
     super
+
     this.hide()
 
     if config.openSidebar || config.annotations || config.query
@@ -156,8 +162,9 @@ module.exports = class Sidebar extends Host
     # container.
 
     if @onLayoutChange
-      rect = @frame[0].getBoundingClientRect()
-      computedStyle = window.getComputedStyle(@frame[0])
+      frame = @frame || @externalFrame
+      rect = frame[0].getBoundingClientRect()
+      computedStyle = window.getComputedStyle(frame[0])
       width = parseInt(computedStyle.width)
       leftMargin = parseInt(computedStyle.marginLeft)
 
@@ -192,6 +199,8 @@ module.exports = class Sidebar extends Host
       })
 
   onPan: (event) =>
+    return unless @frame
+
     switch event.type
       when 'panstart'
         # Initialize the gesture state
@@ -235,8 +244,9 @@ module.exports = class Sidebar extends Host
   show: ->
     @crossframe.call('sidebarOpened')
 
-    @frame.css 'margin-left': "#{-1 * @frame.width()}px"
-    @frame.removeClass 'annotator-collapsed'
+    if @frame
+      @frame.css 'margin-left': "#{-1 * @frame.width()}px"
+      @frame.removeClass 'annotator-collapsed'
 
     if @plugins.Toolbar?
       @plugins.Toolbar.showCollapseSidebarBtn();
@@ -249,12 +259,12 @@ module.exports = class Sidebar extends Host
     this._notifyOfLayoutChange(true)
 
   hide: ->
-    @frame.css 'margin-left': ''
-    @frame.addClass 'annotator-collapsed'
-
-    @plugins.Toolbar.hideCloseBtn();
+    if @frame
+      @frame.css 'margin-left': ''
+      @frame.addClass 'annotator-collapsed'
 
     if @plugins.Toolbar?
+      @plugins.Toolbar.hideCloseBtn();
       @plugins.Toolbar.showExpandSidebarBtn();
 
     if @options.showHighlights == 'whenSidebarOpen'
@@ -263,7 +273,11 @@ module.exports = class Sidebar extends Host
     this._notifyOfLayoutChange(false)
 
   isOpen: ->
-    !@frame.hasClass('annotator-collapsed')
+    if @frame
+      return !@frame.hasClass('annotator-collapsed')
+    else
+      # Assume it will always be open for an external frame
+      return true
 
   setAllVisibleHighlights: (shouldShowHighlights) ->
     @crossframe.call('setVisibleHighlights', shouldShowHighlights)
