@@ -345,6 +345,28 @@ loads.
 
     ``Number``. The current visible width of the sidebar.
 
+.. option:: externalContainerSelector
+
+   .. warning::
+
+      This is an experimental API and may change in future.
+
+  ``string``. A CSS selector specifying the containing element into which the
+  sidebar iframe will be placed.
+
+  This option provides the publisher with more control over where the sidebar
+  is displayed on the screen and how and when it appears and disappears.
+
+  When this option is not specified, Hypothesis chooses where to place the
+  sidebar, typically on the right side of the page, and provides the user with
+  controls to open and close it.
+
+  When this option is specified, the sidebar will be created and placed inside
+  the specified element. Hypothesis will not display its own controls for
+  opening and closing the sidebar and will not display the "bucket bar" showing
+  where annotations are located on the page relative to the current scroll
+  position.
+
 
 Asset and Sidebar App Location
 ##############################
