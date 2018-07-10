@@ -23,20 +23,12 @@ describe('shareDialog', function () {
     angular.mock.module('h');
   });
 
-  it('generates new via link', function () {
+  it('generates new share link', function () {
     var element = util.createDirective(document, 'shareDialog', {});
     fakeStore.frames.returns([{ uri: 'http://example.com' }]);
     element.scope.$digest();
-    assert.equal(element.ctrl.viaPageLink, 'https://via.hypothes.is/http://example.com');
-  });
-
-  it('does not generate new via link if already on via', function () {
-    var element = util.createDirective(document, 'shareDialog', {});
-    fakeStore.frames.returns([{
-      uri: 'https://via.hypothes.is/http://example.com',
-    }]);
-    element.scope.$digest();
-    assert.equal(element.ctrl.viaPageLink, 'https://via.hypothes.is/http://example.com');
+    assert.equal(element.ctrl.sharePageLink,
+      'https://hyp.is/go?url=http://example.com');
   });
 
   it('tracks the target being shared', function(){
