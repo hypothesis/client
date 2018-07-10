@@ -4,6 +4,13 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+### Changed
+
+- Add ability to place sidebar in container element designated by host page
+  ([#707](https://github.com/hypothesis/client/pull/707)).
+
 ## [1.84.0] - 2018-06-14
 
 ### Changed
