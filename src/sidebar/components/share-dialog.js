@@ -1,31 +1,24 @@
 'use strict';
 
-var VIA_PREFIX = 'https://via.hypothes.is/';
-
 // @ngInject
 function ShareDialogController($scope, $element, analytics, store) {
   var self = this;
 
-  function updateViaLink(frames) {
+  function updateSharePageLink(frames) {
     if (!frames.length) {
-      self.viaPageLink = '';
+      self.sharePageLink = '';
       return;
     }
 
-    // Check to see if we are on a via page. If so, we just return the URI.
-    if (frames[0].uri.indexOf(VIA_PREFIX) === 0) {
-      self.viaPageLink = frames[0].uri;
-    } else {
-      self.viaPageLink = VIA_PREFIX + frames[0].uri;
-    }
+    self.sharePageLink = 'https://hyp.is/go?url=' + encodeURIComponent(frames[0].uri);
   }
 
-  var viaInput = $element[0].querySelector('.js-via');
-  viaInput.focus();
-  viaInput.select();
+  var shareLinkInput = $element[0].querySelector('.js-share-link');
+  shareLinkInput.focus();
+  shareLinkInput.select();
 
   $scope.$watch(function () { return store.frames(); },
-    updateViaLink);
+    updateSharePageLink);
 
   $scope.onShareClick = function(target){
     if(target){

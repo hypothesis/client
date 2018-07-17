@@ -9,27 +9,27 @@
     </ul>
     <div class="tab-content">
       <p>Share the link below to show anyone these annotations and invite them to contribute their own.</p>
-      <p><input class="js-via form-input"
+      <p><input class="js-share-link form-input"
           type="text"
-          ng-value="vm.viaPageLink"
+          ng-value="vm.sharePageLink"
           readonly /></p>
       <p class="share-link-icons">
-      <a href="https://twitter.com/intent/tweet?url={{vm.viaPageLink | urlEncode}}&hashtags=annotated"
+      <a href="https://twitter.com/intent/tweet?url={{vm.sharePageLink | urlEncode}}&hashtags=annotated"
          target="_blank"
          title="Tweet link"
          class="share-link-icon h-icon-twitter"
          ng-click="onShareClick('twitter')"></a>
-      <a href="https://www.facebook.com/sharer/sharer.php?u={{vm.viaPageLink | urlEncode}}"
+      <a href="https://www.facebook.com/sharer/sharer.php?u={{vm.sharePageLink | urlEncode}}"
          target="_blank"
          title="Share on Facebook"
          class="share-link-icon h-icon-facebook"
          ng-click="onShareClick('facebook')"></a>
-      <a href="https://plus.google.com/share?url={{vm.viaPageLink | urlEncode}}"
+      <a href="https://plus.google.com/share?url={{vm.sharePageLink | urlEncode}}"
          target="_blank"
          title="Post on Google Plus"
          class="share-link-icon h-icon-google-plus"
          ng-click="onShareClick('googlePlus')"></a>
-      <a href="mailto:?subject=Let's%20Annotate&amp;body={{vm.viaPageLink}}"
+      <a href="mailto:?subject=Let's%20Annotate&amp;body={{vm.sharePageLink}}"
          target="_blank"
          title="Share via email"
          class="share-link-icon h-icon-mail"
