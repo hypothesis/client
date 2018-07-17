@@ -25,10 +25,11 @@ describe('shareDialog', function () {
 
   it('generates new share link', function () {
     var element = util.createDirective(document, 'shareDialog', {});
-    fakeStore.frames.returns([{ uri: 'http://example.com' }]);
+    var uri = 'http://example.com';
+    fakeStore.frames.returns([{ uri }]);
     element.scope.$digest();
     assert.equal(element.ctrl.sharePageLink,
-      'https://hyp.is/go?url=http://example.com');
+      'https://hyp.is/go?url=' + encodeURIComponent(uri));
   });
 
   it('tracks the target being shared', function(){

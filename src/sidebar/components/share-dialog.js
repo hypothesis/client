@@ -10,7 +10,7 @@ function ShareDialogController($scope, $element, analytics, store) {
       return;
     }
 
-    self.sharePageLink = 'https://hyp.is/go?url='+frames[0].uri;
+    self.sharePageLink = 'https://hyp.is/go?url=' + encodeURIComponent(frames[0].uri);
   }
 
   var shareLinkInput = $element[0].querySelector('.js-share-link');
