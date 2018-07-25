@@ -1,6 +1,9 @@
 'use strict';
 
 const util = require('../util');
+const { profile } = require('./session').selectors;
+const { directLinkedAnnotation } = require('./annotations').selectors;
+const memoize = require('../../util/memoize');
 
 function init() {
   return {
@@ -95,14 +98,38 @@ function focusedGroupId(state) {
   return state.focusedGroupId;
 }
 
+function isWorldGroup(id) {
+  return id === '__world__';
+}
+
 /**
- * Return the list of all groups.
+ * Return true if the "Public" group should be shown.
+ */
+function shouldShowWorldGroup(state) {
+  // Hide the "Public" group for logged-out users if the page has groups
+  // associated with it, unless the user has followed a direct link to an
+  // annotation in the "Public" group.
+  var includeWorldGroup = true;
+  var hasNonWorldGroup = state.groups.some(g => !isWorldGroup(g.id));
+  if (hasNonWorldGroup && !profile(state).userid) {
+    var ann = directLinkedAnnotation(state);
+    includeWorldGroup = !!ann && isWorldGroup(ann.group);
+  }
+  return includeWorldGroup;
+}
+
+/**
+ * Return the list of all groups that should be displayed.
  *
  * @return {Group[]}
  */
-function allGroups(state) {
-  return state.groups;
-}
+var allGroups = memoize((state) => {
+  if (shouldShowWorldGroup(state)) {
+    return state.groups;
+  } else {
+    return state.groups.filter(g => !isWorldGroup(g.id));
+  }
+});
 
 /**
  * Return the group with the given ID.

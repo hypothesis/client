@@ -1,28 +1,16 @@
 'use strict';
 
-var redux = require('redux');
-// `.default` is needed because 'redux-thunk' is built as an ES2015 module
-var thunk = require('redux-thunk').default;
-
 var annotations = require('../annotations');
+var selection = require('../selection');
+var createStore = require('../../create-store');
+
 var fixtures = require('../../../test/annotation-fixtures');
-var util = require('../../util');
 var unroll = require('../../../../shared/test/util').unroll;
 
 var { actions, selectors } = annotations;
 
-/**
- * Create a Redux store which only handles annotation actions.
- */
-function createStore() {
-  // Thunk middleware is needed for the ADD_ANNOTATIONS action.
-  var enhancer = redux.applyMiddleware(thunk);
-  var reducer = util.createReducer(annotations.update);
-  return redux.createStore(reducer, annotations.init(), enhancer);
-}
-
-// Tests for most of the functionality in reducers/annotations.js are currently
-// in the tests for the whole Redux store
+// Tests for most of the functionality in the "annotations" module are currently
+// in the tests for the whole Redux store.
 
 describe('annotations reducer', function () {
   describe('#savedAnnotations', function () {
@@ -58,7 +46,7 @@ describe('annotations reducer', function () {
 
   describe('#hideAnnotation', function () {
     it('sets the `hidden` state to `true`', function () {
-      var store = createStore();
+      var store = createStore([annotations]);
       var ann = fixtures.moderatedAnnotation({ hidden: false });
 
       store.dispatch(actions.addAnnotations([ann]));
@@ -71,7 +59,7 @@ describe('annotations reducer', function () {
 
   describe('#unhideAnnotation', function () {
     it('sets the `hidden` state to `false`', function () {
-      var store = createStore();
+      var store = createStore([annotations]);
       var ann = fixtures.moderatedAnnotation({ hidden: true });
 
       store.dispatch(actions.addAnnotations([ann]));
@@ -84,7 +72,7 @@ describe('annotations reducer', function () {
 
   describe('#updateFlagStatus', function () {
     unroll('updates the flagged status of an annotation', function (testCase) {
-      var store = createStore();
+      var store = createStore([annotations]);
       var ann = fixtures.defaultAnnotation();
       ann.flagged = testCase.wasFlagged;
       ann.moderation = testCase.oldModeration;
@@ -132,5 +120,32 @@ describe('annotations reducer', function () {
       oldModeration: { flagCount: 1 },
       newModeration: { flagCount: 0 },
     }]);
+  });
+
+  describe('#directLinkedAnnotation', () => {
+    var directLinkedAnn = {
+      id: 'abcdef',
+    };
+
+    it('returns null if no direct-linked annotation', () => {
+      var store = createStore([annotations, selection], [{}]);
+      assert.equal(store.directLinkedAnnotation(), null);
+    });
+
+    it('returns null if direct-linked annotation not yet loaded', () => {
+      var store = createStore([annotations, selection], [{
+        annotations: directLinkedAnn.id,
+      }]);
+      assert.equal(store.directLinkedAnnotation(), null);
+    });
+
+    it('returns the direct-linked annotation if loaded', () => {
+      var store = createStore([annotations, selection], [{
+        annotations: directLinkedAnn.id,
+      }]);
+      store.addAnnotations([directLinkedAnn]);
+      assert.ok(store.directLinkedAnnotation());
+      assert.deepEqual(store.directLinkedAnnotation().id, directLinkedAnn.id);
+    });
   });
 });

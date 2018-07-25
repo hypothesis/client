@@ -376,6 +376,21 @@ function findAnnotationByID(state, id) {
   return findByID(state.annotations, id);
 }
 
+/**
+ * Return the annotation that the user followed a direct-link to.
+ *
+ * Returns `null` if the annotation has not been loaded.
+ *
+ * @return {Annotation|null}
+ */
+function directLinkedAnnotation(state) {
+  var id = selection.selectors.directLinkedAnnotationId(state);
+  if (!id) {
+    return null;
+  }
+  return findAnnotationByID(state, id);
+}
+
 module.exports = {
   init: init,
   update: update,
@@ -391,6 +406,7 @@ module.exports = {
 
   selectors: {
     annotationExists,
+    directLinkedAnnotation,
     findAnnotationByID,
     findIDsForTags,
     savedAnnotations,
