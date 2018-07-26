@@ -114,14 +114,13 @@ const hasNonWorldGroup = createSelector(
 const shouldShowWorldGroup = createSelector(
   [hasNonWorldGroup, profile, directLinkedAnnotationGroup],
   (hasNonWorldGroup, profile, directLinkedAnnotationGroup) => {
-    // Hide the "Public" group for logged-out users if the page has groups
-    // associated with it, unless the user has followed a direct link to an
-    // annotation in the "Public" group.
-    let includeWorldGroup = true;
-    if (hasNonWorldGroup && !profile.userid) {
-      includeWorldGroup = isWorldGroup(directLinkedAnnotationGroup);
+    if (profile.userid !== null) {
+      // Logged-in users always see the "Public" group.
+      return true;
     }
-    return includeWorldGroup;
+    // Logged-out users only see it if it is the only group or they followed a
+    // direct link to an annotation in the "Public" group.
+    return !hasNonWorldGroup || isWorldGroup(directLinkedAnnotationGroup);
   }
 );
 
