@@ -122,30 +122,39 @@ describe('annotations reducer', function () {
     }]);
   });
 
-  describe('#directLinkedAnnotation', () => {
+  describe('#directLinkedAnnotationGroup', () => {
     var directLinkedAnn = {
       id: 'abcdef',
+      group: 'the-group-id',
     };
 
     it('returns null if no direct-linked annotation', () => {
       var store = createStore([annotations, selection], [{}]);
-      assert.equal(store.directLinkedAnnotation(), null);
+      assert.equal(store.directLinkedAnnotationGroup(), null);
     });
 
     it('returns null if direct-linked annotation not yet loaded', () => {
       var store = createStore([annotations, selection], [{
         annotations: directLinkedAnn.id,
       }]);
-      assert.equal(store.directLinkedAnnotation(), null);
+      assert.equal(store.directLinkedAnnotationGroup(), null);
     });
 
-    it('returns the direct-linked annotation if loaded', () => {
+    it("returns the direct-linked annotation's group after it is loaded", () => {
       var store = createStore([annotations, selection], [{
         annotations: directLinkedAnn.id,
       }]);
       store.addAnnotations([directLinkedAnn]);
-      assert.ok(store.directLinkedAnnotation());
-      assert.deepEqual(store.directLinkedAnnotation().id, directLinkedAnn.id);
+      assert.equal(store.directLinkedAnnotationGroup(), directLinkedAnn.group);
+    });
+
+    it('remembers the group after the direct-linked annotation is unloaded', () => {
+      var store = createStore([annotations, selection], [{
+        annotations: directLinkedAnn.id,
+      }]);
+      store.addAnnotations([directLinkedAnn]);
+      store.removeAnnotations([directLinkedAnn]);
+      assert.equal(store.directLinkedAnnotationGroup(), directLinkedAnn.group);
     });
   });
 });

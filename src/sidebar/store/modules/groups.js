@@ -4,7 +4,7 @@ const { createSelector } = require('reselect');
 
 const util = require('../util');
 const { profile } = require('./session').selectors;
-const { directLinkedAnnotation } = require('./annotations').selectors;
+const { directLinkedAnnotationGroup } = require('./annotations').selectors;
 
 function init() {
   return {
@@ -112,15 +112,14 @@ const hasNonWorldGroup = createSelector(
  * Return true if the "Public" group should be shown.
  */
 const shouldShowWorldGroup = createSelector(
-  [hasNonWorldGroup, profile, directLinkedAnnotation],
-  (hasNonWorldGroup, profile, directLinkedAnnotation) => {
+  [hasNonWorldGroup, profile, directLinkedAnnotationGroup],
+  (hasNonWorldGroup, profile, directLinkedAnnotationGroup) => {
     // Hide the "Public" group for logged-out users if the page has groups
     // associated with it, unless the user has followed a direct link to an
     // annotation in the "Public" group.
     let includeWorldGroup = true;
     if (hasNonWorldGroup && !profile.userid) {
-      const ann = directLinkedAnnotation;
-      includeWorldGroup = !!ann && isWorldGroup(ann.group);
+      includeWorldGroup = isWorldGroup(directLinkedAnnotationGroup);
     }
     return includeWorldGroup;
   }

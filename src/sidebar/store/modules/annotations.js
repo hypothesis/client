@@ -5,8 +5,6 @@
 
 'use strict';
 
-var { createSelector } = require('reselect');
-
 var arrayUtil = require('../../util/array-util');
 var metadata = require('../../annotation-metadata');
 var uiConstants = require('../../ui-constants');
@@ -76,6 +74,14 @@ function init() {
   return {
     annotations: [],
 
+    /**
+     * The ID of the group which the direct-linked annotation belongs to.
+     *
+     * This is stored as a separate field so it can be remembered even after
+     * the direct-linked annotation is unloaded.
+     */
+    directLinkedAnnotationGroup: null,
+
     // The local tag to assign to the next annotation that is loaded into the
     // app
     nextTag: 1,
@@ -92,10 +98,16 @@ var update = {
     var updated = [];
     var nextTag = state.nextTag;
 
+    var directLinkedAnnotationGroup = state.directLinkedAnnotationGroup;
+
     action.annotations.forEach(function (annot) {
       var existing;
       if (annot.id) {
         existing = findByID(state.annotations, annot.id);
+
+        if (annot.id === selection.selectors.directLinkedAnnotationId(state)) {
+          directLinkedAnnotationGroup = annot.group;
+        }
       }
       if (!existing && annot.$tag) {
         existing = findByTag(state.annotations, annot.$tag);
@@ -125,6 +137,7 @@ var update = {
 
     return {
       annotations: added.concat(updated).concat(unchanged),
+      directLinkedAnnotationGroup,
       nextTag: nextTag,
     };
   },
@@ -379,21 +392,14 @@ function findAnnotationByID(state, id) {
 }
 
 /**
- * Return the annotation that the user followed a direct-link to.
+ * Return the ID of the group that the direct-linked annotation belongs to.
  *
- * Returns `null` if the annotation has not been loaded.
- *
- * @return {Annotation|null}
+ * Returns `null` if no direct-linked annotation or it has not been loaded yet
+ * at least once.
  */
-var directLinkedAnnotation = createSelector(
-  [state => state.annotations, selection.selectors.directLinkedAnnotationId],
-  (annotations, directLinkedAnnotationId) => {
-    if (!directLinkedAnnotationId) {
-      return null;
-    }
-    return findByID(annotations, directLinkedAnnotationId);
-  }
-);
+function directLinkedAnnotationGroup(state) {
+  return state.directLinkedAnnotationGroup;
+}
 
 module.exports = {
   init: init,
@@ -410,7 +416,7 @@ module.exports = {
 
   selectors: {
     annotationExists,
-    directLinkedAnnotation,
+    directLinkedAnnotationGroup,
     findAnnotationByID,
     findIDsForTags,
     savedAnnotations,
