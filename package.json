@@ -89,6 +89,7 @@
     "redux": "^3.5.2",
     "redux-thunk": "^2.1.0",
     "request": "^2.76.0",
+    "reselect": "^3.0.1",
     "retry": "^0.8.0",
     "scroll-into-view": "^1.8.2",
     "seamless-immutable": "^6.0.1",

@@ -5,6 +5,8 @@
 
 'use strict';
 
+var { createSelector } = require('reselect');
+
 var arrayUtil = require('../../util/array-util');
 var metadata = require('../../annotation-metadata');
 var uiConstants = require('../../ui-constants');
@@ -383,13 +385,15 @@ function findAnnotationByID(state, id) {
  *
  * @return {Annotation|null}
  */
-function directLinkedAnnotation(state) {
-  var id = selection.selectors.directLinkedAnnotationId(state);
-  if (!id) {
-    return null;
+var directLinkedAnnotation = createSelector(
+  [state => state.annotations, selection.selectors.directLinkedAnnotationId],
+  (annotations, directLinkedAnnotationId) => {
+    if (!directLinkedAnnotationId) {
+      return null;
+    }
+    return findByID(annotations, directLinkedAnnotationId);
   }
-  return findAnnotationByID(state, id);
-}
+);
 
 module.exports = {
   init: init,
