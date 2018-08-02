@@ -4,6 +4,13 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+### Changed
+
+- Fix `groups.focused().id` error on startup if local storage is empty
+  ([#754](https://github.com/hypothesis/client/pull/754)).
+
 ## [1.86.0] - 2018-08-02
 
 ### Changed
