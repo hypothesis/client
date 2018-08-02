@@ -132,6 +132,16 @@ describe('groups', function() {
       });
     });
 
+    [null, 'some-group-id'].forEach(groupId => {
+      it('does not set the focused group if not present in the groups list', () => {
+        var svc = service();
+        fakeLocalStorage.getItem.returns(groupId);
+        return svc.load().then(() => {
+          assert.notCalled(fakeStore.focusGroup);
+        });
+      });
+    });
+
     context('in the sidebar', () => {
       it('waits for the document URL to be determined', () => {
         var svc = service();

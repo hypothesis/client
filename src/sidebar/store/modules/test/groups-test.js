@@ -21,16 +21,30 @@ describe('sidebar.store.modules.groups', () => {
   });
 
   describe('focusGroup', () => {
-    it('updates the focused group if valid', () => {
-      store.loadGroups([publicGroup]);
-      store.focusGroup(publicGroup.id);
-      assert.equal(store.getState().focusedGroupId, publicGroup.id);
+    beforeEach(() => {
+      sinon.stub(console, 'error');
     });
 
-    it('does not set the focused group if invalid', () => {
+    afterEach(() => {
+      console.error.restore();
+    });
+
+    it('updates the focused group if valid', () => {
       store.loadGroups([publicGroup]);
+
+      store.focusGroup(publicGroup.id);
+
+      assert.equal(store.getState().focusedGroupId, publicGroup.id);
+      assert.notCalled(console.error);
+    });
+
+    it('does not update focused group if not valid', () => {
+      store.loadGroups([publicGroup]);
+
       store.focusGroup(privateGroup.id);
-      assert.equal(store.getState().focusedGroupId, null);
+
+      assert.equal(store.getState().focusedGroupId, publicGroup.id);
+      assert.called(console.error);
     });
   });
 
