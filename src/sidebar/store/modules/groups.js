@@ -21,7 +21,11 @@ function init() {
 const update = {
   FOCUS_GROUP(state, action) {
     const group = state.groups.find(g => g.id === action.id);
-    return { focusedGroupId: group ? action.id : null };
+    if (!group) {
+      console.error(`Attempted to focus group ${action.id} which is not loaded`);
+      return {};
+    }
+    return { focusedGroupId: action.id };
   },
 
   LOAD_GROUPS(state, action) {

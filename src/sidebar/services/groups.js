@@ -62,12 +62,12 @@ function groups($rootScope, store, api, isSidebar, localStorage, serviceUrl, ses
         params.document_uri = uri;
       }
       return api.groups.list(params);
-    }).then(gs => {
+    }).then(groups => {
       var isFirstLoad = store.allGroups().length === 0;
       var prevFocusedGroup = localStorage.getItem(STORAGE_KEY);
 
-      store.loadGroups(gs);
-      if (isFirstLoad) {
+      store.loadGroups(groups);
+      if (isFirstLoad && groups.some(g => g.id === prevFocusedGroup)) {
         store.focusGroup(prevFocusedGroup);
       }
 
