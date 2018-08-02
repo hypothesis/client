@@ -4,6 +4,16 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+### Changed
+
+- Convert share dialog links to use bouncer instead of via.
+  ([#748](https://github.com/hypothesis/client/pull/748)).
+
+- Use a pointer cursor for highlights
+  ([#753](https://github.com/hypothesis/client/pull/753)).
+
 ## [1.85.0] - 2018-07-10
 
 ### Changed
