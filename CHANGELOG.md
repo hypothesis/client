@@ -4,7 +4,7 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
-## [Unreleased]
+## [1.87.0] - 2018-08-02
 
 ### Changed
 
