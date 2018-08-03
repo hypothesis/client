@@ -59,6 +59,8 @@ function freeze(selection) {
 
 function init(settings) {
   return {
+    directLinkedAnnotationId: settings.annotations,
+
     // Contains a map of annotation tag:true pairs.
     focusedAnnotationMap: null,
 
@@ -305,6 +307,10 @@ function clearSelectedAnnotations() {
   return {type: actions.CLEAR_SELECTION};
 }
 
+function directLinkedAnnotationId(state) {
+  return state.directLinkedAnnotationId;
+}
+
 module.exports = {
   init: init,
   update: update,
@@ -324,6 +330,7 @@ module.exports = {
   },
 
   selectors: {
+    directLinkedAnnotationId,
     hasSelectedAnnotations,
     isAnnotationSelected,
   },

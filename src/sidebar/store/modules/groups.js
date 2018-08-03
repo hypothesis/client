@@ -1,6 +1,10 @@
 'use strict';
 
+const { createSelector } = require('reselect');
+
 const util = require('../util');
+const { profile } = require('./session').selectors;
+const { directLinkedAnnotationGroup } = require('./annotations').selectors;
 
 function init() {
   return {
@@ -95,14 +99,46 @@ function focusedGroupId(state) {
   return state.focusedGroupId;
 }
 
+function isWorldGroup(id) {
+  return id === '__world__';
+}
+
+const hasNonWorldGroup = createSelector(
+  [state => state.groups],
+  groups => groups.some(g => !isWorldGroup(g.id))
+);
+
 /**
- * Return the list of all groups.
+ * Return true if the "Public" group should be shown.
+ */
+const shouldShowWorldGroup = createSelector(
+  [hasNonWorldGroup, profile, directLinkedAnnotationGroup],
+  (hasNonWorldGroup, profile, directLinkedAnnotationGroup) => {
+    if (profile.userid !== null) {
+      // Logged-in users always see the "Public" group.
+      return true;
+    }
+    // Logged-out users only see it if it is the only group or they followed a
+    // direct link to an annotation in the "Public" group.
+    return !hasNonWorldGroup || isWorldGroup(directLinkedAnnotationGroup);
+  }
+);
+
+/**
+ * Return the list of all groups that should be displayed.
  *
  * @return {Group[]}
  */
-function allGroups(state) {
-  return state.groups;
-}
+const allGroups = createSelector(
+  [shouldShowWorldGroup, state => state.groups],
+  (shouldShowWorldGroup, groups) => {
+    if (shouldShowWorldGroup) {
+      return groups;
+    } else {
+      return groups.filter(g => !isWorldGroup(g.id));
+    }
+  }
+);
 
 /**
  * Return the group with the given ID.

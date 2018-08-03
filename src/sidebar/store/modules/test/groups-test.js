@@ -1,6 +1,9 @@
 'use strict';
 
 const createStore = require('../../create-store');
+const annotations = require('../annotations');
+const selection = require('../selection');
+const session = require('../session');
 const groups = require('../groups');
 
 describe('sidebar.store.modules.groups', () => {
@@ -12,6 +15,11 @@ describe('sidebar.store.modules.groups', () => {
   const privateGroup = {
     id: 'foo',
     name: 'Private',
+  };
+
+  const openGroupForCurrentWebsite = {
+    id: 'opengroup',
+    name: 'BioPub Public Comments',
   };
 
   let store;
@@ -72,9 +80,60 @@ describe('sidebar.store.modules.groups', () => {
   });
 
   describe('allGroups', () => {
-    it('returns all groups', () => {
+    const directLinkedPublicAnn = {
+      id: 'direct-linked-id',
+      group: '__world__',
+    };
+
+    const directLinkedOpenGroupAnn = {
+      id: 'direct-linked-id',
+      group: openGroupForCurrentWebsite.id,
+    };
+
+    const makeStore = (directLinkedId=null) => createStore(
+      [annotations, groups, selection, session],
+      [{ annotations: directLinkedId }]
+    );
+
+    const loggedInUser = {
+      userid: 'acct:johnsmith@hypothes.is',
+      features: {},
+      preferences: {},
+    };
+
+    beforeEach(() => {
+      store = makeStore();
+    });
+
+    it('returns all groups for logged-in users', () => {
       store.loadGroups([publicGroup, privateGroup]);
+      store.updateSession(loggedInUser);
       assert.deepEqual(store.allGroups(), [publicGroup, privateGroup]);
+    });
+
+    it('includes "Public" group for logged-out users if page has no associated groups', () => {
+      store.loadGroups([publicGroup]);
+      assert.deepEqual(store.allGroups(), [publicGroup]);
+    });
+
+    it('excludes "Public" group for logged-out users if page has associated groups', () => {
+      store.loadGroups([publicGroup, openGroupForCurrentWebsite]);
+      assert.deepEqual(store.allGroups(), [openGroupForCurrentWebsite]);
+    });
+
+    it('includes "Public" group for logged-out users if direct linked to "Public" annotation', () => {
+      store = makeStore(directLinkedPublicAnn.id);
+      store.loadGroups([openGroupForCurrentWebsite, publicGroup]);
+      store.addAnnotations([directLinkedPublicAnn]);
+      assert.deepEqual(store.allGroups(), [openGroupForCurrentWebsite, publicGroup]);
+    });
+
+    it('excludes "Public" group for logged-out users if ' +
+       ' direct linked to non-"Public" annotation', () => {
+      store = makeStore(directLinkedOpenGroupAnn);
+      store.loadGroups([openGroupForCurrentWebsite, publicGroup]);
+      store.addAnnotations([directLinkedOpenGroupAnn]);
+      assert.deepEqual(store.allGroups(), [openGroupForCurrentWebsite]);
     });
   });
 
