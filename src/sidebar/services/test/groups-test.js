@@ -68,7 +68,7 @@ describe('groups', function() {
       },
 
       $on: function(event, callback) {
-        if (event === events.GROUPS_CHANGED || event === events.USER_CHANGED || event === events.FRAME_CONNECTED) {
+        if (event === events.USER_CHANGED || event === events.FRAME_CONNECTED) {
           this.eventCallbacks[event] = callback;
         }
       },
@@ -250,18 +250,13 @@ describe('groups', function() {
   });
 
   describe('calls load on various events', function () {
-    var changeEvents = [
-      {event: events.GROUPS_CHANGED},
-      {event: events.USER_CHANGED},
-    ];
-
-    unroll('should fetch the list of groups from the server when #event occurs', function (testCase) {
+    it('refetches groups when the logged-in user changes', () => {
       service();
 
-      return fakeRootScope.eventCallbacks[testCase.event]().then(() => {
+      return fakeRootScope.eventCallbacks[events.USER_CHANGED]().then(() => {
         assert.calledOnce(fakeApi.groups.list);
       });
-    }, changeEvents);
+    });
 
     context('when a new frame connects', () => {
       it('should refetch groups if main frame URL has changed', () => {

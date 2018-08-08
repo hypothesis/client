@@ -130,12 +130,6 @@ function groups($rootScope, store, api, isSidebar, localStorage, serviceUrl, ses
     }
   });
 
-  // reset the focused group if the user leaves it
-  $rootScope.$on(events.GROUPS_CHANGED, function () {
-    // return for use in test
-    return load();
-  });
-
   // refetch the list of groups when user changes
   $rootScope.$on(events.USER_CHANGED, () => {
     // FIXME Makes a second api call on page load. better way?
