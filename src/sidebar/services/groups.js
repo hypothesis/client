@@ -1,14 +1,3 @@
-/**
- * @ngdoc service
- * @name  groups
- *
- * @description Provides access to the list of groups that the user is currently
- *              a member of and the currently selected group in the UI.
- *
- *              The list of groups is initialized from the session state
- *              and can then later be updated using the add() and remove()
- *              methods.
- */
 'use strict';
 
 var STORAGE_KEY = 'hypothesis.groups.focus';
