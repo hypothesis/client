@@ -20,6 +20,9 @@ var serviceConfig = require('../service-config');
 // @ngInject
 function groups($rootScope, store, api, isSidebar, localStorage, serviceUrl, session,
                 settings) {
+
+  // The document URI passed to the most recent `GET /api/groups` call in order
+  // to include groups associated with this page.
   var documentUri;
 
   var svc = serviceConfig(settings);
@@ -61,6 +64,7 @@ function groups($rootScope, store, api, isSidebar, localStorage, serviceUrl, ses
       if (uri) {
         params.document_uri = uri;
       }
+      documentUri = uri;
       return api.groups.list(params);
     }).then(groups => {
       var isFirstLoad = store.allGroups().length === 0;
@@ -141,8 +145,6 @@ function groups($rootScope, store, api, isSidebar, localStorage, serviceUrl, ses
 
   // refetch the list of groups when document url changes
   $rootScope.$on(events.FRAME_CONNECTED, () => {
-    // FIXME Makes a third api call on page load. better way?
-    // return for use in test
     return getDocumentUriForGroupSearch().then(uri => {
       if (documentUri !== uri) {
         documentUri = uri;
