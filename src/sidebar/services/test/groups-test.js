@@ -3,7 +3,6 @@
 var events = require('../../events');
 var fakeReduxStore = require('../../test/fake-redux-store');
 var groups = require('../groups');
-var unroll = require('../../../shared/test/util').unroll;
 
 // Return a mock session service containing three groups.
 var sessionWithThreeGroups = function() {
