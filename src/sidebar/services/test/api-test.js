@@ -303,4 +303,31 @@ describe('sidebar.services.api', function () {
       $httpBackend.flush();
     });
   });
+
+  it('API calls return just the JSON response if `includeMetadata` is false', () => {
+    api.profile.read({}).then(response => {
+      assert.match(response, sinon.match({
+        userid: 'acct:user@example.com',
+      }));
+    });
+
+    $httpBackend.expectGET('http://example.com/api/profile')
+    .respond(() => [200, { userid: 'acct:user@example.com' }]);
+    $httpBackend.flush();
+  });
+
+  it('API calls return an `APIResponse` if `includeMetadata` is true', () => {
+    api.profile.read({}, null, { includeMetadata: true }).then(response => {
+      assert.match(response, sinon.match({
+        data: {
+          userid: 'acct:user@example.com',
+        },
+        token: 'faketoken',
+      }));
+    });
+
+    $httpBackend.expectGET('http://example.com/api/profile')
+    .respond(() => [200, { userid: 'acct:user@example.com' }]);
+    $httpBackend.flush();
+  });
 });

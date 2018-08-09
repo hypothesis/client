@@ -95,12 +95,29 @@ function serializeParams(params) {
 }
 
 /**
+ * @typedef APIResponse
+ * @prop {any} data - The JSON response from the API call.
+ * @prop {string|null} token - The access token that was used to make the call
+ *   or `null` if unauthenticated.
+ */
+
+/**
+ * Options controlling how an API call is made or processed.
+ *
+ * @typedef APICallOptions
+ * @prop [boolean] includeMetadata - If false (the default), the response is
+ *   just the JSON response from the API. If true, the response is an `APIResponse`
+ *   containing additional metadata about the request and response.
+ */
+
+/**
  * Function which makes an API request.
  *
  * @typedef {function} APICallFunction
  * @param [any] params - A map of URL and query string parameters to include with the request.
  * @param [any] data - The body of the request.
- * @return {Promise<any>}
+ * @param [APICallOptions] options
+ * @return {Promise<any|APIResponse>}
  */
 
 /**
@@ -116,13 +133,14 @@ function serializeParams(params) {
  * @return {APICallFunction}
  */
 function createAPICall($http, $q, links, route, tokenGetter) {
-  return function (params, data) {
+  return function (params, data, options = {}) {
     // `$q.all` is used here rather than `Promise.all` because testing code that
     // mixes native Promises with the `$q` promises returned by `$http`
     // functions gets awkward in tests.
+    var token;
     return $q.all([links, tokenGetter()]).then(function (linksAndToken) {
       var links = linksAndToken[0];
-      var token = linksAndToken[1];
+      token = linksAndToken[1];
 
       var descriptor = get(links, route);
       var url = urlUtil.replaceURLParams(descriptor.url, params);
@@ -142,7 +160,11 @@ function createAPICall($http, $q, links, route, tokenGetter) {
       };
       return $http(req);
     }).then(function (response) {
-      return response.data;
+      if (options.includeMetadata) {
+        return { data: response.data, token };
+      } else {
+        return response.data;
+      }
     }).catch(function (response) {
       // Translate the API result into an `Error` to follow the convention that
       // Promises should be rejected with an Error or Error-like object.
