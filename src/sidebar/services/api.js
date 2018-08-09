@@ -95,6 +95,15 @@ function serializeParams(params) {
 }
 
 /**
+ * Function which makes an API request.
+ *
+ * @typedef {function} APICallFunction
+ * @param [any] params - A map of URL and query string parameters to include with the request.
+ * @param [any] data - The body of the request.
+ * @return {Promise<any>}
+ */
+
+/**
  * Creates a function that will make an API call to a named route.
  *
  * @param $http - The Angular HTTP service
@@ -104,6 +113,7 @@ function serializeParams(params) {
  * @param route - The dotted path of the named API route (eg. `annotation.create`)
  * @param {Function} tokenGetter - Function which returns a Promise for an
  *                   access token for the API.
+ * @return {APICallFunction}
  */
 function createAPICall($http, $q, links, route, tokenGetter) {
   return function (params, data) {
@@ -148,7 +158,16 @@ function createAPICall($http, $q, links, route, tokenGetter) {
  * API client for the Hypothesis REST API.
  *
  * Returns an object that with keys that match the routes in
- * the Hypothesis API (see http://h.readthedocs.io/en/latest/api/).
+ * the Hypothesis API (see http://h.readthedocs.io/en/latest/api/). See
+ * `APICallFunction` for the syntax of API calls. For example:
+ *
+ * ```
+ * api.annotations.update({ id: '1234' }, annotation).then(ann => {
+ *   // Do something with the updated annotation.
+ * }).catch(err => {
+ *   // Do something if the API call fails.
+ * });
+ * ```
  *
  * This service handles authenticated calls to the API, using the `auth` service
  * to get auth tokens. The URLs for API endpoints are fetched from the `/api`
