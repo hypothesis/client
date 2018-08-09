@@ -4,6 +4,22 @@ var events = require('../../events');
 var fakeReduxStore = require('../../test/fake-redux-store');
 var groups = require('../groups');
 
+/**
+ * Generate a truth table containing every possible combination of a set of
+ * boolean inputs.
+ *
+ * @param {number} columns
+ * @return {Array<boolean[]>}
+ */
+function truthTable(columns) {
+  if (columns === 1) {
+    return [[true], [false]];
+  }
+  var subTable = truthTable(columns - 1);
+  return [...subTable.map(row => [true, ...row]),
+          ...subTable.map(row => [false, ...row])];
+}
+
 // Return a mock session service containing three groups.
 var sessionWithThreeGroups = function() {
   return {
@@ -75,13 +91,20 @@ describe('groups', function() {
       $broadcast: sandbox.stub(),
     };
     fakeApi = {
+      annotation: {
+        get: sinon.stub(),
+      },
+
       group: {
         member: {
           delete: sandbox.stub().returns(Promise.resolve()),
         },
       },
       groups: {
-        list: sandbox.stub().returns(Promise.resolve(dummyGroups)),
+        list: sandbox.stub().returns(Promise.resolve({
+          data: dummyGroups,
+          token: '1234',
+        })),
       },
     };
     fakeServiceUrl = sandbox.stub();
@@ -179,6 +202,40 @@ describe('groups', function() {
       var svc = service();
       return svc.load().then(() => {
         assert.calledWith(fakeApi.groups.list, sinon.match({ authority: 'publisher.org' }));
+      });
+    });
+
+    truthTable(3).forEach(([ loggedIn, pageHasAssociatedGroups, directLinkToPublicAnnotation ]) => {
+      it('excludes the "Public" group if user logged out and page has associated groups', () => {
+        var svc = service();
+        var shouldShowPublicGroup = loggedIn || !pageHasAssociatedGroups || directLinkToPublicAnnotation;
+
+        // Setup the direct-linked annotation.
+        if (directLinkToPublicAnnotation) {
+          fakeApi.annotation.get.returns(Promise.resolve({
+            id: 'direct-linked-ann',
+            group: '__world__',
+          }));
+          fakeSettings.annotations = 'direct-linked-ann';
+        } else {
+          fakeSettings.annotations = null;
+        }
+
+        // Create groups response from server.
+        var groups = [{ name: 'Public', id: '__world__' }];
+        if (pageHasAssociatedGroups) {
+          groups.push({ name: 'BioPub', id: 'biopub' });
+        }
+
+        fakeApi.groups.list.returns(Promise.resolve({
+          token: loggedIn ? '1234' : null,
+          data: groups,
+        }));
+
+        return svc.load().then(groups => {
+          var publicGroupShown = groups.some(g => g.id === '__world__');
+          assert.equal(publicGroupShown, shouldShowPublicGroup);
+        });
       });
     });
   });
