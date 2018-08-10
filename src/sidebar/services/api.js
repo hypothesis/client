@@ -95,6 +95,32 @@ function serializeParams(params) {
 }
 
 /**
+ * @typedef APIResponse
+ * @prop {any} data - The JSON response from the API call.
+ * @prop {string|null} token - The access token that was used to make the call
+ *   or `null` if unauthenticated.
+ */
+
+/**
+ * Options controlling how an API call is made or processed.
+ *
+ * @typedef APICallOptions
+ * @prop [boolean] includeMetadata - If false (the default), the response is
+ *   just the JSON response from the API. If true, the response is an `APIResponse`
+ *   containing additional metadata about the request and response.
+ */
+
+/**
+ * Function which makes an API request.
+ *
+ * @typedef {function} APICallFunction
+ * @param [any] params - A map of URL and query string parameters to include with the request.
+ * @param [any] data - The body of the request.
+ * @param [APICallOptions] options
+ * @return {Promise<any|APIResponse>}
+ */
+
+/**
  * Creates a function that will make an API call to a named route.
  *
  * @param $http - The Angular HTTP service
@@ -104,20 +130,20 @@ function serializeParams(params) {
  * @param route - The dotted path of the named API route (eg. `annotation.create`)
  * @param {Function} tokenGetter - Function which returns a Promise for an
  *                   access token for the API.
+ * @return {APICallFunction}
  */
 function createAPICall($http, $q, links, route, tokenGetter) {
-  return function (params, data) {
+  return function (params, data, options = {}) {
     // `$q.all` is used here rather than `Promise.all` because testing code that
     // mixes native Promises with the `$q` promises returned by `$http`
     // functions gets awkward in tests.
-    return $q.all([links, tokenGetter()]).then(function (linksAndToken) {
-      var links = linksAndToken[0];
-      var token = linksAndToken[1];
-
+    var accessToken;
+    return $q.all([links, tokenGetter()]).then(([links, token]) => {
       var descriptor = get(links, route);
       var url = urlUtil.replaceURLParams(descriptor.url, params);
       var headers = {};
 
+      accessToken = token;
       if (token) {
         headers.Authorization = 'Bearer ' + token;
       }
@@ -132,7 +158,11 @@ function createAPICall($http, $q, links, route, tokenGetter) {
       };
       return $http(req);
     }).then(function (response) {
-      return response.data;
+      if (options.includeMetadata) {
+        return { data: response.data, token: accessToken };
+      } else {
+        return response.data;
+      }
     }).catch(function (response) {
       // Translate the API result into an `Error` to follow the convention that
       // Promises should be rejected with an Error or Error-like object.
@@ -148,7 +178,16 @@ function createAPICall($http, $q, links, route, tokenGetter) {
  * API client for the Hypothesis REST API.
  *
  * Returns an object that with keys that match the routes in
- * the Hypothesis API (see http://h.readthedocs.io/en/latest/api/).
+ * the Hypothesis API (see http://h.readthedocs.io/en/latest/api/). See
+ * `APICallFunction` for the syntax of API calls. For example:
+ *
+ * ```
+ * api.annotations.update({ id: '1234' }, annotation).then(ann => {
+ *   // Do something with the updated annotation.
+ * }).catch(err => {
+ *   // Do something if the API call fails.
+ * });
+ * ```
  *
  * This service handles authenticated calls to the API, using the `auth` service
  * to get auth tokens. The URLs for API endpoints are fetched from the `/api`

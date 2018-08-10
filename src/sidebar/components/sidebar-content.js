@@ -237,6 +237,20 @@ function SidebarContentController(
     store.profile().userid,
     ...store.searchUris(),
   ]), ([currentGroupId], [prevGroupId]) => {
+    // FIXME - There is a bug here where the set of displayed annotations can
+    // end up not matching the focused group when the user logs out.
+    //
+    // When a user logs in or out, we re-fetch profile and group information
+    // concurrently. If the profile fetch completes first, it will trigger
+    // an annotation fetch. If the group fetch then completes before the
+    // annotation fetch, and the focused group changes due to the previous
+    // focused group not being in the new set of groups, then the `if` below
+    // will skip refetching annotations a second time. This will result in the
+    // wrong set of displayed annotations.
+    //
+    // This should only affect users logging out because the set of groups for
+    // logged-in users is currently a superset of those for logged-out users on
+    // any given page.
 
     if (currentGroupId !== prevGroupId) {
       // The focused group may be changed during loading annotations as a result

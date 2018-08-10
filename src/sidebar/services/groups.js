@@ -27,17 +27,65 @@ function groups($rootScope, store, api, isSidebar, localStorage, serviceUrl, ses
     return awaitStateChange(store, mainUri);
   }
 
+  /**
+   * Filter the returned list of groups from the API.
+   *
+   * `filterGroups` performs client-side filtering to hide the "Public" group
+   * for logged-out users under certain conditions.
+   *
+   * @param {Group[]} groups
+   * @param {boolean} isLoggedIn
+   * @param {string|null} directLinkedAnnotationId
+   * @return {Promise<Group[]>}
+   */
+  function filterGroups(groups, isLoggedIn, directLinkedAnnotationId) {
+    // Logged-in users always see the "Public" group.
+    if (isLoggedIn) {
+      return Promise.resolve(groups);
+    }
+
+    // If the main document URL has no groups associated with it, always show
+    // the "Public" group.
+    var pageHasAssociatedGroups = groups.some(g => g.id !== '__world__');
+    if (!pageHasAssociatedGroups) {
+      return Promise.resolve(groups);
+    }
+
+    // Hide the "Public" group, unless the user specifically visited a direct-
+    // link to an annotation in that group.
+    var nonWorldGroups = groups.filter(g => g.id !== '__world__');
+
+    if (!directLinkedAnnotationId) {
+      return Promise.resolve(nonWorldGroups);
+    }
+
+    return api.annotation.get({ id: directLinkedAnnotationId }).then(ann => {
+      if (ann.group === '__world__') {
+        return groups;
+      } else {
+        return nonWorldGroups;
+      }
+    }).catch(() => {
+      // Annotation does not exist or we do not have permission to read it.
+      // Assume it is not in "Public".
+      return nonWorldGroups;
+    });
+  }
+
   // The document URI passed to the most recent `GET /api/groups` call in order
   // to include groups associated with this page. This is retained to determine
   // whether we need to re-fetch groups if the URLs of frames connected to the
   // sidebar app changes.
   var documentUri;
 
+
   /**
    * Fetch the list of applicable groups from the API.
    *
    * The list of applicable groups depends on the current userid and the URI of
    * the attached frames.
+   *
+   * @return {Promise<Group[]>}
    */
   function load() {
     var uri = Promise.resolve(null);
@@ -55,7 +103,13 @@ function groups($rootScope, store, api, isSidebar, localStorage, serviceUrl, ses
         params.document_uri = uri;
       }
       documentUri = uri;
-      return api.groups.list(params);
+
+      // Fetch groups from the API.
+      return api.groups.list(params, null, { includeMetadata: true });
+    }).then(({ data, token }) => {
+      var isLoggedIn = token !== null;
+      var directLinkedAnnotation = settings.annotations;
+      return filterGroups(data, isLoggedIn, directLinkedAnnotation);
     }).then(groups => {
       var isFirstLoad = store.allGroups().length === 0;
       var prevFocusedGroup = localStorage.getItem(STORAGE_KEY);
@@ -65,7 +119,7 @@ function groups($rootScope, store, api, isSidebar, localStorage, serviceUrl, ses
         store.focusGroup(prevFocusedGroup);
       }
 
-      return store.allGroups();
+      return groups;
     });
   }
 
