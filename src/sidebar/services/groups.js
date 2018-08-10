@@ -20,11 +20,6 @@ var serviceConfig = require('../service-config');
 // @ngInject
 function groups($rootScope, store, api, isSidebar, localStorage, serviceUrl, session,
                 settings) {
-
-  // The document URI passed to the most recent `GET /api/groups` call in order
-  // to include groups associated with this page.
-  var documentUri;
-
   var svc = serviceConfig(settings);
   var authority = svc ? svc.authority : null;
 
@@ -42,6 +37,12 @@ function groups($rootScope, store, api, isSidebar, localStorage, serviceUrl, ses
     }
     return awaitStateChange(store, mainUri);
   }
+
+  // The document URI passed to the most recent `GET /api/groups` call in order
+  // to include groups associated with this page. This is retained to determine
+  // whether we need to re-fetch groups if the URLs of frames connected to the
+  // sidebar app changes.
+  var documentUri;
 
   /**
    * Fetch the list of applicable groups from the API.
