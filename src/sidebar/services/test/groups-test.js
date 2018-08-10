@@ -3,7 +3,6 @@
 var events = require('../../events');
 var fakeReduxStore = require('../../test/fake-redux-store');
 var groups = require('../groups');
-var unroll = require('../../../shared/test/util').unroll;
 
 // Return a mock session service containing three groups.
 var sessionWithThreeGroups = function() {
@@ -68,7 +67,7 @@ describe('groups', function() {
       },
 
       $on: function(event, callback) {
-        if (event === events.GROUPS_CHANGED || event === events.USER_CHANGED || event === events.FRAME_CONNECTED) {
+        if (event === events.USER_CHANGED || event === events.FRAME_CONNECTED) {
           this.eventCallbacks[event] = callback;
         }
       },
@@ -250,18 +249,41 @@ describe('groups', function() {
   });
 
   describe('calls load on various events', function () {
-    var changeEvents = [
-      {event: events.GROUPS_CHANGED},
-      {event: events.USER_CHANGED},
-      {event: events.FRAME_CONNECTED},
-    ];
-
-    unroll('should fetch the list of groups from the server when #event occurs', function (testCase) {
+    it('refetches groups when the logged-in user changes', () => {
       service();
 
-      return fakeRootScope.eventCallbacks[testCase.event]().then(() => {
+      return fakeRootScope.eventCallbacks[events.USER_CHANGED]().then(() => {
         assert.calledOnce(fakeApi.groups.list);
       });
-    }, changeEvents);
+    });
+
+    context('when a new frame connects', () => {
+      it('should refetch groups if main frame URL has changed', () => {
+        var svc = service();
+
+        fakeStore.setState({ searchUris: ['https://domain.com/page-a'] });
+        return svc.load().then(() => {
+          // Simulate main frame URL change, eg. due to client-side navigation in
+          // a single page application.
+          fakeApi.groups.list.resetHistory();
+          fakeStore.setState({searchUris: ['https://domain.com/page-b']});
+
+          return fakeRootScope.eventCallbacks[events.FRAME_CONNECTED]();
+        }).then(() => {
+          assert.calledOnce(fakeApi.groups.list);
+        });
+      });
+
+      it('should not refetch groups if main frame URL has not changed', () => {
+        var svc = service();
+
+        fakeStore.setState({ searchUris: ['https://domain.com/page-a'] });
+        return svc.load().then(() => {
+          return fakeRootScope.eventCallbacks[events.FRAME_CONNECTED]();
+        }).then(() => {
+          assert.calledOnce(fakeApi.groups.list);
+        });
+      });
+    });
   });
 });

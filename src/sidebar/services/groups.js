@@ -20,8 +20,6 @@ var serviceConfig = require('../service-config');
 // @ngInject
 function groups($rootScope, store, api, isSidebar, localStorage, serviceUrl, session,
                 settings) {
-  var documentUri;
-
   var svc = serviceConfig(settings);
   var authority = svc ? svc.authority : null;
 
@@ -39,6 +37,12 @@ function groups($rootScope, store, api, isSidebar, localStorage, serviceUrl, ses
     }
     return awaitStateChange(store, mainUri);
   }
+
+  // The document URI passed to the most recent `GET /api/groups` call in order
+  // to include groups associated with this page. This is retained to determine
+  // whether we need to re-fetch groups if the URLs of frames connected to the
+  // sidebar app changes.
+  var documentUri;
 
   /**
    * Fetch the list of applicable groups from the API.
@@ -61,6 +65,7 @@ function groups($rootScope, store, api, isSidebar, localStorage, serviceUrl, ses
       if (uri) {
         params.document_uri = uri;
       }
+      documentUri = uri;
       return api.groups.list(params);
     }).then(groups => {
       var isFirstLoad = store.allGroups().length === 0;
@@ -126,12 +131,6 @@ function groups($rootScope, store, api, isSidebar, localStorage, serviceUrl, ses
     }
   });
 
-  // reset the focused group if the user leaves it
-  $rootScope.$on(events.GROUPS_CHANGED, function () {
-    // return for use in test
-    return load();
-  });
-
   // refetch the list of groups when user changes
   $rootScope.$on(events.USER_CHANGED, () => {
     // FIXME Makes a second api call on page load. better way?
@@ -141,8 +140,6 @@ function groups($rootScope, store, api, isSidebar, localStorage, serviceUrl, ses
 
   // refetch the list of groups when document url changes
   $rootScope.$on(events.FRAME_CONNECTED, () => {
-    // FIXME Makes a third api call on page load. better way?
-    // return for use in test
     return getDocumentUriForGroupSearch().then(uri => {
       if (documentUri !== uri) {
         documentUri = uri;
