@@ -137,15 +137,13 @@ function createAPICall($http, $q, links, route, tokenGetter) {
     // `$q.all` is used here rather than `Promise.all` because testing code that
     // mixes native Promises with the `$q` promises returned by `$http`
     // functions gets awkward in tests.
-    var token;
-    return $q.all([links, tokenGetter()]).then(function (linksAndToken) {
-      var links = linksAndToken[0];
-      token = linksAndToken[1];
-
+    var accessToken;
+    return $q.all([links, tokenGetter()]).then(([links, token]) => {
       var descriptor = get(links, route);
       var url = urlUtil.replaceURLParams(descriptor.url, params);
       var headers = {};
 
+      accessToken = token;
       if (token) {
         headers.Authorization = 'Bearer ' + token;
       }
@@ -161,7 +159,7 @@ function createAPICall($http, $q, links, route, tokenGetter) {
       return $http(req);
     }).then(function (response) {
       if (options.includeMetadata) {
-        return { data: response.data, token };
+        return { data: response.data, token: accessToken };
       } else {
         return response.data;
       }
