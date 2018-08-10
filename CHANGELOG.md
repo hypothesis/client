@@ -4,6 +4,17 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+### Changed
+
+- Remove unnecessary extra `/api/groups` request on startup
+  ([#756](https://github.com/hypothesis/client/pull/756)).
+
+- Hide "Public" group for unauthenticated users on sites that have their own
+  publicly-readable groups
+  ([#757](https://github.com/hypothesis/client/pull/757)).
+
 ## [1.87.0] - 2018-08-02
 
 ### Changed
