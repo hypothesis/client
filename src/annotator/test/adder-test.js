@@ -98,6 +98,13 @@ describe('annotator.adder', function () {
       annotateBtn.dispatchEvent(new Event('click'));
       assert.called(adderCallbacks.onAnnotate);
     });
+
+    it("calls onAnnotate callback when Annotate button's label is clicked", () => {
+      var annotateBtn = adderCtrl.element.querySelector('.js-annotate-btn');
+      var annotateLabel = annotateBtn.querySelector('span');
+      annotateLabel.dispatchEvent(new Event('click', { bubbles: true }));
+      assert.called(adderCallbacks.onAnnotate);
+    });
   });
 
   describe('#target', function () {

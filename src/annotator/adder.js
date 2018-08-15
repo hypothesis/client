@@ -4,9 +4,7 @@ var classnames = require('classnames');
 
 var template = require('./adder.html');
 
-var ANNOTATE_BTN_CLASS = 'js-annotate-btn';
 var ANNOTATE_BTN_SELECTOR = '.js-annotate-btn';
-
 var HIGHLIGHT_BTN_SELECTOR = '.js-highlight-btn';
 
 /**
@@ -154,25 +152,19 @@ class Adder {
     this._view = this.element.ownerDocument.defaultView;
     this._enterTimeout = null;
 
-    var handleCommand = (event) => {
+    var handleCommand = (event, callback) => {
       event.preventDefault();
       event.stopPropagation();
 
-      var isAnnotateCommand = event.target.classList.contains(ANNOTATE_BTN_CLASS);
-
-      if (isAnnotateCommand) {
-        options.onAnnotate();
-      } else {
-        options.onHighlight();
-      }
+      callback();
 
       this.hide();
     };
 
     this.element.querySelector(ANNOTATE_BTN_SELECTOR)
-      .addEventListener('click', handleCommand);
+      .addEventListener('click', event => handleCommand(event, options.onAnnotate));
     this.element.querySelector(HIGHLIGHT_BTN_SELECTOR)
-      .addEventListener('click', handleCommand);
+      .addEventListener('click', event => handleCommand(event, options.onHighlight));
 
     this._width = () => this.element.getBoundingClientRect().width;
     this._height = () => this.element.getBoundingClientRect().height;
