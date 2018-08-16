@@ -268,4 +268,23 @@ describe('DocumentMeta', function() {
       assert.equal(doc.uri(), canonicalLink.href);
     });
   });
+
+  describe('#refreshMetadata', () => {
+    it('clears the cached metadata', () => {
+      // This relies on the "citation_title" meta tag created by the metadata
+      // tests above.
+      const titleEl = $('meta[name="citation_title"]')[0];
+      titleEl.content = 'First title';
+      const doc = new DocumentMeta($('<div></div>')[0], {});
+      doc.pluginInit();
+
+      assert.equal(doc.metadata.title, 'First title');
+
+      titleEl.content = 'Second title';
+      assert.equal(doc.metadata.title, 'First title');
+
+      doc.refreshMetadata();
+      assert.equal(doc.metadata.title, 'Second title');
+    });
+  });
 });

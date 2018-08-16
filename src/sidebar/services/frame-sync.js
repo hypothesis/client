@@ -127,6 +127,7 @@ function FrameSync($rootScope, $window, Discovery, store, bridge) {
     });
 
     bridge.on('destroyFrame', destroyFrame.bind(this));
+    bridge.on('updateFrame', updateFrame.bind(this));
 
     // Map of annotation tag to anchoring status
     // ('anchored'|'orphan'|'timeout').
@@ -198,6 +199,10 @@ function FrameSync($rootScope, $window, Discovery, store, bridge) {
         uri: info.uri,
       });
     });
+  }
+
+  function updateFrame({ frameIdentifier, metadata, uri }) {
+    store.updateFrame({ id: frameIdentifier, metadata, uri });
   }
 
   function destroyFrame(frameIdentifier) {

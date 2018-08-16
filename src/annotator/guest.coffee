@@ -8,6 +8,9 @@ $ = require('jquery')
 
 adder = require('./adder')
 highlighter = require('./highlighter')
+historyObservable = require('./util/history-observable')
+metaObservable = require('./util/document-meta-observable')
+{ buffer, merge } = require('./util/observable')
 rangeUtil = require('./range-util')
 selections = require('./selections')
 xpathRange = require('./anchoring/range')
@@ -90,6 +93,19 @@ module.exports = class Guest extends Delegator
     @crossframe.onConnect(=> this._setupInitialState(config))
     this._connectAnnotationSync(@crossframe)
     this._connectAnnotationUISync(@crossframe)
+
+    # Observe document metadata and URL changes in SPAs and web pages
+    # using PJAX.
+    historyChanges = historyObservable()
+    metaChanges = metaObservable()
+    @historyOrMetaChanges = buffer(50, merge([historyChanges, metaChanges]))
+      .subscribe(=>
+        # Clear cached metadata
+        this.plugins.Document?.refreshMetadata()
+        this.getDocumentInfo().then((info) =>
+          @crossframe.call('updateFrame', info)
+        )
+      )
 
     # Load plugins
     for own name, opts of @options
@@ -176,6 +192,7 @@ module.exports = class Guest extends Delegator
     $('#annotator-dynamic-style').remove()
 
     this.selections.unsubscribe()
+    this.historyOrMetaChanges.unsubscribe()
     @adder.remove()
 
     @element.find('.annotator-hl').each ->
