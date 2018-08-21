@@ -205,6 +205,21 @@ describe('groups', function() {
       });
     });
 
+    it('injects a defalt organization if group is missing an organization', function () {
+      var svc = service();
+      const groups = [
+        { id: '39r39f', name: 'Ding Dong!' },
+      ];
+      fakeApi.groups.list.returns(Promise.resolve({
+          token: '1234',
+          data: groups,
+      }));
+      return svc.load().then(groups => {
+        assert.isObject(groups[0].organization);
+        assert.hasAllKeys(groups[0].organization, ['id', 'logo']);
+      });
+    });
+
     truthTable(3).forEach(([ loggedIn, pageHasAssociatedGroups, directLinkToPublicAnnotation ]) => {
       it('excludes the "Public" group if user logged out and page has associated groups', () => {
         var svc = service();
