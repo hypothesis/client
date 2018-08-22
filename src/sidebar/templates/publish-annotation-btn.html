@@ -8,13 +8,10 @@
 </button>
 <button class="btn-app btn-update"
         ng-click="vm.onSave()"
-        title="{{'Submit' | translate}}"
-        >
+        title="{{ vm.onCreate()  ? ('Submit' | translate) : ('Update' | translate)}}">
   <!-- <i class="h-icon-cancel-outline publish-annotation-cancel-btn__icon btn-icon"></i> -->
-  {{'Submit' | translate}}
+  {{ vm.onCreate()  ? ('Submit' | translate) : ('Update' | translate)}}
 </button>
-
-
 
 <!-- If the theme is not custom -->
 <div ng-if="!vm.isThemeCustom" dropdown="" class="publish-annotation-btn__btn" is-open="vm.showDropdown" keyboard-nav>
