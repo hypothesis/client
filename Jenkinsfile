@@ -3,7 +3,7 @@
 node {
     checkout scm
 
-    nodeEnv = docker.image("kkarczmarczyk/node-yarn:7.5")
+    nodeEnv = docker.image("node:10")
     workspace = pwd()
     pkgVersion = sh (
       script: 'cat package.json | jq -r .version',
