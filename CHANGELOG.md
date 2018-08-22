@@ -4,6 +4,16 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+### Changed
+
+- Create annotation when clicking "Annotate" button label
+  ([#749](https://github.com/hypothesis/client/pull/749)).
+
+- Support API returning groups without an organization
+  ([#760](https://github.com/hypothesis/client/pull/760)).
+
 ## [1.88.0] - 2018-08-10
 
 ### Changed
