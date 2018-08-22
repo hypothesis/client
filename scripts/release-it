@@ -2,8 +2,7 @@
 
 set -eu
 
-SEMVER=./node_modules/.bin/semver
-CURRENT_VERSION=$(jq -r .version package.json)
-NEW_VERSION=$($SEMVER -i minor "$CURRENT_VERSION")
 yarn config set version-sign-git-tag true
-yarn version --new-version $NEW_VERSION
+
+# Bump minor package version. The `--minor` option was added in Yarn v1.7.0.
+yarn version --minor
