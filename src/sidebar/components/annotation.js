@@ -257,6 +257,17 @@ function AnnotationController(
   };
 
   /**
+   * @ngdoc method
+   * @name annotation.AnnotationController#isCreateModeOn.
+   * @returns {boolean} `true` if this annotation is in the create mode
+   * @returns {boolean} `false` if this annotation is in the edit mode.
+   */
+
+  this.isCreateModeOn = function(){
+    return isNew(self.annotation);
+  };
+
+  /**
     * @ngdoc method
     * @name annotation.AnnotationController#group.
     * @returns {Object} The full group object associated with the annotation.

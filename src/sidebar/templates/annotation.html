@@ -4,6 +4,10 @@
 
 <div ng-keydown="vm.onKeydown($event)" ng-if="vm.user()">
 
+  <div class="feedback-title" ng-if="vm.editing()">
+    {{vm.isCreateModeOn() ? 'Add Feedback' : 'Edit Feedback'}}
+  </div>
+
   <!-- Excerpts -->
   <section class="annotation-quote-list"
     ng-class="{'is-orphan' : vm.isOrphan()}"
@@ -42,7 +46,7 @@
       </div>
 
     </excerpt>
-    <p ng-if="vm.editing()" style="font-size:11px;">Your feedback will be visible to other users and an issue will be opened for the documentation team.</p>
+    <p ng-if="vm.editing() && vm.isCreateModeOn()" style="font-size:11px;">Your feedback will be visible to other users and an issue will be opened for the documentation team.</p>
   </section>
 
   <!-- / Body -->
@@ -95,7 +99,9 @@
         is-shared="vm.isShared()"
         on-cancel="vm.revert()"
         on-save="vm.save()"
-        on-set-privacy="vm.setPrivacy(level)"></publish-annotation-btn>
+        on-set-privacy="vm.setPrivacy(level)"
+        on-create="vm.isCreateModeOn()"
+        ></publish-annotation-btn>
     </div>
 
     <div class="annotation-section annotation-license"
