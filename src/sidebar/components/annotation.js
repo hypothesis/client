@@ -95,6 +95,9 @@ function AnnotationController(
     /** True if the 'Share' dialog for this annotation is currently open. */
     self.showShareDialog = false;
 
+    /** Determines whether the feedback should be collapsed according to the BZ/Jira bug status */
+    self.collapseFeedback = true;
+
     /**
       * `true` if this AnnotationController instance was created as a result of
       * the highlight button being clicked.
@@ -540,16 +543,53 @@ function AnnotationController(
   };
 
   this.state = function () {
+    // This is the data that will return to me.
+    // var tags = ["bug=bugType:bz;bugID:24918249;status:A"];
+    var tags = [{'bug':{
+      'bugType':'BZ',
+      'bugID':'1466411',
+      'status':'C'
+    }}];
+
+    // Find the object that has the 'bug' attribute and return it as a status/
+    // The reason of doing this, not to change the type of tags in the structure.
+    var feedbackStatus = tags.find(function(tag){
+      return tag.bug !== undefined;
+    });
+
     var draft = drafts.get(self.annotation);
     if (draft) {
       return draft;
     }
     return {
-      tags: self.annotation.tags,
+      status: feedbackStatus,
       text: self.annotation.text,
       isPrivate: !permissions.isShared(self.annotation.permissions,
                                        self.annotation.user),
     };
+
+  };
+
+  this.feedbackStatus = function(status, type){
+    var feedbackStatus = {
+      'A' : {'status':'opened', 'icon':'h-icon-visibility'},
+      'I' : {'status':'in progress', 'icon':'h-icon-mail'},
+      'C' : {'status':'resolved', 'icon':'h-icon-visibility-off'},
+    }[status];
+
+    return {
+      'status' : feedbackStatus.status,
+      'icon' : feedbackStatus.icon,
+    }[type];
+  };
+
+  this.toggleCollapsedFeedback = function(event){
+    event.stopPropagation();
+    self.collapseFeedback = !self.collapseFeedback;
+  };
+
+  this.isResolved = function(){
+    return self.state().status.bug.status === 'C';
   };
 
   /**
