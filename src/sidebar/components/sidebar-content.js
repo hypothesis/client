@@ -297,6 +297,15 @@ function SidebarContentController(
   this.focus = focusAnnotation;
   this.scrollTo = scrollToAnnotation;
 
+  /*
+  * When the feedback is created, until it is fetched from server, the $tag
+  * attribute is starts with 'MC'. $tags are internal property, not written
+  * on the server. This function basically checks if the feedback is newly created.
+  */
+  this.isNewlyCreated = function(annotation){
+    return annotation.$tag.startsWith('MC');
+  };
+
   this.selectedAnnotationCount = function () {
     var selection = annotationUI.getState().selectedAnnotationMap;
     if (!selection) {

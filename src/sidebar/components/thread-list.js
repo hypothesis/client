@@ -79,7 +79,6 @@ function ThreadListController($element, $scope, settings, VirtualThreadList) {
       offscreenUpperHeight: state.offscreenUpperHeight + 'px',
       offscreenLowerHeight: state.offscreenLowerHeight + 'px',
     };
-
     scopeTimeout($scope, function () {
       state.visibleThreads.forEach(function (thread) {
         var height = getThreadHeight(thread.id);
@@ -243,6 +242,7 @@ module.exports = {
     onChangeCollapsed: '&',
     /** Called to clear the current selection. */
     onClearSelection: '&',
+    isNewlyCreated: '&',
   },
   template: require('../templates/thread-list.html'),
 };
