@@ -174,19 +174,10 @@ module.exports = class Guest extends Delegator
         this.anchor(annotation)
 
   _connectAnnotationUISync: (crossframe, config) ->
-    crossframe.on 'focusAnnotations', (tags=[], feedback_user, user_id, type) =>
-      className = getProperClassName(feedback_user, user_id, type)
-      selectedClassNames = 'annotator-hl-selected-public annotator-hl-selected-yours'
-      hoverClassNames = 'annotator-hl-hover-public annotator-hl-hover-yours'
+    crossframe.on 'focusAnnotations', (tags=[], className) =>
       for anchor in @anchors when anchor.highlights?
         toggle = anchor.annotation.$tag in tags
-        if toggle
-          # If the text is already selected, don't do anything, if not, highlights it with the lighter color
-          if !$(anchor.highlights).hasClass(selectedClassNames)
-            $(anchor.highlights).toggleClass(className)
-        else
-          # If the feedback is not hovered over and has one of the hover class, clear it.
-          $(anchor.highlights).removeClass(hoverClassNames)
+        $(anchor.highlights).toggleClass(className, toggle)
 
 
     crossframe.on 'scrollToAnnotation', (tag, feedback_user, user_id, type) =>
