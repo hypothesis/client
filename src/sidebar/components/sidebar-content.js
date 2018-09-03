@@ -66,11 +66,14 @@ function SidebarContentController(
 
   function focusAnnotation(annotation) {
     var highlights = [];
+    var typeOfHighlight = 'annotator-hl-hover-yours annotator-hl-hover-public';
+
     if (annotation) {
       highlights = [annotation.$tag];
+      typeOfHighlight = annotation.user ? 'annotator-hl-hover-yours' : 'annotator-hl-hover-public';
     }
     // Manage highlighting/unhighlighting the text of the corresponding hovered feedback in the sidebar
-    frameSync.focusAnnotations(highlights, annotation.user, this.auth.userid, 'hover');
+    frameSync.focusAnnotations(highlights, typeOfHighlight);
   }
 
   function scrollToAnnotation(annotation, event) {
