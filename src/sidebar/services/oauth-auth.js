@@ -167,9 +167,27 @@ function auth($http, $rootScope, $window, OAuthClient,
     if (!tokenInfoPromise) {
       var cfg = serviceConfig(settings);
 
+      if (cfg && cfg.grantToken === 'postMessage') {
+        tokenInfoPromise = new Promise(function(resolve, reject) {
+          /** Receive postMessage() response with grant token from LMS app. */
+          function receiveMessage(event) {
+            if (event.origin !== "http://localhost:8001") {
+              return;
+            }
+
+            oauthClient().then(function(client) {
+              client.exchangeGrantToken(event.data).then(function(accessToken) {
+                resolve(accessToken)
+              });
+            });
+          }
+          window.addEventListener("message", receiveMessage, false);
+          window.parent.parent.postMessage("gimme_grant_token", "http://localhost:8001");
+        });
+      }
       // Check if automatic login is being used, indicated by the presence of
       // the 'grantToken' property in the service configuration.
-      if (cfg && typeof cfg.grantToken !== 'undefined') {
+      else if (cfg && typeof cfg.grantToken !== 'undefined') {
         if (cfg.grantToken) {
           // User is logged-in on the publisher's website.
           // Exchange the grant token for a new access token.
