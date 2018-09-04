@@ -548,7 +548,7 @@ function AnnotationController(
     var tags = [{'bug':{
       'bugType':'BZ',
       'bugID':'1466411',
-      'status':'C'
+      'status':'A'
     }}];
 
     // Find the object that has the 'bug' attribute and return it as a status/
@@ -587,6 +587,7 @@ function AnnotationController(
     event.stopPropagation();
     self.collapseFeedback = !self.collapseFeedback;
   };
+
 
   this.isResolved = function(){
     return self.state().status.bug.status === 'C';
