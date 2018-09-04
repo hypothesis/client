@@ -180,16 +180,10 @@ module.exports = class Guest extends Delegator
         $(anchor.highlights).toggleClass(className, toggle)
 
 
-    crossframe.on 'scrollToAnnotation', (tag, feedback_user, user_id, type) =>
-      # Get the class name according to the given parameteres
-      className = getProperClassName(feedback_user, user_id, type)
-      selectedClassNames = 'annotator-hl-selected-public annotator-hl-selected-yours'
-
+    crossframe.on 'scrollToAnnotation', (tag, className) =>
       for anchor in @anchors when anchor.highlights?
-        # If the feedback is the selected feedback
-        if anchor.annotation.$tag is tag
-          # highlight/unhighlight the feedback on the doc
-          $(anchor.highlights).toggleClass(className) unless type is 'action'
+        if (anchor.annotation.$tag is tag)
+          $(anchor.highlights).toggleClass(className) unless className is undefined
 
           # scroll to the feedback
           event = new CustomEvent('scrolltorange', {
@@ -202,7 +196,7 @@ module.exports = class Guest extends Delegator
             scrollIntoView(anchor.highlights[0])
         else
           # If the feedback is not selected and has one of the selected class, clear it.
-          $(anchor.highlights).removeClass(selectedClassNames)
+          $(anchor.highlights).removeClass('annotator-hl-selected-public annotator-hl-selected-yours')
 
     crossframe.on 'getDocumentInfo', (cb) =>
       this.getDocumentInfo()

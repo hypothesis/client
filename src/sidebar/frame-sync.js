@@ -248,8 +248,8 @@ function FrameSync($rootScope, $window, Discovery, annotationUI, bridge) {
    *
    * @param {string} tag
    */
-  this.scrollToAnnotation = function (tag, feedback_user, user_id, type) {
-    bridge.call('scrollToAnnotation', tag, feedback_user, user_id, type);
+  this.scrollToAnnotation = function (tag, className) {
+    bridge.call('scrollToAnnotation', tag, className);
   };
 
   this.hideSidebar = function(){

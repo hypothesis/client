@@ -77,37 +77,29 @@ function SidebarContentController(
   }
 
   function scrollToAnnotation(annotation, event) {
-    if (!annotation) {
-      return;
-    }
-
-    var className = getProperClassName(annotation.user, this.auth.userid, 'card');
     var target = event.target || event.srcElement; // event.srcElement returns undefined in Firefox.
-    var listOfSpecialActions = ['h-icon-annotation-delete btn-icon' , 'delete-confirmation-yes btn-app btn-delete', 'delete-cancel btn-clean btn-cancel', 'publish-annotation-cancel-btn btn-clean ng-binding', 'btn-app btn-update ng-binding', 'btn btn-clean annotation-action-btn'];
-    var isSpecialAction = listOfSpecialActions.indexOf(target.className) !== -1 ;
-    // If the click is edit, scroll the page but do not touch the text highlight color
-    if(target.className === 'h-icon-annotation-edit btn-icon' || target.className === 'btn btn-clean annotation-action-btn' || target.className === 'h-icon-annotation-delete btn-icon'){
-      frameSync.scrollToAnnotation(annotation.$tag, annotation.user, this.auth.userid, 'action');
-    }
-    else if(isSpecialAction){
-    // If the click is delete or submit or cancel, do not scroll and do not touch the highlight color.
+    // If annotation is null (mouseout) or the event is cancel, update or delete do nothing.
+    if (!annotation || target.nodeName === 'BUTTON') {
       return;
+    }
+    // If the event is edit or delete scroll the page but keep highlighted/unhighlighted the text.
+    if(target.nodeName === 'I'){
+      frameSync.scrollToAnnotation(annotation.$tag);
     }
     else{
       // Manage highlighting/unhighlighting the selected feedback in the sidebar
-      document.getElementById(annotation.id).classList.toggle(className);
-      // ** Clear all other feedback highlights **
-      // See if there is already selected feedback in the sidebar. It has to be max one selected feedback in the case that we do not have the bucket bar!
-      var allFeedbackOnThePage = document.querySelectorAll('.default__card-selected, .users__card-selected');
-      allFeedbackOnThePage.forEach(function(card){
-        if (card.id !== annotation.id){
-          //  Remove the possible existing classes if the feedback is not the one selected
-          document.getElementById(card.id).classList.remove('default__card-selected', 'users__card-selected');
-        }
-      });
+      document.getElementById(annotation.id).classList.toggle(getProperClassName(annotation.user, this.auth.userid, 'card'));
       // Manage highlighting/unhighlighting the text of the corresponding selected feedback in the sidebar
-      frameSync.scrollToAnnotation(annotation.$tag, annotation.user, this.auth.userid, 'text');
+      frameSync.scrollToAnnotation(annotation.$tag, getProperClassName(annotation.user, this.auth.userid, 'text'));
     }
+    // Clear all other feedback highlights
+    var allFeedbackOnThePage = document.querySelectorAll('.default__card-selected, .users__card-selected');
+    allFeedbackOnThePage.forEach(function(card){
+      if (card.id !== annotation.id){
+      // Remove the possible existing classes if the feedback is not the one selected
+        document.getElementById(card.id).classList.remove('default__card-selected', 'users__card-selected');
+      }
+    });
   }
 
   /**
