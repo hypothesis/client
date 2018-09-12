@@ -2,6 +2,7 @@
 
 const EventEmitter = require('tiny-emitter');
 
+const { assertPromiseIsRejected } = require('../../../shared/test/promise-util');
 const { call } = require('../postmessage-json-rpc');
 
 class FakeWindow {
@@ -10,16 +11,6 @@ class FakeWindow {
     this.addEventListener = this.emitter.on.bind(this.emitter);
     this.removeEventListener = this.emitter.off.bind(this.emitter);
   }
-}
-
-function assertPromiseIsRejected(promise, expectedErr) {
-  const rejectFlag = {};
-  return promise.catch(err => {
-    assert.equal(err.message, expectedErr);
-    return rejectFlag;
-  }).then(result => {
-    assert.equal(result, rejectFlag, 'expected promise to be rejected but it was fulfilled');
-  });
 }
 
 describe('sidebar.util.postmessage-json-rpc', () => {
