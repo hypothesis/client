@@ -24,6 +24,7 @@ function configFrom(window_) {
     onLayoutChange: settings.hostPageSetting('onLayoutChange'),
     openSidebar: settings.hostPageSetting('openSidebar', {allowInBrowserExt: true}),
     query: settings.query,
+    requestConfigFromFrame: settings.hostPageSetting('requestConfigFromFrame'),
     services: settings.hostPageSetting('services'),
     showHighlights: settings.showHighlights,
     sidebarAppUrl: settings.sidebarAppUrl,

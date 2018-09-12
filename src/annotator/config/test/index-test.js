@@ -87,15 +87,17 @@ describe('annotator.config.index', function() {
 
   [
     'assetRoot',
-    'openSidebar',
     'branding',
+    'openSidebar',
+    'requestConfigFromFrame',
     'services',
   ].forEach(function(settingName) {
     it('returns the ' + settingName + ' value from the host page', function() {
       var settings = {
         'assetRoot': 'chrome-extension://1234/client/',
-        'openSidebar': 'OPEN_SIDEBAR_SETTING',
         'branding': 'BRANDING_SETTING',
+        'openSidebar': 'OPEN_SIDEBAR_SETTING',
+        'requestConfigFromFrame': 'https://embedder.com',
         'services': 'SERVICES_SETTING',
       };
       fakeSettingsFrom().hostPageSetting = function(settingName) {
