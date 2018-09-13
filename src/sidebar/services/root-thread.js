@@ -98,8 +98,8 @@ function RootThread($rootScope, store, drafts, searchFilter, viewFilter) {
   // Note: These events could all be converted into actions that are handled by
   // the Redux store in store.
   const loadEvents = [events.ANNOTATION_CREATED,
-                    events.ANNOTATION_UPDATED,
-                    events.ANNOTATIONS_LOADED];
+                      events.ANNOTATION_UPDATED,
+                      events.ANNOTATIONS_LOADED];
   loadEvents.forEach(function (event) {
     $rootScope.$on(event, function (event, annotation) {
       store.addAnnotations([].concat(annotation));
