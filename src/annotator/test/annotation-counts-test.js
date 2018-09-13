@@ -1,13 +1,13 @@
 'use strict';
 
-var annotationCounts = require('../annotation-counts');
+const annotationCounts = require('../annotation-counts');
 
 describe('annotationCounts', function () {
-  var countEl1;
-  var countEl2;
-  var CrossFrame;
-  var fakeCrossFrame;
-  var sandbox;
+  let countEl1;
+  let countEl2;
+  let CrossFrame;
+  let fakeCrossFrame;
+  let sandbox;
 
   beforeEach(function () {
     CrossFrame = null;
@@ -35,16 +35,16 @@ describe('annotationCounts', function () {
   });
 
   describe('listen for "publicAnnotationCountChanged" event', function () {
-    var emitEvent = function () {
-      var crossFrameArgs;
-      var evt;
-      var fn;
+    const emitEvent = function () {
+      let crossFrameArgs;
+      let evt;
+      let fn;
 
-      var event = arguments[0];
-      var args = 2 <= arguments.length ? Array.prototype.slice.call(arguments, 1) : [];
+      const event = arguments[0];
+      const args = 2 <= arguments.length ? Array.prototype.slice.call(arguments, 1) : [];
 
       crossFrameArgs = fakeCrossFrame.on.args;
-      for (var i = 0, len = crossFrameArgs.length; i < len; i++) {
+      for (let i = 0, len = crossFrameArgs.length; i < len; i++) {
         evt = crossFrameArgs[i][0];
         fn = crossFrameArgs[i][1];
 
@@ -55,7 +55,7 @@ describe('annotationCounts', function () {
     };
 
     it('displays the updated annotation count on the appropriate elements', function () {
-      var newCount = 10;
+      const newCount = 10;
       annotationCounts(document.body, fakeCrossFrame);
 
       emitEvent('publicAnnotationCountChanged', newCount);

@@ -13,9 +13,9 @@
  *
  */
 function documentMetadata(annotation) {
-  var uri = annotation.uri;
-  var domain = new URL(uri).hostname;
-  var title = domain;
+  const uri = annotation.uri;
+  let domain = new URL(uri).hostname;
+  let title = domain;
 
   if (annotation.document && annotation.document.title) {
     title = annotation.document.title[0];
@@ -45,7 +45,7 @@ function domainAndTitle(annotation) {
 }
 
 function titleLinkFromAnnotation(annotation) {
-  var titleLink = annotation.uri;
+  let titleLink = annotation.uri;
 
   if (titleLink && !(titleLink.indexOf('http://') === 0 || titleLink.indexOf('https://') === 0)) {
     // We only link to http(s) URLs.
@@ -60,12 +60,12 @@ function titleLinkFromAnnotation(annotation) {
 }
 
 function domainTextFromAnnotation(annotation) {
-  var document = documentMetadata(annotation);
+  const document = documentMetadata(annotation);
 
-  var domainText = '';
+  let domainText = '';
   if (document.uri && document.uri.indexOf('file://') === 0 && document.title) {
-    var parts = document.uri.split('/');
-    var filename = parts[parts.length - 1];
+    const parts = document.uri.split('/');
+    const filename = parts[parts.length - 1];
     if (filename) {
       domainText = filename;
     }
@@ -77,9 +77,9 @@ function domainTextFromAnnotation(annotation) {
 }
 
 function titleTextFromAnnotation(annotation) {
-  var document = documentMetadata(annotation);
+  const document = documentMetadata(annotation);
 
-  var titleText = document.title;
+  let titleText = document.title;
   if (titleText.length > 30) {
     titleText = titleText.slice(0, 30) + '…';
   }
@@ -110,7 +110,7 @@ function isPublic(annotation) {
   }
 
   annotation.permissions.read.forEach(function(perm) {
-    var readPermArr = perm.split(':');
+    const readPermArr = perm.split(':');
     if (readPermArr.length === 2 && readPermArr[0] === 'group') {
       isPublic = true;
     }
@@ -167,10 +167,10 @@ function isAnnotation(annotation) {
  */
 function location(annotation) {
   if (annotation) {
-    var targets = annotation.target || [];
-    for (var i = 0; i < targets.length; i++) {
-      var selectors = targets[i].selector || [];
-      for (var k = 0; k < selectors.length; k++) {
+    const targets = annotation.target || [];
+    for (let i = 0; i < targets.length; i++) {
+      const selectors = targets[i].selector || [];
+      for (let k = 0; k < selectors.length; k++) {
         if (selectors[k].type === 'TextPositionSelector') {
           return selectors[k].start;
         }

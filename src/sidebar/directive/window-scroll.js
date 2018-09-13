@@ -3,13 +3,13 @@
 module.exports = function () {
   return {
     link: function (scope, elem, attr) {
-      var active = true;
-      var html = elem.prop('ownerDocument').documentElement;
-      var view = elem.prop('ownerDocument').defaultView;
+      let active = true;
+      const html = elem.prop('ownerDocument').documentElement;
+      const view = elem.prop('ownerDocument').defaultView;
 
       function onScroll() {
-        var clientHeight = html.clientHeight;
-        var scrollHeight = html.scrollHeight;
+        const clientHeight = html.clientHeight;
+        const scrollHeight = html.scrollHeight;
         if (view.scrollY + clientHeight >= scrollHeight - clientHeight) {
           if (active) {
             active = false;

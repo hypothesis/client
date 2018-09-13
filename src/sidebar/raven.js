@@ -12,7 +12,7 @@
  * as a dependency.
  */
 
-var Raven = require('raven-js');
+const Raven = require('raven-js');
 
 // This is only used in apps where Angular is used,
 // but is required globally due to
@@ -20,7 +20,7 @@ var Raven = require('raven-js');
 //
 // Fortunately it does not pull in Angular as a dependency but returns
 // a function that takes it as an input argument.
-var angularPlugin = require('raven-js/plugins/angular');
+const angularPlugin = require('raven-js/plugins/angular');
 
 /**
  * Returns the input URL if it is an HTTP URL or the filename part of the URL
@@ -61,7 +61,7 @@ function convertLocalURLsToFilenames(url) {
  */
 function translateSourceURLs(data) {
   try {
-    var frames = data.exception.values[0].stacktrace.frames;
+    const frames = data.exception.values[0].stacktrace.frames;
     frames.forEach(function (frame) {
       frame.filename = convertLocalURLsToFilenames(frame.filename);
     });
@@ -96,7 +96,7 @@ function setUserInfo(info) {
  * This must be invoked _after_ Raven is configured using init().
  */
 function angularModule(angular) {
-  var prevCallback = Raven._globalOptions.dataCallback;
+  const prevCallback = Raven._globalOptions.dataCallback;
   angularPlugin(Raven, angular);
 
   // Hack: Ensure that both our data callback and the one provided by
@@ -108,7 +108,7 @@ function angularModule(angular) {
   // Raven.config().
   //
   // See https://github.com/getsentry/raven-js/issues/522
-  var angularCallback = Raven._globalOptions.dataCallback;
+  const angularCallback = Raven._globalOptions.dataCallback;
   Raven.setDataCallback(function (data) {
     return angularCallback(prevCallback(data));
   });
@@ -139,7 +139,7 @@ function report(error, when, context) {
     }
   }
 
-  var extra = Object.assign({ when: when }, context);
+  const extra = Object.assign({ when: when }, context);
   Raven.captureException(error, { extra: extra });
 }
 

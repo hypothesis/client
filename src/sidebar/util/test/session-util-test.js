@@ -1,10 +1,10 @@
 'use strict';
 
-var sessionUtil = require('../session-util');
+const sessionUtil = require('../session-util');
 
 describe('sessionUtil.shouldShowSidebarTutorial', function () {
   it('shows sidebar tutorial if the settings object has the show_sidebar_tutorial key set', function () {
-    var sessionState = {
+    const sessionState = {
       preferences: {
         show_sidebar_tutorial: true,
       },
@@ -14,7 +14,7 @@ describe('sessionUtil.shouldShowSidebarTutorial', function () {
   });
 
   it('hides sidebar tutorial if the settings object does not have the show_sidebar_tutorial key set', function () {
-    var sessionState = {
+    const sessionState = {
       preferences: {
         show_sidebar_tutorial: false,
       },

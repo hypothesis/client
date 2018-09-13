@@ -1,16 +1,16 @@
 'use strict';
 
-var features = require('../features');
-var events = require('../../events');
-var bridgeEvents = require('../../../shared/bridge-events');
+const features = require('../features');
+const events = require('../../events');
+const bridgeEvents = require('../../../shared/bridge-events');
 
 describe('h:features - sidebar layer', function () {
 
-  var fakeBridge;
-  var fakeLog;
-  var fakeRootScope;
-  var fakeSession;
-  var sandbox;
+  let fakeBridge;
+  let fakeLog;
+  let fakeRootScope;
+  let fakeSession;
+  let sandbox;
 
   beforeEach(function () {
     sandbox = sinon.sandbox.create();
@@ -50,26 +50,26 @@ describe('h:features - sidebar layer', function () {
 
   describe('flagEnabled', function () {
     it('should retrieve features data', function () {
-      var features_ = features(fakeLog, fakeRootScope, fakeBridge, fakeSession);
+      const features_ = features(fakeLog, fakeRootScope, fakeBridge, fakeSession);
       assert.equal(features_.flagEnabled('feature_on'), true);
       assert.equal(features_.flagEnabled('feature_off'), false);
     });
 
     it('should return false if features have not been loaded', function () {
-      var features_ = features(fakeLog, fakeRootScope, fakeBridge, fakeSession);
+      const features_ = features(fakeLog, fakeRootScope, fakeBridge, fakeSession);
       // simulate feature data not having been loaded yet
       fakeSession.state = {};
       assert.equal(features_.flagEnabled('feature_on'), false);
     });
 
     it('should trigger a refresh of session data', function () {
-      var features_ = features(fakeLog, fakeRootScope, fakeBridge, fakeSession);
+      const features_ = features(fakeLog, fakeRootScope, fakeBridge, fakeSession);
       features_.flagEnabled('feature_on');
       assert.calledOnce(fakeSession.load);
     });
 
     it('should return false for unknown flags', function () {
-      var features_ = features(fakeLog, fakeRootScope, fakeBridge, fakeSession);
+      const features_ = features(fakeLog, fakeRootScope, fakeBridge, fakeSession);
       assert.isFalse(features_.flagEnabled('unknown_feature'));
     });
   });

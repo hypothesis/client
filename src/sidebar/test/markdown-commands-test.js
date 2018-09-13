@@ -1,18 +1,18 @@
 'use strict';
 
-var commands = require('../markdown-commands');
-var unroll = require('../../shared/test/util').unroll;
+const commands = require('../markdown-commands');
+const unroll = require('../../shared/test/util').unroll;
 
 /**
  * Convert a string containing '<sel>' and '</sel>' markers
  * to a commands.EditorState.
  */
 function parseState(text) {
-  var startMarker = '<sel>';
-  var endMarker = '</sel>';
+  const startMarker = '<sel>';
+  const endMarker = '</sel>';
 
-  var selStart = text.indexOf(startMarker);
-  var selEnd = text.indexOf(endMarker);
+  const selStart = text.indexOf(startMarker);
+  const selEnd = text.indexOf(endMarker);
 
   if (selStart < 0) {
     throw new Error('Input field does not contain a selection start');
@@ -33,9 +33,9 @@ function parseState(text) {
  * and '</sel>' markers.
  */
 function formatState(state) {
-  var selectionStart = state.selectionStart;
-  var selectionEnd = state.selectionEnd;
-  var text = state.text;
+  const selectionStart = state.selectionStart;
+  const selectionEnd = state.selectionEnd;
+  const text = state.text;
   return text.slice(0, selectionStart) + '<sel>' +
          text.slice(selectionStart, selectionEnd) + '</sel>' +
          text.slice(selectionEnd);
@@ -50,30 +50,30 @@ describe('markdown commands', function () {
     }
 
     it('adds formatting to spans', function () {
-      var output = toggle(parseState('make <sel>text</sel> bold'));
+      const output = toggle(parseState('make <sel>text</sel> bold'));
       assert.equal(formatState(output), 'make **<sel>text</sel>** bold');
     });
 
     it('removes formatting from spans', function () {
-      var output = toggle(parseState('make **<sel>text</sel>** bold'));
+      const output = toggle(parseState('make **<sel>text</sel>** bold'));
       assert.equal(formatState(output), 'make <sel>text</sel> bold');
     });
 
     it('adds formatting to spans when the prefix and suffix differ', function () {
-      var output = toggle(parseState('make <sel>math</sel> mathy'), '\\(',
+      const output = toggle(parseState('make <sel>math</sel> mathy'), '\\(',
                                      '\\)');
       assert.equal(formatState(output), 'make \\(<sel>math</sel>\\) mathy');
     });
 
     it('inserts placeholders if the selection is empty', function () {
-      var output = toggle(parseState('make <sel></sel> bold'), '**',
+      const output = toggle(parseState('make <sel></sel> bold'), '**',
                           undefined, 'Bold');
       assert.equal(formatState(output), 'make **<sel>Bold</sel>** bold');
     });
   });
 
   describe('block formatting', function () {
-    var FIXTURES = [{
+    const FIXTURES = [{
       tag: 'adds formatting to blocks',
       input: 'one\n<sel>two\nthree</sel>\nfour',
       output: 'one\n> <sel>two\n> three</sel>\nfour',
@@ -92,7 +92,7 @@ describe('markdown commands', function () {
     }];
 
     unroll('#tag', function (fixture) {
-      var output = commands.toggleBlockStyle(
+      const output = commands.toggleBlockStyle(
         parseState(fixture.input), '> '
       );
       assert.equal(formatState(output), fixture.output);
@@ -100,13 +100,13 @@ describe('markdown commands', function () {
   });
 
   describe('link formatting', function () {
-    var linkify = function (text, linkType) {
+    const linkify = function (text, linkType) {
       return commands.convertSelectionToLink(parseState(text), linkType);
     };
 
     unroll('converts text to links', function (testCase) {
-      var sel = testCase.selection;
-      var output = linkify('one <sel>' + sel + '</sel> three');
+      const sel = testCase.selection;
+      const output = linkify('one <sel>' + sel + '</sel> three');
       assert.equal(formatState(output),
         'one [' + sel + '](<sel>http://insert-your-link-here.com</sel>) three');
     },[
@@ -115,8 +115,8 @@ describe('markdown commands', function () {
     ]);
 
     unroll('converts URLs to links', function (testCase) {
-      var sel = testCase.selection;
-      var output = linkify('one <sel>' + sel + '</sel> three');
+      const sel = testCase.selection;
+      const output = linkify('one <sel>' + sel + '</sel> three');
       assert.equal(formatState(output),
         'one [<sel>Description</sel>](' + sel + ') three');
     },[
@@ -126,7 +126,7 @@ describe('markdown commands', function () {
     ]);
 
     it('converts URLs to image links', function () {
-      var output = linkify('one <sel>http://foobar.com</sel> three',
+      const output = linkify('one <sel>http://foobar.com</sel> three',
         commands.LinkType.IMAGE_LINK);
       assert.equal(formatState(output),
         'one ![<sel>Description</sel>](http://foobar.com) three');

@@ -5,15 +5,15 @@ function StreamContentController(
   $scope, $location, $route, $routeParams, annotationMapper, store,
   api, queryParser, rootThread, searchFilter, streamFilter, streamer
 ) {
-  var self = this;
+  const self = this;
 
   store.setAppIsSidebar(false);
 
   /** `offset` parameter for the next search API call. */
-  var offset = 0;
+  let offset = 0;
 
   /** Load annotations fetched from the API into the app. */
-  var load = function (result) {
+  const load = function (result) {
     offset += result.rows.length;
     annotationMapper.loadAnnotations(result.rows, result.replies);
   };
@@ -21,8 +21,8 @@ function StreamContentController(
   /**
    * Fetch the next `limit` annotations starting from `offset` from the API.
    */
-  var fetch = function (limit) {
-    var query = Object.assign({
+  const fetch = function (limit) {
+    const query = Object.assign({
       _separate_replies: true,
       offset: offset,
       limit: limit,
@@ -36,7 +36,7 @@ function StreamContentController(
   };
 
   // Re-do search when query changes
-  var lastQuery = $routeParams.q;
+  const lastQuery = $routeParams.q;
   $scope.$on('$routeUpdate', function () {
     if ($routeParams.q !== lastQuery) {
       store.clearAnnotations();
@@ -49,7 +49,7 @@ function StreamContentController(
     .resetFilter()
     .setMatchPolicyIncludeAll();
 
-  var terms = searchFilter.generateFacetedFilter($routeParams.q);
+  const terms = searchFilter.generateFacetedFilter($routeParams.q);
   queryParser.populateFilter(streamFilter, terms);
   streamer.setConfig('filter', {filter: streamFilter.getFilter()});
   streamer.connect();

@@ -1,28 +1,28 @@
 'use strict';
 
-var angular = require('angular');
+const angular = require('angular');
 
-var events = require('../../events');
+const events = require('../../events');
 
-var FakeWindow = require('../../util/test/fake-window');
+const FakeWindow = require('../../util/test/fake-window');
 
-var DEFAULT_TOKEN_EXPIRES_IN_SECS = 1000;
-var TOKEN_KEY = 'hypothesis.oauth.hypothes%2Eis.token';
+const DEFAULT_TOKEN_EXPIRES_IN_SECS = 1000;
+const TOKEN_KEY = 'hypothesis.oauth.hypothes%2Eis.token';
 
 describe('sidebar.oauth-auth', function () {
 
-  var $rootScope;
-  var FakeOAuthClient;
-  var auth;
-  var nowStub;
-  var fakeApiRoutes;
-  var fakeClient;
-  var fakeFlash;
-  var fakeHttp;
-  var fakeLocalStorage;
-  var fakeWindow;
-  var fakeSettings;
-  var clock;
+  let $rootScope;
+  let FakeOAuthClient;
+  let auth;
+  let nowStub;
+  let fakeApiRoutes;
+  let fakeClient;
+  let fakeFlash;
+  let fakeHttp;
+  let fakeLocalStorage;
+  let fakeWindow;
+  let fakeSettings;
+  let clock;
 
   /**
    * Login and retrieve an auth code.
@@ -130,7 +130,7 @@ describe('sidebar.oauth-auth', function () {
   });
 
   describe('#tokenGetter', function () {
-    var successfulTokenResponse = Promise.resolve({
+    const successfulTokenResponse = Promise.resolve({
       accessToken: 'firstAccessToken',
       refreshToken: 'firstRefreshToken',
       expiresAt: 100,
@@ -146,7 +146,7 @@ describe('sidebar.oauth-auth', function () {
     });
 
     context('when the access token request fails', function() {
-      var expectedErr = new Error('Grant token exchange failed');
+      const expectedErr = new Error('Grant token exchange failed');
       beforeEach('make access token requests fail', function () {
         fakeClient.exchangeGrantToken.returns(Promise.reject(expectedErr));
       });
@@ -193,14 +193,14 @@ describe('sidebar.oauth-auth', function () {
     // the pending Promise for the first request again (and not send a second
     // concurrent HTTP request).
     it('should not make two concurrent access token requests', function () {
-      var respond;
+      let respond;
       fakeClient.exchangeGrantToken.returns(new Promise(resolve => {
         respond = resolve;
       }));
 
       // The first time tokenGetter() is called it makes an `exchangeGrantToken`
       // call and caches the resulting Promise.
-      var tokens = [auth.tokenGetter(), auth.tokenGetter()];
+      const tokens = [auth.tokenGetter(), auth.tokenGetter()];
 
       // Resolve the initial request for an access token in exchange for a JWT.
       respond({
@@ -225,7 +225,7 @@ describe('sidebar.oauth-auth', function () {
       fakeClient.exchangeGrantToken.returns(Promise.resolve(successfulTokenResponse));
 
       function callTokenGetter () {
-        var tokenPromise = auth.tokenGetter();
+        const tokenPromise = auth.tokenGetter();
 
         fakeClient.refreshToken.returns(Promise.resolve({
           accessToken: 'secondAccessToken',
@@ -263,11 +263,11 @@ describe('sidebar.oauth-auth', function () {
           expireAccessToken();
 
           // Delay the response to the refresh request.
-          var respond;
+          let respond;
           fakeClient.refreshToken.returns(new Promise(resolve => respond = resolve));
 
           // Request an auth token multiple times.
-          var tokens = Promise.all([auth.tokenGetter(), auth.tokenGetter()]);
+          const tokens = Promise.all([auth.tokenGetter(), auth.tokenGetter()]);
 
           // Finally, respond to the refresh request.
           respond({
@@ -459,7 +459,7 @@ describe('sidebar.oauth-auth', function () {
 
     function notifyStoredTokenChange() {
       // Trigger "storage" event as if another client refreshed the token.
-      var storageEvent = new Event('storage');
+      const storageEvent = new Event('storage');
       storageEvent.key = TOKEN_KEY;
 
       fakeLocalStorage.getObject.returns({
@@ -486,7 +486,7 @@ describe('sidebar.oauth-auth', function () {
     });
 
     it('notifies other services about the change', () => {
-      var onTokenChange = sinon.stub();
+      const onTokenChange = sinon.stub();
       $rootScope.$on(events.OAUTH_TOKENS_CHANGED, onTokenChange);
 
       notifyStoredTokenChange();
@@ -503,7 +503,7 @@ describe('sidebar.oauth-auth', function () {
     });
 
     it('calls OAuthClient#authorize', () => {
-      var fakePopup = {};
+      const fakePopup = {};
       FakeOAuthClient.openAuthPopupWindow.returns(fakePopup);
       return auth.login().then(() => {
         assert.calledWith(fakeClient.authorize, fakeWindow, fakePopup);
@@ -523,7 +523,7 @@ describe('sidebar.oauth-auth', function () {
     });
 
     it('rejects when auth is canceled', () => {
-      var expectedErr = new Error('Authorization failed');
+      const expectedErr = new Error('Authorization failed');
       fakeClient.authorize.returns(Promise.reject(expectedErr));
 
       return auth.login().catch(err => {
@@ -532,7 +532,7 @@ describe('sidebar.oauth-auth', function () {
     });
 
     it('rejects if auth code exchange fails', () => {
-      var expectedErr = new Error('Auth code exchange failed');
+      const expectedErr = new Error('Auth code exchange failed');
       fakeClient.authorize.returns(Promise.resolve('acode'));
       fakeClient.exchangeAuthCode.returns(Promise.reject(expectedErr));
 

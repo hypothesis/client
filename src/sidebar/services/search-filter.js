@@ -7,7 +7,7 @@
  *     'example:text' -> [null, 'example:text']
  */
 function splitTerm(term) {
-  var filter = term.slice(0, term.indexOf(':'));
+  const filter = term.slice(0, term.indexOf(':'));
   if (!filter) {
     // The whole term is data
     return [null, term];
@@ -15,7 +15,7 @@ function splitTerm(term) {
 
   if (['group', 'quote', 'result', 'since',
        'tag', 'text', 'uri', 'user'].includes(filter)) {
-    var data = term.slice(filter.length+1);
+    const data = term.slice(filter.length+1);
     return [filter, data];
   } else {
     // The filter is not a power search filter, so the whole term is data
@@ -40,25 +40,25 @@ function tokenize(searchtext) {
   //   "bar" -> bar
   //   'foo" -> 'foo"
   //   bar"  -> bar"
-  var _removeQuoteCharacter = function(text) {
-    var start = text.slice(0,1);
-    var end = text.slice(-1);
+  const _removeQuoteCharacter = function(text) {
+    const start = text.slice(0,1);
+    const end = text.slice(-1);
     if (((start === '"') || (start === "'")) && (start === end)) {
       text = text.slice(1, text.length - 1);
     }
     return text;
   };
 
-  var tokens = searchtext.match(/(?:[^\s"']+|"[^"]*"|'[^']*')+/g);
+  let tokens = searchtext.match(/(?:[^\s"']+|"[^"]*"|'[^']*')+/g);
 
   // Cut the opening and closing quote characters
   tokens = tokens.map(_removeQuoteCharacter);
 
   // Remove quotes for power search.
   // I.e. 'tag:"foo bar"' -> 'tag:foo bar'
-  for (var index = 0; index < tokens.length; index++) {
-    var token = tokens[index];
-    var [filter, data] = splitTerm(token);
+  for (let index = 0; index < tokens.length; index++) {
+    const token = tokens[index];
+    const [filter, data] = splitTerm(token);
     if (filter) {
       tokens[index] = filter + ':' + (_removeQuoteCharacter(data));
     }
@@ -74,10 +74,10 @@ function tokenize(searchtext) {
  * @return {Object}
  */
 function toObject(searchtext) {
-  var obj = {};
-  var backendFilter = f => f === 'tag' ? 'tags' : f;
+  const obj = {};
+  const backendFilter = f => f === 'tag' ? 'tags' : f;
 
-  var addToObj = function(key, data) {
+  const addToObj = function(key, data) {
     if (obj[key]) {
       return obj[key].push(data);
     } else {
@@ -86,9 +86,9 @@ function toObject(searchtext) {
   };
 
   if (searchtext) {
-    var terms = tokenize(searchtext);
-    for (var term of terms) {
-      var [filter, data] = splitTerm(term);
+    const terms = tokenize(searchtext);
+    for (const term of terms) {
+      let [filter, data] = splitTerm(term);
       if (!filter) {
         filter = 'any';
         data = term;
@@ -118,21 +118,21 @@ function toObject(searchtext) {
  * @return {Object}
  */
 function generateFacetedFilter(searchtext) {
-  var terms;
-  var any = [];
-  var quote = [];
-  var result = [];
-  var since = [];
-  var tag = [];
-  var text = [];
-  var uri = [];
-  var user = [];
+  let terms;
+  const any = [];
+  const quote = [];
+  const result = [];
+  const since = [];
+  const tag = [];
+  const text = [];
+  const uri = [];
+  const user = [];
 
   if (searchtext) {
     terms = tokenize(searchtext);
-    for (var term of terms) {
-      var t;
-      var filter = term.slice(0, term.indexOf(':'));
+    for (const term of terms) {
+      let t;
+      const filter = term.slice(0, term.indexOf(':'));
       switch (filter) {
       case 'quote':
         quote.push(term.slice(6));

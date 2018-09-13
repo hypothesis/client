@@ -1,7 +1,7 @@
 'use strict';
 
-var minute = 60;
-var hour = minute * 60;
+const minute = 60;
+const hour = minute * 60;
 
 function lessThanThirtySecondsAgo(date, now) {
   return ((now - date) < 30 * 1000);
@@ -32,8 +32,8 @@ function nSec(date, now) {
 }
 
 function nMin(date, now) {
-  var n = Math.floor(delta(date, now) / minute);
-  var template = '{} min';
+  const n = Math.floor(delta(date, now) / minute);
+  let template = '{} min';
 
   if (n > 1) {
     template = template + 's';
@@ -43,8 +43,8 @@ function nMin(date, now) {
 }
 
 function nHr(date, now) {
-  var n = Math.floor(delta(date, now) / hour);
-  var template = '{} hr';
+  const n = Math.floor(delta(date, now) / hour);
+  let template = '{} hr';
 
   if (n > 1) {
     template = template + 's';
@@ -55,7 +55,7 @@ function nHr(date, now) {
 
 // Cached DateTimeFormat instances,
 // because instantiating a DateTimeFormat is expensive.
-var formatters = {};
+const formatters = {};
 
 /**
  * Efficiently return `date` formatted with `options`.
@@ -76,8 +76,8 @@ function format(date, options, Intl) {
   }
 
   if (Intl && Intl.DateTimeFormat) {
-    var key = JSON.stringify(options);
-    var formatter = formatters[key];
+    const key = JSON.stringify(options);
+    let formatter = formatters[key];
 
     if (!formatter) {
       formatter = formatters[key] = new Intl.DateTimeFormat(undefined,
@@ -99,7 +99,7 @@ function dayAndMonthAndYear(date, now, Intl) {
   return format(date, {day: 'numeric', month: 'short', year: 'numeric'}, Intl);
 }
 
-var BREAKPOINTS = [
+const BREAKPOINTS = [
   {
     test: lessThanThirtySecondsAgo,
     format: function () {return 'Just now';},
@@ -137,8 +137,8 @@ function getBreakpoint(date, now) {
   // Turn the given ISO 8601 string into a Date object.
   date = new Date(date);
 
-  var breakpoint;
-  for (var i = 0; i < BREAKPOINTS.length; i++) {
+  let breakpoint;
+  for (let i = 0; i < BREAKPOINTS.length; i++) {
     breakpoint = BREAKPOINTS[i];
     if (breakpoint.test(date, now)) {
       return breakpoint;
@@ -153,7 +153,7 @@ function nextFuzzyUpdate(date) {
     return null;
   }
 
-  var secs = getBreakpoint(date, new Date()).nextUpdate;
+  let secs = getBreakpoint(date, new Date()).nextUpdate;
 
   if (secs === null) {
     return null;
@@ -180,13 +180,13 @@ function nextFuzzyUpdate(date) {
  * @return {Function} A function that cancels the automatic refresh.
  */
 function decayingInterval(date, callback) {
-  var timer;
-  var update = function () {
-    var fuzzyUpdate = nextFuzzyUpdate(date);
+  let timer;
+  const update = function () {
+    const fuzzyUpdate = nextFuzzyUpdate(date);
     if (fuzzyUpdate === null) {
       return;
     }
-    var nextUpdate = (1000 * fuzzyUpdate) + 500;
+    const nextUpdate = (1000 * fuzzyUpdate) + 500;
     timer = setTimeout(function () {
       callback(date);
       update();
@@ -209,7 +209,7 @@ function toFuzzyString(date, Intl) {
   if (!date) {
     return '';
   }
-  var now = new Date();
+  const now = new Date();
 
   return getBreakpoint(date, now).format(new Date(date), now, Intl);
 }

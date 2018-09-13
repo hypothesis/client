@@ -22,14 +22,14 @@
 // @ngInject
 function BrandingDirective(settings) {
 
-  var _hasBranding = !!settings.branding;
+  const _hasBranding = !!settings.branding;
 
   // This is the list of supported property declarations
   // we support. The key is the name and how it should be reflected in the
   // settings by the integrator while the value (in the whitelist) is
   // the type of .style property being set. The types are pretty simple for now
   // and are a one-to-one mapping between the branding type and style property.
-  var _supportedPropSettings = {
+  const _supportedPropSettings = {
     accentColor: 'color',
     appBackgroundColor: 'backgroundColor',
     ctaBackgroundColor: 'backgroundColor',
@@ -40,7 +40,7 @@ function BrandingDirective(settings) {
 
   // filter all attribute values down to the supported
   // branding properties
-  var _getValidBrandingAttribute = function(attrString){
+  const _getValidBrandingAttribute = function(attrString){
     return attrString.split(',').map(function(attr){
       return attr.trim();
     }).filter(function filterAgainstWhitelist(attr){
@@ -54,7 +54,7 @@ function BrandingDirective(settings) {
     link: function(scope, $elem, attrs) {
       if(_hasBranding){
         _getValidBrandingAttribute(attrs.hBranding).forEach(function(attr){
-          var propVal = settings.branding[attr];
+          const propVal = settings.branding[attr];
           if(propVal){
             // the _supportedPropSettings holds the .style property name
             // that is being set

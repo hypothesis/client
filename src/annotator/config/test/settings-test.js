@@ -1,13 +1,13 @@
 'use strict';
 
-var proxyquire = require('proxyquire');
-var util = require('../../../shared/test/util');
+const proxyquire = require('proxyquire');
+const util = require('../../../shared/test/util');
 
-var fakeConfigFuncSettingsFrom = sinon.stub();
-var fakeIsBrowserExtension = sinon.stub();
-var fakeSharedSettings = {};
+const fakeConfigFuncSettingsFrom = sinon.stub();
+const fakeIsBrowserExtension = sinon.stub();
+const fakeSharedSettings = {};
 
-var settingsFrom = proxyquire('../settings', util.noCallThru({
+const settingsFrom = proxyquire('../settings', util.noCallThru({
   './config-func-settings-from': fakeConfigFuncSettingsFrom,
   './is-browser-extension': fakeIsBrowserExtension,
   '../../shared/settings': fakeSharedSettings,
@@ -31,7 +31,7 @@ describe('annotator.config.settingsFrom', function() {
 
   describe('#sidebarAppUrl', function() {
     function appendSidebarLinkToDocument(href) {
-      var link = document.createElement('link');
+      const link = document.createElement('link');
       link.type = 'application/annotator+html';
       link.rel = 'sidebar';
       if (href) {
@@ -42,7 +42,7 @@ describe('annotator.config.settingsFrom', function() {
     }
 
     context("when there's an application/annotator+html link", function() {
-      var link;
+      let link;
 
       beforeEach('add an application/annotator+html <link>', function() {
         link = appendSidebarLinkToDocument('http://example.com/app.html');
@@ -58,8 +58,8 @@ describe('annotator.config.settingsFrom', function() {
     });
 
     context('when there are multiple annotator+html links', function() {
-      var link1;
-      var link2;
+      let link1;
+      let link2;
 
       beforeEach('add two links to the document', function() {
         link1 = appendSidebarLinkToDocument('http://example.com/app1');
@@ -77,7 +77,7 @@ describe('annotator.config.settingsFrom', function() {
     });
 
     context('when the annotator+html link has no href', function() {
-      var link;
+      let link;
 
       beforeEach('add an application/annotator+html <link> with no href', function() {
         link = appendSidebarLinkToDocument();
@@ -111,7 +111,7 @@ describe('annotator.config.settingsFrom', function() {
 
   describe('#clientUrl', function() {
     function appendClientUrlLinkToDocument(href) {
-      var link = document.createElement('link');
+      const link = document.createElement('link');
       link.type = 'application/annotator+javascript';
       link.rel = 'hypothesis-client';
       if (href) {
@@ -122,7 +122,7 @@ describe('annotator.config.settingsFrom', function() {
     }
 
     context("when there's an application/annotator+javascript link", function() {
-      var link;
+      let link;
 
       beforeEach('add an application/annotator+javascript <link>', function() {
         link = appendClientUrlLinkToDocument('http://example.com/app.html');
@@ -138,8 +138,8 @@ describe('annotator.config.settingsFrom', function() {
     });
 
     context('when there are multiple annotator+javascript links', function() {
-      var link1;
-      var link2;
+      let link1;
+      let link2;
 
       beforeEach('add two links to the document', function() {
         link1 = appendClientUrlLinkToDocument('http://example.com/app1');
@@ -157,7 +157,7 @@ describe('annotator.config.settingsFrom', function() {
     });
 
     context('when the annotator+javascript link has no href', function() {
-      var link;
+      let link;
 
       beforeEach('add an application/annotator+javascript <link> with no href', function() {
         link = appendClientUrlLinkToDocument();
@@ -212,7 +212,7 @@ describe('annotator.config.settingsFrom', function() {
 
       context("when there's also an annotations in the URL fragment", function() {
         specify('js-hypothesis-config annotations override URL ones', function() {
-          var window_ = fakeWindow('http://localhost:3000#annotations:annotationsFromURL');
+          const window_ = fakeWindow('http://localhost:3000#annotations:annotationsFromURL');
 
           assert.equal(settingsFrom(window_).annotations, 'annotationsFromJSON');
         });
@@ -266,7 +266,7 @@ describe('annotator.config.settingsFrom', function() {
 
       context("when there's also a query in the URL fragment", function() {
         specify('js-hypothesis-config queries override URL ones', function() {
-          var window_ = fakeWindow('http://localhost:3000#annotations:query:queryFromUrl');
+          const window_ = fakeWindow('http://localhost:3000#annotations:query:queryFromUrl');
 
           assert.equal(settingsFrom(window_).query, 'queryFromJSON');
         });
@@ -329,9 +329,9 @@ describe('annotator.config.settingsFrom', function() {
       it('returns null', function() {
         // An invalid escape sequence which will cause decodeURIComponent() to
         // throw a URIError.
-        var invalidFrag = '%aaaaa';
+        const invalidFrag = '%aaaaa';
 
-        var url = 'http://localhost:3000#annotations:query:' + invalidFrag;
+        const url = 'http://localhost:3000#annotations:query:' + invalidFrag;
 
         assert.isNull(settingsFrom(fakeWindow(url)).query);
       });
@@ -408,7 +408,7 @@ describe('annotator.config.settingsFrom', function() {
         fakeSharedSettings.jsonConfigsFrom.returns({
           'showHighlights': test.input,
         });
-        var settings = settingsFrom(fakeWindow());
+        const settings = settingsFrom(fakeWindow());
 
         assert.deepEqual(settings.showHighlights, test.output);
       });
@@ -417,7 +417,7 @@ describe('annotator.config.settingsFrom', function() {
         fakeConfigFuncSettingsFrom.returns({
           'showHighlights': test.input,
         });
-        var settings = settingsFrom(fakeWindow());
+        const settings = settingsFrom(fakeWindow());
 
         assert.deepEqual(settings.showHighlights, test.output);
       });
@@ -559,9 +559,9 @@ describe('annotator.config.settingsFrom', function() {
           fakeIsBrowserExtension.returns(test.isBrowserExtension);
           fakeConfigFuncSettingsFrom.returns(test.configFuncSettings);
           fakeSharedSettings.jsonConfigsFrom.returns(test.jsonSettings);
-          var settings = settingsFrom(fakeWindow());
+          const settings = settingsFrom(fakeWindow());
 
-          var setting = settings.hostPageSetting(
+          const setting = settings.hostPageSetting(
             'foo',
             {
               allowInBrowserExt: test.allowInBrowserExt || false,

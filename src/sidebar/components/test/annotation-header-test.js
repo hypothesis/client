@@ -1,23 +1,23 @@
 'use strict';
 
-var angular = require('angular');
-var proxyquire = require('proxyquire');
+const angular = require('angular');
+const proxyquire = require('proxyquire');
 
-var fixtures = require('../../test/annotation-fixtures');
+const fixtures = require('../../test/annotation-fixtures');
 
-var fakeDocumentMeta = {
+const fakeDocumentMeta = {
   domain: 'docs.io',
   titleLink: 'http://docs.io/doc.html',
   titleText: 'Dummy title',
 };
 
 describe('sidebar.components.annotation-header', function () {
-  var $componentController;
-  var fakeFeatures;
-  var fakeGroups;
-  var fakeAccountID;
-  var fakeSettings = { usernameUrl: 'http://www.example.org/' };
-  var fakeServiceUrl;
+  let $componentController;
+  let fakeFeatures;
+  let fakeGroups;
+  let fakeAccountID;
+  const fakeSettings = { usernameUrl: 'http://www.example.org/' };
+  let fakeServiceUrl;
 
   beforeEach('Initialize fakeAccountID', () => {
     fakeAccountID = {
@@ -27,7 +27,7 @@ describe('sidebar.components.annotation-header', function () {
   });
 
   beforeEach('Import and register the annotationHeader component', function () {
-    var annotationHeader = proxyquire('../annotation-header', {
+    const annotationHeader = proxyquire('../annotation-header', {
       '../annotation-metadata': {
         domainAndTitle: function (ann) { // eslint-disable-line no-unused-vars
           return fakeDocumentMeta;
@@ -61,18 +61,18 @@ describe('sidebar.components.annotation-header', function () {
   describe('sidebar.components.AnnotationHeaderController', function () {
     describe('#htmlLink()', function () {
       it('returns the HTML link when available', function () {
-        var ann = fixtures.defaultAnnotation();
+        const ann = fixtures.defaultAnnotation();
         ann.links = { html: 'https://annotation.service/123' };
-        var ctrl = $componentController('annotationHeader', {}, {
+        const ctrl = $componentController('annotationHeader', {}, {
           annotation: ann,
         });
         assert.equal(ctrl.htmlLink(), ann.links.html);
       });
 
       it('returns an empty string when no HTML link is available', function () {
-        var ann = fixtures.defaultAnnotation();
+        const ann = fixtures.defaultAnnotation();
         ann.links = {};
-        var ctrl = $componentController('annotationHeader', {}, {
+        const ctrl = $componentController('annotationHeader', {}, {
           annotation: ann,
         });
         assert.equal(ctrl.htmlLink(), '');
@@ -81,8 +81,8 @@ describe('sidebar.components.annotation-header', function () {
 
     describe('#documentMeta()', function () {
       it('returns the domain, title link and text for the annotation', function () {
-        var ann = fixtures.defaultAnnotation();
-        var ctrl = $componentController('annotationHeader', {}, {
+        const ann = fixtures.defaultAnnotation();
+        const ctrl = $componentController('annotationHeader', {}, {
           annotation: ann,
         });
         assert.deepEqual(ctrl.documentMeta(), fakeDocumentMeta);
@@ -193,10 +193,10 @@ describe('sidebar.components.annotation-header', function () {
             // depending on the test case.
             fakeAccountID.isThirdPartyUser.returns(test.isThirdPartyUser);
 
-            var ann = fixtures.defaultAnnotation();
+            const ann = fixtures.defaultAnnotation();
             ann.user_info = test.user_info;
 
-            var ctrl = $componentController('annotationHeader', {}, {
+            const ctrl = $componentController('annotationHeader', {}, {
               annotation: ann,
             });
 
@@ -208,8 +208,8 @@ describe('sidebar.components.annotation-header', function () {
 
     describe('#thirdPartyUsernameLink', () => {
       it('returns the custom username link if set', () => {
-        var ann;
-        var ctrl;
+        let ann;
+        let ctrl;
 
         fakeSettings.usernameUrl = 'http://www.example.org/';
         ann = fixtures.defaultAnnotation();
@@ -220,8 +220,8 @@ describe('sidebar.components.annotation-header', function () {
       });
 
       it('returns null if no custom username link is set in the settings object', () => {
-        var ann;
-        var ctrl;
+        let ann;
+        let ctrl;
 
         fakeSettings.usernameUrl = null;
         ann = fixtures.defaultAnnotation();

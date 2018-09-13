@@ -1,11 +1,11 @@
 'use strict';
 
-var debounce = require('lodash.debounce');
+const debounce = require('lodash.debounce');
 
-var events = require('../events');
-var bridgeEvents = require('../../shared/bridge-events');
-var metadata = require('../annotation-metadata');
-var uiConstants = require('../ui-constants');
+const events = require('../events');
+const bridgeEvents = require('../../shared/bridge-events');
+const metadata = require('../annotation-metadata');
+const uiConstants = require('../ui-constants');
 
 /**
  * @typedef FrameInfo
@@ -44,7 +44,7 @@ function formatAnnot(ann) {
 function FrameSync($rootScope, $window, Discovery, store, bridge) {
 
   // Set of tags of annotations that are currently loaded into the frame
-  var inFrame = new Set();
+  const inFrame = new Set();
 
   /**
    * Watch for changes to the set of annotations displayed in the sidebar and
@@ -52,20 +52,20 @@ function FrameSync($rootScope, $window, Discovery, store, bridge) {
    */
   function setupSyncToFrame() {
     // List of loaded annotations in previous state
-    var prevAnnotations = [];
-    var prevFrames = [];
-    var prevPublicAnns = 0;
+    let prevAnnotations = [];
+    let prevFrames = [];
+    let prevPublicAnns = 0;
 
     store.subscribe(function () {
-      var state = store.getState();
+      const state = store.getState();
       if (state.annotations === prevAnnotations &&
           state.frames === prevFrames) {
         return;
       }
 
-      var publicAnns = 0;
-      var inSidebar = new Set();
-      var added = [];
+      let publicAnns = 0;
+      const inSidebar = new Set();
+      const added = [];
 
       state.annotations.forEach(function (annot) {
         if (metadata.isReply(annot)) {
@@ -82,7 +82,7 @@ function FrameSync($rootScope, $window, Discovery, store, bridge) {
           added.push(annot);
         }
       });
-      var deleted = prevAnnotations.filter(function (annot) {
+      const deleted = prevAnnotations.filter(function (annot) {
         return !inSidebar.has(annot.$tag);
       });
       prevAnnotations = state.annotations;
@@ -122,7 +122,7 @@ function FrameSync($rootScope, $window, Discovery, store, bridge) {
     // A new annotation, note or highlight was created in the frame
     bridge.on('beforeCreateAnnotation', function (event) {
       inFrame.add(event.tag);
-      var annot = Object.assign({}, event.msg, {$tag: event.tag});
+      const annot = Object.assign({}, event.msg, {$tag: event.tag});
       $rootScope.$broadcast(events.BEFORE_ANNOTATION_CREATED, annot);
     });
 
@@ -133,8 +133,8 @@ function FrameSync($rootScope, $window, Discovery, store, bridge) {
     //
     // Updates are coalesced to reduce the overhead from processing
     // triggered by each `UPDATE_ANCHOR_STATUS` action that is dispatched.
-    var anchoringStatusUpdates = {};
-    var scheduleAnchoringStatusUpdate = debounce(() => {
+    let anchoringStatusUpdates = {};
+    const scheduleAnchoringStatusUpdate = debounce(() => {
       store.updateAnchorStatus(anchoringStatusUpdates);
       $rootScope.$broadcast(events.ANNOTATIONS_SYNCED, Object.keys(anchoringStatusUpdates));
       anchoringStatusUpdates = {};
@@ -201,8 +201,8 @@ function FrameSync($rootScope, $window, Discovery, store, bridge) {
   }
 
   function destroyFrame(frameIdentifier) {
-    var frames = store.frames();
-    var frameToDestroy = frames.find(function (frame) {
+    const frames = store.frames();
+    const frameToDestroy = frames.find(function (frame) {
       return frame.id === frameIdentifier;
     });
     if (frameToDestroy) {
@@ -214,7 +214,7 @@ function FrameSync($rootScope, $window, Discovery, store, bridge) {
    * Find and connect to Hypothesis clients in the current window.
    */
   this.connect = function () {
-    var discovery = new Discovery(window, {server: true});
+    const discovery = new Discovery(window, {server: true});
     discovery.startDiscovery(bridge.createChannel.bind(bridge));
     bridge.onConnect(addFrame);
 

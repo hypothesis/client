@@ -1,8 +1,8 @@
 'use strict';
 
-var { isThirdPartyUser } = require('../util/account-id');
-var isThirdPartyService = require('../util/is-third-party-service');
-var serviceConfig = require('../service-config');
+const { isThirdPartyUser } = require('../util/account-id');
+const isThirdPartyService = require('../util/is-third-party-service');
+const serviceConfig = require('../service-config');
 const memoize = require('../util/memoize');
 const groupOrganizations = memoize(require('../util/group-organizations'));
 
@@ -31,8 +31,8 @@ function GroupListController($window, analytics, groups, settings, serviceUrl) {
   };
 
   this.leaveGroup = function (groupId) {
-    var groupName = groups.get(groupId).name;
-    var message = 'Are you sure you want to leave the group "' +
+    const groupName = groups.get(groupId).name;
+    const message = 'Are you sure you want to leave the group "' +
       groupName + '"?';
     if ($window.confirm(message)) {
       analytics.track(analytics.events.GROUP_LEAVE);
@@ -69,7 +69,7 @@ function GroupListController($window, analytics, groups, settings, serviceUrl) {
     return group.links && group.links.html && !this.isThirdPartyService;
   };
 
-  var svc = serviceConfig(settings);
+  const svc = serviceConfig(settings);
   if (svc && svc.icon) {
     this.thirdPartyGroupIcon = svc.icon;
   }

@@ -23,7 +23,7 @@
  * Types of Markdown link that can be inserted with
  * convertSelectionToLink()
  */
-var LinkType = {
+const LinkType = {
   ANCHOR_LINK: 0,
   IMAGE_LINK: 1,
 };
@@ -38,8 +38,8 @@ var LinkType = {
  * @return {EditorState} - The new state of the input field.
  */
 function replaceText(state, pos, length, text) {
-  var newSelectionStart = state.selectionStart;
-  var newSelectionEnd = state.selectionEnd;
+  let newSelectionStart = state.selectionStart;
+  let newSelectionEnd = state.selectionEnd;
 
   if (newSelectionStart >= pos + length) {
     // 1. Selection is after replaced text:
@@ -93,18 +93,18 @@ function convertSelectionToLink(state, linkType) {
     linkType = LinkType.ANCHOR_LINK;
   }
 
-  var selection = state.text.slice(state.selectionStart, state.selectionEnd);
+  const selection = state.text.slice(state.selectionStart, state.selectionEnd);
 
-  var linkPrefix = '';
+  let linkPrefix = '';
   if (linkType === LinkType.IMAGE_LINK) {
     linkPrefix = '!';
   }
 
-  var newState;
+  let newState;
   if (selection.match(/[a-z]+:\/\/.*/)) {
     // Selection is a URL, wrap it with a link and use the selection as
     // the target.
-    var dummyLabel = 'Description';
+    const dummyLabel = 'Description';
     newState = replaceText(state, state.selectionStart, selection.length,
       linkPrefix + '[' + dummyLabel + '](' + selection + ')');
     newState.selectionStart = state.selectionStart + linkPrefix.length + 1;
@@ -113,8 +113,8 @@ function convertSelectionToLink(state, linkType) {
   } else {
     // Selection is not a URL, wrap it with a link and use the selection as
     // the label. Change the selection to the dummy link.
-    var beforeURL = linkPrefix + '[' + selection + '](';
-    var dummyLink = 'http://insert-your-link-here.com';
+    const beforeURL = linkPrefix + '[' + selection + '](';
+    const dummyLink = 'http://insert-your-link-here.com';
     newState = replaceText(state, state.selectionStart, selection.length,
       beforeURL + dummyLink + ')');
     newState.selectionStart = state.selectionStart + beforeURL.length;
@@ -140,11 +140,11 @@ function toggleSpanStyle(state, prefix, suffix, placeholder) {
     suffix = prefix;
   }
 
-  var selectionPrefix = state.text.slice(state.selectionStart - prefix.length,
+  const selectionPrefix = state.text.slice(state.selectionStart - prefix.length,
     state.selectionStart);
-  var selectionSuffix = state.text.slice(state.selectionEnd,
+  const selectionSuffix = state.text.slice(state.selectionEnd,
     state.selectionEnd + prefix.length);
-  var newState = state;
+  let newState = state;
 
   if (state.selectionStart === state.selectionEnd && placeholder) {
     newState = replaceText(state, state.selectionStart, 0, placeholder);
@@ -164,7 +164,7 @@ function toggleSpanStyle(state, prefix, suffix, placeholder) {
 }
 
 function startOfLine(str, pos) {
-  var start = str.lastIndexOf('\n', pos);
+  const start = str.lastIndexOf('\n', pos);
   if (start < 0) {
     return 0;
   } else {
@@ -173,7 +173,7 @@ function startOfLine(str, pos) {
 }
 
 function endOfLine(str, pos) {
-  var end = str.indexOf('\n', pos);
+  const end = str.indexOf('\n', pos);
   if (end < 0) {
     return str.length;
   } else {
@@ -192,16 +192,16 @@ function endOfLine(str, pos) {
  *    the start of the current line and returns the new state of the input.
  */
 function transformLines(state, start, end, callback) {
-  var lineStart = startOfLine(state.text, start);
-  var lineEnd = endOfLine(state.text, start);
+  let lineStart = startOfLine(state.text, start);
+  let lineEnd = endOfLine(state.text, start);
 
   while (lineEnd <= endOfLine(state.text, end)) {
-    var isLastLine = lineEnd === state.text.length;
-    var currentLineLength = lineEnd - lineStart;
+    const isLastLine = lineEnd === state.text.length;
+    const currentLineLength = lineEnd - lineStart;
 
     state = callback(state, lineStart, lineEnd);
 
-    var newLineLength = endOfLine(state.text, lineStart) - lineStart;
+    const newLineLength = endOfLine(state.text, lineStart) - lineStart;
     end += newLineLength - currentLineLength;
 
     if (isLastLine) {
@@ -222,12 +222,12 @@ function transformLines(state, start, end, callback) {
  * @return {EditorState} - The new state of the input field.
  */
 function toggleBlockStyle(state, prefix) {
-  var start = state.selectionStart;
-  var end = state.selectionEnd;
+  const start = state.selectionStart;
+  const end = state.selectionEnd;
 
   // Test whether all lines in the selected range already have the style
   // applied
-  var blockHasStyle = true;
+  let blockHasStyle = true;
   transformLines(state, start, end, function (state, lineStart) {
     if (state.text.slice(lineStart, lineStart + prefix.length) !== prefix) {
       blockHasStyle = false;

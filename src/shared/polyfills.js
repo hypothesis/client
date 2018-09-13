@@ -20,7 +20,7 @@ require('core-js/fn/object/values');
 // URL constructor, required by IE 10/11,
 // early versions of Microsoft Edge.
 try {
-  var url = new window.URL('https://hypothes.is');
+  const url = new window.URL('https://hypothes.is');
 
   // Some browsers (eg. PhantomJS 2.x) include a `URL` constructor which works
   // but is broken.

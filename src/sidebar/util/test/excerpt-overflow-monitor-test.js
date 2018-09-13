@@ -1,12 +1,12 @@
 'use strict';
 
-var ExcerptOverflowMonitor = require('../excerpt-overflow-monitor');
+const ExcerptOverflowMonitor = require('../excerpt-overflow-monitor');
 
 describe('ExcerptOverflowMonitor', function () {
-  var contentHeight;
-  var ctrl;
-  var monitor;
-  var state;
+  let contentHeight;
+  let ctrl;
+  let monitor;
+  let state;
 
   beforeEach(function () {
     contentHeight = 0;

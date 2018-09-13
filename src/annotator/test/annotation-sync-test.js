@@ -1,19 +1,19 @@
 'use strict';
 
-var EventEmitter = require('tiny-emitter');
+const EventEmitter = require('tiny-emitter');
 
-var AnnotationSync = require('../annotation-sync');
+const AnnotationSync = require('../annotation-sync');
 
 describe('AnnotationSync', function() {
-  var createAnnotationSync;
-  var fakeBridge;
-  var options;
-  var publish;
-  var sandbox = sinon.sandbox.create();
+  let createAnnotationSync;
+  let fakeBridge;
+  let options;
+  let publish;
+  const sandbox = sinon.sandbox.create();
 
   beforeEach(function() {
-    var emitter = new EventEmitter();
-    var listeners = {};
+    const emitter = new EventEmitter();
+    const listeners = {};
 
     createAnnotationSync = function() {
       return new AnnotationSync(fakeBridge, options);
@@ -34,8 +34,8 @@ describe('AnnotationSync', function() {
     };
 
     publish = function() {
-      var method = arguments[0];
-      var args = [].slice.call(arguments, 1);
+      const method = arguments[0];
+      const args = [].slice.call(arguments, 1);
 
       listeners[method].apply(listeners, args);
     };
@@ -48,8 +48,8 @@ describe('AnnotationSync', function() {
   describe('#constructor', function() {
     context('when "deleteAnnotation" is published', function() {
       it('calls emit("annotationDeleted")', function() {
-        var ann = {id: 1, $tag: 'tag1'};
-        var eventStub = sinon.stub();
+        const ann = {id: 1, $tag: 'tag1'};
+        const eventStub = sinon.stub();
         options.on('annotationDeleted', eventStub);
         createAnnotationSync();
 
@@ -59,8 +59,8 @@ describe('AnnotationSync', function() {
       });
 
       it("calls the 'deleteAnnotation' event's callback function", function(done) {
-        var ann = {id: 1, $tag: 'tag1'};
-        var callback = function(err, ret) {
+        const ann = {id: 1, $tag: 'tag1'};
+        const callback = function(err, ret) {
           assert.isNull(err);
           assert.deepEqual(ret, {tag: 'tag1', msg: ann});
           done();
@@ -71,8 +71,8 @@ describe('AnnotationSync', function() {
       });
 
       it('deletes any existing annotation from its cache before calling emit', function() {
-        var ann = {id: 1, $tag: 'tag1'};
-        var annSync = createAnnotationSync();
+        const ann = {id: 1, $tag: 'tag1'};
+        const annSync = createAnnotationSync();
         annSync.cache.tag1 = ann;
         options.emit = function() { assert(!annSync.cache.tag1); };
 
@@ -80,8 +80,8 @@ describe('AnnotationSync', function() {
       });
 
       it('deletes any existing annotation from its cache', function() {
-        var ann = {id: 1, $tag: 'tag1'};
-        var annSync = createAnnotationSync();
+        const ann = {id: 1, $tag: 'tag1'};
+        const annSync = createAnnotationSync();
         annSync.cache.tag1 = ann;
 
         publish('deleteAnnotation', {msg: ann}, function() {});
@@ -92,17 +92,17 @@ describe('AnnotationSync', function() {
 
     context('when "loadAnnotations" is published', function() {
       it('calls emit("annotationsLoaded")', function() {
-        var annotations = [
+        const annotations = [
           {id: 1, $tag: 'tag1'},
           {id: 2, $tag: 'tag2'},
           {id: 3, $tag: 'tag3'},
         ];
-        var bodies = [
+        const bodies = [
           {msg: annotations[0], tag: annotations[0].$tag},
           {msg: annotations[1], tag: annotations[1].$tag},
           {msg: annotations[2], tag: annotations[2].$tag},
         ];
-        var loadedStub = sinon.stub();
+        const loadedStub = sinon.stub();
         options.on('annotationsLoaded', loadedStub);
         createAnnotationSync();
 
@@ -114,7 +114,7 @@ describe('AnnotationSync', function() {
 
     context('when "beforeAnnotationCreated" is emitted', function() {
       it('calls bridge.call() passing the event', function() {
-        var ann = {id: 1};
+        const ann = {id: 1};
         createAnnotationSync();
 
         options.emit('beforeAnnotationCreated', ann);
@@ -127,7 +127,7 @@ describe('AnnotationSync', function() {
 
       context('if the annotation has a $tag', function() {
         it('does not call bridge.call()', function() {
-          var ann = {id: 1, $tag: 'tag1'};
+          const ann = {id: 1, $tag: 'tag1'};
           createAnnotationSync();
 
           options.emit('beforeAnnotationCreated', ann);

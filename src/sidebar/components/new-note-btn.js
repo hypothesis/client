@@ -1,14 +1,14 @@
 'use strict';
 
-var events = require('../events');
+const events = require('../events');
 
 module.exports = {
   controllerAs: 'vm',
   //@ngInject
   controller: function ($rootScope, store) {
     this.onNewNoteBtnClick = function(){
-      var topLevelFrame = store.frames().find(f=>!f.id);
-      var annot = {
+      const topLevelFrame = store.frames().find(f=>!f.id);
+      const annot = {
         target: [],
         uri: topLevelFrame.uri,
       };

@@ -11,8 +11,8 @@
 
 /* global __MANIFEST__ */
 
-var boot = require('./boot');
-var settings = require('../shared/settings').jsonConfigsFrom(document);
+const boot = require('./boot');
+const settings = require('../shared/settings').jsonConfigsFrom(document);
 
 boot(document, {
   assetRoot: settings.assetRoot || '__ASSET_ROOT__',

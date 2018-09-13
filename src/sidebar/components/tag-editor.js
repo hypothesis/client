@@ -5,7 +5,7 @@ function TagEditorController(tags) {
   this.onTagsChanged = function () {
     tags.store(this.tagList);
 
-    var newTags = this.tagList.map(function (item) { return item.text; });
+    const newTags = this.tagList.map(function (item) { return item.text; });
     this.onEditTags({tags: newTags});
   };
 

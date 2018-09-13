@@ -2,9 +2,9 @@
 
 /* eslint no-console: "off" */
 
-var queryString = require('query-string');
+const queryString = require('query-string');
 
-var Socket = require('./websocket');
+const Socket = require('./websocket');
 
 /**
  * Return a URL with a cache-busting query string parameter added.
@@ -13,8 +13,8 @@ var Socket = require('./websocket');
  * @return {string} The URL with a cache-buster added.
  */
 function cacheBustURL(url) {
-  var newUrl = url;
-  var cacheBuster = queryString.parse({timestamp: Date.now()});
+  let newUrl = url;
+  const cacheBuster = queryString.parse({timestamp: Date.now()});
   if (url.indexOf('?') !== -1) {
     newUrl += '&' + cacheBuster;
   } else {
@@ -43,9 +43,9 @@ function didAssetChange(url, changed) {
  * @param {Array<string>} changed - List of paths of modified assets.
  */
 function maybeReloadElement(element, changed) {
-  var parentElement = element.parentNode;
-  var newElement = element.cloneNode();
-  var srcKeys = ['href', 'src'];
+  const parentElement = element.parentNode;
+  const newElement = element.cloneNode();
+  const srcKeys = ['href', 'src'];
   srcKeys.forEach(function (key) {
     if (key in element && didAssetChange(element[key], changed)) {
       newElement[key] = cacheBustURL(element[key]);
@@ -55,7 +55,7 @@ function maybeReloadElement(element, changed) {
 }
 
 function reloadExternalStyleSheets(changed) {
-  var linkTags = [].slice.apply(document.querySelectorAll('link'));
+  const linkTags = [].slice.apply(document.querySelectorAll('link'));
   linkTags.forEach(function (tag) {
     maybeReloadElement(tag, changed);
   });
@@ -69,17 +69,17 @@ function reloadExternalStyleSheets(changed) {
  *                       used.
  */
 function connect(url) {
-  var conn = new Socket(url);
+  const conn = new Socket(url);
   conn.on('open', function () {
     console.log('Live reload client listening');
   });
   conn.on('message', function (event) {
-    var message = JSON.parse(event.data);
+    const message = JSON.parse(event.data);
     if (message.type === 'assets-changed') {
-      var scriptsOrTemplatesChanged = message.changed.some(function (path) {
+      const scriptsOrTemplatesChanged = message.changed.some(function (path) {
         return path.match(/\.(html|js)$/);
       });
-      var stylesChanged = message.changed.some(function (path) {
+      const stylesChanged = message.changed.some(function (path) {
         return path.match(/\.css$/);
       });
       if (scriptsOrTemplatesChanged) {

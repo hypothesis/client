@@ -10,24 +10,24 @@
 
 'use strict';
 
-var immutable = require('seamless-immutable');
+const immutable = require('seamless-immutable');
 
-var toSet = require('../../util/array-util').toSet;
-var uiConstants = require('../../ui-constants');
-var tabs = require('../../tabs');
+const toSet = require('../../util/array-util').toSet;
+const uiConstants = require('../../ui-constants');
+const tabs = require('../../tabs');
 
-var util = require('../util');
+const util = require('../util');
 
 
 /**
 * Default starting tab.
 */
-var TAB_DEFAULT = uiConstants.TAB_ANNOTATIONS;
+const TAB_DEFAULT = uiConstants.TAB_ANNOTATIONS;
 
  /**
   * Default sort keys for each tab.
   */
-var TAB_SORTKEY_DEFAULT = {};
+const TAB_SORTKEY_DEFAULT = {};
 TAB_SORTKEY_DEFAULT[uiConstants.TAB_ANNOTATIONS] = 'Location';
 TAB_SORTKEY_DEFAULT[uiConstants.TAB_NOTES] = 'Oldest';
 TAB_SORTKEY_DEFAULT[uiConstants.TAB_ORPHANS] = 'Location';
@@ -35,14 +35,14 @@ TAB_SORTKEY_DEFAULT[uiConstants.TAB_ORPHANS] = 'Location';
 /**
  * Available sort keys for each tab.
  */
-var TAB_SORTKEYS_AVAILABLE = {};
+const TAB_SORTKEYS_AVAILABLE = {};
 TAB_SORTKEYS_AVAILABLE[uiConstants.TAB_ANNOTATIONS] = ['Newest', 'Oldest', 'Location'];
 TAB_SORTKEYS_AVAILABLE[uiConstants.TAB_NOTES] = ['Newest', 'Oldest'];
 TAB_SORTKEYS_AVAILABLE[uiConstants.TAB_ORPHANS] = ['Newest', 'Oldest', 'Location'];
 
 
 function initialSelection(settings) {
-  var selection = {};
+  const selection = {};
   if (settings.annotations && !settings.query) {
     selection[settings.annotations] = true;
   }
@@ -89,7 +89,7 @@ function init(settings) {
   };
 }
 
-var update = {
+const update = {
   CLEAR_SELECTION: function () {
     return {filterQuery: null, selectedAnnotationMap: null};
   },
@@ -134,9 +134,9 @@ var update = {
   },
 
   ADD_ANNOTATIONS(state, action) {
-    var counts = tabs.counts(action.annotations);
+    const counts = tabs.counts(action.annotations);
     // If there are no annotations at all, ADD_ANNOTATIONS will not be called.
-    var haveOnlyPageNotes = counts.notes === action.annotations.length;
+    const haveOnlyPageNotes = counts.notes === action.annotations.length;
     // If this is the init phase and there are only page notes, select the page notes tab.
     if (state.annotations.length === 0 && haveOnlyPageNotes){
       return {selectedTab: uiConstants.TAB_NOTES};
@@ -157,7 +157,7 @@ var update = {
   },
 };
 
-var actions = util.actionTypes(update);
+const actions = util.actionTypes(update);
 
 function select(annotations) {
   return {
@@ -176,9 +176,9 @@ function selectAnnotations(ids) {
 /** Toggle whether annotations are selected or not. */
 function toggleSelectedAnnotations(ids) {
   return function (dispatch, getState) {
-    var selection = Object.assign({}, getState().selectedAnnotationMap);
-    for (var i = 0; i < ids.length; i++) {
-      var id = ids[i];
+    const selection = Object.assign({}, getState().selectedAnnotationMap);
+    for (let i = 0; i < ids.length; i++) {
+      const id = ids[i];
       if (selection[id]) {
         delete selection[id];
       } else {
@@ -200,7 +200,7 @@ function setForceVisible(id, visible) {
   // FIXME: This should be converted to a plain action and accessing the state
   // should happen in the update() function
   return function (dispatch, getState) {
-    var forceVisible = Object.assign({}, getState().forceVisible);
+    const forceVisible = Object.assign({}, getState().forceVisible);
     forceVisible[id] = visible;
     dispatch({
       type: actions.SET_FORCE_VISIBLE,
@@ -225,7 +225,7 @@ function setCollapsed(id, collapsed) {
   // FIXME: This should be converted to a plain action and accessing the state
   // should happen in the update() function
   return function (dispatch, getState) {
-    var expanded = Object.assign({}, getState().expanded);
+    const expanded = Object.assign({}, getState().expanded);
     expanded[id] = !collapsed;
     dispatch({
       type: actions.SET_EXPANDED,
@@ -291,7 +291,7 @@ function removeSelectedAnnotation(id) {
   // FIXME: This should be converted to a plain action and accessing the state
   // should happen in the update() function
   return function (dispatch, getState) {
-    var selection = Object.assign({}, getState().selectedAnnotationMap);
+    const selection = Object.assign({}, getState().selectedAnnotationMap);
     if (!selection || !id) {
       return;
     }

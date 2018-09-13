@@ -1,20 +1,20 @@
 'use strict';
 
-var annotationMetadata = require('../annotation-metadata');
-var memoize = require('../util/memoize');
-var { isThirdPartyUser, username } = require('../util/account-id');
+const annotationMetadata = require('../annotation-metadata');
+const memoize = require('../util/memoize');
+const { isThirdPartyUser, username } = require('../util/account-id');
 
 // @ngInject
 function AnnotationHeaderController(features, groups, settings, serviceUrl) {
-  var self = this;
+  const self = this;
 
   this.user = function () {
     return self.annotation.user;
   };
 
   this.displayName = () => {
-    var userInfo = this.annotation.user_info;
-    var isThirdPartyUser_ = isThirdPartyUser(this.annotation.user, settings.authDomain);
+    const userInfo = this.annotation.user_info;
+    const isThirdPartyUser_ = isThirdPartyUser(this.annotation.user, settings.authDomain);
     if (features.flagEnabled('client_display_names') || isThirdPartyUser_) {
       // userInfo is undefined if the api_render_user_info feature flag is off.
       if (userInfo) {
@@ -43,7 +43,7 @@ function AnnotationHeaderController(features, groups, settings, serviceUrl) {
     return groups.get(self.annotation.group);
   };
 
-  var documentMeta = memoize(annotationMetadata.domainAndTitle);
+  const documentMeta = memoize(annotationMetadata.domainAndTitle);
   this.documentMeta = function () {
     return documentMeta(self.annotation);
   };

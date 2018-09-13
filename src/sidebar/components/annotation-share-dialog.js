@@ -1,13 +1,13 @@
 'use strict';
 
-var angular = require('angular');
+const angular = require('angular');
 
-var scopeTimeout = require('../util/scope-timeout');
+const scopeTimeout = require('../util/scope-timeout');
 
 // @ngInject
 function AnnotationShareDialogController($element, $scope, analytics) {
-  var self = this;
-  var shareLinkInput = $element.find('input')[0];
+  const self = this;
+  const shareLinkInput = $element.find('input')[0];
 
   $scope.$watch('vm.isOpen', function (isOpen) {
     if (isOpen) {
@@ -20,8 +20,8 @@ function AnnotationShareDialogController($element, $scope, analytics) {
   });
 
   this.copyToClipboard = function (event) {
-    var $container = angular.element(event.currentTarget).parent();
-    var shareLinkInput = $container.find('input')[0];
+    const $container = angular.element(event.currentTarget).parent();
+    const shareLinkInput = $container.find('input')[0];
 
     try {
       shareLinkInput.select();

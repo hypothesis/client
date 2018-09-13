@@ -1,12 +1,12 @@
 'use strict';
 
-var EventEmitter = require('tiny-emitter');
-var proxyquire = require('proxyquire');
+const EventEmitter = require('tiny-emitter');
+const proxyquire = require('proxyquire');
 
-var events = require('../../events');
-var unroll = require('../../../shared/test/util').unroll;
+const events = require('../../events');
+const unroll = require('../../../shared/test/util').unroll;
 
-var fixtures = {
+const fixtures = {
   createNotification: {
     type: 'annotation-notification',
     options: {
@@ -39,7 +39,7 @@ var fixtures = {
 };
 
 // the most recently created FakeSocket instance
-var fakeWebSocket = null;
+let fakeWebSocket = null;
 
 class FakeSocket extends EventEmitter {
   constructor(url) {
@@ -68,15 +68,15 @@ class FakeSocket extends EventEmitter {
 }
 
 describe('Streamer', function () {
-  var fakeAnnotationMapper;
-  var fakeStore;
-  var fakeAuth;
-  var fakeGroups;
-  var fakeRootScope;
-  var fakeSession;
-  var fakeSettings;
-  var activeStreamer;
-  var Streamer;
+  let fakeAnnotationMapper;
+  let fakeStore;
+  let fakeAuth;
+  let fakeGroups;
+  let fakeRootScope;
+  let fakeSession;
+  let fakeSettings;
+  let activeStreamer;
+  let Streamer;
 
   function createDefaultStreamer() {
     activeStreamer = new Streamer(
@@ -91,7 +91,7 @@ describe('Streamer', function () {
   }
 
   beforeEach(function () {
-    var emitter = new EventEmitter();
+    const emitter = new EventEmitter();
 
     fakeAuth = {
       tokenGetter: function () {
@@ -168,7 +168,7 @@ describe('Streamer', function () {
   it('should send the client ID after connecting', function () {
     createDefaultStreamer();
     return activeStreamer.connect().then(function () {
-      var clientIdMsg = fakeWebSocket.messages.find(function (msg) {
+      const clientIdMsg = fakeWebSocket.messages.find(function (msg) {
         return msg.messageType === 'client_id';
       });
       assert.ok(clientIdMsg);
@@ -179,7 +179,7 @@ describe('Streamer', function () {
   it('should request the logged-in user ID after connecting', function () {
     createDefaultStreamer();
     return activeStreamer.connect().then(function () {
-      var whoamiMsg = fakeWebSocket.messages.find(function (msg) {
+      const whoamiMsg = fakeWebSocket.messages.find(function (msg) {
         return msg.type === 'whoami';
       });
       assert.ok(whoamiMsg);
@@ -221,7 +221,7 @@ describe('Streamer', function () {
     });
 
     it('should not close any existing socket', function () {
-      var oldWebSocket;
+      let oldWebSocket;
       createDefaultStreamer();
       return activeStreamer.connect().then(function () {
         oldWebSocket = fakeWebSocket;
@@ -235,7 +235,7 @@ describe('Streamer', function () {
 
   describe('#reconnect()', function () {
     it('should close the existing socket', function () {
-      var oldWebSocket;
+      let oldWebSocket;
       createDefaultStreamer();
 
       return activeStreamer.connect().then(function () {
@@ -289,7 +289,7 @@ describe('Streamer', function () {
       });
 
       it('saves pending deletions if the annotation is loaded', function () {
-        var id = fixtures.deleteNotification.payload[0].id;
+        const id = fixtures.deleteNotification.payload[0].id;
         fakeStore.annotationExists.returns(true);
 
         fakeWebSocket.notify(fixtures.deleteNotification);
@@ -299,7 +299,7 @@ describe('Streamer', function () {
       });
 
       it('discards pending deletions if the annotation is not loaded', function () {
-        var id = fixtures.deleteNotification.payload[0].id;
+        const id = fixtures.deleteNotification.payload[0].id;
         fakeStore.annotationExists.returns(false);
 
         fakeWebSocket.notify(fixtures.deleteNotification);
@@ -365,7 +365,7 @@ describe('Streamer', function () {
   });
 
   describe('when annotations are unloaded, updated or deleted', function () {
-    var changeEvents = [
+    const changeEvents = [
       {event: events.ANNOTATION_DELETED},
       {event: events.ANNOTATION_UPDATED},
       {event: events.ANNOTATIONS_UNLOADED},
@@ -409,7 +409,7 @@ describe('Streamer', function () {
     it('updates the session when a notification is received', function () {
       createDefaultStreamer();
       return activeStreamer.connect().then(function () {
-        var model = {
+        const model = {
           groups: [{
             id: 'new-group',
           }],
@@ -485,7 +485,7 @@ describe('Streamer', function () {
         fakeWebSocket.messages = [];
         fakeWebSocket.emit('open');
 
-        var configMsgTypes = fakeWebSocket.messages.map(function (msg) {
+        const configMsgTypes = fakeWebSocket.messages.map(function (msg) {
           return msg.type || msg.messageType;
         });
         assert.deepEqual(configMsgTypes, ['client_id', 'whoami']);

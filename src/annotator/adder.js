@@ -1,11 +1,11 @@
 'use strict';
 
-var classnames = require('classnames');
+const classnames = require('classnames');
 
-var template = require('./adder.html');
+const template = require('./adder.html');
 
-var ANNOTATE_BTN_SELECTOR = '.js-annotate-btn';
-var HIGHLIGHT_BTN_SELECTOR = '.js-highlight-btn';
+const ANNOTATE_BTN_SELECTOR = '.js-annotate-btn';
+const HIGHLIGHT_BTN_SELECTOR = '.js-highlight-btn';
 
 /**
  * @typedef Target
@@ -18,23 +18,23 @@ var HIGHLIGHT_BTN_SELECTOR = '.js-highlight-btn';
  * Show the adder above the selection with an arrow pointing down at the
  * selected text.
  */
-var ARROW_POINTING_DOWN = 1;
+const ARROW_POINTING_DOWN = 1;
 
 /**
  * Show the adder above the selection with an arrow pointing up at the
  * selected text.
  */
-var ARROW_POINTING_UP = 2;
+const ARROW_POINTING_UP = 2;
 
 function toPx(pixels) {
   return pixels.toString() + 'px';
 }
 
-var ARROW_HEIGHT = 10;
+const ARROW_HEIGHT = 10;
 
 // The preferred gap between the end of the text selection and the adder's
 // arrow position.
-var ARROW_H_MARGIN = 20;
+const ARROW_H_MARGIN = 20;
 
 function attachShadow(element) {
   if (element.attachShadow) {
@@ -57,7 +57,7 @@ function attachShadow(element) {
  * @return {Element}
  */
 function nearestPositionedAncestor(el) {
-  var parentEl = el.parentElement;
+  let parentEl = el.parentElement;
   while (parentEl.parentElement) {
     if (getComputedStyle(parentEl).position !== 'static') {
       break;
@@ -73,19 +73,19 @@ function nearestPositionedAncestor(el) {
  * Returns the root DOM node for the adder, which may be in a shadow tree.
  */
 function createAdderDOM(container) {
-  var element;
+  let element;
 
   // If the browser supports Shadow DOM, use it to isolate the adder
   // from the page's CSS
   //
   // See https://developers.google.com/web/fundamentals/primers/shadowdom/
-  var shadowRoot = attachShadow(container);
+  const shadowRoot = attachShadow(container);
   if (shadowRoot) {
     shadowRoot.innerHTML = template;
     element = shadowRoot.querySelector('.js-adder');
 
     // Load stylesheets required by adder into shadow DOM element
-    var adderStyles = Array.from(document.styleSheets).map(function (sheet) {
+    const adderStyles = Array.from(document.styleSheets).map(function (sheet) {
       return sheet.href;
     }).filter(function (url) {
       return (url || '').match(/(icomoon|annotator)\.css/);
@@ -102,7 +102,7 @@ function createAdderDOM(container) {
     // CSP, but that appears to be rare and if this happens, the user will still
     // get a usable adder, albeit one that uses browser default styles for the
     // toolbar.
-    var styleEl = document.createElement('style');
+    const styleEl = document.createElement('style');
     styleEl.textContent = adderStyles.map(function (url) {
       return '@import "' + url + '";';
     }).join('\n');
@@ -152,7 +152,7 @@ class Adder {
     this._view = this.element.ownerDocument.defaultView;
     this._enterTimeout = null;
 
-    var handleCommand = (event, callback) => {
+    const handleCommand = (event, callback) => {
       event.preventDefault();
       event.stopPropagation();
 
@@ -191,18 +191,18 @@ class Adder {
   target(targetRect, isSelectionBackwards) {
     // Set the initial arrow direction based on whether the selection was made
     // forwards/upwards or downwards/backwards.
-    var arrowDirection;
+    let arrowDirection;
     if (isSelectionBackwards) {
       arrowDirection = ARROW_POINTING_DOWN;
     } else {
       arrowDirection = ARROW_POINTING_UP;
     }
-    var top;
-    var left;
+    let top;
+    let left;
 
     // Position the adder such that the arrow it is above or below the selection
     // and close to the end.
-    var hMargin = Math.min(ARROW_H_MARGIN, targetRect.width);
+    const hMargin = Math.min(ARROW_H_MARGIN, targetRect.width);
     if (isSelectionBackwards) {
       left = targetRect.left - this._width() / 2 + hMargin;
     } else {
@@ -262,8 +262,8 @@ class Adder {
     // Typically the adder is a child of the `<body>` and the NPA is the root
     // `<html>` element. However page styling may make the `<body>` positioned.
     // See https://github.com/hypothesis/client/issues/487.
-    var positionedAncestor = nearestPositionedAncestor(this._container);
-    var parentRect = positionedAncestor.getBoundingClientRect();
+    const positionedAncestor = nearestPositionedAncestor(this._container);
+    const parentRect = positionedAncestor.getBoundingClientRect();
 
     Object.assign(this._container.style, {
       top: toPx(top - parentRect.top),

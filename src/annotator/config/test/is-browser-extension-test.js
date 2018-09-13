@@ -1,6 +1,6 @@
 'use strict';
 
-var isBrowserExtension = require('../is-browser-extension');
+const isBrowserExtension = require('../is-browser-extension');
 
 describe('annotator.config.isBrowserExtension', function() {
   [

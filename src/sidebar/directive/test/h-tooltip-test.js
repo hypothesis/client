@@ -1,8 +1,8 @@
 'use strict';
 
-var angular = require('angular');
+const angular = require('angular');
 
-var util = require('./util');
+const util = require('./util');
 
 function testComponent() {
   return {
@@ -13,8 +13,8 @@ function testComponent() {
 }
 
 describe('h-tooltip', function () {
-  var targetEl;
-  var tooltipEl;
+  let targetEl;
+  let tooltipEl;
 
   before(function () {
     angular.module('app', [])
@@ -24,13 +24,13 @@ describe('h-tooltip', function () {
 
   beforeEach(function () {
     angular.mock.module('app');
-    var testEl = util.createDirective(document, 'test', {});
+    const testEl = util.createDirective(document, 'test', {});
     targetEl = testEl[0].querySelector('div');
     tooltipEl = document.querySelector('.tooltip');
   });
 
   afterEach(function () {
-    var testEl = document.querySelector('test');
+    const testEl = document.querySelector('test');
     testEl.parentNode.removeChild(testEl);
   });
 

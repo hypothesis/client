@@ -1,10 +1,10 @@
 'use strict';
 
-var queryString = require('query-string');
-var uuid = require('node-uuid');
+const queryString = require('query-string');
+const uuid = require('node-uuid');
 
-var events = require('../events');
-var Socket = require('../websocket');
+const events = require('../events');
+const Socket = require('../websocket');
 
 /**
  * Open a new WebSocket connection to the Hypothesis push notification service.
@@ -23,14 +23,14 @@ var Socket = require('../websocket');
 function Streamer($rootScope, annotationMapper, store, auth,
                   groups, session, settings) {
   // The randomly generated session UUID
-  var clientId = uuid.v4();
+  const clientId = uuid.v4();
 
   // The socket instance for this Streamer instance
-  var socket;
+  let socket;
 
   // Client configuration messages, to be sent each time a new connection is
   // established.
-  var configMessages = {};
+  const configMessages = {};
 
   // The streamer maintains a set of pending updates and deletions which have
   // been received via the WebSocket but not yet applied to the contents of the
@@ -44,14 +44,14 @@ function Streamer($rootScope, annotationMapper, store, auth,
 
   // Map of ID -> updated annotation for updates that have been received over
   // the WS but not yet applied
-  var pendingUpdates = {};
+  let pendingUpdates = {};
   // Set of IDs of annotations which have been deleted but for which the
   // deletion has not yet been applied
-  var pendingDeletions = {};
+  let pendingDeletions = {};
 
   function handleAnnotationNotification(message) {
-    var action = message.options.action;
-    var annotations = message.payload;
+    const action = message.options.action;
+    const annotations = message.payload;
 
     switch (action) {
     case 'create':
@@ -103,7 +103,7 @@ function Streamer($rootScope, annotationMapper, store, auth,
     //
     // Unfortunately the error event does not provide a way to get at the
     // HTTP status code for HTTP -> WS upgrade requests.
-    var websocketHost = new URL(settings.websocketUrl).hostname;
+    const websocketHost = new URL(settings.websocketUrl).hostname;
     if (['localhost', '127.0.0.1'].indexOf(websocketHost) !== -1) {
       console.warn('Check that your H service is configured to allow ' +
                    'WebSocket connections from ' + window.location.origin);
@@ -115,7 +115,7 @@ function Streamer($rootScope, annotationMapper, store, auth,
     // scope watches on app state affected by the received message
     // are updated
     $rootScope.$apply(function () {
-      var message = JSON.parse(event.data);
+      const message = JSON.parse(event.data);
       if (!message) {
         return;
       }
@@ -125,7 +125,7 @@ function Streamer($rootScope, annotationMapper, store, auth,
       } else if (message.type === 'session-change') {
         handleSessionChangeNotification(message);
       } else if (message.type === 'whoyouare') {
-        var userid = store.getState().session.userid;
+        const userid = store.getState().session.userid;
         if (message.userid !== userid) {
           console.warn('WebSocket user ID "%s" does not match logged-in ID "%s"', message.userid, userid);
         }
@@ -155,21 +155,21 @@ function Streamer($rootScope, annotationMapper, store, auth,
     }
   }
 
-  var _connect = function () {
+  const _connect = function () {
     // If we have no URL configured, don't do anything.
     if (!settings.websocketUrl) {
       return Promise.resolve();
     }
 
     return auth.tokenGetter().then(function (token) {
-      var url;
+      let url;
       if (token) {
         // Include the access token in the URL via a query param. This method
         // is used to send credentials because the `WebSocket` constructor does
         // not support setting the `Authorization` header directly as we do for
         // other API requests.
-        var parsedURL = new URL(settings.websocketUrl);
-        var queryParams = queryString.parse(parsedURL.search);
+        const parsedURL = new URL(settings.websocketUrl);
+        const queryParams = queryString.parse(parsedURL.search);
         queryParams.access_token = token;
         parsedURL.search = queryString.stringify(queryParams);
         url = parsedURL.toString();
@@ -235,8 +235,8 @@ function Streamer($rootScope, annotationMapper, store, auth,
   }
 
   function applyPendingUpdates() {
-    var updates = Object.values(pendingUpdates);
-    var deletions = Object.keys(pendingDeletions).map(function (id) {
+    const updates = Object.values(pendingUpdates);
+    const deletions = Object.keys(pendingDeletions).map(function (id) {
       return {id: id};
     });
 
@@ -275,7 +275,7 @@ function Streamer($rootScope, annotationMapper, store, auth,
     pendingDeletions = {};
   }
 
-  var updateEvents = [
+  const updateEvents = [
     events.ANNOTATION_DELETED,
     events.ANNOTATION_UPDATED,
     events.ANNOTATIONS_UNLOADED,

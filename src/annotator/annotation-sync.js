@@ -6,7 +6,7 @@
 // It also listens for events from Guest when new annotations are created or
 // annotations successfully anchor and relays these to the sidebar app.
 function AnnotationSync(bridge, options) {
-  var self = this;
+  const self = this;
 
   this.bridge = bridge;
 
@@ -25,7 +25,7 @@ function AnnotationSync(bridge, options) {
 
   // Listen locally for interesting events
   Object.keys(this._eventListeners).forEach(function(eventName) {
-    var listener = self._eventListeners[eventName];
+    const listener = self._eventListeners[eventName];
     self._on(eventName, function(annotation) {
       listener.apply(self, [annotation]);
     });
@@ -34,7 +34,7 @@ function AnnotationSync(bridge, options) {
   // Register remotely invokable methods
   Object.keys(this._channelListeners).forEach(function(eventName) {
     self.bridge.on(eventName, function(data, callbackFunction) {
-      var listener = self._channelListeners[eventName];
+      const listener = self._channelListeners[eventName];
       listener.apply(self, [data, callbackFunction]);
     });
   });
@@ -46,8 +46,8 @@ AnnotationSync.prototype.cache = null;
 
 AnnotationSync.prototype.sync = function(annotations) {
   annotations = (function() {
-    var i;
-    var formattedAnnotations = [];
+    let i;
+    const formattedAnnotations = [];
 
     for (i = 0; i < annotations.length; i++) {
       formattedAnnotations.push(this._format(annotations[i]));
@@ -56,8 +56,8 @@ AnnotationSync.prototype.sync = function(annotations) {
   }).call(this);
   this.bridge.call('sync', annotations, (function(_this) {
     return function(err, annotations) {
-      var i;
-      var parsedAnnotations = [];
+      let i;
+      const parsedAnnotations = [];
       annotations = annotations || [];
 
       for (i = 0; i < annotations.length; i++) {
@@ -72,15 +72,15 @@ AnnotationSync.prototype.sync = function(annotations) {
 // Handlers for messages arriving through a channel
 AnnotationSync.prototype._channelListeners = {
   'deleteAnnotation': function(body, cb) {
-    var annotation = this._parse(body);
+    const annotation = this._parse(body);
     delete this.cache[annotation.$tag];
     this._emit('annotationDeleted', annotation);
     cb(null, this._format(annotation));
   },
   'loadAnnotations': function(bodies, cb) {
-    var annotations = (function() {
-      var i;
-      var parsedAnnotations = [];
+    const annotations = (function() {
+      let i;
+      const parsedAnnotations = [];
 
       for (i = 0; i < bodies.length; i++) {
         parsedAnnotations.push(this._parse(bodies[i]));
@@ -106,7 +106,7 @@ AnnotationSync.prototype._mkCallRemotelyAndParseResults = function(method, callB
   return (function(_this) {
     return function(annotation) {
       // Wrap the callback function to first parse returned items
-      var wrappedCallback = function(failure, results) {
+      const wrappedCallback = function(failure, results) {
         if (failure === null) {
           _this._parseResults(results);
         }
@@ -122,10 +122,10 @@ AnnotationSync.prototype._mkCallRemotelyAndParseResults = function(method, callB
 
 // Parse returned message bodies to update cache with any changes made remotely
 AnnotationSync.prototype._parseResults = function(results) {
-  var bodies;
-  var body;
-  var i;
-  var j;
+  let bodies;
+  let body;
+  let i;
+  let j;
 
   for (i = 0; i < results.length; i++) {
     bodies = results[i];
@@ -155,7 +155,7 @@ AnnotationSync.prototype._tag = function(ann, tag) {
 
 // Parse a message body from a RPC call with the provided parser.
 AnnotationSync.prototype._parse = function(body) {
-  var merged = Object.assign(this.cache[body.tag] || {}, body.msg);
+  const merged = Object.assign(this.cache[body.tag] || {}, body.msg);
   return this._tag(merged, body.tag);
 };
 

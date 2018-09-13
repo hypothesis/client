@@ -1,8 +1,8 @@
 'use strict';
 
-var events = require('../shared/bridge-events');
+const events = require('../shared/bridge-events');
 
-var ANNOTATION_COUNT_ATTR = 'data-hypothesis-annotation-count';
+const ANNOTATION_COUNT_ATTR = 'data-hypothesis-annotation-count';
 
 /**
  * Update the elements in the container element with the count data attribute
@@ -16,7 +16,7 @@ function annotationCounts(rootEl, crossframe) {
   crossframe.on(events.PUBLIC_ANNOTATION_COUNT_CHANGED, updateAnnotationCountElems);
 
   function updateAnnotationCountElems(newCount) {
-    var elems = rootEl.querySelectorAll('['+ANNOTATION_COUNT_ATTR+']');
+    const elems = rootEl.querySelectorAll('['+ANNOTATION_COUNT_ATTR+']');
     Array.from(elems).forEach(function(elem) {
       elem.textContent = newCount;
     });

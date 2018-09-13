@@ -1,8 +1,8 @@
 'use strict';
 
-var extend = require('extend');
+const extend = require('extend');
 
-var RPC = require('./frame-rpc');
+const RPC = require('./frame-rpc');
 
 /**
  * The Bridge service sets up a channel between frames and provides an events
@@ -37,10 +37,10 @@ class Bridge {
    * @return {RPC} - Channel for communicating with the window.
    */
   createChannel(source, origin, token) {
-    var channel = null;
-    var connected = false;
+    let channel = null;
+    let connected = false;
 
-    var ready = () => {
+    const ready = () => {
       if (connected) { return; }
       connected = true;
       Array.from(this.onConnectListeners).forEach((cb) =>
@@ -48,14 +48,14 @@ class Bridge {
       );
     };
 
-    var connect = (_token, cb) => {
+    const connect = (_token, cb) => {
       if (_token === token) {
         cb();
         ready();
       }
     };
 
-    var listeners = extend({connect}, this.channelListeners);
+    const listeners = extend({connect}, this.channelListeners);
 
     // Set up a channel
     channel = new RPC(window, source, origin, listeners);
@@ -81,13 +81,13 @@ class Bridge {
    * @param [Function] callback - Called with an array of results.
    */
   call(method, ...args) {
-    var cb;
+    let cb;
     if (typeof(args[args.length - 1]) === 'function') {
       cb = args[args.length - 1];
       args = args.slice(0, -1);
     }
 
-    var _makeDestroyFn = c => {
+    const _makeDestroyFn = c => {
       return error => {
         c.destroy();
         this.links = (Array.from(this.links).filter((l) => l.channel !== c).map((l) => l));
@@ -95,16 +95,16 @@ class Bridge {
       };
     };
 
-    var promises = this.links.map(function(l) {
-      var p = new Promise(function(resolve, reject) {
-        var timeout = setTimeout((() => resolve(null)), 1000);
+    const promises = this.links.map(function(l) {
+      const p = new Promise(function(resolve, reject) {
+        const timeout = setTimeout((() => resolve(null)), 1000);
         try {
           return l.channel.call(method, ...Array.from(args), function(err, result) {
             clearTimeout(timeout);
             if (err) { return reject(err); } else { return resolve(result); }
           });
         } catch (error) {
-          var err = error;
+          const err = error;
           return reject(err);
         }
       });
@@ -113,7 +113,7 @@ class Bridge {
       return p.catch(_makeDestroyFn(l.channel));
     });
 
-    var resultPromise = Promise.all(promises);
+    let resultPromise = Promise.all(promises);
 
     if (cb) {
       resultPromise = resultPromise

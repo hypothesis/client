@@ -7,7 +7,7 @@
  * Reproduced here because this enum is not exported consistently across
  * different versions of PDF.js
  */
-var RenderingStates = {
+const RenderingStates = {
   INITIAL: 0,
   RUNNING: 1,
   PAUSED: 2,

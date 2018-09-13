@@ -1,12 +1,12 @@
 'use strict';
 
-var angular = require('angular');
+const angular = require('angular');
 
-var util = require('../../directive/test/util');
+const util = require('../../directive/test/util');
 
 describe('shareDialog', function () {
-  var fakeAnalytics;
-  var fakeStore;
+  let fakeAnalytics;
+  let fakeStore;
 
   beforeEach(function () {
     fakeAnalytics = {
@@ -24,8 +24,8 @@ describe('shareDialog', function () {
   });
 
   it('generates new share link', function () {
-    var element = util.createDirective(document, 'shareDialog', {});
-    var uri = 'http://example.com';
+    const element = util.createDirective(document, 'shareDialog', {});
+    const uri = 'http://example.com';
     fakeStore.frames.returns([{ uri }]);
     element.scope.$digest();
     assert.equal(element.ctrl.sharePageLink,
@@ -34,8 +34,8 @@ describe('shareDialog', function () {
 
   it('tracks the target being shared', function(){
 
-    var element = util.createDirective(document, 'shareDialog');
-    var clickShareIcon = function(iconName){
+    const element = util.createDirective(document, 'shareDialog');
+    const clickShareIcon = function(iconName){
       element.find('.' + iconName).click();
     };
 

@@ -1,8 +1,8 @@
 'use strict';
 
-var events = require('../events');
-var resolve = require('../util/url-util').resolve;
-var serviceConfig = require('../service-config');
+const events = require('../events');
+const resolve = require('../util/url-util').resolve;
+const serviceConfig = require('../service-config');
 
 /**
  * @typedef RefreshOptions
@@ -31,7 +31,7 @@ function auth($http, $rootScope, $window, OAuthClient,
    * Authorization code from auth popup window.
    * @type {string}
    */
-  var authCode;
+  let authCode;
 
   /**
    * Token info retrieved via `POST /api/token` endpoint.
@@ -40,15 +40,15 @@ function auth($http, $rootScope, $window, OAuthClient,
    *
    * @type {Promise<TokenInfo|null>}
    */
-  var tokenInfoPromise;
+  let tokenInfoPromise;
 
   /** @type {OAuthClient} */
-  var client;
+  let client;
 
   /**
    * Absolute URL of the `/api/token` endpoint.
    */
-  var tokenUrl = resolve('token', settings.apiUrl);
+  const tokenUrl = resolve('token', settings.apiUrl);
 
   /**
    * Show an error message telling the user that the access token has expired.
@@ -74,7 +74,7 @@ function auth($http, $rootScope, $window, OAuthClient,
     // persisted for the default annotation service. If in future we support
     // logging into other services from the client, this function will need to
     // take the API URL as an argument.
-    var apiDomain = new URL(settings.apiUrl).hostname;
+    let apiDomain = new URL(settings.apiUrl).hostname;
 
     // Percent-encode periods to avoid conflict with section delimeters.
     apiDomain = apiDomain.replace(/\./g, '%2E');
@@ -87,7 +87,7 @@ function auth($http, $rootScope, $window, OAuthClient,
    * storage.
    */
   function loadToken() {
-    var token = localStorage.getObject(storageKey());
+    const token = localStorage.getObject(storageKey());
 
     if (!token ||
         typeof token.accessToken !== 'string' ||
@@ -165,7 +165,7 @@ function auth($http, $rootScope, $window, OAuthClient,
    */
   function tokenGetter() {
     if (!tokenInfoPromise) {
-      var cfg = serviceConfig(settings);
+      const cfg = serviceConfig(settings);
 
       // Check if automatic login is being used, indicated by the presence of
       // the 'grantToken' property in the service configuration.
@@ -187,7 +187,7 @@ function auth($http, $rootScope, $window, OAuthClient,
       } else if (authCode) {
         // Exchange authorization code retrieved from login popup for a new
         // access token.
-        var code = authCode;
+        const code = authCode;
         authCode = null; // Auth codes can only be used once.
         tokenInfoPromise = oauthClient().then(client =>
           client.exchangeAuthCode(code)
@@ -201,7 +201,7 @@ function auth($http, $rootScope, $window, OAuthClient,
       }
     }
 
-    var origToken = tokenInfoPromise;
+    const origToken = tokenInfoPromise;
 
     return tokenInfoPromise.then(token => {
       if (!token) {
@@ -216,11 +216,11 @@ function auth($http, $rootScope, $window, OAuthClient,
       }
 
       if (Date.now() > token.expiresAt) {
-        var shouldPersist = true;
+        let shouldPersist = true;
 
         // If we are using automatic login via a grant token, do not persist the
         // initial access token or refreshed tokens.
-        var cfg = serviceConfig(settings);
+        const cfg = serviceConfig(settings);
         if (cfg && typeof cfg.grantToken !== 'undefined') {
           shouldPersist = false;
         }
@@ -255,7 +255,7 @@ function auth($http, $rootScope, $window, OAuthClient,
    * then exchange for access and refresh tokens.
    */
   function login() {
-    var authWindow = OAuthClient.openAuthPopupWindow($window);
+    const authWindow = OAuthClient.openAuthPopupWindow($window);
     return oauthClient().then(client => {
       return client.authorize($window, authWindow);
     }).then(code => {

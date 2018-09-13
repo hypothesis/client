@@ -1,6 +1,6 @@
 'use strict';
 
-var redux = require('redux');
+const redux = require('redux');
 
 /**
  * Utility function that creates a fake Redux store for use in tests.
@@ -22,7 +22,7 @@ function fakeStore(initialState, methods) {
     }
   }
 
-  var store = redux.createStore(update, initialState);
+  const store = redux.createStore(update, initialState);
 
   store.setState = function (state) {
     store.dispatch({type: 'SET_STATE', state: state});

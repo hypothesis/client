@@ -2,7 +2,7 @@
 
 // @ngInject
 function ShareDialogController($scope, $element, analytics, store) {
-  var self = this;
+  const self = this;
 
   function updateSharePageLink(frames) {
     if (!frames.length) {
@@ -13,7 +13,7 @@ function ShareDialogController($scope, $element, analytics, store) {
     self.sharePageLink = 'https://hyp.is/go?url=' + encodeURIComponent(frames[0].uri);
   }
 
-  var shareLinkInput = $element[0].querySelector('.js-share-link');
+  const shareLinkInput = $element[0].querySelector('.js-share-link');
   shareLinkInput.focus();
   shareLinkInput.select();
 

@@ -1,9 +1,9 @@
 'use strict';
 
-var configFuncSettingsFrom = require('../config-func-settings-from');
+const configFuncSettingsFrom = require('../config-func-settings-from');
 
 describe('annotator.config.configFuncSettingsFrom', function() {
-  var sandbox = sinon.sandbox.create();
+  const sandbox = sinon.sandbox.create();
 
   afterEach('reset the sandbox', function() {
     sandbox.restore();
@@ -11,7 +11,7 @@ describe('annotator.config.configFuncSettingsFrom', function() {
 
   context("when there's no window.hypothesisConfig() function", function() {
     it('returns {}', function() {
-      var fakeWindow = {};
+      const fakeWindow = {};
 
       assert.deepEqual(configFuncSettingsFrom(fakeWindow), {});
     });
@@ -44,7 +44,7 @@ describe('annotator.config.configFuncSettingsFrom', function() {
     it('returns whatever window.hypothesisConfig() returns', function () {
       // It just blindly returns whatever hypothesisConfig() returns
       // (even if it's not an object).
-      var fakeWindow = { hypothesisConfig: sinon.stub().returns(42) };
+      const fakeWindow = { hypothesisConfig: sinon.stub().returns(42) };
 
       assert.equal(configFuncSettingsFrom(fakeWindow), 42);
     });

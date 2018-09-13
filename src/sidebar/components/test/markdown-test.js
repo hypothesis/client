@@ -1,10 +1,10 @@
 'use strict';
 
-var angular = require('angular');
-var proxyquire = require('proxyquire');
+const angular = require('angular');
+const proxyquire = require('proxyquire');
 
-var util = require('../../directive/test/util');
-var noCallThru = require('../../../shared/test/util').noCallThru;
+const util = require('../../directive/test/util');
+const noCallThru = require('../../../shared/test/util').noCallThru;
 
 describe('markdown', function () {
   function isHidden(element) {
@@ -24,7 +24,7 @@ describe('markdown', function () {
   }
 
   function getRenderedHTML(editor) {
-    var contentElement = viewElement(editor);
+    const contentElement = viewElement(editor);
     if (isHidden(contentElement)) {
       return 'rendered markdown is hidden';
     }
@@ -79,7 +79,7 @@ describe('markdown', function () {
 
   describe('read only state', function () {
     it('should show the rendered view when readOnly is true', function () {
-      var editor = util.createDirective(document, 'markdown', {
+      const editor = util.createDirective(document, 'markdown', {
         readOnly: true,
         text: 'Hello World',
       });
@@ -88,7 +88,7 @@ describe('markdown', function () {
     });
 
     it('should show the editor when readOnly is false', function () {
-      var editor = util.createDirective(document, 'markdown', {
+      const editor = util.createDirective(document, 'markdown', {
         readOnly: false,
         text: 'Hello World',
       });
@@ -99,7 +99,7 @@ describe('markdown', function () {
 
   describe('rendering', function () {
     it('should render input markdown', function () {
-      var editor = util.createDirective(document, 'markdown', {
+      const editor = util.createDirective(document, 'markdown', {
         readOnly: true,
         text: 'Hello World',
       });
@@ -107,12 +107,12 @@ describe('markdown', function () {
     });
 
     it('should render nothing if no text is provided', function () {
-      var editor = util.createDirective(document, 'markdown', {readOnly: true});
+      const editor = util.createDirective(document, 'markdown', {readOnly: true});
       assert.equal(getRenderedHTML(editor), 'rendered:');
     });
 
     it('should sanitize the result', function () {
-      var editor = util.createDirective(document, 'markdown', {
+      const editor = util.createDirective(document, 'markdown', {
         readOnly: true,
         text: 'Hello <script>alert("attack");</script> World',
       });
@@ -121,7 +121,7 @@ describe('markdown', function () {
     });
 
     it('should replace links with embeds in rendered output', function () {
-      var editor = util.createDirective(document, 'markdown', {
+      const editor = util.createDirective(document, 'markdown', {
         readOnly: true,
         text: 'A video: https://www.youtube.com/watch?v=yJDv-zdhzMY',
       });
@@ -129,7 +129,7 @@ describe('markdown', function () {
     });
 
     it('should tolerate malformed HTML', function () {
-      var editor = util.createDirective(document, 'markdown', {
+      const editor = util.createDirective(document, 'markdown', {
         readOnly: true,
         text: 'Hello <one two.',
       });
@@ -139,11 +139,11 @@ describe('markdown', function () {
 
   describe('toolbar buttons', function () {
     it('should apply formatting when clicking toolbar buttons', function () {
-      var editor = util.createDirective(document, 'markdown', {
+      const editor = util.createDirective(document, 'markdown', {
         readOnly: false,
         text: 'Hello World',
       });
-      var input = inputElement(editor);
+      const input = inputElement(editor);
       toolbarButtons(editor).forEach(function (button) {
         input.value = 'original text';
         angular.element(button).click();
@@ -152,8 +152,8 @@ describe('markdown', function () {
     });
 
     it('should notify parent that the text changed', function () {
-      var onEditText = sinon.stub();
-      var editor = util.createDirective(document, 'markdown', {
+      const onEditText = sinon.stub();
+      const editor = util.createDirective(document, 'markdown', {
         readOnly: false,
         text: 'Hello World',
         onEditText: {
@@ -171,27 +171,27 @@ describe('markdown', function () {
 
   describe('editing', function () {
     it('should populate the input with the current text', function () {
-      var editor = util.createDirective(document, 'markdown', {
+      const editor = util.createDirective(document, 'markdown', {
         readOnly: false,
         text: 'initial comment',
         onEditText: function () {},
       });
-      var input = inputElement(editor);
+      const input = inputElement(editor);
       assert.equal(input.value, 'initial comment');
     });
 
     it('should populate the input with empty text if no text is specified', function () {
-      var editor = util.createDirective(document, 'markdown', {
+      const editor = util.createDirective(document, 'markdown', {
         readOnly: false,
         onEditText: function () {},
       });
-      var input = inputElement(editor);
+      const input = inputElement(editor);
       assert.equal(input.value, '');
     });
 
     it('should call onEditText() callback when text changes', function () {
-      var onEditText = sinon.stub();
-      var editor = util.createDirective(document, 'markdown', {
+      const onEditText = sinon.stub();
+      const editor = util.createDirective(document, 'markdown', {
         readOnly: false,
         text: 'Hello World',
         onEditText: {
@@ -199,7 +199,7 @@ describe('markdown', function () {
           callback: onEditText,
         },
       });
-      var input = inputElement(editor);
+      const input = inputElement(editor);
       input.value = 'new text';
       util.sendEvent(input, 'input');
       assert.called(onEditText);
@@ -208,10 +208,10 @@ describe('markdown', function () {
   });
 
   describe('preview state', function () {
-    var editor;
+    let editor;
 
     function togglePreview() {
-      var toggle = editor[0].querySelector('.markdown-tools-toggle');
+      const toggle = editor[0].querySelector('.markdown-tools-toggle');
       angular.element(toggle).click();
       editor.scope.$digest();
     }
@@ -253,11 +253,11 @@ describe('markdown', function () {
 
   describe('custom text class', function () {
     it('should apply custom text class to text container', function () {
-      var editor = util.createDirective(document, 'markdown', {
+      const editor = util.createDirective(document, 'markdown', {
         customTextClass: 'fancy-effect',
         readOnly: true,
       });
-      var viewEl = viewElement(editor);
+      const viewEl = viewElement(editor);
       assert.include(viewEl.className, 'fancy-effect');
     });
   });

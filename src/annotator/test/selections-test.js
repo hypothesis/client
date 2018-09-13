@@ -1,12 +1,12 @@
 'use strict';
 
-var unroll = require('../../shared/test/util').unroll;
+const unroll = require('../../shared/test/util').unroll;
 
-var observable = require('../util/observable');
-var selections = require('../selections');
+const observable = require('../util/observable');
+const selections = require('../selections');
 
 function FakeDocument() {
-  var listeners = {};
+  const listeners = {};
 
   return {
     getSelection: function () {
@@ -30,11 +30,11 @@ function FakeDocument() {
 }
 
 describe('selections', function () {
-  var clock;
-  var fakeDocument;
-  var range;
-  var rangeSub;
-  var onSelectionChanged;
+  let clock;
+  let fakeDocument;
+  let range;
+  let rangeSub;
+  let onSelectionChanged;
 
   beforeEach(function () {
     clock = sinon.useFakeTimers();
@@ -42,7 +42,7 @@ describe('selections', function () {
     onSelectionChanged = sinon.stub();
 
     // Subscribe to selection changes, ignoring the initial event
-    var ranges = observable.drop(selections(fakeDocument), 1);
+    const ranges = observable.drop(selections(fakeDocument), 1);
     rangeSub = ranges.subscribe({next: onSelectionChanged});
 
     range = {};
@@ -68,9 +68,9 @@ describe('selections', function () {
   ]);
 
   it('emits an event if there is a selection at the initial subscription', function () {
-    var onInitialSelection = sinon.stub();
-    var ranges = selections(fakeDocument);
-    var sub = ranges.subscribe({next: onInitialSelection});
+    const onInitialSelection = sinon.stub();
+    const ranges = selections(fakeDocument);
+    const sub = ranges.subscribe({next: onInitialSelection});
     clock.tick(1);
     assert.called(onInitialSelection);
     sub.unsubscribe();

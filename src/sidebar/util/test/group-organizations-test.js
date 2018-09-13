@@ -1,7 +1,7 @@
 'use strict';
 
-var groupsByOrganization = require('../group-organizations');
-var orgFixtures = require('../../test/group-fixtures');
+const groupsByOrganization = require('../group-organizations');
+const orgFixtures = require('../../test/group-fixtures');
 
 describe('group-organizations', function () {
   context ('when sorting organizations and their contained groups', function () {

@@ -1,8 +1,8 @@
 'use strict';
 
-var angular = require('angular');
+const angular = require('angular');
 
-var util = require('../../directive/test/util');
+const util = require('../../directive/test/util');
 
 describe('svgIcon', function () {
   before(function () {
@@ -16,7 +16,7 @@ describe('svgIcon', function () {
   });
 
   it("sets the element's content to the content of the SVG", function () {
-    var el = util.createDirective(document, 'svgIcon', {name: 'refresh'});
+    const el = util.createDirective(document, 'svgIcon', {name: 'refresh'});
     assert.ok(el[0].querySelector('svg'));
   });
 

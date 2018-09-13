@@ -2,7 +2,7 @@
 
 // Prevent Babel inserting helper code after `@ngInject` comment below which
 // breaks browserify-ngannotate.
-var unused; // eslint-disable-line
+let unused; // eslint-disable-line
 
 // @ngInject
 function viewFilter(unicode) {
@@ -35,12 +35,12 @@ function viewFilter(unicode) {
     }
 
     matches(ann) {
-      var checker = this.checker;
+      const checker = this.checker;
       if (checker.autofalse && checker.autofalse(ann)) {
         return false;
       }
 
-      var value = checker.value(ann);
+      let value = checker.value(ann);
       if (Array.isArray(value)) {
         value = value.map(normalize);
       } else {
@@ -91,7 +91,7 @@ function viewFilter(unicode) {
           return '';
         }
         var target = annotation.target[0];
-        var selectors = target.selector || [];
+        const selectors = target.selector || [];
 
         return selectors
           .filter(s => s.type === 'TextQuoteSelector')
@@ -104,7 +104,7 @@ function viewFilter(unicode) {
       autofalse: ann => typeof ann.updated !== 'string',
       value: ann => new Date(ann.updated),
       match(term, value) {
-        var delta = (Date.now() - value) / 1000;
+        const delta = (Date.now() - value) / 1000;
         return delta <= term;
       },
     },
@@ -141,13 +141,13 @@ function viewFilter(unicode) {
   this.filter = (annotations, filters) => {
     // Convert the input filter object into a filter tree, expanding "any"
     // filters.
-    var fieldFilters = Object.entries(filters).filter(([, filter]) =>
+    const fieldFilters = Object.entries(filters).filter(([, filter]) =>
       filter.terms.length > 0)
     .map(([field, filter]) => {
-      var terms = filter.terms.map(normalize);
-      var termFilters;
+      const terms = filter.terms.map(normalize);
+      let termFilters;
       if (field === 'any') {
-        var anyFields = ['quote', 'text', 'tag', 'user'];
+        const anyFields = ['quote', 'text', 'tag', 'user'];
         termFilters = terms.map(term => new BinaryOpFilter('or', anyFields.map(field =>
           new TermFilter(field, term, this.fields[field])
         )));
@@ -157,7 +157,7 @@ function viewFilter(unicode) {
       return new BinaryOpFilter(filter.operator, termFilters);
     });
 
-    var rootFilter = new BinaryOpFilter('and', fieldFilters);
+    const rootFilter = new BinaryOpFilter('and', fieldFilters);
 
     return annotations
       .filter(ann => rootFilter.matches(ann))

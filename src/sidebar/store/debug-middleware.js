@@ -12,7 +12,7 @@
  */
 function debugMiddleware(store) {
   /* eslint-disable no-console */
-  var serial = 0;
+  let serial = 0;
 
   return function (next) {
     return function (action) {
@@ -23,7 +23,7 @@ function debugMiddleware(store) {
 
       ++serial;
 
-      var groupTitle = action.type + ' (' + serial.toString() + ')';
+      const groupTitle = action.type + ' (' + serial.toString() + ')';
       console.group(groupTitle);
       console.log('Prev State:', store.getState());
       console.log('Action:', action);

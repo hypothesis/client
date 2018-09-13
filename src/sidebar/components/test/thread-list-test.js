@@ -1,15 +1,15 @@
 'use strict';
 
-var angular = require('angular');
+const angular = require('angular');
 
-var EventEmitter = require('tiny-emitter');
-var immutable = require('seamless-immutable');
+const EventEmitter = require('tiny-emitter');
+const immutable = require('seamless-immutable');
 
-var events = require('../../events');
-var threadList = require('../thread-list');
-var util = require('../../directive/test/util');
+const events = require('../../events');
+const threadList = require('../thread-list');
+const util = require('../../directive/test/util');
 
-var annotFixtures = immutable({
+const annotFixtures = immutable({
   annotation: {$tag: 't1', id: '1', text: 'text'},
   reply: {
     $tag: 't2',
@@ -20,7 +20,7 @@ var annotFixtures = immutable({
   highlight: {$highlight: true, $tag: 't3', id: '3'},
 });
 
-var threadFixtures = immutable({
+const threadFixtures = immutable({
   thread: {
     children: [{
       id: annotFixtures.annotation.id,
@@ -39,8 +39,8 @@ var threadFixtures = immutable({
   },
 });
 
-var fakeVirtualThread;
-var fakeSettings = {};
+let fakeVirtualThread;
+const fakeSettings = {};
 
 class FakeVirtualThreadList extends EventEmitter {
   constructor($scope, $window, rootThread, options) {
@@ -48,7 +48,7 @@ class FakeVirtualThreadList extends EventEmitter {
 
     fakeVirtualThread = this; // eslint-disable-line consistent-this
 
-    var thread = rootThread;
+    let thread = rootThread;
 
     this.options = options;
     this.setRootThread = function (_thread) {
@@ -69,10 +69,10 @@ class FakeVirtualThreadList extends EventEmitter {
 }
 
 describe('threadList', function () {
-  var threadListContainers;
+  let threadListContainers;
 
   function createThreadList(inputs) {
-    var defaultInputs = {
+    const defaultInputs = {
       thread: threadFixtures.thread,
       onClearSelection: sinon.stub(),
       onForceVisible: sinon.stub(),
@@ -83,21 +83,21 @@ describe('threadList', function () {
 
     // Create a scrollable container for the `<thread-list>` so that scrolling
     // can be tested.
-    var parentEl = document.createElement('div');
+    const parentEl = document.createElement('div');
     parentEl.classList.add('js-thread-list-scroll-root');
     parentEl.style.overflow = 'scroll';
     parentEl.style.height = '100px';
 
     // Add an element inside the scrollable container which is much taller than
     // the container, so that it actually becomes scrollable.
-    var tallDiv = document.createElement('div');
+    const tallDiv = document.createElement('div');
     tallDiv.style.height = '1000px';
     parentEl.appendChild(tallDiv);
 
     document.body.appendChild(parentEl);
 
     // Create the `<thread-list>` instance
-    var element = util.createDirective(
+    const element = util.createDirective(
       document,
       'threadList',
       Object.assign({}, defaultInputs, inputs),
@@ -138,26 +138,26 @@ describe('threadList', function () {
       VirtualThreadList: FakeVirtualThreadList,
       settings: { theme: 'clean'},
     });
-    var element = createThreadList();
+    const element = createThreadList();
     fakeVirtualThread.notify();
     element.scope.$digest();
     assert.equal(element[0].querySelectorAll('.thread-list__card--theme-clean').length, element[0].querySelectorAll('annotation-thread').length);
   });
 
   it('displays the children of the root thread', function () {
-    var element = createThreadList();
+    const element = createThreadList();
     fakeVirtualThread.notify();
     element.scope.$digest();
-    var children = element[0].querySelectorAll('annotation-thread');
+    const children = element[0].querySelectorAll('annotation-thread');
     assert.equal(children.length, 2);
   });
 
   describe('when a new annotation is created', function () {
     it('scrolls the annotation into view', function () {
-      var element = createThreadList();
+      const element = createThreadList();
       element.parentEl.scrollTop = 500;
 
-      var annot = annotFixtures.annotation;
+      const annot = annotFixtures.annotation;
       element.scope.$broadcast(events.BEFORE_ANNOTATION_CREATED, annot);
 
       // Check that the thread list was scrolled up to make the new annotation
@@ -166,10 +166,10 @@ describe('threadList', function () {
     });
 
     it('does not scroll the annotation into view if it is a reply', function () {
-      var element = createThreadList();
+      const element = createThreadList();
       element.parentEl.scrollTop = 500;
 
-      var reply = annotFixtures.reply;
+      const reply = annotFixtures.reply;
       element.scope.$broadcast(events.BEFORE_ANNOTATION_CREATED, reply);
 
       // Check that the thread list was not scrolled
@@ -177,10 +177,10 @@ describe('threadList', function () {
     });
 
     it('does not scroll the annotation into view if it is a highlight', function () {
-      var element = createThreadList();
+      const element = createThreadList();
       element.parentEl.scrollTop = 500;
 
-      var highlight = annotFixtures.highlight;
+      const highlight = annotFixtures.highlight;
       element.scope.$broadcast(events.BEFORE_ANNOTATION_CREATED, highlight);
 
       // Check that the thread list was not scrolled
@@ -188,8 +188,8 @@ describe('threadList', function () {
     });
 
     it('clears the selection', function () {
-      var inputs = { onClearSelection: sinon.stub() };
-      var element = createThreadList(inputs);
+      const inputs = { onClearSelection: sinon.stub() };
+      const element = createThreadList(inputs);
       element.scope.$broadcast(events.BEFORE_ANNOTATION_CREATED,
         annotFixtures.annotation);
       assert.called(inputs.onClearSelection);
@@ -197,32 +197,32 @@ describe('threadList', function () {
   });
 
   it('calls onFocus() when the user hovers an annotation', function () {
-    var inputs = {
+    const inputs = {
       onFocus: {
         args: ['annotation'],
         callback: sinon.stub(),
       },
     };
-    var element = createThreadList(inputs);
+    const element = createThreadList(inputs);
     fakeVirtualThread.notify();
     element.scope.$digest();
-    var annotation = element[0].querySelector('.thread-list__card');
+    const annotation = element[0].querySelector('.thread-list__card');
     util.sendEvent(annotation, 'mouseover');
     assert.calledWithMatch(inputs.onFocus.callback,
       sinon.match(annotFixtures.annotation));
   });
 
   it('calls onSelect() when a user clicks an annotation', function () {
-    var inputs = {
+    const inputs = {
       onSelect: {
         args: ['annotation'],
         callback: sinon.stub(),
       },
     };
-    var element = createThreadList(inputs);
+    const element = createThreadList(inputs);
     fakeVirtualThread.notify();
     element.scope.$digest();
-    var annotation = element[0].querySelector('.thread-list__card');
+    const annotation = element[0].querySelector('.thread-list__card');
     util.sendEvent(annotation, 'click');
     assert.calledWithMatch(inputs.onSelect.callback,
       sinon.match(annotFixtures.annotation));
@@ -230,7 +230,7 @@ describe('threadList', function () {
 
   it('uses the correct scroll root', function () {
     createThreadList();
-    var scrollRoot = fakeVirtualThread.options.scrollRoot;
+    const scrollRoot = fakeVirtualThread.options.scrollRoot;
     assert.isTrue(scrollRoot.classList.contains('js-thread-list-scroll-root'));
   });
 });

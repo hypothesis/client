@@ -1,11 +1,11 @@
 'use strict';
 
-var buildThread = require('../build-thread');
-var events = require('../events');
-var memoize = require('../util/memoize');
-var metadata = require('../annotation-metadata');
-var tabs = require('../tabs');
-var uiConstants = require('../ui-constants');
+const buildThread = require('../build-thread');
+const events = require('../events');
+const memoize = require('../util/memoize');
+const metadata = require('../annotation-metadata');
+const tabs = require('../tabs');
+const uiConstants = require('../ui-constants');
 
 function truthyKeys(map) {
   return Object.keys(map).filter(function (k) {
@@ -15,7 +15,7 @@ function truthyKeys(map) {
 
 // Mapping from sort order name to a less-than predicate
 // function for comparing annotations to determine their sort order.
-var sortFns = {
+const sortFns = {
   'Newest': function (a, b) {
     return a.updated > b.updated;
   },
@@ -49,17 +49,17 @@ function RootThread($rootScope, store, drafts, searchFilter, viewFilter) {
    *        filter settings etc.)
    */
   function buildRootThread(state) {
-    var sortFn = sortFns[state.sortKey];
+    const sortFn = sortFns[state.sortKey];
 
-    var filterFn;
+    let filterFn;
     if (state.filterQuery) {
-      var filters = searchFilter.generateFacetedFilter(state.filterQuery);
+      const filters = searchFilter.generateFacetedFilter(state.filterQuery);
       filterFn = function (annot) {
         return viewFilter.filter([annot], filters).length > 0;
       };
     }
 
-    var threadFilterFn;
+    let threadFilterFn;
     if (state.isSidebar && !state.filterQuery) {
       threadFilterFn = function (thread) {
         if (!thread.annotation) {
@@ -97,7 +97,7 @@ function RootThread($rootScope, store, drafts, searchFilter, viewFilter) {
   //
   // Note: These events could all be converted into actions that are handled by
   // the Redux store in store.
-  var loadEvents = [events.ANNOTATION_CREATED,
+  const loadEvents = [events.ANNOTATION_CREATED,
                     events.ANNOTATION_UPDATED,
                     events.ANNOTATIONS_LOADED];
   loadEvents.forEach(function (event) {
@@ -141,7 +141,7 @@ function RootThread($rootScope, store, drafts, searchFilter, viewFilter) {
   // Once the focused group state is moved to the app state store, then the
   // logic in this event handler can be moved to the annotations reducer.
   $rootScope.$on(events.GROUP_FOCUSED, function (event, focusedGroupId) {
-    var updatedAnnots = store.getState().annotations.filter(function (ann) {
+    const updatedAnnots = store.getState().annotations.filter(function (ann) {
       return metadata.isNew(ann) && !metadata.isReply(ann);
     }).map(function (ann) {
       return Object.assign(ann, {

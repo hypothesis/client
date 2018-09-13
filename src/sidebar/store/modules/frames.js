@@ -1,6 +1,6 @@
 'use strict';
 
-var util = require('../util');
+const util = require('../util');
 
 function init() {
   return {
@@ -9,7 +9,7 @@ function init() {
   };
 }
 
-var update = {
+const update = {
   CONNECT_FRAME: function (state, action) {
     return {frames: state.frames.concat(action.frame)};
   },
@@ -21,8 +21,8 @@ var update = {
   },
 
   UPDATE_FRAME_ANNOTATION_FETCH_STATUS: function (state, action) {
-    var frames = state.frames.map(function (frame) {
-      var match = (frame.uri && frame.uri === action.uri);
+    const frames = state.frames.map(function (frame) {
+      const match = (frame.uri && frame.uri === action.uri);
       if (match) {
         return Object.assign({}, frame, {
           isAnnotationFetchComplete: action.isAnnotationFetchComplete,
@@ -37,7 +37,7 @@ var update = {
   },
 };
 
-var actions = util.actionTypes(update);
+const actions = util.actionTypes(update);
 
 /**
  * Add a frame to the list of frames currently connected to the sidebar app.
@@ -72,7 +72,7 @@ function frames(state) {
 }
 
 function searchUrisForFrame(frame) {
-  var uris = [frame.uri];
+  let uris = [frame.uri];
 
   if (frame.metadata && frame.metadata.documentFingerprint) {
     uris = frame.metadata.link.map(function (link) {

@@ -30,13 +30,13 @@ function toPx(val) {
  *        state.
  */
 function ExcerptOverflowMonitor(excerpt, requestAnimationFrame) {
-  var pendingUpdate = false;
+  let pendingUpdate = false;
 
   // Last-calculated overflow state
-  var prevOverflowing;
+  let prevOverflowing;
 
   function update() {
-    var state = excerpt.getState();
+    const state = excerpt.getState();
 
     if (!pendingUpdate) {
       return;
@@ -44,9 +44,9 @@ function ExcerptOverflowMonitor(excerpt, requestAnimationFrame) {
 
     pendingUpdate = false;
 
-    var overflowing = false;
+    let overflowing = false;
     if (state.enabled) {
-      var hysteresisPx = state.overflowHysteresis || 0;
+      const hysteresisPx = state.overflowHysteresis || 0;
       overflowing = excerpt.contentHeight() >
         (state.collapsedHeight + hysteresisPx);
     }
@@ -75,12 +75,12 @@ function ExcerptOverflowMonitor(excerpt, requestAnimationFrame) {
    * current overflow state.
    */
   function contentStyle() {
-    var state = excerpt.getState();
+    const state = excerpt.getState();
     if (!state.enabled) {
       return {};
     }
 
-    var maxHeight = '';
+    let maxHeight = '';
     if (prevOverflowing) {
       if (state.collapse) {
         maxHeight = toPx(state.collapsedHeight);

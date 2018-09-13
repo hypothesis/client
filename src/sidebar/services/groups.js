@@ -1,6 +1,6 @@
 'use strict';
 
-var STORAGE_KEY = 'hypothesis.groups.focus';
+const STORAGE_KEY = 'hypothesis.groups.focus';
 const DEFAULT_ORG_ID = '__default__';
 
 /**
@@ -11,19 +11,19 @@ const DEFAULT_ORGANIZATION = {
   logo: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" class="svg-icon masthead-logo" height="28" viewBox="0 0 24 28" width="24"><path d="M3.886 3.945H21.03v16.047H3.886z" fill="#fff" /><path d="M0 2.005C0 .898.897 0 2.005 0h19.99C23.102 0 24 .897 24 2.005v19.99A2.005 2.005 0 0 1 21.995 24H2.005A2.005 2.005 0 0 1 0 21.995V2.005zM9 24l3 4 3-4H9zM7.008 4H4v16h3.008v-4.997C7.008 12.005 8.168 12.01 9 12c1 .007 2.019.06 2.019 2.003V20h3.008v-6.891C14.027 10 12 9.003 10 9.003c-1.99 0-2 0-2.992 1.999V4zM19 19.987c1.105 0 2-.893 2-1.994A1.997 1.997 0 0 0 19 16c-1.105 0-2 .892-2 1.993s.895 1.994 2 1.994z" fill="currentColor" fill-rule="evenodd" /></svg>',
 };
 
-var events = require('../events');
-var { awaitStateChange } = require('../util/state-util');
-var serviceConfig = require('../service-config');
+const events = require('../events');
+const { awaitStateChange } = require('../util/state-util');
+const serviceConfig = require('../service-config');
 
 // @ngInject
 function groups($rootScope, store, api, isSidebar, localStorage, serviceUrl, session,
                 settings) {
-  var svc = serviceConfig(settings);
-  var authority = svc ? svc.authority : null;
+  const svc = serviceConfig(settings);
+  const authority = svc ? svc.authority : null;
 
   function getDocumentUriForGroupSearch() {
     function mainUri() {
-      var uris = store.searchUris();
+      const uris = store.searchUris();
       if (uris.length === 0) {
         return null;
       }
@@ -55,14 +55,14 @@ function groups($rootScope, store, api, isSidebar, localStorage, serviceUrl, ses
 
     // If the main document URL has no groups associated with it, always show
     // the "Public" group.
-    var pageHasAssociatedGroups = groups.some(g => g.id !== '__world__');
+    const pageHasAssociatedGroups = groups.some(g => g.id !== '__world__');
     if (!pageHasAssociatedGroups) {
       return Promise.resolve(groups);
     }
 
     // Hide the "Public" group, unless the user specifically visited a direct-
     // link to an annotation in that group.
-    var nonWorldGroups = groups.filter(g => g.id !== '__world__');
+    const nonWorldGroups = groups.filter(g => g.id !== '__world__');
 
     if (!directLinkedAnnotationId) {
       return Promise.resolve(nonWorldGroups);
@@ -101,7 +101,7 @@ function groups($rootScope, store, api, isSidebar, localStorage, serviceUrl, ses
   // to include groups associated with this page. This is retained to determine
   // whether we need to re-fetch groups if the URLs of frames connected to the
   // sidebar app changes.
-  var documentUri;
+  let documentUri;
 
 
   /**
@@ -113,12 +113,12 @@ function groups($rootScope, store, api, isSidebar, localStorage, serviceUrl, ses
    * @return {Promise<Group[]>}
    */
   function load() {
-    var uri = Promise.resolve(null);
+    let uri = Promise.resolve(null);
     if (isSidebar) {
       uri = getDocumentUriForGroupSearch();
     }
     return uri.then(uri => {
-      var params = {
+      const params = {
         expand: 'organization',
       };
       if (authority) {
@@ -132,14 +132,14 @@ function groups($rootScope, store, api, isSidebar, localStorage, serviceUrl, ses
       // Fetch groups from the API.
       return api.groups.list(params, null, { includeMetadata: true });
     }).then(({ data, token }) => {
-      var isLoggedIn = token !== null;
-      var directLinkedAnnotation = settings.annotations;
+      const isLoggedIn = token !== null;
+      const directLinkedAnnotation = settings.annotations;
       return filterGroups(data, isLoggedIn, directLinkedAnnotation);
     }).then(groups => {
       injectOrganizations(groups);
 
-      var isFirstLoad = store.allGroups().length === 0;
-      var prevFocusedGroup = localStorage.getItem(STORAGE_KEY);
+      const isFirstLoad = store.allGroups().length === 0;
+      const prevFocusedGroup = localStorage.getItem(STORAGE_KEY);
 
       store.loadGroups(groups);
       if (isFirstLoad && groups.some(g => g.id === prevFocusedGroup)) {
@@ -188,9 +188,9 @@ function groups($rootScope, store, api, isSidebar, localStorage, serviceUrl, ses
   }
 
   // Persist the focused group to storage when it changes.
-  var prevFocusedId = store.focusedGroupId();
+  let prevFocusedId = store.focusedGroupId();
   store.subscribe(() => {
-    var focusedId = store.focusedGroupId();
+    const focusedId = store.focusedGroupId();
     if (focusedId !== prevFocusedId) {
       prevFocusedId = focusedId;
 

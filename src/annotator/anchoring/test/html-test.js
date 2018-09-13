@@ -1,15 +1,15 @@
 'use strict';
 
-var html = require('../html');
+const html = require('../html');
 
-var toResult = require('../../../shared/test/promise-util').toResult;
-var unroll = require('../../../shared/test/util').unroll;
-var fixture = require('./html-anchoring-fixture.html');
+const toResult = require('../../../shared/test/promise-util').toResult;
+const unroll = require('../../../shared/test/util').unroll;
+const fixture = require('./html-anchoring-fixture.html');
 
 /** Return all text node children of `container`. */
 function textNodes(container) {
-  var nodes = [];
-  var walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT);
+  const nodes = [];
+  const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT);
   while (walker.nextNode()) {
     nodes.push(walker.currentNode);
   }
@@ -26,7 +26,7 @@ function findNode(context, query) {
   if (query.slice(0,1) === '/') {
     query = query.slice(1);
   }
-  var result = document.evaluate(query, context, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null);
+  const result = document.evaluate(query, context, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null);
   return result.singleNodeValue;
 }
 
@@ -37,8 +37,8 @@ function findNode(context, query) {
  * @param {Object} descriptor
  */
 function toRange(root, descriptor) {
-  var startNode;
-  var endNode;
+  let startNode;
+  let endNode;
 
   if (typeof descriptor.startContainer === 'string') {
     startNode = findNode(root, descriptor.startContainer);
@@ -52,7 +52,7 @@ function toRange(root, descriptor) {
     endNode = textNodes(root)[descriptor.endContainer];
   }
 
-  var range = document.createRange();
+  const range = document.createRange();
   range.setStart(startNode, descriptor.startOffset);
   range.setEnd(endNode, descriptor.endOffset);
   return range;
@@ -76,7 +76,7 @@ function sortByType(selectors) {
  *
  * Originally taken from https://github.com/openannotation/annotator/blob/v1.2.x/test/spec/range_spec.coffee
  */
-var rangeSpecs = [
+const rangeSpecs = [
   // Format:
   //   [startContainer, startOffset, endContainer, endOffset, quote, description]
   // Where the *Container nodes are expressed as either an XPath relative to
@@ -119,14 +119,14 @@ var rangeSpecs = [
  * Test cases for which describing the range is known to fail for certain
  * selectors.
  */
-var expectedFailures = [
+const expectedFailures = [
   // [description, expectedFailureTypes]
 
   // Currently empty.
 ];
 
 describe('HTML anchoring', function () {
-  var container;
+  let container;
 
   beforeEach(function () {
     container = document.createElement('section');
@@ -138,7 +138,7 @@ describe('HTML anchoring', function () {
     container.remove();
   });
 
-  var testCases = rangeSpecs.map(function (data) {
+  const testCases = rangeSpecs.map(function (data) {
     return {
       range: {
         startContainer: data[0],
@@ -154,28 +154,28 @@ describe('HTML anchoring', function () {
   unroll('describes and anchors "#description"', function (testCase) {
     // Resolve the range descriptor to a DOM Range, verify that the expected
     // text was selected.
-    var range = toRange(container, testCase.range);
+    const range = toRange(container, testCase.range);
     assert.equal(range.toString(), testCase.quote);
 
     // Capture a set of selectors describing the range and perform basic sanity
     // checks on them.
-    var selectors = html.describe(container, range);
+    const selectors = html.describe(container, range);
 
-    var rangeSel = findByType(selectors, 'RangeSelector');
-    var positionSel = findByType(selectors, 'TextPositionSelector');
-    var quoteSel = findByType(selectors, 'TextQuoteSelector');
+    const rangeSel = findByType(selectors, 'RangeSelector');
+    const positionSel = findByType(selectors, 'TextPositionSelector');
+    const quoteSel = findByType(selectors, 'TextQuoteSelector');
 
-    var failInfo = expectedFailures.find(function (f) {
+    const failInfo = expectedFailures.find(function (f) {
       return f[0] === testCase.description;
     });
-    var failTypes = {};
+    let failTypes = {};
     if (failInfo) {
       failTypes = failInfo[1];
     }
 
-    var assertRange = failTypes.range ? assert.notOk : assert.ok;
-    var assertQuote = failTypes.quote ? assert.notOk : assert.ok;
-    var assertPosition = failTypes.position ? assert.notOk : assert.ok;
+    const assertRange = failTypes.range ? assert.notOk : assert.ok;
+    const assertQuote = failTypes.quote ? assert.notOk : assert.ok;
+    const assertPosition = failTypes.position ? assert.notOk : assert.ok;
 
     assertRange(rangeSel, 'range selector');
     assertPosition(positionSel, 'position selector');
@@ -183,7 +183,7 @@ describe('HTML anchoring', function () {
 
     // Map each selector back to a Range and check that it refers to the same
     // text. We test each selector in turn to make sure they are all valid.
-    var anchored = selectors.map(function (sel) {
+    const anchored = selectors.map(function (sel) {
       return html.anchor(container, [sel]).then(function (anchoredRange) {
         assert.equal(range.toString(), anchoredRange.toString());
       });
@@ -192,13 +192,13 @@ describe('HTML anchoring', function () {
   }, testCases);
 
   describe('When anchoring fails', function () {
-    var validQuoteSelector = {
+    const validQuoteSelector = {
       type: 'TextQuoteSelector',
       exact: 'Lorem ipsum',
     };
 
     it('throws an error if anchoring using a quote fails', function () {
-      var quoteSelector = {
+      const quoteSelector = {
         type: 'TextQuoteSelector',
         exact: 'This text does not appear in the web page',
       };
@@ -209,7 +209,7 @@ describe('HTML anchoring', function () {
     });
 
     it('does not throw an error if anchoring using a position fails', function () {
-      var positionSelector = {
+      const positionSelector = {
         type: 'TextPositionSelector',
         start: 1000,
         end: 1010,
@@ -221,7 +221,7 @@ describe('HTML anchoring', function () {
     });
 
     it('does not throw an error if anchoring using a range fails', function () {
-      var rangeSelector = {
+      const rangeSelector = {
         type: 'RangeSelector',
         startContainer: '/main',
         startOffset: 1,
@@ -236,8 +236,8 @@ describe('HTML anchoring', function () {
   });
 
   describe('Web page baselines', function () {
-    var fixtures = require('./html-baselines');
-    var frame;
+    const fixtures = require('./html-baselines');
+    let frame;
 
     before(function () {
       frame = document.createElement('iframe');
@@ -249,8 +249,8 @@ describe('HTML anchoring', function () {
     });
 
     unroll('generates selectors which match the baseline (#name)', function (fixture) {
-      var fixtureHtml = fixture.html;
-      var annotations = fixture.annotations.rows;
+      let fixtureHtml = fixture.html;
+      const annotations = fixture.annotations.rows;
 
       // Break references to external stylesheets and images so that the test
       // runner does not try to load them.
@@ -263,11 +263,11 @@ describe('HTML anchoring', function () {
 
       frame.contentWindow.document.documentElement.innerHTML = fixtureHtml;
 
-      var annotationsChecked = annotations.map(function (ann) {
+      const annotationsChecked = annotations.map(function (ann) {
         // Anchor the existing selectors
-        var root = frame.contentWindow.document.body;
-        var selectors = ann.target[0].selector;
-        var result = html.anchor(root, selectors);
+        const root = frame.contentWindow.document.body;
+        const selectors = ann.target[0].selector;
+        const result = html.anchor(root, selectors);
         return result.then(function (range) {
           // Re-anchor the selectors and check that the new and existing
           // selectors match.

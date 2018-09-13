@@ -1,16 +1,16 @@
 'use strict';
 
-var angular = require('angular');
-var EventEmitter = require('tiny-emitter');
+const angular = require('angular');
+const EventEmitter = require('tiny-emitter');
 
-var annotationFixtures = require('../../test/annotation-fixtures');
-var events = require('../../events');
-var FrameSync = require('../frame-sync').default;
-var createFakeStore = require('../../test/fake-redux-store');
-var formatAnnot = require('../frame-sync').formatAnnot;
-var uiConstants = require('../../ui-constants');
+const annotationFixtures = require('../../test/annotation-fixtures');
+const events = require('../../events');
+const FrameSync = require('../frame-sync').default;
+const createFakeStore = require('../../test/fake-redux-store');
+const formatAnnot = require('../frame-sync').formatAnnot;
+const uiConstants = require('../../ui-constants');
 
-var fixtures = {
+const fixtures = {
   ann: Object.assign({$tag: 't1'}, annotationFixtures.defaultAnnotation()),
 
   // New annotation received from the frame
@@ -51,10 +51,10 @@ var fixtures = {
 };
 
 describe('sidebar.frame-sync', function () {
-  var fakeStore;
-  var fakeBridge;
-  var frameSync;
-  var $rootScope;
+  let fakeStore;
+  let fakeBridge;
+  let frameSync;
+  let $rootScope;
 
   before(function () {
     angular.module('app', [])
@@ -74,7 +74,7 @@ describe('sidebar.frame-sync', function () {
       updateAnchorStatus: sinon.stub(),
     });
 
-    var emitter = new EventEmitter();
+    const emitter = new EventEmitter();
     fakeBridge = {
       call: sinon.stub(),
       createChannel: sinon.stub(),
@@ -115,7 +115,7 @@ describe('sidebar.frame-sync', function () {
     });
 
     it('sends a "loadAnnotations" message only for new annotations', function () {
-      var ann2 = Object.assign({}, fixtures.ann, {$tag: 't2', id: 'a2'});
+      const ann2 = Object.assign({}, fixtures.ann, {$tag: 't2', id: 'a2'});
       fakeStore.setState({annotations: [fixtures.ann]});
       fakeBridge.call.reset();
 
@@ -175,8 +175,8 @@ describe('sidebar.frame-sync', function () {
 
   context('when a new annotation is created in the frame', function () {
     it('emits a BEFORE_ANNOTATION_CREATED event', function () {
-      var onCreated = sinon.stub();
-      var ann = {target: []};
+      const onCreated = sinon.stub();
+      const ann = {target: []};
       $rootScope.$on(events.BEFORE_ANNOTATION_CREATED, onCreated);
 
       fakeBridge.emit('beforeCreateAnnotation', {tag: 't1', msg: ann});
@@ -189,7 +189,7 @@ describe('sidebar.frame-sync', function () {
   });
 
   context('when anchoring completes', function () {
-    var clock = sinon.stub();
+    let clock = sinon.stub();
 
     beforeEach(() => {
       clock = sinon.useFakeTimers();
@@ -226,7 +226,7 @@ describe('sidebar.frame-sync', function () {
     });
 
     it('emits an ANNOTATIONS_SYNCED event', function () {
-      var onSync = sinon.stub();
+      const onSync = sinon.stub();
       $rootScope.$on(events.ANNOTATIONS_SYNCED, onSync);
 
       fakeBridge.emit('sync', [{tag: 't1', msg: {$orphan: false}}]);
@@ -237,8 +237,8 @@ describe('sidebar.frame-sync', function () {
   });
 
   context('when a new frame connects', function () {
-    var frameInfo;
-    var fakeChannel = {
+    let frameInfo;
+    const fakeChannel = {
       call: function (name, callback) {
         callback(null, frameInfo);
       },
@@ -258,7 +258,7 @@ describe('sidebar.frame-sync', function () {
   });
 
   context('when a frame is destroyed', function () {
-    var frameId = fixtures.framesListEntry.id;
+    const frameId = fixtures.framesListEntry.id;
 
     it('removes the frame from the frames list', function () {
       fakeBridge.emit('destroyFrame', frameId);
@@ -294,7 +294,7 @@ describe('sidebar.frame-sync', function () {
 
   describe('on "sidebarOpened" message', function () {
     it('broadcasts a sidebarOpened event', function () {
-      var onSidebarOpened = sinon.stub();
+      const onSidebarOpened = sinon.stub();
       $rootScope.$on('sidebarOpened', onSidebarOpened);
 
       fakeBridge.emit('sidebarOpened');

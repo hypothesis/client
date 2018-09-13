@@ -1,13 +1,13 @@
 'use strict';
 
-var configFuncSettingsFrom = require('./config-func-settings-from');
-var isBrowserExtension = require('./is-browser-extension');
-var sharedSettings = require('../../shared/settings');
+const configFuncSettingsFrom = require('./config-func-settings-from');
+const isBrowserExtension = require('./is-browser-extension');
+const sharedSettings = require('../../shared/settings');
 
 function settingsFrom(window_) {
 
-  var jsonConfigs = sharedSettings.jsonConfigsFrom(window_.document);
-  var configFuncSettings = configFuncSettingsFrom(window_);
+  const jsonConfigs = sharedSettings.jsonConfigsFrom(window_.document);
+  const configFuncSettings = configFuncSettingsFrom(window_);
 
   /**
    * Return the href URL of the first annotator sidebar link in the given document.
@@ -24,7 +24,7 @@ function settingsFrom(window_) {
    *
    */
   function sidebarAppUrl() {
-    var link = window_.document.querySelector('link[type="application/annotator+html"][rel="sidebar"]');
+    const link = window_.document.querySelector('link[type="application/annotator+html"][rel="sidebar"]');
 
     if (!link) {
       throw new Error('No application/annotator+html (rel="sidebar") link in the document');
@@ -54,7 +54,7 @@ function settingsFrom(window_) {
    *
    */
   function clientUrl() {
-    var link = window_.document.querySelector('link[type="application/annotator+javascript"][rel="hypothesis-client"]');
+    const link = window_.document.querySelector('link[type="application/annotator+javascript"][rel="hypothesis-client"]');
 
     if (!link) {
       throw new Error('No application/annotator+javascript (rel="hypothesis-client") link in the document');
@@ -81,7 +81,7 @@ function settingsFrom(window_) {
     function annotationsFromURL() {
       // Annotation IDs are url-safe-base64 identifiers
       // See https://tools.ietf.org/html/rfc4648#page-7
-      var annotFragmentMatch = window_.location.href.match(/#annotations:([A-Za-z0-9_-]+)$/);
+      const annotFragmentMatch = window_.location.href.match(/#annotations:([A-Za-z0-9_-]+)$/);
       if (annotFragmentMatch) {
         return annotFragmentMatch[1];
       }
@@ -92,7 +92,7 @@ function settingsFrom(window_) {
   }
 
   function showHighlights() {
-    var showHighlights_ = hostPageSetting('showHighlights');
+    let showHighlights_ = hostPageSetting('showHighlights');
 
     if (showHighlights_ === null) {
       showHighlights_ = 'always';  // The default value is 'always'.
@@ -123,7 +123,7 @@ function settingsFrom(window_) {
 
     /** Return the query from the URL, or null. */
     function queryFromURL() {
-      var queryFragmentMatch = window_.location.href.match(/#annotations:(query|q):(.+)$/i);
+      const queryFragmentMatch = window_.location.href.match(/#annotations:(query|q):(.+)$/i);
       if (queryFragmentMatch) {
         try {
           return decodeURIComponent(queryFragmentMatch[2]);
@@ -138,8 +138,8 @@ function settingsFrom(window_) {
   }
 
   function hostPageSetting(name, options = {}) {
-    var allowInBrowserExt = options.allowInBrowserExt || false;
-    var hasDefaultValue = typeof options.defaultValue !== 'undefined';
+    const allowInBrowserExt = options.allowInBrowserExt || false;
+    const hasDefaultValue = typeof options.defaultValue !== 'undefined';
 
     if (!allowInBrowserExt && isBrowserExtension(sidebarAppUrl())) {
       return hasDefaultValue ? options.defaultValue : null;

@@ -1,18 +1,18 @@
 'use strict';
 
-var annotationMetadata = require('../annotation-metadata');
-var events = require('../events');
-var { isThirdPartyUser } = require('../util/account-id');
+const annotationMetadata = require('../annotation-metadata');
+const events = require('../events');
+const { isThirdPartyUser } = require('../util/account-id');
 
-var isNew = annotationMetadata.isNew;
-var isReply = annotationMetadata.isReply;
-var isPageNote = annotationMetadata.isPageNote;
+const isNew = annotationMetadata.isNew;
+const isReply = annotationMetadata.isReply;
+const isPageNote = annotationMetadata.isPageNote;
 
 /**
  * Return a copy of `annotation` with changes made in the editor applied.
  */
 function updateModel(annotation, changes, permissions) {
-  var userid = annotation.user;
+  const userid = annotation.user;
 
   return Object.assign({}, annotation, {
     // Apply changes from the draft
@@ -29,13 +29,13 @@ function AnnotationController(
   annotationMapper, api, drafts, flash, groups, permissions, serviceUrl,
   session, settings, streamer) {
 
-  var self = this;
-  var newlyCreatedByHighlightButton;
+  const self = this;
+  let newlyCreatedByHighlightButton;
 
   /** Save an annotation to the server. */
   function save(annot) {
-    var saved;
-    var updating = !!annot.id;
+    let saved;
+    const updating = !!annot.id;
 
     if (updating) {
       saved = api.annotation.update({id: annot.id}, annot);
@@ -45,7 +45,7 @@ function AnnotationController(
 
     return saved.then(function (savedAnnot) {
 
-      var event;
+      let event;
 
       // Copy across internal properties which are not part of the annotation
       // model saved on the server
@@ -194,7 +194,7 @@ function AnnotationController(
       return;
     }
 
-    var onRejected = function(err) {
+    const onRejected = function(err) {
       flash.error(err.message, 'Flagging annotation failed');
     };
     annotationMapper.flagAnnotation(self.annotation).then(function(){
@@ -210,14 +210,14 @@ function AnnotationController(
     */
   this.delete = function() {
     return $timeout(function() {  // Don't use confirm inside the digest cycle.
-      var msg = 'Are you sure you want to delete this annotation?';
+      const msg = 'Are you sure you want to delete this annotation?';
       if ($window.confirm(msg)) {
-        var onRejected = function(err) {
+        const onRejected = function(err) {
           flash.error(err.message, 'Deleting annotation failed');
         };
         $scope.$apply(function() {
           annotationMapper.deleteAnnotation(self.annotation).then(function(){
-            var event;
+            let event;
 
             if(self.isReply()){
               event = analytics.events.REPLY_DELETED;
@@ -288,7 +288,7 @@ function AnnotationController(
     if (!target.selector) {
       return null;
     }
-    var quoteSel = target.selector.find(function (sel) {
+    const quoteSel = target.selector.find(function (sel) {
       return sel.type === 'TextQuoteSelector';
     });
     return quoteSel ? quoteSel.exact : null;
@@ -355,10 +355,10 @@ function AnnotationController(
     * Creates a new message in reply to this annotation.
     */
   this.reply = function() {
-    var references = (self.annotation.references || []).concat(self.annotation.id);
-    var group = self.annotation.group;
-    var replyPermissions;
-    var userid = session.state.userid;
+    const references = (self.annotation.references || []).concat(self.annotation.id);
+    const group = self.annotation.group;
+    let replyPermissions;
+    const userid = session.state.userid;
     if (userid) {
       replyPermissions = self.state().isPrivate ?
         permissions.private(userid) : permissions.shared(userid, group);
@@ -394,7 +394,7 @@ function AnnotationController(
       return Promise.resolve();
     }
 
-    var updatedModel = updateModel(self.annotation, self.state(), permissions);
+    const updatedModel = updateModel(self.annotation, self.state(), permissions);
 
     // Optimistically switch back to view mode and display the saving
     // indicator
@@ -405,7 +405,7 @@ function AnnotationController(
 
       self.isSaving = false;
 
-      var event = isNew(self.annotation) ?
+      const event = isNew(self.annotation) ?
         events.ANNOTATION_CREATED : events.ANNOTATION_UPDATED;
       drafts.remove(self.annotation);
 
@@ -527,7 +527,7 @@ function AnnotationController(
   };
 
   this.state = function () {
-    var draft = drafts.get(self.annotation);
+    const draft = drafts.get(self.annotation);
     if (draft) {
       return draft;
     }

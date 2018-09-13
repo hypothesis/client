@@ -1,10 +1,10 @@
 'use strict';
 
-var apiRoutesFactory = require('../api-routes');
+const apiRoutesFactory = require('../api-routes');
 
 // Abridged version of the response returned by https://hypothes.is/api,
 // with the domain name changed.
-var apiIndexResponse = {
+const apiIndexResponse = {
   message: 'Annotation Service API',
   links: {
     annotation: {
@@ -24,7 +24,7 @@ var apiIndexResponse = {
 
 // Abridged version of the response returned by https://hypothes.is/api/links,
 // with the domain name changed.
-var linksResponse = {
+const linksResponse = {
   'forgot-password': 'https://annotation.service/forgot-password',
   'help': 'https://annotation.service/docs/help',
   'groups.new': 'https://annotation.service/groups/new',
@@ -37,9 +37,9 @@ var linksResponse = {
 };
 
 describe('sidebar.api-routes', () => {
-  var apiRoutes;
-  var fakeHttp;
-  var fakeSettings;
+  let apiRoutes;
+  let fakeHttp;
+  let fakeSettings;
 
   function httpResponse(status, data) {
     return Promise.resolve({ status, data });

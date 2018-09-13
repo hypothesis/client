@@ -1,14 +1,14 @@
 'use strict';
 
-var SearchClient = require('../search-client');
-var events = require('../events');
-var isThirdPartyService = require('../util/is-third-party-service');
-var memoize = require('../util/memoize');
-var tabs = require('../tabs');
-var uiConstants = require('../ui-constants');
+const SearchClient = require('../search-client');
+const events = require('../events');
+const isThirdPartyService = require('../util/is-third-party-service');
+const memoize = require('../util/memoize');
+const tabs = require('../tabs');
+const uiConstants = require('../ui-constants');
 
 function firstKey(object) {
-  for (var k in object) {
+  for (const k in object) {
     if (!object.hasOwnProperty(k)) {
       continue;
     }
@@ -22,8 +22,8 @@ function firstKey(object) {
  * ID is a key in `selection`.
  */
 function groupIDFromSelection(selection, results) {
-  var id = firstKey(selection);
-  var annot = results.find(function (annot) {
+  const id = firstKey(selection);
+  const annot = results.find(function (annot) {
     return annot.id === id;
   });
   if (!annot) {
@@ -37,19 +37,19 @@ function SidebarContentController(
   $scope, analytics, store, annotationMapper, api, drafts, features, frameSync,
   groups, rootThread, settings, streamer, streamFilter
 ) {
-  var self = this;
+  const self = this;
 
   function thread() {
     return rootThread.thread(store.getState());
   }
 
-  var unsubscribeAnnotationUI = store.subscribe(function () {
-    var state = store.getState();
+  const unsubscribeAnnotationUI = store.subscribe(function () {
+    const state = store.getState();
 
     self.rootThread = thread();
     self.selectedTab = state.selectedTab;
 
-    var counts = tabs.counts(state.annotations);
+    const counts = tabs.counts(state.annotations);
 
     Object.assign(self, {
       totalNotes: counts.notes,
@@ -62,7 +62,7 @@ function SidebarContentController(
   $scope.$on('$destroy', unsubscribeAnnotationUI);
 
   function focusAnnotation(annotation) {
-    var highlights = [];
+    let highlights = [];
     if (annotation) {
       highlights = [annotation.$tag];
     }
@@ -84,7 +84,7 @@ function SidebarContentController(
    */
   function firstSelectedAnnotation() {
     if (store.getState().selectedAnnotationMap) {
-      var id = Object.keys(store.getState().selectedAnnotationMap)[0];
+      const id = Object.keys(store.getState().selectedAnnotationMap)[0];
       return store.getState().annotations.find(function (annot) {
         return annot.id === id;
       });
@@ -93,14 +93,14 @@ function SidebarContentController(
     }
   }
 
-  var searchClients = [];
+  const searchClients = [];
 
   function _resetAnnotations() {
     annotationMapper.unloadAnnotations(store.savedAnnotations());
   }
 
   function _loadAnnotationsFor(uris, group) {
-    var searchClient = new SearchClient(api.search, {
+    const searchClient = new SearchClient(api.search, {
       // If no group is specified, we are fetching annotations from
       // all groups in order to find out which group contains the selected
       // annotation, therefore we need to load all chunks before processing
@@ -112,7 +112,7 @@ function SidebarContentController(
       if (store.hasSelectedAnnotations()) {
         // Focus the group containing the selected annotation and filter
         // annotations to those from this group
-        var groupID = groupIDFromSelection(
+        let groupID = groupIDFromSelection(
           store.getState().selectedAnnotationMap, results);
         if (!groupID) {
           // If the selected annotation is not available, fall back to
@@ -183,10 +183,10 @@ function SidebarContentController(
     // the batch size, this saves an extra roundtrip to the server
     // to fetch the selected annotation in order to determine which group
     // it is in before fetching the remaining annotations.
-    var group = store.hasSelectedAnnotations() ?
+    const group = store.hasSelectedAnnotations() ?
       null : groups.focused().id;
 
-    var searchUris = store.searchUris();
+    const searchUris = store.searchUris();
     if (searchUris.length > 0) {
       _loadAnnotationsFor(searchUris, group);
 
@@ -214,11 +214,11 @@ function SidebarContentController(
   $scope.$on(events.ANNOTATIONS_SYNCED, function (event, tags) {
     // When a direct-linked annotation is successfully anchored in the page,
     // focus and scroll to it
-    var selectedAnnot = firstSelectedAnnotation();
+    const selectedAnnot = firstSelectedAnnotation();
     if (!selectedAnnot) {
       return;
     }
-    var matchesSelection = tags.some(function (tag) {
+    const matchesSelection = tags.some(function (tag) {
       return tag === selectedAnnot.$tag;
     });
     if (!matchesSelection) {
@@ -281,7 +281,7 @@ function SidebarContentController(
   this.scrollTo = scrollToAnnotation;
 
   this.selectedAnnotationCount = function () {
-    var selection = store.getState().selectedAnnotationMap;
+    const selection = store.getState().selectedAnnotationMap;
     if (!selection) {
       return 0;
     }
@@ -289,7 +289,7 @@ function SidebarContentController(
   };
 
   this.selectedAnnotationUnavailable = function () {
-    var selectedID = firstKey(store.getState().selectedAnnotationMap);
+    const selectedID = firstKey(store.getState().selectedAnnotationMap);
     return !isLoading() &&
            !!selectedID &&
            !store.annotationExists(selectedID);
@@ -316,7 +316,7 @@ function SidebarContentController(
     // The user is logged out and has landed on a direct linked
     // annotation. If there is an annotation selection and that
     // selection is available to the user, show the CTA.
-    var selectedID = firstKey(store.getState().selectedAnnotationMap);
+    const selectedID = firstKey(store.getState().selectedAnnotationMap);
     return !isLoading() &&
            !!selectedID &&
            store.annotationExists(selectedID);
@@ -324,7 +324,7 @@ function SidebarContentController(
 
   this.isLoading = isLoading;
 
-  var visibleCount = memoize(function (thread) {
+  const visibleCount = memoize(function (thread) {
     return thread.children.reduce(function (count, child) {
       return count + visibleCount(child);
     }, thread.visible ? 1 : 0);
@@ -339,7 +339,7 @@ function SidebarContentController(
   };
 
   this.clearSelection = function () {
-    var selectedTab = store.getState().selectedTab;
+    let selectedTab = store.getState().selectedTab;
     if (!store.getState().selectedTab || store.getState().selectedTab === uiConstants.TAB_ORPHANS) {
       selectedTab = uiConstants.TAB_ANNOTATIONS;
     }

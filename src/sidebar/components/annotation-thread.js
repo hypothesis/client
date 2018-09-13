@@ -1,14 +1,14 @@
 'use strict';
 
 function hiddenCount(thread) {
-  var isHidden = thread.annotation && !thread.visible;
+  const isHidden = thread.annotation && !thread.visible;
   return thread.children.reduce(function (count, reply) {
     return count + hiddenCount(reply);
   }, isHidden ? 1 : 0);
 }
 
 function visibleCount(thread) {
-  var isVisible = thread.annotation && thread.visible;
+  const isVisible = thread.annotation && thread.visible;
   return thread.children.reduce(function (count, reply) {
     return count + visibleCount(reply);
   }, isVisible ? 1 : 0);

@@ -1,14 +1,14 @@
 'use strict';
 
-var angular = require('angular');
+const angular = require('angular');
 
-var module = angular.mock.module;
-var inject = angular.mock.inject;
+const module = angular.mock.module;
+const inject = angular.mock.inject;
 
 describe('spinner', function () {
-  var $animate = null;
-  var $element = null;
-  var sandbox = null;
+  let $animate = null;
+  let $element = null;
+  let sandbox = null;
 
   before(function () {
     angular.module('h', []).directive('spinner', require('../spinner'));

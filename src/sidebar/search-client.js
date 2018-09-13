@@ -1,6 +1,6 @@
 'use strict';
 
-var EventEmitter = require('tiny-emitter');
+const EventEmitter = require('tiny-emitter');
 
 /**
  * Client for the Hypothesis search API.
@@ -16,7 +16,7 @@ class SearchClient extends EventEmitter {
     super();
     opts = opts || {};
 
-    var DEFAULT_CHUNK_SIZE = 200;
+    const DEFAULT_CHUNK_SIZE = 200;
     this._searchFn = searchFn;
     this._chunkSize = opts.chunkSize || DEFAULT_CHUNK_SIZE;
     if (typeof opts.incremental !== 'undefined') {
@@ -28,7 +28,7 @@ class SearchClient extends EventEmitter {
   }
 
   _getBatch(query, offset) {
-    var searchQuery = Object.assign({
+    const searchQuery = Object.assign({
       limit: this._chunkSize,
       offset: offset,
       sort: 'created',
@@ -36,13 +36,13 @@ class SearchClient extends EventEmitter {
       _separate_replies: true,
     }, query);
 
-    var self = this;
+    const self = this;
     this._searchFn(searchQuery).then(function (results) {
       if (self._canceled) {
         return;
       }
 
-      var chunk = results.rows.concat(results.replies || []);
+      const chunk = results.rows.concat(results.replies || []);
       if (self._incremental) {
         self.emit('results', chunk);
       } else {
@@ -55,7 +55,7 @@ class SearchClient extends EventEmitter {
       // end up repeating the same query for the next page. If the server's
       // `total` count is incorrect for any reason, that will lead to the client
       // polling the server indefinitely.
-      var nextOffset = offset + results.rows.length;
+      const nextOffset = offset + results.rows.length;
       if (results.total > nextOffset && chunk.length > 0) {
         self._getBatch(query, nextOffset);
       } else {

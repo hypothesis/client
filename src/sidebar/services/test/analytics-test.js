@@ -1,8 +1,8 @@
 'use strict';
 
-var analyticsService = require('../analytics');
+const analyticsService = require('../analytics');
 
-var createEventObj = function(override){
+const createEventObj = function(override){
   return {
     category: override.category,
     label: override.label,
@@ -12,9 +12,9 @@ var createEventObj = function(override){
 
 describe('analytics', function () {
 
-  var $analyticsStub;
-  var $windowStub;
-  var eventTrackStub;
+  let $analyticsStub;
+  let $windowStub;
+  let eventTrackStub;
 
   beforeEach(function () {
     $analyticsStub = {
@@ -37,7 +37,7 @@ describe('analytics', function () {
   describe('applying global category based on environment contexts', function () {
 
     it('sets the category to match the appType setting value', function(){
-      var validTypes = ['chrome-extension', 'embed', 'bookmarklet', 'via'];
+      const validTypes = ['chrome-extension', 'embed', 'bookmarklet', 'via'];
       validTypes.forEach(function(appType, index){
         analyticsService($analyticsStub, $windowStub, {appType: appType}).track('event' + index);
         assert.deepEqual(eventTrackStub.args[index], ['event' + index, createEventObj({category: appType})]);

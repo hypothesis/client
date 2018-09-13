@@ -1,9 +1,9 @@
 'use strict';
 
-var { parseAccountID, username, isThirdPartyUser } = require('../account-id');
+const { parseAccountID, username, isThirdPartyUser } = require('../account-id');
 
 describe('sidebar.util.account-id', function () {
-  var term = 'acct:hacker@example.com';
+  const term = 'acct:hacker@example.com';
 
   describe('parseAccountID', function() {
     it('should extract the username and provider', function () {

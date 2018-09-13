@@ -1,11 +1,11 @@
 'use strict';
 
-var proxyquire = require('proxyquire');
-var util = require('../../../shared/test/util');
+const proxyquire = require('proxyquire');
+const util = require('../../../shared/test/util');
 
-var fakeSettingsFrom = sinon.stub();
+const fakeSettingsFrom = sinon.stub();
 
-var configFrom = proxyquire('../index', util.noCallThru({
+const configFrom = proxyquire('../index', util.noCallThru({
   './settings': fakeSettingsFrom,
 }));
 
@@ -34,7 +34,7 @@ describe('annotator.config.index', function() {
     it('returns the ' + settingName + ' setting', function() {
       fakeSettingsFrom()[settingName] = 'SETTING_VALUE';
 
-      var config = configFrom('WINDOW');
+      const config = configFrom('WINDOW');
 
       assert.equal(config[settingName], 'SETTING_VALUE');
     });
@@ -92,7 +92,7 @@ describe('annotator.config.index', function() {
     'services',
   ].forEach(function(settingName) {
     it('returns the ' + settingName + ' value from the host page', function() {
-      var settings = {
+      const settings = {
         'assetRoot': 'chrome-extension://1234/client/',
         'openSidebar': 'OPEN_SIDEBAR_SETTING',
         'branding': 'BRANDING_SETTING',
@@ -102,7 +102,7 @@ describe('annotator.config.index', function() {
         return settings[settingName];
       };
 
-      var settingValue = configFrom('WINDOW')[settingName];
+      const settingValue = configFrom('WINDOW')[settingName];
 
       assert.equal(settingValue, settings[settingName]);
     });

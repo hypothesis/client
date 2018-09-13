@@ -16,8 +16,8 @@
  */
 // @ngInject
 function tags(localStorage) {
-  var TAGS_LIST_KEY = 'hypothesis.user.tags.list';
-  var TAGS_MAP_KEY = 'hypothesis.user.tags.map';
+  const TAGS_LIST_KEY = 'hypothesis.user.tags.list';
+  const TAGS_MAP_KEY = 'hypothesis.user.tags.map';
 
   /**
    * Return a list of tag suggestions matching `query`.
@@ -26,7 +26,7 @@ function tags(localStorage) {
    * @return {Tag[]} List of matching tags
    */
   function filter(query) {
-    var savedTags = localStorage.getObject(TAGS_LIST_KEY) || [];
+    const savedTags = localStorage.getObject(TAGS_LIST_KEY) || [];
 
     return savedTags.filter((e) => {
       return e.toLowerCase().indexOf(query.toLowerCase()) !== -1;
@@ -41,7 +41,7 @@ function tags(localStorage) {
    */
   function store(tags) {
     // Update the stored (tag, frequency) map.
-    var savedTags = localStorage.getObject(TAGS_MAP_KEY) || {};
+    const savedTags = localStorage.getObject(TAGS_MAP_KEY) || {};
     tags.forEach((tag) => {
       if (savedTags[tag.text]) {
         savedTags[tag.text].count += 1;
@@ -57,7 +57,7 @@ function tags(localStorage) {
     localStorage.setObject(TAGS_MAP_KEY, savedTags);
 
     // Sort tag suggestions by frequency.
-    var tagsList = Object.keys(savedTags).sort((t1, t2) => {
+    const tagsList = Object.keys(savedTags).sort((t1, t2) => {
       if (savedTags[t1].count !== savedTags[t2].count) {
         return savedTags[t2].count - savedTags[t1].count;
       }

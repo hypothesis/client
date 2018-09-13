@@ -2,10 +2,10 @@
 
 // @ngInject
 function SearchInputController($element, $http, $scope) {
-  var self = this;
-  var button = $element.find('button');
-  var input = $element.find('input')[0];
-  var form = $element.find('form')[0];
+  const self = this;
+  const button = $element.find('button');
+  const input = $element.find('input')[0];
+  const form = $element.find('form')[0];
 
   button.on('click', function () {
     input.focus();

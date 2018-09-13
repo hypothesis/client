@@ -1,8 +1,8 @@
 'use strict';
 
-var util = require('../util');
+const util = require('../util');
 
-var fixtures = {
+const fixtures = {
   update: {
     ADD_ANNOTATIONS: function (state, action) {
       if (!state.annotations) {
@@ -34,8 +34,8 @@ describe('reducer utils', function () {
 
   describe('#createReducer', function () {
     it('returns a reducer that combines each update function from the input object', function () {
-      var reducer = util.createReducer(fixtures.update);
-      var newState = reducer({}, {
+      const reducer = util.createReducer(fixtures.update);
+      const newState = reducer({}, {
         type: 'ADD_ANNOTATIONS',
         annotations: [{id: 1}],
       });
@@ -45,21 +45,21 @@ describe('reducer utils', function () {
     });
 
     it('returns a new object if the action was handled', function () {
-      var reducer = util.createReducer(fixtures.update);
-      var originalState = {someFlag: false};
+      const reducer = util.createReducer(fixtures.update);
+      const originalState = {someFlag: false};
       assert.notEqual(reducer(originalState, {type: 'SELECT_TAB', tab: 'notes'}),
         originalState);
     });
 
     it('returns the original object if the action was not handled', function () {
-      var reducer = util.createReducer(fixtures.update);
-      var originalState = {someFlag: false};
+      const reducer = util.createReducer(fixtures.update);
+      const originalState = {someFlag: false};
       assert.equal(reducer(originalState, {type: 'UNKNOWN_ACTION'}), originalState);
     });
 
     it('preserves state not modified by the update function', function () {
-      var reducer = util.createReducer(fixtures.update);
-      var newState = reducer({otherFlag: false}, {
+      const reducer = util.createReducer(fixtures.update);
+      const newState = reducer({otherFlag: false}, {
         type: 'ADD_ANNOTATIONS',
         annotations: [{id: 1}],
       });
@@ -70,21 +70,21 @@ describe('reducer utils', function () {
     });
 
     it('applies update functions from each input object', () => {
-      var firstCounterActions = {
+      const firstCounterActions = {
         INCREMENT_COUNTER(state) {
           return { firstCounter: state.firstCounter + 1 };
         },
       };
-      var secondCounterActions = {
+      const secondCounterActions = {
         INCREMENT_COUNTER(state) {
           return { secondCounter: state.secondCounter + 1 };
         },
       };
-      var reducer = util.createReducer(firstCounterActions, secondCounterActions);
+      const reducer = util.createReducer(firstCounterActions, secondCounterActions);
 
-      var state =  { firstCounter: 5, secondCounter: 10 };
-      var action = { type: 'INCREMENT_COUNTER' };
-      var newState = reducer(state, action);
+      const state =  { firstCounter: 5, secondCounter: 10 };
+      const action = { type: 'INCREMENT_COUNTER' };
+      const newState = reducer(state, action);
 
       assert.deepEqual(newState, { firstCounter: 6, secondCounter: 11 });
     });
@@ -92,9 +92,9 @@ describe('reducer utils', function () {
 
   describe('#bindSelectors', function () {
     it('bound functions call original functions with current value of getState()', function () {
-      var annotations = [{id: 1}];
-      var getState = sinon.stub().returns({annotations: annotations});
-      var bound = util.bindSelectors({
+      const annotations = [{id: 1}];
+      const getState = sinon.stub().returns({annotations: annotations});
+      const bound = util.bindSelectors({
         countAnnotations: fixtures.countAnnotations,
       }, getState);
 

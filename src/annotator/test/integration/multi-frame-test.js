@@ -1,22 +1,22 @@
 'use strict';
 
-var proxyquire = require('proxyquire');
-var isLoaded = require('../../util/frame-util').isLoaded;
+const proxyquire = require('proxyquire');
+const isLoaded = require('../../util/frame-util').isLoaded;
 
-var FRAME_DEBOUNCE_WAIT = require('../../frame-observer').DEBOUNCE_WAIT + 10;
+const FRAME_DEBOUNCE_WAIT = require('../../frame-observer').DEBOUNCE_WAIT + 10;
 
 describe('CrossFrame multi-frame scenario', function () {
-  var fakeAnnotationSync;
-  var fakeBridge;
-  var proxyAnnotationSync;
-  var proxyBridge;
-  var container;
-  var crossFrame;
-  var options;
+  let fakeAnnotationSync;
+  let fakeBridge;
+  let proxyAnnotationSync;
+  let proxyBridge;
+  let container;
+  let crossFrame;
+  let options;
 
-  var sandbox = sinon.sandbox.create();
+  const sandbox = sinon.sandbox.create();
 
-  var waitForFrameObserver = function(cb){
+  const waitForFrameObserver = function(cb){
     return setTimeout(cb, FRAME_DEBOUNCE_WAIT);
   };
 
@@ -30,7 +30,7 @@ describe('CrossFrame multi-frame scenario', function () {
     proxyAnnotationSync = sandbox.stub().returns(fakeAnnotationSync);
     proxyBridge = sandbox.stub().returns(fakeBridge);
 
-    var CrossFrame = proxyquire('../../plugin/cross-frame', {
+    const CrossFrame = proxyquire('../../plugin/cross-frame', {
       '../annotation-sync': proxyAnnotationSync,
       '../../shared/bridge': proxyBridge,
     });
@@ -57,27 +57,27 @@ describe('CrossFrame multi-frame scenario', function () {
 
   it('detects frames on page', function () {
     // Create a frame before initializing
-    var validFrame = document.createElement('iframe');
+    const validFrame = document.createElement('iframe');
     validFrame.setAttribute('enable-annotation', '');
     container.appendChild(validFrame);
 
     // Create another that mimics the sidebar frame
     // This one should should not be detected
-    var invalidFrame = document.createElement('iframe');
+    const invalidFrame = document.createElement('iframe');
     invalidFrame.className = 'h-sidebar-iframe';
     container.appendChild(invalidFrame);
 
     // Now initialize
     crossFrame.pluginInit();
 
-    var validFramePromise = new Promise(function (resolve) {
+    const validFramePromise = new Promise(function (resolve) {
       isLoaded(validFrame, function () {
         assert(validFrame.contentDocument.body.hasChildNodes(),
           'expected valid frame to be modified');
         resolve();
       });
     });
-    var invalidFramePromise = new Promise(function (resolve) {
+    const invalidFramePromise = new Promise(function (resolve) {
       isLoaded(invalidFrame, function () {
         assert(!invalidFrame.contentDocument.body.hasChildNodes(),
           'expected invalid frame to not be modified');
@@ -90,7 +90,7 @@ describe('CrossFrame multi-frame scenario', function () {
 
   it('detects removed frames', function () {
     // Create a frame before initializing
-    var frame = document.createElement('iframe');
+    const frame = document.createElement('iframe');
     frame.setAttribute('enable-annotation', '');
     container.appendChild(frame);
 
@@ -104,7 +104,7 @@ describe('CrossFrame multi-frame scenario', function () {
   });
 
   it('injects embed script in frame', function () {
-    var frame = document.createElement('iframe');
+    const frame = document.createElement('iframe');
     frame.setAttribute('enable-annotation', '');
     container.appendChild(frame);
 
@@ -112,7 +112,7 @@ describe('CrossFrame multi-frame scenario', function () {
 
     return new Promise(function (resolve) {
       isLoaded(frame, function () {
-        var scriptElement = frame.contentDocument.querySelector('script[src]');
+        const scriptElement = frame.contentDocument.querySelector('script[src]');
         assert(scriptElement, 'expected embed script to be injected');
         assert.equal(scriptElement.src, options.config.clientUrl,
           'unexpected embed script source');
@@ -122,7 +122,7 @@ describe('CrossFrame multi-frame scenario', function () {
   });
 
   it('excludes injection from already injected frames', function () {
-    var frame = document.createElement('iframe');
+    const frame = document.createElement('iframe');
     frame.setAttribute('enable-annotation', '');
     container.appendChild(frame);
     frame.contentWindow.eval('window.__hypothesis_frame = true');
@@ -131,7 +131,7 @@ describe('CrossFrame multi-frame scenario', function () {
 
     return new Promise(function (resolve) {
       isLoaded(frame, function () {
-        var scriptElement = frame.contentDocument.querySelector('script[src]');
+        const scriptElement = frame.contentDocument.querySelector('script[src]');
         assert.isNull(scriptElement, 'expected embed script to not be injected');
         resolve();
       });
@@ -143,7 +143,7 @@ describe('CrossFrame multi-frame scenario', function () {
     crossFrame.pluginInit();
 
     // Add a frame to the DOM
-    var frame = document.createElement('iframe');
+    const frame = document.createElement('iframe');
     frame.setAttribute('enable-annotation', '');
     container.appendChild(frame);
 
@@ -161,7 +161,7 @@ describe('CrossFrame multi-frame scenario', function () {
 
   it('detects dynamically removed frames', function () {
     // Create a frame before initializing
-    var frame = document.createElement('iframe');
+    const frame = document.createElement('iframe');
     frame.setAttribute('enable-annotation', '');
     container.appendChild(frame);
 
@@ -184,7 +184,7 @@ describe('CrossFrame multi-frame scenario', function () {
 
   it('detects a frame dynamically removed, and added again', function () {
     // Create a frame before initializing
-    var frame = document.createElement('iframe');
+    const frame = document.createElement('iframe');
     frame.setAttribute('enable-annotation', '');
     container.appendChild(frame);
 
@@ -225,7 +225,7 @@ describe('CrossFrame multi-frame scenario', function () {
     crossFrame.pluginInit();
 
     // Add a frame to the DOM
-    var frame = document.createElement('iframe');
+    const frame = document.createElement('iframe');
     frame.setAttribute('enable-annotation', '');
     container.appendChild(frame);
 

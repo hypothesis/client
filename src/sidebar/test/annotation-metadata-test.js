@@ -1,19 +1,19 @@
 'use strict';
 
-var annotationMetadata = require('../annotation-metadata');
-var fixtures = require('./annotation-fixtures');
+const annotationMetadata = require('../annotation-metadata');
+const fixtures = require('./annotation-fixtures');
 
-var unroll = require('../../shared/test/util').unroll;
+const unroll = require('../../shared/test/util').unroll;
 
-var documentMetadata = annotationMetadata.documentMetadata;
-var domainAndTitle = annotationMetadata.domainAndTitle;
+const documentMetadata = annotationMetadata.documentMetadata;
+const domainAndTitle = annotationMetadata.domainAndTitle;
 
 describe('annotation-metadata', function () {
   describe('.documentMetadata', function() {
 
     context('when the model has a document property', function() {
       it('returns the hostname from model.uri as the domain', function() {
-        var model = {
+        const model = {
           document: {},
           uri: 'http://example.com/',
         };
@@ -23,7 +23,7 @@ describe('annotation-metadata', function () {
 
       context('when model.uri does not start with "urn"', function() {
         it('uses model.uri as the uri', function() {
-          var model = {
+          const model = {
             document: {},
             uri: 'http://example.com/',
           };
@@ -35,7 +35,7 @@ describe('annotation-metadata', function () {
 
       context('when document.title is an available', function() {
         it('uses the first document title as the title', function() {
-          var model = {
+          const model = {
             uri: 'http://example.com/',
             document: {
               title: ['My Document', 'My Other Document'],
@@ -49,7 +49,7 @@ describe('annotation-metadata', function () {
 
       context('when there is no document.title', function() {
         it('returns the domain as the title', function() {
-          var model = {
+          const model = {
             document: {},
             uri: 'http://example.com/',
           };
@@ -61,19 +61,19 @@ describe('annotation-metadata', function () {
 
     context('when the model does not have a document property', function() {
       it('returns model.uri for the uri', function() {
-        var model = {uri: 'http://example.com/'};
+        const model = {uri: 'http://example.com/'};
 
         assert.equal(documentMetadata(model).uri, model.uri);
       });
 
       it('returns the hostname of model.uri for the domain', function() {
-        var model = {uri: 'http://example.com/'};
+        const model = {uri: 'http://example.com/'};
 
         assert.equal(documentMetadata(model).domain, 'example.com');
       });
 
       it('returns the hostname of model.uri for the title', function() {
-        var model = {uri: 'http://example.com/'};
+        const model = {uri: 'http://example.com/'};
 
         assert.equal(documentMetadata(model).title, 'example.com');
       });
@@ -83,7 +83,7 @@ describe('annotation-metadata', function () {
   describe('.domainAndTitle', function() {
     context('when an annotation has a non-http(s) uri', function () {
       it('returns no title link', function () {
-        var model = {
+        const model = {
           uri: 'file:///example.pdf',
         };
 
@@ -93,7 +93,7 @@ describe('annotation-metadata', function () {
 
     context('when an annotation has a direct link', function () {
       it('returns the direct link as a title link', function () {
-        var model = {
+        const model = {
           uri: 'https://annotatedsite.com/',
           links: {
             incontext: 'https://example.com',
@@ -106,7 +106,7 @@ describe('annotation-metadata', function () {
 
     context('when an annotation has no direct link but has a http(s) uri', function () {
       it('returns the uri as title link', function () {
-        var model = {
+        const model = {
           uri: 'https://example.com',
         };
 
@@ -116,7 +116,7 @@ describe('annotation-metadata', function () {
 
     context('when the annotation title is shorter than 30 characters', function () {
       it('returns the annotation title as title text', function () {
-        var model = {
+        const model = {
           uri: 'https://annotatedsite.com/',
           document: {
             title: ['A Short Document Title'],
@@ -129,7 +129,7 @@ describe('annotation-metadata', function () {
 
     context('when the annotation title is longer than 30 characters', function() {
       it('truncates the title text with "…"', function() {
-        var model = {
+        const model = {
           uri: 'http://example.com/',
           document: {
             title: ['My Really Really Long Document Title'],
@@ -145,7 +145,7 @@ describe('annotation-metadata', function () {
 
     context('when the document uri refers to a filename', function () {
       it('returns the filename as domain text', function () {
-        var model = {
+        const model = {
           uri: 'file:///path/to/example.pdf',
           document: {
             title: ['Document Title'],
@@ -158,7 +158,7 @@ describe('annotation-metadata', function () {
 
     context('when domain and title are the same', function () {
       it('returns an empty domain text string', function() {
-        var model = {
+        const model = {
           uri: 'https://example.com',
           document : {
             title: ['example.com'],
@@ -171,7 +171,7 @@ describe('annotation-metadata', function () {
 
     context('when the document has no domain', function () {
       it('returns an empty domain text string', function() {
-        var model = {
+        const model = {
           uri: 'doi:10.1234/5678',
           document : {
             title: ['example.com'],
@@ -184,7 +184,7 @@ describe('annotation-metadata', function () {
 
     context('when the document is a local file with a title', function () {
       it('returns the filename', function() {
-        var model = {
+        const model = {
           uri: 'file:///home/seanh/MyFile.pdf',
           document: {
             title: ['example.com'],
@@ -258,7 +258,7 @@ describe('annotation-metadata', function () {
     });
 
     unroll('returns false if an annotation is not publicly readable', function (testCase) {
-      var annotation = Object.assign(fixtures.defaultAnnotation(), {permissions: testCase});
+      const annotation = Object.assign(fixtures.defaultAnnotation(), {permissions: testCase});
       assert.isFalse(annotationMetadata.isPublic(annotation));
     }, [{
       read:['acct:someemail@localhost'],
@@ -273,32 +273,32 @@ describe('annotation-metadata', function () {
 
   describe('.isOrphan', function () {
     it('returns true if an annotation failed to anchor', function () {
-      var annotation = Object.assign(fixtures.defaultAnnotation(), {$orphan: true});
+      const annotation = Object.assign(fixtures.defaultAnnotation(), {$orphan: true});
       assert.isTrue(annotationMetadata.isOrphan(annotation));
     });
 
     it('returns false if an annotation successfully anchored', function() {
-      var orphan = Object.assign(fixtures.defaultAnnotation(), {$orphan: false});
+      const orphan = Object.assign(fixtures.defaultAnnotation(), {$orphan: false});
       assert.isFalse(annotationMetadata.isOrphan(orphan));
     });
   });
 
   describe('.isWaitingToAnchor', function () {
-    var isWaitingToAnchor = annotationMetadata.isWaitingToAnchor;
+    const isWaitingToAnchor = annotationMetadata.isWaitingToAnchor;
 
     it('returns true for annotations that are not yet anchored', function () {
       assert.isTrue(isWaitingToAnchor(fixtures.defaultAnnotation()));
     });
 
     it('returns false for annotations that are anchored', function () {
-      var anchored = Object.assign({}, fixtures.defaultAnnotation(), {
+      const anchored = Object.assign({}, fixtures.defaultAnnotation(), {
         $orphan: false,
       });
       assert.isFalse(isWaitingToAnchor(anchored));
     });
 
     it('returns false for annotations that failed to anchor', function () {
-      var anchored = Object.assign({}, fixtures.defaultAnnotation(), {
+      const anchored = Object.assign({}, fixtures.defaultAnnotation(), {
         $orphan: true,
       });
       assert.isFalse(isWaitingToAnchor(anchored));
@@ -313,7 +313,7 @@ describe('annotation-metadata', function () {
     });
 
     it('returns false if the anchoring timeout flag was set', function () {
-      var pending = Object.assign({}, fixtures.defaultAnnotation(), {
+      const pending = Object.assign({}, fixtures.defaultAnnotation(), {
         $anchorTimeout: true,
       });
       assert.isFalse(isWaitingToAnchor(pending));
@@ -321,14 +321,14 @@ describe('annotation-metadata', function () {
   });
 
   describe('.flagCount', function () {
-    var flagCount = annotationMetadata.flagCount;
+    const flagCount = annotationMetadata.flagCount;
 
     it('returns `null` if the user is not a moderator', function () {
       assert.equal(flagCount(fixtures.defaultAnnotation()), null);
     });
 
     it('returns the flag count if present', function () {
-      var ann = fixtures.moderatedAnnotation({ flagCount: 10});
+      const ann = fixtures.moderatedAnnotation({ flagCount: 10});
       assert.equal(flagCount(ann), 10);
     });
   });

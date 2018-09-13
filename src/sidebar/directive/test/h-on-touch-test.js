@@ -1,9 +1,9 @@
 'use strict';
 
-var angular = require('angular');
+const angular = require('angular');
 
-var unroll = require('../../../shared/test/util').unroll;
-var util = require('./util');
+const unroll = require('../../../shared/test/util').unroll;
+const util = require('./util');
 
 function testComponent() {
   return {
@@ -21,7 +21,7 @@ function testComponent() {
 }
 
 describe('hOnTouch', function () {
-  var testEl;
+  let testEl;
 
   before(function () {
     angular.module('app', [])

@@ -1,11 +1,11 @@
 'use strict';
 
-var angular = require('angular');
+const angular = require('angular');
 
-var annotationThread = require('../annotation-thread');
-var moderationBanner = require('../moderation-banner');
-var fixtures = require('../../test/annotation-fixtures');
-var util = require('../../directive/test/util');
+const annotationThread = require('../annotation-thread');
+const moderationBanner = require('../moderation-banner');
+const fixtures = require('../../test/annotation-fixtures');
+const util = require('../../directive/test/util');
 
 function PageObject(element) {
   this.annotations = function () {
@@ -38,7 +38,7 @@ describe('annotationThread', function () {
   });
 
   it('renders the tree structure of parent and child annotations', function () {
-    var element = util.createDirective(document, 'annotationThread', {
+    const element = util.createDirective(document, 'annotationThread', {
       thread: {
         id: '1',
         annotation: {id: '1', text: 'text'},
@@ -51,13 +51,13 @@ describe('annotationThread', function () {
         visible: true,
       },
     });
-    var pageObject = new PageObject(element);
+    const pageObject = new PageObject(element);
     assert.equal(pageObject.annotations().length, 2);
     assert.equal(pageObject.visibleReplies().length, 1);
   });
 
   it('does not render hidden threads', function () {
-    var element = util.createDirective(document, 'annotationThread', {
+    const element = util.createDirective(document, 'annotationThread', {
       thread: {
         id: '1',
         annotation: {id: '1'},
@@ -65,13 +65,13 @@ describe('annotationThread', function () {
         children: [],
       },
     });
-    var pageObject = new PageObject(element);
+    const pageObject = new PageObject(element);
     assert.equal(pageObject.annotations().length, 1);
     assert.isTrue(pageObject.isHidden(pageObject.annotations()[0]));
   });
 
   it('shows replies if not collapsed', function () {
-    var element = util.createDirective(document, 'annotationThread', {
+    const element = util.createDirective(document, 'annotationThread', {
       thread: {
         id: '1',
         annotation: {id: '1'},
@@ -85,12 +85,12 @@ describe('annotationThread', function () {
         collapsed: false,
       },
     });
-    var pageObject = new PageObject(element);
+    const pageObject = new PageObject(element);
     assert.isFalse(pageObject.isHidden(pageObject.replyList()));
   });
 
   it('does not show replies if collapsed', function () {
-    var element = util.createDirective(document, 'annotationThread', {
+    const element = util.createDirective(document, 'annotationThread', {
       thread: {
         id: '1',
         annotation: {id: '1'},
@@ -104,12 +104,12 @@ describe('annotationThread', function () {
         collapsed: true,
       },
     });
-    var pageObject = new PageObject(element);
+    const pageObject = new PageObject(element);
     assert.isTrue(pageObject.isHidden(pageObject.replyList()));
   });
 
   it('only shows replies that match the search filter', function () {
-    var element = util.createDirective(document, 'annotationThread', {
+    const element = util.createDirective(document, 'annotationThread', {
       thread: {
         id: '1',
         annotation: {id: '1'},
@@ -128,14 +128,14 @@ describe('annotationThread', function () {
         collapsed: false,
       },
     });
-    var pageObject = new PageObject(element);
+    const pageObject = new PageObject(element);
     assert.equal(pageObject.visibleReplies().length, 1);
   });
 
   describe('#toggleCollapsed', function () {
     it('toggles replies', function () {
-      var onChangeCollapsed = sinon.stub();
-      var element = util.createDirective(document, 'annotationThread', {
+      const onChangeCollapsed = sinon.stub();
+      const element = util.createDirective(document, 'annotationThread', {
         thread: {
           id: '123',
           annotation: {id: '123'},
@@ -154,8 +154,8 @@ describe('annotationThread', function () {
 
   describe('#showThreadAndReplies', function () {
     it('reveals all parents and replies', function () {
-      var onForceVisible = sinon.stub();
-      var thread = {
+      const onForceVisible = sinon.stub();
+      const thread = {
         id: '123',
         annotation: {id: '123'},
         children: [{
@@ -168,7 +168,7 @@ describe('annotationThread', function () {
           annotation: {id: 'parent-id'},
         },
       };
-      var element = util.createDirective(document, 'annotationThread', {
+      const element = util.createDirective(document, 'annotationThread', {
         thread: thread,
         onForceVisible: {
           args: ['thread'],
@@ -183,30 +183,30 @@ describe('annotationThread', function () {
   });
 
   it('renders the moderation banner', function () {
-    var ann = fixtures.moderatedAnnotation({ flagCount: 1 });
-    var thread = {
+    const ann = fixtures.moderatedAnnotation({ flagCount: 1 });
+    const thread = {
       annotation: ann,
       id: '123',
       parent: null,
       children: [],
     };
-    var element = util.createDirective(document, 'annotationThread', {
+    const element = util.createDirective(document, 'annotationThread', {
       thread: thread,
     });
-    var moderationBanner = element
+    const moderationBanner = element
       .find('moderation-banner')
       .controller('moderationBanner');
     assert.deepEqual(moderationBanner, { annotation: ann });
   });
 
   it('does not render the annotation or moderation banner if there is no annotation', function () {
-    var thread = {
+    const thread = {
       annotation: null,
       id: '123',
       parent: null,
       children: [],
     };
-    var element = util.createDirective(document, 'annotationThread', {
+    const element = util.createDirective(document, 'annotationThread', {
       thread: thread,
     });
     assert.notOk(element[0].querySelector('moderation-banner'));

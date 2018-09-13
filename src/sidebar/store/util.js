@@ -20,7 +20,7 @@ function actionTypes(updateFns) {
 function createReducer(...actionToUpdateFn) {
   // Combine the (action name => update function) maps together into a single
   // (action name => update functions) map.
-  var actionToUpdateFns = {};
+  const actionToUpdateFns = {};
   actionToUpdateFn.forEach(map => {
     Object.keys(map).forEach(k => {
       actionToUpdateFns[k] = (actionToUpdateFns[k] || []).concat(map[k]);
@@ -28,7 +28,7 @@ function createReducer(...actionToUpdateFn) {
   });
 
   return (state, action) => {
-    var fns = actionToUpdateFns[action.type];
+    const fns = actionToUpdateFns[action.type];
     if (!fns) {
       return state;
     }
@@ -44,9 +44,9 @@ function createReducer(...actionToUpdateFn) {
  */
 function bindSelectors(selectors, getState) {
   return Object.keys(selectors).reduce(function (bound, key) {
-    var selector = selectors[key];
+    const selector = selectors[key];
     bound[key] = function () {
-      var args = [].slice.apply(arguments);
+      const args = [].slice.apply(arguments);
       args.unshift(getState());
       return selector.apply(null, args);
     };

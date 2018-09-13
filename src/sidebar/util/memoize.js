@@ -12,8 +12,8 @@ function memoize(fn) {
     throw new Error('Memoize input must be a function of one argument');
   }
 
-  var lastArg;
-  var lastResult;
+  let lastArg;
+  let lastResult;
 
   return function (arg) {
     if (arg === lastArg) {

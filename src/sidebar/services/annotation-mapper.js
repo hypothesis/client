@@ -1,8 +1,8 @@
 'use strict';
 
-var angular = require('angular');
+const angular = require('angular');
 
-var events = require('../events');
+const events = require('../events');
 
 function getExistingAnnotation(store, id) {
   return store.getState().annotations.find(function (annot) {
@@ -16,9 +16,9 @@ function annotationMapper($rootScope, store, api) {
   function loadAnnotations(annotations, replies) {
     annotations = annotations.concat(replies || []);
 
-    var loaded = [];
+    const loaded = [];
     annotations.forEach(function (annotation) {
-      var existing = getExistingAnnotation(store, annotation.id);
+      const existing = getExistingAnnotation(store, annotation.id);
       if (existing) {
         $rootScope.$broadcast(events.ANNOTATION_UPDATED, annotation);
         return;
@@ -30,8 +30,8 @@ function annotationMapper($rootScope, store, api) {
   }
 
   function unloadAnnotations(annotations) {
-    var unloaded = annotations.map(function (annotation) {
-      var existing = getExistingAnnotation(store, annotation.id);
+    const unloaded = annotations.map(function (annotation) {
+      const existing = getExistingAnnotation(store, annotation.id);
       if (existing && annotation !== existing) {
         annotation = angular.copy(annotation, existing);
       }

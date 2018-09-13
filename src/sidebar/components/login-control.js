@@ -1,8 +1,8 @@
 'use strict';
 
-var bridgeEvents = require('../../shared/bridge-events');
-var { isThirdPartyUser } = require('../util/account-id');
-var serviceConfig = require('../service-config');
+const bridgeEvents = require('../../shared/bridge-events');
+const { isThirdPartyUser } = require('../util/account-id');
+const serviceConfig = require('../service-config');
 
 module.exports = {
   controllerAs: 'vm',
@@ -19,7 +19,7 @@ module.exports = {
       if (this.auth.status !== 'logged-in') {
         return false;
       }
-      var service = serviceConfig(settings);
+      const service = serviceConfig(settings);
       if (service && !service.onLogoutRequestProvided) {
         return false;
       }
@@ -27,7 +27,7 @@ module.exports = {
     };
 
     this.shouldEnableProfileButton = function () {
-      var service = serviceConfig(settings);
+      const service = serviceConfig(settings);
       if (service) {
         return service.onProfileRequestProvided;
       }

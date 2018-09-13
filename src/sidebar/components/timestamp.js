@@ -1,6 +1,6 @@
 'use strict';
 
-var dateUtil = require('../util/date');
+const dateUtil = require('../util/date');
 
 // @ngInject
 function TimestampController($scope, time) {
@@ -11,8 +11,8 @@ function TimestampController($scope, time) {
   // A formatted version of the timestamp (eg. 'Tue 22nd Dec 2015, 16:00')
   this.absoluteTimestamp = '';
 
-  var cancelTimestampRefresh;
-  var self = this;
+  let cancelTimestampRefresh;
+  const self = this;
 
   function updateTimestamp() {
     self.relativeTimestamp = time.toFuzzyString(self.timestamp);

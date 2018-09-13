@@ -1,8 +1,8 @@
 'use strict';
 
-var escapeHtml = require('escape-html');
-var katex = require('katex');
-var showdown = require('showdown');
+const escapeHtml = require('escape-html');
+const katex = require('katex');
+const showdown = require('showdown');
 
 function targetBlank() {
   function filter(text) {
@@ -11,7 +11,7 @@ function targetBlank() {
   return [{type: 'output', filter: filter}];
 }
 
-var converter;
+let converter;
 
 function renderMarkdown(markdown) {
   if (!converter) {
@@ -40,20 +40,20 @@ function mathPlaceholder(id) {
  * blocks replaced by placeholders.
  */
 function extractMath(content) {
-  var mathBlocks = [];
-  var pos = 0;
-  var replacedContent = content;
+  const mathBlocks = [];
+  let pos = 0;
+  let replacedContent = content;
 
   while (true) { // eslint-disable-line no-constant-condition
-    var blockMathStart = replacedContent.indexOf('$$', pos);
-    var inlineMathStart = replacedContent.indexOf('\\(', pos);
+    const blockMathStart = replacedContent.indexOf('$$', pos);
+    const inlineMathStart = replacedContent.indexOf('\\(', pos);
 
     if (blockMathStart === -1 && inlineMathStart === -1) {
       break;
     }
 
-    var mathStart;
-    var mathEnd;
+    let mathStart;
+    let mathEnd;
     if (blockMathStart !== -1 &&
         (inlineMathStart === -1 || blockMathStart < inlineMathStart)) {
       mathStart = blockMathStart;
@@ -69,15 +69,15 @@ function extractMath(content) {
       mathEnd = mathEnd + 2;
     }
 
-    var id = mathBlocks.length + 1;
-    var placeholder = mathPlaceholder(id);
+    const id = mathBlocks.length + 1;
+    const placeholder = mathPlaceholder(id);
     mathBlocks.push({
       id: id,
       expression: replacedContent.slice(mathStart + 2, mathEnd - 2),
       inline: inlineMathStart !== -1,
     });
 
-    var replacement;
+    let replacement;
     if (inlineMathStart !== -1) {
       replacement = placeholder;
     } else {
@@ -100,7 +100,7 @@ function extractMath(content) {
 
 function insertMath(html, mathBlocks) {
   return mathBlocks.reduce(function (html, block) {
-    var renderedMath;
+    let renderedMath;
     try {
       if (block.inline) {
         renderedMath = katex.renderToString(block.expression);
@@ -121,9 +121,9 @@ function renderMathAndMarkdown(markdown, sanitizeFn) {
   // output through the HTML sanitizer. Therefore we first extract the math
   // blocks from the input, render and sanitize the remaining markdown and then
   // render and re-insert the math blocks back into the output.
-  var mathInfo = extractMath(markdown);
-  var markdownHTML = sanitizeFn(renderMarkdown(mathInfo.content));
-  var mathAndMarkdownHTML = insertMath(markdownHTML, mathInfo.mathBlocks);
+  const mathInfo = extractMath(markdown);
+  const markdownHTML = sanitizeFn(renderMarkdown(mathInfo.content));
+  const mathAndMarkdownHTML = insertMath(markdownHTML, mathInfo.mathBlocks);
   return mathAndMarkdownHTML;
 }
 

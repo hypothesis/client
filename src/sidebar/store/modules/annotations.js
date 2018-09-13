@@ -5,20 +5,20 @@
 
 'use strict';
 
-var arrayUtil = require('../../util/array-util');
-var metadata = require('../../annotation-metadata');
-var uiConstants = require('../../ui-constants');
+const arrayUtil = require('../../util/array-util');
+const metadata = require('../../annotation-metadata');
+const uiConstants = require('../../ui-constants');
 
-var selection = require('./selection');
-var util = require('../util');
+const selection = require('./selection');
+const util = require('../util');
 
 /**
  * Return a copy of `current` with all matching annotations in `annotations`
  * removed.
  */
 function excludeAnnotations(current, annotations) {
-  var ids = {};
-  var tags = {};
+  const ids = {};
+  const tags = {};
   annotations.forEach(function (annot) {
     if (annot.id) {
       ids[annot.id] = true;
@@ -28,7 +28,7 @@ function excludeAnnotations(current, annotations) {
     }
   });
   return current.filter(function (annot) {
-    var shouldRemove = (annot.id && (annot.id in ids)) ||
+    const shouldRemove = (annot.id && (annot.id in ids)) ||
                        (annot.$tag && (annot.$tag in tags));
     return !shouldRemove;
   });
@@ -50,7 +50,7 @@ function findByTag(annotations, tag) {
  * Initialize the status flags and properties of a new annotation.
  */
 function initializeAnnot(annotation, tag) {
-  var orphan = annotation.$orphan;
+  let orphan = annotation.$orphan;
 
   if (!annotation.id) {
     // Currently the user ID, permissions and group of new annotations are
@@ -80,18 +80,18 @@ function init() {
   };
 }
 
-var update = {
+const update = {
   ADD_ANNOTATIONS: function (state, action) {
-    var updatedIDs = {};
-    var updatedTags = {};
+    const updatedIDs = {};
+    const updatedTags = {};
 
-    var added = [];
-    var unchanged = [];
-    var updated = [];
-    var nextTag = state.nextTag;
+    const added = [];
+    const unchanged = [];
+    const updated = [];
+    let nextTag = state.nextTag;
 
     action.annotations.forEach(function (annot) {
-      var existing;
+      let existing;
       if (annot.id) {
         existing = findByID(state.annotations, annot.id);
       }
@@ -128,14 +128,14 @@ var update = {
   },
 
   REMOVE_ANNOTATIONS: function (state, action) {
-    var annots = excludeAnnotations(state.annotations, action.annotations);
-    var selectedTab = state.selectedTab;
+    const annots = excludeAnnotations(state.annotations, action.annotations);
+    let selectedTab = state.selectedTab;
     if (selectedTab === uiConstants.TAB_ORPHANS &&
         arrayUtil.countIf(annots, metadata.isOrphan) === 0) {
       selectedTab = uiConstants.TAB_ANNOTATIONS;
     }
 
-    var tabUpdateFn = selection.update.SELECT_TAB;
+    const tabUpdateFn = selection.update.SELECT_TAB;
     return Object.assign(
       {annotations: annots},
       tabUpdateFn(state, selection.actions.selectTab(selectedTab))
@@ -147,18 +147,18 @@ var update = {
   },
 
   UPDATE_FLAG_STATUS: function (state, action) {
-    var annotations = state.annotations.map(function (annot) {
-      var match = (annot.id && annot.id === action.id);
+    const annotations = state.annotations.map(function (annot) {
+      const match = (annot.id && annot.id === action.id);
       if (match) {
         if (annot.flagged === action.isFlagged) {
           return annot;
         }
 
-        var newAnn = Object.assign({}, annot, {
+        const newAnn = Object.assign({}, annot, {
           flagged: action.isFlagged,
         });
         if (newAnn.moderation) {
-          var countDelta = action.isFlagged ? 1 : -1;
+          const countDelta = action.isFlagged ? 1 : -1;
           newAnn.moderation = Object.assign({}, annot.moderation, {
             flagCount: annot.moderation.flagCount + countDelta,
           });
@@ -172,12 +172,12 @@ var update = {
   },
 
   UPDATE_ANCHOR_STATUS: function (state, action) {
-    var annotations = state.annotations.map(function (annot) {
+    const annotations = state.annotations.map(function (annot) {
       if (!action.statusUpdates.hasOwnProperty(annot.$tag)) {
         return annot;
       }
 
-      var state = action.statusUpdates[annot.$tag];
+      const state = action.statusUpdates[annot.$tag];
       if (state === 'timeout') {
         return Object.assign({}, annot, { $anchorTimeout: true });
       } else {
@@ -188,7 +188,7 @@ var update = {
   },
 
   HIDE_ANNOTATION: function (state, action) {
-    var anns = state.annotations.map(function (ann) {
+    const anns = state.annotations.map(function (ann) {
       if (ann.id !== action.id) {
         return ann;
       }
@@ -198,7 +198,7 @@ var update = {
   },
 
   UNHIDE_ANNOTATION: function (state, action) {
-    var anns = state.annotations.map(function (ann) {
+    const anns = state.annotations.map(function (ann) {
       if (ann.id !== action.id) {
         return ann;
       }
@@ -243,7 +243,7 @@ function addAnnotations(annotations, now) {
   });
 
   return function (dispatch, getState) {
-    var added = annotations.filter(function (annot) {
+    const added = annotations.filter(function (annot) {
       return !findByID(getState().annotations, annot.id);
     });
 
@@ -259,19 +259,19 @@ function addAnnotations(annotations, now) {
     // If anchoring fails to complete in a reasonable amount of time, then
     // we assume that the annotation failed to anchor. If it does later
     // successfully anchor then the status will be updated.
-    var ANCHORING_TIMEOUT = 500;
+    const ANCHORING_TIMEOUT = 500;
 
-    var anchoringIDs = added.filter(metadata.isWaitingToAnchor)
+    const anchoringIDs = added.filter(metadata.isWaitingToAnchor)
                             .map(ann => ann.id);
     if (anchoringIDs.length > 0) {
       setTimeout(() => {
         // Find annotations which haven't yet been anchored in the document.
-        var anns = getState().annotations;
-        var annsStillAnchoring = anchoringIDs.map(id => findByID(anns, id))
+        const anns = getState().annotations;
+        const annsStillAnchoring = anchoringIDs.map(id => findByID(anns, id))
                                              .filter(ann => ann && metadata.isWaitingToAnchor(ann));
 
         // Mark anchoring as timed-out for these annotations.
-        var anchorStatusUpdates = annsStillAnchoring.reduce((updates, ann) => {
+        const anchorStatusUpdates = annsStillAnchoring.reduce((updates, ann) => {
           updates[ann.$tag] = 'timeout';
           return updates;
         }, {});
@@ -359,9 +359,9 @@ function annotationExists(state, id) {
  * @param {string[]} Local tags of annotations to look up
  */
 function findIDsForTags(state, tags) {
-  var ids = [];
+  const ids = [];
   tags.forEach(function (tag) {
-    var annot = findByTag(state.annotations, tag);
+    const annot = findByTag(state.annotations, tag);
     if (annot && annot.id) {
       ids.push(annot.id);
     }

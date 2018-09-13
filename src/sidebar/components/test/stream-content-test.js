@@ -1,7 +1,7 @@
 'use strict';
 
-var angular = require('angular');
-var EventEmitter = require('tiny-emitter');
+const angular = require('angular');
+const EventEmitter = require('tiny-emitter');
 
 class FakeRootThread extends EventEmitter {
   constructor() {
@@ -11,18 +11,18 @@ class FakeRootThread extends EventEmitter {
 }
 
 describe('StreamContentController', function () {
-  var $componentController;
-  var $rootScope;
-  var fakeRoute;
-  var fakeRouteParams;
-  var fakeAnnotationMapper;
-  var fakeStore;
-  var fakeQueryParser;
-  var fakeRootThread;
-  var fakeSearchFilter;
-  var fakeApi;
-  var fakeStreamer;
-  var fakeStreamFilter;
+  let $componentController;
+  let $rootScope;
+  let fakeRoute;
+  let fakeRouteParams;
+  let fakeAnnotationMapper;
+  let fakeStore;
+  let fakeQueryParser;
+  let fakeRootThread;
+  let fakeSearchFilter;
+  let fakeApi;
+  let fakeStreamer;
+  let fakeStreamFilter;
 
 
   before(function () {

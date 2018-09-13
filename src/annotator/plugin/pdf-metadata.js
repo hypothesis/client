@@ -36,7 +36,7 @@ class PDFMetadata {
    */
   constructor(app) {
     this._loaded = new Promise(resolve => {
-      var finish = () => {
+      const finish = () => {
         window.removeEventListener('documentload', finish);
         resolve(app);
       };
@@ -59,7 +59,7 @@ class PDFMetadata {
    */
   getUri() {
     return this._loaded.then(app => {
-      var uri = getPDFURL(app);
+      let uri = getPDFURL(app);
       if (!uri) {
         uri = fingerprintToURN(app.documentFingerprint);
       }
@@ -77,7 +77,7 @@ class PDFMetadata {
    */
   getMetadata() {
     return this._loaded.then(app => {
-      var title = document.title;
+      let title = document.title;
 
       if (app.metadata && app.metadata.has('dc:title') && app.metadata.get('dc:title') !== 'Untitled') {
         title = app.metadata.get('dc:title');
@@ -85,11 +85,11 @@ class PDFMetadata {
         title = app.documentInfo.Title;
       }
 
-      var link = [
+      const link = [
         {href: fingerprintToURN(app.documentFingerprint)},
       ];
 
-      var url = getPDFURL(app);
+      const url = getPDFURL(app);
       if (url) {
         link.push({href: url});
       }

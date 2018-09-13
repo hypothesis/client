@@ -1,10 +1,10 @@
 'use strict';
 
-var annotationMetadata = require('../annotation-metadata');
+const annotationMetadata = require('../annotation-metadata');
 
 // @ngInject
 function ModerationBannerController(store, flash, api) {
-  var self = this;
+  const self = this;
 
   this.flagCount = function () {
     return annotationMetadata.flagCount(self.annotation);
@@ -15,7 +15,7 @@ function ModerationBannerController(store, flash, api) {
   };
 
   this.isHiddenOrFlagged = function () {
-    var flagCount = self.flagCount();
+    const flagCount = self.flagCount();
     return flagCount !== null && (flagCount > 0 || self.isHidden());
   };
 

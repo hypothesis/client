@@ -31,16 +31,16 @@
  *  3. Checking that the UI correctly presents a given state.
  */
 
-var createStore = require('./create-store');
-var debugMiddleware = require('./debug-middleware');
+const createStore = require('./create-store');
+const debugMiddleware = require('./debug-middleware');
 
-var annotations = require('./modules/annotations');
-var frames = require('./modules/frames');
-var links = require('./modules/links');
-var groups = require('./modules/groups');
-var selection= require('./modules/selection');
-var session = require('./modules/session');
-var viewer = require('./modules/viewer');
+const annotations = require('./modules/annotations');
+const frames = require('./modules/frames');
+const links = require('./modules/links');
+const groups = require('./modules/groups');
+const selection= require('./modules/selection');
+const session = require('./modules/session');
+const viewer = require('./modules/viewer');
 
 /**
  * Redux middleware which triggers an Angular change-detection cycle
@@ -77,12 +77,12 @@ function angularDigestMiddleware($rootScope) {
  */
 // @ngInject
 function store($rootScope, settings) {
-  var middleware = [
+  const middleware = [
     debugMiddleware,
     angularDigestMiddleware.bind(null, $rootScope),
   ];
 
-  var modules = [
+  const modules = [
     annotations,
     frames,
     links,

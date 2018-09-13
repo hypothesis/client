@@ -1,9 +1,9 @@
 'use strict';
 
-var boot = require('../boot');
+const boot = require('../boot');
 
 describe('bootstrap', function () {
-  var iframe;
+  let iframe;
 
   beforeEach(function () {
     iframe = document.createElement('iframe');
@@ -15,7 +15,7 @@ describe('bootstrap', function () {
   });
 
   function runBoot() {
-    var assetNames = [
+    const assetNames = [
       // Annotation layer
       'scripts/polyfills.bundle.js',
       'scripts/jquery.bundle.js',
@@ -40,8 +40,8 @@ describe('bootstrap', function () {
       'styles/sidebar.css',
     ];
 
-    var manifest = assetNames.reduce(function (manifest, path) {
-      var url = path.replace(/\.([a-z]+)$/, '.1234.$1');
+    const manifest = assetNames.reduce(function (manifest, path) {
+      const url = path.replace(/\.([a-z]+)$/, '.1234.$1');
       manifest[path] = url;
       return manifest;
     }, {});
@@ -54,11 +54,11 @@ describe('bootstrap', function () {
   }
 
   function findAssets(doc_) {
-    var scripts = Array.from(doc_.querySelectorAll('script')).map(function (el) {
+    const scripts = Array.from(doc_.querySelectorAll('script')).map(function (el) {
       return el.src;
     });
 
-    var styles = Array.from(doc_.querySelectorAll('link[rel="stylesheet"]'))
+    const styles = Array.from(doc_.querySelectorAll('link[rel="stylesheet"]'))
       .map(function (el) {
         return el.href;
       });
@@ -69,7 +69,7 @@ describe('bootstrap', function () {
   context('in the host page', function () {
     it('loads assets for the annotation layer', function () {
       runBoot();
-      var expectedAssets = [
+      const expectedAssets = [
         'scripts/annotator.bundle.1234.js',
         'scripts/jquery.bundle.1234.js',
         'scripts/polyfills.bundle.1234.js',
@@ -86,14 +86,14 @@ describe('bootstrap', function () {
     it('creates the link to the sidebar iframe', function () {
       runBoot();
 
-      var sidebarAppLink = iframe.contentDocument
+      const sidebarAppLink = iframe.contentDocument
         .querySelector('link[type="application/annotator+html"]');
       assert.ok(sidebarAppLink);
       assert.equal(sidebarAppLink.href, 'https://marginal.ly/app.html');
     });
 
     it('does nothing if Hypothesis is already loaded in the document', function () {
-      var link = iframe.contentDocument.createElement('link');
+      const link = iframe.contentDocument.createElement('link');
       link.type = 'application/annotator+html';
       iframe.contentDocument.head.appendChild(link);
 
@@ -104,7 +104,7 @@ describe('bootstrap', function () {
   });
 
   context('in the sidebar application', function () {
-    var appRootElement;
+    let appRootElement;
 
     beforeEach(function () {
       appRootElement = iframe.contentDocument.createElement('hypothesis-app');
@@ -117,7 +117,7 @@ describe('bootstrap', function () {
 
     it('loads assets for the sidebar application', function () {
       runBoot();
-      var expectedAssets = [
+      const expectedAssets = [
         'scripts/angular.bundle.1234.js',
         'scripts/katex.bundle.1234.js',
         'scripts/polyfills.bundle.1234.js',

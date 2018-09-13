@@ -2,7 +2,7 @@
 
 // @ngInject
 function ExcerptController($element, $scope, ExcerptOverflowMonitor) {
-  var self = this;
+  const self = this;
 
   if (this.collapse === undefined) {
     this.collapse = true;
@@ -54,7 +54,7 @@ function ExcerptController($element, $scope, ExcerptOverflowMonitor) {
   // Test if the element or any of its parents have been hidden by
   // an 'ng-show' directive
   function isElementHidden() {
-    var el = $element[0];
+    let el = $element[0];
     while (el) {
       if (el.classList.contains('ng-hide')) {
         return true;
@@ -64,7 +64,7 @@ function ExcerptController($element, $scope, ExcerptOverflowMonitor) {
     return false;
   }
 
-  var overflowMonitor = new ExcerptOverflowMonitor({
+  const overflowMonitor = new ExcerptOverflowMonitor({
     getState: function () {
       return {
         enabled: self.enabled,
@@ -75,7 +75,7 @@ function ExcerptController($element, $scope, ExcerptOverflowMonitor) {
       };
     },
     contentHeight: function () {
-      var contentElem = $element[0].querySelector('.excerpt');
+      const contentElem = $element[0].querySelector('.excerpt');
       if (!contentElem) {
         return null;
       }

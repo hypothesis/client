@@ -1,6 +1,6 @@
 'use strict';
 
-var util = require('../util');
+const util = require('../util');
 
 /**
  * This module defines actions and state related to the display mode of the
@@ -20,7 +20,7 @@ function init() {
   };
 }
 
-var update = {
+const update = {
   SET_SIDEBAR: function (state, action) {
     return {isSidebar: action.isSidebar};
   },
@@ -29,7 +29,7 @@ var update = {
   },
 };
 
-var actions = util.actionTypes(update);
+const actions = util.actionTypes(update);
 
 /** Set whether the app is the sidebar */
 function setAppIsSidebar(isSidebar) {

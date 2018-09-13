@@ -1,8 +1,8 @@
 'use strict';
 
-var angular = require('angular');
+const angular = require('angular');
 
-var util = require('../../directive/test/util');
+const util = require('../../directive/test/util');
 
 describe('sortDropdown', function () {
   before(function () {
@@ -15,8 +15,8 @@ describe('sortDropdown', function () {
   });
 
   it('should update the sort key on click', function () {
-    var changeSpy = sinon.spy();
-    var elem = util.createDirective(document, 'sortDropdown', {
+    const changeSpy = sinon.spy();
+    const elem = util.createDirective(document, 'sortDropdown', {
       sortKeysAvailable: ['Newest', 'Oldest'],
       sortKey: 'Newest',
       onChangeSortKey: {
@@ -24,7 +24,7 @@ describe('sortDropdown', function () {
         callback: changeSpy,
       },
     });
-    var links = elem.find('li');
+    const links = elem.find('li');
     angular.element(links[0]).click();
     assert.calledWith(changeSpy, 'Newest');
   });

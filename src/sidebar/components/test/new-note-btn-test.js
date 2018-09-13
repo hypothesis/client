@@ -1,14 +1,14 @@
 'use strict';
 
-var angular = require('angular');
+const angular = require('angular');
 
-var events = require('../../events');
-var util = require('../../directive/test/util');
+const events = require('../../events');
+const util = require('../../directive/test/util');
 
 describe('newNoteBtn', function () {
-  var $rootScope;
-  var sandbox = sinon.sandbox.create();
-  var fakeStore = {
+  let $rootScope;
+  const sandbox = sinon.sandbox.create();
+  const fakeStore = {
     frames: sinon.stub().returns([{ id: null, uri: 'www.example.org'}, { id: '1', uri: 'www.example.org'}]),
   };
 
@@ -19,10 +19,10 @@ describe('newNoteBtn', function () {
   });
 
   beforeEach(function () {
-    var fakeFeatures = {
+    const fakeFeatures = {
       flagEnabled: sinon.stub().returns(true),
     };
-    var fakeSettings = { theme: 'clean' };
+    const fakeSettings = { theme: 'clean' };
 
     angular.mock.module('app', {
       store: fakeStore,
@@ -40,11 +40,11 @@ describe('newNoteBtn', function () {
   });
 
   it('should broadcast BEFORE_ANNOTATION_CREATED event when the new note button is clicked', function () {
-    var annot = {
+    const annot = {
       target: [],
       uri: 'www.example.org',
     };
-    var elem = util.createDirective(document, 'newNoteBtn', {
+    const elem = util.createDirective(document, 'newNoteBtn', {
       store: fakeStore,
     });
     sandbox.spy($rootScope, '$broadcast');

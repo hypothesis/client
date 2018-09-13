@@ -1,13 +1,13 @@
 'use strict';
 
-var angular = require('angular');
-var proxyquire = require('proxyquire');
-var EventEmitter = require('tiny-emitter');
+const angular = require('angular');
+const proxyquire = require('proxyquire');
+const EventEmitter = require('tiny-emitter');
 
-var events = require('../../events');
-var noCallThru = require('../../../shared/test/util').noCallThru;
+const events = require('../../events');
+const noCallThru = require('../../../shared/test/util').noCallThru;
 
-var searchClients;
+let searchClients;
 
 class FakeSearchClient extends EventEmitter {
   constructor(searchFn, opts) {
@@ -21,7 +21,7 @@ class FakeSearchClient extends EventEmitter {
     this.get = sinon.spy(function (query) {
       assert.ok(query.uri);
 
-      for (var i = 0; i < query.uri.length; i++) {
+      for (let i = 0; i < query.uri.length; i++) {
         var uri = query.uri[i];
         this.emit('results', [{id: uri + '123', group: '__world__'}]);
         this.emit('results', [{id: uri + '456', group: 'private-group'}]);
@@ -42,22 +42,22 @@ class FakeRootThread extends EventEmitter {
 }
 
 describe('sidebar.components.sidebar-content', function () {
-  var $rootScope;
-  var $scope;
-  var store;
-  var ctrl;
-  var fakeAnalytics;
-  var fakeAnnotationMapper;
-  var fakeDrafts;
-  var fakeFeatures;
-  var fakeFrameSync;
-  var fakeGroups;
-  var fakeRootThread;
-  var fakeSettings;
-  var fakeApi;
-  var fakeStreamer;
-  var fakeStreamFilter;
-  var sandbox;
+  let $rootScope;
+  let $scope;
+  let store;
+  let ctrl;
+  let fakeAnalytics;
+  let fakeAnnotationMapper;
+  let fakeDrafts;
+  let fakeFeatures;
+  let fakeFrameSync;
+  let fakeGroups;
+  let fakeRootThread;
+  let fakeSettings;
+  let fakeApi;
+  let fakeStreamer;
+  let fakeStreamFilter;
+  let sandbox;
 
   before(function () {
     angular.module('h', [])
@@ -163,12 +163,12 @@ describe('sidebar.components.sidebar-content', function () {
       // When new clients connect, all existing annotations should be unloaded
       // before reloading annotations for each currently-connected client
       store.addAnnotations([{id: '123'}]);
-      var uri1 = 'http://example.com/page-a';
-      var frames = [{uri: uri1}];
+      const uri1 = 'http://example.com/page-a';
+      let frames = [{uri: uri1}];
       setFrames(frames);
       $scope.$digest();
       fakeAnnotationMapper.unloadAnnotations = sandbox.spy();
-      var uri2 = 'http://example.com/page-b';
+      const uri2 = 'http://example.com/page-b';
       frames = frames.concat({uri: uri2});
       setFrames(frames);
       $scope.$digest();
@@ -177,17 +177,17 @@ describe('sidebar.components.sidebar-content', function () {
     });
 
     it('loads all annotations for a frame', function () {
-      var uri = 'http://example.com';
+      const uri = 'http://example.com';
       setFrames([{uri: uri}]);
       $scope.$digest();
-      var loadSpy = fakeAnnotationMapper.loadAnnotations;
+      const loadSpy = fakeAnnotationMapper.loadAnnotations;
       assert.calledWith(loadSpy, [sinon.match({id: uri + '123'})]);
       assert.calledWith(loadSpy, [sinon.match({id: uri + '456'})]);
     });
 
     it('loads all annotations for a frame with multiple urls', function () {
-      var uri = 'http://example.com/test.pdf';
-      var fingerprint = 'urn:x-pdf:fingerprint';
+      const uri = 'http://example.com/test.pdf';
+      const fingerprint = 'urn:x-pdf:fingerprint';
       setFrames([{
         uri: uri,
         metadata: {
@@ -200,7 +200,7 @@ describe('sidebar.components.sidebar-content', function () {
         },
       }]);
       $scope.$digest();
-      var loadSpy = fakeAnnotationMapper.loadAnnotations;
+      const loadSpy = fakeAnnotationMapper.loadAnnotations;
 
       assert.calledWith(loadSpy, [sinon.match({id: uri + '123'})]);
       assert.calledWith(loadSpy, [sinon.match({id: fingerprint + '123'})]);
@@ -209,12 +209,12 @@ describe('sidebar.components.sidebar-content', function () {
     });
 
     it('loads all annotations for all frames', function () {
-      var uris = ['http://example.com', 'http://foobar.com'];
+      const uris = ['http://example.com', 'http://foobar.com'];
       setFrames(uris.map(function (uri) {
         return {uri: uri};
       }));
       $scope.$digest();
-      var loadSpy = fakeAnnotationMapper.loadAnnotations;
+      const loadSpy = fakeAnnotationMapper.loadAnnotations;
       assert.calledWith(loadSpy, [sinon.match({id: uris[0] + '123'})]);
       assert.calledWith(loadSpy, [sinon.match({id: uris[0] + '456'})]);
       assert.calledWith(loadSpy, [sinon.match({id: uris[1] + '123'})]);
@@ -222,19 +222,19 @@ describe('sidebar.components.sidebar-content', function () {
     });
 
     it('updates annotation fetch status for all frames', function () {
-      var frameUris = ['http://example.com', 'http://foobar.com'];
+      const frameUris = ['http://example.com', 'http://foobar.com'];
       setFrames(frameUris.map(function (frameUri) {
         return {uri: frameUri};
       }));
       $scope.$digest();
-      var updateSpy = store.updateFrameAnnotationFetchStatus;
+      const updateSpy = store.updateFrameAnnotationFetchStatus;
       assert.isTrue(updateSpy.calledWith(frameUris[0], true));
       assert.isTrue(updateSpy.calledWith(frameUris[1], true));
     });
 
     context('when there is a selection', function () {
-      var uri = 'http://example.com';
-      var id = uri + '123';
+      const uri = 'http://example.com';
+      const id = uri + '123';
 
       beforeEach(function () {
         setFrames([{uri: uri}]);
@@ -264,7 +264,7 @@ describe('sidebar.components.sidebar-content', function () {
     });
 
     context('when there is no selection', function () {
-      var uri = 'http://example.com';
+      const uri = 'http://example.com';
 
       beforeEach(function () {
         setFrames([{uri: uri}]);
@@ -286,8 +286,8 @@ describe('sidebar.components.sidebar-content', function () {
     });
 
     context('when the selected annotation is not available', function () {
-      var uri = 'http://example.com';
-      var id = uri + 'does-not-exist';
+      const uri = 'http://example.com';
+      const id = uri + 'does-not-exist';
 
       beforeEach(function () {
         setFrames([{uri: uri}]);
@@ -326,7 +326,7 @@ describe('sidebar.components.sidebar-content', function () {
     beforeEach(connectFrameAndPerformInitialFetch);
 
     it('reloads annotations if the user ID changed', () => {
-      var newProfile = Object.assign({}, store.profile(), {
+      const newProfile = Object.assign({}, store.profile(), {
         userid: 'different-user@hypothes.is',
       });
 
@@ -337,7 +337,7 @@ describe('sidebar.components.sidebar-content', function () {
     });
 
     it('does not reload annotations if the user ID is the same', () => {
-      var newProfile = Object.assign({}, store.profile(), {
+      const newProfile = Object.assign({}, store.profile(), {
         user_info: {
           display_name: 'New display name',
         },
@@ -352,10 +352,10 @@ describe('sidebar.components.sidebar-content', function () {
 
   describe('when an annotation is anchored', function () {
     it('focuses and scrolls to the annotation if already selected', function () {
-      var uri = 'http://example.com';
+      const uri = 'http://example.com';
       store.selectAnnotations(['123']);
       setFrames([{uri: uri}]);
-      var annot = {
+      const annot = {
         $tag: 'atag',
         id: '123',
       };
@@ -368,7 +368,7 @@ describe('sidebar.components.sidebar-content', function () {
   });
 
   describe('when the focused group changes', () => {
-    var uri = 'http://example.com';
+    const uri = 'http://example.com';
 
     beforeEach(() => {
       // Setup an initial state with frames connected, a group focused and some
@@ -386,7 +386,7 @@ describe('sidebar.components.sidebar-content', function () {
     }
 
     it('should load annotations for the new group', () => {
-      var loadSpy = fakeAnnotationMapper.loadAnnotations;
+      const loadSpy = fakeAnnotationMapper.loadAnnotations;
 
       changeGroup();
 
@@ -548,13 +548,13 @@ describe('sidebar.components.sidebar-content', function () {
 
   describe('#forceVisible', function () {
     it('shows the thread', function () {
-      var thread = {id: '1'};
+      const thread = {id: '1'};
       ctrl.forceVisible(thread);
       assert.deepEqual(store.getState().forceVisible, {1: true});
     });
 
     it('uncollapses the parent', function () {
-      var thread = {
+      const thread = {
         id: '2',
         parent: {id: '3'},
       };
