@@ -31,7 +31,7 @@ function Tooltip(rootElement) {
       return;
     }
 
-    var target = this.state.target;
+    const target = this.state.target;
     const label = target.getAttribute('aria-label');
     this._labelEl.textContent = label;
 

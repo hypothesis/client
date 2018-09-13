@@ -298,7 +298,7 @@ describe('rootThread', function () {
 
     unroll('adds or updates annotations when #event event occurs', function (testCase) {
       $rootScope.$broadcast(testCase.event, testCase.annotations);
-      var annotations = [].concat(testCase.annotations);
+      const annotations = [].concat(testCase.annotations);
       assert.notCalled(fakeStore.removeAnnotations);
       assert.calledWith(fakeStore.addAnnotations, sinon.match(annotations));
     }, [
@@ -316,7 +316,7 @@ describe('rootThread', function () {
 
     unroll('removes annotations when #event event occurs', function (testCase) {
       $rootScope.$broadcast(testCase.event, testCase.annotations);
-      var annotations = [].concat(testCase.annotations);
+      const annotations = [].concat(testCase.annotations);
       assert.calledWith(fakeStore.removeAnnotations, sinon.match(annotations));
     }, [
       {event: events.ANNOTATION_DELETED, annotations: annot},

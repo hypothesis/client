@@ -208,7 +208,7 @@ const update = {
   },
 };
 
-var actions = util.actionTypes(update);
+const actions = util.actionTypes(update);
 
 /**
  * Updating the flagged status of an annotation.

@@ -90,7 +90,7 @@ function viewFilter(unicode) {
           // not be required.
           return '';
         }
-        var target = annotation.target[0];
+        const target = annotation.target[0];
         const selectors = target.selector || [];
 
         return selectors

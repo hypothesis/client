@@ -103,7 +103,7 @@ function isNew(annotation) {
 
 /** Return `true` if the given annotation is public, `false` otherwise. */
 function isPublic(annotation) {
-  var isPublic = false;
+  let isPublic = false;
 
   if (!annotation.permissions) {
     return isPublic;

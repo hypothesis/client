@@ -284,7 +284,7 @@ function AnnotationController(
     if (self.annotation.target.length === 0) {
       return null;
     }
-    var target = self.annotation.target[0];
+    const target = self.annotation.target[0];
     if (!target.selector) {
       return null;
     }

@@ -22,7 +22,7 @@ class FakeSearchClient extends EventEmitter {
       assert.ok(query.uri);
 
       for (let i = 0; i < query.uri.length; i++) {
-        var uri = query.uri[i];
+        const uri = query.uri[i];
         this.emit('results', [{id: uri + '123', group: '__world__'}]);
         this.emit('results', [{id: uri + '456', group: 'private-group'}]);
       }

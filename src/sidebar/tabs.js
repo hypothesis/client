@@ -43,7 +43,7 @@ function shouldShowInTab(ann, tab) {
  * @param {Annotation[]} annotations - List of annotations to display
  */
 function counts(annotations) {
-  var counts = {
+  const counts = {
     notes: countIf(annotations, metadata.isPageNote),
     annotations: countIf(annotations, metadata.isAnnotation),
     orphans: countIf(annotations, metadata.isOrphan),

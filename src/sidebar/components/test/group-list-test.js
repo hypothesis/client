@@ -241,7 +241,7 @@ describe('groupList', function () {
       },
     ];
     const element = createGroupList();
-    var links = element.find('.share-link-container');
+    const links = element.find('.share-link-container');
     assert.equal(links.length, 0);
   });
 

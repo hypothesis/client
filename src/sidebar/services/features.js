@@ -50,7 +50,7 @@ function features($log, $rootScope, bridge, session) {
       return false;
     }
 
-    var features = session.state.features;
+    const features = session.state.features;
     if (!(flag in features)) {
       $log.warn('looked up unknown feature', flag);
       return false;

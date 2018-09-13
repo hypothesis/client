@@ -102,7 +102,7 @@ function FrameSync($rootScope, $window, Discovery, store, bridge) {
         inFrame.delete(annot.$tag);
       });
 
-      var frames = store.frames();
+      const frames = store.frames();
       if (frames.length > 0) {
         if (frames.every(function (frame) { return frame.isAnnotationFetchComplete; })) {
           if (publicAnns === 0 || publicAnns !== prevPublicAnns) {
