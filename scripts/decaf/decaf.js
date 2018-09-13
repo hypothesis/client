@@ -37,19 +37,19 @@
 //    the last expression in a function, so the generated
 //    JS source has to do the same.
 
-var Checker = require('jscs');
-var babylon = require('babylon');
-var decaffeinate = require('decaffeinate');
-var fs = require('fs');
-var path = require('path');
-var typescriptFormatter = require('typescript-formatter');
+const Checker = require('jscs');
+const babylon = require('babylon');
+const decaffeinate = require('decaffeinate');
+const fs = require('fs');
+const path = require('path');
+const typescriptFormatter = require('typescript-formatter');
 
-var inFile = process.argv[2];
+const inFile = process.argv[2];
 
-var jscsConfigPath = require.resolve('../../.jscsrc');
-var jscsConfig = JSON.parse(fs.readFileSync(jscsConfigPath, 'utf-8'));
+const jscsConfigPath = require.resolve('../../.jscsrc');
+const jscsConfig = JSON.parse(fs.readFileSync(jscsConfigPath, 'utf-8'));
 
-var stripReturnPatterns = [
+const stripReturnPatterns = [
   // Unit test cases
   /it\(/,
   // Assignments in setters etc.
@@ -75,10 +75,10 @@ function stripUnnecessaryReturns(js) {
   // If we need something more sophisticated, we shouldn't modify the
   // source as a string but should instead write a Babel code transformer.
   return js.split('\n').map(line => {
-    var returnPrefix = 'return ';
+    const returnPrefix = 'return ';
     if (line.trim().startsWith(returnPrefix)) {
-      var remainder = line.trim().slice(returnPrefix.length);
-      for (var i=0; i < stripReturnPatterns.length; i++) {
+      const remainder = line.trim().slice(returnPrefix.length);
+      for (let i=0; i < stripReturnPatterns.length; i++) {
         if (remainder.match(stripReturnPatterns[i])) {
           return remainder;
         }
@@ -101,9 +101,9 @@ function checkSyntax(js) {
   try {
     babylon.parse(js, {sourceType: 'module'});
   } catch (err) {
-    var context = js.split('\n').reduce((context, line, index) => {
-      var lineNumber = index+1;
-      var linePrefix;
+    const context = js.split('\n').reduce((context, line, index) => {
+      const lineNumber = index+1;
+      let linePrefix;
       if (lineNumber === err.loc.line) {
         linePrefix = `**${lineNumber}`;
       } else {
@@ -147,7 +147,7 @@ function reformat(js) {
     return result.dest;
   })
     .then(result => {
-      var checker = new Checker();
+      const checker = new Checker();
       checker.configure(jscsConfig);
       return checker.fixString(result).output;
     });
@@ -164,7 +164,7 @@ function toResultOrError(promise) {
 function convertFile(inFile, outFile) {
   console.log('Converting', inFile);
 
-  var js;
+  let js;
 
   try {
     js = decaffeinate.convert(
@@ -179,10 +179,10 @@ function convertFile(inFile, outFile) {
   });
 }
 
-var conversions = [];
+const conversions = [];
 process.argv.slice(2).forEach(filePath => {
-  var inFile = path.resolve(filePath);
-  var outFile = inFile.replace(/\.coffee$/, '.js');
+  const inFile = path.resolve(filePath);
+  const outFile = inFile.replace(/\.coffee$/, '.js');
   conversions.push(toResultOrError(convertFile(inFile, outFile)).then(function (result) {
     result.fileName = inFile;
     return result;
@@ -190,8 +190,8 @@ process.argv.slice(2).forEach(filePath => {
 });
 
 Promise.all(conversions).then(results => {
-  var ok = 0;
-  var failed = 0;
+  let ok = 0;
+  let failed = 0;
   results.forEach(result => {
     if (result.error) {
       console.log('Error converting %s: \n\n%s', result.fileName, result.error.message);

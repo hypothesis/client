@@ -1,12 +1,12 @@
 'use strict';
 
-var fs = require('fs');
-var path = require('path');
-var gulpUtil = require('gulp-util');
-var request = require('request');
-var through = require('through2');
+const fs = require('fs');
+const path = require('path');
+const gulpUtil = require('gulp-util');
+const request = require('request');
+const through = require('through2');
 
-var SENTRY_API_ROOT = 'https://app.getsentry.com/api/0';
+const SENTRY_API_ROOT = 'https://app.getsentry.com/api/0';
 
 /**
  * interface SentryOptions {
@@ -49,8 +49,8 @@ function createRelease(opts, project, release) {
     },
     json: true,
   }).then(function (result) {
-    var success = (result.response.statusCode === 201);
-    var alreadyCreated = (result.response.statusCode === 400 &&
+    const success = (result.response.statusCode === 201);
+    const alreadyCreated = (result.response.statusCode === 400 &&
                           result.body.detail.match(/already exists/));
 
     if (success || alreadyCreated) {
@@ -99,7 +99,7 @@ function uploadReleaseFile(opts, project, release, file) {
  */
 module.exports = function uploadToSentry(opts, projects, release) {
   // Create releases in every project
-  var releases = projects.map(function (project) {
+  const releases = projects.map(function (project) {
     gulpUtil.log(`Creating release '${release}' in project '${project}'`);
     return createRelease(opts, project, release);
   });
@@ -108,7 +108,7 @@ module.exports = function uploadToSentry(opts, projects, release) {
     Promise.all(releases)
       .then(function () {
         gulpUtil.log(`Uploading ${path.basename(file.path)}`);
-        var uploads = projects.map(function (project) {
+        const uploads = projects.map(function (project) {
           return uploadReleaseFile(opts, project, release, file);
         });
 

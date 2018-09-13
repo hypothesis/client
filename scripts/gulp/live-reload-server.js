@@ -1,10 +1,10 @@
 'use strict';
 
-var fs = require('fs');
-var gulpUtil = require('gulp-util');
-var http = require('http');
-var WebSocketServer = require('websocket').server;
-var urlParser = require('url');
+const fs = require('fs');
+const gulpUtil = require('gulp-util');
+const http = require('http');
+const WebSocketServer = require('websocket').server;
+const urlParser = require('url');
 
 function readmeText() {
   return fs.readFileSync('./README.md', 'utf-8');
@@ -37,13 +37,13 @@ function changelogText() {
  * @constructor
  */
 function LiveReloadServer(port, config) {
-  var connections = [];
+  let connections = [];
 
   function listen() {
-    var log = gulpUtil.log;
-    var server = http.createServer(function (req, response) {
-      var url = urlParser.parse(req.url);
-      var content;
+    const log = gulpUtil.log;
+    const server = http.createServer(function (req, response) {
+      const url = urlParser.parse(req.url);
+      let content;
 
       if (url.pathname === '/document/license') {
         content = `
@@ -145,17 +145,17 @@ function LiveReloadServer(port, config) {
       log(`Live reload server listening at http://localhost:${port}/`);
     });
 
-    var ws = new WebSocketServer({
+    const ws = new WebSocketServer({
       httpServer: server,
     });
 
     ws.on('request', function (req) {
       log('Live reload client connected');
-      var conn = req.accept(null, req.origin);
+      const conn = req.accept(null, req.origin);
       connections.push(conn);
 
       conn.on('close', function () {
-        var closedConn = conn;
+        const closedConn = conn;
         connections = connections.filter(function (conn) {
           return conn !== closedConn;
         });
