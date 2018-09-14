@@ -70,17 +70,21 @@ describe('sidebar.util.postmessage-json-rpc', () => {
       },
     },{
       // Non-object `data` field.
+      origin,
       data: null,
     },{
       // No jsonrpc header
+      origin,
       data: {},
     },{
       // No ID
+      origin,
       data: {
         jsonrpc: '2.0',
       },
     },{
       // ID mismatch
+      origin,
       data: {
         jsonrpc: '2.0',
         id: 'wrong-id',
