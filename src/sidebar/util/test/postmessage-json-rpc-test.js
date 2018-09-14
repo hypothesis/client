@@ -53,6 +53,14 @@ describe('sidebar.util.postmessage-json-rpc', () => {
       });
     });
 
+    it('rejects if `postMessage` fails', () => {
+      frame.postMessage.throws(new Error('Nope!'));
+
+      const result = doCall();
+
+      assertPromiseIsRejected(result, 'Nope!');
+    });
+
     [{
       // Wrong origin.
       origin: 'https://not-the-embedder.com',
