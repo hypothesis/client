@@ -11,15 +11,15 @@
  */
 'use strict';
 
-var events = require('../events');
-var bridgeEvents = require('../../shared/bridge-events');
+const events = require('../events');
+const bridgeEvents = require('../../shared/bridge-events');
 
 
 // @ngInject
 function features($log, $rootScope, bridge, session) {
 
-  var _sendFeatureFlags = function(){
-    var userFeatures = session.state.features;
+  const _sendFeatureFlags = function(){
+    const userFeatures = session.state.features;
     bridge.call(bridgeEvents.FEATURE_FLAGS_UPDATED, userFeatures || {});
   };
 
@@ -50,7 +50,7 @@ function features($log, $rootScope, bridge, session) {
       return false;
     }
 
-    var features = session.state.features;
+    const features = session.state.features;
     if (!(flag in features)) {
       $log.warn('looked up unknown feature', flag);
       return false;

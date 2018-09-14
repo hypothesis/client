@@ -1,10 +1,10 @@
 'use strict';
 
-var fakeStore = require('../../test/fake-redux-store');
-var stateUtil = require('../state-util');
+const fakeStore = require('../../test/fake-redux-store');
+const stateUtil = require('../state-util');
 
 describe('state-util', function () {
-  var store;
+  let store;
 
   beforeEach(function() {
     store = fakeStore({ val: 0 });
@@ -19,7 +19,7 @@ describe('state-util', function () {
     }
 
     it('should return promise that resolves to a non-null value', function () {
-      var expected = 5;
+      const expected = 5;
 
       store.setState({ val: 5 });
 
@@ -29,8 +29,8 @@ describe('state-util', function () {
     });
 
     it('should wait for awaitStateChange to return a non-null value', function () {
-      var valPromise;
-      var expected = 5;
+      let valPromise;
+      const expected = 5;
 
       store.setState({ val: 2 });
       valPromise = stateUtil.awaitStateChange(store, getValWhenGreaterThanTwo);

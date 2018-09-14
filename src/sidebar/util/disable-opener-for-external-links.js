@@ -20,7 +20,7 @@
 function disableOpenerForExternalLinks(root) {
   root.addEventListener('click', event => {
     if (event.target.tagName === 'A') {
-      var linkEl = event.target;
+      const linkEl = event.target;
       if (linkEl.target === '_blank') {
         linkEl.rel = 'noopener';
       }

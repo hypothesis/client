@@ -1,6 +1,6 @@
 'use strict';
 
-var SearchClient = require('../search-client');
+const SearchClient = require('../search-client');
 
 function awaitEvent(emitter, event) {
   return new Promise(function (resolve) {
@@ -9,14 +9,14 @@ function awaitEvent(emitter, event) {
 }
 
 describe('SearchClient', function () {
-  var RESULTS = [
+  const RESULTS = [
     {id: 'one'},
     {id: 'two'},
     {id: 'three'},
     {id: 'four'},
   ];
 
-  var fakeSearchFn;
+  let fakeSearchFn;
 
   beforeEach(function () {
     fakeSearchFn = sinon.spy(function (params) {
@@ -29,8 +29,8 @@ describe('SearchClient', function () {
   });
 
   it('emits "results"', function () {
-    var client = new SearchClient(fakeSearchFn);
-    var onResults = sinon.stub();
+    const client = new SearchClient(fakeSearchFn);
+    const onResults = sinon.stub();
     client.on('results', onResults);
     client.get({uri: 'http://example.com'});
     return awaitEvent(client, 'end').then(function () {
@@ -39,8 +39,8 @@ describe('SearchClient', function () {
   });
 
   it('emits "results" with chunks in incremental mode', function () {
-    var client = new SearchClient(fakeSearchFn, {chunkSize: 2});
-    var onResults = sinon.stub();
+    const client = new SearchClient(fakeSearchFn, {chunkSize: 2});
+    const onResults = sinon.stub();
     client.on('results', onResults);
     client.get({uri: 'http://example.com'});
     return awaitEvent(client, 'end').then(function () {
@@ -61,8 +61,8 @@ describe('SearchClient', function () {
         total: 1000,
       });
     });
-    var client = new SearchClient(fakeSearchFn, {chunkSize: 2});
-    var onResults = sinon.stub();
+    const client = new SearchClient(fakeSearchFn, {chunkSize: 2});
+    const onResults = sinon.stub();
     client.on('results', onResults);
 
     client.get({uri: 'http://example.com'});
@@ -74,9 +74,9 @@ describe('SearchClient', function () {
   });
 
   it('emits "results" once in non-incremental mode', function () {
-    var client = new SearchClient(fakeSearchFn,
+    const client = new SearchClient(fakeSearchFn,
       {chunkSize: 2, incremental: false});
-    var onResults = sinon.stub();
+    const onResults = sinon.stub();
     client.on('results', onResults);
     client.get({uri: 'http://example.com'});
     return awaitEvent(client, 'end').then(function () {
@@ -86,9 +86,9 @@ describe('SearchClient', function () {
   });
 
   it('does not emit "results" if canceled', function () {
-    var client = new SearchClient(fakeSearchFn);
-    var onResults = sinon.stub();
-    var onEnd = sinon.stub();
+    const client = new SearchClient(fakeSearchFn);
+    const onResults = sinon.stub();
+    const onEnd = sinon.stub();
     client.on('results', onResults);
     client.on('end', onEnd);
     client.get({uri: 'http://example.com'});
@@ -100,12 +100,12 @@ describe('SearchClient', function () {
   });
 
   it('emits "error" event if search fails', function () {
-    var err = new Error('search failed');
+    const err = new Error('search failed');
     fakeSearchFn = function () {
       return Promise.reject(err);
     };
-    var client = new SearchClient(fakeSearchFn);
-    var onError = sinon.stub();
+    const client = new SearchClient(fakeSearchFn);
+    const onError = sinon.stub();
     client.on('error', onError);
     client.get({uri: 'http://example.com'});
     return awaitEvent(client, 'end').then(function () {

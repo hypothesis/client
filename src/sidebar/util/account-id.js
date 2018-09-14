@@ -9,7 +9,7 @@ function parseAccountID(user) {
   if (!user) {
     return null;
   }
-  var match = user.match(/^acct:([^@]+)@(.+)/);
+  const match = user.match(/^acct:([^@]+)@(.+)/);
   if (!match) {
     return null;
   }
@@ -23,7 +23,7 @@ function parseAccountID(user) {
  * Returns the username part of an account ID or an empty string.
  */
 function username(user) {
-  var account = parseAccountID(user);
+  const account = parseAccountID(user);
   if (!account) {
     return '';
   }
@@ -34,7 +34,7 @@ function username(user) {
  * Returns true if the authority is of a 3rd party user.
  */
 function isThirdPartyUser(user, authDomain) {
-  var account = parseAccountID(user);
+  const account = parseAccountID(user);
 
   if (!account) {
     return false;

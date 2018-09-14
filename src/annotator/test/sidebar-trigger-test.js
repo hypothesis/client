@@ -1,10 +1,10 @@
 'use strict';
 
-var sidebarTrigger = require('../sidebar-trigger');
+const sidebarTrigger = require('../sidebar-trigger');
 
 describe('sidebarTrigger', function () {
-  var triggerEl1;
-  var triggerEl2;
+  let triggerEl1;
+  let triggerEl2;
 
   beforeEach(function () {
     triggerEl1 = document.createElement('button');
@@ -17,7 +17,7 @@ describe('sidebarTrigger', function () {
   });
 
   it('calls the show callback which a trigger button is clicked', function () {
-    var fakeShowFn = sinon.stub();
+    const fakeShowFn = sinon.stub();
     sidebarTrigger(document, fakeShowFn);
 
     triggerEl1.dispatchEvent(new Event('click'));

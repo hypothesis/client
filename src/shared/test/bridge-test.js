@@ -1,13 +1,13 @@
 'use strict';
 
-var Bridge = require('../bridge');
-var RPC = require('../frame-rpc');
+const Bridge = require('../bridge');
+const RPC = require('../frame-rpc');
 
 describe('shared.bridge', function() {
-  var sandbox = sinon.sandbox.create();
-  var bridge;
-  var createChannel;
-  var fakeWindow;
+  const sandbox = sinon.sandbox.create();
+  let bridge;
+  let createChannel;
+  let fakeWindow;
 
   beforeEach(() => {
     bridge = new Bridge();
@@ -26,36 +26,36 @@ describe('shared.bridge', function() {
 
   describe('#createChannel', function() {
     it('creates a new channel with the provided options', function() {
-      var channel = createChannel();
+      const channel = createChannel();
       assert.equal(channel.src, window);
       assert.equal(channel.dst, fakeWindow);
       assert.equal(channel.origin, 'http://example.com');
     });
 
     it('adds the channel to the .links property', function() {
-      var channel = createChannel();
+      const channel = createChannel();
       assert.isTrue(bridge.links.some(link => (link.channel === channel) && (link.window === fakeWindow)));
     });
 
     it('registers any existing listeners on the channel', function() {
-      var message1 = sandbox.spy();
-      var message2 = sandbox.spy();
+      const message1 = sandbox.spy();
+      const message2 = sandbox.spy();
       bridge.on('message1', message1);
       bridge.on('message2', message2);
-      var channel = createChannel();
+      const channel = createChannel();
       assert.propertyVal(channel._methods, 'message1', message1);
       assert.propertyVal(channel._methods, 'message2', message2);
     });
 
     it('returns the newly created channel', function() {
-      var channel = createChannel();
+      const channel = createChannel();
       assert.instanceOf(channel, RPC);
     });
   });
 
   describe('#call', function() {
     it('forwards the call to every created channel', function() {
-      var channel = createChannel();
+      const channel = createChannel();
       sandbox.stub(channel, 'call');
       bridge.call('method1', 'params1');
       assert.called(channel.call);
@@ -63,19 +63,19 @@ describe('shared.bridge', function() {
     });
 
     it('provides a timeout', function(done) {
-      var channel = createChannel();
+      const channel = createChannel();
       sandbox.stub(channel, 'call');
       sandbox.stub(window, 'setTimeout').yields();
       bridge.call('method1', 'params1', done);
     });
 
     it('calls a callback when all channels return successfully', function(done) {
-      var channel1 = createChannel();
-      var channel2 = bridge.createChannel(fakeWindow, 'http://example.com', 'NEKOT');
+      const channel1 = createChannel();
+      const channel2 = bridge.createChannel(fakeWindow, 'http://example.com', 'NEKOT');
       sandbox.stub(channel1, 'call').yields(null, 'result1');
       sandbox.stub(channel2, 'call').yields(null, 'result2');
 
-      var callback = function(err, results) {
+      const callback = function(err, results) {
         assert.isNull(err);
         assert.deepEqual(results, ['result1', 'result2']);
         done();
@@ -85,13 +85,13 @@ describe('shared.bridge', function() {
     });
 
     it('calls a callback with an error when a channels fails', function(done) {
-      var error = new Error('Uh oh');
-      var channel1 = createChannel();
-      var channel2 = bridge.createChannel(fakeWindow, 'http://example.com', 'NEKOT');
+      const error = new Error('Uh oh');
+      const channel1 = createChannel();
+      const channel2 = bridge.createChannel(fakeWindow, 'http://example.com', 'NEKOT');
       sandbox.stub(channel1, 'call').throws(error);
       sandbox.stub(channel2, 'call').yields(null, 'result2');
 
-      var callback = function(err) {
+      const callback = function(err) {
         assert.equal(err, error);
         done();
       };
@@ -100,11 +100,11 @@ describe('shared.bridge', function() {
     });
 
     it('destroys the channel when a call fails', function(done) {
-      var channel = createChannel();
+      const channel = createChannel();
       sandbox.stub(channel, 'call').throws(new Error(''));
       sandbox.stub(channel, 'destroy');
 
-      var callback = function() {
+      const callback = function() {
         assert.called(channel.destroy);
         done();
       };
@@ -113,7 +113,7 @@ describe('shared.bridge', function() {
     });
 
     it('no longer publishes to a channel that has had an error', function(done) {
-      var channel = createChannel();
+      const channel = createChannel();
       sandbox.stub(channel, 'call').throws(new Error('oeunth'));
       bridge.call('method1', 'params1', function() {
         assert.calledOnce(channel.call);
@@ -125,7 +125,7 @@ describe('shared.bridge', function() {
     });
 
     it('treats a timeout as a success with no result', function(done) {
-      var channel = createChannel();
+      const channel = createChannel();
       sandbox.stub(channel, 'call');
       sandbox.stub(window, 'setTimeout').yields();
       bridge.call('method1', 'params1', function(err, res) {
@@ -137,7 +137,7 @@ describe('shared.bridge', function() {
 
     it('returns a promise object', function() {
       createChannel();
-      var ret = bridge.call('method1', 'params1');
+      const ret = bridge.call('method1', 'params1');
       assert.instanceOf(ret, Promise);
     });
   });
@@ -166,20 +166,20 @@ describe('shared.bridge', function() {
 
   describe('#onConnect', function() {
     it('adds a callback that is called when a channel is connected', function(done) {
-      var channel;
-      var callback = function(c, s) {
+      let channel;
+      const callback = function(c, s) {
         assert.strictEqual(c, channel);
         assert.strictEqual(s, fakeWindow);
         done();
       };
 
-      var data = {
+      const data = {
         protocol: 'frame-rpc',
         method: 'connect',
         arguments: ['TOKEN'],
       };
 
-      var event = {
+      const event = {
         source: fakeWindow,
         origin: 'http://example.com',
         data,
@@ -191,21 +191,21 @@ describe('shared.bridge', function() {
     });
 
     it('allows multiple callbacks to be registered', function(done) {
-      var channel;
-      var callbackCount = 0;
-      var callback = (c, s) => {
+      let channel;
+      let callbackCount = 0;
+      const callback = (c, s) => {
         assert.strictEqual(c, channel);
         assert.strictEqual(s, fakeWindow);
         if (++callbackCount === 2) { done(); }
       };
 
-      var data = {
+      const data = {
         protocol: 'frame-rpc',
         method: 'connect',
         arguments: ['TOKEN'],
       };
 
-      var event = {
+      const event = {
         source: fakeWindow,
         origin: 'http://example.com',
         data,
@@ -220,8 +220,8 @@ describe('shared.bridge', function() {
 
   describe('#destroy', () =>
     it('destroys all opened channels', function() {
-      var channel1 = bridge.createChannel(fakeWindow, 'http://example.com', 'foo');
-      var channel2 = bridge.createChannel(fakeWindow, 'http://example.com', 'bar');
+      const channel1 = bridge.createChannel(fakeWindow, 'http://example.com', 'foo');
+      const channel2 = bridge.createChannel(fakeWindow, 'http://example.com', 'bar');
       sinon.spy(channel1, 'destroy');
       sinon.spy(channel2, 'destroy');
 

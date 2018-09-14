@@ -1,39 +1,39 @@
 'use strict';
 
-var angular = require('angular');
-var proxyquire = require('proxyquire');
+const angular = require('angular');
+const proxyquire = require('proxyquire');
 
-var events = require('../../events');
-var bridgeEvents = require('../../../shared/bridge-events');
-var util = require('../../../shared/test/util');
+const events = require('../../events');
+const bridgeEvents = require('../../../shared/bridge-events');
+const util = require('../../../shared/test/util');
 
 describe('sidebar.components.hypothesis-app', function () {
-  var $componentController = null;
-  var $scope = null;
-  var $rootScope = null;
-  var fakeAnnotationMetadata = null;
-  var fakeStore = null;
-  var fakeAnalytics = null;
-  var fakeAuth = null;
-  var fakeBridge = null;
-  var fakeDrafts = null;
-  var fakeFeatures = null;
-  var fakeFlash = null;
-  var fakeFrameSync = null;
-  var fakeLocation = null;
-  var fakeParams = null;
-  var fakeServiceConfig = null;
-  var fakeSession = null;
-  var fakeGroups = null;
-  var fakeRoute = null;
-  var fakeServiceUrl = null;
-  var fakeSettings = null;
-  var fakeStreamer = null;
-  var fakeWindow = null;
+  let $componentController = null;
+  let $scope = null;
+  let $rootScope = null;
+  let fakeAnnotationMetadata = null;
+  let fakeStore = null;
+  let fakeAnalytics = null;
+  let fakeAuth = null;
+  let fakeBridge = null;
+  let fakeDrafts = null;
+  let fakeFeatures = null;
+  let fakeFlash = null;
+  let fakeFrameSync = null;
+  let fakeLocation = null;
+  let fakeParams = null;
+  let fakeServiceConfig = null;
+  let fakeSession = null;
+  let fakeGroups = null;
+  let fakeRoute = null;
+  let fakeServiceUrl = null;
+  let fakeSettings = null;
+  let fakeStreamer = null;
+  let fakeWindow = null;
 
-  var sandbox = null;
+  let sandbox = null;
 
-  var createController = function (locals) {
+  const createController = function (locals) {
     locals = locals || {};
     locals.$scope = $scope;
     return $componentController('hypothesisApp', locals);
@@ -50,7 +50,7 @@ describe('sidebar.components.hypothesis-app', function () {
 
     fakeServiceConfig = sandbox.stub();
 
-    var component = proxyquire('../hypothesis-app', util.noCallThru({
+    const component = proxyquire('../hypothesis-app', util.noCallThru({
       'angular': angular,
       '../annotation-metadata': fakeAnnotationMetadata,
       '../service-config': fakeServiceConfig,
@@ -163,13 +163,13 @@ describe('sidebar.components.hypothesis-app', function () {
 
     it('is false if the window is the top window', function () {
       fakeWindow.top = fakeWindow;
-      var ctrl = createController();
+      const ctrl = createController();
       assert.isFalse(ctrl.isSidebar);
     });
 
     it('is true if the window is not the top window', function () {
       fakeWindow.top = {};
-      var ctrl = createController();
+      const ctrl = createController();
       assert.isTrue(ctrl.isSidebar);
     });
   });
@@ -187,12 +187,12 @@ describe('sidebar.components.hypothesis-app', function () {
   });
 
   it('auth.status is "unknown" on startup', function () {
-    var ctrl = createController();
+    const ctrl = createController();
     assert.equal(ctrl.auth.status, 'unknown');
   });
 
   it('sets auth.status to "logged-out" if userid is null', function () {
-    var ctrl = createController();
+    const ctrl = createController();
     return fakeSession.load().then(function () {
       assert.equal(ctrl.auth.status, 'logged-out');
     });
@@ -202,7 +202,7 @@ describe('sidebar.components.hypothesis-app', function () {
     fakeSession.load = function () {
       return Promise.resolve({userid: 'acct:jim@hypothes.is'});
     };
-    var ctrl = createController();
+    const ctrl = createController();
     return fakeSession.load().then(function () {
       assert.equal(ctrl.auth.status, 'logged-in');
     });
@@ -241,7 +241,7 @@ describe('sidebar.components.hypothesis-app', function () {
   }].forEach(({ profile, expectedAuth }) => {
     it('sets `auth` properties when profile has loaded', () => {
       fakeSession.load = () => Promise.resolve(profile);
-      var ctrl = createController();
+      const ctrl = createController();
       return fakeSession.load().then(() => {
         assert.deepEqual(ctrl.auth, expectedAuth);
       });
@@ -249,7 +249,7 @@ describe('sidebar.components.hypothesis-app', function () {
   });
 
   it('updates auth when the logged-in user changes', function () {
-    var ctrl = createController();
+    const ctrl = createController();
     return fakeSession.load().then(function () {
       $scope.$broadcast(events.USER_CHANGED, {
         profile: {
@@ -267,13 +267,13 @@ describe('sidebar.components.hypothesis-app', function () {
   });
 
   it('does not show the share dialog at start', function () {
-    var ctrl = createController();
+    const ctrl = createController();
     assert.isFalse(ctrl.shareDialog.visible);
   });
 
   describe('#signUp', function () {
     it('tracks sign up requests in analytics', function () {
-      var ctrl = createController();
+      const ctrl = createController();
       ctrl.signUp();
       assert.calledWith(fakeAnalytics.track, fakeAnalytics.events.SIGN_UP_REQUESTED);
     });
@@ -284,13 +284,13 @@ describe('sidebar.components.hypothesis-app', function () {
       });
 
       it('sends SIGNUP_REQUESTED event', function () {
-        var ctrl = createController();
+        const ctrl = createController();
         ctrl.signUp();
         assert.calledWith(fakeBridge.call, bridgeEvents.SIGNUP_REQUESTED);
       });
 
       it('does not open a URL directly', function () {
-        var ctrl = createController();
+        const ctrl = createController();
         ctrl.signUp();
         assert.notCalled(fakeWindow.open);
       });
@@ -299,7 +299,7 @@ describe('sidebar.components.hypothesis-app', function () {
     context('when not using a third-party service', function () {
       it('opens the signup URL in a new tab', function () {
         fakeServiceUrl.withArgs('signup').returns('https://ann.service/signup');
-        var ctrl = createController();
+        const ctrl = createController();
         ctrl.signUp();
         assert.calledWith(fakeWindow.open, 'https://ann.service/signup');
       });
@@ -320,7 +320,7 @@ describe('sidebar.components.hypothesis-app', function () {
         });
 
         it('shows the help panel', function () {
-          var ctrl = createController();
+          const ctrl = createController();
 
           ctrl.showHelpPanel();
 
@@ -340,7 +340,7 @@ describe('sidebar.components.hypothesis-app', function () {
         });
 
         it('does not show the help panel', function () {
-          var ctrl = createController();
+          const ctrl = createController();
 
           ctrl.showHelpPanel();
 
@@ -358,7 +358,7 @@ describe('sidebar.components.hypothesis-app', function () {
       });
 
       it('shows the help panel', function () {
-        var ctrl = createController();
+        const ctrl = createController();
 
         ctrl.showHelpPanel();
 
@@ -373,13 +373,13 @@ describe('sidebar.components.hypothesis-app', function () {
     });
 
     it('initiates the OAuth login flow', () => {
-      var ctrl = createController();
+      const ctrl = createController();
       ctrl.login();
       assert.called(fakeAuth.login);
     });
 
     it('reloads the session when login completes', () => {
-      var ctrl = createController();
+      const ctrl = createController();
       return ctrl.login().then(() => {
         assert.called(fakeSession.reload);
       });
@@ -388,7 +388,7 @@ describe('sidebar.components.hypothesis-app', function () {
     it('reports an error if login fails', () => {
       fakeAuth.login.returns(Promise.reject(new Error('Login failed')));
 
-      var ctrl = createController();
+      const ctrl = createController();
 
       return ctrl.login().then(null, () => {
         assert.called(fakeFlash.error);
@@ -401,7 +401,7 @@ describe('sidebar.components.hypothesis-app', function () {
       // (so that the partner site we're embedded in can do its own login
       // thing).
       fakeServiceConfig.returns({});
-      var ctrl = createController();
+      const ctrl = createController();
 
       ctrl.login();
 
@@ -412,7 +412,7 @@ describe('sidebar.components.hypothesis-app', function () {
 
   describe('#share()', function () {
     it('shows the share dialog', function () {
-      var ctrl = createController();
+      const ctrl = createController();
       ctrl.share();
       assert.equal(ctrl.shareDialog.visible, true);
     });
@@ -424,7 +424,7 @@ describe('sidebar.components.hypothesis-app', function () {
     function doSharedTests() {
       it('prompts the user if there are drafts', function () {
         fakeDrafts.count.returns(1);
-        var ctrl = createController();
+        const ctrl = createController();
 
         ctrl.logout();
 
@@ -435,7 +435,7 @@ describe('sidebar.components.hypothesis-app', function () {
         fakeDrafts.unsaved = sandbox.stub().returns(
           ['draftOne', 'draftTwo', 'draftThree']
         );
-        var ctrl = createController();
+        const ctrl = createController();
         $rootScope.$emit = sandbox.stub();
 
         ctrl.logout();
@@ -450,7 +450,7 @@ describe('sidebar.components.hypothesis-app', function () {
       });
 
       it('discards draft annotations', function () {
-        var ctrl = createController();
+        const ctrl = createController();
 
         ctrl.logout();
 
@@ -458,7 +458,7 @@ describe('sidebar.components.hypothesis-app', function () {
       });
 
       it('does not emit "annotationDeleted" if the user cancels the prompt', function () {
-        var ctrl = createController();
+        const ctrl = createController();
         fakeDrafts.count.returns(1);
         $rootScope.$emit = sandbox.stub();
         fakeWindow.confirm.returns(false);
@@ -469,7 +469,7 @@ describe('sidebar.components.hypothesis-app', function () {
       });
 
       it('does not discard drafts if the user cancels the prompt', function () {
-        var ctrl = createController();
+        const ctrl = createController();
         fakeDrafts.count.returns(1);
         fakeWindow.confirm.returns(false);
 
@@ -479,7 +479,7 @@ describe('sidebar.components.hypothesis-app', function () {
       });
 
       it('does not prompt if there are no drafts', function () {
-        var ctrl = createController();
+        const ctrl = createController();
         fakeDrafts.count.returns(0);
 
         ctrl.logout();
@@ -492,7 +492,7 @@ describe('sidebar.components.hypothesis-app', function () {
       doSharedTests();
 
       it('calls session.logout()', function () {
-        var ctrl = createController();
+        const ctrl = createController();
         ctrl.logout();
         assert.called(fakeSession.logout);
       });

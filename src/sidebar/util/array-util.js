@@ -23,7 +23,7 @@ function countIf(ary, predicate) {
  */
 function filterMap(ary, mapFn) {
   return ary.reduce(function (newArray, item) {
-    var mapped = mapFn(item);
+    const mapped = mapFn(item);
     if (mapped) {
       newArray.push(mapped);
     }

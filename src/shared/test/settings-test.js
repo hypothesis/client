@@ -1,8 +1,8 @@
 'use strict';
 
-var settings = require('../settings');
+const settings = require('../settings');
 
-var sandbox = sinon.sandbox.create();
+const sandbox = sinon.sandbox.create();
 
 describe('settings', function () {
 
@@ -11,10 +11,10 @@ describe('settings', function () {
   });
 
   describe('#jsonConfigsFrom', function() {
-    var jsonConfigsFrom = settings.jsonConfigsFrom;
+    const jsonConfigsFrom = settings.jsonConfigsFrom;
 
     function appendJSHypothesisConfig(document_, jsonString) {
-      var el = document_.createElement('script');
+      const el = document_.createElement('script');
       el.type = 'application/json';
       el.textContent = jsonString;
       el.classList.add('js-hypothesis-config');
@@ -23,8 +23,8 @@ describe('settings', function () {
     }
 
     afterEach('remove js-hypothesis-config tags', function() {
-      var elements = document.querySelectorAll('.js-settings-test');
-      for (var i=0; i < elements.length; i++) {
+      const elements = document.querySelectorAll('.js-settings-test');
+      for (let i=0; i < elements.length; i++) {
         elements[i].remove();
       }
     });

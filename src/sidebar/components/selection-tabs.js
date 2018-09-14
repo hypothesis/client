@@ -1,7 +1,7 @@
 'use strict';
 
-var sessionUtil = require('../util/session-util');
-var uiConstants = require('../ui-constants');
+const sessionUtil = require('../util/session-util');
+const uiConstants = require('../ui-constants');
 
 module.exports = {
   controllerAs: 'vm',

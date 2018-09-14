@@ -1,10 +1,10 @@
 'use strict';
 
-var disableOpenerForExternalLinks = require('../disable-opener-for-external-links');
+const disableOpenerForExternalLinks = require('../disable-opener-for-external-links');
 
 describe('sidebar.util.disable-opener-for-external-links', () => {
-  var containerEl;
-  var linkEl;
+  let containerEl;
+  let linkEl;
 
   beforeEach(() => {
     containerEl = document.createElement('div');

@@ -1,6 +1,6 @@
 'use strict';
 
-var sessionUtil = require('../util/session-util');
+const sessionUtil = require('../util/session-util');
 
 // @ngInject
 function SidebarTutorialController(session, settings) {

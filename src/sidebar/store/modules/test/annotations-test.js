@@ -1,23 +1,23 @@
 'use strict';
 
-var redux = require('redux');
+const redux = require('redux');
 // `.default` is needed because 'redux-thunk' is built as an ES2015 module
-var thunk = require('redux-thunk').default;
+const thunk = require('redux-thunk').default;
 
-var annotations = require('../annotations');
-var fixtures = require('../../../test/annotation-fixtures');
-var util = require('../../util');
-var unroll = require('../../../../shared/test/util').unroll;
+const annotations = require('../annotations');
+const fixtures = require('../../../test/annotation-fixtures');
+const util = require('../../util');
+const unroll = require('../../../../shared/test/util').unroll;
 
-var { actions, selectors } = annotations;
+const { actions, selectors } = annotations;
 
 /**
  * Create a Redux store which only handles annotation actions.
  */
 function createStore() {
   // Thunk middleware is needed for the ADD_ANNOTATIONS action.
-  var enhancer = redux.applyMiddleware(thunk);
-  var reducer = util.createReducer(annotations.update);
+  const enhancer = redux.applyMiddleware(thunk);
+  const reducer = util.createReducer(annotations.update);
   return redux.createStore(reducer, annotations.init(), enhancer);
 }
 
@@ -26,10 +26,10 @@ function createStore() {
 
 describe('annotations reducer', function () {
   describe('#savedAnnotations', function () {
-    var savedAnnotations = selectors.savedAnnotations;
+    const savedAnnotations = selectors.savedAnnotations;
 
     it('returns annotations which are saved', function () {
-      var state = {
+      const state = {
         annotations: [fixtures.newAnnotation(), fixtures.defaultAnnotation()],
       };
       assert.deepEqual(savedAnnotations(state), [fixtures.defaultAnnotation()]);
@@ -37,19 +37,19 @@ describe('annotations reducer', function () {
   });
 
   describe('#findIDsForTags', function () {
-    var findIDsForTags = selectors.findIDsForTags;
+    const findIDsForTags = selectors.findIDsForTags;
 
     it('returns the IDs corresponding to the provided local tags', function () {
-      var ann = fixtures.defaultAnnotation();
-      var state = {
+      const ann = fixtures.defaultAnnotation();
+      const state = {
         annotations: [Object.assign(ann, {$tag: 't1'})],
       };
       assert.deepEqual(findIDsForTags(state, ['t1']), [ann.id]);
     });
 
     it('does not return IDs for annotations that do not have an ID', function () {
-      var ann = fixtures.newAnnotation();
-      var state = {
+      const ann = fixtures.newAnnotation();
+      const state = {
         annotations: [Object.assign(ann, {$tag: 't1'})],
       };
       assert.deepEqual(findIDsForTags(state, ['t1']), []);
@@ -58,41 +58,41 @@ describe('annotations reducer', function () {
 
   describe('#hideAnnotation', function () {
     it('sets the `hidden` state to `true`', function () {
-      var store = createStore();
-      var ann = fixtures.moderatedAnnotation({ hidden: false });
+      const store = createStore();
+      const ann = fixtures.moderatedAnnotation({ hidden: false });
 
       store.dispatch(actions.addAnnotations([ann]));
       store.dispatch(actions.hideAnnotation(ann.id));
 
-      var storeAnn = selectors.findAnnotationByID(store.getState(), ann.id);
+      const storeAnn = selectors.findAnnotationByID(store.getState(), ann.id);
       assert.equal(storeAnn.hidden, true);
     });
   });
 
   describe('#unhideAnnotation', function () {
     it('sets the `hidden` state to `false`', function () {
-      var store = createStore();
-      var ann = fixtures.moderatedAnnotation({ hidden: true });
+      const store = createStore();
+      const ann = fixtures.moderatedAnnotation({ hidden: true });
 
       store.dispatch(actions.addAnnotations([ann]));
       store.dispatch(actions.unhideAnnotation(ann.id));
 
-      var storeAnn = selectors.findAnnotationByID(store.getState(), ann.id);
+      const storeAnn = selectors.findAnnotationByID(store.getState(), ann.id);
       assert.equal(storeAnn.hidden, false);
     });
   });
 
   describe('#updateFlagStatus', function () {
     unroll('updates the flagged status of an annotation', function (testCase) {
-      var store = createStore();
-      var ann = fixtures.defaultAnnotation();
+      const store = createStore();
+      const ann = fixtures.defaultAnnotation();
       ann.flagged = testCase.wasFlagged;
       ann.moderation = testCase.oldModeration;
 
       store.dispatch(actions.addAnnotations([ann]));
       store.dispatch(actions.updateFlagStatus(ann.id, testCase.nowFlagged));
 
-      var storeAnn = selectors.findAnnotationByID(store.getState(), ann.id);
+      const storeAnn = selectors.findAnnotationByID(store.getState(), ann.id);
       assert.equal(storeAnn.flagged, testCase.nowFlagged);
       assert.deepEqual(storeAnn.moderation, testCase.newModeration);
     }, [{

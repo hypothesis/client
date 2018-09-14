@@ -1,6 +1,6 @@
 'use strict';
 
-var uiConstants = require('../ui-constants');
+const uiConstants = require('../ui-constants');
 
 module.exports = {
   controllerAs: 'vm',

@@ -65,8 +65,8 @@ function DraftStore() {
 
   /** Retrieve the draft changes for an annotation. */
   this.get = function get(model) {
-    for (var i = 0; i < this._drafts.length; i++) {
-      var draft = this._drafts[i];
+    for (let i = 0; i < this._drafts.length; i++) {
+      const draft = this._drafts[i];
       if (match(draft, model)) {
         return {
           isPrivate: draft.isPrivate,
@@ -83,7 +83,7 @@ function DraftStore() {
    * or the draft is empty.
    */
   this.getIfNotEmpty = function (model) {
-    var draft = this.get(model);
+    const draft = this.get(model);
     return isEmpty(draft) ? null : draft;
   };
 
@@ -92,7 +92,7 @@ function DraftStore() {
    * existing draft.
    */
   this.update = function update(model, changes) {
-    var newDraft = {
+    const newDraft = {
       model: {id: model.id, $tag: model.$tag},
       isPrivate: changes.isPrivate,
       tags: changes.tags,

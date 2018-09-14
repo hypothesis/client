@@ -1,13 +1,13 @@
 'use strict';
 
-var retry = require('retry');
-var EventEmitter = require('tiny-emitter');
+const retry = require('retry');
+const EventEmitter = require('tiny-emitter');
 
 // see https://developer.mozilla.org/en-US/docs/Web/API/CloseEvent
-var CLOSE_NORMAL = 1000;
+const CLOSE_NORMAL = 1000;
 
 // Minimum delay, in ms, before reconnecting after an abnormal connection close.
-var RECONNECT_MIN_DELAY = 1000;
+const RECONNECT_MIN_DELAY = 1000;
 
 /**
  * Socket is a minimal wrapper around WebSocket which provides:
@@ -22,20 +22,20 @@ class Socket extends EventEmitter {
   constructor(url) {
     super();
 
-    var self = this;
+    const self = this;
 
     // queue of JSON objects which have not yet been submitted
-    var messageQueue = [];
+    const messageQueue = [];
 
     // the current WebSocket instance
-    var socket;
+    let socket;
 
     // a pending operation to connect a WebSocket
-    var operation;
+    let operation;
 
     function sendMessages() {
       while (messageQueue.length > 0) {
-        var messageString = JSON.stringify(messageQueue.shift());
+        const messageString = JSON.stringify(messageQueue.shift());
         socket.send(messageString);
       }
     }
@@ -66,7 +66,7 @@ class Socket extends EventEmitter {
             self.emit('close', event);
             return;
           }
-          var err = new Error('WebSocket closed abnormally, code: ' + event.code);
+          const err = new Error('WebSocket closed abnormally, code: ' + event.code);
           console.warn(err);
           onAbnormalClose(err);
         };
@@ -97,7 +97,7 @@ class Socket extends EventEmitter {
         return;
       }
       // ...otherwise reconnect the websocket after a short delay.
-      var delay = RECONNECT_MIN_DELAY;
+      let delay = RECONNECT_MIN_DELAY;
       delay += Math.floor(Math.random() * delay);
       operation = setTimeout(function () {
         operation = null;

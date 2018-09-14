@@ -9,7 +9,7 @@ function isSelectionBackwards(selection) {
     return selection.focusOffset < selection.anchorOffset;
   }
 
-  var range = selection.getRangeAt(0);
+  const range = selection.getRangeAt(0);
   return range.startContainer === selection.focusNode;
 }
 
@@ -27,11 +27,11 @@ function isNodeInRange(range, node) {
     return true;
   }
 
-  var nodeRange = node.ownerDocument.createRange();
+  const nodeRange = node.ownerDocument.createRange();
   nodeRange.selectNode(node);
-  var isAtOrBeforeStart =
+  const isAtOrBeforeStart =
     range.compareBoundaryPoints(Range.START_TO_START, nodeRange) <= 0;
-  var isAtOrAfterEnd =
+  const isAtOrAfterEnd =
     range.compareBoundaryPoints(Range.END_TO_END, nodeRange) >= 0;
   nodeRange.detach();
   return isAtOrBeforeStart && isAtOrAfterEnd;
@@ -45,14 +45,14 @@ function isNodeInRange(range, node) {
  * @param {Function} callback
  */
 function forEachNodeInRange(range, callback) {
-  var root = range.commonAncestorContainer;
+  const root = range.commonAncestorContainer;
 
   // The `whatToShow`, `filter` and `expandEntityReferences` arguments are
   // mandatory in IE although optional according to the spec.
-  var nodeIter = root.ownerDocument.createNodeIterator(root,
+  const nodeIter = root.ownerDocument.createNodeIterator(root,
     NodeFilter.SHOW_ALL, null /* filter */, false /* expandEntityReferences */);
 
-  var currentNode;
+  let currentNode;
   while (currentNode = nodeIter.nextNode()) { // eslint-disable-line no-cond-assign
     if (isNodeInRange(range, currentNode)) {
       callback(currentNode);
@@ -67,8 +67,8 @@ function forEachNodeInRange(range, callback) {
  * @return {Array<Rect>} Array of bounding rects in viewport coordinates.
  */
 function getTextBoundingBoxes(range) {
-  var whitespaceOnly = /^\s*$/;
-  var textNodes = [];
+  const whitespaceOnly = /^\s*$/;
+  const textNodes = [];
   forEachNodeInRange(range, function (node) {
     if (node.nodeType === Node.TEXT_NODE &&
         !node.textContent.match(whitespaceOnly)) {
@@ -76,9 +76,9 @@ function getTextBoundingBoxes(range) {
     }
   });
 
-  var rects = [];
+  let rects = [];
   textNodes.forEach(function (node) {
-    var nodeRange = node.ownerDocument.createRange();
+    const nodeRange = node.ownerDocument.createRange();
     nodeRange.selectNodeContents(node);
     if (node === range.startContainer) {
       nodeRange.setStart(node, range.startOffset);
@@ -93,7 +93,7 @@ function getTextBoundingBoxes(range) {
     }
 
     // Measure the range and translate from viewport to document coordinates
-    var viewportRects = Array.from(nodeRange.getClientRects());
+    const viewportRects = Array.from(nodeRange.getClientRects());
     nodeRange.detach();
     rects = rects.concat(viewportRects);
   });
@@ -113,7 +113,7 @@ function selectionFocusRect(selection) {
   if (selection.isCollapsed) {
     return null;
   }
-  var textBoxes = getTextBoundingBoxes(selection.getRangeAt(0));
+  const textBoxes = getTextBoundingBoxes(selection.getRangeAt(0));
   if (textBoxes.length === 0) {
     return null;
   }

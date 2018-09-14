@@ -1,9 +1,9 @@
 'use strict';
 
-var rangeUtil = require('../range-util');
+const rangeUtil = require('../range-util');
 
 function createRange(node, start, end) {
-  var range = node.ownerDocument.createRange();
+  const range = node.ownerDocument.createRange();
   range.setStart(node, start);
   range.setEnd(node, end);
   return range;
@@ -24,8 +24,8 @@ function roundCoords(rect) {
 }
 
 describe('annotator.range-util', function () {
-  var selection;
-  var testNode;
+  let selection;
+  let testNode;
 
   beforeEach(function () {
     selection = window.getSelection();
@@ -41,26 +41,26 @@ describe('annotator.range-util', function () {
   });
 
   function selectNode(node) {
-    var range = testNode.ownerDocument.createRange();
+    const range = testNode.ownerDocument.createRange();
     range.selectNodeContents(node);
     selection.addRange(range);
   }
 
   describe('#isNodeInRange', function () {
     it('is true for a node in the range', function () {
-      var rng = createRange(testNode, 0, 1);
+      const rng = createRange(testNode, 0, 1);
       assert.equal(rangeUtil.isNodeInRange(rng, testNode.firstChild), true);
     });
 
     it('is false for a node before the range', function () {
       testNode.innerHTML = 'one <b>two</b> three';
-      var rng = createRange(testNode, 1, 2);
+      const rng = createRange(testNode, 1, 2);
       assert.equal(rangeUtil.isNodeInRange(rng, testNode.firstChild), false);
     });
 
     it('is false for a node after the range', function () {
       testNode.innerHTML = 'one <b>two</b> three';
-      var rng = createRange(testNode, 1, 2);
+      const rng = createRange(testNode, 1, 2);
       assert.equal(rangeUtil.isNodeInRange(rng, testNode.childNodes.item(2)), false);
     });
   });
@@ -68,16 +68,16 @@ describe('annotator.range-util', function () {
   describe('#getTextBoundingBoxes', function () {
     it('gets the bounding box of a range in a text node', function () {
       testNode.innerHTML = 'plain text';
-      var rng = createRange(testNode.firstChild, 0, 5);
-      var boxes = rangeUtil.getTextBoundingBoxes(rng);
+      const rng = createRange(testNode.firstChild, 0, 5);
+      const boxes = rangeUtil.getTextBoundingBoxes(rng);
       assert.ok(boxes.length);
     });
 
     it('gets the bounding box of a range containing a text node', function () {
       testNode.innerHTML = 'plain text';
-      var rng = createRange(testNode, 0, 1);
+      const rng = createRange(testNode, 0, 1);
 
-      var boxes = rangeUtil.getTextBoundingBoxes(rng);
+      const boxes = rangeUtil.getTextBoundingBoxes(rng);
 
       assert.match(boxes, [sinon.match({
         left: sinon.match.number,
@@ -91,9 +91,9 @@ describe('annotator.range-util', function () {
 
     it('returns the bounding box in viewport coordinates', function () {
       testNode.innerHTML = 'plain text';
-      var rng = createRange(testNode, 0, 1);
+      const rng = createRange(testNode, 0, 1);
 
-      var [rect] = rangeUtil.getTextBoundingBoxes(rng);
+      const [rect] = rangeUtil.getTextBoundingBoxes(rng);
 
       assert.deepEqual(roundCoords(rect), roundCoords(testNode.getBoundingClientRect()));
     });
@@ -113,14 +113,14 @@ describe('annotator.range-util', function () {
       selectNode(testNode);
       selection.collapseToEnd();
       selection.extend(testNode, 0);
-      var rect = rangeUtil.selectionFocusRect(selection);
+      const rect = rangeUtil.selectionFocusRect(selection);
       assert.equal(rect.left, testNode.offsetLeft);
       assert.equal(rect.top, testNode.offsetTop);
     });
 
     it('returns the last line\'s rect if the selection is forwards', function () {
       selectNode(testNode);
-      var rect = rangeUtil.selectionFocusRect(selection);
+      const rect = rangeUtil.selectionFocusRect(selection);
       assert.equal(rect.left, testNode.offsetLeft);
       assert.equal(rect.top + rect.height, testNode.offsetTop + testNode.offsetHeight);
     });

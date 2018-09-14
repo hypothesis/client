@@ -1,12 +1,12 @@
 'use strict';
 
-var { stringify } = require('query-string');
-var sinon = require('sinon');
+const { stringify } = require('query-string');
+const sinon = require('sinon');
 
-var OAuthClient = require('../oauth-client');
-var FakeWindow = require('./fake-window');
+const OAuthClient = require('../oauth-client');
+const FakeWindow = require('./fake-window');
 
-var fixtures = {
+const fixtures = {
   tokenResponse: {
     status: 200,
     data: {
@@ -31,10 +31,10 @@ var fixtures = {
 };
 
 describe('sidebar.util.oauth-client', () => {
-  var fakeHttp;
-  var client;
-  var clock;
-  var config = {
+  let fakeHttp;
+  let client;
+  let clock;
+  const config = {
     clientId: '1234-5678',
     authorizationEndpoint: 'https://annota.te/oauth/authorize',
     tokenEndpoint: 'https://annota.te/api/token',
@@ -59,7 +59,7 @@ describe('sidebar.util.oauth-client', () => {
     it('makes a POST request to the authorization endpoint', () => {
       fakeHttp.post.returns(Promise.resolve(fixtures.tokenResponse));
       return client.exchangeAuthCode('letmein').then(() => {
-        var expectedBody = 'client_id=1234-5678&code=letmein&grant_type=authorization_code';
+        const expectedBody = 'client_id=1234-5678&code=letmein&grant_type=authorization_code';
         assert.calledWith(fakeHttp.post, 'https://annota.te/api/token', expectedBody, fixtures.formPostParams);
       });
     });
@@ -83,7 +83,7 @@ describe('sidebar.util.oauth-client', () => {
     it('makes a POST request to the token endpoint', () => {
       fakeHttp.post.returns(Promise.resolve(fixtures.tokenResponse));
       return client.exchangeGrantToken('letmein').then(() => {
-        var expectedBody =
+        const expectedBody =
           'assertion=letmein' +
           '&grant_type=urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Ajwt-bearer';
         assert.calledWith(fakeHttp.post, 'https://annota.te/api/token', expectedBody, fixtures.formPostParams);
@@ -111,7 +111,7 @@ describe('sidebar.util.oauth-client', () => {
       fakeHttp.post.returns(Promise.resolve(fixtures.tokenResponse));
 
       return client.refreshToken('valid-refresh-token').then(() => {
-        var expectedBody =
+        const expectedBody =
           'grant_type=refresh_token&refresh_token=valid-refresh-token';
 
         assert.calledWith(
@@ -144,7 +144,7 @@ describe('sidebar.util.oauth-client', () => {
       fakeHttp.post.returns(Promise.resolve(fixtures.tokenResponse));
 
       return client.revokeToken('valid-access-token').then(() => {
-        var expectedBody = 'token=valid-access-token';
+        const expectedBody = 'token=valid-access-token';
         assert.calledWith(fakeHttp.post, 'https://annota.te/oauth/revoke', expectedBody, fixtures.formPostParams);
       });
     });
@@ -164,8 +164,8 @@ describe('sidebar.util.oauth-client', () => {
 
   describe('.openAuthPopupWindow', () => {
     it('opens a popup window', () => {
-      var fakeWindow = new FakeWindow;
-      var popupWindow = OAuthClient.openAuthPopupWindow(fakeWindow);
+      const fakeWindow = new FakeWindow;
+      const popupWindow = OAuthClient.openAuthPopupWindow(fakeWindow);
       assert.equal(popupWindow, fakeWindow.open.returnValues[0]);
       assert.calledWith(
         fakeWindow.open,
@@ -177,20 +177,20 @@ describe('sidebar.util.oauth-client', () => {
   });
 
   describe('#authorize', () => {
-    var fakeWindow;
+    let fakeWindow;
 
     beforeEach(() => {
       fakeWindow = new FakeWindow;
     });
 
     function authorize() {
-      var popupWindow = OAuthClient.openAuthPopupWindow(fakeWindow);
-      var authorized = client.authorize(fakeWindow, popupWindow);
+      const popupWindow = OAuthClient.openAuthPopupWindow(fakeWindow);
+      const authorized = client.authorize(fakeWindow, popupWindow);
       return { authorized, popupWindow };
     }
 
     it('navigates the popup window to the authorization URL', () => {
-      var { authorized, popupWindow } = authorize();
+      const { authorized, popupWindow } = authorize();
 
       fakeWindow.sendMessage({
         type: 'authorization_response',
@@ -199,20 +199,20 @@ describe('sidebar.util.oauth-client', () => {
       });
 
       return authorized.then(() => {
-        var params = {
+        const params = {
           client_id: config.clientId,
           origin: 'https://client.hypothes.is',
           response_mode: 'web_message',
           response_type: 'code',
           state: 'notrandom',
         };
-        var expectedAuthUrl = `${config.authorizationEndpoint}?${stringify(params)}`;
+        const expectedAuthUrl = `${config.authorizationEndpoint}?${stringify(params)}`;
         assert.equal(popupWindow.location.href, expectedAuthUrl);
       });
     });
 
     it('resolves with an auth code if successful', () => {
-      var { authorized } = authorize();
+      const { authorized } = authorize();
 
       fakeWindow.sendMessage({
         type: 'authorization_response',
@@ -226,7 +226,7 @@ describe('sidebar.util.oauth-client', () => {
     });
 
     it('rejects with an error if canceled', () => {
-      var { authorized } = authorize();
+      const { authorized } = authorize();
 
       fakeWindow.sendMessage({
         type: 'authorization_canceled',
@@ -239,7 +239,7 @@ describe('sidebar.util.oauth-client', () => {
     });
 
     it('ignores responses with incorrect "state" values', () => {
-      var { authorized } = authorize();
+      const { authorized } = authorize();
 
       fakeWindow.sendMessage({
         type: 'authorization_response',

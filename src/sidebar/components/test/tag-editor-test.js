@@ -1,11 +1,11 @@
 'use strict';
 
-var angular = require('angular');
+const angular = require('angular');
 
-var util = require('../../directive/test/util');
+const util = require('../../directive/test/util');
 
 describe('tagEditor', function () {
-  var fakeTags;
+  let fakeTags;
 
   before(function () {
     angular.module('app',[])
@@ -24,15 +24,15 @@ describe('tagEditor', function () {
   });
 
   it('converts tags to the form expected by ng-tags-input', function () {
-    var element = util.createDirective(document, 'tag-editor', {
+    const element = util.createDirective(document, 'tag-editor', {
       tags: ['foo', 'bar'],
     });
     assert.deepEqual(element.ctrl.tagList, [{text: 'foo'}, {text: 'bar'}]);
   });
 
   describe('when tags are changed', function () {
-    var element;
-    var onEditTags;
+    let element;
+    let onEditTags;
 
     beforeEach(function () {
       onEditTags = sinon.stub();
@@ -54,7 +54,7 @@ describe('tagEditor', function () {
 
   describe('#autocomplete', function () {
     it('suggests tags using the `tags` service', function () {
-      var element = util.createDirective(document, 'tag-editor', {tags: []});
+      const element = util.createDirective(document, 'tag-editor', {tags: []});
       element.ctrl.autocomplete('query');
       assert.calledWith(fakeTags.filter, 'query');
     });

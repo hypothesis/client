@@ -1,9 +1,9 @@
 'use strict';
 
-var events = require('../events');
-var retryUtil = require('../util/retry');
+const events = require('../events');
+const retryUtil = require('../util/retry');
 
-var CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
 /**
  * @typedef Profile
@@ -23,13 +23,13 @@ var CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 function session($q, $rootScope, analytics, store, api, auth,
                  flash, raven, settings, serviceConfig) {
   // Cache the result of load()
-  var lastLoad;
-  var lastLoadTime;
+  let lastLoad;
+  let lastLoadTime;
 
   // Return the authority from the first service defined in the settings.
   // Return null if there are no services defined in the settings.
   function getAuthority() {
-    var service = serviceConfig(settings);
+    const service = serviceConfig(settings);
     if (service === null) {
       return null;
     }
@@ -37,7 +37,7 @@ function session($q, $rootScope, analytics, store, api, auth,
   }
 
   // Options to pass to `retry.operation` when fetching the user's profile.
-  var profileFetchRetryOpts = {};
+  const profileFetchRetryOpts = {};
 
   /**
    * Fetch the user's profile from the annotation service.
@@ -57,8 +57,8 @@ function session($q, $rootScope, analytics, store, api, auth,
       // the /app endpoint.
       lastLoadTime = Date.now();
       lastLoad = retryUtil.retryPromiseOperation(function () {
-        var authority = getAuthority();
-        var opts = {};
+        const authority = getAuthority();
+        const opts = {};
         if (authority) {
           opts.authority = authority;
         }
@@ -93,8 +93,8 @@ function session($q, $rootScope, analytics, store, api, auth,
    * @return {Profile} The updated profile data
    */
   function update(model) {
-    var prevSession = store.getState().session;
-    var userChanged = model.userid !== prevSession.userid;
+    const prevSession = store.getState().session;
+    const userChanged = model.userid !== prevSession.userid;
 
     // Update the session model used by the application
     store.updateSession(model);
@@ -125,7 +125,7 @@ function session($q, $rootScope, analytics, store, api, auth,
    * Log the user out of the current session.
    */
   function logout() {
-    var loggedOut = auth.logout().then(() => {
+    const loggedOut = auth.logout().then(() => {
       // Re-fetch the logged-out user's profile.
       return reload();
     });

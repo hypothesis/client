@@ -1,6 +1,6 @@
 'use strict';
 
-var angular = require('angular');
+const angular = require('angular');
 
 // Fake implementation of the API for fetching annotations and replies to
 // annotations.
@@ -9,7 +9,7 @@ function FakeApi(annots) {
 
   this.annotation = {
     get: function (query) {
-      var result;
+      let result;
       if (query.id) {
         result = annots.find(function (a) {
           return a.id === query.id;
@@ -20,7 +20,7 @@ function FakeApi(annots) {
   };
 
   this.search = function (query) {
-    var result;
+    let result;
     if (query.references) {
       result = annots.filter(function (a) {
         return a.references && a.references.indexOf(query.references) !== -1;
@@ -42,7 +42,7 @@ describe('annotationViewerContent', function () {
   beforeEach(angular.mock.module('h'));
 
   function createController(opts) {
-    var locals = {
+    const locals = {
       $location: {},
       $routeParams: { id: 'test_annotation_id' },
       store: {
@@ -74,7 +74,7 @@ describe('annotationViewerContent', function () {
       },
     };
 
-    var $componentController;
+    let $componentController;
     angular.mock.inject(function (_$componentController_) {
       $componentController = _$componentController_;
     });
@@ -86,11 +86,11 @@ describe('annotationViewerContent', function () {
 
   describe('the standalone view for a top-level annotation', function () {
     it('loads the annotation and all replies', function () {
-      var fakeApi = new FakeApi([
+      const fakeApi = new FakeApi([
         {id: 'test_annotation_id'},
         {id: 'test_reply_id', references: ['test_annotation_id']},
       ]);
-      var controller = createController({api: fakeApi});
+      const controller = createController({api: fakeApi});
       return controller.ctrl.ready.then(function () {
         assert.calledOnce(controller.annotationMapper.loadAnnotations);
         assert.calledWith(controller.annotationMapper.loadAnnotations,
@@ -99,11 +99,11 @@ describe('annotationViewerContent', function () {
     });
 
     it('does not highlight any annotations', function () {
-      var fakeApi = new FakeApi([
+      const fakeApi = new FakeApi([
         {id: 'test_annotation_id'},
         {id: 'test_reply_id', references: ['test_annotation_id']},
       ]);
-      var controller = createController({api: fakeApi});
+      const controller = createController({api: fakeApi});
       return controller.ctrl.ready.then(function () {
         assert.notCalled(controller.store.highlightAnnotations);
       });
@@ -112,11 +112,11 @@ describe('annotationViewerContent', function () {
 
   describe('the standalone view for a reply', function () {
     it('loads the top-level annotation and all replies', function () {
-      var fakeApi = new FakeApi([
+      const fakeApi = new FakeApi([
         {id: 'parent_id'},
         {id: 'test_annotation_id', references: ['parent_id']},
       ]);
-      var controller = createController({api: fakeApi});
+      const controller = createController({api: fakeApi});
       return controller.ctrl.ready.then(function () {
         assert.calledWith(controller.annotationMapper.loadAnnotations,
           sinon.match(fakeApi.annots));
@@ -124,11 +124,11 @@ describe('annotationViewerContent', function () {
     });
 
     it('expands the thread', function () {
-      var fakeApi = new FakeApi([
+      const fakeApi = new FakeApi([
         {id: 'parent_id'},
         {id: 'test_annotation_id', references: ['parent_id']},
       ]);
-      var controller = createController({api: fakeApi});
+      const controller = createController({api: fakeApi});
       return controller.ctrl.ready.then(function () {
         assert.calledWith(controller.store.setCollapsed, 'parent_id', false);
         assert.calledWith(controller.store.setCollapsed, 'test_annotation_id', false);
@@ -136,11 +136,11 @@ describe('annotationViewerContent', function () {
     });
 
     it('highlights the reply', function () {
-      var fakeApi = new FakeApi([
+      const fakeApi = new FakeApi([
         {id: 'parent_id'},
         {id: 'test_annotation_id', references: ['parent_id']},
       ]);
-      var controller = createController({api: fakeApi});
+      const controller = createController({api: fakeApi});
       return controller.ctrl.ready.then(function () {
         assert.calledWith(controller.store.highlightAnnotations,
           sinon.match(['test_annotation_id']));

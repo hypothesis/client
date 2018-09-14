@@ -1,13 +1,13 @@
 'use strict';
 
-var angular = require('angular');
+const angular = require('angular');
 
-var dateUtil = require('../../util/date');
-var util = require('../../directive/test/util');
+const dateUtil = require('../../util/date');
+const util = require('../../directive/test/util');
 
 describe('timestamp', function () {
-  var clock;
-  var fakeTime;
+  let clock;
+  let fakeTime;
 
   before(function () {
     angular.module('app',[])
@@ -32,14 +32,14 @@ describe('timestamp', function () {
 
   describe('#relativeTimestamp', function() {
     it('displays a relative time string', function() {
-      var element = util.createDirective(document, 'timestamp', {
+      const element = util.createDirective(document, 'timestamp', {
         timestamp: '2016-06-10T10:04:04.939Z',
       });
       assert.equal(element.ctrl.relativeTimestamp, 'a while ago');
     });
 
     it('is updated when the timestamp changes', function () {
-      var element = util.createDirective(document, 'timestamp', {
+      const element = util.createDirective(document, 'timestamp', {
         timestamp: '1776-07-04T10:04:04.939Z',
       });
       element.scope.timestamp = '1863-11-19T12:00:00.939Z';
@@ -52,7 +52,7 @@ describe('timestamp', function () {
       fakeTime.decayingInterval = function (date, callback) {
         setTimeout(callback, 10);
       };
-      var element = util.createDirective(document, 'timestamp', {
+      const element = util.createDirective(document, 'timestamp', {
         timestamp: '2016-06-10T10:04:04.939Z',
       });
       fakeTime.toFuzzyString.returns('60 jiffies');
@@ -62,11 +62,11 @@ describe('timestamp', function () {
     });
 
     it('is no longer updated after the component is destroyed', function() {
-      var cancelRefresh = sinon.stub();
+      const cancelRefresh = sinon.stub();
       fakeTime.decayingInterval = function () {
         return cancelRefresh;
       };
-      var element = util.createDirective(document, 'timestamp', {
+      const element = util.createDirective(document, 'timestamp', {
         timestamp: '2016-06-10T10:04:04.939Z',
       });
       element.ctrl.$onDestroy();
@@ -76,8 +76,8 @@ describe('timestamp', function () {
 
   describe('#absoluteTimestamp', function () {
     it('displays the current time', function () {
-      var expectedDate = new Date('2016-06-10T10:04:04.939Z');
-      var element = util.createDirective(document, 'timestamp', {
+      const expectedDate = new Date('2016-06-10T10:04:04.939Z');
+      const element = util.createDirective(document, 'timestamp', {
         timestamp: expectedDate.toISOString(),
       });
 

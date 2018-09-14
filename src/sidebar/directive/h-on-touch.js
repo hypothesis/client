@@ -14,7 +14,7 @@
  * @param {Function} handler
  */
 function addEventHandler($scope, element, events, handler) {
-  var callback = function (event) {
+  const callback = function (event) {
     $scope.$apply(function () {
       handler($scope, {$event: event});
     });
@@ -34,7 +34,7 @@ module.exports = function ($parse) {
   return {
     restrict: 'A',
     link: function ($scope, $element, $attrs) {
-      var fn = $parse($attrs.hOnTouch, null /* interceptor */);
+      const fn = $parse($attrs.hOnTouch, null /* interceptor */);
       addEventHandler(
         $scope,
         $element[0],

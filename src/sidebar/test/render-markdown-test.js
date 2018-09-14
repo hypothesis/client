@@ -1,10 +1,10 @@
 'use strict';
 
-var proxyquire = require('proxyquire');
+const proxyquire = require('proxyquire');
 
 describe('render-markdown', function () {
-  var render;
-  var renderMarkdown;
+  let render;
+  let renderMarkdown;
 
   function fakeSanitize(html) {
     return '{safe}' + html + '{/safe}';
@@ -73,7 +73,7 @@ describe('render-markdown', function () {
     });
 
     it('should not sanitize math renderer output', function () {
-      var fakeSanitize = function (html) {
+      const fakeSanitize = function (html) {
         return html.toLowerCase();
       };
       assert.equal(render('$$X*2$$ FOO', fakeSanitize),

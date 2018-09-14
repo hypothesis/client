@@ -1,16 +1,16 @@
 'use strict';
 
-var addAnalytics = require('./ga');
-var disableOpenerForExternalLinks = require('./util/disable-opener-for-external-links');
-var getApiUrl = require('./get-api-url');
-var serviceConfig = require('./service-config');
-var crossOriginRPC = require('./cross-origin-rpc.js');
+const addAnalytics = require('./ga');
+const disableOpenerForExternalLinks = require('./util/disable-opener-for-external-links');
+const getApiUrl = require('./get-api-url');
+const serviceConfig = require('./service-config');
+const crossOriginRPC = require('./cross-origin-rpc.js');
 require('../shared/polyfills');
 
-var raven;
+let raven;
 
 // Read settings rendered into sidebar app HTML by service/extension.
-var settings = require('../shared/settings').jsonConfigsFrom(document);
+const settings = require('../shared/settings').jsonConfigsFrom(document);
 
 if (settings.raven) {
   // Initialize Raven. This is required at the top of this file
@@ -19,7 +19,7 @@ if (settings.raven) {
   raven.init(settings.raven);
 }
 
-var hostPageConfig = require('./host-config');
+const hostPageConfig = require('./host-config');
 Object.assign(settings, hostPageConfig(window));
 
 settings.apiUrl = getApiUrl(settings);
@@ -35,7 +35,7 @@ document.body.setAttribute('ng-csp', '');
 // Prevent tab-jacking.
 disableOpenerForExternalLinks(document.body);
 
-var angular = require('angular');
+const angular = require('angular');
 
 // autofill-event relies on the existence of window.angular so
 // it must be require'd after angular is first require'd
@@ -54,14 +54,14 @@ if(settings.googleAnalytics){
 
 // Fetch external state that the app needs before it can run. This includes the
 // user's profile and list of groups.
-var resolve = {
+const resolve = {
   // @ngInject
   state: function (groups, session) {
     return Promise.all([groups.load(), session.load()]);
   },
 };
 
-var isSidebar = !(window.location.pathname.startsWith('/stream') ||
+const isSidebar = !(window.location.pathname.startsWith('/stream') ||
                   window.location.pathname.startsWith('/a/'));
 
 // @ngInject
@@ -245,5 +245,5 @@ if (window.chrome && !window.chrome.app) {
   };
 }
 
-var appEl = document.querySelector('hypothesis-app');
+const appEl = document.querySelector('hypothesis-app');
 angular.bootstrap(appEl, ['h'], {strictDi: true});

@@ -1,12 +1,12 @@
 'use strict';
 
-var scrollIntoView = require('scroll-into-view');
+const scrollIntoView = require('scroll-into-view');
 
-var events = require('../events');
-var { parseAccountID } = require('../util/account-id');
-var scopeTimeout = require('../util/scope-timeout');
-var serviceConfig = require('../service-config');
-var bridgeEvents = require('../../shared/bridge-events');
+const events = require('../events');
+const { parseAccountID } = require('../util/account-id');
+const scopeTimeout = require('../util/scope-timeout');
+const serviceConfig = require('../service-config');
+const bridgeEvents = require('../../shared/bridge-events');
 
 /**
  * Return the user's authentication status from their profile.
@@ -15,8 +15,8 @@ var bridgeEvents = require('../../shared/bridge-events');
  */
 function authStateFromProfile(profile) {
   if (profile.userid) {
-    var parsed = parseAccountID(profile.userid);
-    var displayName = parsed.username;
+    const parsed = parseAccountID(profile.userid);
+    let displayName = parsed.username;
     if (profile.user_info && profile.user_info.display_name) {
       displayName = profile.user_info.display_name;
     }
@@ -38,7 +38,7 @@ function HypothesisAppController(
   $window, analytics, store, auth, bridge, drafts, features,
   flash, frameSync, groups, serviceUrl, session, settings, streamer
 ) {
-  var self = this;
+  const self = this;
 
   // This stores information about the current user's authentication status.
   // When the controller instantiates we do not yet know if the user is
@@ -123,7 +123,7 @@ function HypothesisAppController(
   };
 
   this.showHelpPanel = function () {
-    var service = serviceConfig(settings) || {};
+    const service = serviceConfig(settings) || {};
     if (service.onHelpRequestProvided) {
       // Let the host page handle the help request.
       bridge.call(bridgeEvents.HELP_REQUESTED);
@@ -134,9 +134,9 @@ function HypothesisAppController(
   };
 
   // Prompt to discard any unsaved drafts.
-  var promptToLogout = function () {
+  const promptToLogout = function () {
     // TODO - Replace this with a UI which doesn't look terrible.
-    var text = '';
+    let text = '';
     if (drafts.count() === 1) {
       text = 'You have an unsaved annotation.\n' +
         'Do you really want to discard this draft?';

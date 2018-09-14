@@ -1,6 +1,6 @@
 'use strict';
 
-var urlUtil = require('../util/url-util');
+const urlUtil = require('../util/url-util');
 
 /**
  * A function that returns an absolute URL given a link name and params, by
@@ -42,22 +42,22 @@ function serviceUrl(store, apiRoutes) {
     });
 
   return function(linkName, params) {
-    var links = store.getState().links;
+    const links = store.getState().links;
 
     if (links === null) {
       return '';
     }
 
-    var path = links[linkName];
+    const path = links[linkName];
 
     if (!path) {
       throw new Error('Unknown link ' + linkName);
     }
 
     params = params || {};
-    var url = urlUtil.replaceURLParams(path, params);
+    const url = urlUtil.replaceURLParams(path, params);
 
-    var unused = Object.keys(url.params);
+    const unused = Object.keys(url.params);
     if (unused.length > 0) {
       throw new Error('Unknown link parameters: ' + unused.join(', '));
     }

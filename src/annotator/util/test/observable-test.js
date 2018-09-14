@@ -1,10 +1,10 @@
 'use strict';
 
-var observable = require('../observable');
+const observable = require('../observable');
 
 describe('observable', function () {
   describe('delay()', function () {
-    var clock;
+    let clock;
 
     beforeEach(function () {
       clock = sinon.useFakeTimers();
@@ -15,8 +15,8 @@ describe('observable', function () {
     });
 
     it('defers events', function () {
-      var received = [];
-      var obs = observable.delay(50, observable.Observable.of('foo'));
+      const received = [];
+      const obs = observable.delay(50, observable.Observable.of('foo'));
       obs.forEach(function (v) {
         received.push(v);
       });
@@ -26,8 +26,8 @@ describe('observable', function () {
     });
 
     it('delivers events in sequence', function () {
-      var received = [];
-      var obs = observable.delay(10, observable.Observable.of(1,2));
+      const received = [];
+      const obs = observable.delay(10, observable.Observable.of(1,2));
       obs.forEach(function (v) {
         received.push(v);
       });

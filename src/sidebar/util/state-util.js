@@ -12,13 +12,13 @@
  * @return {Promise<T>}
  */
 function awaitStateChange(store, selector) {
-  var result = selector(store);
+  const result = selector(store);
   if (result !== null) {
     return Promise.resolve(result);
   }
   return new Promise(resolve => {
-    var unsubscribe = store.subscribe(() => {
-      var result = selector(store);
+    const unsubscribe = store.subscribe(() => {
+      const result = selector(store);
       if (result !== null) {
         unsubscribe();
         resolve(result);

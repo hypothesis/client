@@ -3,9 +3,9 @@
 // Selectors that calculate the annotation counts displayed in tab headings
 // and determine which tab an annotation should be displayed in.
 
-var countIf = require('./util/array-util').countIf;
-var metadata = require('./annotation-metadata');
-var uiConstants = require('./ui-constants');
+const countIf = require('./util/array-util').countIf;
+const metadata = require('./annotation-metadata');
+const uiConstants = require('./ui-constants');
 
 /**
  * Return the tab in which an annotation should be displayed.
@@ -43,7 +43,7 @@ function shouldShowInTab(ann, tab) {
  * @param {Annotation[]} annotations - List of annotations to display
  */
 function counts(annotations) {
-  var counts = {
+  const counts = {
     notes: countIf(annotations, metadata.isPageNote),
     annotations: countIf(annotations, metadata.isAnnotation),
     orphans: countIf(annotations, metadata.isOrphan),

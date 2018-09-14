@@ -1,11 +1,11 @@
 'use strict';
 
-var getApiUrl = require('../get-api-url');
+const getApiUrl = require('../get-api-url');
 
 describe('sidebar.getApiUrl', function () {
   context('when there is a service object in settings', function () {
     it('returns apiUrl from the service object', function () {
-      var settings = {
+      const settings = {
         apiUrl: 'someApiUrl',
         services: [{
           apiUrl: 'someOtherApiUrl',
@@ -17,7 +17,7 @@ describe('sidebar.getApiUrl', function () {
 
   context('when there is no service object in settings', function () {
     it('returns apiUrl from the settings object', function () {
-      var settings = {
+      const settings = {
         apiUrl: 'someApiUrl',
       };
       assert.equal(getApiUrl(settings), settings.apiUrl);
@@ -26,7 +26,7 @@ describe('sidebar.getApiUrl', function () {
 
   context('when there is a service object in settings but does not contain an apiUrl key', function () {
     it('throws error', function () {
-      var settings = {
+      const settings = {
         apiUrl: 'someApiUrl',
         services: [{}],
       };

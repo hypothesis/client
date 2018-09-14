@@ -1,6 +1,6 @@
 'use strict';
 
-var isThirdPartyService = require('../util/is-third-party-service');
+const isThirdPartyService = require('../util/is-third-party-service');
 
 module.exports = {
   controllerAs: 'vm',

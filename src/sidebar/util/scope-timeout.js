@@ -17,8 +17,8 @@ module.exports = function ($scope, fn, delay, setTimeoutFn, clearTimeoutFn) {
   setTimeoutFn = setTimeoutFn || setTimeout;
   clearTimeoutFn = clearTimeoutFn || clearTimeout;
 
-  var removeDestroyHandler;
-  var id = setTimeoutFn(function () {
+  let removeDestroyHandler;
+  const id = setTimeoutFn(function () {
     removeDestroyHandler();
     fn();
   }, delay);

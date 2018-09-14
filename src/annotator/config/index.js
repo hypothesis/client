@@ -1,6 +1,6 @@
 'use strict';
 
-var settingsFrom = require('./settings');
+const settingsFrom = require('./settings');
 
 /**
  * Reads the Hypothesis configuration from the environment.
@@ -8,7 +8,7 @@ var settingsFrom = require('./settings');
  * @param {Window} window_ - The Window object to read config from.
  */
 function configFrom(window_) {
-  var settings = settingsFrom(window_);
+  const settings = settingsFrom(window_);
   return {
     annotations: settings.annotations,
     // URL where client assets are served from. Used when injecting the client

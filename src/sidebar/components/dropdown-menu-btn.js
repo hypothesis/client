@@ -2,7 +2,7 @@
 
 // @ngInject
 function DropdownMenuBtnController($timeout) {
-  var self = this;
+  const self = this;
   this.toggleDropdown = function($event) {
     $event.stopPropagation();
     $timeout(function () {

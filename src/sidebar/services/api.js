@@ -1,8 +1,8 @@
 'use strict';
 
-var get = require('lodash.get');
+const get = require('lodash.get');
 
-var urlUtil = require('../util/url-util');
+const urlUtil = require('../util/url-util');
 
 /**
  * Translate the response from a failed API call into an Error-like object.
@@ -11,7 +11,7 @@ var urlUtil = require('../util/url-util');
  * error.
  */
 function translateResponseToError(response) {
-  var message;
+  let message;
   if (response.status <= 0) {
     message = 'Service unreachable.';
   } else {
@@ -20,7 +20,7 @@ function translateResponseToError(response) {
       message = message + ': ' + response.data.reason;
     }
   }
-  var err = new Error(message);
+  const err = new Error(message);
   err.response = response;
   return err;
 }
@@ -30,9 +30,9 @@ function translateResponseToError(response) {
  * Client-only properties are marked by a '$' prefix.
  */
 function stripInternalProperties(obj) {
-  var result = {};
+  const result = {};
 
-  for (var k in obj) {
+  for (const k in obj) {
     if (obj.hasOwnProperty(k) && k[0] !== '$') {
       result[k] = obj[k];
     }
@@ -43,8 +43,8 @@ function stripInternalProperties(obj) {
 
 
 function forEachSorted(obj, iterator, context) {
-  var keys = Object.keys(obj).sort();
-  for (var i = 0; i < keys.length; i++) {
+  const keys = Object.keys(obj).sort();
+  for (let i = 0; i < keys.length; i++) {
     iterator.call(context, obj[keys[i]], keys[i]);
   }
   return keys;
@@ -77,7 +77,7 @@ function serializeParams(params) {
   if (!params) {
     return '';
   }
-  var parts = [];
+  const parts = [];
   forEachSorted(params, function(value, key) {
     if (value === null || typeof value === 'undefined') {
       return;
@@ -137,18 +137,18 @@ function createAPICall($http, $q, links, route, tokenGetter) {
     // `$q.all` is used here rather than `Promise.all` because testing code that
     // mixes native Promises with the `$q` promises returned by `$http`
     // functions gets awkward in tests.
-    var accessToken;
+    let accessToken;
     return $q.all([links, tokenGetter()]).then(([links, token]) => {
-      var descriptor = get(links, route);
-      var url = urlUtil.replaceURLParams(descriptor.url, params);
-      var headers = {};
+      const descriptor = get(links, route);
+      const url = urlUtil.replaceURLParams(descriptor.url, params);
+      const headers = {};
 
       accessToken = token;
       if (token) {
         headers.Authorization = 'Bearer ' + token;
       }
 
-      var req = {
+      const req = {
         data: data ? stripInternalProperties(data) : null,
         headers: headers,
         method: descriptor.method,
@@ -196,7 +196,7 @@ function createAPICall($http, $q, links, route, tokenGetter) {
  */
 // @ngInject
 function api($http, $q, apiRoutes, auth) {
-  var links = apiRoutes.routes();
+  const links = apiRoutes.routes();
   function apiCall(route) {
     return createAPICall($http, $q, links, route, auth.tokenGetter);
   }

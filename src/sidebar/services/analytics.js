@@ -1,16 +1,16 @@
 'use strict';
 
-var VIA_REFERRER = /^https:\/\/(qa-)?via.hypothes.is\//;
+const VIA_REFERRER = /^https:\/\/(qa-)?via.hypothes.is\//;
 
-var globalGAOptions = function(win, settings){
+const globalGAOptions = function(win, settings){
 
   settings = settings || {};
 
-  var globalOpts = {
+  const globalOpts = {
     category: '',
   };
 
-  var validTypes = ['chrome-extension', 'firefox-extension', 'embed', 'bookmarklet', 'via'];
+  const validTypes = ['chrome-extension', 'firefox-extension', 'embed', 'bookmarklet', 'via'];
 
   // The preferred method for deciding what type of app is running is
   // through the setting of the appType to one of the valid types above.
@@ -41,7 +41,7 @@ var globalGAOptions = function(win, settings){
  */
 // @ngInject
 function analytics($analytics, $window, settings) {
-  var options = $window ? globalGAOptions($window, settings) : {};
+  const options = $window ? globalGAOptions($window, settings) : {};
 
   return {
 

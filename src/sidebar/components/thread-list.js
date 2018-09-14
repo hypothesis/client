@@ -1,44 +1,44 @@
 'use strict';
 
-var events = require('../events');
-var metadata = require('../annotation-metadata');
+const events = require('../events');
+const metadata = require('../annotation-metadata');
 
 /**
  * Component which displays a virtualized list of annotation threads.
  */
 
-var scopeTimeout = require('../util/scope-timeout');
+const scopeTimeout = require('../util/scope-timeout');
 
 /**
  * Returns the height of the thread for an annotation if it exists in the view
  * or `null` otherwise.
  */
 function getThreadHeight(id) {
-  var threadElement = document.getElementById(id);
+  const threadElement = document.getElementById(id);
   if (!threadElement) {
     return null;
   }
 
   // Note: `getComputedStyle` may return `null` in Firefox if the iframe is
   // hidden. See https://bugzilla.mozilla.org/show_bug.cgi?id=548397
-  var style = window.getComputedStyle(threadElement);
+  const style = window.getComputedStyle(threadElement);
   if (!style) {
     return null;
   }
 
   // Get the height of the element inside the border-box, excluding
   // top and bottom margins.
-  var elementHeight = threadElement.getBoundingClientRect().height;
+  const elementHeight = threadElement.getBoundingClientRect().height;
 
   // Get the bottom margin of the element. style.margin{Side} will return
   // values of the form 'Npx', from which we extract 'N'.
-  var marginHeight = parseFloat(style.marginTop) +
+  const marginHeight = parseFloat(style.marginTop) +
                      parseFloat(style.marginBottom);
 
   return elementHeight + marginHeight;
 }
 
-var virtualThreadOptions = {
+const virtualThreadOptions = {
   // identify the thread types that need to be rendered
   // but not actually visible to the user
   invisibleThreadFilter: function(thread){
@@ -54,7 +54,7 @@ function ThreadListController($element, $scope, settings, VirtualThreadList) {
   // current filters which are in or near the viewport and the view then renders
   // only those threads, using placeholders above and below the visible threads
   // to reserve space for threads which are not actually rendered.
-  var self = this;
+  const self = this;
 
   // `scrollRoot` is the `Element` to scroll when scrolling a given thread into
   // view.
@@ -67,11 +67,11 @@ function ThreadListController($element, $scope, settings, VirtualThreadList) {
 
   this.isThemeClean = settings.theme === 'clean';
 
-  var options = Object.assign({
+  const options = Object.assign({
     scrollRoot: this.scrollRoot,
   }, virtualThreadOptions);
 
-  var visibleThreads = new VirtualThreadList($scope, window, this.thread, options);
+  const visibleThreads = new VirtualThreadList($scope, window, this.thread, options);
   visibleThreads.on('changed', function (state) {
     self.virtualThreadList = {
       visibleThreads: state.visibleThreads,
@@ -82,7 +82,7 @@ function ThreadListController($element, $scope, settings, VirtualThreadList) {
 
     scopeTimeout($scope, function () {
       state.visibleThreads.forEach(function (thread) {
-        var height = getThreadHeight(thread.id);
+        const height = getThreadHeight(thread.id);
         if (!height) {
           return;
         }
@@ -97,13 +97,13 @@ function ThreadListController($element, $scope, settings, VirtualThreadList) {
    * of the view.
    */
   function scrollOffset(id) {
-    var maxYOffset = self.scrollRoot.scrollHeight - self.scrollRoot.clientHeight;
+    const maxYOffset = self.scrollRoot.scrollHeight - self.scrollRoot.clientHeight;
     return Math.min(maxYOffset, visibleThreads.yOffsetOf(id));
   }
 
   /** Scroll the annotation with a given ID or $tag into view. */
   function scrollIntoView(id) {
-    var estimatedYOffset = scrollOffset(id);
+    const estimatedYOffset = scrollOffset(id);
     self.scrollRoot.scrollTop = estimatedYOffset;
 
     // As a result of scrolling the sidebar, the target scroll offset for
@@ -118,7 +118,7 @@ function ThreadListController($element, $scope, settings, VirtualThreadList) {
     // So we wait briefly after the view is scrolled then check whether the
     // estimated Y offset changed and if so, trigger scrolling again.
     scopeTimeout($scope, function () {
-      var newYOffset = scrollOffset(id);
+      const newYOffset = scrollOffset(id);
       if (newYOffset !== estimatedYOffset) {
         scrollIntoView(id);
       }

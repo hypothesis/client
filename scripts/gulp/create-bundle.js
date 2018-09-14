@@ -3,19 +3,19 @@
  */
 'use strict';
 
-var fs = require('fs');
-var path = require('path');
+const fs = require('fs');
+const path = require('path');
 
-var babelify = require('babelify');
-var browserify = require('browserify');
-var coffeeify = require('coffeeify');
-var exorcist = require('exorcist');
-var gulpUtil = require('gulp-util');
-var mkdirp = require('mkdirp');
-var uglifyify = require('uglifyify');
-var watchify = require('watchify');
+const babelify = require('babelify');
+const browserify = require('browserify');
+const coffeeify = require('coffeeify');
+const exorcist = require('exorcist');
+const gulpUtil = require('gulp-util');
+const mkdirp = require('mkdirp');
+const uglifyify = require('uglifyify');
+const watchify = require('watchify');
 
-var log = gulpUtil.log;
+const log = gulpUtil.log;
 
 function streamFinished(stream) {
   return new Promise(function (resolve, reject) {
@@ -65,7 +65,7 @@ module.exports = function createBundle(config, buildOpts) {
 
   buildOpts = buildOpts || {watch: false};
 
-  var bundleOpts = {
+  const bundleOpts = {
     debug: true,
     extensions: ['.coffee'],
 
@@ -115,7 +115,7 @@ module.exports = function createBundle(config, buildOpts) {
   bundleOpts.noParse = (config.noParse || []).map(function (id) {
     // If package.json specifies a custom entry point for the module for
     // use in the browser, resolve that.
-    var packageConfig = require('../../package.json');
+    const packageConfig = require('../../package.json');
     if (packageConfig.browser && packageConfig.browser[id]) {
       return require.resolve('../../' + packageConfig.browser[id]);
     } else {
@@ -123,13 +123,13 @@ module.exports = function createBundle(config, buildOpts) {
     }
   });
 
-  var name = config.name;
+  const name = config.name;
 
-  var bundleFileName = name + '.bundle.js';
-  var bundlePath = config.path + '/' + bundleFileName;
-  var sourcemapPath = bundlePath + '.map';
+  const bundleFileName = name + '.bundle.js';
+  const bundlePath = config.path + '/' + bundleFileName;
+  const sourcemapPath = bundlePath + '.map';
 
-  var bundle = browserify([], bundleOpts);
+  const bundle = browserify([], bundleOpts);
 
   (config.require || []).forEach(function (req) {
     // When another bundle uses 'bundle.external(<module path>)',
@@ -146,8 +146,8 @@ module.exports = function createBundle(config, buildOpts) {
       // If the require path is absolute, the same rules as
       // above apply but the path needs to be relative to
       // the root of the repository
-      var repoRootPath = path.join(__dirname, '../../');
-      var relativePath = path.relative(path.resolve(repoRootPath),
+      const repoRootPath = path.join(__dirname, '../../');
+      const relativePath = path.relative(path.resolve(repoRootPath),
                                        path.resolve(req));
       bundle.require(req, {expose: '/' + relativePath});
     } else {
@@ -174,12 +174,12 @@ module.exports = function createBundle(config, buildOpts) {
   }
 
   function build() {
-    var output = fs.createWriteStream(bundlePath);
-    var b = bundle.bundle();
+    const output = fs.createWriteStream(bundlePath);
+    const b = bundle.bundle();
     b.on('error', function (err) {
       log('Build error', err.toString());
     });
-    var stream = b.pipe(exorcist(sourcemapPath))
+    const stream = b.pipe(exorcist(sourcemapPath))
       .pipe(output);
     return streamFinished(stream);
   }
@@ -187,7 +187,7 @@ module.exports = function createBundle(config, buildOpts) {
   if (buildOpts.watch) {
     bundle.plugin(watchify);
     bundle.on('update', function (ids) {
-      var start = Date.now();
+      const start = Date.now();
 
       log('Source files changed', ids);
       build().then(function () {

@@ -1,14 +1,14 @@
 'use strict';
 
-var angular = require('angular');
-var proxyquire = require('proxyquire');
+const angular = require('angular');
+const proxyquire = require('proxyquire');
 
-var util = require('../../../shared/test/util');
+const util = require('../../../shared/test/util');
 
 // API route directory.
 // This should mirror the structure (but not the exact URLs) of
 // https://hypothes.is/api/.
-var routes = {
+const routes = {
   annotation: {
     create: {
       method: 'POST',
@@ -61,9 +61,9 @@ var routes = {
 };
 
 describe('sidebar.services.api', function () {
-  var $httpBackend = null;
-  var sandbox = null;
-  var api = null;
+  let $httpBackend = null;
+  let sandbox = null;
+  let api = null;
 
   before(function () {
     angular.module('h', [])
@@ -80,11 +80,11 @@ describe('sidebar.services.api', function () {
   beforeEach(function () {
     sandbox = sinon.sandbox.create();
 
-    var fakeApiRoutes = {
+    const fakeApiRoutes = {
       links: sinon.stub(),
       routes: sinon.stub(),
     };
-    var fakeAuth = {};
+    const fakeAuth = {};
 
     angular.mock.module('h', {
       apiRoutes: fakeApiRoutes,
@@ -93,7 +93,7 @@ describe('sidebar.services.api', function () {
     });
 
     angular.mock.inject(function (_$q_) {
-      var $q = _$q_;
+      const $q = _$q_;
       fakeAuth.tokenGetter = function () {
         return $q.resolve('faketoken');
       };
@@ -201,7 +201,7 @@ describe('sidebar.services.api', function () {
   });
 
   it('removes internal properties before sending data to the server', function (done) {
-    var annotation = {
+    const annotation = {
       $highlight: true,
       $notme: 'nooooo!',
       allowed: 123,
@@ -230,7 +230,7 @@ describe('sidebar.services.api', function () {
   });
 
   it("fetches the user's profile", function (done) {
-    var profile = {userid: 'acct:user@publisher.org'};
+    const profile = {userid: 'acct:user@publisher.org'};
     api.profile.read({authority: 'publisher.org'}).then(function (profile_) {
       assert.deepEqual(profile_, profile);
       done();

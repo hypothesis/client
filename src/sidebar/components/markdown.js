@@ -1,24 +1,24 @@
 'use strict';
 
-var debounce = require('lodash.debounce');
+const debounce = require('lodash.debounce');
 
-var commands = require('../markdown-commands');
-var mediaEmbedder = require('../media-embedder');
-var renderMarkdown = require('../render-markdown');
-var scopeTimeout = require('../util/scope-timeout');
+const commands = require('../markdown-commands');
+const mediaEmbedder = require('../media-embedder');
+const renderMarkdown = require('../render-markdown');
+const scopeTimeout = require('../util/scope-timeout');
 
 // @ngInject
 function MarkdownController($element, $sanitize, $scope) {
-  var input = $element[0].querySelector('.js-markdown-input');
-  var output = $element[0].querySelector('.js-markdown-preview');
+  const input = $element[0].querySelector('.js-markdown-input');
+  const output = $element[0].querySelector('.js-markdown-preview');
 
-  var self = this;
+  const self = this;
 
   /**
    * Transform the editor's input field with an editor command.
    */
   function updateState(newStateFn) {
-    var newState = newStateFn({
+    const newState = newStateFn({
       text: input.value,
       selectionStart: input.selectionStart,
       selectionEnd: input.selectionEnd,
@@ -60,7 +60,7 @@ function MarkdownController($element, $sanitize, $scope) {
 
   this.insertMath = function() {
     updateState(function (state) {
-      var before = state.text.slice(0, state.selectionStart);
+      const before = state.text.slice(0, state.selectionStart);
 
       if (before.length === 0 ||
           before.slice(-1) === '\n' ||
@@ -106,13 +106,13 @@ function MarkdownController($element, $sanitize, $scope) {
 
   // Keyboard shortcuts for bold, italic, and link.
   $element.on('keydown', function(e) {
-    var shortcuts = {
+    const shortcuts = {
       66: self.insertBold,
       73: self.insertItalic,
       75: self.insertLink,
     };
 
-    var shortcut = shortcuts[e.keyCode];
+    const shortcut = shortcuts[e.keyCode];
     if (shortcut && (e.ctrlKey || e.metaKey)) {
       e.preventDefault();
       shortcut();
@@ -124,7 +124,7 @@ function MarkdownController($element, $sanitize, $scope) {
     self.preview = !self.preview;
   };
 
-  var handleInputChange = debounce(function () {
+  const handleInputChange = debounce(function () {
     $scope.$apply(function () {
       self.onEditText({text: input.value});
     });

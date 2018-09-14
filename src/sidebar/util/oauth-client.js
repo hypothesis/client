@@ -1,8 +1,8 @@
 'use strict';
 
-var queryString = require('query-string');
+const queryString = require('query-string');
 
-var random = require('./random');
+const random = require('./random');
 
 /**
  * An object holding the details of an access token from the tokenUrl endpoint.
@@ -20,7 +20,7 @@ var random = require('./random');
  * @returns {TokenInfo}
  */
 function tokenInfoFrom(response) {
-  var data = response.data;
+  const data = response.data;
   return {
     accessToken:  data.access_token,
 
@@ -84,7 +84,7 @@ class OAuthClient {
    * @return {Promise<TokenInfo>}
    */
   exchangeAuthCode(code) {
-    var data = {
+    const data = {
       client_id: this.clientId,
       grant_type: 'authorization_code',
       code,
@@ -106,7 +106,7 @@ class OAuthClient {
    * @return {Promise<TokenInfo>}
    */
   exchangeGrantToken(token) {
-    var data = {
+    const data = {
       grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer',
       assertion: token,
     };
@@ -127,7 +127,7 @@ class OAuthClient {
    * @return {Promise<TokenInfo>}
    */
   refreshToken(refreshToken) {
-    var data = { grant_type: 'refresh_token', refresh_token: refreshToken };
+    const data = { grant_type: 'refresh_token', refresh_token: refreshToken };
     return this._formPost(this.tokenEndpoint, data).then((response) => {
       if (response.status !== 200) {
         throw new Error('Failed to refresh access token');
@@ -159,11 +159,11 @@ class OAuthClient {
   authorize($window, authWindow) {
     // Random state string used to check that auth messages came from the popup
     // window that we opened.
-    var state = this.generateState();
+    const state = this.generateState();
 
     // Promise which resolves or rejects when the user accepts or closes the
     // auth popup.
-    var authResponse = new Promise((resolve, reject) => {
+    const authResponse = new Promise((resolve, reject) => {
       function authRespListener(event) {
         if (typeof event.data !== 'object') {
           return;
@@ -186,7 +186,7 @@ class OAuthClient {
     });
 
     // Authorize user and retrieve grant token
-    var authUrl = this.authorizationEndpoint;
+    let authUrl = this.authorizationEndpoint;
     authUrl += '?' + queryString.stringify({
       client_id: this.clientId,
       origin: $window.location.origin,
@@ -207,7 +207,7 @@ class OAuthClient {
    */
   _formPost(url, data) {
     data = queryString.stringify(data);
-    var requestConfig = {
+    const requestConfig = {
       headers: {'Content-Type': 'application/x-www-form-urlencoded'},
     };
     return this.$http.post(url, data, requestConfig);
@@ -231,14 +231,14 @@ class OAuthClient {
     // this.
     //
     // See https://bugs.webkit.org/show_bug.cgi?id=143678
-    var width  = 475;
-    var height = 430;
-    var left   = $window.screen.width / 2 - width / 2;
-    var top    = $window.screen.height /2 - height / 2;
+    const width  = 475;
+    const height = 430;
+    const left   = $window.screen.width / 2 - width / 2;
+    const top    = $window.screen.height /2 - height / 2;
 
     // Generate settings for `window.open` in the required comma-separated
     // key=value format.
-    var authWindowSettings = queryString.stringify({
+    const authWindowSettings = queryString.stringify({
       left: left,
       top: top,
       width: width,

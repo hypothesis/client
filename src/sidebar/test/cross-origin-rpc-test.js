@@ -1,6 +1,6 @@
 'use strict';
 
-var crossOriginRPC = require('../cross-origin-rpc');
+const crossOriginRPC = require('../cross-origin-rpc');
 
 describe('crossOriginRPC', function() {
   describe('server', function() {

@@ -3,7 +3,7 @@
 /* global Uint8Array */
 
 function byteToHex(val) {
-  var str = val.toString(16);
+  const str = val.toString(16);
   return str.length === 1 ? '0' + str : str;
 }
 
@@ -14,8 +14,8 @@ function byteToHex(val) {
  * @return {string}
  */
 function generateHexString(len) {
-  var crypto = window.crypto || window.msCrypto /* IE 11 */;
-  var bytes = new Uint8Array(len / 2);
+  const crypto = window.crypto || window.msCrypto /* IE 11 */;
+  const bytes = new Uint8Array(len / 2);
   crypto.getRandomValues(bytes);
   return Array.from(bytes).map(byteToHex).join('');
 }

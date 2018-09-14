@@ -1,6 +1,6 @@
 'use strict';
 
-var util = require('../util');
+const util = require('../util');
 
 function init() {
   return {
@@ -23,7 +23,7 @@ function init() {
   };
 }
 
-var update = {
+const update = {
   UPDATE_SESSION: function (state, action) {
     return {
       session: action.session,
@@ -31,7 +31,7 @@ var update = {
   },
 };
 
-var actions = util.actionTypes(update);
+const actions = util.actionTypes(update);
 
 /**
  * Update the session state.

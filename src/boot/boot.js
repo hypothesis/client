@@ -1,7 +1,7 @@
 'use strict';
 
 function injectStylesheet(doc, href) {
-  var link = doc.createElement('link');
+  const link = doc.createElement('link');
   link.rel = 'stylesheet';
   link.type = 'text/css';
   link.href = href;
@@ -9,7 +9,7 @@ function injectStylesheet(doc, href) {
 }
 
 function injectScript(doc, src) {
-  var script = doc.createElement('script');
+  const script = doc.createElement('script');
   script.type = 'text/javascript';
   script.src = src;
 
@@ -21,7 +21,7 @@ function injectScript(doc, src) {
 
 function injectAssets(doc, config, assets) {
   assets.forEach(function (path) {
-    var url = config.assetRoot + 'build/' + config.manifest[path];
+    const url = config.assetRoot + 'build/' + config.manifest[path];
     if (url.match(/\.css/)) {
       injectStylesheet(doc, url);
     } else {
@@ -37,7 +37,7 @@ function injectAssets(doc, config, assets) {
  */
 function bootHypothesisClient(doc, config) {
   // Detect presence of Hypothesis in the page
-  var appLinkEl = doc.querySelector('link[type="application/annotator+html"]');
+  const appLinkEl = doc.querySelector('link[type="application/annotator+html"]');
   if (appLinkEl) {
     return;
   }
@@ -45,7 +45,7 @@ function bootHypothesisClient(doc, config) {
   // Register the URL of the sidebar app which the Hypothesis client should load.
   // The <link> tag is also used by browser extensions etc. to detect the
   // presence of the Hypothesis client on the page.
-  var sidebarUrl = doc.createElement('link');
+  const sidebarUrl = doc.createElement('link');
   sidebarUrl.rel = 'sidebar';
   sidebarUrl.href = config.sidebarAppUrl;
   sidebarUrl.type = 'application/annotator+html';
@@ -53,7 +53,7 @@ function bootHypothesisClient(doc, config) {
 
   // Register the URL of the annotation client which is currently being used to drive
   // annotation interactions.
-  var clientUrl = doc.createElement('link');
+  const clientUrl = doc.createElement('link');
   clientUrl.rel = 'hypothesis-client';
   clientUrl.href = config.assetRoot + 'build/boot.js';
   clientUrl.type = 'application/annotator+javascript';

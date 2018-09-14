@@ -1,10 +1,10 @@
 'use strict';
 
-var proxyquire = require('proxyquire');
+const proxyquire = require('proxyquire');
 
 /** Return a fake store object. */
 function fakeStore() {
-  var links = null;
+  let links = null;
   return {
     updateLinks: function(newLinks) {
       links = newLinks;
@@ -16,17 +16,17 @@ function fakeStore() {
 }
 
 function createServiceUrl(linksPromise) {
-  var replaceURLParams = sinon.stub().returns(
+  const replaceURLParams = sinon.stub().returns(
     {url: 'EXPANDED_URL', params: {}}
   );
 
-  var serviceUrlFactory = proxyquire('../service-url', {
+  const serviceUrlFactory = proxyquire('../service-url', {
     '../util/url-util': { replaceURLParams: replaceURLParams },
   });
 
-  var store = fakeStore();
+  const store = fakeStore();
 
-  var apiRoutes = {
+  const apiRoutes = {
     links: sinon.stub().returns(linksPromise),
   };
 
@@ -49,13 +49,13 @@ describe('sidebar.service-url', function () {
   });
 
   context('before the API response has been received', function() {
-    var serviceUrl;
-    var apiRoutes;
+    let serviceUrl;
+    let apiRoutes;
 
     beforeEach(function() {
       // Create a serviceUrl function with an unresolved Promise that will
       // never be resolved - it never receives the links from store.links().
-      var parts = createServiceUrl(new Promise(function() {}));
+      const parts = createServiceUrl(new Promise(function() {}));
 
       serviceUrl = parts.serviceUrl;
       apiRoutes = parts.apiRoutes;
@@ -76,10 +76,10 @@ describe('sidebar.service-url', function () {
   });
 
   context('after the API response has been received', function() {
-    var store;
-    var linksPromise;
-    var replaceURLParams;
-    var serviceUrl;
+    let store;
+    let linksPromise;
+    let replaceURLParams;
+    let serviceUrl;
 
     beforeEach(function() {
       // The links Promise that store.links() will return.
@@ -88,7 +88,7 @@ describe('sidebar.service-url', function () {
         second_link: 'http://example.com/second_page',
       });
 
-      var parts = createServiceUrl(linksPromise);
+      const parts = createServiceUrl(linksPromise);
 
       store = parts.store;
       serviceUrl = parts.serviceUrl;
@@ -103,7 +103,7 @@ describe('sidebar.service-url', function () {
 
     it('calls replaceURLParams with the path and given params', function() {
       return linksPromise.then(function() {
-        var params = {foo: 'bar'};
+        const params = {foo: 'bar'};
 
         serviceUrl('first_link', params);
 
@@ -125,7 +125,7 @@ describe('sidebar.service-url', function () {
 
     it('returns the expanded URL from replaceURLParams', function() {
       return linksPromise.then(function() {
-        var renderedUrl = serviceUrl('first_link');
+        const renderedUrl = serviceUrl('first_link');
 
         assert.equal(renderedUrl, 'EXPANDED_URL');
       });
@@ -140,7 +140,7 @@ describe('sidebar.service-url', function () {
     });
 
     it('throws an error if replaceURLParams returns unused params', function() {
-      var params = {'unused_param_1': 'foo', 'unused_param_2': 'bar'};
+      const params = {'unused_param_1': 'foo', 'unused_param_2': 'bar'};
       replaceURLParams.returns({
         url: 'EXPANDED_URL',
         params: params,

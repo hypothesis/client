@@ -1,13 +1,13 @@
 'use strict';
 
-var angular = require('angular');
-var proxyquire = require('proxyquire');
+const angular = require('angular');
+const proxyquire = require('proxyquire');
 
-var util = require('../../directive/test/util');
+const util = require('../../directive/test/util');
 
 describe('topBar', function () {
-  var fakeSettings = {};
-  var fakeIsThirdPartyService = sinon.stub();
+  const fakeSettings = {};
+  const fakeIsThirdPartyService = sinon.stub();
 
   before(function () {
     angular.module('app', [])
@@ -40,7 +40,7 @@ describe('topBar', function () {
   }
 
   function createTopBar(inputs) {
-    var defaultInputs = {
+    const defaultInputs = {
       isSidebar: true,
     };
     return util.createDirective(document, 'topBar',
@@ -48,42 +48,42 @@ describe('topBar', function () {
   }
 
   it('shows the pending update count', function () {
-    var el = createTopBar({
+    const el = createTopBar({
       pendingUpdateCount: 1,
     });
-    var applyBtn = applyUpdateBtn(el[0]);
+    const applyBtn = applyUpdateBtn(el[0]);
     assert.ok(applyBtn);
   });
 
   it('does not show the pending update count when there are no updates', function () {
-    var el = createTopBar({
+    const el = createTopBar({
       pendingUpdateCount: 0,
     });
-    var applyBtn = applyUpdateBtn(el[0]);
+    const applyBtn = applyUpdateBtn(el[0]);
     assert.notOk(applyBtn);
   });
 
   it('applies updates when clicked', function () {
-    var onApplyPendingUpdates = sinon.stub();
-    var el = createTopBar({
+    const onApplyPendingUpdates = sinon.stub();
+    const el = createTopBar({
       pendingUpdateCount: 1,
       onApplyPendingUpdates: onApplyPendingUpdates,
     });
-    var applyBtn = applyUpdateBtn(el[0]);
+    const applyBtn = applyUpdateBtn(el[0]);
     applyBtn.click();
     assert.called(onApplyPendingUpdates);
   });
 
   it('displays the login control and propagates callbacks', function () {
-    var onShowHelpPanel = sinon.stub();
-    var onLogin = sinon.stub();
-    var onLogout = sinon.stub();
-    var el = createTopBar({
+    const onShowHelpPanel = sinon.stub();
+    const onLogin = sinon.stub();
+    const onLogout = sinon.stub();
+    const el = createTopBar({
       onShowHelpPanel: onShowHelpPanel,
       onLogin: onLogin,
       onLogout: onLogout,
     });
-    var loginControl = el.find('login-control').controller('loginControl');
+    const loginControl = el.find('login-control').controller('loginControl');
 
     loginControl.onShowHelpPanel();
     assert.called(onShowHelpPanel);
@@ -104,7 +104,7 @@ describe('topBar', function () {
 
   context('when using a first-party service', function () {
     it('shows the share page button', function () {
-      var el = createTopBar();
+      let el = createTopBar();
       // I want the DOM element, not AngularJS's annoying angular.element
       // wrapper object.
       el = el [0];
@@ -119,7 +119,7 @@ describe('topBar', function () {
     });
 
     it("doesn't show the share page button", function () {
-      var el = createTopBar();
+      let el = createTopBar();
       // I want the DOM element, not AngularJS's annoying angular.element
       // wrapper object.
       el = el [0];
@@ -129,22 +129,22 @@ describe('topBar', function () {
   });
 
   it('displays the share page when "Share this page" is clicked', function () {
-    var onSharePage = sinon.stub();
-    var el = createTopBar({ onSharePage: onSharePage });
+    const onSharePage = sinon.stub();
+    const el = createTopBar({ onSharePage: onSharePage });
     el.find('[title="Share this page"]').click();
 
     assert.called(onSharePage);
   });
 
   it('displays the search input and propagates query changes', function () {
-    var onSearch = sinon.stub();
-    var el = createTopBar({
+    const onSearch = sinon.stub();
+    const el = createTopBar({
       searchController: {
         query: sinon.stub().returns('query'),
         update: onSearch,
       },
     });
-    var searchInput = el.find('search-input').controller('searchInput');
+    const searchInput = el.find('search-input').controller('searchInput');
 
     assert.equal(searchInput.query, 'query');
 
@@ -153,8 +153,8 @@ describe('topBar', function () {
   });
 
   it('displays the sort dropdown and propagates sort key changes', function () {
-    var onChangeSortKey = sinon.stub();
-    var el = createTopBar({
+    const onChangeSortKey = sinon.stub();
+    const el = createTopBar({
       sortKeysAvailable: ['Newest', 'Oldest'],
       sortKey: 'Newest',
       onChangeSortKey: {
@@ -162,7 +162,7 @@ describe('topBar', function () {
         callback: onChangeSortKey,
       },
     });
-    var sortDropdown = el.find('sort-dropdown').controller('sortDropdown');
+    const sortDropdown = el.find('sort-dropdown').controller('sortDropdown');
 
     assert.deepEqual(sortDropdown.sortKeysAvailable, ['Newest', 'Oldest']);
     assert.deepEqual(sortDropdown.sortKey, 'Newest');
@@ -176,7 +176,7 @@ describe('topBar', function () {
       settings: { theme: 'clean' },
     });
 
-    var el = createTopBar();
+    const el = createTopBar();
     assert.ok(el[0].querySelector('.top-bar--theme-clean'));
   });
 });

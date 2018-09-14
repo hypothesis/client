@@ -2,7 +2,7 @@
 
 // cached date formatting instance.
 // See https://github.com/hypothesis/h/issues/2820#issuecomment-166285361
-var formatter;
+let formatter;
 
 /**
  * Returns a standard human-readable representation

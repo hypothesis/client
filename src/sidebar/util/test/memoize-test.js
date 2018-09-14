@@ -1,10 +1,10 @@
 'use strict';
 
-var memoize = require('../memoize');
+const memoize = require('../memoize');
 
 describe('memoize', function () {
-  var count = 0;
-  var memoized;
+  let count = 0;
+  let memoized;
 
   function square(arg) {
     ++count;

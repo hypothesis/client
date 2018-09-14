@@ -1,23 +1,23 @@
 'use strict';
 
-var angular = require('angular');
+const angular = require('angular');
 
-var events = require('../../events');
+const events = require('../../events');
 
-var mock = angular.mock;
+const mock = angular.mock;
 
 describe('sidebar.session', function () {
-  var $rootScope;
+  let $rootScope;
 
-  var fakeAnalytics;
-  var fakeAuth;
-  var fakeFlash;
-  var fakeRaven;
-  var fakeServiceConfig;
-  var fakeSettings;
-  var fakeApi;
-  var sandbox;
-  var session;
+  let fakeAnalytics;
+  let fakeAuth;
+  let fakeFlash;
+  let fakeRaven;
+  let fakeServiceConfig;
+  let fakeSettings;
+  let fakeApi;
+  let sandbox;
+  let session;
 
   before(function () {
     angular.module('h', [])
@@ -27,12 +27,12 @@ describe('sidebar.session', function () {
   beforeEach(function () {
     sandbox = sinon.sandbox.create();
 
-    var state = {};
+    let state = {};
     fakeAnalytics = {
       track: sinon.stub(),
       events: require('../analytics')().events,
     };
-    var fakeStore = {
+    const fakeStore = {
       getState: function () {
         return {session: state};
       },
@@ -106,7 +106,7 @@ describe('sidebar.session', function () {
     });
 
     context('when using a first party account', () => {
-      var clock;
+      let clock;
 
       beforeEach(() => {
         fakeApi.profile.read.returns(Promise.resolve({
@@ -158,7 +158,7 @@ describe('sidebar.session', function () {
 
       it('should eventually expire the cache', () => {
         clock = sinon.useFakeTimers();
-        var CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+        const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
         return session.load().then(() => {
           clock.tick(CACHE_TTL * 2);
@@ -172,7 +172,7 @@ describe('sidebar.session', function () {
 
   describe('#update()', function () {
     it('broadcasts USER_CHANGED when the user changes', function () {
-      var userChangeCallback = sinon.stub();
+      const userChangeCallback = sinon.stub();
       $rootScope.$on(events.USER_CHANGED, userChangeCallback);
       session.update({
         userid: 'fred',
@@ -231,7 +231,7 @@ describe('sidebar.session', function () {
 
   describe('#logout', function () {
     beforeEach(() => {
-      var loggedIn = true;
+      let loggedIn = true;
 
       fakeAuth.logout = sinon.spy(() => {
         loggedIn = false;

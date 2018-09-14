@@ -1,24 +1,24 @@
 'use strict';
 
-var angular = require('angular');
+const angular = require('angular');
 
-var groupList = require('../group-list');
-var util = require('../../directive/test/util');
+const groupList = require('../group-list');
+const util = require('../../directive/test/util');
 
-var groupFixtures = require('../../test/group-fixtures');
+const groupFixtures = require('../../test/group-fixtures');
 
 describe('groupList', function () {
-  var $window;
+  let $window;
 
-  var PRIVATE_GROUP_LINK = 'https://hypothes.is/groups/hdevs';
-  var OPEN_GROUP_LINK = 'https://hypothes.is/groups/pub';
-  var RESTRICTED_GROUP_LINK = 'https://hypothes.is/groups/restricto';
+  const PRIVATE_GROUP_LINK = 'https://hypothes.is/groups/hdevs';
+  const OPEN_GROUP_LINK = 'https://hypothes.is/groups/pub';
+  const RESTRICTED_GROUP_LINK = 'https://hypothes.is/groups/restricto';
 
-  var groups;
-  var fakeGroups;
-  var fakeAnalytics;
-  var fakeServiceUrl;
-  var fakeSettings;
+  let groups;
+  let fakeGroups;
+  let fakeAnalytics;
+  let fakeServiceUrl;
+  let fakeSettings;
 
   before(function() {
     angular.module('app', [])
@@ -85,7 +85,7 @@ describe('groupList', function () {
         return groups;
       },
       get: function (id) {
-        var match = this.all().filter(function (group) {
+        const match = this.all().filter(function (group) {
           return group.id === id;
         });
         return match.length > 0 ? match[0] : undefined;
@@ -106,14 +106,14 @@ describe('groupList', function () {
   }
 
   it('should render groups', function () {
-    var element = createGroupList();
-    var groupItems = element.find('.group-item');
+    const element = createGroupList();
+    const groupItems = element.find('.group-item');
     assert.equal(groupItems.length, groups.length + 1);
   });
 
   it('should render appropriate group name link title per group type', function() {
-    var element = createGroupList();
-    var nameLinks = element.find('.group-name-link');
+    const element = createGroupList();
+    const nameLinks = element.find('.group-name-link');
     assert.equal(nameLinks.length, groups.length + 1);
 
     assert.include(nameLinks[0].title, 'Show public annotations'); // Open
@@ -217,11 +217,11 @@ describe('groupList', function () {
   });
 
   it('should render share links', function () {
-    var element = createGroupList();
-    var shareLinks = element.find('.share-link-container');
+    const element = createGroupList();
+    const shareLinks = element.find('.share-link-container');
     assert.equal(shareLinks.length, groups.length);
 
-    var link = element.find('.share-link');
+    const link = element.find('.share-link');
     assert.equal(link.length, groups.length);
 
     assert.equal(link[0].href, OPEN_GROUP_LINK);
@@ -240,8 +240,8 @@ describe('groupList', function () {
         links: {},
       },
     ];
-    var element = createGroupList();
-    var links = element.find('.share-link-container');
+    const element = createGroupList();
+    const links = element.find('.share-link-container');
     assert.equal(links.length, 0);
   });
 
@@ -262,22 +262,22 @@ describe('groupList', function () {
         authority: authDomain,
       }];
 
-      var element = createGroupList({ userid });
-      var shareLinks = element.find('.share-link-container');
+      const element = createGroupList({ userid });
+      const shareLinks = element.find('.share-link-container');
 
       assert.equal(shareLinks.length, 0);
     });
   });
 
   it('should track metrics when a user attempts to view a groups activity', function () {
-    var element = createGroupList();
-    var link = element.find('.share-link');
+    const element = createGroupList();
+    const link = element.find('.share-link');
     link.click();
     assert.calledWith(fakeAnalytics.track, fakeAnalytics.events.GROUP_VIEW_ACTIVITY);
   });
 
   function clickLeaveIcon(element, acceptPrompt) {
-    var leaveLink = element.find('.h-icon-cancel-outline');
+    const leaveLink = element.find('.h-icon-cancel-outline');
 
     // accept prompt to leave group
     $window.confirm = function () {
@@ -287,29 +287,29 @@ describe('groupList', function () {
   }
 
   it('should leave group when the leave icon is clicked', function () {
-    var element = createGroupList();
+    const element = createGroupList();
     clickLeaveIcon(element, true);
     assert.ok(fakeGroups.leave.calledWith('h-devs'));
     assert.calledWith(fakeAnalytics.track, fakeAnalytics.events.GROUP_LEAVE);
   });
 
   it('should not leave group when confirmation is dismissed', function () {
-    var element = createGroupList();
+    const element = createGroupList();
     clickLeaveIcon(element, false);
     assert.notCalled(fakeGroups.leave);
     assert.notCalled(fakeAnalytics.track);
   });
 
   it('should not change the focused group when leaving', function () {
-    var element = createGroupList();
+    const element = createGroupList();
     clickLeaveIcon(element, true);
     assert.notCalled(fakeGroups.focus);
     assert.calledWith(fakeAnalytics.track, fakeAnalytics.events.GROUP_LEAVE);
   });
 
   it('should change current group focus when click another group', function () {
-    var element = createGroupList();
-    var groupItems = element.find('.group-item');
+    const element = createGroupList();
+    const groupItems = element.find('.group-item');
 
     // click the second group
     groupItems[1].click();
@@ -323,10 +323,10 @@ describe('groupList', function () {
       .withArgs('groups.new')
       .returns('https://test.hypothes.is/groups/new');
 
-    var element = createGroupList();
+    const element = createGroupList();
     $window.open = sinon.stub();
 
-    var newGroupLink =
+    const newGroupLink =
       element[0].querySelector('.new-group-btn a');
     angular.element(newGroupLink).click();
     assert.calledWith($window.open, 'https://test.hypothes.is/groups/new',

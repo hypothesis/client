@@ -1,21 +1,21 @@
 'use strict';
 
-var angular = require('angular');
+const angular = require('angular');
 
-var inject = angular.mock.inject;
+const inject = angular.mock.inject;
 
-var windowScroll = require('../window-scroll');
+const windowScroll = require('../window-scroll');
 
 describe('windowScroll', function () {
-  var directive = null;
+  let directive = null;
 
-  var doc = null;
-  var html = null;
-  var view = null;
+  let doc = null;
+  let html = null;
+  let view = null;
 
-  var scope = null;
-  var elem = null;
-  var attr = null;
+  let scope = null;
+  let elem = null;
+  let attr = null;
 
   beforeEach(inject(function ($injector) {
     directive = $injector.invoke(windowScroll);
@@ -44,14 +44,14 @@ describe('windowScroll', function () {
 
     scope.$on.firstCall.args[1]();
 
-    var handler = view.addEventListener.firstCall.args[1];
+    const handler = view.addEventListener.firstCall.args[1];
     assert.calledOnce(view.removeEventListener);
     assert.calledWith(view.removeEventListener, 'scroll', handler);
   });
 
   describe('attribute argument', function () {
-    var callback = null;
-    var handler = null;
+    let callback = null;
+    let handler = null;
 
     beforeEach(function () {
       callback = attr.windowScroll;

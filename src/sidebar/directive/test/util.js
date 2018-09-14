@@ -8,7 +8,7 @@
  * This matches how Angular maps directive names to HTML tag names.
  */
 function hyphenate(name) {
-  var uppercasePattern = /([A-Z])/g;
+  const uppercasePattern = /([A-Z])/g;
   return name.replace(uppercasePattern, '-$1').toLowerCase();
 }
 
@@ -19,8 +19,8 @@ function hyphenate(name) {
  * retrieves an instance of the specified Angular module.
  */
 function ngModule(inject, name) {
-  var module;
-  var helper = function (_module) {
+  let module;
+  const helper = function (_module) {
     module = _module;
   };
 
@@ -98,16 +98,16 @@ function createDirective(document, name, attrs, initialScope, initialHtml, opts)
 
   // Create a template consisting of a single element, the directive
   // we want to create and compile it.
-  var $compile;
-  var $scope;
+  let $compile;
+  let $scope;
   angular.mock.inject(function (_$compile_, _$rootScope_) {
     $compile = _$compile_;
     $scope = _$rootScope_.$new();
   });
-  var templateElement = document.createElement(hyphenate(name));
+  const templateElement = document.createElement(hyphenate(name));
   Object.keys(attrs).forEach(function (key) {
-    var attrName = hyphenate(key);
-    var attrKey = key;
+    const attrName = hyphenate(key);
+    let attrKey = key;
     if (typeof attrs[key] === 'function') {
       // If the input property is a function, generate a function expression,
       // eg. `<my-component on-event="onEvent()">`
@@ -137,16 +137,16 @@ function createDirective(document, name, attrs, initialScope, initialHtml, opts)
   });
 
   // compile the template
-  var linkFn = $compile(templateElement);
+  const linkFn = $compile(templateElement);
 
   // link the component, passing in the initial
   // scope values. The caller can then re-render/link
   // the template passing in different properties
   // and verify the output
-  var linkDirective = function(props) {
-    var childScope = $scope.$new();
+  const linkDirective = function(props) {
+    const childScope = $scope.$new();
     angular.extend(childScope, props);
-    var element = linkFn(childScope);
+    const element = linkFn(childScope);
     element.scope = childScope;
     childScope.$digest();
     element.ctrl = element.controller(name);
@@ -166,7 +166,7 @@ function createDirective(document, name, attrs, initialScope, initialHtml, opts)
 function sendEvent(element, eventType) {
   // createEvent() used instead of Event constructor
   // for PhantomJS compatibility
-  var event = document.createEvent('Event');
+  const event = document.createEvent('Event');
   event.initEvent(eventType, true /* bubbles */, true /* cancelable */);
   element.dispatchEvent(event);
 }
@@ -178,14 +178,14 @@ function sendEvent(element, eventType) {
  * looks for approaches that are common in our app.
  */
 function isHidden(element) {
-  var style = window.getComputedStyle(element);
+  const style = window.getComputedStyle(element);
 
   if (style.display === 'none') {
     return true;
   }
 
   // Test for element or ancestor being hidden with `ng-hide` directive
-  var el = element;
+  let el = element;
   while (el) {
     if (el.classList.contains('ng-hide')) {
       return true;

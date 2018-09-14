@@ -1,11 +1,11 @@
 'use strict';
 
-var { readFileSync } = require('fs');
+const { readFileSync } = require('fs');
 
-var express = require('express');
-var { log } = require('gulp-util');
+const express = require('express');
+const { log } = require('gulp-util');
 
-var { version } = require('../../package.json');
+const { version } = require('../../package.json');
 
 /**
  * An express server which serves the contents of the package.
@@ -19,7 +19,7 @@ var { version } = require('../../package.json');
  * app.
  */
 function servePackage(port, hostname) {
-  var app = express();
+  const app = express();
 
   // Enable CORS for assets so that cross-origin font loading works.
   app.use(function (req, res, next) {
@@ -28,9 +28,9 @@ function servePackage(port, hostname) {
     next();
   });
 
-  var serveBootScript = function (req, res) {
-    var entryPath = require.resolve('../..');
-    var entryScript = readFileSync(entryPath).toString('utf-8');
+  const serveBootScript = function (req, res) {
+    const entryPath = require.resolve('../..');
+    const entryScript = readFileSync(entryPath).toString('utf-8');
     res.send(entryScript);
   };
 

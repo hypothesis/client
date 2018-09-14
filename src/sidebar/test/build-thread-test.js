@@ -1,10 +1,10 @@
 'use strict';
 
-var buildThread = require('../build-thread');
-var metadata = require('../annotation-metadata');
+const buildThread = require('../build-thread');
+const metadata = require('../annotation-metadata');
 
 // Fixture with two top level annotations, one note and one reply
-var SIMPLE_FIXTURE = [{
+const SIMPLE_FIXTURE = [{
   id: '1',
   text: 'first annotation',
   references: [],
@@ -25,7 +25,7 @@ var SIMPLE_FIXTURE = [{
  * @param {Array<string>} keys - The keys to retain
  */
 function filter(thread, keys) {
-  var result = {};
+  const result = {};
   keys.forEach(function (key) {
     if (key === 'children') {
       result[key] = thread[key].map(function (child) {
@@ -50,7 +50,7 @@ function createThread(fixture, opts, keys) {
   opts = opts || {};
   keys = keys || [];
 
-  var rootThread = filter(buildThread(fixture, opts),
+  const rootThread = filter(buildThread(fixture, opts),
     keys.concat(['annotation', 'children']));
   return rootThread.children;
 }
@@ -59,7 +59,7 @@ describe('build-thread', function () {
 
   describe('threading', function () {
     it('arranges parents and children as a thread', function () {
-      var thread = createThread(SIMPLE_FIXTURE);
+      const thread = createThread(SIMPLE_FIXTURE);
       assert.deepEqual(thread, [{
         annotation: SIMPLE_FIXTURE[0],
         children: [{
@@ -73,7 +73,7 @@ describe('build-thread', function () {
     });
 
     it('threads nested replies', function () {
-      var NESTED_FIXTURE = [{
+      const NESTED_FIXTURE = [{
         id: '1',
         references: [],
       },{
@@ -84,7 +84,7 @@ describe('build-thread', function () {
         references: ['1','2'],
       }];
 
-      var thread = createThread(NESTED_FIXTURE);
+      const thread = createThread(NESTED_FIXTURE);
       assert.deepEqual(thread, [{
         annotation: NESTED_FIXTURE[0],
         children: [{
@@ -98,7 +98,7 @@ describe('build-thread', function () {
     });
 
     it('handles loops implied by the reply field', function () {
-      var LOOPED_FIXTURE = [{
+      const LOOPED_FIXTURE = [{
         id: '1',
         references: ['2'],
       },{
@@ -106,7 +106,7 @@ describe('build-thread', function () {
         references: ['1'],
       }];
 
-      var thread = createThread(LOOPED_FIXTURE);
+      const thread = createThread(LOOPED_FIXTURE);
       assert.deepEqual(thread, [{
         annotation: LOOPED_FIXTURE[1],
         children: [{
@@ -117,11 +117,11 @@ describe('build-thread', function () {
     });
 
     it('handles missing parent annotations', function () {
-      var fixture = [{
+      const fixture = [{
         id: '1',
         references: ['3'],
       }];
-      var thread = createThread(fixture);
+      const thread = createThread(fixture);
       assert.deepEqual(thread, [{
         annotation: undefined,
         children: [{annotation: fixture[0], children: []}],
@@ -129,13 +129,13 @@ describe('build-thread', function () {
     });
 
     it('handles missing replies', function () {
-      var fixture = [{
+      const fixture = [{
         id: '1',
         references: ['3','2'],
       },{
         id: '3',
       }];
-      var thread = createThread(fixture);
+      const thread = createThread(fixture);
       assert.deepEqual(thread, [{
         annotation: fixture[1],
         children: [{
@@ -149,22 +149,22 @@ describe('build-thread', function () {
     });
 
     it('threads new annotations which have tags but not IDs', function () {
-      var fixture = [{
+      const fixture = [{
         $tag: 't1',
       }];
-      var thread = createThread(fixture);
+      const thread = createThread(fixture);
       assert.deepEqual(thread, [{annotation: fixture[0], children: []}]);
     });
 
     it('threads new replies which have tags but not IDs', function () {
-      var fixture = [{
+      const fixture = [{
         id: '1',
         $tag: 't1',
       },{
         $tag: 't2',
         references: ['1'],
       }];
-      var thread = createThread(fixture, {}, ['parent']);
+      const thread = createThread(fixture, {}, ['parent']);
       assert.deepEqual(thread, [{
         annotation: fixture[0],
         children: [{
@@ -179,24 +179,24 @@ describe('build-thread', function () {
 
   describe('collapsed state', function () {
     it('collapses top-level annotations by default', function () {
-      var thread = buildThread(SIMPLE_FIXTURE, {});
+      const thread = buildThread(SIMPLE_FIXTURE, {});
       assert.isTrue(thread.children[0].collapsed);
     });
 
     it('expands replies by default', function () {
-      var thread = buildThread(SIMPLE_FIXTURE, {});
+      const thread = buildThread(SIMPLE_FIXTURE, {});
       assert.isFalse(thread.children[0].children[0].collapsed);
     });
 
     it('expands threads which have been explicitly expanded', function () {
-      var thread = buildThread(SIMPLE_FIXTURE, {
+      const thread = buildThread(SIMPLE_FIXTURE, {
         expanded: {'1': true},
       });
       assert.isFalse(thread.children[0].collapsed);
     });
 
     it('collapses replies which have been explicitly collapsed', function () {
-      var thread = buildThread(SIMPLE_FIXTURE, {
+      const thread = buildThread(SIMPLE_FIXTURE, {
         expanded: {'3': false},
       });
       assert.isTrue(thread.children[0].children[0].collapsed);
@@ -206,7 +206,7 @@ describe('build-thread', function () {
       // Simulate performing a search which only matches the top-level
       // annotation, not its reply, and then clicking
       // 'View N more in conversation' to show the complete discussion thread
-      var thread = buildThread(SIMPLE_FIXTURE, {
+      const thread = buildThread(SIMPLE_FIXTURE, {
         filterFn: function (annot) {
           return annot.text.match(/first/);
         },
@@ -219,7 +219,7 @@ describe('build-thread', function () {
   describe('filtering', function () {
     context('when there is an active filter', function () {
       it('shows only annotations that match the filter', function () {
-        var threads = createThread(SIMPLE_FIXTURE, {
+        const threads = createThread(SIMPLE_FIXTURE, {
           filterFn: function (annot) { return annot.text.match(/first/); },
         }, ['visible']);
         assert.deepEqual(threads, [{
@@ -234,7 +234,7 @@ describe('build-thread', function () {
       });
 
       it('shows threads containing replies that match the filter', function () {
-        var threads = createThread(SIMPLE_FIXTURE, {
+        const threads = createThread(SIMPLE_FIXTURE, {
           filterFn: function (annot) { return annot.text.match(/third/); },
         }, ['visible']);
         assert.deepEqual(threads, [{
@@ -251,7 +251,7 @@ describe('build-thread', function () {
 
     context('when there is a selection', function () {
       it('shows only selected annotations', function () {
-        var thread = createThread(SIMPLE_FIXTURE, {
+        const thread = createThread(SIMPLE_FIXTURE, {
           selected: ['1'],
         });
         assert.deepEqual(thread, [{
@@ -265,7 +265,7 @@ describe('build-thread', function () {
     });
 
     describe('thread filtering', function () {
-      var fixture = [{
+      const fixture = [{
         id: '1',
         text: 'annotation',
         target: [{selector: {}}],
@@ -276,7 +276,7 @@ describe('build-thread', function () {
       }];
 
       it('shows only annotations matching the thread filter', function () {
-        var thread = createThread(fixture, {
+        const thread = createThread(fixture, {
           threadFilterFn: function (thread) {
             return metadata.isPageNote(thread.annotation);
           },
@@ -291,12 +291,12 @@ describe('build-thread', function () {
   });
 
   describe('sort order', function () {
-    var annots = function (threads) {
+    const annots = function (threads) {
       return threads.map(function (thread) { return thread.annotation; });
     };
 
     it('sorts top-level annotations using the comparison function', function () {
-      var fixture = [{
+      const fixture = [{
         id: '1',
         updated: 100,
         references: [],
@@ -306,7 +306,7 @@ describe('build-thread', function () {
         references: [],
       }];
 
-      var thread = createThread(fixture, {
+      const thread = createThread(fixture, {
         sortCompareFn: function (a, b) {
           return a.updated > b.updated;
         },
@@ -315,7 +315,7 @@ describe('build-thread', function () {
     });
 
     it('sorts replies by creation date', function () {
-      var fixture = [{
+      const fixture = [{
         id: '1',
         references: [],
         updated: 0,
@@ -328,7 +328,7 @@ describe('build-thread', function () {
         references: ['1'],
         created: 50,
       }];
-      var thread = createThread(fixture, {
+      const thread = createThread(fixture, {
         sortCompareFn: function (a, b) { return a.id < b.id; },
       });
       assert.deepEqual(annots(thread[0].children),
@@ -356,31 +356,31 @@ describe('build-thread', function () {
 
   describe('depth', function () {
     it('is 0 for annotations', function () {
-      var thread = createThread(SIMPLE_FIXTURE, {}, ['depth']);
+      const thread = createThread(SIMPLE_FIXTURE, {}, ['depth']);
       assert.deepEqual(thread[0].depth, 0);
     });
 
     it('is 1 for top-level replies', function () {
-      var thread = createThread(SIMPLE_FIXTURE, {}, ['depth']);
+      const thread = createThread(SIMPLE_FIXTURE, {}, ['depth']);
       assert.deepEqual(thread[0].children[0].depth, 1);
     });
   });
 
   describe('highlighting', function () {
     it('does not set highlight state when none are highlighted', function () {
-      var thread = createThread(SIMPLE_FIXTURE, {}, ['dimmed']);
+      const thread = createThread(SIMPLE_FIXTURE, {}, ['dimmed']);
       thread.forEach(function (child) {
         assert.equal(child.highlightState, undefined);
       });
     });
 
     it('highlights annotations', function () {
-      var thread = createThread(SIMPLE_FIXTURE, {highlighted: ['1']}, ['highlightState']);
+      const thread = createThread(SIMPLE_FIXTURE, {highlighted: ['1']}, ['highlightState']);
       assert.equal(thread[0].highlightState, 'highlight');
     });
 
     it('dims annotations which are not highlighted', function () {
-      var thread = createThread(SIMPLE_FIXTURE, {highlighted: ['1']}, ['highlightState']);
+      const thread = createThread(SIMPLE_FIXTURE, {highlighted: ['1']}, ['highlightState']);
       assert.equal(thread[1].highlightState, 'dim');
     });
   });

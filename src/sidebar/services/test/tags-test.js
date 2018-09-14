@@ -1,9 +1,9 @@
 'use strict';
 
-var angular = require('angular');
+const angular = require('angular');
 
-var TAGS_LIST_KEY = 'hypothesis.user.tags.list';
-var TAGS_MAP_KEY = 'hypothesis.user.tags.map';
+const TAGS_LIST_KEY = 'hypothesis.user.tags.list';
+const TAGS_MAP_KEY = 'hypothesis.user.tags.map';
 
 class FakeStorage {
   constructor() {
@@ -20,8 +20,8 @@ class FakeStorage {
 }
 
 describe('sidebar.tags', () => {
-  var fakeLocalStorage;
-  var tags;
+  let fakeLocalStorage;
+  let tags;
 
   before(() => {
     angular.module('h', [])
@@ -31,8 +31,8 @@ describe('sidebar.tags', () => {
   beforeEach(() => {
     fakeLocalStorage = new FakeStorage();
 
-    var stamp = Date.now();
-    var savedTagsMap = {
+    const stamp = Date.now();
+    const savedTagsMap = {
       foo: {
         text: 'foo',
         count: 1,
@@ -54,7 +54,7 @@ describe('sidebar.tags', () => {
         updated: stamp,
       },
     };
-    var savedTagsList = Object.keys(savedTagsMap);
+    const savedTagsList = Object.keys(savedTagsMap);
 
     fakeLocalStorage.setObject(TAGS_MAP_KEY, savedTagsMap);
     fakeLocalStorage.setObject(TAGS_LIST_KEY, savedTagsList);
@@ -81,10 +81,10 @@ describe('sidebar.tags', () => {
     it('saves new tags to storage', () => {
       tags.store([{text: 'new'}]);
 
-      var storedTagsList = fakeLocalStorage.getObject(TAGS_LIST_KEY);
+      const storedTagsList = fakeLocalStorage.getObject(TAGS_LIST_KEY);
       assert.include(storedTagsList, 'new');
 
-      var storedTagsMap = fakeLocalStorage.getObject(TAGS_MAP_KEY);
+      const storedTagsMap = fakeLocalStorage.getObject(TAGS_MAP_KEY);
       assert.match(storedTagsMap.new, sinon.match({
         count: 1,
         text: 'new',
@@ -94,16 +94,16 @@ describe('sidebar.tags', () => {
 
     it('increases the count for a tag already stored', () => {
       tags.store([{text: 'bar'}]);
-      var storedTagsMap = fakeLocalStorage.getObject(TAGS_MAP_KEY);
+      const storedTagsMap = fakeLocalStorage.getObject(TAGS_MAP_KEY);
       assert.equal(storedTagsMap.bar.count, 6);
     });
 
     it('orders list by count descending, lexical ascending', () => {
-      for (var i = 0; i < 6; i++) {
+      for (let i = 0; i < 6; i++) {
         tags.store([{text: 'foo'}]);
       }
 
-      var storedTagsList = fakeLocalStorage.getObject(TAGS_LIST_KEY);
+      const storedTagsList = fakeLocalStorage.getObject(TAGS_LIST_KEY);
       assert.deepEqual(storedTagsList, ['foo', 'bar', 'future', 'argon']);
     });
   });

@@ -47,7 +47,7 @@ function localStorage($window) {
     },
 
     getObject(key) {
-      var item = storage.getItem(key);
+      const item = storage.getItem(key);
       return item ? JSON.parse(item) : null;
     },
 
@@ -56,7 +56,7 @@ function localStorage($window) {
     },
 
     setObject(key, value) {
-      var repr = JSON.stringify(value);
+      const repr = JSON.stringify(value);
       storage.setItem(key, repr);
     },
 

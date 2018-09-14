@@ -1,10 +1,10 @@
 'use strict';
 
-var links = require('../links');
+const links = require('../links');
 
-var init   = links.init;
-var update = links.update.UPDATE_LINKS;
-var action = links.actions.updateLinks;
+const init   = links.init;
+const update = links.update.UPDATE_LINKS;
+const action = links.actions.updateLinks;
 
 describe('sidebar.reducers.links', function() {
   describe('#init()', function() {

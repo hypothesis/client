@@ -1,6 +1,6 @@
 'use strict';
 
-var theTooltip;
+let theTooltip;
 
 /**
  * A custom tooltip similar to the one used in Google Docs which appears
@@ -24,28 +24,28 @@ function Tooltip(rootElement) {
   };
 
   this.render = function () {
-    var TOOLTIP_ARROW_HEIGHT = 7;
+    const TOOLTIP_ARROW_HEIGHT = 7;
 
     if (!this.state.target) {
       this._el.style.visibility = 'hidden';
       return;
     }
 
-    var target = this.state.target;
-    var label = target.getAttribute('aria-label');
+    const target = this.state.target;
+    const label = target.getAttribute('aria-label');
     this._labelEl.textContent = label;
 
-    var tooltipRect = this._el.getBoundingClientRect();
+    const tooltipRect = this._el.getBoundingClientRect();
 
-    var targetRect = target.getBoundingClientRect();
-    var top;
+    const targetRect = target.getBoundingClientRect();
+    let top;
 
     if (this.state.direction === 'up') {
       top = targetRect.bottom + TOOLTIP_ARROW_HEIGHT;
     } else {
       top = targetRect.top - tooltipRect.height - TOOLTIP_ARROW_HEIGHT;
     }
-    var left = targetRect.right - tooltipRect.width;
+    const left = targetRect.right - tooltipRect.width;
 
     this._el.classList.toggle('tooltip--up', this.state.direction === 'up');
     this._el.classList.toggle('tooltip--down', this.state.direction === 'down');
@@ -87,10 +87,10 @@ module.exports = function () {
   return {
     restrict: 'A',
     link: function ($scope, $element) {
-      var el = $element[0];
+      const el = $element[0];
 
       el.addEventListener('mouseover', function () {
-        var direction = el.getAttribute('tooltip-direction') || 'down';
+        const direction = el.getAttribute('tooltip-direction') || 'down';
         theTooltip.setState({
           direction: direction,
           target: el,

@@ -1,10 +1,10 @@
 'use strict';
 
-var angular = require('angular');
-var proxyquire = require('proxyquire');
+const angular = require('angular');
+const proxyquire = require('proxyquire');
 
-var bridgeEvents = require('../../../shared/bridge-events');
-var util = require('../../directive/test/util');
+const bridgeEvents = require('../../../shared/bridge-events');
+const util = require('../../directive/test/util');
 
 function pageObject(element) {
   return {
@@ -64,9 +64,9 @@ function thirdPartyUserPage() {
 }
 
 describe('loginControl', function () {
-  var fakeBridge;
-  var fakeServiceConfig = sinon.stub();
-  var fakeWindow;
+  let fakeBridge;
+  const fakeServiceConfig = sinon.stub();
+  let fakeWindow;
 
   before(function () {
     angular.module('app', [])
@@ -81,8 +81,8 @@ describe('loginControl', function () {
 
   beforeEach(function () {
     fakeBridge = { call: sinon.stub() };
-    var fakeServiceUrl = sinon.stub().returns('someUrl');
-    var fakeSettings = {
+    const fakeServiceUrl = sinon.stub().returns('someUrl');
+    const fakeSettings = {
       authDomain: 'fakeDomain',
     };
     fakeWindow = { open: sinon.stub() };
@@ -134,7 +134,7 @@ describe('loginControl', function () {
       });
 
       it('displays the display name', () => {
-        var profileBtn = firstPartyUserPage().userProfileButton;
+        const profileBtn = firstPartyUserPage().userProfileButton;
         assert.equal(profileBtn.textContent, 'Jim Smith');
       });
 
@@ -284,14 +284,14 @@ describe('loginControl', function () {
 
   context('old controls when a H user is logged in', function () {
     it('shows the complete list of menu options', function () {
-      var el = createLoginControl({
+      const el = createLoginControl({
         auth: {
           username: 'someUsername',
           status: 'logged-in',
         },
         newStyle: false,
       });
-      var page = pageObject(el);
+      const page = pageObject(el);
 
       assert.deepEqual(page.menuLinks(),
         ['Account', 'Help', 'My Annotations', 'Log out']);
@@ -301,13 +301,13 @@ describe('loginControl', function () {
 
   context('old controls when user is logged out', function () {
     it('shows the help and log in menu options', function () {
-      var el = createLoginControl({
+      const el = createLoginControl({
         auth: {
           status: 'logged-out',
         },
         newStyle: false,
       });
-      var page = pageObject(el);
+      const page = pageObject(el);
 
       assert.include(page.menuText(), 'Log in');
       assert.deepEqual(page.menuLinks(), ['Help']);
@@ -316,13 +316,13 @@ describe('loginControl', function () {
 
   context('old controls when auth status is unknown', function () {
     it('shows the help menu option', function () {
-      var el = createLoginControl({
+      const el = createLoginControl({
         auth: {
           status: 'unknown',
         },
         newStyle: false,
       });
-      var page = pageObject(el);
+      const page = pageObject(el);
 
       assert.equal(page.menuText(), '⋯');
       assert.deepEqual(page.menuLinks(), ['Help']);

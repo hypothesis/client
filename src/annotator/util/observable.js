@@ -5,7 +5,7 @@
  * values using the Observable API.
  */
 
-var Observable = require('zen-observable');
+const Observable = require('zen-observable');
 
  /**
   * Returns an observable of events emitted by a DOM event source
@@ -16,7 +16,7 @@ var Observable = require('zen-observable');
   */
 function listen(src, eventNames) {
   return new Observable(function (observer) {
-    var onNext = function (event) {
+    const onNext = function (event) {
       observer.next(event);
     };
 
@@ -37,10 +37,10 @@ function listen(src, eventNames) {
  */
 function delay(delay, src) {
   return new Observable(function (obs) {
-    var timeouts = [];
-    var sub = src.subscribe({
+    let timeouts = [];
+    const sub = src.subscribe({
       next: function (value) {
-        var t = setTimeout(function () {
+        const t = setTimeout(function () {
           timeouts = timeouts.filter(function (other) { return other !== t; });
           obs.next(value);
         }, delay);
@@ -64,14 +64,14 @@ function delay(delay, src) {
   */
 function buffer(delay, src) {
   return new Observable(function (obs) {
-    var lastValue;
-    var timeout;
+    let lastValue;
+    let timeout;
 
     function onNext() {
       obs.next(lastValue);
     }
 
-    var sub = src.subscribe({
+    const sub = src.subscribe({
       next: function (value) {
         lastValue = value;
         clearTimeout(timeout);
@@ -94,7 +94,7 @@ function buffer(delay, src) {
   */
 function merge(sources) {
   return new Observable(function (obs) {
-    var subs = sources.map(function (src) {
+    const subs = sources.map(function (src) {
       return src.subscribe({
         next: function (value) {
           obs.next(value);
@@ -112,7 +112,7 @@ function merge(sources) {
 
 /** Drop the first `n` events from the `src` Observable. */
 function drop(src, n) {
-  var count = 0;
+  let count = 0;
   return src.filter(function () {
     ++count;
     return count > n;

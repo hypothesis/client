@@ -1,15 +1,15 @@
 'use strict';
 
-var fixtures = require('./annotation-fixtures');
-var uiConstants = require('../ui-constants');
-var tabs = require('../tabs');
-var unroll = require('../../shared/test/util').unroll;
+const fixtures = require('./annotation-fixtures');
+const uiConstants = require('../ui-constants');
+const tabs = require('../tabs');
+const unroll = require('../../shared/test/util').unroll;
 
 describe('tabs', function () {
   describe('tabForAnnotation', function () {
     unroll('shows annotation in correct tab', function (testCase) {
-      var ann = testCase.ann;
-      var expectedTab = testCase.expectedTab;
+      const ann = testCase.ann;
+      const expectedTab = testCase.expectedTab;
       assert.equal(tabs.tabForAnnotation(ann), expectedTab);
     }, [{
       ann: fixtures.defaultAnnotation(),
@@ -25,7 +25,7 @@ describe('tabs', function () {
 
   describe('shouldShowInTab', function () {
     unroll('returns true if the annotation should be shown', function (testCase) {
-      var ann = fixtures.defaultAnnotation();
+      const ann = fixtures.defaultAnnotation();
       ann.$anchorTimeout = testCase.anchorTimeout;
       ann.$orphan = testCase.orphan;
 
@@ -61,8 +61,8 @@ describe('tabs', function () {
   });
 
   describe('counts', function () {
-    var annotation = Object.assign(fixtures.defaultAnnotation(), {$orphan:false});
-    var orphan = Object.assign(fixtures.defaultAnnotation(), {$orphan:true});
+    const annotation = Object.assign(fixtures.defaultAnnotation(), {$orphan:false});
+    const orphan = Object.assign(fixtures.defaultAnnotation(), {$orphan:true});
 
     it('counts Annotations and Orphans separately', function () {
       assert.deepEqual(tabs.counts([annotation, orphan], true), {

@@ -1,11 +1,11 @@
 'use strict';
 
-var angular = require('angular');
+const angular = require('angular');
 
 describe('helpPanel', function () {
-  var fakeStore;
-  var $componentController;
-  var $rootScope;
+  let fakeStore;
+  let $componentController;
+  let $rootScope;
 
   beforeEach(function () {
     fakeStore = {
@@ -34,8 +34,8 @@ describe('helpPanel', function () {
       },
     }]);
 
-    var $scope = $rootScope.$new();
-    var ctrl = $componentController('helpPanel', { $scope: $scope });
+    const $scope = $rootScope.$new();
+    const ctrl = $componentController('helpPanel', { $scope: $scope });
     $scope.$digest();
 
     assert.equal(ctrl.url, 'https://publisher.org/article.pdf');

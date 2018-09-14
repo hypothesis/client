@@ -1,11 +1,11 @@
 'use strict';
 
-var angular = require('angular');
+const angular = require('angular');
 
-var util = require('../../directive/test/util');
+const util = require('../../directive/test/util');
 
 describe('searchInput', function () {
-  var fakeHttp;
+  let fakeHttp;
 
   before(function () {
     angular.module('app', [])
@@ -20,24 +20,24 @@ describe('searchInput', function () {
   });
 
   it('displays the search query', function () {
-    var el = util.createDirective(document, 'searchInput', {
+    const el = util.createDirective(document, 'searchInput', {
       query: 'foo',
     });
-    var input = el.find('input')[0];
+    const input = el.find('input')[0];
     assert.equal(input.value, 'foo');
   });
 
   it('invokes #onSearch() when the query changes', function () {
-    var onSearch = sinon.stub();
-    var el = util.createDirective(document, 'searchInput', {
+    const onSearch = sinon.stub();
+    const el = util.createDirective(document, 'searchInput', {
       query: 'foo',
       onSearch: {
         args: ['$query'],
         callback: onSearch,
       },
     });
-    var input = el.find('input')[0];
-    var form = el.find('form');
+    const input = el.find('input')[0];
+    const form = el.find('form');
     input.value = 'new-query';
     form.submit();
     assert.calledWith(onSearch, 'new-query');
@@ -45,14 +45,14 @@ describe('searchInput', function () {
 
   describe('loading indicator', function () {
     it('is hidden when there are no network requests in flight', function () {
-      var el = util.createDirective(document, 'search-input', {});
-      var spinner = el[0].querySelector('.spinner');
+      const el = util.createDirective(document, 'search-input', {});
+      const spinner = el[0].querySelector('.spinner');
       assert.equal(util.isHidden(spinner), true);
     });
 
     it('is visible when there are network requests in flight', function () {
-      var el = util.createDirective(document, 'search-input', {});
-      var spinner = el[0].querySelector('.spinner');
+      const el = util.createDirective(document, 'search-input', {});
+      const spinner = el[0].querySelector('.spinner');
       fakeHttp.pendingRequests.push([{}]);
       el.scope.$digest();
       assert.equal(util.isHidden(spinner), false);

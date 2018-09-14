@@ -1,6 +1,6 @@
 'use strict';
 
-var retry = require('retry');
+const retry = require('retry');
 
 /**
  * Retry a Promise-returning operation until it succeeds or
@@ -14,7 +14,7 @@ var retry = require('retry');
  */
 function retryPromiseOperation(opFn, options) {
   return new Promise(function (resolve, reject) {
-    var operation = retry.operation(options);
+    const operation = retry.operation(options);
     operation.attempt(function () {
       opFn().then(function (result) {
         operation.retry();

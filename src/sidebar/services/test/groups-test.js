@@ -1,8 +1,8 @@
 'use strict';
 
-var events = require('../../events');
-var fakeReduxStore = require('../../test/fake-redux-store');
-var groups = require('../groups');
+const events = require('../../events');
+const fakeReduxStore = require('../../test/fake-redux-store');
+const groups = require('../groups');
 
 /**
  * Generate a truth table containing every possible combination of a set of
@@ -15,34 +15,34 @@ function truthTable(columns) {
   if (columns === 1) {
     return [[true], [false]];
   }
-  var subTable = truthTable(columns - 1);
+  const subTable = truthTable(columns - 1);
   return [...subTable.map(row => [true, ...row]),
           ...subTable.map(row => [false, ...row])];
 }
 
 // Return a mock session service containing three groups.
-var sessionWithThreeGroups = function() {
+const sessionWithThreeGroups = function() {
   return {
     state: {},
   };
 };
 
-var dummyGroups = [
+const dummyGroups = [
   { name: 'Group 1', id: 'id1'},
   { name: 'Group 2', id: 'id2'},
   { name: 'Group 3', id: 'id3'},
 ];
 
 describe('groups', function() {
-  var fakeStore;
-  var fakeIsSidebar;
-  var fakeSession;
-  var fakeSettings;
-  var fakeApi;
-  var fakeLocalStorage;
-  var fakeRootScope;
-  var fakeServiceUrl;
-  var sandbox;
+  let fakeStore;
+  let fakeIsSidebar;
+  let fakeSession;
+  let fakeSettings;
+  let fakeApi;
+  let fakeLocalStorage;
+  let fakeRootScope;
+  let fakeServiceUrl;
+  let sandbox;
 
   beforeEach(function() {
     sandbox = sinon.sandbox.create();
@@ -65,7 +65,7 @@ describe('groups', function() {
         return this.getState().searchUris;
       },
       focusedGroupId() {
-        var group = this.getState().focusedGroup;
+        const group = this.getState().focusedGroup;
         return group ? group.id : null;
       },
     });
@@ -122,7 +122,7 @@ describe('groups', function() {
 
   describe('#all', function() {
     it('returns all groups', function() {
-      var svc = service();
+      const svc = service();
       fakeStore.setState({ groups: dummyGroups });
       assert.deepEqual(svc.all(), dummyGroups);
     });
@@ -130,7 +130,7 @@ describe('groups', function() {
 
   describe('#load', function() {
     it('loads all available groups', function() {
-      var svc = service();
+      const svc = service();
 
       return svc.load().then(() => {
         assert.calledWith(fakeStore.loadGroups, dummyGroups);
@@ -147,7 +147,7 @@ describe('groups', function() {
     });
 
     it('sets the focused group from the value saved in local storage', () => {
-      var svc  = service();
+      const svc  = service();
       fakeLocalStorage.getItem.returns(dummyGroups[1].id);
       return svc.load().then(() => {
         assert.calledWith(fakeStore.focusGroup, dummyGroups[1].id);
@@ -156,7 +156,7 @@ describe('groups', function() {
 
     [null, 'some-group-id'].forEach(groupId => {
       it('does not set the focused group if not present in the groups list', () => {
-        var svc = service();
+        const svc = service();
         fakeLocalStorage.getItem.returns(groupId);
         return svc.load().then(() => {
           assert.notCalled(fakeStore.focusGroup);
@@ -166,10 +166,10 @@ describe('groups', function() {
 
     context('in the sidebar', () => {
       it('waits for the document URL to be determined', () => {
-        var svc = service();
+        const svc = service();
 
         fakeStore.setState({ searchUris: [] });
-        var loaded = svc.load();
+        const loaded = svc.load();
         fakeStore.setState({ searchUris: ['https://asite.com'] });
 
         return loaded.then(() => {
@@ -188,7 +188,7 @@ describe('groups', function() {
 
       it('does not wait for the document URL', () => {
         fakeStore.setState({ searchUris: [] });
-        var svc = service();
+        const svc = service();
         return svc.load().then(() => {
           assert.calledWith(fakeApi.groups.list, {
             expand: 'organization',
@@ -199,14 +199,14 @@ describe('groups', function() {
 
     it('passes authority argument when using a third-party authority', () => {
       fakeSettings.services = [{ authority: 'publisher.org' }];
-      var svc = service();
+      const svc = service();
       return svc.load().then(() => {
         assert.calledWith(fakeApi.groups.list, sinon.match({ authority: 'publisher.org' }));
       });
     });
 
     it('injects a defalt organization if group is missing an organization', function () {
-      var svc = service();
+      const svc = service();
       const groups = [
         { id: '39r39f', name: 'Ding Dong!' },
       ];
@@ -222,8 +222,8 @@ describe('groups', function() {
 
     truthTable(3).forEach(([ loggedIn, pageHasAssociatedGroups, directLinkToPublicAnnotation ]) => {
       it('excludes the "Public" group if user logged out and page has associated groups', () => {
-        var svc = service();
-        var shouldShowPublicGroup = loggedIn || !pageHasAssociatedGroups || directLinkToPublicAnnotation;
+        const svc = service();
+        const shouldShowPublicGroup = loggedIn || !pageHasAssociatedGroups || directLinkToPublicAnnotation;
 
         // Setup the direct-linked annotation.
         if (directLinkToPublicAnnotation) {
@@ -237,7 +237,7 @@ describe('groups', function() {
         }
 
         // Create groups response from server.
-        var groups = [{ name: 'Public', id: '__world__' }];
+        const groups = [{ name: 'Public', id: '__world__' }];
         if (pageHasAssociatedGroups) {
           groups.push({ name: 'BioPub', id: 'biopub' });
         }
@@ -248,7 +248,7 @@ describe('groups', function() {
         }));
 
         return svc.load().then(groups => {
-          var publicGroupShown = groups.some(g => g.id === '__world__');
+          const publicGroupShown = groups.some(g => g.id === '__world__');
           assert.equal(publicGroupShown, shouldShowPublicGroup);
         });
       });
@@ -257,7 +257,7 @@ describe('groups', function() {
 
   describe('#get', function() {
     it('returns the requested group', function() {
-      var svc = service();
+      const svc = service();
       fakeStore.getGroup.withArgs('foo').returns(dummyGroups[1]);
 
       assert.equal(svc.get('foo'), dummyGroups[1]);
@@ -266,7 +266,7 @@ describe('groups', function() {
 
   describe('#focused', function() {
     it('returns the focused group', function() {
-      var svc = service();
+      const svc = service();
       fakeStore.setState({ groups: dummyGroups, focusedGroup: dummyGroups[2] });
       assert.equal(svc.focused(), dummyGroups[2]);
     });
@@ -274,7 +274,7 @@ describe('groups', function() {
 
   describe('#focus', function() {
     it('sets the focused group to the named group', function() {
-      var svc = service();
+      const svc = service();
       svc.focus('foo');
       assert.calledWith(fakeStore.focusGroup, 'foo');
     });
@@ -310,7 +310,7 @@ describe('groups', function() {
 
   describe('#leave', function () {
     it('should call the group leave API', function () {
-      var s = service();
+      const s = service();
       return s.leave('id2').then(() => {
         assert.calledWithMatch(fakeApi.group.member.delete, {
           pubid: 'id2',
@@ -331,7 +331,7 @@ describe('groups', function() {
 
     context('when a new frame connects', () => {
       it('should refetch groups if main frame URL has changed', () => {
-        var svc = service();
+        const svc = service();
 
         fakeStore.setState({ searchUris: ['https://domain.com/page-a'] });
         return svc.load().then(() => {
@@ -347,7 +347,7 @@ describe('groups', function() {
       });
 
       it('should not refetch groups if main frame URL has not changed', () => {
-        var svc = service();
+        const svc = service();
 
         fakeStore.setState({ searchUris: ['https://domain.com/page-a'] });
         return svc.load().then(() => {

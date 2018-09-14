@@ -1,7 +1,7 @@
 'use strict';
 
 /** Default state for new threads, before applying filters etc. */
-var DEFAULT_THREAD_STATE = {
+const DEFAULT_THREAD_STATE = {
   /**
    * The ID of this thread. This will be the same as the annotation ID for
    * created annotations or the `$tag` property for new annotations.
@@ -59,7 +59,7 @@ function setParentID(threads, id, parents) {
     // Parent already assigned, do not try to change it.
     return;
   }
-  var parentID = parents[parents.length-1];
+  const parentID = parents[parents.length-1];
   if (!threads[parentID]) {
     // Parent does not exist. This may be a reply to an annotation which has
     // been deleted. Create a placeholder Thread with no annotation to
@@ -71,7 +71,7 @@ function setParentID(threads, id, parents) {
     setParentID(threads, parentID, parents.slice(0,-1));
   }
 
-  var grandParentID = threads[parentID].parent;
+  let grandParentID = threads[parentID].parent;
   while (grandParentID) {
     if (grandParentID === id) {
       // There is a loop in the `references` field, abort.
@@ -99,7 +99,7 @@ function setParentID(threads, id, parents) {
  */
 function threadAnnotations(annotations) {
   // Map of annotation ID -> container
-  var threads = {};
+  const threads = {};
 
   // Build mapping of annotation ID -> thread
   annotations.forEach(function (annotation) {
@@ -120,7 +120,7 @@ function threadAnnotations(annotations) {
 
   // Collect the set of threads which have no parent as
   // children of the thread root
-  var roots = [];
+  const roots = [];
   Object.keys(threads).forEach(function (id) {
     if (!threads[id].parent) {
       // Top-level threads are collapsed by default
@@ -129,7 +129,7 @@ function threadAnnotations(annotations) {
     }
   });
 
-  var root = {
+  const root = {
     annotation: undefined,
     children: roots,
     visible: true,
@@ -188,7 +188,7 @@ function sort(threads, compareFn) {
  * to `compareFn` and replies sorted by `replyCompareFn`.
  */
 function sortThread(thread, compareFn, replyCompareFn) {
-  var children = thread.children.map(function (child) {
+  const children = thread.children.map(function (child) {
     return sortThread(child, replyCompareFn, replyCompareFn);
   });
 
@@ -202,7 +202,7 @@ function sortThread(thread, compareFn, replyCompareFn) {
  * updated.
  */
 function countRepliesAndDepth(thread, depth) {
-  var children = thread.children.map(function (c) {
+  const children = thread.children.map(function (c) {
     return countRepliesAndDepth(c, depth + 1);
   });
   return Object.assign({}, thread, {
@@ -224,7 +224,7 @@ function hasVisibleChildren(thread) {
 /**
  * Default options for buildThread()
  */
-var defaultOpts = {
+const defaultOpts = {
   /** List of currently selected annotation IDs */
   selected: [],
   /**
@@ -280,12 +280,12 @@ var defaultOpts = {
 function buildThread(annotations, opts) {
   opts = Object.assign({}, defaultOpts, opts);
 
-  var thread = threadAnnotations(annotations);
+  let thread = threadAnnotations(annotations);
 
   // Mark annotations as visible or hidden depending on whether
   // they are being edited and whether they match the current filter
   // criteria
-  var shouldShowThread = function (annotation) {
+  const shouldShowThread = function (annotation) {
     if (opts.forceVisible && opts.forceVisible.indexOf(id(annotation)) !== -1) {
       return true;
     }
@@ -307,9 +307,9 @@ function buildThread(annotations, opts) {
 
   // Set the visibility and highlight states of threads
   thread = mapThread(thread, function (thread) {
-    var highlightState;
+    let highlightState;
     if (opts.highlighted.length > 0) {
-      var isHighlighted = thread.annotation &&
+      const isHighlighted = thread.annotation &&
         opts.highlighted.indexOf(thread.id) !== -1;
       highlightState = isHighlighted ? 'highlight' : 'dim';
     }
@@ -326,14 +326,14 @@ function buildThread(annotations, opts) {
   // 1) Have been explicitly expanded OR
   // 2) Have children matching the filter
   thread = mapThread(thread, function (thread) {
-    var id = thread.id;
+    const id = thread.id;
 
     // If the thread was explicitly expanded or collapsed, respect that option
     if (opts.expanded.hasOwnProperty(id)) {
       return Object.assign({}, thread, {collapsed: !opts.expanded[id]});
     }
 
-    var hasUnfilteredChildren = opts.filterFn && hasVisibleChildren(thread);
+    const hasUnfilteredChildren = opts.filterFn && hasVisibleChildren(thread);
 
     return Object.assign({}, thread, {
       collapsed: thread.collapsed &&

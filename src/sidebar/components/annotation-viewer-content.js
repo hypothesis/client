@@ -6,7 +6,7 @@
  * @return Promise<Array<Annotation>>
  */
 function fetchThread(api, id) {
-  var annot;
+  let annot;
   return api.annotation.get({id: id}).then(function (annot) {
     if (annot.references && annot.references.length) {
       // This is a reply, fetch the top-level annotation
@@ -27,11 +27,11 @@ function AnnotationViewerContentController (
   $location, $routeParams, store, api, rootThread, streamer,
   streamFilter, annotationMapper
 ) {
-  var self = this;
+  const self = this;
 
   store.setAppIsSidebar(false);
 
-  var id = $routeParams.id;
+  const id = $routeParams.id;
 
   this.search.update = function (query) {
     $location.path('/stream').search('q', query);
@@ -48,7 +48,7 @@ function AnnotationViewerContentController (
   this.ready = fetchThread(api, id).then(function (annots) {
     annotationMapper.loadAnnotations(annots);
 
-    var topLevelAnnot = annots.filter(function (annot) {
+    const topLevelAnnot = annots.filter(function (annot) {
       return (annot.references || []).length === 0;
     })[0];
 

@@ -1,17 +1,17 @@
 'use strict';
 
-var events = require('../../shared/bridge-events');
-var features = require('../features');
+const events = require('../../shared/bridge-events');
+const features = require('../features');
 
 describe('features - annotation layer', function () {
 
-  var featureFlagsUpdateHandler;
-  var initialFeatures = {
+  let featureFlagsUpdateHandler;
+  const initialFeatures = {
     feature_on: true,
     feature_off: false,
   };
 
-  var setFeatures = function(features){
+  const setFeatures = function(features){
     featureFlagsUpdateHandler(features || initialFeatures);
   };
 

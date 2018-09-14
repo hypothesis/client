@@ -1,13 +1,13 @@
 'use strict';
 
-var frames = require('../frames');
-var session = require('../session');
-var util = require('../../util');
-var unroll = require('../../../../shared/test/util').unroll;
+const frames = require('../frames');
+const session = require('../session');
+const util = require('../../util');
+const unroll = require('../../../../shared/test/util').unroll;
 
-var actions = frames.actions;
-var update = util.createReducer(frames.update);
-var selectors = frames.selectors;
+const actions = frames.actions;
+const update = util.createReducer(frames.update);
+const selectors = frames.selectors;
 
 function init() {
   return Object.assign({}, frames.init(), session.init());
@@ -16,46 +16,46 @@ function init() {
 describe('frames reducer', function () {
   describe('#connectFrame', function () {
     it('adds the frame to the list of connected frames', function () {
-      var frame = {uri: 'http://example.com'};
-      var state = update(init(), actions.connectFrame(frame));
+      const frame = {uri: 'http://example.com'};
+      const state = update(init(), actions.connectFrame(frame));
       assert.deepEqual(selectors.frames(state), [frame]);
     });
   });
 
   describe('#destroyFrame', function () {
     it('removes the frame from the list of connected frames', function () {
-      var frameList = [{uri: 'http://example.com'}, {uri: 'http://example.org'}];
-      var state = init();
+      const frameList = [{uri: 'http://example.com'}, {uri: 'http://example.org'}];
+      let state = init();
       frameList.forEach(function (frame) {
         state = update(state, actions.connectFrame(frame));
       });
       assert.deepEqual(selectors.frames(state), frameList);
-      var updatedState = update(state, actions.destroyFrame(frameList[0]));
+      const updatedState = update(state, actions.destroyFrame(frameList[0]));
       assert.deepEqual(selectors.frames(updatedState), [frameList[1]]);
     });
   });
 
   describe('#updateFrameAnnotationFetchStatus', function () {
     it('updates the isAnnotationFetchComplete status of the frame', function () {
-      var frame = {
+      const frame = {
         uri: 'http://example.com',
       };
-      var expectedFrame = {
+      const expectedFrame = {
         uri: 'http://example.com',
         isAnnotationFetchComplete: true,
       };
-      var connectedState = update(init(), actions.connectFrame(frame));
-      var updatedState = update(connectedState,
+      const connectedState = update(init(), actions.connectFrame(frame));
+      const updatedState = update(connectedState,
         actions.updateFrameAnnotationFetchStatus(frame.uri, true));
       assert.deepEqual(selectors.frames(updatedState), [expectedFrame]);
     });
 
     it('does not update the isAnnotationFetchComplete status of the wrong frame', function () {
-      var frame = {
+      const frame = {
         uri: 'http://example.com',
       };
-      var connectedState = update(init(), actions.connectFrame(frame));
-      var updatedState = update(connectedState,
+      const connectedState = update(init(), actions.connectFrame(frame));
+      const updatedState = update(connectedState,
         actions.updateFrameAnnotationFetchStatus('http://anotherexample.com', true));
       assert.deepEqual(selectors.frames(updatedState), [frame]);
     });
@@ -63,7 +63,7 @@ describe('frames reducer', function () {
 
   describe('#searchUris', function () {
     unroll('returns the expected search URIs (#when)', function (testCase) {
-      var state = init();
+      let state = init();
       if (testCase.features) {
         state.session.features = testCase.features;
       }

@@ -1,10 +1,10 @@
 'use strict';
 
-var observable = require('./util/observable');
+const observable = require('./util/observable');
 
 /** Returns the selected `DOMRange` in `document`. */
 function selectedRange(document) {
-  var selection = document.getSelection();
+  const selection = document.getSelection();
   if (!selection.rangeCount || selection.getRangeAt(0).collapsed) {
     return null;
   } else {
@@ -27,8 +27,8 @@ function selections(document) {
 
   // Get a stream of selection changes that occur whilst the user is not
   // making a selection with the mouse.
-  var isMouseDown;
-  var selectionEvents = observable.listen(document,
+  let isMouseDown;
+  const selectionEvents = observable.listen(document,
     ['mousedown', 'mouseup', 'selectionchange'])
     .filter(function (event) {
       if (event.type === 'mousedown' || event.type === 'mouseup') {
@@ -39,7 +39,7 @@ function selections(document) {
       }
     });
 
-  var events = observable.merge([
+  const events = observable.merge([
     // Add a delay before checking the state of the selection because
     // the selection is not updated immediately after a 'mouseup' event
     // but only on the next tick of the event loop.

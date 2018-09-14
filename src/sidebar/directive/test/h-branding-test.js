@@ -1,19 +1,19 @@
 'use strict';
 
-var angular = require('angular');
-var unroll = require('../../../shared/test/util').unroll;
+const angular = require('angular');
+const unroll = require('../../../shared/test/util').unroll;
 
 describe('BrandingDirective', function () {
 
-  var $compile;
-  var $rootScope;
-  var customSettings;
+  let $compile;
+  let $rootScope;
+  let customSettings;
 
   // Settings are set and frozen when the app initializes.
   // This function allows us a way to quickly setup our environment
   // with desired settings. Note, needs to be called for angular
   // to be initialized for the test
-  var setSettingsAndBootApp = function(){
+  const setSettingsAndBootApp = function(){
 
     angular.module('app', [])
       .directive('hBranding', require('../h-branding'));
@@ -30,7 +30,7 @@ describe('BrandingDirective', function () {
 
   // convenience method to only worry about what the test
   // should be doing, applying settings variants.
-  var applyBrandingSettings = function(brandingSettings){
+  const applyBrandingSettings = function(brandingSettings){
 
     customSettings = brandingSettings ? {
       branding: brandingSettings,
@@ -42,8 +42,8 @@ describe('BrandingDirective', function () {
   // creates a new element with the attribute string provided.
   // Allowing us to do many attribute configurations before
   // compilation happens.
-  var makeElementWithAttrs = function(attrString){
-    var $element = angular.element('<span ' + attrString + ' ></span>');
+  const makeElementWithAttrs = function(attrString){
+    const $element = angular.element('<span ' + attrString + ' ></span>');
     $compile($element)($rootScope.$new());
     $rootScope.$digest();
     return $element;
@@ -61,14 +61,14 @@ describe('BrandingDirective', function () {
       appBackgroundColor: 'blue',
     });
 
-    var el = makeElementWithAttrs('h-branding="randomBackgroundColor"');
+    const el = makeElementWithAttrs('h-branding="randomBackgroundColor"');
     assert.equal(el[0].style.backgroundColor, '');
   });
 
   unroll('applies branding to elements', function (testCase) {
     applyBrandingSettings(testCase.settings);
 
-    var el = makeElementWithAttrs(testCase.attrs);
+    const el = makeElementWithAttrs(testCase.attrs);
 
     if(Array.isArray(testCase.styleChanged)){
         // we expect that if styleChanged is an array

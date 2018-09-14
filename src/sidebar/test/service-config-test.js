@@ -1,10 +1,10 @@
 'use strict';
 
-var serviceConfig = require('../service-config');
+const serviceConfig = require('../service-config');
 
 describe('serviceConfig', function () {
   it('returns null if services is not an array', function () {
-    var settings = {
+    const settings = {
       services: 'someString',
     };
 
@@ -12,7 +12,7 @@ describe('serviceConfig', function () {
   });
 
   it('returns null if the settings object has no services', function () {
-    var settings = {
+    const settings = {
       services: [],
     };
 
@@ -20,7 +20,7 @@ describe('serviceConfig', function () {
   });
 
   it('returns the first service in the settings object', function () {
-    var settings = {
+    const settings = {
       services: [{
         key: 'val',
       }],

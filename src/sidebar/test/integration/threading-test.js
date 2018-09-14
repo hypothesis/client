@@ -1,11 +1,11 @@
 'use strict';
 
-var angular = require('angular');
-var immutable = require('seamless-immutable');
+const angular = require('angular');
+const immutable = require('seamless-immutable');
 
-var unroll = require('../../../shared/test/util').unroll;
+const unroll = require('../../../shared/test/util').unroll;
 
-var fixtures = immutable({
+const fixtures = immutable({
   annotations: [{
     $orphan: false,
     id: '1',
@@ -30,16 +30,16 @@ var fixtures = immutable({
 });
 
 describe('annotation threading', function () {
-  var store;
-  var rootThread;
+  let store;
+  let rootThread;
 
   beforeEach(function () {
-    var fakeUnicode = {
+    const fakeUnicode = {
       normalize: function (s) { return s; },
       fold: function (s) { return s; },
     };
 
-    var fakeFeatures = {
+    const fakeFeatures = {
       flagEnabled: sinon.stub().returns(true),
     };
 
@@ -82,7 +82,7 @@ describe('annotation threading', function () {
   unroll('should sort annotations by #mode', function (testCase) {
     store.addAnnotations(fixtures.annotations);
     store.setSortKey(testCase.sortKey);
-    var actualOrder = rootThread.thread(store.getState()).children.map(function (thread) {
+    const actualOrder = rootThread.thread(store.getState()).children.map(function (thread) {
       return thread.annotation.id;
     });
     assert.deepEqual(actualOrder, testCase.expectedOrder);

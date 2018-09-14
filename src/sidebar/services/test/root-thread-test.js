@@ -1,17 +1,17 @@
 'use strict';
 
-var angular = require('angular');
-var proxyquire = require('proxyquire');
-var immutable = require('seamless-immutable');
+const angular = require('angular');
+const proxyquire = require('proxyquire');
+const immutable = require('seamless-immutable');
 
-var annotationFixtures = require('../../test/annotation-fixtures');
-var events = require('../../events');
-var uiConstants = require('../../ui-constants');
-var util = require('../../../shared/test/util');
+const annotationFixtures = require('../../test/annotation-fixtures');
+const events = require('../../events');
+const uiConstants = require('../../ui-constants');
+const util = require('../../../shared/test/util');
 
-var unroll = util.unroll;
+const unroll = util.unroll;
 
-var fixtures = immutable({
+const fixtures = immutable({
   emptyThread: {
     annotation: undefined,
     children: [],
@@ -24,15 +24,15 @@ var fixtures = immutable({
 });
 
 describe('rootThread', function () {
-  var fakeStore;
-  var fakeBuildThread;
-  var fakeDrafts;
-  var fakeSearchFilter;
-  var fakeViewFilter;
+  let fakeStore;
+  let fakeBuildThread;
+  let fakeDrafts;
+  let fakeSearchFilter;
+  let fakeViewFilter;
 
-  var $rootScope;
+  let $rootScope;
 
-  var rootThread;
+  let rootThread;
 
   beforeEach(function () {
     fakeStore = {
@@ -101,7 +101,7 @@ describe('rootThread', function () {
     });
 
     it('passes loaded annotations to buildThread()', function () {
-      var annotation = annotationFixtures.defaultAnnotation();
+      const annotation = annotationFixtures.defaultAnnotation();
       fakeStore.state = Object.assign({}, fakeStore.state, {
         annotations: [annotation],
       });
@@ -164,7 +164,7 @@ describe('rootThread', function () {
     }
 
     unroll('sort order is correct when sorting by #order', function (testCase) {
-      var annotations = [{
+      const annotations = [{
         target: targetWithPos(1),
         updated: 20,
       },{
@@ -184,8 +184,8 @@ describe('rootThread', function () {
         sortKeysAvailable: [testCase.order],
       });
       rootThread.thread(fakeStore.state);
-      var sortCompareFn = fakeBuildThread.args[0][1].sortCompareFn;
-      var actualOrder = sortBy(annotations, sortCompareFn).map(function (annot) {
+      const sortCompareFn = fakeBuildThread.args[0][1].sortCompareFn;
+      const actualOrder = sortBy(annotations, sortCompareFn).map(function (annot) {
         return annotations.indexOf(annot);
       });
       assert.deepEqual(actualOrder, testCase.expectedOrder);
@@ -204,9 +204,9 @@ describe('rootThread', function () {
         {selectedTab: uiConstants.TAB_ANNOTATIONS});
 
       rootThread.thread(fakeStore.state);
-      var threadFilterFn = fakeBuildThread.args[0][1].threadFilterFn;
+      const threadFilterFn = fakeBuildThread.args[0][1].threadFilterFn;
 
-      var annotation = {target: [{ selector: {} }]};
+      const annotation = {target: [{ selector: {} }]};
       assert.isDefined(threadFilterFn({annotation: annotation}));
     });
 
@@ -217,7 +217,7 @@ describe('rootThread', function () {
         {selectedTab: uiConstants.TAB_NOTES});
 
       rootThread.thread(fakeStore.state);
-      var threadFilterFn = fakeBuildThread.args[0][1].threadFilterFn;
+      const threadFilterFn = fakeBuildThread.args[0][1].threadFilterFn;
 
       assert.isTrue(threadFilterFn({annotation: {target: [{}]}}));
     });
@@ -229,9 +229,9 @@ describe('rootThread', function () {
         {selectedTab: uiConstants.TAB_ORPHANS});
 
       rootThread.thread(fakeStore.state);
-      var threadFilterFn = fakeBuildThread.args[0][1].threadFilterFn;
+      const threadFilterFn = fakeBuildThread.args[0][1].threadFilterFn;
 
-      var orphan = Object.assign(annotationFixtures.defaultAnnotation(),
+      const orphan = Object.assign(annotationFixtures.defaultAnnotation(),
         {$orphan: true});
 
       assert.isTrue(threadFilterFn({annotation: orphan}));
@@ -244,7 +244,7 @@ describe('rootThread', function () {
         {selectedTab: uiConstants.TAB_ANNOTATIONS});
 
       rootThread.thread(fakeStore.state);
-      var threadFilterFn = fakeBuildThread.args[0][1].threadFilterFn;
+      const threadFilterFn = fakeBuildThread.args[0][1].threadFilterFn;
 
       assert.isFalse(threadFilterFn({annotation: {target: [{}]}}));
     });
@@ -256,7 +256,7 @@ describe('rootThread', function () {
         {selectedTab: uiConstants.TAB_ANNOTATIONS});
 
       rootThread.thread(fakeStore.state);
-      var threadFilterFn = fakeBuildThread.args[0][1].threadFilterFn;
+      const threadFilterFn = fakeBuildThread.args[0][1].threadFilterFn;
 
       assert.isFalse(threadFilterFn({annotation: {$orphan: true}}));
     });
@@ -267,7 +267,7 @@ describe('rootThread', function () {
         {isSidebar: false});
 
       rootThread.thread(fakeStore.state);
-      var threadFilterFn = fakeBuildThread.args[0][1].threadFilterFn;
+      const threadFilterFn = fakeBuildThread.args[0][1].threadFilterFn;
 
       // There should be no thread filter function on the stream and standalone
       // pages, since we show all types of annotations here
@@ -278,13 +278,13 @@ describe('rootThread', function () {
   describe('when the filter query changes', function () {
     it('generates a thread filter function from the query', function () {
       fakeBuildThread.reset();
-      var filters = [{any: {terms: ['queryterm']}}];
-      var annotation = annotationFixtures.defaultAnnotation();
+      const filters = [{any: {terms: ['queryterm']}}];
+      const annotation = annotationFixtures.defaultAnnotation();
       fakeSearchFilter.generateFacetedFilter.returns(filters);
       fakeStore.state = Object.assign({}, fakeStore.state,
         {filterQuery: 'queryterm'});
       rootThread.thread(fakeStore.state);
-      var filterFn = fakeBuildThread.args[0][1].filterFn;
+      const filterFn = fakeBuildThread.args[0][1].filterFn;
 
       fakeViewFilter.filter.returns([annotation]);
       assert.isTrue(filterFn(annotation));
@@ -294,11 +294,11 @@ describe('rootThread', function () {
   });
 
   context('when annotation events occur', function () {
-    var annot = annotationFixtures.defaultAnnotation();
+    const annot = annotationFixtures.defaultAnnotation();
 
     unroll('adds or updates annotations when #event event occurs', function (testCase) {
       $rootScope.$broadcast(testCase.event, testCase.annotations);
-      var annotations = [].concat(testCase.annotations);
+      const annotations = [].concat(testCase.annotations);
       assert.notCalled(fakeStore.removeAnnotations);
       assert.calledWith(fakeStore.addAnnotations, sinon.match(annotations));
     }, [
@@ -309,14 +309,14 @@ describe('rootThread', function () {
     ]);
 
     it('expands the parents of new annotations', function () {
-      var reply = annotationFixtures.oldReply();
+      const reply = annotationFixtures.oldReply();
       $rootScope.$broadcast(events.BEFORE_ANNOTATION_CREATED, reply);
       assert.calledWith(fakeStore.setCollapsed, reply.references[0], false);
     });
 
     unroll('removes annotations when #event event occurs', function (testCase) {
       $rootScope.$broadcast(testCase.event, testCase.annotations);
-      var annotations = [].concat(testCase.annotations);
+      const annotations = [].concat(testCase.annotations);
       assert.calledWith(fakeStore.removeAnnotations, sinon.match(annotations));
     }, [
       {event: events.ANNOTATION_DELETED, annotations: annot},
@@ -329,8 +329,8 @@ describe('rootThread', function () {
     });
 
     describe('when a new annotation is created', function () {
-      var existingNewAnnot;
-      var onDelete;
+      let existingNewAnnot;
+      let onDelete;
       beforeEach(function () {
         onDelete = sinon.stub();
         $rootScope.$on(events.ANNOTATION_DELETED, onDelete);
@@ -341,7 +341,7 @@ describe('rootThread', function () {
 
       it('removes drafts for new and empty annotations', function () {
         fakeDrafts.getIfNotEmpty.returns(null);
-        var annotation = annotationFixtures.newEmptyAnnotation();
+        const annotation = annotationFixtures.newEmptyAnnotation();
 
         $rootScope.$broadcast(events.BEFORE_ANNOTATION_CREATED,
           annotation);
@@ -351,7 +351,7 @@ describe('rootThread', function () {
 
       it('deletes new and empty annotations', function () {
         fakeDrafts.getIfNotEmpty.returns(null);
-        var annotation = annotationFixtures.newEmptyAnnotation();
+        const annotation = annotationFixtures.newEmptyAnnotation();
 
         $rootScope.$broadcast(events.BEFORE_ANNOTATION_CREATED,
           annotation);
@@ -370,7 +370,7 @@ describe('rootThread', function () {
       });
 
       it('does not remove saved annotations', function () {
-        var ann = annotationFixtures.defaultAnnotation();
+        const ann = annotationFixtures.defaultAnnotation();
         fakeStore.state.annotations = [ann];
 
         $rootScope.$broadcast(events.BEFORE_ANNOTATION_CREATED,

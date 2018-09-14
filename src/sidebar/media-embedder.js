@@ -1,13 +1,13 @@
 'use strict';
 
-var queryString = require('query-string');
+const queryString = require('query-string');
 
 /**
 * Return an HTML5 audio player with the given src URL.
 */
 
 function audioElement(src) {
-  var html5audio = document.createElement('audio');
+  const html5audio = document.createElement('audio');
   html5audio.controls = true;
   html5audio.src      =  src;
   return html5audio;
@@ -17,7 +17,7 @@ function audioElement(src) {
  * Return an iframe DOM element with the given src URL.
  */
 function iframe(src) {
-  var iframe_ = document.createElement('iframe');
+  const iframe_ = document.createElement('iframe');
   iframe_.src = src;
   iframe_.classList.add('annotation-media-embed');
   iframe_.setAttribute('frameborder', '0');
@@ -39,14 +39,14 @@ function iframe(src) {
  * formatYouTubeTime('10'); // returns '10'
  **/
 function parseTimeString (timeValue) {
-  var timePattern = /(\d+)([hms]?)/g;
+  const timePattern = /(\d+)([hms]?)/g;
   const multipliers = {
     h: 60 * 60,
     m: 60,
     s: 1,
   };
-  var seconds = 0;
-  var match;
+  let seconds = 0;
+  let match;
   // match[1] - Numeric value
   // match[2] - Unit (e.g. 'h','m','s', or empty)
   while ((match = timePattern.exec(timeValue)) !== null) {
@@ -73,7 +73,7 @@ function parseTimeString (timeValue) {
  * // - param keys are sorted
  */
 function youTubeQueryParams(link) {
-  var query;
+  let query;
   const allowedParams = [
     'end',
     'start',
@@ -122,7 +122,7 @@ function vimeoEmbed(id) {
  * the link, or a DOM element if it can.
  *
  */
-var embedGenerators = [
+const embedGenerators = [
 
   // Matches URLs like https://www.youtube.com/watch?v=rw6oWkCojpw
   function iframeFromYouTubeWatchURL(link) {
@@ -134,7 +134,7 @@ var embedGenerators = [
       return null;
     }
 
-    var groups = /[&\?]v=([^&#]+)/.exec(link.search);
+    const groups = /[&\?]v=([^&#]+)/.exec(link.search);
     if (groups) {
       return youTubeEmbed(groups[1], link);
     }
@@ -148,7 +148,7 @@ var embedGenerators = [
     }
 
     // extract video ID from URL
-    var groups = /^\/([^\/]+)\/?$/.exec(link.pathname);
+    const groups = /^\/([^\/]+)\/?$/.exec(link.pathname);
     if (groups) {
       return youTubeEmbed(groups[1], link);
     }
@@ -161,7 +161,7 @@ var embedGenerators = [
       return null;
     }
 
-    var groups = /^\/([^\/\?#]+)\/?$/.exec(link.pathname);
+    const groups = /^\/([^\/\?#]+)\/?$/.exec(link.pathname);
     if (groups) {
       return vimeoEmbed(groups[1]);
     }
@@ -174,7 +174,7 @@ var embedGenerators = [
       return null;
     }
 
-    var groups = /^\/channels\/[^\/]+\/([^\/?#]+)\/?$/.exec(link.pathname);
+    const groups = /^\/channels\/[^\/]+\/([^\/?#]+)\/?$/.exec(link.pathname);
     if (groups) {
       return vimeoEmbed(groups[1]);
     }
@@ -206,20 +206,20 @@ var embedGenerators = [
     }
 
     // Extract the unique slug from the path.
-    var slugMatch = /^\/(embed|details)\/(.+)/.exec(link.pathname);
+    const slugMatch = /^\/(embed|details)\/(.+)/.exec(link.pathname);
     if (!slugMatch) {
       return null;
     }
 
     // Extract start and end times, which may appear either as query string
     // params or path params.
-    var slug = slugMatch[2];
-    var linkParams = queryString.parse(link.search);
-    var startTime = linkParams.start;
-    var endTime = linkParams.end;
+    let slug = slugMatch[2];
+    const linkParams = queryString.parse(link.search);
+    let startTime = linkParams.start;
+    let endTime = linkParams.end;
 
     if (!startTime) {
-      var startPathParam = slug.match(/\/start\/([^\/]+)/);
+      const startPathParam = slug.match(/\/start\/([^\/]+)/);
       if (startPathParam) {
         startTime = startPathParam[1];
         slug = slug.replace(startPathParam[0], '');
@@ -227,7 +227,7 @@ var embedGenerators = [
     }
 
     if (!endTime) {
-      var endPathParam = slug.match(/\/end\/([^\/]+)/);
+      const endPathParam = slug.match(/\/end\/([^\/]+)/);
       if (endPathParam) {
         endTime = endPathParam[1];
         slug = slug.replace(endPathParam[0], '');
@@ -235,7 +235,7 @@ var embedGenerators = [
     }
 
     // Generate embed URL.
-    var iframeUrl = new URL(`https://archive.org/embed/${slug}`);
+    const iframeUrl = new URL(`https://archive.org/embed/${slug}`);
     if (startTime) {
       iframeUrl.searchParams.append('start', startTime);
     }
@@ -266,8 +266,8 @@ var embedGenerators = [
  *
  */
 function embedForLink(link) {
-  var embed;
-  var j;
+  let embed;
+  let j;
   for (j = 0; j < embedGenerators.length; j++) {
     embed = embedGenerators[j](link);
     if (embed) {
@@ -307,7 +307,7 @@ function replaceLinkWithEmbed(link) {
   if (link.href !== link.textContent && decodeURI(link.href) !== link.textContent) {
     return;
   }
-  var embed = embedForLink(link);
+  const embed = embedForLink(link);
   if (embed){
     link.parentElement.replaceChild(embed, link);
   }
@@ -321,7 +321,7 @@ function replaceLinkWithEmbed(link) {
  *
  */
 function replaceLinksWithEmbeds(element) {
-  var links = element.getElementsByTagName('a');
+  let links = element.getElementsByTagName('a');
 
   // `links` is a "live list" of the <a> element children of `element`.
   // We want to iterate over `links` and replace some of them with embeds,
@@ -329,7 +329,7 @@ function replaceLinksWithEmbeds(element) {
   // a nice, normal array first.
   links = Array.prototype.slice.call(links, 0);
 
-  var i;
+  let i;
   for (i = 0; i < links.length; i++) {
     replaceLinkWithEmbed(links[i]);
   }

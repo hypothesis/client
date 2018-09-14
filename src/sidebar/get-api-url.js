@@ -1,6 +1,6 @@
 'use strict';
 
-var serviceConfig = require('./service-config');
+const serviceConfig = require('./service-config');
 
 /**
  * Function that returns apiUrl from the settings object.
@@ -11,7 +11,7 @@ var serviceConfig = require('./service-config');
  *
  */
 function getApiUrl(settings) {
-  var service = serviceConfig(settings);
+  const service = serviceConfig(settings);
 
   if (service) {
     // If the host page contains a service setting then the client should default to

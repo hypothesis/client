@@ -12,7 +12,7 @@ class FakeWindow {
 
     this.location = 'https://client.hypothes.is/app.html';
     this.open = sinon.spy(href => {
-      var win = new FakeWindow;
+      const win = new FakeWindow;
       win.location = href;
       return win;
     });
@@ -48,7 +48,7 @@ class FakeWindow {
   }
 
   sendMessage(data) {
-    var evt = new MessageEvent('message', { data });
+    const evt = new MessageEvent('message', { data });
     this.trigger(evt);
   }
 }

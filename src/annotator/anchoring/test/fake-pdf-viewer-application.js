@@ -1,6 +1,6 @@
 'use strict';
 
-var RenderingStates = require('../../pdfjs-rendering-states');
+const RenderingStates = require('../../pdfjs-rendering-states');
 
 /**
  * @typedef {Object} Options
@@ -30,7 +30,7 @@ function FakePDFViewerApplication(options) {
   this._container = options.container;
   this._pages = [];
 
-  var self = this;
+  const self = this;
 
   this.pdfViewer = {
     pagesCount: options.content.length,
@@ -38,8 +38,8 @@ function FakePDFViewerApplication(options) {
     getPageView: function (index) {
       checkBounds(index);
 
-      var page = self._pages[index];
-      var textLayerEl = page.querySelector('.textLayer');
+      const page = self._pages[index];
+      const textLayerEl = page.querySelector('.textLayer');
 
       return {
         div: page,
@@ -85,18 +85,18 @@ FakePDFViewerApplication.prototype.dispose = function () {
  * @return {Element} - The root Element for the page
  */
 function createPage(content, rendered) {
-  var pageEl = document.createElement('div');
+  const pageEl = document.createElement('div');
   pageEl.classList.add('page');
 
   if (!rendered) {
     return pageEl;
   }
 
-  var textLayer = document.createElement('div');
+  const textLayer = document.createElement('div');
   textLayer.classList.add('textLayer');
 
   content.split(/\n/).forEach(function (item) {
-    var itemEl = document.createElement('div');
+    const itemEl = document.createElement('div');
     itemEl.textContent = item;
     textLayer.appendChild(itemEl);
   });
@@ -112,11 +112,11 @@ function createPage(content, rendered) {
  * For other pages, there will only be a placeholder element for the whole page.
  */
 FakePDFViewerApplication.prototype.setCurrentPage = function (index) {
-  var self = this;
+  const self = this;
 
   this._checkBounds(index);
 
-  var pages = this._content.map(function (text, idx) {
+  const pages = this._content.map(function (text, idx) {
     return createPage(text, idx === index /* rendered */);
   });
 

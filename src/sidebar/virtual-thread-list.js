@@ -1,7 +1,7 @@
 'use strict';
 
-var EventEmitter = require('tiny-emitter');
-var debounce = require('lodash.debounce');
+const EventEmitter = require('tiny-emitter');
+const debounce = require('lodash.debounce');
 
 /**
  * @typedef Options
@@ -36,7 +36,7 @@ class VirtualThreadList extends EventEmitter {
   constructor($scope, window_, rootThread, options) {
     super();
 
-    var self = this;
+    const self = this;
 
     this._rootThread = rootThread;
 
@@ -48,7 +48,7 @@ class VirtualThreadList extends EventEmitter {
     this.window = window_;
     this.scrollRoot = options.scrollRoot || document.body;
 
-    var debouncedUpdate = debounce(function () {
+    const debouncedUpdate = debounce(function () {
       self._updateVisibleThreads();
       $scope.$digest();
     }, 20);
@@ -106,15 +106,15 @@ class VirtualThreadList extends EventEmitter {
   _height(id) {
     // Default guess of the height required for a threads that have not been
     // measured
-    var DEFAULT_HEIGHT = 200;
+    const DEFAULT_HEIGHT = 200;
     return this._heights[id] || DEFAULT_HEIGHT;
   }
 
   /** Return the vertical offset of an annotation card from the top of the list. */
   yOffsetOf(id) {
-    var self = this;
-    var allThreads = this._rootThread.children;
-    var matchIndex = allThreads.findIndex(function (thread) {
+    const self = this;
+    const allThreads = this._rootThread.children;
+    const matchIndex = allThreads.findIndex(function (thread) {
       return thread.id === id;
     });
     if (matchIndex === -1) {
@@ -134,37 +134,37 @@ class VirtualThreadList extends EventEmitter {
   _updateVisibleThreads() {
     // Space above the viewport in pixels which should be considered 'on-screen'
     // when calculating the set of visible threads
-    var MARGIN_ABOVE = 800;
+    const MARGIN_ABOVE = 800;
     // Same as MARGIN_ABOVE but for the space below the viewport
-    var MARGIN_BELOW = 800;
+    const MARGIN_BELOW = 800;
 
     // Estimated height in pixels of annotation cards which are below the
     // viewport and not actually created. This is used to create an empty spacer
     // element below visible cards in order to give the list's scrollbar the
     // correct dimensions.
-    var offscreenLowerHeight = 0;
+    let offscreenLowerHeight = 0;
     // Same as offscreenLowerHeight but for cards above the viewport.
-    var offscreenUpperHeight = 0;
+    let offscreenUpperHeight = 0;
     // List of annotations which are in or near the viewport and need to
     // actually be created.
-    var visibleThreads = [];
+    const visibleThreads = [];
 
     // List of annotations which are required to be rendered but we do not
     // want them visible. This is to ensure that we allow items to be rendered
     // and initialized (for saving purposes) without having them be presented
     // in out of context scenarios (i.e. in wrong order for sort)
-    var invisibleThreads = [];
+    const invisibleThreads = [];
 
-    var allThreads = this._rootThread.children;
-    var visibleHeight = this.window.innerHeight;
-    var usedHeight = 0;
-    var thread;
+    const allThreads = this._rootThread.children;
+    const visibleHeight = this.window.innerHeight;
+    let usedHeight = 0;
+    let thread;
 
-    for (var i = 0; i < allThreads.length; i++) {
+    for (let i = 0; i < allThreads.length; i++) {
       thread = allThreads[i];
-      var threadHeight = this._height(thread.id);
+      const threadHeight = this._height(thread.id);
 
-      var added = false;
+      let added = false;
 
       if (usedHeight + threadHeight < this.scrollRoot.scrollTop - MARGIN_ABOVE) {
         // Thread is above viewport

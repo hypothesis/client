@@ -1,6 +1,6 @@
 'use strict';
 
-var configFrom = require('./config/index');
+const configFrom = require('./config/index');
 require('../shared/polyfills');
 
 
@@ -17,14 +17,14 @@ if (window.wgxpath) {
   window.wgxpath.install();
 }
 
-var $ = require('jquery');
+const $ = require('jquery');
 
 // Applications
-var Guest = require('./guest');
-var Sidebar = require('./sidebar');
-var PdfSidebar = require('./pdf-sidebar');
+const Guest = require('./guest');
+const Sidebar = require('./sidebar');
+const PdfSidebar = require('./pdf-sidebar');
 
-var pluginClasses = {
+const pluginClasses = {
   // UI plugins
   BucketBar: require('./plugin/bucket-bar'),
   Toolbar: require('./plugin/toolbar'),
@@ -37,11 +37,11 @@ var pluginClasses = {
   CrossFrame: require('./plugin/cross-frame'),
 };
 
-var appLinkEl = document.querySelector('link[type="application/annotator+html"][rel="sidebar"]');
-var config = configFrom(window);
+const appLinkEl = document.querySelector('link[type="application/annotator+html"][rel="sidebar"]');
+const config = configFrom(window);
 
 $.noConflict(true)(function() {
-  var Klass = window.PDFViewerApplication ?
+  let Klass = window.PDFViewerApplication ?
       PdfSidebar :
       Sidebar;
 
@@ -65,7 +65,7 @@ $.noConflict(true)(function() {
 
   config.pluginClasses = pluginClasses;
 
-  var annotator = new Klass(document.body, config);
+  const annotator = new Klass(document.body, config);
   appLinkEl.addEventListener('destroy', function () {
     appLinkEl.parentElement.removeChild(appLinkEl);
     annotator.destroy();

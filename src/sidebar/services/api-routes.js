@@ -1,6 +1,6 @@
 'use strict';
 
-var { retryPromiseOperation } = require('../util/retry');
+const { retryPromiseOperation } = require('../util/retry');
 
 /**
  * A service which fetches and caches API route metadata.
@@ -8,10 +8,10 @@ var { retryPromiseOperation } = require('../util/retry');
 // @ngInject
 function apiRoutes($http, settings) {
   // Cache of route name => route metadata from API root.
-  var routeCache;
+  let routeCache;
   // Cache of links to pages on the service fetched from the API's "links"
   // endpoint.
-  var linkCache;
+  let linkCache;
 
   function getJSON(url) {
     return $http.get(url).then(({ status, data }) => {

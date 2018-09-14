@@ -10,11 +10,11 @@
  *     {url: '/things/foo', params: {q: 'bar'}}
  */
 function replaceURLParams(url, params) {
-  var unusedParams = {};
-  for (var param in params) {
+  const unusedParams = {};
+  for (const param in params) {
     if (params.hasOwnProperty(param)) {
-      var value = params[param];
-      var urlParam = ':' + param;
+      const value = params[param];
+      const urlParam = ':' + param;
       if (url.indexOf(urlParam) !== -1) {
         url = url.replace(urlParam, encodeURIComponent(value));
       } else {

@@ -1,12 +1,12 @@
 'use strict';
 
-var Permissions = require('../permissions');
+const Permissions = require('../permissions');
 
-var userid = 'acct:flash@gord.on';
+const userid = 'acct:flash@gord.on';
 
 describe('permissions', function () {
-  var fakeLocalStorage;
-  var permissions;
+  let fakeLocalStorage;
+  let permissions;
 
   beforeEach(function () {
     fakeLocalStorage = {
@@ -64,25 +64,25 @@ describe('permissions', function () {
 
   describe('#isShared', function () {
     it('returns true if a group can read the annotation', function () {
-      var perms = permissions.shared(userid, 'gid');
+      const perms = permissions.shared(userid, 'gid');
       assert.isTrue(permissions.isShared(perms));
     });
 
     it('returns false if only specific users can read the annotation', function () {
-      var perms = permissions.private(userid);
+      const perms = permissions.private(userid);
       assert.isFalse(permissions.isShared(perms));
     });
   });
 
   describe('#permits', function () {
     it('returns true if the user can perform the action', function () {
-      var perms = permissions.private(userid);
+      const perms = permissions.private(userid);
       assert.isTrue(permissions.permits(perms, 'update', userid));
       assert.isTrue(permissions.permits(perms, 'delete', userid));
     });
 
     it('returns false if the user cannot perform the action', function () {
-      var perms = permissions.private('acct:not.flash@gord.on');
+      const perms = permissions.private('acct:not.flash@gord.on');
       assert.isFalse(permissions.permits(perms, 'update', userid));
       assert.isFalse(permissions.permits(perms, 'delete', userid));
     });

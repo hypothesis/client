@@ -3,8 +3,8 @@
 
 'use strict';
 
-var unroll = require('../../../shared/test/util').unroll;
-var Guest = require('../../guest');
+const unroll = require('../../../shared/test/util').unroll;
+const Guest = require('../../guest');
 
 function quoteSelector(quote) {
   return {
@@ -45,9 +45,9 @@ function FakeCrossFrame() {
 }
 
 describe('anchoring', function () {
-  var guest;
-  var guestConfig;
-  var container;
+  let guest;
+  let guestConfig;
+  let container;
 
   before(function () {
     guestConfig = {pluginClasses: {CrossFrame: FakeCrossFrame}};
@@ -68,20 +68,20 @@ describe('anchoring', function () {
   });
 
   unroll('should highlight #tag when annotations are loaded', function (testCase) {
-    var normalize = function (quotes) {
+    const normalize = function (quotes) {
       return quotes.map(function (q) { return simplifyWhitespace(q); });
     };
 
-    var annotations = testCase.quotes.map(function (q) {
+    const annotations = testCase.quotes.map(function (q) {
       return annotateQuote(q);
     });
 
-    var anchored = annotations.map(function (ann) {
+    const anchored = annotations.map(function (ann) {
       return guest.anchor(ann);
     });
 
     return Promise.all(anchored).then(function () {
-      var assertFn = testCase.expectFail ? assert.notDeepEqual : assert.deepEqual;
+      const assertFn = testCase.expectFail ? assert.notDeepEqual : assert.deepEqual;
       assertFn(normalize(highlightedPhrases(container)),
                normalize(testCase.quotes));
     });
