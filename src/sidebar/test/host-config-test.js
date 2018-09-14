@@ -16,6 +16,7 @@ describe('hostPageConfig', function () {
       annotations: '1234',
       appType: 'bookmarklet',
       openSidebar: true,
+      requestConfigFromFrame: 'https://embedder.com',
       showHighlights: true,
       services: [{
         authority: 'hypothes.is',
@@ -26,6 +27,7 @@ describe('hostPageConfig', function () {
       annotations: '1234',
       appType: 'bookmarklet',
       openSidebar: true,
+      requestConfigFromFrame: 'https://embedder.com',
       showHighlights: true,
       services: [{
         authority: 'hypothes.is',

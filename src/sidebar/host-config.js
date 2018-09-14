@@ -35,6 +35,9 @@ function hostPageConfig(window) {
     // This should be removed once new note button is enabled for everybody.
     'enableExperimentalNewNoteButton',
 
+    // Fetch config from a parent frame.
+    'requestConfigFromFrame',
+
     // Theme which can either be specified as 'clean'.
     // If nothing is the specified the classic look is applied.
     'theme',
