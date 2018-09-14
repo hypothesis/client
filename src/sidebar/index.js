@@ -2,7 +2,7 @@
 
 const addAnalytics = require('./ga');
 const disableOpenerForExternalLinks = require('./util/disable-opener-for-external-links');
-const getApiUrl = require('./get-api-url');
+const { fetchConfig } = require('./util/fetch-config');
 const serviceConfig = require('./service-config');
 const crossOriginRPC = require('./cross-origin-rpc.js');
 require('../shared/polyfills');
@@ -111,19 +111,6 @@ function configureCompile($compileProvider) {
 // @ngInject
 function setupHttp($http, streamer) {
   $http.defaults.headers.common['X-Client-Id'] = streamer.clientId;
-}
-
-/**
- * Merge settings rendered into sidebar app HTML page with
- * settings provided by the embedder of Hypothesis.
- */
-function fetchConfig(appConfig) {
-  const hostPageConfig = require('./host-config');
-  const mergedConfig = Object.assign({}, appConfig, hostPageConfig(window));
-
-  mergedConfig.apiUrl = getApiUrl(mergedConfig);
-
-  return Promise.resolve(mergedConfig);
 }
 
 function startAngularApp(config) {
@@ -257,5 +244,8 @@ function startAngularApp(config) {
 fetchConfig(appConfig).then(config => {
   startAngularApp(config);
 }).catch(err => {
-  console.error(err);
+  // Report error. This will be the only notice that the user gets because the
+  // sidebar does not currently appear at all if the Angular app fails to
+  // start.
+  console.error('Failed to start Hypothesis client: ', err);
 });
