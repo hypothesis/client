@@ -4,6 +4,19 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+### Changed
+
+- Update to Node 10 for Jenkins and Travis builds
+  ([#761](https://github.com/hypothesis/client/pull/761)).
+
+- Add documentation for externalContainerSelector
+  ([#746](https://github.com/hypothesis/client/pull/746)).
+
+- Fetch config via postMessage RPC if `requestConfigFromFrame` is set
+  ([#771](https://github.com/hypothesis/client/pull/771)).
+
 ## [1.89.0] - 2018-08-22
 
 ### Changed
