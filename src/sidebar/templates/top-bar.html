@@ -46,12 +46,13 @@
       sort-key="vm.sortKey"
       on-change-sort-key="vm.onChangeSortKey({sortKey: sortKey})">
     </sort-dropdown>
-    <a class="top-bar__btn"
+    <button class="top-bar__btn"
        ng-click="vm.onSharePage()"
        ng-if="vm.showSharePageButton()"
-       title="Share this page">
+       title="Share this page"
+       aria-label="Share this page">
       <i class="h-icon-annotation-share"></i>
-    </a>
+    </button>
     <login-control
       class="login-control"
       auth="vm.auth"
