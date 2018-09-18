@@ -4,6 +4,15 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+### Changed
+
+- Add aria label to share button in client menu
+  ([#773](https://github.com/hypothesis/client/pull/773)).
+
+- Update core-js ([#770](https://github.com/hypothesis/client/pull/770)).
+
 ## [1.90.0] - 2018-09-14
 
 ### Changed
