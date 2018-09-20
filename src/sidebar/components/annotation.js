@@ -35,6 +35,7 @@ function AnnotationController(
 
   /** Save an annotation to the server. */
   function save(annot) {
+
     var saved;
     var updating = !!annot.id;
 
@@ -286,7 +287,9 @@ function AnnotationController(
     *   otherwise.
     */
   this.hasContent = function() {
-    return self.state().text.length > 0 || self.state().tags.length > 0;
+    // Note: Tags are not a criteria for content validity.
+    // return self.state().text.length > 0 || self.state().tags.length > 0
+    return self.state().text.length > 0;
   };
 
   /**
@@ -545,17 +548,24 @@ function AnnotationController(
   this.state = function () {
     // This is the data that will return to me.
     // var tags = ["bug=bugType:bz;bugID:24918249;status:A"];
-    var tags = [{'bug':{
-      'bugType':'BZ',
-      'bugID':'1466411',
-      'status':'A'
-    }}];
+    var tags = [];
+    var feedbackStatus = {};
 
-    // Find the object that has the 'bug' attribute and return it as a status/
-    // The reason of doing this, not to change the type of tags in the structure.
-    var feedbackStatus = tags.find(function(tag){
-      return tag.bug !== undefined;
-    });
+    if (self.annotation.tags.length !== 0) {
+      // This is for temporary data. It should be removed when backend send the data in the format below.
+      tags = [{'bug':{
+        'bugType':'BZ',
+        'bugID':'1466411',
+        'status':'A'
+      }}];
+
+      // Find the object that has the 'bug' attribute and return it as a status/
+      // The reason of doing this, not to change the type of tags in the structure.
+      feedbackStatus = self.annotation.tags.find(function(tag){
+        return tag.bug !== undefined;
+      });
+    }
+
 
     var draft = drafts.get(self.annotation);
     if (draft) {
@@ -564,12 +574,12 @@ function AnnotationController(
     return {
       status: feedbackStatus,
       text: self.annotation.text,
-      isPrivate: !permissions.isShared(self.annotation.permissions,
-                                       self.annotation.user),
+      isPrivate: !permissions.isShared(self.annotation.permissions,self.annotation.user),
     };
 
   };
 
+  // It is invoked in the template to return the status and the icon.
   this.feedbackStatus = function(status, type){
     var feedbackStatus = {
       'A' : {'status':'opened', 'icon':'h-icon-visibility'},
@@ -588,9 +598,8 @@ function AnnotationController(
     self.collapseFeedback = !self.collapseFeedback;
   };
 
-
   this.isResolved = function(){
-    return self.state().status.bug.status === 'C';
+    return self.state.tags && self.state().status.bug.status === 'C';
   };
 
   /**

@@ -1,4 +1,4 @@
-<header class="annotation-header" ng-if="!vm.user()">
+  <header class="annotation-header" ng-if="!vm.user()">
   <strong>{{'You must be logged in to leave feedback.' | translate}}</strong>
 </header>
 
@@ -177,9 +177,9 @@
     </div>
   </footer>
 
-  <hr />
+
   <div class="annotation-body u-layout-row tags tags-read-only"
-       ng-if="(vm.canCollapseBody || vm.state().status) && !vm.editing()">
+       ng-if="(vm.canCollapseBody || vm.state().status) && !vm.editing() && !vm.isCreateModeOn()">
     <!-- <ul class="tag-list">
       <li class="tag-item" ng-repeat="tag in vm.state().tags">
         <a ng-href="{{vm.tagSearchURL(tag)}}" target="_blank">{{tag}}</a>
@@ -188,7 +188,7 @@
     <a ng-click="vm.toggleCollapsedFeedback($event)">
       <i ng-class="{'h-icon-arrow-right': vm.collapseFeedback, 'h-icon-arrow-drop-down': !vm.collapseFeedback}" ng-if="vm.isResolved()" ></i>
     </a>
-    <div class="feedback-bug-status" ng-init="bug = vm.state().status.bug">
+    <div  class="feedback-bug-status" ng-init="bug = vm.state().status.bug">
       <!-- Find a better way to do this, do not duplicate the p. -->
       <p ng-if="vm.isResolved()">{{vm.feedbackStatus(bug.status, "status")}} by</p>
       <a href="https://bugzilla.redhat.com/show_bug.cgi?id={{bug.bugID}}" target="_blank">{{bug.bugType}}#{{bug.bugID}}</a>
