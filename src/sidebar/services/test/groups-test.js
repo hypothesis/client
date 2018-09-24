@@ -314,7 +314,7 @@ describe('groups', function() {
       return s.leave('id2').then(() => {
         assert.calledWithMatch(fakeApi.group.member.delete, {
           pubid: 'id2',
-          user: 'me',
+          userid: 'me',
         });
       });
     });
