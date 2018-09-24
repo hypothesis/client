@@ -169,7 +169,7 @@ function groups($rootScope, store, api, isSidebar, localStorage, serviceUrl, ses
     // by optimistically updating the session state
     return api.group.member.delete({
       pubid: id,
-      user: 'me',
+      userid: 'me',
     });
   }
 
