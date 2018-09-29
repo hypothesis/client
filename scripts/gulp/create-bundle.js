@@ -12,6 +12,7 @@ const coffeeify = require('coffeeify');
 const exorcist = require('exorcist');
 const gulpUtil = require('gulp-util');
 const mkdirp = require('mkdirp');
+const through = require('through2');
 const uglifyify = require('uglifyify');
 const watchify = require('watchify');
 
@@ -26,6 +27,51 @@ function streamFinished(stream) {
 
 function waitForever() {
   return new Promise(function () {});
+}
+
+/**
+ * Create a transform stream which wraps code from the input with a function
+ * which is immediately executed (aka. an "IIFE").
+ *
+ * @param {string} headerCode - Code added at the start of the wrapper function.
+ * @param {string} trailerCode - Code added at the end of the wrapper function.
+ * @return {Transform} - A Node `Transform` stream.
+ */
+function wrapCodeWithFunction(headerCode, trailerCode='') {
+  const iifeStart = '(function() {' + headerCode + ';';
+  const iifeEnd = ';' + trailerCode + '})()';
+
+  let isFirstChunk = true;
+  return through(function (data, enc, callback) {
+    if (isFirstChunk) {
+      isFirstChunk = false;
+      this.push(Buffer.from(iifeStart));
+    }
+    this.push(data);
+    callback();
+  }, function (callback) {
+    this.push(Buffer.from(iifeEnd));
+    callback();
+  });
+}
+
+/**
+ * Wrap a Browserify bundle's code to change the name of the `require` function
+ * which the bundle uses to load modules defined in other bundles.
+ *
+ * Use this together with Browserify's `externalRequireName` option to define/use
+ * a different name for the `require` function. This is useful to avoid conflicts
+ * with other code on the page which define/use "require".
+ *
+ * @param {string} name - Replacement name for the `require` function.
+ * @return {Transform} - A node `Transform` stream.
+ */
+function useExternalRequireName(name) {
+  // Make the `require` lookup inside the bundle find `name` in the global
+  // scope exported by a previous bundle, instead of `require`.
+  return wrapCodeWithFunction(
+    `var require=("function"==typeof ${name}&&${name})`
+  );
 }
 
 /**
@@ -65,6 +111,11 @@ module.exports = function createBundle(config, buildOpts) {
 
   buildOpts = buildOpts || {watch: false};
 
+  // Use a custom name for the "require" function that bundles use to export
+  // and import modules from other bundles. This avoids conflicts with eg.
+  // pages that use RequireJS.
+  const externalRequireName = 'hypothesisRequire';
+
   const bundleOpts = {
     debug: true,
     extensions: ['.coffee'],
@@ -86,6 +137,7 @@ module.exports = function createBundle(config, buildOpts) {
       '_process',
       'querystring',
     ],
+    externalRequireName,
     insertGlobalVars: {
       // The Browserify polyfill for the `Buffer` global is large and
       // unnecessary, but can get pulled into the bundle by modules that can
@@ -179,8 +231,10 @@ module.exports = function createBundle(config, buildOpts) {
     b.on('error', function (err) {
       log('Build error', err.toString());
     });
-    const stream = b.pipe(exorcist(sourcemapPath))
-      .pipe(output);
+    const stream = (b
+      .pipe(useExternalRequireName(externalRequireName))
+      .pipe(exorcist(sourcemapPath))
+      .pipe(output));
     return streamFinished(stream);
   }
 
