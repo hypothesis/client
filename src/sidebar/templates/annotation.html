@@ -60,23 +60,6 @@
                      show-document-info="vm.showDocumentInfo">
   </annotation-header>
 
-  <div ng-if="vm.deleteConfirmation" class="delete-confirmation">
-    <p>Are you sure?</p>
-    <div>
-      <button class="delete-cancel btn-clean btn-cancel" ng-click="vm.deleteConfirmation=false;">Cancel</button>
-      <button class="delete-confirmation-yes btn-app btn-delete" ng-click="vm.delete()">Delete</button>
-    </div>
-  </div>
-
-</div>
-  <!-- Tags -->
-  <div class="annotation-body form-field" ng-if="vm.editing() && !vm.isThemeCustom">
-    <tag-editor tags="vm.state().tags" on-edit-tags="vm.setTags(tags)"></tag-editor>
-  </div>
-
-
-  <!-- / Tags -->
-
   <footer class="annotation-footer">
     <div class="annotation-form-actions" ng-if="vm.editing()">
       <publish-annotation-btn
@@ -177,29 +160,37 @@
     </div>
   </footer>
 
+  <div ng-if="vm.deleteConfirmation" class="delete-confirmation">
+    <p>Are you sure?</p>
+    <div>
+      <button class="delete-cancel btn-clean btn-cancel" ng-click="vm.deleteConfirmation=false;">Cancel</button>
+      <button class="delete-confirmation-yes btn-app btn-delete" ng-click="vm.delete()">Delete</button>
+    </div>
+  </div>
 
-  <div class="annotation-body u-layout-row tags tags-read-only"
+</div>
+  <!-- Tags -->
+  <div ng-if="vm.editing() && !vm.isThemeCustom">
+    <tag-editor tags="vm.state().tags" on-edit-tags="vm.setTags(tags)"></tag-editor>
+  </div>
+  <!-- / Tags -->
+
+  <div class="bug-status-collapse" ng-click="vm.toggleCollapsedFeedback($event)"
        ng-if="(vm.canCollapseBody || vm.state().status) && !vm.editing() && !vm.isCreateModeOn()">
     <!-- <ul class="tag-list">
       <li class="tag-item" ng-repeat="tag in vm.state().tags">
         <a ng-href="{{vm.tagSearchURL(tag)}}" target="_blank">{{tag}}</a>
       </li>
     </ul> -->
-    <a ng-click="vm.toggleCollapsedFeedback($event)">
-      <i ng-class="{'h-icon-arrow-right': vm.collapseFeedback, 'h-icon-arrow-drop-down': !vm.collapseFeedback}" ng-if="vm.isResolved()" ></i>
-    </a>
-    <div  class="feedback-bug-status" ng-init="bug = vm.state().status.bug">
+
+    <span ng-class="{'h-icon-chevron-right rotate': vm.collapseFeedback, 'h-icon-chevron-right': !vm.collapseFeedback}" ng-if="vm.isResolved()" style="font-size:22px;height:fit-content;"></span>
+    <div class="feedback-bug-status" ng-init="bug = vm.state().status.bug">
       <!-- Find a better way to do this, do not duplicate the p. -->
-      <p ng-if="vm.isResolved()">{{vm.feedbackStatus(bug.status, "status")}} by</p>
-      <a href="https://bugzilla.redhat.com/show_bug.cgi?id={{bug.bugID}}" target="_blank">{{bug.bugType}}#{{bug.bugID}}</a>
-      <p ng-if="!vm.isResolved()">{{vm.feedbackStatus(bug.status, "status")}}</p>
-      <i class="{{vm.feedbackStatus(bug.status, 'icon')}}"></i>
+      <p class="bug-status-resolved" ng-if="vm.isResolved()">{{vm.feedbackStatus(bug.status, "status")}} by</p>
+      <a class="bug-status-link" ng-click="$event.stopPropagation()" href="https://bugzilla.redhat.com/show_bug.cgi?id={{bug.bugID}}" target="_blank">{{bug.bugType}}#{{bug.bugID}}</a>
+      <p class="bug-status-opened" ng-if="!vm.isResolved()">{{vm.feedbackStatus(bug.status, "status")}}</p>
+      <i class="{{vm.feedbackStatus(bug.status, 'icon')}} bug-status-icon"></i>
     </div>
-    <div class="u-stretch"></div>
-    <a class="annotation-link u-strong" ng-if="vm.isThemeCustom" ng-show="vm.canCollapseBody"
-      ng-click="vm.toggleCollapseBody($event)"
-      ng-title="vm.collapseBody ? ('Show the full annotation text' | translate): ('Show the first few lines only' | translate)"
-      ng-bind="vm.collapseBody ? ('More' | translate) : ('Less' | translate)"
-      h-branding="accentColor"></a>
+
   </div>
 </div>

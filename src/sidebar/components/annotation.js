@@ -553,11 +553,11 @@ function AnnotationController(
 
     if (self.annotation.tags.length !== 0) {
       // This is for temporary data. It should be removed when backend send the data in the format below.
-      tags = [{'bug':{
-        'bugType':'BZ',
-        'bugID':'1466411',
-        'status':'A'
-      }}];
+      // tags = [{'bug':{
+      //   'bugType':'BZ',
+      //   'bugID':'1466411',
+      //   'status':'A'
+      // }}];
 
       // Find the object that has the 'bug' attribute and return it as a status/
       // The reason of doing this, not to change the type of tags in the structure.
@@ -584,7 +584,7 @@ function AnnotationController(
     var feedbackStatus = {
       'A' : {'status':'opened', 'icon':'h-icon-visibility'},
       'I' : {'status':'in progress', 'icon':'h-icon-mail'},
-      'C' : {'status':'resolved', 'icon':'h-icon-visibility-off'},
+      'C' : {'status':'Resolved', 'icon':'h-icon-check'},
     }[status];
 
     return {

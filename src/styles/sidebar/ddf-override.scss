@@ -239,11 +239,65 @@ $ddf-sidebar-text: #585858;
     box-shadow: none;
     border-radius: 0;
     font-family: inherit;
+    padding: 0;
 
     .h-icon-visibility-off {
       display: inline;
       margin-right: 5px;
       color: #c00;
+    }
+
+    .feedback-title {
+      padding-top: 15px;
+      padding-left: 15px;
+      font-size: 15px;
+      font-weight: 500;
+    }
+
+    .feedback-main-part {
+      padding: 15px;
+    }
+
+    .bug-status-collapse {
+      display: flex;
+      flex-direction: row;
+      padding: 15px;
+      border-top: 2px solid #ededed;
+
+      .feedback-bug-status {
+        display: flex;
+        width: 100%;
+        align-items: center;
+        margin-left: 5px;
+
+        .bug-status-resolved {
+          margin: 0;
+          padding-right: 5px;
+          font-size: 13px;
+        }
+
+        .bug-status-opened {
+          margin: 0;
+          font-size: 13px;
+        }
+
+        .bug-status-icon {
+          margin-left: auto;
+          font-size: 20px;
+          color: #0076e0;
+        }
+
+        .bug-status-link {
+          font-weight: 600;
+          margin-right: 5px;
+          color: #06c;
+          text-decoration: underline;
+        }
+      }
+
+      .rotate {
+        transform: rotate(-90deg);
+      }
     }
 
     .annotation-quote {
