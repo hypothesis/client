@@ -5,6 +5,7 @@ const { readFileSync } = require('fs');
 const express = require('express');
 const { log } = require('gulp-util');
 
+const { createServer, useSsl } = require('./create-server');
 const { version } = require('../../package.json');
 
 /**
@@ -40,8 +41,9 @@ function servePackage(port, hostname) {
   app.get(`/hypothesis/${version}`, serveBootScript);
   app.use(`/hypothesis/${version}/`, express.static('.'));
 
-  app.listen(port, function () {
-    log(`Package served at http://${hostname}:${port}/hypothesis`);
+  createServer(app).listen(port, () => {
+    const scheme = useSsl ? 'https' : 'http';
+    log(`Package served at ${scheme}://${hostname}:${port}/hypothesis`);
   });
 }
 
