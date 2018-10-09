@@ -6,59 +6,15 @@ const proxyquire = require('proxyquire');
 const util = require('../../../shared/test/util');
 
 // API route directory.
-// This should mirror the structure (but not the exact URLs) of
-// https://hypothes.is/api/.
-const routes = {
-  annotation: {
-    create: {
-      method: 'POST',
-      url: 'http://example.com/api/annotations',
-    },
-    delete: {
-      method: 'DELETE',
-      url: 'http://example.com/api/annotations/:id',
-    },
-    read: {},
-    update: {
-      method: 'PUT',
-      url: 'http://example.com/api/annotations/:id',
-    },
-    flag: {
-      method: 'PUT',
-      url: 'http://example.com/api/annotations/:id/flag',
-    },
-    hide: {
-      method: 'PUT',
-      url: 'http://example.com/api/annotations/:id/hide',
-    },
-    unhide: {
-      method: 'DELETE',
-      url: 'http://example.com/api/annotations/:id/hide',
-    },
-  },
-  group: {
-    member: {
-      delete: {
-        method: 'DELETE',
-        url: 'http://example.com/api/groups/:pubid/members/:user',
-      },
-    },
-  },
-  search: {
-    method: 'GET',
-    url: 'http://example.com/api/search',
-  },
-  profile: {
-    read: {
-      method: 'GET',
-      url: 'http://example.com/api/profile',
-    },
-    update: {
-      method: 'PATCH',
-      url: 'http://example.com/api/profile',
-    },
-  },
-};
+//
+// This should mirror https://hypothes.is/api/. The domain name has been changed
+// to guard against hardcoding of "hypothes.is".
+//
+// This can be updated by running:
+//
+// `curl https://hypothes.is/api/ | sed 's/hypothes.is/example.com/g' | jq . > api-index.json`
+//
+const routes = require('./api-index.json').links;
 
 describe('sidebar.services.api', function () {
   let $httpBackend = null;
@@ -89,7 +45,7 @@ describe('sidebar.services.api', function () {
     angular.mock.module('h', {
       apiRoutes: fakeApiRoutes,
       auth: fakeAuth,
-      settings: {apiUrl: 'http://example.com/api/'},
+      settings: {apiUrl: 'https://example.com/api/'},
     });
 
     angular.mock.inject(function (_$q_) {
@@ -119,7 +75,7 @@ describe('sidebar.services.api', function () {
       done();
     });
 
-    $httpBackend.expectPOST('http://example.com/api/annotations')
+    $httpBackend.expectPOST('https://example.com/api/annotations')
       .respond(function () {
         return [201, {id: 'new-id'}, {}];
       });
@@ -131,7 +87,7 @@ describe('sidebar.services.api', function () {
       done();
     });
 
-    $httpBackend.expectPUT('http://example.com/api/annotations/an-id')
+    $httpBackend.expectPATCH('https://example.com/api/annotations/an-id')
       .respond(function () {
         return [200, {}, {}];
       });
@@ -143,7 +99,7 @@ describe('sidebar.services.api', function () {
       done();
     });
 
-    $httpBackend.expectDELETE('http://example.com/api/annotations/an-id')
+    $httpBackend.expectDELETE('https://example.com/api/annotations/an-id')
       .respond(function () {
         return [200, {}, {}];
       });
@@ -155,7 +111,7 @@ describe('sidebar.services.api', function () {
       done();
     });
 
-    $httpBackend.expectPUT('http://example.com/api/annotations/an-id/flag')
+    $httpBackend.expectPUT('https://example.com/api/annotations/an-id/flag')
       .respond(function () {
         return [204, {}, {}];
       });
@@ -167,7 +123,7 @@ describe('sidebar.services.api', function () {
       done();
     });
 
-    $httpBackend.expectPUT('http://example.com/api/annotations/an-id/hide')
+    $httpBackend.expectPUT('https://example.com/api/annotations/an-id/hide')
       .respond(function () {
         return [204, {}, {}];
       });
@@ -179,7 +135,7 @@ describe('sidebar.services.api', function () {
       done();
     });
 
-    $httpBackend.expectDELETE('http://example.com/api/annotations/an-id/hide')
+    $httpBackend.expectDELETE('https://example.com/api/annotations/an-id/hide')
       .respond(function () {
         return [204, {}, {}];
       });
@@ -188,11 +144,11 @@ describe('sidebar.services.api', function () {
 
   describe('#group.member.delete', () => {
     it('removes current user from a group', (done) => {
-      api.group.member.delete({pubid: 'an-id', user: 'me'}).then(function () {
+      api.group.member.delete({pubid: 'an-id', userid: 'me'}).then(function () {
         done();
       });
 
-      $httpBackend.expectDELETE('http://example.com/api/groups/an-id/members/me')
+      $httpBackend.expectDELETE('https://example.com/api/groups/an-id/members/me')
         .respond(() => {
           return [204, {}, {}];
         });
@@ -210,7 +166,7 @@ describe('sidebar.services.api', function () {
       done();
     });
 
-    $httpBackend.expectPOST('http://example.com/api/annotations', {
+    $httpBackend.expectPOST('https://example.com/api/annotations', {
       allowed: 123,
     })
       .respond(function () { return [200, {id: 'test'}, {}]; });
@@ -220,11 +176,11 @@ describe('sidebar.services.api', function () {
   // Our backend service interprets semicolons as query param delimiters, so we
   // must ensure to encode them in the query string.
   it('encodes semicolons in query parameters', function (done) {
-    api.search({'uri': 'http://example.com/?foo=bar;baz=qux'}).then(function () {
+    api.search({'uri': 'http://foobar.com/?foo=bar;baz=qux'}).then(function () {
       done();
     });
 
-    $httpBackend.expectGET('http://example.com/api/search?uri=http%3A%2F%2Fexample.com%2F%3Ffoo%3Dbar%3Bbaz%3Dqux')
+    $httpBackend.expectGET('https://example.com/api/search?uri=http%3A%2F%2Ffoobar.com%2F%3Ffoo%3Dbar%3Bbaz%3Dqux')
       .respond(function () { return [200, {}, {}]; });
     $httpBackend.flush();
   });
@@ -235,7 +191,7 @@ describe('sidebar.services.api', function () {
       assert.deepEqual(profile_, profile);
       done();
     });
-    $httpBackend.expectGET('http://example.com/api/profile?authority=publisher.org')
+    $httpBackend.expectGET('https://example.com/api/profile?authority=publisher.org')
       .respond(function () { return [200, profile, {}]; });
     $httpBackend.flush();
   });
@@ -245,7 +201,7 @@ describe('sidebar.services.api', function () {
       done();
     });
 
-    $httpBackend.expectPATCH('http://example.com/api/profile')
+    $httpBackend.expectPATCH('https://example.com/api/profile')
       .respond(function () {
         return [200, {}, {}];
       });
@@ -259,7 +215,7 @@ describe('sidebar.services.api', function () {
         assert.equal(err.message, testCase.expectedMessage);
         done();
       });
-      $httpBackend.expectPATCH('http://example.com/api/profile')
+      $httpBackend.expectPATCH('https://example.com/api/profile')
       .respond(function () {
         return [testCase.status, testCase.body, {}, testCase.statusText];
       });
@@ -296,7 +252,7 @@ describe('sidebar.services.api', function () {
         }));
         done();
       });
-      $httpBackend.expectPATCH('http://example.com/api/profile')
+      $httpBackend.expectPATCH('https://example.com/api/profile')
       .respond(function () {
         return [404, { reason: 'User not found' }, {}, 'Not found'];
       });
@@ -311,7 +267,7 @@ describe('sidebar.services.api', function () {
       }));
     });
 
-    $httpBackend.expectGET('http://example.com/api/profile')
+    $httpBackend.expectGET('https://example.com/api/profile')
     .respond(() => [200, { userid: 'acct:user@example.com' }]);
     $httpBackend.flush();
   });
@@ -326,7 +282,7 @@ describe('sidebar.services.api', function () {
       }));
     });
 
-    $httpBackend.expectGET('http://example.com/api/profile')
+    $httpBackend.expectGET('https://example.com/api/profile')
     .respond(() => [200, { userid: 'acct:user@example.com' }]);
     $httpBackend.flush();
   });
