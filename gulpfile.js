@@ -24,6 +24,7 @@ const createBundle = require('./scripts/gulp/create-bundle');
 const manifest = require('./scripts/gulp/manifest');
 const servePackage = require('./scripts/gulp/serve-package');
 const vendorBundles = require('./scripts/gulp/vendor-bundles');
+const { useSsl } = require('./scripts/gulp/create-server');
 
 const IS_PRODUCTION_BUILD = process.env.NODE_ENV === 'production';
 const SCRIPT_DIR = 'build/scripts';
@@ -272,7 +273,8 @@ function generateBootScript(manifest) {
   if (process.env.NODE_ENV === 'production') {
     defaultAssetRoot = `https://cdn.hypothes.is/hypothesis/${version}/`;
   } else {
-    defaultAssetRoot = `http://${packageServerHostname()}:3001/hypothesis/${version}/`;
+    const scheme = useSsl ? 'https': 'http';
+    defaultAssetRoot = `${scheme}://${packageServerHostname()}:3001/hypothesis/${version}/`;
   }
 
   if (isFirstBuild) {
@@ -325,8 +327,9 @@ gulp.task('watch-manifest', function () {
 
 gulp.task('serve-live-reload', ['serve-package'], function () {
   const LiveReloadServer = require('./scripts/gulp/live-reload-server');
+  const scheme = useSsl ? 'https' : 'http';
   liveReloadServer = new LiveReloadServer(3000, {
-    clientUrl: `http://${packageServerHostname()}:3001/hypothesis`,
+    clientUrl: `${scheme}://${packageServerHostname()}:3001/hypothesis`,
   });
 });
 

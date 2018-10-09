@@ -2,9 +2,10 @@
 
 const fs = require('fs');
 const gulpUtil = require('gulp-util');
-const http = require('http');
 const WebSocketServer = require('websocket').server;
 const urlParser = require('url');
+
+const { createServer, useSsl } = require('./create-server');
 
 function readmeText() {
   return fs.readFileSync('./README.md', 'utf-8');
@@ -41,7 +42,7 @@ function LiveReloadServer(port, config) {
 
   function listen() {
     const log = gulpUtil.log;
-    const server = http.createServer(function (req, response) {
+    const app = function (req, response) {
       const url = urlParser.parse(req.url);
       let content;
 
@@ -136,13 +137,15 @@ function LiveReloadServer(port, config) {
         `;
       }
       response.end(content);
-    });
+    };
 
+    const server = createServer(app);
     server.listen(port, function (err) {
       if (err) {
         log('Setting up live reload server failed', err);
       }
-      log(`Live reload server listening at http://localhost:${port}/`);
+      const scheme = useSsl ? 'https' : 'http';
+      log(`Live reload server listening at ${scheme}://localhost:${port}/`);
     });
 
     const ws = new WebSocketServer({
