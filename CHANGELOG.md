@@ -4,6 +4,14 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [Unreleased]
+
+### Changed
+
+- Change JavaScript build to avoid conflicts with sites that use a global
+  variable named "require" for their own purposes (eg. AMD module loading)
+  ([#780](https://github.com/hypothesis/client/pull/780)).
+
 ## [1.92.0] - 2018-10-09
 
 ### Changed
