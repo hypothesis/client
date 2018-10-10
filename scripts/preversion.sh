@@ -2,8 +2,9 @@
 
 set -eu
 
-# Check that tag signing works
-git tag --sign --message "Dummy Tag" dummy-tag
+# Check that tag creation works.
+# The tag is not currently signed because Jenkins does not have this set up.
+git tag --message "Dummy Tag" dummy-tag
 git tag --delete dummy-tag > /dev/null
 
 # Check GitHub API access token
@@ -16,6 +17,3 @@ if [ "$CAN_PUSH" != "true" ]; then
   echo "Cannot push to GitHub using the access token '$GITHUB_TOKEN'"
   exit 1
 fi
-
-# Check that we're not releasing broken code
-make test
