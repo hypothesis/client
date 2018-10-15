@@ -3,6 +3,9 @@ $ddf-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.16), 0 2px 8px 0 rgba(0, 0, 0, 0.12);
 $ddf-app-background: #ededed;
 $ddf-blue: #0076e0;
 $ddf-sidebar-text: #585858;
+$link-color: #06c;
+$link-color-hover: #004080;
+
 
 
 .app-content-wrapper {
@@ -171,7 +174,7 @@ $ddf-sidebar-text: #585858;
 
         &:hover {
           a, button {
-            color: #06c;
+            color: $link-color;
           }
 
           button#highlight-visibility[disabled="disabled"] {
@@ -230,6 +233,14 @@ $ddf-sidebar-text: #585858;
     margin-bottom: 1.15em;
   }
 
+  a {
+    color: $link-color;
+
+    &:hover {
+      color: $link-color-hover;
+    }
+  }
+
   .thread-list__spacer {
     margin-bottom: 0;
   }
@@ -260,9 +271,9 @@ $ddf-sidebar-text: #585858;
 
     .bug-status-collapse {
       display: flex;
-      flex-direction: row;
       padding: 15px;
-      border-top: 2px solid #ededed;
+      flex-direction: row;
+      align-items: center;
 
       .feedback-bug-status {
         display: flex;
@@ -274,23 +285,25 @@ $ddf-sidebar-text: #585858;
           margin: 0;
           padding-right: 5px;
           font-size: 13px;
+          font-weight: 500;
         }
 
         .bug-status-opened {
           margin: 0;
           font-size: 13px;
+          font-weight: 500;
         }
 
         .bug-status-icon {
           margin-left: auto;
-          font-size: 20px;
+          font-size: 1.5rem;
           color: #0076e0;
         }
 
         .bug-status-link {
-          font-weight: 600;
           margin-right: 5px;
-          color: #06c;
+          font-weight: 600;
+          letter-spacing: .4px;
           text-decoration: underline;
         }
       }
@@ -298,6 +311,10 @@ $ddf-sidebar-text: #585858;
       .rotate {
         transform: rotate(-90deg);
       }
+    }
+
+    .bug-status-collapse-bordered {
+        border-top: 2px solid #ededed;
     }
 
     .annotation-quote {

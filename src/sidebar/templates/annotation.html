@@ -1,4 +1,25 @@
-  <header class="annotation-header" ng-if="!vm.user()">
+<link href="https://access.redhat.com/chrome_themes/nimbus/css/patternfly-icons.css" rel="stylesheet" />
+<link href="https://access.redhat.com/chrome_themes/nimbus/css/font-awesome.css" rel="stylesheet" />
+
+
+
+<div style="display:none;">
+  <svg version="1.1" id="hourglass" x="0px" y="0px"
+  	 viewBox="0 0 25 25" style="enable-background:new 0 0 25 25;" xml:space="preserve">
+    <path d="M12.5,25c-1.7,0-3.3-0.3-4.9-1s-2.8-1.5-4-2.7s-2-2.5-2.7-4s-1-3.1-1-4.9s0.3-3.3,1-4.9s1.6-2.8,2.7-4s2.5-2,4-2.7
+    	s3.1-1,4.9-1s3.3,0.3,4.9,1s2.8,1.6,4,2.7c1.1,1.1,2,2.5,2.7,4c0.7,1.5,1,3.1,1,4.9s-0.3,3.3-1,4.9c-0.7,1.5-1.6,2.8-2.7,4
+    	c-1.1,1.1-2.5,2-4,2.7C15.8,24.7,14.2,25,12.5,25z M8.8,3.8c-1.1,0.5-2.2,1.2-3,2s-1.5,1.9-2,3S3,11.2,3,12.5s0.2,2.5,0.7,3.7
+    	c0.5,1.2,1.2,2.2,2,3s1.9,1.5,3,2c1.1,0.5,2.4,0.7,3.7,0.7s2.5-0.2,3.7-0.7c1.1-0.5,2.2-1.2,3-2c0.9-0.9,1.5-1.9,2-3
+    	c0.5-1.2,0.7-2.4,0.7-3.7s-0.2-2.5-0.7-3.7s-1.2-2.2-2-3c-0.9-0.9-1.9-1.5-3-2C15,3.3,13.8,3,12.5,3S10,3.3,8.8,3.8L8.8,3.8z"/>
+    <path d="M8,7c0,0-0.2,2.3,1.8,3.2c0.6,0.3,1.7,0.8,1.8,1.7l0,0c0.1,0.9-0.5,1.5-1.8,2C7.9,14.6,8,17.9,8,17.9l0,0c0,0,0,0,0,0v1.5
+    	c0,0.1,0,0.1,0.1,0.1c0,0,0.1,0.1,0.1,0.1h8.5c0.1,0,0.1,0,0.1-0.1s0.1-0.1,0.1-0.1v-1.5c0,0,0,0,0,0l0,0c0,0,0.1-3.3-1.8-4
+    	c-1.4-0.5-1.8-1.2-1.8-1.9c0.1-0.7,1.2-1.5,1.8-1.8C17.1,9,17,7.2,17,7V5.6c0-0.1,0-0.1-0.1-0.1c0,0-0.1-0.1-0.1-0.1H8.2
+    	c-0.1,0-0.1,0-0.1,0.1C8,5.5,8,5.5,8,5.6L8,7C8,7,8,7,8,7L8,7L8,7z M12.9,16.5c2.7,0,2.3,1.3,2.3,1.3H9.8c0-1.3,2.1-1.3,2.1-1.3
+    	L12.9,16.5L12.9,16.5z"/>
+  </svg>
+</div>
+
+<header class="annotation-header" ng-if="!vm.user()">
   <strong>{{'You must be logged in to leave feedback.' | translate}}</strong>
 </header>
 
@@ -176,20 +197,24 @@
   <!-- / Tags -->
 
   <div class="bug-status-collapse" ng-click="vm.toggleCollapsedFeedback($event)"
-       ng-if="(vm.canCollapseBody || vm.state().status) && !vm.editing() && !vm.isCreateModeOn()">
+       ng-if="(vm.canCollapseBody || vm.state().status) && !vm.editing() && !vm.isCreateModeOn()"
+       ng-class="{'bug-status-collapse-bordered' : !vm.collapseFeedback || !vm.isResolved()}">
     <!-- <ul class="tag-list">
       <li class="tag-item" ng-repeat="tag in vm.state().tags">
         <a ng-href="{{vm.tagSearchURL(tag)}}" target="_blank">{{tag}}</a>
       </li>
     </ul> -->
 
-    <span ng-class="{'h-icon-chevron-right rotate': vm.collapseFeedback, 'h-icon-chevron-right': !vm.collapseFeedback}" ng-if="vm.isResolved()" style="font-size:22px;height:fit-content;"></span>
+    <span ng-class="{'h-icon-chevron-right': vm.collapseFeedback, 'h-icon-chevron-right rotate': !vm.collapseFeedback}" ng-if="vm.isResolved()" style="font-size:24px;"></span>
     <div class="feedback-bug-status" ng-init="bug = vm.state().status.bug">
       <!-- Find a better way to do this, do not duplicate the p. -->
-      <p class="bug-status-resolved" ng-if="vm.isResolved()">{{vm.feedbackStatus(bug.status, "status")}} by</p>
-      <a class="bug-status-link" ng-click="$event.stopPropagation()" href="https://bugzilla.redhat.com/show_bug.cgi?id={{bug.bugID}}" target="_blank">{{bug.bugType}}#{{bug.bugID}}</a>
+      <p class="bug-status-resolved" ng-if="vm.isResolved()">{{vm.feedbackStatus(bug.status, "status")}} by: </p>
+      <a class="bug-status-link" ng-click="$event.stopPropagation()" href="https://partner-bugzilla.redhat.com/show_bug.cgi?id={{bug.bugID}}" target="_blank">{{bug.bugType}}#{{bug.bugID}}</a>
       <p class="bug-status-opened" ng-if="!vm.isResolved()">{{vm.feedbackStatus(bug.status, "status")}}</p>
       <i class="{{vm.feedbackStatus(bug.status, 'icon')}} bug-status-icon"></i>
+      <svg ng-if="!vm.isResolved()" class="bug-status-icon" width="18px" height="18px" style="fill:#0076e0">
+        <use xlink:href="#hourglass"></use>
+      </svg>
     </div>
 
   </div>

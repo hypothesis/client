@@ -582,9 +582,9 @@ function AnnotationController(
   // It is invoked in the template to return the status and the icon.
   this.feedbackStatus = function(status, type){
     var feedbackStatus = {
-      'A' : {'status':'opened', 'icon':'h-icon-visibility'},
-      'I' : {'status':'in progress', 'icon':'h-icon-mail'},
-      'C' : {'status':'Resolved', 'icon':'h-icon-check'},
+      'A' : {'status':'opened', 'icon':'pficon-pending'},
+      'I' : {'status':'in progress', 'icon':'pficon-pending'},
+      'C' : {'status':'Resolved', 'icon':'pficon-ok'},
     }[status];
 
     return {
@@ -598,8 +598,11 @@ function AnnotationController(
     self.collapseFeedback = !self.collapseFeedback;
   };
 
-  this.isResolved = function(){
-    return self.state.tags && self.state().status.bug.status === 'C';
+  this.isResolved = function() {
+    if (!self.state() || !self.state().status || !self.state().status.bug) {
+      return;
+    }
+    return self.state().status.bug.status === 'C';
   };
 
   /**
