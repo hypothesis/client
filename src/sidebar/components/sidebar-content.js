@@ -70,7 +70,7 @@ function SidebarContentController(
 
     if (annotation) {
       highlights = [annotation.$tag];
-      typeOfHighlight = annotation.user ? 'annotator-hl-hover-yours' : 'annotator-hl-hover-public';
+      typeOfHighlight = (annotation.user == this.auth.userid) ? 'annotator-hl-hover-yours' : 'annotator-hl-hover-public';
     }
     // Manage highlighting/unhighlighting the text of the corresponding hovered feedback in the sidebar
     frameSync.focusAnnotations(highlights, typeOfHighlight);
