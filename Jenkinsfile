@@ -10,37 +10,40 @@ node {
       returnStdout: true
     ).trim()
 
-    stage 'Build'
-    nodeEnv.inside("-e HOME=${workspace}") {
-        sh "echo Building Hypothesis client \"${pkgVersion}\""
-        sh 'make clean'
-        sh 'make'
+    stage('Build') {
+        nodeEnv.inside("-e HOME=${workspace}") {
+            sh "echo Building Hypothesis client \"${pkgVersion}\""
+            sh 'make clean'
+            sh 'make'
+        }
     }
 
-    stage 'Test'
-    nodeEnv.inside("-e HOME=${workspace}") {
-        sh 'make test'
+    stage('Test') {
+        nodeEnv.inside("-e HOME=${workspace}") {
+            sh 'make test'
+        }
     }
 
     if (isTag()) {
-        stage 'Publish'
-        nodeEnv.inside("-e HOME=${workspace}") {
-            withCredentials([
-                [$class: 'StringBinding', credentialsId: 'npm-token', variable: 'NPM_TOKEN']]) {
+        stage('Publish') {
+            nodeEnv.inside("-e HOME=${workspace}") {
+                withCredentials([
+                    [$class: 'StringBinding', credentialsId: 'npm-token', variable: 'NPM_TOKEN']]) {
 
-                // Use `npm` rather than `yarn` for publishing.
-                // See https://github.com/yarnpkg/yarn/pull/3391.
-                sh "echo '//registry.npmjs.org/:_authToken=${env.NPM_TOKEN}' >> \$HOME/.npmrc"
-                sh "npm publish"
+                    // Use `npm` rather than `yarn` for publishing.
+                    // See https://github.com/yarnpkg/yarn/pull/3391.
+                    sh "echo '//registry.npmjs.org/:_authToken=${env.NPM_TOKEN}' >> \$HOME/.npmrc"
+                    sh "npm publish"
+                }
             }
-        }
 
-        // Upload the contents of the package to an S3 bucket, which it
-        // will then be served from.
-        docker.image('nickstenning/s3-npm-publish')
-              .withRun('', "hypothesis@${pkgVersion} s3://cdn.hypothes.is") { c ->
-                sh "docker logs --follow ${c.id}"
-              }
+            // Upload the contents of the package to an S3 bucket, which it
+            // will then be served from.
+            docker.image('nickstenning/s3-npm-publish')
+                  .withRun('', "hypothesis@${pkgVersion} s3://cdn.hypothes.is") { c ->
+                    sh "docker logs --follow ${c.id}"
+                  }
+        }
     }
 }
 
