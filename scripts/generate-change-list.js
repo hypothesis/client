@@ -109,10 +109,12 @@ function formatChangeList(pullRequests) {
 }
 
 /**
- * Return a markdown-formatted changelog of changes since a given tag, suitable
- * for inclusion in a CHANGELOG.md file.
+ * Return a markdown-formatted changelog of changes since a given Git tag,
+ * suitable for inclusion in a CHANGELOG.md file.
  *
- * If no tag is specified, default to the most recently created tag.
+ * If no Git tag is specified, default to the most recently created tag.
+ *
+ * Tag names are usually `vX.Y.Z` where `X.Y.Z` is the package version.
  */
 async function changelistSinceTag(octokit, tag=getLastTag()) {
   const org = 'hypothesis';
