@@ -20,7 +20,7 @@
 </div>
 
 <header class="annotation-header" ng-if="!vm.user()">
-  <strong>{{'You must be logged in to leave feedback.' | translate}}</strong>
+  <strong class="header-login">{{'You must be logged in to leave feedback.' | translate}}</strong>
 </header>
 
 <div ng-keydown="vm.onKeydown($event)" ng-if="vm.user()">

@@ -388,6 +388,11 @@ $link-color-hover: #004080;
       display: inline-flex;
       flex-direction: column;
 
+      .header-login {
+        margin-top: 5px;
+        padding: 15px;
+      }
+
       span {
         max-width: 150px;
       }
