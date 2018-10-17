@@ -30,9 +30,10 @@ function getLastTag() {
 }
 
 /**
- * Iterate over pages of items in a GitHub API response and yield each item.
+ * Iterate over items in a GitHub API response and yield each item, fetching
+ * additional pages of results as necessary.
  */
-async function* iterateItems(octokit, response) {
+async function* itemsInGitHubAPIResponse(octokit, response) {
   let isFirstPage = true;
   while (isFirstPage || octokit.hasNextPage(response)) {
     isFirstPage = false;
@@ -58,7 +59,7 @@ async function getPRsMergedSince(octokit, org, repo, tag) {
   });
 
   const prs = [];
-  for await (const pr of iterateItems(octokit, response)) {
+  for await (const pr of itemsInGitHubAPIResponse(octokit, response)) {
     if (!pr.merged_at) {
       // This PR was closed without being merged.
       continue;
