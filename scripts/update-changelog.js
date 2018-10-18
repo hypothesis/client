@@ -8,22 +8,44 @@
 'use strict';
 
 const fs = require('fs');
+const process = require('process');
+
+const octokit = require('@octokit/rest')();
 
 const pkg = require('../package.json');
+const { changelistSinceTag } = require('./generate-change-list');
 
-const dateStr = new Date().toISOString().slice(0,10);
-const versionLine = `## [${pkg.version}] - ${dateStr}`;
+/**
+ * Update CHANGELOG.md with details of pull requests merged since the previous
+ * release.
+ */
+async function updateChangeLog() {
+  if (process.env.GITHUB_TOKEN) {
+    octokit.authenticate({
+      type: 'oauth',
+      token: process.env.GITHUB_TOKEN,
+    });
+  } else {
+    console.warn('GITHUB_TOKEN env var not set. API calls may hit rate limits.');
+  }
 
-const changelogPath = require.resolve('../CHANGELOG.md');
-const changelog = fs.readFileSync(changelogPath).toString();
-const updatedChangelog = changelog.split('\n')
-  .map(ln => ln.match(/\[Unreleased\]/) ? versionLine : ln)
-  .join('\n');
+  const dateStr = new Date().toISOString().slice(0,10);
+  const changelist = await changelistSinceTag(octokit);
 
-if (updatedChangelog === changelog) {
-  console.error('Failed to find "Unreleased" section in changelog');
-  process.exit(1);
+  const changelogPath = require.resolve('../CHANGELOG.md');
+  const changelog = fs.readFileSync(changelogPath).toString();
+  const updatedChangelog = changelog.replace(
+    '# Change Log',
+    `# Change Log
+
+## [${pkg.version}] - ${dateStr}
+
+### Changed
+
+${changelist}
+`);
+
+  fs.writeFileSync(changelogPath, updatedChangelog);
 }
 
-fs.writeFileSync(changelogPath, updatedChangelog);
-
+updateChangeLog();
