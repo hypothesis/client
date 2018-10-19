@@ -26,6 +26,16 @@ node {
         npmTag = "prerelease"
     }
 
+    lastCommitAuthor = sh (
+      script: 'git show HEAD --no-patch --format="%an"',
+      returnStdout: true
+    ).trim()
+
+    if (lastCommitAuthor == "jenkins-hypothesis") {
+        echo "Skipping build of automated commit created by Jenkins"
+        return
+    }
+
     pkgName = sh (
       script: 'cat package.json | jq -r .name',
       returnStdout: true
