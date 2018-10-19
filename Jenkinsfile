@@ -12,7 +12,9 @@ node {
     // Git branch which releases are deployed from.
     releaseFromBranch = "master"
 
-    // Pre-release suffix added to new package version number when deploying.
+    // Pre-release suffix added to new package version number when deploying,
+    // eg. "testing".
+    //
     // If this is empty, the new deployed version will become the live version.
     //
     // Note that once an npm package has been published with a given version,
