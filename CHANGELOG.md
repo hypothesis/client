@@ -4,6 +4,14 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [1.94.0] - 2018-10-19
+
+### Changed
+
+- Move remaining client release steps to Jenkins
+  [#787](https://api.github.com/repos/hypothesis/client/pulls/787)
+
+
 ## [1.93.0] - 2018-10-09
 
 ### Changed
