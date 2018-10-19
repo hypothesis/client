@@ -4,6 +4,23 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [1.94.0-testing-jenkins2] - 2018-10-19
+
+### Changed
+
+- Support serving the client over SSL in development
+  [#785](https://api.github.com/repos/hypothesis/client/pulls/785)
+
+- Update API route definitions used by tests
+  [#786](https://api.github.com/repos/hypothesis/client/pulls/786)
+
+- Wrap "stage" contents in a block in Jenkinsfile
+  [#789](https://api.github.com/repos/hypothesis/client/pulls/789)
+
+- Modify `update-changelog.js` to generate the list of changes itself
+  [#788](https://api.github.com/repos/hypothesis/client/pulls/788)
+
+
 ## [1.93.0] - 2018-10-09
 
 ### Changed
