@@ -4,6 +4,17 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [1.95.0] - 2018-10-22
+
+### Changed
+
+- Skip builds of automated commits on Jenkins
+  [#791](https://api.github.com/repos/hypothesis/client/pulls/791)
+
+- Fix IE 11 JS error which annotating PDFs.
+  [#792](https://api.github.com/repos/hypothesis/client/pulls/792)
+
+
 ## [1.94.0] - 2018-10-19
 
 ### Changed
