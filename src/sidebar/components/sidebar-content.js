@@ -355,6 +355,7 @@ module.exports = {
   bindings: {
     auth: '<',
     search: '<',
+    onLogin: '&',
   },
   template: require('../templates/sidebar-content.html'),
 };

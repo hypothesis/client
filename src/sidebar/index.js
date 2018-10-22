@@ -82,7 +82,7 @@ function configureRoutes($routeProvider) {
       resolve: resolve,
     });
   $routeProvider.otherwise({
-    template: '<sidebar-content search="vm.search" auth="vm.auth"></sidebar-content>',
+    template: '<sidebar-content search="vm.search" auth="vm.auth" on-login="vm.login()"></sidebar-content>',
     reloadOnSearch: false,
     resolve: resolve,
   });
