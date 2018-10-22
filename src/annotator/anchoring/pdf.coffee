@@ -285,7 +285,9 @@ exports.describe = (root, range, options = {}) ->
   startPageIndex = getSiblingIndex(startTextLayer.parentNode)
   endPageIndex = getSiblingIndex(endTextLayer.parentNode)
 
-  iter = document.createNodeIterator(startTextLayer, NodeFilter.SHOW_TEXT)
+  # The `whatToShow`, `filter` and `expandEntityReferences` arguments are
+  # mandatory in IE although optional according to the spec.
+  iter = document.createNodeIterator(startTextLayer, NodeFilter.SHOW_TEXT, null, false);
 
   start = seek(iter, range.start)
   end = seek(iter, range.end) + start + range.end.textContent.length
