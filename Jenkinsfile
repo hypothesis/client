@@ -110,6 +110,7 @@ node {
                 // See https://github.com/yarnpkg/yarn/pull/3391.
                 sh "echo '//registry.npmjs.org/:_authToken=${env.NPM_TOKEN}' >> \$HOME/.npmrc"
                 sh "npm publish --tag ${npmTag}"
+                sh "scripts/wait-for-npm-release.sh"
             }
         }
 
