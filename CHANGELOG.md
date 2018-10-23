@@ -4,6 +4,17 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [1.96.0] - 2018-10-23
+
+### Changed
+
+- Fix "Log in" links in sidebar content area not opening login prompt.
+  [#793](https://api.github.com/repos/hypothesis/client/pulls/793)
+
+- Add missing polyfill for IE 11 compatibility when annotating PDFs
+  [#794](https://api.github.com/repos/hypothesis/client/pulls/794)
+
+
 ## [1.95.0] - 2018-10-22
 
 ### Changed
