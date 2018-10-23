@@ -2416,7 +2416,7 @@ dom-anchor-text-quote@^4.0.2:
     diff-match-patch "^1.0.0"
     dom-anchor-text-position "^4.0.0"
 
-dom-node-iterator@^3.5.0:
+dom-node-iterator@^3.5.0, dom-node-iterator@^3.5.3:
   version "3.5.3"
   resolved "https://registry.yarnpkg.com/dom-node-iterator/-/dom-node-iterator-3.5.3.tgz#32b68aa440962f1734487029f544a3db704637b7"
   integrity sha1-MraKpECWLxc0SHAp9USj23BGN7c=
