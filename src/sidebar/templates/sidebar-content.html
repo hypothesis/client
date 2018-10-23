@@ -29,7 +29,7 @@
       This annotation is not available.
       <br>
       You may need to
-      <a class="loggedout-message__link" href="" ng-click="vm.login()">log in</a>
+      <a class="loggedout-message__link" href="" ng-click="vm.onLogin()">log in</a>
       to see it.
     </span>
     <span ng-if="vm.auth.status === 'logged-in'">
@@ -47,5 +47,5 @@
   thread="vm.rootThread">
 </thread-list>
 
-<loggedout-message ng-if="vm.shouldShowLoggedOutMessage()" on-login="vm.login()">
+<loggedout-message ng-if="vm.shouldShowLoggedOutMessage()" on-login="vm.onLogin()">
 </loggedout-message>
