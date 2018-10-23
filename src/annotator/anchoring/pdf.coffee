@@ -1,5 +1,8 @@
 seek = require('dom-seek')
 
+# `dom-node-iterator` polyfills optional arguments of `createNodeIterator`
+# and properties of the returned `NodeIterator` for IE 11 compatibility.
+createNodeIterator = require('dom-node-iterator/polyfill')()
 xpathRange = require('./range')
 
 html = require('./html')
@@ -285,9 +288,7 @@ exports.describe = (root, range, options = {}) ->
   startPageIndex = getSiblingIndex(startTextLayer.parentNode)
   endPageIndex = getSiblingIndex(endTextLayer.parentNode)
 
-  # The `whatToShow`, `filter` and `expandEntityReferences` arguments are
-  # mandatory in IE although optional according to the spec.
-  iter = document.createNodeIterator(startTextLayer, NodeFilter.SHOW_TEXT, null, false);
+  iter = createNodeIterator.call(document, startTextLayer, NodeFilter.SHOW_TEXT)
 
   start = seek(iter, range.start)
   end = seek(iter, range.end) + start + range.end.textContent.length
