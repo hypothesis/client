@@ -65,8 +65,10 @@ node {
         return
     }
 
+    milestone()
     stage('Publish') {
         input(message: "Publish new client release?")
+        milestone()
 
         newPkgVersion = bumpMinorVersion(pkgVersion)
         if (versionSuffix != "") {
