@@ -4,6 +4,17 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [1.97.0] - 2018-10-25
+
+### Changed
+
+- Use build milestones to automatically abort old builds
+  [#796](https://api.github.com/repos/hypothesis/client/pulls/796)
+
+- Wait for npm release to complete before deploying to CDN
+  [#795](https://api.github.com/repos/hypothesis/client/pulls/795)
+
+
 ## [1.96.0] - 2018-10-23
 
 ### Changed
