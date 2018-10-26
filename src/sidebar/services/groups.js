@@ -48,6 +48,13 @@ function groups($rootScope, store, api, isSidebar, localStorage, serviceUrl, ses
    * @return {Promise<Group[]>}
    */
   function filterGroups(groups, isLoggedIn, directLinkedAnnotationId) {
+    // If service groups are specified only return those.
+    // If a service group doesn't exist in the list of groups don't return it.
+    if (svc && svc.groups) {
+      const focusedGroups = groups.filter(g => svc.groups.includes(g.id));
+      return Promise.resolve(focusedGroups);
+    }
+
     // Logged-in users always see the "Public" group.
     if (isLoggedIn) {
       return Promise.resolve(groups);
