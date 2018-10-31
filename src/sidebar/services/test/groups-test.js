@@ -253,6 +253,46 @@ describe('groups', function() {
         });
       });
     });
+
+    [{
+      description: 'shows service groups',
+      services: [{ groups: ['abc123']}],
+      expected: ['abc123'],
+    },{
+      description: 'only shows service groups that exist',
+      services: [{ groups: ['abc123', 'no_exist']}],
+      expected: ['abc123'],
+    },{
+      description: 'shows no groups if no service groups exist',
+      services: [{ groups: ['no_exist']}],
+      expected: [],
+    },{
+      description: 'shows all groups if service is null',
+      services: null,
+      expected: ['__world__', 'abc123'],
+    },{
+      description: 'shows all groups if service groups does not exist',
+      services: [{}],
+      expected: ['__world__', 'abc123'],
+    }].forEach(({ description, services, expected }) => {
+      it(description, () => {
+        fakeSettings.services = services;
+        const svc = service();
+
+        // Create groups response from server.
+        const groups = [{ name: 'Public', id: '__world__' }, { name: 'ABC', id: 'abc123'}];
+
+        fakeApi.groups.list.returns(Promise.resolve({
+          token: '1234',
+          data: groups,
+        }));
+
+        return svc.load().then(groups => {
+          let displayedGroups = groups.map(g => g.id);
+          assert.deepEqual(displayedGroups, expected);
+        });
+      });
+    });
   });
 
   describe('#get', function() {
