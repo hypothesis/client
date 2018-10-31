@@ -186,6 +186,15 @@ loads.
       group. The image should be suitable for display at 16x16px and the
       recommended format is SVG.
 
+   .. option:: groups
+
+      ``String[]|null``. An array of group IDs. If provided, the list of groups
+      fetched from the API will be filtered against this list so that the user
+      can only select from these groups.
+
+      This can be useful in contexts where it is important that annotations
+      are made in a particular group.
+
    .. option:: onLoginRequest
 
      ``function``. A JavaScript function that the Hypothesis client will
