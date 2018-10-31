@@ -4,6 +4,14 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [1.98.0] - 2018-10-31
+
+### Changed
+
+- Add service.groups setting to filter groups
+  [#799](https://api.github.com/repos/hypothesis/client/pulls/799)
+
+
 ## [1.97.0] - 2018-10-25
 
 ### Changed
