@@ -187,7 +187,6 @@ function startAngularApp(config) {
   .service('groups', require('./services/groups'))
   .service('localStorage', require('./services/local-storage'))
   .service('permissions', require('./services/permissions'))
-  .service('queryParser', require('./services/query-parser'))
   .service('rootThread', require('./services/root-thread'))
   .service('searchFilter', require('./services/search-filter'))
   .service('serviceUrl', require('./services/service-url'))

@@ -17,7 +17,6 @@ describe('StreamContentController', function () {
   let fakeRouteParams;
   let fakeAnnotationMapper;
   let fakeStore;
-  let fakeQueryParser;
   let fakeRootThread;
   let fakeSearchFilter;
   let fakeApi;
@@ -46,10 +45,6 @@ describe('StreamContentController', function () {
     };
 
     fakeRouteParams = {id: 'test'};
-
-    fakeQueryParser = {
-      populateFilter: sinon.spy(),
-    };
 
     fakeRoute = {
       reload: sinon.spy(),
@@ -87,7 +82,6 @@ describe('StreamContentController', function () {
       annotationMapper: fakeAnnotationMapper,
       store: fakeStore,
       api: fakeApi,
-      queryParser: fakeQueryParser,
       rootThread: fakeRootThread,
       searchFilter: fakeSearchFilter,
       streamFilter: fakeStreamFilter,

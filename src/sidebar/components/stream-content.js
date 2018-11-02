@@ -3,7 +3,7 @@
 // @ngInject
 function StreamContentController(
   $scope, $location, $route, $routeParams, annotationMapper, store,
-  api, queryParser, rootThread, searchFilter, streamFilter, streamer
+  api, rootThread, searchFilter
 ) {
   const self = this;
 
@@ -43,16 +43,6 @@ function StreamContentController(
       $route.reload();
     }
   });
-
-  // Set up updates from real-time API.
-  streamFilter
-    .resetFilter()
-    .setMatchPolicyIncludeAll();
-
-  const terms = searchFilter.generateFacetedFilter($routeParams.q);
-  queryParser.populateFilter(streamFilter, terms);
-  streamer.setConfig('filter', {filter: streamFilter.getFilter()});
-  streamer.connect();
 
   // Perform the initial search
   fetch(20);
