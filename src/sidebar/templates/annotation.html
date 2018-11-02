@@ -209,7 +209,7 @@
     <div class="feedback-bug-status" ng-init="bug = vm.state().status.bug">
       <!-- Find a better way to do this, do not duplicate the p. -->
       <p class="bug-status-resolved" ng-if="vm.isResolved()">{{vm.feedbackStatus(bug.status, "status")}} by: </p>
-      <a class="bug-status-link" ng-click="$event.stopPropagation()" href="https://partner-bugzilla.redhat.com/show_bug.cgi?id={{bug.bugID}}" target="_blank">{{bug.bugType}}#{{bug.bugID}}</a>
+      <a class="bug-status-link" ng-click="$event.stopPropagation()" href="https://bugzilla.redhat.com/show_bug.cgi?id={{bug.bugID}}" target="_blank">{{bug.bugType}}#{{bug.bugID}}</a>
       <p class="bug-status-opened" ng-if="!vm.isResolved()">{{vm.feedbackStatus(bug.status, "status")}}</p>
       <i class="{{vm.feedbackStatus(bug.status, 'icon')}} bug-status-icon"></i>
       <svg ng-if="!vm.isResolved()" class="bug-status-icon" width="18px" height="18px" style="fill:#0076e0">
