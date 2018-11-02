@@ -4,6 +4,14 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [1.100.0] - 2018-11-02
+
+### Changed
+
+- Set a useful title on the sidebar iframe
+  [#801](https://api.github.com/repos/hypothesis/client/pulls/801)
+
+
 ## [1.99.0] - 2018-11-02
 
 ### Changed
