@@ -84,7 +84,7 @@ class S3Uploader {
  * are set to be cached indefinitely by the browser. Keys that are pointers
  * to the current version only have a short cache lifetime.
  */
-async function uploadPackageToS3(bucket, tag='') {
+async function uploadPackageToS3(bucket, options) {
   // Get list of files that are distributed with the package, respecting
   // the `files` field in `package.json`, `.npmignore` etc.
   const files = await packlist({ path: '.' });
@@ -119,23 +119,39 @@ async function uploadPackageToS3(bucket, tag='') {
   // Upload a copy of the entry-point to `$PACKAGE_NAME` or `$PACKAGE_NAME@$TAG`.
   // This enables creating URLs that always point to the current version of
   // the package.
+  let aliasCacheControl;
+  if (options.cacheEntry) {
+    // nb. When deploying to cdn.hypothes.is, the max-age seen by the browser is
+    // the higher of the value here and CloudFlare's "Browser Cache TTL"
+    // setting.
+    aliasCacheControl = 'public, max-age=1800, must-revalidate';
+  } else {
+    aliasCacheControl = 'no-cache';
+  }
+
   let aliasPath;
-  if (!tag) {
+  if (!options.tag) {
     aliasPath = `${packageName}`;
   } else {
-    aliasPath = `${packageName}@${tag}`;
+    aliasPath = `${packageName}@${options.tag}`;
   }
   await uploader.upload(aliasPath, entryPoint, {
-    cacheControl:  'public, max-age=30, must-revalidate',
+    cacheControl: aliasCacheControl,
   });
 }
 
 commander
   .option('--bucket [bucket]', 'S3 bucket name')
   .option('--tag [tag]', 'Version tag')
+  .option('--no-cache-entry', 'Prevent CDN/browser caching of entry point')
   .parse(process.argv);
 
-uploadPackageToS3(commander.bucket, commander.tag)
+const options = {
+  tag: commander.tag,
+  cacheEntry: commander.cacheEntry,
+};
+
+uploadPackageToS3(commander.bucket, options)
   .catch(err => {
     console.error('Failed to upload S3 package', err);
     process.exit(1);
