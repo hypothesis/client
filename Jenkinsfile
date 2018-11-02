@@ -12,6 +12,9 @@ node {
     // Git branch which releases are deployed from.
     releaseFromBranch = "master"
 
+    // S3 bucket where the embedded client is served from.
+    s3Bucket = "cdn.hypothes.is"
+
     // Pre-release suffix added to new package version number when deploying,
     // eg. "testing".
     //
@@ -28,6 +31,11 @@ node {
 
     lastCommitAuthor = sh (
       script: 'git show HEAD --no-patch --format="%an"',
+      returnStdout: true
+    ).trim()
+
+    lastCommitHash = sh (
+      script: 'git show HEAD --no-patch --format="%h"',
       returnStdout: true
     ).trim()
 
@@ -66,6 +74,46 @@ node {
     }
 
     milestone()
+    stage('Publish to QA') {
+        qaVersion = pkgVersion + "-${lastCommitHash}"
+        nodeEnv.inside("-e HOME=${workspace}") {
+            withCredentials([
+                string(credentialsId: 'npm-token', variable: 'NPM_TOKEN'),
+                usernamePassword(credentialsId: 'github-jenkins-user',
+                                 passwordVariable: 'GITHUB_TOKEN_NOT_USED',
+                                 usernameVariable: 'GITHUB_USERNAME'),
+                [$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 's3-cdn']
+                ]) {
+                sh """
+                git config --replace-all user.email ${env.GITHUB_USERNAME}@hypothes.is
+                git config --replace-all user.name ${env.GITHUB_USERNAME}
+                """
+
+                // Build a prerelease version of the client, configured to load
+                // the sidebar from the qa h deployment.
+                sh """
+                export SIDEBAR_APP_URL=https://qa.hypothes.is/app.html
+                yarn version --no-git-tag-version --new-version ${qaVersion}
+                """
+
+                // Deploy to S3, so the package can be served by
+                // https://qa.hypothes.is/embed.js.
+                //
+                // If we decide to build a QA browser extension using the QA
+                // client in future then we will need to deploy to npm as well.
+                sh """
+                export AWS_ACCESS_KEY_ID=${env.AWS_ACCESS_KEY_ID}
+                export AWS_SECRET_ACCESS_KEY=${env.AWS_SECRET_ACCESS_KEY}
+                scripts/deploy-to-s3.js --bucket ${s3Bucket} --tag qa --no-cache-entry
+                """
+            }
+        }
+
+        // Revert back to the pre-QA commit.
+        sh "git checkout ${lastCommitHash}"
+    }
+
+    milestone()
     stage('Publish') {
         input(message: "Publish new client release?")
         milestone()
@@ -82,15 +130,17 @@ node {
                 string(credentialsId: 'npm-token', variable: 'NPM_TOKEN'),
                 usernamePassword(credentialsId: 'github-jenkins-user',
                                   passwordVariable: 'GITHUB_TOKEN',
-                                  usernameVariable: 'GITHUB_USERNAME')]) {
+                                  usernameVariable: 'GITHUB_USERNAME'),
+                [$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 's3-cdn']
+                ]) {
 
                 // Configure commit author for version bump commit and auth credentials
                 // for pushing tag to GitHub.
                 //
                 // See https://git-scm.com/docs/git-credential-store
                 sh """
-                git config user.email ${env.GITHUB_USERNAME}@hypothes.is
-                git config user.name ${env.GITHUB_USERNAME}
+                git config --replace-all user.email ${env.GITHUB_USERNAME}@hypothes.is
+                git config --replace-all user.name ${env.GITHUB_USERNAME}
                 git config credential.helper store
                 echo https://${env.GITHUB_USERNAME}:${env.GITHUB_TOKEN}@github.com >> \$HOME/.git-credentials
                 """
@@ -113,17 +163,16 @@ node {
                 sh "echo '//registry.npmjs.org/:_authToken=${env.NPM_TOKEN}' >> \$HOME/.npmrc"
                 sh "npm publish --tag ${npmTag}"
                 sh "scripts/wait-for-npm-release.sh"
+
+                // Deploy the client to cdn.hypothes.is, where the embedded
+                // client is served from by https://hypothes.is/embed.js.
+                sh """
+                export AWS_ACCESS_KEY_ID=${env.AWS_ACCESS_KEY_ID}
+                export AWS_SECRET_ACCESS_KEY=${env.AWS_SECRET_ACCESS_KEY}
+                scripts/deploy-to-s3.js --bucket ${s3Bucket}
+                """
             }
         }
-
-        echo "Uploading package ${pkgName} v${newPkgVersion} to CDN"
-
-        // Upload the contents of the package to an S3 bucket, which it
-        // will then be served from.
-        docker.image('nickstenning/s3-npm-publish')
-              .withRun('', "${pkgName}@${newPkgVersion} s3://cdn.hypothes.is") { c ->
-                sh "docker logs --follow ${c.id}"
-              }
     }
 }
 

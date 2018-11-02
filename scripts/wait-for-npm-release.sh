@@ -5,12 +5,22 @@
 #
 # This script is needed because a new release of a package is not always
 # immediately available after "npm publish" returns.
+#
+# Usage: wait-for-npm-release.sh [<dist-tag>]
+#
+# <dist-tag> defaults to "latest".
+
+if [ -z "$1" ]; then
+  dist_tag=latest
+else
+  dist_tag=$1
+fi
 
 expected_version=$(node -p "require('./package.json').version")
 while [ true ]
 do
-  released_version=$(npm show hypothesis dist-tags.latest)
-  if [ $released_version = $expected_version ]; then
+  released_version=$(npm show hypothesis dist-tags.$dist_tag)
+  if [ "$released_version" = "$expected_version" ]; then
     break
   fi
 

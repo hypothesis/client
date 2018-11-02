@@ -48,4 +48,9 @@ ${changelist}
   fs.writeFileSync(changelogPath, updatedChangelog);
 }
 
+if (pkg.version.includes('-')) {
+  console.warn('Skipping changelog update for pre-release version');
+  return;
+}
+
 updateChangeLog();
