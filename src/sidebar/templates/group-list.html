@@ -1,11 +1,12 @@
 <div class="pull-right"
      dropdown
      keyboard-nav>
+  <!-- Show a drop down menu if showGroupsMenu is true. -->
   <div class="dropdown-toggle"
         dropdown-toggle
         data-toggle="dropdown"
         role="button"
-        title="Change the selected group">
+        title="Change the selected group" ng-if="vm.showGroupsMenu()">
     <img class="group-list-label__icon group-list-label__icon--organization"
          ng-src="{{ vm.focusedIcon() }}"
          alt="{{ vm.orgName(vm.groups.focused().id)}}"
@@ -15,8 +16,23 @@
     !--><span class="group-list-label__label">{{vm.groups.focused().name}}</span><!-- nospace
       !--><i class="h-icon-arrow-drop-down"></i>
   </div>
-  <div class="dropdown-menu__top-arrow"></div>
-  <ul class="dropdown-menu pull-none" role="menu">
+  <!-- Do not show a drop down menu if showGroupsMenu is false. -->
+  <div class="dropdown-toggle"
+        dropdown-toggle
+        role="header"
+        aria-level="2"
+        title="Selected group" ng-if="!vm.showGroupsMenu()">
+    <img class="group-list-label__icon group-list-label__icon--organization"
+         ng-src="{{ vm.focusedIcon() }}"
+         alt="{{ vm.orgName(vm.groups.focused().id)}}"
+         ng-if="vm.focusedIcon()">
+         <i class="group-list-label__icon h-icon-{{ vm.focusedIconClass() }}"
+             ng-if="!vm.focusedIcon()"></i><!-- nospace
+    !--><span class="group-list-label__label">{{vm.groups.focused().name}}</span>
+  </div>
+  <!-- Only build the drop down menu if showGroupsMenu is true. -->
+  <div class="dropdown-menu__top-arrow" ng-if="vm.showGroupsMenu()"></div>
+  <ul class="dropdown-menu pull-none" role="menu" ng-if="vm.showGroupsMenu()">
     <li class="dropdown-menu__row dropdown-menu__row--unpadded "
         ng-repeat="group in vm.groupOrganizations() track by group.id">
       <div ng-class="{'group-item': true, selected: group.id == vm.groups.focused().id}"

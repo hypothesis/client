@@ -75,6 +75,10 @@ function GroupListController($window, analytics, groups, settings, serviceUrl) {
   }
 
   this.isThirdPartyService = isThirdPartyService(settings);
+
+  this.showGroupsMenu = () => {
+    return !( this.isThirdPartyService && (this.groups.all().length <= 1) );
+  };
 }
 
 module.exports = {
