@@ -10,9 +10,11 @@ module.exports = {
   controller: SpinnerController,
   controllerAs: 'vm',
   template: `
-    <span class="spinner">
-      <span><span>
-      </span></span>
-    </span>
+    <div class="spinner__container">
+      <span class="spinner">
+        <span><span>
+        </span></span>
+      </span>
+    </div>
   `,
 };
