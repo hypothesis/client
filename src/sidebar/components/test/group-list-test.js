@@ -332,4 +332,89 @@ describe('groupList', function () {
     assert.calledWith($window.open, 'https://test.hypothes.is/groups/new',
       '_blank');
   });
+  describe('group menu visibility', () => {
+    it('is hidden when third party service and only one group', function () {
+      // Configure third party service.
+      fakeSettings.authDomain = 'example.com';
+      fakeSettings.services = [{
+        authority: 'publisher.org',
+      }];
+
+      // Configure only one group.
+      const group = [{
+        id: 'h-devs',
+        links: {
+          html: PRIVATE_GROUP_LINK,
+        },
+        name: 'Hypothesis Developers',
+        organization: groupFixtures.defaultOrganization(),
+        type: 'private',
+      }];
+      fakeGroups.all = () => { return group; };
+
+      const element = createGroupList();
+
+      const showGroupsMenu = element.ctrl.showGroupsMenu();
+      const dropdownToggle = element.find('.dropdown-toggle');
+      const arrowIcon = element.find('.h-icon-arrow-drop-down');
+      const dropdownMenu = element.find('.dropdown-menu__top-arrow');
+      const dropdownOptions = element.find('.dropdown-menu__row ');
+
+      assert.isFalse(showGroupsMenu);
+      assert.lengthOf(dropdownToggle, 0);
+      assert.lengthOf(arrowIcon, 0);
+      assert.lengthOf(dropdownMenu, 0);
+      assert.lengthOf(dropdownOptions, 0);
+    });
+
+    it('is shown when there is more than one group', function () {
+      // Configure third party service.
+      fakeSettings.authDomain = 'example.com';
+      fakeSettings.services = [{
+        authority: 'publisher.org',
+      }];
+
+      const element = createGroupList();
+
+      const showGroupsMenu = element.ctrl.showGroupsMenu();
+      const dropdownToggle = element.find('.dropdown-toggle');
+      const arrowIcon = element.find('.h-icon-arrow-drop-down');
+      const dropdownMenu = element.find('.dropdown-menu__top-arrow');
+      const dropdownOptions = element.find('.dropdown-menu__row ');
+
+      assert.isTrue(showGroupsMenu);
+      assert.lengthOf(dropdownToggle, 1);
+      assert.lengthOf(arrowIcon, 1);
+      assert.lengthOf(dropdownMenu, 1);
+      assert.lengthOf(dropdownOptions, 4);
+    });
+
+    it('is shown when it is not a thirdparty service', function () {
+      // Configure only one group.
+      const group = [{
+        id: 'h-devs',
+        links: {
+          html: PRIVATE_GROUP_LINK,
+        },
+        name: 'Hypothesis Developers',
+        organization: groupFixtures.defaultOrganization(),
+        type: 'private',
+      }];
+      fakeGroups.all = () => { return group; };
+
+      const element = createGroupList();
+
+      const showGroupsMenu = element.ctrl.showGroupsMenu();
+      const dropdownToggle = element.find('.dropdown-toggle');
+      const arrowIcon = element.find('.h-icon-arrow-drop-down');
+      const dropdownMenu = element.find('.dropdown-menu__top-arrow');
+      const dropdownOptions = element.find('.dropdown-menu__row ');
+
+      assert.isTrue(showGroupsMenu);
+      assert.lengthOf(dropdownToggle, 1);
+      assert.lengthOf(arrowIcon, 1);
+      assert.lengthOf(dropdownMenu, 1);
+      assert.lengthOf(dropdownOptions, 2);
+    });
+  });
 });
