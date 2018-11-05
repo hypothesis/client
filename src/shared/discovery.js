@@ -13,6 +13,10 @@
 /**
  * Discovery finds frames in the current tab/window that can be annotated (the
  * "clients") or can fetch annotations from the backend (the "server").
+ *
+ * Currently only one frame can be designated as the server.
+ * (FIXME: This causes problems. See https://github.com/hypothesis/client/issues/249,
+ * https://github.com/hypothesis/client/issues/187).
  */
 class Discovery {
   /**
