@@ -17,6 +17,20 @@
  * Currently only one frame can be designated as the server.
  * (FIXME: This causes problems. See https://github.com/hypothesis/client/issues/249,
  * https://github.com/hypothesis/client/issues/187).
+ *
+ * The discovery process works as follows:
+ *
+ * 1. Clients and servers perform a top-down, breadth-first traversal of the
+ *    frame hierarchy in the tab and send either an "offer" (server) or
+ *    "discovery" (client) message to each frame, except for their own frame.
+ * 2. Clients listen for "offer" messages and respond with "request" messages.
+ * 3. Servers listen for "discovery" messages and respond with "offer"
+ *    messages.
+ * 4. Servers also listen for "request" messages and respond with "ack" messages
+ *    that include a random channel identifier. At this point servers call
+ *    the callback to `startDiscovery`.
+ * 5. Clients listen for "ack" messages. When they receive one from a server
+ *    they call the callback to `startDiscovery`.
  */
 class Discovery {
   /**
@@ -57,6 +71,9 @@ class Discovery {
 
   /**
    * Find other frames to communicate with.
+   *
+   * See the class overview for a description of how the discovery process
+   * works.
    *
    * @param {DiscoveryCallback} onDiscovery - Callback to invoke with a token when
    *   another frame is discovered.
