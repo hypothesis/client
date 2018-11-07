@@ -4,6 +4,14 @@
 // breaks browserify-ngannotate.
 let unused; // eslint-disable-line
 
+/**
+ * Filter annotations against parsed search queries.
+ *
+ * When the user enters a query in the search box, the query is parsed using
+ * `generateFacetedFilter` and the currently loaded annotations are then matched
+ * against the parsed query by the `filter` method of this class. Annotations
+ * which do not match the filter are then hidden.
+ */
 // @ngInject
 function viewFilter(unicode) {
   /**
