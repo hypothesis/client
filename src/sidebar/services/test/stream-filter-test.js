@@ -10,7 +10,7 @@ describe('sidebar/services/stream-filter', () => {
       value: ['https://example.com', 'doi:1234'],
     },{
       field: '/id',
-      operator: 'exactly',
+      operator: 'equals',
       value: '1234',
     },{
       field: '/references',
@@ -42,7 +42,7 @@ describe('sidebar/services/stream-filter', () => {
 
     it('is chainable', () => {
       const filter = new StreamFilter();
-      assert.equal(filter.addClause('/id', 'exactly', '123'), filter);
+      assert.equal(filter.addClause('/id', 'equals', '123'), filter);
     });
   });
 
