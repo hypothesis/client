@@ -4,6 +4,14 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [1.102.0] - 2018-11-07
+
+### Changed
+
+- Remove support for real-time updates in the /stream view
+  [#802](https://api.github.com/repos/hypothesis/client/pulls/802)
+
+
 ## [1.101.0] - 2018-11-06
 
 ### Changed
