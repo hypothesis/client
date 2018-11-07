@@ -46,13 +46,13 @@ describe('searchInput', function () {
   describe('loading indicator', function () {
     it('is hidden when there are no network requests in flight', function () {
       const el = util.createDirective(document, 'search-input', {});
-      const spinner = el[0].querySelector('.spinner');
+      const spinner = el[0].querySelector('spinner');
       assert.equal(util.isHidden(spinner), true);
     });
 
     it('is visible when there are network requests in flight', function () {
       const el = util.createDirective(document, 'search-input', {});
-      const spinner = el[0].querySelector('.spinner');
+      const spinner = el[0].querySelector('spinner');
       fakeHttp.pendingRequests.push([{}]);
       el.scope.$digest();
       assert.equal(util.isHidden(spinner), false);

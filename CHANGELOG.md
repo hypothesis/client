@@ -4,6 +4,30 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [1.101.0] - 2018-11-06
+
+### Changed
+
+- Adjust spinner positioning and convert to component
+  [#800](https://api.github.com/repos/hypothesis/client/pulls/800)
+
+
+## [1.100.0] - 2018-11-02
+
+### Changed
+
+- Set a useful title on the sidebar iframe
+  [#801](https://api.github.com/repos/hypothesis/client/pulls/801)
+
+
+## [1.99.0] - 2018-11-02
+
+### Changed
+
+- Deploy QA release of client as part of master branch builds
+  [#798](https://api.github.com/repos/hypothesis/client/pulls/798)
+
+
 ## [1.98.0] - 2018-10-31
 
 ### Changed
