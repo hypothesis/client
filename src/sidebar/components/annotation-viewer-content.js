@@ -57,7 +57,6 @@ function AnnotationViewerContentController (
     }
 
     streamFilter
-      .setMatchPolicyIncludeAny()
       .addClause('/references', 'one_of', topLevelAnnot.id, true)
       .addClause('/id', 'equals', topLevelAnnot.id, true);
     streamer.setConfig('filter', { filter: streamFilter.getFilter() });
