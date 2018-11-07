@@ -9,3 +9,5 @@ package-lock.json
 # SSL certificate and key.
 .tlscert.pem
 .tlskey.pem
+
+.tox
