@@ -33,7 +33,7 @@ module.exports = function(config) {
       // watchify
 
       // Unit tests
-      { pattern: '**/*-test.coffee', watched: false, included: true, served: true },
+      { pattern: 'annotator/**/*-test.coffee', watched: false, included: true, served: true },
       { pattern: '**/test/*-test.js', watched: false, included: true, served: true },
 
       // Integration tests

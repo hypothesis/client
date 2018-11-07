@@ -107,7 +107,7 @@ const appBundles = [{
 },{
   // The sidebar application for displaying and editing annotations.
   name: 'sidebar',
-  transforms: ['babel', 'coffee'],
+  transforms: ['babel'],
   entry: './src/sidebar/index',
 },{
   // The annotation layer which handles displaying highlights, presenting
