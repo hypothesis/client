@@ -4,31 +4,25 @@
   <!-- Show a drop down menu if showGroupsMenu is true. -->
   <div class="dropdown-toggle"
         dropdown-toggle
-        data-toggle="dropdown"
-        role="button"
-        title="Change the selected group" ng-if="vm.showGroupsMenu()">
+        data-toggle="dropdown" ng-if="vm.showGroupsMenu()">
     <img class="group-list-label__icon group-list-label__icon--organization"
          ng-src="{{ vm.focusedIcon() }}"
          alt="{{ vm.orgName(vm.groups.focused().id)}}"
          ng-if="vm.focusedIcon()">
          <i class="group-list-label__icon h-icon-{{ vm.focusedIconClass() }}"
              ng-if="!vm.focusedIcon()"></i><!-- nospace
-    !--><span class="group-list-label__label">{{vm.groups.focused().name}}</span><!-- nospace
-      !--><i class="h-icon-arrow-drop-down"></i>
+    !--><h2 class="group-list-label__label"><a class="group-list-label__toggle">{{vm.groups.focused().name}}</a><!-- nospace
+      !--><i class="h-icon-arrow-drop-down"></i></h2>
   </div>
   <!-- Do not show a drop down menu if showGroupsMenu is false. -->
-  <div class="dropdown-toggle"
-        dropdown-toggle
-        role="header"
-        aria-level="2"
-        title="Selected group" ng-if="!vm.showGroupsMenu()">
+  <div ng-if="!vm.showGroupsMenu()">
     <img class="group-list-label__icon group-list-label__icon--organization"
          ng-src="{{ vm.focusedIcon() }}"
          alt="{{ vm.orgName(vm.groups.focused().id)}}"
          ng-if="vm.focusedIcon()">
          <i class="group-list-label__icon h-icon-{{ vm.focusedIconClass() }}"
              ng-if="!vm.focusedIcon()"></i><!-- nospace
-    !--><span class="group-list-label__label">{{vm.groups.focused().name}}</span>
+    !--><h2 class="group-list-label__label">{{vm.groups.focused().name}}</h2>
   </div>
   <!-- Only build the drop down menu if showGroupsMenu is true. -->
   <div class="dropdown-menu__top-arrow" ng-if="vm.showGroupsMenu()"></div>
