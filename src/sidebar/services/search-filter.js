@@ -230,6 +230,13 @@ function generateFacetedFilter(searchtext) {
   };
 }
 
+/**
+ * Parse annotation filter queries into structured representations.
+ *
+ * Provides methods to parse Lucene-style queries ("foo tag: bar")
+ * into structured representations which are then used by other services to
+ * filter annotations displayed to the user or fetched from the API.
+ */
 // @ngInject
 function searchFilter() {
   return {

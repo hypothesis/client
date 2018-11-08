@@ -4,6 +4,14 @@
 // breaks browserify-ngannotate.
 let unused; // eslint-disable-line
 
+/**
+ * Filter annotations against parsed search queries.
+ *
+ * When the user enters a query in the search box, the query is parsed using
+ * `generateFacetedFilter` and the currently loaded annotations are then matched
+ * against the parsed query by the `filter` method of this class. Annotations
+ * which do not match the filter are then hidden.
+ */
 // @ngInject
 function viewFilter(unicode) {
   /**
@@ -81,7 +89,7 @@ function viewFilter(unicode) {
    *   value: a function to extract to facet value for the annotation.
    *   match: a function to check if the extracted value matches the facet value
    */
-  this.fields = {
+  const fieldMatchers = {
     quote: {
       autofalse: ann => (ann.references || []).length > 0,
       value(annotation) {
@@ -149,10 +157,10 @@ function viewFilter(unicode) {
       if (field === 'any') {
         const anyFields = ['quote', 'text', 'tag', 'user'];
         termFilters = terms.map(term => new BinaryOpFilter('or', anyFields.map(field =>
-          new TermFilter(field, term, this.fields[field])
+          new TermFilter(field, term, fieldMatchers[field])
         )));
       } else {
-        termFilters = terms.map(term => new TermFilter(field, term, this.fields[field]));
+        termFilters = terms.map(term => new TermFilter(field, term, fieldMatchers[field]));
       }
       return new BinaryOpFilter(filter.operator, termFilters);
     });
