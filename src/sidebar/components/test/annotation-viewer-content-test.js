@@ -58,13 +58,9 @@ describe('annotationViewerContent', function () {
         connect: function () {},
       },
       streamFilter: {
-        setMatchPolicyIncludeAny: function () {
+        addClause: function () {
           return {
-            addClause: function () {
-              return {
-                addClause: function () {},
-              };
-            },
+            addClause: function () {},
           };
         },
         getFilter: function () {},
