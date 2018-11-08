@@ -4,6 +4,26 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [1.103.0] - 2018-11-08
+
+### Changed
+
+- Convert viewFilter tests to JS
+  [#807](https://api.github.com/repos/hypothesis/client/pulls/807)
+
+- Add postMessage config delivery example page
+  [#797](https://api.github.com/repos/hypothesis/client/pulls/797)
+
+- Add `make docs` and `make checkdocs`
+  [#808](https://api.github.com/repos/hypothesis/client/pulls/808)
+
+- Convert shared/discovery tests to JS
+  [#806](https://api.github.com/repos/hypothesis/client/pulls/806)
+
+- Convert discovery.coffee to JS
+  [#805](https://api.github.com/repos/hypothesis/client/pulls/805)
+
+
 ## [1.102.0] - 2018-11-07
 
 ### Changed
