@@ -21,7 +21,11 @@ lint: node_modules/.uptodate
 
 .PHONY: docs
 docs:
-	cd docs && make livehtml
+	tox -e py3-docs
+
+.PHONY: checkdocs
+checkdocs:
+	tox -e py3-checkdocs
 
 ################################################################################
 
