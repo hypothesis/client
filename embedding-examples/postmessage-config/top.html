@@ -1,0 +1,65 @@
+<html>
+  <head>
+    <style>
+    body {
+      background-color: beige;
+    }
+    </style>
+  </head>
+  <body>
+    <script type="module">
+      // This is the origin of the "h" service that delivers the client.
+      import { CLIENT_ORIGIN } from "../client.js";
+
+      window.addEventListener('message', event => {
+        // Listen for a JSON-RPC "requestConfig" message from the client.
+        // See https://www.jsonrpc.org
+        if (event.origin !== CLIENT_ORIGIN ||
+            typeof event.data !== 'object' ||
+            event.data === null ||
+            event.data.jsonrpc !== '2.0') {
+          return;
+        }
+
+        const { id, method, params } = event.data;
+        let result;
+        let error;
+        if (method === 'requestConfig') {
+          // Insert configuration for the client here.
+          //
+          // Currently only configuration options which apply to the content
+          // in the sidebar part of the client will be used.
+          //
+          // See https://h-client.readthedocs.io/en/latest/publishers/config/#config-settings
+          result = {
+            query: 'user:jimsmith',
+          };
+        } else {
+          error = 'Unsupported method';
+        }
+
+        let reply;
+
+        if (error) {
+          reply = {
+            jsonrpc: '2.0',
+            id,
+            error,
+          };
+        } else {
+          reply = {
+            jsonrpc: '2.0',
+            id,
+            result,
+          };
+        }
+
+        // Send the configuration back to the Hypothesis client.
+        event.source.postMessage(reply, event.origin);
+      });
+    </script>
+    <p>This is the top level window.</p>
+    <iframe width="800" height="400" src="iframe.html">
+    </iframe>
+  </body>
+</html>

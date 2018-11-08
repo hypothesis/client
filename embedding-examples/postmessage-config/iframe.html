@@ -1,0 +1,26 @@
+<html>
+  <head>
+  <style>
+  body {
+    background-color: mistyrose;
+  }
+  </style>
+  </head>
+  <body>
+    <script type="module">
+      import { loadClient } from "../client.js";
+
+      window.hypothesisConfig = () => ({
+        // Tell the Hypothesis client to fetch additional configuration
+        // from the parent frame.
+        requestConfigFromFrame: window.location.origin,
+
+        // This currently has to be set in the frame where the client is loaded.
+        openSidebar: true,
+      });
+
+      loadClient();
+    </script>
+    This is the annotated document.
+  </body>
+</html>
