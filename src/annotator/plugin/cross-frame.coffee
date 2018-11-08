@@ -67,7 +67,7 @@ module.exports = class CrossFrame extends Plugin
         clientUrl = config.clientUrl
 
         FrameUtil.isLoaded frame, () ->
-          subFrameIdentifier = discovery._generateToken()
+          subFrameIdentifier = discovery.generateToken()
           frameIdentifiers.set(frame, subFrameIdentifier)
           injectedConfig = Object.assign({}, config, {subFrameIdentifier})
 
