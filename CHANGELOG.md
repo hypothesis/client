@@ -4,6 +4,14 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [1.105.0] - 2018-11-08
+
+### Changed
+
+- Use atomic git push during release process
+  [#812](https://api.github.com/repos/hypothesis/client/pulls/812)
+
+
 ## [1.104.0] - 2018-11-08
 
 ### Changed
