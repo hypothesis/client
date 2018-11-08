@@ -4,6 +4,17 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [1.104.0] - 2018-11-08
+
+### Changed
+
+- Rewrite used parts of stream-filter.coffee in JS
+  [#803](https://api.github.com/repos/hypothesis/client/pulls/803)
+
+- Disable CoffeeScript support when building sidebar application
+  [#811](https://api.github.com/repos/hypothesis/client/pulls/811)
+
+
 ## [1.103.0] - 2018-11-08
 
 ### Changed
