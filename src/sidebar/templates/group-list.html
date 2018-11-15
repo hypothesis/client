@@ -11,8 +11,8 @@
          ng-if="vm.focusedIcon()">
          <i class="group-list-label__icon h-icon-{{ vm.focusedIconClass() }}"
              ng-if="!vm.focusedIcon()"></i><!-- nospace
-    !--><h2 class="group-list-label__label"><a class="group-list-label__toggle">{{vm.groups.focused().name}}</a><!-- nospace
-      !--><i class="h-icon-arrow-drop-down"></i></h2>
+    !--><span class="group-list-label__label"><a class="group-list-label__toggle">{{vm.groups.focused().name}}</a><!-- nospace
+      !--><i class="h-icon-arrow-drop-down"></i></span>
   </div>
   <!-- Do not show a drop down menu if showGroupsMenu is false. -->
   <div ng-if="!vm.showGroupsMenu()">
@@ -22,7 +22,7 @@
          ng-if="vm.focusedIcon()">
          <i class="group-list-label__icon h-icon-{{ vm.focusedIconClass() }}"
              ng-if="!vm.focusedIcon()"></i><!-- nospace
-    !--><h2 class="group-list-label__label">{{vm.groups.focused().name}}</h2>
+    !--><span class="group-list-label__label">{{vm.groups.focused().name}}</span>
   </div>
   <!-- Only build the drop down menu if showGroupsMenu is true. -->
   <div class="dropdown-menu__top-arrow" ng-if="vm.showGroupsMenu()"></div>
