@@ -25,6 +25,15 @@ class FakeMetadata {
 }
 
 /**
+ * Fake implementation of PDF.js `window.PDFViewerApplication.pdfDocument`.
+ */
+class FakePDFDocumentProxy {
+  constructor({ fingerprint }) {
+    this.fingerprint = fingerprint;
+  }
+}
+
+/**
  * Fake implementation of PDF.js `window.PDFViewerApplication` entry point.
  *
  * This fake only implements the parts that concern document metadata.
@@ -38,7 +47,7 @@ class FakePDFViewerApplication {
     this.url = url;
     this.documentInfo = undefined;
     this.metadata = undefined;
-    this.documentFingerprint = undefined;
+    this.pdfDocument = null;
   }
 
   /**
@@ -50,6 +59,7 @@ class FakePDFViewerApplication {
     window.dispatchEvent(event);
 
     this.url = url;
+    this.downloadComplete = true;
     this.documentInfo = {};
 
     if (typeof title !== undefined) {
@@ -60,9 +70,7 @@ class FakePDFViewerApplication {
       this.metadata = new FakeMetadata(metadata);
     }
 
-    // TODO - This property was removed in recent versions of PDF.js.
-    // The PDFMetadata class should use `pdfDocument.fingerprint` instead.
-    this.documentFingerprint = fingerprint;
+    this.pdfDocument = new FakePDFDocumentProxy({ fingerprint });
   }
 }
 
@@ -149,9 +157,9 @@ describe('annotator/plugin/pdf-metadata', function () {
       it('gets the title from the dc:title field', function () {
         const expectedMetadata = {
           title: 'dcFakeTitle',
-          link: [{href: 'urn:x-pdf:' + fakePDFViewerApplication.documentFingerprint},
+          link: [{href: 'urn:x-pdf:' + fakePDFViewerApplication.pdfDocument.fingerprint},
             {href: fakePDFViewerApplication.url}],
-          documentFingerprint: fakePDFViewerApplication.documentFingerprint,
+          documentFingerprint: fakePDFViewerApplication.pdfDocument.fingerprint,
         };
 
         return pdfMetadata.getMetadata().then(function (actualMetadata) {
@@ -162,9 +170,9 @@ describe('annotator/plugin/pdf-metadata', function () {
       it('gets the title from the documentInfo.Title field', function () {
         const expectedMetadata = {
           title: fakePDFViewerApplication.documentInfo.Title,
-          link: [{href: 'urn:x-pdf:' + fakePDFViewerApplication.documentFingerprint},
+          link: [{href: 'urn:x-pdf:' + fakePDFViewerApplication.pdfDocument.fingerprint},
             {href: fakePDFViewerApplication.url}],
-          documentFingerprint: fakePDFViewerApplication.documentFingerprint,
+          documentFingerprint: fakePDFViewerApplication.pdfDocument.fingerprint,
         };
 
         fakePDFViewerApplication.metadata.has = sinon.stub().returns(false);
@@ -182,7 +190,7 @@ describe('annotator/plugin/pdf-metadata', function () {
           url: 'file://fake.pdf',
         });
         const expectedMetadata = {
-          link: [{href: 'urn:x-pdf:' + fakePDFViewerApplication.documentFingerprint}],
+          link: [{href: 'urn:x-pdf:' + fakePDFViewerApplication.pdfDocument.fingerprint}],
         };
 
         pdfMetadata = new PDFMetadata(fakePDFViewerApplication);

@@ -41,7 +41,7 @@ class PDFMetadata {
         resolve(app);
       };
 
-      if (app.documentFingerprint) {
+      if (app.downloadComplete) {
         resolve(app);
       } else {
         window.addEventListener('documentload', finish);
@@ -61,7 +61,7 @@ class PDFMetadata {
     return this._loaded.then(app => {
       let uri = getPDFURL(app);
       if (!uri) {
-        uri = fingerprintToURN(app.documentFingerprint);
+        uri = fingerprintToURN(app.pdfDocument.fingerprint);
       }
       return uri;
     });
@@ -86,7 +86,7 @@ class PDFMetadata {
       }
 
       const link = [
-        {href: fingerprintToURN(app.documentFingerprint)},
+        {href: fingerprintToURN(app.pdfDocument.fingerprint)},
       ];
 
       const url = getPDFURL(app);
@@ -97,7 +97,7 @@ class PDFMetadata {
       return {
         title: title,
         link: link,
-        documentFingerprint: app.documentFingerprint,
+        documentFingerprint: app.pdfDocument.fingerprint,
       };
     });
   }
