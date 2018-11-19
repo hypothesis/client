@@ -53,9 +53,9 @@ class FakePDFViewerApplication {
   /**
    * Simulate completion of PDF document loading.
    */
-  finishLoading({ url, fingerprint, metadata, title }) {
+  finishLoading({ url, fingerprint, metadata, title, eventName = 'documentload' }) {
     const event = document.createEvent('Event');
-    event.initEvent('documentload', false, false);
+    event.initEvent(eventName, false, false);
     window.dispatchEvent(event);
 
     this.url = url;
@@ -75,17 +75,25 @@ class FakePDFViewerApplication {
 }
 
 describe('annotator/plugin/pdf-metadata', function () {
-  it('waits for the PDF to load before returning metadata', function () {
-    const fakeApp = new FakePDFViewerApplication;
-    const pdfMetadata = new PDFMetadata(fakeApp);
+  [
+    // Event dispatched in older PDF.js versions (pre-7bc4bfcc).
+    'documentload',
+    // Event dispatched in newer PDF.js versions (post-7bc4bfcc).
+    'documentloaded',
+  ].forEach(eventName => {
+    it('waits for the PDF to load before returning metadata', function () {
+      const fakeApp = new FakePDFViewerApplication;
+      const pdfMetadata = new PDFMetadata(fakeApp);
 
-    fakeApp.finishLoading({
-      url: 'http://fake.com',
-      fingerprint: 'fakeFingerprint',
-    });
+      fakeApp.finishLoading({
+        eventName,
+        url: 'http://fake.com',
+        fingerprint: 'fakeFingerprint',
+      });
 
-    return pdfMetadata.getUri().then(function (uri) {
-      assert.equal(uri, 'http://fake.com/');
+      return pdfMetadata.getUri().then(function (uri) {
+        assert.equal(uri, 'http://fake.com/');
+      });
     });
   });
 

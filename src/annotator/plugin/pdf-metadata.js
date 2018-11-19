@@ -38,13 +38,20 @@ class PDFMetadata {
     this._loaded = new Promise(resolve => {
       const finish = () => {
         window.removeEventListener('documentload', finish);
+        window.removeEventListener('documentloaded', finish);
         resolve(app);
       };
 
       if (app.downloadComplete) {
         resolve(app);
       } else {
+        // Listen for either the `documentload` (older PDF.js) or
+        // `documentloaded` (newer PDF.js) events which signal that the document
+        // has been downloaded and the first page has been rendered.
+        //
+        // See https://github.com/mozilla/pdf.js/commit/7bc4bfcc8b7f52b14107f0a551becdf01643c5c2
         window.addEventListener('documentload', finish);
+        window.addEventListener('documentloaded', finish);
       }
     });
   }
