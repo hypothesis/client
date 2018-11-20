@@ -341,7 +341,7 @@ describe('groupList', function () {
       }];
 
       // Configure only one group.
-      const group = [{
+      const groups = [{
         id: 'h-devs',
         links: {
           html: PRIVATE_GROUP_LINK,
@@ -350,7 +350,7 @@ describe('groupList', function () {
         organization: groupFixtures.defaultOrganization(),
         type: 'private',
       }];
-      fakeGroups.all = () => { return group; };
+      fakeGroups.all = () => { return groups; };
 
       const element = createGroupList();
 
@@ -389,9 +389,9 @@ describe('groupList', function () {
       assert.lengthOf(dropdownOptions, 4);
     });
 
-    it('is shown when it is not a thirdparty service', function () {
+    it('is shown when it is not a third party service', function () {
       // Configure only one group.
-      const group = [{
+      const groups = [{
         id: 'h-devs',
         links: {
           html: PRIVATE_GROUP_LINK,
@@ -400,7 +400,7 @@ describe('groupList', function () {
         organization: groupFixtures.defaultOrganization(),
         type: 'private',
       }];
-      fakeGroups.all = () => { return group; };
+      fakeGroups.all = () => { return groups; };
 
       const element = createGroupList();
 
