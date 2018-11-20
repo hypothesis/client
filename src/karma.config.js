@@ -1,6 +1,8 @@
 'use strict';
 
-const istanbul = require('browserify-istanbul');
+/* global __dirname */
+
+const path = require('path');
 
 module.exports = function(config) {
   config.set({
@@ -63,23 +65,12 @@ module.exports = function(config) {
 
       transform: [
         'coffeeify',
-        istanbul({
-          ignore: [
-            // Third party code
-            '**/node_modules/**', '**/vendor/*',
-            // Non JS modules
-            '**/*.html', '**/*.svg',
-          ],
-
-          // There is an outstanding bug with karma-coverage and istanbul
-          // in regards to doing source mapping and transpiling CoffeeScript.
-          // The least bad work around is to replace the instrumenter with
-          // isparta and it will handle doing the re mapping for us.
-          // This issue follows the issue and attempts to fix it:
-          // https://github.com/karma-runner/karma-coverage/issues/157
-          instrumenter: require('isparta'),
-        }),
-        'babelify',
+        ['babelify', {
+          // The transpiled CoffeeScript is fed through Babelify to add
+          // code coverage instrumentation for Istanbul.
+          extensions: ['.js', '.coffee'],
+          plugins: ['babel-plugin-istanbul'],
+        }],
       ],
     },
 
@@ -91,17 +82,17 @@ module.exports = function(config) {
       output: 'minimal',
     },
 
-    coverageReporter: {
-      dir: '../coverage/',
-      reporters: [
-        {type:'html'},
-        {type:'json', subdir: './'},
-      ],
+    coverageIstanbulReporter: {
+      dir: path.join(__dirname, '../coverage'),
+      reports: ['json', 'html'],
+      'report-config': {
+        json: { subdir: './' },
+      },
     },
 
     // Use https://www.npmjs.com/package/karma-mocha-reporter
     // for more helpful rendering of test failures
-    reporters: ['mocha', 'coverage'],
+    reporters: ['mocha', 'coverage-istanbul'],
 
     // web server port
     port: 9876,
