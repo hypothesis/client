@@ -4,6 +4,14 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [1.107.0] - 2018-11-20
+
+### Changed
+
+- Enable third-party authorities to globally disable annotation share links
+  [#820](https://api.github.com/repos/hypothesis/client/pulls/820)
+
+
 ## [1.106.0] - 2018-11-20
 
 ### Changed
