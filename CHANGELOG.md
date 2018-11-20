@@ -4,6 +4,18 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [1.106.0] - 2018-11-20
+
+### Changed
+
+- WIP bot configuration [#813](https://api.github.com/repos/hypothesis/client/pulls/813)
+
+- Fix build under Node 11 [#817](https://api.github.com/repos/hypothesis/client/pulls/817)
+
+- Support recent versions of PDF.js
+  [#818](https://api.github.com/repos/hypothesis/client/pulls/818)
+
+
 ## [1.105.0] - 2018-11-08
 
 ### Changed
