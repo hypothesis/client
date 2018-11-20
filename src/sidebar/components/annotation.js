@@ -3,6 +3,7 @@
 const annotationMetadata = require('../annotation-metadata');
 const events = require('../events');
 const { isThirdPartyUser } = require('../util/account-id');
+const serviceConfig = require('../service-config');
 
 const isNew = annotationMetadata.isNew;
 const isReply = annotationMetadata.isReply;
@@ -23,6 +24,23 @@ function updateModel(annotation, changes, permissions) {
   });
 }
 
+/**
+ * Return true if share links are globally enabled.
+ *
+ * Share links will only be shown on annotation cards if this is true and if
+ * these links are included in API responses.
+ */
+function shouldEnableShareLinks(settings) {
+  const serviceConfig_ = serviceConfig(settings);
+  if (serviceConfig_ === null) {
+    return true;
+  }
+  if (typeof serviceConfig_.enableShareLinks !== 'boolean') {
+    return true;
+  }
+  return serviceConfig_.enableShareLinks;
+}
+
 // @ngInject
 function AnnotationController(
   $document, $rootScope, $scope, $timeout, $window, analytics, store,
@@ -31,6 +49,8 @@ function AnnotationController(
 
   const self = this;
   let newlyCreatedByHighlightButton;
+
+  const enableShareLinks = shouldEnableShareLinks(settings);
 
   /** Save an annotation to the server. */
   function save(annot) {
@@ -487,7 +507,7 @@ function AnnotationController(
   };
 
   this.incontextLink = function () {
-    if (self.annotation.links) {
+    if (enableShareLinks && self.annotation.links) {
       return self.annotation.links.incontext ||
              self.annotation.links.html ||
              '';
