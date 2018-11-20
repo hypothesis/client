@@ -156,7 +156,9 @@ loads.
       items in the array are ignored.
 
    Each item in the :option:`services` array should be an object describing an
-   annotation service, with the following keys:
+   annotation service.
+
+   Required keys:
 
    .. option:: apiUrl
 
@@ -179,12 +181,12 @@ loads.
          :ref:`Generating authorization grant tokens` for how to generate grant
          tokens for the `hypothes.is <https://hypothes.is/>`_ service.
 
-   .. option:: icon
+  Optional keys:
 
-      ``String|null``. The URL to an image for the annotation service. This
-      image will appear to the left of the name of the currently selected
-      group. The image should be suitable for display at 16x16px and the
-      recommended format is SVG.
+   .. option:: enableShareLinks
+
+      ``boolean``. A flag indicating whether annotation cards should show links
+      that take the user to see an annotation in context. (Default: ``true``).
 
    .. option:: groups
 
@@ -194,6 +196,13 @@ loads.
 
       This can be useful in contexts where it is important that annotations
       are made in a particular group.
+
+   .. option:: icon
+
+      ``String|null``. The URL to an image for the annotation service. This
+      image will appear to the left of the name of the currently selected
+      group. The image should be suitable for display at 16x16px and the
+      recommended format is SVG.
 
    .. option:: onLoginRequest
 

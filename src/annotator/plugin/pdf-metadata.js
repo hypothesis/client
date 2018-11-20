@@ -38,13 +38,20 @@ class PDFMetadata {
     this._loaded = new Promise(resolve => {
       const finish = () => {
         window.removeEventListener('documentload', finish);
+        window.removeEventListener('documentloaded', finish);
         resolve(app);
       };
 
-      if (app.documentFingerprint) {
+      if (app.downloadComplete) {
         resolve(app);
       } else {
+        // Listen for either the `documentload` (older PDF.js) or
+        // `documentloaded` (newer PDF.js) events which signal that the document
+        // has been downloaded and the first page has been rendered.
+        //
+        // See https://github.com/mozilla/pdf.js/commit/7bc4bfcc8b7f52b14107f0a551becdf01643c5c2
         window.addEventListener('documentload', finish);
+        window.addEventListener('documentloaded', finish);
       }
     });
   }
@@ -61,7 +68,7 @@ class PDFMetadata {
     return this._loaded.then(app => {
       let uri = getPDFURL(app);
       if (!uri) {
-        uri = fingerprintToURN(app.documentFingerprint);
+        uri = fingerprintToURN(app.pdfDocument.fingerprint);
       }
       return uri;
     });
@@ -86,7 +93,7 @@ class PDFMetadata {
       }
 
       const link = [
-        {href: fingerprintToURN(app.documentFingerprint)},
+        {href: fingerprintToURN(app.pdfDocument.fingerprint)},
       ];
 
       const url = getPDFURL(app);
@@ -97,7 +104,7 @@ class PDFMetadata {
       return {
         title: title,
         link: link,
-        documentFingerprint: app.documentFingerprint,
+        documentFingerprint: app.pdfDocument.fingerprint,
       };
     });
   }
