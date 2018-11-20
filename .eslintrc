@@ -3,9 +3,6 @@
   "globals": {
     "Set": false
   },
-  "plugins": [
-    "mocha"
-  ],
   "rules": {
     "mocha/no-exclusive-tests": "error",
     "no-var": "error",
@@ -14,4 +11,10 @@
       "ObjectExpression": "first"
     }]
   },
+  "parserOptions": {
+    "ecmaVersion": 2018
+  },
+  "plugins": [
+    "mocha"
+  ],
 }
