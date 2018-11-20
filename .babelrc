@@ -1,10 +1,10 @@
 {
   "presets": [
-    ["env", {
+    ["@babel/preset-env", {
        "targets": {
          "browsers": ["> 0.3%"]
       }
     }]
   ],
-  "ignore": "**/vendor/*"
+  "ignore": ["**/vendor/*"]
 }
