@@ -6,5 +6,6 @@
       }
     }]
   ],
+  "plugins": ["angularjs-annotate"],
   "ignore": ["**/vendor/*"]
 }
