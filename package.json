@@ -17,7 +17,7 @@
     "autofill-event": "0.0.1",
     "autoprefixer": "^9.4.7",
     "aws-sdk": "^2.345.0",
-    "babel-preset-es2015": "^6.24.0",
+    "babel-preset-env": "^1.7.0",
     "babelify": "^7.3.0",
     "browserify": "^16.2.3",
     "browserify-istanbul": "^2.0.0",
