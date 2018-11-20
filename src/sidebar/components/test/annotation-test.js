@@ -1164,6 +1164,22 @@ describe('annotation', function() {
         const controller = createDirective(annotation).controller;
         assert.equal(controller.incontextLink(), '');
       });
+
+      [true, false].forEach(enableShareLinks => {
+        it('does not render links if share links are globally disabled', () => {
+          const annotation = Object.assign({}, fixtures.defaultAnnotation(), {
+            links: {
+              incontext: 'https://hpt.is/deadbeef',
+            },
+          });
+          fakeSettings.services = [{
+            enableShareLinks,
+          }];
+          const controller = createDirective(annotation).controller;
+          const hasIncontextLink = controller.incontextLink() === annotation.links.incontext;
+          assert.equal(hasIncontextLink, enableShareLinks);
+        });
+      });
     });
 
     it('renders quotes as plain text', function () {
