@@ -4,7 +4,10 @@
   <!-- Show a drop down menu if showGroupsMenu is true. -->
   <div class="dropdown-toggle"
         dropdown-toggle
-        data-toggle="dropdown" ng-if="vm.showGroupsMenu()">
+        data-toggle="dropdown"
+        role="button"
+        tabindex="0"
+        ng-if="vm.showGroupsMenu()">
     <img class="group-list-label__icon group-list-label__icon--organization"
          ng-src="{{ vm.focusedIcon() }}"
          alt="{{ vm.orgName(vm.groups.focused().id)}}"
