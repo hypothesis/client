@@ -1,4 +1,10 @@
 {
-  "presets": ["es2015"],
+  "presets": [
+    ["env", {
+       "targets": {
+         "browsers": ["> 0.3%"]
+      }
+    }]
+  ],
   "ignore": "**/vendor/*"
 }
