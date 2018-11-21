@@ -105,6 +105,12 @@ $group-list-spacing-below: 50px;
 .group-list-label__label {
   font-size: $body2-font-size;
   font-weight:bold;
+  display: inline-block;
+}
+
+// the anchor showing the name of the currently selected group
+.group-list-label__toggle {
+  color: $gray-dark;
 }
 
 // the name of a group in the groups drop-down list
