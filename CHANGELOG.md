@@ -4,6 +4,14 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [1.108.0] - 2018-11-21
+
+### Changed
+
+- Disable groups drop-down menu when using third-party accounts and there is only one group
+  [#809](https://api.github.com/repos/hypothesis/client/pulls/809)
+
+
 ## [1.107.0] - 2018-11-20
 
 ### Changed
