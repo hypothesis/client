@@ -72,9 +72,9 @@ module.exports = class PDF extends Plugin
       # If the highlights are no longer in the document it means that either
       # the page was destroyed by PDF.js or the placeholder was removed above.
       # The annotations for these anchors need to be refreshed.
-      for hl in anchor.highlights
+      for hl, index in anchor.highlights
         if not document.body.contains(hl)
-          delete anchor.highlights
+          anchor.highlights.splice(index, 1)
           delete anchor.range
           refreshAnnotations.push(anchor.annotation)
           break
