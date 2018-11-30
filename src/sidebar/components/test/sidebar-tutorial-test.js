@@ -2,9 +2,17 @@
 
 const Controller = require('../sidebar-tutorial').controller;
 
-describe('SidebarTutorialController', function () {
+describe('sidebar/components/sidebar-tutorial', function () {
+  const defaultSession = {state: {preferences: {}}};
+  const firstPartySettings = {};
+  const thirdPartySettings = {
+    services: [{
+      authority: 'publisher.org',
+    }],
+  };
 
-  describe('showSidebarTutorial', function () {
+
+  describe('#showSidebarTutorial', function () {
     const settings = {};
 
     it('returns true if show_sidebar_tutorial is true', function () {
@@ -44,6 +52,30 @@ describe('SidebarTutorialController', function () {
       const result = controller.showSidebarTutorial();
 
       assert.equal(result, false);
+    });
+  });
+
+  describe('#canSharePage', () => {
+    it('is true for first party users', () => {
+      const controller = new Controller(defaultSession, firstPartySettings);
+      assert.isTrue(controller.canSharePage());
+    });
+
+    it('is false for third party users', () => {
+      const controller = new Controller(defaultSession, thirdPartySettings);
+      assert.isFalse(controller.canSharePage());
+    });
+  });
+
+  describe('#canCreatePrivateGroup', () => {
+    it('is true for first party users', () => {
+      const controller = new Controller(defaultSession, firstPartySettings);
+      assert.isTrue(controller.canSharePage());
+    });
+
+    it('is false for third party users', () => {
+      const controller = new Controller(defaultSession, thirdPartySettings);
+      assert.isFalse(controller.canSharePage());
     });
   });
 });

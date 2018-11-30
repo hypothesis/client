@@ -27,13 +27,13 @@
         <i class="h-icon-annotation-reply"></i>&nbsp;<strong>Reply</strong>&nbsp;link.
       </p>
     </li>
-    <li class="sidebar-tutorial__list-item">
+    <li class="sidebar-tutorial__list-item" ng-if="vm.canSharePage()">
       <p class="sidebar-tutorial__list-item-content">
         To share an annotated page, click the
         <i class="h-icon-annotation-share"></i>&nbsp;button at the top.
       </p>
     </li>
-    <li class="sidebar-tutorial__list-item">
+    <li class="sidebar-tutorial__list-item" ng-if="vm.canCreatePrivateGroup()">
       <p class="sidebar-tutorial__list-item-content">
         To create a private group, select <strong>Public</strong>,
         open the dropdown, click&nbsp;<strong>+&nbsp;New&nbsp;group</strong>.
