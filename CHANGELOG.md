@@ -4,6 +4,14 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [1.109.0] - 2018-12-01
+
+### Changed
+
+- Hide non-applicable tutorial steps for third party users
+  [#823](https://api.github.com/repos/hypothesis/client/pulls/823)
+
+
 ## [1.108.0] - 2018-11-21
 
 ### Changed
