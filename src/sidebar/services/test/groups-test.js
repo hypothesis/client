@@ -259,6 +259,10 @@ describe('groups', function() {
       services: [{ groups: ['abc123']}],
       expected: ['abc123'],
     },{
+      description: 'also supports identifying service groups by groupid',
+      services: [{ groups: ['group:42@example.com']}],
+      expected: ['abc123'],
+    },{
       description: 'only shows service groups that exist',
       services: [{ groups: ['abc123', 'no_exist']}],
       expected: ['abc123'],
@@ -269,18 +273,22 @@ describe('groups', function() {
     },{
       description: 'shows all groups if service is null',
       services: null,
-      expected: ['__world__', 'abc123'],
+      expected: ['__world__', 'abc123', 'def456'],
     },{
       description: 'shows all groups if service groups does not exist',
       services: [{}],
-      expected: ['__world__', 'abc123'],
+      expected: ['__world__', 'abc123', 'def456'],
     }].forEach(({ description, services, expected }) => {
       it(description, () => {
         fakeSettings.services = services;
         const svc = service();
 
         // Create groups response from server.
-        const groups = [{ name: 'Public', id: '__world__' }, { name: 'ABC', id: 'abc123'}];
+        const groups = [
+          { name: 'Public', id: '__world__' },
+          { name: 'ABC', id: 'abc123', groupid: 'group:42@example.com'},
+          { name: 'DEF', id: 'def456', groupid: null},
+        ];
 
         fakeApi.groups.list.returns(Promise.resolve({
           token: '1234',
