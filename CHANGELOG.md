@@ -4,6 +4,14 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [1.110.0] - 2018-12-04
+
+### Changed
+
+- Support groupids in `groups` config setting
+  [#824](https://api.github.com/repos/hypothesis/client/pulls/824)
+
+
 ## [1.109.0] - 2018-12-01
 
 ### Changed
