@@ -4,6 +4,14 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [1.111.0] - 2018-12-06
+
+### Changed
+
+- Delete only invalid highlight when anchor has multiple highlights
+  [#822](https://api.github.com/repos/hypothesis/client/pulls/822)
+
+
 ## [1.110.0] - 2018-12-04
 
 ### Changed
