@@ -160,34 +160,34 @@ class DocumentMeta extends Plugin {
   }
 
   _getLinks() {
-    // we know our current location is a link for the document
-    let href;
-    let type;
-    let values;
+    // We know our current location is a link for the document.
     this.metadata.link = [{href: this._getDocumentHref()}];
 
-    // look for some relevant link relations
-    for (let link of Array.from(this.document.querySelectorAll('link'))) {
-      href = this._absoluteUrl(link.href); // get absolute url
-      const { rel } = link;
-      ({ type } = link);
-      const lang = link.hreflang;
-
-      if (!['alternate', 'canonical', 'bookmark', 'shortlink'].includes(rel)) { continue; }
-
-      if (rel === 'alternate') {
-        // Ignore feeds resources
-        if (type && type.match(/^application\/(rss|atom)\+xml/)) { continue; }
-        // Ignore alternate languages
-        if (lang) { continue; }
+    // Extract links from certain `<link>` tags.
+    const linkElements = Array.from(this.document.querySelectorAll('link'));
+    for (let link of linkElements) {
+      if (!['alternate', 'canonical', 'bookmark', 'shortlink'].includes(link.rel)) {
+        continue;
       }
 
-      this.metadata.link.push({href, rel, type});
+      if (link.rel === 'alternate') {
+        // Ignore RSS feed links.
+        if (link.type && link.type.match(/^application\/(rss|atom)\+xml/)) {
+          continue;
+        }
+        // Ignore alternate languages.
+        if (link.hreflang) {
+          continue;
+        }
+      }
+
+      const href = this._absoluteUrl(link.href);
+      this.metadata.link.push({href, rel: link.rel, type: link.type});
     }
 
     // look for links in scholar metadata
     for (let name of Object.keys(this.metadata.highwire)) {
-      values = this.metadata.highwire[name];
+      const values = this.metadata.highwire[name];
       if (name === 'pdf_url') {
         for (let url of values) {
           this.metadata.link.push({
@@ -212,7 +212,7 @@ class DocumentMeta extends Plugin {
 
     // look for links in dublincore data
     for (let name of Object.keys(this.metadata.dc)) {
-      values = this.metadata.dc[name];
+      const values = this.metadata.dc[name];
       if (name === 'identifier') {
         for (let id of values) {
           if (id.slice(0, 4) === 'doi:') {
@@ -247,7 +247,6 @@ class DocumentMeta extends Plugin {
     }
   }
 
-  // Hack to get a absolute url from a possibly relative one
   _absoluteUrl(url) {
     return normalizeURI(url, this.baseURI);
   }
