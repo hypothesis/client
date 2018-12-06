@@ -34,6 +34,7 @@ class DocumentMeta extends Plugin {
     // Test seams.
     this.baseURI = this.options.baseURI || baseURI;
     this.document = this.options.document || document;
+    this.normalizeURI = this.options.normalizeURI || normalizeURI;
 
     this.getDocumentMetadata();
   }
@@ -181,8 +182,12 @@ class DocumentMeta extends Plugin {
         }
       }
 
-      const href = this._absoluteUrl(link.href);
-      this.metadata.link.push({href, rel: link.rel, type: link.type});
+      try {
+        const href = this._absoluteUrl(link.href);
+        this.metadata.link.push({href, rel: link.rel, type: link.type});
+      } catch (e) {
+        // Ignore URIs which cannot be parsed.
+      }
     }
 
     // look for links in scholar metadata
@@ -190,10 +195,14 @@ class DocumentMeta extends Plugin {
       const values = this.metadata.highwire[name];
       if (name === 'pdf_url') {
         for (let url of values) {
-          this.metadata.link.push({
-            href: this._absoluteUrl(url),
-            type: 'application/pdf',
-          });
+          try {
+            this.metadata.link.push({
+              href: this._absoluteUrl(url),
+              type: 'application/pdf',
+            });
+          } catch (e) {
+            // Ignore URIs which cannot be parsed.
+          }
         }
       }
 
@@ -242,13 +251,21 @@ class DocumentMeta extends Plugin {
   _getFavicon() {
     for (let link of Array.from(this.document.querySelectorAll('link'))) {
       if (['shortcut icon', 'icon'].includes(link.rel)) {
-        this.metadata.favicon = this._absoluteUrl(link.href);
+        try {
+          this.metadata.favicon = this._absoluteUrl(link.href);
+        } catch (e) {
+          // Ignore URIs which cannot be parsed.
+        }
       }
     }
   }
 
+  /**
+   * Convert a possibly relative URI to an absolute one. This will throw an
+   * exception if the URL cannot be parsed.
+   */
   _absoluteUrl(url) {
-    return normalizeURI(url, this.baseURI);
+    return this.normalizeURI(url, this.baseURI);
   }
 
   // Get the true URI record when it's masked via a different protocol.

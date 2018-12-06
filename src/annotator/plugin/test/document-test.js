@@ -15,8 +15,10 @@
 const $ = require('jquery');
 
 const DocumentMeta = require('../document');
+const { normalizeURI } = require('../../util/url');
 
 describe('DocumentMeta', function() {
+  let fakeNormalizeURI;
   let tempDocument;
   let tempDocumentHead;
   let testDocument = null;
@@ -27,8 +29,18 @@ describe('DocumentMeta', function() {
     tempDocumentHead = document.createElement('head');
     tempDocument.appendChild(tempDocumentHead);
 
+    fakeNormalizeURI = sinon.stub().callsFake((url, base) => {
+      if (url === 'http://a:b:c') {
+        // A modern browser would reject this URL, but PhantomJS's URL parser is
+        // more lenient.
+        throw new Error('Invalid URL');
+      }
+      return normalizeURI(url, base);
+    });
+
     testDocument = new DocumentMeta(tempDocument, {
       document: tempDocument,
+      normalizeURI: fakeNormalizeURI,
     });
     testDocument.pluginInit();
   });
@@ -158,6 +170,43 @@ describe('DocumentMeta', function() {
 
     it('should have a documentFingerprint as the dc resource identifiers URN href', () => {
       assert.equal(metadata.documentFingerprint, metadata.link[9].href);
+    });
+
+    it('should ignore `<link>` tags with invalid URIs', () => {
+      tempDocumentHead.innerHTML = `
+        <link rel="alternate" href="https://example.com/foo">
+        <link rel="alternate" href="http://a:b:c">
+      `;
+
+      testDocument.getDocumentMetadata();
+
+      // There should be one link with the document location and one for the
+      // valid `<link>` tag.
+      assert.deepEqual(testDocument.metadata.link.length, 2);
+      assert.deepEqual(testDocument.metadata.link[1], {
+        rel: 'alternate',
+        href: 'https://example.com/foo',
+        type: '',
+      });
+    });
+
+    it('should ignore favicons with invalid URIs', () => {
+      tempDocumentHead.innerHTML = `
+        <link rel="favicon" href="http://a:b:c">
+      `;
+      testDocument.getDocumentMetadata();
+      assert.isUndefined(testDocument.metadata.favicon);
+    });
+
+    it('should ignore `<meta>` PDF links with invalid URIs', () => {
+      tempDocumentHead.innerHTML = `
+        <meta name="citation_pdf_url" content="http://a:b:c">
+      `;
+      testDocument.getDocumentMetadata();
+
+      // There should only be one link for the document's location.
+      // The invalid PDF link should be ignored.
+      assert.equal(testDocument.metadata.link.length, 1);
     });
   });
 
