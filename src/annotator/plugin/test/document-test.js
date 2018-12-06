@@ -17,41 +17,54 @@ const $ = require('jquery');
 const DocumentMeta = require('../document');
 
 describe('DocumentMeta', function() {
+  let tempDocument;
+  let tempDocumentHead;
   let testDocument = null;
 
   beforeEach(function() {
-    testDocument = new DocumentMeta($('<div></div>')[0], {});
+    tempDocument = document.createDocumentFragment();
+    tempDocument.location = { href: 'https://example.com' };
+    tempDocumentHead = document.createElement('head');
+    tempDocument.appendChild(tempDocumentHead);
+
+    testDocument = new DocumentMeta(tempDocument, {
+      document: tempDocument,
+    });
     testDocument.pluginInit();
   });
 
   afterEach(() => $(document).unbind());
 
   describe('annotation should have some metadata', function() {
-    // Add some metadata to the page
-    const head = $('head');
-    head.append('<link rel="alternate" href="foo.pdf" type="application/pdf"></link>');
-    head.append('<link rel="alternate" href="foo.doc" type="application/msword"></link>');
-    head.append('<link rel="bookmark" href="http://example.com/bookmark"></link>');
-    head.append('<link rel="shortlink" href="http://example.com/bookmark/short"></link>');
-    head.append('<link rel="alternate" href="es/foo.html" hreflang="es" type="text/html"></link>');
-    head.append('<meta name="citation_doi" content="10.1175/JCLI-D-11-00015.1">');
-    head.append('<meta name="citation_title" content="Foo">');
-    head.append('<meta name="citation_pdf_url" content="foo.pdf">');
-    head.append('<meta name="dc.identifier" content="doi:10.1175/JCLI-D-11-00015.1">');
-    head.append('<meta name="dc:identifier" content="foobar-abcxyz">');
-    head.append('<meta name="dc.relation.ispartof" content="isbn:123456789">');
-    head.append('<meta name="DC.type" content="Article">');
-    head.append('<meta property="og:url" content="http://example.com">');
-    head.append('<meta name="twitter:site" content="@okfn">');
-    head.append('<link rel="icon" href="http://example.com/images/icon.ico"></link>');
-    head.append('<meta name="eprints.title" content="Computer Lib / Dream Machines">');
-    head.append('<meta name="prism.title" content="Literary Machines">');
-    head.append('<link rel="alternate" href="feed" type="application/rss+xml"></link>');
-    head.append('<link rel="canonical" href="http://example.com/canonical"></link>');
-
     let metadata = null;
 
-    beforeEach(() => metadata = testDocument.metadata);
+    beforeEach(() => {
+      // Add some metadata to the page
+      tempDocumentHead.innerHTML = `
+        <link rel="alternate" href="foo.pdf" type="application/pdf"></link>
+        <link rel="alternate" href="foo.doc" type="application/msword"></link>
+        <link rel="bookmark" href="http://example.com/bookmark"></link>
+        <link rel="shortlink" href="http://example.com/bookmark/short"></link>
+        <link rel="alternate" href="es/foo.html" hreflang="es" type="text/html"></link>
+        <meta name="citation_doi" content="10.1175/JCLI-D-11-00015.1">
+        <meta name="citation_title" content="Foo">
+        <meta name="citation_pdf_url" content="foo.pdf">
+        <meta name="dc.identifier" content="doi:10.1175/JCLI-D-11-00015.1">
+        <meta name="dc:identifier" content="foobar-abcxyz">
+        <meta name="dc.relation.ispartof" content="isbn:123456789">
+        <meta name="DC.type" content="Article">
+        <meta property="og:url" content="http://example.com">
+        <meta name="twitter:site" content="@okfn">
+        <link rel="icon" href="http://example.com/images/icon.ico"></link>
+        <meta name="eprints.title" content="Computer Lib / Dream Machines">
+        <meta name="prism.title" content="Literary Machines">
+        <link rel="alternate" href="feed" type="application/rss+xml"></link>
+        <link rel="canonical" href="http://example.com/canonical"></link>
+      `;
+
+      testDocument.getDocumentMetadata();
+      metadata = testDocument.metadata;
+    });
 
     it('should have metadata', () => assert.ok(metadata));
 
