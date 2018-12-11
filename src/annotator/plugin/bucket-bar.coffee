@@ -76,6 +76,8 @@ module.exports = class BucketBar extends Plugin
     else
       $(element).append @element
 
+    @highlighter = options.highlighter ? highlighter  # Test seam.
+
   pluginInit: ->
     $(window).on 'resize scroll', @update
 
@@ -113,7 +115,7 @@ module.exports = class BucketBar extends Plugin
       unless anchor.highlights?.length
         return points
 
-      rect = highlighter.getBoundingClientRect(anchor.highlights)
+      rect = @highlighter.getBoundingClientRect(anchor.highlights)
       x = rect.top
       h = rect.bottom - rect.top
 
@@ -251,7 +253,7 @@ module.exports = class BucketBar extends Plugin
           scrollToClosest(@buckets[bucket], 'down')
         else
           annotations = (anchor.annotation for anchor in @buckets[bucket])
-          annotator.selectAnnotations annotations,
+          @annotator.selectAnnotations annotations,
             (event.ctrlKey or event.metaKey),
 
     this._buildTabs(@tabs, @buckets)
