@@ -15,43 +15,68 @@
 const $ = require('jquery');
 
 const DocumentMeta = require('../document');
+const { normalizeURI } = require('../../util/url');
 
 describe('DocumentMeta', function() {
+  let fakeNormalizeURI;
+  let tempDocument;
+  let tempDocumentHead;
   let testDocument = null;
 
   beforeEach(function() {
-    testDocument = new DocumentMeta($('<div></div>')[0], {});
+    tempDocument = document.createDocumentFragment();
+    tempDocument.location = { href: 'https://example.com' };
+    tempDocumentHead = document.createElement('head');
+    tempDocument.appendChild(tempDocumentHead);
+
+    fakeNormalizeURI = sinon.stub().callsFake((url, base) => {
+      if (url === 'http://a:b:c') {
+        // A modern browser would reject this URL, but PhantomJS's URL parser is
+        // more lenient.
+        throw new Error('Invalid URL');
+      }
+      return normalizeURI(url, base);
+    });
+
+    testDocument = new DocumentMeta(tempDocument, {
+      document: tempDocument,
+      normalizeURI: fakeNormalizeURI,
+    });
     testDocument.pluginInit();
   });
 
   afterEach(() => $(document).unbind());
 
   describe('annotation should have some metadata', function() {
-    // Add some metadata to the page
-    const head = $('head');
-    head.append('<link rel="alternate" href="foo.pdf" type="application/pdf"></link>');
-    head.append('<link rel="alternate" href="foo.doc" type="application/msword"></link>');
-    head.append('<link rel="bookmark" href="http://example.com/bookmark"></link>');
-    head.append('<link rel="shortlink" href="http://example.com/bookmark/short"></link>');
-    head.append('<link rel="alternate" href="es/foo.html" hreflang="es" type="text/html"></link>');
-    head.append('<meta name="citation_doi" content="10.1175/JCLI-D-11-00015.1">');
-    head.append('<meta name="citation_title" content="Foo">');
-    head.append('<meta name="citation_pdf_url" content="foo.pdf">');
-    head.append('<meta name="dc.identifier" content="doi:10.1175/JCLI-D-11-00015.1">');
-    head.append('<meta name="dc:identifier" content="foobar-abcxyz">');
-    head.append('<meta name="dc.relation.ispartof" content="isbn:123456789">');
-    head.append('<meta name="DC.type" content="Article">');
-    head.append('<meta property="og:url" content="http://example.com">');
-    head.append('<meta name="twitter:site" content="@okfn">');
-    head.append('<link rel="icon" href="http://example.com/images/icon.ico"></link>');
-    head.append('<meta name="eprints.title" content="Computer Lib / Dream Machines">');
-    head.append('<meta name="prism.title" content="Literary Machines">');
-    head.append('<link rel="alternate" href="feed" type="application/rss+xml"></link>');
-    head.append('<link rel="canonical" href="http://example.com/canonical"></link>');
-
     let metadata = null;
 
-    beforeEach(() => metadata = testDocument.metadata);
+    beforeEach(() => {
+      // Add some metadata to the page
+      tempDocumentHead.innerHTML = `
+        <link rel="alternate" href="foo.pdf" type="application/pdf"></link>
+        <link rel="alternate" href="foo.doc" type="application/msword"></link>
+        <link rel="bookmark" href="http://example.com/bookmark"></link>
+        <link rel="shortlink" href="http://example.com/bookmark/short"></link>
+        <link rel="alternate" href="es/foo.html" hreflang="es" type="text/html"></link>
+        <meta name="citation_doi" content="10.1175/JCLI-D-11-00015.1">
+        <meta name="citation_title" content="Foo">
+        <meta name="citation_pdf_url" content="foo.pdf">
+        <meta name="dc.identifier" content="doi:10.1175/JCLI-D-11-00015.1">
+        <meta name="dc:identifier" content="foobar-abcxyz">
+        <meta name="dc.relation.ispartof" content="isbn:123456789">
+        <meta name="DC.type" content="Article">
+        <meta property="og:url" content="http://example.com">
+        <meta name="twitter:site" content="@okfn">
+        <link rel="icon" href="http://example.com/images/icon.ico"></link>
+        <meta name="eprints.title" content="Computer Lib / Dream Machines">
+        <meta name="prism.title" content="Literary Machines">
+        <link rel="alternate" href="feed" type="application/rss+xml"></link>
+        <link rel="canonical" href="http://example.com/canonical"></link>
+      `;
+
+      testDocument.getDocumentMetadata();
+      metadata = testDocument.metadata;
+    });
 
     it('should have metadata', () => assert.ok(metadata));
 
@@ -145,6 +170,43 @@ describe('DocumentMeta', function() {
 
     it('should have a documentFingerprint as the dc resource identifiers URN href', () => {
       assert.equal(metadata.documentFingerprint, metadata.link[9].href);
+    });
+
+    it('should ignore `<link>` tags with invalid URIs', () => {
+      tempDocumentHead.innerHTML = `
+        <link rel="alternate" href="https://example.com/foo">
+        <link rel="alternate" href="http://a:b:c">
+      `;
+
+      testDocument.getDocumentMetadata();
+
+      // There should be one link with the document location and one for the
+      // valid `<link>` tag.
+      assert.deepEqual(testDocument.metadata.link.length, 2);
+      assert.deepEqual(testDocument.metadata.link[1], {
+        rel: 'alternate',
+        href: 'https://example.com/foo',
+        type: '',
+      });
+    });
+
+    it('should ignore favicons with invalid URIs', () => {
+      tempDocumentHead.innerHTML = `
+        <link rel="favicon" href="http://a:b:c">
+      `;
+      testDocument.getDocumentMetadata();
+      assert.isUndefined(testDocument.metadata.favicon);
+    });
+
+    it('should ignore `<meta>` PDF links with invalid URIs', () => {
+      tempDocumentHead.innerHTML = `
+        <meta name="citation_pdf_url" content="http://a:b:c">
+      `;
+      testDocument.getDocumentMetadata();
+
+      // There should only be one link for the document's location.
+      // The invalid PDF link should be ignored.
+      assert.equal(testDocument.metadata.link.length, 1);
     });
   });
 

@@ -34,6 +34,7 @@ class DocumentMeta extends Plugin {
     // Test seams.
     this.baseURI = this.options.baseURI || baseURI;
     this.document = this.options.document || document;
+    this.normalizeURI = this.options.normalizeURI || normalizeURI;
 
     this.getDocumentMetadata();
   }
@@ -160,40 +161,48 @@ class DocumentMeta extends Plugin {
   }
 
   _getLinks() {
-    // we know our current location is a link for the document
-    let href;
-    let type;
-    let values;
+    // We know our current location is a link for the document.
     this.metadata.link = [{href: this._getDocumentHref()}];
 
-    // look for some relevant link relations
-    for (let link of Array.from(this.document.querySelectorAll('link'))) {
-      href = this._absoluteUrl(link.href); // get absolute url
-      const { rel } = link;
-      ({ type } = link);
-      const lang = link.hreflang;
-
-      if (!['alternate', 'canonical', 'bookmark', 'shortlink'].includes(rel)) { continue; }
-
-      if (rel === 'alternate') {
-        // Ignore feeds resources
-        if (type && type.match(/^application\/(rss|atom)\+xml/)) { continue; }
-        // Ignore alternate languages
-        if (lang) { continue; }
+    // Extract links from certain `<link>` tags.
+    const linkElements = Array.from(this.document.querySelectorAll('link'));
+    for (let link of linkElements) {
+      if (!['alternate', 'canonical', 'bookmark', 'shortlink'].includes(link.rel)) {
+        continue;
       }
 
-      this.metadata.link.push({href, rel, type});
+      if (link.rel === 'alternate') {
+        // Ignore RSS feed links.
+        if (link.type && link.type.match(/^application\/(rss|atom)\+xml/)) {
+          continue;
+        }
+        // Ignore alternate languages.
+        if (link.hreflang) {
+          continue;
+        }
+      }
+
+      try {
+        const href = this._absoluteUrl(link.href);
+        this.metadata.link.push({href, rel: link.rel, type: link.type});
+      } catch (e) {
+        // Ignore URIs which cannot be parsed.
+      }
     }
 
     // look for links in scholar metadata
     for (let name of Object.keys(this.metadata.highwire)) {
-      values = this.metadata.highwire[name];
+      const values = this.metadata.highwire[name];
       if (name === 'pdf_url') {
         for (let url of values) {
-          this.metadata.link.push({
-            href: this._absoluteUrl(url),
-            type: 'application/pdf',
-          });
+          try {
+            this.metadata.link.push({
+              href: this._absoluteUrl(url),
+              type: 'application/pdf',
+            });
+          } catch (e) {
+            // Ignore URIs which cannot be parsed.
+          }
         }
       }
 
@@ -212,7 +221,7 @@ class DocumentMeta extends Plugin {
 
     // look for links in dublincore data
     for (let name of Object.keys(this.metadata.dc)) {
-      values = this.metadata.dc[name];
+      const values = this.metadata.dc[name];
       if (name === 'identifier') {
         for (let id of values) {
           if (id.slice(0, 4) === 'doi:') {
@@ -242,14 +251,21 @@ class DocumentMeta extends Plugin {
   _getFavicon() {
     for (let link of Array.from(this.document.querySelectorAll('link'))) {
       if (['shortcut icon', 'icon'].includes(link.rel)) {
-        this.metadata.favicon = this._absoluteUrl(link.href);
+        try {
+          this.metadata.favicon = this._absoluteUrl(link.href);
+        } catch (e) {
+          // Ignore URIs which cannot be parsed.
+        }
       }
     }
   }
 
-  // Hack to get a absolute url from a possibly relative one
+  /**
+   * Convert a possibly relative URI to an absolute one. This will throw an
+   * exception if the URL cannot be parsed.
+   */
   _absoluteUrl(url) {
-    return normalizeURI(url, this.baseURI);
+    return this.normalizeURI(url, this.baseURI);
   }
 
   // Get the true URI record when it's masked via a different protocol.
