@@ -4,6 +4,14 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [1.113.0] - 2018-12-11
+
+### Changed
+
+- Ignore invalid URLs in `<link>` and `<meta>` tags
+  [#826](https://api.github.com/repos/hypothesis/client/pulls/826)
+
+
 ## [1.112.0] - 2018-12-11
 
 ### Changed
