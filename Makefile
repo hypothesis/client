@@ -1,19 +1,28 @@
 .PHONY: default
-default: all
+default: help
 
-.PHONY: all
-all: build/manifest.json
+.PHONY: help
+help:
+	@echo "make help              Show this help message"
+	@echo "make dev               Run the app in the development server"
+	@echo "make lint              Run the code linter(s) and print any warnings"
+	@echo "make test              Run the unit tests"
+	@echo "make docs              Build docs website and serve it locally"
+	@echo "make checkdocs         Crash if building the docs website fails"
+	@echo "make clean             Delete development artefacts (cached files, "
+	@echo "                       dependencies, etc)"
 
-## Remove build artifacts
-.PHONY: clean
-clean:
-	rm -f node_modules/.uptodate
-	rm -rf build
+.PHONY: dev
+dev: build/manifest.json
+	gulp watch
 
-## Run test suite
 .PHONY: test
 test: node_modules/.uptodate
+ifdef FILTER
+	yarn test --grep $(FILTER)
+else
 	yarn test
+endif
 
 .PHONY: lint
 lint: node_modules/.uptodate
@@ -27,7 +36,10 @@ docs:
 checkdocs:
 	tox -e py3-checkdocs
 
-################################################################################
+.PHONY: clean
+clean:
+	rm -f node_modules/.uptodate
+	rm -rf build
 
 build/manifest.json: node_modules/.uptodate
 	yarn run build
