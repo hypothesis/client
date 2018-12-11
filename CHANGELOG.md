@@ -4,6 +4,14 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [1.112.0] - 2018-12-11
+
+### Changed
+
+- Fix selection of annotations when bucket bar indicators are clicked
+  [#825](https://api.github.com/repos/hypothesis/client/pulls/825)
+
+
 ## [1.111.0] - 2018-12-06
 
 ### Changed
