@@ -52,11 +52,11 @@ tested with at least current versions of iOS Safari and Chrome for Android.
       # Set hostname used when generating client asset URLs
       export PACKAGE_SERVER_HOSTNAME=<HOSTNAME>
 
-      gulp watch
+      make dev
 
    .. tip::
 
-      When ``gulp watch`` runs, it will print out the URLs used for h
+      When ``make dev`` runs, it will print out the URLs used for h
       and client assets. These should include ``<HOSTNAME>`` instead of
       ``localhost``.
 

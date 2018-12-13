@@ -58,7 +58,7 @@ extension itself, but not to h.
 
     .. code-block:: sh
 
-       gulp watch
+       make dev
 
 #. After making changes to the client, you will need to run ``make`` in the
    browser extension repo and reload the extension in Chrome to see changes.
@@ -84,7 +84,7 @@ run:
 .. code-block:: sh
 
    export SIDEBAR_APP_URL=http://localhost:5000/app.html
-   gulp watch
+   make dev
 
 Next, you'll need to create an OAuth client which enables the Hypothesis client
 to request an access token from the service in order to make API calls.
@@ -126,7 +126,7 @@ Hypothesis uses Karma and mocha for testing. To run all the tests once, run:
 
 .. code-block:: sh
 
-   gulp test
+   make test
 
 To run tests and automatically re-run them whenever any source files change, run:
 
@@ -134,8 +134,8 @@ To run tests and automatically re-run them whenever any source files change, run
 
    gulp test-watch
 
-You can filter the tests which are run by passing ``--grep <pattern>`` as an
-argument to ``gulp test``. See the documentation for Mocha's
+You can filter the tests which are run by running ``make test FILTER=<pattern>``.
+See the documentation for Mocha's
 `grep <https://mochajs.org/#g---grep-pattern>`_ option.
 
 Code Style
