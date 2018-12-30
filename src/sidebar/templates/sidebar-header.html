@@ -1,0 +1,19 @@
+<header class="sidebar-header">
+  <h1 class="sidebar-header__heading">
+    <a class="sidebar-header__link"
+      href="{{ vm.groups.focused().links.html }}"
+      target="_blank"
+      ng-click="vm.viewGroupActivity()">
+      <img class="sidebar-header__organization-icon"
+        ng-src="{{ vm.focusedIcon() }}"
+        alt="{{ vm.orgName(vm.groups.focused().id)}}"
+        ng-if="vm.focusedIcon()">
+      {{ vm.groups.focused().name }}
+      <svg class="icon-launch sidebar-header__icon-launch" xmlns="http://www.w3.org/2000/svg" width="auto" height="100%" viewBox="0 0 24 24" aria-labelledby="icon-launch__title">
+        <title id="icon-launch__title">Launch</title>
+        <path d="M0 0h24v24H0z" fill="none"/>
+        <path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/>
+      </svg>
+    </a>
+  </h1>
+</header>

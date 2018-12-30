@@ -1,0 +1,29 @@
+
+.sidebar-header__heading {
+  font-size: 24px;
+  font-weight: 400;
+  line-height: 1.25;
+  margin-top: 0.25em;
+}
+
+.sidebar-header__link {
+  color: $text-color;
+  display: flex;
+  align-items: center;
+  line-height: inherit;
+}
+
+.sidebar-header__organization-icon {
+  height: 24px;
+  line-height: inherit;
+  margin-right: 0.25em;
+  width: auto;
+}
+
+.sidebar-header__icon-launch {
+  fill: $text-color;
+  height: 24px;
+  line-height: inherit;
+  margin-left: 0.25em;
+  width: auto;
+}
