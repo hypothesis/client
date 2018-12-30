@@ -38,7 +38,8 @@
 }
 
 .top-bar__inner .group-list {
-  margin-right: .75em;
+  justify-self: flex-start;
+  margin-right: auto;
   white-space: nowrap;
 }
 
