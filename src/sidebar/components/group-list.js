@@ -67,6 +67,17 @@ function GroupListController(
   };
 
   /**
+   * This is a quick and dirty hack to show styling, and needs refactoring.
+   */
+  this.toggleGroupDetails = function() {
+    const groupDetails = $window.document.getElementById(
+      'group-details-out-of-scope'
+    );
+    groupDetails.classList.toggle('expanded');
+    $window.event.stopPropagation();
+  };
+
+  /**
    * Show the share link for the group if it is not a third-party group
    * AND if the URL needed is present in the group object. We should be able
    * to simplify this once the API is adjusted only to return the link
