@@ -242,10 +242,6 @@ html {
 
   min-height: 40px;
   min-width: 120px;
-
-  &:not(:first-child) {
-    border-top: dotted 1px $gray-lighter;
-  }
 }
 
 .dropdown-menu__row--unpadded {
