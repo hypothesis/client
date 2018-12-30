@@ -19,6 +19,7 @@ describe('groupList', function() {
     name: 'Private',
     organization: groupFixtures.defaultOrganization(),
     type: 'private',
+    isScopedToUri: true,
   });
 
   const restrictedGroup = immutable({
@@ -29,6 +30,18 @@ describe('groupList', function() {
     name: 'Restricted',
     organization: groupFixtures.defaultOrganization(),
     type: 'restricted',
+    isScopedToUri: true,
+  });
+
+  const restrictedOutOfScopeGroup = immutable({
+    id: 'restrictedoos',
+    links: {
+      html: 'https://hypothes.is/groups/restricto',
+    },
+    name: 'Restricted',
+    organization: groupFixtures.defaultOrganization(),
+    type: 'restricted',
+    isScopedToUri: false,
   });
 
   const publicGroup = immutable({
@@ -39,6 +52,7 @@ describe('groupList', function() {
     name: 'Public',
     organization: groupFixtures.defaultOrganization(),
     type: 'open',
+    isScopedToUri: true,
   });
 
   let groups;
@@ -47,6 +61,7 @@ describe('groupList', function() {
   let fakeServiceUrl;
   let fakeSettings;
   let fakeFeatures;
+  let fakeStore;
 
   before(function() {
     angular
@@ -60,6 +75,12 @@ describe('groupList', function() {
   beforeEach(function() {
     fakeFeatures = {
       flagEnabled: sinon.stub().returns(false),
+    };
+
+    fakeStore = {
+      getCurrentlyViewingGroups: sinon.stub().returns([]),
+      getFeaturedGroups: sinon.stub().returns([]),
+      getMyGroups: sinon.stub().returns([]),
     };
 
     fakeAnalytics = {
@@ -81,6 +102,7 @@ describe('groupList', function() {
       serviceUrl: fakeServiceUrl,
       settings: fakeSettings,
       features: fakeFeatures,
+      store: fakeStore,
     });
   });
 
@@ -363,6 +385,86 @@ describe('groupList', function() {
       '_blank'
     );
   });
+  describe('group section visibility', () => {
+    [
+      {
+        description:
+          'shows Currently Viewing section when there are currently viewing groups',
+        currentlyViewingGroups: [publicGroup],
+        featuredGroups: [restrictedGroup],
+        myGroups: [],
+        expectedSections: ['Currently Viewing', 'Featured Groups'],
+      },
+      {
+        description:
+          'shows Featured Groups section when there are featured groups',
+        currentlyViewingGroups: [],
+        featuredGroups: [restrictedGroup],
+        myGroups: [publicGroup],
+        expectedSections: ['Featured Groups', 'My Groups'],
+      },
+      {
+        description: 'shows My Groups section when there are my groups',
+        currentlyViewingGroups: [],
+        featuredGroups: [],
+        myGroups: [publicGroup, privateGroup],
+        expectedSections: ['My Groups'],
+      },
+    ].forEach(
+      ({
+        description,
+        currentlyViewingGroups,
+        featuredGroups,
+        myGroups,
+        expectedSections,
+      }) => {
+        it(description, () => {
+          fakeFeatures.flagEnabled.withArgs('community_groups').returns(true);
+          // In order to show the group drop down there must be at least two groups.
+          groups = currentlyViewingGroups
+            .concat(featuredGroups)
+            .concat(myGroups);
+          fakeStore.getCurrentlyViewingGroups.returns(currentlyViewingGroups);
+          fakeStore.getFeaturedGroups.returns(featuredGroups);
+          fakeStore.getMyGroups.returns(myGroups);
+
+          const element = createGroupList();
+
+          const showGroupsMenu = element.ctrl.showGroupsMenu();
+          const dropdownToggle = element.find('.dropdown-toggle');
+          const arrowIcon = element.find('.h-icon-arrow-drop-down');
+          const sectionHeader = element.find('.dropdown-menu__section-heading');
+          const section = element.find('.dropdown-menu__section');
+          const dropdownOptions = element.find(
+            '.dropdown-community-groups-menu__row'
+          );
+
+          assert.isTrue(showGroupsMenu);
+          assert.lengthOf(dropdownToggle, 1);
+          assert.lengthOf(arrowIcon, 1);
+          sectionHeader.each(function() {
+            assert.isTrue(expectedSections.includes(this.textContent));
+          });
+          // Plus one for the create private group section.
+          assert.lengthOf(section, expectedSections.length + 1);
+          assert.lengthOf(dropdownOptions, 3);
+        });
+      }
+    );
+  });
+
+  it('displays out of scope groups as non-selectable', () => {
+    fakeFeatures.flagEnabled.withArgs('community_groups').returns(true);
+    // In order to show the group drop down there must be at least two groups.
+    groups = [publicGroup, restrictedOutOfScopeGroup];
+    fakeStore.getMyGroups.returns(groups);
+
+    const element = createGroupList();
+    const notSelectable = element.find('.group-item--out-of-scope');
+
+    assert.lengthOf(notSelectable, 1);
+  });
+
   describe('group menu visibility', () => {
     it('is hidden when third party service and only one group', function() {
       // Configure third party service.
@@ -437,38 +539,40 @@ describe('groupList', function() {
     it('is shown when community_groups feature flag is on and there are multiple groups', function() {
       fakeFeatures.flagEnabled.withArgs('community_groups').returns(true);
       groups = [publicGroup, restrictedGroup];
+      fakeStore.getMyGroups.returns(groups);
 
       const element = createGroupList();
 
       const showGroupsMenu = element.ctrl.showGroupsMenu();
       const dropdownToggle = element.find('.dropdown-toggle');
       const arrowIcon = element.find('.h-icon-arrow-drop-down');
-      const dropdownMenu = element.find('.dropdown-menu__top-arrow');
-      const dropdownOptions = element.find('.dropdown-menu__row');
+      const dropdownOptions = element.find(
+        '.dropdown-community-groups-menu__row'
+      );
 
       assert.isTrue(showGroupsMenu);
       assert.lengthOf(dropdownToggle, 1);
       assert.lengthOf(arrowIcon, 1);
-      assert.lengthOf(dropdownMenu, 1);
       assert.lengthOf(dropdownOptions, 3);
     });
 
     it('is not shown when community_groups feature flag is on and there is only one group', function() {
       fakeFeatures.flagEnabled.withArgs('community_groups').returns(true);
-      groups = [privateGroup];
+      groups = [publicGroup];
+      fakeStore.getMyGroups.returns(groups);
 
       const element = createGroupList();
 
       const showGroupsMenu = element.ctrl.showGroupsMenu();
       const dropdownToggle = element.find('.dropdown-toggle');
       const arrowIcon = element.find('.h-icon-arrow-drop-down');
-      const dropdownMenu = element.find('.dropdown-menu__top-arrow');
-      const dropdownOptions = element.find('.dropdown-menu__row');
+      const dropdownOptions = element.find(
+        '.dropdown-community-groups-menu__row'
+      );
 
       assert.isFalse(showGroupsMenu);
       assert.lengthOf(dropdownToggle, 0);
       assert.lengthOf(arrowIcon, 0);
-      assert.lengthOf(dropdownMenu, 0);
       assert.lengthOf(dropdownOptions, 0);
     });
   });

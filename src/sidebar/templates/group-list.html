@@ -28,8 +28,10 @@
     !--><span class="group-list-label__label">{{vm.groups.focused().name}}</span>
   </div>
   <!-- Only build the drop down menu if showGroupsMenu is true. -->
-  <div class="dropdown-menu__top-arrow" ng-if="vm.showGroupsMenu()"></div>
-  <ul class="dropdown-menu pull-none" role="menu" ng-if="vm.showGroupsMenu()">
+
+  <!-- Original groups menu. -->
+  <div class="dropdown-menu__top-arrow" ng-if="vm.showGroupsMenu() && !vm.isFeatureFlagEnabled('community_groups')"></div>
+  <ul class="dropdown-menu pull-none" role="menu" ng-if="vm.showGroupsMenu() && !vm.isFeatureFlagEnabled('community_groups')">
     <li class="dropdown-menu__row dropdown-menu__row--unpadded "
         ng-repeat="group in vm.groupOrganizations() track by group.id">
       <div ng-class="{'group-item': true, selected: group.id == vm.groups.focused().id}"
@@ -82,4 +84,132 @@
       </div>
     </li>
   </ul>
+
+  <!-- Show new menu if community_groups feature flag is enabled. -->
+  <div class="dropdown-menu" role="menu" ng-if="vm.showGroupsMenu() && vm.isFeatureFlagEnabled('community_groups')">
+
+    <!-- Display Currently Viewing. -->
+    <h2 class="dropdown-menu__section-heading" ng-if="vm.currentlyViewingGroupOrganizations().length > 0">Currently Viewing</h2>
+    <ul class="dropdown-menu__section" ng-if="vm.currentlyViewingGroupOrganizations().length > 0">
+      <li class="dropdown-community-groups-menu__row dropdown-menu__row--unpadded"
+          ng-repeat="group in vm.currentlyViewingGroupOrganizations() track by group.id">
+        <div ng-class="{'group-item-community-groups': true, 'is-selected': group.id == vm.groups.focused().id}"
+             ng-click="vm.focusGroup(group.id)" tabindex="0">
+          <!-- the group icon !-->
+          <div class="group-menu-icon-container">
+            <img class="group-list-label__icon group-list-label__icon--organization"
+              alt="{{ vm.orgName(group.id) }}"
+              ng-src="{{ group.logo }}"
+              ng-if="group.logo">
+          </div>
+        <!-- the group name and share link !-->
+        <div class="group-details-community-groups">
+          <a class="group-name-link"
+             href=""
+             title="{{ group.type === 'private' ? 'Show and create annotations in ' + group.name : 'Show public annotations'  }}">
+             {{group.name}}
+          </a>
+        </div>
+      </li>
+    </ul>
+    <!-- Display Featured groups section. -->
+    <h2 class="dropdown-menu__section-heading" ng-if="vm.featuredGroupOrganizations().length > 0">Featured Groups</h2>
+    <ul class="dropdown-menu__section" ng-if="vm.featuredGroupOrganizations().length > 0">
+      <li class="dropdown-community-groups-menu__row dropdown-menu__row--unpadded"
+          ng-repeat="group in vm.featuredGroupOrganizations() track by group.id">
+        <div ng-class="{'group-item-community-groups': true, 'is-selected': group.id == vm.groups.focused().id}"
+             ng-click="vm.focusGroup(group.id)" tabindex="0">
+          <!-- the group icon !-->
+          <div class="group-menu-icon-container">
+            <img class="group-list-label__icon group-list-label__icon--organization"
+              alt="{{ vm.orgName(group.id) }}"
+              ng-src="{{ group.logo }}"
+              ng-if="group.logo">
+          </div>
+        <!-- the group name and share link !-->
+        <div class="group-details-community-groups">
+          <a class="group-name-link"
+             href=""
+             title="{{ group.type === 'private' ? 'Show and create annotations in ' + group.name : 'Show public annotations'  }}">
+             {{group.name}}
+          </a>
+        </div>
+      </li>
+    </ul>
+
+
+    <!-- Display My Groups groups section if user is logged in. -->
+    <h2 class="dropdown-menu__section-heading" ng-if="vm.myGroupOrganizations().length > 0">My Groups</h2>
+    <ul class="dropdown-menu__section" ng-if="vm.myGroupOrganizations().length > 0">
+
+      <li class="dropdown-community-groups-menu__row dropdown-menu__row--unpadded"
+          ng-repeat="group in vm.myGroupOrganizations() track by group.id">
+
+        <!-- Show the group like normal if it is scoped to this page -->
+        <div ng-class="{'group-item-community-groups': true, 'is-selected': group.id == vm.groups.focused().id}"
+             ng-click="vm.focusGroup(group.id)" tabindex="0" ng-if="group.isScopedToUri">
+          <!-- the group icon !-->
+          <div class="group-menu-icon-container">
+            <img class="group-list-label__icon group-list-label__icon--organization"
+              alt="{{ vm.orgName(group.id) }}"
+              ng-src="{{ group.logo }}"
+              ng-if="group.logo">
+          </div>
+          <!-- the group name and share link -->
+          <div class="group-details-community-groups">
+            <a class="group-name-link"
+               href=""
+               title="{{ group.type === 'private' ? 'Show and create annotations in ' + group.name : 'Show public annotations'  }}">
+               {{group.name}}
+            </a>
+          </div>
+        </div>
+
+        <!-- Show the group as not selectable if it is not scoped to this page !-->
+        <div class="group-item--out-of-scope"
+             ng-class="{'group-item-community-groups': true, 'is-selected': group.id == vm.groups.focused().id}"
+             ng-click="vm.toggleGroupDetails()" tabindex="0"  ng-if="!group.isScopedToUri">
+          <!-- the group icon !-->
+          <div class="group-menu-icon-container">
+            <img class="group-list-label__icon group-list-label__icon--organization"
+              alt="{{ vm.orgName(group.id) }}"
+              ng-src="{{ group.logo }}"
+              ng-if="group.logo">
+          </div>
+          <!-- the group name and share link !-->
+          <div class="group-details-community-groups" id="group-details-out-of-scope">
+            <svg class="svg-icon group__icon--unavailable" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 24 24">
+              <path fill="none" d="M0 0h24v24H0V0z"/>
+              <path d="M11 15h2v2h-2zm0-8h2v6h-2zm.99-5C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z"/>
+            </svg>
+            <a class="group-name-link"
+               href=""
+               title="Group not annotatable on this domain.">
+               {{group.name}}
+            </a><br>
+            <p class="group-details__toggle">Why is this group unavailable?</p>
+            <p class="group-details__unavailable-message">
+              This group has been restricted to selected domains by its administrators.
+            </p>
+            <p class="group-details__actions">
+              <a class="button button--text group-details__group-page-link" href="{{group.links.html}}"
+               target="_blank"
+               ng-click="vm.viewGroupActivity()">Go to group page</a>
+            </p>
+          </div>
+        </div>
+      </li>
+    </ul>
+
+    <ul class="dropdown-menu__section dropdown-menu__section--no-header">
+      <li ng-if="vm.auth.status === 'logged-in' && !vm.isThirdPartyUser()" class="dropdown-community-groups-menu__row dropdown-menu__row--unpadded new-group-btn">
+        <div class="group-item-community-groups" ng-click="vm.createNewGroup()" tabindex="0">
+          <div class="group-icon-container"><i class="h-icon-add"></i></div>
+          <div class="group-details-community-groups">
+            New private group
+          </div>
+        </div>
+      </li>
+    </ul>
+  </div>
 </div>

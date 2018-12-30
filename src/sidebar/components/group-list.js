@@ -4,16 +4,25 @@ const { isThirdPartyUser } = require('../util/account-id');
 const isThirdPartyService = require('../util/is-third-party-service');
 const serviceConfig = require('../service-config');
 const memoize = require('../util/memoize');
-const groupOrganizations = memoize(require('../util/group-organizations'));
+const groupsByOrganization = require('../util/group-organizations');
+
+const groupOrganizations = memoize(groupsByOrganization);
+
+const myGroupOrgs = memoize(groupsByOrganization);
+
+const featuredGroupOrgs = memoize(groupsByOrganization);
+
+const currentlyViewingGroupOrgs = memoize(groupsByOrganization);
 
 // @ngInject
 function GroupListController(
   $window,
   analytics,
+  features,
   groups,
   settings,
   serviceUrl,
-  features
+  store
 ) {
   this.groups = groups;
 
@@ -55,6 +64,18 @@ function GroupListController(
 
   this.groupOrganizations = function() {
     return groupOrganizations(this.groups.all());
+  };
+
+  this.currentlyViewingGroupOrganizations = function() {
+    return currentlyViewingGroupOrgs(store.getCurrentlyViewingGroups());
+  };
+
+  this.featuredGroupOrganizations = function() {
+    return featuredGroupOrgs(store.getFeaturedGroups());
+  };
+
+  this.myGroupOrganizations = function() {
+    return myGroupOrgs(store.getMyGroups());
   };
 
   this.viewGroupActivity = function() {
