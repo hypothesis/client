@@ -2,21 +2,20 @@
      dropdown
      keyboard-nav>
   <!-- Show a drop down menu if showGroupsMenu is true. -->
-  <div class="dropdown-toggle"
+  <button class="btn dropdown-toggle"
         dropdown-toggle
         data-toggle="dropdown"
         role="button"
         tabindex="0"
         ng-if="vm.showGroupsMenu()">
-    <img class="group-list-label__icon group-list-label__icon--organization"
-         ng-src="{{ vm.focusedIcon() }}"
-         alt="{{ vm.orgName(vm.groups.focused().id)}}"
-         ng-if="vm.focusedIcon()">
-         <i class="group-list-label__icon h-icon-{{ vm.focusedIconClass() }}"
-             ng-if="!vm.focusedIcon()"></i><!-- nospace
-    !--><span class="group-list-label__label"><a class="group-list-label__toggle">{{vm.groups.focused().name}}</a><!-- nospace
-      !--><i class="h-icon-arrow-drop-down"></i></span>
-  </div>
+        Groups
+        <svg class="svg-icon icon-expand select__expand-icon"
+             xmlns="http://www.w3.org/2000/svg" width="auto" height="100%" viewBox="0 0 24 24" aria-labelledby="icon-expand-title">
+          <title id="icon-expand-title">Expand</title>
+          <path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z"/>
+          <path d="M0 0h24v24H0z" fill="none"/>
+        </svg>
+  </button>
   <!-- Do not show a drop down menu if showGroupsMenu is false. -->
   <div ng-if="!vm.showGroupsMenu()">
     <img class="group-list-label__icon group-list-label__icon--organization"

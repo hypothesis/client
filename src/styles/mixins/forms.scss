@@ -89,4 +89,3 @@
 @function shade($color, $percent){
   @return mix(black, $color, $percent);
 }
-

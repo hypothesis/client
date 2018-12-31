@@ -65,20 +65,28 @@ html {
 
 //DROPDOWNS////////////////////////////////
 .dropdown {
-  position: relative;
-  span {
-    cursor: pointer;
-    &:hover {
-      color: black;
-    }
-  }
 }
 
 .dropdown-toggle {
+  background: $white;
+  border-radius: 4px;
   cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.25;
+  text-transform: uppercase;
 
   &:active {
     outline: 0;
+  }
+
+  .icon-expand {
+    fill: $button-text-color;
+    height: 1.25em;
+    line-height: 1;
+    overflow: hidden;
+    vertical-align: text-top;
+    width: 1.25em;
   }
 }
 
