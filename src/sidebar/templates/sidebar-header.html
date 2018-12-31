@@ -4,7 +4,7 @@
       href="{{ vm.groups.focused().links.html }}"
       target="_blank"
       ng-click="vm.viewGroupActivity()">
-      <img class="sidebar-header__organization-icon"
+      <img class="sidebar-header__organization-icon {{ vm.focusedIconClass() }}"
         ng-src="{{ vm.focusedIcon() }}"
         alt="{{ vm.orgName(vm.groups.focused().id)}}"
         ng-if="vm.focusedIcon()">
