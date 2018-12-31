@@ -134,13 +134,10 @@ $base-font-size: 14px;
     box-shadow: none;
     border-radius: 0px;
     border-style: none none solid solid;
+    height: $top-bar-height;
+    margin-bottom: 10px;
     padding-right: 6px;
     width: 36px;
-    margin-bottom: 10px;
-
-    // the height of the sidebar toggle is set
-    // to match the height of the top bar
-    height: 40px;
   }
 
   .annotator-frame-button--sidebar_close {
