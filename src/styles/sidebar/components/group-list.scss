@@ -38,9 +38,7 @@ $group-list-spacing-below: 50px;
     }
 
     &:hover {
-      .group-name-link {
-        color: $brand-color;
-      }
+      background: $gray-lightest;
     }
 
     &.selected {

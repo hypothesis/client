@@ -81,6 +81,7 @@ html {
   font-size: 14px;
   font-weight: 500;
   line-height: 1.25;
+  text-shadow: none;
   text-transform: uppercase;
 
   &:active {
@@ -197,6 +198,10 @@ html {
   & > .dropdown-menu {
     @include smallshadow;
     visibility: visible;
+  }
+
+  & > .dropdown-toggle {
+    background: $gray-lighter;
   }
 }
 
