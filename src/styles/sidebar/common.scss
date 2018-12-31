@@ -199,10 +199,6 @@ html {
     @include smallshadow;
     visibility: visible;
   }
-
-  & > .dropdown-toggle {
-    background: $gray-lighter;
-  }
 }
 
 // A 'standalone' arrow for the top of a dropdown menu.

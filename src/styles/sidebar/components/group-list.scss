@@ -125,3 +125,10 @@ $group-list-spacing-below: 50px;
   white-space: nowrap;
   color: inherit;
 }
+
+
+.open {
+  & > .group-list__toggle {
+    background: $gray-lighter;
+  }
+}
