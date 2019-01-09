@@ -121,17 +121,17 @@ const appBundleConfigs = appBundles.map(function (config) {
   return Object.assign({}, appBundleBaseConfig, config);
 });
 
-gulp.task('build-js', ['build-vendor-js'], function () {
+gulp.task('build-js', gulp.parallel('build-vendor-js', function () {
   return Promise.all(appBundleConfigs.map(function (config) {
     return createBundle(config);
   }));
-});
+}));
 
-gulp.task('watch-js', ['build-vendor-js'], function () {
+gulp.task('watch-js', gulp.series('build-vendor-js', function watchJS() {
   appBundleConfigs.forEach(function (config) {
     createBundle(config, {watch: true});
   });
-});
+}));
 
 const styleFiles = [
   // H
@@ -169,39 +169,39 @@ gulp.task('build-css', function () {
     .pipe(gulp.dest(STYLE_DIR));
 });
 
-gulp.task('watch-css', ['build-css'], function () {
+gulp.task('watch-css', gulp.series('build-css', function watchCSS() {
   const vendorCSS = styleFiles.filter(function (path) {
     return path.endsWith('.css');
   });
   const styleFileGlobs = vendorCSS.concat('./src/styles/**/*.scss');
 
-  gulp.watch(styleFileGlobs, ['build-css']);
-});
+  gulp.watch(styleFileGlobs, gulp.task('build-css'));
+}));
 
 const fontFiles = ['src/styles/vendor/fonts/*.woff',
                    'node_modules/katex/dist/fonts/*.woff',
                    'node_modules/katex/dist/fonts/*.woff2'];
 
 gulp.task('build-fonts', function () {
-  gulp.src(fontFiles)
+  return gulp.src(fontFiles)
     .pipe(changed(FONTS_DIR))
     .pipe(gulp.dest(FONTS_DIR));
 });
 
-gulp.task('watch-fonts', ['build-fonts'], function () {
-  gulp.watch(fontFiles, ['build-fonts']);
-});
+gulp.task('watch-fonts', gulp.series('build-fonts', function watchFonts() {
+  gulp.watch(fontFiles, gulp.task('build-fonts'));
+}));
 
 const imageFiles = 'src/images/**/*';
 gulp.task('build-images', function () {
-  gulp.src(imageFiles)
+  return gulp.src(imageFiles)
     .pipe(changed(IMAGES_DIR))
     .pipe(gulp.dest(IMAGES_DIR));
 });
 
-gulp.task('watch-images', ['build-images'], function () {
-  gulp.watch(imageFiles, ['build-images']);
-});
+gulp.task('watch-images', gulp.series('build-images', function watchImages() {
+  gulp.watch(imageFiles, gulp.task('build-images'));
+}));
 
 gulp.task('watch-templates', function () {
   gulp.watch(TEMPLATES_DIR + '/*.html', function (file) {
@@ -299,7 +299,7 @@ function generateBootScript(manifest) {
  * URLs containing cache-busting query string parameters.
  */
 function generateManifest() {
-  gulp.src(MANIFEST_SOURCE_FILES)
+  return gulp.src(MANIFEST_SOURCE_FILES)
     .pipe(manifest({name: 'manifest.json'}))
     .pipe(through.obj(function (file, enc, callback) {
       // Trigger a reload of the client in the dev server at localhost:3000
@@ -325,7 +325,11 @@ gulp.task('watch-manifest', function () {
   }));
 });
 
-gulp.task('serve-live-reload', ['serve-package'], function () {
+gulp.task('serve-package', function () {
+  servePackage(3001, packageServerHostname());
+});
+
+gulp.task('serve-live-reload', function () {
   const LiveReloadServer = require('./scripts/gulp/live-reload-server');
   const scheme = useSsl ? 'https' : 'http';
   liveReloadServer = new LiveReloadServer(3000, {
@@ -333,24 +337,24 @@ gulp.task('serve-live-reload', ['serve-package'], function () {
   });
 });
 
-gulp.task('serve-package', function () {
-  servePackage(3001, packageServerHostname());
-});
+const buildAssets = gulp.parallel(
+  'build-js',
+  'build-css',
+  'build-fonts',
+  'build-images'
+);
+gulp.task('build', gulp.series(buildAssets, generateManifest));
 
-gulp.task('build', ['build-js',
-                    'build-css',
-                    'build-fonts',
-                    'build-images'],
-          generateManifest);
-
-gulp.task('watch', ['serve-package',
-                    'serve-live-reload',
-                    'watch-js',
-                    'watch-css',
-                    'watch-fonts',
-                    'watch-images',
-                    'watch-manifest',
-                    'watch-templates']);
+gulp.task('watch', gulp.parallel(
+  'serve-package',
+  'serve-live-reload',
+  'watch-js',
+  'watch-css',
+  'watch-fonts',
+  'watch-images',
+  'watch-manifest',
+  'watch-templates'
+));
 
 function runKarma(baseConfig, opts, done) {
   // See https://github.com/karma-runner/karma-mocha#configuration
@@ -384,7 +388,7 @@ gulp.task('test-watch', function (callback) {
   runKarma('./src/karma.config.js', {}, callback);
 });
 
-gulp.task('upload-sourcemaps', ['build-js'], function () {
+gulp.task('upload-sourcemaps', gulp.series('build-js', function () {
   const uploadToSentry = require('./scripts/gulp/upload-to-sentry');
 
   const opts = {
@@ -396,4 +400,4 @@ gulp.task('upload-sourcemaps', ['build-js'], function () {
 
   return gulp.src(['build/scripts/*.js', 'build/scripts/*.map'])
     .pipe(uploadToSentry(opts, projects, release));
-});
+}));
