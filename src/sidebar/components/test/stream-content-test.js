@@ -26,8 +26,7 @@ describe('StreamContentController', function () {
 
   before(function () {
     angular.module('h', [])
-      .component('streamContent', require('../stream-content'))
-      .config(($compileProvider) => $compileProvider.preAssignBindingsEnabled(true));
+      .component('streamContent', require('../stream-content'));
   });
 
   beforeEach(function () {

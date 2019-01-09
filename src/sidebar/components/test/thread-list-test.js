@@ -115,8 +115,7 @@ describe('threadList', function () {
 
   before(function () {
     angular.module('app', [])
-      .component('threadList', threadList)
-      .config(($compileProvider) => $compileProvider.preAssignBindingsEnabled(true));
+      .component('threadList', threadList);
   });
 
   beforeEach(function () {
