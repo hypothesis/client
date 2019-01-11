@@ -6,12 +6,7 @@
         tabindex="0"
         ng-if="vm.showGroupsMenu()">
         Groups
-        <svg class="svg-icon icon-expand select__expand-icon"
-             xmlns="http://www.w3.org/2000/svg" width="auto" height="100%" viewBox="0 0 24 24" aria-labelledby="icon-expand-title">
-          <title id="icon-expand-title">Expand</title>
-          <path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z"/>
-          <path d="M0 0h24v24H0z" fill="none"/>
-        </svg>
+        <i class="h-icon-arrow-drop-down top-bar__dropdown-arrow"></i>
   </button>
   <ul class="dropdown-menu" role="menu" ng-if="vm.showGroupsMenu()">
     <li class="dropdown-menu__row dropdown-menu__row--unpadded "
