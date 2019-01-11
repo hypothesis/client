@@ -8,31 +8,81 @@
         Groups
         <i class="h-icon-arrow-drop-down top-bar__dropdown-arrow"></i>
   </button>
-  <ul class="dropdown-menu" role="menu" ng-if="vm.showGroupsMenu()">
-    <li class="dropdown-menu__row dropdown-menu__row--unpadded "
-        ng-repeat="group in vm.groupOrganizations() track by group.id">
-      <div ng-class="{'group-item': true, selected: group.id == vm.groups.focused().id}"
-           ng-click="vm.focusGroup(group.id)" tabindex="0">
-        <!-- the group icon !-->
-        <div class="group-menu-icon-container">
-          <img class="group-list-label__icon group-list-label__icon--organization"
-            alt="{{ vm.orgName(group.id) }}"
-            ng-src="{{ group.logo }}"
-            ng-if="group.logo">
+  <div class="dropdown-menu" role="menu" ng-if="vm.showGroupsMenu()">
+    <h2 class="dropdown-menu__section-heading">Currently Viewing</h2>
+    <ul class="dropdown-menu__section">
+      <li class="dropdown-menu__row dropdown-menu__row--unpadded">
+        <div ng-class="{'group-item': true}"
+             ng-click="vm.focusGroup(vm.groups.focused().id)" tabindex="0">
+          <!-- the group icon !-->
+          <div class="group-menu-icon-container">
+            <img class="group-list-label__icon group-list-label__icon--organization"
+              alt="{{ vm.orgName(vm.groups.focused().id) }}"
+              ng-src="{{ vm.groups.focused().logo }}"
+              ng-if="vm.groups.focused().logo">
+          </div>
+          <!-- the group name and share link !-->
+          <div class="group-details">
+            {{vm.groups.focused().name}}
+          </div>
         </div>
-        <!-- the group name and share link !-->
-        <div class="group-details">
-          {{group.name}}
+      </li>
+    </ul>
+
+    <!-- TODO: Add ng-if logic for Featured Groups -->
+    <!-- TODO: Fix group info display (name, org logo, etc.) -->
+    <h2 class="dropdown-menu__section-heading">Featured Groups</h2>
+    <ul class="dropdown-menu__section">
+      <li class="dropdown-menu__row dropdown-menu__row--unpadded">
+        <div ng-class="{'group-item': true, selected: group.id == vm.groups.focused().id}"
+             ng-click="vm.focusGroup(group.id)" tabindex="0">
+          <!-- the group icon !-->
+          <div class="group-menu-icon-container">
+            <img class="group-list-label__icon group-list-label__icon--organization"
+              alt="{{ vm.orgName(group.id) }}"
+              ng-src="{{ group.logo }}"
+              ng-if="group.logo">
+          </div>
+          <!-- the group name and share link !-->
+          <div class="group-details">
+            Example featured group
+          </div>
         </div>
-      </div>
-    </li>
-    <li ng-if="vm.auth.status === 'logged-in' && !vm.isThirdPartyUser()" class="dropdown-menu__row dropdown-menu__row--unpadded new-group-btn">
-      <div class="group-item" ng-click="vm.createNewGroup()" tabindex="0">
-        <div class="group-icon-container"><i class="h-icon-add"></i></div>
-        <div class="group-details">
-          New private group
+      </li>
+    </ul>
+
+    <!-- TODO: Convert to ng-repeat for current user's groups (pending API endpoint) -->
+    <!-- TODO: Fix group info display (name, org logo, etc.) -->
+    <h2 class="dropdown-menu__section-heading">My Groups</h2>
+    <ul class="dropdown-menu__section">
+      <li class="dropdown-menu__row dropdown-menu__row--unpadded"
+          ng-repeat="group in vm.groupOrganizations() track by group.id">
+        <div ng-class="{'group-item': true, selected: group.id == vm.groups.focused().id}"
+             ng-click="vm.focusGroup(group.id)" tabindex="0">
+          <!-- the group icon !-->
+          <div class="group-menu-icon-container">
+            <img class="group-list-label__icon group-list-label__icon--organization"
+              alt="{{ vm.orgName(group.id) }}"
+              ng-src="{{ group.logo }}"
+              ng-if="group.logo">
+          </div>
+          <!-- the group name and share link !-->
+          <div class="group-details">
+            {{group.name}}
+          </div>
         </div>
-      </div>
-    </li>
-  </ul>
+      </li>
+    </ul>
+
+    <ul class="dropdown-menu__section dropdown-menu__section--no-header">
+      <li ng-if="vm.auth.status === 'logged-in' && !vm.isThirdPartyUser()" class="dropdown-menu__row dropdown-menu__row--unpadded new-group-btn">
+        <div class="group-item" ng-click="vm.createNewGroup()" tabindex="0">
+          <div class="group-icon-container"><i class="h-icon-add"></i></div>
+          <div class="group-details">
+            New private group
+          </div>
+        </div>
+      </li>
+    </ul>
+  </div>
 </div>
