@@ -9,8 +9,10 @@
         <i class="h-icon-arrow-drop-down top-bar__dropdown-arrow"></i>
   </button>
   <div class="dropdown-menu" role="menu" ng-if="vm.showGroupsMenu()">
-    <h2 class="dropdown-menu__section-heading">Currently Viewing</h2>
-    <ul class="dropdown-menu__section">
+
+    <!-- TODO: Fix org logo display -->
+    <h2 class="dropdown-menu__section-heading dropdown-menu__section-heading--current">Currently Viewing</h2>
+    <ul class="dropdown-menu__section dropdown-menu__section--current">
       <li class="dropdown-menu__row dropdown-menu__row--unpadded">
         <div ng-class="{'group-item': true}"
              ng-click="vm.focusGroup(vm.groups.focused().id)" tabindex="0">

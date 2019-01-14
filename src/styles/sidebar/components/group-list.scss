@@ -22,6 +22,10 @@ $group-list-spacing-below: 50px;
     }
   }
 
+  .dropdown-menu__section--current {
+    background-color: $gray-lightest;
+  }
+
   .dropdown-menu__section--no-header {
     border-top: solid 1px rgba(0, 0, 0, 0.15);
 
@@ -34,13 +38,17 @@ $group-list-spacing-below: 50px;
     color: $gray-light;
     font-size: 12px;
     line-height: 1;
-    margin: 1px;
+    margin: 1px 1px 0;
     padding: 12px 10px 0;
     text-transform: uppercase;
 
     &:not(:first-child) {
       border-top: solid 1px rgba(0, 0, 0, 0.15);
     }
+  }
+
+  .dropdown-menu__section-heading--current {
+    background-color: $gray-lightest;
   }
 
   .group-item {
