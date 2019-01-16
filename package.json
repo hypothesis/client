@@ -20,7 +20,7 @@
     "babel-preset-es2015": "^6.24.0",
     "babelify": "^7.3.0",
     "browserify": "^13.0.0",
-    "browserify-istanbul": "^2.0.0",
+    "browserify-istanbul": "^3.0.1",
     "browserify-ngannotate": "^1.0.1",
     "browserify-shim": "^3.8.12",
     "browserify-versionify": "^1.0.6",
