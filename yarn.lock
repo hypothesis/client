@@ -1680,16 +1680,7 @@ chalk@^1.0.0, chalk@^1.1.1, chalk@^1.1.3:
     strip-ansi "^3.0.0"
     supports-color "^2.0.0"
 
-chalk@^2.0.1, chalk@^2.1.0:
-  version "2.4.1"
-  resolved "https://registry.yarnpkg.com/chalk/-/chalk-2.4.1.tgz#18c49ab16a037b6eb0152cc83e3471338215b66e"
-  integrity sha512-ObN6h1v2fTJSmUXoS3nMQ92LbDK9be4TV+6G+omQlGJFdcUX5heKi1LZ1YnRMIgwTLEj3E24bT6tYni50rlCfQ==
-  dependencies:
-    ansi-styles "^3.2.1"
-    escape-string-regexp "^1.0.5"
-    supports-color "^5.3.0"
-
-chalk@^2.4.2:
+chalk@^2.0.1, chalk@^2.1.0, chalk@^2.3.0, chalk@^2.4.2:
   version "2.4.2"
   resolved "https://registry.yarnpkg.com/chalk/-/chalk-2.4.2.tgz#cd42541677a54333cf541a49108c1432b44c9424"
   integrity sha512-Mti+f9lpJNcwF4tWV8/OrTTtF1gZi+f8FqlyAdouralcFWFQWF2+NgCHShjkCb+IFBLq9buZwE1xckQU4peSuQ==
@@ -4000,14 +3991,17 @@ gulp-replace@^0.5.4:
     readable-stream "^2.0.1"
     replacestream "^4.0.0"
 
-gulp-sass@^3.1.0:
-  version "3.2.1"
-  resolved "https://registry.yarnpkg.com/gulp-sass/-/gulp-sass-3.2.1.tgz#2e3688a96fd8be1c0c01340750c191b2e79fab94"
-  integrity sha512-UATbRpSDsyXCnpYSPBUEvdvtSEzksJs7/oQ0CujIpzKqKrO6vlnYwhX2UTsGrf4rNLwqlSSaM271It0uHYvJ3Q==
+gulp-sass@^4.0.2:
+  version "4.0.2"
+  resolved "https://registry.yarnpkg.com/gulp-sass/-/gulp-sass-4.0.2.tgz#cfb1e3eff2bd9852431c7ce87f43880807d8d505"
+  integrity sha512-q8psj4+aDrblJMMtRxihNBdovfzGrXJp1l4JU0Sz4b/Mhsi2DPrKFYCGDwjIWRENs04ELVHxdOJQ7Vs98OFohg==
   dependencies:
-    gulp-util "^3.0"
+    chalk "^2.3.0"
     lodash.clonedeep "^4.3.2"
     node-sass "^4.8.3"
+    plugin-error "^1.0.1"
+    replace-ext "^1.0.0"
+    strip-ansi "^4.0.0"
     through2 "^2.0.0"
     vinyl-sourcemaps-apply "^0.2.0"
 
@@ -4028,7 +4022,7 @@ gulp-sourcemaps@^1.6.0:
     through2 "2.X"
     vinyl "1.X"
 
-gulp-util@^3.0, gulp-util@^3.0.0, gulp-util@^3.0.7:
+gulp-util@^3.0.0, gulp-util@^3.0.7:
   version "3.0.8"
   resolved "https://registry.yarnpkg.com/gulp-util/-/gulp-util-3.0.8.tgz#0054e1e744502e27c04c187c3ecc505dd54bbb4f"
   integrity sha1-AFTh50RQLifATBh8PsxQXdVLu08=
@@ -8345,12 +8339,12 @@ through2@0.6.3:
     readable-stream ">=1.0.33-1 <1.1.0-0"
     xtend ">=4.0.0 <4.1.0-0"
 
-through2@2.X, through2@^2.0.0, through2@^2.0.1, through2@^2.0.3:
-  version "2.0.3"
-  resolved "https://registry.yarnpkg.com/through2/-/through2-2.0.3.tgz#0004569b37c7c74ba39c43f3ced78d1ad94140be"
-  integrity sha1-AARWmzfHx0ujnEPzzteNGtlBQL4=
+through2@2.X, through2@^2.0.0, through2@^2.0.1, through2@^2.0.3, through2@~2.0.0:
+  version "2.0.5"
+  resolved "https://registry.yarnpkg.com/through2/-/through2-2.0.5.tgz#01c1e39eb31d07cb7d03a96a70823260b23132cd"
+  integrity sha512-/mrRod8xqpA+IHSLyGCQ2s8SPHiCDEeQJSep1jqLYeEUClOFG2Qsh+4FU6G9VeqpZnGW/Su8LQGc4YKni5rYSQ==
   dependencies:
-    readable-stream "^2.1.5"
+    readable-stream "~2.3.6"
     xtend "~4.0.1"
 
 through2@^0.6.3, through2@~0.6.3:
@@ -8368,14 +8362,6 @@ through2@~0.4.0:
   dependencies:
     readable-stream "~1.0.17"
     xtend "~2.1.1"
-
-through2@~2.0.0:
-  version "2.0.5"
-  resolved "https://registry.yarnpkg.com/through2/-/through2-2.0.5.tgz#01c1e39eb31d07cb7d03a96a70823260b23132cd"
-  integrity sha512-/mrRod8xqpA+IHSLyGCQ2s8SPHiCDEeQJSep1jqLYeEUClOFG2Qsh+4FU6G9VeqpZnGW/Su8LQGc4YKni5rYSQ==
-  dependencies:
-    readable-stream "~2.3.6"
-    xtend "~4.0.1"
 
 "through@>=2.2.7 <3", through@^2.3.6, through@^2.3.7, through@^2.3.8, through@~2.3.4:
   version "2.3.8"
