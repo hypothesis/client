@@ -58,6 +58,12 @@ function GroupListController($window, analytics, groups, settings, serviceUrl) {
     groups.focus(groupId);
   };
 
+  this.toggleGroupDetails = function () {
+    const groupDetails = $window.document.getElementById('group-details-example');
+    groupDetails.classList.toggle('expanded');
+    $window.event.stopPropagation();
+  };
+
   /**
    * Show the share link for the group if it is not a third-party group
    * AND if the URL needed is present in the group object. We should be able

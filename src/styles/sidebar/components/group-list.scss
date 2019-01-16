@@ -78,6 +78,11 @@ $group-list-spacing-below: 50px;
     }
   }
 
+  .group-item--oos {
+    background-color: $gray-lightest;
+    color: $gray-light;
+  }
+
   .group-icon-container {
     margin-right: 10px;
   }
@@ -96,10 +101,58 @@ $group-list-spacing-below: 50px;
     margin-right: 2px;
   }
 
+  .group__icon--unavailable {
+    fill: $gray-light;
+    float: right;
+    height: 20px;
+    width: auto;
+  }
+
   .group-details {
     flex-grow: 1;
     flex-shrink: 1;
     font-weight: 500;
+
+    .group-details__unavailable-message,
+    .group-details__actions {
+      display: none;
+    }
+
+    &.expanded {
+      .group-details__toggle {
+        display: none;
+      }
+
+      .group-details__unavailable-message,
+      .group-details__actions {
+        display: block;
+      }
+    }
+  }
+
+  .group-details__toggle {
+    font-size: 0.8em;
+    font-style: italic;
+    margin: 0;
+    text-decoration: underline;
+  }
+
+  .group-details__unavailable-message {
+    font-size: 0.8em;
+    line-height: 1.5;
+    white-space: normal;
+    width: $group-list-width - 60px;
+  }
+
+  .group-details__actions {
+    text-align: right;
+  }
+
+  .group-details__group-page-link {
+    color: inherit;
+    font-size: 0.8em;
+    text-decoration: underline;
+    text-transform: uppercase;
   }
 
   .new-group-btn {
