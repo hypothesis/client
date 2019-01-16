@@ -148,7 +148,7 @@
     "lint": "eslint .",
     "test": "gulp test",
     "report-coverage": "codecov -f coverage/coverage-final.json",
-    "version": "make clean all && ./scripts/update-changelog.js && git add CHANGELOG.md",
+    "version": "make clean build/manifest.json && ./scripts/update-changelog.js && git add CHANGELOG.md",
     "postversion": "./scripts/postversion.sh",
     "prepublish": "yarn run build"
   }
