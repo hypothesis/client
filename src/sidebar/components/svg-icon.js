@@ -16,10 +16,12 @@ const icons = {
 
 // @ngInject
 function SvgIconController($element) {
-  if (!icons[this.name]) {
-    throw new Error('Unknown icon: ' + this.name);
-  }
-  $element[0].innerHTML = icons[this.name];
+  this.$onInit = () => {
+    if (!icons[this.name]) {
+      throw new Error('Unknown icon: ' + this.name);
+    }
+    $element[0].innerHTML = icons[this.name];
+  };
 }
 
 module.exports = {

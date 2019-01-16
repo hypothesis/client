@@ -67,8 +67,7 @@ describe('sidebar.components.sidebar-content', function () {
           angular: angular,
           '../search-client': FakeSearchClient,
         })
-      ))
-      .config(($compileProvider) => $compileProvider.preAssignBindingsEnabled(true));
+      ));
   });
 
   beforeEach(angular.mock.module('h'));

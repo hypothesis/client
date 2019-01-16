@@ -52,15 +52,6 @@ function StreamContentController(
     store.setForceVisible(id, true);
   };
 
-  Object.assign(this.search, {
-    query: function () {
-      return $routeParams.q || '';
-    },
-    update: function (q) {
-      $location.search({q: q});
-    },
-  });
-
   store.subscribe(function () {
     self.rootThread = rootThread.thread(store.getState());
   });
@@ -69,6 +60,11 @@ function StreamContentController(
   store.setSortKey('Newest');
 
   this.loadMore = fetch;
+
+  this.$onInit = () => {
+    this.search.query = () => $routeParams.q || '';
+    this.search.update = q => $location.search({ q });
+  };
 }
 
 module.exports = {

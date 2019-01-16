@@ -99,7 +99,7 @@ function AnnotationController(
     * All initialization code except for assigning the controller instance's
     * methods goes here.
     */
-  function init() {
+  this.$onInit = () => {
     /** Determines whether controls to expand/collapse the annotation body
      * are displayed adjacent to the tags field.
      */
@@ -156,7 +156,7 @@ function AnnotationController(
         self.edit();
       }
     }
-  }
+  };
 
   /** Save this annotation if it's a new highlight.
    *
@@ -569,8 +569,6 @@ function AnnotationController(
     }
     return self.group().type !== 'private';
   };
-
-  init();
 }
 
 module.exports = {
