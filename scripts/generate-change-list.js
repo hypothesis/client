@@ -50,7 +50,7 @@ async function* itemsInGitHubAPIResponse(octokit, response) {
 async function getPRsMergedSince(octokit, org, repo, tag) {
   const tagDate = getTagDate(tag);
 
-  let response = await octokit.pullRequests.getAll({
+  let response = await octokit.pullRequests.list({
     owner: org,
     repo,
     state: 'closed',
