@@ -58,6 +58,9 @@ function GroupListController($window, analytics, groups, settings, serviceUrl) {
     groups.focus(groupId);
   };
 
+  /**
+   * This is a quick and dirty hack to show styling, and needs refactoring.
+   */
   this.toggleGroupDetails = function () {
     const groupDetails = $window.document.getElementById('group-details-example');
     groupDetails.classList.toggle('expanded');

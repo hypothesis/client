@@ -1,8 +1,16 @@
 'use strict';
 
+const { isThirdPartyUser } = require('../util/account-id');
+const isThirdPartyService = require('../util/is-third-party-service');
+const serviceConfig = require('../service-config');
+
 // @ngInject
 function SidebarHeaderController(groups) {
   this.groups = groups;
+
+  this.showHeader = function() {
+    return !( this.isThirdPartyService && (this.groups.all().length <= 1) );
+  };
 
   this.focusedIcon = function() {
     const focusedGroup = this.groups.focused();

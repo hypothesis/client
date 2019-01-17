@@ -1,5 +1,5 @@
 <header class="sidebar-header">
-  <h1 class="sidebar-header__heading">
+  <h1 class="sidebar-header__heading" ng-if="vm.showHeader()">
     <a class="sidebar-header__link"
       href="{{ vm.groups.focused().links.html }}"
       target="_blank"

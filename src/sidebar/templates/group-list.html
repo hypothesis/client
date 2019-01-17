@@ -1,4 +1,15 @@
 <div dropdown keyboard-nav>
+  <!-- Do not show a drop down menu if showGroupsMenu is false. -->
+  <div ng-if="!vm.showGroupsMenu()">
+    <img class="group-list-label__icon group-list-label__icon--organization"
+         ng-src="{{ vm.focusedIcon() }}"
+         alt="{{ vm.orgName(vm.groups.focused().id)}}"
+         ng-if="vm.focusedIcon()">
+         <i class="group-list-label__icon h-icon-{{ vm.focusedIconClass() }}"
+             ng-if="!vm.focusedIcon()"></i><!-- nospace
+    !--><span class="group-list-label__label">{{vm.groups.focused().name}}</span>
+  </div>
+
   <button class="btn dropdown-toggle group-list__toggle"
         dropdown-toggle
         data-toggle="dropdown"
@@ -76,7 +87,7 @@
       </li>
 
       <!-- TODO: Integrate this display state into the My Groups loop, only
-                 list items in this state if group is scoped, and out of scope -->
+                 list items in this state if group is scoped, AND out of scope -->
       <li class="dropdown-menu__row dropdown-menu__row--unpadded">
         <div class="group-item--oos"
              ng-class="{'group-item': true, selected: group.id == vm.groups.focused().id}"
