@@ -13,7 +13,7 @@
     "angular-route": "^1.7.5",
     "angular-sanitize": "^1.7.5",
     "angular-toastr": "^1.7.0",
-    "angulartics": "0.17.2",
+    "angulartics": "1.6.0",
     "autofill-event": "0.0.1",
     "autoprefixer": "^6.0.3",
     "aws-sdk": "^2.345.0",
