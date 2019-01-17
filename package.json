@@ -7,7 +7,7 @@
   "bugs": "https://github.com/hypothesis/client/issues",
   "repository": "hypothesis/client",
   "devDependencies": {
-    "@octokit/rest": "^15.13.0",
+    "@octokit/rest": "^16.9.0",
     "angular": "^1.7.5",
     "angular-mocks": "^1.7.5",
     "angular-route": "^1.7.5",
