@@ -4,6 +4,26 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [1.115.0] - 2019-01-17
+
+### Changed
+
+- Bump postcss from 5.2.18 to 7.0.13
+  [#845](https://api.github.com/repos/hypothesis/client/pulls/845)
+
+- Bump gulp-changed from 1.3.2 to 3.2.0
+  [#843](https://api.github.com/repos/hypothesis/client/pulls/843)
+
+- Bump through2 from 2.0.5 to 3.0.0
+  [#842](https://api.github.com/repos/hypothesis/client/pulls/842)
+
+- Bump @octokit/rest from 15.13.0 to 16.9.0
+  [#841](https://api.github.com/repos/hypothesis/client/pulls/841)
+
+- Adapt to change of `getAll` method name
+  [#846](https://api.github.com/repos/hypothesis/client/pulls/846)
+
+
 ## [1.114.0] - 2019-01-16
 
 ### Changed
