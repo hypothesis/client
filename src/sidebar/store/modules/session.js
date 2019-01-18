@@ -5,10 +5,7 @@ const util = require('../util');
 function init() {
   return {
     /**
-     * The state of the user's login session.
-     *
-     * This includes their user ID, set of enabled features, and the list of
-     * groups they are a member of.
+     * Profile/session information for the active user.
      */
     session: {
       /** A map of features that are enabled for the current user. */
