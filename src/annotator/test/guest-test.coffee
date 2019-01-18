@@ -549,44 +549,41 @@ describe 'Guest', ->
       guest.anchor(annotation).then ->
         assert.notCalled(anchoring.anchor)
 
-    it 'updates the cross frame and bucket bar plugins', (done) ->
+    it 'updates the cross frame and bucket bar plugins', () ->
       guest = createGuest()
       guest.plugins.CrossFrame =
         sync: sinon.stub()
       guest.plugins.BucketBar =
         update: sinon.stub()
       annotation = {}
-      guest.anchor(annotation).then ->
+      return guest.anchor(annotation).then ->
         assert.called(guest.plugins.BucketBar.update)
         assert.called(guest.plugins.CrossFrame.sync)
-      .then(done, done)
 
-    it 'returns a promise of the anchors for the annotation', (done) ->
+    it 'returns a promise of the anchors for the annotation', () ->
       guest = createGuest()
       highlights = [document.createElement('span')]
       sandbox.stub(anchoring, 'anchor').returns(Promise.resolve(range))
       sandbox.stub(highlighter, 'highlightRange').returns(highlights)
       target = {selector: [{type: 'TextQuoteSelector', exact: 'hello'}]}
-      guest.anchor({target: [target]}).then (anchors) ->
+      return guest.anchor({target: [target]}).then (anchors) ->
         assert.equal(anchors.length, 1)
-      .then(done, done)
 
-    it 'adds the anchor to the "anchors" instance property"', (done) ->
+    it 'adds the anchor to the "anchors" instance property"', () ->
       guest = createGuest()
       highlights = [document.createElement('span')]
       sandbox.stub(anchoring, 'anchor').returns(Promise.resolve(range))
       sandbox.stub(highlighter, 'highlightRange').returns(highlights)
       target = {selector: [{type: 'TextQuoteSelector', exact: 'hello'}]}
       annotation = {target: [target]}
-      guest.anchor(annotation).then ->
+      return guest.anchor(annotation).then ->
         assert.equal(guest.anchors.length, 1)
         assert.strictEqual(guest.anchors[0].annotation, annotation)
         assert.strictEqual(guest.anchors[0].target, target)
         assert.strictEqual(guest.anchors[0].range, range)
         assert.strictEqual(guest.anchors[0].highlights, highlights)
-      .then(done, done)
 
-    it 'destroys targets that have been removed from the annotation', (done) ->
+    it 'destroys targets that have been removed from the annotation', () ->
       annotation = {}
       target = {}
       highlights = []
@@ -594,21 +591,19 @@ describe 'Guest', ->
       guest.anchors = [{annotation, target, highlights}]
       removeHighlights = sandbox.stub(highlighter, 'removeHighlights')
 
-      guest.anchor(annotation).then ->
+      return guest.anchor(annotation).then ->
         assert.equal(guest.anchors.length, 0)
         assert.calledOnce(removeHighlights)
         assert.calledWith(removeHighlights, highlights)
-      .then(done, done)
 
-    it 'does not reanchor targets that are already anchored', (done) ->
+    it 'does not reanchor targets that are already anchored', () ->
       guest = createGuest()
       annotation = target: [{selector: [{type: 'TextQuoteSelector', exact: 'hello'}]}]
       stub = sandbox.stub(anchoring, 'anchor').returns(Promise.resolve(range))
-      guest.anchor(annotation).then ->
+      return guest.anchor(annotation).then ->
         guest.anchor(annotation).then ->
           assert.equal(guest.anchors.length, 1)
           assert.calledOnce(stub)
-      .then(done, done)
 
   describe '#detach()', ->
     it 'removes the anchors from the "anchors" instance variable', ->
