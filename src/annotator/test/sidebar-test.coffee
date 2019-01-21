@@ -328,7 +328,7 @@ describe 'Sidebar', ->
       sidebar = null
       frame = null
       beforeEach ->
-        layoutChangeHandlerSpy = sandbox.spy()
+        layoutChangeHandlerSpy = sandbox.stub()
         sidebar = createSidebar { onLayoutChange: layoutChangeHandlerSpy, sidebarAppUrl: '/' }
 
         # remove info about call that happens on creation of sidebar
@@ -391,7 +391,7 @@ describe 'Sidebar', ->
         }
         document.body.appendChild externalFrame
 
-        layoutChangeHandlerSpy = sandbox.spy()
+        layoutChangeHandlerSpy = sandbox.stub()
         layoutChangeExternalConfig = {
           onLayoutChange: layoutChangeHandlerSpy,
           sidebarAppUrl: '/',

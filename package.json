@@ -97,7 +97,7 @@
     "scroll-into-view": "^1.8.2",
     "seamless-immutable": "^6.0.1",
     "showdown": "^1.6.4",
-    "sinon": "^2.3.5",
+    "sinon": "^7.2.3",
     "stringify": "^5.1.0",
     "through2": "^3.0.0",
     "tiny-emitter": "^2.0.2",

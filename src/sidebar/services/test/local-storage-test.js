@@ -14,7 +14,7 @@ function windowWithLocalStoragePropertyThatThrows() {
 }
 
 function windowWithLocalStorageMethodsThatThrow() {
-  const throwErr = sinon.stub.throws(new Error('Denied'));
+  const throwErr = sinon.stub().throws(new Error('Denied'));
 
   return {
     localStorage: {
