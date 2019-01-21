@@ -204,9 +204,9 @@ angular-toastr@^1.7.0:
   integrity sha1-f9+e9hy0q+56iBjrPZeYwFfU638=
 
 angular@^1.7.5:
-  version "1.7.5"
-  resolved "https://registry.yarnpkg.com/angular/-/angular-1.7.5.tgz#d1c1c01c6f5dc835638f3f9aa51012857bdac49e"
-  integrity sha512-760183yxtGzni740IBTieNuWLtPNAoMqvmC0Z62UoU0I3nqk+VJuO3JbQAXOyvo3Oy/ZsdNQwrSTh/B0OQZjNw==
+  version "1.7.6"
+  resolved "https://registry.yarnpkg.com/angular/-/angular-1.7.6.tgz#db3bd96e3305c870f6227b9b32a4d761880473da"
+  integrity sha512-QELpvuMIe1FTGniAkRz93O6A+di0yu88niDwcdzrSqtUHNtZMgtgFS4f7W/6Gugbuwej8Kyswlmymwdp8iPCWg==
 
 angulartics@0.17.2:
   version "0.17.2"
