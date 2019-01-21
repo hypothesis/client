@@ -82,8 +82,8 @@ describe('sidebar.components.sidebar-content', function () {
     };
 
     fakeAnnotationMapper = {
-      loadAnnotations: sandbox.spy(),
-      unloadAnnotations: sandbox.spy(),
+      loadAnnotations: sandbox.stub(),
+      unloadAnnotations: sandbox.stub(),
     };
 
     fakeFrameSync = {
@@ -100,9 +100,9 @@ describe('sidebar.components.sidebar-content', function () {
     };
 
     fakeStreamer = {
-      setConfig: sandbox.spy(),
-      connect: sandbox.spy(),
-      reconnect: sandbox.spy(),
+      setConfig: sandbox.stub(),
+      connect: sandbox.stub(),
+      reconnect: sandbox.stub(),
     };
 
     fakeStreamFilter = {
