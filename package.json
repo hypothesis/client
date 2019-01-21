@@ -107,7 +107,7 @@
     "watchify": "^3.7.0",
     "websocket": "^1.0.22",
     "wrap-text": "^1.0.7",
-    "zen-observable": "^0.3.0"
+    "zen-observable": "^0.8.11"
   },
   "browserify": {
     "transform": [
