@@ -7556,10 +7556,10 @@ scss-tokenizer@^0.2.3:
     js-base64 "^2.1.8"
     source-map "^0.4.2"
 
-seamless-immutable@^6.0.1:
-  version "6.3.0"
-  resolved "https://registry.yarnpkg.com/seamless-immutable/-/seamless-immutable-6.3.0.tgz#218fd851bc5b989505998325f8c7713d35fafeb8"
-  integrity sha1-IY/YUbxbmJUFmYMl+MdxPTX6/rg=
+seamless-immutable@^7.1.4:
+  version "7.1.4"
+  resolved "https://registry.yarnpkg.com/seamless-immutable/-/seamless-immutable-7.1.4.tgz#6e9536def083ddc4dea0207d722e0e80d0f372f8"
+  integrity sha512-XiUO1QP4ki4E2PHegiGAlu6r82o5A+6tRh7IkGGTVg/h+UoeX4nFBeCGPOhb4CYjvkqsfm/TUtvOMYC1xmV30A==
 
 semver-greatest-satisfied-range@^1.1.0:
   version "1.1.0"
