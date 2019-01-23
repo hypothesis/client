@@ -45,7 +45,7 @@
     "end-of-stream": "^1.1.0",
     "escape-html": "^1.0.3",
     "escape-string-regexp": "^1.0.5",
-    "eslint": "^3.18.0",
+    "eslint": "^4.19.1",
     "eslint-config-hypothesis": "^1.0.0",
     "eslint-plugin-mocha": "^4.8.0",
     "exorcist": "^0.4.0",
