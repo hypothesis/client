@@ -4,6 +4,59 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [1.115.0] - 2019-01-17
+
+### Changed
+
+- Bump postcss from 5.2.18 to 7.0.13
+  [#845](https://api.github.com/repos/hypothesis/client/pulls/845)
+
+- Bump gulp-changed from 1.3.2 to 3.2.0
+  [#843](https://api.github.com/repos/hypothesis/client/pulls/843)
+
+- Bump through2 from 2.0.5 to 3.0.0
+  [#842](https://api.github.com/repos/hypothesis/client/pulls/842)
+
+- Bump @octokit/rest from 15.13.0 to 16.9.0
+  [#841](https://api.github.com/repos/hypothesis/client/pulls/841)
+
+- Adapt to change of `getAll` method name
+  [#846](https://api.github.com/repos/hypothesis/client/pulls/846)
+
+
+## [1.114.0] - 2019-01-16
+
+### Changed
+
+- Refactor Makefile [#828](https://api.github.com/repos/hypothesis/client/pulls/828)
+
+- Upgrade to gulp 4 [#831](https://api.github.com/repos/hypothesis/client/pulls/831)
+
+- Update AngularJS to 1.7.x
+  [#832](https://api.github.com/repos/hypothesis/client/pulls/832)
+
+- Bump vinyl from 1.2.0 to 2.2.0
+  [#836](https://api.github.com/repos/hypothesis/client/pulls/836)
+
+- [Security] Bump stringstream from 0.0.5 to 0.0.6
+  [#838](https://api.github.com/repos/hypothesis/client/pulls/838)
+
+- Bump gulp-postcss from 6.4.0 to 8.0.0
+  [#839](https://api.github.com/repos/hypothesis/client/pulls/839)
+
+- [Security] Bump cached-path-relative from 1.0.1 to 1.0.2
+  [#833](https://api.github.com/repos/hypothesis/client/pulls/833)
+
+- Bump redux-thunk from 2.2.0 to 2.3.0
+  [#837](https://api.github.com/repos/hypothesis/client/pulls/837)
+
+- Bump gulp-sass from 3.2.1 to 4.0.2
+  [#834](https://api.github.com/repos/hypothesis/client/pulls/834)
+
+- Fix `yarn version` command
+  [#840](https://api.github.com/repos/hypothesis/client/pulls/840)
+
+
 ## [1.113.0] - 2018-12-11
 
 ### Changed

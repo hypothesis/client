@@ -35,8 +35,7 @@ describe('annotationViewerContent', function () {
   before(function () {
     angular.module('h', [])
       .component('annotationViewerContent',
-        require('../annotation-viewer-content'))
-      .config(($compileProvider) => $compileProvider.preAssignBindingsEnabled(true));
+        require('../annotation-viewer-content'));
   });
 
   beforeEach(angular.mock.module('h'));

@@ -70,26 +70,29 @@ function ThreadListController($element, $scope, settings, VirtualThreadList) {
   const options = Object.assign({
     scrollRoot: this.scrollRoot,
   }, virtualThreadOptions);
+  let visibleThreads;
 
-  const visibleThreads = new VirtualThreadList($scope, window, this.thread, options);
-  visibleThreads.on('changed', function (state) {
-    self.virtualThreadList = {
-      visibleThreads: state.visibleThreads,
-      invisibleThreads: state.invisibleThreads,
-      offscreenUpperHeight: state.offscreenUpperHeight + 'px',
-      offscreenLowerHeight: state.offscreenLowerHeight + 'px',
-    };
+  this.$onInit = () => {
+    visibleThreads = new VirtualThreadList($scope, window, this.thread, options);
+    visibleThreads.on('changed', function (state) {
+      self.virtualThreadList = {
+        visibleThreads: state.visibleThreads,
+        invisibleThreads: state.invisibleThreads,
+        offscreenUpperHeight: state.offscreenUpperHeight + 'px',
+        offscreenLowerHeight: state.offscreenLowerHeight + 'px',
+      };
 
-    scopeTimeout($scope, function () {
-      state.visibleThreads.forEach(function (thread) {
-        const height = getThreadHeight(thread.id);
-        if (!height) {
-          return;
-        }
-        visibleThreads.setThreadHeight(thread.id, height);
-      });
-    }, 50);
-  });
+      scopeTimeout($scope, function () {
+        state.visibleThreads.forEach(function (thread) {
+          const height = getThreadHeight(thread.id);
+          if (!height) {
+            return;
+          }
+          visibleThreads.setThreadHeight(thread.id, height);
+        });
+      }, 50);
+    });
+  };
 
   /**
    * Return the vertical scroll offset for the document in order to position the
@@ -134,7 +137,7 @@ function ThreadListController($element, $scope, settings, VirtualThreadList) {
   });
 
   this.$onChanges = function (changes) {
-    if (changes.thread) {
+    if (changes.thread && visibleThreads) {
       visibleThreads.setRootThread(changes.thread.currentValue);
     }
   };

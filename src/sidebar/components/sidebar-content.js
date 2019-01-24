@@ -202,10 +202,12 @@ function SidebarContentController(
     streamer.connect();
   });
 
-  // If the user is logged in, we connect nevertheless
-  if (this.auth.status === 'logged-in') {
-    streamer.connect();
-  }
+  this.$onInit = () => {
+    // If the user is logged in, we connect nevertheless
+    if (this.auth.status === 'logged-in') {
+      streamer.connect();
+    }
+  };
 
   $scope.$on(events.USER_CHANGED, function () {
     streamer.reconnect();

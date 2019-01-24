@@ -33,8 +33,10 @@ function AnnotationViewerContentController (
 
   const id = $routeParams.id;
 
-  this.search.update = function (query) {
-    $location.path('/stream').search('q', query);
+  this.$onInit = () => {
+    this.search.update = function (query) {
+      $location.path('/stream').search('q', query);
+    };
   };
 
   store.subscribe(function () {

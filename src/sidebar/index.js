@@ -96,19 +96,6 @@ function configureToastr(toastrConfig) {
 }
 
 // @ngInject
-function configureCompile($compileProvider) {
-  // Make component bindings available in controller constructor. When
-  // pre-assigned bindings is off, as it is by default in Angular >= 1.6.0,
-  // bindings are only available during and after the controller's `$onInit`
-  // method.
-  //
-  // This migration helper is being removed in Angular 1.7.0. To see which
-  // components need updating, look for uses of `preAssignBindingsEnabled` in
-  // tests.
-  $compileProvider.preAssignBindingsEnabled(true);
-}
-
-// @ngInject
 function setupHttp($http, streamer) {
   $http.defaults.headers.common['X-Client-Id'] = streamer.clientId;
 }
@@ -213,7 +200,6 @@ function startAngularApp(config) {
   .value('time', require('./util/time'))
   .value('urlEncodeFilter', require('./filter/url').encode)
 
-  .config(configureCompile)
   .config(configureLocation)
   .config(configureRoutes)
   .config(configureToastr)
