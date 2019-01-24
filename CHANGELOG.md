@@ -4,6 +4,79 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [1.116.0] - 2019-01-24
+
+### Changed
+
+- Remove obsolete comment [#847](https://api.github.com/repos/hypothesis/client/pulls/847)
+
+- Bump gulp-replace from 0.5.4 to 1.0.0
+  [#848](https://api.github.com/repos/hypothesis/client/pulls/848)
+
+- Bump @octokit/rest from 16.9.0 to 16.10.0
+  [#849](https://api.github.com/repos/hypothesis/client/pulls/849)
+
+- Bump browserify from 13.3.0 to 16.2.3
+  [#851](https://api.github.com/repos/hypothesis/client/pulls/851)
+
+- Bump mocha from 2.5.3 to 5.2.0
+  [#852](https://api.github.com/repos/hypothesis/client/pulls/852)
+
+- Bump commander from 2.15.1 to 2.19.0
+  [#853](https://api.github.com/repos/hypothesis/client/pulls/853)
+
+- Bump browserify-ngannotate from 1.0.1 to 2.0.0
+  [#855](https://api.github.com/repos/hypothesis/client/pulls/855)
+
+- Bump websocket from 1.0.26 to 1.0.28
+  [#854](https://api.github.com/repos/hypothesis/client/pulls/854)
+
+- Bump tiny-emitter from 1.2.0 to 2.0.2
+  [#857](https://api.github.com/repos/hypothesis/client/pulls/857)
+
+- Bump uglifyify from 3.0.4 to 5.0.1
+  [#859](https://api.github.com/repos/hypothesis/client/pulls/859)
+
+- Bump cross-env from 5.1.4 to 5.2.0
+  [#862](https://api.github.com/repos/hypothesis/client/pulls/862)
+
+- Bump angular from 1.7.5 to 1.7.6
+  [#858](https://api.github.com/repos/hypothesis/client/pulls/858)
+
+- Bump express from 4.16.3 to 4.16.4
+  [#861](https://api.github.com/repos/hypothesis/client/pulls/861)
+
+- Bump sinon from 2.4.1 to 7.2.3
+  [#860](https://api.github.com/repos/hypothesis/client/pulls/860)
+
+- Bump seamless-immutable from 6.3.0 to 7.1.4
+  [#863](https://api.github.com/repos/hypothesis/client/pulls/863)
+
+- Bump core-js from 2.5.7 to 2.6.2
+  [#865](https://api.github.com/repos/hypothesis/client/pulls/865)
+
+- Bump chance from 1.0.16 to 1.0.18
+  [#866](https://api.github.com/repos/hypothesis/client/pulls/866)
+
+- Bump raf from 3.4.0 to 3.4.1
+  [#864](https://api.github.com/repos/hypothesis/client/pulls/864)
+
+- Bump karma-coverage from 1.1.1 to 1.1.2
+  [#867](https://api.github.com/repos/hypothesis/client/pulls/867)
+
+- Bump coffeeify from 1.2.0 to 2.1.0
+  [#868](https://api.github.com/repos/hypothesis/client/pulls/868)
+
+- Bump postcss from 7.0.13 to 7.0.14
+  [#870](https://api.github.com/repos/hypothesis/client/pulls/870)
+
+- Bump angular-mocks from 1.7.5 to 1.7.6
+  [#874](https://api.github.com/repos/hypothesis/client/pulls/874)
+
+- Bump chai from 4.1.2 to 4.2.0
+  [#873](https://api.github.com/repos/hypothesis/client/pulls/873)
+
+
 ## [1.115.0] - 2019-01-17
 
 ### Changed
