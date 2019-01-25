@@ -12,7 +12,7 @@
     "angular-mocks": "^1.7.5",
     "angular-route": "^1.7.5",
     "angular-sanitize": "^1.7.5",
-    "angular-toastr": "^1.7.0",
+    "angular-toastr": "^2.1.1",
     "angulartics": "0.17.2",
     "autofill-event": "0.0.1",
     "autoprefixer": "^6.0.3",

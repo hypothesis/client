@@ -221,10 +221,10 @@ angular-sanitize@^1.7.5:
   resolved "https://registry.yarnpkg.com/angular-sanitize/-/angular-sanitize-1.7.5.tgz#75d49e15071ca9c70581e76d20940f26372e24d2"
   integrity sha512-wjKCJOIwrkEvfD0keTnKGi6We13gtoCAQIHcdoqyoo3gwvcgNfYymVQIS3+iCGVcjfWz0jHuS3KgB4ysRWsTTA==
 
-angular-toastr@^1.7.0:
-  version "1.7.0"
-  resolved "https://registry.yarnpkg.com/angular-toastr/-/angular-toastr-1.7.0.tgz#7fdf9ef61cb4abee7a8818eb3d9798c057d4eb7f"
-  integrity sha1-f9+e9hy0q+56iBjrPZeYwFfU638=
+angular-toastr@^2.1.1:
+  version "2.1.1"
+  resolved "https://registry.yarnpkg.com/angular-toastr/-/angular-toastr-2.1.1.tgz#9f8350ca482145a44d011a755b8fb3623d60544c"
+  integrity sha1-n4NQykghRaRNARp1W4+zYj1gVEw=
 
 angular@^1.7.5:
   version "1.7.6"
