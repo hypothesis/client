@@ -25,7 +25,7 @@ describe('sidebar.tags', () => {
 
   before(() => {
     angular.module('h', [])
-           .service('tags', require('../tags'));
+      .service('tags', require('../tags'));
   });
 
   beforeEach(() => {

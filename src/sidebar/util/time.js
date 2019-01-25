@@ -81,7 +81,7 @@ function format(date, options, Intl) {
 
     if (!formatter) {
       formatter = formatters[key] = new Intl.DateTimeFormat(undefined,
-                                                            options);
+        options);
     }
 
     return formatter.format(date);

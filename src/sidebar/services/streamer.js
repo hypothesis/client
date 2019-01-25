@@ -21,7 +21,7 @@ const Socket = require('../websocket');
  */
 // @ngInject
 function Streamer($rootScope, annotationMapper, store, auth,
-                  groups, session, settings) {
+  groups, session, settings) {
   // The randomly generated session UUID
   const clientId = uuid.v4();
 

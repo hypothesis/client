@@ -25,7 +25,7 @@ const serviceConfig = require('../service-config');
  */
 // @ngInject
 function auth($http, $rootScope, $window, OAuthClient,
-              apiRoutes, flash, localStorage, settings) {
+  apiRoutes, flash, localStorage, settings) {
 
   /**
    * Authorization code from auth popup window.

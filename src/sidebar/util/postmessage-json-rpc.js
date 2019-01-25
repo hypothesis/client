@@ -29,7 +29,7 @@ function createTimeout(delay, message) {
  * @return {Promise<any>} - A Promise for the response to the call
  */
 function call(frame, origin, method, params=[], timeout=2000,
-              window_=window, id=generateId()) {
+  window_=window, id=generateId()) {
 
   // Send RPC request.
   const request = {

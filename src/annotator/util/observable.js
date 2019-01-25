@@ -7,7 +7,7 @@
 
 const Observable = require('zen-observable');
 
- /**
+/**
   * Returns an observable of events emitted by a DOM event source
   * (eg. an Element, Document or Window).
   *
@@ -54,7 +54,7 @@ function delay(delay, src) {
   });
 }
 
- /**
+/**
   * Buffers events from a source Observable, waiting for a pause of `delay`
   * ms with no events before emitting the last value from `src`.
   *
@@ -86,7 +86,7 @@ function buffer(delay, src) {
   });
 }
 
- /**
+/**
   * Merges multiple streams of values into a single stream.
   *
   * @param {Array<Observable>} sources

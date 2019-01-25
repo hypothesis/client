@@ -155,7 +155,7 @@ describe('annotator/plugin/pdf-metadata', function () {
 
         return pdfMetadata.getUri().then(uri => {
           const expected = new URL(fakePDFViewerApplication.url,
-                                 document.location.href).toString();
+            document.location.href).toString();
           assert.equal(uri, expected);
         });
       });
@@ -166,7 +166,7 @@ describe('annotator/plugin/pdf-metadata', function () {
         const expectedMetadata = {
           title: 'dcFakeTitle',
           link: [{href: 'urn:x-pdf:' + fakePDFViewerApplication.pdfDocument.fingerprint},
-            {href: fakePDFViewerApplication.url}],
+                 {href: fakePDFViewerApplication.url}],
           documentFingerprint: fakePDFViewerApplication.pdfDocument.fingerprint,
         };
 
@@ -179,7 +179,7 @@ describe('annotator/plugin/pdf-metadata', function () {
         const expectedMetadata = {
           title: fakePDFViewerApplication.documentInfo.Title,
           link: [{href: 'urn:x-pdf:' + fakePDFViewerApplication.pdfDocument.fingerprint},
-            {href: fakePDFViewerApplication.url}],
+                 {href: fakePDFViewerApplication.url}],
           documentFingerprint: fakePDFViewerApplication.pdfDocument.fingerprint,
         };
 

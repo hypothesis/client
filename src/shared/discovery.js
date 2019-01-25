@@ -189,7 +189,7 @@ class Discovery {
         discovered = true;
       } else if (messageType === 'offer' || messageType === 'ack') {
         throw new Error(
-`A second Discovery server has been detected at ${origin}.
+          `A second Discovery server has been detected at ${origin}.
  This is unsupported and will cause unexpected behaviour.`
         );
       }

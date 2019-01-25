@@ -153,7 +153,7 @@ function toggleSpanStyle(state, prefix, suffix, placeholder) {
 
   if (selectionPrefix === prefix && selectionSuffix === suffix) {
     newState = replaceText(newState, newState.selectionStart - prefix.length,
-                           prefix.length, '');
+      prefix.length, '');
     newState = replaceText(newState, newState.selectionEnd, suffix.length, '');
   } else {
     newState = replaceText(newState, newState.selectionStart, 0, prefix);

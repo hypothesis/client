@@ -61,13 +61,13 @@ describe('markdown commands', function () {
 
     it('adds formatting to spans when the prefix and suffix differ', function () {
       const output = toggle(parseState('make <sel>math</sel> mathy'), '\\(',
-                                     '\\)');
+        '\\)');
       assert.equal(formatState(output), 'make \\(<sel>math</sel>\\) mathy');
     });
 
     it('inserts placeholders if the selection is empty', function () {
       const output = toggle(parseState('make <sel></sel> bold'), '**',
-                          undefined, 'Bold');
+        undefined, 'Bold');
       assert.equal(formatState(output), 'make **<sel>Bold</sel>** bold');
     });
   });
