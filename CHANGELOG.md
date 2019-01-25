@@ -4,6 +4,35 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [1.117.0] - 2019-01-25
+
+### Changed
+
+- Bump aws-sdk from 2.345.0 to 2.392.0
+  [#869](https://api.github.com/repos/hypothesis/client/pulls/869)
+
+- Bump showdown from 1.8.6 to 1.9.0
+  [#877](https://api.github.com/repos/hypothesis/client/pulls/877)
+
+- Bump raven-js from 3.24.2 to 3.27.0
+  [#880](https://api.github.com/repos/hypothesis/client/pulls/880)
+
+- Bump aws-sdk from 2.392.0 to 2.394.0
+  [#881](https://api.github.com/repos/hypothesis/client/pulls/881)
+
+- Bump gulp-rename from 1.2.2 to 1.4.0
+  [#875](https://api.github.com/repos/hypothesis/client/pulls/875)
+
+- Bump request from 2.85.0 to 2.88.0
+  [#876](https://api.github.com/repos/hypothesis/client/pulls/876)
+
+- Bump redux from 3.7.2 to 4.0.1
+  [#882](https://api.github.com/repos/hypothesis/client/pulls/882)
+
+- Bump eslint from 3.19.0 to 4.19.1
+  [#871](https://api.github.com/repos/hypothesis/client/pulls/871)
+
+
 ## [1.116.0] - 2019-01-24
 
 ### Changed
