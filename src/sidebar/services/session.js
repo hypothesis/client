@@ -22,7 +22,7 @@ const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
  * @ngInject
  */
 function session($q, $rootScope, analytics, store, api, auth,
-                 flash, raven, settings, serviceConfig) {
+  flash, raven, settings, serviceConfig) {
   // Cache the result of load()
   let lastLoad;
   let lastLoadTime;

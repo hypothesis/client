@@ -16,7 +16,7 @@ const uiConstants = require('../ui-constants');
  *                    for PDFs
  */
 
- /**
+/**
   * Return a minimal representation of an annotation that can be sent from the
   * sidebar app to a connected frame.
   *

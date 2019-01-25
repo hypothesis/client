@@ -262,13 +262,13 @@ function addAnnotations(annotations, now) {
     const ANCHORING_TIMEOUT = 500;
 
     const anchoringIDs = added.filter(metadata.isWaitingToAnchor)
-                            .map(ann => ann.id);
+      .map(ann => ann.id);
     if (anchoringIDs.length > 0) {
       setTimeout(() => {
         // Find annotations which haven't yet been anchored in the document.
         const anns = getState().annotations;
         const annsStillAnchoring = anchoringIDs.map(id => findByID(anns, id))
-                                             .filter(ann => ann && metadata.isWaitingToAnchor(ann));
+          .filter(ann => ann && metadata.isWaitingToAnchor(ann));
 
         // Mark anchoring as timed-out for these annotations.
         const anchorStatusUpdates = annsStillAnchoring.reduce((updates, ann) => {

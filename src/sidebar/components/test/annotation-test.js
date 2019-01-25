@@ -258,7 +258,7 @@ describe('annotation', function() {
     beforeEach(
       inject(
         function(_$q_, _$rootScope_, _$timeout_,
-                _$window_) {
+          _$window_) {
           $window = _$window_;
           $q = _$q_;
           $timeout = _$timeout_;
@@ -311,7 +311,7 @@ describe('annotation', function() {
         createDirective(annotation);
 
         assert.deepEqual(annotation.permissions, fakePermissions.default(
-                         fakeSession.state.userid, annotation.group));
+          fakeSession.state.userid, annotation.group));
       });
 
       it('sets the tags and text fields for new annotations', function () {
@@ -691,7 +691,7 @@ describe('annotation', function() {
           fakeAnnotationMapper.deleteAnnotation.returns($q.resolve());
           parts.controller.delete().then(function() {
             assert.calledWith(fakeAnnotationMapper.deleteAnnotation,
-                parts.annotation);
+              parts.annotation);
             done();
           });
           $timeout.flush();
@@ -773,7 +773,7 @@ describe('annotation', function() {
             fakeAnnotationMapper.flagAnnotation.returns($q.resolve());
             parts.controller.flag();
             assert.calledWith(fakeAnnotationMapper.flagAnnotation,
-                parts.annotation);
+              parts.annotation);
             done();
           }
         );
@@ -920,7 +920,7 @@ describe('annotation', function() {
         ['update', 'delete'].forEach(function (action) {
           controller.authorize(action);
           assert.calledWith(fakePermissions.permits, ann.permissions, action,
-                            fakeSession.state.userid);
+            fakeSession.state.userid);
         });
       });
     });

@@ -42,8 +42,8 @@ const config = configFrom(window);
 
 $.noConflict(true)(function() {
   let Klass = window.PDFViewerApplication ?
-      PdfSidebar :
-      Sidebar;
+    PdfSidebar :
+    Sidebar;
 
   if (config.hasOwnProperty('constructor')) {
     Klass = config.constructor;

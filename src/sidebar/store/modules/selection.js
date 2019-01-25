@@ -24,7 +24,7 @@ const util = require('../util');
 */
 const TAB_DEFAULT = uiConstants.TAB_ANNOTATIONS;
 
- /**
+/**
   * Default sort keys for each tab.
   */
 const TAB_SORTKEY_DEFAULT = {};

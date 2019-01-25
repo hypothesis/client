@@ -83,7 +83,7 @@ describe('anchoring', function () {
     return Promise.all(anchored).then(function () {
       const assertFn = testCase.expectFail ? assert.notDeepEqual : assert.deepEqual;
       assertFn(normalize(highlightedPhrases(container)),
-               normalize(testCase.quotes));
+        normalize(testCase.quotes));
     });
   }, [{
     tag: 'a simple quote',

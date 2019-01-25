@@ -71,8 +71,8 @@ describe('BrandingDirective', function () {
     const el = makeElementWithAttrs(testCase.attrs);
 
     if(Array.isArray(testCase.styleChanged)){
-        // we expect that if styleChanged is an array
-        // that expectedPropValue will be an equal length array
+      // we expect that if styleChanged is an array
+      // that expectedPropValue will be an equal length array
       testCase.styleChanged.forEach(function(styleChanged, index){
         assert.equal(el[0].style[styleChanged], testCase.expectedPropValue[index]);
       });

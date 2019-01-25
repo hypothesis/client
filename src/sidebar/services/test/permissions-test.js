@@ -39,19 +39,19 @@ describe('permissions', function () {
   describe('#default', function () {
     it('returns shared permissions by default', function () {
       assert.deepEqual(permissions.default(userid, 'gid'),
-                       permissions.shared(userid, 'gid'));
+        permissions.shared(userid, 'gid'));
     });
 
     it('returns private permissions if the saved level is "private"', function () {
       fakeLocalStorage.getItem.returns('private');
       assert.deepEqual(permissions.default(userid, 'gid'),
-                       permissions.private(userid));
+        permissions.private(userid));
     });
 
     it('returns shared permissions if the saved level is "shared"', function () {
       fakeLocalStorage.getItem.returns('shared');
       assert.deepEqual(permissions.default(userid, 'gid'),
-                       permissions.shared(userid, 'gid'));
+        permissions.shared(userid, 'gid'));
     });
   });
 

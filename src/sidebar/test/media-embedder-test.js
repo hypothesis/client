@@ -360,7 +360,7 @@ describe('media-embedder', function () {
     const url1 = 'https://www.youtube.com/watch?v=QCkm0lL-6lc';
     const url2 = 'https://youtu.be/abcdefg';
     const element = domElement(
-        '<a href="' + url1 + '">' + url1 + '</a>\n\n' +
+      '<a href="' + url1 + '">' + url1 + '</a>\n\n' +
         '<a href="' + url2 + '">' + url2 + '</a>');
 
     mediaEmbedder.replaceLinksWithEmbeds(element);
