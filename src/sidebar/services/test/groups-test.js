@@ -211,8 +211,8 @@ describe('groups', function() {
         { id: '39r39f', name: 'Ding Dong!' },
       ];
       fakeApi.groups.list.returns(Promise.resolve({
-          token: '1234',
-          data: groups,
+        token: '1234',
+        data: groups,
       }));
       return svc.load().then(groups => {
         assert.isObject(groups[0].organization);

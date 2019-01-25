@@ -216,9 +216,9 @@ describe('sidebar.services.api', function () {
         done();
       });
       $httpBackend.expectPATCH('https://example.com/api/profile')
-      .respond(function () {
-        return [testCase.status, testCase.body, {}, testCase.statusText];
-      });
+        .respond(function () {
+          return [testCase.status, testCase.body, {}, testCase.statusText];
+        });
       $httpBackend.flush();
     }, [{
       // Network error
@@ -253,9 +253,9 @@ describe('sidebar.services.api', function () {
         done();
       });
       $httpBackend.expectPATCH('https://example.com/api/profile')
-      .respond(function () {
-        return [404, { reason: 'User not found' }, {}, 'Not found'];
-      });
+        .respond(function () {
+          return [404, { reason: 'User not found' }, {}, 'Not found'];
+        });
       $httpBackend.flush();
     });
   });
@@ -268,7 +268,7 @@ describe('sidebar.services.api', function () {
     });
 
     $httpBackend.expectGET('https://example.com/api/profile')
-    .respond(() => [200, { userid: 'acct:user@example.com' }]);
+      .respond(() => [200, { userid: 'acct:user@example.com' }]);
     $httpBackend.flush();
   });
 
@@ -283,7 +283,7 @@ describe('sidebar.services.api', function () {
     });
 
     $httpBackend.expectGET('https://example.com/api/profile')
-    .respond(() => [200, { userid: 'acct:user@example.com' }]);
+      .respond(() => [200, { userid: 'acct:user@example.com' }]);
     $httpBackend.flush();
   });
 });

@@ -10,7 +10,7 @@ function pageObject(element) {
   return {
     menuLinks: function () {
       return Array.from(element[0].querySelectorAll('.login-control-menu .dropdown-menu a'))
-                  .map(function (el) { return el.textContent; });
+        .map(function (el) { return el.textContent; });
     },
     menuText: function () {
       return element[0].querySelector('span').textContent;

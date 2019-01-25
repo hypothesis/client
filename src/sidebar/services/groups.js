@@ -17,7 +17,7 @@ const serviceConfig = require('../service-config');
 
 // @ngInject
 function groups($rootScope, store, api, isSidebar, localStorage, serviceUrl, session,
-                settings) {
+  settings) {
   const svc = serviceConfig(settings);
   const authority = svc ? svc.authority : null;
 

@@ -68,7 +68,7 @@ function MarkdownController($element, $sanitize, $scope) {
         return commands.toggleSpanStyle(state, '$$', '$$', 'Insert LaTeX');
       } else {
         return commands.toggleSpanStyle(state, '\\(', '\\)',
-                                            'Insert LaTeX');
+          'Insert LaTeX');
       }
     });
   };

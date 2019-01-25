@@ -134,7 +134,7 @@ function AnnotationController(
     self.annotation.group = self.annotation.group || groups.focused().id;
     if (!self.annotation.permissions) {
       self.annotation.permissions = permissions.default(self.annotation.user,
-                                                      self.annotation.group);
+        self.annotation.group);
     }
     self.annotation.text = self.annotation.text || '';
     if (!Array.isArray(self.annotation.tags)) {
@@ -555,7 +555,7 @@ function AnnotationController(
       tags: self.annotation.tags,
       text: self.annotation.text,
       isPrivate: !permissions.isShared(self.annotation.permissions,
-                                       self.annotation.user),
+        self.annotation.user),
     };
   };
 

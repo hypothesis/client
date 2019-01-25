@@ -229,7 +229,7 @@ describe('DocumentMeta', function() {
       const expected = (
         document.location.protocol + '//' +
           document.location.host +
-          document.location.pathname.replace(/[^\/]+$/, '') +
+          document.location.pathname.replace(/[^/]+$/, '') +
           'path'
       );
       assert.equal(result, expected);
