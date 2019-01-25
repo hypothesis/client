@@ -213,8 +213,8 @@ const styleFiles = [
 gulp.task('build-css', function () {
   // Rewrite font URLs to look for fonts in 'build/fonts' instead of
   // 'build/styles/fonts'
-  function rewriteCSSURL(url) {
-    return url.replace(/^fonts\//, '../fonts/');
+  function rewriteCSSURL(asset) {
+    return asset.url.replace(/^fonts\//, '../fonts/');
   }
 
   const sassOpts = {
