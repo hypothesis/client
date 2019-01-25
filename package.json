@@ -83,7 +83,7 @@
     "node-uuid": "^1.4.3",
     "npm-packlist": "^1.1.12",
     "postcss": "^7.0.13",
-    "postcss-url": "^5.1.1",
+    "postcss-url": "^8.0.0",
     "proxyquire": "^1.7.10",
     "proxyquire-universal": "^1.0.8",
     "proxyquireify": "^3.2.1",
