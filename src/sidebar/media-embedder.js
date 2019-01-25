@@ -134,7 +134,7 @@ const embedGenerators = [
       return null;
     }
 
-    const groups = /[&\?]v=([^&#]+)/.exec(link.search);
+    const groups = /[&?]v=([^&#]+)/.exec(link.search);
     if (groups) {
       return youTubeEmbed(groups[1], link);
     }
@@ -148,7 +148,7 @@ const embedGenerators = [
     }
 
     // extract video ID from URL
-    const groups = /^\/([^\/]+)\/?$/.exec(link.pathname);
+    const groups = /^\/([^/]+)\/?$/.exec(link.pathname);
     if (groups) {
       return youTubeEmbed(groups[1], link);
     }
@@ -161,7 +161,7 @@ const embedGenerators = [
       return null;
     }
 
-    const groups = /^\/([^\/\?#]+)\/?$/.exec(link.pathname);
+    const groups = /^\/([^/?#]+)\/?$/.exec(link.pathname);
     if (groups) {
       return vimeoEmbed(groups[1]);
     }
@@ -174,7 +174,7 @@ const embedGenerators = [
       return null;
     }
 
-    const groups = /^\/channels\/[^\/]+\/([^\/?#]+)\/?$/.exec(link.pathname);
+    const groups = /^\/channels\/[^/]+\/([^/?#]+)\/?$/.exec(link.pathname);
     if (groups) {
       return vimeoEmbed(groups[1]);
     }
@@ -219,7 +219,7 @@ const embedGenerators = [
     let endTime = linkParams.end;
 
     if (!startTime) {
-      const startPathParam = slug.match(/\/start\/([^\/]+)/);
+      const startPathParam = slug.match(/\/start\/([^/]+)/);
       if (startPathParam) {
         startTime = startPathParam[1];
         slug = slug.replace(startPathParam[0], '');
@@ -227,7 +227,7 @@ const embedGenerators = [
     }
 
     if (!endTime) {
-      const endPathParam = slug.match(/\/end\/([^\/]+)/);
+      const endPathParam = slug.match(/\/end\/([^/]+)/);
       if (endPathParam) {
         endTime = endPathParam[1];
         slug = slug.replace(endPathParam[0], '');
