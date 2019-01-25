@@ -4,6 +4,17 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [1.118.0] - 2019-01-25
+
+### Changed
+
+- Bump angular-toastr from 1.7.0 to 2.1.1
+  [#878](https://api.github.com/repos/hypothesis/client/pulls/878)
+
+- Bump postcss-url from 5.1.2 to 8.0.0
+  [#879](https://api.github.com/repos/hypothesis/client/pulls/879)
+
+
 ## [1.117.0] - 2019-01-25
 
 ### Changed
