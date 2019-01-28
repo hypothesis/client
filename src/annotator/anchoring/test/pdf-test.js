@@ -134,6 +134,15 @@ describe('annotator.anchoring.pdf', function () {
         assert.equal(position.end, expectedPos + quote.length);
       });
     });
+
+    it('rejects when text selection spans multiple pages', () => {
+      viewer.setCurrentPage(2, 3);
+      const range = findText(container, 'occupied again? NODE A');
+
+      return pdfAnchoring.describe(container, range).catch(err => {
+        assert.equal(err.message, 'selecting across page breaks is not supported');
+      });
+    });
   });
 
   describe('#anchor', function () {
