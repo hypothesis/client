@@ -2936,7 +2936,7 @@ esprima-fb@3001.1.0-dev-harmony-fb:
   resolved "https://registry.yarnpkg.com/esprima-fb/-/esprima-fb-3001.0001.0000-dev-harmony-fb.tgz#b77d37abcd38ea0b77426bb8bc2922ce6b426411"
   integrity sha1-t303q8046gt3Qmu4vCkizmtCZBE=
 
-esprima@2.7.x, esprima@^2.1.0, esprima@^2.7.1:
+esprima@2.7.x, esprima@^2.7.1:
   version "2.7.3"
   resolved "https://registry.yarnpkg.com/esprima/-/esprima-2.7.3.tgz#96e3b70d5779f6ad49cd032673d1c312767ba581"
   integrity sha1-luO3DVd59q1JzQMmc9HDEnZ7pYE=
@@ -4830,14 +4830,14 @@ isobject@^3.0.0, isobject@^3.0.1:
   integrity sha1-TkMekrEalzFjaqH5yNHMvP2reN8=
 
 isparta@^4.0.0:
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/isparta/-/isparta-4.0.0.tgz#1de91996f480b22dcb1aca8510255bae1574446e"
-  integrity sha1-HekZlvSAsi3LGsqFECVbrhV0RG4=
+  version "4.1.1"
+  resolved "https://registry.yarnpkg.com/isparta/-/isparta-4.1.1.tgz#c92e49672946914ec5407c801160f3374e0b7cb4"
+  integrity sha512-kGwkNqmALQzdfGhgo5o8kOA88p14R3Lwg0nfQ/qzv4IhB4rXarT9maPMaYbo6cms4poWbeulrlFlURLUR6rDwQ==
   dependencies:
     babel-core "^6.1.4"
     escodegen "^1.6.1"
-    esprima "^2.1.0"
-    istanbul "^0.4.0"
+    esprima "^4.0.0"
+    istanbul "0.4.5"
     mkdirp "^0.5.0"
     nomnomnomnom "^2.0.0"
     object-assign "^4.0.1"
@@ -4849,7 +4849,7 @@ isstream@~0.1.2:
   resolved "https://registry.yarnpkg.com/isstream/-/isstream-0.1.2.tgz#47e63f7af55afa6f92e1500e690eb8b8529c099a"
   integrity sha1-R+Y/evVa+m+S4VAOaQ64uFKcCZo=
 
-istanbul@^0.4.0, istanbul@^0.4.5:
+istanbul@0.4.5, istanbul@^0.4.0, istanbul@^0.4.5:
   version "0.4.5"
   resolved "https://registry.yarnpkg.com/istanbul/-/istanbul-0.4.5.tgz#65c7d73d4c4da84d4f3ac310b918fb0b8033733b"
   integrity sha1-ZcfXPUxNqE1POsMQuRj7C4Azczs=
