@@ -2,13 +2,44 @@
 
 const VIA_REFERRER = /^https:\/\/(qa-)?via.hypothes.is\//;
 
-const globalGAOptions = function(win, settings) {
-  settings = settings || {};
+const events = {
+  ANNOTATION_CREATED: 'annotationCreated',
+  ANNOTATION_DELETED: 'annotationDeleted',
+  ANNOTATION_FLAGGED: 'annotationFlagged',
+  ANNOTATION_SHARED: 'annotationShared',
+  ANNOTATION_UPDATED: 'annotationUpdated',
+  DOCUMENT_SHARED: 'documentShared',
+  GROUP_LEAVE: 'groupLeave',
+  GROUP_SWITCH: 'groupSwitch',
+  GROUP_VIEW_ACTIVITY: 'groupViewActivity',
+  HIGHLIGHT_CREATED: 'highlightCreated',
+  HIGHLIGHT_UPDATED: 'highlightUpdated',
+  HIGHLIGHT_DELETED: 'highlightDeleted',
+  LOGIN_FAILURE: 'loginFailure',
+  LOGIN_SUCCESS: 'loginSuccessful',
+  LOGOUT_FAILURE: 'logoutFailure',
+  LOGOUT_SUCCESS: 'logoutSuccessful',
+  PAGE_NOTE_CREATED: 'pageNoteCreated',
+  PAGE_NOTE_UPDATED: 'pageNoteUpdated',
+  PAGE_NOTE_DELETED: 'pageNoteDeleted',
+  REPLY_CREATED: 'replyCreated',
+  REPLY_UPDATED: 'replyUpdated',
+  REPLY_DELETED: 'replyDeleted',
+  SIDEBAR_OPENED: 'sidebarOpened',
+  SIGN_UP_REQUESTED: 'signUpRequested',
+};
 
-  const globalOpts = {
-    category: '',
-  };
-
+/**
+ * Return a string identifying the context in which the client is being used.
+ *
+ * This is used as the "category" for analytics events to support comparing
+ * behavior across different environments in which the client is used.
+ *
+ * @param {Window} win
+ * @param {Object} settings - Settings rendered into sidebar HTML
+ * @return {string}
+ */
+function clientType(win, settings = {}) {
   const validTypes = [
     'chrome-extension',
     'firefox-extension',
@@ -16,6 +47,7 @@ const globalGAOptions = function(win, settings) {
     'bookmarklet',
     'via',
   ];
+  let type;
 
   // The preferred method for deciding what type of app is running is
   // through the setting of the appType to one of the valid types above.
@@ -23,17 +55,55 @@ const globalGAOptions = function(win, settings) {
   // the appType setting explicitly - these are the app types that were
   // added before we added the analytics logic
   if (validTypes.indexOf((settings.appType || '').toLowerCase()) > -1) {
-    globalOpts.category = settings.appType.toLowerCase();
+    type = settings.appType.toLowerCase();
   } else if (win.location.protocol === 'chrome-extension:') {
-    globalOpts.category = 'chrome-extension';
+    type = 'chrome-extension';
   } else if (VIA_REFERRER.test(win.document.referrer)) {
-    globalOpts.category = 'via';
+    type = 'via';
   } else {
-    globalOpts.category = 'embed';
+    type = 'embed';
   }
 
-  return globalOpts;
-};
+  return type;
+}
+
+/**
+ * Wrapper around the Google Analytics client.
+ *
+ * See https://developers.google.com/analytics/devguides/collection/analyticsjs/
+ */
+class GoogleAnalytics {
+  /**
+   * @param {Function} ga - The `window.ga` interface to analytics.js
+   * @param {string} category - Category for events.
+   */
+  constructor(ga, category) {
+    this.ga = ga;
+    this.category = category;
+  }
+
+  /**
+   * Report a user interaction to Google Analytics.
+   *
+   * See https://developers.google.com/analytics/devguides/collection/analyticsjs/events
+   *
+   * @param {string} action - The user action
+   * @param {string} label
+   * @param [number] value
+   */
+  sendEvent(action, label, value) {
+    this.ga('send', 'event', this.category, action, label, value);
+  }
+
+  /**
+   * Report a page view.
+   *
+   * This should be sent on initial page load and route changes.
+   */
+  sendPageView() {
+    this.ga('send', 'pageview');
+  }
+}
 
 /**
  * Analytics API to simplify and standardize the values that we
@@ -45,56 +115,30 @@ const globalGAOptions = function(win, settings) {
  * We will standardize the category to be the appType of the client settings
  */
 // @ngInject
-function analytics($analytics, $window, settings) {
-  const options = $window ? globalGAOptions($window, settings) : {};
+function analytics($window, settings) {
+  const category = clientType($window, settings);
+  const noop = () => {};
+  const ga = $window.ga || noop;
+  const googleAnalytics = new GoogleAnalytics(ga, category);
 
   return {
+    sendPageView() {
+      googleAnalytics.sendPageView();
+    },
+
     /**
      * @param  {string} event This is the event name that we are capturing
      *  in our analytics. Example: 'sidebarOpened'. Use camelCase to track multiple
      *  words.
      */
-    track: function(event, label, metricValue) {
-      $analytics.eventTrack(
-        event,
-        Object.assign(
-          {},
-          {
-            label: label || undefined,
-            metricValue: isNaN(metricValue) ? undefined : metricValue,
-          },
-          options
-        )
-      );
+    track(event, label, metricValue) {
+      googleAnalytics.sendEvent(event, label, metricValue);
     },
 
-    events: {
-      ANNOTATION_CREATED: 'annotationCreated',
-      ANNOTATION_DELETED: 'annotationDeleted',
-      ANNOTATION_FLAGGED: 'annotationFlagged',
-      ANNOTATION_SHARED: 'annotationShared',
-      ANNOTATION_UPDATED: 'annotationUpdated',
-      DOCUMENT_SHARED: 'documentShared',
-      GROUP_LEAVE: 'groupLeave',
-      GROUP_SWITCH: 'groupSwitch',
-      GROUP_VIEW_ACTIVITY: 'groupViewActivity',
-      HIGHLIGHT_CREATED: 'highlightCreated',
-      HIGHLIGHT_UPDATED: 'highlightUpdated',
-      HIGHLIGHT_DELETED: 'highlightDeleted',
-      LOGIN_FAILURE: 'loginFailure',
-      LOGIN_SUCCESS: 'loginSuccessful',
-      LOGOUT_FAILURE: 'logoutFailure',
-      LOGOUT_SUCCESS: 'logoutSuccessful',
-      PAGE_NOTE_CREATED: 'pageNoteCreated',
-      PAGE_NOTE_UPDATED: 'pageNoteUpdated',
-      PAGE_NOTE_DELETED: 'pageNoteDeleted',
-      REPLY_CREATED: 'replyCreated',
-      REPLY_UPDATED: 'replyUpdated',
-      REPLY_DELETED: 'replyDeleted',
-      SIDEBAR_OPENED: 'sidebarOpened',
-      SIGN_UP_REQUESTED: 'signUpRequested',
-    },
+    events,
   };
 }
+
+analytics.events = events;
 
 module.exports = analytics;

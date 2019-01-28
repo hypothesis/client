@@ -29,7 +29,7 @@ describe('sidebar.session', function() {
     let state = {};
     fakeAnalytics = {
       track: sinon.stub(),
-      events: require('../analytics')().events,
+      events: require('../analytics').events,
     };
     const fakeStore = {
       getState: function() {
