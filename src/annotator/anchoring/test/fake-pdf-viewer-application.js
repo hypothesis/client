@@ -44,6 +44,35 @@ function createPage(content, rendered) {
 }
 
 /**
+ * Fake implementation of `PDFPageProxy` class.
+ *
+ * The original is defined at https://github.com/mozilla/pdf.js/blob/master/src/display/api.js
+ */
+class FakePDFPageProxy {
+  constructor(pageText) {
+    this.pageText = pageText;
+  }
+
+  getTextContent(params = {}) {
+    if (!params.normalizeWhitespace) {
+      return Promise.reject(new Error('Expected `normalizeWhitespace` to be true'));
+    }
+
+    const textContent = {
+      // The way that the page text is split into items will depend on
+      // the PDF and the version of PDF.js - individual text items might be
+      // just symbols, words, phrases or whole lines.
+      //
+      // Here we split items by line which matches the typical output for a
+      // born-digital PDF.
+      items: this.pageText.split(/\n/).map(line => ({ str: line })),
+    };
+
+    return Promise.resolve(textContent);
+  }
+}
+
+/**
  * @typedef FakePDFPageViewOptions
  * @prop [boolean] rendered - Whether this page is "rendered", as if it were
  *   near the viewport, or not.
@@ -70,6 +99,7 @@ class FakePDFPageView {
     this.renderingState = textLayerEl
       ? RenderingStates.FINISHED
       : RenderingStates.INITIAL;
+    this.pdfPage = new FakePDFPageProxy(text);
   }
 
   dispose() {
@@ -101,19 +131,6 @@ class FakePDFViewer {
   getPageView(index) {
     this._checkBounds(index);
     return this._pages[index];
-  }
-
-  getPageTextContent(index) {
-    this._checkBounds(index);
-    return Promise.resolve({
-      // The way that the page text is split into items will depend on
-      // the PDF and the version of PDF.js - individual text items might be
-      // just symbols, words, phrases or whole lines.
-      //
-      // Here we split items by line which matches the typical output for a
-      // born-digital PDF.
-      items: this._content[index].split(/\n/).map(line => ({ str: line })),
-    });
   }
 
   /**
