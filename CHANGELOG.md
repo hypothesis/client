@@ -4,6 +4,20 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [1.119.0] - 2019-01-28
+
+### Changed
+
+- Bump proxyquire-universal from 1.0.8 to 2.1.0
+  [#883](https://api.github.com/repos/hypothesis/client/pulls/883)
+
+- Bump katex from 0.7.1 to 0.10.0
+  [#886](https://api.github.com/repos/hypothesis/client/pulls/886)
+
+- Bump angular-route from 1.7.5 to 1.7.6
+  [#885](https://api.github.com/repos/hypothesis/client/pulls/885)
+
+
 ## [1.118.0] - 2019-01-25
 
 ### Changed
