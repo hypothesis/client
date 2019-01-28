@@ -224,6 +224,29 @@ describe('annotator.anchoring.pdf', function () {
           assert.equal(err.message, 'Quote not found');
         });
     });
+
+    it('re-anchors successfully using caches', () => {
+      viewer.setCurrentPage(2);
+      const range = findText(container, 'said his lady');
+      let selectors;
+      return pdfAnchoring.describe(container, range).then(selectors_ => {
+        selectors = selectors_;
+
+        // Adjust the position selector so that anchoring fails, and a fallback
+        // to the quote selector is required.
+        const position = selectors.find(s => s.type === 'TextPositionSelector');
+        position.start += 100;
+        position.end += 100;
+
+        return pdfAnchoring.anchor(container, selectors);
+      }).then(() => {
+        // Anchor again using the same selectors. This time anchoring will
+        // use the existing cache.
+        return pdfAnchoring.anchor(container, selectors);
+      }).then(range => {
+        assert.equal(range.toString(), 'said his lady');
+      });
+    });
   });
 
 });
