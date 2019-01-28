@@ -212,6 +212,18 @@ describe('annotator.anchoring.pdf', function () {
         assert.equal(anchoredRange.toString(), 'Loading annotations…');
       });
     });
+
+    it('rejects if quote cannot be anchored', () => {
+      viewer.setCurrentPage(2);
+      const selectors = [{
+        type: 'TextQuoteSelector',
+        exact: 'phrase that does not exist in the PDF',
+      }];
+      return pdfAnchoring.anchor(container, selectors)
+        .catch(err => {
+          assert.equal(err.message, 'Quote not found');
+        });
+    });
   });
 
 });
