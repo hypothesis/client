@@ -51,7 +51,7 @@ describe('annotator.anchoring.pdf', function () {
       container: container,
       content: fixtures.pdfPages,
     });
-    viewer.setCurrentPage(0);
+    viewer.pdfViewer.setCurrentPage(0);
   });
 
   afterEach(function () {
@@ -62,7 +62,7 @@ describe('annotator.anchoring.pdf', function () {
 
   describe('#describe', function () {
     it('returns position and quote selectors', function () {
-      viewer.setCurrentPage(2);
+      viewer.pdfViewer.setCurrentPage(2);
       const range = findText(container, 'Netherfield Park');
       return pdfAnchoring.describe(container, range).then(function (selectors) {
         const types = selectors.map(function (s) { return s.type; });
@@ -71,7 +71,7 @@ describe('annotator.anchoring.pdf', function () {
     });
 
     it('returns a position selector with correct start/end offsets', function () {
-      viewer.setCurrentPage(2);
+      viewer.pdfViewer.setCurrentPage(2);
       const quote = 'Netherfield Park';
       const range = findText(container, quote);
       const contentStr = fixtures.pdfPages.join('');
@@ -85,7 +85,7 @@ describe('annotator.anchoring.pdf', function () {
     });
 
     it('returns a quote selector with the correct quote', function () {
-      viewer.setCurrentPage(2);
+      viewer.pdfViewer.setCurrentPage(2);
       const range = findText(container, 'Netherfield Park');
       return pdfAnchoring.describe(container, range).then(function (selectors) {
         const quote = selectors[1];
@@ -108,7 +108,7 @@ describe('annotator.anchoring.pdf', function () {
       // parent set, this fails.
 
 
-      viewer.setCurrentPage(3);
+      viewer.pdfViewer.setCurrentPage(3);
 
       const quote = 'NODE B';
 
@@ -136,7 +136,7 @@ describe('annotator.anchoring.pdf', function () {
     });
 
     it('rejects when text selection spans multiple pages', () => {
-      viewer.setCurrentPage(2, 3);
+      viewer.pdfViewer.setCurrentPage(2, 3);
       const range = findText(container, 'occupied again? NODE A');
 
       return pdfAnchoring.describe(container, range).catch(err => {
@@ -147,7 +147,7 @@ describe('annotator.anchoring.pdf', function () {
 
   describe('#anchor', function () {
     it('anchors previously created selectors if the page is rendered', function () {
-      viewer.setCurrentPage(2);
+      viewer.pdfViewer.setCurrentPage(2);
       const range = findText(container, 'My dear Mr. Bennet');
       return pdfAnchoring.describe(container, range).then(function (selectors) {
         const position = selectors[0];
@@ -186,7 +186,7 @@ describe('annotator.anchoring.pdf', function () {
       offset: 100000,
     }].forEach(({ offset }) => {
       it('anchors using a quote if the position selector fails', function () {
-        viewer.setCurrentPage(0);
+        viewer.pdfViewer.setCurrentPage(0);
         const range = findText(container, 'Pride And Prejudice');
         return pdfAnchoring.describe(container, range).then(function (selectors) {
           const position = selectors[0];
@@ -203,10 +203,10 @@ describe('annotator.anchoring.pdf', function () {
     });
 
     it('anchors to a placeholder element if the page is not rendered', function () {
-      viewer.setCurrentPage(2);
+      viewer.pdfViewer.setCurrentPage(2);
       const range = findText(container, 'Netherfield Park');
       return pdfAnchoring.describe(container, range).then(function (selectors) {
-        viewer.setCurrentPage(0);
+        viewer.pdfViewer.setCurrentPage(0);
         return pdfAnchoring.anchor(container, selectors);
       }).then(function (anchoredRange) {
         assert.equal(anchoredRange.toString(), 'Loading annotations…');
@@ -214,7 +214,7 @@ describe('annotator.anchoring.pdf', function () {
     });
 
     it('rejects if quote cannot be anchored', () => {
-      viewer.setCurrentPage(2);
+      viewer.pdfViewer.setCurrentPage(2);
       const selectors = [{
         type: 'TextQuoteSelector',
         exact: 'phrase that does not exist in the PDF',
@@ -226,7 +226,7 @@ describe('annotator.anchoring.pdf', function () {
     });
 
     it('re-anchors successfully using caches', () => {
-      viewer.setCurrentPage(2);
+      viewer.pdfViewer.setCurrentPage(2);
       const range = findText(container, 'said his lady');
       let selectors;
       return pdfAnchoring.describe(container, range).then(selectors_ => {
