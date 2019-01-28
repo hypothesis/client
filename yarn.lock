@@ -239,9 +239,9 @@ angular-mocks@^1.7.5:
   integrity sha512-t3eQmuAZczdOVdOQj7muCBwH+MBNwd+/FaAsV1SNp+597EQVWABQwxI6KXE0k0ZlyJ5JbtkNIKU8kGAj1znxhw==
 
 angular-route@^1.7.5:
-  version "1.7.5"
-  resolved "https://registry.yarnpkg.com/angular-route/-/angular-route-1.7.5.tgz#34a3648c407a14a030d075cf485318e33ba23f0e"
-  integrity sha512-7KfyEVVOWTI+jTY/j5rUNCIHGRyeCOx7YqZI/Ci3IbDK7GIsy6xH+hS5ai0Xi0sLjzDZ0PUDO4gBn+K0dVtlOg==
+  version "1.7.6"
+  resolved "https://registry.yarnpkg.com/angular-route/-/angular-route-1.7.6.tgz#2c8337b07ef601937a5428d5ba05de0a973db551"
+  integrity sha512-pssJ9IdZfXdFO5lYUokIeihTUjZf9Wvy+hwyuZdFj2BBr7dIccpVfdIv9LbbH+4ahVLQrY5tzuyJQh/Hp7gRaQ==
 
 angular-sanitize@^1.7.5:
   version "1.7.5"
