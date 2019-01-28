@@ -108,16 +108,18 @@ function createPage(content, rendered) {
 /**
  * Set the index of the page which is currently visible in the viewport.
  *
- * The page which is visible will be "rendered" and have a text layer available.
- * For other pages, there will only be a placeholder element for the whole page.
+ * Pages from `index` up to and including `lastRenderedPage` will be
+ * "rendered" and have a text layer available. Other pages will be "un-rendered"
+ * with no text layer available, but only a placeholder element for the whole
+ * page.
  */
-FakePDFViewerApplication.prototype.setCurrentPage = function (index) {
+FakePDFViewerApplication.prototype.setCurrentPage = function (index, lastRenderedPage=index) {
   const self = this;
 
   this._checkBounds(index);
 
   const pages = this._content.map(function (text, idx) {
-    return createPage(text, idx === index /* rendered */);
+    return createPage(text, idx >= index && idx <= lastRenderedPage);
   });
 
   this._container.innerHTML = '';
