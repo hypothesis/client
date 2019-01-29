@@ -2564,9 +2564,9 @@ di@^0.0.1:
   integrity sha1-gGZJMmzqp8qjMG112YXqJ0i6kTw=
 
 diff-match-patch@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/diff-match-patch/-/diff-match-patch-1.0.0.tgz#1cc3c83a490d67f95d91e39f6ad1f2e086b63048"
-  integrity sha1-HMPIOkkNZ/ldkeOfatHy4Ia2MEg=
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/diff-match-patch/-/diff-match-patch-1.0.4.tgz#6ac4b55237463761c4daf0dc603eb869124744b1"
+  integrity sha512-Uv3SW8bmH9nAtHKaKSanOQmj2DnlH65fUpcrMdfdaOxUG02QQ4YGZ8AE7kKOMisF7UqvOlGKVYWRvezdncW9lg==
 
 diff@3.5.0, diff@^3.5.0:
   version "3.5.0"
