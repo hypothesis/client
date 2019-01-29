@@ -4,6 +4,38 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [1.120.0] - 2019-01-29
+
+### Changed
+
+- Bump classnames from 2.2.5 to 2.2.6
+  [#894](https://api.github.com/repos/hypothesis/client/pulls/894)
+
+- Bump npm-packlist from 1.1.12 to 1.2.0
+  [#900](https://api.github.com/repos/hypothesis/client/pulls/900)
+
+- Bump karma-browserify from 5.2.0 to 5.3.0
+  [#899](https://api.github.com/repos/hypothesis/client/pulls/899)
+
+- Bump core-js from 2.6.2 to 2.6.3
+  [#897](https://api.github.com/repos/hypothesis/client/pulls/897)
+
+- Bump codecov from 1.0.1 to 3.1.0
+  [#895](https://api.github.com/repos/hypothesis/client/pulls/895)
+
+- Bump retry from 0.8.0 to 0.12.0
+  [#893](https://api.github.com/repos/hypothesis/client/pulls/893)
+
+- Bump diff-match-patch from 1.0.0 to 1.0.4
+  [#891](https://api.github.com/repos/hypothesis/client/pulls/891)
+
+- Bump extend from 2.0.1 to 3.0.2
+  [#892](https://api.github.com/repos/hypothesis/client/pulls/892)
+
+- Bump karma from 1.7.1 to 4.0.0
+  [#898](https://api.github.com/repos/hypothesis/client/pulls/898)
+
+
 ## [1.119.0] - 2019-01-28
 
 ### Changed
