@@ -4,6 +4,35 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [1.121.0] - 2019-01-30
+
+### Changed
+
+- Bump autoprefixer from 6.7.7 to 9.4.7
+  [#902](https://api.github.com/repos/hypothesis/client/pulls/902)
+
+- Bump aws-sdk from 2.394.0 to 2.395.0
+  [#903](https://api.github.com/repos/hypothesis/client/pulls/903)
+
+- Bump check-dependencies from 0.12.3 to 1.1.0
+  [#905](https://api.github.com/repos/hypothesis/client/pulls/905)
+
+- Bump gulp-sourcemaps from 1.12.1 to 2.6.4
+  [#906](https://api.github.com/repos/hypothesis/client/pulls/906)
+
+- Bump diff from 2.2.3 to 4.0.1
+  [#907](https://api.github.com/repos/hypothesis/client/pulls/907)
+
+- Bump karma-browserify from 5.3.0 to 6.0.0
+  [#908](https://api.github.com/repos/hypothesis/client/pulls/908)
+
+- Bump angular-sanitize from 1.7.5 to 1.7.6
+  [#909](https://api.github.com/repos/hypothesis/client/pulls/909)
+
+- Bump eslint-plugin-mocha from 4.12.1 to 5.2.1
+  [#910](https://api.github.com/repos/hypothesis/client/pulls/910)
+
+
 ## [1.120.0] - 2019-01-29
 
 ### Changed
