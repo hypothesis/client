@@ -59,7 +59,7 @@
     "gulp-rename": "^1.2.2",
     "gulp-replace": "^1.0.0",
     "gulp-sass": "^4.0.2",
-    "gulp-sourcemaps": "^1.6.0",
+    "gulp-sourcemaps": "^2.6.4",
     "gulp-util": "^3.0.7",
     "hammerjs": "^2.0.4",
     "isparta": "^4.0.0",
