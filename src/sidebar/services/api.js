@@ -225,7 +225,9 @@ function api($http, $q, apiRoutes, auth) {
       list: apiCall('groups.read'),
     },
     profile: {
-      groups: apiCall('profile.groups'),
+      groups: {
+        read: apiCall('profile.groups.read'),
+      },
       read: apiCall('profile.read'),
       update: apiCall('profile.update'),
     },
