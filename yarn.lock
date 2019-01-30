@@ -236,9 +236,9 @@ angular-route@^1.7.5:
   integrity sha512-pssJ9IdZfXdFO5lYUokIeihTUjZf9Wvy+hwyuZdFj2BBr7dIccpVfdIv9LbbH+4ahVLQrY5tzuyJQh/Hp7gRaQ==
 
 angular-sanitize@^1.7.5:
-  version "1.7.5"
-  resolved "https://registry.yarnpkg.com/angular-sanitize/-/angular-sanitize-1.7.5.tgz#75d49e15071ca9c70581e76d20940f26372e24d2"
-  integrity sha512-wjKCJOIwrkEvfD0keTnKGi6We13gtoCAQIHcdoqyoo3gwvcgNfYymVQIS3+iCGVcjfWz0jHuS3KgB4ysRWsTTA==
+  version "1.7.6"
+  resolved "https://registry.yarnpkg.com/angular-sanitize/-/angular-sanitize-1.7.6.tgz#3ee2d4fc6ca31fee2b375b27ae526a6c3c108e3c"
+  integrity sha512-wDRCQ6VAHzHmEWgpC9nb1ea74IGJgP3dCUgF9DHtHQJSeNvAB/2e4glxfogS3tzGOEnppzLEOD1v+m5lJeEo1Q==
 
 angular-toastr@^2.1.1:
   version "2.1.1"
