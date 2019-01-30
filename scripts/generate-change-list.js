@@ -109,8 +109,7 @@ function formatChangeList(pullRequests) {
 }
 
 /**
- * Return a markdown-formatted changelog of changes since a given Git tag,
- * suitable for inclusion in a CHANGELOG.md file.
+ * Return a markdown-formatted changelog of changes since a given Git tag.
  *
  * If no Git tag is specified, default to the most recently created tag.
  *
