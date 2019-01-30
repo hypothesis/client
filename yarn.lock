@@ -8843,9 +8843,9 @@ wrap-ansi@^2.0.0:
     strip-ansi "^3.0.1"
 
 wrap-text@^1.0.7:
-  version "1.0.7"
-  resolved "https://registry.yarnpkg.com/wrap-text/-/wrap-text-1.0.7.tgz#5c4b2984e6f7cb7850ea7f6e4e9885cab601d918"
-  integrity sha1-XEsphOb3y3hQ6n9uTpiFyrYB2Rg=
+  version "1.0.8"
+  resolved "https://registry.yarnpkg.com/wrap-text/-/wrap-text-1.0.8.tgz#1b472024c625fc23560880c12f2944b064bfe4f1"
+  integrity sha512-trmZLGAm8DE+uYrrUH6xHiLT/CXMfEGGE5kDJWIyZygI9i6b1eNS2JjnjOwBoYA6RJbtuSB/d3Ae2BUfpiVDiw==
 
 wrappy@1:
   version "1.0.2"
