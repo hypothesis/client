@@ -34,7 +34,7 @@
     "core-js": "^2.5.7",
     "cross-env": "^5.1.4",
     "custom-event": "^1.0.1",
-    "diff": "^2.2.2",
+    "diff": "^4.0.1",
     "diff-match-patch": "^1.0.0",
     "document-base-uri": "^1.0.0",
     "dom-anchor-fragment": "^1.0.1",
