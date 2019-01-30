@@ -67,7 +67,7 @@
     "jquery": "^3.2.1",
     "js-polyfills": "^0.1.16",
     "karma": "^4.0.0",
-    "karma-browserify": "^5.0.5",
+    "karma-browserify": "^6.0.0",
     "karma-chai": "^0.1.0",
     "karma-coverage": "^1.1.1",
     "karma-mocha": "^1.1.1",
