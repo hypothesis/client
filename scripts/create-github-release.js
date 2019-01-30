@@ -9,7 +9,6 @@
  * `v<VERSION>` where <VERSION> is the `version` field in package.json.
  */
 
-const request = require('request');
 const octokit = require('@octokit/rest')();
 
 const pkg = require('../package.json');
@@ -34,28 +33,16 @@ async function createGitHubRelease() {
 
   const changes = await changelistSinceTag(octokit);
 
-  const release = {
-    tag_name: `v${pkg.version}`,
-    name: `v${pkg.version}`,
+  const [owner, repo] = pkg.repository.split('/');
+
+  await octokit.repos.createRelease({
     body: changes,
     draft: false,
+    name: `v${pkg.version}`,
+    owner,
     prerelease: true,
-  };
-
-  request.post({
-    uri: `https://api.github.com/repos/${pkg.repository}/releases`,
-    body: release,
-    json: true,
-    headers: {
-      Authorization: `token ${process.env.GITHUB_TOKEN}`,
-      'User-Agent': `${pkg.repository} Release Script`,
-    },
-  }, (err, rsp, body) => {
-    if (err || rsp.statusCode !== 201) {
-      const msg = err ? err.message : `${rsp.statusCode}: ${JSON.stringify(body)}`;
-      throw new Error(`Creating GitHub release failed: ${msg}`);
-    }
-    console.info(`Created GitHub release for v${pkg.version}`);
+    repo,
+    tag_name: `v${pkg.version}`,
   });
 }
 
