@@ -84,7 +84,7 @@
     "npm-packlist": "^1.1.12",
     "postcss": "^7.0.13",
     "postcss-url": "^8.0.0",
-    "proxyquire": "^1.7.10",
+    "proxyquire": "^2.1.0",
     "proxyquire-universal": "^2.1.0",
     "proxyquireify": "^3.2.1",
     "query-string": "^3.0.1",
