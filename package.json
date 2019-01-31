@@ -19,7 +19,7 @@
     "autofill-event": "0.0.1",
     "autoprefixer": "^9.4.7",
     "aws-sdk": "^2.345.0",
-    "babel-plugin-angularjs-annotate": "^0.9.0",
+    "babel-plugin-angularjs-annotate": "^0.10.0",
     "babel-plugin-istanbul": "^5.1.0",
     "babel-preset-env": "^1.7.0",
     "babelify": "^10.0.0",
