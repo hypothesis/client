@@ -4,6 +4,17 @@ Entries in this change log follow the format suggested at http://keepachangelog.
 
 # Change Log
 
+## [1.122.0] - 2019-01-31
+
+### Changed
+
+- Bump wrap-text from 1.0.7 to 1.0.8
+  [#904](https://api.github.com/repos/hypothesis/client/pulls/904)
+
+- Update Babel and code coverage tooling
+  [#821](https://api.github.com/repos/hypothesis/client/pulls/821)
+
+
 ## [1.121.0] - 2019-01-30
 
 ### Changed
