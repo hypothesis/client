@@ -29,30 +29,26 @@ node {
         npmTag = "prerelease"
     }
 
-    lastCommitAuthor = sh (
-      script: 'git show HEAD --no-patch --format="%an"',
-      returnStdout: true
-    ).trim()
-
     lastCommitHash = sh (
       script: 'git show HEAD --no-patch --format="%h"',
       returnStdout: true
     ).trim()
-
-    if (lastCommitAuthor == "jenkins-hypothesis") {
-        echo "Skipping build of automated commit created by Jenkins"
-        return
-    }
 
     pkgName = sh (
       script: 'cat package.json | jq -r .name',
       returnStdout: true
     ).trim()
 
+    // Determine version number for next release.
     pkgVersion = sh (
-      script: 'cat package.json | jq -r .version',
+      script: 'git tag --list | sort --version-sort --reverse | head -n1 | tail -c +2',
       returnStdout: true
     ).trim()
+    newPkgVersion = bumpMinorVersion(pkgVersion)
+    if (versionSuffix != "") {
+        newPkgVersion = newPkgVersion + "-" + versionSuffix
+    }
+    echo "Building and testing ${newPkgVersion}"
 
     stage('Build') {
         nodeEnv.inside("-e HOME=${workspace}") {
@@ -108,20 +104,12 @@ node {
                 """
             }
         }
-
-        // Revert back to the pre-QA commit.
-        sh "git checkout ${lastCommitHash}"
     }
 
     milestone()
     stage('Publish') {
         input(message: "Publish new client release?")
         milestone()
-
-        newPkgVersion = bumpMinorVersion(pkgVersion)
-        if (versionSuffix != "") {
-            newPkgVersion = newPkgVersion + "-" + versionSuffix
-        }
 
         echo "Publishing ${pkgName} v${newPkgVersion} from ${releaseFromBranch} branch."
 
@@ -152,8 +140,13 @@ node {
                 // use the workaround from https://github.com/git/git/commit/97716d217c1ea00adfc64e4f6bb85c1236d661ff
                 sh "git fetch --quiet --prune origin 'refs/tags/*:refs/tags/*' "
 
-                // Bump the package version and create the tag and GitHub release.
-                sh "yarn version --new-version ${newPkgVersion}"
+                // Create and push a git tag.
+                sh "git tag v${newPkgVersion}"
+                sh "git push https://github.com/hypothesis/client.git v${newPkgVersion}"
+                sh "sleep 2" // Give GitHub a moment to realize the tag exists.
+
+                // Bump the package version and create the GitHub release.
+                sh "yarn version --no-git-tag-version --new-version ${newPkgVersion}"
 
                 // Publish the updated package to the npm registry.
                 // Use `npm` rather than `yarn` for publishing.
