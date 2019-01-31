@@ -3657,14 +3657,15 @@ execa@^0.7.0:
     signal-exit "^3.0.0"
     strip-eof "^1.0.0"
 
-exorcist@^0.4.0:
-  version "0.4.0"
-  resolved "https://registry.yarnpkg.com/exorcist/-/exorcist-0.4.0.tgz#1230ffdedd9248f42fbccf8b4a44d4cab29e3c64"
-  integrity sha1-EjD/3t2SSPQvvM+LSkTUyrKePGQ=
+exorcist@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/exorcist/-/exorcist-1.0.1.tgz#79316e3c4885845490f7bb405c0e5b5db1167c52"
+  integrity sha1-eTFuPEiFhFSQ97tAXA5bXbEWfFI=
   dependencies:
+    is-stream "~1.1.0"
     minimist "0.0.5"
+    mkdirp "~0.5.1"
     mold-source-map "~0.4.0"
-    nave "~0.5.1"
 
 expand-braces@^0.1.1:
   version "0.1.2"
@@ -5297,7 +5298,7 @@ is-resolvable@^1.0.0:
   resolved "https://registry.yarnpkg.com/is-resolvable/-/is-resolvable-1.1.0.tgz#fb18f87ce1feb925169c9a407c19318a3206ed88"
   integrity sha512-qgDYXFSR5WvEfuS5dMj6oTMEbrrSaM0CrFk2Yiq/gXnBvD9pMa2jGXxyhGLfvhZpuMZe18CJpFxAt3CRs42NMg==
 
-is-stream@^1.0.1, is-stream@^1.1.0:
+is-stream@^1.0.1, is-stream@^1.1.0, is-stream@~1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/is-stream/-/is-stream-1.1.0.tgz#12d4a3dd4e68e0b79ceb8dbc84173ae80d91ca44"
   integrity sha1-EtSj3U5o4Lec6428hBc66A2RykQ=
@@ -6339,7 +6340,7 @@ mkdirp@0.5.0:
   dependencies:
     minimist "0.0.8"
 
-mkdirp@0.5.1, "mkdirp@>=0.5 0", mkdirp@^0.5.0, mkdirp@^0.5.1:
+mkdirp@0.5.1, "mkdirp@>=0.5 0", mkdirp@^0.5.0, mkdirp@^0.5.1, mkdirp@~0.5.1:
   version "0.5.1"
   resolved "https://registry.yarnpkg.com/mkdirp/-/mkdirp-0.5.1.tgz#30057438eac6cf7f8c4767f38648d6697d75c903"
   integrity sha1-MAV0OOrGz3+MR2fzhkjWaX11yQM=
@@ -6463,11 +6464,6 @@ natural-compare@^1.4.0:
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/natural-compare/-/natural-compare-1.4.0.tgz#4abebfeed7541f2c27acfb29bdbbd15c8d5ba4f7"
   integrity sha1-Sr6/7tdUHywnrPspvbvRXI1bpPc=
-
-nave@~0.5.1:
-  version "0.5.3"
-  resolved "https://registry.yarnpkg.com/nave/-/nave-0.5.3.tgz#5acec72375856e5c76c83bd21a68d713eb5f1ba4"
-  integrity sha1-Ws7HI3WFblx2yDvSGmjXE+tfG6Q=
 
 ncname@1.0.x:
   version "1.0.0"
