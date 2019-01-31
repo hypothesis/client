@@ -69,7 +69,11 @@ module.exports = function(config) {
           // The transpiled CoffeeScript is fed through Babelify to add
           // code coverage instrumentation for Istanbul.
           extensions: ['.js', '.coffee'],
-          plugins: ['babel-plugin-istanbul'],
+          plugins: [
+            ['babel-plugin-istanbul', {
+              'exclude': ['**/test/**/*.{coffee,js}'],
+            }],
+          ],
         }],
       ],
     },
