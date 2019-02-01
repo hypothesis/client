@@ -72,9 +72,10 @@ function getPageTextContent(pageIndex) {
     return textContent;
   };
 
-  // FIXME - `pdfViewer.getPageTextContent` was removed in recent versions of PDF.js.
-  pageTextCache[pageIndex] = PDFViewerApplication.pdfViewer
-    .getPageTextContent(pageIndex)
+  pageTextCache[pageIndex] = getPage(pageIndex).pdfPage
+    .getTextContent({
+      normalizeWhitespace: true,
+    })
     .then(joinItems);
 
   return pageTextCache[pageIndex];
