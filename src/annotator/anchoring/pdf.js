@@ -59,6 +59,7 @@ function getPageTextContent(pageIndex) {
     return pageTextCache[pageIndex];
   }
 
+  // Join together PDF.js `TextItem`s representing pieces of text in a PDF page.
   const joinItems = ({ items }) => {
     // Skip empty items since PDF.js leaves their text layer divs blank.
     // Excluding them makes our measurements match the rendered text layer.
@@ -84,7 +85,7 @@ function getPageTextContent(pageIndex) {
  * `pageIndex` begins.
  *
  * @param {number} pageIndex
- * @return {Promise<number>}
+ * @return {Promise<number>} - Character position at which page text starts
  */
 function getPageOffset(pageIndex) {
   let index = -1;
@@ -104,15 +105,20 @@ function getPageOffset(pageIndex) {
 }
 
 /**
+ * Information about the page where a particular character position in the
+ * text of the document occurs.
+ *
  * @typedef PageOffset
- * @prop {number} index - Page index
- * @prop {number} offset - Offset of the start of the text within the page
- * @prop {string} textContent - Complete text of the page
+ * @prop {number} index - Index of page containing offset
+ * @prop {number} offset -
+ *  Character position of the start of `textContent`
+ *  within the full text of the document
+ * @prop {string} textContent - Full text of page containing offset
  */
 
 /**
- * Convert an offset in the text of a document into an offset of the text within
- * a page.
+ * Find the index and text content of a page containing the character position
+ * `offset` within the complete text of the document.
  *
  * @param {number} offset
  * @return {PageOffset}
@@ -149,9 +155,11 @@ function findPage(offset) {
   const count = textContent => {
     const lastPageIndex = PDFViewerApplication.pdfViewer.pagesCount - 1;
     if (total + textContent.length > offset || index === lastPageIndex) {
+      // Offset is in current page.
       offset = total;
       return Promise.resolve({ index, offset, textContent });
     } else {
+      // Offset is within a subsequent page.
       ++index;
       total += textContent.length;
       return getPageTextContent(index).then(count);
@@ -162,10 +170,13 @@ function findPage(offset) {
 }
 
 /**
- * Map a position anchor to a region within the text layer of a rendered page.
+ * Locate the DOM Range which a position selector refers to.
  *
- * If the page is not rendered, a placeholder element is created and the
- * returned range is the placeholder.
+ * If the page is off-screen it may be in an unrendered state, in which case
+ * the text layer will not have been created. In that case a placeholder
+ * DOM element is created and the returned range refers to that placeholder.
+ * In that case, the selector will need to be re-anchored when the page is
+ * scrolled into view.
  *
  * @param {PDFPageView} page - The PDF.js viewer page
  * @param {TextPositionAnchor} anchor - Anchor to locate in page
@@ -206,10 +217,12 @@ function anchorByPosition(page, anchor, options) {
  *
  * @param {number[]} pageIndexes - Pages to search in priority order
  * @param {TextQuoteSelector} quoteSelector
+ * @param {Object} positionHint - Options to pass to `TextQuoteAnchor#toPositionAnchor`
  * @return {Promise<Range>} Location of quote
  */
 function findInPages(pageIndexes, quoteSelector, positionHint) {
   if (pageIndexes.length === 0) {
+    // We reached the end of the document without finding a match for the quote.
     return Promise.reject(new Error('Quote not found'));
   }
 
@@ -246,9 +259,13 @@ function findInPages(pageIndexes, quoteSelector, positionHint) {
     return anchorByPosition(page, anchor);
   };
 
+  // First, get the text offset and other details of the current page.
   return Promise.all([page, content, offset])
+    // Attempt to locate the quote in the current page.
     .then(attempt)
+    // If the quote is located, find the DOM range and return it.
     .then(cacheAndFinish)
+    // If the quote was not found, try the next page.
     .catch(next);
 }
 
