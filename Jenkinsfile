@@ -145,16 +145,14 @@ node {
                 echo https://${env.GITHUB_USERNAME}:${env.GITHUB_TOKEN}@github.com >> \$HOME/.git-credentials
                 """
 
-                // Fetch information about tags so that changelog generation script
-                // can produce diff since last tag. Also remove local tags that no
-                // longer exist on the remote.
+                // Update local information about tags to match the remote,
+                // including removing any local tags that no longer exist.
                 //
                 // The `--prune-tags` option is not supported in Git 2.11 so we
                 // use the workaround from https://github.com/git/git/commit/97716d217c1ea00adfc64e4f6bb85c1236d661ff
                 sh "git fetch --quiet --prune origin 'refs/tags/*:refs/tags/*' "
 
-                // Bump the package version, update the changelog and create the tag
-                // and GitHub release.
+                // Bump the package version and create the tag and GitHub release.
                 sh "yarn version --new-version ${newPkgVersion}"
 
                 // Publish the updated package to the npm registry.
