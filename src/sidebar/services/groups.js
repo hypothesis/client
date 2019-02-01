@@ -150,16 +150,14 @@ function groups(
         }
         documentUri = uri;
 
-        // Fetch groups from the API.
-        return api.groups.list(params, null, { includeMetadata: true });
-      })
-      .then(({ data, token }) => {
-        const isLoggedIn = token !== null;
-        const directLinkedAnnotation = settings.annotations;
-        return filterGroups(data, isLoggedIn, directLinkedAnnotation);
-      })
-      .then(groups => {
-        injectOrganizations(groups);
+      // Fetch groups from the API.
+      return api.groups.list(params);
+    }).then(groups => {
+      const isLoggedIn = store.profile().userid !== null;
+      const directLinkedAnnotation = settings.annotations;
+      return filterGroups(groups, isLoggedIn, directLinkedAnnotation);
+    }).then(groups => {
+      injectOrganizations(groups);
 
         const isFirstLoad = store.allGroups().length === 0;
         const prevFocusedGroup = localStorage.getItem(STORAGE_KEY);
