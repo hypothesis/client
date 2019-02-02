@@ -9,6 +9,7 @@
   "devDependencies": {
     "@babel/core": "^7.1.6",
     "@babel/preset-env": "^7.1.6",
+    "@babel/preset-react": "^7.0.0",
     "@octokit/rest": "^16.9.0",
     "angular": "^1.7.5",
     "angular-mocks": "^1.7.5",
@@ -49,6 +50,7 @@
     "eslint": "^5.12.1",
     "eslint-config-hypothesis": "^1.0.0",
     "eslint-plugin-mocha": "^5.2.1",
+    "eslint-plugin-react": "^7.12.4",
     "exorcist": "^1.0.1",
     "express": "^4.14.1",
     "extend": "^3.0.2",
@@ -85,6 +87,7 @@
     "npm-packlist": "^1.1.12",
     "postcss": "^7.0.13",
     "postcss-url": "^8.0.0",
+    "preact": "10.0.0-alpha.2",
     "prettier": "1.16.4",
     "proxyquire": "^2.1.0",
     "proxyquire-universal": "^2.1.0",
