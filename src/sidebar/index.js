@@ -35,6 +35,9 @@ const angular = require('angular');
 // it must be require'd after angular is first require'd
 require('autofill-event');
 
+// Enable debugging checks for Preact.
+require('preact/debug');
+
 // Setup Angular integration for Raven
 if (appConfig.raven) {
   raven.angularModule(angular);
