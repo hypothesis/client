@@ -171,7 +171,7 @@ node {
 String bumpMinorVersion(String version) {
     def parts = version.tokenize('.')
     if (parts.size() != 3) {
-        throw new IllegalArgumentException("${version} is not a valid MAJOR.MINOR.PATCH version")
+        error "${version} is not a valid MAJOR.MINOR.PATCH version"
     }
     def newMinorVersion = parts[1].toInteger() + 1
 
