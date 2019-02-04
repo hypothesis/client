@@ -145,6 +145,7 @@ node {
 
                 // Bump the package version and create the GitHub release.
                 sh "yarn version --no-git-tag-version --new-version ${newPkgVersion}"
+                sh "scripts/create-github-release.js"
 
                 // Publish the updated package to the npm registry.
                 // Use `npm` rather than `yarn` for publishing.
