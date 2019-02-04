@@ -57,14 +57,6 @@ node {
     }
     echo "Building and testing ${newPkgVersion}"
 
-    stage('Build') {
-        nodeEnv.inside("-e HOME=${workspace}") {
-            sh "echo Building Hypothesis client"
-            sh 'make clean'
-            sh 'make'
-        }
-    }
-
     stage('Test') {
         nodeEnv.inside("-e HOME=${workspace}") {
             sh 'make test'
