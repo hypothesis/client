@@ -151,7 +151,7 @@ node {
                 // See https://github.com/yarnpkg/yarn/pull/3391.
                 sh "echo '//registry.npmjs.org/:_authToken=${env.NPM_TOKEN}' >> \$HOME/.npmrc"
                 sh "npm publish --tag ${npmTag}"
-                sh "scripts/wait-for-npm-release.sh"
+                sh "scripts/wait-for-npm-release.sh ${npmTag}"
 
                 // Deploy the client to cdn.hypothes.is, where the embedded
                 // client is served from by https://hypothes.is/embed.js.
