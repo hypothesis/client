@@ -39,6 +39,13 @@ node {
       returnStdout: true
     ).trim()
 
+    // Update local information about tags to match the remote,
+    // including removing any local tags that no longer exist.
+    //
+    // The `--prune-tags` option is not supported in Git 2.11 so we
+    // use the workaround from https://github.com/git/git/commit/97716d217c1ea00adfc64e4f6bb85c1236d661ff
+    sh "git fetch --quiet --prune origin 'refs/tags/*:refs/tags/*' "
+
     // Determine version number for next release.
     pkgVersion = sh (
       script: 'git tag --list | sort --version-sort --reverse | head -n1 | tail -c +2',
@@ -122,23 +129,14 @@ node {
                 [$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 's3-cdn']
                 ]) {
 
-                // Configure commit author for version bump commit and auth credentials
-                // for pushing tag to GitHub.
-                //
-                // See https://git-scm.com/docs/git-credential-store
+                // Configure author for tag and auth credentials for pushing tag to GitHub.
+                // See https://git-scm.com/docs/git-credential-store.
                 sh """
                 git config --replace-all user.email ${env.GITHUB_USERNAME}@hypothes.is
                 git config --replace-all user.name ${env.GITHUB_USERNAME}
                 git config credential.helper store
                 echo https://${env.GITHUB_USERNAME}:${env.GITHUB_TOKEN}@github.com >> \$HOME/.git-credentials
                 """
-
-                // Update local information about tags to match the remote,
-                // including removing any local tags that no longer exist.
-                //
-                // The `--prune-tags` option is not supported in Git 2.11 so we
-                // use the workaround from https://github.com/git/git/commit/97716d217c1ea00adfc64e4f6bb85c1236d661ff
-                sh "git fetch --quiet --prune origin 'refs/tags/*:refs/tags/*' "
 
                 // Create and push a git tag.
                 sh "git tag v${newPkgVersion}"
