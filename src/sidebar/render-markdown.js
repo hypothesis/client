@@ -8,7 +8,7 @@ function targetBlank() {
   function filter(text) {
     return text.replace(/<a href=/g, '<a target="_blank" href=');
   }
-  return [{type: 'output', filter: filter}];
+  return [{ type: 'output', filter: filter }];
 }
 
 let converter;
@@ -44,7 +44,8 @@ function extractMath(content) {
   let pos = 0;
   let replacedContent = content;
 
-  while (true) { // eslint-disable-line no-constant-condition
+  while (true) {
+    // eslint-disable-line no-constant-condition
     const blockMathStart = replacedContent.indexOf('$$', pos);
     const inlineMathStart = replacedContent.indexOf('\\(', pos);
 
@@ -54,8 +55,10 @@ function extractMath(content) {
 
     let mathStart;
     let mathEnd;
-    if (blockMathStart !== -1 &&
-        (inlineMathStart === -1 || blockMathStart < inlineMathStart)) {
+    if (
+      blockMathStart !== -1 &&
+      (inlineMathStart === -1 || blockMathStart < inlineMathStart)
+    ) {
       mathStart = blockMathStart;
       mathEnd = replacedContent.indexOf('$$', mathStart + 2);
     } else {
@@ -86,9 +89,10 @@ function extractMath(content) {
       replacement = '\n\n' + placeholder + '\n\n';
     }
 
-    replacedContent = replacedContent.slice(0, mathStart) +
-                      replacement +
-                      replacedContent.slice(mathEnd);
+    replacedContent =
+      replacedContent.slice(0, mathStart) +
+      replacement +
+      replacedContent.slice(mathEnd);
     pos = mathStart + replacement.length;
   }
 
@@ -99,7 +103,7 @@ function extractMath(content) {
 }
 
 function insertMath(html, mathBlocks) {
-  return mathBlocks.reduce(function (html, block) {
+  return mathBlocks.reduce(function(html, block) {
     let renderedMath;
     try {
       if (block.inline) {

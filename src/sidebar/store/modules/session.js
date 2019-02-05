@@ -21,7 +21,7 @@ function init() {
 }
 
 const update = {
-  UPDATE_SESSION: function (state, action) {
+  UPDATE_SESSION: function(state, action) {
     return {
       session: action.session,
     };

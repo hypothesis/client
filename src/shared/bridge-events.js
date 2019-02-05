@@ -45,7 +45,6 @@ module.exports = {
    */
   SIGNUP_REQUESTED: 'signupRequested',
 
-
   // Events that the annotator sends to the sidebar
   // ----------------------------------------------
 };

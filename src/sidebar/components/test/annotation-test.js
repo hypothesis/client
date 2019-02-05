@@ -41,12 +41,16 @@ const groupFixtures = {
  * @param {string} label - Button label
  */
 function findActionButton(annotationEl, label) {
-  const btns = Array.from(annotationEl[0].querySelectorAll('annotation-action-button'));
-  const match = btns.find(function (btn) {
+  const btns = Array.from(
+    annotationEl[0].querySelectorAll('annotation-action-button')
+  );
+  const match = btns.find(function(btn) {
     const ctrl = angular.element(btn).controller('annotationActionButton');
     return ctrl.label === label;
   });
-  return match ? angular.element(match).controller('annotationActionButton') : null;
+  return match
+    ? angular.element(match).controller('annotationActionButton')
+    : null;
 }
 
 describe('annotation', function() {
@@ -61,15 +65,18 @@ describe('annotation', function() {
     }
 
     it('copies tags and text into the new model', function() {
-      const changes = {text: 'bar', tags: ['foo', 'bar']};
-      const newModel = updateModel(fixtures.defaultAnnotation(), changes,
-        fakePermissions());
+      const changes = { text: 'bar', tags: ['foo', 'bar'] };
+      const newModel = updateModel(
+        fixtures.defaultAnnotation(),
+        changes,
+        fakePermissions()
+      );
       assert.deepEqual(newModel.tags, changes.tags);
       assert.equal(newModel.text, changes.text);
     });
 
     it('sets permissions to private if the draft is private', function() {
-      const changes = {isPrivate: true, text: 'bar', tags: ['foo', 'bar']};
+      const changes = { isPrivate: true, text: 'bar', tags: ['foo', 'bar'] };
       const annot = fixtures.defaultAnnotation();
       const permissions = fakePermissions();
       permissions.private = sinon.stub().returns('private permissions');
@@ -78,7 +85,7 @@ describe('annotation', function() {
     });
 
     it('sets permissions to shared if the draft is shared', function() {
-      const changes = {isPrivate: false, text: 'bar', tags: ['foo', 'bar']};
+      const changes = { isPrivate: false, text: 'bar', tags: ['foo', 'bar'] };
       const annot = fixtures.defaultAnnotation();
       const permissions = fakePermissions();
       permissions.shared = sinon.stub().returns('shared permissions');
@@ -144,7 +151,8 @@ describe('annotation', function() {
     }
 
     before(function() {
-      angular.module('h', [])
+      angular
+        .module('h', [])
         .component('annotation', annotationComponent())
         .component('annotationActionButton', {
           bindings: require('../annotation-action-button').bindings,
@@ -155,125 +163,122 @@ describe('annotation', function() {
     });
 
     beforeEach(angular.mock.module('h'));
-    beforeEach(angular.mock.module(function($provide) {
-      sandbox = sinon.sandbox.create();
-
-      fakeAnalytics = {
-        track: sandbox.stub(),
-        events: {},
-      };
-
-      fakeAnnotationMapper = {
-        createAnnotation: sandbox.stub().returns({
-          permissions: {
-            read: ['acct:bill@localhost'],
-            update: ['acct:bill@localhost'],
-            destroy: ['acct:bill@localhost'],
-            admin: ['acct:bill@localhost'],
-          },
-        }),
-        deleteAnnotation: sandbox.stub(),
-        flagAnnotation: sandbox.stub(),
-      };
-
-      fakeStore = {
-        updateFlagStatus: sandbox.stub().returns(true),
-      };
-
-      fakeDrafts = {
-        update: sandbox.stub(),
-        remove: sandbox.stub(),
-        get: sandbox.stub().returns(null),
-      };
-
-      fakeFlash = {
-        error: sandbox.stub(),
-      };
-
-      fakeAccountID.isThirdPartyUser.reset();
-      fakeAccountID.isThirdPartyUser.returns(false);
-
-      fakePermissions = {
-        isShared: sandbox.stub().returns(true),
-        permits: sandbox.stub().returns(true),
-        shared: sandbox.stub().returns({
-          read: ['everybody'],
-        }),
-        'private': sandbox.stub().returns({
-          read: ['justme'],
-        }),
-        'default': sandbox.stub().returns({
-          read: ['default'],
-        }),
-        setDefault: sandbox.stub(),
-      };
-
-      fakeSession = {
-        state: {
-          userid: 'acct:bill@localhost',
-        },
-      };
-
-      fakeServiceUrl = sinon.stub();
-
-      fakeGroups = {
-        focused: sinon.stub().returns(groupFixtures.open),
-        get: sinon.stub().returns(groupFixtures.open),
-      };
-
-      fakeSettings = {
-        // "localhost" is the host used by 'first party' annotation fixtures
-        authDomain: 'localhost',
-      };
-
-      fakeApi = {
-        annotation: {
-          create: sinon.spy(function (annot) {
-            return Promise.resolve(Object.assign({}, annot));
-          }),
-          update: sinon.spy(function (annot) {
-            return Promise.resolve(Object.assign({}, annot));
-          }),
-        },
-      };
-
-      fakeStreamer = {
-        hasPendingDeletion: sinon.stub(),
-      };
-
-      $provide.value('analytics', fakeAnalytics);
-      $provide.value('annotationMapper', fakeAnnotationMapper);
-      $provide.value('store', fakeStore);
-      $provide.value('api', fakeApi);
-      $provide.value('drafts', fakeDrafts);
-      $provide.value('flash', fakeFlash);
-      $provide.value('groups', fakeGroups);
-      $provide.value('permissions', fakePermissions);
-      $provide.value('session', fakeSession);
-      $provide.value('serviceUrl', fakeServiceUrl);
-      $provide.value('settings', fakeSettings);
-      $provide.value('streamer', fakeStreamer);
-    }));
-
     beforeEach(
-      inject(
-        function(_$q_, _$rootScope_, _$timeout_,
-          _$window_) {
-          $window = _$window_;
-          $q = _$q_;
-          $timeout = _$timeout_;
-          $rootScope = _$rootScope_;
-          $scope = $rootScope.$new();
-        }
-      )
+      angular.mock.module(function($provide) {
+        sandbox = sinon.sandbox.create();
+
+        fakeAnalytics = {
+          track: sandbox.stub(),
+          events: {},
+        };
+
+        fakeAnnotationMapper = {
+          createAnnotation: sandbox.stub().returns({
+            permissions: {
+              read: ['acct:bill@localhost'],
+              update: ['acct:bill@localhost'],
+              destroy: ['acct:bill@localhost'],
+              admin: ['acct:bill@localhost'],
+            },
+          }),
+          deleteAnnotation: sandbox.stub(),
+          flagAnnotation: sandbox.stub(),
+        };
+
+        fakeStore = {
+          updateFlagStatus: sandbox.stub().returns(true),
+        };
+
+        fakeDrafts = {
+          update: sandbox.stub(),
+          remove: sandbox.stub(),
+          get: sandbox.stub().returns(null),
+        };
+
+        fakeFlash = {
+          error: sandbox.stub(),
+        };
+
+        fakeAccountID.isThirdPartyUser.reset();
+        fakeAccountID.isThirdPartyUser.returns(false);
+
+        fakePermissions = {
+          isShared: sandbox.stub().returns(true),
+          permits: sandbox.stub().returns(true),
+          shared: sandbox.stub().returns({
+            read: ['everybody'],
+          }),
+          private: sandbox.stub().returns({
+            read: ['justme'],
+          }),
+          default: sandbox.stub().returns({
+            read: ['default'],
+          }),
+          setDefault: sandbox.stub(),
+        };
+
+        fakeSession = {
+          state: {
+            userid: 'acct:bill@localhost',
+          },
+        };
+
+        fakeServiceUrl = sinon.stub();
+
+        fakeGroups = {
+          focused: sinon.stub().returns(groupFixtures.open),
+          get: sinon.stub().returns(groupFixtures.open),
+        };
+
+        fakeSettings = {
+          // "localhost" is the host used by 'first party' annotation fixtures
+          authDomain: 'localhost',
+        };
+
+        fakeApi = {
+          annotation: {
+            create: sinon.spy(function(annot) {
+              return Promise.resolve(Object.assign({}, annot));
+            }),
+            update: sinon.spy(function(annot) {
+              return Promise.resolve(Object.assign({}, annot));
+            }),
+          },
+        };
+
+        fakeStreamer = {
+          hasPendingDeletion: sinon.stub(),
+        };
+
+        $provide.value('analytics', fakeAnalytics);
+        $provide.value('annotationMapper', fakeAnnotationMapper);
+        $provide.value('store', fakeStore);
+        $provide.value('api', fakeApi);
+        $provide.value('drafts', fakeDrafts);
+        $provide.value('flash', fakeFlash);
+        $provide.value('groups', fakeGroups);
+        $provide.value('permissions', fakePermissions);
+        $provide.value('session', fakeSession);
+        $provide.value('serviceUrl', fakeServiceUrl);
+        $provide.value('settings', fakeSettings);
+        $provide.value('streamer', fakeStreamer);
+      })
     );
+
+    beforeEach(inject(function(_$q_, _$rootScope_, _$timeout_, _$window_) {
+      $window = _$window_;
+      $q = _$q_;
+      $timeout = _$timeout_;
+      $rootScope = _$rootScope_;
+      $scope = $rootScope.$new();
+    }));
 
     afterEach(function() {
       sandbox.restore();
     });
 
     describe('initialization', function() {
-      it('sets the user of annotations that don\'t have one', function() {
+      it("sets the user of annotations that don't have one", function() {
         // You can create annotations while logged out and then login.
         // When you login a new AnnotationController instance is created for
         // each of your annotations, and on initialization it will set the
@@ -302,7 +307,7 @@ describe('annotation', function() {
         annotation.user = annotation.permissions = undefined;
         annotation.group = '__world__';
         fakeSession.state.userid = 'acct:bill@localhost';
-        fakePermissions.default = function (userid, group) {
+        fakePermissions.default = function(userid, group) {
           return {
             read: [userid, group],
           };
@@ -310,11 +315,13 @@ describe('annotation', function() {
 
         createDirective(annotation);
 
-        assert.deepEqual(annotation.permissions, fakePermissions.default(
-          fakeSession.state.userid, annotation.group));
+        assert.deepEqual(
+          annotation.permissions,
+          fakePermissions.default(fakeSession.state.userid, annotation.group)
+        );
       });
 
-      it('sets the tags and text fields for new annotations', function () {
+      it('sets the tags and text fields for new annotations', function() {
         const annotation = fixtures.newAnnotation();
         delete annotation.tags;
         delete annotation.text;
@@ -329,16 +336,17 @@ describe('annotation', function() {
           permissions: {
             read: ['foo'],
             update: ['bar'],
-            'delete': ['gar'],
+            delete: ['gar'],
             admin: ['har'],
           },
         };
-        const originalPermissions = JSON.parse(JSON.stringify(
-          annotation.permissions));
-        fakePermissions.default = function () {
+        const originalPermissions = JSON.parse(
+          JSON.stringify(annotation.permissions)
+        );
+        fakePermissions.default = function() {
           return 'new permissions';
         };
-        fakePermissions.isShared = function () {};
+        fakePermissions.isShared = function() {};
         createDirective(annotation);
         assert.deepEqual(annotation.permissions, originalPermissions);
       });
@@ -408,7 +416,7 @@ describe('annotation', function() {
       it('edits annotations with drafts on initialization', function() {
         const annotation = fixtures.oldAnnotation();
         // The drafts service has some draft changes for this annotation.
-        fakeDrafts.get.returns({text: 'foo', tags: []});
+        fakeDrafts.get.returns({ text: 'foo', tags: [] });
 
         const controller = createDirective(annotation).controller;
 
@@ -417,20 +425,20 @@ describe('annotation', function() {
     });
 
     describe('#editing()', function() {
-      it('returns false if the annotation does not have a draft', function () {
+      it('returns false if the annotation does not have a draft', function() {
         const controller = createDirective().controller;
         assert.notOk(controller.editing());
       });
 
-      it('returns true if the annotation has a draft', function () {
+      it('returns true if the annotation has a draft', function() {
         const controller = createDirective().controller;
-        fakeDrafts.get.returns({tags: [], text: '', isPrivate: false});
+        fakeDrafts.get.returns({ tags: [], text: '', isPrivate: false });
         assert.isTrue(controller.editing());
       });
 
-      it('returns false if the annotation has a draft but is being saved', function () {
+      it('returns false if the annotation has a draft but is being saved', function() {
         const controller = createDirective().controller;
-        fakeDrafts.get.returns({tags: [], text: '', isPrivate: false});
+        fakeDrafts.get.returns({ tags: [], text: '', isPrivate: false });
         controller.isSaving = true;
         assert.isFalse(controller.editing());
       });
@@ -547,9 +555,11 @@ describe('annotation', function() {
         const controller = createDirective(annotation).controller;
         const reply = sinon.match({
           references: [annotation.id],
-          target: [{
-            source: annotation.target[0].source,
-          }],
+          target: [
+            {
+              source: annotation.target[0].source,
+            },
+          ],
           uri: annotation.uri,
         });
         controller.reply();
@@ -558,7 +568,7 @@ describe('annotation', function() {
 
       it('makes the reply shared if the parent is shared', function() {
         const controller = createDirective(annotation).controller;
-        const perms = {read: ['agroup']};
+        const perms = { read: ['agroup'] };
         const reply = sinon.match({
           references: [annotation.id],
           permissions: perms,
@@ -573,19 +583,18 @@ describe('annotation', function() {
       it('makes the reply private if the parent is private', function() {
         const controller = createDirective(annotation).controller;
         fakePermissions.isShared.returns(false);
-        const perms = {read: ['onlyme']};
+        const perms = { read: ['onlyme'] };
         fakePermissions.private.returns(perms);
-        const reply = sinon.match({permissions: perms});
+        const reply = sinon.match({ permissions: perms });
         controller.reply();
         assert.calledWith(fakeAnnotationMapper.createAnnotation, reply);
-      }
-      );
+      });
 
-      it('sets the reply\'s group to be the same as its parent\'s', function() {
+      it("sets the reply's group to be the same as its parent's", function() {
         const annotation = fixtures.defaultAnnotation();
         annotation.group = 'my group';
         const controller = createDirective(annotation).controller;
-        const reply = sinon.match({group: annotation.group});
+        const reply = sinon.match({ group: annotation.group });
         controller.reply();
         assert.calledWith(fakeAnnotationMapper.createAnnotation, reply);
       });
@@ -595,17 +604,25 @@ describe('annotation', function() {
       it('makes the annotation private when level is "private"', function() {
         const parts = createDirective();
         parts.controller.setPrivacy('private');
-        assert.calledWith(fakeDrafts.update, parts.controller.annotation, sinon.match({
-          isPrivate: true,
-        }));
+        assert.calledWith(
+          fakeDrafts.update,
+          parts.controller.annotation,
+          sinon.match({
+            isPrivate: true,
+          })
+        );
       });
 
       it('makes the annotation shared when level is "shared"', function() {
         const parts = createDirective();
         parts.controller.setPrivacy('shared');
-        assert.calledWith(fakeDrafts.update, parts.controller.annotation, sinon.match({
-          isPrivate: false,
-        }));
+        assert.calledWith(
+          fakeDrafts.update,
+          parts.controller.annotation,
+          sinon.match({
+            isPrivate: false,
+          })
+        );
       });
 
       it('sets the default visibility level if "shared"', function() {
@@ -622,7 +639,7 @@ describe('annotation', function() {
         assert.calledWith(fakePermissions.setDefault, 'private');
       });
 
-      it('doesn\'t save the visibility if the annotation is a reply', function() {
+      it("doesn't save the visibility if the annotation is a reply", function() {
         const parts = createDirective(fixtures.oldReply());
         parts.controller.setPrivacy('private');
         assert.notCalled(fakePermissions.setDefault);
@@ -650,11 +667,13 @@ describe('annotation', function() {
         assert.isNull(controller.quote());
       });
 
-      it('returns `null` if the annotation has selectors but no quote selector', function () {
+      it('returns `null` if the annotation has selectors but no quote selector', function() {
         const annotation = fixtures.defaultAnnotation();
-        annotation.target = [{
-          selector: [],
-        }];
+        annotation.target = [
+          {
+            selector: [],
+          },
+        ];
         const controller = createDirective(annotation).controller;
 
         assert.isNull(controller.quote());
@@ -683,33 +702,29 @@ describe('annotation', function() {
         fakeAnnotationMapper.deleteAnnotation = sandbox.stub();
       });
 
-      it(
-        'calls annotationMapper.delete() if the delete is confirmed',
-        function(done) {
-          const parts = createDirective();
-          sandbox.stub($window, 'confirm').returns(true);
-          fakeAnnotationMapper.deleteAnnotation.returns($q.resolve());
-          parts.controller.delete().then(function() {
-            assert.calledWith(fakeAnnotationMapper.deleteAnnotation,
-              parts.annotation);
-            done();
-          });
-          $timeout.flush();
-        }
-      );
+      it('calls annotationMapper.delete() if the delete is confirmed', function(done) {
+        const parts = createDirective();
+        sandbox.stub($window, 'confirm').returns(true);
+        fakeAnnotationMapper.deleteAnnotation.returns($q.resolve());
+        parts.controller.delete().then(function() {
+          assert.calledWith(
+            fakeAnnotationMapper.deleteAnnotation,
+            parts.annotation
+          );
+          done();
+        });
+        $timeout.flush();
+      });
 
-      it(
-        'doesn\'t call annotationMapper.delete() if the delete is cancelled',
-        function(done) {
-          const parts = createDirective();
-          sandbox.stub($window, 'confirm').returns(false);
-          parts.controller.delete().then(function() {
-            assert.notCalled(fakeAnnotationMapper.deleteAnnotation);
-            done();
-          });
-          $timeout.flush();
-        }
-      );
+      it("doesn't call annotationMapper.delete() if the delete is cancelled", function(done) {
+        const parts = createDirective();
+        sandbox.stub($window, 'confirm').returns(false);
+        parts.controller.delete().then(function() {
+          assert.notCalled(fakeAnnotationMapper.deleteAnnotation);
+          done();
+        });
+        $timeout.flush();
+      });
 
       it('flashes an error if the delete fails on the server', function(done) {
         const controller = createDirective().controller;
@@ -722,14 +737,17 @@ describe('annotation', function() {
           return $q.reject(new Error('500 Server Error'));
         });
         controller.delete().then(function() {
-          assert.calledWith(fakeFlash.error,
-            '500 Server Error', 'Deleting annotation failed');
+          assert.calledWith(
+            fakeFlash.error,
+            '500 Server Error',
+            'Deleting annotation failed'
+          );
           done();
         });
         $timeout.flush();
       });
 
-      it('doesn\'t flash an error if the delete succeeds', function(done) {
+      it("doesn't flash an error if the delete succeeds", function(done) {
         const controller = createDirective().controller;
         sandbox.stub($window, 'confirm').returns(true);
         fakeAnnotationMapper.deleteAnnotation.returns($q.resolve());
@@ -758,7 +776,7 @@ describe('annotation', function() {
           assert.equal('Login to flag annotations', fakeFlash.error.args[0][1]);
         });
 
-        it('doesn\'t try to flag the annotation', function() {
+        it("doesn't try to flag the annotation", function() {
           createDirective().controller.flag();
 
           assert.isFalse(fakeAnnotationMapper.flagAnnotation.called);
@@ -766,34 +784,37 @@ describe('annotation', function() {
       });
 
       context('when the user is logged in', function() {
-        it(
-          'calls annotationMapper.flag() when an annotation is flagged',
-          function(done) {
-            const parts = createDirective();
-            fakeAnnotationMapper.flagAnnotation.returns($q.resolve());
-            parts.controller.flag();
-            assert.calledWith(fakeAnnotationMapper.flagAnnotation,
-              parts.annotation);
-            done();
-          }
-        );
+        it('calls annotationMapper.flag() when an annotation is flagged', function(done) {
+          const parts = createDirective();
+          fakeAnnotationMapper.flagAnnotation.returns($q.resolve());
+          parts.controller.flag();
+          assert.calledWith(
+            fakeAnnotationMapper.flagAnnotation,
+            parts.annotation
+          );
+          done();
+        });
 
         it('flashes an error if the flag fails', function(done) {
           const controller = createDirective().controller;
           const err = new Error('500 Server error');
           fakeAnnotationMapper.flagAnnotation.returns(Promise.reject(err));
           controller.flag();
-          setTimeout(function () {
-            assert.calledWith(fakeFlash.error, '500 Server error', 'Flagging annotation failed');
+          setTimeout(function() {
+            assert.calledWith(
+              fakeFlash.error,
+              '500 Server error',
+              'Flagging annotation failed'
+            );
             done();
           }, 0);
         });
 
-        it('doesn\'t flash an error if the flag succeeds', function(done) {
+        it("doesn't flash an error if the flag succeeds", function(done) {
           const controller = createDirective().controller;
           fakeAnnotationMapper.flagAnnotation.returns($q.resolve());
           controller.flag();
-          setTimeout(function () {
+          setTimeout(function() {
             assert.notCalled(fakeFlash.error);
             done();
           }, 0);
@@ -809,45 +830,48 @@ describe('annotation', function() {
 
         assert.calledOnce(fakeAccountID.isThirdPartyUser);
         assert.alwaysCalledWithExactly(
-          fakeAccountID.isThirdPartyUser, annotation.user, fakeSettings.authDomain);
+          fakeAccountID.isThirdPartyUser,
+          annotation.user,
+          fakeSettings.authDomain
+        );
         assert.equal(returned, fakeAccountID.isThirdPartyUser());
       });
     });
 
-    describe('#isDeleted', function () {
-      it('returns true if the annotation has been marked as deleted', function () {
+    describe('#isDeleted', function() {
+      it('returns true if the annotation has been marked as deleted', function() {
         const controller = createDirective().controller;
         fakeStreamer.hasPendingDeletion.returns(true);
         assert.equal(controller.isDeleted(), true);
       });
 
-      it('returns false if the annotation has not been marked as deleted', function () {
+      it('returns false if the annotation has not been marked as deleted', function() {
         const controller = createDirective().controller;
         fakeStreamer.hasPendingDeletion.returns(false);
         assert.equal(controller.isDeleted(), false);
       });
     });
 
-    describe('#isOrphan', function () {
-      it('returns false if the annotation is not an orphan', function () {
+    describe('#isOrphan', function() {
+      it('returns false if the annotation is not an orphan', function() {
         const controller = createDirective().controller;
         controller.annotation.$orphan = false;
         assert.isFalse(controller.isOrphan());
       });
 
-      it('returns true if the annotation is an orphan', function () {
+      it('returns true if the annotation is an orphan', function() {
         const controller = createDirective().controller;
         controller.annotation.$orphan = true;
         assert.isTrue(controller.isOrphan());
       });
 
-      it('returns true if the anchoring timeout expired', function () {
+      it('returns true if the anchoring timeout expired', function() {
         const controller = createDirective().controller;
         controller.annotation.$anchorTimeout = true;
         assert.isTrue(controller.isOrphan());
       });
 
-      it('returns false if the anchoring timeout expired but anchoring did complete', function () {
+      it('returns false if the anchoring timeout expired but anchoring did complete', function() {
         const controller = createDirective().controller;
         controller.annotation.$orphan = false;
         controller.annotation.$anchorTimeout = true;
@@ -855,60 +879,70 @@ describe('annotation', function() {
       });
     });
 
-    describe('#canFlag', function () {
-      it('returns false if the user signed in is the same as the author of the annotation', function () {
+    describe('#canFlag', function() {
+      it('returns false if the user signed in is the same as the author of the annotation', function() {
         const ann = fixtures.defaultAnnotation();
         const controller = createDirective(ann).controller;
         assert.isFalse(controller.canFlag());
       });
 
-      it('returns true if the user signed in is different from the author of the annotation', function () {
+      it('returns true if the user signed in is different from the author of the annotation', function() {
         const ann = fixtures.thirdPartyAnnotation();
         const controller = createDirective(ann).controller;
         assert.isTrue(controller.canFlag());
       });
     });
 
-    describe('#shouldShowLicense', function () {
-      unroll('returns #expected if #case_', function (testCase) {
-        const ann = fixtures.publicAnnotation();
-        ann.group = testCase.group.id;
-        fakeDrafts.get.returns(testCase.draft);
-        fakeGroups.get.returns(testCase.group);
+    describe('#shouldShowLicense', function() {
+      unroll(
+        'returns #expected if #case_',
+        function(testCase) {
+          const ann = fixtures.publicAnnotation();
+          ann.group = testCase.group.id;
+          fakeDrafts.get.returns(testCase.draft);
+          fakeGroups.get.returns(testCase.group);
 
-        const controller = createDirective(ann).controller;
+          const controller = createDirective(ann).controller;
 
-        assert.equal(controller.shouldShowLicense(), testCase.expected);
-      }, [{
-        case_: 'the annotation is not being edited',
-        draft: null,
-        group: groupFixtures.open,
-        expected: false,
-      },{
-        case_: 'the draft is private',
-        draft: draftFixtures.private,
-        group: groupFixtures.open,
-        expected: false,
-      },{
-        case_: 'the group is private',
-        draft: draftFixtures.shared,
-        group: groupFixtures.private,
-        expected: false,
-      },{
-        case_: 'the draft is shared and the group is open',
-        draft: draftFixtures.shared,
-        group: groupFixtures.open,
-        expected: true,
-      },{
-        case_: 'the draft is shared and the group is restricted',
-        draft: draftFixtures.shared,
-        group: groupFixtures.restricted,
-        expected: true,
-      }]);
+          assert.equal(controller.shouldShowLicense(), testCase.expected);
+        },
+        [
+          {
+            case_: 'the annotation is not being edited',
+            draft: null,
+            group: groupFixtures.open,
+            expected: false,
+          },
+          {
+            case_: 'the draft is private',
+            draft: draftFixtures.private,
+            group: groupFixtures.open,
+            expected: false,
+          },
+          {
+            case_: 'the group is private',
+            draft: draftFixtures.shared,
+            group: groupFixtures.private,
+            expected: false,
+          },
+          {
+            case_: 'the draft is shared and the group is open',
+            draft: draftFixtures.shared,
+            group: groupFixtures.open,
+            expected: true,
+          },
+          {
+            case_: 'the draft is shared and the group is restricted',
+            draft: draftFixtures.shared,
+            group: groupFixtures.restricted,
+            expected: true,
+          },
+        ]
+      );
     });
 
-    describe('#authorize', function () {
-      it('passes the current permissions and logged-in user ID to the permissions service', function () {
+    describe('#authorize', function() {
+      it('passes the current permissions and logged-in user ID to the permissions service', function() {
         const ann = fixtures.defaultAnnotation();
         ann.permissions = {
           read: [fakeSession.state.userid],
@@ -917,10 +951,14 @@ describe('annotation', function() {
         };
         const controller = createDirective(ann).controller;
 
-        ['update', 'delete'].forEach(function (action) {
+        ['update', 'delete'].forEach(function(action) {
           controller.authorize(action);
-          assert.calledWith(fakePermissions.permits, ann.permissions, action,
-            fakeSession.state.userid);
+          assert.calledWith(
+            fakePermissions.permits,
+            ann.permissions,
+            action,
+            fakeSession.state.userid
+          );
         });
       });
     });
@@ -936,14 +974,14 @@ describe('annotation', function() {
         return createDirective(annotation).controller;
       }
 
-      it('removes the draft when saving an annotation succeeds', function () {
+      it('removes the draft when saving an annotation succeeds', function() {
         const controller = createController();
-        return controller.save().then(function () {
+        return controller.save().then(function() {
           assert.calledWith(fakeDrafts.remove, annotation);
         });
       });
 
-      it('emits annotationCreated when saving an annotation succeeds', function () {
+      it('emits annotationCreated when saving an annotation succeeds', function() {
         const controller = createController();
         sandbox.spy($rootScope, '$broadcast');
         return controller.save().then(function() {
@@ -956,14 +994,17 @@ describe('annotation', function() {
         const err = new Error('500 Server Error');
         fakeApi.annotation.create = sinon.stub().returns(Promise.reject(err));
         return controller.save().then(function() {
-          assert.calledWith(fakeFlash.error,
-            '500 Server Error', 'Saving annotation failed');
+          assert.calledWith(
+            fakeFlash.error,
+            '500 Server Error',
+            'Saving annotation failed'
+          );
         });
       });
 
-      it('doesn\'t flash an error when saving an annotation succeeds', function() {
+      it("doesn't flash an error when saving an annotation succeeds", function() {
         const controller = createController();
-        return controller.save().then(function () {
+        return controller.save().then(function() {
           assert.notCalled(fakeFlash.error);
         });
       });
@@ -971,27 +1012,31 @@ describe('annotation', function() {
       it('shows a saving indicator when saving an annotation', function() {
         const controller = createController();
         let create;
-        fakeApi.annotation.create = sinon.stub().returns(new Promise(function (resolve) {
-          create = resolve;
-        }));
+        fakeApi.annotation.create = sinon.stub().returns(
+          new Promise(function(resolve) {
+            create = resolve;
+          })
+        );
         const saved = controller.save();
         assert.equal(controller.isSaving, true);
-        create(Object.assign({}, controller.annotation, {id: 'new-id'}));
-        return saved.then(function () {
+        create(Object.assign({}, controller.annotation, { id: 'new-id' }));
+        return saved.then(function() {
           assert.equal(controller.isSaving, false);
         });
       });
 
-      it('does not remove the draft if saving fails', function () {
+      it('does not remove the draft if saving fails', function() {
         const controller = createController();
-        fakeApi.annotation.create = sinon.stub().returns(Promise.reject({status: -1}));
-        return controller.save().then(function () {
+        fakeApi.annotation.create = sinon
+          .stub()
+          .returns(Promise.reject({ status: -1 }));
+        return controller.save().then(function() {
           assert.notCalled(fakeDrafts.remove);
         });
       });
 
-      it('sets the annotation\'s group to the focused group', function() {
-        fakeGroups.focused = function () {
+      it("sets the annotation's group to the focused group", function() {
+        fakeGroups.focused = function() {
           return { id: 'test-id' };
         };
         const controller = createDirective(fixtures.newAnnotation()).controller;
@@ -1004,26 +1049,29 @@ describe('annotation', function() {
 
       beforeEach(function() {
         annotation = fixtures.defaultAnnotation();
-        fakeDrafts.get.returns({text: 'unsaved change'});
+        fakeDrafts.get.returns({ text: 'unsaved change' });
       });
 
       function createController() {
         return createDirective(annotation).controller;
       }
 
-      it('flashes an error if saving the annotation fails on the server', function () {
+      it('flashes an error if saving the annotation fails on the server', function() {
         const controller = createController();
         const err = new Error('500 Server Error');
         fakeApi.annotation.update = sinon.stub().returns(Promise.reject(err));
         return controller.save().then(function() {
-          assert.calledWith(fakeFlash.error,
-            '500 Server Error', 'Saving annotation failed');
+          assert.calledWith(
+            fakeFlash.error,
+            '500 Server Error',
+            'Saving annotation failed'
+          );
         });
       });
 
-      it('doesn\'t flash an error if saving the annotation succeeds', function () {
+      it("doesn't flash an error if saving the annotation succeeds", function() {
         const controller = createController();
-        return controller.save().then(function () {
+        return controller.save().then(function() {
           assert.notCalled(fakeFlash.error);
         });
       });
@@ -1059,22 +1107,23 @@ describe('annotation', function() {
       it('removes the draft when changes are saved', function() {
         const annotation = fixtures.defaultAnnotation();
         const controller = createDirective(annotation).controller;
-        fakeDrafts.get.returns({text: 'unsaved changes'});
+        fakeDrafts.get.returns({ text: 'unsaved changes' });
         return controller.save().then(function() {
           assert.calledWith(fakeDrafts.remove, annotation);
         });
       });
     });
 
-    describe('reverting edits', function () {
+    describe('reverting edits', function() {
       it('removes the current draft', function() {
-        const controller = createDirective(fixtures.defaultAnnotation()).controller;
+        const controller = createDirective(fixtures.defaultAnnotation())
+          .controller;
         controller.edit();
         controller.revert();
         assert.calledWith(fakeDrafts.remove, controller.annotation);
       });
 
-      it('deletes the annotation if it was new', function () {
+      it('deletes the annotation if it was new', function() {
         const controller = createDirective(fixtures.newAnnotation()).controller;
         sandbox.spy($rootScope, '$broadcast');
         controller.revert();
@@ -1082,10 +1131,10 @@ describe('annotation', function() {
       });
     });
 
-    describe('tag display', function () {
+    describe('tag display', function() {
       beforeEach('make serviceUrl() return a URL for the tag', function() {
         fakeServiceUrl
-          .withArgs('search.tag', {tag: 'atag'})
+          .withArgs('search.tag', { tag: 'atag' })
           .returns('https://hypothes.is/search?q=tag:atag');
       });
 
@@ -1093,17 +1142,21 @@ describe('annotation', function() {
        * Return an annotation directive with a single tag.
        */
       function annotationWithOneTag() {
-        return createDirective(Object.assign(fixtures.defaultAnnotation(), {
-          tags: ['atag'],
-        }));
+        return createDirective(
+          Object.assign(fixtures.defaultAnnotation(), {
+            tags: ['atag'],
+          })
+        );
       }
 
       /**
        * Return the one tag link element from the given annotation directive.
        */
       function tagLinkFrom(directive) {
-        const links = [].slice.apply(directive.element[0].querySelectorAll('a'));
-        const tagLinks = links.filter(function (link) {
+        const links = [].slice.apply(
+          directive.element[0].querySelectorAll('a')
+        );
+        const tagLinks = links.filter(function(link) {
           return link.textContent === 'atag';
         });
         assert.equal(tagLinks.length, 1);
@@ -1115,7 +1168,7 @@ describe('annotation', function() {
           fakeAccountID.isThirdPartyUser.returns(false);
         });
 
-        it('displays links to tag search pages', function () {
+        it('displays links to tag search pages', function() {
           const tagLink = tagLinkFrom(annotationWithOneTag());
 
           assert.equal(tagLink.href, 'https://hypothes.is/search?q=tag:atag');
@@ -1127,7 +1180,7 @@ describe('annotation', function() {
           fakeAccountID.isThirdPartyUser.returns(true);
         });
 
-        it("doesn't link tags for third-party annotations", function () {
+        it("doesn't link tags for third-party annotations", function() {
           // Tag search pages aren't supported for third-party annotations in
           // h, so we don't link to them in the client.
           const tagLink = tagLinkFrom(annotationWithOneTag());
@@ -1137,8 +1190,8 @@ describe('annotation', function() {
       });
     });
 
-    describe('annotation links', function () {
-      it('uses the in-context links when available', function () {
+    describe('annotation links', function() {
+      it('uses the in-context links when available', function() {
         const annotation = Object.assign({}, fixtures.defaultAnnotation(), {
           links: {
             incontext: 'https://hpt.is/deadbeef',
@@ -1148,7 +1201,7 @@ describe('annotation', function() {
         assert.equal(controller.incontextLink(), annotation.links.incontext);
       });
 
-      it('falls back to the HTML link when in-context links are missing', function () {
+      it('falls back to the HTML link when in-context links are missing', function() {
         const annotation = Object.assign({}, fixtures.defaultAnnotation(), {
           links: {
             html: 'https://test.hypothes.is/a/deadbeef',
@@ -1158,7 +1211,7 @@ describe('annotation', function() {
         assert.equal(controller.incontextLink(), annotation.links.html);
       });
 
-      it('in-context link is blank when unknown', function () {
+      it('in-context link is blank when unknown', function() {
         const annotation = fixtures.defaultAnnotation();
         const controller = createDirective(annotation).controller;
         assert.equal(controller.incontextLink(), '');
@@ -1171,67 +1224,93 @@ describe('annotation', function() {
               incontext: 'https://hpt.is/deadbeef',
             },
           });
-          fakeSettings.services = [{
-            enableShareLinks,
-          }];
+          fakeSettings.services = [
+            {
+              enableShareLinks,
+            },
+          ];
           const controller = createDirective(annotation).controller;
-          const hasIncontextLink = controller.incontextLink() === annotation.links.incontext;
+          const hasIncontextLink =
+            controller.incontextLink() === annotation.links.incontext;
           assert.equal(hasIncontextLink, enableShareLinks);
         });
       });
     });
 
-    it('renders quotes as plain text', function () {
+    it('renders quotes as plain text', function() {
       const ann = fixtures.defaultAnnotation();
-      ann.target[0].selector = [{
-        type: 'TextQuoteSelector',
-        exact: '<<-&->>',
-      }];
+      ann.target[0].selector = [
+        {
+          type: 'TextQuoteSelector',
+          exact: '<<-&->>',
+        },
+      ];
       const el = createDirective(ann).element;
       assert.equal(el[0].querySelector('blockquote').textContent, '<<-&->>');
     });
 
-    unroll('renders hidden annotations with a custom text class (#context)', function (testCase) {
-      const el = createDirective(testCase.ann).element;
-      assert.match(el.find('markdown').controller('markdown'), sinon.match({
-        customTextClass: testCase.textClass,
-      }));
-    }, [{
-      context: 'for moderators',
-      ann: Object.assign(fixtures.moderatedAnnotation({ hidden: true }), {
-        // Content still present.
-        text: 'Some offensive content',
-      }),
-      textClass: {
-        'annotation-body is-hidden': true,
-        'has-content': true,
+    unroll(
+      'renders hidden annotations with a custom text class (#context)',
+      function(testCase) {
+        const el = createDirective(testCase.ann).element;
+        assert.match(
+          el.find('markdown').controller('markdown'),
+          sinon.match({
+            customTextClass: testCase.textClass,
+          })
+        );
       },
-    },{
-      context: 'for non-moderators',
-      ann: Object.assign(fixtures.moderatedAnnotation({ hidden: true }), {
-        // Content filtered out by service.
-        tags: [],
-        text: '',
-      }),
-      textClass: {
-        'annotation-body is-hidden': true,
-        'has-content': false,
-      },
-    }]);
+      [
+        {
+          context: 'for moderators',
+          ann: Object.assign(fixtures.moderatedAnnotation({ hidden: true }), {
+            // Content still present.
+            text: 'Some offensive content',
+          }),
+          textClass: {
+            'annotation-body is-hidden': true,
+            'has-content': true,
+          },
+        },
+        {
+          context: 'for non-moderators',
+          ann: Object.assign(fixtures.moderatedAnnotation({ hidden: true }), {
+            // Content filtered out by service.
+            tags: [],
+            text: '',
+          }),
+          textClass: {
+            'annotation-body is-hidden': true,
+            'has-content': false,
+          },
+        },
+      ]
+    );
 
-    it('flags the annotation when the user clicks the "Flag" button', function () {
+    it('flags the annotation when the user clicks the "Flag" button', function() {
       fakeAnnotationMapper.flagAnnotation.returns(Promise.resolve());
-      const ann = Object.assign(fixtures.defaultAnnotation(), { user: 'acct:notCurrentUser@localhost' });
+      const ann = Object.assign(fixtures.defaultAnnotation(), {
+        user: 'acct:notCurrentUser@localhost',
+      });
       const el = createDirective(ann).element;
-      const flagBtn = findActionButton(el, 'Report this annotation to the moderators');
+      const flagBtn = findActionButton(
+        el,
+        'Report this annotation to the moderators'
+      );
       flagBtn.onClick();
       assert.called(fakeAnnotationMapper.flagAnnotation);
     });
 
-    it('highlights the "Flag" button if the annotation is flagged', function () {
-      const ann = Object.assign(fixtures.defaultAnnotation(), { flagged: true, user: 'acct:notCurrentUser@localhost' });
+    it('highlights the "Flag" button if the annotation is flagged', function() {
+      const ann = Object.assign(fixtures.defaultAnnotation(), {
+        flagged: true,
+        user: 'acct:notCurrentUser@localhost',
+      });
       const el = createDirective(ann).element;
-      const flaggedBtn = findActionButton(el, 'Annotation has been reported to the moderators');
+      const flaggedBtn = findActionButton(
+        el,
+        'Annotation has been reported to the moderators'
+      );
       assert.ok(flaggedBtn);
     });
   });

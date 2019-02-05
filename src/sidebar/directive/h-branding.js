@@ -21,7 +21,6 @@
 
 // @ngInject
 function BrandingDirective(settings) {
-
   const _hasBranding = !!settings.branding;
 
   // This is the list of supported property declarations
@@ -40,25 +39,27 @@ function BrandingDirective(settings) {
 
   // filter all attribute values down to the supported
   // branding properties
-  const _getValidBrandingAttribute = function(attrString){
-    return attrString.split(',').map(function(attr){
-      return attr.trim();
-    }).filter(function filterAgainstWhitelist(attr){
-      return attr in _supportedPropSettings;
-    });
+  const _getValidBrandingAttribute = function(attrString) {
+    return attrString
+      .split(',')
+      .map(function(attr) {
+        return attr.trim();
+      })
+      .filter(function filterAgainstWhitelist(attr) {
+        return attr in _supportedPropSettings;
+      });
   };
-
 
   return {
     restrict: 'A',
     link: function(scope, $elem, attrs) {
-      if(_hasBranding){
-        _getValidBrandingAttribute(attrs.hBranding).forEach(function(attr){
+      if (_hasBranding) {
+        _getValidBrandingAttribute(attrs.hBranding).forEach(function(attr) {
           const propVal = settings.branding[attr];
-          if(propVal){
+          if (propVal) {
             // the _supportedPropSettings holds the .style property name
             // that is being set
-            $elem[0].style[ _supportedPropSettings[attr] ] = propVal;
+            $elem[0].style[_supportedPropSettings[attr]] = propVal;
           }
         });
       }

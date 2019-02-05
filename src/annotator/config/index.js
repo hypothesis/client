@@ -13,16 +13,22 @@ function configFrom(window_) {
     annotations: settings.annotations,
     // URL where client assets are served from. Used when injecting the client
     // into child iframes.
-    assetRoot: settings.hostPageSetting('assetRoot', {allowInBrowserExt: true}),
+    assetRoot: settings.hostPageSetting('assetRoot', {
+      allowInBrowserExt: true,
+    }),
     branding: settings.hostPageSetting('branding'),
     // URL of the client's boot script. Used when injecting the client into
     // child iframes.
     clientUrl: settings.clientUrl,
-    enableExperimentalNewNoteButton: settings.hostPageSetting('enableExperimentalNewNoteButton'),
+    enableExperimentalNewNoteButton: settings.hostPageSetting(
+      'enableExperimentalNewNoteButton'
+    ),
     theme: settings.hostPageSetting('theme'),
     usernameUrl: settings.hostPageSetting('usernameUrl'),
     onLayoutChange: settings.hostPageSetting('onLayoutChange'),
-    openSidebar: settings.hostPageSetting('openSidebar', {allowInBrowserExt: true}),
+    openSidebar: settings.hostPageSetting('openSidebar', {
+      allowInBrowserExt: true,
+    }),
     query: settings.query,
     requestConfigFromFrame: settings.hostPageSetting('requestConfigFromFrame'),
     services: settings.hostPageSetting('services'),
@@ -30,8 +36,12 @@ function configFrom(window_) {
     sidebarAppUrl: settings.sidebarAppUrl,
     // Subframe identifier given when a frame is being embedded into
     // by a top level client
-    subFrameIdentifier: settings.hostPageSetting('subFrameIdentifier', {allowInBrowserExt: true}),
-    externalContainerSelector: settings.hostPageSetting('externalContainerSelector'),
+    subFrameIdentifier: settings.hostPageSetting('subFrameIdentifier', {
+      allowInBrowserExt: true,
+    }),
+    externalContainerSelector: settings.hostPageSetting(
+      'externalContainerSelector'
+    ),
   };
 }
 

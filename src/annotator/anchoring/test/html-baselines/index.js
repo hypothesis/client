@@ -23,12 +23,15 @@
 //     them as `<fixture name>.json` in this directory
 //  4. Add an entry to the fixture list below.
 
-module.exports = [{
-  name: 'Minimal Document',
-  html: require('./minimal.html'),
-  annotations: require('./minimal.json'),
-},{
-  name: 'Wikipedia - Regression Testing',
-  html: require('./wikipedia-regression-testing.html'),
-  annotations: require('./wikipedia-regression-testing.json'),
-}];
+module.exports = [
+  {
+    name: 'Minimal Document',
+    html: require('./minimal.html'),
+    annotations: require('./minimal.json'),
+  },
+  {
+    name: 'Wikipedia - Regression Testing',
+    html: require('./wikipedia-regression-testing.html'),
+    annotations: require('./wikipedia-regression-testing.json'),
+  },
+];

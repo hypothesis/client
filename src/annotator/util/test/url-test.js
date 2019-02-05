@@ -25,10 +25,7 @@ describe('annotator.util.url', () => {
       assert.equal(normalizeURI(url), 'http://example.com/wibble');
     });
 
-    [
-      'file:///Users/jane/article.pdf',
-      'doi:10.1234/4567',
-    ].forEach(url => {
+    ['file:///Users/jane/article.pdf', 'doi:10.1234/4567'].forEach(url => {
       it('does not modify absolute non-HTTP/HTTPS URLs', () => {
         assert.equal(normalizeURI(url), url);
       });

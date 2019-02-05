@@ -22,7 +22,9 @@ const update = {
   FOCUS_GROUP(state, action) {
     const group = state.groups.find(g => g.id === action.id);
     if (!group) {
-      console.error(`Attempted to focus group ${action.id} which is not loaded`);
+      console.error(
+        `Attempted to focus group ${action.id} which is not loaded`
+      );
       return {};
     }
     return { focusedGroupId: action.id };
@@ -33,7 +35,10 @@ const update = {
     let focusedGroupId = state.focusedGroupId;
 
     // Reset focused group if not in the new set of groups.
-    if (state.focusedGroupId === null || !groups.find(g => g.id === state.focusedGroupId)) {
+    if (
+      state.focusedGroupId === null ||
+      !groups.find(g => g.id === state.focusedGroupId)
+    ) {
       if (groups.length > 0) {
         focusedGroupId = groups[0].id;
       } else {

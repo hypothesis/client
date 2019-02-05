@@ -27,4 +27,4 @@ function awaitStateChange(store, selector) {
   });
 }
 
-module.exports = { awaitStateChange } ;
+module.exports = { awaitStateChange };

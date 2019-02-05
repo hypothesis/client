@@ -13,16 +13,16 @@
  * @param {Function} fn - Callback to invoke with setTimeout
  * @param {number} delay - Delay argument to pass to setTimeout
  */
-module.exports = function ($scope, fn, delay, setTimeoutFn, clearTimeoutFn) {
+module.exports = function($scope, fn, delay, setTimeoutFn, clearTimeoutFn) {
   setTimeoutFn = setTimeoutFn || setTimeout;
   clearTimeoutFn = clearTimeoutFn || clearTimeout;
 
   let removeDestroyHandler;
-  const id = setTimeoutFn(function () {
+  const id = setTimeoutFn(function() {
     removeDestroyHandler();
     fn();
   }, delay);
-  removeDestroyHandler = $scope.$on('$destroy', function () {
+  removeDestroyHandler = $scope.$on('$destroy', function() {
     clearTimeoutFn(id);
   });
 };

@@ -72,8 +72,8 @@ function getPageTextContent(pageIndex) {
     return textContent;
   };
 
-  pageTextCache[pageIndex] = getPage(pageIndex).pdfPage
-    .getTextContent({
+  pageTextCache[pageIndex] = getPage(pageIndex)
+    .pdfPage.getTextContent({
       normalizeWhitespace: true,
     })
     .then(joinItems);
@@ -261,13 +261,15 @@ function findInPages(pageIndexes, quoteSelector, positionHint) {
   };
 
   // First, get the text offset and other details of the current page.
-  return Promise.all([page, content, offset])
-    // Attempt to locate the quote in the current page.
-    .then(attempt)
-    // If the quote is located, find the DOM range and return it.
-    .then(cacheAndFinish)
-    // If the quote was not found, try the next page.
-    .catch(next);
+  return (
+    Promise.all([page, content, offset])
+      // Attempt to locate the quote in the current page.
+      .then(attempt)
+      // If the quote is located, find the DOM range and return it.
+      .then(cacheAndFinish)
+      // If the quote was not found, try the next page.
+      .catch(next)
+  );
 }
 
 /**

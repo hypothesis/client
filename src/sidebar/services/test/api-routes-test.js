@@ -26,13 +26,13 @@ const apiIndexResponse = {
 // with the domain name changed.
 const linksResponse = {
   'forgot-password': 'https://annotation.service/forgot-password',
-  'help': 'https://annotation.service/docs/help',
+  help: 'https://annotation.service/docs/help',
   'groups.new': 'https://annotation.service/groups/new',
   'groups.leave': 'https://annotation.service/groups/:id/leave',
   'search.tag': 'https://annotation.service/search?q=tag:":tag"',
   'account.settings': 'https://annotation.service/account/settings',
   'oauth.revoke': 'https://annotation.service/oauth/revoke',
-  'signup': 'https://annotation.service/signup',
+  signup: 'https://annotation.service/signup',
   'oauth.authorize': 'https://annotation.service/oauth/authorize',
 };
 
@@ -52,9 +52,11 @@ describe('sidebar.api-routes', () => {
       get: sinon.stub(),
     };
 
-    fakeHttp.get.withArgs('https://annotation.service/api/')
+    fakeHttp.get
+      .withArgs('https://annotation.service/api/')
       .returns(httpResponse(200, apiIndexResponse));
-    fakeHttp.get.withArgs('https://annotation.service/api/links')
+    fakeHttp.get
+      .withArgs('https://annotation.service/api/links')
       .returns(httpResponse(200, linksResponse));
 
     fakeSettings = {
@@ -73,11 +75,12 @@ describe('sidebar.api-routes', () => {
 
     it('caches the route directory', () => {
       // Call `routes()` multiple times, check that only one HTTP call is made.
-      return Promise.all([apiRoutes.routes(), apiRoutes.routes()])
-        .then(([routesA, routesB]) => {
+      return Promise.all([apiRoutes.routes(), apiRoutes.routes()]).then(
+        ([routesA, routesB]) => {
           assert.equal(routesA, routesB);
           assert.equal(fakeHttp.get.callCount, 1);
-        });
+        }
+      );
     });
 
     it('retries the route fetch until it succeeds', () => {
@@ -98,11 +101,12 @@ describe('sidebar.api-routes', () => {
     it('caches the returned links', () => {
       // Call `links()` multiple times, check that only two HTTP calls are made
       // (one for the index, one for the page links).
-      return Promise.all([apiRoutes.links(), apiRoutes.links()])
-        .then(([linksA, linksB]) => {
+      return Promise.all([apiRoutes.links(), apiRoutes.links()]).then(
+        ([linksA, linksB]) => {
           assert.equal(linksA, linksB);
           assert.deepEqual(fakeHttp.get.callCount, 2);
-        });
+        }
+      );
     });
   });
 });

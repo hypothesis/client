@@ -16,22 +16,22 @@ function ExcerptController($element, $scope, ExcerptOverflowMonitor) {
     this.enabled = true;
   }
 
-  this.isExpandable = function () {
+  this.isExpandable = function() {
     return this.overflowing && this.collapse;
   };
 
-  this.isCollapsible = function () {
+  this.isCollapsible = function() {
     return this.overflowing && !this.collapse;
   };
 
-  this.toggle = function (event) {
+  this.toggle = function(event) {
     // When the user clicks a link explicitly to toggle the collapsed state,
     // the event is not propagated.
     event.stopPropagation();
     this.collapse = !this.collapse;
   };
 
-  this.expand = function () {
+  this.expand = function() {
     // When the user expands the excerpt 'implicitly' by clicking at the bottom
     // of the collapsed excerpt, the event is allowed to propagate. For
     // annotation cards, this causes clicking on a quote to scroll the view to
@@ -39,13 +39,13 @@ function ExcerptController($element, $scope, ExcerptOverflowMonitor) {
     this.collapse = false;
   };
 
-  this.showInlineControls = function () {
+  this.showInlineControls = function() {
     return this.overflowing && this.inlineControls;
   };
 
-  this.bottomShadowStyles = function () {
+  this.bottomShadowStyles = function() {
     return {
-      'excerpt__shadow': true,
+      excerpt__shadow: true,
       'excerpt__shadow--transparent': this.inlineControls,
       'is-hidden': !this.isExpandable(),
     };
@@ -64,51 +64,58 @@ function ExcerptController($element, $scope, ExcerptOverflowMonitor) {
     return false;
   }
 
-  const overflowMonitor = new ExcerptOverflowMonitor({
-    getState: function () {
-      return {
-        enabled: self.enabled,
-        animate: self.animate,
-        collapsedHeight: self.collapsedHeight,
-        collapse: self.collapse,
-        overflowHysteresis: self.overflowHysteresis,
-      };
+  const overflowMonitor = new ExcerptOverflowMonitor(
+    {
+      getState: function() {
+        return {
+          enabled: self.enabled,
+          animate: self.animate,
+          collapsedHeight: self.collapsedHeight,
+          collapse: self.collapse,
+          overflowHysteresis: self.overflowHysteresis,
+        };
+      },
+      contentHeight: function() {
+        const contentElem = $element[0].querySelector('.excerpt');
+        if (!contentElem) {
+          return null;
+        }
+        return contentElem.scrollHeight;
+      },
+      onOverflowChanged: function(overflowing) {
+        self.overflowing = overflowing;
+        if (self.onCollapsibleChanged) {
+          self.onCollapsibleChanged({ collapsible: overflowing });
+        }
+        // Even though this change happens outside the framework, we use
+        // $digest() rather than $apply() here to avoid a large number of full
+        // digest cycles if many excerpts update their overflow state at the
+        // same time. The onCollapsibleChanged() handler, if any, is
+        // responsible for triggering any necessary digests in parent scopes.
+        $scope.$digest();
+      },
     },
-    contentHeight: function () {
-      const contentElem = $element[0].querySelector('.excerpt');
-      if (!contentElem) {
-        return null;
-      }
-      return contentElem.scrollHeight;
-    },
-    onOverflowChanged: function (overflowing) {
-      self.overflowing = overflowing;
-      if (self.onCollapsibleChanged) {
-        self.onCollapsibleChanged({collapsible: overflowing});
-      }
-      // Even though this change happens outside the framework, we use
-      // $digest() rather than $apply() here to avoid a large number of full
-      // digest cycles if many excerpts update their overflow state at the
-      // same time. The onCollapsibleChanged() handler, if any, is
-      // responsible for triggering any necessary digests in parent scopes.
-      $scope.$digest();
-    },
-  }, window.requestAnimationFrame);
+    window.requestAnimationFrame
+  );
 
   this.contentStyle = overflowMonitor.contentStyle;
 
   // Listen for document events which might affect whether the excerpt
   // is overflowing, even if its content has not changed.
-  $element[0].addEventListener('load', overflowMonitor.check, false /* capture */);
+  $element[0].addEventListener(
+    'load',
+    overflowMonitor.check,
+    false /* capture */
+  );
   window.addEventListener('resize', overflowMonitor.check);
-  $scope.$on('$destroy', function () {
+  $scope.$on('$destroy', function() {
     window.removeEventListener('resize', overflowMonitor.check);
   });
 
   // Watch for changes to the visibility of the excerpt.
   // Unfortunately there is no DOM API for this, so we rely on a digest
   // being triggered after the visibility changes.
-  $scope.$watch(isElementHidden, function (hidden) {
+  $scope.$watch(isElementHidden, function(hidden) {
     if (!hidden) {
       overflowMonitor.check();
     }

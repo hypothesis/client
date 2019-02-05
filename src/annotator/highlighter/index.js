@@ -10,16 +10,18 @@ const features = require('../features');
 const highlighterFacade = {};
 let overlayFlagEnabled;
 
-Object.keys(domWrapHighlighter).forEach((methodName)=>{
-  highlighterFacade[methodName] = (...args)=>{
+Object.keys(domWrapHighlighter).forEach(methodName => {
+  highlighterFacade[methodName] = (...args) => {
     // lazy check the value but we will
     // use that first value as the rule throughout
     // the in memory session
-    if(overlayFlagEnabled === undefined){
+    if (overlayFlagEnabled === undefined) {
       overlayFlagEnabled = features.flagEnabled('overlay_highlighter');
     }
 
-    const method = overlayFlagEnabled ? overlayHighlighter[methodName] : domWrapHighlighter[methodName];
+    const method = overlayFlagEnabled
+      ? overlayHighlighter[methodName]
+      : domWrapHighlighter[methodName];
     return method.apply(null, args);
   };
 });

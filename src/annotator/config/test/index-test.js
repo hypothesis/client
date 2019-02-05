@@ -5,12 +5,14 @@ const util = require('../../../shared/test/util');
 
 const fakeSettingsFrom = sinon.stub();
 
-const configFrom = proxyquire('../index', util.noCallThru({
-  './settings': fakeSettingsFrom,
-}));
+const configFrom = proxyquire(
+  '../index',
+  util.noCallThru({
+    './settings': fakeSettingsFrom,
+  })
+);
 
 describe('annotator.config.index', function() {
-
   beforeEach('reset fakeSettingsFrom', function() {
     fakeSettingsFrom.reset();
     fakeSettingsFrom.returns({
@@ -25,12 +27,9 @@ describe('annotator.config.index', function() {
     assert.calledWithExactly(fakeSettingsFrom, 'WINDOW');
   });
 
-  [
-    'sidebarAppUrl',
-    'query',
-    'annotations',
-    'showHighlights',
-  ].forEach(function(settingName) {
+  ['sidebarAppUrl', 'query', 'annotations', 'showHighlights'].forEach(function(
+    settingName
+  ) {
     it('returns the ' + settingName + ' setting', function() {
       fakeSettingsFrom()[settingName] = 'SETTING_VALUE';
 
@@ -42,47 +41,51 @@ describe('annotator.config.index', function() {
 
   context("when there's no application/annotator+html <link>", function() {
     beforeEach('remove the application/annotator+html <link>', function() {
-      Object.defineProperty(
-        fakeSettingsFrom(),
-        'sidebarAppUrl',
-        {
-          get: sinon.stub().throws(new Error("there's no link")),
-        }
-      );
+      Object.defineProperty(fakeSettingsFrom(), 'sidebarAppUrl', {
+        get: sinon.stub().throws(new Error("there's no link")),
+      });
     });
 
     it('throws an error', function() {
-      assert.throws(
-        function() { configFrom('WINDOW'); },
-        "there's no link"
-      );
+      assert.throws(function() {
+        configFrom('WINDOW');
+      }, "there's no link");
     });
   });
 
-  [
-    'assetRoot',
-    'subFrameIdentifier',
-    'openSidebar',
-  ].forEach(function(settingName) {
-    it('reads ' + settingName + ' from the host page, even when in a browser extension', function() {
-      configFrom('WINDOW');
+  ['assetRoot', 'subFrameIdentifier', 'openSidebar'].forEach(function(
+    settingName
+  ) {
+    it(
+      'reads ' +
+        settingName +
+        ' from the host page, even when in a browser extension',
+      function() {
+        configFrom('WINDOW');
 
-      assert.calledWithExactly(
-        fakeSettingsFrom().hostPageSetting,
-        settingName, {allowInBrowserExt: true}
-      );
-    });
+        assert.calledWithExactly(
+          fakeSettingsFrom().hostPageSetting,
+          settingName,
+          { allowInBrowserExt: true }
+        );
+      }
+    );
   });
 
-  [
-    'branding',
-    'services',
-  ].forEach(function(settingName) {
-    it('reads ' + settingName + ' from the host page only when in an embedded client', function() {
-      configFrom('WINDOW');
+  ['branding', 'services'].forEach(function(settingName) {
+    it(
+      'reads ' +
+        settingName +
+        ' from the host page only when in an embedded client',
+      function() {
+        configFrom('WINDOW');
 
-      assert.calledWithExactly(fakeSettingsFrom().hostPageSetting, settingName);
-    });
+        assert.calledWithExactly(
+          fakeSettingsFrom().hostPageSetting,
+          settingName
+        );
+      }
+    );
   });
 
   [
@@ -94,11 +97,11 @@ describe('annotator.config.index', function() {
   ].forEach(function(settingName) {
     it('returns the ' + settingName + ' value from the host page', function() {
       const settings = {
-        'assetRoot': 'chrome-extension://1234/client/',
-        'branding': 'BRANDING_SETTING',
-        'openSidebar': 'OPEN_SIDEBAR_SETTING',
-        'requestConfigFromFrame': 'https://embedder.com',
-        'services': 'SERVICES_SETTING',
+        assetRoot: 'chrome-extension://1234/client/',
+        branding: 'BRANDING_SETTING',
+        openSidebar: 'OPEN_SIDEBAR_SETTING',
+        requestConfigFromFrame: 'https://embedder.com',
+        services: 'SERVICES_SETTING',
       };
       fakeSettingsFrom().hostPageSetting = function(settingName) {
         return settings[settingName];

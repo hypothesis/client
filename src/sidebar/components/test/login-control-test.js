@@ -8,11 +8,14 @@ const util = require('../../directive/test/util');
 
 function pageObject(element) {
   return {
-    menuLinks: function () {
-      return Array.from(element[0].querySelectorAll('.login-control-menu .dropdown-menu a'))
-        .map(function (el) { return el.textContent; });
+    menuLinks: function() {
+      return Array.from(
+        element[0].querySelectorAll('.login-control-menu .dropdown-menu a')
+      ).map(function(el) {
+        return el.textContent;
+      });
     },
-    menuText: function () {
+    menuText: function() {
       return element[0].querySelector('span').textContent;
     },
     userProfileButton: element[0].querySelector('.js-user-profile-btn'),
@@ -24,62 +27,71 @@ function pageObject(element) {
 
 function createLoginControl(inputs) {
   return util.createDirective(
-    document, 'loginControl', Object.assign({}, inputs));
+    document,
+    'loginControl',
+    Object.assign({}, inputs)
+  );
 }
 
 function unknownAuthStatusPage() {
-  return pageObject(createLoginControl({
-    auth: {status: 'unknown'},
-    newStyle: true,
-  }));
+  return pageObject(
+    createLoginControl({
+      auth: { status: 'unknown' },
+      newStyle: true,
+    })
+  );
 }
 
 function loggedOutPage() {
-  return pageObject(createLoginControl({
-    auth: {status: 'logged-out'},
-    newStyle: true,
-  }));
+  return pageObject(
+    createLoginControl({
+      auth: { status: 'logged-out' },
+      newStyle: true,
+    })
+  );
 }
 
 function firstPartyUserPage() {
-  return pageObject(createLoginControl({
-    auth: {
-      displayName: 'Jim Smith',
-      username: 'someUsername',
-      status: 'logged-in',
-    },
-    newStyle: true,
-  }));
+  return pageObject(
+    createLoginControl({
+      auth: {
+        displayName: 'Jim Smith',
+        username: 'someUsername',
+        status: 'logged-in',
+      },
+      newStyle: true,
+    })
+  );
 }
 
 function thirdPartyUserPage() {
-  return pageObject(createLoginControl({
-    auth: {
-      userid: 'acct:someUsername@anotherFakeDomain',
-      username: 'someUsername',
-      status: 'logged-in',
-    },
-    newStyle: true,
-  }));
+  return pageObject(
+    createLoginControl({
+      auth: {
+        userid: 'acct:someUsername@anotherFakeDomain',
+        username: 'someUsername',
+        status: 'logged-in',
+      },
+      newStyle: true,
+    })
+  );
 }
 
-describe('loginControl', function () {
+describe('loginControl', function() {
   let fakeBridge;
   const fakeServiceConfig = sinon.stub();
   let fakeWindow;
 
-  before(function () {
-    angular.module('app', [])
-      .component(
-        'loginControl',
-        proxyquire(
-          '../login-control',
-          {'../service-config': fakeServiceConfig}
-        )
-      );
+  before(function() {
+    angular.module('app', []).component(
+      'loginControl',
+      proxyquire('../login-control', {
+        '../service-config': fakeServiceConfig,
+      })
+    );
   });
 
-  beforeEach(function () {
+  beforeEach(function() {
     fakeBridge = { call: sinon.stub() };
     const fakeServiceUrl = sinon.stub().returns('someUrl');
     const fakeSettings = {
@@ -99,7 +111,6 @@ describe('loginControl', function () {
   });
 
   describe('the user profile button', function() {
-
     /**
      * Return true if the user profile button is enabled, false if it's
      * disabled, and null if no user profile button is rendered.
@@ -116,20 +127,20 @@ describe('loginControl', function () {
       return false;
     }
 
-    context('when the user auth status is unknown', function () {
-      it('does not show the user profile button', function () {
+    context('when the user auth status is unknown', function() {
+      it('does not show the user profile button', function() {
         assert.isNull(isUserProfileButtonEnabled(unknownAuthStatusPage()));
       });
     });
 
-    context('when the user is logged out', function () {
-      it('does not show the user profile button', function () {
+    context('when the user is logged out', function() {
+      it('does not show the user profile button', function() {
         assert.isNull(isUserProfileButtonEnabled(loggedOutPage()));
       });
     });
 
-    context('when a first-party user is logged in', function () {
-      it('shows the enabled user profile button', function () {
+    context('when a first-party user is logged in', function() {
+      it('shows the enabled user profile button', function() {
         assert.isTrue(isUserProfileButtonEnabled(firstPartyUserPage()));
       });
 
@@ -152,23 +163,23 @@ describe('loginControl', function () {
       });
     });
 
-    context('when a third-party user is logged in', function () {
-      context("when there's no onProfileRequest callback", function () {
-        beforeEach('provide a service with no onProfileRequest', function () {
+    context('when a third-party user is logged in', function() {
+      context("when there's no onProfileRequest callback", function() {
+        beforeEach('provide a service with no onProfileRequest', function() {
           fakeServiceConfig.returns({});
         });
 
-        it('shows the disabled user profile button', function () {
+        it('shows the disabled user profile button', function() {
           assert.isFalse(isUserProfileButtonEnabled(thirdPartyUserPage()));
         });
       });
 
-      context("when there's an onProfileRequest callback", function () {
-        beforeEach('provide an onProfileRequest callback', function () {
-          fakeServiceConfig.returns({onProfileRequestProvided: true});
+      context("when there's an onProfileRequest callback", function() {
+        beforeEach('provide an onProfileRequest callback', function() {
+          fakeServiceConfig.returns({ onProfileRequestProvided: true });
         });
 
-        it('shows the enabled user profile button', function () {
+        it('shows the enabled user profile button', function() {
           assert.isTrue(isUserProfileButtonEnabled(thirdPartyUserPage()));
         });
 
@@ -176,7 +187,10 @@ describe('loginControl', function () {
           thirdPartyUserPage().userProfileButton.click();
 
           assert.calledOnce(fakeBridge.call);
-          assert.calledWithExactly(fakeBridge.call, bridgeEvents.PROFILE_REQUESTED);
+          assert.calledWithExactly(
+            fakeBridge.call,
+            bridgeEvents.PROFILE_REQUESTED
+          );
         });
 
         it('does not open a new tab', function() {
@@ -188,102 +202,102 @@ describe('loginControl', function () {
     });
   });
 
-  describe('the account settings button', function () {
-    context('when the user auth status is unknown', function () {
-      it('does not show', function () {
+  describe('the account settings button', function() {
+    context('when the user auth status is unknown', function() {
+      it('does not show', function() {
         assert.isNull(unknownAuthStatusPage().accountSettingsButton);
       });
     });
 
-    context('when the user is logged out', function () {
-      it('does not show', function () {
+    context('when the user is logged out', function() {
+      it('does not show', function() {
         assert.isNull(loggedOutPage().accountSettingsButton);
       });
     });
 
-    context('when a first-party user is logged in', function () {
-      it('does show', function () {
+    context('when a first-party user is logged in', function() {
+      it('does show', function() {
         assert.isNotNull(firstPartyUserPage().accountSettingsButton);
       });
     });
 
-    context('when a third-party user is logged in', function () {
-      it('does not show', function () {
+    context('when a third-party user is logged in', function() {
+      it('does not show', function() {
         assert.isNull(thirdPartyUserPage().accountSettingsButton);
       });
     });
   });
 
-  describe('the help button', function () {
-    context('when the user auth status is unknown', function () {
-      it('does show', function () {
+  describe('the help button', function() {
+    context('when the user auth status is unknown', function() {
+      it('does show', function() {
         assert.isNotNull(unknownAuthStatusPage().helpButton);
       });
     });
 
-    context('when the user is logged out', function () {
-      it('does show', function () {
+    context('when the user is logged out', function() {
+      it('does show', function() {
         assert.isNotNull(loggedOutPage().helpButton);
       });
     });
 
-    context('when a first-party user is logged in', function () {
-      it('does show', function () {
+    context('when a first-party user is logged in', function() {
+      it('does show', function() {
         assert.isNotNull(firstPartyUserPage().helpButton);
       });
     });
 
-    context('when a third-party user is logged in', function () {
-      it('does show', function () {
+    context('when a third-party user is logged in', function() {
+      it('does show', function() {
         assert.isNotNull(thirdPartyUserPage().helpButton);
       });
     });
   });
 
-  describe('the log out button', function () {
-    context('when the user auth status is unknown', function () {
-      it('does not show', function () {
+  describe('the log out button', function() {
+    context('when the user auth status is unknown', function() {
+      it('does not show', function() {
         assert.isNull(unknownAuthStatusPage().logOutButton);
       });
     });
 
-    context('when the user is logged out', function () {
-      it('does not show', function () {
+    context('when the user is logged out', function() {
+      it('does not show', function() {
         assert.isNull(loggedOutPage().logOutButton);
       });
     });
 
-    context('when a first-party user is logged in', function () {
-      it('does show', function () {
+    context('when a first-party user is logged in', function() {
+      it('does show', function() {
         assert.isNotNull(firstPartyUserPage().logOutButton);
       });
     });
 
-    context('when a third-party user is logged in', function () {
-      context("when there's no onLogoutRequest callback", function () {
-        beforeEach('provide a service with no onLogoutRequest', function () {
+    context('when a third-party user is logged in', function() {
+      context("when there's no onLogoutRequest callback", function() {
+        beforeEach('provide a service with no onLogoutRequest', function() {
           fakeServiceConfig.returns({});
         });
 
-        it('does not show', function () {
+        it('does not show', function() {
           assert.isNull(thirdPartyUserPage().logOutButton);
         });
       });
 
-      context("when there's an onLogoutRequest callback", function () {
-        beforeEach('provide an onLogoutRequest callback', function () {
-          fakeServiceConfig.returns({onLogoutRequestProvided: true});
+      context("when there's an onLogoutRequest callback", function() {
+        beforeEach('provide an onLogoutRequest callback', function() {
+          fakeServiceConfig.returns({ onLogoutRequestProvided: true });
         });
 
-        it('does show', function () {
+        it('does show', function() {
           assert.isNotNull(thirdPartyUserPage().logOutButton);
         });
       });
     });
   });
 
-  context('old controls when a H user is logged in', function () {
-    it('shows the complete list of menu options', function () {
+  context('old controls when a H user is logged in', function() {
+    it('shows the complete list of menu options', function() {
       const el = createLoginControl({
         auth: {
           username: 'someUsername',
@@ -293,14 +307,18 @@ describe('loginControl', function () {
       });
       const page = pageObject(el);
 
-      assert.deepEqual(page.menuLinks(),
-        ['Account', 'Help', 'My Annotations', 'Log out']);
+      assert.deepEqual(page.menuLinks(), [
+        'Account',
+        'Help',
+        'My Annotations',
+        'Log out',
+      ]);
       assert.include(page.menuText(), 'someUsername');
     });
   });
 
-  context('old controls when user is logged out', function () {
-    it('shows the help and log in menu options', function () {
+  context('old controls when user is logged out', function() {
+    it('shows the help and log in menu options', function() {
       const el = createLoginControl({
         auth: {
           status: 'logged-out',
@@ -314,8 +332,8 @@ describe('loginControl', function () {
     });
   });
 
-  context('old controls when auth status is unknown', function () {
-    it('shows the help menu option', function () {
+  context('old controls when auth status is unknown', function() {
+    it('shows the help menu option', function() {
       const el = createLoginControl({
         auth: {
           status: 'unknown',

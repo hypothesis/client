@@ -6,7 +6,7 @@ const proxyquire = require('proxyquire');
 const util = require('../../directive/test/util');
 const noCallThru = require('../../../shared/test/util').noCallThru;
 
-describe('markdown', function () {
+describe('markdown', function() {
   function isHidden(element) {
     return element.classList.contains('ng-hide');
   }
@@ -39,46 +39,51 @@ describe('markdown', function () {
     };
   }
 
-  before(function () {
-    angular.module('app', ['ngSanitize'])
-      .component('markdown', proxyquire('../markdown', noCallThru({
-        angular: angular,
-        katex: {
-          renderToString: function (input) {
-            return 'math:' + input.replace(/$$/g, '');
+  before(function() {
+    angular.module('app', ['ngSanitize']).component(
+      'markdown',
+      proxyquire(
+        '../markdown',
+        noCallThru({
+          angular: angular,
+          katex: {
+            renderToString: function(input) {
+              return 'math:' + input.replace(/$$/g, '');
+            },
           },
-        },
-        'lodash.debounce': function (fn) {
-          // Make input change debouncing synchronous in tests
-          return function () {
-            fn();
-          };
-        },
-        '../render-markdown': noCallThru(function (markdown, $sanitize) {
-          return $sanitize('rendered:' + markdown);
-        }),
+          'lodash.debounce': function(fn) {
+            // Make input change debouncing synchronous in tests
+            return function() {
+              fn();
+            };
+          },
+          '../render-markdown': noCallThru(function(markdown, $sanitize) {
+            return $sanitize('rendered:' + markdown);
+          }),
 
-        '../markdown-commands': {
-          convertSelectionToLink: mockFormattingCommand,
-          toggleBlockStyle: mockFormattingCommand,
-          toggleSpanStyle: mockFormattingCommand,
-          LinkType: require('../../markdown-commands').LinkType,
-        },
-        '../media-embedder': noCallThru({
-          replaceLinksWithEmbeds: function (element) {
-            // Tag the element as having been processed
-            element.dataset.replacedLinksWithEmbeds = 'yes';
+          '../markdown-commands': {
+            convertSelectionToLink: mockFormattingCommand,
+            toggleBlockStyle: mockFormattingCommand,
+            toggleSpanStyle: mockFormattingCommand,
+            LinkType: require('../../markdown-commands').LinkType,
           },
-        }),
-      })));
+          '../media-embedder': noCallThru({
+            replaceLinksWithEmbeds: function(element) {
+              // Tag the element as having been processed
+              element.dataset.replacedLinksWithEmbeds = 'yes';
+            },
+          }),
+        })
+      )
+    );
   });
 
-  beforeEach(function () {
+  beforeEach(function() {
     angular.mock.module('app');
   });
 
-  describe('read only state', function () {
-    it('should show the rendered view when readOnly is true', function () {
+  describe('read only state', function() {
+    it('should show the rendered view when readOnly is true', function() {
       const editor = util.createDirective(document, 'markdown', {
         readOnly: true,
         text: 'Hello World',
@@ -87,7 +92,7 @@ describe('markdown', function () {
       assert.isFalse(isHidden(viewElement(editor)));
     });
 
-    it('should show the editor when readOnly is false', function () {
+    it('should show the editor when readOnly is false', function() {
       const editor = util.createDirective(document, 'markdown', {
         readOnly: false,
         text: 'Hello World',
@@ -97,8 +102,8 @@ describe('markdown', function () {
     });
   });
 
-  describe('rendering', function () {
-    it('should render input markdown', function () {
+  describe('rendering', function() {
+    it('should render input markdown', function() {
       const editor = util.createDirective(document, 'markdown', {
         readOnly: true,
         text: 'Hello World',
@@ -106,21 +111,22 @@ describe('markdown', function () {
       assert.equal(getRenderedHTML(editor), 'rendered:Hello World');
     });
 
-    it('should render nothing if no text is provided', function () {
-      const editor = util.createDirective(document, 'markdown', {readOnly: true});
+    it('should render nothing if no text is provided', function() {
+      const editor = util.createDirective(document, 'markdown', {
+        readOnly: true,
+      });
       assert.equal(getRenderedHTML(editor), 'rendered:');
     });
 
-    it('should sanitize the result', function () {
+    it('should sanitize the result', function() {
       const editor = util.createDirective(document, 'markdown', {
         readOnly: true,
         text: 'Hello <script>alert("attack");</script> World',
       });
-      assert.equal(getRenderedHTML(editor),
-        'rendered:Hello  World');
+      assert.equal(getRenderedHTML(editor), 'rendered:Hello  World');
     });
 
-    it('should replace links with embeds in rendered output', function () {
+    it('should replace links with embeds in rendered output', function() {
       const editor = util.createDirective(document, 'markdown', {
         readOnly: true,
         text: 'A video: https://www.youtube.com/watch?v=yJDv-zdhzMY',
@@ -128,7 +134,7 @@ describe('markdown', function () {
       assert.equal(viewElement(editor).dataset.replacedLinksWithEmbeds, 'yes');
     });
 
-    it('should tolerate malformed HTML', function () {
+    it('should tolerate malformed HTML', function() {
       const editor = util.createDirective(document, 'markdown', {
         readOnly: true,
         text: 'Hello <one two.',
@@ -137,21 +143,21 @@ describe('markdown', function () {
     });
   });
 
-  describe('toolbar buttons', function () {
-    it('should apply formatting when clicking toolbar buttons', function () {
+  describe('toolbar buttons', function() {
+    it('should apply formatting when clicking toolbar buttons', function() {
       const editor = util.createDirective(document, 'markdown', {
         readOnly: false,
         text: 'Hello World',
       });
       const input = inputElement(editor);
-      toolbarButtons(editor).forEach(function (button) {
+      toolbarButtons(editor).forEach(function(button) {
         input.value = 'original text';
         angular.element(button).click();
         assert.equal(input.value, mockFormattingCommand().text);
       });
     });
 
-    it('should notify parent that the text changed', function () {
+    it('should notify parent that the text changed', function() {
       const onEditText = sinon.stub();
       const editor = util.createDirective(document, 'markdown', {
         readOnly: false,
@@ -161,7 +167,7 @@ describe('markdown', function () {
           callback: onEditText,
         },
       });
-      toolbarButtons(editor).forEach(function (button) {
+      toolbarButtons(editor).forEach(function(button) {
         onEditText.reset();
         angular.element(button).click();
         assert.calledWith(onEditText, inputElement(editor).value);
@@ -169,27 +175,27 @@ describe('markdown', function () {
     });
   });
 
-  describe('editing', function () {
-    it('should populate the input with the current text', function () {
+  describe('editing', function() {
+    it('should populate the input with the current text', function() {
       const editor = util.createDirective(document, 'markdown', {
         readOnly: false,
         text: 'initial comment',
-        onEditText: function () {},
+        onEditText: function() {},
       });
       const input = inputElement(editor);
       assert.equal(input.value, 'initial comment');
     });
 
-    it('should populate the input with empty text if no text is specified', function () {
+    it('should populate the input with empty text if no text is specified', function() {
       const editor = util.createDirective(document, 'markdown', {
         readOnly: false,
-        onEditText: function () {},
+        onEditText: function() {},
       });
       const input = inputElement(editor);
       assert.equal(input.value, '');
     });
 
-    it('should call onEditText() callback when text changes', function () {
+    it('should call onEditText() callback when text changes', function() {
       const onEditText = sinon.stub();
       const editor = util.createDirective(document, 'markdown', {
         readOnly: false,
@@ -207,7 +213,7 @@ describe('markdown', function () {
     });
   });
 
-  describe('preview state', function () {
+  describe('preview state', function() {
     let editor;
 
     function togglePreview() {
@@ -220,7 +226,7 @@ describe('markdown', function () {
       return editor.ctrl.preview;
     }
 
-    beforeEach(function () {
+    beforeEach(function() {
       // Create a new editor, initially in editing mode
       editor = util.createDirective(document, 'markdown', {
         readOnly: false,
@@ -228,22 +234,22 @@ describe('markdown', function () {
       });
     });
 
-    it('enters preview mode when clicking the "Preview" toggle button', function () {
+    it('enters preview mode when clicking the "Preview" toggle button', function() {
       togglePreview();
       assert.isTrue(isPreviewing());
     });
 
-    it('should hide the input when previewing changes', function () {
+    it('should hide the input when previewing changes', function() {
       togglePreview();
       assert.isTrue(isHidden(inputElement(editor)));
     });
 
-    it('should show the rendered markdown when previewing changes', function () {
+    it('should show the rendered markdown when previewing changes', function() {
       togglePreview();
       assert.isFalse(isHidden(viewElement(editor)));
     });
 
-    it('exits preview mode when switching to read-only mode', function () {
+    it('exits preview mode when switching to read-only mode', function() {
       togglePreview();
       editor.scope.readOnly = true;
       editor.scope.$digest();
@@ -251,8 +257,8 @@ describe('markdown', function () {
     });
   });
 
-  describe('custom text class', function () {
-    it('should apply custom text class to text container', function () {
+  describe('custom text class', function() {
+    it('should apply custom text class to text container', function() {
       const editor = util.createDirective(document, 'markdown', {
         customTextClass: 'fancy-effect',
         readOnly: true,

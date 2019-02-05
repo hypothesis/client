@@ -45,7 +45,7 @@ function AnnotationSync(bridge, options) {
 AnnotationSync.prototype.cache = null;
 
 AnnotationSync.prototype.sync = function(annotations) {
-  annotations = (function() {
+  annotations = function() {
     let i;
     const formattedAnnotations = [];
 
@@ -53,32 +53,36 @@ AnnotationSync.prototype.sync = function(annotations) {
       formattedAnnotations.push(this._format(annotations[i]));
     }
     return formattedAnnotations;
-  }).call(this);
-  this.bridge.call('sync', annotations, (function(_this) {
-    return function(err, annotations) {
-      let i;
-      const parsedAnnotations = [];
-      annotations = annotations || [];
+  }.call(this);
+  this.bridge.call(
+    'sync',
+    annotations,
+    (function(_this) {
+      return function(err, annotations) {
+        let i;
+        const parsedAnnotations = [];
+        annotations = annotations || [];
 
-      for (i = 0; i < annotations.length; i++) {
-        parsedAnnotations.push(_this._parse(annotations[i]));
-      }
-      return parsedAnnotations;
-    };
-  })(this));
+        for (i = 0; i < annotations.length; i++) {
+          parsedAnnotations.push(_this._parse(annotations[i]));
+        }
+        return parsedAnnotations;
+      };
+    })(this)
+  );
   return this;
 };
 
 // Handlers for messages arriving through a channel
 AnnotationSync.prototype._channelListeners = {
-  'deleteAnnotation': function(body, cb) {
+  deleteAnnotation: function(body, cb) {
     const annotation = this._parse(body);
     delete this.cache[annotation.$tag];
     this._emit('annotationDeleted', annotation);
     cb(null, this._format(annotation));
   },
-  'loadAnnotations': function(bodies, cb) {
-    const annotations = (function() {
+  loadAnnotations: function(bodies, cb) {
+    const annotations = function() {
       let i;
       const parsedAnnotations = [];
 
@@ -86,7 +90,7 @@ AnnotationSync.prototype._channelListeners = {
         parsedAnnotations.push(this._parse(bodies[i]));
       }
       return parsedAnnotations;
-    }).call(this);
+    }.call(this);
     this._emit('annotationsLoaded', annotations);
     return cb(null, annotations);
   },
@@ -94,15 +98,20 @@ AnnotationSync.prototype._channelListeners = {
 
 // Handlers for events coming from this frame, to send them across the channel
 AnnotationSync.prototype._eventListeners = {
-  'beforeAnnotationCreated': function(annotation) {
+  beforeAnnotationCreated: function(annotation) {
     if (annotation.$tag) {
       return undefined;
     }
-    return this._mkCallRemotelyAndParseResults('beforeCreateAnnotation')(annotation);
+    return this._mkCallRemotelyAndParseResults('beforeCreateAnnotation')(
+      annotation
+    );
   },
 };
 
-AnnotationSync.prototype._mkCallRemotelyAndParseResults = function(method, callBack) {
+AnnotationSync.prototype._mkCallRemotelyAndParseResults = function(
+  method,
+  callBack
+) {
   return (function(_this) {
     return function(annotation) {
       // Wrap the callback function to first parse returned items

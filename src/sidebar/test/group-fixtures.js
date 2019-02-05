@@ -4,7 +4,7 @@ const Chance = require('chance');
 const chance = new Chance();
 
 function group() {
-  const id = chance.hash({length: 15});
+  const id = chance.hash({ length: 15 });
   const name = chance.string();
   const group = {
     id: id,
@@ -17,9 +17,9 @@ function group() {
   return group;
 }
 
-function organization(options={}) {
+function organization(options = {}) {
   const org = {
-    id: chance.hash({length : 15}),
+    id: chance.hash({ length: 15 }),
     name: chance.string(),
     logo: chance.url(),
   };
@@ -34,7 +34,7 @@ function defaultOrganization() {
   };
 }
 
-function expandedGroup(options={}) {
+function expandedGroup(options = {}) {
   const expanded = group();
   expanded.organization = organization();
 

@@ -32,8 +32,9 @@ function apiRoutes($http, settings) {
    */
   function routes() {
     if (!routeCache) {
-      routeCache = retryPromiseOperation(() => getJSON(settings.apiUrl))
-        .then((index) => index.links);
+      routeCache = retryPromiseOperation(() => getJSON(settings.apiUrl)).then(
+        index => index.links
+      );
     }
     return routeCache;
   }

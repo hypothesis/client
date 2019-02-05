@@ -7,25 +7,29 @@ function SearchInputController($element, $http, $scope) {
   const input = $element.find('input')[0];
   const form = $element.find('form')[0];
 
-  button.on('click', function () {
+  button.on('click', function() {
     input.focus();
   });
 
   $scope.$watch(
-    function () { return $http.pendingRequests.length; },
-    function (count) { self.loading = count > 0; }
+    function() {
+      return $http.pendingRequests.length;
+    },
+    function(count) {
+      self.loading = count > 0;
+    }
   );
 
-  form.onsubmit = function (e) {
+  form.onsubmit = function(e) {
     e.preventDefault();
-    self.onSearch({$query: input.value});
+    self.onSearch({ $query: input.value });
   };
 
-  this.inputClasses = function () {
-    return {'is-expanded': self.alwaysExpanded || self.query};
+  this.inputClasses = function() {
+    return { 'is-expanded': self.alwaysExpanded || self.query };
   };
 
-  this.$onChanges = function (changes) {
+  this.$onChanges = function(changes) {
     if (changes.query) {
       input.value = changes.query.currentValue;
     }

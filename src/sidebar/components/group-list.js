@@ -16,44 +16,45 @@ function GroupListController($window, analytics, groups, settings, serviceUrl) {
 
   this.focusedIcon = function() {
     const focusedGroup = this.groups.focused();
-    return focusedGroup && (
-      focusedGroup.organization.logo || this.thirdPartyGroupIcon
+    return (
+      focusedGroup &&
+      (focusedGroup.organization.logo || this.thirdPartyGroupIcon)
     );
   };
 
   this.focusedIconClass = function() {
     const focusedGroup = this.groups.focused();
-    return (focusedGroup && focusedGroup.type === 'private') ? 'group' : 'public';
+    return focusedGroup && focusedGroup.type === 'private' ? 'group' : 'public';
   };
 
-  this.isThirdPartyUser = function () {
+  this.isThirdPartyUser = function() {
     return isThirdPartyUser(this.auth.userid, settings.authDomain);
   };
 
-  this.leaveGroup = function (groupId) {
+  this.leaveGroup = function(groupId) {
     const groupName = groups.get(groupId).name;
-    const message = 'Are you sure you want to leave the group "' +
-      groupName + '"?';
+    const message =
+      'Are you sure you want to leave the group "' + groupName + '"?';
     if ($window.confirm(message)) {
       analytics.track(analytics.events.GROUP_LEAVE);
       groups.leave(groupId);
     }
   };
 
-  this.orgName = function (groupId) {
+  this.orgName = function(groupId) {
     const group = this.groups.get(groupId);
     return group && group.organization && group.organization.name;
   };
 
-  this.groupOrganizations = function () {
+  this.groupOrganizations = function() {
     return groupOrganizations(this.groups.all());
   };
 
-  this.viewGroupActivity = function () {
+  this.viewGroupActivity = function() {
     analytics.track(analytics.events.GROUP_VIEW_ACTIVITY);
   };
 
-  this.focusGroup = function (groupId) {
+  this.focusGroup = function(groupId) {
     analytics.track(analytics.events.GROUP_SWITCH);
     groups.focus(groupId);
   };
@@ -64,7 +65,7 @@ function GroupListController($window, analytics, groups, settings, serviceUrl) {
    * to simplify this once the API is adjusted only to return the link
    * when applicable.
    */
-  this.shouldShowActivityLink = function (groupId) {
+  this.shouldShowActivityLink = function(groupId) {
     const group = groups.get(groupId);
     return group.links && group.links.html && !this.isThirdPartyService;
   };
@@ -77,7 +78,7 @@ function GroupListController($window, analytics, groups, settings, serviceUrl) {
   this.isThirdPartyService = isThirdPartyService(settings);
 
   this.showGroupsMenu = () => {
-    return !( this.isThirdPartyService && (this.groups.all().length <= 1) );
+    return !(this.isThirdPartyService && this.groups.all().length <= 1);
   };
 }
 

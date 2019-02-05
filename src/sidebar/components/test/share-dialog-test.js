@@ -4,38 +4,42 @@ const angular = require('angular');
 
 const util = require('../../directive/test/util');
 
-describe('shareDialog', function () {
+describe('shareDialog', function() {
   let fakeAnalytics;
   let fakeStore;
 
-  beforeEach(function () {
+  beforeEach(function() {
     fakeAnalytics = {
       track: sinon.stub(),
       events: {},
     };
     fakeStore = { frames: sinon.stub().returns([]) };
 
-    angular.module('h', [])
+    angular
+      .module('h', [])
       .component('shareDialog', require('../share-dialog'))
       .value('analytics', fakeAnalytics)
       .value('store', fakeStore)
-      .value('urlEncodeFilter', function (val) { return val; });
+      .value('urlEncodeFilter', function(val) {
+        return val;
+      });
     angular.mock.module('h');
   });
 
-  it('generates new share link', function () {
+  it('generates new share link', function() {
     const element = util.createDirective(document, 'shareDialog', {});
     const uri = 'http://example.com';
     fakeStore.frames.returns([{ uri }]);
     element.scope.$digest();
-    assert.equal(element.ctrl.sharePageLink,
-      'https://hyp.is/go?url=' + encodeURIComponent(uri));
+    assert.equal(
+      element.ctrl.sharePageLink,
+      'https://hyp.is/go?url=' + encodeURIComponent(uri)
+    );
   });
 
-  it('tracks the target being shared', function(){
-
+  it('tracks the target being shared', function() {
     const element = util.createDirective(document, 'shareDialog');
-    const clickShareIcon = function(iconName){
+    const clickShareIcon = function(iconName) {
       element.find('.' + iconName).click();
     };
 

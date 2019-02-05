@@ -24,7 +24,7 @@ function isThirdPartyService(settings) {
     return false;
   }
 
-  return (service.authority !== settings.authDomain);
+  return service.authority !== settings.authDomain;
 }
 
 module.exports = isThirdPartyService;

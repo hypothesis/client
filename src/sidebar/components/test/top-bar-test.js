@@ -5,16 +5,20 @@ const proxyquire = require('proxyquire');
 
 const util = require('../../directive/test/util');
 
-describe('topBar', function () {
+describe('topBar', function() {
   const fakeSettings = {};
   const fakeIsThirdPartyService = sinon.stub();
 
-  before(function () {
-    angular.module('app', [])
-      .component('topBar', proxyquire('../top-bar', {
-        '../util/is-third-party-service': fakeIsThirdPartyService,
-        '@noCallThru': true,
-      }))
+  before(function() {
+    angular
+      .module('app', [])
+      .component(
+        'topBar',
+        proxyquire('../top-bar', {
+          '../util/is-third-party-service': fakeIsThirdPartyService,
+          '@noCallThru': true,
+        })
+      )
       .component('loginControl', {
         bindings: require('../login-control').bindings,
       })
@@ -26,7 +30,7 @@ describe('topBar', function () {
       });
   });
 
-  beforeEach(function () {
+  beforeEach(function() {
     angular.mock.module('app', {
       settings: fakeSettings,
     });
@@ -43,11 +47,14 @@ describe('topBar', function () {
     const defaultInputs = {
       isSidebar: true,
     };
-    return util.createDirective(document, 'topBar',
-      Object.assign(defaultInputs, inputs));
+    return util.createDirective(
+      document,
+      'topBar',
+      Object.assign(defaultInputs, inputs)
+    );
   }
 
-  it('shows the pending update count', function () {
+  it('shows the pending update count', function() {
     const el = createTopBar({
       pendingUpdateCount: 1,
     });
@@ -55,7 +62,7 @@ describe('topBar', function () {
     assert.ok(applyBtn);
   });
 
-  it('does not show the pending update count when there are no updates', function () {
+  it('does not show the pending update count when there are no updates', function() {
     const el = createTopBar({
       pendingUpdateCount: 0,
     });
@@ -63,7 +70,7 @@ describe('topBar', function () {
     assert.notOk(applyBtn);
   });
 
-  it('applies updates when clicked', function () {
+  it('applies updates when clicked', function() {
     const onApplyPendingUpdates = sinon.stub();
     const el = createTopBar({
       pendingUpdateCount: 1,
@@ -74,7 +81,7 @@ describe('topBar', function () {
     assert.called(onApplyPendingUpdates);
   });
 
-  it('displays the login control and propagates callbacks', function () {
+  it('displays the login control and propagates callbacks', function() {
     const onShowHelpPanel = sinon.stub();
     const onLogin = sinon.stub();
     const onLogout = sinon.stub();
@@ -95,40 +102,40 @@ describe('topBar', function () {
     assert.called(onLogout);
   });
 
-  it("checks whether we're using a third-party service", function () {
+  it("checks whether we're using a third-party service", function() {
     createTopBar();
 
     assert.called(fakeIsThirdPartyService);
     assert.alwaysCalledWithExactly(fakeIsThirdPartyService, fakeSettings);
   });
 
-  context('when using a first-party service', function () {
-    it('shows the share page button', function () {
+  context('when using a first-party service', function() {
+    it('shows the share page button', function() {
       let el = createTopBar();
       // I want the DOM element, not AngularJS's annoying angular.element
       // wrapper object.
-      el = el [0];
+      el = el[0];
 
       assert.isNotNull(el.querySelector('[title="Share this page"]'));
     });
   });
 
-  context('when using a third-party service', function () {
+  context('when using a third-party service', function() {
     beforeEach(function() {
       fakeIsThirdPartyService.returns(true);
     });
 
-    it("doesn't show the share page button", function () {
+    it("doesn't show the share page button", function() {
       let el = createTopBar();
       // I want the DOM element, not AngularJS's annoying angular.element
       // wrapper object.
-      el = el [0];
+      el = el[0];
 
       assert.isNull(el.querySelector('[title="Share this page"]'));
     });
   });
 
-  it('displays the share page when "Share this page" is clicked', function () {
+  it('displays the share page when "Share this page" is clicked', function() {
     const onSharePage = sinon.stub();
     const el = createTopBar({ onSharePage: onSharePage });
     el.find('[title="Share this page"]').click();
@@ -136,7 +143,7 @@ describe('topBar', function () {
     assert.called(onSharePage);
   });
 
-  it('displays the search input and propagates query changes', function () {
+  it('displays the search input and propagates query changes', function() {
     const onSearch = sinon.stub();
     const el = createTopBar({
       searchController: {
@@ -148,11 +155,11 @@ describe('topBar', function () {
 
     assert.equal(searchInput.query, 'query');
 
-    searchInput.onSearch({$query: 'new-query'});
+    searchInput.onSearch({ $query: 'new-query' });
     assert.calledWith(onSearch, 'new-query');
   });
 
-  it('displays the sort dropdown and propagates sort key changes', function () {
+  it('displays the sort dropdown and propagates sort key changes', function() {
     const onChangeSortKey = sinon.stub();
     const el = createTopBar({
       sortKeysAvailable: ['Newest', 'Oldest'],
@@ -167,11 +174,11 @@ describe('topBar', function () {
     assert.deepEqual(sortDropdown.sortKeysAvailable, ['Newest', 'Oldest']);
     assert.deepEqual(sortDropdown.sortKey, 'Newest');
 
-    sortDropdown.onChangeSortKey({sortKey: 'Oldest'});
+    sortDropdown.onChangeSortKey({ sortKey: 'Oldest' });
     assert.calledWith(onChangeSortKey, 'Oldest');
   });
 
-  it('shows the clean theme when settings contains the clean theme option', function () {
+  it('shows the clean theme when settings contains the clean theme option', function() {
     angular.mock.module('app', {
       settings: { theme: 'clean' },
     });

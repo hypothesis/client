@@ -48,14 +48,14 @@ class VirtualThreadList extends EventEmitter {
     this.window = window_;
     this.scrollRoot = options.scrollRoot || document.body;
 
-    const debouncedUpdate = debounce(function () {
+    const debouncedUpdate = debounce(function() {
       self._updateVisibleThreads();
       $scope.$digest();
     }, 20);
     this.scrollRoot.addEventListener('scroll', debouncedUpdate);
     this.window.addEventListener('resize', debouncedUpdate);
 
-    this._detach = function () {
+    this._detach = function() {
       this.scrollRoot.removeEventListener('scroll', debouncedUpdate);
       this.window.removeEventListener('resize', debouncedUpdate);
     };
@@ -114,13 +114,13 @@ class VirtualThreadList extends EventEmitter {
   yOffsetOf(id) {
     const self = this;
     const allThreads = this._rootThread.children;
-    const matchIndex = allThreads.findIndex(function (thread) {
+    const matchIndex = allThreads.findIndex(function(thread) {
       return thread.id === id;
     });
     if (matchIndex === -1) {
       return 0;
     }
-    return allThreads.slice(0, matchIndex).reduce(function (offset, thread) {
+    return allThreads.slice(0, matchIndex).reduce(function(offset, thread) {
       return offset + self._height(thread.id);
     }, 0);
   }
@@ -166,17 +166,20 @@ class VirtualThreadList extends EventEmitter {
 
       let added = false;
 
-      if (usedHeight + threadHeight < this.scrollRoot.scrollTop - MARGIN_ABOVE) {
+      if (
+        usedHeight + threadHeight <
+        this.scrollRoot.scrollTop - MARGIN_ABOVE
+      ) {
         // Thread is above viewport
         offscreenUpperHeight += threadHeight;
-      } else if (usedHeight <
-        this.scrollRoot.scrollTop + visibleHeight + MARGIN_BELOW) {
-
+      } else if (
+        usedHeight <
+        this.scrollRoot.scrollTop + visibleHeight + MARGIN_BELOW
+      ) {
         // Thread is either in or close to the viewport
         visibleThreads.push(thread);
         added = true;
       } else {
-
         // Thread is below viewport
         offscreenLowerHeight += threadHeight;
       }
@@ -185,9 +188,11 @@ class VirtualThreadList extends EventEmitter {
       // because it is already outside of the viewport should be checked
       // to see if it needs to be added as an invisible render. So it will
       // be available to go through rendering but not visible to the user
-      if(!added &&
-          this._options.invisibleThreadFilter &&
-          this._options.invisibleThreadFilter(thread)){
+      if (
+        !added &&
+        this._options.invisibleThreadFilter &&
+        this._options.invisibleThreadFilter(thread)
+      ) {
         invisibleThreads.push(thread);
       }
 

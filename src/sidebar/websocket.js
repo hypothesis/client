@@ -55,25 +55,27 @@ class Socket extends EventEmitter {
         randomize: true,
       });
 
-      operation.attempt(function () {
+      operation.attempt(function() {
         socket = new WebSocket(url);
-        socket.onopen = function (event) {
+        socket.onopen = function(event) {
           onOpen();
           self.emit('open', event);
         };
-        socket.onclose = function (event) {
+        socket.onclose = function(event) {
           if (event.code === CLOSE_NORMAL) {
             self.emit('close', event);
             return;
           }
-          const err = new Error('WebSocket closed abnormally, code: ' + event.code);
+          const err = new Error(
+            'WebSocket closed abnormally, code: ' + event.code
+          );
           console.warn(err);
           onAbnormalClose(err);
         };
-        socket.onerror = function (event) {
+        socket.onerror = function(event) {
           self.emit('error', event);
         };
-        socket.onmessage = function (event) {
+        socket.onmessage = function(event) {
           self.emit('message', event);
         };
       });
@@ -92,21 +94,23 @@ class Socket extends EventEmitter {
       // If we're already in a reconnection loop, trigger a retry...
       if (operation) {
         if (!operation.retry(error)) {
-          console.error('reached max retries attempting to reconnect websocket');
+          console.error(
+            'reached max retries attempting to reconnect websocket'
+          );
         }
         return;
       }
       // ...otherwise reconnect the websocket after a short delay.
       let delay = RECONNECT_MIN_DELAY;
       delay += Math.floor(Math.random() * delay);
-      operation = setTimeout(function () {
+      operation = setTimeout(function() {
         operation = null;
         connect();
       }, delay);
     }
 
     /** Close the underlying WebSocket connection */
-    this.close = function () {
+    this.close = function() {
       socket.close();
     };
 
@@ -114,7 +118,7 @@ class Socket extends EventEmitter {
      * Send a JSON object via the WebSocket connection, or queue it
      * for later delivery if not currently connected.
      */
-    this.send = function (message) {
+    this.send = function(message) {
       messageQueue.push(message);
       if (this.isConnected()) {
         sendMessages();
@@ -122,7 +126,7 @@ class Socket extends EventEmitter {
     };
 
     /** Returns true if the WebSocket is currently connected. */
-    this.isConnected = function () {
+    this.isConnected = function() {
       return socket.readyState === WebSocket.OPEN;
     };
 

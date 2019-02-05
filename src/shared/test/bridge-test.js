@@ -12,7 +12,8 @@ describe('shared.bridge', function() {
   beforeEach(() => {
     bridge = new Bridge();
 
-    createChannel = () => bridge.createChannel(fakeWindow, 'http://example.com', 'TOKEN');
+    createChannel = () =>
+      bridge.createChannel(fakeWindow, 'http://example.com', 'TOKEN');
 
     fakeWindow = {
       postMessage: sandbox.stub(),
@@ -34,7 +35,11 @@ describe('shared.bridge', function() {
 
     it('adds the channel to the .links property', function() {
       const channel = createChannel();
-      assert.isTrue(bridge.links.some(link => (link.channel === channel) && (link.window === fakeWindow)));
+      assert.isTrue(
+        bridge.links.some(
+          link => link.channel === channel && link.window === fakeWindow
+        )
+      );
     });
 
     it('registers any existing listeners on the channel', function() {
@@ -71,7 +76,11 @@ describe('shared.bridge', function() {
 
     it('calls a callback when all channels return successfully', function(done) {
       const channel1 = createChannel();
-      const channel2 = bridge.createChannel(fakeWindow, 'http://example.com', 'NEKOT');
+      const channel2 = bridge.createChannel(
+        fakeWindow,
+        'http://example.com',
+        'NEKOT'
+      );
       sandbox.stub(channel1, 'call').yields(null, 'result1');
       sandbox.stub(channel2, 'call').yields(null, 'result2');
 
@@ -87,7 +96,11 @@ describe('shared.bridge', function() {
     it('calls a callback with an error when a channels fails', function(done) {
       const error = new Error('Uh oh');
       const channel1 = createChannel();
-      const channel2 = bridge.createChannel(fakeWindow, 'http://example.com', 'NEKOT');
+      const channel2 = bridge.createChannel(
+        fakeWindow,
+        'http://example.com',
+        'NEKOT'
+      );
       sandbox.stub(channel1, 'call').throws(error);
       sandbox.stub(channel2, 'call').yields(null, 'result2');
 
@@ -161,8 +174,7 @@ describe('shared.bridge', function() {
       bridge.on('message1', sandbox.spy());
       bridge.off('message1');
       assert.isUndefined(bridge.channelListeners.message1);
-    })
-  );
+    }));
 
   describe('#onConnect', function() {
     it('adds a callback that is called when a channel is connected', function(done) {
@@ -196,7 +208,9 @@ describe('shared.bridge', function() {
       const callback = (c, s) => {
         assert.strictEqual(c, channel);
         assert.strictEqual(s, fakeWindow);
-        if (++callbackCount === 2) { done(); }
+        if (++callbackCount === 2) {
+          done();
+        }
       };
 
       const data = {
@@ -220,8 +234,16 @@ describe('shared.bridge', function() {
 
   describe('#destroy', () =>
     it('destroys all opened channels', function() {
-      const channel1 = bridge.createChannel(fakeWindow, 'http://example.com', 'foo');
-      const channel2 = bridge.createChannel(fakeWindow, 'http://example.com', 'bar');
+      const channel1 = bridge.createChannel(
+        fakeWindow,
+        'http://example.com',
+        'foo'
+      );
+      const channel2 = bridge.createChannel(
+        fakeWindow,
+        'http://example.com',
+        'bar'
+      );
       sinon.spy(channel1, 'destroy');
       sinon.spy(channel2, 'destroy');
 
@@ -229,6 +251,5 @@ describe('shared.bridge', function() {
 
       assert.called(channel1.destroy);
       assert.called(channel2.destroy);
-    })
-  );
+    }));
 });
