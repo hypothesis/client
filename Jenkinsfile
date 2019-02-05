@@ -29,38 +29,33 @@ node {
         npmTag = "prerelease"
     }
 
-    lastCommitAuthor = sh (
-      script: 'git show HEAD --no-patch --format="%an"',
-      returnStdout: true
-    ).trim()
-
     lastCommitHash = sh (
       script: 'git show HEAD --no-patch --format="%h"',
       returnStdout: true
     ).trim()
-
-    if (lastCommitAuthor == "jenkins-hypothesis") {
-        echo "Skipping build of automated commit created by Jenkins"
-        return
-    }
 
     pkgName = sh (
       script: 'cat package.json | jq -r .name',
       returnStdout: true
     ).trim()
 
+    // Update local information about tags to match the remote,
+    // including removing any local tags that no longer exist.
+    //
+    // The `--prune-tags` option is not supported in Git 2.11 so we
+    // use the workaround from https://github.com/git/git/commit/97716d217c1ea00adfc64e4f6bb85c1236d661ff
+    sh "git fetch --quiet --prune origin 'refs/tags/*:refs/tags/*' "
+
+    // Determine version number for next release.
     pkgVersion = sh (
-      script: 'cat package.json | jq -r .version',
+      script: 'git tag --list | sort --version-sort --reverse | head -n1 | tail -c +2',
       returnStdout: true
     ).trim()
-
-    stage('Build') {
-        nodeEnv.inside("-e HOME=${workspace}") {
-            sh "echo Building Hypothesis client"
-            sh 'make clean'
-            sh 'make'
-        }
+    newPkgVersion = bumpMinorVersion(pkgVersion)
+    if (versionSuffix != "") {
+        newPkgVersion = newPkgVersion + "-" + versionSuffix
     }
+    echo "Building and testing ${newPkgVersion}"
 
     stage('Test') {
         nodeEnv.inside("-e HOME=${workspace}") {
@@ -108,20 +103,12 @@ node {
                 """
             }
         }
-
-        // Revert back to the pre-QA commit.
-        sh "git checkout ${lastCommitHash}"
     }
 
     milestone()
     stage('Publish') {
         input(message: "Publish new client release?")
         milestone()
-
-        newPkgVersion = bumpMinorVersion(pkgVersion)
-        if (versionSuffix != "") {
-            newPkgVersion = newPkgVersion + "-" + versionSuffix
-        }
 
         echo "Publishing ${pkgName} v${newPkgVersion} from ${releaseFromBranch} branch."
 
@@ -134,10 +121,8 @@ node {
                 [$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 's3-cdn']
                 ]) {
 
-                // Configure commit author for version bump commit and auth credentials
-                // for pushing tag to GitHub.
-                //
-                // See https://git-scm.com/docs/git-credential-store
+                // Configure author for tag and auth credentials for pushing tag to GitHub.
+                // See https://git-scm.com/docs/git-credential-store.
                 sh """
                 git config --replace-all user.email ${env.GITHUB_USERNAME}@hypothes.is
                 git config --replace-all user.name ${env.GITHUB_USERNAME}
@@ -145,22 +130,21 @@ node {
                 echo https://${env.GITHUB_USERNAME}:${env.GITHUB_TOKEN}@github.com >> \$HOME/.git-credentials
                 """
 
-                // Update local information about tags to match the remote,
-                // including removing any local tags that no longer exist.
-                //
-                // The `--prune-tags` option is not supported in Git 2.11 so we
-                // use the workaround from https://github.com/git/git/commit/97716d217c1ea00adfc64e4f6bb85c1236d661ff
-                sh "git fetch --quiet --prune origin 'refs/tags/*:refs/tags/*' "
+                // Create and push a git tag.
+                sh "git tag v${newPkgVersion}"
+                sh "git push https://github.com/hypothesis/client.git v${newPkgVersion}"
+                sh "sleep 2" // Give GitHub a moment to realize the tag exists.
 
-                // Bump the package version and create the tag and GitHub release.
-                sh "yarn version --new-version ${newPkgVersion}"
+                // Bump the package version and create the GitHub release.
+                sh "yarn version --no-git-tag-version --new-version ${newPkgVersion}"
+                sh "scripts/create-github-release.js"
 
                 // Publish the updated package to the npm registry.
                 // Use `npm` rather than `yarn` for publishing.
                 // See https://github.com/yarnpkg/yarn/pull/3391.
                 sh "echo '//registry.npmjs.org/:_authToken=${env.NPM_TOKEN}' >> \$HOME/.npmrc"
                 sh "npm publish --tag ${npmTag}"
-                sh "scripts/wait-for-npm-release.sh"
+                sh "scripts/wait-for-npm-release.sh ${npmTag}"
 
                 // Deploy the client to cdn.hypothes.is, where the embedded
                 // client is served from by https://hypothes.is/embed.js.
@@ -178,7 +162,7 @@ node {
 String bumpMinorVersion(String version) {
     def parts = version.tokenize('.')
     if (parts.size() != 3) {
-        throw new IllegalArgumentException("${version} is not a valid MAJOR.MINOR.PATCH version")
+        error "${version} is not a valid MAJOR.MINOR.PATCH version"
     }
     def newMinorVersion = parts[1].toInteger() + 1
 

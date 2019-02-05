@@ -1,6 +1,6 @@
 {
   "name": "hypothesis",
-  "version": "1.123.0",
+  "version": "1.0.0-dummy-version",
   "description": "Annotate with anyone, anywhere.",
   "license": "BSD-2-Clause",
   "homepage": "https://hypothes.is",
@@ -148,7 +148,6 @@
     "test": "gulp test",
     "report-coverage": "codecov -f coverage/coverage-final.json",
     "version": "make clean build/manifest.json",
-    "postversion": "./scripts/postversion.sh",
     "prepublish": "yarn run build"
   }
 }
