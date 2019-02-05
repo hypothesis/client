@@ -4,22 +4,23 @@ const angular = require('angular');
 
 const util = require('../../directive/test/util');
 
-describe('searchInput', function () {
+describe('searchInput', function() {
   let fakeHttp;
 
-  before(function () {
-    angular.module('app', [])
+  before(function() {
+    angular
+      .module('app', [])
       .component('searchInput', require('../search-input'));
   });
 
-  beforeEach(function () {
-    fakeHttp = {pendingRequests: []};
+  beforeEach(function() {
+    fakeHttp = { pendingRequests: [] };
     angular.mock.module('app', {
       $http: fakeHttp,
     });
   });
 
-  it('displays the search query', function () {
+  it('displays the search query', function() {
     const el = util.createDirective(document, 'searchInput', {
       query: 'foo',
     });
@@ -27,7 +28,7 @@ describe('searchInput', function () {
     assert.equal(input.value, 'foo');
   });
 
-  it('invokes #onSearch() when the query changes', function () {
+  it('invokes #onSearch() when the query changes', function() {
     const onSearch = sinon.stub();
     const el = util.createDirective(document, 'searchInput', {
       query: 'foo',
@@ -43,14 +44,14 @@ describe('searchInput', function () {
     assert.calledWith(onSearch, 'new-query');
   });
 
-  describe('loading indicator', function () {
-    it('is hidden when there are no network requests in flight', function () {
+  describe('loading indicator', function() {
+    it('is hidden when there are no network requests in flight', function() {
       const el = util.createDirective(document, 'search-input', {});
       const spinner = el[0].querySelector('spinner');
       assert.equal(util.isHidden(spinner), true);
     });
 
-    it('is visible when there are network requests in flight', function () {
+    it('is visible when there are network requests in flight', function() {
       const el = util.createDirective(document, 'search-input', {});
       const spinner = el[0].querySelector('spinner');
       fakeHttp.pendingRequests.push([{}]);

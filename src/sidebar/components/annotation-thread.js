@@ -2,28 +2,34 @@
 
 function hiddenCount(thread) {
   const isHidden = thread.annotation && !thread.visible;
-  return thread.children.reduce(function (count, reply) {
-    return count + hiddenCount(reply);
-  }, isHidden ? 1 : 0);
+  return thread.children.reduce(
+    function(count, reply) {
+      return count + hiddenCount(reply);
+    },
+    isHidden ? 1 : 0
+  );
 }
 
 function visibleCount(thread) {
   const isVisible = thread.annotation && thread.visible;
-  return thread.children.reduce(function (count, reply) {
-    return count + visibleCount(reply);
-  }, isVisible ? 1 : 0);
+  return thread.children.reduce(
+    function(count, reply) {
+      return count + visibleCount(reply);
+    },
+    isVisible ? 1 : 0
+  );
 }
 
 function showAllChildren(thread, showFn) {
-  thread.children.forEach(function (child) {
-    showFn({thread: child});
+  thread.children.forEach(function(child) {
+    showFn({ thread: child });
     showAllChildren(child, showFn);
   });
 }
 
 function showAllParents(thread, showFn) {
   while (thread.parent && thread.parent.annotation) {
-    showFn({thread: thread.parent});
+    showFn({ thread: thread.parent });
     thread = thread.parent;
   }
 }
@@ -34,14 +40,14 @@ function AnnotationThreadController() {
   // excluding any replies.
   this.annotationHovered = false;
 
-  this.toggleCollapsed = function () {
+  this.toggleCollapsed = function() {
     this.onChangeCollapsed({
       id: this.thread.id,
       collapsed: !this.thread.collapsed,
     });
   };
 
-  this.threadClasses = function () {
+  this.threadClasses = function() {
     return {
       'annotation-thread': true,
       'annotation-thread--reply': this.thread.depth > 0,
@@ -49,7 +55,7 @@ function AnnotationThreadController() {
     };
   };
 
-  this.threadToggleClasses = function () {
+  this.threadToggleClasses = function() {
     return {
       'annotation-thread__collapse-toggle': true,
       'is-open': !this.thread.collapsed,
@@ -57,7 +63,7 @@ function AnnotationThreadController() {
     };
   };
 
-  this.annotationClasses = function () {
+  this.annotationClasses = function() {
     return {
       annotation: true,
       'annotation--reply': this.thread.depth > 0,
@@ -70,13 +76,13 @@ function AnnotationThreadController() {
   /**
    * Show this thread and any of its children
    */
-  this.showThreadAndReplies = function () {
+  this.showThreadAndReplies = function() {
     showAllParents(this.thread, this.onForceVisible);
-    this.onForceVisible({thread: this.thread});
+    this.onForceVisible({ thread: this.thread });
     showAllChildren(this.thread, this.onForceVisible);
   };
 
-  this.isTopLevelThread = function () {
+  this.isTopLevelThread = function() {
     return !this.thread.parent;
   };
 
@@ -85,11 +91,11 @@ function AnnotationThreadController() {
    * thread which have been hidden because they do not match the current
    * search filter.
    */
-  this.hiddenCount = function () {
+  this.hiddenCount = function() {
     return hiddenCount(this.thread);
   };
 
-  this.shouldShowReply = function (child) {
+  this.shouldShowReply = function(child) {
     return visibleCount(child) > 0;
   };
 }

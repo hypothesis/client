@@ -19,7 +19,7 @@ const util = require('../util');
 function excludeAnnotations(current, annotations) {
   const ids = {};
   const tags = {};
-  annotations.forEach(function (annot) {
+  annotations.forEach(function(annot) {
     if (annot.id) {
       ids[annot.id] = true;
     }
@@ -27,21 +27,21 @@ function excludeAnnotations(current, annotations) {
       tags[annot.$tag] = true;
     }
   });
-  return current.filter(function (annot) {
-    const shouldRemove = (annot.id && (annot.id in ids)) ||
-                       (annot.$tag && (annot.$tag in tags));
+  return current.filter(function(annot) {
+    const shouldRemove =
+      (annot.id && annot.id in ids) || (annot.$tag && annot.$tag in tags);
     return !shouldRemove;
   });
 }
 
 function findByID(annotations, id) {
-  return annotations.find(function (annot) {
+  return annotations.find(function(annot) {
     return annot.id === id;
   });
 }
 
 function findByTag(annotations, tag) {
-  return annotations.find(function (annot) {
+  return annotations.find(function(annot) {
     return annot.$tag === tag;
   });
 }
@@ -81,7 +81,7 @@ function init() {
 }
 
 const update = {
-  ADD_ANNOTATIONS: function (state, action) {
+  ADD_ANNOTATIONS: function(state, action) {
     const updatedIDs = {};
     const updatedTags = {};
 
@@ -90,7 +90,7 @@ const update = {
     const updated = [];
     let nextTag = state.nextTag;
 
-    action.annotations.forEach(function (annot) {
+    action.annotations.forEach(function(annot) {
       let existing;
       if (annot.id) {
         existing = findByID(state.annotations, annot.id);
@@ -115,7 +115,7 @@ const update = {
       }
     });
 
-    state.annotations.forEach(function (annot) {
+    state.annotations.forEach(function(annot) {
       if (!updatedIDs[annot.id] && !updatedTags[annot.$tag]) {
         unchanged.push(annot);
       }
@@ -127,28 +127,30 @@ const update = {
     };
   },
 
-  REMOVE_ANNOTATIONS: function (state, action) {
+  REMOVE_ANNOTATIONS: function(state, action) {
     const annots = excludeAnnotations(state.annotations, action.annotations);
     let selectedTab = state.selectedTab;
-    if (selectedTab === uiConstants.TAB_ORPHANS &&
-        arrayUtil.countIf(annots, metadata.isOrphan) === 0) {
+    if (
+      selectedTab === uiConstants.TAB_ORPHANS &&
+      arrayUtil.countIf(annots, metadata.isOrphan) === 0
+    ) {
       selectedTab = uiConstants.TAB_ANNOTATIONS;
     }
 
     const tabUpdateFn = selection.update.SELECT_TAB;
     return Object.assign(
-      {annotations: annots},
+      { annotations: annots },
       tabUpdateFn(state, selection.actions.selectTab(selectedTab))
     );
   },
 
-  CLEAR_ANNOTATIONS: function () {
-    return {annotations: []};
+  CLEAR_ANNOTATIONS: function() {
+    return { annotations: [] };
   },
 
-  UPDATE_FLAG_STATUS: function (state, action) {
-    const annotations = state.annotations.map(function (annot) {
-      const match = (annot.id && annot.id === action.id);
+  UPDATE_FLAG_STATUS: function(state, action) {
+    const annotations = state.annotations.map(function(annot) {
+      const match = annot.id && annot.id === action.id;
       if (match) {
         if (annot.flagged === action.isFlagged) {
           return annot;
@@ -168,11 +170,11 @@ const update = {
         return annot;
       }
     });
-    return {annotations: annotations};
+    return { annotations: annotations };
   },
 
-  UPDATE_ANCHOR_STATUS: function (state, action) {
-    const annotations = state.annotations.map(function (annot) {
+  UPDATE_ANCHOR_STATUS: function(state, action) {
+    const annotations = state.annotations.map(function(annot) {
       if (!action.statusUpdates.hasOwnProperty(annot.$tag)) {
         return annot;
       }
@@ -184,27 +186,27 @@ const update = {
         return Object.assign({}, annot, { $orphan: state === 'orphan' });
       }
     });
-    return {annotations: annotations};
+    return { annotations: annotations };
   },
 
-  HIDE_ANNOTATION: function (state, action) {
-    const anns = state.annotations.map(function (ann) {
+  HIDE_ANNOTATION: function(state, action) {
+    const anns = state.annotations.map(function(ann) {
       if (ann.id !== action.id) {
         return ann;
       }
       return Object.assign({}, ann, { hidden: true });
     });
-    return {annotations: anns};
+    return { annotations: anns };
   },
 
-  UNHIDE_ANNOTATION: function (state, action) {
-    const anns = state.annotations.map(function (ann) {
+  UNHIDE_ANNOTATION: function(state, action) {
+    const anns = state.annotations.map(function(ann) {
       if (ann.id !== action.id) {
         return ann;
       }
       return Object.assign({}, ann, { hidden: false });
     });
-    return {annotations: anns};
+    return { annotations: anns };
   },
 };
 
@@ -232,18 +234,23 @@ function addAnnotations(annotations, now) {
 
   // Add dates to new annotations. These are ignored by the server but used
   // when sorting unsaved annotation cards.
-  annotations = annotations.map(function (annot) {
-    if (annot.id) { return annot; }
-    return Object.assign({
-      // Date.prototype.toISOString returns a 0-offset (UTC) ISO8601
-      // datetime.
-      created: now.toISOString(),
-      updated: now.toISOString(),
-    }, annot);
+  annotations = annotations.map(function(annot) {
+    if (annot.id) {
+      return annot;
+    }
+    return Object.assign(
+      {
+        // Date.prototype.toISOString returns a 0-offset (UTC) ISO8601
+        // datetime.
+        created: now.toISOString(),
+        updated: now.toISOString(),
+      },
+      annot
+    );
   });
 
-  return function (dispatch, getState) {
-    const added = annotations.filter(function (annot) {
+  return function(dispatch, getState) {
+    const added = annotations.filter(function(annot) {
       return !findByID(getState().annotations, annot.id);
     });
 
@@ -261,20 +268,25 @@ function addAnnotations(annotations, now) {
     // successfully anchor then the status will be updated.
     const ANCHORING_TIMEOUT = 500;
 
-    const anchoringIDs = added.filter(metadata.isWaitingToAnchor)
+    const anchoringIDs = added
+      .filter(metadata.isWaitingToAnchor)
       .map(ann => ann.id);
     if (anchoringIDs.length > 0) {
       setTimeout(() => {
         // Find annotations which haven't yet been anchored in the document.
         const anns = getState().annotations;
-        const annsStillAnchoring = anchoringIDs.map(id => findByID(anns, id))
+        const annsStillAnchoring = anchoringIDs
+          .map(id => findByID(anns, id))
           .filter(ann => ann && metadata.isWaitingToAnchor(ann));
 
         // Mark anchoring as timed-out for these annotations.
-        const anchorStatusUpdates = annsStillAnchoring.reduce((updates, ann) => {
-          updates[ann.$tag] = 'timeout';
-          return updates;
-        }, {});
+        const anchorStatusUpdates = annsStillAnchoring.reduce(
+          (updates, ann) => {
+            updates[ann.$tag] = 'timeout';
+            return updates;
+          },
+          {}
+        );
         dispatch(updateAnchorStatus(anchorStatusUpdates));
       }, ANCHORING_TIMEOUT);
     }
@@ -291,7 +303,7 @@ function removeAnnotations(annotations) {
 
 /** Set the currently displayed annotations to the empty set. */
 function clearAnnotations() {
-  return {type: actions.CLEAR_ANNOTATIONS};
+  return { type: actions.CLEAR_ANNOTATIONS };
 }
 
 /**
@@ -338,14 +350,14 @@ function unhideAnnotation(id) {
  * @param {state} - The global app state
  */
 function savedAnnotations(state) {
-  return state.annotations.filter(function (ann) {
+  return state.annotations.filter(function(ann) {
     return !metadata.isNew(ann);
   });
 }
 
 /** Return true if the annotation with a given ID is currently loaded. */
 function annotationExists(state, id) {
-  return state.annotations.some(function (annot) {
+  return state.annotations.some(function(annot) {
     return annot.id === id;
   });
 }
@@ -360,7 +372,7 @@ function annotationExists(state, id) {
  */
 function findIDsForTags(state, tags) {
   const ids = [];
-  tags.forEach(function (tag) {
+  tags.forEach(function(tag) {
     const annot = findByTag(state.annotations, tag);
     if (annot && annot.id) {
       ids.push(annot.id);

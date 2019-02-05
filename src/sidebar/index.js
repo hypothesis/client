@@ -51,13 +51,15 @@ if (appConfig.googleAnalytics) {
 // user's profile and list of groups.
 const resolve = {
   // @ngInject
-  state: function (groups, session) {
+  state: function(groups, session) {
     return Promise.all([groups.load(), session.load()]);
   },
 };
 
-const isSidebar = !(window.location.pathname.startsWith('/stream') ||
-                  window.location.pathname.startsWith('/a/'));
+const isSidebar = !(
+  window.location.pathname.startsWith('/stream') ||
+  window.location.pathname.startsWith('/a/')
+);
 
 // @ngInject
 function configureLocation($locationProvider) {
@@ -69,20 +71,20 @@ function configureLocation($locationProvider) {
 function configureRoutes($routeProvider) {
   // The `vm.{auth,search}` properties used in these templates come from the
   // `<hypothesis-app>` component which hosts the router's container element.
-  $routeProvider.when('/a/:id',
-    {
-      template: '<annotation-viewer-content search="vm.search"></annotation-viewer-content>',
-      reloadOnSearch: false,
-      resolve: resolve,
-    });
-  $routeProvider.when('/stream',
-    {
-      template: '<stream-content search="vm.search"></stream-content>',
-      reloadOnSearch: false,
-      resolve: resolve,
-    });
+  $routeProvider.when('/a/:id', {
+    template:
+      '<annotation-viewer-content search="vm.search"></annotation-viewer-content>',
+    reloadOnSearch: false,
+    resolve: resolve,
+  });
+  $routeProvider.when('/stream', {
+    template: '<stream-content search="vm.search"></stream-content>',
+    reloadOnSearch: false,
+    resolve: resolve,
+  });
   $routeProvider.otherwise({
-    template: '<sidebar-content search="vm.search" auth="vm.auth" on-login="vm.login()"></sidebar-content>',
+    template:
+      '<sidebar-content search="vm.search" auth="vm.auth" on-login="vm.login()"></sidebar-content>',
     reloadOnSearch: false,
     resolve: resolve,
   });
@@ -111,37 +113,50 @@ function setupI18n($window, $rootScope, i18nService) {
 }
 
 function startAngularApp(config) {
-  angular.module('h', [
-    // Angular addons which export the Angular module name
-    // via module.exports
-    require('angular-route'),
-    require('angular-sanitize'),
-    require('angular-toastr'),
+  angular
+    .module('h', [
+      // Angular addons which export the Angular module name
+      // via module.exports
+      require('angular-route'),
+      require('angular-sanitize'),
+      require('angular-toastr'),
 
-    // Angular addons which do not export the Angular module
-    // name via module.exports
-    ['angulartics', require('angulartics')][0],
-    ['angulartics.google.analytics', require('angulartics/src/angulartics-ga')][0],
-    ['ngTagsInput', require('ng-tags-input')][0],
-    ['ui.bootstrap', require('./vendor/ui-bootstrap-custom-tpls-0.13.4')][0],
+      // Angular addons which do not export the Angular module
+      // name via module.exports
+      ['angulartics', require('angulartics')][0],
+      [
+        'angulartics.google.analytics',
+        require('angulartics/src/angulartics-ga'),
+      ][0],
+      ['ngTagsInput', require('ng-tags-input')][0],
+      ['ui.bootstrap', require('./vendor/ui-bootstrap-custom-tpls-0.13.4')][0],
 
-    // sanitize html
-    'ngSanitize',
+      // sanitize html
+      'ngSanitize',
 
-    // Local addons
-    'ngRaven',
-  ])
+      // Local addons
+      'ngRaven',
+    ])
 
-  // The root component for the application
+    // The root component for the application
     .component('hypothesisApp', require('./components/hypothesis-app'))
 
-  // UI components
+    // UI components
     .component('annotation', require('./components/annotation'))
     .component('annotationHeader', require('./components/annotation-header'))
-    .component('annotationActionButton', require('./components/annotation-action-button'))
-    .component('annotationShareDialog', require('./components/annotation-share-dialog'))
+    .component(
+      'annotationActionButton',
+      require('./components/annotation-action-button')
+    )
+    .component(
+      'annotationShareDialog',
+      require('./components/annotation-share-dialog')
+    )
     .component('annotationThread', require('./components/annotation-thread'))
-    .component('annotationViewerContent', require('./components/annotation-viewer-content'))
+    .component(
+      'annotationViewerContent',
+      require('./components/annotation-viewer-content')
+    )
     .component('dropdownMenuBtn', require('./components/dropdown-menu-btn'))
     .component('excerpt', require('./components/excerpt'))
     .component('groupList', require('./components/group-list'))
@@ -152,7 +167,10 @@ function startAngularApp(config) {
     .component('markdown', require('./components/markdown'))
     .component('moderationBanner', require('./components/moderation-banner'))
     .component('newNoteBtn', require('./components/new-note-btn'))
-    .component('publishAnnotationBtn', require('./components/publish-annotation-btn'))
+    .component(
+      'publishAnnotationBtn',
+      require('./components/publish-annotation-btn')
+    )
     .component('searchInput', require('./components/search-input'))
     .component('searchStatusBar', require('./components/search-status-bar'))
     .component('selectionTabs', require('./components/selection-tabs'))
@@ -198,10 +216,10 @@ function startAngularApp(config) {
     .service('unicode', require('./services/unicode'))
     .service('viewFilter', require('./services/view-filter'))
 
-  // Redux store
+    // Redux store
     .service('store', require('./store'))
 
-  // Utilities
+    // Utilities
     .value('Discovery', require('../shared/discovery'))
     .value('ExcerptOverflowMonitor', require('./util/excerpt-overflow-monitor'))
     .value('OAuthClient', require('./util/oauth-client'))
@@ -238,14 +256,16 @@ function startAngularApp(config) {
   }
 
   const appEl = document.querySelector('hypothesis-app');
-  angular.bootstrap(appEl, ['h'], {strictDi: true});
+  angular.bootstrap(appEl, ['h'], { strictDi: true });
 }
 
-fetchConfig(appConfig).then(config => {
-  startAngularApp(config);
-}).catch(err => {
-  // Report error. This will be the only notice that the user gets because the
-  // sidebar does not currently appear at all if the Angular app fails to
-  // start.
-  console.error('Failed to start Hypothesis client: ', err);
-});
+fetchConfig(appConfig)
+  .then(config => {
+    startAngularApp(config);
+  })
+  .catch(err => {
+    // Report error. This will be the only notice that the user gets because the
+    // sidebar does not currently appear at all if the Angular app fails to
+    // start.
+    console.error('Failed to start Hypothesis client: ', err);
+  });

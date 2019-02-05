@@ -86,19 +86,21 @@ class PDFMetadata {
     return this._loaded.then(app => {
       let title = document.title;
 
-      if (app.metadata && app.metadata.has('dc:title') && app.metadata.get('dc:title') !== 'Untitled') {
+      if (
+        app.metadata &&
+        app.metadata.has('dc:title') &&
+        app.metadata.get('dc:title') !== 'Untitled'
+      ) {
         title = app.metadata.get('dc:title');
       } else if (app.documentInfo && app.documentInfo.Title) {
         title = app.documentInfo.Title;
       }
 
-      const link = [
-        {href: fingerprintToURN(app.pdfDocument.fingerprint)},
-      ];
+      const link = [{ href: fingerprintToURN(app.pdfDocument.fingerprint) }];
 
       const url = getPDFURL(app);
       if (url) {
-        link.push({href: url});
+        link.push({ href: url });
       }
 
       return {

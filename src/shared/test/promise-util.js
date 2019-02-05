@@ -12,14 +12,19 @@
  */
 function assertPromiseIsRejected(promise, expectedErr) {
   const rejectFlag = {};
-  return promise.catch(err => {
-    assert.equal(err.message, expectedErr);
-    return rejectFlag;
-  }).then(result => {
-    assert.equal(result, rejectFlag, 'expected promise to be rejected but it was fulfilled');
-  });
+  return promise
+    .catch(err => {
+      assert.equal(err.message, expectedErr);
+      return rejectFlag;
+    })
+    .then(result => {
+      assert.equal(
+        result,
+        rejectFlag,
+        'expected promise to be rejected but it was fulfilled'
+      );
+    });
 }
-
 
 /**
  * Takes a Promise<T> and returns a Promise<Result>
@@ -31,11 +36,13 @@ function assertPromiseIsRejected(promise, expectedErr) {
  * Consider using `assertPromiseIsRejected` instead.
  */
 function toResult(promise) {
-  return promise.then(function (result) {
-    return { result: result };
-  }).catch(function (err) {
-    return { error: err };
-  });
+  return promise
+    .then(function(result) {
+      return { result: result };
+    })
+    .catch(function(err) {
+      return { error: err };
+    });
 }
 
 module.exports = {

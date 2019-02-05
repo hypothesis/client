@@ -6,43 +6,49 @@ const annotationMetadata = require('../annotation-metadata');
 function ModerationBannerController(store, flash, api) {
   const self = this;
 
-  this.flagCount = function () {
+  this.flagCount = function() {
     return annotationMetadata.flagCount(self.annotation);
   };
 
-  this.isHidden = function () {
+  this.isHidden = function() {
     return self.annotation.hidden;
   };
 
-  this.isHiddenOrFlagged = function () {
+  this.isHiddenOrFlagged = function() {
     const flagCount = self.flagCount();
     return flagCount !== null && (flagCount > 0 || self.isHidden());
   };
 
-  this.isReply = function () {
+  this.isReply = function() {
     return annotationMetadata.isReply(self.annotation);
   };
 
   /**
    * Hide an annotation from non-moderator users.
    */
-  this.hideAnnotation = function () {
-    api.annotation.hide({id: self.annotation.id}).then(function () {
-      store.hideAnnotation(self.annotation.id);
-    }).catch(function () {
-      flash.error('Failed to hide annotation');
-    });
+  this.hideAnnotation = function() {
+    api.annotation
+      .hide({ id: self.annotation.id })
+      .then(function() {
+        store.hideAnnotation(self.annotation.id);
+      })
+      .catch(function() {
+        flash.error('Failed to hide annotation');
+      });
   };
 
   /**
    * Un-hide an annotation from non-moderator users.
    */
-  this.unhideAnnotation = function () {
-    api.annotation.unhide({id: self.annotation.id}).then(function () {
-      store.unhideAnnotation(self.annotation.id);
-    }).catch(function () {
-      flash.error('Failed to unhide annotation');
-    });
+  this.unhideAnnotation = function() {
+    api.annotation
+      .unhide({ id: self.annotation.id })
+      .then(function() {
+        store.unhideAnnotation(self.annotation.id);
+      })
+      .catch(function() {
+        flash.error('Failed to unhide annotation');
+      });
   };
 }
 

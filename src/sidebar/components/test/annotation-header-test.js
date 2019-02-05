@@ -11,7 +11,7 @@ const fakeDocumentMeta = {
   titleText: 'Dummy title',
 };
 
-describe('sidebar.components.annotation-header', function () {
+describe('sidebar.components.annotation-header', function() {
   let $componentController;
   let fakeFeatures;
   let fakeGroups;
@@ -26,10 +26,11 @@ describe('sidebar.components.annotation-header', function () {
     };
   });
 
-  beforeEach('Import and register the annotationHeader component', function () {
+  beforeEach('Import and register the annotationHeader component', function() {
     const annotationHeader = proxyquire('../annotation-header', {
       '../annotation-metadata': {
-        domainAndTitle: function (ann) { // eslint-disable-line no-unused-vars
+        domainAndTitle: function(ann) {
+          // eslint-disable-line no-unused-vars
           return fakeDocumentMeta;
         },
       },
@@ -37,11 +38,10 @@ describe('sidebar.components.annotation-header', function () {
       '@noCallThru': true,
     });
 
-    angular.module('app', [])
-      .component('annotationHeader', annotationHeader);
+    angular.module('app', []).component('annotationHeader', annotationHeader);
   });
 
-  beforeEach('Initialize and register fake AngularJS dependencies', function () {
+  beforeEach('Initialize and register fake AngularJS dependencies', function() {
     fakeFeatures = {
       flagEnabled: sinon.stub().returns(false),
     };
@@ -53,38 +53,50 @@ describe('sidebar.components.annotation-header', function () {
       serviceUrl: fakeServiceUrl,
     });
 
-    angular.mock.inject(function (_$componentController_) {
+    angular.mock.inject(function(_$componentController_) {
       $componentController = _$componentController_;
     });
   });
 
-  describe('sidebar.components.AnnotationHeaderController', function () {
-    describe('#htmlLink()', function () {
-      it('returns the HTML link when available', function () {
+  describe('sidebar.components.AnnotationHeaderController', function() {
+    describe('#htmlLink()', function() {
+      it('returns the HTML link when available', function() {
         const ann = fixtures.defaultAnnotation();
         ann.links = { html: 'https://annotation.service/123' };
-        const ctrl = $componentController('annotationHeader', {}, {
-          annotation: ann,
-        });
+        const ctrl = $componentController(
+          'annotationHeader',
+          {},
+          {
+            annotation: ann,
+          }
+        );
         assert.equal(ctrl.htmlLink(), ann.links.html);
       });
 
-      it('returns an empty string when no HTML link is available', function () {
+      it('returns an empty string when no HTML link is available', function() {
         const ann = fixtures.defaultAnnotation();
         ann.links = {};
-        const ctrl = $componentController('annotationHeader', {}, {
-          annotation: ann,
-        });
+        const ctrl = $componentController(
+          'annotationHeader',
+          {},
+          {
+            annotation: ann,
+          }
+        );
         assert.equal(ctrl.htmlLink(), '');
       });
     });
 
-    describe('#documentMeta()', function () {
-      it('returns the domain, title link and text for the annotation', function () {
+    describe('#documentMeta()', function() {
+      it('returns the domain, title link and text for the annotation', function() {
         const ann = fixtures.defaultAnnotation();
-        const ctrl = $componentController('annotationHeader', {}, {
-          annotation: ann,
-        });
+        const ctrl = $componentController(
+          'annotationHeader',
+          {},
+          {
+            annotation: ann,
+          }
+        );
         assert.deepEqual(ctrl.documentMeta(), fakeDocumentMeta);
       });
     });
@@ -92,7 +104,8 @@ describe('sidebar.components.annotation-header', function () {
     describe('#displayName', () => {
       [
         {
-          context: 'when the api_render_user_info feature flag is turned off in h',
+          context:
+            'when the api_render_user_info feature flag is turned off in h',
           it: 'returns the username',
           user_info: undefined,
           client_display_names: false,
@@ -100,8 +113,10 @@ describe('sidebar.components.annotation-header', function () {
           expectedResult: 'TEST_USERNAME',
         },
         {
-          context: 'when the api_render_user_info feature flag is turned off in h',
-          it: 'returns the username even if the client_display_names feature flag is on',
+          context:
+            'when the api_render_user_info feature flag is turned off in h',
+          it:
+            'returns the username even if the client_display_names feature flag is on',
           user_info: undefined,
           client_display_names: true,
           isThirdPartyUser: false,
@@ -124,8 +139,9 @@ describe('sidebar.components.annotation-header', function () {
           expectedResult: 'TEST_USERNAME',
         },
         {
-          context: 'when both feature flags api_render_user_info and ' +
-                   'client_display_names are on',
+          context:
+            'when both feature flags api_render_user_info and ' +
+            'client_display_names are on',
           it: 'returns the username, if the user has no display_name',
           user_info: { display_name: null },
           client_display_names: true,
@@ -133,8 +149,9 @@ describe('sidebar.components.annotation-header', function () {
           expectedResult: 'TEST_USERNAME',
         },
         {
-          context: 'when both feature flags api_render_user_info and ' +
-                   'client_display_names are on',
+          context:
+            'when both feature flags api_render_user_info and ' +
+            'client_display_names are on',
           it: 'returns the display_name, if the user has one',
           user_info: { display_name: 'Bill Jones' },
           client_display_names: true,
@@ -142,8 +159,9 @@ describe('sidebar.components.annotation-header', function () {
           expectedResult: 'Bill Jones',
         },
         {
-          context: 'when the client_display_names feature flag is off but ' +
-                   'the user is a third-party user',
+          context:
+            'when the client_display_names feature flag is off but ' +
+            'the user is a third-party user',
           it: 'returns display_name even though client_display_names is off',
           user_info: { display_name: 'Bill Jones' },
           client_display_names: false,
@@ -151,8 +169,9 @@ describe('sidebar.components.annotation-header', function () {
           expectedResult: 'Bill Jones',
         },
         {
-          context: 'when client_display_names is on and the user is a ' +
-                   'third-party user',
+          context:
+            'when client_display_names is on and the user is a ' +
+            'third-party user',
           it: 'returns the display_name',
           user_info: { display_name: 'Bill Jones' },
           client_display_names: true,
@@ -160,8 +179,9 @@ describe('sidebar.components.annotation-header', function () {
           expectedResult: 'Bill Jones',
         },
         {
-          context: 'when the user is a third-party user but the ' +
-                   'api_render_user_info feature flag is turned off in h',
+          context:
+            'when the user is a third-party user but the ' +
+            'api_render_user_info feature flag is turned off in h',
           it: 'returns the username',
           user_info: undefined,
           client_display_names: true,
@@ -169,20 +189,21 @@ describe('sidebar.components.annotation-header', function () {
           expectedResult: 'TEST_USERNAME',
         },
         {
-          context: "when the user is a third-party user but doesn't have a " +
-                   'display_name',
+          context:
+            "when the user is a third-party user but doesn't have a " +
+            'display_name',
           it: 'returns the username',
-          user_info: { display_name: null},
+          user_info: { display_name: null },
           client_display_names: true,
           isThirdPartyUser: true,
           expectedResult: 'TEST_USERNAME',
         },
-      ].forEach((test) => {
+      ].forEach(test => {
         context(test.context, () => {
           it(test.it, () => {
             // Make features.flagEnabled('client_display_names') return true
             // or false, depending on the test case.
-            fakeFeatures.flagEnabled = (flag) => {
+            fakeFeatures.flagEnabled = flag => {
               if (flag === 'client_display_names') {
                 return test.client_display_names;
               }
@@ -196,9 +217,13 @@ describe('sidebar.components.annotation-header', function () {
             const ann = fixtures.defaultAnnotation();
             ann.user_info = test.user_info;
 
-            const ctrl = $componentController('annotationHeader', {}, {
-              annotation: ann,
-            });
+            const ctrl = $componentController(
+              'annotationHeader',
+              {},
+              {
+                annotation: ann,
+              }
+            );
 
             assert.equal(ctrl.displayName(), test.expectedResult);
           });
@@ -213,10 +238,17 @@ describe('sidebar.components.annotation-header', function () {
 
         fakeSettings.usernameUrl = 'http://www.example.org/';
         ann = fixtures.defaultAnnotation();
-        ctrl = $componentController('annotationHeader', {}, {
-          annotation: ann,
-        });
-        assert.deepEqual(ctrl.thirdPartyUsernameLink(), 'http://www.example.org/TEST_USERNAME');
+        ctrl = $componentController(
+          'annotationHeader',
+          {},
+          {
+            annotation: ann,
+          }
+        );
+        assert.deepEqual(
+          ctrl.thirdPartyUsernameLink(),
+          'http://www.example.org/TEST_USERNAME'
+        );
       });
 
       it('returns null if no custom username link is set in the settings object', () => {
@@ -225,9 +257,13 @@ describe('sidebar.components.annotation-header', function () {
 
         fakeSettings.usernameUrl = null;
         ann = fixtures.defaultAnnotation();
-        ctrl = $componentController('annotationHeader', {}, {
-          annotation: ann,
-        });
+        ctrl = $componentController(
+          'annotationHeader',
+          {},
+          {
+            annotation: ann,
+          }
+        );
         assert.deepEqual(ctrl.thirdPartyUsernameLink(), null);
       });
     });

@@ -4,8 +4,7 @@ const settings = require('../settings');
 
 const sandbox = sinon.sandbox.create();
 
-describe('settings', function () {
-
+describe('settings', function() {
   afterEach('reset the sandbox', function() {
     sandbox.restore();
   });
@@ -24,7 +23,7 @@ describe('settings', function () {
 
     afterEach('remove js-hypothesis-config tags', function() {
       const elements = document.querySelectorAll('.js-settings-test');
-      for (let i=0; i < elements.length; i++) {
+      for (let i = 0; i < elements.length; i++) {
         elements[i].remove();
       }
     });
@@ -53,10 +52,7 @@ describe('settings', function () {
       });
 
       it('returns the array, parsed into an object', function() {
-        assert.deepEqual(
-          jsonConfigsFrom(document),
-          {0: 'a', 1: 'b', 2: 'c'}
-        );
+        assert.deepEqual(jsonConfigsFrom(document), { 0: 'a', 1: 'b', 2: 'c' });
       });
     });
 
@@ -66,7 +62,7 @@ describe('settings', function () {
       });
 
       it('returns the string, parsed into an object', function() {
-        assert.deepEqual(jsonConfigsFrom(document), {0: 'h', 1: 'i'});
+        assert.deepEqual(jsonConfigsFrom(document), { 0: 'h', 1: 'i' });
       });
     });
 
@@ -92,7 +88,7 @@ describe('settings', function () {
       it('still returns settings from other JSON scripts', function() {
         appendJSHypothesisConfig(document, '{"foo": "FOO", "bar": "BAR"}');
 
-        assert.deepEqual(jsonConfigsFrom(document), {foo: 'FOO', bar: 'BAR'});
+        assert.deepEqual(jsonConfigsFrom(document), { foo: 'FOO', bar: 'BAR' });
       });
     });
 
@@ -112,10 +108,7 @@ describe('settings', function () {
       });
 
       it('returns the settings', function() {
-        assert.deepEqual(
-          jsonConfigsFrom(document),
-          {foo: 'FOO', bar: 'BAR'}
-        );
+        assert.deepEqual(jsonConfigsFrom(document), { foo: 'FOO', bar: 'BAR' });
       });
     });
 
@@ -127,10 +120,11 @@ describe('settings', function () {
       });
 
       it('merges them all into one returned object', function() {
-        assert.deepEqual(
-          jsonConfigsFrom(document),
-          {foo: 'FOO', bar: 'BAR', gar: 'GAR'}
-        );
+        assert.deepEqual(jsonConfigsFrom(document), {
+          foo: 'FOO',
+          bar: 'BAR',
+          gar: 'GAR',
+        });
       });
     });
 
@@ -141,9 +135,12 @@ describe('settings', function () {
         appendJSHypothesisConfig(document, '{"foo": "third"}');
       });
 
-      specify('settings from later in the page override ones from earlier', function() {
-        assert.equal(jsonConfigsFrom(document).foo, 'third');
-      });
+      specify(
+        'settings from later in the page override ones from earlier',
+        function() {
+          assert.equal(jsonConfigsFrom(document).foo, 'third');
+        }
+      );
     });
   });
 });

@@ -33,7 +33,7 @@ function createPage(content, rendered) {
   const textLayer = document.createElement('div');
   textLayer.classList.add('textLayer');
 
-  content.split(/\n/).forEach((item) => {
+  content.split(/\n/).forEach(item => {
     const itemEl = document.createElement('div');
     itemEl.textContent = item;
     textLayer.appendChild(itemEl);
@@ -55,7 +55,9 @@ class FakePDFPageProxy {
 
   getTextContent(params = {}) {
     if (!params.normalizeWhitespace) {
-      return Promise.reject(new Error('Expected `normalizeWhitespace` to be true'));
+      return Promise.reject(
+        new Error('Expected `normalizeWhitespace` to be true')
+      );
     }
 
     const textContent = {

@@ -21,11 +21,11 @@ function init() {
 }
 
 const update = {
-  SET_SIDEBAR: function (state, action) {
-    return {isSidebar: action.isSidebar};
+  SET_SIDEBAR: function(state, action) {
+    return { isSidebar: action.isSidebar };
   },
-  SET_HIGHLIGHTS_VISIBLE: function (state, action) {
-    return {visibleHighlights: action.visible};
+  SET_HIGHLIGHTS_VISIBLE: function(state, action) {
+    return { visibleHighlights: action.visible };
   },
 };
 
@@ -33,7 +33,7 @@ const actions = util.actionTypes(update);
 
 /** Set whether the app is the sidebar */
 function setAppIsSidebar(isSidebar) {
-  return {type: actions.SET_SIDEBAR, isSidebar: isSidebar};
+  return { type: actions.SET_SIDEBAR, isSidebar: isSidebar };
 }
 
 /**
@@ -41,7 +41,7 @@ function setAppIsSidebar(isSidebar) {
  * or not.
  */
 function setShowHighlights(show) {
-  return {type: actions.SET_HIGHLIGHTS_VISIBLE, visible: show};
+  return { type: actions.SET_HIGHLIGHTS_VISIBLE, visible: show };
 }
 
 /**

@@ -1,16 +1,16 @@
 'use strict';
 
 /*
-** Adapted from:
-** https://github.com/openannotation/annotator/blob/v1.2.x/src/plugin/document.coffee
-**
-** Annotator v1.2.10
-** https://github.com/openannotation/annotator
-**
-** Copyright 2015, the Annotator project contributors.
-** Dual licensed under the MIT and GPLv3 licenses.
-** https://github.com/openannotation/annotator/blob/master/LICENSE
-*/
+ ** Adapted from:
+ ** https://github.com/openannotation/annotator/blob/v1.2.x/src/plugin/document.coffee
+ **
+ ** Annotator v1.2.10
+ ** https://github.com/openannotation/annotator
+ **
+ ** Copyright 2015, the Annotator project contributors.
+ ** Dual licensed under the MIT and GPLv3 licenses.
+ ** https://github.com/openannotation/annotator/blob/master/LICENSE
+ */
 
 const baseURI = require('document-base-uri');
 
@@ -26,7 +26,7 @@ class DocumentMeta extends Plugin {
     super(element, options);
 
     this.events = {
-      'beforeAnnotationCreated': 'beforeAnnotationCreated',
+      beforeAnnotationCreated: 'beforeAnnotationCreated',
     };
   }
 
@@ -62,7 +62,9 @@ class DocumentMeta extends Plugin {
   uris() {
     const uniqueUrls = {};
     for (let link of this.metadata.link) {
-      if (link.href) { uniqueUrls[link.href] = true; }
+      if (link.href) {
+        uniqueUrls[link.href] = true;
+      }
     }
     return Object.keys(uniqueUrls);
   }
@@ -162,12 +164,14 @@ class DocumentMeta extends Plugin {
 
   _getLinks() {
     // We know our current location is a link for the document.
-    this.metadata.link = [{href: this._getDocumentHref()}];
+    this.metadata.link = [{ href: this._getDocumentHref() }];
 
     // Extract links from certain `<link>` tags.
     const linkElements = Array.from(this.document.querySelectorAll('link'));
     for (let link of linkElements) {
-      if (!['alternate', 'canonical', 'bookmark', 'shortlink'].includes(link.rel)) {
+      if (
+        !['alternate', 'canonical', 'bookmark', 'shortlink'].includes(link.rel)
+      ) {
         continue;
       }
 
@@ -184,7 +188,7 @@ class DocumentMeta extends Plugin {
 
       try {
         const href = this._absoluteUrl(link.href);
-        this.metadata.link.push({href, rel: link.rel, type: link.type});
+        this.metadata.link.push({ href, rel: link.rel, type: link.type });
       } catch (e) {
         // Ignore URIs which cannot be parsed.
       }
@@ -214,7 +218,7 @@ class DocumentMeta extends Plugin {
           if (doi.slice(0, 4) !== 'doi:') {
             doi = `doi:${doi}`;
           }
-          this.metadata.link.push({href: doi});
+          this.metadata.link.push({ href: doi });
         }
       }
     }
@@ -225,7 +229,7 @@ class DocumentMeta extends Plugin {
       if (name === 'identifier') {
         for (let id of values) {
           if (id.slice(0, 4) === 'doi:') {
-            this.metadata.link.push({href: id});
+            this.metadata.link.push({ href: id });
           }
         }
       }
@@ -239,10 +243,12 @@ class DocumentMeta extends Plugin {
         dcRelationValues[dcRelationValues.length - 1];
       const dcUrnIdentifierComponent =
         dcIdentifierValues[dcIdentifierValues.length - 1];
-      const dcUrn = 'urn:x-dc:' +
-        encodeURIComponent(dcUrnRelationComponent) + '/' +
+      const dcUrn =
+        'urn:x-dc:' +
+        encodeURIComponent(dcUrnRelationComponent) +
+        '/' +
         encodeURIComponent(dcUrnIdentifierComponent);
-      this.metadata.link.push({href: dcUrn});
+      this.metadata.link.push({ href: dcUrn });
       // set this as the documentFingerprint as a hint to include this in search queries
       this.metadata.documentFingerprint = dcUrn;
     }
@@ -282,7 +288,10 @@ class DocumentMeta extends Plugin {
     }
 
     // Otherwise, try using the location specified by the <base> element.
-    if (this.baseURI && allowedSchemes.includes(new URL(this.baseURI).protocol)) {
+    if (
+      this.baseURI &&
+      allowedSchemes.includes(new URL(this.baseURI).protocol)
+    ) {
       return this.baseURI;
     }
 

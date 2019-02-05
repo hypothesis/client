@@ -3,13 +3,13 @@
 const queryString = require('query-string');
 
 /**
-* Return an HTML5 audio player with the given src URL.
-*/
+ * Return an HTML5 audio player with the given src URL.
+ */
 
 function audioElement(src) {
   const html5audio = document.createElement('audio');
   html5audio.controls = true;
-  html5audio.src      =  src;
+  html5audio.src = src;
   return html5audio;
 }
 
@@ -38,7 +38,7 @@ function iframe(src) {
  * formatYouTubeTime('1h1s'); // returns '3601'
  * formatYouTubeTime('10'); // returns '10'
  **/
-function parseTimeString (timeValue) {
+function parseTimeString(timeValue) {
   const timePattern = /(\d+)([hms]?)/g;
   const multipliers = {
     h: 60 * 60,
@@ -77,7 +77,7 @@ function youTubeQueryParams(link) {
   const allowedParams = [
     'end',
     'start',
-    't',                // will be translated to `start`
+    't', // will be translated to `start`
   ];
   const linkParams = queryString.parse(link.search);
   const filteredQuery = {};
@@ -105,14 +105,13 @@ function youTubeQueryParams(link) {
  * Return a YouTube embed (<iframe>) DOM element for the given video ID.
  */
 function youTubeEmbed(id, link) {
-  const query  = youTubeQueryParams(link);
+  const query = youTubeQueryParams(link);
   return iframe(`https://www.youtube.com/embed/${id}${query}`);
 }
 
 function vimeoEmbed(id) {
   return iframe('https://player.vimeo.com/video/' + id);
 }
-
 
 /**
  * A list of functions that return an "embed" DOM element (e.g. an <iframe> or
@@ -123,7 +122,6 @@ function vimeoEmbed(id) {
  *
  */
 const embedGenerators = [
-
   // Matches URLs like https://www.youtube.com/watch?v=rw6oWkCojpw
   function iframeFromYouTubeWatchURL(link) {
     if (link.hostname !== 'www.youtube.com') {
@@ -245,15 +243,17 @@ const embedGenerators = [
     return iframe(iframeUrl.href);
   },
 
-
   // Matches URLs that end with .mp3, .ogg, or .wav (assumed to be audio files)
   function html5audioFromMp3Link(link) {
-    if (link.pathname.endsWith('.mp3') || link.pathname.endsWith('.ogg') || link.pathname.endsWith('.wav')) {
+    if (
+      link.pathname.endsWith('.mp3') ||
+      link.pathname.endsWith('.ogg') ||
+      link.pathname.endsWith('.wav')
+    ) {
       return audioElement(link.href);
     }
     return null;
   },
-
 ];
 
 /**
@@ -304,11 +304,14 @@ function replaceLinkWithEmbed(link) {
   // The link's text may or may not be percent encoded. The `link.href` property
   // will always be percent encoded. When comparing the two we need to be
   // agnostic as to which representation is used.
-  if (link.href !== link.textContent && decodeURI(link.href) !== link.textContent) {
+  if (
+    link.href !== link.textContent &&
+    decodeURI(link.href) !== link.textContent
+  ) {
     return;
   }
   const embed = embedForLink(link);
-  if (embed){
+  if (embed) {
     link.parentElement.replaceChild(embed, link);
   }
 }

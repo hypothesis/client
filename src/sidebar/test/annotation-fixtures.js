@@ -9,7 +9,7 @@ function defaultAnnotation() {
     document: {
       title: 'A special document',
     },
-    target: [{source: 'source', 'selector': []}],
+    target: [{ source: 'source', selector: [] }],
     uri: 'http://example.com',
     user: 'acct:bill@localhost',
     updated: '2015-05-10T20:18:56.613388+00:00',
@@ -35,9 +35,9 @@ function publicAnnotation() {
       title: 'A special document',
     },
     permissions: {
-      read:['group:__world__'],
+      read: ['group:__world__'],
     },
-    target: [{source: 'source', 'selector': []}],
+    target: [{ source: 'source', selector: [] }],
     uri: 'http://example.com',
     user: 'acct:bill@localhost',
     updated: '2015-05-10T20:18:56.613388+00:00',
@@ -89,7 +89,7 @@ function newHighlight() {
   return {
     id: undefined,
     $highlight: true,
-    target: [{source: 'http://example.org'}],
+    target: [{ source: 'http://example.org' }],
   };
 }
 
@@ -100,7 +100,7 @@ function oldAnnotation() {
   return {
     id: 'annotation_id',
     $highlight: undefined,
-    target: [{source: 'source', 'selector': [] }],
+    target: [{ source: 'source', selector: [] }],
     references: [],
     text: 'This is my annotation',
     tags: ['tag_1', 'tag_2'],
@@ -167,7 +167,6 @@ function moderatedAnnotation(modInfo) {
     },
   });
 }
-
 
 module.exports = {
   defaultAnnotation: defaultAnnotation,

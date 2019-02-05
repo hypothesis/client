@@ -9,8 +9,7 @@ const FakeWindow = require('../../util/test/fake-window');
 const DEFAULT_TOKEN_EXPIRES_IN_SECS = 1000;
 const TOKEN_KEY = 'hypothesis.oauth.hypothes%2Eis.token';
 
-describe('sidebar.oauth-auth', function () {
-
+describe('sidebar.oauth-auth', function() {
   let $rootScope;
   let FakeOAuthClient;
   let auth;
@@ -29,20 +28,21 @@ describe('sidebar.oauth-auth', function () {
    */
   function login() {
     fakeClient.authorize.returns(Promise.resolve('acode'));
-    fakeClient.exchangeAuthCode.returns(Promise.resolve({
-      accessToken: 'firstAccessToken',
-      refreshToken: 'firstRefreshToken',
-      expiresAt: Date.now() + 100,
-    }));
+    fakeClient.exchangeAuthCode.returns(
+      Promise.resolve({
+        accessToken: 'firstAccessToken',
+        refreshToken: 'firstRefreshToken',
+        expiresAt: Date.now() + 100,
+      })
+    );
     return auth.login();
   }
 
   before(() => {
-    angular.module('app', [])
-      .service('auth', require('../oauth-auth'));
+    angular.module('app', []).service('auth', require('../oauth-auth'));
   });
 
-  beforeEach(function () {
+  beforeEach(function() {
     // Setup fake clock. This has to be done before setting up the `window`
     // fake which makes use of timers.
     clock = sinon.useFakeTimers();
@@ -51,10 +51,12 @@ describe('sidebar.oauth-auth', function () {
     nowStub.returns(300);
 
     fakeApiRoutes = {
-      links: sinon.stub().returns(Promise.resolve({
-        'oauth.authorize': 'https://hypothes.is/oauth/authorize/',
-        'oauth.revoke': 'https://hypothes.is/oauth/revoke/',
-      })),
+      links: sinon.stub().returns(
+        Promise.resolve({
+          'oauth.authorize': 'https://hypothes.is/oauth/authorize/',
+          'oauth.revoke': 'https://hypothes.is/oauth/revoke/',
+        })
+      ),
     };
 
     fakeFlash = {
@@ -64,10 +66,12 @@ describe('sidebar.oauth-auth', function () {
     fakeSettings = {
       apiUrl: 'https://hypothes.is/api/',
       oauthClientId: 'the-client-id',
-      services: [{
-        authority: 'publisher.org',
-        grantToken: 'a.jwt.token',
-      }],
+      services: [
+        {
+          authority: 'publisher.org',
+          grantToken: 'a.jwt.token',
+        },
+      ],
     };
 
     fakeLocalStorage = {
@@ -91,7 +95,7 @@ describe('sidebar.oauth-auth', function () {
     };
     FakeOAuthClient.openAuthPopupWindow = sinon.stub();
 
-    fakeWindow = new FakeWindow;
+    fakeWindow = new FakeWindow();
 
     fakeHttp = {};
 
@@ -111,7 +115,7 @@ describe('sidebar.oauth-auth', function () {
     });
   });
 
-  afterEach(function () {
+  afterEach(function() {
     performance.now.restore();
     clock.restore();
   });
@@ -129,14 +133,14 @@ describe('sidebar.oauth-auth', function () {
     });
   });
 
-  describe('#tokenGetter', function () {
+  describe('#tokenGetter', function() {
     const successfulTokenResponse = Promise.resolve({
       accessToken: 'firstAccessToken',
       refreshToken: 'firstRefreshToken',
       expiresAt: 100,
     });
 
-    it('exchanges the grant token for an access token if provided', function () {
+    it('exchanges the grant token for an access token if provided', function() {
       fakeClient.exchangeGrantToken.returns(successfulTokenResponse);
 
       return auth.tokenGetter().then(token => {
@@ -147,21 +151,18 @@ describe('sidebar.oauth-auth', function () {
 
     context('when the access token request fails', function() {
       const expectedErr = new Error('Grant token exchange failed');
-      beforeEach('make access token requests fail', function () {
+      beforeEach('make access token requests fail', function() {
         fakeClient.exchangeGrantToken.returns(Promise.reject(expectedErr));
       });
 
       function assertThatAccessTokenPromiseWasRejectedAnd(func) {
-        return auth.tokenGetter().then(
-          function onResolved () {
-            assert(false, 'The Promise should have been rejected');
-          },
-          func
-        );
+        return auth.tokenGetter().then(function onResolved() {
+          assert(false, 'The Promise should have been rejected');
+        }, func);
       }
 
-      it('shows an error message to the user', function () {
-        return assertThatAccessTokenPromiseWasRejectedAnd(function () {
+      it('shows an error message to the user', function() {
+        return assertThatAccessTokenPromiseWasRejectedAnd(function() {
           assert.calledOnce(fakeFlash.error);
           assert.equal(
             fakeFlash.error.firstCall.args[0],
@@ -170,33 +171,38 @@ describe('sidebar.oauth-auth', function () {
         });
       });
 
-      it('returns a rejected promise', function () {
+      it('returns a rejected promise', function() {
         return assertThatAccessTokenPromiseWasRejectedAnd(err => {
           assert.equal(err.message, expectedErr.message);
         });
       });
     });
 
-    it('should cache tokens for future use', function () {
+    it('should cache tokens for future use', function() {
       fakeClient.exchangeGrantToken.returns(successfulTokenResponse);
-      return auth.tokenGetter().then(function () {
-        fakeClient.exchangeGrantToken.reset();
-        return auth.tokenGetter();
-      }).then(function (token) {
-        assert.equal(token, 'firstAccessToken');
-        assert.notCalled(fakeClient.exchangeGrantToken);
-      });
+      return auth
+        .tokenGetter()
+        .then(function() {
+          fakeClient.exchangeGrantToken.reset();
+          return auth.tokenGetter();
+        })
+        .then(function(token) {
+          assert.equal(token, 'firstAccessToken');
+          assert.notCalled(fakeClient.exchangeGrantToken);
+        });
     });
 
     // If an access token request has already been made but is still in
     // flight when tokenGetter() is called again, then it should just return
     // the pending Promise for the first request again (and not send a second
     // concurrent HTTP request).
-    it('should not make two concurrent access token requests', function () {
+    it('should not make two concurrent access token requests', function() {
       let respond;
-      fakeClient.exchangeGrantToken.returns(new Promise(resolve => {
-        respond = resolve;
-      }));
+      fakeClient.exchangeGrantToken.returns(
+        new Promise(resolve => {
+          respond = resolve;
+        })
+      );
 
       // The first time tokenGetter() is called it makes an `exchangeGrantToken`
       // call and caches the resulting Promise.
@@ -213,30 +219,34 @@ describe('sidebar.oauth-auth', function () {
       });
     });
 
-    it('should not attempt to exchange a grant token if none was provided', function () {
+    it('should not attempt to exchange a grant token if none was provided', function() {
       fakeSettings.services = [{ authority: 'publisher.org' }];
-      return auth.tokenGetter().then(function (token) {
+      return auth.tokenGetter().then(function(token) {
         assert.notCalled(fakeClient.exchangeGrantToken);
         assert.equal(token, null);
       });
     });
 
-    it('should refresh the access token if it expired', function () {
-      fakeClient.exchangeGrantToken.returns(Promise.resolve(successfulTokenResponse));
+    it('should refresh the access token if it expired', function() {
+      fakeClient.exchangeGrantToken.returns(
+        Promise.resolve(successfulTokenResponse)
+      );
 
-      function callTokenGetter () {
+      function callTokenGetter() {
         const tokenPromise = auth.tokenGetter();
 
-        fakeClient.refreshToken.returns(Promise.resolve({
-          accessToken: 'secondAccessToken',
-          expiresIn: 100,
-          refreshToken: 'secondRefreshToken',
-        }));
+        fakeClient.refreshToken.returns(
+          Promise.resolve({
+            accessToken: 'secondAccessToken',
+            expiresIn: 100,
+            refreshToken: 'secondRefreshToken',
+          })
+        );
 
         return tokenPromise;
       }
 
-      function assertRefreshTokenWasUsed (refreshToken) {
+      function assertRefreshTokenWasUsed(refreshToken) {
         return () => {
           assert.calledWith(fakeClient.refreshToken, refreshToken);
         };
@@ -251,12 +261,15 @@ describe('sidebar.oauth-auth', function () {
 
     // It only sends one refresh request, even if tokenGetter() is called
     // multiple times and the refresh response hasn't come back yet.
-    it('does not send more than one refresh request', function () {
-      fakeClient.exchangeGrantToken.returns(Promise.resolve(successfulTokenResponse));
+    it('does not send more than one refresh request', function() {
+      fakeClient.exchangeGrantToken.returns(
+        Promise.resolve(successfulTokenResponse)
+      );
 
       // Perform an initial token fetch which will exchange the JWT grant for an
       // access token.
-      return auth.tokenGetter()
+      return auth
+        .tokenGetter()
         .then(() => {
           // Expire the access token to trigger a refresh request on the next
           // token fetch.
@@ -264,7 +277,9 @@ describe('sidebar.oauth-auth', function () {
 
           // Delay the response to the refresh request.
           let respond;
-          fakeClient.refreshToken.returns(new Promise(resolve => respond = resolve));
+          fakeClient.refreshToken.returns(
+            new Promise(resolve => (respond = resolve))
+          );
 
           // Request an auth token multiple times.
           const tokens = Promise.all([auth.tokenGetter(), auth.tokenGetter()]);
@@ -285,12 +300,12 @@ describe('sidebar.oauth-auth', function () {
     });
 
     context('when a refresh request fails', function() {
-      beforeEach('make refresh token requests fail', function () {
+      beforeEach('make refresh token requests fail', function() {
         fakeClient.refreshToken.returns(Promise.reject(new Error('failed')));
         fakeClient.exchangeGrantToken.returns(successfulTokenResponse);
       });
 
-      it('logs the user out', function () {
+      it('logs the user out', function() {
         expireAccessToken();
 
         return auth.tokenGetter(token => {
@@ -299,17 +314,20 @@ describe('sidebar.oauth-auth', function () {
       });
     });
 
-    [{
-      // User is logged-in on the publisher's website.
-      authority: 'publisher.org',
-      grantToken: 'a.jwt.token',
-      expectedToken: 'firstAccessToken',
-    },{
-      // User is anonymous on the publisher's website.
-      authority: 'publisher.org',
-      grantToken: null,
-      expectedToken: null,
-    }].forEach(({ authority, grantToken, expectedToken }) => {
+    [
+      {
+        // User is logged-in on the publisher's website.
+        authority: 'publisher.org',
+        grantToken: 'a.jwt.token',
+        expectedToken: 'firstAccessToken',
+      },
+      {
+        // User is anonymous on the publisher's website.
+        authority: 'publisher.org',
+        grantToken: null,
+        expectedToken: null,
+      },
+    ].forEach(({ authority, grantToken, expectedToken }) => {
       it(`should not persist access tokens if a grant token (${grantToken}) was provided`, () => {
         fakeSettings.services = [{ authority, grantToken }];
         return auth.tokenGetter().then(() => {
@@ -318,7 +336,9 @@ describe('sidebar.oauth-auth', function () {
       });
 
       it(`should not read persisted access tokens if a grant token (${grantToken}) was set`, () => {
-        fakeClient.exchangeGrantToken.returns(Promise.resolve(successfulTokenResponse));
+        fakeClient.exchangeGrantToken.returns(
+          Promise.resolve(successfulTokenResponse)
+        );
         fakeSettings.services = [{ authority, grantToken }];
         return auth.tokenGetter().then(token => {
           assert.equal(token, expectedToken);
@@ -330,25 +350,29 @@ describe('sidebar.oauth-auth', function () {
     it('persists tokens retrieved via auth code exchanges to storage', () => {
       fakeSettings.services = [];
 
-      return login().then(() => {
-        return auth.tokenGetter();
-      }).then(() => {
-        assert.calledWith(fakeLocalStorage.setObject, TOKEN_KEY, {
-          accessToken: 'firstAccessToken',
-          refreshToken: 'firstRefreshToken',
-          expiresAt: 100,
+      return login()
+        .then(() => {
+          return auth.tokenGetter();
+        })
+        .then(() => {
+          assert.calledWith(fakeLocalStorage.setObject, TOKEN_KEY, {
+            accessToken: 'firstAccessToken',
+            refreshToken: 'firstRefreshToken',
+            expiresAt: 100,
+          });
         });
-      });
     });
 
     function expireAndRefreshAccessToken() {
       expireAccessToken();
       fakeLocalStorage.setObject.reset();
-      fakeClient.refreshToken.returns(Promise.resolve({
-        accessToken: 'secondToken',
-        expiresAt: Date.now() + 1000,
-        refreshToken: 'secondRefreshToken',
-      }));
+      fakeClient.refreshToken.returns(
+        Promise.resolve({
+          accessToken: 'secondToken',
+          expiresAt: Date.now() + 1000,
+          refreshToken: 'secondRefreshToken',
+        })
+      );
       return auth.tokenGetter();
     }
 
@@ -356,30 +380,38 @@ describe('sidebar.oauth-auth', function () {
       fakeSettings.services = [];
 
       // 1. Perform initial token exchange.
-      return login().then(() => {
-        return auth.tokenGetter();
-      }).then(() => {
-        // 2. Refresh access token.
-        return expireAndRefreshAccessToken();
-      }).then(() => {
-        // 3. Check that updated token was persisted to storage.
-        assert.calledWith(fakeLocalStorage.setObject, TOKEN_KEY, {
-          accessToken: 'secondToken',
-          refreshToken: 'secondRefreshToken',
-          expiresAt: Date.now() + 1000,
+      return login()
+        .then(() => {
+          return auth.tokenGetter();
+        })
+        .then(() => {
+          // 2. Refresh access token.
+          return expireAndRefreshAccessToken();
+        })
+        .then(() => {
+          // 3. Check that updated token was persisted to storage.
+          assert.calledWith(fakeLocalStorage.setObject, TOKEN_KEY, {
+            accessToken: 'secondToken',
+            refreshToken: 'secondRefreshToken',
+            expiresAt: Date.now() + 1000,
+          });
         });
-      });
     });
 
     it('does not persist refreshed tokens if the original token was temporary', () => {
-      fakeSettings.services = [{ authority: 'publisher.org', grantToken: 'a.jwt.token' }];
+      fakeSettings.services = [
+        { authority: 'publisher.org', grantToken: 'a.jwt.token' },
+      ];
 
-      return auth.tokenGetter().then(() => {
-        return expireAndRefreshAccessToken();
-      }).then(() => {
-        // Check that updated token was not persisted to storage.
-        assert.notCalled(fakeLocalStorage.setObject);
-      });
+      return auth
+        .tokenGetter()
+        .then(() => {
+          return expireAndRefreshAccessToken();
+        })
+        .then(() => {
+          // Check that updated token was not persisted to storage.
+          assert.notCalled(fakeLocalStorage.setObject);
+        });
     });
 
     it('fetches and returns tokens from storage', () => {
@@ -390,7 +422,7 @@ describe('sidebar.oauth-auth', function () {
         expiresAt: 123,
       });
 
-      return auth.tokenGetter().then((token) => {
+      return auth.tokenGetter().then(token => {
         assert.equal(token, 'foo');
       });
     });
@@ -405,46 +437,47 @@ describe('sidebar.oauth-auth', function () {
         refreshToken: 'bar',
         expiresAt: 123,
       });
-      fakeClient.refreshToken.returns(Promise.resolve({
-        accessToken: 'secondToken',
-        expiresAt: Date.now() + 100,
-        refreshToken: 'secondRefreshToken',
-      }));
+      fakeClient.refreshToken.returns(
+        Promise.resolve({
+          accessToken: 'secondToken',
+          expiresAt: Date.now() + 100,
+          refreshToken: 'secondRefreshToken',
+        })
+      );
 
       // Fetch the token again from the service and check that it gets
       // refreshed.
-      return auth.tokenGetter().then((token) => {
+      return auth.tokenGetter().then(token => {
         assert.equal(token, 'secondToken');
-        assert.calledWith(
-          fakeLocalStorage.setObject,
-          TOKEN_KEY,
-          {
-            accessToken: 'secondToken',
-            refreshToken: 'secondRefreshToken',
-            expiresAt: Date.now() + 100,
-          }
-        );
+        assert.calledWith(fakeLocalStorage.setObject, TOKEN_KEY, {
+          accessToken: 'secondToken',
+          refreshToken: 'secondRefreshToken',
+          expiresAt: Date.now() + 100,
+        });
       });
     });
 
-    [{
-      when: 'keys are missing',
-      data: {
-        accessToken: 'foo',
+    [
+      {
+        when: 'keys are missing',
+        data: {
+          accessToken: 'foo',
+        },
       },
-    },{
-      when: 'data types are wrong',
-      data: {
-        accessToken: 123,
-        expiresAt: 'notanumber',
-        refreshToken: null,
+      {
+        when: 'data types are wrong',
+        data: {
+          accessToken: 123,
+          expiresAt: 'notanumber',
+          refreshToken: null,
+        },
       },
-    }].forEach(({ when, data }) => {
+    ].forEach(({ when, data }) => {
       context(when, () => {
         it('ignores invalid tokens in storage', () => {
           fakeSettings.services = [];
           fakeLocalStorage.getObject.withArgs('foo').returns(data);
-          return auth.tokenGetter().then((token) => {
+          return auth.tokenGetter().then(token => {
             assert.equal(token, null);
           });
         });
@@ -472,17 +505,20 @@ describe('sidebar.oauth-auth', function () {
     }
 
     it('reloads tokens from storage', () => {
-      return login().then(() => {
-        return auth.tokenGetter();
-      }).then(token => {
-        assert.equal(token, 'firstAccessToken');
+      return login()
+        .then(() => {
+          return auth.tokenGetter();
+        })
+        .then(token => {
+          assert.equal(token, 'firstAccessToken');
 
-        notifyStoredTokenChange();
+          notifyStoredTokenChange();
 
-        return auth.tokenGetter();
-      }).then(token => {
-        assert.equal(token, 'storedAccessToken');
-      });
+          return auth.tokenGetter();
+        })
+        .then(token => {
+          assert.equal(token, 'storedAccessToken');
+        });
     });
 
     it('notifies other services about the change', () => {
@@ -514,12 +550,15 @@ describe('sidebar.oauth-auth', function () {
       fakeClient.authorize.returns(Promise.resolve('acode'));
 
       // 1. Verify that login completes.
-      return auth.login().then(() => {
-        return auth.tokenGetter();
-      }).then(() => {
-        // 2. Verify that auth code is exchanged for access & refresh tokens.
-        assert.calledWith(fakeClient.exchangeAuthCode, 'acode');
-      });
+      return auth
+        .login()
+        .then(() => {
+          return auth.tokenGetter();
+        })
+        .then(() => {
+          // 2. Verify that auth code is exchanged for access & refresh tokens.
+          assert.calledWith(fakeClient.exchangeAuthCode, 'acode');
+        });
     });
 
     it('rejects when auth is canceled', () => {
@@ -536,11 +575,14 @@ describe('sidebar.oauth-auth', function () {
       fakeClient.authorize.returns(Promise.resolve('acode'));
       fakeClient.exchangeAuthCode.returns(Promise.reject(expectedErr));
 
-      return auth.login().then(() => {
-        return auth.tokenGetter();
-      }).catch(err => {
-        assert.equal(err.message, expectedErr.message);
-      });
+      return auth
+        .login()
+        .then(() => {
+          return auth.tokenGetter();
+        })
+        .catch(err => {
+          assert.equal(err.message, expectedErr.message);
+        });
     });
   });
 
@@ -550,19 +592,24 @@ describe('sidebar.oauth-auth', function () {
       // Hypothesis service.
       fakeSettings.services = [];
 
-      return login().then(() => {
-        return auth.tokenGetter();
-      }).then(token => {
-        assert.notEqual(token, null);
-      });
+      return login()
+        .then(() => {
+          return auth.tokenGetter();
+        })
+        .then(token => {
+          assert.notEqual(token, null);
+        });
     });
 
     it('forgets access tokens', () => {
-      return auth.logout().then(() => {
-        return auth.tokenGetter();
-      }).then(token => {
-        assert.equal(token, null);
-      });
+      return auth
+        .logout()
+        .then(() => {
+          return auth.tokenGetter();
+        })
+        .then(token => {
+          assert.equal(token, null);
+        });
     });
 
     it('removes cached tokens', () => {
@@ -579,7 +626,7 @@ describe('sidebar.oauth-auth', function () {
   });
 
   // Advance time forward so that any current access tokens will have expired.
-  function expireAccessToken () {
+  function expireAccessToken() {
     clock.tick(DEFAULT_TOKEN_EXPIRES_IN_SECS * 1000);
   }
 });

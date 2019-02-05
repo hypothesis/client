@@ -24,9 +24,16 @@ const serviceConfig = require('../service-config');
  * the `OAuthClient` class.
  */
 // @ngInject
-function auth($http, $rootScope, $window, OAuthClient,
-  apiRoutes, flash, localStorage, settings) {
-
+function auth(
+  $http,
+  $rootScope,
+  $window,
+  OAuthClient,
+  apiRoutes,
+  flash,
+  localStorage,
+  settings
+) {
   /**
    * Authorization code from auth popup window.
    * @type {string}
@@ -54,15 +61,11 @@ function auth($http, $rootScope, $window, OAuthClient,
    * Show an error message telling the user that the access token has expired.
    */
   function showAccessTokenExpiredErrorMessage(message) {
-    flash.error(
-      message,
-      'Hypothesis login lost',
-      {
-        extendedTimeOut: 0,
-        tapToDismiss: false,
-        timeOut: 0,
-      }
-    );
+    flash.error(message, 'Hypothesis login lost', {
+      extendedTimeOut: 0,
+      tapToDismiss: false,
+      timeOut: 0,
+    });
   }
 
   /**
@@ -89,10 +92,12 @@ function auth($http, $rootScope, $window, OAuthClient,
   function loadToken() {
     const token = localStorage.getObject(storageKey());
 
-    if (!token ||
-        typeof token.accessToken !== 'string' ||
-        typeof token.refreshToken !== 'string' ||
-        typeof token.expiresAt !== 'number') {
+    if (
+      !token ||
+      typeof token.accessToken !== 'string' ||
+      typeof token.refreshToken !== 'string' ||
+      typeof token.expiresAt !== 'number'
+    ) {
       return null;
     }
 
@@ -118,14 +123,14 @@ function auth($http, $rootScope, $window, OAuthClient,
    * @return {Promise<TokenInfo>} Promise for the new access token
    */
   function refreshAccessToken(refreshToken, options) {
-    return oauthClient().then(client =>
-      client.refreshToken(refreshToken)
-    ).then(tokenInfo => {
-      if (options.persist) {
-        saveToken(tokenInfo);
-      }
-      return tokenInfo;
-    });
+    return oauthClient()
+      .then(client => client.refreshToken(refreshToken))
+      .then(tokenInfo => {
+        if (options.persist) {
+          saveToken(tokenInfo);
+        }
+        return tokenInfo;
+      });
   }
 
   /**
@@ -173,13 +178,14 @@ function auth($http, $rootScope, $window, OAuthClient,
         if (cfg.grantToken) {
           // User is logged-in on the publisher's website.
           // Exchange the grant token for a new access token.
-          tokenInfoPromise = oauthClient().then(client =>
-            client.exchangeGrantToken(cfg.grantToken)
-          ).catch(err => {
-            showAccessTokenExpiredErrorMessage(
-              'You must reload the page to annotate.');
-            throw err;
-          });
+          tokenInfoPromise = oauthClient()
+            .then(client => client.exchangeGrantToken(cfg.grantToken))
+            .catch(err => {
+              showAccessTokenExpiredErrorMessage(
+                'You must reload the page to annotate.'
+              );
+              throw err;
+            });
         } else {
           // User is anonymous on the publisher's website.
           tokenInfoPromise = Promise.resolve(null);
@@ -189,12 +195,12 @@ function auth($http, $rootScope, $window, OAuthClient,
         // access token.
         const code = authCode;
         authCode = null; // Auth codes can only be used once.
-        tokenInfoPromise = oauthClient().then(client =>
-          client.exchangeAuthCode(code)
-        ).then(tokenInfo => {
-          saveToken(tokenInfo);
-          return tokenInfo;
-        });
+        tokenInfoPromise = oauthClient()
+          .then(client => client.exchangeAuthCode(code))
+          .then(tokenInfo => {
+            saveToken(tokenInfo);
+            return tokenInfo;
+          });
       } else {
         // Attempt to load the tokens from the previous session.
         tokenInfoPromise = Promise.resolve(loadToken());
@@ -228,17 +234,19 @@ function auth($http, $rootScope, $window, OAuthClient,
         // Token expired. Attempt to refresh.
         tokenInfoPromise = refreshAccessToken(token.refreshToken, {
           persist: shouldPersist,
-        }).then(token => {
-          // Sanity check that prevents an infinite loop. Mostly useful in
-          // tests.
-          if (Date.now() > token.expiresAt) {
-            throw new Error('Refreshed token expired in the past');
-          }
-          return token;
-        }).catch(() => {
-          // If refreshing the token fails, the user is simply logged out.
-          return null;
-        });
+        })
+          .then(token => {
+            // Sanity check that prevents an infinite loop. Mostly useful in
+            // tests.
+            if (Date.now() > token.expiresAt) {
+              throw new Error('Refreshed token expired in the past');
+            }
+            return token;
+          })
+          .catch(() => {
+            // If refreshing the token fails, the user is simply logged out.
+            return null;
+          });
 
         return tokenGetter();
       } else {
@@ -256,14 +264,16 @@ function auth($http, $rootScope, $window, OAuthClient,
    */
   function login() {
     const authWindow = OAuthClient.openAuthPopupWindow($window);
-    return oauthClient().then(client => {
-      return client.authorize($window, authWindow);
-    }).then(code => {
-      // Save the auth code. It will be exchanged for an access token when the
-      // next API request is made.
-      authCode = code;
-      tokenInfoPromise = null;
-    });
+    return oauthClient()
+      .then(client => {
+        return client.authorize($window, authWindow);
+      })
+      .then(code => {
+        // Save the auth code. It will be exchanged for an access token when the
+        // next API request is made.
+        authCode = code;
+        tokenInfoPromise = null;
+      });
   }
 
   /**
@@ -275,7 +285,8 @@ function auth($http, $rootScope, $window, OAuthClient,
     return Promise.all([tokenInfoPromise, oauthClient()])
       .then(([token, client]) => {
         return client.revokeToken(token.accessToken);
-      }).then(() => {
+      })
+      .then(() => {
         tokenInfoPromise = Promise.resolve(null);
         localStorage.removeItem(storageKey());
       });

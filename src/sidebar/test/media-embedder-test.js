@@ -2,8 +2,8 @@
 
 const mediaEmbedder = require('../media-embedder.js');
 
-describe('media-embedder', function () {
-  function domElement (html) {
+describe('media-embedder', function() {
+  function domElement(html) {
     const element = document.createElement('div');
     element.innerHTML = html;
     return element;
@@ -19,7 +19,7 @@ describe('media-embedder', function () {
     clock.restore();
   });
 
-  it('replaces YouTube watch links with iframes', function () {
+  it('replaces YouTube watch links with iframes', function() {
     const urls = [
       'https://www.youtube.com/watch?v=QCkm0lL-6lc',
       'https://www.youtube.com/watch/?v=QCkm0lL-6lc',
@@ -27,7 +27,7 @@ describe('media-embedder', function () {
       'https://www.youtube.com/watch?foo=bar&v=QCkm0lL-6lc&h=j',
       'https://www.youtube.com/watch?v=QCkm0lL-6lc&foo=bar',
     ];
-    urls.forEach(function (url) {
+    urls.forEach(function(url) {
       const element = domElement('<a href="' + url + '">' + url + '</a>');
 
       mediaEmbedder.replaceLinksWithEmbeds(element);
@@ -36,17 +36,18 @@ describe('media-embedder', function () {
       assert.equal(element.children[0].tagName, 'IFRAME', url);
       assert.equal(
         element.children[0].src,
-        'https://www.youtube.com/embed/QCkm0lL-6lc');
+        'https://www.youtube.com/embed/QCkm0lL-6lc'
+      );
     });
   });
 
-  it('allows whitelisted parameters in YouTube watch URLs', function () {
+  it('allows whitelisted parameters in YouTube watch URLs', function() {
     const urls = [
       'https://www.youtube.com/watch?v=QCkm0lL-6lc&start=5&end=10',
       'https://www.youtube.com/watch?v=QCkm0lL-6lc&end=10&start=5',
       'https://www.youtube.com/watch/?v=QCkm0lL-6lc&end=10&start=5',
     ];
-    urls.forEach(function (url) {
+    urls.forEach(function(url) {
       const element = domElement('<a href="' + url + '">' + url + '</a>');
 
       mediaEmbedder.replaceLinksWithEmbeds(element);
@@ -59,17 +60,18 @@ describe('media-embedder', function () {
       // queryString.
       assert.equal(
         element.children[0].src,
-        'https://www.youtube.com/embed/QCkm0lL-6lc?end=10&start=5');
+        'https://www.youtube.com/embed/QCkm0lL-6lc?end=10&start=5'
+      );
     });
   });
 
-  it('translates YouTube watch `t` param to `start` for embed', function () {
+  it('translates YouTube watch `t` param to `start` for embed', function() {
     const urls = [
       'https://www.youtube.com/watch?v=QCkm0lL-6lc&t=5&end=10',
       'https://www.youtube.com/watch?v=QCkm0lL-6lc&end=10&t=5',
       'https://www.youtube.com/watch/?v=QCkm0lL-6lc&end=10&t=5',
     ];
-    urls.forEach(function (url) {
+    urls.forEach(function(url) {
       const element = domElement('<a href="' + url + '">' + url + '</a>');
 
       mediaEmbedder.replaceLinksWithEmbeds(element);
@@ -78,52 +80,71 @@ describe('media-embedder', function () {
       assert.equal(element.children[0].tagName, 'IFRAME', url);
       assert.equal(
         element.children[0].src,
-        'https://www.youtube.com/embed/QCkm0lL-6lc?end=10&start=5');
+        'https://www.youtube.com/embed/QCkm0lL-6lc?end=10&start=5'
+      );
     });
   });
 
-  it('parses YouTube `t` param values into seconds', function () {
+  it('parses YouTube `t` param values into seconds', function() {
     const cases = [
-      ['https://www.youtube.com/watch?v=QCkm0lL-6lc&t=5m',
-       'https://www.youtube.com/embed/QCkm0lL-6lc?start=300'],
-      ['https://www.youtube.com/watch?v=QCkm0lL-6lc&t=1h5m15s',
-       'https://www.youtube.com/embed/QCkm0lL-6lc?start=3915'],
-      ['https://www.youtube.com/watch?v=QCkm0lL-6lc&t=20m10s',
-       'https://www.youtube.com/embed/QCkm0lL-6lc?start=1210'],
-      ['https://www.youtube.com/watch?v=QCkm0lL-6lc&t=h20m10s',
-       'https://www.youtube.com/embed/QCkm0lL-6lc?start=1210'],
-      ['https://www.youtube.com/watch?v=QCkm0lL-6lc&t=1h20s',
-       'https://www.youtube.com/embed/QCkm0lL-6lc?start=3620'],
-      ['https://www.youtube.com/watch?v=QCkm0lL-6lc&t=1h20ss',
-       'https://www.youtube.com/embed/QCkm0lL-6lc?start=3620'],
-      ['https://www.youtube.com/watch/?v=QCkm0lL-6lc&t=5s',
-       'https://www.youtube.com/embed/QCkm0lL-6lc?start=5'],
-      ['https://www.youtube.com/watch/?v=QCkm0lL-6lc&t=0m5s',
-       'https://www.youtube.com/embed/QCkm0lL-6lc?start=5'],
-      ['https://www.youtube.com/watch/?v=QCkm0lL-6lc&t=m5s',
-       'https://www.youtube.com/embed/QCkm0lL-6lc?start=5'],
-      ['https://www.youtube.com/watch/?v=QCkm0lL-6lc&t=10',
-       'https://www.youtube.com/embed/QCkm0lL-6lc?start=10'],
+      [
+        'https://www.youtube.com/watch?v=QCkm0lL-6lc&t=5m',
+        'https://www.youtube.com/embed/QCkm0lL-6lc?start=300',
+      ],
+      [
+        'https://www.youtube.com/watch?v=QCkm0lL-6lc&t=1h5m15s',
+        'https://www.youtube.com/embed/QCkm0lL-6lc?start=3915',
+      ],
+      [
+        'https://www.youtube.com/watch?v=QCkm0lL-6lc&t=20m10s',
+        'https://www.youtube.com/embed/QCkm0lL-6lc?start=1210',
+      ],
+      [
+        'https://www.youtube.com/watch?v=QCkm0lL-6lc&t=h20m10s',
+        'https://www.youtube.com/embed/QCkm0lL-6lc?start=1210',
+      ],
+      [
+        'https://www.youtube.com/watch?v=QCkm0lL-6lc&t=1h20s',
+        'https://www.youtube.com/embed/QCkm0lL-6lc?start=3620',
+      ],
+      [
+        'https://www.youtube.com/watch?v=QCkm0lL-6lc&t=1h20ss',
+        'https://www.youtube.com/embed/QCkm0lL-6lc?start=3620',
+      ],
+      [
+        'https://www.youtube.com/watch/?v=QCkm0lL-6lc&t=5s',
+        'https://www.youtube.com/embed/QCkm0lL-6lc?start=5',
+      ],
+      [
+        'https://www.youtube.com/watch/?v=QCkm0lL-6lc&t=0m5s',
+        'https://www.youtube.com/embed/QCkm0lL-6lc?start=5',
+      ],
+      [
+        'https://www.youtube.com/watch/?v=QCkm0lL-6lc&t=m5s',
+        'https://www.youtube.com/embed/QCkm0lL-6lc?start=5',
+      ],
+      [
+        'https://www.youtube.com/watch/?v=QCkm0lL-6lc&t=10',
+        'https://www.youtube.com/embed/QCkm0lL-6lc?start=10',
+      ],
     ];
-    cases.forEach(function (url) {
+    cases.forEach(function(url) {
       const element = domElement('<a href="' + url[0] + '">' + url[0] + '</a>');
 
       mediaEmbedder.replaceLinksWithEmbeds(element);
 
       assert.equal(element.childElementCount, 1);
       assert.equal(element.children[0].tagName, 'IFRAME', url[0]);
-      assert.equal(
-        element.children[0].src,
-        url[1]);
+      assert.equal(element.children[0].src, url[1]);
     });
   });
 
-  it ('excludes non-whitelisted params in YouTube watch links', function () {
+  it('excludes non-whitelisted params in YouTube watch links', function() {
     const urls = [
       'https://www.youtube.com/watch?v=QCkm0lL-6lc&start=5&end=10&baz=dingdong',
       'https://www.youtube.com/watch/?v=QCkm0lL-6lc&autoplay=1&end=10&start=5',
     ];
-    urls.forEach(function (url) {
+    urls.forEach(function(url) {
       const element = domElement('<a href="' + url + '">' + url + '</a>');
 
       mediaEmbedder.replaceLinksWithEmbeds(element);
@@ -134,16 +155,17 @@ describe('media-embedder', function () {
       // will be reliably as follows, regardless of original ordering
       assert.equal(
         element.children[0].src,
-        'https://www.youtube.com/embed/QCkm0lL-6lc?end=10&start=5');
+        'https://www.youtube.com/embed/QCkm0lL-6lc?end=10&start=5'
+      );
     });
   });
 
-  it('replaces YouTube share links with iframes', function () {
+  it('replaces YouTube share links with iframes', function() {
     const urls = [
       'https://youtu.be/QCkm0lL-6lc',
       'https://youtu.be/QCkm0lL-6lc/',
     ];
-    urls.forEach(function (url) {
+    urls.forEach(function(url) {
       const element = domElement('<a href="' + url + '">' + url + '</a>');
 
       mediaEmbedder.replaceLinksWithEmbeds(element);
@@ -151,16 +173,18 @@ describe('media-embedder', function () {
       assert.equal(element.childElementCount, 1);
       assert.equal(element.children[0].tagName, 'IFRAME');
       assert.equal(
-        element.children[0].src, 'https://www.youtube.com/embed/QCkm0lL-6lc');
+        element.children[0].src,
+        'https://www.youtube.com/embed/QCkm0lL-6lc'
+      );
     });
   });
 
-  it ('allows whitelisted parameters in YouTube share links', function () {
+  it('allows whitelisted parameters in YouTube share links', function() {
     const urls = [
       'https://youtu.be/QCkm0lL-6lc?start=5&end=10',
       'https://youtu.be/QCkm0lL-6lc/?end=10&start=5',
     ];
-    urls.forEach(function (url) {
+    urls.forEach(function(url) {
       const element = domElement('<a href="' + url + '">' + url + '</a>');
 
       mediaEmbedder.replaceLinksWithEmbeds(element);
@@ -171,16 +195,17 @@ describe('media-embedder', function () {
       // will be reliably as follows, regardless of original ordering
       assert.equal(
         element.children[0].src,
-        'https://www.youtube.com/embed/QCkm0lL-6lc?end=10&start=5');
+        'https://www.youtube.com/embed/QCkm0lL-6lc?end=10&start=5'
+      );
     });
   });
 
-  it('translates YouTube share URL `t` param to `start` for embed', function () {
+  it('translates YouTube share URL `t` param to `start` for embed', function() {
     const urls = [
       'https://youtu.be/QCkm0lL-6lc?t=5&end=10',
       'https://youtu.be/QCkm0lL-6lc/?end=10&t=5',
     ];
-    urls.forEach(function (url) {
+    urls.forEach(function(url) {
       const element = domElement('<a href="' + url + '">' + url + '</a>');
 
       mediaEmbedder.replaceLinksWithEmbeds(element);
@@ -189,16 +214,17 @@ describe('media-embedder', function () {
       assert.equal(element.children[0].tagName, 'IFRAME', url);
       assert.equal(
         element.children[0].src,
-        'https://www.youtube.com/embed/QCkm0lL-6lc?end=10&start=5');
+        'https://www.youtube.com/embed/QCkm0lL-6lc?end=10&start=5'
+      );
     });
   });
 
-  it ('excludes non-whitelisted params in YouTube share links', function () {
+  it('excludes non-whitelisted params in YouTube share links', function() {
     const urls = [
       'https://youtu.be/QCkm0lL-6lc?foo=bar&t=5&end=10&baz=dingdong',
       'https://youtu.be/QCkm0lL-6lc/?autoplay=1&end=10&t=5',
     ];
-    urls.forEach(function (url) {
+    urls.forEach(function(url) {
       const element = domElement('<a href="' + url + '">' + url + '</a>');
 
       mediaEmbedder.replaceLinksWithEmbeds(element);
@@ -209,11 +235,12 @@ describe('media-embedder', function () {
       // will be reliably as follows, regardless of original ordering
       assert.equal(
         element.children[0].src,
-        'https://www.youtube.com/embed/QCkm0lL-6lc?end=10&start=5');
+        'https://www.youtube.com/embed/QCkm0lL-6lc?end=10&start=5'
+      );
     });
   });
 
-  it('replaces Vimeo links with iframes', function () {
+  it('replaces Vimeo links with iframes', function() {
     const urls = [
       'https://vimeo.com/149000090',
       'https://vimeo.com/149000090/',
@@ -222,7 +249,7 @@ describe('media-embedder', function () {
       'https://vimeo.com/149000090?foo=bar&a=b',
       'https://vimeo.com/149000090/?foo=bar&a=b',
     ];
-    urls.forEach(function (url) {
+    urls.forEach(function(url) {
       const element = domElement('<a href="' + url + '">' + url + '</a>');
 
       mediaEmbedder.replaceLinksWithEmbeds(element);
@@ -230,11 +257,13 @@ describe('media-embedder', function () {
       assert.equal(element.childElementCount, 1);
       assert.equal(element.children[0].tagName, 'IFRAME');
       assert.equal(
-        element.children[0].src, 'https://player.vimeo.com/video/149000090');
+        element.children[0].src,
+        'https://player.vimeo.com/video/149000090'
+      );
     });
   });
 
-  it('replaces Vimeo channel links with iframes', function () {
+  it('replaces Vimeo channel links with iframes', function() {
     const urls = [
       'https://vimeo.com/channels/staffpicks/148845534',
       'https://vimeo.com/channels/staffpicks/148845534/',
@@ -244,7 +273,7 @@ describe('media-embedder', function () {
       'https://vimeo.com/channels/staffpicks/148845534?foo=bar&id=1',
       'https://vimeo.com/channels/otherchannel/148845534',
     ];
-    urls.forEach(function (url) {
+    urls.forEach(function(url) {
       const element = domElement('<a href="' + url + '">' + url + '</a>');
 
       mediaEmbedder.replaceLinksWithEmbeds(element);
@@ -252,11 +281,13 @@ describe('media-embedder', function () {
       assert.equal(element.childElementCount, 1);
       assert.equal(element.children[0].tagName, 'IFRAME');
       assert.equal(
-        element.children[0].src, 'https://player.vimeo.com/video/148845534');
+        element.children[0].src,
+        'https://player.vimeo.com/video/148845534'
+      );
     });
   });
 
-  it('replaces internet archive links with iframes', function () {
+  it('replaces internet archive links with iframes', function() {
     const urls = [
       // Video details page.
       'https://archive.org/details/PATH',
@@ -270,7 +301,7 @@ describe('media-embedder', function () {
       // Embed link generated by the "Share" links on the details pages.
       'https://archive.org/embed/PATH?start=360&end=420.3',
     ];
-    urls.forEach(function (url) {
+    urls.forEach(function(url) {
       const element = domElement('<a href="' + url + '">' + url + '</a>');
 
       mediaEmbedder.replaceLinksWithEmbeds(element);
@@ -278,13 +309,13 @@ describe('media-embedder', function () {
       assert.equal(element.children[0].tagName, 'IFRAME');
 
       const actual = element.children[0].src;
-      const expected = url.indexOf('start') !== -1 ?
-        'https://archive.org/embed/PATH?start=360&end=420.3' :
-        'https://archive.org/embed/PATH';
+      const expected =
+        url.indexOf('start') !== -1
+          ? 'https://archive.org/embed/PATH?start=360&end=420.3'
+          : 'https://archive.org/embed/PATH';
       assert.equal(actual, expected);
     });
   });
-
 
   it('replaces audio links with html5 audio elements', function() {
     const urls = [
@@ -300,7 +331,7 @@ describe('media-embedder', function () {
       'https://wisc.pb.unizin.org/frenchcscr/wp-content/uploads/sites/208/2018/03/6Léry_Conclusion.mp3',
       'https://wisc.pb.unizin.org/frenchcscr/wp-content/uploads/sites/208/2018/03/6L%25C3%25A9ry_Conclusion.mp3',
     ];
-    urls.forEach(function (url) {
+    urls.forEach(function(url) {
       const element = domElement('<a href="' + url + '">' + url + '</a>');
 
       mediaEmbedder.replaceLinksWithEmbeds(element);
@@ -320,7 +351,7 @@ describe('media-embedder', function () {
     });
   });
 
-  it('does not replace links if the link text is different', function () {
+  it('does not replace links if the link text is different', function() {
     const url = 'https://youtu.be/QCkm0lL-6lc';
     const element = domElement('<a href="' + url + '">different label</a>');
 
@@ -330,7 +361,7 @@ describe('media-embedder', function () {
     assert.equal(element.children[0].tagName, 'A');
   });
 
-  it('does not replace non-media links', function () {
+  it('does not replace non-media links', function() {
     const url = 'https://example.com/example.html';
     const element = domElement('<a href="' + url + '">' + url + '</a>');
 
@@ -340,37 +371,53 @@ describe('media-embedder', function () {
     assert.equal(element.children[0].tagName, 'A');
   });
 
-  it('does not mess with the rest of the HTML', function () {
+  it('does not mess with the rest of the HTML', function() {
     const url = 'https://www.youtube.com/watch?v=QCkm0lL-6lc';
     const element = domElement(
       '<p>Look at this video:</p>\n\n' +
-      '<a href="' + url + '">' + url + '</a>\n\n' +
-      '<p>Isn\'t it cool!</p>\n\n');
+        '<a href="' +
+        url +
+        '">' +
+        url +
+        '</a>\n\n' +
+        "<p>Isn't it cool!</p>\n\n"
+    );
 
     mediaEmbedder.replaceLinksWithEmbeds(element);
 
     assert.equal(element.childElementCount, 3);
-    assert.equal(
-      element.children[0].outerHTML, '<p>Look at this video:</p>');
-    assert.equal(
-      element.children[2].outerHTML, '<p>Isn\'t it cool!</p>');
+    assert.equal(element.children[0].outerHTML, '<p>Look at this video:</p>');
+    assert.equal(element.children[2].outerHTML, "<p>Isn't it cool!</p>");
   });
 
-  it('replaces multiple links with multiple embeds', function () {
+  it('replaces multiple links with multiple embeds', function() {
     const url1 = 'https://www.youtube.com/watch?v=QCkm0lL-6lc';
     const url2 = 'https://youtu.be/abcdefg';
     const element = domElement(
-      '<a href="' + url1 + '">' + url1 + '</a>\n\n' +
-        '<a href="' + url2 + '">' + url2 + '</a>');
+      '<a href="' +
+        url1 +
+        '">' +
+        url1 +
+        '</a>\n\n' +
+        '<a href="' +
+        url2 +
+        '">' +
+        url2 +
+        '</a>'
+    );
 
     mediaEmbedder.replaceLinksWithEmbeds(element);
 
     assert.equal(element.childElementCount, 2);
     assert.equal(element.children[0].tagName, 'IFRAME');
     assert.equal(
-      element.children[0].src, 'https://www.youtube.com/embed/QCkm0lL-6lc');
+      element.children[0].src,
+      'https://www.youtube.com/embed/QCkm0lL-6lc'
+    );
     assert.equal(element.children[1].tagName, 'IFRAME');
     assert.equal(
-      element.children[1].src, 'https://www.youtube.com/embed/abcdefg');
+      element.children[1].src,
+      'https://www.youtube.com/embed/abcdefg'
+    );
   });
 });

@@ -17,13 +17,13 @@ const uiConstants = require('../ui-constants');
  */
 
 /**
-  * Return a minimal representation of an annotation that can be sent from the
-  * sidebar app to a connected frame.
-  *
-  * Because this representation will be exposed to untrusted third-party
-  * JavaScript, it includes only the information needed to uniquely identify it
-  * within the current session and anchor it in the document.
-  */
+ * Return a minimal representation of an annotation that can be sent from the
+ * sidebar app to a connected frame.
+ *
+ * Because this representation will be exposed to untrusted third-party
+ * JavaScript, it includes only the information needed to uniquely identify it
+ * within the current session and anchor it in the document.
+ */
 function formatAnnot(ann) {
   return {
     tag: ann.$tag,
@@ -42,7 +42,6 @@ function formatAnnot(ann) {
  */
 // @ngInject
 function FrameSync($rootScope, $window, Discovery, store, bridge) {
-
   // Set of tags of annotations that are currently loaded into the frame
   const inFrame = new Set();
 
@@ -56,10 +55,12 @@ function FrameSync($rootScope, $window, Discovery, store, bridge) {
     let prevFrames = [];
     let prevPublicAnns = 0;
 
-    store.subscribe(function () {
+    store.subscribe(function() {
       const state = store.getState();
-      if (state.annotations === prevAnnotations &&
-          state.frames === prevFrames) {
+      if (
+        state.annotations === prevAnnotations &&
+        state.frames === prevFrames
+      ) {
         return;
       }
 
@@ -67,7 +68,7 @@ function FrameSync($rootScope, $window, Discovery, store, bridge) {
       const inSidebar = new Set();
       const added = [];
 
-      state.annotations.forEach(function (annot) {
+      state.annotations.forEach(function(annot) {
         if (metadata.isReply(annot)) {
           // The frame does not need to know about replies
           return;
@@ -82,7 +83,7 @@ function FrameSync($rootScope, $window, Discovery, store, bridge) {
           added.push(annot);
         }
       });
-      const deleted = prevAnnotations.filter(function (annot) {
+      const deleted = prevAnnotations.filter(function(annot) {
         return !inSidebar.has(annot.$tag);
       });
       prevAnnotations = state.annotations;
@@ -93,20 +94,27 @@ function FrameSync($rootScope, $window, Discovery, store, bridge) {
       // annotations if their selectors are updated.
       if (added.length > 0) {
         bridge.call('loadAnnotations', added.map(formatAnnot));
-        added.forEach(function (annot) {
+        added.forEach(function(annot) {
           inFrame.add(annot.$tag);
         });
       }
-      deleted.forEach(function (annot) {
+      deleted.forEach(function(annot) {
         bridge.call('deleteAnnotation', formatAnnot(annot));
         inFrame.delete(annot.$tag);
       });
 
       const frames = store.frames();
       if (frames.length > 0) {
-        if (frames.every(function (frame) { return frame.isAnnotationFetchComplete; })) {
+        if (
+          frames.every(function(frame) {
+            return frame.isAnnotationFetchComplete;
+          })
+        ) {
           if (publicAnns === 0 || publicAnns !== prevPublicAnns) {
-            bridge.call(bridgeEvents.PUBLIC_ANNOTATION_COUNT_CHANGED, publicAnns);
+            bridge.call(
+              bridgeEvents.PUBLIC_ANNOTATION_COUNT_CHANGED,
+              publicAnns
+            );
             prevPublicAnns = publicAnns;
           }
         }
@@ -120,9 +128,9 @@ function FrameSync($rootScope, $window, Discovery, store, bridge) {
    */
   function setupSyncFromFrame() {
     // A new annotation, note or highlight was created in the frame
-    bridge.on('beforeCreateAnnotation', function (event) {
+    bridge.on('beforeCreateAnnotation', function(event) {
       inFrame.add(event.tag);
-      const annot = Object.assign({}, event.msg, {$tag: event.tag});
+      const annot = Object.assign({}, event.msg, { $tag: event.tag });
       $rootScope.$broadcast(events.BEFORE_ANNOTATION_CREATED, annot);
     });
 
@@ -136,41 +144,46 @@ function FrameSync($rootScope, $window, Discovery, store, bridge) {
     let anchoringStatusUpdates = {};
     const scheduleAnchoringStatusUpdate = debounce(() => {
       store.updateAnchorStatus(anchoringStatusUpdates);
-      $rootScope.$broadcast(events.ANNOTATIONS_SYNCED, Object.keys(anchoringStatusUpdates));
+      $rootScope.$broadcast(
+        events.ANNOTATIONS_SYNCED,
+        Object.keys(anchoringStatusUpdates)
+      );
       anchoringStatusUpdates = {};
     }, 10);
 
     // Anchoring an annotation in the frame completed
-    bridge.on('sync', function (events_) {
-      events_.forEach(function (event) {
+    bridge.on('sync', function(events_) {
+      events_.forEach(function(event) {
         inFrame.add(event.tag);
-        anchoringStatusUpdates[event.tag] = event.msg.$orphan ? 'orphan' : 'anchored';
+        anchoringStatusUpdates[event.tag] = event.msg.$orphan
+          ? 'orphan'
+          : 'anchored';
         scheduleAnchoringStatusUpdate();
       });
     });
 
-    bridge.on('showAnnotations', function (tags) {
+    bridge.on('showAnnotations', function(tags) {
       store.selectAnnotations(store.findIDsForTags(tags));
       store.selectTab(uiConstants.TAB_ANNOTATIONS);
     });
 
-    bridge.on('focusAnnotations', function (tags) {
+    bridge.on('focusAnnotations', function(tags) {
       store.focusAnnotations(tags || []);
     });
 
-    bridge.on('toggleAnnotationSelection', function (tags) {
+    bridge.on('toggleAnnotationSelection', function(tags) {
       store.toggleSelectedAnnotations(store.findIDsForTags(tags));
     });
 
-    bridge.on('sidebarOpened', function () {
+    bridge.on('sidebarOpened', function() {
       $rootScope.$broadcast('sidebarOpened');
     });
 
     // These invoke the matching methods by name on the Guests
-    bridge.on('showSidebar', function () {
+    bridge.on('showSidebar', function() {
       bridge.call('showSidebar');
     });
-    bridge.on('hideSidebar', function () {
+    bridge.on('hideSidebar', function() {
       bridge.call('hideSidebar');
     });
     bridge.on('showAll', function () {
@@ -182,7 +195,6 @@ function FrameSync($rootScope, $window, Discovery, store, bridge) {
     bridge.on('setVisibleHighlights', function (state) {
       bridge.call('setVisibleHighlights', state);
     });
-
   }
 
   /**
@@ -191,7 +203,7 @@ function FrameSync($rootScope, $window, Discovery, store, bridge) {
    * connected frames.
    */
   function addFrame(channel) {
-    channel.call('getDocumentInfo', function (err, info) {
+    channel.call('getDocumentInfo', function(err, info) {
       if (err) {
         channel.destroy();
         return;
@@ -212,7 +224,7 @@ function FrameSync($rootScope, $window, Discovery, store, bridge) {
 
   function destroyFrame(frameIdentifier) {
     const frames = store.frames();
-    const frameToDestroy = frames.find(function (frame) {
+    const frameToDestroy = frames.find(function(frame) {
       return frame.id === frameIdentifier;
     });
     if (frameToDestroy) {
@@ -223,8 +235,8 @@ function FrameSync($rootScope, $window, Discovery, store, bridge) {
   /**
    * Find and connect to Hypothesis clients in the current window.
    */
-  this.connect = function () {
-    const discovery = new Discovery(window, {server: true});
+  this.connect = function() {
+    const discovery = new Discovery(window, { server: true });
     discovery.startDiscovery(bridge.createChannel.bind(bridge));
     bridge.onConnect(addFrame);
 
@@ -240,7 +252,7 @@ function FrameSync($rootScope, $window, Discovery, store, bridge) {
    *
    * @param {string[]} tags
    */
-  this.focusAnnotations = function (tags) {
+  this.focusAnnotations = function(tags) {
     bridge.call('focusAnnotations', tags);
   };
 
@@ -249,7 +261,7 @@ function FrameSync($rootScope, $window, Discovery, store, bridge) {
    *
    * @param {string} tag
    */
-  this.scrollToAnnotation = function (tag) {
+  this.scrollToAnnotation = function(tag) {
     bridge.call('scrollToAnnotation', tag);
   };
 }

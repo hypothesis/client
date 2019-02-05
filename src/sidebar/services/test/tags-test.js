@@ -24,8 +24,7 @@ describe('sidebar.tags', () => {
   let tags;
 
   before(() => {
-    angular.module('h', [])
-      .service('tags', require('../tags'));
+    angular.module('h', []).service('tags', require('../tags'));
   });
 
   beforeEach(() => {
@@ -62,7 +61,7 @@ describe('sidebar.tags', () => {
     angular.mock.module('h', {
       localStorage: fakeLocalStorage,
     });
-    angular.mock.inject((_tags_) => {
+    angular.mock.inject(_tags_ => {
       tags = _tags_;
     });
   });
@@ -79,28 +78,31 @@ describe('sidebar.tags', () => {
 
   describe('#store', () => {
     it('saves new tags to storage', () => {
-      tags.store([{text: 'new'}]);
+      tags.store([{ text: 'new' }]);
 
       const storedTagsList = fakeLocalStorage.getObject(TAGS_LIST_KEY);
       assert.include(storedTagsList, 'new');
 
       const storedTagsMap = fakeLocalStorage.getObject(TAGS_MAP_KEY);
-      assert.match(storedTagsMap.new, sinon.match({
-        count: 1,
-        text: 'new',
-        updated: sinon.match.number,
-      }));
+      assert.match(
+        storedTagsMap.new,
+        sinon.match({
+          count: 1,
+          text: 'new',
+          updated: sinon.match.number,
+        })
+      );
     });
 
     it('increases the count for a tag already stored', () => {
-      tags.store([{text: 'bar'}]);
+      tags.store([{ text: 'bar' }]);
       const storedTagsMap = fakeLocalStorage.getObject(TAGS_MAP_KEY);
       assert.equal(storedTagsMap.bar.count, 6);
     });
 
     it('orders list by count descending, lexical ascending', () => {
       for (let i = 0; i < 6; i++) {
-        tags.store([{text: 'foo'}]);
+        tags.store([{ text: 'foo' }]);
       }
 
       const storedTagsList = fakeLocalStorage.getObject(TAGS_LIST_KEY);

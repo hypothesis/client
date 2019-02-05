@@ -13,9 +13,19 @@ function splitTerm(term) {
     return [null, term];
   }
 
-  if (['group', 'quote', 'result', 'since',
-       'tag', 'text', 'uri', 'user'].includes(filter)) {
-    const data = term.slice(filter.length+1);
+  if (
+    [
+      'group',
+      'quote',
+      'result',
+      'since',
+      'tag',
+      'text',
+      'uri',
+      'user',
+    ].includes(filter)
+  ) {
+    const data = term.slice(filter.length + 1);
     return [filter, data];
   } else {
     // The filter is not a power search filter, so the whole term is data
@@ -30,7 +40,9 @@ function splitTerm(term) {
  * Quoted phrases in `searchtext` are returned as a single token.
  */
 function tokenize(searchtext) {
-  if (!searchtext) { return []; }
+  if (!searchtext) {
+    return [];
+  }
 
   // Small helper function for removing quote characters
   // from the beginning- and end of a string, if the
@@ -41,9 +53,9 @@ function tokenize(searchtext) {
   //   'foo" -> 'foo"
   //   bar"  -> bar"
   const _removeQuoteCharacter = function(text) {
-    const start = text.slice(0,1);
+    const start = text.slice(0, 1);
     const end = text.slice(-1);
-    if (((start === '"') || (start === "'")) && (start === end)) {
+    if ((start === '"' || start === "'") && start === end) {
       text = text.slice(1, text.length - 1);
     }
     return text;
@@ -60,7 +72,7 @@ function tokenize(searchtext) {
     const token = tokens[index];
     const [filter, data] = splitTerm(token);
     if (filter) {
-      tokens[index] = filter + ':' + (_removeQuoteCharacter(data));
+      tokens[index] = filter + ':' + _removeQuoteCharacter(data);
     }
   }
 
@@ -75,13 +87,13 @@ function tokenize(searchtext) {
  */
 function toObject(searchtext) {
   const obj = {};
-  const backendFilter = f => f === 'tag' ? 'tags' : f;
+  const backendFilter = f => (f === 'tag' ? 'tags' : f);
 
   const addToObj = function(key, data) {
     if (obj[key]) {
       return obj[key].push(data);
     } else {
-      return obj[key] = [data];
+      return (obj[key] = [data]);
     }
   };
 
@@ -134,62 +146,71 @@ function generateFacetedFilter(searchtext) {
       let t;
       const filter = term.slice(0, term.indexOf(':'));
       switch (filter) {
-      case 'quote':
-        quote.push(term.slice(6));
-        break;
-      case 'result':
-        result.push(term.slice(7));
-        break;
-      case 'since':
-        {
-          // We'll turn this into seconds
-          let time = term.slice(6).toLowerCase();
-          if (time.match(/^\d+$/)) {
-            // Only digits, assuming seconds
-            since.push(time * 1);
+        case 'quote':
+          quote.push(term.slice(6));
+          break;
+        case 'result':
+          result.push(term.slice(7));
+          break;
+        case 'since':
+          {
+            // We'll turn this into seconds
+            let time = term.slice(6).toLowerCase();
+            if (time.match(/^\d+$/)) {
+              // Only digits, assuming seconds
+              since.push(time * 1);
+            }
+            if (time.match(/^\d+sec$/)) {
+              // Time given in seconds
+              t = /^(\d+)sec$/.exec(time)[1];
+              since.push(t * 1);
+            }
+            if (time.match(/^\d+min$/)) {
+              // Time given in minutes
+              t = /^(\d+)min$/.exec(time)[1];
+              since.push(t * 60);
+            }
+            if (time.match(/^\d+hour$/)) {
+              // Time given in hours
+              t = /^(\d+)hour$/.exec(time)[1];
+              since.push(t * 60 * 60);
+            }
+            if (time.match(/^\d+day$/)) {
+              // Time given in days
+              t = /^(\d+)day$/.exec(time)[1];
+              since.push(t * 60 * 60 * 24);
+            }
+            if (time.match(/^\d+week$/)) {
+              // Time given in week
+              t = /^(\d+)week$/.exec(time)[1];
+              since.push(t * 60 * 60 * 24 * 7);
+            }
+            if (time.match(/^\d+month$/)) {
+              // Time given in month
+              t = /^(\d+)month$/.exec(time)[1];
+              since.push(t * 60 * 60 * 24 * 30);
+            }
+            if (time.match(/^\d+year$/)) {
+              // Time given in year
+              t = /^(\d+)year$/.exec(time)[1];
+              since.push(t * 60 * 60 * 24 * 365);
+            }
           }
-          if (time.match(/^\d+sec$/)) {
-            // Time given in seconds
-            t = /^(\d+)sec$/.exec(time)[1];
-            since.push(t * 1);
-          }
-          if (time.match(/^\d+min$/)) {
-            // Time given in minutes
-            t = /^(\d+)min$/.exec(time)[1];
-            since.push(t * 60);
-          }
-          if (time.match(/^\d+hour$/)) {
-            // Time given in hours
-            t = /^(\d+)hour$/.exec(time)[1];
-            since.push(t * 60 * 60);
-          }
-          if (time.match(/^\d+day$/)) {
-            // Time given in days
-            t = /^(\d+)day$/.exec(time)[1];
-            since.push(t * 60 * 60 * 24);
-          }
-          if (time.match(/^\d+week$/)) {
-            // Time given in week
-            t = /^(\d+)week$/.exec(time)[1];
-            since.push(t * 60 * 60 * 24 * 7);
-          }
-          if (time.match(/^\d+month$/)) {
-            // Time given in month
-            t = /^(\d+)month$/.exec(time)[1];
-            since.push(t * 60 * 60 * 24 * 30);
-          }
-          if (time.match(/^\d+year$/)) {
-            // Time given in year
-            t = /^(\d+)year$/.exec(time)[1];
-            since.push(t * 60 * 60 * 24 * 365);
-          }
-        }
-        break;
-      case 'tag': tag.push(term.slice(4)); break;
-      case 'text': text.push(term.slice(5)); break;
-      case 'uri': uri.push(term.slice(4)); break;
-      case 'user': user.push(term.slice(5)); break;
-      default: any.push(term);
+          break;
+        case 'tag':
+          tag.push(term.slice(4));
+          break;
+        case 'text':
+          text.push(term.slice(5));
+          break;
+        case 'uri':
+          uri.push(term.slice(4));
+          break;
+        case 'user':
+          user.push(term.slice(5));
+          break;
+        default:
+          any.push(term);
       }
     }
   }

@@ -6,18 +6,12 @@ const path = require('path');
 
 module.exports = function(config) {
   config.set({
-
     // base path that will be used to resolve all patterns (eg. files, exclude)
     basePath: './',
 
     // frameworks to use
     // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
-    frameworks: [
-      'browserify',
-      'mocha',
-      'chai',
-      'sinon',
-    ],
+    frameworks: ['browserify', 'mocha', 'chai', 'sinon'],
 
     // list of files / patterns to load in the browser
     files: [
@@ -35,16 +29,30 @@ module.exports = function(config) {
       // watchify
 
       // Unit tests
-      { pattern: 'annotator/**/*-test.coffee', watched: false, included: true, served: true },
-      { pattern: '**/test/*-test.js', watched: false, included: true, served: true },
+      {
+        pattern: 'annotator/**/*-test.coffee',
+        watched: false,
+        included: true,
+        served: true,
+      },
+      {
+        pattern: '**/test/*-test.js',
+        watched: false,
+        included: true,
+        served: true,
+      },
 
       // Integration tests
-      { pattern: '**/integration/*-test.js', watched: false, included: true, served: true },
+      {
+        pattern: '**/integration/*-test.js',
+        watched: false,
+        included: true,
+        served: true,
+      },
     ],
 
     // list of files to exclude
-    exclude: [
-    ],
+    exclude: [],
 
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
@@ -59,22 +67,28 @@ module.exports = function(config) {
     browserify: {
       debug: true,
       extensions: ['.coffee'],
-      configure: function (bundle) {
+      configure: function(bundle) {
         bundle.plugin('proxyquire-universal');
       },
 
       transform: [
         'coffeeify',
-        ['babelify', {
-          // The transpiled CoffeeScript is fed through Babelify to add
-          // code coverage instrumentation for Istanbul.
-          extensions: ['.js', '.coffee'],
-          plugins: [
-            ['babel-plugin-istanbul', {
-              'exclude': ['**/test/**/*.{coffee,js}'],
-            }],
-          ],
-        }],
+        [
+          'babelify',
+          {
+            // The transpiled CoffeeScript is fed through Babelify to add
+            // code coverage instrumentation for Istanbul.
+            extensions: ['.js', '.coffee'],
+            plugins: [
+              [
+                'babel-plugin-istanbul',
+                {
+                  exclude: ['**/test/**/*.{coffee,js}'],
+                },
+              ],
+            ],
+          },
+        ],
       ],
     },
 

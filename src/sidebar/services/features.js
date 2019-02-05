@@ -14,11 +14,9 @@
 const events = require('../events');
 const bridgeEvents = require('../../shared/bridge-events');
 
-
 // @ngInject
 function features($log, $rootScope, bridge, session) {
-
-  const _sendFeatureFlags = function(){
+  const _sendFeatureFlags = function() {
     const userFeatures = session.state.features;
     bridge.call(bridgeEvents.FEATURE_FLAGS_UPDATED, userFeatures || {});
   };

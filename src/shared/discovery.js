@@ -37,7 +37,7 @@ class Discovery {
    * @param {Window} target
    * @param {Object} options
    */
-  constructor(target, options={}) {
+  constructor(target, options = {}) {
     /** The window to send and listen for messages with. */
     this.target = target;
 
@@ -80,7 +80,9 @@ class Discovery {
    */
   startDiscovery(onDiscovery) {
     if (this.onDiscovery) {
-      throw new Error('Discovery is already in progress. Call stopDiscovery() first');
+      throw new Error(
+        'Discovery is already in progress. Call stopDiscovery() first'
+      );
     }
 
     this.onDiscovery = onDiscovery;
@@ -142,26 +144,32 @@ class Discovery {
     // When sending messages to or from a Firefox WebExtension, current
     // versions of Firefox have a bug that causes the origin check to fail even
     // though the target and actual origins of the message match.
-    if (origin === 'null' || origin.match('moz-extension:') ||
-        window.location.protocol === 'moz-extension:') {
+    if (
+      origin === 'null' ||
+      origin.match('moz-extension:') ||
+      window.location.protocol === 'moz-extension:'
+    ) {
       origin = '*';
     }
 
     // Check if this is a recognized message from a `Discovery` instance in
     // another frame.
-    const match = (
+    const match =
       typeof data === 'string' &&
-      data.match(/^__cross_frame_dhcp_(discovery|offer|request|ack)(?::(\d+))?$/)
-    );
+      data.match(
+        /^__cross_frame_dhcp_(discovery|offer|request|ack)(?::(\d+))?$/
+      );
     if (!match) {
       return;
     }
 
     // Handle the message, and send a response back to the original frame if
     // appropriate.
-    let [ , messageType, messageToken ] = match;
+    let [, messageType, messageToken] = match;
     const { reply, discovered, token } = this._processMessage(
-      messageType, messageToken, origin
+      messageType,
+      messageToken,
+      origin
     );
 
     if (reply) {
@@ -195,7 +203,8 @@ class Discovery {
       }
     } else {
       // Handle message as a client frame.
-      if (messageType === 'offer') { // eslint-disable-line no-lonely-if
+      if (messageType === 'offer') {
+        // eslint-disable-line no-lonely-if
         if (!this.requestInProgress) {
           this.requestInProgress = true;
           reply = 'request';
@@ -214,7 +223,9 @@ class Discovery {
    * and a server.
    */
   generateToken() {
-    return Math.random().toString().replace(/\D/g, '');
+    return Math.random()
+      .toString()
+      .replace(/\D/g, '');
   }
 }
 

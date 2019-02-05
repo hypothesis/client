@@ -3,7 +3,6 @@
 const configFrom = require('./config/index');
 require('../shared/polyfills');
 
-
 // Polyfills
 
 // document.evaluate() implementation,
@@ -37,13 +36,13 @@ const pluginClasses = {
   CrossFrame: require('./plugin/cross-frame'),
 };
 
-const appLinkEl = document.querySelector('link[type="application/annotator+html"][rel="sidebar"]');
+const appLinkEl = document.querySelector(
+  'link[type="application/annotator+html"][rel="sidebar"]'
+);
 const config = configFrom(window);
 
 $.noConflict(true)(function() {
-  let Klass = window.PDFViewerApplication ?
-    PdfSidebar :
-    Sidebar;
+  let Klass = window.PDFViewerApplication ? PdfSidebar : Sidebar;
 
   if (config.hasOwnProperty('constructor')) {
     Klass = config.constructor;
@@ -66,7 +65,7 @@ $.noConflict(true)(function() {
   config.pluginClasses = pluginClasses;
 
   const annotator = new Klass(document.body, config);
-  appLinkEl.addEventListener('destroy', function () {
+  appLinkEl.addEventListener('destroy', function() {
     appLinkEl.parentElement.removeChild(appLinkEl);
     annotator.destroy();
   });

@@ -14,12 +14,12 @@
  * @param {Function} handler
  */
 function addEventHandler($scope, element, events, handler) {
-  const callback = function (event) {
-    $scope.$apply(function () {
-      handler($scope, {$event: event});
+  const callback = function(event) {
+    $scope.$apply(function() {
+      handler($scope, { $event: event });
     });
   };
-  events.forEach(function (name) {
+  events.forEach(function(name) {
     element.addEventListener(name, callback);
   });
 }
@@ -30,10 +30,10 @@ function addEventHandler($scope, element, events, handler) {
  * mouse press OR touch.
  */
 // @ngInject
-module.exports = function ($parse) {
+module.exports = function($parse) {
   return {
     restrict: 'A',
-    link: function ($scope, $element, $attrs) {
+    link: function($scope, $element, $attrs) {
       const fn = $parse($attrs.hOnTouch, null /* interceptor */);
       addEventHandler(
         $scope,

@@ -20,7 +20,7 @@ function injectScript(doc, src) {
 }
 
 function injectAssets(doc, config, assets) {
-  assets.forEach(function (path) {
+  assets.forEach(function(path) {
     const url = config.assetRoot + 'build/' + config.manifest[path];
     if (url.match(/\.css/)) {
       injectStylesheet(doc, url);
@@ -37,7 +37,9 @@ function injectAssets(doc, config, assets) {
  */
 function bootHypothesisClient(doc, config) {
   // Detect presence of Hypothesis in the page
-  const appLinkEl = doc.querySelector('link[type="application/annotator+html"]');
+  const appLinkEl = doc.querySelector(
+    'link[type="application/annotator+html"]'
+  );
   if (appLinkEl) {
     return;
   }

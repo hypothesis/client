@@ -3,7 +3,7 @@
 module.exports = {
   controllerAs: 'vm',
   //@ngInject
-  controller: function (serviceUrl) {
+  controller: function(serviceUrl) {
     this.serviceUrl = serviceUrl;
   },
   bindings: {

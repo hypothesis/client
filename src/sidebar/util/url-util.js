@@ -22,7 +22,7 @@ function replaceURLParams(url, params) {
       }
     }
   }
-  return {url: url, params: unusedParams};
+  return { url: url, params: unusedParams };
 }
 
 /**

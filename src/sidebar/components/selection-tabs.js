@@ -14,25 +14,27 @@ module.exports = {
 
     this.isThemeClean = settings.theme === 'clean';
 
-    this.enableExperimentalNewNoteButton = settings.enableExperimentalNewNoteButton;
+    this.enableExperimentalNewNoteButton =
+      settings.enableExperimentalNewNoteButton;
 
-    this.selectTab = function (type) {
+    this.selectTab = function(type) {
       store.clearSelectedAnnotations();
       store.selectTab(type);
     };
 
-    this.showAnnotationsUnavailableMessage = function () {
-      return this.selectedTab === this.TAB_ANNOTATIONS &&
+    this.showAnnotationsUnavailableMessage = function() {
+      return (
+        this.selectedTab === this.TAB_ANNOTATIONS &&
         this.totalAnnotations === 0 &&
-        !this.isWaitingToAnchorAnnotations;
+        !this.isWaitingToAnchorAnnotations
+      );
     };
 
-    this.showNotesUnavailableMessage = function () {
-      return this.selectedTab === this.TAB_NOTES &&
-        this.totalNotes === 0;
+    this.showNotesUnavailableMessage = function() {
+      return this.selectedTab === this.TAB_NOTES && this.totalNotes === 0;
     };
 
-    this.showSidebarTutorial = function () {
+    this.showSidebarTutorial = function() {
       return sessionUtil.shouldShowSidebarTutorial(session.state);
     };
   },
