@@ -44,8 +44,8 @@ function extractMath(content) {
   let pos = 0;
   let replacedContent = content;
 
+  // eslint-disable-next-line no-constant-condition
   while (true) {
-    // eslint-disable-line no-constant-condition
     const blockMathStart = replacedContent.indexOf('$$', pos);
     const inlineMathStart = replacedContent.indexOf('\\(', pos);
 
