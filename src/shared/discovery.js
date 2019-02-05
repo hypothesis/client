@@ -203,6 +203,7 @@ class Discovery {
       }
     } else {
       // Handle message as a client frame.
+      // eslint-disable-next-line no-lonely-if
       if (messageType === 'offer') {
         // eslint-disable-line no-lonely-if
         if (!this.requestInProgress) {

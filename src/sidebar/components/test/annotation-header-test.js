@@ -29,8 +29,8 @@ describe('sidebar.components.annotation-header', function() {
   beforeEach('Import and register the annotationHeader component', function() {
     const annotationHeader = proxyquire('../annotation-header', {
       '../annotation-metadata': {
+        // eslint-disable-next-line no-unused-vars
         domainAndTitle: function(ann) {
-          // eslint-disable-line no-unused-vars
           return fakeDocumentMeta;
         },
       },
