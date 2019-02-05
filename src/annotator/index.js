@@ -5,15 +5,10 @@ require('../shared/polyfills');
 
 // Polyfills
 
-// document.evaluate() implementation,
-// required by IE 10, 11
-//
-// This sets `window.wgxpath`
+// `document.evaluate` polyfill for IE 11.
 if (!window.document.evaluate) {
-  require('./vendor/wgxpath.install');
-}
-if (window.wgxpath) {
-  window.wgxpath.install();
+  const wgxpath = require('wicked-good-xpath');
+  wgxpath.install();
 }
 
 const $ = require('jquery');
