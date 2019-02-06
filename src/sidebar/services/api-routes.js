@@ -14,7 +14,12 @@ function apiRoutes($http, settings) {
   let linkCache;
 
   function getJSON(url) {
-    return $http.get(url).then(({ status, data }) => {
+    const config = {
+      headers: {
+        'Hypothesis-Client-Version': '__VERSION__', // replaced by versionify
+      },
+    };
+    return $http.get(url, config).then(({ status, data }) => {
       if (status !== 200) {
         throw new Error(`Fetching ${url} failed`);
       }
