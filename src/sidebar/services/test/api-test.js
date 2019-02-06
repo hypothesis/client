@@ -364,4 +364,16 @@ describe('sidebar.services.api', function() {
       .respond(() => [200, { userid: 'acct:user@example.com' }]);
     $httpBackend.flush();
   });
+
+  it('sends client version custom request header', () => {
+    api.profile.read({});
+
+    $httpBackend
+      .expectGET(
+        'https://example.com/api/profile',
+        headers => headers['Hypothesis-Client-Version'] === '__VERSION__'
+      )
+      .respond(() => [200, { userid: 'acct:user@example.com' }]);
+    $httpBackend.flush();
+  });
 });
