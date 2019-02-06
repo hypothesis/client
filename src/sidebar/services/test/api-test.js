@@ -17,9 +17,11 @@ const util = require('../../../shared/test/util');
 const routes = require('./api-index.json').links;
 
 describe('sidebar.services.api', function() {
-  let $httpBackend = null;
-  let sandbox = null;
-  let api = null;
+  let $httpBackend;
+  let $q;
+  let fakeAuth;
+  let sandbox;
+  let api;
 
   before(function() {
     angular.module('h', []).service(
@@ -45,7 +47,9 @@ describe('sidebar.services.api', function() {
       links: sinon.stub(),
       routes: sinon.stub(),
     };
-    const fakeAuth = {};
+    fakeAuth = {
+      tokenGetter: sinon.stub(),
+    };
 
     angular.mock.module('h', {
       apiRoutes: fakeApiRoutes,
@@ -54,10 +58,8 @@ describe('sidebar.services.api', function() {
     });
 
     angular.mock.inject(function(_$q_) {
-      const $q = _$q_;
-      fakeAuth.tokenGetter = function() {
-        return $q.resolve('faketoken');
-      };
+      $q = _$q_;
+      fakeAuth.tokenGetter.returns($q.resolve('faketoken'));
 
       fakeApiRoutes.routes.returns($q.resolve(routes));
     });
@@ -334,6 +336,31 @@ describe('sidebar.services.api', function() {
 
     $httpBackend
       .expectGET('https://example.com/api/profile')
+      .respond(() => [200, { userid: 'acct:user@example.com' }]);
+    $httpBackend.flush();
+  });
+
+  it('omits Authorization header if no access token is available', () => {
+    fakeAuth.tokenGetter.returns($q.resolve(null));
+    api.profile.read();
+
+    $httpBackend
+      .expectGET(
+        'https://example.com/api/profile',
+        headers => !('Authorization' in headers)
+      )
+      .respond(() => [200, { userid: 'acct:user@example.com' }]);
+    $httpBackend.flush();
+  });
+
+  it('sets Authorization header if access token is available', () => {
+    api.profile.read();
+
+    $httpBackend
+      .expectGET(
+        'https://example.com/api/profile',
+        headers => headers.Authorization === 'Bearer faketoken'
+      )
       .respond(() => [200, { userid: 'acct:user@example.com' }]);
     $httpBackend.flush();
   });
