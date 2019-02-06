@@ -144,18 +144,20 @@ Code Style
 JavaScript
 ##########
 
-Hypothesis uses ESLint to help maintain style consistency. You can check your
-changes for conformance using:
+Hypothesis uses ESLint_ (a linter) and Prettier_ (an automated code formatter)
+to ensure style consistency and help prevent common mistakes. Plugins are
+available for most editors for these tools. We recommend that you set these up
+before making changes to the code.
+
+To auto-format code and run lint checks locally using the CLI, run:
 
 .. code-block:: sh
 
+   make format
    make lint
 
-Many lint errors can be fixed automatically using:
-
-.. code-block:: sh
-
-   ./node_modules/.bin/eslint --fix
+.. _ESLint: https://eslint.org
+.. _Prettier: https://prettier.io
 
 CSS
 ###
