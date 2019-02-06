@@ -1,8 +1,8 @@
 'use strict';
 
-module.exports = function () {
+module.exports = function() {
   return {
-    link: function (scope, elem, attr) {
+    link: function(scope, elem, attr) {
       let active = true;
       const html = elem.prop('ownerDocument').documentElement;
       const view = elem.prop('ownerDocument').defaultView;
@@ -22,7 +22,7 @@ module.exports = function () {
 
       view.addEventListener('scroll', onScroll, false);
 
-      scope.$on('$destroy', function () {
+      scope.$on('$destroy', function() {
         view.removeEventListener('scroll', onScroll);
       });
     },

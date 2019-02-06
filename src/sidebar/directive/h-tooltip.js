@@ -18,12 +18,12 @@ let theTooltip;
  * @param {Element} rootElement - The container for the tooltip.
  */
 function Tooltip(rootElement) {
-  this.setState = function (state) {
+  this.setState = function(state) {
     this.state = Object.freeze(Object.assign({}, this.state, state));
     this.render();
   };
 
-  this.render = function () {
+  this.render = function() {
     const TOOLTIP_ARROW_HEIGHT = 7;
 
     if (!this.state.target) {
@@ -79,17 +79,17 @@ function Tooltip(rootElement) {
  *
  * Example: '<button aria-label="Tooltip label" h-tooltip></button>'
  */
-module.exports = function () {
+module.exports = function() {
   if (!theTooltip) {
     theTooltip = new Tooltip(document.body);
   }
 
   return {
     restrict: 'A',
-    link: function ($scope, $element) {
+    link: function($scope, $element) {
       const el = $element[0];
 
-      el.addEventListener('mouseover', function () {
+      el.addEventListener('mouseover', function() {
         const direction = el.getAttribute('tooltip-direction') || 'down';
         theTooltip.setState({
           direction: direction,
@@ -97,14 +97,14 @@ module.exports = function () {
         });
       });
 
-      el.addEventListener('mouseout', function () {
-        theTooltip.setState({target: null});
+      el.addEventListener('mouseout', function() {
+        theTooltip.setState({ target: null });
       });
 
       // Hide the tooltip if the element is removed whilst the tooltip is active
-      $scope.$on('$destroy', function () {
+      $scope.$on('$destroy', function() {
         if (theTooltip.state.target === el) {
-          theTooltip.setState({target: null});
+          theTooltip.setState({ target: null });
         }
       });
     },

@@ -26,7 +26,7 @@ const fixtures = {
   },
 
   formPostParams: {
-    headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
   },
 };
 
@@ -44,7 +44,7 @@ describe('sidebar.util.oauth-client', () => {
 
   beforeEach(() => {
     fakeHttp = {
-      post: sinon.stub().returns(Promise.resolve({status: 200})),
+      post: sinon.stub().returns(Promise.resolve({ status: 200 })),
     };
     clock = sinon.useFakeTimers();
 
@@ -59,8 +59,14 @@ describe('sidebar.util.oauth-client', () => {
     it('makes a POST request to the authorization endpoint', () => {
       fakeHttp.post.returns(Promise.resolve(fixtures.tokenResponse));
       return client.exchangeAuthCode('letmein').then(() => {
-        const expectedBody = 'client_id=1234-5678&code=letmein&grant_type=authorization_code';
-        assert.calledWith(fakeHttp.post, 'https://annota.te/api/token', expectedBody, fixtures.formPostParams);
+        const expectedBody =
+          'client_id=1234-5678&code=letmein&grant_type=authorization_code';
+        assert.calledWith(
+          fakeHttp.post,
+          'https://annota.te/api/token',
+          expectedBody,
+          fixtures.formPostParams
+        );
       });
     });
 
@@ -72,7 +78,7 @@ describe('sidebar.util.oauth-client', () => {
     });
 
     it('rejects if the request fails', () => {
-      fakeHttp.post.returns(Promise.resolve({status: 400}));
+      fakeHttp.post.returns(Promise.resolve({ status: 400 }));
       return client.exchangeAuthCode('unknowncode').catch(err => {
         assert.equal(err.message, 'Authorization code exchange failed');
       });
@@ -86,7 +92,12 @@ describe('sidebar.util.oauth-client', () => {
         const expectedBody =
           'assertion=letmein' +
           '&grant_type=urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Ajwt-bearer';
-        assert.calledWith(fakeHttp.post, 'https://annota.te/api/token', expectedBody, fixtures.formPostParams);
+        assert.calledWith(
+          fakeHttp.post,
+          'https://annota.te/api/token',
+          expectedBody,
+          fixtures.formPostParams
+        );
       });
     });
 
@@ -99,7 +110,7 @@ describe('sidebar.util.oauth-client', () => {
     });
 
     it('rejects if the request fails', () => {
-      fakeHttp.post.returns(Promise.resolve({status: 400}));
+      fakeHttp.post.returns(Promise.resolve({ status: 400 }));
       return client.exchangeGrantToken('unknowntoken').catch(err => {
         assert.equal(err.message, 'Failed to retrieve access token');
       });
@@ -132,7 +143,7 @@ describe('sidebar.util.oauth-client', () => {
     });
 
     it('rejects if the request fails', () => {
-      fakeHttp.post.returns(Promise.resolve({status: 400}));
+      fakeHttp.post.returns(Promise.resolve({ status: 400 }));
       return client.refreshToken('invalid-token').catch(err => {
         assert.equal(err.message, 'Failed to refresh access token');
       });
@@ -145,17 +156,22 @@ describe('sidebar.util.oauth-client', () => {
 
       return client.revokeToken('valid-access-token').then(() => {
         const expectedBody = 'token=valid-access-token';
-        assert.calledWith(fakeHttp.post, 'https://annota.te/oauth/revoke', expectedBody, fixtures.formPostParams);
+        assert.calledWith(
+          fakeHttp.post,
+          'https://annota.te/oauth/revoke',
+          expectedBody,
+          fixtures.formPostParams
+        );
       });
     });
 
     it('resolves if the request succeeds', () => {
-      fakeHttp.post.returns(Promise.resolve({status: 200}));
+      fakeHttp.post.returns(Promise.resolve({ status: 200 }));
       return client.revokeToken('valid-access-token');
     });
 
     it('rejects if the request fails', () => {
-      fakeHttp.post.returns(Promise.resolve({status: 400}));
+      fakeHttp.post.returns(Promise.resolve({ status: 400 }));
       return client.revokeToken('invalid-token').catch(err => {
         assert.equal(err.message, 'failed');
       });
@@ -164,7 +180,7 @@ describe('sidebar.util.oauth-client', () => {
 
   describe('.openAuthPopupWindow', () => {
     it('opens a popup window', () => {
-      const fakeWindow = new FakeWindow;
+      const fakeWindow = new FakeWindow();
       const popupWindow = OAuthClient.openAuthPopupWindow(fakeWindow);
       assert.equal(popupWindow, fakeWindow.open.returnValues[0]);
       assert.calledWith(
@@ -180,7 +196,7 @@ describe('sidebar.util.oauth-client', () => {
     let fakeWindow;
 
     beforeEach(() => {
-      fakeWindow = new FakeWindow;
+      fakeWindow = new FakeWindow();
     });
 
     function authorize() {
@@ -206,7 +222,9 @@ describe('sidebar.util.oauth-client', () => {
           response_type: 'code',
           state: 'notrandom',
         };
-        const expectedAuthUrl = `${config.authorizationEndpoint}?${stringify(params)}`;
+        const expectedAuthUrl = `${config.authorizationEndpoint}?${stringify(
+          params
+        )}`;
         assert.equal(popupWindow.location.href, expectedAuthUrl);
       });
     });

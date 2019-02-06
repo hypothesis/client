@@ -149,18 +149,26 @@ function viewFilter(unicode) {
   this.filter = (annotations, filters) => {
     // Convert the input filter object into a filter tree, expanding "any"
     // filters.
-    const fieldFilters = Object.entries(filters).filter(([, filter]) =>
-      filter.terms.length > 0)
+    const fieldFilters = Object.entries(filters)
+      .filter(([, filter]) => filter.terms.length > 0)
       .map(([field, filter]) => {
         const terms = filter.terms.map(normalize);
         let termFilters;
         if (field === 'any') {
           const anyFields = ['quote', 'text', 'tag', 'user'];
-          termFilters = terms.map(term => new BinaryOpFilter('or', anyFields.map(field =>
-            new TermFilter(field, term, fieldMatchers[field])
-          )));
+          termFilters = terms.map(
+            term =>
+              new BinaryOpFilter(
+                'or',
+                anyFields.map(
+                  field => new TermFilter(field, term, fieldMatchers[field])
+                )
+              )
+          );
         } else {
-          termFilters = terms.map(term => new TermFilter(field, term, fieldMatchers[field]));
+          termFilters = terms.map(
+            term => new TermFilter(field, term, fieldMatchers[field])
+          );
         }
         return new BinaryOpFilter(filter.operator, termFilters);
       });

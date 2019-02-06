@@ -10,32 +10,37 @@ const threadList = require('../thread-list');
 const util = require('../../directive/test/util');
 
 const annotFixtures = immutable({
-  annotation: {$tag: 't1', id: '1', text: 'text'},
+  annotation: { $tag: 't1', id: '1', text: 'text' },
   reply: {
     $tag: 't2',
     id: '2',
     references: ['1'],
     text: 'areply',
   },
-  highlight: {$highlight: true, $tag: 't3', id: '3'},
+  highlight: { $highlight: true, $tag: 't3', id: '3' },
 });
 
 const threadFixtures = immutable({
   thread: {
-    children: [{
-      id: annotFixtures.annotation.id,
-      annotation: annotFixtures.annotation,
-      children: [{
-        id: annotFixtures.reply.id,
-        annotation: annotFixtures.reply,
-        children: [],
+    children: [
+      {
+        id: annotFixtures.annotation.id,
+        annotation: annotFixtures.annotation,
+        children: [
+          {
+            id: annotFixtures.reply.id,
+            annotation: annotFixtures.reply,
+            children: [],
+            visible: true,
+          },
+        ],
         visible: true,
-      }],
-      visible: true,
-    },{
-      id: annotFixtures.highlight.id,
-      annotation: annotFixtures.highlight,
-    }],
+      },
+      {
+        id: annotFixtures.highlight.id,
+        annotation: annotFixtures.highlight,
+      },
+    ],
   },
 });
 
@@ -51,10 +56,10 @@ class FakeVirtualThreadList extends EventEmitter {
     let thread = rootThread;
 
     this.options = options;
-    this.setRootThread = function (_thread) {
+    this.setRootThread = function(_thread) {
       thread = _thread;
     };
-    this.notify = function () {
+    this.notify = function() {
       this.emit('changed', {
         offscreenLowerHeight: 10,
         offscreenUpperHeight: 20,
@@ -62,13 +67,13 @@ class FakeVirtualThreadList extends EventEmitter {
       });
     };
     this.detach = sinon.stub();
-    this.yOffsetOf = function () {
+    this.yOffsetOf = function() {
       return 42;
     };
   }
 }
 
-describe('threadList', function () {
+describe('threadList', function() {
   let threadListContainers;
 
   function createThreadList(inputs) {
@@ -113,12 +118,11 @@ describe('threadList', function () {
     return element;
   }
 
-  before(function () {
-    angular.module('app', [])
-      .component('threadList', threadList);
+  before(function() {
+    angular.module('app', []).component('threadList', threadList);
   });
 
-  beforeEach(function () {
+  beforeEach(function() {
     angular.mock.module('app', {
       VirtualThreadList: FakeVirtualThreadList,
       settings: fakeSettings,
@@ -126,24 +130,27 @@ describe('threadList', function () {
     threadListContainers = [];
   });
 
-  afterEach(function () {
-    threadListContainers.forEach(function (el) {
+  afterEach(function() {
+    threadListContainers.forEach(function(el) {
       el.remove();
     });
   });
 
-  it('shows the clean theme when settings contains the clean theme option', function () {
+  it('shows the clean theme when settings contains the clean theme option', function() {
     angular.mock.module('app', {
       VirtualThreadList: FakeVirtualThreadList,
-      settings: { theme: 'clean'},
+      settings: { theme: 'clean' },
     });
     const element = createThreadList();
     fakeVirtualThread.notify();
     element.scope.$digest();
-    assert.equal(element[0].querySelectorAll('.thread-list__card--theme-clean').length, element[0].querySelectorAll('annotation-thread').length);
+    assert.equal(
+      element[0].querySelectorAll('.thread-list__card--theme-clean').length,
+      element[0].querySelectorAll('annotation-thread').length
+    );
   });
 
-  it('displays the children of the root thread', function () {
+  it('displays the children of the root thread', function() {
     const element = createThreadList();
     fakeVirtualThread.notify();
     element.scope.$digest();
@@ -151,8 +158,8 @@ describe('threadList', function () {
     assert.equal(children.length, 2);
   });
 
-  describe('when a new annotation is created', function () {
-    it('scrolls the annotation into view', function () {
+  describe('when a new annotation is created', function() {
+    it('scrolls the annotation into view', function() {
       const element = createThreadList();
       element.parentEl.scrollTop = 500;
 
@@ -164,7 +171,7 @@ describe('threadList', function () {
       assert.isBelow(element.parentEl.scrollTop, 100);
     });
 
-    it('does not scroll the annotation into view if it is a reply', function () {
+    it('does not scroll the annotation into view if it is a reply', function() {
       const element = createThreadList();
       element.parentEl.scrollTop = 500;
 
@@ -175,7 +182,7 @@ describe('threadList', function () {
       assert.equal(element.parentEl.scrollTop, 500);
     });
 
-    it('does not scroll the annotation into view if it is a highlight', function () {
+    it('does not scroll the annotation into view if it is a highlight', function() {
       const element = createThreadList();
       element.parentEl.scrollTop = 500;
 
@@ -186,16 +193,18 @@ describe('threadList', function () {
       assert.equal(element.parentEl.scrollTop, 500);
     });
 
-    it('clears the selection', function () {
+    it('clears the selection', function() {
       const inputs = { onClearSelection: sinon.stub() };
       const element = createThreadList(inputs);
-      element.scope.$broadcast(events.BEFORE_ANNOTATION_CREATED,
-        annotFixtures.annotation);
+      element.scope.$broadcast(
+        events.BEFORE_ANNOTATION_CREATED,
+        annotFixtures.annotation
+      );
       assert.called(inputs.onClearSelection);
     });
   });
 
-  it('calls onFocus() when the user hovers an annotation', function () {
+  it('calls onFocus() when the user hovers an annotation', function() {
     const inputs = {
       onFocus: {
         args: ['annotation'],
@@ -207,11 +216,13 @@ describe('threadList', function () {
     element.scope.$digest();
     const annotation = element[0].querySelector('.thread-list__card');
     util.sendEvent(annotation, 'mouseover');
-    assert.calledWithMatch(inputs.onFocus.callback,
-      sinon.match(annotFixtures.annotation));
+    assert.calledWithMatch(
+      inputs.onFocus.callback,
+      sinon.match(annotFixtures.annotation)
+    );
   });
 
-  it('calls onSelect() when a user clicks an annotation', function () {
+  it('calls onSelect() when a user clicks an annotation', function() {
     const inputs = {
       onSelect: {
         args: ['annotation'],
@@ -223,11 +234,13 @@ describe('threadList', function () {
     element.scope.$digest();
     const annotation = element[0].querySelector('.thread-list__card');
     util.sendEvent(annotation, 'click');
-    assert.calledWithMatch(inputs.onSelect.callback,
-      sinon.match(annotFixtures.annotation));
+    assert.calledWithMatch(
+      inputs.onSelect.callback,
+      sinon.match(annotFixtures.annotation)
+    );
   });
 
-  it('uses the correct scroll root', function () {
+  it('uses the correct scroll root', function() {
     createThreadList();
     const scrollRoot = fakeVirtualThread.options.scrollRoot;
     assert.isTrue(scrollRoot.classList.contains('js-thread-list-scroll-root'));

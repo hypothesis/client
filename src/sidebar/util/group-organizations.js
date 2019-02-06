@@ -12,8 +12,10 @@ const DEFAULT_ORG_ID = '__default__';
  * @param {Object} organization
  * @return {String}
  */
-function orgKey (organization) {
-  if (organization.id === DEFAULT_ORG_ID) {  return DEFAULT_ORG_ID; }
+function orgKey(organization) {
+  if (organization.id === DEFAULT_ORG_ID) {
+    return DEFAULT_ORG_ID;
+  }
   return `${organization.name.toLowerCase()}${organization.id}`;
 }
 
@@ -25,7 +27,7 @@ function orgKey (organization) {
  * @param {Object} organization
  * @return undefined - organization is mutated in place
  */
-function addGroup (group, organization) {
+function addGroup(group, organization) {
   // Object.assign won't suffice because of nested objects on groups
   const groupObj = Object.assign({}, group);
   const groupList = organization.groups;
@@ -45,13 +47,16 @@ function addGroup (group, organization) {
  * @return {Object} - A collection of all unique organizations, containing
  *                    their groups. Keyed by each org's "orgKey"
  */
-function organizations (groups) {
+function organizations(groups) {
   const orgs = {};
   groups.forEach(group => {
     // Ignore groups with undefined or non-object organizations
-    if (typeof group.organization !== 'object') { return; }
+    if (typeof group.organization !== 'object') {
+      return;
+    }
     const orgId = orgKey(group.organization);
-    if (typeof orgs[orgId] === 'undefined') { // First time we've seen this org
+    if (typeof orgs[orgId] === 'undefined') {
+      // First time we've seen this org
       orgs[orgId] = Object.assign({}, group.organization);
       orgs[orgId].groups = []; // Will hold this org's groups
     }
@@ -76,21 +81,23 @@ function organizations (groups) {
  * @param {Array<Group>} groups
  * @return {Array<Object>} - groups sorted by which organization they're in
  */
-function groupsByOrganization (groups) {
+function groupsByOrganization(groups) {
   const orgs = organizations(groups);
   const defaultOrganizationGroups = [];
   const sortedGroups = [];
 
   const sortedOrgKeys = Object.keys(orgs).sort();
   sortedOrgKeys.forEach(orgKey => {
-    if (orgKey === DEFAULT_ORG_ID) { // Handle default groups separately
+    if (orgKey === DEFAULT_ORG_ID) {
+      // Handle default groups separately
       defaultOrganizationGroups.push(...orgs[orgKey].groups);
     } else {
       sortedGroups.push(...orgs[orgKey].groups);
     }
   });
 
-  if (defaultOrganizationGroups.length) { // Put default groups at end
+  if (defaultOrganizationGroups.length) {
+    // Put default groups at end
     sortedGroups.push(...defaultOrganizationGroups);
   }
 

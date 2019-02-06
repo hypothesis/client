@@ -24,8 +24,8 @@ function fakeStore(initialState, methods) {
 
   const store = redux.createStore(update, initialState);
 
-  store.setState = function (state) {
-    store.dispatch({type: 'SET_STATE', state: state});
+  store.setState = function(state) {
+    store.dispatch({ type: 'SET_STATE', state: state });
   };
 
   return Object.assign(store, methods);

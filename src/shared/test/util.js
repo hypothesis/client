@@ -19,7 +19,7 @@
 function noCallThru(stubs) {
   // This function is trivial but serves as documentation for why
   // '@noCallThru' is used.
-  return Object.assign(stubs, {'@noCallThru':true});
+  return Object.assign(stubs, { '@noCallThru': true });
 }
 
 /**
@@ -52,18 +52,20 @@ function noCallThru(stubs) {
  * @param {Array<T>} fixtures - Array of fixture objects.
  */
 function unroll(description, testFn, fixtures) {
-  fixtures.forEach(function (fixture) {
-    const caseDescription = Object.keys(fixture).reduce(function (desc, key) {
+  fixtures.forEach(function(fixture) {
+    const caseDescription = Object.keys(fixture).reduce(function(desc, key) {
       return desc.replace('#' + key, String(fixture[key]));
     }, description);
-    it(caseDescription, function (done) {
+    it(caseDescription, function(done) {
       if (testFn.length === 1) {
         // Test case does not accept a 'done' callback argument, so we either
         // call done() immediately if it returns a non-Promiselike object
         // or when the Promise resolves otherwise
         const result = testFn(fixture);
         if (typeof result === 'object' && result.then) {
-          result.then(function () { done(); }, done);
+          result.then(function() {
+            done();
+          }, done);
         } else {
           done();
         }

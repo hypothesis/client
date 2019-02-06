@@ -28,7 +28,7 @@ function tags(localStorage) {
   function filter(query) {
     const savedTags = localStorage.getObject(TAGS_LIST_KEY) || [];
 
-    return savedTags.filter((e) => {
+    return savedTags.filter(e => {
       return e.toLowerCase().indexOf(query.toLowerCase()) !== -1;
     });
   }
@@ -42,7 +42,7 @@ function tags(localStorage) {
   function store(tags) {
     // Update the stored (tag, frequency) map.
     const savedTags = localStorage.getObject(TAGS_MAP_KEY) || {};
-    tags.forEach((tag) => {
+    tags.forEach(tag => {
       if (savedTags[tag.text]) {
         savedTags[tag.text].count += 1;
         savedTags[tag.text].updated = Date.now();

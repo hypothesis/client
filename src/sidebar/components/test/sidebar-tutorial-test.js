@@ -2,20 +2,21 @@
 
 const Controller = require('../sidebar-tutorial').controller;
 
-describe('sidebar/components/sidebar-tutorial', function () {
-  const defaultSession = {state: {preferences: {}}};
+describe('sidebar/components/sidebar-tutorial', function() {
+  const defaultSession = { state: { preferences: {} } };
   const firstPartySettings = {};
   const thirdPartySettings = {
-    services: [{
-      authority: 'publisher.org',
-    }],
+    services: [
+      {
+        authority: 'publisher.org',
+      },
+    ],
   };
 
-
-  describe('#showSidebarTutorial', function () {
+  describe('#showSidebarTutorial', function() {
     const settings = {};
 
-    it('returns true if show_sidebar_tutorial is true', function () {
+    it('returns true if show_sidebar_tutorial is true', function() {
       const session = {
         state: {
           preferences: {
@@ -30,7 +31,7 @@ describe('sidebar/components/sidebar-tutorial', function () {
       assert.equal(result, true);
     });
 
-    it('returns false if show_sidebar_tutorial is false', function () {
+    it('returns false if show_sidebar_tutorial is false', function() {
       const session = {
         state: {
           preferences: {
@@ -45,8 +46,8 @@ describe('sidebar/components/sidebar-tutorial', function () {
       assert.equal(result, false);
     });
 
-    it('returns false if show_sidebar_tutorial is missing', function () {
-      const session = {state: {preferences: {}}};
+    it('returns false if show_sidebar_tutorial is missing', function() {
+      const session = { state: { preferences: {} } };
       const controller = new Controller(session, settings);
 
       const result = controller.showSidebarTutorial();

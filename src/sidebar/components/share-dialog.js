@@ -10,18 +10,20 @@ function ShareDialogController($scope, $element, analytics, store) {
       return;
     }
 
-    self.sharePageLink = 'https://hyp.is/go?url=' + encodeURIComponent(frames[0].uri);
+    self.sharePageLink =
+      'https://hyp.is/go?url=' + encodeURIComponent(frames[0].uri);
   }
 
   const shareLinkInput = $element[0].querySelector('.js-share-link');
   shareLinkInput.focus();
   shareLinkInput.select();
 
-  $scope.$watch(function () { return store.frames(); },
-    updateSharePageLink);
+  $scope.$watch(function() {
+    return store.frames();
+  }, updateSharePageLink);
 
-  $scope.onShareClick = function(target){
-    if(target){
+  $scope.onShareClick = function(target) {
+    if (target) {
       analytics.track(analytics.events.DOCUMENT_SHARED, target);
     }
   };

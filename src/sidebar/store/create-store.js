@@ -27,7 +27,10 @@ const { createReducer, bindSelectors } = require('./util');
  */
 function createStore(modules, initArgs = [], middleware = []) {
   // Create the initial state and state update function.
-  const initialState = Object.assign({}, ...modules.map(m => m.init(...initArgs)));
+  const initialState = Object.assign(
+    {},
+    ...modules.map(m => m.init(...initArgs))
+  );
   const reducer = createReducer(...modules.map(m => m.update));
 
   // Create the store.

@@ -10,11 +10,11 @@ function SidebarTutorialController(session, settings) {
 
   this.isThemeClean = settings.theme === 'clean';
 
-  this.showSidebarTutorial = function () {
+  this.showSidebarTutorial = function() {
     return sessionUtil.shouldShowSidebarTutorial(session.state);
   };
 
-  this.dismiss = function () {
+  this.dismiss = function() {
     session.dismissSidebarTutorial();
   };
 

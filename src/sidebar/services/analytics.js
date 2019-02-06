@@ -2,28 +2,33 @@
 
 const VIA_REFERRER = /^https:\/\/(qa-)?via.hypothes.is\//;
 
-const globalGAOptions = function(win, settings){
-
+const globalGAOptions = function(win, settings) {
   settings = settings || {};
 
   const globalOpts = {
     category: '',
   };
 
-  const validTypes = ['chrome-extension', 'firefox-extension', 'embed', 'bookmarklet', 'via'];
+  const validTypes = [
+    'chrome-extension',
+    'firefox-extension',
+    'embed',
+    'bookmarklet',
+    'via',
+  ];
 
   // The preferred method for deciding what type of app is running is
   // through the setting of the appType to one of the valid types above.
   // However, we also want to capture app types where we were not given
   // the appType setting explicitly - these are the app types that were
   // added before we added the analytics logic
-  if(validTypes.indexOf((settings.appType || '').toLowerCase()) > -1){
+  if (validTypes.indexOf((settings.appType || '').toLowerCase()) > -1) {
     globalOpts.category = settings.appType.toLowerCase();
-  }else if(win.location.protocol === 'chrome-extension:'){
+  } else if (win.location.protocol === 'chrome-extension:') {
     globalOpts.category = 'chrome-extension';
-  }else if(VIA_REFERRER.test(win.document.referrer)){
+  } else if (VIA_REFERRER.test(win.document.referrer)) {
     globalOpts.category = 'via';
-  }else {
+  } else {
     globalOpts.category = 'embed';
   }
 
@@ -44,17 +49,23 @@ function analytics($analytics, $window, settings) {
   const options = $window ? globalGAOptions($window, settings) : {};
 
   return {
-
     /**
      * @param  {string} event This is the event name that we are capturing
      *  in our analytics. Example: 'sidebarOpened'. Use camelCase to track multiple
      *  words.
      */
-    track: function(event, label, metricValue){
-      $analytics.eventTrack(event, Object.assign({}, {
-        label: label || undefined,
-        metricValue: isNaN(metricValue) ? undefined : metricValue,
-      }, options));
+    track: function(event, label, metricValue) {
+      $analytics.eventTrack(
+        event,
+        Object.assign(
+          {},
+          {
+            label: label || undefined,
+            metricValue: isNaN(metricValue) ? undefined : metricValue,
+          },
+          options
+        )
+      );
     },
 
     events: {

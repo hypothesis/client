@@ -40,22 +40,22 @@ function start(store, settings, $window) {
   function jsonRpcResponse(request) {
     // The set of methods that clients can call.
     let methods = {
-      'searchUris': store.searchUris,
+      searchUris: store.searchUris,
     };
 
     let method = methods[request.method];
 
     let response = {
-      'jsonrpc': '2.0',
-      'id': request.id,
+      jsonrpc: '2.0',
+      id: request.id,
     };
 
     if (method) {
       response.result = method();
     } else {
       response.error = {
-        'code': -32601,
-        'message': 'Method not found',
+        code: -32601,
+        message: 'Method not found',
       };
     }
 

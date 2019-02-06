@@ -2,12 +2,14 @@
 
 const EventEmitter = require('tiny-emitter');
 
-const { assertPromiseIsRejected } = require('../../../shared/test/promise-util');
+const {
+  assertPromiseIsRejected,
+} = require('../../../shared/test/promise-util');
 const { call } = require('../postmessage-json-rpc');
 
 class FakeWindow {
   constructor() {
-    this.emitter = new EventEmitter;
+    this.emitter = new EventEmitter();
     this.addEventListener = this.emitter.on.bind(this.emitter);
     this.removeEventListener = this.emitter.off.bind(this.emitter);
   }
@@ -24,13 +26,19 @@ describe('sidebar.util.postmessage-json-rpc', () => {
     function doCall() {
       const timeout = 1;
       return call(
-        frame, origin, 'testMethod', [1, 2, 3], timeout, fakeWindow, messageId
+        frame,
+        origin,
+        'testMethod',
+        [1, 2, 3],
+        timeout,
+        fakeWindow,
+        messageId
       );
     }
 
     beforeEach(() => {
       frame = { postMessage: sinon.stub() };
-      fakeWindow = new FakeWindow;
+      fakeWindow = new FakeWindow();
     });
 
     it('sends a message to the target frame', () => {
@@ -52,35 +60,41 @@ describe('sidebar.util.postmessage-json-rpc', () => {
       assertPromiseIsRejected(result, 'Nope!');
     });
 
-    [{
-      // Wrong origin.
-      origin: 'https://not-the-embedder.com',
-      data: {
-        jsonrpc: '2.0',
-        id: messageId,
+    [
+      {
+        // Wrong origin.
+        origin: 'https://not-the-embedder.com',
+        data: {
+          jsonrpc: '2.0',
+          id: messageId,
+        },
       },
-    },{
-      // Non-object `data` field.
-      origin,
-      data: null,
-    },{
-      // No jsonrpc header
-      origin,
-      data: {},
-    },{
-      // No ID
-      origin,
-      data: {
-        jsonrpc: '2.0',
+      {
+        // Non-object `data` field.
+        origin,
+        data: null,
       },
-    },{
-      // ID mismatch
-      origin,
-      data: {
-        jsonrpc: '2.0',
-        id: 'wrong-id',
+      {
+        // No jsonrpc header
+        origin,
+        data: {},
       },
-    }].forEach(reply => {
+      {
+        // No ID
+        origin,
+        data: {
+          jsonrpc: '2.0',
+        },
+      },
+      {
+        // ID mismatch
+        origin,
+        data: {
+          jsonrpc: '2.0',
+          id: 'wrong-id',
+        },
+      },
+    ].forEach(reply => {
       it('ignores messages that do not have required reply fields', () => {
         const result = doCall();
 
@@ -116,7 +130,10 @@ describe('sidebar.util.postmessage-json-rpc', () => {
         data: { jsonrpc: '2.0', id: messageId },
       });
 
-      return assertPromiseIsRejected(result, 'RPC reply had no result or error');
+      return assertPromiseIsRejected(
+        result,
+        'RPC reply had no result or error'
+      );
     });
 
     it('resolves with the result if the `result` field is set in the response', () => {
@@ -138,7 +155,10 @@ describe('sidebar.util.postmessage-json-rpc', () => {
 
     it('rejects with an error if the timeout is exceeded', () => {
       const result = doCall();
-      return assertPromiseIsRejected(result, 'Request to https://embedder.com timed out');
+      return assertPromiseIsRejected(
+        result,
+        'Request to https://embedder.com timed out'
+      );
     });
   });
 });

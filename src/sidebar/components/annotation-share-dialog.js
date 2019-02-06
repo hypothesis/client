@@ -9,17 +9,17 @@ function AnnotationShareDialogController($element, $scope, analytics) {
   const self = this;
   const shareLinkInput = $element.find('input')[0];
 
-  $scope.$watch('vm.isOpen', function (isOpen) {
+  $scope.$watch('vm.isOpen', function(isOpen) {
     if (isOpen) {
       // Focus the input and select it once the dialog has become visible
-      scopeTimeout($scope, function () {
+      scopeTimeout($scope, function() {
         shareLinkInput.focus();
         shareLinkInput.select();
       });
     }
   });
 
-  this.copyToClipboard = function (event) {
+  this.copyToClipboard = function(event) {
     const $container = angular.element(event.currentTarget).parent();
     const shareLinkInput = $container.find('input')[0];
 
@@ -36,15 +36,15 @@ function AnnotationShareDialogController($element, $scope, analytics) {
     } catch (ex) {
       self.copyToClipboardMessage = 'Select and copy to share.';
     } finally {
-      setTimeout(function () {
+      setTimeout(function() {
         self.copyToClipboardMessage = null;
         $scope.$digest();
       }, 1000);
     }
   };
 
-  this.onShareClick = function(target){
-    if(target){
+  this.onShareClick = function(target) {
+    if (target) {
       analytics.track(analytics.events.ANNOTATION_SHARED, target);
     }
   };

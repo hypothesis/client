@@ -33,7 +33,7 @@ function MarkdownController($element, $sanitize, $scope) {
     // happen automatically.
     input.focus();
 
-    self.onEditText({text: input.value});
+    self.onEditText({ text: input.value });
   }
 
   function focusInput() {
@@ -41,65 +41,72 @@ function MarkdownController($element, $sanitize, $scope) {
     // A timeout is used so that focus() is not called until
     // the visibility change has been applied (by adding or removing
     // the relevant CSS classes)
-    scopeTimeout($scope, function () {
-      input.focus();
-    }, 0);
+    scopeTimeout(
+      $scope,
+      function() {
+        input.focus();
+      },
+      0
+    );
   }
 
   this.insertBold = function() {
-    updateState(function (state) {
+    updateState(function(state) {
       return commands.toggleSpanStyle(state, '**', '**', 'Bold');
     });
   };
 
   this.insertItalic = function() {
-    updateState(function (state) {
+    updateState(function(state) {
       return commands.toggleSpanStyle(state, '*', '*', 'Italic');
     });
   };
 
   this.insertMath = function() {
-    updateState(function (state) {
+    updateState(function(state) {
       const before = state.text.slice(0, state.selectionStart);
 
-      if (before.length === 0 ||
-          before.slice(-1) === '\n' ||
-          before.slice(-2) === '$$') {
+      if (
+        before.length === 0 ||
+        before.slice(-1) === '\n' ||
+        before.slice(-2) === '$$'
+      ) {
         return commands.toggleSpanStyle(state, '$$', '$$', 'Insert LaTeX');
       } else {
-        return commands.toggleSpanStyle(state, '\\(', '\\)',
-          'Insert LaTeX');
+        return commands.toggleSpanStyle(state, '\\(', '\\)', 'Insert LaTeX');
       }
     });
   };
 
   this.insertLink = function() {
-    updateState(function (state) {
+    updateState(function(state) {
       return commands.convertSelectionToLink(state);
     });
   };
 
   this.insertIMG = function() {
-    updateState(function (state) {
-      return commands.convertSelectionToLink(state,
-        commands.LinkType.IMAGE_LINK);
+    updateState(function(state) {
+      return commands.convertSelectionToLink(
+        state,
+        commands.LinkType.IMAGE_LINK
+      );
     });
   };
 
   this.insertList = function() {
-    updateState(function (state) {
+    updateState(function(state) {
       return commands.toggleBlockStyle(state, '* ');
     });
   };
 
   this.insertNumList = function() {
-    updateState(function (state) {
+    updateState(function(state) {
       return commands.toggleBlockStyle(state, '1. ');
     });
   };
 
   this.insertQuote = function() {
-    updateState(function (state) {
+    updateState(function(state) {
       return commands.toggleBlockStyle(state, '> ');
     });
   };
@@ -120,33 +127,33 @@ function MarkdownController($element, $sanitize, $scope) {
   });
 
   this.preview = false;
-  this.togglePreview = function () {
+  this.togglePreview = function() {
     self.preview = !self.preview;
   };
 
-  const handleInputChange = debounce(function () {
-    $scope.$apply(function () {
-      self.onEditText({text: input.value});
+  const handleInputChange = debounce(function() {
+    $scope.$apply(function() {
+      self.onEditText({ text: input.value });
     });
   }, 100);
   input.addEventListener('input', handleInputChange);
 
   // Re-render the markdown when the view needs updating.
-  $scope.$watch('vm.text', function () {
+  $scope.$watch('vm.text', function() {
     output.innerHTML = renderMarkdown(self.text || '', $sanitize);
     mediaEmbedder.replaceLinksWithEmbeds(output);
   });
 
-  this.showEditor = function () {
+  this.showEditor = function() {
     return !self.readOnly && !self.preview;
   };
 
   // Exit preview mode when leaving edit mode
-  $scope.$watch('vm.readOnly', function () {
+  $scope.$watch('vm.readOnly', function() {
     self.preview = false;
   });
 
-  $scope.$watch('vm.showEditor()', function (show) {
+  $scope.$watch('vm.showEditor()', function(show) {
     if (show) {
       input.value = self.text || '';
       focusInput();

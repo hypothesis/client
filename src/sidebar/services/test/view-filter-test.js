@@ -47,10 +47,7 @@ describe('sidebar/services/view-filter', () => {
     let annotations;
 
     beforeEach(() => {
-      annotations = [
-        { id: 1, text: poem.tiger },
-        { id: 2, text: poem.raven },
-      ];
+      annotations = [{ id: 1, text: poem.tiger }, { id: 2, text: poem.raven }];
     });
 
     it('requires all terms to match for "and" operator', () => {
@@ -92,12 +89,16 @@ describe('sidebar/services/view-filter', () => {
       const annotation = {
         id: 1,
         text: poem.tiger,
-        target: [{
-          selector: [{
-            type: 'TextQuoteSelector',
-            exact: 'The Tiger by William Blake',
-          }],
-        }],
+        target: [
+          {
+            selector: [
+              {
+                type: 'TextQuoteSelector',
+                exact: 'The Tiger by William Blake',
+              },
+            ],
+          },
+        ],
         user: 'acct:poe@edgar.com',
         tags: ['poem', 'Blake', 'Tiger'],
       };
@@ -105,7 +106,10 @@ describe('sidebar/services/view-filter', () => {
       // A query which matches the combined fields from the annotation, but not
       // individual fields on their own.
       const filters = {
-        any: { terms: ['burning', 'William', 'poem', 'bright'], operator: 'and' },
+        any: {
+          terms: ['burning', 'William', 'poem', 'bright'],
+          operator: 'and',
+        },
       };
 
       const result = viewFilter.filter([annotation], filters);

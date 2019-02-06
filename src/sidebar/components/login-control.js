@@ -8,14 +8,14 @@ module.exports = {
   controllerAs: 'vm',
 
   //@ngInject
-  controller: function (bridge, serviceUrl, settings, $window) {
+  controller: function(bridge, serviceUrl, settings, $window) {
     this.serviceUrl = serviceUrl;
 
     this.isThirdPartyUser = function() {
       return isThirdPartyUser(this.auth.userid, settings.authDomain);
     };
 
-    this.shouldShowLogOutButton = function () {
+    this.shouldShowLogOutButton = function() {
       if (this.auth.status !== 'logged-in') {
         return false;
       }
@@ -26,7 +26,7 @@ module.exports = {
       return true;
     };
 
-    this.shouldEnableProfileButton = function () {
+    this.shouldEnableProfileButton = function() {
       const service = serviceConfig(settings);
       if (service) {
         return service.onProfileRequestProvided;
@@ -34,12 +34,12 @@ module.exports = {
       return true;
     };
 
-    this.showProfile = function () {
+    this.showProfile = function() {
       if (this.isThirdPartyUser()) {
         bridge.call(bridgeEvents.PROFILE_REQUESTED);
         return;
       }
-      $window.open(this.serviceUrl('user', {user: this.auth.username}));
+      $window.open(this.serviceUrl('user', { user: this.auth.username }));
     };
   },
 

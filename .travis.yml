@@ -10,7 +10,9 @@ matrix:
     # See https://github.com/hypothesis/client/pull/27#discussion_r70611726
     - env: ACTION=lint
       node_js: '10'
-      script: yarn run lint
+      script:
+        - make checkformatting
+        - make lint
     - env: ACTION=test
       node_js: '10'
       after_success:

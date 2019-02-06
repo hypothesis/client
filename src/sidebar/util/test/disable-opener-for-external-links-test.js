@@ -18,10 +18,12 @@ describe('sidebar.util.disable-opener-for-external-links', () => {
   });
 
   function clickLink() {
-    linkEl.dispatchEvent(new Event('click', {
-      bubbles: true,
-      cancelable: true,
-    }));
+    linkEl.dispatchEvent(
+      new Event('click', {
+        bubbles: true,
+        cancelable: true,
+      })
+    );
   }
 
   it('disables opener for external links', () => {

@@ -6,6 +6,8 @@ help:
 	@echo "make help              Show this help message"
 	@echo "make dev               Run the app in the development server"
 	@echo "make lint              Run the code linter(s) and print any warnings"
+	@echo "make checkformatting   Check code formatting"
+	@echo "make format            Automatically format code"
 	@echo "make test              Run the unit tests"
 	@echo "make docs              Build docs website and serve it locally"
 	@echo "make checkdocs         Crash if building the docs website fails"
@@ -40,6 +42,14 @@ checkdocs:
 clean:
 	rm -f node_modules/.uptodate
 	rm -rf build
+
+.PHONY: format
+format:
+	yarn run format
+
+.PHONY: checkformatting
+checkformatting:
+	yarn run checkformatting
 
 build/manifest.json: node_modules/.uptodate
 	yarn run build

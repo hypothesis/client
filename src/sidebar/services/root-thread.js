@@ -8,7 +8,7 @@ const tabs = require('../tabs');
 const uiConstants = require('../ui-constants');
 
 function truthyKeys(map) {
-  return Object.keys(map).filter(function (k) {
+  return Object.keys(map).filter(function(k) {
     return !!map[k];
   });
 }
@@ -16,13 +16,13 @@ function truthyKeys(map) {
 // Mapping from sort order name to a less-than predicate
 // function for comparing annotations to determine their sort order.
 const sortFns = {
-  'Newest': function (a, b) {
+  Newest: function(a, b) {
     return a.updated > b.updated;
   },
-  'Oldest': function (a, b) {
+  Oldest: function(a, b) {
     return a.updated < b.updated;
   },
-  'Location': function (a, b) {
+  Location: function(a, b) {
     return metadata.location(a) < metadata.location(b);
   },
 };
@@ -41,7 +41,6 @@ const sortFns = {
  */
 // @ngInject
 function RootThread($rootScope, store, drafts, searchFilter, viewFilter) {
-
   /**
    * Build the root conversation thread from the given UI state.
    *
@@ -54,14 +53,14 @@ function RootThread($rootScope, store, drafts, searchFilter, viewFilter) {
     let filterFn;
     if (state.filterQuery) {
       const filters = searchFilter.generateFacetedFilter(state.filterQuery);
-      filterFn = function (annot) {
+      filterFn = function(annot) {
         return viewFilter.filter([annot], filters).length > 0;
       };
     }
 
     let threadFilterFn;
     if (state.isSidebar && !state.filterQuery) {
-      threadFilterFn = function (thread) {
+      threadFilterFn = function(thread) {
         if (!thread.annotation) {
           return false;
         }
@@ -84,12 +83,15 @@ function RootThread($rootScope, store, drafts, searchFilter, viewFilter) {
   }
 
   function deleteNewAndEmptyAnnotations() {
-    store.getState().annotations.filter(function (ann) {
-      return metadata.isNew(ann) && !drafts.getIfNotEmpty(ann);
-    }).forEach(function (ann) {
-      drafts.remove(ann);
-      $rootScope.$broadcast(events.ANNOTATION_DELETED, ann);
-    });
+    store
+      .getState()
+      .annotations.filter(function(ann) {
+        return metadata.isNew(ann) && !drafts.getIfNotEmpty(ann);
+      })
+      .forEach(function(ann) {
+        drafts.remove(ann);
+        $rootScope.$broadcast(events.ANNOTATION_DELETED, ann);
+      });
   }
 
   // Listen for annotations being created or loaded
@@ -97,16 +99,18 @@ function RootThread($rootScope, store, drafts, searchFilter, viewFilter) {
   //
   // Note: These events could all be converted into actions that are handled by
   // the Redux store in store.
-  const loadEvents = [events.ANNOTATION_CREATED,
-                      events.ANNOTATION_UPDATED,
-                      events.ANNOTATIONS_LOADED];
-  loadEvents.forEach(function (event) {
-    $rootScope.$on(event, function (event, annotation) {
+  const loadEvents = [
+    events.ANNOTATION_CREATED,
+    events.ANNOTATION_UPDATED,
+    events.ANNOTATIONS_LOADED,
+  ];
+  loadEvents.forEach(function(event) {
+    $rootScope.$on(event, function(event, annotation) {
       store.addAnnotations([].concat(annotation));
     });
   });
 
-  $rootScope.$on(events.BEFORE_ANNOTATION_CREATED, function (event, ann) {
+  $rootScope.$on(events.BEFORE_ANNOTATION_CREATED, function(event, ann) {
     // When a new annotation is created, remove any existing annotations
     // that are empty.
     deleteNewAndEmptyAnnotations();
@@ -122,32 +126,35 @@ function RootThread($rootScope, store, drafts, searchFilter, viewFilter) {
       store.selectTab(uiConstants.TAB_ANNOTATIONS);
     }
 
-    (ann.references || []).forEach(function (parent) {
+    (ann.references || []).forEach(function(parent) {
       store.setCollapsed(parent, false);
     });
   });
 
   // Remove any annotations that are deleted or unloaded
-  $rootScope.$on(events.ANNOTATION_DELETED, function (event, annotation) {
+  $rootScope.$on(events.ANNOTATION_DELETED, function(event, annotation) {
     store.removeAnnotations([annotation]);
     if (annotation.id) {
       store.removeSelectedAnnotation(annotation.id);
     }
   });
-  $rootScope.$on(events.ANNOTATIONS_UNLOADED, function (event, annotations) {
+  $rootScope.$on(events.ANNOTATIONS_UNLOADED, function(event, annotations) {
     store.removeAnnotations(annotations);
   });
 
   // Once the focused group state is moved to the app state store, then the
   // logic in this event handler can be moved to the annotations reducer.
-  $rootScope.$on(events.GROUP_FOCUSED, function (event, focusedGroupId) {
-    const updatedAnnots = store.getState().annotations.filter(function (ann) {
-      return metadata.isNew(ann) && !metadata.isReply(ann);
-    }).map(function (ann) {
-      return Object.assign(ann, {
-        group: focusedGroupId,
+  $rootScope.$on(events.GROUP_FOCUSED, function(event, focusedGroupId) {
+    const updatedAnnots = store
+      .getState()
+      .annotations.filter(function(ann) {
+        return metadata.isNew(ann) && !metadata.isReply(ann);
+      })
+      .map(function(ann) {
+        return Object.assign(ann, {
+          group: focusedGroupId,
+        });
       });
-    });
     if (updatedAnnots.length > 0) {
       store.addAnnotations(updatedAnnots);
     }

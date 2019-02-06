@@ -32,8 +32,8 @@ function getThreadHeight(id) {
 
   // Get the bottom margin of the element. style.margin{Side} will return
   // values of the form 'Npx', from which we extract 'N'.
-  const marginHeight = parseFloat(style.marginTop) +
-                     parseFloat(style.marginBottom);
+  const marginHeight =
+    parseFloat(style.marginTop) + parseFloat(style.marginBottom);
 
   return elementHeight + marginHeight;
 }
@@ -41,7 +41,7 @@ function getThreadHeight(id) {
 const virtualThreadOptions = {
   // identify the thread types that need to be rendered
   // but not actually visible to the user
-  invisibleThreadFilter: function(thread){
+  invisibleThreadFilter: function(thread) {
     // new highlights should always get rendered so we don't
     // miss saving them via the render-save process
     return thread.annotation.$highlight && metadata.isNew(thread.annotation);
@@ -67,14 +67,22 @@ function ThreadListController($element, $scope, settings, VirtualThreadList) {
 
   this.isThemeClean = settings.theme === 'clean';
 
-  const options = Object.assign({
-    scrollRoot: this.scrollRoot,
-  }, virtualThreadOptions);
+  const options = Object.assign(
+    {
+      scrollRoot: this.scrollRoot,
+    },
+    virtualThreadOptions
+  );
   let visibleThreads;
 
   this.$onInit = () => {
-    visibleThreads = new VirtualThreadList($scope, window, this.thread, options);
-    visibleThreads.on('changed', function (state) {
+    visibleThreads = new VirtualThreadList(
+      $scope,
+      window,
+      this.thread,
+      options
+    );
+    visibleThreads.on('changed', function(state) {
       self.virtualThreadList = {
         visibleThreads: state.visibleThreads,
         invisibleThreads: state.invisibleThreads,
@@ -82,15 +90,19 @@ function ThreadListController($element, $scope, settings, VirtualThreadList) {
         offscreenLowerHeight: state.offscreenLowerHeight + 'px',
       };
 
-      scopeTimeout($scope, function () {
-        state.visibleThreads.forEach(function (thread) {
-          const height = getThreadHeight(thread.id);
-          if (!height) {
-            return;
-          }
-          visibleThreads.setThreadHeight(thread.id, height);
-        });
-      }, 50);
+      scopeTimeout(
+        $scope,
+        function() {
+          state.visibleThreads.forEach(function(thread) {
+            const height = getThreadHeight(thread.id);
+            if (!height) {
+              return;
+            }
+            visibleThreads.setThreadHeight(thread.id, height);
+          });
+        },
+        50
+      );
     });
   };
 
@@ -100,7 +112,8 @@ function ThreadListController($element, $scope, settings, VirtualThreadList) {
    * of the view.
    */
   function scrollOffset(id) {
-    const maxYOffset = self.scrollRoot.scrollHeight - self.scrollRoot.clientHeight;
+    const maxYOffset =
+      self.scrollRoot.scrollHeight - self.scrollRoot.clientHeight;
     return Math.min(maxYOffset, visibleThreads.yOffsetOf(id));
   }
 
@@ -120,15 +133,19 @@ function ThreadListController($element, $scope, settings, VirtualThreadList) {
     //
     // So we wait briefly after the view is scrolled then check whether the
     // estimated Y offset changed and if so, trigger scrolling again.
-    scopeTimeout($scope, function () {
-      const newYOffset = scrollOffset(id);
-      if (newYOffset !== estimatedYOffset) {
-        scrollIntoView(id);
-      }
-    }, 200);
+    scopeTimeout(
+      $scope,
+      function() {
+        const newYOffset = scrollOffset(id);
+        if (newYOffset !== estimatedYOffset) {
+          scrollIntoView(id);
+        }
+      },
+      200
+    );
   }
 
-  $scope.$on(events.BEFORE_ANNOTATION_CREATED, function (event, annotation) {
+  $scope.$on(events.BEFORE_ANNOTATION_CREATED, function(event, annotation) {
     if (annotation.$highlight || metadata.isReply(annotation)) {
       return;
     }
@@ -136,13 +153,13 @@ function ThreadListController($element, $scope, settings, VirtualThreadList) {
     scrollIntoView(annotation.$tag);
   });
 
-  this.$onChanges = function (changes) {
+  this.$onChanges = function(changes) {
     if (changes.thread && visibleThreads) {
       visibleThreads.setRootThread(changes.thread.currentValue);
     }
   };
 
-  this.$onDestroy = function () {
+  this.$onDestroy = function() {
     visibleThreads.detach();
   };
 }

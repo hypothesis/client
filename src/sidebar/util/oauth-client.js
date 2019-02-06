@@ -22,12 +22,12 @@ const random = require('./random');
 function tokenInfoFrom(response) {
   const data = response.data;
   return {
-    accessToken:  data.access_token,
+    accessToken: data.access_token,
 
     // Set the expiry date to some time slightly before that implied by
     // `expires_in` to account for the delay in the client receiving the
     // response.
-    expiresAt: Date.now() + ((data.expires_in - 10) * 1000),
+    expiresAt: Date.now() + (data.expires_in - 10) * 1000,
 
     refreshToken: data.refresh_token,
   };
@@ -89,7 +89,7 @@ class OAuthClient {
       grant_type: 'authorization_code',
       code,
     };
-    return this._formPost(this.tokenEndpoint, data).then((response) => {
+    return this._formPost(this.tokenEndpoint, data).then(response => {
       if (response.status !== 200) {
         throw new Error('Authorization code exchange failed');
       }
@@ -128,7 +128,7 @@ class OAuthClient {
    */
   refreshToken(refreshToken) {
     const data = { grant_type: 'refresh_token', refresh_token: refreshToken };
-    return this._formPost(this.tokenEndpoint, data).then((response) => {
+    return this._formPost(this.tokenEndpoint, data).then(response => {
       if (response.status !== 200) {
         throw new Error('Failed to refresh access token');
       }
@@ -187,13 +187,15 @@ class OAuthClient {
 
     // Authorize user and retrieve grant token
     let authUrl = this.authorizationEndpoint;
-    authUrl += '?' + queryString.stringify({
-      client_id: this.clientId,
-      origin: $window.location.origin,
-      response_mode: 'web_message',
-      response_type: 'code',
-      state: state,
-    });
+    authUrl +=
+      '?' +
+      queryString.stringify({
+        client_id: this.clientId,
+        origin: $window.location.origin,
+        response_mode: 'web_message',
+        response_type: 'code',
+        state: state,
+      });
     authWindow.location = authUrl;
 
     return authResponse.then(rsp => rsp.code);
@@ -208,7 +210,7 @@ class OAuthClient {
   _formPost(url, data) {
     data = queryString.stringify(data);
     const requestConfig = {
-      headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     };
     return this.$http.post(url, data, requestConfig);
   }
@@ -231,21 +233,27 @@ class OAuthClient {
     // this.
     //
     // See https://bugs.webkit.org/show_bug.cgi?id=143678
-    const width  = 475;
+    const width = 475;
     const height = 430;
-    const left   = $window.screen.width / 2 - width / 2;
-    const top    = $window.screen.height /2 - height / 2;
+    const left = $window.screen.width / 2 - width / 2;
+    const top = $window.screen.height / 2 - height / 2;
 
     // Generate settings for `window.open` in the required comma-separated
     // key=value format.
-    const authWindowSettings = queryString.stringify({
-      left: left,
-      top: top,
-      width: width,
-      height: height,
-    }).replace(/&/g, ',');
+    const authWindowSettings = queryString
+      .stringify({
+        left: left,
+        top: top,
+        width: width,
+        height: height,
+      })
+      .replace(/&/g, ',');
 
-    return $window.open('about:blank', 'Log in to Hypothesis', authWindowSettings);
+    return $window.open(
+      'about:blank',
+      'Log in to Hypothesis',
+      authWindowSettings
+    );
   }
 }
 

@@ -9,17 +9,17 @@
 module.exports = {
   controllerAs: 'vm',
   // @ngInject
-  controller: function ($scope, $window, store, serviceUrl) {
+  controller: function($scope, $window, store, serviceUrl) {
     this.userAgent = $window.navigator.userAgent;
-    this.version = '__VERSION__';  // replaced by versionify
+    this.version = '__VERSION__'; // replaced by versionify
     this.dateTime = new Date();
     this.serviceUrl = serviceUrl;
 
     $scope.$watch(
-      function () {
+      function() {
         return store.frames();
       },
-      function (frames) {
+      function(frames) {
         if (frames.length === 0) {
           return;
         }
