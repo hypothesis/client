@@ -8,7 +8,8 @@ help:
 	@echo "make lint              Run the code linter(s) and print any warnings"
 	@echo "make checkformatting   Check code formatting"
 	@echo "make format            Automatically format code"
-	@echo "make test              Run the unit tests"
+	@echo "make test              Run the unit tests once"
+	@echo "make servetests        Start the unit test server on localhost"
 	@echo "make docs              Build docs website and serve it locally"
 	@echo "make checkdocs         Crash if building the docs website fails"
 	@echo "make clean             Delete development artefacts (cached files, "
@@ -25,6 +26,10 @@ ifdef FILTER
 else
 	yarn test
 endif
+
+.PHONY: servetests
+servetests: node_modules/.uptodate
+	gulp test-watch
 
 .PHONY: lint
 lint: node_modules/.uptodate
