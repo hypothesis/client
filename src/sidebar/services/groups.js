@@ -14,6 +14,7 @@ const DEFAULT_ORGANIZATION = {
 
 const events = require('../events');
 const { awaitStateChange } = require('../util/state-util');
+const { combineGroups } = require('../util/groups');
 const serviceConfig = require('../service-config');
 
 // @ngInject
@@ -25,7 +26,8 @@ function groups(
   localStorage,
   serviceUrl,
   session,
-  settings
+  settings,
+  features
 ) {
   const svc = serviceConfig(settings);
   const authority = svc ? svc.authority : null;
@@ -150,13 +152,25 @@ function groups(
         }
         documentUri = uri;
 
-        // Fetch groups from the API.
-        return api.groups.list(params, null, { includeMetadata: true });
+        if (features.flagEnabled('community_groups')) {
+          const profileParams = {
+            expand: ['organization'],
+          };
+          const profileGroupsApi = api.profile.groups.read(profileParams);
+          const listGroupsApi = api.groups.list(params);
+          return Promise.all([profileGroupsApi, listGroupsApi]).then(
+            ([myGroups, featuredGroups]) =>
+              combineGroups(myGroups, featuredGroups)
+          );
+        } else {
+          // Fetch groups from the API.
+          return api.groups.list(params);
+        }
       })
-      .then(({ data, token }) => {
-        const isLoggedIn = token !== null;
+      .then(groups => {
+        const isLoggedIn = store.profile().userid !== null;
         const directLinkedAnnotation = settings.annotations;
-        return filterGroups(data, isLoggedIn, directLinkedAnnotation);
+        return filterGroups(groups, isLoggedIn, directLinkedAnnotation);
       })
       .then(groups => {
         injectOrganizations(groups);
