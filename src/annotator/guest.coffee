@@ -91,6 +91,8 @@ module.exports = class Guest extends Delegator
     this._connectAnnotationSync(@crossframe)
     this._connectAnnotationUISync(@crossframe)
 
+    window.addEventListener 'working', this._playerListener, @crossframe
+
     # Load plugins
     for own name, opts of @options
       if not @plugins[name] and @options.pluginClasses[name]
@@ -145,6 +147,13 @@ module.exports = class Guest extends Delegator
     this.subscribe 'annotationsLoaded', (annotations) =>
       for annotation in annotations
         this.anchor(annotation)
+
+  _playerListener: (crossframe) ->
+    crossframe.on 'getDocumentInfo', (cb) =>
+      this.getDocumentInfo()
+      .then((info) -> alert 'hello')
+      .catch((reason) -> cb(reason))
+      # .then((info) -> crossframe.call('updateFrame', info))
 
   _connectAnnotationUISync: (crossframe) ->
     crossframe.on 'focusAnnotations', (tags=[]) =>
