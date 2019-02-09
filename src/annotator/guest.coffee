@@ -23,6 +23,7 @@ animationPromise = (fn) ->
 
 module.exports = class Guest extends Delegator
   SHOW_HIGHLIGHTS_CLASS = 'annotator-highlights-always-on'
+  EVENT_HYPOTHESIS_PATH_CHANGE = 'Hypothesis:pathChange'
 
   # Events to be bound on Delegator#element.
   events:
@@ -90,8 +91,7 @@ module.exports = class Guest extends Delegator
     @crossframe.onConnect(=> this._setupInitialState(config))
     this._connectAnnotationSync(@crossframe)
     this._connectAnnotationUISync(@crossframe)
-
-    window.addEventListener 'working', this._playerListener, @crossframe
+    this._playerListener(@crossframe)
 
     # Load plugins
     for own name, opts of @options
@@ -149,11 +149,11 @@ module.exports = class Guest extends Delegator
         this.anchor(annotation)
 
   _playerListener: (crossframe) ->
-    crossframe.on 'getDocumentInfo', (cb) =>
+    window.addEventListener EVENT_HYPOTHESIS_PATH_CHANGE, (e) =>
+      this.plugins.Document?.getDocumentMetadata()
       this.getDocumentInfo()
-      .then((info) -> alert 'hello')
+      .then((info) -> crossframe.call('updateFrame', info))
       .catch((reason) -> cb(reason))
-      # .then((info) -> crossframe.call('updateFrame', info))
 
   _connectAnnotationUISync: (crossframe) ->
     crossframe.on 'focusAnnotations', (tags=[]) =>
@@ -185,6 +185,7 @@ module.exports = class Guest extends Delegator
     $('#annotator-dynamic-style').remove()
 
     this.selections.unsubscribe()
+    window.removeEventListener EVENT_HYPOTHESIS_PATH_CHANGE
     @adder.remove()
 
     @element.find('.annotator-hl').each ->
