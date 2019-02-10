@@ -45,6 +45,8 @@
     "dom-seek": "^4.0.3",
     "dompurify": "^1.0.10",
     "end-of-stream": "^1.1.0",
+    "enzyme": "^3.8.0",
+    "enzyme-adapter-preact-pure": "^1.9.0",
     "escape-html": "^1.0.3",
     "escape-string-regexp": "^1.0.5",
     "eslint": "^5.12.1",

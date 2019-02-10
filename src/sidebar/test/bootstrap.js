@@ -13,3 +13,9 @@ sinon.assert.expose(assert, { prefix: null });
 window.jQuery = window.$ = require('jquery');
 require('angular');
 require('angular-mocks');
+
+// Configure Enzyme for UI tests.
+require('preact/debug');
+const { configure } = require('enzyme');
+const { Adapter } = require('enzyme-adapter-preact-pure');
+configure({ adapter: new Adapter() });
