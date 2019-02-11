@@ -149,9 +149,9 @@ module.exports = class Guest extends Delegator
         this.anchor(annotation)
 
   _addPlayerListener: (crossframe) ->
-    window.addEventListener EVENT_HYPOTHESIS_PATH_CHANGE, @_playerListener, crossframe
+    window.addEventListener EVENT_HYPOTHESIS_PATH_CHANGE, (e) => this._playerListener(crossframe)
 
-  _playerListener: (e, crossframe) =>
+  _playerListener: (crossframe) =>
       this.plugins.Document?.getDocumentMetadata()
       this.getDocumentInfo()
       .then((info) -> crossframe.call('updateFrame', info))
