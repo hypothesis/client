@@ -91,7 +91,7 @@ module.exports = class Guest extends Delegator
     @crossframe.onConnect(=> this._setupInitialState(config))
     this._connectAnnotationSync(@crossframe)
     this._connectAnnotationUISync(@crossframe)
-    this._playerListener(@crossframe)
+    this._addPlayerListener(@crossframe)
 
     # Load plugins
     for own name, opts of @options
@@ -148,8 +148,10 @@ module.exports = class Guest extends Delegator
       for annotation in annotations
         this.anchor(annotation)
 
-  _playerListener: (crossframe) ->
-    window.addEventListener EVENT_HYPOTHESIS_PATH_CHANGE, (e) =>
+  _addPlayerListener: (crossframe) ->
+    window.addEventListener EVENT_HYPOTHESIS_PATH_CHANGE, @_playerListener
+
+  _playerListener: =>
       this.plugins.Document?.getDocumentMetadata()
       this.getDocumentInfo()
       .then((info) -> crossframe.call('updateFrame', info))
@@ -185,7 +187,7 @@ module.exports = class Guest extends Delegator
     $('#annotator-dynamic-style').remove()
 
     this.selections.unsubscribe()
-    window.removeEventListener EVENT_HYPOTHESIS_PATH_CHANGE
+    window.removeEventListener EVENT_HYPOTHESIS_PATH_CHANGE, @_playerListener
     @adder.remove()
 
     @element.find('.annotator-hl').each ->
