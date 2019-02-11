@@ -72,6 +72,7 @@ module.exports = class Guest extends Delegator
           self._onClearSelection()
 
     this.plugins = {}
+    this._updateListener = {}
     this.anchors = []
 
     # Set the frame identifier if it's available.
@@ -149,13 +150,14 @@ module.exports = class Guest extends Delegator
         this.anchor(annotation)
 
   _addPlayerListener: (crossframe) ->
-    window.addEventListener EVENT_HYPOTHESIS_PATH_CHANGE, (e) => this._playerListener(crossframe)
+    this._updateListener = (e) => this._playerListener(crossframe);
+    window.addEventListener EVENT_HYPOTHESIS_PATH_CHANGE, @_updateListener
 
   _playerListener: (crossframe) =>
       this.plugins.Document?.getDocumentMetadata()
       this.getDocumentInfo()
       .then((info) -> crossframe.call('updateFrame', info))
-      .catch((reason) -> cb(reason))
+      .catch((reason) -> console.error(reason))
 
   _connectAnnotationUISync: (crossframe) ->
     crossframe.on 'focusAnnotations', (tags=[]) =>
@@ -187,7 +189,7 @@ module.exports = class Guest extends Delegator
     $('#annotator-dynamic-style').remove()
 
     this.selections.unsubscribe()
-    window.removeEventListener EVENT_HYPOTHESIS_PATH_CHANGE, @_playerListener
+    window.removeEventListener EVENT_HYPOTHESIS_PATH_CHANGE, @_updateListener
     @adder.remove()
 
     @element.find('.annotator-hl').each ->
