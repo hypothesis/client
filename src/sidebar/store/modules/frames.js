@@ -13,6 +13,16 @@ const update = {
   CONNECT_FRAME: function (state, action) {
     return {frames: state.frames.concat(action.frame)};
   },
+  UPDATE_FRAME: function (state, { id, metadata, uri }) {
+    return {
+      frames: state.frames.map(frame => {
+        if (frame.id !== id) {
+          return frame;
+        }
+        return Object.assign({}, frame, { id, metadata, uri });
+      }),
+    };
+  },
 
   DESTROY_FRAME: function (state, action) {
     return {
@@ -44,6 +54,13 @@ const actions = util.actionTypes(update);
  */
 function connectFrame(frame) {
   return {type: actions.CONNECT_FRAME, frame: frame};
+}
+
+/**
+ * Update the metadata and/or URI for a frame.
+ */
+function updateFrame({ id, metadata, uri }) {
+  return { type: actions.UPDATE_FRAME, id: id || null, metadata, uri };
 }
 
 /**
@@ -107,6 +124,7 @@ module.exports = {
 
   actions: {
     connectFrame: connectFrame,
+    updateFrame: updateFrame,
     destroyFrame: destroyFrame,
     updateFrameAnnotationFetchStatus: updateFrameAnnotationFetchStatus,
   },
