@@ -143,7 +143,9 @@ function createAPICall($http, $q, links, route, tokenGetter) {
       .then(([links, token]) => {
         const descriptor = get(links, route);
         const url = urlUtil.replaceURLParams(descriptor.url, params);
-        const headers = {};
+        const headers = {
+          'Hypothesis-Client-Version': '__VERSION__', // replaced by versionify
+        };
 
         accessToken = token;
         if (token) {

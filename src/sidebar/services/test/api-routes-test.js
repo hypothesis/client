@@ -89,6 +89,14 @@ describe('sidebar.api-routes', () => {
         assert.deepEqual(routes, apiIndexResponse.links);
       });
     });
+
+    it('sends client version custom request header', () => {
+      return apiRoutes.routes().then(() => {
+        assert.calledWith(fakeHttp.get, fakeSettings.apiUrl, {
+          headers: { 'Hypothesis-Client-Version': '__VERSION__' },
+        });
+      });
+    });
   });
 
   describe('#links', () => {
