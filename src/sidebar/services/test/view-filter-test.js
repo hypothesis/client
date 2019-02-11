@@ -153,10 +153,11 @@ describe('sidebar/services/view-filter', () => {
       const anns = [
         annotationWithUser('johnsmith'),
         annotationWithUser('jamesdean'),
+        annotationWithUser('johnjones'),
       ];
-      const result = viewFilter.filter(anns, userQuery('johnsmith'));
+      const result = viewFilter.filter(anns, userQuery('john'));
 
-      assert.deepEqual(result, [anns[0].id]);
+      assert.deepEqual(result, [anns[0].id, anns[2].id]);
     });
 
     it("matches user's display name if present", () => {
@@ -164,6 +165,8 @@ describe('sidebar/services/view-filter', () => {
         // Users with display names set.
         annotationWithUser('jsmith', 'John Smith'),
         annotationWithUser('jdean', 'James Dean'),
+        annotationWithUser('jherriot', 'James Herriot'),
+        annotationWithUser('jadejames', 'Jade'),
 
         // User with no display name.
         annotationWithUser('fmercury'),
@@ -173,7 +176,7 @@ describe('sidebar/services/view-filter', () => {
       ];
       const result = viewFilter.filter(anns, userQuery('james'));
 
-      assert.deepEqual(result, [anns[1].id]);
+      assert.deepEqual(result, [anns[1].id, anns[2].id, anns[3].id]);
     });
 
     it('ignores display name if not set', () => {
