@@ -27,6 +27,7 @@ function groups(
   serviceUrl,
   session,
   settings,
+  auth,
   features
 ) {
   const svc = serviceConfig(settings);
@@ -143,17 +144,23 @@ function groups(
           };
           const profileGroupsApi = api.profile.groups.read(profileParams);
           const listGroupsApi = api.groups.list(params);
-          return Promise.all([profileGroupsApi, listGroupsApi]).then(
-            ([myGroups, featuredGroups]) =>
-              combineGroups(myGroups, featuredGroups)
-          );
+          return Promise.all([
+            profileGroupsApi,
+            listGroupsApi,
+            auth.tokenGetter(),
+          ]).then(([myGroups, featuredGroups, token]) => [
+            combineGroups(myGroups, featuredGroups),
+            token,
+          ]);
         } else {
           // Fetch groups from the API.
-          return api.groups.list(params);
+          return api.groups
+            .list(params, null, { includeMetadata: true })
+            .then(({ data, token }) => [data, token]);
         }
       })
-      .then(groups => {
-        const isLoggedIn = store.profile().userid !== null;
+      .then(([groups, token]) => {
+        const isLoggedIn = token !== null;
         const directLinkedAnnotation = settings.annotations;
         return filterGroups(groups, isLoggedIn, directLinkedAnnotation);
       })

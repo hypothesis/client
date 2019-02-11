@@ -36,6 +36,7 @@ const dummyGroups = [
 ];
 
 describe('groups', function() {
+  let fakeAuth;
   let fakeFeatures;
   let fakeStore;
   let fakeIsSidebar;
@@ -48,6 +49,9 @@ describe('groups', function() {
   let sandbox;
 
   beforeEach(function() {
+    fakeAuth = {
+      tokenGetter: sinon.stub().returns('1234'),
+    };
     fakeFeatures = {
       flagEnabled: sinon.stub().returns(false),
     };
@@ -58,7 +62,6 @@ describe('groups', function() {
         searchUris: ['http://example.org'],
         focusedGroup: null,
         groups: [],
-        profile: sinon.stub().returns({ userid: 'userid' }),
       },
       {
         focusGroup: sinon.stub(),
@@ -79,9 +82,6 @@ describe('groups', function() {
         },
       }
     );
-    fakeStore.profile = () => {
-      return { userid: 'userid' };
-    };
     fakeSession = sessionWithThreeGroups();
     fakeIsSidebar = true;
     fakeLocalStorage = {
@@ -114,7 +114,12 @@ describe('groups', function() {
         },
       },
       groups: {
-        list: sandbox.stub().returns(Promise.resolve(dummyGroups)),
+        list: sandbox.stub().returns(
+          Promise.resolve({
+            data: dummyGroups,
+            token: '1234',
+          })
+        ),
       },
       profile: {
         groups: {
@@ -140,6 +145,7 @@ describe('groups', function() {
       fakeServiceUrl,
       fakeSession,
       fakeSettings,
+      fakeAuth,
       fakeFeatures
     );
   }
@@ -189,6 +195,9 @@ describe('groups', function() {
 
     it('sends `expand` parameter when community-groups feature flag is enabled', function() {
       const svc = service();
+      fakeApi.groups.list.returns(
+        Promise.resolve([{ id: 'groupa', name: 'GroupA' }])
+      );
       fakeFeatures.flagEnabled.withArgs('community_groups').returns(true);
 
       return svc.load().then(() => {
@@ -268,7 +277,12 @@ describe('groups', function() {
     it('injects a defalt organization if group is missing an organization', function() {
       const svc = service();
       const groups = [{ id: '39r39f', name: 'Ding Dong!' }];
-      fakeApi.groups.list.returns(Promise.resolve(groups));
+      fakeApi.groups.list.returns(
+        Promise.resolve({
+          token: '1234',
+          data: groups,
+        })
+      );
       return svc.load().then(groups => {
         assert.isObject(groups[0].organization);
         assert.hasAllKeys(groups[0].organization, ['id', 'logo']);
@@ -303,10 +317,12 @@ describe('groups', function() {
             groups.push({ name: 'BioPub', id: 'biopub' });
           }
 
-          fakeStore.profile = () => {
-            return { userid: loggedIn ? 'userid' : null };
-          };
-          fakeApi.groups.list.returns(Promise.resolve(groups));
+          fakeApi.groups.list.returns(
+            Promise.resolve({
+              token: loggedIn ? '1234' : null,
+              data: groups,
+            })
+          );
 
           return svc.load().then(groups => {
             const publicGroupShown = groups.some(g => g.id === '__world__');
@@ -359,7 +375,12 @@ describe('groups', function() {
           { name: 'DEF', id: 'def456', groupid: null },
         ];
 
-        fakeApi.groups.list.returns(Promise.resolve(groups));
+        fakeApi.groups.list.returns(
+          Promise.resolve({
+            token: '1234',
+            data: groups,
+          })
+        );
 
         return svc.load().then(groups => {
           let displayedGroups = groups.map(g => g.id);
