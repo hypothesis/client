@@ -132,6 +132,60 @@ describe('sidebar/services/view-filter', () => {
     });
   });
 
+  describe('"user" field', () => {
+    let id = 0;
+    function annotationWithUser(username, displayName = null) {
+      ++id;
+      return {
+        id,
+        user: `acct:${username}@example.com`,
+        user_info: {
+          display_name: displayName,
+        },
+      };
+    }
+
+    function userQuery(term) {
+      return { user: { terms: [term], operator: 'or' } };
+    }
+
+    it('matches username', () => {
+      const anns = [
+        annotationWithUser('johnsmith'),
+        annotationWithUser('jamesdean'),
+        annotationWithUser('johnjones'),
+      ];
+      const result = viewFilter.filter(anns, userQuery('john'));
+
+      assert.deepEqual(result, [anns[0].id, anns[2].id]);
+    });
+
+    it("matches user's display name if present", () => {
+      const anns = [
+        // Users with display names set.
+        annotationWithUser('jsmith', 'John Smith'),
+        annotationWithUser('jdean', 'James Dean'),
+        annotationWithUser('jherriot', 'James Herriot'),
+        annotationWithUser('jadejames', 'Jade'),
+
+        // User with no display name.
+        annotationWithUser('fmercury'),
+
+        // Annotation with no extended user info.
+        { id: 100, user: 'acct:jim@example.com' },
+      ];
+      const result = viewFilter.filter(anns, userQuery('james'));
+
+      assert.deepEqual(result, [anns[1].id, anns[2].id, anns[3].id]);
+    });
+
+    it('ignores display name if not set', () => {
+      const anns = [annotationWithUser('msmith')];
+      const result = viewFilter.filter(anns, userQuery('null'));
+      assert.deepEqual(result, []);
+    });
+  });
+
   describe('"since" field', () => {
     it('matches if the annotation is newer than the query', () => {
       const annotation = {

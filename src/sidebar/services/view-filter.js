@@ -4,6 +4,13 @@
 // breaks browserify-ngannotate.
 let unused; // eslint-disable-line
 
+function displayName(ann) {
+  if (!ann.user_info) {
+    return '';
+  }
+  return ann.user_info.display_name || '';
+}
+
 /**
  * Filter annotations against parsed search queries.
  *
@@ -133,7 +140,7 @@ function viewFilter(unicode) {
     },
     user: {
       autofalse: ann => typeof ann.user !== 'string',
-      value: ann => ann.user,
+      value: ann => ann.user + ' ' + displayName(ann),
       match: (term, value) => value.indexOf(term) > -1,
     },
   };

@@ -57,6 +57,21 @@ describe('sidebar.search-filter', () => {
       assert.equal(result.any[2], 'hi-fi');
       assert.equal(result.any[3], 'a:bc');
     });
+
+    it('supports quoting terms', () => {
+      const parsed = searchFilter.toObject('user:"Dan Whaley"');
+      assert.deepEqual(parsed, {
+        user: ['Dan Whaley'],
+      });
+    });
+
+    it('assigns unquoted terms to "any" category', () => {
+      const parsed = searchFilter.toObject('user:Dan Whaley');
+      assert.deepEqual(parsed, {
+        any: ['Whaley'],
+        user: ['Dan'],
+      });
+    });
   });
 
   describe('#generateFacetedFilter', () => {
