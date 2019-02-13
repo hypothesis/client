@@ -154,8 +154,9 @@ function groups(
         documentUri = uri;
 
         if (features.flagEnabled('community_groups')) {
+          params.expand = ['organization', 'scopes'];
           const profileParams = {
-            expand: ['organization'],
+            expand: ['organization', 'scopes'],
           };
           const profileGroupsApi = api.profile.groups.read(profileParams);
           const listGroupsApi = api.groups.list(params);
@@ -164,7 +165,7 @@ function groups(
             listGroupsApi,
             auth.tokenGetter(),
           ]).then(([myGroups, featuredGroups, token]) => [
-            combineGroups(myGroups, featuredGroups),
+            combineGroups(myGroups, featuredGroups, documentUri),
             token,
           ]);
         } else {

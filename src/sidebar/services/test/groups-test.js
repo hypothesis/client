@@ -203,11 +203,11 @@ describe('groups', function() {
       return svc.load().then(() => {
         assert.calledWith(
           fakeApi.profile.groups.read,
-          sinon.match({ expand: ['organization'] })
+          sinon.match({ expand: ['organization', 'scopes'] })
         );
         assert.calledWith(
           fakeApi.groups.list,
-          sinon.match({ expand: 'organization' })
+          sinon.match({ expand: ['organization', 'scopes'] })
         );
       });
     });
