@@ -107,22 +107,8 @@ describe('sidebar.util.groups', () => {
       },
       {
         description:
-          'sets `isScopedToUri` to true if `scopes.enforced` is missing',
-        scopes: {},
-        shouldBeSelectable: true,
-        uri: 'https://foo.com/bar',
-      },
-      {
-        description:
           'sets `isScopedToUri` to true if `scopes.enforced` is false',
         scopes: { enforced: false },
-        shouldBeSelectable: true,
-        uri: 'https://foo.com/bar',
-      },
-      {
-        description:
-          'sets `isScopedToUri` to true if `scopes.uri_patterns` is undefined',
-        scopes: { enforced: true, uri_patterns: undefined },
         shouldBeSelectable: true,
         uri: 'https://foo.com/bar',
       },
