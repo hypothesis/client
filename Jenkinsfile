@@ -67,9 +67,11 @@ node {
         echo "Skipping deployment because this is not the ${releaseFromBranch} branch"
         return
     }
+}
 
-    milestone()
-    stage('Publish to QA') {
+milestone()
+stage('Publish to QA') {
+    node {
         qaVersion = pkgVersion + "-${lastCommitHash}"
         nodeEnv.inside("-e HOME=${workspace}") {
             withCredentials([
@@ -104,12 +106,14 @@ node {
             }
         }
     }
+}
 
+milestone()
+stage('Publish') {
+    input(message: "Publish new client release?")
     milestone()
-    stage('Publish') {
-        input(message: "Publish new client release?")
-        milestone()
 
+    node {
         echo "Publishing ${pkgName} v${newPkgVersion} from ${releaseFromBranch} branch."
 
         nodeEnv.inside("-e HOME=${workspace} -e BRANCH_NAME=${env.BRANCH_NAME}") {
