@@ -747,12 +747,7 @@ acorn@^4.0.3:
   resolved "https://registry.yarnpkg.com/acorn/-/acorn-4.0.13.tgz#105495ae5361d697bd195c825192e1ad7f253787"
   integrity sha1-EFSVrlNh1pe9GVyCUZLhrX8lN4c=
 
-acorn@^6.0.2:
-  version "6.0.5"
-  resolved "https://registry.yarnpkg.com/acorn/-/acorn-6.0.5.tgz#81730c0815f3f3b34d8efa95cb7430965f4d887a"
-  integrity sha512-i33Zgp3XWtmZBMNvCr4azvOFeWVw1Rk6p3hfi3LUDvIFraOMywb1kAtrbi+med14m4Xfpqm3zRZMT+c0FNE7kg==
-
-acorn@^6.0.7:
+acorn@^6.0.2, acorn@^6.0.7:
   version "6.1.0"
   resolved "https://registry.yarnpkg.com/acorn/-/acorn-6.1.0.tgz#b0a3be31752c97a0f7013c5f4903b71a05db6818"
   integrity sha512-MW/FjM+IvU9CgBzjO3UIPCE2pyEwUsoFl+VGdczOPEdxfGFjuKny/gN54mOuX7Qxmb9Rg9MCn2oKiSUeW+pjrw==
@@ -4502,9 +4497,9 @@ gulp-sass@^4.0.2:
     vinyl-sourcemaps-apply "^0.2.0"
 
 gulp-sourcemaps@^2.6.4:
-  version "2.6.4"
-  resolved "https://registry.yarnpkg.com/gulp-sourcemaps/-/gulp-sourcemaps-2.6.4.tgz#cbb2008450b1bcce6cd23bf98337be751bf6e30a"
-  integrity sha1-y7IAhFCxvM5s0jv5gze+dRv24wo=
+  version "2.6.5"
+  resolved "https://registry.yarnpkg.com/gulp-sourcemaps/-/gulp-sourcemaps-2.6.5.tgz#a3f002d87346d2c0f3aec36af7eb873f23de8ae6"
+  integrity sha512-SYLBRzPTew8T5Suh2U8jCSDKY+4NARua4aqjj8HOysBh2tSgT9u4jc1FYirAdPx1akUxxDeK++fqw6Jg0LkQRg==
   dependencies:
     "@gulp-sourcemaps/identity-map" "1.X"
     "@gulp-sourcemaps/map-sources" "1.X"
