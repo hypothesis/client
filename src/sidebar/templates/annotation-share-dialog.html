@@ -3,7 +3,7 @@
      ng-click="vm.onClose()"></div>
 <div class="annotation-share-dialog" ng-class="{'is-open': vm.isOpen}">
   <div class="annotation-share-dialog-target">
-    <span class="annotation-share-dialog-target__label">Share:</span>
+    <span class="annotation-share-dialog-target__label u-stretch">Share:</span>
     <a href="https://twitter.com/intent/tweet?url={{vm.uri | urlEncode}}&hashtags=annotated"
       target="_blank"
       title="Tweet link"
@@ -14,11 +14,6 @@
       title="Share on Facebook"
       class="annotation-share-dialog-target__icon h-icon-facebook"
       ng-click="vm.onShareClick('facebook')"></a>
-    <a href="https://plus.google.com/share?url={{vm.uri | urlEncode}}"
-      target="_blank"
-      title="Post on Google Plus"
-      class="annotation-share-dialog-target__icon h-icon-google-plus"
-      ng-click="vm.onShareClick('googlePlus')"></a>
     <a href="mailto:?subject=Let's%20Annotate&amp;body={{vm.uri}}"
       target="_blank"
       title="Share via email"
