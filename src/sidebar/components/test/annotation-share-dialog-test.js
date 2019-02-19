@@ -62,10 +62,8 @@ describe('annotationShareDialog', function() {
       assert.equal(fakeAnalytics.track.args[0][1], 'twitter');
       clickShareIcon('h-icon-facebook');
       assert.equal(fakeAnalytics.track.args[1][1], 'facebook');
-      clickShareIcon('h-icon-google-plus');
-      assert.equal(fakeAnalytics.track.args[2][1], 'googlePlus');
       clickShareIcon('h-icon-mail');
-      assert.equal(fakeAnalytics.track.args[3][1], 'email');
+      assert.equal(fakeAnalytics.track.args[2][1], 'email');
     });
 
     it('focuses and selects the link when the dialog is opened', function(done) {

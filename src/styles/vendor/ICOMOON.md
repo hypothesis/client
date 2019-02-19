@@ -19,3 +19,10 @@ add the relevant icons and then use the app's _Generate Font_ facility.
     and click the 'Download' button which appears _within_ the tab.
  5. Run `scripts/update-icon-font.py <icomoon zip archive>` to update the icon font
  6. Commit the updated files to the repository.
+
+## Updating or removing icons
+
+To update or remove icons, follow the initial steps for adding icons above, but
+instead of adding an icon use the Icomoon UI tools to edit icons in the set or
+remove them before exporting the updated font and running the
+`update-icon-font.py` script.
