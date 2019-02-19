@@ -62,11 +62,11 @@ node {
             sh 'make test'
         }
     }
+}
 
-    if (env.BRANCH_NAME != releaseFromBranch) {
-        echo "Skipping deployment because this is not the ${releaseFromBranch} branch"
-        return
-    }
+if (env.BRANCH_NAME != releaseFromBranch) {
+    echo "Skipping deployment because ${env.BRANCH_NAME} is not the ${releaseFromBranch} branch"
+    return
 }
 
 milestone()
