@@ -53,6 +53,7 @@ function AnnotationController(
   store,
   annotationMapper,
   api,
+  bridge,
   drafts,
   flash,
   groups,
@@ -195,6 +196,12 @@ function AnnotationController(
     if (!isNew(self.annotation)) {
       // Already saved.
       return;
+    }
+
+    if (!self.annotation.user) {
+      // make the bug https://github.com/hypothesis/client/issues/12 explicit to user so they can at least log in
+      bridge.call('showSidebar');
+      flash.error('Sorry, drafts are currently broken. Please log in first.');
     }
 
     if (!self.isHighlight()) {
