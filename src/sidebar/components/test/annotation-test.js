@@ -115,6 +115,7 @@ describe('annotation', function() {
     let fakeSession;
     let fakeSettings;
     let fakeApi;
+    let fakeBridge;
     let fakeStreamer;
     let sandbox;
 
@@ -248,6 +249,10 @@ describe('annotation', function() {
           },
         };
 
+        fakeBridge = {
+          call: sinon.stub(),
+        };
+
         fakeStreamer = {
           hasPendingDeletion: sinon.stub(),
         };
@@ -256,6 +261,7 @@ describe('annotation', function() {
         $provide.value('annotationMapper', fakeAnnotationMapper);
         $provide.value('store', fakeStore);
         $provide.value('api', fakeApi);
+        $provide.value('bridge', fakeBridge);
         $provide.value('drafts', fakeDrafts);
         $provide.value('flash', fakeFlash);
         $provide.value('groups', fakeGroups);
