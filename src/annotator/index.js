@@ -1,15 +1,6 @@
 'use strict';
 
 const configFrom = require('./config/index');
-require('../shared/polyfills');
-
-// Polyfills
-
-// `document.evaluate` polyfill for IE 11.
-if (!window.document.evaluate) {
-  const wgxpath = require('wicked-good-xpath');
-  wgxpath.install();
-}
 
 const $ = require('jquery');
 

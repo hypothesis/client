@@ -1,9 +1,5 @@
 'use strict';
 
-if (typeof String.prototype.normalize !== 'function') {
-  require('unorm');
-}
-
 /**
  * Unicode combining characters
  * from http://xregexp.com/addons/unicode/unicode-categories.js line:30
