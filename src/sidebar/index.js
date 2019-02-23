@@ -5,7 +5,6 @@ const disableOpenerForExternalLinks = require('./util/disable-opener-for-externa
 const { fetchConfig } = require('./util/fetch-config');
 const serviceConfig = require('./service-config');
 const crossOriginRPC = require('./cross-origin-rpc.js');
-require('../shared/polyfills');
 
 let raven;
 

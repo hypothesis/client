@@ -1,5 +1,7 @@
 'use strict';
 
+const { requiredPolyfillSets } = require('../shared/polyfills');
+
 function injectStylesheet(doc, href) {
   const link = doc.createElement('link');
   link.rel = 'stylesheet';
@@ -28,6 +30,12 @@ function injectAssets(doc, config, assets) {
       injectScript(doc, url);
     }
   });
+}
+
+function polyfillBundles(needed) {
+  return requiredPolyfillSets(needed).map(
+    set => `scripts/polyfills-${set}.bundle.js`
+  );
 }
 
 /**
@@ -61,9 +69,17 @@ function bootHypothesisClient(doc, config) {
   clientUrl.type = 'application/annotator+javascript';
   doc.head.appendChild(clientUrl);
 
+  const polyfills = polyfillBundles([
+    'document.evaluate',
+    'es2015',
+    'es2016',
+    'es2017',
+    'url',
+  ]);
+
   injectAssets(doc, config, [
     // Vendor code and polyfills
-    'scripts/polyfills.bundle.js',
+    ...polyfills,
     'scripts/jquery.bundle.js',
 
     // Main entry point for the client
@@ -79,14 +95,22 @@ function bootHypothesisClient(doc, config) {
  * Bootstrap the sidebar application which displays annotations.
  */
 function bootSidebarApp(doc, config) {
+  const polyfills = polyfillBundles([
+    'es2015',
+    'es2016',
+    'es2017',
+    'string.prototype.normalize',
+    'url',
+  ]);
+
   injectAssets(doc, config, [
-    // Vendor code and polyfills required by app.bundle.js
+    ...polyfills,
+
+    // Vendor code required by sidebar.bundle.js
     'scripts/raven.bundle.js',
     'scripts/angular.bundle.js',
     'scripts/katex.bundle.js',
     'scripts/showdown.bundle.js',
-    'scripts/polyfills.bundle.js',
-    'scripts/unorm.bundle.js',
 
     // The sidebar app
     'scripts/sidebar.bundle.js',
