@@ -1,6 +1,8 @@
 'use strict';
 
-const unorm = require('unorm');
+if (typeof String.prototype.normalize !== 'function') {
+  require('unorm');
+}
 
 /**
  * Unicode combining characters
@@ -11,7 +13,7 @@ const COMBINING_MARKS = /[\u0300-\u036F\u0483-\u0489\u0591-\u05BD\u05BF\u05C1\u0
 // @ngInject
 function unicode() {
   return {
-    normalize: str => unorm.nfkd(str),
+    normalize: str => str.normalize('NFKD'),
     fold: str => str.replace(COMBINING_MARKS, ''),
   };
 }
