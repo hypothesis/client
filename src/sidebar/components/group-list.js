@@ -86,6 +86,7 @@ function GroupListController(
 
   this.showGroupsMenu = () => {
     if (features.flagEnabled('community_groups')) {
+      // Only show the drop down menu if there is more than one group.
       return this.groups.all().length > 1;
     } else {
       return !(this.isThirdPartyService && this.groups.all().length <= 1);
