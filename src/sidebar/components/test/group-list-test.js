@@ -10,9 +10,65 @@ const groupFixtures = require('../../test/group-fixtures');
 describe('groupList', function() {
   let $window;
 
-  const PRIVATE_GROUP_LINK = 'https://hypothes.is/groups/hdevs';
-  const OPEN_GROUP_LINK = 'https://hypothes.is/groups/pub';
-  const RESTRICTED_GROUP_LINK = 'https://hypothes.is/groups/restricto';
+  const PRIVATE_GROUP = {
+    id: 'private',
+    links: {
+      html: 'https://hypothes.is/groups/hdevs',
+    },
+    name: 'Private',
+    organization: groupFixtures.defaultOrganization(),
+    type: 'private',
+    isMember: true,
+    isScopedToUri: true,
+  };
+
+  const RESTRICTED_GROUP = {
+    id: 'restricted',
+    links: {
+      html: 'https://hypothes.is/groups/restricto',
+    },
+    name: 'Restricted',
+    organization: groupFixtures.defaultOrganization(),
+    type: 'restricted',
+    isMember: false,
+    isScopedToUri: true,
+  };
+
+  const RESTRICTED_UNSCOPED_GROUP = {
+    id: 'restricted',
+    links: {
+      html: 'https://hypothes.is/groups/restricto',
+    },
+    name: 'Restricted',
+    organization: groupFixtures.defaultOrganization(),
+    type: 'restricted',
+    isMember: false,
+    isScopedToUri: false,
+  };
+
+  const OPEN_GROUP = {
+    id: 'open',
+    links: {
+      html: 'https://hypothes.is/groups/pub',
+    },
+    name: 'Open',
+    organization: groupFixtures.defaultOrganization(),
+    type: 'open',
+    isMember: false,
+    isScopedToUri: true,
+  };
+
+  const PUBLIC_GROUP = {
+    id: '__world__',
+    links: {
+      html: 'https://hypothes.is/groups/__world__/public',
+    },
+    name: 'Public',
+    organization: groupFixtures.defaultOrganization(),
+    type: 'open',
+    isMember: true,
+    isScopedToUri: true,
+  };
 
   let groups;
   let fakeGroups;
@@ -55,35 +111,7 @@ describe('groupList', function() {
     angular.mock.inject(function(_$window_) {
       $window = _$window_;
 
-      groups = [
-        {
-          id: 'public',
-          links: {
-            html: OPEN_GROUP_LINK,
-          },
-          name: 'Public Group',
-          organization: groupFixtures.defaultOrganization(),
-          type: 'open',
-        },
-        {
-          id: 'h-devs',
-          links: {
-            html: PRIVATE_GROUP_LINK,
-          },
-          name: 'Hypothesis Developers',
-          organization: groupFixtures.defaultOrganization(),
-          type: 'private',
-        },
-        {
-          id: 'restricto',
-          links: {
-            html: RESTRICTED_GROUP_LINK,
-          },
-          name: 'Hello Restricted',
-          organization: groupFixtures.defaultOrganization(),
-          type: 'restricted',
-        },
-      ];
+      groups = [PUBLIC_GROUP, PRIVATE_GROUP, RESTRICTED_GROUP];
 
       fakeGroups = {
         all: function() {
@@ -240,9 +268,9 @@ describe('groupList', function() {
     const link = element.find('.share-link');
     assert.equal(link.length, groups.length);
 
-    assert.equal(link[0].href, OPEN_GROUP_LINK);
-    assert.equal(link[1].href, PRIVATE_GROUP_LINK);
-    assert.equal(link[2].href, RESTRICTED_GROUP_LINK);
+    assert.equal(link[0].href, PUBLIC_GROUP.links.html);
+    assert.equal(link[1].href, PRIVATE_GROUP.links.html);
+    assert.equal(link[2].href, RESTRICTED_GROUP.links.html);
   });
 
   it('should not render share links if they are not present', function() {
@@ -313,7 +341,7 @@ describe('groupList', function() {
   it('should leave group when the leave icon is clicked', function() {
     const element = createGroupList();
     clickLeaveIcon(element, true);
-    assert.ok(fakeGroups.leave.calledWith('h-devs'));
+    assert.ok(fakeGroups.leave.calledWith(PRIVATE_GROUP.id));
     assert.calledWith(fakeAnalytics.track, fakeAnalytics.events.GROUP_LEAVE);
   });
 
@@ -369,20 +397,7 @@ describe('groupList', function() {
       ];
 
       // Configure only one group.
-      const groups = [
-        {
-          id: 'h-devs',
-          links: {
-            html: PRIVATE_GROUP_LINK,
-          },
-          name: 'Hypothesis Developers',
-          organization: groupFixtures.defaultOrganization(),
-          type: 'private',
-        },
-      ];
-      fakeGroups.all = () => {
-        return groups;
-      };
+      groups = [PRIVATE_GROUP];
 
       const element = createGroupList();
 
@@ -425,20 +440,7 @@ describe('groupList', function() {
 
     it('is shown when it is not a third party service', function() {
       // Configure only one group.
-      const groups = [
-        {
-          id: 'h-devs',
-          links: {
-            html: PRIVATE_GROUP_LINK,
-          },
-          name: 'Hypothesis Developers',
-          organization: groupFixtures.defaultOrganization(),
-          type: 'private',
-        },
-      ];
-      fakeGroups.all = () => {
-        return groups;
-      };
+      groups = [PRIVATE_GROUP];
 
       const element = createGroupList();
 
