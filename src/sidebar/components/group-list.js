@@ -7,7 +7,15 @@ const memoize = require('../util/memoize');
 const groupOrganizations = memoize(require('../util/group-organizations'));
 
 // @ngInject
-function GroupListController($window, analytics, groups, settings, serviceUrl, i18nService) {
+function GroupListController(
+  $window,
+  analytics,
+  groups,
+  settings,
+  serviceUrl,
+  features,
+  i18nService
+) {
   this.groups = groups;
   this.tl = i18nService.tl;
 
@@ -88,7 +96,19 @@ function GroupListController($window, analytics, groups, settings, serviceUrl, i
   this.isThirdPartyService = isThirdPartyService(settings);
 
   this.showGroupsMenu = () => {
-    return !(this.isThirdPartyService && this.groups.all().length <= 1);
+    if (features.flagEnabled('community_groups')) {
+      return this.groups.all().length > 1;
+    } else {
+      return !(this.isThirdPartyService && this.groups.all().length <= 1);
+    }
+  };
+
+  /**
+   * Expose the feature flag so it can be used in the template logic to show
+   * or hide the new groups menu.
+   */
+  this.isFeatureFlagEnabled = flag => {
+    return features.flagEnabled(flag);
   };
 }
 
