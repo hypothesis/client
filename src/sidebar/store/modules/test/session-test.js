@@ -16,6 +16,19 @@ describe('sidebar.reducers.session', function() {
     });
   });
 
+  describe('#isLoggedIn', () => {
+    [
+      { userid: 'john', expectedIsLoggedIn: true },
+      { userid: null, expectedIsLoggedIn: false },
+    ].forEach(({ userid, expectedIsLoggedIn }) => {
+      it('returns whether the user is logged in', () => {
+        const newSession = Object.assign(init(), { userid: userid });
+        const state = update(init(), actions.updateSession(newSession));
+        assert.equal(selectors.isLoggedIn(state), expectedIsLoggedIn);
+      });
+    });
+  });
+
   describe('#profile', () => {
     it("returns the user's profile", () => {
       const newSession = Object.assign(init(), { userid: 'john' });

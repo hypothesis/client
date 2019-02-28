@@ -41,6 +41,15 @@ function updateSession(session) {
 }
 
 /**
+ * Return true if a user is logged in and false otherwise.
+ *
+ * @param {object} state - The application state
+ */
+function isLoggedIn(state) {
+  return state.session.userid !== null;
+}
+
+/**
  * Return true if a given feature flag is enabled.
  *
  * @param {object} state - The application state
@@ -70,6 +79,7 @@ module.exports = {
 
   selectors: {
     isFeatureEnabled,
+    isLoggedIn,
     profile,
   },
 };
