@@ -117,6 +117,10 @@ const appBundles = [{
   transforms: ['babel', 'coffee'],
 }];
 
+// Polyfill bundles. Polyfills are grouped into "sets" (one bundle per set)
+// based on major ECMAScript version or DOM API. Some large polyfills
+// (eg. for String.prototype.normalize) are additionally separated out into
+// their own bundles.
 const polyfillBundles = [
   'document.evaluate',
   'es2015',
