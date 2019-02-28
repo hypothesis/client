@@ -117,9 +117,28 @@ const appBundles = [{
   transforms: ['babel', 'coffee'],
 }];
 
-const appBundleConfigs = appBundles.map(function (config) {
-  return Object.assign({}, appBundleBaseConfig, config);
-});
+// Polyfill bundles. Polyfills are grouped into "sets" (one bundle per set)
+// based on major ECMAScript version or DOM API. Some large polyfills
+// (eg. for String.prototype.normalize) are additionally separated out into
+// their own bundles.
+const polyfillBundles = [
+  'document.evaluate',
+  'es2015',
+  'es2016',
+  'es2017',
+  'string.prototype.normalize',
+  'url',
+].map(set => ({
+  name: `polyfills-${set}`,
+  entry: `./src/shared/polyfills/${set}`,
+  transforms: ['babel'],
+}));
+
+const appBundleConfigs = appBundles
+  .concat(polyfillBundles)
+  .map(config => {
+    return Object.assign({}, appBundleBaseConfig, config);
+  });
 
 gulp.task('build-js', gulp.parallel('build-vendor-js', function () {
   return Promise.all(appBundleConfigs.map(function (config) {

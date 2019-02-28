@@ -9,7 +9,6 @@
 module.exports = {
   bundles: {
     jquery: ['jquery'],
-    polyfills: [require.resolve('../../src/shared/polyfills')],
     angular: [
       'angular',
       'angular-route',
@@ -21,7 +20,6 @@ module.exports = {
     ],
     katex: ['katex'],
     showdown: ['showdown'],
-    unorm: ['unorm'],
     raven: ['raven-js'],
   },
 

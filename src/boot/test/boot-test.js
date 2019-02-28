@@ -1,13 +1,27 @@
 'use strict';
 
-const boot = require('../boot');
+const proxyquire = require('proxyquire');
+
+function assetUrl(url) {
+  return `https://marginal.ly/client/build/${url}`;
+}
 
 describe('bootstrap', function() {
+  let boot;
+  let fakePolyfills;
   let iframe;
 
   beforeEach(function() {
     iframe = document.createElement('iframe');
     document.body.appendChild(iframe);
+
+    fakePolyfills = {
+      requiredPolyfillSets: sinon.stub().returns([]),
+    };
+
+    boot = proxyquire('../boot', {
+      '../shared/polyfills': fakePolyfills,
+    });
   });
 
   afterEach(function() {
@@ -16,8 +30,10 @@ describe('bootstrap', function() {
 
   function runBoot() {
     const assetNames = [
+      // Polyfills
+      'scripts/polyfills-es2015.bundle.js',
+
       // Annotation layer
-      'scripts/polyfills.bundle.js',
       'scripts/jquery.bundle.js',
       'scripts/annotator.bundle.js',
       'styles/annotator.css',
@@ -29,8 +45,6 @@ describe('bootstrap', function() {
       'scripts/angular.bundle.js',
       'scripts/katex.bundle.js',
       'scripts/showdown.bundle.js',
-      'scripts/polyfills.bundle.js',
-      'scripts/unorm.bundle.js',
       'scripts/sidebar.bundle.js',
 
       'styles/angular-csp.css',
@@ -75,13 +89,10 @@ describe('bootstrap', function() {
       const expectedAssets = [
         'scripts/annotator.bundle.1234.js',
         'scripts/jquery.bundle.1234.js',
-        'scripts/polyfills.bundle.1234.js',
         'styles/annotator.1234.css',
         'styles/icomoon.1234.css',
         'styles/pdfjs-overrides.1234.css',
-      ].map(function(url) {
-        return 'https://marginal.ly/client/build/' + url;
-      });
+      ].map(assetUrl);
 
       assert.deepEqual(findAssets(iframe.contentDocument), expectedAssets);
     });
@@ -105,6 +116,22 @@ describe('bootstrap', function() {
 
       assert.deepEqual(findAssets(iframe.contentDocument), []);
     });
+
+    it('loads polyfills if required', () => {
+      fakePolyfills.requiredPolyfillSets.callsFake(sets =>
+        sets.filter(s => s.match(/es2015/))
+      );
+
+      runBoot();
+
+      const polyfillsLoaded = findAssets(iframe.contentDocument).filter(a =>
+        a.match(/polyfills/)
+      );
+      assert.called(fakePolyfills.requiredPolyfillSets);
+      assert.deepEqual(polyfillsLoaded, [
+        assetUrl('scripts/polyfills-es2015.bundle.1234.js'),
+      ]);
+    });
   });
 
   context('in the sidebar application', function() {
@@ -124,21 +151,33 @@ describe('bootstrap', function() {
       const expectedAssets = [
         'scripts/angular.bundle.1234.js',
         'scripts/katex.bundle.1234.js',
-        'scripts/polyfills.bundle.1234.js',
         'scripts/raven.bundle.1234.js',
         'scripts/showdown.bundle.1234.js',
         'scripts/sidebar.bundle.1234.js',
-        'scripts/unorm.bundle.1234.js',
         'styles/angular-csp.1234.css',
         'styles/angular-toastr.1234.css',
         'styles/icomoon.1234.css',
         'styles/katex.min.1234.css',
         'styles/sidebar.1234.css',
-      ].map(function(url) {
-        return 'https://marginal.ly/client/build/' + url;
-      });
+      ].map(assetUrl);
 
       assert.deepEqual(findAssets(iframe.contentDocument), expectedAssets);
+    });
+
+    it('loads polyfills if required', () => {
+      fakePolyfills.requiredPolyfillSets.callsFake(sets =>
+        sets.filter(s => s.match(/es2015/))
+      );
+
+      runBoot();
+
+      const polyfillsLoaded = findAssets(iframe.contentDocument).filter(a =>
+        a.match(/polyfills/)
+      );
+      assert.called(fakePolyfills.requiredPolyfillSets);
+      assert.deepEqual(polyfillsLoaded, [
+        assetUrl('scripts/polyfills-es2015.bundle.1234.js'),
+      ]);
     });
   });
 });
