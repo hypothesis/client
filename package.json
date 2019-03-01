@@ -152,6 +152,6 @@
     "test": "gulp test",
     "report-coverage": "codecov -f coverage/coverage-final.json",
     "version": "make clean build/manifest.json",
-    "prepublish": "yarn run build"
+    "prepublishOnly": "make clean build/manifest.json"
   }
 }
