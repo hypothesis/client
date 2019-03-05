@@ -382,7 +382,7 @@ describe('groupList', function() {
       const dropdownToggle = element.find('.dropdown-toggle');
       const arrowIcon = element.find('.h-icon-arrow-drop-down');
       const dropdownMenu = element.find('.dropdown-menu__top-arrow');
-      const dropdownOptions = element.find('.dropdown-menu__row ');
+      const dropdownOptions = element.find('.dropdown-menu__row');
 
       assert.isFalse(showGroupsMenu);
       assert.lengthOf(dropdownToggle, 0);
@@ -406,7 +406,7 @@ describe('groupList', function() {
       const dropdownToggle = element.find('.dropdown-toggle');
       const arrowIcon = element.find('.h-icon-arrow-drop-down');
       const dropdownMenu = element.find('.dropdown-menu__top-arrow');
-      const dropdownOptions = element.find('.dropdown-menu__row ');
+      const dropdownOptions = element.find('.dropdown-menu__row');
 
       assert.isTrue(showGroupsMenu);
       assert.lengthOf(dropdownToggle, 1);
@@ -425,7 +425,7 @@ describe('groupList', function() {
       const dropdownToggle = element.find('.dropdown-toggle');
       const arrowIcon = element.find('.h-icon-arrow-drop-down');
       const dropdownMenu = element.find('.dropdown-menu__top-arrow');
-      const dropdownOptions = element.find('.dropdown-menu__row ');
+      const dropdownOptions = element.find('.dropdown-menu__row');
 
       assert.isTrue(showGroupsMenu);
       assert.lengthOf(dropdownToggle, 1);
@@ -444,7 +444,7 @@ describe('groupList', function() {
       const dropdownToggle = element.find('.dropdown-toggle');
       const arrowIcon = element.find('.h-icon-arrow-drop-down');
       const dropdownMenu = element.find('.dropdown-menu__top-arrow');
-      const dropdownOptions = element.find('.dropdown-menu__row ');
+      const dropdownOptions = element.find('.dropdown-menu__row');
 
       assert.isTrue(showGroupsMenu);
       assert.lengthOf(dropdownToggle, 1);
@@ -463,7 +463,7 @@ describe('groupList', function() {
       const dropdownToggle = element.find('.dropdown-toggle');
       const arrowIcon = element.find('.h-icon-arrow-drop-down');
       const dropdownMenu = element.find('.dropdown-menu__top-arrow');
-      const dropdownOptions = element.find('.dropdown-menu__row ');
+      const dropdownOptions = element.find('.dropdown-menu__row');
 
       assert.isFalse(showGroupsMenu);
       assert.lengthOf(dropdownToggle, 0);
