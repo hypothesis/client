@@ -38,24 +38,22 @@ const linksResponse = {
 
 describe('sidebar.api-routes', () => {
   let apiRoutes;
-  let fakeHttp;
   let fakeSettings;
 
   function httpResponse(status, data) {
-    return Promise.resolve({ status, data });
+    return Promise.resolve({ status, json: () => Promise.resolve(data) });
   }
 
   beforeEach(() => {
-    // Use a Sinon stub rather than Angular's fake $http service here to avoid
-    // the hassles that come with mixing `$q` and regular promises.
-    fakeHttp = {
-      get: sinon.stub(),
-    };
+    // We use a simple sinon stub of `fetch` here rather than `fetch-mock`
+    // because this service's usage of fetch is very simple and it makes it
+    // easier to mock the retry behavior.
+    const fetchStub = sinon.stub(window, 'fetch');
 
-    fakeHttp.get
+    fetchStub
       .withArgs('https://annotation.service/api/')
       .returns(httpResponse(200, apiIndexResponse));
-    fakeHttp.get
+    fetchStub
       .withArgs('https://annotation.service/api/links')
       .returns(httpResponse(200, linksResponse));
 
@@ -63,7 +61,11 @@ describe('sidebar.api-routes', () => {
       apiUrl: 'https://annotation.service/api/',
     };
 
-    apiRoutes = apiRoutesFactory(fakeHttp, fakeSettings);
+    apiRoutes = apiRoutesFactory(fakeSettings);
+  });
+
+  afterEach(() => {
+    window.fetch.restore();
   });
 
   describe('#routes', () => {
@@ -78,13 +80,13 @@ describe('sidebar.api-routes', () => {
       return Promise.all([apiRoutes.routes(), apiRoutes.routes()]).then(
         ([routesA, routesB]) => {
           assert.equal(routesA, routesB);
-          assert.equal(fakeHttp.get.callCount, 1);
+          assert.equal(window.fetch.callCount, 1);
         }
       );
     });
 
     it('retries the route fetch until it succeeds', () => {
-      fakeHttp.get.onFirstCall().returns(httpResponse(500, null));
+      window.fetch.onFirstCall().returns(httpResponse(500, null));
       return apiRoutes.routes().then(routes => {
         assert.deepEqual(routes, apiIndexResponse.links);
       });
@@ -92,7 +94,7 @@ describe('sidebar.api-routes', () => {
 
     it('sends client version custom request header', () => {
       return apiRoutes.routes().then(() => {
-        assert.calledWith(fakeHttp.get, fakeSettings.apiUrl, {
+        assert.calledWith(window.fetch, fakeSettings.apiUrl, {
           headers: { 'Hypothesis-Client-Version': '__VERSION__' },
         });
       });
@@ -112,7 +114,7 @@ describe('sidebar.api-routes', () => {
       return Promise.all([apiRoutes.links(), apiRoutes.links()]).then(
         ([linksA, linksB]) => {
           assert.equal(linksA, linksB);
-          assert.deepEqual(fakeHttp.get.callCount, 2);
+          assert.deepEqual(window.fetch.callCount, 2);
         }
       );
     });
