@@ -153,7 +153,7 @@ function auth(
       return Promise.resolve(client);
     }
     return apiRoutes.links().then(links => {
-      client = new OAuthClient($http, {
+      client = new OAuthClient({
         clientId: settings.oauthClientId,
         authorizationEndpoint: links['oauth.authorize'],
         revokeEndpoint: links['oauth.revoke'],
