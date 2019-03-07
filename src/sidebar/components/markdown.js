@@ -8,7 +8,7 @@ const renderMarkdown = require('../render-markdown');
 const scopeTimeout = require('../util/scope-timeout');
 
 // @ngInject
-function MarkdownController($element, $sanitize, $scope) {
+function MarkdownController($element, $scope) {
   const input = $element[0].querySelector('.js-markdown-input');
   const output = $element[0].querySelector('.js-markdown-preview');
 
@@ -140,7 +140,7 @@ function MarkdownController($element, $sanitize, $scope) {
 
   // Re-render the markdown when the view needs updating.
   $scope.$watch('vm.text', function() {
-    output.innerHTML = renderMarkdown(self.text || '', $sanitize);
+    output.innerHTML = renderMarkdown(self.text || '');
     mediaEmbedder.replaceLinksWithEmbeds(output);
   });
 

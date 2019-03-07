@@ -6,14 +6,6 @@ describe('render-markdown', function() {
   let render;
   let renderMarkdown;
 
-  function fakeSanitize(html) {
-    return '{safe}' + html + '{/safe}';
-  }
-
-  function noopSanitize(html) {
-    return html;
-  }
-
   beforeEach(function() {
     renderMarkdown = proxyquire('../render-markdown', {
       katex: {
@@ -26,9 +18,8 @@ describe('render-markdown', function() {
         },
       },
     });
-    render = function(markdown, sanitizeFn) {
-      sanitizeFn = sanitizeFn || noopSanitize;
-      return renderMarkdown(markdown, sanitizeFn);
+    render = function(markdown) {
+      return renderMarkdown(markdown);
     };
   });
 
@@ -36,7 +27,7 @@ describe('render-markdown', function() {
     it('should autolink URLs', function() {
       assert.equal(
         render('See this link - http://arxiv.org/article'),
-        '<p>See this link - <a target="_blank" href="http://arxiv.org/article">' +
+        '<p>See this link - <a href="http://arxiv.org/article" target="_blank">' +
           'http://arxiv.org/article</a></p>'
       );
     });
@@ -46,8 +37,9 @@ describe('render-markdown', function() {
         render(
           'See this https://hypothes.is/stream?q=tag:group_test_needs_card'
         ),
-        '<p>See this <a target="_blank" ' +
-          'href="https://hypothes.is/stream?q=tag:group_test_needs_card">' +
+        '<p>See this <a ' +
+          'href="https://hypothes.is/stream?q=tag:group_test_needs_card" ' +
+          'target="_blank">' +
           'https://hypothes.is/stream?q=tag:group_test_needs_card</a></p>'
       );
     });
@@ -62,9 +54,19 @@ describe('render-markdown', function() {
     });
 
     it('should sanitize the result', function() {
+      // Check that the rendered HTML is fed through the HTML sanitization
+      // library. This is not an extensive test of sanitization behavior, that
+      // is left to DOMPurify's tests.
       assert.equal(
-        renderMarkdown('one **two** three', fakeSanitize),
-        '{safe}<p>one <strong>two</strong> three</p>{/safe}'
+        renderMarkdown('one **two** <script>alert("three")</script>'),
+        '<p>one <strong>two</strong> </p>'
+      );
+    });
+
+    it('should open links in a new window', () => {
+      assert.equal(
+        renderMarkdown('<a href="http://example.com">test</a>'),
+        '<p><a href="http://example.com" target="_blank">test</a></p>'
       );
     });
   });
@@ -83,13 +85,10 @@ describe('render-markdown', function() {
     });
 
     it('should not sanitize math renderer output', function() {
-      const fakeSanitize = function(html) {
-        return html.toLowerCase();
-      };
-      assert.equal(
-        render('$$X*2$$ FOO', fakeSanitize),
-        '<p>math+display:X*2</p>\n<p>foo</p>'
-      );
+      // Check that KaTeX's rendered output is not corrupted in any way by
+      // sanitization.
+      const html = render('$$ <unknown-tag>foo</unknown-tag> $$');
+      assert.include(html, '<unknown-tag>foo</unknown-tag>');
     });
 
     it('should render mixed inline and block math', function() {

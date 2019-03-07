@@ -40,7 +40,7 @@ describe('markdown', function() {
   }
 
   before(function() {
-    angular.module('app', ['ngSanitize']).component(
+    angular.module('app').component(
       'markdown',
       proxyquire(
         '../markdown',
@@ -57,8 +57,8 @@ describe('markdown', function() {
               fn();
             };
           },
-          '../render-markdown': noCallThru(function(markdown, $sanitize) {
-            return $sanitize('rendered:' + markdown);
+          '../render-markdown': noCallThru(function(markdown) {
+            return 'rendered:' + markdown;
           }),
 
           '../markdown-commands': {
@@ -116,14 +116,6 @@ describe('markdown', function() {
         readOnly: true,
       });
       assert.equal(getRenderedHTML(editor), 'rendered:');
-    });
-
-    it('should sanitize the result', function() {
-      const editor = util.createDirective(document, 'markdown', {
-        readOnly: true,
-        text: 'Hello <script>alert("attack");</script> World',
-      });
-      assert.equal(getRenderedHTML(editor), 'rendered:Hello  World');
     });
 
     it('should replace links with embeds in rendered output', function() {

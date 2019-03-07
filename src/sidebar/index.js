@@ -107,7 +107,6 @@ function startAngularApp(config) {
       // Angular addons which export the Angular module name
       // via module.exports
       require('angular-route'),
-      require('angular-sanitize'),
       require('angular-toastr'),
 
       // Angular addons which do not export the Angular module
