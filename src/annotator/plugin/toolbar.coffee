@@ -115,6 +115,16 @@ module.exports = class Toolbar extends Plugin
   showCloseBtn: () ->
     $('[name=sidebar-close]').show();
 
+  show: () ->
+    $('[name=highlight-visibility]').show();
+    $('[name=insert-comment]').show();
+    $('[name=sidebar-toggle]').show();
+
+  hide: () ->
+    $('[name=highlight-visibility]').hide();
+    $('[name=insert-comment]').hide();
+    $('[name=sidebar-toggle]').hide();
+
   showCollapseSidebarBtn: () ->
     $('[name=sidebar-toggle]')
     .removeClass('h-icon-chevron-left')
