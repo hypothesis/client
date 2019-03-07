@@ -53,6 +53,7 @@
     "exorcist": "^1.0.1",
     "express": "^4.14.1",
     "extend": "^3.0.2",
+    "fetch-mock": "6",
     "gulp": "^4.0.0",
     "gulp-batch": "^1.0.5",
     "gulp-changed": "^3.2.0",
