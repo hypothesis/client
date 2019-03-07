@@ -20,6 +20,7 @@ module.exports = function(config) {
       './shared/polyfills/es2016.js',
       './shared/polyfills/es2017.js',
       './shared/polyfills/string.prototype.normalize.js',
+      './shared/polyfills/fetch.js',
       './shared/polyfills/url.js',
 
       // Test setup

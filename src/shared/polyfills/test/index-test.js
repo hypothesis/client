@@ -56,6 +56,10 @@ describe('shared/polyfills/index', () => {
         set: 'url',
         providesMethod: [window, 'URL', () => {}],
       },
+      {
+        set: 'fetch',
+        providesMethod: [window, 'fetch'],
+      },
     ].forEach(({ set, providesMethod }) => {
       it(`includes "${set}" if required`, () => {
         const [obj, method, replacement] = providesMethod;
