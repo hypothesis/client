@@ -1,17 +1,73 @@
 'use strict';
 
+const immutable = require('seamless-immutable');
+
 const createStore = require('../../create-store');
 const groups = require('../groups');
 
 describe('sidebar.store.modules.groups', () => {
-  const publicGroup = {
+  const publicGroup = immutable({
     id: '__world__',
     name: 'Public',
-  };
+    isMember: true,
+    isScopedToUri: true,
+  });
 
-  const privateGroup = {
-    id: 'foo',
+  const privateGroup = immutable({
+    id: 'privateid',
     name: 'Private',
+    isMember: true,
+    isScopedToUri: true,
+  });
+
+  const restrictedGroup = immutable({
+    id: 'restrictid',
+    name: 'Restricted',
+    isMember: false,
+    isScopedToUri: true,
+  });
+
+  const restrictedOutOfScopeGroup = immutable({
+    id: 'rstrctdOOSid',
+    name: 'Restricted OOS',
+    isMember: false,
+    isScopedToUri: false,
+  });
+
+  const restrictedOutOfScopeMemberGroup = immutable({
+    id: 'rstrctdOOSmemberid',
+    name: 'Restricted OOS Mem',
+    isMember: true,
+    isScopedToUri: false,
+  });
+
+  const openGroup = immutable({
+    id: 'openid',
+    isMember: false,
+    isScopedToUri: true,
+  });
+
+  /*
+   * Returns groups from the specified group list in the store and asserts
+   * that none of the lists contain the same groups. The group lists are:
+   * myGroups, featuredGroups, or currentlyViewingGroups.
+   */
+  const getListAssertNoDupes = (store, list) => {
+    const allLists = {
+      myGroups: store.getMyGroups(),
+      featuredGroups: store.getFeaturedGroups(),
+      currentlyViewingGroups: store.getCurrentlyViewingGroups(),
+    };
+
+    let allGroups = [];
+    for (let groups of Object.values(allLists)) {
+      allGroups = allGroups.concat(groups);
+    }
+
+    const hasDuplicates = new Set(allGroups).size !== allGroups.length;
+    assert.isFalse(hasDuplicates);
+
+    return allLists[list];
   };
 
   let store;
@@ -106,6 +162,133 @@ describe('sidebar.store.modules.groups', () => {
       store.loadGroups([privateGroup]);
       store.focusGroup(privateGroup.id);
       assert.equal(store.focusedGroupId(), privateGroup.id);
+    });
+  });
+
+  describe('getFeaturedGroups', () => {
+    [
+      {
+        description:
+          'If logged in and there is a restricted group the user is not a member of, show it in `Featured Groups`.',
+        isLoggedIn: true,
+        allGroups: [restrictedGroup],
+        expectedFeaturedGroups: [restrictedGroup],
+      },
+      {
+        description:
+          'If logged in and there is an open group, show it in `Featured Groups`.',
+        isLoggedIn: true,
+        allGroups: [openGroup],
+        expectedFeaturedGroups: [openGroup],
+      },
+      {
+        description:
+          'If logged in and the user is a member of all the groups, do not show them in `Featured Groups`.',
+        isLoggedIn: true,
+        allGroups: [publicGroup],
+        expectedFeaturedGroups: [],
+      },
+      {
+        description:
+          'If logged out and there is an in-scope restricted group, show it in `Featured Groups`.',
+        isLoggedIn: false,
+        allGroups: [restrictedGroup],
+        expectedFeaturedGroups: [restrictedGroup],
+      },
+      {
+        description:
+          'If logged out and there is an open group, show it in `Featured Groups`.',
+        isLoggedIn: false,
+        allGroups: [openGroup],
+        expectedFeaturedGroups: [openGroup],
+      },
+    ].forEach(
+      ({ description, isLoggedIn, allGroups, expectedFeaturedGroups }) => {
+        it(description, () => {
+          store.getState().session = { userid: isLoggedIn ? '1234' : null };
+          store.loadGroups(allGroups);
+
+          const featuredGroups = getListAssertNoDupes(store, 'featuredGroups');
+
+          assert.deepEqual(featuredGroups, expectedFeaturedGroups);
+        });
+      }
+    );
+  });
+
+  describe('getMyGroups', () => {
+    [
+      {
+        description: 'If not logged in, do not show groups in `My Groups`',
+        isLoggedIn: false,
+        allGroups: [publicGroup],
+        expectedMyGroups: [],
+      },
+      {
+        description:
+          'If logged in and the user is a member of the group, show it in `My Groups`',
+        isLoggedIn: true,
+        allGroups: [openGroup],
+        expectedMyGroups: [],
+      },
+      {
+        description:
+          'If logged in and the user is a member of the unscoped group, show it in `My Groups`',
+        isLoggedIn: true,
+        allGroups: [restrictedOutOfScopeMemberGroup],
+        expectedMyGroups: [restrictedOutOfScopeMemberGroup],
+      },
+      {
+        description:
+          'If logged in and the user is a member of the group, show it in `My Groups`',
+        isLoggedIn: true,
+        allGroups: [publicGroup],
+        expectedMyGroups: [publicGroup],
+      },
+    ].forEach(({ description, isLoggedIn, allGroups, expectedMyGroups }) => {
+      it(description, () => {
+        store.getState().session = { userid: isLoggedIn ? '1234' : null };
+        store.loadGroups(allGroups);
+
+        const myGroups = getListAssertNoDupes(store, 'myGroups');
+
+        assert.deepEqual(myGroups, expectedMyGroups);
+      });
+    });
+  });
+
+  describe('getCurrentlyViewingGroups', () => {
+    [
+      {
+        description:
+          'If logged out and there is an out-of-scope restricted group, show it in `Currently Viewing`',
+        isLoggedIn: false,
+        allGroups: [restrictedOutOfScopeGroup],
+      },
+      {
+        description:
+          'If logged out and only the Public group is present, show it in `Currently Viewing`',
+        isLoggedIn: false,
+        allGroups: [publicGroup],
+      },
+      {
+        description:
+          'If logged in and there is an out-of-scope restricted group that the user is not a memberof, show it in `Currently Viewing`',
+        isLoggedIn: true,
+        allGroups: [restrictedOutOfScopeGroup],
+      },
+    ].forEach(({ description, isLoggedIn, allGroups }) => {
+      it(description, () => {
+        store.getState().session = { userid: isLoggedIn ? '1234' : null };
+        store.loadGroups(allGroups);
+
+        const currentlyViewing = getListAssertNoDupes(
+          store,
+          'currentlyViewingGroups'
+        );
+
+        assert.deepEqual(currentlyViewing, allGroups);
+      });
     });
   });
 });

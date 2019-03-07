@@ -1,6 +1,7 @@
 'use strict';
 
 const angular = require('angular');
+const immutable = require('seamless-immutable');
 
 const groupList = require('../group-list');
 const util = require('../../directive/test/util');
@@ -10,15 +11,42 @@ const groupFixtures = require('../../test/group-fixtures');
 describe('groupList', function() {
   let $window;
 
-  const PRIVATE_GROUP_LINK = 'https://hypothes.is/groups/hdevs';
-  const OPEN_GROUP_LINK = 'https://hypothes.is/groups/pub';
-  const RESTRICTED_GROUP_LINK = 'https://hypothes.is/groups/restricto';
+  const privateGroup = immutable({
+    id: 'private',
+    links: {
+      html: 'https://hypothes.is/groups/hdevs',
+    },
+    name: 'Private',
+    organization: groupFixtures.defaultOrganization(),
+    type: 'private',
+  });
+
+  const restrictedGroup = immutable({
+    id: 'restricted',
+    links: {
+      html: 'https://hypothes.is/groups/restricto',
+    },
+    name: 'Restricted',
+    organization: groupFixtures.defaultOrganization(),
+    type: 'restricted',
+  });
+
+  const publicGroup = immutable({
+    id: '__world__',
+    links: {
+      html: 'https://hypothes.is/groups/__world__/public',
+    },
+    name: 'Public',
+    organization: groupFixtures.defaultOrganization(),
+    type: 'open',
+  });
 
   let groups;
   let fakeGroups;
   let fakeAnalytics;
   let fakeServiceUrl;
   let fakeSettings;
+  let fakeFeatures;
 
   before(function() {
     angular
@@ -30,6 +58,10 @@ describe('groupList', function() {
   });
 
   beforeEach(function() {
+    fakeFeatures = {
+      flagEnabled: sinon.stub().returns(false),
+    };
+
     fakeAnalytics = {
       track: sinon.stub(),
       events: {
@@ -48,6 +80,7 @@ describe('groupList', function() {
       analytics: fakeAnalytics,
       serviceUrl: fakeServiceUrl,
       settings: fakeSettings,
+      features: fakeFeatures,
     });
   });
 
@@ -55,35 +88,7 @@ describe('groupList', function() {
     angular.mock.inject(function(_$window_) {
       $window = _$window_;
 
-      groups = [
-        {
-          id: 'public',
-          links: {
-            html: OPEN_GROUP_LINK,
-          },
-          name: 'Public Group',
-          organization: groupFixtures.defaultOrganization(),
-          type: 'open',
-        },
-        {
-          id: 'h-devs',
-          links: {
-            html: PRIVATE_GROUP_LINK,
-          },
-          name: 'Hypothesis Developers',
-          organization: groupFixtures.defaultOrganization(),
-          type: 'private',
-        },
-        {
-          id: 'restricto',
-          links: {
-            html: RESTRICTED_GROUP_LINK,
-          },
-          name: 'Hello Restricted',
-          organization: groupFixtures.defaultOrganization(),
-          type: 'restricted',
-        },
-      ];
+      groups = [publicGroup, privateGroup, restrictedGroup];
 
       fakeGroups = {
         all: function() {
@@ -240,9 +245,9 @@ describe('groupList', function() {
     const link = element.find('.share-link');
     assert.equal(link.length, groups.length);
 
-    assert.equal(link[0].href, OPEN_GROUP_LINK);
-    assert.equal(link[1].href, PRIVATE_GROUP_LINK);
-    assert.equal(link[2].href, RESTRICTED_GROUP_LINK);
+    assert.equal(link[0].href, publicGroup.links.html);
+    assert.equal(link[1].href, privateGroup.links.html);
+    assert.equal(link[2].href, restrictedGroup.links.html);
   });
 
   it('should not render share links if they are not present', function() {
@@ -313,7 +318,7 @@ describe('groupList', function() {
   it('should leave group when the leave icon is clicked', function() {
     const element = createGroupList();
     clickLeaveIcon(element, true);
-    assert.ok(fakeGroups.leave.calledWith('h-devs'));
+    assert.ok(fakeGroups.leave.calledWith(privateGroup.id));
     assert.calledWith(fakeAnalytics.track, fakeAnalytics.events.GROUP_LEAVE);
   });
 
@@ -369,20 +374,7 @@ describe('groupList', function() {
       ];
 
       // Configure only one group.
-      const groups = [
-        {
-          id: 'h-devs',
-          links: {
-            html: PRIVATE_GROUP_LINK,
-          },
-          name: 'Hypothesis Developers',
-          organization: groupFixtures.defaultOrganization(),
-          type: 'private',
-        },
-      ];
-      fakeGroups.all = () => {
-        return groups;
-      };
+      groups = [privateGroup];
 
       const element = createGroupList();
 
@@ -390,7 +382,7 @@ describe('groupList', function() {
       const dropdownToggle = element.find('.dropdown-toggle');
       const arrowIcon = element.find('.h-icon-arrow-drop-down');
       const dropdownMenu = element.find('.dropdown-menu__top-arrow');
-      const dropdownOptions = element.find('.dropdown-menu__row ');
+      const dropdownOptions = element.find('.dropdown-menu__row');
 
       assert.isFalse(showGroupsMenu);
       assert.lengthOf(dropdownToggle, 0);
@@ -414,7 +406,7 @@ describe('groupList', function() {
       const dropdownToggle = element.find('.dropdown-toggle');
       const arrowIcon = element.find('.h-icon-arrow-drop-down');
       const dropdownMenu = element.find('.dropdown-menu__top-arrow');
-      const dropdownOptions = element.find('.dropdown-menu__row ');
+      const dropdownOptions = element.find('.dropdown-menu__row');
 
       assert.isTrue(showGroupsMenu);
       assert.lengthOf(dropdownToggle, 1);
@@ -425,20 +417,7 @@ describe('groupList', function() {
 
     it('is shown when it is not a third party service', function() {
       // Configure only one group.
-      const groups = [
-        {
-          id: 'h-devs',
-          links: {
-            html: PRIVATE_GROUP_LINK,
-          },
-          name: 'Hypothesis Developers',
-          organization: groupFixtures.defaultOrganization(),
-          type: 'private',
-        },
-      ];
-      fakeGroups.all = () => {
-        return groups;
-      };
+      groups = [privateGroup];
 
       const element = createGroupList();
 
@@ -446,13 +425,64 @@ describe('groupList', function() {
       const dropdownToggle = element.find('.dropdown-toggle');
       const arrowIcon = element.find('.h-icon-arrow-drop-down');
       const dropdownMenu = element.find('.dropdown-menu__top-arrow');
-      const dropdownOptions = element.find('.dropdown-menu__row ');
+      const dropdownOptions = element.find('.dropdown-menu__row');
 
       assert.isTrue(showGroupsMenu);
       assert.lengthOf(dropdownToggle, 1);
       assert.lengthOf(arrowIcon, 1);
       assert.lengthOf(dropdownMenu, 1);
       assert.lengthOf(dropdownOptions, 2);
+    });
+
+    it('is shown when community_groups feature flag is on and there are multiple groups', function() {
+      fakeFeatures.flagEnabled.withArgs('community_groups').returns(true);
+      groups = [publicGroup, restrictedGroup];
+
+      const element = createGroupList();
+
+      const showGroupsMenu = element.ctrl.showGroupsMenu();
+      const dropdownToggle = element.find('.dropdown-toggle');
+      const arrowIcon = element.find('.h-icon-arrow-drop-down');
+      const dropdownMenu = element.find('.dropdown-menu__top-arrow');
+      const dropdownOptions = element.find('.dropdown-menu__row');
+
+      assert.isTrue(showGroupsMenu);
+      assert.lengthOf(dropdownToggle, 1);
+      assert.lengthOf(arrowIcon, 1);
+      assert.lengthOf(dropdownMenu, 1);
+      assert.lengthOf(dropdownOptions, 3);
+    });
+
+    it('is not shown when community_groups feature flag is on and there is only one group', function() {
+      fakeFeatures.flagEnabled.withArgs('community_groups').returns(true);
+      groups = [privateGroup];
+
+      const element = createGroupList();
+
+      const showGroupsMenu = element.ctrl.showGroupsMenu();
+      const dropdownToggle = element.find('.dropdown-toggle');
+      const arrowIcon = element.find('.h-icon-arrow-drop-down');
+      const dropdownMenu = element.find('.dropdown-menu__top-arrow');
+      const dropdownOptions = element.find('.dropdown-menu__row');
+
+      assert.isFalse(showGroupsMenu);
+      assert.lengthOf(dropdownToggle, 0);
+      assert.lengthOf(arrowIcon, 0);
+      assert.lengthOf(dropdownMenu, 0);
+      assert.lengthOf(dropdownOptions, 0);
+    });
+  });
+
+  [false, true].forEach(isEnabled => {
+    it('returns what features.flagEnabled returns', function() {
+      fakeFeatures.flagEnabled.withArgs('community_groups').returns(isEnabled);
+
+      const element = createGroupList();
+
+      const communityGroupsEnabled = element.ctrl.isFeatureFlagEnabled(
+        'community_groups'
+      );
+      assert.isTrue(communityGroupsEnabled === isEnabled);
     });
   });
 });
