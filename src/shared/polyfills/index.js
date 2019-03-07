@@ -5,6 +5,8 @@
  *
  * This module executes in an environment without any polyfills loaded so it
  * needs to run in old browsers, down to IE 11.
+ *
+ * See gulpfile.js for details of how to add a new polyfill.
  */
 
 /**
@@ -84,6 +86,10 @@ const needsPolyfill = {
   // is separated out into its own bundle.
   'string.prototype.normalize': () => {
     return !hasMethods(String.prototype, 'normalize');
+  },
+
+  fetch: () => {
+    return typeof window.fetch !== 'function';
   },
 };
 

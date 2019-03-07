@@ -96,10 +96,15 @@ function bootHypothesisClient(doc, config) {
  */
 function bootSidebarApp(doc, config) {
   const polyfills = polyfillBundles([
+    // JS polyfills.
     'es2015',
     'es2016',
     'es2017',
     'string.prototype.normalize',
+
+    // DOM polyfills. These are loaded after the JS polyfills as they may
+    // depend upon them, eg. for Promises.
+    'fetch',
     'url',
   ]);
 
