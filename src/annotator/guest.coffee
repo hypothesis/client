@@ -24,6 +24,8 @@ animationPromise = (fn) ->
 module.exports = class Guest extends Delegator
   SHOW_HIGHLIGHTS_CLASS = 'annotator-highlights-always-on'
   EVENT_HYPOTHESIS_PATH_CHANGE = 'Hypothesis:pathChange'
+  EVENT_HYPOTHESIS_SHOW_UI = 'Hypothesis:showUI'
+  EVENT_HYPOTHESIS_HIDE_UI = 'Hypothesis:hideUI'
 
   # Events to be bound on Delegator#element.
   events:
@@ -73,6 +75,8 @@ module.exports = class Guest extends Delegator
 
     this.plugins = {}
     this._updateListener = {}
+    this._showUIListener = {}
+    this._hideUIListener = {}
     this.anchors = []
 
     # Set the frame identifier if it's available.
@@ -93,6 +97,7 @@ module.exports = class Guest extends Delegator
     this._connectAnnotationSync(@crossframe)
     this._connectAnnotationUISync(@crossframe)
     this._addPlayerListener(@crossframe)
+    this._addUiEventsListener()
 
     # Load plugins
     for own name, opts of @options
@@ -153,11 +158,23 @@ module.exports = class Guest extends Delegator
     this._updateListener = (e) => this._playerListener(crossframe);
     window.addEventListener EVENT_HYPOTHESIS_PATH_CHANGE, @_updateListener
 
+  _addUiEventsListener: () ->
+    this._showUIListener = (e) => this.showUI();
+    this._hideUIListener = (e) => this.hideUI();
+    window.addEventListener EVENT_HYPOTHESIS_SHOW_UI, this._showUIListener
+    window.addEventListener EVENT_HYPOTHESIS_HIDE_UI, this._hideUIListener
+
   _playerListener: (crossframe) =>
       this.plugins.Document?.getDocumentMetadata()
       this.getDocumentInfo()
       .then((info) -> crossframe.call('updateFrame', info))
       .catch((reason) -> console.error(reason))
+
+  hideUI: () ->
+    @crossframe?.call('hideAll')
+
+  showUI: (crossframe) ->
+    @crossframe?.call('showAll')
 
   _connectAnnotationUISync: (crossframe) ->
     crossframe.on 'focusAnnotations', (tags=[]) =>
@@ -190,6 +207,8 @@ module.exports = class Guest extends Delegator
 
     this.selections.unsubscribe()
     window.removeEventListener EVENT_HYPOTHESIS_PATH_CHANGE, @_updateListener
+    window.removeEventListener EVENT_HYPOTHESIS_SHOW_UI, @_showUIListener
+    window.removeEventListener EVENT_HYPOTHESIS_HIDE_UI, @_hideUIListener
     @adder.remove()
 
     @element.find('.annotator-hl').each ->
