@@ -14,8 +14,6 @@ module.exports = {
       'angular-route',
       'ng-tags-input',
       'angular-toastr',
-      'angulartics/src/angulartics',
-      'angulartics/src/angulartics-ga',
     ],
     katex: ['katex'],
     showdown: ['showdown'],

@@ -101,6 +101,17 @@ function setupHttp($http, streamer) {
   $http.defaults.headers.common['X-Client-Id'] = streamer.clientId;
 }
 
+/**
+ * Send a page view event when the app starts up.
+ *
+ * We don't bother tracking route changes later because the client only uses a
+ * single route in a given session.
+ */
+// @ngInject
+function sendPageView(analytics) {
+  analytics.sendPageView();
+}
+
 function startAngularApp(config) {
   angular
     .module('h', [
@@ -111,11 +122,6 @@ function startAngularApp(config) {
 
       // Angular addons which do not export the Angular module
       // name via module.exports
-      ['angulartics', require('angulartics')][0],
-      [
-        'angulartics.google.analytics',
-        require('angulartics/src/angulartics-ga'),
-      ][0],
       ['ngTagsInput', require('ng-tags-input')][0],
       ['ui.bootstrap', require('./vendor/ui-bootstrap-custom-tpls-0.13.4')][0],
 
@@ -220,6 +226,7 @@ function startAngularApp(config) {
     .config(configureRoutes)
     .config(configureToastr)
 
+    .run(sendPageView)
     .run(setupHttp)
     .run(crossOriginRPC.server.start);
 
