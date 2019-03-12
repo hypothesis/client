@@ -68,71 +68,52 @@ function clientType(win, settings = {}) {
 }
 
 /**
- * Wrapper around the Google Analytics client.
- *
- * See https://developers.google.com/analytics/devguides/collection/analyticsjs/
- */
-class GoogleAnalytics {
-  /**
-   * @param {Function} ga - The `window.ga` interface to analytics.js
-   * @param {string} category - Category for events.
-   */
-  constructor(ga, category) {
-    this.ga = ga;
-    this.category = category;
-  }
-
-  /**
-   * Report a user interaction to Google Analytics.
-   *
-   * See https://developers.google.com/analytics/devguides/collection/analyticsjs/events
-   *
-   * @param {string} action - The user action
-   * @param {string} label
-   * @param [number] value
-   */
-  sendEvent(action, label, value) {
-    this.ga('send', 'event', this.category, action, label, value);
-  }
-
-  /**
-   * Report a page view.
-   *
-   * This should be sent on initial page load and route changes.
-   */
-  sendPageView() {
-    this.ga('send', 'pageview');
-  }
-}
-
-/**
- * Analytics API to simplify and standardize the values that we
- * pass to the Angulartics service.
- *
- * These analytics are based on google analytics and need to conform to its
- * requirements. Specifically, we are required to send the event and a category.
- *
- * We will standardize the category to be the appType of the client settings
+ * Analytics service for tracking page views and user interactions with the
+ * application.
  */
 // @ngInject
 function analytics($window, settings) {
   const category = clientType($window, settings);
   const noop = () => {};
-  const ga = $window.ga || noop;
-  const googleAnalytics = new GoogleAnalytics(ga, category);
+
+  // Return the current analytics.js command queue function. This function
+  // is replaced when analytics.js fully loads.
+  //
+  // See https://developers.google.com/analytics/devguides/collection/analyticsjs/command-queue-reference
+  const commandQueue = () => $window.ga || noop;
 
   return {
+    /**
+     * Track a page view when the app initially loads or changes route.
+     *
+     * See https://developers.google.com/analytics/devguides/collection/analyticsjs/pages
+     */
     sendPageView() {
-      googleAnalytics.sendPageView();
+      const queue = commandQueue();
+      queue('send', 'pageview');
     },
 
     /**
-     * @param  {string} event This is the event name that we are capturing
-     *  in our analytics. Example: 'sidebarOpened'. Use camelCase to track multiple
-     *  words.
+     * Track an event using Google Analytics.
+     *
+     * GA events have a category, action, label and value. The category is set
+     * to a string indicating the distribution method of the client (embed,
+     * browser extension, proxy service etc.).
+     *
+     * See https://developers.google.com/analytics/devguides/collection/analyticsjs/events
+     *
+     * @param {string} action -
+     *  The event which happened. This should be a value from the `events` enum.
+     * @param [string] label
+     *  A string argument to associate with the event. The meaning depends upon
+     *  the event.
+     * @param [number] value
+     *  A numeric value to associate with the event. The meaning depends upon
+     *  the event.
      */
-    track(event, label, metricValue) {
-      googleAnalytics.sendEvent(event, label, metricValue);
+    track(action, label, value) {
+      const queue = commandQueue();
+      queue('send', 'event', category, action, label, value);
     },
 
     events,

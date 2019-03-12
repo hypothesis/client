@@ -108,4 +108,26 @@ describe('analytics', function() {
       assert.notCalled(ga);
     });
   });
+
+  it('sends events to the current analytics.js command queue', () => {
+    const initialQueue = $windowStub.ga;
+    const queueAfterLoad = sinon.stub();
+
+    // Send a page view hit before analytics.js loads.
+    svc.sendPageView();
+
+    assert.called($windowStub.ga);
+
+    // Simulate analytics.js loading, which will replace the command queue.
+    $windowStub.ga = queueAfterLoad;
+    initialQueue.reset();
+
+    // Report a user interaction after analytics.js loads.
+    svc.track('someEvent');
+
+    // Check that the event was passed to the right queue.
+    assert.notCalled(initialQueue);
+    assert.called(queueAfterLoad);
+    checkEventSent('embed', 'someEvent');
+  });
 });
