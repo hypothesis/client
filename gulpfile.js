@@ -121,11 +121,21 @@ const appBundles = [{
 // based on major ECMAScript version or DOM API. Some large polyfills
 // (eg. for String.prototype.normalize) are additionally separated out into
 // their own bundles.
+//
+// To add a new polyfill:
+//  - Add the relevant dependencies to the project
+//  - Create an entry point in `src/shared/polyfills/{set}` and a feature
+//    detection function in `src/shared/polyfills/index.js`
+//  - Add an entry to the list below to generate the polyfill bundle
+//  - Add the polyfill set name to the required dependencies for the parts of
+//    the client that need it in `src/boot/boot.js`
+//  - Add the polyfill to the test environment if necessary in `src/karma.config.js`
 const polyfillBundles = [
   'document.evaluate',
   'es2015',
   'es2016',
   'es2017',
+  'fetch',
   'string.prototype.normalize',
   'url',
 ].map(set => ({
