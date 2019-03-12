@@ -250,4 +250,21 @@ describe('sidebar.services.api', function() {
       );
     });
   });
+
+  it('does not send a client ID by default', () => {
+    expectCall('get', 'profile');
+    return api.profile.read({}).then(() => {
+      const [, options] = fetchMock.lastCall();
+      assert.isFalse('X-Client-Id' in options.headers);
+    });
+  });
+
+  it('sends a client ID in the X-Client-Id header if configured', () => {
+    expectCall('get', 'profile');
+    api.setClientId('1234-5678');
+    return api.profile.read({}).then(() => {
+      const [, options] = fetchMock.lastCall();
+      assert.equal(options.headers['X-Client-Id'], '1234-5678');
+    });
+  });
 });

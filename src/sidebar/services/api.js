@@ -70,11 +70,14 @@ function stripInternalProperties(obj) {
  * @typedef {Object} APIMethodOptions
  * @prop {() => Promise<string>} getAccessToken -
  *   Function which acquires a valid access token for making an API request.
+ * @prop [() => string|null] getClientId -
+ *   Function that returns a per-session client ID to include with the request
+ *   or `null`.
  * @prop [() => any] onRequestStarted - Callback invoked when the API request starts.
  * @prop [() => any] onRequestFinished - Callback invoked when the API request finishes.
  */
 
-const noop = () => {};
+const noop = () => null;
 
 /**
  * Creates a function that will make an API call to a named route.
@@ -90,6 +93,7 @@ function createAPICall(
   route,
   {
     getAccessToken = noop,
+    getClientId = noop,
     onRequestStarted = noop,
     onRequestFinished = noop,
   } = {}
@@ -112,6 +116,11 @@ function createAPICall(
         accessToken = token;
         if (token) {
           headers.Authorization = 'Bearer ' + token;
+        }
+
+        const clientId = getClientId();
+        if (clientId) {
+          headers['X-Client-Id'] = clientId;
         }
 
         const { url, params: queryParams } = replaceURLParams(
@@ -179,16 +188,31 @@ function createAPICall(
 // @ngInject
 function api(apiRoutes, auth, store) {
   const links = apiRoutes.routes();
+  let clientId = null;
+
+  const getClientId = () => clientId;
 
   function apiCall(route) {
     return createAPICall(links, route, {
       getAccessToken: auth.tokenGetter,
+      getClientId,
       onRequestStarted: store.apiRequestStarted,
       onRequestFinished: store.apiRequestFinished,
     });
   }
 
   return {
+    /**
+     * Set the "client ID" sent with API requests.
+     *
+     * This is a per-session unique ID which the client sends with REST API
+     * requests and in the configuration for the real-time API to prevent the
+     * client from receiving real-time notifications about its own actions.
+     */
+    setClientId(clientId_) {
+      clientId = clientId_;
+    },
+
     search: apiCall('search'),
     annotation: {
       create: apiCall('annotation.create'),

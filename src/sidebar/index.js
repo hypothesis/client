@@ -97,8 +97,8 @@ function configureToastr(toastrConfig) {
 }
 
 // @ngInject
-function setupHttp($http, streamer) {
-  $http.defaults.headers.common['X-Client-Id'] = streamer.clientId;
+function setupApi(api, streamer) {
+  api.setClientId(streamer.clientId);
 }
 
 /**
@@ -227,7 +227,7 @@ function startAngularApp(config) {
     .config(configureToastr)
 
     .run(sendPageView)
-    .run(setupHttp)
+    .run(setupApi)
     .run(crossOriginRPC.server.start);
 
   if (config.liveReloadServer) {
