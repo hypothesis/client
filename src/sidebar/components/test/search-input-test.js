@@ -5,7 +5,7 @@ const angular = require('angular');
 const util = require('../../directive/test/util');
 
 describe('searchInput', function() {
-  let fakeHttp;
+  let fakeStore;
 
   before(function() {
     angular
@@ -14,9 +14,9 @@ describe('searchInput', function() {
   });
 
   beforeEach(function() {
-    fakeHttp = { pendingRequests: [] };
+    fakeStore = { isLoading: sinon.stub().returns(false) };
     angular.mock.module('app', {
-      $http: fakeHttp,
+      store: fakeStore,
     });
   });
 
@@ -45,17 +45,23 @@ describe('searchInput', function() {
   });
 
   describe('loading indicator', function() {
-    it('is hidden when there are no network requests in flight', function() {
+    it('is hidden when there are no API requests in flight', function() {
       const el = util.createDirective(document, 'search-input', {});
       const spinner = el[0].querySelector('spinner');
+
+      fakeStore.isLoading.returns(false);
+      el.scope.$digest();
+
       assert.equal(util.isHidden(spinner), true);
     });
 
-    it('is visible when there are network requests in flight', function() {
+    it('is visible when there are API requests in flight', function() {
       const el = util.createDirective(document, 'search-input', {});
       const spinner = el[0].querySelector('spinner');
-      fakeHttp.pendingRequests.push([{}]);
+
+      fakeStore.isLoading.returns(true);
       el.scope.$digest();
+
       assert.equal(util.isHidden(spinner), false);
     });
   });

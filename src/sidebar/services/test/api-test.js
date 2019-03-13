@@ -20,6 +20,7 @@ describe('sidebar.services.api', function() {
   let $httpBackend;
   let $q;
   let fakeAuth;
+  let fakeStore;
   let sandbox;
   let api;
 
@@ -50,11 +51,16 @@ describe('sidebar.services.api', function() {
     fakeAuth = {
       tokenGetter: sinon.stub(),
     };
+    fakeStore = {
+      apiRequestStarted: sinon.stub(),
+      apiRequestFinished: sinon.stub(),
+    };
 
     angular.mock.module('h', {
       apiRoutes: fakeApiRoutes,
       auth: fakeAuth,
       settings: { apiUrl: 'https://example.com/api/' },
+      store: fakeStore,
     });
 
     angular.mock.inject(function(_$q_) {
@@ -374,6 +380,32 @@ describe('sidebar.services.api', function() {
         headers => headers['Hypothesis-Client-Version'] === '__VERSION__'
       )
       .respond(() => [200, { userid: 'acct:user@example.com' }]);
+    $httpBackend.flush();
+  });
+
+  it('dispatches store actions when an API request starts and completes successfully', () => {
+    api.profile.read({}).then(() => {
+      assert.isTrue(
+        fakeStore.apiRequestFinished.calledAfter(fakeStore.apiRequestStarted)
+      );
+    });
+
+    $httpBackend
+      .expectGET('https://example.com/api/profile')
+      .respond(() => [200, { userid: 'acct:user@example.com' }]);
+    $httpBackend.flush();
+  });
+
+  it('dispatches store actions when an API request starts and fails', () => {
+    api.profile.read({}).catch(() => {
+      assert.isTrue(
+        fakeStore.apiRequestFinished.calledAfter(fakeStore.apiRequestStarted)
+      );
+    });
+
+    $httpBackend
+      .expectGET('https://example.com/api/profile')
+      .respond(() => [400, { reason: 'Something went wrong' }]);
     $httpBackend.flush();
   });
 });

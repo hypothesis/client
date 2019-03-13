@@ -1,7 +1,7 @@
 'use strict';
 
 // @ngInject
-function SearchInputController($element, $http, $scope) {
+function SearchInputController($element, store) {
   const self = this;
   const button = $element.find('button');
   const input = $element.find('input')[0];
@@ -11,19 +11,12 @@ function SearchInputController($element, $http, $scope) {
     input.focus();
   });
 
-  $scope.$watch(
-    function() {
-      return $http.pendingRequests.length;
-    },
-    function(count) {
-      self.loading = count > 0;
-    }
-  );
-
   form.onsubmit = function(e) {
     e.preventDefault();
     self.onSearch({ $query: input.value });
   };
+
+  this.isLoading = () => store.isLoading();
 
   this.inputClasses = function() {
     return { 'is-expanded': self.alwaysExpanded || self.query };
