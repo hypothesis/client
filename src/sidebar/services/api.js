@@ -121,6 +121,18 @@ function serializeParams(params) {
  */
 
 /**
+ * Configuration for an API method.
+ *
+ * @typedef {Object} APIMethodOptions
+ * @prop {() => Promise<string>} getAccessToken -
+ *   Function which acquires a valid access token for making an API request.
+ * @prop [() => any] onRequestStarted - Callback invoked when the API request starts.
+ * @prop [() => any] onRequestFinished - Callback invoked when the API request finishes.
+ */
+
+const noop = () => {};
+
+/**
  * Creates a function that will make an API call to a named route.
  *
  * @param $http - The Angular HTTP service
@@ -128,18 +140,29 @@ function serializeParams(params) {
  * @param links - Object or promise for an object mapping named API routes to
  *                URL templates and methods
  * @param route - The dotted path of the named API route (eg. `annotation.create`)
- * @param {Function} tokenGetter - Function which returns a Promise for an
- *                   access token for the API.
+ * @param [APIMethodOptions] - Configuration for the API method
  * @return {APICallFunction}
  */
-function createAPICall($http, $q, links, route, tokenGetter) {
+function createAPICall(
+  $http,
+  $q,
+  links,
+  route,
+  {
+    getAccessToken = noop,
+    onRequestStarted = noop,
+    onRequestFinished = noop,
+  } = {}
+) {
   return function(params, data, options = {}) {
+    onRequestStarted();
+
     // `$q.all` is used here rather than `Promise.all` because testing code that
     // mixes native Promises with the `$q` promises returned by `$http`
     // functions gets awkward in tests.
     let accessToken;
     return $q
-      .all([links, tokenGetter()])
+      .all([links, getAccessToken()])
       .then(([links, token]) => {
         const descriptor = get(links, route);
         const url = urlUtil.replaceURLParams(descriptor.url, params);
@@ -163,6 +186,8 @@ function createAPICall($http, $q, links, route, tokenGetter) {
         return $http(req);
       })
       .then(function(response) {
+        onRequestFinished();
+
         if (options.includeMetadata) {
           return { data: response.data, token: accessToken };
         } else {
@@ -170,6 +195,8 @@ function createAPICall($http, $q, links, route, tokenGetter) {
         }
       })
       .catch(function(response) {
+        onRequestFinished();
+
         // Translate the API result into an `Error` to follow the convention that
         // Promises should be rejected with an Error or Error-like object.
         //
@@ -201,10 +228,14 @@ function createAPICall($http, $q, links, route, tokenGetter) {
  * not use authentication.
  */
 // @ngInject
-function api($http, $q, apiRoutes, auth) {
+function api($http, $q, apiRoutes, auth, store) {
   const links = apiRoutes.routes();
   function apiCall(route) {
-    return createAPICall($http, $q, links, route, auth.tokenGetter);
+    return createAPICall($http, $q, links, route, {
+      getAccessToken: auth.tokenGetter,
+      onRequestStarted: store.apiRequestStarted,
+      onRequestFinished: store.apiRequestFinished,
+    });
   }
 
   return {
