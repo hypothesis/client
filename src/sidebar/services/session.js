@@ -21,7 +21,6 @@ const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
  * @ngInject
  */
 function session(
-  $q,
   $rootScope,
   analytics,
   store,
@@ -148,7 +147,7 @@ function session(
       .catch(function(err) {
         flash.error('Log out failed');
         analytics.track(analytics.events.LOGOUT_FAILURE);
-        return $q.reject(new Error(err));
+        throw new Error(err);
       })
       .then(function() {
         analytics.track(analytics.events.LOGOUT_SUCCESS);
