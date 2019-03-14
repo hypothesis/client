@@ -242,6 +242,22 @@ html {
 
   min-height: 40px;
   min-width: 120px;
+
+  &:not(:first-child) {
+    border-top: dotted 1px $gray-lighter;
+  }
+}
+
+// Row in a dropdown menu
+.dropdown-community-groups-menu__row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding-left: 8px;
+  padding-right: 16px;
+
+  min-height: 40px;
+  min-width: 120px;
 }
 
 .dropdown-menu__row--unpadded {
