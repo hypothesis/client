@@ -101,9 +101,6 @@ function createAPICall(
   return function(params, data, options = {}) {
     onRequestStarted();
 
-    // `$q.all` is used here rather than `Promise.all` because testing code that
-    // mixes native Promises with the `$q` promises returned by `$http`
-    // functions gets awkward in tests.
     let accessToken;
     return Promise.all([links, getAccessToken()])
       .then(([links, token]) => {
