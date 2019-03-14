@@ -452,6 +452,45 @@ describe('groupList', function() {
       }
     );
   });
+  describe('group details expanded on out of scope groups', () => {
+    it('sets the default for the given groupid to false and returns it', () => {
+      const element = createGroupList();
+
+      const expanded = element.ctrl.isGroupDetailsExpanded('groupid');
+
+      assert.isFalse(expanded);
+      assert.isFalse(element.ctrl.groupDetailsExpanded.groupid);
+    });
+
+    it('gets expanded value for the given groupid if already present', () => {
+      const element = createGroupList();
+
+      element.ctrl.groupDetailsExpanded = { groupid: true };
+      const expanded = element.ctrl.isGroupDetailsExpanded('groupid');
+
+      assert.isTrue(expanded);
+    });
+
+    it('toggles the expanded value for the given groupid', () => {
+      const element = createGroupList();
+      let fakeEvent = { stopPropagation: sinon.stub() };
+
+      element.ctrl.toggleGroupDetails(fakeEvent, 'groupid');
+      assert.isTrue(element.ctrl.groupDetailsExpanded.groupid);
+
+      element.ctrl.toggleGroupDetails(fakeEvent, 'groupid');
+      assert.isFalse(element.ctrl.groupDetailsExpanded.groupid);
+    });
+
+    it('stops the event from propogating when toggling', () => {
+      const element = createGroupList();
+      let fakeEvent = { stopPropagation: sinon.spy() };
+
+      element.ctrl.toggleGroupDetails(fakeEvent, 'groupid');
+
+      sinon.assert.called(fakeEvent.stopPropagation);
+    });
+  });
 
   it('displays out of scope groups as non-selectable', () => {
     fakeFeatures.flagEnabled.withArgs('community_groups').returns(true);

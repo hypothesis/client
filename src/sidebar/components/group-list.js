@@ -26,6 +26,9 @@ function GroupListController(
 ) {
   this.groups = groups;
 
+  // Track which non-selectable groups have their group details expanded.
+  this.groupDetailsExpanded = {};
+
   this.createNewGroup = function() {
     $window.open(serviceUrl('groups.new'), '_blank');
   };
@@ -87,15 +90,21 @@ function GroupListController(
     groups.focus(groupId);
   };
 
+  this.isGroupDetailsExpanded = function(groupId) {
+    if (!(groupId in this.groupDetailsExpanded)) {
+      this.groupDetailsExpanded[groupId] = false;
+    }
+    return this.groupDetailsExpanded[groupId];
+  };
+
   /**
-   * This is a quick and dirty hack to show styling, and needs refactoring.
+   * Toggle the expanded setting on un-selectable groups.
    */
-  this.toggleGroupDetails = function() {
-    const groupDetails = $window.document.getElementById(
-      'group-details-out-of-scope'
-    );
-    groupDetails.classList.toggle('expanded');
-    $window.event.stopPropagation();
+  this.toggleGroupDetails = function(event, groupId) {
+    event.stopPropagation();
+    // Call the isGroupDetailsExpanded method so that if the groupId doesn't exist,
+    // it gets added before toggling it.
+    this.groupDetailsExpanded[groupId] = !this.isGroupDetailsExpanded(groupId);
   };
 
   /**
