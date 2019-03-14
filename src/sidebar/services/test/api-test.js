@@ -23,6 +23,8 @@ describe('sidebar.services.api', function() {
   function defaultBodyForStatus(status) {
     if (status === 204) {
       return '';
+    } else if (status >= 500) {
+      return '<html><body>Internal Server Error</body></html>';
     } else {
       return {};
     }
@@ -33,8 +35,10 @@ describe('sidebar.services.api', function() {
    *
    * @param {string} method - Expected HTTP method (lower case)
    * @param {string} pathAndQuery - Expected part of URL after API root
-   * @param {number} status - Expected HTTP status
-   * @param {Object} body - Expected response body
+   * @param {number} status -
+   *   Expected HTTP status. If <= 0 then the call to `fetch` will reject with
+   *   the content of `body` as the error message.
+   * @param {Object|string} body - Expected response body
    */
   function expectCall(
     method,
@@ -43,7 +47,18 @@ describe('sidebar.services.api', function() {
     body = defaultBodyForStatus(status)
   ) {
     const url = `https://example.com/api/${pathAndQuery}`;
-    fetchMock.mock(url, { status, body }, { method });
+    if (status > 0) {
+      fetchMock.mock(url, { status, body }, { method });
+    } else {
+      fetchMock.mock(
+        url,
+        {
+          status,
+          throws: new Error(body),
+        },
+        { method }
+      );
+    }
   }
 
   beforeEach(() => {
@@ -121,8 +136,11 @@ describe('sidebar.services.api', function() {
     });
   });
 
-  // Our backend service interprets semicolons as query param delimiters, so we
-  // must ensure to encode them in the query string.
+  // Test that semicolons are correctly encoded in the query string, which is
+  // important as they are treated as query param delimiters by the API.
+  //
+  // This used to require custom code when using AngularJS but `fetch` handles
+  // this correctly for us. The test has been kept to catch any regressions.
   it('encodes semicolons in query parameters', () => {
     expectCall(
       'get',
@@ -149,7 +167,7 @@ describe('sidebar.services.api', function() {
       {
         // Network error
         status: -1,
-        body: null,
+        body: 'Service unreachable.',
         expectedMessage: 'Service unreachable.',
       },
       {
@@ -244,6 +262,16 @@ describe('sidebar.services.api', function() {
 
   it('dispatches store actions when an API request starts and fails', () => {
     expectCall('get', 'profile', 400);
+    return api.profile.read({}).catch(() => {
+      assert.isTrue(
+        fakeStore.apiRequestFinished.calledAfter(fakeStore.apiRequestStarted)
+      );
+    });
+  });
+
+  it('dispatches store actions if API request fails with a network error', () => {
+    expectCall('get', 'profile', -1, 'Network error');
+
     return api.profile.read({}).catch(() => {
       assert.isTrue(
         fakeStore.apiRequestFinished.calledAfter(fakeStore.apiRequestStarted)

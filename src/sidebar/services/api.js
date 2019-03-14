@@ -7,16 +7,14 @@ const { replaceURLParams } = require('../util/url-util');
 
 /**
  * Translate the response from a failed API call into an Error-like object.
+ *
+ * @param {Response} response
+ * @param {Object} data - The parsed JSON response
  */
 function translateResponseToError(response, data) {
-  let message;
-  if (response.status <= 0) {
-    message = 'Service unreachable.';
-  } else {
-    message = response.status + ' ' + response.statusText;
-    if (data && data.reason) {
-      message = message + ': ' + data.reason;
-    }
+  let message = response.status + ' ' + response.statusText;
+  if (data && data.reason) {
+    message = message + ': ' + data.reason;
   }
   return new Error(message);
 }
@@ -40,7 +38,8 @@ function stripInternalProperties(obj) {
 /**
  * @typedef APIResponse
  * @prop {any} data -
- *  The JSON response from the API call, unless this call return 204 No Content.
+ *  The JSON response from the API call, unless this call returned a
+ *  "204 No Content" status.
  * @prop {string|null} token - The access token that was used to make the call
  *   or `null` if unauthenticated.
  */
@@ -77,6 +76,7 @@ function stripInternalProperties(obj) {
  * @prop [() => any] onRequestFinished - Callback invoked when the API request finishes.
  */
 
+// istanbul ignore next
 const noop = () => null;
 
 /**
@@ -147,21 +147,29 @@ function createAPICall(
         }
         return Promise.all([response, data]);
       })
-      .then(([response, data]) => {
-        onRequestFinished();
+      .then(
+        ([response, data]) => {
+          // `fetch` executed the request and the response was successfully parsed.
+          onRequestFinished();
 
-        if (response.status >= 400) {
-          // Translate the API result into an `Error` to follow the convention that
-          // Promises should be rejected with an Error or Error-like object.
-          throw translateResponseToError(response, data);
-        }
+          if (response.status >= 400) {
+            // Translate the API result into an `Error` to follow the convention that
+            // Promises should be rejected with an Error or Error-like object.
+            throw translateResponseToError(response, data);
+          }
 
-        if (options.includeMetadata) {
-          return { data, token: accessToken };
-        } else {
-          return data;
+          if (options.includeMetadata) {
+            return { data, token: accessToken };
+          } else {
+            return data;
+          }
+        },
+        err => {
+          // `fetch` failed to execute the request, or parsing the response failed.
+          onRequestFinished();
+          throw err;
         }
-      });
+      );
   };
 }
 
