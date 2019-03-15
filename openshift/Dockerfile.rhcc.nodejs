@@ -1,0 +1,55 @@
+FROM registry.access.redhat.com/rhscl/rhel7
+USER root
+ARG BUILD_NUMBER
+ARG BUILD_HOST
+LABEL Build_Host=${BUILD_HOST}
+LABEL Build_Version=${BUILD_NUMBER}
+ENV BUILD_NUMBER=${BUILD_NUMBER}
+
+RUN yum-config-manager --enable rhel-7-server-optional-rpms
+RUN yum-config-manager --enable rhel-server-rhscl-7-rpms
+
+RUN yum install -y \
+    gcc \
+    bzip2 \
+    rh-nodejs8 \
+    rh-nodejs8-npm \
+    rh-nodejs8-nodejs-nodemon \
+    nss_wrapper \
+ && yum clean all
+
+ARG NODE_ENV
+ARG SIDEBAR_APP_URL
+ARG CLIENT_URL
+ARG ASSET_URL
+
+RUN echo "source /opt/rh/rh-nodejs8/enable" >> /etc/profile
+RUN source scl_source enable rh-nodejs8
+
+RUN useradd -u 1001 -d /opt/app-root node
+
+# Copy over the source folder and set perms
+COPY . /opt/app-root
+RUN chown -R node:node /opt/app-root
+
+# Apply environment config for scl nodejs
+ENV PATH=/opt/rh/rh-nodejs8/root/usr/bin:$PATH
+ENV LD_LIBRARY_PATH=/opt/rh/rh-nodejs8/root/usr/lib64:$LD_LIBRARY_PATH
+ENV PYTHONPATH=/opt/rh/rh-nodejs8/root/usr/lib/python2.7/site-packages:$PYTHONPATH
+ENV MANPATH=/opt/rh/rh-nodejs8/root/usr/share/man:$MANPATH
+
+# Install node deps
+WORKDIR /opt/app-root
+RUN npm install -g yarn gulp gulp-cli
+RUN npm install
+
+EXPOSE 4443
+
+# Run as the node user
+USER 1001
+
+# Run the build scripts to apply environment config
+RUN make clean && make
+
+# Run server
+CMD ["gulp", "build", "serve-package"]
