@@ -5,7 +5,6 @@ const isBrowserExtension = require('./is-browser-extension');
 const sharedSettings = require('../../shared/settings');
 
 function settingsFrom(window_) {
-
   const jsonConfigs = sharedSettings.jsonConfigsFrom(window_.document);
   const configFuncSettings = configFuncSettingsFrom(window_);
 
@@ -24,19 +23,24 @@ function settingsFrom(window_) {
    *
    */
   function sidebarAppUrl() {
-    const link = window_.document.querySelector('link[type="application/annotator+html"][rel="sidebar"]');
+    const link = window_.document.querySelector(
+      'link[type="application/annotator+html"][rel="sidebar"]'
+    );
 
     if (!link) {
-      throw new Error('No application/annotator+html (rel="sidebar") link in the document');
+      throw new Error(
+        'No application/annotator+html (rel="sidebar") link in the document'
+      );
     }
 
     if (!link.href) {
-      throw new Error('application/annotator+html (rel="sidebar") link has no href');
+      throw new Error(
+        'application/annotator+html (rel="sidebar") link has no href'
+      );
     }
 
     return link.href;
   }
-
 
   /**
    * Return the href URL of the first annotator client link in the given document.
@@ -54,14 +58,20 @@ function settingsFrom(window_) {
    *
    */
   function clientUrl() {
-    const link = window_.document.querySelector('link[type="application/annotator+javascript"][rel="hypothesis-client"]');
+    const link = window_.document.querySelector(
+      'link[type="application/annotator+javascript"][rel="hypothesis-client"]'
+    );
 
     if (!link) {
-      throw new Error('No application/annotator+javascript (rel="hypothesis-client") link in the document');
+      throw new Error(
+        'No application/annotator+javascript (rel="hypothesis-client") link in the document'
+      );
     }
 
     if (!link.href) {
-      throw new Error('application/annotator+javascript (rel="hypothesis-client") link has no href');
+      throw new Error(
+        'application/annotator+javascript (rel="hypothesis-client") link has no href'
+      );
     }
 
     return link.href;
@@ -76,12 +86,13 @@ function settingsFrom(window_) {
    * @return {string|null} - The extracted ID, or null.
    */
   function annotations() {
-
     /** Return the annotations from the URL, or null. */
     function annotationsFromURL() {
       // Annotation IDs are url-safe-base64 identifiers
       // See https://tools.ietf.org/html/rfc4648#page-7
-      const annotFragmentMatch = window_.location.href.match(/#annotations:([A-Za-z0-9_-]+)$/);
+      const annotFragmentMatch = window_.location.href.match(
+        /#annotations:([A-Za-z0-9_-]+)$/
+      );
       if (annotFragmentMatch) {
         return annotFragmentMatch[1];
       }
@@ -95,7 +106,7 @@ function settingsFrom(window_) {
     let showHighlights_ = hostPageSetting('showHighlights');
 
     if (showHighlights_ === null) {
-      showHighlights_ = 'always';  // The default value is 'always'.
+      showHighlights_ = 'always'; // The default value is 'always'.
     }
 
     // Convert legacy keys/values to corresponding current configuration.
@@ -120,10 +131,11 @@ function settingsFrom(window_) {
    * @return {string|null} - The config.query setting, or null.
    */
   function query() {
-
     /** Return the query from the URL, or null. */
     function queryFromURL() {
-      const queryFragmentMatch = window_.location.href.match(/#annotations:(query|q):(.+)$/i);
+      const queryFragmentMatch = window_.location.href.match(
+        /#annotations:(query|q):(.+)$/i
+      );
       if (queryFragmentMatch) {
         try {
           return decodeURIComponent(queryFragmentMatch[2]);
@@ -161,11 +173,21 @@ function settingsFrom(window_) {
   }
 
   return {
-    get annotations() { return annotations(); },
-    get clientUrl() { return clientUrl(); },
-    get showHighlights() { return showHighlights(); },
-    get sidebarAppUrl() { return sidebarAppUrl(); },
-    get query() { return query(); },
+    get annotations() {
+      return annotations();
+    },
+    get clientUrl() {
+      return clientUrl();
+    },
+    get showHighlights() {
+      return showHighlights();
+    },
+    get sidebarAppUrl() {
+      return sidebarAppUrl();
+    },
+    get query() {
+      return query();
+    },
     hostPageSetting: hostPageSetting,
   };
 }

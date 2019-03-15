@@ -5,7 +5,6 @@
  * on $rootScope
  */
 module.exports = {
-
   // Internal state changes
   FRAME_CONNECTED: 'frameConnected',
 

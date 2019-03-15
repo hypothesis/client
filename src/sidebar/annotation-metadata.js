@@ -47,7 +47,10 @@ function domainAndTitle(annotation) {
 function titleLinkFromAnnotation(annotation) {
   let titleLink = annotation.uri;
 
-  if (titleLink && !(titleLink.indexOf('http://') === 0 || titleLink.indexOf('https://') === 0)) {
+  if (
+    titleLink &&
+    !(titleLink.indexOf('http://') === 0 || titleLink.indexOf('https://') === 0)
+  ) {
     // We only link to http(s) URLs.
     titleLink = null;
   }
@@ -127,9 +130,11 @@ function isPublic(annotation) {
  * which refers to another annotation.
  */
 function hasSelector(annotation) {
-  return !!(annotation.target &&
-            annotation.target.length > 0 &&
-            annotation.target[0].selector);
+  return !!(
+    annotation.target &&
+    annotation.target.length > 0 &&
+    annotation.target[0].selector
+  );
 }
 
 /**
@@ -139,9 +144,11 @@ function hasSelector(annotation) {
  * the initial timeout allowed for anchoring has expired.
  */
 function isWaitingToAnchor(annotation) {
-  return hasSelector(annotation) &&
-         (typeof annotation.$orphan === 'undefined') &&
-         !annotation.$anchorTimeout;
+  return (
+    hasSelector(annotation) &&
+    typeof annotation.$orphan === 'undefined' &&
+    !annotation.$anchorTimeout
+  );
 }
 
 /** Return `true` if the given annotation is an orphan. */

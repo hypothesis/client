@@ -44,4 +44,4 @@ function awaitStateChange(store, selector) {
   });
 }
 
-module.exports = { awaitStateChange, getDocumentDCIdentifier } ;
+module.exports = { awaitStateChange, getDocumentDCIdentifier };

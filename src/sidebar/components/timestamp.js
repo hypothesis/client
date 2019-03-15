@@ -4,7 +4,6 @@ const dateUtil = require('../util/date');
 
 // @ngInject
 function TimestampController($scope, time) {
-
   // A fuzzy, relative (eg. '6 days ago') format of the timestamp.
   this.relativeTimestamp = null;
 
@@ -22,20 +21,23 @@ function TimestampController($scope, time) {
       if (cancelTimestampRefresh) {
         cancelTimestampRefresh();
       }
-      cancelTimestampRefresh = time.decayingInterval(self.timestamp, function () {
-        updateTimestamp();
-        $scope.$digest();
-      });
+      cancelTimestampRefresh = time.decayingInterval(
+        self.timestamp,
+        function() {
+          updateTimestamp();
+          $scope.$digest();
+        }
+      );
     }
   }
 
-  this.$onChanges = function (changes) {
+  this.$onChanges = function(changes) {
     if (changes.timestamp) {
       updateTimestamp();
     }
   };
 
-  this.$onDestroy = function () {
+  this.$onDestroy = function() {
     if (cancelTimestampRefresh) {
       cancelTimestampRefresh();
     }

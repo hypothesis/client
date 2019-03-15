@@ -10,7 +10,7 @@ class FakeRootThread extends EventEmitter {
   }
 }
 
-describe('StreamContentController', function () {
+describe('StreamContentController', function() {
   let $componentController;
   let $rootScope;
   let fakeRoute;
@@ -23,13 +23,13 @@ describe('StreamContentController', function () {
   let fakeStreamer;
   let fakeStreamFilter;
 
-
-  before(function () {
-    angular.module('h', [])
+  before(function() {
+    angular
+      .module('h', [])
       .component('streamContent', require('../stream-content'));
   });
 
-  beforeEach(function () {
+  beforeEach(function() {
     fakeAnnotationMapper = {
       loadAnnotations: sinon.spy(),
     };
@@ -43,7 +43,7 @@ describe('StreamContentController', function () {
       subscribe: sinon.spy(),
     };
 
-    fakeRouteParams = {id: 'test'};
+    fakeRouteParams = { id: 'test' };
 
     fakeRoute = {
       reload: sinon.spy(),
@@ -55,8 +55,8 @@ describe('StreamContentController', function () {
     };
 
     fakeApi = {
-      search: sinon.spy(function () {
-        return Promise.resolve({rows: [], total: 0});
+      search: sinon.spy(function() {
+        return Promise.resolve({ rows: [], total: 0 });
       }),
     };
 
@@ -87,45 +87,52 @@ describe('StreamContentController', function () {
       streamer: fakeStreamer,
     });
 
-    angular.mock.inject(function (_$componentController_, _$rootScope_) {
+    angular.mock.inject(function(_$componentController_, _$rootScope_) {
       $componentController = _$componentController_;
       $rootScope = _$rootScope_;
     });
   });
 
   function createController() {
-    return $componentController('streamContent', {}, {
-      search: {
-        query: sinon.stub(),
-        update: sinon.stub(),
-      },
-    });
+    return $componentController(
+      'streamContent',
+      {},
+      {
+        search: {
+          query: sinon.stub(),
+          update: sinon.stub(),
+        },
+      }
+    );
   }
 
-  it('calls the search API with `_separate_replies: true`', function () {
+  it('calls the search API with `_separate_replies: true`', function() {
     createController();
     assert.equal(fakeApi.search.firstCall.args[0]._separate_replies, true);
   });
 
-  it('passes the annotations and replies from search to loadAnnotations()', function () {
-    fakeApi.search = function () {
+  it('passes the annotations and replies from search to loadAnnotations()', function() {
+    fakeApi.search = function() {
       return Promise.resolve({
-        'rows': ['annotation_1', 'annotation_2'],
-        'replies': ['reply_1', 'reply_2', 'reply_3'],
+        rows: ['annotation_1', 'annotation_2'],
+        replies: ['reply_1', 'reply_2', 'reply_3'],
       });
     };
 
     createController();
 
-    return Promise.resolve().then(function () {
+    return Promise.resolve().then(function() {
       assert.calledOnce(fakeAnnotationMapper.loadAnnotations);
-      assert.calledWith(fakeAnnotationMapper.loadAnnotations,
-        ['annotation_1', 'annotation_2'], ['reply_1', 'reply_2', 'reply_3']);
+      assert.calledWith(
+        fakeAnnotationMapper.loadAnnotations,
+        ['annotation_1', 'annotation_2'],
+        ['reply_1', 'reply_2', 'reply_3']
+      );
     });
   });
 
-  context('when a $routeUpdate event occurs', function () {
-    it('reloads the route if the query changed', function () {
+  context('when a $routeUpdate event occurs', function() {
+    it('reloads the route if the query changed', function() {
       fakeRouteParams.q = 'test query';
       createController();
       fakeRouteParams.q = 'new query';
@@ -134,7 +141,7 @@ describe('StreamContentController', function () {
       assert.calledOnce(fakeRoute.reload);
     });
 
-    it('does not reload the route if the query did not change', function () {
+    it('does not reload the route if the query did not change', function() {
       fakeRouteParams.q = 'test query';
       createController();
       $rootScope.$broadcast('$routeUpdate');

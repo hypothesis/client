@@ -40,7 +40,10 @@ function convertLocalURLsToFilenames(url) {
 
   // Strip the query string (which is used as a cache buster)
   // and extract the filename from the URL
-  return url.replace(/\?.*/,'').split('/').slice(-1)[0];
+  return url
+    .replace(/\?.*/, '')
+    .split('/')
+    .slice(-1)[0];
 }
 
 /**
@@ -62,7 +65,7 @@ function convertLocalURLsToFilenames(url) {
 function translateSourceURLs(data) {
   try {
     const frames = data.exception.values[0].stacktrace.frames;
-    frames.forEach(function (frame) {
+    frames.forEach(function(frame) {
       frame.filename = convertLocalURLsToFilenames(frame.filename);
     });
     data.culprit = frames[0].filename;
@@ -74,7 +77,7 @@ function translateSourceURLs(data) {
 
 function init(config) {
   Raven.config(config.dsn, {
-    release: '__VERSION__',  // replaced by versionify
+    release: '__VERSION__', // replaced by versionify
     dataCallback: translateSourceURLs,
   }).install();
   installUnhandledPromiseErrorHandler();
@@ -109,7 +112,7 @@ function angularModule(angular) {
   //
   // See https://github.com/getsentry/raven-js/issues/522
   const angularCallback = Raven._globalOptions.dataCallback;
-  Raven.setDataCallback(function (data) {
+  Raven.setDataCallback(function(data) {
     return angularCallback(prevCallback(data));
   });
   return angular.module('ngRaven');
@@ -158,7 +161,7 @@ function report(error, when, context) {
  * automatically, in which case this code can simply be removed.
  */
 function installUnhandledPromiseErrorHandler() {
-  window.addEventListener('unhandledrejection', function (event) {
+  window.addEventListener('unhandledrejection', function(event) {
     if (event.reason) {
       report(event.reason, 'Unhandled Promise rejection');
     }

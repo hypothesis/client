@@ -4,6 +4,13 @@
 // breaks browserify-ngannotate.
 let unused; // eslint-disable-line
 
+function displayName(ann) {
+  if (!ann.user_info) {
+    return '';
+  }
+  return ann.user_info.display_name || '';
+}
+
 /**
  * Filter annotations against parsed search queries.
  *
@@ -133,7 +140,7 @@ function viewFilter(unicode) {
     },
     user: {
       autofalse: ann => typeof ann.user !== 'string',
-      value: ann => ann.user,
+      value: ann => ann.user + ' ' + displayName(ann),
       match: (term, value) => value.indexOf(term) > -1,
     },
   };
@@ -149,21 +156,29 @@ function viewFilter(unicode) {
   this.filter = (annotations, filters) => {
     // Convert the input filter object into a filter tree, expanding "any"
     // filters.
-    const fieldFilters = Object.entries(filters).filter(([, filter]) =>
-      filter.terms.length > 0)
-    .map(([field, filter]) => {
-      const terms = filter.terms.map(normalize);
-      let termFilters;
-      if (field === 'any') {
-        const anyFields = ['quote', 'text', 'tag', 'user'];
-        termFilters = terms.map(term => new BinaryOpFilter('or', anyFields.map(field =>
-          new TermFilter(field, term, fieldMatchers[field])
-        )));
-      } else {
-        termFilters = terms.map(term => new TermFilter(field, term, fieldMatchers[field]));
-      }
-      return new BinaryOpFilter(filter.operator, termFilters);
-    });
+    const fieldFilters = Object.entries(filters)
+      .filter(([, filter]) => filter.terms.length > 0)
+      .map(([field, filter]) => {
+        const terms = filter.terms.map(normalize);
+        let termFilters;
+        if (field === 'any') {
+          const anyFields = ['quote', 'text', 'tag', 'user'];
+          termFilters = terms.map(
+            term =>
+              new BinaryOpFilter(
+                'or',
+                anyFields.map(
+                  field => new TermFilter(field, term, fieldMatchers[field])
+                )
+              )
+          );
+        } else {
+          termFilters = terms.map(
+            term => new TermFilter(field, term, fieldMatchers[field])
+          );
+        }
+        return new BinaryOpFilter(filter.operator, termFilters);
+      });
 
     const rootFilter = new BinaryOpFilter('and', fieldFilters);
 

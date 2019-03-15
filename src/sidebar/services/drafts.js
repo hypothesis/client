@@ -37,8 +37,10 @@ function DraftStore() {
    * Annotations are matched by ID or local tag.
    */
   function match(draft, model) {
-    return (draft.model.$tag && model.$tag === draft.model.$tag) ||
-           (draft.model.id && model.id === draft.model.id);
+    return (
+      (draft.model.$tag && model.$tag === draft.model.$tag) ||
+      (draft.model.id && model.id === draft.model.id)
+    );
   }
 
   /**
@@ -56,11 +58,13 @@ function DraftStore() {
    * @return {Array<{$tag: string}>}
    */
   this.unsaved = function unsaved() {
-    return this._drafts.filter(function(draft) {
-      return !draft.model.id;
-    }).map(function(draft) {
-      return draft.model;
-    });
+    return this._drafts
+      .filter(function(draft) {
+        return !draft.model.id;
+      })
+      .map(function(draft) {
+        return draft.model;
+      });
   };
 
   /** Retrieve the draft changes for an annotation. */
@@ -82,7 +86,7 @@ function DraftStore() {
    * Returns the draft changes for an annotation, or null if no draft exists
    * or the draft is empty.
    */
-  this.getIfNotEmpty = function (model) {
+  this.getIfNotEmpty = function(model) {
     const draft = this.get(model);
     return isEmpty(draft) ? null : draft;
   };
@@ -93,7 +97,7 @@ function DraftStore() {
    */
   this.update = function update(model, changes) {
     const newDraft = {
-      model: {id: model.id, $tag: model.$tag},
+      model: { id: model.id, $tag: model.$tag },
       isPrivate: changes.isPrivate,
       tags: changes.tags,
       text: changes.text,

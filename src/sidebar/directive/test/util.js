@@ -20,7 +20,7 @@ function hyphenate(name) {
  */
 function ngModule(inject, name) {
   let module;
-  const helper = function (_module) {
+  const helper = function(_module) {
     module = _module;
   };
 
@@ -89,7 +89,14 @@ function ngModule(inject, name) {
  *                      The returned object has a link(scope) method which will
  *                      re-link the component with new properties.
  */
-function createDirective(document, name, attrs, initialScope, initialHtml, opts) {
+function createDirective(
+  document,
+  name,
+  attrs,
+  initialScope,
+  initialHtml,
+  opts
+) {
   attrs = attrs || {};
   initialScope = initialScope || {};
   initialHtml = initialHtml || '';
@@ -100,12 +107,12 @@ function createDirective(document, name, attrs, initialScope, initialHtml, opts)
   // we want to create and compile it.
   let $compile;
   let $scope;
-  angular.mock.inject(function (_$compile_, _$rootScope_) {
+  angular.mock.inject(function(_$compile_, _$rootScope_) {
     $compile = _$compile_;
     $scope = _$rootScope_.$new();
   });
   const templateElement = document.createElement(hyphenate(name));
-  Object.keys(attrs).forEach(function (key) {
+  Object.keys(attrs).forEach(function(key) {
     const attrName = hyphenate(key);
     let attrKey = key;
     if (typeof attrs[key] === 'function') {
@@ -128,7 +135,7 @@ function createDirective(document, name, attrs, initialScope, initialHtml, opts)
   opts.parentElement.appendChild(templateElement);
 
   // setup initial scope
-  Object.keys(attrs).forEach(function (key) {
+  Object.keys(attrs).forEach(function(key) {
     if (attrs[key].callback) {
       $scope[key] = attrs[key].callback;
     } else {
@@ -152,8 +159,12 @@ function createDirective(document, name, attrs, initialScope, initialHtml, opts)
     element.ctrl = element.controller(name);
 
     if (!element.ctrl) {
-      throw new Error('Failed to create "' + name + '" directive in test.' +
-        'Did you forget to register it with angular.module(...).directive() ?');
+      throw new Error(
+        'Failed to create "' +
+          name +
+          '" directive in test.' +
+          'Did you forget to register it with angular.module(...).directive() ?'
+      );
     }
 
     return element;

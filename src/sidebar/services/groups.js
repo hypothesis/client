@@ -8,16 +8,29 @@ const DEFAULT_ORG_ID = '__default__';
  */
 const DEFAULT_ORGANIZATION = {
   id: DEFAULT_ORG_ID,
-  logo: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" class="svg-icon masthead-logo" height="28" viewBox="0 0 24 28" width="24"><path d="M3.886 3.945H21.03v16.047H3.886z" fill="#fff" /><path d="M0 2.005C0 .898.897 0 2.005 0h19.99C23.102 0 24 .897 24 2.005v19.99A2.005 2.005 0 0 1 21.995 24H2.005A2.005 2.005 0 0 1 0 21.995V2.005zM9 24l3 4 3-4H9zM7.008 4H4v16h3.008v-4.997C7.008 12.005 8.168 12.01 9 12c1 .007 2.019.06 2.019 2.003V20h3.008v-6.891C14.027 10 12 9.003 10 9.003c-1.99 0-2 0-2.992 1.999V4zM19 19.987c1.105 0 2-.893 2-1.994A1.997 1.997 0 0 0 19 16c-1.105 0-2 .892-2 1.993s.895 1.994 2 1.994z" fill="currentColor" fill-rule="evenodd" /></svg>',
+  logo:
+    'data:image/svg+xml;utf8,' +
+    encodeURIComponent(require('../../images/icons/logo.svg')),
 };
 
 const events = require('../events');
 const { getDocumentDCIdentifier } = require('../util/state-util');
+const { combineGroups } = require('../util/groups');
 const serviceConfig = require('../service-config');
 
 // @ngInject
-function groups($rootScope, store, api, isSidebar, localStorage, serviceUrl, session,
-                settings) {
+function groups(
+  $rootScope,
+  store,
+  api,
+  isSidebar,
+  localStorage,
+  serviceUrl,
+  session,
+  settings,
+  auth,
+  features
+) {
   const svc = serviceConfig(settings);
   const authority = svc ? svc.authority : null;
 
@@ -36,8 +49,8 @@ function groups($rootScope, store, api, isSidebar, localStorage, serviceUrl, ses
     // If service groups are specified only return those.
     // If a service group doesn't exist in the list of groups don't return it.
     if (svc && svc.groups) {
-      const focusedGroups = groups.filter(g =>
-        svc.groups.includes(g.id) || svc.groups.includes(g.groupid)
+      const focusedGroups = groups.filter(
+        g => svc.groups.includes(g.id) || svc.groups.includes(g.groupid)
       );
       return Promise.resolve(focusedGroups);
     }
@@ -62,17 +75,20 @@ function groups($rootScope, store, api, isSidebar, localStorage, serviceUrl, ses
       return Promise.resolve(nonWorldGroups);
     }
 
-    return api.annotation.get({ id: directLinkedAnnotationId }).then(ann => {
-      if (ann.group === '__world__') {
-        return groups;
-      } else {
+    return api.annotation
+      .get({ id: directLinkedAnnotationId })
+      .then(ann => {
+        if (ann.group === '__world__') {
+          return groups;
+        } else {
+          return nonWorldGroups;
+        }
+      })
+      .catch(() => {
+        // Annotation does not exist or we do not have permission to read it.
+        // Assume it is not in "Public".
         return nonWorldGroups;
-      }
-    }).catch(() => {
-      // Annotation does not exist or we do not have permission to read it.
-      // Assume it is not in "Public".
-      return nonWorldGroups;
-    });
+      });
   }
 
   /**
@@ -97,7 +113,6 @@ function groups($rootScope, store, api, isSidebar, localStorage, serviceUrl, ses
   // sidebar app changes.
   let documentUri;
 
-
   /**
    * Fetch the list of applicable groups from the API.
    *
@@ -111,37 +126,59 @@ function groups($rootScope, store, api, isSidebar, localStorage, serviceUrl, ses
     if (isSidebar) {
       uri = getDocumentDCIdentifier(store);
     }
-    return uri.then(uri => {
-      const params = {
-        expand: 'organization',
-      };
-      if (authority) {
-        params.authority = authority;
-      }
-      if (uri) {
-        params.document_uri = uri;
-      }
-      documentUri = uri;
+    return uri
+      .then(uri => {
+        const params = {
+          expand: 'organization',
+        };
+        if (authority) {
+          params.authority = authority;
+        }
+        if (uri) {
+          params.document_uri = uri;
+        }
+        documentUri = uri;
 
-      // Fetch groups from the API.
-      return api.groups.list(params, null, { includeMetadata: true });
-    }).then(({ data, token }) => {
-      const isLoggedIn = token !== null;
-      const directLinkedAnnotation = settings.annotations;
-      return filterGroups(data, isLoggedIn, directLinkedAnnotation);
-    }).then(groups => {
-      injectOrganizations(groups);
+        if (features.flagEnabled('community_groups')) {
+          params.expand = ['organization', 'scopes'];
+          const profileParams = {
+            expand: ['organization', 'scopes'],
+          };
+          const profileGroupsApi = api.profile.groups.read(profileParams);
+          const listGroupsApi = api.groups.list(params);
+          return Promise.all([
+            profileGroupsApi,
+            listGroupsApi,
+            auth.tokenGetter(),
+          ]).then(([myGroups, featuredGroups, token]) => [
+            combineGroups(myGroups, featuredGroups, documentUri),
+            token,
+          ]);
+        } else {
+          // Fetch groups from the API.
+          return api.groups
+            .list(params, null, { includeMetadata: true })
+            .then(({ data, token }) => [data, token]);
+        }
+      })
+      .then(([groups, token]) => {
+        const isLoggedIn = token !== null;
+        const directLinkedAnnotation = settings.annotations;
+        return filterGroups(groups, isLoggedIn, directLinkedAnnotation);
+      })
+      .then(groups => {
+        injectOrganizations(groups);
 
-      const isFirstLoad = store.allGroups().length === 0;
-      const prevFocusedGroup = localStorage.getItem(STORAGE_KEY);
+        const isFirstLoad = store.allGroups().length === 0;
+        const prevFocusedGroup = localStorage.getItem(STORAGE_KEY);
 
-      store.loadGroups(groups);
-      if (isFirstLoad && groups.some(g => g.id === prevFocusedGroup)) {
-        store.focusGroup(prevFocusedGroup);
-      }
+        store.loadGroups(groups);
+        if (isFirstLoad && groups.some(g => g.id === prevFocusedGroup)) {
+          store.focusGroup(prevFocusedGroup);
+        }
 
-      return groups;
-    });
+        return groups;
+      });
   }
 
   function all() {
@@ -166,7 +203,6 @@ function groups($rootScope, store, api, isSidebar, localStorage, serviceUrl, ses
       userid: 'me',
     });
   }
-
 
   /** Return the currently focused group. If no group is explicitly focused we
    * will check localStorage to see if we have persisted a focused group from

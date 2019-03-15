@@ -11,17 +11,18 @@ let difference = (arrayA, arrayB) => {
 const DEBOUNCE_WAIT = 40;
 
 class FrameObserver {
-
-  constructor (target) {
+  constructor(target) {
     this._target = target;
     this._handledFrames = [];
 
-    this._mutationObserver = new MutationObserver(debounce(() => {
-      this._discoverFrames();
-    }, DEBOUNCE_WAIT));
+    this._mutationObserver = new MutationObserver(
+      debounce(() => {
+        this._discoverFrames();
+      }, DEBOUNCE_WAIT)
+    );
   }
 
-  observe (onFrameAddedCallback, onFrameRemovedCallback) {
+  observe(onFrameAddedCallback, onFrameRemovedCallback) {
     this._onFrameAdded = onFrameAddedCallback;
     this._onFrameRemoved = onFrameRemovedCallback;
 
@@ -32,11 +33,11 @@ class FrameObserver {
     });
   }
 
-  disconnect () {
+  disconnect() {
     this._mutationObserver.disconnect();
   }
 
-  _addFrame (frame) {
+  _addFrame(frame) {
     if (FrameUtil.isAccessible(frame)) {
       FrameUtil.isDocumentReady(frame, () => {
         frame.contentWindow.addEventListener('unload', () => {
@@ -50,14 +51,14 @@ class FrameObserver {
     }
   }
 
-  _removeFrame (frame) {
+  _removeFrame(frame) {
     this._onFrameRemoved(frame);
 
     // Remove the frame from our list
     this._handledFrames = this._handledFrames.filter(x => x !== frame);
   }
 
-  _discoverFrames () {
+  _discoverFrames() {
     let frames = FrameUtil.findFrames(this._target);
 
     for (let frame of frames) {

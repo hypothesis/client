@@ -2,8 +2,15 @@
 
 // @ngInject
 function StreamContentController(
-  $scope, $location, $route, $routeParams, annotationMapper, store,
-  api, rootThread, searchFilter
+  $scope,
+  $location,
+  $route,
+  $routeParams,
+  annotationMapper,
+  store,
+  api,
+  rootThread,
+  searchFilter
 ) {
   const self = this;
 
@@ -13,7 +20,7 @@ function StreamContentController(
   let offset = 0;
 
   /** Load annotations fetched from the API into the app. */
-  const load = function (result) {
+  const load = function(result) {
     offset += result.rows.length;
     annotationMapper.loadAnnotations(result.rows, result.replies);
   };
@@ -21,23 +28,27 @@ function StreamContentController(
   /**
    * Fetch the next `limit` annotations starting from `offset` from the API.
    */
-  const fetch = function (limit) {
-    const query = Object.assign({
-      _separate_replies: true,
-      offset: offset,
-      limit: limit,
-    }, searchFilter.toObject($routeParams.q));
+  const fetch = function(limit) {
+    const query = Object.assign(
+      {
+        _separate_replies: true,
+        offset: offset,
+        limit: limit,
+      },
+      searchFilter.toObject($routeParams.q)
+    );
 
-    api.search(query)
+    api
+      .search(query)
       .then(load)
-      .catch(function (err) {
+      .catch(function(err) {
         console.error(err);
       });
   };
 
   // Re-do search when query changes
   const lastQuery = $routeParams.q;
-  $scope.$on('$routeUpdate', function () {
+  $scope.$on('$routeUpdate', function() {
     if ($routeParams.q !== lastQuery) {
       store.clearAnnotations();
       $route.reload();
@@ -48,11 +59,11 @@ function StreamContentController(
   fetch(20);
 
   this.setCollapsed = store.setCollapsed;
-  this.forceVisible = function (id) {
+  this.forceVisible = function(id) {
     store.setForceVisible(id, true);
   };
 
-  store.subscribe(function () {
+  store.subscribe(function() {
     self.rootThread = rootThread.thread(store.getState());
   });
 

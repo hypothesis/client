@@ -4,7 +4,7 @@
  * Return an object where each key in `updateFns` is mapped to the key itself.
  */
 function actionTypes(updateFns) {
-  return Object.keys(updateFns).reduce(function (types, key) {
+  return Object.keys(updateFns).reduce(function(types, key) {
     types[key] = key;
     return types;
   }, {});
@@ -43,9 +43,9 @@ function createReducer(...actionToUpdateFn) {
  * argument set to the current value of `getState()`
  */
 function bindSelectors(selectors, getState) {
-  return Object.keys(selectors).reduce(function (bound, key) {
+  return Object.keys(selectors).reduce(function(bound, key) {
     const selector = selectors[key];
-    bound[key] = function () {
+    bound[key] = function() {
       const args = [].slice.apply(arguments);
       args.unshift(getState());
       return selector.apply(null, args);

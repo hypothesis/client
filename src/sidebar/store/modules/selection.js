@@ -18,15 +18,14 @@ const tabs = require('../../tabs');
 
 const util = require('../util');
 
-
 /**
-* Default starting tab.
-*/
+ * Default starting tab.
+ */
 const TAB_DEFAULT = uiConstants.TAB_ANNOTATIONS;
 
- /**
-  * Default sort keys for each tab.
-  */
+/**
+ * Default sort keys for each tab.
+ */
 const TAB_SORTKEY_DEFAULT = {};
 TAB_SORTKEY_DEFAULT[uiConstants.TAB_ANNOTATIONS] = 'Location';
 TAB_SORTKEY_DEFAULT[uiConstants.TAB_NOTES] = 'Oldest';
@@ -36,10 +35,17 @@ TAB_SORTKEY_DEFAULT[uiConstants.TAB_ORPHANS] = 'Location';
  * Available sort keys for each tab.
  */
 const TAB_SORTKEYS_AVAILABLE = {};
-TAB_SORTKEYS_AVAILABLE[uiConstants.TAB_ANNOTATIONS] = ['Newest', 'Oldest', 'Location'];
+TAB_SORTKEYS_AVAILABLE[uiConstants.TAB_ANNOTATIONS] = [
+  'Newest',
+  'Oldest',
+  'Location',
+];
 TAB_SORTKEYS_AVAILABLE[uiConstants.TAB_NOTES] = ['Newest', 'Oldest'];
-TAB_SORTKEYS_AVAILABLE[uiConstants.TAB_ORPHANS] = ['Newest', 'Oldest', 'Location'];
-
+TAB_SORTKEYS_AVAILABLE[uiConstants.TAB_ORPHANS] = [
+  'Newest',
+  'Oldest',
+  'Location',
+];
 
 function initialSelection(settings) {
   const selection = {};
@@ -90,35 +96,39 @@ function init(settings) {
 }
 
 const update = {
-  CLEAR_SELECTION: function () {
-    return {filterQuery: null, selectedAnnotationMap: null};
+  CLEAR_SELECTION: function() {
+    return { filterQuery: null, selectedAnnotationMap: null };
   },
 
-  SELECT_ANNOTATIONS: function (state, action) {
-    return {selectedAnnotationMap: action.selection};
+  SELECT_ANNOTATIONS: function(state, action) {
+    return { selectedAnnotationMap: action.selection };
   },
 
-  FOCUS_ANNOTATIONS: function (state, action) {
-    return {focusedAnnotationMap: action.focused};
+  FOCUS_ANNOTATIONS: function(state, action) {
+    return { focusedAnnotationMap: action.focused };
   },
 
-  SET_FORCE_VISIBLE: function (state, action) {
-    return {forceVisible: action.forceVisible};
+  SET_FORCE_VISIBLE: function(state, action) {
+    return { forceVisible: action.forceVisible };
   },
 
-  SET_EXPANDED: function (state, action) {
-    return {expanded: action.expanded};
+  SET_EXPANDED: function(state, action) {
+    return { expanded: action.expanded };
   },
 
-  HIGHLIGHT_ANNOTATIONS: function (state, action) {
-    return {highlighted: action.highlighted};
+  HIGHLIGHT_ANNOTATIONS: function(state, action) {
+    return { highlighted: action.highlighted };
   },
 
-  SELECT_TAB: function (state, action) {
+  SELECT_TAB: function(state, action) {
     // Do nothing if the "new tab" is not a valid tab.
-    if ([uiConstants.TAB_ANNOTATIONS,
-         uiConstants.TAB_NOTES,
-         uiConstants.TAB_ORPHANS].indexOf(action.tab) === -1) {
+    if (
+      [
+        uiConstants.TAB_ANNOTATIONS,
+        uiConstants.TAB_NOTES,
+        uiConstants.TAB_ORPHANS,
+      ].indexOf(action.tab) === -1
+    ) {
       return {};
     }
     // Shortcut if the tab is already correct, to avoid resetting the sortKey
@@ -138,13 +148,13 @@ const update = {
     // If there are no annotations at all, ADD_ANNOTATIONS will not be called.
     const haveOnlyPageNotes = counts.notes === action.annotations.length;
     // If this is the init phase and there are only page notes, select the page notes tab.
-    if (state.annotations.length === 0 && haveOnlyPageNotes){
-      return {selectedTab: uiConstants.TAB_NOTES};
+    if (state.annotations.length === 0 && haveOnlyPageNotes) {
+      return { selectedTab: uiConstants.TAB_NOTES };
     }
     return {};
   },
 
-  SET_FILTER_QUERY: function (state, action) {
+  SET_FILTER_QUERY: function(state, action) {
     return {
       filterQuery: action.query,
       forceVisible: {},
@@ -152,8 +162,8 @@ const update = {
     };
   },
 
-  SET_SORT_KEY: function (state, action) {
-    return {sortKey: action.key};
+  SET_SORT_KEY: function(state, action) {
+    return { sortKey: action.key };
   },
 };
 
@@ -175,7 +185,7 @@ function selectAnnotations(ids) {
 
 /** Toggle whether annotations are selected or not. */
 function toggleSelectedAnnotations(ids) {
-  return function (dispatch, getState) {
+  return function(dispatch, getState) {
     const selection = Object.assign({}, getState().selectedAnnotationMap);
     for (let i = 0; i < ids.length; i++) {
       const id = ids[i];
@@ -199,7 +209,7 @@ function toggleSelectedAnnotations(ids) {
 function setForceVisible(id, visible) {
   // FIXME: This should be converted to a plain action and accessing the state
   // should happen in the update() function
-  return function (dispatch, getState) {
+  return function(dispatch, getState) {
     const forceVisible = Object.assign({}, getState().forceVisible);
     forceVisible[id] = visible;
     dispatch({
@@ -224,7 +234,7 @@ function focusAnnotations(tags) {
 function setCollapsed(id, collapsed) {
   // FIXME: This should be converted to a plain action and accessing the state
   // should happen in the update() function
-  return function (dispatch, getState) {
+  return function(dispatch, getState) {
     const expanded = Object.assign({}, getState().expanded);
     expanded[id] = !collapsed;
     dispatch({
@@ -246,7 +256,6 @@ function highlightAnnotations(ids) {
     highlighted: ids,
   };
 }
-
 
 /** Set the type annotations to be displayed. */
 function selectTab(type) {
@@ -290,7 +299,7 @@ function hasSelectedAnnotations(state) {
 function removeSelectedAnnotation(id) {
   // FIXME: This should be converted to a plain action and accessing the state
   // should happen in the update() function
-  return function (dispatch, getState) {
+  return function(dispatch, getState) {
     const selection = Object.assign({}, getState().selectedAnnotationMap);
     if (!selection || !id) {
       return;
@@ -302,7 +311,7 @@ function removeSelectedAnnotation(id) {
 
 /** De-select all annotations. */
 function clearSelectedAnnotations() {
-  return {type: actions.CLEAR_SELECTION};
+  return { type: actions.CLEAR_SELECTION };
 }
 
 module.exports = {

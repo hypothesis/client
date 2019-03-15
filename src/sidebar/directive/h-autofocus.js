@@ -12,7 +12,7 @@
  *
  *   <input ng-if="..." h-autofocus>
  *
-*/
+ */
 module.exports = function() {
   return {
     restrict: 'A',

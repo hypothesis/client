@@ -9,19 +9,14 @@
 module.exports = {
   bundles: {
     jquery: ['jquery'],
-    polyfills: [require.resolve('../../src/shared/polyfills')],
     angular: [
       'angular',
       'angular-route',
-      'angular-sanitize',
       'ng-tags-input',
       'angular-toastr',
-      'angulartics/src/angulartics',
-      'angulartics/src/angulartics-ga',
     ],
     katex: ['katex'],
     showdown: ['showdown'],
-    unorm: ['unorm'],
     raven: ['raven-js'],
   },
 

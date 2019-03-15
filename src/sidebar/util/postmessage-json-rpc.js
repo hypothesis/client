@@ -28,9 +28,15 @@ function createTimeout(delay, message) {
  * @param [id] id - Test seam.
  * @return {Promise<any>} - A Promise for the response to the call
  */
-function call(frame, origin, method, params=[], timeout=2000,
-              window_=window, id=generateId()) {
-
+function call(
+  frame,
+  origin,
+  method,
+  params = [],
+  timeout = 2000,
+  window_ = window,
+  id = generateId()
+) {
   // Send RPC request.
   const request = {
     jsonrpc: '2.0',
@@ -48,15 +54,17 @@ function call(frame, origin, method, params=[], timeout=2000,
   // Await response or timeout.
   let listener;
   const response = new Promise((resolve, reject) => {
-    listener = (event) => {
+    listener = event => {
       if (event.origin !== origin) {
         // Not from the frame that we sent the request to.
         return;
       }
 
-      if (!(event.data instanceof Object) ||
-          event.data.jsonrpc !== '2.0' ||
-          event.data.id !== id) {
+      if (
+        !(event.data instanceof Object) ||
+        event.data.jsonrpc !== '2.0' ||
+        event.data.id !== id
+      ) {
         // Not a valid JSON-RPC response.
         return;
       }
@@ -73,17 +81,22 @@ function call(frame, origin, method, params=[], timeout=2000,
     window_.addEventListener('message', listener);
   });
 
-  const timeoutExpired = createTimeout(timeout, `Request to ${origin} timed out`);
+  const timeoutExpired = createTimeout(
+    timeout,
+    `Request to ${origin} timed out`
+  );
 
   // Cleanup and return.
   // FIXME: If we added a `Promise.finally` polyfill we could simplify this.
-  return Promise.race([response, timeoutExpired]).then(result => {
-    window_.removeEventListener('message', listener);
-    return result;
-  }).catch(err => {
-    window_.removeEventListener('message', listener);
-    throw err;
-  });
+  return Promise.race([response, timeoutExpired])
+    .then(result => {
+      window_.removeEventListener('message', listener);
+      return result;
+    })
+    .catch(err => {
+      window_.removeEventListener('message', listener);
+      throw err;
+    });
 }
 
 module.exports = {

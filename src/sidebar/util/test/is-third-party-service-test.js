@@ -9,7 +9,7 @@ describe('sidebar.util.isThirdPartyService', () => {
 
   beforeEach(() => {
     fakeServiceConfig = sinon.stub();
-    fakeSettings = {authDomain: 'hypothes.is'};
+    fakeSettings = { authDomain: 'hypothes.is' };
 
     isThirdPartyService = proxyquire('../is-third-party-service', {
       '../service-config': fakeServiceConfig,
@@ -18,13 +18,13 @@ describe('sidebar.util.isThirdPartyService', () => {
   });
 
   it('returns false for first-party services', () => {
-    fakeServiceConfig.returns({authority: 'hypothes.is'});
+    fakeServiceConfig.returns({ authority: 'hypothes.is' });
 
     assert.isFalse(isThirdPartyService(fakeSettings));
   });
 
   it('returns true for third-party services', () => {
-    fakeServiceConfig.returns({authority: 'elifesciences.org'});
+    fakeServiceConfig.returns({ authority: 'elifesciences.org' });
 
     assert.isTrue(isThirdPartyService(fakeSettings));
   });

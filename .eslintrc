@@ -3,15 +3,15 @@
   "globals": {
     "Set": false
   },
-  "plugins": [
-    "mocha"
-  ],
   "rules": {
     "mocha/no-exclusive-tests": "error",
     "no-var": "error",
-    "indent": ["error", 2, {
-      "ArrayExpression": "first",
-      "ObjectExpression": "first"
-    }]
+    "indent": "off"
   },
+  "parserOptions": {
+    "ecmaVersion": 2018
+  },
+  "plugins": [
+    "mocha"
+  ],
 }

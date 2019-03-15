@@ -47,10 +47,7 @@ describe('sidebar/services/view-filter', () => {
     let annotations;
 
     beforeEach(() => {
-      annotations = [
-        { id: 1, text: poem.tiger },
-        { id: 2, text: poem.raven },
-      ];
+      annotations = [{ id: 1, text: poem.tiger }, { id: 2, text: poem.raven }];
     });
 
     it('requires all terms to match for "and" operator', () => {
@@ -92,12 +89,16 @@ describe('sidebar/services/view-filter', () => {
       const annotation = {
         id: 1,
         text: poem.tiger,
-        target: [{
-          selector: [{
-            type: 'TextQuoteSelector',
-            exact: 'The Tiger by William Blake',
-          }],
-        }],
+        target: [
+          {
+            selector: [
+              {
+                type: 'TextQuoteSelector',
+                exact: 'The Tiger by William Blake',
+              },
+            ],
+          },
+        ],
         user: 'acct:poe@edgar.com',
         tags: ['poem', 'Blake', 'Tiger'],
       };
@@ -105,7 +106,10 @@ describe('sidebar/services/view-filter', () => {
       // A query which matches the combined fields from the annotation, but not
       // individual fields on their own.
       const filters = {
-        any: { terms: ['burning', 'William', 'poem', 'bright'], operator: 'and' },
+        any: {
+          terms: ['burning', 'William', 'poem', 'bright'],
+          operator: 'and',
+        },
       };
 
       const result = viewFilter.filter([annotation], filters);
@@ -125,6 +129,60 @@ describe('sidebar/services/view-filter', () => {
       const result = viewFilter.filter([annotation], filters);
 
       assert.deepEqual(result, [1]);
+    });
+  });
+
+  describe('"user" field', () => {
+    let id = 0;
+    function annotationWithUser(username, displayName = null) {
+      ++id;
+      return {
+        id,
+        user: `acct:${username}@example.com`,
+        user_info: {
+          display_name: displayName,
+        },
+      };
+    }
+
+    function userQuery(term) {
+      return { user: { terms: [term], operator: 'or' } };
+    }
+
+    it('matches username', () => {
+      const anns = [
+        annotationWithUser('johnsmith'),
+        annotationWithUser('jamesdean'),
+        annotationWithUser('johnjones'),
+      ];
+      const result = viewFilter.filter(anns, userQuery('john'));
+
+      assert.deepEqual(result, [anns[0].id, anns[2].id]);
+    });
+
+    it("matches user's display name if present", () => {
+      const anns = [
+        // Users with display names set.
+        annotationWithUser('jsmith', 'John Smith'),
+        annotationWithUser('jdean', 'James Dean'),
+        annotationWithUser('jherriot', 'James Herriot'),
+        annotationWithUser('jadejames', 'Jade'),
+
+        // User with no display name.
+        annotationWithUser('fmercury'),
+
+        // Annotation with no extended user info.
+        { id: 100, user: 'acct:jim@example.com' },
+      ];
+      const result = viewFilter.filter(anns, userQuery('james'));
+
+      assert.deepEqual(result, [anns[1].id, anns[2].id, anns[3].id]);
+    });
+
+    it('ignores display name if not set', () => {
+      const anns = [annotationWithUser('msmith')];
+      const result = viewFilter.filter(anns, userQuery('null'));
+      assert.deepEqual(result, []);
     });
   });
 

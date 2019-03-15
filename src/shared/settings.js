@@ -29,15 +29,19 @@ function assign(dest, src) {
  */
 function jsonConfigsFrom(document) {
   const config = {};
-  const settingsElements =
-    document.querySelectorAll('script.js-hypothesis-config');
+  const settingsElements = document.querySelectorAll(
+    'script.js-hypothesis-config'
+  );
 
-  for (let i=0; i < settingsElements.length; i++) {
+  for (let i = 0; i < settingsElements.length; i++) {
     let settings;
     try {
       settings = JSON.parse(settingsElements[i].textContent);
     } catch (err) {
-      console.warn('Could not parse settings from js-hypothesis-config tags', err);
+      console.warn(
+        'Could not parse settings from js-hypothesis-config tags',
+        err
+      );
       settings = {};
     }
     assign(config, settings);

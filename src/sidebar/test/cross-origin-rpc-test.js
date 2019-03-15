@@ -4,7 +4,7 @@ const crossOriginRPC = require('../cross-origin-rpc');
 
 describe('crossOriginRPC', function() {
   describe('server', function() {
-    let addedListener;  // The postMessage() listener that the server adds.
+    let addedListener; // The postMessage() listener that the server adds.
     let fakeStore;
     let fakeWindow;
     let settings;
@@ -56,14 +56,16 @@ describe('crossOriginRPC', function() {
       });
 
       assert.isTrue(source.postMessage.calledOnce);
-      assert.isTrue(source.postMessage.calledWithExactly(
-        {
-          jsonrpc: '2.0',
-          id: 42,
-          result: 'THE_SEARCH_URIS',
-        },
-        'https://allowed1.com'
-      ));
+      assert.isTrue(
+        source.postMessage.calledWithExactly(
+          {
+            jsonrpc: '2.0',
+            id: 42,
+            result: 'THE_SEARCH_URIS',
+          },
+          'https://allowed1.com'
+        )
+      );
     });
 
     [
@@ -86,7 +88,7 @@ describe('crossOriginRPC', function() {
 
     it("responds with an error if there's no method", function() {
       crossOriginRPC.server.start(fakeStore, settings, fakeWindow);
-      let jsonRpcRequest = { id: 42 };  // No "method" member.
+      let jsonRpcRequest = { id: 42 }; // No "method" member.
 
       postMessage({
         origin: 'https://allowed1.com',
@@ -95,23 +97,22 @@ describe('crossOriginRPC', function() {
       });
 
       assert.isTrue(source.postMessage.calledOnce);
-      assert.isTrue(source.postMessage.calledWithExactly(
-        {
-          jsonrpc: '2.0',
-          id: 42,
-          error: {
-            code: -32601,
-            message: 'Method not found',
+      assert.isTrue(
+        source.postMessage.calledWithExactly(
+          {
+            jsonrpc: '2.0',
+            id: 42,
+            error: {
+              code: -32601,
+              message: 'Method not found',
+            },
           },
-        },
-        'https://allowed1.com'
-      ));
+          'https://allowed1.com'
+        )
+      );
     });
 
-    [
-      'unknownMethod',
-      null,
-    ].forEach(function(method) {
+    ['unknownMethod', null].forEach(function(method) {
       it('responds with an error if the method is unknown', function() {
         crossOriginRPC.server.start(fakeStore, settings, fakeWindow);
 
@@ -122,17 +123,19 @@ describe('crossOriginRPC', function() {
         });
 
         assert.isTrue(source.postMessage.calledOnce);
-        assert.isTrue(source.postMessage.calledWithExactly(
-          {
-            jsonrpc: '2.0',
-            id: 42,
-            error: {
-              code: -32601,
-              message: 'Method not found',
+        assert.isTrue(
+          source.postMessage.calledWithExactly(
+            {
+              jsonrpc: '2.0',
+              id: 42,
+              error: {
+                code: -32601,
+                message: 'Method not found',
+              },
             },
-          },
-          'https://allowed1.com'
-        ));
+            'https://allowed1.com'
+          )
+        );
       });
     });
   });

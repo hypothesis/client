@@ -4,22 +4,23 @@ const angular = require('angular');
 
 const util = require('../../directive/test/util');
 
-describe('searchInput', function () {
-  let fakeHttp;
+describe('searchInput', function() {
+  let fakeStore;
 
-  before(function () {
-    angular.module('app', [])
+  before(function() {
+    angular
+      .module('app', [])
       .component('searchInput', require('../search-input'));
   });
 
-  beforeEach(function () {
-    fakeHttp = {pendingRequests: []};
+  beforeEach(function() {
+    fakeStore = { isLoading: sinon.stub().returns(false) };
     angular.mock.module('app', {
-      $http: fakeHttp,
+      store: fakeStore,
     });
   });
 
-  it('displays the search query', function () {
+  it('displays the search query', function() {
     const el = util.createDirective(document, 'searchInput', {
       query: 'foo',
     });
@@ -27,7 +28,7 @@ describe('searchInput', function () {
     assert.equal(input.value, 'foo');
   });
 
-  it('invokes #onSearch() when the query changes', function () {
+  it('invokes #onSearch() when the query changes', function() {
     const onSearch = sinon.stub();
     const el = util.createDirective(document, 'searchInput', {
       query: 'foo',
@@ -43,18 +44,24 @@ describe('searchInput', function () {
     assert.calledWith(onSearch, 'new-query');
   });
 
-  describe('loading indicator', function () {
-    it('is hidden when there are no network requests in flight', function () {
+  describe('loading indicator', function() {
+    it('is hidden when there are no API requests in flight', function() {
       const el = util.createDirective(document, 'search-input', {});
       const spinner = el[0].querySelector('spinner');
+
+      fakeStore.isLoading.returns(false);
+      el.scope.$digest();
+
       assert.equal(util.isHidden(spinner), true);
     });
 
-    it('is visible when there are network requests in flight', function () {
+    it('is visible when there are API requests in flight', function() {
       const el = util.createDirective(document, 'search-input', {});
       const spinner = el[0].querySelector('spinner');
-      fakeHttp.pendingRequests.push([{}]);
+
+      fakeStore.isLoading.returns(true);
       el.scope.$digest();
+
       assert.equal(util.isHidden(spinner), false);
     });
   });

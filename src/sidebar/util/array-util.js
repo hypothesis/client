@@ -7,7 +7,7 @@
  * @param {Function} predicate
  */
 function countIf(ary, predicate) {
-  return ary.reduce(function (count, item) {
+  return ary.reduce(function(count, item) {
     return predicate(item) ? count + 1 : count;
   }, 0);
 }
@@ -22,7 +22,7 @@ function countIf(ary, predicate) {
  * @param {Function} mapFn
  */
 function filterMap(ary, mapFn) {
-  return ary.reduce(function (newArray, item) {
+  return ary.reduce(function(newArray, item) {
     const mapped = mapFn(item);
     if (mapped) {
       newArray.push(mapped);
@@ -37,7 +37,7 @@ function filterMap(ary, mapFn) {
  * @param {string[]} list - List of keys for the set.
  */
 function toSet(list) {
-  return list.reduce(function (set, key) {
+  return list.reduce(function(set, key) {
     set[key] = true;
     return set;
   }, {});

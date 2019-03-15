@@ -20,8 +20,15 @@ const Socket = require('../websocket');
  * @param settings - Application settings
  */
 // @ngInject
-function Streamer($rootScope, annotationMapper, store, auth,
-                  groups, session, settings) {
+function Streamer(
+  $rootScope,
+  annotationMapper,
+  store,
+  auth,
+  groups,
+  session,
+  settings
+) {
   // The randomly generated session UUID
   const clientId = uuid.v4();
 
@@ -54,35 +61,35 @@ function Streamer($rootScope, annotationMapper, store, auth,
     const annotations = message.payload;
 
     switch (action) {
-    case 'create':
-    case 'update':
-    case 'past':
-      annotations.forEach(function (ann) {
-        // In the sidebar, only save pending updates for annotations in the
-        // focused group, since we only display annotations from the focused
-        // group and reload all annotations and discard pending updates
-        // when switching groups.
-        if (ann.group === groups.focused().id || !store.isSidebar()) {
-          pendingUpdates[ann.id] = ann;
-        }
-      });
-      break;
-    case 'delete':
-      annotations.forEach(function (ann) {
-        // Discard any pending but not-yet-applied updates for this annotation
-        delete pendingUpdates[ann.id];
+      case 'create':
+      case 'update':
+      case 'past':
+        annotations.forEach(function(ann) {
+          // In the sidebar, only save pending updates for annotations in the
+          // focused group, since we only display annotations from the focused
+          // group and reload all annotations and discard pending updates
+          // when switching groups.
+          if (ann.group === groups.focused().id || !store.isSidebar()) {
+            pendingUpdates[ann.id] = ann;
+          }
+        });
+        break;
+      case 'delete':
+        annotations.forEach(function(ann) {
+          // Discard any pending but not-yet-applied updates for this annotation
+          delete pendingUpdates[ann.id];
 
-        // If we already have this annotation loaded, then record a pending
-        // deletion. We do not check the group of the annotation here because a)
-        // that information is not included with deletion notifications and b)
-        // even if the annotation is from the current group, it might be for a
-        // new annotation (saved in pendingUpdates and removed above), that has
-        // not yet been loaded.
-        if (store.annotationExists(ann.id)) {
-          pendingDeletions[ann.id] = true;
-        }
-      });
-      break;
+          // If we already have this annotation loaded, then record a pending
+          // deletion. We do not check the group of the annotation here because a)
+          // that information is not included with deletion notifications and b)
+          // even if the annotation is from the current group, it might be for a
+          // new annotation (saved in pendingUpdates and removed above), that has
+          // not yet been loaded.
+          if (store.annotationExists(ann.id)) {
+            pendingDeletions[ann.id] = true;
+          }
+        });
+        break;
     }
 
     if (!store.isSidebar()) {
@@ -95,7 +102,7 @@ function Streamer($rootScope, annotationMapper, store, auth,
     groups.load();
   }
 
-  function handleSocketOnError (event) {
+  function handleSocketOnError(event) {
     console.warn('Error connecting to H push notification service:', event);
 
     // In development, warn if the connection failure might be due to
@@ -105,16 +112,19 @@ function Streamer($rootScope, annotationMapper, store, auth,
     // HTTP status code for HTTP -> WS upgrade requests.
     const websocketHost = new URL(settings.websocketUrl).hostname;
     if (['localhost', '127.0.0.1'].indexOf(websocketHost) !== -1) {
-      console.warn('Check that your H service is configured to allow ' +
-                   'WebSocket connections from ' + window.location.origin);
+      console.warn(
+        'Check that your H service is configured to allow ' +
+          'WebSocket connections from ' +
+          window.location.origin
+      );
     }
   }
 
-  function handleSocketOnMessage (event) {
+  function handleSocketOnMessage(event) {
     // Wrap message dispatches in $rootScope.$apply() so that
     // scope watches on app state affected by the received message
     // are updated
-    $rootScope.$apply(function () {
+    $rootScope.$apply(function() {
       const message = JSON.parse(event.data);
       if (!message) {
         return;
@@ -127,7 +137,11 @@ function Streamer($rootScope, annotationMapper, store, auth,
       } else if (message.type === 'whoyouare') {
         const userid = store.getState().session.userid;
         if (message.userid !== userid) {
-          console.warn('WebSocket user ID "%s" does not match logged-in ID "%s"', message.userid, userid);
+          console.warn(
+            'WebSocket user ID "%s" does not match logged-in ID "%s"',
+            message.userid,
+            userid
+          );
         }
       } else {
         console.warn('received unsupported notification', message.type);
@@ -135,8 +149,8 @@ function Streamer($rootScope, annotationMapper, store, auth,
     });
   }
 
-  function sendClientConfig () {
-    Object.keys(configMessages).forEach(function (key) {
+  function sendClientConfig() {
+    Object.keys(configMessages).forEach(function(key) {
       if (configMessages[key]) {
         socket.send(configMessages[key]);
       }
@@ -155,50 +169,56 @@ function Streamer($rootScope, annotationMapper, store, auth,
     }
   }
 
-  const _connect = function () {
+  const _connect = function() {
     // If we have no URL configured, don't do anything.
     if (!settings.websocketUrl) {
       return Promise.resolve();
     }
 
-    return auth.tokenGetter().then(function (token) {
-      let url;
-      if (token) {
-        // Include the access token in the URL via a query param. This method
-        // is used to send credentials because the `WebSocket` constructor does
-        // not support setting the `Authorization` header directly as we do for
-        // other API requests.
-        const parsedURL = new URL(settings.websocketUrl);
-        const queryParams = queryString.parse(parsedURL.search);
-        queryParams.access_token = token;
-        parsedURL.search = queryString.stringify(queryParams);
-        url = parsedURL.toString();
-      } else {
-        url = settings.websocketUrl;
-      }
+    return auth
+      .tokenGetter()
+      .then(function(token) {
+        let url;
+        if (token) {
+          // Include the access token in the URL via a query param. This method
+          // is used to send credentials because the `WebSocket` constructor does
+          // not support setting the `Authorization` header directly as we do for
+          // other API requests.
+          const parsedURL = new URL(settings.websocketUrl);
+          const queryParams = queryString.parse(parsedURL.search);
+          queryParams.access_token = token;
+          parsedURL.search = queryString.stringify(queryParams);
+          url = parsedURL.toString();
+        } else {
+          url = settings.websocketUrl;
+        }
 
-      socket = new Socket(url);
+        socket = new Socket(url);
 
-      socket.on('open', sendClientConfig);
-      socket.on('error', handleSocketOnError);
-      socket.on('message', handleSocketOnMessage);
+        socket.on('open', sendClientConfig);
+        socket.on('error', handleSocketOnError);
+        socket.on('message', handleSocketOnMessage);
 
-      // Configure the client ID
-      setConfig('client-id', {
-        messageType: 'client_id',
-        value: clientId,
+        // Configure the client ID
+        setConfig('client-id', {
+          messageType: 'client_id',
+          value: clientId,
+        });
+
+        // Send a "whoami" message. The server will respond with a "whoyouare"
+        // reply which is useful for verifying that authentication worked as
+        // expected.
+        setConfig('auth-check', {
+          type: 'whoami',
+          id: 1,
+        });
+      })
+      .catch(function(err) {
+        console.error(
+          'Failed to fetch token for WebSocket authentication',
+          err
+        );
       });
-
-      // Send a "whoami" message. The server will respond with a "whoyouare"
-      // reply which is useful for verifying that authentication worked as
-      // expected.
-      setConfig('auth-check', {
-        type: 'whoami',
-        id: 1,
-      });
-    }).catch(function (err) {
-      console.error('Failed to fetch token for WebSocket authentication', err);
-    });
   };
 
   /**
@@ -236,8 +256,8 @@ function Streamer($rootScope, annotationMapper, store, auth,
 
   function applyPendingUpdates() {
     const updates = Object.values(pendingUpdates);
-    const deletions = Object.keys(pendingDeletions).map(function (id) {
-      return {id: id};
+    const deletions = Object.keys(pendingDeletions).map(function(id) {
+      return { id: id };
     });
 
     if (updates.length) {
@@ -252,8 +272,9 @@ function Streamer($rootScope, annotationMapper, store, auth,
   }
 
   function countPendingUpdates() {
-    return Object.keys(pendingUpdates).length +
-           Object.keys(pendingDeletions).length;
+    return (
+      Object.keys(pendingUpdates).length + Object.keys(pendingDeletions).length
+    );
   }
 
   function hasPendingDeletion(id) {
@@ -264,7 +285,7 @@ function Streamer($rootScope, annotationMapper, store, auth,
     if (!Array.isArray(anns)) {
       anns = [anns];
     }
-    anns.forEach(function (ann) {
+    anns.forEach(function(ann) {
       delete pendingUpdates[ann.id];
       delete pendingDeletions[ann.id];
     });
@@ -281,7 +302,7 @@ function Streamer($rootScope, annotationMapper, store, auth,
     events.ANNOTATIONS_UNLOADED,
   ];
 
-  updateEvents.forEach(function (event) {
+  updateEvents.forEach(function(event) {
     $rootScope.$on(event, removePendingUpdates);
   });
   $rootScope.$on(events.GROUP_FOCUSED, clearPendingUpdates);

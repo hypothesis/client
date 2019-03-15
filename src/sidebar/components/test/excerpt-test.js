@@ -5,12 +5,12 @@ const angular = require('angular');
 const util = require('../../directive/test/util');
 const excerpt = require('../excerpt');
 
-describe('excerpt', function () {
+describe('excerpt', function() {
   // ExcerptOverflowMonitor fake instance created by the current test
   let fakeOverflowMonitor;
 
   const SHORT_DIV = '<div id="foo" style="height:5px;"></div>';
-  const TALL_DIV =  '<div id="foo" style="height:200px;">foo bar</div>';
+  const TALL_DIV = '<div id="foo" style="height:200px;">foo bar</div>';
 
   function excerptComponent(attrs, content) {
     const defaultAttrs = {
@@ -23,12 +23,11 @@ describe('excerpt', function () {
     return util.createDirective(document, 'excerpt', attrs, {}, content);
   }
 
-  before(function () {
-    angular.module('app', [])
-      .component('excerpt', excerpt);
+  before(function() {
+    angular.module('app', []).component('excerpt', excerpt);
   });
 
-  beforeEach(function () {
+  beforeEach(function() {
     function FakeOverflowMonitor(ctrl) {
       fakeOverflowMonitor = this; // eslint-disable-line consistent-this
 
@@ -38,18 +37,18 @@ describe('excerpt', function () {
     }
 
     angular.mock.module('app');
-    angular.mock.module(function ($provide) {
+    angular.mock.module(function($provide) {
       $provide.value('ExcerptOverflowMonitor', FakeOverflowMonitor);
     });
   });
 
-  context('when created', function () {
-    it('schedules an overflow state recalculation', function () {
+  context('when created', function() {
+    it('schedules an overflow state recalculation', function() {
       excerptComponent({}, '<span id="foo"></span>');
       assert.called(fakeOverflowMonitor.check);
     });
 
-    it('passes input properties to overflow state recalc', function () {
+    it('passes input properties to overflow state recalc', function() {
       const attrs = {
         animate: false,
         enabled: true,
@@ -67,14 +66,14 @@ describe('excerpt', function () {
       });
     });
 
-    it('reports the content height to ExcerptOverflowMonitor', function () {
+    it('reports the content height to ExcerptOverflowMonitor', function() {
       excerptComponent({}, TALL_DIV);
       assert.deepEqual(fakeOverflowMonitor.ctrl.contentHeight(), 200);
     });
   });
 
-  context('input changes', function () {
-    it('schedules an overflow state check when inputs change', function () {
+  context('input changes', function() {
+    it('schedules an overflow state check when inputs change', function() {
       const element = excerptComponent({}, '<span></span>');
       fakeOverflowMonitor.check.reset();
       element.scope.contentData = 'new-content';
@@ -82,7 +81,7 @@ describe('excerpt', function () {
       assert.calledOnce(fakeOverflowMonitor.check);
     });
 
-    it('does not schedule a state check if inputs are unchanged', function () {
+    it('does not schedule a state check if inputs are unchanged', function() {
       const element = excerptComponent({}, '<span></span>');
       fakeOverflowMonitor.check.reset();
       element.scope.$digest();
@@ -90,15 +89,18 @@ describe('excerpt', function () {
     });
   });
 
-  context('document events', function () {
-    it('schedules an overflow check when media loads', function () {
-      const element = excerptComponent({}, '<img src="https://example.com/foo.jpg">');
+  context('document events', function() {
+    it('schedules an overflow check when media loads', function() {
+      const element = excerptComponent(
+        {},
+        '<img src="https://example.com/foo.jpg">'
+      );
       fakeOverflowMonitor.check.reset();
       util.sendEvent(element[0], 'load');
       assert.called(fakeOverflowMonitor.check);
     });
 
-    it('schedules an overflow check when the window is resized', function () {
+    it('schedules an overflow check when the window is resized', function() {
       const element = excerptComponent({}, '<span></span>');
       fakeOverflowMonitor.check.reset();
       util.sendEvent(element[0].ownerDocument.defaultView, 'resize');
@@ -106,8 +108,8 @@ describe('excerpt', function () {
     });
   });
 
-  context('visibility changes', function () {
-    it('schedules an overflow check when shown', function () {
+  context('visibility changes', function() {
+    it('schedules an overflow check when shown', function() {
       const element = excerptComponent({}, '<span></span>');
       fakeOverflowMonitor.check.reset();
 
@@ -124,31 +126,37 @@ describe('excerpt', function () {
     });
   });
 
-  context('excerpt content style', function () {
-    it('sets the content style using ExcerptOverflowMonitor#contentStyle()', function () {
+  context('excerpt content style', function() {
+    it('sets the content style using ExcerptOverflowMonitor#contentStyle()', function() {
       const element = excerptComponent({}, '<span></span>');
-      fakeOverflowMonitor.contentStyle.returns({'max-height': '52px'});
+      fakeOverflowMonitor.contentStyle.returns({ 'max-height': '52px' });
       element.scope.$digest();
       const content = element[0].querySelector('.excerpt');
       assert.equal(content.style.cssText.trim(), 'max-height: 52px;');
     });
   });
 
-  describe('enabled state', function () {
-    it('renders its contents in a .excerpt element by default', function () {
+  describe('enabled state', function() {
+    it('renders its contents in a .excerpt element by default', function() {
       const element = excerptComponent({}, '<span id="foo"></span>');
 
       assert.equal(element.find('.excerpt #foo').length, 1);
     });
 
-    it('when enabled, renders its contents in a .excerpt element', function () {
-      const element = excerptComponent({enabled: true}, '<span id="foo"></span>');
+    it('when enabled, renders its contents in a .excerpt element', function() {
+      const element = excerptComponent(
+        { enabled: true },
+        '<span id="foo"></span>'
+      );
 
       assert.equal(element.find('.excerpt #foo').length, 1);
     });
 
-    it('when disabled, renders its contents but not in a .excerpt element', function () {
-      const element = excerptComponent({enabled: false}, '<span id="foo"></span>');
+    it('when disabled, renders its contents but not in a .excerpt element', function() {
+      const element = excerptComponent(
+        { enabled: false },
+        '<span id="foo"></span>'
+      );
 
       assert.equal(element.find('.excerpt #foo').length, 0);
       assert.equal(element.find('#foo').length, 1);
@@ -161,7 +169,7 @@ describe('excerpt', function () {
 
   function findVisible(el, selector) {
     const elements = el.querySelectorAll(selector);
-    for (let i=0; i < elements.length; i++) {
+    for (let i = 0; i < elements.length; i++) {
       if (!isHidden(elements[i])) {
         return elements[i];
       }
@@ -169,28 +177,27 @@ describe('excerpt', function () {
     return undefined;
   }
 
-  describe('inline controls', function () {
+  describe('inline controls', function() {
     function findInlineControl(el) {
       return findVisible(el, '.excerpt__toggle-link');
     }
 
-    it('displays inline controls if collapsed', function () {
-      const element = excerptComponent({inlineControls: true},
-        TALL_DIV);
+    it('displays inline controls if collapsed', function() {
+      const element = excerptComponent({ inlineControls: true }, TALL_DIV);
       fakeOverflowMonitor.ctrl.onOverflowChanged(true);
       const expandLink = findInlineControl(element[0]);
       assert.ok(expandLink);
       assert.equal(expandLink.querySelector('a').textContent, 'More');
     });
 
-    it('does not display inline controls if not collapsed', function () {
-      const element = excerptComponent({inlineControls: true}, SHORT_DIV);
+    it('does not display inline controls if not collapsed', function() {
+      const element = excerptComponent({ inlineControls: true }, SHORT_DIV);
       const expandLink = findInlineControl(element[0]);
       assert.notOk(expandLink);
     });
 
-    it('toggles the expanded state when clicked', function () {
-      const element = excerptComponent({inlineControls: true}, TALL_DIV);
+    it('toggles the expanded state when clicked', function() {
+      const element = excerptComponent({ inlineControls: true }, TALL_DIV);
       fakeOverflowMonitor.ctrl.onOverflowChanged(true);
       const expandLink = findInlineControl(element[0]);
       angular.element(expandLink.querySelector('a')).click();
@@ -200,10 +207,9 @@ describe('excerpt', function () {
     });
   });
 
-  describe('bottom area', function () {
-    it('expands the excerpt when clicking at the bottom if collapsed', function () {
-      const element = excerptComponent({inlineControls: true},
-        TALL_DIV);
+  describe('bottom area', function() {
+    it('expands the excerpt when clicking at the bottom if collapsed', function() {
+      const element = excerptComponent({ inlineControls: true }, TALL_DIV);
       element.scope.$digest();
       assert.isTrue(element.ctrl.collapse);
       const bottomArea = element[0].querySelector('.excerpt__shadow');
@@ -212,15 +218,18 @@ describe('excerpt', function () {
     });
   });
 
-  describe('#onCollapsibleChanged', function () {
-    it('is called when overflow state changes', function () {
+  describe('#onCollapsibleChanged', function() {
+    it('is called when overflow state changes', function() {
       const callback = sinon.stub();
-      excerptComponent({
-        onCollapsibleChanged: {
-          args: ['collapsible'],
-          callback: callback,
+      excerptComponent(
+        {
+          onCollapsibleChanged: {
+            args: ['collapsible'],
+            callback: callback,
+          },
         },
-      }, '<span></span>');
+        '<span></span>'
+      );
       fakeOverflowMonitor.ctrl.onOverflowChanged(true);
       assert.calledWith(callback, true);
       fakeOverflowMonitor.ctrl.onOverflowChanged(false);

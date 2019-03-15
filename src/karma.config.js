@@ -1,26 +1,27 @@
 'use strict';
 
-const istanbul = require('browserify-istanbul');
+/* global __dirname */
+
+const path = require('path');
 
 module.exports = function(config) {
   config.set({
-
     // base path that will be used to resolve all patterns (eg. files, exclude)
     basePath: './',
 
     // frameworks to use
     // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
-    frameworks: [
-      'browserify',
-      'mocha',
-      'chai',
-      'sinon',
-    ],
+    frameworks: ['browserify', 'mocha', 'chai', 'sinon'],
 
     // list of files / patterns to load in the browser
     files: [
       // Polyfills for PhantomJS
-      './shared/polyfills.js',
+      './shared/polyfills/es2015.js',
+      './shared/polyfills/es2016.js',
+      './shared/polyfills/es2017.js',
+      './shared/polyfills/string.prototype.normalize.js',
+      './shared/polyfills/fetch.js',
+      './shared/polyfills/url.js',
 
       // Test setup
       './sidebar/test/bootstrap.js',
@@ -33,21 +34,35 @@ module.exports = function(config) {
       // watchify
 
       // Unit tests
-      { pattern: 'annotator/**/*-test.coffee', watched: false, included: true, served: true },
-      { pattern: '**/test/*-test.js', watched: false, included: true, served: true },
+      {
+        pattern: 'annotator/**/*-test.coffee',
+        watched: false,
+        included: true,
+        served: true,
+      },
+      {
+        pattern: '**/test/*-test.js',
+        watched: false,
+        included: true,
+        served: true,
+      },
 
       // Integration tests
-      { pattern: '**/integration/*-test.js', watched: false, included: true, served: true },
+      {
+        pattern: '**/integration/*-test.js',
+        watched: false,
+        included: true,
+        served: true,
+      },
     ],
 
     // list of files to exclude
-    exclude: [
-    ],
+    exclude: [],
 
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
-      './shared/polyfills.js': ['browserify'],
+      './shared/polyfills/*.js': ['browserify'],
       './sidebar/test/bootstrap.js': ['browserify'],
       '**/*-test.js': ['browserify'],
       '**/*-test.coffee': ['browserify'],
@@ -57,29 +72,28 @@ module.exports = function(config) {
     browserify: {
       debug: true,
       extensions: ['.coffee'],
-      configure: function (bundle) {
+      configure: function(bundle) {
         bundle.plugin('proxyquire-universal');
       },
 
       transform: [
         'coffeeify',
-        istanbul({
-          ignore: [
-            // Third party code
-            '**/node_modules/**', '**/vendor/*',
-            // Non JS modules
-            '**/*.html', '**/*.svg',
-          ],
-
-          // There is an outstanding bug with karma-coverage and istanbul
-          // in regards to doing source mapping and transpiling CoffeeScript.
-          // The least bad work around is to replace the instrumenter with
-          // isparta and it will handle doing the re mapping for us.
-          // This issue follows the issue and attempts to fix it:
-          // https://github.com/karma-runner/karma-coverage/issues/157
-          instrumenter: require('isparta'),
-        }),
-        'babelify',
+        [
+          'babelify',
+          {
+            // The transpiled CoffeeScript is fed through Babelify to add
+            // code coverage instrumentation for Istanbul.
+            extensions: ['.js', '.coffee'],
+            plugins: [
+              [
+                'babel-plugin-istanbul',
+                {
+                  exclude: ['**/test/**/*.{coffee,js}'],
+                },
+              ],
+            ],
+          },
+        ],
       ],
     },
 
@@ -91,17 +105,17 @@ module.exports = function(config) {
       output: 'minimal',
     },
 
-    coverageReporter: {
-      dir: '../coverage/',
-      reporters: [
-        {type:'html'},
-        {type:'json', subdir: './'},
-      ],
+    coverageIstanbulReporter: {
+      dir: path.join(__dirname, '../coverage'),
+      reports: ['json', 'html'],
+      'report-config': {
+        json: { subdir: './' },
+      },
     },
 
     // Use https://www.npmjs.com/package/karma-mocha-reporter
     // for more helpful rendering of test failures
-    reporters: ['mocha', 'coverage'],
+    reporters: ['mocha', 'coverage-istanbul'],
 
     // web server port
     port: 9876,

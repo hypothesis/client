@@ -21,7 +21,7 @@ function init() {
 }
 
 const update = {
-  UPDATE_SESSION: function (state, action) {
+  UPDATE_SESSION: function(state, action) {
     return {
       session: action.session,
     };
@@ -38,6 +38,15 @@ function updateSession(session) {
     type: actions.UPDATE_SESSION,
     session: session,
   };
+}
+
+/**
+ * Return true if a user is logged in and false otherwise.
+ *
+ * @param {object} state - The application state
+ */
+function isLoggedIn(state) {
+  return state.session.userid !== null;
 }
 
 /**
@@ -70,6 +79,7 @@ module.exports = {
 
   selectors: {
     isFeatureEnabled,
+    isLoggedIn,
     profile,
   },
 };

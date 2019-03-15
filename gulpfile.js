@@ -117,9 +117,38 @@ const appBundles = [{
   transforms: ['babel', 'coffee'],
 }];
 
-const appBundleConfigs = appBundles.map(function (config) {
-  return Object.assign({}, appBundleBaseConfig, config);
-});
+// Polyfill bundles. Polyfills are grouped into "sets" (one bundle per set)
+// based on major ECMAScript version or DOM API. Some large polyfills
+// (eg. for String.prototype.normalize) are additionally separated out into
+// their own bundles.
+//
+// To add a new polyfill:
+//  - Add the relevant dependencies to the project
+//  - Create an entry point in `src/shared/polyfills/{set}` and a feature
+//    detection function in `src/shared/polyfills/index.js`
+//  - Add an entry to the list below to generate the polyfill bundle
+//  - Add the polyfill set name to the required dependencies for the parts of
+//    the client that need it in `src/boot/boot.js`
+//  - Add the polyfill to the test environment if necessary in `src/karma.config.js`
+const polyfillBundles = [
+  'document.evaluate',
+  'es2015',
+  'es2016',
+  'es2017',
+  'fetch',
+  'string.prototype.normalize',
+  'url',
+].map(set => ({
+  name: `polyfills-${set}`,
+  entry: `./src/shared/polyfills/${set}`,
+  transforms: ['babel'],
+}));
+
+const appBundleConfigs = appBundles
+  .concat(polyfillBundles)
+  .map(config => {
+    return Object.assign({}, appBundleBaseConfig, config);
+  });
 
 gulp.task('build-js', gulp.parallel('build-vendor-js', function () {
   return Promise.all(appBundleConfigs.map(function (config) {
@@ -152,8 +181,8 @@ const styleFiles = [
 gulp.task('build-css', function () {
   // Rewrite font URLs to look for fonts in 'build/fonts' instead of
   // 'build/styles/fonts'
-  function rewriteCSSURL(url) {
-    return url.replace(/^fonts\//, '../fonts/');
+  function rewriteCSSURL(asset) {
+    return asset.url.replace(/^fonts\//, '../fonts/');
   }
 
   const sassOpts = {
@@ -375,7 +404,7 @@ function runKarma(baseConfig, opts, done) {
   const BaseReporter = require('karma/lib/reporters/base');
   BaseReporter.decoratorFactory.$inject =
     BaseReporter.decoratorFactory.$inject.map(dep =>
-        dep.replace('browserLogOptions', 'browserConsoleLogOptions'));
+      dep.replace('browserLogOptions', 'browserConsoleLogOptions'));
 
   const karma = require('karma');
   new karma.Server(Object.assign({}, {

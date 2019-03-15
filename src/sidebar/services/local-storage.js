@@ -9,7 +9,7 @@ class InMemoryStorage {
   }
 
   getItem(key) {
-    return (key in this._store) ? this._store[key] : null;
+    return key in this._store ? this._store[key] : null;
   }
 
   setItem(key, value) {

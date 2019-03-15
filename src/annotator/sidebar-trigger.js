@@ -11,8 +11,9 @@ const SIDEBAR_TRIGGER_BTN_ATTR = 'data-hypothesis-trigger';
  */
 
 function trigger(rootEl, showFn) {
-
-  const triggerElems = rootEl.querySelectorAll('['+SIDEBAR_TRIGGER_BTN_ATTR+']');
+  const triggerElems = rootEl.querySelectorAll(
+    '[' + SIDEBAR_TRIGGER_BTN_ATTR + ']'
+  );
 
   Array.from(triggerElems).forEach(function(triggerElem) {
     triggerElem.addEventListener('click', handleCommand);
