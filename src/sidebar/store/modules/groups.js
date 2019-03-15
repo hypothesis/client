@@ -1,6 +1,7 @@
 'use strict';
 
 const util = require('../util');
+const memoize = require('../../util/memoize');
 const { selectors: sessionSelectors } = require('./session');
 const { isLoggedIn } = sessionSelectors;
 
@@ -121,41 +122,41 @@ function getGroup(state, id) {
 }
 
 /**
- * Return groups that don't show up in Featured and My Groups.
- *
- * @return {Group[]}
- */
-function getCurrentlyViewingGroups(state) {
-  const myGroups = getMyGroups(state);
-  const featuredGroups = getFeaturedGroups(state);
-
-  return state.groups.filter(
-    g => !myGroups.includes(g) && !featuredGroups.includes(g)
-  );
-}
-
-/**
  * Return groups the logged in user is a member of.
  *
  * @return {Group[]}
  */
-function getMyGroups(state) {
+const getMyGroups = memoize(state => {
   // If logged out, the Public group still has isMember set to true so only
   // return groups with membership in logged in state.
   if (isLoggedIn(state)) {
     return state.groups.filter(g => g.isMember);
   }
   return [];
-}
+});
 
 /**
  * Return groups the user isn't a member of that are scoped to the URI.
  *
  * @return {Group[]}
  */
-function getFeaturedGroups(state) {
+const getFeaturedGroups = memoize(state => {
   return state.groups.filter(group => !group.isMember && group.isScopedToUri);
-}
+});
+
+/**
+ * Return groups that don't show up in Featured and My Groups.
+ *
+ * @return {Group[]}
+ */
+const getCurrentlyViewingGroups = memoize(state => {
+  const myGroups = getMyGroups(state);
+  const featuredGroups = getFeaturedGroups(state);
+
+  return state.groups.filter(
+    g => !myGroups.includes(g) && !featuredGroups.includes(g)
+  );
+});
 
 module.exports = {
   init,

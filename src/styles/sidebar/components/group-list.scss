@@ -1,6 +1,6 @@
 /* The groups dropdown list. */
 
-$group-list-width: 270px;
+$group-list-width: 300px;
 $group-list-spacing-below: 50px;
 
 .group-list {
@@ -18,6 +18,27 @@ $group-list-spacing-below: 50px;
       overflow: hidden;
       text-overflow: ellipsis;
       width: $group-list-width - 30px;
+    }
+  }
+
+  .dropdown-menu__section--no-header {
+    border-top: solid 1px rgba(0, 0, 0, 0.15);
+
+    .group-details {
+      font-weight: 400;
+    }
+  }
+
+  .dropdown-menu__section-heading {
+    color: $gray-light;
+    font-size: 12px;
+    line-height: 1;
+    margin: 1px 1px 0;
+    padding: 12px 10px 0;
+    text-transform: uppercase;
+
+    &:not(:first-child) {
+      border-top: solid 1px rgba(0, 0, 0, 0.15);
     }
   }
 
@@ -43,6 +64,38 @@ $group-list-spacing-below: 50px;
     }
   }
 
+  .group-item-community-groups {
+    border: solid 1px transparent;
+    display: flex;
+    flex-direction: row;
+    flex-grow: 1;
+    margin: 1px;
+
+    padding: 10px;
+    cursor: pointer;
+
+    &:focus {
+      outline: none;
+      @include focus-outline;
+    }
+
+    &:hover {
+      background: $gray-lightest;
+    }
+
+    &.is-selected {
+      .group-name-link {
+        font-size: $body2-font-size;
+        font-weight: 600;
+      }
+    }
+  }
+
+  .group-item--out-of-scope {
+    background-color: $gray-lightest;
+    color: $gray-light;
+  }
+
   .group-icon-container {
     margin-right: 10px;
   }
@@ -61,9 +114,62 @@ $group-list-spacing-below: 50px;
     margin-right: 2px;
   }
 
+  .group__icon--unavailable {
+    fill: $gray-light;
+    float: right;
+    height: 20px;
+    width: auto;
+  }
+
   .group-details {
     flex-grow: 1;
     flex-shrink: 1;
+  }
+  .group-details-community-groups {
+    flex-grow: 1;
+    flex-shrink: 1;
+    font-weight: 500;
+
+    .group-details__unavailable-message,
+    .group-details__actions {
+      display: none;
+    }
+
+    &.expanded {
+      .group-details__toggle {
+        display: none;
+      }
+
+      .group-details__unavailable-message,
+      .group-details__actions {
+        display: block;
+      }
+    }
+  }
+
+  .group-details__toggle {
+    font-size: $body1-font-size;
+    font-style: italic;
+    margin: 0;
+    text-decoration: underline;
+  }
+
+  .group-details__unavailable-message {
+    font-size: $body1-font-size;
+    line-height: 1.5;
+    white-space: normal;
+    width: $group-list-width - 60px;
+  }
+
+  .group-details__actions {
+    text-align: right;
+  }
+
+  .group-details__group-page-link {
+    color: inherit;
+    font-size: $body1-font-size;
+    text-decoration: underline;
+    text-transform: uppercase;
   }
 
   .new-group-btn {
@@ -118,4 +224,11 @@ $group-list-spacing-below: 50px;
 .group-name-link {
   white-space: nowrap;
   color: inherit;
+}
+
+
+.open {
+  & > .group-list__toggle {
+    background: $gray-lighter;
+  }
 }

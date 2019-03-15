@@ -4,18 +4,30 @@ const { isThirdPartyUser } = require('../util/account-id');
 const isThirdPartyService = require('../util/is-third-party-service');
 const serviceConfig = require('../service-config');
 const memoize = require('../util/memoize');
-const groupOrganizations = memoize(require('../util/group-organizations'));
+const groupsByOrganization = require('../util/group-organizations');
+
+const groupOrganizations = memoize(groupsByOrganization);
+
+const myGroupOrgs = memoize(groupsByOrganization);
+
+const featuredGroupOrgs = memoize(groupsByOrganization);
+
+const currentlyViewingGroupOrgs = memoize(groupsByOrganization);
 
 // @ngInject
 function GroupListController(
   $window,
   analytics,
+  features,
   groups,
   settings,
   serviceUrl,
-  features
+  store
 ) {
   this.groups = groups;
+
+  // Track which non-selectable groups have their group details expanded.
+  this.groupDetailsExpanded = {};
 
   this.createNewGroup = function() {
     $window.open(serviceUrl('groups.new'), '_blank');
@@ -57,6 +69,18 @@ function GroupListController(
     return groupOrganizations(this.groups.all());
   };
 
+  this.currentlyViewingGroupOrganizations = function() {
+    return currentlyViewingGroupOrgs(store.getCurrentlyViewingGroups());
+  };
+
+  this.featuredGroupOrganizations = function() {
+    return featuredGroupOrgs(store.getFeaturedGroups());
+  };
+
+  this.myGroupOrganizations = function() {
+    return myGroupOrgs(store.getMyGroups());
+  };
+
   this.viewGroupActivity = function() {
     analytics.track(analytics.events.GROUP_VIEW_ACTIVITY);
   };
@@ -64,6 +88,23 @@ function GroupListController(
   this.focusGroup = function(groupId) {
     analytics.track(analytics.events.GROUP_SWITCH);
     groups.focus(groupId);
+  };
+
+  this.isGroupDetailsExpanded = function(groupId) {
+    if (!(groupId in this.groupDetailsExpanded)) {
+      this.groupDetailsExpanded[groupId] = false;
+    }
+    return this.groupDetailsExpanded[groupId];
+  };
+
+  /**
+   * Toggle the expanded setting on un-selectable groups.
+   */
+  this.toggleGroupDetails = function(event, groupId) {
+    event.stopPropagation();
+    // Call the isGroupDetailsExpanded method so that if the groupId doesn't exist,
+    // it gets added before toggling it.
+    this.groupDetailsExpanded[groupId] = !this.isGroupDetailsExpanded(groupId);
   };
 
   /**
