@@ -236,7 +236,6 @@ function SidebarContentController(
   // change.
   $scope.$watch(() => ([
     groups.focused().id,
-    store.profile().userid,
     ...store.searchUris(),
   ]), ([currentGroupId], [prevGroupId]) => {
     // FIXME - There is a bug here where the set of displayed annotations can
