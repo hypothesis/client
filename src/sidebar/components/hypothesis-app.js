@@ -72,9 +72,9 @@ function HypothesisAppController(
     self.auth = authStateFromProfile(data.profile);
   });
 
-  session.load().then(profile => {
-    self.auth = authStateFromProfile(profile);
-  });
+  // session.load().then(profile => {
+  //   self.auth = authStateFromProfile(profile);
+  // });
 
   /** Scroll to the view to the element matching the given selector */
   function scrollToView(selector) {
