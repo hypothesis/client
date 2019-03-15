@@ -1,9 +1,8 @@
 'use strict';
 
-const angular = require('angular');
-const proxyquire = require('proxyquire');
+const fetchMock = require('fetch-mock');
 
-const util = require('../../../shared/test/util');
+const apiFactory = require('../api');
 
 // API route directory.
 //
@@ -17,302 +16,191 @@ const util = require('../../../shared/test/util');
 const routes = require('./api-index.json').links;
 
 describe('sidebar.services.api', function() {
-  let $httpBackend;
-  let $q;
   let fakeAuth;
   let fakeStore;
-  let sandbox;
   let api;
 
-  before(function() {
-    angular.module('h', []).service(
-      'api',
-      proxyquire(
-        '../api',
-        util.noCallThru({
-          angular: angular,
-          '../retry-util': {
-            retryPromiseOperation: function(fn) {
-              return fn();
-            },
-          },
-        })
-      )
-    );
-  });
+  function defaultBodyForStatus(status) {
+    if (status === 204) {
+      return '';
+    } else if (status >= 500) {
+      return '<html><body>Internal Server Error</body></html>';
+    } else {
+      return {};
+    }
+  }
 
-  beforeEach(function() {
-    sandbox = sinon.sandbox.create();
+  /**
+   * Expect an HTTP call using `window.fetch`.
+   *
+   * @param {string} method - Expected HTTP method (lower case)
+   * @param {string} pathAndQuery - Expected part of URL after API root
+   * @param {number|null} status -
+   *   Expected HTTP status. If `null` then the call to `fetch` will reject with
+   *   the content of `body` as the error message.
+   * @param {Object|string} body - Expected response body or error message
+   */
+  function expectCall(
+    method,
+    pathAndQuery,
+    status = 200,
+    body = defaultBodyForStatus(status)
+  ) {
+    const url = `https://example.com/api/${pathAndQuery}`;
+    if (status > 0) {
+      fetchMock.mock(url, { status, body }, { method });
+    } else {
+      fetchMock.mock(
+        url,
+        {
+          status,
+          throws: new Error(body),
+        },
+        { method }
+      );
+    }
+  }
 
+  beforeEach(() => {
     const fakeApiRoutes = {
       links: sinon.stub(),
-      routes: sinon.stub(),
+      routes: sinon.stub().returns(Promise.resolve(routes)),
     };
     fakeAuth = {
-      tokenGetter: sinon.stub(),
+      tokenGetter: sinon.stub().returns(Promise.resolve('faketoken')),
     };
     fakeStore = {
       apiRequestStarted: sinon.stub(),
       apiRequestFinished: sinon.stub(),
     };
 
-    angular.mock.module('h', {
-      apiRoutes: fakeApiRoutes,
-      auth: fakeAuth,
-      settings: { apiUrl: 'https://example.com/api/' },
-      store: fakeStore,
-    });
+    api = apiFactory(fakeApiRoutes, fakeAuth, fakeStore);
 
-    angular.mock.inject(function(_$q_) {
-      $q = _$q_;
-      fakeAuth.tokenGetter.returns($q.resolve('faketoken'));
-
-      fakeApiRoutes.routes.returns($q.resolve(routes));
+    fetchMock.catch(() => {
+      throw new Error('Unexpected `fetch` call');
     });
   });
 
-  afterEach(function() {
-    $httpBackend.verifyNoOutstandingExpectation();
-    $httpBackend.verifyNoOutstandingRequest();
-    sandbox.restore();
+  afterEach(() => {
+    fetchMock.restore();
   });
 
-  beforeEach(
-    angular.mock.inject(function(_$httpBackend_, _api_) {
-      $httpBackend = _$httpBackend_;
-      api = _api_;
-    })
-  );
+  it('saves a new annotation', () => {
+    // nb. The Hypothesis API returns 200 here not 201 as one might expect.
+    expectCall('post', 'annotations', 200, { id: 'new-id' });
 
-  it('saves a new annotation', function(done) {
-    api.annotation.create({}, {}).then(function(saved) {
-      assert.isNotNull(saved.id);
-      done();
-    });
-
-    $httpBackend
-      .expectPOST('https://example.com/api/annotations')
-      .respond(function() {
-        return [201, { id: 'new-id' }, {}];
-      });
-    $httpBackend.flush();
-  });
-
-  it('updates an annotation', function(done) {
-    api.annotation
-      .update({ id: 'an-id' }, { text: 'updated' })
-      .then(function() {
-        done();
-      });
-
-    $httpBackend
-      .expectPATCH('https://example.com/api/annotations/an-id')
-      .respond(function() {
-        return [200, {}, {}];
-      });
-    $httpBackend.flush();
-  });
-
-  it('deletes an annotation', function(done) {
-    api.annotation.delete({ id: 'an-id' }, {}).then(function() {
-      done();
-    });
-
-    $httpBackend
-      .expectDELETE('https://example.com/api/annotations/an-id')
-      .respond(function() {
-        return [200, {}, {}];
-      });
-    $httpBackend.flush();
-  });
-
-  it('flags an annotation', function(done) {
-    api.annotation.flag({ id: 'an-id' }).then(function() {
-      done();
-    });
-
-    $httpBackend
-      .expectPUT('https://example.com/api/annotations/an-id/flag')
-      .respond(function() {
-        return [204, {}, {}];
-      });
-    $httpBackend.flush();
-  });
-
-  it('hides an annotation', function(done) {
-    api.annotation.hide({ id: 'an-id' }).then(function() {
-      done();
-    });
-
-    $httpBackend
-      .expectPUT('https://example.com/api/annotations/an-id/hide')
-      .respond(function() {
-        return [204, {}, {}];
-      });
-    $httpBackend.flush();
-  });
-
-  it('unhides an annotation', function(done) {
-    api.annotation.unhide({ id: 'an-id' }).then(function() {
-      done();
-    });
-
-    $httpBackend
-      .expectDELETE('https://example.com/api/annotations/an-id/hide')
-      .respond(function() {
-        return [204, {}, {}];
-      });
-    $httpBackend.flush();
-  });
-
-  describe('#group.member.delete', () => {
-    it('removes current user from a group', done => {
-      api.group.member
-        .delete({ pubid: 'an-id', userid: 'me' })
-        .then(function() {
-          done();
-        });
-
-      $httpBackend
-        .expectDELETE('https://example.com/api/groups/an-id/members/me')
-        .respond(() => {
-          return [204, {}, {}];
-        });
-      $httpBackend.flush();
+    return api.annotation.create({}, {}).then(ann => {
+      assert.equal(ann.id, 'new-id');
     });
   });
 
-  it('removes internal properties before sending data to the server', function(done) {
+  it('updates an annotation', () => {
+    expectCall('patch', 'annotations/an-id');
+    return api.annotation.update({ id: 'an-id' }, { text: 'updated' });
+  });
+
+  it('deletes an annotation', () => {
+    expectCall('delete', 'annotations/an-id');
+    return api.annotation.delete({ id: 'an-id' }, {});
+  });
+
+  it('flags an annotation', () => {
+    expectCall('put', 'annotations/an-id/flag', 204);
+    return api.annotation.flag({ id: 'an-id' });
+  });
+
+  it('hides an annotation', () => {
+    expectCall('put', 'annotations/an-id/hide', 204);
+    return api.annotation.hide({ id: 'an-id' });
+  });
+
+  it('unhides an annotation', () => {
+    expectCall('delete', 'annotations/an-id/hide', 204);
+    return api.annotation.unhide({ id: 'an-id' });
+  });
+
+  it('removes current user from a group', () => {
+    expectCall('delete', 'groups/an-id/members/me', 204);
+    return api.group.member.delete({ pubid: 'an-id', userid: 'me' });
+  });
+
+  it('removes internal properties before sending data to the server', () => {
     const annotation = {
       $highlight: true,
       $notme: 'nooooo!',
       allowed: 123,
     };
-    api.annotation.create({}, annotation).then(function() {
-      done();
+    expectCall('post', 'annotations', 200, { id: 'test' });
+    return api.annotation.create({}, annotation).then(() => {
+      const [, options] = fetchMock.lastCall();
+      assert.deepEqual(options.body, JSON.stringify({ allowed: 123 }));
     });
-
-    $httpBackend
-      .expectPOST('https://example.com/api/annotations', {
-        allowed: 123,
-      })
-      .respond(function() {
-        return [200, { id: 'test' }, {}];
-      });
-    $httpBackend.flush();
   });
 
-  // Our backend service interprets semicolons as query param delimiters, so we
-  // must ensure to encode them in the query string.
-  it('encodes semicolons in query parameters', function(done) {
-    api.search({ uri: 'http://foobar.com/?foo=bar;baz=qux' }).then(function() {
-      done();
-    });
-
-    $httpBackend
-      .expectGET(
-        'https://example.com/api/search?uri=http%3A%2F%2Ffoobar.com%2F%3Ffoo%3Dbar%3Bbaz%3Dqux'
-      )
-      .respond(function() {
-        return [200, {}, {}];
-      });
-    $httpBackend.flush();
-  });
-
-  it("fetches the user's profile", function(done) {
-    const profile = { userid: 'acct:user@publisher.org' };
-    api.profile.read({ authority: 'publisher.org' }).then(function(profile_) {
-      assert.deepEqual(profile_, profile);
-      done();
-    });
-    $httpBackend
-      .expectGET('https://example.com/api/profile?authority=publisher.org')
-      .respond(function() {
-        return [200, profile, {}];
-      });
-    $httpBackend.flush();
-  });
-
-  it("updates a user's profile", function(done) {
-    api.profile.update({}, { preferences: {} }).then(function() {
-      done();
-    });
-
-    $httpBackend
-      .expectPATCH('https://example.com/api/profile')
-      .respond(function() {
-        return [200, {}, {}];
-      });
-    $httpBackend.flush();
-  });
-
-  context('when an API calls fail', function() {
-    util.unroll(
-      'rejects the call with an Error',
-      function(done, testCase) {
-        api.profile.update({}, { preferences: {} }).catch(function(err) {
-          assert(err instanceof Error);
-          assert.equal(err.message, testCase.expectedMessage);
-          done();
-        });
-        $httpBackend
-          .expectPATCH('https://example.com/api/profile')
-          .respond(function() {
-            return [testCase.status, testCase.body, {}, testCase.statusText];
-          });
-        $httpBackend.flush();
-      },
-      [
-        {
-          // Network error
-          status: -1,
-          body: null,
-          expectedMessage: 'Service unreachable.',
-        },
-        {
-          // Request failed with an error given in the JSON body
-          status: 404,
-          statusText: 'Not found',
-          body: {
-            reason: 'Thing not found',
-          },
-          expectedMessage: '404 Not found: Thing not found',
-        },
-        {
-          // Request failed with a non-JSON response
-          status: 500,
-          statusText: 'Server Error',
-          body: 'Internal Server Error',
-          expectedMessage: '500 Server Error',
-        },
-      ]
+  // Test that semicolons are correctly encoded in the query string, which is
+  // important as they are treated as query param delimiters by the API.
+  //
+  // This used to require custom code when using AngularJS but `fetch` handles
+  // this correctly for us. The test has been kept to catch any regressions.
+  it('encodes semicolons in query parameters', () => {
+    expectCall(
+      'get',
+      'search?uri=http%3A%2F%2Ffoobar.com%2F%3Ffoo%3Dbar%3Bbaz%3Dqux'
     );
+    return api.search({ uri: 'http://foobar.com/?foo=bar;baz=qux' });
+  });
 
-    it("exposes details in the Error's `response` property", function(done) {
-      api.profile.update({}, { preferences: {} }).catch(function(err) {
-        assert.match(
-          err.response,
-          sinon.match({
-            status: 404,
-            statusText: 'Not found',
-            data: {
-              reason: 'User not found',
-            },
-          })
-        );
-        done();
-      });
-      $httpBackend
-        .expectPATCH('https://example.com/api/profile')
-        .respond(function() {
-          return [404, { reason: 'User not found' }, {}, 'Not found'];
+  it("fetches the user's profile", () => {
+    const profile = { userid: 'acct:user@publisher.org' };
+    expectCall('get', 'profile?authority=publisher.org', 200, profile);
+    return api.profile.read({ authority: 'publisher.org' }).then(profile_ => {
+      assert.deepEqual(profile_, profile);
+    });
+  });
+
+  it("updates a user's profile", () => {
+    expectCall('patch', 'profile');
+    return api.profile.update({}, { preferences: {} });
+  });
+
+  context('when an API call fails', () => {
+    [
+      {
+        // Network error
+        status: null,
+        body: 'Service unreachable.',
+        expectedMessage: 'Service unreachable.',
+      },
+      {
+        // Request failed with an error given in the JSON body
+        status: 404,
+        statusText: 'Not found',
+        body: {
+          reason: 'Thing not found',
+        },
+        expectedMessage: '404 Not Found: Thing not found',
+      },
+      {
+        // Request failed with a non-JSON response
+        status: 500,
+        statusText: 'Server Error',
+        body: 'Internal Server Error',
+        expectedMessage: '500 Internal Server Error',
+      },
+    ].forEach(({ status, body, expectedMessage }) => {
+      it('rejects the call with an error', () => {
+        expectCall('patch', 'profile', status, body);
+        return api.profile.update({}, { preferences: {} }).catch(err => {
+          assert(err instanceof Error);
+          assert.equal(err.message, expectedMessage);
         });
-      $httpBackend.flush();
+      });
     });
   });
 
   it('API calls return just the JSON response if `includeMetadata` is false', () => {
-    api.profile.read({}).then(response => {
+    expectCall('get', 'profile', 200, { userid: 'acct:user@example.com' });
+    return api.profile.read({}).then(response => {
       assert.match(
         response,
         sinon.match({
@@ -320,92 +208,92 @@ describe('sidebar.services.api', function() {
         })
       );
     });
-
-    $httpBackend
-      .expectGET('https://example.com/api/profile')
-      .respond(() => [200, { userid: 'acct:user@example.com' }]);
-    $httpBackend.flush();
   });
 
   it('API calls return an `APIResponse` if `includeMetadata` is true', () => {
-    api.profile.read({}, null, { includeMetadata: true }).then(response => {
-      assert.match(
-        response,
-        sinon.match({
-          data: {
-            userid: 'acct:user@example.com',
-          },
-          token: 'faketoken',
-        })
-      );
-    });
-
-    $httpBackend
-      .expectGET('https://example.com/api/profile')
-      .respond(() => [200, { userid: 'acct:user@example.com' }]);
-    $httpBackend.flush();
+    expectCall('get', 'profile', 200, { userid: 'acct:user@example.com' });
+    return api.profile
+      .read({}, null, { includeMetadata: true })
+      .then(response => {
+        assert.match(
+          response,
+          sinon.match({
+            data: {
+              userid: 'acct:user@example.com',
+            },
+            token: 'faketoken',
+          })
+        );
+      });
   });
 
   it('omits Authorization header if no access token is available', () => {
-    fakeAuth.tokenGetter.returns($q.resolve(null));
-    api.profile.read();
-
-    $httpBackend
-      .expectGET(
-        'https://example.com/api/profile',
-        headers => !('Authorization' in headers)
-      )
-      .respond(() => [200, { userid: 'acct:user@example.com' }]);
-    $httpBackend.flush();
+    fakeAuth.tokenGetter.returns(Promise.resolve(null));
+    expectCall('get', 'profile');
+    return api.profile.read().then(() => {
+      const [, options] = fetchMock.lastCall();
+      assert.isFalse('Authorization' in options.headers);
+    });
   });
 
   it('sets Authorization header if access token is available', () => {
-    api.profile.read();
-
-    $httpBackend
-      .expectGET(
-        'https://example.com/api/profile',
-        headers => headers.Authorization === 'Bearer faketoken'
-      )
-      .respond(() => [200, { userid: 'acct:user@example.com' }]);
-    $httpBackend.flush();
+    expectCall('get', 'profile');
+    return api.profile.read().then(() => {
+      const [, options] = fetchMock.lastCall();
+      assert.equal(options.headers.Authorization, 'Bearer faketoken');
+    });
   });
 
   it('sends client version custom request header', () => {
-    api.profile.read({});
-
-    $httpBackend
-      .expectGET(
-        'https://example.com/api/profile',
-        headers => headers['Hypothesis-Client-Version'] === '__VERSION__'
-      )
-      .respond(() => [200, { userid: 'acct:user@example.com' }]);
-    $httpBackend.flush();
+    expectCall('get', 'profile');
+    return api.profile.read({}).then(() => {
+      const [, options] = fetchMock.lastCall();
+      assert.equal(options.headers['Hypothesis-Client-Version'], '__VERSION__');
+    });
   });
 
   it('dispatches store actions when an API request starts and completes successfully', () => {
-    api.profile.read({}).then(() => {
+    expectCall('get', 'profile');
+    return api.profile.read({}).then(() => {
       assert.isTrue(
         fakeStore.apiRequestFinished.calledAfter(fakeStore.apiRequestStarted)
       );
     });
-
-    $httpBackend
-      .expectGET('https://example.com/api/profile')
-      .respond(() => [200, { userid: 'acct:user@example.com' }]);
-    $httpBackend.flush();
   });
 
   it('dispatches store actions when an API request starts and fails', () => {
-    api.profile.read({}).catch(() => {
+    expectCall('get', 'profile', 400);
+    return api.profile.read({}).catch(() => {
       assert.isTrue(
         fakeStore.apiRequestFinished.calledAfter(fakeStore.apiRequestStarted)
       );
     });
+  });
 
-    $httpBackend
-      .expectGET('https://example.com/api/profile')
-      .respond(() => [400, { reason: 'Something went wrong' }]);
-    $httpBackend.flush();
+  it('dispatches store actions if API request fails with a network error', () => {
+    expectCall('get', 'profile', null, 'Network error');
+
+    return api.profile.read({}).catch(() => {
+      assert.isTrue(
+        fakeStore.apiRequestFinished.calledAfter(fakeStore.apiRequestStarted)
+      );
+    });
+  });
+
+  it('does not send a client ID by default', () => {
+    expectCall('get', 'profile');
+    return api.profile.read({}).then(() => {
+      const [, options] = fetchMock.lastCall();
+      assert.isFalse('X-Client-Id' in options.headers);
+    });
+  });
+
+  it('sends a client ID in the X-Client-Id header if configured', () => {
+    expectCall('get', 'profile');
+    api.setClientId('1234-5678');
+    return api.profile.read({}).then(() => {
+      const [, options] = fetchMock.lastCall();
+      assert.equal(options.headers['X-Client-Id'], '1234-5678');
+    });
   });
 });

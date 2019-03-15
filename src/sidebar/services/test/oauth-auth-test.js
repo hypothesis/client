@@ -17,7 +17,6 @@ describe('sidebar.oauth-auth', function() {
   let fakeApiRoutes;
   let fakeClient;
   let fakeFlash;
-  let fakeHttp;
   let fakeLocalStorage;
   let fakeWindow;
   let fakeSettings;
@@ -96,10 +95,7 @@ describe('sidebar.oauth-auth', function() {
 
     fakeWindow = new FakeWindow();
 
-    fakeHttp = {};
-
     angular.mock.module('app', {
-      $http: fakeHttp,
       $window: fakeWindow,
       apiRoutes: fakeApiRoutes,
       flash: fakeFlash,

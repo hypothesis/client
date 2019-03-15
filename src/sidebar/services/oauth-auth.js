@@ -25,7 +25,6 @@ const serviceConfig = require('../service-config');
  */
 // @ngInject
 function auth(
-  $http,
   $rootScope,
   $window,
   OAuthClient,
