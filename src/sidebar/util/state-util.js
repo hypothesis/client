@@ -1,6 +1,23 @@
 'use strict';
 
 /**
+ * Returns the documentFingerprint (DC identifier) when available in the frames state
+ * @param store
+ * @returns {Promise<T>}
+ */
+function getDocumentDCIdentifier(store) {
+  function getIdentifier() {
+    const state = store.getState();
+    const metaFrame = state.frames.find(function (frame) {
+      return frame.metadata && frame.metadata.documentFingerprint;
+    });
+
+    return metaFrame ? metaFrame.metadata.documentFingerprint : null;
+  }
+  return awaitStateChange(store, getIdentifier);
+}
+
+/**
  * Return a value from app state when it meets certain criteria.
  *
  * `await` returns a Promise which resolves when a selector function,
@@ -27,4 +44,4 @@ function awaitStateChange(store, selector) {
   });
 }
 
-module.exports = { awaitStateChange } ;
+module.exports = { awaitStateChange, getDocumentDCIdentifier } ;

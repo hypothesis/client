@@ -14,7 +14,7 @@ const bridgeEvents = require('../../shared/bridge-events');
  * @param {Profile} profile - The profile object from the API.
  */
 function authStateFromProfile(profile) {
-  if (profile.userid) {
+  if (profile && profile.userid) {
     const parsed = parseAccountID(profile.userid);
     let displayName = parsed.username;
     if (profile.user_info && profile.user_info.display_name) {
