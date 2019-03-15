@@ -35,10 +35,10 @@ describe('sidebar.services.api', function() {
    *
    * @param {string} method - Expected HTTP method (lower case)
    * @param {string} pathAndQuery - Expected part of URL after API root
-   * @param {number} status -
-   *   Expected HTTP status. If <= 0 then the call to `fetch` will reject with
+   * @param {number|null} status -
+   *   Expected HTTP status. If `null` then the call to `fetch` will reject with
    *   the content of `body` as the error message.
-   * @param {Object|string} body - Expected response body
+   * @param {Object|string} body - Expected response body or error message
    */
   function expectCall(
     method,
@@ -86,7 +86,8 @@ describe('sidebar.services.api', function() {
   });
 
   it('saves a new annotation', () => {
-    expectCall('post', 'annotations', 201, { id: 'new-id' });
+    // nb. The Hypothesis API returns 200 here not 201 as one might expect.
+    expectCall('post', 'annotations', 200, { id: 'new-id' });
 
     return api.annotation.create({}, {}).then(ann => {
       assert.equal(ann.id, 'new-id');
@@ -166,7 +167,7 @@ describe('sidebar.services.api', function() {
     [
       {
         // Network error
-        status: -1,
+        status: null,
         body: 'Service unreachable.',
         expectedMessage: 'Service unreachable.',
       },
@@ -270,7 +271,7 @@ describe('sidebar.services.api', function() {
   });
 
   it('dispatches store actions if API request fails with a network error', () => {
-    expectCall('get', 'profile', -1, 'Network error');
+    expectCall('get', 'profile', null, 'Network error');
 
     return api.profile.read({}).catch(() => {
       assert.isTrue(
