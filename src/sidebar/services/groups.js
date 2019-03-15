@@ -12,7 +12,7 @@ const DEFAULT_ORGANIZATION = {
 };
 
 const events = require('../events');
-const { awaitStateChange } = require('../util/state-util');
+const { getDocumentDCIdentifier } = require('../util/state-util');
 const serviceConfig = require('../service-config');
 
 // @ngInject
@@ -20,21 +20,6 @@ function groups($rootScope, store, api, isSidebar, localStorage, serviceUrl, ses
                 settings) {
   const svc = serviceConfig(settings);
   const authority = svc ? svc.authority : null;
-
-  function getDocumentUriForGroupSearch() {
-    function mainUri() {
-      const uris = store.searchUris();
-      if (uris.length === 0) {
-        return null;
-      }
-
-      // We get the first HTTP URL here on the assumption that group scopes must
-      // be domains (+paths)? and therefore we need to look up groups based on
-      // HTTP URLs (so eg. we cannot use a "file:" URL or PDF fingerprint).
-      return uris.find(uri => uri.startsWith('http'));
-    }
-    return awaitStateChange(store, mainUri);
-  }
 
   /**
    * Filter the returned list of groups from the API.
@@ -124,7 +109,7 @@ function groups($rootScope, store, api, isSidebar, localStorage, serviceUrl, ses
   function load() {
     let uri = Promise.resolve(null);
     if (isSidebar) {
-      uri = getDocumentUriForGroupSearch();
+      uri = getDocumentDCIdentifier(store);
     }
     return uri.then(uri => {
       const params = {
@@ -214,12 +199,13 @@ function groups($rootScope, store, api, isSidebar, localStorage, serviceUrl, ses
   $rootScope.$on(events.USER_CHANGED, () => {
     // FIXME Makes a second api call on page load. better way?
     // return for use in test
-    return load();
+    // Not going to happen for IA
+    // return load();
   });
 
   // refetch the list of groups when document url changes
   $rootScope.$on(events.FRAME_CONNECTED, () => {
-    return getDocumentUriForGroupSearch().then(uri => {
+    return getDocumentDCIdentifier(store).then(uri => {
       if (documentUri !== uri) {
         documentUri = uri;
         load();

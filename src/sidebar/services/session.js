@@ -2,6 +2,7 @@
 
 const events = require('../events');
 const retryUtil = require('../util/retry');
+const { getDocumentDCIdentifier } = require('../util/state-util');
 
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
@@ -55,21 +56,27 @@ function session($q, $rootScope, analytics, store, api, auth,
       // This serves to make loading the app in the extension cope better with
       // flakey connectivity but it also throttles the frequency of calls to
       // the /app endpoint.
-      lastLoadTime = Date.now();
-      lastLoad = retryUtil.retryPromiseOperation(function () {
-        const authority = getAuthority();
-        const opts = {};
-        if (authority) {
-          opts.authority = authority;
-        }
-        return api.profile.read(opts);
-      }, profileFetchRetryOpts).then(function (session) {
-        update(session);
+      const uri = getDocumentDCIdentifier(store);
+      return uri.then(uri => {
         lastLoadTime = Date.now();
-        return session;
-      }).catch(function (err) {
-        lastLoadTime = null;
-        throw err;
+        lastLoad = retryUtil.retryPromiseOperation(function () {
+          const authority = getAuthority();
+          const opts = {};
+          if (authority) {
+            opts.authority = authority;
+          }
+          if (uri) {
+            opts.document_uri = uri;
+          }
+          return api.profile.read(opts);
+        }, profileFetchRetryOpts).then(function (session) {
+          update(session);
+          lastLoadTime = Date.now();
+          return session;
+        }).catch(function (err) {
+          lastLoadTime = null;
+          throw err;
+        });
       });
     }
     return lastLoad;
