@@ -65,27 +65,30 @@ function session(
       // This serves to make loading the app in the extension cope better with
       // flakey connectivity but it also throttles the frequency of calls to
       // the /app endpoint.
+      lastLoadTime = Date.now();
       const uri = getDocumentDCIdentifier(store);
       return uri.then(uri => {
         lastLoadTime = Date.now();
-        lastLoad = retryUtil.retryPromiseOperation(function () {
-          const authority = getAuthority();
-          const opts = {};
-          if (authority) {
-            opts.authority = authority;
-          }
-          if (uri) {
-            opts.document_uri = uri;
-          }
-          return api.profile.read(opts);
-        }, profileFetchRetryOpts).then(function (session) {
-          update(session);
-          lastLoadTime = Date.now();
-          return session;
-        }).catch(function (err) {
-          lastLoadTime = null;
-          throw err;
-        });
+          lastLoad = retryUtil
+              .retryPromiseOperation(function() {
+                  const authority = getAuthority();
+                  const opts = {};
+                  if (authority) {
+                      opts.authority = authority;
+                  }
+                  if (uri) {
+                      opts.document_uri = uri;
+                  }
+                  return api.profile.read(opts);
+              }, profileFetchRetryOpts)
+              .then(function(session) {
+                  update(session);
+                  return session;
+              })
+              .catch(function(err) {
+                  lastLoadTime = null;
+                  throw err;
+              });
       });
     }
     return lastLoad;
