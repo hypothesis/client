@@ -10,6 +10,7 @@ const babelify = require('babelify');
 const browserify = require('browserify');
 const coffeeify = require('coffeeify');
 const exorcist = require('exorcist');
+const envify = require('loose-envify/custom');
 const gulpUtil = require('gulp-util');
 const mkdirp = require('mkdirp');
 const through = require('through2');
@@ -224,6 +225,16 @@ module.exports = function createBundle(config, buildOpts) {
   if (config.minify) {
     bundle.transform({global: true}, uglifyify);
   }
+
+  // Include or disable debugging checks in our code and dependencies by
+  // replacing references to `process.env.NODE_ENV`.
+  bundle.transform(envify({
+    NODE_ENV: process.env.NODE_ENV || 'development',
+  }), {
+    // Ideally packages should configure this transform in their package.json
+    // file if they need it, but not all of them do.
+    global: true,
+  });
 
   function build() {
     const output = fs.createWriteStream(bundlePath);

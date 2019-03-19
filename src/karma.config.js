@@ -3,6 +3,7 @@
 /* global __dirname */
 
 const path = require('path');
+const envify = require('loose-envify/custom');
 
 module.exports = function(config) {
   config.set({
@@ -94,6 +95,8 @@ module.exports = function(config) {
             ],
           },
         ],
+        // Enable debugging checks in libraries that use `NODE_ENV` guards.
+        [envify({ NODE_ENV: 'development' }), { global: true }],
       ],
     },
 
