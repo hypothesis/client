@@ -1,0 +1,23 @@
+<h2 class="group-list-section__heading">
+  {{ vm.heading }}
+</h2>
+<ul class="group-list-section__content">
+  <li
+    class="dropdown-menu__row dropdown-menu__row--no-border dropdown-menu__row--unpadded"
+    ng-repeat="group in vm.sectionGroups track by group.id"
+  >
+    <group-list-item
+      class="group-list-item"
+      group="group"
+      ng-if="vm.isSelectable(group.id)"
+    >
+    </group-list-item>
+
+    <group-list-item-out-of-scope
+      class="group-list-item-out-of-scope"
+      group="group"
+      ng-if="!vm.isSelectable(group.id)"
+    >
+    </group-list-item-out-of-scope>
+  </li>
+</ul>
