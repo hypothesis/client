@@ -260,6 +260,10 @@ html {
   min-width: 120px;
 }
 
+.dropdown-menu__row--no-border{
+  border: none;
+}
+
 .dropdown-menu__row--unpadded {
   padding-left: 0px;
   padding-right: 0px;
