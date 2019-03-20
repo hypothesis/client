@@ -3,6 +3,7 @@
 const angular = require('angular');
 const immutable = require('seamless-immutable');
 
+const { events } = require('../../services/analytics');
 const groupList = require('../group-list');
 const util = require('../../directive/test/util');
 
@@ -31,17 +32,6 @@ describe('groupList', function() {
     organization: groupFixtures.defaultOrganization(),
     type: 'restricted',
     isScopedToUri: true,
-  });
-
-  const restrictedOutOfScopeGroup = immutable({
-    id: 'restrictedoos',
-    links: {
-      html: 'https://hypothes.is/groups/restricto',
-    },
-    name: 'Restricted',
-    organization: groupFixtures.defaultOrganization(),
-    type: 'restricted',
-    isScopedToUri: false,
   });
 
   const publicGroup = immutable({
@@ -85,11 +75,7 @@ describe('groupList', function() {
 
     fakeAnalytics = {
       track: sinon.stub(),
-      events: {
-        GROUP_LEAVE: 'groupLeave',
-        GROUP_SWITCH: 'groupSwitch',
-        GROUP_VIEW_ACTIVITY: 'groupViewActivity',
-      },
+      events,
     };
 
     fakeServiceUrl = sinon.stub();
@@ -385,6 +371,7 @@ describe('groupList', function() {
       '_blank'
     );
   });
+
   describe('group section visibility', () => {
     [
       {
@@ -393,7 +380,7 @@ describe('groupList', function() {
         currentlyViewingGroups: [publicGroup],
         featuredGroups: [restrictedGroup],
         myGroups: [],
-        expectedSections: ['Currently Viewing', 'Featured Groups'],
+        expectedSections: ["'Currently Viewing'", "'Featured Groups'"],
       },
       {
         description:
@@ -401,14 +388,14 @@ describe('groupList', function() {
         currentlyViewingGroups: [],
         featuredGroups: [restrictedGroup],
         myGroups: [publicGroup],
-        expectedSections: ['Featured Groups', 'My Groups'],
+        expectedSections: ["'Featured Groups'", "'My Groups'"],
       },
       {
         description: 'shows My Groups section when there are my groups',
         currentlyViewingGroups: [],
         featuredGroups: [],
         myGroups: [publicGroup, privateGroup],
-        expectedSections: ['My Groups'],
+        expectedSections: ["'My Groups'"],
       },
     ].forEach(
       ({
@@ -433,75 +420,20 @@ describe('groupList', function() {
           const showGroupsMenu = element.ctrl.showGroupsMenu();
           const dropdownToggle = element.find('.dropdown-toggle');
           const arrowIcon = element.find('.h-icon-arrow-drop-down');
-          const sectionHeader = element.find('.dropdown-menu__section-heading');
-          const section = element.find('.dropdown-menu__section');
-          const dropdownOptions = element.find(
-            '.dropdown-community-groups-menu__row'
-          );
+          const groupListSection = element.find('group-list-section');
 
           assert.isTrue(showGroupsMenu);
           assert.lengthOf(dropdownToggle, 1);
           assert.lengthOf(arrowIcon, 1);
-          sectionHeader.each(function() {
-            assert.isTrue(expectedSections.includes(this.textContent));
+          assert.lengthOf(groupListSection, expectedSections.length);
+          groupListSection.each(function() {
+            assert.isTrue(
+              expectedSections.includes(this.getAttribute('heading'))
+            );
           });
-          // Plus one for the create private group section.
-          assert.lengthOf(section, expectedSections.length + 1);
-          assert.lengthOf(dropdownOptions, 3);
         });
       }
     );
-  });
-  describe('group details expanded on out of scope groups', () => {
-    it('sets the default for the given groupid to false and returns it', () => {
-      const element = createGroupList();
-
-      const expanded = element.ctrl.isGroupDetailsExpanded('groupid');
-
-      assert.isFalse(expanded);
-      assert.isFalse(element.ctrl.groupDetailsExpanded.groupid);
-    });
-
-    it('gets expanded value for the given groupid if already present', () => {
-      const element = createGroupList();
-
-      element.ctrl.groupDetailsExpanded = { groupid: true };
-      const expanded = element.ctrl.isGroupDetailsExpanded('groupid');
-
-      assert.isTrue(expanded);
-    });
-
-    it('toggles the expanded value for the given groupid', () => {
-      const element = createGroupList();
-      let fakeEvent = { stopPropagation: sinon.stub() };
-
-      element.ctrl.toggleGroupDetails(fakeEvent, 'groupid');
-      assert.isTrue(element.ctrl.groupDetailsExpanded.groupid);
-
-      element.ctrl.toggleGroupDetails(fakeEvent, 'groupid');
-      assert.isFalse(element.ctrl.groupDetailsExpanded.groupid);
-    });
-
-    it('stops the event from propogating when toggling', () => {
-      const element = createGroupList();
-      let fakeEvent = { stopPropagation: sinon.spy() };
-
-      element.ctrl.toggleGroupDetails(fakeEvent, 'groupid');
-
-      sinon.assert.called(fakeEvent.stopPropagation);
-    });
-  });
-
-  it('displays out of scope groups as non-selectable', () => {
-    fakeFeatures.flagEnabled.withArgs('community_groups').returns(true);
-    // In order to show the group drop down there must be at least two groups.
-    groups = [publicGroup, restrictedOutOfScopeGroup];
-    fakeStore.getMyGroups.returns(groups);
-
-    const element = createGroupList();
-    const notSelectable = element.find('.group-item--out-of-scope');
-
-    assert.lengthOf(notSelectable, 1);
   });
 
   describe('group menu visibility', () => {
@@ -585,14 +517,12 @@ describe('groupList', function() {
       const showGroupsMenu = element.ctrl.showGroupsMenu();
       const dropdownToggle = element.find('.dropdown-toggle');
       const arrowIcon = element.find('.h-icon-arrow-drop-down');
-      const dropdownOptions = element.find(
-        '.dropdown-community-groups-menu__row'
-      );
+      const groupListSection = element.find('.group-list-section');
 
       assert.isTrue(showGroupsMenu);
       assert.lengthOf(dropdownToggle, 1);
       assert.lengthOf(arrowIcon, 1);
-      assert.lengthOf(dropdownOptions, 3);
+      assert.lengthOf(groupListSection, 1);
     });
 
     it('is not shown when community_groups feature flag is on and there is only one group', function() {
@@ -605,14 +535,12 @@ describe('groupList', function() {
       const showGroupsMenu = element.ctrl.showGroupsMenu();
       const dropdownToggle = element.find('.dropdown-toggle');
       const arrowIcon = element.find('.h-icon-arrow-drop-down');
-      const dropdownOptions = element.find(
-        '.dropdown-community-groups-menu__row'
-      );
+      const groupListSection = element.find('.group-list-section');
 
       assert.isFalse(showGroupsMenu);
       assert.lengthOf(dropdownToggle, 0);
       assert.lengthOf(arrowIcon, 0);
-      assert.lengthOf(dropdownOptions, 0);
+      assert.lengthOf(groupListSection, 0);
     });
   });
 

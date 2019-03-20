@@ -26,9 +26,6 @@ function GroupListController(
 ) {
   this.groups = groups;
 
-  // Track which non-selectable groups have their group details expanded.
-  this.groupDetailsExpanded = {};
-
   this.createNewGroup = function() {
     $window.open(serviceUrl('groups.new'), '_blank');
   };
@@ -88,23 +85,6 @@ function GroupListController(
   this.focusGroup = function(groupId) {
     analytics.track(analytics.events.GROUP_SWITCH);
     groups.focus(groupId);
-  };
-
-  this.isGroupDetailsExpanded = function(groupId) {
-    if (!(groupId in this.groupDetailsExpanded)) {
-      this.groupDetailsExpanded[groupId] = false;
-    }
-    return this.groupDetailsExpanded[groupId];
-  };
-
-  /**
-   * Toggle the expanded setting on un-selectable groups.
-   */
-  this.toggleGroupDetails = function(event, groupId) {
-    event.stopPropagation();
-    // Call the isGroupDetailsExpanded method so that if the groupId doesn't exist,
-    // it gets added before toggling it.
-    this.groupDetailsExpanded[groupId] = !this.isGroupDetailsExpanded(groupId);
   };
 
   /**

@@ -9,7 +9,7 @@ $group-list-spacing-below: 50px;
 
   .dropdown-menu {
     width: $group-list-width;
-    max-height: 500px;  // fallback for browsers lacking support for vh/calc
+    max-height: 500px; // fallback for browsers lacking support for vh/calc
     max-height: calc(100vh - #{$top-bar-height} - #{$group-list-spacing-below});
     overflow-y: auto;
 
@@ -21,23 +21,8 @@ $group-list-spacing-below: 50px;
   }
 
   .dropdown-menu__section--no-header {
-    border-top: solid 1px rgba(0, 0, 0, 0.15);
-
     .group-details {
       font-weight: 400;
-    }
-  }
-
-  .dropdown-menu__section-heading {
-    color: $gray-light;
-    font-size: 12px;
-    line-height: 1;
-    margin: 1px 1px 0;
-    padding: 12px 10px 0;
-    text-transform: uppercase;
-
-    &:not(:first-child) {
-      border-top: solid 1px rgba(0, 0, 0, 0.15);
     }
   }
 
@@ -90,11 +75,6 @@ $group-list-spacing-below: 50px;
     }
   }
 
-  .group-item--out-of-scope {
-    background-color: $gray-lightest;
-    color: $gray-light;
-  }
-
   .group-icon-container {
     margin-right: 10px;
   }
@@ -111,13 +91,6 @@ $group-list-spacing-below: 50px;
     // left-hand side of the groups list
     padding-top: 3px;
     margin-right: 2px;
-  }
-
-  .group__icon--unavailable {
-    fill: $gray-light;
-    float: right;
-    height: 20px;
-    width: auto;
   }
 
   .group-details {
@@ -144,31 +117,6 @@ $group-list-spacing-below: 50px;
         display: block;
       }
     }
-  }
-
-  .group-details__toggle {
-    font-size: $body1-font-size;
-    font-style: italic;
-    margin: 0;
-    text-decoration: underline;
-  }
-
-  .group-details__unavailable-message {
-    font-size: $body1-font-size;
-    line-height: 1.5;
-    white-space: normal;
-    width: $group-list-width - 60px;
-  }
-
-  .group-details__actions {
-    text-align: right;
-  }
-
-  .group-details__group-page-link {
-    color: inherit;
-    font-size: $body1-font-size;
-    text-decoration: underline;
-    text-transform: uppercase;
   }
 
   .new-group-btn {
@@ -209,7 +157,7 @@ $group-list-spacing-below: 50px;
 // the drop-down list when clicked
 .group-list-label__label {
   font-size: $body2-font-size;
-  font-weight:bold;
+  font-weight: bold;
   display: inline-block;
 }
 
@@ -224,7 +172,6 @@ $group-list-spacing-below: 50px;
   white-space: nowrap;
   color: inherit;
 }
-
 
 .open {
   & > .group-list__toggle {
