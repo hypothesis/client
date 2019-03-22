@@ -10,12 +10,13 @@ RUN yum-config-manager --enable rhel-7-server-optional-rpms
 RUN yum-config-manager --enable rhel-server-rhscl-7-rpms
 
 RUN yum install -y \
-    gcc \
     bzip2 \
+    gcc \
+    make \
+    nss_wrapper \
     rh-nodejs8 \
     rh-nodejs8-npm \
     rh-nodejs8-nodejs-nodemon \
-    nss_wrapper \
  && yum clean all
 
 ARG NODE_ENV
