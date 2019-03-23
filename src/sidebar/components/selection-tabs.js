@@ -6,10 +6,11 @@ const uiConstants = require('../ui-constants');
 module.exports = {
   controllerAs: 'vm',
   //@ngInject
-  controller: function ($element, store, features, session, settings) {
+  controller: function ($element, store, features, session, settings, i18nService) {
     this.TAB_ANNOTATIONS = uiConstants.TAB_ANNOTATIONS;
     this.TAB_NOTES = uiConstants.TAB_NOTES;
     this.TAB_ORPHANS = uiConstants.TAB_ORPHANS;
+    this.tl = i18nService.tl;
 
     this.isThemeClean = settings.theme === 'clean';
 

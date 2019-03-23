@@ -7,8 +7,14 @@ const memoize = require('../util/memoize');
 const groupOrganizations = memoize(require('../util/group-organizations'));
 
 // @ngInject
-function GroupListController($window, analytics, groups, settings, serviceUrl) {
+function GroupListController($window, analytics, groups, settings, serviceUrl, i18nService) {
   this.groups = groups;
+  this.tl = i18nService.tl;
+
+  this.groupId = function() {
+    const focusedGroup = this.groups.focused();
+    return focusedGroup && focusedGroup.id.replace(/-/g, '');
+  };
 
   this.createNewGroup = function() {
     $window.open(serviceUrl('groups.new'), '_blank');

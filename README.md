@@ -1,5 +1,12 @@
+Grading
+================
+
+You need to set the WEBTRANSLATE.IT READ KEY for the captions project based on hypothesis-client as an environment variable.
+
 Hypothesis client
 =================
+
+|| 'proj_pub_MpJb4ubUp8fjmDq6cwyQBw'
 
 [![Build status](https://img.shields.io/travis/hypothesis/client/master.svg)][travis]
 [![npm version](https://img.shields.io/npm/v/hypothesis.svg)][npm]
