@@ -8080,9 +8080,9 @@ sax@>=0.6.0, sax@^1.2.4:
   integrity sha512-NqVDv9TpANUjFm0N8uM5GxL36UgKi9/atZw+x7YFnQ8ckwFGKrl4xX4yWtrey3UJm5nP1kUbnYgLopqWNSRhWw==
 
 scroll-into-view@^1.8.2:
-  version "1.9.4"
-  resolved "https://registry.yarnpkg.com/scroll-into-view/-/scroll-into-view-1.9.4.tgz#a2ae61d9832b78de0e4db8dd9f148c6ac155969d"
-  integrity sha512-5ow3pxqgK0iMj5sSReaqeKGrUtcGCInjo5BG0Ha1fqwSX+cGMaP/4vkMMf4e5CuBobO2/RhZslKgQpijstS9Gw==
+  version "1.9.5"
+  resolved "https://registry.yarnpkg.com/scroll-into-view/-/scroll-into-view-1.9.5.tgz#66d692ccd7778230509ee8967efcecdbf4b252cc"
+  integrity sha512-5WX5Jmb4bZVWSUQCEWvkmn/VWw4wMT0LkHb3RIC+VUcntn+92cHI87LJTyNbYb/V7UPMlAVDx95B760M6aZdRA==
   dependencies:
     opencollective "^1.0.3"
     opencollective-postinstall "^2.0.1"
