@@ -31,7 +31,7 @@
     "codecov": "^3.1.0",
     "coffeeify": "^2.1.0",
     "commander": "^2.9.0",
-    "core-js": "^2.5.7",
+    "core-js": "^3.0.0",
     "cross-env": "^5.1.4",
     "custom-event": "^1.0.1",
     "diff": "^4.0.1",
