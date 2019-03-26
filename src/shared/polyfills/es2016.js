@@ -1,3 +1,3 @@
 'use strict';
 
-require('core-js/fn/array/includes');
+require('core-js/features/array/includes');

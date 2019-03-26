@@ -1,14 +1,14 @@
 'use strict';
 
 // ES2015
-require('core-js/es6/promise');
-require('core-js/es6/map');
-require('core-js/es6/set');
-require('core-js/es6/symbol');
-require('core-js/fn/array/fill');
-require('core-js/fn/array/find');
-require('core-js/fn/array/find-index');
-require('core-js/fn/array/from');
-require('core-js/fn/object/assign');
-require('core-js/fn/string/ends-with');
-require('core-js/fn/string/starts-with');
+require('core-js/features/promise');
+require('core-js/features/map');
+require('core-js/features/set');
+require('core-js/features/symbol');
+require('core-js/features/array/fill');
+require('core-js/features/array/find');
+require('core-js/features/array/find-index');
+require('core-js/features/array/from');
+require('core-js/features/object/assign');
+require('core-js/features/string/ends-with');
+require('core-js/features/string/starts-with');
