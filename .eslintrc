@@ -1,5 +1,8 @@
 {
-  "extends": "hypothesis",
+  "extends": [
+    "hypothesis",
+    "plugin:react/recommended"
+  ],
   "globals": {
     "Set": false
   },
@@ -9,9 +12,19 @@
     "indent": "off"
   },
   "parserOptions": {
-    "ecmaVersion": 2018
+    "ecmaVersion": 2018,
+    "ecmaFeatures": {
+      "jsx": true
+    }
   },
   "plugins": [
-    "mocha"
+    "mocha",
+    "react"
   ],
+  "settings": {
+    "react": {
+      "pragma": "createElement",
+      "version": "16.8"
+    }
+  }
 }
