@@ -8,16 +8,24 @@
 </span>
 <div ng-if="vm.newStyle"
      class="pull-right login-control-menu"
-     dropdown
      keyboard-nav>
   <a role="button"
      class="top-bar__btn"
-     data-toggle="dropdown"
-     dropdown-toggle
      title="{{vm.auth.username}}">
+     <!-- Replaced by tags above. not need dropdown toggle.
+     <div ng-if="vm.newStyle"
+          class="pull-right login-control-menu"
+          dropdown
+          keyboard-nav>
+       <a role="button"
+          class="top-bar__btn"
+          data-toggle="dropdown"
+          dropdown-toggle
+          title="{{vm.auth.username}}"> -->
     <i class="h-icon-account" ng-if="vm.auth.status === 'logged-in'"></i><!--
-    !--><i class="h-icon-arrow-drop-down top-bar__dropdown-arrow"></i>
+    <i class="h-icon-arrow-drop-down top-bar__dropdown-arrow"></i>!-->
   </a>
+  <!-- Commented menu not needed in our base.
   <ul class="dropdown-menu pull-right" role="menu">
     <li class="dropdown-menu__row" ng-if="vm.auth.status === 'logged-in'">
       <span ng-if="!vm.shouldEnableProfileButton()"
@@ -39,7 +47,7 @@
       <a class="dropdown-menu__link dropdown-menu__link--subtle js-log-out-btn"
          href="" ng-click="vm.onLogout()">Log out</a>
     </li>
-  </ul>
+  </ul> -->
 </div>
 
 <!-- Old controls -->

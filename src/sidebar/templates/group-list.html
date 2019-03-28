@@ -1,4 +1,4 @@
-<div class="pull-right"
+<div
      dropdown
      keyboard-nav>
   <!-- Show a drop down menu if showGroupsMenu is true. -->
@@ -9,20 +9,28 @@
         tabindex="0"
         ng-if="vm.showGroupsMenu()">
     <img class="group-list-label__icon group-list-label__icon--organization"
+         src="https://d133zon9jtcf53.cloudfront.net/grading-frontend/favicon.png"
+         alt="{{ vm.orgName(vm.groups.focused().id)}}">
+    <!-- Replaced by the tag above.
+    <img class="group-list-label__icon group-list-label__icon--organization"
          ng-src="{{ vm.focusedIcon() }}"
          alt="{{ vm.orgName(vm.groups.focused().id)}}"
-         ng-if="vm.focusedIcon()">
+         ng-if="vm.focusedIcon()"> -->
          <i class="group-list-label__icon h-icon-{{ vm.focusedIconClass() }}"
              ng-if="!vm.focusedIcon()"></i><!-- nospace
-    !--><span class="group-list-label__label"><a class="group-list-label__toggle">{{vm.groups.focused().name}}</a><!-- nospace
+    !--><span class="group-list-label__label" title="{{vm.groups.focused().name}}"><a class="group-list-label__toggle">{{vm.groups.focused().name}}</a><!-- nospace
       !--><i class="h-icon-arrow-drop-down"></i></span>
   </div>
   <!-- Do not show a drop down menu if showGroupsMenu is false. -->
   <div ng-if="!vm.showGroupsMenu()">
     <img class="group-list-label__icon group-list-label__icon--organization"
+         src="https://d133zon9jtcf53.cloudfront.net/grading-frontend/favicon.png"
+         alt="{{ vm.orgName(vm.groups.focused().id)}}">
+    <!-- Replaced by the tag above.
+    <img class="group-list-label__icon group-list-label__icon--organization"
          ng-src="{{ vm.focusedIcon() }}"
          alt="{{ vm.orgName(vm.groups.focused().id)}}"
-         ng-if="vm.focusedIcon()">
+         ng-if="vm.focusedIcon()"> -->
          <i class="group-list-label__icon h-icon-{{ vm.focusedIconClass() }}"
              ng-if="!vm.focusedIcon()"></i><!-- nospace
     !--><span class="group-list-label__label">{{vm.groups.focused().name}}</span>
@@ -38,8 +46,13 @@
         <div class="group-menu-icon-container">
           <img class="group-list-label__icon group-list-label__icon--organization"
             alt="{{ vm.orgName(group.id) }}"
+            src="https://d133zon9jtcf53.cloudfront.net/grading-frontend/favicon.png">
+          <!-- Replaced by the tag above.
+          <img class="group-list-label__icon group-list-label__icon--organization"
+            alt="{{ vm.orgName(group.id) }}"
             ng-src="{{ group.logo }}"
-            ng-if="group.logo">
+            ng-if="group.logo"> -->
+
         </div>
         <!-- the group name and share link !-->
         <div class="group-details">

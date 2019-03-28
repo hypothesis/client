@@ -202,29 +202,6 @@ function AnnotationController(
 
   /**
     * @ngdoc method
-    * @name annotation.AnnotationController#flag
-    * @description Flag the annotation.
-    */
-  this.flag = function() {
-    if (!session.state.userid) {
-      flash.error(
-        'You must be logged in to report an annotation to the moderators.',
-        'Login to flag annotations'
-      );
-      return;
-    }
-
-    const onRejected = function(err) {
-      flash.error(err.message, 'Flagging annotation failed');
-    };
-    annotationMapper.flagAnnotation(self.annotation).then(function(){
-      analytics.track(analytics.events.ANNOTATION_FLAGGED);
-      store.updateFlagStatus(self.annotation.id, true);
-    }, onRejected);
-  };
-
-  /**
-    * @ngdoc method
     * @name annotation.AnnotationController#delete
     * @description Deletes the annotation.
     */
@@ -491,11 +468,6 @@ function AnnotationController(
 
   this.isHiddenByModerator = function () {
     return self.annotation.hidden;
-  };
-
-  this.canFlag = function () {
-    // Users can flag any annotations except their own.
-    return session.state.userid !== self.annotation.user;
   };
 
   this.isFlagged = function() {
