@@ -7,15 +7,16 @@ function useExpressionBinding(propName) {
 }
 
 /**
- * Base controller class for React component wrappers.
+ * Controller for an Angular component that wraps a React component.
  *
- * This is responsible for rendering the React component into the DOM element
- * created by the Angular wrapper component.
+ * This is responsible for taking the inputs to the Angular component and
+ * rendering the React component in the DOM node where the Angular component
+ * has been created.
  */
 class ReactController {
   constructor($element, $scope, injectedProps, type) {
     /** The DOM element where the React component should be rendered. */
-    this.element = $element[0];
+    this.domElement = $element[0];
 
     /** The React component function or class. */
     this.type = type;
@@ -54,7 +55,7 @@ class ReactController {
       }
       this.props[propName] = this[propName];
     });
-    this.render();
+    this.updateReactComponent();
   }
 
   $onChanges(changes) {
@@ -65,19 +66,18 @@ class ReactController {
         this.props[propName] = changes[propName].currentValue;
       }
     });
-    this.render();
+    this.updateReactComponent();
   }
 
   $onDestroy() {
     // Unmount the rendered React component. Although Angular will remove the
     // element itself, this is necessary to run any cleanup/unmount lifecycle
     // hooks in the React component tree.
-    render(createElement(null), this.element);
+    render(createElement(null), this.domElement);
   }
 
-  render() {
-    // Create or update the React component.
-    render(createElement(this.type, this.props), this.element);
+  updateReactComponent() {
+    render(createElement(this.type, this.props), this.domElement);
   }
 }
 
