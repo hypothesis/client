@@ -151,6 +151,12 @@ function startAngularApp(config) {
     .component('dropdownMenuBtn', require('./components/dropdown-menu-btn'))
     .component('excerpt', require('./components/excerpt'))
     .component('groupList', require('./components/group-list'))
+    .component('groupListItem', require('./components/group-list-item'))
+    .component(
+      'groupListItemOutOfScope',
+      require('./components/group-list-item-out-of-scope')
+    )
+    .component('groupListSection', require('./components/group-list-section'))
     .component('helpLink', require('./components/help-link'))
     .component('helpPanel', require('./components/help-panel'))
     .component('loggedoutMessage', require('./components/loggedout-message'))
