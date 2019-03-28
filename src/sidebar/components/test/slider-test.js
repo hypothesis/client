@@ -57,8 +57,8 @@ describe('Slider', () => {
     wrapper.setProps({ visible: false });
 
     setTimeout(() => {
-      const { height } = wrapper.getDOMNode().getBoundingClientRect();
-      assert.equal(height, 0);
+      const containerStyle = wrapper.getDOMNode().style;
+      assert.equal(containerStyle.height, '0px');
       done();
     }, 1);
   });

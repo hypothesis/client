@@ -208,7 +208,7 @@ describe('GroupListItem', () => {
     const onExpand = sinon.stub();
     const wrapper = createGroupListItem(fakeGroup, { onExpand });
     const toggleSubmenu = () => {
-      const dummyEvent = new Event();
+      const dummyEvent = new Event('dummy');
       act(() => {
         wrapper
           .find('MenuItem')
