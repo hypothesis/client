@@ -4,6 +4,15 @@ $group-list-width: 270px;
 $group-list-spacing-below: 50px;
 
 .group-list {
+  flex-basis: 90%;
+  min-width: 0;
+  .dropdown-toggle {
+    display: flex;
+    align-items: center;
+    &:focus {
+        outline: none;
+    }
+  }
   .dropdown {
     white-space: nowrap;
   }
@@ -85,7 +94,7 @@ $group-list-spacing-below: 50px;
 .group-list-label__icon {
   color: $color-gray;
   display: inline-block;
-  margin-right: 4px;
+  margin-right: 0.5em;
   position: relative;
   vertical-align: baseline;
 
@@ -103,6 +112,8 @@ $group-list-spacing-below: 50px;
 // the label showing the currently selected group which opens
 // the drop-down list when clicked
 .group-list-label__label {
+  overflow: hidden;
+  text-overflow: ellipsis;
   font-size: $body2-font-size;
   font-weight:bold;
   display: inline-block;
@@ -116,6 +127,6 @@ $group-list-spacing-below: 50px;
 // the name of a group in the groups drop-down list
 // and 'Post to <Group>' button for saving annotations
 .group-name-link {
-  white-space: nowrap;
+  white-space: normal;
   color: inherit;
 }
