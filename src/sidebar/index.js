@@ -38,6 +38,8 @@ require('autofill-event');
 // Enable debugging checks for Preact.
 require('preact/debug');
 
+const wrapReactComponent = require('./util/wrap-react-component');
+
 // Setup Angular integration for Raven
 if (appConfig.raven) {
   raven.angularModule(angular);
@@ -157,7 +159,7 @@ function startAngularApp(config) {
     .component('groupListItem', require('./components/group-list-item'))
     .component(
       'groupListItemOutOfScope',
-      require('./components/group-list-item-out-of-scope')
+      wrapReactComponent(require('./components/group-list-item-out-of-scope'))
     )
     .component('groupListSection', require('./components/group-list-section'))
     .component('helpLink', require('./components/help-link'))
