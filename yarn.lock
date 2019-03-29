@@ -1533,6 +1533,11 @@ babel-plugin-transform-async-to-generator@^6.22.0:
     babel-plugin-syntax-async-functions "^6.8.0"
     babel-runtime "^6.22.0"
 
+babel-plugin-transform-async-to-promises@^0.8.6:
+  version "0.8.6"
+  resolved "https://registry.yarnpkg.com/babel-plugin-transform-async-to-promises/-/babel-plugin-transform-async-to-promises-0.8.6.tgz#da21f782ee9847ccd47e993de3914193b9d2b77c"
+  integrity sha512-bKgtoXHueZZQ+NjWaUj3juhtIU/7aqVUkhUnAWWBgnPVL4oAgKP0AOzz5kYvWzD+GB9ZIA6MKHhqWe0K3rSdqA==
+
 babel-plugin-transform-es2015-arrow-functions@^6.22.0:
   version "6.22.0"
   resolved "https://registry.yarnpkg.com/babel-plugin-transform-es2015-arrow-functions/-/babel-plugin-transform-es2015-arrow-functions-6.22.0.tgz#452692cb711d5f79dc7f85e440ce41b9f244d221"

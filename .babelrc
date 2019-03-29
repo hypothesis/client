@@ -9,6 +9,9 @@
       }
     }]
   ],
-  "plugins": ["angularjs-annotate"],
+  "plugins": [
+    "angularjs-annotate",
+    "transform-async-to-promises"
+  ],
   "ignore": ["**/vendor/*"]
 }

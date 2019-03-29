@@ -280,15 +280,14 @@ function auth(
    *
    * This revokes and then forgets any OAuth credentials that the user has.
    */
-  function logout() {
-    return Promise.all([tokenInfoPromise, oauthClient()])
-      .then(([token, client]) => {
-        return client.revokeToken(token.accessToken);
-      })
-      .then(() => {
-        tokenInfoPromise = Promise.resolve(null);
-        localStorage.removeItem(storageKey());
-      });
+  async function logout() {
+    const [token, client] = await Promise.all([
+      tokenInfoPromise,
+      oauthClient(),
+    ]);
+    await client.revokeToken(token.accessToken);
+    tokenInfoPromise = Promise.resolve(null);
+    localStorage.removeItem(storageKey());
   }
 
   listenForTokenStorageEvents();
