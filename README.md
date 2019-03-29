@@ -1,3 +1,8 @@
+Grading
+================
+
+You need to set the webtranslate.it read key for the captions project based on hypothesis-client as an environment variable should be named `WEBTRANSLATEITREADKEY`.
+
 Hypothesis client
 =================
 

@@ -18,7 +18,7 @@
          ng-if="vm.focusedIcon()"> -->
          <i class="group-list-label__icon h-icon-{{ vm.focusedIconClass() }}"
              ng-if="!vm.focusedIcon()"></i><!-- nospace
-    !--><span class="group-list-label__label" title="{{vm.groups.focused().name}}"><a class="group-list-label__toggle">{{vm.groups.focused().name}}</a><!-- nospace
+    !--><span class="group-list-label__label" title="{{vm.tl('sidePanel.channels.'+vm.groupId()+'.name')}}"><a class="group-list-label__toggle">{{vm.tl('sidePanel.channels.'+vm.groupId()+'.name')}}</a><!-- nospace
       !--><i class="h-icon-arrow-drop-down"></i></span>
   </div>
   <!-- Do not show a drop down menu if showGroupsMenu is false. -->

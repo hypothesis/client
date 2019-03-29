@@ -100,6 +100,11 @@ function setupHttp($http, streamer) {
   $http.defaults.headers.common['X-Client-Id'] = streamer.clientId;
 }
 
+// @ngInject
+function setupI18n(i18nService) {
+  i18nService.initI18n();
+}
+
 function startAngularApp(config) {
   angular.module('h', [
     // Angular addons which export the Angular module name
@@ -172,6 +177,7 @@ function startAngularApp(config) {
   .service('flash', require('./services/flash'))
   .service('frameSync', require('./services/frame-sync').default)
   .service('groups', require('./services/groups'))
+  .service('i18nService', require('./services/i18nService'))
   .service('localStorage', require('./services/local-storage'))
   .service('permissions', require('./services/permissions'))
   .service('rootThread', require('./services/root-thread'))
@@ -205,6 +211,7 @@ function startAngularApp(config) {
   .config(configureToastr)
 
   .run(setupHttp)
+  .run(setupI18n)
   .run(crossOriginRPC.server.start);
 
   if (config.liveReloadServer) {
