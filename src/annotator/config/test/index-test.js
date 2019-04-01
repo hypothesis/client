@@ -27,17 +27,17 @@ describe('annotator.config.index', function() {
     assert.calledWithExactly(fakeSettingsFrom, 'WINDOW');
   });
 
-  ['sidebarAppUrl', 'query', 'annotations', 'showHighlights'].forEach(function(
-    settingName
-  ) {
-    it('returns the ' + settingName + ' setting', function() {
-      fakeSettingsFrom()[settingName] = 'SETTING_VALUE';
+  ['sidebarAppUrl', 'query', 'annotations', 'group', 'showHighlights'].forEach(
+    settingName => {
+      it('returns the ' + settingName + ' setting', () => {
+        fakeSettingsFrom()[settingName] = 'SETTING_VALUE';
 
-      const config = configFrom('WINDOW');
+        const config = configFrom('WINDOW');
 
-      assert.equal(config[settingName], 'SETTING_VALUE');
-    });
-  });
+        assert.equal(config[settingName], 'SETTING_VALUE');
+      });
+    }
+  );
 
   context("when there's no application/annotator+html <link>", function() {
     beforeEach('remove the application/annotator+html <link>', function() {

@@ -23,6 +23,7 @@ function configFrom(window_) {
     enableExperimentalNewNoteButton: settings.hostPageSetting(
       'enableExperimentalNewNoteButton'
     ),
+    group: settings.group,
     theme: settings.hostPageSetting('theme'),
     usernameUrl: settings.hostPageSetting('usernameUrl'),
     onLayoutChange: settings.hostPageSetting('onLayoutChange'),
