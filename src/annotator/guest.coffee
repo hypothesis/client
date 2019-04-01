@@ -119,10 +119,7 @@ module.exports = class Guest extends Delegator
 
   # Get the document info
   getDocumentInfo: ->
-    if @plugins.PDF?
-      metadataPromise = Promise.resolve(@plugins.PDF.getMetadata())
-      uriPromise = Promise.resolve(@plugins.PDF.uri())
-    else if @plugins.Document?
+    if @plugins.Document?
       uriPromise = Promise.resolve(@plugins.Document.uri())
       metadataPromise = Promise.resolve(@plugins.Document.metadata)
     else
