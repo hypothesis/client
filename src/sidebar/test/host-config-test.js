@@ -14,6 +14,7 @@ describe('hostPageConfig', function() {
   it('parses config from location string and returns whitelisted params', function() {
     const window_ = fakeWindow({
       annotations: '1234',
+      group: 'abc12',
       appType: 'bookmarklet',
       openSidebar: true,
       requestConfigFromFrame: 'https://embedder.com',
@@ -27,6 +28,7 @@ describe('hostPageConfig', function() {
 
     assert.deepEqual(hostPageConfig(window_), {
       annotations: '1234',
+      group: 'abc12',
       appType: 'bookmarklet',
       openSidebar: true,
       requestConfigFromFrame: 'https://embedder.com',
