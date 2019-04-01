@@ -31,26 +31,49 @@ describe('groupListSection', () => {
       {
         description: 'always returns true if disableOosGroupSelection is false',
         fakeDisableOosGroupSelection: false,
+        scopesEnforced: true,
         expectedIsSelectable: [true, true],
       },
       {
         description:
           'always returns true if disableOosGroupSelection is undefined',
         fakeDisableOosGroupSelection: undefined,
+        scopesEnforced: true,
         expectedIsSelectable: [true, true],
       },
       {
         description:
           'returns false if disableOosGroupSelection is true and group is out of scope',
         fakeDisableOosGroupSelection: true,
+        scopesEnforced: true,
         expectedIsSelectable: [true, false],
       },
+      {
+        description:
+          'returns true if disableOosGroupSelection is true and group is out of scope but not enforced',
+        fakeDisableOosGroupSelection: true,
+        scopesEnforced: false,
+        expectedIsSelectable: [true, true],
+      },
     ].forEach(
-      ({ description, fakeDisableOosGroupSelection, expectedIsSelectable }) => {
+      ({
+        description,
+        fakeDisableOosGroupSelection,
+        scopesEnforced,
+        expectedIsSelectable,
+      }) => {
         it(description, () => {
           const fakeSectionGroups = [
-            { isScopedToUri: true, id: 0 },
-            { isScopedToUri: false, id: 1 },
+            {
+              isScopedToUri: true,
+              scopes: { enforced: scopesEnforced },
+              id: 0,
+            },
+            {
+              isScopedToUri: false,
+              scopes: { enforced: scopesEnforced },
+              id: 1,
+            },
           ];
 
           const element = createGroupListSection(
