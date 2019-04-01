@@ -29,6 +29,11 @@
           "method": "DELETE",
           "desc": "Remove the current user from a group."
         }
+      },
+      "read": {
+        "url": "https://example.com/api/groups/:id",
+        "method": "GET",
+        "desc": "Fetch a group."
       }
     },
     "links": {
