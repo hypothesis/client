@@ -9,7 +9,9 @@
   "rules": {
     "mocha/no-exclusive-tests": "error",
     "no-var": "error",
-    "indent": "off"
+    "indent": "off",
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "error"
   },
   "parserOptions": {
     "ecmaVersion": 2018,
@@ -19,7 +21,8 @@
   },
   "plugins": [
     "mocha",
-    "react"
+    "react",
+    "react-hooks"
   ],
   "settings": {
     "react": {
