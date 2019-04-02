@@ -21,6 +21,7 @@
   total-notes="vm.totalNotes">
 </search-status-bar>
 
+<!-- Display error message if direct-linked annotation fetch failed. -->
 <sidebar-content-error
   class="sidebar-content-error"
   logged-out-error-message="'This annotation is not available.'"
@@ -31,6 +32,17 @@
 >
 </sidebar-content-error>
 
+<!-- Display error message if direct-linked group fetch failed. -->
+<sidebar-content-error
+  class="sidebar-content-error"
+  logged-out-error-message="'This group is not available.'"
+  logged-in-error-message="'You either do not have permission to view this group, the group does not exist, or the group is not visible at this URL.'"
+  on-login-request="vm.onLogin()"
+  is-logged-in="vm.auth.status === 'logged-in'"
+  ng-if="vm.selectedGroupUnavailable()"
+>
+</sidebar-content-error>
+
 <thread-list
   on-change-collapsed="vm.setCollapsed(id, collapsed)"
   on-clear-selection="vm.clearSelection()"
@@ -38,6 +50,7 @@
   on-force-visible="vm.forceVisible(thread)"
   on-select="vm.scrollTo(annotation)"
   show-document-info="false"
+  ng-if="!vm.selectedGroupUnavailable()"
   thread="vm.rootThread">
 </thread-list>
 

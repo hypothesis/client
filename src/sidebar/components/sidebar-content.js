@@ -49,6 +49,8 @@ function SidebarContentController(
   streamFilter
 ) {
   const self = this;
+  this.directLinkedGroupFetchFailed =
+    !!settings.group && settings.group !== store.focusedGroup().id;
 
   function thread() {
     return rootThread.thread(store.getState());
@@ -298,11 +300,18 @@ function SidebarContentController(
   this.scrollTo = scrollToAnnotation;
 
   this.selectedAnnotationCount = function() {
+    if (this.directLinkedGroupFetchFailed) {
+      return 1;
+    }
     const selection = store.getState().selectedAnnotationMap;
     if (!selection) {
       return 0;
     }
     return Object.keys(selection).length;
+  };
+
+  this.selectedGroupUnavailable = function() {
+    return !this.isLoading() && this.directLinkedGroupFetchFailed;
   };
 
   this.selectedAnnotationUnavailable = function() {
@@ -367,6 +376,8 @@ function SidebarContentController(
 
     store.clearSelectedAnnotations();
     store.selectTab(selectedTab);
+    // Clear direct-linked group fetch failed state.
+    this.directLinkedGroupFetchFailed = false;
   };
 }
 
