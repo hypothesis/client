@@ -184,7 +184,7 @@ function startAngularApp(config) {
     .component('sortDropdown', require('./components/sort-dropdown'))
     .component('spinner', require('./components/spinner'))
     .component('streamContent', require('./components/stream-content'))
-    .component('svgIcon', require('./components/svg-icon'))
+    .component('svgIcon', wrapReactComponent(require('./components/svg-icon')))
     .component('tagEditor', require('./components/tag-editor'))
     .component('threadList', require('./components/thread-list'))
     .component('timestamp', require('./components/timestamp'))
