@@ -155,7 +155,12 @@ describe('annotation', function() {
         .module('h', [])
         .component('annotation', annotationComponent())
         .component('annotationActionButton', {
-          bindings: require('../annotation-action-button').bindings,
+          bindings: {
+            icon: '<',
+            isDisabled: '<',
+            label: '<',
+            onClick: '&',
+          },
         })
         .component('markdown', {
           bindings: require('../markdown').bindings,
