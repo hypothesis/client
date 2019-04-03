@@ -50,7 +50,6 @@ describe('groups', function() {
   let fakeLocalStorage;
   let fakeRootScope;
   let fakeServiceUrl;
-  let sandbox;
 
   beforeEach(function() {
     fakeAuth = {
@@ -59,7 +58,6 @@ describe('groups', function() {
     fakeFeatures = {
       flagEnabled: sinon.stub().returns(false),
     };
-    sandbox = sinon.sandbox.create();
 
     fakeStore = fakeReduxStore(
       {
@@ -92,8 +90,8 @@ describe('groups', function() {
     fakeSession = sessionWithThreeGroups();
     fakeIsSidebar = true;
     fakeLocalStorage = {
-      getItem: sandbox.stub(),
-      setItem: sandbox.stub(),
+      getItem: sinon.stub(),
+      setItem: sinon.stub(),
     };
     fakeRootScope = {
       eventCallbacks: {},
@@ -108,7 +106,7 @@ describe('groups', function() {
         }
       },
 
-      $broadcast: sandbox.stub(),
+      $broadcast: sinon.stub(),
     };
     fakeApi = {
       annotation: {
@@ -117,24 +115,21 @@ describe('groups', function() {
 
       group: {
         member: {
-          delete: sandbox.stub().returns(Promise.resolve()),
+          delete: sinon.stub().returns(Promise.resolve()),
         },
+        read: sinon.stub().returns(Promise.resolve()),
       },
       groups: {
-        list: sandbox.stub().returns(dummyGroups),
+        list: sinon.stub().returns(dummyGroups),
       },
       profile: {
         groups: {
-          read: sandbox.stub().returns(Promise.resolve([dummyGroups[0]])),
+          read: sinon.stub().returns(Promise.resolve([dummyGroups[0]])),
         },
       },
     };
-    fakeServiceUrl = sandbox.stub();
+    fakeServiceUrl = sinon.stub();
     fakeSettings = {};
-  });
-
-  afterEach(function() {
-    sandbox.restore();
   });
 
   function service() {
