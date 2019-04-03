@@ -77,17 +77,19 @@ function GroupListItemOutOfScope({ analytics, group }) {
               This group has been restricted to selected URLs by its
               administrators.
             </p>
-            <p className="group-list-item-out-of-scope__details-actions">
-              <a
-                className="button button--text group-list-item-out-of-scope__details-group-page-link"
-                href={group.links.html}
-                target="_blank"
-                onClick={trackViewActivity}
-                rel="noopener noreferrer"
-              >
-                Go to group page
-              </a>
-            </p>
+            {group.links.html && (
+              <p className="group-list-item-out-of-scope__details-actions">
+                <a
+                  className="button button--text group-list-item-out-of-scope__details-group-page-link"
+                  href={group.links.html}
+                  target="_blank"
+                  onClick={trackViewActivity}
+                  rel="noopener noreferrer"
+                >
+                  Go to group page
+                </a>
+              </p>
+            )}
           </Fragment>
         )}
       </div>

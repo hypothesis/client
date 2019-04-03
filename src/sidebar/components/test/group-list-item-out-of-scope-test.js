@@ -73,6 +73,15 @@ describe('GroupListItemOutOfScope', () => {
     );
   });
 
+  it('does not show "Go to group page" link if the group has no HTML link', () => {
+    const group = { ...fakeGroup, links: {} };
+    const wrapper = createGroupListItemOutOfScope(group);
+    const link = wrapper
+      .find('a')
+      .filterWhere(link => link.text() === 'Go to group page');
+    assert.isFalse(link.exists());
+  });
+
   it('sets alt text of logo', () => {
     fakeGroupListItemCommon.orgName
       .withArgs(fakeGroup)
