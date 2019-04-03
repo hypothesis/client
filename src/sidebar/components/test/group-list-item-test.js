@@ -1,15 +1,16 @@
 'use strict';
 
-const angular = require('angular');
+const { createElement } = require('preact');
+const { mount } = require('enzyme');
 const proxyquire = require('proxyquire');
-const util = require('../../directive/test/util');
 
 const { events } = require('../../services/analytics');
 
-describe('groupListItem', () => {
+describe('GroupListItem', () => {
   let fakeAnalytics;
   let fakeStore;
   let fakeGroupListItemCommon;
+  let GroupListItem;
 
   before(() => {
     fakeGroupListItemCommon = {
@@ -17,13 +18,10 @@ describe('groupListItem', () => {
       trackViewGroupActivity: sinon.stub(),
     };
 
-    // Return groupListItem with groupListItemCommon stubbed out.
-    const groupListItem = proxyquire('../group-list-item', {
+    GroupListItem = proxyquire('../group-list-item', {
       '../util/group-list-item-common': fakeGroupListItemCommon,
       '@noCallThru': true,
     });
-
-    angular.module('app', []).component('groupListItem', groupListItem);
   });
 
   beforeEach(() => {
@@ -36,64 +34,54 @@ describe('groupListItem', () => {
       track: sinon.stub(),
       events,
     };
-
-    angular.mock.module('app', {
-      analytics: fakeAnalytics,
-      store: fakeStore,
-    });
   });
 
   const createGroupListItem = fakeGroup => {
-    return util.createDirective(document, 'groupListItem', {
-      group: fakeGroup,
-    });
+    return mount(
+      <GroupListItem
+        group={fakeGroup}
+        analytics={fakeAnalytics}
+        store={fakeStore}
+      />
+    );
   };
 
   it('changes the focused group when group is clicked', () => {
     const fakeGroup = { id: 'groupid' };
 
-    const element = createGroupListItem(fakeGroup);
-    const group = element.find('.group-list-item__item');
-
-    group[0].click();
+    const wrapper = createGroupListItem(fakeGroup);
+    wrapper.find('.group-list-item__item').simulate('click');
 
     assert.calledWith(fakeStore.focusGroup, fakeGroup.id);
     assert.calledWith(fakeAnalytics.track, fakeAnalytics.events.GROUP_SWITCH);
   });
 
-  it('calls groupListItemCommon.trackViewGroupActivity when trackViewGroupActivity is called', () => {
-    const fakeGroup = { id: 'groupid' };
-
-    const element = createGroupListItem(fakeGroup);
-    element.ctrl.trackViewGroupActivity();
-
-    assert.calledWith(
-      fakeGroupListItemCommon.trackViewGroupActivity,
-      fakeAnalytics
-    );
-  });
-
-  it('returns groupListItemCommon.orgName when orgName is called', () => {
-    const fakeGroup = { id: 'groupid', organization: { name: 'org' } };
+  it('sets alt text for organization logo', () => {
+    const fakeGroup = {
+      id: 'groupid',
+      // Dummy scheme to avoid actually trying to load image.
+      logo: 'dummy://hypothes.is/logo.svg',
+      organization: { name: 'org' },
+    };
     fakeGroupListItemCommon.orgName
       .withArgs(fakeGroup)
       .returns(fakeGroup.organization.name);
 
-    const element = createGroupListItem(fakeGroup);
-    const orgName = element.ctrl.orgName();
+    const wrapper = createGroupListItem(fakeGroup);
+    const altText = wrapper.find('img').props().alt;
 
-    assert.equal(orgName, fakeGroup.organization.name);
+    assert.equal(altText, fakeGroup.organization.name);
   });
 
-  describe('isSelected', () => {
+  describe('selected state', () => {
     [
       {
-        description: 'returns true if group is the focused group',
+        description: 'is selected if group is the focused group',
         focusedGroupId: 'groupid',
         expectedIsSelected: true,
       },
       {
-        description: 'returns false if group is not the focused group',
+        description: 'is not selected if group is not the focused group',
         focusedGroupId: 'other',
         expectedIsSelected: false,
       },
@@ -102,9 +90,12 @@ describe('groupListItem', () => {
         fakeStore.focusedGroupId.returns(focusedGroupId);
         const fakeGroup = { id: 'groupid' };
 
-        const element = createGroupListItem(fakeGroup);
+        const wrapper = createGroupListItem(fakeGroup);
 
-        assert.equal(element.ctrl.isSelected(), expectedIsSelected);
+        assert.equal(
+          wrapper.find('.group-list-item__item').hasClass('is-selected'),
+          expectedIsSelected
+        );
       });
     });
   });

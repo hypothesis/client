@@ -30,6 +30,7 @@ document.body.setAttribute('ng-csp', '');
 disableOpenerForExternalLinks(document.body);
 
 const angular = require('angular');
+const wrapReactComponent = require('./util/wrap-react-component');
 
 // autofill-event relies on the existence of window.angular so
 // it must be require'd after angular is first require'd
@@ -156,7 +157,10 @@ function startAngularApp(config) {
     .component('dropdownMenuBtn', require('./components/dropdown-menu-btn'))
     .component('excerpt', require('./components/excerpt'))
     .component('groupList', require('./components/group-list'))
-    .component('groupListItem', require('./components/group-list-item'))
+    .component(
+      'groupListItem',
+      wrapReactComponent(require('./components/group-list-item'))
+    )
     .component(
       'groupListItemOutOfScope',
       wrapReactComponent(require('./components/group-list-item-out-of-scope'))
