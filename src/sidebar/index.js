@@ -30,7 +30,6 @@ document.body.setAttribute('ng-csp', '');
 disableOpenerForExternalLinks(document.body);
 
 const angular = require('angular');
-const wrapReactComponent = require('./util/wrap-react-component');
 
 // autofill-event relies on the existence of window.angular so
 // it must be require'd after angular is first require'd
