@@ -10,6 +10,19 @@ const {
   trackViewGroupActivity,
 } = require('../util/group-list-item-common');
 
+const outOfScopeIcon = (
+  <svg
+    className="svg-icon group-list-item-out-of-scope__icon--unavailable"
+    xmlns="http://www.w3.org/2000/svg"
+    width="100%"
+    height="100%"
+    viewBox="0 0 24 24"
+  >
+    <path fill="none" d="M0 0h24v24H0V0z" />
+    <path d="M11 15h2v2h-2zm0-8h2v6h-2zm.99-5C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z" />
+  </svg>
+);
+
 function GroupListItemOutOfScope({ analytics, group }) {
   const [isExpanded, setExpanded] = useState(false);
 
@@ -47,22 +60,13 @@ function GroupListItemOutOfScope({ analytics, group }) {
           expanded: isExpanded,
         })}
       >
-        <svg
-          className="svg-icon group-list-item-out-of-scope__icon--unavailable"
-          xmlns="http://www.w3.org/2000/svg"
-          width="100%"
-          height="100%"
-          viewBox="0 0 24 24"
-        >
-          <path fill="none" d="M0 0h24v24H0V0z" />
-          <path d="M11 15h2v2h-2zm0-8h2v6h-2zm.99-5C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z" />
-        </svg>
+        {outOfScopeIcon}
         <a
           className="group-list-item__name-link"
           href=""
-          title="Group not annotatable on this domain."
+          title="This URL cannot be annotated in this group."
         >
-          {group.name}{' '}
+          {group.name}
         </a>
         <br />
         {/* explanation of why group is not available */}
