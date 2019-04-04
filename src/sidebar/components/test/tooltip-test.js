@@ -6,6 +6,8 @@ const propTypes = require('prop-types');
 
 const { useTooltip } = require('../tooltip');
 
+const { runUntilIdle } = require('./render-utils');
+
 describe('useTooltip', () => {
   function Button({ hidden = false }) {
     const tooltip = useTooltip();
@@ -48,7 +50,7 @@ describe('useTooltip', () => {
     assert.equal(currentTooltipLabel(), 'Reply to message');
   });
 
-  it('positions the tooltip near the target element', done => {
+  it('positions the tooltip near the target element', () => {
     // Create a container with a fixed position and font size so that
     // the tooltip appears in a predictable location.
     const container = document.createElement('div');
@@ -59,20 +61,19 @@ describe('useTooltip', () => {
     document.body.appendChild(container);
 
     // Render component and trigger tooltip display.
-    render(<Button />, container);
-    container.querySelector('button').dispatchEvent(new Event('mouseover'));
+    runUntilIdle(() => {
+      render(<Button />, container);
+      container.querySelector('button').dispatchEvent(new Event('mouseover'));
+    });
 
     // Wait for tooltip to render, measure its size and then position
     // itself in its final location.
-    setTimeout(() => {
-      const { left, top } = currentTooltipPos();
+    const { left, top } = currentTooltipPos();
 
-      assert.closeTo(left, 130, 10);
-      assert.closeTo(top, 180, 10);
+    assert.closeTo(left, 130, 10);
+    assert.closeTo(top, 180, 10);
 
-      container.remove();
-      done();
-    }, 5);
+    container.remove();
   });
 
   it('hides the tooltip when the element is unhovered', () => {
