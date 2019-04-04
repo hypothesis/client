@@ -6,7 +6,7 @@ const moment = require('moment');
  * A wrapper around the i18n
  */
 // @ngInject
-function i18nService() {
+function i18nService($rootScope, localStorage) {
   const fallbackLanguage = 'en-US';
   const languageMapInsperaToIetf = {
       en_us: 'en-US',
@@ -83,11 +83,19 @@ function i18nService() {
 
     moment.locale(locale);
 
+    $rootScope.$watch(function() { return localStorage.getItem('locale'); }, function(newValue) {
+      changeLanguage(getIetfLanguageCode(newValue));
+    });
+
     i18next.init({
       resources,
       lng: languageCode,
       interpolation: {prefix: '__', suffix: '__'},
     });
+  }
+
+  function changeLanguage(language, callback) {
+    i18next.changeLanguage(language, callback);
   }
 
   function translate(key, options) {
@@ -106,6 +114,7 @@ function i18nService() {
       initI18n: initI18n,
       getCurrentLanguageId: getCurrentLanguageId,
       getCurrentLanguageKey: getCurrentLanguageKey,
+      changeLanguage: changeLanguage,
   };
 }
 

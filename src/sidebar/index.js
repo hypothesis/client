@@ -101,8 +101,13 @@ function setupHttp($http, streamer) {
 }
 
 // @ngInject
-function setupI18n(i18nService) {
+function setupI18n($window, $rootScope, i18nService) {
   i18nService.initI18n();
+  angular.element($window).on('storage', function(event) {
+    if (event.key === 'locale') {
+      $rootScope.$apply();
+    }
+  });
 }
 
 function startAngularApp(config) {
