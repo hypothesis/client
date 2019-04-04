@@ -297,6 +297,18 @@ function AnnotationController(
     return self.state().text.length > 0 || self.state().tags.length > 0;
   };
 
+  this.canPostToCurrentGroup = function() {
+    const currentGroup = groups.focused().id;
+    return session.state.groups.some(function(group) { return group.id === currentGroup; });
+  };
+
+  this.canPost = function() {
+    if (!this.canPostToCurrentGroup()) {
+      return false;
+    }
+    return this.hasContent();
+  };
+
   /**
     * Return the annotation's quote if it has one or `null` otherwise.
     */
