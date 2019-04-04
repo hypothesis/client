@@ -30,7 +30,6 @@ document.body.setAttribute('ng-csp', '');
 disableOpenerForExternalLinks(document.body);
 
 const angular = require('angular');
-const wrapReactComponent = require('./util/wrap-react-component');
 
 // autofill-event relies on the existence of window.angular so
 // it must be require'd after angular is first require'd
@@ -38,6 +37,8 @@ require('autofill-event');
 
 // Enable debugging checks for Preact.
 require('preact/debug');
+
+const wrapReactComponent = require('./util/wrap-react-component');
 
 // Setup Angular integration for Raven
 if (appConfig.raven) {
@@ -161,7 +162,7 @@ function startAngularApp(config) {
     )
     .component(
       'groupListItemOutOfScope',
-      require('./components/group-list-item-out-of-scope')
+      wrapReactComponent(require('./components/group-list-item-out-of-scope'))
     )
     .component('groupListSection', require('./components/group-list-section'))
     .component('helpLink', require('./components/help-link'))

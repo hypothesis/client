@@ -1,14 +1,32 @@
 'use strict';
 
-const angular = require('angular');
+const { mount } = require('enzyme');
+const preact = require('preact');
+const { createElement } = require('preact');
 const proxyquire = require('proxyquire');
-const util = require('../../directive/test/util');
 
 const { events } = require('../../services/analytics');
 
-describe('groupListItemOutOfScope', () => {
+describe('GroupListItemOutOfScope', () => {
   let fakeAnalytics;
   let fakeGroupListItemCommon;
+  let GroupListItemOutOfScope;
+
+  const fakeGroup = {
+    id: 'groupid',
+    links: {
+      html: 'https://hypothes.is/groups/groupid',
+    },
+    logo: 'dummy://hypothes.is/logo.svg',
+    organization: { name: 'org' },
+  };
+
+  // Click on the item to expand or collapse it.
+  const toggle = wrapper =>
+    wrapper
+      .find('div')
+      .first()
+      .simulate('click');
 
   before(() => {
     fakeGroupListItemCommon = {
@@ -16,18 +34,14 @@ describe('groupListItemOutOfScope', () => {
       trackViewGroupActivity: sinon.stub(),
     };
 
-    // Return groupListItemOutOfScope with groupListItemCommon stubbed out.
-    const groupListItemOutOfScope = proxyquire(
-      '../group-list-item-out-of-scope',
-      {
-        '../util/group-list-item-common': fakeGroupListItemCommon,
-        '@noCallThru': true,
-      }
-    );
+    GroupListItemOutOfScope = proxyquire('../group-list-item-out-of-scope', {
+      // Use same instance of Preact module in tests and mocked module.
+      // See https://robertknight.me.uk/posts/browserify-dependency-mocking/
+      preact,
 
-    angular
-      .module('app', [])
-      .component('groupListItemOutOfScope', groupListItemOutOfScope);
+      '../util/group-list-item-common': fakeGroupListItemCommon,
+      '@noCallThru': true,
+    });
   });
 
   beforeEach(() => {
@@ -35,21 +49,23 @@ describe('groupListItemOutOfScope', () => {
       track: sinon.stub(),
       events,
     };
-
-    angular.mock.module('app', { analytics: fakeAnalytics });
   });
 
   const createGroupListItemOutOfScope = fakeGroup => {
-    return util.createDirective(document, 'groupListItemOutOfScope', {
-      group: fakeGroup,
-    });
+    return mount(
+      <GroupListItemOutOfScope analytics={fakeAnalytics} group={fakeGroup} />
+    );
   };
 
-  it('calls groupListItemCommon.trackViewGroupActivity when trackViewGroupActivity is called', () => {
-    const fakeGroup = { id: 'groupid' };
+  it('calls trackViewGroupActivity when "Go to group page" link is clicked', () => {
+    const wrapper = createGroupListItemOutOfScope(fakeGroup);
 
-    const element = createGroupListItemOutOfScope(fakeGroup);
-    element.ctrl.trackViewGroupActivity();
+    toggle(wrapper);
+
+    const link = wrapper
+      .find('a')
+      .filterWhere(link => link.text() === 'Go to group page');
+    link.simulate('click');
 
     assert.calledWith(
       fakeGroupListItemCommon.trackViewGroupActivity,
@@ -57,50 +73,35 @@ describe('groupListItemOutOfScope', () => {
     );
   });
 
-  it('returns groupListItemCommon.orgName when orgName is called', () => {
-    const fakeGroup = { id: 'groupid', organization: { name: 'org' } };
+  it('does not show "Go to group page" link if the group has no HTML link', () => {
+    const group = { ...fakeGroup, links: {} };
+    const wrapper = createGroupListItemOutOfScope(group);
+    const link = wrapper
+      .find('a')
+      .filterWhere(link => link.text() === 'Go to group page');
+    assert.isFalse(link.exists());
+  });
+
+  it('sets alt text of logo', () => {
     fakeGroupListItemCommon.orgName
       .withArgs(fakeGroup)
       .returns(fakeGroup.organization.name);
 
-    const element = createGroupListItemOutOfScope(fakeGroup);
-    const orgName = element.ctrl.orgName();
+    const wrapper = createGroupListItemOutOfScope(fakeGroup);
+    const orgName = wrapper.find('img').props().alt;
 
-    assert.calledWith(fakeGroupListItemCommon.orgName, fakeGroup);
     assert.equal(orgName, fakeGroup.organization.name);
   });
 
-  describe('toggleGroupDetails', () => {
-    it('sets the default expanded value to false', () => {
-      const fakeGroup = { id: 'groupid' };
+  it('toggles expanded state when clicked', () => {
+    const wrapper = createGroupListItemOutOfScope(fakeGroup);
 
-      const element = createGroupListItemOutOfScope(fakeGroup);
+    assert.isFalse(wrapper.exists('.expanded'));
 
-      assert.isFalse(element.ctrl.isDetailsExpanded);
-    });
+    toggle(wrapper);
+    assert.isTrue(wrapper.exists('.expanded'));
 
-    it('toggles the expanded value', () => {
-      const fakeGroup = { id: 'groupid' };
-
-      const element = createGroupListItemOutOfScope(fakeGroup);
-      const fakeEvent = { stopPropagation: sinon.stub() };
-
-      element.ctrl.toggleGroupDetails(fakeEvent);
-      assert.isTrue(element.ctrl.isDetailsExpanded);
-
-      element.ctrl.toggleGroupDetails(fakeEvent);
-      assert.isFalse(element.ctrl.isDetailsExpanded);
-    });
-
-    it('stops the event from propagating when toggling', () => {
-      const fakeGroup = { id: 'groupid' };
-
-      const element = createGroupListItemOutOfScope(fakeGroup);
-      const fakeEvent = { stopPropagation: sinon.spy() };
-
-      element.ctrl.toggleGroupDetails(fakeEvent);
-
-      sinon.assert.called(fakeEvent.stopPropagation);
-    });
+    toggle(wrapper);
+    assert.isFalse(wrapper.exists('.expanded'));
   });
 });
