@@ -15,7 +15,7 @@ module.exports = {
     this.dateTime = new Date();
     this.serviceUrl = serviceUrl;
     this.group = groups.focused() && groups.focused().id.replace(/-/g, '');
-    this.tl = i18nService.tl;
+    this.caption = i18nService.tl('sidePanel.channels.'+this.group+'.description');
 
     $scope.$watch(
       function () {

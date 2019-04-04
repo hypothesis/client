@@ -4,9 +4,8 @@
     title="Close"
     ng-click="vm.onClose()"></i>
 
-  <header class="help-panel-title">
-    {{ vm.tl('sidePanel.channels.'+vm.group+'.description') }}
-  </header>
+  <div class="help-panel-caption" ng-bind-html="vm.caption"></div>
+
   <!-- <div class="help-panel-content">
     <help-link
       version="vm.version"
