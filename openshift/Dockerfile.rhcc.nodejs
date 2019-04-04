@@ -30,6 +30,11 @@ RUN echo "source /opt/rh/rh-nodejs8/enable" >> /etc/profile
 # Add the user.
 RUN useradd -u 10001 -g 0 -d /opt/app-root node
 
+WORKDIR /opt/app-root
+
+# Set defaults to include group perms.
+RUN setfacl -Rdm g:0:rwx /opt/app-root
+
 # Copy over the source folder.
 COPY . /opt/app-root
 
@@ -40,7 +45,6 @@ ENV PYTHONPATH=/opt/rh/rh-nodejs8/root/usr/lib/python2.7/site-packages${PYTHONPA
 ENV MANPATH=/opt/rh/rh-nodejs8/root/usr/share/man:$MANPATH
 
 # Install node deps
-WORKDIR /opt/app-root
 RUN npm install yarn gulp gulp-cli
 RUN npm install
 
