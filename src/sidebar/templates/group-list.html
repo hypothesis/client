@@ -60,7 +60,7 @@
             <a class="group-name-link"
                href=""
                title="{{ group.type === 'private' ? 'Show and create annotations in ' + group.name : 'Show public annotations'  }}">
-               {{group.name}}
+               {{vm.tl('sidePanel.channels.'+vm.getProperId(group.id)+'.name')}}
             </a>
           </div>
           <div class="share-link-container" ng-click="$event.stopPropagation()" ng-if="vm.shouldShowActivityLink(group.id)">

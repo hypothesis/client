@@ -11,9 +11,13 @@ function GroupListController($window, analytics, groups, settings, serviceUrl, i
   this.groups = groups;
   this.tl = i18nService.tl;
 
+  this.getProperId = function(id) {
+    return id.replace(/-/g, '');
+  };
+
   this.groupId = function() {
     const focusedGroup = this.groups.focused();
-    return focusedGroup && focusedGroup.id.replace(/-/g, '');
+    return focusedGroup && this.getProperId(focusedGroup.id);
   };
 
   this.createNewGroup = function() {
