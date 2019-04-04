@@ -50,8 +50,8 @@ EXPOSE 4443
 
 # Set permissions so that the content is readable by node.
 RUN chgrp -R 0 /opt/app-root
-RUN chmod -R g+rw /opt/app-root
-RUN find /opt/app-root -type d -exec chmod g+x {} +
+RUN chmod -R g+rws /opt/app-root
+RUN find /opt/app-root -type d -exec chmod g+xs {} +
 
 ENV PATH=/opt/app-root/node_modules/.bin:${PATH}
 
