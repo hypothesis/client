@@ -12,7 +12,6 @@
   <a role="button"
      class="top-bar__btn"
      title="{{vm.auth.username}}">
-     <!-- Replaced by tags above. not need dropdown toggle.
      <div ng-if="vm.newStyle"
           class="pull-right login-control-menu"
           dropdown
@@ -21,13 +20,12 @@
           class="top-bar__btn"
           data-toggle="dropdown"
           dropdown-toggle
-          title="{{vm.auth.username}}"> -->
-    <i class="h-icon-account" ng-if="vm.auth.status === 'logged-in'"></i><!--
-    <i class="h-icon-arrow-drop-down top-bar__dropdown-arrow"></i>!-->
+          title="{{vm.auth.username}}">
+    <i class="h-icon-account" ng-if="vm.auth.status === 'logged-in'"></i>
+    <i class="h-icon-arrow-drop-down top-bar__dropdown-arrow"></i>
   </a>
-  <!-- Commented menu not needed in our base.
   <ul class="dropdown-menu pull-right" role="menu">
-    <li class="dropdown-menu__row" ng-if="vm.auth.status === 'logged-in'">
+    <!-- <li class="dropdown-menu__row" ng-if="vm.auth.status === 'logged-in'">
       <span ng-if="!vm.shouldEnableProfileButton()"
             class="dropdown-menu__link dropdown-menu__link--disabled js-user-profile-btn is-disabled">
         {{vm.auth.displayName}}</span>
@@ -39,15 +37,15 @@
     </li>
     <li class="dropdown-menu__row" ng-if="vm.auth.status === 'logged-in' && !vm.isThirdPartyUser()">
       <a class="dropdown-menu__link js-account-settings-btn" href="{{vm.serviceUrl('account.settings')}}" target="_blank">Account settings</a>
-    </li>
+    </li>-->
     <li class="dropdown-menu__row">
       <a class="dropdown-menu__link js-help-btn" ng-click="vm.onShowHelpPanel()">Help</a>
     </li>
-    <li class="dropdown-menu__row" ng-if="vm.shouldShowLogOutButton()">
+    <!-- <li class="dropdown-menu__row" ng-if="vm.shouldShowLogOutButton()">
       <a class="dropdown-menu__link dropdown-menu__link--subtle js-log-out-btn"
          href="" ng-click="vm.onLogout()">Log out</a>
-    </li>
-  </ul> -->
+    </li> -->
+  </ul>
 </div>
 
 <!-- Old controls -->

@@ -1,16 +1,4 @@
 
-.top-bar__inner {
-    /* remove share button top bar */
-    &> button {
-        display: none;
-    }
-
-    /* remove login */
-    &> .login-control {
-        display: none;
-    }
-
-}
 /* remove share button under editor */
 .annotation-share-dialog-wrapper {
     display: none;
