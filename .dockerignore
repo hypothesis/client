@@ -1,2 +1,7 @@
 Dockerfile
-openshift/Dockerfile.blessed.nodejs
+*/Dockerfile*
+openshift
+docs
+.git
+.idea
+.github

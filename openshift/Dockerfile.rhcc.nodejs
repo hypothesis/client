@@ -1,53 +1,62 @@
-FROM registry.access.redhat.com/rhel7
-USER root
+FROM registry.access.redhat.com/rhscl/nodejs-8-rhel7
+
 ARG BUILD_NUMBER
 ARG BUILD_HOST
 LABEL Build_Host=${BUILD_HOST}
 LABEL Build_Version=${BUILD_NUMBER}
 ENV BUILD_NUMBER=${BUILD_NUMBER}
 
+USER root
+
 RUN yum-config-manager --enable rhel-7-server-optional-rpms
-RUN yum-config-manager --enable rhel-server-rhscl-7-rpms
+#RUN yum-config-manager --enable rhel-server-rhscl-7-rpms
 
 RUN yum install -y \
     bzip2 \
     gcc \
     make \
-    nss_wrapper \
-    rh-nodejs8 \
-    rh-nodejs8-npm \
-    rh-nodejs8-nodejs-nodemon \
  && yum clean all
+    #nss_wrapper
 
+# Pull in relevant configuration for ENV.
 ARG NODE_ENV
 ARG SIDEBAR_APP_URL
 ARG CLIENT_URL
 ARG ASSET_URL
 
+# Source the SCL bootstrap stuff.
 RUN echo "source /opt/rh/rh-nodejs8/enable" >> /etc/profile
-RUN source scl_source enable rh-nodejs8
 
-RUN useradd -u 1001 -d /opt/app-root node
+# Add the user.
+RUN useradd -u 10001 -g 0 -d /opt/app-root node
 
-# Copy over the source folder and set perms
+# Copy over the source folder.
 COPY . /opt/app-root
-RUN chown -R node:node /opt/app-root
 
-# Apply environment config for scl nodejs
-ENV PATH=/opt/rh/rh-nodejs8/root/usr/bin:$PATH
-ENV LD_LIBRARY_PATH=/opt/rh/rh-nodejs8/root/usr/lib64:$LD_LIBRARY_PATH
-ENV PYTHONPATH=/opt/rh/rh-nodejs8/root/usr/lib/python2.7/site-packages:$PYTHONPATH
+# Apply environment config for scl nodejs.
+ENV PATH=/opt/rh/rh-nodejs8/root/usr/bin${PATH:+:${PATH}}
+ENV LD_LIBRARY_PATH=/opt/rh/rh-nodejs8/root/usr/lib64${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
+ENV PYTHONPATH=/opt/rh/rh-nodejs8/root/usr/lib/python2.7/site-packages${PYTHONPATH:+:${PYTHONPATH}}
 ENV MANPATH=/opt/rh/rh-nodejs8/root/usr/share/man:$MANPATH
 
 # Install node deps
 WORKDIR /opt/app-root
-RUN npm install -g yarn gulp gulp-cli
+RUN npm install yarn gulp gulp-cli
 RUN npm install
+
+#CMD ["tail", "-f", "/dev/null"]
 
 EXPOSE 4443
 
+# Set permissions so that the content is readable by node.
+RUN chgrp -R 0 /opt/app-root
+RUN chmod -R g+rw /opt/app-root
+RUN find /opt/app-root -type d -exec chmod g+x {} +
+
+ENV PATH=/opt/app-root/node_modules/.bin:${PATH}
+
 # Run as the node user
-USER 1001
+USER 10001
 
 # Run the build scripts to apply environment config
 RUN make clean && make
