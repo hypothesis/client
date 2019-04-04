@@ -192,12 +192,14 @@ function AnnotationController(
     }
   }
 
-  this.authorize = function(action) {
-    return permissions.permits(
-      self.annotation.permissions,
-      action,
-      session.state.userid
-    );
+  // this.authorize = function(action) {
+  this.authorize = function() {
+    return true;
+    // return permissions.permits(
+    //   self.annotation.permissions,
+    //   action,
+    //   session.state.userid
+    // );
   };
 
   // /**
