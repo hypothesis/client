@@ -15,7 +15,6 @@ const propTypes = require('prop-types');
  */
 function Tooltip({ target }) {
   const label = target.getAttribute('aria-label');
-  const targetRect = target.getBoundingClientRect();
   const TOOLTIP_ARROW_HEIGHT = 7;
 
   const [top, setTop] = useState(null);
@@ -25,6 +24,7 @@ function Tooltip({ target }) {
   useEffect(() => {
     // Once the tooltip has been rendered, measure its size and reposition it
     // above the target.
+    const targetRect = target.getBoundingClientRect();
     const tooltipRect = tooltipRef.current.getBoundingClientRect();
     const newTop = targetRect.top - tooltipRect.height - TOOLTIP_ARROW_HEIGHT;
     const newLeft = targetRect.right - tooltipRect.width;
