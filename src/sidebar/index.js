@@ -125,6 +125,9 @@ function startAngularApp(config) {
     ['ngTagsInput', require('ng-tags-input')][0],
     ['ui.bootstrap', require('./vendor/ui-bootstrap-custom-tpls-0.13.4')][0],
 
+    // sanitize html
+    'ngSanitize',
+
     // Local addons
     'ngRaven',
   ])
