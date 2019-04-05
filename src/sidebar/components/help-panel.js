@@ -17,6 +17,13 @@ module.exports = {
     this.group = groups.focused() && groups.focused().id.replace(/-/g, '');
     this.caption = i18nService.tl('sidePanel.channels.'+this.group+'.description');
 
+    $scope.$watch(function() {
+      return groups.focused().id;
+    }, function() {
+      this.group = groups.focused() && groups.focused().id.replace(/-/g, '');
+      this.caption = i18nService.tl('sidePanel.channels.'+this.group+'.description');
+    }.bind(this));
+
     $scope.$watch(
       function () {
         return store.frames();
