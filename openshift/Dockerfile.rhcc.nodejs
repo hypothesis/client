@@ -30,13 +30,6 @@ RUN useradd -u 10001 -g 0 -d /opt/app-root node
 
 WORKDIR /opt/app-root
 
-# Set permissions so that the content is readable by node.
-RUN chgrp -R 0 /opt/app-root
-RUN chmod -R g+rws /opt/app-root
-RUN find /opt/app-root -type d -exec chmod g+xs {} +
-# Set defaults to include group perms.
-RUN setfacl -Rdm g:0:rwx /opt/app-root
-
 # Copy over the source folder.
 COPY . /opt/app-root
 
@@ -55,6 +48,13 @@ RUN npm install
 EXPOSE 4443
 
 ENV PATH=/opt/app-root/node_modules/.bin:${PATH}
+
+# Set permissions so that the content is readable by node.
+RUN chgrp -R 0 /opt/app-root
+RUN chmod -R g+rws /opt/app-root
+RUN find /opt/app-root -type d -exec chmod g+xs {} +
+# Set defaults to include group perms.
+RUN setfacl -Rdm g:0:rwx /opt/app-root
 
 # Run as the node user
 USER 10001
