@@ -9,14 +9,12 @@ ENV BUILD_NUMBER=${BUILD_NUMBER}
 USER root
 
 RUN yum-config-manager --enable rhel-7-server-optional-rpms
-#RUN yum-config-manager --enable rhel-server-rhscl-7-rpms
 
 RUN yum install -y \
     bzip2 \
     gcc \
     make \
  && yum clean all
-    #nss_wrapper
 
 # Pull in relevant configuration for ENV.
 ARG NODE_ENV
@@ -62,7 +60,8 @@ ENV PATH=/opt/app-root/node_modules/.bin:${PATH}
 USER 10001
 
 # Run the build scripts to apply environment config
-RUN make clean && make
+#RUN make clean && make
 
 # Run server
-CMD ["gulp", "build", "serve-package"]
+CMD ["sh","-c","make && gulp build serve-package"]
+#CMD ["gulp", "build", "serve-package"]
