@@ -86,6 +86,7 @@ module.exports = function(config) {
             // code coverage instrumentation for Istanbul.
             extensions: ['.js', '.coffee'],
             plugins: [
+              'mockable-imports',
               [
                 'babel-plugin-istanbul',
                 {
