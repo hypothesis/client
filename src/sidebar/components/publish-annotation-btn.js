@@ -10,6 +10,7 @@ module.exports = {
     this.showDropdown = false;
     this.privateLabel = i18nService.tl('sidePanel.channels.onlyMe.name');
     this.groupName = i18nService.tl('sidePanel.channels.'+this.group.id.replace(/-/g, '') +'.name');
+    this.tl = i18nService.tl;
 
     this.publishDestination = function () {
       return this.isShared ? this.groupName : this.privateLabel;
