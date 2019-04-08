@@ -1,16 +1,14 @@
 'use strict';
 
 const { mount } = require('enzyme');
-const preact = require('preact');
 const { createElement } = require('preact');
-const proxyquire = require('proxyquire');
 
 const { events } = require('../../services/analytics');
+const GroupListItemOutOfScope = require('../group-list-item-out-of-scope');
 
 describe('GroupListItemOutOfScope', () => {
   let fakeAnalytics;
   let fakeGroupListItemCommon;
-  let GroupListItemOutOfScope;
 
   const fakeGroup = {
     id: 'groupid',
@@ -28,27 +26,23 @@ describe('GroupListItemOutOfScope', () => {
       .first()
       .simulate('click');
 
-  before(() => {
-    fakeGroupListItemCommon = {
-      orgName: sinon.stub(),
-      trackViewGroupActivity: sinon.stub(),
-    };
-
-    GroupListItemOutOfScope = proxyquire('../group-list-item-out-of-scope', {
-      // Use same instance of Preact module in tests and mocked module.
-      // See https://robertknight.me.uk/posts/browserify-dependency-mocking/
-      preact,
-
-      '../util/group-list-item-common': fakeGroupListItemCommon,
-      '@noCallThru': true,
-    });
-  });
-
   beforeEach(() => {
     fakeAnalytics = {
       track: sinon.stub(),
       events,
     };
+    fakeGroupListItemCommon = {
+      orgName: sinon.stub(),
+      trackViewGroupActivity: sinon.stub(),
+    };
+
+    GroupListItemOutOfScope.$imports.$mock({
+      '../util/group-list-item-common': fakeGroupListItemCommon,
+    });
+  });
+
+  afterEach(() => {
+    GroupListItemOutOfScope.$imports.$restore();
   });
 
   const createGroupListItemOutOfScope = fakeGroup => {
