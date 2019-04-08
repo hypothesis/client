@@ -76,12 +76,12 @@
           </div>
         </div>
         <!-- the 'Leave group' icon !-->
-        <div class="group-cancel-icon-container" ng-click="$event.stopPropagation()">
+        <!-- <div class="group-cancel-icon-container" ng-click="$event.stopPropagation()">
           <i class="h-icon-cancel-outline btn--cancel"
              ng-if="group.type === 'private'"
              ng-click="vm.leaveGroup(group.id)"
              title="Leave '{{group.name}}'"></i>
-        </div>
+        </div> -->
       </div>
     </li>
     <li ng-if="vm.auth.status === 'logged-in' && !vm.isThirdPartyUser()" class="dropdown-menu__row dropdown-menu__row--unpadded new-group-btn">
