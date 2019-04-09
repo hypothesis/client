@@ -35,10 +35,9 @@ function combineGroups(userGroups, featuredGroups, uri) {
 }
 
 function isScopedToUri(group, uri) {
-  // If the group has scope info, the scoping is enforced,
-  // and the uri patterns don't include this page's uri
-  // the group is not selectable, otherwise it is.
-  if (group.scopes && group.scopes.enforced) {
+  // Groups with no scopes or groups with no uri_patterns defined
+  // are considered in scope.
+  if (group.scopes && group.scopes.uri_patterns.length > 0) {
     return uriMatchesScopes(uri, group.scopes.uri_patterns);
   }
   return true;
