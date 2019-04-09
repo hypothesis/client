@@ -130,6 +130,12 @@ describe('sidebar.util.groups', () => {
         uri: 'https://foo.com/bar',
       },
       {
+        description: 'sets `isScopedToUri` to true if `uri` is null',
+        scopes: { enforced: true, uri_patterns: ['http://foo.com*'] },
+        isScopedToUri: true,
+        uri: null,
+      },
+      {
         description: 'it permits multiple *s in the scopes uri pattern',
         scopes: { enforced: true, uri_patterns: ['https://foo.com*bar*'] },
         shouldBeSelectable: true,

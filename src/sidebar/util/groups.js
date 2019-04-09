@@ -38,7 +38,9 @@ function isScopedToUri(group, uri) {
   // If the group has scope info, the scoping is enforced,
   // and the uri patterns don't include this page's uri
   // the group is not selectable, otherwise it is.
-  if (group.scopes && group.scopes.enforced) {
+  // The uri may be null if the annotation is not being displayed on
+  // the sidebar in which case all groups are in scope.
+  if (group.scopes && group.scopes.enforced && uri) {
     return uriMatchesScopes(uri, group.scopes.uri_patterns);
   }
   return true;
