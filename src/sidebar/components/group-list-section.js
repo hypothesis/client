@@ -4,11 +4,7 @@
 function GroupListSectionController() {
   this.isSelectable = function(groupId) {
     const group = this.sectionGroups.find(g => g.id === groupId);
-    return (
-      !this.disableOosGroupSelection ||
-      !group.scopes.enforced ||
-      group.isScopedToUri
-    );
+    return !this.disableOosGroupSelection || group.isScopedToUri;
   };
 }
 

@@ -158,17 +158,6 @@ const getCurrentlyViewingGroups = memoize(state => {
   );
 });
 
-/**
- * Return groups that are scoped to the uri. This is used to return the groups
- * that show up in the old groups menu. This should be removed once the new groups
- * menu is permanent.
- *
- * @return {Group[]}
- */
-const getInScopeGroups = memoize(state => {
-  return state.groups.filter(g => g.isScopedToUri);
-});
-
 module.exports = {
   init,
   update,
@@ -182,7 +171,6 @@ module.exports = {
     getCurrentlyViewingGroups,
     getFeaturedGroups,
     getMyGroups,
-    getInScopeGroups,
     focusedGroup,
     focusedGroupId,
   },
