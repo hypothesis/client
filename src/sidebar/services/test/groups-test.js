@@ -30,7 +30,11 @@ const sessionWithThreeGroups = function() {
 };
 
 const dummyGroups = [
-  { name: 'Group 1', id: 'id1' },
+  {
+    name: 'Group 1',
+    id: 'id1',
+    scopes: { enforced: true, uri_patterns: ['*'] },
+  },
   { name: 'Group 2', id: 'id2' },
   { name: 'Group 3', id: 'id3' },
 ];
@@ -258,6 +262,19 @@ describe('groups', function() {
         return svc.load().then(() => {
           assert.calledWith(fakeApi.groups.list, {
             expand: 'organization',
+          });
+        });
+      });
+
+      it('does not wait for the document URL when community_groups feature flag is on', () => {
+        fakeStore.setState({ searchUris: [] });
+        fakeApi.groups.list.returns(Promise.resolve(dummyGroups));
+        fakeApi.profile.groups.read.returns(Promise.resolve([]));
+        fakeFeatures.flagEnabled.withArgs('community_groups').returns(true);
+        const svc = service();
+        return svc.load().then(() => {
+          assert.calledWith(fakeApi.groups.list, {
+            expand: ['organization', 'scopes'],
           });
         });
       });
