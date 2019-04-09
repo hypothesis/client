@@ -132,7 +132,7 @@ describe('sidebar.util.groups', () => {
       {
         description: 'sets `isScopedToUri` to true if `uri` is null',
         scopes: { enforced: true, uri_patterns: ['http://foo.com*'] },
-        isScopedToUri: true,
+        shouldBeSelectable: true,
         uri: null,
       },
       {
