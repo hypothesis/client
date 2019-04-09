@@ -163,6 +163,22 @@ describe('groups', function() {
       assert.deepEqual(svc.all(), dummyGroups);
       assert.called(fakeStore.getInScopeGroups);
     });
+
+    [[0, 1, 2, 3], [2, 0, 1, 3], [0, 3, 1, 2]].forEach(groupInputOrder => {
+      it('sorts the groups in the following order: scoped, public, private maintaining order within each category.', () => {
+        const groups = [
+          { id: 0, type: 'open' },
+          { id: 1, type: 'restricted' },
+          { id: '__world__', type: 'open' },
+          { id: 3, type: 'private' },
+        ];
+        const svc = service();
+        fakeStore.getInScopeGroups = sinon
+          .stub()
+          .returns(groupInputOrder.map(id => groups[id]));
+        assert.deepEqual(svc.all(), groups);
+      });
+    });
   });
 
   describe('#load', function() {
