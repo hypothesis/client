@@ -134,6 +134,13 @@ describe('sidebar.store.modules.groups', () => {
     });
   });
 
+  describe('getInScopeGroups', () => {
+    it('returns all groups that are in scope', () => {
+      store.loadGroups([publicGroup, privateGroup, restrictedOutOfScopeGroup]);
+      assert.deepEqual(store.getInScopeGroups(), [publicGroup, privateGroup]);
+    });
+  });
+
   describe('getGroup', () => {
     it('returns the group with the given ID', () => {
       store.loadGroups([publicGroup, privateGroup]);
