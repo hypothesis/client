@@ -48,7 +48,7 @@ function HypothesisAppController(
 
   // App dialogs
   this.shareDialog = {visible: false};
-  this.helpPanel = {visible: false};
+  this.helpPanel = {visible: true};
 
   // Check to see if we're in the sidebar, or on a standalone page such as
   // the stream page or an individual annotation page.

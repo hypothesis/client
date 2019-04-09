@@ -18,7 +18,7 @@ module.exports = {
     this.caption = i18nService.tl('sidePanel.channels.'+this.group+'.description');
 
     $scope.$watch(function() {
-      return groups.focused().id;
+      return groups.focused() && groups.focused().id || null;
     }, function() {
       this.group = groups.focused() && groups.focused().id.replace(/-/g, '');
       this.caption = i18nService.tl('sidePanel.channels.'+this.group+'.description');

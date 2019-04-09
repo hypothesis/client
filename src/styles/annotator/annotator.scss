@@ -205,7 +205,7 @@ $base-font-size: 14px;
 
 @media screen and (min-width: 37.5em) {
   .annotator-frame {
-    transition: margin-left .15s cubic-bezier(.55, 0, .2, .8);
+    // transition: margin-left .15s cubic-bezier(.55, 0, .2, .8);
     width: 428px;
     margin-left: -428px;
   }
