@@ -77,7 +77,9 @@ function groups(
 
     // If the main document URL has no groups associated with it, always show
     // the "Public" group.
-    const pageHasAssociatedGroups = groups.some(g => g.id !== '__world__');
+    const pageHasAssociatedGroups = groups.some(
+      g => g.id !== '__world__' && g.isScopedToUri
+    );
     if (!pageHasAssociatedGroups) {
       return Promise.resolve(groups);
     }
@@ -144,7 +146,7 @@ function groups(
     return uri
       .then(uri => {
         const params = {
-          expand: 'organization',
+          expand: ['organization', 'scopes'],
         };
         if (authority) {
           params.authority = authority;
@@ -154,27 +156,19 @@ function groups(
         }
         documentUri = uri;
 
-        if (features.flagEnabled('community_groups')) {
-          params.expand = ['organization', 'scopes'];
-          const profileParams = {
-            expand: ['organization', 'scopes'],
-          };
-          const profileGroupsApi = api.profile.groups.read(profileParams);
-          const listGroupsApi = api.groups.list(params);
-          return Promise.all([
-            profileGroupsApi,
-            listGroupsApi,
-            auth.tokenGetter(),
-          ]).then(([myGroups, featuredGroups, token]) => [
-            combineGroups(myGroups, featuredGroups, documentUri),
-            token,
-          ]);
-        } else {
-          // Fetch groups from the API.
-          return api.groups
-            .list(params, null, { includeMetadata: true })
-            .then(({ data, token }) => [data, token]);
-        }
+        const profileGroupsApi = api.profile.groups.read({
+          expand: params.expand,
+        });
+        const listGroupsApi = api.groups.list(params);
+
+        return Promise.all([
+          profileGroupsApi,
+          listGroupsApi,
+          auth.tokenGetter(),
+        ]).then(([myGroups, featuredGroups, token]) => [
+          combineGroups(myGroups, featuredGroups, documentUri),
+          token,
+        ]);
       })
       .then(([groups, token]) => {
         const isLoggedIn = token !== null;
@@ -197,7 +191,10 @@ function groups(
   }
 
   function all() {
-    return store.allGroups();
+    if (features.flagEnabled('community_groups')) {
+      return store.allGroups();
+    }
+    return store.getInScopeGroups();
   }
 
   // Return the full object for the group with the given id.
