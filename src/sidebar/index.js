@@ -164,7 +164,10 @@ function startAngularApp(config) {
       'groupListItemOutOfScope',
       wrapReactComponent(require('./components/group-list-item-out-of-scope'))
     )
-    .component('groupListSection', require('./components/group-list-section'))
+    .component(
+      'groupListSection',
+      wrapReactComponent(require('./components/group-list-section'))
+    )
     .component('helpLink', require('./components/help-link'))
     .component('helpPanel', require('./components/help-panel'))
     .component('loggedoutMessage', require('./components/loggedout-message'))

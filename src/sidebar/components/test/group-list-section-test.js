@@ -1,37 +1,35 @@
 'use strict';
 
-const angular = require('angular');
-const groupListSection = require('../group-list-section');
-const util = require('../../directive/test/util');
+const { shallow } = require('enzyme');
+const { createElement } = require('preact');
 
-describe('groupListSection', () => {
-  before(() => {
-    angular.module('app', []).component('groupListSection', groupListSection);
-  });
+const GroupListSection = require('../group-list-section');
+const GroupListItem = require('../group-list-item');
+const GroupListItemOutOfScope = require('../group-list-item-out-of-scope');
 
-  beforeEach(() => {
-    angular.mock.module('app', {});
-  });
-
+describe('GroupListSection', () => {
   const createGroupListSection = fakeSectionGroups => {
-    return util.createDirective(document, 'groupListSection', {
+    const props = {
       sectionGroups: fakeSectionGroups,
-    });
+      analytics: {},
+      store: {},
+    };
+    return shallow(<GroupListSection {...props} />);
   };
 
-  describe('isSelectable', () => {
+  describe('group item types', () => {
     [
       {
         description:
-          'returns false if group is out of scope and scope is enforced',
-        scopesEnforced: true,
-        expectedIsSelectable: [true, false],
+          'renders GroupListItem if group is out of scope but scope is not enforced',
+        scopesEnforced: false,
+        expectedIsSelectable: [true, true],
       },
       {
         description:
-          'returns true if group is out of scope but scope is not enforced',
-        scopesEnforced: false,
-        expectedIsSelectable: [true, true],
+          'renders GroupListItemOutOfScope if group is out of scope and scope is enforced',
+        scopesEnforced: true,
+        expectedIsSelectable: [true, false],
       },
     ].forEach(({ description, scopesEnforced, expectedIsSelectable }) => {
       it(description, () => {
@@ -48,14 +46,20 @@ describe('groupListSection', () => {
           },
         ];
 
-        const element = createGroupListSection(fakeSectionGroups);
+        const wrapper = createGroupListSection(fakeSectionGroups);
 
-        fakeSectionGroups.forEach(g =>
-          assert.equal(
-            element.ctrl.isSelectable(g.id),
-            expectedIsSelectable[g.id]
+        const itemTypes = wrapper
+          .findWhere(
+            n =>
+              n.type() === GroupListItem || n.type() === GroupListItemOutOfScope
           )
+          .map(item => item.type().name);
+        const expectedItemTypes = fakeSectionGroups.map(g =>
+          expectedIsSelectable[g.id]
+            ? 'GroupListItem'
+            : 'GroupListItemOutOfScope'
         );
+        assert.deepEqual(itemTypes, expectedItemTypes);
       });
     });
   });
