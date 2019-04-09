@@ -30,7 +30,11 @@ const sessionWithThreeGroups = function() {
 };
 
 const dummyGroups = [
-  { name: 'Group 1', id: 'id1' },
+  {
+    name: 'Group 1',
+    id: 'id1',
+    scopes: { enforced: false, uri_patterns: ['http://foo.com'] },
+  },
   { name: 'Group 2', id: 'id2' },
   { name: 'Group 3', id: 'id3' },
 ];
