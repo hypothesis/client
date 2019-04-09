@@ -16,7 +16,6 @@ const DEFAULT_ORGANIZATION = {
 const events = require('../events');
 const { awaitStateChange } = require('../util/state-util');
 const { combineGroups } = require('../util/groups');
-const memoize = require('../util/memoize');
 const serviceConfig = require('../service-config');
 
 // @ngInject
@@ -78,9 +77,7 @@ function groups(
 
     // If the main document URL has no groups associated with it, always show
     // the "Public" group.
-    const pageHasAssociatedGroups = groups.some(
-      g => g.id !== '__world__' && g.isScopedToUri
-    );
+    const pageHasAssociatedGroups = groups.some(g => g.id !== '__world__');
     if (!pageHasAssociatedGroups) {
       return Promise.resolve(groups);
     }
@@ -147,7 +144,7 @@ function groups(
     return uri
       .then(uri => {
         const params = {
-          expand: ['organization', 'scopes'],
+          expand: 'organization',
         };
         if (authority) {
           params.authority = authority;
@@ -157,19 +154,27 @@ function groups(
         }
         documentUri = uri;
 
-        const profileGroupsApi = api.profile.groups.read({
-          expand: params.expand,
-        });
-        const listGroupsApi = api.groups.list(params);
-
-        return Promise.all([
-          profileGroupsApi,
-          listGroupsApi,
-          auth.tokenGetter(),
-        ]).then(([myGroups, featuredGroups, token]) => [
-          combineGroups(myGroups, featuredGroups, documentUri),
-          token,
-        ]);
+        if (features.flagEnabled('community_groups')) {
+          params.expand = ['organization', 'scopes'];
+          const profileParams = {
+            expand: ['organization', 'scopes'],
+          };
+          const profileGroupsApi = api.profile.groups.read(profileParams);
+          const listGroupsApi = api.groups.list(params);
+          return Promise.all([
+            profileGroupsApi,
+            listGroupsApi,
+            auth.tokenGetter(),
+          ]).then(([myGroups, featuredGroups, token]) => [
+            combineGroups(myGroups, featuredGroups, documentUri),
+            token,
+          ]);
+        } else {
+          // Fetch groups from the API.
+          return api.groups
+            .list(params, null, { includeMetadata: true })
+            .then(({ data, token }) => [data, token]);
+        }
       })
       .then(([groups, token]) => {
         const isLoggedIn = token !== null;
@@ -191,25 +196,8 @@ function groups(
       });
   }
 
-  const sortGroups = memoize(groups => {
-    // Sort in the following order: scoped, public, private.
-    // This is for maintaining the order of the old groups menu so when
-    // the old groups menu is removed this can be removed.
-    const worldGroups = groups.filter(g => g.id === '__world__');
-    const nonWorldScopedGroups = groups.filter(
-      g => g.id !== '__world__' && ['open', 'restricted'].includes(g.type)
-    );
-    const remainingGroups = groups.filter(
-      g => !worldGroups.includes(g) && !nonWorldScopedGroups.includes(g)
-    );
-    return nonWorldScopedGroups.concat(worldGroups).concat(remainingGroups);
-  });
-
   function all() {
-    if (features.flagEnabled('community_groups')) {
-      return store.allGroups();
-    }
-    return sortGroups(store.getInScopeGroups());
+    return store.allGroups();
   }
 
   // Return the full object for the group with the given id.

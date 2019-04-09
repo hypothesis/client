@@ -102,14 +102,14 @@ describe('sidebar.util.groups', () => {
       {
         description: 'sets `isScopedToUri` to true if `scopes` is missing',
         scopes: undefined,
-        isScopedToUri: true,
+        shouldBeSelectable: true,
         uri: 'https://foo.com/bar',
       },
       {
         description:
-          'sets `isScopedToUri` to true if `scopes.uri_patterns` is empty',
-        scopes: { uri_patterns: [] },
-        isScopedToUri: true,
+          'sets `isScopedToUri` to true if `scopes.enforced` is false',
+        scopes: { enforced: false },
+        shouldBeSelectable: true,
         uri: 'https://foo.com/bar',
       },
       {
@@ -119,20 +119,20 @@ describe('sidebar.util.groups', () => {
           enforced: true,
           uri_patterns: ['http://foo.com*', 'https://foo.com*'],
         },
-        isScopedToUri: true,
+        shouldBeSelectable: true,
         uri: 'https://foo.com/bar',
       },
       {
         description:
           'sets `isScopedToUri` to false if `scopes.uri_patterns` do not match the uri',
         scopes: { enforced: true, uri_patterns: ['http://foo.com*'] },
-        isScopedToUri: false,
+        shouldBeSelectable: false,
         uri: 'https://foo.com/bar',
       },
       {
         description: 'it permits multiple *s in the scopes uri pattern',
         scopes: { enforced: true, uri_patterns: ['https://foo.com*bar*'] },
-        isScopedToUri: true,
+        shouldBeSelectable: true,
         uri: 'https://foo.com/boo/bar/baz',
       },
       {
@@ -141,17 +141,17 @@ describe('sidebar.util.groups', () => {
           enforced: true,
           uri_patterns: ['https://foo.com?bar=foo$[^]($){mu}+&boo=*'],
         },
-        isScopedToUri: true,
+        shouldBeSelectable: true,
         uri: 'https://foo.com?bar=foo$[^]($){mu}+&boo=foo',
       },
-    ].forEach(({ description, scopes, isScopedToUri, uri }) => {
+    ].forEach(({ description, scopes, shouldBeSelectable, uri }) => {
       it(description, () => {
         const userGroups = [{ id: 'groupa', name: 'GroupA', scopes: scopes }];
         const featuredGroups = [];
 
         const groups = combineGroups(userGroups, featuredGroups, uri);
 
-        groups.forEach(g => assert.equal(g.isScopedToUri, isScopedToUri));
+        groups.forEach(g => assert.equal(g.isScopedToUri, shouldBeSelectable));
       });
     });
 
