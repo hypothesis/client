@@ -157,14 +157,6 @@ function startAngularApp(config) {
     .component('excerpt', require('./components/excerpt'))
     .component('groupList', require('./components/group-list'))
     .component(
-      'groupListItem',
-      wrapReactComponent(require('./components/group-list-item'))
-    )
-    .component(
-      'groupListItemOutOfScope',
-      wrapReactComponent(require('./components/group-list-item-out-of-scope'))
-    )
-    .component(
       'groupListSection',
       wrapReactComponent(require('./components/group-list-section'))
     )
