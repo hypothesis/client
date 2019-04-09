@@ -13,59 +13,50 @@ describe('groupListSection', () => {
     angular.mock.module('app', {});
   });
 
-  const createGroupListSection = (
-    fakeSectionGroups,
-    fakeDisableOosGroupSelection
-  ) => {
-    const config = {
+  const createGroupListSection = fakeSectionGroups => {
+    return util.createDirective(document, 'groupListSection', {
       sectionGroups: fakeSectionGroups,
-    };
-    if (fakeDisableOosGroupSelection !== undefined) {
-      config.disableOosGroupSelection = fakeDisableOosGroupSelection;
-    }
-    return util.createDirective(document, 'groupListSection', config);
+    });
   };
 
   describe('isSelectable', () => {
     [
       {
-        description: 'always returns true if disableOosGroupSelection is false',
-        fakeDisableOosGroupSelection: false,
-        expectedIsSelectable: [true, true],
-      },
-      {
         description:
-          'always returns true if disableOosGroupSelection is undefined',
-        fakeDisableOosGroupSelection: undefined,
-        expectedIsSelectable: [true, true],
-      },
-      {
-        description:
-          'returns false if disableOosGroupSelection is true and group is out of scope',
-        fakeDisableOosGroupSelection: true,
+          'returns false if group is out of scope and scope is enforced',
+        scopesEnforced: true,
         expectedIsSelectable: [true, false],
       },
-    ].forEach(
-      ({ description, fakeDisableOosGroupSelection, expectedIsSelectable }) => {
-        it(description, () => {
-          const fakeSectionGroups = [
-            { isScopedToUri: true, id: 0 },
-            { isScopedToUri: false, id: 1 },
-          ];
+      {
+        description:
+          'returns true if group is out of scope but scope is not enforced',
+        scopesEnforced: false,
+        expectedIsSelectable: [true, true],
+      },
+    ].forEach(({ description, scopesEnforced, expectedIsSelectable }) => {
+      it(description, () => {
+        const fakeSectionGroups = [
+          {
+            isScopedToUri: true,
+            scopes: { enforced: scopesEnforced },
+            id: 0,
+          },
+          {
+            isScopedToUri: false,
+            scopes: { enforced: scopesEnforced },
+            id: 1,
+          },
+        ];
 
-          const element = createGroupListSection(
-            fakeSectionGroups,
-            fakeDisableOosGroupSelection
-          );
+        const element = createGroupListSection(fakeSectionGroups);
 
-          fakeSectionGroups.forEach(g =>
-            assert.equal(
-              element.ctrl.isSelectable(g.id),
-              expectedIsSelectable[g.id]
-            )
-          );
-        });
-      }
-    );
+        fakeSectionGroups.forEach(g =>
+          assert.equal(
+            element.ctrl.isSelectable(g.id),
+            expectedIsSelectable[g.id]
+          )
+        );
+      });
+    });
   });
 });
