@@ -8,13 +8,10 @@ const GroupListItem = require('../group-list-item');
 const GroupListItemOutOfScope = require('../group-list-item-out-of-scope');
 
 describe('GroupListSection', () => {
-  const createGroupListSection = fakeSectionGroups => {
-    const props = {
-      sectionGroups: fakeSectionGroups,
-      analytics: {},
-      store: {},
-    };
-    return shallow(<GroupListSection {...props} />);
+  const createGroupListSection = groups => {
+    return shallow(
+      <GroupListSection groups={groups} analytics={{}} store={{}} />
+    );
   };
 
   describe('group item types', () => {
@@ -33,7 +30,7 @@ describe('GroupListSection', () => {
       },
     ].forEach(({ description, scopesEnforced, expectedIsSelectable }) => {
       it(description, () => {
-        const fakeSectionGroups = [
+        const groups = [
           {
             isScopedToUri: true,
             scopes: { enforced: scopesEnforced },
@@ -46,15 +43,18 @@ describe('GroupListSection', () => {
           },
         ];
 
-        const wrapper = createGroupListSection(fakeSectionGroups);
+        const wrapper = createGroupListSection(groups);
 
+        // Check that the correct group item components were rendered for
+        // each group, depending on whether the group can be annotated in on
+        // the current document.
         const itemTypes = wrapper
           .findWhere(
             n =>
               n.type() === GroupListItem || n.type() === GroupListItemOutOfScope
           )
           .map(item => item.type().name);
-        const expectedItemTypes = fakeSectionGroups.map(g =>
+        const expectedItemTypes = groups.map(g =>
           expectedIsSelectable[g.id]
             ? 'GroupListItem'
             : 'GroupListItemOutOfScope'
