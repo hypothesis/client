@@ -1,9 +1,9 @@
 <div dropdown="" class="publish-annotation-btn__btn" is-open="vm.showDropdown" keyboard-nav>
   <dropdown-menu-btn
-    label="{{vm.tl('sidePanel.buttons.postTo.label')}} {{vm.publishDestination()}}"
+    label="'Post to ' + vm.publishDestination()"
     on-click="vm.onSave()"
     on-toggle-dropdown="vm.showDropdown = !vm.showDropdown"
-    title="{{vm.tl('sidePanel.buttons.postTo.title')}} {{vm.publishDestination()}}"
+    title="Publish this annotation to {{vm.publishDestination()}}"
     dropdown-menu-label="Change annotation sharing setting"
     is-disabled="!vm.canPost">
   </dropdown-menu-btn>
@@ -16,7 +16,7 @@
           </div>
           <div class="group-details">
             <div class="group-name-container">
-              <a href="" class="group-name-link" ng-bind="vm.groupName"></a>
+              <a href="" class="group-name-link" ng-bind="vm.group.name"></a>
             </div>
           </div>
         </div>
@@ -40,5 +40,5 @@
         ng-click="vm.onCancel()"
         title="Cancel changes to this annotation"
         >
-  <i class="h-icon-cancel-outline publish-annotation-cancel-btn__icon btn-icon"></i> {{vm.tl('sidePanel.buttons.postTo.cancel')}}
+  <i class="h-icon-cancel-outline publish-annotation-cancel-btn__icon btn-icon"></i> Cancel
 </button>
