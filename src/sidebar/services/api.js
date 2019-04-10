@@ -232,6 +232,7 @@ function api(apiRoutes, auth, store) {
       member: {
         delete: apiCall('group.member.delete'),
       },
+      read: apiCall('group.read'),
     },
     groups: {
       list: apiCall('groups.read'),

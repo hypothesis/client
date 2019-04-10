@@ -17,6 +17,9 @@ function hostPageConfig(window) {
     // Direct-linked annotation ID
     'annotations',
 
+    // Direct-linked group ID
+    'group',
+
     // Default query passed by url
     'query',
 

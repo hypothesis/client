@@ -102,6 +102,28 @@ function settingsFrom(window_) {
     return jsonConfigs.annotations || annotationsFromURL();
   }
 
+  /**
+   * Return the `#annotations:group:*` ID from the given URL's fragment.
+   *
+   * If the URL contains a `#annotations:group:<GROUP_ID>` fragment then return
+   * the group ID extracted from the fragment. Otherwise return `null`.
+   *
+   * @return {string|null} - The extracted ID, or null.
+   */
+  function group() {
+    function groupFromURL() {
+      const groupFragmentMatch = window_.location.href.match(
+        /#annotations:group:([A-Za-z0-9_-]+)$/
+      );
+      if (groupFragmentMatch) {
+        return groupFragmentMatch[1];
+      }
+      return null;
+    }
+
+    return jsonConfigs.group || groupFromURL();
+  }
+
   function showHighlights() {
     let showHighlights_ = hostPageSetting('showHighlights');
 
@@ -178,6 +200,9 @@ function settingsFrom(window_) {
     },
     get clientUrl() {
       return clientUrl();
+    },
+    get group() {
+      return group();
     },
     get showHighlights() {
       return showHighlights();

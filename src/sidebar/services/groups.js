@@ -59,9 +59,15 @@ function groups(
    * @param {Group[]} groups
    * @param {boolean} isLoggedIn
    * @param {string|null} directLinkedAnnotationId
+   * @param {string|null} directLinkedGroupId
    * @return {Promise<Group[]>}
    */
-  function filterGroups(groups, isLoggedIn, directLinkedAnnotationId) {
+  function filterGroups(
+    groups,
+    isLoggedIn,
+    directLinkedAnnotationId,
+    directLinkedGroupId
+  ) {
     // If service groups are specified only return those.
     // If a service group doesn't exist in the list of groups don't return it.
     if (svc && svc.groups) {
@@ -89,18 +95,26 @@ function groups(
     // link to an annotation in that group.
     const nonWorldGroups = groups.filter(g => g.id !== '__world__');
 
-    if (!directLinkedAnnotationId) {
+    if (!directLinkedAnnotationId && !directLinkedGroupId) {
       return Promise.resolve(nonWorldGroups);
     }
 
-    return api.annotation
-      .get({ id: directLinkedAnnotationId })
+    // If directLinkedGroup is the "Public" group, always return groups.
+    if (directLinkedGroupId === '__world__') {
+      return groups;
+    }
+
+    // If the directLinkedAnnotationId's group is the "Public" group return groups,
+    // otherwise filter out the "Public" group.
+
+    // Force getAnnotation to enter the catch clause if there is no linked annotation.
+    const getAnnotation = directLinkedAnnotationId
+      ? api.annotation.get({ id: directLinkedAnnotationId })
+      : Promise.reject();
+
+    return getAnnotation
       .then(ann => {
-        if (ann.group === '__world__') {
-          return groups;
-        } else {
-          return nonWorldGroups;
-        }
+        return ann.group === '__world__' ? groups : nonWorldGroups;
       })
       .catch(() => {
         // Annotation does not exist or we do not have permission to read it.
@@ -144,6 +158,7 @@ function groups(
     if (isSidebar) {
       uri = getDocumentUriForGroupSearch();
     }
+    const directLinkedGroup = settings.group;
     return uri
       .then(uri => {
         const params = {
@@ -161,20 +176,44 @@ function groups(
           expand: params.expand,
         });
         const listGroupsApi = api.groups.list(params);
-
-        return Promise.all([
+        let groupApiRequests = [
           profileGroupsApi,
           listGroupsApi,
           auth.tokenGetter(),
-        ]).then(([myGroups, featuredGroups, token]) => [
-          combineGroups(myGroups, featuredGroups, documentUri),
-          token,
-        ]);
+        ];
+
+        // If there is a directLinkedGroup, add an api request to get that
+        // particular group as well since it may not be in the results returned
+        // by group.list or profile.groups.
+        if (directLinkedGroup) {
+          const selectedGroupApi = api.group.read({
+            id: directLinkedGroup,
+            expand: params.expand,
+          });
+          groupApiRequests = groupApiRequests.concat(selectedGroupApi);
+        }
+        return Promise.all(groupApiRequests).then(
+          ([myGroups, featuredGroups, token, selectedGroup]) => [
+            combineGroups(
+              myGroups,
+              selectedGroup !== undefined
+                ? featuredGroups.concat([selectedGroup])
+                : featuredGroups,
+              documentUri
+            ),
+            token,
+          ]
+        );
       })
       .then(([groups, token]) => {
         const isLoggedIn = token !== null;
         const directLinkedAnnotation = settings.annotations;
-        return filterGroups(groups, isLoggedIn, directLinkedAnnotation);
+        return filterGroups(
+          groups,
+          isLoggedIn,
+          directLinkedAnnotation,
+          directLinkedGroup
+        );
       })
       .then(groups => {
         injectOrganizations(groups);
@@ -183,7 +222,9 @@ function groups(
         const prevFocusedGroup = localStorage.getItem(STORAGE_KEY);
 
         store.loadGroups(groups);
-        if (isFirstLoad && groups.some(g => g.id === prevFocusedGroup)) {
+        if (isFirstLoad && groups.some(g => g.id === directLinkedGroup)) {
+          store.focusGroup(directLinkedGroup);
+        } else if (isFirstLoad && groups.some(g => g.id === prevFocusedGroup)) {
           store.focusGroup(prevFocusedGroup);
         }
 

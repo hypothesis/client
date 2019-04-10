@@ -124,6 +124,14 @@ describe('sidebar.services.api', function() {
     return api.group.member.delete({ pubid: 'an-id', userid: 'me' });
   });
 
+  it('gets a group by provided group id', () => {
+    const group = { id: 'group-id', name: 'Group' };
+    expectCall('get', 'groups/group-id', 200, group);
+    return api.group.read({ id: 'group-id' }).then(group_ => {
+      assert.deepEqual(group_, group);
+    });
+  });
+
   it('removes internal properties before sending data to the server', () => {
     const annotation = {
       $highlight: true,

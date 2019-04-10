@@ -289,6 +289,29 @@ describe('annotator.config.settingsFrom', function() {
     });
   });
 
+  [
+    {
+      description:
+        "returns an object with the group ID when there's a valid #annotations:group:<ID> fragment",
+      url: 'http://localhost:3000#annotations:group:alphanum3ric_-only',
+      returns: 'alphanum3ric_-only',
+    },
+    {
+      description: "returns null when there's a non-alphanumeric group ID",
+      url: 'http://localhost:3000#annotations:group:not%20alphanumeric',
+      returns: null,
+    },
+    {
+      description: "return null when there's an empty group ID",
+      url: 'http://localhost:3000#annotations:group:',
+      returns: null,
+    },
+  ].forEach(test => {
+    it(test.description, () => {
+      assert.deepEqual(settingsFrom(fakeWindow(test.url)).group, test.returns);
+    });
+  });
+
   describe('#query', function() {
     context(
       'when the host page has a js-hypothesis-config with a query setting',
