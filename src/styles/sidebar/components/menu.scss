@@ -1,0 +1,47 @@
+.menu {
+  position: relative;
+}
+
+// Toggle button that opens the menu.
+.menu__toggle {
+  appearance: none;
+  border: none;
+  background: none;
+  padding: 0;
+  color: inherit;
+  display: flex;
+}
+
+// Triangular indicator next to the toggle button indicating that there is
+// an associated drop-down menu.
+.menu__toggle-arrow {
+  width: 10px;
+  height: 10px;
+  margin-left: 5px;
+}
+
+// Triangular indicator at the top of the menu that associates it with the
+// toggle button.
+.menu__arrow {
+  $size: 10px;
+
+  background-color: white;
+  border-left: 1px solid $grey-3;
+  border-top: 1px solid $grey-3;
+  height: $size;
+  position: absolute;
+  right: #{$size / 2};
+  top: calc(100% - #{$size / 2} + 1px);
+  transform: rotate(45deg);
+  width: $size;
+  z-index: 3;
+}
+
+// Content area of the menu.
+.menu__content {
+  background-color: white;
+  border: 1px solid $grey-3;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+  position: absolute;
+  top: calc(100% + 2px);
+}
