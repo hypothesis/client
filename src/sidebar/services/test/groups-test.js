@@ -129,7 +129,7 @@ describe('groups', function() {
       },
     };
     fakeServiceUrl = sinon.stub();
-    fakeSettings = {};
+    fakeSettings = { group: null };
   });
 
   function service() {
@@ -197,6 +197,45 @@ describe('groups', function() {
       });
     });
 
+    it('combines groups from all 3 endpoints if there is a selectedGroup', () => {
+      const svc = service();
+
+      fakeSettings.group = 'selected-id';
+      const groups = [
+        { id: 'groupa', name: 'GroupA' },
+        { id: 'groupb', name: 'GroupB' },
+        { id: fakeSettings.group, name: 'Selected Group' },
+      ];
+
+      fakeApi.profile.groups.read.returns(Promise.resolve([groups[0]]));
+      fakeApi.groups.list.returns(Promise.resolve([groups[1]]));
+      fakeApi.group.read.returns(Promise.resolve(groups[2]));
+
+      return svc.load().then(() => {
+        assert.calledWith(fakeStore.loadGroups, groups);
+      });
+    });
+
+    it('passes the groupid from settings.group to the api.group.read call', () => {
+      const svc = service();
+
+      fakeSettings.group = 'selected-id';
+      const group = { id: fakeSettings.group, name: 'Selected Group' };
+
+      fakeApi.profile.groups.read.returns(Promise.resolve([]));
+      fakeApi.groups.list.returns(Promise.resolve([]));
+      fakeApi.group.read.returns(Promise.resolve(group));
+
+      return svc.load().then(() => {
+        assert.calledWith(
+          fakeApi.group.read,
+          sinon.match({
+            id: fakeSettings.group,
+          })
+        );
+      });
+    });
+
     it('loads all available groups', function() {
       const svc = service();
 
@@ -210,6 +249,7 @@ describe('groups', function() {
       fakeApi.groups.list.returns(
         Promise.resolve([{ id: 'groupa', name: 'GroupA' }])
       );
+      fakeSettings.group = 'group-id';
 
       return svc.load().then(() => {
         assert.calledWith(
@@ -220,6 +260,10 @@ describe('groups', function() {
           fakeApi.groups.list,
           sinon.match({ expand: ['organization', 'scopes'] })
         );
+        assert.calledWith(
+          fakeApi.group.read,
+          sinon.match({ expand: ['organization', 'scopes'] })
+        );
       });
     });
 
@@ -228,6 +272,25 @@ describe('groups', function() {
       fakeLocalStorage.getItem.returns(dummyGroups[1].id);
       return svc.load().then(() => {
         assert.calledWith(fakeStore.focusGroup, dummyGroups[1].id);
+      });
+    });
+
+    it('sets the direct-linked group to take precedence over the group saved in local storage', () => {
+      const svc = service();
+      fakeSettings.group = dummyGroups[1].id;
+      fakeLocalStorage.getItem.returns(dummyGroups[0].id);
+      fakeApi.groups.list.returns(Promise.resolve(dummyGroups));
+      return svc.load().then(() => {
+        assert.calledWith(fakeStore.focusGroup, dummyGroups[1].id);
+      });
+    });
+
+    it('sets the focused group to the linked group', () => {
+      const svc = service();
+      fakeSettings.group = dummyGroups[1].id;
+      fakeApi.groups.list.returns(Promise.resolve(dummyGroups));
+      return svc.load().then(() => {
+        assert.calledWith(fakeStore.focusGroup, fakeSettings.group);
       });
     });
 
@@ -295,6 +358,70 @@ describe('groups', function() {
       });
     });
 
+    it('both groups are in the final groups list when an annotation and a group are linked to', () => {
+      // This can happen if the linked to annotation and group are configured by
+      // the frame embedding the client.
+      const svc = service();
+
+      fakeSettings.group = 'out-of-scope';
+      fakeSettings.annotations = 'ann-id';
+
+      fakeApi.profile.groups.read.returns(Promise.resolve([]));
+      fakeApi.groups.list.returns(
+        Promise.resolve([
+          { name: 'BioPub', id: 'biopub' },
+          { name: 'Public', id: '__world__' },
+        ])
+      );
+      fakeApi.group.read.returns(
+        Promise.resolve({ name: 'Restricted', id: 'out-of-scope' })
+      );
+      fakeApi.annotation.get.returns(
+        Promise.resolve({
+          id: 'ann-id',
+          group: '__world__',
+        })
+      );
+
+      // The user is logged out.
+      fakeAuth.tokenGetter.returns(null);
+
+      return svc.load().then(groups => {
+        const linkedToGroupShown = groups.some(g => g.id === 'out-of-scope');
+        assert.isTrue(linkedToGroupShown);
+        const linkedToAnnGroupShown = groups.some(g => g.id === '__world__');
+        assert.isTrue(linkedToAnnGroupShown);
+      });
+    });
+
+    it('includes the "Public" group if the user links to it', () => {
+      // Set up the test under conditions that would otherwise
+      // not return the Public group. Aka: the user is logged
+      // out and there are associated groups.
+      const svc = service();
+
+      fakeSettings.group = '__world__';
+      fakeSettings.annotations = undefined;
+
+      fakeApi.profile.groups.read.returns(Promise.resolve([]));
+      fakeApi.groups.list.returns(
+        Promise.resolve([
+          { name: 'BioPub', id: 'biopub' },
+          { name: 'Public', id: '__world__' },
+        ])
+      );
+      fakeApi.group.read.returns(
+        Promise.resolve({ name: 'Public', id: '__world__' })
+      );
+
+      fakeAuth.tokenGetter.returns(null);
+
+      return svc.load().then(groups => {
+        const publicGroupShown = groups.some(g => g.id === '__world__');
+        assert.isTrue(publicGroupShown);
+      });
+    });
+
     truthTable(3).forEach(
       ([loggedIn, pageHasAssociatedGroups, directLinkToPublicAnnotation]) => {
         it('excludes the "Public" group if user logged out and page has associated groups', () => {
@@ -314,7 +441,7 @@ describe('groups', function() {
             );
             fakeSettings.annotations = 'direct-linked-ann';
           } else {
-            fakeSettings.annotations = null;
+            fakeSettings.annotations = undefined;
           }
 
           // Create groups response from server.
@@ -325,7 +452,6 @@ describe('groups', function() {
 
           fakeAuth.tokenGetter.returns(loggedIn ? '1234' : null);
           fakeApi.groups.list.returns(Promise.resolve(groups));
-          fakeApi.profile.groups.read.returns(Promise.resolve([]));
 
           return svc.load().then(groups => {
             const publicGroupShown = groups.some(g => g.id === '__world__');
