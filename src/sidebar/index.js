@@ -136,7 +136,7 @@ function startAngularApp(config) {
       ['ui.bootstrap', require('./vendor/ui-bootstrap-custom-tpls-0.13.4')][0],
 
       // sanitize html
-      'ngSanitize',
+      ['ngSanitize', require('angular-sanitize')][0],
 
       // Local addons
       'ngRaven',
