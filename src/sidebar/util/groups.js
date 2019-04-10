@@ -27,18 +27,22 @@ function combineGroups(userGroups, featuredGroups, uri) {
 
   const groups = userGroups.concat(featuredGroups);
 
-  // Add isScopedToUri property indicating whether a group can be
-  // annotated in at this particular url.
+  // Add isScopedToUri property indicating whether a group is within scope
+  // of the given uri. If the scope check cannot be performed, isScopedToUri
+  // defaults to true.
   groups.forEach(group => (group.isScopedToUri = isScopedToUri(group, uri)));
 
   return groups;
 }
 
 function isScopedToUri(group, uri) {
-  // If the group has scope info, the scoping is enforced,
-  // and the uri patterns don't include this page's uri
-  // the group is not selectable, otherwise it is.
-  if (group.scopes && group.scopes.enforced) {
+  /* If a scope check cannot be performed, meaning:
+   * - the group doesn't have a scopes attribute
+   * - the group has no scopes.uri_patterns present
+   * - there is no uri to compare against (aka: uri=null)
+   * the group is defaulted to in-scope.
+   */
+  if (group.scopes && group.scopes.uri_patterns.length > 0 && uri) {
     return uriMatchesScopes(uri, group.scopes.uri_patterns);
   }
   return true;

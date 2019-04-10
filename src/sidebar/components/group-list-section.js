@@ -4,7 +4,7 @@
 function GroupListSectionController() {
   this.isSelectable = function(groupId) {
     const group = this.sectionGroups.find(g => g.id === groupId);
-    return !this.disableOosGroupSelection || group.isScopedToUri;
+    return !group.scopes.enforced || group.isScopedToUri;
   };
 }
 
@@ -16,8 +16,6 @@ module.exports = {
     sectionGroups: '<',
     /* The string name of the group list section. */
     heading: '<',
-    /* A boolean indicating whether out of scope group selection should be disabled. */
-    disableOosGroupSelection: '<',
   },
   template: require('../templates/group-list-section.html'),
 };
