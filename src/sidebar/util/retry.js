@@ -13,17 +13,19 @@ const retry = require('retry');
  *         it succeeds within the allowed number of attempts.
  */
 function retryPromiseOperation(opFn, options) {
-  return new Promise(function (resolve, reject) {
+  return new Promise(function(resolve, reject) {
     const operation = retry.operation(options);
-    operation.attempt(function () {
-      opFn().then(function (result) {
-        operation.retry();
-        resolve(result);
-      }).catch(function (err) {
-        if (!operation.retry(err)) {
-          reject(err);
-        }
-      });
+    operation.attempt(function() {
+      opFn()
+        .then(function(result) {
+          operation.retry();
+          resolve(result);
+        })
+        .catch(function(err) {
+          if (!operation.retry(err)) {
+            reject(err);
+          }
+        });
     });
   });
 }

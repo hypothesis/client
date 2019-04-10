@@ -11,7 +11,7 @@ module.exports = {
   // @ngInject
   controller: function ($scope, $window, store, serviceUrl, groups, i18nService) {
     this.userAgent = $window.navigator.userAgent;
-    this.version = '__VERSION__';  // replaced by versionify
+    this.version = '__VERSION__'; // replaced by versionify
     this.dateTime = new Date();
     this.serviceUrl = serviceUrl;
     this.group = groups.focused() && groups.focused().id.replace(/-/g, '');
@@ -25,10 +25,10 @@ module.exports = {
     }.bind(this));
 
     $scope.$watch(
-      function () {
+      function() {
         return store.frames();
       },
-      function (frames) {
+      function(frames) {
         if (frames.length === 0) {
           return;
         }

@@ -1,16 +1,16 @@
 'use strict';
 
 /*
-** Adapted from:
-** https://github.com/openannotation/annotator/blob/v1.2.x/test/spec/plugin/document_spec.coffee
-**
-** Annotator v1.2.10
-** https://github.com/openannotation/annotator
-**
-** Copyright 2015, the Annotator project contributors.
-** Dual licensed under the MIT and GPLv3 licenses.
-** https://github.com/openannotation/annotator/blob/master/LICENSE
-*/
+ ** Adapted from:
+ ** https://github.com/openannotation/annotator/blob/v1.2.x/test/spec/plugin/document_spec.coffee
+ **
+ ** Annotator v1.2.10
+ ** https://github.com/openannotation/annotator
+ **
+ ** Copyright 2015, the Annotator project contributors.
+ ** Dual licensed under the MIT and GPLv3 licenses.
+ ** https://github.com/openannotation/annotator/blob/master/LICENSE
+ */
 
 const $ = require('jquery');
 
@@ -126,7 +126,10 @@ describe('DocumentMeta', function() {
 
     it('should have dublincore metadata', function() {
       assert.ok(metadata.dc);
-      assert.deepEqual(metadata.dc.identifier, ['doi:10.1175/JCLI-D-11-00015.1', 'foobar-abcxyz']);
+      assert.deepEqual(metadata.dc.identifier, [
+        'doi:10.1175/JCLI-D-11-00015.1',
+        'foobar-abcxyz',
+      ]);
       assert.deepEqual(metadata.dc['relation.ispartof'], ['isbn:123456789']);
       assert.deepEqual(metadata.dc.type, ['Article']);
     });
@@ -138,7 +141,9 @@ describe('DocumentMeta', function() {
 
     it('should have eprints metadata', function() {
       assert.ok(metadata.eprints);
-      assert.deepEqual(metadata.eprints.title, ['Computer Lib / Dream Machines']);
+      assert.deepEqual(metadata.eprints.title, [
+        'Computer Lib / Dream Machines',
+      ]);
     });
 
     it('should have prism metadata', function() {
@@ -162,11 +167,7 @@ describe('DocumentMeta', function() {
     });
 
     it('should have a favicon', () =>
-      assert.equal(
-        metadata.favicon,
-        'http://example.com/images/icon.ico'
-      )
-    );
+      assert.equal(metadata.favicon, 'http://example.com/images/icon.ico'));
 
     it('should have a documentFingerprint as the dc resource identifiers URN href', () => {
       assert.equal(metadata.documentFingerprint, metadata.link[9].href);
@@ -210,9 +211,7 @@ describe('DocumentMeta', function() {
     });
   });
 
-
   describe('#_absoluteUrl', function() {
-
     it('should add the protocol when the url starts with two slashes', function() {
       const result = testDocument._absoluteUrl('//example.com/');
       const expected = `${document.location.protocol}//example.com/`;
@@ -226,28 +225,24 @@ describe('DocumentMeta', function() {
 
     it('should make a relative path into an absolute url', function() {
       const result = testDocument._absoluteUrl('path');
-      const expected = (
-        document.location.protocol + '//' +
-          document.location.host +
-          document.location.pathname.replace(/[^\/]+$/, '') +
-          'path'
-      );
+      const expected =
+        document.location.protocol +
+        '//' +
+        document.location.host +
+        document.location.pathname.replace(/[^/]+$/, '') +
+        'path';
       assert.equal(result, expected);
     });
 
     it('should make an absolute path into an absolute url', function() {
       const result = testDocument._absoluteUrl('/path');
-      const expected = (
-        document.location.protocol + '//' +
-          document.location.host +
-          '/path'
-      );
+      const expected =
+        document.location.protocol + '//' + document.location.host + '/path';
       assert.equal(result, expected);
     });
   });
 
   describe('#uri', function() {
-
     beforeEach(function() {
       // Remove any existing canonical links which would otherwise override the
       // document's own location.
@@ -270,7 +265,7 @@ describe('DocumentMeta', function() {
       // document.
       const fakeDocument = {
         createElement: htmlDoc.createElement.bind(htmlDoc), // eslint-disable-line no-restricted-properties
-        querySelectorAll: htmlDoc.querySelectorAll.bind(htmlDoc),  // eslint-disable-line no-restricted-properties
+        querySelectorAll: htmlDoc.querySelectorAll.bind(htmlDoc), // eslint-disable-line no-restricted-properties
         location: {
           href,
         },
@@ -325,7 +320,11 @@ describe('DocumentMeta', function() {
       canonicalLink.href = 'https://publisher.org/canonical';
       htmlDoc.head.appendChild(canonicalLink);
 
-      const doc = createDoc('https://publisher.org/not-canonical', null, htmlDoc);
+      const doc = createDoc(
+        'https://publisher.org/not-canonical',
+        null,
+        htmlDoc
+      );
 
       assert.equal(doc.uri(), canonicalLink.href);
     });

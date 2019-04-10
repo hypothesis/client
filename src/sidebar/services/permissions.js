@@ -31,11 +31,11 @@ function Permissions(localStorage) {
   function defaultLevel() {
     const savedLevel = localStorage.getItem(STORAGE_KEY);
     switch (savedLevel) {
-    case 'private':
-    case 'shared':
-      return savedLevel;
-    default:
-      return 'shared';
+      case 'private':
+      case 'shared':
+        return savedLevel;
+      default:
+        return 'shared';
     }
   }
 
@@ -47,7 +47,7 @@ function Permissions(localStorage) {
    * @param {string} userid - User ID of the author
    * @return {Permissions}
    */
-  this.private = function (userid) {
+  this.private = function(userid) {
     return {
       read: [userid],
       update: [userid],
@@ -64,7 +64,7 @@ function Permissions(localStorage) {
    * shared with
    * @return {Permissions}
    */
-  this.shared = function (userid, groupId) {
+  this.shared = function(userid, groupId) {
     return Object.assign(self.private(userid), {
       read: ['group:' + groupId],
     });
@@ -78,7 +78,7 @@ function Permissions(localStorage) {
    * with
    * @return {Permissions}
    */
-  this.default = function (userid, groupId) {
+  this.default = function(userid, groupId) {
     if (defaultLevel() === 'private') {
       return self.private(userid);
     } else {
@@ -91,7 +91,7 @@ function Permissions(localStorage) {
    *
    * @param {'private'|'shared'} level
    */
-  this.setDefault = function (level) {
+  this.setDefault = function(level) {
     localStorage.setItem(STORAGE_KEY, level);
   };
 
@@ -102,8 +102,8 @@ function Permissions(localStorage) {
    * @param {Permissions} perms
    * @return {boolean}
    */
-  this.isShared = function (perms) {
-    return perms.read.some(function (principal) {
+  this.isShared = function(perms) {
+    return perms.read.some(function(principal) {
       return principal.indexOf('group:') === 0;
     });
   };
@@ -116,7 +116,7 @@ function Permissions(localStorage) {
    * @param {string} userid
    * @return {boolean}
    */
-  this.permits = function (perms, action, userid) {
+  this.permits = function(perms, action, userid) {
     return perms[action].indexOf(userid) !== -1;
   };
 }

@@ -28,53 +28,59 @@ class SearchClient extends EventEmitter {
   }
 
   _getBatch(query, offset) {
-    const searchQuery = Object.assign({
-      limit: this._chunkSize,
-      offset: offset,
-      sort: 'created',
-      order: 'asc',
-      _separate_replies: true,
-    }, query);
+    const searchQuery = Object.assign(
+      {
+        limit: this._chunkSize,
+        offset: offset,
+        sort: 'created',
+        order: 'asc',
+        _separate_replies: true,
+      },
+      query
+    );
 
     const self = this;
-    this._searchFn(searchQuery).then(function (results) {
-      if (self._canceled) {
-        return;
-      }
+    this._searchFn(searchQuery)
+      .then(function(results) {
+        if (self._canceled) {
+          return;
+        }
 
-      const chunk = results.rows.concat(results.replies || []);
-      if (self._incremental) {
-        self.emit('results', chunk);
-      } else {
-        self._results = self._results.concat(chunk);
-      }
+        const chunk = results.rows.concat(results.replies || []);
+        if (self._incremental) {
+          self.emit('results', chunk);
+        } else {
+          self._results = self._results.concat(chunk);
+        }
 
-      // Check if there are additional pages of results to fetch. In addition to
-      // checking the `total` figure from the server, we also require that at
-      // least one result was returned in the current page, otherwise we would
-      // end up repeating the same query for the next page. If the server's
-      // `total` count is incorrect for any reason, that will lead to the client
-      // polling the server indefinitely.
-      const nextOffset = offset + results.rows.length;
-      if (results.total > nextOffset && chunk.length > 0) {
-        self._getBatch(query, nextOffset);
-      } else {
-        if (!self._incremental) {
-          self.emit('results', self._results);
+        // Check if there are additional pages of results to fetch. In addition to
+        // checking the `total` figure from the server, we also require that at
+        // least one result was returned in the current page, otherwise we would
+        // end up repeating the same query for the next page. If the server's
+        // `total` count is incorrect for any reason, that will lead to the client
+        // polling the server indefinitely.
+        const nextOffset = offset + results.rows.length;
+        if (results.total > nextOffset && chunk.length > 0) {
+          self._getBatch(query, nextOffset);
+        } else {
+          if (!self._incremental) {
+            self.emit('results', self._results);
+          }
+          self.emit('end');
+        }
+      })
+      .catch(function(err) {
+        if (self._canceled) {
+          return;
+        }
+        self.emit('error', err);
+      })
+      .then(function() {
+        if (self._canceled) {
+          return;
         }
         self.emit('end');
-      }
-    }).catch(function (err) {
-      if (self._canceled) {
-        return;
-      }
-      self.emit('error', err);
-    }).then(function () {
-      if (self._canceled) {
-        return;
-      }
-      self.emit('end');
-    });
+      });
   }
 
   /**

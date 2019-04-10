@@ -1,6 +1,8 @@
 'use strict';
 
 const util = require('../util');
+const { selectors: sessionSelectors } = require('./session');
+const { isLoggedIn } = sessionSelectors;
 
 function init() {
   return {
@@ -22,7 +24,9 @@ const update = {
   FOCUS_GROUP(state, action) {
     const group = state.groups.find(g => g.id === action.id);
     if (!group) {
-      console.error(`Attempted to focus group ${action.id} which is not loaded`);
+      console.error(
+        `Attempted to focus group ${action.id} which is not loaded`
+      );
       return {};
     }
     return { focusedGroupId: action.id };
@@ -33,7 +37,10 @@ const update = {
     let focusedGroupId = state.focusedGroupId;
 
     // Reset focused group if not in the new set of groups.
-    if (state.focusedGroupId === null || !groups.find(g => g.id === state.focusedGroupId)) {
+    if (
+      state.focusedGroupId === null ||
+      !groups.find(g => g.id === state.focusedGroupId)
+    ) {
       if (groups.length > 0) {
         focusedGroupId = groups[0].id;
       } else {
@@ -113,6 +120,43 @@ function getGroup(state, id) {
   return state.groups.find(g => g.id === id);
 }
 
+/**
+ * Return groups that don't show up in Featured and My Groups.
+ *
+ * @return {Group[]}
+ */
+function getCurrentlyViewingGroups(state) {
+  const myGroups = getMyGroups(state);
+  const featuredGroups = getFeaturedGroups(state);
+
+  return state.groups.filter(
+    g => !myGroups.includes(g) && !featuredGroups.includes(g)
+  );
+}
+
+/**
+ * Return groups the logged in user is a member of.
+ *
+ * @return {Group[]}
+ */
+function getMyGroups(state) {
+  // If logged out, the Public group still has isMember set to true so only
+  // return groups with membership in logged in state.
+  if (isLoggedIn(state)) {
+    return state.groups.filter(g => g.isMember);
+  }
+  return [];
+}
+
+/**
+ * Return groups the user isn't a member of that are scoped to the URI.
+ *
+ * @return {Group[]}
+ */
+function getFeaturedGroups(state) {
+  return state.groups.filter(group => !group.isMember && group.isScopedToUri);
+}
+
 module.exports = {
   init,
   update,
@@ -123,6 +167,9 @@ module.exports = {
   selectors: {
     allGroups,
     getGroup,
+    getCurrentlyViewingGroups,
+    getFeaturedGroups,
+    getMyGroups,
     focusedGroup,
     focusedGroupId,
   },

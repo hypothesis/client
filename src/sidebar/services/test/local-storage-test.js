@@ -28,15 +28,12 @@ function windowWithLocalStorageMethodsThatThrow() {
 describe('sidebar.localStorage', () => {
   let fakeWindow;
 
-  before(() =>
-    angular.module('h', [])
-      .service('localStorage', service)
-  );
+  before(() => angular.module('h', []).service('localStorage', service));
 
   [
     windowWithLocalStorageMethodsThatThrow(),
     windowWithLocalStoragePropertyThatThrows(),
-  ].forEach(($window) => {
+  ].forEach($window => {
     context('when browser localStorage is *not* accessible', () => {
       let localStorage = null;
       let key = null;
@@ -47,10 +44,12 @@ describe('sidebar.localStorage', () => {
         });
       });
 
-      beforeEach(angular.mock.inject((_localStorage_) => {
-        localStorage = _localStorage_;
-        key = 'test.memory.key';
-      }));
+      beforeEach(
+        angular.mock.inject(_localStorage_ => {
+          localStorage = _localStorage_;
+          key = 'test.memory.key';
+        })
+      );
 
       it('sets/gets Item', () => {
         const value = 'What shall we do with a drunken sailor?';
@@ -67,7 +66,7 @@ describe('sidebar.localStorage', () => {
       });
 
       it('sets/gets Object', () => {
-        const data = {'foo': 'bar'};
+        const data = { foo: 'bar' };
         localStorage.setObject(key, data);
         const stringified = localStorage.getItem(key);
         assert.equal(stringified, JSON.stringify(data));
@@ -96,7 +95,7 @@ describe('sidebar.localStorage', () => {
     });
 
     beforeEach(() => {
-      angular.mock.inject(_localStorage_ => localStorage = _localStorage_);
+      angular.mock.inject(_localStorage_ => (localStorage = _localStorage_));
     });
 
     it('uses window.localStorage functions to handle data', () => {

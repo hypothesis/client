@@ -4,15 +4,14 @@ const features = require('../features');
 const events = require('../../events');
 const bridgeEvents = require('../../../shared/bridge-events');
 
-describe('h:features - sidebar layer', function () {
-
+describe('h:features - sidebar layer', function() {
   let fakeBridge;
   let fakeLog;
   let fakeRootScope;
   let fakeSession;
   let sandbox;
 
-  beforeEach(function () {
+  beforeEach(function() {
     sandbox = sinon.sandbox.create();
 
     fakeBridge = {
@@ -37,45 +36,64 @@ describe('h:features - sidebar layer', function () {
       load: sinon.stub(),
       state: {
         features: {
-          'feature_on': true,
-          'feature_off': false,
+          feature_on: true,
+          feature_off: false,
         },
       },
     };
   });
 
-  afterEach(function(){
+  afterEach(function() {
     sandbox.restore();
   });
 
-  describe('flagEnabled', function () {
-    it('should retrieve features data', function () {
-      const features_ = features(fakeLog, fakeRootScope, fakeBridge, fakeSession);
+  describe('flagEnabled', function() {
+    it('should retrieve features data', function() {
+      const features_ = features(
+        fakeLog,
+        fakeRootScope,
+        fakeBridge,
+        fakeSession
+      );
       assert.equal(features_.flagEnabled('feature_on'), true);
       assert.equal(features_.flagEnabled('feature_off'), false);
     });
 
-    it('should return false if features have not been loaded', function () {
-      const features_ = features(fakeLog, fakeRootScope, fakeBridge, fakeSession);
+    it('should return false if features have not been loaded', function() {
+      const features_ = features(
+        fakeLog,
+        fakeRootScope,
+        fakeBridge,
+        fakeSession
+      );
       // simulate feature data not having been loaded yet
       fakeSession.state = {};
       assert.equal(features_.flagEnabled('feature_on'), false);
     });
 
-    it('should trigger a refresh of session data', function () {
-      const features_ = features(fakeLog, fakeRootScope, fakeBridge, fakeSession);
+    it('should trigger a refresh of session data', function() {
+      const features_ = features(
+        fakeLog,
+        fakeRootScope,
+        fakeBridge,
+        fakeSession
+      );
       features_.flagEnabled('feature_on');
       assert.calledOnce(fakeSession.load);
     });
 
-    it('should return false for unknown flags', function () {
-      const features_ = features(fakeLog, fakeRootScope, fakeBridge, fakeSession);
+    it('should return false for unknown flags', function() {
+      const features_ = features(
+        fakeLog,
+        fakeRootScope,
+        fakeBridge,
+        fakeSession
+      );
       assert.isFalse(features_.flagEnabled('unknown_feature'));
     });
   });
 
-  it('should broadcast feature flags to annotation layer based on load/user changes', function(){
-
+  it('should broadcast feature flags to annotation layer based on load/user changes', function() {
     assert.notProperty(fakeRootScope.eventCallbacks, events.USER_CHANGED);
     assert.notProperty(fakeRootScope.eventCallbacks, events.FRAME_CONNECTED);
 
@@ -90,12 +108,20 @@ describe('h:features - sidebar layer', function () {
     fakeRootScope.eventCallbacks[events.USER_CHANGED]();
 
     assert.calledOnce(fakeBridge.call);
-    assert.calledWith(fakeBridge.call, bridgeEvents.FEATURE_FLAGS_UPDATED, fakeSession.state.features);
+    assert.calledWith(
+      fakeBridge.call,
+      bridgeEvents.FEATURE_FLAGS_UPDATED,
+      fakeSession.state.features
+    );
 
     // respond to frame connections by broadcasting the feature flags
     fakeRootScope.eventCallbacks[events.FRAME_CONNECTED]();
 
     assert.calledTwice(fakeBridge.call);
-    assert.calledWith(fakeBridge.call, bridgeEvents.FEATURE_FLAGS_UPDATED, fakeSession.state.features);
+    assert.calledWith(
+      fakeBridge.call,
+      bridgeEvents.FEATURE_FLAGS_UPDATED,
+      fakeSession.state.features
+    );
   });
 });

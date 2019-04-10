@@ -23,7 +23,7 @@ describe('annotator.config.configFuncSettingsFrom', function() {
     });
 
     function fakeWindow() {
-      return {hypothesisConfig: 42};
+      return { hypothesisConfig: 42 };
     }
 
     it('returns {}', function() {
@@ -34,14 +34,16 @@ describe('annotator.config.configFuncSettingsFrom', function() {
       configFuncSettingsFrom(fakeWindow());
 
       assert.calledOnce(console.warn);
-      assert.isTrue(console.warn.firstCall.args[0].startsWith(
-        'hypothesisConfig must be a function'
-      ));
+      assert.isTrue(
+        console.warn.firstCall.args[0].startsWith(
+          'hypothesisConfig must be a function'
+        )
+      );
     });
   });
 
   context('when window.hypothesisConfig() is a function', function() {
-    it('returns whatever window.hypothesisConfig() returns', function () {
+    it('returns whatever window.hypothesisConfig() returns', function() {
       // It just blindly returns whatever hypothesisConfig() returns
       // (even if it's not an object).
       const fakeWindow = { hypothesisConfig: sinon.stub().returns(42) };

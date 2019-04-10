@@ -6,7 +6,7 @@ const { retryPromiseOperation } = require('../util/retry');
  * A service which fetches and caches API route metadata.
  */
 // @ngInject
-function apiRoutes($http, settings) {
+function apiRoutes(settings) {
   // Cache of route name => route metadata from API root.
   let routeCache;
   // Cache of links to pages on the service fetched from the API's "links"
@@ -14,11 +14,16 @@ function apiRoutes($http, settings) {
   let linkCache;
 
   function getJSON(url) {
-    return $http.get(url).then(({ status, data }) => {
-      if (status !== 200) {
+    const config = {
+      headers: {
+        'Hypothesis-Client-Version': '__VERSION__', // replaced by versionify
+      },
+    };
+    return fetch(url, config).then(response => {
+      if (response.status !== 200) {
         throw new Error(`Fetching ${url} failed`);
       }
-      return data;
+      return response.json();
     });
   }
 
@@ -32,8 +37,9 @@ function apiRoutes($http, settings) {
    */
   function routes() {
     if (!routeCache) {
-      routeCache = retryPromiseOperation(() => getJSON(settings.apiUrl))
-        .then((index) => index.links);
+      routeCache = retryPromiseOperation(() => getJSON(settings.apiUrl)).then(
+        index => index.links
+      );
     }
     return routeCache;
   }

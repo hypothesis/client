@@ -2,7 +2,9 @@
 
 const proxyquire = require('proxyquire');
 
-const { assertPromiseIsRejected } = require('../../../shared/test/promise-util');
+const {
+  assertPromiseIsRejected,
+} = require('../../../shared/test/promise-util');
 
 describe('sidebar.util.fetch-config', () => {
   let fetchConfig;
@@ -100,7 +102,11 @@ describe('sidebar.util.fetch-config', () => {
           const ancestors = [fakeWindow.parent, fakeWindow.parent.parent];
           ancestors.forEach(frame => {
             assert.calledWith(
-              fakeJsonRpc.call, frame, 'https://embedder.com', 'requestConfig', expectedTimeout
+              fakeJsonRpc.call,
+              frame,
+              'https://embedder.com',
+              'requestConfig',
+              expectedTimeout
             );
           });
         });
@@ -124,28 +130,38 @@ describe('sidebar.util.fetch-config', () => {
         // When the embedder responds with configuration, that should be
         // returned by `fetchConfig`.
         fakeJsonRpc.call.returns(new Promise(() => {}));
-        fakeJsonRpc.call.withArgs(
-          fakeWindow.parent.parent, 'https://embedder.com', 'requestConfig', expectedTimeout
-        ).returns(Promise.resolve({
-          // Here the embedder's parent returns service configuration
-          // (aka. credentials for automatic login).
-          services: [{
-            apiUrl: 'https://servi.ce/api/',
-            grantToken: 'secret-token',
-          }],
-        }));
+        fakeJsonRpc.call
+          .withArgs(
+            fakeWindow.parent.parent,
+            'https://embedder.com',
+            'requestConfig',
+            expectedTimeout
+          )
+          .returns(
+            Promise.resolve({
+              // Here the embedder's parent returns service configuration
+              // (aka. credentials for automatic login).
+              services: [
+                {
+                  apiUrl: 'https://servi.ce/api/',
+                  grantToken: 'secret-token',
+                },
+              ],
+            })
+          );
 
         return fetchConfig({}, fakeWindow).then(config => {
           assert.deepEqual(config, {
             apiUrl: 'https://servi.ce/api/',
-            services: [{
-              apiUrl: 'https://servi.ce/api/',
-              grantToken: 'secret-token',
-            }],
+            services: [
+              {
+                apiUrl: 'https://servi.ce/api/',
+                grantToken: 'secret-token',
+              },
+            ],
           });
         });
       });
-
     });
   });
 });

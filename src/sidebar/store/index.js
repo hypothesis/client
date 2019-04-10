@@ -34,11 +34,12 @@
 const createStore = require('./create-store');
 const debugMiddleware = require('./debug-middleware');
 
+const activity = require('./modules/activity');
 const annotations = require('./modules/annotations');
 const frames = require('./modules/frames');
 const links = require('./modules/links');
 const groups = require('./modules/groups');
-const selection= require('./modules/selection');
+const selection = require('./modules/selection');
 const session = require('./modules/session');
 const viewer = require('./modules/viewer');
 
@@ -53,15 +54,15 @@ const viewer = require('./modules/viewer');
  * See http://redux.js.org/docs/advanced/Middleware.html
  */
 function angularDigestMiddleware($rootScope) {
-  return function (next) {
-    return function (action) {
+  return function(next) {
+    return function(action) {
       next(action);
 
       // '$$phase' is set if Angular is in the middle of a digest cycle already
       if (!$rootScope.$$phase) {
         // $applyAsync() is similar to $apply() but provides debouncing.
         // See http://stackoverflow.com/questions/30789177
-        $rootScope.$applyAsync(function () {});
+        $rootScope.$applyAsync(function() {});
       }
     };
   };
@@ -83,6 +84,7 @@ function store($rootScope, settings) {
   ];
 
   const modules = [
+    activity,
     annotations,
     frames,
     links,

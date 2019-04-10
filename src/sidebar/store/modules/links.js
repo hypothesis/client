@@ -10,10 +10,14 @@
 'use strict';
 
 /** Return the initial links. */
-function init() { return {links: null}; }
+function init() {
+  return { links: null };
+}
 
 /** Return updated links based on the given current state and action object. */
-function updateLinks(state, action) { return {links: action.newLinks}; }
+function updateLinks(state, action) {
+  return { links: action.newLinks };
+}
 
 /** Return an action object for updating the links to the given newLinks. */
 function updateLinksAction(newLinks) {
@@ -21,8 +25,8 @@ function updateLinksAction(newLinks) {
 }
 
 module.exports = {
-  init:    init,
-  update:  { UPDATE_LINKS: updateLinks },
+  init: init,
+  update: { UPDATE_LINKS: updateLinks },
   actions: { updateLinks: updateLinksAction },
   selectors: {},
 };

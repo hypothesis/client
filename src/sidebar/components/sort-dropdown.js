@@ -2,7 +2,7 @@
 
 module.exports = {
   controllerAs: 'vm',
-  controller: function () {},
+  controller: function() {},
   bindings: {
     /** The name of the currently selected sort key. */
     sortKey: '<',

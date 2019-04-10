@@ -1,4 +1,11 @@
 {
-  "presets": ["es2015"],
-  "ignore": "**/vendor/*"
+  "presets": [
+    ["@babel/preset-env", {
+       "targets": {
+         "browsers": ["> 0.3%"]
+      }
+    }]
+  ],
+  "plugins": ["angularjs-annotate"],
+  "ignore": ["**/vendor/*"]
 }

@@ -24,7 +24,8 @@ function configFuncSettingsFrom(window_) {
   }
 
   if (typeof window_.hypothesisConfig !== 'function') {
-    const docs = 'https://h.readthedocs.io/projects/client/en/latest/publishers/config/#window.hypothesisConfig';
+    const docs =
+      'https://h.readthedocs.io/projects/client/en/latest/publishers/config/#window.hypothesisConfig';
     console.warn('hypothesisConfig must be a function, see: ' + docs);
     return {};
   }

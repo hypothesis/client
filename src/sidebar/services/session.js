@@ -21,8 +21,18 @@ const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
  *
  * @ngInject
  */
-function session($q, $rootScope, analytics, store, api, auth,
-                 flash, raven, settings, serviceConfig) {
+function session(
+  $q,
+  $rootScope,
+  analytics,
+  store,
+  api,
+  auth,
+  flash,
+  raven,
+  settings,
+  serviceConfig
+) {
   // Cache the result of load()
   let lastLoad;
   let lastLoadTime;
@@ -49,34 +59,36 @@ function session($q, $rootScope, analytics, store, api, auth,
    * @return {Promise<Profile>} A promise for the user's profile data.
    */
   function load() {
-    if (!lastLoadTime || (Date.now() - lastLoadTime) > CACHE_TTL) {
-
+    if (!lastLoadTime || Date.now() - lastLoadTime > CACHE_TTL) {
       // The load attempt is automatically retried with a backoff.
       //
       // This serves to make loading the app in the extension cope better with
       // flakey connectivity but it also throttles the frequency of calls to
       // the /app endpoint.
+      lastLoadTime = Date.now();
       const uri = getDocumentDCIdentifier(store);
       return uri.then(uri => {
         lastLoadTime = Date.now();
-        lastLoad = retryUtil.retryPromiseOperation(function () {
-          const authority = getAuthority();
-          const opts = {};
-          if (authority) {
-            opts.authority = authority;
-          }
-          if (uri) {
-            opts.document_uri = uri;
-          }
-          return api.profile.read(opts);
-        }, profileFetchRetryOpts).then(function (session) {
-          update(session);
-          lastLoadTime = Date.now();
-          return session;
-        }).catch(function (err) {
-          lastLoadTime = null;
-          throw err;
-        });
+          lastLoad = retryUtil
+              .retryPromiseOperation(function() {
+                  const authority = getAuthority();
+                  const opts = {};
+                  if (authority) {
+                      opts.authority = authority;
+                  }
+                  if (uri) {
+                      opts.document_uri = uri;
+                  }
+                  return api.profile.read(opts);
+              }, profileFetchRetryOpts)
+              .then(function(session) {
+                  update(session);
+                  return session;
+              })
+              .catch(function(err) {
+                  lastLoadTime = null;
+                  throw err;
+              });
       });
     }
     return lastLoad;
@@ -87,7 +99,9 @@ function session($q, $rootScope, analytics, store, api, auth,
    * tutorial and then update the local profile data.
    */
   function dismissSidebarTutorial() {
-    return api.profile.update({}, {preferences: {show_sidebar_tutorial: false}}).then(update);
+    return api.profile
+      .update({}, { preferences: { show_sidebar_tutorial: false } })
+      .then(update);
   }
 
   /**
@@ -137,13 +151,15 @@ function session($q, $rootScope, analytics, store, api, auth,
       return reload();
     });
 
-    return loggedOut.catch(function (err) {
-      flash.error('Log out failed');
-      analytics.track(analytics.events.LOGOUT_FAILURE);
-      return $q.reject(new Error(err));
-    }).then(function(){
-      analytics.track(analytics.events.LOGOUT_SUCCESS);
-    });
+    return loggedOut
+      .catch(function(err) {
+        flash.error('Log out failed');
+        analytics.track(analytics.events.LOGOUT_FAILURE);
+        return $q.reject(new Error(err));
+      })
+      .then(function() {
+        analytics.track(analytics.events.LOGOUT_SUCCESS);
+      });
   }
 
   /**

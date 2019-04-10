@@ -49,25 +49,24 @@ function replaceText(state, pos, length, text) {
     newSelectionEnd += text.length - length;
   } else if (newSelectionEnd <= pos) {
     // 2. Selection is before replaced text: Leave selection unchanged
-  } else if (newSelectionStart <= pos &&
-             newSelectionEnd >= pos + length) {
+  } else if (newSelectionStart <= pos && newSelectionEnd >= pos + length) {
     // 3. Selection fully contains replaced text:
     //    Increment end by difference in length between original and replaced
     //    text
     newSelectionEnd += text.length - length;
-  } else if (newSelectionStart < pos &&
-             newSelectionEnd < pos + length) {
+  } else if (newSelectionStart < pos && newSelectionEnd < pos + length) {
     // 4. Selection overlaps start but not end of replaced text:
     //    Decrement start to start of replacement text
     newSelectionStart = pos;
-  } else if (newSelectionStart < pos + length &&
-             newSelectionEnd > pos + length) {
+  } else if (
+    newSelectionStart < pos + length &&
+    newSelectionEnd > pos + length
+  ) {
     // 5. Selection overlaps end but not start of replaced text:
     //    Increment end by difference in length between original and replaced
     //    text
     newSelectionEnd += text.length - length;
-  } else if (pos < newSelectionStart &&
-             pos + length > newSelectionEnd) {
+  } else if (pos < newSelectionStart && pos + length > newSelectionEnd) {
     // 6. Replaced text fully contains selection:
     //    Expand selection to replaced text
     newSelectionStart = pos;
@@ -105,8 +104,12 @@ function convertSelectionToLink(state, linkType) {
     // Selection is a URL, wrap it with a link and use the selection as
     // the target.
     const dummyLabel = 'Description';
-    newState = replaceText(state, state.selectionStart, selection.length,
-      linkPrefix + '[' + dummyLabel + '](' + selection + ')');
+    newState = replaceText(
+      state,
+      state.selectionStart,
+      selection.length,
+      linkPrefix + '[' + dummyLabel + '](' + selection + ')'
+    );
     newState.selectionStart = state.selectionStart + linkPrefix.length + 1;
     newState.selectionEnd = newState.selectionStart + dummyLabel.length;
     return newState;
@@ -115,8 +118,12 @@ function convertSelectionToLink(state, linkType) {
     // the label. Change the selection to the dummy link.
     const beforeURL = linkPrefix + '[' + selection + '](';
     const dummyLink = 'http://insert-your-link-here.com';
-    newState = replaceText(state, state.selectionStart, selection.length,
-      beforeURL + dummyLink + ')');
+    newState = replaceText(
+      state,
+      state.selectionStart,
+      selection.length,
+      beforeURL + dummyLink + ')'
+    );
     newState.selectionStart = state.selectionStart + beforeURL.length;
     newState.selectionEnd = newState.selectionStart + dummyLink.length;
     return newState;
@@ -140,10 +147,14 @@ function toggleSpanStyle(state, prefix, suffix, placeholder) {
     suffix = prefix;
   }
 
-  const selectionPrefix = state.text.slice(state.selectionStart - prefix.length,
-    state.selectionStart);
-  const selectionSuffix = state.text.slice(state.selectionEnd,
-    state.selectionEnd + prefix.length);
+  const selectionPrefix = state.text.slice(
+    state.selectionStart - prefix.length,
+    state.selectionStart
+  );
+  const selectionSuffix = state.text.slice(
+    state.selectionEnd,
+    state.selectionEnd + prefix.length
+  );
   let newState = state;
 
   if (state.selectionStart === state.selectionEnd && placeholder) {
@@ -152,8 +163,12 @@ function toggleSpanStyle(state, prefix, suffix, placeholder) {
   }
 
   if (selectionPrefix === prefix && selectionSuffix === suffix) {
-    newState = replaceText(newState, newState.selectionStart - prefix.length,
-                           prefix.length, '');
+    newState = replaceText(
+      newState,
+      newState.selectionStart - prefix.length,
+      prefix.length,
+      ''
+    );
     newState = replaceText(newState, newState.selectionEnd, suffix.length, '');
   } else {
     newState = replaceText(newState, newState.selectionStart, 0, prefix);
@@ -228,7 +243,7 @@ function toggleBlockStyle(state, prefix) {
   // Test whether all lines in the selected range already have the style
   // applied
   let blockHasStyle = true;
-  transformLines(state, start, end, function (state, lineStart) {
+  transformLines(state, start, end, function(state, lineStart) {
     if (state.text.slice(lineStart, lineStart + prefix.length) !== prefix) {
       blockHasStyle = false;
     }
@@ -237,12 +252,12 @@ function toggleBlockStyle(state, prefix) {
 
   if (blockHasStyle) {
     // Remove the formatting.
-    return transformLines(state, start, end, function (state, lineStart) {
+    return transformLines(state, start, end, function(state, lineStart) {
       return replaceText(state, lineStart, prefix.length, '');
     });
   } else {
     // Add the block style to any lines which do not already have it applied
-    return transformLines(state, start, end, function (state, lineStart) {
+    return transformLines(state, start, end, function(state, lineStart) {
       if (state.text.slice(lineStart, lineStart + prefix.length) === prefix) {
         return state;
       } else {

@@ -15,8 +15,8 @@ function licenseText() {
   return fs.readFileSync('./LICENSE', 'utf-8');
 }
 
-function changelogText() {
-  return fs.readFileSync('./CHANGELOG.md', 'utf-8');
+function codeOfConductText() {
+  return fs.readFileSync('./CODE_OF_CONDUCT', 'utf-8');
 }
 
 /**
@@ -58,15 +58,15 @@ function LiveReloadServer(port, config) {
           </body>
           </html>
         `;
-      } else if (url.pathname === '/document/changelog') {
+      } else if (url.pathname === '/document/code_of_conduct') {
         content = `
           <html>
           <head>
             <meta charset="UTF-8">
-            <title>Hypothesis in-line frame document - Changelog</title>
+            <title>Hypothesis in-line frame document - Code of conduct</title>
           </head>
           <body>
-            <pre style="margin: 20px;">${changelogText()}</pre>
+            <pre style="margin: 20px;">${codeOfConductText()}</pre>
           </body>
           </html>
         `;
@@ -120,7 +120,7 @@ function LiveReloadServer(port, config) {
                 if (!iframeIsAdded) {
                   var iframe1 = document.querySelector('#iframe1');
                   var iframeNew = iframe1.cloneNode();
-                  iframeNew.src = "/document/changelog";
+                  iframeNew.src = "/document/code_of_conduct";
                   iframeNew.id = "iframe2";
                   iframeIsAdded = true;
                   document.querySelector('#iframe2-container').appendChild(iframeNew);

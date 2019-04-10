@@ -15,22 +15,23 @@ const random = require('./random');
 
 /**
  * Return a new TokenInfo object from the given tokenUrl endpoint response.
- * @param {Object} response - The HTTP response from a POST to the tokenUrl
- *                            endpoint (an Angular $http response object).
- * @returns {TokenInfo}
+ * @param {Response} response - The HTTP response from a POST to the tokenUrl
+ *                            endpoint.
+ * @returns {Promise<TokenInfo>}
  */
 function tokenInfoFrom(response) {
-  const data = response.data;
-  return {
-    accessToken:  data.access_token,
+  return response.json().then(data => {
+    return {
+      accessToken: data.access_token,
 
-    // Set the expiry date to some time slightly before that implied by
-    // `expires_in` to account for the delay in the client receiving the
-    // response.
-    expiresAt: Date.now() + ((data.expires_in - 10) * 1000),
+      // Set the expiry date to some time slightly before that implied by
+      // `expires_in` to account for the delay in the client receiving the
+      // response.
+      expiresAt: Date.now() + (data.expires_in - 10) * 1000,
 
-    refreshToken: data.refresh_token,
-  };
+      refreshToken: data.refresh_token,
+    };
+  });
 }
 
 /**
@@ -62,12 +63,9 @@ class OAuthClient {
   /**
    * Create a new OAuthClient
    *
-   * @param {Object} $http - HTTP client
    * @param {Config} config
    */
-  constructor($http, config) {
-    this.$http = $http;
-
+  constructor(config) {
     this.clientId = config.clientId;
     this.tokenEndpoint = config.tokenEndpoint;
     this.authorizationEndpoint = config.authorizationEndpoint;
@@ -89,7 +87,7 @@ class OAuthClient {
       grant_type: 'authorization_code',
       code,
     };
-    return this._formPost(this.tokenEndpoint, data).then((response) => {
+    return this._formPost(this.tokenEndpoint, data).then(response => {
       if (response.status !== 200) {
         throw new Error('Authorization code exchange failed');
       }
@@ -128,7 +126,7 @@ class OAuthClient {
    */
   refreshToken(refreshToken) {
     const data = { grant_type: 'refresh_token', refresh_token: refreshToken };
-    return this._formPost(this.tokenEndpoint, data).then((response) => {
+    return this._formPost(this.tokenEndpoint, data).then(response => {
       if (response.status !== 200) {
         throw new Error('Failed to refresh access token');
       }
@@ -187,13 +185,15 @@ class OAuthClient {
 
     // Authorize user and retrieve grant token
     let authUrl = this.authorizationEndpoint;
-    authUrl += '?' + queryString.stringify({
-      client_id: this.clientId,
-      origin: $window.location.origin,
-      response_mode: 'web_message',
-      response_type: 'code',
-      state: state,
-    });
+    authUrl +=
+      '?' +
+      queryString.stringify({
+        client_id: this.clientId,
+        origin: $window.location.origin,
+        response_mode: 'web_message',
+        response_type: 'code',
+        state: state,
+      });
     authWindow.location = authUrl;
 
     return authResponse.then(rsp => rsp.code);
@@ -206,11 +206,19 @@ class OAuthClient {
    * @param {Object} data - Parameter dictionary
    */
   _formPost(url, data) {
-    data = queryString.stringify(data);
-    const requestConfig = {
-      headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+    // The `fetch` API has native support for sending form data by setting
+    // the `body` option to a `FormData` instance. We are not using that here
+    // because our test environment has very limited `FormData` support and it
+    // is simpler just to format the data manually.
+    const formData = queryString.stringify(data);
+    const headers = {
+      'Content-Type': 'application/x-www-form-urlencoded',
     };
-    return this.$http.post(url, data, requestConfig);
+    return fetch(url, {
+      method: 'POST',
+      headers,
+      body: formData,
+    });
   }
 
   /**
@@ -231,21 +239,27 @@ class OAuthClient {
     // this.
     //
     // See https://bugs.webkit.org/show_bug.cgi?id=143678
-    const width  = 475;
+    const width = 475;
     const height = 430;
-    const left   = $window.screen.width / 2 - width / 2;
-    const top    = $window.screen.height /2 - height / 2;
+    const left = $window.screen.width / 2 - width / 2;
+    const top = $window.screen.height / 2 - height / 2;
 
     // Generate settings for `window.open` in the required comma-separated
     // key=value format.
-    const authWindowSettings = queryString.stringify({
-      left: left,
-      top: top,
-      width: width,
-      height: height,
-    }).replace(/&/g, ',');
+    const authWindowSettings = queryString
+      .stringify({
+        left: left,
+        top: top,
+        width: width,
+        height: height,
+      })
+      .replace(/&/g, ',');
 
-    return $window.open('about:blank', 'Log in to Hypothesis', authWindowSettings);
+    return $window.open(
+      'about:blank',
+      'Log in to Hypothesis',
+      authWindowSettings
+    );
   }
 }
 
