@@ -13,13 +13,6 @@
  */
 
 const Raven = require('raven-js');
-
-// This is only used in apps where Angular is used,
-// but is required globally due to
-// https://github.com/thlorenz/proxyquireify/issues/40
-//
-// Fortunately it does not pull in Angular as a dependency but returns
-// a function that takes it as an input argument.
 const angularPlugin = require('raven-js/plugins/angular');
 
 /**
