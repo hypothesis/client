@@ -1,24 +1,18 @@
 'use strict';
 
 const angular = require('angular');
-const proxyquire = require('proxyquire');
 
+const topBar = require('../top-bar');
 const util = require('../../directive/test/util');
 
 describe('topBar', function() {
   const fakeSettings = {};
-  const fakeIsThirdPartyService = sinon.stub();
+  let fakeIsThirdPartyService;
 
   before(function() {
     angular
       .module('app', [])
-      .component(
-        'topBar',
-        proxyquire('../top-bar', {
-          '../util/is-third-party-service': fakeIsThirdPartyService,
-          '@noCallThru': true,
-        })
-      )
+      .component('topBar', topBar)
       .component('loginControl', {
         bindings: require('../login-control').bindings,
       })
@@ -35,8 +29,15 @@ describe('topBar', function() {
       settings: fakeSettings,
     });
 
-    fakeIsThirdPartyService.reset();
-    fakeIsThirdPartyService.returns(false);
+    fakeIsThirdPartyService = sinon.stub().returns(false);
+
+    topBar.$imports.$mock({
+      '../util/is-third-party-service': fakeIsThirdPartyService,
+    });
+  });
+
+  afterEach(() => {
+    topBar.$imports.$restore();
   });
 
   function applyUpdateBtn(el) {
