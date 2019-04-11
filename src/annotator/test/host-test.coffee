@@ -1,5 +1,4 @@
-proxyquire = require('proxyquire')
-Host = proxyquire('../host', {})
+Host = require('../host')
 
 describe 'Host', ->
   sandbox = sinon.sandbox.create()

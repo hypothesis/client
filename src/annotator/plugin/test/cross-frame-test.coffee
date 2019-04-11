@@ -1,7 +1,5 @@
-proxyquire = require('proxyquire')
-
 Plugin = require('../../plugin')
-CrossFrame = null
+CrossFrame = require('../cross-frame')
 
 describe 'CrossFrame', ->
   fakeDiscovery = null
@@ -41,16 +39,16 @@ describe 'CrossFrame', ->
     proxyDiscovery = sandbox.stub().returns(fakeDiscovery)
     proxyBridge = sandbox.stub().returns(fakeBridge)
 
-    CrossFrame = proxyquire('../cross-frame', {
+    CrossFrame.$imports.$mock({
       '../plugin': Plugin,
       '../annotation-sync': proxyAnnotationSync,
       '../../shared/bridge': proxyBridge,
       '../../shared/discovery': proxyDiscovery
     })
 
-
   afterEach ->
     sandbox.restore()
+    CrossFrame.$imports.$restore()
 
   describe 'CrossFrame constructor', ->
     it 'instantiates the Discovery component', ->
