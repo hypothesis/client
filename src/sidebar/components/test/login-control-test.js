@@ -1,10 +1,11 @@
 'use strict';
 
 const angular = require('angular');
-const proxyquire = require('proxyquire');
 
 const bridgeEvents = require('../../../shared/bridge-events');
 const util = require('../../directive/test/util');
+
+const loginControl = require('../login-control');
 
 function pageObject(element) {
   return {
@@ -79,19 +80,15 @@ function thirdPartyUserPage() {
 
 describe('loginControl', function() {
   let fakeBridge;
-  const fakeServiceConfig = sinon.stub();
+  let fakeServiceConfig;
   let fakeWindow;
 
   before(function() {
-    angular.module('app', []).component(
-      'loginControl',
-      proxyquire('../login-control', {
-        '../service-config': fakeServiceConfig,
-      })
-    );
+    angular.module('app', []).component('loginControl', loginControl);
   });
 
   beforeEach(function() {
+    fakeServiceConfig = sinon.stub().returns(null);
     fakeBridge = { call: sinon.stub() };
     const fakeServiceUrl = sinon.stub().returns('someUrl');
     const fakeSettings = {
@@ -106,8 +103,13 @@ describe('loginControl', function() {
       $window: fakeWindow,
     });
 
-    fakeServiceConfig.reset();
-    fakeServiceConfig.returns(null);
+    loginControl.$imports.$mock({
+      '../service-config': fakeServiceConfig,
+    });
+  });
+
+  afterEach(() => {
+    loginControl.$imports.$restore();
   });
 
   describe('the user profile button', function() {
