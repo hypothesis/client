@@ -1,34 +1,28 @@
 'use strict';
 
-const proxyquire = require('proxyquire');
-const util = require('../../../shared/test/util');
-
-const fakeConfigFuncSettingsFrom = sinon.stub();
-const fakeIsBrowserExtension = sinon.stub();
-const fakeSharedSettings = {};
-
-const settingsFrom = proxyquire(
-  '../settings',
-  util.noCallThru({
-    './config-func-settings-from': fakeConfigFuncSettingsFrom,
-    './is-browser-extension': fakeIsBrowserExtension,
-    '../../shared/settings': fakeSharedSettings,
-  })
-);
+const settingsFrom = require('../settings');
 
 describe('annotator.config.settingsFrom', function() {
-  beforeEach('reset fakeConfigFuncSettingsFrom', function() {
-    fakeConfigFuncSettingsFrom.reset();
-    fakeConfigFuncSettingsFrom.returns({});
+  let fakeConfigFuncSettingsFrom;
+  let fakeIsBrowserExtension;
+  let fakeSharedSettings;
+
+  beforeEach(() => {
+    fakeConfigFuncSettingsFrom = sinon.stub().returns({});
+    fakeIsBrowserExtension = sinon.stub().returns(false);
+    fakeSharedSettings = {
+      jsonConfigsFrom: sinon.stub().returns({}),
+    };
+
+    settingsFrom.$imports.$mock({
+      './config-func-settings-from': fakeConfigFuncSettingsFrom,
+      './is-browser-extension': fakeIsBrowserExtension,
+      '../../shared/settings': fakeSharedSettings,
+    });
   });
 
-  beforeEach('reset fakeIsBrowserExtension', function() {
-    fakeIsBrowserExtension.reset();
-    fakeIsBrowserExtension.returns(false);
-  });
-
-  beforeEach('reset fakeSharedSettings', function() {
-    fakeSharedSettings.jsonConfigsFrom = sinon.stub().returns({});
+  afterEach(() => {
+    settingsFrom.$imports.$restore();
   });
 
   describe('#sidebarAppUrl', function() {
