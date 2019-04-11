@@ -233,6 +233,58 @@ describe 'Sidebar', ->
         sidebar.onPan({type: 'panright', deltaX: 100})
         assert.equal(sidebar.gestureState.final, 0)
 
+  describe 'panelReady event', ->
+    it 'opens the sidebar when a direct-linked annotation is present.', ->
+      sidebar = createSidebar(
+        config={
+          annotations: 'ann-id',
+        }
+      )
+      show = sandbox.stub(sidebar, 'show')
+      sidebar.publish('panelReady')
+      assert.calledOnce(show)        
+
+    it 'opens the sidebar when a direct-linked group is present.', ->
+      sidebar = createSidebar(
+        config={
+          group: 'group-id',
+        }
+      )
+      show = sandbox.stub(sidebar, 'show')
+      sidebar.publish('panelReady')
+      assert.calledOnce(show)        
+
+    it 'opens the sidebar when a direct-linked query is present.', ->
+      sidebar = createSidebar(
+        config={
+          query: 'tag:foo',
+        }
+      )
+      show = sandbox.stub(sidebar, 'show')
+      sidebar.publish('panelReady')
+      assert.calledOnce(show)        
+
+    it 'opens the sidebar when openSidebar is set to true.', ->
+      sidebar = createSidebar(
+        config={
+          openSidebar: true,
+        }
+      )
+      show = sandbox.stub(sidebar, 'show')
+      sidebar.publish('panelReady')
+      assert.calledOnce(show)        
+
+    it 'does not show the sidebar if not configured to.', ->
+      sidebar = createSidebar(
+        config={
+        }
+      )
+      show = sandbox.stub(sidebar, 'show')
+      sidebar.publish('panelReady')
+      assert.notCalled(show)        
+
+
+
   describe 'swipe gestures', ->
     sidebar = null
 

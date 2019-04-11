@@ -34,7 +34,7 @@ module.exports = class Sidebar extends Host
 
     this.hide()
 
-    if config.openSidebar || config.annotations || config.query
+    if config.openSidebar || config.annotations || config.query || config.group
       this.on 'panelReady', => this.show()
 
     if @plugins.BucketBar?
