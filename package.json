@@ -28,7 +28,6 @@
     "browserify-versionify": "^1.0.6",
     "chai": "^4.1.2",
     "chance": "^1.0.13",
-    "check-dependencies": "^1.1.0",
     "classnames": "^2.2.4",
     "codecov": "^3.1.0",
     "coffeeify": "^2.1.0",
@@ -154,7 +153,6 @@
   "main": "./build/boot.js",
   "scripts": {
     "build": "cross-env NODE_ENV=production gulp build",
-    "deps": "check-dependencies",
     "lint": "eslint .",
     "checkformatting": "prettier --check 'src/**/*.js'",
     "format": "prettier --list-different --write 'src/**/*.js'",
