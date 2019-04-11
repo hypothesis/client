@@ -1,5 +1,3 @@
-proxyquire = require('proxyquire')
-
 adder = require('../adder')
 Observable = require('../util/observable').Observable
 Plugin = require('../plugin')
@@ -8,9 +6,7 @@ Delegator = require('../delegator')
 $ = require('jquery')
 Delegator['@noCallThru'] = true
 
-Guest = null
-anchoring = {}
-highlighter = {}
+Guest = require('../guest')
 rangeUtil = null
 selections = null
 
@@ -50,12 +46,16 @@ describe 'Guest', ->
   sandbox = sinon.sandbox.create()
   CrossFrame = null
   fakeCrossFrame = null
+  highlighter = null
   guestConfig = null
+  htmlAnchoring = null
 
   createGuest = (config={}) ->
     config = Object.assign({}, guestConfig, config)
     element = document.createElement('div')
-    return new Guest(element, config)
+    guest = new Guest(element, config)
+    guest.anchoring = htmlAnchoring
+    return guest
 
   beforeEach ->
     sinon.stub(console, 'warn')
@@ -67,10 +67,16 @@ describe 'Guest', ->
     }
     selections = null
     guestConfig = {pluginClasses: {}}
+    highlighter = {
+      highlightRange: sinon.stub()
+      removeHighlights: sinon.stub()
+    }
+    htmlAnchoring = {
+      anchor: sinon.stub()
+    }
 
-    Guest = proxyquire('../guest', {
+    Guest.$imports.$mock({
       './adder': {Adder: FakeAdder},
-      './anchoring/html': anchoring,
       './highlighter': highlighter,
       './range-util': rangeUtil,
       './selections': (document) ->
@@ -97,6 +103,7 @@ describe 'Guest', ->
   afterEach ->
     sandbox.restore()
     console.warn.restore()
+    Guest.$imports.$restore()
 
   describe 'plugins', ->
     fakePlugin = null
@@ -478,7 +485,7 @@ describe 'Guest', ->
           {selector: [{type: 'TextQuoteSelector', exact: 'hello'}]},
         ]
       }
-      sandbox.stub(anchoring, 'anchor').returns(Promise.resolve(range))
+      htmlAnchoring.anchor.returns(Promise.resolve(range))
 
       guest.anchor(annotation).then ->
         assert.isFalse(annotation.$orphan)
@@ -491,7 +498,7 @@ describe 'Guest', ->
           {selector: [{type: 'TextQuoteSelector', exact: 'hello'}]},
         ]
       }
-      sandbox.stub(anchoring, 'anchor')
+      htmlAnchoring.anchor
         .onFirstCall().returns(Promise.reject())
         .onSecondCall().returns(Promise.resolve(range))
 
@@ -505,7 +512,7 @@ describe 'Guest', ->
           {selector: [{type: 'TextQuoteSelector', exact: 'notinhere'}]},
         ]
       }
-      sandbox.stub(anchoring, 'anchor').returns(Promise.reject())
+      htmlAnchoring.anchor.returns(Promise.reject())
 
       guest.anchor(annotation).then ->
         assert.isTrue(annotation.$orphan)
@@ -518,7 +525,7 @@ describe 'Guest', ->
           {selector: [{type: 'TextQuoteSelector', exact: 'neitherami'}]},
         ]
       }
-      sandbox.stub(anchoring, 'anchor').returns(Promise.reject())
+      htmlAnchoring.anchor.returns(Promise.reject())
 
       guest.anchor(annotation).then ->
         assert.isTrue(annotation.$orphan)
@@ -532,7 +539,7 @@ describe 'Guest', ->
       }
       # This shouldn't be called, but if it is, we successfully anchor so that
       # this test is guaranteed to fail.
-      sandbox.stub(anchoring, 'anchor').returns(Promise.resolve(range))
+      htmlAnchoring.anchor.returns(Promise.resolve(range))
 
       guest.anchor(annotation).then ->
         assert.isTrue(annotation.$orphan)
@@ -544,10 +551,9 @@ describe 'Guest', ->
           {selector: [{type: 'TextPositionSelector', start: 0, end: 5}]},
         ]
       }
-      sandbox.spy(anchoring, 'anchor')
 
       guest.anchor(annotation).then ->
-        assert.notCalled(anchoring.anchor)
+        assert.notCalled(htmlAnchoring.anchor)
 
     it 'updates the cross frame and bucket bar plugins', () ->
       guest = createGuest()
@@ -563,8 +569,8 @@ describe 'Guest', ->
     it 'returns a promise of the anchors for the annotation', () ->
       guest = createGuest()
       highlights = [document.createElement('span')]
-      sandbox.stub(anchoring, 'anchor').returns(Promise.resolve(range))
-      sandbox.stub(highlighter, 'highlightRange').returns(highlights)
+      htmlAnchoring.anchor.returns(Promise.resolve(range))
+      highlighter.highlightRange.returns(highlights)
       target = {selector: [{type: 'TextQuoteSelector', exact: 'hello'}]}
       return guest.anchor({target: [target]}).then (anchors) ->
         assert.equal(anchors.length, 1)
@@ -572,8 +578,8 @@ describe 'Guest', ->
     it 'adds the anchor to the "anchors" instance property"', () ->
       guest = createGuest()
       highlights = [document.createElement('span')]
-      sandbox.stub(anchoring, 'anchor').returns(Promise.resolve(range))
-      sandbox.stub(highlighter, 'highlightRange').returns(highlights)
+      htmlAnchoring.anchor.returns(Promise.resolve(range))
+      highlighter.highlightRange.returns(highlights)
       target = {selector: [{type: 'TextQuoteSelector', exact: 'hello'}]}
       annotation = {target: [target]}
       return guest.anchor(annotation).then ->
@@ -589,7 +595,7 @@ describe 'Guest', ->
       highlights = []
       guest = createGuest()
       guest.anchors = [{annotation, target, highlights}]
-      removeHighlights = sandbox.stub(highlighter, 'removeHighlights')
+      removeHighlights = highlighter.removeHighlights
 
       return guest.anchor(annotation).then ->
         assert.equal(guest.anchors.length, 0)
@@ -599,11 +605,11 @@ describe 'Guest', ->
     it 'does not reanchor targets that are already anchored', () ->
       guest = createGuest()
       annotation = target: [{selector: [{type: 'TextQuoteSelector', exact: 'hello'}]}]
-      stub = sandbox.stub(anchoring, 'anchor').returns(Promise.resolve(range))
+      htmlAnchoring.anchor.returns(Promise.resolve(range))
       return guest.anchor(annotation).then ->
         guest.anchor(annotation).then ->
           assert.equal(guest.anchors.length, 1)
-          assert.calledOnce(stub)
+          assert.calledOnce(htmlAnchoring.anchor)
 
   describe '#detach()', ->
     it 'removes the anchors from the "anchors" instance variable', ->
@@ -636,7 +642,7 @@ describe 'Guest', ->
       guest = createGuest()
       annotation = {}
       highlights = [document.createElement('span')]
-      removeHighlights = sandbox.stub(highlighter, 'removeHighlights')
+      removeHighlights = highlighter.removeHighlights
 
       guest.anchors.push({annotation, highlights})
       guest.deleteAnnotation(annotation)

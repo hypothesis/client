@@ -7,6 +7,7 @@ Delegator = require('./delegator')
 $ = require('jquery')
 
 adder = require('./adder')
+htmlAnchoring = require('./anchoring/html')
 highlighter = require('./highlighter')
 rangeUtil = require('./range-util')
 selections = require('./selections')
@@ -37,7 +38,7 @@ module.exports = class Guest extends Delegator
     TextSelection: {}
 
   # Anchoring module
-  anchoring: require('./anchoring/html')
+  anchoring: htmlAnchoring
 
   # Internal state
   plugins: null
