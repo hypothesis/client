@@ -1,10 +1,9 @@
 'use strict';
 
 const angular = require('angular');
-const proxyquire = require('proxyquire');
 
 const util = require('../../directive/test/util');
-const noCallThru = require('../../../shared/test/util').noCallThru;
+const markdown = require('../markdown');
 
 describe('markdown', function() {
   function isHidden(element) {
@@ -40,46 +39,39 @@ describe('markdown', function() {
   }
 
   before(function() {
-    angular.module('app').component(
-      'markdown',
-      proxyquire(
-        '../markdown',
-        noCallThru({
-          angular: angular,
-          katex: {
-            renderToString: function(input) {
-              return 'math:' + input.replace(/$$/g, '');
-            },
-          },
-          'lodash.debounce': function(fn) {
-            // Make input change debouncing synchronous in tests
-            return function() {
-              fn();
-            };
-          },
-          '../render-markdown': noCallThru(function(markdown) {
-            return 'rendered:' + markdown;
-          }),
-
-          '../markdown-commands': {
-            convertSelectionToLink: mockFormattingCommand,
-            toggleBlockStyle: mockFormattingCommand,
-            toggleSpanStyle: mockFormattingCommand,
-            LinkType: require('../../markdown-commands').LinkType,
-          },
-          '../media-embedder': noCallThru({
-            replaceLinksWithEmbeds: function(element) {
-              // Tag the element as having been processed
-              element.dataset.replacedLinksWithEmbeds = 'yes';
-            },
-          }),
-        })
-      )
-    );
+    angular.module('app', []).component('markdown', markdown);
   });
 
   beforeEach(function() {
     angular.mock.module('app');
+
+    markdown.$imports.$mock({
+      'lodash.debounce': function(fn) {
+        // Make input change debouncing synchronous in tests
+        return function() {
+          fn();
+        };
+      },
+      '../render-markdown': markdown => {
+        return 'rendered:' + markdown;
+      },
+      '../markdown-commands': {
+        convertSelectionToLink: mockFormattingCommand,
+        toggleBlockStyle: mockFormattingCommand,
+        toggleSpanStyle: mockFormattingCommand,
+        LinkType: require('../../markdown-commands').LinkType,
+      },
+      '../media-embedder': {
+        replaceLinksWithEmbeds: function(element) {
+          // Tag the element as having been processed
+          element.dataset.replacedLinksWithEmbeds = 'yes';
+        },
+      },
+    });
+  });
+
+  afterEach(() => {
+    markdown.$imports.$restore();
   });
 
   describe('read only state', function() {
