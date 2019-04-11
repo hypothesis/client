@@ -1,7 +1,6 @@
 'use strict';
 
-const proxyquire = require('proxyquire');
-const noCallThru = require('../../shared/test/util').noCallThru;
+const raven = require('../raven');
 
 function fakeExceptionData(scriptURL) {
   return {
@@ -28,7 +27,6 @@ describe('raven', function() {
   let fakeAngularTransformer;
   let fakeAngularPlugin;
   let fakeRavenJS;
-  let raven;
 
   beforeEach(function() {
     fakeRavenJS = {
@@ -52,13 +50,14 @@ describe('raven', function() {
       Raven.setDataCallback(fakeAngularTransformer);
     });
 
-    raven = proxyquire(
-      '../raven',
-      noCallThru({
-        'raven-js': fakeRavenJS,
-        'raven-js/plugins/angular': fakeAngularPlugin,
-      })
-    );
+    raven.$imports.$mock({
+      'raven-js': fakeRavenJS,
+      'raven-js/plugins/angular': fakeAngularPlugin,
+    });
+  });
+
+  afterEach(() => {
+    raven.$imports.$restore();
   });
 
   describe('.install()', function() {
