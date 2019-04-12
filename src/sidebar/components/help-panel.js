@@ -9,17 +9,26 @@
 module.exports = {
   controllerAs: 'vm',
   // @ngInject
-  controller: function ($scope, $window, store, serviceUrl) {
+  controller: function ($scope, $window, store, serviceUrl, groups, i18nService) {
     this.userAgent = $window.navigator.userAgent;
-    this.version = '__VERSION__';  // replaced by versionify
+    this.version = '__VERSION__'; // replaced by versionify
     this.dateTime = new Date();
     this.serviceUrl = serviceUrl;
+    this.group = groups.focused() && groups.focused().id.replace(/-/g, '');
+    this.caption = i18nService.tl('sidePanel.channels.'+this.group+'.description');
+
+    $scope.$watch(function() {
+      return groups.focused() && groups.focused().id || null;
+    }, function() {
+      this.group = groups.focused() && groups.focused().id.replace(/-/g, '');
+      this.caption = i18nService.tl('sidePanel.channels.'+this.group+'.description');
+    }.bind(this));
 
     $scope.$watch(
-      function () {
+      function() {
         return store.frames();
       },
-      function (frames) {
+      function(frames) {
         if (frames.length === 0) {
           return;
         }

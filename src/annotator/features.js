@@ -4,13 +4,11 @@ const events = require('../shared/bridge-events');
 
 let _features = {};
 
-const _set = (features) => {
+const _set = features => {
   _features = features || {};
 };
 
-
 module.exports = {
-
   init: function(crossframe) {
     crossframe.on(events.FEATURE_FLAGS_UPDATED, _set);
   },
@@ -26,5 +24,4 @@ module.exports = {
     }
     return _features[flag];
   },
-
 };

@@ -6,6 +6,19 @@
   border-radius: 2px;
 }
 
+.help-panel-caption {
+    ul {
+        margin-left: 2em;
+        list-style: inherit;
+    }
+    .categoryInfo {
+        font-weight: 700;
+        &:first-child {
+            margin-top: 0;
+        }
+    }
+}
+
 .help-panel-title {
   color: $grey-6;
   font-weight: bold;

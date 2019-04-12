@@ -26,42 +26,46 @@ const apiIndexResponse = {
 // with the domain name changed.
 const linksResponse = {
   'forgot-password': 'https://annotation.service/forgot-password',
-  'help': 'https://annotation.service/docs/help',
+  help: 'https://annotation.service/docs/help',
   'groups.new': 'https://annotation.service/groups/new',
   'groups.leave': 'https://annotation.service/groups/:id/leave',
   'search.tag': 'https://annotation.service/search?q=tag:":tag"',
   'account.settings': 'https://annotation.service/account/settings',
   'oauth.revoke': 'https://annotation.service/oauth/revoke',
-  'signup': 'https://annotation.service/signup',
+  signup: 'https://annotation.service/signup',
   'oauth.authorize': 'https://annotation.service/oauth/authorize',
 };
 
 describe('sidebar.api-routes', () => {
   let apiRoutes;
-  let fakeHttp;
   let fakeSettings;
 
   function httpResponse(status, data) {
-    return Promise.resolve({ status, data });
+    return Promise.resolve({ status, json: () => Promise.resolve(data) });
   }
 
   beforeEach(() => {
-    // Use a Sinon stub rather than Angular's fake $http service here to avoid
-    // the hassles that come with mixing `$q` and regular promises.
-    fakeHttp = {
-      get: sinon.stub(),
-    };
+    // We use a simple sinon stub of `fetch` here rather than `fetch-mock`
+    // because this service's usage of fetch is very simple and it makes it
+    // easier to mock the retry behavior.
+    const fetchStub = sinon.stub(window, 'fetch');
 
-    fakeHttp.get.withArgs('https://annotation.service/api/')
+    fetchStub
+      .withArgs('https://annotation.service/api/')
       .returns(httpResponse(200, apiIndexResponse));
-    fakeHttp.get.withArgs('https://annotation.service/api/links')
+    fetchStub
+      .withArgs('https://annotation.service/api/links')
       .returns(httpResponse(200, linksResponse));
 
     fakeSettings = {
       apiUrl: 'https://annotation.service/api/',
     };
 
-    apiRoutes = apiRoutesFactory(fakeHttp, fakeSettings);
+    apiRoutes = apiRoutesFactory(fakeSettings);
+  });
+
+  afterEach(() => {
+    window.fetch.restore();
   });
 
   describe('#routes', () => {
@@ -73,17 +77,26 @@ describe('sidebar.api-routes', () => {
 
     it('caches the route directory', () => {
       // Call `routes()` multiple times, check that only one HTTP call is made.
-      return Promise.all([apiRoutes.routes(), apiRoutes.routes()])
-        .then(([routesA, routesB]) => {
+      return Promise.all([apiRoutes.routes(), apiRoutes.routes()]).then(
+        ([routesA, routesB]) => {
           assert.equal(routesA, routesB);
-          assert.equal(fakeHttp.get.callCount, 1);
-        });
+          assert.equal(window.fetch.callCount, 1);
+        }
+      );
     });
 
     it('retries the route fetch until it succeeds', () => {
-      fakeHttp.get.onFirstCall().returns(httpResponse(500, null));
+      window.fetch.onFirstCall().returns(httpResponse(500, null));
       return apiRoutes.routes().then(routes => {
         assert.deepEqual(routes, apiIndexResponse.links);
+      });
+    });
+
+    it('sends client version custom request header', () => {
+      return apiRoutes.routes().then(() => {
+        assert.calledWith(window.fetch, fakeSettings.apiUrl, {
+          headers: { 'Hypothesis-Client-Version': '__VERSION__' },
+        });
       });
     });
   });
@@ -98,11 +111,12 @@ describe('sidebar.api-routes', () => {
     it('caches the returned links', () => {
       // Call `links()` multiple times, check that only two HTTP calls are made
       // (one for the index, one for the page links).
-      return Promise.all([apiRoutes.links(), apiRoutes.links()])
-        .then(([linksA, linksB]) => {
+      return Promise.all([apiRoutes.links(), apiRoutes.links()]).then(
+        ([linksA, linksB]) => {
           assert.equal(linksA, linksB);
-          assert.deepEqual(fakeHttp.get.callCount, 2);
-        });
+          assert.deepEqual(window.fetch.callCount, 2);
+        }
+      );
     });
   });
 });

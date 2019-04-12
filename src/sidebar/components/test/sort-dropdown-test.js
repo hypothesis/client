@@ -4,17 +4,18 @@ const angular = require('angular');
 
 const util = require('../../directive/test/util');
 
-describe('sortDropdown', function () {
-  before(function () {
-    angular.module('app', [])
+describe('sortDropdown', function() {
+  before(function() {
+    angular
+      .module('app', [])
       .component('sortDropdown', require('../sort-dropdown'));
   });
 
-  beforeEach(function () {
+  beforeEach(function() {
     angular.mock.module('app');
   });
 
-  it('should update the sort key on click', function () {
+  it('should update the sort key on click', function() {
     const changeSpy = sinon.spy();
     const elem = util.createDirective(document, 'sortDropdown', {
       sortKeysAvailable: ['Newest', 'Oldest'],

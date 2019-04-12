@@ -7,18 +7,18 @@ const util = require('../../directive/test/util');
 const module = angular.mock.module;
 const inject = angular.mock.inject;
 
-describe('spinner', function () {
+describe('spinner', function() {
   let $animate = null;
   let $element = null;
   let sandbox = null;
 
-  before(function () {
+  before(function() {
     angular.module('h', []).component('spinner', require('../spinner'));
   });
 
   beforeEach(module('h'));
 
-  beforeEach(inject(function (_$animate_) {
+  beforeEach(inject(function(_$animate_) {
     sandbox = sinon.sandbox.create();
 
     $animate = _$animate_;
@@ -27,11 +27,11 @@ describe('spinner', function () {
     $element = util.createDirective(document, 'spinner');
   }));
 
-  afterEach(function () {
+  afterEach(function() {
     sandbox.restore();
   });
 
-  it('disables ngAnimate animations for itself', function () {
+  it('disables ngAnimate animations for itself', function() {
     assert.calledOnce($animate.enabled);
 
     const [enabled, jqElement] = $animate.enabled.getCall(0).args;

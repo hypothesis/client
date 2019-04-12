@@ -8,13 +8,16 @@ const { isThirdPartyUser, username } = require('../util/account-id');
 function AnnotationHeaderController(features, groups, settings, serviceUrl) {
   const self = this;
 
-  this.user = function () {
+  this.user = function() {
     return self.annotation.user;
   };
 
   this.displayName = () => {
     const userInfo = this.annotation.user_info;
-    const isThirdPartyUser_ = isThirdPartyUser(this.annotation.user, settings.authDomain);
+    const isThirdPartyUser_ = isThirdPartyUser(
+      this.annotation.user,
+      settings.authDomain
+    );
     if (features.flagEnabled('client_display_names') || isThirdPartyUser_) {
       // userInfo is undefined if the api_render_user_info feature flag is off.
       if (userInfo) {
@@ -27,32 +30,32 @@ function AnnotationHeaderController(features, groups, settings, serviceUrl) {
     return username(this.annotation.user);
   };
 
-  this.isThirdPartyUser = function () {
+  this.isThirdPartyUser = function() {
     return isThirdPartyUser(self.annotation.user, settings.authDomain);
   };
 
-  this.thirdPartyUsernameLink = function () {
-    return settings.usernameUrl ?
-      settings.usernameUrl + username(this.annotation.user):
-      null;
+  this.thirdPartyUsernameLink = function() {
+    return settings.usernameUrl
+      ? settings.usernameUrl + username(this.annotation.user)
+      : null;
   };
 
   this.serviceUrl = serviceUrl;
 
-  this.group = function () {
+  this.group = function() {
     return groups.get(self.annotation.group);
   };
 
   const documentMeta = memoize(annotationMetadata.domainAndTitle);
-  this.documentMeta = function () {
+  this.documentMeta = function() {
     return documentMeta(self.annotation);
   };
 
-  this.updated = function () {
+  this.updated = function() {
     return self.annotation.updated;
   };
 
-  this.htmlLink = function () {
+  this.htmlLink = function() {
     if (self.annotation.links && self.annotation.links.html) {
       return self.annotation.links.html;
     }

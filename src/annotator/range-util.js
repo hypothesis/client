@@ -49,11 +49,16 @@ function forEachNodeInRange(range, callback) {
 
   // The `whatToShow`, `filter` and `expandEntityReferences` arguments are
   // mandatory in IE although optional according to the spec.
-  const nodeIter = root.ownerDocument.createNodeIterator(root,
-    NodeFilter.SHOW_ALL, null /* filter */, false /* expandEntityReferences */);
+  const nodeIter = root.ownerDocument.createNodeIterator(
+    root,
+    NodeFilter.SHOW_ALL,
+    null /* filter */,
+    false /* expandEntityReferences */
+  );
 
   let currentNode;
-  while (currentNode = nodeIter.nextNode()) { // eslint-disable-line no-cond-assign
+  while ((currentNode = nodeIter.nextNode())) {
+    // eslint-disable-line no-cond-assign
     if (isNodeInRange(range, currentNode)) {
       callback(currentNode);
     }
@@ -69,15 +74,17 @@ function forEachNodeInRange(range, callback) {
 function getTextBoundingBoxes(range) {
   const whitespaceOnly = /^\s*$/;
   const textNodes = [];
-  forEachNodeInRange(range, function (node) {
-    if (node.nodeType === Node.TEXT_NODE &&
-        !node.textContent.match(whitespaceOnly)) {
+  forEachNodeInRange(range, function(node) {
+    if (
+      node.nodeType === Node.TEXT_NODE &&
+      !node.textContent.match(whitespaceOnly)
+    ) {
       textNodes.push(node);
     }
   });
 
   let rects = [];
-  textNodes.forEach(function (node) {
+  textNodes.forEach(function(node) {
     const nodeRange = node.ownerDocument.createRange();
     nodeRange.selectNodeContents(node);
     if (node === range.startContainer) {

@@ -48,43 +48,45 @@ describe('AnnotationSync', function() {
   describe('#constructor', function() {
     context('when "deleteAnnotation" is published', function() {
       it('calls emit("annotationDeleted")', function() {
-        const ann = {id: 1, $tag: 'tag1'};
+        const ann = { id: 1, $tag: 'tag1' };
         const eventStub = sinon.stub();
         options.on('annotationDeleted', eventStub);
         createAnnotationSync();
 
-        publish('deleteAnnotation', {msg: ann}, function() {});
+        publish('deleteAnnotation', { msg: ann }, function() {});
 
         assert.calledWith(eventStub, ann);
       });
 
       it("calls the 'deleteAnnotation' event's callback function", function(done) {
-        const ann = {id: 1, $tag: 'tag1'};
+        const ann = { id: 1, $tag: 'tag1' };
         const callback = function(err, ret) {
           assert.isNull(err);
-          assert.deepEqual(ret, {tag: 'tag1', msg: ann});
+          assert.deepEqual(ret, { tag: 'tag1', msg: ann });
           done();
         };
         createAnnotationSync();
 
-        publish('deleteAnnotation', {msg: ann}, callback);
+        publish('deleteAnnotation', { msg: ann }, callback);
       });
 
       it('deletes any existing annotation from its cache before calling emit', function() {
-        const ann = {id: 1, $tag: 'tag1'};
+        const ann = { id: 1, $tag: 'tag1' };
         const annSync = createAnnotationSync();
         annSync.cache.tag1 = ann;
-        options.emit = function() { assert(!annSync.cache.tag1); };
+        options.emit = function() {
+          assert(!annSync.cache.tag1);
+        };
 
-        publish('deleteAnnotation', {msg: ann}, function() {});
+        publish('deleteAnnotation', { msg: ann }, function() {});
       });
 
       it('deletes any existing annotation from its cache', function() {
-        const ann = {id: 1, $tag: 'tag1'};
+        const ann = { id: 1, $tag: 'tag1' };
         const annSync = createAnnotationSync();
         annSync.cache.tag1 = ann;
 
-        publish('deleteAnnotation', {msg: ann}, function() {});
+        publish('deleteAnnotation', { msg: ann }, function() {});
 
         assert(!annSync.cache.tag1);
       });
@@ -93,14 +95,14 @@ describe('AnnotationSync', function() {
     context('when "loadAnnotations" is published', function() {
       it('calls emit("annotationsLoaded")', function() {
         const annotations = [
-          {id: 1, $tag: 'tag1'},
-          {id: 2, $tag: 'tag2'},
-          {id: 3, $tag: 'tag3'},
+          { id: 1, $tag: 'tag1' },
+          { id: 2, $tag: 'tag2' },
+          { id: 3, $tag: 'tag3' },
         ];
         const bodies = [
-          {msg: annotations[0], tag: annotations[0].$tag},
-          {msg: annotations[1], tag: annotations[1].$tag},
-          {msg: annotations[2], tag: annotations[2].$tag},
+          { msg: annotations[0], tag: annotations[0].$tag },
+          { msg: annotations[1], tag: annotations[1].$tag },
+          { msg: annotations[2], tag: annotations[2].$tag },
         ];
         const loadedStub = sinon.stub();
         options.on('annotationsLoaded', loadedStub);
@@ -114,20 +116,23 @@ describe('AnnotationSync', function() {
 
     context('when "beforeAnnotationCreated" is emitted', function() {
       it('calls bridge.call() passing the event', function() {
-        const ann = {id: 1};
+        const ann = { id: 1 };
         createAnnotationSync();
 
         options.emit('beforeAnnotationCreated', ann);
 
         assert.called(fakeBridge.call);
         assert.calledWith(
-          fakeBridge.call, 'beforeCreateAnnotation', {msg: ann, tag: ann.$tag},
-          sinon.match.func);
+          fakeBridge.call,
+          'beforeCreateAnnotation',
+          { msg: ann, tag: ann.$tag },
+          sinon.match.func
+        );
       });
 
       context('if the annotation has a $tag', function() {
         it('does not call bridge.call()', function() {
-          const ann = {id: 1, $tag: 'tag1'};
+          const ann = { id: 1, $tag: 'tag1' };
           createAnnotationSync();
 
           options.emit('beforeAnnotationCreated', ann);

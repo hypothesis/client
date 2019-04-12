@@ -4,18 +4,19 @@ const angular = require('angular');
 
 const util = require('../../directive/test/util');
 
-describe('searchStatusBar', function () {
-  before(function () {
-    angular.module('app', [])
+describe('searchStatusBar', function() {
+  before(function() {
+    angular
+      .module('app', [])
       .component('searchStatusBar', require('../search-status-bar'));
   });
 
-  beforeEach(function () {
+  beforeEach(function() {
     angular.mock.module('app');
   });
 
-  context('when there is a filter', function () {
-    it('should display the filter count', function () {
+  context('when there is a filter', function() {
+    it('should display the filter count', function() {
       const elem = util.createDirective(document, 'searchStatusBar', {
         filterActive: true,
         filterMatchCount: 5,
@@ -24,8 +25,8 @@ describe('searchStatusBar', function () {
     });
   });
 
-  context('when there is a selection', function () {
-    it('should display the "Show all annotations (2)" message when there are 2 annotations', function () {
+  context('when there is a selection', function() {
+    it('should display the "Show all annotations (2)" message when there are 2 annotations', function() {
       const msg = 'Show all annotations';
       const msgCount = '(2)';
       const elem = util.createDirective(document, 'searchStatusBar', {
@@ -38,7 +39,7 @@ describe('searchStatusBar', function () {
       assert.include(clearBtn.textContent, msgCount);
     });
 
-    it('should display the "Show all notes (3)" message when there are 3 notes', function () {
+    it('should display the "Show all notes (3)" message when there are 3 notes', function() {
       const msg = 'Show all notes';
       const msgCount = '(3)';
       const elem = util.createDirective(document, 'searchStatusBar', {

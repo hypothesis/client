@@ -26,13 +26,16 @@ function ancestors(window_) {
  * @param {Window} window_ - Test seam.
  * @return {Promise<any>}
  */
-function fetchConfigFromAncestorFrame(origin, window_=window) {
+function fetchConfigFromAncestorFrame(origin, window_ = window) {
   const configResponses = [];
 
   for (let ancestor of ancestors(window_)) {
     const timeout = 3000;
     const result = postMessageJsonRpc.call(
-      ancestor, origin, 'requestConfig', timeout
+      ancestor,
+      origin,
+      'requestConfig',
+      timeout
     );
     configResponses.push(result);
   }
@@ -56,7 +59,7 @@ function fetchConfigFromAncestorFrame(origin, window_=window) {
  * @param {Window} window_ - Test seam.
  * @return {Promise<Object>} - The merged settings.
  */
-function fetchConfig(appConfig, window_=window) {
+function fetchConfig(appConfig, window_ = window) {
   const hostPageConfig = hostConfig(window_);
 
   let embedderConfig;

@@ -60,7 +60,7 @@
             <a class="group-name-link"
                href=""
                title="{{ group.type === 'private' ? 'Show and create annotations in ' + group.name : 'Show public annotations'  }}">
-               {{group.name}}
+               {{vm.tl('sidePanel.channels.'+vm.getProperId(group.id)+'.name')}}
             </a>
           </div>
           <div class="share-link-container" ng-click="$event.stopPropagation()" ng-if="vm.shouldShowActivityLink(group.id)">
@@ -76,12 +76,12 @@
           </div>
         </div>
         <!-- the 'Leave group' icon !-->
-        <div class="group-cancel-icon-container" ng-click="$event.stopPropagation()">
+        <!-- <div class="group-cancel-icon-container" ng-click="$event.stopPropagation()">
           <i class="h-icon-cancel-outline btn--cancel"
              ng-if="group.type === 'private'"
              ng-click="vm.leaveGroup(group.id)"
              title="Leave '{{group.name}}'"></i>
-        </div>
+        </div> -->
       </div>
     </li>
     <li ng-if="vm.auth.status === 'logged-in' && !vm.isThirdPartyUser()" class="dropdown-menu__row dropdown-menu__row--unpadded new-group-btn">

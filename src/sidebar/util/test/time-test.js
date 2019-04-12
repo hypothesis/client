@@ -38,10 +38,10 @@ const FIXTURES_NEXT_FUZZY_UPDATE = [
   [8 * year, null],
 ];
 
-describe('sidebar.util.time', function () {
+describe('sidebar.util.time', function() {
   let sandbox;
 
-  beforeEach(function () {
+  beforeEach(function() {
     sandbox = sinon.sandbox.create();
     sandbox.useFakeTimers();
 
@@ -53,17 +53,16 @@ describe('sidebar.util.time', function () {
     }
   });
 
-  afterEach(function () {
+  afterEach(function() {
     sandbox.restore();
   });
 
-  describe('.toFuzzyString', function () {
-
+  describe('.toFuzzyString', function() {
     function mockIntl() {
       return {
-        DateTimeFormat: function () {
+        DateTimeFormat: function() {
           return {
-            format: function () {
+            format: function() {
               if (new Date().getYear() === 70) {
                 return '1 Jan';
               } else {
@@ -75,14 +74,14 @@ describe('sidebar.util.time', function () {
       };
     }
 
-    it('Handles empty dates', function () {
+    it('Handles empty dates', function() {
       const t = null;
       const expect = '';
       assert.equal(time.toFuzzyString(t, mockIntl()), expect);
     });
 
-    const testFixture = function (f) {
-      return function () {
+    const testFixture = function(f) {
+      return function() {
         const t = new Date().toISOString();
         const expect = f[1];
         sandbox.clock.tick(f[0] * 1000);
@@ -92,11 +91,10 @@ describe('sidebar.util.time', function () {
 
     for (let i = 0, f; i < FIXTURES_TO_FUZZY_STRING.length; i++) {
       f = FIXTURES_TO_FUZZY_STRING[i];
-      it('creates correct fuzzy string for fixture ' + i,
-        testFixture(f));
+      it('creates correct fuzzy string for fixture ' + i, testFixture(f));
     }
 
-    it('falls back to simple strings for >24hrs ago', function () {
+    it('falls back to simple strings for >24hrs ago', function() {
       // If window.Intl is not available then the date formatting for dates
       // more than one day ago falls back to a simple date string.
       const d = new Date().toISOString();
@@ -105,7 +103,7 @@ describe('sidebar.util.time', function () {
       assert.equal(time.toFuzzyString(d, null), 'Thu Jan 01 1970');
     });
 
-    it('falls back to simple strings for >1yr ago', function () {
+    it('falls back to simple strings for >1yr ago', function() {
       // If window.Intl is not available then the date formatting for dates
       // more than one year ago falls back to a simple date string.
       const d = new Date().toISOString();
@@ -113,11 +111,10 @@ describe('sidebar.util.time', function () {
 
       assert.equal(time.toFuzzyString(d, null), 'Thu Jan 01 1970');
     });
-
   });
 
-  describe('.decayingInterval', function () {
-    it('uses a short delay for recent timestamps', function () {
+  describe('.decayingInterval', function() {
+    it('uses a short delay for recent timestamps', function() {
       const date = new Date();
       const callback = sandbox.stub();
       time.decayingInterval(date, callback);
@@ -127,7 +124,7 @@ describe('sidebar.util.time', function () {
       assert.calledTwice(callback);
     });
 
-    it('uses a longer delay for older timestamps', function () {
+    it('uses a longer delay for older timestamps', function() {
       const date = new Date();
       const ONE_MINUTE = minute * 1000;
       sandbox.clock.tick(10 * ONE_MINUTE);
@@ -141,7 +138,7 @@ describe('sidebar.util.time', function () {
       assert.calledTwice(callback);
     });
 
-    it('returned function cancels the timer', function () {
+    it('returned function cancels the timer', function() {
       const date = new Date();
       const callback = sandbox.stub();
       const cancel = time.decayingInterval(date, callback);
@@ -150,7 +147,7 @@ describe('sidebar.util.time', function () {
       assert.notCalled(callback);
     });
 
-    it('does not set a timeout for dates > 24hrs ago', function () {
+    it('does not set a timeout for dates > 24hrs ago', function() {
       const date = new Date();
       const ONE_DAY = day * 1000;
       sandbox.clock.tick(10 * ONE_DAY);
@@ -163,15 +160,15 @@ describe('sidebar.util.time', function () {
     });
   });
 
-  describe('.nextFuzzyUpdate', function () {
-    it('Handles empty dates', function () {
+  describe('.nextFuzzyUpdate', function() {
+    it('Handles empty dates', function() {
       const t = null;
       const expect = null;
       assert.equal(time.nextFuzzyUpdate(t), expect);
     });
 
-    const testFixture = function (f) {
-      return function () {
+    const testFixture = function(f) {
+      return function() {
         const t = new Date().toISOString();
         const expect = f[1];
         sandbox.clock.tick(f[0] * 1000);
@@ -181,8 +178,10 @@ describe('sidebar.util.time', function () {
 
     for (let i = 0, f; i < FIXTURES_NEXT_FUZZY_UPDATE.length; i++) {
       f = FIXTURES_NEXT_FUZZY_UPDATE[i];
-      it('gives correct next fuzzy update time for fixture ' + i,
-        testFixture(f));
+      it(
+        'gives correct next fuzzy update time for fixture ' + i,
+        testFixture(f)
+      );
     }
   });
 });

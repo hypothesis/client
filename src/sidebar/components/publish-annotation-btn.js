@@ -6,20 +6,22 @@
  */
 // @ngInject
 module.exports = {
-  controller: function () {
+  controller: function (i18nService) {
     this.showDropdown = false;
-    this.privateLabel = 'Only Me';
+    this.privateLabel = i18nService.tl('sidePanel.channels.onlyMe.name');
+    this.tl = i18nService.tl;
 
     this.publishDestination = function () {
-      return this.isShared ? this.group.name : this.privateLabel;
+      this.groupName = i18nService.tl('sidePanel.channels.'+this.group.id.replace(/-/g, '') +'.name');
+      return this.isShared ? this.groupName : this.privateLabel;
     };
 
-    this.groupCategory = function () {
+    this.groupCategory = function() {
       return this.group.type === 'open' ? 'public' : 'group';
     };
 
-    this.setPrivacy = function (level) {
-      this.onSetPrivacy({level: level});
+    this.setPrivacy = function(level) {
+      this.onSetPrivacy({ level: level });
     };
   },
   controllerAs: 'vm',

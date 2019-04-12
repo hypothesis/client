@@ -5,9 +5,9 @@ const events = require('../events');
 module.exports = {
   controllerAs: 'vm',
   //@ngInject
-  controller: function ($rootScope, store) {
-    this.onNewNoteBtnClick = function(){
-      const topLevelFrame = store.frames().find(f=>!f.id);
+  controller: function($rootScope, store) {
+    this.onNewNoteBtnClick = function() {
+      const topLevelFrame = store.frames().find(f => !f.id);
       const annot = {
         target: [],
         uri: topLevelFrame.uri,
@@ -16,7 +16,6 @@ module.exports = {
       $rootScope.$broadcast(events.BEFORE_ANNOTATION_CREATED, annot);
     };
   },
-  bindings: {
-  },
+  bindings: {},
   template: require('../templates/new-note-btn.html'),
 };

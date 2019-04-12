@@ -1,14 +1,25 @@
 'use strict';
 
+const createDOMPurify = require('dompurify');
 const escapeHtml = require('escape-html');
 const katex = require('katex');
 const showdown = require('showdown');
+
+const DOMPurify = createDOMPurify(window);
+
+// Ensure that any links generated either by Showdown or in the markdown/HTML
+// passed to Showdown open in an external window.
+DOMPurify.addHook('afterSanitizeAttributes', node => {
+  if ('target' in node) {
+    node.setAttribute('target', '_blank');
+  }
+});
 
 function targetBlank() {
   function filter(text) {
     return text.replace(/<a href=/g, '<a target="_blank" href=');
   }
-  return [{type: 'output', filter: filter}];
+  return [{ type: 'output', filter: filter }];
 }
 
 let converter;
@@ -44,7 +55,8 @@ function extractMath(content) {
   let pos = 0;
   let replacedContent = content;
 
-  while (true) { // eslint-disable-line no-constant-condition
+  // eslint-disable-next-line no-constant-condition
+  while (true) {
     const blockMathStart = replacedContent.indexOf('$$', pos);
     const inlineMathStart = replacedContent.indexOf('\\(', pos);
 
@@ -54,8 +66,10 @@ function extractMath(content) {
 
     let mathStart;
     let mathEnd;
-    if (blockMathStart !== -1 &&
-        (inlineMathStart === -1 || blockMathStart < inlineMathStart)) {
+    if (
+      blockMathStart !== -1 &&
+      (inlineMathStart === -1 || blockMathStart < inlineMathStart)
+    ) {
       mathStart = blockMathStart;
       mathEnd = replacedContent.indexOf('$$', mathStart + 2);
     } else {
@@ -86,9 +100,10 @@ function extractMath(content) {
       replacement = '\n\n' + placeholder + '\n\n';
     }
 
-    replacedContent = replacedContent.slice(0, mathStart) +
-                      replacement +
-                      replacedContent.slice(mathEnd);
+    replacedContent =
+      replacedContent.slice(0, mathStart) +
+      replacement +
+      replacedContent.slice(mathEnd);
     pos = mathStart + replacement.length;
   }
 
@@ -99,7 +114,7 @@ function extractMath(content) {
 }
 
 function insertMath(html, mathBlocks) {
-  return mathBlocks.reduce(function (html, block) {
+  return mathBlocks.reduce(function(html, block) {
     let renderedMath;
     try {
       if (block.inline) {
@@ -116,13 +131,13 @@ function insertMath(html, mathBlocks) {
   }, html);
 }
 
-function renderMathAndMarkdown(markdown, sanitizeFn) {
+function renderMathAndMarkdown(markdown) {
   // KaTeX takes care of escaping its input, so we want to avoid passing its
   // output through the HTML sanitizer. Therefore we first extract the math
   // blocks from the input, render and sanitize the remaining markdown and then
   // render and re-insert the math blocks back into the output.
   const mathInfo = extractMath(markdown);
-  const markdownHTML = sanitizeFn(renderMarkdown(mathInfo.content));
+  const markdownHTML = DOMPurify.sanitize(renderMarkdown(mathInfo.content));
   const mathAndMarkdownHTML = insertMath(markdownHTML, mathInfo.mathBlocks);
   return mathAndMarkdownHTML;
 }

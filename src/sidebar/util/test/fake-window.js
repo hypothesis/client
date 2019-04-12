@@ -9,10 +9,9 @@ class FakeWindow {
       height: 768,
     };
 
-
     this.location = 'https://client.hypothes.is/app.html';
     this.open = sinon.spy(href => {
-      const win = new FakeWindow;
+      const win = new FakeWindow();
       win.location = href;
       return win;
     });
@@ -30,17 +29,17 @@ class FakeWindow {
   }
 
   addEventListener(event, callback) {
-    this.callbacks.push({event, callback});
+    this.callbacks.push({ event, callback });
   }
 
   removeEventListener(event, callback) {
-    this.callbacks = this.callbacks.filter((cb) =>
-      !(cb.event === event && cb.callback === callback)
+    this.callbacks = this.callbacks.filter(
+      cb => !(cb.event === event && cb.callback === callback)
     );
   }
 
   trigger(event) {
-    this.callbacks.forEach((cb) => {
+    this.callbacks.forEach(cb => {
       if (cb.event === event.type) {
         cb.callback(event);
       }

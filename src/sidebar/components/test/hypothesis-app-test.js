@@ -7,7 +7,7 @@ const events = require('../../events');
 const bridgeEvents = require('../../../shared/bridge-events');
 const util = require('../../../shared/test/util');
 
-describe('sidebar.components.hypothesis-app', function () {
+describe('sidebar.components.hypothesis-app', function() {
   let $componentController = null;
   let $scope = null;
   let $rootScope = null;
@@ -33,211 +33,221 @@ describe('sidebar.components.hypothesis-app', function () {
 
   let sandbox = null;
 
-  const createController = function (locals) {
+  const createController = function(locals) {
     locals = locals || {};
     locals.$scope = $scope;
     return $componentController('hypothesisApp', locals);
   };
 
-  beforeEach(function () {
+  beforeEach(function() {
     sandbox = sinon.sandbox.create();
   });
 
-  beforeEach(function () {
+  beforeEach(function() {
     fakeAnnotationMetadata = {
-      location: function () { return 0; },
+      location: function() {
+        return 0;
+      },
     };
 
     fakeServiceConfig = sandbox.stub();
 
-    const component = proxyquire('../hypothesis-app', util.noCallThru({
-      'angular': angular,
-      '../annotation-metadata': fakeAnnotationMetadata,
-      '../service-config': fakeServiceConfig,
-    }));
+    const component = proxyquire(
+      '../hypothesis-app',
+      util.noCallThru({
+        angular: angular,
+        '../annotation-metadata': fakeAnnotationMetadata,
+        '../service-config': fakeServiceConfig,
+      })
+    );
 
-    angular.module('h', [])
-      .component('hypothesisApp', component);
+    angular.module('h', []).component('hypothesisApp', component);
   });
 
   beforeEach(angular.mock.module('h'));
 
-  beforeEach(angular.mock.module(function ($provide) {
-    fakeStore = {
-      tool: 'comment',
-      clearSelectedAnnotations: sandbox.spy(),
-    };
+  beforeEach(
+    angular.mock.module(function($provide) {
+      fakeStore = {
+        tool: 'comment',
+        clearSelectedAnnotations: sandbox.spy(),
+      };
 
-    fakeAnalytics = {
-      track: sandbox.stub(),
-      events: require('../../services/analytics')().events,
-    };
+      fakeAnalytics = {
+        track: sandbox.stub(),
+        events: require('../../services/analytics').events,
+      };
 
-    fakeAuth = {};
+      fakeAuth = {};
 
-    fakeDrafts = {
-      contains: sandbox.stub(),
-      remove: sandbox.spy(),
-      all: sandbox.stub().returns([]),
-      discard: sandbox.spy(),
-      count: sandbox.stub().returns(0),
-      unsaved: sandbox.stub().returns([]),
-    };
+      fakeDrafts = {
+        contains: sandbox.stub(),
+        remove: sandbox.spy(),
+        all: sandbox.stub().returns([]),
+        discard: sandbox.spy(),
+        count: sandbox.stub().returns(0),
+        unsaved: sandbox.stub().returns([]),
+      };
 
-    fakeFeatures = {
-      fetch: sandbox.spy(),
-      flagEnabled: sandbox.stub().returns(false),
-    };
+      fakeFeatures = {
+        fetch: sandbox.spy(),
+        flagEnabled: sandbox.stub().returns(false),
+      };
 
-    fakeFlash = {
-      error: sandbox.stub(),
-    };
+      fakeFlash = {
+        error: sandbox.stub(),
+      };
 
-    fakeFrameSync = {
-      connect: sandbox.spy(),
-    };
+      fakeFrameSync = {
+        connect: sandbox.spy(),
+      };
 
-    fakeLocation = {
-      search: sandbox.stub().returns({}),
-    };
+      fakeLocation = {
+        search: sandbox.stub().returns({}),
+      };
 
-    fakeParams = {id: 'test'};
+      fakeParams = { id: 'test' };
 
-    fakeSession = {
-      load: sandbox.stub().returns(Promise.resolve({userid: null})),
-      logout: sandbox.stub(),
-      reload: sandbox.stub().returns(Promise.resolve({userid: null})),
-    };
+      fakeSession = {
+        load: sandbox.stub().returns(Promise.resolve({ userid: null })),
+        logout: sandbox.stub(),
+        reload: sandbox.stub().returns(Promise.resolve({ userid: null })),
+      };
 
-    fakeGroups = {focus: sandbox.spy()};
+      fakeGroups = { focus: sandbox.spy() };
 
-    fakeRoute = {reload: sandbox.spy()};
+      fakeRoute = { reload: sandbox.spy() };
 
-    fakeWindow = {
-      top: {},
-      confirm: sandbox.stub(),
-      open: sandbox.stub(),
-    };
+      fakeWindow = {
+        top: {},
+        confirm: sandbox.stub(),
+        open: sandbox.stub(),
+      };
 
-    fakeServiceUrl = sinon.stub();
-    fakeSettings = {};
-    fakeStreamer = {
-      countPendingUpdates: sinon.stub(),
-      applyPendingUpdates: sinon.stub(),
-    };
-    fakeBridge = {
-      call: sandbox.stub(),
-    };
+      fakeServiceUrl = sinon.stub();
+      fakeSettings = {};
+      fakeStreamer = {
+        countPendingUpdates: sinon.stub(),
+        applyPendingUpdates: sinon.stub(),
+      };
+      fakeBridge = {
+        call: sandbox.stub(),
+      };
 
-    $provide.value('store', fakeStore);
-    $provide.value('auth', fakeAuth);
-    $provide.value('analytics', fakeAnalytics);
-    $provide.value('drafts', fakeDrafts);
-    $provide.value('features', fakeFeatures);
-    $provide.value('flash', fakeFlash);
-    $provide.value('frameSync', fakeFrameSync);
-    $provide.value('serviceUrl', fakeServiceUrl);
-    $provide.value('session', fakeSession);
-    $provide.value('settings', fakeSettings);
-    $provide.value('bridge', fakeBridge);
-    $provide.value('streamer', fakeStreamer);
-    $provide.value('groups', fakeGroups);
-    $provide.value('$route', fakeRoute);
-    $provide.value('$location', fakeLocation);
-    $provide.value('$routeParams', fakeParams);
-    $provide.value('$window', fakeWindow);
-  }));
+      $provide.value('store', fakeStore);
+      $provide.value('auth', fakeAuth);
+      $provide.value('analytics', fakeAnalytics);
+      $provide.value('drafts', fakeDrafts);
+      $provide.value('features', fakeFeatures);
+      $provide.value('flash', fakeFlash);
+      $provide.value('frameSync', fakeFrameSync);
+      $provide.value('serviceUrl', fakeServiceUrl);
+      $provide.value('session', fakeSession);
+      $provide.value('settings', fakeSettings);
+      $provide.value('bridge', fakeBridge);
+      $provide.value('streamer', fakeStreamer);
+      $provide.value('groups', fakeGroups);
+      $provide.value('$route', fakeRoute);
+      $provide.value('$location', fakeLocation);
+      $provide.value('$routeParams', fakeParams);
+      $provide.value('$window', fakeWindow);
+    })
+  );
 
-  beforeEach(angular.mock.inject(function (_$componentController_, _$rootScope_) {
-    $componentController = _$componentController_;
-    $rootScope = _$rootScope_;
-    $scope = $rootScope.$new();
-  }));
+  beforeEach(
+    angular.mock.inject(function(_$componentController_, _$rootScope_) {
+      $componentController = _$componentController_;
+      $rootScope = _$rootScope_;
+      $scope = $rootScope.$new();
+    })
+  );
 
-  afterEach(function () {
+  afterEach(function() {
     sandbox.restore();
   });
 
-  describe('#isSidebar', function () {
-
-    it('is false if the window is the top window', function () {
+  describe('#isSidebar', function() {
+    it('is false if the window is the top window', function() {
       fakeWindow.top = fakeWindow;
       const ctrl = createController();
       assert.isFalse(ctrl.isSidebar);
     });
 
-    it('is true if the window is not the top window', function () {
+    it('is true if the window is not the top window', function() {
       fakeWindow.top = {};
       const ctrl = createController();
       assert.isTrue(ctrl.isSidebar);
     });
   });
 
-  it('connects to host frame in the sidebar app', function () {
+  it('connects to host frame in the sidebar app', function() {
     fakeWindow.top = {};
     createController();
     assert.called(fakeFrameSync.connect);
   });
 
-  it('does not connect to the host frame in the stream', function () {
+  it('does not connect to the host frame in the stream', function() {
     fakeWindow.top = fakeWindow;
     createController();
     assert.notCalled(fakeFrameSync.connect);
   });
 
-  it('auth.status is "unknown" on startup', function () {
+  it('auth.status is "unknown" on startup', function() {
     const ctrl = createController();
     assert.equal(ctrl.auth.status, 'unknown');
   });
 
-  it('sets auth.status to "logged-out" if userid is null', function () {
+  it('sets auth.status to "logged-out" if userid is null', function() {
     const ctrl = createController();
-    return fakeSession.load().then(function () {
+    return fakeSession.load().then(function() {
       assert.equal(ctrl.auth.status, 'logged-out');
     });
   });
 
-  it('sets auth.status to "logged-in" if userid is non-null', function () {
-    fakeSession.load = function () {
-      return Promise.resolve({userid: 'acct:jim@hypothes.is'});
+  it('sets auth.status to "logged-in" if userid is non-null', function() {
+    fakeSession.load = function() {
+      return Promise.resolve({ userid: 'acct:jim@hypothes.is' });
     };
     const ctrl = createController();
-    return fakeSession.load().then(function () {
+    return fakeSession.load().then(function() {
       assert.equal(ctrl.auth.status, 'logged-in');
     });
   });
 
-  [{
-    // User who has set a display name
-    profile: {
-      userid: 'acct:jim@hypothes.is',
-      user_info: {
-        display_name: 'Jim Smith',
+  [
+    {
+      // User who has set a display name
+      profile: {
+        userid: 'acct:jim@hypothes.is',
+        user_info: {
+          display_name: 'Jim Smith',
+        },
+      },
+      expectedAuth: {
+        status: 'logged-in',
+        userid: 'acct:jim@hypothes.is',
+        username: 'jim',
+        provider: 'hypothes.is',
+        displayName: 'Jim Smith',
       },
     },
-    expectedAuth: {
-      status: 'logged-in',
-      userid: 'acct:jim@hypothes.is',
-      username: 'jim',
-      provider: 'hypothes.is',
-      displayName: 'Jim Smith',
-    },
-  },{
-    // User who has not set a display name
-    profile: {
-      userid: 'acct:jim@hypothes.is',
-      user_info: {
-        display_name: null,
+    {
+      // User who has not set a display name
+      profile: {
+        userid: 'acct:jim@hypothes.is',
+        user_info: {
+          display_name: null,
+        },
+      },
+      expectedAuth: {
+        status: 'logged-in',
+        userid: 'acct:jim@hypothes.is',
+        username: 'jim',
+        provider: 'hypothes.is',
+        displayName: 'jim',
       },
     },
-    expectedAuth: {
-      status: 'logged-in',
-      userid: 'acct:jim@hypothes.is',
-      username: 'jim',
-      provider: 'hypothes.is',
-      displayName: 'jim',
-    },
-  }].forEach(({ profile, expectedAuth }) => {
+  ].forEach(({ profile, expectedAuth }) => {
     it('sets `auth` properties when profile has loaded', () => {
       fakeSession.load = () => Promise.resolve(profile);
       const ctrl = createController();
@@ -247,9 +257,9 @@ describe('sidebar.components.hypothesis-app', function () {
     });
   });
 
-  it('updates auth when the logged-in user changes', function () {
+  it('updates auth when the logged-in user changes', function() {
     const ctrl = createController();
-    return fakeSession.load().then(function () {
+    return fakeSession.load().then(function() {
       $scope.$broadcast(events.USER_CHANGED, {
         profile: {
           userid: 'acct:john@hypothes.is',
@@ -265,38 +275,41 @@ describe('sidebar.components.hypothesis-app', function () {
     });
   });
 
-  it('does not show the share dialog at start', function () {
+  it('does not show the share dialog at start', function() {
     const ctrl = createController();
     assert.isFalse(ctrl.shareDialog.visible);
   });
 
-  describe('#signUp', function () {
-    it('tracks sign up requests in analytics', function () {
+  describe('#signUp', function() {
+    it('tracks sign up requests in analytics', function() {
       const ctrl = createController();
       ctrl.signUp();
-      assert.calledWith(fakeAnalytics.track, fakeAnalytics.events.SIGN_UP_REQUESTED);
+      assert.calledWith(
+        fakeAnalytics.track,
+        fakeAnalytics.events.SIGN_UP_REQUESTED
+      );
     });
 
-    context('when using a third-party service', function () {
-      beforeEach(function () {
+    context('when using a third-party service', function() {
+      beforeEach(function() {
         fakeServiceConfig.returns({});
       });
 
-      it('sends SIGNUP_REQUESTED event', function () {
+      it('sends SIGNUP_REQUESTED event', function() {
         const ctrl = createController();
         ctrl.signUp();
         assert.calledWith(fakeBridge.call, bridgeEvents.SIGNUP_REQUESTED);
       });
 
-      it('does not open a URL directly', function () {
+      it('does not open a URL directly', function() {
         const ctrl = createController();
         ctrl.signUp();
         assert.notCalled(fakeWindow.open);
       });
     });
 
-    context('when not using a third-party service', function () {
-      it('opens the signup URL in a new tab', function () {
+    context('when not using a third-party service', function() {
+      it('opens the signup URL in a new tab', function() {
         fakeServiceUrl.withArgs('signup').returns('https://ann.service/signup');
         const ctrl = createController();
         ctrl.signUp();
@@ -305,20 +318,20 @@ describe('sidebar.components.hypothesis-app', function () {
     });
   });
 
-  describe('#showHelpPanel', function () {
-    context('when using a third-party service', function () {
-      context("when there's no onHelpRequest callback function", function () {
-        beforeEach('configure a service with no onHelpRequest', function () {
+  describe('#showHelpPanel', function() {
+    context('when using a third-party service', function() {
+      context("when there's no onHelpRequest callback function", function() {
+        beforeEach('configure a service with no onHelpRequest', function() {
           fakeServiceConfig.returns({});
         });
 
-        it('does not send an event', function () {
+        it('does not send an event', function() {
           createController().showHelpPanel();
 
           assert.notCalled(fakeBridge.call);
         });
 
-        it('shows the help panel', function () {
+        it('shows the help panel', function() {
           const ctrl = createController();
 
           ctrl.showHelpPanel();
@@ -327,18 +340,18 @@ describe('sidebar.components.hypothesis-app', function () {
         });
       });
 
-      context("when there's an onHelpRequest callback function", function () {
-        beforeEach('provide an onHelpRequest callback', function () {
-          fakeServiceConfig.returns({onHelpRequestProvided: true});
+      context("when there's an onHelpRequest callback function", function() {
+        beforeEach('provide an onHelpRequest callback', function() {
+          fakeServiceConfig.returns({ onHelpRequestProvided: true });
         });
 
-        it('sends the HELP_REQUESTED event', function () {
+        it('sends the HELP_REQUESTED event', function() {
           createController().showHelpPanel();
 
           assert.calledWith(fakeBridge.call, bridgeEvents.HELP_REQUESTED);
         });
 
-        it('does not show the help panel', function () {
+        it('does not show the help panel', function() {
           const ctrl = createController();
 
           ctrl.showHelpPanel();
@@ -346,17 +359,16 @@ describe('sidebar.components.hypothesis-app', function () {
           assert.isFalse(ctrl.helpPanel.visible);
         });
       });
-
     });
 
-    context('when not using a third-party service', function () {
-      it('does not send an event', function () {
+    context('when not using a third-party service', function() {
+      it('does not send an event', function() {
         createController().showHelpPanel();
 
         assert.notCalled(fakeBridge.call);
       });
 
-      it('shows the help panel', function () {
+      it('shows the help panel', function() {
         const ctrl = createController();
 
         ctrl.showHelpPanel();
@@ -366,7 +378,7 @@ describe('sidebar.components.hypothesis-app', function () {
     });
   });
 
-  describe('#login()', function () {
+  describe('#login()', function() {
     beforeEach(() => {
       fakeAuth.login = sinon.stub().returns(Promise.resolve());
     });
@@ -394,7 +406,7 @@ describe('sidebar.components.hypothesis-app', function () {
       });
     });
 
-    it('sends LOGIN_REQUESTED if a third-party service is in use', function () {
+    it('sends LOGIN_REQUESTED if a third-party service is in use', function() {
       // If the client is using a third-party annotation service then clicking
       // on a login button should send the LOGIN_REQUESTED event over the bridge
       // (so that the partner site we're embedded in can do its own login
@@ -405,23 +417,24 @@ describe('sidebar.components.hypothesis-app', function () {
       ctrl.login();
 
       assert.equal(fakeBridge.call.callCount, 1);
-      assert.isTrue(fakeBridge.call.calledWithExactly(bridgeEvents.LOGIN_REQUESTED));
+      assert.isTrue(
+        fakeBridge.call.calledWithExactly(bridgeEvents.LOGIN_REQUESTED)
+      );
     });
   });
 
-  describe('#share()', function () {
-    it('shows the share dialog', function () {
+  describe('#share()', function() {
+    it('shows the share dialog', function() {
       const ctrl = createController();
       ctrl.share();
       assert.equal(ctrl.shareDialog.visible, true);
     });
   });
 
-  describe('#logout()', function () {
-
+  describe('#logout()', function() {
     // Tests shared by both of the contexts below.
     function doSharedTests() {
-      it('prompts the user if there are drafts', function () {
+      it('prompts the user if there are drafts', function() {
         fakeDrafts.count.returns(1);
         const ctrl = createController();
 
@@ -430,25 +443,31 @@ describe('sidebar.components.hypothesis-app', function () {
         assert.equal(fakeWindow.confirm.callCount, 1);
       });
 
-      it('emits "annotationDeleted" for each unsaved draft annotation', function () {
-        fakeDrafts.unsaved = sandbox.stub().returns(
-          ['draftOne', 'draftTwo', 'draftThree']
-        );
+      it('emits "annotationDeleted" for each unsaved draft annotation', function() {
+        fakeDrafts.unsaved = sandbox
+          .stub()
+          .returns(['draftOne', 'draftTwo', 'draftThree']);
         const ctrl = createController();
         $rootScope.$emit = sandbox.stub();
 
         ctrl.logout();
 
         assert($rootScope.$emit.calledThrice);
-        assert.deepEqual(
-          $rootScope.$emit.firstCall.args, ['annotationDeleted', 'draftOne']);
-        assert.deepEqual(
-          $rootScope.$emit.secondCall.args, ['annotationDeleted', 'draftTwo']);
-        assert.deepEqual(
-          $rootScope.$emit.thirdCall.args, ['annotationDeleted', 'draftThree']);
+        assert.deepEqual($rootScope.$emit.firstCall.args, [
+          'annotationDeleted',
+          'draftOne',
+        ]);
+        assert.deepEqual($rootScope.$emit.secondCall.args, [
+          'annotationDeleted',
+          'draftTwo',
+        ]);
+        assert.deepEqual($rootScope.$emit.thirdCall.args, [
+          'annotationDeleted',
+          'draftThree',
+        ]);
       });
 
-      it('discards draft annotations', function () {
+      it('discards draft annotations', function() {
         const ctrl = createController();
 
         ctrl.logout();
@@ -456,7 +475,7 @@ describe('sidebar.components.hypothesis-app', function () {
         assert(fakeDrafts.discard.calledOnce);
       });
 
-      it('does not emit "annotationDeleted" if the user cancels the prompt', function () {
+      it('does not emit "annotationDeleted" if the user cancels the prompt', function() {
         const ctrl = createController();
         fakeDrafts.count.returns(1);
         $rootScope.$emit = sandbox.stub();
@@ -467,7 +486,7 @@ describe('sidebar.components.hypothesis-app', function () {
         assert($rootScope.$emit.notCalled);
       });
 
-      it('does not discard drafts if the user cancels the prompt', function () {
+      it('does not discard drafts if the user cancels the prompt', function() {
         const ctrl = createController();
         fakeDrafts.count.returns(1);
         fakeWindow.confirm.returns(false);
@@ -477,7 +496,7 @@ describe('sidebar.components.hypothesis-app', function () {
         assert(fakeDrafts.discard.notCalled);
       });
 
-      it('does not prompt if there are no drafts', function () {
+      it('does not prompt if there are no drafts', function() {
         const ctrl = createController();
         fakeDrafts.count.returns(0);
 
@@ -487,31 +506,34 @@ describe('sidebar.components.hypothesis-app', function () {
       });
     }
 
-    context('when no third-party service is in use', function () {
+    context('when no third-party service is in use', function() {
       doSharedTests();
 
-      it('calls session.logout()', function () {
+      it('calls session.logout()', function() {
         const ctrl = createController();
         ctrl.logout();
         assert.called(fakeSession.logout);
       });
     });
 
-    context('when a third-party service is in use', function () {
+    context('when a third-party service is in use', function() {
       beforeEach('configure a third-party service to be in use', function() {
         fakeServiceConfig.returns({});
       });
 
       doSharedTests();
 
-      it('sends LOGOUT_REQUESTED', function () {
+      it('sends LOGOUT_REQUESTED', function() {
         createController().logout();
 
         assert.calledOnce(fakeBridge.call);
-        assert.calledWithExactly(fakeBridge.call, bridgeEvents.LOGOUT_REQUESTED);
+        assert.calledWithExactly(
+          fakeBridge.call,
+          bridgeEvents.LOGOUT_REQUESTED
+        );
       });
 
-      it('does not send LOGOUT_REQUESTED if the user cancels the prompt', function () {
+      it('does not send LOGOUT_REQUESTED if the user cancels the prompt', function() {
         fakeDrafts.count.returns(1);
         fakeWindow.confirm.returns(false);
 
@@ -520,7 +542,7 @@ describe('sidebar.components.hypothesis-app', function () {
         assert.notCalled(fakeBridge.call);
       });
 
-      it('does not call session.logout()', function () {
+      it('does not call session.logout()', function() {
         createController().logout();
 
         assert.notCalled(fakeSession.logout);

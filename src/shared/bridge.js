@@ -21,8 +21,7 @@ class Bridge {
    * This removes the event listeners for messages arriving from other windows.
    */
   destroy() {
-    Array.from(this.links).map((link) =>
-      link.channel.destroy());
+    Array.from(this.links).map(link => link.channel.destroy());
   }
 
   /**
@@ -41,9 +40,11 @@ class Bridge {
     let connected = false;
 
     const ready = () => {
-      if (connected) { return; }
+      if (connected) {
+        return;
+      }
       connected = true;
-      Array.from(this.onConnectListeners).forEach((cb) =>
+      Array.from(this.onConnectListeners).forEach(cb =>
         cb.call(null, channel, source)
       );
     };
@@ -55,7 +56,7 @@ class Bridge {
       }
     };
 
-    const listeners = extend({connect}, this.channelListeners);
+    const listeners = extend({ connect }, this.channelListeners);
 
     // Set up a channel
     channel = new RPC(window, source, origin, listeners);
@@ -82,7 +83,7 @@ class Bridge {
    */
   call(method, ...args) {
     let cb;
-    if (typeof(args[args.length - 1]) === 'function') {
+    if (typeof args[args.length - 1] === 'function') {
       cb = args[args.length - 1];
       args = args.slice(0, -1);
     }
@@ -90,18 +91,27 @@ class Bridge {
     const _makeDestroyFn = c => {
       return error => {
         c.destroy();
-        this.links = (Array.from(this.links).filter((l) => l.channel !== c).map((l) => l));
+        this.links = Array.from(this.links)
+          .filter(l => l.channel !== c)
+          .map(l => l);
         throw error;
       };
     };
 
     const promises = this.links.map(function(l) {
       const p = new Promise(function(resolve, reject) {
-        const timeout = setTimeout((() => resolve(null)), 1000);
+        const timeout = setTimeout(() => resolve(null), 1000);
         try {
-          return l.channel.call(method, ...Array.from(args), function(err, result) {
+          return l.channel.call(method, ...Array.from(args), function(
+            err,
+            result
+          ) {
             clearTimeout(timeout);
-            if (err) { return reject(err); } else { return resolve(result); }
+            if (err) {
+              return reject(err);
+            } else {
+              return resolve(result);
+            }
           });
         } catch (error) {
           const err = error;

@@ -4,11 +4,11 @@
   <input class="simple-search-input"
          type="text"
          name="query"
-         placeholder="{{vm.loading && 'Loading' || 'Search'}}…"
-         ng-disabled="vm.loading"
+         placeholder="{{vm.isLoading() && 'Loading' || 'Search'}}…"
+         ng-disabled="vm.isLoading()"
          ng-class="vm.inputClasses()"/>
-  <button type="button" class="simple-search-icon top-bar__btn" ng-hide="vm.loading">
+  <button type="button" class="simple-search-icon top-bar__btn" ng-hide="vm.isLoading()">
     <i class="h-icon-search"></i>
   </button>
-  <spinner class="top-bar__btn" ng-show="vm.loading" title="Loading…"></spinner>
+  <spinner class="top-bar__btn" ng-show="vm.isLoading()" title="Loading…"></spinner>
 </form>

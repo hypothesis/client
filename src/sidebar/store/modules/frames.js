@@ -10,8 +10,8 @@ function init() {
 }
 
 const update = {
-  CONNECT_FRAME: function (state, action) {
-    return {frames: state.frames.concat(action.frame)};
+  CONNECT_FRAME: function(state, action) {
+    return { frames: state.frames.concat(action.frame) };
   },
   UPDATE_FRAME: function (state, { id, metadata, uri }) {
     return {
@@ -24,15 +24,15 @@ const update = {
     };
   },
 
-  DESTROY_FRAME: function (state, action) {
+  DESTROY_FRAME: function(state, action) {
     return {
       frames: state.frames.filter(f => f !== action.frame),
     };
   },
 
-  UPDATE_FRAME_ANNOTATION_FETCH_STATUS: function (state, action) {
-    const frames = state.frames.map(function (frame) {
-      const match = (frame.uri && frame.uri === action.uri);
+  UPDATE_FRAME_ANNOTATION_FETCH_STATUS: function(state, action) {
+    const frames = state.frames.map(function(frame) {
+      const match = frame.uri && frame.uri === action.uri;
       if (match) {
         return Object.assign({}, frame, {
           isAnnotationFetchComplete: action.isAnnotationFetchComplete,
@@ -53,7 +53,7 @@ const actions = util.actionTypes(update);
  * Add a frame to the list of frames currently connected to the sidebar app.
  */
 function connectFrame(frame) {
-  return {type: actions.CONNECT_FRAME, frame: frame};
+  return { type: actions.CONNECT_FRAME, frame: frame };
 }
 
 /**
@@ -67,7 +67,7 @@ function updateFrame({ id, metadata, uri }) {
  * Remove a frame from the list of frames currently connected to the sidebar app.
  */
 function destroyFrame(frame) {
-  return {type: actions.DESTROY_FRAME, frame: frame};
+  return { type: actions.DESTROY_FRAME, frame: frame };
 }
 
 /**
@@ -92,13 +92,13 @@ function searchUrisForFrame(frame) {
   let uris = [frame.uri];
 
   if (frame.metadata && frame.metadata.documentFingerprint) {
-    uris = frame.metadata.link.map(function (link) {
+    uris = frame.metadata.link.map(function(link) {
       return link.href;
     });
   }
 
   if (frame.metadata && frame.metadata.link) {
-    frame.metadata.link.forEach(function (link) {
+    frame.metadata.link.forEach(function(link) {
       if (link.href.startsWith('doi:')) {
         uris.push(link.href);
       }
@@ -113,7 +113,7 @@ function searchUrisForFrame(frame) {
  * current page.
  */
 function searchUris(state) {
-  return state.frames.reduce(function (uris, frame) {
+  return state.frames.reduce(function(uris, frame) {
     return uris.concat(searchUrisForFrame(frame));
   }, []);
 }

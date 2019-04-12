@@ -6,7 +6,10 @@ help:
 	@echo "make help              Show this help message"
 	@echo "make dev               Run the app in the development server"
 	@echo "make lint              Run the code linter(s) and print any warnings"
-	@echo "make test              Run the unit tests"
+	@echo "make checkformatting   Check code formatting"
+	@echo "make format            Automatically format code"
+	@echo "make test              Run the unit tests once"
+	@echo "make servetests        Start the unit test server on localhost"
 	@echo "make docs              Build docs website and serve it locally"
 	@echo "make checkdocs         Crash if building the docs website fails"
 	@echo "make clean             Delete development artefacts (cached files, "
@@ -24,6 +27,10 @@ else
 	yarn test
 endif
 
+.PHONY: servetests
+servetests: node_modules/.uptodate
+	gulp test-watch
+
 .PHONY: lint
 lint: node_modules/.uptodate
 	yarn run lint
@@ -40,6 +47,14 @@ checkdocs:
 clean:
 	rm -f node_modules/.uptodate
 	rm -rf build
+
+.PHONY: format
+format:
+	yarn run format
+
+.PHONY: checkformatting
+checkformatting:
+	yarn run checkformatting
 
 build/manifest.json: node_modules/.uptodate
 	yarn run build

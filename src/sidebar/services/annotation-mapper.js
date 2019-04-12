@@ -5,7 +5,7 @@ const angular = require('angular');
 const events = require('../events');
 
 function getExistingAnnotation(store, id) {
-  return store.getState().annotations.find(function (annot) {
+  return store.getState().annotations.find(function(annot) {
     return annot.id === id;
   });
 }
@@ -17,7 +17,7 @@ function annotationMapper($rootScope, store, api) {
     annotations = annotations.concat(replies || []);
 
     const loaded = [];
-    annotations.forEach(function (annotation) {
+    annotations.forEach(function(annotation) {
       const existing = getExistingAnnotation(store, annotation.id);
       if (existing) {
         $rootScope.$broadcast(events.ANNOTATION_UPDATED, annotation);
@@ -30,7 +30,7 @@ function annotationMapper($rootScope, store, api) {
   }
 
   function unloadAnnotations(annotations) {
-    const unloaded = annotations.map(function (annotation) {
+    const unloaded = annotations.map(function(annotation) {
       const existing = getExistingAnnotation(store, annotation.id);
       if (existing && annotation !== existing) {
         annotation = angular.copy(annotation, existing);
@@ -46,21 +46,25 @@ function annotationMapper($rootScope, store, api) {
   }
 
   function deleteAnnotation(annotation) {
-    return api.annotation.delete({
-      id: annotation.id,
-    }).then(function () {
-      $rootScope.$broadcast(events.ANNOTATION_DELETED, annotation);
-      return annotation;
-    });
+    return api.annotation
+      .delete({
+        id: annotation.id,
+      })
+      .then(function() {
+        $rootScope.$broadcast(events.ANNOTATION_DELETED, annotation);
+        return annotation;
+      });
   }
 
   function flagAnnotation(annot) {
-    return api.annotation.flag({
-      id: annot.id,
-    }).then(function () {
-      $rootScope.$broadcast(events.ANNOTATION_FLAGGED, annot);
-      return annot;
-    });
+    return api.annotation
+      .flag({
+        id: annot.id,
+      })
+      .then(function() {
+        $rootScope.$broadcast(events.ANNOTATION_FLAGGED, annot);
+        return annot;
+      });
   }
 
   return {
@@ -71,6 +75,5 @@ function annotationMapper($rootScope, store, api) {
     flagAnnotation: flagAnnotation,
   };
 }
-
 
 module.exports = annotationMapper;

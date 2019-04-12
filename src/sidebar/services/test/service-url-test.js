@@ -10,15 +10,15 @@ function fakeStore() {
       links = newLinks;
     },
     getState: function() {
-      return {links: links};
+      return { links: links };
     },
   };
 }
 
 function createServiceUrl(linksPromise) {
-  const replaceURLParams = sinon.stub().returns(
-    {url: 'EXPANDED_URL', params: {}}
-  );
+  const replaceURLParams = sinon
+    .stub()
+    .returns({ url: 'EXPANDED_URL', params: {} });
 
   const serviceUrlFactory = proxyquire('../service-url', {
     '../util/url-util': { replaceURLParams: replaceURLParams },
@@ -38,13 +38,12 @@ function createServiceUrl(linksPromise) {
   };
 }
 
-describe('sidebar.service-url', function () {
-
+describe('sidebar.service-url', function() {
   beforeEach(function() {
     sinon.stub(console, 'warn');
   });
 
-  afterEach(function () {
+  afterEach(function() {
     console.warn.restore();
   });
 
@@ -71,7 +70,7 @@ describe('sidebar.service-url', function () {
     });
 
     it('returns an empty string even if link params are given', function() {
-      assert.equal(serviceUrl('foo', {bar: 'bar'}), '');
+      assert.equal(serviceUrl('foo', { bar: 'bar' }), '');
     });
   });
 
@@ -97,20 +96,21 @@ describe('sidebar.service-url', function () {
 
     it('updates store with the real links', function() {
       return linksPromise.then(function(links) {
-        assert.deepEqual(store.getState(), {links: links});
+        assert.deepEqual(store.getState(), { links: links });
       });
     });
 
     it('calls replaceURLParams with the path and given params', function() {
       return linksPromise.then(function() {
-        const params = {foo: 'bar'};
+        const params = { foo: 'bar' };
 
         serviceUrl('first_link', params);
 
         assert.calledOnce(replaceURLParams);
-        assert.deepEqual(
-          replaceURLParams.args[0],
-          ['http://example.com/first_page/:foo', params]);
+        assert.deepEqual(replaceURLParams.args[0], [
+          'http://example.com/first_page/:foo',
+          params,
+        ]);
       });
     });
 
@@ -134,13 +134,17 @@ describe('sidebar.service-url', function () {
     it("throws an error if it doesn't have the requested link", function() {
       return linksPromise.then(function() {
         assert.throws(
-          function() { serviceUrl('madeUpLinkName'); },
-          Error, 'Unknown link madeUpLinkName');
+          function() {
+            serviceUrl('madeUpLinkName');
+          },
+          Error,
+          'Unknown link madeUpLinkName'
+        );
       });
     });
 
     it('throws an error if replaceURLParams returns unused params', function() {
-      const params = {'unused_param_1': 'foo', 'unused_param_2': 'bar'};
+      const params = { unused_param_1: 'foo', unused_param_2: 'bar' };
       replaceURLParams.returns({
         url: 'EXPANDED_URL',
         params: params,
@@ -148,8 +152,12 @@ describe('sidebar.service-url', function () {
 
       return linksPromise.then(function() {
         assert.throws(
-          function() { serviceUrl('first_link', params); },
-          Error, 'Unknown link parameters: unused_param_1, unused_param_2');
+          function() {
+            serviceUrl('first_link', params);
+          },
+          Error,
+          'Unknown link parameters: unused_param_1, unused_param_2'
+        );
       });
     });
   });

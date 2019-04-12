@@ -39,7 +39,7 @@ const ARROW_H_MARGIN = 20;
 function attachShadow(element) {
   if (element.attachShadow) {
     // Shadow DOM v1 (Chrome v53, Safari 10)
-    return element.attachShadow({mode: 'open'});
+    return element.attachShadow({ mode: 'open' });
   } else if (element.createShadowRoot) {
     // Shadow DOM v0 (Chrome ~35-52)
     return element.createShadowRoot();
@@ -85,11 +85,13 @@ function createAdderDOM(container) {
     element = shadowRoot.querySelector('.js-adder');
 
     // Load stylesheets required by adder into shadow DOM element
-    const adderStyles = Array.from(document.styleSheets).map(function (sheet) {
-      return sheet.href;
-    }).filter(function (url) {
-      return (url || '').match(/(icomoon|annotator)\.css/);
-    });
+    const adderStyles = Array.from(document.styleSheets)
+      .map(function(sheet) {
+        return sheet.href;
+      })
+      .filter(function(url) {
+        return (url || '').match(/(icomoon|annotator)\.css/);
+      });
 
     // Stylesheet <link> elements are inert inside shadow roots [1]. Until
     // Shadow DOM implementations support external stylesheets [2], grab the
@@ -103,9 +105,11 @@ function createAdderDOM(container) {
     // get a usable adder, albeit one that uses browser default styles for the
     // toolbar.
     const styleEl = document.createElement('style');
-    styleEl.textContent = adderStyles.map(function (url) {
-      return '@import "' + url + '";';
-    }).join('\n');
+    styleEl.textContent = adderStyles
+      .map(function(url) {
+        return '@import "' + url + '";';
+      })
+      .join('\n');
     shadowRoot.appendChild(styleEl);
   } else {
     container.innerHTML = template;
@@ -161,10 +165,16 @@ class Adder {
       this.hide();
     };
 
-    this.element.querySelector(ANNOTATE_BTN_SELECTOR)
-      .addEventListener('click', event => handleCommand(event, options.onAnnotate));
-    this.element.querySelector(HIGHLIGHT_BTN_SELECTOR)
-      .addEventListener('click', event => handleCommand(event, options.onHighlight));
+    this.element
+      .querySelector(ANNOTATE_BTN_SELECTOR)
+      .addEventListener('click', event =>
+        handleCommand(event, options.onAnnotate)
+      );
+    this.element
+      .querySelector(HIGHLIGHT_BTN_SELECTOR)
+      .addEventListener('click', event =>
+        handleCommand(event, options.onHighlight)
+      );
 
     this._width = () => this.element.getBoundingClientRect().width;
     this._height = () => this.element.getBoundingClientRect().height;
@@ -173,7 +183,7 @@ class Adder {
   /** Hide the adder */
   hide() {
     clearTimeout(this._enterTimeout);
-    this.element.className = classnames({'annotator-adder': true});
+    this.element.className = classnames({ 'annotator-adder': true });
     this.element.style.visibility = 'hidden';
   }
 
@@ -211,8 +221,10 @@ class Adder {
 
     // Flip arrow direction if adder would appear above the top or below the
     // bottom of the viewport.
-    if (targetRect.top - this._height() < 0 &&
-        arrowDirection === ARROW_POINTING_DOWN) {
+    if (
+      targetRect.top - this._height() < 0 &&
+      arrowDirection === ARROW_POINTING_DOWN
+    ) {
       arrowDirection = ARROW_POINTING_UP;
     } else if (targetRect.top + this._height() > this._view.innerHeight) {
       arrowDirection = ARROW_POINTING_DOWN;
@@ -231,7 +243,7 @@ class Adder {
     top = Math.max(top, 0);
     top = Math.min(top, this._view.innerHeight - this._height());
 
-    return {top, left, arrowDirection};
+    return { top, left, arrowDirection };
   }
 
   /**

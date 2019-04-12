@@ -200,7 +200,7 @@ module.exports = function createBundle(config, buildOpts) {
       // the root of the repository
       const repoRootPath = path.join(__dirname, '../../');
       const relativePath = path.relative(path.resolve(repoRootPath),
-                                       path.resolve(req));
+        path.resolve(req));
       bundle.require(req, {expose: '/' + relativePath});
     } else {
       // this is a package under node_modules/, no

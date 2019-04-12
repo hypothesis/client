@@ -14,7 +14,7 @@ const Socket = require('./websocket');
  */
 function cacheBustURL(url) {
   let newUrl = url;
-  const cacheBuster = queryString.parse({timestamp: Date.now()});
+  const cacheBuster = queryString.parse({ timestamp: Date.now() });
   if (url.indexOf('?') !== -1) {
     newUrl += '&' + cacheBuster;
   } else {
@@ -30,7 +30,7 @@ function cacheBustURL(url) {
  * @param {Array<string>} changed - List of paths of modified assets.
  */
 function didAssetChange(url, changed) {
-  return changed.some(function (path) {
+  return changed.some(function(path) {
     return url.indexOf(path) !== -1;
   });
 }
@@ -46,7 +46,7 @@ function maybeReloadElement(element, changed) {
   const parentElement = element.parentNode;
   const newElement = element.cloneNode();
   const srcKeys = ['href', 'src'];
-  srcKeys.forEach(function (key) {
+  srcKeys.forEach(function(key) {
     if (key in element && didAssetChange(element[key], changed)) {
       newElement[key] = cacheBustURL(element[key]);
     }
@@ -56,7 +56,7 @@ function maybeReloadElement(element, changed) {
 
 function reloadExternalStyleSheets(changed) {
   const linkTags = [].slice.apply(document.querySelectorAll('link'));
-  linkTags.forEach(function (tag) {
+  linkTags.forEach(function(tag) {
     maybeReloadElement(tag, changed);
   });
 }
@@ -70,21 +70,21 @@ function reloadExternalStyleSheets(changed) {
  */
 function connect(url) {
   const conn = new Socket(url);
-  conn.on('open', function () {
+  conn.on('open', function() {
     console.log('Live reload client listening');
   });
-  conn.on('message', function (event) {
+  conn.on('message', function(event) {
     const message = JSON.parse(event.data);
     if (message.type === 'assets-changed') {
-      const scriptsOrTemplatesChanged = message.changed.some(function (path) {
+      const scriptsOrTemplatesChanged = message.changed.some(function(path) {
         return path.match(/\.(html|js)$/);
       });
-      const stylesChanged = message.changed.some(function (path) {
+      const stylesChanged = message.changed.some(function(path) {
         return path.match(/\.css$/);
       });
       if (scriptsOrTemplatesChanged) {
         // Ask the host page to reload the client (eg. by reloading itself).
-        window.top.postMessage({type:'reloadrequest'}, '*');
+        window.top.postMessage({ type: 'reloadrequest' }, '*');
         return;
       }
       if (stylesChanged) {
@@ -92,7 +92,7 @@ function connect(url) {
       }
     }
   });
-  conn.on('error', function (err) {
+  conn.on('error', function(err) {
     console.error('Error connecting to live reload server:', err);
   });
 }

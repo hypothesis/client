@@ -47,8 +47,8 @@ function ExcerptOverflowMonitor(excerpt, requestAnimationFrame) {
     let overflowing = false;
     if (state.enabled) {
       const hysteresisPx = state.overflowHysteresis || 0;
-      overflowing = excerpt.contentHeight() >
-        (state.collapsedHeight + hysteresisPx);
+      overflowing =
+        excerpt.contentHeight() > state.collapsedHeight + hysteresisPx;
     }
     if (overflowing === prevOverflowing) {
       return;
@@ -90,8 +90,7 @@ function ExcerptOverflowMonitor(excerpt, requestAnimationFrame) {
         // auto height
         maxHeight = toPx(excerpt.contentHeight());
       }
-    } else if (typeof prevOverflowing === 'undefined' &&
-               state.collapse) {
+    } else if (typeof prevOverflowing === 'undefined' && state.collapse) {
       // If the excerpt is collapsed but the overflowing state has not yet
       // been computed then the exact max height is unknown, but it will be
       // in the range [state.collapsedHeight, state.collapsedHeight +

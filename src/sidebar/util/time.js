@@ -4,19 +4,19 @@ const minute = 60;
 const hour = minute * 60;
 
 function lessThanThirtySecondsAgo(date, now) {
-  return ((now - date) < 30 * 1000);
+  return now - date < 30 * 1000;
 }
 
 function lessThanOneMinuteAgo(date, now) {
-  return ((now - date) < 60 * 1000);
+  return now - date < 60 * 1000;
 }
 
 function lessThanOneHourAgo(date, now) {
-  return ((now - date) < (60 * 60 * 1000));
+  return now - date < 60 * 60 * 1000;
 }
 
 function lessThanOneDayAgo(date, now) {
-  return ((now - date) < (24 * 60 * 60 * 1000));
+  return now - date < 24 * 60 * 60 * 1000;
 }
 
 function thisYear(date, now) {
@@ -80,8 +80,7 @@ function format(date, options, Intl) {
     let formatter = formatters[key];
 
     if (!formatter) {
-      formatter = formatters[key] = new Intl.DateTimeFormat(undefined,
-                                                            options);
+      formatter = formatters[key] = new Intl.DateTimeFormat(undefined, options);
     }
 
     return formatter.format(date);
@@ -92,17 +91,23 @@ function format(date, options, Intl) {
 }
 
 function dayAndMonth(date, now, Intl) {
-  return format(date, {month: 'short', day: 'numeric'}, Intl);
+  return format(date, { month: 'short', day: 'numeric' }, Intl);
 }
 
 function dayAndMonthAndYear(date, now, Intl) {
-  return format(date, {day: 'numeric', month: 'short', year: 'numeric'}, Intl);
+  return format(
+    date,
+    { day: 'numeric', month: 'short', year: 'numeric' },
+    Intl
+  );
 }
 
 const BREAKPOINTS = [
   {
     test: lessThanThirtySecondsAgo,
-    format: function () {return 'Just now';},
+    format: function() {
+      return 'Just now';
+    },
     nextUpdate: 1,
   },
   {
@@ -126,14 +131,15 @@ const BREAKPOINTS = [
     nextUpdate: null,
   },
   {
-    test: function () {return true;},
+    test: function() {
+      return true;
+    },
     format: dayAndMonthAndYear,
     nextUpdate: null,
   },
 ];
 
 function getBreakpoint(date, now) {
-
   // Turn the given ISO 8601 string into a Date object.
   date = new Date(date);
 
@@ -181,20 +187,20 @@ function nextFuzzyUpdate(date) {
  */
 function decayingInterval(date, callback) {
   let timer;
-  const update = function () {
+  const update = function() {
     const fuzzyUpdate = nextFuzzyUpdate(date);
     if (fuzzyUpdate === null) {
       return;
     }
-    const nextUpdate = (1000 * fuzzyUpdate) + 500;
-    timer = setTimeout(function () {
+    const nextUpdate = 1000 * fuzzyUpdate + 500;
+    timer = setTimeout(function() {
       callback(date);
       update();
     }, nextUpdate);
   };
   update();
 
-  return function () {
+  return function() {
     clearTimeout(timer);
   };
 }
