@@ -31,7 +31,8 @@ function session(
   flash,
   raven,
   settings,
-  serviceConfig
+  serviceConfig,
+  localStorage
 ) {
   // Cache the result of load()
   let lastLoad;
@@ -99,9 +100,7 @@ function session(
    * tutorial and then update the local profile data.
    */
   function dismissSidebarTutorial() {
-    return api.profile
-      .update({}, { preferences: { show_sidebar_tutorial: false } })
-      .then(update);
+    localStorage.setItem('SIDEBAR_STARTUP_PAGE_DISMISSED', true);
   }
 
   /**
