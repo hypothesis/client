@@ -91,7 +91,7 @@
     "postcss": "^7.0.13",
     "postcss-url": "^8.0.0",
     "preact": "10.0.0-alpha.4",
-    "prettier": "1.16.4",
+    "prettier": "1.17.0",
     "proxyquire": "^2.1.0",
     "proxyquire-universal": "^2.1.0",
     "proxyquireify": "^3.2.1",
