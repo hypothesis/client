@@ -70,6 +70,13 @@ class FakeVirtualThreadList extends EventEmitter {
     this.yOffsetOf = function() {
       return 42;
     };
+    this.calculateVisibleThreads = () => {
+      return {
+        offscreenLowerHeight: 10,
+        offscreenUpperHeight: 20,
+        visibleThreads: thread.children,
+      };
+    };
   }
 }
 
