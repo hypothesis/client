@@ -16,7 +16,7 @@
   </top-bar>
 
   <div class="content">
-    <sidebar-tutorial ng-if="vm.isSidebar && !vm.isStartupPageDismissed()"></sidebar-tutorial>
+    <sidebar-tutorial ng-if="vm.isSidebar"></sidebar-tutorial>
     <share-dialog
       ng-if="vm.shareDialog.visible"
       on-close="vm.shareDialog.visible = false">

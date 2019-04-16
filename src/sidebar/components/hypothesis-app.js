@@ -52,8 +52,7 @@ function HypothesisAppController(
   serviceUrl,
   session,
   settings,
-  streamer,
-  localStorage
+  streamer
 ) {
   const self = this;
 
@@ -73,14 +72,6 @@ function HypothesisAppController(
   if (this.isSidebar) {
     frameSync.connect();
   }
-
-  this.isStartupPageDismissed = function() {
-    const closed = localStorage.getItem('SIDEBAR_STARTUP_PAGE_DISMISSED') === 'true';
-    if (closed) {
-        return true;
-    }
-    return false;
-  };
 
   this.sortKey = function() {
     return store.getState().sortKey;
