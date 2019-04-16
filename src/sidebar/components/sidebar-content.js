@@ -299,15 +299,15 @@ function SidebarContentController(
   this.focus = focusAnnotation;
   this.scrollTo = scrollToAnnotation;
 
-  this.selectedAnnotationCount = function() {
+  this.areAllAnnotationsVisible = function() {
     if (this.directLinkedGroupFetchFailed) {
-      return 1;
+      return true;
     }
     const selection = store.getState().selectedAnnotationMap;
     if (!selection) {
-      return 0;
+      return false;
     }
-    return Object.keys(selection).length;
+    return Object.keys(selection).length > 0;
   };
 
   this.selectedGroupUnavailable = function() {

@@ -265,8 +265,8 @@ describe('sidebar.components.sidebar-content', function() {
         $scope.$digest();
       });
 
-      it('selectedAnnotationCount is > 0', function() {
-        assert.equal(ctrl.selectedAnnotationCount(), 1);
+      it('areAllAnnotationsVisible is true', function() {
+        assert.isTrue(ctrl.areAllAnnotationsVisible());
       });
 
       it("switches to the selected annotation's group", function() {
@@ -295,8 +295,8 @@ describe('sidebar.components.sidebar-content', function() {
         $scope.$digest();
       });
 
-      it('selectedAnnotationCount is 0', function() {
-        assert.equal(ctrl.selectedAnnotationCount(), 0);
+      it('areAllAnnotationsVisible is false', function() {
+        assert.isFalse(ctrl.areAllAnnotationsVisible());
       });
 
       it('fetches annotations for the current group', function() {

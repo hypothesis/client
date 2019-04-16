@@ -11,7 +11,7 @@
                   'one': '1 search result',
                   'other': '{} search results'}"></span>
 </div>
-<div class="search-status-bar" ng-if="!vm.filterActive && vm.selectionCount > 0">
+<div class="search-status-bar" ng-if="!vm.filterActive && vm.areAllAnnotationsVisible">
   <button class="primary-action-btn primary-action-btn--short"
           ng-click="vm.onClearSelection()"
           title="Clear the selection and show all annotations">

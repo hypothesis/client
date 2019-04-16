@@ -30,7 +30,7 @@ describe('searchStatusBar', function() {
       const msg = 'Show all annotations';
       const msgCount = '(2)';
       const elem = util.createDirective(document, 'searchStatusBar', {
-        selectionCount: 1,
+        areAllAnnotationsVisible: true,
         totalAnnotations: 2,
         selectedTab: 'annotation',
       });
@@ -43,7 +43,7 @@ describe('searchStatusBar', function() {
       const msg = 'Show all notes';
       const msgCount = '(3)';
       const elem = util.createDirective(document, 'searchStatusBar', {
-        selectionCount: 1,
+        areAllAnnotationsVisible: true,
         totalNotes: 3,
         selectedTab: 'note',
       });

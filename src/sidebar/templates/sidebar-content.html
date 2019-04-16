@@ -1,5 +1,5 @@
 <selection-tabs
-  ng-if="!vm.search.query() && vm.selectedAnnotationCount() === 0"
+  ng-if="!vm.search.query() && vm.annotationsAreSelected()"
   is-waiting-to-anchor-annotations="vm.waitingToAnchorAnnotations"
   is-loading="vm.isLoading"
   selected-tab="vm.selectedTab"
@@ -14,7 +14,7 @@
   filter-match-count="vm.visibleCount()"
   on-clear-selection="vm.clearSelection()"
   search-query="vm.search.query()"
-  selection-count="vm.selectedAnnotationCount()"
+  are-all-annotations-visible="vm.areAllAnnotationsVisible()"
   total-count="vm.topLevelThreadCount()"
   selected-tab="vm.selectedTab"
   total-annotations="vm.totalAnnotations"
