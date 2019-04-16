@@ -163,5 +163,8 @@
     "report-coverage": "codecov -f coverage/coverage-final.json",
     "version": "make clean build/manifest.json",
     "prepublishOnly": "make clean build/manifest.json"
+  },
+  "dependencies": {
+    "paho-mqtt": "^1.1.0"
   }
 }
