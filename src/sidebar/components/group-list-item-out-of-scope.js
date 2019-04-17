@@ -9,6 +9,7 @@ const {
   orgName,
   trackViewGroupActivity,
 } = require('../util/group-list-item-common');
+const { withServices } = require('../util/service-context');
 
 const outOfScopeIcon = (
   <svg
@@ -109,4 +110,4 @@ GroupListItemOutOfScope.propTypes = {
 
 GroupListItemOutOfScope.injectedProps = ['analytics'];
 
-module.exports = GroupListItemOutOfScope;
+module.exports = withServices(GroupListItemOutOfScope);
