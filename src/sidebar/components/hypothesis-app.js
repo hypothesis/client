@@ -24,6 +24,7 @@ function authStateFromProfile(profile) {
       status: 'logged-in',
       displayName,
       userid: profile.userid,
+      privileges: profile.privileges,
       username: parsed.username,
       provider: parsed.provider,
     };
