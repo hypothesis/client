@@ -1,7 +1,8 @@
 'use strict';
 
+const { createSelector } = require('reselect');
+
 const util = require('../util');
-const memoize = require('../../util/memoize');
 const { selectors: sessionSelectors } = require('./session');
 const { isLoggedIn } = sessionSelectors;
 
@@ -126,37 +127,44 @@ function getGroup(state, id) {
  *
  * @return {Group[]}
  */
-const getMyGroups = memoize(state => {
-  // If logged out, the Public group still has isMember set to true so only
-  // return groups with membership in logged in state.
-  if (isLoggedIn(state)) {
-    return state.groups.filter(g => g.isMember);
+const getMyGroups = createSelector(
+  state => state.groups,
+  isLoggedIn,
+  (groups, loggedIn) => {
+    // If logged out, the Public group still has isMember set to true so only
+    // return groups with membership in logged in state.
+    if (loggedIn) {
+      return groups.filter(g => g.isMember);
+    }
+    return [];
   }
-  return [];
-});
+);
 
 /**
  * Return groups the user isn't a member of that are scoped to the URI.
  *
  * @return {Group[]}
  */
-const getFeaturedGroups = memoize(state => {
-  return state.groups.filter(group => !group.isMember && group.isScopedToUri);
-});
+const getFeaturedGroups = createSelector(
+  state => state.groups,
+  groups => groups.filter(group => !group.isMember && group.isScopedToUri)
+);
 
 /**
  * Return groups that don't show up in Featured and My Groups.
  *
  * @return {Group[]}
  */
-const getCurrentlyViewingGroups = memoize(state => {
-  const myGroups = getMyGroups(state);
-  const featuredGroups = getFeaturedGroups(state);
-
-  return state.groups.filter(
-    g => !myGroups.includes(g) && !featuredGroups.includes(g)
-  );
-});
+const getCurrentlyViewingGroups = createSelector(
+  allGroups,
+  getMyGroups,
+  getFeaturedGroups,
+  (allGroups, myGroups, featuredGroups) => {
+    return allGroups.filter(
+      g => !myGroups.includes(g) && !featuredGroups.includes(g)
+    );
+  }
+);
 
 /**
  * Return groups that are scoped to the uri. This is used to return the groups
@@ -165,9 +173,10 @@ const getCurrentlyViewingGroups = memoize(state => {
  *
  * @return {Group[]}
  */
-const getInScopeGroups = memoize(state => {
-  return state.groups.filter(g => g.isScopedToUri);
-});
+const getInScopeGroups = createSelector(
+  state => state.groups,
+  groups => groups.filter(g => g.isScopedToUri)
+);
 
 module.exports = {
   init,
