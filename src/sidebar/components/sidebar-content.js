@@ -285,6 +285,17 @@ function SidebarContentController(
     true
   );
 
+  this.showSelectedTabs = function() {
+    if (
+      this.selectedAnnotationUnavailable() ||
+      this.selectedGroupUnavailable() ||
+      this.search.query()
+    ) {
+      return false;
+    }
+    return true;
+  };
+
   this.setCollapsed = function(id, collapsed) {
     store.setCollapsed(id, collapsed);
   };

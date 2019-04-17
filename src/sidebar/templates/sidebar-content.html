@@ -1,5 +1,5 @@
 <selection-tabs
-  ng-if="!vm.search.query() && vm.annotationsAreSelected()"
+  ng-if="vm.showSelectedTabs()"
   is-waiting-to-anchor-annotations="vm.waitingToAnchorAnnotations"
   is-loading="vm.isLoading"
   selected-tab="vm.selectedTab"
