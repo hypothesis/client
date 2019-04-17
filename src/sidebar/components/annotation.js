@@ -216,14 +216,20 @@ function AnnotationController(
     }
   }
 
-  // this.authorize = function(action) {
-  this.authorize = function() {
+  this.authorize = function(action) {
+    const belongsToUser = permissions.permits(
+      self.annotation.permissions,
+      action,
+      session.state.userid
+    );
+    if (!belongsToUser) {
+        // Check if user is a planner
+        if (session.state.privileges.indexOf('ar_plan') >= 0) {
+            return true;
+        }
+        return false;
+    }
     return true;
-    // return permissions.permits(
-    //   self.annotation.permissions,
-    //   action,
-    //   session.state.userid
-    // );
   };
 
   // /**
