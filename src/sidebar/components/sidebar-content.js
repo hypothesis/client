@@ -161,7 +161,7 @@ function SidebarContentController(
     searchClient.get({ uri: uris, group: group });
   }
 
-  function isLoading() {
+  this.isLoading = function() {
     if (
       !store.frames().some(function(frame) {
         return frame.uri;
@@ -177,7 +177,7 @@ function SidebarContentController(
     }
 
     return false;
-  }
+  };
 
   /**
    * Load annotations for all URLs associated with `frames`.
@@ -272,7 +272,7 @@ function SidebarContentController(
         // of switching to the group containing a direct-linked annotation.
         //
         // In that case, we don't want to trigger reloading annotations again.
-        if (isLoading()) {
+        if (this.isLoading()) {
           return;
         }
         store.clearSelectedAnnotations();
@@ -307,7 +307,9 @@ function SidebarContentController(
 
   this.selectedAnnotationUnavailable = function() {
     const selectedID = firstKey(store.getState().selectedAnnotationMap);
-    return !isLoading() && !!selectedID && !store.annotationExists(selectedID);
+    return (
+      !this.isLoading() && !!selectedID && !store.annotationExists(selectedID)
+    );
   };
 
   this.shouldShowLoggedOutMessage = function() {
@@ -332,10 +334,10 @@ function SidebarContentController(
     // annotation. If there is an annotation selection and that
     // selection is available to the user, show the CTA.
     const selectedID = firstKey(store.getState().selectedAnnotationMap);
-    return !isLoading() && !!selectedID && store.annotationExists(selectedID);
+    return (
+      !this.isLoading() && !!selectedID && store.annotationExists(selectedID)
+    );
   };
-
-  this.isLoading = isLoading;
 
   const visibleCount = memoize(function(thread) {
     return thread.children.reduce(
