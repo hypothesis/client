@@ -1,5 +1,4 @@
 {
-  FragmentAnchor
   RangeAnchor
   TextPositionAnchor
   TextQuoteAnchor
@@ -40,8 +39,6 @@ exports.anchor = (root, selectors, options = {}) ->
   # Collect all the selectors
   for selector in selectors ? []
     switch selector.type
-      when 'FragmentSelector'
-        fragment = selector
       when 'TextPositionSelector'
         position = selector
         options.hint = position.start  # TextQuoteAnchor hint
@@ -60,11 +57,6 @@ exports.anchor = (root, selectors, options = {}) ->
   # From a default of failure, we build up catch clauses to try selectors in
   # order, from simple to complex.
   promise = Promise.reject('unable to anchor')
-
-  if fragment?
-    promise = promise.catch ->
-      return querySelector(FragmentAnchor, root, fragment, options)
-      .then(maybeAssertQuote)
 
   if range?
     promise = promise.catch ->
@@ -85,7 +77,7 @@ exports.anchor = (root, selectors, options = {}) ->
 
 
 exports.describe = (root, range, options = {}) ->
-  types = [FragmentAnchor, RangeAnchor, TextPositionAnchor, TextQuoteAnchor]
+  types = [RangeAnchor, TextPositionAnchor, TextQuoteAnchor]
 
   selectors = for type in types
     try
