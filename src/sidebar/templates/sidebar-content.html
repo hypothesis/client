@@ -21,22 +21,16 @@
   total-notes="vm.totalNotes">
 </search-status-bar>
 
-<div class="annotation-unavailable-message"
-    ng-if="vm.selectedAnnotationUnavailable()">
-  <div class="annotation-unavailable-message__icon"></div>
-  <p class="annotation-unavailable-message__label">
-    <span ng-if="vm.auth.status === 'logged-out'">
-      This annotation is not available.
-      <br>
-      You may need to
-      <a class="loggedout-message__link" href="" ng-click="vm.onLogin()">log in</a>
-      to see it.
-    </span>
-    <span ng-if="vm.auth.status === 'logged-in'">
-      You do not have permission to view this annotation.
-    </span>
-  </p>
-</div>
+<sidebar-content-error
+  class="sidebar-content-error"
+  logged-out-error-message="'This annotation is not available.'"
+  logged-in-error-message="'You do not have permission to view this annotation.'"
+  on-login-request="vm.onLogin()"
+  is-logged-in="vm.auth.status === 'logged-in'"
+  ng-if="vm.selectedAnnotationUnavailable()"
+>
+</sidebar-content-error>
+
 <thread-list
   on-change-collapsed="vm.setCollapsed(id, collapsed)"
   on-clear-selection="vm.clearSelection()"
