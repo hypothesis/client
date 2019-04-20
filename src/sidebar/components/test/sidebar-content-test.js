@@ -6,6 +6,7 @@ const EventEmitter = require('tiny-emitter');
 
 const events = require('../../events');
 const noCallThru = require('../../../shared/test/util').noCallThru;
+const uiConstants = require('../../ui-constants');
 
 let searchClients;
 
@@ -150,7 +151,7 @@ describe('sidebar.components.sidebar-content', function() {
     });
   }
 
-  beforeEach(
+  const makeSidebarContentController = () => {
     angular.mock.inject(function($componentController, _store_, _$rootScope_) {
       $rootScope = _$rootScope_;
       $scope = $rootScope.$new();
@@ -163,11 +164,82 @@ describe('sidebar.components.sidebar-content', function() {
           auth: { status: 'unknown' },
         }
       );
-    })
-  );
+    });
+  };
+
+  beforeEach(() => {
+    makeSidebarContentController();
+  });
 
   afterEach(function() {
     return sandbox.restore();
+  });
+
+  describe('clearSelection', () => {
+    it('sets selectedTab to Annotations tab if selectedTab is null', () => {
+      store.selectTab(uiConstants.TAB_ORPHANS);
+      $scope.$digest();
+      ctrl.clearSelection();
+
+      assert.equal(store.getState().selectedTab, uiConstants.TAB_ANNOTATIONS);
+    });
+
+    it('sets selectedTab to Annotations tab if selectedTab is set to orphans', () => {
+      store.selectTab(uiConstants.TAB_ORPHANS);
+      $scope.$digest();
+
+      ctrl.clearSelection();
+
+      assert.equal(store.getState().selectedTab, uiConstants.TAB_ANNOTATIONS);
+    });
+
+    it('clears selected annotations', () => {
+      ctrl.clearSelection();
+
+      assert.equal(store.getState().selectedAnnotationMap, null);
+      assert.equal(store.getState().filterQuery, null);
+    });
+
+    it('clears the directLinkedGroupFetchFailed state', () => {
+      ctrl.directLinkedGroupFetchFailed = true;
+
+      ctrl.clearSelection();
+
+      assert.isFalse(ctrl.directLinkedGroupFetchFailed);
+    });
+  });
+
+  describe('showSelectedTabs', () => {
+    beforeEach(() => {
+      setFrames([{ uri: 'http://www.example.com' }]);
+      ctrl.search = { query: sinon.stub().returns(undefined) };
+    });
+
+    it('returns false if there is a search query', () => {
+      ctrl.search = { query: sinon.stub().returns('tag:foo') };
+      assert.isFalse(ctrl.showSelectedTabs());
+    });
+
+    it('returns false if selected group is unavailable', () => {
+      fakeSettings.group = 'group-id';
+      store.loadGroups([{ id: 'default-id' }]);
+      store.focusGroup('default-id');
+      fakeGroups.focused.returns({ id: 'default-id' });
+      $scope.$digest();
+      // Re-construct the controller after the environment setup.
+      makeSidebarContentController();
+      assert.isFalse(ctrl.showSelectedTabs());
+    });
+
+    it('returns false if selected annotation is unavailable', () => {
+      store.selectAnnotations(['missing']);
+      $scope.$digest();
+      assert.isFalse(ctrl.showSelectedTabs());
+    });
+
+    it('returns true in all other cases', () => {
+      assert.isTrue(ctrl.showSelectedTabs());
+    });
   });
 
   describe('#loadAnnotations', function() {
@@ -255,7 +327,62 @@ describe('sidebar.components.sidebar-content', function() {
       assert.isTrue(updateSpy.calledWith(frameUris[1], true));
     });
 
-    context('when there is a selection', function() {
+    context('when there is a direct-linked group error', () => {
+      beforeEach(() => {
+        setFrames([{ uri: 'http://www.example.com' }]);
+        fakeSettings.group = 'group-id';
+        store.loadGroups([{ id: 'default-id' }]);
+        store.focusGroup('default-id');
+        fakeGroups.focused.returns({ id: 'default-id' });
+        $scope.$digest();
+        // Re-construct the controller after the environment setup.
+        makeSidebarContentController();
+      });
+
+      it('sets directLinkedGroupFetchFailed to true', () => {
+        assert.isTrue(ctrl.directLinkedGroupFetchFailed);
+      });
+
+      it('areAllAnnotationsVisible returns true since there is an error message', () => {
+        assert.isTrue(ctrl.areAllAnnotationsVisible());
+      });
+
+      it('selectedGroupUnavailable returns true', () => {
+        assert.isTrue(ctrl.selectedGroupUnavailable());
+      });
+    });
+
+    context('when there is a direct-linked group selection', () => {
+      beforeEach(() => {
+        setFrames([{ uri: 'http://www.example.com' }]);
+        fakeSettings.group = 'group-id';
+        store.loadGroups([{ id: fakeSettings.group }]);
+        store.focusGroup(fakeSettings.group);
+        fakeGroups.focused.returns({ id: fakeSettings.group });
+        $scope.$digest();
+      });
+
+      it('sets directLinkedGroupFetchFailed to false', () => {
+        assert.isFalse(ctrl.directLinkedGroupFetchFailed);
+      });
+
+      it('areAllAnnotationsVisible returns false since group has no annotations', () => {
+        assert.isFalse(ctrl.areAllAnnotationsVisible());
+      });
+
+      it('selectedGroupUnavailable returns false', () => {
+        assert.isFalse(ctrl.selectedGroupUnavailable());
+      });
+
+      it('fetches annotations for the direct-linked group', () => {
+        assert.calledWith(searchClients[0].get, {
+          uri: ['http://www.example.com'],
+          group: 'group-id',
+        });
+      });
+    });
+
+    context('when there is a direct-linked annotation selection', function() {
       const uri = 'http://example.com';
       const id = uri + '123';
 
@@ -265,8 +392,8 @@ describe('sidebar.components.sidebar-content', function() {
         $scope.$digest();
       });
 
-      it('selectedAnnotationCount is > 0', function() {
-        assert.equal(ctrl.selectedAnnotationCount(), 1);
+      it('areAllAnnotationsVisible is true', function() {
+        assert.isTrue(ctrl.areAllAnnotationsVisible());
       });
 
       it("switches to the selected annotation's group", function() {
@@ -295,8 +422,8 @@ describe('sidebar.components.sidebar-content', function() {
         $scope.$digest();
       });
 
-      it('selectedAnnotationCount is 0', function() {
-        assert.equal(ctrl.selectedAnnotationCount(), 0);
+      it('areAllAnnotationsVisible is false', function() {
+        assert.isFalse(ctrl.areAllAnnotationsVisible());
       });
 
       it('fetches annotations for the current group', function() {

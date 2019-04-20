@@ -15,7 +15,8 @@ module.exports = {
     onClearSelection: '&',
     searchQuery: '<',
     selectedTab: '<',
-    selectionCount: '<',
+    // Boolean indicating all annotations are visible (none are hidden).
+    areAllAnnotationsVisible: '<',
     totalAnnotations: '<',
     totalNotes: '<',
   },

@@ -49,7 +49,7 @@ class VirtualThreadList extends EventEmitter {
     this.scrollRoot = options.scrollRoot || document.body;
 
     const debouncedUpdate = debounce(function() {
-      self._updateVisibleThreads();
+      self.calculateVisibleThreads();
       $scope.$digest();
     }, 20);
     this.scrollRoot.addEventListener('scroll', debouncedUpdate);
@@ -83,7 +83,7 @@ class VirtualThreadList extends EventEmitter {
       return;
     }
     this._rootThread = thread;
-    this._updateVisibleThreads();
+    this.calculateVisibleThreads();
   }
 
   /**
@@ -131,7 +131,7 @@ class VirtualThreadList extends EventEmitter {
    *
    * Emits a `changed` event with the recalculated set of visible threads.
    */
-  _updateVisibleThreads() {
+  calculateVisibleThreads() {
     // Space above the viewport in pixels which should be considered 'on-screen'
     // when calculating the set of visible threads
     const MARGIN_ABOVE = 800;
@@ -205,6 +205,12 @@ class VirtualThreadList extends EventEmitter {
       visibleThreads: visibleThreads,
       invisibleThreads: invisibleThreads,
     });
+    return {
+      offscreenLowerHeight,
+      offscreenUpperHeight,
+      visibleThreads,
+      invisibleThreads,
+    };
   }
 }
 

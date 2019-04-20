@@ -181,6 +181,39 @@ describe('groups', function() {
   });
 
   describe('#load', function() {
+    it('filters out direct-linked groups that are out of scope and scope enforced', () => {
+      const svc = service();
+      fakeLocalStorage.getItem.returns(dummyGroups[0].id);
+      const outOfScopeEnforcedGroup = {
+        id: 'oos',
+        scopes: { enforced: true, uri_patterns: ['http://foo.com'] },
+      };
+      fakeSettings.group = outOfScopeEnforcedGroup.id;
+      fakeApi.group.read.returns(Promise.resolve(outOfScopeEnforcedGroup));
+      return svc.load().then(groups => {
+        // The focus group is not set to the direct-linked group.
+        assert.calledWith(fakeStore.focusGroup, dummyGroups[0].id);
+        // The direct-linked group is not in the list of groups.
+        assert.isFalse(groups.some(g => g.id === fakeSettings.group));
+      });
+    });
+
+    it('catches 404 error from api.group.read request', () => {
+      const svc = service();
+      fakeLocalStorage.getItem.returns(dummyGroups[0].id);
+      fakeSettings.group = 'does-not-exist';
+      fakeApi.group.read.returns(
+        Promise.reject(
+          "404 Not Found: Either the resource you requested doesn't exist, \
+          or you are not currently authorized to see it."
+        )
+      );
+      return svc.load().then(() => {
+        // The focus group is not set to the direct-linked group.
+        assert.calledWith(fakeStore.focusGroup, dummyGroups[0].id);
+      });
+    });
+
     it('combines groups from both endpoints', function() {
       const svc = service();
 

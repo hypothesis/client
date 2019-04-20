@@ -49,6 +49,8 @@ function SidebarContentController(
   streamFilter
 ) {
   const self = this;
+  this.directLinkedGroupFetchFailed =
+    !!settings.group && settings.group !== store.focusedGroup().id;
 
   function thread() {
     return rootThread.thread(store.getState());
@@ -161,7 +163,7 @@ function SidebarContentController(
     searchClient.get({ uri: uris, group: group });
   }
 
-  function isLoading() {
+  this.isLoading = function() {
     if (
       !store.frames().some(function(frame) {
         return frame.uri;
@@ -177,7 +179,7 @@ function SidebarContentController(
     }
 
     return false;
-  }
+  };
 
   /**
    * Load annotations for all URLs associated with `frames`.
@@ -272,7 +274,7 @@ function SidebarContentController(
         // of switching to the group containing a direct-linked annotation.
         //
         // In that case, we don't want to trigger reloading annotations again.
-        if (isLoading()) {
+        if (this.isLoading()) {
           return;
         }
         store.clearSelectedAnnotations();
@@ -282,6 +284,17 @@ function SidebarContentController(
     },
     true
   );
+
+  this.showSelectedTabs = function() {
+    if (
+      this.selectedAnnotationUnavailable() ||
+      this.selectedGroupUnavailable() ||
+      this.search.query()
+    ) {
+      return false;
+    }
+    return true;
+  };
 
   this.setCollapsed = function(id, collapsed) {
     store.setCollapsed(id, collapsed);
@@ -297,17 +310,26 @@ function SidebarContentController(
   this.focus = focusAnnotation;
   this.scrollTo = scrollToAnnotation;
 
-  this.selectedAnnotationCount = function() {
+  this.areAllAnnotationsVisible = function() {
+    if (this.directLinkedGroupFetchFailed) {
+      return true;
+    }
     const selection = store.getState().selectedAnnotationMap;
     if (!selection) {
-      return 0;
+      return false;
     }
-    return Object.keys(selection).length;
+    return Object.keys(selection).length > 0;
+  };
+
+  this.selectedGroupUnavailable = function() {
+    return !this.isLoading() && this.directLinkedGroupFetchFailed;
   };
 
   this.selectedAnnotationUnavailable = function() {
     const selectedID = firstKey(store.getState().selectedAnnotationMap);
-    return !isLoading() && !!selectedID && !store.annotationExists(selectedID);
+    return (
+      !this.isLoading() && !!selectedID && !store.annotationExists(selectedID)
+    );
   };
 
   this.shouldShowLoggedOutMessage = function() {
@@ -332,10 +354,10 @@ function SidebarContentController(
     // annotation. If there is an annotation selection and that
     // selection is available to the user, show the CTA.
     const selectedID = firstKey(store.getState().selectedAnnotationMap);
-    return !isLoading() && !!selectedID && store.annotationExists(selectedID);
+    return (
+      !this.isLoading() && !!selectedID && store.annotationExists(selectedID)
+    );
   };
-
-  this.isLoading = isLoading;
 
   const visibleCount = memoize(function(thread) {
     return thread.children.reduce(
@@ -365,6 +387,8 @@ function SidebarContentController(
 
     store.clearSelectedAnnotations();
     store.selectTab(selectedTab);
+    // Clear direct-linked group fetch failed state.
+    this.directLinkedGroupFetchFailed = false;
   };
 }
 

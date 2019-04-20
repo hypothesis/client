@@ -68,6 +68,19 @@ function groups(
     directLinkedAnnotationId,
     directLinkedGroupId
   ) {
+    // Filter the directLinkedGroup out if it is out of scope and scope is enforced.
+    if (directLinkedGroupId) {
+      const directLinkedGroup = groups.find(g => g.id === directLinkedGroupId);
+      if (
+        directLinkedGroup &&
+        !directLinkedGroup.isScopedToUri &&
+        directLinkedGroup.scopes.enforced
+      ) {
+        groups = groups.filter(g => g.id !== directLinkedGroupId);
+        directLinkedGroupId = undefined;
+      }
+    }
+
     // If service groups are specified only return those.
     // If a service group doesn't exist in the list of groups don't return it.
     if (svc && svc.groups) {
@@ -186,10 +199,16 @@ function groups(
         // particular group as well since it may not be in the results returned
         // by group.list or profile.groups.
         if (directLinkedGroup) {
-          const selectedGroupApi = api.group.read({
-            id: directLinkedGroup,
-            expand: params.expand,
-          });
+          const selectedGroupApi = api.group
+            .read({
+              id: directLinkedGroup,
+              expand: params.expand,
+            })
+            .catch(() => {
+              // If the group does not exist or the user doesn't have permission,
+              // return undefined.
+              return undefined;
+            });
           groupApiRequests = groupApiRequests.concat(selectedGroupApi);
         }
         return Promise.all(groupApiRequests).then(
