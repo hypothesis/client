@@ -7735,12 +7735,10 @@ preact-render-to-string@^4.1.0:
   dependencies:
     pretty-format "^3.8.0"
 
-preact@10.0.0-alpha.4:
-  version "10.0.0-alpha.4"
-  resolved "https://registry.yarnpkg.com/preact/-/preact-10.0.0-alpha.4.tgz#c0cf81771fa7aaa3e71adf8741b1e341e2cc4bd1"
-  integrity sha512-HD8ocvxID8NjC6m0rZhY1HbbBIHBKw7E4/0nu/zulPcGhgXEjm2BD9Tt8wQdoa/nea3APJ72TxRJSg2oQmU3uA==
-  dependencies:
-    prop-types "^15.6.2"
+preact@10.0.0-beta.0:
+  version "10.0.0-beta.0"
+  resolved "https://registry.yarnpkg.com/preact/-/preact-10.0.0-beta.0.tgz#8d53947b167449c09a678fefc2085c0f56ed34bd"
+  integrity sha512-BKd77y7ZpPLybjtM35DJtzXj+sxlAt29MCMGOJnSrsv1jt30aE/wS9qoU9nL8ih+yhal3B22mGAvuh2mGLAFMg==
 
 prelude-ls@~1.1.2:
   version "1.1.2"
