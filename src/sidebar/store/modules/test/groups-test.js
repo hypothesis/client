@@ -127,6 +127,25 @@ describe('sidebar.store.modules.groups', () => {
     });
   });
 
+  describe('clearGroups', () => {
+    it('clears the list of groups', () => {
+      store.loadGroups([publicGroup]);
+
+      store.clearGroups();
+
+      assert.equal(store.getState().groups.length, 0);
+    });
+
+    it('clears the focused group id', () => {
+      store.loadGroups([publicGroup]);
+      store.focusGroup(publicGroup.id);
+
+      store.clearGroups();
+
+      assert.equal(store.getState().focusedGroupId, null);
+    });
+  });
+
   describe('allGroups', () => {
     it('returns all groups', () => {
       store.loadGroups([publicGroup, privateGroup]);

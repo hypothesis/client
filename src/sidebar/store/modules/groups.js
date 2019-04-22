@@ -55,9 +55,22 @@ const update = {
       groups: action.groups,
     };
   },
+
+  CLEAR_GROUPS() {
+    return {
+      focusedGroupId: null,
+      groups: [],
+    };
+  },
 };
 
 const actions = util.actionTypes(update);
+
+function clearGroups() {
+  return {
+    type: actions.CLEAR_GROUPS,
+  };
+}
 
 /**
  * Set the current focused group.
@@ -184,6 +197,7 @@ module.exports = {
   actions: {
     focusGroup,
     loadGroups,
+    clearGroups,
   },
   selectors: {
     allGroups,
