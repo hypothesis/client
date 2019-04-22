@@ -85,6 +85,8 @@ describe('groups', function() {
           const group = this.getState().focusedGroup;
           return group ? group.id : null;
         },
+        setDirectLinkedGroupFetchFailed: sinon.stub(),
+        clearDirectLinkedGroupFetchFailed: sinon.stub(),
       }
     );
     fakeSession = sessionWithThreeGroups();
@@ -191,6 +193,8 @@ describe('groups', function() {
       fakeSettings.group = outOfScopeEnforcedGroup.id;
       fakeApi.group.read.returns(Promise.resolve(outOfScopeEnforcedGroup));
       return svc.load().then(groups => {
+        // The failure state is captured in the store.
+        assert.called(fakeStore.setDirectLinkedGroupFetchFailed);
         // The focus group is not set to the direct-linked group.
         assert.calledWith(fakeStore.focusGroup, dummyGroups[0].id);
         // The direct-linked group is not in the list of groups.
@@ -211,6 +215,8 @@ describe('groups', function() {
         )
       );
       return svc.load().then(() => {
+        // The failure state is captured in the store.
+        assert.called(fakeStore.setDirectLinkedGroupFetchFailed);
         // The focus group is not set to the direct-linked group.
         assert.calledWith(fakeStore.focusGroup, dummyGroups[0].id);
       });
@@ -378,6 +384,16 @@ describe('groups', function() {
       fakeApi.groups.list.returns(Promise.resolve(dummyGroups));
       return svc.load().then(() => {
         assert.calledWith(fakeStore.focusGroup, fakeSettings.group);
+      });
+    });
+
+    it('clears the directLinkedGroupFetchFailed state if loading a direct-linked group', () => {
+      const svc = service();
+      fakeSettings.group = dummyGroups[1].id;
+      fakeApi.groups.list.returns(Promise.resolve(dummyGroups));
+      return svc.load().then(() => {
+        assert.called(fakeStore.clearDirectLinkedGroupFetchFailed);
+        assert.notCalled(fakeStore.setDirectLinkedGroupFetchFailed);
       });
     });
 

@@ -49,8 +49,6 @@ function SidebarContentController(
   streamFilter
 ) {
   const self = this;
-  this.directLinkedGroupFetchFailed =
-    !!settings.group && settings.group !== store.focusedGroup().id;
 
   function thread() {
     return rootThread.thread(store.getState());
@@ -311,7 +309,7 @@ function SidebarContentController(
   this.scrollTo = scrollToAnnotation;
 
   this.areAllAnnotationsVisible = function() {
-    if (this.directLinkedGroupFetchFailed) {
+    if (store.getState().directLinkedGroupFetchFailed) {
       return true;
     }
     const selection = store.getState().selectedAnnotationMap;
@@ -322,7 +320,7 @@ function SidebarContentController(
   };
 
   this.selectedGroupUnavailable = function() {
-    return !this.isLoading() && this.directLinkedGroupFetchFailed;
+    return !this.isLoading() && store.getState().directLinkedGroupFetchFailed;
   };
 
   this.selectedAnnotationUnavailable = function() {
@@ -387,8 +385,7 @@ function SidebarContentController(
 
     store.clearSelectedAnnotations();
     store.selectTab(selectedTab);
-    // Clear direct-linked group fetch failed state.
-    this.directLinkedGroupFetchFailed = false;
+    store.clearDirectLinkedGroupFetchFailed();
   };
 }
 

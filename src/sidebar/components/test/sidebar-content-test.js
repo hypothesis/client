@@ -213,11 +213,11 @@ describe('sidebar.components.sidebar-content', function() {
     });
 
     it('clears the directLinkedGroupFetchFailed state', () => {
-      ctrl.directLinkedGroupFetchFailed = true;
+      store.setDirectLinkedGroupFetchFailed();
 
       ctrl.clearSelection();
 
-      assert.isFalse(ctrl.directLinkedGroupFetchFailed);
+      assert.isFalse(store.getState().directLinkedGroupFetchFailed);
     });
   });
 
@@ -234,12 +234,8 @@ describe('sidebar.components.sidebar-content', function() {
 
     it('returns false if selected group is unavailable', () => {
       fakeSettings.group = 'group-id';
-      store.loadGroups([{ id: 'default-id' }]);
-      store.focusGroup('default-id');
-      fakeGroups.focused.returns({ id: 'default-id' });
+      store.setDirectLinkedGroupFetchFailed();
       $scope.$digest();
-      // Re-construct the controller after the environment setup.
-      makeSidebarContentController();
       assert.isFalse(ctrl.showSelectedTabs());
     });
 
@@ -343,12 +339,8 @@ describe('sidebar.components.sidebar-content', function() {
       beforeEach(() => {
         setFrames([{ uri: 'http://www.example.com' }]);
         fakeSettings.group = 'group-id';
-        store.loadGroups([{ id: 'default-id' }]);
-        store.focusGroup('default-id');
-        fakeGroups.focused.returns({ id: 'default-id' });
+        store.setDirectLinkedGroupFetchFailed();
         $scope.$digest();
-        // Re-construct the controller after the environment setup.
-        makeSidebarContentController();
       });
 
       [null, 'acct:person@example.com'].forEach(userid => {
@@ -362,10 +354,6 @@ describe('sidebar.components.sidebar-content', function() {
 
           assert.equal(errorMessage, "'This group is not available.'");
         });
-      });
-
-      it('sets directLinkedGroupFetchFailed to true', () => {
-        assert.isTrue(ctrl.directLinkedGroupFetchFailed);
       });
 
       it('areAllAnnotationsVisible returns true since there is an error message', () => {
@@ -385,10 +373,6 @@ describe('sidebar.components.sidebar-content', function() {
         store.focusGroup(fakeSettings.group);
         fakeGroups.focused.returns({ id: fakeSettings.group });
         $scope.$digest();
-      });
-
-      it('sets directLinkedGroupFetchFailed to false', () => {
-        assert.isFalse(ctrl.directLinkedGroupFetchFailed);
       });
 
       it('areAllAnnotationsVisible returns false since group has no annotations', () => {
