@@ -1,20 +1,23 @@
 'use strict';
 
-const proxyquire = require('proxyquire');
+const isThirdPartyService = require('../is-third-party-service');
 
 describe('sidebar.util.isThirdPartyService', () => {
   let fakeServiceConfig;
   let fakeSettings;
-  let isThirdPartyService;
 
   beforeEach(() => {
     fakeServiceConfig = sinon.stub();
     fakeSettings = { authDomain: 'hypothes.is' };
 
-    isThirdPartyService = proxyquire('../is-third-party-service', {
+    isThirdPartyService.$imports.$mock({
       '../service-config': fakeServiceConfig,
       '@noCallThru': true,
     });
+  });
+
+  afterEach(() => {
+    isThirdPartyService.$imports.$restore();
   });
 
   it('returns false for first-party services', () => {

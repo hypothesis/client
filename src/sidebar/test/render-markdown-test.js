@@ -1,13 +1,12 @@
 'use strict';
 
-const proxyquire = require('proxyquire');
+const renderMarkdown = require('../render-markdown');
 
 describe('render-markdown', function() {
   let render;
-  let renderMarkdown;
 
   beforeEach(function() {
-    renderMarkdown = proxyquire('../render-markdown', {
+    renderMarkdown.$imports.$mock({
       katex: {
         renderToString: function(input, opts) {
           if (opts && opts.displayMode) {
@@ -21,6 +20,10 @@ describe('render-markdown', function() {
     render = function(markdown) {
       return renderMarkdown(markdown);
     };
+  });
+
+  afterEach(() => {
+    renderMarkdown.$imports.$restore();
   });
 
   describe('autolinking', function() {

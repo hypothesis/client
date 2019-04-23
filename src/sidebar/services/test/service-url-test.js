@@ -1,6 +1,6 @@
 'use strict';
 
-const proxyquire = require('proxyquire');
+const serviceUrlFactory = require('../service-url');
 
 /** Return a fake store object. */
 function fakeStore() {
@@ -20,7 +20,7 @@ function createServiceUrl(linksPromise) {
     .stub()
     .returns({ url: 'EXPANDED_URL', params: {} });
 
-  const serviceUrlFactory = proxyquire('../service-url', {
+  serviceUrlFactory.$imports.$mock({
     '../util/url-util': { replaceURLParams: replaceURLParams },
   });
 
@@ -45,6 +45,7 @@ describe('sidebar.service-url', function() {
 
   afterEach(function() {
     console.warn.restore();
+    serviceUrlFactory.$imports.$restore();
   });
 
   context('before the API response has been received', function() {

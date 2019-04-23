@@ -1,17 +1,16 @@
 'use strict';
 
 const angular = require('angular');
-const proxyquire = require('proxyquire');
 
 const events = require('../../events');
 const bridgeEvents = require('../../../shared/bridge-events');
-const util = require('../../../shared/test/util');
+
+const hypothesisApp = require('../hypothesis-app');
 
 describe('sidebar.components.hypothesis-app', function() {
   let $componentController = null;
   let $scope = null;
   let $rootScope = null;
-  let fakeAnnotationMetadata = null;
   let fakeStore = null;
   let fakeAnalytics = null;
   let fakeAuth = null;
@@ -44,24 +43,17 @@ describe('sidebar.components.hypothesis-app', function() {
   });
 
   beforeEach(function() {
-    fakeAnnotationMetadata = {
-      location: function() {
-        return 0;
-      },
-    };
-
     fakeServiceConfig = sandbox.stub();
 
-    const component = proxyquire(
-      '../hypothesis-app',
-      util.noCallThru({
-        angular: angular,
-        '../annotation-metadata': fakeAnnotationMetadata,
-        '../service-config': fakeServiceConfig,
-      })
-    );
+    hypothesisApp.$imports.$mock({
+      '../service-config': fakeServiceConfig,
+    });
 
-    angular.module('h', []).component('hypothesisApp', component);
+    angular.module('h', []).component('hypothesisApp', hypothesisApp);
+  });
+
+  afterEach(() => {
+    hypothesisApp.$imports.$restore();
   });
 
   beforeEach(angular.mock.module('h'));

@@ -1,13 +1,12 @@
 'use strict';
 
-const proxyquire = require('proxyquire');
-
 const {
   assertPromiseIsRejected,
 } = require('../../../shared/test/promise-util');
 
+const { fetchConfig, $imports } = require('../fetch-config');
+
 describe('sidebar.util.fetch-config', () => {
-  let fetchConfig;
   let fakeHostConfig;
   let fakeJsonRpc;
   let fakeWindow;
@@ -17,11 +16,10 @@ describe('sidebar.util.fetch-config', () => {
     fakeJsonRpc = {
       call: sinon.stub(),
     };
-    const patched = proxyquire('../fetch-config', {
+    $imports.$mock({
       '../host-config': fakeHostConfig,
       './postmessage-json-rpc': fakeJsonRpc,
     });
-    fetchConfig = patched.fetchConfig;
 
     // By default, embedder provides no custom config.
     fakeHostConfig.returns({});
@@ -37,6 +35,10 @@ describe('sidebar.util.fetch-config', () => {
     const fakeParent = { parent: fakeTopWindow, top: fakeTopWindow };
 
     fakeWindow = { parent: fakeParent, top: fakeTopWindow };
+  });
+
+  afterEach(() => {
+    $imports.$restore();
   });
 
   describe('fetchConfig', () => {

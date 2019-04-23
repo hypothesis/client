@@ -1,14 +1,8 @@
 'use strict';
 
-const proxyquire = require('proxyquire');
-
-const VirtualThreadList = proxyquire('../virtual-thread-list', {
-  'lodash.debounce': function(fn) {
-    // Make debounced functions execute immediately
-    return fn;
-  },
-});
 const util = require('../../shared/test/util');
+const VirtualThreadList = require('../virtual-thread-list');
+
 const unroll = util.unroll;
 
 describe('VirtualThreadList', function() {
@@ -44,6 +38,16 @@ describe('VirtualThreadList', function() {
       }),
     };
   }
+
+  beforeEach(() => {
+    VirtualThreadList.$imports.$mock({
+      'lodash.debounce': fn => fn,
+    });
+  });
+
+  afterEach(() => {
+    VirtualThreadList.$imports.$restore();
+  });
 
   beforeEach(function() {
     fakeScope = { $digest: sinon.stub() };
