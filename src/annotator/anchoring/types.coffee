@@ -122,6 +122,5 @@ class TextQuoteAnchor
 
 
 exports.RangeAnchor = RangeAnchor
-exports.FragmentAnchor = require('dom-anchor-fragment')
 exports.TextPositionAnchor = TextPositionAnchor
 exports.TextQuoteAnchor = TextQuoteAnchor
