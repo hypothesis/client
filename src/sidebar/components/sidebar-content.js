@@ -250,24 +250,15 @@ function SidebarContentController(
   // Re-fetch annotations when focused group, logged-in user or connected frames
   // change.
   $scope.$watch(
-    () => [groups.focused().id, store.profile().userid, ...store.searchUris()],
-    ([currentGroupId], [prevGroupId]) => {
-      // FIXME - There is a bug here where the set of displayed annotations can
-      // end up not matching the focused group when the user logs out.
-      //
-      // When a user logs in or out, we re-fetch profile and group information
-      // concurrently. If the profile fetch completes first, it will trigger
-      // an annotation fetch. If the group fetch then completes before the
-      // annotation fetch, and the focused group changes due to the previous
-      // focused group not being in the new set of groups, then the `if` below
-      // will skip refetching annotations a second time. This will result in the
-      // wrong set of displayed annotations.
-      //
-      // This should only affect users logging out because the set of groups for
-      // logged-in users is currently a superset of those for logged-out users on
-      // any given page.
+    () => [groups.focused(), store.profile().userid, ...store.searchUris()],
+    ([currentGroup], [prevGroup]) => {
+      // If the currentGroup is null, clear the selected annotations and return immediatly.
+      if (!currentGroup) {
+        store.clearSelectedAnnotations();
+        return;
+      }
 
-      if (currentGroupId !== prevGroupId) {
+      if (!prevGroup || currentGroup.id !== prevGroup.id) {
         // The focused group may be changed during loading annotations as a result
         // of switching to the group containing a direct-linked annotation.
         //
@@ -338,7 +329,7 @@ function SidebarContentController(
 
     // If user has not landed on a direct linked annotation
     // don't show the CTA.
-    if (!settings.annotations) {
+    if (!store.getState().directLinkedAnnotationsId) {
       return false;
     }
 
@@ -386,6 +377,7 @@ function SidebarContentController(
     store.clearSelectedAnnotations();
     store.selectTab(selectedTab);
     store.clearDirectLinkedGroupFetchFailed();
+    store.clearDirectLinkedIds();
   };
 }
 

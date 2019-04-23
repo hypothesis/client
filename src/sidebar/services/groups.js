@@ -166,8 +166,8 @@ function groups(
     if (isSidebar) {
       uri = getDocumentUriForGroupSearch();
     }
-    const directLinkedGroupId = settings.group;
-    const directLinkedAnnId = settings.annotations;
+    const directLinkedGroupId = store.getState().directLinkedGroupId;
+    const directLinkedAnnId = store.getState().directLinkedAnnotationsId;
     let directLinkedAnnotationGroupId = null;
     return uri
       .then(uri => {
@@ -374,7 +374,8 @@ function groups(
   let prevFocusedId = store.focusedGroupId();
   store.subscribe(() => {
     const focusedId = store.focusedGroupId();
-    if (focusedId !== prevFocusedId) {
+    // The focused group may be null when the user login state changes.
+    if (focusedId !== null && focusedId !== prevFocusedId) {
       prevFocusedId = focusedId;
 
       localStorage.setItem(STORAGE_KEY, focusedId);

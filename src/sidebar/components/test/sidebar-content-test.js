@@ -219,6 +219,13 @@ describe('sidebar.components.sidebar-content', function() {
 
       assert.isFalse(store.getState().directLinkedGroupFetchFailed);
     });
+
+    it("clears the direct linked id's from the settings", () => {
+      ctrl.clearSelection();
+
+      assert.equal(store.getState().directLinkedAnnotationsId, null);
+      assert.equal(store.getState().directLinkedGroupId, null);
+    });
   });
 
   describe('showSelectedTabs', () => {
@@ -588,8 +595,7 @@ describe('sidebar.components.sidebar-content', function() {
     }
 
     beforeEach(function() {
-      // There is a direct-linked annotation
-      fakeSettings.annotations = 'test';
+      store.setDirectLinkedAnnotationsId('test');
     });
 
     it('displays a message if the selection is unavailable', function() {
@@ -671,7 +677,7 @@ describe('sidebar.components.sidebar-content', function() {
       ctrl.auth = {
         status: 'logged-out',
       };
-      delete fakeSettings.annotations;
+      store.setDirectLinkedAnnotationsId(null);
       store.addAnnotations([{ id: '123' }]);
       store.selectAnnotations(['123']);
       $scope.$digest();

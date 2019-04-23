@@ -121,6 +121,7 @@ function HypothesisAppController(
     return auth
       .login()
       .then(() => {
+        store.clearGroups();
         session.reload();
       })
       .catch(err => {
@@ -179,6 +180,7 @@ function HypothesisAppController(
     if (!promptToLogout()) {
       return;
     }
+    store.clearGroups();
     drafts.unsaved().forEach(function(draft) {
       $rootScope.$emit(events.ANNOTATION_DELETED, draft);
     });
