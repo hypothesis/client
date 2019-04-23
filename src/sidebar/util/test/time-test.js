@@ -77,7 +77,7 @@ describe('sidebar.util.time', function() {
     it('Handles empty dates', function() {
       const t = null;
       const expect = '';
-      assert.equal(time.toFuzzyString(t, mockIntl()), expect);
+      assert.equal(time.toFuzzyString(t, undefined, mockIntl()), expect);
     });
 
     const testFixture = function(f) {
@@ -85,7 +85,7 @@ describe('sidebar.util.time', function() {
         const t = new Date().toISOString();
         const expect = f[1];
         sandbox.clock.tick(f[0] * 1000);
-        assert.equal(time.toFuzzyString(t, mockIntl()), expect);
+        assert.equal(time.toFuzzyString(t, undefined, mockIntl()), expect);
       };
     };
 
@@ -100,7 +100,7 @@ describe('sidebar.util.time', function() {
       const d = new Date().toISOString();
       sandbox.clock.tick(day * 2 * 1000);
 
-      assert.equal(time.toFuzzyString(d, null), 'Thu Jan 01 1970');
+      assert.equal(time.toFuzzyString(d, undefined, null), 'Thu Jan 01 1970');
     });
 
     it('falls back to simple strings for >1yr ago', function() {
@@ -109,7 +109,7 @@ describe('sidebar.util.time', function() {
       const d = new Date().toISOString();
       sandbox.clock.tick(year * 2 * 1000);
 
-      assert.equal(time.toFuzzyString(d, null), 'Thu Jan 01 1970');
+      assert.equal(time.toFuzzyString(d, undefined, null), 'Thu Jan 01 1970');
     });
   });
 

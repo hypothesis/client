@@ -209,14 +209,13 @@ function decayingInterval(date, callback) {
  * Formats a date as a string relative to the current date.
  *
  * @param {number} date - The absolute timestamp to format.
+ * @param {Date} [now] - The date to consider as the current time.
  * @return {string} A 'fuzzy' string describing the relative age of the date.
  */
-function toFuzzyString(date, Intl) {
+function toFuzzyString(date, now = new Date(), Intl) {
   if (!date) {
     return '';
   }
-  const now = new Date();
-
   return getBreakpoint(date, now).format(new Date(date), now, Intl);
 }
 
