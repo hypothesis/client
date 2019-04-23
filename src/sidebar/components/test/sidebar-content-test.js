@@ -6,6 +6,7 @@ const EventEmitter = require('tiny-emitter');
 const events = require('../../events');
 const sidebarContent = require('../sidebar-content');
 const uiConstants = require('../../ui-constants');
+const util = require('../../directive/test/util');
 
 let searchClients;
 
@@ -146,6 +147,19 @@ describe('sidebar.components.sidebar-content', function() {
   function setFrames(frames) {
     frames.forEach(function(frame) {
       store.connectFrame(frame);
+    });
+  }
+
+  function createSidebarContent(
+    { userid } = { userid: 'acct:person@example.com' }
+  ) {
+    return util.createDirective(document, 'sidebarContent', {
+      auth: {
+        status: userid ? 'logged-in' : 'logged-out',
+        userid: userid,
+      },
+      search: sinon.stub().returns({ query: sinon.stub() }),
+      onLogin: sinon.stub(),
     });
   }
 
@@ -335,6 +349,19 @@ describe('sidebar.components.sidebar-content', function() {
         $scope.$digest();
         // Re-construct the controller after the environment setup.
         makeSidebarContentController();
+      });
+
+      [null, 'acct:person@example.com'].forEach(userid => {
+        it('displays same group error message regardless of login state', () => {
+          const element = createSidebarContent({ userid });
+
+          const sidebarContentError = element.find('.sidebar-content-error');
+          const errorMessage = sidebarContentError.attr(
+            'logged-in-error-message'
+          );
+
+          assert.equal(errorMessage, "'This group is not available.'");
+        });
       });
 
       it('sets directLinkedGroupFetchFailed to true', () => {
