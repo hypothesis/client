@@ -9,7 +9,7 @@ const GroupListItemOutOfScope = require('./group-list-item-out-of-scope');
 /**
  * A labeled section of the groups list.
  */
-function GroupListSection({ analytics, groups, heading, store }) {
+function GroupListSection({ groups, heading }) {
   const isSelectable = groupId => {
     const group = groups.find(g => g.id === groupId);
     return !group.scopes.enforced || group.isScopedToUri;
@@ -25,17 +25,11 @@ function GroupListSection({ analytics, groups, heading, store }) {
             key={group.id}
           >
             {isSelectable(group.id) ? (
-              <GroupListItem
-                className="group-list-item"
-                group={group}
-                analytics={analytics}
-                store={store}
-              />
+              <GroupListItem className="group-list-item" group={group} />
             ) : (
               <GroupListItemOutOfScope
                 className="group-list-item-out-of-scope"
                 group={group}
-                analytics={analytics}
               />
             )}
           </li>
@@ -50,13 +44,6 @@ GroupListSection.propTypes = {
   groups: propTypes.arrayOf(propTypes.object),
   /* The string name of the group list section. */
   heading: propTypes.string,
-
-  // TODO - These are only used by child components. It shouldn't be necessary
-  // to pass them down manually.
-  analytics: propTypes.object.isRequired,
-  store: propTypes.object.isRequired,
 };
-
-GroupListSection.injectedProps = ['analytics', 'store'];
 
 module.exports = GroupListSection;

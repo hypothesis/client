@@ -2,8 +2,10 @@
 
 const angular = require('angular');
 const { Component, createElement } = require('preact');
+const { useContext } = require('preact/hooks');
 const propTypes = require('prop-types');
 
+const { ServiceContext } = require('../service-context');
 const wrapReactComponent = require('../wrap-react-component');
 const { createDirective } = require('../../directive/test/util');
 
@@ -11,13 +13,19 @@ const { createDirective } = require('../../directive/test/util');
 // This makes it easy to call it with different arguments.
 let lastOnDblClickCallback;
 
-function Button({ label, isDisabled, onClick, theme, onDblClick }) {
+// Saved service context from last render of `Button`.
+// Components in the tree can use this to get at Angular services.
+let lastServiceContext;
+
+function Button({ label, isDisabled, onClick, onDblClick }) {
   // We don't actually use the `onDblClick` handler in this component.
   // It exists just to test callbacks that take arguments.
   lastOnDblClickCallback = onDblClick;
 
+  lastServiceContext = useContext(ServiceContext);
+
   return (
-    <button disabled={isDisabled} onClick={onClick} className={'btn--' + theme}>
+    <button disabled={isDisabled} onClick={onClick}>
       {label}
     </button>
   );
@@ -32,12 +40,7 @@ Button.propTypes = {
 
   // An optional callback with a `{ click }` argument.
   onDblClick: propTypes.func,
-
-  // A property whose value comes from Angular dependency injection rather than
-  // the parent component.
-  theme: propTypes.string,
 };
-Button.injectedProps = ['theme'];
 
 describe('wrapReactComponent', () => {
   function renderButton() {
@@ -98,10 +101,11 @@ describe('wrapReactComponent', () => {
     assert.called(onClick);
   });
 
-  it('gets values for injected properties from Angular', () => {
-    const { element } = renderButton();
-    const btnEl = element[0].querySelector('button');
-    assert.equal(btnEl.className, 'btn--dark');
+  it('exposes Angular services to the React component and descendants', () => {
+    lastServiceContext = null;
+    renderButton();
+    assert.ok(lastServiceContext);
+    assert.equal(lastServiceContext.get('theme'), 'dark');
   });
 
   it('updates the React component when the Angular component is updated', () => {

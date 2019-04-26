@@ -53,11 +53,9 @@ describe('GroupListSection', () => {
             n =>
               n.type() === GroupListItem || n.type() === GroupListItemOutOfScope
           )
-          .map(item => item.type().name);
+          .map(item => item.type());
         const expectedItemTypes = groups.map(g =>
-          expectedIsSelectable[g.id]
-            ? 'GroupListItem'
-            : 'GroupListItemOutOfScope'
+          expectedIsSelectable[g.id] ? GroupListItem : GroupListItemOutOfScope
         );
         assert.deepEqual(itemTypes, expectedItemTypes);
       });

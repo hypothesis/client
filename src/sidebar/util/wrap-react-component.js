@@ -1,6 +1,7 @@
 'use strict';
 
 const { createElement, render } = require('preact');
+const { ServiceContext } = require('./service-context');
 
 function useExpressionBinding(propName) {
   return propName.match(/^on[A-Z]/);
@@ -14,15 +15,20 @@ function useExpressionBinding(propName) {
  * has been created.
  */
 class ReactController {
-  constructor($element, $scope, injectedProps, type) {
+  constructor($element, $injector, $scope, type) {
     /** The DOM element where the React component should be rendered. */
     this.domElement = $element[0];
+
+    /**
+     * The Angular service injector, used by this component and its descendants.
+     */
+    this.$injector = $injector;
 
     /** The React component function or class. */
     this.type = type;
 
     /** The input props to the React component. */
-    this.props = injectedProps;
+    this.props = {};
 
     // Wrap callback properties (eg. `onClick`) with `$scope.$apply` to trigger
     // a digest cycle after the function is called. This ensures that the
@@ -49,11 +55,9 @@ class ReactController {
   $onInit() {
     // Copy properties supplied by the parent Angular component to React props.
     Object.keys(this.type.propTypes).forEach(propName => {
-      if (propName in this.props) {
-        // Skip properties already handled in the constructor.
-        return;
+      if (!useExpressionBinding(propName)) {
+        this.props[propName] = this[propName];
       }
-      this.props[propName] = this[propName];
     });
     this.updateReactComponent();
   }
@@ -77,16 +81,16 @@ class ReactController {
   }
 
   updateReactComponent() {
-    render(createElement(this.type, this.props), this.domElement);
+    // Render component, with a `ServiceContext.Provider` wrapper which
+    // provides access to Angular services via `withServices` or `useContext`
+    // in child components.
+    render(
+      <ServiceContext.Provider value={this.$injector}>
+        <this.type {...this.props} />
+      </ServiceContext.Provider>,
+      this.domElement
+    );
   }
-}
-
-function objectWithKeysAndValues(keys, values) {
-  const obj = {};
-  for (let i = 0; i < keys.length; i++) {
-    obj[keys[i]] = values[i];
-  }
-  return obj;
 }
 
 /**
@@ -98,25 +102,8 @@ function objectWithKeysAndValues(keys, values) {
  * one-way ('<') bindings except for those with names matching /^on[A-Z]/ which
  * are assumed to be callbacks that use expression ('&') bindings.
  *
- * If the React component needs access to an Angular service, the service
- * should be added to `propTypes` and the name listed in an `injectedProps`
- * array:
- *
- * @example
- *   // In `MyComponent.js`:
- *   function MyComponent({ theme }) {
- *     return <div>You are using the {theme} theme</div>
- *   }
- *   MyComponent.propTypes = {
- *     theme: propTypes.string,
- *   }
- *   MyComponent.injectedProps = ['theme'];
- *
- *   // In the Angular bootstrap code:
- *   angular
- *     .module(...)
- *     .component('my-component', wrapReactComponent(MyComponent))
- *     .value('theme', 'dark');
+ * If the React component needs access to an Angular service, it can get at
+ * them using the `withServices` wrapper from service-context.js.
  *
  * @param {Function} type - The React component class or function
  * @return {Object} -
@@ -131,30 +118,23 @@ function wrapReactComponent(type) {
     );
   }
 
-  // Create controller.
-  const injectedPropNames = type.injectedProps || [];
-  class Controller extends ReactController {
-    constructor($element, $scope, ...injectedPropValues) {
-      const injectedProps = objectWithKeysAndValues(
-        injectedPropNames,
-        injectedPropValues
-      );
-      super($element, $scope, injectedProps, type);
-    }
+  /**
+   * Create an AngularJS component controller that renders the specific React
+   * component being wrapped.
+   */
+  // @ngInject
+  function createController($element, $injector, $scope) {
+    return new ReactController($element, $injector, $scope, type);
   }
-  Controller.$inject = ['$element', '$scope', ...injectedPropNames];
 
-  // Create bindings object.
   const bindings = {};
-  Object.keys(type.propTypes)
-    .filter(name => !injectedPropNames.includes(name))
-    .forEach(propName => {
-      bindings[propName] = useExpressionBinding(propName) ? '&' : '<';
-    });
+  Object.keys(type.propTypes).forEach(propName => {
+    bindings[propName] = useExpressionBinding(propName) ? '&' : '<';
+  });
 
   return {
     bindings,
-    controller: Controller,
+    controller: createController,
   };
 }
 

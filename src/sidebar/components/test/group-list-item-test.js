@@ -1,6 +1,7 @@
 'use strict';
 
 const { createElement } = require('preact');
+
 const { mount } = require('enzyme');
 const GroupListItem = require('../group-list-item');
 

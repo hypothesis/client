@@ -5,6 +5,7 @@ const propTypes = require('prop-types');
 const { createElement } = require('preact');
 
 const { orgName } = require('../util/group-list-item-common');
+const { withServices } = require('../util/service-context');
 
 function GroupListItem({ analytics, group, store }) {
   const focusGroup = () => {
@@ -61,4 +62,4 @@ GroupListItem.propTypes = {
 
 GroupListItem.injectedProps = ['analytics', 'store'];
 
-module.exports = GroupListItem;
+module.exports = withServices(GroupListItem);
