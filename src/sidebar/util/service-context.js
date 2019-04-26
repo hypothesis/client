@@ -38,7 +38,7 @@ const ServiceContext = createContext(fallbackInjector);
  * Wrap a React component to inject any services it depends upon as props.
  *
  * Components declare their service dependencies in an `injectedProps` static
- * property.
+ * property. These services also need to be declared in `propTypes`.
  *
  * Any props which are passed directly will override injected props.
  *
@@ -51,7 +51,7 @@ const ServiceContext = createContext(fallbackInjector);
  *   // the parent.
  *   MyComponent.injectedProps = ['settings']
  *
- *   // Wrap `MyComponent` to inject any passed props.
+ *   // Wrap `MyComponent` to inject any services it needs.
  *   module.exports = withServices(MyComponent);
  */
 function withServices(Component) {
@@ -62,7 +62,12 @@ function withServices(Component) {
   }
 
   function Wrapper(props) {
+    // Get the current dependency injector instance that is provided by a
+    // `ServiceContext.Provider` somewhere higher up the component tree.
     const $injector = useContext(ServiceContext);
+
+    // Inject services, unless they have been overridden by props passed from
+    // the parent component.
     const services = {};
     for (let service of Component.injectedProps) {
       if (!(service in props)) {
@@ -71,6 +76,9 @@ function withServices(Component) {
     }
     return <Component {...services} {...props} />;
   }
+
+  // Set the name of the wrapper for use in debug tools and queries in Enzyme
+  // tests.
   const wrappedName = Component.displayName || Component.name;
   Wrapper.displayName = `withServices(${wrappedName})`;
 

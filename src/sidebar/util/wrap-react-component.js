@@ -20,8 +20,7 @@ class ReactController {
     this.domElement = $element[0];
 
     /**
-     * The Angular service injector, used by this component and possibly
-     * children as well.
+     * The Angular service injector, used by this component and its descendants.
      */
     this.$injector = $injector;
 
@@ -119,6 +118,10 @@ function wrapReactComponent(type) {
     );
   }
 
+  /**
+   * Create an AngularJS component controller that renders the specific React
+   * component being wrapped.
+   */
   // @ngInject
   function createController($element, $injector, $scope) {
     return new ReactController($element, $injector, $scope, type);
