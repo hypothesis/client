@@ -217,12 +217,17 @@ function AnnotationController(
   }
 
   this.authorize = function(action) {
+    if (action === 'reply') {
+        return !!session.state.privileges.length;
+    }
     const belongsToUser = permissions.permits(
       self.annotation.permissions,
       action,
       session.state.userid
     );
-    if (!belongsToUser) {
+    if (action === 'update') {
+        return belongsToUser;
+    } else if (!belongsToUser) {
         // Check if user is a planner
         if (session.state.privileges.indexOf('ar_plan') >= 0) {
             return true;
