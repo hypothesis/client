@@ -3,6 +3,8 @@
 const queryString = require('query-string');
 const uuid = require('node-uuid');
 
+const PahoMQTTClientWrapper = require('../../inspera/scripts/mqtt');
+
 const events = require('../events');
 const Socket = require('../websocket');
 
@@ -193,11 +195,16 @@ function Streamer(
           url = settings.websocketUrl;
         }
 
-        socket = new Socket(url);
+        if (settings.useMQTT) {
+          const pahoMQTTClientWrapper = new PahoMQTTClientWrapper(url, session.state.annotationUpdateChannel, session.state.userid, settings._token, handleSocketOnMessage);
+          pahoMQTTClientWrapper.createAndConnect();
+        } else {
+            socket = new Socket(url);
 
-        socket.on('open', sendClientConfig);
-        socket.on('error', handleSocketOnError);
-        socket.on('message', handleSocketOnMessage);
+            socket.on('open', sendClientConfig);
+            socket.on('error', handleSocketOnError);
+            socket.on('message', handleSocketOnMessage);
+        }
 
         // Configure the client ID
         setConfig('client-id', {
