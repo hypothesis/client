@@ -124,6 +124,7 @@
         icon="'h-icon-annotation-reply'"
         is-disabled="vm.isDeleted()"
         label="'Reply'"
+        ng-show="vm.authorize('reply')"
         on-click="vm.reply()"
       ></annotation-action-button>
       <span class="annotation-share-dialog-wrapper" ng-if="vm.incontextLink()">
