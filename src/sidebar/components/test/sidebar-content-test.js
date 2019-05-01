@@ -1,11 +1,10 @@
 'use strict';
 
 const angular = require('angular');
-const proxyquire = require('proxyquire');
 const EventEmitter = require('tiny-emitter');
 
 const events = require('../../events');
-const noCallThru = require('../../../shared/test/util').noCallThru;
+const sidebarContent = require('../sidebar-content');
 const uiConstants = require('../../ui-constants');
 
 let searchClients;
@@ -64,21 +63,12 @@ describe('sidebar.components.sidebar-content', function() {
     angular
       .module('h', [])
       .service('store', require('../../store'))
-      .component(
-        'sidebarContent',
-        proxyquire(
-          '../sidebar-content',
-          noCallThru({
-            angular: angular,
-            '../search-client': FakeSearchClient,
-          })
-        )
-      );
+      .component('sidebarContent', sidebarContent);
   });
 
   beforeEach(angular.mock.module('h'));
 
-  beforeEach(
+  beforeEach(() => {
     angular.mock.module(function($provide) {
       searchClients = [];
       sandbox = sinon.sandbox.create();
@@ -142,8 +132,16 @@ describe('sidebar.components.sidebar-content', function() {
       $provide.value('streamFilter', fakeStreamFilter);
       $provide.value('groups', fakeGroups);
       $provide.value('settings', fakeSettings);
-    })
-  );
+    });
+
+    sidebarContent.$imports.$mock({
+      '../search-client': FakeSearchClient,
+    });
+  });
+
+  afterEach(() => {
+    sidebarContent.$imports.$restore();
+  });
 
   function setFrames(frames) {
     frames.forEach(function(frame) {

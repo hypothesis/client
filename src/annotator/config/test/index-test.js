@@ -1,23 +1,22 @@
 'use strict';
 
-const proxyquire = require('proxyquire');
-const util = require('../../../shared/test/util');
-
-const fakeSettingsFrom = sinon.stub();
-
-const configFrom = proxyquire(
-  '../index',
-  util.noCallThru({
-    './settings': fakeSettingsFrom,
-  })
-);
+const configFrom = require('../index');
 
 describe('annotator.config.index', function() {
-  beforeEach('reset fakeSettingsFrom', function() {
-    fakeSettingsFrom.reset();
-    fakeSettingsFrom.returns({
+  let fakeSettingsFrom;
+
+  beforeEach(() => {
+    fakeSettingsFrom = sinon.stub().returns({
       hostPageSetting: sinon.stub(),
     });
+
+    configFrom.$imports.$mock({
+      './settings': fakeSettingsFrom,
+    });
+  });
+
+  afterEach(() => {
+    configFrom.$imports.$restore();
   });
 
   it('gets the configuration settings', function() {

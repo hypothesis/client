@@ -1,13 +1,12 @@
 'use strict';
 
-const proxyquire = require('proxyquire');
+const boot = require('../boot');
 
 function assetUrl(url) {
   return `https://marginal.ly/client/build/${url}`;
 }
 
 describe('bootstrap', function() {
-  let boot;
   let fakePolyfills;
   let iframe;
 
@@ -19,12 +18,13 @@ describe('bootstrap', function() {
       requiredPolyfillSets: sinon.stub().returns([]),
     };
 
-    boot = proxyquire('../boot', {
+    boot.$imports.$mock({
       '../shared/polyfills': fakePolyfills,
     });
   });
 
   afterEach(function() {
+    boot.$imports.$restore();
     iframe.remove();
   });
 

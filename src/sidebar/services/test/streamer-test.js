@@ -1,10 +1,11 @@
 'use strict';
 
 const EventEmitter = require('tiny-emitter');
-const proxyquire = require('proxyquire');
 
 const events = require('../../events');
 const unroll = require('../../../shared/test/util').unroll;
+
+const Streamer = require('../streamer');
 
 const fixtures = {
   createNotification: {
@@ -82,7 +83,6 @@ describe('Streamer', function() {
   let fakeSession;
   let fakeSettings;
   let activeStreamer;
-  let Streamer;
 
   function createDefaultStreamer() {
     activeStreamer = new Streamer(
@@ -143,12 +143,13 @@ describe('Streamer', function() {
       websocketUrl: 'ws://example.com/ws',
     };
 
-    Streamer = proxyquire('../streamer', {
+    Streamer.$imports.$mock({
       '../websocket': FakeSocket,
     });
   });
 
   afterEach(function() {
+    Streamer.$imports.$restore();
     activeStreamer = null;
   });
 

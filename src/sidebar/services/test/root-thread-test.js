@@ -1,13 +1,14 @@
 'use strict';
 
 const angular = require('angular');
-const proxyquire = require('proxyquire');
 const immutable = require('seamless-immutable');
 
 const annotationFixtures = require('../../test/annotation-fixtures');
 const events = require('../../events');
 const uiConstants = require('../../ui-constants');
 const util = require('../../../shared/test/util');
+
+const rootThreadFactory = require('../root-thread');
 
 const unroll = util.unroll;
 
@@ -84,12 +85,7 @@ describe('rootThread', function() {
       .value('drafts', fakeDrafts)
       .value('searchFilter', fakeSearchFilter)
       .value('viewFilter', fakeViewFilter)
-      .service(
-        'rootThread',
-        proxyquire('../root-thread', {
-          '../build-thread': util.noCallThru(fakeBuildThread),
-        })
-      );
+      .service('rootThread', rootThreadFactory);
 
     angular.mock.module('app');
 
@@ -97,6 +93,16 @@ describe('rootThread', function() {
       $rootScope = _$rootScope_;
       rootThread = _rootThread_;
     });
+  });
+
+  beforeEach(() => {
+    rootThreadFactory.$imports.$mock({
+      '../build-thread': fakeBuildThread,
+    });
+  });
+
+  afterEach(() => {
+    rootThreadFactory.$imports.$restore();
   });
 
   describe('#thread', function() {

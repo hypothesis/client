@@ -1,12 +1,13 @@
 'use strict';
 
 const angular = require('angular');
-const proxyquire = require('proxyquire');
 
 const events = require('../../events');
 const fixtures = require('../../test/annotation-fixtures');
 const testUtil = require('../../../shared/test/util');
 const util = require('../../directive/test/util');
+
+const annotationComponent = require('../annotation');
 
 const inject = angular.mock.inject;
 const unroll = testUtil.unroll;
@@ -100,9 +101,6 @@ describe('annotation', function() {
     let $scope;
     let $timeout;
     let $window;
-    // Unfortunately fakeAccountID needs to be initialised here because it
-    // gets passed into proxyquire() _before_ the beforeEach() that initializes
-    // the rest of the fakes runs.
     const fakeAccountID = {
       isThirdPartyUser: sinon.stub(),
     };
@@ -120,16 +118,15 @@ describe('annotation', function() {
     let fakeStreamer;
     let sandbox;
 
-    /**
-     * Returns the annotation directive with helpers stubbed out.
-     */
-    function annotationComponent() {
-      return proxyquire('../annotation', {
-        angular: testUtil.noCallThru(angular),
+    beforeEach(() => {
+      annotationComponent.$imports.$mock({
         '../util/account-id': fakeAccountID,
-        '@noCallThru': true,
       });
-    }
+    });
+
+    afterEach(() => {
+      annotationComponent.$imports.$restore();
+    });
 
     function createDirective(annotation) {
       annotation = annotation || fixtures.defaultAnnotation();
@@ -153,7 +150,7 @@ describe('annotation', function() {
     before(function() {
       angular
         .module('h', [])
-        .component('annotation', annotationComponent())
+        .component('annotation', annotationComponent)
         .component('annotationActionButton', {
           bindings: {
             icon: '<',
