@@ -7,6 +7,7 @@ Delegator = require('./delegator')
 $ = require('jquery')
 
 adder = require('./adder')
+htmlAnchoring = require('./anchoring/html')
 highlighter = require('./highlighter')
 rangeUtil = require('./range-util')
 selections = require('./selections')
@@ -37,7 +38,7 @@ module.exports = class Guest extends Delegator
     TextSelection: {}
 
   # Anchoring module
-  anchoring: require('./anchoring/html')
+  anchoring: null
 
   # Internal state
   plugins: null
@@ -48,7 +49,7 @@ module.exports = class Guest extends Delegator
   html:
     adder: '<hypothesis-adder></hypothesis-adder>'
 
-  constructor: (element, config) ->
+  constructor: (element, config, anchoring = htmlAnchoring) ->
     super
 
     this.adder = $(this.html.adder).appendTo(@element).hide()
@@ -76,6 +77,8 @@ module.exports = class Guest extends Delegator
     # Set the frame identifier if it's available.
     # The "top" guest instance will have this as null since it's in a top frame not a sub frame
     this.frameIdentifier = config.subFrameIdentifier || null
+
+    this.anchoring = anchoring
 
     cfOptions =
       config: config

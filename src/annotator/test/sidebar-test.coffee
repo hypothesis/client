@@ -1,11 +1,6 @@
 events = require('../../shared/bridge-events')
 
-proxyquire = require('proxyquire')
-
-rafStub = (fn) ->
-  fn()
-
-Sidebar = proxyquire('../sidebar', { raf: rafStub })
+Sidebar = require('../sidebar')
 
 DEFAULT_WIDTH = 350
 DEFAULT_HEIGHT = 600
@@ -16,6 +11,14 @@ describe 'Sidebar', ->
   CrossFrame = null
   fakeCrossFrame = null
   sidebarConfig = {pluginClasses: {}}
+
+  before ->
+    rafStub = (fn) ->
+      fn()
+    Sidebar.$imports.$mock({ raf: rafStub })
+
+  after ->
+    Sidebar.$imports.$restore()
 
   createSidebar = (config={}) ->
     config = Object.assign({}, sidebarConfig, config)
