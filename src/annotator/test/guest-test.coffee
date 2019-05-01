@@ -54,7 +54,6 @@ describe 'Guest', ->
     config = Object.assign({}, guestConfig, config)
     element = document.createElement('div')
     guest = new Guest(element, config)
-    guest.anchoring = htmlAnchoring
     return guest
 
   beforeEach ->
@@ -77,6 +76,7 @@ describe 'Guest', ->
 
     Guest.$imports.$mock({
       './adder': {Adder: FakeAdder},
+      './anchoring/html': htmlAnchoring,
       './highlighter': highlighter,
       './range-util': rangeUtil,
       './selections': (document) ->
