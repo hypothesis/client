@@ -228,11 +228,8 @@ function AnnotationController(
     if (belongsToUser) {
         return true;
     }
-    if (action === 'delete') {
-        if (session.state.privileges.indexOf('ar_plan') >= 0) {
-            return true;
-        }
-        return false;
+    if (action === 'delete' && session.state.privileges.indexOf('ar_plan') >= 0) {
+        return true;
     }
     return false;
   };
