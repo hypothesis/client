@@ -96,6 +96,14 @@ function session(
   }
 
   /**
+  * Store the preference server-side that the user dismissed the sidebar
+   * help page and then update the local profile data.
+   */
+  function dismissSidebarHelp() {
+      localStorage.setItem('SIDEBAR_HELP_PAGE_DISMISSED', true);
+  }
+
+  /**
    * Store the preference server-side that the user dismissed the sidebar
    * tutorial and then update the local profile data.
    */
@@ -179,6 +187,7 @@ function session(
   });
 
   return {
+    dismissSidebarHelp,
     dismissSidebarTutorial,
     load,
     logout,

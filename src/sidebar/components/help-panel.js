@@ -9,13 +9,16 @@
 module.exports = {
   controllerAs: 'vm',
   // @ngInject
-  controller: function ($scope, $window, store, serviceUrl, groups, i18nService) {
+  controller: function ($scope, $window, store, serviceUrl, groups, i18nService, session) {
     this.userAgent = $window.navigator.userAgent;
     this.version = '__VERSION__'; // replaced by versionify
     this.dateTime = new Date();
     this.serviceUrl = serviceUrl;
     this.group = groups.focused() && groups.focused().id.replace(/-/g, '');
     this.caption = i18nService.tl('sidePanel.channels.'+this.group+'.description');
+    this.onClose = function() {
+        session.dismissSidebarHelp();
+    };
 
     $scope.$watch(function() {
       return groups.focused() && groups.focused().id || null;

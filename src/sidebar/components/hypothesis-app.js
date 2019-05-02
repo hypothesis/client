@@ -83,6 +83,14 @@ function HypothesisAppController(
     return false;
   };
 
+  this.isHelpPageDismissed = function() {
+      const closed = localStorage.getItem('SIDEBAR_HELP_PAGE_DISMISSED') === 'true';
+      if (closed) {
+          return true;
+      }
+      return false;
+  };
+
   this.sortKey = function() {
     return store.getState().sortKey;
   };

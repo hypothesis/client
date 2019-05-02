@@ -21,8 +21,7 @@
       ng-if="vm.shareDialog.visible"
       on-close="vm.shareDialog.visible = false">
     </share-dialog>
-    <help-panel ng-if="vm.helpPanel.visible"
-      on-close="vm.helpPanel.visible = false"
+    <help-panel ng-if="!vm.isHelpPageDismissed()"
       auth="vm.auth">
     </help-panel>
     <main ng-view=""></main>
