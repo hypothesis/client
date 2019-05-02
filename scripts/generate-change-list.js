@@ -6,19 +6,30 @@ const wrapText = require('wrap-text');
 
 /**
  * Return a `Date` indicating when a Git tag was created.
+ *
+ * The tag creation date is used for annotated tags, otherwise there is a
+ * fallback to the date of the tagged commit.
  */
 function getTagDate(tag) {
-  const result = execSync(`git tag --list "${tag}" "--format=%(taggerdate)"`, {
-    encoding: 'utf-8',
-  });
-  return new Date(result.trim());
+  const result = execSync(
+    `git tag --list "${tag}" "--format=%(committerdate) -- %(taggerdate)"`,
+    {
+      encoding: 'utf-8',
+    }
+  );
+  const [commitDate, tagDate] = result.trim().split('--');
+  const date = new Date(tagDate || commitDate);
+  if (isNaN(date)) {
+    throw new Error(`Unable to determine tag date of tag "${tag}"`);
+  }
+  return date;
 }
 
 /**
- * Return the name of the most recently created Git tag.
+ * Return the name of the tag with the highest version number.
  */
-function getLastTag() {
-  const result = execSync('git tag --list --sort=-taggerdate', {
+function getHighestVersionTag() {
+  const result = execSync('git tag --list --sort=-version:refname', {
     encoding: 'utf-8',
   });
   const tags = result.split('\n').map(line => line.trim());
@@ -33,14 +44,11 @@ function getLastTag() {
  * Iterate over items in a GitHub API response and yield each item, fetching
  * additional pages of results as necessary.
  */
-async function* itemsInGitHubAPIResponse(octokit, response) {
-  let isFirstPage = true;
-  while (isFirstPage || octokit.hasNextPage(response)) {
-    isFirstPage = false;
-    for (let item of response.data) {
+async function* itemsInGitHubAPIResponse(octokit, options) {
+  for await (const page of octokit.paginate.iterator(options)) {
+    for (let item of page.data) {
       yield item;
     }
-    response = await octokit.getNextPage(response);
   }
 }
 
@@ -50,7 +58,7 @@ async function* itemsInGitHubAPIResponse(octokit, response) {
 async function getPRsMergedSince(octokit, org, repo, tag) {
   const tagDate = getTagDate(tag);
 
-  let response = await octokit.pullRequests.list({
+  const options = await octokit.pullRequests.list.endpoint.merge({
     owner: org,
     repo,
     state: 'closed',
@@ -59,7 +67,7 @@ async function getPRsMergedSince(octokit, org, repo, tag) {
   });
 
   const prs = [];
-  for await (const pr of itemsInGitHubAPIResponse(octokit, response)) {
+  for await (const pr of itemsInGitHubAPIResponse(octokit, options)) {
     if (!pr.merged_at) {
       // This PR was closed without being merged.
       continue;
@@ -100,12 +108,16 @@ async function getPRsMergedSince(octokit, org, repo, tag) {
  * ```
  */
 function formatChangeList(pullRequests) {
-  return pullRequests
-    .map(pr => `- ${pr.title} [#${pr.number}](${pr.url})`)
-    .map(item => wrapText(item, 90))
-    // Align the start of lines after the first with the text in the first line.
-    .map(item => item.replace(/\n/mg, '\n  '))
-    .join('\n\n');
+  return (
+    pullRequests
+      // Skip automated dependency update PRs.
+      .filter(pr => !pr.labels.some(label => label.name === 'dependencies'))
+      .map(pr => `- ${pr.title} [#${pr.number}](${pr.html_url})`)
+      .map(item => wrapText(item, 90))
+      // Align the start of lines after the first with the text in the first line.
+      .map(item => item.replace(/\n/gm, '\n  '))
+      .join('\n\n')
+  );
 }
 
 /**
@@ -115,12 +127,26 @@ function formatChangeList(pullRequests) {
  *
  * Tag names are usually `vX.Y.Z` where `X.Y.Z` is the package version.
  */
-async function changelistSinceTag(octokit, tag=getLastTag()) {
+async function changelistSinceTag(octokit, tag = getHighestVersionTag()) {
   const org = 'hypothesis';
   const repo = 'client';
 
   const mergedPRs = await getPRsMergedSince(octokit, org, repo, tag);
   return formatChangeList(mergedPRs);
+}
+
+if (require.main === module) {
+  const Octokit = require('@octokit/rest');
+  const octokit = new Octokit({ auth: `token ${process.env.GITHUB_TOKEN}` });
+  const tag = process.argv[2] || getHighestVersionTag();
+
+  changelistSinceTag(octokit, tag)
+    .then(changes => {
+      console.log(changes);
+    })
+    .catch(err => {
+      console.error('Unable to generate change list:', err);
+    });
 }
 
 module.exports = {
