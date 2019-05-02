@@ -225,16 +225,13 @@ function AnnotationController(
       action,
       session.state.userid
     );
-    if (action === 'update') {
-        return belongsToUser;
-    } else if (!belongsToUser) {
-        // Check if user is a planner
-        if (session.state.privileges.indexOf('ar_plan') >= 0) {
-            return true;
-        }
-        return false;
+    if (belongsToUser) {
+        return true;
     }
-    return true;
+    if (action === 'delete' && session.state.privileges.indexOf('ar_plan') >= 0) {
+        return true;
+    }
+    return false;
   };
 
   // /**
