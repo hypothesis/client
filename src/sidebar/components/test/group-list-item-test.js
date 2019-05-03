@@ -9,8 +9,20 @@ const { events } = require('../../services/analytics');
 
 describe('GroupListItem', () => {
   let fakeAnalytics;
+  let fakeGroups;
   let fakeStore;
   let fakeGroupListItemCommon;
+
+  const fakeGroup = {
+    id: 'groupid',
+    name: 'Test',
+    links: {
+      html: 'https://annotate.com/groups/groupid',
+    },
+    scopes: {
+      enforced: false,
+    },
+  };
 
   beforeEach(() => {
     fakeStore = {
@@ -29,6 +41,10 @@ describe('GroupListItem', () => {
       orgName: sinon.stub(),
     };
 
+    fakeGroups = {
+      leave: sinon.stub(),
+    };
+
     GroupListItem.$imports.$mock({
       '../util/group-list-item-common': fakeGroupListItemCommon,
       '../store/use-store': callback => callback(fakeStore),
@@ -43,55 +59,58 @@ describe('GroupListItem', () => {
     return mount(
       <GroupListItem
         group={fakeGroup}
+        groups={fakeGroups}
         analytics={fakeAnalytics}
-        store={fakeStore}
       />
     );
   };
 
   it('changes the focused group when group is clicked', () => {
-    const fakeGroup = { id: 'groupid' };
-
     const wrapper = createGroupListItem(fakeGroup);
-    wrapper.find('.group-list-item__item').simulate('click');
+    wrapper
+      .find('MenuItem')
+      .props()
+      .onClick();
 
     assert.calledWith(fakeStore.focusGroup, fakeGroup.id);
     assert.calledWith(fakeAnalytics.track, fakeAnalytics.events.GROUP_SWITCH);
   });
 
   it('clears the direct linked ids from the store when the group is clicked', () => {
-    const fakeGroup = { id: 'groupid' };
-
     const wrapper = createGroupListItem(fakeGroup);
-    wrapper.find('.group-list-item__item').simulate('click');
+    wrapper
+      .find('MenuItem')
+      .props()
+      .onClick();
 
     assert.calledOnce(fakeStore.clearDirectLinkedIds);
   });
 
   it('clears the direct-linked group fetch failed from the store when the group is clicked', () => {
-    const fakeGroup = { id: 'groupid' };
-
     const wrapper = createGroupListItem(fakeGroup);
-    wrapper.find('.group-list-item__item').simulate('click');
+    wrapper
+      .find('MenuItem')
+      .props()
+      .onClick();
 
     assert.calledOnce(fakeStore.clearDirectLinkedGroupFetchFailed);
   });
 
   it('sets alt text for organization logo', () => {
-    const fakeGroup = {
-      id: 'groupid',
+    const group = {
+      ...fakeGroup,
       // Dummy scheme to avoid actually trying to load image.
       logo: 'dummy://hypothes.is/logo.svg',
       organization: { name: 'org' },
     };
     fakeGroupListItemCommon.orgName
-      .withArgs(fakeGroup)
-      .returns(fakeGroup.organization.name);
+      .withArgs(group)
+      .returns(group.organization.name);
 
-    const wrapper = createGroupListItem(fakeGroup);
-    const altText = wrapper.find('img').props().alt;
+    const wrapper = createGroupListItem(group);
+    const altText = wrapper.find('MenuItem').prop('iconAlt');
 
-    assert.equal(altText, fakeGroup.organization.name);
+    assert.equal(altText, group.organization.name);
   });
 
   describe('selected state', () => {
@@ -109,12 +128,11 @@ describe('GroupListItem', () => {
     ].forEach(({ description, focusedGroupId, expectedIsSelected }) => {
       it(description, () => {
         fakeStore.focusedGroupId.returns(focusedGroupId);
-        const fakeGroup = { id: 'groupid' };
 
         const wrapper = createGroupListItem(fakeGroup);
 
         assert.equal(
-          wrapper.find('.group-list-item__item').hasClass('is-selected'),
+          wrapper.find('MenuItem').prop('isSelected'),
           expectedIsSelected
         );
       });

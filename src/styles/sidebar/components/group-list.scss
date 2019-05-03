@@ -48,33 +48,6 @@ $group-list-spacing-below: 50px;
     }
   }
 
-  .group-item-community-groups {
-    border: solid 1px transparent;
-    display: flex;
-    flex-direction: row;
-    flex-grow: 1;
-    margin: 1px;
-
-    padding: 10px;
-    cursor: pointer;
-
-    &:focus {
-      outline: none;
-      @include focus-outline;
-    }
-
-    &:hover {
-      background: $gray-lightest;
-    }
-
-    &.is-selected {
-      .group-name-link {
-        font-size: $body2-font-size;
-        font-weight: 600;
-      }
-    }
-  }
-
   .group-icon-container {
     margin-right: 10px;
   }
@@ -96,27 +69,6 @@ $group-list-spacing-below: 50px;
   .group-details {
     flex-grow: 1;
     flex-shrink: 1;
-  }
-  .group-details-community-groups {
-    flex-grow: 1;
-    flex-shrink: 1;
-    font-weight: 500;
-
-    .group-details__unavailable-message,
-    .group-details__actions {
-      display: none;
-    }
-
-    &.expanded {
-      .group-details__toggle {
-        display: none;
-      }
-
-      .group-details__unavailable-message,
-      .group-details__actions {
-        display: block;
-      }
-    }
   }
 
   .new-group-btn {

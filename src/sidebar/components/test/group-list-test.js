@@ -51,7 +51,6 @@ describe('groupList', function() {
   let fakeServiceUrl;
   let fakeSettings;
   let fakeFeatures;
-  let fakeStore;
 
   before(function() {
     angular
@@ -65,12 +64,6 @@ describe('groupList', function() {
   beforeEach(function() {
     fakeFeatures = {
       flagEnabled: sinon.stub().returns(false),
-    };
-
-    fakeStore = {
-      getCurrentlyViewingGroups: sinon.stub().returns([]),
-      getFeaturedGroups: sinon.stub().returns([]),
-      getMyGroups: sinon.stub().returns([]),
     };
 
     fakeAnalytics = {
@@ -88,7 +81,6 @@ describe('groupList', function() {
       serviceUrl: fakeServiceUrl,
       settings: fakeSettings,
       features: fakeFeatures,
-      store: fakeStore,
     });
   });
 
@@ -372,70 +364,6 @@ describe('groupList', function() {
     );
   });
 
-  describe('group section visibility', () => {
-    [
-      {
-        description:
-          'shows Currently Viewing section when there are currently viewing groups',
-        currentlyViewingGroups: [publicGroup],
-        featuredGroups: [restrictedGroup],
-        myGroups: [],
-        expectedSections: ["'Currently Viewing'", "'Featured Groups'"],
-      },
-      {
-        description:
-          'shows Featured Groups section when there are featured groups',
-        currentlyViewingGroups: [],
-        featuredGroups: [restrictedGroup],
-        myGroups: [publicGroup],
-        expectedSections: ["'Featured Groups'", "'My Groups'"],
-      },
-      {
-        description: 'shows My Groups section when there are my groups',
-        currentlyViewingGroups: [],
-        featuredGroups: [],
-        myGroups: [publicGroup, privateGroup],
-        expectedSections: ["'My Groups'"],
-      },
-    ].forEach(
-      ({
-        description,
-        currentlyViewingGroups,
-        featuredGroups,
-        myGroups,
-        expectedSections,
-      }) => {
-        it(description, () => {
-          fakeFeatures.flagEnabled.withArgs('community_groups').returns(true);
-          // In order to show the group drop down there must be at least two groups.
-          groups = currentlyViewingGroups
-            .concat(featuredGroups)
-            .concat(myGroups);
-          fakeStore.getCurrentlyViewingGroups.returns(currentlyViewingGroups);
-          fakeStore.getFeaturedGroups.returns(featuredGroups);
-          fakeStore.getMyGroups.returns(myGroups);
-
-          const element = createGroupList();
-
-          const showGroupsMenu = element.ctrl.showGroupsMenu();
-          const dropdownToggle = element.find('.dropdown-toggle');
-          const arrowIcon = element.find('.h-icon-arrow-drop-down');
-          const groupListSection = element.find('group-list-section');
-
-          assert.isTrue(showGroupsMenu);
-          assert.lengthOf(dropdownToggle, 1);
-          assert.lengthOf(arrowIcon, 1);
-          assert.lengthOf(groupListSection, expectedSections.length);
-          groupListSection.each(function() {
-            assert.isTrue(
-              expectedSections.includes(this.getAttribute('heading'))
-            );
-          });
-        });
-      }
-    );
-  });
-
   describe('group menu visibility', () => {
     it('is hidden when third party service and only one group', function() {
       // Configure third party service.
@@ -505,42 +433,6 @@ describe('groupList', function() {
       assert.lengthOf(arrowIcon, 1);
       assert.lengthOf(dropdownMenu, 1);
       assert.lengthOf(dropdownOptions, 2);
-    });
-
-    it('is shown when community_groups feature flag is on and there are multiple groups', function() {
-      fakeFeatures.flagEnabled.withArgs('community_groups').returns(true);
-      groups = [publicGroup, restrictedGroup];
-      fakeStore.getMyGroups.returns(groups);
-
-      const element = createGroupList();
-
-      const showGroupsMenu = element.ctrl.showGroupsMenu();
-      const dropdownToggle = element.find('.dropdown-toggle');
-      const arrowIcon = element.find('.h-icon-arrow-drop-down');
-      const groupListSection = element.find('.group-list-section');
-
-      assert.isTrue(showGroupsMenu);
-      assert.lengthOf(dropdownToggle, 1);
-      assert.lengthOf(arrowIcon, 1);
-      assert.lengthOf(groupListSection, 1);
-    });
-
-    it('is not shown when community_groups feature flag is on and there is only one group', function() {
-      fakeFeatures.flagEnabled.withArgs('community_groups').returns(true);
-      groups = [publicGroup];
-      fakeStore.getMyGroups.returns(groups);
-
-      const element = createGroupList();
-
-      const showGroupsMenu = element.ctrl.showGroupsMenu();
-      const dropdownToggle = element.find('.dropdown-toggle');
-      const arrowIcon = element.find('.h-icon-arrow-drop-down');
-      const groupListSection = element.find('.group-list-section');
-
-      assert.isFalse(showGroupsMenu);
-      assert.lengthOf(dropdownToggle, 0);
-      assert.lengthOf(arrowIcon, 0);
-      assert.lengthOf(groupListSection, 0);
     });
   });
 

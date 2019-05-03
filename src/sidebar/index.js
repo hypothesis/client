@@ -160,8 +160,8 @@ function startAngularApp(config) {
     .component('excerpt', require('./components/excerpt'))
     .component('groupList', require('./components/group-list'))
     .component(
-      'groupListSection',
-      wrapReactComponent(require('./components/group-list-section'))
+      'groupListV2',
+      wrapReactComponent(require('./components/group-list-v2'))
     )
     .component('helpLink', require('./components/help-link'))
     .component('helpPanel', require('./components/help-panel'))

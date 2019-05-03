@@ -1,4 +1,9 @@
-<div class="pull-right" dropdown keyboard-nav>
+<div
+  class="pull-right"
+  dropdown
+  keyboard-nav
+  ng-if="!vm.isFeatureFlagEnabled('community_groups')"
+>
   <!-- Show a drop down menu if showGroupsMenu is true. -->
   <div
     class="dropdown-toggle"
@@ -132,56 +137,7 @@
       </div>
     </li>
   </ul>
-
-  <!-- Show new menu if community_groups feature flag is enabled. -->
-  <div
-    class="dropdown-menu"
-    role="menu"
-    ng-if="vm.showGroupsMenu() && vm.isFeatureFlagEnabled('community_groups')"
-  >
-    <!-- Currently Viewing -->
-    <group-list-section
-      class="group-list-section"
-      heading="'Currently Viewing'"
-      groups="vm.currentlyViewingGroupOrganizations()"
-      ng-if="vm.currentlyViewingGroupOrganizations().length > 0"
-    >
-    </group-list-section>
-
-    <!-- Featured Groups -->
-    <group-list-section
-      class="group-list-section"
-      heading="'Featured Groups'"
-      groups="vm.featuredGroupOrganizations()"
-      ng-if="vm.featuredGroupOrganizations().length > 0"
-    >
-    </group-list-section>
-
-    <!-- My Groups -->
-    <group-list-section
-      class="group-list-section"
-      heading="'My Groups'"
-      groups="vm.myGroupOrganizations()"
-      ng-if="vm.myGroupOrganizations().length > 0"
-    >
-    </group-list-section>
-
-    <ul class="dropdown-menu__section dropdown-menu__section--no-header">
-      <li
-        ng-if="vm.auth.status === 'logged-in' && !vm.isThirdPartyUser()"
-        class="dropdown-community-groups-menu__row dropdown-menu__row--unpadded new-group-btn"
-      >
-        <div
-          class="group-item-community-groups"
-          ng-click="vm.createNewGroup()"
-          tabindex="0"
-        >
-          <div class="group-icon-container"><i class="h-icon-add"></i></div>
-          <div class="group-details-community-groups">
-            New private group
-          </div>
-        </div>
-      </li>
-    </ul>
-  </div>
 </div>
+<group-list-v2
+  ng-if="vm.isFeatureFlagEnabled('community_groups')"
+></group-list-v2>
