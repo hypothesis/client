@@ -21,4 +21,20 @@ describe('SvgIcon', () => {
       render(<SvgIcon name="unknown" />, container);
     });
   });
+
+  it('sets the size of the SVG if provided', () => {
+    const container = document.createElement('div');
+    render(<SvgIcon name="refresh" size={16} />, container);
+    const svg = container.querySelector('svg');
+    assert.equal(svg.style.width, '16px');
+    assert.equal(svg.style.height, '16px');
+  });
+
+  it("uses the icon's default size if no size is provided", () => {
+    const container = document.createElement('div');
+    render(<SvgIcon name="refresh" />, container);
+    const svg = container.querySelector('svg');
+    assert.equal(svg.style.width, '');
+    assert.equal(svg.style.height, '');
+  });
 });
