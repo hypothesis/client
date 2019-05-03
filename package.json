@@ -100,6 +100,7 @@
     "retry": "^0.12.0",
     "scroll-into-view": "^1.8.2",
     "seamless-immutable": "^7.1.4",
+    "shallowequal": "^1.1.0",
     "showdown": "^1.6.4",
     "sinon": "^7.2.3",
     "stringify": "^5.1.0",
