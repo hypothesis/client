@@ -216,14 +216,22 @@ function AnnotationController(
     }
   }
 
-  // this.authorize = function(action) {
-  this.authorize = function() {
-    return true;
-    // return permissions.permits(
-    //   self.annotation.permissions,
-    //   action,
-    //   session.state.userid
-    // );
+  this.authorize = function(action) {
+    if (action === 'reply') {
+        return !!session.state.privileges.length;
+    }
+    const belongsToUser = permissions.permits(
+      self.annotation.permissions,
+      action,
+      session.state.userid
+    );
+    if (belongsToUser) {
+        return true;
+    }
+    if (action === 'delete' && session.state.privileges.indexOf('ar_plan') >= 0) {
+        return true;
+    }
+    return false;
   };
 
   // /**

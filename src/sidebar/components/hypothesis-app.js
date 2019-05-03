@@ -24,6 +24,7 @@ function authStateFromProfile(profile) {
       status: 'logged-in',
       displayName,
       userid: profile.userid,
+      privileges: profile.privileges,
       username: parsed.username,
       provider: parsed.provider,
     };
@@ -52,7 +53,8 @@ function HypothesisAppController(
   serviceUrl,
   session,
   settings,
-  streamer
+  streamer,
+  localStorage
 ) {
   const self = this;
 
@@ -72,6 +74,14 @@ function HypothesisAppController(
   if (this.isSidebar) {
     frameSync.connect();
   }
+
+  this.isStartupPageDismissed = function() {
+    const closed = localStorage.getItem('SIDEBAR_STARTUP_PAGE_DISMISSED') === 'true';
+    if (closed) {
+        return true;
+    }
+    return false;
+  };
 
   this.sortKey = function() {
     return store.getState().sortKey;

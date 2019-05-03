@@ -4,9 +4,10 @@ const sessionUtil = require('../util/session-util');
 const isThirdPartyService = require('../util/is-third-party-service');
 
 // @ngInject
-function SidebarTutorialController(session, settings) {
+function SidebarTutorialController(session, settings, i18nService, $sce) {
   // Compute once since this doesn't change after the app starts.
   const isThirdPartyService_ = isThirdPartyService(settings);
+  this.caption = $sce.trustAsHtml(i18nService.tl('sidePanel.startup.page'));
 
   this.isThemeClean = settings.theme === 'clean';
 
