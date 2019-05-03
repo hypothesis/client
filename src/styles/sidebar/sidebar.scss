@@ -1,10 +1,19 @@
 $base-font-size: 12px;
 $base-line-height: 20px;
 
+// Variables and mixins
+// --------------------
 @import '../variables';
-@import '../reset';
+@import '../mixins/focus';
+@import '../mixins/responsive';
 
+// Base styles
+// -----------
+@import '../reset';
 @import './elements';
+
+// Misc. legacy :(
+// ---------------
 @import './common';
 
 // Components
