@@ -96,7 +96,7 @@ function session(
   }
 
   /**
-  * Store the preference server-side that the user dismissed the sidebar
+   * Store the preference server-side that the user dismissed the sidebar
    * help page and then update the local profile data.
    */
   function dismissSidebarHelp() {
