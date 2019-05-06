@@ -76,11 +76,11 @@ function HypothesisAppController(
   }
 
   this.isStartupPageDismissed = function() {
-    const closed = localStorage.getItem('SIDEBAR_STARTUP_PAGE_DISMISSED') === 'true';
-    if (closed) {
-        return true;
-    }
-    return false;
+    return localStorage.getItem('SIDEBAR_STARTUP_PAGE_DISMISSED') === 'true';
+  };
+
+  this.isHelpPageDismissed = function() {
+      return localStorage.getItem('SIDEBAR_HELP_PAGE_DISMISSED') === 'true';
   };
 
   this.sortKey = function() {
