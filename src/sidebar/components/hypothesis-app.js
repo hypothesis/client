@@ -76,19 +76,23 @@ function HypothesisAppController(
   }
 
   this.isStartupPageDismissed = function() {
-    const isStudent = session.state.privileges && !!session.state.privileges.length;
-    if (isStudent) {
-        return true;
+    if (session.state.privileges) {
+        const isStudent = session.state.privileges && !session.state.privileges.length;
+        if (!isStudent) {
+            return localStorage.getItem('SIDEBAR_STARTUP_PAGE_DISMISSED') === 'true';
+        }
     }
-    return localStorage.getItem('SIDEBAR_STARTUP_PAGE_DISMISSED') === 'true';
+    return true;
   };
 
   this.isHelpPageDismissed = function() {
-      const isStudent = session.state.privileges && !!session.state.privileges.length;
-      if (isStudent) {
-          return true;
+      if (session.state.privileges) {
+          const isStudent = session.state.privileges && !session.state.privileges.length;
+          if (!isStudent) {
+              return localStorage.getItem('SIDEBAR_HELP_PAGE_DISMISSED') === 'true';
+          }
       }
-      return localStorage.getItem('SIDEBAR_HELP_PAGE_DISMISSED') === 'true';
+      return true;
   };
 
   this.sortKey = function() {
