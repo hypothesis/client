@@ -76,10 +76,18 @@ function HypothesisAppController(
   }
 
   this.isStartupPageDismissed = function() {
+    const isStudent = session.state.privileges && !!session.state.privileges.length;
+    if (isStudent) {
+        return true;
+    }
     return localStorage.getItem('SIDEBAR_STARTUP_PAGE_DISMISSED') === 'true';
   };
 
   this.isHelpPageDismissed = function() {
+      const isStudent = session.state.privileges && !!session.state.privileges.length;
+      if (isStudent) {
+          return true;
+      }
       return localStorage.getItem('SIDEBAR_HELP_PAGE_DISMISSED') === 'true';
   };
 
