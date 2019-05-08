@@ -213,9 +213,11 @@ function groups(
         }
         return Promise.all(groupApiRequests).then(
           ([myGroups, featuredGroups, token, selectedGroup]) => [
+            // Don't add the selectedGroup if it's already in the featuredGroups.
             combineGroups(
               myGroups,
-              selectedGroup !== undefined
+              selectedGroup !== undefined &&
+                !featuredGroups.some(g => g.id === selectedGroup.id)
                 ? featuredGroups.concat([selectedGroup])
                 : featuredGroups,
               documentUri

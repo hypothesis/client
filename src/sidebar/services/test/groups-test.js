@@ -230,6 +230,25 @@ describe('groups', function() {
       });
     });
 
+    // TODO: Add a de-dup test for the direct-linked annotation.
+
+    it('does not duplicate groups if the direct-linked group is also a featured group', () => {
+      const svc = service();
+
+      // Set the direct-linked group to dummyGroups[0].
+      fakeSettings.group = dummyGroups[0].id;
+      fakeApi.group.read.returns(Promise.resolve(dummyGroups[0]));
+
+      // Include the dummyGroups[0] in the featured groups.
+      fakeApi.profile.groups.read.returns(Promise.resolve([]));
+      fakeApi.groups.list.returns(Promise.resolve([dummyGroups[0]]));
+
+      return svc.load().then(groups => {
+        const groupIds = groups.map(g => g.id);
+        assert.deepEqual(groupIds, [fakeSettings.group]);
+      });
+    });
+
     it('combines groups from all 3 endpoints if there is a selectedGroup', () => {
       const svc = service();
 
