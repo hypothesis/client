@@ -25,7 +25,6 @@ describe('GroupListItem', () => {
 
     fakeGroupListItemCommon = {
       orgName: sinon.stub(),
-      trackViewGroupActivity: sinon.stub(),
     };
 
     GroupListItem.$imports.$mock({
