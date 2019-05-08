@@ -5,11 +5,11 @@ const escapeStringRegexp = require('escape-string-regexp');
 /**
  * Combine groups from multiple api calls together to form a unique list of groups.
  * Add an isMember property to each group indicating whether the logged in user is a member.
- * Add an isScopedToUri property to each group indicating whether the group can be annotated
- *   in based on group scoping and the uri of the current page.
+ * Add an isScopedToUri property to each group indicating whether the uri matches the group's
+ *   uri patterns. If no uri patterns are specified, defaults to True.
  *
  * @param {Group[]} userGroups - groups the user is a member of
- * @param {Group[]} featuredGroups - groups scoped to the particular uri, authority, and user
+ * @param {Group[]} featuredGroups - all other groups, may include some duplicates from the userGroups
  * @param {string} uri - uri of the current page
  */
 function combineGroups(userGroups, featuredGroups, uri) {
