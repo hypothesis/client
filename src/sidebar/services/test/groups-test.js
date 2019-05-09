@@ -117,7 +117,7 @@ describe('groups', function() {
         member: {
           delete: sinon.stub().returns(Promise.resolve()),
         },
-        read: sinon.stub().returns(Promise.resolve()),
+        read: sinon.stub().returns(Promise.resolve(new Error('404 Error'))),
       },
       groups: {
         list: sinon.stub().returns(dummyGroups),
@@ -198,14 +198,16 @@ describe('groups', function() {
       });
     });
 
-    it('catches 404 error from api.group.read request', () => {
+    it('catches error from api.group.read request', () => {
       const svc = service();
       fakeLocalStorage.getItem.returns(dummyGroups[0].id);
       fakeSettings.group = 'does-not-exist';
       fakeApi.group.read.returns(
         Promise.reject(
-          "404 Not Found: Either the resource you requested doesn't exist, \
+          new Error(
+            "404 Not Found: Either the resource you requested doesn't exist, \
           or you are not currently authorized to see it."
+          )
         )
       );
       return svc.load().then(() => {
@@ -327,6 +329,39 @@ describe('groups', function() {
       });
     });
 
+    it("sets the direct-linked annotation's group to take precedence over the group saved in local storage and the direct-linked group", () => {
+      const svc = service();
+      fakeSettings.annotations = 'ann-id';
+      fakeSettings.group = dummyGroups[1].id;
+      fakeLocalStorage.getItem.returns(dummyGroups[0].id);
+      fakeApi.groups.list.returns(Promise.resolve(dummyGroups));
+      fakeApi.annotation.get.returns(
+        Promise.resolve({
+          id: 'ann-id',
+          group: dummyGroups[2].id,
+        })
+      );
+      return svc.load().then(() => {
+        assert.calledWith(fakeStore.focusGroup, dummyGroups[2].id);
+      });
+    });
+
+    it("sets the focused group to the direct-linked annotation's group", () => {
+      const svc = service();
+      fakeSettings.annotations = 'ann-id';
+      fakeApi.groups.list.returns(Promise.resolve(dummyGroups));
+      fakeLocalStorage.getItem.returns(dummyGroups[0].id);
+      fakeApi.annotation.get.returns(
+        Promise.resolve({
+          id: 'ann-id',
+          group: dummyGroups[1].id,
+        })
+      );
+      return svc.load().then(() => {
+        assert.calledWith(fakeStore.focusGroup, dummyGroups[1].id);
+      });
+    });
+
     it('sets the direct-linked group to take precedence over the group saved in local storage', () => {
       const svc = service();
       fakeSettings.group = dummyGroups[1].id;
@@ -407,6 +442,96 @@ describe('groups', function() {
       return svc.load().then(groups => {
         assert.isObject(groups[0].organization);
         assert.hasAllKeys(groups[0].organization, ['id', 'logo']);
+      });
+    });
+
+    it('catches error when fetching the direct-linked annotation', () => {
+      const svc = service();
+
+      fakeSettings.annotations = 'ann-id';
+
+      fakeApi.profile.groups.read.returns(Promise.resolve([]));
+      fakeApi.groups.list.returns(
+        Promise.resolve([{ name: 'BioPub', id: 'biopub' }])
+      );
+      fakeApi.annotation.get.returns(
+        Promise.reject(
+          new Error(
+            "404 Not Found: Either the resource you requested doesn't exist, \
+          or you are not currently authorized to see it."
+          )
+        )
+      );
+
+      return svc.load().then(groups => {
+        const groupIds = groups.map(g => g.id);
+        assert.deepEqual(groupIds, ['biopub']);
+      });
+    });
+
+    it("catches error when fetching the direct-linked annotation's group", () => {
+      const svc = service();
+
+      fakeSettings.annotations = 'ann-id';
+
+      fakeApi.profile.groups.read.returns(Promise.resolve([]));
+      fakeApi.groups.list.returns(
+        Promise.resolve([
+          { name: 'BioPub', id: 'biopub' },
+          { name: 'Public', id: '__world__' },
+        ])
+      );
+      fakeApi.group.read.returns(
+        Promise.reject(
+          new Error(
+            "404 Not Found: Either the resource you requested doesn't exist, \
+          or you are not currently authorized to see it."
+          )
+        )
+      );
+      fakeApi.annotation.get.returns(
+        Promise.resolve({
+          id: 'ann-id',
+          group: 'out-of-scope',
+        })
+      );
+
+      // The user is logged out.
+      fakeAuth.tokenGetter.returns(null);
+
+      return svc.load().then(groups => {
+        const groupIds = groups.map(g => g.id);
+        assert.deepEqual(groupIds, ['biopub']);
+      });
+    });
+
+    it("includes the direct-linked annotation's group when it is not in the normal list of groups", () => {
+      const svc = service();
+
+      fakeSettings.annotations = 'ann-id';
+
+      fakeApi.profile.groups.read.returns(Promise.resolve([]));
+      fakeApi.groups.list.returns(
+        Promise.resolve([
+          { name: 'BioPub', id: 'biopub' },
+          { name: 'Public', id: '__world__' },
+        ])
+      );
+      fakeApi.group.read.returns(
+        Promise.resolve({ name: 'Restricted', id: 'out-of-scope' })
+      );
+      fakeApi.annotation.get.returns(
+        Promise.resolve({
+          id: 'ann-id',
+          group: 'out-of-scope',
+        })
+      );
+
+      return svc.load().then(groups => {
+        const directLinkedAnnGroupShown = groups.some(
+          g => g.id === 'out-of-scope'
+        );
+        assert.isTrue(directLinkedAnnGroupShown);
       });
     });
 

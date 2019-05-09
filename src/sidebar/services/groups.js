@@ -58,14 +58,14 @@ function groups(
    *
    * @param {Group[]} groups
    * @param {boolean} isLoggedIn
-   * @param {string|null} directLinkedAnnotationId
+   * @param {string|null} directLinkedAnnotationGroupId
    * @param {string|null} directLinkedGroupId
-   * @return {Promise<Group[]>}
+   * @return {Group[]}
    */
   function filterGroups(
     groups,
     isLoggedIn,
-    directLinkedAnnotationId,
+    directLinkedAnnotationGroupId,
     directLinkedGroupId
   ) {
     // Filter the directLinkedGroup out if it is out of scope and scope is enforced.
@@ -87,12 +87,12 @@ function groups(
       const focusedGroups = groups.filter(
         g => svc.groups.includes(g.id) || svc.groups.includes(g.groupid)
       );
-      return Promise.resolve(focusedGroups);
+      return focusedGroups;
     }
 
     // Logged-in users always see the "Public" group.
     if (isLoggedIn) {
-      return Promise.resolve(groups);
+      return groups;
     }
 
     // If the main document URL has no groups associated with it, always show
@@ -101,39 +101,20 @@ function groups(
       g => g.id !== '__world__' && g.isScopedToUri
     );
     if (!pageHasAssociatedGroups) {
-      return Promise.resolve(groups);
-    }
-
-    // Hide the "Public" group, unless the user specifically visited a direct-
-    // link to an annotation in that group.
-    const nonWorldGroups = groups.filter(g => g.id !== '__world__');
-
-    if (!directLinkedAnnotationId && !directLinkedGroupId) {
-      return Promise.resolve(nonWorldGroups);
-    }
-
-    // If directLinkedGroup is the "Public" group, always return groups.
-    if (directLinkedGroupId === '__world__') {
       return groups;
     }
 
-    // If the directLinkedAnnotationId's group is the "Public" group return groups,
-    // otherwise filter out the "Public" group.
+    // If directLinkedGroup or directLinkedAnnotationGroupId is the "Public" group,
+    // always return groups.
+    if (
+      directLinkedGroupId === '__world__' ||
+      directLinkedAnnotationGroupId === '__world__'
+    ) {
+      return groups;
+    }
 
-    // Force getAnnotation to enter the catch clause if there is no linked annotation.
-    const getAnnotation = directLinkedAnnotationId
-      ? api.annotation.get({ id: directLinkedAnnotationId })
-      : Promise.reject();
-
-    return getAnnotation
-      .then(ann => {
-        return ann.group === '__world__' ? groups : nonWorldGroups;
-      })
-      .catch(() => {
-        // Annotation does not exist or we do not have permission to read it.
-        // Assume it is not in "Public".
-        return nonWorldGroups;
-      });
+    // Return non-world groups.
+    return groups.filter(g => g.id !== '__world__');
   }
 
   /**
@@ -158,6 +139,19 @@ function groups(
   // sidebar app changes.
   let documentUri;
 
+  /*
+   * Fetch an individual group.
+   *
+   * @param {Object} requestParams
+   * @return {Promise<Group>|undefined}
+   */
+  function fetchGroup(requestParams) {
+    return api.group.read(requestParams).catch(() => {
+      // If the group does not exist or the user doesn't have permission.
+      return null;
+    });
+  }
+
   /**
    * Fetch the list of applicable groups from the API.
    *
@@ -171,7 +165,9 @@ function groups(
     if (isSidebar) {
       uri = getDocumentUriForGroupSearch();
     }
-    const directLinkedGroup = settings.group;
+    const directLinkedGroupId = settings.group;
+    const directLinkedAnnId = settings.annotations;
+    let directLinkedAnnotationGroupId = null;
     return uri
       .then(uri => {
         const params = {
@@ -195,45 +191,95 @@ function groups(
           auth.tokenGetter(),
         ];
 
-        // If there is a directLinkedGroup, add an api request to get that
-        // particular group as well since it may not be in the results returned
-        // by group.list or profile.groups.
-        if (directLinkedGroup) {
-          const selectedGroupApi = api.group
-            .read({
-              id: directLinkedGroup,
-              expand: params.expand,
-            })
+        // If there is a directLinkedAnnId, fetch the annotation to see if there needs
+        // to be a second api request to fetch its group since the group may not be in
+        // the results returned by group.list, profile.groups, or the direct-linked group.
+        let selectedAnnApi = Promise.resolve(null);
+        if (directLinkedAnnId) {
+          selectedAnnApi = api.annotation
+            .get({ id: directLinkedAnnId })
             .catch(() => {
-              // If the group does not exist or the user doesn't have permission,
-              // return undefined.
-              return undefined;
+              // If the annotation does not exist or the user doesn't have permission.
+              return null;
             });
-          groupApiRequests = groupApiRequests.concat(selectedGroupApi);
         }
+        groupApiRequests = groupApiRequests.concat(selectedAnnApi);
+
+        // If there is a directLinkedGroupId, add an api request to get that
+        // particular group since it may not be in the results returned by
+        // group.list or profile.groups.
+        let selectedGroupApi = Promise.resolve(null);
+        if (directLinkedGroupId) {
+          selectedGroupApi = fetchGroup({
+            id: directLinkedGroupId,
+            expand: params.expand,
+          });
+        }
+        groupApiRequests = groupApiRequests.concat(selectedGroupApi);
         return Promise.all(groupApiRequests).then(
-          ([myGroups, featuredGroups, token, selectedGroup]) => [
-            // Don't add the selectedGroup if it's already in the featuredGroups.
-            combineGroups(
-              myGroups,
-              selectedGroup !== undefined &&
-                !featuredGroups.some(g => g.id === selectedGroup.id)
+          ([myGroups, featuredGroups, token, selectedAnn, selectedGroup]) => {
+            // If there is a direct-linked group, add it to the featured groups list.
+            const allFeaturedGroups =
+              selectedGroup !== null &&
+              !featuredGroups.some(g => g.id === selectedGroup.id)
                 ? featuredGroups.concat([selectedGroup])
-                : featuredGroups,
-              documentUri
-            ),
-            token,
-          ]
+                : featuredGroups;
+
+            // If there's a selected annotation it may require an extra api call
+            // to fetch its group.
+            if (selectedAnn) {
+              // Set the directLinkedAnnotationGroupId to be used later in
+              // the filterGroups method.
+              directLinkedAnnotationGroupId = selectedAnn.group;
+
+              const selectedAnnGroup = myGroups
+                .concat(allFeaturedGroups)
+                .some(g => g.id === selectedAnn.group);
+
+              // If the direct-linked annotation's group has not already been fetched,
+              // fetch it.
+              if (!selectedAnnGroup) {
+                return fetchGroup({
+                  id: selectedAnn.group,
+                  expand: params.expand,
+                }).then(directLinkedAnnGroup => {
+                  // If the directLinkedAnnotation's group fetch failed, return
+                  // the list of groups without it.
+                  if (!directLinkedAnnGroup) {
+                    return [
+                      combineGroups(myGroups, allFeaturedGroups, documentUri),
+                      token,
+                    ];
+                  }
+
+                  // If the directLinkedAnnotation's group fetch was successful,
+                  // combine it with the other groups.
+                  return [
+                    combineGroups(
+                      myGroups,
+                      allFeaturedGroups.concat(directLinkedAnnGroup),
+                      documentUri
+                    ),
+                    token,
+                  ];
+                });
+              }
+            }
+            // If there is no direct-linked annotation, return the list of groups without it.
+            return [
+              combineGroups(myGroups, allFeaturedGroups, documentUri),
+              token,
+            ];
+          }
         );
       })
       .then(([groups, token]) => {
         const isLoggedIn = token !== null;
-        const directLinkedAnnotation = settings.annotations;
         return filterGroups(
           groups,
           isLoggedIn,
-          directLinkedAnnotation,
-          directLinkedGroup
+          directLinkedAnnotationGroupId,
+          directLinkedGroupId
         );
       })
       .then(groups => {
@@ -243,8 +289,17 @@ function groups(
         const prevFocusedGroup = localStorage.getItem(STORAGE_KEY);
 
         store.loadGroups(groups);
-        if (isFirstLoad && groups.some(g => g.id === directLinkedGroup)) {
-          store.focusGroup(directLinkedGroup);
+
+        if (
+          isFirstLoad &&
+          groups.some(g => g.id === directLinkedAnnotationGroupId)
+        ) {
+          store.focusGroup(directLinkedAnnotationGroupId);
+        } else if (
+          isFirstLoad &&
+          groups.some(g => g.id === directLinkedGroupId)
+        ) {
+          store.focusGroup(directLinkedGroupId);
         } else if (isFirstLoad && groups.some(g => g.id === prevFocusedGroup)) {
           store.focusGroup(prevFocusedGroup);
         }
