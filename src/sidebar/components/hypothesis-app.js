@@ -25,6 +25,7 @@ function authStateFromProfile(profile) {
       displayName,
       userid: profile.userid,
       privileges: profile.privileges,
+      isStudent: profile.isStudent,
       username: parsed.username,
       provider: parsed.provider,
     };
@@ -75,24 +76,30 @@ function HypothesisAppController(
     frameSync.connect();
   }
 
+  this.isStudent = function() {
+    return session.state.isStudent;
+  };
+
+  this.getStorageSetting = function(key) {
+      return localStorage.getItem(key) === 'true';
+  };
+
   this.isStartupPageDismissed = function() {
     if (session.state.privileges) {
-        const isStudent = session.state.privileges && !session.state.privileges.length;
-        if (!isStudent) {
-            return localStorage.getItem('SIDEBAR_STARTUP_PAGE_DISMISSED') === 'true';
+        if (!this.isStudent()) {
+            return this.getStorageSetting('SIDEBAR_STARTUP_PAGE_DISMISSED');
         }
     }
     return true;
   };
 
   this.isHelpPageDismissed = function() {
-      if (session.state.privileges) {
-          const isStudent = session.state.privileges && !session.state.privileges.length;
-          if (!isStudent) {
-              return localStorage.getItem('SIDEBAR_HELP_PAGE_DISMISSED') === 'true';
-          }
+    if (session.state.privileges) {
+      if (!this.isStudent()) {
+        return this.getStorageSetting('SIDEBAR_HELP_PAGE_DISMISSED');
       }
-      return true;
+    }
+    return true;
   };
 
   this.sortKey = function() {
