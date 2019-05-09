@@ -140,7 +140,10 @@ function SidebarContentController(
 
       if (results.length) {
         annotationMapper.loadAnnotations(results);
-      }
+    } else {
+        const first = groups.all()[0];
+        groups.focus(first.id);
+    }
     });
     searchClient.on('end', function() {
       // Remove client from list of active search clients.
