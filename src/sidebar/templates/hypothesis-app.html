@@ -16,12 +16,12 @@
   </top-bar>
 
   <div class="content">
-    <sidebar-tutorial ng-if="vm.isSidebar && !vm.isStartupPageDismissed()"></sidebar-tutorial>
+    <sidebar-tutorial ng-if="vm.isSidebar && !vm.isStartupPageVisibleOrDismissed()"></sidebar-tutorial>
     <share-dialog
       ng-if="vm.shareDialog.visible"
       on-close="vm.shareDialog.visible = false">
     </share-dialog>
-    <help-panel ng-if="!vm.isHelpPageDismissed()"
+    <help-panel ng-if="!vm.isHelpPageVisibleOrDismissed()"
       auth="vm.auth">
     </help-panel>
     <main ng-view=""></main>

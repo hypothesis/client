@@ -84,7 +84,7 @@ function HypothesisAppController(
       return localStorage.getItem(key) === 'true';
   };
 
-  this.isStartupPageDismissed = function() {
+  this.isStartupPageVisibleOrDismissed = function() {
     if (session.state.privileges) {
         if (!this.isStudent()) {
             return this.getStorageSetting('SIDEBAR_STARTUP_PAGE_DISMISSED');
@@ -93,7 +93,7 @@ function HypothesisAppController(
     return true;
   };
 
-  this.isHelpPageDismissed = function() {
+  this.isHelpPageVisibleOrDismissed = function() {
     if (session.state.privileges) {
       if (!this.isStudent()) {
         return this.getStorageSetting('SIDEBAR_HELP_PAGE_DISMISSED');
