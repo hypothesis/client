@@ -77,7 +77,8 @@ function groups(
         directLinkedGroup.scopes.enforced
       ) {
         groups = groups.filter(g => g.id !== directLinkedGroupId);
-        directLinkedGroupId = undefined;
+        store.setDirectLinkedGroupFetchFailed();
+        directLinkedGroupId = null;
       }
     }
 
@@ -213,6 +214,14 @@ function groups(
           selectedGroupApi = fetchGroup({
             id: directLinkedGroupId,
             expand: params.expand,
+          }).then(group => {
+            // If the group does not exist or the user doesn't have permission.
+            if (group === null) {
+              store.setDirectLinkedGroupFetchFailed();
+            } else {
+              store.clearDirectLinkedGroupFetchFailed();
+            }
+            return group;
           });
         }
         groupApiRequests = groupApiRequests.concat(selectedGroupApi);
