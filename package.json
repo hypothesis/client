@@ -22,7 +22,6 @@
     "babel-plugin-istanbul": "^5.1.0",
     "babel-plugin-mockable-imports": "^1.1.0",
     "babel-plugin-transform-async-to-promises": "^0.8.6",
-    "babel-preset-env": "^1.7.0",
     "babelify": "^10.0.0",
     "browserify": "^16.2.3",
     "browserify-shim": "^3.8.12",
