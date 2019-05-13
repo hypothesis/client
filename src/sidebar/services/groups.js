@@ -255,34 +255,27 @@ function groups(
                   // If the directLinkedAnnotation's group fetch failed, return
                   // the list of groups without it.
                   if (!directLinkedAnnGroup) {
-                    return [
-                      combineGroups(myGroups, allFeaturedGroups, documentUri),
-                      token,
-                    ];
+                    return [myGroups, allFeaturedGroups, documentUri, token];
                   }
 
                   // If the directLinkedAnnotation's group fetch was successful,
                   // combine it with the other groups.
                   return [
-                    combineGroups(
-                      myGroups,
-                      allFeaturedGroups.concat(directLinkedAnnGroup),
-                      documentUri
-                    ),
+                    myGroups,
+                    allFeaturedGroups.concat(directLinkedAnnGroup),
+                    documentUri,
                     token,
                   ];
                 });
               }
             }
             // If there is no direct-linked annotation, return the list of groups without it.
-            return [
-              combineGroups(myGroups, allFeaturedGroups, documentUri),
-              token,
-            ];
+            return [myGroups, allFeaturedGroups, documentUri, token];
           }
         );
       })
-      .then(([groups, token]) => {
+      .then(([myGroups, featuredGroups, documentUri, token]) => {
+        const groups = combineGroups(myGroups, featuredGroups, documentUri);
         const isLoggedIn = token !== null;
         return filterGroups(
           groups,
