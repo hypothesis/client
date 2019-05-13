@@ -5,13 +5,13 @@ const util = require('../util');
 function init(settings) {
   return {
     /**
-     * The id of the direct-linked group.
+     * The ID of the direct-linked group.
      * @type {string}
      */
     directLinkedGroupId: settings.group || null,
 
     /**
-     * The id of the direct-linked annotation's group.
+     * The ID of the direct-linked annotation.
      * @type {string}
      */
     directLinkedAnnotationId: settings.annotations || null,
