@@ -383,7 +383,7 @@ describe('sidebar.components.hypothesis-app', function() {
     it('clears groups', () => {
       const ctrl = createController();
 
-      ctrl.login().then(() => {
+      return ctrl.login().then(() => {
         assert.called(fakeStore.clearGroups);
       });
     });
