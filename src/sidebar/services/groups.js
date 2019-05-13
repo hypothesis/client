@@ -270,16 +270,14 @@ function groups(
         return Promise.all([myGroups, allFeaturedGroups, documentUri, token]);
       })
       .then(([myGroups, featuredGroups, documentUri, token]) => {
-        const groups = combineGroups(myGroups, featuredGroups, documentUri);
         const isLoggedIn = token !== null;
-        return filterGroups(
-          groups,
+        const groups = filterGroups(
+          combineGroups(myGroups, featuredGroups, documentUri),
           isLoggedIn,
           directLinkedAnnotationGroupId,
           directLinkedGroupId
         );
-      })
-      .then(groups => {
+
         injectOrganizations(groups);
 
         const isFirstLoad = store.allGroups().length === 0;
