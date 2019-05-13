@@ -11,18 +11,22 @@ describe('sidebar/store/modules/direct-linked', () => {
     store = createStore([directLinked], [fakeSettings]);
   });
 
-  it('sets directLinkedGroupFetchFailed to true', () => {
-    store.setDirectLinkedGroupFetchFailed();
+  describe('setDirectLinkedGroupFetchFailed', () => {
+    it('sets directLinkedGroupFetchFailed to true', () => {
+      store.setDirectLinkedGroupFetchFailed();
 
-    assert.isTrue(store.getState().directLinkedGroupFetchFailed);
+      assert.isTrue(store.getState().directLinkedGroupFetchFailed);
+    });
   });
 
-  it('sets directLinkedGroupFetchFailed to false', () => {
-    store.setDirectLinkedGroupFetchFailed();
+  describe('clearDirectLinkedGroupFetchFailed', () => {
+    it('sets directLinkedGroupFetchFailed to false', () => {
+      store.setDirectLinkedGroupFetchFailed();
 
-    store.clearDirectLinkedGroupFetchFailed();
+      store.clearDirectLinkedGroupFetchFailed();
 
-    assert.isFalse(store.getState().directLinkedGroupFetchFailed);
+      assert.isFalse(store.getState().directLinkedGroupFetchFailed);
+    });
   });
 
   it('sets directLinkedAnnotationId to settings.annotations during store init', () => {
@@ -33,10 +37,12 @@ describe('sidebar/store/modules/direct-linked', () => {
     assert.equal(store.getState().directLinkedAnnotationId, 'ann-id');
   });
 
-  it('sets directLinkedAnnotationId to the specified annotation id', () => {
-    store.setDirectLinkedAnnotationId('ann-id');
+  describe('setDirectLinkedAnnotationId', () => {
+    it('sets directLinkedAnnotationId to the specified annotation id', () => {
+      store.setDirectLinkedAnnotationId('ann-id');
 
-    assert.equal(store.getState().directLinkedAnnotationId, 'ann-id');
+      assert.equal(store.getState().directLinkedAnnotationId, 'ann-id');
+    });
   });
 
   it('sets directLinkedGroupId to settings.group during store init', () => {
@@ -47,19 +53,23 @@ describe('sidebar/store/modules/direct-linked', () => {
     assert.equal(store.getState().directLinkedGroupId, 'group-id');
   });
 
-  it('sets directLinkedGroupId to the specified group id', () => {
-    store.setDirectLinkedGroupId('group-id');
+  describe('setDirectLinkedGroupId', () => {
+    it('sets directLinkedGroupId to the specified group id', () => {
+      store.setDirectLinkedGroupId('group-id');
 
-    assert.equal(store.getState().directLinkedGroupId, 'group-id');
+      assert.equal(store.getState().directLinkedGroupId, 'group-id');
+    });
   });
 
-  it('sets direct-link annotations and group ids to null', () => {
-    store.setDirectLinkedGroupId('ann-id');
-    store.setDirectLinkedGroupId('group-id');
+  describe('clearDirectLinkedIds', () => {
+    it('sets direct-link annotations and group ids to null', () => {
+      store.setDirectLinkedGroupId('ann-id');
+      store.setDirectLinkedGroupId('group-id');
 
-    store.clearDirectLinkedIds();
+      store.clearDirectLinkedIds();
 
-    assert.equal(store.getState().directLinkedAnnotationId, null);
-    assert.equal(store.getState().directLinkedGroupId, null);
+      assert.equal(store.getState().directLinkedAnnotationId, null);
+      assert.equal(store.getState().directLinkedGroupId, null);
+    });
   });
 });
