@@ -167,7 +167,7 @@ function groups(
       uri = getDocumentUriForGroupSearch();
     }
     const directLinkedGroupId = store.getState().directLinkedGroupId;
-    const directLinkedAnnId = store.getState().directLinkedAnnotationsId;
+    const directLinkedAnnId = store.getState().directLinkedAnnotationId;
     let directLinkedAnnotationGroupId = null;
     return uri
       .then(uri => {

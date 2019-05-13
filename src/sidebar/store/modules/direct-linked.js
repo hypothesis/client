@@ -14,7 +14,7 @@ function init(settings) {
      * The id of the direct-linked annotation's group.
      * @type {string}
      */
-    directLinkedAnnotationsId: settings.annotations || null,
+    directLinkedAnnotationId: settings.annotations || null,
 
     /**
      * Indicates that an error occured in retrieving/showing the direct linked group.
@@ -39,14 +39,14 @@ const update = {
       directLinkedGroupId: action.directLinkedGroupId,
     };
   },
-  UPDATE_DIRECT_LINKED_ANNOTATIONS_ID(state, action) {
+  UPDATE_DIRECT_LINKED_ANNOTATION_ID(state, action) {
     return {
-      directLinkedAnnotationsId: action.directLinkedAnnotationsId,
+      directLinkedAnnotationId: action.directLinkedAnnotationId,
     };
   },
   CLEAR_DIRECT_LINKED_IDS() {
     return {
-      directLinkedAnnotationsId: null,
+      directLinkedAnnotationId: null,
       directLinkedGroupId: null,
     };
   },
@@ -67,10 +67,10 @@ function setDirectLinkedGroupId(groupId) {
 /**
  * Set the direct linked annotation's id.
  */
-function setDirectLinkedAnnotationsId(annId) {
+function setDirectLinkedAnnotationId(annId) {
   return {
-    type: actions.UPDATE_DIRECT_LINKED_ANNOTATIONS_ID,
-    directLinkedAnnotationsId: annId,
+    type: actions.UPDATE_DIRECT_LINKED_ANNOTATION_ID,
+    directLinkedAnnotationId: annId,
   };
 }
 
@@ -109,7 +109,7 @@ module.exports = {
   actions: {
     setDirectLinkedGroupFetchFailed,
     setDirectLinkedGroupId,
-    setDirectLinkedAnnotationsId,
+    setDirectLinkedAnnotationId,
     clearDirectLinkedGroupFetchFailed,
     clearDirectLinkedIds,
   },

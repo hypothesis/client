@@ -65,7 +65,7 @@ describe('groups', function() {
         focusedGroup: null,
         groups: [],
         directLinkedGroupId: null,
-        directLinkedAnnotationsId: null,
+        directLinkedAnnotationId: null,
       },
       {
         focusGroup: sinon.stub(),
@@ -342,7 +342,7 @@ describe('groups', function() {
     it("sets the direct-linked annotation's group to take precedence over the group saved in local storage and the direct-linked group", () => {
       const svc = service();
       fakeStore.setState({
-        directLinkedAnnotationsId: 'ann-id',
+        directLinkedAnnotationId: 'ann-id',
         directLinkedGroupId: dummyGroups[1].id,
       });
       fakeLocalStorage.getItem.returns(dummyGroups[0].id);
@@ -360,7 +360,7 @@ describe('groups', function() {
 
     it("sets the focused group to the direct-linked annotation's group", () => {
       const svc = service();
-      fakeStore.setState({ directLinkedAnnotationsId: 'ann-id' });
+      fakeStore.setState({ directLinkedAnnotationId: 'ann-id' });
       fakeApi.groups.list.returns(Promise.resolve(dummyGroups));
       fakeLocalStorage.getItem.returns(dummyGroups[0].id);
       fakeApi.annotation.get.returns(
@@ -470,7 +470,7 @@ describe('groups', function() {
     it('catches error when fetching the direct-linked annotation', () => {
       const svc = service();
 
-      fakeStore.setState({ directLinkedAnnotationsId: 'ann-id' });
+      fakeStore.setState({ directLinkedAnnotationId: 'ann-id' });
 
       fakeApi.profile.groups.read.returns(Promise.resolve([]));
       fakeApi.groups.list.returns(
@@ -494,7 +494,7 @@ describe('groups', function() {
     it("catches error when fetching the direct-linked annotation's group", () => {
       const svc = service();
 
-      fakeStore.setState({ directLinkedAnnotationsId: 'ann-id' });
+      fakeStore.setState({ directLinkedAnnotationId: 'ann-id' });
 
       fakeApi.profile.groups.read.returns(Promise.resolve([]));
       fakeApi.groups.list.returns(
@@ -530,7 +530,7 @@ describe('groups', function() {
     it("includes the direct-linked annotation's group when it is not in the normal list of groups", () => {
       const svc = service();
 
-      fakeStore.setState({ directLinkedAnnotationsId: 'ann-id' });
+      fakeStore.setState({ directLinkedAnnotationId: 'ann-id' });
 
       fakeApi.profile.groups.read.returns(Promise.resolve([]));
       fakeApi.groups.list.returns(
@@ -564,7 +564,7 @@ describe('groups', function() {
 
       fakeStore.setState({
         directLinkedGroupId: 'out-of-scope',
-        directLinkedAnnotationsId: 'ann-id',
+        directLinkedAnnotationId: 'ann-id',
       });
 
       fakeApi.profile.groups.read.returns(Promise.resolve([]));
@@ -603,7 +603,7 @@ describe('groups', function() {
 
       fakeStore.setState({
         directLinkedGroupId: '__world__',
-        directLinkedAnnotationsId: null,
+        directLinkedAnnotationId: null,
       });
 
       fakeApi.profile.groups.read.returns(Promise.resolve([]));
@@ -643,7 +643,7 @@ describe('groups', function() {
               })
             );
             fakeStore.setState({
-              directLinkedAnnotationsId: 'direct-linked-ann',
+              directLinkedAnnotationId: 'direct-linked-ann',
             });
           }
 

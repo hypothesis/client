@@ -25,18 +25,18 @@ describe('sidebar/store/modules/direct-linked', () => {
     assert.isFalse(store.getState().directLinkedGroupFetchFailed);
   });
 
-  it('sets directLinkedAnnotationsId to settings.annotations during store init', () => {
+  it('sets directLinkedAnnotationId to settings.annotations during store init', () => {
     fakeSettings.annotations = 'ann-id';
 
     store = createStore([directLinked], [fakeSettings]);
 
-    assert.equal(store.getState().directLinkedAnnotationsId, 'ann-id');
+    assert.equal(store.getState().directLinkedAnnotationId, 'ann-id');
   });
 
-  it('sets directLinkedAnnotationsId to the specified annotation id', () => {
-    store.setDirectLinkedAnnotationsId('ann-id');
+  it('sets directLinkedAnnotationId to the specified annotation id', () => {
+    store.setDirectLinkedAnnotationId('ann-id');
 
-    assert.equal(store.getState().directLinkedAnnotationsId, 'ann-id');
+    assert.equal(store.getState().directLinkedAnnotationId, 'ann-id');
   });
 
   it('sets directLinkedGroupId to settings.group during store init', () => {
@@ -59,7 +59,7 @@ describe('sidebar/store/modules/direct-linked', () => {
 
     store.clearDirectLinkedIds();
 
-    assert.equal(store.getState().directLinkedAnnotationsId, null);
+    assert.equal(store.getState().directLinkedAnnotationId, null);
     assert.equal(store.getState().directLinkedGroupId, null);
   });
 });

@@ -329,7 +329,7 @@ function SidebarContentController(
 
     // If user has not landed on a direct linked annotation
     // don't show the CTA.
-    if (!store.getState().directLinkedAnnotationsId) {
+    if (!store.getState().directLinkedAnnotationId) {
       return false;
     }
 

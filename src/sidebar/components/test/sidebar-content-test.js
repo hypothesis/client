@@ -220,10 +220,10 @@ describe('sidebar.components.sidebar-content', function() {
       assert.isFalse(store.getState().directLinkedGroupFetchFailed);
     });
 
-    it("clears the direct linked id's from the settings", () => {
+    it('clears the direct linked IDs in the store', () => {
       ctrl.clearSelection();
 
-      assert.equal(store.getState().directLinkedAnnotationsId, null);
+      assert.equal(store.getState().directLinkedAnnotationId, null);
       assert.equal(store.getState().directLinkedGroupId, null);
     });
   });
@@ -595,7 +595,7 @@ describe('sidebar.components.sidebar-content', function() {
     }
 
     beforeEach(function() {
-      store.setDirectLinkedAnnotationsId('test');
+      store.setDirectLinkedAnnotationId('test');
     });
 
     it('displays a message if the selection is unavailable', function() {
@@ -677,7 +677,7 @@ describe('sidebar.components.sidebar-content', function() {
       ctrl.auth = {
         status: 'logged-out',
       };
-      store.setDirectLinkedAnnotationsId(null);
+      store.setDirectLinkedAnnotationId(null);
       store.addAnnotations([{ id: '123' }]);
       store.selectAnnotations(['123']);
       $scope.$digest();
