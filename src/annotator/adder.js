@@ -4,6 +4,8 @@ const classnames = require('classnames');
 
 const template = require('./adder.html');
 
+const i18nService = require('../sidebar/services/i18nService')();
+
 const ANNOTATE_BTN_SELECTOR = '.js-annotate-btn';
 const HIGHLIGHT_BTN_SELECTOR = '.js-highlight-btn';
 
@@ -118,6 +120,13 @@ function createAdderDOM(container) {
   return element;
 }
 
+function loadCaptions(element) {
+    const captionElems = element.querySelectorAll('.caption');
+    Array.from(captionElems).forEach(function(elem) {
+      elem.textContent = i18nService.tl(elem.textContent);
+    });
+}
+
 /**
  * Annotation 'adder' toolbar which appears next to the selection
  * and provides controls for the user to create new annotations.
@@ -133,8 +142,12 @@ class Adder {
    *        event handlers.
    */
   constructor(container, options) {
+    i18nService.initI18n();
     this.element = createAdderDOM(container);
     this._container = container;
+
+    // Load captions using i18nService.
+    loadCaptions(this.element);
 
     // Set initial style
     Object.assign(container.style, {
