@@ -10,6 +10,8 @@ const { withServices } = require('../util/service-context');
 function GroupListItem({ analytics, group, store }) {
   const focusGroup = () => {
     analytics.track(analytics.events.GROUP_SWITCH);
+    store.clearDirectLinkedGroupFetchFailed();
+    store.clearDirectLinkedIds();
     store.focusGroup(group.id);
   };
 

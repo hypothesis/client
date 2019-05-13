@@ -16,6 +16,8 @@ describe('GroupListItem', () => {
     fakeStore = {
       focusGroup: sinon.stub(),
       focusedGroupId: sinon.stub().returns('groupid'),
+      clearDirectLinkedIds: sinon.stub(),
+      clearDirectLinkedGroupFetchFailed: sinon.stub(),
     };
 
     fakeAnalytics = {
@@ -54,6 +56,24 @@ describe('GroupListItem', () => {
 
     assert.calledWith(fakeStore.focusGroup, fakeGroup.id);
     assert.calledWith(fakeAnalytics.track, fakeAnalytics.events.GROUP_SWITCH);
+  });
+
+  it('clears the direct linked ids from the store when the group is clicked', () => {
+    const fakeGroup = { id: 'groupid' };
+
+    const wrapper = createGroupListItem(fakeGroup);
+    wrapper.find('.group-list-item__item').simulate('click');
+
+    assert.calledOnce(fakeStore.clearDirectLinkedIds);
+  });
+
+  it('clears the direct-linked group fetch failed from the store when the group is clicked', () => {
+    const fakeGroup = { id: 'groupid' };
+
+    const wrapper = createGroupListItem(fakeGroup);
+    wrapper.find('.group-list-item__item').simulate('click');
+
+    assert.calledOnce(fakeStore.clearDirectLinkedGroupFetchFailed);
   });
 
   it('sets alt text for organization logo', () => {
