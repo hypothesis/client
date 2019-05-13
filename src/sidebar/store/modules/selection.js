@@ -88,6 +88,8 @@ function init(settings) {
 
     selectedTab: TAB_DEFAULT,
 
+    defaultGroupIsFocussed: false,
+
     // Key by which annotations are currently sorted.
     sortKey: TAB_SORTKEY_DEFAULT[TAB_DEFAULT],
     // Keys by which annotations can be sorted.
@@ -160,6 +162,12 @@ const update = {
       forceVisible: {},
       expanded: {},
     };
+  },
+
+  SET_DEFAULT_GROUP_FOCUS: function() {
+      return {
+        defaultGroupIsFocussed: true,
+      };
   },
 
   SET_SORT_KEY: function(state, action) {
@@ -281,6 +289,13 @@ function setSortKey(key) {
   };
 }
 
+/** Sets true the value of defaultGroupIsFocussed to set as ready. */
+function setFocusDefaultGroup() {
+  return {
+    type: actions.SET_DEFAULT_GROUP_FOCUS,
+  };
+}
+
 /**
  * Returns true if the annotation with the given `id` is selected.
  */
@@ -330,6 +345,7 @@ module.exports = {
     setForceVisible: setForceVisible,
     setSortKey: setSortKey,
     toggleSelectedAnnotations: toggleSelectedAnnotations,
+    setFocusDefaultGroup: setFocusDefaultGroup,
   },
 
   selectors: {
