@@ -6,12 +6,26 @@ function init(settings) {
   return {
     /**
      * The ID of the direct-linked group.
+     *
+     * This ID is initialized from the client's configuration to indicate that
+     * the client should focus on a particular group initially. The user may
+     * need to login for this step to complete. When the user navigates away
+     * from the group or clears the selection, the direct link is "consumed"
+     * and no longer used.
+     *
      * @type {string}
      */
     directLinkedGroupId: settings.group || null,
 
     /**
      * The ID of the direct-linked annotation.
+     *
+     * This ID is initialized from the client's configuration to indicate that
+     * the client should focus on a particular annotation. The user may need to
+     * login to see the annotation. When the user clears the selection or
+     * switches to a different group manually, the direct link is "consumed"
+     * and no longer used.
+     *
      * @type {string}
      */
     directLinkedAnnotationId: settings.annotations || null,
@@ -95,7 +109,10 @@ function clearDirectLinkedGroupFetchFailed() {
 }
 
 /**
- * Clear the direct linked annotations and group id's.
+ * Clear the direct linked annotations and group IDs.
+ *
+ * This action indicates that the direct link has been "consumed" and should
+ * not affect future group/annotation etc. fetches.
  */
 function clearDirectLinkedIds() {
   return {

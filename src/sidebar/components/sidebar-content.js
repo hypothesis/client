@@ -252,8 +252,9 @@ function SidebarContentController(
   $scope.$watch(
     () => [groups.focused(), store.profile().userid, ...store.searchUris()],
     ([currentGroup], [prevGroup]) => {
-      // If the currentGroup is null, clear the selected annotations and return immediatly.
       if (!currentGroup) {
+        // When switching accounts, groups are cleared and so the focused group
+        // will be null for a brief period of time.
         store.clearSelectedAnnotations();
         return;
       }
