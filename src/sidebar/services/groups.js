@@ -168,12 +168,13 @@ function groups(
     }
     const directLinkedGroupId = store.getState().directLinkedGroupId;
     const directLinkedAnnId = store.getState().directLinkedAnnotationId;
+    const params = {
+      expand: ['organization', 'scopes'],
+    };
+
     let directLinkedAnnotationGroupId = null;
     return uri
       .then(uri => {
-        const params = {
-          expand: ['organization', 'scopes'],
-        };
         if (authority) {
           params.authority = authority;
         }
@@ -225,54 +226,53 @@ function groups(
           });
         }
         groupApiRequests = groupApiRequests.concat(selectedGroupApi);
-        return Promise.all(groupApiRequests).then(
-          ([myGroups, featuredGroups, token, selectedAnn, selectedGroup]) => {
-            // If there is a direct-linked group, add it to the featured groups list.
-            const allFeaturedGroups =
-              selectedGroup !== null &&
-              !featuredGroups.some(g => g.id === selectedGroup.id)
-                ? featuredGroups.concat([selectedGroup])
-                : featuredGroups;
+        return Promise.all(groupApiRequests);
+      })
+      .then(([myGroups, featuredGroups, token, selectedAnn, selectedGroup]) => {
+        // If there is a direct-linked group, add it to the featured groups list.
+        const allFeaturedGroups =
+          selectedGroup !== null &&
+          !featuredGroups.some(g => g.id === selectedGroup.id)
+            ? featuredGroups.concat([selectedGroup])
+            : featuredGroups;
 
-            // If there's a selected annotation it may require an extra api call
-            // to fetch its group.
-            if (selectedAnn) {
-              // Set the directLinkedAnnotationGroupId to be used later in
-              // the filterGroups method.
-              directLinkedAnnotationGroupId = selectedAnn.group;
+        // If there's a selected annotation it may require an extra api call
+        // to fetch its group.
+        if (selectedAnn) {
+          // Set the directLinkedAnnotationGroupId to be used later in
+          // the filterGroups method.
+          directLinkedAnnotationGroupId = selectedAnn.group;
 
-              const selectedAnnGroup = myGroups
-                .concat(allFeaturedGroups)
-                .some(g => g.id === selectedAnn.group);
+          const selectedAnnGroup = myGroups
+            .concat(allFeaturedGroups)
+            .some(g => g.id === selectedAnn.group);
 
-              // If the direct-linked annotation's group has not already been fetched,
-              // fetch it.
-              if (!selectedAnnGroup) {
-                return fetchGroup({
-                  id: selectedAnn.group,
-                  expand: params.expand,
-                }).then(directLinkedAnnGroup => {
-                  // If the directLinkedAnnotation's group fetch failed, return
-                  // the list of groups without it.
-                  if (!directLinkedAnnGroup) {
-                    return [myGroups, allFeaturedGroups, documentUri, token];
-                  }
-
-                  // If the directLinkedAnnotation's group fetch was successful,
-                  // combine it with the other groups.
-                  return [
-                    myGroups,
-                    allFeaturedGroups.concat(directLinkedAnnGroup),
-                    documentUri,
-                    token,
-                  ];
-                });
+          // If the direct-linked annotation's group has not already been fetched,
+          // fetch it.
+          if (!selectedAnnGroup) {
+            return fetchGroup({
+              id: selectedAnn.group,
+              expand: params.expand,
+            }).then(directLinkedAnnGroup => {
+              // If the directLinkedAnnotation's group fetch failed, return
+              // the list of groups without it.
+              if (!directLinkedAnnGroup) {
+                return [myGroups, allFeaturedGroups, documentUri, token];
               }
-            }
-            // If there is no direct-linked annotation, return the list of groups without it.
-            return [myGroups, allFeaturedGroups, documentUri, token];
+
+              // If the directLinkedAnnotation's group fetch was successful,
+              // combine it with the other groups.
+              return [
+                myGroups,
+                allFeaturedGroups.concat(directLinkedAnnGroup),
+                documentUri,
+                token,
+              ];
+            });
           }
-        );
+        }
+        // If there is no direct-linked annotation, return the list of groups without it.
+        return [myGroups, allFeaturedGroups, documentUri, token];
       })
       .then(([myGroups, featuredGroups, documentUri, token]) => {
         const groups = combineGroups(myGroups, featuredGroups, documentUri);
