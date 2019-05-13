@@ -154,10 +154,12 @@ function groups(
   }
 
   /**
-   * Fetch the list of applicable groups from the API.
+   * Fetch groups from the API, load them into the store and set the focused
+   * group.
    *
-   * The list of applicable groups depends on the current userid and the URI of
-   * the attached frames.
+   * The groups that are fetched depend on the current user, the URI of
+   * the current document, and whether any direct-links were followed (either
+   * to an annotation or group).
    *
    * @return {Promise<Group[]>}
    */
@@ -173,8 +175,14 @@ function groups(
     };
 
     let directLinkedAnnotationGroupId = null;
+
+    // Step 1: Get the URI of the active document, so we can fetch groups
+    // associated with that document.
     return uri
       .then(uri => {
+        // Step 2: Concurrently fetch the groups the user is a member of,
+        // the groups associated with the current document and the annotation
+        // or group that was direct-linked (if any).
         if (authority) {
           params.authority = authority;
         }
@@ -229,6 +237,10 @@ function groups(
         return Promise.all(groupApiRequests);
       })
       .then(([myGroups, featuredGroups, token, selectedAnn, selectedGroup]) => {
+        // Step 3. Add the direct-linked group to the list of featured groups,
+        // and if there was a direct-linked annotation, fetch its group if we
+        // don't already have it.
+
         // If there is a direct-linked group, add it to the featured groups list.
         let allFeaturedGroups =
           selectedGroup !== null &&
@@ -270,6 +282,8 @@ function groups(
         return Promise.all([myGroups, allFeaturedGroups, documentUri, token]);
       })
       .then(([myGroups, featuredGroups, documentUri, token]) => {
+        // Step 4. Combine all the groups into a single list and set additional
+        // metadata on them that will be used elsewhere in the app.
         const isLoggedIn = token !== null;
         const groups = filterGroups(
           combineGroups(myGroups, featuredGroups, documentUri),
@@ -280,6 +294,8 @@ function groups(
 
         injectOrganizations(groups);
 
+        // Step 5. Load the groups into the store and focus the appropriate
+        // group.
         const isFirstLoad = store.allGroups().length === 0;
         const prevFocusedGroup = localStorage.getItem(STORAGE_KEY);
 
