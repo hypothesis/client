@@ -26,8 +26,8 @@ function SidebarContentError({
               href=""
               onClick={onLoginRequest}
             >
-              log in{' '}
-            </a>
+              log in
+            </a>{' '}
             to see it.
           </Fragment>
         ) : (
