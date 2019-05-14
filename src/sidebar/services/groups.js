@@ -222,7 +222,7 @@ function groups(
       });
     }
 
-    let [
+    const [
       myGroups,
       featuredGroups,
       token,
@@ -241,11 +241,12 @@ function groups(
     // don't already have it.
 
     // If there is a direct-linked group, add it to the featured groups list.
-    featuredGroups =
+    if (
       directLinkedGroup &&
       !featuredGroups.some(g => g.id === directLinkedGroup.id)
-        ? featuredGroups.concat([directLinkedGroup])
-        : featuredGroups;
+    ) {
+      featuredGroups.push(directLinkedGroup);
+    }
 
     // If there's a direct-linked annotation it may require an extra API call
     // to fetch its group.
