@@ -233,91 +233,79 @@ function groups(
       });
     }
     groupApiRequests = groupApiRequests.concat(directLinkedGroupApi);
-    return Promise.all(groupApiRequests)
-      .then(
-        ([
-          myGroups,
-          featuredGroups,
-          token,
-          directLinkedAnn,
-          directLinkedGroup,
-        ]) => {
-          // Step 3. Add the direct-linked group to the list of featured groups,
-          // and if there was a direct-linked annotation, fetch its group if we
-          // don't already have it.
+    let [
+      myGroups,
+      featuredGroups,
+      token,
+      directLinkedAnn,
+      directLinkedGroup,
+    ] = await Promise.all(groupApiRequests);
 
-          // If there is a direct-linked group, add it to the featured groups list.
-          let allFeaturedGroups =
-            directLinkedGroup !== null &&
-            !featuredGroups.some(g => g.id === directLinkedGroup.id)
-              ? featuredGroups.concat([directLinkedGroup])
-              : featuredGroups;
+    // Step 3. Add the direct-linked group to the list of featured groups,
+    // and if there was a direct-linked annotation, fetch its group if we
+    // don't already have it.
 
-          // If there's a direct-linked annotation it may require an extra API call
-          // to fetch its group.
-          if (directLinkedAnn) {
-            // Set the directLinkedAnnotationGroupId to be used later in
-            // the filterGroups method.
-            directLinkedAnnotationGroupId = directLinkedAnn.group;
+    // If there is a direct-linked group, add it to the featured groups list.
+    featuredGroups =
+      directLinkedGroup !== null &&
+      !featuredGroups.some(g => g.id === directLinkedGroup.id)
+        ? featuredGroups.concat([directLinkedGroup])
+        : featuredGroups;
 
-            const directLinkedAnnGroup = myGroups
-              .concat(allFeaturedGroups)
-              .some(g => g.id === directLinkedAnn.group);
+    // If there's a direct-linked annotation it may require an extra API call
+    // to fetch its group.
+    if (directLinkedAnn) {
+      // Set the directLinkedAnnotationGroupId to be used later in
+      // the filterGroups method.
+      directLinkedAnnotationGroupId = directLinkedAnn.group;
 
-            // If the direct-linked annotation's group has not already been fetched,
-            // fetch it.
-            if (!directLinkedAnnGroup) {
-              const initialFeaturedGroups = allFeaturedGroups;
-              allFeaturedGroups = fetchGroup({
-                id: directLinkedAnn.group,
-                expand: params.expand,
-              }).then(directLinkedAnnGroup => {
-                if (!directLinkedAnnGroup) {
-                  return initialFeaturedGroups;
-                }
-                return initialFeaturedGroups.concat(directLinkedAnnGroup);
-              });
-            }
-          }
-          return Promise.all([myGroups, allFeaturedGroups, documentUri, token]);
+      const directLinkedAnnGroup = myGroups
+        .concat(featuredGroups)
+        .find(g => g.id === directLinkedAnn.group);
+
+      // If the direct-linked annotation's group has not already been fetched,
+      // fetch it.
+      if (!directLinkedAnnGroup) {
+        const directLinkedAnnGroup = await fetchGroup({
+          id: directLinkedAnn.group,
+          expand: params.expand,
+        });
+        if (directLinkedAnnGroup) {
+          featuredGroups.push(directLinkedAnnGroup);
         }
-      )
-      .then(([myGroups, featuredGroups, documentUri, token]) => {
-        // Step 4. Combine all the groups into a single list and set additional
-        // metadata on them that will be used elsewhere in the app.
-        const isLoggedIn = token !== null;
-        const groups = filterGroups(
-          combineGroups(myGroups, featuredGroups, documentUri),
-          isLoggedIn,
-          directLinkedAnnotationGroupId,
-          directLinkedGroupId
-        );
+      }
+    }
+    // Step 4. Combine all the groups into a single list and set additional
+    // metadata on them that will be used elsewhere in the app.
+    const isLoggedIn = token !== null;
+    const groups = filterGroups(
+      combineGroups(myGroups, featuredGroups, documentUri),
+      isLoggedIn,
+      directLinkedAnnotationGroupId,
+      directLinkedGroupId
+    );
 
-        injectOrganizations(groups);
+    injectOrganizations(groups);
 
-        // Step 5. Load the groups into the store and focus the appropriate
-        // group.
-        const isFirstLoad = store.allGroups().length === 0;
-        const prevFocusedGroup = localStorage.getItem(STORAGE_KEY);
+    // Step 5. Load the groups into the store and focus the appropriate
+    // group.
+    const isFirstLoad = store.allGroups().length === 0;
+    const prevFocusedGroup = localStorage.getItem(STORAGE_KEY);
 
-        store.loadGroups(groups);
+    store.loadGroups(groups);
 
-        if (
-          isFirstLoad &&
-          groups.some(g => g.id === directLinkedAnnotationGroupId)
-        ) {
-          store.focusGroup(directLinkedAnnotationGroupId);
-        } else if (
-          isFirstLoad &&
-          groups.some(g => g.id === directLinkedGroupId)
-        ) {
-          store.focusGroup(directLinkedGroupId);
-        } else if (isFirstLoad && groups.some(g => g.id === prevFocusedGroup)) {
-          store.focusGroup(prevFocusedGroup);
-        }
+    if (
+      isFirstLoad &&
+      groups.some(g => g.id === directLinkedAnnotationGroupId)
+    ) {
+      store.focusGroup(directLinkedAnnotationGroupId);
+    } else if (isFirstLoad && groups.some(g => g.id === directLinkedGroupId)) {
+      store.focusGroup(directLinkedGroupId);
+    } else if (isFirstLoad && groups.some(g => g.id === prevFocusedGroup)) {
+      store.focusGroup(prevFocusedGroup);
+    }
 
-        return groups;
-      });
+    return groups;
   }
 
   const sortGroups = memoize(groups => {
