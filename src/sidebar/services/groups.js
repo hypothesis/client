@@ -154,10 +154,12 @@ function groups(
   }
 
   /**
-   * Fetch the list of applicable groups from the API.
+   * Fetch groups from the API, load them into the store and set the focused
+   * group.
    *
-   * The list of applicable groups depends on the current userid and the URI of
-   * the attached frames.
+   * The groups that are fetched depend on the current user, the URI of
+   * the current document, and whether any direct-links were followed (either
+   * to an annotation or group).
    *
    * @return {Promise<Group[]>}
    */
@@ -168,12 +170,19 @@ function groups(
     }
     const directLinkedGroupId = store.getState().directLinkedGroupId;
     const directLinkedAnnId = store.getState().directLinkedAnnotationId;
+    const params = {
+      expand: ['organization', 'scopes'],
+    };
+
     let directLinkedAnnotationGroupId = null;
+
+    // Step 1: Get the URI of the active document, so we can fetch groups
+    // associated with that document.
     return uri
       .then(uri => {
-        const params = {
-          expand: ['organization', 'scopes'],
-        };
+        // Step 2: Concurrently fetch the groups the user is a member of,
+        // the groups associated with the current document and the annotation
+        // or group that was direct-linked (if any).
         if (authority) {
           params.authority = authority;
         }
@@ -192,26 +201,27 @@ function groups(
           auth.tokenGetter(),
         ];
 
-        // If there is a directLinkedAnnId, fetch the annotation to see if there needs
-        // to be a second api request to fetch its group since the group may not be in
-        // the results returned by group.list, profile.groups, or the direct-linked group.
-        let selectedAnnApi = Promise.resolve(null);
+        // If there is a direct-linked annotation, fetch the annotation to see
+        // if there needs to be a second API request to fetch its group since
+        // the group may not be in the results returned by group.list,
+        // profile.groups, or the direct-linked group.
+        let directLinkedAnnApi = Promise.resolve(null);
         if (directLinkedAnnId) {
-          selectedAnnApi = api.annotation
+          directLinkedAnnApi = api.annotation
             .get({ id: directLinkedAnnId })
             .catch(() => {
               // If the annotation does not exist or the user doesn't have permission.
               return null;
             });
         }
-        groupApiRequests = groupApiRequests.concat(selectedAnnApi);
+        groupApiRequests = groupApiRequests.concat(directLinkedAnnApi);
 
-        // If there is a directLinkedGroupId, add an api request to get that
+        // If there is a direct-linked group, add an API request to get that
         // particular group since it may not be in the results returned by
         // group.list or profile.groups.
-        let selectedGroupApi = Promise.resolve(null);
+        let directLinkedGroupApi = Promise.resolve(null);
         if (directLinkedGroupId) {
-          selectedGroupApi = fetchGroup({
+          directLinkedGroupApi = fetchGroup({
             id: directLinkedGroupId,
             expand: params.expand,
           }).then(group => {
@@ -224,76 +234,72 @@ function groups(
             return group;
           });
         }
-        groupApiRequests = groupApiRequests.concat(selectedGroupApi);
-        return Promise.all(groupApiRequests).then(
-          ([myGroups, featuredGroups, token, selectedAnn, selectedGroup]) => {
-            // If there is a direct-linked group, add it to the featured groups list.
-            const allFeaturedGroups =
-              selectedGroup !== null &&
-              !featuredGroups.some(g => g.id === selectedGroup.id)
-                ? featuredGroups.concat([selectedGroup])
-                : featuredGroups;
-
-            // If there's a selected annotation it may require an extra api call
-            // to fetch its group.
-            if (selectedAnn) {
-              // Set the directLinkedAnnotationGroupId to be used later in
-              // the filterGroups method.
-              directLinkedAnnotationGroupId = selectedAnn.group;
-
-              const selectedAnnGroup = myGroups
-                .concat(allFeaturedGroups)
-                .some(g => g.id === selectedAnn.group);
-
-              // If the direct-linked annotation's group has not already been fetched,
-              // fetch it.
-              if (!selectedAnnGroup) {
-                return fetchGroup({
-                  id: selectedAnn.group,
-                  expand: params.expand,
-                }).then(directLinkedAnnGroup => {
-                  // If the directLinkedAnnotation's group fetch failed, return
-                  // the list of groups without it.
-                  if (!directLinkedAnnGroup) {
-                    return [
-                      combineGroups(myGroups, allFeaturedGroups, documentUri),
-                      token,
-                    ];
-                  }
-
-                  // If the directLinkedAnnotation's group fetch was successful,
-                  // combine it with the other groups.
-                  return [
-                    combineGroups(
-                      myGroups,
-                      allFeaturedGroups.concat(directLinkedAnnGroup),
-                      documentUri
-                    ),
-                    token,
-                  ];
-                });
-              }
-            }
-            // If there is no direct-linked annotation, return the list of groups without it.
-            return [
-              combineGroups(myGroups, allFeaturedGroups, documentUri),
-              token,
-            ];
-          }
-        );
+        groupApiRequests = groupApiRequests.concat(directLinkedGroupApi);
+        return Promise.all(groupApiRequests);
       })
-      .then(([groups, token]) => {
+      .then(
+        ([
+          myGroups,
+          featuredGroups,
+          token,
+          directLinkedAnn,
+          directLinkedGroup,
+        ]) => {
+          // Step 3. Add the direct-linked group to the list of featured groups,
+          // and if there was a direct-linked annotation, fetch its group if we
+          // don't already have it.
+
+          // If there is a direct-linked group, add it to the featured groups list.
+          let allFeaturedGroups =
+            directLinkedGroup !== null &&
+            !featuredGroups.some(g => g.id === directLinkedGroup.id)
+              ? featuredGroups.concat([directLinkedGroup])
+              : featuredGroups;
+
+          // If there's a direct-linked annotation it may require an extra API call
+          // to fetch its group.
+          if (directLinkedAnn) {
+            // Set the directLinkedAnnotationGroupId to be used later in
+            // the filterGroups method.
+            directLinkedAnnotationGroupId = directLinkedAnn.group;
+
+            const directLinkedAnnGroup = myGroups
+              .concat(allFeaturedGroups)
+              .some(g => g.id === directLinkedAnn.group);
+
+            // If the direct-linked annotation's group has not already been fetched,
+            // fetch it.
+            if (!directLinkedAnnGroup) {
+              const initialFeaturedGroups = allFeaturedGroups;
+              allFeaturedGroups = fetchGroup({
+                id: directLinkedAnn.group,
+                expand: params.expand,
+              }).then(directLinkedAnnGroup => {
+                if (!directLinkedAnnGroup) {
+                  return initialFeaturedGroups;
+                }
+                return initialFeaturedGroups.concat(directLinkedAnnGroup);
+              });
+            }
+          }
+          return Promise.all([myGroups, allFeaturedGroups, documentUri, token]);
+        }
+      )
+      .then(([myGroups, featuredGroups, documentUri, token]) => {
+        // Step 4. Combine all the groups into a single list and set additional
+        // metadata on them that will be used elsewhere in the app.
         const isLoggedIn = token !== null;
-        return filterGroups(
-          groups,
+        const groups = filterGroups(
+          combineGroups(myGroups, featuredGroups, documentUri),
           isLoggedIn,
           directLinkedAnnotationGroupId,
           directLinkedGroupId
         );
-      })
-      .then(groups => {
+
         injectOrganizations(groups);
 
+        // Step 5. Load the groups into the store and focus the appropriate
+        // group.
         const isFirstLoad = store.allGroups().length === 0;
         const prevFocusedGroup = localStorage.getItem(STORAGE_KEY);
 
