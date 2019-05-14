@@ -201,9 +201,10 @@ function groups(
           auth.tokenGetter(),
         ];
 
-        // If there is a directLinkedAnnId, fetch the annotation to see if there needs
-        // to be a second api request to fetch its group since the group may not be in
-        // the results returned by group.list, profile.groups, or the direct-linked group.
+        // If there is a direct-linked annotation, fetch the annotation to see
+        // if there needs to be a second API request to fetch its group since
+        // the group may not be in the results returned by group.list,
+        // profile.groups, or the direct-linked group.
         let directLinkedAnnApi = Promise.resolve(null);
         if (directLinkedAnnId) {
           directLinkedAnnApi = api.annotation
@@ -215,7 +216,7 @@ function groups(
         }
         groupApiRequests = groupApiRequests.concat(directLinkedAnnApi);
 
-        // If there is a directLinkedGroupId, add an api request to get that
+        // If there is a direct-linked group, add an API request to get that
         // particular group since it may not be in the results returned by
         // group.list or profile.groups.
         let directLinkedGroupApi = Promise.resolve(null);
@@ -255,7 +256,7 @@ function groups(
               ? featuredGroups.concat([directLinkedGroup])
               : featuredGroups;
 
-          // If there's a selected annotation it may require an extra api call
+          // If there's a direct-linked annotation it may require an extra API call
           // to fetch its group.
           if (directLinkedAnn) {
             // Set the directLinkedAnnotationGroupId to be used later in
@@ -274,14 +275,9 @@ function groups(
                 id: directLinkedAnn.group,
                 expand: params.expand,
               }).then(directLinkedAnnGroup => {
-                // If the directLinkedAnnotation's group fetch failed, return
-                // the list of groups without it.
                 if (!directLinkedAnnGroup) {
                   return initialFeaturedGroups;
                 }
-
-                // If the directLinkedAnnotation's group fetch was successful,
-                // combine it with the other groups.
                 return initialFeaturedGroups.concat(directLinkedAnnGroup);
               });
             }
