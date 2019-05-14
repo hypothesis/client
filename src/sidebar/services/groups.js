@@ -290,15 +290,14 @@ function groups(
 
     store.loadGroups(groups);
 
-    if (
-      isFirstLoad &&
-      groups.some(g => g.id === directLinkedAnnotationGroupId)
-    ) {
-      store.focusGroup(directLinkedAnnotationGroupId);
-    } else if (isFirstLoad && groups.some(g => g.id === directLinkedGroupId)) {
-      store.focusGroup(directLinkedGroupId);
-    } else if (isFirstLoad && groups.some(g => g.id === prevFocusedGroup)) {
-      store.focusGroup(prevFocusedGroup);
+    if (isFirstLoad) {
+      if (groups.some(g => g.id === directLinkedAnnotationGroupId)) {
+        store.focusGroup(directLinkedAnnotationGroupId);
+      } else if (groups.some(g => g.id === directLinkedGroupId)) {
+        store.focusGroup(directLinkedGroupId);
+      } else if (groups.some(g => g.id === prevFocusedGroup)) {
+        store.focusGroup(prevFocusedGroup);
+      }
     }
 
     return groups;
