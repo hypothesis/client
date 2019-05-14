@@ -164,7 +164,7 @@ const update = {
     };
   },
 
-  SET_DEFAULT_GROUP_FOCUS: function() {
+  SET_DEFAULT_GROUP_AS_FOCUSSED: function() {
       return {
         defaultGroupIsFocussed: true,
       };
@@ -290,9 +290,9 @@ function setSortKey(key) {
 }
 
 /** Sets true the value of defaultGroupIsFocussed to set as ready. */
-function setFocusDefaultGroup() {
+function setDefaultGroupAsFocussed() {
   return {
-    type: actions.SET_DEFAULT_GROUP_FOCUS,
+    type: actions.SET_DEFAULT_GROUP_AS_FOCUSSED,
   };
 }
 
@@ -345,7 +345,7 @@ module.exports = {
     setForceVisible: setForceVisible,
     setSortKey: setSortKey,
     toggleSelectedAnnotations: toggleSelectedAnnotations,
-    setFocusDefaultGroup: setFocusDefaultGroup,
+    setDefaultGroupAsFocussed: setDefaultGroupAsFocussed,
   },
 
   selectors: {

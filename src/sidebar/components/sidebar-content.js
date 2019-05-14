@@ -144,7 +144,7 @@ function SidebarContentController(
       if (!store.getState().defaultGroupIsFocussed && !results.length) {
           const first = groups.all()[0];
           groups.focus(first.id);
-          store.setFocusDefaultGroup();
+          store.setDefaultGroupAsFocussed();
       }
     });
     searchClient.on('end', function() {
