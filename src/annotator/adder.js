@@ -123,7 +123,7 @@ function createAdderDOM(container) {
 function loadCaptions(element) {
     const captionElems = element.querySelectorAll('.caption');
     Array.from(captionElems).forEach(function(elem) {
-      elem.textContent = i18nService.tl(elem.textContent);
+      elem.textContent = i18nService.tl(elem.dataset.translate);
     });
 }
 
@@ -177,6 +177,11 @@ class Adder {
 
       this.hide();
     };
+
+    window.parent.addEventListener('LANGUAGE_HAS_CHANGED', () => {
+        i18nService.changeLanguage(i18nService.getInitialLanguage());
+        loadCaptions(this.element);
+    });
 
     this.element
       .querySelector(ANNOTATE_BTN_SELECTOR)

@@ -117,6 +117,7 @@ function i18nService($rootScope, localStorage = window.localStorage) {
       getCurrentLanguageId: getCurrentLanguageId,
       getCurrentLanguageKey: getCurrentLanguageKey,
       changeLanguage: changeLanguage,
+      getInitialLanguage: getInitialLanguage,
   };
 }
 
