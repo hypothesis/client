@@ -178,7 +178,7 @@ class Adder {
       this.hide();
     };
 
-    window.parent.addEventListener('LANGUAGE_HAS_CHANGED', () => {
+    window.parent.addEventListener('language:changed', () => {
         i18nService.changeLanguage(i18nService.getInitialLanguage());
         loadCaptions(this.element);
     });
