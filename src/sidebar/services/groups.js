@@ -170,29 +170,26 @@ function groups(
     if (isSidebar) {
       uri = await getDocumentUriForGroupSearch();
     }
-    const directLinkedGroupId = store.getState().directLinkedGroupId;
-    const directLinkedAnnId = store.getState().directLinkedAnnotationId;
-    const params = {
-      expand: ['organization', 'scopes'],
-    };
-
-    let directLinkedAnnotationGroupId = null;
+    documentUri = uri;
 
     // Step 2: Concurrently fetch the groups the user is a member of,
     // the groups associated with the current document and the annotation
     // or group that was direct-linked (if any).
+    const params = {
+      expand: ['organization', 'scopes'],
+    };
     if (authority) {
       params.authority = authority;
     }
     if (uri) {
       params.document_uri = uri;
     }
-    documentUri = uri;
 
     // If there is a direct-linked annotation, fetch the annotation to see
     // if there needs to be a second API request to fetch its group since
     // the group may not be in the results returned by group.list,
     // profile.groups, or the direct-linked group.
+    const directLinkedAnnId = store.getState().directLinkedAnnotationId;
     let directLinkedAnnApi = null;
     if (directLinkedAnnId) {
       directLinkedAnnApi = api.annotation
@@ -206,6 +203,7 @@ function groups(
     // If there is a direct-linked group, add an API request to get that
     // particular group since it may not be in the results returned by
     // group.list or profile.groups.
+    const directLinkedGroupId = store.getState().directLinkedGroupId;
     let directLinkedGroupApi = null;
     if (directLinkedGroupId) {
       directLinkedGroupApi = fetchGroup({
@@ -250,6 +248,7 @@ function groups(
 
     // If there's a direct-linked annotation it may require an extra API call
     // to fetch its group.
+    let directLinkedAnnotationGroupId = null;
     if (directLinkedAnn) {
       // Set the directLinkedAnnotationGroupId to be used later in
       // the filterGroups method.
@@ -271,6 +270,7 @@ function groups(
         }
       }
     }
+
     // Step 4. Combine all the groups into a single list and set additional
     // metadata on them that will be used elsewhere in the app.
     const isLoggedIn = token !== null;
