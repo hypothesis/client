@@ -163,10 +163,12 @@ function groups(
    *
    * @return {Promise<Group[]>}
    */
-  function load() {
-    let uri = Promise.resolve(null);
+  async function load() {
+    // Step 1: Get the URI of the active document, so we can fetch groups
+    // associated with that document.
+    let uri = null;
     if (isSidebar) {
-      uri = getDocumentUriForGroupSearch();
+      uri = await getDocumentUriForGroupSearch();
     }
     const directLinkedGroupId = store.getState().directLinkedGroupId;
     const directLinkedAnnId = store.getState().directLinkedAnnotationId;
@@ -176,67 +178,62 @@ function groups(
 
     let directLinkedAnnotationGroupId = null;
 
-    // Step 1: Get the URI of the active document, so we can fetch groups
-    // associated with that document.
-    return uri
-      .then(uri => {
-        // Step 2: Concurrently fetch the groups the user is a member of,
-        // the groups associated with the current document and the annotation
-        // or group that was direct-linked (if any).
-        if (authority) {
-          params.authority = authority;
-        }
-        if (uri) {
-          params.document_uri = uri;
-        }
-        documentUri = uri;
+    // Step 2: Concurrently fetch the groups the user is a member of,
+    // the groups associated with the current document and the annotation
+    // or group that was direct-linked (if any).
+    if (authority) {
+      params.authority = authority;
+    }
+    if (uri) {
+      params.document_uri = uri;
+    }
+    documentUri = uri;
 
-        const profileGroupsApi = api.profile.groups.read({
-          expand: params.expand,
+    const profileGroupsApi = api.profile.groups.read({
+      expand: params.expand,
+    });
+    const listGroupsApi = api.groups.list(params);
+    let groupApiRequests = [
+      profileGroupsApi,
+      listGroupsApi,
+      auth.tokenGetter(),
+    ];
+
+    // If there is a direct-linked annotation, fetch the annotation to see
+    // if there needs to be a second API request to fetch its group since
+    // the group may not be in the results returned by group.list,
+    // profile.groups, or the direct-linked group.
+    let directLinkedAnnApi = Promise.resolve(null);
+    if (directLinkedAnnId) {
+      directLinkedAnnApi = api.annotation
+        .get({ id: directLinkedAnnId })
+        .catch(() => {
+          // If the annotation does not exist or the user doesn't have permission.
+          return null;
         });
-        const listGroupsApi = api.groups.list(params);
-        let groupApiRequests = [
-          profileGroupsApi,
-          listGroupsApi,
-          auth.tokenGetter(),
-        ];
+    }
+    groupApiRequests = groupApiRequests.concat(directLinkedAnnApi);
 
-        // If there is a direct-linked annotation, fetch the annotation to see
-        // if there needs to be a second API request to fetch its group since
-        // the group may not be in the results returned by group.list,
-        // profile.groups, or the direct-linked group.
-        let directLinkedAnnApi = Promise.resolve(null);
-        if (directLinkedAnnId) {
-          directLinkedAnnApi = api.annotation
-            .get({ id: directLinkedAnnId })
-            .catch(() => {
-              // If the annotation does not exist or the user doesn't have permission.
-              return null;
-            });
+    // If there is a direct-linked group, add an API request to get that
+    // particular group since it may not be in the results returned by
+    // group.list or profile.groups.
+    let directLinkedGroupApi = Promise.resolve(null);
+    if (directLinkedGroupId) {
+      directLinkedGroupApi = fetchGroup({
+        id: directLinkedGroupId,
+        expand: params.expand,
+      }).then(group => {
+        // If the group does not exist or the user doesn't have permission.
+        if (group === null) {
+          store.setDirectLinkedGroupFetchFailed();
+        } else {
+          store.clearDirectLinkedGroupFetchFailed();
         }
-        groupApiRequests = groupApiRequests.concat(directLinkedAnnApi);
-
-        // If there is a direct-linked group, add an API request to get that
-        // particular group since it may not be in the results returned by
-        // group.list or profile.groups.
-        let directLinkedGroupApi = Promise.resolve(null);
-        if (directLinkedGroupId) {
-          directLinkedGroupApi = fetchGroup({
-            id: directLinkedGroupId,
-            expand: params.expand,
-          }).then(group => {
-            // If the group does not exist or the user doesn't have permission.
-            if (group === null) {
-              store.setDirectLinkedGroupFetchFailed();
-            } else {
-              store.clearDirectLinkedGroupFetchFailed();
-            }
-            return group;
-          });
-        }
-        groupApiRequests = groupApiRequests.concat(directLinkedGroupApi);
-        return Promise.all(groupApiRequests);
-      })
+        return group;
+      });
+    }
+    groupApiRequests = groupApiRequests.concat(directLinkedGroupApi);
+    return Promise.all(groupApiRequests)
       .then(
         ([
           myGroups,
