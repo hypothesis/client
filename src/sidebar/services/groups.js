@@ -189,21 +189,11 @@ function groups(
     }
     documentUri = uri;
 
-    const profileGroupsApi = api.profile.groups.read({
-      expand: params.expand,
-    });
-    const listGroupsApi = api.groups.list(params);
-    let groupApiRequests = [
-      profileGroupsApi,
-      listGroupsApi,
-      auth.tokenGetter(),
-    ];
-
     // If there is a direct-linked annotation, fetch the annotation to see
     // if there needs to be a second API request to fetch its group since
     // the group may not be in the results returned by group.list,
     // profile.groups, or the direct-linked group.
-    let directLinkedAnnApi = Promise.resolve(null);
+    let directLinkedAnnApi = null;
     if (directLinkedAnnId) {
       directLinkedAnnApi = api.annotation
         .get({ id: directLinkedAnnId })
@@ -212,12 +202,11 @@ function groups(
           return null;
         });
     }
-    groupApiRequests = groupApiRequests.concat(directLinkedAnnApi);
 
     // If there is a direct-linked group, add an API request to get that
     // particular group since it may not be in the results returned by
     // group.list or profile.groups.
-    let directLinkedGroupApi = Promise.resolve(null);
+    let directLinkedGroupApi = null;
     if (directLinkedGroupId) {
       directLinkedGroupApi = fetchGroup({
         id: directLinkedGroupId,
@@ -232,14 +221,20 @@ function groups(
         return group;
       });
     }
-    groupApiRequests = groupApiRequests.concat(directLinkedGroupApi);
+
     let [
       myGroups,
       featuredGroups,
       token,
       directLinkedAnn,
       directLinkedGroup,
-    ] = await Promise.all(groupApiRequests);
+    ] = await Promise.all([
+      api.profile.groups.read({ expand: params.expand }),
+      api.groups.list(params),
+      auth.tokenGetter(),
+      directLinkedAnnApi,
+      directLinkedGroupApi,
+    ]);
 
     // Step 3. Add the direct-linked group to the list of featured groups,
     // and if there was a direct-linked annotation, fetch its group if we
@@ -247,7 +242,7 @@ function groups(
 
     // If there is a direct-linked group, add it to the featured groups list.
     featuredGroups =
-      directLinkedGroup !== null &&
+      directLinkedGroup &&
       !featuredGroups.some(g => g.id === directLinkedGroup.id)
         ? featuredGroups.concat([directLinkedGroup])
         : featuredGroups;
