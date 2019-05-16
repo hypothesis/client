@@ -23,6 +23,9 @@ let ignoreNextClick = false;
  *   <Menu label="Preferences">
  *     <MenuItem label="View" onClick={showViewSettings}/>
  *     <MenuItem label="Theme" onClick={showThemeSettings}/>
+ *     <MenuSection>
+ *       <MenuItem label="Log out"/>
+ *     </MenuSection>
  *   </Menu>
  */
 function Menu({
