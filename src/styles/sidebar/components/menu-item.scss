@@ -26,13 +26,6 @@ $menu-item-padding: 10px;
     }
   }
 
-  // Shaded item at the bottom of the menu.
-  // This is used to indicate an action which is different in functionality
-  // from a list of items above which do the same thing.
-  &--shaded {
-    background: $grey-1;
-  }
-
   &:hover {
     background: $grey-1;
   }

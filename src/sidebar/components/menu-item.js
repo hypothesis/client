@@ -31,24 +31,23 @@ function MenuItem({
   isDisabled,
   isExpanded,
   isSelected,
+  isSubmenuItem,
   isSubmenuVisible,
   label,
   onClick,
   onToggleSubmenu,
-  style,
 }) {
   const iconClass = 'menu-item__icon';
   const iconIsUrl = icon && icon.indexOf('/') !== -1;
   const labelClass = classnames('menu-item__label', {
-    'menu-item__label--submenu': style === 'submenu',
+    'menu-item__label--submenu': isSubmenuItem,
   });
 
   return (
     <div
       aria-checked={isSelected}
       className={classnames('menu-item', {
-        'menu-item--submenu': style === 'submenu',
-        'menu-item--shaded': style === 'shaded',
+        'menu-item--submenu': isSubmenuItem,
         'is-disabled': isDisabled,
         'is-expanded': isExpanded,
         'is-selected': isSelected,
@@ -133,6 +132,12 @@ MenuItem.propTypes = {
   isSelected: propTypes.bool,
 
   /**
+   * True if this item is part of a submenu, in which case it is rendered
+   * with a different style (shaded background)
+   */
+  isSubmenuItem: propTypes.bool,
+
+  /**
    * If present, display a button to toggle the sub-menu associated with this
    * item and indicate the current state; `true` if the submenu is visible.
    */
@@ -149,9 +154,6 @@ MenuItem.propTypes = {
    * state of the menu.
    */
   onToggleSubmenu: propTypes.func,
-
-  /** Style of menu item. */
-  style: propTypes.oneOf(['submenu', 'shaded']),
 };
 
 module.exports = MenuItem;
