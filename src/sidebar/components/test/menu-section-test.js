@@ -25,6 +25,6 @@ describe('MenuSection', () => {
 
   it('renders menu items', () => {
     const wrapper = createMenuSection();
-    assert.isTrue(wrapper.exists('.menu-item'));
+    assert.isTrue(wrapper.exists('li > .menu-item'));
   });
 });
