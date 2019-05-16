@@ -109,6 +109,8 @@ MenuItem.propTypes = {
    *
    * If the property is `null` a blank placeholder is displayed in place of an
    * icon. If the property is omitted, no placeholder is displayed.
+   * The placeholder is useful to keep menu item labels aligned in a list if
+   * some items have icons and others do not.
    */
   icon: propTypes.string,
 
