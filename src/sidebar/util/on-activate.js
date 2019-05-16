@@ -9,7 +9,7 @@
  *
  * @param {string} role - ARIA role for the item
  * @param {Function} handler - Event handler
- * @return {Object} Props to spread into a DOM element
+ * @return {Object} Props to spread into a React element
  */
 function onActivate(role, handler) {
   return {
