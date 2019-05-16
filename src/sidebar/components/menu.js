@@ -1,5 +1,6 @@
 'use strict';
 
+const classnames = require('classnames');
 const { Fragment, createElement } = require('preact');
 const { useCallback, useEffect, useRef, useState } = require('preact/hooks');
 const propTypes = require('prop-types');
@@ -8,6 +9,11 @@ const { listen } = require('../util/dom');
 
 const SvgIcon = require('./svg-icon');
 
+/**
+ * Flag indicating whether the next click event on the menu's toggle button
+ * should be ignored, because the action it would trigger has already been
+ * triggered by a preceding "mousedown" event.
+ */
 let ignoreNextClick = false;
 
 /**
@@ -56,22 +62,22 @@ function Menu({
   };
   const closeMenu = useCallback(() => setOpen(false), [setOpen]);
 
-  // Close menu when user clicks outside or presses Esc.
+  // Set up an effect which adds document-level event handlers when the menu
+  // is open and removes them when the menu is closed or removed.
+  //
+  // These handlers close the menu when the user taps or clicks outside the
+  // menu or presses Escape.
   const menuRef = useRef();
   useEffect(() => {
     if (!isOpen) {
       return () => {};
     }
 
-    const unlisten = listen(
+    const removeListeners = listen(
       document.body,
       ['keypress', 'click', 'mousedown'],
       event => {
         if (event.type === 'keypress' && event.key !== 'Escape') {
-          return;
-        }
-        if (event.type === 'click' && ignoreNextClick) {
-          ignoreNextClick = false;
           return;
         }
         if (
@@ -88,12 +94,8 @@ function Menu({
       }
     );
 
-    return unlisten;
+    return removeListeners;
   }, [closeMenu, isOpen]);
-
-  const menuStyle = {
-    [align]: 0,
-  };
 
   return (
     <div className="menu" ref={menuRef}>
@@ -115,7 +117,13 @@ function Menu({
       {isOpen && (
         <Fragment>
           <div className="menu__arrow" />
-          <div className="menu__content" role="menu" style={menuStyle}>
+          <div
+            className={classnames(
+              'menu__content',
+              `menu__content--align-${align}`
+            )}
+            role="menu"
+          >
             {children}
           </div>
         </Fragment>

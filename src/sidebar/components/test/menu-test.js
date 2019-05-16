@@ -78,15 +78,31 @@ describe('Menu', () => {
     new Event('click'),
     ((e = new Event('keypress')), (e.key = 'Escape'), e),
   ].forEach(event => {
-    it('closes when the user clicks or presses the mouse outside', () => {
-      const wrapper = createMenu();
+    it(`closes when the user clicks or presses the mouse outside (${
+      event.type
+    })`, () => {
+      const wrapper = createMenu({ defaultOpen: true });
 
       act(() => {
         document.body.dispatchEvent(event);
       });
+      wrapper.update();
 
       assert.isFalse(isOpen(wrapper));
     });
+  });
+
+  it('does not close when user presses non-Escape key outside', () => {
+    const wrapper = createMenu({ defaultOpen: true });
+
+    act(() => {
+      const event = new Event('keypress');
+      event.key = 'a';
+      document.body.dispatchEvent(event);
+    });
+    wrapper.update();
+
+    assert.isTrue(isOpen(wrapper));
   });
 
   it('does not close menu if user presses mouse on menu content', () => {
@@ -100,5 +116,16 @@ describe('Menu', () => {
       content = wrapper.find('.menu__content');
     });
     assert.isTrue(isOpen(wrapper));
+  });
+
+  it('aligns menu content depending on `align` prop', () => {
+    const wrapper = createMenu({ defaultOpen: true });
+    assert.isTrue(wrapper.exists('.menu__content--align-left'));
+
+    wrapper.setProps({ align: 'left' });
+    assert.isTrue(wrapper.exists('.menu__content--align-left'));
+
+    wrapper.setProps({ align: 'right' });
+    assert.isTrue(wrapper.exists('.menu__content--align-right'));
   });
 });
