@@ -4,11 +4,9 @@
 
 const path = require('path');
 
-const batch = require('gulp-batch');
 const changed = require('gulp-changed');
 const commander = require('commander');
 const debounce = require('lodash.debounce');
-const endOfStream = require('end-of-stream');
 const gulp = require('gulp');
 const gulpIf = require('gulp-if');
 const gulpUtil = require('gulp-util');
@@ -347,11 +345,7 @@ function generateManifest() {
 }
 
 gulp.task('watch-manifest', function () {
-  gulp.watch(MANIFEST_SOURCE_FILES, batch(function (events, done) {
-    endOfStream(generateManifest(), function () {
-      done();
-    });
-  }));
+  gulp.watch(MANIFEST_SOURCE_FILES, { delay: 500 }, generateManifest);
 });
 
 gulp.task('serve-package', function () {
