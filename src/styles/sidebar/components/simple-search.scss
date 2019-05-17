@@ -21,6 +21,8 @@
   $expanded-max-width: 150px;
 
   .simple-search-input {
+    @include outline-on-keyboard-focus;
+
     flex-grow: 1;
     order: 1;
 
@@ -28,7 +30,6 @@
 
     // disable the default browser styling for the input
     border: none;
-    outline: none;
     padding: 0px;
     width: 100%;
 

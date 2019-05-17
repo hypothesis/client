@@ -51,11 +51,12 @@
 
 // Removes the native styling from a <button> element
 @mixin reset-native-btn-styles {
+  @include outline-on-keyboard-focus;
+
   padding: 0px;
   margin: 0px;
   background-color: transparent;
   border-style: none;
-  outline: none;
 }
 
 .top-bar__btn {
