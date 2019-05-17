@@ -35,8 +35,8 @@
   border-top: 1px solid $grey-3;
   height: $size;
   position: absolute;
-  right: #{$size / 2};
-  top: calc(100% - #{$size / 2} + 1px);
+  right: 0;
+  top: 100%;
   transform: rotate(45deg);
   width: $size;
   z-index: 3;
@@ -48,7 +48,7 @@
   border: 1px solid $grey-3;
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
   position: absolute;
-  top: calc(100% + 2px);
+  top: calc(100% + 5px);
 
   &--align-left {
     left: 0;
