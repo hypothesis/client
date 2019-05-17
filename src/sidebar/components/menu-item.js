@@ -61,7 +61,7 @@ function MenuItem({
             (iconIsUrl ? (
               <img className={iconClass} alt={iconAlt} src={icon} />
             ) : (
-              <SvgIcon name={icon} size={10} />
+              <SvgIcon name={icon} className="menu-item__icon" />
             ))}
         </div>
       )}
@@ -86,7 +86,10 @@ function MenuItem({
           aria-label={`Show actions for ${label}`}
           {...onActivate('button', onToggleSubmenu)}
         >
-          <SvgIcon name={isSubmenuVisible ? 'collapse-menu' : 'expand-menu'} />
+          <SvgIcon
+            name={isSubmenuVisible ? 'collapse-menu' : 'expand-menu'}
+            className="menu-item__toggle-icon"
+          />
         </div>
       )}
     </div>

@@ -23,7 +23,7 @@ const icons = {
  * This matches the way we do icons on the website, see
  * https://github.com/hypothesis/h/pull/3675
  */
-function SvgIcon({ name, size }) {
+function SvgIcon({ name, className = '' }) {
   if (!icons[name]) {
     throw new Error(`Unknown icon ${name}`);
   }
@@ -32,11 +32,13 @@ function SvgIcon({ name, size }) {
   const element = useRef();
   useLayoutEffect(() => {
     const svg = element.current.querySelector('svg');
-    if (typeof size === 'number') {
-      svg.style.width = `${size}px`;
-      svg.style.height = `${size}px`;
-    }
-  }, [element, size]);
+    svg.setAttribute('class', className);
+  }, [
+    className,
+    // `markup` is a dependency of this effect because the SVG is replaced if
+    // it changes.
+    markup,
+  ]);
 
   return <span dangerouslySetInnerHTML={markup} ref={element} />;
 }
@@ -45,8 +47,8 @@ SvgIcon.propTypes = {
   /** The name of the icon to load. */
   name: propTypes.string,
 
-  /** The size of the icon in pixels. */
-  size: propTypes.number,
+  /** A CSS class to apply to the `<svg>` element. */
+  className: propTypes.string,
 };
 
 module.exports = SvgIcon;

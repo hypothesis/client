@@ -110,7 +110,7 @@ function Menu({
         {label}
         {menuIndicator && (
           <span className="menu__toggle-arrow">
-            <SvgIcon name="expand-menu" />
+            <SvgIcon name="expand-menu" className="menu__toggle-icon" />
           </span>
         )}
       </button>

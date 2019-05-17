@@ -12,6 +12,11 @@
   display: flex;
 }
 
+.menu__toggle-icon {
+  width: 10px;
+  height: 10px;
+}
+
 // Triangular indicator next to the toggle button indicating that there is
 // an associated drop-down menu.
 .menu__toggle-arrow {

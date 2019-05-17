@@ -111,10 +111,8 @@ $menu-item-padding: 10px;
     background-color: $grey-3;
   }
 
-  // The toggle icon is loaded from a string, so we can't apply a class to it
-  // directly.
-  svg {
-    width: 12px;
-    height: 12px;
+  &-icon {
+    width: 10px;
+    height: 10px;
   }
 }

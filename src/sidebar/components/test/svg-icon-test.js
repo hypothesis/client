@@ -22,19 +22,25 @@ describe('SvgIcon', () => {
     });
   });
 
-  it('sets the size of the SVG if provided', () => {
-    const container = document.createElement('div');
-    render(<SvgIcon name="refresh" size={16} />, container);
-    const svg = container.querySelector('svg');
-    assert.equal(svg.style.width, '16px');
-    assert.equal(svg.style.height, '16px');
-  });
-
-  it("uses the icon's default size if no size is provided", () => {
+  it('does not set the class of the SVG by default', () => {
     const container = document.createElement('div');
     render(<SvgIcon name="refresh" />, container);
     const svg = container.querySelector('svg');
-    assert.equal(svg.style.width, '');
-    assert.equal(svg.style.height, '');
+    assert.equal(svg.getAttribute('class'), '');
+  });
+
+  it('sets the class of the SVG if provided', () => {
+    const container = document.createElement('div');
+    render(<SvgIcon name="refresh" className="thing__icon" />, container);
+    const svg = container.querySelector('svg');
+    assert.equal(svg.getAttribute('class'), 'thing__icon');
+  });
+
+  it('retains the CSS class if the icon changes', () => {
+    const container = document.createElement('div');
+    render(<SvgIcon name="expand-menu" className="thing__icon" />, container);
+    render(<SvgIcon name="collapse-menu" className="thing__icon" />, container);
+    const svg = container.querySelector('svg');
+    assert.equal(svg.getAttribute('class'), 'thing__icon');
   });
 });
