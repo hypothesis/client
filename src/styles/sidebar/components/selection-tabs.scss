@@ -17,14 +17,13 @@
 }
 
 .selection-tabs__type {
+  @include outline-on-keyboard-focus;
+
   color: $grey-6;
   margin-right: 20px;
   cursor: pointer;
   min-width: 85px;
   min-height: 18px;
-
-  // Disable focus ring for selected tab
-  outline: none;
 
   user-select: none;
 }

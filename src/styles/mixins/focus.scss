@@ -1,0 +1,23 @@
+/**
+ * Display an outline on an element only when it has keyboard focus.
+ *
+ * This requires the browser to support the :focus-visible pseudo-selector [1]
+ * or for the JS polyfill [2] to be loaded.
+ *
+ * [1] https://developer.mozilla.org/en-US/docs/Web/CSS/:focus-visible
+ * [2] https://github.com/WICG/focus-visible
+ */
+@mixin outline-on-keyboard-focus {
+  // Selector for browsers using JS polyfill, which adds the "focus-visible"
+  // class to a keyboard-focused element.
+  &:focus:not(.focus-visible) {
+    outline: none;
+  }
+
+  // Selector for browsers with native :focus-visible support.
+  // (Do not combine with above, as an unsupported pseudo-class disables the
+  // entire selector)
+  &:focus:not(:focus-visible) {
+    outline: none;
+  }
+}

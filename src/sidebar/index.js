@@ -35,6 +35,9 @@ const angular = require('angular');
 // it must be require'd after angular is first require'd
 require('autofill-event');
 
+// Load polyfill for :focus-visible pseudo-class.
+require('focus-visible');
+
 // Enable debugging checks for Preact.
 require('preact/debug');
 
