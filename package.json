@@ -149,8 +149,8 @@
   "scripts": {
     "build": "cross-env NODE_ENV=production gulp build",
     "lint": "eslint .",
-    "checkformatting": "prettier --check 'src/**/*.js'",
-    "format": "prettier --list-different --write 'src/**/*.js'",
+    "checkformatting": "prettier --check '**/*.js'",
+    "format": "prettier --list-different --write '**/*.js'",
     "test": "gulp test",
     "report-coverage": "codecov -f coverage/coverage-final.json",
     "version": "make clean build/manifest.json",
