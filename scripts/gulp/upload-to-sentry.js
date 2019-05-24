@@ -17,11 +17,10 @@ const SENTRY_API_ROOT = 'https://app.getsentry.com/api/0';
  * }
  */
 
-
 /** Wrapper around request() that returns a Promise. */
 function httpRequest(opts) {
-  return new Promise(function (resolve, reject) {
-    request(opts, function (err, response, body) {
+  return new Promise(function(resolve, reject) {
+    request(opts, function(err, response, body) {
       if (err) {
         reject(err);
       } else {
@@ -34,11 +33,12 @@ function httpRequest(opts) {
   });
 }
 
-
 /** Create a release in Sentry. Returns a Promise. */
 function createRelease(opts, project, release) {
   return httpRequest({
-    uri: `${SENTRY_API_ROOT}/projects/${opts.organization}/${project}/releases/`,
+    uri: `${SENTRY_API_ROOT}/projects/${
+      opts.organization
+    }/${project}/releases/`,
     method: 'POST',
     auth: {
       user: opts.key,
@@ -48,23 +48,27 @@ function createRelease(opts, project, release) {
       version: release,
     },
     json: true,
-  }).then(function (result) {
-    const success = (result.response.statusCode === 201);
-    const alreadyCreated = (result.response.statusCode === 400 &&
-                          result.body.detail.match(/already exists/));
+  }).then(function(result) {
+    const success = result.response.statusCode === 201;
+    const alreadyCreated =
+      result.response.statusCode === 400 &&
+      result.body.detail.match(/already exists/);
 
     if (success || alreadyCreated) {
       return;
     }
-    throw new Error(`unable to create release '${release}' in project '${project}'`);
+    throw new Error(
+      `unable to create release '${release}' in project '${project}'`
+    );
   });
 }
-
 
 /** Upload a named file to a release in Sentry. Returns a Promise. */
 function uploadReleaseFile(opts, project, release, file) {
   return httpRequest({
-    uri: `${SENTRY_API_ROOT}/projects/${opts.organization}/${project}/releases/${release}/files/`,
+    uri: `${SENTRY_API_ROOT}/projects/${
+      opts.organization
+    }/${project}/releases/${release}/files/`,
     method: 'POST',
     auth: {
       user: opts.key,
@@ -74,14 +78,15 @@ function uploadReleaseFile(opts, project, release, file) {
       file: fs.createReadStream(file.path),
       name: path.basename(file.path),
     },
-  }).then(function (result) {
+  }).then(function(result) {
     if (result.response.statusCode === 201) {
       return;
     }
-    throw new Error(`Uploading file failed: ${result.response.statusCode}: ${result.body}`);
+    throw new Error(
+      `Uploading file failed: ${result.response.statusCode}: ${result.body}`
+    );
   });
 }
-
 
 /**
  * Upload a stream of Vinyl files as a Sentry release.
@@ -99,25 +104,25 @@ function uploadReleaseFile(opts, project, release, file) {
  */
 module.exports = function uploadToSentry(opts, projects, release) {
   // Create releases in every project
-  const releases = projects.map(function (project) {
+  const releases = projects.map(function(project) {
     gulpUtil.log(`Creating release '${release}' in project '${project}'`);
     return createRelease(opts, project, release);
   });
 
-  return through.obj(function (file, enc, callback) {
+  return through.obj(function(file, enc, callback) {
     Promise.all(releases)
-      .then(function () {
+      .then(function() {
         gulpUtil.log(`Uploading ${path.basename(file.path)}`);
-        const uploads = projects.map(function (project) {
+        const uploads = projects.map(function(project) {
           return uploadReleaseFile(opts, project, release, file);
         });
 
         return Promise.all(uploads);
       })
-      .then(function () {
+      .then(function() {
         callback();
       })
-      .catch(function (err) {
+      .catch(function(err) {
         gulpUtil.log('Sentry upload failed: ', err);
         callback(err);
       });

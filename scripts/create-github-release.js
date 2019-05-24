@@ -19,7 +19,9 @@ async function createGitHubRelease() {
   const GITHUB_ORG_REPO_PAT = /^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/;
 
   if (!pkg.repository || !pkg.repository.match(GITHUB_ORG_REPO_PAT)) {
-    throw new Error('package.json is missing a "repository" field of the form :owner/:repo');
+    throw new Error(
+      'package.json is missing a "repository" field of the form :owner/:repo'
+    );
   }
 
   if (!process.env.GITHUB_TOKEN) {

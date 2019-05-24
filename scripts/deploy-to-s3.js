@@ -49,9 +49,11 @@ class S3Uploader {
   async upload(destPath, srcFile, { cacheControl }) {
     if (!this.region) {
       // Find out where the S3 bucket is.
-      const regionResult = await this.s3.getBucketLocation({
-        Bucket: this.bucket,
-      }).promise();
+      const regionResult = await this.s3
+        .getBucketLocation({
+          Bucket: this.bucket,
+        })
+        .promise();
       this.region = regionResult.LocationConstraint;
       this.s3 = new AWS.S3({ region: this.region });
     }
@@ -101,20 +103,16 @@ async function uploadPackageToS3(bucket, options) {
 
   // Upload all package files to `$PACKAGE_NAME/$VERSION`.
   const uploads = files.map(file =>
-    uploader.upload(
-      `${packageName}/${version}/${file}`,
-      file,
-      { cacheControl: cacheForever },
-    )
+    uploader.upload(`${packageName}/${version}/${file}`, file, {
+      cacheControl: cacheForever,
+    })
   );
   await Promise.all(uploads);
 
   // Upload a copy of the entry-point to `$PACKAGE_NAME@$VERSION`.
-  await uploader.upload(
-    `${packageName}@${version}`,
-    entryPoint,
-    { cacheControl: cacheForever },
-  );
+  await uploader.upload(`${packageName}@${version}`, entryPoint, {
+    cacheControl: cacheForever,
+  });
 
   // Upload a copy of the entry-point to `$PACKAGE_NAME` or `$PACKAGE_NAME@$TAG`.
   // This enables creating URLs that always point to the current version of
@@ -151,8 +149,7 @@ const options = {
   cacheEntry: commander.cacheEntry,
 };
 
-uploadPackageToS3(commander.bucket, options)
-  .catch(err => {
-    console.error('Failed to upload S3 package', err);
-    process.exit(1);
-  });
+uploadPackageToS3(commander.bucket, options).catch(err => {
+  console.error('Failed to upload S3 package', err);
+  process.exit(1);
+});

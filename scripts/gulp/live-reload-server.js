@@ -42,7 +42,7 @@ function LiveReloadServer(port, config) {
 
   function listen() {
     const log = gulpUtil.log;
-    const app = function (req, response) {
+    const app = function(req, response) {
       const url = urlParser.parse(req.url);
       let content;
 
@@ -140,7 +140,7 @@ function LiveReloadServer(port, config) {
     };
 
     const server = createServer(app);
-    server.listen(port, function (err) {
+    server.listen(port, function(err) {
       if (err) {
         log('Setting up live reload server failed', err);
       }
@@ -152,14 +152,14 @@ function LiveReloadServer(port, config) {
       httpServer: server,
     });
 
-    ws.on('request', function (req) {
+    ws.on('request', function(req) {
       log('Live reload client connected');
       const conn = req.accept(null, req.origin);
       connections.push(conn);
 
-      conn.on('close', function () {
+      conn.on('close', function() {
         const closedConn = conn;
-        connections = connections.filter(function (conn) {
+        connections = connections.filter(function(conn) {
           return conn !== closedConn;
         });
       });
@@ -173,12 +173,14 @@ function LiveReloadServer(port, config) {
    *                                 Paths are relative to the root asset
    *                                 build directory.
    */
-  this.notifyChanged = function (assets) {
-    connections.forEach(function (conn) {
-      conn.sendUTF(JSON.stringify({
-        type: 'assets-changed',
-        changed: assets,
-      }));
+  this.notifyChanged = function(assets) {
+    connections.forEach(function(conn) {
+      conn.sendUTF(
+        JSON.stringify({
+          type: 'assets-changed',
+          changed: assets,
+        })
+      );
     });
   };
 
