@@ -196,7 +196,7 @@ function Streamer(
         }
 
         if (settings.useMQTT) {
-          const pahoMQTTClientWrapper = new PahoMQTTClientWrapper(url, session.state.annotationUpdateChannel, session.state.userid, settings._token, handleSocketOnMessage);
+          const pahoMQTTClientWrapper = new PahoMQTTClientWrapper(store, url, session.state.annotationUpdateChannels, session.state.userid, settings._token, handleSocketOnMessage);
           pahoMQTTClientWrapper.createAndConnect();
         } else {
             socket = new Socket(url);
