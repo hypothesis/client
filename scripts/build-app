@@ -1,0 +1,25 @@
+#!/bin/sh
+
+# Create a production build of the client with a given OAuth client ID
+#
+# Usage:
+#
+# ./build <oauth_client_id> [<api_url>]
+#
+# oauth_client_id - The OAuth client ID registered with the "h" service.
+# api_url - The root URL of the h service's REST API. Must have trailing
+#           slash (eg. https://hypothes.is/api/)
+#
+# After running this script, you will need to upload the contents of the "build"
+# dir to the location that the client will be served from.
+
+set -eu
+
+export NODE_ENV=production
+export OAUTH_CLIENT_ID=$1
+export API_URL=${2:-https://hypothes.is/api/}
+
+# Remove any outputs from previous builds.
+rm -rf build/
+
+gulp build

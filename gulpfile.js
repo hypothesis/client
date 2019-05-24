@@ -4,6 +4,7 @@
 
 const { mkdirSync, readdirSync } = require('fs');
 const path = require('path');
+const url = require('url');
 
 const changed = require('gulp-changed');
 const commander = require('commander');
@@ -209,6 +210,24 @@ gulp.task(
   })
 );
 
+gulp.task('build-html', () => {
+  const clientIdRequiredMsg =
+    'You must configure an OAuth client ID with the "OAUTH_CLIENT_ID" env var';
+  const apiUrl = process.env.API_URL || 'https://hypothes.is/api/';
+  const config = {
+    apiUrl,
+    authDomain: url.parse(apiUrl).hostname,
+
+    oauthClientId: process.env.OAUTH_CLIENT_ID || clientIdRequiredMsg,
+  };
+  const htmlSafeJsonConfig = JSON.stringify(config).replace(/</g, '\\u003c');
+  return gulp
+    .src('src/sidebar/app.html')
+    .pipe(replace('__CONFIG__', htmlSafeJsonConfig))
+    .pipe(rename('app.html'))
+    .pipe(gulp.dest('./build'));
+});
+
 const MANIFEST_SOURCE_FILES =
   'build/@(fonts|images|scripts|styles)/*.@(js|css|woff|jpg|png|svg)';
 
@@ -235,7 +254,7 @@ function generateBootScript(manifest, { usingDevServer = false } = {}) {
   } else {
     defaultAssetRoot = '{current_scheme}://{current_host}:3001/hypothesis';
   }
-  defaultAssetRoot = `${defaultAssetRoot}/${version}/`;
+  defaultAssetRoot = `${defaultAssetRoot}/${version}/build/`;
 
   if (isFirstBuild) {
     log(`Sidebar app URL: ${defaultSidebarAppUrl}`);
@@ -295,6 +314,7 @@ const buildAssets = gulp.parallel(
   'build-js',
   'build-css',
   'build-fonts',
+  'build-html',
   'build-images'
 );
 gulp.task('build', gulp.series(buildAssets, generateManifest));
