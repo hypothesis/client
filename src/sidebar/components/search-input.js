@@ -1,4 +1,5 @@
 'use strict';
+const { fetchConfig } = require('../util/fetch-config');
 
 // @ngInject
 function SearchInputController($element, store) {
@@ -26,6 +27,15 @@ function SearchInputController($element, store) {
     if (changes.query) {
       input.value = changes.query.currentValue;
     }
+  };
+
+  this.$onInit = () => {
+    fetchConfig({}).then(config => {
+      if (config.grading_user) {
+        input.value = 'user:"' + config.grading_user + '"';
+        self.onSearch({ $query: input.value });
+      }
+    });
   };
 }
 
