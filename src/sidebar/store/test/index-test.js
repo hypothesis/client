@@ -340,6 +340,23 @@ describe('store', function() {
     });
   });
 
+  describe('#getFirstSelectedAnnotationId', function() {
+    it('returns the first selected annotation id it finds', function() {
+      store.selectAnnotations([1, 2]);
+      assert.equal(store.getFirstSelectedAnnotationId(), 1);
+    });
+
+    it('returns null if no selected annotation ids are found', function() {
+      store.selectAnnotations([]);
+      assert.isNull(store.getFirstSelectedAnnotationId());
+    });
+
+    it('returns null if no annotation ids are ', function() {
+      store.selectAnnotations([]);
+      assert.isNull(store.getFirstSelectedAnnotationId());
+    });
+  });
+
   describe('#isAnnotationSelected', function() {
     it('returns true if the id provided is selected', function() {
       store.selectAnnotations([1]);
