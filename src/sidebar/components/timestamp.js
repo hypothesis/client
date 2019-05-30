@@ -17,10 +17,10 @@ function Timestamp({ className, href, timestamp }) {
   const [now, setNow] = useState(new Date());
 
   // Fuzzy, relative timestamp (eg. '6 days ago')
-  const relativeTimestamp = useMemo(() => toFuzzyString(timestamp, now), [
-    timestamp,
-    now,
-  ]);
+  const relativeTimestamp = useMemo(
+    () => toFuzzyString(timestamp ? new Date(timestamp) : null, now),
+    [timestamp, now]
+  );
 
   // Absolute timestamp (eg. 'Tue 22nd Dec 2015, 16:00')
   const absoluteTimestamp = useMemo(() => formatDate(new Date(timestamp)), [
