@@ -31,6 +31,7 @@ describe('GroupListItem', () => {
 
     GroupListItem.$imports.$mock({
       '../util/group-list-item-common': fakeGroupListItemCommon,
+      '../store/use-store': callback => callback(fakeStore),
     });
   });
 

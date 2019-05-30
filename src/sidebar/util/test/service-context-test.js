@@ -1,9 +1,14 @@
 'use strict';
 
+const { mount } = require('enzyme');
 const propTypes = require('prop-types');
 const { createElement, render } = require('preact');
 
-const { ServiceContext, withServices } = require('../service-context');
+const {
+  ServiceContext,
+  withServices,
+  useService,
+} = require('../service-context');
 
 describe('service-context', () => {
   describe('withServices', () => {
@@ -73,6 +78,27 @@ describe('service-context', () => {
       assert.throws(() => {
         render(<WrappedComponent />, container);
       }, /Missing ServiceContext/);
+    });
+  });
+
+  describe('useService', () => {
+    it('returns the named service', () => {
+      const injector = {
+        get: sinon
+          .stub()
+          .withArgs('aService')
+          .returns('aValue'),
+      };
+      function TestComponent() {
+        const value = useService('aService');
+        return <div>{value}</div>;
+      }
+      const wrapper = mount(
+        <ServiceContext.Provider value={injector}>
+          <TestComponent />
+        </ServiceContext.Provider>
+      );
+      assert.equal(wrapper.text(), 'aValue');
     });
   });
 });

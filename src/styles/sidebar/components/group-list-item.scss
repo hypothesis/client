@@ -26,10 +26,7 @@
   }
 
   &.is-selected {
-    .name-link {
-      font-size: $body2-font-size;
-      font-weight: 600;
-    }
+    background: $gray-lightest;
   }
 }
 

@@ -4,18 +4,26 @@ const classnames = require('classnames');
 const propTypes = require('prop-types');
 const { createElement } = require('preact');
 
+const useStore = require('../store/use-store');
 const { orgName } = require('../util/group-list-item-common');
 const { withServices } = require('../util/service-context');
 
-function GroupListItem({ analytics, group, store }) {
+function GroupListItem({ analytics, group }) {
+  const actions = useStore(store => ({
+    clearDirectLinkedGroupFetchFailed: store.clearDirectLinkedGroupFetchFailed,
+    clearDirectLinkedIds: store.clearDirectLinkedIds,
+    focusGroup: store.focusGroup,
+  }));
+
   const focusGroup = () => {
     analytics.track(analytics.events.GROUP_SWITCH);
-    store.clearDirectLinkedGroupFetchFailed();
-    store.clearDirectLinkedIds();
-    store.focusGroup(group.id);
+    actions.clearDirectLinkedGroupFetchFailed();
+    actions.clearDirectLinkedIds();
+    actions.focusGroup(group.id);
   };
 
-  const isSelected = group.id === store.focusedGroupId();
+  const focusedGroupId = useStore(store => store.focusedGroupId());
+  const isSelected = group.id === focusedGroupId;
   const groupOrgName = orgName(group);
 
   return (
@@ -59,9 +67,8 @@ GroupListItem.propTypes = {
   group: propTypes.object.isRequired,
 
   analytics: propTypes.object.isRequired,
-  store: propTypes.object.isRequired,
 };
 
-GroupListItem.injectedProps = ['analytics', 'store'];
+GroupListItem.injectedProps = ['analytics'];
 
 module.exports = withServices(GroupListItem);

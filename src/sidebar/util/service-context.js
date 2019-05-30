@@ -1,5 +1,7 @@
 'use strict';
 
+/* global process */
+
 /**
  * This module provides dependency injection of services into React
  * components via React's "context" API [1].
@@ -70,6 +72,15 @@ function withServices(Component) {
     // the parent component.
     const services = {};
     for (let service of Component.injectedProps) {
+      // Debugging check to make sure the store is used correctly.
+      if (process.env.NODE_ENV !== 'production') {
+        if (service === 'store') {
+          throw new Error(
+            'Do not use `withServices` to inject the `store` service. Use the `useStore` hook instead'
+          );
+        }
+      }
+
       if (!(service in props)) {
         services[service] = $injector.get(service);
       }
@@ -91,7 +102,21 @@ function withServices(Component) {
   return Wrapper;
 }
 
+/**
+ * Hook for looking up a service within a component or a custom hook.
+ *
+ * This is an alternative to `withServices` that is mainly useful in the
+ * context of custom hooks.
+ *
+ * @param {string} service - Name of the service to look up
+ */
+function useService(service) {
+  const injector = useContext(ServiceContext);
+  return injector.get(service);
+}
+
 module.exports = {
   ServiceContext,
   withServices,
+  useService,
 };
