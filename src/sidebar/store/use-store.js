@@ -20,9 +20,7 @@ const warnOnce = require('../util/warn-once');
  *
  * @example
  *   function MyWidget({ widgetId }) {
- *     const widget = useStore(
- *      useCallback(store => store.getWidget(widgetId), [widgetId])
- *     );
+ *     const widget = useStore(store => store.getWidget(widgetId));
  *     const hideWidget = useStore(store => store.hideWidget);
  *
  *     return (
@@ -81,6 +79,8 @@ function useStore(callback) {
 
     // Check for updates when the store changes in future.
     const unsubscribe = store.subscribe(checkForUpdate);
+
+    // Remove the subscription when the component is unmounted.
     return unsubscribe;
   }, [forceUpdate, store]);
 
