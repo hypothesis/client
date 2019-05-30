@@ -581,10 +581,24 @@ function AnnotationController(
 
   // It is invoked in the template to return the status and the icon.
   this.feedbackStatus = function(status, type){
+    /* BZ Statues
+      'NEW' => 'awaiting_acknowledgement',
+      'ASSIGNED' => 'in_progress',
+      'POST' => 'in_progress',
+      'MODIFIED' => 'needs_feedback',
+      'ON_DEV' => 'in_progress',
+      'ON_QA' => 'in_progress',
+      'VERIFIED' => 'in_progress',
+      'RELEASE_PENDING' => 'in_progress',
+      'CLOSED' => 'closed',
+    */
+    // awaiting_acknowledgement == opened
+
     var feedbackStatus = {
       'A' : {'status':'opened', 'icon':'pficon-pending'},
       'I' : {'status':'in progress', 'icon':'pficon-pending'},
       'C' : {'status':'Resolved', 'icon':'pficon-ok'},
+      'N' : {'status':'needs feedback', 'icon':'pficon-pending'},
     }[status];
 
     return {
