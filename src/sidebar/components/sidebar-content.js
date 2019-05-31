@@ -7,24 +7,13 @@ const memoize = require('../util/memoize');
 const tabs = require('../tabs');
 const uiConstants = require('../ui-constants');
 
-function firstKey(object) {
-  for (const k in object) {
-    if (!object.hasOwnProperty(k)) {
-      continue;
-    }
-    return k;
-  }
-  return null;
-}
-
 /**
  * Returns the group ID of the first annotation in `results` whose
- * ID is a key in `selection`.
+ * ID is `annId`.
  */
-function groupIDFromSelection(selection, results) {
-  const id = firstKey(selection);
+function getGroupID(annId, results) {
   const annot = results.find(function(annot) {
-    return annot.id === id;
+    return annot.id === annId;
   });
   if (!annot) {
     return null;
@@ -123,10 +112,7 @@ function SidebarContentController(
       if (store.hasSelectedAnnotations()) {
         // Focus the group containing the selected annotation and filter
         // annotations to those from this group
-        let groupID = groupIDFromSelection(
-          store.getState().selectedAnnotationMap,
-          results
-        );
+        let groupID = getGroupID(store.getFirstSelectedAnnotationId(), results);
         if (!groupID) {
           // If the selected annotation is not available, fall back to
           // loading annotations for the currently focused group
@@ -316,7 +302,7 @@ function SidebarContentController(
   };
 
   this.selectedAnnotationUnavailable = function() {
-    const selectedID = firstKey(store.getState().selectedAnnotationMap);
+    const selectedID = store.getFirstSelectedAnnotationId();
     return (
       !this.isLoading() && !!selectedID && !store.annotationExists(selectedID)
     );
@@ -343,7 +329,7 @@ function SidebarContentController(
     // The user is logged out and has landed on a direct linked
     // annotation. If there is an annotation selection and that
     // selection is available to the user, show the CTA.
-    const selectedID = firstKey(store.getState().selectedAnnotationMap);
+    const selectedID = store.getFirstSelectedAnnotationId();
     return (
       !this.isLoading() && !!selectedID && store.annotationExists(selectedID)
     );

@@ -10,6 +10,7 @@
 
 'use strict';
 
+const { createSelector } = require('reselect');
 const immutable = require('seamless-immutable');
 
 const toSet = require('../../util/array-util').toSet;
@@ -314,6 +315,16 @@ function clearSelectedAnnotations() {
   return { type: actions.CLEAR_SELECTION };
 }
 
+/**
+ * Returns the annotation ID of the first annotation in `selectedAnnotationMap`.
+ *
+ * @return {string|null}
+ */
+const getFirstSelectedAnnotationId = createSelector(
+  state => state.selectedAnnotationMap,
+  selected => (selected ? Object.keys(selected)[0] : null)
+);
+
 module.exports = {
   init: init,
   update: update,
@@ -335,5 +346,6 @@ module.exports = {
   selectors: {
     hasSelectedAnnotations,
     isAnnotationSelected,
+    getFirstSelectedAnnotationId,
   },
 };
