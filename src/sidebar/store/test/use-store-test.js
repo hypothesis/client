@@ -82,7 +82,7 @@ describe('useStore', () => {
   it('warns if the callback always returns a different value', () => {
     const warnOnce = sinon.stub();
     $imports.$mock({
-      '../util/warn-once': warnOnce,
+      '../../shared/warn-once': warnOnce,
     });
     const BuggyComponent = () => {
       // The result of the callback is an object with an `aValue` property

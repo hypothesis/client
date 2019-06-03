@@ -3,6 +3,8 @@
 const queryString = require('query-string');
 const uuid = require('node-uuid');
 
+const warnOnce = require('../../shared/warn-once');
+
 const events = require('../events');
 const Socket = require('../websocket');
 
@@ -103,7 +105,7 @@ function Streamer(
   }
 
   function handleSocketOnError(event) {
-    console.warn('Error connecting to H push notification service:', event);
+    warnOnce('Error connecting to H push notification service:', event);
 
     // In development, warn if the connection failure might be due to
     // the app's origin not having been whitelisted in the H service's config.
@@ -112,7 +114,7 @@ function Streamer(
     // HTTP status code for HTTP -> WS upgrade requests.
     const websocketHost = new URL(settings.websocketUrl).hostname;
     if (['localhost', '127.0.0.1'].indexOf(websocketHost) !== -1) {
-      console.warn(
+      warnOnce(
         'Check that your H service is configured to allow ' +
           'WebSocket connections from ' +
           window.location.origin
@@ -144,7 +146,7 @@ function Streamer(
           );
         }
       } else {
-        console.warn('received unsupported notification', message.type);
+        warnOnce('received unsupported notification', message.type);
       }
     });
   }
