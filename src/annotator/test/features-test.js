@@ -56,7 +56,6 @@ describe('features - annotation layer', function() {
     });
 
     it('should warn when accessing unknown flags', function() {
-      assert.notCalled(fakeWarnOnce);
       assert.isFalse(features.flagEnabled('unknown_feature'));
       assert.calledOnce(fakeWarnOnce);
       assert.calledWith(fakeWarnOnce, 'looked up unknown feature');
