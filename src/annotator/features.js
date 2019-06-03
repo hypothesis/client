@@ -1,6 +1,7 @@
 'use strict';
 
 const events = require('../shared/bridge-events');
+const warnOnce = require('../shared/warn-once');
 
 let _features = {};
 
@@ -19,7 +20,7 @@ module.exports = {
 
   flagEnabled: function(flag) {
     if (!(flag in _features)) {
-      console.warn('looked up unknown feature', flag);
+      warnOnce('looked up unknown feature', flag);
       return false;
     }
     return _features[flag];

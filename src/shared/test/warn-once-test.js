@@ -23,4 +23,15 @@ describe('warnOnce', () => {
     warnOnce('something else is wrong');
     assert.calledWith(console.warn, 'something else is wrong');
   });
+
+  it('supports multiple arguments', () => {
+    warnOnce('foo', 'bar', 'baz');
+    assert.calledWith(console.warn, 'foo', 'bar', 'baz');
+  });
+
+  it('supports non-string arguments', () => {
+    const obj = {};
+    warnOnce(1, {}, false);
+    assert.calledWith(console.warn, 1, obj, false);
+  });
 });

@@ -6,7 +6,7 @@ const shallowEqual = require('shallowequal');
 const { useEffect, useRef, useReducer } = require('preact/hooks');
 
 const { useService } = require('../util/service-context');
-const warnOnce = require('../util/warn-once');
+const warnOnce = require('../../shared/warn-once');
 
 /**
  * Hook for accessing state or actions from the store inside a component.

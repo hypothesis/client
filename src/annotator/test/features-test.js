@@ -5,6 +5,8 @@ const features = require('../features');
 
 describe('features - annotation layer', function() {
   let featureFlagsUpdateHandler;
+  let fakeWarnOnce;
+
   const initialFeatures = {
     feature_on: true,
     feature_off: false,
@@ -15,7 +17,10 @@ describe('features - annotation layer', function() {
   };
 
   beforeEach(function() {
-    sinon.stub(console, 'warn');
+    fakeWarnOnce = sinon.stub();
+    features.$imports.$mock({
+      '../shared/warn-once': fakeWarnOnce,
+    });
 
     features.init({
       on: function(topic, handler) {
@@ -30,8 +35,8 @@ describe('features - annotation layer', function() {
   });
 
   afterEach(function() {
-    console.warn.restore();
     features.reset();
+    features.$imports.$restore();
   });
 
   describe('flagEnabled', function() {
@@ -51,10 +56,9 @@ describe('features - annotation layer', function() {
     });
 
     it('should warn when accessing unknown flags', function() {
-      assert.notCalled(console.warn);
       assert.isFalse(features.flagEnabled('unknown_feature'));
-      assert.calledOnce(console.warn);
-      assert.calledWith(console.warn, 'looked up unknown feature');
+      assert.calledOnce(fakeWarnOnce);
+      assert.calledWith(fakeWarnOnce, 'looked up unknown feature');
     });
   });
 });

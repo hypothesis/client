@@ -13,9 +13,10 @@
 
 const events = require('../events');
 const bridgeEvents = require('../../shared/bridge-events');
+const warnOnce = require('../../shared/warn-once');
 
 // @ngInject
-function features($log, $rootScope, bridge, session) {
+function features($rootScope, bridge, session) {
   const _sendFeatureFlags = function() {
     const userFeatures = session.state.features;
     bridge.call(bridgeEvents.FEATURE_FLAGS_UPDATED, userFeatures || {});
@@ -50,7 +51,7 @@ function features($log, $rootScope, bridge, session) {
 
     const features = session.state.features;
     if (!(flag in features)) {
-      $log.warn('looked up unknown feature', flag);
+      warnOnce('looked up unknown feature', flag);
       return false;
     }
     return features[flag];
