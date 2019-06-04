@@ -150,7 +150,10 @@ Menu.propTypes = {
   /**
    * Label element for the toggle button that hides and shows the menu.
    */
-  label: propTypes.object.isRequired,
+  label: propTypes.oneOfType([
+    propTypes.object.isRequired,
+    propTypes.string.isRequired,
+  ]),
 
   /**
    * Menu items and sections to display in the content area of the menu.
