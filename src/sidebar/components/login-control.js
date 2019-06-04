@@ -1,47 +1,10 @@
 'use strict';
 
-const bridgeEvents = require('../../shared/bridge-events');
-const { isThirdPartyUser } = require('../util/account-id');
-const serviceConfig = require('../service-config');
-
 module.exports = {
   controllerAs: 'vm',
 
   //@ngInject
-  controller: function(bridge, serviceUrl, settings, $window) {
-    this.serviceUrl = serviceUrl;
-
-    this.isThirdPartyUser = function() {
-      return isThirdPartyUser(this.auth.userid, settings.authDomain);
-    };
-
-    this.shouldShowLogOutButton = function() {
-      if (this.auth.status !== 'logged-in') {
-        return false;
-      }
-      const service = serviceConfig(settings);
-      if (service && !service.onLogoutRequestProvided) {
-        return false;
-      }
-      return true;
-    };
-
-    this.shouldEnableProfileButton = function() {
-      const service = serviceConfig(settings);
-      if (service) {
-        return service.onProfileRequestProvided;
-      }
-      return true;
-    };
-
-    this.showProfile = function() {
-      if (this.isThirdPartyUser()) {
-        bridge.call(bridgeEvents.PROFILE_REQUESTED);
-        return;
-      }
-      $window.open(this.serviceUrl('user', { user: this.auth.username }));
-    };
-  },
+  controller: function() {},
 
   bindings: {
     /**
