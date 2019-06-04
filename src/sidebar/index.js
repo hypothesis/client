@@ -190,7 +190,10 @@ function startAngularApp(config) {
     .component('svgIcon', wrapReactComponent(require('./components/svg-icon')))
     .component('tagEditor', require('./components/tag-editor'))
     .component('threadList', require('./components/thread-list'))
-    .component('timestamp', require('./components/timestamp'))
+    .component(
+      'timestamp',
+      wrapReactComponent(require('./components/timestamp'))
+    )
     .component('topBar', require('./components/top-bar'))
 
     .directive('hAutofocus', require('./directive/h-autofocus'))
