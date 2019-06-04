@@ -198,6 +198,10 @@ function startAngularApp(config) {
       wrapReactComponent(require('./components/timestamp'))
     )
     .component('topBar', require('./components/top-bar'))
+    .component(
+      'userMenu',
+      wrapReactComponent(require('./components/user-menu'))
+    )
 
     .directive('hAutofocus', require('./directive/h-autofocus'))
     .directive('hBranding', require('./directive/h-branding'))
