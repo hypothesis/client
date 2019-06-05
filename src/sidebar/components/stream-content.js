@@ -59,9 +59,6 @@ function StreamContentController(
   fetch(20);
 
   this.setCollapsed = store.setCollapsed;
-  this.forceVisible = function(id) {
-    store.setForceVisible(id, true);
-  };
 
   store.subscribe(function() {
     self.rootThread = rootThread.thread(store.getState());
