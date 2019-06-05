@@ -41,6 +41,10 @@ describe('topBar', function() {
     return el.querySelector('.top-bar__apply-update-btn');
   }
 
+  function helpBtn(el) {
+    return el.querySelector('.top-bar__help-btn');
+  }
+
   function createTopBar(inputs) {
     const defaultInputs = {
       isSidebar: true,
@@ -79,6 +83,16 @@ describe('topBar', function() {
     assert.called(onApplyPendingUpdates);
   });
 
+  it('shows help when help icon clicked', function() {
+    const onShowHelpPanel = sinon.stub();
+    const el = createTopBar({
+      onShowHelpPanel: onShowHelpPanel,
+    });
+    const help = helpBtn(el[0]);
+    help.click();
+    assert.called(onShowHelpPanel);
+  });
+
   it('displays the login control and propagates callbacks', function() {
     const onShowHelpPanel = sinon.stub();
     const onLogin = sinon.stub();
@@ -89,9 +103,6 @@ describe('topBar', function() {
       onLogout: onLogout,
     });
     const loginControl = el.find('login-control').controller('loginControl');
-
-    loginControl.onShowHelpPanel();
-    assert.called(onShowHelpPanel);
 
     loginControl.onLogin();
     assert.called(onLogin);

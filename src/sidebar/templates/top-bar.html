@@ -49,6 +49,12 @@
        aria-label="Share this page">
       <i class="h-icon-annotation-share"></i>
     </button>
+    <button class="top-bar__btn top-bar__help-btn"
+       ng-click="vm.onShowHelpPanel()"
+       title="Help"
+       aria-label="Help">
+       <svg-icon name="'help'"></svg-icon>
+    </button>
     <login-control
       class="login-control"
       auth="vm.auth"
