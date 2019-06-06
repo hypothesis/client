@@ -18,9 +18,6 @@ describe('topBar', function() {
       })
       .component('searchInput', {
         bindings: require('../search-input').bindings,
-      })
-      .component('sortDropdown', {
-        bindings: require('../sort-dropdown').bindings,
       });
   });
 
@@ -158,25 +155,6 @@ describe('topBar', function() {
 
     searchInput.onSearch({ $query: 'new-query' });
     assert.calledWith(onSearch, 'new-query');
-  });
-
-  it('displays the sort dropdown and propagates sort key changes', function() {
-    const onChangeSortKey = sinon.stub();
-    const el = createTopBar({
-      sortKeysAvailable: ['Newest', 'Oldest'],
-      sortKey: 'Newest',
-      onChangeSortKey: {
-        args: ['sortKey'],
-        callback: onChangeSortKey,
-      },
-    });
-    const sortDropdown = el.find('sort-dropdown').controller('sortDropdown');
-
-    assert.deepEqual(sortDropdown.sortKeysAvailable, ['Newest', 'Oldest']);
-    assert.deepEqual(sortDropdown.sortKey, 'Newest');
-
-    sortDropdown.onChangeSortKey({ sortKey: 'Oldest' });
-    assert.calledWith(onChangeSortKey, 'Oldest');
   });
 
   it('shows the clean theme when settings contains the clean theme option', function() {
