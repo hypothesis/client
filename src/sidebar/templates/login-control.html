@@ -1,8 +1,8 @@
 <!-- New controls -->
 <span class="login-text"
-      ng-if="vm.newStyle && vm.auth.status === 'unknown'">⋯</span>
+      ng-if="vm.auth.status === 'unknown'">⋯</span>
 <span class="login-text"
-      ng-if="vm.newStyle && vm.auth.status === 'logged-out'">
+      ng-if="vm.auth.status === 'logged-out'">
   <a href="" ng-click="vm.onSignUp()" target="_blank" h-branding="accentColor">Sign up</a>
   / <a href="" ng-click="vm.onLogin()" h-branding="accentColor">Log in</a>
 </span>
