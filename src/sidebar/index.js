@@ -184,7 +184,6 @@ function startAngularApp(config) {
     )
     .component('sidebarTutorial', require('./components/sidebar-tutorial'))
     .component('shareDialog', require('./components/share-dialog'))
-    .component('sortDropdown', require('./components/sort-dropdown'))
     .component(
       'sortMenu',
       wrapReactComponent(require('./components/sort-menu'))
