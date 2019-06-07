@@ -138,7 +138,7 @@ function groups(
   // to include groups associated with this page. This is retained to determine
   // whether we need to re-fetch groups if the URLs of frames connected to the
   // sidebar app changes.
-  let documentUri;
+  let documentUri = null;
 
   /*
    * Fetch an individual group.
@@ -166,11 +166,9 @@ function groups(
   async function load() {
     // Step 1: Get the URI of the active document, so we can fetch groups
     // associated with that document.
-    let uri = null;
     if (isSidebar) {
-      uri = await getDocumentUriForGroupSearch();
+      documentUri = await getDocumentUriForGroupSearch();
     }
-    documentUri = uri;
 
     // Step 2: Concurrently fetch the groups the user is a member of,
     // the groups associated with the current document and the annotation
@@ -181,8 +179,8 @@ function groups(
     if (authority) {
       params.authority = authority;
     }
-    if (uri) {
-      params.document_uri = uri;
+    if (documentUri) {
+      params.document_uri = documentUri;
     }
 
     // If there is a direct-linked annotation, fetch the annotation to see
