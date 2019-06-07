@@ -180,8 +180,28 @@ class Adder {
     this._height = () => this.element.getBoundingClientRect().height;
   }
 
+  setupFocusRedirect(elementToFocusNext) {
+    this.element.ownerDocument.addEventListener(
+      'keydown',
+      e => {
+        if (e.key === 'Tab' || e.keyCode === 9) {
+          e.preventDefault();
+          this.focusRedirected = true;
+          elementToFocusNext.focus();
+        }
+      },
+      { capture: true, once: true }
+    );
+  }
+
   /** Hide the adder */
   hide() {
+    if (this.focusRedirected) {
+      // this is a hack.. safari clears selection on focus change,
+      // which triggers hiding
+      this.focusRedirected = false;
+      return;
+    }
     clearTimeout(this._enterTimeout);
     this.element.className = classnames({ 'annotator-adder': true });
     this.element.style.visibility = 'hidden';
@@ -259,6 +279,10 @@ class Adder {
       'annotator-adder--arrow-down': arrowDirection === ARROW_POINTING_DOWN,
       'annotator-adder--arrow-up': arrowDirection === ARROW_POINTING_UP,
     });
+
+    this.setupFocusRedirect(
+      this.element.querySelector(ANNOTATE_BTN_SELECTOR)
+    );
 
     // Some sites make big assumptions about interactive
     // elements on the page. Some want to hide interactive elements
