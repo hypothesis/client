@@ -183,10 +183,9 @@ function groups(
       params.document_uri = documentUri;
     }
 
-    // If there is a direct-linked annotation, fetch the annotation to see
-    // if there needs to be a second API request to fetch its group since
-    // the group may not be in the results returned by group.list,
-    // profile.groups, or the direct-linked group.
+    // If there is a direct-linked annotation, fetch the annotation in case
+    // the associated group has not already been fetched and we need to make
+    // an additional request for it.
     const directLinkedAnnId = store.getState().directLinkedAnnotationId;
     let directLinkedAnnApi = null;
     if (directLinkedAnnId) {
@@ -199,8 +198,8 @@ function groups(
     }
 
     // If there is a direct-linked group, add an API request to get that
-    // particular group since it may not be in the results returned by
-    // group.list or profile.groups.
+    // particular group since it may not be in the set of groups that are
+    // fetched by other requests.
     const directLinkedGroupId = store.getState().directLinkedGroupId;
     let directLinkedGroupApi = null;
     if (directLinkedGroupId) {
@@ -252,12 +251,12 @@ function groups(
       // the filterGroups method.
       directLinkedAnnotationGroupId = directLinkedAnn.group;
 
+      // If the direct-linked annotation's group has not already been fetched,
+      // fetch it.
       const directLinkedAnnGroup = myGroups
         .concat(featuredGroups)
         .find(g => g.id === directLinkedAnn.group);
 
-      // If the direct-linked annotation's group has not already been fetched,
-      // fetch it.
       if (!directLinkedAnnGroup) {
         const directLinkedAnnGroup = await fetchGroup({
           id: directLinkedAnn.group,
