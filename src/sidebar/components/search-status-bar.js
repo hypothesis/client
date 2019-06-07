@@ -37,15 +37,21 @@ function SearchStatusBarController(store, rootThread) {
     }
     return Object.keys(selection).length > 0;
   };
+
+  this.filterQuery = function() {
+    return store.getState().filterQuery;
+  };
+
+  this.filterActive = function() {
+    return !!store.getState().filterQuery;
+  };
 }
 
 module.exports = {
   controller: SearchStatusBarController,
   controllerAs: 'vm',
   bindings: {
-    filterActive: '<',
     onClearSelection: '&',
-    searchQuery: '<',
     selectedTab: '<',
     totalAnnotations: '<',
     totalNotes: '<',

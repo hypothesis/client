@@ -264,7 +264,7 @@ function SidebarContentController(
     if (
       this.selectedAnnotationUnavailable() ||
       this.selectedGroupUnavailable() ||
-      this.search.query()
+      store.getState().filterQuery
     ) {
       return false;
     }
@@ -337,7 +337,6 @@ module.exports = {
   controllerAs: 'vm',
   bindings: {
     auth: '<',
-    search: '<',
     onLogin: '&',
   },
   template: require('../templates/sidebar-content.html'),
