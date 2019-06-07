@@ -73,16 +73,6 @@ function HypothesisAppController(
     frameSync.connect();
   }
 
-  this.sortKey = function() {
-    return store.getState().sortKey;
-  };
-
-  this.sortKeysAvailable = function() {
-    return store.getState().sortKeysAvailable;
-  };
-
-  this.setSortKey = store.setSortKey;
-
   // Reload the view when the user switches accounts
   $scope.$on(events.USER_CHANGED, function(event, data) {
     self.auth = authStateFromProfile(data.profile);
