@@ -11,11 +11,8 @@
 <search-status-bar
   ng-show="!vm.isLoading()"
   filter-active="!!vm.search.query()"
-  filter-match-count="vm.visibleCount()"
   on-clear-selection="vm.clearSelection()"
   search-query="vm.search.query()"
-  are-all-annotations-visible="vm.areAllAnnotationsVisible()"
-  total-count="vm.topLevelThreadCount()"
   selected-tab="vm.selectedTab"
   total-annotations="vm.totalAnnotations"
   total-notes="vm.totalNotes">
