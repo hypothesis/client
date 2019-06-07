@@ -12,7 +12,9 @@ describe('SvgIcon', () => {
   it("sets the element's content to the content of the SVG", () => {
     const container = document.createElement('div');
     render(<SvgIcon name="refresh" />, container);
-    assert.ok(container.querySelector('svg'));
+    const svg = container.querySelector('svg');
+    assert.ok(svg);
+    assert.isAbove(svg.childElementCount, 0);
   });
 
   it('throws an error if the icon is unknown', () => {
@@ -26,7 +28,7 @@ describe('SvgIcon', () => {
     const container = document.createElement('div');
     render(<SvgIcon name="refresh" />, container);
     const svg = container.querySelector('svg');
-    assert.equal(svg.getAttribute('class'), '');
+    assert.equal(svg.getAttribute('class'), null);
   });
 
   it('sets the class of the SVG if provided', () => {
@@ -42,5 +44,14 @@ describe('SvgIcon', () => {
     render(<SvgIcon name="collapse-menu" className="thing__icon" />, container);
     const svg = container.querySelector('svg');
     assert.equal(svg.getAttribute('class'), 'thing__icon');
+  });
+
+  it('preserves "width", "height" and "viewBox" attributes from the source', () => {
+    const container = document.createElement('div');
+    render(<SvgIcon name="refresh" />, container);
+    const svg = container.querySelector('svg');
+    assert.equal(svg.getAttribute('width'), '16px');
+    assert.equal(svg.getAttribute('height'), '16px');
+    assert.equal(svg.getAttribute('viewBox'), '0 0 16 16');
   });
 });
