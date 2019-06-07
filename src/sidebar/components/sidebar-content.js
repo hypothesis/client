@@ -141,6 +141,11 @@ function SidebarContentController(
       if (results.length) {
         annotationMapper.loadAnnotations(results);
       }
+      if (!store.getState().defaultGroupIsFocussed && !results.length) {
+          const first = groups.all()[0];
+          groups.focus(first.id);
+      }
+      store.setDefaultGroupAsFocussed();
     });
     searchClient.on('end', function() {
       // Remove client from list of active search clients.
