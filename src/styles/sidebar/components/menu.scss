@@ -28,18 +28,17 @@
 // Triangular indicator at the top of the menu that associates it with the
 // toggle button.
 .menu__arrow {
-  $size: 10px;
+  color: $grey-3;
+  fill: white;
 
-  background-color: white;
-  border-left: 1px solid $grey-3;
-  border-top: 1px solid $grey-3;
-  height: $size;
+  // Position the arrow so that it appears flush with the right edge of the
+  // content when the menu is right-aligned, and the bottom of the arrow just
+  // overlaps the content's border. The effect is that the menu's border is a
+  // rounded rect with a notch at the top.
   position: absolute;
+  top: calc(100% - 2px);  // nb. Adjust this if changing the <svg> size.
   right: 0;
-  top: 100%;
-  transform: rotate(45deg);
-  width: $size;
-  z-index: 3;
+  z-index: 1;
 }
 
 // Content area of the menu.

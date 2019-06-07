@@ -9,6 +9,14 @@ const { listen } = require('../util/dom');
 
 const SvgIcon = require('./svg-icon');
 
+// The triangular indicator below the menu toggle button that visually links it
+// to the menu content.
+const menuArrow = (
+  <svg className="menu__arrow" width={15} height={8}>
+    <path d="M0 8 L7 0 L15 8" stroke="currentColor" strokeWidth="2" />
+  </svg>
+);
+
 /**
  * Flag indicating whether the next click event on the menu's toggle button
  * should be ignored, because the action it would trigger has already been
@@ -116,7 +124,7 @@ function Menu({
       </button>
       {isOpen && (
         <Fragment>
-          <div className="menu__arrow" />
+          {menuArrow}
           <div
             className={classnames(
               'menu__content',
