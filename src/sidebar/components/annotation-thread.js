@@ -21,21 +21,21 @@ function visibleCount(thread) {
 }
 
 function showAllChildren(thread, showFn) {
-  thread.children.forEach(function(child) {
-    showFn({ thread: child });
+  thread.children.forEach(child => {
+    showFn(child);
     showAllChildren(child, showFn);
   });
 }
 
 function showAllParents(thread, showFn) {
   while (thread.parent && thread.parent.annotation) {
-    showFn({ thread: thread.parent });
+    showFn(thread.parent);
     thread = thread.parent;
   }
 }
 
 // @ngInject
-function AnnotationThreadController() {
+function AnnotationThreadController(store) {
   // Flag that tracks whether the content of the annotation is hovered,
   // excluding any replies.
   this.annotationHovered = false;
@@ -78,7 +78,7 @@ function AnnotationThreadController() {
    */
   this.showThreadAndReplies = function() {
     showAllParents(this.thread, this.onForceVisible);
-    this.onForceVisible({ thread: this.thread });
+    this.onForceVisible(this.thread);
     showAllChildren(this.thread, this.onForceVisible);
   };
 
@@ -98,6 +98,13 @@ function AnnotationThreadController() {
   this.shouldShowReply = function(child) {
     return visibleCount(child) > 0;
   };
+
+  this.onForceVisible = function(thread) {
+    store.setForceVisible(thread.id, true);
+    if (thread.parent) {
+      store.setCollapsed(thread.parent.id, false);
+    }
+  };
 }
 
 /**
@@ -116,11 +123,6 @@ module.exports = {
     showDocumentInfo: '<',
     /** Called when the user clicks on the expand/collapse replies toggle. */
     onChangeCollapsed: '&',
-    /**
-     * Called when the user clicks the button to show this thread or
-     * one of its replies.
-     */
-    onForceVisible: '&',
   },
   template: require('../templates/annotation-thread.html'),
 };

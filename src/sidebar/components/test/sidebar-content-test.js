@@ -717,24 +717,6 @@ describe('sidebar.components.sidebar-content', function() {
     });
   });
 
-  describe('#forceVisible', function() {
-    it('shows the thread', function() {
-      const thread = { id: '1' };
-      ctrl.forceVisible(thread);
-      assert.deepEqual(store.getState().forceVisible, { 1: true });
-    });
-
-    it('uncollapses the parent', function() {
-      const thread = {
-        id: '2',
-        parent: { id: '3' },
-      };
-      assert.equal(store.getState().expanded[thread.parent.id], undefined);
-      ctrl.forceVisible(thread);
-      assert.equal(store.getState().expanded[thread.parent.id], true);
-    });
-  });
-
   describe('#visibleCount', function() {
     it('returns the total number of visible annotations or replies', function() {
       fakeRootThread.thread.returns({
