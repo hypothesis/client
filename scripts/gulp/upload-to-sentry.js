@@ -36,9 +36,7 @@ function httpRequest(opts) {
 /** Create a release in Sentry. Returns a Promise. */
 function createRelease(opts, project, release) {
   return httpRequest({
-    uri: `${SENTRY_API_ROOT}/projects/${
-      opts.organization
-    }/${project}/releases/`,
+    uri: `${SENTRY_API_ROOT}/projects/${opts.organization}/${project}/releases/`,
     method: 'POST',
     auth: {
       user: opts.key,
@@ -66,9 +64,7 @@ function createRelease(opts, project, release) {
 /** Upload a named file to a release in Sentry. Returns a Promise. */
 function uploadReleaseFile(opts, project, release, file) {
   return httpRequest({
-    uri: `${SENTRY_API_ROOT}/projects/${
-      opts.organization
-    }/${project}/releases/${release}/files/`,
+    uri: `${SENTRY_API_ROOT}/projects/${opts.organization}/${project}/releases/${release}/files/`,
     method: 'POST',
     auth: {
       user: opts.key,
