@@ -53,7 +53,7 @@ function MenuItem({
         'is-selected': isSelected,
       })}
       role="menuitem"
-      {...onClick && onActivate('menuitem', onClick)}
+      {...(onClick && onActivate('menuitem', onClick))}
     >
       {icon !== undefined && (
         <div className="menu-item__icon-container">
