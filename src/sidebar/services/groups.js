@@ -158,8 +158,7 @@ function groups(
    * group.
    *
    * The groups that are fetched depend on the current user, the URI of
-   * the current document, and whether any direct-links were followed (either
-   * to an annotation or group).
+   * the current document, and the direct-linked group and/or annotation.
    *
    * @return {Promise<Group[]>}
    */
