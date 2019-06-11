@@ -43,6 +43,7 @@ $base-line-height: 20px;
 @import './components/share-link';
 @import './components/sidebar-tutorial';
 @import './components/simple-search';
+@import './components/svg-icon';
 @import './components/spinner';
 @import './components/tags-input';
 @import './components/thread-list';
@@ -51,7 +52,8 @@ $base-line-height: 20px;
 
 // Top-level styles
 // ----------------
-html, body {
+html,
+body {
   height: 100%;
 }
 
@@ -105,7 +107,7 @@ hypothesis-app {
   border-radius: 2px;
   font-family: $sans-font-family;
   font-weight: 300;
-  margin-bottom: .72em;
+  margin-bottom: 0.72em;
   padding: 1em;
   position: relative;
   background-color: $body-background;
@@ -114,7 +116,9 @@ hypothesis-app {
     border: 1px none $gray-lighter;
     border-bottom-style: solid;
     padding: 0 0 1.1em;
-    li a { padding-bottom: .231em }
+    li a {
+      padding-bottom: 0.231em;
+    }
   }
 
   .close {

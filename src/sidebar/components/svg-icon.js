@@ -41,7 +41,9 @@ function SvgIcon({ name, className = '' }) {
     markup,
   ]);
 
-  return <span dangerouslySetInnerHTML={markup} ref={element} />;
+  return (
+    <span className="svg-icon" dangerouslySetInnerHTML={markup} ref={element} />
+  );
 }
 
 SvgIcon.propTypes = {
