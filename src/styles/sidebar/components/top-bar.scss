@@ -14,7 +14,7 @@
 
   // Force top-bar onto a new compositor layer so that it does not judder when
   // the window is scrolled.
-  transform: translate3d(0,0,0);
+  transform: translate3d(0, 0, 0);
 }
 
 .top-bar--theme-clean {
@@ -91,6 +91,12 @@
   padding-bottom: 2px;
   padding-top: 2px;
   user-select: none;
+}
+
+/* FIXME: Temporary fix to make 'help' icon align with other top-bar icons */
+.top-bar__help-icon {
+  width: 15px;
+  height: 15px;
 }
 
 .top-bar__apply-icon {

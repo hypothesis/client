@@ -11,12 +11,18 @@
       always-expanded="true">
     </search-input>
     <div class="top-bar__expander"></div>
+    <button class="top-bar__btn top-bar__help-btn"
+       ng-click="vm.onShowHelpPanel()"
+       title="Help"
+       aria-label="Help">
+       <svg-icon name="'help'" class-name="'top-bar__help-icon'"></svg-icon>
+    </button>
     <login-control
+      class="login-control"
       auth="vm.auth"
-      new-style="false"
-      on-show-help-panel="vm.onShowHelpPanel()"
       on-login="vm.onLogin()"
-      on-logout="vm.onLogout()">
+      on-logout="vm.onLogout()"
+      on-sign-up="vm.onSignUp()">
     </login-control>
   </div>
   <!-- New design for the top bar, as used in the sidebar.
@@ -49,11 +55,15 @@
        aria-label="Share this page">
       <i class="h-icon-annotation-share"></i>
     </button>
+    <button class="top-bar__btn top-bar__help-btn"
+       ng-click="vm.onShowHelpPanel()"
+       title="Help"
+       aria-label="Help">
+       <svg-icon name="'help'"  class-name="'top-bar__help-icon'"></svg-icon>
+    </button>
     <login-control
       class="login-control"
       auth="vm.auth"
-      new-style="true"
-      on-show-help-panel="vm.onShowHelpPanel()"
       on-login="vm.onLogin()"
       on-logout="vm.onLogout()"
       on-sign-up="vm.onSignUp()">
