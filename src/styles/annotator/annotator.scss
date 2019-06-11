@@ -108,7 +108,7 @@ $base-font-size: 14px;
   .annotator-frame-button {
     transition: background-color .25s .25s;
     @include smallshadow;
-    background: $white;
+    background: rgba(255, 255, 255, 0.7);
     border: solid 1px $gray-lighter;
     border-radius: 4px;
     color: $gray-light;
