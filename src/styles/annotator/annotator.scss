@@ -125,6 +125,7 @@ $base-font-size: 14px;
     }
 
     &:focus, &:hover {
+      background: $white;
       outline: 0;
       color: $text-color;
     }
