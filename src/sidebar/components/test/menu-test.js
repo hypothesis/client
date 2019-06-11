@@ -78,9 +78,7 @@ describe('Menu', () => {
     new Event('click'),
     ((e = new Event('keypress')), (e.key = 'Escape'), e),
   ].forEach(event => {
-    it(`closes when the user clicks or presses the mouse outside (${
-      event.type
-    })`, () => {
+    it(`closes when the user clicks or presses the mouse outside (${event.type})`, () => {
       const wrapper = createMenu({ defaultOpen: true });
 
       act(() => {

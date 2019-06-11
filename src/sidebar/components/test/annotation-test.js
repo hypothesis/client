@@ -115,6 +115,7 @@ describe('annotation', function() {
     let fakeSession;
     let fakeSettings;
     let fakeApi;
+    let fakeBridge;
     let fakeStreamer;
     let sandbox;
 
@@ -248,6 +249,10 @@ describe('annotation', function() {
           },
         };
 
+        fakeBridge = {
+          call: sinon.stub(),
+        };
+
         fakeStreamer = {
           hasPendingDeletion: sinon.stub(),
         };
@@ -256,6 +261,7 @@ describe('annotation', function() {
         $provide.value('annotationMapper', fakeAnnotationMapper);
         $provide.value('store', fakeStore);
         $provide.value('api', fakeApi);
+        $provide.value('bridge', fakeBridge);
         $provide.value('drafts', fakeDrafts);
         $provide.value('flash', fakeFlash);
         $provide.value('groups', fakeGroups);
@@ -371,6 +377,18 @@ describe('annotation', function() {
 
         assert.notCalled(fakeApi.annotation.create);
         assert.called(fakeDrafts.update);
+      });
+
+      it('opens the sidebar when trying to save highlights while logged out', () => {
+        // The sidebar is opened in order to draw the user's attention to
+        // the `You must be logged in to create annotations and highlights` message.
+        const annotation = fixtures.newHighlight();
+        // The user is not logged-in.
+        annotation.user = fakeSession.state.userid = undefined;
+
+        createDirective(annotation);
+
+        assert.calledWith(fakeBridge.call, 'showSidebar');
       });
 
       it('does not save new annotations on initialization', function() {

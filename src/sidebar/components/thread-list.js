@@ -185,11 +185,6 @@ module.exports = {
     thread: '<',
     showDocumentInfo: '<',
 
-    /**
-     * Called when the user clicks a link to show an annotation that does not
-     * match the current filter.
-     */
-    onForceVisible: '&',
     /** Called when the user focuses an annotation by hovering it. */
     onFocus: '&',
     /** Called when a user selects an annotation. */

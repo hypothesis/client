@@ -53,6 +53,7 @@ function AnnotationController(
   store,
   annotationMapper,
   api,
+  bridge,
   drafts,
   flash,
   groups,
@@ -195,6 +196,11 @@ function AnnotationController(
     if (!isNew(self.annotation)) {
       // Already saved.
       return;
+    }
+
+    if (!self.annotation.user) {
+      // Open sidebar to display error message about needing to login to create highlights.
+      bridge.call('showSidebar');
     }
 
     if (!self.isHighlight()) {

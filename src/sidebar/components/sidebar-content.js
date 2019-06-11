@@ -276,13 +276,6 @@ function SidebarContentController(
     store.setCollapsed(id, collapsed);
   };
 
-  this.forceVisible = function(thread) {
-    store.setForceVisible(thread.id, true);
-    if (thread.parent) {
-      store.setCollapsed(thread.parent.id, false);
-    }
-  };
-
   this.focus = focusAnnotation;
   this.scrollTo = scrollToAnnotation;
 
