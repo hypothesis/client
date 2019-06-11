@@ -379,6 +379,18 @@ describe('annotation', function() {
         assert.called(fakeDrafts.update);
       });
 
+      it('opens the sidebar when trying to save highlights while logged out', () => {
+        // The sidebar is opened in order to draw the user's attention to
+        // the `You must be logged in to create annotations and highlights` message.
+        const annotation = fixtures.newHighlight();
+        // The user is not logged-in.
+        annotation.user = fakeSession.state.userid = undefined;
+
+        createDirective(annotation);
+
+        assert.calledWith(fakeBridge.call, 'showSidebar');
+      });
+
       it('does not save new annotations on initialization', function() {
         const annotation = fixtures.newAnnotation();
 
