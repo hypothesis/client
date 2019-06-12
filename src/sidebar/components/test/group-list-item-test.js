@@ -9,7 +9,7 @@ const { events } = require('../../services/analytics');
 
 describe('GroupListItem', () => {
   let fakeAnalytics;
-  let fakeGroups;
+  let fakeGroupsService;
   let fakeStore;
   let fakeGroupListItemCommon;
 
@@ -41,7 +41,7 @@ describe('GroupListItem', () => {
       orgName: sinon.stub(),
     };
 
-    fakeGroups = {
+    fakeGroupsService = {
       leave: sinon.stub(),
     };
 
@@ -59,7 +59,7 @@ describe('GroupListItem', () => {
     return mount(
       <GroupListItem
         group={fakeGroup}
-        groups={fakeGroups}
+        groups={fakeGroupsService}
         analytics={fakeAnalytics}
       />
     );

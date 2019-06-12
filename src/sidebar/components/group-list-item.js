@@ -16,7 +16,7 @@ const MenuItem = require('./menu-item');
  * The item has a primary action which selects the group, along with a set of
  * secondary actions accessible via a toggle menu.
  */
-function GroupListItem({ analytics, group, groups }) {
+function GroupListItem({ analytics, group, groups: groupsService }) {
   const canLeaveGroup = group.type === 'private';
   const activityUrl = group.links.html;
   const hasActionMenu = activityUrl || canLeaveGroup;
@@ -43,7 +43,7 @@ function GroupListItem({ analytics, group, groups }) {
     const message = `Are you sure you want to leave the group "${group.name}"?`;
     if (window.confirm(message)) {
       analytics.track(analytics.events.GROUP_LEAVE);
-      groups.leave(group.id);
+      groupsService.leave(group.id);
     }
   };
 
@@ -111,6 +111,7 @@ function GroupListItem({ analytics, group, groups }) {
 GroupListItem.propTypes = {
   group: propTypes.object.isRequired,
 
+  // Injected services.
   analytics: propTypes.object.isRequired,
   groups: propTypes.object.isRequired,
 };
