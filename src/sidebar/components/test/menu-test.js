@@ -72,6 +72,12 @@ describe('Menu', () => {
     assert.isTrue(wrapper.exists(TestMenuItem));
   });
 
+  it('flips toggle arrow when open', () => {
+    const wrapper = createMenu({ defaultOpen: true });
+    const toggle = wrapper.find('.menu__toggle-arrow');
+    assert.isTrue(toggle.hasClass('is-open'));
+  });
+
   let e;
   [
     new Event('mousedown'),
@@ -125,5 +131,14 @@ describe('Menu', () => {
 
     wrapper.setProps({ align: 'right' });
     assert.isTrue(wrapper.exists('.menu__content--align-right'));
+  });
+
+  it('applies custom content class', () => {
+    const wrapper = createMenu({
+      defaultOpen: true,
+      contentClass: 'special-menu',
+    });
+    const content = wrapper.find('.menu__content');
+    assert.isTrue(content.hasClass('special-menu'));
   });
 });

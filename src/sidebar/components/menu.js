@@ -45,6 +45,7 @@ let ignoreNextClick = false;
 function Menu({
   align = 'left',
   children,
+  contentClass,
   defaultOpen = false,
   label,
   menuIndicator = true,
@@ -117,7 +118,9 @@ function Menu({
       >
         {label}
         {menuIndicator && (
-          <span className="menu__toggle-arrow">
+          <span
+            className={classnames('menu__toggle-arrow', isOpen && 'is-open')}
+          >
             <SvgIcon name="expand-menu" className="menu__toggle-icon" />
           </span>
         )}
@@ -128,7 +131,8 @@ function Menu({
           <div
             className={classnames(
               'menu__content',
-              `menu__content--align-${align}`
+              `menu__content--align-${align}`,
+              contentClass
             )}
             role="menu"
           >
@@ -161,10 +165,12 @@ Menu.propTypes = {
    * These are typically `MenuSection` and `MenuItem` components, but other
    * custom content is also allowed.
    */
-  children: propTypes.oneOfType([
-    propTypes.object,
-    propTypes.arrayOf(propTypes.object),
-  ]),
+  children: propTypes.any,
+
+  /**
+   * Additional CSS classes to apply to the menu.
+   */
+  contentClass: propTypes.string,
 
   /**
    * Whether the menu is open or closed when initially rendered.

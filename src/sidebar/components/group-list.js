@@ -8,12 +8,6 @@ const groupsByOrganization = require('../util/group-organizations');
 
 const groupOrganizations = memoize(groupsByOrganization);
 
-const myGroupOrgs = memoize(groupsByOrganization);
-
-const featuredGroupOrgs = memoize(groupsByOrganization);
-
-const currentlyViewingGroupOrgs = memoize(groupsByOrganization);
-
 // @ngInject
 function GroupListController(
   $window,
@@ -21,8 +15,7 @@ function GroupListController(
   features,
   groups,
   settings,
-  serviceUrl,
-  store
+  serviceUrl
 ) {
   this.groups = groups;
 
@@ -64,18 +57,6 @@ function GroupListController(
 
   this.groupOrganizations = function() {
     return groupOrganizations(this.groups.all());
-  };
-
-  this.currentlyViewingGroupOrganizations = function() {
-    return currentlyViewingGroupOrgs(store.getCurrentlyViewingGroups());
-  };
-
-  this.featuredGroupOrganizations = function() {
-    return featuredGroupOrgs(store.getFeaturedGroups());
-  };
-
-  this.myGroupOrganizations = function() {
-    return myGroupOrgs(store.getMyGroups());
   };
 
   this.viewGroupActivity = function() {

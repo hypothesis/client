@@ -1,70 +1,11 @@
-/* The group. */
-
-.group-list-item {
-  display: flex;
-  flex-direction: row;
-  flex-grow: 1;
-}
-
-.group-list-item__item {
-  border: solid 1px transparent;
-  display: flex;
-  flex-direction: row;
-  flex-grow: 1;
-  margin: 1px;
-
+// Footer to display at the bottom of a menu item.
+.group-list-item__footer {
+  background-color: $grey-1;
+  margin: 0;
+  padding-top: 15px;
   padding: 10px;
-  cursor: pointer;
 
-  &:focus {
-    outline: none;
-    @include focus-outline;
-  }
-
-  &:hover {
-    background: $gray-lightest;
-  }
-
-  &.is-selected {
-    background: $gray-lightest;
-  }
-}
-
-.group-list-item__icon-container {
-  margin-right: 10px;
-  width: 15px;
-  height: 15px;
-}
-
-// the icon indicating the type of group currently selected at
-// the top of the groups list
-.group-list-item__icon {
-  color: $color-gray;
-  display: inline-block;
-  margin-right: 4px;
-  position: relative;
-  vertical-align: baseline;
-
-  // align the base of the chat-heads icon for groups
-  // with the baseline of the group name label
-  transform: translateY(1px);
-}
-
-.group-list-item__icon--organization {
-  height: 15px;
-  width: 15px;
-  top: 2px;
-}
-
-// the name of a group in the groups drop-down list
-// and 'Post to <Group>' button for saving annotations
-.group-list-item__name-link {
-  white-space: nowrap;
-  color: inherit;
-}
-
-.group-list-item__details {
-  flex-grow: 1;
-  flex-shrink: 1;
-  font-weight: 500;
+  // Align the left edge of the footer text with menu item labels above.
+  padding-left: 35px;
+  white-space: normal;
 }
