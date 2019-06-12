@@ -1,6 +1,7 @@
 'use strict';
 
 const { createElement } = require('preact');
+const { act } = require('preact/test-utils');
 
 const { mount } = require('enzyme');
 const GroupListItem = require('../group-list-item');
@@ -12,19 +13,21 @@ describe('GroupListItem', () => {
   let fakeGroupsService;
   let fakeStore;
   let fakeGroupListItemCommon;
-
-  const fakeGroup = {
-    id: 'groupid',
-    name: 'Test',
-    links: {
-      html: 'https://annotate.com/groups/groupid',
-    },
-    scopes: {
-      enforced: false,
-    },
-  };
+  let fakeGroup;
 
   beforeEach(() => {
+    fakeGroup = {
+      id: 'groupid',
+      name: 'Test',
+      links: {
+        html: 'https://annotate.com/groups/groupid',
+      },
+      scopes: {
+        enforced: false,
+      },
+      type: 'private',
+    };
+
     fakeStore = {
       focusGroup: sinon.stub(),
       focusedGroupId: sinon.stub().returns('groupid'),
@@ -49,18 +52,22 @@ describe('GroupListItem', () => {
       '../util/group-list-item-common': fakeGroupListItemCommon,
       '../store/use-store': callback => callback(fakeStore),
     });
+
+    sinon.stub(window, 'confirm').returns(false);
   });
 
   afterEach(() => {
     GroupListItem.$imports.$restore();
+    window.confirm.restore();
   });
 
-  const createGroupListItem = fakeGroup => {
+  const createGroupListItem = (fakeGroup, props = {}) => {
     return mount(
       <GroupListItem
         group={fakeGroup}
         groups={fakeGroupsService}
         analytics={fakeAnalytics}
+        {...props}
       />
     );
   };
@@ -136,6 +143,127 @@ describe('GroupListItem', () => {
           expectedIsSelected
         );
       });
+    });
+  });
+
+  it('toggles submenu when toggle is clicked', () => {
+    const wrapper = createGroupListItem(fakeGroup);
+    const toggleSubmenu = () => {
+      const dummyEvent = new Event();
+      act(() => {
+        wrapper
+          .find('MenuItem')
+          .first()
+          .props()
+          .onToggleSubmenu(dummyEvent);
+      });
+      wrapper.update();
+    };
+
+    toggleSubmenu();
+    assert.isTrue(wrapper.exists('ul'));
+    toggleSubmenu();
+    assert.isFalse(wrapper.exists('ul'));
+  });
+
+  it('does not show submenu toggle if there are no available actions', () => {
+    fakeGroup.links.html = null;
+    fakeGroup.type = 'open';
+    const wrapper = createGroupListItem(fakeGroup);
+    assert.isUndefined(wrapper.find('MenuItem').prop('isExpanded'));
+  });
+
+  it('does not show link to activity page if not available', () => {
+    fakeGroup.links.html = null;
+    const wrapper = createGroupListItem(fakeGroup, {
+      defaultSubmenuOpen: true,
+    });
+    assert.isFalse(wrapper.exists('MenuItem[label="View group activity"]'));
+  });
+
+  it('shows link to activity page if available', () => {
+    const wrapper = createGroupListItem(fakeGroup, {
+      defaultSubmenuOpen: true,
+    });
+    assert.isTrue(wrapper.exists('MenuItem[label="View group activity"]'));
+  });
+
+  it('does not show "Leave" action if user cannot leave', () => {
+    fakeGroup.type = 'open';
+    const wrapper = createGroupListItem(fakeGroup, {
+      defaultSubmenuOpen: true,
+    });
+    assert.isFalse(wrapper.exists('MenuItem[label="Leave group"]'));
+  });
+
+  it('shows "Leave" action if user can leave', () => {
+    fakeGroup.type = 'private';
+    const wrapper = createGroupListItem(fakeGroup, {
+      defaultSubmenuOpen: true,
+    });
+    assert.isTrue(wrapper.exists('MenuItem[label="Leave group"]'));
+  });
+
+  it('prompts to leave group if "Leave" action is clicked', () => {
+    const wrapper = createGroupListItem(fakeGroup, {
+      defaultSubmenuOpen: true,
+    });
+    act(() => {
+      wrapper
+        .find('MenuItem[label="Leave group"]')
+        .props()
+        .onClick();
+    });
+    assert.called(window.confirm);
+    assert.notCalled(fakeGroupsService.leave);
+  });
+
+  it('leaves group if "Leave" is clicked and user confirms', () => {
+    const wrapper = createGroupListItem(fakeGroup, {
+      defaultSubmenuOpen: true,
+    });
+    window.confirm.returns(true);
+    act(() => {
+      wrapper
+        .find('MenuItem[label="Leave group"]')
+        .props()
+        .onClick();
+    });
+    assert.called(window.confirm);
+    assert.calledWith(fakeGroupsService.leave, fakeGroup.id);
+  });
+
+  [
+    {
+      enforced: false,
+      isScopedToUri: false,
+      expectDisabled: false,
+    },
+    {
+      enforced: true,
+      isScopedToUri: false,
+      expectDisabled: true,
+    },
+    {
+      enforced: true,
+      isScopedToUri: true,
+      expectDisabled: false,
+    },
+  ].forEach(({ enforced, isScopedToUri, expectDisabled }) => {
+    it('disables menu item and shows note in submenu if group is not selectable', () => {
+      fakeGroup.scopes.enforced = enforced;
+      fakeGroup.isScopedToUri = isScopedToUri;
+      const wrapper = createGroupListItem(fakeGroup, {
+        defaultSubmenuOpen: true,
+      });
+      assert.equal(
+        wrapper
+          .find('MenuItem')
+          .first()
+          .prop('isDisabled'),
+        expectDisabled
+      );
+      assert.equal(wrapper.exists('.group-list-item__footer'), expectDisabled);
     });
   });
 });

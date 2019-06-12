@@ -16,13 +16,20 @@ const MenuItem = require('./menu-item');
  * The item has a primary action which selects the group, along with a set of
  * secondary actions accessible via a toggle menu.
  */
-function GroupListItem({ analytics, group, groups: groupsService }) {
+function GroupListItem({
+  analytics,
+  defaultSubmenuOpen = false,
+  group,
+  groups: groupsService,
+}) {
   const canLeaveGroup = group.type === 'private';
   const activityUrl = group.links.html;
   const hasActionMenu = activityUrl || canLeaveGroup;
   const isSelectable = !group.scopes.enforced || group.isScopedToUri;
 
-  const [isExpanded, setExpanded] = useState(hasActionMenu ? false : undefined);
+  const [isExpanded, setExpanded] = useState(
+    hasActionMenu ? defaultSubmenuOpen : undefined
+  );
   const focusedGroupId = useStore(store => store.focusedGroupId());
   const isSelected = group.id === focusedGroupId;
 
@@ -110,6 +117,9 @@ function GroupListItem({ analytics, group, groups: groupsService }) {
 
 GroupListItem.propTypes = {
   group: propTypes.object.isRequired,
+
+  /** Whether the submenu is open when the item is initially rendered. */
+  defaultSubmenuOpen: propTypes.bool,
 
   // Injected services.
   analytics: propTypes.object.isRequired,
