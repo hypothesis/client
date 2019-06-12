@@ -48,7 +48,13 @@ describe('GroupListItem', () => {
       leave: sinon.stub(),
     };
 
+    function FakeMenuItem() {
+      return null;
+    }
+    FakeMenuItem.displayName = 'MenuItem';
+
     GroupListItem.$imports.$mock({
+      './menu-item': FakeMenuItem,
       '../util/group-list-item-common': fakeGroupListItemCommon,
       '../store/use-store': callback => callback(fakeStore),
     });
@@ -62,6 +68,10 @@ describe('GroupListItem', () => {
   });
 
   const createGroupListItem = (fakeGroup, props = {}) => {
+    // nb. Mount rendering is used here with a manually mocked `MenuItem`
+    // because `GroupListItem` renders multiple top-level elements (wrapped in
+    // a fragment) and `wrapper.update()` cannot be used in that case when using
+    // shallow rendering.
     return mount(
       <GroupListItem
         group={fakeGroup}
