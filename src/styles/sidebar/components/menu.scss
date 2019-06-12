@@ -4,6 +4,8 @@
 
 // Toggle button that opens the menu.
 .menu__toggle {
+  @include outline-on-keyboard-focus;
+
   appearance: none;
   border: none;
   background: none;
