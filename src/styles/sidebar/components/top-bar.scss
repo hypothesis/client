@@ -62,10 +62,11 @@
 .top-bar__btn {
   @include reset-native-btn-styles;
 
+  height: 100%;
   color: $gray-light;
   display: inline-block;
   cursor: pointer;
-  padding: 0 3px;
+  padding: 1px 3px 0 3px;
 
   &:hover {
     color: $gray-dark;
@@ -91,12 +92,6 @@
   padding-bottom: 2px;
   padding-top: 2px;
   user-select: none;
-}
-
-/* FIXME: Temporary fix to make 'help' icon align with other top-bar icons */
-.top-bar__help-icon {
-  width: 15px;
-  height: 15px;
 }
 
 .top-bar__apply-icon {
