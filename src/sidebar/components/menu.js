@@ -45,6 +45,7 @@ let ignoreNextClick = false;
 function Menu({
   align = 'left',
   children,
+  contentClass,
   defaultOpen = false,
   label,
   menuIndicator = true,
@@ -128,7 +129,8 @@ function Menu({
           <div
             className={classnames(
               'menu__content',
-              `menu__content--align-${align}`
+              `menu__content--align-${align}`,
+              contentClass
             )}
             role="menu"
           >
@@ -165,6 +167,11 @@ Menu.propTypes = {
     propTypes.object,
     propTypes.arrayOf(propTypes.object),
   ]),
+
+  /**
+   * Additional CSS classes to apply to the menu.
+   */
+  contentClass: propTypes.string,
 
   /**
    * Whether the menu is open or closed when initially rendered.

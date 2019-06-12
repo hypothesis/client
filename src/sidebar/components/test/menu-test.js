@@ -126,4 +126,13 @@ describe('Menu', () => {
     wrapper.setProps({ align: 'right' });
     assert.isTrue(wrapper.exists('.menu__content--align-right'));
   });
+
+  it('applies custom content class', () => {
+    const wrapper = createMenu({
+      defaultOpen: true,
+      contentClass: 'special-menu',
+    });
+    const content = wrapper.find('.menu__content');
+    assert.isTrue(content.hasClass('special-menu'));
+  });
 });
