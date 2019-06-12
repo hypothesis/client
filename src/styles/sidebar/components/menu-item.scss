@@ -91,6 +91,8 @@ $menu-item-padding: 10px;
 // Toggle button used to expand or collapse the submenu associated with a menu
 // item.
 .menu-item__toggle {
+  @include outline-on-keyboard-focus;
+
   display: flex;
   flex-direction: column;
   justify-content: center;
