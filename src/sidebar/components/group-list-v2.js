@@ -80,7 +80,12 @@ function GroupList({ serviceUrl, settings }) {
   }
 
   return (
-    <Menu align="left" label={label} title="Select group">
+    <Menu
+      align="left"
+      contentClass="group-list-v2__content"
+      label={label}
+      title="Select group"
+    >
       {currentGroupsSorted.length > 0 && (
         <GroupListSection
           heading="Currently Viewing"
