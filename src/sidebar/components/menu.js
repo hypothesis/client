@@ -163,10 +163,7 @@ Menu.propTypes = {
    * These are typically `MenuSection` and `MenuItem` components, but other
    * custom content is also allowed.
    */
-  children: propTypes.oneOfType([
-    propTypes.object,
-    propTypes.arrayOf(propTypes.object),
-  ]),
+  children: propTypes.any,
 
   /**
    * Additional CSS classes to apply to the menu.
