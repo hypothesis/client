@@ -6,6 +6,7 @@ const { createElement } = require('preact');
 const GroupList = require('../group-list-v2');
 
 describe('GroupList', () => {
+  let fakeServiceConfig;
   let fakeServiceUrl;
   let fakeSettings;
   let fakeStore;
@@ -34,9 +35,11 @@ describe('GroupList', () => {
       focusedGroup: sinon.stub().returns(testGroup),
       profile: sinon.stub().returns({ userid: null }),
     };
+    fakeServiceConfig = sinon.stub().returns(null);
 
     GroupList.$imports.$mock({
       '../store/use-store': callback => callback(fakeStore),
+      '../service-config': fakeServiceConfig,
     });
   });
 
@@ -144,5 +147,20 @@ describe('GroupList', () => {
     });
     const wrapper = createGroupList();
     assert.equal(wrapper.text(), 'Test group');
+  });
+
+  it('renders a placeholder if groups have not loaded yet', () => {
+    fakeStore.focusedGroup.returns(null);
+    const wrapper = createGroupList();
+    const label = wrapper.find('Menu').prop('label');
+    assert.equal(shallow(label).text(), '…');
+  });
+
+  it('renders the publisher-provided icon in the toggle button', () => {
+    fakeServiceConfig.returns({ icon: 'test-icon' });
+    const wrapper = createGroupList();
+    const label = wrapper.find('Menu').prop('label');
+    const img = shallow(label).find('img');
+    assert.equal(img.prop('src'), 'test-icon');
   });
 });
