@@ -72,6 +72,12 @@ describe('Menu', () => {
     assert.isTrue(wrapper.exists(TestMenuItem));
   });
 
+  it('flips toggle arrow when open', () => {
+    const wrapper = createMenu({ defaultOpen: true });
+    const toggle = wrapper.find('.menu__toggle-arrow');
+    assert.isTrue(toggle.hasClass('is-open'));
+  });
+
   let e;
   [
     new Event('mousedown'),

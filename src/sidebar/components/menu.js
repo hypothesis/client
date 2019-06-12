@@ -118,7 +118,9 @@ function Menu({
       >
         {label}
         {menuIndicator && (
-          <span className="menu__toggle-arrow">
+          <span
+            className={classnames('menu__toggle-arrow', isOpen && 'is-open')}
+          >
             <SvgIcon name="expand-menu" className="menu__toggle-icon" />
           </span>
         )}

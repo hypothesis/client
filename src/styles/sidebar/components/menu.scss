@@ -24,6 +24,11 @@
   width: 10px;
   height: 10px;
   margin-left: 5px;
+
+  &.is-open {
+    // Flip the indicator when the menu is open.
+    transform: rotateX(180deg);
+  }
 }
 
 // Triangular indicator at the top of the menu that associates it with the
