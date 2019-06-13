@@ -171,7 +171,7 @@ function groups(
 
     // Step 2: Concurrently fetch the groups the user is a member of,
     // the groups associated with the current document and the annotation
-    // or group that was direct-linked (if any).
+    // and/or group that was direct-linked (if any).
     const params = {
       expand: ['organization', 'scopes'],
     };
