@@ -6,12 +6,12 @@
     <i class="primary-action-btn__icon h-icon-close"></i> Clear search
   </button>
   <span ng-pluralize
-           count="vm.filterMatchCount"
+           count="vm.filterMatchCount()"
            when="{'0': 'No results for “{{vm.searchQuery}}”',
                   'one': '1 search result',
                   'other': '{} search results'}"></span>
 </div>
-<div class="search-status-bar" ng-if="!vm.filterActive && vm.areAllAnnotationsVisible">
+<div class="search-status-bar" ng-if="!vm.filterActive && vm.areAllAnnotationsVisible()">
   <button class="primary-action-btn primary-action-btn--short"
           ng-click="vm.onClearSelection()"
           title="Clear the selection and show all annotations">

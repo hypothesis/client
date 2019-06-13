@@ -363,10 +363,6 @@ describe('sidebar.components.sidebar-content', function() {
         });
       });
 
-      it('areAllAnnotationsVisible returns true since there is an error message', () => {
-        assert.isTrue(ctrl.areAllAnnotationsVisible());
-      });
-
       it('selectedGroupUnavailable returns true', () => {
         assert.isTrue(ctrl.selectedGroupUnavailable());
       });
@@ -380,10 +376,6 @@ describe('sidebar.components.sidebar-content', function() {
         store.focusGroup(fakeSettings.group);
         fakeGroups.focused.returns({ id: fakeSettings.group });
         $scope.$digest();
-      });
-
-      it('areAllAnnotationsVisible returns false since group has no annotations', () => {
-        assert.isFalse(ctrl.areAllAnnotationsVisible());
       });
 
       it('selectedGroupUnavailable returns false', () => {
@@ -406,10 +398,6 @@ describe('sidebar.components.sidebar-content', function() {
         setFrames([{ uri: uri }]);
         store.selectAnnotations([id]);
         $scope.$digest();
-      });
-
-      it('areAllAnnotationsVisible is true', function() {
-        assert.isTrue(ctrl.areAllAnnotationsVisible());
       });
 
       it("switches to the selected annotation's group", function() {
@@ -436,10 +424,6 @@ describe('sidebar.components.sidebar-content', function() {
         setFrames([{ uri: uri }]);
         fakeGroups.focused.returns({ id: 'a-group' });
         $scope.$digest();
-      });
-
-      it('areAllAnnotationsVisible is false', function() {
-        assert.isFalse(ctrl.areAllAnnotationsVisible());
       });
 
       it('fetches annotations for the current group', function() {
@@ -714,27 +698,6 @@ describe('sidebar.components.sidebar-content', function() {
         $rootScope.$broadcast(events.USER_CHANGED);
         assert.called(fakeStreamer.reconnect);
       });
-    });
-  });
-
-  describe('#visibleCount', function() {
-    it('returns the total number of visible annotations or replies', function() {
-      fakeRootThread.thread.returns({
-        children: [
-          {
-            id: '1',
-            visible: true,
-            children: [{ id: '3', visible: true, children: [] }],
-          },
-          {
-            id: '2',
-            visible: false,
-            children: [],
-          },
-        ],
-      });
-      $scope.$digest();
-      assert.equal(ctrl.visibleCount(), 2);
     });
   });
 });
