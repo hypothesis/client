@@ -163,7 +163,10 @@ function startAngularApp(config) {
       'groupListV2',
       wrapReactComponent(require('./components/group-list-v2'))
     )
-    .component('helpLink', require('./components/help-link'))
+    .component(
+      'helpLink',
+      wrapReactComponent(require('./components/help-link'))
+    )
     .component('helpPanel', require('./components/help-panel'))
     .component('loggedoutMessage', require('./components/loggedout-message'))
     .component('loginControl', require('./components/login-control'))
