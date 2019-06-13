@@ -191,7 +191,7 @@ function startAngularApp(config) {
       'sortMenu',
       wrapReactComponent(require('./components/sort-menu'))
     )
-    .component('spinner', require('./components/spinner'))
+    .component('spinner', wrapReactComponent(require('./components/spinner')))
     .component('streamContent', require('./components/stream-content'))
     .component('svgIcon', wrapReactComponent(require('./components/svg-icon')))
     .component('tagEditor', require('./components/tag-editor'))
