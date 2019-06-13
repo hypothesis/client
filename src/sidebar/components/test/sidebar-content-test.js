@@ -231,11 +231,10 @@ describe('sidebar.components.sidebar-content', function() {
   describe('showSelectedTabs', () => {
     beforeEach(() => {
       setFrames([{ uri: 'http://www.example.com' }]);
-      ctrl.search = { query: sinon.stub().returns(undefined) };
     });
 
     it('returns false if there is a search query', () => {
-      ctrl.search = { query: sinon.stub().returns('tag:foo') };
+      store.setFilterQuery('tag:foo');
       assert.isFalse(ctrl.showSelectedTabs());
     });
 
