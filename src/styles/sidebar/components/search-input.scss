@@ -1,7 +1,7 @@
 @import "../../base.scss";
 @import "../../mixins/icons";
 
-.simple-search-form {
+.search-input__form {
   display: flex;
   flex-flow: row nowrap;
 
@@ -9,18 +9,18 @@
   color: $gray-dark;
 }
 
-.simple-search-icon {
+.search-input__icon {
   order: 0;
 }
 
-:not(:focus) ~ .simple-search-icon {
+:not(:focus) ~ .search-input__icon {
   color: $gray-light;
 }
 
 @at-root {
   $expanded-max-width: 150px;
 
-  .simple-search-input {
+  .search-input__input {
     @include outline-on-keyboard-focus;
 
     flex-grow: 1;

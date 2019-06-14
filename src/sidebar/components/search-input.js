@@ -44,16 +44,9 @@ function SearchInput({ alwaysExpanded, query, onSearch }) {
   }
 
   return (
-    <form
-      className={classnames(
-        'simple-search-form',
-        !query && 'simple-search-inactive'
-      )}
-      name="searchForm"
-      onSubmit={onSubmit}
-    >
+    <form className="search-input__form" name="searchForm" onSubmit={onSubmit}>
       <input
-        className={classnames('simple-search-input', {
+        className={classnames('search-input__input', {
           'is-expanded': alwaysExpanded || query,
         })}
         type="text"
@@ -67,7 +60,7 @@ function SearchInput({ alwaysExpanded, query, onSearch }) {
       {!isLoading && (
         <button
           type="button"
-          className="simple-search-icon top-bar__btn"
+          className="search-input__icon top-bar__btn"
           onClick={() => input.current.focus()}
         >
           <i className="h-icon-search"></i>
