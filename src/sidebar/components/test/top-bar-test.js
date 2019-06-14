@@ -17,7 +17,11 @@ describe('topBar', function() {
         bindings: require('../login-control').bindings,
       })
       .component('searchInput', {
-        bindings: require('../search-input').bindings,
+        bindings: {
+          alwaysExpanded: '<',
+          query: '<',
+          onSearch: '&',
+        },
       });
   });
 

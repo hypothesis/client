@@ -177,7 +177,10 @@ function startAngularApp(config) {
       'publishAnnotationBtn',
       require('./components/publish-annotation-btn')
     )
-    .component('searchInput', require('./components/search-input'))
+    .component(
+      'searchInput',
+      wrapReactComponent(require('./components/search-input'))
+    )
     .component('searchStatusBar', require('./components/search-status-bar'))
     .component('selectionTabs', require('./components/selection-tabs'))
     .component('sidebarContent', require('./components/sidebar-content'))
