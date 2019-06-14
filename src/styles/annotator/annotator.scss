@@ -120,7 +120,7 @@ $base-font-size: 14px;
     margin-bottom: 5px;
 
     &:focus, &:hover {
-      background: $white;
+      background-color: $white;
       outline: 0;
       color: $text-color;
     }
