@@ -11,6 +11,7 @@ function Spinner() {
   // have been converted to Preact, we should be able to remove this.
   return (
     <div className="spinner__container">
+      {/* See `.spinner` CSS definition for an explanation of the nested spans. */}
       <span className="spinner">
         <span>
           <span />
