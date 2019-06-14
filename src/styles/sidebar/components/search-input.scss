@@ -1,6 +1,3 @@
-@import "../../base.scss";
-@import "../../mixins/icons";
-
 .search-input__form {
   display: flex;
   flex-flow: row nowrap;
@@ -13,45 +10,37 @@
   order: 0;
 }
 
-:not(:focus) ~ .search-input__icon {
-  color: $gray-light;
-}
+.search-input__input {
+  @include outline-on-keyboard-focus;
 
-@at-root {
-  $expanded-max-width: 150px;
+  flex-grow: 1;
+  order: 1;
 
-  .search-input__input {
-    @include outline-on-keyboard-focus;
+  color: $text-color;
 
-    flex-grow: 1;
-    order: 1;
+  // Disable default browser styling for the input.
+  border: none;
+  padding: 0px;
+  width: 100%;
 
-    color: $text-color;
+  // The search box expands when focused, via a change in the
+  // `max-width` property. In Safari, the <input> will not accept
+  // focus if `max-width` is set to 0px so we set it to
+  // a near-zero positive value instead.
+  // See GH #2654
+  max-width: 0.1px;
 
-    // disable the default browser styling for the input
-    border: none;
-    padding: 0px;
-    width: 100%;
+  transition: max-width .3s ease-out, padding-left .3s ease-out;
 
-    // the search box expands when focused, via a change in the
-    // `max-width` property. In Safari, the <input> will not accept
-    // focus if `max-width` is set to 0px so we set it to
-    // a near-zero positive value instead.
-    // See GH #2654
-    max-width: 0.1px;
+  &:disabled {
+    background: none;
+    color: $gray-light;
+  }
 
-    transition: max-width .3s ease-out, padding-left .3s ease-out;
-
-    &:disabled {
-      background: none;
-      color: $gray-light;
-    }
-
-    // expand the search input when focused (triggered by clicking
-    // on the search icon) or when `is-expanded` is applied
-    &:focus,&.is-expanded {
-      max-width: $expanded-max-width;
-      padding-left: 6px;
-    }
+  // Expand the search input when focused (triggered by clicking
+  // on the search icon) or when `is-expanded` is applied.
+  &:focus,&.is-expanded {
+    max-width: 150px;
+    padding-left: 6px;
   }
 }
