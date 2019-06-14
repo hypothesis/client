@@ -119,15 +119,15 @@ $base-font-size: 14px;
     font-size: 16px;
     margin-bottom: 5px;
 
-    &:active {
-      transition: background-color .25s;
-      background-color: $gray-light;
-    }
-
     &:focus, &:hover {
       background: $white;
       outline: 0;
       color: $text-color;
+    }
+
+    &:active {
+      transition: background-color .25s;
+      background-color: $gray-light;
     }
   }
 
