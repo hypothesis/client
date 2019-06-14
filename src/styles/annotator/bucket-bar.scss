@@ -10,8 +10,9 @@
 }
 
 .annotator-bucket-indicator {
+  transition: background-color .25s .25s;
   box-sizing: border-box;
-  background: $white;
+  background: $toolbar-button-background;
   border: solid 1px $gray-lighter;
   border-radius: 2px 4px 4px 2px;
   right: 0;
@@ -59,6 +60,10 @@
     border-width: 7px;
     border-right: 4px solid $white;
     margin-top: -7px;
+  }
+
+  &:focus, &:hover {
+    background-color: $white;
   }
 
   &.lower, &.upper {
