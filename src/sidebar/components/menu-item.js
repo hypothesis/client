@@ -43,8 +43,8 @@ function MenuItem({
     'menu-item__label--submenu': isSubmenuItem,
   });
 
-  const hasLeftIcon = icon != null || isSubmenuItem; // eslint-disable-line eqeqeq
-  const hasRightIcon = icon != null && isSubmenuItem; // eslint-disable-line eqeqeq
+  const hasLeftIcon = icon || isSubmenuItem;
+  const hasRightIcon = icon && isSubmenuItem;
 
   let renderedIcon = null;
   if (icon !== 'blank') {
