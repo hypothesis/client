@@ -12,8 +12,11 @@ const icons = {
   copy: require('../../images/icons/copy.svg'),
   cursor: require('../../images/icons/cursor.svg'),
   external: require('../../images/icons/external.svg'),
+  groups: require('../../images/icons/groups.svg'),
   help: require('../../images/icons/help.svg'),
   leave: require('../../images/icons/leave.svg'),
+  lock: require('../../images/icons/lock.svg'),
+  public: require('../../images/icons/public.svg'),
   refresh: require('../../images/icons/refresh.svg'),
   share: require('../../images/icons/share.svg'),
 };
