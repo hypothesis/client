@@ -1,45 +1,92 @@
 'use strict';
 
-// @ngInject
-function SearchInputController($element, store) {
-  const self = this;
-  const button = $element.find('button');
-  const input = $element.find('input')[0];
-  const form = $element.find('form')[0];
+const classnames = require('classnames');
+const { createElement } = require('preact');
+const { useRef, useState } = require('preact/hooks');
+const propTypes = require('prop-types');
 
-  button.on('click', function() {
-    input.focus();
-  });
+const useStore = require('../store/use-store');
 
-  form.onsubmit = function(e) {
+const Spinner = require('./spinner');
+
+/**
+ * An input field in the top bar for entering a query that filters annotations
+ * (in the sidebar) or searches annotations (in the stream/single annotation
+ * view).
+ *
+ * This component also renders a loading spinner to indicate when the client
+ * is fetching for data from the API or in a "loading" state for any other
+ * reason.
+ */
+function SearchInput({ alwaysExpanded, query, onSearch }) {
+  const isLoading = useStore(store => store.isLoading());
+  const input = useRef();
+
+  // The active filter query from the previous render.
+  const [prevQuery, setPrevQuery] = useState(query);
+
+  // The query that the user is currently typing, but may not yet have applied.
+  const [pendingQuery, setPendingQuery] = useState(query);
+
+  const onSubmit = e => {
     e.preventDefault();
-    self.onSearch({ $query: input.value });
+    // TODO - When the parent components are converted to React, the signature
+    // of the callback can be simplified to `onSearch(query)` rather than
+    // `onSearch({ $query: query })`.
+    onSearch({ $query: input.current.value });
   };
 
-  this.isLoading = () => store.isLoading();
+  // When the active query changes outside of this component, update the input
+  // field to match. This happens when clearing the current filter for example.
+  if (query !== prevQuery) {
+    setPendingQuery(query);
+    setPrevQuery(query);
+  }
 
-  this.inputClasses = function() {
-    return { 'is-expanded': self.alwaysExpanded || self.query };
-  };
-
-  this.$onChanges = function(changes) {
-    if (changes.query) {
-      input.value = changes.query.currentValue;
-    }
-  };
+  return (
+    <form className="search-input__form" name="searchForm" onSubmit={onSubmit}>
+      <input
+        className={classnames('search-input__input', {
+          'is-expanded': alwaysExpanded || query,
+        })}
+        type="text"
+        name="query"
+        placeholder={(isLoading && 'Loading…') || 'Search…'}
+        disabled={isLoading}
+        ref={input}
+        value={pendingQuery}
+        onInput={e => setPendingQuery(e.target.value)}
+      />
+      {!isLoading && (
+        <button
+          type="button"
+          className="search-input__icon top-bar__btn"
+          onClick={() => input.current.focus()}
+        >
+          <i className="h-icon-search"></i>
+        </button>
+      )}
+      {isLoading && <Spinner className="top-bar__btn" title="Loading…" />}
+    </form>
+  );
 }
 
-module.exports = {
-  controller: SearchInputController,
-  controllerAs: 'vm',
-  bindings: {
-    // Specifies whether the search input field should always be expanded,
-    // regardless of whether the it is focused or has an active query.
-    //
-    // If false, it is only expanded when focused or when 'query' is non-empty
-    alwaysExpanded: '<',
-    query: '<',
-    onSearch: '&',
-  },
-  template: require('../templates/search-input.html'),
+SearchInput.propTypes = {
+  /**
+   * If true, the input field is always shown. If false, the input field is
+   * only shown if the query is non-empty.
+   */
+  alwaysExpanded: propTypes.bool,
+
+  /**
+   * The currently active filter query.
+   */
+  query: propTypes.string,
+
+  /**
+   * Callback to invoke when the current filter query changes.
+   */
+  onSearch: propTypes.func,
 };
+
+module.exports = SearchInput;
