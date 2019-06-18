@@ -29,19 +29,17 @@
 }
 
 .annotation.is-dimmed {
-  // Lighten the username and bodies of dimmed annotations to make other
+  // Lighten the bodies of dimmed annotations to make other
   // annotations which are not dimmed stand out
-  .annotation-header__user,
   .annotation-body {
     color: $grey-5;
   }
 }
 
 .annotation.is-highlighted {
-  // Slightly darken the username and bodies of highlighted annotations to
+  // Slightly darken the bodies of highlighted annotations to
   // make them stand out next to others, which will have the `is-dimmed` state
   // set
-  .annotation-header__user,
   .annotation-body {
     color: $grey-7;
   }
@@ -153,12 +151,6 @@
 .annotation-media-embed {
   width: 369px;
   height: 208px;
-}
-
-.annotation-header__user {
-  @include font-normal;
-  color: $grey-7;
-  font-weight: bold;
 }
 
 .annotation-replies {

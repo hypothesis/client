@@ -156,6 +156,10 @@ function startAngularApp(config) {
     )
     .component('annotationThread', require('./components/annotation-thread'))
     .component(
+      'annotationUser',
+      wrapReactComponent(require('./components/annotation-user'))
+    )
+    .component(
       'annotationViewerContent',
       require('./components/annotation-viewer-content')
     )
