@@ -20,6 +20,10 @@ $menu-item-padding: 10px;
   // Prevent menu item text from being selected when user toggles menu.
   user-select: none;
 
+  &:hover {
+    background: $grey-1;
+  }
+
   // An item in a submenu associated with a top-level item.
   &--submenu {
     min-height: $item-height - 10px;
@@ -27,13 +31,11 @@ $menu-item-padding: 10px;
     color: mix($grey-5, $grey-6, $weight: 50%);
     font-weight: normal;
     &:hover {
-      background: $grey-1;
+      // Since submenu items already have a light grey background, we need to
+      // use a slightly darker grey as the hover state.
+      background: $grey-3;
       color: $grey-6;
     }
-  }
-
-  &:hover {
-    background: $grey-1;
   }
 
   &.is-disabled {
