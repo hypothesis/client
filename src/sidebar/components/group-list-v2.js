@@ -104,7 +104,7 @@ function GroupList({ serviceUrl, settings }) {
 
       {canCreateNewGroup && (
         <MenuItem
-          icon="add-group"
+          icon="add"
           href={newGroupLink}
           label="New private group"
           style="shaded"
