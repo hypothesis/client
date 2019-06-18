@@ -42,6 +42,19 @@ describe('MenuItem', () => {
     assert.isTrue(wrapper.exists('SvgIcon[name="an-svg-icon"]'));
   });
 
+  it('renders a blank space for an icon if `icon` is "blank"', () => {
+    const wrapper = createMenuItem({ icon: 'blank' });
+    const iconSpace = wrapper.find('.menu-item__icon-container');
+    assert.equal(iconSpace.length, 1);
+    assert.equal(iconSpace.children().length, 0);
+  });
+
+  it('does not render a space for an icon if `icon` is missing', () => {
+    const wrapper = createMenuItem();
+    const iconSpace = wrapper.find('.menu-item__icon-container');
+    assert.equal(iconSpace.length, 0);
+  });
+
   it('shows the submenu indicator if `isSubmenuVisible` is a boolean', () => {
     const wrapper = createMenuItem({ isSubmenuVisible: true });
     assert.isTrue(wrapper.exists('SvgIcon[name="collapse-menu"]'));
@@ -60,5 +73,29 @@ describe('MenuItem', () => {
     const wrapper = createMenuItem({ isSubmenuVisible: true, onToggleSubmenu });
     wrapper.find('.menu-item__toggle').simulate('click');
     assert.called(onToggleSubmenu);
+  });
+
+  it('renders top-level menu item icons on the left', () => {
+    const wrapper = createMenuItem({ icon: 'an-svg-icon' });
+    const iconSpaces = wrapper.find('.menu-item__icon-container');
+
+    // There should be only one icon space, on the left.
+    assert.equal(iconSpaces.length, 1);
+    assert.equal(iconSpaces.at(0).children().length, 1);
+  });
+
+  it('renders submenu item icons on the right', () => {
+    const wrapper = createMenuItem({
+      icon: 'an-svg-icon',
+      isSubmenuItem: true,
+    });
+    const iconSpaces = wrapper.find('.menu-item__icon-container');
+    assert.equal(iconSpaces.length, 2);
+
+    // There should be a space for the parent item's icon.
+    assert.equal(iconSpaces.at(0).children().length, 0);
+
+    // The actual icon for the submenu should be shown on the right.
+    assert.equal(iconSpaces.at(1).children().length, 1);
   });
 });

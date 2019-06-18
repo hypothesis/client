@@ -70,7 +70,7 @@ function GroupListItem({
   return (
     <Fragment>
       <MenuItem
-        icon={group.logo || null}
+        icon={group.logo || 'blank'}
         iconAlt={orgName(group)}
         isDisabled={!isSelectable}
         isExpanded={isExpanded}
@@ -81,13 +81,13 @@ function GroupListItem({
         onToggleSubmenu={toggleSubmenu}
       />
       {isExpanded && (
-        <Fragment>
+        <div className="group-list-item__submenu">
           <ul onClick={collapseSubmenu}>
             {activityUrl && (
               <li>
                 <MenuItem
                   href={activityUrl}
-                  icon="share"
+                  icon="external"
                   isSubmenuItem={true}
                   label="View group activity"
                 />
@@ -109,7 +109,7 @@ function GroupListItem({
               This group is restricted to specific URLs.
             </p>
           )}
-        </Fragment>
+        </div>
       )}
     </Fragment>
   );

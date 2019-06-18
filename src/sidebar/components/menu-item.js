@@ -43,6 +43,20 @@ function MenuItem({
     'menu-item__label--submenu': isSubmenuItem,
   });
 
+  const hasLeftIcon = icon || isSubmenuItem;
+  const hasRightIcon = icon && isSubmenuItem;
+
+  let renderedIcon = null;
+  if (icon !== 'blank') {
+    renderedIcon = iconIsUrl ? (
+      <img className={iconClass} alt={iconAlt} src={icon} />
+    ) : (
+      <SvgIcon name={icon} className="menu-item__icon" />
+    );
+  }
+  const leftIcon = isSubmenuItem ? null : renderedIcon;
+  const rightIcon = isSubmenuItem ? renderedIcon : null;
+
   return (
     <div
       aria-checked={isSelected}
@@ -55,15 +69,8 @@ function MenuItem({
       role="menuitem"
       {...(onClick && onActivate('menuitem', onClick))}
     >
-      {icon !== undefined && (
-        <div className="menu-item__icon-container">
-          {icon &&
-            (iconIsUrl ? (
-              <img className={iconClass} alt={iconAlt} src={icon} />
-            ) : (
-              <SvgIcon name={icon} className="menu-item__icon" />
-            ))}
-        </div>
+      {hasLeftIcon && (
+        <div className="menu-item__icon-container">{leftIcon}</div>
       )}
       {href && (
         <a
@@ -76,6 +83,9 @@ function MenuItem({
         </a>
       )}
       {!href && <span className={labelClass}>{label}</span>}
+      {hasRightIcon && (
+        <div className="menu-item__icon-container">{rightIcon}</div>
+      )}
       {typeof isSubmenuVisible === 'boolean' && (
         <div
           className="menu-item__toggle"
@@ -110,8 +120,8 @@ MenuItem.propTypes = {
    * Name or URL of icon to display. If the value is a URL it is displayed
    * using an `<img>`, if it is a name it is displayed using `SvgIcon`.
    *
-   * If the property is `null` a blank placeholder is displayed in place of an
-   * icon. If the property is omitted, no placeholder is displayed.
+   * If the property is `"blank"` a blank placeholder is displayed in place of an
+   * icon. If the property is falsey, no placeholder is displayed.
    * The placeholder is useful to keep menu item labels aligned in a list if
    * some items have icons and others do not.
    */

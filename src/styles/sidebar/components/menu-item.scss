@@ -4,9 +4,11 @@ $menu-item-padding: 10px;
   $item-padding: $menu-item-padding;
   $item-height: 40px;
 
+  color: $grey-6;
   display: flex;
   flex-direction: row;
   flex-grow: 1;
+  font-weight: 500;
   align-items: center;
   min-width: 150px;
   min-height: $item-height;
@@ -18,17 +20,22 @@ $menu-item-padding: 10px;
   // Prevent menu item text from being selected when user toggles menu.
   user-select: none;
 
+  &:hover {
+    background: $grey-1;
+  }
+
   // An item in a submenu associated with a top-level item.
   &--submenu {
     min-height: $item-height - 10px;
     background: $grey-1;
+    color: mix($grey-5, $grey-6, $weight: 50%);
+    font-weight: normal;
     &:hover {
-      background: $grey-1;
+      // Since submenu items already have a light grey background, we need to
+      // use a slightly darker grey as the hover state.
+      background: $grey-3;
+      color: $grey-6;
     }
-  }
-
-  &:hover {
-    background: $grey-1;
   }
 
   &.is-disabled {
@@ -39,6 +46,13 @@ $menu-item-padding: 10px;
 
   &.is-expanded {
     background: $grey-1;
+
+    // Since expanded items already have a light grey background, we need to
+    // make the hover state a little darker. This should match submenu items'
+    // hover state.
+    &:hover {
+      background: $grey-3;
+    }
   }
 
   &.is-selected {
@@ -55,7 +69,7 @@ $menu-item-padding: 10px;
 }
 
 .menu-item__icon {
-  color: $color-gray;
+  color: inherit;
   display: inline-block;
   margin-right: 4px;
   position: relative;
@@ -75,16 +89,12 @@ $menu-item-padding: 10px;
   white-space: nowrap;
   flex-grow: 1;
   flex-shrink: 1;
-  font-weight: 500;
+  font-weight: inherit;
 
   padding-right: $menu-item-padding;
 
   &--submenu {
-    font-weight: 300;
-  }
-
-  &:hover {
-    color: $brand;
+    font-weight: normal;
   }
 }
 
@@ -93,6 +103,7 @@ $menu-item-padding: 10px;
 .menu-item__toggle {
   @include outline-on-keyboard-focus;
 
+  color: $grey-4;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -112,10 +123,11 @@ $menu-item-padding: 10px;
 
   &:hover {
     background-color: $grey-3;
+    color: $grey-5;
   }
 
   &-icon {
-    width: 10px;
-    height: 10px;
+    width: 12px;
+    height: 12px;
   }
 }
