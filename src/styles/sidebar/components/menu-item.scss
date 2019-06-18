@@ -46,6 +46,13 @@ $menu-item-padding: 10px;
 
   &.is-expanded {
     background: $grey-1;
+
+    // Since expanded items already have a light grey background, we need to
+    // make the hover state a little darker. This should match submenu items'
+    // hover state.
+    &:hover {
+      background: $grey-3;
+    }
   }
 
   &.is-selected {
