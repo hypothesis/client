@@ -62,25 +62,25 @@ describe('SearchInput', () => {
     assert.calledWith(onSearch, { $query: 'new-query' });
   });
 
-  it('shows loading indicator when app is in a "loading" state', () => {
+  it('renders loading indicator when app is in a "loading" state', () => {
     fakeStore.isLoading.returns(true);
     const wrapper = createSearchInput();
     assert.isTrue(wrapper.exists('Spinner'));
   });
 
-  it('hides search button when app is in "loading" state', () => {
+  it('doesn\'t render search button when app is in "loading" state', () => {
     fakeStore.isLoading.returns(true);
     const wrapper = createSearchInput();
     assert.isFalse(wrapper.exists('button'));
   });
 
-  it('hides loading indicator when app is not in "loading" state', () => {
+  it('renders loading indicator when app is not in "loading" state', () => {
     fakeStore.isLoading.returns(false);
     const wrapper = createSearchInput();
     assert.isFalse(wrapper.exists('Spinner'));
   });
 
-  it('shows search button when app is not in "loading" state', () => {
+  it('doesn\'t render search button when app is not in "loading" state', () => {
     fakeStore.isLoading.returns(false);
     const wrapper = createSearchInput();
     assert.isTrue(wrapper.exists('button'));
