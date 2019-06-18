@@ -81,7 +81,7 @@ function GroupListItem({
         onToggleSubmenu={toggleSubmenu}
       />
       {isExpanded && (
-        <Fragment>
+        <div className="group-list-item__submenu">
           <ul onClick={collapseSubmenu}>
             {activityUrl && (
               <li>
@@ -109,7 +109,7 @@ function GroupListItem({
               This group is restricted to specific URLs.
             </p>
           )}
-        </Fragment>
+        </div>
       )}
     </Fragment>
   );
