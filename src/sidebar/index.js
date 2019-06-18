@@ -148,6 +148,10 @@ function startAngularApp(config) {
       wrapReactComponent(require('./components/annotation-action-button'))
     )
     .component(
+      'annotationPublishControl',
+      wrapReactComponent(require('./components/annotation-publish-control'))
+    )
+    .component(
       'annotationShareDialog',
       require('./components/annotation-share-dialog')
     )
