@@ -43,11 +43,11 @@ function MenuItem({
     'menu-item__label--submenu': isSubmenuItem,
   });
 
-  const leftIconSpace = icon !== undefined || isSubmenuItem;
-  const rightIconSpace = icon !== undefined && isSubmenuItem;
+  const hasLeftIcon = icon != null || isSubmenuItem; // eslint-disable-line eqeqeq
+  const hasRightIcon = icon != null && isSubmenuItem; // eslint-disable-line eqeqeq
 
   let renderedIcon = null;
-  if (icon) {
+  if (icon !== 'blank') {
     renderedIcon = iconIsUrl ? (
       <img className={iconClass} alt={iconAlt} src={icon} />
     ) : (
@@ -69,7 +69,7 @@ function MenuItem({
       role="menuitem"
       {...(onClick && onActivate('menuitem', onClick))}
     >
-      {leftIconSpace && (
+      {hasLeftIcon && (
         <div className="menu-item__icon-container">{leftIcon}</div>
       )}
       {href && (
@@ -83,7 +83,7 @@ function MenuItem({
         </a>
       )}
       {!href && <span className={labelClass}>{label}</span>}
-      {rightIconSpace && (
+      {hasRightIcon && (
         <div className="menu-item__icon-container">{rightIcon}</div>
       )}
       {typeof isSubmenuVisible === 'boolean' && (
@@ -120,8 +120,8 @@ MenuItem.propTypes = {
    * Name or URL of icon to display. If the value is a URL it is displayed
    * using an `<img>`, if it is a name it is displayed using `SvgIcon`.
    *
-   * If the property is `null` a blank placeholder is displayed in place of an
-   * icon. If the property is omitted, no placeholder is displayed.
+   * If the property is `"blank"` a blank placeholder is displayed in place of an
+   * icon. If the property is falsey, no placeholder is displayed.
    * The placeholder is useful to keep menu item labels aligned in a list if
    * some items have icons and others do not.
    */

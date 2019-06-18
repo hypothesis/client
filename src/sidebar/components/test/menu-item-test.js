@@ -42,8 +42,8 @@ describe('MenuItem', () => {
     assert.isTrue(wrapper.exists('SvgIcon[name="an-svg-icon"]'));
   });
 
-  it('renders a blank space for an icon if `icon` is `null`', () => {
-    const wrapper = createMenuItem({ icon: null });
+  it('renders a blank space for an icon if `icon` is "blank"', () => {
+    const wrapper = createMenuItem({ icon: 'blank' });
     const iconSpace = wrapper.find('.menu-item__icon-container');
     assert.equal(iconSpace.length, 1);
     assert.equal(iconSpace.children().length, 0);

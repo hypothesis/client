@@ -70,7 +70,7 @@ function GroupListItem({
   return (
     <Fragment>
       <MenuItem
-        icon={group.logo || null}
+        icon={group.logo || 'blank'}
         iconAlt={orgName(group)}
         isDisabled={!isSelectable}
         isExpanded={isExpanded}
