@@ -1,6 +1,7 @@
 'use strict';
 
 const { createElement } = require('preact');
+const { act } = require('preact/test-utils');
 const { mount } = require('enzyme');
 
 const Timestamp = require('../timestamp');
@@ -72,7 +73,10 @@ describe('Timestamp', () => {
       });
       fakeTime.toFuzzyString.returns('60 jiffies');
 
-      clock.tick(1000);
+      act(() => {
+        clock.tick(1000);
+      });
+      wrapper.update();
 
       assert.equal(wrapper.text(), '60 jiffies');
     });
