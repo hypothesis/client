@@ -74,13 +74,13 @@ describe('SearchInput', () => {
     assert.isFalse(wrapper.exists('button'));
   });
 
-  it('renders loading indicator when app is not in "loading" state', () => {
+  it('doesn\'t render loading indicator when app is not in "loading" state', () => {
     fakeStore.isLoading.returns(false);
     const wrapper = createSearchInput();
     assert.isFalse(wrapper.exists('Spinner'));
   });
 
-  it('doesn\'t render search button when app is not in "loading" state', () => {
+  it('renders search button when app is not in "loading" state', () => {
     fakeStore.isLoading.returns(false);
     const wrapper = createSearchInput();
     assert.isTrue(wrapper.exists('button'));
