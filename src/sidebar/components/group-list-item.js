@@ -87,7 +87,7 @@ function GroupListItem({
               <li>
                 <MenuItem
                   href={activityUrl}
-                  icon="share"
+                  icon="external"
                   isSubmenuItem={true}
                   label="View group activity"
                 />
