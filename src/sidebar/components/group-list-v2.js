@@ -57,12 +57,12 @@ function GroupList({ serviceUrl, settings }) {
   if (focusedGroup) {
     const icon = focusedGroup.organization.logo;
     label = (
-      <span>
+      <span className="group-list-v2__menu-label">
         <img
-          className="group-list-label__icon group-list-label__icon--organization"
+          className="group-list-v2__menu-icon"
           src={icon || publisherProvidedIcon(settings)}
         />
-        <span className="group-list-label__label">{focusedGroup.name}</span>
+        {focusedGroup.name}
       </span>
     );
   } else {
