@@ -43,6 +43,20 @@ function MenuItem({
     'menu-item__label--submenu': isSubmenuItem,
   });
 
+  const leftIconSpace = icon !== undefined || isSubmenuItem;
+  const rightIconSpace = icon !== undefined && isSubmenuItem;
+
+  let renderedIcon = null;
+  if (icon) {
+    renderedIcon = iconIsUrl ? (
+      <img className={iconClass} alt={iconAlt} src={icon} />
+    ) : (
+      <SvgIcon name={icon} className="menu-item__icon" />
+    );
+  }
+  const leftIcon = isSubmenuItem ? null : renderedIcon;
+  const rightIcon = isSubmenuItem ? renderedIcon : null;
+
   return (
     <div
       aria-checked={isSelected}
@@ -55,15 +69,8 @@ function MenuItem({
       role="menuitem"
       {...(onClick && onActivate('menuitem', onClick))}
     >
-      {icon !== undefined && (
-        <div className="menu-item__icon-container">
-          {icon &&
-            (iconIsUrl ? (
-              <img className={iconClass} alt={iconAlt} src={icon} />
-            ) : (
-              <SvgIcon name={icon} className="menu-item__icon" />
-            ))}
-        </div>
+      {leftIconSpace && (
+        <div className="menu-item__icon-container">{leftIcon}</div>
       )}
       {href && (
         <a
@@ -76,6 +83,9 @@ function MenuItem({
         </a>
       )}
       {!href && <span className={labelClass}>{label}</span>}
+      {rightIconSpace && (
+        <div className="menu-item__icon-container">{rightIcon}</div>
+      )}
       {typeof isSubmenuVisible === 'boolean' && (
         <div
           className="menu-item__toggle"
