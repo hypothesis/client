@@ -61,6 +61,63 @@ describe('store', function() {
     });
   });
 
+  describe('clearSelection', () => {
+    // Test clearSelection here over the entire store as it triggers the
+    // CLEAR_SELECTION action in multiple store modules.
+    it('sets `selectedAnnotationMap` to null', () => {
+      store.clearSelection();
+      assert.isNull(store.getState().selectedAnnotationMap);
+    });
+
+    it('sets `filterQuery` to null', () => {
+      store.clearSelection();
+      assert.isNull(store.getState().filterQuery);
+    });
+
+    it('sets `directLinkedGroupFetchFailed` to false', () => {
+      store.clearSelection();
+      assert.isFalse(store.getState().directLinkedGroupFetchFailed);
+    });
+
+    it('sets `directLinkedAnnotationId` to null', () => {
+      store.clearSelection();
+      assert.isNull(store.getState().directLinkedAnnotationId);
+    });
+
+    it('sets `directLinkedGroupId` to null', () => {
+      store.clearSelection();
+      assert.isNull(store.getState().directLinkedGroupId);
+    });
+
+    it('sets `sortKey` to default annotation sort key if set to Orphans', () => {
+      store.selectTab(uiConstants.TAB_ORPHANS);
+      store.clearSelection();
+      assert.equal(store.getState().sortKey, 'Location');
+    });
+
+    it('sets `sortKeysAvailable` to available annotation sort keys if set to Orphans', () => {
+      store.selectTab(uiConstants.TAB_ORPHANS);
+      store.clearSelection();
+      assert.deepEqual(store.getState().sortKeysAvailable, [
+        'Newest',
+        'Oldest',
+        'Location',
+      ]);
+    });
+
+    it('sets `selectedTab` to Annotations if set to Orphans', () => {
+      store.selectTab(uiConstants.TAB_ORPHANS);
+      store.clearSelection();
+      assert.equal(store.getState().selectedTab, uiConstants.TAB_ANNOTATIONS);
+    });
+
+    it('does not change `selectedTab` if set to something other than Orphans', () => {
+      store.selectTab(uiConstants.TAB_NOTES);
+      store.clearSelection();
+      assert.equal(store.getState().selectedTab, uiConstants.TAB_NOTES);
+    });
+  });
+
   describe('#addAnnotations()', function() {
     const ANCHOR_TIME_LIMIT = 1000;
     let clock;

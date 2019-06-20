@@ -64,6 +64,29 @@ function freeze(selection) {
   }
 }
 
+const setTab = (selectedTab, newTab) => {
+  // Do nothing if the "new tab" is not a valid tab.
+  if (
+    [
+      uiConstants.TAB_ANNOTATIONS,
+      uiConstants.TAB_NOTES,
+      uiConstants.TAB_ORPHANS,
+    ].indexOf(newTab) === -1
+  ) {
+    return {};
+  }
+  // Shortcut if the tab is already correct, to avoid resetting the sortKey
+  // unnecessarily.
+  if (selectedTab === newTab) {
+    return {};
+  }
+  return {
+    selectedTab: newTab,
+    sortKey: TAB_SORTKEY_DEFAULT[newTab],
+    sortKeysAvailable: TAB_SORTKEYS_AVAILABLE[newTab],
+  };
+};
+
 function init(settings) {
   return {
     // Contains a map of annotation tag:true pairs.
@@ -97,7 +120,20 @@ function init(settings) {
 }
 
 const update = {
-  CLEAR_SELECTION: function() {
+  CLEAR_SELECTION: function(state) {
+    let selectedTab = state.selectedTab;
+    if (selectedTab === uiConstants.TAB_ORPHANS) {
+      selectedTab = uiConstants.TAB_ANNOTATIONS;
+    }
+    const tabSettings = setTab(state.selectedTab, selectedTab);
+    return {
+      filterQuery: null,
+      selectedAnnotationMap: null,
+      ...tabSettings,
+    };
+  },
+
+  CLEAR_SELECTED_ANNOTATIONS: function() {
     return { filterQuery: null, selectedAnnotationMap: null };
   },
 
@@ -122,26 +158,7 @@ const update = {
   },
 
   SELECT_TAB: function(state, action) {
-    // Do nothing if the "new tab" is not a valid tab.
-    if (
-      [
-        uiConstants.TAB_ANNOTATIONS,
-        uiConstants.TAB_NOTES,
-        uiConstants.TAB_ORPHANS,
-      ].indexOf(action.tab) === -1
-    ) {
-      return {};
-    }
-    // Shortcut if the tab is already correct, to avoid resetting the sortKey
-    // unnecessarily.
-    if (state.selectedTab === action.tab) {
-      return {};
-    }
-    return {
-      selectedTab: action.tab,
-      sortKey: TAB_SORTKEY_DEFAULT[action.tab],
-      sortKeysAvailable: TAB_SORTKEYS_AVAILABLE[action.tab],
-    };
+    return setTab(state.selectedTab, action.tab);
   },
 
   ADD_ANNOTATIONS(state, action) {
@@ -312,7 +329,13 @@ function removeSelectedAnnotation(id) {
 
 /** De-select all annotations. */
 function clearSelectedAnnotations() {
-  return { type: actions.CLEAR_SELECTION };
+  return { type: actions.CLEAR_SELECTED_ANNOTATIONS };
+}
+
+function clearSelection() {
+  return {
+    type: actions.CLEAR_SELECTION,
+  };
 }
 
 /**
@@ -331,6 +354,7 @@ module.exports = {
 
   actions: {
     clearSelectedAnnotations: clearSelectedAnnotations,
+    clearSelection: clearSelection,
     focusAnnotations: focusAnnotations,
     highlightAnnotations: highlightAnnotations,
     removeSelectedAnnotation: removeSelectedAnnotation,
