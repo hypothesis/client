@@ -290,11 +290,51 @@ describe('GroupListItem', () => {
     });
   });
 
+  [
+    {
+      groupType: 'private',
+      expectedText: 'Copy invite link',
+      hasLink: true,
+    },
+    {
+      groupType: 'open',
+      expectedText: 'Copy activity link',
+      hasLink: true,
+    },
+    {
+      groupType: 'restricted',
+      expectedText: 'Copy activity link',
+      hasLink: true,
+    },
+    {
+      groupType: 'open',
+      expectedText: null,
+      hasLink: false,
+    },
+  ].forEach(({ groupType, expectedText, hasLink }) => {
+    it('shows appropriate "Copy link" action', () => {
+      fakeGroup.type = groupType;
+      fakeGroup.links.html = hasLink ? 'https://anno.co/groups/1' : null;
+      const wrapper = createGroupListItem(fakeGroup, {
+        defaultSubmenuOpen: true,
+      });
+      const copyAction = wrapper
+        .find('MenuItem')
+        .filterWhere(n => n.prop('label').startsWith('Copy'));
+
+      if (expectedText) {
+        assert.equal(copyAction.prop('label'), expectedText);
+      } else {
+        assert.isFalse(copyAction.exists());
+      }
+    });
+  });
+
   it('copies activity URL if "Copy link" action is clicked', () => {
     const wrapper = createGroupListItem(fakeGroup, {
       defaultSubmenuOpen: true,
     });
-    clickMenuItem(wrapper, 'Copy link');
+    clickMenuItem(wrapper, 'Copy invite link');
     assert.calledWith(fakeCopyText, 'https://annotate.com/groups/groupid');
     assert.calledWith(fakeFlash.info, 'Copied link for "Test"');
   });
@@ -304,7 +344,7 @@ describe('GroupListItem', () => {
     const wrapper = createGroupListItem(fakeGroup, {
       defaultSubmenuOpen: true,
     });
-    clickMenuItem(wrapper, 'Copy link');
+    clickMenuItem(wrapper, 'Copy invite link');
     assert.calledWith(fakeCopyText, 'https://annotate.com/groups/groupid');
     assert.calledWith(fakeFlash.error, 'Unable to copy link');
   });

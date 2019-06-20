@@ -75,6 +75,9 @@ function GroupListItem({
     }
   };
 
+  const copyLinkLabel =
+    group.type === 'private' ? 'Copy invite link' : 'Copy activity link';
+
   // Close the submenu when any clicks happen which close the top-level menu.
   const collapseSubmenu = () => setExpanded(false);
 
@@ -110,7 +113,7 @@ function GroupListItem({
                   onClick={copyLink}
                   icon="copy"
                   isSubmenuItem={true}
-                  label="Copy link"
+                  label={copyLinkLabel}
                 />
               </li>
             )}
