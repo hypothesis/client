@@ -5,6 +5,10 @@
  *
  * In most browsers, this function can only be called in response to a user
  * gesture. For example in response to a "click" event.
+ *
+ * @throws {Error}
+ *   This function may throw an exception if the browser rejects the attempt
+ *   to copy text.
  */
 function copyText(text) {
   const temp = document.createElement('span');
