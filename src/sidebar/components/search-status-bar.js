@@ -45,13 +45,16 @@ function SearchStatusBarController(store, rootThread) {
   this.filterActive = function() {
     return !!store.getState().filterQuery;
   };
+
+  this.onClearSelection = function() {
+    store.clearSelection();
+  };
 }
 
 module.exports = {
   controller: SearchStatusBarController,
   controllerAs: 'vm',
   bindings: {
-    onClearSelection: '&',
     selectedTab: '<',
     totalAnnotations: '<',
     totalNotes: '<',

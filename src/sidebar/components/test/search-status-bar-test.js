@@ -24,6 +24,7 @@ describe('searchStatusBar', () => {
       clearSelectedAnnotations: sinon.stub(),
       clearDirectLinkedGroupFetchFailed: sinon.stub(),
       clearDirectLinkedIds: sinon.stub(),
+      clearSelection: sinon.stub(),
     };
     angular.mock.module('app', {
       store: fakeStore,

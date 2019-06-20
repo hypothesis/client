@@ -49,7 +49,13 @@ const virtualThreadOptions = {
 };
 
 // @ngInject
-function ThreadListController($element, $scope, settings, VirtualThreadList) {
+function ThreadListController(
+  $element,
+  $scope,
+  settings,
+  store,
+  VirtualThreadList
+) {
   // `visibleThreads` keeps track of the subset of all threads matching the
   // current filters which are in or near the viewport and the view then renders
   // only those threads, using placeholders above and below the visible threads
@@ -162,7 +168,7 @@ function ThreadListController($element, $scope, settings, VirtualThreadList) {
     if (annotation.$highlight || metadata.isReply(annotation)) {
       return;
     }
-    self.onClearSelection();
+    store.clearSelection();
     scrollIntoView(annotation.$tag);
   });
 
@@ -191,8 +197,6 @@ module.exports = {
     onSelect: '&',
     /** Called when a user toggles the expansion state of an annotation thread. */
     onChangeCollapsed: '&',
-    /** Called to clear the current selection. */
-    onClearSelection: '&',
   },
   template: require('../templates/thread-list.html'),
 };

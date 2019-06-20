@@ -10,7 +10,6 @@
 
 <search-status-bar
   ng-show="!vm.isLoading()"
-  on-clear-selection="vm.clearSelection()"
   selected-tab="vm.selectedTab"
   total-annotations="vm.totalAnnotations"
   total-notes="vm.totalNotes">
@@ -40,7 +39,6 @@
 
 <thread-list
   on-change-collapsed="vm.setCollapsed(id, collapsed)"
-  on-clear-selection="vm.clearSelection()"
   on-focus="vm.focus(annotation)"
   on-select="vm.scrollTo(annotation)"
   show-document-info="false"

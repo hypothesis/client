@@ -5,7 +5,6 @@ const EventEmitter = require('tiny-emitter');
 
 const events = require('../../events');
 const sidebarContent = require('../sidebar-content');
-const uiConstants = require('../../ui-constants');
 const util = require('../../directive/test/util');
 
 let searchClients;
@@ -185,47 +184,6 @@ describe('sidebar.components.sidebar-content', function() {
 
   afterEach(function() {
     return sandbox.restore();
-  });
-
-  describe('clearSelection', () => {
-    it('sets selectedTab to Annotations tab if selectedTab is null', () => {
-      store.selectTab(uiConstants.TAB_ORPHANS);
-      $scope.$digest();
-      ctrl.clearSelection();
-
-      assert.equal(store.getState().selectedTab, uiConstants.TAB_ANNOTATIONS);
-    });
-
-    it('sets selectedTab to Annotations tab if selectedTab is set to orphans', () => {
-      store.selectTab(uiConstants.TAB_ORPHANS);
-      $scope.$digest();
-
-      ctrl.clearSelection();
-
-      assert.equal(store.getState().selectedTab, uiConstants.TAB_ANNOTATIONS);
-    });
-
-    it('clears selected annotations', () => {
-      ctrl.clearSelection();
-
-      assert.equal(store.getState().selectedAnnotationMap, null);
-      assert.equal(store.getState().filterQuery, null);
-    });
-
-    it('clears the directLinkedGroupFetchFailed state', () => {
-      store.setDirectLinkedGroupFetchFailed();
-
-      ctrl.clearSelection();
-
-      assert.isFalse(store.getState().directLinkedGroupFetchFailed);
-    });
-
-    it('clears the direct linked IDs in the store', () => {
-      ctrl.clearSelection();
-
-      assert.equal(store.getState().directLinkedAnnotationId, null);
-      assert.equal(store.getState().directLinkedGroupId, null);
-    });
   });
 
   describe('showSelectedTabs', () => {
