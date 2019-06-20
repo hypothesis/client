@@ -10,6 +10,8 @@ const { events } = require('../../services/analytics');
 
 describe('GroupListItem', () => {
   let fakeAnalytics;
+  let fakeCopyText;
+  let fakeFlash;
   let fakeGroupsService;
   let fakeStore;
   let fakeGroupListItemCommon;
@@ -40,6 +42,11 @@ describe('GroupListItem', () => {
       events,
     };
 
+    fakeFlash = {
+      info: sinon.stub(),
+      error: sinon.stub(),
+    };
+
     fakeGroupListItemCommon = {
       orgName: sinon.stub(),
     };
@@ -48,6 +55,8 @@ describe('GroupListItem', () => {
       leave: sinon.stub(),
     };
 
+    fakeCopyText = sinon.stub();
+
     function FakeMenuItem() {
       return null;
     }
@@ -55,6 +64,9 @@ describe('GroupListItem', () => {
 
     GroupListItem.$imports.$mock({
       './menu-item': FakeMenuItem,
+      '../util/copy-to-clipboard': {
+        copyText: fakeCopyText,
+      },
       '../util/group-list-item-common': fakeGroupListItemCommon,
       '../store/use-store': callback => callback(fakeStore),
     });
@@ -74,6 +86,7 @@ describe('GroupListItem', () => {
     // shallow rendering.
     return mount(
       <GroupListItem
+        flash={fakeFlash}
         group={fakeGroup}
         groups={fakeGroupsService}
         analytics={fakeAnalytics}
@@ -81,6 +94,16 @@ describe('GroupListItem', () => {
       />
     );
   };
+
+  function clickMenuItem(wrapper, label) {
+    act(() => {
+      wrapper
+        .find(`MenuItem[label="${label}"]`)
+        .props()
+        .onClick();
+    });
+    wrapper.update();
+  }
 
   it('changes the focused group when group is clicked', () => {
     const wrapper = createGroupListItem(fakeGroup);
@@ -218,12 +241,7 @@ describe('GroupListItem', () => {
     const wrapper = createGroupListItem(fakeGroup, {
       defaultSubmenuOpen: true,
     });
-    act(() => {
-      wrapper
-        .find('MenuItem[label="Leave group"]')
-        .props()
-        .onClick();
-    });
+    clickMenuItem(wrapper, 'Leave group');
     assert.called(window.confirm);
     assert.notCalled(fakeGroupsService.leave);
   });
@@ -233,12 +251,7 @@ describe('GroupListItem', () => {
       defaultSubmenuOpen: true,
     });
     window.confirm.returns(true);
-    act(() => {
-      wrapper
-        .find('MenuItem[label="Leave group"]')
-        .props()
-        .onClick();
-    });
+    clickMenuItem(wrapper, 'Leave group');
     assert.called(window.confirm);
     assert.calledWith(fakeGroupsService.leave, fakeGroup.id);
   });
@@ -275,5 +288,64 @@ describe('GroupListItem', () => {
       );
       assert.equal(wrapper.exists('.group-list-item__footer'), expectDisabled);
     });
+  });
+
+  [
+    {
+      groupType: 'private',
+      expectedText: 'Copy invite link',
+      hasLink: true,
+    },
+    {
+      groupType: 'open',
+      expectedText: 'Copy activity link',
+      hasLink: true,
+    },
+    {
+      groupType: 'restricted',
+      expectedText: 'Copy activity link',
+      hasLink: true,
+    },
+    {
+      groupType: 'open',
+      expectedText: null,
+      hasLink: false,
+    },
+  ].forEach(({ groupType, expectedText, hasLink }) => {
+    it('shows appropriate "Copy link" action', () => {
+      fakeGroup.type = groupType;
+      fakeGroup.links.html = hasLink ? 'https://anno.co/groups/1' : null;
+      const wrapper = createGroupListItem(fakeGroup, {
+        defaultSubmenuOpen: true,
+      });
+      const copyAction = wrapper
+        .find('MenuItem')
+        .filterWhere(n => n.prop('label').startsWith('Copy'));
+
+      if (expectedText) {
+        assert.equal(copyAction.prop('label'), expectedText);
+      } else {
+        assert.isFalse(copyAction.exists());
+      }
+    });
+  });
+
+  it('copies activity URL if "Copy link" action is clicked', () => {
+    const wrapper = createGroupListItem(fakeGroup, {
+      defaultSubmenuOpen: true,
+    });
+    clickMenuItem(wrapper, 'Copy invite link');
+    assert.calledWith(fakeCopyText, 'https://annotate.com/groups/groupid');
+    assert.calledWith(fakeFlash.info, 'Copied link for "Test"');
+  });
+
+  it('reports an error if "Copy link" action fails', () => {
+    fakeCopyText.throws(new Error('Something went wrong'));
+    const wrapper = createGroupListItem(fakeGroup, {
+      defaultSubmenuOpen: true,
+    });
+    clickMenuItem(wrapper, 'Copy invite link');
+    assert.calledWith(fakeCopyText, 'https://annotate.com/groups/groupid');
+    assert.calledWith(fakeFlash.error, 'Unable to copy link');
   });
 });
