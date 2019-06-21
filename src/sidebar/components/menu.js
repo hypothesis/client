@@ -82,6 +82,7 @@ function Menu({
       return () => {};
     }
 
+    // Close menu when user presses Escape key, regardless of focus.
     const removeKeypressListener = listen(
       document.body,
       ['keypress'],
@@ -92,6 +93,21 @@ function Menu({
       }
     );
 
+    // Close menu if user focuses an element outside the menu via any means
+    // (key press, programmatic focus change).
+    const removeFocusListener = listen(
+      document.body,
+      'focus',
+      event => {
+        if (!menuRef.current.contains(event.target)) {
+          closeMenu();
+        }
+      },
+      { useCapture: true }
+    );
+
+    // Close menu if user clicks outside menu, even if on an element which
+    // does not accept focus.
     const removeClickListener = listen(
       document.body,
       ['mousedown', 'click'],
@@ -107,6 +123,7 @@ function Menu({
     return () => {
       removeKeypressListener();
       removeClickListener();
+      removeFocusListener();
     };
   }, [closeMenu, isOpen]);
 
