@@ -82,18 +82,32 @@ function Menu({
       return () => {};
     }
 
-    const removeListeners = listen(
+    const removeKeypressListener = listen(
       document.body,
-      ['keypress', 'click', 'mousedown'],
+      ['keypress'],
       event => {
-        if (event.type === 'keypress' && event.key !== 'Escape') {
-          return;
+        if (event.key === 'Escape') {
+          closeMenu();
         }
-        closeMenu();
       }
     );
 
-    return removeListeners;
+    const removeClickListener = listen(
+      document.body,
+      ['mousedown', 'click'],
+      event => {
+        // nb. Mouse events inside the current menu are handled elsewhere.
+        if (!menuRef.current.contains(event.target)) {
+          closeMenu();
+        }
+      },
+      { useCapture: true }
+    );
+
+    return () => {
+      removeKeypressListener();
+      removeClickListener();
+    };
   }, [closeMenu, isOpen]);
 
   const stopPropagation = e => e.stopPropagation();
