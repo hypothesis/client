@@ -51,6 +51,15 @@ describe('Menu', () => {
     assert.isFalse(isOpen(wrapper));
   });
 
+  it('calls `onOpenChanged` prop when menu is opened or closed', () => {
+    const onOpenChanged = sinon.stub();
+    const wrapper = createMenu({ onOpenChanged });
+    wrapper.find('button').simulate('click');
+    assert.calledWith(onOpenChanged, true);
+    wrapper.find('button').simulate('click');
+    assert.calledWith(onOpenChanged, false);
+  });
+
   it('opens and closes when the toggle button is pressed', () => {
     const wrapper = createMenu();
     assert.isFalse(isOpen(wrapper));

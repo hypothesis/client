@@ -91,6 +91,7 @@ function GroupList({ serviceUrl, settings }) {
       align="left"
       contentClass="group-list__content"
       label={label}
+      onOpenChanged={() => setExpandedGroup(null)}
       title="Select group"
     >
       {currentGroupsSorted.length > 0 && (

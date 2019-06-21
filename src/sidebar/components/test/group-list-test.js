@@ -173,16 +173,21 @@ describe('GroupList', () => {
     assert.equal(img.prop('src'), 'test-icon');
   });
 
-  it('sets or resets expanded group item', () => {
+  /**
+   * Assert that the submenu for a particular group is expanded (or none is
+   * if `group` is `null`).
+   */
+  const verifyGroupIsExpanded = (wrapper, group) =>
+    wrapper.find('GroupListSection').forEach(section => {
+      assert.equal(section.prop('expandedGroup'), group);
+    });
+
+  it("sets or resets expanded group item when a group's submenu toggle is clicked", () => {
     const testGroups = populateGroupSections();
 
     // Render group list. Initially no submenu should be expanded.
     const wrapper = createGroupList();
-    const verifyGroupIsExpanded = group =>
-      wrapper.find('GroupListSection').forEach(section => {
-        assert.equal(section.prop('expandedGroup'), group);
-      });
-    verifyGroupIsExpanded(null);
+    verifyGroupIsExpanded(wrapper, null);
 
     // Expand a group in one of the sections.
     act(() => {
@@ -192,7 +197,7 @@ describe('GroupList', () => {
         .prop('onExpandGroup')(testGroups[0]);
     });
     wrapper.update();
-    verifyGroupIsExpanded(testGroups[0]);
+    verifyGroupIsExpanded(wrapper, testGroups[0]);
 
     // Reset expanded group.
     act(() => {
@@ -202,6 +207,28 @@ describe('GroupList', () => {
         .prop('onExpandGroup')(null);
     });
     wrapper.update();
-    verifyGroupIsExpanded(null);
+    verifyGroupIsExpanded(wrapper, null);
+  });
+
+  it('resets expanded group when menu is closed', () => {
+    const testGroups = populateGroupSections();
+    const wrapper = createGroupList();
+
+    // Expand one of the submenus.
+    act(() => {
+      wrapper
+        .find('GroupListSection')
+        .first()
+        .prop('onExpandGroup')(testGroups[0]);
+    });
+    wrapper.update();
+    verifyGroupIsExpanded(wrapper, testGroups[0]);
+
+    // Close the menu
+    act(() => {
+      wrapper.find('Menu').prop('onOpenChanged')(false);
+    });
+    wrapper.update();
+    verifyGroupIsExpanded(wrapper, null);
   });
 });
