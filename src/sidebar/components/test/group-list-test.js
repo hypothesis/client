@@ -2,6 +2,7 @@
 
 const { shallow } = require('enzyme');
 const { createElement } = require('preact');
+const { act } = require('preact/test-utils');
 
 const GroupList = require('../group-list');
 
@@ -21,6 +22,27 @@ describe('GroupList', () => {
     return shallow(
       <GroupList serviceUrl={fakeServiceUrl} settings={fakeSettings} />
     ).dive();
+  }
+
+  /**
+   * Configure the store to populate all of the group sections.
+   * Must be called before group list is rendered.
+   */
+  function populateGroupSections() {
+    const testGroups = [
+      {
+        ...testGroup,
+        id: 'zzz',
+      },
+      {
+        ...testGroup,
+        id: 'aaa',
+      },
+    ];
+    fakeStore.getMyGroups.returns(testGroups);
+    fakeStore.getCurrentlyViewingGroups.returns(testGroups);
+    fakeStore.getFeaturedGroups.returns(testGroups);
+    return testGroups;
   }
 
   beforeEach(() => {
@@ -75,20 +97,7 @@ describe('GroupList', () => {
   });
 
   it('sorts groups within each section by organization', () => {
-    const testGroups = [
-      {
-        ...testGroup,
-        id: 'zzz',
-      },
-      {
-        ...testGroup,
-        id: 'aaa',
-      },
-    ];
-    fakeStore.getMyGroups.returns(testGroups);
-    fakeStore.getCurrentlyViewingGroups.returns(testGroups);
-    fakeStore.getFeaturedGroups.returns(testGroups);
-
+    const testGroups = populateGroupSections();
     const fakeGroupOrganizations = groups =>
       groups.sort((a, b) => a.id.localeCompare(b.id));
     GroupList.$imports.$mock({
@@ -162,5 +171,37 @@ describe('GroupList', () => {
     const label = wrapper.find('Menu').prop('label');
     const img = shallow(label).find('img');
     assert.equal(img.prop('src'), 'test-icon');
+  });
+
+  it('sets or resets expanded group item', () => {
+    const testGroups = populateGroupSections();
+
+    // Render group list. Initially no submenu should be expanded.
+    const wrapper = createGroupList();
+    const verifyGroupIsExpanded = group =>
+      wrapper.find('GroupListSection').forEach(section => {
+        assert.equal(section.prop('expandedGroup'), group);
+      });
+    verifyGroupIsExpanded(null);
+
+    // Expand a group in one of the sections.
+    act(() => {
+      wrapper
+        .find('GroupListSection')
+        .first()
+        .prop('onExpandGroup')(testGroups[0]);
+    });
+    wrapper.update();
+    verifyGroupIsExpanded(testGroups[0]);
+
+    // Reset expanded group.
+    act(() => {
+      wrapper
+        .find('GroupListSection')
+        .first()
+        .prop('onExpandGroup')(null);
+    });
+    wrapper.update();
+    verifyGroupIsExpanded(null);
   });
 });

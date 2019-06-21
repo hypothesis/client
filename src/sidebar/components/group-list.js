@@ -1,7 +1,7 @@
 'use strict';
 
 const { createElement } = require('preact');
-const { useMemo } = require('preact/hooks');
+const { useMemo, useState } = require('preact/hooks');
 const propTypes = require('prop-types');
 
 const isThirdPartyService = require('../util/is-third-party-service');
@@ -53,6 +53,13 @@ function GroupList({ serviceUrl, settings }) {
   const canCreateNewGroup = userid && !isThirdPartyUser(userid, authDomain);
   const newGroupLink = serviceUrl('groups.new');
 
+  // The group whose submenu is currently open, or `null` if no group item is
+  // currently expanded.
+  //
+  // nb. If we create other menus that behave similarly in future, we may want
+  // to move this state to the `Menu` component.
+  const [expandedGroup, setExpandedGroup] = useState(null);
+
   let label;
   if (focusedGroup) {
     const icon = focusedGroup.organization.logo;
@@ -88,18 +95,27 @@ function GroupList({ serviceUrl, settings }) {
     >
       {currentGroupsSorted.length > 0 && (
         <GroupListSection
+          expandedGroup={expandedGroup}
+          onExpandGroup={setExpandedGroup}
           heading="Currently Viewing"
           groups={currentGroupsSorted}
         />
       )}
       {featuredGroupsSorted.length > 0 && (
         <GroupListSection
+          expandedGroup={expandedGroup}
+          onExpandGroup={setExpandedGroup}
           heading="Featured Groups"
           groups={featuredGroupsSorted}
         />
       )}
       {myGroupsSorted.length > 0 && (
-        <GroupListSection heading="My Groups" groups={myGroupsSorted} />
+        <GroupListSection
+          expandedGroup={expandedGroup}
+          onExpandGroup={setExpandedGroup}
+          heading="My Groups"
+          groups={myGroupsSorted}
+        />
       )}
 
       {canCreateNewGroup && (

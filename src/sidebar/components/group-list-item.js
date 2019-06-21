@@ -2,7 +2,6 @@
 
 const propTypes = require('prop-types');
 const { Fragment, createElement } = require('preact');
-const { useState } = require('preact/hooks');
 
 const useStore = require('../store/use-store');
 const { orgName } = require('../util/group-list-item-common');
@@ -19,19 +18,17 @@ const MenuItem = require('./menu-item');
  */
 function GroupListItem({
   analytics,
-  defaultSubmenuOpen = false,
+  isExpanded,
   flash,
   group,
   groups: groupsService,
+  onExpand,
 }) {
   const canLeaveGroup = group.type === 'private';
   const activityUrl = group.links.html;
   const hasActionMenu = activityUrl || canLeaveGroup;
   const isSelectable = !group.scopes.enforced || group.isScopedToUri;
 
-  const [isExpanded, setExpanded] = useState(
-    hasActionMenu ? defaultSubmenuOpen : undefined
-  );
   const focusedGroupId = useStore(store => store.focusedGroupId());
   const isSelected = group.id === focusedGroupId;
 
@@ -63,7 +60,7 @@ function GroupListItem({
     // TODO - Fix this more cleanly in `MenuItem`.
     event.preventDefault();
 
-    setExpanded(!isExpanded);
+    onExpand(!isExpanded);
   };
 
   const copyLink = () => {
@@ -79,7 +76,7 @@ function GroupListItem({
     group.type === 'private' ? 'Copy invite link' : 'Copy activity link';
 
   // Close the submenu when any clicks happen which close the top-level menu.
-  const collapseSubmenu = () => setExpanded(false);
+  const collapseSubmenu = () => onExpand(false);
 
   return (
     <Fragment>
@@ -87,7 +84,7 @@ function GroupListItem({
         icon={group.logo || 'blank'}
         iconAlt={orgName(group)}
         isDisabled={!isSelectable}
-        isExpanded={isExpanded}
+        isExpanded={hasActionMenu ? isExpanded : undefined}
         isSelected={isSelected}
         isSubmenuVisible={isExpanded}
         label={group.name}
@@ -142,8 +139,17 @@ function GroupListItem({
 GroupListItem.propTypes = {
   group: propTypes.object.isRequired,
 
-  /** Whether the submenu is open when the item is initially rendered. */
-  defaultSubmenuOpen: propTypes.bool,
+  /**
+   * Whether the submenu for this group is expanded.
+   */
+  isExpanded: propTypes.bool,
+
+  /**
+   * Callback invoked to expand or collapse the current group.
+   *
+   * @type {(expand: boolean) => any}
+   */
+  onExpand: propTypes.func,
 
   // Injected services.
   analytics: propTypes.object.isRequired,
