@@ -207,6 +207,7 @@ function startAngularApp(config) {
 
     .service('analytics', require('./services/analytics'))
     .service('annotationMapper', require('./services/annotation-mapper'))
+    .service('annotations', require('./services/annotations'))
     .service('api', require('./services/api'))
     .service('apiRoutes', require('./services/api-routes'))
     .service('auth', require('./services/oauth-auth'))
