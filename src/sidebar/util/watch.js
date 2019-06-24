@@ -54,7 +54,9 @@ export function watch(subscribe, watchFns, callback) {
   const isArray = Array.isArray(watchFns);
 
   const getWatchedValues = () =>
-    isArray ? watchFns.map(fn => fn()) : watchFns();
+    isArray
+      ? /** @type {Function[]} */ (watchFns).map(fn => fn())
+      : /** @type {Function} */ (watchFns)();
 
   let prevValues = getWatchedValues();
   const unsubscribe = subscribe(() => {

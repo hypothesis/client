@@ -25,6 +25,7 @@ export function clearFormatters() {
  * @param {Date} now
  */
 function delta(date, now) {
+  // @ts-ignore
   return now - date;
 }
 
@@ -145,7 +146,7 @@ const BREAKPOINTS = [
  *
  * @param {Date} date - The date to consider as the timestamp to format.
  * @param {Date} now - The date to consider as the current time.
- * @return {breakpoint|null} An object that describes how to format the date or
+ * @return {Object} An object that describes how to format the date or
  *                           null if no breakpoint matches.
  */
 function getBreakpoint(date, now) {
@@ -195,7 +196,7 @@ export function nextFuzzyUpdate(date, now) {
  * This can be used to refresh parts of a UI whose
  * update frequency depends on the age of a timestamp.
  *
- * @param {String} date - An ISO 8601 date string timestamp to format.
+ * @param {string} date - An ISO 8601 date string timestamp to format.
  * @param {UpdateCallback} callback - A callback function to call when the timestamp changes.
  * @return {Function} A function that cancels the automatic refresh.
  */
@@ -223,7 +224,7 @@ export function decayingInterval(date, callback) {
 /**
  * This callback is a param for the `decayingInterval` function.
  * @callback UpdateCallback
- * @param {Date} - The date associated with the current interval/timeout
+ * @param {string} date - The date associated with the current interval/timeout
  */
 
 /**

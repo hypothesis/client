@@ -1,11 +1,14 @@
+/** @typedef {import('redux').Store} Store */
+
 /**
  * Return a value from app state when it meets certain criteria.
  *
  * `await` returns a Promise which resolves when a selector function,
  * which reads values from a Redux store, returns non-null.
  *
+ * @template T
  * @param {Object} store - Redux store
- * @param {Function<T|null>} selector - Function which returns a value from the
+ * @param {(s: Store) => T|null} selector - Function which returns a value from the
  *   store if the criteria is met or `null` otherwise.
  * @return {Promise<T>}
  */

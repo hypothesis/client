@@ -1,3 +1,5 @@
+/** @typedef {import('../build-thread').Thread} Thread */
+
 /**
  * Count the number of annotations/replies in the `thread` whose `visible`
  * property matches `visibility`.

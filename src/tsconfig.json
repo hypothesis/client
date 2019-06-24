@@ -1,7 +1,14 @@
 {
   "compilerOptions": {
-    "target": "ES5",
+    "allowJs": true,
+    "checkJs": true,
+    "lib": ["es2018", "dom"],
+    "jsx": "react",
+    "jsxFactory": "createElement",
     "module": "commonjs",
-    "allowJs": true
-  }
+    "noEmit": true
+  },
+  "include": [
+    "sidebar/util/*.js"
+  ]
 }

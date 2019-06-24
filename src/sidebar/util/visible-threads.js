@@ -1,3 +1,7 @@
+/**
+ * @typedef {import('../build-thread').Thread} Thread
+ */
+
 export const THREAD_DIMENSION_DEFAULTS = {
   // When we don't have a real measurement of a thread card's height (yet)
   // from the browser, use this as an approximate value, in pixels.

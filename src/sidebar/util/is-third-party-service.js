@@ -9,7 +9,7 @@ import serviceConfig from '../service-config';
  * If no custom annotation services are configured then return `false`.
  *
  * @param {Object} settings - the sidebar settings object
- *
+ * @return {boolean}
  */
 export default function isThirdPartyService(settings) {
   const service = serviceConfig(settings);

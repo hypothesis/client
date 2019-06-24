@@ -58,7 +58,7 @@ export function sharedPermissions(userid, groupid) {
  * Return the default permissions for an annotation in a given group.
  *
  * @param {string} userid - User ID of the author
- * @param {string} groupId - ID of the group the annotation is being shared
+ * @param {string} groupid - ID of the group the annotation is being shared
  * with
  * @return {Permissions}
  */

@@ -1,21 +1,26 @@
 // Functions that determine which tab an annotation should be displayed in.
 
-import uiConstants from '../ui-constants';
-
 import * as metadata from './annotation-metadata';
+
+/**
+ * @typedef {import('../../types/api').Annotation} Annotation
+ *
+ * @typedef {'annotation'|'note'|'orphan'} Tab
+ */
 
 /**
  * Return the tab in which an annotation should be displayed.
  *
  * @param {Annotation} ann
+ * @return {Tab}
  */
 export function tabForAnnotation(ann) {
   if (metadata.isOrphan(ann)) {
-    return uiConstants.TAB_ORPHANS;
+    return 'orphan';
   } else if (metadata.isPageNote(ann)) {
-    return uiConstants.TAB_NOTES;
+    return 'note';
   } else {
-    return uiConstants.TAB_ANNOTATIONS;
+    return 'annotation';
   }
 }
 
@@ -23,7 +28,7 @@ export function tabForAnnotation(ann) {
  * Return true if an annotation should be displayed in a given tab.
  *
  * @param {Annotation} ann
- * @param {number} tab - The TAB_* value indicating the tab
+ * @param {Tab} tab
  */
 export function shouldShowInTab(ann, tab) {
   if (metadata.isWaitingToAnchor(ann)) {

@@ -18,7 +18,7 @@
  * An object representing document info
  *
  * @typedef {Object} DocumentInfo
- * @property {string=} url - current document URL
+ * @property {string=} uri - current document URL
  * @property {DocMetadata} metadata - document metadata
  */
 
@@ -27,7 +27,6 @@ export default class VersionData {
    * @param {UserInfo} userInfo
    * @param {DocumentInfo} documentInfo
    * @param {Window} window_ - test seam
-   * @return {VersionData}
    */
   constructor(userInfo, documentInfo, window_ = window) {
     const noValueString = 'N/A';

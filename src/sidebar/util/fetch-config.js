@@ -24,7 +24,7 @@ function ancestors(window_) {
  * Returns the global embedder ancestor frame.
  *
  * @param {number} levels - Number of ancestors levels to ascend.
- * @param {Window=} window
+ * @param {Window=} window_
  * @return {Window}
  */
 function getAncestorFrame(levels, window_ = window) {
@@ -57,6 +57,7 @@ function fetchConfigFromAncestorFrame(origin, window_ = window) {
       ancestor,
       origin,
       'requestConfig',
+      [],
       timeout
     );
     configResponses.push(result);
@@ -86,7 +87,7 @@ function fetchConfigLegacy(appConfig, window_ = window) {
   const hostPageConfig = hostConfig(window_);
 
   let embedderConfig;
-  const origin = hostPageConfig.requestConfigFromFrame;
+  const origin = /** @type string */ (hostPageConfig.requestConfigFromFrame);
   embedderConfig = fetchConfigFromAncestorFrame(origin, window_);
 
   return embedderConfig.then(embedderConfig => {
@@ -154,7 +155,7 @@ async function fetchConfigRpc(appConfig, parentFrame, origin) {
  *  already have the `services` value
  * @param {function} rpcCall - RPC method
  *  (method, args, timeout) => Promise
- * @return {Object} - The mutated settings
+ * @return {Promise<Object>} - The mutated settings
  */
 async function fetchGroupsAsync(config, rpcCall) {
   if (Array.isArray(config.services)) {
@@ -170,6 +171,7 @@ async function fetchGroupsAsync(config, rpcCall) {
   }
   return config;
 }
+
 /**
  * Fetch the host configuration and merge it with the app configuration from h.
  *
@@ -180,10 +182,11 @@ async function fetchGroupsAsync(config, rpcCall) {
  *
  * @param {Object} appConfig - Settings rendered into `app.html` by the h service.
  * @param {Window} window_ - Test seam.
- * @return {Object} - The merged settings.
+ * @return {Promise<Object>} - The merged settings.
  */
 export async function fetchConfig(appConfig, window_ = window) {
   const hostPageConfig = hostConfig(window);
+
   const requestConfigFromFrame = hostPageConfig.requestConfigFromFrame;
 
   if (!requestConfigFromFrame) {

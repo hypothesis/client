@@ -192,6 +192,8 @@ export default class OAuthClient {
         response_type: 'code',
         state: state,
       });
+
+    // @ts-ignore
     authWindow.location = authUrl;
 
     return authResponse.then(rsp => rsp.code);

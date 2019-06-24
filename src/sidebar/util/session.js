@@ -1,5 +1,7 @@
 import serviceConfig from '../service-config';
 
+/** @typedef {import('../../types/api').Profile} Profile */
+
 /**
  * Returns true if the sidebar tutorial has to be shown to a user for a given session.
  * @deprecated To be removed once preact help/tutorial panel is in place
@@ -25,7 +27,7 @@ export function shouldShowSidebarTutorial(sessionState) {
  *   in turn implies that there is an authenticated user.
  *
  * @param {boolean} isSidebar - is the app currently displayed in a sidebar?
- * @param {Object} sessionState - `session` state from the store
+ * @param {Profile} profile - User profile returned from the API
  * @param {Object} settings - app configuration/settings
  * @return {boolean} - Tutorial panel should be displayed automatically
  */
