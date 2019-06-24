@@ -4,7 +4,6 @@ const SearchClient = require('../search-client');
 const events = require('../events');
 const isThirdPartyService = require('../util/is-third-party-service');
 const tabs = require('../tabs');
-const uiConstants = require('../ui-constants');
 
 /**
  * Returns the group ID of the first annotation in `results` whose
@@ -314,21 +313,6 @@ function SidebarContentController(
     return (
       !this.isLoading() && !!selectedID && store.annotationExists(selectedID)
     );
-  };
-
-  this.clearSelection = function() {
-    let selectedTab = store.getState().selectedTab;
-    if (
-      !store.getState().selectedTab ||
-      store.getState().selectedTab === uiConstants.TAB_ORPHANS
-    ) {
-      selectedTab = uiConstants.TAB_ANNOTATIONS;
-    }
-
-    store.clearSelectedAnnotations();
-    store.selectTab(selectedTab);
-    store.clearDirectLinkedGroupFetchFailed();
-    store.clearDirectLinkedIds();
   };
 }
 
