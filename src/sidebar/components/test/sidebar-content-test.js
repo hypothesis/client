@@ -168,6 +168,10 @@ describe('sidebar.components.sidebar-content', function() {
       $scope = $rootScope.$new();
       store = _store_;
       store.updateFrameAnnotationFetchStatus = sinon.stub();
+      store.clearGroups();
+      store.loadGroups([{ id: 'group-id' }]);
+      store.focusGroup('group-id');
+
       ctrl = $componentController(
         'sidebarContent',
         { $scope: $scope },
@@ -491,15 +495,12 @@ describe('sidebar.components.sidebar-content', function() {
       $scope.$digest();
     });
 
-    function changeGroup() {
-      fakeGroups.focused.returns({ id: 'different-group' });
-      $scope.$digest();
-    }
-
     it('should load annotations for the new group', () => {
       const loadSpy = fakeAnnotationMapper.loadAnnotations;
+      store.loadGroups([{ id: 'different-group' }]);
+      store.focusGroup('different-group');
 
-      changeGroup();
+      $scope.$digest();
 
       assert.calledWith(fakeAnnotationMapper.unloadAnnotations, [
         sinon.match({ id: '123' }),
@@ -511,8 +512,10 @@ describe('sidebar.components.sidebar-content', function() {
 
     it('should clear the selection', () => {
       store.selectAnnotations(['123']);
+      store.loadGroups([{ id: 'different-group' }]);
+      store.focusGroup('different-group');
 
-      changeGroup();
+      $scope.$digest();
 
       assert.isFalse(store.hasSelectedAnnotations());
     });

@@ -233,16 +233,20 @@ function SidebarContentController(
   // Re-fetch annotations when focused group, logged-in user or connected frames
   // change.
   $scope.$watch(
-    () => [groups.focused(), store.profile().userid, ...store.searchUris()],
-    ([currentGroup], [prevGroup]) => {
-      if (!currentGroup) {
-        // When switching accounts, groups are cleared and so the focused group
+    () => [
+      store.focusedGroupId(),
+      store.profile().userid,
+      ...store.searchUris(),
+    ],
+    ([currentGroupId], [prevGroupId]) => {
+      if (!currentGroupId) {
+        // When switching accounts, groups are cleared and so the focused group id
         // will be null for a brief period of time.
         store.clearSelectedAnnotations();
         return;
       }
 
-      if (!prevGroup || currentGroup.id !== prevGroup.id) {
+      if (!prevGroupId || currentGroupId !== prevGroupId) {
         // The focused group may be changed during loading annotations as a result
         // of switching to the group containing a direct-linked annotation.
         //
