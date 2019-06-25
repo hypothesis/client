@@ -59,7 +59,7 @@ describe('SearchInput', () => {
     const wrapper = createSearchInput({ query: 'foo', onSearch });
     typeQuery(wrapper, 'new-query');
     wrapper.find('form').simulate('submit');
-    assert.calledWith(onSearch, { $query: 'new-query' });
+    assert.calledWith(onSearch, 'new-query');
   });
 
   it('renders loading indicator when app is in a "loading" state', () => {

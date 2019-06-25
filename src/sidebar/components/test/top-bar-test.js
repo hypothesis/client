@@ -176,7 +176,7 @@ describe('TopBar', () => {
       const searchInput = wrapper.find('SearchInput');
 
       assert.equal(searchInput.prop('query'), 'query');
-      searchInput.props().onSearch({ $query: 'new-query' });
+      searchInput.props().onSearch('new-query');
       assert.calledWith(onSearch, 'new-query');
     });
   });

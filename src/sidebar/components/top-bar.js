@@ -1,6 +1,7 @@
 'use strict';
 
 const { Fragment, createElement } = require('preact');
+const { useCallback } = require('preact/hooks');
 const classnames = require('classnames');
 const propTypes = require('prop-types');
 
@@ -35,7 +36,9 @@ function TopBar({
   const showSharePageButton = !isThirdPartyService(settings);
   const loginLinkStyle = applyTheme(['accentColor'], settings);
 
-  // TODO - Simplify `SearchInput`'s `onSearch` prop type
+  const onSearch = useCallback(query => searchController.update(query), [
+    searchController,
+  ]);
 
   const loginControl = (
     <Fragment>
@@ -67,7 +70,7 @@ function TopBar({
           <SearchInput
             className="SearchInput"
             query={searchController.query()}
-            onSearch={({ $query }) => searchController.update($query)}
+            onSearch={onSearch}
             alwaysExpanded={true}
           />
           <div className="top-bar__expander"></div>
@@ -99,7 +102,7 @@ function TopBar({
           <SearchInput
             className="SearchInput"
             query={searchController.query()}
-            onSearch={({ $query }) => searchController.update($query)}
+            onSearch={onSearch}
             title="Filter the annotation list"
           />
           <SortMenu />

@@ -30,10 +30,7 @@ function SearchInput({ alwaysExpanded, query, onSearch }) {
 
   const onSubmit = e => {
     e.preventDefault();
-    // TODO - When the parent components are converted to React, the signature
-    // of the callback can be simplified to `onSearch(query)` rather than
-    // `onSearch({ $query: query })`.
-    onSearch({ $query: input.current.value });
+    onSearch(input.current.value);
   };
 
   // When the active query changes outside of this component, update the input
