@@ -2771,9 +2771,9 @@ domhandler@^2.3.0:
     domelementtype "1"
 
 dompurify@^1.0.10:
-  version "1.0.10"
-  resolved "https://registry.yarnpkg.com/dompurify/-/dompurify-1.0.10.tgz#18d7353631c86ee25049e38fbca8c6b2c5a2af87"
-  integrity sha512-huhl3DSWX5LaA7jDtnj3XQdJgWW1wYouNW7N0drGzQa4vEUSVWyeFN+Atx6HP4r5cang6oQytMom6I4yhGJj5g==
+  version "1.0.11"
+  resolved "https://registry.yarnpkg.com/dompurify/-/dompurify-1.0.11.tgz#fe0f4a40d147f7cebbe31a50a1357539cfc1eb4d"
+  integrity sha512-XywCTXZtc/qCX3iprD1pIklRVk/uhl8BKpkTxr+ZyMVUzSUg7wkQXRBp/euJ5J5moa1QvfpvaPQVP71z1O59dQ==
 
 domutils@1.5.1:
   version "1.5.1"
@@ -3665,9 +3665,9 @@ flush-write-stream@^1.0.2:
     readable-stream "^2.0.4"
 
 focus-visible@^5.0.0:
-  version "5.0.0"
-  resolved "https://registry.yarnpkg.com/focus-visible/-/focus-visible-5.0.0.tgz#f4dfd73dae73506e4da88c73daed8df38918a98d"
-  integrity sha512-pBs5ZHozBCX99PFcByTmVFoXcAH2bY49P4b/clrluy35QIZyVFBvP7MpWA6az00fkfyGZPm3H7XakKFesLptVg==
+  version "5.0.1"
+  resolved "https://registry.yarnpkg.com/focus-visible/-/focus-visible-5.0.1.tgz#8bbe2d938bf88f067a252d72ac3a1cb2c3cb4767"
+  integrity sha512-xmuzsbC+LsF8iHlbBUvLsM6sfqyeUCAJTq3GK9JboFAdCqdDt/d4XoeE9jWT3cct2NFs/BKZ8IM8Yjkk1wgO3Q==
 
 follow-redirects@^1.0.0:
   version "1.4.1"
@@ -6910,10 +6910,10 @@ preact-render-to-string@^4.1.0:
   dependencies:
     pretty-format "^3.8.0"
 
-preact@10.0.0-beta.2:
-  version "10.0.0-beta.2"
-  resolved "https://registry.yarnpkg.com/preact/-/preact-10.0.0-beta.2.tgz#659b6520eb41d5a3d178a61b3311e6ae79d8cf56"
-  integrity sha512-sKu2tdECRcmG8B2Q0GIAhTR95PhaWy15RkYFgpzfkEQLo7qqnE5lYQO2ccHNTfwuzj0LVPRdG71s5QjhnRyVbQ==
+preact@10.0.0-beta.3:
+  version "10.0.0-beta.3"
+  resolved "https://registry.yarnpkg.com/preact/-/preact-10.0.0-beta.3.tgz#dabd0628d941f9e7908f68bb008e012ddff1b28f"
+  integrity sha512-JDeA+CVFBlv+r+v/tScG8hzOcOedXfBLUA5IhStqpfc7rPGY3T85pdlu4aGo2tV0AoZzQfO4LTnKkQEnKJ3UxQ==
 
 prelude-ls@~1.1.2:
   version "1.1.2"

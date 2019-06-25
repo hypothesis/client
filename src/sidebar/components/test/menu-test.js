@@ -83,6 +83,7 @@ describe('Menu', () => {
     new Event('mousedown'),
     new Event('click'),
     ((e = new Event('keypress')), (e.key = 'Escape'), e),
+    new Event('focus'),
   ].forEach(event => {
     it(`closes when the user clicks or presses the mouse outside (${event.type})`, () => {
       const wrapper = createMenu({ defaultOpen: true });
@@ -120,6 +121,51 @@ describe('Menu', () => {
       content = wrapper.find('.menu__content');
     });
     assert.isTrue(isOpen(wrapper));
+  });
+
+  [
+    {
+      eventType: 'click',
+      key: null,
+      shouldClose: true,
+    },
+    {
+      eventType: 'keypress',
+      key: 'Enter',
+      shouldClose: true,
+    },
+    {
+      eventType: 'keypress',
+      key: ' ',
+      shouldClose: true,
+    },
+    {
+      eventType: 'keypress',
+      key: 'a',
+      shouldClose: false,
+    },
+    {
+      eventType: 'focus',
+      key: null,
+      shouldClose: false,
+    },
+  ].forEach(({ eventType, key, shouldClose }) => {
+    it(`${
+      shouldClose ? 'closes' : "doesn't close"
+    } when user performs a "${eventType}" (key: "${key}") on menu content`, () => {
+      const wrapper = createMenu({ defaultOpen: true });
+      wrapper.find('.menu__content').simulate(eventType, { key });
+      assert.equal(isOpen(wrapper), !shouldClose);
+    });
+  });
+
+  it("doesn't close when user presses on a menu element outside the toggle button or content", () => {
+    const wrapper = createMenu({ defaultOpen: true });
+
+    // The event may be received either by the top `<div>` or the arrow element
+    // itself.
+    wrapper.find('.menu').simulate('mousedown');
+    wrapper.find('.menu__arrow').simulate('mousedown');
   });
 
   it('aligns menu content depending on `align` prop', () => {

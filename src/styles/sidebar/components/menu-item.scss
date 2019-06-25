@@ -1,6 +1,8 @@
 $menu-item-padding: 10px;
 
 .menu-item {
+  @include outline-on-keyboard-focus;
+
   $item-height: 40px;
 
   color: $grey-6;
