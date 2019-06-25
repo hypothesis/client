@@ -1,31 +1,25 @@
 'use strict';
 
-const angular = require('angular');
+const { shallow } = require('enzyme');
+const { createElement } = require('preact');
 
-const util = require('../../directive/test/util');
+const ModerationBanner = require('../moderation-banner');
 const fixtures = require('../../test/annotation-fixtures');
 const unroll = require('../../../shared/test/util').unroll;
 
 const moderatedAnnotation = fixtures.moderatedAnnotation;
 
-describe('moderationBanner', function() {
-  let bannerEl;
-  let fakeStore;
-  let fakeFlash;
+describe('ModerationBanner', () => {
   let fakeApi;
+  let fakeFlash;
 
-  before(function() {
-    angular
-      .module('app', [])
-      .component('moderationBanner', require('../moderation-banner'));
-  });
+  function createComponent(props) {
+    return shallow(
+      <ModerationBanner api={fakeApi} flash={fakeFlash} {...props} />
+    ).dive(); // dive() needed because this component uses `withServices`
+  }
 
-  beforeEach(function() {
-    fakeStore = {
-      hideAnnotation: sinon.stub(),
-      unhideAnnotation: sinon.stub(),
-    };
-
+  beforeEach(() => {
     fakeFlash = {
       error: sinon.stub(),
     };
@@ -37,31 +31,29 @@ describe('moderationBanner', function() {
       },
     };
 
-    angular.mock.module('app', {
-      store: fakeStore,
-      api: fakeApi,
-      flash: fakeFlash,
+    ModerationBanner.$imports.$mock({
+      '../store/use-store': callback =>
+        callback({
+          hide: sinon.stub(),
+          unhide: sinon.stub(),
+        }),
     });
   });
 
-  afterEach(function() {
-    bannerEl.remove();
+  afterEach(() => {
+    ModerationBanner.$imports.$restore();
   });
-
-  function createBanner(inputs) {
-    const el = util.createDirective(document, 'moderationBanner', inputs);
-    bannerEl = el[0];
-    return bannerEl;
-  }
 
   unroll(
     'displays if user is a moderator and annotation is hidden or flagged',
     function(testCase) {
-      const banner = createBanner({ annotation: testCase.ann });
+      const wrapper = createComponent({
+        annotation: testCase.ann,
+      });
       if (testCase.expectVisible) {
-        assert.notEqual(banner.textContent.trim(), '');
+        assert.notEqual(wrapper.text().trim(), '');
       } else {
-        assert.equal(banner.textContent.trim(), '');
+        assert.isFalse(wrapper.exists());
       }
     },
     [
@@ -72,9 +64,10 @@ describe('moderationBanner', function() {
       },
       {
         // Hidden, but user is not a moderator
-        ann: Object.assign(fixtures.defaultAnnotation(), {
+        ann: {
+          ...fixtures.defaultAnnotation(),
           hidden: true,
-        }),
+        },
         expectVisible: false,
       },
       {
@@ -98,42 +91,62 @@ describe('moderationBanner', function() {
 
   it('displays the number of flags the annotation has received', function() {
     const ann = fixtures.moderatedAnnotation({ flagCount: 10 });
-    const banner = createBanner({ annotation: ann });
-    assert.include(banner.textContent, 'Flagged for review x10');
+    const wrapper = createComponent({ annotation: ann });
+    assert.include(wrapper.text(), 'Flagged for review x10');
   });
 
   it('displays in a more compact form if the annotation is a reply', function() {
-    const ann = Object.assign(fixtures.oldReply(), {
-      moderation: {
-        flagCount: 10,
+    const wrapper = createComponent({
+      annotation: {
+        ...fixtures.oldReply(),
+        moderation: {
+          flagCount: 10,
+        },
       },
     });
-    const banner = createBanner({ annotation: ann });
-    assert.ok(banner.querySelector('.is-reply'));
+    wrapper.exists('.is-reply');
+  });
+
+  it('does not display in a more compact form if the annotation is not a reply', function() {
+    const wrapper = createComponent({
+      annotation: {
+        ...fixtures.moderatedAnnotation({}),
+        moderation: {
+          flagCount: 10,
+        },
+      },
+    });
+    assert.isFalse(wrapper.exists('.is-reply'));
   });
 
   it('reports if the annotation was hidden', function() {
-    const ann = moderatedAnnotation({
-      flagCount: 1,
-      hidden: true,
+    const wrapper = createComponent({
+      annotation: fixtures.moderatedAnnotation({
+        flagCount: 1,
+        hidden: true,
+      }),
     });
-    const banner = createBanner({ annotation: ann });
-    assert.include(banner.textContent, 'Hidden from users');
+    assert.include(wrapper.text(), 'Hidden from users');
   });
 
   it('hides the annotation if "Hide" is clicked', function() {
-    const ann = moderatedAnnotation({ flagCount: 10 });
-    const banner = createBanner({ annotation: ann });
-    banner.querySelector('button').click();
+    const wrapper = createComponent({
+      annotation: fixtures.moderatedAnnotation({
+        flagCount: 10,
+      }),
+    });
+    wrapper.find('button').simulate('click');
     assert.calledWith(fakeApi.annotation.hide, { id: 'ann-id' });
   });
 
   it('reports an error if hiding the annotation fails', function(done) {
-    const ann = moderatedAnnotation({ flagCount: 10 });
-    const banner = createBanner({ annotation: ann });
+    const wrapper = createComponent({
+      annotation: moderatedAnnotation({
+        flagCount: 10,
+      }),
+    });
     fakeApi.annotation.hide.returns(Promise.reject(new Error('Network Error')));
-
-    banner.querySelector('button').click();
+    wrapper.find('button').simulate('click');
 
     setTimeout(function() {
       assert.calledWith(fakeFlash.error, 'Failed to hide annotation');
@@ -142,29 +155,27 @@ describe('moderationBanner', function() {
   });
 
   it('unhides the annotation if "Unhide" is clicked', function() {
-    const ann = moderatedAnnotation({
-      flagCount: 1,
-      hidden: true,
+    const wrapper = createComponent({
+      annotation: moderatedAnnotation({
+        flagCount: 1,
+        hidden: true,
+      }),
     });
-    const banner = createBanner({ annotation: ann });
-
-    banner.querySelector('button').click();
-
+    wrapper.find('button').simulate('click');
     assert.calledWith(fakeApi.annotation.unhide, { id: 'ann-id' });
   });
 
   it('reports an error if unhiding the annotation fails', function(done) {
-    const ann = moderatedAnnotation({
-      flagCount: 1,
-      hidden: true,
+    const wrapper = createComponent({
+      annotation: moderatedAnnotation({
+        flagCount: 1,
+        hidden: true,
+      }),
     });
-    const banner = createBanner({ annotation: ann });
     fakeApi.annotation.unhide.returns(
       Promise.reject(new Error('Network Error'))
     );
-
-    banner.querySelector('button').click();
-
+    wrapper.find('button').simulate('click');
     setTimeout(function() {
       assert.calledWith(fakeFlash.error, 'Failed to unhide annotation');
       done();
