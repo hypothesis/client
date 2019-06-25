@@ -98,7 +98,8 @@ $base-font-size: 14px;
       height: 100%;
     }
 
-    ul, li {
+    ul,
+    li {
       box-sizing: border-box;
       list-style: none;
       @include reset-box-model;
@@ -106,7 +107,7 @@ $base-font-size: 14px;
   }
 
   .annotator-frame-button {
-    transition: background-color .25s .25s;
+    transition: background-color 0.25s 0.25s;
     @include smallshadow;
     background: $white;
     border: solid 1px $gray-lighter;
@@ -120,11 +121,12 @@ $base-font-size: 14px;
     margin-bottom: 5px;
 
     &:active {
-      transition: background-color .25s;
+      transition: background-color 0.25s;
       background-color: $gray-light;
     }
 
-    &:focus, &:hover {
+    &:focus,
+    &:hover {
       outline: 0;
       color: $text-color;
     }
@@ -202,7 +204,7 @@ $base-font-size: 14px;
 
 @media screen and (min-width: 37.5em) {
   .annotator-frame {
-    transition: margin-left .15s cubic-bezier(.55, 0, .2, .8);
+    transition: margin-left 0.15s cubic-bezier(0.55, 0, 0.2, 0.8);
     width: 428px;
     margin-left: -428px;
   }

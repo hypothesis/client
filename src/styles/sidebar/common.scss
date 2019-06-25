@@ -18,7 +18,9 @@ p {
   }
 }
 
-em { font-style: italic; }
+em {
+  font-style: italic;
+}
 
 html {
   font-size: $base-font-size;
@@ -36,13 +38,13 @@ html {
   float: right;
 }
 
-
 //CLOSER////////////////////////////////
 .close {
   cursor: pointer;
   float: right;
-  opacity: .6;
-  &:active, &:hover {
+  opacity: 0.6;
+  &:active,
+  &:hover {
     opacity: 1;
   }
 }
@@ -56,7 +58,10 @@ html {
     margin-bottom: 1.5em;
   }
 
-  select, textarea, input, button {
+  select,
+  textarea,
+  input,
+  button {
     display: block;
     // margin-top: .75em;
   }
@@ -119,9 +124,10 @@ html {
   }
 
   // These psuedo-elements add the speech bubble tail / triangle.
-  &:before, &:after {
+  &:before,
+  &:after {
     // http://www.red-team-design.com/css-diagonal-borders-still-not-rendering-properly-on-firefox
-    transform: scale(.9999);
+    transform: scale(0.9999);
     border-color: rgba(0, 0, 0, 0);
 
     border-style: solid;
@@ -151,7 +157,8 @@ html {
     text-align: right;
 
     // Align the tail
-    &:before, &:after {
+    &:before,
+    &:after {
       left: auto;
       right: 0;
     }
@@ -161,7 +168,8 @@ html {
   // the menu itself has to be aligned by the user
   &.pull-center {
     // Align the tail
-    &:before, &:after {
+    &:before,
+    &:after {
       left: auto;
       right: 50%;
     }
@@ -171,7 +179,8 @@ html {
   // This is used for cases where a separate element is used
   // as the indicator
   &.pull-none {
-    &:before, &:after {
+    &:before,
+    &:after {
       display: none;
     }
   }
@@ -207,7 +216,7 @@ html {
   border-bottom: $arrow-size solid $gray-lighter;
   position: absolute;
   right: 0px;
-  bottom: - $bottom-offset;
+  bottom: -$bottom-offset;
 
   z-index: 3;
 
@@ -220,7 +229,7 @@ html {
     border-left: $arrow-size solid transparent;
     border-right: $arrow-size solid transparent;
     border-bottom: $arrow-size solid white;
-    content: "";
+    content: '';
     position: absolute;
     left: 0 - $arrow-size;
     top: 1px;
@@ -248,7 +257,7 @@ html {
 }
 
 // Row in a dropdown menu
-.dropdown-menu__row--no-border{
+.dropdown-menu__row--no-border {
   border: none;
 }
 
@@ -275,7 +284,7 @@ html {
 
 //TABS////////////////////////////////
 .nav-tabs {
-  margin-bottom: .7em;
+  margin-bottom: 0.7em;
 
   & > li {
     display: inline-block;
@@ -287,16 +296,15 @@ html {
       color: $gray-dark;
       cursor: pointer;
       border-bottom: 3px solid transparent;
-      padding-left: .153em;
-      padding-right: .153em;
-      padding-bottom: .076em;
+      padding-left: 0.153em;
+      padding-right: 0.153em;
+      padding-bottom: 0.076em;
     }
 
     &:active a {
       position: relative;
-      top: .076em;
+      top: 0.076em;
     }
-
 
     &.active:active a {
       top: 0;
@@ -307,8 +315,8 @@ html {
     }
 
     &:before {
-      content: "/";
-      margin: 0 .75em;
+      content: '/';
+      margin: 0 0.75em;
     }
 
     &:first-child:before {

@@ -8,11 +8,13 @@
 
 $container-width: 1em;
 $container-height: $container-width;
-$part-width: .1em;
+$part-width: 0.1em;
 $part-height: 3 * $part-width;
 
 @keyframes spin {
-  to { transform: rotate(1turn); }
+  to {
+    transform: rotate(1turn);
+  }
 }
 
 // Container which centers the spinner vertically.
@@ -71,11 +73,11 @@ $part-height: 3 * $part-width;
 }
 
 .spinner > span > span:before {
-    transform: rotate(-120deg);
-    background: rgba(0, 0, 0, 0.3);
+  transform: rotate(-120deg);
+  background: rgba(0, 0, 0, 0.3);
 }
 
 .spinner > span > span:after {
-    transform: rotate(-150deg);
-    background: rgba(0, 0, 0, 0.2);
+  transform: rotate(-150deg);
+  background: rgba(0, 0, 0, 0.2);
 }

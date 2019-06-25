@@ -3,7 +3,6 @@ $adder-transition-duration: 80ms;
 // Main class for the root element of the "adder" toolbar that appears when the
 // user makes a text selection.
 .annotator-adder {
-
   // Reset all inherited properties to their initial values. This prevents CSS
   // property values from the host page being inherited by elements of the
   // Adder, even when using Shadow DOM.
@@ -18,7 +17,7 @@ $adder-transition-duration: 80ms;
   direction: ltr;
   position: absolute;
   background: $white;
-  border: 1px solid rgba(0,0,0,0.20);
+  border: 1px solid rgba(0, 0, 0, 0.2);
   border-radius: 4px;
   box-shadow: 0px 2px 10px 0px rgba(0, 0, 0, 0.25);
 
@@ -28,27 +27,41 @@ $adder-transition-duration: 80ms;
 }
 
 @keyframes adder-fade-in {
-  0% { opacity: 0.05; }
-  20% { opacity: 0.7; }
-  100% { opacity: 1.0; }
+  0% {
+    opacity: 0.05;
+  }
+  20% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 1;
+  }
 }
 
 @keyframes adder-pop-up {
-  from { transform: scale(0.8) translateY(10px); }
-  to { transform: scale(1.0) translateY(0px); }
+  from {
+    transform: scale(0.8) translateY(10px);
+  }
+  to {
+    transform: scale(1) translateY(0px);
+  }
 }
 
 @keyframes adder-pop-down {
-  from { transform: scale(0.8) translateY(-10px); }
-  to { transform: scale(1.0) translateY(0px); }
+  from {
+    transform: scale(0.8) translateY(-10px);
+  }
+  to {
+    transform: scale(1) translateY(0px);
+  }
 }
 
 @mixin adder-arrow($rotation) {
   transform: rotate($rotation);
   background: $white;
-  border-bottom: 1px solid rgba(0,0,0,0.20);
-  border-right: 1px solid rgba(0,0,0,0.20);
-  content: "";
+  border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+  border-right: 1px solid rgba(0, 0, 0, 0.2);
+  content: '';
   display: block;
   height: 6px;
   left: 0;

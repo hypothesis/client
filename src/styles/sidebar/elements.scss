@@ -4,7 +4,8 @@ a {
   text-decoration: none;
 }
 
-a:active, a:focus {
+a:active,
+a:focus {
   text-decoration: none;
 }
 
@@ -18,4 +19,6 @@ ol {
   padding-left: 3em;
 }
 
-svg { -webkit-tap-highlight-color: rgba(255, 255, 255, 0); }
+svg {
+  -webkit-tap-highlight-color: rgba(255, 255, 255, 0);
+}

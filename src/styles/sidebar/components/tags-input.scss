@@ -1,8 +1,8 @@
 // Styles for the ngTagsInput plugin.
 // http://mbenford.github.io/ngTagsInput/gettingstarted
 
-@import "../../mixins/forms";
-@import "../../variables";
+@import '../../mixins/forms';
+@import '../../variables';
 
 tags-input {
   .host {
@@ -20,7 +20,7 @@ tags-input {
     // Input
     .input {
       float: left;
-      padding: .1333em 0;
+      padding: 0.1333em 0;
       outline: none;
       border: none !important;
       background: none;
@@ -34,17 +34,17 @@ tags-input {
   }
 
   .tag-list {
-    margin-top: -.33em; // Absorb the first row of margin-top on the tags.
+    margin-top: -0.33em; // Absorb the first row of margin-top on the tags.
     float: left;
   }
 
   .tag-item {
     float: left;
     position: relative;
-    padding: .0769em 1.307em .0769em .538em;
-    margin-top: .384em;
-    margin-right: .384em;
-    font-size: .866em;
+    padding: 0.0769em 1.307em 0.0769em 0.538em;
+    margin-top: 0.384em;
+    margin-right: 0.384em;
+    font-size: 0.866em;
     color: $button-text-color;
     border: 1px solid $gray-lighter;
     border-radius: 2px;
@@ -61,7 +61,7 @@ tags-input {
       top: 0;
       right: 0;
       bottom: 0;
-      width: .9412em;
+      width: 0.9412em;
       font-size: 1.3077em;
       font-weight: bold;
       line-height: 1;
@@ -73,31 +73,32 @@ tags-input {
 }
 
 .tags-read-only {
-  font-size: .8461em;
-  margin: .4545em 0;
+  font-size: 0.8461em;
+  margin: 0.4545em 0;
 
   .tag-list {
     @include pie-clearfix;
     // Margin between bottom of ascent of annotation body and
     // top of tags list should be ~15px
-    margin-top: -$layout-h-margin + 10px ;
+    margin-top: -$layout-h-margin + 10px;
     // Margin between top of x-height of annotation footer
     // labels and bottom of tags list should be ~15px
-    margin-bottom: $layout-h-margin - 10px ;
+    margin-bottom: $layout-h-margin - 10px;
 
     .tag-item {
       float: left;
-      margin-right: .4545em;
+      margin-right: 0.4545em;
 
       a {
         text-decoration: none;
         border: 1px solid $gray-lighter;
         border-radius: 2px;
-        padding: 0 .4545em .1818em;
+        padding: 0 0.4545em 0.1818em;
         color: $gray-light;
         background: $gray-lightest;
 
-        &:hover, &:focus {
+        &:hover,
+        &:focus {
           color: $link-color-hover;
         }
       }
@@ -106,14 +107,14 @@ tags-input {
 }
 
 tags-input .autocomplete {
-  margin-top: .3em;
+  margin-top: 0.3em;
   position: absolute;
-  padding: .3em 0;
+  padding: 0.3em 0;
   z-index: 999;
   width: 100%;
   background-color: white;
   border: thin solid rgba(0, 0, 0, 0.2);
-  box-shadow: 0 .3em .6em rgba(0, 0, 0, 0.2);
+  box-shadow: 0 0.3em 0.6em rgba(0, 0, 0, 0.2);
 
   .suggestion-list {
     margin: 0;
@@ -122,7 +123,7 @@ tags-input .autocomplete {
   }
 
   .suggestion-item {
-    padding: .3em .6em;
+    padding: 0.3em 0.6em;
     cursor: pointer;
     white-space: nowrap;
     overflow: hidden;
@@ -131,12 +132,12 @@ tags-input .autocomplete {
     color: black;
     background-color: white;
 
-     em {
-       font-family: $sans-font-family;
-       font-weight: bold;
-       font-style: normal;
-       color: black;
-       background-color: white;
+    em {
+      font-family: $sans-font-family;
+      font-weight: bold;
+      font-style: normal;
+      color: black;
+      background-color: white;
     }
 
     &.selected {
