@@ -81,6 +81,30 @@
   color: $gray-light;
 }
 
+@mixin primary-action-btn {
+  // note that there is currently some duplication here between
+  // the styling for this element and <dropdown-menu-btn>
+  color: $color-seashell;
+  background-color: $color-dove-gray;
+  height: 35px;
+  border: none;
+  border-radius: 2px;
+
+  font-weight: bold;
+  font-size: $body1-font-size;
+
+  padding-left: 12px;
+  padding-right: 12px;
+
+  &:disabled {
+    color: $gray-light;
+  }
+
+  &:hover:enabled {
+    background-color: $color-mine-shaft;
+  }
+}
+
 // Tint and shade functions from
 // https://css-tricks.com/snippets/sass/tint-shade-functions
 @function tint($color, $percent) {

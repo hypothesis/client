@@ -187,4 +187,32 @@ describe('Menu', () => {
     const content = wrapper.find('.menu__content');
     assert.isTrue(content.hasClass('special-menu'));
   });
+
+  it('applies custom arrow class', () => {
+    const wrapper = createMenu({
+      arrowClass: 'my-arrow-class',
+      defaultOpen: true,
+    });
+    const arrow = wrapper.find('.menu__arrow');
+
+    assert.isTrue(arrow.hasClass('my-arrow-class'));
+  });
+
+  it('has relative positioning if `containerPositioned` is `true`', () => {
+    const wrapper = createMenu({
+      containerPositioned: true, // default
+    });
+    const menuContainer = wrapper.find('.menu');
+
+    assert.include({ position: 'relative' }, menuContainer.prop('style'));
+  });
+
+  it('has static positioning if `containerPositioned` is `false`', () => {
+    const wrapper = createMenu({
+      containerPositioned: false,
+    });
+    const menuContainer = wrapper.find('.menu');
+
+    assert.include({ position: 'static' }, menuContainer.prop('style'));
+  });
 });

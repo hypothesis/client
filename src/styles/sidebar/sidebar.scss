@@ -20,8 +20,8 @@ $base-line-height: 20px;
 // ----------
 @import './components/annotation';
 @import './components/annotation-share-dialog';
+@import './components/annotation-publish-control';
 @import './components/annotation-thread';
-@import './components/dropdown-menu-btn';
 @import './components/excerpt';
 @import './components/group-list';
 @import './components/group-list-v2';
@@ -37,7 +37,6 @@ $base-line-height: 20px;
 @import './components/moderation-banner';
 @import './components/new-note';
 @import './components/primary-action-btn';
-@import './components/publish-annotation-btn';
 @import './components/search-status-bar';
 @import './components/selection-tabs';
 @import './components/share-link';
