@@ -16,7 +16,6 @@ const DEFAULT_ORGANIZATION = {
 const events = require('../events');
 const { awaitStateChange } = require('../util/state-util');
 const { combineGroups } = require('../util/groups');
-const memoize = require('../util/memoize');
 const serviceConfig = require('../service-config');
 
 // @ngInject
