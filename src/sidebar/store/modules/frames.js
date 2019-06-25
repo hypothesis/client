@@ -1,5 +1,7 @@
 'use strict';
 
+const { createSelector } = require('reselect');
+
 const util = require('../util');
 
 function init() {
@@ -71,6 +73,24 @@ function frames(state) {
   return state.frames;
 }
 
+/**
+ * Return the "main" frame that the sidebar is connected to.
+ *
+ * The sidebar may be connected to multiple frames from different URLs.
+ * For some purposes, the main frame (typically the top-level one that contains
+ * the sidebar) needs to be distinguished. This selector returns the main frame
+ * for that purpose.
+ *
+ * This may be `null` during startup.
+ */
+const mainFrame = createSelector(
+  state => state.frames,
+
+  // Sub-frames will all have a "frame identifier" set. The main frame is the
+  // one with a `null` id.
+  frames => frames.find(f => !f.id) || null
+);
+
 function searchUrisForFrame(frame) {
   let uris = [frame.uri];
 
@@ -113,6 +133,7 @@ module.exports = {
 
   selectors: {
     frames,
+    mainFrame,
     searchUris,
   },
 };

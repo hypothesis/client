@@ -37,15 +37,11 @@ function groups(
 
   function getDocumentUriForGroupSearch() {
     function mainUri() {
-      const uris = store.searchUris();
-      if (uris.length === 0) {
+      const mainFrame = store.mainFrame();
+      if (!mainFrame) {
         return null;
       }
-
-      // We get the first HTTP URL here on the assumption that group scopes must
-      // be domains (+paths)? and therefore we need to look up groups based on
-      // HTTP URLs (so eg. we cannot use a "file:" URL or PDF fingerprint).
-      return uris.find(uri => uri.startsWith('http'));
+      return mainFrame.uri;
     }
     return awaitStateChange(store, mainUri);
   }
