@@ -44,7 +44,7 @@
   // overlaps the content's border. The effect is that the menu's border is a
   // rounded rect with a notch at the top.
   position: absolute;
-  top: calc(100% - 2px);  // nb. Adjust this if changing the <svg> size.
+  top: calc(100% - 2px); // nb. Adjust this if changing the <svg> size.
   right: 0;
   z-index: 1;
 }

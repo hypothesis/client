@@ -47,10 +47,10 @@
 }
 
 .sidebar-tutorial__list-item::before {
-  content: counter(sidebar-tutorial__list) ".";
+  content: counter(sidebar-tutorial__list) '.';
   display: table-cell; /* aha! */
   text-align: right;
-  padding-right: .3em;
+  padding-right: 0.3em;
   color: $gray-light;
 }
 

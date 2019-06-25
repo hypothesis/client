@@ -1,10 +1,10 @@
 // Common form styles.
-@import "mixins/forms";
+@import 'mixins/forms';
 
 .form-field {
   @include pie-clearfix;
   clear: both;
-  margin-bottom: .75em;
+  margin-bottom: 0.75em;
 }
 
 .form-description {
@@ -20,13 +20,14 @@
 .form-label {
   cursor: pointer;
   font-weight: bold;
-  margin-bottom: .4em;
+  margin-bottom: 0.4em;
 }
 
 .form-input {
   @include form-input;
 
-  &:focus, &.js-focus {
+  &:focus,
+  &.js-focus {
     @include form-input-focus;
   }
 }
@@ -39,7 +40,9 @@
 
 .form-field-error {
   .form-input {
-    &, &:focus, &.js-focus {
+    &,
+    &:focus,
+    &.js-focus {
       @include form-input-error;
     }
   }
@@ -53,13 +56,13 @@
   position: relative;
   display: none;
   background: $error-color;
-  margin-top: .75em;
-  padding: .25em .75em;
+  margin-top: 0.75em;
+  padding: 0.25em 0.75em;
   float: left;
   border-radius: 2px;
 
   .form-error {
-    font-size: .833em;
+    font-size: 0.833em;
     color: white;
   }
 
@@ -67,7 +70,7 @@
     bottom: 100%;
     left: 50%;
     border: solid transparent;
-    content: " ";
+    content: ' ';
     height: 0;
     width: 0;
     position: absolute;
@@ -85,11 +88,11 @@
 
 .form-actions {
   @include pie-clearfix;
-  margin-top: .75em;
+  margin-top: 0.75em;
 }
 
 .form-actions-message {
-  font-size: .833em;
+  font-size: 0.833em;
   float: left;
   margin-top: 1em;
 }
@@ -99,7 +102,7 @@
   float: right;
 
   > * {
-    margin-left: .75em;
+    margin-left: 0.75em;
     &:first-child {
       margin-left: 0;
     }
@@ -109,20 +112,27 @@
 .btn {
   @include btn;
 
-  &:hover, &:focus, &:active,
-  &.js-hover, &.js-focus, &.js-active {
+  &:hover,
+  &:focus,
+  &:active,
+  &.js-hover,
+  &.js-focus,
+  &.js-active {
     @include btn-hover;
   }
 
-  &:focus, &.js-focus {
+  &:focus,
+  &.js-focus {
     @include focus-outline;
   }
 
-  &:active, &.js-active {
+  &:active,
+  &.js-active {
     @include btn-active;
   }
 
-  &[disabled], &.js-disabled {
+  &[disabled],
+  &.js-disabled {
     @include btn-disabled;
   }
 }
@@ -130,21 +140,35 @@
 .btn-clean {
   border: none;
 
-  &, &:focus, &:hover, &:active, &[disabled],
-  &.js-hover, &.js-focus, &.js-active, &.js-disabled {
+  &,
+  &:focus,
+  &:hover,
+  &:active,
+  &[disabled],
+  &.js-hover,
+  &.js-focus,
+  &.js-active,
+  &.js-disabled {
     box-shadow: none;
     background: none;
   }
 
-  &:focus, &:hover, &:active, &.js-hover, &.js-focus, &.js-active {
+  &:focus,
+  &:hover,
+  &:active,
+  &.js-hover,
+  &.js-focus,
+  &.js-active {
     color: $link-color;
   }
 
-  &:active, &.js-active {
+  &:active,
+  &.js-active {
     color: $link-color-hover;
   }
 
-  &[disabled], &.js-disabled {
+  &[disabled],
+  &.js-disabled {
     color: $text-color;
   }
 }
@@ -162,7 +186,7 @@
 .btn-message {
   font-style: italic;
   color: $gray-light;
-  margin-right: .5em;
+  margin-right: 0.5em;
   position: absolute;
   right: 100%;
   top: 0;
@@ -173,7 +197,7 @@
   display: inline-block;
   background: $success-color;
   border-radius: 50%;
-  color: #FFF;
+  color: #fff;
   padding: 2px;
 }
 
@@ -192,19 +216,19 @@
   right: auto;
 }
 
-[status-button-state=success] .btn-message-success,
-[status-button-state=loading] .btn-message-loading {
+[status-button-state='success'] .btn-message-success,
+[status-button-state='loading'] .btn-message-loading {
   left: auto;
   top: 0;
   right: 100%;
 }
 
 [status-button-state] .btn-message-text {
-  transition: opacity .2s .6s ease-in;
+  transition: opacity 0.2s 0.6s ease-in;
   opacity: 0;
 }
 
-[status-button-state=success] .btn-message-success .btn-message-text {
+[status-button-state='success'] .btn-message-success .btn-message-text {
   opacity: 1;
 }
 
@@ -212,7 +236,7 @@
   transform: scale(0);
 }
 
-[status-button-state=success] .btn-message-success .btn-message-icon {
-  transition: transform .15s 0 cubic-bezier(0, 1.8, 1, 1.8);
+[status-button-state='success'] .btn-message-success .btn-message-icon {
+  transition: transform 0.15s 0 cubic-bezier(0, 1.8, 1, 1.8);
   transform: scale(1);
 }

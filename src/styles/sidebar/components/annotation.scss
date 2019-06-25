@@ -1,4 +1,4 @@
-@import "../../mixins/icons";
+@import '../../mixins/icons';
 
 // Highlight quote of annotation whenever its thread is hovered
 .thread-list__card:hover .annotation-quote {
@@ -118,7 +118,10 @@
   height: 60px;
   background: repeating-linear-gradient(
     to bottom,
-    $grey-2, $grey-2 15px, white 15px, white 20px
+    $grey-2,
+    $grey-2 15px,
+    white 15px,
+    white 20px
   );
 }
 
@@ -232,13 +235,14 @@
     margin: 0;
   }
 
-  .annotation-body, .annotation-footer {
+  .annotation-body,
+  .annotation-footer {
     display: none;
   }
 
   .annotation-collapsed-replies {
     display: inline;
-    margin-left: .25em;
+    margin-left: 0.25em;
   }
 }
 

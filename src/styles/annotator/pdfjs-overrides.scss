@@ -1,10 +1,14 @@
-@import "../variables";
+@import '../variables';
 
 // In order for our highlights to be visible we need to use solid colors.
 #viewer.has-transparent-text-layer .textLayer {
   opacity: 1;
-  ::selection { background: rgba(0, 0, 255, .2); }
-  ::-moz-selection { background: rgba(0 , 0 , 255, .2); }
+  ::selection {
+    background: rgba(0, 0, 255, 0.2);
+  }
+  ::-moz-selection {
+    background: rgba(0, 0, 255, 0.2);
+  }
 }
 
 // When using search funcionality of PDF.js the matches should highlight the content but not cover it. Fix for #648

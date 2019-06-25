@@ -6,30 +6,42 @@ $break-desktop: 1024px !default;
 @mixin respond-to($media) {
   @if type-of($media) == 'string' {
     @if $media == 'handhelds' {
-      @media only screen and (max-width: $break-wide-handheld) { @content; }
+      @media only screen and (max-width: $break-wide-handheld) {
+        @content;
+      }
+    } @else if $media == 'wide-handhelds' {
+      @media only screen and (min-width: $break-wide-handheld + 1) and (max-width: $break-tablet) {
+        @content;
+      }
+    } @else if $media == 'tablets' {
+      @media only screen and (min-width: $break-tablet + 1) and (max-width: $break-desktop) {
+        @content;
+      }
+    } @else if $media == 'desktops' {
+      @media only screen and (min-width: $break-desktop + 1) {
+        @content;
+      }
     }
-    @else if $media == 'wide-handhelds' {
-      @media only screen and (min-width: $break-wide-handheld + 1) and (max-width: $break-tablet) { @content; }
-    }
-    @else if $media == 'tablets' {
-      @media only screen and (min-width: $break-tablet + 1) and (max-width: $break-desktop) { @content; }
-    }
-    @else if $media == 'desktops' {
-      @media only screen and (min-width: $break-desktop + 1) { @content; }
-    }
-  }
-  @else if type-of($media) == 'list' {
+  } @else if type-of($media) == 'list' {
     @if index($media, 'handhelds') {
-      @media only screen and (max-width: $break-wide-handheld) { @content; }
+      @media only screen and (max-width: $break-wide-handheld) {
+        @content;
+      }
     }
     @if index($media, 'wide-handhelds') {
-      @media only screen and (min-width: $break-wide-handheld + 1) and (max-width: $break-tablet) { @content; }
+      @media only screen and (min-width: $break-wide-handheld + 1) and (max-width: $break-tablet) {
+        @content;
+      }
     }
     @if index($media, 'tablets') {
-      @media only screen and (min-width: $break-tablet + -1) and (max-width: $break-desktop){ @content; }
+      @media only screen and (min-width: $break-tablet + -1) and (max-width: $break-desktop) {
+        @content;
+      }
     }
     @if index($media, 'desktops') {
-      @media only screen and (min-width: $break-desktop + 1) { @content; }
+      @media only screen and (min-width: $break-desktop + 1) {
+        @content;
+      }
     }
   }
 }

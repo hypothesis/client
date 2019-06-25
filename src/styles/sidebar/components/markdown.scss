@@ -1,7 +1,7 @@
 //MARKDOWN EDITOR //////////////////////////
 .markdown-preview {
   overflow: auto;
-  border: .1em solid $gray-lighter;
+  border: 0.1em solid $gray-lighter;
   background-color: $gray-lightest;
   min-height: 120px;
   padding-left: 0.9em;
@@ -10,13 +10,13 @@
 
 .markdown-tools {
   background-color: $white;
-  border-top: .1em solid #D3D3D3;
-  border-left: .1em solid #D3D3D3;
-  border-right: .1em solid #D3D3D3;
-  border-radius: .15em .15em 0 0;
+  border-top: 0.1em solid #d3d3d3;
+  border-left: 0.1em solid #d3d3d3;
+  border-right: 0.1em solid #d3d3d3;
+  border-radius: 0.15em 0.15em 0 0;
   width: 100%;
-  margin-bottom: -.1em;
-  padding: .7em .7em .7em .5em;
+  margin-bottom: -0.1em;
+  padding: 0.7em 0.7em 0.7em 0.5em;
   user-select: none;
 
   &.disable {
@@ -26,12 +26,17 @@
     }
   }
 
-  .markdown-tools-button {padding: .4em;}
+  .markdown-tools-button {
+    padding: 0.4em;
+  }
 
-  .markdown-tools-button, .markdown-tools-toggle, .markdown-tools-badge {
+  .markdown-tools-button,
+  .markdown-tools-toggle,
+  .markdown-tools-badge {
     color: $gray;
 
-    &:hover, &:focus {
+    &:hover,
+    &:focus {
       color: black;
     }
   }
