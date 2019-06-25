@@ -29,8 +29,7 @@ function groups(
   serviceUrl,
   session,
   settings,
-  auth,
-  features
+  auth
 ) {
   const svc = serviceConfig(settings);
   const authority = svc ? svc.authority : null;
@@ -299,25 +298,8 @@ function groups(
     return groups;
   }
 
-  const sortGroups = memoize(groups => {
-    // Sort in the following order: scoped, public, private.
-    // This is for maintaining the order of the old groups menu so when
-    // the old groups menu is removed this can be removed.
-    const worldGroups = groups.filter(g => g.id === '__world__');
-    const nonWorldScopedGroups = groups.filter(
-      g => g.id !== '__world__' && ['open', 'restricted'].includes(g.type)
-    );
-    const remainingGroups = groups.filter(
-      g => !worldGroups.includes(g) && !nonWorldScopedGroups.includes(g)
-    );
-    return nonWorldScopedGroups.concat(worldGroups).concat(remainingGroups);
-  });
-
   function all() {
-    if (features.flagEnabled('community_groups')) {
-      return store.allGroups();
-    }
-    return sortGroups(store.getInScopeGroups());
+    return store.allGroups();
   }
 
   // Return the full object for the group with the given id.
