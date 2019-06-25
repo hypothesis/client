@@ -131,7 +131,6 @@ function startAngularApp(config) {
       // Angular addons which do not export the Angular module
       // name via module.exports
       ['ngTagsInput', require('ng-tags-input')][0],
-      ['ui.bootstrap', require('./vendor/ui-bootstrap-custom-tpls-0.13.4')][0],
 
       // Local addons
       'ngRaven',
