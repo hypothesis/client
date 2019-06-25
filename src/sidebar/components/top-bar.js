@@ -4,6 +4,7 @@ const { Fragment, createElement } = require('preact');
 const classnames = require('classnames');
 const propTypes = require('prop-types');
 
+const { applyTheme } = require('../util/theme');
 const isThirdPartyService = require('../util/is-third-party-service');
 const { withServices } = require('../util/service-context');
 
@@ -32,9 +33,8 @@ function TopBar({
 }) {
   const useCleanTheme = settings.theme === 'clean';
   const showSharePageButton = !isThirdPartyService(settings);
+  const loginLinkStyle = applyTheme(['accentColor'], settings);
 
-  // TODO - Replace `h-branding` directives.
-  // TODO - Replace `h-tooltip` directives.
   // TODO - Simplify `SearchInput`'s `onSearch` prop type
 
   const loginControl = (
@@ -42,16 +42,11 @@ function TopBar({
       {auth.status === 'unknown' && <span className="login-text">⋯</span>}
       {auth.status === 'logged-out' && (
         <span className="login-text">
-          <a
-            href="#"
-            onClick={onSignUp}
-            target="_blank"
-            h-branding="accentColor"
-          >
+          <a href="#" onClick={onSignUp} target="_blank" style={loginLinkStyle}>
             Sign up
           </a>{' '}
           /{' '}
-          <a href="#" onClick={onLogin} h-branding="accentColor">
+          <a href="#" onClick={onLogin} style={loginLinkStyle}>
             Log in
           </a>
         </span>
@@ -96,11 +91,9 @@ function TopBar({
             <a
               className="top-bar__apply-update-btn"
               onClick={onApplyPendingUpdates}
-              h-tooltip
-              tooltip-direction="up"
-              aria-label={`Show ${pendingUpdateCount} new/updated annotation(s)`}
+              title={`Show ${pendingUpdateCount} new/updated annotation(s)`}
             >
-              <SvgIcon className="top-bar__apply-icon" name="'refresh'" />
+              <SvgIcon className="top-bar__apply-icon" name="refresh" />
             </a>
           )}
           <SearchInput
