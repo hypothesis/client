@@ -72,14 +72,13 @@
 
   <footer class="annotation-footer">
     <div class="annotation-form-actions" ng-if="vm.editing()">
-      <publish-annotation-btn
-        class="publish-annotation-btn"
-        group="vm.group()"
-        can-post="vm.hasContent()"
-        is-shared="vm.isShared()"
-        on-cancel="vm.revert()"
-        on-save="vm.save()"
-        on-set-privacy="vm.setPrivacy(level)"></publish-annotation-btn>
+    <annotation-publish-control
+      group="vm.group()"
+      is-disabled="!vm.hasContent()"
+      is-shared="vm.isShared()"
+      on-cancel="vm.revert()"
+      on-save="vm.save()"
+      on-set-privacy="vm.setPrivacy(level)"></annotation-publish-control>
     </div>
 
     <div class="annotation-section annotation-license"

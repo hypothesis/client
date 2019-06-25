@@ -11,8 +11,8 @@ const SvgIcon = require('./svg-icon');
 
 // The triangular indicator below the menu toggle button that visually links it
 // to the menu content.
-const menuArrow = (
-  <svg className="menu__arrow" width={15} height={8}>
+const menuArrow = className => (
+  <svg className={classnames('menu__arrow', className)} width={15} height={8}>
     <path d="M0 8 L7 0 L15 8" stroke="currentColor" strokeWidth="2" />
   </svg>
 );
@@ -44,7 +44,9 @@ let ignoreNextClick = false;
  */
 function Menu({
   align = 'left',
+  arrowClass = '',
   children,
+  containerPositioned = true,
   contentClass,
   defaultOpen = false,
   label,
@@ -136,10 +138,16 @@ function Menu({
     }
   };
 
+  const containerStyle = {
+    position: containerPositioned ? 'relative' : 'static',
+  };
+
   return (
     <div
       className="menu"
       ref={menuRef}
+      // Add inline styles for positioning
+      style={containerStyle}
       // Don't close the menu if the mouse is released over one of the menu
       // elements outside the content area (eg. the arrow at the top of the
       // content).
@@ -167,7 +175,7 @@ function Menu({
       </button>
       {isOpen && (
         <Fragment>
-          {menuArrow}
+          {menuArrow(arrowClass)}
           <div
             className={classnames(
               'menu__content',
@@ -194,6 +202,13 @@ Menu.propTypes = {
   align: propTypes.oneOf(['left', 'right']),
 
   /**
+   * Additional CSS class for the arrow caret at the edge of the menu
+   * content that "points" toward the menu's toggle button. This can be used
+   * to adjust the position of that caret respective to the toggle button.
+   */
+  arrowClass: propTypes.string,
+
+  /**
    * Label element for the toggle button that hides and shows the menu.
    */
   label: propTypes.oneOfType([
@@ -208,6 +223,12 @@ Menu.propTypes = {
    * custom content is also allowed.
    */
   children: propTypes.any,
+
+  /**
+   * Whether the menu elements should be positioned relative to the Menu
+   * container. When `false`, the consumer is responsible for positioning.
+   */
+  containerPositioned: propTypes.bool,
 
   /**
    * Additional CSS classes to apply to the menu.

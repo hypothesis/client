@@ -148,6 +148,10 @@ function startAngularApp(config) {
       wrapReactComponent(require('./components/annotation-action-button'))
     )
     .component(
+      'annotationPublishControl',
+      wrapReactComponent(require('./components/annotation-publish-control'))
+    )
+    .component(
       'annotationShareDialog',
       require('./components/annotation-share-dialog')
     )
@@ -156,7 +160,6 @@ function startAngularApp(config) {
       'annotationViewerContent',
       require('./components/annotation-viewer-content')
     )
-    .component('dropdownMenuBtn', require('./components/dropdown-menu-btn'))
     .component('excerpt', require('./components/excerpt'))
     .component('groupList', require('./components/group-list'))
     .component(
@@ -173,10 +176,6 @@ function startAngularApp(config) {
     .component('markdown', require('./components/markdown'))
     .component('moderationBanner', require('./components/moderation-banner'))
     .component('newNoteBtn', require('./components/new-note-btn'))
-    .component(
-      'publishAnnotationBtn',
-      require('./components/publish-annotation-btn')
-    )
     .component(
       'searchInput',
       wrapReactComponent(require('./components/search-input'))
