@@ -82,32 +82,72 @@ function Menu({
       return () => {};
     }
 
-    const removeListeners = listen(
+    // Close menu when user presses Escape key, regardless of focus.
+    const removeKeypressListener = listen(
       document.body,
-      ['keypress', 'click', 'mousedown'],
+      ['keypress'],
       event => {
-        if (event.type === 'keypress' && event.key !== 'Escape') {
-          return;
+        if (event.key === 'Escape') {
+          closeMenu();
         }
-        if (
-          event.type === 'mousedown' &&
-          menuRef.current &&
-          menuRef.current.contains(event.target)
-        ) {
-          // Close the menu as soon as the user _presses_ the mouse outside the
-          // menu, but only when they _release_ the mouse if they click inside
-          // the menu.
-          return;
-        }
-        closeMenu();
       }
     );
 
-    return removeListeners;
+    // Close menu if user focuses an element outside the menu via any means
+    // (key press, programmatic focus change).
+    const removeFocusListener = listen(
+      document.body,
+      'focus',
+      event => {
+        if (!menuRef.current.contains(event.target)) {
+          closeMenu();
+        }
+      },
+      { useCapture: true }
+    );
+
+    // Close menu if user clicks outside menu, even if on an element which
+    // does not accept focus.
+    const removeClickListener = listen(
+      document.body,
+      ['mousedown', 'click'],
+      event => {
+        // nb. Mouse events inside the current menu are handled elsewhere.
+        if (!menuRef.current.contains(event.target)) {
+          closeMenu();
+        }
+      },
+      { useCapture: true }
+    );
+
+    return () => {
+      removeKeypressListener();
+      removeClickListener();
+      removeFocusListener();
+    };
   }, [closeMenu, isOpen]);
 
+  const stopPropagation = e => e.stopPropagation();
+
+  // Close menu if user presses a key which activates menu items.
+  const handleMenuKeyPress = event => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      closeMenu();
+    }
+  };
+
   return (
-    <div className="menu" ref={menuRef}>
+    <div
+      className="menu"
+      ref={menuRef}
+      // Don't close the menu if the mouse is released over one of the menu
+      // elements outside the content area (eg. the arrow at the top of the
+      // content).
+      onClick={stopPropagation}
+      // Don't close the menu if the user presses the mouse down on menu elements
+      // except for the toggle button.
+      onMouseDown={stopPropagation}
+    >
       <button
         aria-expanded={isOpen ? 'true' : 'false'}
         aria-haspopup={true}
@@ -135,6 +175,8 @@ function Menu({
               contentClass
             )}
             role="menu"
+            onClick={closeMenu}
+            onKeyPress={handleMenuKeyPress}
           >
             {children}
           </div>
