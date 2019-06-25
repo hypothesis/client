@@ -69,23 +69,25 @@ function MenuItem({
       role="menuitem"
       {...(onClick && onActivate('menuitem', onClick))}
     >
-      {hasLeftIcon && (
-        <div className="menu-item__icon-container">{leftIcon}</div>
-      )}
-      {href && (
-        <a
-          className={labelClass}
-          href={href}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          {label}
-        </a>
-      )}
-      {!href && <span className={labelClass}>{label}</span>}
-      {hasRightIcon && (
-        <div className="menu-item__icon-container">{rightIcon}</div>
-      )}
+      <div className="menu-item__action">
+        {hasLeftIcon && (
+          <div className="menu-item__icon-container">{leftIcon}</div>
+        )}
+        {href && (
+          <a
+            className={labelClass}
+            href={href}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {label}
+          </a>
+        )}
+        {!href && <span className={labelClass}>{label}</span>}
+        {hasRightIcon && (
+          <div className="menu-item__icon-container">{rightIcon}</div>
+        )}
+      </div>
       {typeof isSubmenuVisible === 'boolean' && (
         <div
           className="menu-item__toggle"

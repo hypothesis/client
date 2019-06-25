@@ -3,7 +3,6 @@ $menu-item-padding: 10px;
 .menu-item {
   @include outline-on-keyboard-focus;
 
-  $item-padding: $menu-item-padding;
   $item-height: 40px;
 
   color: $grey-6;
@@ -14,7 +13,6 @@ $menu-item-padding: 10px;
   align-items: center;
   min-width: 150px;
   min-height: $item-height;
-  padding-left: $item-padding;
 
   // TODO - Make the link fill the full available vertical space.
   cursor: pointer;
@@ -22,45 +20,52 @@ $menu-item-padding: 10px;
   // Prevent menu item text from being selected when user toggles menu.
   user-select: none;
 
-  &:hover {
-    background: $grey-1;
-  }
-
   // An item in a submenu associated with a top-level item.
   &--submenu {
     min-height: $item-height - 10px;
     background: $grey-1;
     color: mix($grey-5, $grey-6, $weight: 50%);
     font-weight: normal;
-    &:hover {
-      // Since submenu items already have a light grey background, we need to
-      // use a slightly darker grey as the hover state.
+  }
+
+  &.is-expanded {
+    background: $grey-1;
+  }
+}
+
+// The container for the clickable area of the menu item which triggers its
+// main action. For menu items without submenus, this covers the full area of
+// the menu item. For menu items with submenus, this covers the full area
+// except for the toggle that opens the submenu.
+.menu-item__action {
+  align-self: stretch;
+  display: flex;
+  flex-grow: 1;
+  align-items: center;
+  padding-left: $menu-item-padding;
+
+  &:hover {
+    background: $grey-1;
+
+    .menu-item.is-expanded & {
+      // Since expanded items already have a light grey background, we need to
+      // make the hover state a little darker. This should match submenu items'
+      // hover state.
+      background: $grey-3;
+    }
+
+    // Since submenu items already have a light grey background, we need to
+    // use a slightly darker grey as the hover state.
+    .menu-item--submenu & {
       background: $grey-3;
       color: $grey-6;
     }
   }
 
-  &.is-disabled {
-    .menu-item__label {
-      color: $grey-4;
-    }
-  }
-
-  &.is-expanded {
-    background: $grey-1;
-
-    // Since expanded items already have a light grey background, we need to
-    // make the hover state a little darker. This should match submenu items'
-    // hover state.
-    &:hover {
-      background: $grey-3;
-    }
-  }
-
-  &.is-selected {
+  .menu-item.is-selected & {
     $border-width: 4px;
     border-left: $border-width solid $brand;
-    padding-left: $item-padding - $border-width;
+    padding-left: $menu-item-padding - $border-width;
   }
 }
 
@@ -97,6 +102,10 @@ $menu-item-padding: 10px;
 
   &--submenu {
     font-weight: normal;
+  }
+
+  .menu-item.is-disabled & {
+    color: $grey-4;
   }
 }
 
