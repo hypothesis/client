@@ -61,6 +61,7 @@ function SearchInput({ alwaysExpanded, query, onSearch }) {
         <button
           type="button"
           className="search-input__icon top-bar__btn"
+          title="Search"
           onClick={() => input.current.focus()}
         >
           <i className="h-icon-search" />
