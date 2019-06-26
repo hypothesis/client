@@ -135,7 +135,14 @@ TopBar.propTypes = {
   /**
    * Object containing current authentication status.
    */
-  auth: propTypes.object,
+  auth: propTypes.shape({
+    status: propTypes.string.isRequired,
+
+    // Additional properties when user is logged in.
+    displayName: propTypes.string,
+    userid: propTypes.string,
+    username: propTypes.string,
+  }),
 
   /**
    * Flag indicating whether the app is the sidebar or a top-level page.
@@ -161,7 +168,13 @@ TopBar.propTypes = {
   /** Callback invoked when user clicks "Sign up" button. */
   onSignUp: propTypes.func,
 
-  searchController: propTypes.object,
+  /**
+   * Object used to read and update the search query.
+   */
+  searchController: propTypes.shape({
+    query: propTypes.func.isRequired,
+    update: propTypes.func.isRequired,
+  }),
 
   /** Count of updates received via WebSocket that have not been applied. */
   pendingUpdateCount: propTypes.number,
