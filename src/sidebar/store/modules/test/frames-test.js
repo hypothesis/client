@@ -1,6 +1,8 @@
 'use strict';
 
 const frames = require('../frames');
+const createStore = require('../../create-store');
+
 const session = require('../session');
 const util = require('../../util');
 const unroll = require('../../../../shared/test/util').unroll;
@@ -13,7 +15,16 @@ function init() {
   return Object.assign({}, frames.init(), session.init());
 }
 
-describe('frames reducer', function() {
+describe('sidebar/store/modules/frames', function() {
+  let store;
+
+  beforeEach(() => {
+    // Setup a store for tests. Note that some of the tests in this module
+    // pre-date the `createStore` helper and have not been refactored to use
+    // it yet.
+    store = createStore([frames]);
+  });
+
   describe('#connectFrame', function() {
     it('adds the frame to the list of connected frames', function() {
       const frame = { uri: 'http://example.com' };
@@ -68,6 +79,34 @@ describe('frames reducer', function() {
         )
       );
       assert.deepEqual(selectors.frames(updatedState), [frame]);
+    });
+  });
+
+  describe('#mainFrame', () => {
+    it('returns `null` if no frames are connected', () => {
+      assert.isNull(store.mainFrame());
+    });
+
+    [
+      {
+        frames: [{ id: null, uri: 'https://example.org' }],
+        expectedFrame: 0,
+      },
+      {
+        frames: [
+          // An iframe which is also connected.
+          { id: 'iframe1', uri: 'https://foo.com/' },
+
+          // The top-level frame.
+          { id: null, uri: 'https://example.org' },
+        ],
+        expectedFrame: 1,
+      },
+    ].forEach(({ frames, expectedFrame }) => {
+      it('returns the main frame from the frames connected to the sidebar', () => {
+        frames.forEach(frame => store.connectFrame(frame));
+        assert.equal(store.mainFrame(), frames[expectedFrame]);
+      });
     });
   });
 

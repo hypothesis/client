@@ -57,7 +57,7 @@ describe('groups', function() {
 
     fakeStore = fakeReduxStore(
       {
-        searchUris: ['http://example.org'],
+        mainFrame: { uri: 'http://example.org' },
         focusedGroup: null,
         groups: [],
         directLinkedGroupId: null,
@@ -76,8 +76,8 @@ describe('groups', function() {
         focusedGroup() {
           return this.getState().focusedGroup;
         },
-        searchUris() {
-          return this.getState().searchUris;
+        mainFrame() {
+          return this.getState().mainFrame;
         },
         focusedGroupId() {
           const group = this.getState().focusedGroup;
@@ -388,9 +388,9 @@ describe('groups', function() {
       it('waits for the document URL to be determined', () => {
         const svc = service();
 
-        fakeStore.setState({ searchUris: [] });
+        fakeStore.setState({ mainFrame: null });
         const loaded = svc.load();
-        fakeStore.setState({ searchUris: ['https://asite.com'] });
+        fakeStore.setState({ mainFrame: { uri: 'https://asite.com' } });
 
         return loaded.then(() => {
           assert.calledWith(fakeApi.groups.list, {
@@ -407,7 +407,7 @@ describe('groups', function() {
       });
 
       it('does not wait for the document URL', () => {
-        fakeStore.setState({ searchUris: [] });
+        fakeStore.setState({ mainFrame: null });
         const svc = service();
         return svc.load().then(() => {
           assert.calledWith(fakeApi.groups.list, {
@@ -775,14 +775,16 @@ describe('groups', function() {
       it('should refetch groups if main frame URL has changed', () => {
         const svc = service();
 
-        fakeStore.setState({ searchUris: ['https://domain.com/page-a'] });
+        fakeStore.setState({ mainFrame: { uri: 'https://domain.com/page-a' } });
         return svc
           .load()
           .then(() => {
             // Simulate main frame URL change, eg. due to client-side navigation in
             // a single page application.
             fakeApi.groups.list.resetHistory();
-            fakeStore.setState({ searchUris: ['https://domain.com/page-b'] });
+            fakeStore.setState({
+              mainFrame: { uri: 'https://domain.com/page-b' },
+            });
 
             return fakeRootScope.eventCallbacks[events.FRAME_CONNECTED]();
           })
@@ -794,7 +796,7 @@ describe('groups', function() {
       it('should not refetch groups if main frame URL has not changed', () => {
         const svc = service();
 
-        fakeStore.setState({ searchUris: ['https://domain.com/page-a'] });
+        fakeStore.setState({ mainFrame: { uri: 'https://domain.com/page-a' } });
         return svc
           .load()
           .then(() => {
