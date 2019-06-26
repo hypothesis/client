@@ -57,9 +57,9 @@ function GroupList({ serviceUrl, settings }) {
   if (focusedGroup) {
     const icon = focusedGroup.organization.logo;
     label = (
-      <span className="group-list-v2__menu-label">
+      <span className="group-list__menu-label">
         <img
-          className="group-list-v2__menu-icon"
+          className="group-list__menu-icon"
           src={icon || publisherProvidedIcon(settings)}
         />
         {focusedGroup.name}
@@ -82,7 +82,7 @@ function GroupList({ serviceUrl, settings }) {
   return (
     <Menu
       align="left"
-      contentClass="group-list-v2__content"
+      contentClass="group-list__content"
       label={label}
       title="Select group"
     >

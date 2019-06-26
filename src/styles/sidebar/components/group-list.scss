@@ -1,8 +1,8 @@
-.group-list-v2__content {
+.group-list__content {
   min-width: 250px;
 }
 
-.group-list-v2__menu-label {
+.group-list__menu-label {
   align-items: center;
   color: $grey-6;
   display: flex;
@@ -10,7 +10,7 @@
   font-weight: bold;
 }
 
-.group-list-v2__menu-icon {
+.group-list__menu-icon {
   width: 15px;
   height: 15px;
   margin-right: 4px;
