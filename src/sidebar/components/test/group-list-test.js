@@ -3,7 +3,7 @@
 const { shallow } = require('enzyme');
 const { createElement } = require('preact');
 
-const GroupList = require('../group-list-v2');
+const GroupList = require('../group-list');
 
 describe('GroupList', () => {
   let fakeServiceConfig;

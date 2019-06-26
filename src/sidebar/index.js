@@ -162,7 +162,7 @@ function startAngularApp(config) {
     .component('excerpt', require('./components/excerpt'))
     .component(
       'groupList',
-      wrapReactComponent(require('./components/group-list-v2'))
+      wrapReactComponent(require('./components/group-list'))
     )
     .component(
       'helpLink',
