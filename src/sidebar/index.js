@@ -161,9 +161,8 @@ function startAngularApp(config) {
       require('./components/annotation-viewer-content')
     )
     .component('excerpt', require('./components/excerpt'))
-    .component('groupList', require('./components/group-list'))
     .component(
-      'groupListV2',
+      'groupList',
       wrapReactComponent(require('./components/group-list-v2'))
     )
     .component(

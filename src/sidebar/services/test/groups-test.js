@@ -41,7 +41,6 @@ const dummyGroups = [
 
 describe('groups', function() {
   let fakeAuth;
-  let fakeFeatures;
   let fakeStore;
   let fakeIsSidebar;
   let fakeSession;
@@ -54,9 +53,6 @@ describe('groups', function() {
   beforeEach(function() {
     fakeAuth = {
       tokenGetter: sinon.stub().returns('1234'),
-    };
-    fakeFeatures = {
-      flagEnabled: sinon.stub().returns(false),
     };
 
     fakeStore = fakeReduxStore(
@@ -146,41 +142,16 @@ describe('groups', function() {
       fakeServiceUrl,
       fakeSession,
       fakeSettings,
-      fakeAuth,
-      fakeFeatures
+      fakeAuth
     );
   }
 
   describe('#all', function() {
-    it('returns all groups from store.allGroups when community-groups feature flag is enabled', () => {
+    it('returns all groups from store.allGroups', () => {
       const svc = service();
       fakeStore.allGroups = sinon.stub().returns(dummyGroups);
-      fakeFeatures.flagEnabled.withArgs('community_groups').returns(true);
       assert.deepEqual(svc.all(), dummyGroups);
       assert.called(fakeStore.allGroups);
-    });
-
-    it('returns all groups from store.getInScopeGroups when community-groups feature flag is disabled', () => {
-      const svc = service();
-      fakeStore.getInScopeGroups = sinon.stub().returns(dummyGroups);
-      assert.deepEqual(svc.all(), dummyGroups);
-      assert.called(fakeStore.getInScopeGroups);
-    });
-
-    [[0, 1, 2, 3], [2, 0, 1, 3], [0, 3, 1, 2]].forEach(groupInputOrder => {
-      it('sorts the groups in the following order: scoped, public, private maintaining order within each category.', () => {
-        const groups = [
-          { id: 0, type: 'open' },
-          { id: 1, type: 'restricted' },
-          { id: '__world__', type: 'open' },
-          { id: 3, type: 'private' },
-        ];
-        const svc = service();
-        fakeStore.getInScopeGroups = sinon
-          .stub()
-          .returns(groupInputOrder.map(id => groups[id]));
-        assert.deepEqual(svc.all(), groups);
-      });
     });
   });
 
