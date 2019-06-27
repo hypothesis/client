@@ -1,26 +1,14 @@
 <header class="annotation-header">
   <!-- User -->
   <span ng-if="vm.user()">
-    <a class="annotation-header__user"
-      target="_blank"
-      ng-if="!vm.isThirdPartyUser()"
-      ng-href="{{vm.serviceUrl('user',{user:vm.user()})}}"
-      >{{vm.displayName()}}</a>
-    <a class="annotation-header__user"
-      target="_blank"
-      ng-if="vm.isThirdPartyUser() && vm.thirdPartyUsernameLink()"
-      href="{{ vm.thirdPartyUsernameLink() }}"
-      >{{vm.displayName()}}</a>
-    <span class="annotation-header__user"
-      ng-if="vm.isThirdPartyUser() && !vm.thirdPartyUsernameLink()"
-      >{{vm.displayName()}}</span>
+    <annotation-user annotation="vm.annotation"></annotation-user>
     <span class="annotation-collapsed-replies">
       <a class="annotation-link" href=""
         ng-click="vm.onReplyCountClick()"
         ng-pluralize count="vm.replyCount"
         when="{'0': '', 'one': '1 reply', 'other': '{} replies'}"></a>
     </span>
-    <br>
+    <br />
     <span class="annotation-header__share-info">
       <a class="annotation-header__group"
         target="_blank" ng-if="vm.group() && vm.group().links.html" href="{{vm.group().links.html}}">
