@@ -41,9 +41,11 @@ function TopBar({
 
   const loginControl = (
     <Fragment>
-      {auth.status === 'unknown' && <span className="login-text">⋯</span>}
+      {auth.status === 'unknown' && (
+        <span className="top-bar__login-links">⋯</span>
+      )}
       {auth.status === 'logged-out' && (
-        <span className="login-text">
+        <span className="top-bar__login-links">
           <a href="#" onClick={onSignUp} target="_blank" style={loginLinkStyle}>
             Sign up
           </a>{' '}
