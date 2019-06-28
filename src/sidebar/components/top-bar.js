@@ -1,16 +1,17 @@
 'use strict';
 
 const { Fragment, createElement } = require('preact');
-const { useCallback } = require('preact/hooks');
 const classnames = require('classnames');
 const propTypes = require('prop-types');
 
+const useStore = require('../store/use-store');
 const { applyTheme } = require('../util/theme');
 const isThirdPartyService = require('../util/is-third-party-service');
 const { withServices } = require('../util/service-context');
 
 const GroupList = require('./group-list');
 const SearchInput = require('./search-input');
+const StreamSearchInput = require('./stream-search-input');
 const SortMenu = require('./sort-menu');
 const SvgIcon = require('./svg-icon');
 const UserMenu = require('./user-menu');
@@ -29,16 +30,14 @@ function TopBar({
   onShowHelpPanel,
   onSignUp,
   pendingUpdateCount,
-  searchController,
   settings,
 }) {
   const useCleanTheme = settings.theme === 'clean';
   const showSharePageButton = !isThirdPartyService(settings);
   const loginLinkStyle = applyTheme(['accentColor'], settings);
 
-  const onSearch = useCallback(query => searchController.update(query), [
-    searchController,
-  ]);
+  const filterQuery = useStore(store => store.filterQuery());
+  const setFilterQuery = useStore(store => store.setFilterQuery);
 
   const loginControl = (
     <Fragment>
@@ -67,12 +66,7 @@ function TopBar({
       {/* Single-annotation and stream views. */}
       {!isSidebar && (
         <div className="top-bar__inner content">
-          <SearchInput
-            className="SearchInput"
-            query={searchController.query()}
-            onSearch={onSearch}
-            alwaysExpanded={true}
-          />
+          <StreamSearchInput />
           <div className="top-bar__expander"></div>
           <button
             className="top-bar__btn top-bar__help-btn"
@@ -99,12 +93,7 @@ function TopBar({
               <SvgIcon className="top-bar__apply-icon" name="refresh" />
             </a>
           )}
-          <SearchInput
-            className="SearchInput"
-            query={searchController.query()}
-            onSearch={onSearch}
-            title="Filter the annotation list"
-          />
+          <SearchInput query={filterQuery} onSearch={setFilterQuery} />
           <SortMenu />
           {showSharePageButton && (
             <button
@@ -167,14 +156,6 @@ TopBar.propTypes = {
 
   /** Callback invoked when user clicks "Sign up" button. */
   onSignUp: propTypes.func,
-
-  /**
-   * Object used to read and update the search query.
-   */
-  searchController: propTypes.shape({
-    query: propTypes.func.isRequired,
-    update: propTypes.func.isRequired,
-  }),
 
   /** Count of updates received via WebSocket that have not been applied. */
   pendingUpdateCount: propTypes.number,

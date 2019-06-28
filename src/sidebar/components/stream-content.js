@@ -3,7 +3,6 @@
 // @ngInject
 function StreamContentController(
   $scope,
-  $location,
   $route,
   $routeParams,
   annotationMapper,
@@ -55,6 +54,9 @@ function StreamContentController(
     }
   });
 
+  // If redirected to this route from `/a/:id`, clear any existing annotations.
+  store.clearAnnotations();
+
   // Perform the initial search
   fetch(20);
 
@@ -68,18 +70,11 @@ function StreamContentController(
   store.setSortKey('Newest');
 
   this.loadMore = fetch;
-
-  this.$onInit = () => {
-    this.search.query = () => $routeParams.q || '';
-    this.search.update = q => $location.search({ q });
-  };
 }
 
 module.exports = {
   controller: StreamContentController,
   controllerAs: 'vm',
-  bindings: {
-    search: '<',
-  },
+  bindings: {},
   template: require('../templates/stream-content.html'),
 };

@@ -79,13 +79,12 @@ function configureRoutes($routeProvider) {
   // The `vm.{auth,search}` properties used in these templates come from the
   // `<hypothesis-app>` component which hosts the router's container element.
   $routeProvider.when('/a/:id', {
-    template:
-      '<annotation-viewer-content search="vm.search"></annotation-viewer-content>',
+    template: '<annotation-viewer-content></annotation-viewer-content>',
     reloadOnSearch: false,
     resolve: resolve,
   });
   $routeProvider.when('/stream', {
-    template: '<stream-content search="vm.search"></stream-content>',
+    template: '<stream-content></stream-content>',
     reloadOnSearch: false,
     resolve: resolve,
   });

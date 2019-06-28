@@ -5,6 +5,7 @@ const { shallow } = require('enzyme');
 
 const GroupList = require('../group-list');
 const SearchInput = require('../search-input');
+const StreamSearchInput = require('../stream-search-input');
 const SortMenu = require('../sort-menu');
 const TopBar = require('../top-bar');
 const UserMenu = require('../user-menu');
@@ -13,10 +14,17 @@ describe('TopBar', () => {
   const fakeSettings = {};
   let fakeIsThirdPartyService;
 
+  let fakeStore;
+
   beforeEach(() => {
     fakeIsThirdPartyService = sinon.stub().returns(false);
+    fakeStore = {
+      filterQuery: sinon.stub().returns(null),
+      setFilterQuery: sinon.stub(),
+    };
 
     TopBar.$imports.$mock({
+      '../store/use-store': callback => callback(fakeStore),
       '../util/is-third-party-service': fakeIsThirdPartyService,
     });
   });
@@ -35,18 +43,8 @@ describe('TopBar', () => {
 
   function createTopBar(props = {}) {
     const auth = { status: 'unknown' };
-    const searchController = {
-      query: () => '',
-      update: () => {},
-    };
     return shallow(
-      <TopBar
-        auth={auth}
-        searchController={searchController}
-        isSidebar={true}
-        settings={fakeSettings}
-        {...props}
-      />
+      <TopBar auth={auth} isSidebar={true} settings={fakeSettings} {...props} />
     ).dive(); // Dive through `withServices` wrapper.
   }
 
@@ -163,22 +161,22 @@ describe('TopBar', () => {
     assert.called(onSharePage);
   });
 
-  [true, false].forEach(isSidebar => {
-    it(`displays the search input and propagates query changes (isSidebar: ${isSidebar})`, () => {
-      const onSearch = sinon.stub();
-      const wrapper = createTopBar({
-        isSidebar,
-        searchController: {
-          query: sinon.stub().returns('query'),
-          update: onSearch,
-        },
-      });
-      const searchInput = wrapper.find('SearchInput');
+  it('displays search input in the sidebar', () => {
+    fakeStore.filterQuery.returns('test-query');
+    const wrapper = createTopBar();
+    assert.equal(wrapper.find(SearchInput).prop('query'), 'test-query');
+  });
 
-      assert.equal(searchInput.prop('query'), 'query');
-      searchInput.props().onSearch('new-query');
-      assert.calledWith(onSearch, 'new-query');
-    });
+  it('updates search in the sidebar', () => {
+    const wrapper = createTopBar();
+    wrapper.find('SearchInput').prop('onSearch')('new-query');
+    assert.calledWith(fakeStore.setFilterQuery, 'new-query');
+  });
+
+  it('displays search input in the single annotation view / stream', () => {
+    const wrapper = createTopBar({ isSidebar: false });
+    const searchInput = wrapper.find(StreamSearchInput);
+    assert.ok(searchInput.exists());
   });
 
   it('shows the clean theme when settings contains the clean theme option', () => {
@@ -195,13 +193,12 @@ describe('TopBar', () => {
       assert.isFalse(wrapper.exists('button[title="Share this page"]'));
     });
 
-    it('does show the search input, Help menu and user menu', () => {
+    it('does show the Help menu and user menu', () => {
       const wrapper = createTopBar({
         isSidebar: false,
         auth: { status: 'logged-in' },
       });
       assert.isTrue(wrapper.exists('button[title="Help"]'));
-      assert.isTrue(wrapper.exists(SearchInput));
       assert.isTrue(wrapper.exists(UserMenu));
     });
   });
