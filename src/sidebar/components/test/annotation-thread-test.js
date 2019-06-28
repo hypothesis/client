@@ -238,10 +238,8 @@ describe('annotationThread', function() {
     const element = util.createDirective(document, 'annotationThread', {
       thread: thread,
     });
-    const moderationBanner = element
-      .find('moderation-banner')
-      .controller('moderationBanner');
-    assert.deepEqual(moderationBanner, { annotation: ann });
+    assert.ok(element[0].querySelector('moderation-banner'));
+    assert.ok(element[0].querySelector('annotation'));
   });
 
   it('does not render the annotation or moderation banner if there is no annotation', function() {

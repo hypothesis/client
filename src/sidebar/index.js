@@ -176,7 +176,10 @@ function startAngularApp(config) {
     .component('loggedoutMessage', require('./components/loggedout-message'))
     .component('loginControl', require('./components/login-control'))
     .component('markdown', require('./components/markdown'))
-    .component('moderationBanner', require('./components/moderation-banner'))
+    .component(
+      'moderationBanner',
+      wrapReactComponent(require('./components/moderation-banner'))
+    )
     .component('newNoteBtn', require('./components/new-note-btn'))
     .component(
       'searchInput',
