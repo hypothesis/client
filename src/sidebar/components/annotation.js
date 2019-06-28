@@ -60,8 +60,7 @@ function AnnotationController(
   permissions,
   serviceUrl,
   session,
-  settings,
-  streamer
+  settings
 ) {
   const self = this;
   let newlyCreatedByHighlightButton;
@@ -526,7 +525,7 @@ function AnnotationController(
   };
 
   this.isDeleted = function() {
-    return streamer.hasPendingDeletion(self.annotation.id);
+    return store.hasPendingDeletion(self.annotation.id);
   };
 
   this.isHiddenByModerator = function() {

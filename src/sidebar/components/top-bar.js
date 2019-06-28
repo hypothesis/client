@@ -5,12 +5,16 @@ const isThirdPartyService = require('../util/is-third-party-service');
 module.exports = {
   controllerAs: 'vm',
   //@ngInject
-  controller: function(settings) {
+  controller: function(settings, store, streamer) {
     if (settings.theme && settings.theme === 'clean') {
       this.isThemeClean = true;
     } else {
       this.isThemeClean = false;
     }
+
+    this.applyPendingUpdates = streamer.applyPendingUpdates;
+
+    this.pendingUpdateCount = store.pendingUpdateCount;
 
     this.showSharePageButton = function() {
       return !isThirdPartyService(settings);
@@ -25,8 +29,6 @@ module.exports = {
     onSharePage: '&',
     onSignUp: '&',
     searchController: '<',
-    pendingUpdateCount: '<',
-    onApplyPendingUpdates: '&',
   },
   template: require('../templates/top-bar.html'),
 };

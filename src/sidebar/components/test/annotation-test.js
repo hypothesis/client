@@ -116,7 +116,6 @@ describe('annotation', function() {
     let fakeSettings;
     let fakeApi;
     let fakeBridge;
-    let fakeStreamer;
     let sandbox;
 
     beforeEach(() => {
@@ -189,6 +188,7 @@ describe('annotation', function() {
         };
 
         fakeStore = {
+          hasPendingDeletion: sinon.stub(),
           updateFlagStatus: sandbox.stub().returns(true),
         };
 
@@ -253,10 +253,6 @@ describe('annotation', function() {
           call: sinon.stub(),
         };
 
-        fakeStreamer = {
-          hasPendingDeletion: sinon.stub(),
-        };
-
         $provide.value('analytics', fakeAnalytics);
         $provide.value('annotationMapper', fakeAnnotationMapper);
         $provide.value('store', fakeStore);
@@ -269,7 +265,6 @@ describe('annotation', function() {
         $provide.value('session', fakeSession);
         $provide.value('serviceUrl', fakeServiceUrl);
         $provide.value('settings', fakeSettings);
-        $provide.value('streamer', fakeStreamer);
       })
     );
 
@@ -861,13 +856,13 @@ describe('annotation', function() {
     describe('#isDeleted', function() {
       it('returns true if the annotation has been marked as deleted', function() {
         const controller = createDirective().controller;
-        fakeStreamer.hasPendingDeletion.returns(true);
+        fakeStore.hasPendingDeletion.returns(true);
         assert.equal(controller.isDeleted(), true);
       });
 
       it('returns false if the annotation has not been marked as deleted', function() {
         const controller = createDirective().controller;
-        fakeStreamer.hasPendingDeletion.returns(false);
+        fakeStore.hasPendingDeletion.returns(false);
         assert.equal(controller.isDeleted(), false);
       });
     });

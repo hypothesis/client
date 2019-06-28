@@ -7,6 +7,8 @@ const util = require('../../directive/test/util');
 
 describe('topBar', function() {
   const fakeSettings = {};
+  let fakeStore;
+  let fakeStreamer;
   let fakeIsThirdPartyService;
 
   before(function() {
@@ -26,8 +28,18 @@ describe('topBar', function() {
   });
 
   beforeEach(function() {
+    fakeStore = {
+      pendingUpdateCount: sinon.stub().returns(0),
+    };
+
+    fakeStreamer = {
+      applyPendingUpdates: sinon.stub(),
+    };
+
     angular.mock.module('app', {
       settings: fakeSettings,
+      store: fakeStore,
+      streamer: fakeStreamer,
     });
 
     fakeIsThirdPartyService = sinon.stub().returns(false);
@@ -61,30 +73,25 @@ describe('topBar', function() {
   }
 
   it('shows the pending update count', function() {
-    const el = createTopBar({
-      pendingUpdateCount: 1,
-    });
+    fakeStore.pendingUpdateCount.returns(1);
+    const el = createTopBar();
     const applyBtn = applyUpdateBtn(el[0]);
     assert.ok(applyBtn);
   });
 
   it('does not show the pending update count when there are no updates', function() {
-    const el = createTopBar({
-      pendingUpdateCount: 0,
-    });
+    fakeStore.pendingUpdateCount.returns(0);
+    const el = createTopBar();
     const applyBtn = applyUpdateBtn(el[0]);
     assert.notOk(applyBtn);
   });
 
   it('applies updates when clicked', function() {
-    const onApplyPendingUpdates = sinon.stub();
-    const el = createTopBar({
-      pendingUpdateCount: 1,
-      onApplyPendingUpdates: onApplyPendingUpdates,
-    });
+    fakeStore.pendingUpdateCount.returns(1);
+    const el = createTopBar();
     const applyBtn = applyUpdateBtn(el[0]);
     applyBtn.click();
-    assert.called(onApplyPendingUpdates);
+    assert.called(fakeStreamer.applyPendingUpdates);
   });
 
   it('shows help when help icon clicked', function() {

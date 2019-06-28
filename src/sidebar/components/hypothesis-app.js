@@ -51,8 +51,7 @@ function HypothesisAppController(
   groups,
   serviceUrl,
   session,
-  settings,
-  streamer
+  settings
 ) {
   const self = this;
 
@@ -193,9 +192,6 @@ function HypothesisAppController(
       store.setFilterQuery(query);
     },
   };
-
-  this.countPendingUpdates = streamer.countPendingUpdates;
-  this.applyPendingUpdates = streamer.applyPendingUpdates;
 }
 
 module.exports = {

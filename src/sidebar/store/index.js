@@ -40,6 +40,7 @@ const directLinked = require('./modules/direct-linked');
 const frames = require('./modules/frames');
 const links = require('./modules/links');
 const groups = require('./modules/groups');
+const realTimeUpdates = require('./modules/real-time-updates');
 const selection = require('./modules/selection');
 const session = require('./modules/session');
 const viewer = require('./modules/viewer');
@@ -91,6 +92,7 @@ function store($rootScope, settings) {
     frames,
     links,
     groups,
+    realTimeUpdates,
     selection,
     session,
     viewer,
