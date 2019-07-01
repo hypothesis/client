@@ -1,245 +1,227 @@
 'use strict';
 
-const angular = require('angular');
+const { mount } = require('enzyme');
+const { createElement } = require('preact');
 
-const util = require('../../directive/test/util');
+const uiConstants = require('../../ui-constants');
+const SelectionTabs = require('../selection-tabs');
 
-describe('selectionTabs', function() {
-  const fakeSession = {
-    state: {
-      preferences: {
-        show_sidebar_tutorial: false,
-      },
-    },
-  };
-  const fakeSettings = {
-    enableExperimentalNewNoteButton: false,
-  };
+describe('SelectionTabs', function() {
+  // mock services
+  let fakeSession;
+  let fakeSettings;
 
-  before(function() {
-    angular
-      .module('app', [])
-      .component('selectionTabs', require('../selection-tabs'));
+  SelectionTabs.$imports.$mock({
+    '../store/use-store': callback =>
+      callback({
+        clearSelectedAnnotations: sinon.stub(),
+        selectTab: sinon.stub(),
+      }),
   });
 
-  beforeEach(function() {
-    const fakeStore = {};
-    const fakeFeatures = {
-      flagEnabled: sinon.stub().returns(true),
+  function createComponent(props) {
+    const defaultProps = {
+      isLoading: false,
+      isWaitingToAnchorAnnotations: false,
+      selectedTab: uiConstants.TAB_ANNOTATIONS,
+      totalAnnotations: 123,
+      totalNotes: 456,
+      totalOrphans: 0,
+      ...props,
     };
+    return mount(
+      <SelectionTabs
+        session={fakeSession}
+        settings={fakeSettings}
+        {...defaultProps}
+      />
+    );
+  }
 
-    angular.mock.module('app', {
-      store: fakeStore,
-      features: fakeFeatures,
-      session: fakeSession,
-      settings: fakeSettings,
-    });
+  beforeEach(() => {
+    fakeSession = {
+      state: {
+        preferences: {
+          show_sidebar_tutorial: false,
+        },
+      },
+    };
+    fakeSettings = {
+      enableExperimentalNewNoteButton: false,
+    };
   });
-
   context('displays selection tabs, counts and a selection', function() {
     it('should display the tabs and counts of annotations and notes', function() {
-      const elem = util.createDirective(document, 'selectionTabs', {
-        selectedTab: 'annotation',
-        totalAnnotations: '123',
-        totalNotes: '456',
-      });
-      const tabs = elem[0].querySelectorAll('a');
-
-      assert.include(tabs[0].textContent, 'Annotations');
-      assert.include(tabs[1].textContent, 'Notes');
-      assert.include(tabs[0].textContent, '123');
-      assert.include(tabs[1].textContent, '456');
+      const wrapper = createComponent();
+      const tabs = wrapper.find('a');
+      assert.isTrue(tabs.at(0).contains('Annotations'));
+      assert.equal(
+        tabs
+          .at(0)
+          .find('.selection-tabs__count')
+          .text(),
+        123
+      );
+      assert.isTrue(tabs.at(1).contains('Page Notes'));
+      assert.equal(
+        tabs
+          .at(1)
+          .find('.selection-tabs__count')
+          .text(),
+        456
+      );
     });
 
     it('should display annotations tab as selected', function() {
-      const elem = util.createDirective(document, 'selectionTabs', {
-        selectedTab: 'annotation',
-        totalAnnotations: '123',
-        totalNotes: '456',
-      });
-      const tabs = elem[0].querySelectorAll('a');
-
-      assert.isTrue(tabs[0].classList.contains('is-selected'));
+      const wrapper = createComponent();
+      const aTags = wrapper.find('a');
+      assert.isTrue(aTags.at(0).hasClass('is-selected'));
     });
 
     it('should display notes tab as selected', function() {
-      const elem = util.createDirective(document, 'selectionTabs', {
-        selectedTab: 'note',
-        totalAnnotations: '123',
-        totalNotes: '456',
+      const wrapper = createComponent({
+        selectedTab: uiConstants.TAB_NOTES,
       });
-      const tabs = elem[0].querySelectorAll('a');
+      const tabs = wrapper.find('a');
+      assert.isTrue(tabs.at(1).hasClass('is-selected'));
+    });
 
-      assert.isTrue(tabs[1].classList.contains('is-selected'));
+    it('should display orphans tab as selected', function() {
+      const wrapper = createComponent({
+        selectedTab: uiConstants.TAB_ORPHANS,
+      });
+      const tabs = wrapper.find('a');
+      assert.isTrue(tabs.at(2).hasClass('is-selected'));
+    });
+
+    it('should show the clean theme when settings does not contain the clean theme option', function() {
+      fakeSettings.theme = 'clean';
+      const wrapper = createComponent();
+      assert.isTrue(wrapper.exists('.selection-tabs--theme-clean'));
     });
 
     it('should not show the clean theme when settings does not contain the clean theme option', function() {
-      const elem = util.createDirective(document, 'selectionTabs', {
-        selectedTab: 'annotation',
-        totalAnnotations: '123',
-        totalNotes: '456',
-      });
-
-      assert.isFalse(
-        elem[0]
-          .querySelectorAll('.selection-tabs')[0]
-          .classList.contains('selection-tabs--theme-clean')
-      );
+      const wrapper = createComponent();
+      assert.isFalse(wrapper.exists('.selection-tabs--theme-clean'));
     });
 
-    it('should show the clean theme when settings contains the clean theme option', function() {
-      angular.mock.module('app', {
-        store: {},
-        features: {
-          flagEnabled: sinon.stub().returns(true),
-        },
-        settings: { theme: 'clean' },
-      });
-
-      const elem = util.createDirective(document, 'selectionTabs', {
-        selectedTab: 'annotation',
-        totalAnnotations: '123',
-        totalNotes: '456',
-      });
-
-      assert.isTrue(
-        elem[0]
-          .querySelectorAll('.selection-tabs')[0]
-          .classList.contains('selection-tabs--theme-clean')
-      );
-    });
-
+    /*
+    // TODO: Issue #1206
+    //
     it('should not display the new new note button when the annotations tab is active', function() {
-      const elem = util.createDirective(document, 'selectionTabs', {
-        selectedTab: 'annotation',
-        totalAnnotations: '123',
-        totalNotes: '456',
-      });
-      const newNoteElem = elem[0].querySelectorAll('new-note-btn');
-
-      assert.equal(newNoteElem.length, 0);
+      const wrapper = createComponent();
+      assert.isFalse(wrapper.exists('.new-note-btn'));
     });
 
     it('should not display the new note button when the notes tab is active and the new note button is disabled', function() {
-      const elem = util.createDirective(document, 'selectionTabs', {
-        selectedTab: 'note',
-        totalAnnotations: '123',
-        totalNotes: '456',
+      const wrapper = createComponent({
+        selectedTab: uiConstants.TAB_NOTES,
       });
-      const newNoteElem = elem[0].querySelectorAll('new-note-btn');
-
-      assert.equal(newNoteElem.length, 0);
+      assert.isFalse(wrapper.exists('.new-note-btn'));
     });
 
     it('should display the new note button when the notes tab is active and the new note button is enabled', function() {
-      fakeSettings.enableExperimentalNewNoteButton = true;
-      const elem = util.createDirective(document, 'selectionTabs', {
-        selectedTab: 'note',
-        totalAnnotations: '123',
-        totalNotes: '456',
+      const wrapper = createComponent({
+        selectedTab: uiConstants.TAB_NOTES,
       });
-      const newNoteElem = elem[0].querySelectorAll('new-note-btn');
+      assert.isTrue(wrapper.exists('.new-note-btn'));
+    });
+    */
 
-      assert.equal(newNoteElem.length, 1);
+    it('should not display a message when its loading annotation count is 0', function() {
+      const wrapper = createComponent({
+        totalAnnotations: 0,
+        isLoading: true,
+      });
+      assert.isFalse(wrapper.exists('.annotation-unavailable-message__label'));
+    });
+
+    it('should not display a message when its loading notes count is 0', function() {
+      const wrapper = createComponent({
+        selectedTab: uiConstants.TAB_NOTES,
+        totalNotes: 0,
+        isLoading: true,
+      });
+      assert.isFalse(wrapper.exists('.annotation-unavailable-message__label'));
     });
 
     it('should display the longer version of the no notes message when there are no notes', function() {
-      fakeSession.state.preferences.show_sidebar_tutorial = false;
-      fakeSettings.enableExperimentalNewNoteButton = false;
-
-      const elem = util.createDirective(document, 'selectionTabs', {
-        selectedTab: 'note',
-        totalAnnotations: '10',
+      const wrapper = createComponent({
+        selectedTab: uiConstants.TAB_NOTES,
         totalNotes: 0,
       });
-      const unavailableMsg = elem[0].querySelector(
-        '.annotation-unavailable-message__label'
-      );
-      const unavailableTutorial = elem[0].querySelector(
-        '.annotation-unavailable-message__tutorial'
-      );
-      const noteIcon = unavailableTutorial.querySelector('i');
-
       assert.include(
-        unavailableMsg.textContent,
+        wrapper.find('.annotation-unavailable-message__label').text(),
         'There are no page notes in this group.'
       );
+    });
+
+    it('should display the prompt to create a note when there are no notes and enableExperimentalNewNoteButton is true', function() {
+      fakeSettings.enableExperimentalNewNoteButton = true;
+      const wrapper = createComponent({
+        selectedTab: uiConstants.TAB_NOTES,
+        totalNotes: 0,
+      });
       assert.include(
-        unavailableTutorial.textContent,
+        wrapper.find('.annotation-unavailable-message__tutorial').text(),
         'Create one by clicking the'
       );
-      assert.isTrue(noteIcon.classList.contains('h-icon-note'));
+      assert.isTrue(
+        wrapper
+          .find('.annotation-unavailable-message__tutorial i')
+          .hasClass('h-icon-note')
+      );
     });
 
     it('should display the longer version of the no annotations message when there are no annotations', function() {
-      fakeSession.state.preferences.show_sidebar_tutorial = false;
-      fakeSettings.enableExperimentalNewNoteButton = false;
-
-      const elem = util.createDirective(document, 'selectionTabs', {
-        selectedTab: 'annotation',
+      const wrapper = createComponent({
         totalAnnotations: 0,
-        totalNotes: '10',
       });
-      const unavailableMsg = elem[0].querySelector(
-        '.annotation-unavailable-message__label'
-      );
-      const unavailableTutorial = elem[0].querySelector(
-        '.annotation-unavailable-message__tutorial'
-      );
-      const noteIcon = unavailableTutorial.querySelector('i');
-
       assert.include(
-        unavailableMsg.textContent,
+        wrapper.find('.annotation-unavailable-message__label').text(),
         'There are no annotations in this group.'
       );
       assert.include(
-        unavailableTutorial.textContent,
+        wrapper.find('.annotation-unavailable-message__tutorial').text(),
         'Create one by selecting some text and clicking the'
       );
-      assert.isTrue(noteIcon.classList.contains('h-icon-annotate'));
+      assert.isTrue(
+        wrapper
+          .find('.annotation-unavailable-message__tutorial i')
+          .hasClass('h-icon-annotate')
+      );
     });
 
     context('when the sidebar tutorial is displayed', function() {
-      fakeSession.state.preferences.show_sidebar_tutorial = true;
-
       it('should display the shorter version of the no notes message when there are no notes', function() {
-        const elem = util.createDirective(document, 'selectionTabs', {
-          selectedTab: 'note',
-          totalAnnotations: '10',
+        fakeSession.state.preferences.show_sidebar_tutorial = true;
+        const wrapper = createComponent({
           totalNotes: 0,
+          selectedTab: uiConstants.TAB_NOTES,
         });
-        const msg = elem[0].querySelector(
-          '.annotation-unavailable-message__label'
-        );
 
-        assert.include(
-          msg.textContent,
-          'There are no page notes in this group.'
-        );
-        assert.notInclude(msg.textContent, 'Create one by clicking the');
+        const msg = wrapper.find('.annotation-unavailable-message__label');
+
+        assert.include(msg.text(), 'There are no page notes in this group.');
+        assert.notInclude(msg.text(), 'Create one by clicking the');
         assert.notInclude(
-          msg.textContent,
+          msg.text(),
           'Create one by selecting some text and clicking the'
         );
       });
 
       it('should display the shorter version of the no annotations message when there are no annotations', function() {
-        const elem = util.createDirective(document, 'selectionTabs', {
-          selectedTab: 'annotation',
+        fakeSession.state.preferences.show_sidebar_tutorial = true;
+        const wrapper = createComponent({
           totalAnnotations: 0,
-          totalNotes: '10',
         });
-        const msg = elem[0].querySelector(
-          '.annotation-unavailable-message__label'
-        );
 
-        assert.include(
-          msg.textContent,
-          'There are no annotations in this group.'
-        );
-        assert.notInclude(msg.textContent, 'Create one by clicking the');
+        const msg = wrapper.find('.annotation-unavailable-message__label');
+
+        assert.include(msg.text(), 'There are no annotations in this group.');
+        assert.notInclude(msg.text(), 'Create one by clicking the');
         assert.notInclude(
-          msg.textContent,
+          msg.text(),
           'Create one by selecting some text and clicking the'
         );
       });

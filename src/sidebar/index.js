@@ -189,7 +189,10 @@ function startAngularApp(config) {
       wrapReactComponent(require('./components/search-input'))
     )
     .component('searchStatusBar', require('./components/search-status-bar'))
-    .component('selectionTabs', require('./components/selection-tabs'))
+    .component(
+      'selectionTabs',
+      wrapReactComponent(require('./components/selection-tabs'))
+    )
     .component('sidebarContent', require('./components/sidebar-content'))
     .component(
       'sidebarContentError',
