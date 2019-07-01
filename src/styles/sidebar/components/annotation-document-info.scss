@@ -1,0 +1,14 @@
+.annotation-document-info {
+  font-size: 13px;
+  color: $grey-5;
+  display: flex;
+
+  &__title {
+    margin-right: 5px;
+  }
+
+  &__domain {
+    margin-right: 5px;
+    font-size: 12px;
+  }
+}
