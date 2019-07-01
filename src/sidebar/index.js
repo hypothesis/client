@@ -188,7 +188,10 @@ function startAngularApp(config) {
       'newNoteBtn',
       wrapReactComponent(require('./components/new-note-btn'))
     )
-    .component('selectionTabs', require('./components/selection-tabs'))
+    .component(
+      'selectionTabs',
+      wrapReactComponent(require('./components/selection-tabs'))
+    )
     .component('sidebarContent', require('./components/sidebar-content'))
     .component(
       'sidebarContentError',
