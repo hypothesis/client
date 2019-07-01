@@ -74,11 +74,6 @@ class SearchClient extends EventEmitter {
           return;
         }
         self.emit('error', err);
-      })
-      .then(function() {
-        if (self._canceled) {
-          return;
-        }
         self.emit('end');
       });
   }
