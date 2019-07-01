@@ -1,102 +1,84 @@
 'use strict';
 
-const annotationMetadata = require('../annotation-metadata');
-const memoize = require('../util/memoize');
-const { isThirdPartyUser, username } = require('../util/account-id');
+const propTypes = require('prop-types');
+const { createElement } = require('preact');
 
-// @ngInject
-function AnnotationHeaderController(features, groups, settings, serviceUrl) {
-  const self = this;
-
-  this.user = function() {
-    return self.annotation.user;
-  };
-
-  this.displayName = () => {
-    const userInfo = this.annotation.user_info;
-    const isThirdPartyUser_ = isThirdPartyUser(
-      this.annotation.user,
-      settings.authDomain
-    );
-    if (features.flagEnabled('client_display_names') || isThirdPartyUser_) {
-      // userInfo is undefined if the api_render_user_info feature flag is off.
-      if (userInfo) {
-        // display_name is null if the user doesn't have a display name.
-        if (userInfo.display_name) {
-          return userInfo.display_name;
-        }
-      }
-    }
-    return username(this.annotation.user);
-  };
-
-  this.isThirdPartyUser = function() {
-    return isThirdPartyUser(self.annotation.user, settings.authDomain);
-  };
-
-  this.thirdPartyUsernameLink = function() {
-    return settings.usernameUrl
-      ? settings.usernameUrl + username(this.annotation.user)
-      : null;
-  };
-
-  this.serviceUrl = serviceUrl;
-
-  this.group = function() {
-    return groups.get(self.annotation.group);
-  };
-
-  const documentMeta = memoize(annotationMetadata.domainAndTitle);
-  this.documentMeta = function() {
-    return documentMeta(self.annotation);
-  };
-
-  this.updated = function() {
-    return self.annotation.updated;
-  };
-
-  this.htmlLink = function() {
-    if (self.annotation.links && self.annotation.links.html) {
-      return self.annotation.links.html;
-    }
-    return '';
-  };
-}
+const AnnotationDocumentInfo = require('./annotation-document-info');
+const AnnotationShareInfo = require('./annotation-share-info');
+const AnnotationUser = require('./annotation-user');
+const Timestamp = require('./timestamp');
 
 /**
- * Header component for an annotation card.
- *
- * Header which displays the username, last update timestamp and other key
- * metadata about an annotation.
+ * Render an annotation's header summary, including metadata about its user,
+ * sharing status, document and timestamp. It also allows the user to
+ * toggle sub-threads/replies in certain cases.
  */
-module.exports = {
-  controller: AnnotationHeaderController,
-  controllerAs: 'vm',
-  bindings: {
-    /**
-     * The saved annotation
-     */
-    annotation: '<',
+function AnnotationHeader({
+  annotation,
+  isEditing,
+  isHighlight,
+  isPrivate,
+  onReplyCountClick,
+  replyCount,
+  showDocumentInfo,
+}) {
+  const annotationLink = annotation.links ? annotation.links.html : '';
+  const replyPluralized = !replyCount || replyCount > 1 ? 'replies' : 'reply';
 
-    /**
-     * True if the annotation is private or will become private when the user
-     * saves their changes.
-     */
-    isPrivate: '<',
+  return (
+    <header className="annotation-header">
+      <div className="annotation-header__row">
+        <AnnotationUser annotation={annotation} />
+        <div className="annotation-collapsed-replies">
+          <a className="annotation-link" onClick={onReplyCountClick}>
+            {replyCount} {replyPluralized}
+          </a>
+        </div>
+        {!isEditing && annotation.updated && (
+          <div className="annotation-header__timestamp">
+            <Timestamp
+              className="annotation-header__timestamp-link"
+              href={annotationLink}
+              timestamp={annotation.updated}
+            />
+          </div>
+        )}
+      </div>
 
-    /** True if the user is currently editing the annotation. */
-    isEditing: '<',
+      <div className="annotation-header__row">
+        <AnnotationShareInfo annotation={annotation} isPrivate={isPrivate} />
+        {!isEditing && isHighlight && (
+          <div className="annotation-header__highlight">
+            <i
+              className="h-icon-border-color"
+              title="This is a highlight. Click 'edit' to add a note or tag."
+            />
+          </div>
+        )}
+        {showDocumentInfo && <AnnotationDocumentInfo annotation={annotation} />}
+      </div>
+    </header>
+  );
+}
 
-    /**
-     * True if the annotation is a highlight.
-     * FIXME: This should determined in AnnotationHeaderController
-     */
-    isHighlight: '<',
-    onReplyCountClick: '&',
-    replyCount: '<',
-
-    /** True if document metadata should be shown. */
-    showDocumentInfo: '<',
-  },
-  template: require('../templates/annotation-header.html'),
+AnnotationHeader.propTypes = {
+  /* The annotation */
+  annotation: propTypes.object.isRequired,
+  /* Whether the annotation is actively being edited */
+  isEditing: propTypes.bool,
+  /* Whether the annotation is a highlight */
+  isHighlight: propTypes.bool,
+  /* Whether the annotation is an "only me" (private) annotation */
+  isPrivate: propTypes.bool,
+  /* Callback for when the toggle-replies element is clicked */
+  onReplyCountClick: propTypes.func.isRequired,
+  /* How many replies this annotation currently has */
+  replyCount: propTypes.number,
+  /**
+   * Should document metadata be rendered? Hint: this is enabled for single-
+   * annotation and stream views
+   */
+  showDocumentInfo: propTypes.bool,
 };
+
+module.exports = AnnotationHeader;

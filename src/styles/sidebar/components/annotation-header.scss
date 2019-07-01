@@ -1,0 +1,25 @@
+.annotation-header {
+  @include pie-clearfix;
+  // Margin between top of x-height of username and
+  // top of the annotation card should be ~15px
+  margin-top: -$layout-h-margin + 10px;
+  color: $grey-5;
+
+  &__row {
+    display: flex;
+    align-items: baseline;
+  }
+
+  &__timestamp {
+    margin-left: auto;
+  }
+
+  &__timestamp-link {
+    @include font-small;
+    color: $grey-4;
+  }
+
+  &__highlight {
+    margin-right: 5px;
+  }
+}
