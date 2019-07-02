@@ -16,6 +16,7 @@ const icons = {
   help: require('../../images/icons/help.svg'),
   leave: require('../../images/icons/leave.svg'),
   lock: require('../../images/icons/lock.svg'),
+  logo: require('../../images/icons/logo.svg'),
   public: require('../../images/icons/public.svg'),
   refresh: require('../../images/icons/refresh.svg'),
   share: require('../../images/icons/share.svg'),
