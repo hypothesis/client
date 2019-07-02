@@ -75,7 +75,7 @@ function ModerationBanner({ annotation, api, flash }) {
   }
   return (
     <div className={bannerClasses}>
-      {flagCount && !annotation.hidden && (
+      {Boolean(flagCount) && !annotation.hidden && (
         <span>Flagged for review x{flagCount}</span>
       )}
       {annotation.hidden && (
