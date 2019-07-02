@@ -63,7 +63,7 @@ function SearchInput({ alwaysExpanded, query, onSearch }) {
           className="search-input__icon top-bar__btn"
           onClick={() => input.current.focus()}
         >
-          <i className="h-icon-search"></i>
+          <i className="h-icon-search" />
         </button>
       )}
       {isLoading && <Spinner className="top-bar__btn" title="Loading…" />}

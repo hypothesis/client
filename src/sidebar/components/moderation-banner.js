@@ -81,7 +81,7 @@ function ModerationBanner({ annotation, api, flash }) {
       {annotation.hidden && (
         <span>Hidden from users. Flagged x{flagCount}</span>
       )}
-      <span className="u-stretch"></span>
+      <span className="u-stretch" />
       <button {...toggleButtonProps}>
         {annotation.hidden ? 'Unhide' : 'Hide'}
       </button>
