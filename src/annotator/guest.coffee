@@ -450,7 +450,7 @@ module.exports = class Guest extends Delegator
     this.adderCtrl.showAt(left, top, arrowDirection)
 
   _onClearSelection: () ->
-    this.adderCtrl.hide()
+    # this.adderCtrl.hide()
     @selectedRanges = []
 
     $('.annotator-toolbar .h-icon-annotate')
