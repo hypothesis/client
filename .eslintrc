@@ -1,8 +1,5 @@
 {
-  "extends": [
-    "hypothesis",
-    "plugin:react/recommended"
-  ],
+  "extends": ["hypothesis", "plugin:react/recommended"],
   "globals": {
     "Set": false
   },
@@ -10,6 +7,7 @@
     "mocha/no-exclusive-tests": "error",
     "no-var": "error",
     "indent": "off",
+    "react/self-closing-comp": "error",
     "react-hooks/rules-of-hooks": "error",
     "react-hooks/exhaustive-deps": "error"
   },
@@ -19,11 +17,7 @@
       "jsx": true
     }
   },
-  "plugins": [
-    "mocha",
-    "react",
-    "react-hooks"
-  ],
+  "plugins": ["mocha", "react", "react-hooks"],
   "settings": {
     "react": {
       "pragma": "createElement",
