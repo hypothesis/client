@@ -186,12 +186,6 @@ function FrameSync($rootScope, $window, Discovery, store, bridge) {
     bridge.on('hideSidebar', function() {
       bridge.call('hideSidebar');
     });
-    bridge.on('showAll', function () {
-      bridge.call('showAll');
-    });
-    bridge.on('hideAll', function () {
-      bridge.call('hideAll');
-    });
     bridge.on('setVisibleHighlights', function (state) {
       bridge.call('setVisibleHighlights', state);
     });
