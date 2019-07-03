@@ -32,7 +32,7 @@ module.exports = class Guest extends Delegator
     ".annotator-hl click":               "onHighlightClick"
     ".annotator-hl mouseover":           "onHighlightMouseover"
     ".annotator-hl mouseout":            "onHighlightMouseout"
-    "click":                             "onElementClick"
+    # "click":                             "onElementClick"
     "touchstart":                        "onElementTouchStart"
 
   options:
@@ -464,9 +464,9 @@ module.exports = class Guest extends Delegator
     else
       this.showAnnotations annotations
 
-  onElementClick: (event) ->
-    if !@selectedTargets?.length
-      @crossframe?.call('hideSidebar')
+  # onElementClick: (event) ->
+  #   if !@selectedTargets?.length
+  #     @crossframe?.call('hideSidebar')
 
   onElementTouchStart: (event) ->
     # Mobile browsers do not register click events on
