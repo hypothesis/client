@@ -19,7 +19,10 @@ $base-line-height: 20px;
 // Components
 // ----------
 @import './components/annotation';
+@import './components/annotation-document-info';
+@import './components/annotation-header';
 @import './components/annotation-share-dialog';
+@import './components/annotation-share-info';
 @import './components/annotation-publish-control';
 @import './components/annotation-thread';
 @import './components/annotation-user';

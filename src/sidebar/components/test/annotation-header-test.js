@@ -1,273 +1,146 @@
 'use strict';
 
-const angular = require('angular');
+const { createElement } = require('preact');
+const { shallow } = require('enzyme');
 
+const unroll = require('../../../shared/test/util').unroll;
 const fixtures = require('../../test/annotation-fixtures');
-const annotationHeader = require('../annotation-header');
 
-const fakeDocumentMeta = {
-  domain: 'docs.io',
-  titleLink: 'http://docs.io/doc.html',
-  titleText: 'Dummy title',
-};
+const AnnotationHeader = require('../annotation-header');
+const AnnotationDocumentInfo = require('../annotation-document-info');
+const Timestamp = require('../timestamp');
 
-describe('sidebar.components.annotation-header', function() {
-  let $componentController;
-  let fakeFeatures;
-  let fakeGroups;
-  let fakeAccountID;
-  const fakeSettings = { usernameUrl: 'http://www.example.org/' };
-  let fakeServiceUrl;
+describe('AnnotationHeader', () => {
+  const createAnnotationHeader = props => {
+    return shallow(
+      <AnnotationHeader
+        annotation={fixtures.defaultAnnotation()}
+        isEditing={false}
+        isHighlight={false}
+        isPrivate={false}
+        onReplyCountClick={sinon.stub()}
+        replyCount={0}
+        showDocumentInfo={false}
+        {...props}
+      />
+    );
+  };
 
-  beforeEach('Initialize fakeAccountID', () => {
-    fakeAccountID = {
-      isThirdPartyUser: sinon.stub().returns(false),
-      username: sinon.stub().returns('TEST_USERNAME'),
-    };
-  });
+  describe('collapsed replies', () => {
+    it('should have a callback', () => {
+      const fakeCallback = sinon.stub();
+      const wrapper = createAnnotationHeader({
+        onReplyCountClick: fakeCallback,
+      });
+      const replyCollapseLink = wrapper.find('.annotation-link');
+      assert.equal(replyCollapseLink.prop('onClick'), fakeCallback);
+    });
 
-  beforeEach('Import and register the annotationHeader component', function() {
-    annotationHeader.$imports.$mock({
-      '../annotation-metadata': {
-        // eslint-disable-next-line no-unused-vars
-        domainAndTitle: function(ann) {
-          return fakeDocumentMeta;
-        },
+    unroll(
+      'it should render the annotation reply count',
+      testCase => {
+        const wrapper = createAnnotationHeader({
+          replyCount: testCase.replyCount,
+        });
+        const replyCollapseLink = wrapper.find('.annotation-link');
+        assert.equal(replyCollapseLink.text(), testCase.expected);
       },
-      '../util/account-id': fakeAccountID,
-    });
-    angular.module('app', []).component('annotationHeader', annotationHeader);
-  });
-
-  afterEach(() => {
-    annotationHeader.$imports.$restore();
-  });
-
-  beforeEach('Initialize and register fake AngularJS dependencies', function() {
-    fakeFeatures = {
-      flagEnabled: sinon.stub().returns(false),
-    };
-
-    angular.mock.module('app', {
-      features: fakeFeatures,
-      groups: fakeGroups,
-      settings: fakeSettings,
-      serviceUrl: fakeServiceUrl,
-    });
-
-    angular.mock.inject(function(_$componentController_) {
-      $componentController = _$componentController_;
-    });
-  });
-
-  describe('sidebar.components.AnnotationHeaderController', function() {
-    describe('#htmlLink()', function() {
-      it('returns the HTML link when available', function() {
-        const ann = fixtures.defaultAnnotation();
-        ann.links = { html: 'https://annotation.service/123' };
-        const ctrl = $componentController(
-          'annotationHeader',
-          {},
-          {
-            annotation: ann,
-          }
-        );
-        assert.equal(ctrl.htmlLink(), ann.links.html);
-      });
-
-      it('returns an empty string when no HTML link is available', function() {
-        const ann = fixtures.defaultAnnotation();
-        ann.links = {};
-        const ctrl = $componentController(
-          'annotationHeader',
-          {},
-          {
-            annotation: ann,
-          }
-        );
-        assert.equal(ctrl.htmlLink(), '');
-      });
-    });
-
-    describe('#documentMeta()', function() {
-      it('returns the domain, title link and text for the annotation', function() {
-        const ann = fixtures.defaultAnnotation();
-        const ctrl = $componentController(
-          'annotationHeader',
-          {},
-          {
-            annotation: ann,
-          }
-        );
-        assert.deepEqual(ctrl.documentMeta(), fakeDocumentMeta);
-      });
-    });
-
-    describe('#displayName', () => {
       [
         {
-          context:
-            'when the api_render_user_info feature flag is turned off in h',
-          it: 'returns the username',
-          user_info: undefined,
-          client_display_names: false,
-          isThirdPartyUser: false,
-          expectedResult: 'TEST_USERNAME',
+          replyCount: 0,
+          expected: '0 replies',
         },
         {
-          context:
-            'when the api_render_user_info feature flag is turned off in h',
-          it:
-            'returns the username even if the client_display_names feature flag is on',
-          user_info: undefined,
-          client_display_names: true,
-          isThirdPartyUser: false,
-          expectedResult: 'TEST_USERNAME',
+          replyCount: 1,
+          expected: '1 reply',
         },
         {
-          context: 'when the client_display_names feature flag is off in h',
-          it: 'returns the username',
-          user_info: { display_name: null },
-          client_display_names: false,
-          isThirdPartyUser: false,
-          expectedResult: 'TEST_USERNAME',
+          replyCount: 2,
+          expected: '2 replies',
         },
-        {
-          context: 'when the client_display_names feature flag is off in h',
-          it: 'returns the username even if the user has a display name',
-          user_info: { display_name: 'Bill Jones' },
-          client_display_names: false,
-          isThirdPartyUser: false,
-          expectedResult: 'TEST_USERNAME',
-        },
-        {
-          context:
-            'when both feature flags api_render_user_info and ' +
-            'client_display_names are on',
-          it: 'returns the username, if the user has no display_name',
-          user_info: { display_name: null },
-          client_display_names: true,
-          isThirdPartyUser: false,
-          expectedResult: 'TEST_USERNAME',
-        },
-        {
-          context:
-            'when both feature flags api_render_user_info and ' +
-            'client_display_names are on',
-          it: 'returns the display_name, if the user has one',
-          user_info: { display_name: 'Bill Jones' },
-          client_display_names: true,
-          isThirdPartyUser: false,
-          expectedResult: 'Bill Jones',
-        },
-        {
-          context:
-            'when the client_display_names feature flag is off but ' +
-            'the user is a third-party user',
-          it: 'returns display_name even though client_display_names is off',
-          user_info: { display_name: 'Bill Jones' },
-          client_display_names: false,
-          isThirdPartyUser: true,
-          expectedResult: 'Bill Jones',
-        },
-        {
-          context:
-            'when client_display_names is on and the user is a ' +
-            'third-party user',
-          it: 'returns the display_name',
-          user_info: { display_name: 'Bill Jones' },
-          client_display_names: true,
-          isThirdPartyUser: true,
-          expectedResult: 'Bill Jones',
-        },
-        {
-          context:
-            'when the user is a third-party user but the ' +
-            'api_render_user_info feature flag is turned off in h',
-          it: 'returns the username',
-          user_info: undefined,
-          client_display_names: true,
-          isThirdPartyUser: true,
-          expectedResult: 'TEST_USERNAME',
-        },
-        {
-          context:
-            "when the user is a third-party user but doesn't have a " +
-            'display_name',
-          it: 'returns the username',
-          user_info: { display_name: null },
-          client_display_names: true,
-          isThirdPartyUser: true,
-          expectedResult: 'TEST_USERNAME',
-        },
-      ].forEach(test => {
-        context(test.context, () => {
-          it(test.it, () => {
-            // Make features.flagEnabled('client_display_names') return true
-            // or false, depending on the test case.
-            fakeFeatures.flagEnabled = flag => {
-              if (flag === 'client_display_names') {
-                return test.client_display_names;
-              }
-              return false;
-            };
+      ]
+    );
+  });
 
-            // Make isThirdPartyUser() return true or false,
-            // depending on the test case.
-            fakeAccountID.isThirdPartyUser.returns(test.isThirdPartyUser);
+  describe('timestamp', () => {
+    it('should render a timestamp if annotation has an `updated` value', () => {
+      const wrapper = createAnnotationHeader();
+      const timestamp = wrapper.find(Timestamp);
 
-            const ann = fixtures.defaultAnnotation();
-            ann.user_info = test.user_info;
-
-            const ctrl = $componentController(
-              'annotationHeader',
-              {},
-              {
-                annotation: ann,
-              }
-            );
-
-            assert.equal(ctrl.displayName(), test.expectedResult);
-          });
-        });
-      });
+      assert.isTrue(timestamp.exists());
     });
 
-    describe('#thirdPartyUsernameLink', () => {
-      it('returns the custom username link if set', () => {
-        let ann;
-        let ctrl;
+    it('should not render a timestamp if annotation does not have an `updated` value', () => {
+      const wrapper = createAnnotationHeader({
+        annotation: fixtures.newAnnotation(),
+      });
+      const timestamp = wrapper.find(Timestamp);
 
-        fakeSettings.usernameUrl = 'http://www.example.org/';
-        ann = fixtures.defaultAnnotation();
-        ctrl = $componentController(
-          'annotationHeader',
-          {},
-          {
-            annotation: ann,
-          }
-        );
-        assert.deepEqual(
-          ctrl.thirdPartyUsernameLink(),
-          'http://www.example.org/TEST_USERNAME'
-        );
+      assert.isFalse(timestamp.exists());
+    });
+  });
+
+  describe('annotation is-highlight icon', () => {
+    it('should display is-highlight icon if annotation is a highlight', () => {
+      const wrapper = createAnnotationHeader({
+        isEditing: false,
+        isHighlight: true,
+      });
+      const highlightIcon = wrapper.find('.annotation-header__highlight');
+
+      assert.isTrue(highlightIcon.exists());
+    });
+
+    it('should not display the is-highlight icon if annotation is not a highlight', () => {
+      const wrapper = createAnnotationHeader({
+        isEditing: false,
+        isHighlight: false,
+      });
+      const highlightIcon = wrapper.find('.annotation-header__highlight');
+
+      assert.isFalse(highlightIcon.exists());
+    });
+  });
+
+  describe('annotation document info', () => {
+    it('should render document info if `showDocumentInfo` is enabled', () => {
+      const wrapper = createAnnotationHeader({ showDocumentInfo: true });
+
+      const documentInfo = wrapper.find(AnnotationDocumentInfo);
+
+      assert.isTrue(documentInfo.exists());
+    });
+
+    it('should not render document info if `showDocumentInfo` is not enabled', () => {
+      const wrapper = createAnnotationHeader({ showDocumentInfo: false });
+
+      const documentInfo = wrapper.find(AnnotationDocumentInfo);
+
+      assert.isFalse(documentInfo.exists());
+    });
+  });
+
+  context('user is editing annotation', () => {
+    it('should not display timestamp', () => {
+      const wrapper = createAnnotationHeader({
+        annotation: fixtures.defaultAnnotation(),
+        isEditing: true,
       });
 
-      it('returns null if no custom username link is set in the settings object', () => {
-        let ann;
-        let ctrl;
+      const timestamp = wrapper.find(Timestamp);
 
-        fakeSettings.usernameUrl = null;
-        ann = fixtures.defaultAnnotation();
-        ctrl = $componentController(
-          'annotationHeader',
-          {},
-          {
-            annotation: ann,
-          }
-        );
-        assert.deepEqual(ctrl.thirdPartyUsernameLink(), null);
+      assert.isFalse(timestamp.exists());
+    });
+
+    it('should not display is-highlight icon', () => {
+      const wrapper = createAnnotationHeader({
+        annotation: fixtures.defaultAnnotation(),
+        isEditing: true,
+        isHighlight: true,
       });
+      const highlight = wrapper.find('.annotation-header__highlight');
+
+      assert.isFalse(highlight.exists());
     });
   });
 });
