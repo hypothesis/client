@@ -69,7 +69,7 @@ function TopBar({
       {!isSidebar && (
         <div className="top-bar__inner content">
           <StreamSearchInput />
-          <div className="top-bar__expander"></div>
+          <div className="top-bar__expander" />
           <button
             className="top-bar__btn top-bar__help-btn"
             onClick={onShowHelpPanel}
@@ -85,7 +85,7 @@ function TopBar({
       {isSidebar && (
         <div className="top-bar__inner content">
           <GroupList className="GroupList" auth={auth} />
-          <div className="top-bar__expander"></div>
+          <div className="top-bar__expander" />
           {pendingUpdateCount > 0 && (
             <a
               className="top-bar__apply-update-btn"
@@ -104,7 +104,7 @@ function TopBar({
               title="Share this page"
               aria-label="Share this page"
             >
-              <i className="h-icon-annotation-share"></i>
+              <i className="h-icon-annotation-share" />
             </button>
           )}
           <button
