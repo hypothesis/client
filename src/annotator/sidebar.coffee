@@ -242,6 +242,7 @@ module.exports = class Sidebar extends Host
 
   show: ->
     @crossframe.call('sidebarOpened')
+    window.dispatchEvent(new Event('HYPOTHESIS_SIDEBAR_OPENED'))
 
     if @frame
       @frame.css 'margin-left': "#{-1 * @frame.width()}px"
@@ -258,6 +259,8 @@ module.exports = class Sidebar extends Host
     this._notifyOfLayoutChange(true)
 
   hide: ->
+    window.dispatchEvent(new Event('HYPOTHESIS_SIDEBAR_CLOSED'))
+
     if @frame
       @frame.css 'margin-left': ''
       @frame.addClass 'annotator-collapsed'
