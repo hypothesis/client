@@ -33,8 +33,8 @@ module.exports = class Sidebar extends Host
 
     this.hide()
 
-    if config.openSidebar || config.annotations || config.query
-      this.on 'panelReady', => this.show()
+    # if config.openSidebar || config.annotations || config.query
+    #   this.on 'panelReady', => this.show()
 
     if @plugins.BucketBar?
       @plugins.BucketBar.element.on 'click', (event) => this.show()
@@ -71,8 +71,6 @@ module.exports = class Sidebar extends Host
     sidebarTrigger(document.body, => this.show())
     features.init(@crossframe)
 
-    @crossframe.on('hideAll', => this.hideAll())
-    @crossframe.on('showAll', => this.showAll())
     @crossframe.on('showSidebar', => this.show())
     @crossframe.on('hideSidebar', => this.hide())
     @crossframe.on(events.LOGIN_REQUESTED, =>
@@ -272,14 +270,6 @@ module.exports = class Sidebar extends Host
       @setVisibleHighlights(false)
 
     this._notifyOfLayoutChange(false)
-
-  showAll: ->
-    this.show()
-    @plugins.Toolbar.show()
-
-  hideAll: ->
-    this.hide()
-    @plugins.Toolbar.hide()
 
   isOpen: ->
     if @frame
