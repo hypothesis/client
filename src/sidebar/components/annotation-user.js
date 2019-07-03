@@ -30,22 +30,28 @@ function AnnotationUser({ annotation, features, serviceUrl, settings }) {
 
   if (shouldLinkToActivity) {
     return (
-      <a
-        className="annotation-user"
-        href={
-          isFirstPartyUser
-            ? serviceUrl('user', { user })
-            : `${settings.usernameUrl}${username_}`
-        }
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        {displayName}
-      </a>
+      <div className="annotation-user">
+        <a
+          className="annotation-user__link"
+          href={
+            isFirstPartyUser
+              ? serviceUrl('user', { user })
+              : `${settings.usernameUrl}${username_}`
+          }
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <span className="annotation-user__user-name">{displayName}</span>
+        </a>
+      </div>
     );
   }
 
-  return <div className="annotation-user">{displayName}</div>;
+  return (
+    <div className="annotation-user">
+      <span className="annotation-user__user-name">{displayName}</span>
+    </div>
+  );
 }
 
 AnnotationUser.propTypes = {
