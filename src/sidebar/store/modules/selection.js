@@ -13,9 +13,10 @@
 const { createSelector } = require('reselect');
 const immutable = require('seamless-immutable');
 
+const arrayUtil = require('../../util/array-util');
+const metadata = require('../../annotation-metadata');
 const toSet = require('../../util/array-util').toSet;
 const uiConstants = require('../../ui-constants');
-const tabs = require('../../tabs');
 
 const util = require('../util');
 
@@ -162,9 +163,12 @@ const update = {
   },
 
   ADD_ANNOTATIONS(state, action) {
-    const counts = tabs.counts(action.annotations);
+    const noteCount = arrayUtil.countIf(
+      action.annotations,
+      metadata.isPageNote
+    );
     // If there are no annotations at all, ADD_ANNOTATIONS will not be called.
-    const haveOnlyPageNotes = counts.notes === action.annotations.length;
+    const haveOnlyPageNotes = noteCount === action.annotations.length;
     // If this is the init phase and there are only page notes, select the page notes tab.
     if (state.annotations.length === 0 && haveOnlyPageNotes) {
       return { selectedTab: uiConstants.TAB_NOTES };
