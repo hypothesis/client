@@ -21,11 +21,8 @@ describe('SearchStatusBar', () => {
     };
     fakeStore = {
       getState: sinon.stub(),
-      selectTab: sinon.stub(),
-      clearSelectedAnnotations: sinon.stub(),
-      clearDirectLinkedGroupFetchFailed: sinon.stub(),
-      clearDirectLinkedIds: sinon.stub(),
-      clearSelection: sinon.stub(),
+      annotationCount: sinon.stub().returns(1),
+      noteCount: sinon.stub().returns(0),
     };
 
     SearchStatusBar.$imports.$mock({
@@ -96,13 +93,11 @@ describe('SearchStatusBar', () => {
       });
       fakeStore.getState.returns({
         filterQuery: 'tag:foo',
-      });
-
-      const wrapper = createComponent({
         selectedTab: 'annotation',
-        totalAnnotations: 3,
-        totalNotes: 0,
       });
+      fakeStore.annotationCount.returns(3);
+
+      const wrapper = createComponent({});
 
       const buttonText = wrapper.find('button').text();
       assert.equal(buttonText, 'Clear search');
@@ -117,13 +112,10 @@ describe('SearchStatusBar', () => {
       filterQuery: null,
       directLinkedGroupFetchFailed: true,
       selectedAnnotationMap: { annId: true },
+      selectedTab: 'annotation',
     });
 
-    const wrapper = createComponent({
-      selectedTab: 'annotation',
-      totalAnnotations: 1,
-      totalNotes: 0,
-    });
+    const wrapper = createComponent({});
 
     const buttonText = wrapper.find('button').text();
     assert.equal(buttonText, 'Show all annotations');
@@ -134,13 +126,10 @@ describe('SearchStatusBar', () => {
       filterQuery: null,
       directLinkedGroupFetchFailed: false,
       selectedAnnotationMap: { annId: true },
+      selectedTab: 'annotation',
     });
 
-    const wrapper = createComponent({
-      selectedTab: 'annotation',
-      totalAnnotations: 1,
-      totalNotes: 0,
-    });
+    const wrapper = createComponent({});
 
     const buttonText = wrapper.find('button').text();
     assert.equal(buttonText, 'Show all annotations');
@@ -152,12 +141,10 @@ describe('SearchStatusBar', () => {
         filterQuery: null,
         directLinkedGroupFetchFailed: false,
         selectedAnnotationMap: selectedAnnotationMap,
-      });
-      const wrapper = createComponent({
         selectedTab: 'annotation',
-        totalAnnotations: 1,
-        totalNotes: 0,
       });
+
+      const wrapper = createComponent({});
 
       const buttons = wrapper.find('button');
       assert.equal(buttons.length, 0);
@@ -203,13 +190,12 @@ describe('SearchStatusBar', () => {
         filterQuery: null,
         directLinkedGroupFetchFailed: false,
         selectedAnnotationMap: { annId: true },
-      });
-
-      const wrapper = createComponent({
         selectedTab: test.selectedTab,
-        totalAnnotations: test.totalAnnotations,
-        totalNotes: test.totalNotes,
       });
+      fakeStore.noteCount.returns(test.totalNotes);
+      fakeStore.annotationCount.returns(test.totalAnnotations);
+
+      const wrapper = createComponent({});
 
       const buttonText = wrapper.find('button').text();
       assert.equal(buttonText, test.expectedText);

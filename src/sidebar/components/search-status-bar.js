@@ -21,16 +21,14 @@ const countVisibleAnns = annThread => {
  * A bar where the user can clear a selection or search and see whether
  * any search results were found.
  * */
-function SearchStatusBar({
-  selectedTab,
-  totalAnnotations,
-  totalNotes,
-  rootThread,
-}) {
+function SearchStatusBar({ rootThread }) {
   const storeState = useStore(store => store.getState());
   const clearSelection = useStore(store => store.clearSelection);
   const filterQuery = storeState.filterQuery;
   const filterActive = !!storeState.filterQuery;
+  const annotationCount = useStore(store => store.annotationCount());
+  const noteCount = useStore(store => store.noteCount());
+  const selectedTab = storeState.selectedTab;
 
   const thread = rootThread.thread(storeState);
 
@@ -89,13 +87,13 @@ function SearchStatusBar({
             {selectedTab === uiConstants.TAB_ANNOTATIONS && (
               <Fragment>
                 Show all annotations
-                {totalAnnotations > 1 && <span> ({totalAnnotations})</span>}
+                {annotationCount > 1 && <span> ({annotationCount})</span>}
               </Fragment>
             )}
             {selectedTab === uiConstants.TAB_NOTES && (
               <Fragment>
                 Show all notes
-                {totalNotes > 1 && <span> ({totalNotes})</span>}
+                {noteCount > 1 && <span> ({noteCount})</span>}
               </Fragment>
             )}
           </button>
@@ -106,13 +104,7 @@ function SearchStatusBar({
 }
 
 SearchStatusBar.propTypes = {
-  selectedTab: propTypes.oneOf([
-    uiConstants.TAB_ANNOTATIONS,
-    uiConstants.TAB_ORPHANS,
-    uiConstants.TAB_NOTES,
-  ]).isRequired,
-  totalAnnotations: propTypes.number.isRequired,
-  totalNotes: propTypes.number.isRequired,
+  // Injected services.
   rootThread: propTypes.object.isRequired,
 };
 

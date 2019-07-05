@@ -83,22 +83,4 @@ describe('tabs', function() {
       ]
     );
   });
-
-  describe('counts', function() {
-    const annotation = Object.assign(fixtures.defaultAnnotation(), {
-      $orphan: false,
-    });
-    const orphan = Object.assign(fixtures.defaultAnnotation(), {
-      $orphan: true,
-    });
-
-    it('counts Annotations and Orphans separately', function() {
-      assert.deepEqual(tabs.counts([annotation, orphan], true), {
-        anchoring: 0,
-        annotations: 1,
-        notes: 0,
-        orphans: 1,
-      });
-    });
-  });
 });

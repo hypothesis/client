@@ -22,19 +22,7 @@ function SidebarContentController(
   }
 
   const unsubscribeAnnotationUI = store.subscribe(function() {
-    const state = store.getState();
-
     self.rootThread = thread();
-    self.selectedTab = state.selectedTab;
-
-    const counts = tabs.counts(state.annotations);
-
-    Object.assign(self, {
-      totalNotes: counts.notes,
-      totalAnnotations: counts.annotations,
-      totalOrphans: counts.orphans,
-      waitingToAnchorAnnotations: counts.anchoring > 0,
-    });
   });
 
   $scope.$on('$destroy', unsubscribeAnnotationUI);
