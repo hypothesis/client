@@ -149,12 +149,9 @@ function settingsFrom(window_) {
     return jsonConfigs.query || queryFromURL();
   }
 
-  function getMetaValueSidebarDefaultExpanded() {
+  function getSidebarDefaultExpanded() {
       const annotationSidebarDefaultExpanded = window_.document.querySelector('meta[name="annotationSidebarDefaultExpanded"]').content;
-      if (annotationSidebarDefaultExpanded === 'true') {
-          return true;
-      }
-      return false;
+      return annotationSidebarDefaultExpanded === 'true';
   }
 
   function hostPageSetting(name, options = {}) {
@@ -197,7 +194,7 @@ function settingsFrom(window_) {
       return query();
     },
     hostPageSetting: hostPageSetting,
-    getMetaValueSidebarDefaultExpanded: getMetaValueSidebarDefaultExpanded,
+    getSidebarDefaultExpanded: getSidebarDefaultExpanded,
   };
 }
 
