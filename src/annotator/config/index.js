@@ -26,6 +26,7 @@ function configFrom(window_) {
     theme: settings.hostPageSetting('theme'),
     usernameUrl: settings.hostPageSetting('usernameUrl'),
     onLayoutChange: settings.hostPageSetting('onLayoutChange'),
+    annotationSidebarDefaultExpanded: settings.getSidebarDefaultExpanded(),
     openSidebar: settings.hostPageSetting('openSidebar', {
       allowInBrowserExt: true,
     }),

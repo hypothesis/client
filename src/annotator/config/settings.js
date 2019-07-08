@@ -149,6 +149,11 @@ function settingsFrom(window_) {
     return jsonConfigs.query || queryFromURL();
   }
 
+  function getSidebarDefaultExpanded() {
+      const annotationSidebarDefaultExpanded = window_.document.querySelector('meta[name="annotationSidebarDefaultExpanded"]').content;
+      return annotationSidebarDefaultExpanded === 'true';
+  }
+
   function hostPageSetting(name, options = {}) {
     const allowInBrowserExt = options.allowInBrowserExt || false;
     const hasDefaultValue = typeof options.defaultValue !== 'undefined';
@@ -189,6 +194,7 @@ function settingsFrom(window_) {
       return query();
     },
     hostPageSetting: hostPageSetting,
+    getSidebarDefaultExpanded: getSidebarDefaultExpanded,
   };
 }
 

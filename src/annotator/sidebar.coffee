@@ -33,6 +33,9 @@ module.exports = class Sidebar extends Host
 
     this.hide()
 
+    if config.annotationSidebarDefaultExpanded
+        this.on 'panelReady', => this.show()
+
     # if config.openSidebar || config.annotations || config.query
     #   this.on 'panelReady', => this.show()
 
