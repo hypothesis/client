@@ -21,6 +21,12 @@
   border-bottom: none;
 }
 
+.top-bar__login-links {
+  flex-shrink: 0;
+  font-size: $body2-font-size;
+  padding-left: 6px;
+}
+
 .top-bar__inner {
   // the edges of the top-bar's contents should be aligned
   // with the edges of annotation cards displayed below
