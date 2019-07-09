@@ -181,7 +181,10 @@ function startAngularApp(config) {
       wrapReactComponent(require('./components/moderation-banner'))
     )
     .component('newNoteBtn', require('./components/new-note-btn'))
-    .component('searchStatusBar', require('./components/search-status-bar'))
+    .component(
+      'searchStatusBar',
+      wrapReactComponent(require('./components/search-status-bar'))
+    )
     .component('selectionTabs', require('./components/selection-tabs'))
     .component('sidebarContent', require('./components/sidebar-content'))
     .component(

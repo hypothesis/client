@@ -9,7 +9,8 @@
 </selection-tabs>
 
 <search-status-bar
-  ng-show="!vm.isLoading()"
+  class="search-status-bar"
+  ng-if="!vm.isLoading()"
   selected-tab="vm.selectedTab"
   total-annotations="vm.totalAnnotations"
   total-notes="vm.totalNotes">
