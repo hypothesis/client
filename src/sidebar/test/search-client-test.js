@@ -8,7 +8,7 @@ function awaitEvent(emitter, event) {
   });
 }
 
-describe('SearchClient', function() {
+describe('SearchClient', () => {
   const RESULTS = [
     { id: 'one' },
     { id: 'two' },
@@ -18,7 +18,7 @@ describe('SearchClient', function() {
 
   let fakeSearchFn;
 
-  beforeEach(function() {
+  beforeEach(() => {
     fakeSearchFn = sinon.spy(function(params) {
       return Promise.resolve({
         rows: RESULTS.slice(params.offset, params.offset + params.limit),
@@ -27,34 +27,45 @@ describe('SearchClient', function() {
     });
   });
 
-  it('emits "results"', function() {
+  it('emits "results"', () => {
     const client = new SearchClient(fakeSearchFn);
     const onResults = sinon.stub();
     client.on('results', onResults);
     client.get({ uri: 'http://example.com' });
-    return awaitEvent(client, 'end').then(function() {
+    return awaitEvent(client, 'end').then(() => {
       assert.calledWith(onResults, RESULTS);
     });
   });
 
-  it('emits "results" with chunks in incremental mode', function() {
+  it('emits "end" only once', () => {
+    const client = new SearchClient(fakeSearchFn, { chunkSize: 2 });
+    client.on('results', sinon.stub());
+    let emitEndCounter = 0;
+    client.on('end', () => {
+      emitEndCounter += 1;
+      assert.equal(emitEndCounter, 1);
+    });
+    client.get({ uri: 'http://example.com' });
+  });
+
+  it('emits "results" with chunks in incremental mode', () => {
     const client = new SearchClient(fakeSearchFn, { chunkSize: 2 });
     const onResults = sinon.stub();
     client.on('results', onResults);
     client.get({ uri: 'http://example.com' });
-    return awaitEvent(client, 'end').then(function() {
+    return awaitEvent(client, 'end').then(() => {
       assert.calledWith(onResults, RESULTS.slice(0, 2));
       assert.calledWith(onResults, RESULTS.slice(2, 4));
     });
   });
 
-  it('stops fetching chunks if the results array is empty', function() {
+  it('stops fetching chunks if the results array is empty', () => {
     // Simulate a situation where the `total` count for the server is incorrect
     // and we appear to have reached the end of the result list even though
     // `total` implies that there should be more results available.
     //
     // In that case the client should stop trying to fetch additional pages.
-    fakeSearchFn = sinon.spy(function() {
+    fakeSearchFn = sinon.spy(() => {
       return Promise.resolve({
         rows: [],
         total: 1000,
@@ -66,13 +77,13 @@ describe('SearchClient', function() {
 
     client.get({ uri: 'http://example.com' });
 
-    return awaitEvent(client, 'end').then(function() {
+    return awaitEvent(client, 'end').then(() => {
       assert.calledWith(onResults, []);
       assert.calledOnce(fakeSearchFn);
     });
   });
 
-  it('emits "results" once in non-incremental mode', function() {
+  it('emits "results" once in non-incremental mode', () => {
     const client = new SearchClient(fakeSearchFn, {
       chunkSize: 2,
       incremental: false,
@@ -80,13 +91,13 @@ describe('SearchClient', function() {
     const onResults = sinon.stub();
     client.on('results', onResults);
     client.get({ uri: 'http://example.com' });
-    return awaitEvent(client, 'end').then(function() {
+    return awaitEvent(client, 'end').then(() => {
       assert.calledOnce(onResults);
       assert.calledWith(onResults, RESULTS);
     });
   });
 
-  it('does not emit "results" if canceled', function() {
+  it('does not emit "results" if canceled', () => {
     const client = new SearchClient(fakeSearchFn);
     const onResults = sinon.stub();
     const onEnd = sinon.stub();
@@ -94,22 +105,22 @@ describe('SearchClient', function() {
     client.on('end', onEnd);
     client.get({ uri: 'http://example.com' });
     client.cancel();
-    return Promise.resolve().then(function() {
+    return Promise.resolve().then(() => {
       assert.notCalled(onResults);
       assert.called(onEnd);
     });
   });
 
-  it('emits "error" event if search fails', function() {
+  it('emits "error" event if search fails', () => {
     const err = new Error('search failed');
-    fakeSearchFn = function() {
+    fakeSearchFn = () => {
       return Promise.reject(err);
     };
     const client = new SearchClient(fakeSearchFn);
     const onError = sinon.stub();
     client.on('error', onError);
     client.get({ uri: 'http://example.com' });
-    return awaitEvent(client, 'end').then(function() {
+    return awaitEvent(client, 'end').then(() => {
       assert.calledWith(onError, err);
     });
   });

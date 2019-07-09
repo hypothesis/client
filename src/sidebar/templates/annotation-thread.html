@@ -10,8 +10,9 @@
     <div class="annotation-thread__thread-line"></div>
   </div>
   <div class="annotation-thread__content">
-    <moderation-banner annotation="vm.thread.annotation"
-                       ng-if="vm.thread.annotation">
+    <moderation-banner
+      annotation="vm.thread.annotation"
+      ng-if="vm.thread.annotation">
     </moderation-banner>
     <annotation ng-class="vm.annotationClasses()"
              annotation="vm.thread.annotation"

@@ -19,7 +19,6 @@ describe('sidebar.components.hypothesis-app', function() {
   let fakeFeatures = null;
   let fakeFlash = null;
   let fakeFrameSync = null;
-  let fakeLocation = null;
   let fakeParams = null;
   let fakeServiceConfig = null;
   let fakeSession = null;
@@ -95,10 +94,6 @@ describe('sidebar.components.hypothesis-app', function() {
         connect: sandbox.spy(),
       };
 
-      fakeLocation = {
-        search: sandbox.stub().returns({}),
-      };
-
       fakeParams = { id: 'test' };
 
       fakeSession = {
@@ -138,7 +133,6 @@ describe('sidebar.components.hypothesis-app', function() {
       $provide.value('bridge', fakeBridge);
       $provide.value('groups', fakeGroups);
       $provide.value('$route', fakeRoute);
-      $provide.value('$location', fakeLocation);
       $provide.value('$routeParams', fakeParams);
       $provide.value('$window', fakeWindow);
     })

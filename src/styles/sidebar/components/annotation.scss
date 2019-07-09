@@ -3,7 +3,6 @@
 // Highlight quote of annotation whenever its thread is hovered
 .thread-list__card:hover .annotation-quote {
   border-left: $highlight 3px solid;
-  color: $grey-5;
 }
 
 // When hovering a top-level annotation, show the footer in a hovered state.
@@ -17,7 +16,7 @@
     color: $grey-6;
   }
 
-  .annotation-header__timestamp {
+  .annotation-header__timestamp-link {
     color: $grey-5;
   }
 }
@@ -60,33 +59,8 @@
 }
 
 .annotation-quote-list,
-.annotation-header,
 .annotation-footer {
   @include pie-clearfix;
-}
-
-.annotation-header {
-  display: flex;
-  flex-direction: row;
-  align-items: baseline;
-  // Margin between top of x-height of username and
-  // top of the annotation card should be ~15px
-  margin-top: -$layout-h-margin + 10px;
-}
-
-.annotation-header__share-info {
-  color: $grey-5;
-  @include font-normal;
-}
-
-.annotation-header__group {
-  color: $color-gray;
-  font-size: $body1-font-size;
-}
-
-.annotation-header__group-name {
-  display: inline-block;
-  margin-left: 5px;
 }
 
 .annotation-body {
@@ -162,11 +136,6 @@
 .annotation-replies__count {
   @include font-normal;
   color: $grey-5;
-}
-
-.annotation-header__timestamp {
-  @include font-small;
-  color: $grey-4;
 }
 
 .annotation-actions {

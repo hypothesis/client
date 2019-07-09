@@ -6,6 +6,11 @@
   align-items: center;
   color: $grey-6;
   display: flex;
+
+  // Prevent label from wrapping if top bar is too narrow to fit all of its
+  // items.
+  flex-shrink: 0;
+
   font-size: $body2-font-size;
   font-weight: bold;
 }

@@ -35,7 +35,6 @@ function authStateFromProfile(profile) {
 // @ngInject
 function HypothesisAppController(
   $document,
-  $location,
   $rootScope,
   $route,
   $scope,
@@ -182,15 +181,6 @@ function HypothesisAppController(
     }
 
     session.logout();
-  };
-
-  this.search = {
-    query: function() {
-      return store.getState().filterQuery;
-    },
-    update: function(query) {
-      store.setFilterQuery(query);
-    },
   };
 }
 

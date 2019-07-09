@@ -19,7 +19,10 @@ $base-line-height: 20px;
 // Components
 // ----------
 @import './components/annotation';
+@import './components/annotation-document-info';
+@import './components/annotation-header';
 @import './components/annotation-share-dialog';
+@import './components/annotation-share-info';
 @import './components/annotation-publish-control';
 @import './components/annotation-thread';
 @import './components/annotation-user';
@@ -28,7 +31,6 @@ $base-line-height: 20px;
 @import './components/group-list-item';
 @import './components/help-panel';
 @import './components/loggedout-message';
-@import './components/login-control';
 @import './components/markdown';
 @import './components/menu';
 @import './components/menu-item';
