@@ -167,7 +167,7 @@ describe('TopBar', () => {
     assert.equal(wrapper.find(SearchInput).prop('query'), 'test-query');
   });
 
-  it('updates search in the sidebar', () => {
+  it('updates current filter when changing search query in the sidebar', () => {
     const wrapper = createTopBar();
     wrapper.find('SearchInput').prop('onSearch')('new-query');
     assert.calledWith(fakeStore.setFilterQuery, 'new-query');

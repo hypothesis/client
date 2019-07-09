@@ -11,8 +11,7 @@ const SearchInput = require('./search-input');
 /**
  * Search input for the single annotation view and stream.
  *
- * This displays and updates the "q" query param in the URL which controls
- * the API query that is used to search for annotations.
+ * This displays and updates the "q" query param in the URL.
  */
 function StreamSearchInput({ $location, $rootScope }) {
   const [query, setQuery] = useState($location.search().q);

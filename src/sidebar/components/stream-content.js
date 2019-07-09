@@ -54,7 +54,8 @@ function StreamContentController(
     }
   });
 
-  // If redirected to this route from `/a/:id`, clear any existing annotations.
+  // In case this route loaded after a client-side route change (eg. from
+  // '/a/:id'), clear any existing annotations.
   store.clearAnnotations();
 
   // Perform the initial search

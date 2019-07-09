@@ -90,7 +90,9 @@ function TopBar({
             <a
               className="top-bar__apply-update-btn"
               onClick={onApplyPendingUpdates}
-              title={`Show ${pendingUpdateCount} new/updated annotation(s)`}
+              title={`Show ${pendingUpdateCount} new/updated ${
+                pendingUpdateCount === 1 ? 'annotation' : 'annotations'
+              }`}
             >
               <SvgIcon className="top-bar__apply-icon" name="refresh" />
             </a>
