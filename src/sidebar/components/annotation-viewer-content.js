@@ -28,7 +28,6 @@ function fetchThread(api, id) {
 
 // @ngInject
 function AnnotationViewerContentController(
-  $location,
   $routeParams,
   store,
   api,
@@ -42,12 +41,6 @@ function AnnotationViewerContentController(
   store.setAppIsSidebar(false);
 
   const id = $routeParams.id;
-
-  this.$onInit = () => {
-    this.search.update = function(query) {
-      $location.path('/stream').search('q', query);
-    };
-  };
 
   store.subscribe(function() {
     self.rootThread = rootThread.thread(store.getState());
@@ -87,8 +80,6 @@ function AnnotationViewerContentController(
 module.exports = {
   controller: AnnotationViewerContentController,
   controllerAs: 'vm',
-  bindings: {
-    search: '<',
-  },
+  bindings: {},
   template: require('../templates/annotation-viewer-content.html'),
 };

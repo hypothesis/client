@@ -348,6 +348,10 @@ const getFirstSelectedAnnotationId = createSelector(
   selected => (selected ? Object.keys(selected)[0] : null)
 );
 
+function filterQuery(state) {
+  return state.filterQuery;
+}
+
 module.exports = {
   init: init,
   update: update,
@@ -369,6 +373,7 @@ module.exports = {
 
   selectors: {
     hasSelectedAnnotations,
+    filterQuery,
     isAnnotationSelected,
     getFirstSelectedAnnotationId,
   },
