@@ -5,9 +5,12 @@ const redux = require('redux');
 const thunk = require('redux-thunk').default;
 
 const annotations = require('../annotations');
+const selection = require('../selection');
+const drafts = require('../drafts');
 const fixtures = require('../../../test/annotation-fixtures');
 const util = require('../../util');
 const unroll = require('../../../../shared/test/util').unroll;
+const uiConstants = require('../../../ui-constants');
 
 const { actions, selectors } = annotations;
 
@@ -143,5 +146,88 @@ describe('annotations reducer', function() {
         },
       ]
     );
+  });
+
+  describe('#createAnnotation', function() {
+    const createStore = require('../../create-store');
+
+    it('should create an annotation', function() {
+      const store = createStore([annotations, selection, drafts], [{}, {}, {}]);
+      const ann = fixtures.oldAnnotation();
+      store.dispatch(actions.createAnnotation(ann));
+      assert.equal(
+        selectors.findAnnotationByID(store.getState(), ann.id).id,
+        ann.id
+      );
+    });
+
+    it('should change tab focus to match last created annotation', function() {
+      const store = createStore([annotations, selection, drafts], [{}, {}, {}]);
+
+      // Tab focus should be annotation
+      store.dispatch(actions.addAnnotations([fixtures.oldAnnotation()]));
+      assert.equal(store.getState().selectedTab, uiConstants.TAB_ANNOTATIONS);
+
+      // after createAnnotation of type note, tab should switch focus
+      store.dispatch(actions.createAnnotation(fixtures.oldPageNote()));
+      assert.equal(store.getState().selectedTab, uiConstants.TAB_NOTES);
+
+      // tab should switch back if createAnnotation called again with type annotation
+      store.dispatch(actions.createAnnotation(fixtures.oldAnnotation()));
+      assert.equal(store.getState().selectedTab, uiConstants.TAB_ANNOTATIONS);
+    });
+
+    it('should expand parents', function() {
+      const store = createStore([annotations, selection, drafts], [{}, {}, {}]);
+
+      store.dispatch(
+        actions.addAnnotations([
+          {
+            id: 'annotation_id',
+            $highlight: undefined,
+            target: [{ source: 'source', selector: [] }],
+            references: [],
+            text: 'This is my annotation',
+            tags: ['tag_1', 'tag_2'],
+          },
+        ])
+      );
+
+      // collapse the parent and assert that is is collapsed
+      store.dispatch(selection.actions.setCollapsed('annotation_id', true));
+      assert.isFalse(store.getState().expanded.annotation_id);
+
+      // creating a new child should expand the parent
+      store.dispatch(
+        actions.createAnnotation({
+          highlight: undefined,
+          target: [{ source: 'http://example.org' }],
+          references: ['annotation_id'],
+          text: '',
+          tags: [],
+        })
+      );
+      assert.isTrue(store.getState().expanded.annotation_id);
+    });
+  });
+
+  describe('#removeAndDeselectedAnnotation', function() {
+    const createStore = require('../../create-store');
+    it('should remove and de-select annotations', function() {
+      const store = createStore([annotations, selection, drafts], [{}, {}, {}]);
+      const ann = fixtures.publicAnnotation();
+      store.dispatch(actions.addAnnotations([ann]));
+
+      // select the annotation and assert it is so
+      store.dispatch(selection.actions.selectAnnotations([ann.id]));
+      assert.isTrue(store.getState().selectedAnnotationMap[ann.id]);
+
+      // make sure its not selected anymore
+      store.dispatch(actions.removeAndDeselectedAnnotation(ann));
+      assert.isNotOk(store.getState().selectedAnnotationMap);
+
+      // annotation should not exist anymore
+      assert.isNotOk(selectors.findAnnotationByID(store.getState(), ann.id));
+    });
   });
 });

@@ -10,6 +10,7 @@ const metadata = require('../../annotation-metadata');
 const uiConstants = require('../../ui-constants');
 
 const selection = require('./selection');
+const drafts = require('./drafts');
 const util = require('../util');
 
 /**
@@ -332,6 +333,47 @@ function hideAnnotation(id) {
 }
 
 /**
+ * De-select and remove an annotation.
+ */
+function removeAndDeselectedAnnotation(annotation) {
+  return function(dispatch) {
+    dispatch(removeAnnotations([annotation]));
+    if (annotation.id) {
+      dispatch(selection.actions.removeSelectedAnnotation(annotation.id));
+    }
+  };
+}
+
+/**
+ * Create a new annotation
+ *
+ * Cleans up any existing empty draft before creating a new annotation.
+ * Changes focused tab to either notes or annotions corresponding to the
+ * new type of annotation.
+ */
+function createAnnotation(ann) {
+  return function(dispatch) {
+    // When a new annotation is created, remove any existing annotations
+    // that are empty.
+    dispatch(drafts.actions.deleteNewAndEmptyAnnotations([ann]));
+    dispatch(addAnnotations([ann]));
+    // If the annotation is of type note or annotation, make sure
+    // the appropriate tab is selected. If it is of type reply, user
+    // stays in the selected tab.
+    if (metadata.isPageNote(ann)) {
+      dispatch(selection.actions.selectTab(uiConstants.TAB_NOTES));
+    } else if (metadata.isAnnotation(ann)) {
+      dispatch(selection.actions.selectTab(uiConstants.TAB_ANNOTATIONS));
+    }
+
+    (ann.references || []).forEach(parent => {
+      // expand any parents of this annotation
+      dispatch(selection.actions.setCollapsed(parent, false));
+    });
+  };
+}
+
+/**
  * Update the local hidden state of an annotation.
  *
  * This updates an annotation to reflect the fact that it has been made visible
@@ -392,13 +434,15 @@ module.exports = {
   init: init,
   update: update,
   actions: {
-    addAnnotations: addAnnotations,
-    clearAnnotations: clearAnnotations,
-    removeAnnotations: removeAnnotations,
-    updateAnchorStatus: updateAnchorStatus,
-    updateFlagStatus: updateFlagStatus,
-    hideAnnotation: hideAnnotation,
-    unhideAnnotation: unhideAnnotation,
+    addAnnotations,
+    clearAnnotations,
+    createAnnotation,
+    hideAnnotation,
+    removeAnnotations,
+    removeAndDeselectedAnnotation,
+    updateAnchorStatus,
+    updateFlagStatus,
+    unhideAnnotation,
   },
 
   selectors: {

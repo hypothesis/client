@@ -5,7 +5,6 @@ const events = require('../events');
 const memoize = require('../util/memoize');
 const metadata = require('../annotation-metadata');
 const tabs = require('../tabs');
-const uiConstants = require('../ui-constants');
 
 function truthyKeys(map) {
   return Object.keys(map).filter(function(k) {
@@ -82,18 +81,6 @@ function RootThread($rootScope, store, searchFilter, viewFilter) {
     });
   }
 
-  function deleteNewAndEmptyAnnotations() {
-    store
-      .getState()
-      .annotations.filter(function(ann) {
-        return metadata.isNew(ann) && !store.getDraftIfNotEmpty(ann);
-      })
-      .forEach(function(ann) {
-        store.removeDraft(ann);
-        $rootScope.$broadcast(events.ANNOTATION_DELETED, ann);
-      });
-  }
-
   // Listen for annotations being created or loaded
   // and show them in the UI.
   //
@@ -111,33 +98,14 @@ function RootThread($rootScope, store, searchFilter, viewFilter) {
   });
 
   $rootScope.$on(events.BEFORE_ANNOTATION_CREATED, function(event, ann) {
-    // When a new annotation is created, remove any existing annotations
-    // that are empty.
-    deleteNewAndEmptyAnnotations();
-
-    store.addAnnotations([ann]);
-
-    // If the annotation is of type note or annotation, make sure
-    // the appropriate tab is selected. If it is of type reply, user
-    // stays in the selected tab.
-    if (metadata.isPageNote(ann)) {
-      store.selectTab(uiConstants.TAB_NOTES);
-    } else if (metadata.isAnnotation(ann)) {
-      store.selectTab(uiConstants.TAB_ANNOTATIONS);
-    }
-
-    (ann.references || []).forEach(function(parent) {
-      store.setCollapsed(parent, false);
-    });
+    store.createAnnotation(ann);
   });
 
   // Remove any annotations that are deleted or unloaded
   $rootScope.$on(events.ANNOTATION_DELETED, function(event, annotation) {
-    store.removeAnnotations([annotation]);
-    if (annotation.id) {
-      store.removeSelectedAnnotation(annotation.id);
-    }
+    store.removeAndDeselectedAnnotation(annotation);
   });
+
   $rootScope.$on(events.ANNOTATIONS_UNLOADED, function(event, annotations) {
     store.removeAnnotations(annotations);
   });

@@ -39,6 +39,7 @@ describe('rootThread', function() {
       state: {
         annotations: [],
         expanded: {},
+        drafts: [],
         filterQuery: null,
         focusedAnnotationMap: null,
         forceVisible: {},
@@ -63,6 +64,8 @@ describe('rootThread', function() {
       selectTab: sinon.stub(),
       getDraftIfNotEmpty: sinon.stub().returns(null),
       removeDraft: sinon.stub(),
+      createAnnotation: sinon.stub(),
+      removeAndDeselectedAnnotation: sinon.stub(),
     };
 
     fakeBuildThread = sinon.stub().returns(fixtures.emptyThread);
@@ -341,6 +344,12 @@ describe('rootThread', function() {
   context('when annotation events occur', function() {
     const annot = annotationFixtures.defaultAnnotation();
 
+    it('adds or updates annotations when BEFORE_ANNOTATION_CREATED event occurs', function() {
+      $rootScope.$broadcast(events.BEFORE_ANNOTATION_CREATED, annot);
+      assert.notCalled(fakeStore.removeAnnotations);
+      assert.calledWith(fakeStore.createAnnotation, sinon.match(annot));
+    });
+
     unroll(
       'adds or updates annotations when #event event occurs',
       function(testCase) {
@@ -350,38 +359,24 @@ describe('rootThread', function() {
         assert.calledWith(fakeStore.addAnnotations, sinon.match(annotations));
       },
       [
-        { event: events.BEFORE_ANNOTATION_CREATED, annotations: annot },
+        //{ event: events.BEFORE_ANNOTATION_CREATED, annotations: annot },
         { event: events.ANNOTATION_CREATED, annotations: annot },
         { event: events.ANNOTATION_UPDATED, annotations: annot },
         { event: events.ANNOTATIONS_LOADED, annotations: [annot] },
       ]
     );
 
-    it('expands the parents of new annotations', function() {
-      const reply = annotationFixtures.oldReply();
-      $rootScope.$broadcast(events.BEFORE_ANNOTATION_CREATED, reply);
-      assert.calledWith(fakeStore.setCollapsed, reply.references[0], false);
+    it('removes and de-selects annotations when ANNOTATION_DELETED event occurs', function() {
+      $rootScope.$broadcast(events.ANNOTATION_DELETED, annot);
+      assert.calledWith(
+        fakeStore.removeAndDeselectedAnnotation,
+        sinon.match(annot)
+      );
     });
 
-    unroll(
-      'removes annotations when #event event occurs',
-      function(testCase) {
-        $rootScope.$broadcast(testCase.event, testCase.annotations);
-        const annotations = [].concat(testCase.annotations);
-        assert.calledWith(
-          fakeStore.removeAnnotations,
-          sinon.match(annotations)
-        );
-      },
-      [
-        { event: events.ANNOTATION_DELETED, annotations: annot },
-        { event: events.ANNOTATIONS_UNLOADED, annotations: [annot] },
-      ]
-    );
-
-    it('deselects deleted annotations', function() {
-      $rootScope.$broadcast(events.ANNOTATION_DELETED, annot);
-      assert.calledWith(fakeStore.removeSelectedAnnotation, annot.id);
+    it('removes annotations when ANNOTATIONS_UNLOADED event occurs', function() {
+      $rootScope.$broadcast(events.ANNOTATIONS_UNLOADED, annot);
+      assert.calledWith(fakeStore.removeAnnotations, sinon.match(annot));
     });
 
     describe('when a new annotation is created', function() {
@@ -393,24 +388,6 @@ describe('rootThread', function() {
 
         existingNewAnnot = { $tag: 'a-new-tag' };
         fakeStore.state.annotations.push(existingNewAnnot);
-      });
-
-      it('removes drafts for new and empty annotations', function() {
-        fakeStore.getDraftIfNotEmpty.returns(null);
-        const annotation = annotationFixtures.newEmptyAnnotation();
-
-        $rootScope.$broadcast(events.BEFORE_ANNOTATION_CREATED, annotation);
-
-        assert.calledWith(fakeStore.removeDraft, existingNewAnnot);
-      });
-
-      it('deletes new and empty annotations', function() {
-        fakeStore.getDraftIfNotEmpty.returns(null);
-        const annotation = annotationFixtures.newEmptyAnnotation();
-
-        $rootScope.$broadcast(events.BEFORE_ANNOTATION_CREATED, annotation);
-
-        assert.calledWithMatch(onDelete, sinon.match.any, existingNewAnnot);
       });
 
       it('does not remove annotations that have non-empty drafts', function() {
