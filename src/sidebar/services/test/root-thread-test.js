@@ -27,7 +27,6 @@ const fixtures = immutable({
 describe('rootThread', function() {
   let fakeStore;
   let fakeBuildThread;
-  let fakeDrafts;
   let fakeSearchFilter;
   let fakeViewFilter;
 
@@ -62,14 +61,11 @@ describe('rootThread', function() {
       addAnnotations: sinon.stub(),
       setCollapsed: sinon.stub(),
       selectTab: sinon.stub(),
+      getDraftIfNotEmpty: sinon.stub().returns(null),
+      removeDraft: sinon.stub(),
     };
 
     fakeBuildThread = sinon.stub().returns(fixtures.emptyThread);
-
-    fakeDrafts = {
-      getIfNotEmpty: sinon.stub().returns(null),
-      remove: sinon.stub(),
-    };
 
     fakeSearchFilter = {
       generateFacetedFilter: sinon.stub(),
@@ -82,7 +78,6 @@ describe('rootThread', function() {
     angular
       .module('app', [])
       .value('store', fakeStore)
-      .value('drafts', fakeDrafts)
       .value('searchFilter', fakeSearchFilter)
       .value('viewFilter', fakeViewFilter)
       .service('rootThread', rootThreadFactory);
@@ -401,16 +396,16 @@ describe('rootThread', function() {
       });
 
       it('removes drafts for new and empty annotations', function() {
-        fakeDrafts.getIfNotEmpty.returns(null);
+        fakeStore.getDraftIfNotEmpty.returns(null);
         const annotation = annotationFixtures.newEmptyAnnotation();
 
         $rootScope.$broadcast(events.BEFORE_ANNOTATION_CREATED, annotation);
 
-        assert.calledWith(fakeDrafts.remove, existingNewAnnot);
+        assert.calledWith(fakeStore.removeDraft, existingNewAnnot);
       });
 
       it('deletes new and empty annotations', function() {
-        fakeDrafts.getIfNotEmpty.returns(null);
+        fakeStore.getDraftIfNotEmpty.returns(null);
         const annotation = annotationFixtures.newEmptyAnnotation();
 
         $rootScope.$broadcast(events.BEFORE_ANNOTATION_CREATED, annotation);
@@ -419,14 +414,14 @@ describe('rootThread', function() {
       });
 
       it('does not remove annotations that have non-empty drafts', function() {
-        fakeDrafts.getIfNotEmpty.returns(fixtures.nonEmptyDraft);
+        fakeStore.getDraftIfNotEmpty.returns(fixtures.nonEmptyDraft);
 
         $rootScope.$broadcast(
           events.BEFORE_ANNOTATION_CREATED,
           annotationFixtures.newAnnotation()
         );
 
-        assert.notCalled(fakeDrafts.remove);
+        assert.notCalled(fakeStore.removeDraft);
         assert.notCalled(onDelete);
       });
 
@@ -439,7 +434,7 @@ describe('rootThread', function() {
           annotationFixtures.newAnnotation()
         );
 
-        assert.notCalled(fakeDrafts.remove);
+        assert.notCalled(fakeStore.removeDraft);
         assert.notCalled(onDelete);
       });
     });

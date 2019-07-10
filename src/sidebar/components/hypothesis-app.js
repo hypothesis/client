@@ -43,7 +43,6 @@ function HypothesisAppController(
   store,
   auth,
   bridge,
-  drafts,
   features,
   flash,
   frameSync,
@@ -150,18 +149,19 @@ function HypothesisAppController(
   const promptToLogout = function() {
     // TODO - Replace this with a UI which doesn't look terrible.
     let text = '';
-    if (drafts.count() === 1) {
+    const drafts = store.countDrafts();
+    if (drafts === 1) {
       text =
         'You have an unsaved annotation.\n' +
         'Do you really want to discard this draft?';
-    } else if (drafts.count() > 1) {
+    } else if (drafts > 1) {
       text =
         'You have ' +
-        drafts.count() +
+        drafts +
         ' unsaved annotations.\n' +
         'Do you really want to discard these drafts?';
     }
-    return drafts.count() === 0 || $window.confirm(text);
+    return drafts === 0 || $window.confirm(text);
   };
 
   // Log the user out.
@@ -169,11 +169,12 @@ function HypothesisAppController(
     if (!promptToLogout()) {
       return;
     }
+
     store.clearGroups();
-    drafts.unsaved().forEach(function(draft) {
+    store.unsavedAnnotations().forEach(function(draft) {
       $rootScope.$emit(events.ANNOTATION_DELETED, draft);
     });
-    drafts.discard();
+    store.discardAllDrafts();
 
     if (serviceConfig(settings)) {
       // Let the host page handle the signup request
