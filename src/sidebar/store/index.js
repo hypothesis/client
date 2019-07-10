@@ -37,6 +37,7 @@ const debugMiddleware = require('./debug-middleware');
 const activity = require('./modules/activity');
 const annotations = require('./modules/annotations');
 const directLinked = require('./modules/direct-linked');
+const drafts = require('./modules/drafts');
 const frames = require('./modules/frames');
 const links = require('./modules/links');
 const groups = require('./modules/groups');
@@ -88,6 +89,7 @@ function store($rootScope, settings) {
     activity,
     annotations,
     directLinked,
+    drafts,
     frames,
     links,
     groups,

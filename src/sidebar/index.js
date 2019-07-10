@@ -211,7 +211,6 @@ function startAngularApp(config) {
     .service('apiRoutes', require('./services/api-routes'))
     .service('auth', require('./services/oauth-auth'))
     .service('bridge', require('../shared/bridge'))
-    .service('drafts', require('./services/drafts'))
     .service('features', require('./services/features'))
     .service('flash', require('./services/flash'))
     .service('frameSync', require('./services/frame-sync').default)
