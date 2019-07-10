@@ -9,7 +9,10 @@
     "indent": "off",
     "react/self-closing-comp": "error",
     "react-hooks/rules-of-hooks": "error",
-    "react-hooks/exhaustive-deps": "error"
+    "react-hooks/exhaustive-deps": "error",
+
+    // Suppressed to make ESLint v6 migration easier.
+    "no-prototype-builtins": "off"
   },
   "parserOptions": {
     "ecmaVersion": 2018,

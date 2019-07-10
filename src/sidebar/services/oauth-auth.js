@@ -286,7 +286,10 @@ function auth(
       oauthClient(),
     ]);
     await client.revokeToken(token.accessToken);
+
+    // eslint-disable-next-line require-atomic-updates
     tokenInfoPromise = Promise.resolve(null);
+
     localStorage.removeItem(storageKey());
   }
 
