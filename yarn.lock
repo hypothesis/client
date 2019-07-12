@@ -3088,10 +3088,10 @@ escodegen@~1.1.0:
   optionalDependencies:
     source-map "~0.1.30"
 
-eslint-config-hypothesis@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/eslint-config-hypothesis/-/eslint-config-hypothesis-1.0.0.tgz#21d47ddd6c0001e84bf6783a3d36c35a2c07d624"
-  integrity sha1-IdR93WwAAehL9ng6PTbDWiwH1iQ=
+eslint-config-hypothesis@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/eslint-config-hypothesis/-/eslint-config-hypothesis-2.0.0.tgz#18c185401d2f9c49cc455861b6a8add7675a1a63"
+  integrity sha512-B1lR2AAmdMixKePtoXDnbOqsdsI+AtNprdsRkN3K82hZvi4vvdAhZMwMCUJlg5EZK64kQV71/TbdqhPd+0ieJw==
 
 eslint-plugin-mocha@^5.2.1:
   version "5.3.0"
