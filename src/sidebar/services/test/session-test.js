@@ -204,31 +204,6 @@ describe('sidebar.session', function() {
     });
   });
 
-  describe('#dismissSidebarTutorial()', function() {
-    beforeEach(function() {
-      fakeApi.profile.update.returns(
-        Promise.resolve({
-          preferences: {},
-        })
-      );
-    });
-
-    it('disables the tutorial for the user', function() {
-      session.dismissSidebarTutorial();
-      assert.calledWith(
-        fakeApi.profile.update,
-        {},
-        { preferences: { show_sidebar_tutorial: false } }
-      );
-    });
-
-    it('should update the session with the response from the API', function() {
-      return session.dismissSidebarTutorial().then(function() {
-        assert.isNotOk(session.state.preferences.show_sidebar_tutorial);
-      });
-    });
-  });
-
   describe('#reload', () => {
     beforeEach(() => {
       // Load the initial profile data, as the client will do on startup.
