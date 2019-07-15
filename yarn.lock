@@ -6905,10 +6905,10 @@ preact-render-to-string@^4.1.0:
   dependencies:
     pretty-format "^3.8.0"
 
-preact@10.0.0-beta.3:
-  version "10.0.0-beta.3"
-  resolved "https://registry.yarnpkg.com/preact/-/preact-10.0.0-beta.3.tgz#dabd0628d941f9e7908f68bb008e012ddff1b28f"
-  integrity sha512-JDeA+CVFBlv+r+v/tScG8hzOcOedXfBLUA5IhStqpfc7rPGY3T85pdlu4aGo2tV0AoZzQfO4LTnKkQEnKJ3UxQ==
+preact@10.0.0-rc.0:
+  version "10.0.0-rc.0"
+  resolved "https://registry.yarnpkg.com/preact/-/preact-10.0.0-rc.0.tgz#084316631ae6f0a965e889e7715cccb74c4a5d6e"
+  integrity sha512-mOOF2FoSt52uYPa+n2cvgI0NI+yo6Rxyamvu5z/8GHod3UhtExWhBcOeTawriR4HiGuR5VHENJEJ/dtBWMZZaQ==
 
 prelude-ls@~1.1.2:
   version "1.1.2"
