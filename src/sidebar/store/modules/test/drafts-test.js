@@ -261,4 +261,40 @@ describe('Drafts Store', () => {
       assert.isOk(store.getDraft(newAnnotations[3]));
     });
   });
+
+  describe('#deleteNewAndEmptyAnnotations', () => {
+    it('should remove only new or empty drafts', () => {
+      const newAnnotations = [
+        {
+          id: undefined,
+          $tag: 'my_annotation_tag1',
+        },
+        {
+          id: undefined,
+          $tag: 'my_annotation_tag2',
+        },
+        {
+          id: 'my_id',
+          $tag: 'my_annotation_tag3',
+        },
+        {
+          id: undefined,
+          $tag: 'my_annotation_tag4',
+        },
+      ];
+      store.createDraft(newAnnotations[0], fixtures.emptyDraft);
+      store.createDraft(newAnnotations[1], fixtures.emptyDraft);
+      store.createDraft(newAnnotations[2], fixtures.emptyDraft);
+      store.createDraft(newAnnotations[3], fixtures.draftWithText);
+      store.deleteNewAndEmptyAnnotations(newAnnotations);
+
+      // first 2 should be removed
+      assert.isNotOk(store.getDraft(newAnnotations[0]));
+      assert.isNotOk(store.getDraft(newAnnotations[1]));
+
+      // last 2 should remain
+      assert.isOk(store.getDraft(newAnnotations[2]));
+      assert.isOk(store.getDraft(newAnnotations[3]));
+    });
+  });
 });
