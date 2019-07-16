@@ -9,6 +9,7 @@ const { withServices } = require('../util/service-context');
 const { copyText } = require('../util/copy-to-clipboard');
 
 const MenuItem = require('./menu-item');
+const Slider = require('./slider');
 
 /**
  * An item in the groups selection menu.
@@ -91,7 +92,7 @@ function GroupListItem({
         onClick={isSelectable ? focusGroup : toggleSubmenu}
         onToggleSubmenu={toggleSubmenu}
       />
-      {isExpanded && (
+      <Slider visible={isExpanded}>
         <div className="group-list-item__submenu">
           <ul onClick={collapseSubmenu}>
             {activityUrl && (
@@ -131,7 +132,7 @@ function GroupListItem({
             </p>
           )}
         </div>
-      )}
+      </Slider>
     </Fragment>
   );
 }

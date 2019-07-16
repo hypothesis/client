@@ -62,8 +62,14 @@ describe('GroupListItem', () => {
     }
     FakeMenuItem.displayName = 'MenuItem';
 
+    function FakeSlider({ children, visible }) {
+      return visible ? children : null;
+    }
+    FakeSlider.displayName = 'Slider';
+
     GroupListItem.$imports.$mock({
       './menu-item': FakeMenuItem,
+      './slider': FakeSlider,
       '../util/copy-to-clipboard': {
         copyText: fakeCopyText,
       },
