@@ -26,7 +26,6 @@ function SidebarContentController(
   store,
   annotationMapper,
   api,
-  drafts,
   features,
   frameSync,
   groups,

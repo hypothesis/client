@@ -15,7 +15,6 @@ describe('sidebar.components.hypothesis-app', function() {
   let fakeAnalytics = null;
   let fakeAuth = null;
   let fakeBridge = null;
-  let fakeDrafts = null;
   let fakeFeatures = null;
   let fakeFlash = null;
   let fakeFrameSync = null;
@@ -64,6 +63,10 @@ describe('sidebar.components.hypothesis-app', function() {
         clearSelectedAnnotations: sandbox.spy(),
         getState: sinon.stub(),
         clearGroups: sinon.stub(),
+        // draft store
+        countDrafts: sandbox.stub().returns(0),
+        discardAllDrafts: sandbox.stub(),
+        unsavedAnnotations: sandbox.stub().returns([]),
       };
 
       fakeAnalytics = {
@@ -72,15 +75,6 @@ describe('sidebar.components.hypothesis-app', function() {
       };
 
       fakeAuth = {};
-
-      fakeDrafts = {
-        contains: sandbox.stub(),
-        remove: sandbox.spy(),
-        all: sandbox.stub().returns([]),
-        discard: sandbox.spy(),
-        count: sandbox.stub().returns(0),
-        unsaved: sandbox.stub().returns([]),
-      };
 
       fakeFeatures = {
         fetch: sandbox.spy(),
@@ -128,7 +122,6 @@ describe('sidebar.components.hypothesis-app', function() {
       $provide.value('store', fakeStore);
       $provide.value('auth', fakeAuth);
       $provide.value('analytics', fakeAnalytics);
-      $provide.value('drafts', fakeDrafts);
       $provide.value('features', fakeFeatures);
       $provide.value('flash', fakeFlash);
       $provide.value('frameSync', fakeFrameSync);
@@ -434,7 +427,7 @@ describe('sidebar.components.hypothesis-app', function() {
     // Tests shared by both of the contexts below.
     function doSharedTests() {
       it('prompts the user if there are drafts', function() {
-        fakeDrafts.count.returns(1);
+        fakeStore.countDrafts.returns(1);
         const ctrl = createController();
 
         ctrl.logout();
@@ -451,7 +444,7 @@ describe('sidebar.components.hypothesis-app', function() {
       });
 
       it('emits "annotationDeleted" for each unsaved draft annotation', function() {
-        fakeDrafts.unsaved = sandbox
+        fakeStore.unsavedAnnotations = sandbox
           .stub()
           .returns(['draftOne', 'draftTwo', 'draftThree']);
         const ctrl = createController();
@@ -479,12 +472,12 @@ describe('sidebar.components.hypothesis-app', function() {
 
         ctrl.logout();
 
-        assert(fakeDrafts.discard.calledOnce);
+        assert(fakeStore.discardAllDrafts.calledOnce);
       });
 
       it('does not emit "annotationDeleted" if the user cancels the prompt', function() {
         const ctrl = createController();
-        fakeDrafts.count.returns(1);
+        fakeStore.countDrafts.returns(1);
         $rootScope.$emit = sandbox.stub();
         fakeWindow.confirm.returns(false);
 
@@ -495,17 +488,17 @@ describe('sidebar.components.hypothesis-app', function() {
 
       it('does not discard drafts if the user cancels the prompt', function() {
         const ctrl = createController();
-        fakeDrafts.count.returns(1);
+        fakeStore.countDrafts.returns(1);
         fakeWindow.confirm.returns(false);
 
         ctrl.logout();
 
-        assert(fakeDrafts.discard.notCalled);
+        assert(fakeStore.discardAllDrafts.notCalled);
       });
 
       it('does not prompt if there are no drafts', function() {
         const ctrl = createController();
-        fakeDrafts.count.returns(0);
+        fakeStore.countDrafts.returns(0);
 
         ctrl.logout();
 
@@ -541,7 +534,7 @@ describe('sidebar.components.hypothesis-app', function() {
       });
 
       it('does not send LOGOUT_REQUESTED if the user cancels the prompt', function() {
-        fakeDrafts.count.returns(1);
+        fakeStore.countDrafts.returns(1);
         fakeWindow.confirm.returns(false);
 
         createController().logout();
