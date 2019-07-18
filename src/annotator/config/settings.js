@@ -150,8 +150,8 @@ function settingsFrom(window_) {
   }
 
   function getSidebarDefaultExpanded() {
-      const annotationSidebarDefaultExpanded = window_.document.querySelector('meta[name="annotationSidebarDefaultExpanded"]').content;
-      return annotationSidebarDefaultExpanded === 'true';
+      const meta = window_.document.querySelector('meta[name="annotationSidebarDefaultExpanded"]');
+      return meta ? meta.content === 'true' : false;
   }
 
   function hostPageSetting(name, options = {}) {
