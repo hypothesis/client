@@ -1,21 +1,43 @@
 'use strict';
 
+const { createElement } = require('preact');
+const propTypes = require('prop-types');
+
 const events = require('../events');
+const useStore = require('../store/use-store');
+const { applyTheme } = require('../util/theme');
+const { withServices } = require('../util/service-context');
 
-module.exports = {
-  controllerAs: 'vm',
-  //@ngInject
-  controller: function($rootScope, store) {
-    this.onNewNoteBtnClick = function() {
-      const topLevelFrame = store.frames().find(f => !f.id);
-      const annot = {
-        target: [],
-        uri: topLevelFrame.uri,
-      };
+function NewNoteButton({ $rootScope, settings }) {
+  const store = useStore(store => ({
+    frames: store.frames(),
+  }));
 
-      $rootScope.$broadcast(events.BEFORE_ANNOTATION_CREATED, annot);
+  const onNewNoteBtnClick = function() {
+    const topLevelFrame = store.frames.find(f => !f.id);
+    const annot = {
+      target: [],
+      uri: topLevelFrame.uri,
     };
-  },
-  bindings: {},
-  template: require('../templates/new-note-btn.html'),
+    $rootScope.$broadcast(events.BEFORE_ANNOTATION_CREATED, annot);
+  };
+
+  return (
+    <button
+      style={applyTheme(['ctaBackgroundColor'], settings)}
+      className="new-note__create"
+      onClick={onNewNoteBtnClick}
+    >
+      + New note
+    </button>
+  );
+}
+NewNoteButton.propTypes = {
+  // Injected services.
+  $rootScope: propTypes.object.isRequired,
+  settings: propTypes.object.isRequired,
 };
+
+NewNoteButton.injectedProps = ['$rootScope', 'settings'];
+
+module.exports = withServices(NewNoteButton);
