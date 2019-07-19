@@ -84,24 +84,6 @@ function HypothesisAppController(
       return localStorage.getItem(key) === 'true';
   };
 
-  this.isStartupPageVisibleOrDismissed = function() {
-    if (session.state.privileges) {
-        if (!this.isStudent()) {
-            return this.getStorageSetting('SIDEBAR_STARTUP_PAGE_DISMISSED');
-        }
-    }
-    return true;
-  };
-
-  this.isHelpPageVisibleOrDismissed = function() {
-    if (session.state.privileges) {
-      if (!this.isStudent()) {
-        return this.getStorageSetting('SIDEBAR_HELP_PAGE_DISMISSED');
-      }
-    }
-    return true;
-  };
-
   this.sortKey = function() {
     return store.getState().sortKey;
   };

@@ -41,7 +41,7 @@
     <p class="annotation-unavailable-message__label">
       {{vm.tl('sidePanel.selectionTabs.noPageNotesInGroup')}}
       <br />
-      <div ng-if="!vm.enableExperimentalNewNoteButton && !vm.showSidebarTutorial()" class="annotation-unavailable-message__tutorial">
+      <div ng-if="!vm.enableExperimentalNewNoteButton" class="annotation-unavailable-message__tutorial">
         {{vm.tl('sidePanel.selectionTabs.createNewOne')}}
         <i class="help-icon h-icon-note"></i>
         {{vm.tl('sidePanel.selectionTabs.button')}}
@@ -53,7 +53,7 @@
 
       {{vm.tl('sidePanel.selectionTabs.noAnnotationsInGroup')}}
       <br />
-      <div ng-if="!vm.showSidebarTutorial()" class="annotation-unavailable-message__tutorial">
+      <div class="annotation-unavailable-message__tutorial">
         {{vm.tl('sidePanel.selectionTabs.createNewAnnotations')}}
         <i class="help-icon h-icon-annotate"></i> {{vm.tl('sidePanel.selectionTabs.button')}}
       </div>

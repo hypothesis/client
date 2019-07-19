@@ -1,6 +1,5 @@
 'use strict';
 
-const sessionUtil = require('../util/session-util');
 const uiConstants = require('../ui-constants');
 
 module.exports = {
@@ -32,10 +31,6 @@ module.exports = {
 
     this.showNotesUnavailableMessage = function() {
       return this.selectedTab === this.TAB_NOTES && this.totalNotes === 0;
-    };
-
-    this.showSidebarTutorial = function() {
-      return sessionUtil.shouldShowSidebarTutorial(session.state);
     };
   },
   bindings: {

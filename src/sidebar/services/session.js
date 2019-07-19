@@ -104,14 +104,6 @@ function session(
   }
 
   /**
-   * Store the preference server-side that the user dismissed the sidebar
-   * tutorial and then update the local profile data.
-   */
-  function dismissSidebarTutorial() {
-    localStorage.setItem('SIDEBAR_STARTUP_PAGE_DISMISSED', true);
-  }
-
-  /**
    * Update the local profile data.
    *
    * This method can be used to update the profile data in the client when new
@@ -188,7 +180,6 @@ function session(
 
   return {
     dismissSidebarHelp,
-    dismissSidebarTutorial,
     load,
     logout,
     reload,
