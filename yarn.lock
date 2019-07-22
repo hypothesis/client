@@ -2981,9 +2981,9 @@ entities@^1.1.1, entities@~1.1.1:
   integrity sha512-f2LZMYl1Fzu7YSBKg+RoROelpOaNrcGmE9AZubeDfrCEia483oW4MI4VyFd5VNHIgQ/7qm1I0wUHK1eJnn2y2w==
 
 enzyme-adapter-preact-pure@^2.0.0:
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/enzyme-adapter-preact-pure/-/enzyme-adapter-preact-pure-2.0.0.tgz#6d8f1a523934786fb8bb365320acd124973760cc"
-  integrity sha512-KeOEkzvSr2YraAZWKGWt5oVKHjIQNQ3ds3TIna97lIK+Hzfr9Y8ay8eD+tmBazU2aaf1MCqDTizGpCy0UGLSVg==
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/enzyme-adapter-preact-pure/-/enzyme-adapter-preact-pure-2.0.1.tgz#6305cbdd06da8d199d41e6ed7ea0f1c34ddca2cf"
+  integrity sha512-sqbsY64bMPYpaBWFO4J6GDaJHQ/wBhb8gR2oG0ia3KpHKJ23yxprPGS6PooFUuw7JPGWCY3fJoD9LGWINZfWpg==
   dependencies:
     array.prototype.flatmap "^1.2.1"
     preact-render-to-string "^4.1.0"
