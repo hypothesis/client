@@ -56,7 +56,11 @@ describe('MenuItem', () => {
   });
 
   it('shows the submenu indicator if `isSubmenuVisible` is a boolean', () => {
-    const wrapper = createMenuItem({ isSubmenuVisible: true });
+    const wrapper = createMenuItem({
+      isSubmenuVisible: true,
+      // eslint-disable-next-line react/display-name
+      renderSubmenu: () => <div>Submenu</div>,
+    });
     assert.isTrue(wrapper.exists('SvgIcon[name="collapse-menu"]'));
 
     wrapper.setProps({ isSubmenuVisible: false });
@@ -70,7 +74,12 @@ describe('MenuItem', () => {
 
   it('calls the `onToggleSubmenu` callback when the submenu toggle is clicked', () => {
     const onToggleSubmenu = sinon.stub();
-    const wrapper = createMenuItem({ isSubmenuVisible: true, onToggleSubmenu });
+    const wrapper = createMenuItem({
+      isSubmenuVisible: true,
+      onToggleSubmenu,
+      // eslint-disable-next-line react/display-name
+      renderSubmenu: () => <div>Submenu</div>,
+    });
     wrapper.find('.menu-item__toggle').simulate('click');
     assert.called(onToggleSubmenu);
   });
@@ -97,5 +106,45 @@ describe('MenuItem', () => {
 
     // The actual icon for the submenu should be shown on the right.
     assert.equal(iconSpaces.at(1).children().length, 1);
+  });
+
+  it('does not render submenu content if `isSubmenuVisible` is undefined', () => {
+    const wrapper = createMenuItem({});
+    assert.isFalse(wrapper.exists('Slider'));
+  });
+
+  it('shows submenu content if `isSubmenuVisible` is true', () => {
+    const wrapper = createMenuItem({
+      isSubmenuVisible: true,
+      // eslint-disable-next-line react/display-name
+      renderSubmenu: () => <div>Submenu content</div>,
+    });
+    assert.equal(wrapper.find('Slider').prop('visible'), true);
+    assert.equal(
+      wrapper
+        .find('Slider')
+        .children()
+        .text(),
+      'Submenu content'
+    );
+  });
+
+  it('hides submenu content if `isSubmenuVisible` is false', () => {
+    const wrapper = createMenuItem({
+      isSubmenuVisible: false,
+      // eslint-disable-next-line react/display-name
+      renderSubmenu: () => <div>Submenu content</div>,
+    });
+    assert.equal(wrapper.find('Slider').prop('visible'), false);
+
+    // The submenu content may still be rendered if the submenu is currently
+    // collapsing.
+    assert.equal(
+      wrapper
+        .find('Slider')
+        .children()
+        .text(),
+      'Submenu content'
+    );
   });
 });

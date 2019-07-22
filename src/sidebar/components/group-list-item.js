@@ -9,7 +9,6 @@ const { withServices } = require('../util/service-context');
 const { copyText } = require('../util/copy-to-clipboard');
 
 const MenuItem = require('./menu-item');
-const Slider = require('./slider');
 
 /**
  * An item in the groups selection menu.
@@ -80,20 +79,18 @@ function GroupListItem({
   const collapseSubmenu = () => onExpand(false);
 
   return (
-    <Fragment>
-      <MenuItem
-        icon={group.logo || 'blank'}
-        iconAlt={orgName(group)}
-        isDisabled={!isSelectable}
-        isExpanded={hasActionMenu ? isExpanded : undefined}
-        isSelected={isSelected}
-        isSubmenuVisible={isExpanded}
-        label={group.name}
-        onClick={isSelectable ? focusGroup : toggleSubmenu}
-        onToggleSubmenu={toggleSubmenu}
-      />
-      <Slider visible={isExpanded}>
-        <div className="group-list-item__submenu">
+    <MenuItem
+      icon={group.logo || 'blank'}
+      iconAlt={orgName(group)}
+      isDisabled={!isSelectable}
+      isExpanded={hasActionMenu ? isExpanded : undefined}
+      isSelected={isSelected}
+      isSubmenuVisible={isExpanded}
+      label={group.name}
+      onClick={isSelectable ? focusGroup : toggleSubmenu}
+      onToggleSubmenu={toggleSubmenu}
+      renderSubmenu={() => (
+        <Fragment>
           <ul onClick={collapseSubmenu}>
             {activityUrl && (
               <li>
@@ -131,9 +128,9 @@ function GroupListItem({
               This group is restricted to specific URLs.
             </p>
           )}
-        </div>
-      </Slider>
-    </Fragment>
+        </Fragment>
+      )}
+    />
   );
 }
 

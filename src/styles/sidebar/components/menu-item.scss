@@ -148,3 +148,8 @@ $menu-item-padding: 10px;
     height: 12px;
   }
 }
+
+// The container for open submenus
+.menu-item__submenu {
+  border-bottom: solid 1px $grey-2;
+}

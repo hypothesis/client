@@ -1,11 +1,12 @@
 'use strict';
 
 const classnames = require('classnames');
-const { createElement } = require('preact');
+const { Fragment, createElement } = require('preact');
 const propTypes = require('prop-types');
 
 const { onActivate } = require('../util/on-activate');
 
+const Slider = require('./slider');
 const SvgIcon = require('./svg-icon');
 
 /**
@@ -20,9 +21,8 @@ const SvgIcon = require('./svg-icon');
  * The icon can either be an external SVG image, referenced by URL, or a named
  * icon rendered by an `SvgIcon`.
  *
- * For items that have submenus, the `MenuItem` only provides an indicator as
- * to whether the submenu is open. The container is responsible for displaying
- * the submenu items beneath the current item.
+ * For items that have submenus, the `MenuItem` will call the `renderSubmenu`
+ * prop to render the content of the submenu, when the submenu is visible.
  */
 function MenuItem({
   href,
@@ -36,6 +36,7 @@ function MenuItem({
   label,
   onClick,
   onToggleSubmenu,
+  renderSubmenu,
 }) {
   const iconClass = 'menu-item__icon';
   const iconIsUrl = icon && icon.indexOf('/') !== -1;
@@ -58,51 +59,60 @@ function MenuItem({
   const rightIcon = isSubmenuItem ? renderedIcon : null;
 
   return (
-    <div
-      aria-checked={isSelected}
-      className={classnames('menu-item', {
-        'menu-item--submenu': isSubmenuItem,
-        'is-disabled': isDisabled,
-        'is-expanded': isExpanded,
-        'is-selected': isSelected,
-      })}
-      role="menuitem"
-      {...(onClick && onActivate('menuitem', onClick))}
-    >
-      <div className="menu-item__action">
-        {hasLeftIcon && (
-          <div className="menu-item__icon-container">{leftIcon}</div>
-        )}
-        {href && (
-          <a
-            className={labelClass}
-            href={href}
-            target="_blank"
-            rel="noopener noreferrer"
+    // Wrapper element is a `<div>` rather than a `Fragment` to work around
+    // limitations of Enzyme's shallow rendering.
+    <div>
+      <div
+        aria-checked={isSelected}
+        className={classnames('menu-item', {
+          'menu-item--submenu': isSubmenuItem,
+          'is-disabled': isDisabled,
+          'is-expanded': isExpanded,
+          'is-selected': isSelected,
+        })}
+        role="menuitem"
+        {...(onClick && onActivate('menuitem', onClick))}
+      >
+        <div className="menu-item__action">
+          {hasLeftIcon && (
+            <div className="menu-item__icon-container">{leftIcon}</div>
+          )}
+          {href && (
+            <a
+              className={labelClass}
+              href={href}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {label}
+            </a>
+          )}
+          {!href && <span className={labelClass}>{label}</span>}
+          {hasRightIcon && (
+            <div className="menu-item__icon-container">{rightIcon}</div>
+          )}
+        </div>
+        {typeof isSubmenuVisible === 'boolean' && (
+          <div
+            className="menu-item__toggle"
+            // We need to pass strings here rather than just the boolean attribute
+            // because otherwise the attribute will be omitted entirely when
+            // `isSubmenuVisible` is false.
+            aria-expanded={isSubmenuVisible ? 'true' : 'false'}
+            aria-label={`Show actions for ${label}`}
+            {...onActivate('button', onToggleSubmenu)}
           >
-            {label}
-          </a>
-        )}
-        {!href && <span className={labelClass}>{label}</span>}
-        {hasRightIcon && (
-          <div className="menu-item__icon-container">{rightIcon}</div>
+            <SvgIcon
+              name={isSubmenuVisible ? 'collapse-menu' : 'expand-menu'}
+              className="menu-item__toggle-icon"
+            />
+          </div>
         )}
       </div>
       {typeof isSubmenuVisible === 'boolean' && (
-        <div
-          className="menu-item__toggle"
-          // We need to pass strings here rather than just the boolean attribute
-          // because otherwise the attribute will be omitted entirely when
-          // `isSubmenuVisible` is false.
-          aria-expanded={isSubmenuVisible ? 'true' : 'false'}
-          aria-label={`Show actions for ${label}`}
-          {...onActivate('button', onToggleSubmenu)}
-        >
-          <SvgIcon
-            name={isSubmenuVisible ? 'collapse-menu' : 'expand-menu'}
-            className="menu-item__toggle-icon"
-          />
-        </div>
+        <Slider visible={isSubmenuVisible}>
+          <div className="menu-item__submenu">{renderSubmenu()}</div>
+        </Slider>
       )}
     </div>
   );
@@ -171,6 +181,12 @@ MenuItem.propTypes = {
    * state of the menu.
    */
   onToggleSubmenu: propTypes.func,
+
+  /**
+   * Function called to render the item's submenu when `isSubmenuVisible`
+   * is `true`.
+   */
+  renderSubmenu: propTypes.func,
 };
 
 module.exports = MenuItem;
