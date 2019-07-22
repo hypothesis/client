@@ -69,6 +69,7 @@ describe('sidebar/store/modules/real-time-updates', () => {
 
     it("does not add pending updates if the focused group does not match the annotation's group", () => {
       fakeFocusedGroupId.returns('other-group');
+      addPendingUpdates(store);
       assert.deepEqual(store.pendingUpdates(), {});
     });
 
@@ -136,8 +137,11 @@ describe('sidebar/store/modules/real-time-updates', () => {
 
   it('clears pending updates when annotations are removed', () => {
     const updates = addPendingUpdates(store);
-    store.dispatch(removeAnnotations(updates));
-    assert.deepEqual(store.pendingUpdateCount(), 0);
+    const deletions = addPendingDeletions(store);
+
+    store.dispatch(removeAnnotations([...updates, ...deletions]));
+
+    assert.equal(store.pendingUpdateCount(), 0);
   });
 
   it('clears pending updates when focused group changes', () => {
