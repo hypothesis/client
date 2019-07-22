@@ -28,7 +28,13 @@ $menu-item-padding: 10px;
     font-weight: normal;
   }
 
+  // Animate the background color transition of menu items with expanding submenus.
+  // The timing should match the expansion of the submenu.
+  transition: background 0.15s ease-in;
+
   &.is-expanded {
+    // Set the background color of menu items with submenus to match the
+    // submenu items.
     background: $grey-1;
   }
 }
