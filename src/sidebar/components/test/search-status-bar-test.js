@@ -1,22 +1,23 @@
 'use strict';
 
-const angular = require('angular');
+const { shallow } = require('enzyme');
+const { createElement } = require('preact');
 
-const util = require('../../directive/test/util');
+const SearchStatusBar = require('../search-status-bar');
 
-describe('searchStatusBar', () => {
-  before(() => {
-    angular
-      .module('app', [])
-      .component('searchStatusBar', require('../search-status-bar'));
-  });
-
+describe('SearchStatusBar', () => {
   let fakeRootThread;
   let fakeStore;
 
+  function createComponent(props) {
+    return shallow(
+      <SearchStatusBar rootThread={fakeRootThread} {...props} />
+    ).dive(); // dive() needed because this component uses `withServices`
+  }
+
   beforeEach(() => {
     fakeRootThread = {
-      thread: sinon.stub(),
+      thread: sinon.stub().returns({ children: [] }),
     };
     fakeStore = {
       getState: sinon.stub(),
@@ -26,174 +27,192 @@ describe('searchStatusBar', () => {
       clearDirectLinkedIds: sinon.stub(),
       clearSelection: sinon.stub(),
     };
-    angular.mock.module('app', {
-      store: fakeStore,
-      rootThread: fakeRootThread,
+
+    SearchStatusBar.$imports.$mock({
+      '../store/use-store': callback => callback(fakeStore),
     });
   });
 
-  describe('filterQuery', () => {
-    ['tag:foo', null].forEach(filterQuery => {
-      it('returns the `filterQuery`', () => {
-        fakeStore.getState.returns({ filterQuery });
-
-        const elem = util.createDirective(document, 'searchStatusBar', {});
-        const ctrl = elem.ctrl;
-
-        assert.equal(ctrl.filterQuery(), filterQuery);
-      });
-    });
+  afterEach(() => {
+    SearchStatusBar.$imports.$restore();
   });
 
-  describe('filterActive', () => {
-    it('returns true if there is a `filterQuery`', () => {
-      fakeStore.getState.returns({ filterQuery: 'tag:foo' });
-
-      const elem = util.createDirective(document, 'searchStatusBar', {});
-      const ctrl = elem.ctrl;
-
-      assert.isTrue(ctrl.filterActive());
-    });
-
-    it('returns false if `filterQuery` is null', () => {
-      fakeStore.getState.returns({ filterQuery: null });
-
-      const elem = util.createDirective(document, 'searchStatusBar', {});
-      const ctrl = elem.ctrl;
-
-      assert.isFalse(ctrl.filterActive());
-    });
-  });
-
-  describe('filterMatchCount', () => {
-    it('returns the total number of visible annotations or replies', () => {
+  [
+    {
+      description:
+        'shows correct text if 2 annotations match the search filter',
+      children: [
+        {
+          id: '1',
+          visible: true,
+          children: [{ id: '3', visible: true, children: [] }],
+        },
+        {
+          id: '2',
+          visible: false,
+          children: [],
+        },
+      ],
+      expectedText: '2 search results',
+    },
+    {
+      description:
+        'shows correct text if 1 annotation matches the search filter',
+      children: [
+        {
+          id: '1',
+          visible: true,
+          children: [{ id: '3', visible: false, children: [] }],
+        },
+        {
+          id: '2',
+          visible: false,
+          children: [],
+        },
+      ],
+      expectedText: '1 search result',
+    },
+    {
+      description:
+        'shows correct text if no annotation matches the search filter',
+      children: [
+        {
+          id: '1',
+          visible: false,
+          children: [{ id: '3', visible: false, children: [] }],
+        },
+        {
+          id: '2',
+          visible: false,
+          children: [],
+        },
+      ],
+      expectedText: 'No results for "tag:foo"',
+    },
+  ].forEach(test => {
+    it(test.description, () => {
       fakeRootThread.thread.returns({
-        children: [
-          {
-            id: '1',
-            visible: true,
-            children: [{ id: '3', visible: true, children: [] }],
-          },
-          {
-            id: '2',
-            visible: false,
-            children: [],
-          },
-        ],
+        children: test.children,
       });
       fakeStore.getState.returns({
         filterQuery: 'tag:foo',
       });
 
-      const elem = util.createDirective(document, 'searchStatusBar', {});
-      const ctrl = elem.ctrl;
-
-      assert.equal(ctrl.filterMatchCount(), 2);
-    });
-  });
-
-  describe('areAllAnnotationsVisible', () => {
-    it('returns true if the direct-linked group fetch failed', () => {
-      fakeStore.getState.returns({ directLinkedGroupFetchFailed: true });
-
-      const elem = util.createDirective(document, 'searchStatusBar', {});
-      const ctrl = elem.ctrl;
-
-      assert.isTrue(ctrl.areAllAnnotationsVisible());
-    });
-
-    it('returns true if there are annotations selected', () => {
-      fakeStore.getState.returns({
-        directLinkedGroupFetchFailed: false,
-        selectedAnnotationMap: { ann: true },
-      });
-
-      const elem = util.createDirective(document, 'searchStatusBar', {});
-      const ctrl = elem.ctrl;
-
-      assert.isTrue(ctrl.areAllAnnotationsVisible());
-    });
-
-    it('returns false if there are no annotations selected', () => {
-      fakeStore.getState.returns({
-        directLinkedGroupFetchFailed: false,
-        selectedAnnotationMap: {},
-      });
-
-      const elem = util.createDirective(document, 'searchStatusBar', {});
-      const ctrl = elem.ctrl;
-
-      assert.isFalse(ctrl.areAllAnnotationsVisible());
-    });
-
-    it('returns false if the `selectedAnnotationMap` is null', () => {
-      fakeStore.getState.returns({
-        directLinkedGroupFetchFailed: false,
-        selectedAnnotationMap: null,
-      });
-
-      const elem = util.createDirective(document, 'searchStatusBar', {});
-      const ctrl = elem.ctrl;
-
-      assert.isFalse(ctrl.areAllAnnotationsVisible());
-    });
-  });
-
-  context('when there is a filter', () => {
-    it('should display the filter count', () => {
-      fakeRootThread.thread.returns({
-        children: [
-          {
-            id: '1',
-            visible: true,
-            children: [{ id: '3', visible: true, children: [] }],
-          },
-          {
-            id: '2',
-            visible: false,
-            children: [],
-          },
-        ],
-      });
-
-      fakeStore.getState.returns({
-        filterQuery: 'tag:foo',
-      });
-
-      const elem = util.createDirective(document, 'searchStatusBar', {});
-      assert.include(elem[0].textContent, '2 search results');
-    });
-  });
-
-  context('when there is a selection', () => {
-    it('should display the "Show all annotations (2)" message when there are 2 annotations', () => {
-      const msg = 'Show all annotations';
-      const msgCount = '(2)';
-      fakeStore.getState.returns({
-        selectedAnnotationMap: { ann1: true },
-      });
-      const elem = util.createDirective(document, 'searchStatusBar', {
-        totalAnnotations: 2,
+      const wrapper = createComponent({
         selectedTab: 'annotation',
+        totalAnnotations: 3,
+        totalNotes: 0,
       });
-      const clearBtn = elem[0].querySelector('button');
-      assert.include(clearBtn.textContent, msg);
-      assert.include(clearBtn.textContent, msgCount);
+
+      const buttonText = wrapper.find('button').text();
+      assert.equal(buttonText, 'Clear search');
+
+      const searchResultsText = wrapper.find('span').text();
+      assert.equal(searchResultsText, test.expectedText);
+    });
+  });
+
+  it('displays "Show all annotations" button when a direct-linked group fetch fails', () => {
+    fakeStore.getState.returns({
+      filterQuery: null,
+      directLinkedGroupFetchFailed: true,
+      selectedAnnotationMap: { annId: true },
     });
 
-    it('should display the "Show all notes (3)" message when there are 3 notes', () => {
-      const msg = 'Show all notes';
-      const msgCount = '(3)';
+    const wrapper = createComponent({
+      selectedTab: 'annotation',
+      totalAnnotations: 1,
+      totalNotes: 0,
+    });
+
+    const buttonText = wrapper.find('button').text();
+    assert.equal(buttonText, 'Show all annotations');
+  });
+
+  it('displays "Show all annotations" button when there are selected annotations', () => {
+    fakeStore.getState.returns({
+      filterQuery: null,
+      directLinkedGroupFetchFailed: false,
+      selectedAnnotationMap: { annId: true },
+    });
+
+    const wrapper = createComponent({
+      selectedTab: 'annotation',
+      totalAnnotations: 1,
+      totalNotes: 0,
+    });
+
+    const buttonText = wrapper.find('button').text();
+    assert.equal(buttonText, 'Show all annotations');
+  });
+
+  [null, {}].forEach(selectedAnnotationMap => {
+    it('does not display "Show all annotations" button when there are no selected annotations', () => {
       fakeStore.getState.returns({
-        selectedAnnotationMap: { ann1: true },
+        filterQuery: null,
+        directLinkedGroupFetchFailed: false,
+        selectedAnnotationMap: selectedAnnotationMap,
       });
-      const elem = util.createDirective(document, 'searchStatusBar', {
-        totalNotes: 3,
-        selectedTab: 'note',
+      const wrapper = createComponent({
+        selectedTab: 'annotation',
+        totalAnnotations: 1,
+        totalNotes: 0,
       });
-      const clearBtn = elem[0].querySelector('button');
-      assert.include(clearBtn.textContent, msg);
-      assert.include(clearBtn.textContent, msgCount);
+
+      const buttons = wrapper.find('button');
+      assert.equal(buttons.length, 0);
+    });
+  });
+
+  [
+    {
+      description:
+        'displays "Show all annotations and notes" button when the orphans tab is selected',
+      selectedTab: 'orphan',
+      totalAnnotations: 1,
+      totalNotes: 1,
+      expectedText: 'Show all annotations and notes',
+    },
+    {
+      description:
+        'displays "Show all notes" button when the notes tab is selected',
+      selectedTab: 'note',
+      totalAnnotations: 1,
+      totalNotes: 1,
+      expectedText: 'Show all notes',
+    },
+    {
+      description:
+        'displays "Show all notes (2)" button when the notes tab is selected and there are two notes',
+      selectedTab: 'note',
+      totalAnnotations: 2,
+      totalNotes: 2,
+      expectedText: 'Show all notes (2)',
+    },
+    {
+      description:
+        'displays "Show all annotations (2)" button when the notes tab is selected and there are two annotations',
+      selectedTab: 'annotation',
+      totalAnnotations: 2,
+      totalNotes: 2,
+      expectedText: 'Show all annotations (2)',
+    },
+  ].forEach(test => {
+    it(test.description, () => {
+      fakeStore.getState.returns({
+        filterQuery: null,
+        directLinkedGroupFetchFailed: false,
+        selectedAnnotationMap: { annId: true },
+      });
+
+      const wrapper = createComponent({
+        selectedTab: test.selectedTab,
+        totalAnnotations: test.totalAnnotations,
+        totalNotes: test.totalNotes,
+      });
+
+      const buttonText = wrapper.find('button').text();
+      assert.equal(buttonText, test.expectedText);
     });
   });
 });
