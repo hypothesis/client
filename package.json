@@ -59,7 +59,7 @@
     "focus-visible": "^5.0.0",
     "gulp": "^4.0.0",
     "gulp-changed": "^4.0.0",
-    "gulp-if": "^2.0.0",
+    "gulp-if": "^3.0.0",
     "gulp-postcss": "^8.0.0",
     "gulp-rename": "^1.2.2",
     "gulp-replace": "^1.0.0",
