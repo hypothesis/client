@@ -180,10 +180,13 @@ function startAngularApp(config) {
       'moderationBanner',
       wrapReactComponent(require('./components/moderation-banner'))
     )
-    .component('newNoteBtn', require('./components/new-note-btn'))
     .component(
       'searchStatusBar',
       wrapReactComponent(require('./components/search-status-bar'))
+    )
+    .component(
+      'newNoteBtn',
+      wrapReactComponent(require('./components/new-note-btn'))
     )
     .component('selectionTabs', require('./components/selection-tabs'))
     .component('sidebarContent', require('./components/sidebar-content'))

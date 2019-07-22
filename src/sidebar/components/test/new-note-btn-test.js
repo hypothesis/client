@@ -1,64 +1,77 @@
 'use strict';
 
-const angular = require('angular');
+const { shallow } = require('enzyme');
+const { createElement } = require('preact');
 
 const events = require('../../events');
-const util = require('../../directive/test/util');
+const NewNoteButton = require('../new-note-btn');
 
-describe('newNoteBtn', function() {
-  let $rootScope;
-  const sandbox = sinon.sandbox.create();
-  const fakeStore = {
-    frames: sinon
-      .stub()
-      .returns([
-        { id: null, uri: 'www.example.org' },
-        { id: '1', uri: 'www.example.org' },
-      ]),
-  };
+describe('NewNoteButton', function() {
+  let fakeStore;
+  let fakeSettings;
+  let fakeRootScope;
 
-  before(function() {
-    angular
-      .module('app', [])
-      .component('selectionTabs', require('../selection-tabs'))
-      .component('newNoteBtn', require('../new-note-btn'));
-  });
+  function createComponent() {
+    return shallow(
+      <NewNoteButton
+        $rootScope={fakeRootScope}
+        settings={fakeSettings}
+        store={fakeStore}
+      />
+    ).dive(); // dive() needed because this component uses `withServices`
+  }
 
   beforeEach(function() {
-    const fakeFeatures = {
-      flagEnabled: sinon.stub().returns(true),
+    fakeRootScope = {
+      $broadcast: sinon.stub(),
     };
-    const fakeSettings = { theme: 'clean' };
-
-    angular.mock.module('app', {
-      store: fakeStore,
-      features: fakeFeatures,
-      settings: fakeSettings,
-    });
-
-    angular.mock.inject(function(_$componentController_, _$rootScope_) {
-      $rootScope = _$rootScope_;
+    fakeSettings = {
+      branding: {
+        ctaBackgroundColor: '#00f',
+      },
+    };
+    fakeStore = {
+      createAnnotation: sinon.stub(),
+      frames: sinon
+        .stub()
+        .returns([
+          { id: null, uri: 'www.example.org' },
+          { id: '1', uri: 'www.example.org' },
+        ]),
+    };
+    NewNoteButton.$imports.$mock({
+      '../store/use-store': callback => callback(fakeStore),
     });
   });
 
-  afterEach(function() {
-    sandbox.restore();
+  afterEach(() => {
+    NewNoteButton.$imports.$restore();
   });
 
-  it('should broadcast BEFORE_ANNOTATION_CREATED event when the new note button is clicked', function() {
-    const annot = {
-      target: [],
-      uri: 'www.example.org',
-    };
-    const elem = util.createDirective(document, 'newNoteBtn', {
-      store: fakeStore,
-    });
-    sandbox.spy($rootScope, '$broadcast');
-    elem.ctrl.onNewNoteBtnClick();
+  it('creates the component', () => {
+    const wrapper = createComponent();
+    assert.include(wrapper.text(), 'New note');
+  });
+
+  it("has a backgroundColor equal to the setting's ctaBackgroundColor color", () => {
+    const wrapper = createComponent();
+    assert.equal(
+      wrapper.prop('style').backgroundColor,
+      fakeSettings.branding.ctaBackgroundColor
+    );
+  });
+
+  it('should broadcast BEFORE_ANNOTATION_CREATED event when the new note button is clicked', () => {
+    const wrapper = createComponent();
+    wrapper.find('button').simulate('click');
+    const topLevelFrame = fakeStore.frames().find(f => !f.id);
     assert.calledWith(
-      $rootScope.$broadcast,
+      fakeRootScope.$broadcast,
       events.BEFORE_ANNOTATION_CREATED,
-      annot
+      {
+        target: [],
+        uri: topLevelFrame.uri,
+      }
     );
   });
 });
