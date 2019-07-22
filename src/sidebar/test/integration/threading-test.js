@@ -54,7 +54,6 @@ describe('annotation threading', function() {
     angular
       .module('app', [])
       .service('store', require('../../store'))
-      .service('drafts', require('../../services/drafts'))
       .service('rootThread', require('../../services/root-thread'))
       .service('searchFilter', require('../../services/search-filter'))
       .service('viewFilter', require('../../services/view-filter'))

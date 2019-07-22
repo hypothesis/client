@@ -1,4 +1,4 @@
-.loggedout-message {
+.logged-out-message {
   margin: 25px auto;
   width: 70%;
   text-align: center;
@@ -7,7 +7,7 @@
   flex-direction: column;
 }
 
-.loggedout-message__link {
+.logged-out-message__link {
   text-decoration: underline;
   color: $grey-5;
 
@@ -16,11 +16,13 @@
   }
 }
 
-.loggedout-message-logo {
+.logged-out-message__logo {
   margin-top: 25px;
+  display: flex;
+  justify-content: center;
 }
 
-.loggedout-message-logo__icon {
+.logged-out-message__logo-icon {
   font-size: 30px;
   color: $grey-4;
 

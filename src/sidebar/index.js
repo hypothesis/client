@@ -171,7 +171,10 @@ function startAngularApp(config) {
       wrapReactComponent(require('./components/help-link'))
     )
     .component('helpPanel', require('./components/help-panel'))
-    .component('loggedoutMessage', require('./components/loggedout-message'))
+    .component(
+      'loggedOutMessage',
+      wrapReactComponent(require('./components/logged-out-message'))
+    )
     .component('markdown', require('./components/markdown'))
     .component(
       'moderationBanner',
@@ -204,11 +207,11 @@ function startAngularApp(config) {
 
     .service('analytics', require('./services/analytics'))
     .service('annotationMapper', require('./services/annotation-mapper'))
+    .service('annotations', require('./services/annotations'))
     .service('api', require('./services/api'))
     .service('apiRoutes', require('./services/api-routes'))
     .service('auth', require('./services/oauth-auth'))
     .service('bridge', require('../shared/bridge'))
-    .service('drafts', require('./services/drafts'))
     .service('features', require('./services/features'))
     .service('flash', require('./services/flash'))
     .service('frameSync', require('./services/frame-sync').default)

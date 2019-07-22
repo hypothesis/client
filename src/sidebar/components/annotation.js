@@ -54,7 +54,6 @@ function AnnotationController(
   annotationMapper,
   api,
   bridge,
-  drafts,
   flash,
   groups,
   permissions,
@@ -176,7 +175,7 @@ function AnnotationController(
     // created by the annotate button) or it has edits not yet saved to the
     // server - then open the editor on AnnotationController instantiation.
     if (!newlyCreatedByHighlightButton) {
-      if (isNew(self.annotation) || drafts.get(self.annotation)) {
+      if (isNew(self.annotation) || store.getDraft(self.annotation)) {
         self.edit();
       }
     }
@@ -217,7 +216,7 @@ function AnnotationController(
       });
     } else {
       // User isn't logged in, save to drafts.
-      drafts.update(self.annotation, self.state());
+      store.createDraft(self.annotation, self.state());
     }
   }
 
@@ -292,8 +291,8 @@ function AnnotationController(
    * @description Switches the view to an editor.
    */
   this.edit = function() {
-    if (!drafts.get(self.annotation)) {
-      drafts.update(self.annotation, self.state());
+    if (!store.getDraft(self.annotation)) {
+      store.createDraft(self.annotation, self.state());
     }
   };
 
@@ -304,7 +303,7 @@ function AnnotationController(
    *   (i.e. the annotation editor form should be open), `false` otherwise.
    */
   this.editing = function() {
-    return drafts.get(self.annotation) && !self.isSaving;
+    return store.getDraft(self.annotation) && !self.isSaving;
   };
 
   /**
@@ -430,7 +429,7 @@ function AnnotationController(
    * @description Reverts an edit in progress and returns to the viewer.
    */
   this.revert = function() {
-    drafts.remove(self.annotation);
+    store.removeDraft(self.annotation);
     if (isNew(self.annotation)) {
       $rootScope.$broadcast(events.ANNOTATION_DELETED, self.annotation);
     }
@@ -465,7 +464,7 @@ function AnnotationController(
         const event = isNew(self.annotation)
           ? events.ANNOTATION_CREATED
           : events.ANNOTATION_UPDATED;
-        drafts.remove(self.annotation);
+        store.removeDraft(self.annotation);
 
         $rootScope.$broadcast(event, updatedModel);
       })
@@ -495,7 +494,7 @@ function AnnotationController(
     if (!isReply(self.annotation)) {
       permissions.setDefault(privacy);
     }
-    drafts.update(self.annotation, {
+    store.createDraft(self.annotation, {
       tags: self.state().tags,
       text: self.state().text,
       isPrivate: privacy === 'private',
@@ -570,7 +569,7 @@ function AnnotationController(
   };
 
   this.setText = function(text) {
-    drafts.update(self.annotation, {
+    store.createDraft(self.annotation, {
       isPrivate: self.state().isPrivate,
       tags: self.state().tags,
       text: text,
@@ -578,7 +577,7 @@ function AnnotationController(
   };
 
   this.setTags = function(tags) {
-    drafts.update(self.annotation, {
+    store.createDraft(self.annotation, {
       isPrivate: self.state().isPrivate,
       tags: tags,
       text: self.state().text,
@@ -586,7 +585,7 @@ function AnnotationController(
   };
 
   this.state = function() {
-    const draft = drafts.get(self.annotation);
+    const draft = store.getDraft(self.annotation);
     if (draft) {
       return draft;
     }
