@@ -12,15 +12,21 @@ const UserMenu = require('../user-menu');
 
 describe('TopBar', () => {
   const fakeSettings = {};
-  let fakeIsThirdPartyService;
-
   let fakeStore;
+  let fakeStreamer;
+  let fakeIsThirdPartyService;
 
   beforeEach(() => {
     fakeIsThirdPartyService = sinon.stub().returns(false);
+
     fakeStore = {
       filterQuery: sinon.stub().returns(null),
+      pendingUpdateCount: sinon.stub().returns(0),
       setFilterQuery: sinon.stub(),
+    };
+
+    fakeStreamer = {
+      applyPendingUpdates: sinon.stub(),
     };
 
     TopBar.$imports.$mock({
@@ -44,35 +50,35 @@ describe('TopBar', () => {
   function createTopBar(props = {}) {
     const auth = { status: 'unknown' };
     return shallow(
-      <TopBar auth={auth} isSidebar={true} settings={fakeSettings} {...props} />
+      <TopBar
+        auth={auth}
+        isSidebar={true}
+        settings={fakeSettings}
+        streamer={fakeStreamer}
+        {...props}
+      />
     ).dive(); // Dive through `withServices` wrapper.
   }
 
   it('shows the pending update count', () => {
-    const wrapper = createTopBar({
-      pendingUpdateCount: 1,
-    });
+    fakeStore.pendingUpdateCount.returns(1);
+    const wrapper = createTopBar();
     const applyBtn = applyUpdateBtn(wrapper);
     assert.isTrue(applyBtn.exists());
   });
 
   it('does not show the pending update count when there are no updates', () => {
-    const wrapper = createTopBar({
-      pendingUpdateCount: 0,
-    });
+    const wrapper = createTopBar();
     const applyBtn = applyUpdateBtn(wrapper);
     assert.isFalse(applyBtn.exists());
   });
 
   it('applies updates when clicked', () => {
-    const onApplyPendingUpdates = sinon.stub();
-    const wrapper = createTopBar({
-      pendingUpdateCount: 1,
-      onApplyPendingUpdates,
-    });
+    fakeStore.pendingUpdateCount.returns(1);
+    const wrapper = createTopBar();
     const applyBtn = applyUpdateBtn(wrapper);
     applyBtn.simulate('click');
-    assert.called(onApplyPendingUpdates);
+    assert.called(fakeStreamer.applyPendingUpdates);
   });
 
   it('shows Help Panel when help icon is clicked', () => {

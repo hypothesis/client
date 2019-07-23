@@ -23,14 +23,13 @@ const UserMenu = require('./user-menu');
 function TopBar({
   auth,
   isSidebar,
-  onApplyPendingUpdates,
   onLogin,
   onLogout,
   onSharePage,
   onShowHelpPanel,
   onSignUp,
-  pendingUpdateCount,
   settings,
+  streamer,
 }) {
   const useCleanTheme = settings.theme === 'clean';
   const showSharePageButton = !isThirdPartyService(settings);
@@ -38,6 +37,10 @@ function TopBar({
 
   const filterQuery = useStore(store => store.filterQuery());
   const setFilterQuery = useStore(store => store.setFilterQuery);
+
+  const pendingUpdateCount = useStore(store => store.pendingUpdateCount());
+
+  const applyPendingUpdates = () => streamer.applyPendingUpdates();
 
   const loginControl = (
     <Fragment>
@@ -89,7 +92,7 @@ function TopBar({
           {pendingUpdateCount > 0 && (
             <a
               className="top-bar__apply-update-btn"
-              onClick={onApplyPendingUpdates}
+              onClick={applyPendingUpdates}
               title={`Show ${pendingUpdateCount} new/updated ${
                 pendingUpdateCount === 1 ? 'annotation' : 'annotations'
               }`}
@@ -161,16 +164,11 @@ TopBar.propTypes = {
   /** Callback invoked when user clicks "Sign up" button. */
   onSignUp: propTypes.func,
 
-  /** Count of updates received via WebSocket that have not been applied. */
-  pendingUpdateCount: propTypes.number,
-
-  /** Called when user clicks button to apply pending real-time updates. */
-  onApplyPendingUpdates: propTypes.func,
-
   // Services
   settings: propTypes.object,
+  streamer: propTypes.object,
 };
 
-TopBar.injectedProps = ['settings'];
+TopBar.injectedProps = ['settings', 'streamer'];
 
 module.exports = withServices(TopBar);

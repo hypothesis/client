@@ -49,8 +49,7 @@ function HypothesisAppController(
   groups,
   serviceUrl,
   session,
-  settings,
-  streamer
+  settings
 ) {
   const self = this;
 
@@ -184,9 +183,6 @@ function HypothesisAppController(
 
     session.logout();
   };
-
-  this.countPendingUpdates = streamer.countPendingUpdates;
-  this.applyPendingUpdates = streamer.applyPendingUpdates;
 }
 
 module.exports = {

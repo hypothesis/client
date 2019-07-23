@@ -25,7 +25,6 @@ describe('sidebar.components.hypothesis-app', function() {
   let fakeRoute = null;
   let fakeServiceUrl = null;
   let fakeSettings = null;
-  let fakeStreamer = null;
   let fakeWindow = null;
 
   let sandbox = null;
@@ -111,10 +110,6 @@ describe('sidebar.components.hypothesis-app', function() {
 
       fakeServiceUrl = sinon.stub();
       fakeSettings = {};
-      fakeStreamer = {
-        countPendingUpdates: sinon.stub(),
-        applyPendingUpdates: sinon.stub(),
-      };
       fakeBridge = {
         call: sandbox.stub(),
       };
@@ -129,7 +124,6 @@ describe('sidebar.components.hypothesis-app', function() {
       $provide.value('session', fakeSession);
       $provide.value('settings', fakeSettings);
       $provide.value('bridge', fakeBridge);
-      $provide.value('streamer', fakeStreamer);
       $provide.value('groups', fakeGroups);
       $provide.value('$route', fakeRoute);
       $provide.value('$routeParams', fakeParams);
