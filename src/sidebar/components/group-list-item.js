@@ -83,7 +83,7 @@ function GroupListItem({
       icon={group.logo || 'blank'}
       iconAlt={orgName(group)}
       isDisabled={!isSelectable}
-      isExpanded={hasActionMenu ? isExpanded : undefined}
+      isExpanded={hasActionMenu ? isExpanded : false}
       isSelected={isSelected}
       isSubmenuVisible={isExpanded}
       label={group.name}

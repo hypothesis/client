@@ -232,7 +232,7 @@ describe('GroupListItem', () => {
     fakeGroup.links.html = null;
     fakeGroup.type = 'open';
     const wrapper = createGroupListItem(fakeGroup);
-    assert.isUndefined(wrapper.find('MenuItem').prop('isExpanded'));
+    assert.isFalse(wrapper.find('MenuItem').prop('isExpanded'));
   });
 
   function getSubmenu(wrapper) {
