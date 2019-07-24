@@ -89,7 +89,7 @@ function GroupListItem({
       label={group.name}
       onClick={isSelectable ? focusGroup : toggleSubmenu}
       onToggleSubmenu={toggleSubmenu}
-      renderSubmenu={() => (
+      submenu={
         <Fragment>
           <ul onClick={collapseSubmenu}>
             {activityUrl && (
@@ -129,7 +129,7 @@ function GroupListItem({
             </p>
           )}
         </Fragment>
-      )}
+      }
     />
   );
 }

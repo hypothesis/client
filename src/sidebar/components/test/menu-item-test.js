@@ -58,8 +58,6 @@ describe('MenuItem', () => {
   it('shows the submenu indicator if `isSubmenuVisible` is a boolean', () => {
     const wrapper = createMenuItem({
       isSubmenuVisible: true,
-      // eslint-disable-next-line react/display-name
-      renderSubmenu: () => <div>Submenu</div>,
     });
     assert.isTrue(wrapper.exists('SvgIcon[name="collapse-menu"]'));
 
@@ -77,8 +75,6 @@ describe('MenuItem', () => {
     const wrapper = createMenuItem({
       isSubmenuVisible: true,
       onToggleSubmenu,
-      // eslint-disable-next-line react/display-name
-      renderSubmenu: () => <div>Submenu</div>,
     });
     wrapper.find('.menu-item__toggle').simulate('click');
     assert.called(onToggleSubmenu);
@@ -116,8 +112,7 @@ describe('MenuItem', () => {
   it('shows submenu content if `isSubmenuVisible` is true', () => {
     const wrapper = createMenuItem({
       isSubmenuVisible: true,
-      // eslint-disable-next-line react/display-name
-      renderSubmenu: () => <div>Submenu content</div>,
+      submenu: <div>Submenu content</div>,
     });
     assert.equal(wrapper.find('Slider').prop('visible'), true);
     assert.equal(
@@ -132,8 +127,7 @@ describe('MenuItem', () => {
   it('hides submenu content if `isSubmenuVisible` is false', () => {
     const wrapper = createMenuItem({
       isSubmenuVisible: false,
-      // eslint-disable-next-line react/display-name
-      renderSubmenu: () => <div>Submenu content</div>,
+      submenu: <div>Submenu content</div>,
     });
     assert.equal(wrapper.find('Slider').prop('visible'), false);
 

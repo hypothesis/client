@@ -1,7 +1,7 @@
 'use strict';
 
 const classnames = require('classnames');
-const { Fragment, createElement } = require('preact');
+const { createElement } = require('preact');
 const propTypes = require('prop-types');
 
 const { onActivate } = require('../util/on-activate');
@@ -36,7 +36,7 @@ function MenuItem({
   label,
   onClick,
   onToggleSubmenu,
-  renderSubmenu,
+  submenu,
 }) {
   const iconClass = 'menu-item__icon';
   const iconIsUrl = icon && icon.indexOf('/') !== -1;
@@ -111,7 +111,7 @@ function MenuItem({
       </div>
       {typeof isSubmenuVisible === 'boolean' && (
         <Slider visible={isSubmenuVisible}>
-          <div className="menu-item__submenu">{renderSubmenu()}</div>
+          <div className="menu-item__submenu">{submenu}</div>
         </Slider>
       )}
     </div>
@@ -183,10 +183,13 @@ MenuItem.propTypes = {
   onToggleSubmenu: propTypes.func,
 
   /**
-   * Function called to render the item's submenu when `isSubmenuVisible`
-   * is `true`.
+   * Contents of the submenu for this item.
+   *
+   * This is typically a list of `MenuItem` components with the `isSubmenuItem`
+   * prop set to `true`, but can include other content as well.
+   * The submenu is only rendered if `isSubmenuVisible` is `true`.
    */
-  renderSubmenu: propTypes.func,
+  submenu: propTypes.any,
 };
 
 module.exports = MenuItem;

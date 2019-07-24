@@ -236,11 +236,11 @@ describe('GroupListItem', () => {
   });
 
   function getSubmenu(wrapper) {
-    const renderSubmenu = wrapper
+    const submenu = wrapper
       .find('MenuItem')
       .first()
-      .prop('renderSubmenu');
-    return mount(<div>{renderSubmenu()}</div>);
+      .prop('submenu');
+    return mount(<div>{submenu}</div>);
   }
 
   it('does not show link to activity page if not available', () => {
