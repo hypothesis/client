@@ -22,15 +22,23 @@ const countVisibleAnns = annThread => {
  * any search results were found.
  * */
 function SearchStatusBar({ rootThread }) {
-  const storeState = useStore(store => store.getState());
+  const {
+    directLinkedGroupFetchFailed,
+    filterQuery,
+    selectedAnnotationMap,
+    selectedTab,
+  } = useStore(store => ({
+    directLinkedGroupFetchFailed: store.getState().directLinkedGroupFetchFailed,
+    filterQuery: store.getState().filterQuery,
+    selectedAnnotationMap: store.getState().selectedAnnotationMap,
+    selectedTab: store.getState().selectedTab,
+  }));
   const clearSelection = useStore(store => store.clearSelection);
-  const filterQuery = storeState.filterQuery;
-  const filterActive = !!storeState.filterQuery;
+  const filterActive = !!filterQuery;
   const annotationCount = useStore(store => store.annotationCount());
   const noteCount = useStore(store => store.noteCount());
-  const selectedTab = storeState.selectedTab;
 
-  const thread = rootThread.thread(storeState);
+  const thread = useStore(store => rootThread.thread(store.getState()));
 
   const visibleCount = useMemo(() => {
     return countVisibleAnns(thread);
@@ -49,10 +57,10 @@ function SearchStatusBar({ rootThread }) {
   };
 
   const areNotAllAnnotationsVisible = () => {
-    if (storeState.directLinkedGroupFetchFailed) {
+    if (directLinkedGroupFetchFailed) {
       return true;
     }
-    const selection = storeState.selectedAnnotationMap;
+    const selection = selectedAnnotationMap;
     if (!selection) {
       return false;
     }
