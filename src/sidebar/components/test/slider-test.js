@@ -9,16 +9,8 @@ describe('Slider', () => {
   let container;
 
   const createSlider = (props = {}) => {
-    // Use a fake `setTimeout` in tests that runs the callback immediately
-    // to avoid an issue with async state updates
-    // (see https://github.com/preactjs/preact/issues/1794).
-    const fakeSetTimeout = callback => {
-      callback();
-      return null;
-    };
-
     return mount(
-      <Slider visible={false} queueTask={fakeSetTimeout} {...props}>
+      <Slider visible={false} {...props}>
         <div style={{ width: 100, height: 200 }}>Test content</div>
       </Slider>,
       { attachTo: container }
@@ -38,6 +30,10 @@ describe('Slider', () => {
     const wrapper = createSlider({ visible: false });
     const { height } = wrapper.getDOMNode().getBoundingClientRect();
     assert.equal(height, 0);
+
+    // The content shouldn't be rendered, so it doesn't appear in the keyboard
+    // navigation order.
+    assert.equal(wrapper.getDOMNode().style.display, 'none');
   });
 
   it('should render expanded if `visible` is true on mount', () => {
@@ -67,7 +63,7 @@ describe('Slider', () => {
     }, 1);
   });
 
-  it('should set the container height to "auto" once the transition finishes', () => {
+  it('should set the container height to "auto" when an expand transition finishes', () => {
     const wrapper = createSlider({ visible: false });
 
     wrapper.setProps({ visible: true });
@@ -82,6 +78,20 @@ describe('Slider', () => {
 
     containerStyle = wrapper.getDOMNode().style;
     assert.equal(containerStyle.height, 'auto');
+  });
+
+  it('should stop rendering content when a collapse transition finishes', () => {
+    const wrapper = createSlider({ visible: true });
+
+    wrapper.setProps({ visible: false });
+
+    wrapper
+      .find('div')
+      .first()
+      .simulate('transitionend');
+
+    const containerStyle = wrapper.getDOMNode().style;
+    assert.equal(containerStyle.display, 'none');
   });
 
   [true, false].forEach(visible => {
