@@ -26,7 +26,8 @@ function GroupListSection({ expandedGroup, onExpandGroup, groups, heading }) {
 
 GroupListSection.propTypes = {
   /**
-   * The group whose submenu is currently expanded, if any.
+   * The `Group` whose submenu is currently expanded, or `null` if no group
+   * is currently expanded.
    */
   expandedGroup: propTypes.object,
   /* The list of groups to be displayed in the group list section. */
