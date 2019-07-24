@@ -62,6 +62,11 @@ describe('GroupListItem', () => {
     }
     FakeMenuItem.displayName = 'MenuItem';
 
+    function FakeSlider({ children, visible }) {
+      return visible ? children : null;
+    }
+    FakeSlider.displayName = 'Slider';
+
     GroupListItem.$imports.$mock({
       './menu-item': FakeMenuItem,
       '../util/copy-to-clipboard': {
@@ -179,8 +184,29 @@ describe('GroupListItem', () => {
     });
   });
 
+  it('expands submenu if `isExpanded` is `true`', () => {
+    const wrapper = createGroupListItem(fakeGroup, { isExpanded: true });
+    assert.isTrue(
+      wrapper
+        .find('MenuItem')
+        .first()
+        .prop('isExpanded')
+    );
+  });
+
+  it('collapses submenu if `isExpanded` is `false`', () => {
+    const wrapper = createGroupListItem(fakeGroup, { isExpanded: false });
+    assert.isFalse(
+      wrapper
+        .find('MenuItem')
+        .first()
+        .prop('isExpanded')
+    );
+  });
+
   it('toggles submenu when toggle is clicked', () => {
-    const wrapper = createGroupListItem(fakeGroup);
+    const onExpand = sinon.stub();
+    const wrapper = createGroupListItem(fakeGroup, { onExpand });
     const toggleSubmenu = () => {
       const dummyEvent = new Event();
       act(() => {
@@ -194,64 +220,85 @@ describe('GroupListItem', () => {
     };
 
     toggleSubmenu();
-    assert.isTrue(wrapper.exists('ul'));
+    assert.calledWith(onExpand, true);
+    onExpand.resetHistory();
+
+    wrapper.setProps({ isExpanded: true });
     toggleSubmenu();
-    assert.isFalse(wrapper.exists('ul'));
+    assert.calledWith(onExpand, false);
   });
 
   it('does not show submenu toggle if there are no available actions', () => {
     fakeGroup.links.html = null;
     fakeGroup.type = 'open';
     const wrapper = createGroupListItem(fakeGroup);
-    assert.isUndefined(wrapper.find('MenuItem').prop('isExpanded'));
+    assert.isFalse(wrapper.find('MenuItem').prop('isExpanded'));
   });
+
+  function getSubmenu(wrapper) {
+    const submenu = wrapper
+      .find('MenuItem')
+      .first()
+      .prop('submenu');
+    return mount(<div>{submenu}</div>);
+  }
 
   it('does not show link to activity page if not available', () => {
     fakeGroup.links.html = null;
     const wrapper = createGroupListItem(fakeGroup, {
-      defaultSubmenuOpen: true,
+      isExpanded: true,
     });
-    assert.isFalse(wrapper.exists('MenuItem[label="View group activity"]'));
+    const submenu = getSubmenu(wrapper);
+    assert.isFalse(submenu.exists('MenuItem[label="View group activity"]'));
   });
 
   it('shows link to activity page if available', () => {
     const wrapper = createGroupListItem(fakeGroup, {
-      defaultSubmenuOpen: true,
+      isExpanded: true,
     });
-    assert.isTrue(wrapper.exists('MenuItem[label="View group activity"]'));
+    const submenu = getSubmenu(wrapper);
+    assert.isTrue(submenu.exists('MenuItem[label="View group activity"]'));
   });
 
   it('does not show "Leave" action if user cannot leave', () => {
     fakeGroup.type = 'open';
     const wrapper = createGroupListItem(fakeGroup, {
-      defaultSubmenuOpen: true,
+      isExpanded: true,
     });
-    assert.isFalse(wrapper.exists('MenuItem[label="Leave group"]'));
+    const submenu = getSubmenu(wrapper);
+    assert.isFalse(submenu.exists('MenuItem[label="Leave group"]'));
   });
 
   it('shows "Leave" action if user can leave', () => {
     fakeGroup.type = 'private';
     const wrapper = createGroupListItem(fakeGroup, {
-      defaultSubmenuOpen: true,
+      isExpanded: true,
     });
-    assert.isTrue(wrapper.exists('MenuItem[label="Leave group"]'));
+    const submenu = getSubmenu(wrapper);
+    assert.isTrue(submenu.exists('MenuItem[label="Leave group"]'));
   });
 
   it('prompts to leave group if "Leave" action is clicked', () => {
     const wrapper = createGroupListItem(fakeGroup, {
-      defaultSubmenuOpen: true,
+      isExpanded: true,
     });
-    clickMenuItem(wrapper, 'Leave group');
+
+    const submenu = getSubmenu(wrapper);
+    clickMenuItem(submenu, 'Leave group');
+
     assert.called(window.confirm);
     assert.notCalled(fakeGroupsService.leave);
   });
 
   it('leaves group if "Leave" is clicked and user confirms', () => {
     const wrapper = createGroupListItem(fakeGroup, {
-      defaultSubmenuOpen: true,
+      isExpanded: true,
     });
     window.confirm.returns(true);
-    clickMenuItem(wrapper, 'Leave group');
+
+    const submenu = getSubmenu(wrapper);
+    clickMenuItem(submenu, 'Leave group');
+
     assert.called(window.confirm);
     assert.calledWith(fakeGroupsService.leave, fakeGroup.id);
   });
@@ -277,7 +324,7 @@ describe('GroupListItem', () => {
       fakeGroup.scopes.enforced = enforced;
       fakeGroup.isScopedToUri = isScopedToUri;
       const wrapper = createGroupListItem(fakeGroup, {
-        defaultSubmenuOpen: true,
+        isExpanded: true,
       });
       assert.equal(
         wrapper
@@ -286,7 +333,9 @@ describe('GroupListItem', () => {
           .prop('isDisabled'),
         expectDisabled
       );
-      assert.equal(wrapper.exists('.group-list-item__footer'), expectDisabled);
+
+      const submenu = getSubmenu(wrapper);
+      assert.equal(submenu.exists('.group-list-item__footer'), expectDisabled);
     });
   });
 
@@ -316,9 +365,10 @@ describe('GroupListItem', () => {
       fakeGroup.type = groupType;
       fakeGroup.links.html = hasLink ? 'https://anno.co/groups/1' : null;
       const wrapper = createGroupListItem(fakeGroup, {
-        defaultSubmenuOpen: true,
+        isExpanded: true,
       });
-      const copyAction = wrapper
+      const submenu = getSubmenu(wrapper);
+      const copyAction = submenu
         .find('MenuItem')
         .filterWhere(n => n.prop('label').startsWith('Copy'));
 
@@ -332,9 +382,9 @@ describe('GroupListItem', () => {
 
   it('copies activity URL if "Copy link" action is clicked', () => {
     const wrapper = createGroupListItem(fakeGroup, {
-      defaultSubmenuOpen: true,
+      isExpanded: true,
     });
-    clickMenuItem(wrapper, 'Copy invite link');
+    clickMenuItem(getSubmenu(wrapper), 'Copy invite link');
     assert.calledWith(fakeCopyText, 'https://annotate.com/groups/groupid');
     assert.calledWith(fakeFlash.info, 'Copied link for "Test"');
   });
@@ -342,9 +392,9 @@ describe('GroupListItem', () => {
   it('reports an error if "Copy link" action fails', () => {
     fakeCopyText.throws(new Error('Something went wrong'));
     const wrapper = createGroupListItem(fakeGroup, {
-      defaultSubmenuOpen: true,
+      isExpanded: true,
     });
-    clickMenuItem(wrapper, 'Copy invite link');
+    clickMenuItem(getSubmenu(wrapper), 'Copy invite link');
     assert.calledWith(fakeCopyText, 'https://annotate.com/groups/groupid');
     assert.calledWith(fakeFlash.error, 'Unable to copy link');
   });
