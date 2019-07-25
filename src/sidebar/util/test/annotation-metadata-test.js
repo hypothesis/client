@@ -1,9 +1,9 @@
 'use strict';
 
 const annotationMetadata = require('../annotation-metadata');
-const fixtures = require('./annotation-fixtures');
+const fixtures = require('../../test/annotation-fixtures');
 
-const unroll = require('../../shared/test/util').unroll;
+const unroll = require('../../../shared/test/util').unroll;
 
 const documentMetadata = annotationMetadata.documentMetadata;
 const domainAndTitle = annotationMetadata.domainAndTitle;

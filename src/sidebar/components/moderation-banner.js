@@ -4,7 +4,7 @@ const { createElement } = require('preact');
 const classnames = require('classnames');
 const propTypes = require('prop-types');
 
-const annotationMetadata = require('../annotation-metadata');
+const annotationMetadata = require('../util/annotation-metadata');
 const useStore = require('../store/use-store');
 const { withServices } = require('../util/service-context');
 

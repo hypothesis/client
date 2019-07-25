@@ -3,7 +3,7 @@
 // Selectors that calculate the annotation counts displayed in tab headings
 // and determine which tab an annotation should be displayed in.
 
-const metadata = require('./annotation-metadata');
+const metadata = require('./util/annotation-metadata');
 const uiConstants = require('./ui-constants');
 
 /**

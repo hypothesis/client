@@ -3,7 +3,7 @@
 const propTypes = require('prop-types');
 const { createElement } = require('preact');
 
-const annotationMetadata = require('../annotation-metadata');
+const annotationMetadata = require('../util/annotation-metadata');
 
 /**
  * Render some metadata about an annotation's document and link to it

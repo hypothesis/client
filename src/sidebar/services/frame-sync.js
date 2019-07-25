@@ -4,7 +4,7 @@ const debounce = require('lodash.debounce');
 
 const events = require('../events');
 const bridgeEvents = require('../../shared/bridge-events');
-const metadata = require('../annotation-metadata');
+const metadata = require('../util/annotation-metadata');
 const uiConstants = require('../ui-constants');
 
 /**
