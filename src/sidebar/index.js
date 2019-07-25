@@ -158,10 +158,6 @@ function startAngularApp(config) {
     )
     .component('annotationThread', require('./components/annotation-thread'))
     .component(
-      'annotationUser',
-      wrapReactComponent(require('./components/annotation-user'))
-    )
-    .component(
       'annotationViewerContent',
       require('./components/annotation-viewer-content')
     )
@@ -185,10 +181,6 @@ function startAngularApp(config) {
       wrapReactComponent(require('./components/search-status-bar'))
     )
     .component(
-      'newNoteBtn',
-      wrapReactComponent(require('./components/new-note-btn'))
-    )
-    .component(
       'selectionTabs',
       wrapReactComponent(require('./components/selection-tabs'))
     )
@@ -203,10 +195,6 @@ function startAngularApp(config) {
     .component('svgIcon', wrapReactComponent(require('./components/svg-icon')))
     .component('tagEditor', require('./components/tag-editor'))
     .component('threadList', require('./components/thread-list'))
-    .component(
-      'timestamp',
-      wrapReactComponent(require('./components/timestamp'))
-    )
     .component('topBar', wrapReactComponent(require('./components/top-bar')))
     .directive('hAutofocus', require('./directive/h-autofocus'))
     .directive('hBranding', require('./directive/h-branding'))
