@@ -2,7 +2,7 @@
 
 const events = require('../events');
 const isThirdPartyService = require('../util/is-third-party-service');
-const tabs = require('../tabs');
+const tabs = require('../util/tabs');
 
 // @ngInject
 function SidebarContentController(

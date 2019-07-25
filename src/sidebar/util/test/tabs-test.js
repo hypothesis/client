@@ -1,9 +1,9 @@
 'use strict';
 
-const fixtures = require('./annotation-fixtures');
-const uiConstants = require('../ui-constants');
+const fixtures = require('../../test/annotation-fixtures');
+const uiConstants = require('../../ui-constants');
 const tabs = require('../tabs');
-const unroll = require('../../shared/test/util').unroll;
+const unroll = require('../../../shared/test/util').unroll;
 
 describe('tabs', function() {
   describe('tabForAnnotation', function() {

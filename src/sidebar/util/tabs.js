@@ -1,10 +1,9 @@
 'use strict';
 
-// Selectors that calculate the annotation counts displayed in tab headings
-// and determine which tab an annotation should be displayed in.
+// Functions that determine which tab an annotation should be displayed in.
 
-const metadata = require('./util/annotation-metadata');
-const uiConstants = require('./ui-constants');
+const metadata = require('./annotation-metadata');
+const uiConstants = require('../ui-constants');
 
 /**
  * Return the tab in which an annotation should be displayed.
