@@ -69,16 +69,14 @@ Tab.propTypes = {
  *  Tabbed display of annotations and notes.
  */
 
-function SelectionTabs({
-  isWaitingToAnchorAnnotations,
-  isLoading,
-  selectedTab,
-  totalAnnotations,
-  totalNotes,
-  totalOrphans,
-  settings,
-  session,
-}) {
+function SelectionTabs({ isLoading, settings, session }) {
+  const selectedTab = useStore(store => store.getState().selectedTab);
+  const noteCount = useStore(store => store.noteCount());
+  const annotationCount = useStore(store => store.annotationCount());
+  const orphanCount = useStore(store => store.orphanCount());
+  const isWaitingToAnchorAnnotations = useStore(store =>
+    store.isWaitingToAnchorAnnotations()
+  );
   // actions
   const store = useStore(store => ({
     clearSelectedAnnotations: store.clearSelectedAnnotations,
@@ -94,11 +92,11 @@ function SelectionTabs({
 
   const showAnnotationsUnavailableMessage =
     selectedTab === uiConstants.TAB_ANNOTATIONS &&
-    totalAnnotations === 0 &&
+    annotationCount === 0 &&
     !isWaitingToAnchorAnnotations;
 
   const showNotesUnavailableMessage =
-    selectedTab === uiConstants.TAB_NOTES && totalNotes === 0;
+    selectedTab === uiConstants.TAB_NOTES && noteCount === 0;
 
   const showSidebarTutorial = sessionUtil.shouldShowSidebarTutorial(
     session.state
@@ -112,7 +110,7 @@ function SelectionTabs({
         })}
       >
         <Tab
-          count={totalAnnotations}
+          count={annotationCount}
           isWaitingToAnchor={isWaitingToAnchorAnnotations}
           selected={selectedTab === uiConstants.TAB_ANNOTATIONS}
           type={uiConstants.TAB_ANNOTATIONS}
@@ -121,7 +119,7 @@ function SelectionTabs({
           Annotations
         </Tab>
         <Tab
-          count={totalNotes}
+          count={noteCount}
           isWaitingToAnchor={isWaitingToAnchorAnnotations}
           selected={selectedTab === uiConstants.TAB_NOTES}
           type={uiConstants.TAB_NOTES}
@@ -129,9 +127,9 @@ function SelectionTabs({
         >
           Page Notes
         </Tab>
-        {totalOrphans > 0 && (
+        {orphanCount > 0 && (
           <Tab
-            count={totalOrphans}
+            count={orphanCount}
             isWaitingToAnchor={isWaitingToAnchorAnnotations}
             selected={selectedTab === uiConstants.TAB_ORPHANS}
             type={uiConstants.TAB_ORPHANS}
@@ -182,20 +180,6 @@ SelectionTabs.propTypes = {
    * Are we waiting on any annotations from the server?
    */
   isLoading: propTypes.bool.isRequired,
-  /**
-   * Are there any annotations still waiting to anchor?
-   */
-  isWaitingToAnchorAnnotations: propTypes.bool.isRequired,
-  /**
-   * The currently selected tab (annotations, notes or orphans).
-   */
-  selectedTab: propTypes.oneOf(['annotation', 'note', 'orphan']).isRequired,
-  /**
-   * The totals for each respect tab.
-   */
-  totalAnnotations: propTypes.number.isRequired,
-  totalNotes: propTypes.number.isRequired,
-  totalOrphans: propTypes.number.isRequired,
 
   // Injected services.
   settings: propTypes.object.isRequired,

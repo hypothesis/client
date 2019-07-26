@@ -1,6 +1,6 @@
 'use strict';
 
-const annotationMetadata = require('../annotation-metadata');
+const annotationMetadata = require('../util/annotation-metadata');
 const events = require('../events');
 const { isThirdPartyUser } = require('../util/account-id');
 const serviceConfig = require('../service-config');

@@ -1,9 +1,9 @@
 'use strict';
 
-const fixtures = require('./annotation-fixtures');
-const uiConstants = require('../ui-constants');
+const fixtures = require('../../test/annotation-fixtures');
+const uiConstants = require('../../ui-constants');
 const tabs = require('../tabs');
-const unroll = require('../../shared/test/util').unroll;
+const unroll = require('../../../shared/test/util').unroll;
 
 describe('tabs', function() {
   describe('tabForAnnotation', function() {
@@ -82,23 +82,5 @@ describe('tabs', function() {
         },
       ]
     );
-  });
-
-  describe('counts', function() {
-    const annotation = Object.assign(fixtures.defaultAnnotation(), {
-      $orphan: false,
-    });
-    const orphan = Object.assign(fixtures.defaultAnnotation(), {
-      $orphan: true,
-    });
-
-    it('counts Annotations and Orphans separately', function() {
-      assert.deepEqual(tabs.counts([annotation, orphan], true), {
-        anchoring: 0,
-        annotations: 1,
-        notes: 0,
-        orphans: 1,
-      });
-    });
   });
 });

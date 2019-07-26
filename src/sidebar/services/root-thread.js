@@ -3,8 +3,8 @@
 const buildThread = require('../build-thread');
 const events = require('../events');
 const memoize = require('../util/memoize');
-const metadata = require('../annotation-metadata');
-const tabs = require('../tabs');
+const metadata = require('../util/annotation-metadata');
+const tabs = require('../util/tabs');
 const uiConstants = require('../ui-constants');
 
 function truthyKeys(map) {

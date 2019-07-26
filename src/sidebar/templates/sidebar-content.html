@@ -1,19 +1,10 @@
 <selection-tabs
   ng-if="vm.showSelectedTabs()"
-  is-waiting-to-anchor-annotations="vm.waitingToAnchorAnnotations"
-  is-loading="vm.isLoading()"
-  selected-tab="vm.selectedTab"
-  total-annotations="vm.totalAnnotations"
-  total-notes="vm.totalNotes"
-  total-orphans="vm.totalOrphans">
+  is-loading="vm.isLoading()">
 </selection-tabs>
 
 <search-status-bar
-  class="search-status-bar"
-  ng-if="!vm.isLoading()"
-  selected-tab="vm.selectedTab"
-  total-annotations="vm.totalAnnotations"
-  total-notes="vm.totalNotes">
+  ng-if="!vm.isLoading()">
 </search-status-bar>
 
 <!-- Display error message if direct-linked annotation fetch failed. -->

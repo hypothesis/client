@@ -4,7 +4,7 @@ const immutable = require('seamless-immutable');
 
 const storeFactory = require('../index');
 const annotationFixtures = require('../../test/annotation-fixtures');
-const metadata = require('../../annotation-metadata');
+const metadata = require('../../util/annotation-metadata');
 const unroll = require('../../../shared/test/util').unroll;
 const uiConstants = require('../../ui-constants');
 

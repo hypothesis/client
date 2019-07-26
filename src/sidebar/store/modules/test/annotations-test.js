@@ -25,6 +25,68 @@ function createStore() {
 // in the tests for the whole Redux store
 
 describe('annotations reducer', function() {
+  describe('isWaitingToAnchorAnnotations', () => {
+    it('returns true if there are unanchored annotations', () => {
+      const unanchored = Object.assign(fixtures.oldAnnotation(), {
+        $orphan: 'undefined',
+      });
+      const state = {
+        annotations: [unanchored, fixtures.defaultAnnotation()],
+      };
+      assert.isTrue(selectors.isWaitingToAnchorAnnotations(state));
+    });
+
+    it('returns false if all annotations are anchored', () => {
+      const state = {
+        annotations: [
+          Object.assign(fixtures.oldPageNote(), { $orphan: false }),
+          Object.assign(fixtures.defaultAnnotation(), { $orphan: false }),
+        ],
+      };
+      assert.isFalse(selectors.isWaitingToAnchorAnnotations(state));
+    });
+  });
+
+  describe('noteCount', () => {
+    it('returns number of page notes', () => {
+      const state = {
+        annotations: [
+          fixtures.oldPageNote(),
+          fixtures.oldAnnotation(),
+          fixtures.defaultAnnotation(),
+        ],
+      };
+      assert.deepEqual(selectors.noteCount(state), 1);
+    });
+  });
+
+  describe('annotationCount', () => {
+    it('returns number of annotations', () => {
+      const state = {
+        annotations: [
+          fixtures.oldPageNote(),
+          fixtures.oldAnnotation(),
+          fixtures.defaultAnnotation(),
+        ],
+      };
+      assert.deepEqual(selectors.annotationCount(state), 2);
+    });
+  });
+
+  describe('orphanCount', () => {
+    it('returns number of orphaned annotations', () => {
+      const orphan = Object.assign(fixtures.oldAnnotation(), { $orphan: true });
+      const state = {
+        annotations: [
+          orphan,
+          fixtures.oldAnnotation(),
+          fixtures.defaultAnnotation(),
+        ],
+      };
+      assert.deepEqual(selectors.orphanCount(state), 1);
+    });
+  });
+
   describe('#savedAnnotations', function() {
     const savedAnnotations = selectors.savedAnnotations;
 

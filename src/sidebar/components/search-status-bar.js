@@ -21,18 +21,24 @@ const countVisibleAnns = annThread => {
  * A bar where the user can clear a selection or search and see whether
  * any search results were found.
  * */
-function SearchStatusBar({
-  selectedTab,
-  totalAnnotations,
-  totalNotes,
-  rootThread,
-}) {
-  const storeState = useStore(store => store.getState());
+function SearchStatusBar({ rootThread }) {
+  const {
+    directLinkedGroupFetchFailed,
+    filterQuery,
+    selectedAnnotationMap,
+    selectedTab,
+  } = useStore(store => ({
+    directLinkedGroupFetchFailed: store.getState().directLinkedGroupFetchFailed,
+    filterQuery: store.getState().filterQuery,
+    selectedAnnotationMap: store.getState().selectedAnnotationMap,
+    selectedTab: store.getState().selectedTab,
+  }));
   const clearSelection = useStore(store => store.clearSelection);
-  const filterQuery = storeState.filterQuery;
-  const filterActive = !!storeState.filterQuery;
+  const filterActive = !!filterQuery;
+  const annotationCount = useStore(store => store.annotationCount());
+  const noteCount = useStore(store => store.noteCount());
 
-  const thread = rootThread.thread(storeState);
+  const thread = useStore(store => rootThread.thread(store.getState()));
 
   const visibleCount = useMemo(() => {
     return countVisibleAnns(thread);
@@ -51,10 +57,10 @@ function SearchStatusBar({
   };
 
   const areNotAllAnnotationsVisible = () => {
-    if (storeState.directLinkedGroupFetchFailed) {
+    if (directLinkedGroupFetchFailed) {
       return true;
     }
-    const selection = storeState.selectedAnnotationMap;
+    const selection = selectedAnnotationMap;
     if (!selection) {
       return false;
     }
@@ -89,13 +95,13 @@ function SearchStatusBar({
             {selectedTab === uiConstants.TAB_ANNOTATIONS && (
               <Fragment>
                 Show all annotations
-                {totalAnnotations > 1 && <span> ({totalAnnotations})</span>}
+                {annotationCount > 1 && <span> ({annotationCount})</span>}
               </Fragment>
             )}
             {selectedTab === uiConstants.TAB_NOTES && (
               <Fragment>
                 Show all notes
-                {totalNotes > 1 && <span> ({totalNotes})</span>}
+                {noteCount > 1 && <span> ({noteCount})</span>}
               </Fragment>
             )}
           </button>
@@ -106,13 +112,7 @@ function SearchStatusBar({
 }
 
 SearchStatusBar.propTypes = {
-  selectedTab: propTypes.oneOf([
-    uiConstants.TAB_ANNOTATIONS,
-    uiConstants.TAB_ORPHANS,
-    uiConstants.TAB_NOTES,
-  ]).isRequired,
-  totalAnnotations: propTypes.number.isRequired,
-  totalNotes: propTypes.number.isRequired,
+  // Injected services.
   rootThread: propTypes.object.isRequired,
 };
 

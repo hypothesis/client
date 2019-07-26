@@ -24,7 +24,7 @@ describe('AnnotationDocumentInfo', () => {
     fakeDomainAndTitle = sinon.stub();
     fakeMetadata = { domainAndTitle: fakeDomainAndTitle };
     AnnotationDocumentInfo.$imports.$mock({
-      '../annotation-metadata': fakeMetadata,
+      '../util/annotation-metadata': fakeMetadata,
     });
   });
 
