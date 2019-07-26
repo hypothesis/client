@@ -5,7 +5,7 @@ const propTypes = require('prop-types');
 const { createElement } = require('preact');
 const { Fragment } = require('preact');
 
-const NewNoteBnt = require('./new-note-btn');
+const NewNoteBtn = require('./new-note-btn');
 const sessionUtil = require('../util/session-util');
 const uiConstants = require('../ui-constants');
 const useStore = require('../store/use-store');
@@ -140,7 +140,7 @@ function SelectionTabs({ isLoading, settings, session }) {
         )}
       </div>
       {selectedTab === uiConstants.TAB_NOTES &&
-        settings.enableExperimentalNewNoteButton && <NewNoteBnt />}
+        settings.enableExperimentalNewNoteButton && <NewNoteBtn />}
       {!isLoading && (
         <div className="selection-tabs__empty-message">
           {showNotesUnavailableMessage && (

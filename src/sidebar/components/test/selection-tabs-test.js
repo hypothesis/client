@@ -133,7 +133,7 @@ describe('SelectionTabs', function() {
       assert.isFalse(wrapper.exists('.selection-tabs--theme-clean'));
     });
 
-    it('should not display the new-note-bnt when the annotations tab is active', function() {
+    it('should not display the new-note-btn when the annotations tab is active', function() {
       const wrapper = createComponent();
       assert.equal(wrapper.find(NewNoteBtn).length, 0);
     });
