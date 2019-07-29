@@ -35,7 +35,7 @@
   on-select="vm.scrollTo(annotation)"
   show-document-info="false"
   ng-if="!vm.selectedGroupUnavailable()"
-  thread="vm.rootThread">
+  thread="vm.rootThread()">
 </thread-list>
 
 <logged-out-message ng-if="vm.shouldShowLoggedOutMessage()" on-login="vm.onLogin()">

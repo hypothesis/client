@@ -62,10 +62,7 @@ function StreamContentController(
   fetch(20);
 
   this.setCollapsed = store.setCollapsed;
-
-  store.subscribe(function() {
-    self.rootThread = rootThread.thread(store.getState());
-  });
+  this.rootThread = () => rootThread.thread(store.getState());
 
   // Sort the stream so that the newest annotations are at the top
   store.setSortKey('Newest');

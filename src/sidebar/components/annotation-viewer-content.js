@@ -36,15 +36,11 @@ function AnnotationViewerContentController(
   streamFilter,
   annotationMapper
 ) {
-  const self = this;
-
   store.setAppIsSidebar(false);
 
   const id = $routeParams.id;
 
-  store.subscribe(function() {
-    self.rootThread = rootThread.thread(store.getState());
-  });
+  this.rootThread = () => rootThread.thread(store.getState());
 
   this.setCollapsed = function(id, collapsed) {
     store.setCollapsed(id, collapsed);
