@@ -11,8 +11,6 @@ function StreamContentController(
   rootThread,
   searchFilter
 ) {
-  const self = this;
-
   store.setAppIsSidebar(false);
 
   /** `offset` parameter for the next search API call. */
