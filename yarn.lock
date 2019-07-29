@@ -1363,9 +1363,9 @@ babel-plugin-mockable-imports@^1.5.1:
   integrity sha512-n3M7UIDIyun3ztI11WUWfM2dqr+3ERn1EJ0z9w+WY6cHvtqhIHCGDFdhY2bY2BD20zPjf1zoaF+Iva+0VJLp/w==
 
 babel-plugin-transform-async-to-promises@^0.8.6:
-  version "0.8.12"
-  resolved "https://registry.yarnpkg.com/babel-plugin-transform-async-to-promises/-/babel-plugin-transform-async-to-promises-0.8.12.tgz#281917387606f2f925eb6e9e368703cb6c436337"
-  integrity sha512-hkTh5yCZAGFUrOsBJgwJlhnnW4BxOn7GBdnJ7Dy4/JLgLdBqsWX+6+VYXv3/T2Xm+4r5mX6scvmxOTU+eTi5cA==
+  version "0.8.13"
+  resolved "https://registry.yarnpkg.com/babel-plugin-transform-async-to-promises/-/babel-plugin-transform-async-to-promises-0.8.13.tgz#d45895658a670ddf16f4b8f0a16487d89bb43cd0"
+  integrity sha512-EG665Sn79e5ndzNIbbgtIGFUXggr6j8PIDEL7kWyRbmeli7/Gva2/osjEsVayz4k7U82LKrRa8B/kkL/7n0prQ==
 
 babel-polyfill@^6.26.0:
   version "6.26.0"
@@ -5606,11 +5606,6 @@ lodash.uniq@^4.5.0:
   integrity sha1-0CJTc662Uq3BvILklFM5qEJ1R3M=
 
 lodash@^4.0.0, lodash@^4.0.1, lodash@^4.15.0, lodash@^4.17.10, lodash@^4.17.11, lodash@^4.17.13, lodash@^4.17.14, lodash@~4.17.4:
-  version "4.17.15"
-  resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.15.tgz#b447f6670a0455bbfeedd11392eff330ea097548"
-  integrity sha512-8xOcRHvCjnocdS5cpwXQXVzmmh5e5+saE2QGoeQmbKmRS6J3VQppPOIt0MnmE+4xlZoumy0GPG0D0MVIQbNA1A==
-
-lodash@^4.17.14:
   version "4.17.15"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.15.tgz#b447f6670a0455bbfeedd11392eff330ea097548"
   integrity sha512-8xOcRHvCjnocdS5cpwXQXVzmmh5e5+saE2QGoeQmbKmRS6J3VQppPOIt0MnmE+4xlZoumy0GPG0D0MVIQbNA1A==
