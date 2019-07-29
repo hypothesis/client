@@ -17,15 +17,7 @@ function SidebarContentController(
 ) {
   const self = this;
 
-  function thread() {
-    return rootThread.thread(store.getState());
-  }
-
-  const unsubscribeAnnotationUI = store.subscribe(function() {
-    self.rootThread = thread();
-  });
-
-  $scope.$on('$destroy', unsubscribeAnnotationUI);
+  this.rootThread = () => rootThread.thread(store.getState());
 
   function focusAnnotation(annotation) {
     let highlights = [];
