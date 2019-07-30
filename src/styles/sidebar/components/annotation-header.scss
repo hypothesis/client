@@ -10,12 +10,29 @@
     align-items: baseline;
   }
 
+  // Timestamps are right aligned in a flex row
   &__timestamp {
     margin-left: auto;
   }
 
-  &__timestamp-link {
+  &__timestamp-edited {
     @include font-small;
+    font-style: italic;
+    color: $grey-4;
+  }
+
+  &__timestamp-created-link,
+  &__timestamp-edited-link {
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  &__timestamp-created-link {
+    color: $grey-5;
+  }
+
+  &__timestamp-edited-link {
     color: $grey-4;
   }
 
