@@ -39,7 +39,7 @@ const sortFns = {
  * The root thread is then displayed by viewer.html
  */
 // @ngInject
-function RootThread($rootScope, store, searchFilter, viewFilter) {
+function RootThread($rootScope, settings, store, searchFilter, viewFilter) {
   /**
    * Build the root conversation thread from the given UI state.
    *
@@ -50,15 +50,19 @@ function RootThread($rootScope, store, searchFilter, viewFilter) {
     const sortFn = sortFns[state.sortKey];
 
     let filterFn;
-    if (state.filterQuery) {
-      const filters = searchFilter.generateFacetedFilter(state.filterQuery);
+    if (state.filterQuery || state.focusedMode) {
+      const filters = searchFilter.generateFacetedFilter(
+        state.filterQuery,
+        settings.focusedUser
+      );
       filterFn = function(annot) {
         return viewFilter.filter([annot], filters).length > 0;
       };
     }
 
     let threadFilterFn;
-    if (state.isSidebar && !state.filterQuery) {
+    const hasFilters = state.filterQuery || state.focusedMode;
+    if (state.isSidebar && !hasFilters) {
       threadFilterFn = function(thread) {
         if (!thread.annotation) {
           return false;

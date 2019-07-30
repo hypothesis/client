@@ -10,6 +10,9 @@ function hostPageConfig(window) {
   const configJSON = queryString.parse(window.location.search).config;
   const config = JSON.parse(configJSON || '{}');
 
+  // temp: hack to force user
+  config.focusedUser = 'kyle';
+
   // Known configuration parameters which we will import from the host page.
   // Note that since the host page is untrusted code, the filtering needs to
   // be done here.
@@ -37,6 +40,9 @@ function hostPageConfig(window) {
     // New note button override.
     // This should be removed once new note button is enabled for everybody.
     'enableExperimentalNewNoteButton',
+
+    // Forces the sidebar to filter annotations to a single user.
+    'focusedUser',
 
     // Fetch config from a parent frame.
     'requestConfigFromFrame',

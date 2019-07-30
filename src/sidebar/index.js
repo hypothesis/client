@@ -181,6 +181,10 @@ function startAngularApp(config) {
       wrapReactComponent(require('./components/search-status-bar'))
     )
     .component(
+      'focusedModeHeader',
+      wrapReactComponent(require('./components/focused-mode-header'))
+    )
+    .component(
       'selectionTabs',
       wrapReactComponent(require('./components/selection-tabs'))
     )

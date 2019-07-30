@@ -113,6 +113,8 @@ function init(settings) {
 
     selectedTab: TAB_DEFAULT,
 
+    focusedMode: !!settings.focusedUser,
+
     // Key by which annotations are currently sorted.
     sortKey: TAB_SORTKEY_DEFAULT[TAB_DEFAULT],
     // Keys by which annotations can be sorted.

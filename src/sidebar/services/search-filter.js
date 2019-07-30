@@ -129,7 +129,7 @@ function toObject(searchtext) {
  * @param {string} searchtext
  * @return {Object}
  */
-function generateFacetedFilter(searchtext) {
+function generateFacetedFilter(searchtext, focusedUser) {
   let terms;
   const any = [];
   const quote = [];
@@ -138,7 +138,7 @@ function generateFacetedFilter(searchtext) {
   const tag = [];
   const text = [];
   const uri = [];
-  const user = [];
+  const user = focusedUser ? [focusedUser] : [];
 
   if (searchtext) {
     terms = tokenize(searchtext);

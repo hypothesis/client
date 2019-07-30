@@ -125,6 +125,10 @@ function SidebarContentController(
     true
   );
 
+  this.showFocusedHeader = () => {
+    return store.getState().focusedMode;
+  };
+
   this.showSelectedTabs = function() {
     if (
       this.selectedAnnotationUnavailable() ||
@@ -132,8 +136,11 @@ function SidebarContentController(
       store.getState().filterQuery
     ) {
       return false;
+    } else if (store.getState().focusedMode) {
+      return false;
+    } else {
+      return true;
     }
-    return true;
   };
 
   this.setCollapsed = function(id, collapsed) {
