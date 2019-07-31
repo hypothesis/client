@@ -1,0 +1,15 @@
+.annotation-user {
+  &__user-name {
+    @include font-normal;
+    color: $grey-7;
+    font-weight: bold;
+
+    .is-dimmed & {
+      color: $grey-5;
+    }
+
+    .is-highlighted & {
+      color: $grey-7;
+    }
+  }
+}

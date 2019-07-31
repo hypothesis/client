@@ -68,22 +68,27 @@ function getEnv(key) {
 }
 
 /** A list of all modules included in vendor bundles. */
-const vendorModules = Object.keys(vendorBundles.bundles)
-  .reduce(function (deps, key) {
-    return deps.concat(vendorBundles.bundles[key]);
-  }, []);
+const vendorModules = Object.keys(vendorBundles.bundles).reduce(function(
+  deps,
+  key
+) {
+  return deps.concat(vendorBundles.bundles[key]);
+},
+[]);
 
 // Builds the bundles containing vendor JS code
-gulp.task('build-vendor-js', function () {
+gulp.task('build-vendor-js', function() {
   const finished = [];
-  Object.keys(vendorBundles.bundles).forEach(function (name) {
-    finished.push(createBundle({
-      name: name,
-      require: vendorBundles.bundles[name],
-      minify: IS_PRODUCTION_BUILD,
-      path: SCRIPT_DIR,
-      noParse: vendorBundles.noParseModules,
-    }));
+  Object.keys(vendorBundles.bundles).forEach(function(name) {
+    finished.push(
+      createBundle({
+        name: name,
+        require: vendorBundles.bundles[name],
+        minify: IS_PRODUCTION_BUILD,
+        path: SCRIPT_DIR,
+        noParse: vendorBundles.noParseModules,
+      })
+    );
   });
   return Promise.all(finished);
 });
@@ -95,25 +100,29 @@ const appBundleBaseConfig = {
   noParse: vendorBundles.noParseModules,
 };
 
-const appBundles = [{
-  // The entry point for both the Hypothesis client and the sidebar
-  // application. This is responsible for loading the rest of the assets needed
-  // by the client.
-  name: 'boot',
-  entry: './src/boot/index',
-  transforms: ['babel'],
-},{
-  // The sidebar application for displaying and editing annotations.
-  name: 'sidebar',
-  transforms: ['babel'],
-  entry: './src/sidebar/index',
-},{
-  // The annotation layer which handles displaying highlights, presenting
-  // annotation tools on the page and instantiating the sidebar application.
-  name: 'annotator',
-  entry: './src/annotator/index',
-  transforms: ['babel', 'coffee'],
-}];
+const appBundles = [
+  {
+    // The entry point for both the Hypothesis client and the sidebar
+    // application. This is responsible for loading the rest of the assets needed
+    // by the client.
+    name: 'boot',
+    entry: './src/boot/index',
+    transforms: ['babel'],
+  },
+  {
+    // The sidebar application for displaying and editing annotations.
+    name: 'sidebar',
+    transforms: ['babel'],
+    entry: './src/sidebar/index',
+  },
+  {
+    // The annotation layer which handles displaying highlights, presenting
+    // annotation tools on the page and instantiating the sidebar application.
+    name: 'annotator',
+    entry: './src/annotator/index',
+    transforms: ['babel', 'coffee'],
+  },
+];
 
 // Polyfill bundles. Polyfills are grouped into "sets" (one bundle per set)
 // based on major ECMAScript version or DOM API. Some large polyfills
@@ -142,23 +151,29 @@ const polyfillBundles = [
   transforms: ['babel'],
 }));
 
-const appBundleConfigs = appBundles
-  .concat(polyfillBundles)
-  .map(config => {
-    return Object.assign({}, appBundleBaseConfig, config);
-  });
+const appBundleConfigs = appBundles.concat(polyfillBundles).map(config => {
+  return Object.assign({}, appBundleBaseConfig, config);
+});
 
-gulp.task('build-js', gulp.parallel('build-vendor-js', function () {
-  return Promise.all(appBundleConfigs.map(function (config) {
-    return createBundle(config);
-  }));
-}));
+gulp.task(
+  'build-js',
+  gulp.parallel('build-vendor-js', function() {
+    return Promise.all(
+      appBundleConfigs.map(function(config) {
+        return createBundle(config);
+      })
+    );
+  })
+);
 
-gulp.task('watch-js', gulp.series('build-vendor-js', function watchJS() {
-  appBundleConfigs.forEach(function (config) {
-    createBundle(config, {watch: true});
-  });
-}));
+gulp.task(
+  'watch-js',
+  gulp.series('build-vendor-js', function watchJS() {
+    appBundleConfigs.forEach(function(config) {
+      createBundle(config, { watch: true });
+    });
+  })
+);
 
 const styleFiles = [
   // H
@@ -173,7 +188,7 @@ const styleFiles = [
   './node_modules/angular-toastr/dist/angular-toastr.css',
 ];
 
-gulp.task('build-css', function () {
+gulp.task('build-css', function() {
   // Rewrite font URLs to look for fonts in 'build/fonts' instead of
   // 'build/styles/fonts'
   function rewriteCSSURL(asset) {
@@ -188,7 +203,8 @@ gulp.task('build-css', function () {
     url: rewriteCSSURL,
   });
 
-  return gulp.src(styleFiles)
+  return gulp
+    .src(styleFiles)
     .pipe(sourcemaps.init())
     .pipe(gulpIf(isSASSFile, sass(sassOpts).on('error', sass.logError)))
     .pipe(postcss([require('autoprefixer'), cssURLRewriter]))
@@ -196,47 +212,61 @@ gulp.task('build-css', function () {
     .pipe(gulp.dest(STYLE_DIR));
 });
 
-gulp.task('watch-css', gulp.series('build-css', function watchCSS() {
-  const vendorCSS = styleFiles.filter(function (path) {
-    return path.endsWith('.css');
-  });
-  const styleFileGlobs = vendorCSS.concat('./src/styles/**/*.scss');
+gulp.task(
+  'watch-css',
+  gulp.series('build-css', function watchCSS() {
+    const vendorCSS = styleFiles.filter(function(path) {
+      return path.endsWith('.css');
+    });
+    const styleFileGlobs = vendorCSS.concat('./src/styles/**/*.scss');
 
-  gulp.watch(styleFileGlobs, gulp.task('build-css'));
-}));
+    gulp.watch(styleFileGlobs, gulp.task('build-css'));
+  })
+);
 
-const fontFiles = ['src/styles/vendor/fonts/*.woff',
-                   'node_modules/katex/dist/fonts/*.woff',
-                   'node_modules/katex/dist/fonts/*.woff2'];
+const fontFiles = [
+  'src/styles/vendor/fonts/*.woff',
+  'node_modules/katex/dist/fonts/*.woff',
+  'node_modules/katex/dist/fonts/*.woff2',
+];
 
-gulp.task('build-fonts', function () {
-  return gulp.src(fontFiles)
+gulp.task('build-fonts', function() {
+  return gulp
+    .src(fontFiles)
     .pipe(changed(FONTS_DIR))
     .pipe(gulp.dest(FONTS_DIR));
 });
 
-gulp.task('watch-fonts', gulp.series('build-fonts', function watchFonts() {
-  gulp.watch(fontFiles, gulp.task('build-fonts'));
-}));
+gulp.task(
+  'watch-fonts',
+  gulp.series('build-fonts', function watchFonts() {
+    gulp.watch(fontFiles, gulp.task('build-fonts'));
+  })
+);
 
 const imageFiles = 'src/images/**/*';
-gulp.task('build-images', function () {
-  return gulp.src(imageFiles)
+gulp.task('build-images', function() {
+  return gulp
+    .src(imageFiles)
     .pipe(changed(IMAGES_DIR))
     .pipe(gulp.dest(IMAGES_DIR));
 });
 
-gulp.task('watch-images', gulp.series('build-images', function watchImages() {
-  gulp.watch(imageFiles, gulp.task('build-images'));
-}));
+gulp.task(
+  'watch-images',
+  gulp.series('build-images', function watchImages() {
+    gulp.watch(imageFiles, gulp.task('build-images'));
+  })
+);
 
-gulp.task('watch-templates', function () {
-  gulp.watch(TEMPLATES_DIR + '/*.html', function (file) {
+gulp.task('watch-templates', function() {
+  gulp.watch(TEMPLATES_DIR + '/*.html', function(file) {
     liveReloadServer.notifyChanged([file.path]);
   });
 });
 
-const MANIFEST_SOURCE_FILES = 'build/@(fonts|images|scripts|styles)/*.@(js|css|woff|jpg|png|svg)';
+const MANIFEST_SOURCE_FILES =
+  'build/@(fonts|images|scripts|styles)/*.@(js|css|woff|jpg|png|svg)';
 
 let prevManifest = {};
 
@@ -245,12 +275,12 @@ let prevManifest = {};
  * two versions of a manifest.
  */
 function changedAssets(prevManifest, newManifest) {
-  return Object.keys(newManifest).filter(function (asset) {
+  return Object.keys(newManifest).filter(function(asset) {
     return newManifest[asset] !== prevManifest[asset];
   });
 }
 
-const debouncedLiveReload = debounce(function () {
+const debouncedLiveReload = debounce(function() {
   // Notify dev clients about the changed assets. Note: This currently has an
   // issue that if CSS, JS and templates are all changed in quick succession,
   // some of the assets might be empty/incomplete files that are still being
@@ -292,15 +322,16 @@ let isFirstBuild = true;
 function generateBootScript(manifest) {
   const { version } = require('./package.json');
 
-  const defaultSidebarAppUrl = process.env.SIDEBAR_APP_URL ?
-    `${process.env.SIDEBAR_APP_URL}` : 'https://hypothes.is/app.html';
+  const defaultSidebarAppUrl = process.env.SIDEBAR_APP_URL
+    ? `${process.env.SIDEBAR_APP_URL}`
+    : 'https://hypothes.is/app.html';
 
   let defaultAssetRoot;
 
   if (process.env.NODE_ENV === 'production') {
     defaultAssetRoot = `https://cdn.hypothes.is/hypothesis/${version}/`;
   } else {
-    const scheme = useSsl ? 'https': 'http';
+    const scheme = useSsl ? 'https' : 'http';
     defaultAssetRoot = `${scheme}://${packageServerHostname()}:3001/hypothesis/${version}/`;
   }
 
@@ -310,13 +341,14 @@ function generateBootScript(manifest) {
     isFirstBuild = false;
   }
 
-  gulp.src('build/scripts/boot.bundle.js')
+  gulp
+    .src('build/scripts/boot.bundle.js')
     .pipe(replace('__MANIFEST__', JSON.stringify(manifest)))
     .pipe(replace('__ASSET_ROOT__', defaultAssetRoot))
     .pipe(replace('__SIDEBAR_APP_URL__', defaultSidebarAppUrl))
     // Strip sourcemap link. It will have been invalidated by the previous
     // replacements and the bundle is so small that it isn't really valuable.
-    .pipe(replace(/^\/\/# sourceMappingURL=\S+$/m,''))
+    .pipe(replace(/^\/\/# sourceMappingURL=\S+$/m, ''))
     .pipe(rename('boot.js'))
     .pipe(gulp.dest('build/'));
 }
@@ -326,33 +358,36 @@ function generateBootScript(manifest) {
  * URLs containing cache-busting query string parameters.
  */
 function generateManifest() {
-  return gulp.src(MANIFEST_SOURCE_FILES)
-    .pipe(manifest({name: 'manifest.json'}))
-    .pipe(through.obj(function (file, enc, callback) {
-      // Trigger a reload of the client in the dev server at localhost:3000
-      const newManifest = JSON.parse(file.contents.toString());
-      const changed = changedAssets(prevManifest, newManifest);
-      prevManifest = newManifest;
-      triggerLiveReload(changed);
+  return gulp
+    .src(MANIFEST_SOURCE_FILES)
+    .pipe(manifest({ name: 'manifest.json' }))
+    .pipe(
+      through.obj(function(file, enc, callback) {
+        // Trigger a reload of the client in the dev server at localhost:3000
+        const newManifest = JSON.parse(file.contents.toString());
+        const changed = changedAssets(prevManifest, newManifest);
+        prevManifest = newManifest;
+        triggerLiveReload(changed);
 
-      // Expand template vars in boot script bundle
-      generateBootScript(newManifest);
+        // Expand template vars in boot script bundle
+        generateBootScript(newManifest);
 
-      this.push(file);
-      callback();
-    }))
+        this.push(file);
+        callback();
+      })
+    )
     .pipe(gulp.dest('build/'));
 }
 
-gulp.task('watch-manifest', function () {
+gulp.task('watch-manifest', function() {
   gulp.watch(MANIFEST_SOURCE_FILES, { delay: 500 }, generateManifest);
 });
 
-gulp.task('serve-package', function () {
+gulp.task('serve-package', function() {
   servePackage(3001, packageServerHostname());
 });
 
-gulp.task('serve-live-reload', function () {
+gulp.task('serve-live-reload', function() {
   const LiveReloadServer = require('./scripts/gulp/live-reload-server');
   const scheme = useSsl ? 'https' : 'http';
   liveReloadServer = new LiveReloadServer(3000, {
@@ -368,16 +403,19 @@ const buildAssets = gulp.parallel(
 );
 gulp.task('build', gulp.series(buildAssets, generateManifest));
 
-gulp.task('watch', gulp.parallel(
-  'serve-package',
-  'serve-live-reload',
-  'watch-js',
-  'watch-css',
-  'watch-fonts',
-  'watch-images',
-  'watch-manifest',
-  'watch-templates'
-));
+gulp.task(
+  'watch',
+  gulp.parallel(
+    'serve-package',
+    'serve-live-reload',
+    'watch-js',
+    'watch-css',
+    'watch-fonts',
+    'watch-images',
+    'watch-manifest',
+    'watch-templates'
+  )
+);
 
 function runKarma(baseConfig, opts, done) {
   // See https://github.com/karma-runner/karma-mocha#configuration
@@ -393,34 +431,46 @@ function runKarma(baseConfig, opts, done) {
   // be displayed when using a non-default reporter.
   // See https://github.com/karma-runner/karma/pull/2220
   const BaseReporter = require('karma/lib/reporters/base');
-  BaseReporter.decoratorFactory.$inject =
-    BaseReporter.decoratorFactory.$inject.map(dep =>
-      dep.replace('browserLogOptions', 'browserConsoleLogOptions'));
+  BaseReporter.decoratorFactory.$inject = BaseReporter.decoratorFactory.$inject.map(
+    dep => dep.replace('browserLogOptions', 'browserConsoleLogOptions')
+  );
 
   const karma = require('karma');
-  new karma.Server(Object.assign({}, {
-    configFile: path.resolve(__dirname, baseConfig),
-  }, cliOpts, opts), done).start();
+  new karma.Server(
+    Object.assign(
+      {},
+      {
+        configFile: path.resolve(__dirname, baseConfig),
+      },
+      cliOpts,
+      opts
+    ),
+    done
+  ).start();
 }
 
-gulp.task('test', function (callback) {
-  runKarma('./src/karma.config.js', {singleRun:true}, callback);
+gulp.task('test', function(callback) {
+  runKarma('./src/karma.config.js', { singleRun: true }, callback);
 });
 
-gulp.task('test-watch', function (callback) {
+gulp.task('test-watch', function(callback) {
   runKarma('./src/karma.config.js', {}, callback);
 });
 
-gulp.task('upload-sourcemaps', gulp.series('build-js', function () {
-  const uploadToSentry = require('./scripts/gulp/upload-to-sentry');
+gulp.task(
+  'upload-sourcemaps',
+  gulp.series('build-js', function() {
+    const uploadToSentry = require('./scripts/gulp/upload-to-sentry');
 
-  const opts = {
-    key: getEnv('SENTRY_API_KEY'),
-    organization: getEnv('SENTRY_ORGANIZATION'),
-  };
-  const projects = getEnv('SENTRY_PROJECTS').split(',');
-  const release = getEnv('SENTRY_RELEASE_VERSION');
+    const opts = {
+      key: getEnv('SENTRY_API_KEY'),
+      organization: getEnv('SENTRY_ORGANIZATION'),
+    };
+    const projects = getEnv('SENTRY_PROJECTS').split(',');
+    const release = getEnv('SENTRY_RELEASE_VERSION');
 
-  return gulp.src(['build/scripts/*.js', 'build/scripts/*.map'])
-    .pipe(uploadToSentry(opts, projects, release));
-}));
+    return gulp
+      .src(['build/scripts/*.js', 'build/scripts/*.map'])
+      .pipe(uploadToSentry(opts, projects, release));
+  })
+);

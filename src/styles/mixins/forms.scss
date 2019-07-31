@@ -1,32 +1,33 @@
-@import "../base";
+@import '../base';
 
 // See http://compass-style.org/reference/compass/utilities/general/clearfix/#mixin-pie-clearfix
 @mixin pie-clearfix {
   &:after {
-    content: "";
+    content: '';
     display: table;
     clear: both;
   }
 }
 
 @mixin focus-outline {
-  border-color: #51A7E8;
-  box-shadow: 0px 1px 2px rgba(0, 0, 0, .075) inset, 0px 0px 5px rgba(81, 167, 232, .5);
+  border-color: #51a7e8;
+  box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.075) inset,
+    0px 0px 5px rgba(81, 167, 232, 0.5);
 }
 
 @mixin form-input {
   @include font-normal;
   border: 1px solid $gray-lighter;
   border-radius: 2px;
-  padding: .5em .75em;
+  padding: 0.5em 0.75em;
   font-weight: normal;
   color: $gray;
-  background-color: #FAFAFA;
+  background-color: #fafafa;
 }
 
 @mixin form-input-focus {
   outline: none;
-  background-color: #FFF;
+  background-color: #fff;
 
   @include focus-outline;
   @include placeholder {
@@ -45,20 +46,20 @@
 }
 
 @mixin btn {
-  box-shadow: 0 1px 0 rgba(0, 0, 0, .15);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.15);
 
   background: linear-gradient($button-background-gradient);
   display: inline-block;
   font-weight: bold;
   color: $button-text-color;
-  text-shadow: 0 1px 0 #FFF;
+  text-shadow: 0 1px 0 #fff;
   border-radius: 2px;
   border: 1px solid $gray-light;
-  padding: .5em .9em;
+  padding: 0.5em 0.9em;
 }
 
 @mixin btn-hover {
-  box-shadow: 0 1px 0 rgba(0, 0, 0, .05);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.05);
   outline: none;
   color: $button-text-color;
   background: $button-background-start;
@@ -66,7 +67,7 @@
 }
 
 @mixin btn-active {
-  box-shadow: inset 0 1px 0 rgba(0, 0, 0, .1);
+  box-shadow: inset 0 1px 0 rgba(0, 0, 0, 0.1);
   background: $button-background-end;
   color: #424242;
   border-color: #bababa;
@@ -75,18 +76,39 @@
 @mixin btn-disabled {
   box-shadow: none;
   cursor: default;
-  background: #F0F0F0;
-  border-color: #CECECE;
+  background: #f0f0f0;
+  border-color: #cecece;
   color: $gray-light;
+}
+
+@mixin primary-action-btn {
+  color: $color-seashell;
+  background-color: $color-dove-gray;
+  height: 35px;
+  border: none;
+  border-radius: 2px;
+
+  font-weight: bold;
+  font-size: $body1-font-size;
+
+  padding-left: 12px;
+  padding-right: 12px;
+
+  &:disabled {
+    color: $gray-light;
+  }
+
+  &:hover:enabled {
+    background-color: $color-mine-shaft;
+  }
 }
 
 // Tint and shade functions from
 // https://css-tricks.com/snippets/sass/tint-shade-functions
-@function tint($color, $percent){
+@function tint($color, $percent) {
   @return mix(white, $color, $percent);
 }
 
-@function shade($color, $percent){
+@function shade($color, $percent) {
   @return mix(black, $color, $percent);
 }
-

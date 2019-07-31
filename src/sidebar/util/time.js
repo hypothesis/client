@@ -55,8 +55,14 @@ function nHr(date, now) {
 
 // Cached DateTimeFormat instances,
 // because instantiating a DateTimeFormat is expensive.
-const formatters = {};
+let formatters = {};
 
+/**
+ * Clears the cache of formatters.
+ */
+function clearFormatters() {
+  formatters = {};
+}
 /**
  * Efficiently return `date` formatted with `options`.
  *
@@ -139,10 +145,15 @@ const BREAKPOINTS = [
   },
 ];
 
+/**
+ * Returns a dict that describes how to format the date based on the delta
+ * between date and now.
+ *
+ * @param {Date} date - The date to consider as the timestamp to format.
+ * @param {Date} now - The date to consider as the current time.
+ * @return {breakpoint} A dict that describes how to format the date.
+ */
 function getBreakpoint(date, now) {
-  // Turn the given ISO 8601 string into a Date object.
-  date = new Date(date);
-
   let breakpoint;
   for (let i = 0; i < BREAKPOINTS.length; i++) {
     breakpoint = BREAKPOINTS[i];
@@ -154,12 +165,12 @@ function getBreakpoint(date, now) {
   return null;
 }
 
-function nextFuzzyUpdate(date) {
+function nextFuzzyUpdate(date, now) {
   if (!date) {
     return null;
   }
 
-  let secs = getBreakpoint(date, new Date()).nextUpdate;
+  let secs = getBreakpoint(date, now).nextUpdate;
 
   if (secs === null) {
     return null;
@@ -183,12 +194,15 @@ function nextFuzzyUpdate(date) {
  * This can be used to refresh parts of a UI whose
  * update frequency depends on the age of a timestamp.
  *
+ * @param {String} date - An ISO 8601 date string timestamp to format.
+ * @param {Date} callback - A callback function to call when the timestamp changes.
  * @return {Function} A function that cancels the automatic refresh.
  */
 function decayingInterval(date, callback) {
   let timer;
+  const timeStamp = date ? new Date(date) : null;
   const update = function() {
-    const fuzzyUpdate = nextFuzzyUpdate(date);
+    const fuzzyUpdate = nextFuzzyUpdate(timeStamp, new Date());
     if (fuzzyUpdate === null) {
       return;
     }
@@ -208,19 +222,20 @@ function decayingInterval(date, callback) {
 /**
  * Formats a date as a string relative to the current date.
  *
- * @param {number} date - The absolute timestamp to format.
+ * @param {Date} date - The date to consider as the timestamp to format.
+ * @param {Date} now - The date to consider as the current time.
+ * @param {Object} Intl - JS internationalization API implementation.
  * @return {string} A 'fuzzy' string describing the relative age of the date.
  */
-function toFuzzyString(date, Intl) {
+function toFuzzyString(date, now, Intl) {
   if (!date) {
     return '';
   }
-  const now = new Date();
-
-  return getBreakpoint(date, now).format(new Date(date), now, Intl);
+  return getBreakpoint(date, now).format(date, now, Intl);
 }
 
 module.exports = {
+  clearFormatters: clearFormatters,
   decayingInterval: decayingInterval,
   nextFuzzyUpdate: nextFuzzyUpdate,
   toFuzzyString: toFuzzyString,

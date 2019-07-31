@@ -36,8 +36,16 @@ describe('annotationThread', function() {
       });
   });
 
+  let fakeStore;
+
   beforeEach(function() {
-    angular.mock.module('app');
+    fakeStore = {
+      setForceVisible: sinon.stub(),
+      setCollapsed: sinon.stub(),
+      getState: sinon.stub(),
+    };
+
+    angular.mock.module('app', { store: fakeStore });
   });
 
   it('renders the tree structure of parent and child annotations', function() {
@@ -73,6 +81,33 @@ describe('annotationThread', function() {
     const pageObject = new PageObject(element);
     assert.equal(pageObject.annotations().length, 1);
     assert.isTrue(pageObject.isHidden(pageObject.annotations()[0]));
+  });
+
+  describe('onForceVisible', () => {
+    it('shows the thread', () => {
+      const thread = {
+        id: '1',
+        children: [],
+      };
+      const element = util.createDirective(document, 'annotationThread', {
+        thread: thread,
+      });
+      element.ctrl.onForceVisible(thread);
+      assert.calledWith(fakeStore.setForceVisible, thread.id, true);
+    });
+
+    it('uncollapses the parent', () => {
+      const thread = {
+        id: '2',
+        children: [],
+        parent: { id: '3' },
+      };
+      const element = util.createDirective(document, 'annotationThread', {
+        thread: thread,
+      });
+      element.ctrl.onForceVisible(thread);
+      assert.calledWith(fakeStore.setCollapsed, thread.parent.id, false);
+    });
   });
 
   it('shows replies if not collapsed', function() {
@@ -166,7 +201,6 @@ describe('annotationThread', function() {
 
   describe('#showThreadAndReplies', function() {
     it('reveals all parents and replies', function() {
-      const onForceVisible = sinon.stub();
       const thread = {
         id: '123',
         annotation: { id: '123' },
@@ -184,15 +218,12 @@ describe('annotationThread', function() {
       };
       const element = util.createDirective(document, 'annotationThread', {
         thread: thread,
-        onForceVisible: {
-          args: ['thread'],
-          callback: onForceVisible,
-        },
       });
       element.ctrl.showThreadAndReplies();
-      assert.calledWith(onForceVisible, thread.parent);
-      assert.calledWith(onForceVisible, thread);
-      assert.calledWith(onForceVisible, thread.children[0]);
+      assert.calledWith(fakeStore.setForceVisible, thread.parent.id, true);
+      assert.calledWith(fakeStore.setForceVisible, thread.id, true);
+      assert.calledWith(fakeStore.setForceVisible, thread.children[0].id, true);
+      assert.calledWith(fakeStore.setCollapsed, thread.parent.id, false);
     });
   });
 
@@ -207,10 +238,8 @@ describe('annotationThread', function() {
     const element = util.createDirective(document, 'annotationThread', {
       thread: thread,
     });
-    const moderationBanner = element
-      .find('moderation-banner')
-      .controller('moderationBanner');
-    assert.deepEqual(moderationBanner, { annotation: ann });
+    assert.ok(element[0].querySelector('moderation-banner'));
+    assert.ok(element[0].querySelector('annotation'));
   });
 
   it('does not render the annotation or moderation banner if there is no annotation', function() {

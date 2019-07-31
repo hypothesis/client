@@ -14,11 +14,17 @@
 
   // Force top-bar onto a new compositor layer so that it does not judder when
   // the window is scrolled.
-  transform: translate3d(0,0,0);
+  transform: translate3d(0, 0, 0);
 }
 
 .top-bar--theme-clean {
   border-bottom: none;
+}
+
+.top-bar__login-links {
+  flex-shrink: 0;
+  font-size: $body2-font-size;
+  padding-left: 6px;
 }
 
 .top-bar__inner {
@@ -51,20 +57,22 @@
 
 // Removes the native styling from a <button> element
 @mixin reset-native-btn-styles {
+  @include outline-on-keyboard-focus;
+
   padding: 0px;
   margin: 0px;
   background-color: transparent;
   border-style: none;
-  outline: none;
 }
 
 .top-bar__btn {
   @include reset-native-btn-styles;
 
+  height: 100%;
   color: $gray-light;
   display: inline-block;
   cursor: pointer;
-  padding: 0 3px;
+  padding: 1px 3px 0 3px;
 
   &:hover {
     color: $gray-dark;

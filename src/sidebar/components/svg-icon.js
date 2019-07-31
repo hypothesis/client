@@ -6,12 +6,18 @@ const propTypes = require('prop-types');
 
 // The list of supported icons
 const icons = {
-  'add-group': require('../../images/icons/add-group.svg'),
+  add: require('../../images/icons/add.svg'),
   'collapse-menu': require('../../images/icons/collapse-menu.svg'),
   'expand-menu': require('../../images/icons/expand-menu.svg'),
   copy: require('../../images/icons/copy.svg'),
   cursor: require('../../images/icons/cursor.svg'),
+  external: require('../../images/icons/external.svg'),
+  groups: require('../../images/icons/groups.svg'),
+  help: require('../../images/icons/help.svg'),
   leave: require('../../images/icons/leave.svg'),
+  lock: require('../../images/icons/lock.svg'),
+  logo: require('../../images/icons/logo.svg'),
+  public: require('../../images/icons/public.svg'),
   refresh: require('../../images/icons/refresh.svg'),
   share: require('../../images/icons/share.svg'),
 };
@@ -40,7 +46,9 @@ function SvgIcon({ name, className = '' }) {
     markup,
   ]);
 
-  return <span dangerouslySetInnerHTML={markup} ref={element} />;
+  return (
+    <span className="svg-icon" dangerouslySetInnerHTML={markup} ref={element} />
+  );
 }
 
 SvgIcon.propTypes = {

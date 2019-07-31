@@ -1,133 +1,141 @@
 'use strict';
 
-const { isThirdPartyUser } = require('../util/account-id');
+const { createElement } = require('preact');
+const { useMemo, useState } = require('preact/hooks');
+const propTypes = require('prop-types');
+
 const isThirdPartyService = require('../util/is-third-party-service');
-const serviceConfig = require('../service-config');
-const memoize = require('../util/memoize');
+const { isThirdPartyUser } = require('../util/account-id');
 const groupsByOrganization = require('../util/group-organizations');
+const useStore = require('../store/use-store');
+const { withServices } = require('../util/service-context');
+const serviceConfig = require('../service-config');
 
-const groupOrganizations = memoize(groupsByOrganization);
+const Menu = require('./menu');
+const MenuItem = require('./menu-item');
+const GroupListSection = require('./group-list-section');
 
-const myGroupOrgs = memoize(groupsByOrganization);
-
-const featuredGroupOrgs = memoize(groupsByOrganization);
-
-const currentlyViewingGroupOrgs = memoize(groupsByOrganization);
-
-// @ngInject
-function GroupListController(
-  $window,
-  analytics,
-  features,
-  groups,
-  settings,
-  serviceUrl,
-  store
-) {
-  this.groups = groups;
-
-  this.createNewGroup = function() {
-    $window.open(serviceUrl('groups.new'), '_blank');
-  };
-
-  this.focusedIcon = function() {
-    const focusedGroup = this.groups.focused();
-    return (
-      focusedGroup &&
-      (focusedGroup.organization.logo || this.thirdPartyGroupIcon)
-    );
-  };
-
-  this.focusedIconClass = function() {
-    const focusedGroup = this.groups.focused();
-    return focusedGroup && focusedGroup.type === 'private' ? 'group' : 'public';
-  };
-
-  this.isThirdPartyUser = function() {
-    return isThirdPartyUser(this.auth.userid, settings.authDomain);
-  };
-
-  this.leaveGroup = function(groupId) {
-    const groupName = groups.get(groupId).name;
-    const message =
-      'Are you sure you want to leave the group "' + groupName + '"?';
-    if ($window.confirm(message)) {
-      analytics.track(analytics.events.GROUP_LEAVE);
-      groups.leave(groupId);
-    }
-  };
-
-  this.orgName = function(groupId) {
-    const group = this.groups.get(groupId);
-    return group && group.organization && group.organization.name;
-  };
-
-  this.groupOrganizations = function() {
-    return groupOrganizations(this.groups.all());
-  };
-
-  this.currentlyViewingGroupOrganizations = function() {
-    return currentlyViewingGroupOrgs(store.getCurrentlyViewingGroups());
-  };
-
-  this.featuredGroupOrganizations = function() {
-    return featuredGroupOrgs(store.getFeaturedGroups());
-  };
-
-  this.myGroupOrganizations = function() {
-    return myGroupOrgs(store.getMyGroups());
-  };
-
-  this.viewGroupActivity = function() {
-    analytics.track(analytics.events.GROUP_VIEW_ACTIVITY);
-  };
-
-  this.focusGroup = function(groupId) {
-    analytics.track(analytics.events.GROUP_SWITCH);
-    groups.focus(groupId);
-  };
-
-  /**
-   * Show the share link for the group if it is not a third-party group
-   * AND if the URL needed is present in the group object. We should be able
-   * to simplify this once the API is adjusted only to return the link
-   * when applicable.
-   */
-  this.shouldShowActivityLink = function(groupId) {
-    const group = groups.get(groupId);
-    return group.links && group.links.html && !this.isThirdPartyService;
-  };
-
+/**
+ * Return the custom icon for the top bar configured by the publisher in
+ * the Hypothesis client configuration.
+ */
+function publisherProvidedIcon(settings) {
   const svc = serviceConfig(settings);
-  if (svc && svc.icon) {
-    this.thirdPartyGroupIcon = svc.icon;
-  }
-
-  this.isThirdPartyService = isThirdPartyService(settings);
-
-  this.showGroupsMenu = () => {
-    if (features.flagEnabled('community_groups')) {
-      // Only show the drop down menu if there is more than one group.
-      return this.groups.all().length > 1;
-    } else {
-      return !(this.isThirdPartyService && this.groups.all().length <= 1);
-    }
-  };
-
-  /**
-   * Expose the feature flag so it can be used in the template logic to show
-   * or hide the new groups menu.
-   */
-  this.isFeatureFlagEnabled = flag => {
-    return features.flagEnabled(flag);
-  };
+  return svc && svc.icon ? svc.icon : null;
 }
 
-module.exports = {
-  controller: GroupListController,
-  controllerAs: 'vm',
-  bindings: {
-    auth: '<',
-  },
-  template: require('../templates/group-list.html'),
+/**
+ * Menu allowing the user to select which group to show and also access
+ * additional actions related to groups.
+ */
+function GroupList({ serviceUrl, settings }) {
+  const currentGroups = useStore(store => store.getCurrentlyViewingGroups());
+  const featuredGroups = useStore(store => store.getFeaturedGroups());
+  const myGroups = useStore(store => store.getMyGroups());
+  const focusedGroup = useStore(store => store.focusedGroup());
+  const userid = useStore(store => store.profile().userid);
+
+  const myGroupsSorted = useMemo(() => groupsByOrganization(myGroups), [
+    myGroups,
+  ]);
+
+  const featuredGroupsSorted = useMemo(
+    () => groupsByOrganization(featuredGroups),
+    [featuredGroups]
+  );
+
+  const currentGroupsSorted = useMemo(
+    () => groupsByOrganization(currentGroups),
+    [currentGroups]
+  );
+
+  const { authDomain } = settings;
+  const canCreateNewGroup = userid && !isThirdPartyUser(userid, authDomain);
+  const newGroupLink = serviceUrl('groups.new');
+
+  // The group whose submenu is currently open, or `null` if no group item is
+  // currently expanded.
+  //
+  // nb. If we create other menus that behave similarly in future, we may want
+  // to move this state to the `Menu` component.
+  const [expandedGroup, setExpandedGroup] = useState(null);
+
+  let label;
+  if (focusedGroup) {
+    const icon = focusedGroup.organization.logo;
+    label = (
+      <span className="group-list__menu-label">
+        <img
+          className="group-list__menu-icon"
+          src={icon || publisherProvidedIcon(settings)}
+        />
+        {focusedGroup.name}
+      </span>
+    );
+  } else {
+    label = <span>…</span>;
+  }
+
+  // If there is only one group and no actions available for that group,
+  // just show the group name as a label.
+  const actionsAvailable = !isThirdPartyService(settings);
+  if (
+    !actionsAvailable &&
+    currentGroups.length + featuredGroups.length + myGroups.length < 2
+  ) {
+    return label;
+  }
+
+  return (
+    <Menu
+      align="left"
+      contentClass="group-list__content"
+      label={label}
+      onOpenChanged={() => setExpandedGroup(null)}
+      title="Select group"
+    >
+      {currentGroupsSorted.length > 0 && (
+        <GroupListSection
+          expandedGroup={expandedGroup}
+          onExpandGroup={setExpandedGroup}
+          heading="Currently Viewing"
+          groups={currentGroupsSorted}
+        />
+      )}
+      {featuredGroupsSorted.length > 0 && (
+        <GroupListSection
+          expandedGroup={expandedGroup}
+          onExpandGroup={setExpandedGroup}
+          heading="Featured Groups"
+          groups={featuredGroupsSorted}
+        />
+      )}
+      {myGroupsSorted.length > 0 && (
+        <GroupListSection
+          expandedGroup={expandedGroup}
+          onExpandGroup={setExpandedGroup}
+          heading="My Groups"
+          groups={myGroupsSorted}
+        />
+      )}
+
+      {canCreateNewGroup && (
+        <MenuItem
+          icon="add"
+          href={newGroupLink}
+          label="New private group"
+          style="shaded"
+        />
+      )}
+    </Menu>
+  );
+}
+
+GroupList.propTypes = {
+  serviceUrl: propTypes.func,
+  settings: propTypes.object,
 };
+
+GroupList.injectedProps = ['serviceUrl', 'settings'];
+
+module.exports = withServices(GroupList);

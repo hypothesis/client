@@ -5,60 +5,72 @@ const { createElement } = require('preact');
 
 const GroupListSection = require('../group-list-section');
 const GroupListItem = require('../group-list-item');
-const GroupListItemOutOfScope = require('../group-list-item-out-of-scope');
+const MenuSection = require('../menu-section');
 
 describe('GroupListSection', () => {
-  const createGroupListSection = groups => {
+  const testGroups = [
+    {
+      id: 'group1',
+      name: 'Group 1',
+    },
+    {
+      id: 'group2',
+      name: 'Group 2',
+    },
+  ];
+
+  const createGroupListSection = ({
+    groups = testGroups,
+    heading = 'Test section',
+    ...props
+  } = {}) => {
     return shallow(
-      <GroupListSection groups={groups} analytics={{}} store={{}} />
+      <GroupListSection groups={groups} heading={heading} {...props} />
     );
   };
 
-  describe('group item types', () => {
-    [
-      {
-        description:
-          'renders GroupListItem if group is out of scope but scope is not enforced',
-        scopesEnforced: false,
-        expectedIsSelectable: [true, true],
-      },
-      {
-        description:
-          'renders GroupListItemOutOfScope if group is out of scope and scope is enforced',
-        scopesEnforced: true,
-        expectedIsSelectable: [true, false],
-      },
-    ].forEach(({ description, scopesEnforced, expectedIsSelectable }) => {
-      it(description, () => {
-        const groups = [
-          {
-            isScopedToUri: true,
-            scopes: { enforced: scopesEnforced },
-            id: 0,
-          },
-          {
-            isScopedToUri: false,
-            scopes: { enforced: scopesEnforced },
-            id: 1,
-          },
-        ];
+  it('renders heading', () => {
+    const wrapper = createGroupListSection();
+    assert.equal(wrapper.find(MenuSection).prop('heading'), 'Test section');
+  });
 
-        const wrapper = createGroupListSection(groups);
+  it('renders groups', () => {
+    const wrapper = createGroupListSection();
+    assert.equal(wrapper.find(GroupListItem).length, testGroups.length);
+  });
 
-        // Check that the correct group item components were rendered for
-        // each group, depending on whether the group can be annotated in on
-        // the current document.
-        const itemTypes = wrapper
-          .findWhere(
-            n =>
-              n.type() === GroupListItem || n.type() === GroupListItemOutOfScope
-          )
-          .map(item => item.type());
-        const expectedItemTypes = groups.map(g =>
-          expectedIsSelectable[g.id] ? GroupListItem : GroupListItemOutOfScope
-        );
-        assert.deepEqual(itemTypes, expectedItemTypes);
+  it('expands group specified by `expandedGroup` prop', () => {
+    const wrapper = createGroupListSection();
+    for (let i = 0; i < testGroups.length; i++) {
+      wrapper.setProps({ expandedGroup: testGroups[i] });
+      wrapper.find(GroupListItem).forEach((n, idx) => {
+        assert.equal(n.prop('isExpanded'), idx === i);
       });
+    }
+  });
+
+  it("sets expanded group when a group's submenu is expanded", () => {
+    const onExpandGroup = sinon.stub();
+    const wrapper = createGroupListSection({ onExpandGroup });
+    wrapper
+      .find(GroupListItem)
+      .first()
+      .props()
+      .onExpand(true);
+    assert.calledWith(onExpandGroup, testGroups[0]);
+  });
+
+  it("resets expanded group when group's submenu is collapsed", () => {
+    const onExpandGroup = sinon.stub();
+    const wrapper = createGroupListSection({
+      expandedGroup: testGroups[0],
+      onExpandGroup,
     });
+    wrapper
+      .find(GroupListItem)
+      .first()
+      .props()
+      .onExpand(false);
+    assert.calledWith(onExpandGroup, null);
   });
 });

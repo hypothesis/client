@@ -3,7 +3,6 @@
 // @ngInject
 function StreamContentController(
   $scope,
-  $location,
   $route,
   $routeParams,
   annotationMapper,
@@ -12,8 +11,6 @@ function StreamContentController(
   rootThread,
   searchFilter
 ) {
-  const self = this;
-
   store.setAppIsSidebar(false);
 
   /** `offset` parameter for the next search API call. */
@@ -55,34 +52,25 @@ function StreamContentController(
     }
   });
 
+  // In case this route loaded after a client-side route change (eg. from
+  // '/a/:id'), clear any existing annotations.
+  store.clearAnnotations();
+
   // Perform the initial search
   fetch(20);
 
   this.setCollapsed = store.setCollapsed;
-  this.forceVisible = function(id) {
-    store.setForceVisible(id, true);
-  };
-
-  store.subscribe(function() {
-    self.rootThread = rootThread.thread(store.getState());
-  });
+  this.rootThread = () => rootThread.thread(store.getState());
 
   // Sort the stream so that the newest annotations are at the top
   store.setSortKey('Newest');
 
   this.loadMore = fetch;
-
-  this.$onInit = () => {
-    this.search.query = () => $routeParams.q || '';
-    this.search.update = q => $location.search({ q });
-  };
 }
 
 module.exports = {
   controller: StreamContentController,
   controllerAs: 'vm',
-  bindings: {
-    search: '<',
-  },
+  bindings: {},
   template: require('../templates/stream-content.html'),
 };

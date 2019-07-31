@@ -4,12 +4,15 @@
 
 // Toggle button that opens the menu.
 .menu__toggle {
+  @include outline-on-keyboard-focus;
+
   appearance: none;
   border: none;
   background: none;
   padding: 0;
   color: inherit;
   display: flex;
+  align-items: center;
 }
 
 .menu__toggle-icon {
@@ -23,23 +26,27 @@
   width: 10px;
   height: 10px;
   margin-left: 5px;
+
+  &.is-open {
+    // Flip the indicator when the menu is open.
+    transform: rotateX(180deg);
+  }
 }
 
 // Triangular indicator at the top of the menu that associates it with the
 // toggle button.
 .menu__arrow {
-  $size: 10px;
+  color: $grey-3;
+  fill: white;
 
-  background-color: white;
-  border-left: 1px solid $grey-3;
-  border-top: 1px solid $grey-3;
-  height: $size;
+  // Position the arrow so that it appears flush with the right edge of the
+  // content when the menu is right-aligned, and the bottom of the arrow just
+  // overlaps the content's border. The effect is that the menu's border is a
+  // rounded rect with a notch at the top.
   position: absolute;
+  top: calc(100% - 2px); // nb. Adjust this if changing the <svg> size.
   right: 0;
-  top: 100%;
-  transform: rotate(45deg);
-  width: $size;
-  z-index: 3;
+  z-index: 2;
 }
 
 // Content area of the menu.
@@ -47,8 +54,10 @@
   background-color: white;
   border: 1px solid $grey-3;
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+  font-size: $body2-font-size;
   position: absolute;
   top: calc(100% + 5px);
+  z-index: 1;
 
   &--align-left {
     left: 0;

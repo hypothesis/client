@@ -11,7 +11,8 @@
 //    }
 //  }
 @mixin icons {
-  [class^="h-icon-"], [class*=" h-icon-"] {
+  [class^='h-icon-'],
+  [class*=' h-icon-'] {
     @content;
   }
 }

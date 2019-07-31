@@ -1,33 +1,10 @@
 {
-  "extends": [
-    "hypothesis",
-    "plugin:react/recommended"
-  ],
+  "extends": ["hypothesis"],
   "globals": {
     "Set": false
   },
   "rules": {
-    "mocha/no-exclusive-tests": "error",
-    "no-var": "error",
-    "indent": "off",
-    "react-hooks/rules-of-hooks": "error",
-    "react-hooks/exhaustive-deps": "error"
-  },
-  "parserOptions": {
-    "ecmaVersion": 2018,
-    "ecmaFeatures": {
-      "jsx": true
-    }
-  },
-  "plugins": [
-    "mocha",
-    "react",
-    "react-hooks"
-  ],
-  "settings": {
-    "react": {
-      "pragma": "createElement",
-      "version": "16.8"
-    }
+    // Suppressed to make ESLint v6 migration easier.
+    "no-prototype-builtins": "off"
   }
 }

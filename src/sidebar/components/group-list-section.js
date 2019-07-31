@@ -1,49 +1,48 @@
 'use strict';
 
-const { Fragment, createElement } = require('preact');
+const { createElement } = require('preact');
 const propTypes = require('prop-types');
 
 const GroupListItem = require('./group-list-item');
-const GroupListItemOutOfScope = require('./group-list-item-out-of-scope');
+const MenuSection = require('./menu-section');
 
 /**
  * A labeled section of the groups list.
  */
-function GroupListSection({ groups, heading }) {
-  const isSelectable = groupId => {
-    const group = groups.find(g => g.id === groupId);
-    return !group.scopes.enforced || group.isScopedToUri;
-  };
-
+function GroupListSection({ expandedGroup, onExpandGroup, groups, heading }) {
   return (
-    <Fragment>
-      <h2 className="group-list-section__heading">{heading}</h2>
-      <ul className="group-list-section__content">
-        {groups.map(group => (
-          <li
-            className="dropdown-menu__row dropdown-menu__row--no-border dropdown-menu__row--unpadded"
-            key={group.id}
-          >
-            {isSelectable(group.id) ? (
-              <GroupListItem className="group-list-item" group={group} />
-            ) : (
-              <GroupListItemOutOfScope
-                className="group-list-item-out-of-scope"
-                group={group}
-              />
-            )}
-          </li>
-        ))}
-      </ul>
-    </Fragment>
+    <MenuSection heading={heading}>
+      {groups.map(group => (
+        <GroupListItem
+          key={group.id}
+          isExpanded={group === expandedGroup}
+          onExpand={expanded => onExpandGroup(expanded ? group : null)}
+          group={group}
+        />
+      ))}
+    </MenuSection>
   );
 }
 
 GroupListSection.propTypes = {
+  /**
+   * The `Group` whose submenu is currently expanded, or `null` if no group
+   * is currently expanded.
+   */
+  expandedGroup: propTypes.object,
   /* The list of groups to be displayed in the group list section. */
   groups: propTypes.arrayOf(propTypes.object),
   /* The string name of the group list section. */
   heading: propTypes.string,
+  /**
+   * Callback invoked when a group is expanded or collapsed.
+   *
+   * The argument is the group being expanded, or `null` if the expanded group
+   * is being collapsed.
+   *
+   * @type {(group: Group|null) => any}
+   */
+  onExpandGroup: propTypes.func,
 };
 
 module.exports = GroupListSection;

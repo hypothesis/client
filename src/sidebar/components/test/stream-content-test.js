@@ -94,17 +94,13 @@ describe('StreamContentController', function() {
   });
 
   function createController() {
-    return $componentController(
-      'streamContent',
-      {},
-      {
-        search: {
-          query: sinon.stub(),
-          update: sinon.stub(),
-        },
-      }
-    );
+    return $componentController('streamContent', {}, {});
   }
+
+  it('clears any existing annotations when the /stream route is loaded', () => {
+    createController();
+    assert.calledOnce(fakeStore.clearAnnotations);
+  });
 
   it('calls the search API with `_separate_replies: true`', function() {
     createController();
@@ -144,7 +140,10 @@ describe('StreamContentController', function() {
     it('does not reload the route if the query did not change', function() {
       fakeRouteParams.q = 'test query';
       createController();
+      fakeStore.clearAnnotations.resetHistory();
+
       $rootScope.$broadcast('$routeUpdate');
+
       assert.notCalled(fakeStore.clearAnnotations);
       assert.notCalled(fakeRoute.reload);
     });

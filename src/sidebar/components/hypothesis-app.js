@@ -35,7 +35,6 @@ function authStateFromProfile(profile) {
 // @ngInject
 function HypothesisAppController(
   $document,
-  $location,
   $rootScope,
   $route,
   $scope,
@@ -44,15 +43,13 @@ function HypothesisAppController(
   store,
   auth,
   bridge,
-  drafts,
   features,
   flash,
   frameSync,
   groups,
   serviceUrl,
   session,
-  settings,
-  streamer
+  settings
 ) {
   const self = this;
 
@@ -72,16 +69,6 @@ function HypothesisAppController(
   if (this.isSidebar) {
     frameSync.connect();
   }
-
-  this.sortKey = function() {
-    return store.getState().sortKey;
-  };
-
-  this.sortKeysAvailable = function() {
-    return store.getState().sortKeysAvailable;
-  };
-
-  this.setSortKey = store.setSortKey;
 
   // Reload the view when the user switches accounts
   $scope.$on(events.USER_CHANGED, function(event, data) {
@@ -161,18 +148,19 @@ function HypothesisAppController(
   const promptToLogout = function() {
     // TODO - Replace this with a UI which doesn't look terrible.
     let text = '';
-    if (drafts.count() === 1) {
+    const drafts = store.countDrafts();
+    if (drafts === 1) {
       text =
         'You have an unsaved annotation.\n' +
         'Do you really want to discard this draft?';
-    } else if (drafts.count() > 1) {
+    } else if (drafts > 1) {
       text =
         'You have ' +
-        drafts.count() +
+        drafts +
         ' unsaved annotations.\n' +
         'Do you really want to discard these drafts?';
     }
-    return drafts.count() === 0 || $window.confirm(text);
+    return drafts === 0 || $window.confirm(text);
   };
 
   // Log the user out.
@@ -180,11 +168,12 @@ function HypothesisAppController(
     if (!promptToLogout()) {
       return;
     }
+
     store.clearGroups();
-    drafts.unsaved().forEach(function(draft) {
-      $rootScope.$emit(events.ANNOTATION_DELETED, draft);
+    store.unsavedAnnotations().forEach(function(annotation) {
+      $rootScope.$emit(events.ANNOTATION_DELETED, annotation);
     });
-    drafts.discard();
+    store.discardAllDrafts();
 
     if (serviceConfig(settings)) {
       // Let the host page handle the signup request
@@ -194,18 +183,6 @@ function HypothesisAppController(
 
     session.logout();
   };
-
-  this.search = {
-    query: function() {
-      return store.getState().filterQuery;
-    },
-    update: function(query) {
-      store.setFilterQuery(query);
-    },
-  };
-
-  this.countPendingUpdates = streamer.countPendingUpdates;
-  this.applyPendingUpdates = streamer.applyPendingUpdates;
 }
 
 module.exports = {

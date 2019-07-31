@@ -10,8 +10,9 @@
     <div class="annotation-thread__thread-line"></div>
   </div>
   <div class="annotation-thread__content">
-    <moderation-banner annotation="vm.thread.annotation"
-                       ng-if="vm.thread.annotation">
+    <moderation-banner
+      annotation="vm.thread.annotation"
+      ng-if="vm.thread.annotation">
     </moderation-banner>
     <annotation ng-class="vm.annotationClasses()"
              annotation="vm.thread.annotation"
@@ -50,7 +51,7 @@
           show-document-info="false"
           thread="child"
           on-change-collapsed="vm.onChangeCollapsed({id:id, collapsed:collapsed})"
-          on-force-visible="vm.onForceVisible({thread:thread})">
+          on-force-visible="vm.onForceVisible(thread)">
         </annotation-thread>
       </li>
     </ul>

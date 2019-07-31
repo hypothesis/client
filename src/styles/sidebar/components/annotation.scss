@@ -1,9 +1,8 @@
-@import "../../mixins/icons";
+@import '../../mixins/icons';
 
 // Highlight quote of annotation whenever its thread is hovered
 .thread-list__card:hover .annotation-quote {
   border-left: $highlight 3px solid;
-  color: $grey-5;
 }
 
 // When hovering a top-level annotation, show the footer in a hovered state.
@@ -17,7 +16,7 @@
     color: $grey-6;
   }
 
-  .annotation-header__timestamp {
+  .annotation-header__timestamp-link {
     color: $grey-5;
   }
 }
@@ -29,19 +28,17 @@
 }
 
 .annotation.is-dimmed {
-  // Lighten the username and bodies of dimmed annotations to make other
+  // Lighten the bodies of dimmed annotations to make other
   // annotations which are not dimmed stand out
-  .annotation-header__user,
   .annotation-body {
     color: $grey-5;
   }
 }
 
 .annotation.is-highlighted {
-  // Slightly darken the username and bodies of highlighted annotations to
+  // Slightly darken the bodies of highlighted annotations to
   // make them stand out next to others, which will have the `is-dimmed` state
   // set
-  .annotation-header__user,
   .annotation-body {
     color: $grey-7;
   }
@@ -62,33 +59,8 @@
 }
 
 .annotation-quote-list,
-.annotation-header,
 .annotation-footer {
   @include pie-clearfix;
-}
-
-.annotation-header {
-  display: flex;
-  flex-direction: row;
-  align-items: baseline;
-  // Margin between top of x-height of username and
-  // top of the annotation card should be ~15px
-  margin-top: -$layout-h-margin + 10px;
-}
-
-.annotation-header__share-info {
-  color: $grey-5;
-  @include font-normal;
-}
-
-.annotation-header__group {
-  color: $color-gray;
-  font-size: $body1-font-size;
-}
-
-.annotation-header__group-name {
-  display: inline-block;
-  margin-left: 5px;
 }
 
 .annotation-body {
@@ -118,7 +90,10 @@
   height: 60px;
   background: repeating-linear-gradient(
     to bottom,
-    $grey-2, $grey-2 15px, white 15px, white 20px
+    $grey-2,
+    $grey-2 15px,
+    white 15px,
+    white 20px
   );
 }
 
@@ -152,12 +127,6 @@
   height: 208px;
 }
 
-.annotation-header__user {
-  @include font-normal;
-  color: $grey-7;
-  font-weight: bold;
-}
-
 .annotation-replies {
   float: left;
   margin-top: 2px;
@@ -167,11 +136,6 @@
 .annotation-replies__count {
   @include font-normal;
   color: $grey-5;
-}
-
-.annotation-header__timestamp {
-  @include font-small;
-  color: $grey-4;
 }
 
 .annotation-actions {
@@ -232,13 +196,14 @@
     margin: 0;
   }
 
-  .annotation-body, .annotation-footer {
+  .annotation-body,
+  .annotation-footer {
     display: none;
   }
 
   .annotation-collapsed-replies {
     display: inline;
-    margin-left: .25em;
+    margin-left: 0.25em;
   }
 }
 

@@ -5,33 +5,6 @@ const EventEmitter = require('tiny-emitter');
 
 const events = require('../../events');
 const sidebarContent = require('../sidebar-content');
-const uiConstants = require('../../ui-constants');
-const util = require('../../directive/test/util');
-
-let searchClients;
-
-class FakeSearchClient extends EventEmitter {
-  constructor(searchFn, opts) {
-    super();
-
-    assert.ok(searchFn);
-    searchClients.push(this);
-    this.cancel = sinon.stub();
-    this.incremental = !!opts.incremental;
-
-    this.get = sinon.spy(function(query) {
-      assert.ok(query.uri);
-
-      for (let i = 0; i < query.uri.length; i++) {
-        const uri = query.uri[i];
-        this.emit('results', [{ id: uri + '123', group: '__world__' }]);
-        this.emit('results', [{ id: uri + '456', group: 'private-group' }]);
-      }
-
-      this.emit('end');
-    });
-  }
-}
 
 class FakeRootThread extends EventEmitter {
   constructor() {
@@ -48,16 +21,11 @@ describe('sidebar.components.sidebar-content', function() {
   let store;
   let ctrl;
   let fakeAnalytics;
-  let fakeAnnotationMapper;
-  let fakeDrafts;
-  let fakeFeatures;
+  let fakeAnnotations;
   let fakeFrameSync;
-  let fakeGroups;
   let fakeRootThread;
   let fakeSettings;
-  let fakeApi;
   let fakeStreamer;
-  let fakeStreamFilter;
   let sandbox;
 
   before(function() {
@@ -71,7 +39,6 @@ describe('sidebar.components.sidebar-content', function() {
 
   beforeEach(() => {
     angular.mock.module(function($provide) {
-      searchClients = [];
       sandbox = sinon.sandbox.create();
 
       fakeAnalytics = {
@@ -79,22 +46,9 @@ describe('sidebar.components.sidebar-content', function() {
         events: {},
       };
 
-      fakeAnnotationMapper = {
-        loadAnnotations: sandbox.stub(),
-        unloadAnnotations: sandbox.stub(),
-      };
-
       fakeFrameSync = {
         focusAnnotations: sinon.stub(),
         scrollToAnnotation: sinon.stub(),
-      };
-
-      fakeDrafts = {
-        unsaved: sandbox.stub().returns([]),
-      };
-
-      fakeFeatures = {
-        flagEnabled: sandbox.stub().returns(true),
       };
 
       fakeStreamer = {
@@ -103,40 +57,20 @@ describe('sidebar.components.sidebar-content', function() {
         reconnect: sandbox.stub(),
       };
 
-      fakeStreamFilter = {
-        resetFilter: sandbox.stub().returnsThis(),
-        addClause: sandbox.stub().returnsThis(),
-        getFilter: sandbox.stub().returns({}),
-      };
-
-      fakeGroups = {
-        focused: sinon.stub().returns({ id: 'foo' }),
-        focus: sinon.stub(),
+      fakeAnnotations = {
+        load: sinon.stub(),
       };
 
       fakeRootThread = new FakeRootThread();
 
       fakeSettings = {};
 
-      fakeApi = {
-        search: sinon.stub(),
-      };
-
       $provide.value('analytics', fakeAnalytics);
-      $provide.value('annotationMapper', fakeAnnotationMapper);
-      $provide.value('api', fakeApi);
-      $provide.value('drafts', fakeDrafts);
-      $provide.value('features', fakeFeatures);
       $provide.value('frameSync', fakeFrameSync);
       $provide.value('rootThread', fakeRootThread);
       $provide.value('streamer', fakeStreamer);
-      $provide.value('streamFilter', fakeStreamFilter);
-      $provide.value('groups', fakeGroups);
+      $provide.value('annotations', fakeAnnotations);
       $provide.value('settings', fakeSettings);
-    });
-
-    sidebarContent.$imports.$mock({
-      '../search-client': FakeSearchClient,
     });
   });
 
@@ -150,25 +84,17 @@ describe('sidebar.components.sidebar-content', function() {
     });
   }
 
-  function createSidebarContent(
-    { userid } = { userid: 'acct:person@example.com' }
-  ) {
-    return util.createDirective(document, 'sidebarContent', {
-      auth: {
-        status: userid ? 'logged-in' : 'logged-out',
-        userid: userid,
-      },
-      search: sinon.stub().returns({ query: sinon.stub() }),
-      onLogin: sinon.stub(),
-    });
-  }
-
   const makeSidebarContentController = () => {
     angular.mock.inject(function($componentController, _store_, _$rootScope_) {
       $rootScope = _$rootScope_;
       $scope = $rootScope.$new();
+
       store = _store_;
       store.updateFrameAnnotationFetchStatus = sinon.stub();
+      store.clearGroups();
+      store.loadGroups([{ id: 'group-id' }]);
+      store.focusGroup('group-id');
+
       ctrl = $componentController(
         'sidebarContent',
         { $scope: $scope },
@@ -187,55 +113,30 @@ describe('sidebar.components.sidebar-content', function() {
     return sandbox.restore();
   });
 
-  describe('clearSelection', () => {
-    it('sets selectedTab to Annotations tab if selectedTab is null', () => {
-      store.selectTab(uiConstants.TAB_ORPHANS);
-      $scope.$digest();
-      ctrl.clearSelection();
-
-      assert.equal(store.getState().selectedTab, uiConstants.TAB_ANNOTATIONS);
+  describe('isLoading', () => {
+    it("returns true if the document's url isn't known", () => {
+      assert.isTrue(ctrl.isLoading());
     });
 
-    it('sets selectedTab to Annotations tab if selectedTab is set to orphans', () => {
-      store.selectTab(uiConstants.TAB_ORPHANS);
-      $scope.$digest();
-
-      ctrl.clearSelection();
-
-      assert.equal(store.getState().selectedTab, uiConstants.TAB_ANNOTATIONS);
+    it('returns true if annotations are still being fetched', () => {
+      setFrames([{ uri: 'http://www.example.com' }]);
+      store.annotationFetchStarted('tag:foo');
+      assert.isTrue(ctrl.isLoading());
     });
 
-    it('clears selected annotations', () => {
-      ctrl.clearSelection();
-
-      assert.equal(store.getState().selectedAnnotationMap, null);
-      assert.equal(store.getState().filterQuery, null);
-    });
-
-    it('clears the directLinkedGroupFetchFailed state', () => {
-      store.setDirectLinkedGroupFetchFailed();
-
-      ctrl.clearSelection();
-
-      assert.isFalse(store.getState().directLinkedGroupFetchFailed);
-    });
-
-    it('clears the direct linked IDs in the store', () => {
-      ctrl.clearSelection();
-
-      assert.equal(store.getState().directLinkedAnnotationId, null);
-      assert.equal(store.getState().directLinkedGroupId, null);
+    it('returns false if annotations have been fetched', () => {
+      setFrames([{ uri: 'http://www.example.com' }]);
+      assert.isFalse(ctrl.isLoading());
     });
   });
 
   describe('showSelectedTabs', () => {
     beforeEach(() => {
       setFrames([{ uri: 'http://www.example.com' }]);
-      ctrl.search = { query: sinon.stub().returns(undefined) };
     });
 
     it('returns false if there is a search query', () => {
-      ctrl.search = { query: sinon.stub().returns('tag:foo') };
+      store.setFilterQuery('tag:foo');
       assert.isFalse(ctrl.showSelectedTabs());
     });
 
@@ -257,228 +158,16 @@ describe('sidebar.components.sidebar-content', function() {
     });
   });
 
-  describe('#loadAnnotations', function() {
-    it('unloads any existing annotations', function() {
-      // When new clients connect, all existing annotations should be unloaded
-      // before reloading annotations for each currently-connected client
-      store.addAnnotations([{ id: '123' }]);
-      const uri1 = 'http://example.com/page-a';
-      let frames = [{ uri: uri1 }];
-      setFrames(frames);
-      $scope.$digest();
-      fakeAnnotationMapper.unloadAnnotations = sandbox.spy();
-      const uri2 = 'http://example.com/page-b';
-      frames = frames.concat({ uri: uri2 });
-      setFrames(frames);
-      $scope.$digest();
-      assert.calledWith(
-        fakeAnnotationMapper.unloadAnnotations,
-        store.getState().annotations
-      );
-    });
-
-    it('loads all annotations for a frame', function() {
-      const uri = 'http://example.com';
-      setFrames([{ uri: uri }]);
-      $scope.$digest();
-      const loadSpy = fakeAnnotationMapper.loadAnnotations;
-      assert.calledWith(loadSpy, [sinon.match({ id: uri + '123' })]);
-      assert.calledWith(loadSpy, [sinon.match({ id: uri + '456' })]);
-    });
-
-    it('loads all annotations for a frame with multiple urls', function() {
-      const uri = 'http://example.com/test.pdf';
-      const fingerprint = 'urn:x-pdf:fingerprint';
-      setFrames([
-        {
-          uri: uri,
-          metadata: {
-            documentFingerprint: 'fingerprint',
-            link: [
-              {
-                href: fingerprint,
-              },
-              {
-                href: uri,
-              },
-            ],
-          },
-        },
-      ]);
-      $scope.$digest();
-      const loadSpy = fakeAnnotationMapper.loadAnnotations;
-
-      assert.calledWith(loadSpy, [sinon.match({ id: uri + '123' })]);
-      assert.calledWith(loadSpy, [sinon.match({ id: fingerprint + '123' })]);
-      assert.calledWith(loadSpy, [sinon.match({ id: uri + '456' })]);
-      assert.calledWith(loadSpy, [sinon.match({ id: fingerprint + '456' })]);
-    });
-
-    it('loads all annotations for all frames', function() {
-      const uris = ['http://example.com', 'http://foobar.com'];
-      setFrames(
-        uris.map(function(uri) {
-          return { uri: uri };
-        })
-      );
-      $scope.$digest();
-      const loadSpy = fakeAnnotationMapper.loadAnnotations;
-      assert.calledWith(loadSpy, [sinon.match({ id: uris[0] + '123' })]);
-      assert.calledWith(loadSpy, [sinon.match({ id: uris[0] + '456' })]);
-      assert.calledWith(loadSpy, [sinon.match({ id: uris[1] + '123' })]);
-      assert.calledWith(loadSpy, [sinon.match({ id: uris[1] + '456' })]);
-    });
-
-    it('updates annotation fetch status for all frames', function() {
-      const frameUris = ['http://example.com', 'http://foobar.com'];
-      setFrames(
-        frameUris.map(function(frameUri) {
-          return { uri: frameUri };
-        })
-      );
-      $scope.$digest();
-      const updateSpy = store.updateFrameAnnotationFetchStatus;
-      assert.isTrue(updateSpy.calledWith(frameUris[0], true));
-      assert.isTrue(updateSpy.calledWith(frameUris[1], true));
-    });
-
-    context('when there is a direct-linked group error', () => {
-      beforeEach(() => {
-        setFrames([{ uri: 'http://www.example.com' }]);
-        fakeSettings.group = 'group-id';
-        store.setDirectLinkedGroupFetchFailed();
-        $scope.$digest();
-      });
-
-      [null, 'acct:person@example.com'].forEach(userid => {
-        it('displays same group error message regardless of login state', () => {
-          const element = createSidebarContent({ userid });
-
-          const sidebarContentError = element.find('.sidebar-content-error');
-          const errorMessage = sidebarContentError.attr(
-            'logged-in-error-message'
-          );
-
-          assert.equal(errorMessage, "'This group is not available.'");
-        });
-      });
-
-      it('areAllAnnotationsVisible returns true since there is an error message', () => {
-        assert.isTrue(ctrl.areAllAnnotationsVisible());
-      });
-
-      it('selectedGroupUnavailable returns true', () => {
-        assert.isTrue(ctrl.selectedGroupUnavailable());
-      });
-    });
-
-    context('when there is a direct-linked group selection', () => {
-      beforeEach(() => {
-        setFrames([{ uri: 'http://www.example.com' }]);
-        fakeSettings.group = 'group-id';
-        store.loadGroups([{ id: fakeSettings.group }]);
-        store.focusGroup(fakeSettings.group);
-        fakeGroups.focused.returns({ id: fakeSettings.group });
-        $scope.$digest();
-      });
-
-      it('areAllAnnotationsVisible returns false since group has no annotations', () => {
-        assert.isFalse(ctrl.areAllAnnotationsVisible());
-      });
-
-      it('selectedGroupUnavailable returns false', () => {
-        assert.isFalse(ctrl.selectedGroupUnavailable());
-      });
-
-      it('fetches annotations for the direct-linked group', () => {
-        assert.calledWith(searchClients[0].get, {
-          uri: ['http://www.example.com'],
-          group: 'group-id',
-        });
-      });
-    });
-
-    context('when there is a direct-linked annotation selection', function() {
-      const uri = 'http://example.com';
-      const id = uri + '123';
-
-      beforeEach(function() {
-        setFrames([{ uri: uri }]);
-        store.selectAnnotations([id]);
-        $scope.$digest();
-      });
-
-      it('areAllAnnotationsVisible is true', function() {
-        assert.isTrue(ctrl.areAllAnnotationsVisible());
-      });
-
-      it("switches to the selected annotation's group", function() {
-        assert.calledWith(fakeGroups.focus, '__world__');
-        assert.calledOnce(fakeAnnotationMapper.loadAnnotations);
-        assert.calledWith(fakeAnnotationMapper.loadAnnotations, [
-          { id: uri + '123', group: '__world__' },
-        ]);
-      });
-
-      it('fetches annotations for all groups', function() {
-        assert.calledWith(searchClients[0].get, { uri: [uri], group: null });
-      });
-
-      it('loads annotations in one batch', function() {
-        assert.notOk(searchClients[0].incremental);
-      });
-    });
-
-    context('when there is no selection', function() {
-      const uri = 'http://example.com';
-
-      beforeEach(function() {
-        setFrames([{ uri: uri }]);
-        fakeGroups.focused.returns({ id: 'a-group' });
-        $scope.$digest();
-      });
-
-      it('areAllAnnotationsVisible is false', function() {
-        assert.isFalse(ctrl.areAllAnnotationsVisible());
-      });
-
-      it('fetches annotations for the current group', function() {
-        assert.calledWith(searchClients[0].get, {
-          uri: [uri],
-          group: 'a-group',
-        });
-      });
-
-      it('loads annotations in batches', function() {
-        assert.ok(searchClients[0].incremental);
-      });
-    });
-
-    context('when the selected annotation is not available', function() {
-      const uri = 'http://example.com';
-      const id = uri + 'does-not-exist';
-
-      beforeEach(function() {
-        setFrames([{ uri: uri }]);
-        store.selectAnnotations([id]);
-        fakeGroups.focused.returns({ id: 'private-group' });
-        $scope.$digest();
-      });
-
-      it('loads annotations from the focused group instead', function() {
-        assert.calledWith(fakeGroups.focus, 'private-group');
-        assert.calledWith(fakeAnnotationMapper.loadAnnotations, [
-          { group: 'private-group', id: 'http://example.com456' },
-        ]);
-      });
-    });
-  });
-
   function connectFrameAndPerformInitialFetch() {
     setFrames([{ uri: 'https://a-page.com' }]);
     $scope.$digest();
-    fakeAnnotationMapper.loadAnnotations.reset();
+    fakeAnnotations.load.reset();
   }
+
+  it('generates the thread list', () => {
+    const thread = fakeRootThread.thread(store.getState());
+    assert.equal(ctrl.rootThread(), thread);
+  });
 
   context('when the search URIs of connected frames change', () => {
     beforeEach(connectFrameAndPerformInitialFetch);
@@ -488,7 +177,11 @@ describe('sidebar.components.sidebar-content', function() {
 
       $scope.$digest();
 
-      assert.called(fakeAnnotationMapper.loadAnnotations);
+      assert.calledWith(
+        fakeAnnotations.load,
+        ['https://a-page.com', 'https://new-frame.com'],
+        'group-id'
+      );
     });
   });
 
@@ -503,7 +196,11 @@ describe('sidebar.components.sidebar-content', function() {
       store.updateSession(newProfile);
       $scope.$digest();
 
-      assert.called(fakeAnnotationMapper.loadAnnotations);
+      assert.calledWith(
+        fakeAnnotations.load,
+        ['https://a-page.com'],
+        'group-id'
+      );
     });
 
     it('does not reload annotations if the user ID is the same', () => {
@@ -516,7 +213,7 @@ describe('sidebar.components.sidebar-content', function() {
       store.updateSession(newProfile);
       $scope.$digest();
 
-      assert.notCalled(fakeAnnotationMapper.loadAnnotations);
+      assert.notCalled(fakeAnnotations.load);
     });
   });
 
@@ -545,33 +242,30 @@ describe('sidebar.components.sidebar-content', function() {
       // annotations loaded.
       store.addAnnotations([{ id: '123' }]);
       store.addAnnotations = sinon.stub();
-      fakeDrafts.unsaved.returns([{ id: uri + '123' }, { id: uri + '456' }]);
       setFrames([{ uri: uri }]);
       $scope.$digest();
+      fakeAnnotations.load = sinon.stub();
     });
 
-    function changeGroup() {
-      fakeGroups.focused.returns({ id: 'different-group' });
-      $scope.$digest();
-    }
-
     it('should load annotations for the new group', () => {
-      const loadSpy = fakeAnnotationMapper.loadAnnotations;
+      store.loadGroups([{ id: 'different-group' }]);
+      store.focusGroup('different-group');
 
-      changeGroup();
-
-      assert.calledWith(fakeAnnotationMapper.unloadAnnotations, [
-        sinon.match({ id: '123' }),
-      ]);
       $scope.$digest();
-      assert.calledWith(loadSpy, [sinon.match({ id: uri + '123' })]);
-      assert.calledWith(loadSpy, [sinon.match({ id: uri + '456' })]);
+
+      assert.calledWith(
+        fakeAnnotations.load,
+        ['http://example.com'],
+        'different-group'
+      );
     });
 
     it('should clear the selection', () => {
       store.selectAnnotations(['123']);
+      store.loadGroups([{ id: 'different-group' }]);
+      store.focusGroup('different-group');
 
-      changeGroup();
+      $scope.$digest();
 
       assert.isFalse(store.hasSelectedAnnotations());
     });
@@ -621,10 +315,9 @@ describe('sidebar.components.sidebar-content', function() {
     });
 
     it("doesn't show a message if the document isn't loaded yet", function() {
-      // No search requests have been sent yet.
-      searchClients = [];
       // There is a selection but the selected annotation isn't available.
       store.selectAnnotations(['missing']);
+      store.annotationFetchStarted();
       $scope.$digest();
 
       assert.isFalse(ctrl.selectedAnnotationUnavailable());
@@ -714,45 +407,6 @@ describe('sidebar.components.sidebar-content', function() {
         $rootScope.$broadcast(events.USER_CHANGED);
         assert.called(fakeStreamer.reconnect);
       });
-    });
-  });
-
-  describe('#forceVisible', function() {
-    it('shows the thread', function() {
-      const thread = { id: '1' };
-      ctrl.forceVisible(thread);
-      assert.deepEqual(store.getState().forceVisible, { 1: true });
-    });
-
-    it('uncollapses the parent', function() {
-      const thread = {
-        id: '2',
-        parent: { id: '3' },
-      };
-      assert.equal(store.getState().expanded[thread.parent.id], undefined);
-      ctrl.forceVisible(thread);
-      assert.equal(store.getState().expanded[thread.parent.id], true);
-    });
-  });
-
-  describe('#visibleCount', function() {
-    it('returns the total number of visible annotations or replies', function() {
-      fakeRootThread.thread.returns({
-        children: [
-          {
-            id: '1',
-            visible: true,
-            children: [{ id: '3', visible: true, children: [] }],
-          },
-          {
-            id: '2',
-            visible: false,
-            children: [],
-          },
-        ],
-      });
-      $scope.$digest();
-      assert.equal(ctrl.visibleCount(), 2);
     });
   });
 });

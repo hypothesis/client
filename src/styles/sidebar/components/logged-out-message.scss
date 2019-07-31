@@ -1,0 +1,32 @@
+.logged-out-message {
+  margin: 25px auto;
+  width: 70%;
+  text-align: center;
+  color: $grey-5;
+  display: flex;
+  flex-direction: column;
+}
+
+.logged-out-message__link {
+  text-decoration: underline;
+  color: $grey-5;
+
+  &:hover {
+    color: $grey-7;
+  }
+}
+
+.logged-out-message__logo {
+  margin-top: 25px;
+  display: flex;
+  justify-content: center;
+}
+
+.logged-out-message__logo-icon {
+  font-size: 30px;
+  color: $grey-4;
+
+  &:hover {
+    color: $grey-7;
+  }
+}

@@ -112,9 +112,7 @@ class ReactController {
 function wrapReactComponent(type) {
   if (!type.propTypes) {
     throw new Error(
-      `React component ${
-        type.name
-      } does not specify its inputs using "propTypes"`
+      `React component ${type.name} does not specify its inputs using "propTypes"`
     );
   }
 

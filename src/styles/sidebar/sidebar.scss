@@ -1,26 +1,36 @@
 $base-font-size: 12px;
 $base-line-height: 20px;
 
+// Variables and mixins
+// --------------------
 @import '../variables';
-@import '../reset';
+@import '../mixins/focus';
+@import '../mixins/responsive';
 
+// Base styles
+// -----------
+@import '../reset';
 @import './elements';
+
+// Misc. legacy :(
+// ---------------
 @import './common';
 
 // Components
 // ----------
 @import './components/annotation';
+@import './components/annotation-document-info';
+@import './components/annotation-header';
 @import './components/annotation-share-dialog';
+@import './components/annotation-share-info';
+@import './components/annotation-publish-control';
 @import './components/annotation-thread';
-@import './components/dropdown-menu-btn';
+@import './components/annotation-user';
 @import './components/excerpt';
 @import './components/group-list';
 @import './components/group-list-item';
-@import './components/group-list-item-out-of-scope';
-@import './components/group-list-section';
 @import './components/help-panel';
-@import './components/loggedout-message';
-@import './components/login-control';
+@import './components/logged-out-message';
 @import './components/markdown';
 @import './components/menu';
 @import './components/menu-item';
@@ -28,12 +38,12 @@ $base-line-height: 20px;
 @import './components/moderation-banner';
 @import './components/new-note';
 @import './components/primary-action-btn';
-@import './components/publish-annotation-btn';
 @import './components/search-status-bar';
 @import './components/selection-tabs';
 @import './components/share-link';
+@import './components/search-input';
 @import './components/sidebar-tutorial';
-@import './components/simple-search';
+@import './components/svg-icon';
 @import './components/spinner';
 @import './components/tags-input';
 @import './components/thread-list';
@@ -42,7 +52,8 @@ $base-line-height: 20px;
 
 // Top-level styles
 // ----------------
-html, body {
+html,
+body {
   height: 100%;
 }
 
@@ -96,7 +107,7 @@ hypothesis-app {
   border-radius: 2px;
   font-family: $sans-font-family;
   font-weight: 300;
-  margin-bottom: .72em;
+  margin-bottom: 0.72em;
   padding: 1em;
   position: relative;
   background-color: $body-background;
@@ -105,7 +116,9 @@ hypothesis-app {
     border: 1px none $gray-lighter;
     border-bottom-style: solid;
     padding: 0 0 1.1em;
-    li a { padding-bottom: .231em }
+    li a {
+      padding-bottom: 0.231em;
+    }
   }
 
   .close {

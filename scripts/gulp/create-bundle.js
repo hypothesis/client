@@ -20,14 +20,14 @@ const watchify = require('watchify');
 const log = gulpUtil.log;
 
 function streamFinished(stream) {
-  return new Promise(function (resolve, reject) {
+  return new Promise(function(resolve, reject) {
     stream.on('finish', resolve);
     stream.on('error', reject);
   });
 }
 
 function waitForever() {
-  return new Promise(function () {});
+  return new Promise(function() {});
 }
 
 /**
@@ -38,22 +38,25 @@ function waitForever() {
  * @param {string} trailerCode - Code added at the end of the wrapper function.
  * @return {Transform} - A Node `Transform` stream.
  */
-function wrapCodeWithFunction(headerCode, trailerCode='') {
+function wrapCodeWithFunction(headerCode, trailerCode = '') {
   const iifeStart = '(function() {' + headerCode + ';';
   const iifeEnd = ';' + trailerCode + '})()';
 
   let isFirstChunk = true;
-  return through(function (data, enc, callback) {
-    if (isFirstChunk) {
-      isFirstChunk = false;
-      this.push(Buffer.from(iifeStart));
+  return through(
+    function(data, enc, callback) {
+      if (isFirstChunk) {
+        isFirstChunk = false;
+        this.push(Buffer.from(iifeStart));
+      }
+      this.push(data);
+      callback();
+    },
+    function(callback) {
+      this.push(Buffer.from(iifeEnd));
+      callback();
     }
-    this.push(data);
-    callback();
-  }, function (callback) {
-    this.push(Buffer.from(iifeEnd));
-    callback();
-  });
+  );
 }
 
 /**
@@ -110,7 +113,7 @@ function useExternalRequireName(name) {
 module.exports = function createBundle(config, buildOpts) {
   mkdirp.sync(config.path);
 
-  buildOpts = buildOpts || {watch: false};
+  buildOpts = buildOpts || { watch: false };
 
   // Use a custom name for the "require" function that bundles use to export
   // and import modules from other bundles. This avoids conflicts with eg.
@@ -133,11 +136,7 @@ module.exports = function createBundle(config, buildOpts) {
     //
     // See node_modules/browserify/lib/builtins.js to find out which
     // modules provide the implementations of these.
-    builtins: [
-      'console',
-      '_process',
-      'querystring',
-    ],
+    builtins: ['console', '_process', 'querystring'],
     externalRequireName,
     insertGlobalVars: {
       // The Browserify polyfill for the `Buffer` global is large and
@@ -151,7 +150,7 @@ module.exports = function createBundle(config, buildOpts) {
       // `global` or `self` that is not an alias for `window`. See
       // https://github.com/hypothesis/h/issues/2723 and
       // https://github.com/hypothesis/client/issues/277
-      global: function () {
+      global: function() {
         return 'window';
       },
     },
@@ -165,7 +164,7 @@ module.exports = function createBundle(config, buildOpts) {
   // Specify modules that Browserify should not parse.
   // The 'noParse' array must contain full file paths,
   // not module names.
-  bundleOpts.noParse = (config.noParse || []).map(function (id) {
+  bundleOpts.noParse = (config.noParse || []).map(function(id) {
     // If package.json specifies a custom entry point for the module for
     // use in the browser, resolve that.
     const packageConfig = require('../../package.json');
@@ -184,7 +183,7 @@ module.exports = function createBundle(config, buildOpts) {
 
   const bundle = browserify([], bundleOpts);
 
-  (config.require || []).forEach(function (req) {
+  (config.require || []).forEach(function(req) {
     // When another bundle uses 'bundle.external(<module path>)',
     // the module path is rewritten relative to the
     // base directory and a '/' prefix is added, so
@@ -194,15 +193,17 @@ module.exports = function createBundle(config, buildOpts) {
     // In the bundle which provides './dir/module', we
     // therefore need to expose the module as '/dir/module'.
     if (req[0] === '.') {
-      bundle.require(req, {expose: req.slice(1)});
+      bundle.require(req, { expose: req.slice(1) });
     } else if (req[0] === '/') {
       // If the require path is absolute, the same rules as
       // above apply but the path needs to be relative to
       // the root of the repository
       const repoRootPath = path.join(__dirname, '../../');
-      const relativePath = path.relative(path.resolve(repoRootPath),
-        path.resolve(req));
-      bundle.require(req, {expose: '/' + relativePath});
+      const relativePath = path.relative(
+        path.resolve(repoRootPath),
+        path.resolve(req)
+      );
+      bundle.require(req, { expose: '/' + relativePath });
     } else {
       // this is a package under node_modules/, no
       // rewriting required.
@@ -213,7 +214,7 @@ module.exports = function createBundle(config, buildOpts) {
   bundle.add(config.entry || []);
   bundle.external(config.external || []);
 
-  (config.transforms || []).forEach(function (transform) {
+  (config.transforms || []).forEach(function(transform) {
     if (transform === 'coffee') {
       bundle.transform(coffeeify);
     }
@@ -223,49 +224,56 @@ module.exports = function createBundle(config, buildOpts) {
   });
 
   if (config.minify) {
-    bundle.transform({global: true}, uglifyify);
+    bundle.transform({ global: true }, uglifyify);
   }
 
   // Include or disable debugging checks in our code and dependencies by
   // replacing references to `process.env.NODE_ENV`.
-  bundle.transform(envify({
-    NODE_ENV: process.env.NODE_ENV || 'development',
-  }), {
-    // Ideally packages should configure this transform in their package.json
-    // file if they need it, but not all of them do.
-    global: true,
-  });
+  bundle.transform(
+    envify({
+      NODE_ENV: process.env.NODE_ENV || 'development',
+    }),
+    {
+      // Ideally packages should configure this transform in their package.json
+      // file if they need it, but not all of them do.
+      global: true,
+    }
+  );
 
   function build() {
     const output = fs.createWriteStream(bundlePath);
     const b = bundle.bundle();
-    b.on('error', function (err) {
+    b.on('error', function(err) {
       log('Build error', err.toString());
     });
-    const stream = (b
+    const stream = b
       .pipe(useExternalRequireName(externalRequireName))
       .pipe(exorcist(sourcemapPath))
-      .pipe(output));
+      .pipe(output);
     return streamFinished(stream);
   }
 
   if (buildOpts.watch) {
     bundle.plugin(watchify);
-    bundle.on('update', function (ids) {
+    bundle.on('update', function(ids) {
       const start = Date.now();
 
       log('Source files changed', ids);
-      build().then(function () {
-        log('Updated %s (%d ms)', bundleFileName, Date.now() - start);
-      }).catch(function (err) {
-        console.error('Building updated bundle failed:', err);
+      build()
+        .then(function() {
+          log('Updated %s (%d ms)', bundleFileName, Date.now() - start);
+        })
+        .catch(function(err) {
+          console.error('Building updated bundle failed:', err);
+        });
+    });
+    build()
+      .then(function() {
+        log('Built ' + bundleFileName);
+      })
+      .catch(function(err) {
+        console.error('Error building bundle:', err);
       });
-    });
-    build().then(function () {
-      log('Built ' + bundleFileName);
-    }).catch(function (err) {
-      console.error('Error building bundle:', err);
-    });
 
     return waitForever();
   } else {

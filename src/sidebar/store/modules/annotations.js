@@ -5,8 +5,10 @@
 
 'use strict';
 
+const { createSelector } = require('reselect');
+
 const arrayUtil = require('../../util/array-util');
-const metadata = require('../../annotation-metadata');
+const metadata = require('../../util/annotation-metadata');
 const uiConstants = require('../../ui-constants');
 
 const selection = require('./selection');
@@ -388,6 +390,38 @@ function findAnnotationByID(state, id) {
   return findByID(state.annotations, id);
 }
 
+/**
+ * Return the number of page notes.
+ */
+const noteCount = createSelector(
+  state => state.annotations,
+  annotations => arrayUtil.countIf(annotations, metadata.isPageNote)
+);
+
+/**
+ * Returns the number of annotations (as opposed to notes or orphans).
+ */
+const annotationCount = createSelector(
+  state => state.annotations,
+  annotations => arrayUtil.countIf(annotations, metadata.isAnnotation)
+);
+
+/**
+ * Returns the number of orphaned annotations.
+ */
+const orphanCount = createSelector(
+  state => state.annotations,
+  annotations => arrayUtil.countIf(annotations, metadata.isOrphan)
+);
+
+/**
+ * Returns true if some annotations have not been anchored yet.
+ */
+const isWaitingToAnchorAnnotations = createSelector(
+  state => state.annotations,
+  annotations => annotations.some(metadata.isWaitingToAnchor)
+);
+
 module.exports = {
   init: init,
   update: update,
@@ -403,6 +437,10 @@ module.exports = {
 
   selectors: {
     annotationExists,
+    noteCount,
+    annotationCount,
+    orphanCount,
+    isWaitingToAnchorAnnotations,
     findAnnotationByID,
     findIDsForTags,
     savedAnnotations,

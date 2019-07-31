@@ -1,7 +1,7 @@
 'use strict';
 
 const events = require('../events');
-const metadata = require('../annotation-metadata');
+const metadata = require('../util/annotation-metadata');
 
 /**
  * Component which displays a virtualized list of annotation threads.
@@ -49,7 +49,13 @@ const virtualThreadOptions = {
 };
 
 // @ngInject
-function ThreadListController($element, $scope, settings, VirtualThreadList) {
+function ThreadListController(
+  $element,
+  $scope,
+  settings,
+  store,
+  VirtualThreadList
+) {
   // `visibleThreads` keeps track of the subset of all threads matching the
   // current filters which are in or near the viewport and the view then renders
   // only those threads, using placeholders above and below the visible threads
@@ -162,7 +168,7 @@ function ThreadListController($element, $scope, settings, VirtualThreadList) {
     if (annotation.$highlight || metadata.isReply(annotation)) {
       return;
     }
-    self.onClearSelection();
+    store.clearSelection();
     scrollIntoView(annotation.$tag);
   });
 
@@ -185,19 +191,12 @@ module.exports = {
     thread: '<',
     showDocumentInfo: '<',
 
-    /**
-     * Called when the user clicks a link to show an annotation that does not
-     * match the current filter.
-     */
-    onForceVisible: '&',
     /** Called when the user focuses an annotation by hovering it. */
     onFocus: '&',
     /** Called when a user selects an annotation. */
     onSelect: '&',
     /** Called when a user toggles the expansion state of an annotation thread. */
     onChangeCollapsed: '&',
-    /** Called to clear the current selection. */
-    onClearSelection: '&',
   },
   template: require('../templates/thread-list.html'),
 };

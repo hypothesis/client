@@ -15,15 +15,16 @@
   width: 200px;
   font-size: $body1-font-size;
   cursor: default;
-  box-shadow: 0px 0px 4px 0px rgba(0,0,0,0.15);
+  box-shadow: 0px 0px 4px 0px rgba(0, 0, 0, 0.15);
 
   // Styling for the dialog box tail pointing down at the
   // 'Share' button
-  &:after, &:before {
+  &:after,
+  &:before {
     top: 100%;
     right: 10px;
     border: solid transparent;
-    content: " ";
+    content: ' ';
     height: 0;
     width: 0;
     position: absolute;

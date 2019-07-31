@@ -9,6 +9,14 @@ const { listen } = require('../util/dom');
 
 const SvgIcon = require('./svg-icon');
 
+// The triangular indicator below the menu toggle button that visually links it
+// to the menu content.
+const menuArrow = className => (
+  <svg className={classnames('menu__arrow', className)} width={15} height={8}>
+    <path d="M0 8 L7 0 L15 8" stroke="currentColor" strokeWidth="2" />
+  </svg>
+);
+
 /**
  * Flag indicating whether the next click event on the menu's toggle button
  * should be ignored, because the action it would trigger has already been
@@ -36,13 +44,26 @@ let ignoreNextClick = false;
  */
 function Menu({
   align = 'left',
+  arrowClass = '',
   children,
+  containerPositioned = true,
+  contentClass,
   defaultOpen = false,
   label,
+  onOpenChanged,
   menuIndicator = true,
   title,
 }) {
   const [isOpen, setOpen] = useState(defaultOpen);
+
+  // Notify parent when menu is opened or closed.
+  const wasOpen = useRef(isOpen);
+  useEffect(() => {
+    if (typeof onOpenChanged === 'function' && wasOpen.current !== isOpen) {
+      wasOpen.current = isOpen;
+      onOpenChanged(isOpen);
+    }
+  }, [isOpen, onOpenChanged]);
 
   // Toggle menu when user presses toggle button. The menu is shown on mouse
   // press for a more responsive/native feel but also handles a click event for
@@ -73,32 +94,78 @@ function Menu({
       return () => {};
     }
 
-    const removeListeners = listen(
+    // Close menu when user presses Escape key, regardless of focus.
+    const removeKeypressListener = listen(
       document.body,
-      ['keypress', 'click', 'mousedown'],
+      ['keypress'],
       event => {
-        if (event.type === 'keypress' && event.key !== 'Escape') {
-          return;
+        if (event.key === 'Escape') {
+          closeMenu();
         }
-        if (
-          event.type === 'mousedown' &&
-          menuRef.current &&
-          menuRef.current.contains(event.target)
-        ) {
-          // Close the menu as soon as the user _presses_ the mouse outside the
-          // menu, but only when they _release_ the mouse if they click inside
-          // the menu.
-          return;
-        }
-        closeMenu();
       }
     );
 
-    return removeListeners;
+    // Close menu if user focuses an element outside the menu via any means
+    // (key press, programmatic focus change).
+    const removeFocusListener = listen(
+      document.body,
+      'focus',
+      event => {
+        if (!menuRef.current.contains(event.target)) {
+          closeMenu();
+        }
+      },
+      { useCapture: true }
+    );
+
+    // Close menu if user clicks outside menu, even if on an element which
+    // does not accept focus.
+    const removeClickListener = listen(
+      document.body,
+      ['mousedown', 'click'],
+      event => {
+        // nb. Mouse events inside the current menu are handled elsewhere.
+        if (!menuRef.current.contains(event.target)) {
+          closeMenu();
+        }
+      },
+      { useCapture: true }
+    );
+
+    return () => {
+      removeKeypressListener();
+      removeClickListener();
+      removeFocusListener();
+    };
   }, [closeMenu, isOpen]);
 
+  const stopPropagation = e => e.stopPropagation();
+
+  // Close menu if user presses a key which activates menu items.
+  const handleMenuKeyPress = event => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      closeMenu();
+    }
+  };
+
+  const containerStyle = {
+    position: containerPositioned ? 'relative' : 'static',
+  };
+
   return (
-    <div className="menu" ref={menuRef}>
+    <div
+      className="menu"
+      ref={menuRef}
+      // Add inline styles for positioning
+      style={containerStyle}
+      // Don't close the menu if the mouse is released over one of the menu
+      // elements outside the content area (eg. the arrow at the top of the
+      // content).
+      onClick={stopPropagation}
+      // Don't close the menu if the user presses the mouse down on menu elements
+      // except for the toggle button.
+      onMouseDown={stopPropagation}
+    >
       <button
         aria-expanded={isOpen ? 'true' : 'false'}
         aria-haspopup={true}
@@ -109,20 +176,25 @@ function Menu({
       >
         {label}
         {menuIndicator && (
-          <span className="menu__toggle-arrow">
+          <span
+            className={classnames('menu__toggle-arrow', isOpen && 'is-open')}
+          >
             <SvgIcon name="expand-menu" className="menu__toggle-icon" />
           </span>
         )}
       </button>
       {isOpen && (
         <Fragment>
-          <div className="menu__arrow" />
+          {menuArrow(arrowClass)}
           <div
             className={classnames(
               'menu__content',
-              `menu__content--align-${align}`
+              `menu__content--align-${align}`,
+              contentClass
             )}
             role="menu"
+            onClick={closeMenu}
+            onKeyPress={handleMenuKeyPress}
           >
             {children}
           </div>
@@ -140,9 +212,19 @@ Menu.propTypes = {
   align: propTypes.oneOf(['left', 'right']),
 
   /**
+   * Additional CSS class for the arrow caret at the edge of the menu
+   * content that "points" toward the menu's toggle button. This can be used
+   * to adjust the position of that caret respective to the toggle button.
+   */
+  arrowClass: propTypes.string,
+
+  /**
    * Label element for the toggle button that hides and shows the menu.
    */
-  label: propTypes.object.isRequired,
+  label: propTypes.oneOfType([
+    propTypes.object.isRequired,
+    propTypes.string.isRequired,
+  ]),
 
   /**
    * Menu items and sections to display in the content area of the menu.
@@ -150,15 +232,31 @@ Menu.propTypes = {
    * These are typically `MenuSection` and `MenuItem` components, but other
    * custom content is also allowed.
    */
-  children: propTypes.oneOfType([
-    propTypes.object,
-    propTypes.arrayOf(propTypes.object),
-  ]),
+  children: propTypes.any,
+
+  /**
+   * Whether the menu elements should be positioned relative to the Menu
+   * container. When `false`, the consumer is responsible for positioning.
+   */
+  containerPositioned: propTypes.bool,
+
+  /**
+   * Additional CSS classes to apply to the menu.
+   */
+  contentClass: propTypes.string,
 
   /**
    * Whether the menu is open or closed when initially rendered.
    */
   defaultOpen: propTypes.bool,
+
+  /**
+   * Callback invoked when the menu is opened or closed.
+   *
+   * This can be used, for example, to reset any ephemeral state that the
+   * menu content may have.
+   */
+  onOpenChanged: propTypes.func,
 
   /**
    * A title for the menu. This is important for accessibility if the menu's

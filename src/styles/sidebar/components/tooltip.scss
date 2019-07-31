@@ -6,9 +6,9 @@
 @mixin tooltip-arrow($rotation) {
   transform: rotate($rotation);
   background: $grey-7;
-  border-bottom: 1px solid rgba(0,0,0,0.20);
-  border-right: 1px solid rgba(0,0,0,0.20);
-  content: "";
+  border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+  border-right: 1px solid rgba(0, 0, 0, 0.2);
+  content: '';
   display: block;
   height: 6px;
   left: 0;
@@ -40,14 +40,14 @@
 // Variant for tooltips above the target that point down at it
 .tooltip--down:before {
   @include tooltip-arrow(45deg);
-  content: "";
+  content: '';
   top: calc(100% - 5px);
 }
 
 // Variant for tooltips below the target that point up at it
 .tooltip--up:before {
   @include tooltip-arrow(225deg);
-  content: "";
+  content: '';
   top: -3px;
 }
 

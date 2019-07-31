@@ -45,6 +45,7 @@ const threadFixtures = immutable({
 });
 
 let fakeVirtualThread;
+let fakeStore;
 const fakeSettings = {};
 
 class FakeVirtualThreadList extends EventEmitter {
@@ -86,7 +87,6 @@ describe('threadList', function() {
   function createThreadList(inputs) {
     const defaultInputs = {
       thread: threadFixtures.thread,
-      onClearSelection: sinon.stub(),
       onForceVisible: sinon.stub(),
       onFocus: sinon.stub(),
       onSelect: sinon.stub(),
@@ -126,6 +126,10 @@ describe('threadList', function() {
   }
 
   before(function() {
+    fakeStore = {
+      clearSelection: sinon.stub(),
+    };
+
     angular.module('app', []).component('threadList', threadList);
   });
 
@@ -133,6 +137,7 @@ describe('threadList', function() {
     angular.mock.module('app', {
       VirtualThreadList: FakeVirtualThreadList,
       settings: fakeSettings,
+      store: fakeStore,
     });
     threadListContainers = [];
   });
@@ -201,13 +206,12 @@ describe('threadList', function() {
     });
 
     it('clears the selection', function() {
-      const inputs = { onClearSelection: sinon.stub() };
-      const element = createThreadList(inputs);
+      const element = createThreadList();
       element.scope.$broadcast(
         events.BEFORE_ANNOTATION_CREATED,
         annotFixtures.annotation
       );
-      assert.called(inputs.onClearSelection);
+      assert.called(fakeStore.clearSelection);
     });
   });
 

@@ -1,7 +1,7 @@
 'use strict';
 
 const buildThread = require('../build-thread');
-const metadata = require('../annotation-metadata');
+const metadata = require('../util/annotation-metadata');
 
 // Fixture with two top level annotations, one note and one reply
 const SIMPLE_FIXTURE = [

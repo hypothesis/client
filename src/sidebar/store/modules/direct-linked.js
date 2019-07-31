@@ -64,6 +64,13 @@ const update = {
       directLinkedGroupId: null,
     };
   },
+  CLEAR_SELECTION: function() {
+    return {
+      directLinkedAnnotationId: null,
+      directLinkedGroupId: null,
+      directLinkedGroupFetchFailed: false,
+    };
+  },
 };
 
 const actions = util.actionTypes(update);

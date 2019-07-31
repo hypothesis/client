@@ -1,5 +1,5 @@
 @at-root {
-  $expand-duration: .15s;
+  $expand-duration: 0.15s;
 
   // the truncated body of the <excerpt>
   .excerpt {
@@ -36,7 +36,6 @@
     font-weight: normal;
   }
 
-
   // a shadow displayed at the bottom of an <excerpt>s with inline controls
   // disabled, which provides a hint that the excerpt is collapsed
   // -------------
@@ -53,8 +52,12 @@
     right: $shadow-h-offset;
     bottom: 0;
     height: 40px;
-    background-image: linear-gradient(to bottom,
-      transparent 50%, rgba(0,0,0,0.08) 95%, rgba(0,0,0,0.13) 100%);
+    background-image: linear-gradient(
+      to bottom,
+      transparent 50%,
+      rgba(0, 0, 0, 0.08) 95%,
+      rgba(0, 0, 0, 0.13) 100%
+    );
     transition: opacity $expand-duration linear;
   }
 

@@ -3,8 +3,8 @@
 const buildThread = require('../build-thread');
 const events = require('../events');
 const memoize = require('../util/memoize');
-const metadata = require('../annotation-metadata');
-const tabs = require('../tabs');
+const metadata = require('../util/annotation-metadata');
+const tabs = require('../util/tabs');
 const uiConstants = require('../ui-constants');
 
 function truthyKeys(map) {
@@ -40,7 +40,7 @@ const sortFns = {
  * The root thread is then displayed by viewer.html
  */
 // @ngInject
-function RootThread($rootScope, store, drafts, searchFilter, viewFilter) {
+function RootThread($rootScope, store, searchFilter, viewFilter) {
   /**
    * Build the root conversation thread from the given UI state.
    *
@@ -86,10 +86,10 @@ function RootThread($rootScope, store, drafts, searchFilter, viewFilter) {
     store
       .getState()
       .annotations.filter(function(ann) {
-        return metadata.isNew(ann) && !drafts.getIfNotEmpty(ann);
+        return metadata.isNew(ann) && !store.getDraftIfNotEmpty(ann);
       })
       .forEach(function(ann) {
-        drafts.remove(ann);
+        store.removeDraft(ann);
         $rootScope.$broadcast(events.ANNOTATION_DELETED, ann);
       });
   }

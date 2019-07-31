@@ -41,7 +41,6 @@ const dummyGroups = [
 
 describe('groups', function() {
   let fakeAuth;
-  let fakeFeatures;
   let fakeStore;
   let fakeIsSidebar;
   let fakeSession;
@@ -55,13 +54,10 @@ describe('groups', function() {
     fakeAuth = {
       tokenGetter: sinon.stub().returns('1234'),
     };
-    fakeFeatures = {
-      flagEnabled: sinon.stub().returns(false),
-    };
 
     fakeStore = fakeReduxStore(
       {
-        searchUris: ['http://example.org'],
+        mainFrame: { uri: 'http://example.org' },
         focusedGroup: null,
         groups: [],
         directLinkedGroupId: null,
@@ -80,8 +76,8 @@ describe('groups', function() {
         focusedGroup() {
           return this.getState().focusedGroup;
         },
-        searchUris() {
-          return this.getState().searchUris;
+        mainFrame() {
+          return this.getState().mainFrame;
         },
         focusedGroupId() {
           const group = this.getState().focusedGroup;
@@ -146,41 +142,16 @@ describe('groups', function() {
       fakeServiceUrl,
       fakeSession,
       fakeSettings,
-      fakeAuth,
-      fakeFeatures
+      fakeAuth
     );
   }
 
   describe('#all', function() {
-    it('returns all groups from store.allGroups when community-groups feature flag is enabled', () => {
+    it('returns all groups from store.allGroups', () => {
       const svc = service();
       fakeStore.allGroups = sinon.stub().returns(dummyGroups);
-      fakeFeatures.flagEnabled.withArgs('community_groups').returns(true);
       assert.deepEqual(svc.all(), dummyGroups);
       assert.called(fakeStore.allGroups);
-    });
-
-    it('returns all groups from store.getInScopeGroups when community-groups feature flag is disabled', () => {
-      const svc = service();
-      fakeStore.getInScopeGroups = sinon.stub().returns(dummyGroups);
-      assert.deepEqual(svc.all(), dummyGroups);
-      assert.called(fakeStore.getInScopeGroups);
-    });
-
-    [[0, 1, 2, 3], [2, 0, 1, 3], [0, 3, 1, 2]].forEach(groupInputOrder => {
-      it('sorts the groups in the following order: scoped, public, private maintaining order within each category.', () => {
-        const groups = [
-          { id: 0, type: 'open' },
-          { id: 1, type: 'restricted' },
-          { id: '__world__', type: 'open' },
-          { id: 3, type: 'private' },
-        ];
-        const svc = service();
-        fakeStore.getInScopeGroups = sinon
-          .stub()
-          .returns(groupInputOrder.map(id => groups[id]));
-        assert.deepEqual(svc.all(), groups);
-      });
     });
   });
 
@@ -417,9 +388,9 @@ describe('groups', function() {
       it('waits for the document URL to be determined', () => {
         const svc = service();
 
-        fakeStore.setState({ searchUris: [] });
+        fakeStore.setState({ mainFrame: null });
         const loaded = svc.load();
-        fakeStore.setState({ searchUris: ['https://asite.com'] });
+        fakeStore.setState({ mainFrame: { uri: 'https://asite.com' } });
 
         return loaded.then(() => {
           assert.calledWith(fakeApi.groups.list, {
@@ -436,7 +407,7 @@ describe('groups', function() {
       });
 
       it('does not wait for the document URL', () => {
-        fakeStore.setState({ searchUris: [] });
+        fakeStore.setState({ mainFrame: null });
         const svc = service();
         return svc.load().then(() => {
           assert.calledWith(fakeApi.groups.list, {
@@ -804,14 +775,16 @@ describe('groups', function() {
       it('should refetch groups if main frame URL has changed', () => {
         const svc = service();
 
-        fakeStore.setState({ searchUris: ['https://domain.com/page-a'] });
+        fakeStore.setState({ mainFrame: { uri: 'https://domain.com/page-a' } });
         return svc
           .load()
           .then(() => {
             // Simulate main frame URL change, eg. due to client-side navigation in
             // a single page application.
             fakeApi.groups.list.resetHistory();
-            fakeStore.setState({ searchUris: ['https://domain.com/page-b'] });
+            fakeStore.setState({
+              mainFrame: { uri: 'https://domain.com/page-b' },
+            });
 
             return fakeRootScope.eventCallbacks[events.FRAME_CONNECTED]();
           })
@@ -823,7 +796,7 @@ describe('groups', function() {
       it('should not refetch groups if main frame URL has not changed', () => {
         const svc = service();
 
-        fakeStore.setState({ searchUris: ['https://domain.com/page-a'] });
+        fakeStore.setState({ mainFrame: { uri: 'https://domain.com/page-a' } });
         return svc
           .load()
           .then(() => {

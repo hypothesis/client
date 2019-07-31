@@ -1,0 +1,47 @@
+.search-input__form {
+  display: flex;
+  flex-flow: row nowrap;
+
+  position: relative;
+  color: $gray-dark;
+}
+
+.search-input__icon {
+  order: 0;
+}
+
+.search-input__input {
+  @include outline-on-keyboard-focus;
+
+  flex-grow: 1;
+  order: 1;
+
+  color: $text-color;
+
+  // Disable default browser styling for the input.
+  border: none;
+  padding: 0px;
+  width: 100%;
+
+  // The search box expands when focused, via a change in the
+  // `max-width` property. In Safari, the <input> will not accept
+  // focus if `max-width` is set to 0px so we set it to
+  // a near-zero positive value instead.
+  // See https://github.com/hypothesis/h/issues/2654
+  max-width: 0.1px;
+
+  transition: max-width 0.3s ease-out, padding-left 0.3s ease-out;
+
+  &:disabled {
+    background: none;
+    color: $gray-light;
+  }
+
+  // Expand the search input when focused (triggered by clicking
+  // on the search icon) or when `is-expanded` is applied.
+  &:focus,
+  &.is-expanded {
+    max-width: 150px;
+    padding-left: 6px;
+  }
+}

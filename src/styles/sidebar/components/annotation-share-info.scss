@@ -1,0 +1,26 @@
+.annotation-share-info {
+  display: flex;
+  align-items: baseline;
+
+  &__group,
+  &__private {
+    display: flex;
+    align-items: baseline;
+    font-size: $body1-font-size;
+    color: $grey-5;
+  }
+
+  &__group-info {
+    margin-right: 5px;
+  }
+
+  &__private-info {
+    margin-right: 5px;
+  }
+
+  &__icon {
+    margin-right: 5px;
+    width: 10px;
+    height: 10px;
+  }
+}
