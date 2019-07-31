@@ -47,14 +47,33 @@ function MenuItem({
   const hasLeftIcon = icon || isSubmenuItem;
   const hasRightIcon = icon && isSubmenuItem;
 
-  let renderedIcon = null;
-  if (icon !== 'blank') {
-    renderedIcon = iconIsUrl ? (
+  let renderedIcon = (() => {
+    if (!icon || icon === 'blank') {
+      return null;
+    }
+    let iconEl = iconIsUrl ? (
       <img className={iconClass} alt={iconAlt} src={icon} />
     ) : (
       <SvgIcon name={icon} className="menu-item__icon" />
     );
-  }
+    // MenuItems with a `click` property will have that applied to the
+    // entirety of  `div.menu-item`, but those with `href` need to have
+    // the icon wrapped in an `a` element
+    if (href) {
+      iconEl = (
+        <a
+          href={href}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="menu-item__icon-link"
+        >
+          {iconEl}
+        </a>
+      );
+    }
+    return iconEl;
+  })();
+
   const leftIcon = isSubmenuItem ? null : renderedIcon;
   const rightIcon = isSubmenuItem ? renderedIcon : null;
 

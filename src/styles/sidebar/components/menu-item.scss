@@ -79,6 +79,10 @@ $menu-item-padding: 10px;
   margin-right: 10px;
   width: 15px;
   height: 15px;
+
+  & a {
+    color: inherit;
+  }
 }
 
 .menu-item__icon {

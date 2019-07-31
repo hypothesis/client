@@ -42,6 +42,14 @@ describe('MenuItem', () => {
     assert.isTrue(wrapper.exists('SvgIcon[name="an-svg-icon"]'));
   });
 
+  it('links icon to `href` if `href` is provided', () => {
+    const wrapper = createMenuItem({
+      icon: 'an-svg-icon',
+      href: 'http://www.example.com',
+    });
+    assert.isTrue(wrapper.exists('.menu-item__icon-link'));
+  });
+
   it('renders a blank space for an icon if `icon` is "blank"', () => {
     const wrapper = createMenuItem({ icon: 'blank' });
     const iconSpace = wrapper.find('.menu-item__icon-container');
