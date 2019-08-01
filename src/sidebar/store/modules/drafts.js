@@ -1,5 +1,6 @@
 'use strict';
 
+const metadata = require('../../util/annotation-metadata');
 const util = require('../util');
 
 /**
@@ -96,14 +97,41 @@ function createDraft(annotation, changes) {
   };
 }
 
-/** Remove all drafts. */
+/**
+ * Remove any drafts that are empty.
+ *
+ * An empty draft has no text and no reference tags.
+ */
+
+function deleteNewAndEmptyDrafts() {
+  const annotations = require('./annotations');
+  return (dispatch, getState) => {
+    const newDrafts = getState().drafts.filter(draft => {
+      return (
+        metadata.isNew(draft.annotation) &&
+        !getDraftIfNotEmpty(getState(), draft.annotation)
+      );
+    });
+    const removedAnnotations = newDrafts.map(draft => {
+      dispatch(removeDraft(draft.annotation));
+      return draft.annotation;
+    });
+    dispatch(annotations.actions.removeAnnotations(removedAnnotations));
+  };
+}
+
+/**
+ * Remove all drafts.
+ * */
 function discardAllDrafts() {
   return {
     type: actions.DISCARD_ALL_DRAFTS,
   };
 }
 
-/** Remove the draft version of an annotation. */
+/**
+ * Remove the draft version of an annotation.
+ */
 function removeDraft(annotation) {
   return {
     type: actions.REMOVE_DRAFT,
@@ -169,6 +197,7 @@ module.exports = {
   update,
   actions: {
     createDraft,
+    deleteNewAndEmptyDrafts,
     discardAllDrafts,
     removeDraft,
   },

@@ -1,15 +1,16 @@
 'use strict';
 
+const annotations = require('../annotations');
 const createStore = require('../../create-store');
 const selection = require('../selection');
 const uiConstants = require('../../../ui-constants');
 
-describe('selection', () => {
+describe('store/modules/selection', () => {
   let store;
-  let fakeSettings = {};
+  let fakeSettings = [{}, {}];
 
   beforeEach(() => {
-    store = createStore([selection], [fakeSettings]);
+    store = createStore([annotations, selection], fakeSettings);
   });
 
   describe('getFirstSelectedAnnotationId', function() {
@@ -145,20 +146,14 @@ describe('selection', () => {
     });
   });
 
-  describe('removeSelectedAnnotation()', function() {
-    it('removes an annotation from the selectedAnnotationMap', function() {
+  describe('#REMOVE_ANNOTATIONS', function() {
+    it('removing an annotation should also remove it from selectedAnnotationMap', function() {
       store.selectAnnotations([1, 2, 3]);
-      store.removeSelectedAnnotation(2);
+      store.removeAnnotations([{ id: 2 }]);
       assert.deepEqual(store.getState().selectedAnnotationMap, {
         1: true,
         3: true,
       });
-    });
-
-    it('nulls the map if no annotations are selected', function() {
-      store.selectAnnotations([1]);
-      store.removeSelectedAnnotation(1);
-      assert.isNull(store.getState().selectedAnnotationMap);
     });
   });
 

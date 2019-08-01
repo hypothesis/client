@@ -1,24 +1,20 @@
 'use strict';
 
-const redux = require('redux');
-// `.default` is needed because 'redux-thunk' is built as an ES2015 module
-const thunk = require('redux-thunk').default;
-
 const annotations = require('../annotations');
+const createStoreFromModules = require('../../create-store');
+const drafts = require('../drafts');
 const fixtures = require('../../../test/annotation-fixtures');
-const util = require('../../util');
+const selection = require('../selection');
+const uiConstants = require('../../../ui-constants');
 const unroll = require('../../../../shared/test/util').unroll;
 
 const { actions, selectors } = annotations;
 
 /**
- * Create a Redux store which only handles annotation actions.
+ * Create a Redux store which handles annotation, selection and draft actions.
  */
 function createStore() {
-  // Thunk middleware is needed for the ADD_ANNOTATIONS action.
-  const enhancer = redux.applyMiddleware(thunk);
-  const reducer = util.createReducer(annotations.update);
-  return redux.createStore(reducer, annotations.init(), enhancer);
+  return createStoreFromModules([annotations, selection, drafts], [{}, {}, {}]);
 }
 
 // Tests for most of the functionality in reducers/annotations.js are currently
@@ -144,6 +140,16 @@ describe('annotations reducer', function() {
     });
   });
 
+  describe('#removeAnnotations', function() {
+    it('removes the annotation', function() {
+      const store = createStore();
+      const ann = fixtures.defaultAnnotation();
+      store.dispatch(actions.addAnnotations([ann]));
+      store.dispatch(actions.removeAnnotations([ann]));
+      assert.equal(store.getState().annotations.length, 0);
+    });
+  });
+
   describe('#updateFlagStatus', function() {
     unroll(
       'updates the flagged status of an annotation',
@@ -205,5 +211,58 @@ describe('annotations reducer', function() {
         },
       ]
     );
+  });
+
+  describe('#createAnnotation', function() {
+    it('should create an annotation', function() {
+      const store = createStore();
+      const ann = fixtures.oldAnnotation();
+      store.dispatch(actions.createAnnotation(ann));
+      assert.equal(
+        selectors.findAnnotationByID(store.getState(), ann.id).id,
+        ann.id
+      );
+    });
+
+    it('should change tab focus to TAB_ANNOTATIONS when a new annotation is created', function() {
+      const store = createStore();
+      store.dispatch(actions.createAnnotation(fixtures.oldAnnotation()));
+      assert.equal(store.getState().selectedTab, uiConstants.TAB_ANNOTATIONS);
+    });
+
+    it('should change tab focus to TAB_NOTES when a new note annotation is created', function() {
+      const store = createStore();
+      store.dispatch(actions.createAnnotation(fixtures.oldPageNote()));
+      assert.equal(store.getState().selectedTab, uiConstants.TAB_NOTES);
+    });
+
+    it('should expand parent of created annotation', function() {
+      const store = createStore();
+      store.dispatch(
+        actions.addAnnotations([
+          {
+            id: 'annotation_id',
+            $highlight: undefined,
+            target: [{ source: 'source', selector: [] }],
+            references: [],
+            text: 'This is my annotation',
+            tags: ['tag_1', 'tag_2'],
+          },
+        ])
+      );
+      // Collapse the parent.
+      store.dispatch(selection.actions.setCollapsed('annotation_id', true));
+      // Creating a new child annotation should expand its parent.
+      store.dispatch(
+        actions.createAnnotation({
+          highlight: undefined,
+          target: [{ source: 'http://example.org' }],
+          references: ['annotation_id'],
+          text: '',
+          tags: [],
+        })
+      );
+      assert.isTrue(store.getState().expanded.annotation_id);
+    });
   });
 });
