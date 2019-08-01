@@ -97,6 +97,16 @@ function LiveReloadServer(port, config) {
             window.hypothesisConfig = function () {
               return {
                 liveReloadServer: 'ws://' + appHost + ':${port}',
+                // Force into focused user mode
+
+                // Example focused user mode
+                // focus: {
+                //   user: {
+                //     username: 'foo',
+                //     authority: 'lms',
+                //     displayName: 'Foo Bar',
+                //   }
+                // },
 
                 // Open the sidebar when the page loads
                 openSidebar: true,

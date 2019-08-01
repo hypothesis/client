@@ -28,6 +28,7 @@ describe('rootThread', function() {
   let fakeStore;
   let fakeBuildThread;
   let fakeSearchFilter;
+  let fakeSettings;
   let fakeViewFilter;
 
   let $rootScope;
@@ -65,6 +66,8 @@ describe('rootThread', function() {
       getDraftIfNotEmpty: sinon.stub().returns(null),
       removeDraft: sinon.stub(),
       createAnnotation: sinon.stub(),
+      focusModeFocused: sinon.stub().returns(false),
+      focusModeUsername: sinon.stub().returns({}),
     };
 
     fakeBuildThread = sinon.stub().returns(fixtures.emptyThread);
@@ -72,6 +75,8 @@ describe('rootThread', function() {
     fakeSearchFilter = {
       generateFacetedFilter: sinon.stub(),
     };
+
+    fakeSettings = {};
 
     fakeViewFilter = {
       filter: sinon.stub(),
@@ -81,6 +86,7 @@ describe('rootThread', function() {
       .module('app', [])
       .value('store', fakeStore)
       .value('searchFilter', fakeSearchFilter)
+      .value('settings', fakeSettings)
       .value('viewFilter', fakeViewFilter)
       .service('rootThread', rootThreadFactory);
 
@@ -327,6 +333,26 @@ describe('rootThread', function() {
       fakeStore.state = Object.assign({}, fakeStore.state, {
         filterQuery: 'queryterm',
       });
+      rootThread.thread(fakeStore.state);
+      const filterFn = fakeBuildThread.args[0][1].filterFn;
+
+      fakeViewFilter.filter.returns([annotation]);
+      assert.isTrue(filterFn(annotation));
+      assert.calledWith(
+        fakeViewFilter.filter,
+        sinon.match([annotation]),
+        filters
+      );
+    });
+  });
+
+  describe('when the focus user is present', () => {
+    it("generates a thread filter focused on the user's annotations", () => {
+      fakeBuildThread.reset();
+      const filters = [{ user: { terms: ['acct:bill@localhost'] } }];
+      const annotation = annotationFixtures.defaultAnnotation();
+      fakeSearchFilter.generateFacetedFilter.returns(filters);
+      fakeStore.focusModeFocused = sinon.stub().returns(true);
       rootThread.thread(fakeStore.state);
       const filterFn = fakeBuildThread.args[0][1].filterFn;
 

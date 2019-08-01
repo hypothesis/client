@@ -186,6 +186,84 @@ describe('store/modules/selection', () => {
     });
   });
 
+  describe('setFocusModeFocused()', function() {
+    it('sets the focus mode to enabled', function() {
+      store.setFocusModeFocused(true);
+      assert.equal(store.getState().focusMode.focused, true);
+    });
+
+    it('sets the focus mode to not enabled', function() {
+      store = createStore([selection], [{ focus: { user: {} } }]);
+      store.setFocusModeFocused(false);
+      assert.equal(store.getState().focusMode.focused, false);
+    });
+  });
+
+  describe('focusModeEnabled()', function() {
+    it('should be true when the focus setting is present', function() {
+      store = createStore([selection], [{ focus: { user: {} } }]);
+      assert.equal(store.focusModeEnabled(), true);
+    });
+    it('should be false when the focus setting is not present', function() {
+      assert.equal(store.focusModeEnabled(), false);
+    });
+  });
+
+  describe('focusModeFocused()', function() {
+    it('should return true by default when focus mode is enabled', function() {
+      store = createStore([selection], [{ focus: { user: {} } }]);
+      assert.equal(store.getState().focusMode.enabled, true);
+      assert.equal(store.getState().focusMode.focused, true);
+      assert.equal(store.focusModeFocused(), true);
+    });
+    it('should return false by default when focus mode is not enabled', function() {
+      assert.equal(store.getState().focusMode.enabled, false);
+      assert.equal(store.getState().focusMode.focused, true);
+      assert.equal(store.focusModeFocused(), false);
+    });
+  });
+
+  describe('focusModeUserPrettyName()', function() {
+    it('should return false by default when focus mode is not enabled', function() {
+      store = createStore(
+        [selection],
+        [{ focus: { user: { displayName: 'FakeDisplayName' } } }]
+      );
+      assert.equal(store.focusModeUserPrettyName(), 'FakeDisplayName');
+    });
+    it('should the username when displayName is missing', function() {
+      store = createStore(
+        [selection],
+        [{ focus: { user: { username: 'FakeUserName' } } }]
+      );
+      assert.equal(store.focusModeUserPrettyName(), 'FakeUserName');
+    });
+    it('should an return empty string when user object has no names', function() {
+      store = createStore([selection], [{ focus: { user: {} } }]);
+      assert.equal(store.focusModeUserPrettyName(), '');
+    });
+    it('should an return empty string when there is no focus object', function() {
+      assert.equal(store.focusModeUserPrettyName(), '');
+    });
+  });
+
+  describe('focusModeUsername()', function() {
+    it('should return the user name when present', function() {
+      store = createStore(
+        [selection],
+        [{ focus: { user: { username: 'FakeUserName' } } }]
+      );
+      assert.equal(store.focusModeUsername(), 'FakeUserName');
+    });
+    it('should return null when the username is not present', function() {
+      store = createStore([selection], [{ focus: { user: {} } }]);
+      assert.isNull(store.focusModeUsername());
+    });
+    it('should return null when the user object is not present', function() {
+      assert.isNull(store.focusModeUsername());
+    });
+  });
+
   describe('highlightAnnotations()', function() {
     it('sets the highlighted annotations', function() {
       store.highlightAnnotations(['id1', 'id2']);

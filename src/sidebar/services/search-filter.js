@@ -127,9 +127,12 @@ function toObject(searchtext) {
  * facet.
  *
  * @param {string} searchtext
+ * @param {object} focusFilters - Map of the filter objects keyed to array values.
+ *  Currently, only the `user` filter key is supported.
+ *
  * @return {Object}
  */
-function generateFacetedFilter(searchtext, focusedUser) {
+function generateFacetedFilter(searchtext, focusFilters = {}) {
   let terms;
   const any = [];
   const quote = [];
@@ -138,8 +141,7 @@ function generateFacetedFilter(searchtext, focusedUser) {
   const tag = [];
   const text = [];
   const uri = [];
-  const user = focusedUser ? [focusedUser] : [];
-
+  const user = focusFilters.user ? [focusFilters.user] : [];
   if (searchtext) {
     terms = tokenize(searchtext);
     for (const term of terms) {

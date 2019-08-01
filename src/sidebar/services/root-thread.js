@@ -39,7 +39,7 @@ const sortFns = {
  * The root thread is then displayed by viewer.html
  */
 // @ngInject
-function RootThread($rootScope, settings, store, searchFilter, viewFilter) {
+function RootThread($rootScope, store, searchFilter, viewFilter) {
   /**
    * Build the root conversation thread from the given UI state.
    *
@@ -48,21 +48,31 @@ function RootThread($rootScope, settings, store, searchFilter, viewFilter) {
    */
   function buildRootThread(state) {
     const sortFn = sortFns[state.sortKey];
-
+    const shouldFilterThread = () => {
+      // is there a query or focused truthy value from the config?
+      return state.filterQuery || store.focusModeFocused();
+    };
     let filterFn;
-    if (state.filterQuery || state.focusedMode) {
+    if (shouldFilterThread()) {
+      const userFilter = {}; // optional user filter object for focused mode
+      // look for a unique username, if present, add it to the user filter
+      const focusedUsername = store.focusModeUsername(); // may be null if no focused user
+      if (focusedUsername) {
+        // focused user found, add it to the filter object
+        userFilter.user = focusedUsername;
+      }
       const filters = searchFilter.generateFacetedFilter(
         state.filterQuery,
-        settings.focusedUser
+        userFilter
       );
+
       filterFn = function(annot) {
         return viewFilter.filter([annot], filters).length > 0;
       };
     }
 
     let threadFilterFn;
-    const hasFilters = state.filterQuery || state.focusedMode;
-    if (state.isSidebar && !hasFilters) {
+    if (state.isSidebar && !shouldFilterThread()) {
       threadFilterFn = function(thread) {
         if (!thread.annotation) {
           return false;

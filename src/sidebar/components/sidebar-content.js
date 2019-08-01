@@ -126,7 +126,7 @@ function SidebarContentController(
   );
 
   this.showFocusedHeader = () => {
-    return store.getState().focusedMode;
+    return store.focusModeEnabled();
   };
 
   this.showSelectedTabs = function() {
@@ -136,7 +136,7 @@ function SidebarContentController(
       store.getState().filterQuery
     ) {
       return false;
-    } else if (store.getState().focusedMode) {
+    } else if (store.focusModeFocused()) {
       return false;
     } else {
       return true;
