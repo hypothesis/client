@@ -176,6 +176,18 @@ const update = {
     return {};
   },
 
+  REMOVE_ANNOTATIONS: function(state, action) {
+    const selection = Object.assign({}, state.selectedAnnotationMap);
+    action.annotations.forEach(annotation => {
+      if (annotation.id) {
+        delete selection[annotation.id];
+      }
+    });
+    return {
+      selectedAnnotationMap: freeze(selection),
+    };
+  },
+
   SET_FILTER_QUERY: function(state, action) {
     return {
       filterQuery: action.query,
@@ -317,20 +329,6 @@ function hasSelectedAnnotations(state) {
   return !!state.selectedAnnotationMap;
 }
 
-/** De-select an annotation. */
-function removeSelectedAnnotation(id) {
-  // FIXME: This should be converted to a plain action and accessing the state
-  // should happen in the update() function
-  return function(dispatch, getState) {
-    const selection = Object.assign({}, getState().selectedAnnotationMap);
-    if (!selection || !id) {
-      return;
-    }
-    delete selection[id];
-    dispatch(select(selection));
-  };
-}
-
 /** De-select all annotations. */
 function clearSelectedAnnotations() {
   return { type: actions.CLEAR_SELECTED_ANNOTATIONS };
@@ -365,7 +363,6 @@ module.exports = {
     clearSelection: clearSelection,
     focusAnnotations: focusAnnotations,
     highlightAnnotations: highlightAnnotations,
-    removeSelectedAnnotation: removeSelectedAnnotation,
     selectAnnotations: selectAnnotations,
     selectTab: selectTab,
     setCollapsed: setCollapsed,

@@ -28,7 +28,7 @@ const fixtures = immutable({
   },
 });
 
-describe('Drafts Store', () => {
+describe('store/modules/drafts', () => {
   let store;
 
   beforeEach(() => {
@@ -223,6 +223,48 @@ describe('Drafts Store', () => {
     it('should not return saved annotations which have drafts', () => {
       store.createDraft(fixtures.annotation, fixtures.draftWithText);
       assert.deepEqual(store.unsavedAnnotations(), []);
+    });
+  });
+
+  describe('#deleteNewAndEmptyDrafts', () => {
+    [
+      {
+        key: 'should remove new and empty drafts',
+        annotation: {
+          id: undefined,
+          $tag: 'my_annotation_tag',
+        },
+        draft: fixtures.emptyDraft,
+        shouldRemove: true,
+      },
+      {
+        key: 'should not remove drafts with an id',
+        annotation: {
+          id: 'my_id',
+          $tag: 'my_annotation_tag',
+        },
+        draft: fixtures.emptyDraft,
+        shouldRemove: false,
+      },
+      {
+        key: 'should not remove drafts with text',
+        annotation: {
+          id: undefined,
+          $tag: 'my_annotation_tag',
+        },
+        draft: fixtures.draftWithText,
+        shouldRemove: false,
+      },
+    ].forEach(test => {
+      it(test.key, () => {
+        store.createDraft(test.annotation, test.draft);
+        store.deleteNewAndEmptyDrafts([test.annotation]);
+        if (test.shouldRemove) {
+          assert.isNotOk(store.getDraft(test.annotation));
+        } else {
+          assert.isOk(store.getDraft(test.annotation));
+        }
+      });
     });
   });
 });

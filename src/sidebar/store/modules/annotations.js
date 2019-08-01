@@ -12,6 +12,7 @@ const metadata = require('../../util/annotation-metadata');
 const uiConstants = require('../../ui-constants');
 
 const selection = require('./selection');
+const drafts = require('./drafts');
 const util = require('../util');
 
 /**
@@ -334,6 +335,36 @@ function hideAnnotation(id) {
 }
 
 /**
+ * Create a new annotation
+ *
+ * The method does 4 tasks:
+ * 1. Removes any existing empty drafts.
+ * 2. Creates a new annotation.
+ * 3. Changes the focused tab to match that of the newly created annotation.
+ * 4. Expands the collapsed state of all new annotation's parents.
+ */
+function createAnnotation(ann) {
+  return dispatch => {
+    // When a new annotation is created, remove any existing annotations
+    // that are empty.
+    dispatch(drafts.actions.deleteNewAndEmptyDrafts([ann]));
+    dispatch(addAnnotations([ann]));
+    // If the annotation is of type note or annotation, make sure
+    // the appropriate tab is selected. If it is of type reply, user
+    // stays in the selected tab.
+    if (metadata.isPageNote(ann)) {
+      dispatch(selection.actions.selectTab(uiConstants.TAB_NOTES));
+    } else if (metadata.isAnnotation(ann)) {
+      dispatch(selection.actions.selectTab(uiConstants.TAB_ANNOTATIONS));
+    }
+    (ann.references || []).forEach(parent => {
+      // Expand any parents of this annotation.
+      dispatch(selection.actions.setCollapsed(parent, false));
+    });
+  };
+}
+
+/**
  * Update the local hidden state of an annotation.
  *
  * This updates an annotation to reflect the fact that it has been made visible
@@ -426,13 +457,14 @@ module.exports = {
   init: init,
   update: update,
   actions: {
-    addAnnotations: addAnnotations,
-    clearAnnotations: clearAnnotations,
-    removeAnnotations: removeAnnotations,
-    updateAnchorStatus: updateAnchorStatus,
-    updateFlagStatus: updateFlagStatus,
-    hideAnnotation: hideAnnotation,
-    unhideAnnotation: unhideAnnotation,
+    addAnnotations,
+    clearAnnotations,
+    createAnnotation,
+    hideAnnotation,
+    removeAnnotations,
+    updateAnchorStatus,
+    updateFlagStatus,
+    unhideAnnotation,
   },
 
   selectors: {
