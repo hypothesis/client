@@ -24,6 +24,9 @@ function AnnotationHeader({
 }) {
   const annotationLink = annotation.links ? annotation.links.html : '';
   const replyPluralized = !replyCount || replyCount > 1 ? 'replies' : 'reply';
+  // NB: `created` and `updated` are strings, not `Date`s
+  const hasBeenEdited =
+    annotation.updated && annotation.created !== annotation.updated;
 
   return (
     <header className="annotation-header">
@@ -34,13 +37,26 @@ function AnnotationHeader({
             {replyCount} {replyPluralized}
           </a>
         </div>
-        {!isEditing && annotation.updated && (
+        {!isEditing && annotation.created && (
           <div className="annotation-header__timestamp">
-            <Timestamp
-              className="annotation-header__timestamp-link"
-              href={annotationLink}
-              timestamp={annotation.updated}
-            />
+            {hasBeenEdited && (
+              <span className="annotation-header__timestamp-edited">
+                (edited{' '}
+                <Timestamp
+                  className="annotation-header__timestamp-edited-link"
+                  href={annotationLink}
+                  timestamp={annotation.updated}
+                />
+                ){' '}
+              </span>
+            )}
+            <span className="annotation-header__timestamp-created">
+              <Timestamp
+                className="annotation-header__timestamp-created-link"
+                href={annotationLink}
+                timestamp={annotation.created}
+              />
+            </span>
           </div>
         )}
       </div>

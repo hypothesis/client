@@ -6,6 +6,7 @@
 function defaultAnnotation() {
   return {
     id: 'deadbeef',
+    created: '2015-05-10T20:18:56.613388+00:00',
     document: {
       title: 'A special document',
     },

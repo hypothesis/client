@@ -62,19 +62,46 @@ describe('AnnotationHeader', () => {
     );
   });
 
-  describe('timestamp', () => {
-    it('should render a timestamp if annotation has an `updated` value', () => {
+  describe('timestamps', () => {
+    it('should render timestamp container element if annotation has a `created` value', () => {
       const wrapper = createAnnotationHeader();
-      const timestamp = wrapper.find(Timestamp);
+      const timestamp = wrapper.find('.annotation-header__timestamp');
 
       assert.isTrue(timestamp.exists());
     });
 
-    it('should not render a timestamp if annotation does not have an `updated` value', () => {
+    it('should not render timestamp container if annotation does not have a `created` value', () => {
       const wrapper = createAnnotationHeader({
         annotation: fixtures.newAnnotation(),
       });
-      const timestamp = wrapper.find(Timestamp);
+      const timestamp = wrapper.find('.annotation-header__timestamp');
+
+      assert.isFalse(timestamp.exists());
+    });
+
+    it('should render edited timestamp if annotation has been edited', () => {
+      const annotation = fixtures.defaultAnnotation();
+      annotation.updated = '2018-05-10T20:18:56.613388+00:00';
+
+      const wrapper = createAnnotationHeader({
+        annotation: annotation,
+      });
+      const timestamp = wrapper
+        .find(Timestamp)
+        .filter('.annotation-header__timestamp-edited-link');
+
+      assert.isTrue(timestamp.exists());
+    });
+
+    it('should not render edited timestamp if annotation has not been edited', () => {
+      // Default annotation's created value is same as updated; as if the annotation
+      // has not been edited before
+      const wrapper = createAnnotationHeader({
+        annotation: fixtures.newAnnotation(),
+      });
+      const timestamp = wrapper
+        .find(Timestamp)
+        .filter('.annotation-header__timestamp-edited-link');
 
       assert.isFalse(timestamp.exists());
     });
