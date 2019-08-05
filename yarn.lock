@@ -1363,9 +1363,9 @@ babel-plugin-mockable-imports@^1.5.1:
   integrity sha512-n3M7UIDIyun3ztI11WUWfM2dqr+3ERn1EJ0z9w+WY6cHvtqhIHCGDFdhY2bY2BD20zPjf1zoaF+Iva+0VJLp/w==
 
 babel-plugin-transform-async-to-promises@^0.8.6:
-  version "0.8.13"
-  resolved "https://registry.yarnpkg.com/babel-plugin-transform-async-to-promises/-/babel-plugin-transform-async-to-promises-0.8.13.tgz#d45895658a670ddf16f4b8f0a16487d89bb43cd0"
-  integrity sha512-EG665Sn79e5ndzNIbbgtIGFUXggr6j8PIDEL7kWyRbmeli7/Gva2/osjEsVayz4k7U82LKrRa8B/kkL/7n0prQ==
+  version "0.8.14"
+  resolved "https://registry.yarnpkg.com/babel-plugin-transform-async-to-promises/-/babel-plugin-transform-async-to-promises-0.8.14.tgz#8c783aecb1139f39c608f8bb0f5bb69c343c878e"
+  integrity sha512-BHw2WriDbnLwaaIydAjVeXXKBal0pWlFWxfo0UKL2CTaSorvRocrsTflni/mzIOP8c+EJ8xHqtbre8GbIm4ehQ==
 
 babel-polyfill@^6.26.0:
   version "6.26.0"
