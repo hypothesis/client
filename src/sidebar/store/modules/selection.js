@@ -113,6 +113,13 @@ function init(settings) {
 
     selectedTab: TAB_DEFAULT,
 
+    focusMode: {
+      enabled: settings.hasOwnProperty('focus'), // readonly
+      focused: true,
+      // Copy over the focus confg from settings object
+      config: { ...(settings.focus ? settings.focus : {}) },
+    },
+
     // Key by which annotations are currently sorted.
     sortKey: TAB_SORTKEY_DEFAULT[TAB_DEFAULT],
     // Keys by which annotations can be sorted.
@@ -144,6 +151,15 @@ const update = {
 
   FOCUS_ANNOTATIONS: function(state, action) {
     return { focusedAnnotationMap: action.focused };
+  },
+
+  SET_FOCUS_MODE_FOCUSED: function(state, action) {
+    return {
+      focusMode: {
+        ...state.focusMode,
+        focused: action.focused,
+      },
+    };
   },
 
   SET_FORCE_VISIBLE: function(state, action) {
@@ -307,6 +323,16 @@ function setFilterQuery(query) {
   };
 }
 
+/**
+ * Set the focused to only show annotations by the focused user.
+ */
+function setFocusModeFocused(focused) {
+  return {
+    type: actions.SET_FOCUS_MODE_FOCUSED,
+    focused,
+  };
+}
+
 /** Sets the sort key for the annotation list. */
 function setSortKey(key) {
   return {
@@ -353,6 +379,55 @@ const getFirstSelectedAnnotationId = createSelector(
 function filterQuery(state) {
   return state.filterQuery;
 }
+/**
+ * Returns the on/off state of the focus mode. This can be toggled on or off to
+ * filter to the focused user.
+ *
+ * @return {boolean}
+ */
+function focusModeFocused(state) {
+  return state.focusMode.enabled && state.focusMode.focused;
+}
+/**
+ * Returns the value of the focus mode from the config.
+ *
+ * @return {boolean}
+ */
+function focusModeEnabled(state) {
+  return state.focusMode.enabled;
+}
+
+/**
+ * Returns the username of the focused mode or null if none is found.
+ *
+ * @return {object}
+ */
+function focusModeUsername(state) {
+  if (state.focusMode.config.user && state.focusMode.config.user.username) {
+    return state.focusMode.config.user.username;
+  }
+  return null;
+}
+
+/**
+ * Returns the display name for a user or the username
+ * if display name is not present. If both are missing
+ * then this returns an empty string.
+ *
+ * @return {string}
+ */
+function focusModeUserPrettyName(state) {
+  const user = state.focusMode.config.user;
+  if (!user) {
+    return '';
+  } else if (user.displayName) {
+    return user.displayName;
+  } else if (user.username) {
+    return user.username;
+  } else {
+    return '';
+  }
+}
 
 module.exports = {
   init: init,
@@ -367,6 +442,7 @@ module.exports = {
     selectTab: selectTab,
     setCollapsed: setCollapsed,
     setFilterQuery: setFilterQuery,
+    setFocusModeFocused: setFocusModeFocused,
     setForceVisible: setForceVisible,
     setSortKey: setSortKey,
     toggleSelectedAnnotations: toggleSelectedAnnotations,
@@ -375,6 +451,10 @@ module.exports = {
   selectors: {
     hasSelectedAnnotations,
     filterQuery,
+    focusModeFocused,
+    focusModeEnabled,
+    focusModeUsername,
+    focusModeUserPrettyName,
     isAnnotationSelected,
     getFirstSelectedAnnotationId,
   },

@@ -185,5 +185,23 @@ describe('sidebar.search-filter', () => {
         }
       });
     });
+
+    it('filters to a focused user', () => {
+      const filter = searchFilter.generateFacetedFilter(null, {
+        user: 'fakeusername',
+      });
+      // Remove empty facets.
+      Object.keys(filter).forEach(k => {
+        if (filter[k].terms.length === 0) {
+          delete filter[k];
+        }
+      });
+      assert.deepEqual(filter, {
+        user: {
+          operator: 'or',
+          terms: ['fakeusername'],
+        },
+      });
+    });
   });
 });

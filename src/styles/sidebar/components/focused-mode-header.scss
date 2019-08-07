@@ -1,0 +1,11 @@
+.focused-mode-header {
+  margin-bottom: 10px;
+  button {
+    width: 100%;
+    height: 24px;
+    margin-right: 10px;
+    &:focus {
+      outline: none;
+    }
+  }
+}

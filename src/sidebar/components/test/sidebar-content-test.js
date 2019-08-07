@@ -158,6 +158,17 @@ describe('sidebar.components.sidebar-content', function() {
     });
   });
 
+  describe('showFocusedHeader', () => {
+    it('returns true if focus mode is enabled', () => {
+      store.focusModeEnabled = sinon.stub().returns(true);
+      assert.isTrue(ctrl.showFocusedHeader());
+    });
+    it('returns false if focus mode is not enabled', () => {
+      store.focusModeEnabled = sinon.stub().returns(false);
+      assert.isFalse(ctrl.showFocusedHeader());
+    });
+  });
+
   function connectFrameAndPerformInitialFetch() {
     setFrames([{ uri: 'https://a-page.com' }]);
     $scope.$digest();

@@ -38,6 +38,9 @@ function hostPageConfig(window) {
     // This should be removed once new note button is enabled for everybody.
     'enableExperimentalNewNoteButton',
 
+    // Forces the sidebar to filter annotations to a single user.
+    'focus',
+
     // Fetch config from a parent frame.
     'requestConfigFromFrame',
 
