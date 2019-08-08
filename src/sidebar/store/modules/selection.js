@@ -324,7 +324,7 @@ function setFilterQuery(query) {
 }
 
 /**
- * Set the focused to only show annotations by the focused user.
+ * Set the focused to only show annotations matching the current focus mode.
  */
 function setFocusModeFocused(focused) {
   return {
@@ -379,17 +379,9 @@ const getFirstSelectedAnnotationId = createSelector(
 function filterQuery(state) {
   return state.filterQuery;
 }
+
 /**
- * Returns the on/off state of the focus mode. This can be toggled on or off to
- * filter to the focused user.
- *
- * @return {boolean}
- */
-function focusModeFocused(state) {
-  return state.focusMode.enabled && state.focusMode.focused;
-}
-/**
- * Returns the value of the focus mode from the config.
+ * Do the config settings indicate that the client should be in a focused mode?
  *
  * @return {boolean}
  */
@@ -398,15 +390,34 @@ function focusModeEnabled(state) {
 }
 
 /**
- * Returns the username of the focused mode or null if none is found.
+ * Is a focus mode enabled, and is it presently applied?
  *
- * @return {object}
+ * @return {boolean}
+ */
+function focusModeFocused(state) {
+  return focusModeEnabled(state) && state.focusMode.focused;
+}
+
+/**
+ * Returns the username for a focused user or `null` if no focused user.
+ *
+ * @return {object|null}
  */
 function focusModeUsername(state) {
   if (state.focusMode.config.user && state.focusMode.config.user.username) {
     return state.focusMode.config.user.username;
   }
   return null;
+}
+
+/**
+ * Does the configured focus mode include user info, i.e. are we focusing on a
+ * user?
+ *
+ * @return {boolean}
+ */
+function focusModeHasUser(state) {
+  return focusModeEnabled(state) && !!focusModeUsername(state);
 }
 
 /**
@@ -453,6 +464,7 @@ module.exports = {
     filterQuery,
     focusModeFocused,
     focusModeEnabled,
+    focusModeHasUser,
     focusModeUsername,
     focusModeUserPrettyName,
     isAnnotationSelected,

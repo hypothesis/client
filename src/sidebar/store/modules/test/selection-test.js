@@ -223,6 +223,27 @@ describe('store/modules/selection', () => {
     });
   });
 
+  describe('focusModeHasUser()', () => {
+    it('should return `true` if focus enabled and valid `user` object present', () => {
+      store = createStore(
+        [selection],
+        [{ focus: { user: { username: 'whatever' } } }]
+      );
+      assert.isTrue(store.focusModeHasUser());
+    });
+    it('should return `false` if focus enabled but `user` object invalid', () => {
+      store = createStore(
+        [selection],
+        [{ focus: { user: { displayName: 'whatever' } } }] // `username` is required
+      );
+      assert.isFalse(store.focusModeHasUser());
+    });
+    it('should return `false` if `user` object missing', () => {
+      store = createStore([selection], [{ focus: {} }]);
+      assert.isFalse(store.focusModeHasUser());
+    });
+  });
+
   describe('focusModeUserPrettyName()', function() {
     it('should return false by default when focus mode is not enabled', function() {
       store = createStore(
