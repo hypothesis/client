@@ -49,22 +49,14 @@ function RootThread($rootScope, store, searchFilter, viewFilter) {
   function buildRootThread(state) {
     const sortFn = sortFns[state.sortKey];
     const shouldFilterThread = () => {
-      // is there a query or focused truthy value from the config?
+      // Is there a search query, or are we in an active (focused) focus mode?
       return state.filterQuery || store.focusModeFocused();
     };
     let filterFn;
     if (shouldFilterThread()) {
-      const userFilter = {}; // optional user filter object for focused mode
-      // look for a unique username, if present, add it to the user filter
-      const focusedUsername = store.focusModeUsername(); // may be null if no focused user
-      if (focusedUsername) {
-        // focused user found, add it to the filter object
-        userFilter.user = focusedUsername;
-      }
-      const filters = searchFilter.generateFacetedFilter(
-        state.filterQuery,
-        userFilter
-      );
+      const filters = searchFilter.generateFacetedFilter(state.filterQuery, {
+        user: store.focusModeUsername(), // `null` if no focused user
+      });
 
       filterFn = function(annot) {
         return viewFilter.filter([annot], filters).length > 0;
