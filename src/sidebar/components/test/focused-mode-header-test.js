@@ -19,8 +19,9 @@ describe('FocusedModeHeader', function() {
           focused: true,
         },
       },
-      focusModeFocused: sinon.stub().returns(false),
+      focusModeFocused: sinon.stub().returns(true),
       focusModeUserPrettyName: sinon.stub().returns('Fake User'),
+      focusModeHasUser: sinon.stub().returns(true),
       setFocusModeFocused: sinon.stub(),
     };
     FocusedModeHeader.$imports.$mock({
@@ -32,29 +33,71 @@ describe('FocusedModeHeader', function() {
     FocusedModeHeader.$imports.$restore();
   });
 
-  it('creates the component', () => {
-    const wrapper = createComponent();
-    assert.include(wrapper.text(), 'All annotations');
-  });
+  context('not in user-focused mode', () => {
+    it('should not render anything if not in user-focused mode', () => {
+      fakeStore.focusModeHasUser = sinon.stub().returns(false);
 
-  it("sets the button's text to the user's name when focused", () => {
-    fakeStore.focusModeFocused = sinon.stub().returns(true);
-    const wrapper = createComponent();
-    assert.include(wrapper.text(), 'Annotations by Fake User');
-  });
-
-  describe('clicking the button shall toggle the focused mode', function() {
-    it('when focused is false, toggle to true', () => {
       const wrapper = createComponent();
-      wrapper.find('button').simulate('click');
-      assert.calledWith(fakeStore.setFocusModeFocused, true);
+
+      assert.isFalse(wrapper.exists('.focused-mode-header'));
+    });
+  });
+
+  context('user-focused mode', () => {
+    context('focus is applied (focused/on)', () => {
+      it("should render status text indicating only that user's annotations are visible", () => {
+        const wrapper = createComponent();
+
+        assert.match(wrapper.text(), /Annotations by.+Fake User/);
+      });
+
+      it('should render a button allowing the user to view all annotations', () => {
+        const wrapper = createComponent();
+
+        const button = wrapper.find('button');
+
+        assert.include(button.text(), 'Show all');
+      });
     });
 
-    it('when focused is true, toggle to false', () => {
-      fakeStore.focusModeFocused = sinon.stub().returns(true);
-      const wrapper = createComponent();
-      wrapper.find('button').simulate('click');
-      assert.calledWith(fakeStore.setFocusModeFocused, false);
+    context('focus is not applied (unfocused/off)', () => {
+      beforeEach(() => {
+        fakeStore.focusModeFocused = sinon.stub().returns(false);
+      });
+
+      it("should render status text indicating that all user's annotations are visible", () => {
+        const wrapper = createComponent();
+
+        assert.match(wrapper.text(), /Everybody.*s annotations/);
+      });
+
+      it("should render a button allowing the user to view only focus user's annotations", () => {
+        const wrapper = createComponent();
+
+        const button = wrapper.find('button');
+
+        assert.include(button.text(), 'Only Fake User');
+      });
+    });
+
+    describe('toggle button', () => {
+      it('should toggle focus mode to false if clicked when focused', () => {
+        fakeStore.focusModeFocused = sinon.stub().returns(true);
+        const wrapper = createComponent();
+
+        wrapper.find('button').simulate('click');
+
+        assert.calledWith(fakeStore.setFocusModeFocused, false);
+      });
+
+      it('should toggle focus mode to true if clicked when not focused', () => {
+        fakeStore.focusModeFocused = sinon.stub().returns(false);
+        const wrapper = createComponent();
+
+        wrapper.find('button').simulate('click');
+
+        assert.calledWith(fakeStore.setFocusModeFocused, true);
+      });
     });
   });
 });

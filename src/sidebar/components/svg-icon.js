@@ -7,6 +7,7 @@ const propTypes = require('prop-types');
 // The list of supported icons
 const icons = {
   add: require('../../images/icons/add.svg'),
+  cancel: require('../../images/icons/cancel.svg'),
   'collapse-menu': require('../../images/icons/collapse-menu.svg'),
   'expand-menu': require('../../images/icons/expand-menu.svg'),
   copy: require('../../images/icons/copy.svg'),

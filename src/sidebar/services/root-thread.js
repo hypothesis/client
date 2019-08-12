@@ -55,7 +55,8 @@ function RootThread($rootScope, store, searchFilter, viewFilter) {
     let filterFn;
     if (shouldFilterThread()) {
       const filters = searchFilter.generateFacetedFilter(state.filterQuery, {
-        user: store.focusModeUsername(), // `null` if no focused user
+        // if a focus mode is applied (focused) and we're focusing on a user
+        user: store.focusModeFocused() && store.focusModeUsername(),
       });
 
       filterFn = function(annot) {
