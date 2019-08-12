@@ -30,11 +30,6 @@ describe('DocumentMeta', function() {
     tempDocument.appendChild(tempDocumentHead);
 
     fakeNormalizeURI = sinon.stub().callsFake((url, base) => {
-      if (url === 'http://a:b:c') {
-        // A modern browser would reject this URL, but PhantomJS's URL parser is
-        // more lenient.
-        throw new Error('Invalid URL');
-      }
       return normalizeURI(url, base);
     });
 

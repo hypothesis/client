@@ -175,10 +175,7 @@ function createDirective(
 
 /** Helper to dispatch a native event to a DOM element. */
 function sendEvent(element, eventType) {
-  // createEvent() used instead of Event constructor
-  // for PhantomJS compatibility
-  const event = document.createEvent('Event');
-  event.initEvent(eventType, true /* bubbles */, true /* cancelable */);
+  const event = new Event(eventType, { bubbles: true, cancelable: true });
   element.dispatchEvent(event);
 }
 
