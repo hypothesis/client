@@ -100,9 +100,10 @@ function viewFilter(unicode) {
     quote: {
       autofalse: ann => (ann.references || []).length > 0,
       value(annotation) {
-        if (!annotation.target) {
-          // FIXME: All annotations *must* have a target, so this check should
-          // not be required.
+        if (!annotation.target || !annotation.target.length) {
+          // Sanity check that ignores any annotation without a target. We should
+          // never arrive at this place in the code, but its a safe guard against
+          // anything from the server that may be malformed.
           return '';
         }
         const target = annotation.target[0];
@@ -183,7 +184,9 @@ function viewFilter(unicode) {
     const rootFilter = new BinaryOpFilter('and', fieldFilters);
 
     return annotations
-      .filter(ann => rootFilter.matches(ann))
+      .filter(ann => {
+        return ann.id && rootFilter.matches(ann);
+      })
       .map(ann => ann.id);
   };
 }
