@@ -74,9 +74,10 @@ describe('sidebar/services/view-filter', () => {
   describe('"any" field', () => {
     it('finds matches in any field', () => {
       const annotations = [
-        { id: 1, text: poem.tiger },
-        { id: 2, user: 'Tiger' },
-        { id: 3, tags: ['Tiger'] },
+        { id: 1, text: poem.tiger, target: [{}] },
+        { id: 4, user: 'lion', target: [{}] },
+        { id: 2, user: 'Tiger', target: [{}] },
+        { id: 3, tags: ['Tiger'], target: [{}] },
       ];
       const filters = { any: { terms: ['Tiger'], operator: 'and' } };
 
@@ -191,6 +192,7 @@ describe('sidebar/services/view-filter', () => {
       const annotation = {
         id: 1,
         updated: isoDateWithAge(50),
+        target: [{}],
       };
       const filters = {
         since: { terms: [100], operator: 'and' },
@@ -205,6 +207,7 @@ describe('sidebar/services/view-filter', () => {
       const annotation = {
         id: 1,
         updated: isoDateWithAge(150),
+        target: [{}],
       };
       const filters = {
         since: { terms: [100], operator: 'and' },
@@ -217,7 +220,11 @@ describe('sidebar/services/view-filter', () => {
   });
 
   it('ignores filters with no terms in the query', () => {
-    const annotation = { id: 1, tags: ['foo'] };
+    const annotation = {
+      id: 1,
+      tags: ['foo'],
+      target: [{}],
+    };
     const filters = {
       any: {
         terms: ['foo'],

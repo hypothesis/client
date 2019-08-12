@@ -100,11 +100,6 @@ function viewFilter(unicode) {
     quote: {
       autofalse: ann => (ann.references || []).length > 0,
       value(annotation) {
-        if (!annotation.target) {
-          // FIXME: All annotations *must* have a target, so this check should
-          // not be required.
-          return '';
-        }
         const target = annotation.target[0];
         const selectors = target.selector || [];
 
@@ -183,7 +178,9 @@ function viewFilter(unicode) {
     const rootFilter = new BinaryOpFilter('and', fieldFilters);
 
     return annotations
-      .filter(ann => rootFilter.matches(ann))
+      .filter(ann => {
+        return ann.id && rootFilter.matches(ann);
+      })
       .map(ann => ann.id);
   };
 }
