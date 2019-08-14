@@ -76,7 +76,7 @@ describe('FocusedModeHeader', function() {
 
         const button = wrapper.find('button');
 
-        assert.include(button.text(), 'Only Fake User');
+        assert.include(button.text(), 'Show only Fake User');
       });
     });
 
