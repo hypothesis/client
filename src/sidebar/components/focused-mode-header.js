@@ -45,7 +45,7 @@ function FocusedModeHeader() {
     if (selectors.focusModeFocused) {
       return 'Show all';
     } else {
-      return `Only ${selectors.focusModeUserPrettyName}`;
+      return `Show only ${selectors.focusModeUserPrettyName}`;
     }
   })();
 
