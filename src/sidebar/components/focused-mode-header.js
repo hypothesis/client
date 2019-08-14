@@ -4,8 +4,6 @@ const { createElement } = require('preact');
 
 const useStore = require('../store/use-store');
 
-const SvgIcon = require('./svg-icon');
-
 /**
  * Render a control to interact with any focused "mode" in the sidebar.
  * Currently only a user-focus mode is supported but this could be broadened
@@ -55,7 +53,6 @@ function FocusedModeHeader() {
     <div className="focused-mode-header sheet">
       {filterStatus}
       <button onClick={toggleFocusedMode} className="focused-mode-header__btn">
-        <SvgIcon name="cancel" className="focused-mode-header__btn-icon" />
         {buttonText}
       </button>
     </div>
