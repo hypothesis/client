@@ -22,7 +22,7 @@ describe('sidebar.services.api', function() {
 
   function defaultBodyForStatus(status) {
     if (status === 204) {
-      return '';
+      return null;
     } else if (status >= 500) {
       return '<html><body>Internal Server Error</body></html>';
     } else {

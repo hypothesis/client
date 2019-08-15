@@ -3,7 +3,6 @@
 node {
     checkout scm
 
-    nodeEnv = docker.image("node:10-stretch")
     workspace = pwd()
 
     // Tag used when deploying to NPM.
@@ -57,9 +56,18 @@ node {
     }
     echo "Building and testing ${newPkgVersion}"
 
+    sh "docker build -t hypothesis-client-tests ."
+    nodeEnv = docker.image("hypothesis-client-tests")
+
+    stage('Setup') {
+      nodeEnv.inside("-e HOME=${workspace}") {
+        sh "yarn install"
+      }
+    }
+
     stage('Test') {
         nodeEnv.inside("-e HOME=${workspace}") {
-            sh 'make test'
+          sh "make checkformatting lint test"
         }
     }
 }

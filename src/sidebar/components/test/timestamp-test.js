@@ -31,7 +31,7 @@ describe('Timestamp', () => {
 
   it('displays a link if an "href" is provided', () => {
     const wrapper = createTimestamp({
-      timestamp: '',
+      timestamp: '2016-06-10',
       href: 'https://example.com',
     });
     const link = wrapper.find('a');
@@ -40,7 +40,7 @@ describe('Timestamp', () => {
   });
 
   it('displays static text if no "href" is provided', () => {
-    const wrapper = createTimestamp({ timestamp: '' });
+    const wrapper = createTimestamp({ timestamp: '2016-06-10' });
     assert.equal(wrapper.find('a').length, 0);
     assert.equal(wrapper.find('span').length, 1);
   });
