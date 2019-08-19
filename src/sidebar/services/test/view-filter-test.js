@@ -74,9 +74,10 @@ describe('sidebar/services/view-filter', () => {
   describe('"any" field', () => {
     it('finds matches in any field', () => {
       const annotations = [
-        { id: 1, text: poem.tiger },
-        { id: 2, user: 'Tiger' },
-        { id: 3, tags: ['Tiger'] },
+        { id: 1, text: poem.tiger, target: [{}] },
+        { id: 4, user: 'lion', target: [{}] },
+        { id: 2, user: 'Tiger', target: [{}] },
+        { id: 3, tags: ['Tiger'], target: [{}] },
       ];
       const filters = { any: { terms: ['Tiger'], operator: 'and' } };
 
@@ -191,6 +192,7 @@ describe('sidebar/services/view-filter', () => {
       const annotation = {
         id: 1,
         updated: isoDateWithAge(50),
+        target: [{}],
       };
       const filters = {
         since: { terms: [100], operator: 'and' },
@@ -205,6 +207,7 @@ describe('sidebar/services/view-filter', () => {
       const annotation = {
         id: 1,
         updated: isoDateWithAge(150),
+        target: [{}],
       };
       const filters = {
         since: { terms: [100], operator: 'and' },
@@ -217,7 +220,11 @@ describe('sidebar/services/view-filter', () => {
   });
 
   it('ignores filters with no terms in the query', () => {
-    const annotation = { id: 1, tags: ['foo'] };
+    const annotation = {
+      id: 1,
+      tags: ['foo'],
+      target: [{}],
+    };
     const filters = {
       any: {
         terms: ['foo'],
@@ -232,5 +239,58 @@ describe('sidebar/services/view-filter', () => {
     const result = viewFilter.filter([annotation], filters);
 
     assert.deepEqual(result, [1]);
+  });
+
+  it('ignores annotations (drafts) with no id', () => {
+    const annotation = {
+      tags: ['foo'],
+      target: [{}],
+    };
+    const filters = {
+      any: {
+        terms: ['foo'],
+        operator: 'and',
+      },
+    };
+
+    const result = viewFilter.filter([annotation], filters);
+
+    assert.deepEqual(result, []);
+  });
+
+  describe('malformed target object', () => {
+    it('should not fail on annotations without a target object', () => {
+      const annotation = {
+        id: 1,
+        text: 'foo',
+        // Missing target
+      };
+
+      const filters = {
+        any: {
+          terms: ['foo'],
+          operator: 'or',
+        },
+      };
+
+      viewFilter.filter([annotation], filters);
+    });
+
+    it('should not fail on annotations without a target object item', () => {
+      const annotation = {
+        id: 1,
+        text: 'foo',
+        target: [], // Missing target item
+      };
+
+      const filters = {
+        any: {
+          terms: ['foo'],
+          operator: 'or',
+        },
+      };
+
+      viewFilter.filter([annotation], filters);
+    });
   });
 });
