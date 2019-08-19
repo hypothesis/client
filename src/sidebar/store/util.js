@@ -20,6 +20,10 @@ function actionTypes(updateFns) {
 function createReducer(...actionToUpdateFn) {
   // Combine the (action name => update function) maps together into a single
   // (action name => update functions) map.
+  //
+  // After namespace migration, remove the requirement for actionToUpdateFns
+  // to use arrays. Why? createReducer will be called once for each module rather
+  // than once for all modules.
   const actionToUpdateFns = {};
   actionToUpdateFn.forEach(map => {
     Object.keys(map).forEach(k => {
@@ -27,35 +31,51 @@ function createReducer(...actionToUpdateFn) {
     });
   });
 
-  return (state, action) => {
+  return (state = {}, action) => {
     const fns = actionToUpdateFns[action.type];
     if (!fns) {
       return state;
+    }
+    // Some modules return an array rather than an object. They need to be
+    // handled differently so we don't cast them to an object.
+    if (Array.isArray(state)) {
+      return [...fns[0](state, action)];
     }
     return Object.assign({}, state, ...fns.map(f => f(state, action)));
   };
 }
 
 /**
- * Takes an object mapping keys to selector functions and the `getState()`
- * function from the store and returns an object with the same keys but where
- * the values are functions that call the original functions with the `state`
- * argument set to the current value of `getState()`
+ * Takes a mapping of namespaced modules and the store's `getState()` function
+ * and returns an aggregated flat object with all the selectors at the root
+ * level. The keys to this object are functions that call the original
+ * selectors with the `state` argument set to the current value of `getState()`
+ * for namespaced modules or `getState().base` for non-namespaced modules.
  */
-function bindSelectors(selectors, getState) {
-  return Object.keys(selectors).reduce(function(bound, key) {
-    const selector = selectors[key];
-    bound[key] = function() {
-      const args = [].slice.apply(arguments);
-      args.unshift(getState());
-      return selector.apply(null, args);
-    };
-    return bound;
-  }, {});
+function bindSelectors(namespaces, getState) {
+  const totalSelectors = {};
+  Object.keys(namespaces).forEach(namespace => {
+    const selectors = namespaces[namespace].selectors;
+    const useLocalState = namespaces[namespace].useLocalState;
+    Object.keys(selectors).forEach(selector => {
+      totalSelectors[selector] = function() {
+        const args = [].slice.apply(arguments);
+        if (useLocalState) {
+          // Temporary scaffold until all selectors use namespaces.
+          args.unshift(getState()[namespace]);
+        } else {
+          // Namespace modules get root scope
+          args.unshift(getState());
+        }
+        return selectors[selector].apply(null, args);
+      };
+    });
+  });
+  return totalSelectors;
 }
 
 module.exports = {
-  actionTypes: actionTypes,
-  bindSelectors: bindSelectors,
-  createReducer: createReducer,
+  actionTypes,
+  bindSelectors,
+  createReducer,
 };
