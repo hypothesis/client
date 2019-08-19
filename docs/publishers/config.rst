@@ -365,10 +365,6 @@ loads.
 
 .. option:: externalContainerSelector
 
-   .. warning::
-
-      This is an experimental API and may change in future.
-
   ``string``. A CSS selector specifying the containing element into which the
   sidebar iframe will be placed.
 
@@ -385,6 +381,45 @@ loads.
   where annotations are located on the page relative to the current scroll
   position.
 
+  .. warning::
+
+    The :option:`externalContainerSelector` 
+    setting is currently still experimental and may change in the future.
+
+.. option:: focus
+
+  ``Object``. A structured object that defines a focused filter set for the available 
+  annotations on a page. When this object is passed to the config, the sidebar will add 
+  a UI button element that the user can toggle on or off to apply the filtered set of 
+  annotations defined by this ``focus`` object. This structure may define a particular 
+  ``user`` to focus on. Currently, only the ``user`` type is supported, but others may 
+  be added later.
+
+  .. note::
+    The focus ``user`` is not necessarily the same user viewing the sidebar.
+
+  For example:
+
+  .. code-block:: javascript
+    
+    window.hypothesisConfig = function () {
+      return {
+        focus: {
+          user: {
+            // required
+            username: "foobar1234",
+
+            // optional
+            displayName: "Foo Bar",
+            authority: "example.com",
+          }
+        }
+      };
+    };
+  .. warning::
+
+    The :option:`focus`
+    setting is currently still experimental and may change in the future.
 
 Asset and Sidebar App Location
 ##############################
