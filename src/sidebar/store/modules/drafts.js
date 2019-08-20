@@ -9,9 +9,7 @@ const util = require('../util');
  */
 
 function init() {
-  return {
-    drafts: [],
-  };
+  return [];
 }
 
 /**
@@ -58,27 +56,21 @@ class Draft {
 
 const update = {
   DISCARD_ALL_DRAFTS: function() {
-    return {
-      drafts: [],
-    };
+    return [];
   },
   REMOVE_DRAFT: function(state, action) {
-    const drafts = state.drafts.filter(draft => {
+    const drafts = state.filter(draft => {
       return !draft.match(action.annotation);
     });
-    return {
-      drafts,
-    };
+    return drafts;
   },
   UPDATE_DRAFT: function(state, action) {
     // removes a matching existing draft, then adds
-    const drafts = state.drafts.filter(draft => {
+    const drafts = state.filter(draft => {
       return !draft.match(action.draft.annotation);
     });
     drafts.push(action.draft); // push ok since its a copy
-    return {
-      drafts,
-    };
+    return drafts;
   },
 };
 
@@ -106,10 +98,10 @@ function createDraft(annotation, changes) {
 function deleteNewAndEmptyDrafts() {
   const annotations = require('./annotations');
   return (dispatch, getState) => {
-    const newDrafts = getState().base.drafts.filter(draft => {
+    const newDrafts = getState().drafts.filter(draft => {
       return (
         metadata.isNew(draft.annotation) &&
-        !getDraftIfNotEmpty(getState().base, draft.annotation)
+        !getDraftIfNotEmpty(getState(), draft.annotation)
       );
     });
     const removedAnnotations = newDrafts.map(draft => {
@@ -157,8 +149,9 @@ function countDrafts(state) {
  * @return {Draft|null}
  */
 function getDraft(state, annotation) {
-  for (let i = 0; i < state.drafts.length; i++) {
-    const draft = state.drafts[i];
+  const drafts = state.drafts;
+  for (let i = 0; i < drafts.length; i++) {
+    const draft = drafts[i];
     if (draft.match(annotation)) {
       return draft;
     }
@@ -194,6 +187,7 @@ function unsavedAnnotations(state) {
 
 module.exports = {
   init,
+  namespace: 'drafts',
   update,
   actions: {
     createDraft,
