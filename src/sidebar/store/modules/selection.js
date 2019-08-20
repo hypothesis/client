@@ -236,7 +236,7 @@ function selectAnnotations(ids) {
 /** Toggle whether annotations are selected or not. */
 function toggleSelectedAnnotations(ids) {
   return function(dispatch, getState) {
-    const selection = Object.assign({}, getState().selectedAnnotationMap);
+    const selection = Object.assign({}, getState().base.selectedAnnotationMap);
     for (let i = 0; i < ids.length; i++) {
       const id = ids[i];
       if (selection[id]) {
@@ -260,7 +260,7 @@ function setForceVisible(id, visible) {
   // FIXME: This should be converted to a plain action and accessing the state
   // should happen in the update() function
   return function(dispatch, getState) {
-    const forceVisible = Object.assign({}, getState().forceVisible);
+    const forceVisible = Object.assign({}, getState().base.forceVisible);
     forceVisible[id] = visible;
     dispatch({
       type: actions.SET_FORCE_VISIBLE,
@@ -285,7 +285,7 @@ function setCollapsed(id, collapsed) {
   // FIXME: This should be converted to a plain action and accessing the state
   // should happen in the update() function
   return function(dispatch, getState) {
-    const expanded = Object.assign({}, getState().expanded);
+    const expanded = Object.assign({}, getState().base.expanded);
     expanded[id] = !collapsed;
     dispatch({
       type: actions.SET_EXPANDED,

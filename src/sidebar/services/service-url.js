@@ -42,7 +42,7 @@ function serviceUrl(store, apiRoutes) {
     });
 
   return function(linkName, params) {
-    const links = store.getState().links;
+    const links = store.getRootState().links;
 
     if (links === null) {
       return '';

@@ -14,8 +14,23 @@ const fixtures = {
       return { tab: action.tab };
     },
   },
-  countAnnotations: function(state) {
-    return state.annotations.length;
+  selectors: {
+    namespace1: {
+      selectors: {
+        countAnnotations1: function(state) {
+          return state.namespace1.annotations.length;
+        },
+      },
+    },
+    namespace2: {
+      useLocalState: true,
+      selectors: {
+        countAnnotations2: function(state) {
+          // useLocalState does not need namespaced path.
+          return state.annotations.length;
+        },
+      },
+    },
   },
 };
 
@@ -36,6 +51,15 @@ describe('reducer utils', function() {
   });
 
   describe('#createReducer', function() {
+    it('returns an object if input state is undefined', function() {
+      // See redux.js:assertReducerShape in the "redux" package.
+      const reducer = util.createReducer(fixtures.update);
+      const initialState = reducer(undefined, {
+        type: 'DUMMY_ACTION',
+      });
+      assert.isOk(initialState);
+    });
+
     it('returns a reducer that combines each update function from the input object', function() {
       const reducer = util.createReducer(fixtures.update);
       const newState = reducer(
@@ -105,23 +129,39 @@ describe('reducer utils', function() {
 
       assert.deepEqual(newState, { firstCounter: 6, secondCounter: 11 });
     });
+
+    it('supports reducer functions that return an array', function() {
+      const action = {
+        type: 'FIRST_ITEM',
+        item: 'bar',
+      };
+      const addItem = {
+        FIRST_ITEM(state, action) {
+          // Concatenate the array with a new item.
+          return [...state, action.item];
+        },
+      };
+      const reducer = util.createReducer(addItem);
+      const newState = reducer(['foo'], action);
+      assert.equal(newState.length, 2);
+    });
   });
 
   describe('#bindSelectors', function() {
     it('bound functions call original functions with current value of getState()', function() {
-      const annotations = [{ id: 1 }];
-      const getState = sinon.stub().returns({ annotations: annotations });
-      const bound = util.bindSelectors(
-        {
-          countAnnotations: fixtures.countAnnotations,
+      const getState = sinon.stub().returns({
+        namespace1: {
+          annotations: [{ id: 1 }],
         },
-        getState
-      );
-
-      assert.equal(bound.countAnnotations(), 1);
-
-      getState.returns({ annotations: annotations.concat([{ id: 2 }]) });
-      assert.equal(bound.countAnnotations(), 2);
+        namespace2: {
+          annotations: [{ id: 1 }],
+        },
+      });
+      const bound = util.bindSelectors(fixtures.selectors, getState);
+      // Test non-namespaced selector (useLocalState=true)
+      assert.equal(bound.countAnnotations1(), 1);
+      // Test the namespaced selector
+      assert.equal(bound.countAnnotations2(), 1);
     });
   });
 });

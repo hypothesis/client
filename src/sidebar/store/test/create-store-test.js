@@ -2,38 +2,68 @@
 
 const createStore = require('../create-store');
 
-const counterModule = {
-  init(value = 0) {
-    return { count: value };
-  },
+const BASE = 0;
 
-  update: {
-    ['INCREMENT_COUNTER'](state, action) {
-      return { count: state.count + action.amount };
+const modules = [
+  {
+    // base module
+    init(value = 0) {
+      return { count: value };
+    },
+
+    update: {
+      INCREMENT_COUNTER: (state, action) => {
+        return { count: state.count + action.amount };
+      },
+    },
+
+    actions: {
+      increment(amount) {
+        return { type: 'INCREMENT_COUNTER', amount };
+      },
+    },
+
+    selectors: {
+      getCount(state) {
+        return state.count;
+      },
     },
   },
+  {
+    // namespaced module
+    init(value = 0) {
+      return { count: value };
+    },
+    namespace: 'foo',
 
-  actions: {
-    increment(amount) {
-      return { type: 'INCREMENT_COUNTER', amount };
+    update: {
+      ['INCREMENT_COUNTER_2'](state, action) {
+        return { count: state.count + action.amount };
+      },
+    },
+
+    actions: {
+      increment2(amount) {
+        return { type: 'INCREMENT_COUNTER_2', amount };
+      },
+    },
+
+    selectors: {
+      getCount2(state) {
+        return state.foo.count;
+      },
     },
   },
-
-  selectors: {
-    getCount(state) {
-      return state.count;
-    },
-  },
-};
+];
 
 function counterStore(initArgs = [], middleware = []) {
-  return createStore([counterModule], initArgs, middleware);
+  return createStore(modules, initArgs, middleware);
 }
 
 describe('sidebar.store.create-store', () => {
   it('returns a working Redux store', () => {
     const store = counterStore();
-    store.dispatch(counterModule.actions.increment(5));
+    store.dispatch(modules[BASE].actions.increment(5));
     assert.equal(store.getState().count, 5);
   });
 
@@ -60,14 +90,14 @@ describe('sidebar.store.create-store', () => {
 
   it('adds selectors as methods to the store', () => {
     const store = counterStore();
-    store.dispatch(counterModule.actions.increment(5));
+    store.dispatch(modules[BASE].actions.increment(5));
     assert.equal(store.getCount(), 5);
   });
 
   it('applies `thunk` middleware by default', () => {
     const store = counterStore();
     const doubleAction = (dispatch, getState) => {
-      dispatch(counterModule.actions.increment(getState().count));
+      dispatch(modules[BASE].actions.increment(getState().base.count));
     };
 
     store.increment(5);
@@ -91,5 +121,26 @@ describe('sidebar.store.create-store', () => {
     store.increment(5);
 
     assert.deepEqual(actions, [{ type: 'INCREMENT_COUNTER', amount: 5 }]);
+  });
+
+  it('namespaced actions and selectors operate on their respective state', () => {
+    const store = counterStore();
+    store.increment2(6);
+    store.increment(5);
+    assert.equal(store.getCount2(), 6);
+  });
+
+  it('getState returns the base state', () => {
+    const store = counterStore();
+    store.increment(5);
+    assert.equal(store.getState().count, 5);
+  });
+
+  it('getRootState returns the top level root state', () => {
+    const store = counterStore();
+    store.increment(5);
+    store.increment2(6);
+    assert.equal(store.getRootState().base.count, 5);
+    assert.equal(store.getRootState().foo.count, 6);
   });
 });

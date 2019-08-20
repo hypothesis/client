@@ -106,10 +106,10 @@ function createDraft(annotation, changes) {
 function deleteNewAndEmptyDrafts() {
   const annotations = require('./annotations');
   return (dispatch, getState) => {
-    const newDrafts = getState().drafts.filter(draft => {
+    const newDrafts = getState().base.drafts.filter(draft => {
       return (
         metadata.isNew(draft.annotation) &&
-        !getDraftIfNotEmpty(getState(), draft.annotation)
+        !getDraftIfNotEmpty(getState().base, draft.annotation)
       );
     });
     const removedAnnotations = newDrafts.map(draft => {

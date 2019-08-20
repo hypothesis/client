@@ -254,7 +254,7 @@ function addAnnotations(annotations, now) {
 
   return function(dispatch, getState) {
     const added = annotations.filter(function(annot) {
-      return !findByID(getState().annotations, annot.id);
+      return !findByID(getState().base.annotations, annot.id);
     });
 
     dispatch({
@@ -262,7 +262,7 @@ function addAnnotations(annotations, now) {
       annotations: annotations,
     });
 
-    if (!getState().isSidebar) {
+    if (!getState().base.isSidebar) {
       return;
     }
 
@@ -277,7 +277,7 @@ function addAnnotations(annotations, now) {
     if (anchoringIDs.length > 0) {
       setTimeout(() => {
         // Find annotations which haven't yet been anchored in the document.
-        const anns = getState().annotations;
+        const anns = getState().base.annotations;
         const annsStillAnchoring = anchoringIDs
           .map(id => findByID(anns, id))
           .filter(ann => ann && metadata.isWaitingToAnchor(ann));
