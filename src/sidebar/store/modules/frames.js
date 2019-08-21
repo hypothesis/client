@@ -5,25 +5,21 @@ const { createSelector } = require('reselect');
 const util = require('../util');
 
 function init() {
-  return {
-    // The list of frames connected to the sidebar app
-    frames: [],
-  };
+  // The list of frames connected to the sidebar app
+  return [];
 }
 
 const update = {
   CONNECT_FRAME: function(state, action) {
-    return { frames: state.frames.concat(action.frame) };
+    return [...state, action.frame];
   },
 
   DESTROY_FRAME: function(state, action) {
-    return {
-      frames: state.frames.filter(f => f !== action.frame),
-    };
+    return state.filter(f => f !== action.frame);
   },
 
   UPDATE_FRAME_ANNOTATION_FETCH_STATUS: function(state, action) {
-    const frames = state.frames.map(function(frame) {
+    const frames = state.map(function(frame) {
       const match = frame.uri && frame.uri === action.uri;
       if (match) {
         return Object.assign({}, frame, {
@@ -33,9 +29,7 @@ const update = {
         return frame;
       }
     });
-    return {
-      frames: frames,
-    };
+    return frames;
   },
 };
 
@@ -123,6 +117,7 @@ function searchUris(state) {
 
 module.exports = {
   init: init,
+  namespace: 'frames',
   update: update,
 
   actions: {
