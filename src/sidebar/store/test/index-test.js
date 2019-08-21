@@ -76,17 +76,19 @@ describe('store', function() {
 
     it('sets `directLinkedGroupFetchFailed` to false', () => {
       store.clearSelection();
-      assert.isFalse(store.getState().directLinkedGroupFetchFailed);
+      assert.isFalse(
+        store.getRootState().directLinked.directLinkedGroupFetchFailed
+      );
     });
 
     it('sets `directLinkedAnnotationId` to null', () => {
       store.clearSelection();
-      assert.isNull(store.getState().directLinkedAnnotationId);
+      assert.isNull(store.getRootState().directLinked.directLinkedAnnotationId);
     });
 
     it('sets `directLinkedGroupId` to null', () => {
       store.clearSelection();
-      assert.isNull(store.getState().directLinkedGroupId);
+      assert.isNull(store.getRootState().directLinked.directLinkedGroupId);
     });
 
     it('sets `sortKey` to default annotation sort key if set to Orphans', () => {

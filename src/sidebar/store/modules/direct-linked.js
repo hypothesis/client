@@ -129,6 +129,7 @@ function clearDirectLinkedIds() {
 
 module.exports = {
   init,
+  namespace: 'directLinked',
   update,
   actions: {
     setDirectLinkedGroupFetchFailed,
