@@ -57,7 +57,7 @@ describe('sidebar/store/modules/activity', () => {
   });
 
   it('defaults `activeAnnotationFetches` counter to zero', () => {
-    assert.equal(store.getState().activity.activeAnnotationFetches, 0);
+    assert.equal(store.getRootState().activity.activeAnnotationFetches, 0);
   });
 
   describe('annotationFetchFinished', () => {
@@ -70,7 +70,7 @@ describe('sidebar/store/modules/activity', () => {
     it('increments `activeAnnotationFetches` counter when a new annotation fetch is started', () => {
       store.annotationFetchStarted();
 
-      assert.equal(store.getState().activity.activeAnnotationFetches, 1);
+      assert.equal(store.getRootState().activity.activeAnnotationFetches, 1);
     });
   });
 
@@ -86,7 +86,7 @@ describe('sidebar/store/modules/activity', () => {
 
       store.annotationFetchFinished();
 
-      assert.equal(store.getState().activity.activeAnnotationFetches, 0);
+      assert.equal(store.getRootState().activity.activeAnnotationFetches, 0);
     });
   });
 
