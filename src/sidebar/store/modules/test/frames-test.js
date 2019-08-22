@@ -84,7 +84,7 @@ describe('sidebar/store/modules/frames', function() {
     });
   });
 
-  describe('xxx #searchUris', function() {
+  describe('#searchUris', function() {
     [
       {
         when: 'one HTML frame',
