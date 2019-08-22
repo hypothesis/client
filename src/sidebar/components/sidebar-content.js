@@ -151,7 +151,7 @@ function SidebarContentController(
   this.scrollTo = scrollToAnnotation;
 
   this.selectedGroupUnavailable = function() {
-    return store.getState().directLinkedGroupFetchFailed;
+    return store.getRootState().directLinked.directLinkedGroupFetchFailed;
   };
 
   this.selectedAnnotationUnavailable = function() {
@@ -169,7 +169,7 @@ function SidebarContentController(
 
     // If user has not landed on a direct linked annotation
     // don't show the CTA.
-    if (!store.getState().directLinkedAnnotationId) {
+    if (!store.getRootState().directLinked.directLinkedAnnotationId) {
       return false;
     }
 

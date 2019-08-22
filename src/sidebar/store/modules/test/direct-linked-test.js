@@ -7,6 +7,10 @@ describe('sidebar/store/modules/direct-linked', () => {
   let store;
   let fakeSettings = {};
 
+  const getDirectLinkedState = () => {
+    return store.getRootState().directLinked;
+  };
+
   beforeEach(() => {
     store = createStore([directLinked], [fakeSettings]);
   });
@@ -15,7 +19,7 @@ describe('sidebar/store/modules/direct-linked', () => {
     it('sets directLinkedGroupFetchFailed to true', () => {
       store.setDirectLinkedGroupFetchFailed();
 
-      assert.isTrue(store.getState().directLinkedGroupFetchFailed);
+      assert.isTrue(getDirectLinkedState().directLinkedGroupFetchFailed);
     });
   });
 
@@ -25,7 +29,7 @@ describe('sidebar/store/modules/direct-linked', () => {
 
       store.clearDirectLinkedGroupFetchFailed();
 
-      assert.isFalse(store.getState().directLinkedGroupFetchFailed);
+      assert.isFalse(getDirectLinkedState().directLinkedGroupFetchFailed);
     });
   });
 
@@ -34,14 +38,14 @@ describe('sidebar/store/modules/direct-linked', () => {
 
     store = createStore([directLinked], [fakeSettings]);
 
-    assert.equal(store.getState().directLinkedAnnotationId, 'ann-id');
+    assert.equal(getDirectLinkedState().directLinkedAnnotationId, 'ann-id');
   });
 
   describe('setDirectLinkedAnnotationId', () => {
     it('sets directLinkedAnnotationId to the specified annotation id', () => {
       store.setDirectLinkedAnnotationId('ann-id');
 
-      assert.equal(store.getState().directLinkedAnnotationId, 'ann-id');
+      assert.equal(getDirectLinkedState().directLinkedAnnotationId, 'ann-id');
     });
   });
 
@@ -50,14 +54,14 @@ describe('sidebar/store/modules/direct-linked', () => {
 
     store = createStore([directLinked], [fakeSettings]);
 
-    assert.equal(store.getState().directLinkedGroupId, 'group-id');
+    assert.equal(getDirectLinkedState().directLinkedGroupId, 'group-id');
   });
 
   describe('setDirectLinkedGroupId', () => {
     it('sets directLinkedGroupId to the specified group id', () => {
       store.setDirectLinkedGroupId('group-id');
 
-      assert.equal(store.getState().directLinkedGroupId, 'group-id');
+      assert.equal(getDirectLinkedState().directLinkedGroupId, 'group-id');
     });
   });
 
@@ -68,8 +72,8 @@ describe('sidebar/store/modules/direct-linked', () => {
 
       store.clearDirectLinkedIds();
 
-      assert.equal(store.getState().directLinkedAnnotationId, null);
-      assert.equal(store.getState().directLinkedGroupId, null);
+      assert.equal(getDirectLinkedState().directLinkedAnnotationId, null);
+      assert.equal(getDirectLinkedState().directLinkedGroupId, null);
     });
   });
 });
