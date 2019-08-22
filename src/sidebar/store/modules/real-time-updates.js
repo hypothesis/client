@@ -138,7 +138,7 @@ function clearPendingUpdates() {
  * @return {{[id: string]: Annotation}}
  */
 function pendingUpdates(state) {
-  return state.pendingUpdates;
+  return state.realTimeUpdates.pendingUpdates;
 }
 
 /**
@@ -148,14 +148,17 @@ function pendingUpdates(state) {
  * @return {{[id: string]: boolean}}
  */
 function pendingDeletions(state) {
-  return state.pendingDeletions;
+  return state.realTimeUpdates.pendingDeletions;
 }
 
 /**
  * Return a total count of pending updates and deletions.
  */
 const pendingUpdateCount = createSelector(
-  state => [state.pendingUpdates, state.pendingDeletions],
+  state => [
+    state.realTimeUpdates.pendingUpdates,
+    state.realTimeUpdates.pendingDeletions,
+  ],
   ([pendingUpdates, pendingDeletions]) =>
     Object.keys(pendingUpdates).length + Object.keys(pendingDeletions).length
 );
@@ -165,11 +168,12 @@ const pendingUpdateCount = createSelector(
  * has not yet been applied.
  */
 function hasPendingDeletion(state, id) {
-  return state.pendingDeletions.hasOwnProperty(id);
+  return state.realTimeUpdates.pendingDeletions.hasOwnProperty(id);
 }
 
 module.exports = {
   init,
+  namespace: 'realTimeUpdates',
   update,
   actions: {
     receiveRealTimeUpdates,
