@@ -46,11 +46,7 @@ describe('rootThread', function() {
           focusedAnnotationMap: null,
           forceVisible: {},
           highlighted: [],
-
           selectedAnnotationMap: null,
-          session: {
-            features: {},
-          },
           sortKey: 'Location',
           sortKeysAvailable: ['Location'],
         },
@@ -300,6 +296,13 @@ describe('rootThread', function() {
       // There should be no thread filter function on the stream and standalone
       // pages, since we show all types of annotations here
       assert.notOk(threadFilterFn);
+    });
+
+    it('filter returns false when no annotations are provided', function() {
+      fakeBuildThread.reset();
+      rootThread.thread(fakeStore.state);
+      const threadFilterFn = fakeBuildThread.args[0][1].threadFilterFn;
+      assert.isFalse(threadFilterFn({}));
     });
   });
 

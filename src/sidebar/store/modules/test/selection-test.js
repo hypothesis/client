@@ -80,6 +80,17 @@ describe('store/modules/selection', () => {
     });
   });
 
+  describe('filterQuery', function() {
+    it('returns the filterQuery value when provided', function() {
+      store.setFilterQuery('tag:foo');
+      assert.equal(store.filterQuery(), 'tag:foo');
+    });
+
+    it('returns null when no filterQuery is present', function() {
+      assert.isNull(store.filterQuery());
+    });
+  });
+
   describe('isAnnotationSelected', function() {
     it('returns true if the id provided is selected', function() {
       store.selectAnnotations([1]);

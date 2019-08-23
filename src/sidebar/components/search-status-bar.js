@@ -28,10 +28,11 @@ function SearchStatusBar({ rootThread }) {
     selectedAnnotationMap,
     selectedTab,
   } = useStore(store => ({
-    directLinkedGroupFetchFailed: store.getState().directLinkedGroupFetchFailed,
-    filterQuery: store.getState().filterQuery,
-    selectedAnnotationMap: store.getState().selectedAnnotationMap,
-    selectedTab: store.getState().selectedTab,
+    directLinkedGroupFetchFailed: store.getRootState().directLinked
+      .directLinkedGroupFetchFailed,
+    filterQuery: store.getRootState().selection.filterQuery,
+    selectedAnnotationMap: store.getRootState().selection.selectedAnnotationMap,
+    selectedTab: store.getRootState().selection.selectedTab,
   }));
   const clearSelection = useStore(store => store.clearSelection);
   const filterActive = !!filterQuery;
