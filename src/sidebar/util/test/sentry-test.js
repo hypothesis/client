@@ -24,25 +24,43 @@ describe('sidebar/util/sentry', () => {
     sentry.$imports.$restore();
   });
 
-  it('limits the number of events sent to Sentry per session', () => {
-    sentry.init({ dsn: 'test-dsn' });
-    assert.called(fakeSentry.init);
+  describe('init', () => {
+    it('configures Sentry', () => {
+      sentry.init({
+        dsn: 'test-dsn',
+        environment: 'dev',
+      });
 
-    // The first `maxEvents` events should be sent to Sentry.
-    const maxEvents = 5;
-    const beforeSend = fakeSentry.init.getCall(0).args[0].beforeSend;
-    for (let i = 0; i < maxEvents; i++) {
-      const val = {};
+      assert.calledWith(
+        fakeSentry.init,
+        sinon.match({
+          dsn: 'test-dsn',
+          environment: 'dev',
+          release: '1.0.0-dummy-version',
+        })
+      );
+    });
 
-      // These events should not be modified.
-      assert.equal(beforeSend(val), val);
-    }
-    assert.notCalled(fakeWarnOnce);
+    it('limits the number of events sent to Sentry per session', () => {
+      sentry.init({ dsn: 'test-dsn' });
+      assert.called(fakeSentry.init);
 
-    // Subsequent events should not be sent and a warning should be logged.
-    assert.equal(beforeSend({}), null);
-    assert.equal(beforeSend({}), null); // Verify this works a second time.
-    assert.called(fakeWarnOnce);
+      // The first `maxEvents` events should be sent to Sentry.
+      const maxEvents = 5;
+      const beforeSend = fakeSentry.init.getCall(0).args[0].beforeSend;
+      for (let i = 0; i < maxEvents; i++) {
+        const val = {};
+
+        // These events should not be modified.
+        assert.equal(beforeSend(val), val);
+      }
+      assert.notCalled(fakeWarnOnce);
+
+      // Subsequent events should not be sent and a warning should be logged.
+      assert.equal(beforeSend({}), null);
+      assert.equal(beforeSend({}), null); // Verify this works a second time.
+      assert.called(fakeWarnOnce);
+    });
   });
 
   describe('setUserInfo', () => {

@@ -7,6 +7,7 @@ const warnOnce = require('../../shared/warn-once');
 /**
  * @typedef SentryConfig
  * @prop {string} dsn
+ * @prop {string} environment
  */
 
 let eventsSent = 0;
@@ -23,6 +24,7 @@ const maxEventsToSendPerSession = 5;
 function init(config) {
   Sentry.init({
     dsn: config.dsn,
+    environment: config.environment,
     release: '__VERSION__', // replaced by versionify
 
     beforeSend: event => {
