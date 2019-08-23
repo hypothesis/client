@@ -47,17 +47,20 @@ function RootThread($rootScope, store, searchFilter, viewFilter) {
    *        filter settings etc.)
    */
   function buildRootThread(state) {
-    const sortFn = sortFns[state.sortKey];
+    const sortFn = sortFns[state.selection.sortKey];
     const shouldFilterThread = () => {
       // Is there a search query, or are we in an active (focused) focus mode?
-      return state.filterQuery || store.focusModeFocused();
+      return state.selection.filterQuery || store.focusModeFocused();
     };
     let filterFn;
     if (shouldFilterThread()) {
-      const filters = searchFilter.generateFacetedFilter(state.filterQuery, {
-        // if a focus mode is applied (focused) and we're focusing on a user
-        user: store.focusModeFocused() && store.focusModeUsername(),
-      });
+      const filters = searchFilter.generateFacetedFilter(
+        state.selection.filterQuery,
+        {
+          // if a focus mode is applied (focused) and we're focusing on a user
+          user: store.focusModeFocused() && store.focusModeUsername(),
+        }
+      );
 
       filterFn = function(annot) {
         return viewFilter.filter([annot], filters).length > 0;
@@ -65,23 +68,26 @@ function RootThread($rootScope, store, searchFilter, viewFilter) {
     }
 
     let threadFilterFn;
-    if (state.isSidebar && !shouldFilterThread()) {
+    if (state.base.isSidebar && !shouldFilterThread()) {
       threadFilterFn = function(thread) {
         if (!thread.annotation) {
           return false;
         }
 
-        return tabs.shouldShowInTab(thread.annotation, state.selectedTab);
+        return tabs.shouldShowInTab(
+          thread.annotation,
+          state.selection.selectedTab
+        );
       };
     }
 
     // Get the currently loaded annotations and the set of inputs which
     // determines what is visible and build the visible thread structure
-    return buildThread(state.annotations, {
-      forceVisible: truthyKeys(state.forceVisible),
-      expanded: state.expanded,
-      highlighted: state.highlighted,
-      selected: truthyKeys(state.selectedAnnotationMap || {}),
+    return buildThread(state.base.annotations, {
+      forceVisible: truthyKeys(state.selection.forceVisible),
+      expanded: state.selection.expanded,
+      highlighted: state.selection.highlighted,
+      selected: truthyKeys(state.selection.selectedAnnotationMap || {}),
       sortCompareFn: sortFn,
       filterFn: filterFn,
       threadFilterFn: threadFilterFn,

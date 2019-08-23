@@ -6,11 +6,7 @@ const immutable = require('seamless-immutable');
 const annotationFixtures = require('../../test/annotation-fixtures');
 const events = require('../../events');
 const uiConstants = require('../../ui-constants');
-const util = require('../../../shared/test/util');
-
 const rootThreadFactory = require('../root-thread');
-
-const unroll = util.unroll;
 
 const fixtures = immutable({
   emptyThread: {
@@ -38,25 +34,31 @@ describe('rootThread', function() {
   beforeEach(function() {
     fakeStore = {
       state: {
-        annotations: [],
-        expanded: {},
-        drafts: [],
-        filterQuery: null,
-        focusedAnnotationMap: null,
-        forceVisible: {},
-        highlighted: [],
-        isSidebar: true,
-        selectedAnnotationMap: null,
-        session: {
-          features: {},
+        base: {
+          annotations: [],
+          isSidebar: true,
+          visibleHighlights: false,
         },
-        sortKey: 'Location',
-        sortKeysAvailable: ['Location'],
-        visibleHighlights: false,
+        drafts: [],
+        selection: {
+          expanded: {},
+          filterQuery: null,
+          focusedAnnotationMap: null,
+          forceVisible: {},
+          highlighted: [],
+
+          selectedAnnotationMap: null,
+          session: {
+            features: {},
+          },
+          sortKey: 'Location',
+          sortKeysAvailable: ['Location'],
+        },
       },
       getState: function() {
-        return this.state;
+        return this.state.base;
       },
+
       subscribe: sinon.stub(),
       removeAnnotations: sinon.stub(),
       removeSelectedAnnotation: sinon.stub(),
@@ -115,17 +117,16 @@ describe('rootThread', function() {
 
     it('passes loaded annotations to buildThread()', function() {
       const annotation = annotationFixtures.defaultAnnotation();
-      fakeStore.state = Object.assign({}, fakeStore.state, {
-        annotations: [annotation],
-      });
+      fakeStore.state.base.annotations = [annotation];
       rootThread.thread(fakeStore.state);
       assert.calledWith(fakeBuildThread, sinon.match([annotation]));
     });
 
     it('passes the current selection to buildThread()', function() {
-      fakeStore.state = Object.assign({}, fakeStore.state, {
-        selectedAnnotationMap: { id1: true, id2: true },
-      });
+      fakeStore.state.selection.selectedAnnotationMap = {
+        id1: true,
+        id2: true,
+      };
       rootThread.thread(fakeStore.state);
       assert.calledWith(
         fakeBuildThread,
@@ -137,9 +138,7 @@ describe('rootThread', function() {
     });
 
     it('passes the current expanded set to buildThread()', function() {
-      fakeStore.state = Object.assign({}, fakeStore.state, {
-        expanded: { id1: true, id2: true },
-      });
+      fakeStore.state.selection.expanded = { id1: true, id2: true };
       rootThread.thread(fakeStore.state);
       assert.calledWith(
         fakeBuildThread,
@@ -151,9 +150,7 @@ describe('rootThread', function() {
     });
 
     it('passes the current force-visible set to buildThread()', function() {
-      fakeStore.state = Object.assign({}, fakeStore.state, {
-        forceVisible: { id1: true, id2: true },
-      });
+      fakeStore.state.selection.forceVisible = { id1: true, id2: true };
       rootThread.thread(fakeStore.state);
       assert.calledWith(
         fakeBuildThread,
@@ -165,9 +162,7 @@ describe('rootThread', function() {
     });
 
     it('passes the highlighted set to buildThread()', function() {
-      fakeStore.state = Object.assign({}, fakeStore.state, {
-        highlighted: ['id1', 'id2'],
-      });
+      fakeStore.state.selection.highlighted = ['id1', 'id2'];
       rootThread.thread(fakeStore.state);
       assert.calledWith(
         fakeBuildThread,
@@ -194,33 +189,44 @@ describe('rootThread', function() {
       ];
     }
 
-    unroll(
-      'sort order is correct when sorting by #order',
-      function(testCase) {
-        const annotations = [
-          {
-            target: targetWithPos(1),
-            updated: 20,
-          },
-          {
-            target: targetWithPos(100),
-            updated: 100,
-          },
-          {
-            target: targetWithPos(50),
-            updated: 50,
-          },
-          {
-            target: targetWithPos(20),
-            updated: 10,
-          },
-        ];
+    const annotations = [
+      {
+        target: targetWithPos(1),
+        updated: 20,
+      },
+      {
+        target: targetWithPos(100),
+        updated: 100,
+      },
+      {
+        target: targetWithPos(50),
+        updated: 50,
+      },
+      {
+        target: targetWithPos(20),
+        updated: 10,
+      },
+    ];
 
+    [
+      {
+        order: 'Location',
+        expectedOrder: [0, 3, 2, 1],
+      },
+      {
+        order: 'Oldest',
+        expectedOrder: [3, 0, 2, 1],
+      },
+      {
+        order: 'Newest',
+        expectedOrder: [1, 2, 0, 3],
+      },
+    ].forEach(testCase => {
+      it(`sort order is correct when sorting by ${testCase.order}`, () => {
         fakeBuildThread.reset();
-        fakeStore.state = Object.assign({}, fakeStore.state, {
-          sortKey: testCase.order,
-          sortKeysAvailable: [testCase.order],
-        });
+        fakeStore.state.selection.sortKey = testCase.order;
+        fakeStore.state.selection.sortKeysAvailable = [testCase.order];
+
         rootThread.thread(fakeStore.state);
         const sortCompareFn = fakeBuildThread.args[0][1].sortCompareFn;
         const actualOrder = sortBy(annotations, sortCompareFn).map(function(
@@ -229,23 +235,14 @@ describe('rootThread', function() {
           return annotations.indexOf(annot);
         });
         assert.deepEqual(actualOrder, testCase.expectedOrder);
-      },
-      [
-        { order: 'Location', expectedOrder: [0, 3, 2, 1] },
-        { order: 'Oldest', expectedOrder: [3, 0, 2, 1] },
-        { order: 'Newest', expectedOrder: [1, 2, 0, 3] },
-      ]
-    );
+      });
+    });
   });
 
   describe('when no filter query is set', function() {
     it('filter matches only annotations when Annotations tab is selected', function() {
       fakeBuildThread.reset();
-
-      fakeStore.state = Object.assign({}, fakeStore.state, {
-        selectedTab: uiConstants.TAB_ANNOTATIONS,
-      });
-
+      fakeStore.state.selection.selectedTab = uiConstants.TAB_ANNOTATIONS;
       rootThread.thread(fakeStore.state);
       const threadFilterFn = fakeBuildThread.args[0][1].threadFilterFn;
 
@@ -255,11 +252,7 @@ describe('rootThread', function() {
 
     it('filter matches only notes when Notes tab is selected', function() {
       fakeBuildThread.reset();
-
-      fakeStore.state = Object.assign({}, fakeStore.state, {
-        selectedTab: uiConstants.TAB_NOTES,
-      });
-
+      fakeStore.state.selection.selectedTab = uiConstants.TAB_NOTES;
       rootThread.thread(fakeStore.state);
       const threadFilterFn = fakeBuildThread.args[0][1].threadFilterFn;
 
@@ -268,11 +261,7 @@ describe('rootThread', function() {
 
     it('filter matches only orphans when Orphans tab is selected', function() {
       fakeBuildThread.reset();
-
-      fakeStore.state = Object.assign({}, fakeStore.state, {
-        selectedTab: uiConstants.TAB_ORPHANS,
-      });
-
+      fakeStore.state.selection.selectedTab = uiConstants.TAB_ORPHANS;
       rootThread.thread(fakeStore.state);
       const threadFilterFn = fakeBuildThread.args[0][1].threadFilterFn;
 
@@ -285,11 +274,7 @@ describe('rootThread', function() {
 
     it('filter does not match notes when Annotations tab is selected', function() {
       fakeBuildThread.reset();
-
-      fakeStore.state = Object.assign({}, fakeStore.state, {
-        selectedTab: uiConstants.TAB_ANNOTATIONS,
-      });
-
+      fakeStore.state.selection.selectedTab = uiConstants.TAB_ANNOTATIONS;
       rootThread.thread(fakeStore.state);
       const threadFilterFn = fakeBuildThread.args[0][1].threadFilterFn;
 
@@ -298,11 +283,7 @@ describe('rootThread', function() {
 
     it('filter does not match orphans when Annotations tab is selected', function() {
       fakeBuildThread.reset();
-
-      fakeStore.state = Object.assign({}, fakeStore.state, {
-        selectedTab: uiConstants.TAB_ANNOTATIONS,
-      });
-
+      fakeStore.state.selection.selectedTab = uiConstants.TAB_ANNOTATIONS;
       rootThread.thread(fakeStore.state);
       const threadFilterFn = fakeBuildThread.args[0][1].threadFilterFn;
 
@@ -311,9 +292,7 @@ describe('rootThread', function() {
 
     it('does not filter annotations when not in the sidebar', function() {
       fakeBuildThread.reset();
-      fakeStore.state = Object.assign({}, fakeStore.state, {
-        isSidebar: false,
-      });
+      fakeStore.state.base.isSidebar = false;
 
       rootThread.thread(fakeStore.state);
       const threadFilterFn = fakeBuildThread.args[0][1].threadFilterFn;
@@ -330,9 +309,8 @@ describe('rootThread', function() {
       const filters = [{ any: { terms: ['queryterm'] } }];
       const annotation = annotationFixtures.defaultAnnotation();
       fakeSearchFilter.generateFacetedFilter.returns(filters);
-      fakeStore.state = Object.assign({}, fakeStore.state, {
-        filterQuery: 'queryterm',
-      });
+      fakeStore.state.selection.filterQuery = 'queryterm';
+
       rootThread.thread(fakeStore.state);
       const filterFn = fakeBuildThread.args[0][1].filterFn;
 
@@ -375,20 +353,18 @@ describe('rootThread', function() {
       assert.calledWith(fakeStore.createAnnotation, sinon.match(annot));
     });
 
-    unroll(
-      'adds or updates annotations when #event event occurs',
-      function(testCase) {
+    [
+      { event: events.ANNOTATION_CREATED, annotations: annot },
+      { event: events.ANNOTATION_UPDATED, annotations: annot },
+      { event: events.ANNOTATIONS_LOADED, annotations: [annot] },
+    ].forEach(testCase => {
+      it(`adds or updates annotations when ${testCase.event} event occurs`, () => {
         $rootScope.$broadcast(testCase.event, testCase.annotations);
         const annotations = [].concat(testCase.annotations);
         assert.notCalled(fakeStore.removeAnnotations);
         assert.calledWith(fakeStore.addAnnotations, sinon.match(annotations));
-      },
-      [
-        { event: events.ANNOTATION_CREATED, annotations: annot },
-        { event: events.ANNOTATION_UPDATED, annotations: annot },
-        { event: events.ANNOTATIONS_LOADED, annotations: [annot] },
-      ]
-    );
+      });
+    });
 
     it('removes annotations when ANNOTATION_DELETED event occurs', function() {
       $rootScope.$broadcast(events.ANNOTATION_DELETED, annot);
@@ -408,12 +384,11 @@ describe('rootThread', function() {
         $rootScope.$on(events.ANNOTATION_DELETED, onDelete);
 
         existingNewAnnot = { $tag: 'a-new-tag' };
-        fakeStore.state.annotations.push(existingNewAnnot);
+        fakeStore.state.base.annotations.push(existingNewAnnot);
       });
 
       it('does not remove annotations that have non-empty drafts', function() {
         fakeStore.getDraftIfNotEmpty.returns(fixtures.nonEmptyDraft);
-
         $rootScope.$broadcast(
           events.BEFORE_ANNOTATION_CREATED,
           annotationFixtures.newAnnotation()
@@ -425,7 +400,7 @@ describe('rootThread', function() {
 
       it('does not remove saved annotations', function() {
         const ann = annotationFixtures.defaultAnnotation();
-        fakeStore.state.annotations = [ann];
+        fakeStore.state.base.annotations = [ann];
 
         $rootScope.$broadcast(
           events.BEFORE_ANNOTATION_CREATED,
@@ -440,7 +415,7 @@ describe('rootThread', function() {
 
   describe('when the focused group changes', function() {
     it('moves new annotations to the focused group', function() {
-      fakeStore.state.annotations = [{ $tag: 'a-tag' }];
+      fakeStore.state.base.annotations = [{ $tag: 'a-tag' }];
 
       $rootScope.$broadcast(events.GROUP_FOCUSED, 'private-group');
 

@@ -131,20 +131,9 @@ const update = {
   },
 
   REMOVE_ANNOTATIONS: function(state, action) {
-    const annots = excludeAnnotations(state.annotations, action.annotations);
-    let selectedTab = state.selectedTab;
-    if (
-      selectedTab === uiConstants.TAB_ORPHANS &&
-      arrayUtil.countIf(annots, metadata.isOrphan) === 0
-    ) {
-      selectedTab = uiConstants.TAB_ANNOTATIONS;
-    }
-
-    const tabUpdateFn = selection.update.SELECT_TAB;
-    return Object.assign(
-      { annotations: annots },
-      tabUpdateFn(state, selection.actions.selectTab(selectedTab))
-    );
+    return {
+      annotations: [...action.remainingAnnotations],
+    };
   },
 
   CLEAR_ANNOTATIONS: function() {
@@ -260,6 +249,7 @@ function addAnnotations(annotations, now) {
     dispatch({
       type: actions.ADD_ANNOTATIONS,
       annotations: annotations,
+      currentAnnotationCount: getState().base.annotations.length,
     });
 
     if (!getState().base.isSidebar) {
@@ -298,9 +288,16 @@ function addAnnotations(annotations, now) {
 
 /** Remove annotations from the currently displayed set. */
 function removeAnnotations(annotations) {
-  return {
-    type: actions.REMOVE_ANNOTATIONS,
-    annotations: annotations,
+  return (dispatch, getState) => {
+    const remainingAnnotations = excludeAnnotations(
+      getState().base.annotations,
+      annotations
+    );
+    dispatch({
+      type: actions.REMOVE_ANNOTATIONS,
+      annotationsToRemove: annotations,
+      remainingAnnotations,
+    });
   };
 }
 

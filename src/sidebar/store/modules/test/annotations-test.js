@@ -227,13 +227,19 @@ describe('annotations reducer', function() {
     it('should change tab focus to TAB_ANNOTATIONS when a new annotation is created', function() {
       const store = createStore();
       store.dispatch(actions.createAnnotation(fixtures.oldAnnotation()));
-      assert.equal(store.getState().selectedTab, uiConstants.TAB_ANNOTATIONS);
+      assert.equal(
+        store.getRootState().selection.selectedTab,
+        uiConstants.TAB_ANNOTATIONS
+      );
     });
 
     it('should change tab focus to TAB_NOTES when a new note annotation is created', function() {
       const store = createStore();
       store.dispatch(actions.createAnnotation(fixtures.oldPageNote()));
-      assert.equal(store.getState().selectedTab, uiConstants.TAB_NOTES);
+      assert.equal(
+        store.getRootState().selection.selectedTab,
+        uiConstants.TAB_NOTES
+      );
     });
 
     it('should expand parent of created annotation', function() {
@@ -262,7 +268,7 @@ describe('annotations reducer', function() {
           tags: [],
         })
       );
-      assert.isTrue(store.getState().expanded.annotation_id);
+      assert.isTrue(store.getRootState().selection.expanded.annotation_id);
     });
   });
 });

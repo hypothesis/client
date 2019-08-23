@@ -38,7 +38,7 @@ function SearchStatusBar({ rootThread }) {
   const annotationCount = useStore(store => store.annotationCount());
   const noteCount = useStore(store => store.noteCount());
 
-  const thread = useStore(store => rootThread.thread(store.getState()));
+  const thread = useStore(store => rootThread.thread(store.getRootState()));
 
   const visibleCount = useMemo(() => {
     return countVisibleAnns(thread);

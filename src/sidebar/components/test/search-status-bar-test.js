@@ -21,6 +21,7 @@ describe('SearchStatusBar', () => {
     };
     fakeStore = {
       getState: sinon.stub(),
+      getRootState: sinon.stub(),
       annotationCount: sinon.stub().returns(1),
       noteCount: sinon.stub().returns(0),
     };

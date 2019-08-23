@@ -15,11 +15,11 @@ function SortMenu() {
     setSortKey: store.setSortKey,
   }));
   // The currently-applied sort order
-  const sortKey = useStore(store => store.getState().sortKey);
+  const sortKey = useStore(store => store.getRootState().selection.sortKey);
   // All available sorting options. These change depending on current
   // "tab" or context.
   const sortKeysAvailable = useStore(
-    store => store.getState().sortKeysAvailable
+    store => store.getRootState().selection.sortKeysAvailable
   );
 
   const menuItems = sortKeysAvailable.map(sortOption => {

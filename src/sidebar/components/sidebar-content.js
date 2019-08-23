@@ -17,7 +17,7 @@ function SidebarContentController(
 ) {
   const self = this;
 
-  this.rootThread = () => rootThread.thread(store.getState());
+  this.rootThread = () => rootThread.thread(store.getRootState());
 
   function focusAnnotation(annotation) {
     let highlights = [];
@@ -41,8 +41,10 @@ function SidebarContentController(
    * not the order in which they appear in the document.
    */
   function firstSelectedAnnotation() {
-    if (store.getState().selectedAnnotationMap) {
-      const id = Object.keys(store.getState().selectedAnnotationMap)[0];
+    if (store.getRootState().selection.selectedAnnotationMap) {
+      const id = Object.keys(
+        store.getRootState().selection.selectedAnnotationMap
+      )[0];
       return store.getState().annotations.find(function(annot) {
         return annot.id === id;
       });
@@ -133,7 +135,7 @@ function SidebarContentController(
     if (
       this.selectedAnnotationUnavailable() ||
       this.selectedGroupUnavailable() ||
-      store.getState().filterQuery
+      store.getRootState().selection.filterQuery
     ) {
       return false;
     } else if (store.focusModeFocused()) {

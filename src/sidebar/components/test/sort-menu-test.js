@@ -16,12 +16,14 @@ describe('SortMenu', () => {
 
   beforeEach(() => {
     fakeState = {
-      sortKey: 'Location',
-      sortKeysAvailable: ['Newest', 'Oldest', 'Location'],
+      selection: {
+        sortKey: 'Location',
+        sortKeysAvailable: ['Newest', 'Oldest', 'Location'],
+      },
     };
     fakeStore = {
       setSortKey: sinon.stub(),
-      getState: sinon.stub().returns(fakeState),
+      getRootState: sinon.stub().returns(fakeState),
     };
 
     SortMenu.$imports.$mock({
@@ -38,8 +40,8 @@ describe('SortMenu', () => {
 
     const menuItems = wrapper.find(MenuItem);
 
-    assert.lengthOf(menuItems, fakeState.sortKeysAvailable.length);
-    fakeState.sortKeysAvailable.forEach(sortKey => {
+    assert.lengthOf(menuItems, fakeState.selection.sortKeysAvailable.length);
+    fakeState.selection.sortKeysAvailable.forEach(sortKey => {
       assert.lengthOf(
         menuItems.filterWhere(menuItem => menuItem.prop('label') === sortKey),
         1
@@ -52,7 +54,9 @@ describe('SortMenu', () => {
 
     const currentSortKeyMenuItem = wrapper
       .find(MenuItem)
-      .filterWhere(menuItem => menuItem.prop('label') === fakeState.sortKey);
+      .filterWhere(
+        menuItem => menuItem.prop('label') === fakeState.selection.sortKey
+      );
     assert.isTrue(currentSortKeyMenuItem.prop('isSelected'));
   });
 

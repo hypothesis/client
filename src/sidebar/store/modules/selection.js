@@ -186,7 +186,7 @@ const update = {
     // If there are no annotations at all, ADD_ANNOTATIONS will not be called.
     const haveOnlyPageNotes = noteCount === action.annotations.length;
     // If this is the init phase and there are only page notes, select the page notes tab.
-    if (state.annotations.length === 0 && haveOnlyPageNotes) {
+    if (action.currentAnnotationCount === 0 && haveOnlyPageNotes) {
       return { selectedTab: uiConstants.TAB_NOTES };
     }
     return {};
@@ -194,13 +194,21 @@ const update = {
 
   REMOVE_ANNOTATIONS: function(state, action) {
     const selection = Object.assign({}, state.selectedAnnotationMap);
-    action.annotations.forEach(annotation => {
+    action.annotationsToRemove.forEach(annotation => {
       if (annotation.id) {
         delete selection[annotation.id];
       }
     });
+    let selectedTab = state.selectedTab;
+    if (
+      selectedTab === uiConstants.TAB_ORPHANS &&
+      arrayUtil.countIf(action.remainingAnnotations, metadata.isOrphan) === 0
+    ) {
+      selectedTab = uiConstants.TAB_ANNOTATIONS;
+    }
     return {
       selectedAnnotationMap: freeze(selection),
+      selectedTab: selectedTab,
     };
   },
 
@@ -236,7 +244,10 @@ function selectAnnotations(ids) {
 /** Toggle whether annotations are selected or not. */
 function toggleSelectedAnnotations(ids) {
   return function(dispatch, getState) {
-    const selection = Object.assign({}, getState().base.selectedAnnotationMap);
+    const selection = Object.assign(
+      {},
+      getState().selection.selectedAnnotationMap
+    );
     for (let i = 0; i < ids.length; i++) {
       const id = ids[i];
       if (selection[id]) {
@@ -260,7 +271,7 @@ function setForceVisible(id, visible) {
   // FIXME: This should be converted to a plain action and accessing the state
   // should happen in the update() function
   return function(dispatch, getState) {
-    const forceVisible = Object.assign({}, getState().base.forceVisible);
+    const forceVisible = Object.assign({}, getState().selection.forceVisible);
     forceVisible[id] = visible;
     dispatch({
       type: actions.SET_FORCE_VISIBLE,
@@ -285,7 +296,7 @@ function setCollapsed(id, collapsed) {
   // FIXME: This should be converted to a plain action and accessing the state
   // should happen in the update() function
   return function(dispatch, getState) {
-    const expanded = Object.assign({}, getState().base.expanded);
+    const expanded = Object.assign({}, getState().selection.expanded);
     expanded[id] = !collapsed;
     dispatch({
       type: actions.SET_EXPANDED,
@@ -345,14 +356,14 @@ function setSortKey(key) {
  * Returns true if the annotation with the given `id` is selected.
  */
 function isAnnotationSelected(state, id) {
-  return (state.selectedAnnotationMap || {}).hasOwnProperty(id);
+  return (state.selection.selectedAnnotationMap || {}).hasOwnProperty(id);
 }
 
 /**
  * Return true if any annotations are currently selected.
  */
 function hasSelectedAnnotations(state) {
-  return !!state.selectedAnnotationMap;
+  return !!state.selection.selectedAnnotationMap;
 }
 
 /** De-select all annotations. */
@@ -372,12 +383,12 @@ function clearSelection() {
  * @return {string|null}
  */
 const getFirstSelectedAnnotationId = createSelector(
-  state => state.selectedAnnotationMap,
+  state => state.selection.selectedAnnotationMap,
   selected => (selected ? Object.keys(selected)[0] : null)
 );
 
 function filterQuery(state) {
-  return state.filterQuery;
+  return state.selection.filterQuery;
 }
 
 /**
@@ -386,7 +397,7 @@ function filterQuery(state) {
  * @return {boolean}
  */
 function focusModeEnabled(state) {
-  return state.focusMode.enabled;
+  return state.selection.focusMode.enabled;
 }
 
 /**
@@ -395,7 +406,7 @@ function focusModeEnabled(state) {
  * @return {boolean}
  */
 function focusModeFocused(state) {
-  return focusModeEnabled(state) && state.focusMode.focused;
+  return focusModeEnabled(state) && state.selection.focusMode.focused;
 }
 
 /**
@@ -404,8 +415,11 @@ function focusModeFocused(state) {
  * @return {object|null}
  */
 function focusModeUsername(state) {
-  if (state.focusMode.config.user && state.focusMode.config.user.username) {
-    return state.focusMode.config.user.username;
+  if (
+    state.selection.focusMode.config.user &&
+    state.selection.focusMode.config.user.username
+  ) {
+    return state.selection.focusMode.config.user.username;
   }
   return null;
 }
@@ -428,7 +442,7 @@ function focusModeHasUser(state) {
  * @return {string}
  */
 function focusModeUserPrettyName(state) {
-  const user = state.focusMode.config.user;
+  const user = state.selection.focusMode.config.user;
   if (!user) {
     return '';
   } else if (user.displayName) {
@@ -442,6 +456,7 @@ function focusModeUserPrettyName(state) {
 
 module.exports = {
   init: init,
+  namespace: 'selection',
   update: update,
 
   actions: {

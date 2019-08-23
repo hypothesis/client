@@ -5,6 +5,7 @@ const createStore = require('../../create-store');
 const annotations = require('../annotations');
 const groups = require('../groups');
 const realTimeUpdates = require('../real-time-updates');
+const selection = require('../selection');
 
 const { removeAnnotations } = annotations.actions;
 const { focusGroup } = groups.actions;
@@ -13,6 +14,7 @@ describe('sidebar/store/modules/real-time-updates', () => {
   let fakeAnnotationExists;
   let fakeFocusedGroupId;
   let fakeIsSidebar;
+  let fakeSettings = {};
   let store;
 
   beforeEach(() => {
@@ -20,7 +22,10 @@ describe('sidebar/store/modules/real-time-updates', () => {
     fakeFocusedGroupId = sinon.stub().returns('group-1');
     fakeIsSidebar = sinon.stub().returns(true);
 
-    store = createStore([realTimeUpdates]);
+    store = createStore(
+      [realTimeUpdates, annotations, selection],
+      [fakeSettings]
+    );
 
     realTimeUpdates.$imports.$mock({
       './annotations': {
