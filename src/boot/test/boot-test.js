@@ -41,7 +41,7 @@ describe('bootstrap', function() {
       'styles/pdfjs-overrides.css',
 
       // Sidebar app
-      'scripts/raven.bundle.js',
+      'scripts/sentry.bundle.js',
       'scripts/angular.bundle.js',
       'scripts/katex.bundle.js',
       'scripts/showdown.bundle.js',
@@ -151,7 +151,7 @@ describe('bootstrap', function() {
       const expectedAssets = [
         'scripts/angular.bundle.1234.js',
         'scripts/katex.bundle.1234.js',
-        'scripts/raven.bundle.1234.js',
+        'scripts/sentry.bundle.1234.js',
         'scripts/showdown.bundle.1234.js',
         'scripts/sidebar.bundle.1234.js',
         'styles/angular-csp.1234.css',

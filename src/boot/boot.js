@@ -112,7 +112,7 @@ function bootSidebarApp(doc, config) {
     ...polyfills,
 
     // Vendor code required by sidebar.bundle.js
-    'scripts/raven.bundle.js',
+    'scripts/sentry.bundle.js',
     'scripts/angular.bundle.js',
     'scripts/katex.bundle.js',
     'scripts/showdown.bundle.js',

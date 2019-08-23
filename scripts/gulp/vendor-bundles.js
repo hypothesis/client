@@ -11,8 +11,8 @@ module.exports = {
     jquery: ['jquery'],
     angular: ['angular', 'angular-route', 'ng-tags-input', 'angular-toastr'],
     katex: ['katex'],
+    sentry: ['@sentry/browser'],
     showdown: ['showdown'],
-    raven: ['raven-js'],
   },
 
   // List of modules to exclude from parsing for require() statements.

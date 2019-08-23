@@ -2,6 +2,7 @@
 
 const events = require('../events');
 const retryUtil = require('../util/retry');
+const sentry = require('../util/sentry');
 
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
@@ -27,7 +28,6 @@ function session(
   api,
   auth,
   flash,
-  raven,
   settings,
   serviceConfig
 ) {
@@ -122,11 +122,11 @@ function session(
 
       // Associate error reports with the current user in Sentry.
       if (model.userid) {
-        raven.setUserInfo({
+        sentry.setUserInfo({
           id: model.userid,
         });
       } else {
-        raven.setUserInfo(undefined);
+        sentry.setUserInfo(null);
       }
     }
 

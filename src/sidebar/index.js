@@ -6,16 +6,16 @@ const { fetchConfig } = require('./util/fetch-config');
 const serviceConfig = require('./service-config');
 const crossOriginRPC = require('./cross-origin-rpc.js');
 
-let raven;
+let sentry;
 
 // Read settings rendered into sidebar app HTML by service/extension.
 const appConfig = require('../shared/settings').jsonConfigsFrom(document);
 
-if (appConfig.raven) {
-  // Initialize Raven. This is required at the top of this file
+if (appConfig.sentry) {
+  // Initialize Sentry. This is required at the top of this file
   // so that it happens early in the app's startup flow
-  raven = require('./raven');
-  raven.init(appConfig.raven);
+  sentry = require('./util/sentry');
+  sentry.init(appConfig.sentry);
 }
 
 // Disable Angular features that are not compatible with CSP.
@@ -42,13 +42,6 @@ require('focus-visible');
 require('preact/debug');
 
 const wrapReactComponent = require('./util/wrap-react-component');
-
-// Setup Angular integration for Raven
-if (appConfig.raven) {
-  raven.angularModule(angular);
-} else {
-  angular.module('ngRaven', []);
-}
 
 if (appConfig.googleAnalytics) {
   addAnalytics(appConfig.googleAnalytics);
@@ -130,9 +123,6 @@ function startAngularApp(config) {
       // Angular addons which do not export the Angular module
       // name via module.exports
       ['ngTagsInput', require('ng-tags-input')][0],
-
-      // Local addons
-      'ngRaven',
     ])
 
     // The root component for the application
@@ -239,7 +229,6 @@ function startAngularApp(config) {
     .value('VirtualThreadList', require('./virtual-thread-list'))
     .value('isSidebar', isSidebar)
     .value('random', require('./util/random'))
-    .value('raven', require('./raven'))
     .value('serviceConfig', serviceConfig)
     .value('settings', config)
     .value('time', require('./util/time'))

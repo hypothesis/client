@@ -3,6 +3,7 @@
 const angular = require('angular');
 
 const events = require('../../events');
+const sessionFactory = require('../session');
 
 const mock = angular.mock;
 
@@ -12,15 +13,17 @@ describe('sidebar.session', function() {
   let fakeAnalytics;
   let fakeAuth;
   let fakeFlash;
-  let fakeRaven;
+  let fakeSentry;
   let fakeServiceConfig;
   let fakeSettings;
   let fakeApi;
   let sandbox;
+
+  // The instance of the `session` service.
   let session;
 
   before(function() {
-    angular.module('h', []).service('session', require('../session'));
+    angular.module('h', []).service('session', sessionFactory);
   });
 
   beforeEach(function() {
@@ -43,7 +46,7 @@ describe('sidebar.session', function() {
       login: sandbox.stub().returns(Promise.resolve()),
     };
     fakeFlash = { error: sandbox.spy() };
-    fakeRaven = {
+    fakeSentry = {
       setUserInfo: sandbox.spy(),
     };
     fakeApi = {
@@ -63,9 +66,12 @@ describe('sidebar.session', function() {
       api: fakeApi,
       auth: fakeAuth,
       flash: fakeFlash,
-      raven: fakeRaven,
       settings: fakeSettings,
       serviceConfig: fakeServiceConfig,
+    });
+
+    sessionFactory.$imports.$mock({
+      '../util/sentry': fakeSentry,
     });
   });
 
@@ -77,6 +83,7 @@ describe('sidebar.session', function() {
   );
 
   afterEach(function() {
+    sessionFactory.$imports.$restore();
     sandbox.restore();
   });
 
@@ -198,7 +205,7 @@ describe('sidebar.session', function() {
       session.update({
         userid: 'anne',
       });
-      assert.calledWith(fakeRaven.setUserInfo, {
+      assert.calledWith(fakeSentry.setUserInfo, {
         id: 'anne',
       });
     });
