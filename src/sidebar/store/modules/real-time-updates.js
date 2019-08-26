@@ -26,42 +26,11 @@ function init() {
 }
 
 const update = {
-  RECEIVE_REAL_TIME_UPDATES(
-    state,
-    { updatedAnnotations = [], deletedAnnotations = [] }
-  ) {
-    const pendingUpdates = { ...state.pendingUpdates };
-    const pendingDeletions = { ...state.pendingDeletions };
-
-    updatedAnnotations.forEach(ann => {
-      // In the sidebar, only save pending updates for annotations in the
-      // focused group, since we only display annotations from the focused
-      // group and reload all annotations and discard pending updates
-      // when switching groups.
-      if (
-        ann.group === groupSelectors.focusedGroupId(state) ||
-        !viewerSelectors.isSidebar(state)
-      ) {
-        pendingUpdates[ann.id] = ann;
-      }
-    });
-
-    deletedAnnotations.forEach(ann => {
-      // Discard any pending but not-yet-applied updates for this annotation
-      delete pendingUpdates[ann.id];
-
-      // If we already have this annotation loaded, then record a pending
-      // deletion. We do not check the group of the annotation here because a)
-      // that information is not included with deletion notifications and b)
-      // even if the annotation is from the current group, it might be for a
-      // new annotation (saved in pendingUpdates and removed above), that has
-      // not yet been loaded.
-      if (annotationSelectors.annotationExists(state, ann.id)) {
-        pendingDeletions[ann.id] = true;
-      }
-    });
-
-    return { pendingUpdates, pendingDeletions };
+  RECEIVE_REAL_TIME_UPDATES(state, action) {
+    return {
+      pendingUpdates: { ...action.pendingUpdates },
+      pendingDeletions: { ...action.pendingDeletions },
+    };
   },
 
   CLEAR_PENDING_UPDATES() {
@@ -114,11 +83,45 @@ const actions = actionTypes(update);
  * @param {Annotation[]} args.updatedAnnotations
  * @param {Annotation[]} args.deletedAnnotations
  */
-function receiveRealTimeUpdates({ updatedAnnotations, deletedAnnotations }) {
-  return {
-    type: actions.RECEIVE_REAL_TIME_UPDATES,
-    updatedAnnotations,
-    deletedAnnotations,
+function receiveRealTimeUpdates({
+  updatedAnnotations = [],
+  deletedAnnotations = [],
+}) {
+  return (dispatch, getState) => {
+    const pendingUpdates = { ...getState().realTimeUpdates.pendingUpdates };
+    const pendingDeletions = { ...getState().realTimeUpdates.pendingDeletions };
+
+    updatedAnnotations.forEach(ann => {
+      // In the sidebar, only save pending updates for annotations in the
+      // focused group, since we only display annotations from the focused
+      // group and reload all annotations and discard pending updates
+      // when switching groups.
+      if (
+        ann.group === groupSelectors.focusedGroupId(getState().base) ||
+        !viewerSelectors.isSidebar(getState().base)
+      ) {
+        pendingUpdates[ann.id] = ann;
+      }
+    });
+    deletedAnnotations.forEach(ann => {
+      // Discard any pending but not-yet-applied updates for this annotation
+      delete pendingUpdates[ann.id];
+
+      // If we already have this annotation loaded, then record a pending
+      // deletion. We do not check the group of the annotation here because a)
+      // that information is not included with deletion notifications and b)
+      // even if the annotation is from the current group, it might be for a
+      // new annotation (saved in pendingUpdates and removed above), that has
+      // not yet been loaded.
+      if (annotationSelectors.annotationExists(getState().base, ann.id)) {
+        pendingDeletions[ann.id] = true;
+      }
+    });
+    dispatch({
+      type: actions.RECEIVE_REAL_TIME_UPDATES,
+      pendingUpdates,
+      pendingDeletions,
+    });
   };
 }
 
