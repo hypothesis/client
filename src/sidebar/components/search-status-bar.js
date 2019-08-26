@@ -28,17 +28,18 @@ function SearchStatusBar({ rootThread }) {
     selectedAnnotationMap,
     selectedTab,
   } = useStore(store => ({
-    directLinkedGroupFetchFailed: store.getState().directLinkedGroupFetchFailed,
-    filterQuery: store.getState().filterQuery,
-    selectedAnnotationMap: store.getState().selectedAnnotationMap,
-    selectedTab: store.getState().selectedTab,
+    directLinkedGroupFetchFailed: store.getRootState().directLinked
+      .directLinkedGroupFetchFailed,
+    filterQuery: store.getRootState().selection.filterQuery,
+    selectedAnnotationMap: store.getRootState().selection.selectedAnnotationMap,
+    selectedTab: store.getRootState().selection.selectedTab,
   }));
   const clearSelection = useStore(store => store.clearSelection);
   const filterActive = !!filterQuery;
   const annotationCount = useStore(store => store.annotationCount());
   const noteCount = useStore(store => store.noteCount());
 
-  const thread = useStore(store => rootThread.thread(store.getState()));
+  const thread = useStore(store => rootThread.thread(store.getRootState()));
 
   const visibleCount = useMemo(() => {
     return countVisibleAnns(thread);

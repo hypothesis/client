@@ -21,6 +21,10 @@ describe('SearchStatusBar', () => {
     };
     fakeStore = {
       getState: sinon.stub(),
+      getRootState: sinon.stub().returns({
+        selection: {},
+        directLinked: {},
+      }),
       annotationCount: sinon.stub().returns(1),
       noteCount: sinon.stub().returns(0),
     };
@@ -91,9 +95,14 @@ describe('SearchStatusBar', () => {
       fakeRootThread.thread.returns({
         children: test.children,
       });
-      fakeStore.getState.returns({
-        filterQuery: 'tag:foo',
-        selectedTab: 'annotation',
+      fakeStore.getRootState.returns({
+        selection: {
+          filterQuery: 'tag:foo',
+          selectedTab: 'annotation',
+        },
+        directLinked: {
+          directLinkedGroupFetchFailed: false,
+        },
       });
       fakeStore.annotationCount.returns(3);
 
@@ -108,11 +117,13 @@ describe('SearchStatusBar', () => {
   });
 
   it('displays "Show all annotations" button when a direct-linked group fetch fails', () => {
-    fakeStore.getState.returns({
-      filterQuery: null,
-      directLinkedGroupFetchFailed: true,
-      selectedAnnotationMap: { annId: true },
-      selectedTab: 'annotation',
+    fakeStore.getRootState.returns({
+      selection: {
+        filterQuery: null,
+        selectedAnnotationMap: { annId: true },
+        selectedTab: 'annotation',
+      },
+      directLinked: {},
     });
 
     const wrapper = createComponent({});
@@ -122,11 +133,15 @@ describe('SearchStatusBar', () => {
   });
 
   it('displays "Show all annotations" button when there are selected annotations', () => {
-    fakeStore.getState.returns({
-      filterQuery: null,
-      directLinkedGroupFetchFailed: false,
-      selectedAnnotationMap: { annId: true },
-      selectedTab: 'annotation',
+    fakeStore.getRootState.returns({
+      selection: {
+        filterQuery: null,
+        selectedAnnotationMap: { annId: true },
+        selectedTab: 'annotation',
+      },
+      directLinked: {
+        directLinkedGroupFetchFailed: false,
+      },
     });
 
     const wrapper = createComponent({});
@@ -137,11 +152,15 @@ describe('SearchStatusBar', () => {
 
   [null, {}].forEach(selectedAnnotationMap => {
     it('does not display "Show all annotations" button when there are no selected annotations', () => {
-      fakeStore.getState.returns({
-        filterQuery: null,
-        directLinkedGroupFetchFailed: false,
-        selectedAnnotationMap: selectedAnnotationMap,
-        selectedTab: 'annotation',
+      fakeStore.getRootState.returns({
+        selection: {
+          filterQuery: null,
+          selectedAnnotationMap: selectedAnnotationMap,
+          selectedTab: 'annotation',
+        },
+        directLinked: {
+          directLinkedGroupFetchFailed: false,
+        },
       });
 
       const wrapper = createComponent({});
@@ -186,11 +205,15 @@ describe('SearchStatusBar', () => {
     },
   ].forEach(test => {
     it(test.description, () => {
-      fakeStore.getState.returns({
-        filterQuery: null,
-        directLinkedGroupFetchFailed: false,
-        selectedAnnotationMap: { annId: true },
-        selectedTab: test.selectedTab,
+      fakeStore.getRootState.returns({
+        selection: {
+          filterQuery: null,
+          selectedAnnotationMap: { annId: true },
+          selectedTab: test.selectedTab,
+        },
+        directLinked: {
+          directLinkedGroupFetchFailed: false,
+        },
       });
       fakeStore.noteCount.returns(test.totalNotes);
       fakeStore.annotationCount.returns(test.totalAnnotations);

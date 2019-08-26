@@ -3,6 +3,8 @@
 const immutable = require('seamless-immutable');
 
 const drafts = require('../drafts');
+const annotations = require('../annotations');
+const selection = require('../selection');
 const { Draft } = require('../drafts');
 const createStore = require('../../create-store');
 
@@ -32,7 +34,7 @@ describe('store/modules/drafts', () => {
   let store;
 
   beforeEach(() => {
-    store = createStore([drafts]);
+    store = createStore([drafts, annotations, selection], [{}]);
   });
 
   describe('Draft', () => {

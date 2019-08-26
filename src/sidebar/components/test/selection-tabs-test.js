@@ -63,9 +63,11 @@ describe('SelectionTabs', function() {
       noteCount: sinon.stub().returns(456),
       orphanCount: sinon.stub().returns(0),
       isWaitingToAnchorAnnotations: sinon.stub().returns(false),
-      getState: sinon
-        .stub()
-        .returns({ selectedTab: uiConstants.TAB_ANNOTATIONS }),
+      getRootState: sinon.stub().returns({
+        selection: {
+          selectedTab: uiConstants.TAB_ANNOTATIONS,
+        },
+      }),
     };
   });
 
@@ -101,14 +103,18 @@ describe('SelectionTabs', function() {
     });
 
     it('should display notes tab as selected', function() {
-      fakeStore.getState.returns({ selectedTab: uiConstants.TAB_NOTES });
+      fakeStore.getRootState.returns({
+        selection: { selectedTab: uiConstants.TAB_NOTES },
+      });
       const wrapper = createDeepComponent({});
       const tabs = wrapper.find('a');
       assert.isTrue(tabs.at(1).hasClass('is-selected'));
     });
 
     it('should display orphans tab as selected if there is 1 or more orphans', function() {
-      fakeStore.getState.returns({ selectedTab: uiConstants.TAB_ORPHANS });
+      fakeStore.getRootState.returns({
+        selection: { selectedTab: uiConstants.TAB_ORPHANS },
+      });
       fakeStore.orphanCount.returns(1);
       const wrapper = createDeepComponent({});
       const tabs = wrapper.find('a');
@@ -116,7 +122,9 @@ describe('SelectionTabs', function() {
     });
 
     it('should not display orphans tab if there are 0 orphans', function() {
-      fakeStore.getState.returns({ selectedTab: uiConstants.TAB_ORPHANS });
+      fakeStore.getRootState.returns({
+        selection: { selectedTab: uiConstants.TAB_ORPHANS },
+      });
       const wrapper = createDeepComponent({});
       const tabs = wrapper.find('a');
       assert.equal(tabs.length, 2);
@@ -139,14 +147,18 @@ describe('SelectionTabs', function() {
     });
 
     it('should not display the new-note-btn when the notes tab is active and the new-note-btn is disabled', function() {
-      fakeStore.getState.returns({ selectedTab: uiConstants.TAB_NOTES });
+      fakeStore.getRootState.returns({
+        selection: { selectedTab: uiConstants.TAB_NOTES },
+      });
       const wrapper = createComponent({});
       assert.equal(wrapper.find(NewNoteBtn).length, 0);
     });
 
     it('should display the new-note-btn when the notes tab is active and the new-note-btn is enabled', function() {
       fakeSettings.enableExperimentalNewNoteButton = true;
-      fakeStore.getState.returns({ selectedTab: uiConstants.TAB_NOTES });
+      fakeStore.getRootState.returns({
+        selection: { selectedTab: uiConstants.TAB_NOTES },
+      });
       const wrapper = createComponent({});
       assert.equal(wrapper.find(NewNoteBtn).length, 1);
     });
@@ -160,7 +172,9 @@ describe('SelectionTabs', function() {
     });
 
     it('should not display a message when its loading notes count is 0', function() {
-      fakeStore.getState.returns({ selectedTab: uiConstants.TAB_NOTES });
+      fakeStore.getRootState.returns({
+        selection: { selectedTab: uiConstants.TAB_NOTES },
+      });
       fakeStore.noteCount.returns(0);
       const wrapper = createComponent({
         isLoading: true,
@@ -178,7 +192,9 @@ describe('SelectionTabs', function() {
     });
 
     it('should display the longer version of the no notes message when there are no notes', function() {
-      fakeStore.getState.returns({ selectedTab: uiConstants.TAB_NOTES });
+      fakeStore.getRootState.returns({
+        selection: { selectedTab: uiConstants.TAB_NOTES },
+      });
       fakeStore.noteCount.returns(0);
       const wrapper = createComponent({});
       assert.include(
@@ -189,7 +205,9 @@ describe('SelectionTabs', function() {
 
     it('should display the prompt to create a note when there are no notes and enableExperimentalNewNoteButton is true', function() {
       fakeSettings.enableExperimentalNewNoteButton = true;
-      fakeStore.getState.returns({ selectedTab: uiConstants.TAB_NOTES });
+      fakeStore.getRootState.returns({
+        selection: { selectedTab: uiConstants.TAB_NOTES },
+      });
       fakeStore.noteCount.returns(0);
       const wrapper = createComponent({});
       assert.include(
@@ -224,7 +242,9 @@ describe('SelectionTabs', function() {
     context('when the sidebar tutorial is displayed', function() {
       it('should display the shorter version of the no notes message when there are no notes', function() {
         fakeSession.state.preferences.show_sidebar_tutorial = true;
-        fakeStore.getState.returns({ selectedTab: uiConstants.TAB_NOTES });
+        fakeStore.getRootState.returns({
+          selection: { selectedTab: uiConstants.TAB_NOTES },
+        });
         fakeStore.noteCount.returns(0);
         const wrapper = createComponent({});
 

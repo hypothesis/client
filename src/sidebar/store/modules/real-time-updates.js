@@ -82,14 +82,14 @@ const update = {
     return { pendingUpdates };
   },
 
-  REMOVE_ANNOTATIONS(state, { annotations }) {
+  REMOVE_ANNOTATIONS(state, { annotationsToRemove }) {
     // Discard any pending updates which conflict with an annotation removed
     // locally.
 
     const pendingUpdates = { ...state.pendingUpdates };
     const pendingDeletions = { ...state.pendingDeletions };
 
-    annotations.forEach(ann => {
+    annotationsToRemove.forEach(ann => {
       delete pendingUpdates[ann.id];
       delete pendingDeletions[ann.id];
     });

@@ -43,19 +43,22 @@ describe('store', function() {
   describe('initialization', function() {
     it('does not set a selection when settings.annotations is null', function() {
       assert.isFalse(store.hasSelectedAnnotations());
-      assert.equal(Object.keys(store.getState().expanded).length, 0);
+      assert.equal(
+        Object.keys(store.getRootState().selection.expanded).length,
+        0
+      );
     });
 
     it('sets the selection when settings.annotations is set', function() {
       store = storeFactory(fakeRootScope, { annotations: 'testid' });
-      assert.deepEqual(store.getState().selectedAnnotationMap, {
+      assert.deepEqual(store.getRootState().selection.selectedAnnotationMap, {
         testid: true,
       });
     });
 
     it('expands the selected annotations when settings.annotations is set', function() {
       store = storeFactory(fakeRootScope, { annotations: 'testid' });
-      assert.deepEqual(store.getState().expanded, {
+      assert.deepEqual(store.getRootState().selection.expanded, {
         testid: true,
       });
     });
@@ -66,12 +69,12 @@ describe('store', function() {
     // CLEAR_SELECTION action in multiple store modules.
     it('sets `selectedAnnotationMap` to null', () => {
       store.clearSelection();
-      assert.isNull(store.getState().selectedAnnotationMap);
+      assert.isNull(store.getRootState().selection.selectedAnnotationMap);
     });
 
     it('sets `filterQuery` to null', () => {
       store.clearSelection();
-      assert.isNull(store.getState().filterQuery);
+      assert.isNull(store.getRootState().selection.filterQuery);
     });
 
     it('sets `directLinkedGroupFetchFailed` to false', () => {
@@ -94,13 +97,13 @@ describe('store', function() {
     it('sets `sortKey` to default annotation sort key if set to Orphans', () => {
       store.selectTab(uiConstants.TAB_ORPHANS);
       store.clearSelection();
-      assert.equal(store.getState().sortKey, 'Location');
+      assert.equal(store.getRootState().selection.sortKey, 'Location');
     });
 
     it('sets `sortKeysAvailable` to available annotation sort keys if set to Orphans', () => {
       store.selectTab(uiConstants.TAB_ORPHANS);
       store.clearSelection();
-      assert.deepEqual(store.getState().sortKeysAvailable, [
+      assert.deepEqual(store.getRootState().selection.sortKeysAvailable, [
         'Newest',
         'Oldest',
         'Location',
@@ -110,13 +113,19 @@ describe('store', function() {
     it('sets `selectedTab` to Annotations if set to Orphans', () => {
       store.selectTab(uiConstants.TAB_ORPHANS);
       store.clearSelection();
-      assert.equal(store.getState().selectedTab, uiConstants.TAB_ANNOTATIONS);
+      assert.equal(
+        store.getRootState().selection.selectedTab,
+        uiConstants.TAB_ANNOTATIONS
+      );
     });
 
     it('does not change `selectedTab` if set to something other than Orphans', () => {
       store.selectTab(uiConstants.TAB_NOTES);
       store.clearSelection();
-      assert.equal(store.getState().selectedTab, uiConstants.TAB_NOTES);
+      assert.equal(
+        store.getRootState().selection.selectedTab,
+        uiConstants.TAB_NOTES
+      );
     });
   });
 
@@ -143,20 +152,29 @@ describe('store', function() {
       store.addAnnotations([annot]);
       const page = oldPageNote();
       store.addAnnotations([page]);
-      assert.equal(store.getState().selectedTab, uiConstants.TAB_ANNOTATIONS);
+      assert.equal(
+        store.getRootState().selection.selectedTab,
+        uiConstants.TAB_ANNOTATIONS
+      );
     });
 
     it('sets `selectedTab` to "note" if only page notes are present', function() {
       const page = oldPageNote();
       store.addAnnotations([page]);
-      assert.equal(store.getState().selectedTab, uiConstants.TAB_NOTES);
+      assert.equal(
+        store.getRootState().selection.selectedTab,
+        uiConstants.TAB_NOTES
+      );
     });
 
     it('leaves `selectedTab` as "annotation" if annotations and/or page notes are present', function() {
       const page = oldPageNote();
       const annot = defaultAnnotation();
       store.addAnnotations([annot, page]);
-      assert.equal(store.getState().selectedTab, uiConstants.TAB_ANNOTATIONS);
+      assert.equal(
+        store.getRootState().selection.selectedTab,
+        uiConstants.TAB_ANNOTATIONS
+      );
     });
 
     it('assigns a local tag to annotations', function() {
@@ -324,7 +342,10 @@ describe('store', function() {
       store.addAnnotations([orphan]);
       store.selectTab(uiConstants.TAB_ORPHANS);
       store.removeAnnotations([orphan]);
-      assert.equal(store.getState().selectedTab, uiConstants.TAB_ANNOTATIONS);
+      assert.equal(
+        store.getRootState().selection.selectedTab,
+        uiConstants.TAB_ANNOTATIONS
+      );
     });
   });
 

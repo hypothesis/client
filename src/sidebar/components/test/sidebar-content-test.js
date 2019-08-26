@@ -176,7 +176,7 @@ describe('sidebar.components.sidebar-content', function() {
   }
 
   it('generates the thread list', () => {
-    const thread = fakeRootThread.thread(store.getState());
+    const thread = fakeRootThread.thread(store.getRootState());
     assert.equal(ctrl.rootThread(), thread);
   });
 
