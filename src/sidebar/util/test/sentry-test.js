@@ -3,12 +3,14 @@
 const sentry = require('../sentry');
 
 describe('sidebar/util/sentry', () => {
+  let fakeDocumentReferrer;
   let fakeSentry;
   let fakeWarnOnce;
 
   beforeEach(() => {
     fakeSentry = {
       init: sinon.stub(),
+      setTag: sinon.stub(),
       setUser: sinon.stub(),
     };
 
@@ -25,6 +27,15 @@ describe('sidebar/util/sentry', () => {
   });
 
   describe('init', () => {
+    beforeEach(() => {
+      fakeDocumentReferrer = sinon.stub(document, 'referrer');
+      fakeDocumentReferrer.get(() => 'https://example.com');
+    });
+
+    afterEach(() => {
+      fakeDocumentReferrer.restore();
+    });
+
     it('configures Sentry', () => {
       sentry.init({
         dsn: 'test-dsn',
@@ -38,6 +49,15 @@ describe('sidebar/util/sentry', () => {
           environment: 'dev',
           release: '1.0.0-dummy-version',
         })
+      );
+    });
+
+    it('adds extra context to reports', () => {
+      sentry.init({ dsn: 'test-dsn', environment: 'dev' });
+      assert.calledWith(
+        fakeSentry.setTag,
+        'document_url',
+        'https://example.com'
       );
     });
 

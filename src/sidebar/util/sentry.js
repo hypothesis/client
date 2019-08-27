@@ -44,6 +44,13 @@ function init(config) {
       return event;
     },
   });
+
+  // In the sidebar application, it is often useful to know the URL which the
+  // client was loaded into. This information is usually available in an iframe
+  // via `document.referrer`. More information about the document is available
+  // later when frames where the "annotator" code has loaded have connected to
+  // the sidebar via `postMessage` RPC messages.
+  Sentry.setTag('document_url', document.referrer);
 }
 
 /**
