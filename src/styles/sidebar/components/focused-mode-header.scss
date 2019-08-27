@@ -12,11 +12,6 @@
     height: 30px;
     padding-left: 10px;
     padding-right: 10px;
-    background-color: $grey-2;
-    color: $grey-5;
-    &:hover:enabled {
-      background-color: $grey-3;
-    }
   }
 
   &__filter-status {

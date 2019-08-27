@@ -48,7 +48,7 @@ describe('FocusedModeHeader', function() {
       it("should render status text indicating only that user's annotations are visible", () => {
         const wrapper = createComponent();
 
-        assert.match(wrapper.text(), /Annotations by.+Fake User/);
+        assert.match(wrapper.text(), /Showing.+Fake User.+only/);
       });
 
       it('should render a button allowing the user to view all annotations', () => {
@@ -68,7 +68,7 @@ describe('FocusedModeHeader', function() {
       it("should render status text indicating that all user's annotations are visible", () => {
         const wrapper = createComponent();
 
-        assert.match(wrapper.text(), /Everybody.*s annotations/);
+        assert.match(wrapper.text(), /Showing.+all/);
       });
 
       it("should render a button allowing the user to view only focus user's annotations", () => {
