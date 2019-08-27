@@ -1,18 +1,22 @@
 'use strict';
 
+const createStore = require('../../create-store');
 const session = require('../session');
 
-const util = require('../../util');
-
-const { init, actions, selectors } = session;
-const update = util.createReducer(session.update);
+const { init } = session;
 
 describe('sidebar.reducers.session', function() {
+  let store;
+
+  beforeEach(() => {
+    store = createStore([session]);
+  });
+
   describe('#updateSession', function() {
     it('updates the session state', function() {
       const newSession = Object.assign(init(), { userid: 'john' });
-      const state = update(init(), actions.updateSession(newSession));
-      assert.deepEqual(state.session, newSession);
+      store.updateSession({ userid: 'john' });
+      assert.deepEqual(store.getRootState().session, newSession);
     });
   });
 
@@ -22,18 +26,20 @@ describe('sidebar.reducers.session', function() {
       { userid: null, expectedIsLoggedIn: false },
     ].forEach(({ userid, expectedIsLoggedIn }) => {
       it('returns whether the user is logged in', () => {
-        const newSession = Object.assign(init(), { userid: userid });
-        const state = update(init(), actions.updateSession(newSession));
-        assert.equal(selectors.isLoggedIn(state), expectedIsLoggedIn);
+        store.updateSession({ userid: userid });
+        assert.equal(store.isLoggedIn(), expectedIsLoggedIn);
       });
     });
   });
 
   describe('#profile', () => {
     it("returns the user's profile", () => {
-      const newSession = Object.assign(init(), { userid: 'john' });
-      const state = update(init(), actions.updateSession(newSession));
-      assert.equal(selectors.profile(state), newSession);
+      store.updateSession({ userid: 'john' });
+      assert.deepEqual(store.profile(), {
+        userid: 'john',
+        features: {},
+        preferences: {},
+      });
     });
   });
 });
