@@ -30,6 +30,9 @@ describe('sidebar/util/sentry', () => {
     beforeEach(() => {
       fakeDocumentReferrer = sinon.stub(document, 'referrer');
       fakeDocumentReferrer.get(() => 'https://example.com');
+
+      // Reset rate limiting counters.
+      sentry.reset();
     });
 
     afterEach(() => {
@@ -61,15 +64,19 @@ describe('sidebar/util/sentry', () => {
       );
     });
 
+    function getBeforeSendHook() {
+      return fakeSentry.init.getCall(0).args[0].beforeSend;
+    }
+
     it('limits the number of events sent to Sentry per session', () => {
       sentry.init({ dsn: 'test-dsn' });
       assert.called(fakeSentry.init);
 
       // The first `maxEvents` events should be sent to Sentry.
       const maxEvents = 5;
-      const beforeSend = fakeSentry.init.getCall(0).args[0].beforeSend;
+      const beforeSend = getBeforeSendHook();
       for (let i = 0; i < maxEvents; i++) {
-        const val = {};
+        const val = { extra: {} };
 
         // These events should not be modified.
         assert.equal(beforeSend(val), val);
@@ -80,6 +87,44 @@ describe('sidebar/util/sentry', () => {
       assert.equal(beforeSend({}), null);
       assert.equal(beforeSend({}), null); // Verify this works a second time.
       assert.called(fakeWarnOnce);
+    });
+
+    it('extracts metadata from thrown `Event`s', () => {
+      sentry.init({ dsn: 'test-dsn' });
+      const beforeSend = getBeforeSendHook();
+      const event = { extra: {} };
+
+      beforeSend(event, {
+        originalException: new CustomEvent('unexpectedevent', {
+          detail: 'Details of the unexpected event',
+        }),
+      });
+
+      assert.deepEqual(event, {
+        extra: {
+          type: 'unexpectedevent',
+          detail: 'Details of the unexpected event',
+          isTrusted: false,
+        },
+      });
+    });
+
+    it('ignores errors serializing non-Error exception values', () => {
+      sentry.init({ dsn: 'test-dsn' });
+      const beforeSend = getBeforeSendHook();
+      const event = { extra: {} };
+      const originalException = new CustomEvent('unexpectedevent');
+      Object.defineProperty(originalException, 'detail', {
+        get: () => {
+          throw new Error('Something went wrong');
+        },
+      });
+
+      beforeSend(event, { originalException });
+
+      // Serializing the custom event detail will fail, so that data will simply
+      // be omitted from the report.
+      assert.deepEqual(event.extra, {});
     });
   });
 
