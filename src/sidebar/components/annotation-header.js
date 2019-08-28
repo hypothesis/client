@@ -44,7 +44,6 @@ function AnnotationHeader({
                 (edited{' '}
                 <Timestamp
                   className="annotation-header__timestamp-edited-link"
-                  href={annotationLink}
                   timestamp={annotation.updated}
                 />
                 ){' '}

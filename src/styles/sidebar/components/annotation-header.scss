@@ -21,8 +21,7 @@
     color: $grey-4;
   }
 
-  &__timestamp-created-link,
-  &__timestamp-edited-link {
+  &__timestamp-created-link {
     &:hover {
       text-decoration: underline;
     }
@@ -30,10 +29,6 @@
 
   &__timestamp-created-link {
     color: $grey-5;
-  }
-
-  &__timestamp-edited-link {
-    color: $grey-4;
   }
 
   &__highlight {
