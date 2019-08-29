@@ -10,7 +10,7 @@ describe('sidebar/util/sentry', () => {
   beforeEach(() => {
     fakeSentry = {
       init: sinon.stub(),
-      setTag: sinon.stub(),
+      setExtra: sinon.stub(),
       setUser: sinon.stub(),
     };
 
@@ -55,7 +55,7 @@ describe('sidebar/util/sentry', () => {
     it('adds extra context to reports', () => {
       sentry.init({ dsn: 'test-dsn', environment: 'dev' });
       assert.calledWith(
-        fakeSentry.setTag,
+        fakeSentry.setExtra,
         'document_url',
         'https://example.com'
       );

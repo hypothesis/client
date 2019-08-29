@@ -50,7 +50,7 @@ function init(config) {
   // via `document.referrer`. More information about the document is available
   // later when frames where the "annotator" code has loaded have connected to
   // the sidebar via `postMessage` RPC messages.
-  Sentry.setTag('document_url', document.referrer);
+  Sentry.setExtra('document_url', document.referrer);
 }
 
 /**
