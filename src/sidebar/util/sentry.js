@@ -27,7 +27,8 @@ function init(config) {
     environment: config.environment,
     release: '__VERSION__', // replaced by versionify
 
-    beforeSend: event => {
+    // See https://docs.sentry.io/error-reporting/configuration/filtering/?platform=javascript#before-send
+    beforeSend: (event, hint) => {
       if (eventsSent >= maxEventsToSendPerSession) {
         // Cap the number of events that any client instance will send, to
         // reduce the impact on our Sentry event quotas.
@@ -39,8 +40,25 @@ function init(config) {
         );
         return null;
       }
-
       ++eventsSent;
+
+      // Add additional debugging information for non-Error exception types
+      // which Sentry can't serialize to a useful format automatically.
+      //
+      // See https://github.com/getsentry/sentry-javascript/issues/2210
+      try {
+        const originalErr = hint && hint.originalException;
+        if (originalErr instanceof Event) {
+          Object.assign(event.extra, {
+            type: originalErr.type,
+            detail: originalErr.detail,
+            isTrusted: originalErr.isTrusted,
+          });
+        }
+      } catch (e) {
+        // If something went wrong serializing the data, just ignore it.
+      }
+
       return event;
     },
   });
