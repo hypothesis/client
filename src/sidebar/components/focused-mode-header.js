@@ -32,11 +32,12 @@ function FocusedModeHeader() {
     <div className="focused-mode-header__filter-status">
       {selectors.focusModeFocused ? (
         <span>
-          Annotations by <strong>{selectors.focusModeUserPrettyName}</strong>{' '}
-          only
+          Showing <strong>{selectors.focusModeUserPrettyName}</strong> only
         </span>
       ) : (
-        <span>Everybody&rsquo;s annotations</span>
+        <span>
+          Showing <strong>all</strong>
+        </span>
       )}
     </div>
   );
@@ -50,7 +51,7 @@ function FocusedModeHeader() {
   })();
 
   return (
-    <div className="focused-mode-header sheet">
+    <div className="focused-mode-header sheet sheet--short">
       {filterStatus}
       <button onClick={toggleFocusedMode} className="focused-mode-header__btn">
         {buttonText}

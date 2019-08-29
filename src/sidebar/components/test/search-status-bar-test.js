@@ -26,6 +26,8 @@ describe('SearchStatusBar', () => {
         directLinked: {},
       }),
       annotationCount: sinon.stub().returns(1),
+      focusModeFocused: sinon.stub().returns(false),
+      focusModeUserPrettyName: sinon.stub().returns('Fake User'),
       noteCount: sinon.stub().returns(0),
     };
 
@@ -113,6 +115,52 @@ describe('SearchStatusBar', () => {
 
       const searchResultsText = wrapper.find('span').text();
       assert.equal(searchResultsText, test.expectedText);
+    });
+  });
+
+  context('user-focused mode applied', () => {
+    beforeEach(() => {
+      fakeStore.focusModeFocused = sinon.stub().returns(true);
+    });
+
+    it('should not display a clear/show-all-annotations button when user-focused', () => {
+      const wrapper = createComponent({});
+
+      const buttons = wrapper.find('button');
+      assert.equal(buttons.length, 0);
+    });
+    [
+      {
+        description:
+          'shows pluralized annotation count when multiple annotations match for user',
+        children: [
+          { id: '1', visible: true, children: [] },
+          { id: '2', visible: true, children: [] },
+        ],
+        expected: 'Showing 2 annotations',
+      },
+      {
+        description:
+          'shows single annotation count when one annotation matches for user',
+        children: [{ id: '1', visible: true, children: [] }],
+        expected: 'Showing 1 annotation',
+      },
+      {
+        description:
+          'shows "no annotations" wording when no annotations match for user',
+        children: [],
+        expected: 'No annotations for Fake User',
+      },
+    ].forEach(test => {
+      it(test.description, () => {
+        fakeRootThread.thread.returns({
+          children: test.children,
+        });
+        const wrapper = createComponent({});
+        const resultText = wrapper.find('strong').text();
+
+        assert.equal(resultText, test.expected);
+      });
     });
   });
 
