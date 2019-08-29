@@ -27,6 +27,7 @@ function init(config) {
     environment: config.environment,
     release: '__VERSION__', // replaced by versionify
 
+    // See https://docs.sentry.io/error-reporting/configuration/filtering/?platform=javascript#before-send
     beforeSend: (event, hint) => {
       if (eventsSent >= maxEventsToSendPerSession) {
         // Cap the number of events that any client instance will send, to
