@@ -6,7 +6,7 @@ const init = links.init;
 const update = links.update.UPDATE_LINKS;
 const action = links.actions.updateLinks;
 
-describe('sidebar.reducers.links', function() {
+describe('sidebar/store/modules/links', function() {
   describe('#init()', function() {
     it('returns a null links object', function() {
       assert.deepEqual(init(), null);

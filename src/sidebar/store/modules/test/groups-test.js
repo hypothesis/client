@@ -6,7 +6,7 @@ const createStore = require('../../create-store');
 const groups = require('../groups');
 const session = require('../session');
 
-describe('sidebar.store.modules.groups', () => {
+describe('sidebar/store/modules/groups', () => {
   const publicGroup = immutable({
     id: '__world__',
     name: 'Public',

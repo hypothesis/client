@@ -5,7 +5,7 @@ const session = require('../session');
 
 const { init } = session;
 
-describe('sidebar.reducers.session', function() {
+describe('sidebar/store/modules/session', function() {
   let store;
 
   beforeEach(() => {
