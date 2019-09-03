@@ -106,7 +106,7 @@ function session(
    * @return {Profile} The updated profile data
    */
   function update(model) {
-    const prevSession = store.getState().session;
+    const prevSession = store.getRootState().session;
     const userChanged = model.userid !== prevSession.userid;
 
     // Update the session model used by the application
@@ -184,7 +184,7 @@ function session(
     // this service. In future, other services which access the session state
     // will do so directly from store or via selector functions
     get state() {
-      return store.getState().session;
+      return store.getRootState().session;
     },
 
     update,

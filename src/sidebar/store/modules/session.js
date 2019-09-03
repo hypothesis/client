@@ -3,27 +3,25 @@
 const util = require('../util');
 
 function init() {
+  /**
+   * Profile/session information for the active user.
+   */
   return {
+    /** A map of features that are enabled for the current user. */
+    features: {},
+    /** A map of preference names and values. */
+    preferences: {},
     /**
-     * Profile/session information for the active user.
+     * The authenticated user ID or null if the user is not logged in.
      */
-    session: {
-      /** A map of features that are enabled for the current user. */
-      features: {},
-      /** A map of preference names and values. */
-      preferences: {},
-      /**
-       * The authenticated user ID or null if the user is not logged in.
-       */
-      userid: null,
-    },
+    userid: null,
   };
 }
 
 const update = {
   UPDATE_SESSION: function(state, action) {
     return {
-      session: action.session,
+      ...action.session,
     };
   },
 };
@@ -71,6 +69,7 @@ function profile(state) {
 
 module.exports = {
   init,
+  namespace: 'session',
   update,
 
   actions: {

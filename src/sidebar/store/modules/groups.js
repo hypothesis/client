@@ -102,10 +102,10 @@ function loadGroups(groups) {
  * @return {Group|null}
  */
 function focusedGroup(state) {
-  if (!state.focusedGroupId) {
+  if (!state.groups.focusedGroupId) {
     return null;
   }
-  return getGroup(state, state.focusedGroupId);
+  return getGroup(state, state.groups.focusedGroupId);
 }
 
 /**
@@ -114,7 +114,7 @@ function focusedGroup(state) {
  * @return {string|null}
  */
 function focusedGroupId(state) {
-  return state.focusedGroupId;
+  return state.groups.focusedGroupId;
 }
 
 /**
@@ -123,16 +123,17 @@ function focusedGroupId(state) {
  * @return {Group[]}
  */
 function allGroups(state) {
-  return state.groups;
+  return state.groups.groups;
 }
 
 /**
  * Return the group with the given ID.
  *
+ * @param {string} id
  * @return {Group|undefined}
  */
 function getGroup(state, id) {
-  return state.groups.find(g => g.id === id);
+  return state.groups.groups.find(g => g.id === id);
 }
 
 /**
@@ -141,7 +142,7 @@ function getGroup(state, id) {
  * @return {Group[]}
  */
 const getMyGroups = createSelector(
-  state => state.groups,
+  state => state.groups.groups,
   isLoggedIn,
   (groups, loggedIn) => {
     // If logged out, the Public group still has isMember set to true so only
@@ -159,7 +160,7 @@ const getMyGroups = createSelector(
  * @return {Group[]}
  */
 const getFeaturedGroups = createSelector(
-  state => state.groups,
+  state => state.groups.groups,
   groups => groups.filter(group => !group.isMember && group.isScopedToUri)
 );
 
@@ -187,12 +188,13 @@ const getCurrentlyViewingGroups = createSelector(
  * @return {Group[]}
  */
 const getInScopeGroups = createSelector(
-  state => state.groups,
+  state => state.groups.groups,
   groups => groups.filter(g => g.isScopedToUri)
 );
 
 module.exports = {
   init,
+  namespace: 'groups',
   update,
   actions: {
     focusGroup,

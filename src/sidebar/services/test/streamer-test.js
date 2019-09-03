@@ -1,9 +1,6 @@
 'use strict';
 
 const EventEmitter = require('tiny-emitter');
-
-const unroll = require('../../../shared/test/util').unroll;
-
 const Streamer = require('../streamer');
 
 const fixtures = {
@@ -122,7 +119,7 @@ describe('Streamer', function() {
     fakeStore = {
       annotationExists: sinon.stub().returns(false),
       clearPendingUpdates: sinon.stub(),
-      getState: sinon.stub().returns({
+      getRootState: sinon.stub().returns({
         session: {
           userid: 'jim@hypothes.is',
         },
@@ -400,10 +397,18 @@ describe('Streamer', function() {
       console.warn.restore();
     });
 
-    unroll(
-      'does nothing if the userid matches the logged-in userid',
-      function(testCase) {
-        fakeStore.getState.returns({
+    [
+      {
+        userid: 'acct:mr_bond@hypothes.is',
+        websocketUserid: 'acct:mr_bond@hypothes.is',
+      },
+      {
+        userid: null,
+        websocketUserid: null,
+      },
+    ].forEach(testCase => {
+      it('does nothing if the userid matches the logged-in userid', () => {
+        fakeStore.getRootState.returns({
           session: {
             userid: testCase.userid,
           },
@@ -416,23 +421,21 @@ describe('Streamer', function() {
           });
           assert.notCalled(console.warn);
         });
-      },
-      [
-        {
-          userid: 'acct:mr_bond@hypothes.is',
-          websocketUserid: 'acct:mr_bond@hypothes.is',
-        },
-        {
-          userid: null,
-          websocketUserid: null,
-        },
-      ]
-    );
+      });
+    });
 
-    unroll(
-      'logs a warning if the userid does not match the logged-in userid',
-      function(testCase) {
-        fakeStore.getState.returns({
+    [
+      {
+        userid: 'acct:mr_bond@hypothes.is',
+        websocketUserid: 'acct:the_spanish_inquisition@hypothes.is',
+      },
+      {
+        userid: null,
+        websocketUserid: 'acct:the_spanish_inquisition@hypothes.is',
+      },
+    ].forEach(testCase => {
+      it('logs a warning if the userid does not match the logged-in userid', () => {
+        fakeStore.getRootState.returns({
           session: {
             userid: testCase.userid,
           },
@@ -445,18 +448,8 @@ describe('Streamer', function() {
           });
           assert.called(console.warn);
         });
-      },
-      [
-        {
-          userid: 'acct:mr_bond@hypothes.is',
-          websocketUserid: 'acct:the_spanish_inquisition@hypothes.is',
-        },
-        {
-          userid: null,
-          websocketUserid: 'acct:the_spanish_inquisition@hypothes.is',
-        },
-      ]
-    );
+      });
+    });
   });
 
   describe('reconnections', function() {

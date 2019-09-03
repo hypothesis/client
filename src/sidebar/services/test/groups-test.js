@@ -57,9 +57,11 @@ describe('groups', function() {
 
     fakeStore = fakeReduxStore(
       {
-        mainFrame: { uri: 'http://example.org' },
-        focusedGroup: null,
-        groups: [],
+        frames: [{ uri: 'http://example.org' }],
+        groups: {
+          focusedGroup: null,
+          groups: [],
+        },
         directLinked: {
           directLinkedGroupId: null,
           directLinkedAnnotationId: null,
@@ -70,19 +72,16 @@ describe('groups', function() {
         getGroup: sinon.stub(),
         loadGroups: sinon.stub(),
         allGroups() {
-          return this.getState().groups;
-        },
-        getInScopeGroups() {
-          return this.getState().groups;
+          return this.getRootState().groups.groups;
         },
         focusedGroup() {
-          return this.getState().focusedGroup;
+          return this.getRootState().groups.focusedGroup;
         },
         mainFrame() {
-          return this.getState().mainFrame;
+          return this.getRootState().frames[0];
         },
         focusedGroupId() {
-          const group = this.getState().focusedGroup;
+          const group = this.getRootState().groups.focusedGroup;
           return group ? group.id : null;
         },
         setDirectLinkedGroupFetchFailed: sinon.stub(),
@@ -430,9 +429,9 @@ describe('groups', function() {
       it('waits for the document URL to be determined', () => {
         const svc = service();
 
-        fakeStore.setState({ mainFrame: null });
+        fakeStore.setState({ frames: [null] });
         const loaded = svc.load();
-        fakeStore.setState({ mainFrame: { uri: 'https://asite.com' } });
+        fakeStore.setState({ frames: [{ uri: 'https://asite.com' }] });
 
         return loaded.then(() => {
           assert.calledWith(fakeApi.groups.list, {
@@ -449,7 +448,7 @@ describe('groups', function() {
       });
 
       it('does not wait for the document URL', () => {
-        fakeStore.setState({ mainFrame: null });
+        fakeStore.setState({ frames: [null] });
         const svc = service();
         return svc.load().then(() => {
           assert.calledWith(fakeApi.groups.list, {
@@ -751,7 +750,9 @@ describe('groups', function() {
   describe('#focused', function() {
     it('returns the focused group', function() {
       const svc = service();
-      fakeStore.setState({ groups: dummyGroups, focusedGroup: dummyGroups[2] });
+      fakeStore.setState({
+        groups: { groups: dummyGroups, focusedGroup: dummyGroups[2] },
+      });
       assert.equal(svc.focused(), dummyGroups[2]);
     });
   });
@@ -768,7 +769,9 @@ describe('groups', function() {
     it('stores the focused group id in localStorage', function() {
       service();
 
-      fakeStore.setState({ groups: dummyGroups, focusedGroup: dummyGroups[1] });
+      fakeStore.setState({
+        groups: { groups: dummyGroups, focusedGroup: dummyGroups[1] },
+      });
 
       assert.calledWithMatch(
         fakeLocalStorage.setItem,
@@ -780,7 +783,9 @@ describe('groups', function() {
     it('emits the GROUP_FOCUSED event if the focused group changed', function() {
       service();
 
-      fakeStore.setState({ groups: dummyGroups, focusedGroup: dummyGroups[1] });
+      fakeStore.setState({
+        groups: { groups: dummyGroups, focusedGroup: dummyGroups[1] },
+      });
 
       assert.calledWith(
         fakeRootScope.$broadcast,
@@ -792,9 +797,14 @@ describe('groups', function() {
     it('does not emit GROUP_FOCUSED if the focused group did not change', () => {
       service();
 
-      fakeStore.setState({ groups: dummyGroups, focusedGroup: dummyGroups[1] });
+      fakeStore.setState({
+        groups: { groups: dummyGroups, focusedGroup: dummyGroups[1] },
+      });
+
       fakeRootScope.$broadcast.reset();
-      fakeStore.setState({ groups: dummyGroups, focusedGroup: dummyGroups[1] });
+      fakeStore.setState({
+        groups: { groups: dummyGroups, focusedGroup: dummyGroups[1] },
+      });
 
       assert.notCalled(fakeRootScope.$broadcast);
     });
@@ -825,7 +835,9 @@ describe('groups', function() {
       it('should refetch groups if main frame URL has changed', () => {
         const svc = service();
 
-        fakeStore.setState({ mainFrame: { uri: 'https://domain.com/page-a' } });
+        fakeStore.setState({
+          frames: [{ uri: 'https://domain.com/page-a' }],
+        });
         return svc
           .load()
           .then(() => {
@@ -833,7 +845,7 @@ describe('groups', function() {
             // a single page application.
             fakeApi.groups.list.resetHistory();
             fakeStore.setState({
-              mainFrame: { uri: 'https://domain.com/page-b' },
+              frames: [{ uri: 'https://domain.com/page-b' }],
             });
 
             return fakeRootScope.eventCallbacks[events.FRAME_CONNECTED]();
@@ -846,7 +858,9 @@ describe('groups', function() {
       it('should not refetch groups if main frame URL has not changed', () => {
         const svc = service();
 
-        fakeStore.setState({ mainFrame: { uri: 'https://domain.com/page-a' } });
+        fakeStore.setState({
+          frames: [{ uri: 'https://domain.com/page-a' }],
+        });
         return svc
           .load()
           .then(() => {

@@ -4,6 +4,7 @@ const immutable = require('seamless-immutable');
 
 const createStore = require('../../create-store');
 const groups = require('../groups');
+const session = require('../session');
 
 describe('sidebar.store.modules.groups', () => {
   const publicGroup = immutable({
@@ -73,7 +74,7 @@ describe('sidebar.store.modules.groups', () => {
   let store;
 
   beforeEach(() => {
-    store = createStore([groups]);
+    store = createStore([groups, session]);
   });
 
   describe('focusGroup', () => {
@@ -90,7 +91,7 @@ describe('sidebar.store.modules.groups', () => {
 
       store.focusGroup(publicGroup.id);
 
-      assert.equal(store.getState().focusedGroupId, publicGroup.id);
+      assert.equal(store.getRootState().groups.focusedGroupId, publicGroup.id);
       assert.notCalled(console.error);
     });
 
@@ -99,7 +100,7 @@ describe('sidebar.store.modules.groups', () => {
 
       store.focusGroup(privateGroup.id);
 
-      assert.equal(store.getState().focusedGroupId, publicGroup.id);
+      assert.equal(store.getRootState().groups.focusedGroupId, publicGroup.id);
       assert.called(console.error);
     });
   });
@@ -107,7 +108,7 @@ describe('sidebar.store.modules.groups', () => {
   describe('loadGroups', () => {
     it('updates the set of groups', () => {
       store.loadGroups([publicGroup]);
-      assert.deepEqual(store.getState().groups, [publicGroup]);
+      assert.deepEqual(store.getRootState().groups.groups, [publicGroup]);
     });
 
     it('resets the focused group if not in new set of groups', () => {
@@ -115,7 +116,7 @@ describe('sidebar.store.modules.groups', () => {
       store.focusGroup(publicGroup.id);
       store.loadGroups([]);
 
-      assert.equal(store.getState().focusedGroupId, null);
+      assert.equal(store.getRootState().groups.focusedGroupId, null);
     });
 
     it('leaves focused group unchanged if in new set of groups', () => {
@@ -123,7 +124,7 @@ describe('sidebar.store.modules.groups', () => {
       store.focusGroup(publicGroup.id);
       store.loadGroups([publicGroup, privateGroup]);
 
-      assert.equal(store.getState().focusedGroupId, publicGroup.id);
+      assert.equal(store.getRootState().groups.focusedGroupId, publicGroup.id);
     });
   });
 
@@ -133,7 +134,7 @@ describe('sidebar.store.modules.groups', () => {
 
       store.clearGroups();
 
-      assert.equal(store.getState().groups.length, 0);
+      assert.equal(store.getRootState().groups.groups.length, 0);
     });
 
     it('clears the focused group id', () => {
@@ -142,7 +143,7 @@ describe('sidebar.store.modules.groups', () => {
 
       store.clearGroups();
 
-      assert.equal(store.getState().focusedGroupId, null);
+      assert.equal(store.getRootState().groups.focusedGroupId, null);
     });
   });
 
@@ -231,11 +232,9 @@ describe('sidebar.store.modules.groups', () => {
     ].forEach(
       ({ description, isLoggedIn, allGroups, expectedFeaturedGroups }) => {
         it(description, () => {
-          store.getState().session = { userid: isLoggedIn ? '1234' : null };
+          store.updateSession({ userid: isLoggedIn ? '1234' : null });
           store.loadGroups(allGroups);
-
           const featuredGroups = getListAssertNoDupes(store, 'featuredGroups');
-
           assert.deepEqual(featuredGroups, expectedFeaturedGroups);
         });
       }
@@ -273,7 +272,7 @@ describe('sidebar.store.modules.groups', () => {
       },
     ].forEach(({ description, isLoggedIn, allGroups, expectedMyGroups }) => {
       it(description, () => {
-        store.getState().session = { userid: isLoggedIn ? '1234' : null };
+        store.updateSession({ userid: isLoggedIn ? '1234' : null });
         store.loadGroups(allGroups);
 
         const myGroups = getListAssertNoDupes(store, 'myGroups');
@@ -305,7 +304,7 @@ describe('sidebar.store.modules.groups', () => {
       },
     ].forEach(({ description, isLoggedIn, allGroups }) => {
       it(description, () => {
-        store.getState().session = { userid: isLoggedIn ? '1234' : null };
+        store.updateSession({ userid: isLoggedIn ? '1234' : null });
         store.loadGroups(allGroups);
 
         const currentlyViewing = getListAssertNoDupes(
