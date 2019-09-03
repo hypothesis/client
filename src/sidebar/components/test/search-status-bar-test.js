@@ -40,63 +40,8 @@ describe('SearchStatusBar', () => {
     SearchStatusBar.$imports.$restore();
   });
 
-  [
-    {
-      description:
-        'shows correct text if 2 annotations match the search filter',
-      children: [
-        {
-          id: '1',
-          visible: true,
-          children: [{ id: '3', visible: true, children: [] }],
-        },
-        {
-          id: '2',
-          visible: false,
-          children: [],
-        },
-      ],
-      expectedText: '2 search results',
-    },
-    {
-      description:
-        'shows correct text if 1 annotation matches the search filter',
-      children: [
-        {
-          id: '1',
-          visible: true,
-          children: [{ id: '3', visible: false, children: [] }],
-        },
-        {
-          id: '2',
-          visible: false,
-          children: [],
-        },
-      ],
-      expectedText: '1 search result',
-    },
-    {
-      description:
-        'shows correct text if no annotation matches the search filter',
-      children: [
-        {
-          id: '1',
-          visible: false,
-          children: [{ id: '3', visible: false, children: [] }],
-        },
-        {
-          id: '2',
-          visible: false,
-          children: [],
-        },
-      ],
-      expectedText: 'No results for "tag:foo"',
-    },
-  ].forEach(test => {
-    it(test.description, () => {
-      fakeRootThread.thread.returns({
-        children: test.children,
-      });
+  context('user search query is applied', () => {
+    beforeEach(() => {
       fakeStore.getRootState.returns({
         selection: {
           filterQuery: 'tag:foo',
@@ -107,14 +52,74 @@ describe('SearchStatusBar', () => {
         },
       });
       fakeStore.annotationCount.returns(3);
+    });
 
-      const wrapper = createComponent({});
+    [
+      {
+        description:
+          'shows correct text if 2 annotations match the search filter',
+        children: [
+          {
+            id: '1',
+            visible: true,
+            children: [{ id: '3', visible: true, children: [] }],
+          },
+          {
+            id: '2',
+            visible: false,
+            children: [],
+          },
+        ],
+        expectedText: '2 search results',
+      },
+      {
+        description:
+          'shows correct text if 1 annotation matches the search filter',
+        children: [
+          {
+            id: '1',
+            visible: true,
+            children: [{ id: '3', visible: false, children: [] }],
+          },
+          {
+            id: '2',
+            visible: false,
+            children: [],
+          },
+        ],
+        expectedText: '1 search result',
+      },
+      {
+        description:
+          'shows correct text if no annotation matches the search filter',
+        children: [
+          {
+            id: '1',
+            visible: false,
+            children: [{ id: '3', visible: false, children: [] }],
+          },
+          {
+            id: '2',
+            visible: false,
+            children: [],
+          },
+        ],
+        expectedText: 'No results for "tag:foo"',
+      },
+    ].forEach(test => {
+      it(test.description, () => {
+        fakeRootThread.thread.returns({
+          children: test.children,
+        });
 
-      const buttonText = wrapper.find('button').text();
-      assert.equal(buttonText, 'Clear search');
+        const wrapper = createComponent({});
 
-      const searchResultsText = wrapper.find('span').text();
-      assert.equal(searchResultsText, test.expectedText);
+        const buttonText = wrapper.find('button').text();
+        assert.equal(buttonText, 'Clear search');
+
+        const searchResultsText = wrapper.find('span').text();
+        assert.equal(searchResultsText, test.expectedText);
+      });
     });
   });
 
@@ -129,6 +134,7 @@ describe('SearchStatusBar', () => {
       const buttons = wrapper.find('button');
       assert.equal(buttons.length, 0);
     });
+
     [
       {
         description:
@@ -157,119 +163,169 @@ describe('SearchStatusBar', () => {
           children: test.children,
         });
         const wrapper = createComponent({});
-        const resultText = wrapper.find('strong').text();
+        const resultText = wrapper
+          .find('.search-status-bar__focused-text')
+          .text();
 
         assert.equal(resultText, test.expected);
       });
     });
-  });
 
-  it('displays "Show all annotations" button when a direct-linked group fetch fails', () => {
-    fakeStore.getRootState.returns({
-      selection: {
-        filterQuery: null,
-        selectedAnnotationMap: { annId: true },
-        selectedTab: 'annotation',
-      },
-      directLinked: {},
-    });
+    it('should not display user-focused mode text if filtered mode is (also) applied', () => {
+      fakeRootThread.thread.returns({
+        children: [
+          { id: '1', visible: true, children: [] },
+          { id: '2', visible: true, children: [] },
+        ],
+      });
 
-    const wrapper = createComponent({});
-
-    const buttonText = wrapper.find('button').text();
-    assert.equal(buttonText, 'Show all annotations');
-  });
-
-  it('displays "Show all annotations" button when there are selected annotations', () => {
-    fakeStore.getRootState.returns({
-      selection: {
-        filterQuery: null,
-        selectedAnnotationMap: { annId: true },
-        selectedTab: 'annotation',
-      },
-      directLinked: {
-        directLinkedGroupFetchFailed: false,
-      },
-    });
-
-    const wrapper = createComponent({});
-
-    const buttonText = wrapper.find('button').text();
-    assert.equal(buttonText, 'Show all annotations');
-  });
-
-  [null, {}].forEach(selectedAnnotationMap => {
-    it('does not display "Show all annotations" button when there are no selected annotations', () => {
       fakeStore.getRootState.returns({
         selection: {
-          filterQuery: null,
-          selectedAnnotationMap: selectedAnnotationMap,
+          filterQuery: 'tag:foo',
           selectedTab: 'annotation',
         },
-        directLinked: {
-          directLinkedGroupFetchFailed: false,
-        },
+        directLinked: {},
       });
 
       const wrapper = createComponent({});
 
-      const buttons = wrapper.find('button');
-      assert.equal(buttons.length, 0);
+      const focusedTextEl = wrapper.find('.search-status-bar__focused-text');
+      const filteredTextEl = wrapper.find('.search-status-bar__filtered-text');
+      assert.isFalse(focusedTextEl.exists());
+      assert.isTrue(filteredTextEl.exists());
     });
   });
 
-  [
-    {
-      description:
-        'displays "Show all annotations and notes" button when the orphans tab is selected',
-      selectedTab: 'orphan',
-      totalAnnotations: 1,
-      totalNotes: 1,
-      expectedText: 'Show all annotations and notes',
-    },
-    {
-      description:
-        'displays "Show all notes" button when the notes tab is selected',
-      selectedTab: 'note',
-      totalAnnotations: 1,
-      totalNotes: 1,
-      expectedText: 'Show all notes',
-    },
-    {
-      description:
-        'displays "Show all notes (2)" button when the notes tab is selected and there are two notes',
-      selectedTab: 'note',
-      totalAnnotations: 2,
-      totalNotes: 2,
-      expectedText: 'Show all notes (2)',
-    },
-    {
-      description:
-        'displays "Show all annotations (2)" button when the notes tab is selected and there are two annotations',
-      selectedTab: 'annotation',
-      totalAnnotations: 2,
-      totalNotes: 2,
-      expectedText: 'Show all annotations (2)',
-    },
-  ].forEach(test => {
-    it(test.description, () => {
-      fakeStore.getRootState.returns({
-        selection: {
-          filterQuery: null,
-          selectedAnnotationMap: { annId: true },
-          selectedTab: test.selectedTab,
+  context('selected-annotation(s) mode applied', () => {
+    context('selected mode only', () => {
+      [
+        {
+          description:
+            'should display show-all-annotation button with annotation count',
+          tab: 'annotation',
+          annotationCount: 5,
+          noteCount: 3,
+          buttonText: 'Show all annotations (5)',
         },
-        directLinked: {
-          directLinkedGroupFetchFailed: false,
+        {
+          description:
+            'should display show-all-annotation button with annotation and notes count',
+          tab: 'orphan',
+          annotationCount: 5,
+          noteCount: 3,
+          buttonText: 'Show all annotations and notes',
         },
+        {
+          description: 'should display show-all-notes button with note count',
+          tab: 'note',
+          annotationCount: 3,
+          noteCount: 3,
+          buttonText: 'Show all notes (3)',
+        },
+        {
+          description:
+            'should display show-all-annotation button with no count',
+          tab: 'annotation',
+          annotationCount: 1,
+          noteCount: 3,
+          buttonText: 'Show all annotations',
+        },
+        {
+          description: 'should display show-all-notes button with no count',
+          tab: 'note',
+          annotationCount: 1,
+          noteCount: 1,
+          buttonText: 'Show all notes',
+        },
+      ].forEach(test => {
+        it(test.description, () => {
+          fakeStore.getRootState.returns({
+            selection: {
+              filterQuery: null,
+              selectedAnnotationMap: { annId: true },
+              selectedTab: test.tab,
+            },
+            directLinked: {},
+          });
+          fakeStore.annotationCount.returns(test.annotationCount);
+          fakeStore.noteCount.returns(test.noteCount);
+
+          const wrapper = createComponent({});
+
+          const button = wrapper.find('button');
+          const selectedText = wrapper.find(
+            '.search-status-bar__selected-text'
+          );
+
+          assert.isTrue(button.exists());
+          assert.equal(button.text(), test.buttonText);
+          assert.isTrue(selectedText.exists());
+        });
       });
-      fakeStore.noteCount.returns(test.totalNotes);
-      fakeStore.annotationCount.returns(test.totalAnnotations);
+    });
 
-      const wrapper = createComponent({});
+    context('combined with applied user-focused mode', () => {
+      [
+        { tab: 'annotation', buttonText: 'Show all annotations by Fake User' },
+        { tab: 'orphan', buttonText: 'Show all annotations and notes' },
+        { tab: 'note', buttonText: 'Show all notes by Fake User' },
+      ].forEach(test => {
+        it(`displays correct text for tab '${test.tab}', without count`, () => {
+          fakeStore.focusModeFocused = sinon.stub().returns(true);
+          fakeStore.getRootState.returns({
+            selection: {
+              filterQuery: null,
+              selectedTab: test.tab,
+            },
+            directLinked: {
+              directLinkedGroupFetchFailed: true,
+            },
+          });
+          fakeStore.annotationCount.returns(5);
+          fakeStore.noteCount.returns(3);
 
-      const buttonText = wrapper.find('button').text();
-      assert.equal(buttonText, test.expectedText);
+          const wrapper = createComponent({});
+
+          const button = wrapper.find('button');
+          const selectedText = wrapper.find(
+            '.search-status-bar__selected-text'
+          );
+
+          assert.isTrue(button.exists());
+          assert.equal(button.text(), test.buttonText);
+          assert.isTrue(selectedText.exists());
+        });
+      });
+    });
+
+    context('combined with applied query filter', () => {
+      // Applied-query mode wins out here; no selection UI rendered
+      it('does not show selected-mode elements', () => {
+        fakeStore.focusModeFocused = sinon.stub().returns(true);
+        fakeStore.getRootState.returns({
+          selection: {
+            filterQuery: 'tag:foo',
+            selectedTab: 'annotation',
+          },
+          directLinked: {
+            directLinkedGroupFetchFailed: false,
+          },
+        });
+        fakeStore.annotationCount.returns(5);
+        fakeStore.noteCount.returns(3);
+
+        const wrapper = createComponent({});
+
+        const button = wrapper.find('button');
+        const selectedText = wrapper.find('.search-status-bar__selected-text');
+        const filteredText = wrapper.find('.search-status-bar__filtered-text');
+
+        assert.isTrue(button.exists());
+        assert.isFalse(selectedText.exists());
+        assert.isTrue(filteredText.exists());
+      });
     });
   });
+
+  // });
 });
