@@ -11,4 +11,5 @@ the Hypothesis client.
    envvars
    mobile
    security
+   docs
    arch/index

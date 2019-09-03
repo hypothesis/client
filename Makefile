@@ -36,12 +36,12 @@ lint: node_modules/.uptodate
 	yarn run lint
 
 .PHONY: docs
-docs:
-	tox -e py3-docs
+docs: python
+	tox -e py36-docs
 
 .PHONY: checkdocs
-checkdocs:
-	tox -e py3-checkdocs
+checkdocs: python
+	tox -e py36-checkdocs
 
 .PHONY: clean
 clean:
@@ -55,6 +55,10 @@ format:
 .PHONY: checkformatting
 checkformatting:
 	yarn run checkformatting
+
+.PHONY: python
+python:
+	@./bin/install-python
 
 build/manifest.json: node_modules/.uptodate
 	yarn run build
