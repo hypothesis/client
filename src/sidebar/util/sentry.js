@@ -14,6 +14,22 @@ let eventsSent = 0;
 const maxEventsToSendPerSession = 5;
 
 /**
+ * Return the origin which the current script comes from.
+ *
+ * @return {string|null}
+ */
+function currentScriptOrigin() {
+  try {
+    // nb. IE 11 does not support `document.currentScript` and this property
+    // is only available while a `<script>` tag is initially being executed.
+    const scriptUrl = new URL(document.currentScript.src);
+    return scriptUrl.origin;
+  } catch (e) {
+    return null;
+  }
+}
+
+/**
  * Initialize the Sentry integration.
  *
  * This will activate Sentry and enable capturing of uncaught errors and
@@ -22,10 +38,23 @@ const maxEventsToSendPerSession = 5;
  * @param {SentryConfig} config
  */
 function init(config) {
+  // Only send events for errors which can be attributed to our code. This
+  // reduces noise in Sentry caused by errors triggered by eg. script tags added
+  // by browser extensions. The downside is that this may cause us to miss errors
+  // which are caused by our code but, for any reason, cannot be attributed to
+  // it. This logic assumes that all of our script bundles are served from
+  // the same origin as the bundle which includes this module.
+  //
+  // If we can't determine the current script's origin, just disable the
+  // whitelist and report all errors.
+  const scriptOrigin = currentScriptOrigin();
+  const whitelistUrls = scriptOrigin ? [scriptOrigin] : null;
+
   Sentry.init({
     dsn: config.dsn,
     environment: config.environment,
     release: '__VERSION__', // replaced by versionify
+    whitelistUrls,
 
     // See https://docs.sentry.io/error-reporting/configuration/filtering/?platform=javascript#before-send
     beforeSend: (event, hint) => {
