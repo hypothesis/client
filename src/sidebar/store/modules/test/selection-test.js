@@ -5,7 +5,7 @@ const createStore = require('../../create-store');
 const selection = require('../selection');
 const uiConstants = require('../../../ui-constants');
 
-describe('store/modules/selection', () => {
+describe('sidebar/store/modules/selection', () => {
   let store;
   let fakeSettings = [{}, {}];
 
