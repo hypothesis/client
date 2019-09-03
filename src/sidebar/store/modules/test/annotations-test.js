@@ -5,6 +5,7 @@ const createStoreFromModules = require('../../create-store');
 const drafts = require('../drafts');
 const fixtures = require('../../../test/annotation-fixtures');
 const selection = require('../selection');
+const viewer = require('../viewer');
 const uiConstants = require('../../../ui-constants');
 const unroll = require('../../../../shared/test/util').unroll;
 
@@ -14,7 +15,7 @@ const { actions, selectors } = annotations;
  * Create a Redux store which handles annotation, selection and draft actions.
  */
 function createStore() {
-  return createStoreFromModules([annotations, selection, drafts], [{}, {}, {}]);
+  return createStoreFromModules([annotations, selection, drafts, viewer], [{}]);
 }
 
 // Tests for most of the functionality in reducers/annotations.js are currently

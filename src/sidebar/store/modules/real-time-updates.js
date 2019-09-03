@@ -97,8 +97,8 @@ function receiveRealTimeUpdates({
       // group and reload all annotations and discard pending updates
       // when switching groups.
       if (
-        ann.group === groupSelectors.focusedGroupId(getState().base) ||
-        !viewerSelectors.isSidebar(getState().base)
+        ann.group === groupSelectors.focusedGroupId(getState()) ||
+        !viewerSelectors.isSidebar(getState())
       ) {
         pendingUpdates[ann.id] = ann;
       }

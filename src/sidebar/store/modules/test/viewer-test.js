@@ -1,22 +1,33 @@
 'use strict';
 
 const viewer = require('../viewer');
+const createStore = require('../../create-store');
 
-const util = require('../../util');
+describe('store/modules/viewer', function() {
+  let store;
 
-const { init, actions, selectors } = viewer;
-const update = util.createReducer(viewer.update);
-
-describe('viewer reducer', function() {
+  beforeEach(() => {
+    store = createStore([viewer]);
+  });
   describe('#setAppIsSidebar', function() {
-    it('sets a flag indicating that the app is the sidebar', function() {
-      const state = update(init(), actions.setAppIsSidebar(true));
-      assert.isTrue(selectors.isSidebar(state));
+    it('sets a flag indicating that the app is not the sidebar', function() {
+      store.setAppIsSidebar(false);
+      assert.isFalse(store.isSidebar());
     });
 
-    it('sets a flag indicating that the app is not the sidebar', function() {
-      const state = update(init(), actions.setAppIsSidebar(false));
-      assert.isFalse(selectors.isSidebar(state));
+    it('sets a flag indicating that the app is the sidebar', function() {
+      store.setAppIsSidebar(true);
+      assert.isTrue(store.isSidebar());
+    });
+
+    it('sets a flag indicating that highlights are visible', function() {
+      store.setShowHighlights(true);
+      assert.isTrue(store.getRootState().viewer.visibleHighlights);
+    });
+
+    it('sets a flag indicating that highlights are not visible', function() {
+      store.setShowHighlights(false);
+      assert.isFalse(store.getRootState().viewer.visibleHighlights);
     });
   });
 });

@@ -36,6 +36,8 @@ describe('rootThread', function() {
       state: {
         base: {
           annotations: [],
+        },
+        viewer: {
           isSidebar: true,
           visibleHighlights: false,
         },
@@ -288,7 +290,7 @@ describe('rootThread', function() {
 
     it('does not filter annotations when not in the sidebar', function() {
       fakeBuildThread.reset();
-      fakeStore.state.base.isSidebar = false;
+      fakeStore.state.viewer.isSidebar = false;
 
       rootThread.thread(fakeStore.state);
       const threadFilterFn = fakeBuildThread.args[0][1].threadFilterFn;

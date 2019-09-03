@@ -252,7 +252,7 @@ function addAnnotations(annotations, now) {
       currentAnnotationCount: getState().base.annotations.length,
     });
 
-    if (!getState().base.isSidebar) {
+    if (!getState().viewer.isSidebar) {
       return;
     }
 

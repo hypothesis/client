@@ -68,7 +68,7 @@ function RootThread($rootScope, store, searchFilter, viewFilter) {
     }
 
     let threadFilterFn;
-    if (state.base.isSidebar && !shouldFilterThread()) {
+    if (state.viewer.isSidebar && !shouldFilterThread()) {
       threadFilterFn = function(thread) {
         if (!thread.annotation) {
           return false;
