@@ -110,7 +110,9 @@ describe('sidebar.frame-sync', function() {
 
   context('when annotations are loaded into the sidebar', function() {
     it('sends a "loadAnnotations" message to the frame', function() {
-      fakeStore.setState({ annotations: [fixtures.ann] });
+      fakeStore.setState({
+        annotations: { annotations: [fixtures.ann] },
+      });
       assert.calledWithMatch(
         fakeBridge.call,
         'loadAnnotations',
@@ -120,10 +122,14 @@ describe('sidebar.frame-sync', function() {
 
     it('sends a "loadAnnotations" message only for new annotations', function() {
       const ann2 = Object.assign({}, fixtures.ann, { $tag: 't2', id: 'a2' });
-      fakeStore.setState({ annotations: [fixtures.ann] });
+      fakeStore.setState({
+        annotations: { annotations: [fixtures.ann] },
+      });
       fakeBridge.call.reset();
 
-      fakeStore.setState({ annotations: [fixtures.ann, ann2] });
+      fakeStore.setState({
+        annotations: { annotations: [fixtures.ann, ann2] },
+      });
 
       assert.calledWithMatch(
         fakeBridge.call,
@@ -133,7 +139,9 @@ describe('sidebar.frame-sync', function() {
     });
 
     it('does not send a "loadAnnotations" message for replies', function() {
-      fakeStore.setState({ annotations: [annotationFixtures.newReply()] });
+      fakeStore.setState({
+        annotations: { annotations: [annotationFixtures.newReply()] },
+      });
       assert.isFalse(fakeBridge.call.calledWith('loadAnnotations'));
     });
   });
@@ -141,7 +149,7 @@ describe('sidebar.frame-sync', function() {
   context('when annotation count has changed', function() {
     it('sends a "publicAnnotationCountChanged" message to the frame when there are public annotations', function() {
       fakeStore.setState({
-        annotations: [annotationFixtures.publicAnnotation()],
+        annotations: { annotations: [annotationFixtures.publicAnnotation()] },
       });
       assert.calledWithMatch(
         fakeBridge.call,
@@ -152,7 +160,7 @@ describe('sidebar.frame-sync', function() {
 
     it('sends a "publicAnnotationCountChanged" message to the frame when there are only private annotations', function() {
       fakeStore.setState({
-        annotations: [annotationFixtures.defaultAnnotation()],
+        annotations: { annotations: [annotationFixtures.defaultAnnotation()] },
       });
       assert.calledWithMatch(
         fakeBridge.call,
@@ -164,7 +172,7 @@ describe('sidebar.frame-sync', function() {
     it('does not send a "publicAnnotationCountChanged" message to the frame if annotation fetch is not complete', function() {
       fakeStore.frames.returns([{ uri: 'http://example.com' }]);
       fakeStore.setState({
-        annotations: [annotationFixtures.publicAnnotation()],
+        annotations: { annotations: [annotationFixtures.publicAnnotation()] },
       });
       assert.isFalse(
         fakeBridge.call.calledWith('publicAnnotationCountChanged')
@@ -174,7 +182,7 @@ describe('sidebar.frame-sync', function() {
     it('does not send a "publicAnnotationCountChanged" message if there are no connected frames', function() {
       fakeStore.frames.returns([]);
       fakeStore.setState({
-        annotations: [annotationFixtures.publicAnnotation()],
+        annotations: { annotations: [annotationFixtures.publicAnnotation()] },
       });
       assert.isFalse(
         fakeBridge.call.calledWith('publicAnnotationCountChanged')
@@ -184,8 +192,12 @@ describe('sidebar.frame-sync', function() {
 
   context('when annotations are removed from the sidebar', function() {
     it('sends a "deleteAnnotation" message to the frame', function() {
-      fakeStore.setState({ annotations: [fixtures.ann] });
-      fakeStore.setState({ annotations: [] });
+      fakeStore.setState({
+        annotations: { annotations: [fixtures.ann] },
+      });
+      fakeStore.setState({
+        annotations: { annotations: [] },
+      });
       assert.calledWithMatch(
         fakeBridge.call,
         'deleteAnnotation',

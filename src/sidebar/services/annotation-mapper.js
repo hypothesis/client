@@ -5,7 +5,7 @@ const angular = require('angular');
 const events = require('../events');
 
 function getExistingAnnotation(store, id) {
-  return store.getState().annotations.find(function(annot) {
+  return store.getRootState().annotations.annotations.find(function(annot) {
     return annot.id === id;
   });
 }

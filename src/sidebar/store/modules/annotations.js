@@ -243,13 +243,13 @@ function addAnnotations(annotations, now) {
 
   return function(dispatch, getState) {
     const added = annotations.filter(function(annot) {
-      return !findByID(getState().base.annotations, annot.id);
+      return !findByID(getState().annotations.annotations, annot.id);
     });
 
     dispatch({
       type: actions.ADD_ANNOTATIONS,
       annotations: annotations,
-      currentAnnotationCount: getState().base.annotations.length,
+      currentAnnotationCount: getState().annotations.annotations.length,
     });
 
     if (!getState().viewer.isSidebar) {
@@ -267,7 +267,7 @@ function addAnnotations(annotations, now) {
     if (anchoringIDs.length > 0) {
       setTimeout(() => {
         // Find annotations which haven't yet been anchored in the document.
-        const anns = getState().base.annotations;
+        const anns = getState().annotations.annotations;
         const annsStillAnchoring = anchoringIDs
           .map(id => findByID(anns, id))
           .filter(ann => ann && metadata.isWaitingToAnchor(ann));
@@ -290,7 +290,7 @@ function addAnnotations(annotations, now) {
 function removeAnnotations(annotations) {
   return (dispatch, getState) => {
     const remainingAnnotations = excludeAnnotations(
-      getState().base.annotations,
+      getState().annotations.annotations,
       annotations
     );
     dispatch({
@@ -380,14 +380,14 @@ function unhideAnnotation(id) {
  * @param {state} - The global app state
  */
 function savedAnnotations(state) {
-  return state.annotations.filter(function(ann) {
+  return state.annotations.annotations.filter(function(ann) {
     return !metadata.isNew(ann);
   });
 }
 
 /** Return true if the annotation with a given ID is currently loaded. */
 function annotationExists(state, id) {
-  return state.annotations.some(function(annot) {
+  return state.annotations.annotations.some(function(annot) {
     return annot.id === id;
   });
 }
@@ -403,7 +403,7 @@ function annotationExists(state, id) {
 function findIDsForTags(state, tags) {
   const ids = [];
   tags.forEach(function(tag) {
-    const annot = findByTag(state.annotations, tag);
+    const annot = findByTag(state.annotations.annotations, tag);
     if (annot && annot.id) {
       ids.push(annot.id);
     }
@@ -415,14 +415,14 @@ function findIDsForTags(state, tags) {
  * Return the annotation with the given ID.
  */
 function findAnnotationByID(state, id) {
-  return findByID(state.annotations, id);
+  return findByID(state.annotations.annotations, id);
 }
 
 /**
  * Return the number of page notes.
  */
 const noteCount = createSelector(
-  state => state.annotations,
+  state => state.annotations.annotations,
   annotations => arrayUtil.countIf(annotations, metadata.isPageNote)
 );
 
@@ -430,7 +430,7 @@ const noteCount = createSelector(
  * Returns the number of annotations (as opposed to notes or orphans).
  */
 const annotationCount = createSelector(
-  state => state.annotations,
+  state => state.annotations.annotations,
   annotations => arrayUtil.countIf(annotations, metadata.isAnnotation)
 );
 
@@ -438,7 +438,7 @@ const annotationCount = createSelector(
  * Returns the number of orphaned annotations.
  */
 const orphanCount = createSelector(
-  state => state.annotations,
+  state => state.annotations.annotations,
   annotations => arrayUtil.countIf(annotations, metadata.isOrphan)
 );
 
@@ -446,12 +446,13 @@ const orphanCount = createSelector(
  * Returns true if some annotations have not been anchored yet.
  */
 const isWaitingToAnchorAnnotations = createSelector(
-  state => state.annotations,
+  state => state.annotations.annotations,
   annotations => annotations.some(metadata.isWaitingToAnchor)
 );
 
 module.exports = {
   init: init,
+  namespace: 'annotations',
   update: update,
   actions: {
     addAnnotations,

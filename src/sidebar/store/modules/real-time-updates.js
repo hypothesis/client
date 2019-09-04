@@ -113,7 +113,7 @@ function receiveRealTimeUpdates({
       // even if the annotation is from the current group, it might be for a
       // new annotation (saved in pendingUpdates and removed above), that has
       // not yet been loaded.
-      if (annotationSelectors.annotationExists(getState().base, ann.id)) {
+      if (annotationSelectors.annotationExists(getState(), ann.id)) {
         pendingDeletions[ann.id] = true;
       }
     });

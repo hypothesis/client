@@ -34,7 +34,7 @@ describe('rootThread', function() {
   beforeEach(function() {
     fakeStore = {
       state: {
-        base: {
+        annotations: {
           annotations: [],
         },
         viewer: {
@@ -53,8 +53,8 @@ describe('rootThread', function() {
           sortKeysAvailable: ['Location'],
         },
       },
-      getState: function() {
-        return this.state.base;
+      getRootState: function() {
+        return this.state;
       },
 
       subscribe: sinon.stub(),
@@ -115,7 +115,7 @@ describe('rootThread', function() {
 
     it('passes loaded annotations to buildThread()', function() {
       const annotation = annotationFixtures.defaultAnnotation();
-      fakeStore.state.base.annotations = [annotation];
+      fakeStore.state.annotations.annotations = [annotation];
       rootThread.thread(fakeStore.state);
       assert.calledWith(fakeBuildThread, sinon.match([annotation]));
     });
@@ -389,7 +389,7 @@ describe('rootThread', function() {
         $rootScope.$on(events.ANNOTATION_DELETED, onDelete);
 
         existingNewAnnot = { $tag: 'a-new-tag' };
-        fakeStore.state.base.annotations.push(existingNewAnnot);
+        fakeStore.state.annotations.annotations.push(existingNewAnnot);
       });
 
       it('does not remove annotations that have non-empty drafts', function() {
@@ -405,7 +405,7 @@ describe('rootThread', function() {
 
       it('does not remove saved annotations', function() {
         const ann = annotationFixtures.defaultAnnotation();
-        fakeStore.state.base.annotations = [ann];
+        fakeStore.state.annotations.annotations = [ann];
 
         $rootScope.$broadcast(
           events.BEFORE_ANNOTATION_CREATED,
@@ -420,7 +420,7 @@ describe('rootThread', function() {
 
   describe('when the focused group changes', function() {
     it('moves new annotations to the focused group', function() {
-      fakeStore.state.base.annotations = [{ $tag: 'a-tag' }];
+      fakeStore.state.annotations.annotations = [{ $tag: 'a-tag' }];
 
       $rootScope.$broadcast(events.GROUP_FOCUSED, 'private-group');
 
@@ -436,7 +436,7 @@ describe('rootThread', function() {
     });
 
     it('does not move replies to the new group', function() {
-      fakeStore.state.annotations = [annotationFixtures.newReply()];
+      fakeStore.state.annotations.annotations = [annotationFixtures.newReply()];
 
       $rootScope.$broadcast(events.GROUP_FOCUSED, 'private-group');
 
@@ -444,7 +444,9 @@ describe('rootThread', function() {
     });
 
     it('does not move saved annotations to the new group', function() {
-      fakeStore.state.annotations = [annotationFixtures.defaultAnnotation()];
+      fakeStore.state.annotations.annotations = [
+        annotationFixtures.defaultAnnotation(),
+      ];
 
       $rootScope.$broadcast(events.GROUP_FOCUSED, 'private-group');
 

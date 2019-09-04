@@ -83,7 +83,7 @@ function RootThread($rootScope, store, searchFilter, viewFilter) {
 
     // Get the currently loaded annotations and the set of inputs which
     // determines what is visible and build the visible thread structure
-    return buildThread(state.base.annotations, {
+    return buildThread(state.annotations.annotations, {
       forceVisible: truthyKeys(state.selection.forceVisible),
       expanded: state.selection.expanded,
       highlighted: state.selection.highlighted,
@@ -127,8 +127,8 @@ function RootThread($rootScope, store, searchFilter, viewFilter) {
   // logic in this event handler can be moved to the annotations reducer.
   $rootScope.$on(events.GROUP_FOCUSED, function(event, focusedGroupId) {
     const updatedAnnots = store
-      .getState()
-      .annotations.filter(function(ann) {
+      .getRootState()
+      .annotations.annotations.filter(function(ann) {
         return metadata.isNew(ann) && !metadata.isReply(ann);
       })
       .map(function(ann) {

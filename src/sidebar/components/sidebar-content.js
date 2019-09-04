@@ -45,7 +45,7 @@ function SidebarContentController(
       const id = Object.keys(
         store.getRootState().selection.selectedAnnotationMap
       )[0];
-      return store.getState().annotations.find(function(annot) {
+      return store.getRootState().annotations.annotations.find(function(annot) {
         return annot.id === id;
       });
     } else {
