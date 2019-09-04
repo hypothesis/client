@@ -4,6 +4,7 @@ const sentry = require('../sentry');
 
 describe('sidebar/util/sentry', () => {
   let fakeDocumentReferrer;
+  let fakeDocumentCurrentScript;
   let fakeSentry;
   let fakeWarnOnce;
 
@@ -31,11 +32,18 @@ describe('sidebar/util/sentry', () => {
       fakeDocumentReferrer = sinon.stub(document, 'referrer');
       fakeDocumentReferrer.get(() => 'https://example.com');
 
+      fakeDocumentCurrentScript = sinon.stub(document, 'currentScript');
+      fakeDocumentCurrentScript.get(() => ({
+        src:
+          'https://cdn.hypothes.is/hypothesis/1.123.0/build/scripts/sidebar.bundle.js',
+      }));
+
       // Reset rate limiting counters.
       sentry.reset();
     });
 
     afterEach(() => {
+      fakeDocumentCurrentScript.restore();
       fakeDocumentReferrer.restore();
     });
 
@@ -51,6 +59,36 @@ describe('sidebar/util/sentry', () => {
           dsn: 'test-dsn',
           environment: 'dev',
           release: '1.0.0-dummy-version',
+        })
+      );
+    });
+
+    it('configures Sentry to only report errors that can be attributed to our code', () => {
+      sentry.init({
+        dsn: 'test-dsn',
+        environment: 'dev',
+      });
+
+      assert.calledWith(
+        fakeSentry.init,
+        sinon.match({
+          whitelistUrls: ['https://cdn.hypothes.is'],
+        })
+      );
+    });
+
+    it('disables the URL whitelist if `document.currentScript` is inaccessible', () => {
+      fakeDocumentCurrentScript.get(() => null);
+
+      sentry.init({
+        dsn: 'test-dsn',
+        environment: 'dev',
+      });
+
+      assert.calledWith(
+        fakeSentry.init,
+        sinon.match({
+          whitelistUrls: null,
         })
       );
     });
