@@ -56,7 +56,7 @@
 
   <div class="annotation-body u-layout-row tags tags-read-only"
        ng-if="(vm.canCollapseBody || vm.state().tags.length) && !vm.editing()">
-    <ul class="tag-list">
+    <ul class="tag-list" aria-label="Annotation tags">
       <li class="tag-item" ng-repeat="tag in vm.state().tags">
         <a ng-href="{{vm.tagSearchURL(tag)}}" target="_blank">{{tag}}</a>
       </li>
