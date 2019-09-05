@@ -16,6 +16,10 @@ function findText(container, text) {
   return domAnchorTextQuote.toRange(container, { exact: text });
 }
 
+function delay(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 const fixtures = {
   // Each item in this list contains the text for one page of the "PDF"
   pdfPages: [
@@ -34,7 +38,7 @@ const fixtures = {
   ],
 };
 
-describe('annotator.anchoring.pdf', function() {
+describe('annotator/anchoring/pdf', function() {
   let container;
   let viewer;
 
@@ -272,6 +276,48 @@ describe('annotator.anchoring.pdf', function() {
         .then(range => {
           assert.equal(range.toString(), 'said his lady');
         });
+    });
+
+    [
+      {
+        // `PDFViewer.getPageView` returns a nullish value.
+        description: 'page view not loaded',
+        pageView: undefined,
+      },
+      {
+        // `PDFPageViewer.getPageView` returns a `PDFPageView`, but the associated
+        // page is not ready yet and so the `pdfPage` property is missing.
+        description: 'page view PDF page not ready',
+        pageView: {},
+      },
+    ].forEach(({ description, pageView }) => {
+      it(`waits until page views are ready (${description})`, async () => {
+        viewer.pdfViewer.setCurrentPage(1);
+
+        // Simulate PDF viewer not having fully loaded yet.
+        const getPageView = sinon.stub(viewer.pdfViewer, 'getPageView');
+        getPageView.returns(pageView);
+
+        // Try anchoring. The PDF anchoring logic should wait until the PDF
+        // page view is ready.
+        const anchorPromise = pdfAnchoring.anchor(container, [
+          {
+            type: 'TextQuoteSelector',
+            exact: 'a zombie in possession',
+          },
+        ]);
+
+        // Wait a moment so that anchoring will attempt to fetch the PDF page
+        // view, but block because it is not ready yet.
+        await delay(10);
+        getPageView.restore();
+        viewer.pdfViewer.notify('pagesloaded');
+
+        // Check that anchoring completes successfully when the document has
+        // loaded.
+        const anchor = await anchorPromise;
+        assert.equal(anchor.toString(), 'a zombie in possession');
+      });
     });
   });
 });

@@ -130,6 +130,13 @@ class FakePDFViewer {
     return this._content.length;
   }
 
+  /**
+   * Return the `FakePDFPageView` object representing a rendered page or a
+   * placeholder for one.
+   *
+   * During PDF.js startup when the document is still being loaded, this may
+   * return a nullish value even when the PDF page index is valid.
+   */
   getPageView(index) {
     this._checkBounds(index);
     return this._pages[index];
@@ -160,6 +167,14 @@ class FakePDFViewer {
 
   dispose() {
     this._pages.forEach(page => page.dispose());
+  }
+
+  /**
+   * Dispatch a DOM event to notify observers that some event has occurred
+   * in the PDF viewer.
+   */
+  notify(eventName) {
+    this._container.dispatchEvent(new Event(eventName, { bubbles: true }));
   }
 
   _checkBounds(index) {
