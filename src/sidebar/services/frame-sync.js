@@ -56,7 +56,7 @@ function FrameSync($rootScope, $window, Discovery, store, bridge) {
     let prevPublicAnns = 0;
 
     store.subscribe(function() {
-      const state = store.getRootState();
+      const state = store.getState();
       if (
         state.annotations.annotations === prevAnnotations &&
         state.frames === prevFrames

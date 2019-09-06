@@ -40,7 +40,7 @@ function AnnotationViewerContentController(
 
   const id = $routeParams.id;
 
-  this.rootThread = () => rootThread.thread(store.getRootState());
+  this.rootThread = () => rootThread.thread(store.getState());
 
   this.setCollapsed = function(id, collapsed) {
     store.setCollapsed(id, collapsed);

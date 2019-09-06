@@ -8,7 +8,7 @@ describe('sidebar/store/modules/direct-linked', () => {
   let fakeSettings = {};
 
   const getDirectLinkedState = () => {
-    return store.getRootState().directLinked;
+    return store.getState().directLinked;
   };
 
   beforeEach(() => {

@@ -91,7 +91,7 @@ describe('sidebar/store/modules/groups', () => {
 
       store.focusGroup(publicGroup.id);
 
-      assert.equal(store.getRootState().groups.focusedGroupId, publicGroup.id);
+      assert.equal(store.getState().groups.focusedGroupId, publicGroup.id);
       assert.notCalled(console.error);
     });
 
@@ -100,7 +100,7 @@ describe('sidebar/store/modules/groups', () => {
 
       store.focusGroup(privateGroup.id);
 
-      assert.equal(store.getRootState().groups.focusedGroupId, publicGroup.id);
+      assert.equal(store.getState().groups.focusedGroupId, publicGroup.id);
       assert.called(console.error);
     });
   });
@@ -108,7 +108,7 @@ describe('sidebar/store/modules/groups', () => {
   describe('loadGroups', () => {
     it('updates the set of groups', () => {
       store.loadGroups([publicGroup]);
-      assert.deepEqual(store.getRootState().groups.groups, [publicGroup]);
+      assert.deepEqual(store.getState().groups.groups, [publicGroup]);
     });
 
     it('resets the focused group if not in new set of groups', () => {
@@ -116,7 +116,7 @@ describe('sidebar/store/modules/groups', () => {
       store.focusGroup(publicGroup.id);
       store.loadGroups([]);
 
-      assert.equal(store.getRootState().groups.focusedGroupId, null);
+      assert.equal(store.getState().groups.focusedGroupId, null);
     });
 
     it('leaves focused group unchanged if in new set of groups', () => {
@@ -124,7 +124,7 @@ describe('sidebar/store/modules/groups', () => {
       store.focusGroup(publicGroup.id);
       store.loadGroups([publicGroup, privateGroup]);
 
-      assert.equal(store.getRootState().groups.focusedGroupId, publicGroup.id);
+      assert.equal(store.getState().groups.focusedGroupId, publicGroup.id);
     });
   });
 
@@ -134,7 +134,7 @@ describe('sidebar/store/modules/groups', () => {
 
       store.clearGroups();
 
-      assert.equal(store.getRootState().groups.groups.length, 0);
+      assert.equal(store.getState().groups.groups.length, 0);
     });
 
     it('clears the focused group id', () => {
@@ -143,7 +143,7 @@ describe('sidebar/store/modules/groups', () => {
 
       store.clearGroups();
 
-      assert.equal(store.getRootState().groups.focusedGroupId, null);
+      assert.equal(store.getState().groups.focusedGroupId, null);
     });
   });
 

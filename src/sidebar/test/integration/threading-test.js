@@ -71,20 +71,20 @@ describe('annotation threading', function() {
 
   it('should display newly loaded annotations', function() {
     store.addAnnotations(fixtures.annotations);
-    assert.equal(rootThread.thread(store.getRootState()).children.length, 2);
+    assert.equal(rootThread.thread(store.getState()).children.length, 2);
   });
 
   it('should not display unloaded annotations', function() {
     store.addAnnotations(fixtures.annotations);
     store.removeAnnotations(fixtures.annotations);
-    assert.equal(rootThread.thread(store.getRootState()).children.length, 0);
+    assert.equal(rootThread.thread(store.getState()).children.length, 0);
   });
 
   it('should filter annotations when a search is set', function() {
     store.addAnnotations(fixtures.annotations);
     store.setFilterQuery('second');
-    assert.equal(rootThread.thread(store.getRootState()).children.length, 1);
-    assert.equal(rootThread.thread(store.getRootState()).children[0].id, '2');
+    assert.equal(rootThread.thread(store.getState()).children.length, 1);
+    assert.equal(rootThread.thread(store.getState()).children[0].id, '2');
   });
 
   unroll(
@@ -93,7 +93,7 @@ describe('annotation threading', function() {
       store.addAnnotations(fixtures.annotations);
       store.setSortKey(testCase.sortKey);
       const actualOrder = rootThread
-        .thread(store.getRootState())
+        .thread(store.getState())
         .children.map(function(thread) {
           return thread.annotation.id;
         });

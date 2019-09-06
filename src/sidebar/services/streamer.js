@@ -98,7 +98,7 @@ function Streamer(
       } else if (message.type === 'session-change') {
         handleSessionChangeNotification(message);
       } else if (message.type === 'whoyouare') {
-        const userid = store.getRootState().session.userid;
+        const userid = store.getState().session.userid;
         if (message.userid !== userid) {
           console.warn(
             'WebSocket user ID "%s" does not match logged-in ID "%s"',

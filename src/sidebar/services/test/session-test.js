@@ -35,7 +35,7 @@ describe('sidebar.session', function() {
       events: require('../analytics').events,
     };
     const fakeStore = {
-      getRootState: function() {
+      getState: function() {
         return { session: state };
       },
       updateSession: function(session) {

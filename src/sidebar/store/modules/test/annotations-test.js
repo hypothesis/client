@@ -138,10 +138,7 @@ describe('sidebar/store/modules/annotations', function() {
       store.dispatch(actions.addAnnotations([ann]));
       store.dispatch(actions.hideAnnotation(ann.id));
 
-      const storeAnn = selectors.findAnnotationByID(
-        store.getRootState(),
-        ann.id
-      );
+      const storeAnn = selectors.findAnnotationByID(store.getState(), ann.id);
       assert.equal(storeAnn.hidden, true);
     });
   });
@@ -154,10 +151,7 @@ describe('sidebar/store/modules/annotations', function() {
       store.dispatch(actions.addAnnotations([ann]));
       store.dispatch(actions.unhideAnnotation(ann.id));
 
-      const storeAnn = selectors.findAnnotationByID(
-        store.getRootState(),
-        ann.id
-      );
+      const storeAnn = selectors.findAnnotationByID(store.getState(), ann.id);
       assert.equal(storeAnn.hidden, false);
     });
   });
@@ -168,7 +162,7 @@ describe('sidebar/store/modules/annotations', function() {
       const ann = fixtures.defaultAnnotation();
       store.dispatch(actions.addAnnotations([ann]));
       store.dispatch(actions.removeAnnotations([ann]));
-      assert.equal(store.getRootState().annotations.annotations.length, 0);
+      assert.equal(store.getState().annotations.annotations.length, 0);
     });
   });
 
@@ -226,10 +220,7 @@ describe('sidebar/store/modules/annotations', function() {
         store.dispatch(actions.addAnnotations([ann]));
         store.dispatch(actions.updateFlagStatus(ann.id, testCase.nowFlagged));
 
-        const storeAnn = selectors.findAnnotationByID(
-          store.getRootState(),
-          ann.id
-        );
+        const storeAnn = selectors.findAnnotationByID(store.getState(), ann.id);
         assert.equal(storeAnn.flagged, testCase.nowFlagged);
         assert.deepEqual(storeAnn.moderation, testCase.newModeration);
       });
@@ -242,7 +233,7 @@ describe('sidebar/store/modules/annotations', function() {
       const ann = fixtures.oldAnnotation();
       store.dispatch(actions.createAnnotation(ann));
       assert.equal(
-        selectors.findAnnotationByID(store.getRootState(), ann.id).id,
+        selectors.findAnnotationByID(store.getState(), ann.id).id,
         ann.id
       );
     });
@@ -251,7 +242,7 @@ describe('sidebar/store/modules/annotations', function() {
       const store = createStore();
       store.dispatch(actions.createAnnotation(fixtures.oldAnnotation()));
       assert.equal(
-        store.getRootState().selection.selectedTab,
+        store.getState().selection.selectedTab,
         uiConstants.TAB_ANNOTATIONS
       );
     });
@@ -260,7 +251,7 @@ describe('sidebar/store/modules/annotations', function() {
       const store = createStore();
       store.dispatch(actions.createAnnotation(fixtures.oldPageNote()));
       assert.equal(
-        store.getRootState().selection.selectedTab,
+        store.getState().selection.selectedTab,
         uiConstants.TAB_NOTES
       );
     });
@@ -291,7 +282,7 @@ describe('sidebar/store/modules/annotations', function() {
           tags: [],
         })
       );
-      assert.isTrue(store.getRootState().selection.expanded.annotation_id);
+      assert.isTrue(store.getState().selection.expanded.annotation_id);
     });
   });
 });

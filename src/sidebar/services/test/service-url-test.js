@@ -12,9 +12,6 @@ function fakeStore() {
     getState: function() {
       return { links: links };
     },
-    getRootState: function() {
-      return { links: links };
-    },
   };
 }
 

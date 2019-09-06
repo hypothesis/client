@@ -22,12 +22,12 @@ describe('store/modules/viewer', function() {
 
     it('sets a flag indicating that highlights are visible', function() {
       store.setShowHighlights(true);
-      assert.isTrue(store.getRootState().viewer.visibleHighlights);
+      assert.isTrue(store.getState().viewer.visibleHighlights);
     });
 
     it('sets a flag indicating that highlights are not visible', function() {
       store.setShowHighlights(false);
-      assert.isFalse(store.getRootState().viewer.visibleHighlights);
+      assert.isFalse(store.getState().viewer.visibleHighlights);
     });
   });
 });

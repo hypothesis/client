@@ -23,11 +23,9 @@ const fixtures = {
       },
     },
     namespace2: {
-      useLocalState: true,
       selectors: {
         countAnnotations2: function(state) {
-          // useLocalState does not need namespaced path.
-          return state.annotations.length;
+          return state.namespace2.annotations.length;
         },
       },
     },
@@ -107,29 +105,6 @@ describe('reducer utils', function() {
       });
     });
 
-    it('applies update functions from each input object', () => {
-      const firstCounterActions = {
-        INCREMENT_COUNTER(state) {
-          return { firstCounter: state.firstCounter + 1 };
-        },
-      };
-      const secondCounterActions = {
-        INCREMENT_COUNTER(state) {
-          return { secondCounter: state.secondCounter + 1 };
-        },
-      };
-      const reducer = util.createReducer(
-        firstCounterActions,
-        secondCounterActions
-      );
-
-      const state = { firstCounter: 5, secondCounter: 10 };
-      const action = { type: 'INCREMENT_COUNTER' };
-      const newState = reducer(state, action);
-
-      assert.deepEqual(newState, { firstCounter: 6, secondCounter: 11 });
-    });
-
     it('supports reducer functions that return an array', function() {
       const action = {
         type: 'FIRST_ITEM',
@@ -154,13 +129,11 @@ describe('reducer utils', function() {
           annotations: [{ id: 1 }],
         },
         namespace2: {
-          annotations: [{ id: 1 }],
+          annotations: [{ id: 2 }],
         },
       });
       const bound = util.bindSelectors(fixtures.selectors, getState);
-      // Test non-namespaced selector (useLocalState=true)
       assert.equal(bound.countAnnotations1(), 1);
-      // Test the namespaced selector
       assert.equal(bound.countAnnotations2(), 1);
     });
   });

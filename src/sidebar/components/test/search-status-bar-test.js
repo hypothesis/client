@@ -20,8 +20,7 @@ describe('SearchStatusBar', () => {
       thread: sinon.stub().returns({ children: [] }),
     };
     fakeStore = {
-      getState: sinon.stub(),
-      getRootState: sinon.stub().returns({
+      getState: sinon.stub().returns({
         selection: {},
         directLinked: {},
       }),
@@ -42,7 +41,7 @@ describe('SearchStatusBar', () => {
 
   context('user search query is applied', () => {
     beforeEach(() => {
-      fakeStore.getRootState.returns({
+      fakeStore.getState.returns({
         selection: {
           filterQuery: 'tag:foo',
           selectedTab: 'annotation',
@@ -179,7 +178,7 @@ describe('SearchStatusBar', () => {
         ],
       });
 
-      fakeStore.getRootState.returns({
+      fakeStore.getState.returns({
         selection: {
           filterQuery: 'tag:foo',
           selectedTab: 'annotation',
@@ -239,7 +238,7 @@ describe('SearchStatusBar', () => {
         },
       ].forEach(test => {
         it(test.description, () => {
-          fakeStore.getRootState.returns({
+          fakeStore.getState.returns({
             selection: {
               filterQuery: null,
               selectedAnnotationMap: { annId: true },
@@ -272,7 +271,7 @@ describe('SearchStatusBar', () => {
       ].forEach(test => {
         it(`displays correct text for tab '${test.tab}', without count`, () => {
           fakeStore.focusModeFocused = sinon.stub().returns(true);
-          fakeStore.getRootState.returns({
+          fakeStore.getState.returns({
             selection: {
               filterQuery: null,
               selectedTab: test.tab,
@@ -302,7 +301,7 @@ describe('SearchStatusBar', () => {
       // Applied-query mode wins out here; no selection UI rendered
       it('does not show selected-mode elements', () => {
         fakeStore.focusModeFocused = sinon.stub().returns(true);
-        fakeStore.getRootState.returns({
+        fakeStore.getState.returns({
           selection: {
             filterQuery: 'tag:foo',
             selectedTab: 'annotation',

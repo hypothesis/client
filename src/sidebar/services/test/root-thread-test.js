@@ -53,7 +53,7 @@ describe('rootThread', function() {
           sortKeysAvailable: ['Location'],
         },
       },
-      getRootState: function() {
+      getState: function() {
         return this.state;
       },
 

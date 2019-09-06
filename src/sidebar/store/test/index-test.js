@@ -43,22 +43,19 @@ describe('store', function() {
   describe('initialization', function() {
     it('does not set a selection when settings.annotations is null', function() {
       assert.isFalse(store.hasSelectedAnnotations());
-      assert.equal(
-        Object.keys(store.getRootState().selection.expanded).length,
-        0
-      );
+      assert.equal(Object.keys(store.getState().selection.expanded).length, 0);
     });
 
     it('sets the selection when settings.annotations is set', function() {
       store = storeFactory(fakeRootScope, { annotations: 'testid' });
-      assert.deepEqual(store.getRootState().selection.selectedAnnotationMap, {
+      assert.deepEqual(store.getState().selection.selectedAnnotationMap, {
         testid: true,
       });
     });
 
     it('expands the selected annotations when settings.annotations is set', function() {
       store = storeFactory(fakeRootScope, { annotations: 'testid' });
-      assert.deepEqual(store.getRootState().selection.expanded, {
+      assert.deepEqual(store.getState().selection.expanded, {
         testid: true,
       });
     });
@@ -69,41 +66,41 @@ describe('store', function() {
     // CLEAR_SELECTION action in multiple store modules.
     it('sets `selectedAnnotationMap` to null', () => {
       store.clearSelection();
-      assert.isNull(store.getRootState().selection.selectedAnnotationMap);
+      assert.isNull(store.getState().selection.selectedAnnotationMap);
     });
 
     it('sets `filterQuery` to null', () => {
       store.clearSelection();
-      assert.isNull(store.getRootState().selection.filterQuery);
+      assert.isNull(store.getState().selection.filterQuery);
     });
 
     it('sets `directLinkedGroupFetchFailed` to false', () => {
       store.clearSelection();
       assert.isFalse(
-        store.getRootState().directLinked.directLinkedGroupFetchFailed
+        store.getState().directLinked.directLinkedGroupFetchFailed
       );
     });
 
     it('sets `directLinkedAnnotationId` to null', () => {
       store.clearSelection();
-      assert.isNull(store.getRootState().directLinked.directLinkedAnnotationId);
+      assert.isNull(store.getState().directLinked.directLinkedAnnotationId);
     });
 
     it('sets `directLinkedGroupId` to null', () => {
       store.clearSelection();
-      assert.isNull(store.getRootState().directLinked.directLinkedGroupId);
+      assert.isNull(store.getState().directLinked.directLinkedGroupId);
     });
 
     it('sets `sortKey` to default annotation sort key if set to Orphans', () => {
       store.selectTab(uiConstants.TAB_ORPHANS);
       store.clearSelection();
-      assert.equal(store.getRootState().selection.sortKey, 'Location');
+      assert.equal(store.getState().selection.sortKey, 'Location');
     });
 
     it('sets `sortKeysAvailable` to available annotation sort keys if set to Orphans', () => {
       store.selectTab(uiConstants.TAB_ORPHANS);
       store.clearSelection();
-      assert.deepEqual(store.getRootState().selection.sortKeysAvailable, [
+      assert.deepEqual(store.getState().selection.sortKeysAvailable, [
         'Newest',
         'Oldest',
         'Location',
@@ -114,7 +111,7 @@ describe('store', function() {
       store.selectTab(uiConstants.TAB_ORPHANS);
       store.clearSelection();
       assert.equal(
-        store.getRootState().selection.selectedTab,
+        store.getState().selection.selectedTab,
         uiConstants.TAB_ANNOTATIONS
       );
     });
@@ -123,7 +120,7 @@ describe('store', function() {
       store.selectTab(uiConstants.TAB_NOTES);
       store.clearSelection();
       assert.equal(
-        store.getRootState().selection.selectedTab,
+        store.getState().selection.selectedTab,
         uiConstants.TAB_NOTES
       );
     });
@@ -144,7 +141,7 @@ describe('store', function() {
     it('adds annotations not in the store', function() {
       const annot = defaultAnnotation();
       store.addAnnotations([annot]);
-      assert.match(store.getRootState().annotations.annotations, [
+      assert.match(store.getState().annotations.annotations, [
         sinon.match(annot),
       ]);
     });
@@ -155,7 +152,7 @@ describe('store', function() {
       const page = oldPageNote();
       store.addAnnotations([page]);
       assert.equal(
-        store.getRootState().selection.selectedTab,
+        store.getState().selection.selectedTab,
         uiConstants.TAB_ANNOTATIONS
       );
     });
@@ -164,7 +161,7 @@ describe('store', function() {
       const page = oldPageNote();
       store.addAnnotations([page]);
       assert.equal(
-        store.getRootState().selection.selectedTab,
+        store.getState().selection.selectedTab,
         uiConstants.TAB_NOTES
       );
     });
@@ -174,7 +171,7 @@ describe('store', function() {
       const annot = defaultAnnotation();
       store.addAnnotations([annot, page]);
       assert.equal(
-        store.getRootState().selection.selectedTab,
+        store.getState().selection.selectedTab,
         uiConstants.TAB_ANNOTATIONS
       );
     });
@@ -185,11 +182,9 @@ describe('store', function() {
 
       store.addAnnotations([annotA, annotB]);
 
-      const tags = store
-        .getRootState()
-        .annotations.annotations.map(function(a) {
-          return a.$tag;
-        });
+      const tags = store.getState().annotations.annotations.map(function(a) {
+        return a.$tag;
+      });
 
       assert.deepEqual(tags, ['t1', 't2']);
     });
@@ -200,7 +195,7 @@ describe('store', function() {
       const update = Object.assign({}, defaultAnnotation(), { text: 'update' });
       store.addAnnotations([update]);
 
-      const updatedAnnot = store.getRootState().annotations.annotations[0];
+      const updatedAnnot = store.getState().annotations.annotations[0];
       assert.equal(updatedAnnot.text, 'update');
     });
 
@@ -212,7 +207,7 @@ describe('store', function() {
       const saved = Object.assign({}, annot, { id: 'server-id' });
       store.addAnnotations([saved]);
 
-      const annots = store.getRootState().annotations.annotations;
+      const annots = store.getState().annotations.annotations;
       assert.equal(annots.length, 1);
       assert.equal(annots[0].id, 'server-id');
     });
@@ -225,7 +220,7 @@ describe('store', function() {
       const nowStr = now.toISOString();
 
       store.addAnnotations([newAnnotation()], now);
-      const annot = store.getRootState().annotations.annotations[0];
+      const annot = store.getState().annotations.annotations[0];
 
       assert.equal(annot.created, nowStr);
       assert.equal(annot.updated, nowStr);
@@ -238,7 +233,7 @@ describe('store', function() {
       annot.updated = '2000-01-01T04:05:06Z';
 
       store.addAnnotations([annot], now);
-      const result = store.getRootState().annotations.annotations[0];
+      const result = store.getState().annotations.annotations[0];
 
       assert.equal(result.created, annot.created);
       assert.equal(result.updated, annot.updated);
@@ -252,7 +247,7 @@ describe('store', function() {
       const update = Object.assign({}, defaultAnnotation(), { text: 'update' });
       store.addAnnotations([update]);
 
-      const updatedAnnot = store.getRootState().annotations.annotations[0];
+      const updatedAnnot = store.getState().annotations.annotations[0];
       assert.isFalse(updatedAnnot.$orphan);
     });
 
@@ -262,9 +257,7 @@ describe('store', function() {
 
       clock.tick(ANCHOR_TIME_LIMIT);
 
-      assert.isTrue(
-        store.getRootState().annotations.annotations[0].$anchorTimeout
-      );
+      assert.isTrue(store.getState().annotations.annotations[0].$anchorTimeout);
     });
 
     it('does not set the timeout flag on annotations that do anchor within a time limit', function() {
@@ -275,7 +268,7 @@ describe('store', function() {
       clock.tick(ANCHOR_TIME_LIMIT);
 
       assert.isFalse(
-        store.getRootState().annotations.annotations[0].$anchorTimeout
+        store.getState().annotations.annotations[0].$anchorTimeout
       );
     });
 
@@ -292,9 +285,7 @@ describe('store', function() {
 
     it('does not expect annotations to anchor on the stream', function() {
       const isOrphan = function() {
-        return !!metadata.isOrphan(
-          store.getRootState().annotations.annotations[0]
-        );
+        return !!metadata.isOrphan(store.getState().annotations.annotations[0]);
       };
 
       const annot = defaultAnnotation();
@@ -308,14 +299,14 @@ describe('store', function() {
 
     it('initializes the $orphan field for new annotations', function() {
       store.addAnnotations([newAnnotation()]);
-      assert.isFalse(store.getRootState().annotations.annotations[0].$orphan);
+      assert.isFalse(store.getState().annotations.annotations[0].$orphan);
     });
 
     it('adds multiple new annotations', function() {
       store.addAnnotations([fixtures.newPair[0]]);
       store.addAnnotations([fixtures.newPair[1]]);
 
-      assert.equal(store.getRootState().annotations.annotations.length, 2);
+      assert.equal(store.getState().annotations.annotations.length, 2);
     });
   });
 
@@ -324,14 +315,14 @@ describe('store', function() {
       const annot = defaultAnnotation();
       store.addAnnotations([annot]);
       store.removeAnnotations([annot]);
-      assert.deepEqual(store.getRootState().annotations.annotations, []);
+      assert.deepEqual(store.getState().annotations.annotations, []);
     });
 
     it('matches annotations to remove by ID', function() {
       store.addAnnotations(fixtures.pair);
       store.removeAnnotations([{ id: fixtures.pair[0].id }]);
 
-      const ids = store.getRootState().annotations.annotations.map(function(a) {
+      const ids = store.getState().annotations.annotations.map(function(a) {
         return a.id;
       });
       assert.deepEqual(ids, [fixtures.pair[1].id]);
@@ -341,11 +332,9 @@ describe('store', function() {
       store.addAnnotations(fixtures.pair);
       store.removeAnnotations([{ $tag: fixtures.pair[0].$tag }]);
 
-      const tags = store
-        .getRootState()
-        .annotations.annotations.map(function(a) {
-          return a.$tag;
-        });
+      const tags = store.getState().annotations.annotations.map(function(a) {
+        return a.$tag;
+      });
       assert.deepEqual(tags, [fixtures.pair[1].$tag]);
     });
 
@@ -355,7 +344,7 @@ describe('store', function() {
       store.selectTab(uiConstants.TAB_ORPHANS);
       store.removeAnnotations([orphan]);
       assert.equal(
-        store.getRootState().selection.selectedTab,
+        store.getState().selection.selectedTab,
         uiConstants.TAB_ANNOTATIONS
       );
     });
@@ -366,7 +355,7 @@ describe('store', function() {
       const annot = defaultAnnotation();
       store.addAnnotations([annot]);
       store.clearAnnotations();
-      assert.deepEqual(store.getRootState().annotations.annotations, []);
+      assert.deepEqual(store.getState().annotations.annotations, []);
     });
   });
 
@@ -375,10 +364,7 @@ describe('store', function() {
       'sets the visibleHighlights state flag to #state',
       function(testCase) {
         store.setShowHighlights(testCase.state);
-        assert.equal(
-          store.getRootState().viewer.visibleHighlights,
-          testCase.state
-        );
+        assert.equal(store.getState().viewer.visibleHighlights, testCase.state);
       },
       [{ state: true }, { state: false }]
     );
@@ -389,10 +375,7 @@ describe('store', function() {
       const annot = defaultAnnotation();
       store.addAnnotations([annot]);
       store.updateAnchorStatus({ [tagForID(annot.id)]: 'orphan' });
-      assert.equal(
-        store.getRootState().annotations.annotations[0].$orphan,
-        true
-      );
+      assert.equal(store.getState().annotations.annotations[0].$orphan, true);
     });
   });
 });

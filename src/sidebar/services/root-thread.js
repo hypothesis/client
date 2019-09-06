@@ -127,7 +127,7 @@ function RootThread($rootScope, store, searchFilter, viewFilter) {
   // logic in this event handler can be moved to the annotations reducer.
   $rootScope.$on(events.GROUP_FOCUSED, function(event, focusedGroupId) {
     const updatedAnnots = store
-      .getRootState()
+      .getState()
       .annotations.annotations.filter(function(ann) {
         return metadata.isNew(ann) && !metadata.isReply(ann);
       })

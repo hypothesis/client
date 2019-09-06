@@ -16,7 +16,7 @@ describe('sidebar/store/modules/session', function() {
     it('updates the session state', function() {
       const newSession = Object.assign(init(), { userid: 'john' });
       store.updateSession({ userid: 'john' });
-      assert.deepEqual(store.getRootState().session, newSession);
+      assert.deepEqual(store.getState().session, newSession);
     });
   });
 

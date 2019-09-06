@@ -72,16 +72,16 @@ describe('groups', function() {
         getGroup: sinon.stub(),
         loadGroups: sinon.stub(),
         allGroups() {
-          return this.getRootState().groups.groups;
+          return this.getState().groups.groups;
         },
         focusedGroup() {
-          return this.getRootState().groups.focusedGroup;
+          return this.getState().groups.focusedGroup;
         },
         mainFrame() {
-          return this.getRootState().frames[0];
+          return this.getState().frames[0];
         },
         focusedGroupId() {
-          const group = this.getRootState().groups.focusedGroup;
+          const group = this.getState().groups.focusedGroup;
           return group ? group.id : null;
         },
         setDirectLinkedGroupFetchFailed: sinon.stub(),
