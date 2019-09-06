@@ -7,7 +7,6 @@ const fixtures = require('../../../test/annotation-fixtures');
 const selection = require('../selection');
 const viewer = require('../viewer');
 const uiConstants = require('../../../ui-constants');
-const unroll = require('../../../../shared/test/util').unroll;
 
 const { actions, selectors } = annotations;
 
@@ -21,24 +20,28 @@ function createStore() {
 // Tests for most of the functionality in reducers/annotations.js are currently
 // in the tests for the whole Redux store
 
-describe('annotations reducer', function() {
+describe('sidebar/store/modules/annotations', function() {
   describe('isWaitingToAnchorAnnotations', () => {
     it('returns true if there are unanchored annotations', () => {
       const unanchored = Object.assign(fixtures.oldAnnotation(), {
         $orphan: 'undefined',
       });
       const state = {
-        annotations: [unanchored, fixtures.defaultAnnotation()],
+        annotations: {
+          annotations: [unanchored, fixtures.defaultAnnotation()],
+        },
       };
       assert.isTrue(selectors.isWaitingToAnchorAnnotations(state));
     });
 
     it('returns false if all annotations are anchored', () => {
       const state = {
-        annotations: [
-          Object.assign(fixtures.oldPageNote(), { $orphan: false }),
-          Object.assign(fixtures.defaultAnnotation(), { $orphan: false }),
-        ],
+        annotations: {
+          annotations: [
+            Object.assign(fixtures.oldPageNote(), { $orphan: false }),
+            Object.assign(fixtures.defaultAnnotation(), { $orphan: false }),
+          ],
+        },
       };
       assert.isFalse(selectors.isWaitingToAnchorAnnotations(state));
     });
@@ -47,11 +50,13 @@ describe('annotations reducer', function() {
   describe('noteCount', () => {
     it('returns number of page notes', () => {
       const state = {
-        annotations: [
-          fixtures.oldPageNote(),
-          fixtures.oldAnnotation(),
-          fixtures.defaultAnnotation(),
-        ],
+        annotations: {
+          annotations: [
+            fixtures.oldPageNote(),
+            fixtures.oldAnnotation(),
+            fixtures.defaultAnnotation(),
+          ],
+        },
       };
       assert.deepEqual(selectors.noteCount(state), 1);
     });
@@ -60,11 +65,13 @@ describe('annotations reducer', function() {
   describe('annotationCount', () => {
     it('returns number of annotations', () => {
       const state = {
-        annotations: [
-          fixtures.oldPageNote(),
-          fixtures.oldAnnotation(),
-          fixtures.defaultAnnotation(),
-        ],
+        annotations: {
+          annotations: [
+            fixtures.oldPageNote(),
+            fixtures.oldAnnotation(),
+            fixtures.defaultAnnotation(),
+          ],
+        },
       };
       assert.deepEqual(selectors.annotationCount(state), 2);
     });
@@ -74,11 +81,13 @@ describe('annotations reducer', function() {
     it('returns number of orphaned annotations', () => {
       const orphan = Object.assign(fixtures.oldAnnotation(), { $orphan: true });
       const state = {
-        annotations: [
-          orphan,
-          fixtures.oldAnnotation(),
-          fixtures.defaultAnnotation(),
-        ],
+        annotations: {
+          annotations: [
+            orphan,
+            fixtures.oldAnnotation(),
+            fixtures.defaultAnnotation(),
+          ],
+        },
       };
       assert.deepEqual(selectors.orphanCount(state), 1);
     });
@@ -89,7 +98,9 @@ describe('annotations reducer', function() {
 
     it('returns annotations which are saved', function() {
       const state = {
-        annotations: [fixtures.newAnnotation(), fixtures.defaultAnnotation()],
+        annotations: {
+          annotations: [fixtures.newAnnotation(), fixtures.defaultAnnotation()],
+        },
       };
       assert.deepEqual(savedAnnotations(state), [fixtures.defaultAnnotation()]);
     });
@@ -101,7 +112,9 @@ describe('annotations reducer', function() {
     it('returns the IDs corresponding to the provided local tags', function() {
       const ann = fixtures.defaultAnnotation();
       const state = {
-        annotations: [Object.assign(ann, { $tag: 't1' })],
+        annotations: {
+          annotations: [Object.assign(ann, { $tag: 't1' })],
+        },
       };
       assert.deepEqual(findIDsForTags(state, ['t1']), [ann.id]);
     });
@@ -109,7 +122,9 @@ describe('annotations reducer', function() {
     it('does not return IDs for annotations that do not have an ID', function() {
       const ann = fixtures.newAnnotation();
       const state = {
-        annotations: [Object.assign(ann, { $tag: 't1' })],
+        annotations: {
+          annotations: [Object.assign(ann, { $tag: 't1' })],
+        },
       };
       assert.deepEqual(findIDsForTags(state, ['t1']), []);
     });
@@ -123,7 +138,10 @@ describe('annotations reducer', function() {
       store.dispatch(actions.addAnnotations([ann]));
       store.dispatch(actions.hideAnnotation(ann.id));
 
-      const storeAnn = selectors.findAnnotationByID(store.getState(), ann.id);
+      const storeAnn = selectors.findAnnotationByID(
+        store.getRootState(),
+        ann.id
+      );
       assert.equal(storeAnn.hidden, true);
     });
   });
@@ -136,7 +154,10 @@ describe('annotations reducer', function() {
       store.dispatch(actions.addAnnotations([ann]));
       store.dispatch(actions.unhideAnnotation(ann.id));
 
-      const storeAnn = selectors.findAnnotationByID(store.getState(), ann.id);
+      const storeAnn = selectors.findAnnotationByID(
+        store.getRootState(),
+        ann.id
+      );
       assert.equal(storeAnn.hidden, false);
     });
   });
@@ -147,14 +168,56 @@ describe('annotations reducer', function() {
       const ann = fixtures.defaultAnnotation();
       store.dispatch(actions.addAnnotations([ann]));
       store.dispatch(actions.removeAnnotations([ann]));
-      assert.equal(store.getState().annotations.length, 0);
+      assert.equal(store.getRootState().annotations.annotations.length, 0);
     });
   });
 
   describe('#updateFlagStatus', function() {
-    unroll(
-      'updates the flagged status of an annotation',
-      function(testCase) {
+    [
+      {
+        description: 'non-moderator flags annotation',
+        wasFlagged: false,
+        nowFlagged: true,
+        oldModeration: undefined,
+        newModeration: undefined,
+      },
+      {
+        description: 'non-moderator un-flags an annotation',
+        wasFlagged: true,
+        nowFlagged: false,
+        oldModeration: undefined,
+        newModeration: undefined,
+      },
+      {
+        description: 'moderator un-flags an already un-flagged annotation',
+        wasFlagged: false,
+        nowFlagged: false,
+        oldModeration: { flagCount: 1 },
+        newModeration: { flagCount: 1 },
+      },
+      {
+        description: 'moderator flags an already flagged annotation',
+        wasFlagged: true,
+        nowFlagged: true,
+        oldModeration: { flagCount: 1 },
+        newModeration: { flagCount: 1 },
+      },
+      {
+        description: 'moderator flags an annotation',
+        wasFlagged: false,
+        nowFlagged: true,
+        oldModeration: { flagCount: 0 },
+        newModeration: { flagCount: 1 },
+      },
+      {
+        description: 'moderator un-flags an annotation',
+        wasFlagged: true,
+        nowFlagged: false,
+        oldModeration: { flagCount: 1 },
+        newModeration: { flagCount: 0 },
+      },
+    ].forEach(testCase => {
+      it(`updates the flagged status of an annotation when a ${testCase.description}`, () => {
         const store = createStore();
         const ann = fixtures.defaultAnnotation();
         ann.flagged = testCase.wasFlagged;
@@ -163,55 +226,14 @@ describe('annotations reducer', function() {
         store.dispatch(actions.addAnnotations([ann]));
         store.dispatch(actions.updateFlagStatus(ann.id, testCase.nowFlagged));
 
-        const storeAnn = selectors.findAnnotationByID(store.getState(), ann.id);
+        const storeAnn = selectors.findAnnotationByID(
+          store.getRootState(),
+          ann.id
+        );
         assert.equal(storeAnn.flagged, testCase.nowFlagged);
         assert.deepEqual(storeAnn.moderation, testCase.newModeration);
-      },
-      [
-        {
-          // Non-moderator flags annotation
-          wasFlagged: false,
-          nowFlagged: true,
-          oldModeration: undefined,
-          newModeration: undefined,
-        },
-        {
-          // Non-moderator un-flags annotation
-          wasFlagged: true,
-          nowFlagged: false,
-          oldModeration: undefined,
-          newModeration: undefined,
-        },
-        {
-          // Moderator un-flags an already unflagged annotation
-          wasFlagged: false,
-          nowFlagged: false,
-          oldModeration: { flagCount: 1 },
-          newModeration: { flagCount: 1 },
-        },
-        {
-          // Moderator flags an already flagged annotation
-          wasFlagged: true,
-          nowFlagged: true,
-          oldModeration: { flagCount: 1 },
-          newModeration: { flagCount: 1 },
-        },
-        {
-          // Moderator flags annotation
-          wasFlagged: false,
-          nowFlagged: true,
-          oldModeration: { flagCount: 0 },
-          newModeration: { flagCount: 1 },
-        },
-        {
-          // Moderator un-flags annotation
-          wasFlagged: true,
-          nowFlagged: false,
-          oldModeration: { flagCount: 1 },
-          newModeration: { flagCount: 0 },
-        },
-      ]
-    );
+      });
+    });
   });
 
   describe('#createAnnotation', function() {
@@ -220,7 +242,7 @@ describe('annotations reducer', function() {
       const ann = fixtures.oldAnnotation();
       store.dispatch(actions.createAnnotation(ann));
       assert.equal(
-        selectors.findAnnotationByID(store.getState(), ann.id).id,
+        selectors.findAnnotationByID(store.getRootState(), ann.id).id,
         ann.id
       );
     });

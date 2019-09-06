@@ -144,7 +144,9 @@ describe('store', function() {
     it('adds annotations not in the store', function() {
       const annot = defaultAnnotation();
       store.addAnnotations([annot]);
-      assert.match(store.getState().annotations, [sinon.match(annot)]);
+      assert.match(store.getRootState().annotations.annotations, [
+        sinon.match(annot),
+      ]);
     });
 
     it('does not change `selectedTab` state if annotations are already loaded', function() {
@@ -183,9 +185,11 @@ describe('store', function() {
 
       store.addAnnotations([annotA, annotB]);
 
-      const tags = store.getState().annotations.map(function(a) {
-        return a.$tag;
-      });
+      const tags = store
+        .getRootState()
+        .annotations.annotations.map(function(a) {
+          return a.$tag;
+        });
 
       assert.deepEqual(tags, ['t1', 't2']);
     });
@@ -196,7 +200,7 @@ describe('store', function() {
       const update = Object.assign({}, defaultAnnotation(), { text: 'update' });
       store.addAnnotations([update]);
 
-      const updatedAnnot = store.getState().annotations[0];
+      const updatedAnnot = store.getRootState().annotations.annotations[0];
       assert.equal(updatedAnnot.text, 'update');
     });
 
@@ -208,7 +212,7 @@ describe('store', function() {
       const saved = Object.assign({}, annot, { id: 'server-id' });
       store.addAnnotations([saved]);
 
-      const annots = store.getState().annotations;
+      const annots = store.getRootState().annotations.annotations;
       assert.equal(annots.length, 1);
       assert.equal(annots[0].id, 'server-id');
     });
@@ -221,7 +225,7 @@ describe('store', function() {
       const nowStr = now.toISOString();
 
       store.addAnnotations([newAnnotation()], now);
-      const annot = store.getState().annotations[0];
+      const annot = store.getRootState().annotations.annotations[0];
 
       assert.equal(annot.created, nowStr);
       assert.equal(annot.updated, nowStr);
@@ -234,7 +238,7 @@ describe('store', function() {
       annot.updated = '2000-01-01T04:05:06Z';
 
       store.addAnnotations([annot], now);
-      const result = store.getState().annotations[0];
+      const result = store.getRootState().annotations.annotations[0];
 
       assert.equal(result.created, annot.created);
       assert.equal(result.updated, annot.updated);
@@ -248,7 +252,7 @@ describe('store', function() {
       const update = Object.assign({}, defaultAnnotation(), { text: 'update' });
       store.addAnnotations([update]);
 
-      const updatedAnnot = store.getState().annotations[0];
+      const updatedAnnot = store.getRootState().annotations.annotations[0];
       assert.isFalse(updatedAnnot.$orphan);
     });
 
@@ -258,7 +262,9 @@ describe('store', function() {
 
       clock.tick(ANCHOR_TIME_LIMIT);
 
-      assert.isTrue(store.getState().annotations[0].$anchorTimeout);
+      assert.isTrue(
+        store.getRootState().annotations.annotations[0].$anchorTimeout
+      );
     });
 
     it('does not set the timeout flag on annotations that do anchor within a time limit', function() {
@@ -268,7 +274,9 @@ describe('store', function() {
 
       clock.tick(ANCHOR_TIME_LIMIT);
 
-      assert.isFalse(store.getState().annotations[0].$anchorTimeout);
+      assert.isFalse(
+        store.getRootState().annotations.annotations[0].$anchorTimeout
+      );
     });
 
     it('does not attempt to modify orphan status if annotations are removed before anchoring timeout expires', function() {
@@ -284,7 +292,9 @@ describe('store', function() {
 
     it('does not expect annotations to anchor on the stream', function() {
       const isOrphan = function() {
-        return !!metadata.isOrphan(store.getState().annotations[0]);
+        return !!metadata.isOrphan(
+          store.getRootState().annotations.annotations[0]
+        );
       };
 
       const annot = defaultAnnotation();
@@ -298,14 +308,14 @@ describe('store', function() {
 
     it('initializes the $orphan field for new annotations', function() {
       store.addAnnotations([newAnnotation()]);
-      assert.isFalse(store.getState().annotations[0].$orphan);
+      assert.isFalse(store.getRootState().annotations.annotations[0].$orphan);
     });
 
     it('adds multiple new annotations', function() {
       store.addAnnotations([fixtures.newPair[0]]);
       store.addAnnotations([fixtures.newPair[1]]);
 
-      assert.equal(store.getState().annotations.length, 2);
+      assert.equal(store.getRootState().annotations.annotations.length, 2);
     });
   });
 
@@ -314,14 +324,14 @@ describe('store', function() {
       const annot = defaultAnnotation();
       store.addAnnotations([annot]);
       store.removeAnnotations([annot]);
-      assert.deepEqual(store.getState().annotations, []);
+      assert.deepEqual(store.getRootState().annotations.annotations, []);
     });
 
     it('matches annotations to remove by ID', function() {
       store.addAnnotations(fixtures.pair);
       store.removeAnnotations([{ id: fixtures.pair[0].id }]);
 
-      const ids = store.getState().annotations.map(function(a) {
+      const ids = store.getRootState().annotations.annotations.map(function(a) {
         return a.id;
       });
       assert.deepEqual(ids, [fixtures.pair[1].id]);
@@ -331,9 +341,11 @@ describe('store', function() {
       store.addAnnotations(fixtures.pair);
       store.removeAnnotations([{ $tag: fixtures.pair[0].$tag }]);
 
-      const tags = store.getState().annotations.map(function(a) {
-        return a.$tag;
-      });
+      const tags = store
+        .getRootState()
+        .annotations.annotations.map(function(a) {
+          return a.$tag;
+        });
       assert.deepEqual(tags, [fixtures.pair[1].$tag]);
     });
 
@@ -354,7 +366,7 @@ describe('store', function() {
       const annot = defaultAnnotation();
       store.addAnnotations([annot]);
       store.clearAnnotations();
-      assert.deepEqual(store.getState().annotations, []);
+      assert.deepEqual(store.getRootState().annotations.annotations, []);
     });
   });
 
@@ -377,7 +389,10 @@ describe('store', function() {
       const annot = defaultAnnotation();
       store.addAnnotations([annot]);
       store.updateAnchorStatus({ [tagForID(annot.id)]: 'orphan' });
-      assert.equal(store.getState().annotations[0].$orphan, true);
+      assert.equal(
+        store.getRootState().annotations.annotations[0].$orphan,
+        true
+      );
     });
   });
 });

@@ -56,9 +56,9 @@ function FrameSync($rootScope, $window, Discovery, store, bridge) {
     let prevPublicAnns = 0;
 
     store.subscribe(function() {
-      const state = store.getState();
+      const state = store.getRootState();
       if (
-        state.annotations === prevAnnotations &&
+        state.annotations.annotations === prevAnnotations &&
         state.frames === prevFrames
       ) {
         return;
@@ -68,7 +68,7 @@ function FrameSync($rootScope, $window, Discovery, store, bridge) {
       const inSidebar = new Set();
       const added = [];
 
-      state.annotations.forEach(function(annot) {
+      state.annotations.annotations.forEach(function(annot) {
         if (metadata.isReply(annot)) {
           // The frame does not need to know about replies
           return;
@@ -86,7 +86,7 @@ function FrameSync($rootScope, $window, Discovery, store, bridge) {
       const deleted = prevAnnotations.filter(function(annot) {
         return !inSidebar.has(annot.$tag);
       });
-      prevAnnotations = state.annotations;
+      prevAnnotations = state.annotations.annotations;
       prevFrames = state.frames;
 
       // We currently only handle adding and removing annotations from the frame
