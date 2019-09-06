@@ -49,11 +49,12 @@ function setShowHighlights(show) {
  * client, as opposed to the standalone annotation page or stream views.
  */
 function isSidebar(state) {
-  return state.isSidebar;
+  return state.viewer.isSidebar;
 }
 
 module.exports = {
   init: init,
+  namespace: 'viewer',
   update: update,
   actions: {
     setAppIsSidebar: setAppIsSidebar,

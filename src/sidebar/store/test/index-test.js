@@ -363,7 +363,10 @@ describe('store', function() {
       'sets the visibleHighlights state flag to #state',
       function(testCase) {
         store.setShowHighlights(testCase.state);
-        assert.equal(store.getState().visibleHighlights, testCase.state);
+        assert.equal(
+          store.getRootState().viewer.visibleHighlights,
+          testCase.state
+        );
       },
       [{ state: true }, { state: false }]
     );
