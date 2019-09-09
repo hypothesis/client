@@ -23,7 +23,7 @@ describe('SortMenu', () => {
     };
     fakeStore = {
       setSortKey: sinon.stub(),
-      getRootState: sinon.stub().returns(fakeState),
+      getState: sinon.stub().returns(fakeState),
     };
 
     SortMenu.$imports.$mock({

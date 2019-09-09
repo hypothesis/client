@@ -17,7 +17,7 @@ function SidebarContentController(
 ) {
   const self = this;
 
-  this.rootThread = () => rootThread.thread(store.getRootState());
+  this.rootThread = () => rootThread.thread(store.getState());
 
   function focusAnnotation(annotation) {
     let highlights = [];
@@ -41,11 +41,11 @@ function SidebarContentController(
    * not the order in which they appear in the document.
    */
   function firstSelectedAnnotation() {
-    if (store.getRootState().selection.selectedAnnotationMap) {
+    if (store.getState().selection.selectedAnnotationMap) {
       const id = Object.keys(
-        store.getRootState().selection.selectedAnnotationMap
+        store.getState().selection.selectedAnnotationMap
       )[0];
-      return store.getRootState().annotations.annotations.find(function(annot) {
+      return store.getState().annotations.annotations.find(function(annot) {
         return annot.id === id;
       });
     } else {
@@ -135,7 +135,7 @@ function SidebarContentController(
     if (
       this.selectedAnnotationUnavailable() ||
       this.selectedGroupUnavailable() ||
-      store.getRootState().selection.filterQuery
+      store.getState().selection.filterQuery
     ) {
       return false;
     } else if (store.focusModeFocused()) {
@@ -153,7 +153,7 @@ function SidebarContentController(
   this.scrollTo = scrollToAnnotation;
 
   this.selectedGroupUnavailable = function() {
-    return store.getRootState().directLinked.directLinkedGroupFetchFailed;
+    return store.getState().directLinked.directLinkedGroupFetchFailed;
   };
 
   this.selectedAnnotationUnavailable = function() {
@@ -171,7 +171,7 @@ function SidebarContentController(
 
     // If user has not landed on a direct linked annotation
     // don't show the CTA.
-    if (!store.getRootState().directLinked.directLinkedAnnotationId) {
+    if (!store.getState().directLinked.directLinkedAnnotationId) {
       return false;
     }
 

@@ -26,7 +26,7 @@ const countVisibleAnns = annThread => {
  * annotations, and, in some cases, a mechanism for clearing the filter(s).
  * */
 function SearchStatusBar({ rootThread }) {
-  const thread = useStore(store => rootThread.thread(store.getRootState()));
+  const thread = useStore(store => rootThread.thread(store.getState()));
 
   const actions = useStore(store => ({
     clearSelection: store.clearSelection,
@@ -45,13 +45,13 @@ function SearchStatusBar({ rootThread }) {
     selectionMap,
     selectedTab,
   } = useStore(store => ({
-    directLinkedGroupFetchFailed: store.getRootState().directLinked
+    directLinkedGroupFetchFailed: store.getState().directLinked
       .directLinkedGroupFetchFailed,
-    filterQuery: store.getRootState().selection.filterQuery,
+    filterQuery: store.getState().selection.filterQuery,
     focusModeFocused: store.focusModeFocused(),
     focusModeUserPrettyName: store.focusModeUserPrettyName(),
-    selectionMap: store.getRootState().selection.selectedAnnotationMap,
-    selectedTab: store.getRootState().selection.selectedTab,
+    selectionMap: store.getState().selection.selectedAnnotationMap,
+    selectedTab: store.getState().selection.selectedTab,
   }));
 
   // The search status bar UI represents multiple "modes" of filtering

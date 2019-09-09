@@ -119,7 +119,7 @@ describe('Streamer', function() {
     fakeStore = {
       annotationExists: sinon.stub().returns(false),
       clearPendingUpdates: sinon.stub(),
-      getRootState: sinon.stub().returns({
+      getState: sinon.stub().returns({
         session: {
           userid: 'jim@hypothes.is',
         },
@@ -408,7 +408,7 @@ describe('Streamer', function() {
       },
     ].forEach(testCase => {
       it('does nothing if the userid matches the logged-in userid', () => {
-        fakeStore.getRootState.returns({
+        fakeStore.getState.returns({
           session: {
             userid: testCase.userid,
           },
@@ -435,7 +435,7 @@ describe('Streamer', function() {
       },
     ].forEach(testCase => {
       it('logs a warning if the userid does not match the logged-in userid', () => {
-        fakeStore.getRootState.returns({
+        fakeStore.getState.returns({
           session: {
             userid: testCase.userid,
           },

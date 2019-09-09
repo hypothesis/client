@@ -10,7 +10,7 @@ describe('sidebar/store/modules/selection', () => {
   let fakeSettings = [{}, {}];
 
   const getSelectionState = () => {
-    return store.getRootState().selection;
+    return store.getState().selection;
   };
 
   beforeEach(() => {

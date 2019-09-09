@@ -7,7 +7,9 @@ describe('state-util', function() {
   let store;
 
   beforeEach(function() {
-    store = fakeStore({ val: 0 });
+    store = fakeStore({
+      fake: { val: 0 },
+    });
   });
 
   describe('awaitStateChange()', function() {
@@ -20,9 +22,7 @@ describe('state-util', function() {
 
     it('should return promise that resolves to a non-null value', function() {
       const expected = 5;
-
       store.setState({ val: 5 });
-
       return stateUtil
         .awaitStateChange(store, getValWhenGreaterThanTwo)
         .then(function(actual) {

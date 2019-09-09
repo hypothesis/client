@@ -179,7 +179,7 @@ function groups(
     // If there is a direct-linked annotation, fetch the annotation in case
     // the associated group has not already been fetched and we need to make
     // an additional request for it.
-    const directLinkedAnnId = store.getRootState().directLinked
+    const directLinkedAnnId = store.getState().directLinked
       .directLinkedAnnotationId;
     let directLinkedAnnApi = null;
     if (directLinkedAnnId) {
@@ -194,7 +194,7 @@ function groups(
     // If there is a direct-linked group, add an API request to get that
     // particular group since it may not be in the set of groups that are
     // fetched by other requests.
-    const directLinkedGroupId = store.getRootState().directLinked
+    const directLinkedGroupId = store.getState().directLinked
       .directLinkedGroupId;
     let directLinkedGroupApi = null;
     if (directLinkedGroupId) {

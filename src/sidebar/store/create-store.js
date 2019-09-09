@@ -26,62 +26,32 @@ const { createReducer, bindSelectors } = require('./util');
  * @param [any[]] middleware - List of additional Redux middlewares to use.
  */
 function createStore(modules, initArgs = [], middleware = []) {
-  // Create the initial state and state update function. The "base"
-  // namespace is reserved for non-namespaced modules which will eventually
-  // be converted over.
+  // Create the initial state and state update function.
 
   // Namespaced objects for initial states.
-  const initialState = {
-    base: null,
-  };
+  const initialState = {};
   // Namespaced reducers from each module.
-  const allReducers = {
-    base: null,
-  };
+  const allReducers = {};
   // Namespaced selectors from each module.
-  const allSelectors = {
-    base: {
-      selectors: {},
-      // Tells the bindSelector method to use local state for these selectors
-      // rather than the top level root state.
-      useLocalState: true,
-    },
-  };
-
-  // Temporary list of non-namespaced modules used for createReducer.
-  const baseModules = [];
+  const allSelectors = {};
 
   // Iterate over each module and prep each module's:
   //    1. state
   //    2. reducers
   //    3. selectors
   //
-  // Modules that have no namespace get dumped into the "base" namespace.
-  //
   modules.forEach(module => {
     if (module.namespace) {
       initialState[module.namespace] = module.init(...initArgs);
+
       allReducers[module.namespace] = createReducer(module.update);
       allSelectors[module.namespace] = {
         selectors: module.selectors,
       };
     } else {
-      // No namespace
-      allSelectors.base.selectors = {
-        // Aggregate the selectors into a single "base" map
-        ...allSelectors.base.selectors,
-        ...module.selectors,
-      };
-      initialState.base = {
-        ...initialState.base,
-        ...module.init(...initArgs),
-      };
-      baseModules.push(module);
+      console.warn('Store module does not specify a namespace', module);
     }
   });
-
-  // Create the base reducer for modules that are not opting in for namespacing
-  allReducers.base = createReducer(...baseModules.map(m => m.update));
 
   const defaultMiddleware = [
     // The `thunk` middleware handles actions which are functions.
@@ -98,21 +68,10 @@ function createStore(modules, initArgs = [], middleware = []) {
     enhancer
   );
 
-  // Temporary wrapper while we use the "base" namespace. This allows getState
-  // to work as it did before. Under the covers the state is actually
-  // nested inside "base" namespace.
-  const getState = store.getState;
-  store.getState = () => getState().base;
-
-  // Because getState is overridden, we still need a fallback for the root state
-  // for the namespaced modules. They will temporarily use getRootState
-  // until all modules are namespaced and then this will be deprecated.
-  store.getRootState = () => getState();
-
   // Add actions and selectors as methods to the store.
   const actions = Object.assign({}, ...modules.map(m => m.actions));
   const boundActions = redux.bindActionCreators(actions, store.dispatch);
-  const boundSelectors = bindSelectors(allSelectors, store.getRootState);
+  const boundSelectors = bindSelectors(allSelectors, store.getState);
 
   Object.assign(store, boundActions, boundSelectors);
 
