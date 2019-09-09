@@ -105,6 +105,12 @@ describe 'Guest', ->
     console.warn.restore()
     Guest.$imports.$restore()
 
+  it 'creates an annotation when user clicks on "Annotate" button in adder', ->
+    # TODO
+
+  it 'creates a highlight when user clicks on "Highlight" button in adder', ->
+    # TODO
+
   describe 'plugins', ->
     fakePlugin = null
     guest = null
@@ -230,6 +236,9 @@ describe 'Guest', ->
         emitGuestEvent('focusAnnotations', 'ctx', ['tag1'])
         assert.isFalse(highlight1.hasClass('annotator-hl-focused'))
 
+      it 'ignores annotations with no associated highlights', ->
+        # TODO
+
     describe 'on "scrollToAnnotation" event', ->
 
       beforeEach ->
@@ -244,6 +253,13 @@ describe 'Guest', ->
         emitGuestEvent('scrollToAnnotation', 'tag1')
         assert.called(scrollIntoView)
         assert.calledWith(scrollIntoView, highlight[0])
+
+
+      it 'does not scroll to anchors with non-matching tags', ->
+        # TODO
+
+      it 'ignores anchors with no highlights', ->
+        # TODO
 
       context 'when dispatching the "scrolltorange" event', ->
 
@@ -317,6 +333,13 @@ describe 'Guest', ->
         guest.plugins.PDF.getMetadata.returns(promise)
 
         emitGuestEvent('getDocumentInfo', assertComplete)
+
+  describe 'on "setVisibleHighlights" event', ->
+    it 'shows highlights if value is `true`', ->
+      # TODO
+
+    it 'hides highlights if value is `false`', ->
+      # TODO
 
   describe 'document events', ->
 
@@ -649,3 +672,7 @@ describe 'Guest', ->
 
       assert.calledOnce(removeHighlights)
       assert.calledWith(removeHighlights, highlights)
+
+  describe '#destroy', ->
+    it 'removes any remaining highlights from the document', ->
+      # TODO
