@@ -21,7 +21,7 @@ const { TextPositionAnchor, TextQuoteAnchor } = require('./types');
 let pageTextCache = {};
 
 /**
- * 2D map from `[quote][position]` to `{page, anchor}` intended to optimize
+ * 2D map from `[quote][position]` to `{pageIndex, anchor}` intended to optimize
  * re-anchoring of a pair of quote and position selectors if the position
  * selector fails to anchor on its own.
  */
@@ -41,11 +41,35 @@ function getNodeTextLayer(node) {
 /**
  * Returns the view into which a PDF page is drawn.
  *
+ * If called while the PDF document is still loading, this will delay until
+ * the document loading has progressed far enough for a `PDFPageView` and its
+ * associated `PDFPage` to be ready.
+ *
  * @param {number} pageIndex
- * @return {PDFPageView}
+ * @return {Promise<PDFPageView>}
  */
-function getPage(pageIndex) {
-  return PDFViewerApplication.pdfViewer.getPageView(pageIndex);
+async function getPageView(pageIndex) {
+  const pdfViewer = PDFViewerApplication.pdfViewer;
+  let pageView = pdfViewer.getPageView(pageIndex);
+
+  if (!pageView || !pageView.pdfPage) {
+    // If the document is still loading, wait for the `pagesloaded` event.
+    //
+    // Note that loading happens in several stages. Initially the page view
+    // objects do not exist (`pageView` will be nullish), then after the
+    // "pagesinit" event, the page view exists but it does not have a `pdfPage`
+    // property set, then finally after the "pagesloaded" event, it will have
+    // a "pdfPage" property.
+    pageView = await new Promise(resolve => {
+      const onPagesLoaded = () => {
+        document.removeEventListener('pagesloaded', onPagesLoaded);
+        resolve(pdfViewer.getPageView(pageIndex));
+      };
+      document.addEventListener('pagesloaded', onPagesLoaded);
+    });
+  }
+
+  return pageView;
 }
 
 /**
@@ -54,13 +78,13 @@ function getPage(pageIndex) {
  * @param {number} pageIndex
  * @return {Promise<string>}
  */
-function getPageTextContent(pageIndex) {
+async function getPageTextContent(pageIndex) {
   if (pageTextCache[pageIndex]) {
     return pageTextCache[pageIndex];
   }
 
   // Join together PDF.js `TextItem`s representing pieces of text in a PDF page.
-  const joinItems = ({ items }) => {
+  const joinItems = items => {
     // Skip empty items since PDF.js leaves their text layer divs blank.
     // Excluding them makes our measurements match the rendered text layer.
     // Otherwise, the selectors we generate would not match this stored text.
@@ -72,11 +96,16 @@ function getPageTextContent(pageIndex) {
     return textContent;
   };
 
-  pageTextCache[pageIndex] = getPage(pageIndex)
-    .pdfPage.getTextContent({
+  // Fetch the text content for a given page as a string.
+  const getTextContent = async pageIndex => {
+    const pageView = await getPageView(pageIndex);
+    const textContent = await pageView.pdfPage.getTextContent({
       normalizeWhitespace: true,
-    })
-    .then(joinItems);
+    });
+    return joinItems(textContent.items);
+  };
+
+  pageTextCache[pageIndex] = getTextContent(pageIndex);
 
   return pageTextCache[pageIndex];
 }
@@ -179,12 +208,14 @@ function findPage(offset) {
  * In that case, the selector will need to be re-anchored when the page is
  * scrolled into view.
  *
- * @param {PDFPageView} page - The PDF.js viewer page
+ * @param {number} pageIndex - The PDF page index
  * @param {TextPositionAnchor} anchor - Anchor to locate in page
  * @param {Object} options - Options for `anchor.toSelector`
- * @return {Range}
+ * @return {Promise<Range>}
  */
-function anchorByPosition(page, anchor, options) {
+async function anchorByPosition(pageIndex, anchor, options) {
+  const page = await getPageView(pageIndex);
+
   let renderingDone = false;
   if (page.textLayer) {
     renderingDone = page.textLayer.renderingDone;
@@ -230,10 +261,9 @@ function findInPages(pageIndexes, quoteSelector, positionHint) {
   const [pageIndex, ...rest] = pageIndexes;
 
   const content = getPageTextContent(pageIndex);
-  const page = getPage(pageIndex);
   const offset = getPageOffset(pageIndex);
 
-  const attempt = ([, content, offset]) => {
+  const attempt = ([content, offset]) => {
     const root = { textContent: content };
     const anchor = TextQuoteAnchor.fromSelector(root, quoteSelector);
     if (positionHint) {
@@ -253,16 +283,16 @@ function findInPages(pageIndexes, quoteSelector, positionHint) {
         quotePositionCache[quoteSelector.exact] = {};
       }
       quotePositionCache[quoteSelector.exact][positionHint.start] = {
-        page,
+        pageIndex,
         anchor,
       };
     }
-    return anchorByPosition(page, anchor);
+    return anchorByPosition(pageIndex, anchor);
   };
 
   // First, get the text offset and other details of the current page.
   return (
-    Promise.all([page, content, offset])
+    Promise.all([content, offset])
       // Attempt to locate the quote in the current page.
       .then(attempt)
       // If the quote is located, find the DOM range and return it.
@@ -334,7 +364,6 @@ function anchor(root, selectors, options = {}) {
   if (position) {
     result = result.catch(() => {
       return findPage(position.start).then(({ index, offset, textContent }) => {
-        const page = getPage(index);
         const start = position.start - offset;
         const end = position.end - offset;
         const length = end - start;
@@ -342,7 +371,7 @@ function anchor(root, selectors, options = {}) {
         checkQuote(textContent.substr(start, length));
 
         const anchor = new TextPositionAnchor(root, start, end);
-        return anchorByPosition(page, anchor, options);
+        return anchorByPosition(index, anchor, options);
       });
     });
   }
@@ -354,10 +383,10 @@ function anchor(root, selectors, options = {}) {
         quotePositionCache[quote.exact] &&
         quotePositionCache[quote.exact][position.start]
       ) {
-        const { page, anchor } = quotePositionCache[quote.exact][
+        const { pageIndex, anchor } = quotePositionCache[quote.exact][
           position.start
         ];
-        return anchorByPosition(page, anchor, options);
+        return anchorByPosition(pageIndex, anchor, options);
       }
 
       return prioritizePages(position).then(pageIndices => {
