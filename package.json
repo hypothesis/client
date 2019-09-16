@@ -43,7 +43,7 @@
     "dom-anchor-text-quote": "^4.0.2",
     "dom-node-iterator": "^3.5.3",
     "dom-seek": "^4.0.3",
-    "dompurify": "^1.0.10",
+    "dompurify": "^2.0.0",
     "enzyme": "^3.8.0",
     "enzyme-adapter-preact-pure": "^2.0.0",
     "escape-html": "^1.0.3",
