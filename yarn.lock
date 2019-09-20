@@ -1354,13 +1354,13 @@ autoprefixer@^9.4.7:
     postcss-value-parser "^4.0.0"
 
 aws-sdk@^2.345.0:
-  version "2.524.0"
-  resolved "https://registry.yarnpkg.com/aws-sdk/-/aws-sdk-2.524.0.tgz#0acbd6a066cfb5b357b254b6ed273cca98ca6d5f"
-  integrity sha512-nCnKEExs1OqwNG6sIrRy+Lj8Zt2M6BTa6YlEMQ1gIpdwznaAN9XyTnm+MDc3iYsSl58MOBwiKpY8d6CONuxuDw==
+  version "2.532.0"
+  resolved "https://registry.yarnpkg.com/aws-sdk/-/aws-sdk-2.532.0.tgz#89ccd716bfdf5bea5654933f5a531b38932d29f6"
+  integrity sha512-+auGlLHZlcAJaJFV6kcacLteggSdN1YsalyiXoGnLhHZTBH/s9YAwHTUftYI4ifyD3fPESr/rpdceWe1m0U2Mw==
   dependencies:
     buffer "4.9.1"
     events "1.1.1"
-    ieee754 "1.1.8"
+    ieee754 "1.1.13"
     jmespath "0.15.0"
     querystring "0.2.0"
     sax "1.2.1"
@@ -4505,12 +4505,7 @@ iconv-lite@0.4.24, iconv-lite@^0.4.24, iconv-lite@^0.4.4:
   dependencies:
     safer-buffer ">= 2.1.2 < 3"
 
-ieee754@1.1.8:
-  version "1.1.8"
-  resolved "https://registry.yarnpkg.com/ieee754/-/ieee754-1.1.8.tgz#be33d40ac10ef1926701f6f08a2d86fbfd1ad3e4"
-  integrity sha1-vjPUCsEO8ZJnAfbwii2G+/0a0+Q=
-
-ieee754@^1.1.4:
+ieee754@1.1.13, ieee754@^1.1.4:
   version "1.1.13"
   resolved "https://registry.yarnpkg.com/ieee754/-/ieee754-1.1.13.tgz#ec168558e95aa181fd87d37f55c32bbcb6708b84"
   integrity sha512-4vf7I2LYV/HaWerSo3XmlMkp5eZ83i+/CDluXi/IGTs/O1sejBNhTtnxzmRZfvOUqj7lZjqHkeTvpgSFDlWZTg==
