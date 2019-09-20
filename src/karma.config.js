@@ -10,9 +10,13 @@ const envify = require('loose-envify/custom');
 let chromeFlags = [];
 process.env.CHROME_BIN = require('puppeteer').executablePath();
 
+// `true` if this build is running in a continuous integration environment.
+let isCIBuild = false;
+
 // On Travis and in Docker, the tests run as root, so the sandbox must be
 // disabled.
 if (process.env.TRAVIS || process.env.RUNNING_IN_DOCKER) {
+  isCIBuild = true;
   chromeFlags.push('--no-sandbox');
 }
 
@@ -117,8 +121,14 @@ module.exports = function(config) {
       // Display a helpful diff when comparing complex objects
       // See https://www.npmjs.com/package/karma-mocha-reporter#showdiff
       showDiff: true,
-      // Only show the total test counts and details for failed tests
-      output: 'minimal',
+
+      // Output only summary and errors in development to make output easier
+      // to parse.
+      //
+      // In CI enable full output to help track down an issue where CI builds
+      // have been failing frequently on Jenkins with "Disconnected, because
+      // no message in XXX ms" errors.
+      output: isCIBuild ? 'full' : 'minimal',
     },
 
     coverageIstanbulReporter: {
