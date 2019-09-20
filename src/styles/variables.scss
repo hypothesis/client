@@ -46,6 +46,16 @@ $grey-7: #202020;
 $brand: #bd1c2b;
 $highlight: #58cef4;
 
+// Tint and shade functions from
+// https://css-tricks.com/snippets/sass/tint-shade-functions
+@function tint($color, $percent) {
+  @return mix(white, $color, $percent);
+}
+
+@function shade($color, $percent) {
+  @return mix(black, $color, $percent);
+}
+
 @function color-weight($c, $n: 500) {
   @if $n == 50 {
     @return tint($c, 85%);

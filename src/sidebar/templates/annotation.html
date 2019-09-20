@@ -58,7 +58,7 @@
        ng-if="(vm.canCollapseBody || vm.state().tags.length) && !vm.editing()">
     <ul class="tag-list" aria-label="Annotation tags">
       <li class="tag-item" ng-repeat="tag in vm.state().tags">
-        <a ng-href="{{vm.tagSearchURL(tag)}}" target="_blank">{{tag}}</a>
+        <a ng-href="{{vm.tagSearchURL(tag)}}" aria-label="Tag: {{tag}}" target="_blank">{{tag}}</a>
       </li>
     </ul>
     <div class="u-stretch"></div>
