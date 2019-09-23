@@ -151,7 +151,11 @@ module.exports = function(config) {
 
     // level of logging
     // possible values: config.LOG_DISABLE || config.LOG_ERROR || config.LOG_WARN || config.LOG_INFO || config.LOG_DEBUG
-    logLevel: config.LOG_INFO,
+
+    // `DEBUG` logging is enabled for CI builds to help track down an issue
+    // on Jenkins where Karma disconnects from Chrome on test startup with
+    // a "No activity in XXX ms" error.
+    logLevel: isCIBuild ? config.LOG_DEBUG : config.LOG_INFO,
 
     browserConsoleLogOptions: {
       level: 'log',
