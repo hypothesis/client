@@ -34,7 +34,7 @@
     "coffeeify": "^2.1.0",
     "commander": "^3.0.0",
     "core-js": "^2.5.7",
-    "cross-env": "^5.1.4",
+    "cross-env": "^6.0.0",
     "custom-event": "^1.0.1",
     "diff": "^4.0.1",
     "diff-match-patch": "^1.0.0",
