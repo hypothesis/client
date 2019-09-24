@@ -18,6 +18,16 @@ let isCIBuild = false;
 if (process.env.TRAVIS || process.env.RUNNING_IN_DOCKER) {
   isCIBuild = true;
   chromeFlags.push('--no-sandbox');
+
+  // Enable debug logging from Chrome to help track down a cause of frequent
+  // build failures in Jenkins. The log files are written to `chrome_debug.log`
+  // in the workspace for the current build.
+  chromeFlags.push('--enable-logging');
+  chromeFlags.push('--v=1');
+  process.env.CHROME_LOG_FILE = path.resolve(
+    __dirname + '/../',
+    'chrome_debug.log'
+  );
 }
 
 if (process.env.RUNNING_IN_DOCKER) {

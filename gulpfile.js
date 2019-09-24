@@ -427,14 +427,6 @@ function runKarma(baseConfig, opts, done) {
     },
   };
 
-  // Work around a bug in Karma 1.10 which causes console log messages not to
-  // be displayed when using a non-default reporter.
-  // See https://github.com/karma-runner/karma/pull/2220
-  const BaseReporter = require('karma/lib/reporters/base');
-  BaseReporter.decoratorFactory.$inject = BaseReporter.decoratorFactory.$inject.map(
-    dep => dep.replace('browserLogOptions', 'browserConsoleLogOptions')
-  );
-
   const karma = require('karma');
   new karma.Server(
     Object.assign(
