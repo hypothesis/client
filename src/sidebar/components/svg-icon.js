@@ -1,5 +1,6 @@
 'use strict';
 
+const classnames = require('classnames');
 const { createElement } = require('preact');
 const { useLayoutEffect, useRef } = require('preact/hooks');
 const propTypes = require('prop-types');
@@ -12,7 +13,9 @@ const icons = {
   'expand-menu': require('../../images/icons/expand-menu.svg'),
   copy: require('../../images/icons/copy.svg'),
   cursor: require('../../images/icons/cursor.svg'),
+  email: require('../../images/icons/email.svg'),
   external: require('../../images/icons/external.svg'),
+  facebook: require('../../images/icons/facebook.svg'),
   groups: require('../../images/icons/groups.svg'),
   help: require('../../images/icons/help.svg'),
   leave: require('../../images/icons/leave.svg'),
@@ -21,6 +24,7 @@ const icons = {
   public: require('../../images/icons/public.svg'),
   refresh: require('../../images/icons/refresh.svg'),
   share: require('../../images/icons/share.svg'),
+  twitter: require('../../images/icons/twitter.svg'),
 };
 
 /**
@@ -30,7 +34,7 @@ const icons = {
  * This matches the way we do icons on the website, see
  * https://github.com/hypothesis/h/pull/3675
  */
-function SvgIcon({ name, className = '' }) {
+function SvgIcon({ name, className = '', inline = false }) {
   if (!icons[name]) {
     throw new Error(`Unknown icon ${name}`);
   }
@@ -48,7 +52,11 @@ function SvgIcon({ name, className = '' }) {
   ]);
 
   return (
-    <span className="svg-icon" dangerouslySetInnerHTML={markup} ref={element} />
+    <span
+      className={classnames('svg-icon', { 'svg-icon--inline': inline })}
+      dangerouslySetInnerHTML={markup}
+      ref={element}
+    />
   );
 }
 
@@ -58,6 +66,9 @@ SvgIcon.propTypes = {
 
   /** A CSS class to apply to the `<svg>` element. */
   className: propTypes.string,
+
+  /** Apply a style allowing for inline display of icon */
+  inline: propTypes.bool,
 };
 
 module.exports = SvgIcon;
