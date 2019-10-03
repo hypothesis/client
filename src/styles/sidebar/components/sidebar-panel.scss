@@ -1,0 +1,52 @@
+.sidebar-panel {
+  border: solid 1px $grey-3;
+  border-radius: 2px;
+  font-family: $sans-font-family;
+  margin-bottom: 0.75em;
+  position: relative;
+  background-color: $body-background;
+
+  &__header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    border: 1px none $grey-3;
+    border-bottom-style: solid;
+    padding: 1em 0;
+    margin: 0 1em;
+  }
+
+  &__title {
+    color: $brand;
+    font-size: $body2-font-size;
+    font-weight: 700;
+  }
+
+  &__close-btn {
+    display: flex;
+    align-items: center;
+    position: absolute;
+    right: 1em;
+    top: 0.75em;
+    border-radius: 2px;
+    border: none;
+    padding: 0.5em;
+    background-color: $grey-1;
+    color: $grey-5;
+    font-weight: 700;
+
+    &-icon {
+      color: $grey-5;
+    }
+
+    &:hover {
+      background-color: $grey-2;
+      color: $grey-6;
+    }
+  }
+
+  &__content {
+    padding: 0.75em;
+    padding-top: 0;
+  }
+}
