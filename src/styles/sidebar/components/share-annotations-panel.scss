@@ -1,0 +1,58 @@
+.share-annotations-panel {
+  color: $grey-5;
+
+  .share-annotations-panel__intro {
+    color: $grey-7;
+    font-weight: 500;
+  }
+  .share-annotations-panel__input {
+    display: flex;
+  }
+  .share-annotations-panel__form-input {
+    border-radius: 0;
+  }
+  .share-annotations-panel__copy-btn {
+    position: relative;
+    display: flex;
+    padding: 10px;
+    color: $grey-4;
+    background: $grey-1;
+    border: 1px solid $grey-3;
+    border-radius: 0;
+    border-left: 0px;
+
+    &:hover {
+      background-color: $grey-2;
+      color: $grey-5;
+    }
+  }
+
+  .share-annotations-panel__copy-btn-icon {
+    display: flex;
+  }
+
+  .share-annotations-panel__links {
+    border-top: 1px solid $grey-3;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    padding-top: 8px;
+  }
+
+  .share-annotations-panel__icon {
+    display: flex;
+    color: $grey-5;
+    width: 24px;
+    height: 24px;
+    margin: 0 8px;
+
+    &:hover {
+      color: $grey-6;
+    }
+  }
+
+  .share-annotations-panel__icon--inline {
+    width: 1em;
+    height: 1em;
+  }
+}
