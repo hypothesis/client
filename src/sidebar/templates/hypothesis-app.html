@@ -4,7 +4,6 @@
     on-login="vm.login()"
     on-sign-up="vm.signUp()"
     on-logout="vm.logout()"
-    on-share-page="vm.share()"
     on-show-help-panel="vm.showHelpPanel()"
     is-sidebar="::vm.isSidebar">
   </top-bar>
@@ -19,6 +18,7 @@
       on-close="vm.helpPanel.visible = false"
       auth="vm.auth">
     </help-panel>
+    <share-annotations-panel></share-annotations-panel>
     <main ng-view=""></main>
   </div>
 </div>

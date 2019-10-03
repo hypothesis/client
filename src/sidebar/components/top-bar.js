@@ -8,6 +8,7 @@ const useStore = require('../store/use-store');
 const { applyTheme } = require('../util/theme');
 const isThirdPartyService = require('../util/is-third-party-service');
 const { withServices } = require('../util/service-context');
+const uiConstants = require('../ui-constants');
 
 const GroupList = require('./group-list');
 const SearchInput = require('./search-input');
@@ -25,7 +26,6 @@ function TopBar({
   isSidebar,
   onLogin,
   onLogout,
-  onSharePage,
   onShowHelpPanel,
   onSignUp,
   settings,
@@ -40,7 +40,16 @@ function TopBar({
 
   const pendingUpdateCount = useStore(store => store.pendingUpdateCount());
 
+  const togglePanelFn = useStore(store => store.toggleSidebarPanel);
+  const currentActivePanel = useStore(
+    store => store.getState().sidebarPanels.activeSidebarPanel
+  );
+
   const applyPendingUpdates = () => streamer.applyPendingUpdates();
+
+  const toggleSharePanel = () => {
+    togglePanelFn(uiConstants.PANEL_SHARE_ANNOTATIONS);
+  };
 
   const loginControl = (
     <Fragment>
@@ -104,12 +113,15 @@ function TopBar({
           <SortMenu />
           {showSharePageButton && (
             <button
-              className="top-bar__btn"
-              onClick={onSharePage}
+              className={classnames('top-bar__btn', {
+                'top-bar__btn--active':
+                  currentActivePanel === uiConstants.PANEL_SHARE_ANNOTATIONS,
+              })}
+              onClick={toggleSharePanel}
               title="Share this page"
               aria-label="Share this page"
             >
-              <i className="h-icon-annotation-share" />
+              <SvgIcon name="share" />
             </button>
           )}
           <button
@@ -157,9 +169,6 @@ TopBar.propTypes = {
 
   /** Callback invoked when user clicks "Logout" action in account menu. */
   onLogout: propTypes.func,
-
-  /** Callback invoked when user clicks "Share" toolbar action. */
-  onSharePage: propTypes.func,
 
   /** Callback invoked when user clicks "Sign up" button. */
   onSignUp: propTypes.func,
