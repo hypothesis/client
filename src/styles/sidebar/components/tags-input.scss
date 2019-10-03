@@ -10,8 +10,9 @@ tags-input {
   }
 
   .tags {
+    display: flex;
+    flex-wrap: wrap;
     @include form-input;
-    @include pie-clearfix;
 
     &.focused {
       @include form-input-focus;
@@ -19,7 +20,6 @@ tags-input {
 
     // Input
     .input {
-      float: left;
       padding: 0.1333em 0;
       outline: none;
       border: none !important;
@@ -35,18 +35,19 @@ tags-input {
 
   .tag-list {
     margin-top: -0.33em; // Absorb the first row of margin-top on the tags.
-    float: left;
+    display: flex;
+    flex-wrap: wrap;
   }
 
   .tag-item {
-    float: left;
     position: relative;
     padding: 0.0769em 1.307em 0.0769em 0.538em;
     margin-top: 0.384em;
     margin-right: 0.384em;
     font-size: 0.866em;
-    color: $button-text-color;
-    border: 1px solid $gray-lighter;
+    color: $grey-6;
+    border: 1px solid $grey-4;
+    background-color: $grey-3;
     border-radius: 2px;
 
     &.selected {
@@ -73,11 +74,12 @@ tags-input {
 }
 
 .tags-read-only {
-  font-size: 0.8461em;
+  font-size: $normal-font-size;
   margin: 0.4545em 0;
 
   .tag-list {
-    @include pie-clearfix;
+    display: flex;
+    flex-wrap: wrap;
     // Margin between bottom of ascent of annotation body and
     // top of tags list should be ~15px
     margin-top: -$layout-h-margin + 10px;
@@ -86,16 +88,15 @@ tags-input {
     margin-bottom: $layout-h-margin - 10px;
 
     .tag-item {
-      float: left;
-      margin-right: 0.4545em;
+      margin: 0 0.4545em 0.4545em 0;
 
       a {
         text-decoration: none;
-        border: 1px solid $gray-lighter;
+        border: 1px solid $grey-3;
         border-radius: 2px;
         padding: 0 0.4545em 0.1818em;
-        color: $gray-light;
-        background: $gray-lightest;
+        color: $grey-6;
+        background: $grey-2;
 
         &:hover,
         &:focus {
