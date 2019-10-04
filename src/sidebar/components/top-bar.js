@@ -42,7 +42,7 @@ function TopBar({
 
   const togglePanelFn = useStore(store => store.toggleSidebarPanel);
   const currentActivePanel = useStore(
-    store => store.getState().sidebarPanels.activeSidebarPanel
+    store => store.getState().sidebarPanels.activePanelName
   );
 
   const applyPendingUpdates = () => streamer.applyPendingUpdates();
