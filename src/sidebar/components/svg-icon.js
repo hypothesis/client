@@ -67,7 +67,7 @@ SvgIcon.propTypes = {
   /** A CSS class to apply to the `<svg>` element. */
   className: propTypes.string,
 
-  /** Apply a style allowing for inline display of icon */
+  /** Apply a style allowing for inline display of icon wrapper */
   inline: propTypes.bool,
 };
 
