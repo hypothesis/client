@@ -25,9 +25,6 @@
   &__close-btn {
     display: flex;
     align-items: center;
-    position: absolute;
-    right: 1em;
-    top: 0.75em;
     border-radius: 2px;
     border: none;
     padding: 0.5em;
@@ -40,6 +37,7 @@
     }
 
     &:hover {
+      transition: 0.2s ease-out;
       background-color: $grey-2;
       color: $grey-6;
     }
