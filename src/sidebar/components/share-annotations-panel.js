@@ -55,10 +55,6 @@ function ShareAnnotationsPanel({ analytics, flash }) {
 
   const inputRef = useRef();
 
-  const focusShareLink = () => {
-    inputRef.current.select();
-  };
-
   return (
     <SidebarPanel
       title={panelTitle}
@@ -82,8 +78,6 @@ function ShareAnnotationsPanel({ analytics, flash }) {
               className="form-input share-annotations-panel__form-input"
               type="text"
               value={shareURI}
-              onClick={focusShareLink}
-              onFocus={focusShareLink}
               readOnly
             />
             <button
@@ -92,10 +86,7 @@ function ShareAnnotationsPanel({ analytics, flash }) {
               aria-label="copy share link"
               className="btn btn-clean share-annotations-panel__copy-btn"
             >
-              <SvgIcon
-                name="copy"
-                className="share-annotations-panel__copy-btn-icon"
-              />
+              <SvgIcon name="copy" />
             </button>
           </div>
           <p>
@@ -120,8 +111,8 @@ function ShareAnnotationsPanel({ analytics, flash }) {
               <em>Only Me</em>) annotations are only visible to you.
             </span>
           </p>
-          <div className="share-annotations-panel__links">
-            <div className="share-annotations-panel__link">
+          <ul className="share-annotations-panel__links">
+            <li className="share-annotations-panel__link">
               <a
                 href={`https://twitter.com/intent/tweet?url=${shareURI}&hashtags=annotated`}
                 title="Tweet share link"
@@ -132,8 +123,8 @@ function ShareAnnotationsPanel({ analytics, flash }) {
                   className="share-annotations-panel__icon"
                 />
               </a>
-            </div>
-            <div className="share-annotations-panel__link">
+            </li>
+            <li className="share-annotations-panel__link">
               <a
                 href={`https://www.facebook.com/sharer/sharer.php?u=${shareURI}`}
                 title="Share on Facebook"
@@ -144,8 +135,8 @@ function ShareAnnotationsPanel({ analytics, flash }) {
                   className="share-annotations-panel__icon"
                 />
               </a>
-            </div>
-            <div className="share-annotations-panel__link">
+            </li>
+            <li className="share-annotations-panel__link">
               <a
                 href={`mailto:?subject=Let's%20Annotate&amp;body=${shareURI}`}
                 title="Share via email"
@@ -156,8 +147,8 @@ function ShareAnnotationsPanel({ analytics, flash }) {
                   className="share-annotations-panel__icon"
                 />
               </a>
-            </div>
-          </div>
+            </li>
+          </ul>
         </div>
       )}
     </SidebarPanel>
