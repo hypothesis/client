@@ -75,17 +75,15 @@ This takes longer to setup than :ref:`running-from-browser-ext`.
 You should follow these steps if you want to make changes to h as well as to
 the client.
 
-First follow the
-`instructions for setting up a development install of h <http://h.readthedocs.io/en/latest/developing/>`_.
-Once you have a development install of h set up, you can
-configure it to use a local build of the client. **In the client repository**,
-run:
+First follow the `instructions for setting up a development install of h
+<http://h.readthedocs.io/en/latest/developing/>`_. Then run both h and the
+client at the same time in different shells. **In the client repository**, run:
 
 .. code-block:: sh
 
    make dev
 
-**In the `hypothesis/h` repository** run:
+Then in a different shell, **in the h repository**, run:
 
 .. code-block:: sh
 
