@@ -148,7 +148,10 @@ stage('Publish') {
                 sh "sleep 2" // Give GitHub a moment to realize the tag exists.
 
                 // Bump the package version and create the GitHub release.
-                sh "yarn version --no-git-tag-version --new-version ${newPkgVersion}"
+                sh """
+                export SIDEBAR_APP_URL=https://hypothes.is/app.html
+                yarn version --no-git-tag-version --new-version ${newPkgVersion}
+                """
                 sh "scripts/create-github-release.js"
 
                 // Publish the updated package to the npm registry.
