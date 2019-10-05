@@ -17,7 +17,7 @@ help:
 
 .PHONY: dev
 dev: build/manifest.json
-	gulp watch
+	node_modules/.bin/gulp watch
 
 .PHONY: test
 test: node_modules/.uptodate
@@ -29,7 +29,7 @@ endif
 
 .PHONY: servetests
 servetests: node_modules/.uptodate
-	gulp test-watch
+	node_modules/.bin/gulp test-watch
 
 .PHONY: lint
 lint: node_modules/.uptodate

@@ -26,8 +26,6 @@ To build the client for development:
 
    git clone 'https://github.com/hypothesis/client.git'
    cd client
-   npm install -g gulp-cli  # Tip: if you get a "permission denied" error try
-                            # `sudo npm install -g gulp-cli` instead.
    make
 
 You now have a development client built. To run your development client in
