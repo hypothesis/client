@@ -324,7 +324,7 @@ function generateBootScript(manifest) {
 
   const defaultSidebarAppUrl = process.env.SIDEBAR_APP_URL
     ? `${process.env.SIDEBAR_APP_URL}`
-    : 'https://hypothes.is/app.html';
+    : 'http://localhost:5000/app.html';
 
   let defaultAssetRoot;
 

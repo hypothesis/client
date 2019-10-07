@@ -73,35 +73,18 @@ This takes longer to setup than :ref:`running-from-browser-ext`.
 You should follow these steps if you want to make changes to h as well as to
 the client.
 
-First follow the
-`instructions for setting up a development install of h <http://h.readthedocs.io/en/latest/developing/>`_.
-Once you have a development install of h set up, you can
-configure it to use a local build of the client. **In the client repository**,
-run:
+First follow the `instructions for setting up a development install of h
+<http://h.readthedocs.io/en/latest/developing/>`_. Then run both h and the
+client at the same time in different shells. **In the client repository**, run:
 
 .. code-block:: sh
 
-   export SIDEBAR_APP_URL=http://localhost:5000/app.html
    make dev
 
-Next, you'll need to create an OAuth client which enables the Hypothesis client
-to request an access token from the service in order to make API calls.
-
-1. Go to http://localhost:5000/admin/oauthclients (you'll need to be logged
-   in to h as an admin user)
-2. Select "Register a new OAuth client"
-3. Choose a name (eg. "Client") and set the redirect URL to
-   http://localhost:5000/app.html. Leave the other settings at their default values.
-4. After creating the client, make a note of the randomly generated client ID.
-
-**In the `hypothesis/h` repository**, set the :envvar:`CLIENT_URL` and
-:envvar:`CLIENT_OAUTH_ID` env vars to tell h where to load the client from and
-what OAuth client to use, before running ``make dev``:
+Then in a different shell, **in the h repository**, run:
 
 .. code-block:: sh
 
-   export CLIENT_OAUTH_ID={ OAuth client ID from step above }
-   export CLIENT_URL=http://localhost:3001/hypothesis
    make dev
 
 Once the client and h are running, you can test it out by visiting:
