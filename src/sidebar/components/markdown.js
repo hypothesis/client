@@ -138,6 +138,13 @@ function MarkdownController($element, $scope) {
   }, 100);
   input.addEventListener('input', handleInputChange);
 
+  const handleBlur = debounce(function() {
+      if (self.text) {
+          self.onSave();
+      }
+  }, 100);
+  input.addEventListener('blur', handleBlur);
+
   // Re-render the markdown when the view needs updating.
   $scope.$watch('vm.text', function() {
     output.innerHTML = renderMarkdown(self.text || '');
@@ -176,6 +183,7 @@ module.exports = {
     readOnly: '<',
     text: '<?',
     onEditText: '&',
+    onSave: '&',
   },
   template: require('../templates/markdown.html'),
 };
