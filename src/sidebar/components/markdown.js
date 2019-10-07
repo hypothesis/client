@@ -138,11 +138,11 @@ function MarkdownController($element, $scope) {
   }, 100);
   input.addEventListener('input', handleInputChange);
 
-  const handleBlur = debounce(function() {
+  const handleBlur = function() {
       if (self.text) {
           self.onSave();
       }
-  }, 100);
+  };
   input.addEventListener('blur', handleBlur);
 
   // Re-render the markdown when the view needs updating.
