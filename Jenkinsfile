@@ -157,13 +157,8 @@ stage('Publish') {
                 // Publish the updated package to the npm registry.
                 // Use `npm` rather than `yarn` for publishing.
                 // See https://github.com/yarnpkg/yarn/pull/3391.
-                //
-                // `npm publish` currently re-builds the client, so `SIDEBAR_APP_URL` must be set.
                 sh "echo '//registry.npmjs.org/:_authToken=${env.NPM_TOKEN}' >> \$HOME/.npmrc"
-                sh """
-                export SIDEBAR_APP_URL=https://hypothes.is/app.html
-                npm publish --tag ${npmTag}
-                """
+                sh "npm publish --tag ${npmTag}"
                 sh "scripts/wait-for-npm-release.sh ${npmTag}"
 
                 // Deploy the client to cdn.hypothes.is, where the embedded

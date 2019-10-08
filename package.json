@@ -155,7 +155,6 @@
     "format": "prettier --list-different --write '**/*.{js,scss}'",
     "test": "gulp test",
     "report-coverage": "codecov -f coverage/coverage-final.json",
-    "version": "make clean build/manifest.json",
-    "prepublishOnly": "make clean build/manifest.json"
+    "version": "make clean build/manifest.json"
   }
 }
