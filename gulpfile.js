@@ -2,23 +2,20 @@
 
 'use strict';
 
+const { mkdirSync } = require('fs');
 const path = require('path');
 
 const changed = require('gulp-changed');
 const commander = require('commander');
 const debounce = require('lodash.debounce');
 const gulp = require('gulp');
-const gulpIf = require('gulp-if');
 const gulpUtil = require('gulp-util');
-const postcss = require('gulp-postcss');
-const postcssURL = require('postcss-url');
 const replace = require('gulp-replace');
 const rename = require('gulp-rename');
-const sass = require('gulp-sass');
-const sourcemaps = require('gulp-sourcemaps');
 const through = require('through2');
 
 const createBundle = require('./scripts/gulp/create-bundle');
+const createStyleBundle = require('./scripts/gulp/create-style-bundle');
 const manifest = require('./scripts/gulp/manifest');
 const servePackage = require('./scripts/gulp/serve-package');
 const vendorBundles = require('./scripts/gulp/vendor-bundles');
@@ -55,10 +52,6 @@ function parseCommandLine() {
 }
 
 const taskArgs = parseCommandLine();
-
-function isSASSFile(file) {
-  return file.path.match(/\.scss$/);
-}
 
 function getEnv(key) {
   if (!process.env.hasOwnProperty(key)) {
@@ -175,7 +168,7 @@ gulp.task(
   })
 );
 
-const styleFiles = [
+const cssBundles = [
   // H
   './src/styles/annotator/annotator.scss',
   './src/styles/annotator/pdfjs-overrides.scss',
@@ -189,35 +182,21 @@ const styleFiles = [
 ];
 
 gulp.task('build-css', function() {
-  // Rewrite font URLs to look for fonts in 'build/fonts' instead of
-  // 'build/styles/fonts'
-  function rewriteCSSURL(asset) {
-    return asset.url.replace(/^fonts\//, '../fonts/');
-  }
-
-  const sassOpts = {
-    outputStyle: IS_PRODUCTION_BUILD ? 'compressed' : 'nested',
-  };
-
-  const cssURLRewriter = postcssURL({
-    url: rewriteCSSURL,
-  });
-
-  return gulp
-    .src(styleFiles)
-    .pipe(sourcemaps.init())
-    .pipe(gulpIf(isSASSFile, sass(sassOpts).on('error', sass.logError)))
-    .pipe(postcss([require('autoprefixer'), cssURLRewriter]))
-    .pipe(sourcemaps.write('.'))
-    .pipe(gulp.dest(STYLE_DIR));
+  mkdirSync(STYLE_DIR, { recursive: true });
+  const bundles = cssBundles.map(entry =>
+    createStyleBundle({
+      input: entry,
+      output: `${STYLE_DIR}/${path.basename(entry, path.extname(entry))}.css`,
+      minify: IS_PRODUCTION_BUILD,
+    })
+  );
+  return Promise.all(bundles);
 });
 
 gulp.task(
   'watch-css',
   gulp.series('build-css', function watchCSS() {
-    const vendorCSS = styleFiles.filter(function(path) {
-      return path.endsWith('.css');
-    });
+    const vendorCSS = cssBundles.filter(path => path.endsWith('.css'));
     const styleFileGlobs = vendorCSS.concat('./src/styles/**/*.scss');
 
     gulp.watch(styleFileGlobs, gulp.task('build-css'));
