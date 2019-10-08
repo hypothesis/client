@@ -43,4 +43,20 @@ describe('SvgIcon', () => {
     const svg = container.querySelector('svg');
     assert.equal(svg.getAttribute('class'), 'thing__icon');
   });
+
+  it('sets a default class on the wrapper element', () => {
+    const container = document.createElement('div');
+    render(<SvgIcon name="expand-menu" />, container);
+    const wrapper = container.querySelector('span');
+    assert.isTrue(wrapper.classList.contains('svg-icon'));
+    assert.isFalse(wrapper.classList.contains('svg-icon--inline'));
+  });
+
+  it('appends an inline class to wrapper if `inline` prop is `true`', () => {
+    const container = document.createElement('div');
+    render(<SvgIcon name="expand-menu" inline={true} />, container);
+    const wrapper = container.querySelector('span');
+    assert.isTrue(wrapper.classList.contains('svg-icon'));
+    assert.isTrue(wrapper.classList.contains('svg-icon--inline'));
+  });
 });
