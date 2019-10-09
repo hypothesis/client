@@ -2881,9 +2881,9 @@ domhandler@^2.3.0:
     domelementtype "1"
 
 dompurify@^2.0.1:
-  version "2.0.4"
-  resolved "https://registry.yarnpkg.com/dompurify/-/dompurify-2.0.4.tgz#8ad181d526aef28089354f3c92ebba6531bbb7fd"
-  integrity sha512-sRl7eWZaQYnZAgNMHxDet/S4FSeWhvJpuFUlCIl4ahOcYAVSKcbnJQX96TR/kwsrYwDD5GQ5MRk2WLH83bRLRQ==
+  version "2.0.5"
+  resolved "https://registry.yarnpkg.com/dompurify/-/dompurify-2.0.5.tgz#8b1ea58ceb2e5d850f3f81b6ee2cb78abbfdc0a2"
+  integrity sha512-DErslJjzL8PoJOkPm3mfQsBPH9Kn05WdGyV7yxX/KpSf9r54TfnUf12HfBYL55KBlM/DUin2y9FkuPlI5OxRlQ==
 
 domutils@1.5.1:
   version "1.5.1"
