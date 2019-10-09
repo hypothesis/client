@@ -44,6 +44,7 @@ const groups = require('./modules/groups');
 const realTimeUpdates = require('./modules/real-time-updates');
 const selection = require('./modules/selection');
 const session = require('./modules/session');
+const sidebarPanels = require('./modules/sidebar-panels');
 const viewer = require('./modules/viewer');
 
 /**
@@ -97,6 +98,7 @@ function store($rootScope, settings) {
     realTimeUpdates,
     selection,
     session,
+    sidebarPanels,
     viewer,
   ];
   return createStore(modules, [settings], middleware);
