@@ -28,6 +28,16 @@ if (process.env.TRAVIS || process.env.RUNNING_IN_DOCKER) {
     __dirname + '/../',
     'chrome_debug.log'
   );
+
+  // Enable even more debug logging from Chrome to help track down build
+  // failures in Jenkins. This generates a large (~40MB+) JSON file detailing
+  // events that happen during browser startup.
+  //
+  // See https://www.chromium.org/developers/how-tos/trace-event-profiling-tool/recording-tracing-runs#TOC-Capturing-chrome-desktop-startup
+  const traceFile = path.resolve(__dirname + '/../', 'chrome_trace.json');
+  chromeFlags.push('--trace-startup');
+  chromeFlags.push('--trace-startup-duration=7');
+  chromeFlags.push(`--trace-startup-file=${traceFile}`);
 }
 
 if (process.env.RUNNING_IN_DOCKER) {
