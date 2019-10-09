@@ -188,7 +188,6 @@ function startAngularApp(config) {
       wrapReactComponent(require('./components/share-annotations-panel'))
     )
     .component('sidebarTutorial', require('./components/sidebar-tutorial'))
-    .component('shareDialog', require('./components/share-dialog'))
     .component('streamContent', require('./components/stream-content'))
     .component('svgIcon', wrapReactComponent(require('./components/svg-icon')))
     .component('tagEditor', require('./components/tag-editor'))

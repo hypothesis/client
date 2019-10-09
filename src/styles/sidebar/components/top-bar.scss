@@ -77,6 +77,9 @@
   &:hover {
     color: $gray-dark;
   }
+  &--active {
+    color: $gray-dark;
+  }
 }
 
 // Button which indicates that other users have made or edited annotations
