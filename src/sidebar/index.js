@@ -183,6 +183,10 @@ function startAngularApp(config) {
       'sidebarContentError',
       wrapReactComponent(require('./components/sidebar-content-error'))
     )
+    .component(
+      'shareAnnotationsPanel',
+      wrapReactComponent(require('./components/share-annotations-panel'))
+    )
     .component('sidebarTutorial', require('./components/sidebar-tutorial'))
     .component('shareDialog', require('./components/share-dialog'))
     .component('streamContent', require('./components/stream-content'))

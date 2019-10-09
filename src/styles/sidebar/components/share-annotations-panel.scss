@@ -1,0 +1,56 @@
+.share-annotations-panel {
+  color: $grey-5;
+
+  &__intro {
+    color: $grey-7;
+    font-weight: 500;
+  }
+
+  &__input {
+    display: flex;
+  }
+
+  &__form-input {
+    border-radius: 0;
+  }
+
+  &__copy-btn {
+    @include outline-on-keyboard-focus;
+    padding: 10px;
+    color: $grey-4;
+    background: $grey-1;
+    border: 1px solid $grey-3;
+    border-radius: 0;
+    border-left: 0px;
+
+    &:hover {
+      background-color: $grey-2;
+      color: $grey-5;
+    }
+  }
+
+  &__links {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    padding-top: 8px;
+    border-top: 1px solid $grey-3;
+  }
+
+  &__icon {
+    display: flex;
+    width: 24px;
+    height: 24px;
+    margin: 0 8px;
+    color: $grey-5;
+
+    &:hover {
+      color: $grey-6;
+    }
+  }
+
+  &__icon--inline {
+    width: 1em;
+    height: 1em;
+  }
+}
