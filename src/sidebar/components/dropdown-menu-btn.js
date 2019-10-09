@@ -4,7 +4,6 @@
 function DropdownMenuBtnController($timeout) {
   const self = this;
   this.toggleDropdown = function($event) {
-    $event.preventDefault();
     $event.stopPropagation();
     $timeout(function() {
       self.onToggleDropdown();
