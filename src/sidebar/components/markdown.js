@@ -138,9 +138,12 @@ function MarkdownController($element, $scope) {
   }, 100);
   input.addEventListener('input', handleInputChange);
 
-  const handleBlur = function() {
-      if (self.text) {
-          self.onSave();
+  const handleBlur = function(event) {
+      if (!event.relatedTarget ||
+          (event.relatedTarget && event.relatedTarget.id !== 'dropdown-saving-selector')) {
+          if (self.text) {
+              self.onSave();
+          }
       }
   };
   input.addEventListener('blur', handleBlur);
