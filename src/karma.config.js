@@ -10,13 +10,9 @@ const envify = require('loose-envify/custom');
 let chromeFlags = [];
 process.env.CHROME_BIN = require('puppeteer').executablePath();
 
-// `true` if this build is running in a continuous integration environment.
-let isCIBuild = false;
-
 // On Travis and in Docker, the tests run as root, so the sandbox must be
 // disabled.
 if (process.env.TRAVIS || process.env.RUNNING_IN_DOCKER) {
-  isCIBuild = true;
   chromeFlags.push('--no-sandbox');
 
   // Enable debug logging from Chrome to help track down a cause of frequent
@@ -144,11 +140,7 @@ module.exports = function(config) {
 
       // Output only summary and errors in development to make output easier
       // to parse.
-      //
-      // In CI enable full output to help track down an issue where CI builds
-      // have been failing frequently on Jenkins with "Disconnected, because
-      // no message in XXX ms" errors.
-      output: isCIBuild ? 'full' : 'minimal',
+      output: 'minimal',
     },
 
     coverageIstanbulReporter: {
@@ -171,11 +163,7 @@ module.exports = function(config) {
 
     // level of logging
     // possible values: config.LOG_DISABLE || config.LOG_ERROR || config.LOG_WARN || config.LOG_INFO || config.LOG_DEBUG
-
-    // `DEBUG` logging is enabled for CI builds to help track down an issue
-    // on Jenkins where Karma disconnects from Chrome on test startup with
-    // a "No activity in XXX ms" error.
-    logLevel: isCIBuild ? config.LOG_DEBUG : config.LOG_INFO,
+    logLevel: config.LOG_INFO,
 
     browserConsoleLogOptions: {
       level: 'log',
