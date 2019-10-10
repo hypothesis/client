@@ -1,0 +1,218 @@
+'use strict';
+
+const { createElement } = require('preact');
+const { shallow } = require('enzyme');
+const unroll = require('../../../shared/test/util').unroll;
+
+const ShareAnnotationsPanel = require('../share-annotations-panel');
+const SidebarPanel = require('../sidebar-panel');
+
+describe('ShareAnnotationsPanel', () => {
+  let fakeStore;
+  let fakeAnalytics;
+  let fakeFlash;
+  let fakeCopyToClipboard;
+
+  const fakePrivateGroup = {
+    type: 'private',
+    name: 'Test Private Group',
+    id: 'testprivate',
+  };
+
+  const createShareAnnotationsPanel = props =>
+    shallow(
+      <ShareAnnotationsPanel
+        analytics={fakeAnalytics}
+        flash={fakeFlash}
+        {...props}
+      />
+    ).dive(); // Needed because of `withServices`
+
+  beforeEach(() => {
+    fakeAnalytics = {
+      events: {
+        DOCUMENT_SHARED: 'whatever',
+      },
+      track: sinon.stub(),
+    };
+    fakeCopyToClipboard = {
+      copyText: sinon.stub(),
+    };
+    fakeFlash = {
+      info: sinon.stub(),
+      error: sinon.stub(),
+    };
+
+    fakeStore = {
+      focusedGroup: sinon.stub().returns(fakePrivateGroup),
+      mainFrame: () => ({
+        uri: 'https://www.example.com',
+      }),
+    };
+
+    ShareAnnotationsPanel.$imports.$mock({
+      '../store/use-store': callback => callback(fakeStore),
+      '../util/copy-to-clipboard': fakeCopyToClipboard,
+    });
+  });
+
+  afterEach(() => {
+    ShareAnnotationsPanel.$imports.$restore();
+  });
+
+  describe('panel title', () => {
+    it("sets sidebar panel title to include group's name", () => {
+      const wrapper = createShareAnnotationsPanel();
+
+      assert.equal(
+        wrapper.find(SidebarPanel).prop('title'),
+        'Share Annotations in Test Private Group'
+      );
+    });
+
+    it('sets a temporary title if focused group not available', () => {
+      fakeStore.focusedGroup = sinon.stub().returns({});
+
+      const wrapper = createShareAnnotationsPanel();
+      assert.equal(
+        wrapper.find(SidebarPanel).prop('title'),
+        'Share Annotations in ...'
+      );
+    });
+  });
+
+  describe('panel content', () => {
+    it('renders panel content if needed info available', () => {
+      const wrapper = createShareAnnotationsPanel();
+      assert.isTrue(wrapper.exists('.share-annotations-panel'));
+    });
+
+    it('does not render panel content if needed info not available', () => {
+      fakeStore.focusedGroup.returns(undefined);
+
+      const wrapper = createShareAnnotationsPanel();
+      assert.isFalse(wrapper.exists('.share-annotations-panel'));
+    });
+  });
+
+  unroll(
+    'it displays appropriate help text depending on group type',
+    testCase => {
+      fakeStore.focusedGroup.returns({
+        type: testCase.groupType,
+        name: 'Test Group',
+        id: 'testid,',
+      });
+
+      const wrapper = createShareAnnotationsPanel();
+
+      assert.match(
+        wrapper.find('.share-annotations-panel__intro').text(),
+        testCase.introPattern
+      );
+
+      assert.match(
+        wrapper.find('.share-annotations-panel').text(),
+        testCase.visibilityPattern
+      );
+    },
+    [
+      {
+        groupType: 'private',
+        introPattern: /Use this link.*with other group members/,
+        visibilityPattern: /Annotations in the private group.*are only visible to group members/,
+      },
+      {
+        groupType: 'restricted',
+        introPattern: /Use this link to share these annotations with anyone/,
+        visibilityPattern: /Anyone using this link may view the annotations in the group/,
+      },
+      {
+        groupType: 'open',
+        introPattern: /Use this link to share these annotations with anyone/,
+        visibilityPattern: /Anyone using this link may view the annotations in the group/,
+      },
+    ]
+  );
+
+  describe('web share link', () => {
+    it('displays web share link in readonly form input', () => {
+      const wrapper = createShareAnnotationsPanel();
+
+      const inputEl = wrapper.find('input');
+      assert.equal(
+        inputEl.prop('value'),
+        'https://hyp.is/go?url=https%3A%2F%2Fwww.example.com&group=testprivate'
+      );
+      assert.equal(inputEl.prop('readOnly'), true);
+    });
+
+    describe('copy link to clipboard', () => {
+      it('copies link to clipboard when copy button clicked', () => {
+        const wrapper = createShareAnnotationsPanel();
+
+        wrapper.find('button').simulate('click');
+
+        assert.calledWith(
+          fakeCopyToClipboard.copyText,
+          'https://hyp.is/go?url=https%3A%2F%2Fwww.example.com&group=testprivate'
+        );
+      });
+
+      it('confirms link copy when successful', () => {
+        const wrapper = createShareAnnotationsPanel();
+
+        wrapper.find('button').simulate('click');
+
+        assert.calledWith(fakeFlash.info, 'Copied share link to clipboard');
+      });
+      it('flashes an error if link copying unsuccessful', () => {
+        fakeCopyToClipboard.copyText.throws();
+        const wrapper = createShareAnnotationsPanel();
+
+        wrapper.find('button').simulate('click');
+
+        assert.calledWith(fakeFlash.error, 'Unable to copy link');
+      });
+    });
+  });
+
+  describe('other share links', () => {
+    const shareLink =
+      'https://hyp.is/go?url=https%3A%2F%2Fwww.example.com&group=testprivate';
+    const encodedLink = encodeURIComponent(shareLink);
+    const encodedSubject = encodeURIComponent("Let's Annotate");
+
+    [
+      {
+        service: 'facebook',
+        expectedURI: `https://www.facebook.com/sharer/sharer.php?u=${encodedLink}`,
+        title: 'Share on Facebook',
+      },
+      {
+        service: 'twitter',
+        expectedURI: `https://twitter.com/intent/tweet?url=${encodedLink}&hashtags=annotated`,
+        title: 'Tweet share link',
+      },
+      {
+        service: 'email',
+        expectedURI: `mailto:?subject=${encodedSubject}&body=${encodedLink}`,
+        title: 'Share via email',
+      },
+    ].forEach(testCase => {
+      it(`creates a share link for ${testCase.service} and tracks clicks`, () => {
+        const wrapper = createShareAnnotationsPanel();
+
+        const link = wrapper.find(`a[title="${testCase.title}"]`);
+        link.simulate('click');
+
+        assert.equal(link.prop('href'), testCase.expectedURI);
+        assert.calledWith(
+          fakeAnalytics.track,
+          fakeAnalytics.events.DOCUMENT_SHARED,
+          testCase.service
+        );
+      });
+    });
+  });
+});

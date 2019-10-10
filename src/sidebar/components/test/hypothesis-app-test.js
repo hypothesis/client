@@ -252,11 +252,6 @@ describe('sidebar.components.hypothesis-app', function() {
     });
   });
 
-  it('does not show the share dialog at start', function() {
-    const ctrl = createController();
-    assert.isFalse(ctrl.shareDialog.visible);
-  });
-
   describe('#signUp', function() {
     it('tracks sign up requests in analytics', function() {
       const ctrl = createController();
@@ -406,14 +401,6 @@ describe('sidebar.components.hypothesis-app', function() {
       assert.isTrue(
         fakeBridge.call.calledWithExactly(bridgeEvents.LOGIN_REQUESTED)
       );
-    });
-  });
-
-  describe('#share()', function() {
-    it('shows the share dialog', function() {
-      const ctrl = createController();
-      ctrl.share();
-      assert.equal(ctrl.shareDialog.visible, true);
     });
   });
 

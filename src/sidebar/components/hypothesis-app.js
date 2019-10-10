@@ -1,10 +1,7 @@
 'use strict';
 
-const scrollIntoView = require('scroll-into-view');
-
 const events = require('../events');
 const { parseAccountID } = require('../util/account-id');
-const scopeTimeout = require('../util/scope-timeout');
 const serviceConfig = require('../service-config');
 const bridgeEvents = require('../../shared/bridge-events');
 
@@ -60,7 +57,6 @@ function HypothesisAppController(
   this.auth = { status: 'unknown' };
 
   // App dialogs
-  this.shareDialog = { visible: false };
   this.helpPanel = { visible: false };
 
   // Check to see if we're in the sidebar, or on a standalone page such as
@@ -78,19 +74,6 @@ function HypothesisAppController(
   session.load().then(profile => {
     self.auth = authStateFromProfile(profile);
   });
-
-  /** Scroll to the view to the element matching the given selector */
-  function scrollToView(selector) {
-    // Add a timeout so that if the element has just been shown (eg. via ngIf)
-    // it is added to the DOM before we try to locate and scroll to it.
-    scopeTimeout(
-      $scope,
-      function() {
-        scrollIntoView($document[0].querySelector(selector));
-      },
-      0
-    );
-  }
 
   /**
    * Start the login flow. This will present the user with the login dialog.
@@ -125,12 +108,6 @@ function HypothesisAppController(
       return;
     }
     $window.open(serviceUrl('signup'));
-  };
-
-  // Display the dialog for sharing the current page
-  this.share = function() {
-    this.shareDialog.visible = true;
-    scrollToView('share-dialog');
   };
 
   this.showHelpPanel = function() {

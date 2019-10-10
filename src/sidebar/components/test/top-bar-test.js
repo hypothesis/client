@@ -3,6 +3,8 @@
 const { createElement } = require('preact');
 const { shallow } = require('enzyme');
 
+const uiConstants = require('../../ui-constants');
+
 const GroupList = require('../group-list');
 const SearchInput = require('../search-input');
 const StreamSearchInput = require('../stream-search-input');
@@ -21,8 +23,14 @@ describe('TopBar', () => {
 
     fakeStore = {
       filterQuery: sinon.stub().returns(null),
+      getState: sinon.stub().returns({
+        sidebarPanels: {
+          activePanelName: null,
+        },
+      }),
       pendingUpdateCount: sinon.stub().returns(0),
       setFilterQuery: sinon.stub(),
+      toggleSidebarPanel: sinon.stub(),
     };
 
     fakeStreamer = {
@@ -143,9 +151,9 @@ describe('TopBar', () => {
   });
 
   context('when using a first-party service', () => {
-    it('shows the share page button', () => {
+    it('shows the share annotations button', () => {
       const wrapper = createTopBar();
-      assert.isTrue(wrapper.exists('[title="Share this page"]'));
+      assert.isTrue(wrapper.exists('[title="Share annotations on this page"]'));
     });
   });
 
@@ -154,17 +162,31 @@ describe('TopBar', () => {
       fakeIsThirdPartyService.returns(true);
     });
 
-    it("doesn't show the share page button", () => {
+    it("doesn't show the share annotations button", () => {
       const wrapper = createTopBar();
-      assert.isFalse(wrapper.exists('[title="Share this page"]'));
+      assert.isFalse(
+        wrapper.exists('[title="Share annotations on this page"]')
+      );
     });
   });
 
-  it('displays the share page when "Share this page" is clicked', () => {
-    const onSharePage = sinon.stub();
-    const wrapper = createTopBar({ onSharePage });
-    wrapper.find('[title="Share this page"]').simulate('click');
-    assert.called(onSharePage);
+  it('toggles the share annotations panel when "Share" is clicked', () => {
+    const wrapper = createTopBar();
+    wrapper.find('[title="Share annotations on this page"]').simulate('click');
+    assert.called(fakeStore.toggleSidebarPanel);
+  });
+
+  it('adds an active-state class to the "Share" icon when the panel is open', () => {
+    fakeStore.getState.returns({
+      sidebarPanels: {
+        activePanelName: uiConstants.PANEL_SHARE_ANNOTATIONS,
+      },
+    });
+
+    const wrapper = createTopBar();
+    const shareEl = wrapper.find('[title="Share annotations on this page"]');
+
+    assert.include(shareEl.prop('className'), 'top-bar__btn--active');
   });
 
   it('displays search input in the sidebar', () => {
