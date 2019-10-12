@@ -138,6 +138,16 @@ function MarkdownController($element, $scope) {
   }, 100);
   input.addEventListener('input', handleInputChange);
 
+  const handleBlur = function(event) {
+      if (!event.relatedTarget ||
+          (event.relatedTarget && event.relatedTarget.id !== 'dropdown-saving-selector')) {
+          if (self.text) {
+              self.onSave();
+          }
+      }
+  };
+  input.addEventListener('blur', handleBlur);
+
   // Re-render the markdown when the view needs updating.
   $scope.$watch('vm.text', function() {
     output.innerHTML = renderMarkdown(self.text || '');
@@ -176,6 +186,7 @@ module.exports = {
     readOnly: '<',
     text: '<?',
     onEditText: '&',
+    onSave: '&',
   },
   template: require('../templates/markdown.html'),
 };

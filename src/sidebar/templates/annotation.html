@@ -42,6 +42,7 @@
                 custom-text-class="{'annotation-body is-hidden':vm.isHiddenByModerator(),
                                     'has-content':vm.hasContent()}"
                 on-edit-text="vm.setText(text)"
+                on-save="vm.save()"
                 read-only="!vm.editing()">
       </markdown>
     </excerpt>
