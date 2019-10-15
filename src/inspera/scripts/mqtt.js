@@ -4,7 +4,7 @@ const uuid = require('node-uuid');
 const MQTT = require('paho-mqtt');
 const authErrorRedirectionHandler = require('./authErrorRedirectionHandler');
 
-function PahoMQTTClientWrapper(store, url, annotationUpdateChannels, userId, csrfToken, onMessageReceived, isStudent) {
+function PahoMQTTClientWrapper(store, url, annotationUpdateChannels, userId, csrfToken, onMessageReceived) {
     let client;
     function createAndConnect() {
         try {
@@ -62,7 +62,7 @@ function PahoMQTTClientWrapper(store, url, annotationUpdateChannels, userId, csr
             console.info('Reconnecting');
             fetch('/ICSXapi/assessment/GetSignedWebSocketUrl?token=' + csrfToken)
                 .then(function(response) {
-                    authErrorRedirectionHandler(response, isStudent);
+                    authErrorRedirectionHandler(response);
                     return response.json();
                 })
                 .then(function(data) {

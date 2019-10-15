@@ -197,7 +197,7 @@ function createAPICall(
         }
       })
       .catch(function(response) {
-        authErrorRedirectionHandler(response, false);
+        authErrorRedirectionHandler(response);
         onRequestFinished();
 
         // Translate the API result into an `Error` to follow the convention that
