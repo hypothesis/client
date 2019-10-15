@@ -1,11 +1,14 @@
 Plugin = require('../plugin')
 $ = require('jquery')
+configFrom = require('../config/index')
+
 
 makeButton = (item) ->
   anchor = $('<button></button>')
   .attr('href', '')
   .attr('title', item.title)
   .attr('name', item.name)
+  .attr('aria-pressed', item.ariaPressed)
   .on(item.on)
   .addClass('annotator-frame-button')
   .addClass(item.class)
@@ -27,6 +30,10 @@ module.exports = class Toolbar extends Plugin
     else
       $(@element).append @toolbar
 
+    config = configFrom(window);
+    # config.showHighlights will be either 'always' or 'never'
+    highlightsAreVisible = if config.showHighlights == 'never' then false else true
+
     items = [
       "title": "Close Sidebar"
       "class": "annotator-frame-button--sidebar_close h-icon-close"
@@ -39,6 +46,7 @@ module.exports = class Toolbar extends Plugin
           @toolbar.find('[name=sidebar-close]').hide();
     ,
       "title": "Toggle or Resize Sidebar"
+      "ariaPressed": config.openSidebar
       "class": "annotator-frame-button--sidebar_toggle h-icon-chevron-left"
       "name": "sidebar-toggle"
       "on":
@@ -48,12 +56,15 @@ module.exports = class Toolbar extends Plugin
           collapsed = @annotator.frame.hasClass('annotator-collapsed')
           if collapsed
             @annotator.show()
+            event.target.setAttribute('aria-pressed', true);
           else
             @annotator.hide()
+            event.target.setAttribute('aria-pressed', false);
     ,
-      "title": "Hide Highlights"
-      "class": "h-icon-visibility"
+      "title": "Toggle Highlights Visibility"
+      "class": if highlightsAreVisible then 'h-icon-visibility' else 'h-icon-visibility-off'
       "name": "highlight-visibility"
+      "ariaPressed": highlightsAreVisible
       "on":
         "click": (event) =>
           event.preventDefault()
@@ -87,12 +98,12 @@ module.exports = class Toolbar extends Plugin
       $('[name=highlight-visibility]')
       .removeClass('h-icon-visibility-off')
       .addClass('h-icon-visibility')
-      .prop('title', 'Hide Highlights');
+      .attr('aria-pressed', 'true')
     else
       $('[name=highlight-visibility]')
       .removeClass('h-icon-visibility')
       .addClass('h-icon-visibility-off')
-      .prop('title', 'Show Highlights');
+      .attr('aria-pressed', 'false')
 
   disableMinimizeBtn: () ->
     $('[name=sidebar-toggle]').remove();
