@@ -1,5 +1,9 @@
 #!groovy
 
+// Enable concurrent builds of this project to be throttled using the
+// throttle-concurrents Jenkins plugin (https://plugins.jenkins.io/throttle-concurrents)
+
+throttle(['client']) {
 node {
     checkout scm
 
@@ -70,6 +74,7 @@ node {
           sh "make checkformatting lint test"
         }
     }
+}
 }
 
 if (env.BRANCH_NAME != releaseFromBranch) {
