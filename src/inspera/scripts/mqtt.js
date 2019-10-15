@@ -2,8 +2,9 @@
 
 const uuid = require('node-uuid');
 const MQTT = require('paho-mqtt');
+const authErrorRedirectionHandler = require('./authErrorRedirectionHandler');
 
-function PahoMQTTClientWrapper(store, url, annotationUpdateChannels, userId, csrfToken, onMessageReceived) {
+function PahoMQTTClientWrapper(store, url, annotationUpdateChannels, userId, csrfToken, onMessageReceived, isStudent) {
     let client;
     function createAndConnect() {
         try {
@@ -14,7 +15,7 @@ function PahoMQTTClientWrapper(store, url, annotationUpdateChannels, userId, csr
         }
         client.onConnectionLost = onConnectionLost;
         client.onMessageArrived = onMessageArrived;
-        
+
         const connectOptions = {
             useSSL: true,
             timeout: 3,
@@ -33,16 +34,16 @@ function PahoMQTTClientWrapper(store, url, annotationUpdateChannels, userId, csr
 
         client.connect(connectOptions);
     };
-    
+
     const onMessageArrived = function (message) {
         let messageObject = JSON.parse(message.payloadString);
         const triggeringUserId = messageObject.data.triggeringUser;
         const currentTargetUrn = store.frames()[0].metadata.documentFingerprint;
         const currentFocusedChannel = store.focusedGroupId();
-        
+
         // if the annotation does not belong to the current user,
         // is targeted at the current context and channel
-        if (triggeringUserId !== userId && 
+        if (triggeringUserId !== userId &&
                 messageObject.data.payload[0].uri == currentTargetUrn &&
                 messageObject.data.payload[0].group == currentFocusedChannel) {
             delete messageObject.data.triggeringUser;
@@ -55,12 +56,13 @@ function PahoMQTTClientWrapper(store, url, annotationUpdateChannels, userId, csr
         console.info('Client disconnected', e);
         reconnectClient();
     };
-    
+
     const reconnectClient = function () {
         setTimeout(function () {
             console.info('Reconnecting');
             fetch('/ICSXapi/assessment/GetSignedWebSocketUrl?token=' + csrfToken)
                 .then(function(response) {
+                    authErrorRedirectionHandler(response);
                     return response.json();
                 })
                 .then(function(data) {
@@ -75,7 +77,7 @@ function PahoMQTTClientWrapper(store, url, annotationUpdateChannels, userId, csr
                 });
         }, 20000);
     };
-    
+
     this.createAndConnect = createAndConnect;
 }
 module.exports = PahoMQTTClientWrapper;
