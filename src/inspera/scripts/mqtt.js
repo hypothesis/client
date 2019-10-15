@@ -62,7 +62,7 @@ function PahoMQTTClientWrapper(store, url, annotationUpdateChannels, userId, csr
             console.info('Reconnecting');
             fetch('/ICSXapi/assessment/GetSignedWebSocketUrl?token=' + csrfToken)
                 .then(function(response) {
-                    authErrorRedirectionHandler(response);
+                    authErrorRedirectionHandler(response, isStudent);
                     return response.json();
                 })
                 .then(function(data) {
