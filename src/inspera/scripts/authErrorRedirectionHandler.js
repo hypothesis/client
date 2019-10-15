@@ -7,7 +7,7 @@
 */
 function authErrorRedirectionHandler(response) {
     if (response.status === 401) {
-        window.parent.parent.postMessage({ redirectToLogin: true });
+        window.parent.parent.postMessage({ action: 'redirectToLogin' });
     }
     return false;
 }
