@@ -7437,9 +7437,9 @@ sax@>=0.6.0, sax@^1.2.4:
   integrity sha512-NqVDv9TpANUjFm0N8uM5GxL36UgKi9/atZw+x7YFnQ8ckwFGKrl4xX4yWtrey3UJm5nP1kUbnYgLopqWNSRhWw==
 
 scroll-into-view@^1.8.2:
-  version "1.9.7"
-  resolved "https://registry.yarnpkg.com/scroll-into-view/-/scroll-into-view-1.9.7.tgz#ddf36d1ceee5dbb730be5b2c895dfd29a4597997"
-  integrity sha512-zhUw4nEe9H2C4yFMdWU5V1wFyRmB0OoJQ93BtSMH1Rj1a6kS0EmG7I4WoY2S3OwW3YKyU851q03rpxtIcDwzhw==
+  version "1.11.0"
+  resolved "https://registry.yarnpkg.com/scroll-into-view/-/scroll-into-view-1.11.0.tgz#aa1d78a0b9e159bfeb684535d1442dc400722780"
+  integrity sha512-4K1N1fc6oK1rLm/dbjO7/OfoZHprXh0SOG50caIWvHODWZLCLoMzsitbO9qKIG9VwdK/YKcfm67hyHuY+ThnvA==
 
 seamless-immutable@^7.1.4:
   version "7.1.4"
