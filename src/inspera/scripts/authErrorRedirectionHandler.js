@@ -8,7 +8,6 @@ function authErrorRedirectionHandler(response) {
     if (response.status === 401) {
         window.parent.parent.postMessage({ hypothesis: true, action: 'redirectToLogin' }, '*');
     }
-    return false;
 }
 
 module.exports = authErrorRedirectionHandler;
