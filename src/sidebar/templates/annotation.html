@@ -45,11 +45,11 @@
                      'has-content':vm.hasContent()}">
       </markdown-view>
     </excerpt>
-    <markdown text="vm.state().text"
-              on-edit-text="vm.setText(text)"
-              read-only="false"
-              ng-if="vm.editing()">
-    </markdown>
+    <markdown-editor
+      text="vm.state().text"
+      on-edit-text="vm.setText(text)"
+      ng-if="vm.editing()">
+    </markdown-editor>
   </section>
   <!-- / Body -->
 
