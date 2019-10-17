@@ -96,10 +96,7 @@ describe('MarkdownEditor', () => {
       it('applies formatting when toolbar button is clicked', () => {
         const onEditText = sinon.stub();
         const wrapper = mount(
-          <MarkdownEditor
-            text="test"
-            onEditText={onEditText}
-          />
+          <MarkdownEditor text="test" onEditText={onEditText} />
         );
         const button = wrapper.find(
           `ToolbarButton[title="${command}"] > button`

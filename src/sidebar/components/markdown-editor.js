@@ -25,6 +25,73 @@ const SHORTCUT_KEYS = {
   list: 'u',
 };
 
+/**
+ * Apply a toolbar command to an editor input field.
+ *
+ * @param {string} command
+ * @param {HTMLInputElement} inputEl
+ */
+function handleToolbarCommand(command, inputEl) {
+  const update = newStateFn => {
+    // Apply the toolbar command to the current state of the input field.
+    const newState = newStateFn({
+      text: inputEl.value,
+      selectionStart: inputEl.selectionStart,
+      selectionEnd: inputEl.selectionEnd,
+    });
+
+    // Update the input field to match the new state.
+    inputEl.value = newState.text;
+    inputEl.selectionStart = newState.selectionStart;
+    inputEl.selectionEnd = newState.selectionEnd;
+
+    // Restore input field focus which is lost when its contents are changed.
+    inputEl.focus();
+  };
+
+  const insertMath = state => {
+    const before = state.text.slice(0, state.selectionStart);
+    if (
+      before.length === 0 ||
+      before.slice(-1) === '\n' ||
+      before.slice(-2) === '$$'
+    ) {
+      return toggleSpanStyle(state, '$$', '$$', 'Insert LaTeX');
+    } else {
+      return toggleSpanStyle(state, '\\(', '\\)', 'Insert LaTeX');
+    }
+  };
+
+  switch (command) {
+    case 'bold':
+      update(state => toggleSpanStyle(state, '**', '**', 'Bold'));
+      break;
+    case 'italic':
+      update(state => toggleSpanStyle(state, '*', '*', 'Italic'));
+      break;
+    case 'quote':
+      update(state => toggleBlockStyle(state, '> '));
+      break;
+    case 'link':
+      update(state => convertSelectionToLink(state));
+      break;
+    case 'image':
+      update(state => convertSelectionToLink(state, LinkType.IMAGE_LINK));
+      break;
+    case 'math':
+      update(insertMath);
+      break;
+    case 'numlist':
+      update(state => toggleBlockStyle(state, '1. '));
+      break;
+    case 'list':
+      update(state => toggleBlockStyle(state, '* '));
+      break;
+    default:
+      throw new Error(`Unknown toolbar command "${command}"`);
+  }
+}
+
 function ToolbarButton({
   disabled = false,
   icon,
@@ -144,73 +211,6 @@ Toolbar.propTypes = {
   /** Callback invoked when the "Preview" toggle button is clicked. */
   onTogglePreview: propTypes.func,
 };
-
-/**
- * Apply a toolbar command to an editor input field.
- *
- * @param {string} command
- * @param {HTMLInputElement} inputEl
- */
-function handleToolbarCommand(command, inputEl) {
-  const update = newStateFn => {
-    // Apply the toolbar command to the current state of the input field.
-    const newState = newStateFn({
-      text: inputEl.value,
-      selectionStart: inputEl.selectionStart,
-      selectionEnd: inputEl.selectionEnd,
-    });
-
-    // Update the input field to match the new state.
-    inputEl.value = newState.text;
-    inputEl.selectionStart = newState.selectionStart;
-    inputEl.selectionEnd = newState.selectionEnd;
-
-    // Restore input field focus which is lost when its contents are changed.
-    inputEl.focus();
-  };
-
-  const insertMath = state => {
-    const before = state.text.slice(0, state.selectionStart);
-    if (
-      before.length === 0 ||
-      before.slice(-1) === '\n' ||
-      before.slice(-2) === '$$'
-    ) {
-      return toggleSpanStyle(state, '$$', '$$', 'Insert LaTeX');
-    } else {
-      return toggleSpanStyle(state, '\\(', '\\)', 'Insert LaTeX');
-    }
-  };
-
-  switch (command) {
-    case 'bold':
-      update(state => toggleSpanStyle(state, '**', '**', 'Bold'));
-      break;
-    case 'italic':
-      update(state => toggleSpanStyle(state, '*', '*', 'Italic'));
-      break;
-    case 'quote':
-      update(state => toggleBlockStyle(state, '> '));
-      break;
-    case 'link':
-      update(state => convertSelectionToLink(state));
-      break;
-    case 'image':
-      update(state => convertSelectionToLink(state, LinkType.IMAGE_LINK));
-      break;
-    case 'math':
-      update(insertMath);
-      break;
-    case 'numlist':
-      update(state => toggleBlockStyle(state, '1. '));
-      break;
-    case 'list':
-      update(state => toggleBlockStyle(state, '* '));
-      break;
-    default:
-      throw new Error(`Unknown toolbar command "${command}"`);
-  }
-}
 
 /**
  * Viewer/editor for the body of an annotation in markdown format.
