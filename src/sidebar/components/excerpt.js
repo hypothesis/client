@@ -12,10 +12,6 @@ function ExcerptController($element, $scope, ExcerptOverflowMonitor) {
     this.animate = true;
   }
 
-  if (this.enabled === undefined) {
-    this.enabled = true;
-  }
-
   this.isExpandable = function() {
     return this.overflowing && this.collapse;
   };
@@ -68,7 +64,6 @@ function ExcerptController($element, $scope, ExcerptOverflowMonitor) {
     {
       getState: function() {
         return {
-          enabled: self.enabled,
           animate: self.animate,
           collapsedHeight: self.collapsedHeight,
           collapse: self.collapse,
@@ -123,7 +118,6 @@ function ExcerptController($element, $scope, ExcerptOverflowMonitor) {
 
   // Watch input properties which may affect the overflow state
   $scope.$watch('vm.contentData', overflowMonitor.check);
-  $scope.$watch('vm.enabled', overflowMonitor.check);
 
   // Trigger an initial calculation of the overflow state.
   //
@@ -150,8 +144,6 @@ module.exports = {
      * is overflowing.
      */
     contentData: '<',
-    /** Whether or not truncation should be enabled */
-    enabled: '<?',
     /**
      * Specifies whether controls to expand and collapse
      * the excerpt should be shown inside the <excerpt> component.

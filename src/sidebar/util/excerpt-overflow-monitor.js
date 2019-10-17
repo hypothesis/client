@@ -44,12 +44,9 @@ function ExcerptOverflowMonitor(excerpt, requestAnimationFrame) {
 
     pendingUpdate = false;
 
-    let overflowing = false;
-    if (state.enabled) {
-      const hysteresisPx = state.overflowHysteresis || 0;
-      overflowing =
-        excerpt.contentHeight() > state.collapsedHeight + hysteresisPx;
-    }
+    const hysteresisPx = state.overflowHysteresis || 0;
+    const overflowing =
+      excerpt.contentHeight() > state.collapsedHeight + hysteresisPx;
     if (overflowing === prevOverflowing) {
       return;
     }
@@ -76,9 +73,6 @@ function ExcerptOverflowMonitor(excerpt, requestAnimationFrame) {
    */
   function contentStyle() {
     const state = excerpt.getState();
-    if (!state.enabled) {
-      return {};
-    }
 
     let maxHeight = '';
     if (prevOverflowing) {

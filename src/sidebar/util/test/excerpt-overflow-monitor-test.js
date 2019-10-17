@@ -12,7 +12,6 @@ describe('ExcerptOverflowMonitor', function() {
     contentHeight = 0;
 
     state = {
-      enabled: true,
       animate: true,
       collapsedHeight: 100,
       collapse: true,
@@ -34,7 +33,7 @@ describe('ExcerptOverflowMonitor', function() {
     });
   });
 
-  context('when enabled', function() {
+  describe('overflow state', function() {
     it('overflows if height > collaped height + hysteresis', function() {
       contentHeight = 200;
       monitor.check();
@@ -49,18 +48,6 @@ describe('ExcerptOverflowMonitor', function() {
 
     it('does not overflow if height is in [collapsed height, collapsed height + hysteresis]', function() {
       contentHeight = 110;
-      monitor.check();
-      assert.calledWith(ctrl.onOverflowChanged, false);
-    });
-  });
-
-  context('when not enabled', function() {
-    beforeEach(function() {
-      state.enabled = false;
-    });
-
-    it('does not overflow if height > collapsed height + hysteresis', function() {
-      contentHeight = 200;
       monitor.check();
       assert.calledWith(ctrl.onOverflowChanged, false);
     });

@@ -31,20 +31,25 @@
 
   <!-- Body -->
   <section name="text" class="annotation-body">
-    <excerpt enabled="!vm.editing()"
+    <excerpt
       inline-controls="false"
       on-collapsible-changed="vm.setBodyCollapsible(collapsible)"
       collapse="vm.collapseBody"
       collapsed-height="400"
       overflow-hysteresis="20"
-      content-data="vm.state().text">
+      content-data="vm.state().text"
+      ng-if="!vm.editing()">
       <markdown text="vm.state().text"
                 custom-text-class="{'annotation-body is-hidden':vm.isHiddenByModerator(),
                                     'has-content':vm.hasContent()}"
-                on-edit-text="vm.setText(text)"
-                read-only="!vm.editing()">
+                read-only="true">
       </markdown>
     </excerpt>
+    <markdown text="vm.state().text"
+              on-edit-text="vm.setText(text)"
+              read-only="false"
+              ng-if="vm.editing()">
+    </markdown>
   </section>
   <!-- / Body -->
 

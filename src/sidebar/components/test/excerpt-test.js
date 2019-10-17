@@ -14,7 +14,6 @@ describe('excerpt', function() {
 
   function excerptComponent(attrs, content) {
     const defaultAttrs = {
-      enabled: true,
       contentData: 'the content',
       collapsedHeight: 40,
       inlineControls: false,
@@ -51,7 +50,6 @@ describe('excerpt', function() {
     it('passes input properties to overflow state recalc', function() {
       const attrs = {
         animate: false,
-        enabled: true,
         collapsedHeight: 40,
         inlineControls: false,
         overflowHysteresis: 20,
@@ -59,7 +57,6 @@ describe('excerpt', function() {
       excerptComponent(attrs, '<span></span>');
       assert.deepEqual(fakeOverflowMonitor.ctrl.getState(), {
         animate: attrs.animate,
-        enabled: attrs.enabled,
         collapsedHeight: attrs.collapsedHeight,
         collapse: true,
         overflowHysteresis: attrs.overflowHysteresis,
@@ -133,33 +130,6 @@ describe('excerpt', function() {
       element.scope.$digest();
       const content = element[0].querySelector('.excerpt');
       assert.equal(content.style.cssText.trim(), 'max-height: 52px;');
-    });
-  });
-
-  describe('enabled state', function() {
-    it('renders its contents in a .excerpt element by default', function() {
-      const element = excerptComponent({}, '<span id="foo"></span>');
-
-      assert.equal(element.find('.excerpt #foo').length, 1);
-    });
-
-    it('when enabled, renders its contents in a .excerpt element', function() {
-      const element = excerptComponent(
-        { enabled: true },
-        '<span id="foo"></span>'
-      );
-
-      assert.equal(element.find('.excerpt #foo').length, 1);
-    });
-
-    it('when disabled, renders its contents but not in a .excerpt element', function() {
-      const element = excerptComponent(
-        { enabled: false },
-        '<span id="foo"></span>'
-      );
-
-      assert.equal(element.find('.excerpt #foo').length, 0);
-      assert.equal(element.find('#foo').length, 1);
     });
   });
 
