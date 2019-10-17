@@ -161,7 +161,10 @@ function startAngularApp(config) {
       'loggedOutMessage',
       wrapReactComponent(require('./components/logged-out-message'))
     )
-    .component('markdown', require('./components/markdown'))
+    .component(
+      'markdownEditor',
+      wrapReactComponent(require('./components/markdown-editor'))
+    )
     .component(
       'markdownView',
       wrapReactComponent(require('./components/markdown-view'))

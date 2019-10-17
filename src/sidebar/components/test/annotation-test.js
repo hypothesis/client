@@ -158,8 +158,11 @@ describe('annotation', function() {
             onClick: '&',
           },
         })
-        .component('markdown', {
-          bindings: require('../markdown').bindings,
+        .component('markdownEditor', {
+          bindings: {
+            text: '<',
+            onEditText: '&',
+          },
         })
         .component('markdownView', {
           bindings: {

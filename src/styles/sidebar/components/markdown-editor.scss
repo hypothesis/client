@@ -1,0 +1,42 @@
+$toolbar-border: 0.1em solid $grey-3;
+
+.markdown-editor__toolbar {
+  display: flex;
+  flex-direction: row;
+
+  background-color: white;
+  border: $toolbar-border;
+  border-bottom: none;
+  border-radius: 0.15em 0.15em 0 0;
+  width: 100%;
+  margin-bottom: -0.1em;
+  padding: 5px 5px;
+}
+
+.markdown-editor__toolbar-button {
+  appearance: none;
+  border: none;
+  background: none;
+
+  color: $grey-5;
+  font-size: 16px;
+
+  &:hover,
+  &:focus {
+    color: black;
+  }
+
+  &:disabled {
+    color: $grey-3;
+  }
+
+  &.is-text {
+    font-size: 13px;
+  }
+}
+
+.markdown-editor__preview {
+  border: $toolbar-border;
+  background-color: $grey-1;
+  padding: 10px;
+}
