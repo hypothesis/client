@@ -4,15 +4,13 @@ $toolbar-border: 0.1em solid $grey-3;
   display: flex;
   flex-direction: row;
 
-  background-color: $white;
-  border-top: $toolbar-border;
-  border-left: $toolbar-border;
-  border-right: $toolbar-border;
+  background-color: white;
+  border: $toolbar-border;
+  border-bottom: none;
   border-radius: 0.15em 0.15em 0 0;
   width: 100%;
   margin-bottom: -0.1em;
   padding: 5px 5px;
-  user-select: none;
 }
 
 .markdown-editor__toolbar-button {
