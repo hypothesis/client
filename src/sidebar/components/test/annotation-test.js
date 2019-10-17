@@ -160,6 +160,12 @@ describe('annotation', function() {
         })
         .component('markdown', {
           bindings: require('../markdown').bindings,
+        })
+        .component('markdownView', {
+          bindings: {
+            markdown: '<',
+            textClass: '<',
+          },
         });
     });
 
@@ -1268,9 +1274,9 @@ describe('annotation', function() {
       function(testCase) {
         const el = createDirective(testCase.ann).element;
         assert.match(
-          el.find('markdown').controller('markdown'),
+          el.find('markdown-view').controller('markdownView'),
           sinon.match({
-            customTextClass: testCase.textClass,
+            textClass: testCase.textClass,
           })
         );
       },

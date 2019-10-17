@@ -163,6 +163,10 @@ function startAngularApp(config) {
     )
     .component('markdown', require('./components/markdown'))
     .component(
+      'markdownView',
+      wrapReactComponent(require('./components/markdown-view'))
+    )
+    .component(
       'moderationBanner',
       wrapReactComponent(require('./components/moderation-banner'))
     )

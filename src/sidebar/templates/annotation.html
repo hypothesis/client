@@ -39,10 +39,10 @@
       overflow-hysteresis="20"
       content-data="vm.state().text"
       ng-if="!vm.editing()">
-      <markdown text="vm.state().text"
-                custom-text-class="{'annotation-body is-hidden':vm.isHiddenByModerator(),
-                                    'has-content':vm.hasContent()}"
-                read-only="true">
+      <markdown-view
+        markdown="vm.state().text"
+        text-class="{'annotation-body is-hidden':vm.isHiddenByModerator(),
+                     'has-content':vm.hasContent()}"
       </markdown>
     </excerpt>
     <markdown text="vm.state().text"
