@@ -98,7 +98,6 @@ describe('MarkdownEditor', () => {
         const wrapper = mount(
           <MarkdownEditor
             text="test"
-            readOnly={false}
             onEditText={onEditText}
           />
         );
