@@ -41,7 +41,12 @@ function SearchInput({ alwaysExpanded, query, onSearch }) {
   }
 
   return (
-    <form className="search-input__form" name="searchForm" onSubmit={onSubmit}>
+    <form
+      action="#"
+      className="search-input__form"
+      name="searchForm"
+      onSubmit={onSubmit}
+    >
       <input
         className={classnames('search-input__input', {
           'is-expanded': alwaysExpanded || query,
