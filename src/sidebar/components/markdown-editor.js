@@ -263,7 +263,7 @@ function MarkdownEditor({ onEditText = () => {}, text = '' }) {
         />
       ) : (
         <textarea
-          className="form-input form-textarea"
+          className="markdown-editor__input form-input form-textarea"
           ref={input}
           onClick={e => e.stopPropagation()}
           onKeydown={handleKeyDown}

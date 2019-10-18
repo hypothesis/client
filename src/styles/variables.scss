@@ -121,9 +121,17 @@ $normal-line-height: 17px;
 $small-font-size: 11px;
 $small-line-height: 12px;
 
+// Minimum font size for <input> fields on iOS. If the font size is smaller than
+// this, iOS will zoom into the field when focused.
+$touch-input-font-size: 16px;
+
 // Layout margins
 // -------------------------
 $layout-h-margin: 15px;
+
+// Minimum recommended size for tap targets on mobile.
+// This value originated from Apple's Human Interface Guidelines.
+$touch-target-size: 44px;
 
 // Z-Index Scale
 // -------------------------
