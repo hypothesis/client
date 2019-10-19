@@ -562,10 +562,6 @@ function AnnotationController(
       return;
     }
     self.canCollapseBody = canCollapse;
-
-    // This event handler is called from outside the digest cycle, so
-    // explicitly trigger a digest.
-    $scope.$digest();
   };
 
   this.setText = function(text) {

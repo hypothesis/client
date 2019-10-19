@@ -1,209 +1,135 @@
 'use strict';
 
-const angular = require('angular');
+const { createElement } = require('preact');
+const { act } = require('preact/test-utils');
+const { mount } = require('enzyme');
 
-const util = require('../../directive/test/util');
-const excerpt = require('../excerpt');
+const Excerpt = require('../excerpt');
 
-describe('excerpt', function() {
-  // ExcerptOverflowMonitor fake instance created by the current test
-  let fakeOverflowMonitor;
+describe('Excerpt', () => {
+  const SHORT_DIV = <div id="foo" style="height: 5px;" />;
+  const TALL_DIV = (
+    <div id="foo" style="height: 200px;">
+      foo bar
+    </div>
+  );
+  const DEFAULT_CONTENT = <span className="the-content">default content</span>;
 
-  const SHORT_DIV = '<div id="foo" style="height:5px;"></div>';
-  const TALL_DIV = '<div id="foo" style="height:200px;">foo bar</div>';
+  let container;
+  let fakeObserveElementSize;
 
-  function excerptComponent(attrs, content) {
-    const defaultAttrs = {
-      contentData: 'the content',
-      collapsedHeight: 40,
-      inlineControls: false,
-    };
-    attrs = Object.assign(defaultAttrs, attrs);
-    return util.createDirective(document, 'excerpt', attrs, {}, content);
+  function createExcerpt(props = {}, content = DEFAULT_CONTENT) {
+    return mount(
+      <Excerpt
+        collapse={true}
+        collapsedHeight={40}
+        inlineControls={false}
+        settings={{}}
+        {...props}
+      >
+        {content}
+      </Excerpt>,
+      { attachTo: container }
+    );
   }
 
-  before(function() {
-    angular.module('app', []).component('excerpt', excerpt);
-  });
+  beforeEach(() => {
+    fakeObserveElementSize = sinon.stub();
+    container = document.createElement('div');
+    document.body.appendChild(container);
 
-  beforeEach(function() {
-    function FakeOverflowMonitor(ctrl) {
-      fakeOverflowMonitor = this; // eslint-disable-line consistent-this
-
-      this.ctrl = ctrl;
-      this.check = sinon.stub();
-      this.contentStyle = sinon.stub().returns({});
-    }
-
-    angular.mock.module('app');
-    angular.mock.module(function($provide) {
-      $provide.value('ExcerptOverflowMonitor', FakeOverflowMonitor);
+    Excerpt.$imports.$mock({
+      '../util/observe-element-size': fakeObserveElementSize,
     });
   });
 
-  context('when created', function() {
-    it('schedules an overflow state recalculation', function() {
-      excerptComponent({}, '<span id="foo"></span>');
-      assert.called(fakeOverflowMonitor.check);
-    });
-
-    it('passes input properties to overflow state recalc', function() {
-      const attrs = {
-        animate: false,
-        collapsedHeight: 40,
-        inlineControls: false,
-        overflowHysteresis: 20,
-      };
-      excerptComponent(attrs, '<span></span>');
-      assert.deepEqual(fakeOverflowMonitor.ctrl.getState(), {
-        animate: attrs.animate,
-        collapsedHeight: attrs.collapsedHeight,
-        collapse: true,
-        overflowHysteresis: attrs.overflowHysteresis,
-      });
-    });
-
-    it('reports the content height to ExcerptOverflowMonitor', function() {
-      excerptComponent({}, TALL_DIV);
-      assert.deepEqual(fakeOverflowMonitor.ctrl.contentHeight(), 200);
-    });
+  afterEach(() => {
+    container.remove();
   });
 
-  context('input changes', function() {
-    it('schedules an overflow state check when inputs change', function() {
-      const element = excerptComponent({}, '<span></span>');
-      fakeOverflowMonitor.check.reset();
-      element.scope.contentData = 'new-content';
-      element.scope.$digest();
-      assert.calledOnce(fakeOverflowMonitor.check);
-    });
-
-    it('does not schedule a state check if inputs are unchanged', function() {
-      const element = excerptComponent({}, '<span></span>');
-      fakeOverflowMonitor.check.reset();
-      element.scope.$digest();
-      assert.notCalled(fakeOverflowMonitor.check);
-    });
-  });
-
-  context('document events', function() {
-    it('schedules an overflow check when media loads', function() {
-      const element = excerptComponent(
-        {},
-        '<img src="https://example.com/foo.jpg">'
-      );
-      fakeOverflowMonitor.check.reset();
-      util.sendEvent(element[0], 'load');
-      assert.called(fakeOverflowMonitor.check);
-    });
-
-    it('schedules an overflow check when the window is resized', function() {
-      const element = excerptComponent({}, '<span></span>');
-      fakeOverflowMonitor.check.reset();
-      util.sendEvent(element[0].ownerDocument.defaultView, 'resize');
-      assert.called(fakeOverflowMonitor.check);
-    });
-  });
-
-  context('visibility changes', function() {
-    it('schedules an overflow check when shown', function() {
-      const element = excerptComponent({}, '<span></span>');
-      fakeOverflowMonitor.check.reset();
-
-      // ng-hide is the class used by the ngShow and ngHide directives
-      // to show or hide elements. For now, this is the only way of hiding
-      // or showing excerpts that we need to support.
-      element[0].classList.add('ng-hide');
-      element.scope.$digest();
-      assert.notCalled(fakeOverflowMonitor.check);
-
-      element[0].classList.remove('ng-hide');
-      element.scope.$digest();
-      assert.called(fakeOverflowMonitor.check);
-    });
-  });
-
-  context('excerpt content style', function() {
-    it('sets the content style using ExcerptOverflowMonitor#contentStyle()', function() {
-      const element = excerptComponent({}, '<span></span>');
-      fakeOverflowMonitor.contentStyle.returns({ 'max-height': '52px' });
-      element.scope.$digest();
-      const content = element[0].querySelector('.excerpt');
-      assert.equal(content.style.cssText.trim(), 'max-height: 52px;');
-    });
-  });
-
-  function isHidden(el) {
-    return !el.offsetParent || el.classList.contains('ng-hide');
+  function getExcerptHeight(wrapper) {
+    return wrapper.find('.excerpt').prop('style')['max-height'];
   }
 
-  function findVisible(el, selector) {
-    const elements = el.querySelectorAll(selector);
-    for (let i = 0; i < elements.length; i++) {
-      if (!isHidden(elements[i])) {
-        return elements[i];
-      }
-    }
-    return undefined;
-  }
-
-  describe('inline controls', function() {
-    function findInlineControl(el) {
-      return findVisible(el, '.excerpt__toggle-link');
-    }
-
-    it('displays inline controls if collapsed', function() {
-      const element = excerptComponent({ inlineControls: true }, TALL_DIV);
-      fakeOverflowMonitor.ctrl.onOverflowChanged(true);
-      const expandLink = findInlineControl(element[0]);
-      assert.ok(expandLink);
-      assert.equal(expandLink.querySelector('a').textContent, 'More');
-    });
-
-    it('does not display inline controls if not collapsed', function() {
-      const element = excerptComponent({ inlineControls: true }, SHORT_DIV);
-      const expandLink = findInlineControl(element[0]);
-      assert.notOk(expandLink);
-    });
-
-    it('toggles the expanded state when clicked', function() {
-      const element = excerptComponent({ inlineControls: true }, TALL_DIV);
-      fakeOverflowMonitor.ctrl.onOverflowChanged(true);
-      const expandLink = findInlineControl(element[0]);
-      angular.element(expandLink.querySelector('a')).click();
-      element.scope.$digest();
-      const collapseLink = findInlineControl(element[0]);
-      assert.equal(collapseLink.querySelector('a').textContent, 'Less');
-    });
+  it('renders content in container', () => {
+    const wrapper = createExcerpt();
+    const contentEl = wrapper.find('[test-name="excerpt-content"]');
+    assert.include(contentEl.html(), 'default content');
   });
 
-  describe('bottom area', function() {
-    it('expands the excerpt when clicking at the bottom if collapsed', function() {
-      const element = excerptComponent({ inlineControls: true }, TALL_DIV);
-      element.scope.$digest();
-      assert.isTrue(element.ctrl.collapse);
-      const bottomArea = element[0].querySelector('.excerpt__shadow');
-      angular.element(bottomArea).click();
-      assert.isFalse(element.ctrl.collapse);
-    });
+  it('truncates content if it exceeds `collapsedHeight` + `overflowHysteresis`', () => {
+    const wrapper = createExcerpt({}, TALL_DIV);
+    assert.equal(getExcerptHeight(wrapper), 40);
   });
 
-  describe('#onCollapsibleChanged', function() {
-    it('is called when overflow state changes', function() {
-      const callback = sinon.stub();
-      excerptComponent(
-        {
-          onCollapsibleChanged: {
-            args: ['collapsible'],
-            callback: callback,
-          },
-        },
-        '<span></span>'
-      );
-      fakeOverflowMonitor.ctrl.onOverflowChanged(true);
-      assert.calledWith(callback, true);
-      fakeOverflowMonitor.ctrl.onOverflowChanged(false);
-      assert.calledWith(callback, false);
+  it('does not truncate content if it does not exceed `collapsedHeight` + `overflowHysteresis`', () => {
+    const wrapper = createExcerpt({}, SHORT_DIV);
+    assert.equal(getExcerptHeight(wrapper), 5);
+  });
+
+  it('updates the collapsed state when the content height changes', () => {
+    const wrapper = createExcerpt({}, SHORT_DIV);
+    assert.called(fakeObserveElementSize);
+
+    const contentElem = fakeObserveElementSize.getCall(0).args[0];
+    const sizeChangedCallback = fakeObserveElementSize.getCall(0).args[1];
+    act(() => {
+      contentElem.style.height = '400px';
+      sizeChangedCallback();
+    });
+    wrapper.update();
+
+    assert.equal(getExcerptHeight(wrapper), 40);
+
+    act(() => {
+      contentElem.style.height = '10px';
+      sizeChangedCallback();
+    });
+    wrapper.update();
+
+    assert.equal(getExcerptHeight(wrapper), 10);
+  });
+
+  it('calls `onCollapsibleChanged` when collapsibility changes', () => {
+    const onCollapsibleChanged = sinon.stub();
+    createExcerpt({ onCollapsibleChanged }, SHORT_DIV);
+
+    const contentElem = fakeObserveElementSize.getCall(0).args[0];
+    const sizeChangedCallback = fakeObserveElementSize.getCall(0).args[1];
+    act(() => {
+      contentElem.style.height = '400px';
+      sizeChangedCallback();
+    });
+
+    assert.calledWith(onCollapsibleChanged, { collapsible: true });
+  });
+
+  it('calls `onToggleCollapsed` when user clicks in bottom area to expand excerpt', () => {
+    const onToggleCollapsed = sinon.stub();
+    const wrapper = createExcerpt({ onToggleCollapsed }, TALL_DIV);
+    const control = wrapper.find('.excerpt__shadow');
+    assert.equal(getExcerptHeight(wrapper), 40);
+    control.simulate('click');
+    assert.called(onToggleCollapsed);
+  });
+
+  context('when inline controls are enabled', () => {
+    it('displays inline controls if collapsed', () => {
+      const wrapper = createExcerpt({ inlineControls: true }, TALL_DIV);
+      assert.isTrue(wrapper.exists('.excerpt__inline-controls'));
+    });
+
+    it('does not display inline controls if not collapsed', () => {
+      const wrapper = createExcerpt({ inlineControls: true }, SHORT_DIV);
+      assert.isFalse(wrapper.exists('.excerpt__inline-controls'));
+    });
+
+    it('toggles the expanded state when clicked', () => {
+      const wrapper = createExcerpt({ inlineControls: true }, TALL_DIV);
+      const control = wrapper.find('.excerpt__inline-controls a');
+      assert.equal(getExcerptHeight(wrapper), 40);
+      control.simulate('click');
+      assert.equal(getExcerptHeight(wrapper), 200);
     });
   });
 });

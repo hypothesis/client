@@ -131,6 +131,10 @@ function startAngularApp(config) {
     // UI components
     .component('annotation', require('./components/annotation'))
     .component(
+      'annotationBody',
+      wrapReactComponent(require('./components/annotation-body'))
+    )
+    .component(
       'annotationHeader',
       wrapReactComponent(require('./components/annotation-header'))
     )
@@ -143,6 +147,10 @@ function startAngularApp(config) {
       wrapReactComponent(require('./components/annotation-publish-control'))
     )
     .component(
+      'annotationQuote',
+      wrapReactComponent(require('./components/annotation-quote'))
+    )
+    .component(
       'annotationShareDialog',
       require('./components/annotation-share-dialog')
     )
@@ -151,7 +159,6 @@ function startAngularApp(config) {
       'annotationViewerContent',
       require('./components/annotation-viewer-content')
     )
-    .component('excerpt', require('./components/excerpt'))
     .component(
       'helpPanel',
       wrapReactComponent(require('./components/help-panel'))
@@ -159,14 +166,6 @@ function startAngularApp(config) {
     .component(
       'loggedOutMessage',
       wrapReactComponent(require('./components/logged-out-message'))
-    )
-    .component(
-      'markdownEditor',
-      wrapReactComponent(require('./components/markdown-editor'))
-    )
-    .component(
-      'markdownView',
-      wrapReactComponent(require('./components/markdown-view'))
     )
     .component(
       'moderationBanner',
@@ -232,7 +231,6 @@ function startAngularApp(config) {
 
     // Utilities
     .value('Discovery', require('../shared/discovery'))
-    .value('ExcerptOverflowMonitor', require('./util/excerpt-overflow-monitor'))
     .value('OAuthClient', require('./util/oauth-client'))
     .value('VirtualThreadList', require('./virtual-thread-list'))
     .value('isSidebar', isSidebar)
