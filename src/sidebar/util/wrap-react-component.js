@@ -63,19 +63,10 @@ class ReactController {
     });
   }
 
-  $onInit() {
-    // Copy properties supplied by the parent Angular component to React props.
-    Object.keys(this.type.propTypes).forEach(propName => {
-      if (!useExpressionBinding(propName)) {
-        this.props[propName] = this[propName];
-      }
-    });
-    this.updateReactComponent();
-  }
-
   $onChanges(changes) {
     // Copy updated property values from parent Angular component to React
-    // props.
+    // props. This callback is run when the component is initially created as
+    // well as subsequent updates.
     Object.keys(changes).forEach(propName => {
       if (!useExpressionBinding(propName)) {
         this.props[propName] = changes[propName].currentValue;
