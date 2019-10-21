@@ -19,7 +19,7 @@ const { version } = require('../../package.json');
  * returned by the service's '/embed.js' route and included in the '/app.html'
  * app.
  */
-function servePackage(port, hostname) {
+function servePackage(port) {
   const app = express();
 
   // Enable CORS for assets so that cross-origin font loading works.
@@ -43,7 +43,7 @@ function servePackage(port, hostname) {
 
   createServer(app).listen(port, () => {
     const scheme = useSsl ? 'https' : 'http';
-    log(`Package served at ${scheme}://${hostname}:${port}/hypothesis`);
+    log(`Package served at ${scheme}://localhost:${port}/hypothesis`);
   });
 }
 
