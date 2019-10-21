@@ -1,7 +1,6 @@
 'use strict';
 
 const adder = require('../adder');
-const unroll = require('../../shared/test/util').unroll;
 
 function rect(left, top, width, height) {
   return { left: left, top: top, width: width, height: height };
@@ -57,9 +56,15 @@ describe('annotator.adder', function() {
   }
 
   context('when Shadow DOM is supported', function() {
-    unroll(
-      'creates the adder DOM in a shadow root (using #attachFn)',
-      function(testCase) {
+    [
+      {
+        attachFn: 'createShadowRoot', // Shadow DOM v0 API
+      },
+      {
+        attachFn: 'attachShadow', // Shadow DOM v1 API
+      },
+    ].forEach(testCase => {
+      it(`creates the adder DOM in a shadow root (using ${testCase.attachFn})`, () => {
         const adderEl = document.createElement('div');
         let shadowEl;
 
@@ -83,16 +88,8 @@ describe('annotator.adder', function() {
         );
 
         adderEl.remove();
-      },
-      [
-        {
-          attachFn: 'createShadowRoot', // Shadow DOM v0 API
-        },
-        {
-          attachFn: 'attachShadow', // Shadow DOM v1 API
-        },
-      ]
-    );
+      });
+    });
   });
 
   describe('button handling', function() {

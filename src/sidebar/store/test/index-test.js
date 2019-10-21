@@ -5,7 +5,6 @@ const immutable = require('seamless-immutable');
 const storeFactory = require('../index');
 const annotationFixtures = require('../../test/annotation-fixtures');
 const metadata = require('../../util/annotation-metadata');
-const unroll = require('../../../shared/test/util').unroll;
 const uiConstants = require('../../ui-constants');
 
 const defaultAnnotation = annotationFixtures.defaultAnnotation;
@@ -360,14 +359,12 @@ describe('store', function() {
   });
 
   describe('#setShowHighlights()', function() {
-    unroll(
-      'sets the visibleHighlights state flag to #state',
-      function(testCase) {
+    [{ state: true }, { state: false }].forEach(testCase => {
+      it(`sets the visibleHighlights state flag to ${testCase.state}`, () => {
         store.setShowHighlights(testCase.state);
         assert.equal(store.getState().viewer.visibleHighlights, testCase.state);
-      },
-      [{ state: true }, { state: false }]
-    );
+      });
+    });
   });
 
   describe('#updatingAnchorStatus', function() {

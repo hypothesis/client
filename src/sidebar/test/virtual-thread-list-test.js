@@ -1,9 +1,6 @@
 'use strict';
 
-const util = require('../../shared/test/util');
 const VirtualThreadList = require('../virtual-thread-list');
-
-const unroll = util.unroll;
 
 describe('VirtualThreadList', function() {
   let lastState;
@@ -105,9 +102,36 @@ describe('VirtualThreadList', function() {
     });
   });
 
-  unroll(
-    'generates expected state when #when',
-    function(testCase) {
+  [
+    {
+      when: 'scrollRoot is scrolled to top of list',
+      threads: 100,
+      scrollOffset: 0,
+      windowHeight: 300,
+      expectedVisibleThreads: idRange(0, 5),
+      expectedHeightAbove: 0,
+      expectedHeightBelow: 18800,
+    },
+    {
+      when: 'scrollRoot is scrolled to middle of list',
+      threads: 100,
+      scrollOffset: 2000,
+      windowHeight: 300,
+      expectedVisibleThreads: idRange(5, 15),
+      expectedHeightAbove: 1000,
+      expectedHeightBelow: 16800,
+    },
+    {
+      when: 'scrollRoot is scrolled to bottom of list',
+      threads: 100,
+      scrollOffset: 18800,
+      windowHeight: 300,
+      expectedVisibleThreads: idRange(89, 99),
+      expectedHeightAbove: 17800,
+      expectedHeightBelow: 0,
+    },
+  ].forEach(testCase => {
+    it(`generates expected state when ${testCase.when}`, () => {
       const thread = generateRootThread(testCase.threads);
 
       fakeScrollRoot.scrollTop = testCase.scrollOffset;
@@ -134,37 +158,8 @@ describe('VirtualThreadList', function() {
         lastState.offscreenLowerHeight,
         testCase.expectedHeightBelow
       );
-    },
-    [
-      {
-        when: 'scrollRoot is scrolled to top of list',
-        threads: 100,
-        scrollOffset: 0,
-        windowHeight: 300,
-        expectedVisibleThreads: idRange(0, 5),
-        expectedHeightAbove: 0,
-        expectedHeightBelow: 18800,
-      },
-      {
-        when: 'scrollRoot is scrolled to middle of list',
-        threads: 100,
-        scrollOffset: 2000,
-        windowHeight: 300,
-        expectedVisibleThreads: idRange(5, 15),
-        expectedHeightAbove: 1000,
-        expectedHeightBelow: 16800,
-      },
-      {
-        when: 'scrollRoot is scrolled to bottom of list',
-        threads: 100,
-        scrollOffset: 18800,
-        windowHeight: 300,
-        expectedVisibleThreads: idRange(89, 99),
-        expectedHeightAbove: 17800,
-        expectedHeightBelow: 0,
-      },
-    ]
-  );
+    });
+  });
 
   it('recalculates when a window.resize occurs', function() {
     lastState = null;
@@ -184,9 +179,17 @@ describe('VirtualThreadList', function() {
   });
 
   describe('#setThreadHeight', function() {
-    unroll(
-      'affects visible threads',
-      function(testCase) {
+    [
+      {
+        threadHeight: 1000,
+        expectedVisibleThreads: idRange(0, 1),
+      },
+      {
+        threadHeight: 300,
+        expectedVisibleThreads: idRange(0, 4),
+      },
+    ].forEach(testCase => {
+      it('affects visible threads', () => {
         const thread = generateRootThread(10);
         fakeWindow.innerHeight = 500;
         fakeScrollRoot.scrollTop = 0;
@@ -198,18 +201,8 @@ describe('VirtualThreadList', function() {
           threadIDs(lastState.visibleThreads),
           testCase.expectedVisibleThreads
         );
-      },
-      [
-        {
-          threadHeight: 1000,
-          expectedVisibleThreads: idRange(0, 1),
-        },
-        {
-          threadHeight: 300,
-          expectedVisibleThreads: idRange(0, 4),
-        },
-      ]
-    );
+      });
+    });
   });
 
   describe('#detach', function() {
@@ -228,9 +221,24 @@ describe('VirtualThreadList', function() {
   });
 
   describe('#yOffsetOf', function() {
-    unroll(
-      'returns #offset as the Y offset of the #nth thread',
-      function(testCase) {
+    [
+      {
+        nth: 'first',
+        index: 0,
+        offset: 0,
+      },
+      {
+        nth: 'second',
+        index: 1,
+        offset: 100,
+      },
+      {
+        nth: 'last',
+        index: 9,
+        offset: 900,
+      },
+    ].forEach(testCase => {
+      it(`returns ${testCase.offset} as the Y offset of the ${testCase.nth} thread`, () => {
         const thread = generateRootThread(10);
         threadList.setRootThread(thread);
         idRange(0, 10).forEach(function(id) {
@@ -238,24 +246,7 @@ describe('VirtualThreadList', function() {
         });
         const id = idRange(testCase.index, testCase.index)[0];
         assert.equal(threadList.yOffsetOf(id), testCase.offset);
-      },
-      [
-        {
-          nth: 'first',
-          index: 0,
-          offset: 0,
-        },
-        {
-          nth: 'second',
-          index: 1,
-          offset: 100,
-        },
-        {
-          nth: 'last',
-          index: 9,
-          offset: 900,
-        },
-      ]
-    );
+      });
+    });
   });
 });

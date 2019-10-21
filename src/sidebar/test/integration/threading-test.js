@@ -3,8 +3,6 @@
 const angular = require('angular');
 const immutable = require('seamless-immutable');
 
-const unroll = require('../../../shared/test/util').unroll;
-
 const fixtures = immutable({
   annotations: [
     {
@@ -87,9 +85,17 @@ describe('annotation threading', function() {
     assert.equal(rootThread.thread(store.getState()).children[0].id, '2');
   });
 
-  unroll(
-    'should sort annotations by #mode',
-    function(testCase) {
+  [
+    {
+      sortKey: 'Oldest',
+      expectedOrder: ['1', '2'],
+    },
+    {
+      sortKey: 'Newest',
+      expectedOrder: ['2', '1'],
+    },
+  ].forEach(testCase => {
+    it(`should sort annotations by ${testCase.mode}`, () => {
       store.addAnnotations(fixtures.annotations);
       store.setSortKey(testCase.sortKey);
       const actualOrder = rootThread
@@ -98,16 +104,6 @@ describe('annotation threading', function() {
           return thread.annotation.id;
         });
       assert.deepEqual(actualOrder, testCase.expectedOrder);
-    },
-    [
-      {
-        sortKey: 'Oldest',
-        expectedOrder: ['1', '2'],
-      },
-      {
-        sortKey: 'Newest',
-        expectedOrder: ['2', '1'],
-      },
-    ]
-  );
+    });
+  });
 });

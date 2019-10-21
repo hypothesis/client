@@ -4,13 +4,11 @@ const angular = require('angular');
 
 const events = require('../../events');
 const fixtures = require('../../test/annotation-fixtures');
-const testUtil = require('../../../shared/test/util');
 const util = require('../../directive/test/util');
 
 const annotationComponent = require('../annotation');
 
 const inject = angular.mock.inject;
-const unroll = testUtil.unroll;
 
 const draftFixtures = {
   shared: { text: 'draft', tags: [], isPrivate: false },
@@ -917,9 +915,39 @@ describe('annotation', function() {
     });
 
     describe('#shouldShowLicense', function() {
-      unroll(
-        'returns #expected if #case_',
-        function(testCase) {
+      [
+        {
+          case_: 'the annotation is not being edited',
+          draft: null,
+          group: groupFixtures.open,
+          expected: false,
+        },
+        {
+          case_: 'the draft is private',
+          draft: draftFixtures.private,
+          group: groupFixtures.open,
+          expected: false,
+        },
+        {
+          case_: 'the group is private',
+          draft: draftFixtures.shared,
+          group: groupFixtures.private,
+          expected: false,
+        },
+        {
+          case_: 'the draft is shared and the group is open',
+          draft: draftFixtures.shared,
+          group: groupFixtures.open,
+          expected: true,
+        },
+        {
+          case_: 'the draft is shared and the group is restricted',
+          draft: draftFixtures.shared,
+          group: groupFixtures.restricted,
+          expected: true,
+        },
+      ].forEach(testCase => {
+        it(`returns ${testCase.expected} if ${testCase.case_}`, () => {
           const ann = fixtures.publicAnnotation();
           ann.group = testCase.group.id;
           fakeStore.getDraft.returns(testCase.draft);
@@ -928,40 +956,8 @@ describe('annotation', function() {
           const controller = createDirective(ann).controller;
 
           assert.equal(controller.shouldShowLicense(), testCase.expected);
-        },
-        [
-          {
-            case_: 'the annotation is not being edited',
-            draft: null,
-            group: groupFixtures.open,
-            expected: false,
-          },
-          {
-            case_: 'the draft is private',
-            draft: draftFixtures.private,
-            group: groupFixtures.open,
-            expected: false,
-          },
-          {
-            case_: 'the group is private',
-            draft: draftFixtures.shared,
-            group: groupFixtures.private,
-            expected: false,
-          },
-          {
-            case_: 'the draft is shared and the group is open',
-            draft: draftFixtures.shared,
-            group: groupFixtures.open,
-            expected: true,
-          },
-          {
-            case_: 'the draft is shared and the group is restricted',
-            draft: draftFixtures.shared,
-            group: groupFixtures.restricted,
-            expected: true,
-          },
-        ]
-      );
+        });
+      });
     });
 
     describe('#authorize', function() {
@@ -1272,9 +1268,32 @@ describe('annotation', function() {
       assert.equal(el[0].querySelector('blockquote').textContent, '<<-&->>');
     });
 
-    unroll(
-      'renders hidden annotations with a custom text class (#context)',
-      function(testCase) {
+    [
+      {
+        context: 'for moderators',
+        ann: Object.assign(fixtures.moderatedAnnotation({ hidden: true }), {
+          // Content still present.
+          text: 'Some offensive content',
+        }),
+        textClass: {
+          'annotation-body is-hidden': true,
+          'has-content': true,
+        },
+      },
+      {
+        context: 'for non-moderators',
+        ann: Object.assign(fixtures.moderatedAnnotation({ hidden: true }), {
+          // Content filtered out by service.
+          tags: [],
+          text: '',
+        }),
+        textClass: {
+          'annotation-body is-hidden': true,
+          'has-content': false,
+        },
+      },
+    ].forEach(testCase => {
+      it(`renders hidden annotations with a custom text class (${testCase.context})`, () => {
         const el = createDirective(testCase.ann).element;
         assert.match(
           el.find('markdown-view').controller('markdownView'),
@@ -1282,33 +1301,8 @@ describe('annotation', function() {
             textClass: testCase.textClass,
           })
         );
-      },
-      [
-        {
-          context: 'for moderators',
-          ann: Object.assign(fixtures.moderatedAnnotation({ hidden: true }), {
-            // Content still present.
-            text: 'Some offensive content',
-          }),
-          textClass: {
-            'annotation-body is-hidden': true,
-            'has-content': true,
-          },
-        },
-        {
-          context: 'for non-moderators',
-          ann: Object.assign(fixtures.moderatedAnnotation({ hidden: true }), {
-            // Content filtered out by service.
-            tags: [],
-            text: '',
-          }),
-          textClass: {
-            'annotation-body is-hidden': true,
-            'has-content': false,
-          },
-        },
-      ]
-    );
+      });
+    });
 
     it('flags the annotation when the user clicks the "Flag" button', function() {
       fakeAnnotationMapper.flagAnnotation.returns(Promise.resolve());

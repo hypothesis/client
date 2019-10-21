@@ -3,8 +3,6 @@
 const annotationMetadata = require('../annotation-metadata');
 const fixtures = require('../../test/annotation-fixtures');
 
-const unroll = require('../../../shared/test/util').unroll;
-
 const documentMetadata = annotationMetadata.documentMetadata;
 const domainAndTitle = annotationMetadata.domainAndTitle;
 
@@ -288,23 +286,21 @@ describe('annotation-metadata', function() {
       assert.isTrue(annotationMetadata.isPublic(fixtures.publicAnnotation()));
     });
 
-    unroll(
-      'returns false if an annotation is not publicly readable',
-      function(testCase) {
+    [
+      {
+        read: ['acct:someemail@localhost'],
+      },
+      {
+        read: ['something invalid'],
+      },
+    ].forEach(testCase => {
+      it('returns false if an annotation is not publicly readable', () => {
         const annotation = Object.assign(fixtures.defaultAnnotation(), {
           permissions: testCase,
         });
         assert.isFalse(annotationMetadata.isPublic(annotation));
-      },
-      [
-        {
-          read: ['acct:someemail@localhost'],
-        },
-        {
-          read: ['something invalid'],
-        },
-      ]
-    );
+      });
+    });
 
     it('returns false if an annotation is missing permissions', function() {
       assert.isFalse(annotationMetadata.isPublic(fixtures.defaultAnnotation()));

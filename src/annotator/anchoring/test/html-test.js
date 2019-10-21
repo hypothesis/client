@@ -3,7 +3,6 @@
 const html = require('../html');
 
 const toResult = require('../../../shared/test/promise-util').toResult;
-const unroll = require('../../../shared/test/util').unroll;
 const fixture = require('./html-anchoring-fixture.html');
 
 /** Return all text node children of `container`. */
@@ -320,7 +319,7 @@ describe('HTML anchoring', function() {
     container.remove();
   });
 
-  const testCases = rangeSpecs.map(function(data) {
+  const testCases = rangeSpecs.map(data => {
     return {
       range: {
         startContainer: data[0],
@@ -333,9 +332,8 @@ describe('HTML anchoring', function() {
     };
   });
 
-  unroll(
-    'describes and anchors "#description"',
-    function(testCase) {
+  testCases.forEach(testCase => {
+    it(`describes and anchors ${testCase.description}`, () => {
       // Resolve the range descriptor to a DOM Range, verify that the expected
       // text was selected.
       const range = toRange(container, testCase.range);
@@ -373,9 +371,8 @@ describe('HTML anchoring', function() {
         });
       });
       return Promise.all(anchored);
-    },
-    testCases
-  );
+    });
+  });
 
   describe('When anchoring fails', function() {
     const validQuoteSelector = {
@@ -436,9 +433,8 @@ describe('HTML anchoring', function() {
       frame.remove();
     });
 
-    unroll(
-      'generates selectors which match the baseline (#name)',
-      function(fixture) {
+    fixtures.forEach(fixture => {
+      it(`generates selectors which match the baseline ${fixture.name}`, () => {
         let fixtureHtml = fixture.html;
         const annotations = fixture.annotations.rows;
 
@@ -471,9 +467,8 @@ describe('HTML anchoring', function() {
             });
         });
 
-        return Promise.all(annotationsChecked);
-      },
-      fixtures
-    );
+        Promise.all(annotationsChecked);
+      });
+    });
   });
 });
