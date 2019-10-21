@@ -88,7 +88,7 @@
     "npm-packlist": "^1.1.12",
     "postcss": "^7.0.13",
     "postcss-url": "^8.0.0",
-    "preact": "10.0.0",
+    "preact": "10.0.1",
     "prettier": "1.18.2",
     "puppeteer": "^1.2.0",
     "query-string": "^3.0.1",
