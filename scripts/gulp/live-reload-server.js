@@ -120,7 +120,9 @@ function LiveReloadServer(port, config) {
             });
 
             var embedScript = document.createElement('script');
-            embedScript.src = '${config.clientUrl}';
+            embedScript.src = '${
+              config.clientUrl
+            }'.replace('{current_host}', document.location.hostname);
             document.body.appendChild(embedScript);
 
             var iframeIsAdded = false;

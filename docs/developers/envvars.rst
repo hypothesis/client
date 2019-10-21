@@ -10,7 +10,3 @@ build tasks.
    the sidebar app's iframe), used when the host page does not contain a
    :option:`sidebarAppUrl` setting.
    ``https://hypothes.is/app.html`` by default.
-
-.. envvar:: PACKAGE_SERVER_HOSTNAME
-
-   The hostname that is used to generate URLs to the package content server.

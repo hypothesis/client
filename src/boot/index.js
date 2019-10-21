@@ -13,9 +13,12 @@
 
 const boot = require('./boot');
 const settings = require('../shared/settings').jsonConfigsFrom(document);
+const processUrlTemplate = require('./url-template');
 
 boot(document, {
-  assetRoot: settings.assetRoot || '__ASSET_ROOT__',
+  assetRoot: processUrlTemplate(settings.assetRoot || '__ASSET_ROOT__'),
   manifest: __MANIFEST__,
-  sidebarAppUrl: settings.sidebarAppUrl || '__SIDEBAR_APP_URL__',
+  sidebarAppUrl: processUrlTemplate(
+    settings.sidebarAppUrl || '__SIDEBAR_APP_URL__'
+  ),
 });

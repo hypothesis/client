@@ -19,7 +19,6 @@ const createStyleBundle = require('./scripts/gulp/create-style-bundle');
 const manifest = require('./scripts/gulp/manifest');
 const servePackage = require('./scripts/gulp/serve-package');
 const vendorBundles = require('./scripts/gulp/vendor-bundles');
-const { useSsl } = require('./scripts/gulp/create-server');
 
 const IS_PRODUCTION_BUILD = process.env.NODE_ENV === 'production';
 const SCRIPT_DIR = 'build/scripts';
@@ -279,17 +278,6 @@ function triggerLiveReload(changedFiles) {
   debouncedLiveReload();
 }
 
-/**
- * Return the hostname that should be used when generating URLs to the package
- * content server.
- *
- * Customizing this can be useful when testing the client on different devices
- * than the one the package content server is running on.
- */
-function packageServerHostname() {
-  return process.env.PACKAGE_SERVER_HOSTNAME || 'localhost';
-}
-
 let isFirstBuild = true;
 
 /**
@@ -303,15 +291,14 @@ function generateBootScript(manifest) {
 
   const defaultSidebarAppUrl = process.env.SIDEBAR_APP_URL
     ? `${process.env.SIDEBAR_APP_URL}`
-    : 'http://localhost:5000/app.html';
+    : '{current_scheme}://{current_host}:5000/app.html';
 
   let defaultAssetRoot;
 
   if (process.env.NODE_ENV === 'production') {
     defaultAssetRoot = `https://cdn.hypothes.is/hypothesis/${version}/`;
   } else {
-    const scheme = useSsl ? 'https' : 'http';
-    defaultAssetRoot = `${scheme}://${packageServerHostname()}:3001/hypothesis/${version}/`;
+    defaultAssetRoot = `{current_scheme}://{current_host}:3001/hypothesis/${version}/`;
   }
 
   if (isFirstBuild) {
@@ -363,14 +350,15 @@ gulp.task('watch-manifest', function() {
 });
 
 gulp.task('serve-package', function() {
-  servePackage(3001, packageServerHostname());
+  servePackage(3001);
 });
 
 gulp.task('serve-live-reload', function() {
   const LiveReloadServer = require('./scripts/gulp/live-reload-server');
-  const scheme = useSsl ? 'https' : 'http';
   liveReloadServer = new LiveReloadServer(3000, {
-    clientUrl: `${scheme}://${packageServerHostname()}:3001/hypothesis`,
+    // The scheme is omitted here as the client asset server will use the same
+    // protcol (HTTP or HTTPS) as the test page server.
+    clientUrl: `//{current_host}:3001/hypothesis`,
   });
 });
 

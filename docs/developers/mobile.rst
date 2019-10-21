@@ -15,9 +15,11 @@ tested with at least current versions of iOS Safari and Chrome for Android.
    by editing ``conf/development-app.ini`` and changing the ``host`` setting from
    ``localhost`` to ``0.0.0.0``.
 
-#. Get the IP address or hostname of your development system (``<HOSTNAME>``
+#. Get the hostname of your development system (``<HOSTNAME>``
    in the steps below). You can do this using the ``hostname`` terminal command on
-   Mac/Linux.
+   macOS/Linux.
+
+   On macOS, this will typically be something like "Bobs-MacBookPro.local".
 
    .. tip::
 
@@ -39,26 +41,11 @@ tested with at least current versions of iOS Safari and Chrome for Android.
 
       make dev
 
-#. Set the :envvar:`SIDEBAR_APP_URL` and :envvar:`PACKAGE_SERVER_HOSTNAME`
-   environment variables to load assets from this hostname and start the dev
-   server:
+#. Make sure the "Redirect URL" of the OAuth client associated with your
+   development client matches `<HOSTNAME>`. You can configure the OAuth clients
+   registered with h at http://localhost:5000/admin/oauthclients.
 
-   .. code-block:: sh
-
-      # In the client repository
-
-      # Set URL which sidebar app ("app.html") is loaded from
-      export SIDEBAR_APP_URL=http://<HOSTNAME>:5000/app.html
-      # Set hostname used when generating client asset URLs
-      export PACKAGE_SERVER_HOSTNAME=<HOSTNAME>
-
-      make dev
-
-   .. tip::
-
-      When ``make dev`` runs, it will print out the URLs used for h
-      and client assets. These should include ``<HOSTNAME>`` instead of
-      ``localhost``.
+   This step is necessary to make logging into the client work.
 
 #. On your mobile device, go to a page which has the client embedded such as
    ``http://<HOSTNAME>:3000`` or ``http://<HOSTNAME>:5000/docs/help``.
