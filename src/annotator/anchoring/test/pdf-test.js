@@ -188,6 +188,19 @@ describe('annotator/anchoring/pdf', function() {
       });
     });
 
+    // See https://github.com/hypothesis/client/issues/1329
+    it('anchors selectors that match the last text on the page', async () => {
+      viewer.pdfViewer.setCurrentPage(1);
+      const selectors = [
+        {
+          type: 'TextQuoteSelector',
+          exact: 'horde of the living dead.',
+        },
+      ];
+      const anchoredRange = await pdfAnchoring.anchor(container, selectors);
+      assert.equal(anchoredRange.toString(), selectors[0].exact);
+    });
+
     [
       {
         // Position on same page as quote but different text.
