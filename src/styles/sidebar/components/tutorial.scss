@@ -1,0 +1,22 @@
+.tutorial {
+  &__list {
+    margin-top: 1em;
+    padding-left: 2em;
+  }
+
+  &__item {
+    margin: 0.5em 0;
+  }
+
+  &__icon {
+    width: 12px;
+    height: 12px;
+    color: $grey-5;
+    margin-right: 1px;
+    margin-bottom: -1px;
+  }
+
+  &__instruction {
+    white-space: nowrap;
+  }
+}

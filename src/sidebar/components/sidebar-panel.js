@@ -79,6 +79,7 @@ SidebarPanel.propTypes = {
   /** The panel's title: rendered in its containing visual "frame" */
   title: propTypes.string.isRequired,
 
+  /** Optional callback to invoke when this panel's active status changes */
   onActiveChanged: propTypes.func,
 };
 

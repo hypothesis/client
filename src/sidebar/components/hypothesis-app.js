@@ -4,6 +4,7 @@ const events = require('../events');
 const { parseAccountID } = require('../util/account-id');
 const serviceConfig = require('../service-config');
 const bridgeEvents = require('../../shared/bridge-events');
+const uiConstants = require('../ui-constants');
 
 /**
  * Return the user's authentication status from their profile.
@@ -73,6 +74,9 @@ function HypothesisAppController(
 
   session.load().then(profile => {
     self.auth = authStateFromProfile(profile);
+    if (store.isTutorialAutoDisplayed() && this.isSidebar) {
+      store.openSidebarPanel(uiConstants.PANEL_HELP);
+    }
   });
 
   /**
@@ -108,17 +112,6 @@ function HypothesisAppController(
       return;
     }
     $window.open(serviceUrl('signup'));
-  };
-
-  this.showHelpPanel = function() {
-    const service = serviceConfig(settings) || {};
-    if (service.onHelpRequestProvided) {
-      // Let the host page handle the help request.
-      bridge.call(bridgeEvents.HELP_REQUESTED);
-      return;
-    }
-
-    this.helpPanel.visible = true;
   };
 
   // Prompt to discard any unsaved drafts.

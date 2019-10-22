@@ -15,6 +15,16 @@
     border-bottom-style: solid;
   }
 
+  &__subheader {
+    width: 100%;
+    text-align: center;
+    padding: 1em 0.5em;
+    border-bottom: 1px solid $grey-3;
+    font-size: 1.25em;
+    font-weight: 500;
+    color: $grey-5;
+  }
+
   &__title {
     color: $brand;
     font-size: $body2-font-size;
@@ -44,7 +54,7 @@
   }
 
   &__content {
-    padding: 0.75em;
-    padding-top: 0;
+    margin: 1em;
+    margin-top: 0;
   }
 }

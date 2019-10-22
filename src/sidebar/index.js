@@ -153,10 +153,9 @@ function startAngularApp(config) {
     )
     .component('excerpt', require('./components/excerpt'))
     .component(
-      'helpLink',
-      wrapReactComponent(require('./components/help-link'))
+      'helpPanel',
+      wrapReactComponent(require('./components/help-panel'))
     )
-    .component('helpPanel', require('./components/help-panel'))
     .component(
       'loggedOutMessage',
       wrapReactComponent(require('./components/logged-out-message'))
@@ -194,7 +193,6 @@ function startAngularApp(config) {
       'shareAnnotationsPanel',
       wrapReactComponent(require('./components/share-annotations-panel'))
     )
-    .component('sidebarTutorial', require('./components/sidebar-tutorial'))
     .component('streamContent', require('./components/stream-content'))
     .component('svgIcon', wrapReactComponent(require('./components/svg-icon')))
     .component('tagEditor', require('./components/tag-editor'))

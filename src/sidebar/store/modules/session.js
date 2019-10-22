@@ -1,12 +1,18 @@
 'use strict';
 
+const serviceConfig = require('../../service-config');
 const util = require('../util');
 
-function init() {
+function init(settings) {
   /**
    * Profile/session information for the active user.
    */
+  const service = serviceConfig(settings) || {};
   return {
+    /** Whether handlers provided in service configuration for certain events */
+    configuredServiceEventHandlers: {
+      onHelpRequest: service.onHelpRequestProvided,
+    },
     /** A map of features that are enabled for the current user. */
     features: {},
     /** A map of preference names and values. */
@@ -59,6 +65,27 @@ function isFeatureEnabled(state, feature) {
 }
 
 /**
+ * Should the tutorial panel be auto-displayed on client launch?
+ */
+function isTutorialAutoDisplayed(state) {
+  return (
+    state.viewer.isSidebar &&
+    !!state.session.preferences.show_sidebar_tutorial &&
+    !state.session.configuredServiceEventHandlers.onHelpRequest
+  );
+}
+
+/**
+ * Does the current services configuration provide an event handler for
+ * `eventName`?
+ *
+ * @param {string} eventName
+ */
+function isServiceEventConfigured(state, eventName) {
+  return !!state.session.configuredServiceEventHandlers[eventName];
+}
+
+/**
  * Return the user's profile.
  *
  * Returns the current user's profile fetched from the `/api/profile` endpoint.
@@ -79,6 +106,8 @@ module.exports = {
   selectors: {
     isFeatureEnabled,
     isLoggedIn,
+    isServiceEventConfigured,
+    isTutorialAutoDisplayed,
     profile,
   },
 };

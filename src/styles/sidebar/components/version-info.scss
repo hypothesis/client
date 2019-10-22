@@ -1,0 +1,20 @@
+.version-info {
+  margin-bottom: 0;
+
+  &__key {
+    float: left;
+    width: 8em;
+    line-height: 1.25em;
+    margin-bottom: 0.5em;
+    padding-right: 1em;
+    text-align: right;
+    font-weight: 500;
+    color: $grey-6;
+  }
+
+  &__value {
+    margin-bottom: 0.5em;
+    margin-left: 8em;
+    color: $grey-6;
+  }
+}

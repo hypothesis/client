@@ -4,6 +4,7 @@ const { Fragment, createElement } = require('preact');
 const classnames = require('classnames');
 const propTypes = require('prop-types');
 
+const bridgeEvents = require('../../shared/bridge-events');
 const useStore = require('../store/use-store');
 const { applyTheme } = require('../util/theme');
 const isThirdPartyService = require('../util/is-third-party-service');
@@ -23,10 +24,10 @@ const UserMenu = require('./user-menu');
  */
 function TopBar({
   auth,
+  bridge,
   isSidebar,
   onLogin,
   onLogout,
-  onShowHelpPanel,
   onSignUp,
   settings,
   streamer,
@@ -34,6 +35,9 @@ function TopBar({
   const useCleanTheme = settings.theme === 'clean';
   const showSharePageButton = !isThirdPartyService(settings);
   const loginLinkStyle = applyTheme(['accentColor'], settings);
+  const hasHelpEventConfigured = useStore(store =>
+    store.isServiceEventConfigured('onHelpRequest')
+  );
 
   const filterQuery = useStore(store => store.filterQuery());
   const setFilterQuery = useStore(store => store.setFilterQuery);
@@ -49,6 +53,14 @@ function TopBar({
 
   const toggleSharePanel = () => {
     togglePanelFn(uiConstants.PANEL_SHARE_ANNOTATIONS);
+  };
+
+  const requestHelp = () => {
+    if (hasHelpEventConfigured) {
+      bridge.call(bridgeEvents.HELP_REQUESTED);
+    } else {
+      togglePanelFn(uiConstants.PANEL_HELP);
+    }
   };
 
   const loginControl = (
@@ -84,7 +96,7 @@ function TopBar({
           <div className="top-bar__expander" />
           <button
             className="top-bar__btn top-bar__help-btn"
-            onClick={onShowHelpPanel}
+            onClick={requestHelp}
             title="Help"
             aria-label="Help"
           >
@@ -125,8 +137,11 @@ function TopBar({
             </button>
           )}
           <button
-            className="top-bar__btn top-bar__help-btn"
-            onClick={onShowHelpPanel}
+            className={classnames('top-bar__btn top-bar__help-btn', {
+              'top-bar__btn--active':
+                currentActivePanel === uiConstants.PANEL_HELP,
+            })}
+            onClick={requestHelp}
             title="Help"
             aria-label="Help"
           >
@@ -152,15 +167,12 @@ TopBar.propTypes = {
     username: propTypes.string,
   }),
 
+  bridge: propTypes.object.isRequired,
+
   /**
    * Flag indicating whether the app is the sidebar or a top-level page.
    */
   isSidebar: propTypes.bool,
-
-  /**
-   * Callback invoked when user clicks "Help" button.
-   */
-  onShowHelpPanel: propTypes.func,
 
   /**
    * Callback invoked when user clicks "Login" button.
@@ -178,6 +190,6 @@ TopBar.propTypes = {
   streamer: propTypes.object,
 };
 
-TopBar.injectedProps = ['settings', 'streamer'];
+TopBar.injectedProps = ['bridge', 'settings', 'streamer'];
 
 module.exports = withServices(TopBar);
