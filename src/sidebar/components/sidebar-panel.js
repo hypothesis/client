@@ -17,7 +17,7 @@ const SvgIcon = require('./svg-icon');
  * as providing a close button. Only one sidebar panel (as defined by the panel's
  * `panelName`) is active at one time.
  */
-function SidebarPanel({ children, panelName, title }) {
+function SidebarPanel({ children, panelName, title, onActiveChanged }) {
   const panelIsActive = useStore(store => store.isSidebarPanelOpen(panelName));
   const togglePanelFn = useStore(store => store.toggleSidebarPanel);
 
@@ -31,8 +31,11 @@ function SidebarPanel({ children, panelName, title }) {
       if (panelIsActive) {
         scrollIntoView(panelElement.current);
       }
+      if (typeof onActiveChanged === 'function') {
+        onActiveChanged(panelIsActive);
+      }
     }
-  }, [panelIsActive]);
+  }, [panelIsActive, onActiveChanged]);
 
   const closePanel = () => {
     togglePanelFn(panelName, false);
@@ -75,6 +78,8 @@ SidebarPanel.propTypes = {
 
   /** The panel's title: rendered in its containing visual "frame" */
   title: propTypes.string.isRequired,
+
+  onActiveChanged: propTypes.func,
 };
 
 module.exports = SidebarPanel;
