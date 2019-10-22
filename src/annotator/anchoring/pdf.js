@@ -9,9 +9,9 @@ const seek = require('dom-seek');
 const createNodeIterator = require('dom-node-iterator/polyfill')();
 
 const xpathRange = require('./range');
-const html = require('./html');
 const RenderingStates = require('../pdfjs-rendering-states');
 const { TextPositionAnchor, TextQuoteAnchor } = require('./types');
+const { toRange: textPositionToRange } = require('./text-position');
 
 // Caches for performance.
 
@@ -210,10 +210,9 @@ function findPage(offset) {
  *
  * @param {number} pageIndex - The PDF page index
  * @param {TextPositionAnchor} anchor - Anchor to locate in page
- * @param {Object} options - Options for `anchor.toSelector`
  * @return {Promise<Range>}
  */
-async function anchorByPosition(pageIndex, anchor, options) {
+async function anchorByPosition(pageIndex, anchor) {
   const page = await getPageView(pageIndex);
 
   let renderingDone = false;
@@ -221,11 +220,9 @@ async function anchorByPosition(pageIndex, anchor, options) {
     renderingDone = page.textLayer.renderingDone;
   }
   if (page.renderingState === RenderingStates.FINISHED && renderingDone) {
-    // The page has been rendered. Use HTML anchoring to locate the quote in
-    // the text layer.
+    // The page has been rendered. Locate the position in the text layer.
     const root = page.textLayer.textLayerDiv;
-    const selector = anchor.toSelector(options);
-    return html.anchor(root, [selector]);
+    return textPositionToRange(root, anchor.start, anchor.end);
   }
 
   // The page has not been rendered yet. Create a placeholder element and
@@ -371,7 +368,7 @@ function anchor(root, selectors, options = {}) {
         checkQuote(textContent.substr(start, length));
 
         const anchor = new TextPositionAnchor(root, start, end);
-        return anchorByPosition(index, anchor, options);
+        return anchorByPosition(index, anchor);
       });
     });
   }
@@ -386,7 +383,7 @@ function anchor(root, selectors, options = {}) {
         const { pageIndex, anchor } = quotePositionCache[quote.exact][
           position.start
         ];
-        return anchorByPosition(pageIndex, anchor, options);
+        return anchorByPosition(pageIndex, anchor);
       }
 
       return prioritizePages(position).then(pageIndices => {
