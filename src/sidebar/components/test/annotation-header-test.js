@@ -3,7 +3,6 @@
 const { createElement } = require('preact');
 const { shallow } = require('enzyme');
 
-const unroll = require('../../../shared/test/util').unroll;
 const fixtures = require('../../test/annotation-fixtures');
 
 const AnnotationHeader = require('../annotation-header');
@@ -36,30 +35,28 @@ describe('AnnotationHeader', () => {
       assert.equal(replyCollapseLink.prop('onClick'), fakeCallback);
     });
 
-    unroll(
-      'it should render the annotation reply count',
-      testCase => {
+    [
+      {
+        replyCount: 0,
+        expected: '0 replies',
+      },
+      {
+        replyCount: 1,
+        expected: '1 reply',
+      },
+      {
+        replyCount: 2,
+        expected: '2 replies',
+      },
+    ].forEach(testCase => {
+      it(`it should render the annotation reply count (${testCase.replyCount})`, () => {
         const wrapper = createAnnotationHeader({
           replyCount: testCase.replyCount,
         });
         const replyCollapseLink = wrapper.find('.annotation-link');
         assert.equal(replyCollapseLink.text(), testCase.expected);
-      },
-      [
-        {
-          replyCount: 0,
-          expected: '0 replies',
-        },
-        {
-          replyCount: 1,
-          expected: '1 reply',
-        },
-        {
-          replyCount: 2,
-          expected: '2 replies',
-        },
-      ]
-    );
+      });
+    });
   });
 
   describe('timestamps', () => {

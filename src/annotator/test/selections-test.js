@@ -1,7 +1,5 @@
 'use strict';
 
-const unroll = require('../../shared/test/util').unroll;
-
 const observable = require('../util/observable');
 const selections = require('../selections');
 
@@ -61,15 +59,11 @@ describe('selections', function() {
     clock.restore();
   });
 
-  unroll(
-    'emits the selected range when #event occurs',
-    function(testCase) {
-      fakeDocument.dispatchEvent({ type: testCase.event });
-      clock.tick(testCase.delay);
-      assert.calledWith(onSelectionChanged, range);
-    },
-    [{ event: 'mouseup', delay: 20 }]
-  );
+  it('emits the selected range when mouseup occurs', function() {
+    fakeDocument.dispatchEvent({ type: 'mouseup' });
+    clock.tick(20);
+    assert.calledWith(onSelectionChanged, range);
+  });
 
   it('emits an event if there is a selection at the initial subscription', function() {
     const onInitialSelection = sinon.stub();

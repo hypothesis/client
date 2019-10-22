@@ -2,7 +2,6 @@
 
 const angular = require('angular');
 
-const unroll = require('../../../shared/test/util').unroll;
 const util = require('./util');
 
 function testComponent() {
@@ -35,22 +34,20 @@ describe('hOnTouch', function() {
     testEl = util.createDirective(document, 'test', {});
   });
 
-  unroll(
-    'calls the handler when activated with a "#event" event',
-    function(testCase) {
+  [
+    {
+      event: 'touchstart',
+    },
+    {
+      event: 'mousedown',
+    },
+    {
+      event: 'click',
+    },
+  ].forEach(testCase => {
+    it(`calls the handler when activated with a "${testCase.event}" event`, () => {
       util.sendEvent(testEl[0].querySelector('div'), testCase.event);
       assert.equal(testEl.ctrl.tapCount, 1);
-    },
-    [
-      {
-        event: 'touchstart',
-      },
-      {
-        event: 'mousedown',
-      },
-      {
-        event: 'click',
-      },
-    ]
-  );
+    });
+  });
 });

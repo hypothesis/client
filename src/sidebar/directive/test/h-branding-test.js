@@ -1,7 +1,6 @@
 'use strict';
 
 const angular = require('angular');
-const unroll = require('../../../shared/test/util').unroll;
 
 describe('BrandingDirective', function() {
   let $compile;
@@ -62,9 +61,8 @@ describe('BrandingDirective', function() {
     assert.equal(el[0].style.backgroundColor, '');
   });
 
-  unroll(
-    'applies branding to elements',
-    function(testCase) {
+  require('./h-branding-fixtures').forEach(testCase => {
+    it('applies branding to elements', () => {
       applyBrandingSettings(testCase.settings);
 
       const el = makeElementWithAttrs(testCase.attrs);
@@ -84,7 +82,6 @@ describe('BrandingDirective', function() {
           testCase.expectedPropValue
         );
       }
-    },
-    require('./h-branding-fixtures')
-  );
+    });
+  });
 });

@@ -2,7 +2,6 @@
 
 const { createElement } = require('preact');
 const { shallow } = require('enzyme');
-const unroll = require('../../../shared/test/util').unroll;
 
 const ShareAnnotationsPanel = require('../share-annotations-panel');
 const SidebarPanel = require('../sidebar-panel');
@@ -95,9 +94,24 @@ describe('ShareAnnotationsPanel', () => {
     });
   });
 
-  unroll(
-    'it displays appropriate help text depending on group type',
-    testCase => {
+  [
+    {
+      groupType: 'private',
+      introPattern: /Use this link.*with other group members/,
+      visibilityPattern: /Annotations in the private group.*are only visible to group members/,
+    },
+    {
+      groupType: 'restricted',
+      introPattern: /Use this link to share these annotations with anyone/,
+      visibilityPattern: /Anyone using this link may view the annotations in the group/,
+    },
+    {
+      groupType: 'open',
+      introPattern: /Use this link to share these annotations with anyone/,
+      visibilityPattern: /Anyone using this link may view the annotations in the group/,
+    },
+  ].forEach(testCase => {
+    it('it displays appropriate help text depending on group type', () => {
       fakeStore.focusedGroup.returns({
         type: testCase.groupType,
         name: 'Test Group',
@@ -115,25 +129,8 @@ describe('ShareAnnotationsPanel', () => {
         wrapper.find('.share-annotations-panel').text(),
         testCase.visibilityPattern
       );
-    },
-    [
-      {
-        groupType: 'private',
-        introPattern: /Use this link.*with other group members/,
-        visibilityPattern: /Annotations in the private group.*are only visible to group members/,
-      },
-      {
-        groupType: 'restricted',
-        introPattern: /Use this link to share these annotations with anyone/,
-        visibilityPattern: /Anyone using this link may view the annotations in the group/,
-      },
-      {
-        groupType: 'open',
-        introPattern: /Use this link to share these annotations with anyone/,
-        visibilityPattern: /Anyone using this link may view the annotations in the group/,
-      },
-    ]
-  );
+    });
+  });
 
   describe('web share link', () => {
     it('displays web share link in readonly form input', () => {

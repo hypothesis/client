@@ -1,7 +1,6 @@
 'use strict';
 
 const commands = require('../markdown-commands');
-const unroll = require('../../shared/test/util').unroll;
 
 /**
  * Convert a string containing '<sel>' and '</sel>' markers
@@ -84,7 +83,7 @@ describe('markdown commands', function() {
   });
 
   describe('block formatting', function() {
-    const FIXTURES = [
+    [
       {
         tag: 'adds formatting to blocks',
         input: 'one\n<sel>two\nthree</sel>\nfour',
@@ -105,19 +104,15 @@ describe('markdown commands', function() {
         input: '<sel></sel>',
         output: '> <sel></sel>',
       },
-    ];
-
-    unroll(
-      '#tag',
-      function(fixture) {
+    ].forEach(fixture => {
+      it(fixture.tag, () => {
         const output = commands.toggleBlockStyle(
           parseState(fixture.input),
           '> '
         );
         assert.equal(formatState(output), fixture.output);
-      },
-      FIXTURES
-    );
+      });
+    });
   });
 
   describe('link formatting', function() {
@@ -125,35 +120,31 @@ describe('markdown commands', function() {
       return commands.convertSelectionToLink(parseState(text), linkType);
     };
 
-    unroll(
-      'converts text to links',
-      function(testCase) {
+    [{ selection: 'two' }, { selection: 'jim:smith' }].forEach(testCase => {
+      it('converts text to links', () => {
         const sel = testCase.selection;
         const output = linkify('one <sel>' + sel + '</sel> three');
         assert.equal(
           formatState(output),
           'one [' + sel + '](<sel>http://insert-your-link-here.com</sel>) three'
         );
-      },
-      [{ selection: 'two' }, { selection: 'jim:smith' }]
-    );
+      });
+    });
 
-    unroll(
-      'converts URLs to links',
-      function(testCase) {
+    [
+      { selection: 'http://foobar.com' },
+      { selection: 'https://twitter.com/username' },
+      { selection: ' http://example.com/url-with-a-leading-space' },
+    ].forEach(testCase => {
+      it(`converts URLs to links`, () => {
         const sel = testCase.selection;
         const output = linkify('one <sel>' + sel + '</sel> three');
         assert.equal(
           formatState(output),
           'one [<sel>Description</sel>](' + sel + ') three'
         );
-      },
-      [
-        { selection: 'http://foobar.com' },
-        { selection: 'https://twitter.com/username' },
-        { selection: ' http://example.com/url-with-a-leading-space' },
-      ]
-    );
+      });
+    });
 
     it('converts URLs to image links', function() {
       const output = linkify(
