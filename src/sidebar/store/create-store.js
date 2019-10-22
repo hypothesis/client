@@ -71,7 +71,7 @@ function createStore(modules, initArgs = [], middleware = []) {
   // Add actions and selectors as methods to the store.
   const actions = Object.assign({}, ...modules.map(m => m.actions));
   const boundActions = redux.bindActionCreators(actions, store.dispatch);
-  const boundSelectors = bindSelectors(allSelectors, store.getState);
+  const boundSelectors = bindSelectors(allSelectors, store.getState, store);
 
   Object.assign(store, boundActions, boundSelectors);
 

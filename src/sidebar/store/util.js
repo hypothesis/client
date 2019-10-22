@@ -41,14 +41,17 @@ function createReducer(actionToUpdateFn) {
  * level. The keys to this object are functions that call the original
  * selectors with the `state` argument set to the current value of `getState()`.
  */
-function bindSelectors(namespaces, getState) {
+function bindSelectors(namespaces, getState, store) {
   const totalSelectors = {};
   Object.keys(namespaces).forEach(namespace => {
     const selectors = namespaces[namespace].selectors;
     Object.keys(selectors).forEach(selector => {
       totalSelectors[selector] = function() {
         const args = [].slice.apply(arguments);
-        args.unshift(getState());
+        args.unshift({
+          ...getState(),
+          getStore: ()=>(store)
+        });
         return selectors[selector].apply(null, args);
       };
     });
