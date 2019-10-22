@@ -342,10 +342,9 @@ function prioritizePages(position) {
  *
  * @param {HTMLElement} root
  * @param {Array} selectors - Selector objects to anchor
- * @param {Object} options - Options to pass to selector anchoring
  * @return {Promise<Range>}
  */
-function anchor(root, selectors, options = {}) {
+function anchor(root, selectors) {
   const position = selectors.find(s => s.type === 'TextPositionSelector');
   const quote = selectors.find(s => s.type === 'TextQuoteSelector');
 
