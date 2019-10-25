@@ -2,6 +2,7 @@
 
 const uuid = require('node-uuid');
 const MQTT = require('paho-mqtt');
+const authErrorRedirectionHandler = require('./authErrorRedirectionHandler');
 
 function PahoMQTTClientWrapper(store, url, annotationUpdateChannels, userId, csrfToken, onMessageReceived) {
     let client;
@@ -76,6 +77,8 @@ function PahoMQTTClientWrapper(store, url, annotationUpdateChannels, userId, csr
                     console.error('Error getting new websocket url', error);
                     if (error.errorType !== 'NOT_LOGGED_IN') {
                         reconnectClient();
+                    } else {
+                        authErrorRedirectionHandler();
                     }
                 });
         }, 20000);

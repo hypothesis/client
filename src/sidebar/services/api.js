@@ -4,6 +4,8 @@ const get = require('lodash.get');
 
 const urlUtil = require('../util/url-util');
 
+const authErrorRedirectionHandler = require('../../inspera/scripts/authErrorRedirectionHandler');
+
 /**
  * Translate the response from a failed API call into an Error-like object.
  *
@@ -195,6 +197,9 @@ function createAPICall(
         }
       })
       .catch(function(response) {
+        if (response.status === 401) {
+          authErrorRedirectionHandler(); 
+        }
         onRequestFinished();
 
         // Translate the API result into an `Error` to follow the convention that
