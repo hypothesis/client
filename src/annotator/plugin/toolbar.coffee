@@ -1,6 +1,5 @@
 Plugin = require('../plugin')
 $ = require('jquery')
-configFrom = require('../config/index')
 
 
 makeButton = (item) ->
@@ -30,9 +29,12 @@ module.exports = class Toolbar extends Plugin
     else
       $(@element).append @toolbar
 
-    config = configFrom(window);
-    # config.showHighlights will be either 'always' or 'never'
-    highlightsAreVisible = if config.showHighlights == 'never' then false else true
+    # Get the parsed configuration to determine the initial state of the buttons.
+    # nb. This duplicates state that lives elsewhere. To avoid it getting out
+    # of sync, it would be better if that initial state were passed in.
+    config = @annotator.options
+    highlightsAreVisible = config.showHighlights == 'always'
+    isSidebarOpen = config.openSidebar
 
     items = [
       "title": "Close Sidebar"
@@ -46,7 +48,7 @@ module.exports = class Toolbar extends Plugin
           @toolbar.find('[name=sidebar-close]').hide();
     ,
       "title": "Toggle or Resize Sidebar"
-      "ariaPressed": config.openSidebar
+      "ariaPressed": isSidebarOpen
       "class": "annotator-frame-button--sidebar_toggle h-icon-chevron-left"
       "name": "sidebar-toggle"
       "on":
@@ -95,12 +97,12 @@ module.exports = class Toolbar extends Plugin
 
   onSetVisibleHighlights: (state) ->
     if state
-      $('[name=highlight-visibility]')
+      @element.find('[name=highlight-visibility]')
       .removeClass('h-icon-visibility-off')
       .addClass('h-icon-visibility')
       .attr('aria-pressed', 'true')
     else
-      $('[name=highlight-visibility]')
+      @element.find('[name=highlight-visibility]')
       .removeClass('h-icon-visibility')
       .addClass('h-icon-visibility-off')
       .attr('aria-pressed', 'false')
