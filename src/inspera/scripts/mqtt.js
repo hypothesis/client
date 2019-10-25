@@ -62,7 +62,9 @@ function PahoMQTTClientWrapper(store, url, annotationUpdateChannels, userId, csr
             console.info('Reconnecting');
             fetch('/ICSXapi/assessment/GetSignedWebSocketUrl?token=' + csrfToken)
                 .then(function(response) {
-                    authErrorRedirectionHandler(response);
+                    if (response.status === 401) {
+                        return Promise.reject({ response, errorType: 'NOT_LOGGED_IN' });
+                    }
                     return response.json();
                 })
                 .then(function(data) {
@@ -73,7 +75,11 @@ function PahoMQTTClientWrapper(store, url, annotationUpdateChannels, userId, csr
                 })
                 .catch(function(error) {
                     console.error('Error getting new websocket url', error);
-                    reconnectClient();
+                    if (error.errorType !== 'NOT_LOGGED_IN') {
+                        reconnectClient();
+                    } else {
+                        authErrorRedirectionHandler();
+                    }
                 });
         }, 20000);
     };
