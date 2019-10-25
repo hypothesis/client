@@ -1,11 +1,13 @@
 Plugin = require('../plugin')
 $ = require('jquery')
 
+
 makeButton = (item) ->
   anchor = $('<button></button>')
   .attr('href', '')
   .attr('title', item.title)
   .attr('name', item.name)
+  .attr('aria-pressed', item.ariaPressed)
   .on(item.on)
   .addClass('annotator-frame-button')
   .addClass(item.class)
@@ -27,6 +29,13 @@ module.exports = class Toolbar extends Plugin
     else
       $(@element).append @toolbar
 
+    # Get the parsed configuration to determine the initial state of the buttons.
+    # nb. This duplicates state that lives elsewhere. To avoid it getting out
+    # of sync, it would be better if that initial state were passed in.
+    config = @annotator.options
+    highlightsAreVisible = config.showHighlights == 'always'
+    isSidebarOpen = config.openSidebar
+
     items = [
       "title": "Close Sidebar"
       "class": "annotator-frame-button--sidebar_close h-icon-close"
@@ -39,6 +48,7 @@ module.exports = class Toolbar extends Plugin
           @toolbar.find('[name=sidebar-close]').hide();
     ,
       "title": "Toggle or Resize Sidebar"
+      "ariaPressed": isSidebarOpen
       "class": "annotator-frame-button--sidebar_toggle h-icon-chevron-left"
       "name": "sidebar-toggle"
       "on":
@@ -48,12 +58,15 @@ module.exports = class Toolbar extends Plugin
           collapsed = @annotator.frame.hasClass('annotator-collapsed')
           if collapsed
             @annotator.show()
+            event.target.setAttribute('aria-pressed', true);
           else
             @annotator.hide()
+            event.target.setAttribute('aria-pressed', false);
     ,
-      "title": "Hide Highlights"
-      "class": "h-icon-visibility"
+      "title": "Toggle Highlights Visibility"
+      "class": if highlightsAreVisible then 'h-icon-visibility' else 'h-icon-visibility-off'
       "name": "highlight-visibility"
+      "ariaPressed": highlightsAreVisible
       "on":
         "click": (event) =>
           event.preventDefault()
@@ -84,15 +97,15 @@ module.exports = class Toolbar extends Plugin
 
   onSetVisibleHighlights: (state) ->
     if state
-      $('[name=highlight-visibility]')
+      @element.find('[name=highlight-visibility]')
       .removeClass('h-icon-visibility-off')
       .addClass('h-icon-visibility')
-      .prop('title', 'Hide Highlights');
+      .attr('aria-pressed', 'true')
     else
-      $('[name=highlight-visibility]')
+      @element.find('[name=highlight-visibility]')
       .removeClass('h-icon-visibility')
       .addClass('h-icon-visibility-off')
-      .prop('title', 'Show Highlights');
+      .attr('aria-pressed', 'false')
 
   disableMinimizeBtn: () ->
     $('[name=sidebar-toggle]').remove();
