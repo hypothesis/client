@@ -90,7 +90,7 @@
     "postcss-url": "^8.0.0",
     "preact": "10.0.1",
     "prettier": "1.18.2",
-    "puppeteer": "^1.2.0",
+    "puppeteer": "^2.0.0",
     "query-string": "^3.0.1",
     "raf": "^3.1.0",
     "redux": "^4.0.1",
