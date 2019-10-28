@@ -5,6 +5,9 @@
   },
   "rules": {
     // Suppressed to make ESLint v6 migration easier.
-    "no-prototype-builtins": "off"
+    "no-prototype-builtins": "off",
+
+    // Handled by Prettier.
+    "comma-dangle": "off"
   }
 }
