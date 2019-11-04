@@ -1,18 +1,19 @@
 'use strict';
 
 const { createElement } = require('preact');
-const { shallow } = require('enzyme');
+const { mount } = require('enzyme');
 
 const fixtures = require('../../test/annotation-fixtures');
 
 const AnnotationDocumentInfo = require('../annotation-document-info');
+const mockImportedComponents = require('./mock-imported-components');
 
 describe('AnnotationDocumentInfo', () => {
   let fakeDomainAndTitle;
   let fakeMetadata;
 
   const createAnnotationDocumentInfo = props => {
-    return shallow(
+    return mount(
       <AnnotationDocumentInfo
         annotation={fixtures.defaultAnnotation()}
         {...props}
@@ -23,6 +24,8 @@ describe('AnnotationDocumentInfo', () => {
   beforeEach(() => {
     fakeDomainAndTitle = sinon.stub();
     fakeMetadata = { domainAndTitle: fakeDomainAndTitle };
+
+    AnnotationDocumentInfo.$imports.$mock(mockImportedComponents());
     AnnotationDocumentInfo.$imports.$mock({
       '../util/annotation-metadata': fakeMetadata,
     });

@@ -1,18 +1,17 @@
 'use strict';
 
 const { createElement } = require('preact');
-const { shallow } = require('enzyme');
+const { mount } = require('enzyme');
 
 const SidebarPanel = require('../sidebar-panel');
+const mockImportedComponents = require('./mock-imported-components');
 
 describe('SidebarPanel', () => {
   let fakeStore;
   let fakeScrollIntoView;
 
   const createSidebarPanel = props =>
-    shallow(
-      <SidebarPanel panelName="testpanel" title="Test Panel" {...props} />
-    );
+    mount(<SidebarPanel panelName="testpanel" title="Test Panel" {...props} />);
 
   beforeEach(() => {
     fakeScrollIntoView = sinon.stub();
@@ -27,6 +26,7 @@ describe('SidebarPanel', () => {
       toggleSidebarPanel: sinon.stub(),
     };
 
+    SidebarPanel.$imports.$mock(mockImportedComponents());
     SidebarPanel.$imports.$mock({
       '../store/use-store': callback => callback(fakeStore),
       'scroll-into-view': fakeScrollIntoView,

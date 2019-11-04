@@ -1,9 +1,10 @@
 'use strict';
 
 const { createElement } = require('preact');
-const { shallow } = require('enzyme');
+const { mount } = require('enzyme');
 
 const AnnotationUser = require('../annotation-user');
+const mockImportedComponents = require('./mock-imported-components');
 
 describe('AnnotationUser', () => {
   let fakeAnnotation;
@@ -14,14 +15,14 @@ describe('AnnotationUser', () => {
   let fakeUsername;
 
   const createAnnotationUser = () => {
-    return shallow(
+    return mount(
       <AnnotationUser
         annotation={fakeAnnotation}
         features={fakeFeatures}
         serviceUrl={fakeServiceUrl}
         settings={fakeSettings}
       />
-    ).dive(); // Dive needed because of `withServices` usage in component
+    );
   };
 
   beforeEach(() => {
@@ -34,6 +35,7 @@ describe('AnnotationUser', () => {
     fakeSettings = {};
     fakeUsername = sinon.stub();
 
+    AnnotationUser.$imports.$mock(mockImportedComponents());
     AnnotationUser.$imports.$mock({
       '../util/account-id': {
         isThirdPartyUser: fakeIsThirdPartyUser,

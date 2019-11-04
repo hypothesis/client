@@ -1,11 +1,12 @@
 'use strict';
 
 const { createElement } = require('preact');
-const { shallow } = require('enzyme');
+const { mount } = require('enzyme');
 
 const fixtures = require('../../test/annotation-fixtures');
 
 const AnnotationShareInfo = require('../annotation-share-info');
+const mockImportedComponents = require('./mock-imported-components');
 
 describe('AnnotationShareInfo', () => {
   let fakeGroup;
@@ -13,7 +14,7 @@ describe('AnnotationShareInfo', () => {
   let fakeGetGroup;
 
   const createAnnotationShareInfo = props => {
-    return shallow(
+    return mount(
       <AnnotationShareInfo
         annotation={fixtures.defaultAnnotation()}
         isPrivate={false}
@@ -33,6 +34,7 @@ describe('AnnotationShareInfo', () => {
     fakeGetGroup = sinon.stub().returns(fakeGroup);
     fakeStore = { getGroup: fakeGetGroup };
 
+    AnnotationShareInfo.$imports.$mock(mockImportedComponents());
     AnnotationShareInfo.$imports.$mock({
       '../store/use-store': callback => callback(fakeStore),
     });

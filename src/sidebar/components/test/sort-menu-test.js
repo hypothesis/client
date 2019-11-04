@@ -1,17 +1,17 @@
 'use strict';
 
 const { createElement } = require('preact');
-const { shallow } = require('enzyme');
+const { mount } = require('enzyme');
 
 const SortMenu = require('../sort-menu');
-const MenuItem = require('../menu-item');
+const mockImportedComponents = require('./mock-imported-components');
 
 describe('SortMenu', () => {
   let fakeState;
   let fakeStore;
 
   const createSortMenu = () => {
-    return shallow(<SortMenu />);
+    return mount(<SortMenu />);
   };
 
   beforeEach(() => {
@@ -26,6 +26,7 @@ describe('SortMenu', () => {
       getState: sinon.stub().returns(fakeState),
     };
 
+    SortMenu.$imports.$mock(mockImportedComponents());
     SortMenu.$imports.$mock({
       '../store/use-store': callback => callback(fakeStore),
     });
@@ -38,7 +39,7 @@ describe('SortMenu', () => {
   it('renders a menu item for each sort option', () => {
     const wrapper = createSortMenu();
 
-    const menuItems = wrapper.find(MenuItem);
+    const menuItems = wrapper.find('MenuItem');
 
     assert.lengthOf(menuItems, fakeState.selection.sortKeysAvailable.length);
     fakeState.selection.sortKeysAvailable.forEach(sortKey => {
@@ -53,7 +54,7 @@ describe('SortMenu', () => {
     const wrapper = createSortMenu();
 
     const currentSortKeyMenuItem = wrapper
-      .find(MenuItem)
+      .find('MenuItem')
       .filterWhere(
         menuItem => menuItem.prop('label') === fakeState.selection.sortKey
       );
@@ -62,7 +63,7 @@ describe('SortMenu', () => {
 
   it('sets the sort key via action when onClick callback invoked', () => {
     const wrapper = createSortMenu();
-    const menuItems = wrapper.find(MenuItem);
+    const menuItems = wrapper.find('MenuItem');
 
     menuItems.forEach(menuItem => {
       const callback = menuItem.prop('onClick');

@@ -1,9 +1,10 @@
 'use strict';
 
-const { shallow } = require('enzyme');
+const { mount } = require('enzyme');
 const { createElement } = require('preact');
 
 const SidebarContentError = require('../sidebar-content-error');
+const mockImportedComponents = require('./mock-imported-components');
 
 describe('SidebarContentError', () => {
   const createSidebarContentError = (
@@ -11,7 +12,7 @@ describe('SidebarContentError', () => {
     loggedInErrorMessage,
     isLoggedIn
   ) => {
-    return shallow(
+    return mount(
       <SidebarContentError
         loggedOutErrorMessage={loggedOutErrorMessage}
         loggedInErrorMessage={loggedInErrorMessage}
@@ -20,6 +21,14 @@ describe('SidebarContentError', () => {
       />
     );
   };
+
+  beforeEach(() => {
+    SidebarContentError.$imports.$mock(mockImportedComponents());
+  });
+
+  afterEach(() => {
+    SidebarContentError.$imports.$restore();
+  });
 
   it('shows error you may need to login to view message when logged out', () => {
     const isLoggedIn = false;

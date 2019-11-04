@@ -1,11 +1,10 @@
 'use strict';
 
-const { shallow } = require('enzyme');
+const { mount } = require('enzyme');
 const { createElement } = require('preact');
 
 const GroupListSection = require('../group-list-section');
-const GroupListItem = require('../group-list-item');
-const MenuSection = require('../menu-section');
+const mockImportedComponents = require('./mock-imported-components');
 
 describe('GroupListSection', () => {
   const testGroups = [
@@ -24,26 +23,34 @@ describe('GroupListSection', () => {
     heading = 'Test section',
     ...props
   } = {}) => {
-    return shallow(
+    return mount(
       <GroupListSection groups={groups} heading={heading} {...props} />
     );
   };
 
+  beforeEach(() => {
+    GroupListSection.$imports.$mock(mockImportedComponents());
+  });
+
+  afterEach(() => {
+    GroupListSection.$imports.$restore();
+  });
+
   it('renders heading', () => {
     const wrapper = createGroupListSection();
-    assert.equal(wrapper.find(MenuSection).prop('heading'), 'Test section');
+    assert.equal(wrapper.find('MenuSection').prop('heading'), 'Test section');
   });
 
   it('renders groups', () => {
     const wrapper = createGroupListSection();
-    assert.equal(wrapper.find(GroupListItem).length, testGroups.length);
+    assert.equal(wrapper.find('GroupListItem').length, testGroups.length);
   });
 
   it('expands group specified by `expandedGroup` prop', () => {
     const wrapper = createGroupListSection();
     for (let i = 0; i < testGroups.length; i++) {
       wrapper.setProps({ expandedGroup: testGroups[i] });
-      wrapper.find(GroupListItem).forEach((n, idx) => {
+      wrapper.find('GroupListItem').forEach((n, idx) => {
         assert.equal(n.prop('isExpanded'), idx === i);
       });
     }
@@ -53,7 +60,7 @@ describe('GroupListSection', () => {
     const onExpandGroup = sinon.stub();
     const wrapper = createGroupListSection({ onExpandGroup });
     wrapper
-      .find(GroupListItem)
+      .find('GroupListItem')
       .first()
       .props()
       .onExpand(true);
@@ -67,7 +74,7 @@ describe('GroupListSection', () => {
       onExpandGroup,
     });
     wrapper
-      .find(GroupListItem)
+      .find('GroupListItem')
       .first()
       .props()
       .onExpand(false);

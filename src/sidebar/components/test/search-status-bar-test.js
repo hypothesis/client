@@ -1,18 +1,17 @@
 'use strict';
 
-const { shallow } = require('enzyme');
+const { mount } = require('enzyme');
 const { createElement } = require('preact');
 
 const SearchStatusBar = require('../search-status-bar');
+const mockImportedComponents = require('./mock-imported-components');
 
 describe('SearchStatusBar', () => {
   let fakeRootThread;
   let fakeStore;
 
   function createComponent(props) {
-    return shallow(
-      <SearchStatusBar rootThread={fakeRootThread} {...props} />
-    ).dive(); // dive() needed because this component uses `withServices`
+    return mount(<SearchStatusBar rootThread={fakeRootThread} {...props} />);
   }
 
   beforeEach(() => {
@@ -30,6 +29,7 @@ describe('SearchStatusBar', () => {
       noteCount: sinon.stub().returns(0),
     };
 
+    SearchStatusBar.$imports.$mock(mockImportedComponents());
     SearchStatusBar.$imports.$mock({
       '../store/use-store': callback => callback(fakeStore),
     });

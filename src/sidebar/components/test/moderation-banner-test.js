@@ -1,10 +1,11 @@
 'use strict';
 
-const { shallow } = require('enzyme');
+const { mount } = require('enzyme');
 const { createElement } = require('preact');
 
 const ModerationBanner = require('../moderation-banner');
 const fixtures = require('../../test/annotation-fixtures');
+const mockImportedComponents = require('./mock-imported-components');
 
 const moderatedAnnotation = fixtures.moderatedAnnotation;
 
@@ -13,9 +14,9 @@ describe('ModerationBanner', () => {
   let fakeFlash;
 
   function createComponent(props) {
-    return shallow(
+    return mount(
       <ModerationBanner api={fakeApi} flash={fakeFlash} {...props} />
-    ).dive(); // dive() needed because this component uses `withServices`
+    );
   }
 
   beforeEach(() => {
@@ -30,6 +31,7 @@ describe('ModerationBanner', () => {
       },
     };
 
+    ModerationBanner.$imports.$mock(mockImportedComponents());
     ModerationBanner.$imports.$mock({
       '../store/use-store': callback =>
         callback({
@@ -83,7 +85,7 @@ describe('ModerationBanner', () => {
       if (testCase.expectVisible) {
         assert.notEqual(wrapper.text().trim(), '');
       } else {
-        assert.isFalse(wrapper.exists());
+        assert.equal(wrapper.text().trim(), '');
       }
     });
   });

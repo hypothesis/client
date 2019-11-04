@@ -1,10 +1,10 @@
 'use strict';
 
 const { createElement } = require('preact');
-const { shallow } = require('enzyme');
+const { mount } = require('enzyme');
 
 const UserMenu = require('../user-menu');
-const MenuItem = require('../menu-item');
+const mockImportedComponents = require('./mock-imported-components');
 
 describe('UserMenu', () => {
   let fakeAuth;
@@ -17,7 +17,7 @@ describe('UserMenu', () => {
   let fakeSettings;
 
   const createUserMenu = () => {
-    return shallow(
+    return mount(
       <UserMenu
         auth={fakeAuth}
         bridge={fakeBridge}
@@ -25,12 +25,12 @@ describe('UserMenu', () => {
         serviceUrl={fakeServiceUrl}
         settings={fakeSettings}
       />
-    ).dive(); // Dive needed because this component uses `withServices`
+    );
   };
 
   const findMenuItem = (wrapper, labelText) => {
     return wrapper
-      .find(MenuItem)
+      .find('MenuItem')
       .filterWhere(n => n.prop('label') === labelText);
   };
 
@@ -51,6 +51,7 @@ describe('UserMenu', () => {
       authDomain: 'hypothes.is',
     };
 
+    UserMenu.$imports.$mock(mockImportedComponents());
     UserMenu.$imports.$mock({
       '../util/account-id': {
         isThirdPartyUser: fakeIsThirdPartyUser,

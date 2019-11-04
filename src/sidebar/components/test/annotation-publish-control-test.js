@@ -1,10 +1,10 @@
 'use strict';
 
 const { createElement } = require('preact');
-const { shallow } = require('enzyme');
+const { mount } = require('enzyme');
 
 const AnnotationPublishControl = require('../annotation-publish-control');
-const MenuItem = require('../menu-item');
+const mockImportedComponents = require('./mock-imported-components');
 
 describe('AnnotationPublishControl', () => {
   let fakeGroup;
@@ -12,7 +12,7 @@ describe('AnnotationPublishControl', () => {
   let fakeApplyTheme;
 
   const createAnnotationPublishControl = (props = {}) => {
-    return shallow(
+    return mount(
       <AnnotationPublishControl
         group={fakeGroup}
         isDisabled={false}
@@ -23,7 +23,7 @@ describe('AnnotationPublishControl', () => {
         settings={fakeSettings}
         {...props}
       />
-    ).dive(); // Dive needed because this component uses `withServices`
+    );
   };
 
   beforeEach(() => {
@@ -40,6 +40,7 @@ describe('AnnotationPublishControl', () => {
 
     fakeApplyTheme = sinon.stub();
 
+    AnnotationPublishControl.$imports.$mock(mockImportedComponents());
     AnnotationPublishControl.$imports.$mock({
       '../util/theme': {
         applyTheme: fakeApplyTheme,
@@ -121,7 +122,7 @@ describe('AnnotationPublishControl', () => {
         const wrapper = createAnnotationPublishControl({
           onSetPrivacy: fakeOnSetPrivacy,
         });
-        const shareMenuItem = wrapper.find(MenuItem).first();
+        const shareMenuItem = wrapper.find('MenuItem').first();
 
         shareMenuItem.prop('onClick')();
 
@@ -130,7 +131,7 @@ describe('AnnotationPublishControl', () => {
 
       it('should have a label that is the name of the group', () => {
         const wrapper = createAnnotationPublishControl();
-        const shareMenuItem = wrapper.find(MenuItem).first();
+        const shareMenuItem = wrapper.find('MenuItem').first();
 
         assert.equal(shareMenuItem.prop('label'), fakeGroup.name);
       });
@@ -138,7 +139,7 @@ describe('AnnotationPublishControl', () => {
       context('private group', () => {
         it('should have a group icon', () => {
           const wrapper = createAnnotationPublishControl();
-          const shareMenuItem = wrapper.find(MenuItem).first();
+          const shareMenuItem = wrapper.find('MenuItem').first();
 
           assert.equal(shareMenuItem.prop('icon'), 'groups');
         });
@@ -150,7 +151,7 @@ describe('AnnotationPublishControl', () => {
 
         it('should have a public icon', () => {
           const wrapper = createAnnotationPublishControl();
-          const shareMenuItem = wrapper.find(MenuItem).first();
+          const shareMenuItem = wrapper.find('MenuItem').first();
 
           assert.equal(shareMenuItem.prop('icon'), 'public');
         });
@@ -163,7 +164,7 @@ describe('AnnotationPublishControl', () => {
         const wrapper = createAnnotationPublishControl({
           onSetPrivacy: fakeOnSetPrivacy,
         });
-        const privateMenuItem = wrapper.find(MenuItem).at(1);
+        const privateMenuItem = wrapper.find('MenuItem').at(1);
 
         privateMenuItem.prop('onClick')();
 
@@ -171,13 +172,13 @@ describe('AnnotationPublishControl', () => {
       });
       it('should use a private/lock icon', () => {
         const wrapper = createAnnotationPublishControl();
-        const privateMenuItem = wrapper.find(MenuItem).at(1);
+        const privateMenuItem = wrapper.find('MenuItem').at(1);
 
         assert.equal(privateMenuItem.prop('icon'), 'lock');
       });
       it('should have an "Only me" label', () => {
         const wrapper = createAnnotationPublishControl();
-        const privateMenuItem = wrapper.find(MenuItem).at(1);
+        const privateMenuItem = wrapper.find('MenuItem').at(1);
 
         assert.equal(privateMenuItem.prop('label'), 'Only Me');
       });

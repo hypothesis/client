@@ -1,11 +1,11 @@
 'use strict';
 
-const { shallow, mount } = require('enzyme');
+const { mount } = require('enzyme');
 const { createElement } = require('preact');
 
-const NewNoteBtn = require('../new-note-btn');
 const uiConstants = require('../../ui-constants');
 const SelectionTabs = require('../selection-tabs');
+const mockImportedComponents = require('./mock-imported-components');
 
 describe('SelectionTabs', function() {
   // mock services
@@ -18,23 +18,7 @@ describe('SelectionTabs', function() {
     isLoading: false,
   };
 
-  SelectionTabs.$imports.$mock({
-    '../store/use-store': callback => callback(fakeStore),
-  });
-
   function createComponent(props) {
-    return shallow(
-      <SelectionTabs
-        session={fakeSession}
-        settings={fakeSettings}
-        {...defaultProps}
-        {...props}
-      />
-    ).dive();
-  }
-
-  // required for <Tab> rendering
-  function createDeepComponent(props) {
     return mount(
       <SelectionTabs
         session={fakeSession}
@@ -69,6 +53,15 @@ describe('SelectionTabs', function() {
         },
       }),
     };
+
+    SelectionTabs.$imports.$mock(mockImportedComponents());
+    SelectionTabs.$imports.$mock({
+      '../store/use-store': callback => callback(fakeStore),
+    });
+  });
+
+  afterEach(() => {
+    SelectionTabs.$imports.$restore();
   });
 
   const unavailableMessage = wrapper =>
@@ -76,7 +69,7 @@ describe('SelectionTabs', function() {
 
   context('displays selection tabs and counts', function() {
     it('should display the tabs and counts of annotations and notes', function() {
-      const wrapper = createDeepComponent();
+      const wrapper = createComponent();
       const tabs = wrapper.find('a');
       assert.isTrue(tabs.at(0).contains('Annotations'));
       assert.equal(
@@ -97,7 +90,7 @@ describe('SelectionTabs', function() {
     });
 
     it('should display annotations tab as selected', function() {
-      const wrapper = createDeepComponent();
+      const wrapper = createComponent();
       const aTags = wrapper.find('a');
       assert.isTrue(aTags.at(0).hasClass('is-selected'));
     });
@@ -106,7 +99,7 @@ describe('SelectionTabs', function() {
       fakeStore.getState.returns({
         selection: { selectedTab: uiConstants.TAB_NOTES },
       });
-      const wrapper = createDeepComponent({});
+      const wrapper = createComponent({});
       const tabs = wrapper.find('a');
       assert.isTrue(tabs.at(1).hasClass('is-selected'));
     });
@@ -116,7 +109,7 @@ describe('SelectionTabs', function() {
         selection: { selectedTab: uiConstants.TAB_ORPHANS },
       });
       fakeStore.orphanCount.returns(1);
-      const wrapper = createDeepComponent({});
+      const wrapper = createComponent({});
       const tabs = wrapper.find('a');
       assert.isTrue(tabs.at(2).hasClass('is-selected'));
     });
@@ -125,7 +118,7 @@ describe('SelectionTabs', function() {
       fakeStore.getState.returns({
         selection: { selectedTab: uiConstants.TAB_ORPHANS },
       });
-      const wrapper = createDeepComponent({});
+      const wrapper = createComponent({});
       const tabs = wrapper.find('a');
       assert.equal(tabs.length, 2);
     });
@@ -143,7 +136,7 @@ describe('SelectionTabs', function() {
 
     it('should not display the new-note-btn when the annotations tab is active', function() {
       const wrapper = createComponent();
-      assert.equal(wrapper.find(NewNoteBtn).length, 0);
+      assert.equal(wrapper.find('NewNoteButton').length, 0);
     });
 
     it('should not display the new-note-btn when the notes tab is active and the new-note-btn is disabled', function() {
@@ -151,7 +144,7 @@ describe('SelectionTabs', function() {
         selection: { selectedTab: uiConstants.TAB_NOTES },
       });
       const wrapper = createComponent({});
-      assert.equal(wrapper.find(NewNoteBtn).length, 0);
+      assert.equal(wrapper.find('NewNoteButton').length, 0);
     });
 
     it('should display the new-note-btn when the notes tab is active and the new-note-btn is enabled', function() {
@@ -160,7 +153,7 @@ describe('SelectionTabs', function() {
         selection: { selectedTab: uiConstants.TAB_NOTES },
       });
       const wrapper = createComponent({});
-      assert.equal(wrapper.find(NewNoteBtn).length, 1);
+      assert.equal(wrapper.find('NewNoteButton').length, 1);
     });
 
     it('should not display a message when its loading annotation count is 0', function() {

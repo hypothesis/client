@@ -1,16 +1,12 @@
 'use strict';
 
 const { createElement } = require('preact');
-const { shallow } = require('enzyme');
+const { mount } = require('enzyme');
 
 const uiConstants = require('../../ui-constants');
 
-const GroupList = require('../group-list');
-const SearchInput = require('../search-input');
-const StreamSearchInput = require('../stream-search-input');
-const SortMenu = require('../sort-menu');
 const TopBar = require('../top-bar');
-const UserMenu = require('../user-menu');
+const mockImportedComponents = require('./mock-imported-components');
 
 describe('TopBar', () => {
   const fakeSettings = {};
@@ -37,6 +33,7 @@ describe('TopBar', () => {
       applyPendingUpdates: sinon.stub(),
     };
 
+    TopBar.$imports.$mock(mockImportedComponents());
     TopBar.$imports.$mock({
       '../store/use-store': callback => callback(fakeStore),
       '../util/is-third-party-service': fakeIsThirdPartyService,
@@ -57,7 +54,7 @@ describe('TopBar', () => {
 
   function createTopBar(props = {}) {
     const auth = { status: 'unknown' };
-    return shallow(
+    return mount(
       <TopBar
         auth={auth}
         isSidebar={true}
@@ -65,7 +62,7 @@ describe('TopBar', () => {
         streamer={fakeStreamer}
         {...props}
       />
-    ).dive(); // Dive through `withServices` wrapper.
+    );
   }
 
   it('shows the pending update count', () => {
@@ -137,7 +134,7 @@ describe('TopBar', () => {
       const wrapper = createTopBar({ auth, onLogout });
       assert.isFalse(getLoginText(wrapper).exists());
 
-      const userMenu = wrapper.find(UserMenu);
+      const userMenu = wrapper.find('UserMenu');
       assert.isTrue(userMenu.exists());
       assert.include(userMenu.props(), { auth, onLogout });
     });
@@ -192,7 +189,7 @@ describe('TopBar', () => {
   it('displays search input in the sidebar', () => {
     fakeStore.filterQuery.returns('test-query');
     const wrapper = createTopBar();
-    assert.equal(wrapper.find(SearchInput).prop('query'), 'test-query');
+    assert.equal(wrapper.find('SearchInput').prop('query'), 'test-query');
   });
 
   it('updates current filter when changing search query in the sidebar', () => {
@@ -203,7 +200,7 @@ describe('TopBar', () => {
 
   it('displays search input in the single annotation view / stream', () => {
     const wrapper = createTopBar({ isSidebar: false });
-    const searchInput = wrapper.find(StreamSearchInput);
+    const searchInput = wrapper.find('StreamSearchInput');
     assert.ok(searchInput.exists());
   });
 
@@ -216,8 +213,8 @@ describe('TopBar', () => {
   context('in the stream and single annotation pages', () => {
     it('does not render the group list, sort menu or share menu', () => {
       const wrapper = createTopBar({ isSidebar: false });
-      assert.isFalse(wrapper.exists(GroupList));
-      assert.isFalse(wrapper.exists(SortMenu));
+      assert.isFalse(wrapper.exists('GroupList'));
+      assert.isFalse(wrapper.exists('SortMenu'));
       assert.isFalse(wrapper.exists('button[title="Share this page"]'));
     });
 
@@ -227,7 +224,7 @@ describe('TopBar', () => {
         auth: { status: 'logged-in' },
       });
       assert.isTrue(wrapper.exists('button[title="Help"]'));
-      assert.isTrue(wrapper.exists(UserMenu));
+      assert.isTrue(wrapper.exists('UserMenu'));
     });
   });
 });

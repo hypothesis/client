@@ -1,10 +1,11 @@
 'use strict';
 
-const { shallow } = require('enzyme');
+const { mount } = require('enzyme');
 const { createElement } = require('preact');
 const { act } = require('preact/test-utils');
 
 const StreamSearchInput = require('../stream-search-input');
+const mockImportedComponents = require('./mock-imported-components');
 
 describe('StreamSearchInput', () => {
   let fakeLocation;
@@ -19,16 +20,22 @@ describe('StreamSearchInput', () => {
       $apply: callback => callback(),
       $on: sinon.stub(),
     };
+
+    StreamSearchInput.$imports.$mock(mockImportedComponents());
+  });
+
+  afterEach(() => {
+    StreamSearchInput.$imports.$restore();
   });
 
   function createSearchInput(props = {}) {
-    return shallow(
+    return mount(
       <StreamSearchInput
         $location={fakeLocation}
         $rootScope={fakeRootScope}
         {...props}
       />
-    ).dive(); // Dive through `withServices` wrapper.
+    );
   }
 
   it('displays current "q" search param', () => {

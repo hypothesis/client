@@ -1,9 +1,10 @@
 'use strict';
 
 const { createElement } = require('preact');
-const { shallow } = require('enzyme');
+const { mount } = require('enzyme');
 
 const HelpLink = require('../help-link');
+const mockImportedComponents = require('./mock-imported-components');
 
 describe('Help (mailto) Link', () => {
   let fakeAuth;
@@ -14,7 +15,7 @@ describe('Help (mailto) Link', () => {
   let fakeVersion;
 
   const createHelpLink = () => {
-    return shallow(
+    return mount(
       <HelpLink
         auth={fakeAuth}
         dateTime={fakeDateTime}
@@ -35,6 +36,12 @@ describe('Help (mailto) Link', () => {
     fakeUrl = 'http://www.example.com';
     fakeUserAgent = 'Some User Agent';
     fakeVersion = '1.0.0';
+
+    HelpLink.$imports.$mock(mockImportedComponents());
+  });
+
+  afterEach(() => {
+    HelpLink.$imports.$restore();
   });
 
   it('sets required props as part of formatted email body', () => {

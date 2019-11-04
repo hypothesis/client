@@ -1,17 +1,26 @@
 'use strict';
 
 const { createElement } = require('preact');
-const { shallow } = require('enzyme');
+const { mount } = require('enzyme');
 
 const MenuSection = require('../menu-section');
+const mockImportedComponents = require('./mock-imported-components');
 
 describe('MenuSection', () => {
   const createMenuSection = props =>
-    shallow(
+    mount(
       <MenuSection {...props}>
         <div className="menu-item">Test item</div>
       </MenuSection>
     );
+
+  beforeEach(() => {
+    MenuSection.$imports.$mock(mockImportedComponents());
+  });
+
+  afterEach(() => {
+    MenuSection.$imports.$restore();
+  });
 
   it('renders the heading', () => {
     const wrapper = createMenuSection({ heading: 'A heading' });
