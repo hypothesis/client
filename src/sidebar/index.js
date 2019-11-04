@@ -155,6 +155,8 @@ function startAngularApp(config) {
     .component(
       'helpLink',
       wrapReactComponent(require('./components/help-link'))
+      'helpPanel',
+      wrapReactComponent(require('./components/help-panel'))
     )
     .component('helpPanel', require('./components/help-panel'))
     .component(
