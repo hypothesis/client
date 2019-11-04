@@ -1,10 +1,10 @@
 'use strict';
 
 const { createElement } = require('preact');
-const { shallow } = require('enzyme');
+const { mount } = require('enzyme');
 
 const ShareAnnotationsPanel = require('../share-annotations-panel');
-const SidebarPanel = require('../sidebar-panel');
+const mockImportedComponents = require('./mock-imported-components');
 
 describe('ShareAnnotationsPanel', () => {
   let fakeStore;
@@ -19,13 +19,13 @@ describe('ShareAnnotationsPanel', () => {
   };
 
   const createShareAnnotationsPanel = props =>
-    shallow(
+    mount(
       <ShareAnnotationsPanel
         analytics={fakeAnalytics}
         flash={fakeFlash}
         {...props}
       />
-    ).dive(); // Needed because of `withServices`
+    );
 
   beforeEach(() => {
     fakeAnalytics = {
@@ -49,6 +49,7 @@ describe('ShareAnnotationsPanel', () => {
       }),
     };
 
+    ShareAnnotationsPanel.$imports.$mock(mockImportedComponents());
     ShareAnnotationsPanel.$imports.$mock({
       '../store/use-store': callback => callback(fakeStore),
       '../util/copy-to-clipboard': fakeCopyToClipboard,
@@ -64,7 +65,7 @@ describe('ShareAnnotationsPanel', () => {
       const wrapper = createShareAnnotationsPanel();
 
       assert.equal(
-        wrapper.find(SidebarPanel).prop('title'),
+        wrapper.find('SidebarPanel').prop('title'),
         'Share Annotations in Test Private Group'
       );
     });
@@ -74,7 +75,7 @@ describe('ShareAnnotationsPanel', () => {
 
       const wrapper = createShareAnnotationsPanel();
       assert.equal(
-        wrapper.find(SidebarPanel).prop('title'),
+        wrapper.find('SidebarPanel').prop('title'),
         'Share Annotations in ...'
       );
     });

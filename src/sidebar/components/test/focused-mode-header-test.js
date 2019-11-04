@@ -1,14 +1,15 @@
 'use strict';
 
-const { shallow } = require('enzyme');
+const { mount } = require('enzyme');
 const { createElement } = require('preact');
 
 const FocusedModeHeader = require('../focused-mode-header');
+const mockImportedComponents = require('./mock-imported-components');
 
 describe('FocusedModeHeader', function() {
   let fakeStore;
   function createComponent() {
-    return shallow(<FocusedModeHeader />);
+    return mount(<FocusedModeHeader />);
   }
 
   beforeEach(function() {
@@ -24,6 +25,8 @@ describe('FocusedModeHeader', function() {
       focusModeHasUser: sinon.stub().returns(true),
       setFocusModeFocused: sinon.stub(),
     };
+
+    FocusedModeHeader.$imports.$mock(mockImportedComponents());
     FocusedModeHeader.$imports.$mock({
       '../store/use-store': callback => callback(fakeStore),
     });

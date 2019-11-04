@@ -1,10 +1,11 @@
 'use strict';
 
-const { shallow } = require('enzyme');
+const { mount } = require('enzyme');
 const { createElement } = require('preact');
 const { act } = require('preact/test-utils');
 
 const GroupList = require('../group-list');
+const mockImportedComponents = require('./mock-imported-components');
 
 describe('GroupList', () => {
   let fakeServiceConfig;
@@ -19,9 +20,9 @@ describe('GroupList', () => {
   };
 
   function createGroupList() {
-    return shallow(
+    return mount(
       <GroupList serviceUrl={fakeServiceUrl} settings={fakeSettings} />
-    ).dive();
+    );
   }
 
   /**
@@ -59,6 +60,7 @@ describe('GroupList', () => {
     };
     fakeServiceConfig = sinon.stub().returns(null);
 
+    GroupList.$imports.$mock(mockImportedComponents());
     GroupList.$imports.$mock({
       '../store/use-store': callback => callback(fakeStore),
       '../service-config': fakeServiceConfig,
@@ -162,14 +164,14 @@ describe('GroupList', () => {
     fakeStore.focusedGroup.returns(null);
     const wrapper = createGroupList();
     const label = wrapper.find('Menu').prop('label');
-    assert.equal(shallow(label).text(), '…');
+    assert.equal(mount(label).text(), '…');
   });
 
   it('renders the publisher-provided icon in the toggle button', () => {
     fakeServiceConfig.returns({ icon: 'test-icon' });
     const wrapper = createGroupList();
     const label = wrapper.find('Menu').prop('label');
-    const img = shallow(label).find('img');
+    const img = mount(label).find('img');
     assert.equal(img.prop('src'), 'test-icon');
   });
 

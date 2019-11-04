@@ -1,13 +1,22 @@
 'use strict';
 
 const { createElement } = require('preact');
-const { shallow } = require('enzyme');
+const { mount } = require('enzyme');
 
 const MenuItem = require('../menu-item');
+const mockImportedComponents = require('./mock-imported-components');
 
 describe('MenuItem', () => {
   const createMenuItem = props =>
-    shallow(<MenuItem label="Test item" {...props} />);
+    mount(<MenuItem label="Test item" {...props} />);
+
+  beforeEach(() => {
+    MenuItem.$imports.$mock(mockImportedComponents());
+  });
+
+  afterEach(() => {
+    MenuItem.$imports.$restore();
+  });
 
   it('invokes `onClick` callback when clicked', () => {
     const onClick = sinon.stub();

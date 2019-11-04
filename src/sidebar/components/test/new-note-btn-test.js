@@ -1,10 +1,11 @@
 'use strict';
 
-const { shallow } = require('enzyme');
+const { mount } = require('enzyme');
 const { createElement } = require('preact');
 
 const events = require('../../events');
 const NewNoteButton = require('../new-note-btn');
+const mockImportedComponents = require('./mock-imported-components');
 
 describe('NewNoteButton', function() {
   let fakeStore;
@@ -12,13 +13,13 @@ describe('NewNoteButton', function() {
   let fakeRootScope;
 
   function createComponent() {
-    return shallow(
+    return mount(
       <NewNoteButton
         $rootScope={fakeRootScope}
         settings={fakeSettings}
         store={fakeStore}
       />
-    ).dive(); // dive() needed because this component uses `withServices`
+    );
   }
 
   beforeEach(function() {
@@ -39,6 +40,8 @@ describe('NewNoteButton', function() {
           { id: '1', uri: 'www.example.org' },
         ]),
     };
+
+    NewNoteButton.$imports.$mock(mockImportedComponents());
     NewNoteButton.$imports.$mock({
       '../store/use-store': callback => callback(fakeStore),
     });
@@ -54,7 +57,7 @@ describe('NewNoteButton', function() {
   });
 
   it("has a backgroundColor equal to the setting's ctaBackgroundColor color", () => {
-    const wrapper = createComponent();
+    const wrapper = createComponent().find('button');
     assert.equal(
       wrapper.prop('style').backgroundColor,
       fakeSettings.branding.ctaBackgroundColor

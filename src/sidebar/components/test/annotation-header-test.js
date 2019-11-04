@@ -1,17 +1,16 @@
 'use strict';
 
 const { createElement } = require('preact');
-const { shallow } = require('enzyme');
+const { mount } = require('enzyme');
 
 const fixtures = require('../../test/annotation-fixtures');
 
 const AnnotationHeader = require('../annotation-header');
-const AnnotationDocumentInfo = require('../annotation-document-info');
-const Timestamp = require('../timestamp');
+const mockImportedComponents = require('./mock-imported-components');
 
 describe('AnnotationHeader', () => {
   const createAnnotationHeader = props => {
-    return shallow(
+    return mount(
       <AnnotationHeader
         annotation={fixtures.defaultAnnotation()}
         isEditing={false}
@@ -24,6 +23,14 @@ describe('AnnotationHeader', () => {
       />
     );
   };
+
+  beforeEach(() => {
+    AnnotationHeader.$imports.$mock(mockImportedComponents());
+  });
+
+  afterEach(() => {
+    AnnotationHeader.$imports.$restore();
+  });
 
   describe('collapsed replies', () => {
     it('should have a callback', () => {
@@ -84,7 +91,7 @@ describe('AnnotationHeader', () => {
         annotation: annotation,
       });
       const timestamp = wrapper
-        .find(Timestamp)
+        .find('Timestamp')
         .filter('.annotation-header__timestamp-edited-link');
 
       assert.isTrue(timestamp.exists());
@@ -97,7 +104,7 @@ describe('AnnotationHeader', () => {
         annotation: fixtures.newAnnotation(),
       });
       const timestamp = wrapper
-        .find(Timestamp)
+        .find('Timestamp')
         .filter('.annotation-header__timestamp-edited-link');
 
       assert.isFalse(timestamp.exists());
@@ -130,7 +137,7 @@ describe('AnnotationHeader', () => {
     it('should render document info if `showDocumentInfo` is enabled', () => {
       const wrapper = createAnnotationHeader({ showDocumentInfo: true });
 
-      const documentInfo = wrapper.find(AnnotationDocumentInfo);
+      const documentInfo = wrapper.find('AnnotationDocumentInfo');
 
       assert.isTrue(documentInfo.exists());
     });
@@ -138,7 +145,7 @@ describe('AnnotationHeader', () => {
     it('should not render document info if `showDocumentInfo` is not enabled', () => {
       const wrapper = createAnnotationHeader({ showDocumentInfo: false });
 
-      const documentInfo = wrapper.find(AnnotationDocumentInfo);
+      const documentInfo = wrapper.find('AnnotationDocumentInfo');
 
       assert.isFalse(documentInfo.exists());
     });
@@ -151,7 +158,7 @@ describe('AnnotationHeader', () => {
         isEditing: true,
       });
 
-      const timestamp = wrapper.find(Timestamp);
+      const timestamp = wrapper.find('Timestamp');
 
       assert.isFalse(timestamp.exists());
     });

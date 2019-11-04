@@ -1,20 +1,29 @@
 'use strict';
 
 const { createElement } = require('preact');
-const { shallow } = require('enzyme');
+const { mount } = require('enzyme');
 
 const LoggedOutMessage = require('../logged-out-message');
+const mockImportedComponents = require('./mock-imported-components');
 
 describe('LoggedOutMessage', () => {
   const createLoggedOutMessage = props => {
-    return shallow(
+    return mount(
       <LoggedOutMessage
         onLogin={sinon.stub()}
         serviceUrl={sinon.stub()}
         {...props}
       />
-    ).dive(); // Dive needed because this component uses `withServices`
+    );
   };
+
+  beforeEach(() => {
+    LoggedOutMessage.$imports.$mock(mockImportedComponents());
+  });
+
+  afterEach(() => {
+    LoggedOutMessage.$imports.$restore();
+  });
 
   it('should link to signup', () => {
     const fakeServiceUrl = sinon.stub().returns('signup_link');

@@ -8,8 +8,20 @@ function isComponent(value) {
   );
 }
 
+/**
+ * Return the display name of a component, stripping away any the names of
+ * any wrapper components which use the `withWrapper(OriginalName)` convention.
+ */
 function getDisplayName(component) {
-  return component.displayName || component.name || 'UnknownComponent';
+  let displayName =
+    component.displayName || component.name || 'UnknownComponent';
+
+  const wrappedComponentMatch = displayName.match(/\([A-Z][A-Za-z0-9]+\)/);
+  if (wrappedComponentMatch) {
+    displayName = wrappedComponentMatch[0].slice(1, -1);
+  }
+
+  return displayName;
 }
 
 /**
@@ -17,7 +29,9 @@ function getDisplayName(component) {
  * imported by a file.
  *
  * Mocked components will have the same display name as the original component,
- * but will just render their children and not call the original implementation.
+ * minus any wrappers (eg. `Widget` and `withServices(Widget)` both become
+ * `Widget`). They will render only their children, as if they were just a
+ * `Fragment`.
  *
  * @example
  *   beforeEach(() => {
@@ -38,6 +52,7 @@ function mockImportedComponents() {
 
     const mock = props => props.children;
     mock.displayName = getDisplayName(value);
+
     return mock;
   };
 }
