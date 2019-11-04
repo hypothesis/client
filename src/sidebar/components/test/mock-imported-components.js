@@ -1,5 +1,8 @@
 'use strict';
 
+/**
+ * Return true if `value` "looks like" a React/Preact component.
+ */
 function isComponent(value) {
   return (
     typeof value === 'function' &&
@@ -9,8 +12,11 @@ function isComponent(value) {
 }
 
 /**
- * Return the display name of a component, stripping away any the names of
- * any wrapper components which use the `withWrapper(OriginalName)` convention.
+ * Return the display name of a component, minus the names of any wrappers
+ * (eg. `withServices(OriginalName)` becomes `OriginalName`).
+ *
+ * @param {Function} component - A Preact component
+ * @return {string}
  */
 function getDisplayName(component) {
   let displayName =
@@ -43,6 +49,8 @@ function getDisplayName(component) {
  *   afterEach(() => {
  *     ComponentUnderTest.$imports.$restore();
  *   });
+ *
+ * @return {Function} - A function that can be passed to `$imports.$mock`.
  */
 function mockImportedComponents() {
   return (source, symbol, value) => {
