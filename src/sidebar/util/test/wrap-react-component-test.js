@@ -203,6 +203,14 @@ describe('wrapReactComponent', () => {
     assert.calledWith(onDblClick, 1);
   });
 
+  it('supports invoking callback properties if a digest cycle is already in progress', () => {
+    const { element, onDblClick } = renderButton();
+    element.scope.$apply(() => {
+      lastOnDblClickCallback({ count: 1 });
+    });
+    assert.calledWith(onDblClick, 1);
+  });
+
   it('triggers a digest cycle when invoking callback properties', () => {
     // Create an Angular component which passes an `on-{event}` callback down
     // to a child React component.

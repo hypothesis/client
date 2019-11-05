@@ -45,26 +45,28 @@ class ReactController {
               `Was passed "${arg}"`
           );
         }
-        $scope.$apply(() => {
+
+        // Test whether a digest cycle is already in progress using `$$phase`,
+        // in which case there is no need to trigger one with `$apply`.
+        //
+        // Most of the time there will be no digest cycle in progress, but this
+        // can happen if a change made by Angular code indirectly causes a
+        // component to call a function prop.
+        if ($scope.$root.$$phase) {
           this[propName](arg);
-        });
+        } else {
+          $scope.$apply(() => {
+            this[propName](arg);
+          });
+        }
       };
     });
   }
 
-  $onInit() {
-    // Copy properties supplied by the parent Angular component to React props.
-    Object.keys(this.type.propTypes).forEach(propName => {
-      if (!useExpressionBinding(propName)) {
-        this.props[propName] = this[propName];
-      }
-    });
-    this.updateReactComponent();
-  }
-
   $onChanges(changes) {
     // Copy updated property values from parent Angular component to React
-    // props.
+    // props. This callback is run when the component is initially created as
+    // well as subsequent updates.
     Object.keys(changes).forEach(propName => {
       if (!useExpressionBinding(propName)) {
         this.props[propName] = changes[propName].currentValue;
