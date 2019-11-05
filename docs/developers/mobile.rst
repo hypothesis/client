@@ -41,7 +41,9 @@ Troubleshooting
 - If logging into the client does not work when the client is accessed via
   a non-localhost URL, make sure the "Redirect URL" for the Hypothesis client's
   "OAuth client" (managed at http://localhost:5000/admin/oauthclients) is
-  set to ``{current_scheme}://{current_host}:5000``.
+  set to ``{current_scheme}://{current_host}:5000``:
+
+  .. image:: edit-oauth-client.png
 
 - Make sure that you are not overriding the ``CLIENT_URL`` env var in your h
   environment or ``SIDEBAR_APP_URL`` env var in your client dev environment
