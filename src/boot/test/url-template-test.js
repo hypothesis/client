@@ -6,7 +6,7 @@ describe('processUrlTemplate', () => {
   let fakeDocument;
 
   beforeEach(() => {
-    fakeDocument = { currentScript: null };
+    fakeDocument = { currentScript: null, querySelectorAll: sinon.stub() };
   });
 
   context('when `document.currentScript` is set', () => {
@@ -34,12 +34,27 @@ describe('processUrlTemplate', () => {
   });
 
   context('when `document.currentScript` is not set', () => {
-    it('does not replace parameters', () => {
+    beforeEach(() => {
+      fakeDocument.querySelectorAll
+        .withArgs('script')
+        .returns([{ src: 'http://test-host:3001/script.js' }]);
+    });
+
+    it('falls back to using origin info from the last <script> tag in the document', () => {
       const url = processUrlTemplate(
         '{current_scheme}://{current_host}:2000/style.css',
         fakeDocument
       );
-      assert.equal(url, '{current_scheme}://{current_host}:2000/style.css');
+      assert.equal(url, 'http://test-host:2000/style.css');
+    });
+
+    it('does not try to determine the origin if there are no URL template params', () => {
+      const url = processUrlTemplate(
+        'https://hypothes.is/embed.js',
+        fakeDocument
+      );
+      assert.equal(url, 'https://hypothes.is/embed.js');
+      assert.notCalled(fakeDocument.querySelectorAll);
     });
   });
 });
