@@ -31,7 +31,7 @@ function Tab({
       onTouchStart={onChangeTab.bind(this, type)}
       role="tab"
       tabIndex="0"
-      ariaSelected={selected}
+      aria-selected={selected}
     >
       {children}
       {count > 0 && !isWaitingToAnchor && (
