@@ -62,27 +62,55 @@ describe('SidebarPanel', () => {
     assert.isFalse(wrapper.find('Slider').prop('visible'));
   });
 
-  it('scrolls panel into view when opened', () => {
-    fakeStore.isSidebarPanelOpen.returns(false);
-    // Initial render will establish in state that the panel is not active
-    const wrapper = createSidebarPanel();
-    // Now, make it so the panel will have an active state
-    fakeStore.isSidebarPanelOpen.returns(true);
+  context('when panel state changes', () => {
+    // Establish a component with an initial state and then change
+    // that state
+    const wrapperWithInitialState = (initialState, props = {}) => {
+      fakeStore.isSidebarPanelOpen.returns(initialState);
+      const wrapper = createSidebarPanel(props);
+      fakeStore.isSidebarPanelOpen.returns(!initialState);
+      return wrapper;
+    };
 
-    // Trick to make things re-render now with updated state
-    wrapper.setProps({});
+    it('scrolls panel into view when opened after being closed', () => {
+      const wrapper = wrapperWithInitialState(false, {});
+      // force re-render
+      wrapper.setProps({});
 
-    assert.calledOnce(fakeScrollIntoView);
-  });
+      assert.calledOnce(fakeScrollIntoView);
+    });
 
-  it('does not scroll panel if already opened', () => {
-    fakeStore.isSidebarPanelOpen.returns(true);
-    // Initial render will establish in state that the panel is already active
-    const wrapper = createSidebarPanel();
+    it('fires `onActiveChanged` callback if provided when opened', () => {
+      const fakeCallback = sinon.stub();
+      const wrapper = wrapperWithInitialState(false, {
+        onActiveChanged: fakeCallback,
+      });
+      // force re-render
+      wrapper.setProps({});
 
-    // Re-rendering should not cause `scrollIntoView` to be invoked
-    wrapper.setProps({});
+      assert.calledWith(fakeCallback, true);
+    });
 
-    assert.isFalse(fakeScrollIntoView.called);
+    it('fires `onActiveChanged` callback if provided when closed', () => {
+      const fakeCallback = sinon.stub();
+      const wrapper = wrapperWithInitialState(true, {
+        onActiveChanged: fakeCallback,
+      });
+      // force re-render
+      wrapper.setProps({});
+
+      assert.calledWith(fakeCallback, false);
+    });
+
+    it('does not scroll panel if already opened', () => {
+      // First render: panel is active
+      fakeStore.isSidebarPanelOpen.returns(true);
+      const wrapper = createSidebarPanel();
+      // Re-rendering should not cause `scrollIntoView` to be invoked
+      // As the panel is already open
+      wrapper.setProps({});
+
+      assert.isFalse(fakeScrollIntoView.called);
+    });
   });
 });
