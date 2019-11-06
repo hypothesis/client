@@ -36,14 +36,11 @@ let liveReloadChangedFiles = [];
 
 function parseCommandLine() {
   commander
-    // Test configuration.
-    // See https://github.com/karma-runner/karma-mocha#configuration
-    .option('--grep [pattern]', 'Run only tests matching a given pattern')
+    .option(
+      '--grep [pattern]',
+      'Run only tests where filename matches a pattern'
+    )
     .parse(process.argv);
-
-  if (commander.grep) {
-    gulpUtil.log(`Running tests matching pattern /${commander.grep}/`);
-  }
 
   return {
     grep: commander.grep,
@@ -384,37 +381,20 @@ gulp.task(
   )
 );
 
-function runKarma(baseConfig, opts, done) {
-  // See https://github.com/karma-runner/karma-mocha#configuration
-  const cliOpts = {
-    client: {
-      mocha: {
-        grep: taskArgs.grep,
-      },
-    },
-  };
-
+function runKarma({ singleRun }, done) {
   const karma = require('karma');
   new karma.Server(
-    Object.assign(
-      {},
-      {
-        configFile: path.resolve(__dirname, baseConfig),
-      },
-      cliOpts,
-      opts
-    ),
+    {
+      configFile: path.resolve(__dirname, './src/karma.config.js'),
+      grep: taskArgs.grep,
+      singleRun,
+    },
     done
   ).start();
 }
 
-gulp.task('test', function(callback) {
-  runKarma('./src/karma.config.js', { singleRun: true }, callback);
-});
-
-gulp.task('test-watch', function(callback) {
-  runKarma('./src/karma.config.js', {}, callback);
-});
+gulp.task('test', done => runKarma({ singleRun: true }, done));
+gulp.task('test-watch', done => runKarma({ singleRun: false }, done));
 
 gulp.task(
   'upload-sourcemaps',

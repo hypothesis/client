@@ -29,7 +29,11 @@ endif
 
 .PHONY: servetests
 servetests: node_modules/.uptodate
+ifdef FILTER
+	node_modules/.bin/gulp test-watch --grep $(FILTER)
+else
 	node_modules/.bin/gulp test-watch
+endif
 
 .PHONY: lint
 lint: node_modules/.uptodate

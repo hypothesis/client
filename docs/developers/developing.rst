@@ -110,8 +110,7 @@ Hypothesis uses Karma and mocha for testing. To run all the tests once, run:
    make test
 
 You can filter the tests which are run by running ``make test FILTER=<pattern>``.
-See the documentation for Mocha's
-`grep <https://mochajs.org/#g---grep-pattern>`_ option.
+Only test files matching ``<pattern>`` will be executed.
 
 To run tests and automatically re-run them whenever any source files change, run:
 
@@ -121,7 +120,7 @@ To run tests and automatically re-run them whenever any source files change, run
 
 This command will also serve the tests on localhost (typically `http://localhost:9876`)
 so that break points can be set and the browser's console can be used for interactive
-debugging. 
+debugging.
 
 
 Code Style

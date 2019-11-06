@@ -6,6 +6,7 @@
 
 const path = require('path');
 const envify = require('loose-envify/custom');
+const glob = require('glob');
 
 let chromeFlags = [];
 process.env.CHROME_BIN = require('puppeteer').executablePath();
@@ -50,6 +51,22 @@ if (process.env.RUNNING_IN_DOCKER) {
 }
 
 module.exports = function(config) {
+  let testFiles = [
+    'annotator/**/*-test.coffee',
+    '**/test/*-test.js',
+    '**/integration/*-test.js',
+  ];
+
+  if (config.grep) {
+    const allFiles = testFiles
+      .map(pattern => glob.sync(pattern, { cwd: __dirname }))
+      .flat();
+    testFiles = allFiles.filter(path => path.match(config.grep));
+
+    // eslint-disable-next-line no-console
+    console.log(`Running tests matching pattern "${config.grep}": `, testFiles);
+  }
+
   config.set({
     // base path that will be used to resolve all patterns (eg. files, exclude)
     basePath: './',
@@ -66,31 +83,13 @@ module.exports = function(config) {
       // Empty HTML file to assist with some tests
       { pattern: './annotator/test/empty.html', watched: false },
 
-      // Karma watching is disabled for these files because they are
-      // bundled with karma-browserify which handles watching itself via
-      // watchify
+      // Test modules.
+      ...testFiles.map(pattern => ({
+        pattern,
 
-      // Unit tests
-      {
-        pattern: 'annotator/**/*-test.coffee',
+        // Disable watching because karma-browserify handles this.
         watched: false,
-        included: true,
-        served: true,
-      },
-      {
-        pattern: '**/test/*-test.js',
-        watched: false,
-        included: true,
-        served: true,
-      },
-
-      // Integration tests
-      {
-        pattern: '**/integration/*-test.js',
-        watched: false,
-        included: true,
-        served: true,
-      },
+      })),
     ],
 
     // list of files to exclude
