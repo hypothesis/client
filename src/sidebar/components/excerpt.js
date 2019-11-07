@@ -15,8 +15,8 @@ const { withServices } = require('../util/service-context');
 const observeElementSize = require('../util/observe-element-size');
 
 /**
- * A toggle link at the bottom of an excerpt which controls whether it is
- * expanded or collapsed.
+ * An optional toggle link at the bottom of an excerpt which controls whether
+ * it is expanded or collapsed.
  */
 function InlineControls({ isCollapsed, setCollapsed, linkStyle = {} }) {
   const toggleTitle = isCollapsed
@@ -81,8 +81,9 @@ function Excerpt({
     const newContentHeight = contentElement.current.clientHeight;
     setContentHeight(newContentHeight);
 
+    // prettier-ignore
     const isCollapsible =
-      newContentHeight > collapsedHeight + overflowHysteresis;
+      newContentHeight > (collapsedHeight + overflowHysteresis);
     onCollapsibleChanged({ collapsible: isCollapsible });
   }, [collapsedHeight, onCollapsibleChanged, overflowHysteresis]);
 
@@ -97,9 +98,10 @@ function Excerpt({
 
   // Render the (possibly truncated) content and controls for
   // expanding/collapsing the content.
-  const overflowing = contentHeight > collapsedHeight + overflowHysteresis;
+  // prettier-ignore
+  const isOverflowing = contentHeight > (collapsedHeight + overflowHysteresis);
   const isCollapsed = inlineControls ? collapsedByInlineControls : collapse;
-  const isExpandable = overflowing && isCollapsed;
+  const isExpandable = isOverflowing && isCollapsed;
 
   const contentStyle = {};
   if (contentHeight !== 0) {
@@ -125,7 +127,7 @@ function Excerpt({
         })}
         title="Show the full excerpt"
       />
-      {overflowing && inlineControls && (
+      {isOverflowing && inlineControls && (
         <InlineControls
           isCollapsed={collapsedByInlineControls}
           setCollapsed={setCollapsed}
@@ -158,7 +160,7 @@ Excerpt.propTypes = {
   collapse: propTypes.bool,
 
   /**
-   * Maximum height of the container when it is collapsed.
+   * Maximum height of the container, in pixels, when it is collapsed.
    */
   collapsedHeight: propTypes.number,
 
