@@ -5,7 +5,7 @@ const { Fragment, createElement } = require('preact');
 const { useCallback, useEffect, useRef, useState } = require('preact/hooks');
 const propTypes = require('prop-types');
 
-const { listen } = require('../util/dom');
+const useComponentShouldClose = require('./hooks/use-component-should-close');
 
 const SvgIcon = require('./svg-icon');
 
@@ -89,56 +89,7 @@ function Menu({
   // These handlers close the menu when the user taps or clicks outside the
   // menu or presses Escape.
   const menuRef = useRef();
-  useEffect(() => {
-    if (!isOpen) {
-      return () => {};
-    }
-
-    // Close menu when user presses Escape key, regardless of focus.
-    const removeKeypressListener = listen(
-      document.body,
-      ['keypress'],
-      event => {
-        if (event.key === 'Escape') {
-          closeMenu();
-        }
-      }
-    );
-
-    // Close menu if user focuses an element outside the menu via any means
-    // (key press, programmatic focus change).
-    const removeFocusListener = listen(
-      document.body,
-      'focus',
-      event => {
-        if (!menuRef.current.contains(event.target)) {
-          closeMenu();
-        }
-      },
-      { useCapture: true }
-    );
-
-    // Close menu if user clicks outside menu, even if on an element which
-    // does not accept focus.
-    const removeClickListener = listen(
-      document.body,
-      ['mousedown', 'click'],
-      event => {
-        // nb. Mouse events inside the current menu are handled elsewhere.
-        if (!menuRef.current.contains(event.target)) {
-          closeMenu();
-        }
-      },
-      { useCapture: true }
-    );
-
-    return () => {
-      removeKeypressListener();
-      removeClickListener();
-      removeFocusListener();
-    };
-  }, [closeMenu, isOpen]);
-
+  useComponentShouldClose(menuRef, isOpen, closeMenu);
   const stopPropagation = e => e.stopPropagation();
 
   // Close menu if user presses a key which activates menu items.
