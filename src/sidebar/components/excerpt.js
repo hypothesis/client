@@ -156,6 +156,8 @@ Excerpt.propTypes = {
   /**
    * If the content should be truncated if its height exceeds
    * `collapsedHeight + overflowHysteresis`.
+   *
+   * This prop is only used if `inlineControls` is false.
    */
   collapse: propTypes.bool,
 
