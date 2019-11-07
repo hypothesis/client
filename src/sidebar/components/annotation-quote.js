@@ -33,7 +33,16 @@ function AnnotationQuote({ isOrphan, quote, settings = {} }) {
 }
 
 AnnotationQuote.propTypes = {
+  /**
+   * If `true`, display an indicator that the annotated text was not found in
+   * the current version of the document.
+   */
   isOrphan: propTypes.bool,
+
+  /**
+   * The text that the annotation refers to. This is rendered as plain text
+   * (ie. HTML tags are rendered literally).
+   */
   quote: propTypes.string,
 
   // Used for theming.
