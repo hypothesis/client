@@ -29,6 +29,9 @@ function Tab({
       })}
       onMouseDown={onChangeTab.bind(this, type)}
       onTouchStart={onChangeTab.bind(this, type)}
+      role="tab"
+      tabIndex="0"
+      aria-selected={selected}
     >
       {children}
       {count > 0 && !isWaitingToAnchor && (
@@ -108,6 +111,7 @@ function SelectionTabs({ isLoading, settings, session }) {
         className={classnames('selection-tabs', {
           'selection-tabs--theme-clean': isThemeClean,
         })}
+        role="tablist"
       >
         <Tab
           count={annotationCount}
