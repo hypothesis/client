@@ -18,9 +18,11 @@ describe('sidebar.components.hypothesis-app', function() {
   let fakeFeatures = null;
   let fakeFlash = null;
   let fakeFrameSync = null;
+  let fakeIsSidebar = null;
   let fakeParams = null;
   let fakeServiceConfig = null;
   let fakeSession = null;
+  let fakeShouldAutoDisplayTutorial = null;
   let fakeGroups = null;
   let fakeRoute = null;
   let fakeServiceUrl = null;
@@ -40,10 +42,16 @@ describe('sidebar.components.hypothesis-app', function() {
   });
 
   beforeEach(function() {
+    fakeIsSidebar = sandbox.stub().returns(true);
     fakeServiceConfig = sandbox.stub();
+    fakeShouldAutoDisplayTutorial = sinon.stub().returns(false);
 
     hypothesisApp.$imports.$mock({
+      '../util/is-sidebar': fakeIsSidebar,
       '../service-config': fakeServiceConfig,
+      '../util/session-util': {
+        shouldAutoDisplayTutorial: fakeShouldAutoDisplayTutorial,
+      },
     });
 
     angular.module('h', []).component('hypothesisApp', hypothesisApp);
@@ -60,8 +68,15 @@ describe('sidebar.components.hypothesis-app', function() {
       fakeStore = {
         tool: 'comment',
         clearSelectedAnnotations: sandbox.spy(),
-        getState: sinon.stub(),
+        getState: sinon.stub().returns({
+          session: {
+            preferences: {
+              show_sidebar_tutorial: false,
+            },
+          },
+        }),
         clearGroups: sinon.stub(),
+        openSidebarPanel: sinon.stub(),
         // draft store
         countDrafts: sandbox.stub().returns(0),
         discardAllDrafts: sandbox.stub(),
@@ -143,30 +158,34 @@ describe('sidebar.components.hypothesis-app', function() {
     sandbox.restore();
   });
 
-  describe('#isSidebar', function() {
-    it('is false if the window is the top window', function() {
-      fakeWindow.top = fakeWindow;
-      const ctrl = createController();
-      assert.isFalse(ctrl.isSidebar);
-    });
-
-    it('is true if the window is not the top window', function() {
-      fakeWindow.top = {};
-      const ctrl = createController();
-      assert.isTrue(ctrl.isSidebar);
-    });
-  });
-
   it('connects to host frame in the sidebar app', function() {
-    fakeWindow.top = {};
+    fakeIsSidebar.returns(true);
     createController();
     assert.called(fakeFrameSync.connect);
   });
 
   it('does not connect to the host frame in the stream', function() {
-    fakeWindow.top = fakeWindow;
+    fakeIsSidebar.returns(false);
     createController();
     assert.notCalled(fakeFrameSync.connect);
+  });
+
+  describe('auto-opening tutorial', () => {
+    it('should open tutorial on profile load when criteria are met', () => {
+      fakeShouldAutoDisplayTutorial.returns(true);
+      createController();
+      return fakeSession.load().then(() => {
+        assert.calledOnce(fakeStore.openSidebarPanel);
+      });
+    });
+
+    it('should not open tutorial on profile load when criteria are not met', () => {
+      fakeShouldAutoDisplayTutorial.returns(false);
+      createController();
+      return fakeSession.load().then(() => {
+        assert.equal(fakeStore.openSidebarPanel.callCount, 0);
+      });
+    });
   });
 
   it('auth.status is "unknown" on startup', function() {
@@ -286,66 +305,6 @@ describe('sidebar.components.hypothesis-app', function() {
         const ctrl = createController();
         ctrl.signUp();
         assert.calledWith(fakeWindow.open, 'https://ann.service/signup');
-      });
-    });
-  });
-
-  describe('#showHelpPanel', function() {
-    context('when using a third-party service', function() {
-      context("when there's no onHelpRequest callback function", function() {
-        beforeEach('configure a service with no onHelpRequest', function() {
-          fakeServiceConfig.returns({});
-        });
-
-        it('does not send an event', function() {
-          createController().showHelpPanel();
-
-          assert.notCalled(fakeBridge.call);
-        });
-
-        it('shows the help panel', function() {
-          const ctrl = createController();
-
-          ctrl.showHelpPanel();
-
-          assert.isTrue(ctrl.helpPanel.visible);
-        });
-      });
-
-      context("when there's an onHelpRequest callback function", function() {
-        beforeEach('provide an onHelpRequest callback', function() {
-          fakeServiceConfig.returns({ onHelpRequestProvided: true });
-        });
-
-        it('sends the HELP_REQUESTED event', function() {
-          createController().showHelpPanel();
-
-          assert.calledWith(fakeBridge.call, bridgeEvents.HELP_REQUESTED);
-        });
-
-        it('does not show the help panel', function() {
-          const ctrl = createController();
-
-          ctrl.showHelpPanel();
-
-          assert.isFalse(ctrl.helpPanel.visible);
-        });
-      });
-    });
-
-    context('when not using a third-party service', function() {
-      it('does not send an event', function() {
-        createController().showHelpPanel();
-
-        assert.notCalled(fakeBridge.call);
-      });
-
-      it('shows the help panel', function() {
-        const ctrl = createController();
-
-        ctrl.showHelpPanel();
-
-        assert.isTrue(ctrl.helpPanel.visible);
       });
     });
   });

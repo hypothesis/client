@@ -4,6 +4,9 @@ const events = require('../events');
 const { parseAccountID } = require('../util/account-id');
 const serviceConfig = require('../service-config');
 const bridgeEvents = require('../../shared/bridge-events');
+const uiConstants = require('../ui-constants');
+const isSidebar = require('../util/is-sidebar');
+const { shouldAutoDisplayTutorial } = require('../util/session-util');
 
 /**
  * Return the user's authentication status from their profile.
@@ -56,23 +59,34 @@ function HypothesisAppController(
   // used by templates to show an intermediate or loading state.
   this.auth = { status: 'unknown' };
 
-  // App dialogs
-  this.helpPanel = { visible: false };
-
   // Check to see if we're in the sidebar, or on a standalone page such as
   // the stream page or an individual annotation page.
-  this.isSidebar = $window.top !== $window;
+  this.isSidebar = isSidebar();
   if (this.isSidebar) {
     frameSync.connect();
   }
 
   // Reload the view when the user switches accounts
+  this.onUserChange = profile => {
+    self.auth = authStateFromProfile(profile);
+    if (
+      shouldAutoDisplayTutorial(
+        this.isSidebar,
+        store.getState().session,
+        settings
+      )
+    ) {
+      // Auto-open the tutorial (help) panel
+      store.openSidebarPanel(uiConstants.PANEL_HELP);
+    }
+  };
+
   $scope.$on(events.USER_CHANGED, function(event, data) {
-    self.auth = authStateFromProfile(data.profile);
+    self.onUserChange(data.profile);
   });
 
   session.load().then(profile => {
-    self.auth = authStateFromProfile(profile);
+    self.onUserChange(profile);
   });
 
   /**
@@ -108,17 +122,6 @@ function HypothesisAppController(
       return;
     }
     $window.open(serviceUrl('signup'));
-  };
-
-  this.showHelpPanel = function() {
-    const service = serviceConfig(settings) || {};
-    if (service.onHelpRequestProvided) {
-      // Let the host page handle the help request.
-      bridge.call(bridgeEvents.HELP_REQUESTED);
-      return;
-    }
-
-    this.helpPanel.visible = true;
   };
 
   // Prompt to discard any unsaved drafts.

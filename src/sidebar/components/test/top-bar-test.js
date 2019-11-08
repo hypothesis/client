@@ -4,15 +4,18 @@ const { createElement } = require('preact');
 const { mount } = require('enzyme');
 
 const uiConstants = require('../../ui-constants');
+const bridgeEvents = require('../../../shared/bridge-events');
 
 const TopBar = require('../top-bar');
 const mockImportedComponents = require('./mock-imported-components');
 
 describe('TopBar', () => {
   const fakeSettings = {};
+  let fakeBridge;
   let fakeStore;
   let fakeStreamer;
   let fakeIsThirdPartyService;
+  let fakeServiceConfig;
 
   beforeEach(() => {
     fakeIsThirdPartyService = sinon.stub().returns(false);
@@ -29,6 +32,12 @@ describe('TopBar', () => {
       toggleSidebarPanel: sinon.stub(),
     };
 
+    fakeBridge = {
+      call: sinon.stub(),
+    };
+
+    fakeServiceConfig = sinon.stub().returns({});
+
     fakeStreamer = {
       applyPendingUpdates: sinon.stub(),
     };
@@ -37,6 +46,7 @@ describe('TopBar', () => {
     TopBar.$imports.$mock({
       '../store/use-store': callback => callback(fakeStore),
       '../util/is-third-party-service': fakeIsThirdPartyService,
+      '../service-config': fakeServiceConfig,
     });
   });
 
@@ -57,6 +67,7 @@ describe('TopBar', () => {
     return mount(
       <TopBar
         auth={auth}
+        bridge={fakeBridge}
         isSidebar={true}
         settings={fakeSettings}
         streamer={fakeStreamer}
@@ -86,14 +97,41 @@ describe('TopBar', () => {
     assert.called(fakeStreamer.applyPendingUpdates);
   });
 
-  it('shows Help Panel when help icon is clicked', () => {
-    const onShowHelpPanel = sinon.stub();
-    const wrapper = createTopBar({
-      onShowHelpPanel: onShowHelpPanel,
+  describe('`HelpButton` and help requests', () => {
+    context('no help service handler configured in services (default)', () => {
+      it('toggles Help Panel on click', () => {
+        const wrapper = createTopBar();
+        const help = helpBtn(wrapper);
+        help.simulate('click');
+        assert.calledWith(fakeStore.toggleSidebarPanel, uiConstants.PANEL_HELP);
+      });
+
+      it('displays a help icon active state when help panel active', () => {
+        // state returning active sidebar panel as `PANEL_HELP` triggers active class
+        fakeStore.getState = sinon.stub().returns({
+          sidebarPanels: {
+            activePanelName: uiConstants.PANEL_HELP,
+          },
+        });
+        const wrapper = createTopBar();
+        const help = helpBtn(wrapper);
+
+        wrapper.update();
+        assert.isTrue(help.hasClass('top-bar__btn--active'));
+        assert.isOk(help.prop('aria-expanded'));
+      });
+
+      context('help service handler configured in services', () => {
+        it('fires a bridge event if help clicked and service is configured', () => {
+          fakeServiceConfig.returns({ onHelpRequestProvided: true });
+          const wrapper = createTopBar();
+          const help = helpBtn(wrapper);
+          help.simulate('click');
+          assert.equal(fakeStore.toggleSidebarPanel.callCount, 0);
+          assert.calledWith(fakeBridge.call, bridgeEvents.HELP_REQUESTED);
+        });
+      });
     });
-    const help = helpBtn(wrapper);
-    help.simulate('click');
-    assert.called(onShowHelpPanel);
   });
 
   describe('login/account actions', () => {
@@ -170,7 +208,10 @@ describe('TopBar', () => {
   it('toggles the share annotations panel when "Share" is clicked', () => {
     const wrapper = createTopBar();
     wrapper.find('[title="Share annotations on this page"]').simulate('click');
-    assert.called(fakeStore.toggleSidebarPanel);
+    assert.calledWith(
+      fakeStore.toggleSidebarPanel,
+      uiConstants.PANEL_SHARE_ANNOTATIONS
+    );
   });
 
   it('adds an active-state class to the "Share" icon when the panel is open', () => {
@@ -216,15 +257,6 @@ describe('TopBar', () => {
       assert.isFalse(wrapper.exists('GroupList'));
       assert.isFalse(wrapper.exists('SortMenu'));
       assert.isFalse(wrapper.exists('button[title="Share this page"]'));
-    });
-
-    it('does show the Help menu and user menu', () => {
-      const wrapper = createTopBar({
-        isSidebar: false,
-        auth: { status: 'logged-in' },
-      });
-      assert.isTrue(wrapper.exists('button[title="Help"]'));
-      assert.isTrue(wrapper.exists('UserMenu'));
     });
   });
 });

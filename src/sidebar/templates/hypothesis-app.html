@@ -4,16 +4,11 @@
     on-login="vm.login()"
     on-sign-up="vm.signUp()"
     on-logout="vm.logout()"
-    on-show-help-panel="vm.showHelpPanel()"
     is-sidebar="::vm.isSidebar">
   </top-bar>
 
   <div class="content">
-    <sidebar-tutorial ng-if="vm.isSidebar"></sidebar-tutorial>
-    <help-panel ng-if="vm.helpPanel.visible"
-      on-close="vm.helpPanel.visible = false"
-      auth="vm.auth">
-    </help-panel>
+    <help-panel auth="vm.auth"></help-panel>
     <share-annotations-panel></share-annotations-panel>
     <main ng-view=""></main>
   </div>
