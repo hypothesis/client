@@ -1,10 +1,11 @@
 'use strict';
 
-const configFrom = require('./config/index');
-
 const $ = require('jquery');
 
-// Applications
+// Load polyfill for :focus-visible pseudo-class.
+require('focus-visible');
+
+const configFrom = require('./config/index');
 const Guest = require('./guest');
 const Sidebar = require('./sidebar');
 const PdfSidebar = require('./pdf-sidebar');
