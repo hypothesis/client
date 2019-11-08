@@ -11,7 +11,7 @@
  *   to copy text.
  */
 function copyText(text) {
-  const temp = document.createElement('span');
+  const temp = document.createElement('pre');
   temp.className = 'copy-text';
   temp.textContent = text;
   document.body.appendChild(temp);
