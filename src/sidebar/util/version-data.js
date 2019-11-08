@@ -55,19 +55,29 @@ class VersionData {
   }
 
   /**
-   * Return a single, encoded URL string of version data suitable for use in
-   * a querystring (as the value of a single parameter)
+   * Return a single formatted string representing version data, suitable for
+   * copying to the clipboard.
    *
-   * @return {string} - URI-encoded string
+   * @return {string} - Single, multiline string representing current version data
    */
-  asEncodedURLString() {
+  asFormattedString() {
     let versionString = '';
     for (let prop in this) {
       if (Object.prototype.hasOwnProperty.call(this, prop)) {
         versionString += `${prop}: ${this[prop]}\r\n`;
       }
     }
-    return encodeURIComponent(versionString);
+    return versionString;
+  }
+
+  /**
+   * Return a single, encoded URL string of version data suitable for use in
+   * a querystring (as the value of a single parameter)
+   *
+   * @return {string} - URI-encoded string
+   */
+  asEncodedURLString() {
+    return encodeURIComponent(this.asFormattedString());
   }
 }
 
