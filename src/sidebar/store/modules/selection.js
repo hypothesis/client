@@ -8,6 +8,12 @@
  * - The current filter query
  */
 
+/**
+ * @typedef User
+ * @property {string} username - Unique user's username
+ * @property {string} displayName - User's display name
+ */
+
 'use strict';
 
 const { createSelector } = require('reselect');
@@ -114,7 +120,7 @@ function init(settings) {
     selectedTab: TAB_DEFAULT,
 
     focusMode: {
-      enabled: settings.hasOwnProperty('focus'), // readonly
+      enabled: settings.hasOwnProperty('focus'),
       focused: true,
       // Copy over the focus confg from settings object
       config: { ...(settings.focus ? settings.focus : {}) },
@@ -158,6 +164,19 @@ const update = {
       focusMode: {
         ...state.focusMode,
         focused: action.focused,
+      },
+    };
+  },
+
+  CHANGE_FOCUS_MODE_USER: function(state, action) {
+    return {
+      focusMode: {
+        ...state.focusMode,
+        enabled: true,
+        focused: true,
+        config: {
+          user: { ...action.user },
+        },
       },
     };
   },
@@ -344,6 +363,18 @@ function setFocusModeFocused(focused) {
   };
 }
 
+/**
+ * Changes the focused user and sets focused enabled to `true`.
+ *
+ * @param {User} user - The user to focus on
+ */
+function changeFocusModeUser(user) {
+  return {
+    type: actions.CHANGE_FOCUS_MODE_USER,
+    user,
+  };
+}
+
 /** Sets the sort key for the annotation list. */
 function setSortKey(key) {
   return {
@@ -469,6 +500,7 @@ module.exports = {
     setCollapsed: setCollapsed,
     setFilterQuery: setFilterQuery,
     setFocusModeFocused: setFocusModeFocused,
+    changeFocusModeUser: changeFocusModeUser,
     setForceVisible: setForceVisible,
     setSortKey: setSortKey,
     toggleSelectedAnnotations: toggleSelectedAnnotations,

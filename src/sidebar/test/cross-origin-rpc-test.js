@@ -12,7 +12,7 @@ describe('crossOriginRPC', function() {
 
     beforeEach(function() {
       fakeStore = {
-        searchUris: sinon.stub().returns('THE_SEARCH_URIS'),
+        changeFocusModeUser: sinon.stub(),
       };
 
       fakeWindow = {
@@ -46,26 +46,72 @@ describe('crossOriginRPC', function() {
       assert.isTrue(fakeWindow.addEventListener.calledWith('message'));
     });
 
-    it('sends a response with the result from the called method', function() {
+    it('sends a response with the "ok" result', function() {
       crossOriginRPC.server.start(fakeStore, settings, fakeWindow);
 
       postMessage({
-        data: { method: 'searchUris', id: 42 },
+        data: { method: 'changeFocusModeUser', id: 42 },
         origin: 'https://allowed1.com',
         source: source,
       });
 
       assert.isTrue(source.postMessage.calledOnce);
+
       assert.isTrue(
         source.postMessage.calledWithExactly(
           {
             jsonrpc: '2.0',
             id: 42,
-            result: 'THE_SEARCH_URIS',
+            result: 'ok',
           },
           'https://allowed1.com'
         )
       );
+    });
+
+    it('calls the registered method with the provided params', function() {
+      crossOriginRPC.server.start(fakeStore, settings, fakeWindow);
+
+      postMessage({
+        data: {
+          method: 'changeFocusModeUser',
+          id: 42,
+          params: ['one', 'two'],
+        },
+        origin: 'https://allowed1.com',
+        source: source,
+      });
+      assert.isTrue(
+        fakeStore.changeFocusModeUser.calledWithExactly('one', 'two')
+      );
+    });
+
+    it('calls the registered method with no params', function() {
+      crossOriginRPC.server.start(fakeStore, settings, fakeWindow);
+
+      postMessage({
+        data: {
+          method: 'changeFocusModeUser',
+          id: 42,
+        },
+        origin: 'https://allowed1.com',
+        source: source,
+      });
+      assert.isTrue(fakeStore.changeFocusModeUser.calledWithExactly());
+    });
+
+    it('does not call the unregistered method', function() {
+      crossOriginRPC.server.start(fakeStore, settings, fakeWindow);
+
+      postMessage({
+        data: {
+          method: 'unregisteredMethod',
+          id: 42,
+        },
+        origin: 'https://allowed1.com',
+        source: source,
+      });
+      assert.isTrue(fakeStore.changeFocusModeUser.notCalled);
     });
 
     [
@@ -78,7 +124,7 @@ describe('crossOriginRPC', function() {
 
         postMessage({
           origin: 'https://notallowed.com',
-          data: { method: 'searchUris', id: 42 },
+          data: { method: 'changeFocusModeUser', id: 42 },
           source: source,
         });
 

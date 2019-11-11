@@ -1,6 +1,19 @@
 'use strict';
 
 /**
+ * Return the mapped methods that can be called remotely via this server.
+ *
+ * @param {Object} store - The global store
+ * @return {Object}
+ */
+
+const registeredMethods = store => {
+  return {
+    changeFocusModeUser: store.changeFocusModeUser,
+  };
+};
+
+/**
  * Begin responding to JSON-RPC requests from frames on other origins.
  *
  * Register a window.postMessage() event listener that receives and responds to
@@ -15,13 +28,14 @@
  * http://www.jsonrpc.org/specification
  *
  * The only part that we support so far is receiving JSON-RPC 2.0 requests (not
- * notifications) without any parameters and sending back a successful
- * response. Notifications (JSON-RPC calls that don't require a response),
- * method parameters, and error responses are not yet supported.
+ * notifications) and sending back a successful "ok" response.
  *
+ * All methods called upon must be mapped in the `registeredMethods` function.
  */
 // @ngInject
 function start(store, settings, $window) {
+  const methods = registeredMethods(store);
+
   $window.addEventListener('message', function receiveMessage(event) {
     let allowedOrigins = settings.rpcAllowedOrigins || [];
 
@@ -38,28 +52,25 @@ function start(store, settings, $window) {
 
   /** Return a JSON-RPC response to the given JSON-RPC request object. */
   function jsonRpcResponse(request) {
-    // The set of methods that clients can call.
-    let methods = {
-      searchUris: store.searchUris,
-    };
+    const method = methods[request.method];
 
-    let method = methods[request.method];
-
-    let response = {
-      jsonrpc: '2.0',
-      id: request.id,
-    };
-
-    if (method) {
-      response.result = method();
-    } else {
-      response.error = {
-        code: -32601,
-        message: 'Method not found',
+    // Return an error response if the method name is not registered with
+    // registeredMethods.
+    if (method === undefined) {
+      return {
+        jsonrpc: '2.0',
+        id: request.id,
+        error: { code: -32601, message: 'Method not found' },
       };
     }
 
-    return response;
+    // Call the method and return the result response.
+    if (request.params) {
+      method(...request.params);
+    } else {
+      method();
+    }
+    return { jsonrpc: '2.0', result: 'ok', id: request.id };
   }
 }
 
