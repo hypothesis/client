@@ -85,7 +85,7 @@
     "mocha": "^6.0.0",
     "ng-tags-input": "^3.1.1",
     "node-uuid": "^1.4.3",
-    "npm-packlist": "^1.1.12",
+    "npm-packlist": "^2.0.0",
     "postcss": "^7.0.13",
     "postcss-url": "^8.0.0",
     "preact": "^10.0.4",
