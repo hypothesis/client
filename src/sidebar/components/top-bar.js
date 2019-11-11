@@ -20,30 +20,38 @@ const SvgIcon = require('./svg-icon');
 const UserMenu = require('./user-menu');
 
 /**
- * Button for opening/closing the help panel
+ * Reusable component to render a button for toggling a sidebar panel.
+ * Takes an `onClick` callback, as panel toggles are sometimes more complex than
+ * just opening and closing a panel.
  */
-function HelpButton({ onClick }) {
-  const isActive = useStore(
-    store =>
-      store.getState().sidebarPanels.activePanelName === uiConstants.PANEL_HELP
+function TogglePanelButton({ panelName, iconName, title, onClick }) {
+  const currentActivePanel = useStore(
+    store => store.getState().sidebarPanels.activePanelName
   );
+  const isActive = currentActivePanel === panelName;
   return (
     <button
-      className={classnames('top-bar__btn top-bar__help-btn', {
-        'top-bar__btn--active': isActive,
+      className={classnames('top-bar__btn', `top-bar__${iconName}-btn`, {
+        'is-active': isActive,
       })}
       onClick={onClick}
-      title="Help"
-      aria-expanded={isActive}
-      aria-pressed={isActive}
+      title={title}
+      aria-pressed={isActive ? 'true' : 'false'}
     >
-      <SvgIcon name="help" className="top-bar__help-icon" />
+      <SvgIcon
+        name={iconName}
+        className={classnames(`top-bar__{$iconName}-icon`)}
+      />
     </button>
   );
 }
 
-HelpButton.propTypes = {
-  /* callback */
+TogglePanelButton.propTypes = {
+  /** The panel's string name as defined in `uiConstants` */
+  panelName: propTypes.string.isRequired,
+  iconName: propTypes.string.isRequired,
+  title: propTypes.string.isRequired,
+  /** callback */
   onClick: propTypes.func.isRequired,
 };
 
@@ -71,9 +79,6 @@ function TopBar({
   const pendingUpdateCount = useStore(store => store.pendingUpdateCount());
 
   const togglePanelFn = useStore(store => store.toggleSidebarPanel);
-  const currentActivePanel = useStore(
-    store => store.getState().sidebarPanels.activePanelName
-  );
 
   const applyPendingUpdates = () => streamer.applyPendingUpdates();
 
@@ -125,7 +130,12 @@ function TopBar({
         <div className="top-bar__inner content">
           <StreamSearchInput />
           <div className="top-bar__expander" />
-          <HelpButton onClick={requestHelp} />
+          <TogglePanelButton
+            panelName={uiConstants.PANEL_HELP}
+            iconName="help"
+            title="Help"
+            onClick={requestHelp}
+          />
           {loginControl}
         </div>
       )}
@@ -135,32 +145,32 @@ function TopBar({
           <GroupList className="GroupList" auth={auth} />
           <div className="top-bar__expander" />
           {pendingUpdateCount > 0 && (
-            <a
-              className="top-bar__apply-update-btn"
+            <button
+              className="top-bar__btn top-bar__btn--refresh"
               onClick={applyPendingUpdates}
               title={`Show ${pendingUpdateCount} new/updated ${
                 pendingUpdateCount === 1 ? 'annotation' : 'annotations'
               }`}
             >
               <SvgIcon className="top-bar__apply-icon" name="refresh" />
-            </a>
+            </button>
           )}
           <SearchInput query={filterQuery} onSearch={setFilterQuery} />
           <SortMenu />
           {showSharePageButton && (
-            <button
-              className={classnames('top-bar__btn', {
-                'top-bar__btn--active':
-                  currentActivePanel === uiConstants.PANEL_SHARE_ANNOTATIONS,
-              })}
-              onClick={toggleSharePanel}
+            <TogglePanelButton
+              panelName={uiConstants.PANEL_SHARE_ANNOTATIONS}
+              iconName="share"
               title="Share annotations on this page"
-              aria-label="Share annotations on this page"
-            >
-              <SvgIcon name="share" />
-            </button>
+              onClick={toggleSharePanel}
+            />
           )}
-          <HelpButton onClick={requestHelp} />
+          <TogglePanelButton
+            panelName={uiConstants.PANEL_HELP}
+            iconName="help"
+            title="Help"
+            onClick={requestHelp}
+          />
           {loginControl}
         </div>
       )}

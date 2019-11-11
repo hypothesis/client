@@ -1,0 +1,10 @@
+@import './focus';
+
+@mixin reset-native-btn-styles {
+  @include outline-on-keyboard-focus;
+
+  padding: 0px;
+  margin: 0px;
+  background-color: transparent;
+  border-style: none;
+}
