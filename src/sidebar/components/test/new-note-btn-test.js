@@ -33,12 +33,10 @@ describe('NewNoteButton', function() {
     };
     fakeStore = {
       createAnnotation: sinon.stub(),
-      frames: sinon
-        .stub()
-        .returns([
-          { id: null, uri: 'www.example.org' },
-          { id: '1', uri: 'www.example.org' },
-        ]),
+      frames: sinon.stub().returns([
+        { id: null, uri: 'www.example.org' },
+        { id: '1', uri: 'www.example.org' },
+      ]),
     };
 
     NewNoteButton.$imports.$mock(mockImportedComponents());
