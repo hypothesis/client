@@ -1,5 +1,5 @@
 .version-info {
-  margin-bottom: 0;
+  margin-top: 0.5em;
 
   &__key {
     float: left;
@@ -17,5 +17,34 @@
     margin-left: 8em;
     overflow-wrap: break-word; // Keep really long userids from overflowing
     color: $grey-6;
+  }
+
+  &__actions {
+    display: flex;
+    justify-content: center;
+    padding-bottom: 0.5em;
+  }
+
+  &__copy-btn {
+    @include outline-on-keyboard-focus;
+    display: flex;
+    align-items: center;
+    border-radius: 2px;
+    border: none;
+    padding: 0.5em;
+    background-color: $grey-1;
+    color: $grey-5;
+    font-weight: 700;
+
+    &-icon {
+      color: $grey-5;
+      margin: 0 5px;
+    }
+
+    &:hover {
+      transition: 0.2s ease-out;
+      background-color: $grey-2;
+      color: $grey-6;
+    }
   }
 }

@@ -1,10 +1,9 @@
 .help-panel {
   &__sub-panel-title {
     margin: 0;
-    padding: 0.5em;
-    text-align: center;
+    padding: 0.5em 0;
     font-size: 1.25em;
-    font-weight: 600;
+    font-weight: 500;
   }
 
   &__content {
@@ -22,6 +21,7 @@
 
   &__footer {
     padding: 0.5em 0;
+    margin-left: auto;
     display: flex;
     align-items: center;
   }
@@ -29,14 +29,11 @@
   &__sub-panel-link {
     display: flex;
     align-items: center;
+    margin-left: auto;
     color: $brand;
 
-    &--right {
-      margin-left: auto;
-    }
-
     &-icon {
-      margin: 5px;
+      margin-left: 2px;
       width: 12px;
       height: 12px;
     }

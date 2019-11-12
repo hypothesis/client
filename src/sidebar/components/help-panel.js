@@ -97,40 +97,48 @@ function HelpPanel({ auth, session }) {
 
   return (
     <SidebarPanel
-      title="Need some help?"
+      title="Help"
       panelName={uiConstants.PANEL_HELP}
       onActiveChanged={onActiveChanged}
     >
-      <h3 className="help-panel__sub-panel-title">
-        {subPanelTitles[activeSubPanel]}
-      </h3>
-      <div className="help-panel__content">
-        {activeSubPanel === 'tutorial' && <Tutorial />}
-        {activeSubPanel === 'versionInfo' && (
-          <VersionInfo versionData={versionData} />
-        )}
+      <div className="u-layout-row">
+        <h3 className="help-panel__sub-panel-title">
+          {subPanelTitles[activeSubPanel]}
+        </h3>
         <div className="help-panel__footer">
           {activeSubPanel === 'versionInfo' && (
             <a
               href="#"
-              className="help-panel__sub-panel-link help-panel__sub-panel-link--left"
+              className="help-panel__sub-panel-link"
               onClick={e => openSubPanel(e, 'tutorial')}
             >
-              <SvgIcon name="arrow-left" className="help-panel__icon" />
               <div>Getting started</div>
+              <SvgIcon
+                name="arrow-right"
+                className="help-panel__sub-panel-link-icon"
+              />
             </a>
           )}
           {activeSubPanel === 'tutorial' && (
             <a
               href="#"
-              className="help-panel__sub-panel-link help-panel__sub-panel-link--right"
+              className="help-panel__sub-panel-link"
               onClick={e => openSubPanel(e, 'versionInfo')}
             >
               <div>About this version</div>
-              <SvgIcon name="arrow-right" className="help-panel__icon" />
+              <SvgIcon
+                name="arrow-right"
+                className="help-panel__sub-panel-link-icon"
+              />
             </a>
           )}
         </div>
+      </div>
+      <div className="help-panel__content">
+        {activeSubPanel === 'tutorial' && <Tutorial />}
+        {activeSubPanel === 'versionInfo' && (
+          <VersionInfo versionData={versionData} />
+        )}
       </div>
       <div className="help-panel-tabs">
         <HelpPanelTab

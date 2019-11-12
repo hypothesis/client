@@ -80,6 +80,17 @@ describe('VersionData', () => {
     });
   });
 
+  describe('#asFormattedString', () => {
+    ['timestamp', 'account', 'url'].forEach(prop => {
+      it(`includes a line for the value of ${prop} in the string`, () => {
+        const versionData = new VersionData({}, {});
+        const formatted = versionData.asFormattedString();
+        const subStr = `${prop}: ${versionData[prop]}\r\n`;
+        assert.include(formatted, subStr);
+      });
+    });
+  });
+
   describe('#asEncodedURLString', () => {
     ['timestamp', 'account'].forEach(prop => {
       it(`includes encoded value for ${prop} in URL string`, () => {
