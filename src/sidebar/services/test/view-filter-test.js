@@ -47,7 +47,10 @@ describe('sidebar/services/view-filter', () => {
     let annotations;
 
     beforeEach(() => {
-      annotations = [{ id: 1, text: poem.tiger }, { id: 2, text: poem.raven }];
+      annotations = [
+        { id: 1, text: poem.tiger },
+        { id: 2, text: poem.raven },
+      ];
     });
 
     it('requires all terms to match for "and" operator', () => {
