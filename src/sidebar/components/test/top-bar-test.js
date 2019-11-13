@@ -55,7 +55,7 @@ describe('TopBar', () => {
   });
 
   function applyUpdateBtn(wrapper) {
-    return wrapper.find('.top-bar__apply-update-btn');
+    return wrapper.find('.top-bar__btn--refresh');
   }
 
   function helpBtn(wrapper) {
@@ -117,8 +117,9 @@ describe('TopBar', () => {
         const help = helpBtn(wrapper);
 
         wrapper.update();
-        assert.isTrue(help.hasClass('top-bar__btn--active'));
-        assert.isOk(help.prop('aria-expanded'));
+
+        assert.isTrue(help.hasClass('is-active'));
+        assert.isOk(help.prop('aria-pressed'));
       });
 
       context('help service handler configured in services', () => {
@@ -207,7 +208,7 @@ describe('TopBar', () => {
 
   it('toggles the share annotations panel when "Share" is clicked', () => {
     const wrapper = createTopBar();
-    wrapper.find('[title="Share annotations on this page"]').simulate('click');
+    wrapper.find('.top-bar__share-btn').simulate('click');
     assert.calledWith(
       fakeStore.toggleSidebarPanel,
       uiConstants.PANEL_SHARE_ANNOTATIONS
@@ -222,9 +223,9 @@ describe('TopBar', () => {
     });
 
     const wrapper = createTopBar();
-    const shareEl = wrapper.find('[title="Share annotations on this page"]');
+    const shareEl = wrapper.find('.top-bar__share-btn');
 
-    assert.include(shareEl.prop('className'), 'top-bar__btn--active');
+    assert.include(shareEl.prop('className'), 'is-active');
   });
 
   it('displays search input in the sidebar', () => {
