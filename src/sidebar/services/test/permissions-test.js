@@ -52,6 +52,17 @@ describe('permissions', function() {
       );
     });
 
+    it('returns shared permissions if the saved level is "private" but no `userid`', function() {
+      // FIXME: This test is necessary for the patch fix to prevent the "split-null" bug
+      // https://github.com/hypothesis/client/issues/1221 but should be removed when the
+      // code is refactored.
+      fakeLocalStorage.getItem.returns('private');
+      assert.deepEqual(
+        permissions.default(undefined, 'gid'),
+        permissions.shared(undefined, 'gid')
+      );
+    });
+
     it('returns shared permissions if the saved level is "shared"', function() {
       fakeLocalStorage.getItem.returns('shared');
       assert.deepEqual(
