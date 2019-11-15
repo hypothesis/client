@@ -5,7 +5,7 @@ const { Fragment, createElement } = require('preact');
 const { useCallback, useEffect, useRef, useState } = require('preact/hooks');
 const propTypes = require('prop-types');
 
-const { listen } = require('../util/dom');
+const useElementShouldClose = require('./hooks/use-element-should-close');
 
 const SvgIcon = require('./svg-icon');
 
@@ -89,59 +89,14 @@ function Menu({
   // These handlers close the menu when the user taps or clicks outside the
   // menu or presses Escape.
   const menuRef = useRef();
-  useEffect(() => {
-    if (!isOpen) {
-      return () => {};
-    }
 
-    // Close menu when user presses Escape key, regardless of focus.
-    const removeKeypressListener = listen(
-      document.body,
-      ['keypress'],
-      event => {
-        if (event.key === 'Escape') {
-          closeMenu();
-        }
-      }
-    );
-
-    // Close menu if user focuses an element outside the menu via any means
-    // (key press, programmatic focus change).
-    const removeFocusListener = listen(
-      document.body,
-      'focus',
-      event => {
-        if (!menuRef.current.contains(event.target)) {
-          closeMenu();
-        }
-      },
-      { useCapture: true }
-    );
-
-    // Close menu if user clicks outside menu, even if on an element which
-    // does not accept focus.
-    const removeClickListener = listen(
-      document.body,
-      ['mousedown', 'click'],
-      event => {
-        // nb. Mouse events inside the current menu are handled elsewhere.
-        if (!menuRef.current.contains(event.target)) {
-          closeMenu();
-        }
-      },
-      { useCapture: true }
-    );
-
-    return () => {
-      removeKeypressListener();
-      removeClickListener();
-      removeFocusListener();
-    };
-  }, [closeMenu, isOpen]);
+  // Menu element should close via `closeMenu` whenever it's open and there
+  // are user interactions outside of it (e.g. clicks) in the document
+  useElementShouldClose(menuRef, isOpen, closeMenu);
 
   const stopPropagation = e => e.stopPropagation();
 
-  // Close menu if user presses a key which activates menu items.
+  // It should also close if the user presses a key which activates menu items.
   const handleMenuKeyPress = event => {
     if (event.key === 'Enter' || event.key === ' ') {
       closeMenu();
