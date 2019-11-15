@@ -10,7 +10,7 @@
 
 /**
  * @typedef User
- * @property {string} username - Unique user's username
+ * @property {string} userid - Unique user's id
  * @property {string} displayName - User's display name
  */
 
@@ -441,16 +441,20 @@ function focusModeFocused(state) {
 }
 
 /**
- * Returns the username for a focused user or `null` if no focused user.
+ * Returns the `userid` for a focused user or `null` if no focused user.
  *
- * @return {object|null}
+ * @return {string|null}
  */
-function focusModeUsername(state) {
-  if (
-    state.selection.focusMode.config.user &&
-    state.selection.focusMode.config.user.username
-  ) {
-    return state.selection.focusMode.config.user.username;
+function focusModeUserId(state) {
+  if (state.selection.focusMode.config.user) {
+    if (state.selection.focusMode.config.user.userid) {
+      return state.selection.focusMode.config.user.userid;
+    }
+    if (state.selection.focusMode.config.user.username) {
+      // remove once LMS no longer sends username in RPC or config
+      // https://github.com/hypothesis/client/issues/1516
+      return state.selection.focusMode.config.user.username;
+    }
   }
   return null;
 }
@@ -462,11 +466,11 @@ function focusModeUsername(state) {
  * @return {boolean}
  */
 function focusModeHasUser(state) {
-  return focusModeEnabled(state) && !!focusModeUsername(state);
+  return focusModeEnabled(state) && !!focusModeUserId(state);
 }
 
 /**
- * Returns the display name for a user or the username
+ * Returns the display name for a user or the userid
  * if display name is not present. If both are missing
  * then this returns an empty string.
  *
@@ -478,7 +482,10 @@ function focusModeUserPrettyName(state) {
     return '';
   } else if (user.displayName) {
     return user.displayName;
+  } else if (user.userid) {
+    return user.userid;
   } else if (user.username) {
+    // remove once LMS no longer sends `username` in RPC
     return user.username;
   } else {
     return '';
@@ -491,19 +498,19 @@ module.exports = {
   update: update,
 
   actions: {
-    clearSelectedAnnotations: clearSelectedAnnotations,
-    clearSelection: clearSelection,
-    focusAnnotations: focusAnnotations,
-    highlightAnnotations: highlightAnnotations,
-    selectAnnotations: selectAnnotations,
-    selectTab: selectTab,
-    setCollapsed: setCollapsed,
-    setFilterQuery: setFilterQuery,
-    setFocusModeFocused: setFocusModeFocused,
-    changeFocusModeUser: changeFocusModeUser,
-    setForceVisible: setForceVisible,
-    setSortKey: setSortKey,
-    toggleSelectedAnnotations: toggleSelectedAnnotations,
+    clearSelectedAnnotations,
+    clearSelection,
+    focusAnnotations,
+    highlightAnnotations,
+    selectAnnotations,
+    selectTab,
+    setCollapsed,
+    setFilterQuery,
+    setFocusModeFocused,
+    changeFocusModeUser,
+    setForceVisible,
+    setSortKey,
+    toggleSelectedAnnotations,
   },
 
   selectors: {
@@ -512,7 +519,7 @@ module.exports = {
     focusModeFocused,
     focusModeEnabled,
     focusModeHasUser,
-    focusModeUsername,
+    focusModeUserId,
     focusModeUserPrettyName,
     isAnnotationSelected,
     getFirstSelectedAnnotationId,
