@@ -201,6 +201,20 @@ describe('sidebar/store/modules/selection', () => {
     });
   });
 
+  describe('changeFocusModeUser()', function() {
+    it('sets the focused user and enables focus mode', function() {
+      store.setFocusModeFocused(false);
+      store.changeFocusModeUser({
+        username: 'testuser',
+        displayName: 'Test User',
+      });
+      assert.equal(store.focusModeUsername(), 'testuser');
+      assert.equal(store.focusModeUserPrettyName(), 'Test User');
+      assert.equal(store.focusModeFocused(), true);
+      assert.equal(store.focusModeEnabled(), true);
+    });
+  });
+
   describe('setFocusModeFocused()', function() {
     it('sets the focus mode to enabled', function() {
       store.setFocusModeFocused(true);
