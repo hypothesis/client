@@ -1,4 +1,4 @@
 'use strict';
 
-require('core-js/fn/object/entries');
-require('core-js/fn/object/values');
+require('core-js/es/object/entries');
+require('core-js/es/object/values');
