@@ -18,6 +18,7 @@ $base-line-height: 20px;
 
 // Components
 // ----------
+@import './components/action-button';
 @import './components/annotation';
 @import './components/annotation-document-info';
 @import './components/annotation-header';

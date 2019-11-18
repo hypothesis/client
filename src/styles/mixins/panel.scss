@@ -1,0 +1,47 @@
+@use "buttons";
+@use "../variables" as var;
+
+/**
+ * Base styles for a "panel"-like element, with appropriate
+ * padding, heading and close-button styles.
+ */
+@mixin panel {
+  background-color: var.$body-background;
+  border: solid 1px var.$grey-3;
+  border-radius: 2px;
+
+  &__header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 1em 0;
+    margin: 0 1em;
+    border: 1px none var.$grey-3;
+    border-bottom-style: solid;
+  }
+
+  &__subheader {
+    width: 100%;
+    text-align: center;
+    padding: 1em 0.5em;
+    border-bottom: 1px solid var.$grey-3;
+    font-size: 1.25em;
+    font-weight: 500;
+    color: var.$grey-5;
+  }
+
+  &__title {
+    color: var.$brand;
+    font-size: var.$body2-font-size;
+    font-weight: 700;
+  }
+
+  &__close-btn {
+    @include buttons.action-button(0px);
+  }
+
+  &__content {
+    margin: 1em;
+    margin-top: 0;
+  }
+}

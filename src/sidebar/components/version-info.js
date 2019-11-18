@@ -38,8 +38,11 @@ function VersionInfo({ flash, versionData }) {
         <dd className="version-info__value">{versionData.timestamp}</dd>
       </dl>
       <div className="version-info__actions">
-        <button className="version-info__copy-btn" onClick={copyVersionData}>
-          <SvgIcon name="copy" className="version-info__copy-btn-icon" />
+        <button
+          className="version-info__copy-btn action-button"
+          onClick={copyVersionData}
+        >
+          <SvgIcon name="copy" className="action-button__icon" />
           Copy version details
         </button>
       </div>

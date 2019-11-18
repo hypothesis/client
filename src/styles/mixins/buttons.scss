@@ -1,10 +1,56 @@
-@import './focus';
+@use "./focus";
+@use "../variables" as var;
 
 @mixin reset-native-btn-styles {
-  @include outline-on-keyboard-focus;
+  @include focus.outline-on-keyboard-focus;
 
   padding: 0px;
   margin: 0px;
   background-color: transparent;
   border-style: none;
+}
+
+/**
+ * A <button> composed of an SVG icon (left) and text (right) with some
+ * hover transition effects
+ */
+@mixin action-button($icon-margin: 0 5px) {
+  @include reset-native-btn-styles;
+  display: flex;
+  align-items: center;
+  padding: 0.5em;
+  border-radius: 2px;
+  border: none;
+  background-color: var.$grey-1;
+  color: var.$grey-5;
+  font-weight: 700;
+
+  &__icon {
+    color: var.$grey-5;
+    margin: $icon-margin;
+  }
+
+  &:hover {
+    transition: 0.2s ease-out;
+    background-color: var.$grey-2;
+    color: var.$grey-6;
+  }
+}
+
+/**
+ * An action button that is icon-only and displayed to the right of an
+ * <input> element. Colors are one tick more subtle than `action-button`.
+ */
+@mixin input-icon-button {
+  @include action-button;
+  padding: 10px;
+  border-radius: 0; // Turn off border-radius to align with <input> edges
+  border: 1px solid var.$grey-3;
+  border-left: 0px; // Avoid double border with the <input>
+  color: var.$grey-4;
+
+  &:hover {
+    background-color: var.$grey-2;
+    color: var.$grey-5;
+  }
 }

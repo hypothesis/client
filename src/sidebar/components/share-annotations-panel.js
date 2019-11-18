@@ -87,7 +87,7 @@ function ShareAnnotationsPanel({ analytics, flash }) {
               onClick={copyShareLink}
               title="copy share link"
               aria-label="Copy share link"
-              className="btn btn-clean share-annotations-panel__copy-btn"
+              className="share-annotations-panel__copy-btn"
             >
               <SvgIcon name="copy" />
             </button>
@@ -114,8 +114,8 @@ function ShareAnnotationsPanel({ analytics, flash }) {
               <em>Only Me</em>) annotations are only visible to you.
             </span>
           </p>
-          <ul className="share-annotations-panel__links">
-            <li className="share-annotations-panel__link">
+          <ul className="share-annotations-panel-links">
+            <li className="share-annotations-panel-links__link">
               <a
                 href={`https://twitter.com/intent/tweet?url=${encodedURI}&hashtags=annotated`}
                 title="Tweet share link"
@@ -123,7 +123,7 @@ function ShareAnnotationsPanel({ analytics, flash }) {
               >
                 <SvgIcon
                   name="twitter"
-                  className="share-annotations-panel__icon"
+                  className="share-annotations-panel-links__icon"
                 />
               </a>
             </li>
@@ -135,7 +135,7 @@ function ShareAnnotationsPanel({ analytics, flash }) {
               >
                 <SvgIcon
                   name="facebook"
-                  className="share-annotations-panel__icon"
+                  className="share-annotations-panel-links__icon"
                 />
               </a>
             </li>
@@ -149,7 +149,7 @@ function ShareAnnotationsPanel({ analytics, flash }) {
               >
                 <SvgIcon
                   name="email"
-                  className="share-annotations-panel__icon"
+                  className="share-annotations-panel-links__icon"
                 />
               </a>
             </li>
