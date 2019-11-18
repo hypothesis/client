@@ -136,6 +136,7 @@
   },
   "browser": {
     "hammerjs": "./node_modules/hammerjs/hammer.js",
+    "fetch-mock": "./node_modules/fetch-mock/cjs/client.js",
     "jquery": "./node_modules/jquery/dist/jquery.slim.js"
   },
   "browserify-shim": {
