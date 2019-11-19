@@ -1,0 +1,57 @@
+@use "../../mixins/forms";
+@use "../../variables" as var;
+
+.tag-editor {
+  cursor: default;
+  color: var.$grey-6;
+
+  &__input {
+    @include form-input;
+    width: 100%;
+    &:focus {
+      @include form-input-focus;
+    }
+  }
+
+  &__tag-list {
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: -0.33em; // Absorb the first row of margin-top on the tags.
+  }
+
+  &__tag-item {
+    display: flex;
+    margin-right: 0.5em;
+    margin-bottom: 0.5em;
+  }
+
+  &__edit,
+  &__link {
+    text-decoration: none;
+    border: 1px solid var.$grey-4;
+    border-radius: 2px 0 0 2px;
+    border-right-width: 0;
+    padding: 0.2em 0.5em;
+    color: var.$grey-6;
+    background: var.$grey-2;
+  }
+
+  &__link {
+    border-width: 1px;
+    background: var.$grey-3;
+    &:hover,
+    &:focus {
+      color: var.$link-color-hover;
+    }
+  }
+
+  &__delete {
+    appearance: none;
+    text-decoration: none;
+    border: 1px solid var.$grey-4;
+    border-radius: 0 2px 2px 0;
+    padding: 0.2em 0.5em;
+    color: var.$grey-6;
+    background: var.$grey-3;
+  }
+}

@@ -195,6 +195,10 @@ function startAngularApp(config) {
     .component('streamContent', require('./components/stream-content'))
     .component('svgIcon', wrapReactComponent(require('./components/svg-icon')))
     .component('tagEditor', require('./components/tag-editor'))
+    .component(
+      'tagEditor2',
+      wrapReactComponent(require('./components/tag-editor2'))
+    )
     .component('threadList', require('./components/thread-list'))
     .component('topBar', wrapReactComponent(require('./components/top-bar')))
     .directive('hAutofocus', require('./directive/h-autofocus'))
