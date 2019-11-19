@@ -16,7 +16,6 @@ $color-dove-gray: #626262;
 $color-gray: #818181;
 // Colors
 // ---------------------
-$brand-color: #bd1c2b !default;
 
 $button-text-color: $gray-dark !default;
 $button-background-start: $white !default;
@@ -90,8 +89,8 @@ $text-color: $gray-dark !default;
 
 // Links
 // -------------------------
-$link-color: $brand-color !default;
-$link-color-hover: color-weight($brand-color, 700) !default;
+$link-color: $brand !default;
+$link-color-hover: color-weight($brand, 700) !default;
 
 // Typography
 // -------------------------
