@@ -2,10 +2,13 @@
   display: flex;
 
   &__cancel-btn {
-    @extend .btn--cancel;
-
     margin-left: 5px;
     font-weight: normal;
+    color: $grey-4;
+
+    &:hover {
+      color: $grey-5;
+    }
 
     &__icon {
       margin-right: 3px;
