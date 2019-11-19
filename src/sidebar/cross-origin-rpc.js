@@ -1,17 +1,31 @@
 'use strict';
 
+const warnOnce = require('../shared/warn-once');
+
 /**
  * Return the mapped methods that can be called remotely via this server.
  *
  * @param {Object} store - The global store
  * @return {Object}
  */
-
 const registeredMethods = store => {
   return {
     changeFocusModeUser: store.changeFocusModeUser,
   };
 };
+
+/**
+ * Return true if `data` "looks like" a JSON-RPC message.
+ *
+ * @param {any} data
+ */
+function isJsonRpcMessage(data) {
+  // eslint-disable-next-line eqeqeq
+  if (data == null || typeof data !== 'object') {
+    return false;
+  }
+  return data.jsonrpc === '2.0';
+}
 
 /**
  * Begin responding to JSON-RPC requests from frames on other origins.
@@ -39,7 +53,14 @@ function start(store, settings, $window) {
   $window.addEventListener('message', function receiveMessage(event) {
     let allowedOrigins = settings.rpcAllowedOrigins || [];
 
+    if (!isJsonRpcMessage(event.data)) {
+      return;
+    }
+
     if (!allowedOrigins.includes(event.origin)) {
+      warnOnce(
+        `Ignoring JSON-RPC request from non-whitelisted origin ${event.origin}`
+      );
       return;
     }
 

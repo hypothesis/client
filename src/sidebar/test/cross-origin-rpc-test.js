@@ -6,6 +6,7 @@ describe('crossOriginRPC', function() {
   describe('server', function() {
     let addedListener; // The postMessage() listener that the server adds.
     let fakeStore;
+    let fakeWarnOnce;
     let fakeWindow;
     let settings;
     let source;
@@ -28,6 +29,12 @@ describe('crossOriginRPC', function() {
       };
 
       source = { postMessage: sinon.stub() };
+
+      fakeWarnOnce = sinon.stub();
+
+      crossOriginRPC.$imports.$mock({
+        '../shared/warn-once': fakeWarnOnce,
+      });
     });
 
     /**
@@ -50,7 +57,7 @@ describe('crossOriginRPC', function() {
       crossOriginRPC.server.start(fakeStore, settings, fakeWindow);
 
       postMessage({
-        data: { method: 'changeFocusModeUser', id: 42 },
+        data: { jsonrpc: '2.0', method: 'changeFocusModeUser', id: 42 },
         origin: 'https://allowed1.com',
         source: source,
       });
@@ -74,6 +81,7 @@ describe('crossOriginRPC', function() {
 
       postMessage({
         data: {
+          jsonrpc: '2.0',
           method: 'changeFocusModeUser',
           id: 42,
           params: ['one', 'two'],
@@ -91,6 +99,7 @@ describe('crossOriginRPC', function() {
 
       postMessage({
         data: {
+          jsonrpc: '2.0',
           method: 'changeFocusModeUser',
           id: 42,
         },
@@ -114,6 +123,18 @@ describe('crossOriginRPC', function() {
       assert.isTrue(fakeStore.changeFocusModeUser.notCalled);
     });
 
+    [{}, null, { jsonrpc: '1.0' }].forEach(invalidMessage => {
+      it('ignores non JSON-RPC messages', () => {
+        const settings = { rpcAllowedOrigins: [] };
+        crossOriginRPC.server.start(fakeStore, settings, fakeWindow);
+
+        postMessage({ data: invalidMessage, origin: 'https://foo.com' });
+
+        assert.notCalled(fakeWarnOnce);
+        assert.isTrue(source.postMessage.notCalled);
+      });
+    });
+
     [
       {},
       { rpcAllowedOrigins: [] },
@@ -124,17 +145,21 @@ describe('crossOriginRPC', function() {
 
         postMessage({
           origin: 'https://notallowed.com',
-          data: { method: 'changeFocusModeUser', id: 42 },
+          data: { jsonrpc: '2.0', method: 'changeFocusModeUser', id: 42 },
           source: source,
         });
 
+        assert.calledWith(
+          fakeWarnOnce,
+          sinon.match(/Ignoring JSON-RPC request from non-whitelisted origin/)
+        );
         assert.isTrue(source.postMessage.notCalled);
       });
     });
 
     it("responds with an error if there's no method", function() {
       crossOriginRPC.server.start(fakeStore, settings, fakeWindow);
-      let jsonRpcRequest = { id: 42 }; // No "method" member.
+      let jsonRpcRequest = { jsonrpc: '2.0', id: 42 }; // No "method" member.
 
       postMessage({
         origin: 'https://allowed1.com',
@@ -164,7 +189,7 @@ describe('crossOriginRPC', function() {
 
         postMessage({
           origin: 'https://allowed1.com',
-          data: { method: method, id: 42 },
+          data: { jsonrpc: '2.0', method: method, id: 42 },
           source: source,
         });
 
