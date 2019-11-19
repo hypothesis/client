@@ -1,5 +1,6 @@
 @import '../base';
 @import '../mixins/icons';
+@import '../mixins/focus';
 
 @import './adder';
 
@@ -107,6 +108,8 @@ $base-font-size: 14px;
   }
 
   .annotator-frame-button {
+    @include outline-on-keyboard-focus;
+
     transition: background-color 0.25s;
     @include smallshadow;
     background: $white;
@@ -126,7 +129,6 @@ $base-font-size: 14px;
 
     &:focus,
     &:hover {
-      outline: 0;
       color: $text-color;
     }
   }
