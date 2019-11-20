@@ -156,16 +156,22 @@ describe('annotation', function() {
             onClick: '&',
           },
         })
-        .component('markdownEditor', {
+        .component('annotationBody', {
           bindings: {
-            text: '<',
+            collapse: '<',
+            hasContent: '<',
+            isEditing: '<',
+            isHiddenByModerator: '<',
+            onCollapsibleChanged: '&',
             onEditText: '&',
+            onToggleCollapsed: '&',
+            text: '<',
           },
         })
-        .component('markdownView', {
+        .component('annotationQuote', {
           bindings: {
-            markdown: '<',
-            textClass: '<',
+            isOrphan: '<',
+            quote: '<',
           },
         });
     });
@@ -1256,18 +1262,6 @@ describe('annotation', function() {
       });
     });
 
-    it('renders quotes as plain text', function() {
-      const ann = fixtures.defaultAnnotation();
-      ann.target[0].selector = [
-        {
-          type: 'TextQuoteSelector',
-          exact: '<<-&->>',
-        },
-      ];
-      const el = createDirective(ann).element;
-      assert.equal(el[0].querySelector('blockquote').textContent, '<<-&->>');
-    });
-
     [
       {
         context: 'for moderators',
@@ -1275,10 +1269,8 @@ describe('annotation', function() {
           // Content still present.
           text: 'Some offensive content',
         }),
-        textClass: {
-          'annotation-body is-hidden': true,
-          'has-content': true,
-        },
+        isHiddenByModerator: true,
+        hasContent: true,
       },
       {
         context: 'for non-moderators',
@@ -1287,18 +1279,17 @@ describe('annotation', function() {
           tags: [],
           text: '',
         }),
-        textClass: {
-          'annotation-body is-hidden': true,
-          'has-content': false,
-        },
+        isHiddenByModerator: true,
+        hasContent: false,
       },
-    ].forEach(testCase => {
-      it(`renders hidden annotations with a custom text class (${testCase.context})`, () => {
-        const el = createDirective(testCase.ann).element;
+    ].forEach(({ ann, context, isHiddenByModerator, hasContent }) => {
+      it(`passes moderation status to annotation body (${context})`, () => {
+        const el = createDirective(ann).element;
         assert.match(
-          el.find('markdown-view').controller('markdownView'),
+          el.find('annotation-body').controller('annotationBody'),
           sinon.match({
-            textClass: testCase.textClass,
+            isHiddenByModerator,
+            hasContent,
           })
         );
       });
