@@ -4,6 +4,10 @@ $toolbar-border: 0.1em solid $grey-3;
   display: flex;
   flex-direction: row;
 
+  // Toolbar buttons wrap on non-touch devices if they don't fit. We don't use
+  // scrolling because that's less convenient to use with a mouse/touchpad.
+  flex-wrap: wrap;
+
   background-color: white;
   border: $toolbar-border;
   border-bottom: none;
@@ -39,4 +43,34 @@ $toolbar-border: 0.1em solid $grey-3;
   border: $toolbar-border;
   background-color: $grey-1;
   padding: 10px;
+}
+
+@media (pointer: coarse) {
+  .markdown-editor__input {
+    font-size: $touch-input-font-size;
+  }
+
+  .markdown-editor__toolbar {
+    // Remove the padding to avoid the toolbar taking up too much space as we
+    // make the buttons larger.
+    padding: 0;
+
+    // Some extra padding at the bottom is needed though as otherwise the
+    // browser is likely to confuse taps on the toolbar buttons and taps on
+    // selection handles, if some text in the first line of the input is
+    // selected.
+    padding-bottom: 10px;
+
+    // Use scrolling rather than wrapping to handle overflow for touch devices.
+    // This saves vertical space.
+    flex-wrap: unset;
+    overflow-x: scroll;
+  }
+
+  // Make the toolbar buttons larger and easier to tap.
+  .markdown-editor__toolbar-button {
+    min-width: $touch-target-size;
+    min-height: $touch-target-size;
+    font-size: 20px;
+  }
 }

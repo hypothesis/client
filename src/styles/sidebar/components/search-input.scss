@@ -45,3 +45,9 @@
     padding-left: 6px;
   }
 }
+
+@media (pointer: coarse) {
+  .search-input__input {
+    font-size: $touch-input-font-size;
+  }
+}
