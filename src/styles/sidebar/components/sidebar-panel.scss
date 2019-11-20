@@ -1,60 +1,7 @@
+@use "../../mixins/panel";
+
 .sidebar-panel {
+  @include panel.panel;
   position: relative;
-  background-color: $body-background;
-  border: solid 1px $grey-3;
-  border-radius: 2px;
   margin-bottom: 0.75em;
-
-  &__header {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    padding: 1em 0;
-    margin: 0 1em;
-    border: 1px none $grey-3;
-    border-bottom-style: solid;
-  }
-
-  &__subheader {
-    width: 100%;
-    text-align: center;
-    padding: 1em 0.5em;
-    border-bottom: 1px solid $grey-3;
-    font-size: 1.25em;
-    font-weight: 500;
-    color: $grey-5;
-  }
-
-  &__title {
-    color: $brand;
-    font-size: $body2-font-size;
-    font-weight: 700;
-  }
-
-  &__close-btn {
-    @include outline-on-keyboard-focus;
-    display: flex;
-    align-items: center;
-    border-radius: 2px;
-    border: none;
-    padding: 0.5em;
-    background-color: $grey-1;
-    color: $grey-5;
-    font-weight: 700;
-
-    &-icon {
-      color: $grey-5;
-    }
-
-    &:hover {
-      transition: 0.2s ease-out;
-      background-color: $grey-2;
-      color: $grey-6;
-    }
-  }
-
-  &__content {
-    margin: 1em;
-    margin-top: 0;
-  }
 }

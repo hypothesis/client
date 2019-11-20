@@ -52,10 +52,7 @@ function SidebarPanel({ children, panelName, title, onActiveChanged }) {
               onClick={closePanel}
               aria-label="close panel"
             >
-              <SvgIcon
-                name="cancel"
-                className="sidebar-panel__close-btn-icon"
-              />
+              <SvgIcon name="cancel" className="action-button__icon--compact" />
               Close
             </button>
           </div>
