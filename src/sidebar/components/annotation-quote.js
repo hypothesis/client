@@ -19,7 +19,7 @@ function AnnotationQuote({ isOrphan, quote, settings = {} }) {
       <Excerpt
         collapsedHeight={35}
         inlineControls={true}
-        overflowHystersis={20}
+        overflowThreshold={20}
       >
         <blockquote
           className="annotation-quote"

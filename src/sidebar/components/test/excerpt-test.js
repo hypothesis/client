@@ -57,12 +57,12 @@ describe('Excerpt', () => {
     assert.include(contentEl.html(), 'default content');
   });
 
-  it('truncates content if it exceeds `collapsedHeight` + `overflowHysteresis`', () => {
+  it('truncates content if it exceeds `collapsedHeight` + `overflowThreshold`', () => {
     const wrapper = createExcerpt({}, TALL_DIV);
     assert.equal(getExcerptHeight(wrapper), 40);
   });
 
-  it('does not truncate content if it does not exceed `collapsedHeight` + `overflowHysteresis`', () => {
+  it('does not truncate content if it does not exceed `collapsedHeight` + `overflowThreshold`', () => {
     const wrapper = createExcerpt({}, SHORT_DIV);
     assert.equal(getExcerptHeight(wrapper), 5);
   });

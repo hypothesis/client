@@ -19,7 +19,7 @@ describe('AnnotationBody', () => {
     AnnotationBody.$imports.$restore();
   });
 
-  it('displays the comment if `isEditing` is false', () => {
+  it('displays the body if `isEditing` is false', () => {
     const wrapper = createBody({ isEditing: false });
     assert.isFalse(wrapper.exists('MarkdownEditor'));
     assert.isTrue(wrapper.exists('MarkdownView'));

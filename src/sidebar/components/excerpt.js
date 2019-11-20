@@ -62,7 +62,7 @@ function Excerpt({
   inlineControls = true,
   onCollapsibleChanged = noop,
   onToggleCollapsed = noop,
-  overflowHysteresis = 0,
+  overflowThreshold = 0,
   settings = {},
 }) {
   const [collapsedByInlineControls, setCollapsedByInlineControls] = useState(
@@ -83,9 +83,9 @@ function Excerpt({
 
     // prettier-ignore
     const isCollapsible =
-      newContentHeight > (collapsedHeight + overflowHysteresis);
+      newContentHeight > (collapsedHeight + overflowThreshold);
     onCollapsibleChanged({ collapsible: isCollapsible });
-  }, [collapsedHeight, onCollapsibleChanged, overflowHysteresis]);
+  }, [collapsedHeight, onCollapsibleChanged, overflowThreshold]);
 
   useLayoutEffect(() => {
     const cleanup = observeElementSize(
@@ -99,7 +99,7 @@ function Excerpt({
   // Render the (possibly truncated) content and controls for
   // expanding/collapsing the content.
   // prettier-ignore
-  const isOverflowing = contentHeight > (collapsedHeight + overflowHysteresis);
+  const isOverflowing = contentHeight > (collapsedHeight + overflowThreshold);
   const isCollapsed = inlineControls ? collapsedByInlineControls : collapse;
   const isExpandable = isOverflowing && isCollapsed;
 
@@ -139,9 +139,6 @@ function Excerpt({
 }
 
 Excerpt.propTypes = {
-  /**
-   * The content to render inside the container.
-   */
   children: propTypes.object,
 
   /**
@@ -155,7 +152,7 @@ Excerpt.propTypes = {
 
   /**
    * If the content should be truncated if its height exceeds
-   * `collapsedHeight + overflowHysteresis`.
+   * `collapsedHeight + overflowThreshold`.
    *
    * This prop is only used if `inlineControls` is false.
    */
@@ -170,10 +167,10 @@ Excerpt.propTypes = {
    * An additional margin of pixels by which the content height can exceed
    * `collapsedHeight` before it becomes collapsible.
    */
-  overflowHysteresis: propTypes.number,
+  overflowThreshold: propTypes.number,
 
   /**
-   * Called when the content height exceeds or falls below `collapsedHeight + overflowHysteresis`.
+   * Called when the content height exceeds or falls below `collapsedHeight + overflowThreshold`.
    */
   onCollapsibleChanged: propTypes.func,
 

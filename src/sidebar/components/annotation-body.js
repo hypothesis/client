@@ -29,7 +29,7 @@ function AnnotationBody({
           inlineControls={false}
           onCollapsibleChanged={onCollapsibleChanged}
           onToggleCollapsed={collapsed => onToggleCollapsed({ collapsed })}
-          overflowHystersis={20}
+          overflowThreshold={20}
         >
           <MarkdownView
             markdown={text}
@@ -47,12 +47,19 @@ function AnnotationBody({
 
 AnnotationBody.propTypes = {
   /**
-   * Whether to limit the height of the annotation body if it is tall.
+   * Whether to limit the height of the annotation body.
+   *
+   * If this is true and the intrinsic height exceeds a fixed threshold, the
+   * body is truncated. See `onCollapsibleChanged` and `onToggleCollapsed`.
    */
   collapse: propTypes.bool,
 
   /**
-   * If the
+   * Whether to show moderated content, if `isHiddenByModerator` is true or
+   * a placeholder otherwise.
+   *
+   * This will be `true` if the current user is a moderator of the annotation's
+   * group. For non-moderators the content is not exposed via the API.
    */
   hasContent: propTypes.bool,
 
@@ -75,14 +82,13 @@ AnnotationBody.propTypes = {
   onCollapsibleChanged: propTypes.func,
 
   /**
-   * Callback invoked when the user edits the content of the annotation body
-   * when `isEditing` is true.
+   * Callback invoked when the user edits the content of the annotation body.
    */
   onEditText: propTypes.func,
 
   /**
-   * Callback invoked when the user clicks a space in a truncated annotation
-   * body to indicate that they want to see the rest of the content.
+   * Callback invoked when the user clicks a shaded area at the bottom of a
+   * truncated body to indicate that they want to see the rest of the content.
    */
   onToggleCollapsed: propTypes.func,
 
