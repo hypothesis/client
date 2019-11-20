@@ -7,20 +7,9 @@
   margin-bottom: 0.75em;
 }
 
-.form-description {
-  margin-bottom: 1em;
-}
-
-.form-input,
-.form-label {
+.form-input {
   width: 100%;
   display: block;
-}
-
-.form-label {
-  cursor: pointer;
-  font-weight: bold;
-  margin-bottom: 0.4em;
 }
 
 .form-input {
@@ -38,75 +27,9 @@
   resize: vertical;
 }
 
-.form-field-error {
-  .form-input {
-    &,
-    &:focus,
-    &.js-focus {
-      @include form-input-error;
-    }
-  }
-
-  .form-error-list {
-    display: block;
-  }
-}
-
-.form-error-list {
-  position: relative;
-  display: none;
-  background: $error-color;
-  margin-top: 0.75em;
-  padding: 0.25em 0.75em;
-  float: left;
-  border-radius: 2px;
-
-  .form-error {
-    font-size: 0.833em;
-    color: white;
-  }
-
-  &:after {
-    bottom: 100%;
-    left: 50%;
-    border: solid transparent;
-    content: ' ';
-    height: 0;
-    width: 0;
-    position: absolute;
-    pointer-events: none;
-    border-color: rgba($error-color, 0);
-    border-bottom-color: $error-color;
-    border-width: 4px;
-    margin-left: -4px;
-  }
-}
-
-.form-error {
-  color: $error-color;
-}
-
 .form-actions {
   @include pie-clearfix;
   margin-top: 0.75em;
-}
-
-.form-actions-message {
-  font-size: 0.833em;
-  float: left;
-  margin-top: 1em;
-}
-
-.form-actions-buttons {
-  @include pie-clearfix;
-  float: right;
-
-  > * {
-    margin-left: 0.75em;
-    &:first-child {
-      margin-left: 0;
-    }
-  }
 }
 
 .btn {
@@ -114,25 +37,19 @@
 
   &:hover,
   &:focus,
-  &:active,
-  &.js-hover,
-  &.js-focus,
-  &.js-active {
+  &:active {
     @include btn-hover;
   }
 
-  &:focus,
-  &.js-focus {
+  &:focus {
     @include focus-outline;
   }
 
-  &:active,
-  &.js-active {
+  &:active {
     @include btn-active;
   }
 
-  &[disabled],
-  &.js-disabled {
+  &[disabled] {
     @include btn-disabled;
   }
 }
@@ -144,31 +61,22 @@
   &:focus,
   &:hover,
   &:active,
-  &[disabled],
-  &.js-hover,
-  &.js-focus,
-  &.js-active,
-  &.js-disabled {
+  &[disabled] {
     box-shadow: none;
     background: none;
   }
 
   &:focus,
   &:hover,
-  &:active,
-  &.js-hover,
-  &.js-focus,
-  &.js-active {
+  &:active {
     color: $link-color;
   }
 
-  &:active,
-  &.js-active {
+  &:active {
     color: $link-color-hover;
   }
 
-  &[disabled],
-  &.js-disabled {
+  &[disabled] {
     color: $text-color;
   }
 }
@@ -176,59 +84,4 @@
 .btn-icon {
   display: inline-block;
   font-size: 16px;
-}
-
-// Positions a message/icon to the left of a button.
-.btn-with-message {
-  position: relative;
-}
-
-.btn-message {
-  font-style: italic;
-  color: $gray-light;
-  margin-right: 0.5em;
-  position: absolute;
-  right: 100%;
-  top: 0;
-  white-space: nowrap;
-}
-
-.btn-message-icon {
-  display: inline-block;
-  background: $success-color;
-  border-radius: 50%;
-  color: #fff;
-  padding: 2px;
-}
-
-// Handles state transitions from "default" -> "loading" -> "success"
-[status-button-state] .btn-message {
-  top: -999em;
-  left: -999em;
-  right: auto;
-}
-
-[status-button-state='success'] .btn-message-success,
-[status-button-state='loading'] .btn-message-loading {
-  left: auto;
-  top: 0;
-  right: 100%;
-}
-
-[status-button-state] .btn-message-text {
-  transition: opacity 0.2s 0.6s ease-in;
-  opacity: 0;
-}
-
-[status-button-state='success'] .btn-message-success .btn-message-text {
-  opacity: 1;
-}
-
-[status-button-state] .btn-message-success .btn-message-icon {
-  transform: scale(0);
-}
-
-[status-button-state='success'] .btn-message-success .btn-message-icon {
-  transition: transform 0.15s 0 cubic-bezier(0, 1.8, 1, 1.8);
-  transform: scale(1);
 }
