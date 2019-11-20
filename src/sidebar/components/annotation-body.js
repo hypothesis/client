@@ -14,7 +14,6 @@ function AnnotationBody({
   collapse,
   isEditing,
   isHiddenByModerator,
-  hasContent,
   onCollapsibleChanged,
   onEditText,
   onToggleCollapsed,
@@ -35,7 +34,7 @@ function AnnotationBody({
             markdown={text}
             textClass={{
               'annotation-body is-hidden': isHiddenByModerator,
-              'has-content': hasContent,
+              'has-content': text.length > 0,
             }}
           />
         </Excerpt>
@@ -55,15 +54,6 @@ AnnotationBody.propTypes = {
   collapse: propTypes.bool,
 
   /**
-   * Whether to show moderated content, if `isHiddenByModerator` is true or
-   * a placeholder otherwise.
-   *
-   * This will be `true` if the current user is a moderator of the annotation's
-   * group. For non-moderators the content is not exposed via the API.
-   */
-  hasContent: propTypes.bool,
-
-  /**
    * Whether to display the body in edit mode (if true) or view mode.
    */
   isEditing: propTypes.bool,
@@ -71,6 +61,10 @@ AnnotationBody.propTypes = {
   /**
    * `true` if the contents of this annotation body have been redacted by
    * a moderator.
+   *
+   * For redacted annotations, the text is shown struck-through (if available)
+   * or replaced by a placeholder indicating redacted content (if `text` is
+   * empty).
    */
   isHiddenByModerator: propTypes.bool,
 
