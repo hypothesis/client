@@ -1,3 +1,6 @@
+@use "../../mixins/focus";
+@use "../../mixins/forms";
+
 // A dark grey button used for the primary action
 // in a form
 .focused-mode-header {
@@ -5,8 +8,8 @@
   align-items: center;
 
   &__btn {
-    @include primary-action-btn;
-    @include outline-on-keyboard-focus;
+    @include forms.primary-action-btn;
+    @include focus.outline-on-keyboard-focus;
     display: flex;
     margin-left: auto;
     height: 30px;

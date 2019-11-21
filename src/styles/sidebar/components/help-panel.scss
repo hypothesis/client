@@ -1,3 +1,5 @@
+@use "../../variables" as var;
+
 .help-panel {
   &__sub-panel-title {
     margin: 0;
@@ -8,10 +10,10 @@
 
   &__content {
     padding: 0.5em;
-    border-top: 1px solid $grey-3;
-    border-bottom: 1px solid $grey-3;
-    line-height: $normal-line-height;
-    font-size: $normal-font-size;
+    border-top: 1px solid var.$grey-3;
+    border-bottom: 1px solid var.$grey-3;
+    line-height: var.$normal-line-height;
+    font-size: var.$normal-font-size;
   }
 
   &__icon {
@@ -30,7 +32,7 @@
     display: flex;
     align-items: center;
     margin-left: auto;
-    color: $brand;
+    color: var.$brand;
 
     &-icon {
       margin-left: 2px;
@@ -46,10 +48,10 @@
     &__tab {
       flex: 1 1 0px;
       margin-top: 0.5em;
-      border-right: 1px solid $grey-3;
+      border-right: 1px solid var.$grey-3;
       text-align: center;
       font-size: 1.25em;
-      color: $grey-5;
+      color: var.$grey-5;
 
       &:last-of-type {
         border-right: none;
@@ -57,7 +59,7 @@
     }
 
     &__link {
-      color: $grey-5;
+      color: var.$grey-5;
     }
 
     &__icon {

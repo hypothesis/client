@@ -1,3 +1,5 @@
+@use "../../variables" as var;
+
 .annotation-thread {
   display: flex;
   flex-direction: row;
@@ -33,7 +35,7 @@ li:first-child .annotation-thread--top-reply {
 
 // The dashed line at the left edge of replies
 .annotation-thread__thread-line {
-  border-right: 1px dashed $grey-3;
+  border-right: 1px dashed var.$grey-3;
   flex-grow: 1;
 }
 
@@ -48,7 +50,7 @@ li:first-child .annotation-thread--top-reply {
 // when the annotation itself is hovered, not the replies.
 .annotation-thread__collapse-toggle:hover,
 .annotation-thread__collapse-toggle.is-hovered {
-  color: $grey-7;
+  color: var.$grey-7;
 }
 
 // Toggle arrow which expands and collapses threads.
@@ -56,7 +58,7 @@ li:first-child .annotation-thread--top-reply {
 // to the left of the threads.
 .annotation-thread__collapse-toggle {
   width: 10px;
-  color: $grey-4;
+  color: var.$grey-4;
   display: block;
   text-align: center;
 

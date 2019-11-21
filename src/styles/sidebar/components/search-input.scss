@@ -1,9 +1,12 @@
+@use "../../mixins/focus";
+@use "../../variables" as var;
+
 .search-input__form {
   display: flex;
   flex-flow: row nowrap;
 
   position: relative;
-  color: $gray-dark;
+  color: var.$gray-dark;
 }
 
 .search-input__icon {
@@ -11,12 +14,12 @@
 }
 
 .search-input__input {
-  @include outline-on-keyboard-focus;
+  @include focus.outline-on-keyboard-focus;
 
   flex-grow: 1;
   order: 1;
 
-  color: $text-color;
+  color: var.$text-color;
 
   // Disable default browser styling for the input.
   border: none;
@@ -34,7 +37,7 @@
 
   &:disabled {
     background: none;
-    color: $gray-light;
+    color: var.$gray-light;
   }
 
   // Expand the search input when focused (triggered by clicking
@@ -48,6 +51,6 @@
 
 @media (pointer: coarse) {
   .search-input__input {
-    font-size: $touch-input-font-size;
+    font-size: var.$touch-input-font-size;
   }
 }

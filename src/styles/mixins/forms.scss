@@ -1,3 +1,5 @@
+@use "../variables" as var;
+
 /* Style input placeholders */
 @mixin placeholder {
   &.placeholder {
@@ -27,12 +29,12 @@
 }
 
 @mixin form-input {
-  @include font-normal;
-  border: 1px solid $gray-lighter;
+  @include var.font-normal;
+  border: 1px solid var.$gray-lighter;
   border-radius: 2px;
   padding: 0.5em 0.75em;
   font-weight: normal;
-  color: $gray;
+  color: var.$gray;
   background-color: #fafafa;
 }
 
@@ -42,44 +44,44 @@
 
   @include focus-outline;
   @include placeholder {
-    color: $gray;
+    color: var.$gray;
   }
 }
 
 @mixin form-input-error {
-  color: $error-color;
-  border-color: color-weight($error-color, 300);
-  background-color: color-weight($error-color, 50);
+  color: var.$error-color;
+  border-color: var.color-weight(var.$error-color, 300);
+  background-color: var.color-weight(var.$error-color, 50);
 
   @include placeholder {
-    color: tint($error-color, 5%);
+    color: var.tint(var.$error-color, 5%);
   }
 }
 
 @mixin btn {
   box-shadow: 0 1px 0 rgba(0, 0, 0, 0.15);
 
-  background: linear-gradient($button-background-gradient);
+  background: linear-gradient(var.$button-background-gradient);
   display: inline-block;
   font-weight: bold;
-  color: $button-text-color;
+  color: var.$button-text-color;
   text-shadow: 0 1px 0 #fff;
   border-radius: 2px;
-  border: 1px solid $gray-light;
+  border: 1px solid var.$gray-light;
   padding: 0.5em 0.9em;
 }
 
 @mixin btn-hover {
   box-shadow: 0 1px 0 rgba(0, 0, 0, 0.05);
   outline: none;
-  color: $button-text-color;
-  background: $button-background-start;
+  color: var.$button-text-color;
+  background: var.$button-background-start;
   border-color: #bababa;
 }
 
 @mixin btn-active {
   box-shadow: inset 0 1px 0 rgba(0, 0, 0, 0.1);
-  background: $button-background-end;
+  background: var.$button-background-end;
   color: #424242;
   border-color: #bababa;
 }
@@ -89,27 +91,27 @@
   cursor: default;
   background: #f0f0f0;
   border-color: #cecece;
-  color: $gray-light;
+  color: var.$gray-light;
 }
 
 @mixin primary-action-btn {
-  color: $grey-1;
-  background-color: $color-dove-gray;
+  color: var.$grey-1;
+  background-color: var.$color-dove-gray;
   height: 35px;
   border: none;
   border-radius: 2px;
 
   font-weight: bold;
-  font-size: $body1-font-size;
+  font-size: var.$body1-font-size;
 
   padding-left: 12px;
   padding-right: 12px;
 
   &:disabled {
-    color: $gray-light;
+    color: var.$gray-light;
   }
 
   &:hover:enabled {
-    background-color: $color-mine-shaft;
+    background-color: var.$color-mine-shaft;
   }
 }

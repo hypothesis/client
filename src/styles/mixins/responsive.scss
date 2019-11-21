@@ -1,10 +1,12 @@
+@use "sass:list";
+@use "sass:meta";
 $break-wide-handheld: 480px !default;
 $break-tablet: 768px !default;
 $break-desktop: 1024px !default;
 
 // DEPRECATED: Use mobile first mixins defined below.
 @mixin respond-to($media) {
-  @if type-of($media) == 'string' {
+  @if meta.type-of($media) == 'string' {
     @if $media == 'handhelds' {
       @media only screen and (max-width: $break-wide-handheld) {
         @content;
@@ -22,23 +24,23 @@ $break-desktop: 1024px !default;
         @content;
       }
     }
-  } @else if type-of($media) == 'list' {
-    @if index($media, 'handhelds') {
+  } @else if meta.type-of($media) == 'list' {
+    @if list.index($media, 'handhelds') {
       @media only screen and (max-width: $break-wide-handheld) {
         @content;
       }
     }
-    @if index($media, 'wide-handhelds') {
+    @if list.index($media, 'wide-handhelds') {
       @media only screen and (min-width: $break-wide-handheld + 1) and (max-width: $break-tablet) {
         @content;
       }
     }
-    @if index($media, 'tablets') {
+    @if list.index($media, 'tablets') {
       @media only screen and (min-width: $break-tablet + -1) and (max-width: $break-desktop) {
         @content;
       }
     }
-    @if index($media, 'desktops') {
+    @if list.index($media, 'desktops') {
       @media only screen and (min-width: $break-desktop + 1) {
         @content;
       }

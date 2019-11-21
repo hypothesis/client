@@ -1,5 +1,7 @@
+@use "../styled-text";
+
 .markdown-view {
-  @include styled-text;
+  @include styled-text.styled-text;
 
   cursor: text;
 

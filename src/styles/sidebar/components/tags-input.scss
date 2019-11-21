@@ -1,3 +1,6 @@
+@use "../../mixins/forms";
+@use "../../variables" as var;
+
 // Styles for the ngTagsInput plugin.
 // http://mbenford.github.io/ngTagsInput/gettingstarted
 
@@ -9,10 +12,10 @@ tags-input {
   .tags {
     display: flex;
     flex-wrap: wrap;
-    @include form-input;
+    @include forms.form-input;
 
     &.focused {
-      @include form-input-focus;
+      @include forms.form-input-focus;
     }
 
     // Input
@@ -21,7 +24,7 @@ tags-input {
       outline: none;
       border: none !important;
       background: none;
-      color: $gray;
+      color: var.$gray;
 
       // Firefox and Webkit render input boxes at different heights. This
       // causes issues when the tags (which render consistentely) are inserted
@@ -42,14 +45,14 @@ tags-input {
     margin-top: 0.384em;
     margin-right: 0.384em;
     font-size: 0.866em;
-    color: $grey-6;
-    border: 1px solid $grey-4;
-    background-color: $grey-3;
+    color: var.$grey-6;
+    border: 1px solid var.$grey-4;
+    background-color: var.$grey-3;
     border-radius: 2px;
 
     &.selected {
-      @include btn-hover;
-      @include focus-outline;
+      @include forms.btn-hover;
+      @include forms.focus-outline;
     }
 
     .remove-button {
@@ -71,7 +74,7 @@ tags-input {
 }
 
 .tags-read-only {
-  font-size: $normal-font-size;
+  font-size: var.$normal-font-size;
   margin: 0.4545em 0;
 
   .tag-list {
@@ -79,25 +82,25 @@ tags-input {
     flex-wrap: wrap;
     // Margin between bottom of ascent of annotation body and
     // top of tags list should be ~15px
-    margin-top: -$layout-h-margin + 10px;
+    margin-top: -(var.$layout-h-margin) + 10px;
     // Margin between top of x-height of annotation footer
     // labels and bottom of tags list should be ~15px
-    margin-bottom: $layout-h-margin - 10px;
+    margin-bottom: var.$layout-h-margin - 10px;
 
     .tag-item {
       margin: 0 0.4545em 0.4545em 0;
 
       a {
         text-decoration: none;
-        border: 1px solid $grey-3;
+        border: 1px solid var.$grey-3;
         border-radius: 2px;
         padding: 0 0.4545em 0.1818em;
-        color: $grey-6;
-        background: $grey-2;
+        color: var.$grey-6;
+        background: var.$grey-2;
 
         &:hover,
         &:focus {
-          color: $link-color-hover;
+          color: var.$link-color-hover;
         }
       }
     }
@@ -126,12 +129,12 @@ tags-input .autocomplete {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    font-family: $sans-font-family;
+    font-family: var.$sans-font-family;
     color: black;
     background-color: white;
 
     em {
-      font-family: $sans-font-family;
+      font-family: var.$sans-font-family;
       font-weight: bold;
       font-style: normal;
       color: black;

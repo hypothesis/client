@@ -1,3 +1,4 @@
+@use "sass:color";
 // Colors and shades of gray
 // Names courtesy of http://chir.ag/projects/name-that-color
 
@@ -42,11 +43,11 @@ $highlight: #58cef4;
 // Tint and shade functions from
 // https://css-tricks.com/snippets/sass/tint-shade-functions
 @function tint($color, $percent) {
-  @return mix(white, $color, $percent);
+  @return color.mix(white, $color, $percent);
 }
 
 @function shade($color, $percent) {
-  @return mix(black, $color, $percent);
+  @return color.mix(black, $color, $percent);
 }
 
 @function color-weight($c, $n: 500) {

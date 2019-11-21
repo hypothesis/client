@@ -1,13 +1,16 @@
+@use "../../mixins/forms";
+@use "../../variables" as var;
+
 .annotation-publish-control {
   display: flex;
 
   &__cancel-btn {
     margin-left: 5px;
     font-weight: normal;
-    color: $grey-4;
+    color: var.$grey-4;
 
     &:hover {
-      color: $grey-5;
+      color: var.$grey-5;
     }
 
     &__icon {
@@ -19,9 +22,9 @@
   // A split button with a primary submit on the left and a drop-down menu
   // of related options to the right
   .annotation-publish-control__btn {
-    $text-color: $grey-1;
-    $default-background-color: $color-dove-gray;
-    $hover-background-color: $color-mine-shaft;
+    $text-color: var.$grey-1;
+    $default-background-color: var.$color-dove-gray;
+    $hover-background-color: var.$color-mine-shaft;
     $h-padding: 9px;
     $height: 35px;
     $border-radius: 2px;
@@ -42,7 +45,7 @@
     }
 
     &-primary {
-      @include primary-action-btn;
+      @include forms.primary-action-btn;
 
       // the label occupies the entire space of the button and
       // shows a darker state on hover
@@ -67,7 +70,7 @@
       margin-left: 8px;
 
       border: none;
-      background-color: $color-dove-gray;
+      background-color: var.$color-dove-gray;
       border-top-right-radius: $border-radius;
       border-bottom-right-radius: $border-radius;
 
@@ -81,7 +84,7 @@
       button[aria-expanded='true'] &-separator {
         // hide the 1px vertical separator when the dropdown arrow
         // is hovered or menu is open
-        background-color: $color-dove-gray;
+        background-color: var.$color-dove-gray;
       }
 
       // 1px vertical separator between label and dropdown arrow
@@ -95,7 +98,7 @@
         width: 1px;
         height: 15px;
 
-        background-color: $color-gray;
+        background-color: var.$color-gray;
       }
 
       // the ▼ arrow which reveals the dropdown menu when clicked

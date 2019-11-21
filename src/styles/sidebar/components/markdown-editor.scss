@@ -1,4 +1,6 @@
-$toolbar-border: 0.1em solid $grey-3;
+@use "../../variables" as var;
+
+$toolbar-border: 0.1em solid var.$grey-3;
 
 .markdown-editor__toolbar {
   display: flex;
@@ -22,7 +24,7 @@ $toolbar-border: 0.1em solid $grey-3;
   border: none;
   background: none;
 
-  color: $grey-5;
+  color: var.$grey-5;
   font-size: 16px;
 
   &:hover,
@@ -31,7 +33,7 @@ $toolbar-border: 0.1em solid $grey-3;
   }
 
   &:disabled {
-    color: $grey-3;
+    color: var.$grey-3;
   }
 
   &.is-text {
@@ -41,13 +43,13 @@ $toolbar-border: 0.1em solid $grey-3;
 
 .markdown-editor__preview {
   border: $toolbar-border;
-  background-color: $grey-1;
+  background-color: var.$grey-1;
   padding: 10px;
 }
 
 @media (pointer: coarse) {
   .markdown-editor__input {
-    font-size: $touch-input-font-size;
+    font-size: var.$touch-input-font-size;
   }
 
   .markdown-editor__toolbar {
@@ -69,8 +71,8 @@ $toolbar-border: 0.1em solid $grey-3;
 
   // Make the toolbar buttons larger and easier to tap.
   .markdown-editor__toolbar-button {
-    min-width: $touch-target-size;
-    min-height: $touch-target-size;
+    min-width: var.$touch-target-size;
+    min-height: var.$touch-target-size;
     font-size: 20px;
   }
 }

@@ -1,3 +1,5 @@
+@use "../../variables" as var;
+
 .tutorial {
   &__list {
     margin-top: 0em;
@@ -13,7 +15,7 @@
     height: 12px;
     margin-right: 1px;
     margin-bottom: -1px; // Pull the icon a little toward the baseline
-    color: $grey-5;
+    color: var.$grey-5;
   }
 
   &__instruction {

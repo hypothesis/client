@@ -1,3 +1,5 @@
+@use "../../variables" as var;
+
 @at-root {
   $expand-duration: 0.15s;
 
@@ -28,11 +30,11 @@
   .excerpt__toggle-link {
     padding-left: 15px;
     background-image: linear-gradient(to right, transparent 0px, white 12px);
-    line-height: $normal-line-height;
+    line-height: var.$normal-line-height;
   }
 
   .excerpt__toggle-link > a {
-    color: $text-color;
+    color: var.$text-color;
     font-style: italic;
     font-weight: normal;
   }

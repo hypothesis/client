@@ -1,6 +1,8 @@
+@use "../variables" as var;
+
 // basic standard styling for elements
 a {
-  color: $link-color;
+  color: var.$link-color;
   text-decoration: none;
 }
 
@@ -11,7 +13,7 @@ a:focus {
 
 a:hover {
   text-decoration: none;
-  color: $link-color-hover;
+  color: var.$link-color-hover;
 }
 
 ol {

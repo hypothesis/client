@@ -1,5 +1,7 @@
+@use "../../variables" as var;
+
 .new-note__create {
-  background-color: $color-dove-gray;
+  background-color: var.$color-dove-gray;
   border: none;
   border-radius: 3px;
   color: #fff;

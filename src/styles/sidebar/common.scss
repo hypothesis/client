@@ -1,8 +1,10 @@
+@use "../variables" as var;
+
 //ELEMENT STYLES////////////////////////////////
 body {
   position: relative;
-  background-color: $body-background;
-  color: $text-color;
+  background-color: var.$body-background;
+  color: var.$text-color;
 }
 
 p {
@@ -18,14 +20,14 @@ em {
 }
 
 html {
-  font-size: $base-font-size;
-  line-height: $base-line-height;
+  font-size: var.$base-font-size;
+  line-height: var.$base-line-height;
 }
 
 //MCRANDOM////////////////////////////////
 
 .small {
-  font-size: $body1-font-size;
+  font-size: var.$body1-font-size;
 }
 
 //CLOSER////////////////////////////////
@@ -42,8 +44,8 @@ html {
 //FORM RELATED////////////////////////////////
 .form-vertical {
   legend {
-    font-size: $body1-font-size;
-    line-height: $body1-line-height;
+    font-size: var.$body1-font-size;
+    line-height: var.$body1-line-height;
     margin-top: 1.5em;
     margin-bottom: 1.5em;
   }
@@ -66,9 +68,9 @@ html {
     line-height: 1;
 
     a {
-      font-family: $sans-font-family;
+      font-family: var.$sans-font-family;
       font-weight: bold;
-      color: $gray-dark;
+      color: var.$gray-dark;
       cursor: pointer;
       border-bottom: 3px solid transparent;
       padding-left: 0.153em;
@@ -86,7 +88,7 @@ html {
     }
 
     &.active a {
-      border-color: $gray-lighter;
+      border-color: var.$gray-lighter;
     }
 
     &:before {
