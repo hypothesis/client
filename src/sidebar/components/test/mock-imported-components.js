@@ -39,6 +39,8 @@ function getDisplayName(component) {
  * `Widget`). They will render only their children, as if they were just a
  * `Fragment`.
  *
+ * Components may be excluded (not mocked) by using the `exclude` parameter.
+ *
  * @example
  *   beforeEach(() => {
  *     ComponentUnderTest.$imports.$mock(mockImportedComponents());
@@ -50,9 +52,11 @@ function getDisplayName(component) {
  *     ComponentUnderTest.$imports.$restore();
  *   });
  *
+ * @param {string[]} exclude - An Array of component displayNames that
+ *                             should not be mocked.
  * @return {Function} - A function that can be passed to `$imports.$mock`.
  */
-function mockImportedComponents() {
+function mockImportedComponents(exclude = []) {
   return (source, symbol, value) => {
     if (!isComponent(value)) {
       return null;
@@ -60,6 +64,9 @@ function mockImportedComponents() {
 
     const mock = props => props.children;
     mock.displayName = getDisplayName(value);
+    if (exclude.includes(mock.displayName)) {
+      return null;
+    }
 
     return mock;
   };
