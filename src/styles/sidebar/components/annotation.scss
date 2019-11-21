@@ -1,8 +1,12 @@
-@mixin quote {
-  @include font-normal;
+@use "../../mixins/forms";
+@use "../../mixins/icons";
+@use "../../variables" as var;
 
-  border-left: 3px solid $gray-lighter;
-  color: $grey-4;
+@mixin quote {
+  @include var.font-normal;
+
+  border-left: 3px solid var.$gray-lighter;
+  color: var.$grey-4;
   font-family: sans-serif;
   font-size: 12px;
   font-style: italic;
@@ -12,7 +16,7 @@
 
 // Highlight quote of annotation whenever its thread is hovered
 .thread-list__card:hover .annotation-quote {
-  border-left: $highlight 3px solid;
+  border-left: var.$highlight 3px solid;
 }
 
 // When hovering a top-level annotation, show the footer in a hovered state.
@@ -23,17 +27,17 @@
   .annotation-replies__link,
   .annotation-replies__count,
   .annotation-action-btn {
-    color: $grey-6;
+    color: var.$grey-6;
   }
 
   .annotation-header__timestamp-link {
-    color: $grey-5;
+    color: var.$grey-5;
   }
 }
 
 .annotation {
   display: block;
-  font-family: $sans-font-family;
+  font-family: var.$sans-font-family;
   position: relative;
 }
 
@@ -41,7 +45,7 @@
   // Lighten the bodies of dimmed annotations to make other
   // annotations which are not dimmed stand out
   .annotation-body {
-    color: $grey-5;
+    color: var.$grey-5;
   }
 }
 
@@ -50,13 +54,13 @@
   // make them stand out next to others, which will have the `is-dimmed` state
   // set
   .annotation-body {
-    color: $grey-7;
+    color: var.$grey-7;
   }
 }
 
 .annotation-link {
-  @include font-small;
-  color: $grey-4;
+  @include var.font-small;
+  color: var.$grey-4;
   // Decrease the margin between the more/less link
   // and the annotation body.
   margin-top: -12px;
@@ -70,16 +74,16 @@
 
 .annotation-quote-list,
 .annotation-footer {
-  @include pie-clearfix;
+  @include forms.pie-clearfix;
 }
 
 .annotation-body {
-  @include font-normal;
-  color: $grey-6;
+  @include var.font-normal;
+  color: var.$grey-6;
   // Margin between top of ascent of annotation body and
   // bottom of ascent of annotation-quote should be ~15px.
-  margin-top: $layout-h-margin - 5px;
-  margin-bottom: $layout-h-margin;
+  margin-top: var.$layout-h-margin - 5px;
+  margin-bottom: var.$layout-h-margin;
   margin-right: 0px;
   margin-left: 0px;
 }
@@ -100,8 +104,8 @@
   height: 60px;
   background: repeating-linear-gradient(
     to bottom,
-    $grey-2,
-    $grey-2 15px,
+    var.$grey-2,
+    var.$grey-2 15px,
     white 15px,
     white 20px
   );
@@ -110,9 +114,9 @@
 // the footer at the bottom of an annotation displaying
 // the annotation actions and reply counts
 .annotation-footer {
-  @include font-normal;
-  color: $grey-5;
-  margin-top: $layout-h-margin;
+  @include var.font-normal;
+  color: var.$grey-5;
+  margin-top: var.$layout-h-margin;
 }
 
 .u-flex-spacer {
@@ -122,10 +126,10 @@
 .annotation-quote-list {
   // Margin between top of ascent of annotation quote and
   // bottom of ascent of username should be ~15px
-  margin-top: $layout-h-margin - 5px;
+  margin-top: var.$layout-h-margin - 5px;
   // Margin between bottom of ascent of annotation quote and
   // top of ascent of annotation-body should be ~15px
-  margin-bottom: $layout-h-margin - 3px;
+  margin-bottom: var.$layout-h-margin - 3px;
 }
 
 .annotation-quote-list.is-orphan {
@@ -144,8 +148,8 @@
 
 .annotation-replies__link,
 .annotation-replies__count {
-  @include font-normal;
-  color: $grey-5;
+  @include var.font-normal;
+  color: var.$grey-5;
 }
 
 .annotation-actions {
@@ -155,7 +159,7 @@
 }
 
 .annotation-action-btn {
-  color: $grey-5;
+  color: var.$grey-5;
   font-weight: normal;
   padding: 0;
   margin: 0px 0px 0px 12px;
@@ -173,8 +177,8 @@
 }
 
 .annotation-citation-domain {
-  color: $gray-light;
-  font-size: $body1-font-size;
+  color: var.$gray-light;
+  font-size: var.$body1-font-size;
 }
 
 .annotation-license {
@@ -183,15 +187,15 @@
   font-size: 0.8em;
   padding-top: 0.583em;
 
-  @include icons {
-    font-size: $normal-font-size;
+  @include icons.icons {
+    font-size: var.$normal-font-size;
     vertical-align: -2px;
     margin-right: 1px;
   }
 }
 
 .annotation-license__link {
-  color: $gray-light;
+  color: var.$gray-light;
   display: block;
 }
 
@@ -232,13 +236,13 @@
 // Style adjustments for annotation cards that are replies
 .annotation--reply {
   .annotation-action-btn {
-    color: $grey-4;
+    color: var.$grey-4;
   }
 
   .annotation-footer {
     // Margin between bottom of ascent of annotation body and
     // top of annotation footer should be ~15px
-    margin-top: $layout-h-margin - 8px;
+    margin-top: var.$layout-h-margin - 8px;
   }
 
   .annotation-header {
@@ -250,14 +254,14 @@
   .annotation-body {
     // Margin between top of ascent of annotation body and
     // bottom of ascent of username should be ~15px
-    margin-top: $layout-h-margin - 8px;
+    margin-top: var.$layout-h-margin - 8px;
     // Margin between bottom of ascent of annotation body and
     // top of annotation footer labels should be ~15px
-    margin-bottom: $layout-h-margin - 3px;
+    margin-bottom: var.$layout-h-margin - 3px;
   }
 }
 
 .annotation--flagged {
-  color: $brand;
+  color: var.$brand;
   cursor: default;
 }

@@ -1,66 +1,66 @@
-$base-font-size: 12px;
-$base-line-height: 20px;
-
 // Variables and mixins
 // --------------------
-@import '../variables';
-@import '../mixins/buttons';
-@import '../mixins/focus';
-@import '../mixins/forms';
-@import '../mixins/icons';
-@import '../mixins/responsive';
+@use '../variables' as var with (
+  $base-font-size: 12px,
+  $base-line-height: 20px
+);
+@use '../mixins/buttons';
+@use '../mixins/focus';
+@use '../mixins/forms';
+@use '../mixins/icons';
+@use '../mixins/responsive';
 
 // Base styles
 // -----------
-@import '../reset';
-@import '../util';
-@import './elements';
+@use '../reset';
+@use '../util';
+@use './elements';
 
 // Misc. legacy :(
 // ---------------
-@import '../forms';
-@import './styled-text';
-@import './common';
+@use '../forms' as forms2;
+@use './styled-text';
+@use './common';
 
 // Components
 // ----------
-@import './components/action-button';
-@import './components/annotation';
-@import './components/annotation-document-info';
-@import './components/annotation-header';
-@import './components/annotation-share-dialog';
-@import './components/annotation-share-info';
-@import './components/annotation-publish-control';
-@import './components/annotation-thread';
-@import './components/annotation-user';
-@import './components/excerpt';
-@import './components/focused-mode-header';
-@import './components/group-list';
-@import './components/group-list-item';
-@import './components/help-panel';
-@import './components/logged-out-message';
-@import './components/markdown-editor';
-@import './components/markdown-view';
-@import './components/menu';
-@import './components/menu-item';
-@import './components/menu-section';
-@import './components/moderation-banner';
-@import './components/new-note';
-@import './components/primary-action-btn';
-@import './components/search-status-bar';
-@import './components/selection-tabs';
-@import './components/share-annotations-panel';
-@import './components/search-input';
-@import './components/share-links';
-@import './components/sidebar-panel';
-@import './components/svg-icon';
-@import './components/spinner';
-@import './components/tags-input';
-@import './components/thread-list';
-@import './components/tooltip';
-@import './components/top-bar';
-@import './components/tutorial';
-@import './components/version-info';
+@use './components/action-button';
+@use './components/annotation';
+@use './components/annotation-document-info';
+@use './components/annotation-header';
+@use './components/annotation-share-dialog';
+@use './components/annotation-share-info';
+@use './components/annotation-publish-control';
+@use './components/annotation-thread';
+@use './components/annotation-user';
+@use './components/excerpt';
+@use './components/focused-mode-header';
+@use './components/group-list';
+@use './components/group-list-item';
+@use './components/help-panel';
+@use './components/logged-out-message';
+@use './components/markdown-editor';
+@use './components/markdown-view';
+@use './components/menu';
+@use './components/menu-item';
+@use './components/menu-section';
+@use './components/moderation-banner';
+@use './components/new-note';
+@use './components/primary-action-btn';
+@use './components/search-status-bar';
+@use './components/selection-tabs';
+@use './components/share-annotations-panel';
+@use './components/search-input';
+@use './components/share-links';
+@use './components/sidebar-panel';
+@use './components/svg-icon';
+@use './components/spinner';
+@use './components/tags-input';
+@use './components/thread-list';
+@use './components/tooltip';
+@use './components/top-bar';
+@use './components/tutorial';
+@use './components/version-info';
 
 // Top-level styles
 // ----------------
@@ -70,8 +70,8 @@ body {
 }
 
 body {
-  background: $grey-2;
-  font-family: $sans-font-family;
+  background: var.$grey-2;
+  font-family: var.$sans-font-family;
   font-weight: normal;
   -webkit-overflow-scrolling: touch;
 }
@@ -84,15 +84,15 @@ hypothesis-app {
 .app-content-wrapper {
   $sidebar-h-padding: 9px;
 
-  background: $grey-2;
+  background: var.$grey-2;
   min-height: 100%;
   height: 100%;
   overflow: scroll;
   -webkit-overflow-scrolling: touch;
   padding: $sidebar-h-padding;
-  padding-top: $sidebar-h-padding + $top-bar-height;
+  padding-top: $sidebar-h-padding + var.$top-bar-height;
 
-  @include respond-to(tablets desktops) {
+  @include responsive.respond-to(tablets desktops) {
     padding-bottom: 4rem;
   }
 }
@@ -101,9 +101,9 @@ hypothesis-app {
   margin-left: auto;
   margin-right: auto;
 
-  @include respond-to(tablets desktops) {
+  @include responsive.respond-to(tablets desktops) {
     margin: auto;
-    max-width: $break-tablet;
+    max-width: responsive.$break-tablet;
     padding-left: 4rem;
     padding-right: 4rem;
   }
@@ -113,17 +113,17 @@ hypothesis-app {
 // ---------------------------------------
 
 .sheet {
-  border: solid 1px $gray-lighter;
+  border: solid 1px var.$gray-lighter;
   border-radius: 2px;
-  font-family: $sans-font-family;
+  font-family: var.$sans-font-family;
   font-weight: 300;
   margin-bottom: 0.72em;
   padding: 1em;
   position: relative;
-  background-color: $body-background;
+  background-color: var.$body-background;
 
   .nav-tabs {
-    border: 1px none $gray-lighter;
+    border: 1px none var.$gray-lighter;
     border-bottom-style: solid;
     padding: 0 0 1.1em;
     li a {
@@ -153,7 +153,7 @@ hypothesis-app {
 .annotation-unavailable-message {
   display: flex;
   flex-direction: column;
-  border: 1px solid $gray-lighter;
+  border: 1px solid var.$gray-lighter;
   padding-top: 30px;
   padding-bottom: 30px;
   border-radius: 3px;

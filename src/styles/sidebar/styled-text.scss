@@ -1,3 +1,5 @@
+@use "../variables" as var;
+
 @mixin styled-text() {
   // Reset the line-height in case any parent elements have set it.
   line-height: normal;
@@ -23,7 +25,7 @@
   h4,
   h5,
   h6 {
-    font-family: $sans-font-family;
+    font-family: var.$sans-font-family;
   }
 
   // Use a modular scale for headings:
@@ -105,10 +107,10 @@
   }
 
   blockquote {
-    @include font-normal;
+    @include var.font-normal;
 
-    border-left: 3px solid $grey-3;
-    color: $grey-4;
+    border-left: 3px solid var.$grey-3;
+    color: var.$grey-4;
     font-family: sans-serif;
     font-size: 12px;
     font-style: italic;
@@ -132,7 +134,7 @@
   }
 
   code {
-    font-family: $mono-font-family;
+    font-family: var.$mono-font-family;
     font-size: 0.875em;
     color: black;
   }
@@ -140,7 +142,7 @@
   pre code {
     padding: 10px;
     display: block;
-    background-color: $grey-1;
+    background-color: var.$grey-1;
     border-radius: 2px;
   }
 }

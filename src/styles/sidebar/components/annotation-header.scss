@@ -1,9 +1,12 @@
+@use "../../mixins/forms";
+@use "../../variables" as var;
+
 .annotation-header {
-  @include pie-clearfix;
+  @include forms.pie-clearfix;
   // Margin between top of x-height of username and
   // top of the annotation card should be ~15px
-  margin-top: -$layout-h-margin + 10px;
-  color: $grey-5;
+  margin-top: -(var.$layout-h-margin) + 10px;
+  color: var.$grey-5;
 
   &__row {
     display: flex;
@@ -16,9 +19,9 @@
   }
 
   &__timestamp-edited {
-    @include font-small;
+    @include var.font-small;
     font-style: italic;
-    color: $grey-4;
+    color: var.$grey-4;
   }
 
   &__timestamp-created-link {
@@ -28,7 +31,7 @@
   }
 
   &__timestamp-created-link {
-    color: $grey-5;
+    color: var.$grey-5;
   }
 
   &__highlight {

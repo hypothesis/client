@@ -1,7 +1,10 @@
+@use "mixins/forms";
+@use "variables" as var;
+
 // Common form styles.
 
 .form-field {
-  @include pie-clearfix;
+  @include forms.pie-clearfix;
   clear: both;
   margin-bottom: 0.75em;
 }
@@ -12,11 +15,11 @@
 }
 
 .form-input {
-  @include form-input;
+  @include forms.form-input;
 
   &:focus,
   &.js-focus {
-    @include form-input-focus;
+    @include forms.form-input-focus;
   }
 }
 
@@ -27,29 +30,29 @@
 }
 
 .form-actions {
-  @include pie-clearfix;
+  @include forms.pie-clearfix;
   margin-top: 0.75em;
 }
 
 .btn {
-  @include btn;
+  @include forms.btn;
 
   &:hover,
   &:focus,
   &:active {
-    @include btn-hover;
+    @include forms.btn-hover;
   }
 
   &:focus {
-    @include focus-outline;
+    @include forms.focus-outline;
   }
 
   &:active {
-    @include btn-active;
+    @include forms.btn-active;
   }
 
   &[disabled] {
-    @include btn-disabled;
+    @include forms.btn-disabled;
   }
 }
 
@@ -68,15 +71,15 @@
   &:focus,
   &:hover,
   &:active {
-    color: $link-color;
+    color: var.$link-color;
   }
 
   &:active {
-    color: $link-color-hover;
+    color: var.$link-color-hover;
   }
 
   &[disabled] {
-    color: $text-color;
+    color: var.$text-color;
   }
 }
 

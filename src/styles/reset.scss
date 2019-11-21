@@ -1,4 +1,4 @@
-@import 'mixins/reset';
+@use 'mixins/reset';
 
 /*
   Consistency fixes
@@ -57,7 +57,7 @@ input,
 textarea,
 button,
 select {
-  @include reset-font;
+  @include reset.reset-font;
   line-height: normal;
   margin: 0;
 }
@@ -82,7 +82,7 @@ img::-moz-selection {
 ul,
 ol,
 li {
-  @include reset-box-model;
+  @include reset.reset-box-model;
 }
 
 ul,

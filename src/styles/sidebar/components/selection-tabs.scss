@@ -1,11 +1,14 @@
+@use "../../mixins/focus";
+@use "../../variables" as var;
+
 .selection-tabs {
   display: flex;
   flex-direction: row;
-  color: $grey-5;
-  @include font-normal;
+  color: var.$grey-5;
+  @include var.font-normal;
 
   &:hover {
-    color: $grey-6;
+    color: var.$grey-6;
   }
 
   padding-bottom: 10px;
@@ -16,9 +19,9 @@
 }
 
 .selection-tabs__type {
-  @include outline-on-keyboard-focus;
+  @include focus.outline-on-keyboard-focus;
 
-  color: $grey-6;
+  color: var.$grey-6;
   margin-right: 20px;
   cursor: pointer;
   min-width: 85px;

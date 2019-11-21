@@ -1,6 +1,8 @@
+@use "../../variables" as var;
+
 // Footer to display at the bottom of a menu item.
 .group-list-item__footer {
-  background-color: $grey-1;
+  background-color: var.$grey-1;
   margin: 0;
   padding-top: 15px;
   padding: 10px;

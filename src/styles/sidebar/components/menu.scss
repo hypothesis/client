@@ -1,10 +1,13 @@
+@use "../../mixins/focus";
+@use "../../variables" as var;
+
 .menu {
   position: relative;
 }
 
 // Toggle button that opens the menu.
 .menu__toggle {
-  @include outline-on-keyboard-focus;
+  @include focus.outline-on-keyboard-focus;
 
   appearance: none;
   border: none;
@@ -36,7 +39,7 @@
 // Triangular indicator at the top of the menu that associates it with the
 // toggle button.
 .menu__arrow {
-  color: $grey-3;
+  color: var.$grey-3;
   fill: white;
 
   // Position the arrow so that it appears flush with the right edge of the
@@ -52,9 +55,9 @@
 // Content area of the menu.
 .menu__content {
   background-color: white;
-  border: 1px solid $grey-3;
+  border: 1px solid var.$grey-3;
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
-  font-size: $body2-font-size;
+  font-size: var.$body2-font-size;
   position: absolute;
   top: calc(100% + 5px);
   z-index: 1;

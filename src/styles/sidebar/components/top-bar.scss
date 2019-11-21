@@ -1,7 +1,10 @@
+@use "../../mixins/buttons";
+@use "../../variables" as var;
+
 .top-bar {
-  background: $white;
-  border-bottom: solid 1px $grey-3;
-  height: $top-bar-height;
+  background: var.$white;
+  border-bottom: solid 1px var.$grey-3;
+  height: var.$top-bar-height;
   // TODO bring into standard rhythm of typography
   font-size: 15px;
   position: absolute;
@@ -21,7 +24,7 @@
 
 .top-bar__login-links {
   flex-shrink: 0;
-  font-size: $body2-font-size;
+  font-size: var.$body2-font-size;
   padding-left: 5px;
 }
 
@@ -54,27 +57,27 @@
 }
 
 .top-bar__btn {
-  @include reset-native-btn-styles;
+  @include buttons.reset-native-btn-styles;
 
   height: 100%;
-  color: $gray-light;
+  color: var.$gray-light;
   display: inline-block;
   cursor: pointer;
   padding: 1px 3px 0 3px;
 
   &:hover {
-    color: $gray-dark;
+    color: var.$gray-dark;
   }
 
   &.is-active {
-    color: $gray-dark;
+    color: var.$gray-dark;
   }
 
   &--refresh {
-    color: $brand;
+    color: var.$brand;
 
     &:hover {
-      color: $brand;
+      color: var.$brand;
     }
   }
 }

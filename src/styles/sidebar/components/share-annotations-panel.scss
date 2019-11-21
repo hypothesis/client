@@ -1,11 +1,13 @@
+@use "../../variables" as var;
+
 @use "../../mixins/buttons";
 @use "../../mixins/links";
 
 .share-annotations-panel {
-  color: $grey-5;
+  color: var.$grey-5;
 
   &__intro {
-    color: $grey-7;
+    color: var.$grey-7;
     font-weight: 500;
   }
 

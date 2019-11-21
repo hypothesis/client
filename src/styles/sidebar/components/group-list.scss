@@ -1,17 +1,19 @@
+@use "../../variables" as var;
+
 .group-list__content {
   min-width: 250px;
 }
 
 .group-list__menu-label {
   align-items: center;
-  color: $grey-6;
+  color: var.$grey-6;
   display: flex;
 
   // Prevent label from wrapping if top bar is too narrow to fit all of its
   // items.
   flex-shrink: 0;
 
-  font-size: $body2-font-size;
+  font-size: var.$body2-font-size;
   font-weight: bold;
 }
 

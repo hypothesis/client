@@ -1,3 +1,5 @@
+@use '../variables' as var;
+
 $adder-transition-duration: 80ms;
 
 // Main class for the root element of the "adder" toolbar that appears when the
@@ -16,7 +18,7 @@ $adder-transition-duration: 80ms;
   box-sizing: border-box;
   direction: ltr;
   position: absolute;
-  background: $white;
+  background: var.$white;
   border: 1px solid rgba(0, 0, 0, 0.2);
   border-radius: 4px;
   box-shadow: 0px 2px 10px 0px rgba(0, 0, 0, 0.25);
@@ -58,7 +60,7 @@ $adder-transition-duration: 80ms;
 
 @mixin adder-arrow($rotation) {
   transform: rotate($rotation);
-  background: $white;
+  background: var.$white;
   border-bottom: 1px solid rgba(0, 0, 0, 0.2);
   border-right: 1px solid rgba(0, 0, 0, 0.2);
   content: '';
@@ -96,11 +98,11 @@ $adder-transition-duration: 80ms;
 }
 
 .annotator-adder-actions:hover .annotator-adder-actions__button {
-  color: $gray-light !important;
+  color: var.$gray-light !important;
 }
 
 .annotator-adder-actions:hover .annotator-adder-actions__label {
-  color: $gray-light !important;
+  color: var.$gray-light !important;
 }
 
 .annotator-adder-actions__button {
@@ -108,7 +110,7 @@ $adder-transition-duration: 80ms;
   font-family: h;
   font-size: 18px;
   background: transparent !important;
-  color: $gray-dark !important;
+  color: var.$gray-dark !important;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -124,10 +126,10 @@ $adder-transition-duration: 80ms;
 }
 
 .annotator-adder-actions .annotator-adder-actions__button:hover {
-  color: $gray-dark !important;
+  color: var.$gray-dark !important;
 
   .annotator-adder-actions__label {
-    color: $gray-dark !important;
+    color: var.$gray-dark !important;
   }
 }
 
@@ -135,6 +137,6 @@ $adder-transition-duration: 80ms;
   font-size: 11px;
   margin: 2px 0px;
   font-family: sans-serif;
-  color: $gray-dark !important;
+  color: var.$gray-dark !important;
   transition: color $adder-transition-duration;
 }

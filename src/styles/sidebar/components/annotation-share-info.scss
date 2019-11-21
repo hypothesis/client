@@ -1,3 +1,5 @@
+@use "../../variables" as var;
+
 .annotation-share-info {
   display: flex;
   align-items: baseline;
@@ -6,8 +8,8 @@
   &__private {
     display: flex;
     align-items: baseline;
-    font-size: $body1-font-size;
-    color: $grey-5;
+    font-size: var.$body1-font-size;
+    color: var.$grey-5;
   }
 
   &__group-info {
