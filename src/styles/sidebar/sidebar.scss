@@ -4,7 +4,10 @@ $base-line-height: 20px;
 // Variables and mixins
 // --------------------
 @import '../variables';
+@import '../mixins/buttons';
 @import '../mixins/focus';
+@import '../mixins/forms';
+@import '../mixins/icons';
 @import '../mixins/responsive';
 
 // Base styles
@@ -14,6 +17,9 @@ $base-line-height: 20px;
 
 // Misc. legacy :(
 // ---------------
+@import '../base';
+@import '../forms';
+@import './styled-text';
 @import './common';
 
 // Components

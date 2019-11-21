@@ -1,5 +1,3 @@
-@import '../../mixins/icons';
-
 // Highlight quote of annotation whenever its thread is hovered
 .thread-list__card:hover .annotation-quote {
   border-left: $highlight 3px solid;
