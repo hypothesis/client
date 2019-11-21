@@ -115,7 +115,7 @@ function Excerpt({
 
   return (
     <div className="excerpt" style={contentStyle}>
-      <div test-name="excerpt-content" ref={contentElement}>
+      <div className="excerpt__content" ref={contentElement}>
         {children}
       </div>
       <div
