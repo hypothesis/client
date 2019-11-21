@@ -174,43 +174,4 @@ describe('ShareAnnotationsPanel', () => {
       });
     });
   });
-
-  describe('other share links', () => {
-    const shareLink =
-      'https://hyp.is/go?url=https%3A%2F%2Fwww.example.com&group=testprivate';
-    const encodedLink = encodeURIComponent(shareLink);
-    const encodedSubject = encodeURIComponent("Let's Annotate");
-
-    [
-      {
-        service: 'facebook',
-        expectedURI: `https://www.facebook.com/sharer/sharer.php?u=${encodedLink}`,
-        title: 'Share on Facebook',
-      },
-      {
-        service: 'twitter',
-        expectedURI: `https://twitter.com/intent/tweet?url=${encodedLink}&hashtags=annotated`,
-        title: 'Tweet share link',
-      },
-      {
-        service: 'email',
-        expectedURI: `mailto:?subject=${encodedSubject}&body=${encodedLink}`,
-        title: 'Share via email',
-      },
-    ].forEach(testCase => {
-      it(`creates a share link for ${testCase.service} and tracks clicks`, () => {
-        const wrapper = createShareAnnotationsPanel();
-
-        const link = wrapper.find(`a[title="${testCase.title}"]`);
-        link.simulate('click');
-
-        assert.equal(link.prop('href'), testCase.expectedURI);
-        assert.calledWith(
-          fakeAnalytics.track,
-          fakeAnalytics.events.DOCUMENT_SHARED,
-          testCase.service
-        );
-      });
-    });
-  });
 });

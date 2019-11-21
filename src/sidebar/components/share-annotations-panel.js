@@ -7,6 +7,7 @@ const { copyText } = require('../util/copy-to-clipboard');
 const { withServices } = require('../util/service-context');
 const uiConstants = require('../ui-constants');
 
+const ShareLinks = require('./share-links');
 const SidebarPanel = require('./sidebar-panel');
 const SvgIcon = require('./svg-icon');
 
@@ -40,14 +41,6 @@ function ShareAnnotationsPanel({ analytics, flash }) {
       group.id
     }`;
   })(mainFrame, focusedGroup);
-
-  // This is the double-encoded format needed for other services (the entire
-  // URI needs to be encoded because it's used as the value of querystring params)
-  const encodedURI = encodeURIComponent(shareURI);
-
-  const trackShareClick = shareTarget => {
-    analytics.track(analytics.events.DOCUMENT_SHARED, shareTarget);
-  };
 
   const copyShareLink = () => {
     try {
@@ -114,46 +107,10 @@ function ShareAnnotationsPanel({ analytics, flash }) {
               <em>Only Me</em>) annotations are only visible to you.
             </span>
           </p>
-          <ul className="share-annotations-panel-links">
-            <li className="share-annotations-panel-links__link">
-              <a
-                href={`https://twitter.com/intent/tweet?url=${encodedURI}&hashtags=annotated`}
-                title="Tweet share link"
-                onClick={trackShareClick('twitter')}
-              >
-                <SvgIcon
-                  name="twitter"
-                  className="share-annotations-panel-links__icon"
-                />
-              </a>
-            </li>
-            <li className="share-annotations-panel__link">
-              <a
-                href={`https://www.facebook.com/sharer/sharer.php?u=${encodedURI}`}
-                title="Share on Facebook"
-                onClick={trackShareClick('facebook')}
-              >
-                <SvgIcon
-                  name="facebook"
-                  className="share-annotations-panel-links__icon"
-                />
-              </a>
-            </li>
-            <li className="share-annotations-panel__link">
-              <a
-                href={`mailto:?subject=${encodeURIComponent(
-                  "Let's Annotate"
-                )}&body=${encodedURI}`}
-                title="Share via email"
-                onClick={trackShareClick('email')}
-              >
-                <SvgIcon
-                  name="email"
-                  className="share-annotations-panel-links__icon"
-                />
-              </a>
-            </li>
-          </ul>
+          <ShareLinks
+            shareURI={shareURI}
+            analyticsEventName={analytics.events.DOCUMENT_SHARED}
+          />
         </div>
       )}
     </SidebarPanel>
