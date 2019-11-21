@@ -53,7 +53,7 @@ describe('Excerpt', () => {
 
   it('renders content in container', () => {
     const wrapper = createExcerpt();
-    const contentEl = wrapper.find('[test-name="excerpt-content"]');
+    const contentEl = wrapper.find('.excerpt__content');
     assert.include(contentEl.html(), 'default content');
   });
 

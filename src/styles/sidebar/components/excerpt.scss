@@ -1,18 +1,23 @@
+// FIXME - Remove the `@at-root` here when SASS modules are used, as local
+// variables will no longer be exposed to other modules.
+
 @at-root {
   $expand-duration: 0.15s;
 
-  // the truncated body of the <excerpt>
   .excerpt {
     transition: max-height $expand-duration ease-in;
     overflow: hidden;
     position: relative;
   }
 
-  // a container which wraps the <excerpt> and contains the excerpt
-  // itself plus the shadow at the bottom that can be clicked to expand or
-  // collapse it
-  .excerpt__container {
-    position: relative;
+  .excerpt__content {
+    // Create a new block-formatting context. This prevents any margins on
+    // elements inside the excerpt from "leaking out" due to margin-collapsing,
+    // which would push this container element away from the top of the excerpt.
+    //
+    // See https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Block_formatting_context
+    // and https://github.com/hypothesis/client/issues/1518.
+    display: inline-block;
   }
 
   // inline controls for expanding and collapsing
