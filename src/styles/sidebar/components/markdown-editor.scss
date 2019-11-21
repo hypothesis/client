@@ -20,16 +20,20 @@ $toolbar-border: 0.1em solid var.$grey-3;
 }
 
 .markdown-editor__toolbar-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   appearance: none;
   border: none;
   background: none;
+  min-width: 24px;
+  min-height: 24px;
 
   color: var.$grey-5;
-  font-size: 16px;
 
   &:hover,
   &:focus {
-    color: black;
+    color: $grey-7;
   }
 
   &:disabled {
@@ -39,12 +43,23 @@ $toolbar-border: 0.1em solid var.$grey-3;
   &.is-text {
     font-size: 13px;
   }
+
+  &-icon {
+    width: 10px;
+    height: 10px;
+  }
 }
 
 .markdown-editor__preview {
   border: $toolbar-border;
   background-color: var.$grey-1;
   padding: 10px;
+}
+
+.markdown-editor__toolbar-help-link {
+  display: flex;
+  align-items: center;
+  margin-bottom: 2px; // Tweak to align help icon better with adjacent buttons
 }
 
 @media (pointer: coarse) {
@@ -73,6 +88,10 @@ $toolbar-border: 0.1em solid var.$grey-3;
   .markdown-editor__toolbar-button {
     min-width: var.$touch-target-size;
     min-height: var.$touch-target-size;
-    font-size: 20px;
+
+    &-icon {
+      width: 12px;
+      height: 12px;
+    }
   }
 }

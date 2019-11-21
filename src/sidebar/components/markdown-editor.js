@@ -12,6 +12,7 @@ const {
   toggleBlockStyle,
   toggleSpanStyle,
 } = require('../markdown-commands');
+const SvgIcon = require('./svg-icon');
 
 // Mapping of toolbar command name to key for Ctrl+<key> keyboard shortcuts.
 // The shortcuts are taken from Stack Overflow's editor.
@@ -94,7 +95,7 @@ function handleToolbarCommand(command, inputEl) {
 
 function ToolbarButton({
   disabled = false,
-  icon,
+  iconName,
   label = null,
   onClick,
   shortcutKey,
@@ -109,13 +110,18 @@ function ToolbarButton({
     <button
       className={classnames(
         'markdown-editor__toolbar-button',
-        icon && `h-icon-${icon}`,
         label && 'is-text'
       )}
       disabled={disabled}
       onClick={onClick}
       title={tooltip}
     >
+      {iconName && (
+        <SvgIcon
+          name={iconName}
+          className="markdown-editor__toolbar-button-icon"
+        />
+      )}
       {label}
     </button>
   );
@@ -123,7 +129,7 @@ function ToolbarButton({
 
 ToolbarButton.propTypes = {
   disabled: propTypes.bool,
-  icon: propTypes.string,
+  iconName: propTypes.string,
   label: propTypes.string,
   onClick: propTypes.func,
   shortcutKey: propTypes.string,
@@ -139,60 +145,74 @@ function Toolbar({ isPreviewing, onCommand, onTogglePreview }) {
     >
       <ToolbarButton
         disabled={isPreviewing}
-        icon="format-bold"
+        iconName="format-bold"
         onClick={() => onCommand('bold')}
         shortcutKey={SHORTCUT_KEYS.bold}
         title="Bold"
       />
       <ToolbarButton
         disabled={isPreviewing}
-        icon="format-italic"
+        iconName="format-italic"
         onClick={() => onCommand('italic')}
         shortcutKey={SHORTCUT_KEYS.italic}
         title="Italic"
       />
       <ToolbarButton
         disabled={isPreviewing}
-        icon="format-quote"
+        iconName="format-quote"
         onClick={() => onCommand('quote')}
         shortcutKey={SHORTCUT_KEYS.quote}
         title="Quote"
       />
       <ToolbarButton
         disabled={isPreviewing}
-        icon="link"
+        iconName="link"
         onClick={() => onCommand('link')}
         shortcutKey={SHORTCUT_KEYS.link}
         title="Insert link"
       />
       <ToolbarButton
         disabled={isPreviewing}
-        icon="insert-photo"
+        iconName="image"
         onClick={() => onCommand('image')}
         shortcutKey={SHORTCUT_KEYS.image}
         title="Insert image"
       />
       <ToolbarButton
         disabled={isPreviewing}
-        icon="functions"
+        iconName="format-functions"
         onClick={() => onCommand('math')}
         title="Insert math (LaTeX is supported)"
       />
       <ToolbarButton
         disabled={isPreviewing}
-        icon="format-list-numbered"
+        iconName="format-list-numbered"
         onClick={() => onCommand('numlist')}
         shortcutKey={SHORTCUT_KEYS.numlist}
         title="Numbered list"
       />
       <ToolbarButton
         disabled={isPreviewing}
-        icon="format-list-bulleted"
+        iconName="format-list-unordered"
         onClick={() => onCommand('list')}
         shortcutKey={SHORTCUT_KEYS.list}
         title="Bulleted list"
       />
       <span className="u-stretch" />
+      <div className="markdown-editor__toolbar-help-link">
+        <a
+          href="https://web.hypothes.is/help/formatting-annotations-with-markdown/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="markdown-editor__toolbar-button"
+          title="Formatting help"
+        >
+          <SvgIcon
+            name="help"
+            className="markdown-editor__toolbar-button-icon"
+          />
+        </a>
+      </div>
       <ToolbarButton
         label={isPreviewing ? 'Write' : 'Preview'}
         onClick={onTogglePreview}
