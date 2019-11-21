@@ -1,3 +1,16 @@
+/* Style input placeholders */
+@mixin placeholder {
+  &.placeholder {
+    @content;
+  }
+  &:placeholder {
+    @content;
+  }
+  &::placeholder {
+    @content;
+  }
+}
+
 // See http://compass-style.org/reference/compass/utilities/general/clearfix/#mixin-pie-clearfix
 @mixin pie-clearfix {
   &:after {

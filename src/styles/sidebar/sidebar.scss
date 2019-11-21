@@ -17,7 +17,6 @@ $base-line-height: 20px;
 
 // Misc. legacy :(
 // ---------------
-@import '../base';
 @import '../forms';
 @import './styled-text';
 @import './common';
@@ -69,8 +68,7 @@ body {
 }
 
 body {
-  @include grey-background;
-
+  background: $grey-2;
   font-family: $sans-font-family;
   font-weight: normal;
   -webkit-overflow-scrolling: touch;
@@ -84,8 +82,7 @@ hypothesis-app {
 .app-content-wrapper {
   $sidebar-h-padding: 9px;
 
-  @include grey-background;
-
+  background: $grey-2;
   min-height: 100%;
   height: 100%;
   overflow: scroll;
