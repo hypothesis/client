@@ -1,9 +1,11 @@
 @import '../variables';
 @import '../mixins/icons';
 @import '../mixins/focus';
+@import '../mixins/reset';
 @import '../mixins/shadow';
 
 @import './adder';
+@import './bucket-bar';
 
 $base-font-size: 14px;
 
@@ -44,7 +46,6 @@ $base-font-size: 14px;
   @include reset-box-model;
 
   // frame styles
-  @import './bucket-bar';
   user-select: none;
   background: $grey-2;
   direction: ltr;
