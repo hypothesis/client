@@ -58,7 +58,7 @@ function RootThread($rootScope, store, searchFilter, viewFilter) {
         state.selection.filterQuery,
         {
           // if a focus mode is applied (focused) and we're focusing on a user
-          user: store.focusModeFocused() && store.focusModeUsername(),
+          user: store.focusModeFocused() && store.focusModeUserId(),
         }
       );
 

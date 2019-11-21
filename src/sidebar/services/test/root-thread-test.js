@@ -67,7 +67,7 @@ describe('rootThread', function() {
       removeDraft: sinon.stub(),
       createAnnotation: sinon.stub(),
       focusModeFocused: sinon.stub().returns(false),
-      focusModeUsername: sinon.stub().returns({}),
+      focusModeUserId: sinon.stub().returns({}),
     };
 
     fakeBuildThread = sinon.stub().returns(fixtures.emptyThread);

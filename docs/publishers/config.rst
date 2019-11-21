@@ -408,10 +408,8 @@ loads.
           user: {
             // required
             username: "foobar1234",
-
             // optional
             displayName: "Foo Bar",
-            authority: "example.com",
           }
         }
       };

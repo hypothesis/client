@@ -205,10 +205,10 @@ describe('sidebar/store/modules/selection', () => {
     it('sets the focused user and enables focus mode', function() {
       store.setFocusModeFocused(false);
       store.changeFocusModeUser({
-        username: 'testuser',
+        userid: 'testuser',
         displayName: 'Test User',
       });
-      assert.equal(store.focusModeUsername(), 'testuser');
+      assert.equal(store.focusModeUserId(), 'testuser');
       assert.equal(store.focusModeUserPrettyName(), 'Test User');
       assert.equal(store.focusModeFocused(), true);
       assert.equal(store.focusModeEnabled(), true);
@@ -256,14 +256,14 @@ describe('sidebar/store/modules/selection', () => {
     it('should return `true` if focus enabled and valid `user` object present', () => {
       store = createStore(
         [selection],
-        [{ focus: { user: { username: 'whatever' } } }]
+        [{ focus: { user: { userid: 'acct:userid@authority' } } }]
       );
       assert.isTrue(store.focusModeHasUser());
     });
     it('should return `false` if focus enabled but `user` object invalid', () => {
       store = createStore(
         [selection],
-        [{ focus: { user: { displayName: 'whatever' } } }] // `username` is required
+        [{ focus: { user: { displayName: 'FakeDisplayName' } } }] // `userid` is required
       );
       assert.isFalse(store.focusModeHasUser());
     });
@@ -274,43 +274,61 @@ describe('sidebar/store/modules/selection', () => {
   });
 
   describe('focusModeUserPrettyName()', function() {
-    it('should return false by default when focus mode is not enabled', function() {
+    it('returns false by default when focus mode is not enabled', function() {
       store = createStore(
         [selection],
         [{ focus: { user: { displayName: 'FakeDisplayName' } } }]
       );
       assert.equal(store.focusModeUserPrettyName(), 'FakeDisplayName');
     });
-    it('should the username when displayName is missing', function() {
+    it('returns the userid when displayName is missing', function() {
       store = createStore(
         [selection],
-        [{ focus: { user: { username: 'FakeUserName' } } }]
+        [{ focus: { user: { userid: 'acct:userid@authority' } } }]
       );
-      assert.equal(store.focusModeUserPrettyName(), 'FakeUserName');
+      assert.equal(store.focusModeUserPrettyName(), 'acct:userid@authority');
     });
-    it('should an return empty string when user object has no names', function() {
+    it('returns an empty string when user object has is empty', function() {
       store = createStore([selection], [{ focus: { user: {} } }]);
       assert.equal(store.focusModeUserPrettyName(), '');
     });
-    it('should an return empty string when there is no focus object', function() {
+    it('return an empty string when there is no focus object', function() {
       assert.equal(store.focusModeUserPrettyName(), '');
+    });
+    it('returns the username when displayName and userid is missing', function() {
+      // remove once LMS no longer sends username in RPC or config
+      // https://github.com/hypothesis/client/issues/1516
+      store = createStore(
+        [selection],
+        [{ focus: { user: { username: 'fake_user_name' } } }]
+      );
+      assert.equal(store.focusModeUserPrettyName(), 'fake_user_name');
     });
   });
 
-  describe('focusModeUsername()', function() {
-    it('should return the user name when present', function() {
+  describe('focusModeUserId()', function() {
+    it('should return the userid when present', function() {
       store = createStore(
         [selection],
-        [{ focus: { user: { username: 'FakeUserName' } } }]
+        [{ focus: { user: { userid: 'acct:userid@authority' } } }]
       );
-      assert.equal(store.focusModeUsername(), 'FakeUserName');
+      assert.equal(store.focusModeUserId(), 'acct:userid@authority');
     });
-    it('should return null when the username is not present', function() {
+    it('should return null when the userid is not present', function() {
       store = createStore([selection], [{ focus: { user: {} } }]);
-      assert.isNull(store.focusModeUsername());
+      assert.isNull(store.focusModeUserId());
     });
     it('should return null when the user object is not present', function() {
-      assert.isNull(store.focusModeUsername());
+      assert.isNull(store.focusModeUserId());
+    });
+    it('should return the username when present but no userid', function() {
+      // remove once LMS no longer sends username in RPC or config
+      // https://github.com/hypothesis/client/issues/1516
+      store = createStore(
+        [selection],
+        [{ focus: { user: { username: 'fake_user_name' } } }]
+      );
+      assert.equal(store.focusModeUserId(), 'fake_user_name');
     });
   });
 
