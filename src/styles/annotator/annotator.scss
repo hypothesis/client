@@ -1,8 +1,11 @@
-@import '../base';
+@import '../variables';
 @import '../mixins/icons';
 @import '../mixins/focus';
+@import '../mixins/reset';
+@import '../mixins/shadow';
 
 @import './adder';
+@import './bucket-bar';
 
 $base-font-size: 14px;
 
@@ -43,9 +46,7 @@ $base-font-size: 14px;
   @include reset-box-model;
 
   // frame styles
-  @import './bucket-bar';
   user-select: none;
-  @include grey-background;
   direction: ltr;
   background: none;
   font-size: $base-font-size;
@@ -169,6 +170,11 @@ $base-font-size: 14px;
 // it is manually resized by dragging
 .annotator-no-transition {
   transition: none !important;
+}
+
+.annotator-hide {
+  display: none;
+  visibility: hidden;
 }
 
 /*

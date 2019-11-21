@@ -4,16 +4,22 @@ $base-line-height: 20px;
 // Variables and mixins
 // --------------------
 @import '../variables';
+@import '../mixins/buttons';
 @import '../mixins/focus';
+@import '../mixins/forms';
+@import '../mixins/icons';
 @import '../mixins/responsive';
 
 // Base styles
 // -----------
 @import '../reset';
+@import '../util';
 @import './elements';
 
 // Misc. legacy :(
 // ---------------
+@import '../forms';
+@import './styled-text';
 @import './common';
 
 // Components
@@ -64,8 +70,7 @@ body {
 }
 
 body {
-  @include grey-background;
-
+  background: $grey-2;
   font-family: $sans-font-family;
   font-weight: normal;
   -webkit-overflow-scrolling: touch;
@@ -79,8 +84,7 @@ hypothesis-app {
 .app-content-wrapper {
   $sidebar-h-padding: 9px;
 
-  @include grey-background;
-
+  background: $grey-2;
   min-height: 100%;
   height: 100%;
   overflow: scroll;
