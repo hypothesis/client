@@ -11,6 +11,7 @@ const scopeTimeout = require('../util/scope-timeout');
 function MarkdownController($element, $scope) {
   const input = $element[0].querySelector('.js-markdown-input');
   const output = $element[0].querySelector('.js-markdown-preview');
+  const tools = $element[0].querySelector('.markdown-tools');
 
   const self = this;
 
@@ -139,12 +140,18 @@ function MarkdownController($element, $scope) {
   input.addEventListener('input', handleInputChange);
 
   const handleBlur = function(event) {
+      if (event.relatedTarget && tools.contains(event.relatedTarget)) {
+          return false;
+      }
       if (!event.relatedTarget ||
-          (event.relatedTarget && event.relatedTarget.id !== 'dropdown-saving-selector')) {
+          (event.relatedTarget
+                && event.relatedTarget.id !== 'dropdown-saving-selector'
+                && event.relatedTarget.id !== 'cancel-btn')) {
           if (self.text) {
               self.onSave();
           }
       }
+      return false;
   };
   input.addEventListener('blur', handleBlur);
 
