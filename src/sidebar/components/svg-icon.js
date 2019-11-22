@@ -33,6 +33,7 @@ const icons = {
   link: require('../../images/icons/link.svg'),
   lock: require('../../images/icons/lock.svg'),
   logo: require('../../images/icons/logo.svg'),
+  pointer: require('../../images/icons/pointer.svg'),
   public: require('../../images/icons/public.svg'),
   refresh: require('../../images/icons/refresh.svg'),
   reply: require('../../images/icons/reply.svg'),
