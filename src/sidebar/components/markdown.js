@@ -11,7 +11,6 @@ const scopeTimeout = require('../util/scope-timeout');
 function MarkdownController($element, $scope) {
   const input = $element[0].querySelector('.js-markdown-input');
   const output = $element[0].querySelector('.js-markdown-preview');
-  const tools = $element[0].querySelector('.markdown-tools');
 
   const self = this;
 
@@ -140,6 +139,7 @@ function MarkdownController($element, $scope) {
   input.addEventListener('input', handleInputChange);
 
   const handleBlur = function(event) {
+      const tools = $element[0].querySelector('.markdown-tools');
       if (event.relatedTarget && tools.contains(event.relatedTarget)) {
           return false;
       }
