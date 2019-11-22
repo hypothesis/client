@@ -6,10 +6,10 @@
   color: var.$grey-6;
 
   &__input {
-    @include form-input;
+    @include forms.form-input;
     width: 100%;
     &:focus {
-      @include form-input-focus;
+      @include forms.form-input-focus;
     }
   }
 
