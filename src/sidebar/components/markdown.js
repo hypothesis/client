@@ -139,12 +139,19 @@ function MarkdownController($element, $scope) {
   input.addEventListener('input', handleInputChange);
 
   const handleBlur = function(event) {
+      const tools = $element[0].querySelector('.markdown-tools');
+      if (event.relatedTarget && tools.contains(event.relatedTarget)) {
+          return false;
+      }
       if (!event.relatedTarget ||
-          (event.relatedTarget && event.relatedTarget.id !== 'dropdown-saving-selector')) {
+          (event.relatedTarget
+                && event.relatedTarget.id !== 'dropdown-saving-selector'
+                && event.relatedTarget.id !== 'cancel-btn')) {
           if (self.text) {
               self.onSave();
           }
       }
+      return false;
   };
   input.addEventListener('blur', handleBlur);
 

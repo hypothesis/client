@@ -405,7 +405,7 @@ function AnnotationController(
   this.onKeydown = function(event) {
     if (event.keyCode === 13 && (event.metaKey || event.ctrlKey)) {
       event.preventDefault();
-      self.save();
+      event.target.blur();
     }
   };
 
