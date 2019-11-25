@@ -3,8 +3,27 @@
 const observeElementSize = require('../observe-element-size');
 
 /**
+ * Wait for a condition to become true.
+ *
+ * @param {() => boolean} callback
+ */
+function waitFor(callback) {
+  return new Promise(resolve => {
+    const timer = setInterval(() => {
+      if (callback()) {
+        clearInterval(timer);
+        resolve();
+      }
+    }, 0);
+  });
+}
+
+/**
  * Give MutationObserver, ResizeObserver etc. a chance to deliver their
  * notifications.
+ *
+ * This waits for a fixed amount of time. If you can wait for a specific event
+ * using `waitFor`, you should do so.
  */
 function waitForObservations() {
   return new Promise(resolve => setTimeout(resolve, 1));
@@ -40,8 +59,7 @@ describe('observeElementSize', () => {
       startObserving();
 
       content.innerHTML = '<p>different content</p>';
-      await waitForObservations();
-      assert.called(sizeChanged);
+      await waitFor(() => sizeChanged.called);
 
       stopObserving();
       sizeChanged.reset();
@@ -84,8 +102,7 @@ describe('observeElementSize', () => {
         // Change the content height, which is not directly observed.
         content.style.minHeight = '500px';
         triggerCheck();
-        await waitForObservations();
-        assert.called(sizeChanged);
+        await waitFor(() => sizeChanged.called);
 
         sizeChanged.reset();
         stopObserving();
