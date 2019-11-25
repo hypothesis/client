@@ -131,9 +131,6 @@ function AnnotationController(
     /** True if the annotation is currently being saved. */
     self.isSaving = false;
 
-    /** True if the 'Share' dialog for this annotation is currently open. */
-    self.showShareDialog = false;
-
     /**
      * `true` if this AnnotationController instance was created as a result of
      * the highlight button being clicked.

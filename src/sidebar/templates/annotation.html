@@ -108,19 +108,7 @@
         on-click="vm.reply()"
       ></annotation-action-button>
       <span class="annotation-share-dialog-wrapper" ng-if="vm.incontextLink()">
-        <annotation-action-button
-         icon="'h-icon-annotation-share'"
-         is-disabled="vm.isDeleted()"
-         label="'Share'"
-         on-click="vm.showShareDialog = true"
-        ></annotation-action-button>
-        <annotation-share-dialog
-          group="vm.group()"
-          uri="vm.incontextLink()"
-          is-private="vm.state().isPrivate"
-          is-open="vm.showShareDialog"
-          on-close="vm.showShareDialog = false">
-        </annotation-share-dialog>
+        <annotation-share-control group="vm.group()" is-private="vm.state().isPrivate" share-uri="vm.incontextLink()"></annotation-share-control>
       </span>
       <span ng-if="vm.canFlag()">
         <annotation-action-button

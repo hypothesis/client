@@ -45,3 +45,21 @@
     margin-top: 0;
   }
 }
+
+/**
+ * `panel` with tighter margins and padding, for use in more confined spaces
+ */
+@mixin panel--compact {
+  @include panel;
+
+  &__header {
+    padding: 0.75em 0;
+    margin: 0 0.75em;
+    border-bottom: none;
+  }
+
+  &__content {
+    margin: 0.75em;
+    margin-top: 0;
+  }
+}

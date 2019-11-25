@@ -151,8 +151,8 @@ function startAngularApp(config) {
       wrapReactComponent(require('./components/annotation-quote'))
     )
     .component(
-      'annotationShareDialog',
-      require('./components/annotation-share-dialog')
+      'annotationShareControl',
+      wrapReactComponent(require('./components/annotation-share-control'))
     )
     .component('annotationThread', require('./components/annotation-thread'))
     .component(
