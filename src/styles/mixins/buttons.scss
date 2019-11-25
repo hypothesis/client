@@ -11,14 +11,32 @@
 }
 
 /**
+ * Basic color, sizing, padding and hover for any button
+ */
+@mixin button-base {
+  @include reset-native-btn-styles;
+  padding: 0.5em;
+  color: var.$grey-5;
+
+  &__icon {
+    width: 16px;
+    height: 16px;
+  }
+
+  &:hover {
+    transition: 0.2s ease-out;
+    color: var.$grey-6;
+  }
+}
+
+/**
  * A <button> composed of an SVG icon (left) and text (right) with some
  * hover transition effects
  */
 @mixin action-button($icon-margin: 0 5px) {
-  @include reset-native-btn-styles;
+  @include button-base;
   display: flex;
   align-items: center;
-  padding: 0.5em;
   border-radius: 2px;
   border: none;
   background-color: var.$grey-1;
@@ -31,9 +49,7 @@
   }
 
   &:hover {
-    transition: 0.2s ease-out;
     background-color: var.$grey-2;
-    color: var.$grey-6;
   }
 }
 

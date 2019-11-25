@@ -80,7 +80,7 @@ function AnnotationShareControl({
   return (
     <div className="annotation-share-control" ref={shareRef}>
       <AnnotationActionButton
-        icon="h-icon-annotation-share"
+        icon="share"
         isDisabled={false}
         label="Share"
         onClick={toggleSharePanel}

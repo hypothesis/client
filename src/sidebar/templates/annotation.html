@@ -53,14 +53,15 @@
   <!-- / Tags -->
 
   <footer class="annotation-footer">
+
     <div class="annotation-form-actions" ng-if="vm.editing()">
-    <annotation-publish-control
-      group="vm.group()"
-      is-disabled="!vm.hasContent()"
-      is-shared="vm.isShared()"
-      on-cancel="vm.revert()"
-      on-save="vm.save()"
-      on-set-privacy="vm.setPrivacy(level)"></annotation-publish-control>
+      <annotation-publish-control
+        group="vm.group()"
+        is-disabled="!vm.hasContent()"
+        is-shared="vm.isShared()"
+        on-cancel="vm.revert()"
+        on-save="vm.save()"
+        on-set-privacy="vm.setPrivacy(level)"></annotation-publish-control>
     </div>
 
     <div class="annotation-section annotation-license"
@@ -88,21 +89,21 @@
     <div class="annotation-actions" ng-if="!vm.isSaving && !vm.editing() && vm.id()">
       <div ng-show="vm.isSaving">Saving…</div>
       <annotation-action-button
-        icon="'h-icon-annotation-edit'"
+        icon="'edit'"
         is-disabled="vm.isDeleted()"
         label="'Edit'"
         ng-show="vm.authorize('update') && !vm.isSaving"
         on-click="vm.edit()"
       ></annotation-action-button>
       <annotation-action-button
-        icon="'h-icon-annotation-delete'"
+        icon="'trash'"
         is-disabled="vm.isDeleted()"
         label="'Delete'"
         ng-show="vm.authorize('delete')"
         on-click="vm.delete()"
       ></annotation-action-button>
       <annotation-action-button
-        icon="'h-icon-annotation-reply'"
+        icon="'reply'"
         is-disabled="vm.isDeleted()"
         label="'Reply'"
         on-click="vm.reply()"
@@ -112,14 +113,15 @@
       </span>
       <span ng-if="vm.canFlag()">
         <annotation-action-button
-         icon="'h-icon-annotation-flag'"
+         icon="'flag'"
          is-disabled="vm.isDeleted()"
          label="'Report this annotation to the moderators'"
          ng-if="!vm.isFlagged()"
          on-click="vm.flag()"
         ></annotation-action-button>
         <annotation-action-button
-         icon="'h-icon-annotation-flag annotation--flagged'"
+         class-name="'annotation-action-button--active'"
+         icon="'flag--active'"
          is-disabled="vm.isDeleted()"
          label="'Annotation has been reported to the moderators'"
          ng-if="vm.isFlagged()"
