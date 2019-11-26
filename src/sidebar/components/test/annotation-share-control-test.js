@@ -75,6 +75,11 @@ describe('AnnotationShareControl', () => {
     AnnotationShareControl.$imports.$restore();
   });
 
+  it('does not render component if `group` prop not OK', () => {
+    const wrapper = createComponent({ group: undefined });
+    assert.equal(wrapper.html(), '');
+  });
+
   it('does not render content when not open', () => {
     const wrapper = createComponent();
 
