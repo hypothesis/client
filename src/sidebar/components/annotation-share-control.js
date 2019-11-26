@@ -45,6 +45,11 @@ function AnnotationShareControl({
     }
   }, [isOpen]);
 
+  // FIXME: See https://github.com/hypothesis/client/issues/1542
+  if (!group) {
+    return null;
+  }
+
   const copyShareLink = () => {
     try {
       copyText(shareUri);
@@ -127,8 +132,12 @@ function AnnotationShareControl({
 }
 
 AnnotationShareControl.propTypes = {
-  /** group that the annotation is in */
-  group: propTypes.object.isRequired,
+  /** group that the annotation is in
+   *  If missing, this component will not render
+   *  FIXME: Refactor after root cause is addressed
+   *  See https://github.com/hypothesis/client/issues/1542
+   */
+  group: propTypes.object,
   /** Is this annotation set to "only me"/private? */
   isPrivate: propTypes.bool.isRequired,
   /** The URI to view the annotation on its own */
