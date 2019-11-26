@@ -14,9 +14,8 @@ const envify = require('loose-envify/custom');
 const gulpUtil = require('gulp-util');
 const mkdirp = require('mkdirp');
 const through = require('through2');
+const uglifyify = require('uglifyify');
 const watchify = require('watchify');
-
-const minifyStream = require('./minify-stream');
 
 const log = gulpUtil.log;
 
@@ -224,6 +223,10 @@ module.exports = function createBundle(config, buildOpts) {
     }
   });
 
+  if (config.minify) {
+    bundle.transform({ global: true }, uglifyify);
+  }
+
   // Include or disable debugging checks in our code and dependencies by
   // replacing references to `process.env.NODE_ENV`.
   bundle.transform(
@@ -237,23 +240,16 @@ module.exports = function createBundle(config, buildOpts) {
     }
   );
 
-  if (config.minify) {
-    bundle.transform({ global: true }, minifyStream);
-  }
-
   function build() {
     const output = fs.createWriteStream(bundlePath);
     const b = bundle.bundle();
     b.on('error', function(err) {
       log('Build error', err.toString());
     });
-    let stream = b.pipe(useExternalRequireName(externalRequireName));
-
-    if (config.minify) {
-      stream = stream.pipe(minifyStream());
-    }
-
-    stream.pipe(exorcist(sourcemapPath)).pipe(output);
+    const stream = b
+      .pipe(useExternalRequireName(externalRequireName))
+      .pipe(exorcist(sourcemapPath))
+      .pipe(output);
     return streamFinished(stream);
   }
 
