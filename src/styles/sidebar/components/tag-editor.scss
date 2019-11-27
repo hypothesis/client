@@ -1,10 +1,8 @@
 @use "../../mixins/forms";
+@use "../../mixins/buttons";
 @use "../../variables" as var;
 
 .tag-editor {
-  cursor: default;
-  color: var.$grey-6;
-
   &__input {
     @include forms.form-input;
     width: 100%;
@@ -16,7 +14,6 @@
   &__tag-list {
     display: flex;
     flex-wrap: wrap;
-    margin-top: -0.33em; // Absorb the first row of margin-top on the tags.
   }
 
   &__tag-item {
@@ -28,30 +25,35 @@
   &__edit,
   &__link {
     text-decoration: none;
-    border: 1px solid var.$grey-4;
-    border-radius: 2px 0 0 2px;
+    border: 1px solid var.$grey-3;
+    border-radius: 4px 0 0 4px;
     border-right-width: 0;
     padding: 0.2em 0.5em;
     color: var.$grey-6;
-    background: var.$grey-2;
+    background: var.$grey-1;
   }
 
   &__link {
     border-width: 1px;
-    background: var.$grey-3;
+    background: var.$grey-1;
+    border-radius: 4px;
     &:hover,
     &:focus {
-      color: var.$link-color-hover;
+      border-color: var.$grey-5;
+      color: var.$brand;
     }
   }
 
   &__delete {
+    @include buttons.action-button;
     appearance: none;
     text-decoration: none;
-    border: 1px solid var.$grey-4;
-    border-radius: 0 2px 2px 0;
+    border: 1px solid var.$grey-3;
+    border-radius: 0 4px 4px 0;
     padding: 0.2em 0.5em;
-    color: var.$grey-6;
-    background: var.$grey-3;
+    &:hover,
+    &:focus {
+      border-color: var.$grey-5;
+    }
   }
 }

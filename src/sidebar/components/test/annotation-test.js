@@ -1156,65 +1156,6 @@ describe('annotation', function() {
       });
     });
 
-    describe('tag display', function() {
-      beforeEach('make serviceUrl() return a URL for the tag', function() {
-        fakeServiceUrl
-          .withArgs('search.tag', { tag: 'atag' })
-          .returns('https://hypothes.is/search?q=tag:atag');
-      });
-
-      /**
-       * Return an annotation directive with a single tag.
-       */
-      function annotationWithOneTag() {
-        return createDirective(
-          Object.assign(fixtures.defaultAnnotation(), {
-            tags: ['atag'],
-          })
-        );
-      }
-
-      /**
-       * Return the one tag link element from the given annotation directive.
-       */
-      function tagLinkFrom(directive) {
-        const links = [].slice.apply(
-          directive.element[0].querySelectorAll('a')
-        );
-        const tagLinks = links.filter(function(link) {
-          return link.textContent === 'atag';
-        });
-        assert.equal(tagLinks.length, 1);
-        return tagLinks[0];
-      }
-
-      context('when the annotation is first-party', function() {
-        beforeEach('configure a first-party annotation', function() {
-          fakeAccountID.isThirdPartyUser.returns(false);
-        });
-
-        it('displays links to tag search pages', function() {
-          const tagLink = tagLinkFrom(annotationWithOneTag());
-
-          assert.equal(tagLink.href, 'https://hypothes.is/search?q=tag:atag');
-        });
-      });
-
-      context('when the annotation is third-party', function() {
-        beforeEach('configure a third-party annotation', function() {
-          fakeAccountID.isThirdPartyUser.returns(true);
-        });
-
-        it("doesn't link tags for third-party annotations", function() {
-          // Tag search pages aren't supported for third-party annotations in
-          // h, so we don't link to them in the client.
-          const tagLink = tagLinkFrom(annotationWithOneTag());
-
-          assert.isFalse(tagLink.hasAttribute('href'));
-        });
-      });
-    });
-
     describe('annotation links', function() {
       it('uses the in-context links when available', function() {
         const annotation = Object.assign({}, fixtures.defaultAnnotation(), {

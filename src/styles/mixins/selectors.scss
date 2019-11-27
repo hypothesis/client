@@ -1,0 +1,6 @@
+@mixin hover-fade {
+  transition: 0.4s ease-out;
+  &:hover {
+    transition: 0.2s;
+  }
+}

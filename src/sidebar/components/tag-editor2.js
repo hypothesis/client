@@ -120,11 +120,17 @@ function TagEditor2({
   const buildTagItem = tag => {
     if (editMode) {
       return (
-        <li key={`${tag}`} className="tag-editor__tag-item" aria-label={`Tag: ${tag}`}>
+        <li
+          key={`${tag}`}
+          className="tag-editor__tag-item"
+          aria-label={`Tag: ${tag}`}
+        >
           <span className="tag-editor__edit">{tag}</span>
           <button
-            onClick={deleteTag.bind(this, tag)}
-            title="Delete tag from this annotation"
+            onClick={() => {
+              deleteTag(tag);
+            }}
+            title={`Remove Tag: ${tag}`}
             className="tag-editor__delete"
           >
             <SvgIcon name="cancel" />
@@ -133,12 +139,12 @@ function TagEditor2({
       );
     } else {
       return (
-        <li 
-        key={`${tag}`} className="tag-editor__tag-item" aria-label={`Tag: ${tag}`}>
+        <li key={`${tag}`} className="tag-editor__tag-item">
           <a
             className="tag-editor__link"
             href={createTagSearchURL(tag)}
             target="_blank"
+            aria-label={`Tag: ${tag}`}
             rel="noopener noreferrer"
           >
             {tag}
@@ -149,7 +155,7 @@ function TagEditor2({
   };
 
   const buildTagList = () => {
-    const tagElements = tagList.map(buildTagItem)
+    const tagElements = tagList.map(buildTagItem);
     return (
       <ul className="tag-editor__tag-list" aria-label="Annotation tags">
         {tagElements}
@@ -158,9 +164,9 @@ function TagEditor2({
   };
 
   const buildSuggestionsList = () => {
-    const suggestionElements = suggestions.map((suggestion, index) => 
-      (<option key={index} value={suggestion} />)
-    );
+    const suggestionElements = suggestions.map((suggestion, index) => (
+      <option key={index} value={suggestion} />
+    ));
     return (
       <datalist
         id={`tag-editor-datalist-${id}`}
@@ -173,7 +179,7 @@ function TagEditor2({
   };
 
   return (
-    <section className="TagEditor">
+    <section className="tag-editor">
       {buildTagList()}
       {editMode && (
         <input
