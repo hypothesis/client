@@ -221,7 +221,7 @@ module.exports = function createBundle(config, buildOpts) {
       stream = stream.pipe(minifyStream());
     }
 
-    stream.pipe(exorcist(sourcemapPath)).pipe(output);
+    stream = stream.pipe(exorcist(sourcemapPath)).pipe(output);
     return streamFinished(stream);
   }
 
