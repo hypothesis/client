@@ -13,7 +13,6 @@ const exorcist = require('exorcist');
 const envify = require('loose-envify/custom');
 const gulpUtil = require('gulp-util');
 const mkdirp = require('mkdirp');
-const through = require('through2');
 const watchify = require('watchify');
 
 const minifyStream = require('./minify-stream');
@@ -29,54 +28,6 @@ function streamFinished(stream) {
 
 function waitForever() {
   return new Promise(function() {});
-}
-
-/**
- * Create a transform stream which wraps code from the input with a function
- * which is immediately executed (aka. an "IIFE").
- *
- * @param {string} headerCode - Code added at the start of the wrapper function.
- * @param {string} trailerCode - Code added at the end of the wrapper function.
- * @return {Transform} - A Node `Transform` stream.
- */
-function wrapCodeWithFunction(headerCode, trailerCode = '') {
-  const iifeStart = '(function() {' + headerCode + ';';
-  const iifeEnd = ';' + trailerCode + '})()';
-
-  let isFirstChunk = true;
-  return through(
-    function(data, enc, callback) {
-      if (isFirstChunk) {
-        isFirstChunk = false;
-        this.push(Buffer.from(iifeStart));
-      }
-      this.push(data);
-      callback();
-    },
-    function(callback) {
-      this.push(Buffer.from(iifeEnd));
-      callback();
-    }
-  );
-}
-
-/**
- * Wrap a Browserify bundle's code to change the name of the `require` function
- * which the bundle uses to load modules defined in other bundles.
- *
- * Use this together with Browserify's `externalRequireName` option to define/use
- * a different name for the `require` function. This is useful to avoid conflicts
- * with other code on the page which define/use "require".
- *
- * @param {string} name - Replacement name for the `require` function.
- * @return {Transform} - A node `Transform` stream.
- */
-function useExternalRequireName(name) {
-  // Make the `require` lookup inside the bundle find `name` in the global
-  // scope exported by a previous bundle, instead of `require`.
-  return wrapCodeWithFunction(
-    `var require=("function"==typeof ${name}&&${name})`
-  );
 }
 
 /**
@@ -176,6 +127,24 @@ module.exports = function createBundle(config, buildOpts) {
     }
   });
 
+  // Override the "prelude" script which Browserify adds at the start of
+  // generated bundles to look for the custom require name set by previous bundles
+  // on the page instead of the default "require".
+  const defaultPreludePath = require.resolve('browser-pack/prelude');
+  const prelude = fs
+    .readFileSync(defaultPreludePath)
+    .toString()
+    .replace(
+      'var previousRequire = typeof require == "function" && require;',
+      `var previousRequire = typeof ${externalRequireName} == "function" && ${externalRequireName};`
+    );
+  if (!prelude.includes(externalRequireName)) {
+    throw new Error(
+      'Failed to modify prelude to use custom name for "require" function'
+    );
+  }
+  bundleOpts.prelude = prelude;
+
   const name = config.name;
 
   const bundleFileName = name + '.bundle.js';
@@ -243,11 +212,10 @@ module.exports = function createBundle(config, buildOpts) {
 
   function build() {
     const output = fs.createWriteStream(bundlePath);
-    const b = bundle.bundle();
-    b.on('error', function(err) {
+    let stream = bundle.bundle();
+    stream.on('error', function(err) {
       log('Build error', err.toString());
     });
-    let stream = b.pipe(useExternalRequireName(externalRequireName));
 
     if (config.minify) {
       stream = stream.pipe(minifyStream());
