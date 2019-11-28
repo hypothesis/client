@@ -1,0 +1,29 @@
+@use '../../variables' as var;
+
+.annotation-quote {
+  // Margin between top of ascent of annotation quote and
+  // bottom of ascent of username should be ~15px
+  margin-top: var.$layout-h-margin - 5px;
+  // Margin between bottom of ascent of annotation quote and
+  // top of ascent of annotation-body should be ~15px
+  margin-bottom: var.$layout-h-margin - 3px;
+}
+
+.annotation-quote.is-orphan {
+  text-decoration: line-through;
+}
+
+.annotation-quote__quote {
+  @include var.font-normal;
+
+  border-left: 3px solid var.$gray-lighter;
+  color: var.$grey-4;
+  font-family: sans-serif;
+  font-size: 12px;
+  font-style: italic;
+  letter-spacing: 0.1px;
+  padding: 0 1em;
+
+  // Prevent long URLs etc. in quote causing overflow
+  overflow-wrap: break-word;
+}

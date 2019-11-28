@@ -33,7 +33,8 @@ function AnnotationBody({
           <MarkdownView
             markdown={text}
             textClass={{
-              'annotation-body is-hidden': isHiddenByModerator,
+              'annotation-body__text': true,
+              'is-hidden': isHiddenByModerator,
               'has-content': text.length > 0,
             }}
           />
