@@ -31,8 +31,12 @@ function minifyStream() {
       const code = Buffer.concat(this.chunks).toString();
       const minified = terser.minify(code, {
         // See https://github.com/terser/terser#minify-options-structure
-        sourceMap: { url: 'inline' },
+        sourceMap: {
+          content: 'inline',
+          url: 'inline',
+        },
       }).code;
+
       this.push(minified);
       callback();
     },
