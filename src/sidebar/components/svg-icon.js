@@ -15,10 +15,13 @@ const icons = {
   'collapse-menu': require('../../images/icons/collapse-menu.svg'),
   copy: require('../../images/icons/copy.svg'),
   cursor: require('../../images/icons/cursor.svg'),
+  edit: require('../../images/icons/edit.svg'),
   email: require('../../images/icons/email.svg'),
   'expand-menu': require('../../images/icons/expand-menu.svg'),
   external: require('../../images/icons/external.svg'),
   facebook: require('../../images/icons/facebook.svg'),
+  flag: require('../../images/icons/flag.svg'),
+  'flag--active': require('../../images/icons/flag--active.svg'),
   'format-bold': require('../../images/icons/format-bold.svg'),
   'format-functions': require('../../images/icons/format-functions.svg'),
   'format-italic': require('../../images/icons/format-italic.svg'),
@@ -38,6 +41,7 @@ const icons = {
   refresh: require('../../images/icons/refresh.svg'),
   reply: require('../../images/icons/reply.svg'),
   share: require('../../images/icons/share.svg'),
+  trash: require('../../images/icons/trash.svg'),
   twitter: require('../../images/icons/twitter.svg'),
 };
 

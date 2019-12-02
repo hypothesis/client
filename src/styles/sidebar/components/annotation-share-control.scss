@@ -10,8 +10,8 @@
 .annotation-share-panel {
   @include panel.panel--compact;
   position: absolute;
-  right: -5px;
-  bottom: 30px;
+  right: 5px;
+  bottom: 32px;
   width: 275px;
   box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.15);
   cursor: default;

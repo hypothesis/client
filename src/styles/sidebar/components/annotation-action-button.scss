@@ -1,0 +1,21 @@
+@use "../../mixins/buttons";
+@use "../../variables" as var;
+
+.annotation-action-button {
+  @include buttons.button-base;
+
+  &--active {
+    color: var.$brand;
+
+    &:hover {
+      color: var.$brand;
+    }
+  }
+}
+
+@media (pointer: coarse) {
+  .annotation-action-button {
+    min-width: var.$touch-target-size;
+    min-height: var.$touch-target-size;
+  }
+}

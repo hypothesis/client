@@ -4,22 +4,31 @@ const classnames = require('classnames');
 const propTypes = require('prop-types');
 const { createElement } = require('preact');
 
-function AnnotationActionButton({ icon, isDisabled, label, onClick }) {
+const SvgIcon = require('./svg-icon');
+
+function AnnotationActionButton({
+  className = '',
+  icon,
+  isDisabled,
+  label,
+  onClick,
+}) {
   return (
     <button
-      className="btn btn-clean annotation-action-btn"
+      className={classnames('annotation-action-button', className)}
       onClick={onClick}
       disabled={isDisabled}
       aria-label={label}
-      h-tooltip
+      title={label}
     >
-      <i className={classnames(icon, 'btn-icon')} />
+      <SvgIcon name={icon} className="annotation-action-button__icon" />
     </button>
   );
 }
 
 AnnotationActionButton.propTypes = {
-  /** A CSS classname corresponding to an `h` icon */
+  className: propTypes.string,
+  /** The name of the SVGIcon to render */
   icon: propTypes.string.isRequired,
   isDisabled: propTypes.bool.isRequired,
   label: propTypes.string.isRequired,
