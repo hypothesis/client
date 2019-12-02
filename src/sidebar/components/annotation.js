@@ -8,7 +8,6 @@ const {
 } = require('../util/annotation-metadata');
 const events = require('../events');
 const { isThirdPartyUser } = require('../util/account-id');
-const serviceConfig = require('../service-config');
 
 /**
  * Return a copy of `annotation` with changes made in the editor applied.
@@ -24,23 +23,6 @@ function updateModel(annotation, changes, permissions) {
       ? permissions.private(userid)
       : permissions.shared(userid, annotation.group),
   });
-}
-
-/**
- * Return true if share links are globally enabled.
- *
- * Share links will only be shown on annotation cards if this is true and if
- * these links are included in API responses.
- */
-function shouldEnableShareLinks(settings) {
-  const serviceConfig_ = serviceConfig(settings);
-  if (serviceConfig_ === null) {
-    return true;
-  }
-  if (typeof serviceConfig_.enableShareLinks !== 'boolean') {
-    return true;
-  }
-  return serviceConfig_.enableShareLinks;
 }
 
 // @ngInject
@@ -64,8 +46,6 @@ function AnnotationController(
 ) {
   const self = this;
   let newlyCreatedByHighlightButton;
-
-  const enableShareLinks = shouldEnableShareLinks(settings);
 
   /** Save an annotation to the server. */
   function save(annot) {
@@ -217,14 +197,6 @@ function AnnotationController(
       store.createDraft(self.annotation, self.state());
     }
   }
-
-  this.authorize = function(action) {
-    return permissions.permits(
-      self.annotation.permissions,
-      action,
-      session.state.userid
-    );
-  };
 
   /**
    * @ngdoc method
@@ -517,26 +489,8 @@ function AnnotationController(
     return self.annotation.hidden;
   };
 
-  this.canFlag = function() {
-    // Users can flag any annotations except their own.
-    return session.state.userid !== self.annotation.user;
-  };
-
-  this.isFlagged = function() {
-    return self.annotation.flagged;
-  };
-
   this.isReply = function() {
     return isReply(self.annotation);
-  };
-
-  this.incontextLink = function() {
-    if (enableShareLinks && self.annotation.links) {
-      return (
-        self.annotation.links.incontext || self.annotation.links.html || ''
-      );
-    }
-    return '';
   };
 
   /**

@@ -33,25 +33,6 @@ const groupFixtures = {
   },
 };
 
-/**
- * Returns the controller for the action button with the given `label`.
- *
- * @param {Element} annotationEl - Annotation element
- * @param {string} label - Button label
- */
-function findActionButton(annotationEl, label) {
-  const btns = Array.from(
-    annotationEl[0].querySelectorAll('annotation-action-button')
-  );
-  const match = btns.find(function(btn) {
-    const ctrl = angular.element(btn).controller('annotationActionButton');
-    return ctrl.label === label;
-  });
-  return match
-    ? angular.element(match).controller('annotationActionButton')
-    : null;
-}
-
 describe('annotation', function() {
   describe('updateModel()', function() {
     const updateModel = require('../annotation').updateModel;
@@ -877,20 +858,6 @@ describe('annotation', function() {
       });
     });
 
-    describe('#canFlag', function() {
-      it('returns false if the user signed in is the same as the author of the annotation', function() {
-        const ann = fixtures.defaultAnnotation();
-        const controller = createDirective(ann).controller;
-        assert.isFalse(controller.canFlag());
-      });
-
-      it('returns true if the user signed in is different from the author of the annotation', function() {
-        const ann = fixtures.thirdPartyAnnotation();
-        const controller = createDirective(ann).controller;
-        assert.isTrue(controller.canFlag());
-      });
-    });
-
     describe('#shouldShowLicense', function() {
       [
         {
@@ -933,28 +900,6 @@ describe('annotation', function() {
           const controller = createDirective(ann).controller;
 
           assert.equal(controller.shouldShowLicense(), testCase.expected);
-        });
-      });
-    });
-
-    describe('#authorize', function() {
-      it('passes the current permissions and logged-in user ID to the permissions service', function() {
-        const ann = fixtures.defaultAnnotation();
-        ann.permissions = {
-          read: [fakeSession.state.userid],
-          delete: [fakeSession.state.userid],
-          update: [fakeSession.state.userid],
-        };
-        const controller = createDirective(ann).controller;
-
-        ['update', 'delete'].forEach(function(action) {
-          controller.authorize(action);
-          assert.calledWith(
-            fakePermissions.permits,
-            ann.permissions,
-            action,
-            fakeSession.state.userid
-          );
         });
       });
     });
@@ -1186,53 +1131,6 @@ describe('annotation', function() {
       });
     });
 
-    describe('annotation links', function() {
-      it('uses the in-context links when available', function() {
-        const annotation = Object.assign({}, fixtures.defaultAnnotation(), {
-          links: {
-            incontext: 'https://hpt.is/deadbeef',
-          },
-        });
-        const controller = createDirective(annotation).controller;
-        assert.equal(controller.incontextLink(), annotation.links.incontext);
-      });
-
-      it('falls back to the HTML link when in-context links are missing', function() {
-        const annotation = Object.assign({}, fixtures.defaultAnnotation(), {
-          links: {
-            html: 'https://test.hypothes.is/a/deadbeef',
-          },
-        });
-        const controller = createDirective(annotation).controller;
-        assert.equal(controller.incontextLink(), annotation.links.html);
-      });
-
-      it('in-context link is blank when unknown', function() {
-        const annotation = fixtures.defaultAnnotation();
-        const controller = createDirective(annotation).controller;
-        assert.equal(controller.incontextLink(), '');
-      });
-
-      [true, false].forEach(enableShareLinks => {
-        it('does not render links if share links are globally disabled', () => {
-          const annotation = Object.assign({}, fixtures.defaultAnnotation(), {
-            links: {
-              incontext: 'https://hpt.is/deadbeef',
-            },
-          });
-          fakeSettings.services = [
-            {
-              enableShareLinks,
-            },
-          ];
-          const controller = createDirective(annotation).controller;
-          const hasIncontextLink =
-            controller.incontextLink() === annotation.links.incontext;
-          assert.equal(hasIncontextLink, enableShareLinks);
-        });
-      });
-    });
-
     [
       {
         context: 'for moderators',
@@ -1261,33 +1159,6 @@ describe('annotation', function() {
           })
         );
       });
-    });
-
-    it('flags the annotation when the user clicks the "Flag" button', function() {
-      fakeAnnotationMapper.flagAnnotation.returns(Promise.resolve());
-      const ann = Object.assign(fixtures.defaultAnnotation(), {
-        user: 'acct:notCurrentUser@localhost',
-      });
-      const el = createDirective(ann).element;
-      const flagBtn = findActionButton(
-        el,
-        'Report this annotation to the moderators'
-      );
-      flagBtn.onClick();
-      assert.called(fakeAnnotationMapper.flagAnnotation);
-    });
-
-    it('highlights the "Flag" button if the annotation is flagged', function() {
-      const ann = Object.assign(fixtures.defaultAnnotation(), {
-        flagged: true,
-        user: 'acct:notCurrentUser@localhost',
-      });
-      const el = createDirective(ann).element;
-      const flaggedBtn = findActionButton(
-        el,
-        'Annotation has been reported to the moderators'
-      );
-      assert.ok(flaggedBtn);
     });
   });
 });

@@ -6,18 +6,21 @@ const { createElement } = require('preact');
 
 const SvgIcon = require('./svg-icon');
 
+/**
+ * A simple icon-only button for actions applicable to annotations
+ */
 function AnnotationActionButton({
-  className = '',
   icon,
-  isDisabled,
+  isActive = false,
   label,
-  onClick,
+  onClick = () => null,
 }) {
   return (
     <button
-      className={classnames('annotation-action-button', className)}
+      className={classnames('annotation-action-button', {
+        'is-active': isActive,
+      })}
       onClick={onClick}
-      disabled={isDisabled}
       aria-label={label}
       title={label}
     >
@@ -27,12 +30,14 @@ function AnnotationActionButton({
 }
 
 AnnotationActionButton.propTypes = {
-  className: propTypes.string,
   /** The name of the SVGIcon to render */
   icon: propTypes.string.isRequired,
-  isDisabled: propTypes.bool.isRequired,
+  /** Is this button currently in an "active" or "on" state? */
+  isActive: propTypes.bool,
+  /** a label used for the `title` and `aria-label` attributes */
   label: propTypes.string.isRequired,
-  onClick: propTypes.func.isRequired,
+  /** optional callback for clicks */
+  onClick: propTypes.func,
 };
 
 module.exports = AnnotationActionButton;
