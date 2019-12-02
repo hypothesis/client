@@ -14,7 +14,7 @@ const Excerpt = require('./excerpt');
 function AnnotationQuote({ isOrphan, quote, settings = {} }) {
   return (
     <section
-      className={classnames('annotation-quote-list', isOrphan && 'is-orphan')}
+      className={classnames('annotation-quote', isOrphan && 'is-orphan')}
     >
       <Excerpt
         collapsedHeight={35}
@@ -22,7 +22,7 @@ function AnnotationQuote({ isOrphan, quote, settings = {} }) {
         overflowThreshold={20}
       >
         <blockquote
-          className="annotation-quote"
+          className="annotation-quote__quote"
           style={applyTheme(['selectionFontFamily'], settings)}
         >
           {quote}

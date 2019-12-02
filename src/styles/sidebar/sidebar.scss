@@ -27,11 +27,13 @@
 @use './components/action-button';
 @use './components/annotation-action-button';
 @use './components/annotation';
+@use './components/annotation-body';
 @use './components/annotation-document-info';
 @use './components/annotation-header';
+@use './components/annotation-publish-control';
+@use './components/annotation-quote';
 @use './components/annotation-share-control';
 @use './components/annotation-share-info';
-@use './components/annotation-publish-control';
 @use './components/annotation-thread';
 @use './components/annotation-user';
 @use './components/excerpt';

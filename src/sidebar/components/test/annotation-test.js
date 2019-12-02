@@ -159,7 +159,6 @@ describe('annotation', function() {
         .component('annotationBody', {
           bindings: {
             collapse: '<',
-            hasContent: '<',
             isEditing: '<',
             isHiddenByModerator: '<',
             onCollapsibleChanged: '&',
@@ -1270,7 +1269,6 @@ describe('annotation', function() {
           text: 'Some offensive content',
         }),
         isHiddenByModerator: true,
-        hasContent: true,
       },
       {
         context: 'for non-moderators',
@@ -1280,16 +1278,14 @@ describe('annotation', function() {
           text: '',
         }),
         isHiddenByModerator: true,
-        hasContent: false,
       },
-    ].forEach(({ ann, context, isHiddenByModerator, hasContent }) => {
+    ].forEach(({ ann, context, isHiddenByModerator }) => {
       it(`passes moderation status to annotation body (${context})`, () => {
         const el = createDirective(ann).element;
         assert.match(
           el.find('annotation-body').controller('annotationBody'),
           sinon.match({
             isHiddenByModerator,
-            hasContent,
           })
         );
       });
