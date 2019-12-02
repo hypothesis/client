@@ -77,6 +77,7 @@ function Streamer(
         });
         break;
       case 'delete':
+      case 'not-shared':
         annotations.forEach(function(ann) {
           // Discard any pending but not-yet-applied updates for this annotation
           delete pendingUpdates[ann.id];
