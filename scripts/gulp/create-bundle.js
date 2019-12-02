@@ -135,8 +135,8 @@ module.exports = function createBundle(config, buildOpts) {
     .readFileSync(defaultPreludePath)
     .toString()
     .replace(
-      'var previousRequire = typeof require == "function" && require;',
-      `var previousRequire = typeof ${externalRequireName} == "function" && ${externalRequireName};`
+      /typeof require == "function" && require/g,
+      `typeof ${externalRequireName} == "function" && ${externalRequireName};`
     );
   if (!prelude.includes(externalRequireName)) {
     throw new Error(
