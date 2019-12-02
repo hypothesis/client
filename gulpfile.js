@@ -282,8 +282,9 @@ let isFirstBuild = true;
  * the Hypothesis client.
  *
  * @param {Object} manifest - Manifest mapping asset paths to cache-busted URLs
+ * @param {Object} options - Options for generating the boot script
  */
-function generateBootScript(manifest) {
+function generateBootScript(manifest, { usingDevServer = false } = {}) {
   const { version } = require('./package.json');
 
   const defaultSidebarAppUrl = process.env.SIDEBAR_APP_URL
@@ -292,11 +293,12 @@ function generateBootScript(manifest) {
 
   let defaultAssetRoot;
 
-  if (process.env.NODE_ENV === 'production') {
-    defaultAssetRoot = `https://cdn.hypothes.is/hypothesis/${version}/`;
+  if (process.env.NODE_ENV === 'production' && !usingDevServer) {
+    defaultAssetRoot = 'https://cdn.hypothes.is/hypothesis';
   } else {
-    defaultAssetRoot = `{current_scheme}://{current_host}:3001/hypothesis/${version}/`;
+    defaultAssetRoot = '{current_scheme}://{current_host}:3001/hypothesis';
   }
+  defaultAssetRoot = `${defaultAssetRoot}/${version}/`;
 
   if (isFirstBuild) {
     gulpUtil.log(`Sidebar app URL: ${defaultSidebarAppUrl}`);
@@ -320,7 +322,7 @@ function generateBootScript(manifest) {
  * Generate a JSON manifest mapping file paths to
  * URLs containing cache-busting query string parameters.
  */
-function generateManifest() {
+function generateManifest(opts) {
   return gulp
     .src(MANIFEST_SOURCE_FILES)
     .pipe(manifest({ name: 'manifest.json' }))
@@ -333,7 +335,7 @@ function generateManifest() {
         triggerLiveReload(changed);
 
         // Expand template vars in boot script bundle
-        generateBootScript(newManifest);
+        generateBootScript(newManifest, opts);
 
         this.push(file);
         callback();
@@ -343,7 +345,9 @@ function generateManifest() {
 }
 
 gulp.task('watch-manifest', function() {
-  gulp.watch(MANIFEST_SOURCE_FILES, { delay: 500 }, generateManifest);
+  gulp.watch(MANIFEST_SOURCE_FILES, { delay: 500 }, function updateManifest() {
+    generateManifest({ usingDevServer: true });
+  });
 });
 
 gulp.task('serve-package', function() {
