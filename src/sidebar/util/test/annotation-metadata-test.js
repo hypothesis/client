@@ -372,4 +372,50 @@ describe('annotation-metadata', function() {
       assert.equal(flagCount(ann), 10);
     });
   });
+
+  describe('quote', () => {
+    it('returns quote if annotation has a quote', () => {
+      const ann = {
+        target: [
+          {
+            source: 'https://publisher.org/article.pdf',
+            selector: [{ type: 'TextQuoteSelector', exact: 'expected quote' }],
+          },
+        ],
+      };
+      assert.equal(annotationMetadata.quote(ann), 'expected quote');
+    });
+
+    // FIXME - This currently happens when creating a new Page Note. Annotations
+    // from the API should always have a target.
+    //
+    // See https://github.com/hypothesis/client/issues/1290.
+    it('returns `null` if annotation has an empty target array', () => {
+      const ann = { target: [] };
+      assert.equal(annotationMetadata.quote(ann), null);
+    });
+
+    it('returns `null` if annotation has no selectors', () => {
+      const ann = {
+        target: [
+          {
+            source: 'https://publisher.org/article.pdf',
+          },
+        ],
+      };
+      assert.equal(annotationMetadata.quote(ann), null);
+    });
+
+    it('returns `null` if annotation has no text quote selector', () => {
+      const ann = {
+        target: [
+          {
+            source: 'https://publisher.org/article.pdf',
+            selector: [{ type: 'TextPositionSelector', start: 0, end: 100 }],
+          },
+        ],
+      };
+      assert.equal(annotationMetadata.quote(ann), null);
+    });
+  });
 });

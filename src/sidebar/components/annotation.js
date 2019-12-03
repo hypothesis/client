@@ -1,13 +1,14 @@
 'use strict';
 
-const annotationMetadata = require('../util/annotation-metadata');
+const {
+  isNew,
+  isReply,
+  isPageNote,
+  quote,
+} = require('../util/annotation-metadata');
 const events = require('../events');
 const { isThirdPartyUser } = require('../util/account-id');
 const serviceConfig = require('../service-config');
-
-const isNew = annotationMetadata.isNew;
-const isReply = annotationMetadata.isReply;
-const isPageNote = annotationMetadata.isPageNote;
 
 /**
  * Return a copy of `annotation` with changes made in the editor applied.
@@ -325,19 +326,7 @@ function AnnotationController(
   /**
    * Return the annotation's quote if it has one or `null` otherwise.
    */
-  this.quote = function() {
-    if (self.annotation.target.length === 0) {
-      return null;
-    }
-    const target = self.annotation.target[0];
-    if (!target.selector) {
-      return null;
-    }
-    const quoteSel = target.selector.find(function(sel) {
-      return sel.type === 'TextQuoteSelector';
-    });
-    return quoteSel ? quoteSel.exact : null;
-  };
+  this.quote = () => quote(self.annotation);
 
   this.id = function() {
     return self.annotation.id;

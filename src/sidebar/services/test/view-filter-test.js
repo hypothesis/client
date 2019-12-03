@@ -260,40 +260,4 @@ describe('sidebar/services/view-filter', () => {
 
     assert.deepEqual(result, []);
   });
-
-  describe('malformed target object', () => {
-    it('should not fail on annotations without a target object', () => {
-      const annotation = {
-        id: 1,
-        text: 'foo',
-        // Missing target
-      };
-
-      const filters = {
-        any: {
-          terms: ['foo'],
-          operator: 'or',
-        },
-      };
-
-      viewFilter.filter([annotation], filters);
-    });
-
-    it('should not fail on annotations without a target object item', () => {
-      const annotation = {
-        id: 1,
-        text: 'foo',
-        target: [], // Missing target item
-      };
-
-      const filters = {
-        any: {
-          terms: ['foo'],
-          operator: 'or',
-        },
-      };
-
-      viewFilter.filter([annotation], filters);
-    });
-  });
 });
