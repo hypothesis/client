@@ -143,6 +143,10 @@ function startAngularApp(config) {
       wrapReactComponent(require('./components/annotation-action-bar'))
     )
     .component(
+      'annotationLicense',
+      wrapReactComponent(require('./components/annotation-license'))
+    )
+    .component(
       'annotationPublishControl',
       wrapReactComponent(require('./components/annotation-publish-control'))
     )

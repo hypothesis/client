@@ -1,0 +1,22 @@
+@use "../../variables" as var;
+
+.annotation-license {
+  @include var.font-small;
+  border-top: 1px solid var.$grey-3;
+  padding-top: 0.75em;
+
+  &__link {
+    display: flex;
+    color: var.$grey-5;
+  }
+
+  &__icon {
+    width: 12px;
+    height: 12px;
+    margin-right: 1px;
+  }
+
+  &__details {
+    margin-left: 0.25em;
+  }
+}
