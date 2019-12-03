@@ -14,7 +14,7 @@ const DEFAULT_ORGANIZATION = {
 };
 
 const events = require('../events');
-const { awaitStateChange } = require('../util/state-util');
+const { awaitStateChange } = require('../util/state');
 const { combineGroups } = require('../util/groups');
 const serviceConfig = require('../service-config');
 

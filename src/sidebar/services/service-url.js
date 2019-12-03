@@ -1,6 +1,6 @@
 'use strict';
 
-const urlUtil = require('../util/url-util');
+const urlUtil = require('../util/url');
 
 /**
  * A function that returns an absolute URL given a link name and params, by

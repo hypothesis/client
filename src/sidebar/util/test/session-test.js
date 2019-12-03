@@ -1,8 +1,8 @@
 'use strict';
 
-const sessionUtil = require('../session-util');
+const sessionUtil = require('../session');
 
-describe('sidebar.util.session-util', () => {
+describe('sidebar/util/session', () => {
   describe('#shouldShowSidebarTutorial', () => {
     it('shows sidebar tutorial if the settings object has the show_sidebar_tutorial key set', function() {
       const sessionState = {

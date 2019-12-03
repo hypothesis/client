@@ -6,7 +6,7 @@ const serviceConfig = require('../service-config');
 const bridgeEvents = require('../../shared/bridge-events');
 const uiConstants = require('../ui-constants');
 const isSidebar = require('../util/is-sidebar');
-const { shouldAutoDisplayTutorial } = require('../util/session-util');
+const { shouldAutoDisplayTutorial } = require('../util/session');
 
 /**
  * Return the user's authentication status from their profile.

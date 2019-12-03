@@ -3,7 +3,7 @@
 const get = require('lodash.get');
 const queryString = require('query-string');
 
-const { replaceURLParams } = require('../util/url-util');
+const { replaceURLParams } = require('../util/url');
 
 /**
  * Translate the response from a failed API call into an Error-like object.

@@ -21,7 +21,7 @@ function createServiceUrl(linksPromise) {
     .returns({ url: 'EXPANDED_URL', params: {} });
 
   serviceUrlFactory.$imports.$mock({
-    '../util/url-util': { replaceURLParams: replaceURLParams },
+    '../util/url': { replaceURLParams: replaceURLParams },
   });
 
   const store = fakeStore();

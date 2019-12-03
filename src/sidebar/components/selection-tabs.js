@@ -6,7 +6,7 @@ const { createElement } = require('preact');
 const { Fragment } = require('preact');
 
 const NewNoteBtn = require('./new-note-btn');
-const sessionUtil = require('../util/session-util');
+const sessionUtil = require('../util/session');
 const uiConstants = require('../ui-constants');
 const useStore = require('../store/use-store');
 const { withServices } = require('../util/service-context');
