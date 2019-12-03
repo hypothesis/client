@@ -685,41 +685,13 @@ describe('annotation', function() {
     });
 
     describe('#quote', function() {
-      it('returns `null` if the annotation has no quotes', function() {
-        const annotation = fixtures.defaultAnnotation();
-        annotation.target = [{}];
-        const controller = createDirective(annotation).controller;
-
-        assert.isNull(controller.quote());
-      });
-
-      it('returns `null` if the annotation has selectors but no quote selector', function() {
-        const annotation = fixtures.defaultAnnotation();
-        annotation.target = [
-          {
-            selector: [],
-          },
+      it("returns the annotation's quote", () => {
+        const ann = fixtures.defaultAnnotation();
+        const controller = createDirective(ann).controller;
+        ann.target[0].selector = [
+          { type: 'TextQuoteSelector', exact: 'test quote' },
         ];
-        const controller = createDirective(annotation).controller;
-
-        assert.isNull(controller.quote());
-      });
-
-      it("returns the first quote's text if the annotation has quotes", function() {
-        const annotation = fixtures.defaultAnnotation();
-        annotation.target = [
-          {
-            selector: [
-              {
-                type: 'TextQuoteSelector',
-                exact: 'The text that the user selected',
-              },
-            ],
-          },
-        ];
-        const controller = createDirective(annotation).controller;
-
-        assert.equal(controller.quote(), 'The text that the user selected');
+        assert.equal(controller.quote(), 'test quote');
       });
     });
 

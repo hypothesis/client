@@ -1,5 +1,7 @@
 'use strict';
 
+const { quote } = require('../util/annotation-metadata');
+
 // Prevent Babel inserting helper code after `@ngInject` comment below which
 // breaks browserify-ngannotate.
 let unused; // eslint-disable-line
@@ -99,21 +101,7 @@ function viewFilter(unicode) {
   const fieldMatchers = {
     quote: {
       autofalse: ann => (ann.references || []).length > 0,
-      value(annotation) {
-        if (!annotation.target || !annotation.target.length) {
-          // Sanity check that ignores any annotation without a target. We should
-          // never arrive at this place in the code, but its a safe guard against
-          // anything from the server that may be malformed.
-          return '';
-        }
-        const target = annotation.target[0];
-        const selectors = target.selector || [];
-
-        return selectors
-          .filter(s => s.type === 'TextQuoteSelector')
-          .map(s => s.exact)
-          .join('\n');
-      },
+      value: ann => quote(ann) || '',
       match: (term, value) => value.indexOf(term) > -1,
     },
     since: {

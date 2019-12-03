@@ -200,6 +200,23 @@ function flagCount(ann) {
   return ann.moderation.flagCount;
 }
 
+/**
+ * Return the text quote that an annotation refers to.
+ *
+ * @return {string|null}
+ */
+function quote(ann) {
+  if (ann.target.length === 0) {
+    return null;
+  }
+  const target = ann.target[0];
+  if (!target.selector) {
+    return null;
+  }
+  const quoteSel = target.selector.find(s => s.type === 'TextQuoteSelector');
+  return quoteSel ? quoteSel.exact : null;
+}
+
 module.exports = {
   documentMetadata: documentMetadata,
   domainAndTitle: domainAndTitle,
@@ -212,4 +229,5 @@ module.exports = {
   isReply: isReply,
   isWaitingToAnchor: isWaitingToAnchor,
   location: location,
+  quote,
 };
