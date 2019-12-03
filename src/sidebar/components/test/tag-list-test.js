@@ -9,13 +9,14 @@ const TagList = require('../tag-list');
 describe('TagList', function() {
   let fakeServiceUrl;
   let fakeIsThirdPartyUser;
+  const fakeTags = ['tag1', 'tag2'];
 
   function createComponent(props) {
     return mount(
       <TagList
         // props
         annotation={{}}
-        tags={['tag1', 'tag2']}
+        tags={fakeTags}
         // service props
         serviceUrl={fakeServiceUrl}
         settings={{}}
@@ -26,8 +27,7 @@ describe('TagList', function() {
 
   beforeEach(function() {
     fakeServiceUrl = sinon.stub().returns('http://serviceurl.com');
-    fakeIsThirdPartyUser = sinon.stub();
-    fakeIsThirdPartyUser.returns(false);
+    fakeIsThirdPartyUser = sinon.stub().returns(false);
 
     TagList.$imports.$mock(mockImportedComponents());
     TagList.$imports.$mock({
@@ -41,87 +41,50 @@ describe('TagList', function() {
     TagList.$imports.$restore();
   });
 
-  it('adds appropriate class names and tag values to the elements', () => {
-    const wrapper = createComponent();
-    assert.equal(
-      wrapper
-        .find('a.tag-list__link')
-        .at(0)
-        .text(),
-      'tag1'
-    );
-    assert.equal(
-      wrapper
-        .find('a.tag-list__link')
-        .at(1)
-        .text(),
-      'tag2'
-    );
-  });
-
-  it('adds appropriate aria values to the elements', () => {
-    const wrapper = createComponent();
-    assert.equal(
-      wrapper
-        .find('.tag-list__item a')
-        .at(0)
-        .prop('aria-label'),
-      'Tag: tag1'
-    );
-    assert.equal(
-      wrapper
-        .find('.tag-list__item a')
-        .at(1)
-        .prop('aria-label'),
-      'Tag: tag2'
-    );
-  });
-
-  it('does not render any tags if tags prop is empty', () => {
+  it('does not render any tags if `tags` prop is empty', () => {
     const wrapper = createComponent({ tags: [] });
     assert.isFalse(wrapper.find('.tag-list__item a').exists());
   });
 
-  it('renders the href when isThirdPartyUser is false', () => {
-    const wrapper = createComponent();
-    assert.equal(
-      wrapper
-        .find('a.tag-list__link')
-        .at(0)
-        .prop('href'),
-      'http://serviceurl.com'
-    );
-    assert.equal(
-      wrapper
-        .find('a.tag-list__link')
-        .at(1)
-        .prop('href'),
-      'http://serviceurl.com'
-    );
+  context('when `isThirdPartyUser` returns false', () => {
+    it('adds appropriate classes, props and values', () => {
+      const wrapper = createComponent();
+      wrapper.find('a').forEach((link, i) => {
+        assert.isTrue(link.hasClass('tag-list__link'));
+        assert.equal(link.prop('aria-label'), `Tag: ${fakeTags[i]}`);
+        assert.equal(link.prop('href'), 'http://serviceurl.com');
+        assert.equal(
+          link.prop('title'),
+          `View annotations with tag: ${fakeTags[i]}`
+        );
+        assert.equal(link.text(), fakeTags[i]);
+      });
+    });
 
-    assert.calledWith(fakeServiceUrl, 'search.tag', { tag: 'tag1' });
-    assert.calledWith(fakeServiceUrl, 'search.tag', { tag: 'tag2' });
+    it('calls fakeServiceUrl()', () => {
+      createComponent();
+      assert.calledWith(fakeServiceUrl, 'search.tag', { tag: 'tag1' });
+      assert.calledWith(fakeServiceUrl, 'search.tag', { tag: 'tag2' });
+    });
   });
 
-  it('does not render the href when isThirdPartyUser is true', () => {
-    fakeIsThirdPartyUser.returns(true);
-    const wrapper = createComponent();
-    assert.equal(
-      wrapper
-        .find('a.tag-list__link')
-        .at(0)
-        .prop('href'),
-      undefined
-    );
+  context('when `isThirdPartyUser` returns true', () => {
+    beforeEach(function() {
+      fakeIsThirdPartyUser.returns(true);
+    });
 
-    assert.equal(
-      wrapper
-        .find('a.tag-list__link')
-        .at(1)
-        .prop('href'),
-      undefined
-    );
+    it('adds appropriate classes, props and values', () => {
+      const wrapper = createComponent();
+      wrapper.find('span').forEach((link, i) => {
+        assert.isTrue(link.hasClass('tag-list__text'));
+        assert.equal(link.prop('aria-label'), `Tag: ${fakeTags[i]}`);
+        assert.equal(link.text(), fakeTags[i]);
+      });
+    });
 
-    assert.notCalled(fakeServiceUrl);
+    it('does not call fakeServiceUrl()', () => {
+      createComponent();
+      assert.notCalled(fakeServiceUrl);
+    });
   });
 });
