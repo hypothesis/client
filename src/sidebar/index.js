@@ -139,8 +139,8 @@ function startAngularApp(config) {
       wrapReactComponent(require('./components/annotation-header'))
     )
     .component(
-      'annotationActionButton',
-      wrapReactComponent(require('./components/annotation-action-button'))
+      'annotationActionBar',
+      wrapReactComponent(require('./components/annotation-action-bar'))
     )
     .component(
       'annotationPublishControl',
@@ -149,10 +149,6 @@ function startAngularApp(config) {
     .component(
       'annotationQuote',
       wrapReactComponent(require('./components/annotation-quote'))
-    )
-    .component(
-      'annotationShareControl',
-      wrapReactComponent(require('./components/annotation-share-control'))
     )
     .component('annotationThread', require('./components/annotation-thread'))
     .component(

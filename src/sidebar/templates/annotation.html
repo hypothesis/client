@@ -86,46 +86,13 @@
     </div>
 
     <div class="annotation-actions" ng-if="!vm.isSaving && !vm.editing() && vm.id()">
-      <div ng-show="vm.isSaving">Saving…</div>
-      <annotation-action-button
-        icon="'edit'"
-        is-disabled="vm.isDeleted()"
-        label="'Edit'"
-        ng-show="vm.authorize('update') && !vm.isSaving"
-        on-click="vm.edit()"
-      ></annotation-action-button>
-      <annotation-action-button
-        icon="'trash'"
-        is-disabled="vm.isDeleted()"
-        label="'Delete'"
-        ng-show="vm.authorize('delete')"
-        on-click="vm.delete()"
-      ></annotation-action-button>
-      <annotation-action-button
-        icon="'reply'"
-        is-disabled="vm.isDeleted()"
-        label="'Reply'"
-        on-click="vm.reply()"
-      ></annotation-action-button>
-      <span class="annotation-share-dialog-wrapper" ng-if="vm.incontextLink()">
-        <annotation-share-control group="vm.group()" is-private="vm.state().isPrivate" share-uri="vm.incontextLink()"></annotation-share-control>
-      </span>
-      <span ng-if="vm.canFlag()">
-        <annotation-action-button
-         icon="'flag'"
-         is-disabled="vm.isDeleted()"
-         label="'Report this annotation to the moderators'"
-         ng-if="!vm.isFlagged()"
-         on-click="vm.flag()"
-        ></annotation-action-button>
-        <annotation-action-button
-         class-name="'annotation-action-button--active'"
-         icon="'flag--active'"
-         is-disabled="vm.isDeleted()"
-         label="'Annotation has been reported to the moderators'"
-         ng-if="vm.isFlagged()"
-        ></annotation-action-button>
-      </span>
+      <annotation-action-bar
+        annotation="vm.annotation"
+        is-private="vm.state().isPrivate"
+        on-delete="vm.delete()"
+        on-flag="vm.flag()"
+        on-edit="vm.edit()"
+        on-reply="vm.reply()"></annotation-action-bar>
     </div>
   </footer>
 </div>

@@ -30,8 +30,20 @@ describe('AnnotationActionButton', () => {
     AnnotationActionButton.$imports.$restore();
   });
 
-  it('applies any provided className to the button', () => {
-    const wrapper = createComponent({ className: 'my-class' });
-    assert.isTrue(wrapper.hasClass('my-class'));
+  it('adds active className if `isActive` is `true`', () => {
+    const wrapper = createComponent({ isActive: true });
+
+    assert.isTrue(wrapper.find('button').hasClass('is-active'));
+  });
+
+  it('renders `SvgIcon` if icon property set', () => {
+    const wrapper = createComponent();
+    assert.equal(wrapper.find('SvgIcon').prop('name'), 'fakeIcon');
+  });
+
+  it('invokes `onClick` callback when pressed', () => {
+    const wrapper = createComponent();
+    wrapper.find('button').simulate('click');
+    assert.calledOnce(fakeOnClick);
   });
 });

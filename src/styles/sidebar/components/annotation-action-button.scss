@@ -4,7 +4,7 @@
 .annotation-action-button {
   @include buttons.button-base;
 
-  &--active {
+  &.is-active {
     color: var.$brand;
 
     &:hover {
