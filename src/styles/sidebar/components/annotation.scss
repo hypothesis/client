@@ -46,12 +46,19 @@
   }
 }
 
+.annotation-link-more {
+  display: flex;
+  flex-flow: row-reverse;
+}
+
 .annotation-link {
   @include var.font-small;
   color: var.$grey-4;
   // Decrease the margin between the more/less link
   // and the annotation body.
-  margin-top: -12px;
+  margin-top: -1em;
+  padding-bottom: 0.5em;
+  padding-top: 0.5em;
 }
 
 .annotation-replies:hover {

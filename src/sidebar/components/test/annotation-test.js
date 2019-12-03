@@ -1072,61 +1072,49 @@ describe('annotation', function() {
       });
     });
 
-    describe('tag display', function() {
-      beforeEach('make serviceUrl() return a URL for the tag', function() {
-        fakeServiceUrl
-          .withArgs('search.tag', { tag: 'atag' })
-          .returns('https://hypothes.is/search?q=tag:atag');
+    describe('annotation links', function() {
+      it('uses the in-context links when available', function() {
+        const annotation = Object.assign({}, fixtures.defaultAnnotation(), {
+          links: {
+            incontext: 'https://hpt.is/deadbeef',
+          },
+        });
+        const controller = createDirective(annotation).controller;
+        assert.equal(controller.incontextLink(), annotation.links.incontext);
       });
 
-      /**
-       * Return an annotation directive with a single tag.
-       */
-      function annotationWithOneTag() {
-        return createDirective(
-          Object.assign(fixtures.defaultAnnotation(), {
-            tags: ['atag'],
-          })
-        );
-      }
-
-      /**
-       * Return the one tag link element from the given annotation directive.
-       */
-      function tagLinkFrom(directive) {
-        const links = [].slice.apply(
-          directive.element[0].querySelectorAll('a')
-        );
-        const tagLinks = links.filter(function(link) {
-          return link.textContent === 'atag';
+      it('falls back to the HTML link when in-context links are missing', function() {
+        const annotation = Object.assign({}, fixtures.defaultAnnotation(), {
+          links: {
+            html: 'https://test.hypothes.is/a/deadbeef',
+          },
         });
-        assert.equal(tagLinks.length, 1);
-        return tagLinks[0];
-      }
-
-      context('when the annotation is first-party', function() {
-        beforeEach('configure a first-party annotation', function() {
-          fakeAccountID.isThirdPartyUser.returns(false);
-        });
-
-        it('displays links to tag search pages', function() {
-          const tagLink = tagLinkFrom(annotationWithOneTag());
-
-          assert.equal(tagLink.href, 'https://hypothes.is/search?q=tag:atag');
-        });
+        const controller = createDirective(annotation).controller;
+        assert.equal(controller.incontextLink(), annotation.links.html);
       });
 
-      context('when the annotation is third-party', function() {
-        beforeEach('configure a third-party annotation', function() {
-          fakeAccountID.isThirdPartyUser.returns(true);
-        });
+      it('in-context link is blank when unknown', function() {
+        const annotation = fixtures.defaultAnnotation();
+        const controller = createDirective(annotation).controller;
+        assert.equal(controller.incontextLink(), '');
+      });
 
-        it("doesn't link tags for third-party annotations", function() {
-          // Tag search pages aren't supported for third-party annotations in
-          // h, so we don't link to them in the client.
-          const tagLink = tagLinkFrom(annotationWithOneTag());
-
-          assert.isFalse(tagLink.hasAttribute('href'));
+      [true, false].forEach(enableShareLinks => {
+        it('does not render links if share links are globally disabled', () => {
+          const annotation = Object.assign({}, fixtures.defaultAnnotation(), {
+            links: {
+              incontext: 'https://hpt.is/deadbeef',
+            },
+          });
+          fakeSettings.services = [
+            {
+              enableShareLinks,
+            },
+          ];
+          const controller = createDirective(annotation).controller;
+          const hasIncontextLink =
+            controller.incontextLink() === annotation.links.incontext;
+          assert.equal(hasIncontextLink, enableShareLinks);
         });
       });
     });

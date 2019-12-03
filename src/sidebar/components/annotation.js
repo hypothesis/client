@@ -459,13 +459,6 @@ function AnnotationController(
     });
   };
 
-  this.tagSearchURL = function(tag) {
-    if (this.isThirdPartyUser()) {
-      return null;
-    }
-    return serviceUrl('search.tag', { tag: tag });
-  };
-
   this.isOrphan = function() {
     if (typeof self.annotation.$orphan === 'undefined') {
       return self.annotation.$anchorTimeout;
