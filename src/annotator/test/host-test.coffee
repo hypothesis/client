@@ -78,7 +78,7 @@ describe 'Host', ->
       appURL = new URL('/base/annotator/test/empty.html', window.location.href)
       host = createHost({annotations: '1234'})
       configStr = encodeURIComponent(JSON.stringify({annotations: '1234'}))
-      assert.equal(host.frame[0].children[0].src, appURL + '?config=' + configStr)
+      assert.equal(host.frame[0].children[0].src, appURL + '#config=' + configStr)
 
     it 'adds drop shadow if the clean theme is enabled', ->
       host = createHost({theme: 'clean'})
