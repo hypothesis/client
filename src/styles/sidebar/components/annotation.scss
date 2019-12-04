@@ -61,6 +61,13 @@
   padding-top: 0.5em;
 }
 
+.annotation-link-more {
+  display: flex;
+  flex-flow: row-reverse;
+  padding-bottom: 5px;
+  padding-top: 5px;
+}
+
 .annotation-replies:hover {
   .annotation-replies__link {
     text-decoration: underline;

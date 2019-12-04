@@ -1,4 +1,5 @@
 @use "./focus";
+@use "./selectors";
 @use "../variables" as var;
 
 @mixin reset-native-btn-styles {
@@ -15,6 +16,7 @@
  */
 @mixin button-base {
   @include reset-native-btn-styles;
+  @include selectors.hover-fade;
   padding: 0.5em;
   color: var.$grey-5;
 
@@ -24,7 +26,6 @@
   }
 
   &:hover {
-    transition: 0.2s ease-out;
     color: var.$grey-6;
   }
 }
