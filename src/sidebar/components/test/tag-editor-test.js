@@ -45,7 +45,7 @@ describe('TagEditor', function() {
   });
 
   it('adds appropriate tag values to the elements', () => {
-    const wrapper = createComponent({ editMode: true });
+    const wrapper = createComponent();
     wrapper.find('li').forEach((tag, i) => {
       assert.isTrue(tag.hasClass('tag-editor__tag-item'));
       assert.equal(tag.text(), fakeTags[i]);
@@ -54,7 +54,7 @@ describe('TagEditor', function() {
   });
 
   it('creates the component with a unique id', () => {
-    const wrapper = createComponent({ editMode: true });
+    const wrapper = createComponent();
     assert.equal(
       wrapper.find('input').prop('list'),
       'tag-editor-datalist-annotation_id'
@@ -62,7 +62,7 @@ describe('TagEditor', function() {
   });
 
   it('calls fakeTagsService.filter with the value from the input field', () => {
-    const wrapper = createComponent({ editMode: true });
+    const wrapper = createComponent();
     wrapper.find('input').instance().value = 'tag3';
     // simulate `keyup` to populate suggestions list
     wrapper.find('input').simulate('keyup', { key: 'any' });
@@ -70,7 +70,7 @@ describe('TagEditor', function() {
   });
 
   it('generates a datalist set equal to the array value returned from fakeTagsService.filter ', () => {
-    const wrapper = createComponent({ editMode: true });
+    const wrapper = createComponent();
     // simulate `keyup` to populate suggestions list
     wrapper.find('input').simulate('keyup', { key: 'any' });
 
@@ -91,7 +91,7 @@ describe('TagEditor', function() {
   });
 
   it('clears the suggestions when adding a new tag', () => {
-    const wrapper = createComponent({ editMode: true });
+    const wrapper = createComponent();
     wrapper.find('input').instance().value = 'tag3';
     // simulate `keyup` to populate suggestions list
     wrapper.find('input').simulate('keyup', { key: 'any' });
@@ -153,7 +153,7 @@ describe('TagEditor', function() {
     };
 
     it('adds a tag from the input field', () => {
-      const wrapper = createComponent({ editMode: true });
+      const wrapper = createComponent();
       wrapper.find('input').instance().value = 'tag3';
 
       wrapper.find('input').simulate('keyup'); // simulates a selection
@@ -161,7 +161,7 @@ describe('TagEditor', function() {
     });
 
     it('populate the datalist, then adds a tag from the input field', () => {
-      const wrapper = createComponent({ editMode: true });
+      const wrapper = createComponent();
       wrapper.find('input').instance().value = 'tag3';
 
       // simulate `keyup` to populate suggestions list
@@ -172,8 +172,20 @@ describe('TagEditor', function() {
       addTagsSuccess(wrapper, ['tag1', 'tag2', 'tag3']);
     });
 
+    it('clears out the <datalist> element after adding a tag', () => {
+      const wrapper = createComponent();
+      wrapper.find('input').instance().value = 'tag3';
+
+      // simulate `keyup` to populate suggestions list
+      wrapper.find('input').simulate('keyup', { key: 'any' });
+      assert.equal(wrapper.find('datalist option').length, 2);
+
+      wrapper.find('input').simulate('keyup'); // simulates a selection
+      assert.isFalse(wrapper.find('datalist').exists());
+    });
+
     it('should not add a tag if the input is empty', () => {
-      const wrapper = createComponent({ editMode: true });
+      const wrapper = createComponent();
       wrapper.find('input').instance().value = '';
 
       wrapper.find('input').simulate('keyup'); // simulates a selection
@@ -181,21 +193,21 @@ describe('TagEditor', function() {
     });
 
     it('should not add a tag if the input is blank space', () => {
-      const wrapper = createComponent({ editMode: true });
+      const wrapper = createComponent();
       wrapper.find('input').instance().value = '  ';
       wrapper.find('input').simulate('keyup'); // simulates a selection
       addTagsFail();
     });
 
     it('should not add a tag if its a duplicate of one already in the list', () => {
-      const wrapper = createComponent({ editMode: true });
+      const wrapper = createComponent();
       wrapper.find('input').instance().value = 'tag1';
       wrapper.find('input').simulate('keyup'); // simulates a selection
       addTagsFail();
     });
 
     it('adds a tag via keypress `Enter`', () => {
-      const wrapper = createComponent({ editMode: true });
+      const wrapper = createComponent();
       wrapper.find('input').instance().value = 'tag3';
 
       wrapper.find('input').simulate('keypress', { key: 'Enter' });
@@ -203,7 +215,7 @@ describe('TagEditor', function() {
     });
 
     it('adds a tag via keypress `,`', () => {
-      const wrapper = createComponent({ editMode: true });
+      const wrapper = createComponent();
       wrapper.find('input').instance().value = 'tag3';
 
       wrapper.find('input').simulate('keypress', { key: ',' });
@@ -211,7 +223,7 @@ describe('TagEditor', function() {
     });
 
     it('does not add a tag when key is not `,` or  `Enter`', () => {
-      const wrapper = createComponent({ editMode: true });
+      const wrapper = createComponent();
       wrapper.find('input').instance().value = 'tag3';
 
       wrapper.find('input').simulate('keypress', { key: 'e' });
@@ -233,7 +245,7 @@ describe('TagEditor', function() {
     };
 
     it('removes `tag1` when clicking its delete button', () => {
-      const wrapper = createComponent({ editMode: true });
+      const wrapper = createComponent();
       assert.equal(wrapper.find('.tag-editor__edit').length, 2);
       wrapper
         .find('button')

@@ -61,6 +61,7 @@
 >>>>>>> Rename TagEditor2 to TagEditor
 
   <tag-list
+    ng-if="!vm.editing()"
     annotation="vm.annotation"
     tags="vm.state().tags"
   ></tag-list>

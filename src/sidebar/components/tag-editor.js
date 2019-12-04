@@ -58,8 +58,9 @@ function TagEditor({ annotation, onEditTags, tags: tagsService, tagList }) {
       // don't add duplicate tag
       return;
     }
-    setSuggestions([]);
+
     saveTags([...tagList, value]);
+    setSuggestions([]);
 
     // clear the input field and maintain focus
     inputEl.current.value = '';
@@ -114,15 +115,23 @@ function TagEditor({ annotation, onEditTags, tags: tagsService, tagList }) {
     const suggestionElements = suggestions.map((suggestion, index) => (
       <option key={index} value={suggestion} />
     ));
-    return (
-      <datalist
-        id={`tag-editor-datalist-${annotation.id}`}
-        className="tag-editor__suggestions"
-        aria-label="Annotation suggestions"
-      >
-        {suggestionElements}
-      </datalist>
-    );
+
+    // Only return a datalist if there is something to render in the list. This
+    // avoid a bug in Firefox where the datalist rendered does not correspond to the
+    // actual list of <option>s in the dom. Wiping out the entire <datalist> tag seems
+    // to force Firefox's hand.
+    if (suggestionElements.length > 0) {
+      return (
+        <datalist
+          id={`tag-editor-datalist-${annotation.id}`}
+          className="tag-editor__suggestions"
+          aria-label="Annotation suggestions"
+        >
+          {suggestionElements}
+        </datalist>
+      );
+    }
+    return null;
   };
 
   return (

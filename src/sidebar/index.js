@@ -198,10 +198,7 @@ function startAngularApp(config) {
       'tagEditor',
       wrapReactComponent(require('./components/tag-editor'))
     )
-    .component(
-      'tagList',
-      wrapReactComponent(require('./components/tag-list'))
-    )
+    .component('tagList', wrapReactComponent(require('./components/tag-list')))
     .component('threadList', require('./components/thread-list'))
     .component('topBar', wrapReactComponent(require('./components/top-bar')))
     .directive('hAutofocus', require('./directive/h-autofocus'))
