@@ -29,26 +29,23 @@
     text="vm.state().text">
   </annotation-body>
 
+  <div class="annotation-link-more">
+    <a class="annotation-link u-strong" ng-show="vm.canCollapseBody && !vm.editing()"
+      ng-click="vm.toggleCollapseBody($event)"
+      ng-title="vm.collapseBody ? 'Show the full annotation text' : 'Show the first few lines only'"
+      ng-bind="vm.collapseBody ? 'More' : 'Less'"
+      h-branding="accentColor">mire</a>
+  </div>
   <!-- Tags -->
   <div class="annotation-body form-field" ng-if="vm.editing()">
     <tag-editor tags="vm.state().tags"
                 on-edit-tags="vm.setTags(tags)"></tag-editor>
   </div>
 
-  <div class="annotation-body u-layout-row tags tags-read-only"
-       ng-if="(vm.canCollapseBody || vm.state().tags.length) && !vm.editing()">
-    <ul class="tag-list" aria-label="Annotation tags">
-      <li class="tag-item" ng-repeat="tag in vm.state().tags">
-        <a ng-href="{{vm.tagSearchURL(tag)}}" aria-label="Tag: {{tag}}" target="_blank">{{tag}}</a>
-      </li>
-    </ul>
-    <div class="u-stretch"></div>
-    <a class="annotation-link u-strong" ng-show="vm.canCollapseBody"
-      ng-click="vm.toggleCollapseBody($event)"
-      ng-title="vm.collapseBody ? 'Show the full annotation text' : 'Show the first few lines only'"
-      ng-bind="vm.collapseBody ? 'More' : 'Less'"
-      h-branding="accentColor"></a>
-  </div>
+  <tag-list
+    annotation="vm.annotation"
+    tags="vm.state().tags" 
+  ></tag-list>
   <!-- / Tags -->
 
   <footer class="annotation-footer">
