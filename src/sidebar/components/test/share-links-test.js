@@ -57,9 +57,16 @@ describe('ShareLinks', () => {
       const wrapper = createComponent({ shareURI: shareLink });
 
       const link = wrapper.find(`a[title="${testCase.title}"]`);
-      link.simulate('click');
 
       assert.equal(link.prop('href'), testCase.expectedURI);
+
+      // Assure tracking doesn't happen until clicked
+      // See https://github.com/hypothesis/client/issues/1566
+      assert.notCalled(fakeAnalytics.track);
+
+      // Now click...
+      link.simulate('click');
+
       assert.calledWith(
         fakeAnalytics.track,
         'potato-peeling',

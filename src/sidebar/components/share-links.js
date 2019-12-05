@@ -12,7 +12,9 @@ const SvgIcon = require('./svg-icon');
  */
 function ShareLinks({ analytics, analyticsEventName, shareURI }) {
   const trackShareClick = shareTarget => {
-    analytics.track(analyticsEventName, shareTarget);
+    return () => {
+      analytics.track(analyticsEventName, shareTarget);
+    };
   };
 
   // This is the double-encoded format needed for other services (the entire
