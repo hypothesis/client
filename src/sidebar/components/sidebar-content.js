@@ -216,6 +216,10 @@ function SidebarContentController(
     }
   }
 
+  window.addEventListener('testing', () => {
+      loadAnnotations();
+  });
+
   $scope.$on('sidebarOpened', function() {
     analytics.track(analytics.events.SIDEBAR_OPENED);
 
