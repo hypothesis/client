@@ -12,6 +12,8 @@ const icons = {
   'arrow-left': require('../../images/icons/arrow-left.svg'),
   'arrow-right': require('../../images/icons/arrow-right.svg'),
   cancel: require('../../images/icons/cancel.svg'),
+  'cc-std': require('../../images/icons/cc-std.svg'),
+  'cc-zero': require('../../images/icons/cc-zero.svg'),
   'collapse-menu': require('../../images/icons/collapse-menu.svg'),
   copy: require('../../images/icons/copy.svg'),
   cursor: require('../../images/icons/cursor.svg'),

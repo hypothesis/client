@@ -121,24 +121,6 @@
   font-size: var.$body1-font-size;
 }
 
-.annotation-license {
-  clear: both;
-  border-top: #cccccc 1px solid;
-  font-size: 0.8em;
-  padding-top: 0.583em;
-
-  @include icons.icons {
-    font-size: var.$normal-font-size;
-    vertical-align: -2px;
-    margin-right: 1px;
-  }
-}
-
-.annotation-license__link {
-  color: var.$gray-light;
-  display: block;
-}
-
 .annotation-collapsed-replies {
   display: none;
 }
