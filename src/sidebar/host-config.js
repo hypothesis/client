@@ -7,7 +7,8 @@ const queryString = require('query-string');
  * client.
  */
 function hostPageConfig(window) {
-  const configJSON = queryString.parse(window.location.search).config;
+  const configStr = window.location.hash.slice(1);
+  const configJSON = queryString.parse(configStr).config;
   const config = JSON.parse(configJSON || '{}');
 
   // Known configuration parameters which we will import from the host page.

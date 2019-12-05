@@ -5,7 +5,7 @@ const hostPageConfig = require('../host-config');
 function fakeWindow(config) {
   return {
     location: {
-      search: '?config=' + JSON.stringify(config),
+      hash: '#config=' + JSON.stringify(config),
     },
   };
 }
