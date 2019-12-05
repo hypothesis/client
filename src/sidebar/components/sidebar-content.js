@@ -216,8 +216,10 @@ function SidebarContentController(
     }
   }
 
-  window.addEventListener('testing', () => {
-      loadAnnotations();
+  window.addEventListener('message', (event) => {
+      if (event.data.action === 'test-player:updated') {
+          loadAnnotations();
+      }
   });
 
   $scope.$on('sidebarOpened', function() {
