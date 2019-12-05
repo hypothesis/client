@@ -8,9 +8,41 @@ const { withServices } = require('../util/service-context');
 const SvgIcon = require('./svg-icon');
 
 /**
+ * A single sharing link as a list item
+ */
+function ShareLink({ iconName, title, uri, onClick }) {
+  return (
+    <li className="share-links__link">
+      <a
+        href={uri}
+        title={title}
+        onClick={onClick}
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <SvgIcon name={iconName} className="share-links__icon" />
+      </a>
+    </li>
+  );
+}
+
+ShareLink.propTypes = {
+  /** The name of the SVG icon to use for this link */
+  iconName: propTypes.string.isRequired,
+  /** link title */
+  title: propTypes.string.isRequired,
+  /** URI for sharing this annotation on the given social service */
+  uri: propTypes.string.isRequired,
+  /** click callback (for analytics tracking) */
+  onClick: propTypes.func.isRequired,
+};
+
+/**
  * A list of share links to social-media platforms.
  */
 function ShareLinks({ analytics, analyticsEventName, shareURI }) {
+  // Return a click callback that will track click events for the given
+  // social platform (`shareTarget`)
   const trackShareClick = shareTarget => {
     return () => {
       analytics.track(analyticsEventName, shareTarget);
@@ -23,35 +55,28 @@ function ShareLinks({ analytics, analyticsEventName, shareURI }) {
 
   return (
     <ul className="share-links">
-      <li className="share-links__link">
-        <a
-          href={`https://twitter.com/intent/tweet?url=${encodedURI}&hashtags=annotated`}
-          title="Tweet share link"
-          onClick={trackShareClick('twitter')}
-        >
-          <SvgIcon name="twitter" className="share-links__icon" />
-        </a>
-      </li>
-      <li className="share-links__link">
-        <a
-          href={`https://www.facebook.com/sharer/sharer.php?u=${encodedURI}`}
-          title="Share on Facebook"
-          onClick={trackShareClick('facebook')}
-        >
-          <SvgIcon name="facebook" className="share-links__icon" />
-        </a>
-      </li>
-      <li className="share-links__link">
-        <a
-          href={`mailto:?subject=${encodeURIComponent(
-            "Let's Annotate"
-          )}&body=${encodedURI}`}
-          title="Share via email"
-          onClick={trackShareClick('email')}
-        >
-          <SvgIcon name="email" className="share-links__icon" />
-        </a>
-      </li>
+      <ShareLink
+        iconName="twitter"
+        title="Tweet share link"
+        uri={`https://twitter.com/intent/tweet?url=${encodedURI}&hashtags=annotated`}
+        onClick={trackShareClick('twitter')}
+      />
+
+      <ShareLink
+        iconName="facebook"
+        title="Share on Facebook"
+        uri={`https://www.facebook.com/sharer/sharer.php?u=${encodedURI}`}
+        onClick={trackShareClick('facebook')}
+      />
+
+      <ShareLink
+        iconName="email"
+        title="Share via email"
+        uri={`mailto:?subject=${encodeURIComponent(
+          "Let's Annotate"
+        )}&body=${encodedURI}`}
+        onClick={trackShareClick('email')}
+      />
     </ul>
   );
 }
