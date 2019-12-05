@@ -8,32 +8,24 @@ const { withServices } = require('../util/service-context');
 const SvgIcon = require('./svg-icon');
 
 /**
- * Component to edit annotation tags. Tags may be added or removed from any
- * given annotation. This component also renders suggested tags which use
- * the `tags` service to set or get previously used tags to
- * local storage.
+ * Component to edit annotation's tags.
  */
 function TagEditor({ annotation, onEditTags, tags: tagsService, tagList }) {
   const inputEl = useRef(null);
   const [suggestions, setSuggestions] = useState([]);
 
   /**
-   * Passes the tags list to the provided callback `onEditTags` so it may
-   * be saved to the service. Also passes the list to `tagsService.store`
-   * so it may be presented as a future suggestion if its not already
-   * one.
-   *
-   * @param {Array<string>} tagList
+   * Handle changes to this annotation's tags
    */
-  const saveTags = tagList => {
-    // save suggested tags
+  const updateTags = tagList => {
+    // update suggested-tags list via service
     tagsService.store(tagList.map(tag => ({ text: tag })));
-    // set the new tag to the annotation
+    // invoke callback with updated tags
     onEditTags({ tags: tagList });
   };
 
   /**
-   * Remove a tag.
+   * Remove a tag from this annotation.
    *
    * @param {string} tag
    */
@@ -41,12 +33,12 @@ function TagEditor({ annotation, onEditTags, tags: tagsService, tagList }) {
     const newTagList = [...tagList]; // make a copy
     const index = newTagList.indexOf(tag);
     newTagList.splice(index, 1);
-    saveTags(newTagList);
+    updateTags(newTagList);
   };
 
   /**
-   * Adds a new local tag equal to the value of the input field only
-   * if its not already in the `tagList`.
+   * Adds a tag equal to the value of the input field, and
+   * then clears out the suggestions list and the input field.
    */
   const addTag = () => {
     const value = inputEl.current.value.trim();
@@ -59,7 +51,7 @@ function TagEditor({ annotation, onEditTags, tags: tagsService, tagList }) {
       return;
     }
 
-    saveTags([...tagList, value]);
+    updateTags([...tagList, value]);
     setSuggestions([]);
 
     // clear the input field and maintain focus
@@ -111,7 +103,7 @@ function TagEditor({ annotation, onEditTags, tags: tagsService, tagList }) {
     }
   };
 
-  const buildSuggestionsList = () => {
+  const suggestionsList = (() => {
     const suggestionElements = suggestions.map((suggestion, index) => (
       <option key={index} value={suggestion} />
     ));
@@ -132,11 +124,14 @@ function TagEditor({ annotation, onEditTags, tags: tagsService, tagList }) {
       );
     }
     return null;
-  };
+  })();
 
   return (
     <section className="tag-editor">
-      <ul className="tag-editor__tag-list" aria-label="Annotation tags">
+      <ul
+        className="tag-editor__tag-list"
+        aria-label="Suggested tags for annotation"
+      >
         {tagList.map(tag => {
           return (
             <li
@@ -168,7 +163,7 @@ function TagEditor({ annotation, onEditTags, tags: tagsService, tagList }) {
         className="tag-editor__input"
         type="text"
       />
-      {buildSuggestionsList()}
+      {suggestionsList}
     </section>
   );
 }
@@ -180,17 +175,17 @@ function TagEditor({ annotation, onEditTags, tags: tagsService, tagList }) {
 
 TagEditor.propTypes = {
   /* Annotation that owns the tags. */
-  annotation: propTypes.object,
+  annotation: propTypes.object.isRequired,
 
   /**
    *  Callback that saves the tag list.
    *
    *  @param {Array<Tag>} - Array of tags to save
    */
-  onEditTags: propTypes.func,
+  onEditTags: propTypes.func.isRequired,
 
   /* The list of editable tags as strings. */
-  tagList: propTypes.array,
+  tagList: propTypes.array.isRequired,
 
   /** Services */
   tags: propTypes.object,
