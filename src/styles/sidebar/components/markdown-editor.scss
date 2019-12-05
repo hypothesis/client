@@ -1,3 +1,4 @@
+@use '../mixins/effects';
 @use "../../variables" as var;
 
 $toolbar-border: 0.1em solid var.$grey-3;
@@ -20,6 +21,7 @@ $toolbar-border: 0.1em solid var.$grey-3;
 }
 
 .markdown-editor__toolbar-button {
+  @include effects.hover-fade;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -51,12 +53,14 @@ $toolbar-border: 0.1em solid var.$grey-3;
 }
 
 .markdown-editor__preview {
+  @include effects.hover-fade;
   border: $toolbar-border;
   background-color: var.$grey-1;
   padding: 10px;
 }
 
 .markdown-editor__toolbar-help-link {
+  @include effects.hover-fade;
   display: flex;
   align-items: center;
   margin-bottom: 2px; // Tweak to align help icon better with adjacent buttons

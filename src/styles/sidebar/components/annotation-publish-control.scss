@@ -1,10 +1,12 @@
 @use "../../mixins/forms";
+@use "../../mixins/effects";
 @use "../../variables" as var;
 
 .annotation-publish-control {
   display: flex;
 
   &__cancel-btn {
+    @include effects.hover-fade;
     margin-left: 5px;
     font-weight: normal;
     color: var.$grey-4;
@@ -59,6 +61,7 @@
     // dropdown arrow which reveals the button's associated menu
     // when clicked
     &-dropdown-arrow {
+      @include effects.hover-fade;
       position: absolute;
       right: 0px;
       top: 0px;

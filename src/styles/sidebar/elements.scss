@@ -1,7 +1,9 @@
+@use "../mixins/effects";
 @use "../variables" as var;
 
 // basic standard styling for elements
 a {
+  @include effects.hover-fade;
   color: var.$link-color;
   text-decoration: none;
 }

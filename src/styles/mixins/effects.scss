@@ -1,0 +1,9 @@
+/**
+ * Standard hover fade in/out effect for anything clickable
+ */
+@mixin hover-fade {
+  transition: 0.25s ease-out;
+  &:hover {
+    transition: 0.1s;
+  }
+}

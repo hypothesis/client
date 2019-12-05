@@ -1,4 +1,5 @@
 @use "../../mixins/buttons";
+@use "../../mixins/effects";
 @use "../../variables" as var;
 
 .top-bar {
@@ -58,7 +59,7 @@
 
 .top-bar__btn {
   @include buttons.reset-native-btn-styles;
-
+  @include effects.hover-fade;
   height: 100%;
   color: var.$gray-light;
   display: inline-block;

@@ -4,6 +4,7 @@
 @use '../mixins/focus';
 @use '../mixins/reset';
 @use '../mixins/shadow';
+@use '../mixins/effects';
 
 @use './adder';
 @use './bucket-bar';
@@ -110,9 +111,9 @@ var.$base-font-size: 14px;
   }
 
   .annotator-frame-button {
+    @include effects.hover-fade;
     @include focus.outline-on-keyboard-focus;
 
-    transition: background-color 0.25s;
     @include shadow.smallshadow;
     background: var.$white;
     border: solid 1px var.$gray-lighter;
