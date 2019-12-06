@@ -12,13 +12,16 @@ const AWS = require('aws-sdk');
 /**
  * File extension / mime type associations for file types we actually use.
  */
-const MIME_TYPES = {
+const TEXT_MIME_TYPES = {
   '.css': 'text/css',
   '.md': 'text/markdown',
   '.js': 'application/javascript',
   '.json': 'application/json',
-  '.map': 'application/octet-stream',
+  '.map': 'application/json',
   '.svg': 'image/svg+xml',
+};
+
+const BINARY_MIME_TYPES = {
   '.woff': 'font/woff',
   '.woff2': 'font/woff2',
 };
@@ -33,9 +36,16 @@ function contentTypeFromFilename(path) {
     return 'text/plain';
   }
 
-  if (MIME_TYPES[extension]) {
-    return MIME_TYPES[extension];
+  let mimeType = TEXT_MIME_TYPES[extension];
+  if (mimeType) {
+    return mimeType + '; charset=UTF-8';
   }
+
+  mimeType = BINARY_MIME_TYPES[extension];
+  if (mimeType) {
+    return mimeType;
+  }
+
   throw new Error(`Unable to look up Content-Type for ${path}`);
 }
 
