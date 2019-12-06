@@ -17,7 +17,7 @@ const TEXT_MIME_TYPES = {
   '.md': 'text/markdown',
   '.js': 'application/javascript',
   '.json': 'application/json',
-  '.map': 'application/octet-stream',
+  '.map': 'application/json',
   '.svg': 'image/svg+xml',
 };
 
