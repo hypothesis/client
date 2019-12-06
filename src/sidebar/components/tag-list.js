@@ -2,7 +2,7 @@
 
 const { createElement } = require('preact');
 const propTypes = require('prop-types');
-const { useEffect, useState } = require('preact/hooks');
+const { useMemo } = require('preact/hooks');
 
 const { isThirdPartyUser } = require('../util/account-id');
 const { withServices } = require('../util/service-context');
@@ -11,13 +11,11 @@ const { withServices } = require('../util/service-context');
  * Component to render an annotation's tags.
  */
 function TagList({ annotation, serviceUrl, settings, tags }) {
-  // Should we show a linked tag or just a text tag?
-  const [renderLink, setRenderLink] = useState(false);
-
-  useEffect(() => {
+  const renderLink = useMemo(
     // Show a link if the authority of the user is not 3rd party
-    setRenderLink(!isThirdPartyUser(annotation.user, settings.authDomain));
-  }, [annotation, settings]);
+    () => !isThirdPartyUser(annotation.user, settings.authDomain),
+    [annotation, settings]
+  );
 
   /**
    * Returns a uri link for a specific tag name.
