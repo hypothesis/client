@@ -14,12 +14,11 @@ function apiRoutes(settings) {
   let linkCache;
 
   function getJSON(url) {
-    const config = {
-      headers: {
-        'Hypothesis-Client-Version': '__VERSION__', // replaced by versionify
-      },
-    };
-    return fetch(url, config).then(response => {
+    // nb. The `/api/` and `/api/links` routes are fetched without specifying
+    // any additional headers/config so that we can use `<link rel="preload">` in
+    // the `/app.html` response to fetch them early, while the client JS app
+    // is loading.
+    return fetch(url).then(response => {
       if (response.status !== 200) {
         throw new Error(`Fetching ${url} failed`);
       }
