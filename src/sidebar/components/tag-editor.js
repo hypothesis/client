@@ -50,7 +50,6 @@ function TagEditor({ annotation, onEditTags, tags: tagsService, tagList }) {
       // don't add duplicate tag
       return;
     }
-
     updateTags([...tagList, value]);
     setSuggestions([]);
 
@@ -88,13 +87,18 @@ function TagEditor({ annotation, onEditTags, tags: tagsService, tagList }) {
       return suggestionsSet;
     };
 
-    if (e.key && e.key !== 'Enter') {
+    if (e.key) {
       // A user typed a letter and we need to filter the results
       // to update the <dataset> suggestions
-      const suggestions = removeDuplicates(
-        tagsService.filter(inputEl.current.value)
-      );
-      setSuggestions(suggestions);
+
+      const value = inputEl.current.value.trim();
+      if (value.length !== 0) {
+        // Only change suggestions if input is non-empty
+        const suggestions = removeDuplicates(tagsService.filter(value));
+        setSuggestions(suggestions);
+      } else {
+        setSuggestions([]);
+      }
     } else if (e.type === 'keyup') {
       // Assume the user selected an option from <datalist>
       // either by clicking on it with the mouse or pressing

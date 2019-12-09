@@ -4,6 +4,10 @@
 
 .tag-editor {
   &__input {
+    &::-webkit-calendar-picker-indicator {
+      // Turn off the default arrow icon
+      display: none;
+    }
     @include forms.form-input;
     width: 100%;
     &:focus {

@@ -72,6 +72,7 @@ describe('TagEditor', function() {
   it('generates a datalist set equal to the array value returned from fakeTagsService.filter ', () => {
     const wrapper = createComponent();
     // simulate `keyup` to populate suggestions list
+    wrapper.find('input').instance().value = 'non-empty';
     wrapper.find('input').simulate('keyup', { key: 'any' });
 
     assert.equal(
@@ -108,6 +109,17 @@ describe('TagEditor', function() {
     );
   });
 
+  it('clears the suggestions when clearing the input', () => {
+    const wrapper = createComponent();
+    wrapper.find('input').instance().value = 'non-empty';
+    // simulate `keyup` to populate suggestions list
+    wrapper.find('input').simulate('keyup', { key: 'any' });
+    assert.equal(wrapper.find('datalist option').length, 2);
+    wrapper.find('input').instance().value = '';
+    wrapper.find('input').simulate('keyup', { key: 'any' });
+    assert.equal(wrapper.find('datalist option').length, 0);
+  });
+
   it('does not render duplicate suggestions', () => {
     // `tag3` supplied in the `tagList` will be a duplicate value relative
     // with the fakeTagsService.filter result above.
@@ -116,6 +128,7 @@ describe('TagEditor', function() {
       tagList: ['tag1', 'tag2', 'tag3'],
     });
     // simulate `keyup` to populate suggestions list
+    wrapper.find('input').instance().value = 'non-empty';
     wrapper.find('input').simulate('keyup', { key: 'any' });
     assert.equal(wrapper.find('datalist option').length, 1);
     assert.equal(
@@ -174,7 +187,7 @@ describe('TagEditor', function() {
 
     it('clears out the <datalist> element after adding a tag', () => {
       const wrapper = createComponent();
-      wrapper.find('input').instance().value = 'tag3';
+      wrapper.find('input').instance().value = 'non-empty';
 
       // simulate `keyup` to populate suggestions list
       wrapper.find('input').simulate('keyup', { key: 'any' });
