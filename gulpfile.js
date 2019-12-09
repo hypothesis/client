@@ -8,8 +8,8 @@ const path = require('path');
 const changed = require('gulp-changed');
 const commander = require('commander');
 const debounce = require('lodash.debounce');
+const log = require('fancy-log');
 const gulp = require('gulp');
-const gulpUtil = require('gulp-util');
 const replace = require('gulp-replace');
 const rename = require('gulp-rename');
 const through = require('through2');
@@ -301,8 +301,8 @@ function generateBootScript(manifest, { usingDevServer = false } = {}) {
   defaultAssetRoot = `${defaultAssetRoot}/${version}/`;
 
   if (isFirstBuild) {
-    gulpUtil.log(`Sidebar app URL: ${defaultSidebarAppUrl}`);
-    gulpUtil.log(`Client asset root URL: ${defaultAssetRoot}`);
+    log(`Sidebar app URL: ${defaultSidebarAppUrl}`);
+    log(`Client asset root URL: ${defaultAssetRoot}`);
     isFirstBuild = false;
   }
 

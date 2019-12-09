@@ -2,7 +2,8 @@
 
 const fs = require('fs');
 const path = require('path');
-const gulpUtil = require('gulp-util');
+
+const log = require('fancy-log');
 const request = require('request');
 const through = require('through2');
 
@@ -101,14 +102,14 @@ function uploadReleaseFile(opts, project, release, file) {
 module.exports = function uploadToSentry(opts, projects, release) {
   // Create releases in every project
   const releases = projects.map(function(project) {
-    gulpUtil.log(`Creating release '${release}' in project '${project}'`);
+    log(`Creating release '${release}' in project '${project}'`);
     return createRelease(opts, project, release);
   });
 
   return through.obj(function(file, enc, callback) {
     Promise.all(releases)
       .then(function() {
-        gulpUtil.log(`Uploading ${path.basename(file.path)}`);
+        log(`Uploading ${path.basename(file.path)}`);
         const uploads = projects.map(function(project) {
           return uploadReleaseFile(opts, project, release, file);
         });
@@ -119,7 +120,7 @@ module.exports = function uploadToSentry(opts, projects, release) {
         callback();
       })
       .catch(function(err) {
-        gulpUtil.log('Sentry upload failed: ', err);
+        log('Sentry upload failed: ', err);
         callback(err);
       });
   });
