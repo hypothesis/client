@@ -1,7 +1,7 @@
 'use strict';
 
 const fs = require('fs');
-const gulpUtil = require('gulp-util');
+const log = require('fancy-log');
 const WebSocketServer = require('websocket').server;
 const urlParser = require('url');
 
@@ -41,7 +41,6 @@ function LiveReloadServer(port, config) {
   let connections = [];
 
   function listen() {
-    const log = gulpUtil.log;
     const app = function(req, response) {
       const url = urlParser.parse(req.url);
       let content;

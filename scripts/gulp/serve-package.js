@@ -3,7 +3,7 @@
 const { readFileSync } = require('fs');
 
 const express = require('express');
-const { log } = require('gulp-util');
+const log = require('fancy-log');
 
 const { createServer, useSsl } = require('./create-server');
 const { version } = require('../../package.json');

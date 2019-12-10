@@ -10,14 +10,12 @@ const babelify = require('babelify');
 const browserify = require('browserify');
 const coffeeify = require('coffeeify');
 const exorcist = require('exorcist');
+const log = require('fancy-log');
 const envify = require('loose-envify/custom');
-const gulpUtil = require('gulp-util');
 const mkdirp = require('mkdirp');
 const watchify = require('watchify');
 
 const minifyStream = require('./minify-stream');
-
-const log = gulpUtil.log;
 
 function streamFinished(stream) {
   return new Promise(function(resolve, reject) {
