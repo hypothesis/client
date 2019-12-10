@@ -115,7 +115,7 @@ var.$base-font-size: 14px;
     transition: background-color 0.25s;
     @include shadow.smallshadow;
     background: var.$white;
-    border: solid 1px var.$gray-lighter;
+    border: solid 1px var.$grey-3;
     border-radius: 4px;
     color: var.$gray-light;
     text-decoration: none;

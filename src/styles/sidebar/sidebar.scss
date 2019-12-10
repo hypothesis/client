@@ -119,7 +119,7 @@ hypothesis-app {
 // ---------------------------------------
 
 .sheet {
-  border: solid 1px var.$gray-lighter;
+  border: solid 1px var.$grey-3;
   border-radius: 2px;
   font-family: var.$sans-font-family;
   font-weight: 300;
@@ -127,15 +127,6 @@ hypothesis-app {
   padding: 1em;
   position: relative;
   background-color: var.$body-background;
-
-  .nav-tabs {
-    border: 1px none var.$gray-lighter;
-    border-bottom-style: solid;
-    padding: 0 0 1.1em;
-    li a {
-      padding-bottom: 0.231em;
-    }
-  }
 
   .close {
     position: absolute;
@@ -159,7 +150,7 @@ hypothesis-app {
 .annotation-unavailable-message {
   display: flex;
   flex-direction: column;
-  border: 1px solid var.$gray-lighter;
+  border: 1px solid var.$grey-3;
   padding-top: 30px;
   padding-bottom: 30px;
   border-radius: 3px;
