@@ -67,7 +67,7 @@
   color: var.$button-text-color;
   text-shadow: 0 1px 0 #fff;
   border-radius: 2px;
-  border: 1px solid var.$gray-light;
+  border: 1px solid var.$grey-semi;
   padding: 0.5em 0.9em;
 }
 
@@ -91,7 +91,7 @@
   cursor: default;
   background: #f0f0f0;
   border-color: #cecece;
-  color: var.$gray-light;
+  color: var.$grey-semi;
 }
 
 @mixin primary-action-btn {
@@ -108,7 +108,7 @@
   padding-right: 12px;
 
   &:disabled {
-    color: var.$gray-light;
+    color: var.$grey-semi;
   }
 
   &:hover:enabled {

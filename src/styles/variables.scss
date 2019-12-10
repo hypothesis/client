@@ -11,7 +11,10 @@ $grey-3: #dbdbdb;
 
 $grey-4: #a6a6a6;
 
-$gray-light: #969696 !default;
+// Interim color variable for migration purposes, as the step between `$grey-4`
+// and `$grey-5` is large. Represents `base-semi` in proposed future palette,
+// minus blue tint.
+$grey-semi: #9c9c9c;
 
 $grey-5: #7a7a7a;
 
