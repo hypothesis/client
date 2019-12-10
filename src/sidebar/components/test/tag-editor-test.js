@@ -61,14 +61,6 @@ describe('TagEditor', function() {
     );
   });
 
-  it('calls fakeTagsService.filter with the value from the input field', () => {
-    const wrapper = createComponent();
-    wrapper.find('input').instance().value = 'tag3';
-    // simulate `keyup` to populate suggestions list
-    wrapper.find('input').simulate('keyup', { key: 'any' });
-    assert.isTrue(fakeTagsService.filter.calledWith('tag3'));
-  });
-
   it('generates a datalist set equal to the array value returned from fakeTagsService.filter ', () => {
     const wrapper = createComponent();
     // simulate `keyup` to populate suggestions list
@@ -109,17 +101,6 @@ describe('TagEditor', function() {
     );
   });
 
-  it('clears the suggestions when clearing the input', () => {
-    const wrapper = createComponent();
-    wrapper.find('input').instance().value = 'non-empty';
-    // simulate `keyup` to populate suggestions list
-    wrapper.find('input').simulate('keyup', { key: 'any' });
-    assert.equal(wrapper.find('datalist option').length, 2);
-    wrapper.find('input').instance().value = '';
-    wrapper.find('input').simulate('keyup', { key: 'any' });
-    assert.equal(wrapper.find('datalist option').length, 0);
-  });
-
   it('does not render duplicate suggestions', () => {
     // `tag3` supplied in the `tagList` will be a duplicate value relative
     // with the fakeTagsService.filter result above.
@@ -144,7 +125,7 @@ describe('TagEditor', function() {
     /**
      * Helper function to assert that a tag was correctly added
      */
-    const addTagsSuccess = (wrapper, tagList) => {
+    const assertAddTagsSuccess = (wrapper, tagList) => {
       // saves the suggested tags to the service
       assert.isTrue(
         fakeTagsService.store.calledWith(tagList.map(tag => ({ text: tag })))
@@ -160,7 +141,7 @@ describe('TagEditor', function() {
     /**
      * Helper function to assert that a tag was correctly not added
      */
-    const addTagsFail = () => {
+    const assertAddTagsFail = () => {
       assert.isTrue(fakeTagsService.store.notCalled);
       assert.isTrue(fakeOnEditTags.notCalled);
     };
@@ -170,7 +151,7 @@ describe('TagEditor', function() {
       wrapper.find('input').instance().value = 'tag3';
 
       wrapper.find('input').simulate('keyup'); // simulates a selection
-      addTagsSuccess(wrapper, ['tag1', 'tag2', 'tag3']);
+      assertAddTagsSuccess(wrapper, ['tag1', 'tag2', 'tag3']);
     });
 
     it('populate the datalist, then adds a tag from the input field', () => {
@@ -182,7 +163,7 @@ describe('TagEditor', function() {
       assert.equal(wrapper.find('datalist option').length, 2);
 
       wrapper.find('input').simulate('keyup'); // simulates a selection
-      addTagsSuccess(wrapper, ['tag1', 'tag2', 'tag3']);
+      assertAddTagsSuccess(wrapper, ['tag1', 'tag2', 'tag3']);
     });
 
     it('clears out the <datalist> element after adding a tag', () => {
@@ -202,69 +183,68 @@ describe('TagEditor', function() {
       wrapper.find('input').instance().value = '';
 
       wrapper.find('input').simulate('keyup'); // simulates a selection
-      addTagsFail();
+      assertAddTagsFail();
     });
 
     it('should not add a tag if the input is blank space', () => {
       const wrapper = createComponent();
       wrapper.find('input').instance().value = '  ';
       wrapper.find('input').simulate('keyup'); // simulates a selection
-      addTagsFail();
+      assertAddTagsFail();
     });
 
     it('should not add a tag if its a duplicate of one already in the list', () => {
       const wrapper = createComponent();
       wrapper.find('input').instance().value = 'tag1';
       wrapper.find('input').simulate('keyup'); // simulates a selection
-      addTagsFail();
+      assertAddTagsFail();
     });
 
-    it('adds a tag via keypress `Enter`', () => {
-      const wrapper = createComponent();
-      wrapper.find('input').instance().value = 'tag3';
-
-      wrapper.find('input').simulate('keypress', { key: 'Enter' });
-      addTagsSuccess(wrapper, ['tag1', 'tag2', 'tag3']);
-    });
-
-    it('adds a tag via keypress `,`', () => {
-      const wrapper = createComponent();
-      wrapper.find('input').instance().value = 'tag3';
-
-      wrapper.find('input').simulate('keypress', { key: ',' });
-      addTagsSuccess(wrapper, ['tag1', 'tag2', 'tag3']);
-    });
-
-    it('does not add a tag when key is not `,` or  `Enter`', () => {
-      const wrapper = createComponent();
-      wrapper.find('input').instance().value = 'tag3';
-
-      wrapper.find('input').simulate('keypress', { key: 'e' });
-      addTagsFail();
+    [
+      {
+        key: 'Enter',
+        text: 'adds a tag via keypress `Enter`',
+        run: wrapper => {
+          assertAddTagsSuccess(wrapper, ['tag1', 'tag2', 'tag3']);
+        },
+      },
+      {
+        key: ',',
+        text: 'adds a tag via keypress `,`',
+        run: wrapper => {
+          assertAddTagsSuccess(wrapper, ['tag1', 'tag2', 'tag3']);
+        },
+      },
+      {
+        key: 'e',
+        text: 'does not add a tag when key is not `,` or  `Enter`',
+        run: () => {
+          assertAddTagsFail();
+        },
+      },
+    ].forEach(test => {
+      it(test.text, () => {
+        const wrapper = createComponent();
+        wrapper.find('input').instance().value = 'tag3';
+        wrapper.find('input').simulate('keypress', { key: test.key });
+        test.run(wrapper);
+      });
     });
   });
 
   context('when removing tags', () => {
-    /**
-     * Helper function to assert that a tag was correctly added
-     */
-    const removeTagsSuccess = tagList => {
-      // saves the suggested tags to the service
-      assert.isTrue(
-        fakeTagsService.store.calledWith(tagList.map(tag => ({ text: tag })))
-      );
-      // called the onEditTags callback prop
-      assert.isTrue(fakeOnEditTags.calledWith({ tags: tagList }));
-    };
-
     it('removes `tag1` when clicking its delete button', () => {
-      const wrapper = createComponent();
+      const wrapper = createComponent(); // note: initial tagList is ['tag1', 'tag2']
       assert.equal(wrapper.find('.tag-editor__edit').length, 2);
       wrapper
         .find('button')
-        .at(0)
+        .at(0) // delete 'tag1'
         .simulate('click');
-      removeTagsSuccess(['tag2']);
+
+      // saves the suggested tags to the service (only 'tag2' should be passed)
+      assert.isTrue(fakeTagsService.store.calledWith([{ text: 'tag2' }]));
+      // called the onEditTags callback prop  (only 'tag2' should be passed)
+      assert.isTrue(fakeOnEditTags.calledWith({ tags: ['tag2'] }));
     });
   });
 });

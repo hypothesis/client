@@ -2,7 +2,7 @@
 
 const { createElement } = require('preact');
 const propTypes = require('prop-types');
-const { useRef, useState } = require('preact/hooks');
+const { useMemo, useRef, useState } = require('preact/hooks');
 
 const { withServices } = require('../util/service-context');
 const SvgIcon = require('./svg-icon');
@@ -12,13 +12,29 @@ const SvgIcon = require('./svg-icon');
  */
 function TagEditor({ annotation, onEditTags, tags: tagsService, tagList }) {
   const inputEl = useRef(null);
-  const [suggestions, setSuggestions] = useState([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+
+  // List of suggestions returned from the tagsService
+  const suggestions = useMemo(() => {
+    // Remove any repeated suggestions that are already tags.
+    const removeDuplicates = (suggestions, tags) => {
+      const suggestionsSet = [];
+      suggestions.forEach(suggestion => {
+        if (tags.indexOf(suggestion) < 0) {
+          suggestionsSet.push(suggestion);
+        }
+      });
+      return suggestionsSet;
+    };
+    // Call filter with an empty string to return all suggestions
+    return removeDuplicates(tagsService.filter(''), tagList);
+  }, [tagsService, tagList]);
 
   /**
    * Handle changes to this annotation's tags
    */
   const updateTags = tagList => {
-    // update suggested-tags list via service
+    // update suggested tags list via service
     tagsService.store(tagList.map(tag => ({ text: tag })));
     // invoke callback with updated tags
     onEditTags({ tags: tagList });
@@ -37,8 +53,8 @@ function TagEditor({ annotation, onEditTags, tags: tagsService, tagList }) {
   };
 
   /**
-   * Adds a tag equal to the value of the input field, and
-   * then clears out the suggestions list and the input field.
+   * Adds a tag to the annotation equal to the value of the input field
+   * and then clears out the suggestions list and the input field.
    */
   const addTag = () => {
     const value = inputEl.current.value.trim();
@@ -51,7 +67,7 @@ function TagEditor({ annotation, onEditTags, tags: tagsService, tagList }) {
       return;
     }
     updateTags([...tagList, value]);
-    setSuggestions([]);
+    setShowSuggestions(false);
 
     // clear the input field and maintain focus
     inputEl.current.value = '';
@@ -75,30 +91,9 @@ function TagEditor({ annotation, onEditTags, tags: tagsService, tagList }) {
    *  based on the value of inputEl.
    */
   const handleKeyUp = e => {
-    // Helper to remove any repeated suggestions
-    // that are already tags.
-    const removeDuplicates = suggestions => {
-      const suggestionsSet = [];
-      suggestions.forEach(suggestion => {
-        if (tagList.indexOf(suggestion) < 0) {
-          suggestionsSet.push(suggestion);
-        }
-      });
-      return suggestionsSet;
-    };
-
     if (e.key) {
-      // A user typed a letter and we need to filter the results
-      // to update the <dataset> suggestions
-
-      const value = inputEl.current.value.trim();
-      if (value.length !== 0) {
-        // Only change suggestions if input is non-empty
-        const suggestions = removeDuplicates(tagsService.filter(value));
-        setSuggestions(suggestions);
-      } else {
-        setSuggestions([]);
-      }
+      // Show the suggestions if the user types anything
+      setShowSuggestions(true);
     } else if (e.type === 'keyup') {
       // Assume the user selected an option from <datalist>
       // either by clicking on it with the mouse or pressing
@@ -107,28 +102,20 @@ function TagEditor({ annotation, onEditTags, tags: tagsService, tagList }) {
     }
   };
 
-  const suggestionsList = (() => {
-    const suggestionElements = suggestions.map((suggestion, index) => (
-      <option key={index} value={suggestion} />
-    ));
-
-    // Only return a datalist if there is something to render in the list. This
-    // avoid a bug in Firefox where the datalist rendered does not correspond to the
-    // actual list of <option>s in the dom. Wiping out the entire <datalist> tag seems
-    // to force Firefox's hand.
-    if (suggestionElements.length > 0) {
-      return (
-        <datalist
-          id={`tag-editor-datalist-${annotation.id}`}
-          className="tag-editor__suggestions"
-          aria-label="Annotation suggestions"
-        >
-          {suggestionElements}
-        </datalist>
-      );
-    }
-    return null;
-  })();
+  const suggestionsList = () => {
+    return (
+      <datalist
+        id={`tag-editor-datalist-${annotation.id}`}
+        className="tag-editor__suggestions"
+        aria-label="Annotation suggestions"
+      >
+        {' '}
+        {suggestions.map((suggestion, index) => (
+          <option key={index} value={suggestion} />
+        ))}
+      </datalist>
+    );
+  };
 
   return (
     <section className="tag-editor">
@@ -159,7 +146,6 @@ function TagEditor({ annotation, onEditTags, tags: tagsService, tagList }) {
       </ul>
       <input
         list={`tag-editor-datalist-${annotation.id}`}
-        onBlur={handleKeyUp}
         onKeyUp={handleKeyUp}
         onKeyPress={handleKeyPress}
         ref={inputEl}
@@ -167,7 +153,7 @@ function TagEditor({ annotation, onEditTags, tags: tagsService, tagList }) {
         className="tag-editor__input"
         type="text"
       />
-      {suggestionsList}
+      {showSuggestions && suggestionsList()}
     </section>
   );
 }
@@ -192,8 +178,8 @@ TagEditor.propTypes = {
   tagList: propTypes.array.isRequired,
 
   /** Services */
-  tags: propTypes.object,
-  serviceUrl: propTypes.func,
+  tags: propTypes.object.isRequired,
+  serviceUrl: propTypes.func.isRequired,
 };
 
 TagEditor.injectedProps = ['serviceUrl', 'tags'];
