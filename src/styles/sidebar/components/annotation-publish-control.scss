@@ -1,23 +1,9 @@
+@use "../../mixins/buttons";
 @use "../../mixins/forms";
 @use "../../variables" as var;
 
 .annotation-publish-control {
   display: flex;
-
-  &__cancel-btn {
-    margin-left: 5px;
-    font-weight: normal;
-    color: var.$grey-4;
-
-    &:hover {
-      color: var.$grey-5;
-    }
-
-    &__icon {
-      margin-right: 3px;
-      transform: translateY(10%);
-    }
-  }
 
   // A split button with a primary submit on the left and a drop-down menu
   // of related options to the right
@@ -32,6 +18,7 @@
 
     height: $height;
     position: relative;
+    margin-right: 1em;
 
     // Align the menu arrow correctly with the ▼ in the toggle
     &-menu-arrow {
