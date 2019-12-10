@@ -23,7 +23,7 @@
   // of related options to the right
   .annotation-publish-control__btn {
     $text-color: var.$grey-1;
-    $default-background-color: var.$color-dove-gray;
+    $default-background-color: var.$grey-mid;
     $hover-background-color: var.$grey-6;
     $h-padding: 9px;
     $height: 35px;
@@ -70,7 +70,7 @@
       margin-left: 8px;
 
       border: none;
-      background-color: var.$color-dove-gray;
+      background-color: var.$grey-mid;
       border-top-right-radius: $border-radius;
       border-bottom-right-radius: $border-radius;
 
@@ -84,7 +84,7 @@
       button[aria-expanded='true'] &-separator {
         // hide the 1px vertical separator when the dropdown arrow
         // is hovered or menu is open
-        background-color: var.$color-dove-gray;
+        background-color: var.$grey-mid;
       }
 
       // 1px vertical separator between label and dropdown arrow

@@ -16,8 +16,10 @@ $gray-light: #969696 !default;
 $grey-5: #7a7a7a;
 $gray: #777 !default;
 
-$color-dove-gray: #626262;
-$gray-dark: #585858;
+// Interim color variable for migration purposes, as the step between `$grey-5`
+// and `$grey-6` is large. Represents `base-mid` in proposed future palette,
+// minus blue tint.
+$grey-mid: #595959;
 
 $grey-6: #3f3f3f;
 
@@ -30,7 +32,7 @@ $black: #000 !default;
 $brand: #bd1c2b;
 $highlight: #58cef4;
 
-$button-text-color: $gray-dark !default;
+$button-text-color: $grey-mid !default;
 $button-background-start: $white !default;
 $button-background-end: #f0f0f0 !default;
 $button-background-gradient: to bottom, $button-background-start,
@@ -85,7 +87,7 @@ $success-color: #1cbd41 !default;
 // Scaffolding
 // -------------------------
 $body-background: $white !default;
-$text-color: $gray-dark !default;
+$text-color: $grey-mid !default;
 
 // Links
 // -------------------------
