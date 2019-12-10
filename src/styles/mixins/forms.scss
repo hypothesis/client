@@ -34,7 +34,7 @@
   border-radius: 2px;
   padding: 0.5em 0.75em;
   font-weight: normal;
-  color: var.$gray;
+  color: var.$grey-5;
   background-color: #fafafa;
 }
 
@@ -44,7 +44,7 @@
 
   @include focus-outline;
   @include placeholder {
-    color: var.$gray;
+    color: var.$grey-5;
   }
 }
 
