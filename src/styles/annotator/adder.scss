@@ -98,11 +98,11 @@ $adder-transition-duration: 80ms;
 }
 
 .annotator-adder-actions:hover .annotator-adder-actions__button {
-  color: var.$gray-light !important;
+  color: var.$grey-semi !important;
 }
 
 .annotator-adder-actions:hover .annotator-adder-actions__label {
-  color: var.$gray-light !important;
+  color: var.$grey-semi !important;
 }
 
 .annotator-adder-actions__button {
@@ -110,7 +110,7 @@ $adder-transition-duration: 80ms;
   font-family: h;
   font-size: 18px;
   background: transparent !important;
-  color: var.$gray-dark !important;
+  color: var.$grey-mid !important;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -126,10 +126,10 @@ $adder-transition-duration: 80ms;
 }
 
 .annotator-adder-actions .annotator-adder-actions__button:hover {
-  color: var.$gray-dark !important;
+  color: var.$grey-mid !important;
 
   .annotator-adder-actions__label {
-    color: var.$gray-dark !important;
+    color: var.$grey-mid !important;
   }
 }
 
@@ -137,6 +137,6 @@ $adder-transition-duration: 80ms;
   font-size: 11px;
   margin: 2px 0px;
   font-family: sans-serif;
-  color: var.$gray-dark !important;
+  color: var.$grey-mid !important;
   transition: color $adder-transition-duration;
 }

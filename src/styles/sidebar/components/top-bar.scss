@@ -60,17 +60,17 @@
   @include buttons.reset-native-btn-styles;
 
   height: 100%;
-  color: var.$gray-light;
+  color: var.$grey-semi;
   display: inline-block;
   cursor: pointer;
   padding: 1px 3px 0 3px;
 
   &:hover {
-    color: var.$gray-dark;
+    color: var.$grey-mid;
   }
 
   &.is-active {
-    color: var.$gray-dark;
+    color: var.$grey-mid;
   }
 
   &--refresh {

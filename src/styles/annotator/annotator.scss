@@ -117,7 +117,7 @@ var.$base-font-size: 14px;
     background: var.$white;
     border: solid 1px var.$grey-3;
     border-radius: 4px;
-    color: var.$gray-light;
+    color: var.$grey-semi;
     text-decoration: none;
     height: 30px;
     width: 30px;
@@ -126,7 +126,7 @@ var.$base-font-size: 14px;
     margin-bottom: 5px;
 
     &:active {
-      background-color: var.$gray-light;
+      background-color: var.$grey-semi;
     }
 
     &:focus,
