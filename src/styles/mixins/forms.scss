@@ -23,9 +23,9 @@
 }
 
 @mixin focus-outline {
-  border-color: #51a7e8;
+  border-color: var.$color-focus-outline;
   box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.075) inset,
-    0px 0px 5px rgba(81, 167, 232, 0.5);
+    0px 0px 5px var.$color-focus-shadow;
 }
 
 @mixin form-input {
@@ -35,12 +35,12 @@
   padding: 0.5em 0.75em;
   font-weight: normal;
   color: var.$grey-5;
-  background-color: #fafafa;
+  background-color: var.$grey-0;
 }
 
 @mixin form-input-focus {
   outline: none;
-  background-color: #fff;
+  background-color: var.$white;
 
   @include focus-outline;
   @include placeholder {
@@ -48,50 +48,12 @@
   }
 }
 
-@mixin form-input-error {
-  color: var.$error-color;
-  border-color: var.color-weight(var.$error-color, 300);
-  background-color: var.color-weight(var.$error-color, 50);
-
-  @include placeholder {
-    color: var.tint(var.$error-color, 5%);
-  }
-}
-
-@mixin btn {
-  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.15);
-
-  background: linear-gradient(var.$button-background-gradient);
-  display: inline-block;
-  font-weight: bold;
-  color: var.$button-text-color;
-  text-shadow: 0 1px 0 #fff;
-  border-radius: 2px;
-  border: 1px solid var.$grey-semi;
-  padding: 0.5em 0.9em;
-}
-
 @mixin btn-hover {
   box-shadow: 0 1px 0 rgba(0, 0, 0, 0.05);
   outline: none;
   color: var.$button-text-color;
   background: var.$button-background-start;
-  border-color: #bababa;
-}
-
-@mixin btn-active {
-  box-shadow: inset 0 1px 0 rgba(0, 0, 0, 0.1);
-  background: var.$button-background-end;
-  color: #424242;
-  border-color: #bababa;
-}
-
-@mixin btn-disabled {
-  box-shadow: none;
-  cursor: default;
-  background: #f0f0f0;
-  border-color: #cecece;
-  color: var.$grey-semi;
+  border-color: var.$grey-4;
 }
 
 @mixin primary-action-btn {

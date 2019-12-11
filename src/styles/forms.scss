@@ -1,21 +1,10 @@
 @use "mixins/forms";
 @use "variables" as var;
 
-// Common form styles.
-
-.form-field {
-  @include forms.pie-clearfix;
-  clear: both;
-  margin-bottom: 0.75em;
-}
-
-.form-input {
-  width: 100%;
-  display: block;
-}
-
 .form-input {
   @include forms.form-input;
+  width: 100%;
+  display: block;
 
   &:focus,
   &.js-focus {
@@ -27,63 +16,4 @@
   min-height: 8em;
   max-width: 100%;
   resize: vertical;
-}
-
-.form-actions {
-  @include forms.pie-clearfix;
-  margin-top: 0.75em;
-}
-
-.btn {
-  @include forms.btn;
-
-  &:hover,
-  &:focus,
-  &:active {
-    @include forms.btn-hover;
-  }
-
-  &:focus {
-    @include forms.focus-outline;
-  }
-
-  &:active {
-    @include forms.btn-active;
-  }
-
-  &[disabled] {
-    @include forms.btn-disabled;
-  }
-}
-
-.btn-clean {
-  border: none;
-
-  &,
-  &:focus,
-  &:hover,
-  &:active,
-  &[disabled] {
-    box-shadow: none;
-    background: none;
-  }
-
-  &:focus,
-  &:hover,
-  &:active {
-    color: var.$link-color;
-  }
-
-  &:active {
-    color: var.$link-color-hover;
-  }
-
-  &[disabled] {
-    color: var.$text-color;
-  }
-}
-
-.btn-icon {
-  display: inline-block;
-  font-size: 16px;
 }
