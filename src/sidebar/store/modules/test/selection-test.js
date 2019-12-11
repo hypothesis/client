@@ -205,7 +205,7 @@ describe('sidebar/store/modules/selection', () => {
     it('sets the focused user and enables focus mode', function() {
       store.setFocusModeFocused(false);
       store.changeFocusModeUser({
-        userid: 'testuser',
+        username: 'testuser',
         displayName: 'Test User',
       });
       assert.equal(store.focusModeUserId(), 'testuser');
