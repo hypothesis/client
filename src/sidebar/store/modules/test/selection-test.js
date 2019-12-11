@@ -213,6 +213,23 @@ describe('sidebar/store/modules/selection', () => {
       assert.equal(store.focusModeFocused(), true);
       assert.equal(store.focusModeEnabled(), true);
     });
+
+    // When the LMS app wants the client to disable focus mode it sends a
+    // changeFocusModeUser() RPC call with {username: undefined, displayName:
+    // undefined}:
+    //
+    // https://github.com/hypothesis/lms/blob/d6b88fd7e375a4b23899117556b3e39cfe18986b/lms/static/scripts/frontend_apps/components/LMSGrader.js#L46
+    //
+    // This is the LMS app's way of asking the client to disable focus mode.
+    it('disables focus mode if username is undefined', function() {
+      store.setFocusModeFocused(true);
+      store.changeFocusModeUser({
+        username: undefined,
+        displayName: undefined,
+      });
+      assert.equal(store.focusModeFocused(), false);
+      assert.equal(store.focusModeEnabled(), false);
+    });
   });
 
   describe('setFocusModeFocused()', function() {

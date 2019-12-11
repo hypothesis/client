@@ -169,16 +169,26 @@ const update = {
   },
 
   CHANGE_FOCUS_MODE_USER: function(state, action) {
-    return {
-      focusMode: {
-        ...state.focusMode,
-        enabled: true,
-        focused: true,
-        config: {
-          user: { ...action.user },
+    if (action.user.username === undefined) {
+      return {
+        focusMode: {
+          ...state.focusMode,
+          enabled: false,
+          focused: false,
         },
-      },
-    };
+      };
+    } else {
+      return {
+        focusMode: {
+          ...state.focusMode,
+          enabled: true,
+          focused: true,
+          config: {
+            user: { ...action.user },
+          },
+        },
+      };
+    }
   },
 
   SET_FORCE_VISIBLE: function(state, action) {
