@@ -7,7 +7,7 @@
 
 const { createSelector } = require('reselect');
 
-const arrayUtil = require('../../util/array-util');
+const arrayUtil = require('../../util/array');
 const metadata = require('../../util/annotation-metadata');
 const uiConstants = require('../../ui-constants');
 

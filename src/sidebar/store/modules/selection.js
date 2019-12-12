@@ -19,9 +19,9 @@
 const { createSelector } = require('reselect');
 const immutable = require('seamless-immutable');
 
-const arrayUtil = require('../../util/array-util');
+const arrayUtil = require('../../util/array');
 const metadata = require('../../util/annotation-metadata');
-const toSet = require('../../util/array-util').toSet;
+const toSet = require('../../util/array').toSet;
 const uiConstants = require('../../ui-constants');
 
 const util = require('../util');

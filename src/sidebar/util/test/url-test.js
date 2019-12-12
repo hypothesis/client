@@ -1,8 +1,8 @@
 'use strict';
 
-const urlUtil = require('../url-util');
+const urlUtil = require('../url');
 
-describe('url-util', function() {
+describe('sidebar/util/url', function() {
   describe('replaceURLParams()', function() {
     it('should replace params in URLs', function() {
       const replaced = urlUtil.replaceURLParams('http://foo.com/things/:id', {

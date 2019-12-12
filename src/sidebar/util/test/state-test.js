@@ -1,9 +1,9 @@
 'use strict';
 
 const fakeStore = require('../../test/fake-redux-store');
-const stateUtil = require('../state-util');
+const stateUtil = require('../state');
 
-describe('state-util', function() {
+describe('sidebar/util/state', function() {
   let store;
 
   beforeEach(function() {

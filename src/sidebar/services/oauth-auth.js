@@ -1,7 +1,7 @@
 'use strict';
 
 const events = require('../events');
-const resolve = require('../util/url-util').resolve;
+const resolve = require('../util/url').resolve;
 const serviceConfig = require('../service-config');
 
 /**

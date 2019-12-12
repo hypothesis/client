@@ -49,7 +49,7 @@ describe('sidebar.components.hypothesis-app', function() {
     hypothesisApp.$imports.$mock({
       '../util/is-sidebar': fakeIsSidebar,
       '../service-config': fakeServiceConfig,
-      '../util/session-util': {
+      '../util/session': {
         shouldAutoDisplayTutorial: fakeShouldAutoDisplayTutorial,
       },
     });
