@@ -8,6 +8,7 @@ const { withServices } = require('../util/service-context');
 
 const Menu = require('./menu');
 const MenuItem = require('./menu-item');
+const SvgIcon = require('./svg-icon');
 
 /**
  * Render a compound control button for publishing (saving) an annotation:
@@ -75,11 +76,11 @@ function AnnotationPublishControl({
         </Menu>
       </div>
       <button
-        className="annotation-publish-control__cancel-btn btn-clean"
+        className="action-button"
         onClick={onCancel}
         title="Cancel changes to this annotation"
       >
-        <i className="h-icon-cancel-outline publish-annotation-cancel-btn__icon btn-icon" />{' '}
+        <SvgIcon name="cancel" className="action-button__icon--compact" />
         Cancel
       </button>
     </div>
