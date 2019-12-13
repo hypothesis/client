@@ -43,13 +43,36 @@
   color: var.$grey-5;
   font-weight: 700;
 
+  &:hover {
+    background-color: var.$grey-2;
+  }
+
+  &__label {
+    padding-left: 0.25em;
+    padding-right: 0.25em;
+  }
+
   &__icon {
     color: var.$grey-5;
     margin: $icon-margin;
+
+    &--compact {
+      margin: 0;
+    }
+
+    &--primary {
+      color: var.$grey-1;
+    }
   }
 
-  &:hover {
-    background-color: var.$grey-2;
+  &--primary {
+    color: var.$grey-1;
+    background-color: var.$grey-mid;
+
+    &:hover {
+      color: var.$grey-1;
+      background-color: var.$grey-6;
+    }
   }
 }
 

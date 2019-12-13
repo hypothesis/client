@@ -2,8 +2,4 @@
 
 .action-button {
   @include buttons.action-button;
-
-  &__icon--compact {
-    margin: 0;
-  }
 }
