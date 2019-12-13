@@ -1,0 +1,21 @@
+@use "../../mixins/buttons";
+@use "../../variables" as var;
+
+.icon-button {
+  @include buttons.button-base;
+
+  &.is-active {
+    color: var.$brand;
+
+    &:hover {
+      color: var.$brand;
+    }
+  }
+}
+
+@media (pointer: coarse) {
+  .icon-button {
+    min-width: var.$touch-target-size;
+    min-height: var.$touch-target-size;
+  }
+}
