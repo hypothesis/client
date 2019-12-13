@@ -16,6 +16,24 @@
   // Force top-bar onto a new compositor layer so that it does not judder when
   // the window is scrolled.
   transform: translate3d(0, 0, 0);
+
+  &__icon-button {
+    &.is-active {
+      color: var.$grey-6;
+
+      &:hover {
+        color: var.$grey-6;
+      }
+    }
+  }
+
+  &__icon-button--refresh {
+    color: var.$brand;
+
+    &:hover {
+      color: var.$brand;
+    }
+  }
 }
 
 .top-bar--theme-clean {
@@ -54,30 +72,4 @@
 // and the toolbar icons (in the new top-bar design)
 .top-bar__expander {
   flex-grow: 1;
-}
-
-.top-bar__btn {
-  @include buttons.reset-native-btn-styles;
-
-  height: 100%;
-  color: var.$grey-semi;
-  display: inline-block;
-  cursor: pointer;
-  padding: 1px 3px 0 3px;
-
-  &:hover {
-    color: var.$grey-mid;
-  }
-
-  &.is-active {
-    color: var.$grey-mid;
-  }
-
-  &--refresh {
-    color: var.$brand;
-
-    &:hover {
-      color: var.$brand;
-    }
-  }
 }

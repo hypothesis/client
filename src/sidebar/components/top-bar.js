@@ -13,47 +13,11 @@ const { withServices } = require('../util/service-context');
 const uiConstants = require('../ui-constants');
 
 const GroupList = require('./group-list');
+const IconButton = require('./icon-button');
 const SearchInput = require('./search-input');
 const StreamSearchInput = require('./stream-search-input');
 const SortMenu = require('./sort-menu');
-const SvgIcon = require('./svg-icon');
 const UserMenu = require('./user-menu');
-
-/**
- * Reusable component to render a button for toggling a sidebar panel.
- * Takes an `onClick` callback, as panel toggles are sometimes more complex than
- * just opening and closing a panel.
- */
-function TogglePanelButton({ panelName, iconName, title, onClick }) {
-  const currentActivePanel = useStore(
-    store => store.getState().sidebarPanels.activePanelName
-  );
-  const isActive = currentActivePanel === panelName;
-  return (
-    <button
-      className={classnames('top-bar__btn', `top-bar__${iconName}-btn`, {
-        'is-active': isActive,
-      })}
-      onClick={onClick}
-      title={title}
-      aria-pressed={isActive ? 'true' : 'false'}
-    >
-      <SvgIcon
-        name={iconName}
-        className={classnames(`top-bar__{$iconName}-icon`)}
-      />
-    </button>
-  );
-}
-
-TogglePanelButton.propTypes = {
-  /** The panel's string name as defined in `uiConstants` */
-  panelName: propTypes.string.isRequired,
-  iconName: propTypes.string.isRequired,
-  title: propTypes.string.isRequired,
-  /** callback */
-  onClick: propTypes.func.isRequired,
-};
 
 /**
  * The toolbar which appears at the top of the sidebar providing actions
@@ -85,6 +49,10 @@ function TopBar({
   const toggleSharePanel = () => {
     togglePanelFn(uiConstants.PANEL_SHARE_ANNOTATIONS);
   };
+
+  const currentActivePanel = useStore(
+    store => store.getState().sidebarPanels.activePanelName
+  );
 
   /**
    * Open the help panel, or, if a service callback is configured to handle
@@ -130,11 +98,13 @@ function TopBar({
         <div className="top-bar__inner content">
           <StreamSearchInput />
           <div className="top-bar__expander" />
-          <TogglePanelButton
-            panelName={uiConstants.PANEL_HELP}
-            iconName="help"
-            title="Help"
+          <IconButton
+            className="top-bar__icon-button"
+            icon="help"
+            isActive={currentActivePanel === uiConstants.PANEL_HELP}
             onClick={requestHelp}
+            title="Help"
+            useCompactStyle
           />
           {loginControl}
         </div>
@@ -145,31 +115,37 @@ function TopBar({
           <GroupList className="GroupList" auth={auth} />
           <div className="top-bar__expander" />
           {pendingUpdateCount > 0 && (
-            <button
-              className="top-bar__btn top-bar__btn--refresh"
+            <IconButton
+              className="top-bar__icon-button top-bar__icon-button--refresh"
+              icon="refresh"
               onClick={applyPendingUpdates}
               title={`Show ${pendingUpdateCount} new/updated ${
                 pendingUpdateCount === 1 ? 'annotation' : 'annotations'
               }`}
-            >
-              <SvgIcon className="top-bar__apply-icon" name="refresh" />
-            </button>
+              useCompactStyle
+            />
           )}
           <SearchInput query={filterQuery} onSearch={setFilterQuery} />
           <SortMenu />
           {showSharePageButton && (
-            <TogglePanelButton
-              panelName={uiConstants.PANEL_SHARE_ANNOTATIONS}
-              iconName="share"
-              title="Share annotations on this page"
+            <IconButton
+              className="top-bar__icon-button"
+              icon="share"
+              isActive={
+                currentActivePanel === uiConstants.PANEL_SHARE_ANNOTATIONS
+              }
               onClick={toggleSharePanel}
+              title="Share annotations on this page"
+              useCompactStyle
             />
           )}
-          <TogglePanelButton
-            panelName={uiConstants.PANEL_HELP}
-            iconName="help"
-            title="Help"
+          <IconButton
+            className="top-bar__icon-button"
+            icon="help"
+            isActive={currentActivePanel === uiConstants.PANEL_HELP}
             onClick={requestHelp}
+            title="Help"
+            useCompactStyle
           />
           {loginControl}
         </div>

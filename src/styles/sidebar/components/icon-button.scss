@@ -11,11 +11,23 @@
       color: var.$brand;
     }
   }
+
+  &--compact {
+    padding: 0.25em;
+  }
 }
 
 @media (pointer: coarse) {
   .icon-button {
     min-width: var.$touch-target-size;
     min-height: var.$touch-target-size;
+  }
+
+  // Until the top bar can be refactored to allow for breathing room around
+  // the search interface, we can't spare the room for comfortable tap targets
+  // on touchscreen devices. This overrides `IconButton`'s larger tap targets.
+  .icon-button--compact {
+    min-width: auto;
+    min-height: auto;
   }
 }

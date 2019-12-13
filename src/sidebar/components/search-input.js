@@ -7,6 +7,7 @@ const propTypes = require('prop-types');
 
 const useStore = require('../store/use-store');
 
+const IconButton = require('./icon-button');
 const Spinner = require('./spinner');
 
 /**
@@ -60,14 +61,13 @@ function SearchInput({ alwaysExpanded, query, onSearch }) {
         onInput={e => setPendingQuery(e.target.value)}
       />
       {!isLoading && (
-        <button
-          type="button"
-          className="search-input__icon top-bar__btn"
-          title="Search"
+        <IconButton
+          className="search-input__icon-button top-bar__icon-button"
+          icon="search"
           onClick={() => input.current.focus()}
-        >
-          <i className="h-icon-search" />
-        </button>
+          title="Search annotations"
+          useCompactStyle
+        />
       )}
       {isLoading && <Spinner className="top-bar__btn" title="Loading…" />}
     </form>

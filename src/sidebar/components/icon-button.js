@@ -15,11 +15,13 @@ function IconButton({
   isActive = false,
   title,
   onClick = () => null,
+  useCompactStyle = false,
 }) {
   return (
     <button
       className={classnames('icon-button', className, {
         'is-active': isActive,
+        'icon-button--compact': useCompactStyle,
       })}
       onClick={onClick}
       aria-pressed={isActive}
@@ -31,7 +33,10 @@ function IconButton({
 }
 
 IconButton.propTypes = {
-  /** Optional additional class(es) to apply to the component element */
+  /** Optional additional class(es) to apply to the component element
+   * NB: Padding is controlled by the component's styles. Use
+   * `useCompactStyle` for tighter padding.
+   */
   className: propTypes.string,
   /** The name of the SVGIcon to render */
   icon: propTypes.string.isRequired,
@@ -41,6 +46,8 @@ IconButton.propTypes = {
   title: propTypes.string.isRequired,
   /** optional callback for clicks */
   onClick: propTypes.func,
+  /** tighten padding and make icon button fit in smaller space */
+  useCompactStyle: propTypes.bool,
 };
 
 module.exports = IconButton;

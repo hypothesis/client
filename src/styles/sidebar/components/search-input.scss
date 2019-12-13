@@ -9,7 +9,7 @@
   color: var.$grey-mid;
 }
 
-.search-input__icon {
+.search-input__icon-button {
   order: 0;
 }
 
@@ -27,11 +27,8 @@
   width: 100%;
 
   // The search box expands when focused, via a change in the
-  // `max-width` property. In Safari, the <input> will not accept
-  // focus if `max-width` is set to 0px so we set it to
-  // a near-zero positive value instead.
-  // See https://github.com/hypothesis/h/issues/2654
-  max-width: 0.1px;
+  // `max-width` property.
+  max-width: 0px;
 
   transition: max-width 0.3s ease-out, padding-left 0.3s ease-out;
 

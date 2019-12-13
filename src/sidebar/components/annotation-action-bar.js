@@ -6,11 +6,11 @@ const { createElement } = require('preact');
 const { withServices } = require('../util/service-context');
 const { isShareable, shareURI } = require('../util/annotation-sharing');
 
-const AnnotationActionButton = require('./annotation-action-button');
 const AnnotationShareControl = require('./annotation-share-control');
+const IconButton = require('./icon-button');
 
 /**
- * A collection of `AnnotationActionButton`s in the footer area of an annotation.
+ * A collection of `IconButton`s in the footer area of an annotation.
  */
 function AnnotationActionBar({
   annotation,
@@ -45,16 +45,12 @@ function AnnotationActionBar({
   return (
     <div className="annotation-action-bar">
       {showEditAction && (
-        <AnnotationActionButton icon="edit" label="Edit" onClick={onEdit} />
+        <IconButton icon="edit" title="Edit" onClick={onEdit} />
       )}
       {showDeleteAction && (
-        <AnnotationActionButton
-          icon="trash"
-          label="Delete"
-          onClick={onDelete}
-        />
+        <IconButton icon="trash" title="Delete" onClick={onDelete} />
       )}
-      <AnnotationActionButton icon="reply" label="Reply" onClick={onReply} />
+      <IconButton icon="reply" title="Reply" onClick={onReply} />
       {showShareAction && (
         <AnnotationShareControl
           group={annotationGroup}
@@ -63,17 +59,17 @@ function AnnotationActionBar({
         />
       )}
       {showFlagAction && !annotation.flagged && (
-        <AnnotationActionButton
+        <IconButton
           icon="flag"
-          label="Report this annotation to moderators"
+          title="Report this annotation to moderators"
           onClick={onFlag}
         />
       )}
       {showFlagAction && annotation.flagged && (
-        <AnnotationActionButton
+        <IconButton
           isActive={true}
           icon="flag--active"
-          label="Annotation has been reported to the moderators"
+          title="Annotation has been reported to the moderators"
         />
       )}
     </div>

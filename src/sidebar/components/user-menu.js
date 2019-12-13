@@ -8,6 +8,7 @@ const { isThirdPartyUser } = require('../util/account-id');
 const serviceConfig = require('../service-config');
 const { withServices } = require('../util/service-context');
 
+const IconButton = require('./icon-button');
 const Menu = require('./menu');
 const MenuSection = require('./menu-section');
 const MenuItem = require('./menu-item');
@@ -44,7 +45,14 @@ function UserMenu({ auth, bridge, onLogout, serviceUrl, settings }) {
     return props;
   })();
 
-  const menuLabel = <i className="h-icon-account top-bar__btn" />;
+  const menuLabel = (
+    <IconButton
+      className="top-bar__icon-button"
+      icon="profile"
+      title="User menu"
+      useCompactStyle
+    />
+  );
   return (
     <div className="user-menu">
       <Menu label={menuLabel} title={auth.displayName} align="right">

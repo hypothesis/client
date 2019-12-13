@@ -4,6 +4,7 @@ const { createElement } = require('preact');
 
 const useStore = require('../store/use-store');
 
+const IconButton = require('./icon-button');
 const Menu = require('./menu');
 const MenuItem = require('./menu-item');
 
@@ -35,7 +36,14 @@ function SortMenu() {
     );
   });
 
-  const menuLabel = <i className="h-icon-sort top-bar__btn" />;
+  const menuLabel = (
+    <IconButton
+      className="top-bar__icon-button"
+      icon="sort"
+      title="Sort annotations"
+      useCompactStyle
+    />
+  );
 
   return (
     <div className="sort-menu">
