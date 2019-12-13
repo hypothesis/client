@@ -39,10 +39,13 @@ const icons = {
   lock: require('../../images/icons/lock.svg'),
   logo: require('../../images/icons/logo.svg'),
   pointer: require('../../images/icons/pointer.svg'),
+  profile: require('../../images/icons/profile.svg'),
   public: require('../../images/icons/public.svg'),
   refresh: require('../../images/icons/refresh.svg'),
   reply: require('../../images/icons/reply.svg'),
+  search: require('../../images/icons/search.svg'),
   share: require('../../images/icons/share.svg'),
+  sort: require('../../images/icons/sort.svg'),
   trash: require('../../images/icons/trash.svg'),
   twitter: require('../../images/icons/twitter.svg'),
 };
