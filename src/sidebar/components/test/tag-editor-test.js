@@ -29,11 +29,21 @@ describe('TagEditor', function() {
     );
   }
 
+  // Simulates a selection event from datalist
+  function selectOption(wrapper) {
+    wrapper.find('input').simulate('input', { inputType: undefined });
+  }
+
+  // Simulates a typing input event
+  function typeInput(wrapper) {
+    wrapper.find('input').simulate('input', { inputType: 'insertText' });
+  }
+
   beforeEach(function() {
     fakeOnEditTags = sinon.stub();
     fakeServiceUrl = sinon.stub().returns('http://serviceurl.com');
     fakeTagsService = {
-      filter: sinon.stub().returns(['tag3', 'tag4']),
+      filter: sinon.stub().returns(['tag4', 'tag3']),
       store: sinon.stub(),
     };
 
@@ -61,12 +71,14 @@ describe('TagEditor', function() {
     );
   });
 
-  it('generates a datalist set equal to the array value returned from fakeTagsService.filter ', () => {
+  it('generates a ordered datalist containing the array values returned from fakeTagsService.filter ', () => {
     const wrapper = createComponent();
     // simulate `keyup` to populate suggestions list
     wrapper.find('input').instance().value = 'non-empty';
-    wrapper.find('input').simulate('keyup', { key: 'any' });
+    wrapper.find('input').simulate('input', { inputType: 'insertText' });
 
+    // fakeTagsService.filter returns ['tag4', 'tag3'], but
+    // datalist shall be ordered as ['tag3', 'tag4']
     assert.equal(
       wrapper
         .find('datalist option')
@@ -83,22 +95,54 @@ describe('TagEditor', function() {
     );
   });
 
-  it('clears the suggestions when adding a new tag', () => {
+  [
+    {
+      text: ' in Chrome and Safari',
+      eventPayload: { inputType: undefined },
+    },
+    {
+      text: ' in Firefox',
+      eventPayload: { inputType: 'insertReplacementText' },
+    },
+  ].forEach(test => {
+    it(`clears the suggestions when selecting a tag from datalist ${test.text}`, () => {
+      const wrapper = createComponent();
+      wrapper.find('input').instance().value = 'tag3';
+      typeInput(wrapper);
+      assert.equal(wrapper.find('datalist option').length, 2);
+      wrapper.find('input').simulate('input', test.eventPayload); // simulates a selection
+      assert.equal(wrapper.find('datalist option').length, 0);
+
+      assert.isTrue(
+        fakeTagsService.store.calledWith([
+          { text: 'tag1' },
+          { text: 'tag2' },
+          { text: 'tag3' },
+        ])
+      );
+    });
+  });
+
+  it('clears the suggestions when deleting input', () => {
     const wrapper = createComponent();
     wrapper.find('input').instance().value = 'tag3';
-    // simulate `keyup` to populate suggestions list
-    wrapper.find('input').simulate('keyup', { key: 'any' });
+    typeInput(wrapper);
     assert.equal(wrapper.find('datalist option').length, 2);
-    wrapper.find('input').simulate('keyup'); // no key supplied
+    wrapper.find('input').instance().value = '';
+    wrapper
+      .find('input')
+      .simulate('input', { inputType: 'deleteContentBackward' });
     assert.equal(wrapper.find('datalist option').length, 0);
+  });
 
-    assert.isTrue(
-      fakeTagsService.store.calledWith([
-        { text: 'tag1' },
-        { text: 'tag2' },
-        { text: 'tag3' },
-      ])
-    );
+  it('does not clear the suggestions when deleting only part of the input', () => {
+    const wrapper = createComponent();
+    wrapper.find('input').instance().value = 'tag3';
+    typeInput(wrapper);
+    assert.equal(wrapper.find('datalist option').length, 2);
+    wrapper.find('input').instance().value = 't'; // non-empty input remains
+    wrapper.find('input').simulate('keyup', { key: 'deleteContentBackward' });
+    assert.notEqual(wrapper.find('datalist option').length, 0);
   });
 
   it('does not render duplicate suggestions', () => {
@@ -108,9 +152,8 @@ describe('TagEditor', function() {
       editMode: true,
       tagList: ['tag1', 'tag2', 'tag3'],
     });
-    // simulate `keyup` to populate suggestions list
     wrapper.find('input').instance().value = 'non-empty';
-    wrapper.find('input').simulate('keyup', { key: 'any' });
+    typeInput(wrapper);
     assert.equal(wrapper.find('datalist option').length, 1);
     assert.equal(
       wrapper
@@ -149,8 +192,7 @@ describe('TagEditor', function() {
     it('adds a tag from the input field', () => {
       const wrapper = createComponent();
       wrapper.find('input').instance().value = 'tag3';
-
-      wrapper.find('input').simulate('keyup'); // simulates a selection
+      selectOption(wrapper);
       assertAddTagsSuccess(wrapper, ['tag1', 'tag2', 'tag3']);
     });
 
@@ -158,45 +200,43 @@ describe('TagEditor', function() {
       const wrapper = createComponent();
       wrapper.find('input').instance().value = 'tag3';
 
-      // simulate `keyup` to populate suggestions list
-      wrapper.find('input').simulate('keyup', { key: 'any' });
+      typeInput(wrapper);
       assert.equal(wrapper.find('datalist option').length, 2);
 
-      wrapper.find('input').simulate('keyup'); // simulates a selection
+      selectOption(wrapper);
       assertAddTagsSuccess(wrapper, ['tag1', 'tag2', 'tag3']);
     });
 
-    it('clears out the <datalist> element after adding a tag', () => {
+    it('clears out the <option> elements after adding a tag', () => {
       const wrapper = createComponent();
       wrapper.find('input').instance().value = 'non-empty';
 
-      // simulate `keyup` to populate suggestions list
-      wrapper.find('input').simulate('keyup', { key: 'any' });
+      typeInput(wrapper);
       assert.equal(wrapper.find('datalist option').length, 2);
 
-      wrapper.find('input').simulate('keyup'); // simulates a selection
-      assert.isFalse(wrapper.find('datalist').exists());
+      selectOption(wrapper);
+      assert.equal(wrapper.find('datalist option').length, 0);
     });
 
     it('should not add a tag if the input is empty', () => {
       const wrapper = createComponent();
       wrapper.find('input').instance().value = '';
 
-      wrapper.find('input').simulate('keyup'); // simulates a selection
+      selectOption(wrapper);
       assertAddTagsFail();
     });
 
     it('should not add a tag if the input is blank space', () => {
       const wrapper = createComponent();
       wrapper.find('input').instance().value = '  ';
-      wrapper.find('input').simulate('keyup'); // simulates a selection
+      selectOption(wrapper);
       assertAddTagsFail();
     });
 
     it('should not add a tag if its a duplicate of one already in the list', () => {
       const wrapper = createComponent();
       wrapper.find('input').instance().value = 'tag1';
-      wrapper.find('input').simulate('keyup'); // simulates a selection
+      selectOption(wrapper);
       assertAddTagsFail();
     });
 

@@ -24,7 +24,7 @@ function TagEditor({ annotation, onEditTags, tags: tagsService, tagList }) {
           suggestionsSet.push(suggestion);
         }
       });
-      return suggestionsSet;
+      return suggestionsSet.sort();
     };
     // Call filter with an empty string to return all suggestions
     return removeDuplicates(tagsService.filter(''), tagList);
@@ -86,19 +86,29 @@ function TagEditor({ annotation, onEditTags, tags: tagsService, tagList }) {
       e.preventDefault();
     }
   };
-  /**
-   *  As the user types, change the suggestions query
-   *  based on the value of inputEl.
-   */
-  const handleKeyUp = e => {
-    if (e.key) {
-      // Show the suggestions if the user types anything
+
+  const handleOnInput = e => {
+    if (e.inputType === 'insertText') {
+      // Show the suggestions if the user types something into the field
       setShowSuggestions(true);
-    } else if (e.type === 'keyup') {
-      // Assume the user selected an option from <datalist>
-      // either by clicking on it with the mouse or pressing
-      // the 'Enter' key.
+    } else if (
+      e.inputType === undefined ||
+      e.inputType === 'insertReplacementText'
+    ) {
+      // nb. Chrome / Safari reports undefined and Firefox reports 'insertReplacementText'
+      // for the inputTyp value when clicking on an element in the datalist.
+      //
+      // There are two ways to arrive here, either click an item with the mouse
+      // or use keyboard navigation and press 'Enter'.
+      //
+      // If the input value typed already exactly matches the option selected
+      // then this Event won't fire and a user would have to press 'Enter' a second
+      // time to trigger the handleKeyPress callback above to add the tag.
       addTag();
+    } else if (inputEl.current.value.length === 0) {
+      // If the user deleted input, hide suggestions. This has
+      // no effect in Safari and the list will stay open.
+      setShowSuggestions(false);
     }
   };
 
@@ -109,10 +119,10 @@ function TagEditor({ annotation, onEditTags, tags: tagsService, tagList }) {
         className="tag-editor__suggestions"
         aria-label="Annotation suggestions"
       >
-        {' '}
-        {suggestions.map((suggestion, index) => (
-          <option key={index} value={suggestion} />
-        ))}
+        {showSuggestions &&
+          suggestions.map((suggestion, index) => (
+            <option key={index} value={suggestion} />
+          ))}
       </datalist>
     );
   };
@@ -146,14 +156,14 @@ function TagEditor({ annotation, onEditTags, tags: tagsService, tagList }) {
       </ul>
       <input
         list={`tag-editor-datalist-${annotation.id}`}
-        onKeyUp={handleKeyUp}
+        onInput={handleOnInput}
         onKeyPress={handleKeyPress}
         ref={inputEl}
         placeholder="Add tags..."
         className="tag-editor__input"
         type="text"
       />
-      {showSuggestions && suggestionsList()}
+      {suggestionsList()}
     </section>
   );
 }

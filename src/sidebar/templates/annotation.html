@@ -37,28 +37,13 @@
       h-branding="accentColor">mire</a>
   </div>
   <!-- Tags -->
-<<<<<<< HEAD
-<<<<<<< HEAD
-  <div class="annotation-body" ng-if="vm.editing()">
-    <tag-editor tags="vm.state().tags"
-                on-edit-tags="vm.setTags(tags)"></tag-editor>
-  </div>
-=======
-  <tag-editor2 
-=======
   <tag-editor
->>>>>>> Rename TagEditor2 to TagEditor
     ng-if="vm.editing()"
     annotation="vm.annotation"
     on-edit-tags="vm.setTags(tags)"
     tag-list="vm.state().tags" 
     />
-<<<<<<< HEAD
-  </tag-editor2>
->>>>>>> Add new preact tag editor component
-=======
   </tag-editor>
->>>>>>> Rename TagEditor2 to TagEditor
 
   <tag-list
     ng-if="!vm.editing()"
