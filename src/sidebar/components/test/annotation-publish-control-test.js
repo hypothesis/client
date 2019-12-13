@@ -191,10 +191,9 @@ describe('AnnotationPublishControl', () => {
       const wrapper = createAnnotationPublishControl({
         onCancel: fakeOnCancel,
       });
-      const cancelBtn = wrapper.find(
-        '[title="Cancel changes to this annotation"]'
-      );
-      cancelBtn.prop('onClick')();
+      const cancelBtn = wrapper.find('ActionButton');
+
+      cancelBtn.props().onClick();
 
       assert.calledOnce(fakeOnCancel);
     });

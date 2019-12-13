@@ -7,8 +7,8 @@ const scrollIntoView = require('scroll-into-view');
 
 const useStore = require('../store/use-store');
 
+const ActionButton = require('./action-button');
 const Slider = require('./slider');
-const SvgIcon = require('./svg-icon');
 
 /**
  * Base component for a sidebar panel.
@@ -47,14 +47,12 @@ function SidebarPanel({ children, panelName, title, onActiveChanged }) {
         <div className="sidebar-panel__header">
           <div className="sidebar-panel__title u-stretch">{title}</div>
           <div>
-            <button
-              className="sidebar-panel__close-btn"
+            <ActionButton
+              icon="cancel"
+              label="Close"
               onClick={closePanel}
-              aria-label="close panel"
-            >
-              <SvgIcon name="cancel" className="action-button__icon--compact" />
-              Close
-            </button>
+              useCompactStyle
+            />
           </div>
         </div>
         <div className="sidebar-panel__content">{children}</div>
