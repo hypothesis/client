@@ -7,12 +7,20 @@ const { useMemo, useRef, useState } = require('preact/hooks');
 const { withServices } = require('../util/service-context');
 const SvgIcon = require('./svg-icon');
 
+// Global counter used to create a unique id for each instance of a TagEditor
+let datalistIdCounter = 0;
+
 /**
  * Component to edit annotation's tags.
  */
-function TagEditor({ annotation, onEditTags, tags: tagsService, tagList }) {
+
+function TagEditor({ onEditTags, tags: tagsService, tagList }) {
   const inputEl = useRef(null);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [datalistId] = useState(() => {
+    ++datalistIdCounter;
+    return `tag-editor-datalist-${datalistIdCounter}`;
+  });
 
   // List of suggestions returned from the tagsService
   const suggestions = useMemo(() => {
@@ -36,7 +44,6 @@ function TagEditor({ annotation, onEditTags, tags: tagsService, tagList }) {
   const updateTags = tagList => {
     // update suggested tags list via service
     tagsService.store(tagList.map(tag => ({ text: tag })));
-    // invoke callback with updated tags
     onEditTags({ tags: tagList });
   };
 
@@ -69,7 +76,6 @@ function TagEditor({ annotation, onEditTags, tags: tagsService, tagList }) {
     updateTags([...tagList, value]);
     setShowSuggestions(false);
 
-    // clear the input field and maintain focus
     inputEl.current.value = '';
     inputEl.current.focus();
   };
@@ -102,8 +108,9 @@ function TagEditor({ annotation, onEditTags, tags: tagsService, tagList }) {
       // or use keyboard navigation and press 'Enter'.
       //
       // If the input value typed already exactly matches the option selected
-      // then this Event won't fire and a user would have to press 'Enter' a second
+      // then this event won't fire and a user would have to press 'Enter' a second
       // time to trigger the handleKeyPress callback above to add the tag.
+      // Bug: https://github.com/hypothesis/client/issues/1604
       addTag();
     } else if (inputEl.current.value.length === 0) {
       // If the user deleted input, hide suggestions. This has
@@ -112,16 +119,28 @@ function TagEditor({ annotation, onEditTags, tags: tagsService, tagList }) {
     }
   };
 
+  const handleKeyUp = e => {
+    // Safari on macOS and iOS have an issue where pressing "Enter" in an
+    // input when its value exactly matches a suggestion in the associated <datalist>
+    // does not generate a "keypress" event. Therefore we catch the subsequent
+    // "keyup" event instead.
+
+    if (e.key === 'Enter') {
+      // nb. `addTag` will do nothing if the "keypress" event was already handled.
+      addTag();
+    }
+  };
+
   const suggestionsList = () => {
     return (
       <datalist
-        id={`tag-editor-datalist-${annotation.id}`}
+        id={datalistId}
         className="tag-editor__suggestions"
         aria-label="Annotation suggestions"
       >
         {showSuggestions &&
-          suggestions.map((suggestion, index) => (
-            <option key={index} value={suggestion} />
+          suggestions.map(suggestion => (
+            <option key={suggestion} value={suggestion} />
           ))}
       </datalist>
     );
@@ -155,9 +174,10 @@ function TagEditor({ annotation, onEditTags, tags: tagsService, tagList }) {
         })}
       </ul>
       <input
-        list={`tag-editor-datalist-${annotation.id}`}
+        list={datalistId}
         onInput={handleOnInput}
         onKeyPress={handleKeyPress}
+        onKeyUp={handleKeyUp}
         ref={inputEl}
         placeholder="Add tags..."
         className="tag-editor__input"
@@ -174,9 +194,6 @@ function TagEditor({ annotation, onEditTags, tags: tagsService, tagList }) {
  */
 
 TagEditor.propTypes = {
-  /* Annotation that owns the tags. */
-  annotation: propTypes.object.isRequired,
-
   /**
    *  Callback that saves the tag list.
    *

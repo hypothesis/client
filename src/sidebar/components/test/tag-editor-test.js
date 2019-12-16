@@ -16,9 +16,6 @@ describe('TagEditor', function() {
     return mount(
       <TagEditor
         // props
-        annotation={{
-          id: 'annotation_id',
-        }}
         onEditTags={fakeOnEditTags}
         tagList={fakeTags}
         // service props
@@ -32,6 +29,12 @@ describe('TagEditor', function() {
   // Simulates a selection event from datalist
   function selectOption(wrapper) {
     wrapper.find('input').simulate('input', { inputType: undefined });
+  }
+  // Simulates a selection event from datalist. This is the
+  // only event that fires in in Safari. In Chrome, both the `keyup`
+  // and `input` events fire, but only the first one adds the tag.
+  function selectOptionViaKeyUp(wrapper) {
+    wrapper.find('input').simulate('keyup', { key: 'Enter' });
   }
 
   // Simulates a typing input event
@@ -63,17 +66,25 @@ describe('TagEditor', function() {
     });
   });
 
-  it('creates the component with a unique id', () => {
+  it("creates a `list` prop on the input that matches the datalist's `id`", () => {
     const wrapper = createComponent();
     assert.equal(
       wrapper.find('input').prop('list'),
-      'tag-editor-datalist-annotation_id'
+      wrapper.find('datalist').prop('id')
+    );
+  });
+
+  it('creates multiple TagEditors with unique datalist `id`s', () => {
+    const wrapper1 = createComponent();
+    const wrapper2 = createComponent();
+    assert.notEqual(
+      wrapper1.find('datalist').prop('id'),
+      wrapper2.find('datalist').prop('id')
     );
   });
 
   it('generates a ordered datalist containing the array values returned from fakeTagsService.filter ', () => {
     const wrapper = createComponent();
-    // simulate `keyup` to populate suggestions list
     wrapper.find('input').instance().value = 'non-empty';
     wrapper.find('input').simulate('input', { inputType: 'insertText' });
 
@@ -141,7 +152,9 @@ describe('TagEditor', function() {
     typeInput(wrapper);
     assert.equal(wrapper.find('datalist option').length, 2);
     wrapper.find('input').instance().value = 't'; // non-empty input remains
-    wrapper.find('input').simulate('keyup', { key: 'deleteContentBackward' });
+    wrapper
+      .find('input')
+      .simulate('input', { inputType: 'deleteContentBackward' });
     assert.notEqual(wrapper.find('datalist option').length, 0);
   });
 
@@ -193,6 +206,13 @@ describe('TagEditor', function() {
       const wrapper = createComponent();
       wrapper.find('input').instance().value = 'tag3';
       selectOption(wrapper);
+      assertAddTagsSuccess(wrapper, ['tag1', 'tag2', 'tag3']);
+    });
+
+    it('adds a tag from the input field via keyup event', () => {
+      const wrapper = createComponent();
+      wrapper.find('input').instance().value = 'tag3';
+      selectOptionViaKeyUp(wrapper);
       assertAddTagsSuccess(wrapper, ['tag1', 'tag2', 'tag3']);
     });
 
