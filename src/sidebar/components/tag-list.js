@@ -60,10 +60,10 @@ function TagList({ annotation, serviceUrl, settings, tags }) {
 
 TagList.propTypes = {
   /* Annotation that owns the tags. */
-  annotation: propTypes.object,
+  annotation: propTypes.object.isRequired,
 
   /* List of tags as strings. */
-  tags: propTypes.array,
+  tags: propTypes.array.isRequired,
 
   /** Services */
   serviceUrl: propTypes.func,

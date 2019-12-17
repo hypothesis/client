@@ -37,12 +37,16 @@
       h-branding="accentColor">mire</a>
   </div>
   <!-- Tags -->
-  <div class="annotation-body" ng-if="vm.editing()">
-    <tag-editor tags="vm.state().tags"
-                on-edit-tags="vm.setTags(tags)"></tag-editor>
-  </div>
+  <tag-editor
+    ng-if="vm.editing()"
+    annotation="vm.annotation"
+    on-edit-tags="vm.setTags(tags)"
+    tag-list="vm.state().tags" 
+    />
+  </tag-editor>
 
   <tag-list
+    ng-if="!vm.editing()"
     annotation="vm.annotation"
     tags="vm.state().tags"
   ></tag-list>
