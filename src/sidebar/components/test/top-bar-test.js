@@ -54,12 +54,9 @@ describe('TopBar', () => {
     TopBar.$imports.$restore();
   });
 
-  function applyUpdateBtn(wrapper) {
-    return wrapper.find('.top-bar__btn--refresh');
-  }
-
-  function helpBtn(wrapper) {
-    return wrapper.find('.top-bar__help-btn');
+  // Helper to retrieve an `IconButton` by icon name, for convenience
+  function getButton(wrapper, iconName) {
+    return wrapper.find('IconButton').filter({ icon: iconName });
   }
 
   function createTopBar(props = {}) {
@@ -79,21 +76,23 @@ describe('TopBar', () => {
   it('shows the pending update count', () => {
     fakeStore.pendingUpdateCount.returns(1);
     const wrapper = createTopBar();
-    const applyBtn = applyUpdateBtn(wrapper);
+    const applyBtn = getButton(wrapper, 'refresh');
     assert.isTrue(applyBtn.exists());
   });
 
   it('does not show the pending update count when there are no updates', () => {
     const wrapper = createTopBar();
-    const applyBtn = applyUpdateBtn(wrapper);
+    const applyBtn = getButton(wrapper, 'refresh');
     assert.isFalse(applyBtn.exists());
   });
 
   it('applies updates when clicked', () => {
     fakeStore.pendingUpdateCount.returns(1);
     const wrapper = createTopBar();
-    const applyBtn = applyUpdateBtn(wrapper);
-    applyBtn.simulate('click');
+    const applyBtn = getButton(wrapper, 'refresh');
+
+    applyBtn.props().onClick();
+
     assert.called(fakeStreamer.applyPendingUpdates);
   });
 
@@ -101,8 +100,10 @@ describe('TopBar', () => {
     context('no help service handler configured in services (default)', () => {
       it('toggles Help Panel on click', () => {
         const wrapper = createTopBar();
-        const help = helpBtn(wrapper);
-        help.simulate('click');
+        const helpButton = getButton(wrapper, 'help');
+
+        helpButton.props().onClick();
+
         assert.calledWith(fakeStore.toggleSidebarPanel, uiConstants.PANEL_HELP);
       });
 
@@ -114,20 +115,22 @@ describe('TopBar', () => {
           },
         });
         const wrapper = createTopBar();
-        const help = helpBtn(wrapper);
+        const helpButton = getButton(wrapper, 'help');
 
         wrapper.update();
 
-        assert.isTrue(help.hasClass('is-active'));
-        assert.isOk(help.prop('aria-pressed'));
+        assert.isTrue(helpButton.props().isActive);
       });
 
       context('help service handler configured in services', () => {
         it('fires a bridge event if help clicked and service is configured', () => {
           fakeServiceConfig.returns({ onHelpRequestProvided: true });
           const wrapper = createTopBar();
-          const help = helpBtn(wrapper);
-          help.simulate('click');
+
+          const helpButton = getButton(wrapper, 'help');
+
+          helpButton.props().onClick();
+
           assert.equal(fakeStore.toggleSidebarPanel.callCount, 0);
           assert.calledWith(fakeBridge.call, bridgeEvents.HELP_REQUESTED);
         });
@@ -208,7 +211,10 @@ describe('TopBar', () => {
 
   it('toggles the share annotations panel when "Share" is clicked', () => {
     const wrapper = createTopBar();
-    wrapper.find('.top-bar__share-btn').simulate('click');
+    const shareButton = getButton(wrapper, 'share');
+
+    shareButton.props().onClick();
+
     assert.calledWith(
       fakeStore.toggleSidebarPanel,
       uiConstants.PANEL_SHARE_ANNOTATIONS
@@ -221,11 +227,10 @@ describe('TopBar', () => {
         activePanelName: uiConstants.PANEL_SHARE_ANNOTATIONS,
       },
     });
-
     const wrapper = createTopBar();
-    const shareEl = wrapper.find('.top-bar__share-btn');
+    const shareButton = getButton(wrapper, 'share');
 
-    assert.include(shareEl.prop('className'), 'is-active');
+    assert.isTrue(shareButton.prop('isActive'));
   });
 
   it('displays search input in the sidebar', () => {

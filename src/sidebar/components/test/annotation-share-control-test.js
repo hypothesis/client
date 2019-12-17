@@ -33,7 +33,7 @@ describe('AnnotationShareControl', () => {
   function openElement(wrapper) {
     act(() => {
       wrapper
-        .find('AnnotationActionButton')
+        .find('IconButton')
         .props()
         .onClick();
     });
@@ -92,7 +92,7 @@ describe('AnnotationShareControl', () => {
 
     act(() => {
       wrapper
-        .find('AnnotationActionButton')
+        .find('IconButton')
         .props()
         .onClick();
     });

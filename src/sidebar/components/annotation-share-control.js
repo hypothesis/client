@@ -8,7 +8,7 @@ const useElementShouldClose = require('./hooks/use-element-should-close');
 const { copyText } = require('../util/copy-to-clipboard');
 const { withServices } = require('../util/service-context');
 
-const AnnotationActionButton = require('./annotation-action-button');
+const IconButton = require('./icon-button');
 const ShareLinks = require('./share-links');
 const SvgIcon = require('./svg-icon');
 
@@ -84,12 +84,7 @@ function AnnotationShareControl({
 
   return (
     <div className="annotation-share-control" ref={shareRef}>
-      <AnnotationActionButton
-        icon="share"
-        isDisabled={false}
-        label="Share"
-        onClick={toggleSharePanel}
-      />
+      <IconButton icon="share" title="Share" onClick={toggleSharePanel} />
       {isOpen && (
         <div className="annotation-share-panel">
           <div className="annotation-share-panel__header">
