@@ -8,6 +8,8 @@ const { withServices } = require('../util/service-context');
 const uiConstants = require('../ui-constants');
 const useStore = require('../store/use-store');
 
+const ActionButton = require('./action-button');
+
 /**
  * Of the annotations in the thread `annThread`, how many
  * are currently `visible` in the browser (sidebar)?
@@ -143,22 +145,17 @@ function SearchStatusBar({ rootThread }) {
     })(),
   };
 
-  const btnProps = {
-    className: 'primary-action-btn primary-action-btn--short',
-    onClick: actions.clearSelection,
-  };
-
   return (
     <div>
       {modes.filtered && (
         <div className="search-status-bar">
-          <button
-            title="Clear the search filter and show all annotations"
-            {...btnProps}
-          >
-            <i className="primary-action-btn__icon h-icon-close" />
-            Clear search
-          </button>
+          <ActionButton
+            icon="cancel"
+            label="Clear search"
+            onClick={actions.clearSelection}
+            isPrimary
+            useCompactStyle
+          />
           <span className="search-status-bar__filtered-text">
             {modeText.filtered}
           </span>
@@ -173,14 +170,12 @@ function SearchStatusBar({ rootThread }) {
       )}
       {modes.selected && (
         <div className="search-status-bar">
-          <button
-            title="Clear the selection and show all annotations"
-            {...btnProps}
-          >
-            <span className="search-status-bar__selected-text">
-              {modeText.selected}
-            </span>
-          </button>
+          <ActionButton
+            label={modeText.selected}
+            onClick={actions.clearSelection}
+            isPrimary
+            useCompactStyle
+          />
         </div>
       )}
     </div>

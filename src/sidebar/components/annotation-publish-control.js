@@ -6,9 +6,9 @@ const { createElement } = require('preact');
 const { applyTheme } = require('../util/theme');
 const { withServices } = require('../util/service-context');
 
+const ActionButton = require('./action-button');
 const Menu = require('./menu');
 const MenuItem = require('./menu-item');
-const SvgIcon = require('./svg-icon');
 
 /**
  * Render a compound control button for publishing (saving) an annotation:
@@ -75,14 +75,12 @@ function AnnotationPublishControl({
           />
         </Menu>
       </div>
-      <button
-        className="action-button"
+      <ActionButton
+        icon="cancel"
+        label="Cancel"
         onClick={onCancel}
-        title="Cancel changes to this annotation"
-      >
-        <SvgIcon name="cancel" className="action-button__icon--compact" />
-        Cancel
-      </button>
+        useCompactStyle
+      />
     </div>
   );
 }

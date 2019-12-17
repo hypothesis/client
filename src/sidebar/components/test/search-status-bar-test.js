@@ -113,8 +113,8 @@ describe('SearchStatusBar', () => {
 
         const wrapper = createComponent({});
 
-        const buttonText = wrapper.find('button').text();
-        assert.equal(buttonText, 'Clear search');
+        const button = wrapper.find('ActionButton');
+        assert.equal(button.props().label, 'Clear search');
 
         const searchResultsText = wrapper.find('span').text();
         assert.equal(searchResultsText, test.expectedText);
@@ -251,14 +251,10 @@ describe('SearchStatusBar', () => {
 
           const wrapper = createComponent({});
 
-          const button = wrapper.find('button');
-          const selectedText = wrapper.find(
-            '.search-status-bar__selected-text'
-          );
+          const button = wrapper.find('ActionButton');
 
           assert.isTrue(button.exists());
-          assert.equal(button.text(), test.buttonText);
-          assert.isTrue(selectedText.exists());
+          assert.equal(button.props().label, test.buttonText);
         });
       });
     });
@@ -285,14 +281,10 @@ describe('SearchStatusBar', () => {
 
           const wrapper = createComponent({});
 
-          const button = wrapper.find('button');
-          const selectedText = wrapper.find(
-            '.search-status-bar__selected-text'
-          );
+          const button = wrapper.find('ActionButton');
 
           assert.isTrue(button.exists());
-          assert.equal(button.text(), test.buttonText);
-          assert.isTrue(selectedText.exists());
+          assert.equal(button.props().label, test.buttonText);
         });
       });
     });
@@ -315,16 +307,11 @@ describe('SearchStatusBar', () => {
 
         const wrapper = createComponent({});
 
-        const button = wrapper.find('button');
-        const selectedText = wrapper.find('.search-status-bar__selected-text');
-        const filteredText = wrapper.find('.search-status-bar__filtered-text');
+        const button = wrapper.find('ActionButton');
 
         assert.isTrue(button.exists());
-        assert.isFalse(selectedText.exists());
-        assert.isTrue(filteredText.exists());
+        assert.equal(button.props().label, 'Clear search');
       });
     });
   });
-
-  // });
 });
