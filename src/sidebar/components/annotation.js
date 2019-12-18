@@ -32,7 +32,6 @@ function AnnotationController(
   $scope,
   $timeout,
   $window,
-  analytics,
   store,
   annotationMapper,
   api,
@@ -59,8 +58,6 @@ function AnnotationController(
     }
 
     return saved.then(function(savedAnnot) {
-      let event;
-
       // Copy across internal properties which are not part of the annotation
       // model saved on the server
       savedAnnot.$tag = annot.$tag;
@@ -69,26 +66,6 @@ function AnnotationController(
           savedAnnot[k] = annot[k];
         }
       });
-
-      if (self.isReply()) {
-        event = updating
-          ? analytics.events.REPLY_UPDATED
-          : analytics.events.REPLY_CREATED;
-      } else if (self.isHighlight()) {
-        event = updating
-          ? analytics.events.HIGHLIGHT_UPDATED
-          : analytics.events.HIGHLIGHT_CREATED;
-      } else if (isPageNote(self.annotation)) {
-        event = updating
-          ? analytics.events.PAGE_NOTE_UPDATED
-          : analytics.events.PAGE_NOTE_CREATED;
-      } else {
-        event = updating
-          ? analytics.events.ANNOTATION_UPDATED
-          : analytics.events.ANNOTATION_CREATED;
-      }
-
-      analytics.track(event);
 
       return savedAnnot;
     });
@@ -216,7 +193,6 @@ function AnnotationController(
       flash.error(err.message, 'Flagging annotation failed');
     };
     annotationMapper.flagAnnotation(self.annotation).then(function() {
-      analytics.track(analytics.events.ANNOTATION_FLAGGED);
       store.updateFlagStatus(self.annotation.id, true);
     }, onRejected);
   };
@@ -231,25 +207,12 @@ function AnnotationController(
       // Don't use confirm inside the digest cycle.
       const msg = 'Are you sure you want to delete this annotation?';
       if ($window.confirm(msg)) {
-        const onRejected = function(err) {
-          flash.error(err.message, 'Deleting annotation failed');
-        };
         $scope.$apply(function() {
-          annotationMapper.deleteAnnotation(self.annotation).then(function() {
-            let event;
-
-            if (self.isReply()) {
-              event = analytics.events.REPLY_DELETED;
-            } else if (self.isHighlight()) {
-              event = analytics.events.HIGHLIGHT_DELETED;
-            } else if (isPageNote(self.annotation)) {
-              event = analytics.events.PAGE_NOTE_DELETED;
-            } else {
-              event = analytics.events.ANNOTATION_DELETED;
-            }
-
-            analytics.track(event);
-          }, onRejected);
+          annotationMapper
+            .deleteAnnotation(self.annotation)
+            .catch(err =>
+              flash.error(err.message, 'Deleting annotation failed')
+            );
         });
       }
     }, true);

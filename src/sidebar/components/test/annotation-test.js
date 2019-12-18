@@ -83,7 +83,6 @@ describe('annotation', function() {
     const fakeAccountID = {
       isThirdPartyUser: sinon.stub(),
     };
-    let fakeAnalytics;
     let fakeAnnotationMapper;
     let fakeStore;
     let fakeFlash;
@@ -160,11 +159,6 @@ describe('annotation', function() {
     beforeEach(
       angular.mock.module(function($provide) {
         sandbox = sinon.sandbox.create();
-
-        fakeAnalytics = {
-          track: sandbox.stub(),
-          events: {},
-        };
 
         fakeAnnotationMapper = {
           createAnnotation: sandbox.stub().returns({
@@ -246,7 +240,6 @@ describe('annotation', function() {
           call: sinon.stub(),
         };
 
-        $provide.value('analytics', fakeAnalytics);
         $provide.value('annotationMapper', fakeAnnotationMapper);
         $provide.value('store', fakeStore);
         $provide.value('api', fakeApi);
