@@ -24,7 +24,6 @@
 
 // Components
 // ----------
-@use './components/action-button';
 @use './components/annotation-action-bar';
 @use './components/annotation';
 @use './components/annotation-body';
@@ -37,12 +36,12 @@
 @use './components/annotation-share-info';
 @use './components/annotation-thread';
 @use './components/annotation-user';
+@use './components/button';
 @use './components/excerpt';
 @use './components/focused-mode-header';
 @use './components/group-list';
 @use './components/group-list-item';
 @use './components/help-panel';
-@use './components/icon-button';
 @use './components/logged-out-message';
 @use './components/markdown-editor';
 @use './components/markdown-view';

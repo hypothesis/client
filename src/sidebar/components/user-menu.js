@@ -8,7 +8,7 @@ const { isThirdPartyUser } = require('../util/account-id');
 const serviceConfig = require('../service-config');
 const { withServices } = require('../util/service-context');
 
-const IconButton = require('./icon-button');
+const Button = require('./button');
 const Menu = require('./menu');
 const MenuSection = require('./menu-section');
 const MenuItem = require('./menu-item');
@@ -46,7 +46,7 @@ function UserMenu({ auth, bridge, onLogout, serviceUrl, settings }) {
   })();
 
   const menuLabel = (
-    <IconButton
+    <Button
       className="top-bar__icon-button"
       icon="profile"
       title="User menu"

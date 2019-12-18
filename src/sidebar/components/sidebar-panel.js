@@ -7,7 +7,7 @@ const scrollIntoView = require('scroll-into-view');
 
 const useStore = require('../store/use-store');
 
-const ActionButton = require('./action-button');
+const Button = require('./button');
 const Slider = require('./slider');
 
 /**
@@ -47,9 +47,9 @@ function SidebarPanel({ children, panelName, title, onActiveChanged }) {
         <div className="sidebar-panel__header">
           <div className="sidebar-panel__title u-stretch">{title}</div>
           <div>
-            <ActionButton
+            <Button
               icon="cancel"
-              label="Close"
+              buttonText="Close"
               onClick={closePanel}
               useCompactStyle
             />

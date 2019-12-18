@@ -8,7 +8,7 @@ const { withServices } = require('../util/service-context');
 const uiConstants = require('../ui-constants');
 const useStore = require('../store/use-store');
 
-const ActionButton = require('./action-button');
+const Button = require('./button');
 
 /**
  * Of the annotations in the thread `annThread`, how many
@@ -149,12 +149,12 @@ function SearchStatusBar({ rootThread }) {
     <div>
       {modes.filtered && (
         <div className="search-status-bar">
-          <ActionButton
+          <Button
             icon="cancel"
-            label="Clear search"
+            buttonText="Clear search"
             onClick={actions.clearSelection}
-            isPrimary
             useCompactStyle
+            usePrimaryStyle
           />
           <span className="search-status-bar__filtered-text">
             {modeText.filtered}
@@ -170,11 +170,11 @@ function SearchStatusBar({ rootThread }) {
       )}
       {modes.selected && (
         <div className="search-status-bar">
-          <ActionButton
-            label={modeText.selected}
+          <Button
+            buttonText={modeText.selected}
             onClick={actions.clearSelection}
-            isPrimary
             useCompactStyle
+            usePrimaryStyle
           />
         </div>
       )}

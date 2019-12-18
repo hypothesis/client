@@ -1,6 +1,5 @@
 @use "../../variables" as var;
 
-@use "../../mixins/buttons";
 @use "../../mixins/links";
 
 .share-annotations-panel {
@@ -17,10 +16,6 @@
 
   &__form-input {
     border-radius: 0;
-  }
-
-  &__copy-btn {
-    @include buttons.input-icon-button;
   }
 
   &__icon--inline {

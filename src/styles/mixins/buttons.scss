@@ -27,69 +27,43 @@
     transition: 0.2s ease-out;
     color: var.$grey-6;
   }
+
+  &.is-active {
+    color: var.$brand;
+
+    &:hover {
+      color: var.$brand;
+    }
+  }
 }
 
 /**
- * A <button> composed of an SVG icon (left) and text (right) with some
- * hover transition effects
+ * A button with background color, layout rules to allow an icon, and text settings
  */
-@mixin action-button($icon-margin: 0 5px) {
-  @include button-base;
+@mixin button-basic {
   display: flex;
   align-items: center;
   border-radius: 2px;
   border: none;
   background-color: var.$grey-1;
-  color: var.$grey-5;
   font-weight: 700;
+  color: var.$grey-5;
+
+  padding-right: 0.75em;
+  padding-left: 0.75em;
 
   &:hover {
     background-color: var.$grey-2;
-  }
-
-  &__label {
-    padding-left: 0.25em;
-    padding-right: 0.25em;
-  }
-
-  &__icon {
-    color: var.$grey-5;
-    margin: $icon-margin;
-
-    &--compact {
-      margin: 0;
-    }
-
-    &--primary {
-      color: var.$grey-1;
-    }
-  }
-
-  &--primary {
-    color: var.$grey-1;
-    background-color: var.$grey-mid;
-
-    &:hover {
-      color: var.$grey-1;
-      background-color: var.$grey-6;
-    }
   }
 }
 
-/**
- * An action button that is icon-only and displayed to the right of an
- * <input> element. Colors are one tick more subtle than `action-button`.
- */
-@mixin input-icon-button {
-  @include action-button;
-  padding: 10px;
-  border-radius: 0; // Turn off border-radius to align with <input> edges
-  border: 1px solid var.$grey-3;
-  border-left: 0px; // Avoid double border with the <input>
-  color: var.$grey-4;
+/* colors for a "primary" button */
+@mixin button-primary {
+  color: var.$grey-1;
+  background-color: var.$grey-mid;
 
   &:hover {
-    background-color: var.$grey-2;
-    color: var.$grey-5;
+    color: var.$grey-1;
+    background-color: var.$grey-6;
   }
 }

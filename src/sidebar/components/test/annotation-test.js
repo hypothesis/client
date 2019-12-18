@@ -129,14 +129,6 @@ describe('annotation', function() {
       angular
         .module('h', [])
         .component('annotation', annotationComponent)
-        .component('annotationActionButton', {
-          bindings: {
-            icon: '<',
-            isDisabled: '<',
-            label: '<',
-            onClick: '&',
-          },
-        })
         .component('annotationBody', {
           bindings: {
             collapse: '<',

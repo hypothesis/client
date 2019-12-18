@@ -54,9 +54,9 @@ describe('TopBar', () => {
     TopBar.$imports.$restore();
   });
 
-  // Helper to retrieve an `IconButton` by icon name, for convenience
+  // Helper to retrieve an `Button` by icon name, for convenience
   function getButton(wrapper, iconName) {
-    return wrapper.find('IconButton').filter({ icon: iconName });
+    return wrapper.find('Button').filter({ icon: iconName });
   }
 
   function createTopBar(props = {}) {

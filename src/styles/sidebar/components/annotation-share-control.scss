@@ -1,4 +1,3 @@
-@use '../../mixins/buttons';
 @use '../../mixins/links';
 @use '../../mixins/panel';
 @use "../../variables" as var;
@@ -24,11 +23,6 @@
     padding: 0.5em;
     border-radius: 0;
     font-size: var.$small-font-size;
-  }
-
-  &__copy-btn {
-    @include buttons.input-icon-button;
-    padding: 5px;
   }
 
   &__permissions {

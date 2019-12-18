@@ -7,10 +7,10 @@ const { withServices } = require('../util/service-context');
 const { isShareable, shareURI } = require('../util/annotation-sharing');
 
 const AnnotationShareControl = require('./annotation-share-control');
-const IconButton = require('./icon-button');
+const Button = require('./button');
 
 /**
- * A collection of `IconButton`s in the footer area of an annotation.
+ * A collection of `Button`s in the footer area of an annotation.
  */
 function AnnotationActionBar({
   annotation,
@@ -44,13 +44,11 @@ function AnnotationActionBar({
 
   return (
     <div className="annotation-action-bar">
-      {showEditAction && (
-        <IconButton icon="edit" title="Edit" onClick={onEdit} />
-      )}
+      {showEditAction && <Button icon="edit" title="Edit" onClick={onEdit} />}
       {showDeleteAction && (
-        <IconButton icon="trash" title="Delete" onClick={onDelete} />
+        <Button icon="trash" title="Delete" onClick={onDelete} />
       )}
-      <IconButton icon="reply" title="Reply" onClick={onReply} />
+      <Button icon="reply" title="Reply" onClick={onReply} />
       {showShareAction && (
         <AnnotationShareControl
           group={annotationGroup}
@@ -59,14 +57,14 @@ function AnnotationActionBar({
         />
       )}
       {showFlagAction && !annotation.flagged && (
-        <IconButton
+        <Button
           icon="flag"
           title="Report this annotation to moderators"
           onClick={onFlag}
         />
       )}
       {showFlagAction && annotation.flagged && (
-        <IconButton
+        <Button
           isActive={true}
           icon="flag--active"
           title="Annotation has been reported to the moderators"

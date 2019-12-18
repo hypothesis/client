@@ -6,7 +6,7 @@ const { createElement } = require('preact');
 const { copyText } = require('../util/copy-to-clipboard');
 const { withServices } = require('../util/service-context');
 
-const ActionButton = require('./action-button');
+const Button = require('./button');
 
 /**
  * Display current client version info
@@ -38,8 +38,8 @@ function VersionInfo({ flash, versionData }) {
         <dd className="version-info__value">{versionData.timestamp}</dd>
       </dl>
       <div className="version-info__actions">
-        <ActionButton
-          label="Copy version details"
+        <Button
+          buttonText="Copy version details"
           onClick={copyVersionData}
           icon="copy"
         />

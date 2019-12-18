@@ -8,7 +8,7 @@ const useElementShouldClose = require('./hooks/use-element-should-close');
 const { copyText } = require('../util/copy-to-clipboard');
 const { withServices } = require('../util/service-context');
 
-const IconButton = require('./icon-button');
+const Button = require('./button');
 const ShareLinks = require('./share-links');
 const SvgIcon = require('./svg-icon');
 
@@ -84,7 +84,7 @@ function AnnotationShareControl({
 
   return (
     <div className="annotation-share-control" ref={shareRef}>
-      <IconButton icon="share" title="Share" onClick={toggleSharePanel} />
+      <Button icon="share" title="Share" onClick={toggleSharePanel} />
       {isOpen && (
         <div className="annotation-share-panel">
           <div className="annotation-share-panel__header">
@@ -102,13 +102,13 @@ function AnnotationShareControl({
                 readOnly
                 ref={inputRef}
               />
-              <button
-                className="annotation-share-panel__copy-btn"
-                aria-label="Copy share link to clipboard"
+              <Button
+                icon="copy"
+                title="Copy share link to clipboard"
                 onClick={copyShareLink}
-              >
-                <SvgIcon name="copy" />
-              </button>
+                useInputStyle
+                useCompactStyle
+              />
             </div>
             <div className="annotation-share-panel__permissions">
               {annotationSharingInfo}

@@ -7,7 +7,7 @@ const propTypes = require('prop-types');
 
 const useStore = require('../store/use-store');
 
-const IconButton = require('./icon-button');
+const Button = require('./button');
 const Spinner = require('./spinner');
 
 /**
@@ -61,7 +61,7 @@ function SearchInput({ alwaysExpanded, query, onSearch }) {
         onInput={e => setPendingQuery(e.target.value)}
       />
       {!isLoading && (
-        <IconButton
+        <Button
           className="search-input__icon-button top-bar__icon-button"
           icon="search"
           onClick={() => input.current.focus()}

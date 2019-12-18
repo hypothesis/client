@@ -3,15 +3,15 @@
 const { createElement } = require('preact');
 const { mount } = require('enzyme');
 
-const IconButton = require('../icon-button');
+const Button = require('../button');
 const mockImportedComponents = require('./mock-imported-components');
 
-describe('IconButton', () => {
+describe('Button', () => {
   let fakeOnClick;
 
   function createComponent(props = {}) {
     return mount(
-      <IconButton
+      <Button
         icon="fakeIcon"
         isActive={false}
         title="My Action"
@@ -23,11 +23,11 @@ describe('IconButton', () => {
 
   beforeEach(() => {
     fakeOnClick = sinon.stub();
-    IconButton.$imports.$mock(mockImportedComponents());
+    Button.$imports.$mock(mockImportedComponents());
   });
 
   afterEach(() => {
-    IconButton.$imports.$restore();
+    Button.$imports.$restore();
   });
 
   it('adds active className if `isActive` is `true`', () => {
@@ -46,6 +46,20 @@ describe('IconButton', () => {
     assert.isTrue(wrapper.find('button').prop('aria-pressed'));
   });
 
+  it('sets `title` to provided `title` prop', () => {
+    const wrapper = createComponent({});
+    assert.equal(wrapper.find('button').prop('title'), 'My Action');
+  });
+
+  it('uses `buttonText` to set `title` attr if `title` missing', () => {
+    const wrapper = createComponent({
+      buttonText: 'My Label',
+      title: undefined,
+    });
+
+    assert.equal(wrapper.find('button').prop('title'), 'My Label');
+  });
+
   it('invokes `onClick` callback when pressed', () => {
     const wrapper = createComponent();
     wrapper.find('button').simulate('click');
@@ -61,6 +75,18 @@ describe('IconButton', () => {
   it('sets compact style if `useCompactStyle` is set`', () => {
     const wrapper = createComponent({ useCompactStyle: true });
 
-    assert.isTrue(wrapper.find('button').hasClass('icon-button--compact'));
+    assert.isTrue(wrapper.find('button').hasClass('button--compact'));
+  });
+
+  it('sets input style if `useInputStyle` is set', () => {
+    const wrapper = createComponent({ useInputStyle: true });
+
+    assert.isTrue(wrapper.find('button').hasClass('button--input'));
+  });
+
+  it('sets primary style if `usePrimaryStyle` is set`', () => {
+    const wrapper = createComponent({ usePrimaryStyle: true });
+
+    assert.isTrue(wrapper.find('button').hasClass('button--primary'));
   });
 });

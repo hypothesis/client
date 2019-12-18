@@ -47,7 +47,7 @@ describe('SidebarPanel', () => {
     const wrapper = createSidebarPanel({ panelName: 'flibberty' });
 
     wrapper
-      .find('ActionButton')
+      .find('Button')
       .props()
       .onClick();
 
