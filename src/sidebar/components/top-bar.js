@@ -12,8 +12,8 @@ const serviceConfig = require('../service-config');
 const { withServices } = require('../util/service-context');
 const uiConstants = require('../ui-constants');
 
+const Button = require('./button');
 const GroupList = require('./group-list');
-const IconButton = require('./icon-button');
 const SearchInput = require('./search-input');
 const StreamSearchInput = require('./stream-search-input');
 const SortMenu = require('./sort-menu');
@@ -98,7 +98,7 @@ function TopBar({
         <div className="top-bar__inner content">
           <StreamSearchInput />
           <div className="top-bar__expander" />
-          <IconButton
+          <Button
             className="top-bar__icon-button"
             icon="help"
             isActive={currentActivePanel === uiConstants.PANEL_HELP}
@@ -115,7 +115,7 @@ function TopBar({
           <GroupList className="GroupList" auth={auth} />
           <div className="top-bar__expander" />
           {pendingUpdateCount > 0 && (
-            <IconButton
+            <Button
               className="top-bar__icon-button top-bar__icon-button--refresh"
               icon="refresh"
               onClick={applyPendingUpdates}
@@ -128,7 +128,7 @@ function TopBar({
           <SearchInput query={filterQuery} onSearch={setFilterQuery} />
           <SortMenu />
           {showSharePageButton && (
-            <IconButton
+            <Button
               className="top-bar__icon-button"
               icon="share"
               isActive={
@@ -139,7 +139,7 @@ function TopBar({
               useCompactStyle
             />
           )}
-          <IconButton
+          <Button
             className="top-bar__icon-button"
             icon="help"
             isActive={currentActivePanel === uiConstants.PANEL_HELP}

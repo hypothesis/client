@@ -7,6 +7,7 @@ const { copyText } = require('../util/copy-to-clipboard');
 const { withServices } = require('../util/service-context');
 const uiConstants = require('../ui-constants');
 
+const Button = require('./button');
 const ShareLinks = require('./share-links');
 const SidebarPanel = require('./sidebar-panel');
 const SvgIcon = require('./svg-icon');
@@ -76,14 +77,12 @@ function ShareAnnotationsPanel({ analytics, flash }) {
               value={shareURI}
               readOnly
             />
-            <button
+            <Button
+              icon="copy"
               onClick={copyShareLink}
-              title="copy share link"
-              aria-label="Copy share link"
-              className="share-annotations-panel__copy-btn"
-            >
-              <SvgIcon name="copy" />
-            </button>
+              title="Copy share link"
+              useInputStyle
+            />
           </div>
           <p>
             {focusedGroup.type === 'private' ? (

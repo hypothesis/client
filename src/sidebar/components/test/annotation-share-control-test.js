@@ -16,6 +16,10 @@ describe('AnnotationShareControl', () => {
 
   let container;
 
+  const getButton = (wrapper, iconName) => {
+    return wrapper.find('Button').filter({ icon: iconName });
+  };
+
   function createComponent(props = {}) {
     return mount(
       <AnnotationShareControl
@@ -33,7 +37,7 @@ describe('AnnotationShareControl', () => {
   function openElement(wrapper) {
     act(() => {
       wrapper
-        .find('IconButton')
+        .find('Button')
         .props()
         .onClick();
     });
@@ -89,12 +93,10 @@ describe('AnnotationShareControl', () => {
 
   it('toggles the share control element when the button is clicked', () => {
     const wrapper = createComponent();
+    const button = getButton(wrapper, 'share');
 
     act(() => {
-      wrapper
-        .find('IconButton')
-        .props()
-        .onClick();
+      button.props().onClick();
     });
     wrapper.update();
 
@@ -115,7 +117,9 @@ describe('AnnotationShareControl', () => {
       const wrapper = createComponent();
       openElement(wrapper);
 
-      wrapper.find('.annotation-share-panel__copy-btn').simulate('click');
+      getButton(wrapper, 'copy')
+        .props()
+        .onClick();
 
       assert.calledWith(
         fakeCopyToClipboard.copyText,
@@ -127,7 +131,9 @@ describe('AnnotationShareControl', () => {
       const wrapper = createComponent();
       openElement(wrapper);
 
-      wrapper.find('.annotation-share-panel__copy-btn').simulate('click');
+      getButton(wrapper, 'copy')
+        .props()
+        .onClick();
 
       assert.calledWith(fakeFlash.info, 'Copied share link to clipboard');
     });
@@ -137,7 +143,9 @@ describe('AnnotationShareControl', () => {
       const wrapper = createComponent();
       openElement(wrapper);
 
-      wrapper.find('.annotation-share-panel__copy-btn').simulate('click');
+      getButton(wrapper, 'copy')
+        .props()
+        .onClick();
 
       assert.calledWith(fakeFlash.error, 'Unable to copy link');
     });

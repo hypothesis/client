@@ -113,8 +113,8 @@ describe('SearchStatusBar', () => {
 
         const wrapper = createComponent({});
 
-        const button = wrapper.find('ActionButton');
-        assert.equal(button.props().label, 'Clear search');
+        const button = wrapper.find('Button');
+        assert.equal(button.props().buttonText, 'Clear search');
 
         const searchResultsText = wrapper.find('span').text();
         assert.equal(searchResultsText, test.expectedText);
@@ -251,10 +251,10 @@ describe('SearchStatusBar', () => {
 
           const wrapper = createComponent({});
 
-          const button = wrapper.find('ActionButton');
+          const button = wrapper.find('Button');
 
           assert.isTrue(button.exists());
-          assert.equal(button.props().label, test.buttonText);
+          assert.equal(button.props().buttonText, test.buttonText);
         });
       });
     });
@@ -281,10 +281,10 @@ describe('SearchStatusBar', () => {
 
           const wrapper = createComponent({});
 
-          const button = wrapper.find('ActionButton');
+          const button = wrapper.find('Button');
 
           assert.isTrue(button.exists());
-          assert.equal(button.props().label, test.buttonText);
+          assert.equal(button.props().buttonText, test.buttonText);
         });
       });
     });
@@ -307,10 +307,10 @@ describe('SearchStatusBar', () => {
 
         const wrapper = createComponent({});
 
-        const button = wrapper.find('ActionButton');
+        const button = wrapper.find('Button');
 
         assert.isTrue(button.exists());
-        assert.equal(button.props().label, 'Clear search');
+        assert.equal(button.props().buttonText, 'Clear search');
       });
     });
   });

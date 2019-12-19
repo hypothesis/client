@@ -4,7 +4,7 @@ const { createElement } = require('preact');
 
 const useStore = require('../store/use-store');
 
-const IconButton = require('./icon-button');
+const Button = require('./button');
 const Menu = require('./menu');
 const MenuItem = require('./menu-item');
 
@@ -37,7 +37,7 @@ function SortMenu() {
   });
 
   const menuLabel = (
-    <IconButton
+    <Button
       className="top-bar__icon-button"
       icon="sort"
       title="Sort annotations"

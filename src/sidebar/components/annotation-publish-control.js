@@ -6,7 +6,7 @@ const { createElement } = require('preact');
 const { applyTheme } = require('../util/theme');
 const { withServices } = require('../util/service-context');
 
-const ActionButton = require('./action-button');
+const Button = require('./button');
 const Menu = require('./menu');
 const MenuItem = require('./menu-item');
 
@@ -75,9 +75,9 @@ function AnnotationPublishControl({
           />
         </Menu>
       </div>
-      <ActionButton
+      <Button
         icon="cancel"
-        label="Cancel"
+        buttonText="Cancel"
         onClick={onCancel}
         useCompactStyle
       />

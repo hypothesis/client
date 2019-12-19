@@ -36,10 +36,6 @@
     font-weight: 700;
   }
 
-  &__close-btn {
-    @include buttons.action-button(0px);
-  }
-
   &__content {
     margin: 1em;
     margin-top: 0;

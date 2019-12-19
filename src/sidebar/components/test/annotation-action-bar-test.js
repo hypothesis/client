@@ -52,7 +52,7 @@ describe('AnnotationActionBar', () => {
   };
 
   const getButton = (wrapper, iconName) => {
-    return wrapper.find('IconButton').filter({ icon: iconName });
+    return wrapper.find('Button').filter({ icon: iconName });
   };
 
   beforeEach(() => {

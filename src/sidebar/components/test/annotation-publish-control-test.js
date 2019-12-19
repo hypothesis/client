@@ -191,7 +191,7 @@ describe('AnnotationPublishControl', () => {
       const wrapper = createAnnotationPublishControl({
         onCancel: fakeOnCancel,
       });
-      const cancelBtn = wrapper.find('ActionButton');
+      const cancelBtn = wrapper.find('Button');
 
       cancelBtn.props().onClick();
 
