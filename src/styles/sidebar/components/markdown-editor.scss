@@ -1,3 +1,4 @@
+@use "../../mixins/forms";
 @use "../../variables" as var;
 
 $toolbar-border: 0.1em solid var.$grey-3;
@@ -62,11 +63,15 @@ $toolbar-border: 0.1em solid var.$grey-3;
   margin-bottom: 2px; // Tweak to align help icon better with adjacent buttons
 }
 
-@media (pointer: coarse) {
-  .markdown-editor__input {
-    font-size: var.$touch-input-font-size;
-  }
+.markdown-editor__input {
+  @include forms.form-input;
 
+  min-height: 8em;
+  resize: vertical;
+  width: 100%;
+}
+
+@media (pointer: coarse) {
   .markdown-editor__toolbar {
     // Remove the padding to avoid the toolbar taking up too much space as we
     // make the buttons larger.

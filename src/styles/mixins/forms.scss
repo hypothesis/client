@@ -28,6 +28,16 @@
     0px 0px 5px var.$color-focus-shadow;
 }
 
+@mixin form-input-focus {
+  outline: none;
+  background-color: var.$white;
+
+  @include focus-outline;
+  @include placeholder {
+    color: var.$grey-5;
+  }
+}
+
 @mixin form-input {
   @include var.font-normal;
   border: 1px solid var.$grey-3;
@@ -36,15 +46,13 @@
   font-weight: normal;
   color: var.$grey-5;
   background-color: var.$grey-0;
-}
 
-@mixin form-input-focus {
-  outline: none;
-  background-color: var.$white;
+  &:focus {
+    @include form-input-focus;
+  }
 
-  @include focus-outline;
-  @include placeholder {
-    color: var.$grey-5;
+  @media (pointer: coarse) {
+    font-size: var.$touch-input-font-size;
   }
 }
 

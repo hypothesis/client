@@ -6,13 +6,6 @@
   &__input {
     @include forms.form-input;
     width: 100%;
-    &:focus {
-      @include forms.form-input-focus;
-    }
-
-    @media (pointer: coarse) {
-      font-size: var.$touch-input-font-size;
-    }
   }
 
   &__tag-list {
