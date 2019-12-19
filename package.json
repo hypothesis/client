@@ -80,7 +80,6 @@
     "loose-envify": "^1.4.0",
     "mkdirp": "^0.5.1",
     "mocha": "^6.0.0",
-    "ng-tags-input": "^3.1.1",
     "node-uuid": "^1.4.3",
     "npm-packlist": "^2.0.1",
     "postcss": "^7.0.13",
