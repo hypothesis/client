@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * @typedef Tag
  * @property {string} text - The label of the tag

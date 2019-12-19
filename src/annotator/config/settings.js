@@ -1,5 +1,3 @@
-'use strict';
-
 const configFuncSettingsFrom = require('./config-func-settings-from');
 const isBrowserExtension = require('./is-browser-extension');
 const sharedSettings = require('../../shared/settings');

@@ -1,5 +1,3 @@
-'use strict';
-
 const { Fragment, createElement, toChildArray } = require('preact');
 const propTypes = require('prop-types');
 

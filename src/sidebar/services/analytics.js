@@ -1,5 +1,3 @@
-'use strict';
-
 const VIA_REFERRER = /^https:\/\/(qa-)?via.hypothes.is\//;
 
 const events = {

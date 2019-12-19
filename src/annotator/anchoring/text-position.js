@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * Functions to convert between DOM ranges and characters offsets within the
  * `textContent` of HTML elements.

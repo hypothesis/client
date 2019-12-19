@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * Return a value from app state when it meets certain criteria.
  *

@@ -1,5 +1,3 @@
-'use strict';
-
 const Sentry = require('@sentry/browser');
 
 const warnOnce = require('../../shared/warn-once');

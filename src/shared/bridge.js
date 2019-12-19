@@ -1,5 +1,3 @@
-'use strict';
-
 const extend = require('extend');
 
 const RPC = require('./frame-rpc');

@@ -1,5 +1,3 @@
-'use strict';
-
 const angular = require('angular');
 const immutable = require('seamless-immutable');
 

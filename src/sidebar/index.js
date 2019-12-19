@@ -1,5 +1,3 @@
-'use strict';
-
 const addAnalytics = require('./ga');
 const disableOpenerForExternalLinks = require('./util/disable-opener-for-external-links');
 const { fetchConfig } = require('./util/fetch-config');

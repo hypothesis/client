@@ -1,5 +1,3 @@
-'use strict';
-
 const flash = require('../flash');
 
 describe('sidebar.flash', () => {

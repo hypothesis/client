@@ -1,5 +1,3 @@
-'use strict';
-
 const STORAGE_KEY = 'hypothesis.privacy';
 
 /**

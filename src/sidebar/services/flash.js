@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * A service for displaying "flash" notification messages.
  */

@@ -1,5 +1,3 @@
-'use strict';
-
 function orgName(group) {
   return group.organization && group.organization.name;
 }

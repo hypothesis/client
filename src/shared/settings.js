@@ -1,5 +1,3 @@
-'use strict';
-
 // `Object.assign()`-like helper. Used because this script needs to work
 // in IE 10/11 without polyfills.
 function assign(dest, src) {

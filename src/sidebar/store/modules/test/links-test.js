@@ -1,5 +1,3 @@
-'use strict';
-
 const links = require('../links');
 
 const init = links.init;

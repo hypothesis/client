@@ -3,8 +3,6 @@
  * sidebar.
  */
 
-'use strict';
-
 const { createSelector } = require('reselect');
 
 const arrayUtil = require('../../util/array');

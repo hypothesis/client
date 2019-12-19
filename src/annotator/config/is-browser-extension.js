@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * Return true if the client is from a browser extension.
  *

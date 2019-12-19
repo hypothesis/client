@@ -1,5 +1,3 @@
-'use strict';
-
 const SearchClient = require('../search-client');
 
 function awaitEvent(emitter, event) {

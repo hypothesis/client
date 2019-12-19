@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * Checkers to test which polyfills are required by the current browser.
  *

@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * This module defines the set of global events that are dispatched
  * on $rootScope

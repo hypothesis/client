@@ -1,5 +1,3 @@
-'use strict';
-
 const observable = require('./util/observable');
 
 /** Returns the selected `DOMRange` in `document`. */

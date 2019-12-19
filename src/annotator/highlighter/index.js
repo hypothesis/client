@@ -1,5 +1,3 @@
-'use strict';
-
 const domWrapHighlighter = require('./dom-wrap-highlighter');
 const overlayHighlighter = require('./overlay-highlighter');
 const features = require('../features');

@@ -1,5 +1,3 @@
-'use strict';
-
 const { requiredPolyfillSets } = require('../shared/polyfills');
 
 function injectStylesheet(doc, href) {

@@ -1,5 +1,3 @@
-'use strict';
-
 const angular = require('angular');
 
 describe('BrandingDirective', function() {

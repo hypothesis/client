@@ -1,5 +1,3 @@
-'use strict';
-
 const VirtualThreadList = require('../virtual-thread-list');
 
 describe('VirtualThreadList', function() {

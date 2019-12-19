@@ -1,5 +1,3 @@
-'use strict';
-
 const propTypes = require('prop-types');
 const { createElement } = require('preact');
 const { useEffect, useMemo, useState } = require('preact/hooks');

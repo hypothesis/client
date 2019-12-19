@@ -1,5 +1,3 @@
-'use strict';
-
 const { parseAccountID, username, isThirdPartyUser } = require('../account-id');
 
 describe('sidebar.util.account-id', function() {

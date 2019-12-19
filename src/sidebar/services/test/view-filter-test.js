@@ -1,5 +1,3 @@
-'use strict';
-
 const ViewFilter = require('../view-filter');
 
 function isoDateWithAge(age) {

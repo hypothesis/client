@@ -1,5 +1,3 @@
-'use strict';
-
 const events = require('../events');
 const metadata = require('../util/annotation-metadata');
 

@@ -1,5 +1,3 @@
-'use strict';
-
 const baseURI = require('document-base-uri');
 
 /**

@@ -1,5 +1,3 @@
-'use strict';
-
 const memoize = require('../memoize');
 
 describe('memoize', function() {

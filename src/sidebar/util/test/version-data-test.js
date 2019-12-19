@@ -1,5 +1,3 @@
-'use strict';
-
 const VersionData = require('../version-data');
 
 describe('VersionData', () => {

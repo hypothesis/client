@@ -1,5 +1,3 @@
-'use strict';
-
 const processUrlTemplate = require('../url-template');
 
 describe('processUrlTemplate', () => {

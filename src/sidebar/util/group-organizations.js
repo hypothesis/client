@@ -1,5 +1,3 @@
-'use strict';
-
 const immutable = require('seamless-immutable');
 
 // TODO: Update when this is a property available on the API response

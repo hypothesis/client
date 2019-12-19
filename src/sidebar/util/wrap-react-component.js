@@ -1,5 +1,3 @@
-'use strict';
-
 const { createElement, render } = require('preact');
 const { ServiceContext } = require('./service-context');
 

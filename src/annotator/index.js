@@ -1,5 +1,3 @@
-'use strict';
-
 const $ = require('jquery');
 
 // Load polyfill for :focus-visible pseudo-class.

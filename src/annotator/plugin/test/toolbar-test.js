@@ -1,5 +1,3 @@
-'use strict';
-
 const $ = require('jquery');
 
 const Toolbar = require('../toolbar');

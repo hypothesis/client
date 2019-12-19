@@ -1,5 +1,3 @@
-'use strict';
-
 const serviceUrlFactory = require('../service-url');
 
 /** Return a fake store object. */

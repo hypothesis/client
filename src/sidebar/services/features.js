@@ -9,8 +9,6 @@
  * change at any time and should write code accordingly. Feature flags should
  * not be cached, and should not be interrogated only at setup time.
  */
-'use strict';
-
 const events = require('../events');
 const bridgeEvents = require('../../shared/bridge-events');
 const warnOnce = require('../../shared/warn-once');

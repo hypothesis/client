@@ -1,5 +1,3 @@
-'use strict';
-
 const Permissions = require('../permissions');
 
 const userid = 'acct:flash@gord.on';

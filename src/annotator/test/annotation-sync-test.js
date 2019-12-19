@@ -1,5 +1,3 @@
-'use strict';
-
 const EventEmitter = require('tiny-emitter');
 
 const AnnotationSync = require('../annotation-sync');

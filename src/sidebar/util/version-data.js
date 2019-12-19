@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * An object representing user info
  *

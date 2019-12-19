@@ -1,5 +1,3 @@
-'use strict';
-
 const observable = require('../util/observable');
 const selections = require('../selections');
 

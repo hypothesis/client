@@ -1,5 +1,3 @@
-'use strict';
-
 const { retryPromiseOperation } = require('../util/retry');
 
 /**

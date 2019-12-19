@@ -1,5 +1,3 @@
-'use strict';
-
 const isThirdPartyService = require('../is-third-party-service');
 
 describe('sidebar.util.isThirdPartyService', () => {

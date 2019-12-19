@@ -1,5 +1,3 @@
-'use strict';
-
 /** Default state for new threads, before applying filters etc. */
 const DEFAULT_THREAD_STATE = {
   /**

@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * @const {Object} All supported options for theming and their corresponding
  *                 CSS property names (JS-style)

@@ -1,5 +1,3 @@
-'use strict';
-
 const events = require('../../events');
 const fakeReduxStore = require('../../test/fake-redux-store');
 const groups = require('../groups');

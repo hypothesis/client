@@ -1,5 +1,3 @@
-'use strict';
-
 const annotations = require('../annotations');
 const createStoreFromModules = require('../../create-store');
 const drafts = require('../drafts');

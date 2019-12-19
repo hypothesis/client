@@ -1,5 +1,3 @@
-'use strict';
-
 const { createSelector } = require('reselect');
 
 const util = require('../util');

@@ -1,5 +1,3 @@
-'use strict';
-
 const types = require('../types');
 
 const TextQuoteAnchor = types.TextQuoteAnchor;

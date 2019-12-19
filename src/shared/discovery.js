@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * Callback invoked when another frame is discovered in this window which runs
  * the Hypothesis sidebar or annotation layer code.

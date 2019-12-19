@@ -1,5 +1,3 @@
-'use strict';
-
 const { useEffect } = require('preact/hooks');
 
 const { listen } = require('../../util/dom');

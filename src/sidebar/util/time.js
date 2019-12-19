@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * Utility functions for generating formatted "fuzzy" date strings and
  * computing decaying intervals for updating those dates in a UI.

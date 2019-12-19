@@ -1,5 +1,3 @@
-'use strict';
-
 const { combineGroups } = require('../groups');
 
 describe('sidebar.util.groups', () => {

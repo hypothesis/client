@@ -1,5 +1,3 @@
-'use strict';
-
 const crossOriginRPC = require('../cross-origin-rpc');
 
 describe('crossOriginRPC', function() {

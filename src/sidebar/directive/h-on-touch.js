@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * Install an event handler on an element.
  *

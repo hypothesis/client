@@ -1,5 +1,3 @@
-'use strict';
-
 // Functions that determine which tab an annotation should be displayed in.
 
 const metadata = require('./annotation-metadata');

@@ -1,5 +1,3 @@
-'use strict';
-
 const renderMarkdown = require('../render-markdown');
 
 describe('render-markdown', function() {

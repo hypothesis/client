@@ -1,5 +1,3 @@
-'use strict';
-
 const SIDEBAR_TRIGGER_BTN_ATTR = 'data-hypothesis-trigger';
 
 /**

@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * Commands for toggling markdown formatting of a selection
  * in an input field.

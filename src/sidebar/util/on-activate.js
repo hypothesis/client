@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * Return a set of props that can be applied to a React DOM element to make
  * it activateable like a button.

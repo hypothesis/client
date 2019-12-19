@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * Functions (aka. 'operators') for generating and manipulating streams of
  * values using the Observable API.

@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * uiConstants is a set of globally used constants across the application.
  */

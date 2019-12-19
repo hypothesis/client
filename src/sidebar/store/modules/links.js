@@ -7,8 +7,6 @@
  * Used by serviceUrl.
  */
 
-'use strict';
-
 /** Return the initial links. */
 function init() {
   return null;

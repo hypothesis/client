@@ -1,5 +1,3 @@
-'use strict';
-
 const mediaEmbedder = require('../media-embedder.js');
 
 describe('media-embedder', function() {

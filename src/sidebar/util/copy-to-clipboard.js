@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * Copy the string `text` to the clipboard.
  *

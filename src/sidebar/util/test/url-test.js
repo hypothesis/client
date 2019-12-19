@@ -1,5 +1,3 @@
-'use strict';
-
 const urlUtil = require('../url');
 
 describe('sidebar/util/url', function() {

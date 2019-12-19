@@ -1,5 +1,3 @@
-'use strict';
-
 /* eslint no-console: "off" */
 
 const queryString = require('query-string');

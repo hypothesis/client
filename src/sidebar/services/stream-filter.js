@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * StreamFilter generates JSON-serializable configuration objects that
  * control which real-time updates are received from the annotation service.

@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * Sets a timeout which is linked to the lifetime of an Angular scope.
  *

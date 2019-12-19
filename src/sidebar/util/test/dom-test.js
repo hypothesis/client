@@ -1,5 +1,3 @@
-'use strict';
-
 const { listen } = require('../dom');
 
 describe('sidebar/util/dom', () => {

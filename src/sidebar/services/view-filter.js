@@ -1,5 +1,3 @@
-'use strict';
-
 const { quote } = require('../util/annotation-metadata');
 
 // Prevent Babel inserting helper code after `@ngInject` comment below which

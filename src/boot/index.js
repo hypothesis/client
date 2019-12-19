@@ -1,5 +1,3 @@
-'use strict';
-
 // This is the main entry point for the Hypothesis client in the host page
 // and the sidebar application.
 //

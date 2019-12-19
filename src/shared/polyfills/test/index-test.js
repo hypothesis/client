@@ -1,5 +1,3 @@
-'use strict';
-
 const { requiredPolyfillSets } = require('../');
 
 function stubOut(obj, property, replacement = undefined) {

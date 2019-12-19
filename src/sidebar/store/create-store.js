@@ -1,5 +1,3 @@
-'use strict';
-
 const redux = require('redux');
 // `.default` is needed because 'redux-thunk' is built as an ES2015 module
 const thunk = require('redux-thunk').default;

@@ -1,5 +1,3 @@
-'use strict';
-
 const disableOpenerForExternalLinks = require('../disable-opener-for-external-links');
 
 describe('sidebar.util.disable-opener-for-external-links', () => {

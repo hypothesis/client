@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * Watch for changes in the size (`clientWidth` and `clientHeight`) of
  * an element.

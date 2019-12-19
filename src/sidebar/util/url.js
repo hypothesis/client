@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * Replace parameters in a URL template with values from a `params` object.
  *

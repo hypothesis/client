@@ -1,5 +1,3 @@
-'use strict';
-
 const Sidebar = require('./sidebar');
 
 const DEFAULT_CONFIG = {

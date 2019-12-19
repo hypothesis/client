@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * This module contains state related to real-time updates received via the
  * WebSocket connection to h's real-time API.

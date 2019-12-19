@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * A debug utility that prints information about internal application state
  * changes to the console.

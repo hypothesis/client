@@ -1,5 +1,3 @@
-'use strict';
-
 const queryString = require('query-string');
 const uuid = require('node-uuid');
 

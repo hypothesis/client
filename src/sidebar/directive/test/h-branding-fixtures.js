@@ -1,5 +1,3 @@
-'use strict';
-// Test data for the firehose of branding combinations
 module.exports = [
   // ALL SUPPORTED PROPERTIES
   {

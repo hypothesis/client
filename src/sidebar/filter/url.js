@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * URL encode a string, dealing appropriately with null values.
  */

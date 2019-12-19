@@ -1,5 +1,3 @@
-'use strict';
-
 const warnOnce = require('../warn-once');
 
 describe('warnOnce', () => {

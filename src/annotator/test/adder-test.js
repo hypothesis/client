@@ -1,5 +1,3 @@
-'use strict';
-
 const adder = require('../adder');
 
 function rect(left, top, width, height) {

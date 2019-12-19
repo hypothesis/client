@@ -1,5 +1,3 @@
-'use strict';
-
 const isLoaded = require('../../util/frame-util').isLoaded;
 
 const FRAME_DEBOUNCE_WAIT = require('../../frame-observer').DEBOUNCE_WAIT + 10;

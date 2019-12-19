@@ -1,5 +1,3 @@
-'use strict';
-
 const redux = require('redux');
 
 /**

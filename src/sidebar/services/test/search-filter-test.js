@@ -1,5 +1,3 @@
-'use strict';
-
 const searchFilter = require('../search-filter')();
 
 describe('sidebar.search-filter', () => {

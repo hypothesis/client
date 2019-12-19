@@ -1,5 +1,3 @@
-'use strict';
-
 /* global PDFViewerApplication */
 
 const seek = require('dom-seek');

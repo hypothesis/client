@@ -1,5 +1,3 @@
-'use strict';
-
 const fixtures = require('../../test/annotation-fixtures');
 const uiConstants = require('../../ui-constants');
 const tabs = require('../tabs');

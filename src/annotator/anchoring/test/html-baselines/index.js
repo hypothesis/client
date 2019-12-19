@@ -1,5 +1,3 @@
-'use strict';
-
 // Fixtures for anchoring baseline tests. The goals of these tests are to:
 //
 // 1) Check for unexpected changes in the selectors captured when describing
