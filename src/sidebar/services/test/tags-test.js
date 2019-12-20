@@ -74,6 +74,16 @@ describe('sidebar.tags', () => {
     it('is case insensitive', () => {
       assert.deepEqual(tags.filter('Ar'), ['bar', 'argon']);
     });
+
+    it('limits tags when provided a limit value', () => {
+      assert.deepEqual(tags.filter('r', 1), ['bar']);
+      assert.deepEqual(tags.filter('r', 2), ['bar', 'future']);
+      assert.deepEqual(tags.filter('r', 3), ['bar', 'future', 'argon']);
+    });
+
+    it('does not limit tags when limit is 0', () => {
+      assert.deepEqual(tags.filter('r', 0), ['bar', 'future', 'argon']);
+    });
   });
 
   describe('#store', () => {

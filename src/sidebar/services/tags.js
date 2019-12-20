@@ -23,13 +23,22 @@ function tags(localStorage) {
    * Return a list of tag suggestions matching `query`.
    *
    * @param {string} query
+   * @param {number} limit - Optional limit of the results.
    * @return {Tag[]} List of matching tags
    */
-  function filter(query) {
+  function filter(query, limit = null) {
     const savedTags = localStorage.getObject(TAGS_LIST_KEY) || [];
-
+    let resultCount = 0;
     return savedTags.filter(e => {
-      return e.toLowerCase().indexOf(query.toLowerCase()) !== -1;
+      if (e.toLowerCase().indexOf(query.toLowerCase()) !== -1) {
+        if (Number(limit) === 0 || resultCount < limit) {
+          // limit allows a subset of the results
+          // See https://github.com/hypothesis/client/issues/1606
+          ++resultCount;
+          return true;
+        }
+      }
+      return false;
     });
   }
 

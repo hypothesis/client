@@ -307,4 +307,34 @@ describe('TagEditor', function() {
       assert.isTrue(fakeOnEditTags.calledWith({ tags: ['tag2'] }));
     });
   });
+
+  describe('filter on text input based on user agent', () => {
+    let stub = sinon.stub(navigator, 'userAgent');
+
+    afterEach(function() {
+      stub.restore();
+    });
+
+    it('calls filter when changing input with a limit of 20 when browser is Chrome', () => {
+      const wrapper = createComponent();
+      stub.get(() => 'Chrome/1.0');
+      wrapper.find('input').instance().value = 'tag';
+      typeInput(wrapper);
+
+      assert.isTrue(fakeTagsService.filter.calledTwice);
+      assert.isTrue(fakeTagsService.filter.calledWith('tag', 20));
+    });
+
+    it('does not call filter when changing input when browser is not Chrome', () => {
+      let stub = sinon.stub(navigator, 'userAgent');
+      stub.get(() => '');
+      const wrapper = createComponent();
+
+      wrapper.find('input').instance().value = 'tag';
+      typeInput(wrapper);
+
+      assert.isTrue(fakeTagsService.filter.calledOnce);
+      assert.isTrue(fakeTagsService.filter.calledWith(''));
+    });
+  });
 });
