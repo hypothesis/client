@@ -24,6 +24,7 @@ function Button({
   icon = '',
   isActive = false,
   onClick = () => null,
+  style = {},
   title,
   useCompactStyle = false,
   useInputStyle = false,
@@ -51,6 +52,7 @@ function Button({
       onClick={onClick}
       aria-pressed={isActive}
       title={title}
+      style={style}
     >
       {icon && <SvgIcon name={icon} className="button__icon" />}
       {buttonText}
@@ -107,6 +109,9 @@ Button.propTypes = {
 
   /** callback for button clicks */
   onClick: propTypes.func,
+
+  /** optional inline styling  */
+  style: propTypes.object,
 
   /**
    * `title`, used for button `title`, is required unless `buttonText` is present

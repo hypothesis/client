@@ -6,10 +6,11 @@ const { createElement } = require('preact');
 const { Fragment } = require('preact');
 
 const NewNoteBtn = require('./new-note-btn');
-const sessionUtil = require('../util/session');
 const uiConstants = require('../ui-constants');
 const useStore = require('../store/use-store');
 const { withServices } = require('../util/service-context');
+
+const SvgIcon = require('./svg-icon');
 
 /**
  *  Display name of the tab and annotation count.
@@ -72,7 +73,7 @@ Tab.propTypes = {
  *  Tabbed display of annotations and notes.
  */
 
-function SelectionTabs({ isLoading, settings, session }) {
+function SelectionTabs({ isLoading, settings }) {
   const selectedTab = useStore(store => store.getState().selection.selectedTab);
   const noteCount = useStore(store => store.noteCount());
   const annotationCount = useStore(store => store.annotationCount());
@@ -100,10 +101,6 @@ function SelectionTabs({ isLoading, settings, session }) {
 
   const showNotesUnavailableMessage =
     selectedTab === uiConstants.TAB_NOTES && noteCount === 0;
-
-  const showSidebarTutorial = sessionUtil.shouldShowSidebarTutorial(
-    session.state
-  );
 
   return (
     <Fragment>
@@ -146,32 +143,23 @@ function SelectionTabs({ isLoading, settings, session }) {
       {selectedTab === uiConstants.TAB_NOTES &&
         settings.enableExperimentalNewNoteButton && <NewNoteBtn />}
       {!isLoading && (
-        <div className="selection-tabs__empty-message">
+        <div>
           {showNotesUnavailableMessage && (
-            <div className="annotation-unavailable-message">
-              <p className="annotation-unavailable-message__label">
-                There are no page notes in this group.
-                {settings.enableExperimentalNewNoteButton &&
-                  !showSidebarTutorial && (
-                    <div className="annotation-unavailable-message__tutorial">
-                      Create one by clicking the{' '}
-                      <i className="help-icon h-icon-note" /> button.
-                    </div>
-                  )}
-              </p>
+            <div className="selection-tabs__message">
+              There are no page notes in this group.
             </div>
           )}
           {showAnnotationsUnavailableMessage && (
-            <div className="annotation-unavailable-message">
-              <p className="annotation-unavailable-message__label">
-                There are no annotations in this group.
-                {!showSidebarTutorial && (
-                  <div className="annotation-unavailable-message__tutorial">
-                    Create one by selecting some text and clicking the{' '}
-                    <i className="help-icon h-icon-annotate" /> button.
-                  </div>
-                )}
-              </p>
+            <div className="selection-tabs__message">
+              There are no annotations in this group.
+              <br />
+              Create one by selecting some text and clicking the{' '}
+              <SvgIcon
+                name="annotate"
+                inline="true"
+                className="selection-tabs__icon"
+              />{' '}
+              button.
             </div>
           )}
         </div>
@@ -187,9 +175,8 @@ SelectionTabs.propTypes = {
 
   // Injected services.
   settings: propTypes.object.isRequired,
-  session: propTypes.object.isRequired,
 };
 
-SelectionTabs.injectedProps = ['session', 'settings'];
+SelectionTabs.injectedProps = ['settings'];
 
 module.exports = withServices(SelectionTabs);
