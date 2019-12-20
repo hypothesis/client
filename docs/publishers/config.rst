@@ -406,8 +406,9 @@ loads.
       return {
         focus: {
           user: {
-            // required
+            // required (username or userid)
             username: "foobar1234",
+            userid: 'acct:foobar1234@domain',
             // optional
             displayName: "Foo Bar",
           }
