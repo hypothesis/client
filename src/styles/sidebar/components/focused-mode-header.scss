@@ -9,7 +9,6 @@
 
   &__btn {
     @include forms.primary-action-btn;
-    @include focus.outline-on-keyboard-focus;
     display: flex;
     margin-left: auto;
     height: 30px;
