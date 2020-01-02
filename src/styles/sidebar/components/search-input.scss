@@ -1,4 +1,4 @@
-@use "../../mixins/focus";
+@use "../../mixins/forms";
 @use "../../variables" as var;
 
 .search-input__form {
@@ -14,17 +14,16 @@
 }
 
 .search-input__input {
-  @include focus.outline-on-keyboard-focus;
+  @include forms.form-input;
 
   flex-grow: 1;
   order: 1;
 
-  color: var.$text-color;
-
   // Disable default browser styling for the input.
-  border: none;
-  padding: 0px;
-  width: 100%;
+  &:not(:focus) {
+    border: none;
+    padding: 0px;
+  }
 
   // The search box expands when focused, via a change in the
   // `max-width` property.
@@ -43,11 +42,5 @@
   &.is-expanded {
     max-width: 150px;
     padding-left: 6px;
-  }
-}
-
-@media (pointer: coarse) {
-  .search-input__input {
-    font-size: var.$touch-input-font-size;
   }
 }

@@ -5,15 +5,4 @@
   @include forms.form-input;
   width: 100%;
   display: block;
-
-  &:focus,
-  &.js-focus {
-    @include forms.form-input-focus;
-  }
-}
-
-.form-textarea {
-  min-height: 8em;
-  max-width: 100%;
-  resize: vertical;
 }

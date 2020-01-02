@@ -6,9 +6,6 @@
   &__input {
     @include forms.form-input;
     width: 100%;
-    &:focus {
-      @include forms.form-input-focus;
-    }
   }
 
   &__tag-list {
