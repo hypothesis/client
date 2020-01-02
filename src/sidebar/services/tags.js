@@ -26,12 +26,13 @@ function tags(localStorage) {
    * @param {number} limit - Optional limit of the results.
    * @return {Tag[]} List of matching tags
    */
-  function filter(query, limit = null) {
+  function filter(query, limit = 0) {
+    const limitNumber = Number(limit); // ensures we are dealing with a number
     const savedTags = localStorage.getObject(TAGS_LIST_KEY) || [];
     let resultCount = 0;
     return savedTags.filter(e => {
       if (e.toLowerCase().indexOf(query.toLowerCase()) !== -1) {
-        if (Number(limit) === 0 || resultCount < limit) {
+        if (limitNumber === 0 || resultCount < limitNumber) {
           // limit allows a subset of the results
           // See https://github.com/hypothesis/client/issues/1606
           ++resultCount;
