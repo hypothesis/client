@@ -57,7 +57,7 @@ const icons = {
  * This matches the way we do icons on the website, see
  * https://github.com/hypothesis/h/pull/3675
  */
-function SvgIcon({ name, className = '', inline = false }) {
+function SvgIcon({ name, className = '', inline = false, title = '' }) {
   if (!icons[name]) {
     throw new Error(`Unknown icon ${name}`);
   }
@@ -66,12 +66,17 @@ function SvgIcon({ name, className = '', inline = false }) {
   const element = useRef();
   useLayoutEffect(() => {
     const svg = element.current.querySelector('svg');
+    const svgTitle = svg.querySelector('title');
     svg.setAttribute('class', className);
+    if (title && svgTitle) {
+      svgTitle.innerHTML = title;
+    }
   }, [
     className,
     // `markup` is a dependency of this effect because the SVG is replaced if
     // it changes.
     markup,
+    title,
   ]);
 
   return (
@@ -92,6 +97,8 @@ SvgIcon.propTypes = {
 
   /** Apply a style allowing for inline display of icon wrapper */
   inline: propTypes.bool,
+
+  title: propTypes.string,
 };
 
 module.exports = SvgIcon;
