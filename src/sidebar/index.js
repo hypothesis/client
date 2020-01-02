@@ -119,10 +119,6 @@ function startAngularApp(config) {
       // via module.exports
       require('angular-route'),
       require('angular-toastr'),
-
-      // Angular addons which do not export the Angular module
-      // name via module.exports
-      ['ngTagsInput', require('ng-tags-input')][0],
     ])
 
     // The root component for the application
