@@ -46,13 +46,14 @@ function MenuItem({
 
   const hasLeftIcon = icon || isSubmenuItem;
   const hasRightIcon = icon && isSubmenuItem;
+  const iconTitle = typeof label === 'string' && label;
 
   let renderedIcon = null;
   if (icon !== 'blank') {
     renderedIcon = iconIsUrl ? (
       <img className={iconClass} alt={iconAlt} src={icon} />
     ) : (
-      <SvgIcon name={icon} className="menu-item__icon" />
+      <SvgIcon name={icon} className="menu-item__icon" title={iconTitle} />
     );
   }
   const leftIcon = isSubmenuItem ? null : renderedIcon;
