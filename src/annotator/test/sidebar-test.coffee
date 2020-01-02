@@ -7,7 +7,7 @@ DEFAULT_HEIGHT = 600
 EXTERNAL_CONTAINER_SELECTOR = 'test-external-container'
 
 describe 'Sidebar', ->
-  sandbox = sinon.sandbox.create()
+  sandbox = sinon.createSandbox()
   CrossFrame = null
   fakeCrossFrame = null
   sidebarConfig = {pluginClasses: {}}

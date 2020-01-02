@@ -39,7 +39,7 @@ describe('sidebar.components.sidebar-content', function() {
 
   beforeEach(() => {
     angular.mock.module(function($provide) {
-      sandbox = sinon.sandbox.create();
+      sandbox = sinon.createSandbox();
 
       fakeAnalytics = {
         track: sandbox.stub(),

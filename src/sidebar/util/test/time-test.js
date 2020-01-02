@@ -12,7 +12,7 @@ describe('sidebar.util.time', function() {
   let fakeIntl;
 
   beforeEach(function() {
-    sandbox = sinon.sandbox.create();
+    sandbox = sinon.createSandbox();
     sandbox.useFakeTimers();
 
     fakeIntl = {

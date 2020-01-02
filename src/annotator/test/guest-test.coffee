@@ -43,7 +43,7 @@ timeoutPromise = (millis = 0) ->
   new Promise((resolve) -> setTimeout(resolve, millis))
 
 describe 'Guest', ->
-  sandbox = sinon.sandbox.create()
+  sandbox = sinon.createSandbox()
   CrossFrame = null
   fakeCrossFrame = null
   highlighter = null

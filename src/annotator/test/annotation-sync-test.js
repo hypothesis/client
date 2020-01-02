@@ -9,7 +9,7 @@ describe('AnnotationSync', function() {
   let fakeBridge;
   let options;
   let publish;
-  const sandbox = sinon.sandbox.create();
+  const sandbox = sinon.createSandbox();
 
   beforeEach(function() {
     const emitter = new EventEmitter();

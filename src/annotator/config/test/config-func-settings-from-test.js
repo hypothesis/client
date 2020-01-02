@@ -3,7 +3,7 @@
 const configFuncSettingsFrom = require('../config-func-settings-from');
 
 describe('annotator.config.configFuncSettingsFrom', function() {
-  const sandbox = sinon.sandbox.create();
+  const sandbox = sinon.createSandbox();
 
   afterEach('reset the sandbox', function() {
     sandbox.restore();

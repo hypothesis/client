@@ -6,7 +6,7 @@ const immutable = require('seamless-immutable');
 const events = require('../../events');
 
 describe('annotationMapper', function() {
-  const sandbox = sinon.sandbox.create();
+  const sandbox = sinon.createSandbox();
   let $rootScope;
   let store;
   let fakeApi;

@@ -4,7 +4,7 @@ const Bridge = require('../bridge');
 const RPC = require('../frame-rpc');
 
 describe('shared.bridge', function() {
-  const sandbox = sinon.sandbox.create();
+  const sandbox = sinon.createSandbox();
   let bridge;
   let createChannel;
   let fakeWindow;

@@ -12,7 +12,7 @@ describe('h:features - sidebar layer', function() {
   let sandbox;
 
   beforeEach(function() {
-    sandbox = sinon.sandbox.create();
+    sandbox = sinon.createSandbox();
 
     fakeBridge = {
       call: sinon.stub(),

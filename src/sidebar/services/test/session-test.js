@@ -27,7 +27,7 @@ describe('sidebar.session', function() {
   });
 
   beforeEach(function() {
-    sandbox = sinon.sandbox.create();
+    sandbox = sinon.createSandbox();
 
     let state = {};
     fakeAnalytics = {

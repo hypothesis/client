@@ -38,7 +38,7 @@ describe('sidebar.components.hypothesis-app', function() {
   };
 
   beforeEach(function() {
-    sandbox = sinon.sandbox.create();
+    sandbox = sinon.createSandbox();
   });
 
   beforeEach(function() {
