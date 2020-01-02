@@ -6,6 +6,7 @@ const { createElement } = require('preact');
 const AnnotationDocumentInfo = require('./annotation-document-info');
 const AnnotationShareInfo = require('./annotation-share-info');
 const AnnotationUser = require('./annotation-user');
+const SvgIcon = require('./svg-icon');
 const Timestamp = require('./timestamp');
 
 /**
@@ -64,9 +65,10 @@ function AnnotationHeader({
         <AnnotationShareInfo annotation={annotation} isPrivate={isPrivate} />
         {!isEditing && isHighlight && (
           <div className="annotation-header__highlight">
-            <i
-              className="h-icon-border-color"
+            <SvgIcon
+              name="highlight"
               title="This is a highlight. Click 'edit' to add a note or tag."
+              className="annotation-header__highlight-icon"
             />
           </div>
         )}
