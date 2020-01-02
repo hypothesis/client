@@ -120,6 +120,7 @@ function ToolbarButton({
         <SvgIcon
           name={iconName}
           className="markdown-editor__toolbar-button-icon"
+          title={tooltip}
         />
       )}
       {label}

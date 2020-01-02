@@ -48,7 +48,7 @@ function AnnotationActionBar({
       {showDeleteAction && (
         <Button icon="trash" title="Delete" onClick={onDelete} />
       )}
-      <Button icon="reply" title="Reply" onClick={onReply} />
+      <Button icon="reply" title="Reply to this annotation" onClick={onReply} />
       {showShareAction && (
         <AnnotationShareControl
           group={annotationGroup}

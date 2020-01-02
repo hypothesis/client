@@ -20,7 +20,7 @@ function ShareLink({ iconName, title, uri, onClick }) {
         target="_blank"
         rel="noopener noreferrer"
       >
-        <SvgIcon name={iconName} className="share-links__icon" />
+        <SvgIcon name={iconName} className="share-links__icon" title={title} />
       </a>
     </li>
   );

@@ -33,7 +33,11 @@ function AnnotationShareInfo({ annotation, isPrivate }) {
           {group.type === 'open' ? (
             <SvgIcon className="annotation-share-info__icon" name="public" />
           ) : (
-            <SvgIcon className="annotation-share-info__icon" name="groups" />
+            <SvgIcon
+              className="annotation-share-info__icon"
+              name="groups"
+              title={group.name}
+            />
           )}
           <span className="annotation-share-info__group-info">
             {group.name}
@@ -46,7 +50,11 @@ function AnnotationShareInfo({ annotation, isPrivate }) {
           title="This annotation is visible only to you."
         >
           {/* Show the lock icon in all cases when the annotation is private... */}
-          <SvgIcon className="annotation-share-info__icon" name="lock" />
+          <SvgIcon
+            className="annotation-share-info__icon"
+            name="lock"
+            title="Only me"
+          />
           {/* but only render the "Only Me" text if we're not showing/linking a group name */}
           {!linkToGroup && (
             <span className="annotation-share-info__private-info">Only me</span>

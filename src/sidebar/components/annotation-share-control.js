@@ -84,7 +84,11 @@ function AnnotationShareControl({
 
   return (
     <div className="annotation-share-control" ref={shareRef}>
-      <Button icon="share" title="Share" onClick={toggleSharePanel} />
+      <Button
+        icon="share"
+        title="Share this annotation"
+        onClick={toggleSharePanel}
+      />
       {isOpen && (
         <div className="annotation-share-panel">
           <div className="annotation-share-panel__header">
