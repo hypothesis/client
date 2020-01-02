@@ -10,7 +10,7 @@ describe 'CrossFrame', ->
   proxyBridge = null
   proxyAnnotationSync = null
 
-  sandbox = sinon.sandbox.create()
+  sandbox = sinon.createSandbox()
 
   createCrossFrame = (options) ->
     defaults =

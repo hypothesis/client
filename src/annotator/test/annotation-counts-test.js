@@ -12,7 +12,7 @@ describe('annotationCounts', function() {
   beforeEach(function() {
     CrossFrame = null;
     fakeCrossFrame = {};
-    sandbox = sinon.sandbox.create();
+    sandbox = sinon.createSandbox();
 
     countEl1 = document.createElement('button');
     countEl1.setAttribute('data-hypothesis-annotation-count', '');

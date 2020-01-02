@@ -1,7 +1,7 @@
 Host = require('../host')
 
 describe 'Host', ->
-  sandbox = sinon.sandbox.create()
+  sandbox = sinon.createSandbox()
   CrossFrame = null
   fakeCrossFrame = null
   hostConfig = {pluginClasses: {}}

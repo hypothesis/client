@@ -2,7 +2,7 @@
 
 const settings = require('../settings');
 
-const sandbox = sinon.sandbox.create();
+const sandbox = sinon.createSandbox();
 
 describe('settings', function() {
   afterEach('reset the sandbox', function() {

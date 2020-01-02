@@ -14,7 +14,7 @@ describe('CrossFrame multi-frame scenario', function() {
   let crossFrame;
   let options;
 
-  const sandbox = sinon.sandbox.create();
+  const sandbox = sinon.createSandbox();
 
   const waitForFrameObserver = function(cb) {
     return setTimeout(cb, FRAME_DEBOUNCE_WAIT);
