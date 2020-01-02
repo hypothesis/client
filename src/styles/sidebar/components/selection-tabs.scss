@@ -48,3 +48,17 @@
 .selection-tabs__type--orphan {
   margin-left: -5px;
 }
+
+.selection-tabs__message {
+  border: 1px solid var.$grey-3;
+  padding: 3em;
+  text-align: center;
+}
+
+.selection-tabs__icon {
+  width: 12px;
+  height: 12px;
+  margin-right: 1px;
+  margin-bottom: -1px; // Pull the icon a little toward the baseline
+  color: var.$grey-5;
+}

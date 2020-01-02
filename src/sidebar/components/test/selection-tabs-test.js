@@ -9,7 +9,6 @@ const mockImportedComponents = require('./mock-imported-components');
 
 describe('SelectionTabs', function() {
   // mock services
-  let fakeSession;
   let fakeSettings;
   let fakeStore;
 
@@ -20,23 +19,11 @@ describe('SelectionTabs', function() {
 
   function createComponent(props) {
     return mount(
-      <SelectionTabs
-        session={fakeSession}
-        settings={fakeSettings}
-        {...defaultProps}
-        {...props}
-      />
+      <SelectionTabs settings={fakeSettings} {...defaultProps} {...props} />
     );
   }
 
   beforeEach(() => {
-    fakeSession = {
-      state: {
-        preferences: {
-          show_sidebar_tutorial: false,
-        },
-      },
-    };
     fakeSettings = {
       enableExperimentalNewNoteButton: false,
     };
@@ -65,7 +52,7 @@ describe('SelectionTabs', function() {
   });
 
   const unavailableMessage = wrapper =>
-    wrapper.find('.annotation-unavailable-message__label').text();
+    wrapper.find('.selection-tabs__message').text();
 
   context('displays selection tabs and counts', function() {
     it('should display the tabs and counts of annotations and notes', function() {
@@ -172,7 +159,7 @@ describe('SelectionTabs', function() {
       const wrapper = createComponent({
         isLoading: true,
       });
-      assert.isFalse(wrapper.exists('.annotation-unavailable-message__label'));
+      assert.isFalse(wrapper.exists('.selection-tabs__message'));
     });
 
     it('should not display the longer version of the no annotations message when there are no annotations and isWaitingToAnchorAnnotations is true', function() {
@@ -181,7 +168,7 @@ describe('SelectionTabs', function() {
       const wrapper = createComponent({
         isLoading: false,
       });
-      assert.isFalse(wrapper.exists('.annotation-unavailable-message__label'));
+      assert.isFalse(wrapper.exists('.selection-tabs__message'));
     });
 
     it('should display the longer version of the no notes message when there are no notes', function() {
@@ -196,24 +183,6 @@ describe('SelectionTabs', function() {
       );
     });
 
-    it('should display the prompt to create a note when there are no notes and enableExperimentalNewNoteButton is true', function() {
-      fakeSettings.enableExperimentalNewNoteButton = true;
-      fakeStore.getState.returns({
-        selection: { selectedTab: uiConstants.TAB_NOTES },
-      });
-      fakeStore.noteCount.returns(0);
-      const wrapper = createComponent({});
-      assert.include(
-        wrapper.find('.annotation-unavailable-message__tutorial').text(),
-        'Create one by clicking the'
-      );
-      assert.isTrue(
-        wrapper
-          .find('.annotation-unavailable-message__tutorial i')
-          .hasClass('h-icon-note')
-      );
-    });
-
     it('should display the longer version of the no annotations message when there are no annotations', function() {
       fakeStore.annotationCount.returns(0);
       const wrapper = createComponent({});
@@ -222,49 +191,9 @@ describe('SelectionTabs', function() {
         'There are no annotations in this group.'
       );
       assert.include(
-        wrapper.find('.annotation-unavailable-message__tutorial').text(),
+        unavailableMessage(wrapper),
         'Create one by selecting some text and clicking the'
       );
-      assert.isTrue(
-        wrapper
-          .find('.annotation-unavailable-message__tutorial i')
-          .hasClass('h-icon-annotate')
-      );
-    });
-
-    context('when the sidebar tutorial is displayed', function() {
-      it('should display the shorter version of the no notes message when there are no notes', function() {
-        fakeSession.state.preferences.show_sidebar_tutorial = true;
-        fakeStore.getState.returns({
-          selection: { selectedTab: uiConstants.TAB_NOTES },
-        });
-        fakeStore.noteCount.returns(0);
-        const wrapper = createComponent({});
-
-        const msg = unavailableMessage(wrapper);
-
-        assert.include(msg, 'There are no page notes in this group.');
-        assert.notInclude(msg, 'Create one by clicking the');
-        assert.notInclude(
-          msg,
-          'Create one by selecting some text and clicking the'
-        );
-      });
-
-      it('should display the shorter version of the no annotations message when there are no annotations', function() {
-        fakeSession.state.preferences.show_sidebar_tutorial = true;
-        fakeStore.annotationCount.returns(0);
-        const wrapper = createComponent({});
-
-        const msg = unavailableMessage(wrapper);
-
-        assert.include(msg, 'There are no annotations in this group.');
-        assert.notInclude(msg, 'Create one by clicking the');
-        assert.notInclude(
-          msg,
-          'Create one by selecting some text and clicking the'
-        );
-      });
     });
   });
 });

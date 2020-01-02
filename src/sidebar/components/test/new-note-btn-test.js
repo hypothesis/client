@@ -2,6 +2,7 @@
 
 const { mount } = require('enzyme');
 const { createElement } = require('preact');
+const { act } = require('preact/test-utils');
 
 const events = require('../../events');
 const NewNoteButton = require('../new-note-btn');
@@ -49,22 +50,22 @@ describe('NewNoteButton', function() {
     NewNoteButton.$imports.$restore();
   });
 
-  it('creates the component', () => {
+  it("sets a backgroundColor equal to the setting's ctaBackgroundColor color", () => {
     const wrapper = createComponent();
-    assert.include(wrapper.text(), 'New note');
-  });
-
-  it("has a backgroundColor equal to the setting's ctaBackgroundColor color", () => {
-    const wrapper = createComponent().find('button');
     assert.equal(
-      wrapper.prop('style').backgroundColor,
+      wrapper.find('Button').prop('style').backgroundColor,
       fakeSettings.branding.ctaBackgroundColor
     );
   });
 
   it('should broadcast BEFORE_ANNOTATION_CREATED event when the new note button is clicked', () => {
     const wrapper = createComponent();
-    wrapper.find('button').simulate('click');
+    act(() => {
+      wrapper
+        .find('Button')
+        .props()
+        .onClick();
+    });
     const topLevelFrame = fakeStore.frames().find(f => !f.id);
     assert.calledWith(
       fakeRootScope.$broadcast,

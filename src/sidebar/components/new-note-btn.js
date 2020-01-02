@@ -8,6 +8,8 @@ const useStore = require('../store/use-store');
 const { applyTheme } = require('../util/theme');
 const { withServices } = require('../util/service-context');
 
+const Button = require('./button');
+
 function NewNoteButton({ $rootScope, settings }) {
   const store = useStore(store => ({
     frames: store.frames(),
@@ -23,13 +25,16 @@ function NewNoteButton({ $rootScope, settings }) {
   };
 
   return (
-    <button
-      style={applyTheme(['ctaBackgroundColor'], settings)}
-      className="new-note__create"
-      onClick={onNewNoteBtnClick}
-    >
-      + New note
-    </button>
+    <div className="new-note-button">
+      <Button
+        buttonText="New note"
+        icon="add"
+        onClick={onNewNoteBtnClick}
+        style={applyTheme(['ctaBackgroundColor'], settings)}
+        useCompactStyle
+        usePrimaryStyle
+      />
+    </div>
   );
 }
 NewNoteButton.propTypes = {
