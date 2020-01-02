@@ -54,7 +54,7 @@ function Button({
       title={title}
       style={style}
     >
-      {icon && <SvgIcon name={icon} className="button__icon" />}
+      {icon && <SvgIcon name={icon} className="button__icon" title={title} />}
       {buttonText}
     </button>
   );
