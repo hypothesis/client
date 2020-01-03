@@ -10,6 +10,7 @@ const icons = {
   'arrow-left': require('../../images/icons/arrow-left.svg'),
   'arrow-right': require('../../images/icons/arrow-right.svg'),
   cancel: require('../../images/icons/cancel.svg'),
+  'caret-right': require('../../images/icons/caret-right.svg'),
   'cc-std': require('../../images/icons/cc-std.svg'),
   'cc-zero': require('../../images/icons/cc-zero.svg'),
   'collapse-menu': require('../../images/icons/collapse-menu.svg'),
