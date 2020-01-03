@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * Return true if `value` "looks like" a React/Preact component.
  */

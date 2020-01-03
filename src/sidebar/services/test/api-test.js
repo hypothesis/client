@@ -1,5 +1,3 @@
-'use strict';
-
 const fetchMock = require('fetch-mock');
 
 const apiFactory = require('../api');

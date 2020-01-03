@@ -1,5 +1,3 @@
-'use strict';
-
 let loaded = false;
 
 module.exports = function(trackingId) {

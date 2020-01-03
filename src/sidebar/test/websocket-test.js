@@ -1,5 +1,3 @@
-'use strict';
-
 const Socket = require('../websocket');
 
 describe('websocket wrapper', function() {

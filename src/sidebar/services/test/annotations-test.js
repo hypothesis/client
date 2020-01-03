@@ -1,5 +1,3 @@
-'use strict';
-
 const annotations = require('../annotations');
 const EventEmitter = require('tiny-emitter');
 

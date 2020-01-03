@@ -1,5 +1,3 @@
-'use strict';
-
 const getApiUrl = require('../get-api-url');
 
 describe('sidebar.getApiUrl', function() {

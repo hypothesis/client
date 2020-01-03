@@ -1,5 +1,3 @@
-'use strict';
-
 const groupListItemCommon = require('../group-list-item-common');
 
 const { events } = require('../../services/analytics');

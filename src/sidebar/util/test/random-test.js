@@ -1,5 +1,3 @@
-'use strict';
-
 const random = require('../random');
 
 describe('sidebar.util.random', () => {

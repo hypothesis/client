@@ -1,5 +1,3 @@
-'use strict';
-
 const settingsFrom = require('../settings');
 
 describe('annotator.config.settingsFrom', function() {

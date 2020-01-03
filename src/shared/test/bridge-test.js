@@ -1,5 +1,3 @@
-'use strict';
-
 const Bridge = require('../bridge');
 const RPC = require('../frame-rpc');
 

@@ -1,5 +1,3 @@
-'use strict';
-
 const immutable = require('seamless-immutable');
 
 const drafts = require('../drafts');

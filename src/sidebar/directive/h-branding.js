@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * The BrandingDirective brings theming configuration to our sidebar
  * by allowing the branding hypothesis settings to be reflected on items

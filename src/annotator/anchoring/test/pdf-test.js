@@ -1,5 +1,3 @@
-'use strict';
-
 const domAnchorTextQuote = require('dom-anchor-text-quote');
 
 const FakePDFViewerApplication = require('./fake-pdf-viewer-application');

@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * Attach listeners for one or multiple events to an element and return a
  * function that removes the listeners.

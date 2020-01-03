@@ -1,5 +1,3 @@
-'use strict';
-
 const fetchMock = require('fetch-mock');
 const { stringify } = require('query-string');
 const sinon = require('sinon');

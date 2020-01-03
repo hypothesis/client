@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * Fake implementation of the parts of PDF.js that the Hypothesis client's
  * anchoring interacts with.

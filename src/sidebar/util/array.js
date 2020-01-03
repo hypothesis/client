@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * Return the number of elements in `ary` for which `predicate` returns true.
  *

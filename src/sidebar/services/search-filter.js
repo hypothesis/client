@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * Splits a search term into filter and data.
  *

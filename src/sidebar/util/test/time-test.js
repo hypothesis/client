@@ -1,5 +1,3 @@
-'use strict';
-
 const time = require('../time');
 
 const second = 1000;

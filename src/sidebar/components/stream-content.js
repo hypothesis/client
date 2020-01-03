@@ -1,5 +1,3 @@
-'use strict';
-
 // @ngInject
 function StreamContentController(
   $scope,

@@ -1,5 +1,3 @@
-'use strict';
-
 const observable = require('../observable');
 
 describe('observable', function() {

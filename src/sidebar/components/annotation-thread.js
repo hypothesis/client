@@ -1,5 +1,3 @@
-'use strict';
-
 function hiddenCount(thread) {
   const isHidden = thread.annotation && !thread.visible;
   return thread.children.reduce(

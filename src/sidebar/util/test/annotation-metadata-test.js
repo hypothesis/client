@@ -1,5 +1,3 @@
-'use strict';
-
 const annotationMetadata = require('../annotation-metadata');
 const fixtures = require('../../test/annotation-fixtures');
 

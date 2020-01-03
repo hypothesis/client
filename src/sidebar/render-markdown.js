@@ -1,5 +1,3 @@
-'use strict';
-
 const createDOMPurify = require('dompurify');
 const escapeHtml = require('escape-html');
 const katex = require('katex');

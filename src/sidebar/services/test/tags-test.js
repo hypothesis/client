@@ -1,5 +1,3 @@
-'use strict';
-
 const angular = require('angular');
 
 const TAGS_LIST_KEY = 'hypothesis.user.tags.list';

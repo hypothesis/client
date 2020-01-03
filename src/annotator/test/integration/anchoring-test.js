@@ -1,8 +1,6 @@
 // Tests that the expected parts of the page are highlighted when annotations
 // with various combinations of selector are anchored.
 
-'use strict';
-
 const Guest = require('../../guest');
 
 function quoteSelector(quote) {

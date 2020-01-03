@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * A simple memoization function which caches the last result of
  * a single-argument function.

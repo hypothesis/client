@@ -1,5 +1,3 @@
-'use strict';
-
 const unicode = require('../unicode')();
 
 describe('unicode', () => {

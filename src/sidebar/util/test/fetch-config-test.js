@@ -1,5 +1,3 @@
-'use strict';
-
 const {
   assertPromiseIsRejected,
 } = require('../../../shared/test/promise-util');

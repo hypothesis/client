@@ -1,5 +1,3 @@
-'use strict';
-
 const STORAGE_KEY = 'hypothesis.groups.focus';
 const DEFAULT_ORG_ID = '__default__';
 

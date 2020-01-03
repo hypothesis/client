@@ -1,5 +1,3 @@
-'use strict';
-
 const retryUtil = require('../retry');
 const toResult = require('../../../shared/test/promise-util').toResult;
 

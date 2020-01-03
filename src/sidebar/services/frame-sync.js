@@ -1,5 +1,3 @@
-'use strict';
-
 const debounce = require('lodash.debounce');
 
 const events = require('../events');

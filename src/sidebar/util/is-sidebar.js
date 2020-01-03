@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * Is the instance of the application in the current `window_` within a
  * sidebar (vs. single-annotation or stream view)?

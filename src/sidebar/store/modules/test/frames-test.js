@@ -1,5 +1,3 @@
-'use strict';
-
 const frames = require('../frames');
 const createStore = require('../../create-store');
 

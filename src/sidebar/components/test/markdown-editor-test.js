@@ -1,5 +1,3 @@
-'use strict';
-
 const { createElement, render } = require('preact');
 const { act } = require('preact/test-utils');
 const { mount } = require('enzyme');

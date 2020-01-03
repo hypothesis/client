@@ -1,5 +1,3 @@
-'use strict';
-
 const retry = require('retry');
 const EventEmitter = require('tiny-emitter');
 

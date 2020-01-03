@@ -1,5 +1,3 @@
-'use strict';
-
 const angular = require('angular');
 const { Component, createElement } = require('preact');
 const { useContext } = require('preact/hooks');

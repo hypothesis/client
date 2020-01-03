@@ -1,5 +1,3 @@
-'use strict';
-
 const apiRoutesFactory = require('../api-routes');
 
 // Abridged version of the response returned by https://hypothes.is/api,

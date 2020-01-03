@@ -1,5 +1,3 @@
-'use strict';
-
 const { normalizeURI } = require('../url');
 
 describe('annotator.util.url', () => {

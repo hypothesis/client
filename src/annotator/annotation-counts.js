@@ -1,5 +1,3 @@
-'use strict';
-
 const events = require('../shared/bridge-events');
 
 const ANNOTATION_COUNT_ATTR = 'data-hypothesis-annotation-count';

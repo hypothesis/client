@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * Extract the protocol and hostname (ie. host without port) from the URL.
  *

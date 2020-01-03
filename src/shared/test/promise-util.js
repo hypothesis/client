@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * Helper to assert a promise is rejected.
  *

@@ -1,5 +1,3 @@
-'use strict';
-
 const events = require('../events');
 const { parseAccountID } = require('../util/account-id');
 const serviceConfig = require('../service-config');

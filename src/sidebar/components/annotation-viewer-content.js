@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * Fetch all annotations in the same thread as `id`.
  *

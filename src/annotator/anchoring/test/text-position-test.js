@@ -1,5 +1,3 @@
-'use strict';
-
 const { toRange } = require('../text-position');
 
 describe('text-position', () => {

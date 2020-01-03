@@ -1,5 +1,3 @@
-'use strict';
-
 const { mount } = require('enzyme');
 const { createStore } = require('redux');
 const { createElement } = require('preact');

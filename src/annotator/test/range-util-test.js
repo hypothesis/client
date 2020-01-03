@@ -1,5 +1,3 @@
-'use strict';
-
 const rangeUtil = require('../range-util');
 
 function createRange(node, start, end) {

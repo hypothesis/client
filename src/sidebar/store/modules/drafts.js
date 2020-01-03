@@ -1,5 +1,3 @@
-'use strict';
-
 const metadata = require('../../util/annotation-metadata');
 const util = require('../util');
 

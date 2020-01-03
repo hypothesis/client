@@ -1,5 +1,3 @@
-'use strict';
-
 const classnames = require('classnames');
 const { Fragment, createElement } = require('preact');
 const { useCallback, useEffect, useRef, useState } = require('preact/hooks');

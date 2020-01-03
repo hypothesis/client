@@ -1,7 +1,5 @@
 /* global process */
 
-'use strict';
-
 /* global __dirname */
 
 const path = require('path');

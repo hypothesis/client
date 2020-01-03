@@ -1,5 +1,3 @@
-'use strict';
-
 const urlUtil = require('../util/url');
 
 /**

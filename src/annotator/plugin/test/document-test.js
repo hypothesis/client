@@ -1,5 +1,3 @@
-'use strict';
-
 /*
  ** Adapted from:
  ** https://github.com/openannotation/annotator/blob/v1.2.x/test/spec/plugin/document_spec.coffee

@@ -14,8 +14,6 @@
  * @property {string} displayName - User's display name
  */
 
-'use strict';
-
 const { createSelector } = require('reselect');
 const immutable = require('seamless-immutable');
 

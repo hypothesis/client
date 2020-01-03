@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * Fallback in-memory store if `localStorage` is not read/writable.
  */

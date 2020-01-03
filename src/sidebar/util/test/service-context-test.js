@@ -1,5 +1,3 @@
-'use strict';
-
 const { mount } = require('enzyme');
 const propTypes = require('prop-types');
 const { createElement, render } = require('preact');

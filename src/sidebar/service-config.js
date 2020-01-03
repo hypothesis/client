@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * Return the configuration for the annotation service which the client would retrieve
  * annotations from which may contain the authority, grantToken and icon.

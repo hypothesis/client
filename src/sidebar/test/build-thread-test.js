@@ -1,5 +1,3 @@
-'use strict';
-
 const buildThread = require('../build-thread');
 const metadata = require('../util/annotation-metadata');
 

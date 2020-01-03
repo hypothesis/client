@@ -1,5 +1,3 @@
-'use strict';
-
 // ES2015
 //
 // nb. The imports which add entire classes (Promise, Set etc.) will also add

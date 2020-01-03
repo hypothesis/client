@@ -1,5 +1,3 @@
-'use strict';
-
 const sessionUtil = require('../session');
 
 describe('sidebar/util/session', () => {

@@ -1,5 +1,3 @@
-'use strict';
-
 const events = require('../events');
 const retryUtil = require('../util/retry');
 const sentry = require('../util/sentry');

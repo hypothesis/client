@@ -1,5 +1,3 @@
-'use strict';
-
 const boot = require('../boot');
 
 function assetUrl(url) {

@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * Return an object where each key in `updateFns` is mapped to the key itself.
  */

@@ -1,5 +1,3 @@
-'use strict';
-
 const analyticsService = require('../analytics');
 
 describe('analytics', function() {

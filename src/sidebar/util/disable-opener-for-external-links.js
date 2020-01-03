@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * Prevent windows or tabs opened via links under `root` from accessing their
  * opening `Window`.

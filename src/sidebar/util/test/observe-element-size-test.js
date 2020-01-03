@@ -1,5 +1,3 @@
-'use strict';
-
 const observeElementSize = require('../observe-element-size');
 
 /**

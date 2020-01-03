@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * Unicode combining characters
  * from http://xregexp.com/addons/unicode/unicode-categories.js line:30

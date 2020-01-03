@@ -1,5 +1,3 @@
-'use strict';
-
 let FrameUtil = require('./util/frame-util');
 let debounce = require('lodash.debounce');
 

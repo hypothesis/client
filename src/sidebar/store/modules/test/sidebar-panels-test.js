@@ -1,5 +1,3 @@
-'use strict';
-
 const createStore = require('../../create-store');
 const sidebarPanels = require('../sidebar-panels');
 

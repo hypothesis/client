@@ -1,5 +1,3 @@
-'use strict';
-
 /** An attribute directive that focuses an <input> when it's linked by Angular.
  *
  * The HTML5 autofocus attribute automatically puts the keyboard focus in an

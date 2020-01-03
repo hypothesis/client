@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * Return all `<iframe>` elements under `container` which are annotate-able.
  *

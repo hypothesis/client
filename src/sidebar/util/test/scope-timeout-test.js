@@ -1,5 +1,3 @@
-'use strict';
-
 const scopeTimeout = require('../scope-timeout');
 
 function FakeScope() {

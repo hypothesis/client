@@ -1,5 +1,3 @@
-'use strict';
-
 const sidebarTrigger = require('../sidebar-trigger');
 
 describe('sidebarTrigger', function() {

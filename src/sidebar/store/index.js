@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * Central store of state for the sidebar application, managed using
  * [Redux](http://redux.js.org/).

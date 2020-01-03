@@ -1,5 +1,3 @@
-'use strict';
-
 const sentry = require('../sentry');
 
 describe('sidebar/util/sentry', () => {

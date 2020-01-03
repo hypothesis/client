@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * Store module which tracks activity happening in the application that may
  * need to be reflected in the UI.

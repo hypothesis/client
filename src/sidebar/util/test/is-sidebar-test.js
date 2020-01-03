@@ -1,5 +1,3 @@
-'use strict';
-
 const isSidebar = require('../is-sidebar');
 
 describe('sidebar.utils.is-sidebar', () => {

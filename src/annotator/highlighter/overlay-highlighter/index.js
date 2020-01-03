@@ -1,5 +1,3 @@
-'use strict';
-
 module.exports = {
   highlightRange: () => {
     // eslint-disable-next-line no-console

@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * Return an object containing config settings from window.hypothesisConfig().
  *

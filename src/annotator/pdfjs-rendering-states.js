@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * Enum values for page rendering states (IRenderableView#renderingState)
  * in PDF.js. Taken from web/pdf_rendering_queue.js in the PDF.js library.

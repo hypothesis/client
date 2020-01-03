@@ -1,5 +1,3 @@
-'use strict';
-
 const configFuncSettingsFrom = require('../config-func-settings-from');
 
 describe('annotator.config.configFuncSettingsFrom', function() {

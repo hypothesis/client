@@ -1,5 +1,3 @@
-'use strict';
-
 const groupsByOrganization = require('../group-organizations');
 const orgFixtures = require('../../test/group-fixtures');
 

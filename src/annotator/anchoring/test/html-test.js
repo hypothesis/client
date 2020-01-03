@@ -1,5 +1,3 @@
-'use strict';
-
 const html = require('../html');
 
 const toResult = require('../../../shared/test/promise-util').toResult;

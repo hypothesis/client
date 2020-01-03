@@ -1,5 +1,3 @@
-'use strict';
-
 const configFrom = require('../index');
 
 describe('annotator.config.index', function() {

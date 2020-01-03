@@ -1,5 +1,3 @@
-'use strict';
-
 const buildThread = require('../build-thread');
 const events = require('../events');
 const memoize = require('../util/memoize');

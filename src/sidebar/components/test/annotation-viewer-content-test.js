@@ -1,5 +1,3 @@
-'use strict';
-
 const angular = require('angular');
 
 // Fake implementation of the API for fetching annotations and replies to

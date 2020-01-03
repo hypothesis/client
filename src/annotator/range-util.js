@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * Returns true if the start point of a selection occurs after the end point,
  * in document order.

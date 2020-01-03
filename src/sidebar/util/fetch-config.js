@@ -1,5 +1,3 @@
-'use strict';
-
 const getApiUrl = require('../get-api-url');
 const hostConfig = require('../host-config');
 const postMessageJsonRpc = require('./postmessage-json-rpc');

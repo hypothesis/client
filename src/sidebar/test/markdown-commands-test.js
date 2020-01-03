@@ -1,5 +1,3 @@
-'use strict';
-
 const commands = require('../markdown-commands');
 
 /**

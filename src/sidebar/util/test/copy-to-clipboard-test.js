@@ -1,5 +1,3 @@
-'use strict';
-
 const { copyText } = require('../copy-to-clipboard');
 
 describe('copy-to-clipboard', () => {

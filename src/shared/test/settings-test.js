@@ -1,5 +1,3 @@
-'use strict';
-
 const settings = require('../settings');
 
 const sandbox = sinon.createSandbox();

@@ -1,5 +1,3 @@
-'use strict';
-
 const StreamFilter = require('../stream-filter');
 
 describe('sidebar/services/stream-filter', () => {

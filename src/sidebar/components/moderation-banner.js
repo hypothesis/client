@@ -1,5 +1,3 @@
-'use strict';
-
 const { createElement } = require('preact');
 const classnames = require('classnames');
 const propTypes = require('prop-types');

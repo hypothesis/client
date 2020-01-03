@@ -1,5 +1,3 @@
-'use strict';
-
 const classnames = require('classnames');
 
 const template = require('./adder.html');

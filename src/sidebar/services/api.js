@@ -1,5 +1,3 @@
-'use strict';
-
 const get = require('lodash.get');
 const queryString = require('query-string');
 

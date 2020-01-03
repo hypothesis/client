@@ -1,5 +1,3 @@
-'use strict';
-
 const warnOnce = require('../shared/warn-once');
 
 /**

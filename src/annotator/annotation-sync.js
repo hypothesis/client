@@ -1,5 +1,3 @@
-'use strict';
-
 // AnnotationSync listens for messages from the sidebar app indicating that
 // annotations have been added or removed and relays them to Guest.
 //

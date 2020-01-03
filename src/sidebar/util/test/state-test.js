@@ -1,5 +1,3 @@
-'use strict';
-
 const fakeStore = require('../../test/fake-redux-store');
 const stateUtil = require('../state');
 

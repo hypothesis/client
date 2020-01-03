@@ -1,5 +1,3 @@
-'use strict';
-
 const { generateHexString } = require('./random');
 
 /** Generate a random ID to associate RPC requests and responses. */

@@ -1,5 +1,3 @@
-'use strict';
-
 const sharingUtil = require('../annotation-sharing');
 
 describe('sidebar.util.annotation-sharing', () => {

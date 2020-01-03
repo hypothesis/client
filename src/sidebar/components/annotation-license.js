@@ -1,5 +1,3 @@
-'use strict';
-
 const { createElement } = require('preact');
 
 const SvgIcon = require('./svg-icon');

@@ -1,5 +1,3 @@
-'use strict';
-
 const features = require('../features');
 const events = require('../../events');
 const bridgeEvents = require('../../../shared/bridge-events');

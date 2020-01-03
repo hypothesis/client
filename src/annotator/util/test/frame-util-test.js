@@ -1,5 +1,3 @@
-'use strict';
-
 const frameUtil = require('../frame-util');
 
 describe('annotator.util.frame-util', function() {

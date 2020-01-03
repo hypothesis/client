@@ -1,5 +1,3 @@
-'use strict';
-
 const annotationCounts = require('../annotation-counts');
 
 describe('annotationCounts', function() {

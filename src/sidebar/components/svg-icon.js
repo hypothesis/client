@@ -1,5 +1,3 @@
-'use strict';
-
 const classnames = require('classnames');
 const { createElement } = require('preact');
 const { useLayoutEffect, useRef } = require('preact/hooks');

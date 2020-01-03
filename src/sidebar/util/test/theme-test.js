@@ -1,5 +1,3 @@
-'use strict';
-
 const { applyTheme } = require('../theme');
 
 describe('sidebar/util/theme/applyTheme', () => {

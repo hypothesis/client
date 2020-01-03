@@ -8,8 +8,6 @@
  * may be "active" (open) at one time.
  */
 
-'use strict';
-
 const util = require('../util');
 
 function init() {

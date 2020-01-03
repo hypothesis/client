@@ -1,5 +1,3 @@
-'use strict';
-
 const url = require('../url');
 
 describe('url.encode', function() {

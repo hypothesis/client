@@ -1,5 +1,3 @@
-'use strict';
-
 const serviceConfig = require('../service-config');
 
 describe('serviceConfig', function() {

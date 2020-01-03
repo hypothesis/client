@@ -1,5 +1,3 @@
-'use strict';
-
 const viewer = require('../viewer');
 const createStore = require('../../create-store');
 
