@@ -309,15 +309,18 @@ describe('TagEditor', function() {
   });
 
   describe('filter on text input based on user agent', () => {
-    let stub = sinon.stub(navigator, 'userAgent');
+    let fakeNavigator;
+    beforeEach(function() {
+      fakeNavigator = sinon.stub(navigator, 'userAgent');
+    });
 
     afterEach(function() {
-      stub.restore();
+      fakeNavigator.restore();
     });
 
     it('calls filter when changing input with a limit of 20 when browser is Chrome', () => {
+      fakeNavigator.get(() => 'Chrome/1.0');
       const wrapper = createComponent();
-      stub.get(() => 'Chrome/1.0');
       wrapper.find('input').instance().value = 'tag';
       typeInput(wrapper);
 
@@ -326,8 +329,7 @@ describe('TagEditor', function() {
     });
 
     it('does not call filter when changing input when browser is not Chrome', () => {
-      let stub = sinon.stub(navigator, 'userAgent');
-      stub.get(() => '');
+      fakeNavigator.get(() => '');
       const wrapper = createComponent();
 
       wrapper.find('input').instance().value = 'tag';

@@ -80,10 +80,6 @@ describe('sidebar.tags', () => {
       assert.deepEqual(tags.filter('r', 2), ['bar', 'future']);
       assert.deepEqual(tags.filter('r', 3), ['bar', 'future', 'argon']);
     });
-
-    it('does not limit tags when limit is 0', () => {
-      assert.deepEqual(tags.filter('r', 0), ['bar', 'future', 'argon']);
-    });
   });
 
   describe('#store', () => {
