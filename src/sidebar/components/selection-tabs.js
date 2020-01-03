@@ -156,7 +156,7 @@ function SelectionTabs({ isLoading, settings }) {
               Create one by selecting some text and clicking the{' '}
               <SvgIcon
                 name="annotate"
-                inline="true"
+                inline={true}
                 className="selection-tabs__icon"
               />{' '}
               button.
