@@ -59,4 +59,18 @@ describe('SvgIcon', () => {
     assert.isTrue(wrapper.classList.contains('svg-icon'));
     assert.isTrue(wrapper.classList.contains('svg-icon--inline'));
   });
+
+  it('sets a title to the containing `span` element if `title` is present', () => {
+    const container = document.createElement('div');
+    render(<SvgIcon name="expand-menu" title="Open menu" />, container);
+    const wrapper = container.querySelector('span');
+    assert.equal(wrapper.getAttribute('title'), 'Open menu');
+  });
+
+  it('sets does not set a title on the containing `span` element if `title` not present', () => {
+    const container = document.createElement('div');
+    render(<SvgIcon name="expand-menu" />, container);
+    const wrapper = container.querySelector('span');
+    assert.notOk(wrapper.getAttribute('title'));
+  });
 });

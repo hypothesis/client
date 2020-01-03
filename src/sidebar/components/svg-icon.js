@@ -57,7 +57,7 @@ const icons = {
  * This matches the way we do icons on the website, see
  * https://github.com/hypothesis/h/pull/3675
  */
-function SvgIcon({ name, className = '', inline = false }) {
+function SvgIcon({ name, className = '', inline = false, title = '' }) {
   if (!icons[name]) {
     throw new Error(`Unknown icon ${name}`);
   }
@@ -74,11 +74,17 @@ function SvgIcon({ name, className = '', inline = false }) {
     markup,
   ]);
 
+  const spanProps = {};
+  if (title) {
+    spanProps.title = title;
+  }
+
   return (
     <span
       className={classnames('svg-icon', { 'svg-icon--inline': inline })}
       dangerouslySetInnerHTML={markup}
       ref={element}
+      {...spanProps}
     />
   );
 }
@@ -92,6 +98,9 @@ SvgIcon.propTypes = {
 
   /** Apply a style allowing for inline display of icon wrapper */
   inline: propTypes.bool,
+
+  /** Optional title attribute to apply to the SVG's containing `span` */
+  title: propTypes.string,
 };
 
 module.exports = SvgIcon;
