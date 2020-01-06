@@ -5,7 +5,7 @@ const fixtures = require('../../test/annotation-fixtures');
 const util = require('../../directive/test/util');
 
 const annotationComponent = require('../annotation');
-const { $imports } = require('../annotation');
+const { $imports, updateModel } = require('../annotation');
 
 const inject = angular.mock.inject;
 
@@ -34,8 +34,6 @@ const groupFixtures = {
 
 describe('annotation', function() {
   describe('updateModel()', function() {
-    const updateModel = require('../annotation').updateModel;
-
     function fakePermissions() {
       return {
         shared: function() {},

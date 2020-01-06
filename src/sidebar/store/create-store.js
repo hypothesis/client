@@ -1,6 +1,5 @@
 const redux = require('redux');
-// `.default` is needed because 'redux-thunk' is built as an ES2015 module
-const thunk = require('redux-thunk').default;
+const { default: thunk } = require('redux-thunk');
 
 const { createReducer, bindSelectors } = require('./util');
 

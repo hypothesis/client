@@ -1,5 +1,5 @@
 const events = require('../events');
-const resolve = require('../util/url').resolve;
+const { resolve } = require('../util/url');
 const serviceConfig = require('../service-config');
 
 /**

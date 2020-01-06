@@ -2,12 +2,13 @@ const addAnalytics = require('./ga');
 const disableOpenerForExternalLinks = require('./util/disable-opener-for-external-links');
 const { fetchConfig } = require('./util/fetch-config');
 const serviceConfig = require('./service-config');
+const { jsonConfigsFrom } = require('../shared/settings');
 const crossOriginRPC = require('./cross-origin-rpc.js');
 
 let sentry;
 
 // Read settings rendered into sidebar app HTML by service/extension.
-const appConfig = require('../shared/settings').jsonConfigsFrom(document);
+const appConfig = jsonConfigsFrom(document);
 
 if (appConfig.sentry) {
   // Initialize Sentry. This is required at the top of this file
