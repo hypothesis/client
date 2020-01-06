@@ -13,7 +13,6 @@ describe('AnnotationHeader', () => {
         annotation={fixtures.defaultAnnotation()}
         isEditing={false}
         isHighlight={false}
-        isPrivate={false}
         onReplyCountClick={sinon.stub()}
         replyCount={0}
         showDocumentInfo={false}

@@ -16,7 +16,6 @@ function AnnotationHeader({
   annotation,
   isEditing,
   isHighlight,
-  isPrivate,
   onReplyCountClick,
   replyCount,
   showDocumentInfo,
@@ -60,7 +59,7 @@ function AnnotationHeader({
       </div>
 
       <div className="annotation-header__row">
-        <AnnotationShareInfo annotation={annotation} isPrivate={isPrivate} />
+        <AnnotationShareInfo annotation={annotation} />
         {!isEditing && isHighlight && (
           <div className="annotation-header__highlight">
             <SvgIcon
@@ -84,8 +83,6 @@ AnnotationHeader.propTypes = {
   isEditing: propTypes.bool,
   /* Whether the annotation is a highlight */
   isHighlight: propTypes.bool,
-  /* Whether the annotation is an "only me" (private) annotation */
-  isPrivate: propTypes.bool,
   /* Callback for when the toggle-replies element is clicked */
   onReplyCountClick: propTypes.func.isRequired,
   /* How many replies this annotation currently has */

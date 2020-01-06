@@ -7,7 +7,6 @@
   <annotation-header annotation="vm.annotation"
                          is-editing="vm.editing()"
                          is-highlight="vm.isHighlight()"
-                         is-private="vm.state().isPrivate"
                          on-reply-count-click="vm.onReplyCountClick()"
                          reply-count="vm.replyCount"
                          show-document-info="vm.showDocumentInfo">
@@ -41,7 +40,7 @@
     ng-if="vm.editing()"
     annotation="vm.annotation"
     on-edit-tags="vm.setTags(tags)"
-    tag-list="vm.state().tags" 
+    tag-list="vm.state().tags"
     />
   </tag-editor>
 
