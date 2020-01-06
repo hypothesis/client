@@ -19,7 +19,7 @@ const immutable = require('seamless-immutable');
 
 const arrayUtil = require('../../util/array');
 const metadata = require('../../util/annotation-metadata');
-const toSet = require('../../util/array').toSet;
+const { toSet } = require('../../util/array');
 const uiConstants = require('../../ui-constants');
 
 const util = require('../util');

@@ -10,8 +10,10 @@
 /* global __MANIFEST__ */
 
 const boot = require('./boot');
-const settings = require('../shared/settings').jsonConfigsFrom(document);
+const { jsonConfigsFrom } = require('../shared/settings');
 const processUrlTemplate = require('./url-template');
+
+const settings = jsonConfigsFrom(document);
 
 boot(document, {
   assetRoot: processUrlTemplate(settings.assetRoot || '__ASSET_ROOT__'),

@@ -1,4 +1,4 @@
-const isLoaded = require('../../util/frame-util').isLoaded;
+const { isLoaded } = require('../../util/frame-util');
 
 const FRAME_DEBOUNCE_WAIT = require('../../frame-observer').DEBOUNCE_WAIT + 10;
 const CrossFrame = require('../../plugin/cross-frame');

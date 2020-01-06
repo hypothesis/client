@@ -8,9 +8,11 @@ sinon.assert.expose(assert, { prefix: null });
 // the directive tests rely on angular.element() returning
 // a full version of jQuery.
 //
-window.jQuery = window.$ = require('jquery');
+const jQuery = require('jquery');
 require('angular');
 require('angular-mocks');
+
+window.jQuery = window.$ = jQuery;
 
 // Configure Enzyme for UI tests.
 require('preact/debug');
