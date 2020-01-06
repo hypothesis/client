@@ -14,12 +14,17 @@ const SvgIcon = require('./svg-icon');
  * "Popup"-style component for sharing a single annotation.
  */
 function AnnotationShareControl({
+  annotation,
   analytics,
   flash,
   group,
-  isPrivate,
+  permissions,
   shareUri,
 }) {
+  const isPrivate = !permissions.isShared(
+    annotation.permissions,
+    annotation.user
+  );
   const shareRef = useRef();
   const inputRef = useRef();
 
@@ -125,22 +130,23 @@ function AnnotationShareControl({
 }
 
 AnnotationShareControl.propTypes = {
+  /* The annotation in question */
+  annotation: propTypes.object.isRequired,
   /** group that the annotation is in
    *  If missing, this component will not render
    *  FIXME: Refactor after root cause is addressed
    *  See https://github.com/hypothesis/client/issues/1542
    */
   group: propTypes.object,
-  /** Is this annotation set to "only me"/private? */
-  isPrivate: propTypes.bool.isRequired,
   /** The URI to view the annotation on its own */
   shareUri: propTypes.string.isRequired,
 
   /* services */
   analytics: propTypes.object.isRequired,
   flash: propTypes.object.isRequired,
+  permissions: propTypes.object.isRequired,
 };
 
-AnnotationShareControl.injectedProps = ['analytics', 'flash'];
+AnnotationShareControl.injectedProps = ['analytics', 'flash', 'permissions'];
 
 module.exports = withServices(AnnotationShareControl);

@@ -12,7 +12,6 @@ const Button = require('./button');
  */
 function AnnotationActionBar({
   annotation,
-  isPrivate,
   onDelete,
   onEdit,
   onFlag,
@@ -49,8 +48,8 @@ function AnnotationActionBar({
       <Button icon="reply" title="Reply" onClick={onReply} />
       {showShareAction && (
         <AnnotationShareControl
+          annotation={annotation}
           group={annotationGroup}
-          isPrivate={isPrivate}
           shareUri={shareURI(annotation)}
         />
       )}
@@ -74,8 +73,6 @@ function AnnotationActionBar({
 
 AnnotationActionBar.propTypes = {
   annotation: propTypes.object.isRequired,
-  /** Is this annotation shared at the group level or marked as "only me"/private? */
-  isPrivate: propTypes.bool.isRequired,
   /** Callbacks for when action buttons are clicked/tapped */
   onEdit: propTypes.func.isRequired,
   onDelete: propTypes.func.isRequired,

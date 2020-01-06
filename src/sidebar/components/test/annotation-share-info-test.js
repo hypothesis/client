@@ -10,12 +10,13 @@ describe('AnnotationShareInfo', () => {
   let fakeGroup;
   let fakeStore;
   let fakeGetGroup;
+  let fakePermissions;
 
   const createAnnotationShareInfo = props => {
     return mount(
       <AnnotationShareInfo
         annotation={fixtures.defaultAnnotation()}
-        isPrivate={false}
+        permissions={fakePermissions}
         {...props}
       />
     );
@@ -31,6 +32,9 @@ describe('AnnotationShareInfo', () => {
     };
     fakeGetGroup = sinon.stub().returns(fakeGroup);
     fakeStore = { getGroup: fakeGetGroup };
+    fakePermissions = {
+      isShared: sinon.stub().returns(true),
+    };
 
     AnnotationShareInfo.$imports.$mock(mockImportedComponents());
     AnnotationShareInfo.$imports.$mock({
@@ -96,15 +100,19 @@ describe('AnnotationShareInfo', () => {
 
   describe('"only you" information', () => {
     it('should not show privacy information if annotation is not private', () => {
-      const wrapper = createAnnotationShareInfo({ isPrivate: false });
+      const wrapper = createAnnotationShareInfo();
 
       const privacy = wrapper.find('.annotation-share-info__private');
 
       assert.notOk(privacy.exists());
     });
     context('private annotation', () => {
+      beforeEach(() => {
+        fakePermissions.isShared.returns(false);
+      });
+
       it('should show privacy icon', () => {
-        const wrapper = createAnnotationShareInfo({ isPrivate: true });
+        const wrapper = createAnnotationShareInfo();
 
         const privacyIcon = wrapper.find(
           '.annotation-share-info__private .annotation-share-info__icon'
@@ -114,7 +122,7 @@ describe('AnnotationShareInfo', () => {
         assert.equal(privacyIcon.prop('name'), 'lock');
       });
       it('should not show "only me" text for first-party group', () => {
-        const wrapper = createAnnotationShareInfo({ isPrivate: true });
+        const wrapper = createAnnotationShareInfo();
 
         const privacyText = wrapper.find(
           '.annotation-share-info__private-info'
@@ -124,7 +132,7 @@ describe('AnnotationShareInfo', () => {
       });
       it('should show "only me" text for annotation in third-party group', () => {
         fakeGetGroup.returns({ name: 'Some Name' });
-        const wrapper = createAnnotationShareInfo({ isPrivate: true });
+        const wrapper = createAnnotationShareInfo();
 
         const privacyText = wrapper.find(
           '.annotation-share-info__private-info'

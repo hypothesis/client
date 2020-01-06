@@ -6,10 +6,12 @@ const AnnotationShareControl = require('../annotation-share-control');
 const mockImportedComponents = require('./mock-imported-components');
 
 describe('AnnotationShareControl', () => {
+  let fakeAnnotation;
   let fakeAnalytics;
   let fakeCopyToClipboard;
   let fakeFlash;
   let fakeGroup;
+  let fakePermissions;
   let fakeShareUri;
 
   let container;
@@ -21,10 +23,11 @@ describe('AnnotationShareControl', () => {
   function createComponent(props = {}) {
     return mount(
       <AnnotationShareControl
+        annotation={fakeAnnotation}
         analytics={fakeAnalytics}
         flash={fakeFlash}
         group={fakeGroup}
-        isPrivate={false}
+        permissions={fakePermissions}
         shareUri={fakeShareUri}
         {...props}
       />,
@@ -48,6 +51,12 @@ describe('AnnotationShareControl', () => {
     container = document.createElement('div');
     document.body.appendChild(container);
 
+    fakeAnnotation = {
+      group: 'fakegroup',
+      permissions: {},
+      user: 'acct:bar@foo.com',
+    };
+
     fakeAnalytics = {
       events: {
         ANNOTATION_SHARED: 'whatever',
@@ -63,6 +72,9 @@ describe('AnnotationShareControl', () => {
     fakeGroup = {
       name: 'My Group',
       type: 'private',
+    };
+    fakePermissions = {
+      isShared: sinon.stub().returns(true),
     };
     fakeShareUri = 'https://www.example.com';
     AnnotationShareControl.$imports.$mock(mockImportedComponents());
@@ -152,26 +164,27 @@ describe('AnnotationShareControl', () => {
   [
     {
       groupType: 'private',
-      isPrivate: false,
+      isShared: true,
       expected: 'Only members of the group My Group may view this annotation.',
     },
     {
       groupType: 'open',
-      isPrivate: false,
+      isShared: true,
       expected: 'Anyone using this link may view this annotation.',
     },
     {
       groupType: 'private',
-      isPrivate: true,
+      isShared: false,
       expected: 'Only you may view this annotation.',
     },
     {
       groupType: 'open',
-      isPrivate: true,
+      isShared: false,
       expected: 'Only you may view this annotation.',
     },
   ].forEach(testcase => {
-    it(`renders the correct sharing information for a ${testcase.groupType} group when annotation privacy is ${testcase.isPrivate}`, () => {
+    it(`renders the correct sharing information for a ${testcase.groupType} group when annotation sharing is ${testcase.isShared}`, () => {
+      fakePermissions.isShared.returns(testcase.isShared);
       fakeGroup.type = testcase.groupType;
       const wrapper = createComponent({ isPrivate: testcase.isPrivate });
       openElement(wrapper);

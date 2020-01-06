@@ -7,7 +7,6 @@
   <annotation-header annotation="vm.annotation"
                          is-editing="vm.editing()"
                          is-highlight="vm.isHighlight()"
-                         is-private="vm.state().isPrivate"
                          on-reply-count-click="vm.onReplyCountClick()"
                          reply-count="vm.replyCount"
                          show-document-info="vm.showDocumentInfo">
@@ -34,15 +33,15 @@
       ng-click="vm.toggleCollapseBody($event)"
       ng-title="vm.collapseBody ? 'Show the full annotation text' : 'Show the first few lines only'"
       ng-bind="vm.collapseBody ? 'More' : 'Less'"
-      h-branding="accentColor">mire</a>
+      h-branding="accentColor">more</a>
   </div>
   <!-- Tags -->
   <tag-editor
     ng-if="vm.editing()"
     annotation="vm.annotation"
     on-edit-tags="vm.setTags(tags)"
-    tag-list="vm.state().tags" 
-    />
+    tag-list="vm.state().tags"
+  >
   </tag-editor>
 
   <tag-list
@@ -81,7 +80,6 @@
     <div class="annotation-actions" ng-if="!vm.isSaving && !vm.editing() && vm.id()">
       <annotation-action-bar
         annotation="vm.annotation"
-        is-private="vm.state().isPrivate"
         on-delete="vm.delete()"
         on-flag="vm.flag()"
         on-edit="vm.edit()"

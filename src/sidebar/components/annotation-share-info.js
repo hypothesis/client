@@ -1,15 +1,16 @@
 const propTypes = require('prop-types');
 const { createElement } = require('preact');
 
-const SvgIcon = require('./svg-icon');
-
+const { withServices } = require('../util/service-context');
 const useStore = require('../store/use-store');
+
+const SvgIcon = require('./svg-icon');
 
 /**
  * Render information about what group an annotation is in and
  * whether it is private to the current user (only me)
  */
-function AnnotationShareInfo({ annotation, isPrivate }) {
+function AnnotationShareInfo({ annotation, permissions }) {
   const group = useStore(store => store.getGroup(annotation.group));
 
   // We may not have access to the group object beyond its ID
@@ -18,6 +19,11 @@ function AnnotationShareInfo({ annotation, isPrivate }) {
   // Only show the name of the group and link to it if there is a
   // URL (link) returned by the API for this group. Some groups do not have links
   const linkToGroup = hasGroup && group.links && group.links.html;
+
+  const isPrivate = !permissions.isShared(
+    annotation.permissions,
+    annotation.user
+  );
 
   return (
     <div className="annotation-share-info">
@@ -59,8 +65,11 @@ function AnnotationShareInfo({ annotation, isPrivate }) {
 AnnotationShareInfo.propTypes = {
   /** The current annotation object for which sharing info will be rendered */
   annotation: propTypes.object.isRequired,
-  /** Is this an "only me" (private) annotation? */
-  isPrivate: propTypes.bool.isRequired,
+
+  /** injected services */
+  permissions: propTypes.object.isRequired,
 };
 
-module.exports = AnnotationShareInfo;
+AnnotationShareInfo.injectedProps = ['permissions'];
+
+module.exports = withServices(AnnotationShareInfo);
