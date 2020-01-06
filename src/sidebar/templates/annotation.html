@@ -80,7 +80,6 @@
     <div class="annotation-actions" ng-if="!vm.isSaving && !vm.editing() && vm.id()">
       <annotation-action-bar
         annotation="vm.annotation"
-        is-private="vm.state().isPrivate"
         on-delete="vm.delete()"
         on-flag="vm.flag()"
         on-edit="vm.edit()"
