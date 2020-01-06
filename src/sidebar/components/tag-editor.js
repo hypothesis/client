@@ -15,23 +15,38 @@ let datalistIdCounter = 0;
 function TagEditor({ onEditTags, tags: tagsService, tagList }) {
   const inputEl = useRef(null);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [suggestionsFiltered, setSuggestionsFiltered] = useState([]); // For Chrome only
   const [datalistId] = useState(() => {
     ++datalistIdCounter;
     return `tag-editor-datalist-${datalistIdCounter}`;
   });
 
+  const isChromeUA = !!window.navigator.userAgent.match(/Chrome\/[.0-9]*/);
+  // Suggestion limiter to speed up the performance in Chrome
+  // See https://github.com/hypothesis/client/issues/1606
+  const chromeSuggestionsLimit = 20;
+
+  /**
+   * Helper function that returns a list of suggestions less any
+   * results also found from the duplicates list.
+   *
+   * @param {Array<string>} suggestions - Original list of suggestions
+   * @param {Array<string>} duplicates - Items to be removed from the result
+   * @return {Array<string>}
+   */
+  const removeDuplicates = (suggestions, duplicates) => {
+    const suggestionsSet = [];
+    suggestions.forEach(suggestion => {
+      if (duplicates.indexOf(suggestion) < 0) {
+        suggestionsSet.push(suggestion);
+      }
+    });
+    return suggestionsSet.sort();
+  };
+
   // List of suggestions returned from the tagsService
   const suggestions = useMemo(() => {
     // Remove any repeated suggestions that are already tags.
-    const removeDuplicates = (suggestions, tags) => {
-      const suggestionsSet = [];
-      suggestions.forEach(suggestion => {
-        if (tags.indexOf(suggestion) < 0) {
-          suggestionsSet.push(suggestion);
-        }
-      });
-      return suggestionsSet.sort();
-    };
     // Call filter with an empty string to return all suggestions
     return removeDuplicates(tagsService.filter(''), tagList);
   }, [tagsService, tagList]);
@@ -92,9 +107,30 @@ function TagEditor({ onEditTags, tags: tagsService, tagList }) {
   };
 
   const handleOnInput = e => {
-    if (e.inputType === 'insertText') {
-      // Show the suggestions if the user types something into the field
-      setShowSuggestions(true);
+    if (
+      e.inputType === 'insertText' ||
+      e.inputType === 'deleteContentBackward'
+    ) {
+      if (inputEl.current.value.length === 0) {
+        // If the user deleted input, hide suggestions. This has
+        // no effect in Safari and the list will stay open.
+        setShowSuggestions(false);
+      } else {
+        if (isChromeUA) {
+          // Filter down the suggestions list for Chrome to subvert a performance
+          // issue. Returning too many suggestions causes a noticeable delay when
+          // rendering the datalist.
+          // See https://github.com/hypothesis/client/issues/1606
+          setSuggestionsFiltered(
+            removeDuplicates(
+              tagsService.filter(inputEl.current.value, chromeSuggestionsLimit),
+              tagList
+            )
+          );
+        }
+        // Show the suggestions if the user types something into the field
+        setShowSuggestions(true);
+      }
     } else if (
       e.inputType === undefined ||
       e.inputType === 'insertReplacementText'
@@ -110,10 +146,6 @@ function TagEditor({ onEditTags, tags: tagsService, tagList }) {
       // time to trigger the handleKeyPress callback above to add the tag.
       // Bug: https://github.com/hypothesis/client/issues/1604
       addTag();
-    } else if (inputEl.current.value.length === 0) {
-      // If the user deleted input, hide suggestions. This has
-      // no effect in Safari and the list will stay open.
-      setShowSuggestions(false);
     }
   };
 
@@ -130,6 +162,9 @@ function TagEditor({ onEditTags, tags: tagsService, tagList }) {
   };
 
   const suggestionsList = () => {
+    // If this is Chrome, use the filtered list, otherwise use the full list
+    // See https://github.com/hypothesis/client/issues/1606
+    const optionsList = isChromeUA ? suggestionsFiltered : suggestions;
     return (
       <datalist
         id={datalistId}
@@ -137,7 +172,7 @@ function TagEditor({ onEditTags, tags: tagsService, tagList }) {
         aria-label="Annotation suggestions"
       >
         {showSuggestions &&
-          suggestions.map(suggestion => (
+          optionsList.map(suggestion => (
             <option key={suggestion} value={suggestion} />
           ))}
       </datalist>

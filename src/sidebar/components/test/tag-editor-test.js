@@ -305,4 +305,36 @@ describe('TagEditor', function() {
       assert.isTrue(fakeOnEditTags.calledWith({ tags: ['tag2'] }));
     });
   });
+
+  describe('filter on text input based on user agent', () => {
+    let fakeNavigator;
+    beforeEach(function() {
+      fakeNavigator = sinon.stub(navigator, 'userAgent');
+    });
+
+    afterEach(function() {
+      fakeNavigator.restore();
+    });
+
+    it('calls filter when changing input with a limit of 20 when browser is Chrome', () => {
+      fakeNavigator.get(() => 'Chrome/1.0');
+      const wrapper = createComponent();
+      wrapper.find('input').instance().value = 'tag';
+      typeInput(wrapper);
+
+      assert.isTrue(fakeTagsService.filter.calledTwice);
+      assert.isTrue(fakeTagsService.filter.calledWith('tag', 20));
+    });
+
+    it('does not call filter when changing input when browser is not Chrome', () => {
+      fakeNavigator.get(() => '');
+      const wrapper = createComponent();
+
+      wrapper.find('input').instance().value = 'tag';
+      typeInput(wrapper);
+
+      assert.isTrue(fakeTagsService.filter.calledOnce);
+      assert.isTrue(fakeTagsService.filter.calledWith(''));
+    });
+  });
 });
