@@ -37,4 +37,11 @@
   &__highlight {
     margin-right: 5px;
   }
+
+  &__highlight-icon {
+    width: 12px;
+    height: 12px;
+    /* bring down the baseline a little */
+    margin-bottom: -1px;
+  }
 }

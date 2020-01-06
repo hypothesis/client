@@ -4,8 +4,8 @@
        ng-class="vm.threadToggleClasses()"
        title="{{vm.thread.collapsed && 'Expand' || 'Collapse'}}"
        ng-click="vm.toggleCollapsed()">
-       <span ng-class="{'h-icon-arrow-right': vm.thread.collapsed,
-                        'h-icon-arrow-drop-down': !vm.thread.collapsed}"></span>
+       <svg-icon name="'caret-right'" ng-if="vm.thread.collapsed"></svg-icon>
+       <svg-icon name="'expand-menu'" ng-if="!vm.thread.collapsed"></svg-icon>
     </a>
     <div class="annotation-thread__thread-line"></div>
   </div>
