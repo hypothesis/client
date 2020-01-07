@@ -22,7 +22,7 @@ const uiConstants = require('../ui-constants');
  * JavaScript, it includes only the information needed to uniquely identify it
  * within the current session and anchor it in the document.
  */
-function formatAnnot(ann) {
+export function formatAnnot(ann) {
   return {
     tag: ann.$tag,
     msg: {
@@ -39,7 +39,13 @@ function formatAnnot(ann) {
  * sidebar.
  */
 // @ngInject
-function FrameSync($rootScope, $window, Discovery, store, bridge) {
+export default function FrameSync(
+  $rootScope,
+  $window,
+  Discovery,
+  store,
+  bridge
+) {
   // Set of tags of annotations that are currently loaded into the frame
   const inFrame = new Set();
 
@@ -253,8 +259,3 @@ function FrameSync($rootScope, $window, Discovery, store, bridge) {
     bridge.call('scrollToAnnotation', tag);
   };
 }
-
-module.exports = {
-  default: FrameSync,
-  formatAnnot: formatAnnot,
-};
