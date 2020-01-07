@@ -1,35 +1,37 @@
 const { createElement } = require('preact');
 const { mount } = require('enzyme');
+const { act } = require('preact/test-utils');
+
+const { waitFor } = require('./util');
 
 const AnnotationActionBar = require('../annotation-action-bar');
 const mockImportedComponents = require('./mock-imported-components');
 
 describe('AnnotationActionBar', () => {
   let fakeAnnotation;
-  let fakeOnDelete;
   let fakeOnEdit;
-  let fakeOnFlag;
   let fakeOnReply;
+
+  let fakeUserProfile;
+
   // Fake services
-  let fakeGroups;
+  let fakeAnnotationMapper;
+  let fakeFlash;
   let fakePermissions;
-  let fakeSession;
   let fakeSettings;
   // Fake dependencies
   let fakeIsShareable;
+  let fakeStore;
 
   function createComponent(props = {}) {
     return mount(
       <AnnotationActionBar
         annotation={fakeAnnotation}
-        isPrivate={false}
-        onDelete={fakeOnDelete}
+        annotationMapper={fakeAnnotationMapper}
+        flash={fakeFlash}
         onEdit={fakeOnEdit}
         onReply={fakeOnReply}
-        onFlag={fakeOnFlag}
-        groups={fakeGroups}
         permissions={fakePermissions}
-        session={fakeSession}
         settings={fakeSettings}
         {...props}
       />
@@ -59,20 +61,23 @@ describe('AnnotationActionBar', () => {
       permissions: {},
       user: 'acct:bar@foo.com',
     };
-    fakeSession = {
-      state: {
-        userid: 'acct:foo@bar.com',
-      },
+
+    fakeUserProfile = {
+      userid: 'account:foo@bar.com',
+    };
+
+    fakeAnnotationMapper = {
+      deleteAnnotation: sinon.stub().resolves(),
+      flagAnnotation: sinon.stub().resolves(),
+    };
+
+    fakeFlash = {
+      info: sinon.stub(),
+      error: sinon.stub(),
     };
 
     fakeOnEdit = sinon.stub();
-    fakeOnDelete = sinon.stub();
     fakeOnReply = sinon.stub();
-    fakeOnFlag = sinon.stub();
-
-    fakeGroups = {
-      get: sinon.stub(),
-    };
 
     fakePermissions = {
       permits: sinon.stub().returns(true),
@@ -81,16 +86,25 @@ describe('AnnotationActionBar', () => {
 
     fakeIsShareable = sinon.stub().returns(true);
 
+    fakeStore = {
+      profile: sinon.stub().returns(fakeUserProfile),
+      getGroup: sinon.stub().returns({}),
+      updateFlagStatus: sinon.stub(),
+    };
+
     AnnotationActionBar.$imports.$mock(mockImportedComponents());
     AnnotationActionBar.$imports.$mock({
       '../util/annotation-sharing': {
         isShareable: fakeIsShareable,
         shareURI: sinon.stub().returns('http://share.me'),
       },
+      '../store/use-store': callback => callback(fakeStore),
     });
+    sinon.stub(window, 'confirm').returns(false);
   });
 
   afterEach(() => {
+    window.confirm.restore();
     AnnotationActionBar.$imports.$restore();
   });
 
@@ -128,15 +142,45 @@ describe('AnnotationActionBar', () => {
       assert.isTrue(getButton(wrapper, 'trash').exists());
     });
 
-    it('invokes `onDelete` callback when delete button clicked', () => {
+    it('asks for confirmation before deletion', () => {
       allowOnly('delete');
       const button = getButton(createComponent(), 'trash');
 
-      button.props().onClick();
+      act(() => {
+        button.props().onClick();
+      });
 
-      assert.calledOnce(fakeOnDelete);
+      assert.calledOnce(confirm);
+      assert.notCalled(fakeAnnotationMapper.deleteAnnotation);
     });
 
+    it('invokes delete on service when confirmed', () => {
+      allowOnly('delete');
+      window.confirm.returns(true);
+      const button = getButton(createComponent(), 'trash');
+
+      act(() => {
+        button.props().onClick();
+      });
+
+      assert.calledWith(fakeAnnotationMapper.deleteAnnotation, fakeAnnotation);
+    });
+
+    it('sets a flash message if there is an error with deletion', async () => {
+      allowOnly('delete');
+      window.confirm.returns(true);
+      fakeAnnotationMapper.deleteAnnotation.rejects();
+
+      const button = getButton(createComponent(), 'trash');
+      act(() => {
+        button.props().onClick();
+      });
+
+      await waitFor(() => fakeFlash.error.called);
+    });
+  });
+
+  describe('edit action button', () => {
     it('does not show edit button if permissions do not allow', () => {
       disallowOnly('delete');
 
@@ -156,7 +200,9 @@ describe('AnnotationActionBar', () => {
     it('invokes `onReply` callback when reply button clicked', () => {
       const button = getButton(createComponent(), 'reply');
 
-      button.props().onClick();
+      act(() => {
+        button.props().onClick();
+      });
 
       assert.calledOnce(fakeOnReply);
     });
@@ -184,16 +230,63 @@ describe('AnnotationActionBar', () => {
       assert.isTrue(getButton(wrapper, 'flag').exists());
     });
 
-    it('invokes `onFlag` callback when flag button clicked', () => {
+    it('sets a flash error when clicked if user is not logged in', () => {
+      fakeStore.profile.returns({
+        userid: null,
+      });
+
       const button = getButton(createComponent(), 'flag');
 
-      button.props().onClick();
+      act(() => {
+        button.props().onClick();
+      });
 
-      assert.calledOnce(fakeOnFlag);
+      assert.calledOnce(fakeFlash.error);
+      assert.notCalled(fakeAnnotationMapper.flagAnnotation);
+    });
+
+    it('invokes flag on service when clicked', () => {
+      window.confirm.returns(true);
+
+      const button = getButton(createComponent(), 'flag');
+
+      act(() => {
+        button.props().onClick();
+      });
+
+      assert.calledWith(fakeAnnotationMapper.flagAnnotation, fakeAnnotation);
+    });
+
+    it('updates flag state in store after flagging on service is successful', async () => {
+      window.confirm.returns(true);
+      fakeAnnotationMapper.flagAnnotation.resolves(fakeAnnotation);
+
+      const button = getButton(createComponent(), 'flag');
+
+      act(() => {
+        button.props().onClick();
+      });
+
+      await fakeAnnotation;
+      assert.calledWith(fakeStore.updateFlagStatus, fakeAnnotation.id, true);
+    });
+
+    it('sets flash error message if flagging fails on service', async () => {
+      window.confirm.returns(true);
+      fakeAnnotationMapper.flagAnnotation.rejects();
+
+      const button = getButton(createComponent(), 'flag');
+
+      act(() => {
+        button.props().onClick();
+      });
+
+      await waitFor(() => fakeFlash.error.called);
+      assert.notCalled(fakeStore.updateFlagStatus);
     });
 
     it('does not show flag action button if user is author', () => {
-      fakeAnnotation.user = 'acct:foo@bar.com';
+      fakeAnnotation.user = fakeUserProfile.userid;
 
       const wrapper = createComponent();
 

@@ -175,49 +175,6 @@ function AnnotationController(
 
   /**
    * @ngdoc method
-   * @name annotation.AnnotationController#flag
-   * @description Flag the annotation.
-   */
-  this.flag = function() {
-    if (!session.state.userid) {
-      flash.error(
-        'You must be logged in to report an annotation to the moderators.',
-        'Login to flag annotations'
-      );
-      return;
-    }
-
-    const onRejected = function(err) {
-      flash.error(err.message, 'Flagging annotation failed');
-    };
-    annotationMapper.flagAnnotation(self.annotation).then(function() {
-      store.updateFlagStatus(self.annotation.id, true);
-    }, onRejected);
-  };
-
-  /**
-   * @ngdoc method
-   * @name annotation.AnnotationController#delete
-   * @description Deletes the annotation.
-   */
-  this.delete = function() {
-    return $timeout(function() {
-      // Don't use confirm inside the digest cycle.
-      const msg = 'Are you sure you want to delete this annotation?';
-      if ($window.confirm(msg)) {
-        $scope.$apply(function() {
-          annotationMapper
-            .deleteAnnotation(self.annotation)
-            .catch(err =>
-              flash.error(err.message, 'Deleting annotation failed')
-            );
-        });
-      }
-    }, true);
-  };
-
-  /**
-   * @ngdoc method
    * @name annotation.AnnotationController#edit
    * @description Switches the view to an editor.
    */
