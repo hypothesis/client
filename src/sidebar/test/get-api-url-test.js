@@ -1,4 +1,4 @@
-const getApiUrl = require('../get-api-url');
+import getApiUrl from '../get-api-url';
 
 describe('sidebar.getApiUrl', function() {
   context('when there is a service object in settings', function() {

@@ -1,4 +1,4 @@
-const url = require('../url');
+import * as url from '../url';
 
 describe('url.encode', function() {
   it('urlencodes its input', function() {

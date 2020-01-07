@@ -1,4 +1,4 @@
-const settingsFrom = require('./settings');
+import settingsFrom from './settings';
 
 /**
  * Reads the Hypothesis configuration from the environment.

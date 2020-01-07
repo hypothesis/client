@@ -1,4 +1,4 @@
-const queryString = require('query-string');
+import * as queryString from 'query-string';
 
 /**
  * Return an HTML5 audio player with the given src URL.

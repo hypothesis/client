@@ -1,9 +1,8 @@
-const propTypes = require('prop-types');
-const { createElement } = require('preact');
+import propTypes from 'prop-types';
+import { createElement } from 'preact';
 
-const { withServices } = require('../util/service-context');
-
-const SvgIcon = require('./svg-icon');
+import { withServices } from '../util/service-context';
+import SvgIcon from './svg-icon';
 
 /**
  * A single sharing link as a list item

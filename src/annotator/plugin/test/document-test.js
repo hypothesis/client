@@ -10,10 +10,10 @@
  ** https://github.com/openannotation/annotator/blob/master/LICENSE
  */
 
-const $ = require('jquery');
+import $ from 'jquery';
 
-const DocumentMeta = require('../document');
-const { normalizeURI } = require('../../util/url');
+import DocumentMeta from '../document';
+import { normalizeURI } from '../../util/url';
 
 describe('DocumentMeta', function() {
   let fakeNormalizeURI;

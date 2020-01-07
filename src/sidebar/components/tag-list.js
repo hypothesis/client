@@ -1,9 +1,9 @@
-const { createElement } = require('preact');
-const propTypes = require('prop-types');
-const { useMemo } = require('preact/hooks');
+import { createElement } from 'preact';
+import propTypes from 'prop-types';
+import { useMemo } from 'preact/hooks';
 
-const { isThirdPartyUser } = require('../util/account-id');
-const { withServices } = require('../util/service-context');
+import { isThirdPartyUser } from '../util/account-id';
+import { withServices } from '../util/service-context';
 
 /**
  * Component to render an annotation's tags.

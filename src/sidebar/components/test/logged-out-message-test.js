@@ -1,8 +1,8 @@
-const { createElement } = require('preact');
-const { mount } = require('enzyme');
+import { createElement } from 'preact';
+import { mount } from 'enzyme';
 
-const LoggedOutMessage = require('../logged-out-message');
-const mockImportedComponents = require('./mock-imported-components');
+import LoggedOutMessage from '../logged-out-message';
+import mockImportedComponents from './mock-imported-components';
 
 describe('LoggedOutMessage', () => {
   const createLoggedOutMessage = props => {

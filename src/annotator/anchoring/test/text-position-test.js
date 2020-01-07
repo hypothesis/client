@@ -1,4 +1,4 @@
-const { toRange } = require('../text-position');
+import { toRange } from '../text-position';
 
 describe('text-position', () => {
   let container;

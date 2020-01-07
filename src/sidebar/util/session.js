@@ -1,4 +1,4 @@
-const serviceConfig = require('../service-config');
+import serviceConfig from '../service-config';
 
 /**
  * Returns true if the sidebar tutorial has to be shown to a user for a given session.

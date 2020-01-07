@@ -3,15 +3,14 @@
  * sidebar.
  */
 
-const { createSelector } = require('reselect');
+import { createSelector } from 'reselect';
 
-const arrayUtil = require('../../util/array');
-const metadata = require('../../util/annotation-metadata');
-const uiConstants = require('../../ui-constants');
-
-const selection = require('./selection');
-const drafts = require('./drafts');
-const util = require('../util');
+import * as arrayUtil from '../../util/array';
+import * as metadata from '../../util/annotation-metadata';
+import * as uiConstants from '../../ui-constants';
+import * as selection from './selection';
+import * as drafts from './drafts';
+import * as util from '../util';
 
 /**
  * Return a copy of `current` with all matching annotations in `annotations`

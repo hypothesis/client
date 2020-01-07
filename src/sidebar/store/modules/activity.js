@@ -3,7 +3,7 @@
  * need to be reflected in the UI.
  */
 
-const { actionTypes } = require('../util');
+import { actionTypes } from '../util';
 
 function init() {
   return {

@@ -1,15 +1,15 @@
 /* global PDFViewerApplication */
 
-const seek = require('dom-seek');
+import seek from 'dom-seek';
 
 // `dom-node-iterator` polyfills optional arguments of `createNodeIterator`
 // and properties of the returned `NodeIterator` for IE 11 compatibility.
 const createNodeIterator = require('dom-node-iterator/polyfill')();
 
-const xpathRange = require('./range');
-const RenderingStates = require('../pdfjs-rendering-states');
-const { TextPositionAnchor, TextQuoteAnchor } = require('./types');
-const { toRange: textPositionToRange } = require('./text-position');
+import xpathRange from './range';
+import RenderingStates from '../pdfjs-rendering-states';
+import { TextPositionAnchor, TextQuoteAnchor } from './types';
+import { toRange as textPositionToRange } from './text-position';
 
 // Caches for performance.
 

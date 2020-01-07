@@ -1,7 +1,8 @@
 // Functions that determine which tab an annotation should be displayed in.
 
-const metadata = require('./annotation-metadata');
-const uiConstants = require('../ui-constants');
+import * as metadata from './annotation-metadata';
+
+import * as uiConstants from '../ui-constants';
 
 /**
  * Return the tab in which an annotation should be displayed.

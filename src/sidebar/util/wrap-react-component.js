@@ -1,5 +1,6 @@
-const { createElement, render } = require('preact');
-const { ServiceContext } = require('./service-context');
+import { createElement, render } from 'preact';
+
+import { ServiceContext } from './service-context';
 
 function useExpressionBinding(propName) {
   return propName.match(/^on[A-Z]/);

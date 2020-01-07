@@ -1,6 +1,6 @@
-const extend = require('extend');
+import extend from 'extend';
 
-const RPC = require('./frame-rpc');
+import RPC from './frame-rpc';
 
 /**
  * The Bridge service sets up a channel between frames and provides an events

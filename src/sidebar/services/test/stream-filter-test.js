@@ -1,4 +1,4 @@
-const StreamFilter = require('../stream-filter');
+import StreamFilter from '../stream-filter';
 
 describe('sidebar/services/stream-filter', () => {
   describe('#addClause', () => {

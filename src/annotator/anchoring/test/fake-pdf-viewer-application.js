@@ -9,7 +9,7 @@
  * each of the relevant classes in PDF.js.
  */
 
-const RenderingStates = require('../../pdfjs-rendering-states');
+import RenderingStates from '../../pdfjs-rendering-states';
 
 /**
  * Create the DOM structure for a page which matches the structure produced by

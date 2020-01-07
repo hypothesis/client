@@ -1,4 +1,4 @@
-const serviceUrlFactory = require('../service-url');
+import serviceUrlFactory from '../service-url';
 
 /** Return a fake store object. */
 function fakeStore() {

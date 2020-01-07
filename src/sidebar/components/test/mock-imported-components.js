@@ -2,11 +2,9 @@
  * Return true if `value` "looks like" a React/Preact component.
  */
 function isComponent(value) {
-  return (
-    typeof value === 'function' &&
-    value.hasOwnProperty('propTypes') &&
-    value.name.match(/^[A-Z]/)
-  );
+  return typeof value === 'function' &&
+  value.hasOwnProperty('propTypes') &&
+  value.name.match(/^[A-Z]/);
 }
 
 /**

@@ -1,4 +1,4 @@
-const VirtualThreadList = require('../virtual-thread-list');
+import VirtualThreadList from '../virtual-thread-list';
 
 describe('VirtualThreadList', function() {
   let lastState;

@@ -1,4 +1,4 @@
-const escapeStringRegexp = require('escape-string-regexp');
+import escapeStringRegexp from 'escape-string-regexp';
 
 /**
  * Combine groups from multiple api calls together to form a unique list of groups.

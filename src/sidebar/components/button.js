@@ -1,8 +1,8 @@
-const classnames = require('classnames');
-const propTypes = require('prop-types');
-const { createElement } = require('preact');
+import classnames from 'classnames';
+import propTypes from 'prop-types';
+import { createElement } from 'preact';
 
-const SvgIcon = require('./svg-icon');
+import SvgIcon from './svg-icon';
 
 /**
  * A button, one of three base types depending on provided props:

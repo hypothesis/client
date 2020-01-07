@@ -12,8 +12,9 @@
  *     https://reactjs.org/docs/hooks-reference.html#usecontext
  */
 
-const { useContext } = require('preact/hooks');
-const { createContext, createElement } = require('preact');
+import { useContext } from 'preact/hooks';
+
+import { createContext, createElement } from 'preact';
 
 const fallbackInjector = {
   get(service) {

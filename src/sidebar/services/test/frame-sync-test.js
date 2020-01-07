@@ -1,11 +1,11 @@
-const angular = require('angular');
-const EventEmitter = require('tiny-emitter');
+import angular from 'angular';
+import EventEmitter from 'tiny-emitter';
 
-const annotationFixtures = require('../../test/annotation-fixtures');
-const events = require('../../events');
-const createFakeStore = require('../../test/fake-redux-store');
-const { default: FrameSync, formatAnnot } = require('../frame-sync');
-const uiConstants = require('../../ui-constants');
+import * as annotationFixtures from '../../test/annotation-fixtures';
+import * as events from '../../events';
+import createFakeStore from '../../test/fake-redux-store';
+import FrameSync, { formatAnnot } from '../frame-sync';
+import * as uiConstants from '../../ui-constants';
 
 const fixtures = {
   ann: Object.assign({ $tag: 't1' }, annotationFixtures.defaultAnnotation()),

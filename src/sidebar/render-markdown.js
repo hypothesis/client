@@ -1,7 +1,7 @@
-const createDOMPurify = require('dompurify');
-const escapeHtml = require('escape-html');
-const katex = require('katex');
-const showdown = require('showdown');
+import createDOMPurify from 'dompurify';
+import escapeHtml from 'escape-html';
+import * as katex from 'katex';
+import showdown from 'showdown';
 
 const DOMPurify = createDOMPurify(window);
 

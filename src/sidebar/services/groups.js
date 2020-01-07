@@ -11,10 +11,10 @@ const DEFAULT_ORGANIZATION = {
     encodeURIComponent(require('../../images/icons/logo.svg')),
 };
 
-const events = require('../events');
-const { awaitStateChange } = require('../util/state');
-const { combineGroups } = require('../util/groups');
-const serviceConfig = require('../service-config');
+import * as events from '../events';
+import { awaitStateChange } from '../util/state';
+import { combineGroups } from '../util/groups';
+import serviceConfig from '../service-config';
 
 // @ngInject
 function groups(

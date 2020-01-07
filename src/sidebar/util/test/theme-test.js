@@ -1,4 +1,4 @@
-const { applyTheme } = require('../theme');
+import { applyTheme } from '../theme';
 
 describe('sidebar/util/theme/applyTheme', () => {
   let fakeSettings;

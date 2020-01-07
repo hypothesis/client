@@ -1,4 +1,4 @@
-const { generateHexString } = require('./random');
+import { generateHexString } from './random';
 
 /** Generate a random ID to associate RPC requests and responses. */
 function generateId() {

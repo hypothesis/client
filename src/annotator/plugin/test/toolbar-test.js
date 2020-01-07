@@ -1,6 +1,6 @@
-const $ = require('jquery');
+import $ from 'jquery';
 
-const Toolbar = require('../toolbar');
+import Toolbar from '../toolbar';
 
 describe('Toolbar', () => {
   let container;

@@ -1,4 +1,4 @@
-const serviceConfig = require('../service-config');
+import serviceConfig from '../service-config';
 
 /**
  * Is the sharing of annotations enabled? Check for any defined `serviceConfig`,

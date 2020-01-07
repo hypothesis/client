@@ -1,8 +1,8 @@
-const { mount } = require('enzyme');
-const { createElement } = require('preact');
+import { mount } from 'enzyme';
+import { createElement } from 'preact';
 
-const SearchStatusBar = require('../search-status-bar');
-const mockImportedComponents = require('./mock-imported-components');
+import SearchStatusBar from '../search-status-bar';
+import mockImportedComponents from './mock-imported-components';
 
 describe('SearchStatusBar', () => {
   let fakeRootThread;

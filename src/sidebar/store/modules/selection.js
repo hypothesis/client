@@ -14,15 +14,15 @@
  * @property {string} displayName - User's display name
  */
 
-const { createSelector } = require('reselect');
-const immutable = require('seamless-immutable');
+import { createSelector } from 'reselect';
 
-const arrayUtil = require('../../util/array');
-const metadata = require('../../util/annotation-metadata');
-const { toSet } = require('../../util/array');
-const uiConstants = require('../../ui-constants');
+import immutable from 'seamless-immutable';
 
-const util = require('../util');
+import * as arrayUtil from '../../util/array';
+import * as metadata from '../../util/annotation-metadata';
+import { toSet } from '../../util/array';
+import * as uiConstants from '../../ui-constants';
+import * as util from '../util';
 
 /**
  * Default starting tab.

@@ -1,8 +1,8 @@
-const { createElement } = require('preact');
-const { mount } = require('enzyme');
+import { createElement } from 'preact';
+import { mount } from 'enzyme';
 
-const AnnotationBody = require('../annotation-body');
-const mockImportedComponents = require('./mock-imported-components');
+import AnnotationBody from '../annotation-body';
+import mockImportedComponents from './mock-imported-components';
 
 describe('AnnotationBody', () => {
   function createBody(props = {}) {

@@ -1,4 +1,4 @@
-const { createElement } = require('preact');
+import { createElement } from 'preact';
 
 /**
  * Loading indicator.

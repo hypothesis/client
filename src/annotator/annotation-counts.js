@@ -1,4 +1,4 @@
-const events = require('../shared/bridge-events');
+import * as events from '../shared/bridge-events';
 
 const ANNOTATION_COUNT_ATTR = 'data-hypothesis-annotation-count';
 

@@ -1,7 +1,7 @@
-const domAnchorTextQuote = require('dom-anchor-text-quote');
+import * as domAnchorTextQuote from 'dom-anchor-text-quote';
 
-const FakePDFViewerApplication = require('./fake-pdf-viewer-application');
-const pdfAnchoring = require('../pdf');
+import FakePDFViewerApplication from './fake-pdf-viewer-application';
+import * as pdfAnchoring from '../pdf';
 
 /**
  * Return a DOM Range which refers to the specified `text` in `container`.

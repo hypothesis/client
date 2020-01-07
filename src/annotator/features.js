@@ -1,5 +1,5 @@
-const events = require('../shared/bridge-events');
-const warnOnce = require('../shared/warn-once');
+import * as events from '../shared/bridge-events';
+import warnOnce from '../shared/warn-once';
 
 let _features = {};
 

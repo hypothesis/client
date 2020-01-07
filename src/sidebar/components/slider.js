@@ -1,6 +1,6 @@
-const propTypes = require('prop-types');
-const { createElement } = require('preact');
-const { useCallback, useEffect, useRef, useState } = require('preact/hooks');
+import propTypes from 'prop-types';
+import { createElement } from 'preact';
+import { useCallback, useEffect, useRef, useState } from 'preact/hooks';
 
 /**
  * A container which reveals its content when `visible` is `true` using

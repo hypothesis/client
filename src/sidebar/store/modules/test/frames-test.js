@@ -1,5 +1,5 @@
-const frames = require('../frames');
-const createStore = require('../../create-store');
+import * as frames from '../frames';
+import createStore from '../../create-store';
 
 describe('sidebar/store/modules/frames', function() {
   let store;

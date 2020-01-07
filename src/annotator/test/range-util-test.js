@@ -1,4 +1,4 @@
-const rangeUtil = require('../range-util');
+import * as rangeUtil from '../range-util';
 
 function createRange(node, start, end) {
   const range = node.ownerDocument.createRange();

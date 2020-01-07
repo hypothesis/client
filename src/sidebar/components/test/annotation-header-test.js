@@ -1,10 +1,9 @@
-const { createElement } = require('preact');
-const { mount } = require('enzyme');
+import { createElement } from 'preact';
+import { mount } from 'enzyme';
 
-const fixtures = require('../../test/annotation-fixtures');
-
-const AnnotationHeader = require('../annotation-header');
-const mockImportedComponents = require('./mock-imported-components');
+import * as fixtures from '../../test/annotation-fixtures';
+import AnnotationHeader from '../annotation-header';
+import mockImportedComponents from './mock-imported-components';
 
 describe('AnnotationHeader', () => {
   const createAnnotationHeader = props => {

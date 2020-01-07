@@ -1,10 +1,9 @@
-const { createElement } = require('preact');
-const { useEffect, useState } = require('preact/hooks');
-const propTypes = require('prop-types');
+import { createElement } from 'preact';
+import { useEffect, useState } from 'preact/hooks';
+import propTypes from 'prop-types';
 
-const { withServices } = require('../util/service-context');
-
-const SearchInput = require('./search-input');
+import { withServices } from '../util/service-context';
+import SearchInput from './search-input';
 
 /**
  * Search input for the single annotation view and stream.

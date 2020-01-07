@@ -1,14 +1,13 @@
-const propTypes = require('prop-types');
-const { createElement } = require('preact');
-const { useEffect, useRef, useState } = require('preact/hooks');
+import propTypes from 'prop-types';
+import { createElement } from 'preact';
+import { useEffect, useRef, useState } from 'preact/hooks';
 
-const useElementShouldClose = require('./hooks/use-element-should-close');
-const { copyText } = require('../util/copy-to-clipboard');
-const { withServices } = require('../util/service-context');
-
-const Button = require('./button');
-const ShareLinks = require('./share-links');
-const SvgIcon = require('./svg-icon');
+import useElementShouldClose from './hooks/use-element-should-close';
+import { copyText } from '../util/copy-to-clipboard';
+import { withServices } from '../util/service-context';
+import Button from './button';
+import ShareLinks from './share-links';
+import SvgIcon from './svg-icon';
 
 /**
  * "Popup"-style component for sharing a single annotation.

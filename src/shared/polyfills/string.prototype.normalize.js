@@ -1,1 +1,1 @@
-require('unorm');
+import 'unorm';

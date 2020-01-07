@@ -1,11 +1,10 @@
-const { createElement } = require('preact');
-const { useRef } = require('preact/hooks');
-const propTypes = require('prop-types');
+import { createElement } from 'preact';
+import { useRef } from 'preact/hooks';
+import propTypes from 'prop-types';
+import { act } from 'preact/test-utils';
+import { mount } from 'enzyme';
 
-const { act } = require('preact/test-utils');
-const { mount } = require('enzyme');
-
-const useElementShouldClose = require('../use-element-should-close');
+import useElementShouldClose from '../use-element-should-close';
 
 describe('hooks.useElementShouldClose', () => {
   let handleClose;

@@ -1,4 +1,4 @@
-const boot = require('../boot');
+import boot from '../boot';
 
 function assetUrl(url) {
   return `https://marginal.ly/client/build/${url}`;

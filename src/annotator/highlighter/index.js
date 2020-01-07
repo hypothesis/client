@@ -1,6 +1,6 @@
-const domWrapHighlighter = require('./dom-wrap-highlighter');
-const overlayHighlighter = require('./overlay-highlighter');
-const features = require('../features');
+import * as domWrapHighlighter from './dom-wrap-highlighter';
+import * as overlayHighlighter from './overlay-highlighter';
+import * as features from '../features';
 
 // we need a facade for the highlighter interface
 // that will let us lazy check the overlay_highlighter feature

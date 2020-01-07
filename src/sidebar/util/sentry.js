@@ -1,6 +1,6 @@
-const Sentry = require('@sentry/browser');
+import * as Sentry from '@sentry/browser';
 
-const warnOnce = require('../../shared/warn-once');
+import warnOnce from '../../shared/warn-once';
 
 /**
  * @typedef SentryConfig

@@ -1,9 +1,8 @@
-const queryString = require('query-string');
-const uuid = require('node-uuid');
+import * as queryString from 'query-string';
+import uuid from 'node-uuid';
 
-const warnOnce = require('../../shared/warn-once');
-
-const Socket = require('../websocket');
+import warnOnce from '../../shared/warn-once';
+import Socket from '../websocket';
 
 /**
  * Open a new WebSocket connection to the Hypothesis push notification service.

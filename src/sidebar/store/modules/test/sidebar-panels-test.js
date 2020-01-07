@@ -1,5 +1,5 @@
-const createStore = require('../../create-store');
-const sidebarPanels = require('../sidebar-panels');
+import createStore from '../../create-store';
+import * as sidebarPanels from '../sidebar-panels';
 
 describe('sidebar/store/modules/sidebar-panels', () => {
   let store;

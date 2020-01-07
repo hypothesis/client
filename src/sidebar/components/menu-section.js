@@ -1,5 +1,5 @@
-const { Fragment, createElement, toChildArray } = require('preact');
-const propTypes = require('prop-types');
+import { Fragment, createElement, toChildArray } from 'preact';
+import propTypes from 'prop-types';
 
 /**
  * Group a set of menu items together visually, with an optional header.

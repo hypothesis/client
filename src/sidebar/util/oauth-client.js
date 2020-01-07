@@ -1,6 +1,6 @@
-const queryString = require('query-string');
+import * as queryString from 'query-string';
 
-const random = require('./random');
+import * as random from './random';
 
 /**
  * An object holding the details of an access token from the tokenUrl endpoint.

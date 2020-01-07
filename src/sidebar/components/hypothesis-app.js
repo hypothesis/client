@@ -1,10 +1,10 @@
-const events = require('../events');
-const { parseAccountID } = require('../util/account-id');
-const serviceConfig = require('../service-config');
-const bridgeEvents = require('../../shared/bridge-events');
-const uiConstants = require('../ui-constants');
-const isSidebar = require('../util/is-sidebar');
-const { shouldAutoDisplayTutorial } = require('../util/session');
+import * as events from '../events';
+import { parseAccountID } from '../util/account-id';
+import serviceConfig from '../service-config';
+import * as bridgeEvents from '../../shared/bridge-events';
+import * as uiConstants from '../ui-constants';
+import isSidebar from '../util/is-sidebar';
+import { shouldAutoDisplayTutorial } from '../util/session';
 
 /**
  * Return the user's authentication status from their profile.

@@ -1,6 +1,6 @@
-const events = require('../../events');
-const fakeReduxStore = require('../../test/fake-redux-store');
-const groups = require('../groups');
+import * as events from '../../events';
+import fakeReduxStore from '../../test/fake-redux-store';
+import groups from '../groups';
 
 /**
  * Generate a truth table containing every possible combination of a set of

@@ -1,4 +1,4 @@
-const baseURI = require('document-base-uri');
+import baseURI from 'document-base-uri';
 
 /**
  * Return a normalized version of a URI.

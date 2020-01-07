@@ -1,5 +1,6 @@
-let FrameUtil = require('./util/frame-util');
-let debounce = require('lodash.debounce');
+import * as FrameUtil from './util/frame-util';
+
+import debounce from 'lodash.debounce';
 
 // Find difference of two arrays
 let difference = (arrayA, arrayB) => {

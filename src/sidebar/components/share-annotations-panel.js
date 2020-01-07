@@ -1,14 +1,14 @@
-const propTypes = require('prop-types');
-const { createElement } = require('preact');
-const useStore = require('../store/use-store');
-const { copyText } = require('../util/copy-to-clipboard');
-const { withServices } = require('../util/service-context');
-const uiConstants = require('../ui-constants');
+import propTypes from 'prop-types';
+import { createElement } from 'preact';
 
-const Button = require('./button');
-const ShareLinks = require('./share-links');
-const SidebarPanel = require('./sidebar-panel');
-const SvgIcon = require('./svg-icon');
+import useStore from '../store/use-store';
+import { copyText } from '../util/copy-to-clipboard';
+import { withServices } from '../util/service-context';
+import * as uiConstants from '../ui-constants';
+import Button from './button';
+import ShareLinks from './share-links';
+import SidebarPanel from './sidebar-panel';
+import SvgIcon from './svg-icon';
 
 /**
  * A panel for sharing the current group's annotations.

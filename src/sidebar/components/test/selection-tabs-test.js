@@ -1,9 +1,9 @@
-const { mount } = require('enzyme');
-const { createElement } = require('preact');
+import { mount } from 'enzyme';
+import { createElement } from 'preact';
 
-const uiConstants = require('../../ui-constants');
-const SelectionTabs = require('../selection-tabs');
-const mockImportedComponents = require('./mock-imported-components');
+import * as uiConstants from '../../ui-constants';
+import SelectionTabs from '../selection-tabs';
+import mockImportedComponents from './mock-imported-components';
 
 describe('SelectionTabs', function() {
   // mock services

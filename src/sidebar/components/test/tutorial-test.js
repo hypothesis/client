@@ -1,8 +1,8 @@
-const { mount } = require('enzyme');
-const { createElement } = require('preact');
+import { mount } from 'enzyme';
+import { createElement } from 'preact';
 
-const Tutorial = require('../tutorial');
-const mockImportedComponents = require('./mock-imported-components');
+import Tutorial from '../tutorial';
+import mockImportedComponents from './mock-imported-components';
 
 describe('Tutorial', function() {
   let fakeIsThirdPartyService;

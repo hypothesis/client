@@ -1,6 +1,6 @@
-const classnames = require('classnames');
+import classnames from 'classnames';
 
-const template = require('./adder.html');
+import template from './adder.html';
 
 const ANNOTATE_BTN_SELECTOR = '.js-annotate-btn';
 const HIGHLIGHT_BTN_SELECTOR = '.js-highlight-btn';

@@ -1,8 +1,8 @@
-const immutable = require('seamless-immutable');
+import immutable from 'seamless-immutable';
 
-const createStore = require('../../create-store');
-const groups = require('../groups');
-const session = require('../session');
+import createStore from '../../create-store';
+import * as groups from '../groups';
+import * as session from '../session';
 
 describe('sidebar/store/modules/groups', () => {
   const publicGroup = immutable({

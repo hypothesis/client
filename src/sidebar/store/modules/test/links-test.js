@@ -1,4 +1,4 @@
-const links = require('../links');
+import * as links from '../links';
 
 const init = links.init;
 const update = links.update.UPDATE_LINKS;

@@ -1,9 +1,9 @@
-const addAnalytics = require('./ga');
-const disableOpenerForExternalLinks = require('./util/disable-opener-for-external-links');
-const { fetchConfig } = require('./util/fetch-config');
-const serviceConfig = require('./service-config');
-const { jsonConfigsFrom } = require('../shared/settings');
-const crossOriginRPC = require('./cross-origin-rpc.js');
+import addAnalytics from './ga';
+import disableOpenerForExternalLinks from './util/disable-opener-for-external-links';
+import { fetchConfig } from './util/fetch-config';
+import serviceConfig from './service-config';
+import { jsonConfigsFrom } from '../shared/settings';
+import * as crossOriginRPC from './cross-origin-rpc.js';
 
 let sentry;
 
@@ -28,19 +28,19 @@ document.body.setAttribute('ng-csp', '');
 // Prevent tab-jacking.
 disableOpenerForExternalLinks(document.body);
 
-const angular = require('angular');
+import angular from 'angular';
 
 // autofill-event relies on the existence of window.angular so
 // it must be require'd after angular is first require'd
-require('autofill-event');
+import 'autofill-event';
 
 // Load polyfill for :focus-visible pseudo-class.
-require('focus-visible');
+import 'focus-visible';
 
 // Enable debugging checks for Preact.
-require('preact/debug');
+import 'preact/debug';
 
-const wrapReactComponent = require('./util/wrap-react-component');
+import wrapReactComponent from './util/wrap-react-component';
 
 if (appConfig.googleAnalytics) {
   addAnalytics(appConfig.googleAnalytics);

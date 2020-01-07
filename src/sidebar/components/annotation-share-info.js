@@ -1,10 +1,9 @@
-const propTypes = require('prop-types');
-const { createElement } = require('preact');
+import propTypes from 'prop-types';
+import { createElement } from 'preact';
 
-const { withServices } = require('../util/service-context');
-const useStore = require('../store/use-store');
-
-const SvgIcon = require('./svg-icon');
+import { withServices } from '../util/service-context';
+import useStore from '../store/use-store';
+import SvgIcon from './svg-icon';
 
 /**
  * Render information about what group an annotation is in and

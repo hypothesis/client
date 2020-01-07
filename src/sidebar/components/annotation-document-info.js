@@ -1,7 +1,7 @@
-const propTypes = require('prop-types');
-const { createElement } = require('preact');
+import propTypes from 'prop-types';
+import { createElement } from 'preact';
 
-const annotationMetadata = require('../util/annotation-metadata');
+import * as annotationMetadata from '../util/annotation-metadata';
 
 /**
  * Render some metadata about an annotation's document and link to it

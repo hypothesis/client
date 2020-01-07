@@ -1,5 +1,5 @@
-const retry = require('retry');
-const EventEmitter = require('tiny-emitter');
+import retry from 'retry';
+import EventEmitter from 'tiny-emitter';
 
 // see https://developer.mozilla.org/en-US/docs/Web/API/CloseEvent
 const CLOSE_NORMAL = 1000;

@@ -1,10 +1,10 @@
-const annotations = require('../annotations');
-const createStoreFromModules = require('../../create-store');
-const drafts = require('../drafts');
-const fixtures = require('../../../test/annotation-fixtures');
-const selection = require('../selection');
-const viewer = require('../viewer');
-const uiConstants = require('../../../ui-constants');
+import * as annotations from '../annotations';
+import createStoreFromModules from '../../create-store';
+import * as drafts from '../drafts';
+import * as fixtures from '../../../test/annotation-fixtures';
+import * as selection from '../selection';
+import * as viewer from '../viewer';
+import * as uiConstants from '../../../ui-constants';
 
 const { actions, selectors } = annotations;
 

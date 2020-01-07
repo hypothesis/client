@@ -1,4 +1,4 @@
-const EventEmitter = require('tiny-emitter');
+import EventEmitter from 'tiny-emitter';
 
 /**
  * Client for the Hypothesis search API.

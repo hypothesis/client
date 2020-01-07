@@ -3,7 +3,7 @@
  * values using the Observable API.
  */
 
-const Observable = require('zen-observable');
+import Observable from 'zen-observable';
 
 /**
  * Returns an observable of events emitted by a DOM event source

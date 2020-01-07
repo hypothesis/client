@@ -1,6 +1,6 @@
-const { createElement } = require('preact');
+import { createElement } from 'preact';
 
-const SvgIcon = require('./svg-icon');
+import SvgIcon from './svg-icon';
 
 /**
  * Render information about CC licensing

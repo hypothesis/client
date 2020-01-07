@@ -1,7 +1,7 @@
-const { createSelector } = require('reselect');
+import { createSelector } from 'reselect';
 
-const util = require('../util');
-const { selectors: sessionSelectors } = require('./session');
+import * as util from '../util';
+import { selectors as sessionSelectors } from './session';
 const { isLoggedIn } = sessionSelectors;
 
 function init() {

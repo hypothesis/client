@@ -1,5 +1,5 @@
-const angular = require('angular');
-const immutable = require('seamless-immutable');
+import angular from 'angular';
+import immutable from 'seamless-immutable';
 
 const fixtures = immutable({
   annotations: [

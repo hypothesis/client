@@ -1,4 +1,4 @@
-const SearchClient = require('../search-client');
+import SearchClient from '../search-client';
 
 function awaitEvent(emitter, event) {
   return new Promise(function(resolve) {

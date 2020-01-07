@@ -1,4 +1,4 @@
-const warnOnce = require('../shared/warn-once');
+import warnOnce from '../shared/warn-once';
 
 /**
  * Return the mapped methods that can be called remotely via this server.

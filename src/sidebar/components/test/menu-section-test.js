@@ -1,8 +1,8 @@
-const { createElement } = require('preact');
-const { mount } = require('enzyme');
+import { createElement } from 'preact';
+import { mount } from 'enzyme';
 
-const MenuSection = require('../menu-section');
-const mockImportedComponents = require('./mock-imported-components');
+import MenuSection from '../menu-section';
+import mockImportedComponents from './mock-imported-components';
 
 describe('MenuSection', () => {
   const createMenuSection = props =>

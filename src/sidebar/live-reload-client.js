@@ -1,8 +1,8 @@
 /* eslint no-console: "off" */
 
-const queryString = require('query-string');
+import * as queryString from 'query-string';
 
-const Socket = require('./websocket');
+import Socket from './websocket';
 
 /**
  * Return a URL with a cache-busting query string parameter added.

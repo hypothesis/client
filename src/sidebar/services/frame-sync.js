@@ -1,9 +1,9 @@
-const debounce = require('lodash.debounce');
+import debounce from 'lodash.debounce';
 
-const events = require('../events');
-const bridgeEvents = require('../../shared/bridge-events');
-const metadata = require('../util/annotation-metadata');
-const uiConstants = require('../ui-constants');
+import * as events from '../events';
+import * as bridgeEvents from '../../shared/bridge-events';
+import * as metadata from '../util/annotation-metadata';
+import * as uiConstants from '../ui-constants';
 
 /**
  * @typedef FrameInfo

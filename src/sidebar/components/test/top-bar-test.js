@@ -1,11 +1,10 @@
-const { createElement } = require('preact');
-const { mount } = require('enzyme');
+import { createElement } from 'preact';
+import { mount } from 'enzyme';
 
-const uiConstants = require('../../ui-constants');
-const bridgeEvents = require('../../../shared/bridge-events');
-
-const TopBar = require('../top-bar');
-const mockImportedComponents = require('./mock-imported-components');
+import * as uiConstants from '../../ui-constants';
+import * as bridgeEvents from '../../../shared/bridge-events';
+import TopBar from '../top-bar';
+import mockImportedComponents from './mock-imported-components';
 
 describe('TopBar', () => {
   const fakeSettings = {};

@@ -1,12 +1,11 @@
-const { createElement } = require('preact');
-const propTypes = require('prop-types');
-const { useMemo } = require('preact/hooks');
+import { createElement } from 'preact';
+import propTypes from 'prop-types';
+import { useMemo } from 'preact/hooks';
 
-const { withServices } = require('../util/service-context');
-const uiConstants = require('../ui-constants');
-const useStore = require('../store/use-store');
-
-const Button = require('./button');
+import { withServices } from '../util/service-context';
+import * as uiConstants from '../ui-constants';
+import useStore from '../store/use-store';
+import Button from './button';
 
 /**
  * Of the annotations in the thread `annThread`, how many

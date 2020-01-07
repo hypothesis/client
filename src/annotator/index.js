@@ -1,12 +1,12 @@
-const $ = require('jquery');
+import $ from 'jquery';
 
 // Load polyfill for :focus-visible pseudo-class.
-require('focus-visible');
+import 'focus-visible';
 
-const configFrom = require('./config/index');
-const Guest = require('./guest');
-const Sidebar = require('./sidebar');
-const PdfSidebar = require('./pdf-sidebar');
+import configFrom from './config/index';
+import Guest from './guest';
+import Sidebar from './sidebar';
+import PdfSidebar from './pdf-sidebar';
 
 const pluginClasses = {
   // UI plugins

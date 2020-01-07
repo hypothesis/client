@@ -1,6 +1,6 @@
-const { createSelector } = require('reselect');
+import { createSelector } from 'reselect';
 
-const util = require('../util');
+import * as util from '../util';
 
 function init() {
   // The list of frames connected to the sidebar app

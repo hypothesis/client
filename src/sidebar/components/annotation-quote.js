@@ -1,10 +1,10 @@
-const classnames = require('classnames');
-const { createElement } = require('preact');
-const propTypes = require('prop-types');
+import classnames from 'classnames';
+import { createElement } from 'preact';
+import propTypes from 'prop-types';
 
-const { withServices } = require('../util/service-context');
-const { applyTheme } = require('../util/theme');
-const Excerpt = require('./excerpt');
+import { withServices } from '../util/service-context';
+import { applyTheme } from '../util/theme';
+import Excerpt from './excerpt';
 
 /**
  * Display the selected text from the document associated with an annotation.

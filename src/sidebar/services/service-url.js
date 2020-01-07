@@ -1,4 +1,4 @@
-const urlUtil = require('../util/url');
+import * as urlUtil from '../util/url';
 
 /**
  * A function that returns an absolute URL given a link name and params, by

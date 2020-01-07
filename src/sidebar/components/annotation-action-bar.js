@@ -1,11 +1,10 @@
-const propTypes = require('prop-types');
-const { createElement } = require('preact');
+import propTypes from 'prop-types';
+import { createElement } from 'preact';
 
-const { withServices } = require('../util/service-context');
-const { isShareable, shareURI } = require('../util/annotation-sharing');
-
-const AnnotationShareControl = require('./annotation-share-control');
-const Button = require('./button');
+import { withServices } from '../util/service-context';
+import { isShareable, shareURI } from '../util/annotation-sharing';
+import AnnotationShareControl from './annotation-share-control';
+import Button from './button';
 
 /**
  * A collection of `Button`s in the footer area of an annotation.

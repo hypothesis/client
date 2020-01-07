@@ -1,10 +1,10 @@
-const { mount } = require('enzyme');
-const { createElement } = require('preact');
-const { act } = require('preact/test-utils');
+import { mount } from 'enzyme';
+import { createElement } from 'preact';
+import { act } from 'preact/test-utils';
 
-const events = require('../../events');
-const NewNoteButton = require('../new-note-btn');
-const mockImportedComponents = require('./mock-imported-components');
+import * as events from '../../events';
+import NewNoteButton from '../new-note-btn';
+import mockImportedComponents from './mock-imported-components';
 
 describe('NewNoteButton', function() {
   let fakeStore;

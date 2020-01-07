@@ -1,6 +1,6 @@
-const { createElement } = require('preact');
+import { createElement } from 'preact';
 
-const useStore = require('../store/use-store');
+import useStore from '../store/use-store';
 
 /**
  * Render a control to interact with any focused "mode" in the sidebar.

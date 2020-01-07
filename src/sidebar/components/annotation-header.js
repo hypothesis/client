@@ -1,11 +1,11 @@
-const propTypes = require('prop-types');
-const { createElement } = require('preact');
+import propTypes from 'prop-types';
+import { createElement } from 'preact';
 
-const AnnotationDocumentInfo = require('./annotation-document-info');
-const AnnotationShareInfo = require('./annotation-share-info');
-const AnnotationUser = require('./annotation-user');
-const SvgIcon = require('./svg-icon');
-const Timestamp = require('./timestamp');
+import AnnotationDocumentInfo from './annotation-document-info';
+import AnnotationShareInfo from './annotation-share-info';
+import AnnotationUser from './annotation-user';
+import SvgIcon from './svg-icon';
+import Timestamp from './timestamp';
 
 /**
  * Render an annotation's header summary, including metadata about its user,

@@ -1,6 +1,6 @@
-const events = require('../events');
-const { resolve } = require('../util/url');
-const serviceConfig = require('../service-config');
+import * as events from '../events';
+import { resolve } from '../util/url';
+import serviceConfig from '../service-config';
 
 /**
  * @typedef RefreshOptions

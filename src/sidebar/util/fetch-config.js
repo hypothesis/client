@@ -1,6 +1,6 @@
-const getApiUrl = require('../get-api-url');
-const hostConfig = require('../host-config');
-const postMessageJsonRpc = require('./postmessage-json-rpc');
+import getApiUrl from '../get-api-url';
+import hostConfig from '../host-config';
+import * as postMessageJsonRpc from './postmessage-json-rpc';
 
 function ancestors(window_) {
   if (window_ === window_.top) {

@@ -1,12 +1,11 @@
-const classnames = require('classnames');
-const { createElement } = require('preact');
-const { useRef, useState } = require('preact/hooks');
-const propTypes = require('prop-types');
+import classnames from 'classnames';
+import { createElement } from 'preact';
+import { useRef, useState } from 'preact/hooks';
+import propTypes from 'prop-types';
 
-const useStore = require('../store/use-store');
-
-const Button = require('./button');
-const Spinner = require('./spinner');
+import useStore from '../store/use-store';
+import Button from './button';
+import Spinner from './spinner';
 
 /**
  * An input field in the top bar for entering a query that filters annotations

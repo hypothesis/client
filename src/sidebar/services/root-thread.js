@@ -1,8 +1,8 @@
-const buildThread = require('../build-thread');
-const events = require('../events');
-const memoize = require('../util/memoize');
-const metadata = require('../util/annotation-metadata');
-const tabs = require('../util/tabs');
+import buildThread from '../build-thread';
+import * as events from '../events';
+import memoize from '../util/memoize';
+import * as metadata from '../util/annotation-metadata';
+import * as tabs from '../util/tabs';
 
 function truthyKeys(map) {
   return Object.keys(map).filter(function(k) {

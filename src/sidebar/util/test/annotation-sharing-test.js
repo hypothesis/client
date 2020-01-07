@@ -1,4 +1,4 @@
-const sharingUtil = require('../annotation-sharing');
+import * as sharingUtil from '../annotation-sharing';
 
 describe('sidebar.util.annotation-sharing', () => {
   let fakeAnnotation;

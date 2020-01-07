@@ -1,7 +1,6 @@
-const html = require('../html');
-
-const { toResult } = require('../../../shared/test/promise-util');
-const fixture = require('./html-anchoring-fixture.html');
+import * as html from '../html';
+import { toResult } from '../../../shared/test/promise-util';
+import fixture from './html-anchoring-fixture.html';
 
 /** Return all text node children of `container`. */
 function textNodes(container) {

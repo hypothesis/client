@@ -1,4 +1,4 @@
-const crossOriginRPC = require('../cross-origin-rpc');
+import * as crossOriginRPC from '../cross-origin-rpc';
 
 describe('crossOriginRPC', function() {
   describe('server', function() {

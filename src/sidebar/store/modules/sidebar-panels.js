@@ -8,7 +8,7 @@
  * may be "active" (open) at one time.
  */
 
-const util = require('../util');
+import * as util from '../util';
 
 function init() {
   return {

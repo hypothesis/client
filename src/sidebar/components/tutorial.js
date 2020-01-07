@@ -1,10 +1,9 @@
-const { createElement } = require('preact');
-const propTypes = require('prop-types');
+import { createElement } from 'preact';
+import propTypes from 'prop-types';
 
-const { withServices } = require('../util/service-context');
-const isThirdPartyService = require('../util/is-third-party-service');
-
-const SvgIcon = require('./svg-icon');
+import { withServices } from '../util/service-context';
+import isThirdPartyService from '../util/is-third-party-service';
+import SvgIcon from './svg-icon';
 
 /**
  * Subcomponent: an "instruction" within the tutorial step that includes an

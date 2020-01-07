@@ -1,6 +1,6 @@
-const angular = require('angular');
+import angular from 'angular';
 
-const events = require('../events');
+import * as events from '../events';
 
 function getExistingAnnotation(store, id) {
   return store.getState().annotations.annotations.find(function(annot) {

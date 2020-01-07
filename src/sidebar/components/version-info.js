@@ -1,10 +1,9 @@
-const propTypes = require('prop-types');
-const { createElement } = require('preact');
+import propTypes from 'prop-types';
+import { createElement } from 'preact';
 
-const { copyText } = require('../util/copy-to-clipboard');
-const { withServices } = require('../util/service-context');
-
-const Button = require('./button');
+import { copyText } from '../util/copy-to-clipboard';
+import { withServices } from '../util/service-context';
+import Button from './button';
 
 /**
  * Display current client version info

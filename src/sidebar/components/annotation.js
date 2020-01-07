@@ -1,11 +1,6 @@
-const {
-  isNew,
-  isReply,
-  isPageNote,
-  quote,
-} = require('../util/annotation-metadata');
-const events = require('../events');
-const { isThirdPartyUser } = require('../util/account-id');
+import { isNew, isReply, isPageNote, quote } from '../util/annotation-metadata';
+import * as events from '../events';
+import { isThirdPartyUser } from '../util/account-id';
 
 /**
  * Return a copy of `annotation` with changes made in the editor applied.

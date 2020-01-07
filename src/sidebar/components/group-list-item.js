@@ -1,12 +1,11 @@
-const propTypes = require('prop-types');
-const { Fragment, createElement } = require('preact');
+import propTypes from 'prop-types';
+import { Fragment, createElement } from 'preact';
 
-const useStore = require('../store/use-store');
-const { orgName } = require('../util/group-list-item-common');
-const { withServices } = require('../util/service-context');
-const { copyText } = require('../util/copy-to-clipboard');
-
-const MenuItem = require('./menu-item');
+import useStore from '../store/use-store';
+import { orgName } from '../util/group-list-item-common';
+import { withServices } from '../util/service-context';
+import { copyText } from '../util/copy-to-clipboard';
+import MenuItem from './menu-item';
 
 /**
  * An item in the groups selection menu.

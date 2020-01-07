@@ -1,4 +1,4 @@
-const { parseAccountID, username, isThirdPartyUser } = require('../account-id');
+import { parseAccountID, username, isThirdPartyUser } from '../account-id';
 
 describe('sidebar.util.account-id', function() {
   const term = 'acct:hacker@example.com';

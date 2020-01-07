@@ -1,4 +1,4 @@
-const serviceConfig = require('../service-config');
+import serviceConfig from '../service-config';
 
 /**
  * Return `true` if the first configured service is a "third-party" service.

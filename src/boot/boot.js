@@ -1,4 +1,4 @@
-const { requiredPolyfillSets } = require('../shared/polyfills');
+import { requiredPolyfillSets } from '../shared/polyfills';
 
 function injectStylesheet(doc, href) {
   const link = doc.createElement('link');

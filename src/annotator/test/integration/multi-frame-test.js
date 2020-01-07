@@ -1,7 +1,7 @@
-const { isLoaded } = require('../../util/frame-util');
+import { isLoaded } from '../../util/frame-util';
 
 const FRAME_DEBOUNCE_WAIT = require('../../frame-observer').DEBOUNCE_WAIT + 10;
-const CrossFrame = require('../../plugin/cross-frame');
+import CrossFrame from '../../plugin/cross-frame';
 
 describe('CrossFrame multi-frame scenario', function() {
   let fakeAnnotationSync;

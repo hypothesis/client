@@ -1,11 +1,10 @@
-const classnames = require('classnames');
-const { createElement } = require('preact');
-const propTypes = require('prop-types');
+import classnames from 'classnames';
+import { createElement } from 'preact';
+import propTypes from 'prop-types';
 
-const { onActivate } = require('../util/on-activate');
-
-const Slider = require('./slider');
-const SvgIcon = require('./svg-icon');
+import { onActivate } from '../util/on-activate';
+import Slider from './slider';
+import SvgIcon from './svg-icon';
 
 /**
  * An item in a dropdown menu.

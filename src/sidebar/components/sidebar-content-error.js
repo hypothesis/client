@@ -1,5 +1,5 @@
-const { Fragment, createElement } = require('preact');
-const propTypes = require('prop-types');
+import { Fragment, createElement } from 'preact';
+import propTypes from 'prop-types';
 
 /**
  * An error message to display in the sidebar.

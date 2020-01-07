@@ -1,5 +1,6 @@
-const angular = require('angular');
-const service = require('../local-storage');
+import angular from 'angular';
+
+import service from '../local-storage';
 
 function windowWithLocalStoragePropertyThatThrows() {
   const win = {};

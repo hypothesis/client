@@ -1,7 +1,7 @@
-const get = require('lodash.get');
-const queryString = require('query-string');
+import get from 'lodash.get';
+import * as queryString from 'query-string';
 
-const { replaceURLParams } = require('../util/url');
+import { replaceURLParams } from '../util/url';
 
 /**
  * Translate the response from a failed API call into an Error-like object.

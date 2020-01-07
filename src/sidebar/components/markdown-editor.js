@@ -1,16 +1,11 @@
-const classnames = require('classnames');
-const { createElement } = require('preact');
-const { useEffect, useRef, useState } = require('preact/hooks');
-const propTypes = require('prop-types');
+import classnames from 'classnames';
+import { createElement } from 'preact';
+import { useEffect, useRef, useState } from 'preact/hooks';
+import propTypes from 'prop-types';
 
-const MarkdownView = require('./markdown-view');
-const {
-  LinkType,
-  convertSelectionToLink,
-  toggleBlockStyle,
-  toggleSpanStyle,
-} = require('../markdown-commands');
-const SvgIcon = require('./svg-icon');
+import MarkdownView from './markdown-view';
+import { LinkType, convertSelectionToLink, toggleBlockStyle, toggleSpanStyle } from '../markdown-commands';
+import SvgIcon from './svg-icon';
 
 // Mapping of toolbar command name to key for Ctrl+<key> keyboard shortcuts.
 // The shortcuts are taken from Stack Overflow's editor.

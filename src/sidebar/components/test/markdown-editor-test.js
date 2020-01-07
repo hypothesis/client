@@ -1,9 +1,9 @@
-const { createElement, render } = require('preact');
-const { act } = require('preact/test-utils');
-const { mount } = require('enzyme');
+import { createElement, render } from 'preact';
+import { act } from 'preact/test-utils';
+import { mount } from 'enzyme';
 
-const { LinkType } = require('../../markdown-commands');
-const MarkdownEditor = require('../markdown-editor');
+import { LinkType } from '../../markdown-commands';
+import MarkdownEditor from '../markdown-editor';
 
 describe('MarkdownEditor', () => {
   const formatResult = {

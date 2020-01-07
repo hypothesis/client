@@ -1,9 +1,9 @@
-const propTypes = require('prop-types');
-const { createElement } = require('preact');
-const { useEffect, useMemo, useState } = require('preact/hooks');
+import propTypes from 'prop-types';
+import { createElement } from 'preact';
+import { useEffect, useMemo, useState } from 'preact/hooks';
 
-const { format: formatDate } = require('../util/date');
-const { decayingInterval, toFuzzyString } = require('../util/time');
+import { format as formatDate } from '../util/date';
+import { decayingInterval, toFuzzyString } from '../util/time';
 
 /**
  * Display a relative timestamp (eg. '6 minutes ago') as static text or a link.

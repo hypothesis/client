@@ -1,5 +1,5 @@
-const EventEmitter = require('tiny-emitter');
-const debounce = require('lodash.debounce');
+import EventEmitter from 'tiny-emitter';
+import debounce from 'lodash.debounce';
 
 /**
  * @typedef Options

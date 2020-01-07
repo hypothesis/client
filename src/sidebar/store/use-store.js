@@ -1,10 +1,11 @@
 /* global process */
 
-const shallowEqual = require('shallowequal');
-const { useEffect, useRef, useReducer } = require('preact/hooks');
+import shallowEqual from 'shallowequal';
 
-const { useService } = require('../util/service-context');
-const warnOnce = require('../../shared/warn-once');
+import { useEffect, useRef, useReducer } from 'preact/hooks';
+
+import { useService } from '../util/service-context';
+import warnOnce from '../../shared/warn-once';
 
 /**
  * Hook for accessing state or actions from the store inside a component.

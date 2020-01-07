@@ -1,8 +1,8 @@
-const { createElement } = require('preact');
-const propTypes = require('prop-types');
+import { createElement } from 'preact';
+import propTypes from 'prop-types';
 
-const GroupListItem = require('./group-list-item');
-const MenuSection = require('./menu-section');
+import GroupListItem from './group-list-item';
+import MenuSection from './menu-section';
 
 /**
  * A labeled section of the groups list.

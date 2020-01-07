@@ -1,9 +1,8 @@
-const angular = require('angular');
+import angular from 'angular';
 
-const events = require('../../events');
-const bridgeEvents = require('../../../shared/bridge-events');
-
-const hypothesisApp = require('../hypothesis-app');
+import * as events from '../../events';
+import * as bridgeEvents from '../../../shared/bridge-events';
+import * as hypothesisApp from '../hypothesis-app';
 
 describe('sidebar.components.hypothesis-app', function() {
   let $componentController = null;

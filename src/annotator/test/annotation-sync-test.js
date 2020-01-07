@@ -1,6 +1,6 @@
-const EventEmitter = require('tiny-emitter');
+import EventEmitter from 'tiny-emitter';
 
-const AnnotationSync = require('../annotation-sync');
+import AnnotationSync from '../annotation-sync';
 
 describe('AnnotationSync', function() {
   let createAnnotationSync;

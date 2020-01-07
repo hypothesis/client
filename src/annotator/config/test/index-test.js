@@ -1,4 +1,4 @@
-const configFrom = require('../index');
+import configFrom from '../index';
 
 describe('annotator.config.index', function() {
   let fakeSettingsFrom;

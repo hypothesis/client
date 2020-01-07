@@ -3,13 +3,12 @@
  * WebSocket connection to h's real-time API.
  */
 
-const { createSelector } = require('reselect');
+import { createSelector } from 'reselect';
 
-const { actionTypes } = require('../util');
-
-const { selectors: annotationSelectors } = require('./annotations');
-const { selectors: groupSelectors } = require('./groups');
-const { selectors: viewerSelectors } = require('./viewer');
+import { actionTypes } from '../util';
+import { selectors as annotationSelectors } from './annotations';
+import { selectors as groupSelectors } from './groups';
+import { selectors as viewerSelectors } from './viewer';
 
 function init() {
   return {

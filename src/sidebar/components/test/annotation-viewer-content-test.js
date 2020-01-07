@@ -1,4 +1,4 @@
-const angular = require('angular');
+import angular from 'angular';
 
 // Fake implementation of the API for fetching annotations and replies to
 // annotations.

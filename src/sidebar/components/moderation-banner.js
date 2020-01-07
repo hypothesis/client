@@ -1,10 +1,10 @@
-const { createElement } = require('preact');
-const classnames = require('classnames');
-const propTypes = require('prop-types');
+import { createElement } from 'preact';
+import classnames from 'classnames';
+import propTypes from 'prop-types';
 
-const annotationMetadata = require('../util/annotation-metadata');
-const useStore = require('../store/use-store');
-const { withServices } = require('../util/service-context');
+import * as annotationMetadata from '../util/annotation-metadata';
+import useStore from '../store/use-store';
+import { withServices } from '../util/service-context';
 
 /**
  * Banner allows moderators to hide/unhide the flagged

@@ -1,9 +1,9 @@
-const { createElement } = require('preact');
-const propTypes = require('prop-types');
+import { createElement } from 'preact';
+import propTypes from 'prop-types';
 
-const Excerpt = require('./excerpt');
-const MarkdownEditor = require('./markdown-editor');
-const MarkdownView = require('./markdown-view');
+import Excerpt from './excerpt';
+import MarkdownEditor from './markdown-editor';
+import MarkdownView from './markdown-view';
 
 /**
  * Display the rendered content of an annotation.

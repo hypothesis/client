@@ -1,14 +1,13 @@
-const classnames = require('classnames');
-const propTypes = require('prop-types');
-const { createElement } = require('preact');
-const { Fragment } = require('preact');
+import classnames from 'classnames';
+import propTypes from 'prop-types';
+import { createElement } from 'preact';
+import { Fragment } from 'preact';
 
-const NewNoteBtn = require('./new-note-btn');
-const uiConstants = require('../ui-constants');
-const useStore = require('../store/use-store');
-const { withServices } = require('../util/service-context');
-
-const SvgIcon = require('./svg-icon');
+import NewNoteBtn from './new-note-btn';
+import * as uiConstants from '../ui-constants';
+import useStore from '../store/use-store';
+import { withServices } from '../util/service-context';
+import SvgIcon from './svg-icon';
 
 /**
  *  Display name of the tab and annotation count.

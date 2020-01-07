@@ -1,5 +1,5 @@
-const events = require('../../shared/bridge-events');
-const features = require('../features');
+import * as events from '../../shared/bridge-events';
+import * as features from '../features';
 
 describe('features - annotation layer', function() {
   let featureFlagsUpdateHandler;

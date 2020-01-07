@@ -1,5 +1,5 @@
-const metadata = require('../../util/annotation-metadata');
-const util = require('../util');
+import * as metadata from '../../util/annotation-metadata';
+import * as util from '../util';
 
 /**
  * The drafts store provides temporary storage for unsaved edits to new or

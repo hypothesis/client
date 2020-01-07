@@ -1,4 +1,4 @@
-const Sidebar = require('./sidebar');
+import Sidebar from './sidebar';
 
 const DEFAULT_CONFIG = {
   TextSelection: {},

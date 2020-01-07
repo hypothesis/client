@@ -1,4 +1,4 @@
-const queryString = require('query-string');
+import * as queryString from 'query-string';
 
 /**
  * Return the app configuration specified by the frame embedding the Hypothesis

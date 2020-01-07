@@ -1,8 +1,8 @@
-const angular = require('angular');
+import angular from 'angular';
 
 const inject = angular.mock.inject;
 
-const windowScroll = require('../window-scroll');
+import windowScroll from '../window-scroll';
 
 describe('windowScroll', function() {
   let directive = null;

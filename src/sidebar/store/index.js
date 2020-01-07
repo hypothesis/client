@@ -29,21 +29,21 @@
  *  3. Checking that the UI correctly presents a given state.
  */
 
-const createStore = require('./create-store');
-const debugMiddleware = require('./debug-middleware');
+import createStore from './create-store';
 
-const activity = require('./modules/activity');
-const annotations = require('./modules/annotations');
-const directLinked = require('./modules/direct-linked');
-const drafts = require('./modules/drafts');
-const frames = require('./modules/frames');
-const links = require('./modules/links');
-const groups = require('./modules/groups');
-const realTimeUpdates = require('./modules/real-time-updates');
-const selection = require('./modules/selection');
-const session = require('./modules/session');
-const sidebarPanels = require('./modules/sidebar-panels');
-const viewer = require('./modules/viewer');
+import debugMiddleware from './debug-middleware';
+import * as activity from './modules/activity';
+import * as annotations from './modules/annotations';
+import * as directLinked from './modules/direct-linked';
+import * as drafts from './modules/drafts';
+import * as frames from './modules/frames';
+import * as links from './modules/links';
+import * as groups from './modules/groups';
+import * as realTimeUpdates from './modules/real-time-updates';
+import * as selection from './modules/selection';
+import * as session from './modules/session';
+import * as sidebarPanels from './modules/sidebar-panels';
+import * as viewer from './modules/viewer';
 
 /**
  * Redux middleware which triggers an Angular change-detection cycle

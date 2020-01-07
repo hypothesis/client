@@ -1,4 +1,4 @@
-const { quote } = require('../util/annotation-metadata');
+import { quote } from '../util/annotation-metadata';
 
 // Prevent Babel inserting helper code after `@ngInject` comment below which
 // breaks browserify-ngannotate.

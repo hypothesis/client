@@ -1,4 +1,4 @@
-const redux = require('redux');
+import * as redux from 'redux';
 
 /**
  * Utility function that creates a fake Redux store for use in tests.

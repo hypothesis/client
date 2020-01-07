@@ -1,11 +1,10 @@
-const classnames = require('classnames');
-const { Fragment, createElement } = require('preact');
-const { useCallback, useEffect, useRef, useState } = require('preact/hooks');
-const propTypes = require('prop-types');
+import classnames from 'classnames';
+import { Fragment, createElement } from 'preact';
+import { useCallback, useEffect, useRef, useState } from 'preact/hooks';
+import propTypes from 'prop-types';
 
-const useElementShouldClose = require('./hooks/use-element-should-close');
-
-const SvgIcon = require('./svg-icon');
+import useElementShouldClose from './hooks/use-element-should-close';
+import SvgIcon from './svg-icon';
 
 // The triangular indicator below the menu toggle button that visually links it
 // to the menu content.

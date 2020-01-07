@@ -1,16 +1,15 @@
-const { createElement } = require('preact');
-const { useCallback, useMemo, useState } = require('preact/hooks');
-const propTypes = require('prop-types');
+import { createElement } from 'preact';
+import { useCallback, useMemo, useState } from 'preact/hooks';
+import propTypes from 'prop-types';
 
-const uiConstants = require('../ui-constants');
-const useStore = require('../store/use-store');
-const VersionData = require('../util/version-data');
-const { withServices } = require('../util/service-context');
-
-const SidebarPanel = require('./sidebar-panel');
-const SvgIcon = require('./svg-icon');
-const Tutorial = require('./tutorial');
-const VersionInfo = require('./version-info');
+import * as uiConstants from '../ui-constants';
+import useStore from '../store/use-store';
+import VersionData from '../util/version-data';
+import { withServices } from '../util/service-context';
+import SidebarPanel from './sidebar-panel';
+import SvgIcon from './svg-icon';
+import Tutorial from './tutorial';
+import VersionInfo from './version-info';
 
 /**
  * External link "tabs" inside of the help panel.

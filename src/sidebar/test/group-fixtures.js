@@ -1,4 +1,4 @@
-const Chance = require('chance');
+import Chance from 'chance';
 const chance = new Chance();
 
 function group() {

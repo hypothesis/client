@@ -9,9 +9,10 @@
 
 /* global __MANIFEST__ */
 
-const boot = require('./boot');
-const { jsonConfigsFrom } = require('../shared/settings');
-const processUrlTemplate = require('./url-template');
+import boot from './boot';
+
+import { jsonConfigsFrom } from '../shared/settings';
+import processUrlTemplate from './url-template';
 
 const settings = jsonConfigsFrom(document);
 

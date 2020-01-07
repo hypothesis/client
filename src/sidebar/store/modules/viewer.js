@@ -1,4 +1,4 @@
-const util = require('../util');
+import * as util from '../util';
 
 /**
  * This module defines actions and state related to the display mode of the

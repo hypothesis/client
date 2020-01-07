@@ -1,6 +1,6 @@
-const { useEffect } = require('preact/hooks');
+import { useEffect } from 'preact/hooks';
 
-const { listen } = require('../../util/dom');
+import { listen } from '../../util/dom';
 
 /**
  * This hook adds appropriate `eventListener`s to the document when a target

@@ -1,7 +1,7 @@
-const classnames = require('classnames');
-const { createElement } = require('preact');
-const { useLayoutEffect, useRef } = require('preact/hooks');
-const propTypes = require('prop-types');
+import classnames from 'classnames';
+import { createElement } from 'preact';
+import { useLayoutEffect, useRef } from 'preact/hooks';
+import propTypes from 'prop-types';
 
 // The list of supported icons
 const icons = {

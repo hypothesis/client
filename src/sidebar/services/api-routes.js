@@ -1,4 +1,4 @@
-const { retryPromiseOperation } = require('../util/retry');
+import { retryPromiseOperation } from '../util/retry';
 
 /**
  * A service which fetches and caches API route metadata.

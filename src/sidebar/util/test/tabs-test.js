@@ -1,6 +1,6 @@
-const fixtures = require('../../test/annotation-fixtures');
-const uiConstants = require('../../ui-constants');
-const tabs = require('../tabs');
+import * as fixtures from '../../test/annotation-fixtures';
+import * as uiConstants from '../../ui-constants';
+import * as tabs from '../tabs';
 
 describe('tabs', function() {
   describe('tabForAnnotation', function() {

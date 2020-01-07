@@ -1,6 +1,6 @@
-const angular = require('angular');
+import angular from 'angular';
 
-const util = require('./util');
+import * as util from './util';
 
 function testComponent() {
   return {

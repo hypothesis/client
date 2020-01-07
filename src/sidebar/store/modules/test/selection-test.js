@@ -1,7 +1,7 @@
-const annotations = require('../annotations');
-const createStore = require('../../create-store');
-const selection = require('../selection');
-const uiConstants = require('../../../ui-constants');
+import * as annotations from '../annotations';
+import createStore from '../../create-store';
+import * as selection from '../selection';
+import * as uiConstants from '../../../ui-constants';
 
 describe('sidebar/store/modules/selection', () => {
   let store;

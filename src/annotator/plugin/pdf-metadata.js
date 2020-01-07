@@ -1,4 +1,4 @@
-const { normalizeURI } = require('../util/url');
+import { normalizeURI } from '../util/url';
 
 /**
  * @typedef Link

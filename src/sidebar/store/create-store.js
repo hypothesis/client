@@ -1,7 +1,7 @@
-const redux = require('redux');
-const { default: thunk } = require('redux-thunk');
+import * as redux from 'redux';
+import thunk from 'redux-thunk';
 
-const { createReducer, bindSelectors } = require('./util');
+import { createReducer, bindSelectors } from './util';
 
 /**
  * Create a Redux store from a set of _modules_.

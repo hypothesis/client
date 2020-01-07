@@ -1,5 +1,5 @@
-const annotationMetadata = require('../annotation-metadata');
-const fixtures = require('../../test/annotation-fixtures');
+import * as annotationMetadata from '../annotation-metadata';
+import * as fixtures from '../../test/annotation-fixtures';
 
 const documentMetadata = annotationMetadata.documentMetadata;
 const domainAndTitle = annotationMetadata.domainAndTitle;

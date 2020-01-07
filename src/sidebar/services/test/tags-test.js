@@ -1,4 +1,4 @@
-const angular = require('angular');
+import angular from 'angular';
 
 const TAGS_LIST_KEY = 'hypothesis.user.tags.list';
 const TAGS_MAP_KEY = 'hypothesis.user.tags.map';

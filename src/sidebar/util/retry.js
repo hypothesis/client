@@ -1,4 +1,4 @@
-const retry = require('retry');
+import retry from 'retry';
 
 /**
  * Retry a Promise-returning operation until it succeeds or

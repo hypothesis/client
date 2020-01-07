@@ -1,8 +1,5 @@
-const {
-  assertPromiseIsRejected,
-} = require('../../../shared/test/promise-util');
-
-const { fetchConfig, $imports } = require('../fetch-config');
+import { assertPromiseIsRejected } from '../../../shared/test/promise-util';
+import { fetchConfig, $imports } from '../fetch-config';
 
 describe('sidebar.util.fetch-config', () => {
   let fakeHostConfig;

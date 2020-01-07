@@ -1,4 +1,4 @@
-const PDFMetadata = require('../pdf-metadata');
+import PDFMetadata from '../pdf-metadata';
 
 /**
  * Fake implementation of PDF.js `window.PDFViewerApplication.metadata`.

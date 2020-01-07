@@ -1,4 +1,4 @@
-const { combineGroups } = require('../groups');
+import { combineGroups } from '../groups';
 
 describe('sidebar.util.groups', () => {
   describe('combineGroups', () => {

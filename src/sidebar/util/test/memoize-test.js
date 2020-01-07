@@ -1,4 +1,4 @@
-const memoize = require('../memoize');
+import memoize from '../memoize';
 
 describe('memoize', function() {
   let count = 0;

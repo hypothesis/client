@@ -9,9 +9,10 @@
  * change at any time and should write code accordingly. Feature flags should
  * not be cached, and should not be interrogated only at setup time.
  */
-const events = require('../events');
-const bridgeEvents = require('../../shared/bridge-events');
-const warnOnce = require('../../shared/warn-once');
+import * as events from '../events';
+
+import * as bridgeEvents from '../../shared/bridge-events';
+import warnOnce from '../../shared/warn-once';
 
 // @ngInject
 function features($rootScope, bridge, session) {

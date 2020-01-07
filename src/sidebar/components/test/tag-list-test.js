@@ -1,8 +1,8 @@
-const { createElement } = require('preact');
-const { mount } = require('enzyme');
+import { createElement } from 'preact';
+import { mount } from 'enzyme';
 
-const mockImportedComponents = require('./mock-imported-components');
-const TagList = require('../tag-list');
+import mockImportedComponents from './mock-imported-components';
+import TagList from '../tag-list';
 
 describe('TagList', function() {
   let fakeServiceUrl;

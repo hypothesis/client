@@ -1,8 +1,8 @@
-const { createElement } = require('preact');
-const { mount } = require('enzyme');
+import { createElement } from 'preact';
+import { mount } from 'enzyme';
 
-const UserMenu = require('../user-menu');
-const mockImportedComponents = require('./mock-imported-components');
+import UserMenu from '../user-menu';
+import mockImportedComponents from './mock-imported-components';
 
 describe('UserMenu', () => {
   let fakeAuth;

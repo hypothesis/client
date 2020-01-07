@@ -1,9 +1,7 @@
-const EventEmitter = require('tiny-emitter');
+import EventEmitter from 'tiny-emitter';
 
-const {
-  assertPromiseIsRejected,
-} = require('../../../shared/test/promise-util');
-const { call } = require('../postmessage-json-rpc');
+import { assertPromiseIsRejected } from '../../../shared/test/promise-util';
+import { call } from '../postmessage-json-rpc';
 
 class FakeWindow {
   constructor() {

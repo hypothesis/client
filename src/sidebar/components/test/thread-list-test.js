@@ -1,11 +1,10 @@
-const angular = require('angular');
+import angular from 'angular';
+import EventEmitter from 'tiny-emitter';
+import immutable from 'seamless-immutable';
 
-const EventEmitter = require('tiny-emitter');
-const immutable = require('seamless-immutable');
-
-const events = require('../../events');
-const threadList = require('../thread-list');
-const util = require('../../directive/test/util');
+import * as events from '../../events';
+import * as threadList from '../thread-list';
+import * as util from '../../directive/test/util';
 
 const annotFixtures = immutable({
   annotation: { $tag: 't1', id: '1', text: 'text' },

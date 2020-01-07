@@ -1,6 +1,6 @@
-const configFuncSettingsFrom = require('./config-func-settings-from');
-const isBrowserExtension = require('./is-browser-extension');
-const sharedSettings = require('../../shared/settings');
+import configFuncSettingsFrom from './config-func-settings-from';
+import isBrowserExtension from './is-browser-extension';
+import * as sharedSettings from '../../shared/settings';
 
 function settingsFrom(window_) {
   const jsonConfigs = sharedSettings.jsonConfigsFrom(window_.document);

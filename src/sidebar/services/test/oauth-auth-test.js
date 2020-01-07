@@ -1,8 +1,7 @@
-const angular = require('angular');
+import angular from 'angular';
 
-const events = require('../../events');
-
-const FakeWindow = require('../../util/test/fake-window');
+import * as events from '../../events';
+import FakeWindow from '../../util/test/fake-window';
 
 const DEFAULT_TOKEN_EXPIRES_IN_SECS = 1000;
 const TOKEN_KEY = 'hypothesis.oauth.hypothes%2Eis.token';

@@ -1,12 +1,11 @@
-const { createElement } = require('preact');
-const propTypes = require('prop-types');
+import { createElement } from 'preact';
+import propTypes from 'prop-types';
 
-const events = require('../events');
-const useStore = require('../store/use-store');
-const { applyTheme } = require('../util/theme');
-const { withServices } = require('../util/service-context');
-
-const Button = require('./button');
+import * as events from '../events';
+import useStore from '../store/use-store';
+import { applyTheme } from '../util/theme';
+import { withServices } from '../util/service-context';
+import Button from './button';
 
 function NewNoteButton({ $rootScope, settings }) {
   const store = useStore(store => ({

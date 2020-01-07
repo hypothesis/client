@@ -1,4 +1,4 @@
-const observable = require('./util/observable');
+import * as observable from './util/observable';
 
 /** Returns the selected `DOMRange` in `document`. */
 function selectedRange(document) {
