@@ -149,6 +149,43 @@ function isWaitingToAnchor(annotation) {
   );
 }
 
+/**
+ * Is this annotation a highlight?
+ *
+ * Highlights are generally identifiable by having no text content AND no tags,
+ * but there is some nuance.
+ *
+ * @param {Object} annotation
+ * @return {boolean}
+ */
+function isHighlight(annotation) {
+  // `$highlight` is an ephemeral attribute set by the `annotator` on new
+  // annotation objects (created by clicking the "highlight" button).
+  // It is not persisted and cannot be relied upon, but if it IS present,
+  // this is definitely a highlight (one which is not yet saved).
+  if (annotation.$highlight) {
+    return true;
+  }
+
+  if (isNew(annotation)) {
+    // For new (unsaved-to-service) annotations, unless they have a truthy
+    // `$highlight` attribute, we don't know yet if they are a highlight.
+    return false;
+  }
+
+  // Note that it is possible to end up with an empty (no `text`) annotation
+  // that is not a highlight by adding at least one tag—thus, it is necessary
+  // to check for the existence of tags as well as text content.
+
+  return (
+    !isPageNote(annotation) &&
+    !isReply(annotation) &&
+    !annotation.hidden && // A hidden annotation has some form of objectionable content
+    !annotation.text &&
+    !(annotation.tags && annotation.tags.length)
+  );
+}
+
 /** Return `true` if the given annotation is an orphan. */
 function isOrphan(annotation) {
   return hasSelector(annotation) && annotation.$orphan;
@@ -220,6 +257,7 @@ module.exports = {
   domainAndTitle: domainAndTitle,
   flagCount: flagCount,
   isAnnotation: isAnnotation,
+  isHighlight: isHighlight,
   isNew: isNew,
   isOrphan: isOrphan,
   isPageNote: isPageNote,

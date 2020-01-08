@@ -234,6 +234,58 @@ describe('annotation-metadata', function() {
     });
   });
 
+  describe('.isHighlight', () => {
+    [
+      {
+        annotation: fixtures.newEmptyAnnotation(),
+        expect: false,
+        desc: 'new, empty annotation',
+      },
+      {
+        annotation: fixtures.newReply(),
+        expect: false,
+        desc: 'new, reply annotation',
+      },
+      {
+        annotation: fixtures.newAnnotation(),
+        expect: false,
+        desc: 'new, with some text',
+      },
+      {
+        annotation: fixtures.newHighlight(),
+        expect: true,
+        desc: 'new, marked as $highlight',
+      },
+      {
+        annotation: fixtures.oldAnnotation(),
+        expect: false,
+        desc: 'pre-existing annotation',
+      },
+      {
+        annotation: fixtures.oldHighlight(),
+        expect: true,
+        desc: 'pre-existing higlight',
+      },
+      {
+        annotation: fixtures.oldPageNote(),
+        expect: false,
+        desc: 'pre-existing page note',
+      },
+      {
+        annotation: fixtures.oldReply(),
+        expect: false,
+        desc: 'pre-existing reply',
+      },
+    ].forEach(testcase => {
+      it(`returns ${testcase.expect} for isHighlight when annotation is: ${testcase.desc}`, () => {
+        assert.equal(
+          annotationMetadata.isHighlight(testcase.annotation),
+          testcase.expect
+        );
+      });
+    });
+  });
+
   describe('.isPageNote', function() {
     it('returns true for an annotation with an empty target', function() {
       assert.isTrue(
