@@ -34,16 +34,20 @@ describe('annotationThread', function() {
       });
   });
 
+  let fakeFeatures;
   let fakeStore;
 
   beforeEach(function() {
+    fakeFeatures = {
+      flagEnabled: sinon.stub().returns(false),
+    };
     fakeStore = {
       setForceVisible: sinon.stub(),
       setCollapsed: sinon.stub(),
       getState: sinon.stub(),
     };
 
-    angular.mock.module('app', { store: fakeStore });
+    angular.mock.module('app', { features: fakeFeatures, store: fakeStore });
   });
 
   it('renders the tree structure of parent and child annotations', function() {
@@ -252,5 +256,56 @@ describe('annotationThread', function() {
     });
     assert.notOk(element[0].querySelector('moderation-banner'));
     assert.notOk(element[0].querySelector('annotation'));
+  });
+
+  describe('preact-migrated Annotation component', () => {
+    it('additionally renders `AnnotationOmega` when `client_preact_annotation` feature flag is enabled', () => {
+      fakeFeatures.flagEnabled
+        .withArgs('client_preact_annotation')
+        .returns(true);
+
+      const element = util.createDirective(document, 'annotationThread', {
+        thread: {
+          id: '1',
+          annotation: { id: '1', text: 'text' },
+          children: [
+            {
+              id: '2',
+              annotation: { id: '2', text: 'areply' },
+              children: [],
+              visible: true,
+            },
+          ],
+          visible: true,
+        },
+      });
+
+      assert.ok(element[0].querySelector('annotation'));
+      assert.ok(element[0].querySelector('annotation-omega'));
+    });
+    it('does not render `AnnotationOmega` if `client_preact_annotation` feature flag is not enabled', () => {
+      fakeFeatures.flagEnabled
+        .withArgs('client_preact_annotation')
+        .returns(false);
+
+      const element = util.createDirective(document, 'annotationThread', {
+        thread: {
+          id: '1',
+          annotation: { id: '1', text: 'text' },
+          children: [
+            {
+              id: '2',
+              annotation: { id: '2', text: 'areply' },
+              children: [],
+              visible: true,
+            },
+          ],
+          visible: true,
+        },
+      });
+
+      assert.ok(element[0].querySelector('annotation'));
+      assert.notOk(element[0].querySelector('annotation-omega'));
+    });
   });
 });

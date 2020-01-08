@@ -33,7 +33,7 @@ function showAllParents(thread, showFn) {
 }
 
 // @ngInject
-function AnnotationThreadController(store) {
+function AnnotationThreadController(features, store) {
   // Flag that tracks whether the content of the annotation is hovered,
   // excluding any replies.
   this.annotationHovered = false;
@@ -102,6 +102,10 @@ function AnnotationThreadController(store) {
     if (thread.parent) {
       store.setCollapsed(thread.parent.id, false);
     }
+  };
+
+  this.shouldShowAnnotationOmega = () => {
+    return features.flagEnabled('client_preact_annotation');
   };
 }
 
