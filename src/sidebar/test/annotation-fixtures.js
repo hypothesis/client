@@ -113,7 +113,7 @@ function oldHighlight() {
   return {
     id: 'annotation_id',
     $highlight: undefined,
-    target: ['foo', 'bar'],
+    target: [{ source: 'source', selector: [] }],
     references: [],
     text: '',
     tags: [],
