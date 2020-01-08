@@ -137,8 +137,7 @@ describe('annotation', function() {
         })
         .component('annotationQuote', {
           bindings: {
-            isOrphan: '<',
-            quote: '<',
+            annotation: '<',
           },
         });
     });
@@ -679,33 +678,6 @@ describe('annotation', function() {
         const controller = createDirective().controller;
         fakeStore.hasPendingDeletion.returns(false);
         assert.equal(controller.isDeleted(), false);
-      });
-    });
-
-    describe('#isOrphan', function() {
-      it('returns false if the annotation is not an orphan', function() {
-        const controller = createDirective().controller;
-        controller.annotation.$orphan = false;
-        assert.isFalse(controller.isOrphan());
-      });
-
-      it('returns true if the annotation is an orphan', function() {
-        const controller = createDirective().controller;
-        controller.annotation.$orphan = true;
-        assert.isTrue(controller.isOrphan());
-      });
-
-      it('returns true if the anchoring timeout expired', function() {
-        const controller = createDirective().controller;
-        controller.annotation.$anchorTimeout = true;
-        assert.isTrue(controller.isOrphan());
-      });
-
-      it('returns false if the anchoring timeout expired but anchoring did complete', function() {
-        const controller = createDirective().controller;
-        controller.annotation.$orphan = false;
-        controller.annotation.$anchorTimeout = true;
-        assert.isFalse(controller.isOrphan());
       });
     });
 

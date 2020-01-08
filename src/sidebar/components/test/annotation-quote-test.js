@@ -6,14 +6,31 @@ const { $imports } = require('../annotation-quote');
 const mockImportedComponents = require('./mock-imported-components');
 
 describe('AnnotationQuote', () => {
+  let fakeAnnotation;
+  let fakeIsOrphan;
+  let fakeQuote;
+
   function createQuote(props) {
     return mount(
-      <AnnotationQuote quote="test quote" settings={{}} {...props} />
+      <AnnotationQuote annotation={fakeAnnotation} settings={{}} {...props} />
     );
   }
 
   beforeEach(() => {
+    fakeAnnotation = {
+      target: [],
+    };
+
+    fakeQuote = sinon.stub().returns('test quote');
+    fakeIsOrphan = sinon.stub();
+
     $imports.$mock(mockImportedComponents());
+    $imports.$mock({
+      '../util/annotation-metadata': {
+        quote: fakeQuote,
+        isOrphan: fakeIsOrphan,
+      },
+    });
   });
 
   afterEach(() => {

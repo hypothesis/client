@@ -12,10 +12,7 @@
                          show-document-info="vm.showDocumentInfo">
   </annotation-header>
 
-  <annotation-quote
-    quote="vm.quote()"
-    is-orphan="vm.isOrphan()"
-    ng-if="vm.quote()">
+  <annotation-quote annotation="vm.annotation" ng-if="vm.quote()">
   </annotation-quote>
 
   <annotation-body
