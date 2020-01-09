@@ -377,13 +377,6 @@ function AnnotationController(
     });
   };
 
-  this.isOrphan = function() {
-    if (typeof self.annotation.$orphan === 'undefined') {
-      return self.annotation.$anchorTimeout;
-    }
-    return self.annotation.$orphan;
-  };
-
   this.user = function() {
     return self.annotation.user;
   };

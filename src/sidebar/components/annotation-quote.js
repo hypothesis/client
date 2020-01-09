@@ -2,17 +2,22 @@ const classnames = require('classnames');
 const { createElement } = require('preact');
 const propTypes = require('prop-types');
 
+const { isOrphan, quote } = require('../util/annotation-metadata');
 const { withServices } = require('../util/service-context');
 const { applyTheme } = require('../util/theme');
+
 const Excerpt = require('./excerpt');
 
 /**
  * Display the selected text from the document associated with an annotation.
  */
-function AnnotationQuote({ isOrphan, quote, settings = {} }) {
+function AnnotationQuote({ annotation, settings = {} }) {
   return (
     <section
-      className={classnames('annotation-quote', isOrphan && 'is-orphan')}
+      className={classnames(
+        'annotation-quote',
+        isOrphan(annotation) && 'is-orphan'
+      )}
     >
       <Excerpt
         collapsedHeight={35}
@@ -23,7 +28,7 @@ function AnnotationQuote({ isOrphan, quote, settings = {} }) {
           className="annotation-quote__quote"
           style={applyTheme(['selectionFontFamily'], settings)}
         >
-          {quote}
+          {quote(annotation)}
         </blockquote>
       </Excerpt>
     </section>
@@ -31,17 +36,7 @@ function AnnotationQuote({ isOrphan, quote, settings = {} }) {
 }
 
 AnnotationQuote.propTypes = {
-  /**
-   * If `true`, display an indicator that the annotated text was not found in
-   * the current version of the document.
-   */
-  isOrphan: propTypes.bool,
-
-  /**
-   * The text that the annotation refers to. This is rendered as plain text
-   * (ie. HTML tags are rendered literally).
-   */
-  quote: propTypes.string,
+  annotation: propTypes.object.isRequired,
 
   // Used for theming.
   settings: propTypes.object,

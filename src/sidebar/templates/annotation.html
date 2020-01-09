@@ -6,16 +6,12 @@
 
   <annotation-header annotation="vm.annotation"
                          is-editing="vm.editing()"
-                         is-highlight="vm.isHighlight()"
                          on-reply-count-click="vm.onReplyCountClick()"
                          reply-count="vm.replyCount"
                          show-document-info="vm.showDocumentInfo">
   </annotation-header>
 
-  <annotation-quote
-    quote="vm.quote()"
-    is-orphan="vm.isOrphan()"
-    ng-if="vm.quote()">
+  <annotation-quote annotation="vm.annotation" ng-if="vm.quote()">
   </annotation-quote>
 
   <annotation-body

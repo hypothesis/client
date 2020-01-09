@@ -1,6 +1,8 @@
 const propTypes = require('prop-types');
 const { createElement } = require('preact');
 
+const { isHighlight } = require('../util/annotation-metadata');
+
 const AnnotationDocumentInfo = require('./annotation-document-info');
 const AnnotationShareInfo = require('./annotation-share-info');
 const AnnotationUser = require('./annotation-user');
@@ -15,7 +17,6 @@ const Timestamp = require('./timestamp');
 function AnnotationHeader({
   annotation,
   isEditing,
-  isHighlight,
   onReplyCountClick,
   replyCount,
   showDocumentInfo,
@@ -60,7 +61,7 @@ function AnnotationHeader({
 
       <div className="annotation-header__row">
         <AnnotationShareInfo annotation={annotation} />
-        {!isEditing && isHighlight && (
+        {!isEditing && isHighlight(annotation) && (
           <div className="annotation-header__highlight">
             <SvgIcon
               name="highlight"
@@ -81,8 +82,6 @@ AnnotationHeader.propTypes = {
   annotation: propTypes.object.isRequired,
   /* Whether the annotation is actively being edited */
   isEditing: propTypes.bool,
-  /* Whether the annotation is a highlight */
-  isHighlight: propTypes.bool,
   /* Callback for when the toggle-replies element is clicked */
   onReplyCountClick: propTypes.func.isRequired,
   /* How many replies this annotation currently has */

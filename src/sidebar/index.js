@@ -125,6 +125,10 @@ function startAngularApp(config) {
     // UI components
     .component('annotation', require('./components/annotation'))
     .component(
+      'annotationOmega',
+      wrapReactComponent(require('./components/annotation-omega'))
+    )
+    .component(
       'annotationBody',
       wrapReactComponent(require('./components/annotation-body'))
     )

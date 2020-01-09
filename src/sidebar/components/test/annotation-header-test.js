@@ -8,12 +8,13 @@ const { $imports } = require('../annotation-header');
 const mockImportedComponents = require('./mock-imported-components');
 
 describe('AnnotationHeader', () => {
+  let fakeIsHighlight;
+
   const createAnnotationHeader = props => {
     return mount(
       <AnnotationHeader
         annotation={fixtures.defaultAnnotation()}
         isEditing={false}
-        isHighlight={false}
         onReplyCountClick={sinon.stub()}
         replyCount={0}
         showDocumentInfo={false}
@@ -23,7 +24,14 @@ describe('AnnotationHeader', () => {
   };
 
   beforeEach(() => {
+    fakeIsHighlight = sinon.stub().returns(false);
+
     $imports.$mock(mockImportedComponents());
+    $imports.$mock({
+      '../util/annotation-metadata': {
+        isHighlight: fakeIsHighlight,
+      },
+    });
   });
 
   afterEach(() => {
@@ -111,9 +119,9 @@ describe('AnnotationHeader', () => {
 
   describe('annotation is-highlight icon', () => {
     it('should display is-highlight icon if annotation is a highlight', () => {
+      fakeIsHighlight.returns(true);
       const wrapper = createAnnotationHeader({
         isEditing: false,
-        isHighlight: true,
       });
       const highlightIcon = wrapper.find('.annotation-header__highlight');
 
@@ -121,9 +129,9 @@ describe('AnnotationHeader', () => {
     });
 
     it('should not display the is-highlight icon if annotation is not a highlight', () => {
+      fakeIsHighlight.returns(false);
       const wrapper = createAnnotationHeader({
         isEditing: false,
-        isHighlight: false,
       });
       const highlightIcon = wrapper.find('.annotation-header__highlight');
 
