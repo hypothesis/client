@@ -2,6 +2,7 @@ const { createElement } = require('preact');
 const { mount } = require('enzyme');
 
 const AnnotationUser = require('../annotation-user');
+const { $imports } = require('../annotation-user');
 const mockImportedComponents = require('./mock-imported-components');
 
 describe('AnnotationUser', () => {
@@ -33,8 +34,8 @@ describe('AnnotationUser', () => {
     fakeSettings = {};
     fakeUsername = sinon.stub();
 
-    AnnotationUser.$imports.$mock(mockImportedComponents());
-    AnnotationUser.$imports.$mock({
+    $imports.$mock(mockImportedComponents());
+    $imports.$mock({
       '../util/account-id': {
         isThirdPartyUser: fakeIsThirdPartyUser,
         username: fakeUsername,
@@ -43,7 +44,7 @@ describe('AnnotationUser', () => {
   });
 
   afterEach(() => {
-    AnnotationUser.$imports.$restore();
+    $imports.$restore();
   });
 
   describe('link to user activity', () => {

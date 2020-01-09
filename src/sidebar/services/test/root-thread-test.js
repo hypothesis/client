@@ -5,6 +5,7 @@ const annotationFixtures = require('../../test/annotation-fixtures');
 const events = require('../../events');
 const uiConstants = require('../../ui-constants');
 const rootThreadFactory = require('../root-thread');
+const { $imports } = require('../root-thread');
 
 const fixtures = immutable({
   emptyThread: {
@@ -97,13 +98,13 @@ describe('rootThread', function() {
   });
 
   beforeEach(() => {
-    rootThreadFactory.$imports.$mock({
+    $imports.$mock({
       '../build-thread': fakeBuildThread,
     });
   });
 
   afterEach(() => {
-    rootThreadFactory.$imports.$restore();
+    $imports.$restore();
   });
 
   describe('#thread', function() {

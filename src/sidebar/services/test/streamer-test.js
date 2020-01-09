@@ -1,5 +1,7 @@
 const EventEmitter = require('tiny-emitter');
+
 const Streamer = require('../streamer');
+const { $imports } = require('../streamer');
 
 const fixtures = {
   createNotification: {
@@ -141,13 +143,13 @@ describe('Streamer', function() {
       websocketUrl: 'ws://example.com/ws',
     };
 
-    Streamer.$imports.$mock({
+    $imports.$mock({
       '../websocket': FakeSocket,
     });
   });
 
   afterEach(function() {
-    Streamer.$imports.$restore();
+    $imports.$restore();
     activeStreamer = null;
   });
 

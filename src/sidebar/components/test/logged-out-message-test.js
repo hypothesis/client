@@ -2,6 +2,7 @@ const { createElement } = require('preact');
 const { mount } = require('enzyme');
 
 const LoggedOutMessage = require('../logged-out-message');
+const { $imports } = require('../logged-out-message');
 const mockImportedComponents = require('./mock-imported-components');
 
 describe('LoggedOutMessage', () => {
@@ -16,11 +17,11 @@ describe('LoggedOutMessage', () => {
   };
 
   beforeEach(() => {
-    LoggedOutMessage.$imports.$mock(mockImportedComponents());
+    $imports.$mock(mockImportedComponents());
   });
 
   afterEach(() => {
-    LoggedOutMessage.$imports.$restore();
+    $imports.$restore();
   });
 
   it('should link to signup', () => {

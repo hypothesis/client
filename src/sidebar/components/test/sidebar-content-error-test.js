@@ -2,6 +2,7 @@ const { mount } = require('enzyme');
 const { createElement } = require('preact');
 
 const SidebarContentError = require('../sidebar-content-error');
+const { $imports } = require('../sidebar-content-error');
 const mockImportedComponents = require('./mock-imported-components');
 
 describe('SidebarContentError', () => {
@@ -21,11 +22,11 @@ describe('SidebarContentError', () => {
   };
 
   beforeEach(() => {
-    SidebarContentError.$imports.$mock(mockImportedComponents());
+    $imports.$mock(mockImportedComponents());
   });
 
   afterEach(() => {
-    SidebarContentError.$imports.$restore();
+    $imports.$restore();
   });
 
   it('shows error you may need to login to view message when logged out', () => {

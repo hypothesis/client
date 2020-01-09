@@ -2,6 +2,7 @@ const { createElement } = require('preact');
 const { mount } = require('enzyme');
 
 const MenuItem = require('../menu-item');
+const { $imports } = require('../menu-item');
 const mockImportedComponents = require('./mock-imported-components');
 
 describe('MenuItem', () => {
@@ -9,11 +10,11 @@ describe('MenuItem', () => {
     mount(<MenuItem label="Test item" {...props} />);
 
   beforeEach(() => {
-    MenuItem.$imports.$mock(mockImportedComponents());
+    $imports.$mock(mockImportedComponents());
   });
 
   afterEach(() => {
-    MenuItem.$imports.$restore();
+    $imports.$restore();
   });
 
   it('invokes `onClick` callback when clicked', () => {

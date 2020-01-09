@@ -5,6 +5,7 @@ const { act } = require('preact/test-utils');
 const { waitFor } = require('./util');
 
 const AnnotationActionBar = require('../annotation-action-bar');
+const { $imports } = require('../annotation-action-bar');
 const mockImportedComponents = require('./mock-imported-components');
 
 describe('AnnotationActionBar', () => {
@@ -92,8 +93,8 @@ describe('AnnotationActionBar', () => {
       updateFlagStatus: sinon.stub(),
     };
 
-    AnnotationActionBar.$imports.$mock(mockImportedComponents());
-    AnnotationActionBar.$imports.$mock({
+    $imports.$mock(mockImportedComponents());
+    $imports.$mock({
       '../util/annotation-sharing': {
         isShareable: fakeIsShareable,
         shareURI: sinon.stub().returns('http://share.me'),
@@ -105,7 +106,7 @@ describe('AnnotationActionBar', () => {
 
   afterEach(() => {
     window.confirm.restore();
-    AnnotationActionBar.$imports.$restore();
+    $imports.$restore();
   });
 
   describe('edit action button', () => {

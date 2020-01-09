@@ -1,4 +1,5 @@
 const crossOriginRPC = require('../cross-origin-rpc');
+const { $imports } = require('../cross-origin-rpc');
 
 describe('crossOriginRPC', function() {
   describe('server', function() {
@@ -30,9 +31,13 @@ describe('crossOriginRPC', function() {
 
       fakeWarnOnce = sinon.stub();
 
-      crossOriginRPC.$imports.$mock({
+      $imports.$mock({
         '../shared/warn-once': fakeWarnOnce,
       });
+    });
+
+    afterEach(() => {
+      $imports.$restore();
     });
 
     /**

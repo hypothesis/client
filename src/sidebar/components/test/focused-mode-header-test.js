@@ -2,6 +2,7 @@ const { mount } = require('enzyme');
 const { createElement } = require('preact');
 
 const FocusedModeHeader = require('../focused-mode-header');
+const { $imports } = require('../focused-mode-header');
 const mockImportedComponents = require('./mock-imported-components');
 
 describe('FocusedModeHeader', function() {
@@ -24,14 +25,14 @@ describe('FocusedModeHeader', function() {
       setFocusModeFocused: sinon.stub(),
     };
 
-    FocusedModeHeader.$imports.$mock(mockImportedComponents());
-    FocusedModeHeader.$imports.$mock({
+    $imports.$mock(mockImportedComponents());
+    $imports.$mock({
       '../store/use-store': callback => callback(fakeStore),
     });
   });
 
   afterEach(() => {
-    FocusedModeHeader.$imports.$restore();
+    $imports.$restore();
   });
 
   context('not in user-focused mode', () => {

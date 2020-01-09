@@ -4,6 +4,7 @@ const { mount } = require('enzyme');
 const fixtures = require('../../test/annotation-fixtures');
 
 const AnnotationDocumentInfo = require('../annotation-document-info');
+const { $imports } = require('../annotation-document-info');
 const mockImportedComponents = require('./mock-imported-components');
 
 describe('AnnotationDocumentInfo', () => {
@@ -23,14 +24,14 @@ describe('AnnotationDocumentInfo', () => {
     fakeDomainAndTitle = sinon.stub();
     fakeMetadata = { domainAndTitle: fakeDomainAndTitle };
 
-    AnnotationDocumentInfo.$imports.$mock(mockImportedComponents());
-    AnnotationDocumentInfo.$imports.$mock({
+    $imports.$mock(mockImportedComponents());
+    $imports.$mock({
       '../util/annotation-metadata': fakeMetadata,
     });
   });
 
   afterEach(() => {
-    AnnotationDocumentInfo.$imports.$restore();
+    $imports.$restore();
   });
 
   it('should not render if there is no document title', () => {

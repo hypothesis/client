@@ -2,6 +2,7 @@ const { createElement } = require('preact');
 const { mount } = require('enzyme');
 
 const ShareLinks = require('../share-links');
+const { $imports } = require('../share-links');
 const mockImportedComponents = require('./mock-imported-components');
 
 describe('ShareLinks', () => {
@@ -24,11 +25,11 @@ describe('ShareLinks', () => {
       track: sinon.stub(),
     };
 
-    ShareLinks.$imports.$mock(mockImportedComponents());
+    $imports.$mock(mockImportedComponents());
   });
 
   afterEach(() => {
-    ShareLinks.$imports.$restore();
+    $imports.$restore();
   });
 
   const encodedLink = encodeURIComponent(shareLink);

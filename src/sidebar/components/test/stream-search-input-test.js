@@ -3,6 +3,7 @@ const { createElement } = require('preact');
 const { act } = require('preact/test-utils');
 
 const StreamSearchInput = require('../stream-search-input');
+const { $imports } = require('../stream-search-input');
 const mockImportedComponents = require('./mock-imported-components');
 
 describe('StreamSearchInput', () => {
@@ -19,11 +20,11 @@ describe('StreamSearchInput', () => {
       $on: sinon.stub(),
     };
 
-    StreamSearchInput.$imports.$mock(mockImportedComponents());
+    $imports.$mock(mockImportedComponents());
   });
 
   afterEach(() => {
-    StreamSearchInput.$imports.$restore();
+    $imports.$restore();
   });
 
   function createSearchInput(props = {}) {

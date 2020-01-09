@@ -2,6 +2,7 @@ const { createElement } = require('preact');
 const { mount } = require('enzyme');
 
 const AnnotationPublishControl = require('../annotation-publish-control');
+const { $imports } = require('../annotation-publish-control');
 const mockImportedComponents = require('./mock-imported-components');
 
 describe('AnnotationPublishControl', () => {
@@ -38,12 +39,16 @@ describe('AnnotationPublishControl', () => {
 
     fakeApplyTheme = sinon.stub();
 
-    AnnotationPublishControl.$imports.$mock(mockImportedComponents());
-    AnnotationPublishControl.$imports.$mock({
+    $imports.$mock(mockImportedComponents());
+    $imports.$mock({
       '../util/theme': {
         applyTheme: fakeApplyTheme,
       },
     });
+  });
+
+  afterEach(() => {
+    $imports.$restore();
   });
 
   describe('theming', () => {

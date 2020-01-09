@@ -72,10 +72,6 @@ describe('sidebar.components.sidebar-content', function() {
     });
   });
 
-  afterEach(() => {
-    sidebarContent.$imports.$restore();
-  });
-
   function setFrames(frames) {
     frames.forEach(function(frame) {
       store.connectFrame(frame);

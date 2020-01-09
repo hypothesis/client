@@ -1,4 +1,5 @@
 const features = require('../features');
+const { $imports } = require('../features');
 const events = require('../../events');
 const bridgeEvents = require('../../../shared/bridge-events');
 
@@ -38,13 +39,13 @@ describe('h:features - sidebar layer', function() {
       },
     };
 
-    features.$imports.$mock({
+    $imports.$mock({
       '../../shared/warn-once': fakeWarnOnce,
     });
   });
 
   afterEach(function() {
-    features.$imports.$restore();
+    $imports.$restore();
     sandbox.restore();
   });
 

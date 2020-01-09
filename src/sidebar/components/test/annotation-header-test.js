@@ -4,6 +4,7 @@ const { mount } = require('enzyme');
 const fixtures = require('../../test/annotation-fixtures');
 
 const AnnotationHeader = require('../annotation-header');
+const { $imports } = require('../annotation-header');
 const mockImportedComponents = require('./mock-imported-components');
 
 describe('AnnotationHeader', () => {
@@ -22,11 +23,11 @@ describe('AnnotationHeader', () => {
   };
 
   beforeEach(() => {
-    AnnotationHeader.$imports.$mock(mockImportedComponents());
+    $imports.$mock(mockImportedComponents());
   });
 
   afterEach(() => {
-    AnnotationHeader.$imports.$restore();
+    $imports.$restore();
   });
 
   describe('collapsed replies', () => {

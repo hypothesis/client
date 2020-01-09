@@ -2,6 +2,7 @@ const { createElement } = require('preact');
 const { mount } = require('enzyme');
 
 const SortMenu = require('../sort-menu');
+const { $imports } = require('../sort-menu');
 const mockImportedComponents = require('./mock-imported-components');
 
 describe('SortMenu', () => {
@@ -24,14 +25,14 @@ describe('SortMenu', () => {
       getState: sinon.stub().returns(fakeState),
     };
 
-    SortMenu.$imports.$mock(mockImportedComponents());
-    SortMenu.$imports.$mock({
+    $imports.$mock(mockImportedComponents());
+    $imports.$mock({
       '../store/use-store': callback => callback(fakeStore),
     });
   });
 
   afterEach(() => {
-    SortMenu.$imports.$restore();
+    $imports.$restore();
   });
 
   it('renders a menu item for each sort option', () => {

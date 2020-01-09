@@ -4,6 +4,7 @@ const { mount } = require('enzyme');
 
 const { LinkType } = require('../../markdown-commands');
 const MarkdownEditor = require('../markdown-editor');
+const { $imports } = require('../markdown-editor');
 
 describe('MarkdownEditor', () => {
   const formatResult = {
@@ -29,14 +30,14 @@ describe('MarkdownEditor', () => {
       return null;
     };
 
-    MarkdownEditor.$imports.$mock({
+    $imports.$mock({
       '../markdown-commands': fakeMarkdownCommands,
       './markdown-view': MarkdownView,
     });
   });
 
   afterEach(() => {
-    MarkdownEditor.$imports.$restore();
+    $imports.$restore();
   });
 
   const commands = [

@@ -3,6 +3,7 @@ const { mount } = require('enzyme');
 
 const mockImportedComponents = require('./mock-imported-components');
 const TagEditor = require('../tag-editor');
+const { $imports } = require('../tag-editor');
 
 describe('TagEditor', function() {
   let fakeTags = ['tag1', 'tag2'];
@@ -48,11 +49,11 @@ describe('TagEditor', function() {
       store: sinon.stub(),
     };
 
-    TagEditor.$imports.$mock(mockImportedComponents());
+    $imports.$mock(mockImportedComponents());
   });
 
   afterEach(() => {
-    TagEditor.$imports.$restore();
+    $imports.$restore();
   });
 
   it('adds appropriate tag values to the elements', () => {

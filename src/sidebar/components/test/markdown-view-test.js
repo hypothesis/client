@@ -2,6 +2,7 @@ const { createElement } = require('preact');
 const { mount } = require('enzyme');
 
 const MarkdownView = require('../markdown-view');
+const { $imports } = require('../markdown-view');
 
 describe('MarkdownView', () => {
   let fakeMediaEmbedder;
@@ -16,14 +17,14 @@ describe('MarkdownView', () => {
       },
     };
 
-    MarkdownView.$imports.$mock({
+    $imports.$mock({
       '../render-markdown': fakeRenderMarkdown,
       '../media-embedder': fakeMediaEmbedder,
     });
   });
 
   afterEach(() => {
-    MarkdownView.$imports.$restore();
+    $imports.$restore();
   });
 
   it('renders nothing if no markdown is provied', () => {

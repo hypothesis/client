@@ -2,6 +2,7 @@ const { mount } = require('enzyme');
 const { createElement } = require('preact');
 
 const SearchStatusBar = require('../search-status-bar');
+const { $imports } = require('../search-status-bar');
 const mockImportedComponents = require('./mock-imported-components');
 
 describe('SearchStatusBar', () => {
@@ -27,14 +28,14 @@ describe('SearchStatusBar', () => {
       noteCount: sinon.stub().returns(0),
     };
 
-    SearchStatusBar.$imports.$mock(mockImportedComponents());
-    SearchStatusBar.$imports.$mock({
+    $imports.$mock(mockImportedComponents());
+    $imports.$mock({
       '../store/use-store': callback => callback(fakeStore),
     });
   });
 
   afterEach(() => {
-    SearchStatusBar.$imports.$restore();
+    $imports.$restore();
   });
 
   context('user search query is applied', () => {

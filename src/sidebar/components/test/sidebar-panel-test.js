@@ -2,6 +2,7 @@ const { createElement } = require('preact');
 const { mount } = require('enzyme');
 
 const SidebarPanel = require('../sidebar-panel');
+const { $imports } = require('../sidebar-panel');
 const mockImportedComponents = require('./mock-imported-components');
 
 describe('SidebarPanel', () => {
@@ -24,15 +25,15 @@ describe('SidebarPanel', () => {
       toggleSidebarPanel: sinon.stub(),
     };
 
-    SidebarPanel.$imports.$mock(mockImportedComponents());
-    SidebarPanel.$imports.$mock({
+    $imports.$mock(mockImportedComponents());
+    $imports.$mock({
       '../store/use-store': callback => callback(fakeStore),
       'scroll-into-view': fakeScrollIntoView,
     });
   });
 
   afterEach(() => {
-    SidebarPanel.$imports.$restore();
+    $imports.$restore();
   });
 
   it('renders the provided title', () => {

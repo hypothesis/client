@@ -3,6 +3,7 @@ const { act } = require('preact/test-utils');
 const { mount } = require('enzyme');
 
 const Excerpt = require('../excerpt');
+const { $imports } = require('../excerpt');
 
 describe('Excerpt', () => {
   const SHORT_DIV = <div id="foo" style="height: 5px;" />;
@@ -36,12 +37,13 @@ describe('Excerpt', () => {
     container = document.createElement('div');
     document.body.appendChild(container);
 
-    Excerpt.$imports.$mock({
+    $imports.$mock({
       '../util/observe-element-size': fakeObserveElementSize,
     });
   });
 
   afterEach(() => {
+    $imports.$restore();
     container.remove();
   });
 

@@ -38,14 +38,16 @@ function getDisplayName(component) {
  * `Fragment`.
  *
  * @example
+ *   import ComponentUnderTest, { $imports } from '../component-under-test';
+ *
  *   beforeEach(() => {
- *     ComponentUnderTest.$imports.$mock(mockImportedComponents());
+ *     $imports.$mock(mockImportedComponents());
  *
  *     // Add additional mocks or overrides here.
  *   });
  *
  *   afterEach(() => {
- *     ComponentUnderTest.$imports.$restore();
+ *     $imports.$restore();
  *   });
  *
  * @return {Function} - A function that can be passed to `$imports.$mock`.

@@ -5,6 +5,7 @@ const uiConstants = require('../../ui-constants');
 const bridgeEvents = require('../../../shared/bridge-events');
 
 const TopBar = require('../top-bar');
+const { $imports } = require('../top-bar');
 const mockImportedComponents = require('./mock-imported-components');
 
 describe('TopBar', () => {
@@ -40,8 +41,8 @@ describe('TopBar', () => {
       applyPendingUpdates: sinon.stub(),
     };
 
-    TopBar.$imports.$mock(mockImportedComponents());
-    TopBar.$imports.$mock({
+    $imports.$mock(mockImportedComponents());
+    $imports.$mock({
       '../store/use-store': callback => callback(fakeStore),
       '../util/is-third-party-service': fakeIsThirdPartyService,
       '../service-config': fakeServiceConfig,
@@ -49,7 +50,7 @@ describe('TopBar', () => {
   });
 
   afterEach(() => {
-    TopBar.$imports.$restore();
+    $imports.$restore();
   });
 
   // Helper to retrieve an `Button` by icon name, for convenience

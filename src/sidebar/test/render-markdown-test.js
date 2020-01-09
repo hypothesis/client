@@ -1,10 +1,11 @@
 const renderMarkdown = require('../render-markdown');
+const { $imports } = require('../render-markdown');
 
 describe('render-markdown', function() {
   let render;
 
   beforeEach(function() {
-    renderMarkdown.$imports.$mock({
+    $imports.$mock({
       katex: {
         renderToString: function(input, opts) {
           if (opts && opts.displayMode) {
@@ -21,7 +22,7 @@ describe('render-markdown', function() {
   });
 
   afterEach(() => {
-    renderMarkdown.$imports.$restore();
+    $imports.$restore();
   });
 
   describe('autolinking', function() {

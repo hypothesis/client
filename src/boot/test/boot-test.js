@@ -1,4 +1,5 @@
 const boot = require('../boot');
+const { $imports } = require('../boot');
 
 function assetUrl(url) {
   return `https://marginal.ly/client/build/${url}`;
@@ -16,13 +17,13 @@ describe('bootstrap', function() {
       requiredPolyfillSets: sinon.stub().returns([]),
     };
 
-    boot.$imports.$mock({
+    $imports.$mock({
       '../shared/polyfills': fakePolyfills,
     });
   });
 
   afterEach(function() {
-    boot.$imports.$restore();
+    $imports.$restore();
     iframe.remove();
   });
 

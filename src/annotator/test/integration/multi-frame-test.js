@@ -2,6 +2,7 @@ const isLoaded = require('../../util/frame-util').isLoaded;
 
 const FRAME_DEBOUNCE_WAIT = require('../../frame-observer').DEBOUNCE_WAIT + 10;
 const CrossFrame = require('../../plugin/cross-frame');
+const { $imports } = require('../../plugin/cross-frame');
 
 describe('CrossFrame multi-frame scenario', function() {
   let fakeAnnotationSync;
@@ -28,7 +29,7 @@ describe('CrossFrame multi-frame scenario', function() {
     proxyAnnotationSync = sandbox.stub().returns(fakeAnnotationSync);
     proxyBridge = sandbox.stub().returns(fakeBridge);
 
-    CrossFrame.$imports.$mock({
+    $imports.$mock({
       '../annotation-sync': proxyAnnotationSync,
       '../../shared/bridge': proxyBridge,
     });
@@ -52,7 +53,7 @@ describe('CrossFrame multi-frame scenario', function() {
     crossFrame.destroy();
     container.parentNode.removeChild(container);
 
-    CrossFrame.$imports.$restore();
+    $imports.$restore();
   });
 
   it('detects frames on page', function() {

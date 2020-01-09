@@ -1,5 +1,6 @@
 const events = require('../../shared/bridge-events');
 const features = require('../features');
+const { $imports } = require('../features');
 
 describe('features - annotation layer', function() {
   let featureFlagsUpdateHandler;
@@ -16,7 +17,7 @@ describe('features - annotation layer', function() {
 
   beforeEach(function() {
     fakeWarnOnce = sinon.stub();
-    features.$imports.$mock({
+    $imports.$mock({
       '../shared/warn-once': fakeWarnOnce,
     });
 
@@ -34,7 +35,7 @@ describe('features - annotation layer', function() {
 
   afterEach(function() {
     features.reset();
-    features.$imports.$restore();
+    $imports.$restore();
   });
 
   describe('flagEnabled', function() {

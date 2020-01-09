@@ -2,6 +2,7 @@ const { mount } = require('enzyme');
 const { createElement } = require('preact');
 
 const Tutorial = require('../tutorial');
+const { $imports } = require('../tutorial');
 const mockImportedComponents = require('./mock-imported-components');
 
 describe('Tutorial', function() {
@@ -14,14 +15,14 @@ describe('Tutorial', function() {
   beforeEach(() => {
     fakeIsThirdPartyService = sinon.stub().returns(false);
 
-    Tutorial.$imports.$mock(mockImportedComponents());
-    Tutorial.$imports.$mock({
+    $imports.$mock(mockImportedComponents());
+    $imports.$mock({
       '../util/is-third-party-service': fakeIsThirdPartyService,
     });
   });
 
   afterEach(() => {
-    Tutorial.$imports.$restore();
+    $imports.$restore();
   });
 
   it('should show four "steps" of instructions to first-party users', () => {

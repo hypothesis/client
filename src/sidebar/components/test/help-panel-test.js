@@ -3,6 +3,7 @@ const { createElement } = require('preact');
 const { act } = require('preact/test-utils');
 
 const HelpPanel = require('../help-panel');
+const { $imports } = require('../help-panel');
 const mockImportedComponents = require('./mock-imported-components');
 
 describe('HelpPanel', function() {
@@ -32,15 +33,15 @@ describe('HelpPanel', function() {
     };
     fakeVersionData = sinon.stub().returns(fakeVersionDataObject);
 
-    HelpPanel.$imports.$mock(mockImportedComponents());
-    HelpPanel.$imports.$mock({
+    $imports.$mock(mockImportedComponents());
+    $imports.$mock({
       '../store/use-store': callback => callback(fakeStore),
       '../util/version-data': fakeVersionData,
     });
   });
 
   afterEach(() => {
-    HelpPanel.$imports.$restore();
+    $imports.$restore();
   });
 
   context('when viewing tutorial sub-panel', () => {

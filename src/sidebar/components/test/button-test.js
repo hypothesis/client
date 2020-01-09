@@ -2,6 +2,7 @@ const { createElement } = require('preact');
 const { mount } = require('enzyme');
 
 const Button = require('../button');
+const { $imports } = require('../button');
 const mockImportedComponents = require('./mock-imported-components');
 
 describe('Button', () => {
@@ -21,11 +22,11 @@ describe('Button', () => {
 
   beforeEach(() => {
     fakeOnClick = sinon.stub();
-    Button.$imports.$mock(mockImportedComponents());
+    $imports.$mock(mockImportedComponents());
   });
 
   afterEach(() => {
-    Button.$imports.$restore();
+    $imports.$restore();
   });
 
   it('adds active className if `isActive` is `true`', () => {

@@ -2,6 +2,7 @@ const { mount } = require('enzyme');
 const { createElement } = require('preact');
 
 const GroupListSection = require('../group-list-section');
+const { $imports } = require('../group-list-section');
 const mockImportedComponents = require('./mock-imported-components');
 
 describe('GroupListSection', () => {
@@ -27,11 +28,11 @@ describe('GroupListSection', () => {
   };
 
   beforeEach(() => {
-    GroupListSection.$imports.$mock(mockImportedComponents());
+    $imports.$mock(mockImportedComponents());
   });
 
   afterEach(() => {
-    GroupListSection.$imports.$restore();
+    $imports.$restore();
   });
 
   it('renders heading', () => {
