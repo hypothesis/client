@@ -1,0 +1,41 @@
+@use "../../variables" as var;
+
+.datalist {
+  color: var.$white;
+}
+
+.datalist__items {
+  position: absolute;
+  width: 100%;
+  padding: 0;
+  background-color: var.$grey-mid;
+  z-index: 10;
+}
+
+.datalist__arrow-down {
+  position: absolute;
+  top: -1px;
+  left: 6px;
+  width: 0;
+  height: 0;
+  border-left: 7px solid transparent;
+  border-right: 7px solid transparent;
+  border-top: 7px solid #fff;
+}
+
+.datalist__ul {
+  list-style: none;
+  padding: 0;
+  > li {
+    padding: 0.25em 2em;
+    white-space: nowrap;
+  }
+  > li.is-selected {
+    background-color: var.$grey-5;
+    color: white;
+  }
+  > li:hover {
+    cursor: pointer;
+    background-color: var.$grey-4;
+  }
+}
