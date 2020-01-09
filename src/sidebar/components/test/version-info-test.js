@@ -2,6 +2,7 @@ const { mount } = require('enzyme');
 const { createElement } = require('preact');
 
 const VersionInfo = require('../version-info');
+const { $imports } = require('../version-info');
 
 describe('VersionInfo', function() {
   let fakeVersionData;
@@ -25,7 +26,7 @@ describe('VersionInfo', function() {
     fakeCopyToClipboard = {
       copyText: sinon.stub(),
     };
-    VersionInfo.$imports.$mock({
+    $imports.$mock({
       '../util/copy-to-clipboard': fakeCopyToClipboard,
     });
 
@@ -38,6 +39,10 @@ describe('VersionInfo', function() {
       timestamp: 'fakeTimestamp',
     };
     fakeVersionData.asFormattedString = sinon.stub().returns('fakeString');
+  });
+
+  afterEach(() => {
+    $imports.$restore();
   });
 
   it('renders `versionData` information', () => {

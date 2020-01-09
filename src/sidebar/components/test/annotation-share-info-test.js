@@ -4,6 +4,7 @@ const { mount } = require('enzyme');
 const fixtures = require('../../test/annotation-fixtures');
 
 const AnnotationShareInfo = require('../annotation-share-info');
+const { $imports } = require('../annotation-share-info');
 const mockImportedComponents = require('./mock-imported-components');
 
 describe('AnnotationShareInfo', () => {
@@ -36,14 +37,14 @@ describe('AnnotationShareInfo', () => {
       isShared: sinon.stub().returns(true),
     };
 
-    AnnotationShareInfo.$imports.$mock(mockImportedComponents());
-    AnnotationShareInfo.$imports.$mock({
+    $imports.$mock(mockImportedComponents());
+    $imports.$mock({
       '../store/use-store': callback => callback(fakeStore),
     });
   });
 
   afterEach(() => {
-    AnnotationShareInfo.$imports.$restore();
+    $imports.$restore();
   });
 
   describe('group link', () => {

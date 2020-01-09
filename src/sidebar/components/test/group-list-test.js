@@ -3,6 +3,7 @@ const { createElement } = require('preact');
 const { act } = require('preact/test-utils');
 
 const GroupList = require('../group-list');
+const { $imports } = require('../group-list');
 const mockImportedComponents = require('./mock-imported-components');
 
 describe('GroupList', () => {
@@ -58,15 +59,15 @@ describe('GroupList', () => {
     };
     fakeServiceConfig = sinon.stub().returns(null);
 
-    GroupList.$imports.$mock(mockImportedComponents());
-    GroupList.$imports.$mock({
+    $imports.$mock(mockImportedComponents());
+    $imports.$mock({
       '../store/use-store': callback => callback(fakeStore),
       '../service-config': fakeServiceConfig,
     });
   });
 
   afterEach(() => {
-    GroupList.$imports.$restore();
+    $imports.$restore();
   });
 
   it('displays no sections if there are no groups', () => {
@@ -100,7 +101,7 @@ describe('GroupList', () => {
     const testGroups = populateGroupSections();
     const fakeGroupOrganizations = groups =>
       groups.sort((a, b) => a.id.localeCompare(b.id));
-    GroupList.$imports.$mock({
+    $imports.$mock({
       '../util/group-organizations': fakeGroupOrganizations,
     });
 
@@ -151,7 +152,7 @@ describe('GroupList', () => {
   });
 
   it('displays the group name and icon as static text if there is only one group and no actions available', () => {
-    GroupList.$imports.$mock({
+    $imports.$mock({
       '../util/is-third-party-service': () => true,
     });
     const wrapper = createGroupList();

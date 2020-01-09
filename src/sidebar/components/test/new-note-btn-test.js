@@ -4,6 +4,7 @@ const { act } = require('preact/test-utils');
 
 const events = require('../../events');
 const NewNoteButton = require('../new-note-btn');
+const { $imports } = require('../new-note-btn');
 const mockImportedComponents = require('./mock-imported-components');
 
 describe('NewNoteButton', function() {
@@ -38,14 +39,14 @@ describe('NewNoteButton', function() {
       ]),
     };
 
-    NewNoteButton.$imports.$mock(mockImportedComponents());
-    NewNoteButton.$imports.$mock({
+    $imports.$mock(mockImportedComponents());
+    $imports.$mock({
       '../store/use-store': callback => callback(fakeStore),
     });
   });
 
   afterEach(() => {
-    NewNoteButton.$imports.$restore();
+    $imports.$restore();
   });
 
   it("sets a backgroundColor equal to the setting's ctaBackgroundColor color", () => {

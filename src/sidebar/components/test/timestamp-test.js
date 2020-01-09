@@ -3,6 +3,7 @@ const { act } = require('preact/test-utils');
 const { mount } = require('enzyme');
 
 const Timestamp = require('../timestamp');
+const { $imports } = require('../timestamp');
 
 describe('Timestamp', () => {
   let clock;
@@ -15,14 +16,14 @@ describe('Timestamp', () => {
       decayingInterval: sinon.stub(),
     };
 
-    Timestamp.$imports.$mock({
+    $imports.$mock({
       '../util/time': fakeTime,
     });
   });
 
   afterEach(() => {
     clock.restore();
-    Timestamp.$imports.$restore();
+    $imports.$restore();
   });
 
   const createTimestamp = props => mount(<Timestamp {...props} />);
@@ -104,7 +105,7 @@ describe('Timestamp', () => {
       it(`displays an absolute timestamp (${variant})`, () => {
         const date = new Date('2016-06-10T10:04:04.939Z');
         const format = date => `formatted:${date}`;
-        Timestamp.$imports.$mock({
+        $imports.$mock({
           '../util/date': {
             format,
           },

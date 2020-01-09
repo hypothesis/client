@@ -1,4 +1,5 @@
 const configFrom = require('../index');
+const { $imports } = require('../index');
 
 describe('annotator.config.index', function() {
   let fakeSettingsFrom;
@@ -8,13 +9,13 @@ describe('annotator.config.index', function() {
       hostPageSetting: sinon.stub(),
     });
 
-    configFrom.$imports.$mock({
+    $imports.$mock({
       './settings': fakeSettingsFrom,
     });
   });
 
   afterEach(() => {
-    configFrom.$imports.$restore();
+    $imports.$restore();
   });
 
   it('gets the configuration settings', function() {

@@ -7,6 +7,7 @@ $ = require('jquery')
 Delegator['@noCallThru'] = true
 
 Guest = require('../guest')
+{ $imports } = require('../guest')
 rangeUtil = null
 selections = null
 
@@ -74,7 +75,7 @@ describe 'Guest', ->
       anchor: sinon.stub()
     }
 
-    Guest.$imports.$mock({
+    $imports.$mock({
       './adder': {Adder: FakeAdder},
       './anchoring/html': htmlAnchoring,
       './highlighter': highlighter,
@@ -103,7 +104,7 @@ describe 'Guest', ->
   afterEach ->
     sandbox.restore()
     console.warn.restore()
-    Guest.$imports.$restore()
+    $imports.$restore()
 
   describe 'plugins', ->
     fakePlugin = null

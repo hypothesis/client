@@ -1,4 +1,5 @@
 const VirtualThreadList = require('../virtual-thread-list');
+const { $imports } = require('../virtual-thread-list');
 
 describe('VirtualThreadList', function() {
   let lastState;
@@ -35,13 +36,13 @@ describe('VirtualThreadList', function() {
   }
 
   beforeEach(() => {
-    VirtualThreadList.$imports.$mock({
+    $imports.$mock({
       'lodash.debounce': fn => fn,
     });
   });
 
   afterEach(() => {
-    VirtualThreadList.$imports.$restore();
+    $imports.$restore();
   });
 
   beforeEach(function() {

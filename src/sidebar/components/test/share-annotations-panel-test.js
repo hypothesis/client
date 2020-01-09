@@ -2,6 +2,7 @@ const { createElement } = require('preact');
 const { mount } = require('enzyme');
 
 const ShareAnnotationsPanel = require('../share-annotations-panel');
+const { $imports } = require('../share-annotations-panel');
 const mockImportedComponents = require('./mock-imported-components');
 
 describe('ShareAnnotationsPanel', () => {
@@ -47,15 +48,15 @@ describe('ShareAnnotationsPanel', () => {
       }),
     };
 
-    ShareAnnotationsPanel.$imports.$mock(mockImportedComponents());
-    ShareAnnotationsPanel.$imports.$mock({
+    $imports.$mock(mockImportedComponents());
+    $imports.$mock({
       '../store/use-store': callback => callback(fakeStore),
       '../util/copy-to-clipboard': fakeCopyToClipboard,
     });
   });
 
   afterEach(() => {
-    ShareAnnotationsPanel.$imports.$restore();
+    $imports.$restore();
   });
 
   describe('panel title', () => {

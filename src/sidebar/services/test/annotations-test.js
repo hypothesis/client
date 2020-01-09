@@ -1,5 +1,7 @@
-const annotations = require('../annotations');
 const EventEmitter = require('tiny-emitter');
+
+const annotations = require('../annotations');
+const { $imports } = require('../annotations');
 
 let searchClients;
 let longRunningSearchClient = false;
@@ -72,14 +74,14 @@ describe('annotations', () => {
     fakeUris = ['http://example.com'];
     fakeGroupId = 'group-id';
 
-    annotations.$imports.$mock({
+    $imports.$mock({
       '../search-client': FakeSearchClient,
     });
   });
 
   afterEach(() => {
     console.error.restore();
-    annotations.$imports.$restore();
+    $imports.$restore();
   });
 
   function service() {

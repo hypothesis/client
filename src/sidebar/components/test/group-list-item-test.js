@@ -3,6 +3,7 @@ const { act } = require('preact/test-utils');
 
 const { mount } = require('enzyme');
 const GroupListItem = require('../group-list-item');
+const { $imports } = require('../group-list-item');
 
 const { events } = require('../../services/analytics');
 
@@ -65,7 +66,7 @@ describe('GroupListItem', () => {
     }
     FakeSlider.displayName = 'Slider';
 
-    GroupListItem.$imports.$mock({
+    $imports.$mock({
       './menu-item': FakeMenuItem,
       '../util/copy-to-clipboard': {
         copyText: fakeCopyText,
@@ -78,7 +79,7 @@ describe('GroupListItem', () => {
   });
 
   afterEach(() => {
-    GroupListItem.$imports.$restore();
+    $imports.$restore();
     window.confirm.restore();
   });
 

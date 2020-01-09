@@ -1,4 +1,5 @@
 const serviceUrlFactory = require('../service-url');
+const { $imports } = require('../service-url');
 
 /** Return a fake store object. */
 function fakeStore() {
@@ -18,7 +19,7 @@ function createServiceUrl(linksPromise) {
     .stub()
     .returns({ url: 'EXPANDED_URL', params: {} });
 
-  serviceUrlFactory.$imports.$mock({
+  $imports.$mock({
     '../util/url': { replaceURLParams: replaceURLParams },
   });
 
@@ -43,7 +44,7 @@ describe('sidebar.service-url', function() {
 
   afterEach(function() {
     console.warn.restore();
-    serviceUrlFactory.$imports.$restore();
+    $imports.$restore();
   });
 
   context('before the API response has been received', function() {

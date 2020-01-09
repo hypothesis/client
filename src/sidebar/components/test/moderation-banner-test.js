@@ -2,6 +2,7 @@ const { mount } = require('enzyme');
 const { createElement } = require('preact');
 
 const ModerationBanner = require('../moderation-banner');
+const { $imports } = require('../moderation-banner');
 const fixtures = require('../../test/annotation-fixtures');
 const mockImportedComponents = require('./mock-imported-components');
 
@@ -29,8 +30,8 @@ describe('ModerationBanner', () => {
       },
     };
 
-    ModerationBanner.$imports.$mock(mockImportedComponents());
-    ModerationBanner.$imports.$mock({
+    $imports.$mock(mockImportedComponents());
+    $imports.$mock({
       '../store/use-store': callback =>
         callback({
           hide: sinon.stub(),
@@ -40,7 +41,7 @@ describe('ModerationBanner', () => {
   });
 
   afterEach(() => {
-    ModerationBanner.$imports.$restore();
+    $imports.$restore();
   });
 
   [

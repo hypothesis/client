@@ -2,6 +2,7 @@ const { createElement } = require('preact');
 const { mount } = require('enzyme');
 
 const MenuSection = require('../menu-section');
+const { $imports } = require('../menu-section');
 const mockImportedComponents = require('./mock-imported-components');
 
 describe('MenuSection', () => {
@@ -13,11 +14,11 @@ describe('MenuSection', () => {
     );
 
   beforeEach(() => {
-    MenuSection.$imports.$mock(mockImportedComponents());
+    $imports.$mock(mockImportedComponents());
   });
 
   afterEach(() => {
-    MenuSection.$imports.$restore();
+    $imports.$restore();
   });
 
   it('renders the heading', () => {

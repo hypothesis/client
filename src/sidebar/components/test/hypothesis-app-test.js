@@ -4,6 +4,7 @@ const events = require('../../events');
 const bridgeEvents = require('../../../shared/bridge-events');
 
 const hypothesisApp = require('../hypothesis-app');
+const { $imports } = require('../hypothesis-app');
 
 describe('sidebar.components.hypothesis-app', function() {
   let $componentController = null;
@@ -44,7 +45,7 @@ describe('sidebar.components.hypothesis-app', function() {
     fakeServiceConfig = sandbox.stub();
     fakeShouldAutoDisplayTutorial = sinon.stub().returns(false);
 
-    hypothesisApp.$imports.$mock({
+    $imports.$mock({
       '../util/is-sidebar': fakeIsSidebar,
       '../service-config': fakeServiceConfig,
       '../util/session': {
@@ -56,7 +57,7 @@ describe('sidebar.components.hypothesis-app', function() {
   });
 
   afterEach(() => {
-    hypothesisApp.$imports.$restore();
+    $imports.$restore();
   });
 
   beforeEach(angular.mock.module('h'));

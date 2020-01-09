@@ -2,6 +2,7 @@ const { createElement } = require('preact');
 const { mount } = require('enzyme');
 
 const SearchInput = require('../search-input');
+const { $imports } = require('../search-input');
 
 describe('SearchInput', () => {
   let fakeStore;
@@ -22,14 +23,14 @@ describe('SearchInput', () => {
     const FakeSpinner = () => null;
     FakeSpinner.displayName = 'Spinner';
 
-    SearchInput.$imports.$mock({
+    $imports.$mock({
       './spinner': FakeSpinner,
       '../store/use-store': callback => callback(fakeStore),
     });
   });
 
   afterEach(() => {
-    SearchInput.$imports.$restore();
+    $imports.$restore();
   });
 
   it('displays the active query', () => {

@@ -3,6 +3,7 @@ const { mount } = require('enzyme');
 
 const mockImportedComponents = require('./mock-imported-components');
 const TagList = require('../tag-list');
+const { $imports } = require('../tag-list');
 
 describe('TagList', function() {
   let fakeServiceUrl;
@@ -27,8 +28,8 @@ describe('TagList', function() {
     fakeServiceUrl = sinon.stub().returns('http://serviceurl.com');
     fakeIsThirdPartyUser = sinon.stub().returns(false);
 
-    TagList.$imports.$mock(mockImportedComponents());
-    TagList.$imports.$mock({
+    $imports.$mock(mockImportedComponents());
+    $imports.$mock({
       '../util/account-id': {
         isThirdPartyUser: fakeIsThirdPartyUser,
       },
@@ -36,7 +37,7 @@ describe('TagList', function() {
   });
 
   afterEach(() => {
-    TagList.$imports.$restore();
+    $imports.$restore();
   });
 
   it('does not render any tags if `tags` prop is empty', () => {

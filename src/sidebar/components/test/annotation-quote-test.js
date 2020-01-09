@@ -2,6 +2,7 @@ const { createElement } = require('preact');
 const { mount } = require('enzyme');
 
 const AnnotationQuote = require('../annotation-quote');
+const { $imports } = require('../annotation-quote');
 const mockImportedComponents = require('./mock-imported-components');
 
 describe('AnnotationQuote', () => {
@@ -12,11 +13,11 @@ describe('AnnotationQuote', () => {
   }
 
   beforeEach(() => {
-    AnnotationQuote.$imports.$mock(mockImportedComponents());
+    $imports.$mock(mockImportedComponents());
   });
 
   afterEach(() => {
-    AnnotationQuote.$imports.$restore();
+    $imports.$restore();
   });
 
   it('renders the quote', () => {

@@ -2,6 +2,7 @@ const { createElement } = require('preact');
 const { mount } = require('enzyme');
 
 const AnnotationBody = require('../annotation-body');
+const { $imports } = require('../annotation-body');
 const mockImportedComponents = require('./mock-imported-components');
 
 describe('AnnotationBody', () => {
@@ -10,11 +11,11 @@ describe('AnnotationBody', () => {
   }
 
   beforeEach(() => {
-    AnnotationBody.$imports.$mock(mockImportedComponents());
+    $imports.$mock(mockImportedComponents());
   });
 
   afterEach(() => {
-    AnnotationBody.$imports.$restore();
+    $imports.$restore();
   });
 
   it('displays the body if `isEditing` is false', () => {

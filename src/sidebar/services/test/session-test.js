@@ -2,6 +2,7 @@ const angular = require('angular');
 
 const events = require('../../events');
 const sessionFactory = require('../session');
+const { $imports } = require('../session');
 
 const mock = angular.mock;
 
@@ -68,7 +69,7 @@ describe('sidebar.session', function() {
       serviceConfig: fakeServiceConfig,
     });
 
-    sessionFactory.$imports.$mock({
+    $imports.$mock({
       '../util/sentry': fakeSentry,
     });
   });
@@ -81,7 +82,7 @@ describe('sidebar.session', function() {
   );
 
   afterEach(function() {
-    sessionFactory.$imports.$restore();
+    $imports.$restore();
     sandbox.restore();
   });
 

@@ -3,6 +3,7 @@ const { act } = require('preact/test-utils');
 const { mount } = require('enzyme');
 
 const Menu = require('../menu');
+const { $imports } = require('../menu');
 
 describe('Menu', () => {
   let container;
@@ -29,14 +30,14 @@ describe('Menu', () => {
     container = document.createElement('div');
     document.body.appendChild(container);
 
-    Menu.$imports.$mock({
+    $imports.$mock({
       // eslint-disable-next-line react/display-name
       './svg-icon': () => <span>Fake SVG icon</span>,
     });
   });
 
   afterEach(() => {
-    Menu.$imports.$restore();
+    $imports.$restore();
     container.remove();
   });
 

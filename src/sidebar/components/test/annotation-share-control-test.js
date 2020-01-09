@@ -3,6 +3,7 @@ const { mount } = require('enzyme');
 const { act } = require('preact/test-utils');
 
 const AnnotationShareControl = require('../annotation-share-control');
+const { $imports } = require('../annotation-share-control');
 const mockImportedComponents = require('./mock-imported-components');
 
 describe('AnnotationShareControl', () => {
@@ -77,16 +78,16 @@ describe('AnnotationShareControl', () => {
       isShared: sinon.stub().returns(true),
     };
     fakeShareUri = 'https://www.example.com';
-    AnnotationShareControl.$imports.$mock(mockImportedComponents());
 
-    AnnotationShareControl.$imports.$mock({
+    $imports.$mock(mockImportedComponents());
+    $imports.$mock({
       '../util/copy-to-clipboard': fakeCopyToClipboard,
       './hooks/use-element-should-close': sinon.stub(),
     });
   });
 
   afterEach(() => {
-    AnnotationShareControl.$imports.$restore();
+    $imports.$restore();
   });
 
   it('does not render component if `group` prop not OK', () => {

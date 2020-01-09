@@ -5,6 +5,7 @@ const fixtures = require('../../test/annotation-fixtures');
 const util = require('../../directive/test/util');
 
 const annotationComponent = require('../annotation');
+const { $imports } = require('../annotation');
 
 const inject = angular.mock.inject;
 
@@ -91,13 +92,13 @@ describe('annotation', function() {
     let sandbox;
 
     beforeEach(() => {
-      annotationComponent.$imports.$mock({
+      $imports.$mock({
         '../util/account-id': fakeAccountID,
       });
     });
 
     afterEach(() => {
-      annotationComponent.$imports.$restore();
+      $imports.$restore();
     });
 
     function createDirective(annotation) {

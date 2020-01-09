@@ -1,6 +1,7 @@
 events = require('../../shared/bridge-events')
 
 Sidebar = require('../sidebar')
+{ $imports } = require('../sidebar')
 
 DEFAULT_WIDTH = 350
 DEFAULT_HEIGHT = 600
@@ -15,10 +16,10 @@ describe 'Sidebar', ->
   before ->
     rafStub = (fn) ->
       fn()
-    Sidebar.$imports.$mock({ raf: rafStub })
+    $imports.$mock({ raf: rafStub })
 
   after ->
-    Sidebar.$imports.$restore()
+    $imports.$restore()
 
   createSidebar = (config={}) ->
     config = Object.assign({}, sidebarConfig, config)

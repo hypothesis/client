@@ -1,4 +1,5 @@
 const settingsFrom = require('../settings');
+const { $imports } = require('../settings');
 
 describe('annotator.config.settingsFrom', function() {
   let fakeConfigFuncSettingsFrom;
@@ -12,7 +13,7 @@ describe('annotator.config.settingsFrom', function() {
       jsonConfigsFrom: sinon.stub().returns({}),
     };
 
-    settingsFrom.$imports.$mock({
+    $imports.$mock({
       './config-func-settings-from': fakeConfigFuncSettingsFrom,
       './is-browser-extension': fakeIsBrowserExtension,
       '../../shared/settings': fakeSharedSettings,
@@ -20,7 +21,7 @@ describe('annotator.config.settingsFrom', function() {
   });
 
   afterEach(() => {
-    settingsFrom.$imports.$restore();
+    $imports.$restore();
   });
 
   describe('#sidebarAppUrl', function() {

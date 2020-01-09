@@ -2,6 +2,7 @@ const { createElement } = require('preact');
 const { mount } = require('enzyme');
 
 const UserMenu = require('../user-menu');
+const { $imports } = require('../user-menu');
 const mockImportedComponents = require('./mock-imported-components');
 
 describe('UserMenu', () => {
@@ -49,8 +50,8 @@ describe('UserMenu', () => {
       authDomain: 'hypothes.is',
     };
 
-    UserMenu.$imports.$mock(mockImportedComponents());
-    UserMenu.$imports.$mock({
+    $imports.$mock(mockImportedComponents());
+    $imports.$mock({
       '../util/account-id': {
         isThirdPartyUser: fakeIsThirdPartyUser,
       },
@@ -62,7 +63,7 @@ describe('UserMenu', () => {
   });
 
   afterEach(() => {
-    UserMenu.$imports.$restore();
+    $imports.$restore();
   });
 
   describe('profile menu item', () => {

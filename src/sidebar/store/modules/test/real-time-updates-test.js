@@ -3,6 +3,7 @@ const createStore = require('../../create-store');
 const annotations = require('../annotations');
 const groups = require('../groups');
 const realTimeUpdates = require('../real-time-updates');
+const { $imports } = require('../real-time-updates');
 const selection = require('../selection');
 
 const { removeAnnotations } = annotations.actions;
@@ -25,7 +26,7 @@ describe('sidebar/store/modules/real-time-updates', () => {
       [fakeSettings]
     );
 
-    realTimeUpdates.$imports.$mock({
+    $imports.$mock({
       './annotations': {
         selectors: { annotationExists: fakeAnnotationExists },
       },
@@ -39,7 +40,7 @@ describe('sidebar/store/modules/real-time-updates', () => {
   });
 
   afterEach(() => {
-    realTimeUpdates.$imports.$restore();
+    $imports.$restore();
   });
 
   function addPendingUpdates(store) {

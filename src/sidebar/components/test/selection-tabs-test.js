@@ -3,6 +3,7 @@ const { createElement } = require('preact');
 
 const uiConstants = require('../../ui-constants');
 const SelectionTabs = require('../selection-tabs');
+const { $imports } = require('../selection-tabs');
 const mockImportedComponents = require('./mock-imported-components');
 
 describe('SelectionTabs', function() {
@@ -39,14 +40,14 @@ describe('SelectionTabs', function() {
       }),
     };
 
-    SelectionTabs.$imports.$mock(mockImportedComponents());
-    SelectionTabs.$imports.$mock({
+    $imports.$mock(mockImportedComponents());
+    $imports.$mock({
       '../store/use-store': callback => callback(fakeStore),
     });
   });
 
   afterEach(() => {
-    SelectionTabs.$imports.$restore();
+    $imports.$restore();
   });
 
   const unavailableMessage = wrapper =>
