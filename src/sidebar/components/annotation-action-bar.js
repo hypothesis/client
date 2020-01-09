@@ -2,42 +2,72 @@ const propTypes = require('prop-types');
 const { createElement } = require('preact');
 
 const { withServices } = require('../util/service-context');
+const useStore = require('../store/use-store');
 const { isShareable, shareURI } = require('../util/annotation-sharing');
 
 const AnnotationShareControl = require('./annotation-share-control');
 const Button = require('./button');
 
 /**
- * A collection of `Button`s in the footer area of an annotation.
+ * A collection of `Button`s in the footer area of an annotation that take
+ * actions on the annotation.
  */
 function AnnotationActionBar({
   annotation,
-  onDelete,
+  annotationMapper,
+  flash,
   onEdit,
-  onFlag,
   onReply,
-  groups,
   permissions,
-  session,
   settings,
 }) {
+  const userProfile = useStore(store => store.profile());
+  const annotationGroup = useStore(store => store.getGroup(annotation.group));
+
   // Is the current user allowed to take the given `action` on this annotation?
   const userIsAuthorizedTo = action => {
     return permissions.permits(
       annotation.permissions,
       action,
-      session.state.userid
+      userProfile.userid
     );
   };
 
   const showDeleteAction = userIsAuthorizedTo('delete');
   const showEditAction = userIsAuthorizedTo('update');
+
   // Anyone may flag an annotation except the annotation's author.
   // This option is even presented to anonymous users
-  const showFlagAction = session.state.userid !== annotation.user;
+  const showFlagAction = userProfile.userid !== annotation.user;
   const showShareAction = isShareable(annotation, settings);
 
-  const annotationGroup = groups.get(annotation.group);
+  const updateFlagFn = useStore(store => store.updateFlagStatus);
+
+  const updateFlag = () => {
+    updateFlagFn(annotation.id, true);
+  };
+
+  const onDelete = () => {
+    if (window.confirm('Are you sure you want to delete this annotation?')) {
+      annotationMapper.deleteAnnotation(annotation).catch(err => {
+        flash.error(err.message, 'Deleting annotation failed');
+      });
+    }
+  };
+
+  const onFlag = () => {
+    if (!userProfile.userid) {
+      flash.error(
+        'You must be logged in to report an annotation to moderators.',
+        'Log in to flag annotations'
+      );
+      return;
+    }
+    annotationMapper
+      .flagAnnotation(annotation) // Flag annotation on service
+      .then(updateFlag) // Update app state with flag
+      .catch(err => flash.error(err.message, 'Flagging annotation failed'));
+  };
 
   return (
     <div className="annotation-action-bar">
@@ -75,21 +105,19 @@ AnnotationActionBar.propTypes = {
   annotation: propTypes.object.isRequired,
   /** Callbacks for when action buttons are clicked/tapped */
   onEdit: propTypes.func.isRequired,
-  onDelete: propTypes.func.isRequired,
-  onFlag: propTypes.func.isRequired,
   onReply: propTypes.func.isRequired,
 
   // Injected services
-  groups: propTypes.object.isRequired,
+  annotationMapper: propTypes.object.isRequired,
+  flash: propTypes.object.isRequired,
   permissions: propTypes.object.isRequired,
-  session: propTypes.object.isRequired,
   settings: propTypes.object.isRequired,
 };
 
 AnnotationActionBar.injectedProps = [
-  'groups',
+  'annotationMapper',
+  'flash',
   'permissions',
-  'session',
   'settings',
 ];
 

@@ -73,11 +73,8 @@ describe('annotation', function() {
   });
 
   describe('AnnotationController', function() {
-    let $q;
     let $rootScope;
     let $scope;
-    let $timeout;
-    let $window;
     const fakeAccountID = {
       isThirdPartyUser: sinon.stub(),
     };
@@ -159,8 +156,6 @@ describe('annotation', function() {
               admin: ['acct:bill@localhost'],
             },
           }),
-          deleteAnnotation: sandbox.stub(),
-          flagAnnotation: sandbox.stub(),
         };
 
         fakeStore = {
@@ -243,10 +238,7 @@ describe('annotation', function() {
       })
     );
 
-    beforeEach(inject(function(_$q_, _$rootScope_, _$timeout_, _$window_) {
-      $window = _$window_;
-      $q = _$q_;
-      $timeout = _$timeout_;
+    beforeEach(inject(function(_$rootScope_) {
       $rootScope = _$rootScope_;
       $scope = $rootScope.$new();
     }));
@@ -656,131 +648,6 @@ describe('annotation', function() {
           { type: 'TextQuoteSelector', exact: 'test quote' },
         ];
         assert.equal(controller.quote(), 'test quote');
-      });
-    });
-
-    describe('#delete()', function() {
-      beforeEach(function() {
-        fakeAnnotationMapper.deleteAnnotation = sandbox.stub();
-      });
-
-      it('calls annotationMapper.delete() if the delete is confirmed', function(done) {
-        const parts = createDirective();
-        sandbox.stub($window, 'confirm').returns(true);
-        fakeAnnotationMapper.deleteAnnotation.returns($q.resolve());
-        parts.controller.delete().then(function() {
-          assert.calledWith(
-            fakeAnnotationMapper.deleteAnnotation,
-            parts.annotation
-          );
-          done();
-        });
-        $timeout.flush();
-      });
-
-      it("doesn't call annotationMapper.delete() if the delete is cancelled", function(done) {
-        const parts = createDirective();
-        sandbox.stub($window, 'confirm').returns(false);
-        parts.controller.delete().then(function() {
-          assert.notCalled(fakeAnnotationMapper.deleteAnnotation);
-          done();
-        });
-        $timeout.flush();
-      });
-
-      it('flashes an error if the delete fails on the server', function(done) {
-        const controller = createDirective().controller;
-        sandbox.stub($window, 'confirm').returns(true);
-
-        fakeAnnotationMapper.deleteAnnotation = sinon.spy(() => {
-          // nb. we only instantiate the rejected promise when
-          // `deleteAnnotation` is called to avoid triggering `$q`'s unhandled
-          // promise rejection handler during the `$timeout.flush()` call.
-          return $q.reject(new Error('500 Server Error'));
-        });
-        controller.delete().then(function() {
-          assert.calledWith(
-            fakeFlash.error,
-            '500 Server Error',
-            'Deleting annotation failed'
-          );
-          done();
-        });
-        $timeout.flush();
-      });
-
-      it("doesn't flash an error if the delete succeeds", function(done) {
-        const controller = createDirective().controller;
-        sandbox.stub($window, 'confirm').returns(true);
-        fakeAnnotationMapper.deleteAnnotation.returns($q.resolve());
-        controller.delete().then(function() {
-          assert.notCalled(fakeFlash.error);
-          done();
-        });
-        $timeout.flush();
-      });
-    });
-
-    describe('#flag()', function() {
-      beforeEach(function() {
-        fakeAnnotationMapper.flagAnnotation = sandbox.stub();
-      });
-
-      context('when the user is not logged in', function() {
-        beforeEach(function() {
-          delete fakeSession.state.userid;
-        });
-
-        it('flashes an error', function() {
-          createDirective().controller.flag();
-
-          assert.isTrue(fakeFlash.error.calledOnce);
-          assert.equal('Login to flag annotations', fakeFlash.error.args[0][1]);
-        });
-
-        it("doesn't try to flag the annotation", function() {
-          createDirective().controller.flag();
-
-          assert.isFalse(fakeAnnotationMapper.flagAnnotation.called);
-        });
-      });
-
-      context('when the user is logged in', function() {
-        it('calls annotationMapper.flag() when an annotation is flagged', function(done) {
-          const parts = createDirective();
-          fakeAnnotationMapper.flagAnnotation.returns($q.resolve());
-          parts.controller.flag();
-          assert.calledWith(
-            fakeAnnotationMapper.flagAnnotation,
-            parts.annotation
-          );
-          done();
-        });
-
-        it('flashes an error if the flag fails', function(done) {
-          const controller = createDirective().controller;
-          const err = new Error('500 Server error');
-          fakeAnnotationMapper.flagAnnotation.returns(Promise.reject(err));
-          controller.flag();
-          setTimeout(function() {
-            assert.calledWith(
-              fakeFlash.error,
-              '500 Server error',
-              'Flagging annotation failed'
-            );
-            done();
-          }, 0);
-        });
-
-        it("doesn't flash an error if the flag succeeds", function(done) {
-          const controller = createDirective().controller;
-          fakeAnnotationMapper.flagAnnotation.returns($q.resolve());
-          controller.flag();
-          setTimeout(function() {
-            assert.notCalled(fakeFlash.error);
-            done();
-          }, 0);
-        });
       });
     });
 
