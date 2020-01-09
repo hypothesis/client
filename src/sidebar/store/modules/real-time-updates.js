@@ -7,9 +7,9 @@ const { createSelector } = require('reselect');
 
 const { actionTypes } = require('../util');
 
-const { selectors: annotationSelectors } = require('./annotations');
-const { selectors: groupSelectors } = require('./groups');
-const { selectors: viewerSelectors } = require('./viewer');
+const annotations = require('./annotations');
+const groups = require('./groups');
+const viewer = require('./viewer');
 
 function init() {
   return {
@@ -95,8 +95,8 @@ function receiveRealTimeUpdates({
       // group and reload all annotations and discard pending updates
       // when switching groups.
       if (
-        ann.group === groupSelectors.focusedGroupId(getState()) ||
-        !viewerSelectors.isSidebar(getState())
+        ann.group === groups.selectors.focusedGroupId(getState()) ||
+        !viewer.selectors.isSidebar(getState())
       ) {
         pendingUpdates[ann.id] = ann;
       }
@@ -111,7 +111,7 @@ function receiveRealTimeUpdates({
       // even if the annotation is from the current group, it might be for a
       // new annotation (saved in pendingUpdates and removed above), that has
       // not yet been loaded.
-      if (annotationSelectors.annotationExists(getState(), ann.id)) {
+      if (annotations.selectors.annotationExists(getState(), ann.id)) {
         pendingDeletions[ann.id] = true;
       }
     });

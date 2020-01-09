@@ -1,8 +1,7 @@
 const { createSelector } = require('reselect');
 
 const util = require('../util');
-const { selectors: sessionSelectors } = require('./session');
-const { isLoggedIn } = sessionSelectors;
+const session = require('./session');
 
 function init() {
   return {
@@ -141,7 +140,7 @@ function getGroup(state, id) {
  */
 const getMyGroups = createSelector(
   state => state.groups.groups,
-  isLoggedIn,
+  session.selectors.isLoggedIn,
   (groups, loggedIn) => {
     // If logged out, the Public group still has isMember set to true so only
     // return groups with membership in logged in state.
