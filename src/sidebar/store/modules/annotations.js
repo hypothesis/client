@@ -48,17 +48,21 @@ function findByTag(annotations, tag) {
 }
 
 /**
- * Initialize the status flags and properties of a new annotation.
+ * Set custom private fields on an annotation object about to be added to the
+ * store's collection of `annotations`.
+ *
+ * `annotation` may either be new (unsaved) or a persisted annotation retrieved
+ * from the service.
+ *
+ * @param {Object} annotation
+ * @param {Number} tag - The `$tag` value that should be used for this
+ *                       if it doesn't have a `$tag` already
+ * @return {Object} - annotation with local (`$*`) fields set
  */
-function initializeAnnot(annotation, tag) {
+function initializeAnnotation(annotation, tag) {
   let orphan = annotation.$orphan;
 
   if (!annotation.id) {
-    // Currently the user ID, permissions and group of new annotations are
-    // initialized in the <annotation> component controller because the session
-    // state and focused group are not stored in the Redux store. Once they are,
-    // that initialization should be moved here.
-
     // New annotations must be anchored
     orphan = false;
   }
@@ -91,7 +95,7 @@ const update = {
     const updated = [];
     let nextTag = state.nextTag;
 
-    action.annotations.forEach(function(annot) {
+    action.annotations.forEach(annot => {
       let existing;
       if (annot.id) {
         existing = findByID(state.annotations, annot.id);
@@ -111,12 +115,12 @@ const update = {
           updatedTags[existing.$tag] = true;
         }
       } else {
-        added.push(initializeAnnot(annot, 't' + nextTag));
+        added.push(initializeAnnotation(annot, 't' + nextTag));
         ++nextTag;
       }
     });
 
-    state.annotations.forEach(function(annot) {
+    state.annotations.forEach(annot => {
       if (!updatedIDs[annot.id] && !updatedTags[annot.$tag]) {
         unchanged.push(annot);
       }
@@ -218,29 +222,14 @@ function updateFlagStatus(id, isFlagged) {
   };
 }
 
-/** Add annotations to the currently displayed set. */
-function addAnnotations(annotations, now) {
-  now = now || new Date();
-
-  // Add dates to new annotations. These are ignored by the server but used
-  // when sorting unsaved annotation cards.
-  annotations = annotations.map(function(annot) {
-    if (annot.id) {
-      return annot;
-    }
-    return Object.assign(
-      {
-        // Date.prototype.toISOString returns a 0-offset (UTC) ISO8601
-        // datetime.
-        created: now.toISOString(),
-        updated: now.toISOString(),
-      },
-      annot
-    );
-  });
-
+/**
+ * Add these `annotations` to the current collection of annotations in the store.
+ *
+ * @param {Object}[] annotations - Array of annotation objects to add.
+ */
+function addAnnotations(annotations) {
   return function(dispatch, getState) {
-    const added = annotations.filter(function(annot) {
+    const added = annotations.filter(annot => {
       return !findByID(getState().annotations.annotations, annot.id);
     });
 
@@ -250,6 +239,7 @@ function addAnnotations(annotations, now) {
       currentAnnotationCount: getState().annotations.annotations.length,
     });
 
+    // If we're not in the sidebar, we're done here.
     if (!getState().viewer.isSidebar) {
       return;
     }
@@ -330,19 +320,42 @@ function hideAnnotation(id) {
 }
 
 /**
- * Create a new annotation
+ * Create a new annotation (as-yet unpersisted)
  *
- * The method does 4 tasks:
- * 1. Removes any existing empty drafts.
- * 2. Creates a new annotation.
- * 3. Changes the focused tab to match that of the newly created annotation.
- * 4. Expands the collapsed state of all new annotation's parents.
+ * This method has several responsibilities:
+ * 1. Set some default data attributes on the annotation
+ * 2. Remove any existing, empty drafts
+ * 3. Add the annotation to the current collection of annotations
+ * 4. Change focused tab to the applicable one for the new annotation's meta-type
+ * 5. Expand all of the new annotation's parents
+ *
  */
-function createAnnotation(ann) {
-  return dispatch => {
+function createAnnotation(ann, now = new Date()) {
+  return (dispatch, getState) => {
+    /**
+     * Extend the new, unsaved annotation object with defaults for some
+     * required data fields.
+     *
+     * Note: the `created` and `updated` values will be ignored and superseded
+     * by the service when the annotation is persisted, but they are used
+     * app-side for annotation card sorting until then.
+     */
+    ann = Object.assign(
+      {
+        created: now.toISOString(),
+        group: getState().groups.focusedGroupId,
+        tags: [],
+        text: '',
+        updated: now.toISOString(),
+        user: getState().session.userid,
+        user_info: getState().session.user_info,
+      },
+      ann
+    );
     // When a new annotation is created, remove any existing annotations
     // that are empty.
     dispatch(drafts.actions.deleteNewAndEmptyDrafts([ann]));
+
     dispatch(addAnnotations([ann]));
     // If the annotation is of type note or annotation, make sure
     // the appropriate tab is selected. If it is of type reply, user

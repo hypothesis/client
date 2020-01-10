@@ -45,6 +45,8 @@ function publicAnnotation() {
 
 /** Return an annotation domain model object for a new annotation
  * (newly-created client-side, not yet saved to the server).
+ * Components will never see this data structure, as it will have been
+ * amended by store reducers.
  */
 function newAnnotation() {
   return {
@@ -54,6 +56,7 @@ function newAnnotation() {
     references: [],
     text: 'Annotation text',
     tags: ['tag_1', 'tag_2'],
+    user: 'acct:bill@localhost',
   };
 }
 
@@ -89,6 +92,7 @@ function newHighlight() {
     id: undefined,
     $highlight: true,
     target: [{ source: 'http://example.org' }],
+    user: 'acct:bill@localhost',
   };
 }
 

@@ -245,35 +245,14 @@ describe('annotation', function() {
     });
 
     describe('initialization', function() {
-      it("sets the user of annotations that don't have one", function() {
-        // You can create annotations while logged out and then login.
-        // When you login a new AnnotationController instance is created for
-        // each of your annotations, and on initialization it will set the
-        // annotation's user to your username from the session.
-        const annotation = fixtures.newAnnotation();
-        annotation.user = undefined;
-        fakeSession.state.userid = 'acct:bill@localhost';
-        fakeSession.state.user_info = {
-          display_name: 'Bill Jones',
-        };
-
-        createDirective(annotation);
-
-        assert.equal(annotation.user, 'acct:bill@localhost');
-        assert.deepEqual(annotation.user_info, {
-          display_name: 'Bill Jones',
-        });
-      });
-
       it('sets the permissions of new annotations', function() {
         // You can create annotations while logged out and then login.
         // When you login a new AnnotationController instance is created for
         // each of your annotations, and on initialization it will set the
         // annotation's permissions using your username from the session.
         const annotation = fixtures.newAnnotation();
-        annotation.user = annotation.permissions = undefined;
+        annotation.permissions = undefined;
         annotation.group = '__world__';
-        fakeSession.state.userid = 'acct:bill@localhost';
         fakePermissions.default = function(userid, group) {
           return {
             read: [userid, group],
@@ -284,17 +263,8 @@ describe('annotation', function() {
 
         assert.deepEqual(
           annotation.permissions,
-          fakePermissions.default(fakeSession.state.userid, annotation.group)
+          fakePermissions.default(annotation.user, annotation.group)
         );
-      });
-
-      it('sets the tags and text fields for new annotations', function() {
-        const annotation = fixtures.newAnnotation();
-        delete annotation.tags;
-        delete annotation.text;
-        createDirective(annotation);
-        assert.equal(annotation.text, '');
-        assert.deepEqual(annotation.tags, []);
       });
 
       it('preserves the permissions of existing annotations', function() {
@@ -794,14 +764,6 @@ describe('annotation', function() {
         return controller.save().then(function() {
           assert.notCalled(fakeStore.removeDraft);
         });
-      });
-
-      it("sets the annotation's group to the focused group", function() {
-        fakeGroups.focused = function() {
-          return { id: 'test-id' };
-        };
-        const controller = createDirective(fixtures.newAnnotation()).controller;
-        assert.equal(controller.annotation.group, 'test-id');
       });
     });
 
