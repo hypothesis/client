@@ -46,16 +46,17 @@ function TagEditor({ onEditTags, tags: tagsService, tagList }) {
    * reset the activeItem and open the Datalist
    */
   const updateSuggestions = () => {
-    // Remove any repeated suggestions that are already tags.
-    // Call filter with an empty string to return all suggestions
-    setSuggestions(
-      removeDuplicates(
-        tagsService.filter(inputEl.current.value.trim()),
-        tagList
-      )
-    );
+    const value = inputEl.current.value.trim();
+    if (value === '') {
+      // If there is no input, just hide the suggestions
+      setOpen(false);
+    } else {
+      // Remove any repeated suggestions that are already tags.
+      // Call filter with an empty string to return all suggestions
+      setSuggestions(removeDuplicates(tagsService.filter(value), tagList));
+      setOpen(true);
+    }
     setActiveItem(-1);
-    setOpen(true);
   };
 
   /**

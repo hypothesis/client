@@ -4,10 +4,10 @@ const propTypes = require('prop-types');
 const { useMemo } = require('preact/hooks');
 
 /**
- * Custom datalist component
+ * Custom datalist component. Use this in conjunction with an input field.
  */
 
-function DataList({
+function Datalist({
   activeItem = -1,
   list,
   listFormatter = item => item,
@@ -33,10 +33,10 @@ function DataList({
   }, [activeItem, list, listFormatter, onSelectItem]);
 
   return (
-    <div className="datalist">
+    <div className={classnames({}, 'datalist')}>
       {list.length && open && (
         <div className="datalist__items">
-          <span className="datalist__arrow-down"/>
+          <span className="datalist__arrow-down" />
           <ul className="datalist__ul">{items}</ul>
         </div>
       )}
@@ -44,7 +44,7 @@ function DataList({
   );
 }
 
-DataList.propTypes = {
+Datalist.propTypes = {
   /**
    * The activeItem is highlighted.
    */
@@ -56,6 +56,8 @@ DataList.propTypes = {
   list: propTypes.array.isRequired,
   /**
    * An optional formatter to render each item inside an <li> tag
+   * This is useful if the list is an array of objects rather than
+   * just strings.
    */
   listFormatter: propTypes.func,
   /**
@@ -66,8 +68,7 @@ DataList.propTypes = {
   /**
    * Is the list open or closed?
    */
-
-  open: propTypes.boolean,
+  open: propTypes.bool,
 };
 
-module.exports = DataList;
+module.exports = Datalist;

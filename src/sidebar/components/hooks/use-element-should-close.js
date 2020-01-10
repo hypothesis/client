@@ -82,8 +82,12 @@ export default function useElementShouldClose(
       document.body,
       'focus',
       event => {
+<<<<<<< HEAD
         const current = getCurrentNode(closeableEl);
         if (!current.contains(event.target)) {
+=======
+        if (!closeableEl.current.contains(event.target)) {
+>>>>>>> Add tests
           handleClose();
         }
       },
@@ -96,8 +100,12 @@ export default function useElementShouldClose(
       document.body,
       ['mousedown', 'click'],
       event => {
+<<<<<<< HEAD
         const current = getCurrentNode(closeableEl);
         if (!current.contains(event.target)) {
+=======
+        if (!closeableEl.current.contains(event.target)) {
+>>>>>>> Add tests
           handleClose();
         }
       },
