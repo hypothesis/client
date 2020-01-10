@@ -1,5 +1,7 @@
 const angular = require('angular');
 
+const tagsFactory = require('../tags');
+
 const TAGS_LIST_KEY = 'hypothesis.user.tags.list';
 const TAGS_MAP_KEY = 'hypothesis.user.tags.map';
 
@@ -22,7 +24,7 @@ describe('sidebar.tags', () => {
   let tags;
 
   before(() => {
-    angular.module('h', []).service('tags', require('../tags'));
+    angular.module('h', []).service('tags', tagsFactory);
   });
 
   beforeEach(() => {

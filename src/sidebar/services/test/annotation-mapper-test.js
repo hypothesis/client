@@ -1,6 +1,8 @@
 const angular = require('angular');
 const immutable = require('seamless-immutable');
 
+const annotationMapperFactory = require('../annotation-mapper');
+const storeFactory = require('../../store');
 const events = require('../../events');
 
 describe('annotationMapper', function() {
@@ -19,8 +21,8 @@ describe('annotationMapper', function() {
     };
     angular
       .module('app', [])
-      .service('annotationMapper', require('../annotation-mapper'))
-      .service('store', require('../../store'))
+      .service('annotationMapper', annotationMapperFactory)
+      .service('store', storeFactory)
       .value('api', fakeApi)
       .value('settings', {});
     angular.mock.module('app');

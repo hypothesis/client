@@ -1,5 +1,7 @@
 const angular = require('angular');
 
+const annotationViewerContent = require('../annotation-viewer-content');
+
 // Fake implementation of the API for fetching annotations and replies to
 // annotations.
 function FakeApi(annots) {
@@ -32,10 +34,7 @@ describe('annotationViewerContent', function() {
   before(function() {
     angular
       .module('h', [])
-      .component(
-        'annotationViewerContent',
-        require('../annotation-viewer-content')
-      );
+      .component('annotationViewerContent', annotationViewerContent);
   });
 
   beforeEach(angular.mock.module('h'));

@@ -1,6 +1,11 @@
 const angular = require('angular');
 const immutable = require('seamless-immutable');
 
+const storeFactory = require('../../store');
+const rootThreadFactory = require('../../services/root-thread');
+const searchFilterFactory = require('../../services/search-filter');
+const viewFilterFactory = require('../../services/view-filter');
+
 const fixtures = immutable({
   annotations: [
     {
@@ -49,10 +54,10 @@ describe('annotation threading', function() {
 
     angular
       .module('app', [])
-      .service('store', require('../../store'))
-      .service('rootThread', require('../../services/root-thread'))
-      .service('searchFilter', require('../../services/search-filter'))
-      .service('viewFilter', require('../../services/view-filter'))
+      .service('store', storeFactory)
+      .service('rootThread', rootThreadFactory)
+      .service('searchFilter', searchFilterFactory)
+      .service('viewFilter', viewFilterFactory)
       .value('features', fakeFeatures)
       .value('settings', {})
       .value('unicode', fakeUnicode);

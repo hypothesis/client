@@ -1,6 +1,7 @@
 const angular = require('angular');
 
 const events = require('../../events');
+const { events: analyticsEvents } = require('../analytics');
 const sessionFactory = require('../session');
 const { $imports } = require('../session');
 
@@ -31,7 +32,7 @@ describe('sidebar.session', function() {
     let state = {};
     fakeAnalytics = {
       track: sinon.stub(),
-      events: require('../analytics').events,
+      events: analyticsEvents,
     };
     const fakeStore = {
       getState: function() {

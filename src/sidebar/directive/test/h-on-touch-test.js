@@ -1,5 +1,6 @@
 const angular = require('angular');
 
+const hOnTouch = require('../h-on-touch');
 const util = require('./util');
 
 function testComponent() {
@@ -23,7 +24,7 @@ describe('hOnTouch', function() {
   before(function() {
     angular
       .module('app', [])
-      .directive('hOnTouch', require('../h-on-touch'))
+      .directive('hOnTouch', hOnTouch)
       .directive('test', testComponent);
   });
 

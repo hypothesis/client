@@ -1,4 +1,6 @@
-const searchFilter = require('../search-filter')();
+const searchFilterFactory = require('../search-filter');
+
+const searchFilter = searchFilterFactory();
 
 describe('sidebar.search-filter', () => {
   describe('#toObject', () => {

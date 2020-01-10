@@ -27,6 +27,8 @@ document.body.setAttribute('ng-csp', '');
 disableOpenerForExternalLinks(document.body);
 
 const angular = require('angular');
+const angularRoute = require('angular-route');
+const angularToastr = require('angular-toastr');
 
 // autofill-event relies on the existence of window.angular so
 // it must be require'd after angular is first require'd
@@ -185,8 +187,8 @@ function startAngularApp(config) {
     .module('h', [
       // Angular addons which export the Angular module name
       // via module.exports
-      require('angular-route'),
-      require('angular-toastr'),
+      angularRoute,
+      angularToastr,
     ])
 
     // The root component for the application

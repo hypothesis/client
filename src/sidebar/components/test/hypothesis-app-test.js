@@ -1,6 +1,7 @@
 const angular = require('angular');
 
 const events = require('../../events');
+const { events: analyticsEvents } = require('../../services/analytics');
 const bridgeEvents = require('../../../shared/bridge-events');
 
 const hypothesisApp = require('../hypothesis-app');
@@ -84,7 +85,7 @@ describe('sidebar.components.hypothesis-app', function() {
 
       fakeAnalytics = {
         track: sandbox.stub(),
-        events: require('../../services/analytics').events,
+        events: analyticsEvents,
       };
 
       fakeAuth = {};

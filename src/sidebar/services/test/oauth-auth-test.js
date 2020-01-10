@@ -1,5 +1,6 @@
 const angular = require('angular');
 
+const authFactory = require('../oauth-auth');
 const events = require('../../events');
 
 const FakeWindow = require('../../util/test/fake-window');
@@ -36,7 +37,7 @@ describe('sidebar.oauth-auth', function() {
   }
 
   before(() => {
-    angular.module('app', []).service('auth', require('../oauth-auth'));
+    angular.module('app', []).service('auth', authFactory);
   });
 
   beforeEach(function() {

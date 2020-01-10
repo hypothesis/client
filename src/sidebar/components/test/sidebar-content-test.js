@@ -3,6 +3,7 @@ const EventEmitter = require('tiny-emitter');
 
 const events = require('../../events');
 const sidebarContent = require('../sidebar-content');
+const storeFactory = require('../../store');
 
 class FakeRootThread extends EventEmitter {
   constructor() {
@@ -29,7 +30,7 @@ describe('sidebar.components.sidebar-content', function() {
   before(function() {
     angular
       .module('h', [])
-      .service('store', require('../../store'))
+      .service('store', storeFactory)
       .component('sidebarContent', sidebarContent);
   });
 

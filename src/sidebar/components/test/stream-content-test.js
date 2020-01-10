@@ -1,6 +1,8 @@
 const angular = require('angular');
 const EventEmitter = require('tiny-emitter');
 
+const streamContent = require('../stream-content');
+
 class FakeRootThread extends EventEmitter {
   constructor() {
     super();
@@ -22,9 +24,7 @@ describe('StreamContentController', function() {
   let fakeStreamFilter;
 
   before(function() {
-    angular
-      .module('h', [])
-      .component('streamContent', require('../stream-content'));
+    angular.module('h', []).component('streamContent', streamContent);
   });
 
   beforeEach(function() {
