@@ -1,4 +1,6 @@
-const unicode = require('../unicode')();
+const unicodeFactory = require('../unicode');
+
+const unicode = unicodeFactory();
 
 describe('unicode', () => {
   describe('#fold', () => {

@@ -1,5 +1,6 @@
 const angular = require('angular');
 
+const hTooltip = require('../h-tooltip');
 const util = require('./util');
 
 function testComponent() {
@@ -17,7 +18,7 @@ describe('h-tooltip', function() {
   before(function() {
     angular
       .module('app', [])
-      .directive('hTooltip', require('../h-tooltip'))
+      .directive('hTooltip', hTooltip)
       .directive('test', testComponent);
   });
 
