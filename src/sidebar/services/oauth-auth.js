@@ -1,5 +1,5 @@
 const events = require('../events');
-const resolve = require('../util/url').resolve;
+const { resolve } = require('../util/url');
 const serviceConfig = require('../service-config');
 
 /**
@@ -21,7 +21,6 @@ const serviceConfig = require('../service-config');
  * Interaction with OAuth endpoints in the annotation service is delegated to
  * the `OAuthClient` class.
  */
-// @ngInject
 function auth(
   $rootScope,
   $window,
@@ -299,5 +298,18 @@ function auth(
     tokenGetter,
   };
 }
+
+// `$inject` is added manually rather than using `@ngInject` to work around
+// a conflict between the transform-async-to-promises and angularjs-annotate
+// Babel plugins.
+auth.$inject = [
+  '$rootScope',
+  '$window',
+  'OAuthClient',
+  'apiRoutes',
+  'flash',
+  'localStorage',
+  'settings',
+];
 
 module.exports = auth;

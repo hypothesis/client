@@ -1,5 +1,8 @@
 const angular = require('angular');
 
+const hBranding = require('../h-branding');
+const fixtures = require('./h-branding-fixtures');
+
 describe('BrandingDirective', function() {
   let $compile;
   let $rootScope;
@@ -10,7 +13,7 @@ describe('BrandingDirective', function() {
   // with desired settings. Note, needs to be called for angular
   // to be initialized for the test
   const setSettingsAndBootApp = function() {
-    angular.module('app', []).directive('hBranding', require('../h-branding'));
+    angular.module('app', []).directive('hBranding', hBranding);
 
     angular.mock.module('app', {
       settings: customSettings || {},
@@ -59,7 +62,7 @@ describe('BrandingDirective', function() {
     assert.equal(el[0].style.backgroundColor, '');
   });
 
-  require('./h-branding-fixtures').forEach(testCase => {
+  fixtures.forEach(testCase => {
     it('applies branding to elements', () => {
       applyBrandingSettings(testCase.settings);
 
