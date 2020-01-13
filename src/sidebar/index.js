@@ -1,10 +1,10 @@
-const addAnalytics = require('./ga');
-const disableOpenerForExternalLinks = require('./util/disable-opener-for-external-links');
-const { fetchConfig } = require('./util/fetch-config');
-const serviceConfig = require('./service-config');
-const { jsonConfigsFrom } = require('../shared/settings');
-const crossOriginRPC = require('./cross-origin-rpc.js');
-const sentry = require('./util/sentry');
+import addAnalytics from './ga';
+import disableOpenerForExternalLinks from './util/disable-opener-for-external-links';
+import { fetchConfig } from './util/fetch-config';
+import serviceConfig from './service-config';
+import { jsonConfigsFrom } from '../shared/settings';
+import crossOriginRPC from './cross-origin-rpc.js';
+import * as sentry from './util/sentry';
 
 // Read settings rendered into sidebar app HTML by service/extension.
 const appConfig = jsonConfigsFrom(document);
@@ -26,21 +26,23 @@ document.body.setAttribute('ng-csp', '');
 // Prevent tab-jacking.
 disableOpenerForExternalLinks(document.body);
 
-const angular = require('angular');
-const angularRoute = require('angular-route');
-const angularToastr = require('angular-toastr');
+import angular from 'angular';
+
+// Angular addons which export the Angular module name via `module.exports`.
+import angularRoute from 'angular-route';
+import angularToastr from 'angular-toastr';
 
 // autofill-event relies on the existence of window.angular so
 // it must be require'd after angular is first require'd
-require('autofill-event');
+import 'autofill-event';
 
 // Load polyfill for :focus-visible pseudo-class.
-require('focus-visible');
+import 'focus-visible';
 
 // Enable debugging checks for Preact.
-require('preact/debug');
+import 'preact/debug';
 
-const wrapReactComponent = require('./util/wrap-react-component');
+import wrapReactComponent from './util/wrap-react-component';
 
 if (appConfig.googleAnalytics) {
   addAnalytics(appConfig.googleAnalytics);
@@ -112,84 +114,80 @@ function sendPageView(analytics) {
 }
 
 // Preact UI components that are wrapped for use within Angular templates.
-const AnnotationActionBar = require('./components/annotation-action-bar');
-const AnnotationBody = require('./components/annotation-body');
-const AnnotationHeader = require('./components/annotation-header');
-const AnnotationLicense = require('./components/annotation-license');
-const AnnotationOmega = require('./components/annotation-omega');
-const AnnotationPublishControl = require('./components/annotation-publish-control');
-const AnnotationQuote = require('./components/annotation-quote');
-const FocusedModeHeader = require('./components/focused-mode-header');
-const HelpPanel = require('./components/help-panel');
-const LoggedOutMessage = require('./components/logged-out-message');
-const ModerationBanner = require('./components/moderation-banner');
-const SearchStatusBar = require('./components/search-status-bar');
-const SelectionTabs = require('./components/selection-tabs');
-const ShareAnnotationsPanel = require('./components/share-annotations-panel');
-const SidebarContentError = require('./components/sidebar-content-error');
-const SvgIcon = require('./components/svg-icon');
-const TagEditor = require('./components/tag-editor');
-const TagList = require('./components/tag-list');
-const TopBar = require('./components/top-bar');
+import AnnotationActionBar from './components/annotation-action-bar';
+import AnnotationBody from './components/annotation-body';
+import AnnotationHeader from './components/annotation-header';
+import AnnotationLicense from './components/annotation-license';
+import AnnotationOmega from './components/annotation-omega';
+import AnnotationPublishControl from './components/annotation-publish-control';
+import AnnotationQuote from './components/annotation-quote';
+import FocusedModeHeader from './components/focused-mode-header';
+import HelpPanel from './components/help-panel';
+import LoggedOutMessage from './components/logged-out-message';
+import ModerationBanner from './components/moderation-banner';
+import SearchStatusBar from './components/search-status-bar';
+import SelectionTabs from './components/selection-tabs';
+import ShareAnnotationsPanel from './components/share-annotations-panel';
+import SidebarContentError from './components/sidebar-content-error';
+import SvgIcon from './components/svg-icon';
+import TagEditor from './components/tag-editor';
+import TagList from './components/tag-list';
+import TopBar from './components/top-bar';
 
 // Remaining UI components that are still built with Angular.
-const annotation = require('./components/annotation');
-const annotationThread = require('./components/annotation-thread');
-const annotationViewerContent = require('./components/annotation-viewer-content');
-const hypothesisApp = require('./components/hypothesis-app');
-const sidebarContent = require('./components/sidebar-content');
-const streamContent = require('./components/stream-content');
-const threadList = require('./components/thread-list');
+import annotation from './components/annotation';
+import annotationThread from './components/annotation-thread';
+import annotationViewerContent from './components/annotation-viewer-content';
+import hypothesisApp from './components/hypothesis-app';
+import sidebarContent from './components/sidebar-content';
+import streamContent from './components/stream-content';
+import threadList from './components/thread-list';
 
 // Angular directives.
-const hAutofocusDirective = require('./directive/h-autofocus');
-const hBrandingDirective = require('./directive/h-branding');
-const hOnTouchDirective = require('./directive/h-on-touch');
-const hTooltipDirective = require('./directive/h-tooltip');
-const windowScrollDirective = require('./directive/window-scroll');
+import hAutofocusDirective from './directive/h-autofocus';
+import hBrandingDirective from './directive/h-branding';
+import hOnTouchDirective from './directive/h-on-touch';
+import hTooltipDirective from './directive/h-tooltip';
+import windowScrollDirective from './directive/window-scroll';
 
 // Services.
-const analyticsService = require('./services/analytics');
-const annotationMapperService = require('./services/annotation-mapper');
-const annotationsService = require('./services/annotations');
-const apiService = require('./services/api');
-const apiRoutesService = require('./services/api-routes');
-const authService = require('./services/oauth-auth');
-const bridgeService = require('../shared/bridge');
-const featuresService = require('./services/features');
-const flashService = require('./services/flash');
-const { default: frameSyncService } = require('./services/frame-sync');
-const groupsService = require('./services/groups');
-const localStorageService = require('./services/local-storage');
-const permissionsService = require('./services/permissions');
-const rootThreadService = require('./services/root-thread');
-const searchFilterService = require('./services/search-filter');
-const serviceUrlService = require('./services/service-url');
-const sessionService = require('./services/session');
-const streamerService = require('./services/streamer');
-const streamFilterService = require('./services/stream-filter');
-const tagsService = require('./services/tags');
-const unicodeService = require('./services/unicode');
-const viewFilterService = require('./services/view-filter');
+import analyticsService from './services/analytics';
+import annotationMapperService from './services/annotation-mapper';
+import annotationsService from './services/annotations';
+import apiService from './services/api';
+import apiRoutesService from './services/api-routes';
+import authService from './services/oauth-auth';
+import bridgeService from '../shared/bridge';
+import featuresService from './services/features';
+import flashService from './services/flash';
+import frameSyncService from './services/frame-sync';
+import groupsService from './services/groups';
+import localStorageService from './services/local-storage';
+import permissionsService from './services/permissions';
+import rootThreadService from './services/root-thread';
+import searchFilterService from './services/search-filter';
+import serviceUrlService from './services/service-url';
+import sessionService from './services/session';
+import streamerService from './services/streamer';
+import streamFilterService from './services/stream-filter';
+import tagsService from './services/tags';
+import unicodeService from './services/unicode';
+import viewFilterService from './services/view-filter';
 
-const store = require('./store');
+// Redux store.
+import store from './store';
 
 // Utilities.
-const Discovery = require('../shared/discovery');
-const OAuthClient = require('./util/oauth-client');
-const VirtualThreadList = require('./virtual-thread-list');
-const random = require('./util/random');
-const time = require('./util/time');
-const { encode: urlEncodeFilter } = require('./filter/url');
+import Discovery from '../shared/discovery';
+import OAuthClient from './util/oauth-client';
+import VirtualThreadList from './virtual-thread-list';
+import * as random from './util/random';
+import * as time from './util/time';
+import { encode as urlEncodeFilter } from './filter/url';
 
 function startAngularApp(config) {
   angular
-    .module('h', [
-      // Angular addons which export the Angular module name
-      // via module.exports
-      angularRoute,
-      angularToastr,
-    ])
+    .module('h', [angularRoute, angularToastr])
 
     // The root component for the application
     .component('hypothesisApp', hypothesisApp)
