@@ -1,6 +1,7 @@
 import { mount } from 'enzyme';
 import { createElement } from 'preact';
 
+import bridgeEvents from '../../../shared/bridge-events';
 import UserMenu from '../user-menu';
 import { $imports } from '../user-menu';
 
@@ -11,7 +12,6 @@ describe('UserMenu', () => {
   let fakeBridge;
   let fakeIsThirdPartyUser;
   let fakeOnLogout;
-  let fakeProfileBridgeEvent;
   let fakeServiceConfig;
   let fakeServiceUrl;
   let fakeSettings;
@@ -44,7 +44,6 @@ describe('UserMenu', () => {
     fakeBridge = { call: sinon.stub() };
     fakeIsThirdPartyUser = sinon.stub();
     fakeOnLogout = sinon.stub();
-    fakeProfileBridgeEvent = 'profile-requested';
     fakeServiceConfig = sinon.stub();
     fakeServiceUrl = sinon.stub();
     fakeSettings = {
@@ -57,9 +56,6 @@ describe('UserMenu', () => {
         isThirdPartyUser: fakeIsThirdPartyUser,
       },
       '../service-config': fakeServiceConfig,
-      '../../shared/bridge-events': {
-        PROFILE_REQUESTED: fakeProfileBridgeEvent,
-      },
     });
   });
 
@@ -149,7 +145,7 @@ describe('UserMenu', () => {
         onProfileSelected();
 
         assert.equal(fakeBridge.call.callCount, 1);
-        assert.calledWith(fakeBridge.call, fakeProfileBridgeEvent);
+        assert.calledWith(fakeBridge.call, bridgeEvents.PROFILE_REQUESTED);
       });
 
       it('should not fire profile event for first-party user', () => {
