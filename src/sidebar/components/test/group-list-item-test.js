@@ -1,11 +1,10 @@
-const { createElement } = require('preact');
-const { act } = require('preact/test-utils');
+import { mount } from 'enzyme';
+import { createElement } from 'preact';
+import { act } from 'preact/test-utils';
 
-const { mount } = require('enzyme');
-const GroupListItem = require('../group-list-item');
-const { $imports } = require('../group-list-item');
-
-const { events } = require('../../services/analytics');
+import { events } from '../../services/analytics';
+import GroupListItem from '../group-list-item';
+import { $imports } from '../group-list-item';
 
 describe('GroupListItem', () => {
   let fakeAnalytics;

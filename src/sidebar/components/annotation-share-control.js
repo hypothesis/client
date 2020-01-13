@@ -1,14 +1,14 @@
-const propTypes = require('prop-types');
-const { createElement } = require('preact');
-const { useEffect, useRef, useState } = require('preact/hooks');
+import { createElement } from 'preact';
+import { useEffect, useRef, useState } from 'preact/hooks';
+import propTypes from 'prop-types';
 
-const useElementShouldClose = require('./hooks/use-element-should-close');
-const { copyText } = require('../util/copy-to-clipboard');
-const { withServices } = require('../util/service-context');
+import { copyText } from '../util/copy-to-clipboard';
+import { withServices } from '../util/service-context';
 
-const Button = require('./button');
-const ShareLinks = require('./share-links');
-const SvgIcon = require('./svg-icon');
+import Button from './button';
+import useElementShouldClose from './hooks/use-element-should-close';
+import ShareLinks from './share-links';
+import SvgIcon from './svg-icon';
 
 /**
  * "Popup"-style component for sharing a single annotation.
@@ -149,4 +149,4 @@ AnnotationShareControl.propTypes = {
 
 AnnotationShareControl.injectedProps = ['analytics', 'flash', 'permissions'];
 
-module.exports = withServices(AnnotationShareControl);
+export default withServices(AnnotationShareControl);

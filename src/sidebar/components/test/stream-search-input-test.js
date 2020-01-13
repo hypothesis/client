@@ -1,10 +1,11 @@
-const { mount } = require('enzyme');
-const { createElement } = require('preact');
-const { act } = require('preact/test-utils');
+import { mount } from 'enzyme';
+import { createElement } from 'preact';
+import { act } from 'preact/test-utils';
 
-const StreamSearchInput = require('../stream-search-input');
-const { $imports } = require('../stream-search-input');
-const mockImportedComponents = require('./mock-imported-components');
+import StreamSearchInput from '../stream-search-input';
+import { $imports } from '../stream-search-input';
+
+import mockImportedComponents from './mock-imported-components';
 
 describe('StreamSearchInput', () => {
   let fakeLocation;

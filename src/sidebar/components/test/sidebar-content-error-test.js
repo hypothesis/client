@@ -1,9 +1,10 @@
-const { mount } = require('enzyme');
-const { createElement } = require('preact');
+import { mount } from 'enzyme';
+import { createElement } from 'preact';
 
-const SidebarContentError = require('../sidebar-content-error');
-const { $imports } = require('../sidebar-content-error');
-const mockImportedComponents = require('./mock-imported-components');
+import SidebarContentError from '../sidebar-content-error';
+import { $imports } from '../sidebar-content-error';
+
+import mockImportedComponents from './mock-imported-components';
 
 describe('SidebarContentError', () => {
   const createSidebarContentError = (

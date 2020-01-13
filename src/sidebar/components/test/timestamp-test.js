@@ -1,9 +1,9 @@
-const { createElement } = require('preact');
-const { act } = require('preact/test-utils');
-const { mount } = require('enzyme');
+import { mount } from 'enzyme';
+import { createElement } from 'preact';
+import { act } from 'preact/test-utils';
 
-const Timestamp = require('../timestamp');
-const { $imports } = require('../timestamp');
+import Timestamp from '../timestamp';
+import { $imports } from '../timestamp';
 
 describe('Timestamp', () => {
   let clock;

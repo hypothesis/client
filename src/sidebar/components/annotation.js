@@ -1,11 +1,6 @@
-const {
-  isNew,
-  isReply,
-  isPageNote,
-  quote,
-} = require('../util/annotation-metadata');
-const events = require('../events');
-const { isThirdPartyUser } = require('../util/account-id');
+import events from '../events';
+import { isThirdPartyUser } from '../util/account-id';
+import { isNew, isReply, isPageNote, quote } from '../util/annotation-metadata';
 
 /**
  * Return a copy of `annotation` with changes made in the editor applied.
@@ -451,7 +446,7 @@ function AnnotationController(
   };
 }
 
-module.exports = {
+export default {
   controller: AnnotationController,
   controllerAs: 'vm',
   bindings: {

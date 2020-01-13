@@ -1,10 +1,11 @@
-const { mount } = require('enzyme');
-const { createElement } = require('preact');
-const { act } = require('preact/test-utils');
+import { mount } from 'enzyme';
+import { createElement } from 'preact';
+import { act } from 'preact/test-utils';
 
-const GroupList = require('../group-list');
-const { $imports } = require('../group-list');
-const mockImportedComponents = require('./mock-imported-components');
+import GroupList from '../group-list';
+import { $imports } from '../group-list';
+
+import mockImportedComponents from './mock-imported-components';
 
 describe('GroupList', () => {
   let fakeServiceConfig;

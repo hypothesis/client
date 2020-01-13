@@ -1,9 +1,10 @@
-const { createElement } = require('preact');
-const { mount } = require('enzyme');
+import { mount } from 'enzyme';
+import { createElement } from 'preact';
 
-const ShareLinks = require('../share-links');
-const { $imports } = require('../share-links');
-const mockImportedComponents = require('./mock-imported-components');
+import ShareLinks from '../share-links';
+import { $imports } from '../share-links';
+
+import mockImportedComponents from './mock-imported-components';
 
 describe('ShareLinks', () => {
   let fakeAnalytics;

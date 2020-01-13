@@ -1,10 +1,10 @@
-const { createElement } = require('preact');
-const classnames = require('classnames');
-const propTypes = require('prop-types');
+import classnames from 'classnames';
+import { createElement } from 'preact';
+import propTypes from 'prop-types';
 
-const annotationMetadata = require('../util/annotation-metadata');
-const useStore = require('../store/use-store');
-const { withServices } = require('../util/service-context');
+import useStore from '../store/use-store';
+import * as annotationMetadata from '../util/annotation-metadata';
+import { withServices } from '../util/service-context';
 
 /**
  * Banner allows moderators to hide/unhide the flagged
@@ -101,4 +101,4 @@ ModerationBanner.propTypes = {
 
 ModerationBanner.injectedProps = ['api', 'flash'];
 
-module.exports = withServices(ModerationBanner);
+export default withServices(ModerationBanner);

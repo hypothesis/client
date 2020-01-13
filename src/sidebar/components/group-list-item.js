@@ -1,12 +1,12 @@
-const propTypes = require('prop-types');
-const { Fragment, createElement } = require('preact');
+import { Fragment, createElement } from 'preact';
+import propTypes from 'prop-types';
 
-const useStore = require('../store/use-store');
-const { orgName } = require('../util/group-list-item-common');
-const { withServices } = require('../util/service-context');
-const { copyText } = require('../util/copy-to-clipboard');
+import useStore from '../store/use-store';
+import { copyText } from '../util/copy-to-clipboard';
+import { orgName } from '../util/group-list-item-common';
+import { withServices } from '../util/service-context';
 
-const MenuItem = require('./menu-item');
+import MenuItem from './menu-item';
 
 /**
  * An item in the groups selection menu.
@@ -155,4 +155,4 @@ GroupListItem.propTypes = {
 
 GroupListItem.injectedProps = ['analytics', 'flash', 'groups'];
 
-module.exports = withServices(GroupListItem);
+export default withServices(GroupListItem);

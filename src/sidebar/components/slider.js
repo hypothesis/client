@@ -1,6 +1,6 @@
-const propTypes = require('prop-types');
-const { createElement } = require('preact');
-const { useCallback, useEffect, useRef, useState } = require('preact/hooks');
+import { createElement } from 'preact';
+import { useCallback, useEffect, useRef, useState } from 'preact/hooks';
+import propTypes from 'prop-types';
 
 /**
  * A container which reveals its content when `visible` is `true` using
@@ -12,7 +12,7 @@ const { useCallback, useEffect, useRef, useState } = require('preact/hooks');
  *
  * Currently the only reveal/expand direction supported is top-down.
  */
-function Slider({ children, visible }) {
+export default function Slider({ children, visible }) {
   const containerRef = useRef(null);
   const [containerHeight, setContainerHeight] = useState(visible ? 'auto' : 0);
 
@@ -97,5 +97,3 @@ Slider.propTypes = {
    */
   visible: propTypes.bool,
 };
-
-module.exports = Slider;

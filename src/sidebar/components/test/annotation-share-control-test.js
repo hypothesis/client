@@ -1,10 +1,11 @@
-const { createElement } = require('preact');
-const { mount } = require('enzyme');
-const { act } = require('preact/test-utils');
+import { mount } from 'enzyme';
+import { createElement } from 'preact';
+import { act } from 'preact/test-utils';
 
-const AnnotationShareControl = require('../annotation-share-control');
-const { $imports } = require('../annotation-share-control');
-const mockImportedComponents = require('./mock-imported-components');
+import AnnotationShareControl from '../annotation-share-control';
+import { $imports } from '../annotation-share-control';
+
+import mockImportedComponents from './mock-imported-components';
 
 describe('AnnotationShareControl', () => {
   let fakeAnnotation;

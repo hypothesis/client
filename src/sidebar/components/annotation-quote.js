@@ -1,12 +1,12 @@
-const classnames = require('classnames');
-const { createElement } = require('preact');
-const propTypes = require('prop-types');
+import classnames from 'classnames';
+import { createElement } from 'preact';
+import propTypes from 'prop-types';
 
-const { isOrphan, quote } = require('../util/annotation-metadata');
-const { withServices } = require('../util/service-context');
-const { applyTheme } = require('../util/theme');
+import { isOrphan, quote } from '../util/annotation-metadata';
+import { withServices } from '../util/service-context';
+import { applyTheme } from '../util/theme';
 
-const Excerpt = require('./excerpt');
+import Excerpt from './excerpt';
 
 /**
  * Display the selected text from the document associated with an annotation.
@@ -44,4 +44,4 @@ AnnotationQuote.propTypes = {
 
 AnnotationQuote.injectedProps = ['settings'];
 
-module.exports = withServices(AnnotationQuote);
+export default withServices(AnnotationQuote);

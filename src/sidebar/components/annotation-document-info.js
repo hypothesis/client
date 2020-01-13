@@ -1,13 +1,13 @@
-const propTypes = require('prop-types');
-const { createElement } = require('preact');
+import { createElement } from 'preact';
+import propTypes from 'prop-types';
 
-const annotationMetadata = require('../util/annotation-metadata');
+import * as annotationMetadata from '../util/annotation-metadata';
 
 /**
  * Render some metadata about an annotation's document and link to it
  * if a link is available.
  */
-function AnnotationDocumentInfo({ annotation }) {
+export default function AnnotationDocumentInfo({ annotation }) {
   const documentInfo = annotationMetadata.domainAndTitle(annotation);
   // If there's no document title, nothing to do here
   if (!documentInfo.titleText) {
@@ -38,5 +38,3 @@ AnnotationDocumentInfo.propTypes = {
   /* Annotation for which the document metadata will be rendered */
   annotation: propTypes.object.isRequired,
 };
-
-module.exports = AnnotationDocumentInfo;

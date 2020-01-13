@@ -1,9 +1,10 @@
-const { mount } = require('enzyme');
-const { createElement } = require('preact');
+import { mount } from 'enzyme';
+import { createElement } from 'preact';
 
-const FocusedModeHeader = require('../focused-mode-header');
-const { $imports } = require('../focused-mode-header');
-const mockImportedComponents = require('./mock-imported-components');
+import FocusedModeHeader from '../focused-mode-header';
+import { $imports } from '../focused-mode-header';
+
+import mockImportedComponents from './mock-imported-components';
 
 describe('FocusedModeHeader', function() {
   let fakeStore;

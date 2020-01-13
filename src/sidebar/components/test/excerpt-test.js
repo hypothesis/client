@@ -1,9 +1,9 @@
-const { createElement } = require('preact');
-const { act } = require('preact/test-utils');
-const { mount } = require('enzyme');
+import { mount } from 'enzyme';
+import { createElement } from 'preact';
+import { act } from 'preact/test-utils';
 
-const Excerpt = require('../excerpt');
-const { $imports } = require('../excerpt');
+import Excerpt from '../excerpt';
+import { $imports } from '../excerpt';
 
 describe('Excerpt', () => {
   const SHORT_DIV = <div id="foo" style="height: 5px;" />;

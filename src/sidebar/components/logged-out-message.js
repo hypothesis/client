@@ -1,9 +1,9 @@
-const propTypes = require('prop-types');
-const { createElement } = require('preact');
+import { createElement } from 'preact';
+import propTypes from 'prop-types';
 
-const { withServices } = require('../util/service-context');
+import { withServices } from '../util/service-context';
 
-const SvgIcon = require('./svg-icon');
+import SvgIcon from './svg-icon';
 
 /**
  * Render a call-to-action to log in or sign up. This message is intended to be
@@ -46,4 +46,4 @@ LoggedOutMessage.propTypes = {
 
 LoggedOutMessage.injectedProps = ['serviceUrl'];
 
-module.exports = withServices(LoggedOutMessage);
+export default withServices(LoggedOutMessage);

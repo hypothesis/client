@@ -1,10 +1,11 @@
-const { mount } = require('enzyme');
-const { createElement } = require('preact');
-const { act } = require('preact/test-utils');
+import { mount } from 'enzyme';
+import { createElement } from 'preact';
+import { act } from 'preact/test-utils';
 
-const HelpPanel = require('../help-panel');
-const { $imports } = require('../help-panel');
-const mockImportedComponents = require('./mock-imported-components');
+import HelpPanel from '../help-panel';
+import { $imports } from '../help-panel';
+
+import mockImportedComponents from './mock-imported-components';
 
 describe('HelpPanel', function() {
   let fakeAuth;

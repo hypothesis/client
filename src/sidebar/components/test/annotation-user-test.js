@@ -1,9 +1,10 @@
-const { createElement } = require('preact');
-const { mount } = require('enzyme');
+import { mount } from 'enzyme';
+import { createElement } from 'preact';
 
-const AnnotationUser = require('../annotation-user');
-const { $imports } = require('../annotation-user');
-const mockImportedComponents = require('./mock-imported-components');
+import AnnotationUser from '../annotation-user';
+import { $imports } from '../annotation-user';
+
+import mockImportedComponents from './mock-imported-components';
 
 describe('AnnotationUser', () => {
   let fakeAnnotation;

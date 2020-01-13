@@ -1,11 +1,11 @@
-const { createElement } = require('preact');
-const { mount } = require('enzyme');
+import { mount } from 'enzyme';
+import { createElement } from 'preact';
 
-const fixtures = require('../../test/annotation-fixtures');
+import * as fixtures from '../../test/annotation-fixtures';
+import AnnotationDocumentInfo from '../annotation-document-info';
+import { $imports } from '../annotation-document-info';
 
-const AnnotationDocumentInfo = require('../annotation-document-info');
-const { $imports } = require('../annotation-document-info');
-const mockImportedComponents = require('./mock-imported-components');
+import mockImportedComponents from './mock-imported-components';
 
 describe('AnnotationDocumentInfo', () => {
   let fakeDomainAndTitle;

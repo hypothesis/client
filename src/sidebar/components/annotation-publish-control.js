@@ -1,12 +1,12 @@
-const propTypes = require('prop-types');
-const { createElement } = require('preact');
+import { createElement } from 'preact';
+import propTypes from 'prop-types';
 
-const { applyTheme } = require('../util/theme');
-const { withServices } = require('../util/service-context');
+import { withServices } from '../util/service-context';
+import { applyTheme } from '../util/theme';
 
-const Button = require('./button');
-const Menu = require('./menu');
-const MenuItem = require('./menu-item');
+import Button from './button';
+import Menu from './menu';
+import MenuItem from './menu-item';
 
 /**
  * Render a compound control button for publishing (saving) an annotation:
@@ -111,4 +111,4 @@ AnnotationPublishControl.propTypes = {
 
 AnnotationPublishControl.injectedProps = ['settings'];
 
-module.exports = withServices(AnnotationPublishControl);
+export default withServices(AnnotationPublishControl);

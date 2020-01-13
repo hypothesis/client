@@ -1,12 +1,14 @@
-const { createElement } = require('preact');
-const { mount } = require('enzyme');
+import { mount } from 'enzyme';
+import { createElement } from 'preact';
 
-const mockImportedComponents = require('./mock-imported-components');
-const fixtures = require('../../test/annotation-fixtures');
+import * as fixtures from '../../test/annotation-fixtures';
+
+import mockImportedComponents from './mock-imported-components';
 
 // @TODO Note this import as `Annotation` for easier updating later
-const Annotation = require('../annotation-omega');
-const { $imports } = require('../annotation-omega');
+
+import Annotation from '../annotation-omega';
+import { $imports } from '../annotation-omega';
 
 describe('AnnotationOmega', () => {
   let fakeOnReplyCountClick;

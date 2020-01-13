@@ -1,6 +1,6 @@
-const { createElement, render } = require('preact');
+import { createElement, render } from 'preact';
 
-const SvgIcon = require('../svg-icon');
+import SvgIcon from '../svg-icon';
 
 describe('SvgIcon', () => {
   // Tests here use DOM APIs rather than Enzyme because SvgIcon uses

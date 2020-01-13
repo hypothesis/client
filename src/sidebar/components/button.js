@@ -1,8 +1,8 @@
-const classnames = require('classnames');
-const propTypes = require('prop-types');
-const { createElement } = require('preact');
+import classnames from 'classnames';
+import { createElement } from 'preact';
+import propTypes from 'prop-types';
 
-const SvgIcon = require('./svg-icon');
+import SvgIcon from './svg-icon';
 
 /**
  * A button, one of three base types depending on provided props:
@@ -16,7 +16,7 @@ const SvgIcon = require('./svg-icon');
  * - `usePrimaryStyle`: for applying "primary action" styling
  * - `className`: arbitrary additional class name(s) to apply
  */
-function Button({
+export default function Button({
   buttonText = '',
   className = '',
   icon = '',
@@ -128,5 +128,3 @@ Button.propTypes = {
    */
   usePrimaryStyle: propTypes.bool,
 };
-
-module.exports = Button;

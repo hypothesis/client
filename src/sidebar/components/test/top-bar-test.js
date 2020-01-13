@@ -1,12 +1,12 @@
-const { createElement } = require('preact');
-const { mount } = require('enzyme');
+import { mount } from 'enzyme';
+import { createElement } from 'preact';
 
-const uiConstants = require('../../ui-constants');
-const bridgeEvents = require('../../../shared/bridge-events');
+import bridgeEvents from '../../../shared/bridge-events';
+import uiConstants from '../../ui-constants';
+import TopBar from '../top-bar';
+import { $imports } from '../top-bar';
 
-const TopBar = require('../top-bar');
-const { $imports } = require('../top-bar');
-const mockImportedComponents = require('./mock-imported-components');
+import mockImportedComponents from './mock-imported-components';
 
 describe('TopBar', () => {
   const fakeSettings = {};

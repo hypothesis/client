@@ -1,21 +1,21 @@
-const { Fragment, createElement } = require('preact');
-const classnames = require('classnames');
-const propTypes = require('prop-types');
+import classnames from 'classnames';
+import { Fragment, createElement } from 'preact';
+import propTypes from 'prop-types';
 
-const bridgeEvents = require('../../shared/bridge-events');
-const useStore = require('../store/use-store');
-const { applyTheme } = require('../util/theme');
-const isThirdPartyService = require('../util/is-third-party-service');
-const serviceConfig = require('../service-config');
-const { withServices } = require('../util/service-context');
-const uiConstants = require('../ui-constants');
+import bridgeEvents from '../../shared/bridge-events';
+import serviceConfig from '../service-config';
+import useStore from '../store/use-store';
+import uiConstants from '../ui-constants';
+import isThirdPartyService from '../util/is-third-party-service';
+import { withServices } from '../util/service-context';
+import { applyTheme } from '../util/theme';
 
-const Button = require('./button');
-const GroupList = require('./group-list');
-const SearchInput = require('./search-input');
-const StreamSearchInput = require('./stream-search-input');
-const SortMenu = require('./sort-menu');
-const UserMenu = require('./user-menu');
+import Button from './button';
+import GroupList from './group-list';
+import SearchInput from './search-input';
+import SortMenu from './sort-menu';
+import StreamSearchInput from './stream-search-input';
+import UserMenu from './user-menu';
 
 /**
  * The toolbar which appears at the top of the sidebar providing actions
@@ -190,4 +190,4 @@ TopBar.propTypes = {
 
 TopBar.injectedProps = ['bridge', 'settings', 'streamer'];
 
-module.exports = withServices(TopBar);
+export default withServices(TopBar);

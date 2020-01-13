@@ -1,10 +1,10 @@
-const { createElement } = require('preact');
-const propTypes = require('prop-types');
+import { createElement } from 'preact';
+import propTypes from 'prop-types';
 
-const { withServices } = require('../util/service-context');
-const isThirdPartyService = require('../util/is-third-party-service');
+import isThirdPartyService from '../util/is-third-party-service';
+import { withServices } from '../util/service-context';
 
-const SvgIcon = require('./svg-icon');
+import SvgIcon from './svg-icon';
 
 /**
  * Subcomponent: an "instruction" within the tutorial step that includes an
@@ -80,4 +80,4 @@ Tutorial.propTypes = {
 
 Tutorial.injectedProps = ['settings'];
 
-module.exports = withServices(Tutorial);
+export default withServices(Tutorial);

@@ -1,6 +1,6 @@
-const events = require('../events');
-const isThirdPartyService = require('../util/is-third-party-service');
-const tabs = require('../util/tabs');
+import events from '../events';
+import isThirdPartyService from '../util/is-third-party-service';
+import * as tabs from '../util/tabs';
 
 // @ngInject
 function SidebarContentController(
@@ -191,7 +191,7 @@ function SidebarContentController(
   };
 }
 
-module.exports = {
+export default {
   controller: SidebarContentController,
   controllerAs: 'vm',
   bindings: {

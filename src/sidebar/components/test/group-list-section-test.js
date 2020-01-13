@@ -1,9 +1,10 @@
-const { mount } = require('enzyme');
-const { createElement } = require('preact');
+import { mount } from 'enzyme';
+import { createElement } from 'preact';
 
-const GroupListSection = require('../group-list-section');
-const { $imports } = require('../group-list-section');
-const mockImportedComponents = require('./mock-imported-components');
+import GroupListSection from '../group-list-section';
+import { $imports } from '../group-list-section';
+
+import mockImportedComponents from './mock-imported-components';
 
 describe('GroupListSection', () => {
   const testGroups = [

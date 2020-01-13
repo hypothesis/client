@@ -1,15 +1,15 @@
-const { createElement } = require('preact');
+import { createElement } from 'preact';
 
-const useStore = require('../store/use-store');
+import useStore from '../store/use-store';
 
-const Button = require('./button');
-const Menu = require('./menu');
-const MenuItem = require('./menu-item');
+import Button from './button';
+import Menu from './menu';
+import MenuItem from './menu-item';
 
 /**
  * A drop-down menu of sorting options for a collection of annotations.
  */
-function SortMenu() {
+export default function SortMenu() {
   const actions = useStore(store => ({
     setSortKey: store.setSortKey,
   }));
@@ -58,5 +58,3 @@ function SortMenu() {
 }
 
 SortMenu.propTypes = {};
-
-module.exports = SortMenu;

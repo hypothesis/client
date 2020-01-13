@@ -1,7 +1,7 @@
-const { createElement } = require('preact');
-const { mount } = require('enzyme');
+import { mount } from 'enzyme';
+import { createElement } from 'preact';
 
-const Spinner = require('../spinner');
+import Spinner from '../spinner';
 
 describe('Spinner', function() {
   const createSpinner = (props = {}) => mount(<Spinner {...props} />);

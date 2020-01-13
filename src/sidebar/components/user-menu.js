@@ -1,15 +1,15 @@
-const { createElement } = require('preact');
-const propTypes = require('prop-types');
+import { createElement } from 'preact';
+import propTypes from 'prop-types';
 
-const bridgeEvents = require('../../shared/bridge-events');
-const { isThirdPartyUser } = require('../util/account-id');
-const serviceConfig = require('../service-config');
-const { withServices } = require('../util/service-context');
+import bridgeEvents from '../../shared/bridge-events';
+import serviceConfig from '../service-config';
+import { isThirdPartyUser } from '../util/account-id';
+import { withServices } from '../util/service-context';
 
-const Button = require('./button');
-const Menu = require('./menu');
-const MenuSection = require('./menu-section');
-const MenuItem = require('./menu-item');
+import Button from './button';
+import Menu from './menu';
+import MenuItem from './menu-item';
+import MenuSection from './menu-section';
 
 /**
  * A menu with user and account links.
@@ -91,4 +91,4 @@ UserMenu.propTypes = {
 
 UserMenu.injectedProps = ['bridge', 'serviceUrl', 'settings'];
 
-module.exports = withServices(UserMenu);
+export default withServices(UserMenu);

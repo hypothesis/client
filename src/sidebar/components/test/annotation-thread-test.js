@@ -1,9 +1,9 @@
-const angular = require('angular');
+import angular from 'angular';
 
-const annotationThread = require('../annotation-thread');
-const moderationBanner = require('../moderation-banner');
-const fixtures = require('../../test/annotation-fixtures');
-const util = require('../../directive/test/util');
+import * as util from '../../directive/test/util';
+import * as fixtures from '../../test/annotation-fixtures';
+import annotationThread from '../annotation-thread';
+import moderationBanner from '../moderation-banner';
 
 function PageObject(element) {
   this.annotations = function() {

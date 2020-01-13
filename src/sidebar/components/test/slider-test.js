@@ -1,7 +1,7 @@
-const { mount } = require('enzyme');
-const { createElement } = require('preact');
+import { mount } from 'enzyme';
+import { createElement } from 'preact';
 
-const Slider = require('../slider');
+import Slider from '../slider';
 
 describe('Slider', () => {
   let container;

@@ -1,8 +1,8 @@
-const { createElement } = require('preact');
-const { mount } = require('enzyme');
+import { mount } from 'enzyme';
+import { createElement } from 'preact';
 
-const MarkdownView = require('../markdown-view');
-const { $imports } = require('../markdown-view');
+import MarkdownView from '../markdown-view';
+import { $imports } from '../markdown-view';
 
 describe('MarkdownView', () => {
   let fakeMediaEmbedder;

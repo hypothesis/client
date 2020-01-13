@@ -1,10 +1,10 @@
-const propTypes = require('prop-types');
-const { createElement } = require('preact');
+import { createElement } from 'preact';
+import propTypes from 'prop-types';
 
-const { copyText } = require('../util/copy-to-clipboard');
-const { withServices } = require('../util/service-context');
+import { copyText } from '../util/copy-to-clipboard';
+import { withServices } from '../util/service-context';
 
-const Button = require('./button');
+import Button from './button';
 
 /**
  * Display current client version info
@@ -60,4 +60,4 @@ VersionInfo.propTypes = {
 
 VersionInfo.injectedProps = ['flash'];
 
-module.exports = withServices(VersionInfo);
+export default withServices(VersionInfo);

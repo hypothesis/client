@@ -109,10 +109,7 @@ function AnnotationThreadController(features, store) {
   };
 }
 
-/**
- * Renders a thread of annotations.
- */
-module.exports = {
+export default {
   controllerAs: 'vm',
   controller: AnnotationThreadController,
   bindings: {

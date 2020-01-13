@@ -1,6 +1,6 @@
-const { useEffect } = require('preact/hooks');
+import { useEffect } from 'preact/hooks';
 
-const { listen } = require('../../util/dom');
+import { listen } from '../../util/dom';
 
 /**
  * This hook adds appropriate `eventListener`s to the document when a target
@@ -19,7 +19,11 @@ const { listen } = require('../../util/dom');
  * @param {() => void} handleClose - A function that will do the actual closing
  *                                   of `closeableEl`
  */
-function useElementShouldClose(closeableEl, isOpen, handleClose) {
+export default function useElementShouldClose(
+  closeableEl,
+  isOpen,
+  handleClose
+) {
   useEffect(() => {
     if (!isOpen) {
       return () => {};
@@ -69,5 +73,3 @@ function useElementShouldClose(closeableEl, isOpen, handleClose) {
     };
   }, [closeableEl, isOpen, handleClose]);
 }
-
-module.exports = useElementShouldClose;

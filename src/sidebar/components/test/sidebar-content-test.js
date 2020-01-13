@@ -1,9 +1,9 @@
-const angular = require('angular');
-const EventEmitter = require('tiny-emitter');
+import angular from 'angular';
+import EventEmitter from 'tiny-emitter';
 
-const events = require('../../events');
-const sidebarContent = require('../sidebar-content');
-const storeFactory = require('../../store');
+import events from '../../events';
+import storeFactory from '../../store';
+import sidebarContent from '../sidebar-content';
 
 class FakeRootThread extends EventEmitter {
   constructor() {

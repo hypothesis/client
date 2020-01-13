@@ -1,9 +1,9 @@
-const { createElement } = require('preact');
-const { act } = require('preact/test-utils');
-const { mount } = require('enzyme');
+import { mount } from 'enzyme';
+import { createElement } from 'preact';
+import { act } from 'preact/test-utils';
 
-const Menu = require('../menu');
-const { $imports } = require('../menu');
+import Menu from '../menu';
+import { $imports } from '../menu';
 
 describe('Menu', () => {
   let container;

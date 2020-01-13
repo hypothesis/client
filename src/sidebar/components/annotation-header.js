@@ -1,20 +1,20 @@
-const propTypes = require('prop-types');
-const { createElement } = require('preact');
+import { createElement } from 'preact';
+import propTypes from 'prop-types';
 
-const { isHighlight } = require('../util/annotation-metadata');
+import { isHighlight } from '../util/annotation-metadata';
 
-const AnnotationDocumentInfo = require('./annotation-document-info');
-const AnnotationShareInfo = require('./annotation-share-info');
-const AnnotationUser = require('./annotation-user');
-const SvgIcon = require('./svg-icon');
-const Timestamp = require('./timestamp');
+import AnnotationDocumentInfo from './annotation-document-info';
+import AnnotationShareInfo from './annotation-share-info';
+import AnnotationUser from './annotation-user';
+import SvgIcon from './svg-icon';
+import Timestamp from './timestamp';
 
 /**
  * Render an annotation's header summary, including metadata about its user,
  * sharing status, document and timestamp. It also allows the user to
  * toggle sub-threads/replies in certain cases.
  */
-function AnnotationHeader({
+export default function AnnotationHeader({
   annotation,
   isEditing,
   onReplyCountClick,
@@ -92,5 +92,3 @@ AnnotationHeader.propTypes = {
    */
   showDocumentInfo: propTypes.bool,
 };
-
-module.exports = AnnotationHeader;

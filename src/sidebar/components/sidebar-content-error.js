@@ -1,10 +1,10 @@
-const { Fragment, createElement } = require('preact');
-const propTypes = require('prop-types');
+import { Fragment, createElement } from 'preact';
+import propTypes from 'prop-types';
 
 /**
  * An error message to display in the sidebar.
  */
-function SidebarContentError({
+export default function SidebarContentError({
   loggedOutErrorMessage,
   loggedInErrorMessage,
   onLoginRequest,
@@ -46,5 +46,3 @@ SidebarContentError.propTypes = {
   /* A boolean indicating whether the user is logged in or not. */
   isLoggedIn: propTypes.bool,
 };
-
-module.exports = SidebarContentError;

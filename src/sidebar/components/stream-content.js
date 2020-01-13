@@ -66,7 +66,7 @@ function StreamContentController(
   this.loadMore = fetch;
 }
 
-module.exports = {
+export default {
   controller: StreamContentController,
   controllerAs: 'vm',
   bindings: {},

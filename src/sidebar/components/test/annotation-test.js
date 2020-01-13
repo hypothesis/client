@@ -1,11 +1,10 @@
-const angular = require('angular');
+import angular from 'angular';
 
-const events = require('../../events');
-const fixtures = require('../../test/annotation-fixtures');
-const util = require('../../directive/test/util');
-
-const annotationComponent = require('../annotation');
-const { $imports, updateModel } = require('../annotation');
+import * as util from '../../directive/test/util';
+import events from '../../events';
+import * as fixtures from '../../test/annotation-fixtures';
+import annotationComponent from '../annotation';
+import { $imports, updateModel } from '../annotation';
 
 const inject = angular.mock.inject;
 

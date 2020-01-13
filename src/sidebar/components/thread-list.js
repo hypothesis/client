@@ -1,11 +1,11 @@
-const events = require('../events');
-const metadata = require('../util/annotation-metadata');
+import events from '../events';
+import * as metadata from '../util/annotation-metadata';
 
 /**
  * Component which displays a virtualized list of annotation threads.
  */
 
-const scopeTimeout = require('../util/scope-timeout');
+import scopeTimeout from '../util/scope-timeout';
 
 /**
  * Returns the height of the thread for an annotation if it exists in the view
@@ -181,7 +181,7 @@ function ThreadListController(
   };
 }
 
-module.exports = {
+export default {
   controller: ThreadListController,
   controllerAs: 'vm',
   bindings: {
