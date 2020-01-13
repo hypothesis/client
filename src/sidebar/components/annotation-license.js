@@ -1,11 +1,11 @@
-const { createElement } = require('preact');
+import { createElement } from 'preact';
 
-const SvgIcon = require('./svg-icon');
+import SvgIcon from './svg-icon';
 
 /**
  * Render information about CC licensing
  */
-function AnnotationLicense() {
+export default function AnnotationLicense() {
   return (
     <div className="annotation-license">
       <a
@@ -34,5 +34,3 @@ function AnnotationLicense() {
 }
 
 AnnotationLicense.propTypes = {};
-
-module.exports = AnnotationLicense;

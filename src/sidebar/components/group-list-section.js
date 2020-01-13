@@ -1,13 +1,18 @@
-const { createElement } = require('preact');
-const propTypes = require('prop-types');
+import { createElement } from 'preact';
+import propTypes from 'prop-types';
 
-const GroupListItem = require('./group-list-item');
-const MenuSection = require('./menu-section');
+import GroupListItem from './group-list-item';
+import MenuSection from './menu-section';
 
 /**
  * A labeled section of the groups list.
  */
-function GroupListSection({ expandedGroup, onExpandGroup, groups, heading }) {
+export default function GroupListSection({
+  expandedGroup,
+  onExpandGroup,
+  groups,
+  heading,
+}) {
   return (
     <MenuSection heading={heading}>
       {groups.map(group => (
@@ -42,5 +47,3 @@ GroupListSection.propTypes = {
    */
   onExpandGroup: propTypes.func,
 };
-
-module.exports = GroupListSection;

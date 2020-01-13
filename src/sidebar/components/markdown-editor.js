@@ -1,16 +1,17 @@
-const classnames = require('classnames');
-const { createElement } = require('preact');
-const { useEffect, useRef, useState } = require('preact/hooks');
-const propTypes = require('prop-types');
+import classnames from 'classnames';
+import { createElement } from 'preact';
+import { useEffect, useRef, useState } from 'preact/hooks';
+import propTypes from 'prop-types';
 
-const MarkdownView = require('./markdown-view');
-const {
+import {
   LinkType,
   convertSelectionToLink,
   toggleBlockStyle,
   toggleSpanStyle,
-} = require('../markdown-commands');
-const SvgIcon = require('./svg-icon');
+} from '../markdown-commands';
+
+import MarkdownView from './markdown-view';
+import SvgIcon from './svg-icon';
 
 // Mapping of toolbar command name to key for Ctrl+<key> keyboard shortcuts.
 // The shortcuts are taken from Stack Overflow's editor.
@@ -233,7 +234,7 @@ Toolbar.propTypes = {
 /**
  * Viewer/editor for the body of an annotation in markdown format.
  */
-function MarkdownEditor({ onEditText = () => {}, text = '' }) {
+export default function MarkdownEditor({ onEditText = () => {}, text = '' }) {
   /** Whether the preview mode is currently active. */
   const [preview, setPreview] = useState(false);
 
@@ -305,5 +306,3 @@ MarkdownEditor.propTypes = {
    */
   onEditText: propTypes.func,
 };
-
-module.exports = MarkdownEditor;

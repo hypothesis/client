@@ -1,9 +1,9 @@
-const propTypes = require('prop-types');
-const { createElement } = require('preact');
+import { createElement } from 'preact';
+import propTypes from 'prop-types';
 
-const { withServices } = require('../util/service-context');
+import { withServices } from '../util/service-context';
 
-const SvgIcon = require('./svg-icon');
+import SvgIcon from './svg-icon';
 
 /**
  * A single sharing link as a list item
@@ -91,4 +91,4 @@ ShareLinks.propTypes = {
 
 ShareLinks.injectedProps = ['analytics'];
 
-module.exports = withServices(ShareLinks);
+export default withServices(ShareLinks);

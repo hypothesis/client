@@ -1,16 +1,16 @@
-const propTypes = require('prop-types');
-const { createElement } = require('preact');
-const { useEffect, useMemo, useState } = require('preact/hooks');
+import { createElement } from 'preact';
+import { useEffect, useMemo, useState } from 'preact/hooks';
+import propTypes from 'prop-types';
 
-const { format: formatDate } = require('../util/date');
-const { decayingInterval, toFuzzyString } = require('../util/time');
+import { format as formatDate } from '../util/date';
+import { decayingInterval, toFuzzyString } from '../util/time';
 
 /**
  * Display a relative timestamp (eg. '6 minutes ago') as static text or a link.
  *
  * The timestamp automatically refreshes at an appropriate frequency.
  */
-function Timestamp({ className, href, timestamp }) {
+export default function Timestamp({ className, href, timestamp }) {
   // "Current" time, used when calculating the relative age of `timestamp`.
   const [now, setNow] = useState(new Date());
 
@@ -60,5 +60,3 @@ Timestamp.propTypes = {
    */
   timestamp: propTypes.string.isRequired,
 };
-
-module.exports = Timestamp;

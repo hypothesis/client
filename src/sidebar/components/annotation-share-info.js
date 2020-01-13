@@ -1,10 +1,10 @@
-const propTypes = require('prop-types');
-const { createElement } = require('preact');
+import { createElement } from 'preact';
+import propTypes from 'prop-types';
 
-const { withServices } = require('../util/service-context');
-const useStore = require('../store/use-store');
+import useStore from '../store/use-store';
+import { withServices } from '../util/service-context';
 
-const SvgIcon = require('./svg-icon');
+import SvgIcon from './svg-icon';
 
 /**
  * Render information about what group an annotation is in and
@@ -72,4 +72,4 @@ AnnotationShareInfo.propTypes = {
 
 AnnotationShareInfo.injectedProps = ['permissions'];
 
-module.exports = withServices(AnnotationShareInfo);
+export default withServices(AnnotationShareInfo);

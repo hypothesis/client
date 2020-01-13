@@ -1,12 +1,12 @@
-const { createElement } = require('preact');
-const propTypes = require('prop-types');
+import { createElement } from 'preact';
+import propTypes from 'prop-types';
 
-const useStore = require('../store/use-store');
-const { quote } = require('../util/annotation-metadata');
-const { withServices } = require('../util/service-context');
+import useStore from '../store/use-store';
+import { quote } from '../util/annotation-metadata';
+import { withServices } from '../util/service-context';
 
-const AnnotationHeader = require('./annotation-header');
-const AnnotationQuote = require('./annotation-quote');
+import AnnotationHeader from './annotation-header';
+import AnnotationQuote from './annotation-quote';
 
 /**
  * The "new", migrated-to-preact annotation component.
@@ -67,4 +67,4 @@ AnnotationOmega.propTypes = {
 
 AnnotationOmega.injectedProps = ['permissions'];
 
-module.exports = withServices(AnnotationOmega);
+export default withServices(AnnotationOmega);

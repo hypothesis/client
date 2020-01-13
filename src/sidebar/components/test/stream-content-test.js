@@ -1,7 +1,7 @@
-const angular = require('angular');
-const EventEmitter = require('tiny-emitter');
+import angular from 'angular';
+import EventEmitter from 'tiny-emitter';
 
-const streamContent = require('../stream-content');
+import streamContent from '../stream-content';
 
 class FakeRootThread extends EventEmitter {
   constructor() {

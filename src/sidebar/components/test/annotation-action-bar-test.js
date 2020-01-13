@@ -1,12 +1,12 @@
-const { createElement } = require('preact');
-const { mount } = require('enzyme');
-const { act } = require('preact/test-utils');
+import { mount } from 'enzyme';
+import { createElement } from 'preact';
+import { act } from 'preact/test-utils';
 
-const { waitFor } = require('./util');
+import AnnotationActionBar from '../annotation-action-bar';
+import { $imports } from '../annotation-action-bar';
 
-const AnnotationActionBar = require('../annotation-action-bar');
-const { $imports } = require('../annotation-action-bar');
-const mockImportedComponents = require('./mock-imported-components');
+import mockImportedComponents from './mock-imported-components';
+import { waitFor } from './util';
 
 describe('AnnotationActionBar', () => {
   let fakeAnnotation;

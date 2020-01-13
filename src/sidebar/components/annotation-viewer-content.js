@@ -71,7 +71,7 @@ function AnnotationViewerContentController(
   });
 }
 
-module.exports = {
+export default {
   controller: AnnotationViewerContentController,
   controllerAs: 'vm',
   bindings: {},

@@ -1,9 +1,9 @@
-const { createElement } = require('preact');
-const propTypes = require('prop-types');
-const { useMemo } = require('preact/hooks');
+import { createElement } from 'preact';
+import { useMemo } from 'preact/hooks';
+import propTypes from 'prop-types';
 
-const { isThirdPartyUser } = require('../util/account-id');
-const { withServices } = require('../util/service-context');
+import { isThirdPartyUser } from '../util/account-id';
+import { withServices } from '../util/service-context';
 
 /**
  * Component to render an annotation's tags.
@@ -70,4 +70,4 @@ TagList.propTypes = {
 
 TagList.injectedProps = ['serviceUrl', 'settings'];
 
-module.exports = withServices(TagList);
+export default withServices(TagList);

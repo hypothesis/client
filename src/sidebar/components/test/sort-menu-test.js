@@ -1,9 +1,10 @@
-const { createElement } = require('preact');
-const { mount } = require('enzyme');
+import { mount } from 'enzyme';
+import { createElement } from 'preact';
 
-const SortMenu = require('../sort-menu');
-const { $imports } = require('../sort-menu');
-const mockImportedComponents = require('./mock-imported-components');
+import SortMenu from '../sort-menu';
+import { $imports } from '../sort-menu';
+
+import mockImportedComponents from './mock-imported-components';
 
 describe('SortMenu', () => {
   let fakeState;

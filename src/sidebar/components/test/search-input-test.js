@@ -1,8 +1,8 @@
-const { createElement } = require('preact');
-const { mount } = require('enzyme');
+import { mount } from 'enzyme';
+import { createElement } from 'preact';
 
-const SearchInput = require('../search-input');
-const { $imports } = require('../search-input');
+import SearchInput from '../search-input';
+import { $imports } from '../search-input';
 
 describe('SearchInput', () => {
   let fakeStore;

@@ -1,16 +1,11 @@
-const {
-  isNew,
-  isReply,
-  isPageNote,
-  quote,
-} = require('../util/annotation-metadata');
-const events = require('../events');
-const { isThirdPartyUser } = require('../util/account-id');
+import events from '../events';
+import { isThirdPartyUser } from '../util/account-id';
+import { isNew, isReply, isPageNote, quote } from '../util/annotation-metadata';
 
 /**
  * Return a copy of `annotation` with changes made in the editor applied.
  */
-function updateModel(annotation, changes, permissions) {
+export function updateModel(annotation, changes, permissions) {
   const userid = annotation.user;
 
   return Object.assign({}, annotation, {
@@ -451,7 +446,7 @@ function AnnotationController(
   };
 }
 
-module.exports = {
+export default {
   controller: AnnotationController,
   controllerAs: 'vm',
   bindings: {
@@ -462,7 +457,4 @@ module.exports = {
     isCollapsed: '<',
   },
   template: require('../templates/annotation.html'),
-
-  // Private helper exposed for use in unit tests.
-  updateModel: updateModel,
 };

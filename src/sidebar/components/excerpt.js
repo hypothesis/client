@@ -1,16 +1,11 @@
-const classnames = require('classnames');
-const propTypes = require('prop-types');
-const { createElement } = require('preact');
-const {
-  useCallback,
-  useLayoutEffect,
-  useRef,
-  useState,
-} = require('preact/hooks');
+import classnames from 'classnames';
+import { createElement } from 'preact';
+import { useCallback, useLayoutEffect, useRef, useState } from 'preact/hooks';
+import propTypes from 'prop-types';
 
-const { applyTheme } = require('../util/theme');
-const { withServices } = require('../util/service-context');
-const observeElementSize = require('../util/observe-element-size');
+import observeElementSize from '../util/observe-element-size';
+import { withServices } from '../util/service-context';
+import { applyTheme } from '../util/theme';
 
 /**
  * An optional toggle link at the bottom of an excerpt which controls whether
@@ -185,4 +180,4 @@ Excerpt.propTypes = {
 
 Excerpt.injectedProps = ['settings'];
 
-module.exports = withServices(Excerpt);
+export default withServices(Excerpt);

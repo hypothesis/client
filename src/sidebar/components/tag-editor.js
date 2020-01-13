@@ -1,9 +1,10 @@
-const { createElement } = require('preact');
-const propTypes = require('prop-types');
-const { useMemo, useRef, useState } = require('preact/hooks');
+import { createElement } from 'preact';
+import { useMemo, useRef, useState } from 'preact/hooks';
+import propTypes from 'prop-types';
 
-const { withServices } = require('../util/service-context');
-const SvgIcon = require('./svg-icon');
+import { withServices } from '../util/service-context';
+
+import SvgIcon from './svg-icon';
 
 // Global counter used to create a unique id for each instance of a TagEditor
 let datalistIdCounter = 0;
@@ -244,4 +245,4 @@ TagEditor.propTypes = {
 
 TagEditor.injectedProps = ['serviceUrl', 'tags'];
 
-module.exports = withServices(TagEditor);
+export default withServices(TagEditor);

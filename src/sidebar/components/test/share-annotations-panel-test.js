@@ -1,9 +1,10 @@
-const { createElement } = require('preact');
-const { mount } = require('enzyme');
+import { mount } from 'enzyme';
+import { createElement } from 'preact';
 
-const ShareAnnotationsPanel = require('../share-annotations-panel');
-const { $imports } = require('../share-annotations-panel');
-const mockImportedComponents = require('./mock-imported-components');
+import ShareAnnotationsPanel from '../share-annotations-panel';
+import { $imports } from '../share-annotations-panel';
+
+import mockImportedComponents from './mock-imported-components';
 
 describe('ShareAnnotationsPanel', () => {
   let fakeStore;

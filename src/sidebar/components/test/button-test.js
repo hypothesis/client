@@ -1,9 +1,10 @@
-const { createElement } = require('preact');
-const { mount } = require('enzyme');
+import { mount } from 'enzyme';
+import { createElement } from 'preact';
 
-const Button = require('../button');
-const { $imports } = require('../button');
-const mockImportedComponents = require('./mock-imported-components');
+import Button from '../button';
+import { $imports } from '../button';
+
+import mockImportedComponents from './mock-imported-components';
 
 describe('Button', () => {
   let fakeOnClick;

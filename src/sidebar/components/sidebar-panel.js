@@ -1,12 +1,12 @@
-const propTypes = require('prop-types');
-const { createElement } = require('preact');
-const { useEffect, useRef } = require('preact/hooks');
-const scrollIntoView = require('scroll-into-view');
+import { createElement } from 'preact';
+import { useEffect, useRef } from 'preact/hooks';
+import propTypes from 'prop-types';
+import scrollIntoView from 'scroll-into-view';
 
-const useStore = require('../store/use-store');
+import useStore from '../store/use-store';
 
-const Button = require('./button');
-const Slider = require('./slider');
+import Button from './button';
+import Slider from './slider';
 
 /**
  * Base component for a sidebar panel.
@@ -15,7 +15,12 @@ const Slider = require('./slider');
  * as providing a close button. Only one sidebar panel (as defined by the panel's
  * `panelName`) is active at one time.
  */
-function SidebarPanel({ children, panelName, title, onActiveChanged }) {
+export default function SidebarPanel({
+  children,
+  panelName,
+  title,
+  onActiveChanged,
+}) {
   const panelIsActive = useStore(store => store.isSidebarPanelOpen(panelName));
   const togglePanelFn = useStore(store => store.toggleSidebarPanel);
 
@@ -75,5 +80,3 @@ SidebarPanel.propTypes = {
   /** Optional callback to invoke when this panel's active status changes */
   onActiveChanged: propTypes.func,
 };
-
-module.exports = SidebarPanel;

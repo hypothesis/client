@@ -1,6 +1,6 @@
-const angular = require('angular');
+import angular from 'angular';
 
-const annotationViewerContent = require('../annotation-viewer-content');
+import annotationViewerContent from '../annotation-viewer-content';
 
 // Fake implementation of the API for fetching annotations and replies to
 // annotations.

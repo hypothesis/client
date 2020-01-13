@@ -1,12 +1,12 @@
-const { createElement } = require('preact');
-const propTypes = require('prop-types');
+import { createElement } from 'preact';
+import propTypes from 'prop-types';
 
-const events = require('../events');
-const useStore = require('../store/use-store');
-const { applyTheme } = require('../util/theme');
-const { withServices } = require('../util/service-context');
+import events from '../events';
+import useStore from '../store/use-store';
+import { withServices } from '../util/service-context';
+import { applyTheme } from '../util/theme';
 
-const Button = require('./button');
+import Button from './button';
 
 function NewNoteButton({ $rootScope, settings }) {
   const store = useStore(store => ({
@@ -43,4 +43,4 @@ NewNoteButton.propTypes = {
 
 NewNoteButton.injectedProps = ['$rootScope', 'settings'];
 
-module.exports = withServices(NewNoteButton);
+export default withServices(NewNoteButton);

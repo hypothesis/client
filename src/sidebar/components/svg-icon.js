@@ -1,7 +1,7 @@
-const classnames = require('classnames');
-const { createElement } = require('preact');
-const { useLayoutEffect, useRef } = require('preact/hooks');
-const propTypes = require('prop-types');
+import classnames from 'classnames';
+import { createElement } from 'preact';
+import { useLayoutEffect, useRef } from 'preact/hooks';
+import propTypes from 'prop-types';
 
 // The list of supported icons
 const icons = {
@@ -56,7 +56,12 @@ const icons = {
  * This matches the way we do icons on the website, see
  * https://github.com/hypothesis/h/pull/3675
  */
-function SvgIcon({ name, className = '', inline = false, title = '' }) {
+export default function SvgIcon({
+  name,
+  className = '',
+  inline = false,
+  title = '',
+}) {
   if (!icons[name]) {
     throw new Error(`Unknown icon ${name}`);
   }
@@ -101,5 +106,3 @@ SvgIcon.propTypes = {
   /** Optional title attribute to apply to the SVG's containing `span` */
   title: propTypes.string,
 };
-
-module.exports = SvgIcon;

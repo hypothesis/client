@@ -1,16 +1,16 @@
-const { createElement } = require('preact');
-const { useCallback, useMemo, useState } = require('preact/hooks');
-const propTypes = require('prop-types');
+import { createElement } from 'preact';
+import { useCallback, useMemo, useState } from 'preact/hooks';
+import propTypes from 'prop-types';
 
-const uiConstants = require('../ui-constants');
-const useStore = require('../store/use-store');
-const VersionData = require('../util/version-data');
-const { withServices } = require('../util/service-context');
+import useStore from '../store/use-store';
+import uiConstants from '../ui-constants';
+import { withServices } from '../util/service-context';
+import VersionData from '../util/version-data';
 
-const SidebarPanel = require('./sidebar-panel');
-const SvgIcon = require('./svg-icon');
-const Tutorial = require('./tutorial');
-const VersionInfo = require('./version-info');
+import SidebarPanel from './sidebar-panel';
+import SvgIcon from './svg-icon';
+import Tutorial from './tutorial';
+import VersionInfo from './version-info';
 
 /**
  * External link "tabs" inside of the help panel.
@@ -156,4 +156,4 @@ HelpPanel.propTypes = {
 };
 
 HelpPanel.injectedProps = ['session'];
-module.exports = withServices(HelpPanel);
+export default withServices(HelpPanel);

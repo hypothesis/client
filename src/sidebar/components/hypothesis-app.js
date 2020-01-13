@@ -1,10 +1,10 @@
-const events = require('../events');
-const { parseAccountID } = require('../util/account-id');
-const serviceConfig = require('../service-config');
-const bridgeEvents = require('../../shared/bridge-events');
-const uiConstants = require('../ui-constants');
-const isSidebar = require('../util/is-sidebar');
-const { shouldAutoDisplayTutorial } = require('../util/session');
+import bridgeEvents from '../../shared/bridge-events';
+import events from '../events';
+import serviceConfig from '../service-config';
+import uiConstants from '../ui-constants';
+import { parseAccountID } from '../util/account-id';
+import isSidebar from '../util/is-sidebar';
+import { shouldAutoDisplayTutorial } from '../util/session';
 
 /**
  * Return the user's authentication status from their profile.
@@ -163,7 +163,7 @@ function HypothesisAppController(
   };
 }
 
-module.exports = {
+export default {
   controller: HypothesisAppController,
   controllerAs: 'vm',
   template: require('../templates/hypothesis-app.html'),

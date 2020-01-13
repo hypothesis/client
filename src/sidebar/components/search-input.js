@@ -1,12 +1,12 @@
-const classnames = require('classnames');
-const { createElement } = require('preact');
-const { useRef, useState } = require('preact/hooks');
-const propTypes = require('prop-types');
+import classnames from 'classnames';
+import { createElement } from 'preact';
+import { useRef, useState } from 'preact/hooks';
+import propTypes from 'prop-types';
 
-const useStore = require('../store/use-store');
+import useStore from '../store/use-store';
 
-const Button = require('./button');
-const Spinner = require('./spinner');
+import Button from './button';
+import Spinner from './spinner';
 
 /**
  * An input field in the top bar for entering a query that filters annotations
@@ -17,7 +17,7 @@ const Spinner = require('./spinner');
  * is fetching for data from the API or in a "loading" state for any other
  * reason.
  */
-function SearchInput({ alwaysExpanded, query, onSearch }) {
+export default function SearchInput({ alwaysExpanded, query, onSearch }) {
   const isLoading = useStore(store => store.isLoading());
   const input = useRef();
 
@@ -89,5 +89,3 @@ SearchInput.propTypes = {
    */
   onSearch: propTypes.func,
 };
-
-module.exports = SearchInput;

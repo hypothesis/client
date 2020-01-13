@@ -1,13 +1,13 @@
-const { createElement } = require('preact');
+import { createElement } from 'preact';
 
-const useStore = require('../store/use-store');
+import useStore from '../store/use-store';
 
 /**
  * Render a control to interact with any focused "mode" in the sidebar.
  * Currently only a user-focus mode is supported but this could be broadened
  * and abstracted if needed. Allow user to toggle in and out of the focus "mode."
  */
-function FocusedModeHeader() {
+export default function FocusedModeHeader() {
   const actions = useStore(store => ({
     setFocusModeFocused: store.setFocusModeFocused,
   }));
@@ -59,5 +59,3 @@ function FocusedModeHeader() {
 }
 
 FocusedModeHeader.propTypes = {};
-
-module.exports = FocusedModeHeader;

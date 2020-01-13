@@ -1,16 +1,16 @@
-const classnames = require('classnames');
-const { createElement } = require('preact');
-const { useEffect, useMemo, useRef } = require('preact/hooks');
-const propTypes = require('prop-types');
+import classnames from 'classnames';
+import { createElement } from 'preact';
+import { useEffect, useMemo, useRef } from 'preact/hooks';
+import propTypes from 'prop-types';
 
-const { replaceLinksWithEmbeds } = require('../media-embedder');
-const renderMarkdown = require('../render-markdown');
+import { replaceLinksWithEmbeds } from '../media-embedder';
+import renderMarkdown from '../render-markdown';
 
 /**
  * A component which renders markdown as HTML and replaces recognized links
  * with embedded video/audio.
  */
-function MarkdownView({ markdown = '', textClass = {} }) {
+export default function MarkdownView({ markdown = '', textClass = {} }) {
   const html = useMemo(() => (markdown ? renderMarkdown(markdown) : ''), [
     markdown,
   ]);
@@ -39,5 +39,3 @@ MarkdownView.propTypes = {
    */
   textClass: propTypes.object,
 };
-
-module.exports = MarkdownView;

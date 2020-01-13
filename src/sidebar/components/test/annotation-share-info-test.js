@@ -1,11 +1,11 @@
-const { createElement } = require('preact');
-const { mount } = require('enzyme');
+import { mount } from 'enzyme';
+import { createElement } from 'preact';
 
-const fixtures = require('../../test/annotation-fixtures');
+import * as fixtures from '../../test/annotation-fixtures';
+import AnnotationShareInfo from '../annotation-share-info';
+import { $imports } from '../annotation-share-info';
 
-const AnnotationShareInfo = require('../annotation-share-info');
-const { $imports } = require('../annotation-share-info');
-const mockImportedComponents = require('./mock-imported-components');
+import mockImportedComponents from './mock-imported-components';
 
 describe('AnnotationShareInfo', () => {
   let fakeGroup;

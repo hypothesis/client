@@ -1,9 +1,10 @@
-const { createElement } = require('preact');
-const { mount } = require('enzyme');
+import { mount } from 'enzyme';
+import { createElement } from 'preact';
 
-const AnnotationPublishControl = require('../annotation-publish-control');
-const { $imports } = require('../annotation-publish-control');
-const mockImportedComponents = require('./mock-imported-components');
+import AnnotationPublishControl from '../annotation-publish-control';
+import { $imports } from '../annotation-publish-control';
+
+import mockImportedComponents from './mock-imported-components';
 
 describe('AnnotationPublishControl', () => {
   let fakeGroup;

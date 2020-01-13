@@ -1,9 +1,10 @@
-const { createElement } = require('preact');
-const { mount } = require('enzyme');
+import { mount } from 'enzyme';
+import { createElement } from 'preact';
 
-const SidebarPanel = require('../sidebar-panel');
-const { $imports } = require('../sidebar-panel');
-const mockImportedComponents = require('./mock-imported-components');
+import SidebarPanel from '../sidebar-panel';
+import { $imports } from '../sidebar-panel';
+
+import mockImportedComponents from './mock-imported-components';
 
 describe('SidebarPanel', () => {
   let fakeStore;

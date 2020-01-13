@@ -1,8 +1,8 @@
-const propTypes = require('prop-types');
-const { createElement } = require('preact');
+import { createElement } from 'preact';
+import propTypes from 'prop-types';
 
-const { isThirdPartyUser, username } = require('../util/account-id');
-const { withServices } = require('../util/service-context');
+import { isThirdPartyUser, username } from '../util/account-id';
+import { withServices } from '../util/service-context';
 
 /**
  * Display information about an annotation's user. Link to the user's
@@ -63,4 +63,4 @@ AnnotationUser.propTypes = {
 };
 
 AnnotationUser.injectedProps = ['features', 'serviceUrl', 'settings'];
-module.exports = withServices(AnnotationUser);
+export default withServices(AnnotationUser);

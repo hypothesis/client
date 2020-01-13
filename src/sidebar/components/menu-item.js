@@ -1,11 +1,11 @@
-const classnames = require('classnames');
-const { createElement } = require('preact');
-const propTypes = require('prop-types');
+import classnames from 'classnames';
+import { createElement } from 'preact';
+import propTypes from 'prop-types';
 
-const { onActivate } = require('../util/on-activate');
+import { onActivate } from '../util/on-activate';
 
-const Slider = require('./slider');
-const SvgIcon = require('./svg-icon');
+import Slider from './slider';
+import SvgIcon from './svg-icon';
 
 /**
  * An item in a dropdown menu.
@@ -22,7 +22,7 @@ const SvgIcon = require('./svg-icon');
  * For items that have submenus, the `MenuItem` will call the `renderSubmenu`
  * prop to render the content of the submenu, when the submenu is visible.
  */
-function MenuItem({
+export default function MenuItem({
   href,
   icon,
   iconAlt,
@@ -189,5 +189,3 @@ MenuItem.propTypes = {
    */
   submenu: propTypes.any,
 };
-
-module.exports = MenuItem;

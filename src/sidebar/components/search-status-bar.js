@@ -1,12 +1,12 @@
-const { createElement } = require('preact');
-const propTypes = require('prop-types');
-const { useMemo } = require('preact/hooks');
+import { createElement } from 'preact';
+import { useMemo } from 'preact/hooks';
+import propTypes from 'prop-types';
 
-const { withServices } = require('../util/service-context');
-const uiConstants = require('../ui-constants');
-const useStore = require('../store/use-store');
+import useStore from '../store/use-store';
+import uiConstants from '../ui-constants';
+import { withServices } from '../util/service-context';
 
-const Button = require('./button');
+import Button from './button';
 
 /**
  * Of the annotations in the thread `annThread`, how many
@@ -187,4 +187,4 @@ SearchStatusBar.propTypes = {
 
 SearchStatusBar.injectedProps = ['rootThread'];
 
-module.exports = withServices(SearchStatusBar);
+export default withServices(SearchStatusBar);

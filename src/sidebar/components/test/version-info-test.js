@@ -1,8 +1,8 @@
-const { mount } = require('enzyme');
-const { createElement } = require('preact');
+import { mount } from 'enzyme';
+import { createElement } from 'preact';
 
-const VersionInfo = require('../version-info');
-const { $imports } = require('../version-info');
+import VersionInfo from '../version-info';
+import { $imports } from '../version-info';
 
 describe('VersionInfo', function() {
   let fakeVersionData;

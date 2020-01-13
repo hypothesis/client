@@ -1,17 +1,17 @@
-const { createElement } = require('preact');
-const { useMemo, useState } = require('preact/hooks');
-const propTypes = require('prop-types');
+import { createElement } from 'preact';
+import { useMemo, useState } from 'preact/hooks';
+import propTypes from 'prop-types';
 
-const isThirdPartyService = require('../util/is-third-party-service');
-const { isThirdPartyUser } = require('../util/account-id');
-const groupsByOrganization = require('../util/group-organizations');
-const useStore = require('../store/use-store');
-const { withServices } = require('../util/service-context');
-const serviceConfig = require('../service-config');
+import serviceConfig from '../service-config';
+import useStore from '../store/use-store';
+import { isThirdPartyUser } from '../util/account-id';
+import groupsByOrganization from '../util/group-organizations';
+import isThirdPartyService from '../util/is-third-party-service';
+import { withServices } from '../util/service-context';
 
-const Menu = require('./menu');
-const MenuItem = require('./menu-item');
-const GroupListSection = require('./group-list-section');
+import GroupListSection from './group-list-section';
+import Menu from './menu';
+import MenuItem from './menu-item';
 
 /**
  * Return the custom icon for the top bar configured by the publisher in
@@ -136,4 +136,4 @@ GroupList.propTypes = {
 
 GroupList.injectedProps = ['serviceUrl', 'settings'];
 
-module.exports = withServices(GroupList);
+export default withServices(GroupList);

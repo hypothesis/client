@@ -1,10 +1,11 @@
-const { mount } = require('enzyme');
-const { createElement } = require('preact');
+import { mount } from 'enzyme';
+import { createElement } from 'preact';
 
-const ModerationBanner = require('../moderation-banner');
-const { $imports } = require('../moderation-banner');
-const fixtures = require('../../test/annotation-fixtures');
-const mockImportedComponents = require('./mock-imported-components');
+import * as fixtures from '../../test/annotation-fixtures';
+import ModerationBanner from '../moderation-banner';
+import { $imports } from '../moderation-banner';
+
+import mockImportedComponents from './mock-imported-components';
 
 const moderatedAnnotation = fixtures.moderatedAnnotation;
 

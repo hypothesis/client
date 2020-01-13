@@ -1,5 +1,5 @@
-const { Fragment, createElement, toChildArray } = require('preact');
-const propTypes = require('prop-types');
+import { Fragment, createElement, toChildArray } from 'preact';
+import propTypes from 'prop-types';
 
 /**
  * Group a set of menu items together visually, with an optional header.
@@ -16,7 +16,7 @@ const propTypes = require('prop-types');
  *     </MenuSection>
  *   </Menu>
  */
-function MenuSection({ heading, children }) {
+export default function MenuSection({ heading, children }) {
   return (
     <Fragment>
       {heading && <h2 className="menu-section__heading">{heading}</h2>}
@@ -43,5 +43,3 @@ MenuSection.propTypes = {
     propTypes.arrayOf(propTypes.object),
   ]).isRequired,
 };
-
-module.exports = MenuSection;
