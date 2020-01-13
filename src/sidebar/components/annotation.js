@@ -5,7 +5,7 @@ import { isNew, isReply, isPageNote, quote } from '../util/annotation-metadata';
 /**
  * Return a copy of `annotation` with changes made in the editor applied.
  */
-function updateModel(annotation, changes, permissions) {
+export function updateModel(annotation, changes, permissions) {
   const userid = annotation.user;
 
   return Object.assign({}, annotation, {
@@ -457,7 +457,4 @@ export default {
     isCollapsed: '<',
   },
   template: require('../templates/annotation.html'),
-
-  // Private helper exposed for use in unit tests.
-  updateModel: updateModel,
 };
