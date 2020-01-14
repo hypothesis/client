@@ -1,5 +1,5 @@
-const viewer = require('../viewer');
-const createStore = require('../../create-store');
+import createStore from '../../create-store';
+import viewer from '../viewer';
 
 describe('store/modules/viewer', function() {
   let store;

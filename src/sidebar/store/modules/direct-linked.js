@@ -1,4 +1,4 @@
-const util = require('../util');
+import * as util from '../util';
 
 function init(settings) {
   return {
@@ -125,7 +125,7 @@ function clearDirectLinkedIds() {
   };
 }
 
-module.exports = {
+export default {
   init,
   namespace: 'directLinked',
   update,

@@ -1,10 +1,10 @@
-const immutable = require('seamless-immutable');
+import immutable from 'seamless-immutable';
 
-const drafts = require('../drafts');
-const annotations = require('../annotations');
-const selection = require('../selection');
-const { Draft } = require('../drafts');
-const createStore = require('../../create-store');
+import createStore from '../../create-store';
+import annotations from '../annotations';
+import drafts from '../drafts';
+import { Draft } from '../drafts';
+import selection from '../selection';
 
 const fixtures = immutable({
   draftWithText: {

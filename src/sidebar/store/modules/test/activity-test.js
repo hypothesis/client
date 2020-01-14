@@ -1,5 +1,5 @@
-const createStore = require('../../create-store');
-const activity = require('../activity');
+import createStore from '../../create-store';
+import activity from '../activity';
 
 describe('sidebar/store/modules/activity', () => {
   let store;

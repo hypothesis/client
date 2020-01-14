@@ -22,7 +22,7 @@ function updateLinksAction(newLinks) {
   return { type: 'UPDATE_LINKS', newLinks: newLinks };
 }
 
-module.exports = {
+export default {
   init: init,
   namespace: 'links',
   update: { UPDATE_LINKS: updateLinks },

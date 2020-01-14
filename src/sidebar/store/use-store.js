@@ -1,10 +1,10 @@
 /* global process */
 
-const shallowEqual = require('shallowequal');
-const { useEffect, useRef, useReducer } = require('preact/hooks');
+import { useEffect, useRef, useReducer } from 'preact/hooks';
+import shallowEqual from 'shallowequal';
 
-const { useService } = require('../util/service-context');
-const warnOnce = require('../../shared/warn-once');
+import warnOnce from '../../shared/warn-once';
+import { useService } from '../util/service-context';
 
 /**
  * Hook for accessing state or actions from the store inside a component.
@@ -35,7 +35,7 @@ const warnOnce = require('../../shared/warn-once');
  *   and/or actions extracted from the store.
  * @return {T} - The result of `callback(store)`
  */
-function useStore(callback) {
+export default function useStore(callback) {
   const store = useService('store');
 
   // Store the last-used callback in a ref so we can access it in the effect
@@ -84,5 +84,3 @@ function useStore(callback) {
 
   return lastResult.current;
 }
-
-module.exports = useStore;

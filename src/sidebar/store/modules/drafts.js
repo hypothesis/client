@@ -1,5 +1,5 @@
-const metadata = require('../../util/annotation-metadata');
-const util = require('../util');
+import * as metadata from '../../util/annotation-metadata';
+import * as util from '../util';
 
 /**
  * The drafts store provides temporary storage for unsaved edits to new or
@@ -23,7 +23,7 @@ function init() {
  *    which are the user's draft changes to the annotation. These are returned
  *    from the drafts store selector by `drafts.getDraft()`.
  */
-class Draft {
+export class Draft {
   constructor(annotation, changes) {
     this.annotation = { id: annotation.id, $tag: annotation.$tag };
     this.isPrivate = changes.isPrivate;
@@ -94,7 +94,8 @@ function createDraft(annotation, changes) {
  */
 
 function deleteNewAndEmptyDrafts() {
-  const annotations = require('./annotations');
+  const { default: annotations } = require('./annotations');
+
   return (dispatch, getState) => {
     const newDrafts = getState().drafts.filter(draft => {
       return (
@@ -183,7 +184,7 @@ function unsavedAnnotations(state) {
     .map(draft => draft.annotation);
 }
 
-module.exports = {
+export default {
   init,
   namespace: 'drafts',
   update,
@@ -200,5 +201,4 @@ module.exports = {
     getDraftIfNotEmpty,
     unsavedAnnotations,
   },
-  Draft,
 };

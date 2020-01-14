@@ -29,21 +29,20 @@
  *  3. Checking that the UI correctly presents a given state.
  */
 
-const createStore = require('./create-store');
-const debugMiddleware = require('./debug-middleware');
-
-const activity = require('./modules/activity');
-const annotations = require('./modules/annotations');
-const directLinked = require('./modules/direct-linked');
-const drafts = require('./modules/drafts');
-const frames = require('./modules/frames');
-const links = require('./modules/links');
-const groups = require('./modules/groups');
-const realTimeUpdates = require('./modules/real-time-updates');
-const selection = require('./modules/selection');
-const session = require('./modules/session');
-const sidebarPanels = require('./modules/sidebar-panels');
-const viewer = require('./modules/viewer');
+import createStore from './create-store';
+import debugMiddleware from './debug-middleware';
+import activity from './modules/activity';
+import annotations from './modules/annotations';
+import directLinked from './modules/direct-linked';
+import drafts from './modules/drafts';
+import frames from './modules/frames';
+import groups from './modules/groups';
+import links from './modules/links';
+import realTimeUpdates from './modules/real-time-updates';
+import selection from './modules/selection';
+import session from './modules/session';
+import sidebarPanels from './modules/sidebar-panels';
+import viewer from './modules/viewer';
 
 /**
  * Redux middleware which triggers an Angular change-detection cycle
@@ -79,7 +78,7 @@ function angularDigestMiddleware($rootScope) {
  * passing the current state of the store.
  */
 // @ngInject
-function store($rootScope, settings) {
+export default function store($rootScope, settings) {
   const middleware = [
     debugMiddleware,
     angularDigestMiddleware.bind(null, $rootScope),
@@ -101,5 +100,3 @@ function store($rootScope, settings) {
   ];
   return createStore(modules, [settings], middleware);
 }
-
-module.exports = store;
