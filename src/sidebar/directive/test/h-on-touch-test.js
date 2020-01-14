@@ -1,7 +1,8 @@
-const angular = require('angular');
+import angular from 'angular';
 
-const hOnTouch = require('../h-on-touch');
-const util = require('./util');
+import hOnTouch from '../h-on-touch';
+
+import * as util from './util';
 
 function testComponent() {
   return {

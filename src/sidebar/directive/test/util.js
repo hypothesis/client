@@ -16,7 +16,7 @@ function hyphenate(name) {
  * Given the 'inject' function from the 'angular-mocks' module,
  * retrieves an instance of the specified Angular module.
  */
-function ngModule(inject, name) {
+export function ngModule(inject, name) {
   let module;
   const helper = function(_module) {
     module = _module;
@@ -87,7 +87,7 @@ function ngModule(inject, name) {
  *                      The returned object has a link(scope) method which will
  *                      re-link the component with new properties.
  */
-function createDirective(
+export function createDirective(
   document,
   name,
   attrs,
@@ -172,7 +172,7 @@ function createDirective(
 }
 
 /** Helper to dispatch a native event to a DOM element. */
-function sendEvent(element, eventType) {
+export function sendEvent(element, eventType) {
   const event = new Event(eventType, { bubbles: true, cancelable: true });
   element.dispatchEvent(event);
 }
@@ -183,7 +183,7 @@ function sendEvent(element, eventType) {
  * There are many possible ways of hiding DOM elements on a page, this just
  * looks for approaches that are common in our app.
  */
-function isHidden(element) {
+export function isHidden(element) {
   const style = window.getComputedStyle(element);
 
   if (style.display === 'none') {
@@ -201,10 +201,3 @@ function isHidden(element) {
 
   return false;
 }
-
-module.exports = {
-  createDirective: createDirective,
-  isHidden: isHidden,
-  ngModule: ngModule,
-  sendEvent: sendEvent,
-};

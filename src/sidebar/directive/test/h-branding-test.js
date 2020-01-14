@@ -1,7 +1,8 @@
-const angular = require('angular');
+import angular from 'angular';
 
-const hBranding = require('../h-branding');
-const fixtures = require('./h-branding-fixtures');
+import hBranding from '../h-branding';
+
+import fixtures from './h-branding-fixtures';
 
 describe('BrandingDirective', function() {
   let $compile;
