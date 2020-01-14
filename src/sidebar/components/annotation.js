@@ -92,24 +92,12 @@ function AnnotationController(
      */
     newlyCreatedByHighlightButton = self.annotation.$highlight || false;
 
-    // New annotations (just created locally by the client, rather then
-    // received from the server) have some fields missing. Add them.
-    //
-    // FIXME: This logic should go in the `addAnnotations` Redux action once all
-    // required state is in the store.
-    self.annotation.user = self.annotation.user || session.state.userid;
-    self.annotation.user_info =
-      self.annotation.user_info || session.state.user_info;
-    self.annotation.group = self.annotation.group || groups.focused().id;
+    // FIXME: This logic needs to move into the `annotations` store module
     if (!self.annotation.permissions) {
       self.annotation.permissions = permissions.default(
         self.annotation.user,
         self.annotation.group
       );
-    }
-    self.annotation.text = self.annotation.text || '';
-    if (!Array.isArray(self.annotation.tags)) {
-      self.annotation.tags = [];
     }
 
     // Automatically save new highlights to the server when they're created.

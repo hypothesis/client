@@ -1,25 +1,194 @@
 const annotations = require('../annotations');
-const createStoreFromModules = require('../../create-store');
+const createStore = require('../../create-store');
 const drafts = require('../drafts');
 const fixtures = require('../../../test/annotation-fixtures');
+
+const metadata = require('../../../util/annotation-metadata');
+
+const groups = require('../groups');
 const selection = require('../selection');
+const session = require('../session');
 const viewer = require('../viewer');
 const uiConstants = require('../../../ui-constants');
 
 const { actions, selectors } = annotations;
 
-/**
- * Create a Redux store which handles annotation, selection and draft actions.
- */
-function createStore() {
-  return createStoreFromModules([annotations, selection, drafts, viewer], [{}]);
+function createTestStore() {
+  return createStore(
+    [annotations, selection, drafts, groups, session, viewer],
+    [{}]
+  );
 }
 
 // Tests for most of the functionality in reducers/annotations.js are currently
 // in the tests for the whole Redux store
 
 describe('sidebar/store/modules/annotations', function() {
-  describe('isWaitingToAnchorAnnotations', () => {
+  describe('#addAnnotations()', function() {
+    const ANCHOR_TIME_LIMIT = 1000;
+    let clock;
+    let store;
+
+    function tagForID(id) {
+      const storeAnn = store.findAnnotationByID(id);
+      if (!storeAnn) {
+        throw new Error(`No annotation with ID ${id}`);
+      }
+      return storeAnn.$tag;
+    }
+
+    beforeEach(function() {
+      clock = sinon.useFakeTimers();
+      store = createTestStore();
+    });
+
+    afterEach(function() {
+      clock.restore();
+    });
+
+    it('adds annotations not in the store', function() {
+      const annot = fixtures.defaultAnnotation();
+      store.addAnnotations([annot]);
+      assert.match(store.getState().annotations.annotations, [
+        sinon.match(annot),
+      ]);
+    });
+
+    it('does not change `selectedTab` state if annotations are already loaded', function() {
+      const annot = fixtures.defaultAnnotation();
+      store.addAnnotations([annot]);
+      const page = fixtures.oldPageNote();
+      store.addAnnotations([page]);
+      assert.equal(
+        store.getState().selection.selectedTab,
+        uiConstants.TAB_ANNOTATIONS
+      );
+    });
+
+    it('sets `selectedTab` to "note" if only page notes are present', function() {
+      const page = fixtures.oldPageNote();
+      store.addAnnotations([page]);
+      assert.equal(
+        store.getState().selection.selectedTab,
+        uiConstants.TAB_NOTES
+      );
+    });
+
+    it('leaves `selectedTab` as "annotation" if annotations and/or page notes are present', function() {
+      const page = fixtures.oldPageNote();
+      const annot = fixtures.defaultAnnotation();
+      store.addAnnotations([annot, page]);
+      assert.equal(
+        store.getState().selection.selectedTab,
+        uiConstants.TAB_ANNOTATIONS
+      );
+    });
+
+    it('assigns a local tag to annotations', function() {
+      const annotA = Object.assign(fixtures.defaultAnnotation(), { id: 'a1' });
+      const annotB = Object.assign(fixtures.defaultAnnotation(), { id: 'a2' });
+
+      store.addAnnotations([annotA, annotB]);
+
+      const tags = store.getState().annotations.annotations.map(function(a) {
+        return a.$tag;
+      });
+
+      assert.deepEqual(tags, ['t1', 't2']);
+    });
+
+    it('updates annotations with matching IDs in the store', function() {
+      const annot = fixtures.defaultAnnotation();
+      store.addAnnotations([annot]);
+      const update = Object.assign({}, fixtures.defaultAnnotation(), {
+        text: 'update',
+      });
+      store.addAnnotations([update]);
+
+      const updatedAnnot = store.getState().annotations.annotations[0];
+      assert.equal(updatedAnnot.text, 'update');
+    });
+
+    it('updates annotations with matching tags in the store', function() {
+      const annot = fixtures.newAnnotation();
+      annot.$tag = 'local-tag';
+      store.addAnnotations([annot]);
+
+      const saved = Object.assign({}, annot, { id: 'server-id' });
+      store.addAnnotations([saved]);
+
+      const annots = store.getState().annotations.annotations;
+      assert.equal(annots.length, 1);
+      assert.equal(annots[0].id, 'server-id');
+    });
+
+    it('preserves anchoring status of updated annotations', function() {
+      const annot = fixtures.defaultAnnotation();
+      store.addAnnotations([annot]);
+      store.updateAnchorStatus({ [tagForID(annot.id)]: 'anchored' });
+
+      const update = Object.assign({}, fixtures.defaultAnnotation(), {
+        text: 'update',
+      });
+      store.addAnnotations([update]);
+
+      const updatedAnnot = store.getState().annotations.annotations[0];
+      assert.isFalse(updatedAnnot.$orphan);
+    });
+
+    it('sets the timeout flag on annotations that fail to anchor within a time limit', function() {
+      const annot = fixtures.defaultAnnotation();
+      store.addAnnotations([annot]);
+
+      clock.tick(ANCHOR_TIME_LIMIT);
+
+      assert.isTrue(store.getState().annotations.annotations[0].$anchorTimeout);
+    });
+
+    it('does not set the timeout flag on annotations that do anchor within a time limit', function() {
+      const annot = fixtures.defaultAnnotation();
+      store.addAnnotations([annot]);
+      store.updateAnchorStatus({ [tagForID(annot.id)]: 'anchored' });
+
+      clock.tick(ANCHOR_TIME_LIMIT);
+
+      assert.isFalse(
+        store.getState().annotations.annotations[0].$anchorTimeout
+      );
+    });
+
+    it('does not attempt to modify orphan status if annotations are removed before anchoring timeout expires', function() {
+      const annot = fixtures.defaultAnnotation();
+      store.addAnnotations([annot]);
+      store.updateAnchorStatus({ [tagForID(annot.id)]: 'anchored' });
+      store.removeAnnotations([annot]);
+
+      assert.doesNotThrow(function() {
+        clock.tick(ANCHOR_TIME_LIMIT);
+      });
+    });
+
+    it('does not expect annotations to anchor on the stream', function() {
+      const isOrphan = function() {
+        return !!metadata.isOrphan(store.getState().annotations.annotations[0]);
+      };
+
+      const annot = fixtures.defaultAnnotation();
+      store.setAppIsSidebar(false);
+      store.addAnnotations([annot]);
+
+      clock.tick(ANCHOR_TIME_LIMIT);
+
+      assert.isFalse(isOrphan());
+    });
+
+    it('initializes the $orphan field for new annotations', function() {
+      store.addAnnotations([fixtures.newAnnotation()]);
+      assert.isFalse(store.getState().annotations.annotations[0].$orphan);
+    });
+  });
+
+  describe('#isWaitingToAnchorAnnotations', () => {
     it('returns true if there are unanchored annotations', () => {
       const unanchored = Object.assign(fixtures.oldAnnotation(), {
         $orphan: 'undefined',
@@ -130,7 +299,7 @@ describe('sidebar/store/modules/annotations', function() {
 
   describe('#hideAnnotation', function() {
     it('sets the `hidden` state to `true`', function() {
-      const store = createStore();
+      const store = createTestStore();
       const ann = fixtures.moderatedAnnotation({ hidden: false });
 
       store.dispatch(actions.addAnnotations([ann]));
@@ -143,7 +312,7 @@ describe('sidebar/store/modules/annotations', function() {
 
   describe('#unhideAnnotation', function() {
     it('sets the `hidden` state to `false`', function() {
-      const store = createStore();
+      const store = createTestStore();
       const ann = fixtures.moderatedAnnotation({ hidden: true });
 
       store.dispatch(actions.addAnnotations([ann]));
@@ -156,7 +325,7 @@ describe('sidebar/store/modules/annotations', function() {
 
   describe('#removeAnnotations', function() {
     it('removes the annotation', function() {
-      const store = createStore();
+      const store = createTestStore();
       const ann = fixtures.defaultAnnotation();
       store.dispatch(actions.addAnnotations([ann]));
       store.dispatch(actions.removeAnnotations([ann]));
@@ -210,7 +379,7 @@ describe('sidebar/store/modules/annotations', function() {
       },
     ].forEach(testCase => {
       it(`updates the flagged status of an annotation when a ${testCase.description}`, () => {
-        const store = createStore();
+        const store = createTestStore();
         const ann = fixtures.defaultAnnotation();
         ann.flagged = testCase.wasFlagged;
         ann.moderation = testCase.oldModeration;
@@ -226,8 +395,22 @@ describe('sidebar/store/modules/annotations', function() {
   });
 
   describe('#createAnnotation', function() {
+    let clock;
+    let now;
+    let store;
+
+    beforeEach(() => {
+      // Stop the clock to keep the current date from advancing
+      clock = sinon.useFakeTimers();
+      now = new Date();
+      store = createTestStore();
+    });
+
+    afterEach(() => {
+      clock.restore();
+    });
+
     it('should create an annotation', function() {
-      const store = createStore();
       const ann = fixtures.oldAnnotation();
       store.dispatch(actions.createAnnotation(ann));
       assert.equal(
@@ -236,8 +419,91 @@ describe('sidebar/store/modules/annotations', function() {
       );
     });
 
+    it('should set basic default properties on a new/empty annotation', () => {
+      store.dispatch(actions.createAnnotation({ id: 'myID' }, now));
+
+      const createdAnnotation = selectors.findAnnotationByID(
+        store.getState(),
+        'myID'
+      );
+
+      assert.include(createdAnnotation, {
+        created: now.toISOString(),
+        updated: now.toISOString(),
+        text: '',
+      });
+      assert.isArray(createdAnnotation.tags);
+    });
+
+    it('should set user properties on a new/empty annotation', () => {
+      store.dispatch(actions.createAnnotation({ id: 'myID' }, now));
+
+      const createdAnnotation = selectors.findAnnotationByID(
+        store.getState(),
+        'myID'
+      );
+
+      assert.equal(createdAnnotation.user, store.getState().session.userid);
+      assert.equal(
+        createdAnnotation.user_info,
+        store.getState().session.user_info
+      );
+    });
+
+    it('should set group to currently-focused group if not set on annotation', () => {
+      store.dispatch(actions.createAnnotation({ id: 'myID' }, now));
+
+      const createdAnnotation = selectors.findAnnotationByID(
+        store.getState(),
+        'myID'
+      );
+
+      assert.equal(
+        createdAnnotation.group,
+        store.getState().groups.focusedGroupId
+      );
+    });
+
+    it('should set not overwrite properties if present', () => {
+      store.dispatch(
+        actions.createAnnotation(
+          {
+            id: 'myID',
+            created: 'when',
+            updated: 'then',
+            text: 'my annotation',
+            tags: ['foo', 'bar'],
+            group: 'fzzy',
+            user: 'acct:foo@bar.com',
+            user_info: {
+              display_name: 'Herbivore Fandango',
+            },
+          },
+          now
+        )
+      );
+
+      const createdAnnotation = selectors.findAnnotationByID(
+        store.getState(),
+        'myID'
+      );
+
+      assert.include(createdAnnotation, {
+        created: 'when',
+        updated: 'then',
+        text: 'my annotation',
+        group: 'fzzy',
+        user: 'acct:foo@bar.com',
+      });
+
+      assert.include(createdAnnotation.tags, 'foo', 'bar');
+      assert.equal(
+        createdAnnotation.user_info.display_name,
+        'Herbivore Fandango'
+      );
+    });
+
     it('should change tab focus to TAB_ANNOTATIONS when a new annotation is created', function() {
-      const store = createStore();
       store.dispatch(actions.createAnnotation(fixtures.oldAnnotation()));
       assert.equal(
         store.getState().selection.selectedTab,
@@ -246,7 +512,6 @@ describe('sidebar/store/modules/annotations', function() {
     });
 
     it('should change tab focus to TAB_NOTES when a new note annotation is created', function() {
-      const store = createStore();
       store.dispatch(actions.createAnnotation(fixtures.oldPageNote()));
       assert.equal(
         store.getState().selection.selectedTab,
@@ -255,7 +520,7 @@ describe('sidebar/store/modules/annotations', function() {
     });
 
     it('should expand parent of created annotation', function() {
-      const store = createStore();
+      const store = createTestStore();
       store.dispatch(
         actions.addAnnotations([
           {
