@@ -1,6 +1,6 @@
 const VIA_REFERRER = /^https:\/\/(qa-)?via.hypothes.is\//;
 
-const events = {
+export const events = {
   ANNOTATION_CREATED: 'annotationCreated',
   ANNOTATION_DELETED: 'annotationDeleted',
   ANNOTATION_FLAGGED: 'annotationFlagged',
@@ -117,5 +117,3 @@ export default function analytics($window, settings) {
     events,
   };
 }
-
-analytics.events = events;
