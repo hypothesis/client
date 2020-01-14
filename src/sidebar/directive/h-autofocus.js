@@ -11,11 +11,11 @@
  *   <input ng-if="..." h-autofocus>
  *
  */
-module.exports = function() {
+export default function autofocusDirective() {
   return {
     restrict: 'A',
     link: function($scope, $element) {
       $element[0].focus();
     },
   };
-};
+}

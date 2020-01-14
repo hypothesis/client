@@ -1,4 +1,4 @@
-module.exports = [
+export default [
   // ALL SUPPORTED PROPERTIES
   {
     settings: { appBackgroundColor: 'blue' },

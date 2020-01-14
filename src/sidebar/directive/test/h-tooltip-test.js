@@ -1,7 +1,8 @@
-const angular = require('angular');
+import angular from 'angular';
 
-const hTooltip = require('../h-tooltip');
-const util = require('./util');
+import hTooltip from '../h-tooltip';
+
+import * as util from './util';
 
 function testComponent() {
   return {

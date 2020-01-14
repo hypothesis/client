@@ -1,6 +1,6 @@
 let loaded = false;
 
-module.exports = function(trackingId) {
+function loadGoogleAnalytics(trackingId) {
   // small measure to make we do not accidentally
   // load the analytics scripts more than once
   if (loaded) {
@@ -46,4 +46,6 @@ module.exports = function(trackingId) {
   ga('set', 'anonymizeIp', true);
 
   /* eslint-enable */
-};
+}
+
+module.exports = loadGoogleAnalytics;

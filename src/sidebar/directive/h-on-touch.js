@@ -28,7 +28,7 @@ function addEventHandler($scope, element, events, handler) {
  * mouse press OR touch.
  */
 // @ngInject
-module.exports = function($parse) {
+export default function onTouchDirective($parse) {
   return {
     restrict: 'A',
     link: function($scope, $element, $attrs) {
@@ -41,4 +41,4 @@ module.exports = function($parse) {
       );
     },
   };
-};
+}

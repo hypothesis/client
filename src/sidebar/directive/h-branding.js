@@ -18,7 +18,7 @@
  */
 
 // @ngInject
-function BrandingDirective(settings) {
+export default function BrandingDirective(settings) {
   const _hasBranding = !!settings.branding;
 
   // This is the list of supported property declarations
@@ -64,5 +64,3 @@ function BrandingDirective(settings) {
     },
   };
 }
-
-module.exports = BrandingDirective;
