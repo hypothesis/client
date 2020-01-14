@@ -33,8 +33,8 @@ function Datalist({
   }, [activeItem, list, listFormatter, onSelectItem]);
 
   return (
-    <div className={classnames({}, 'datalist')}>
-      {list.length && open && (
+    <div className="datalist">
+      {list.length > 0 && open && (
         <div className="datalist__items">
           <span className="datalist__arrow-down" />
           <ul className="datalist__ul">{items}</ul>

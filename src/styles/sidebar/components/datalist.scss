@@ -1,41 +1,70 @@
 @use "../../variables" as var;
 
 .datalist {
-  color: var.$white;
+  position: relative;
 }
 
 .datalist__items {
   position: absolute;
-  width: 100%;
-  padding: 0;
-  background-color: var.$grey-mid;
+  font-size: var.$body2-font-size;
+  top: 5px;
+  max-width: 100%;
+  min-width: 10em;
+  border: 1px solid var.$grey-3;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
   z-index: 10;
+
+  @media (pointer: coarse) {
+    font-size: var.$touch-input-font-size;
+  }
 }
 
 .datalist__arrow-down {
   position: absolute;
-  top: -1px;
+  top: -6px;
   left: 6px;
   width: 0;
   height: 0;
   border-left: 7px solid transparent;
   border-right: 7px solid transparent;
-  border-top: 7px solid #fff;
+  border-bottom: 7px solid var.$grey-4;
+  z-index: -1;
 }
 
 .datalist__ul {
   list-style: none;
+  background-color: var.$white;
   padding: 0;
   > li {
-    padding: 0.25em 2em;
-    white-space: nowrap;
+    padding: 0.25em 1.5em 0.25em 1em;
+    border-left: 4px transparent solid;
   }
   > li.is-selected {
-    background-color: var.$grey-5;
-    color: white;
+    border-left: 4px var.$brand solid;
+    background-color: var.$grey-1;
   }
   > li:hover {
     cursor: pointer;
-    background-color: var.$grey-4;
+    background-color: var.$grey-2;
+  }
+}
+
+/* Dark theme */
+
+@media screen and (prefers-color-scheme: dark) {
+  .datalist__items {
+    color: var.$white;
+  }
+  .datalist__arrow-down {
+    border-bottom: 7px solid var.$grey-6;
+  }
+  .datalist__ul {
+    background-color: var.$grey-6;
+    > li.is-selected {
+      background-color: var.$grey-mid;
+    }
+    > li:hover {
+      background-color: var.$grey-5;
+    }
   }
 }
