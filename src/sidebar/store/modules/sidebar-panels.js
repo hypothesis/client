@@ -8,7 +8,7 @@
  * may be "active" (open) at one time.
  */
 
-const util = require('../util');
+import * as util from '../util';
 
 function init() {
   return {
@@ -111,7 +111,7 @@ function isSidebarPanelOpen(state, panelName) {
   return state.sidebarPanels.activePanelName === panelName;
 }
 
-module.exports = {
+export default {
   namespace: 'sidebarPanels',
   init: init,
   update: update,

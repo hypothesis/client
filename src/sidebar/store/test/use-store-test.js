@@ -1,9 +1,10 @@
-const { mount } = require('enzyme');
-const { createStore } = require('redux');
-const { createElement } = require('preact');
-const { act } = require('preact/test-utils');
+import { mount } from 'enzyme';
+import { createElement } from 'preact';
+import { act } from 'preact/test-utils';
+import { createStore } from 'redux';
 
-const useStore = require('../use-store');
+import useStore from '../use-store';
+
 const { $imports } = useStore;
 
 const initialState = { value: 10, otherValue: 20 };

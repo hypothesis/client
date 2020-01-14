@@ -1,7 +1,7 @@
 /**
  * Return an object where each key in `updateFns` is mapped to the key itself.
  */
-function actionTypes(updateFns) {
+export function actionTypes(updateFns) {
   return Object.keys(updateFns).reduce(function(types, key) {
     types[key] = key;
     return types;
@@ -15,7 +15,7 @@ function actionTypes(updateFns) {
  * @param {Object} actionToUpdateFn - Object mapping action names to update
  *                                      functions.
  */
-function createReducer(actionToUpdateFn) {
+export function createReducer(actionToUpdateFn) {
   return (state = {}, action) => {
     const fn = actionToUpdateFn[action.type];
     if (!fn) {
@@ -39,7 +39,7 @@ function createReducer(actionToUpdateFn) {
  * level. The keys to this object are functions that call the original
  * selectors with the `state` argument set to the current value of `getState()`.
  */
-function bindSelectors(namespaces, getState) {
+export function bindSelectors(namespaces, getState) {
   const totalSelectors = {};
   Object.keys(namespaces).forEach(namespace => {
     const selectors = namespaces[namespace].selectors;
@@ -53,9 +53,3 @@ function bindSelectors(namespaces, getState) {
   });
   return totalSelectors;
 }
-
-module.exports = {
-  actionTypes,
-  bindSelectors,
-  createReducer,
-};

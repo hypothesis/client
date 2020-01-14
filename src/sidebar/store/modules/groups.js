@@ -1,7 +1,8 @@
-const { createSelector } = require('reselect');
+import { createSelector } from 'reselect';
 
-const util = require('../util');
-const session = require('./session');
+import * as util from '../util';
+
+import session from './session';
 
 function init() {
   return {
@@ -189,7 +190,7 @@ const getInScopeGroups = createSelector(
   groups => groups.filter(g => g.isScopedToUri)
 );
 
-module.exports = {
+export default {
   init,
   namespace: 'groups',
   update,

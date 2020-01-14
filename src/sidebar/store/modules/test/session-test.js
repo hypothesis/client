@@ -1,5 +1,5 @@
-const createStore = require('../../create-store');
-const session = require('../session');
+import createStore from '../../create-store';
+import session from '../session';
 
 const { init } = session;
 

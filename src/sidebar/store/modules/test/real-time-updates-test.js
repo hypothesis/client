@@ -1,10 +1,9 @@
-const createStore = require('../../create-store');
-
-const annotations = require('../annotations');
-const groups = require('../groups');
-const realTimeUpdates = require('../real-time-updates');
-const { $imports } = require('../real-time-updates');
-const selection = require('../selection');
+import createStore from '../../create-store';
+import annotations from '../annotations';
+import groups from '../groups';
+import realTimeUpdates from '../real-time-updates';
+import { $imports } from '../real-time-updates';
+import selection from '../selection';
 
 const { removeAnnotations } = annotations.actions;
 const { focusGroup } = groups.actions;

@@ -1,8 +1,8 @@
 /* eslint-disable no-console */
 
-const redux = require('redux');
+import * as redux from 'redux';
 
-const debugMiddleware = require('../debug-middleware');
+import debugMiddleware from '../debug-middleware';
 
 function id(state) {
   return state;

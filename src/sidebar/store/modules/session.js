@@ -1,4 +1,4 @@
-const util = require('../util');
+import * as util from '../util';
 
 function init() {
   /**
@@ -65,7 +65,7 @@ function profile(state) {
   return state.session;
 }
 
-module.exports = {
+export default {
   init,
   namespace: 'session',
   update,

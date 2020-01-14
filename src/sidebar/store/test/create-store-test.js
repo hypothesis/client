@@ -1,4 +1,4 @@
-const createStore = require('../create-store');
+import createStore from '../create-store';
 
 const A = 0;
 

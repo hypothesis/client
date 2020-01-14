@@ -1,5 +1,5 @@
-const metadata = require('../../util/annotation-metadata');
-const util = require('../util');
+import * as metadata from '../../util/annotation-metadata';
+import * as util from '../util';
 
 /**
  * The drafts store provides temporary storage for unsaved edits to new or
@@ -183,7 +183,7 @@ function unsavedAnnotations(state) {
     .map(draft => draft.annotation);
 }
 
-module.exports = {
+export default {
   init,
   namespace: 'drafts',
   update,

@@ -1,4 +1,4 @@
-const util = require('../util');
+import * as util from '../util';
 
 const fixtures = {
   update: {

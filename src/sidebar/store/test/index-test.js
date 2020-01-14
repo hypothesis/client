@@ -1,8 +1,8 @@
-const immutable = require('seamless-immutable');
+import immutable from 'seamless-immutable';
 
-const storeFactory = require('../index');
-const annotationFixtures = require('../../test/annotation-fixtures');
-const uiConstants = require('../../ui-constants');
+import * as annotationFixtures from '../../test/annotation-fixtures';
+import uiConstants from '../../ui-constants';
+import storeFactory from '../index';
 
 const defaultAnnotation = annotationFixtures.defaultAnnotation;
 const newAnnotation = annotationFixtures.newAnnotation;

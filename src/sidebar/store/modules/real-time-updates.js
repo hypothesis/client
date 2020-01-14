@@ -3,13 +3,13 @@
  * WebSocket connection to h's real-time API.
  */
 
-const { createSelector } = require('reselect');
+import { createSelector } from 'reselect';
 
-const { actionTypes } = require('../util');
+import { actionTypes } from '../util';
 
-const annotations = require('./annotations');
-const groups = require('./groups');
-const viewer = require('./viewer');
+import annotations from './annotations';
+import groups from './groups';
+import viewer from './viewer';
 
 function init() {
   return {
@@ -172,7 +172,7 @@ function hasPendingDeletion(state, id) {
   return state.realTimeUpdates.pendingDeletions.hasOwnProperty(id);
 }
 
-module.exports = {
+export default {
   init,
   namespace: 'realTimeUpdates',
   update,

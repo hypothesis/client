@@ -1,5 +1,5 @@
-const createStore = require('../../create-store');
-const directLinked = require('../direct-linked');
+import createStore from '../../create-store';
+import directLinked from '../direct-linked';
 
 describe('sidebar/store/modules/direct-linked', () => {
   let store;

@@ -8,7 +8,7 @@
  * to the console, along with the application state before and after the action
  * was handled.
  */
-function debugMiddleware(store) {
+export default function debugMiddleware(store) {
   /* eslint-disable no-console */
   let serial = 0;
 
@@ -34,5 +34,3 @@ function debugMiddleware(store) {
   };
   /* eslint-enable no-console */
 }
-
-module.exports = debugMiddleware;

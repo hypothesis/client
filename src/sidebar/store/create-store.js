@@ -1,7 +1,7 @@
-const redux = require('redux');
-const { default: thunk } = require('redux-thunk');
+import * as redux from 'redux';
+import thunk from 'redux-thunk';
 
-const { createReducer, bindSelectors } = require('./util');
+import { createReducer, bindSelectors } from './util';
 
 /**
  * Create a Redux store from a set of _modules_.
@@ -22,7 +22,7 @@ const { createReducer, bindSelectors } = require('./util');
  * @param {any[]} initArgs - Arguments to pass to each state module's `init` function
  * @param [any[]] middleware - List of additional Redux middlewares to use.
  */
-function createStore(modules, initArgs = [], middleware = []) {
+export default function createStore(modules, initArgs = [], middleware = []) {
   // Create the initial state and state update function.
 
   // Namespaced objects for initial states.
@@ -74,5 +74,3 @@ function createStore(modules, initArgs = [], middleware = []) {
 
   return store;
 }
-
-module.exports = createStore;

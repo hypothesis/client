@@ -14,15 +14,14 @@
  * @property {string} displayName - User's display name
  */
 
-const { createSelector } = require('reselect');
-const immutable = require('seamless-immutable');
+import { createSelector } from 'reselect';
+import immutable from 'seamless-immutable';
 
-const arrayUtil = require('../../util/array');
-const metadata = require('../../util/annotation-metadata');
-const { toSet } = require('../../util/array');
-const uiConstants = require('../../ui-constants');
-
-const util = require('../util');
+import uiConstants from '../../ui-constants';
+import * as metadata from '../../util/annotation-metadata';
+import * as arrayUtil from '../../util/array';
+import { toSet } from '../../util/array';
+import * as util from '../util';
 
 /**
  * Default starting tab.
@@ -500,7 +499,7 @@ function focusModeUserPrettyName(state) {
   }
 }
 
-module.exports = {
+export default {
   init: init,
   namespace: 'selection',
   update: update,

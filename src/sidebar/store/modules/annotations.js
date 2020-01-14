@@ -3,15 +3,15 @@
  * sidebar.
  */
 
-const { createSelector } = require('reselect');
+import { createSelector } from 'reselect';
 
-const arrayUtil = require('../../util/array');
-const metadata = require('../../util/annotation-metadata');
-const uiConstants = require('../../ui-constants');
+import uiConstants from '../../ui-constants';
+import * as metadata from '../../util/annotation-metadata';
+import * as arrayUtil from '../../util/array';
+import * as util from '../util';
 
-const selection = require('./selection');
-const drafts = require('./drafts');
-const util = require('../util');
+import drafts from './drafts';
+import selection from './selection';
 
 /**
  * Return a copy of `current` with all matching annotations in `annotations`
@@ -461,7 +461,7 @@ const isWaitingToAnchorAnnotations = createSelector(
   annotations => annotations.some(metadata.isWaitingToAnchor)
 );
 
-module.exports = {
+export default {
   init: init,
   namespace: 'annotations',
   update: update,
