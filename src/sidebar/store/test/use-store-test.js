@@ -3,9 +3,7 @@ import { createElement } from 'preact';
 import { act } from 'preact/test-utils';
 import { createStore } from 'redux';
 
-import useStore from '../use-store';
-
-const { $imports } = useStore;
+import useStore, { $imports } from '../use-store';
 
 const initialState = { value: 10, otherValue: 20 };
 const reducer = (state = initialState, action) => {
