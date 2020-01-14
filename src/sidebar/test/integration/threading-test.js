@@ -1,10 +1,10 @@
-const angular = require('angular');
-const immutable = require('seamless-immutable');
+import angular from 'angular';
+import immutable from 'seamless-immutable';
 
-const storeFactory = require('../../store');
-const rootThreadFactory = require('../../services/root-thread');
-const searchFilterFactory = require('../../services/search-filter');
-const viewFilterFactory = require('../../services/view-filter');
+import rootThreadFactory from '../../services/root-thread';
+import searchFilterFactory from '../../services/search-filter';
+import viewFilterFactory from '../../services/view-filter';
+import storeFactory from '../../store';
 
 const fixtures = immutable({
   annotations: [
