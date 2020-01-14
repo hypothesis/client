@@ -1,6 +1,6 @@
-const fetchMock = require('fetch-mock');
+import fetchMock from 'fetch-mock';
 
-const apiFactory = require('../api');
+import apiFactory from '../api';
 
 // API route directory.
 //

@@ -13,7 +13,7 @@
  * on frequency of usage.
  */
 // @ngInject
-function tags(localStorage) {
+export default function tags(localStorage) {
   const TAGS_LIST_KEY = 'hypothesis.user.tags.list';
   const TAGS_MAP_KEY = 'hypothesis.user.tags.map';
 
@@ -78,5 +78,3 @@ function tags(localStorage) {
     store,
   };
 }
-
-module.exports = tags;

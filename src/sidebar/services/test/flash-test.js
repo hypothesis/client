@@ -1,4 +1,4 @@
-const flash = require('../flash');
+import flash from '../flash';
 
 describe('sidebar.flash', () => {
   ['info', 'success', 'warning', 'error'].forEach(method => {

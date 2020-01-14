@@ -70,7 +70,7 @@ function clientType(win, settings = {}) {
  * application.
  */
 // @ngInject
-function analytics($window, settings) {
+export default function analytics($window, settings) {
   const category = clientType($window, settings);
   const noop = () => {};
 
@@ -119,5 +119,3 @@ function analytics($window, settings) {
 }
 
 analytics.events = events;
-
-module.exports = analytics;

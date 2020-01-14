@@ -1,4 +1,4 @@
-const unicodeFactory = require('../unicode');
+import unicodeFactory from '../unicode';
 
 const unicode = unicodeFactory();
 

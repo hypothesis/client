@@ -1,4 +1,4 @@
-const Permissions = require('../permissions');
+import Permissions from '../permissions';
 
 const userid = 'acct:flash@gord.on';
 

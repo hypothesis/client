@@ -1,6 +1,6 @@
-const events = require('../events');
-const retryUtil = require('../util/retry');
-const sentry = require('../util/sentry');
+import events from '../events';
+import * as retryUtil from '../util/retry';
+import * as sentry from '../util/sentry';
 
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
@@ -19,7 +19,7 @@ const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
  *
  * @ngInject
  */
-function session(
+export default function session(
   $rootScope,
   analytics,
   store,
@@ -187,6 +187,4 @@ function session(
 
     update,
   };
-}
-
-module.exports = session;
+} // 5 minutes

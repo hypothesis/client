@@ -23,7 +23,7 @@ const STORAGE_KEY = 'hypothesis.privacy';
  * annotations to local storage.
  */
 // @ngInject
-function Permissions(localStorage) {
+export default function Permissions(localStorage) {
   const self = this;
 
   function defaultLevel() {
@@ -125,5 +125,3 @@ function Permissions(localStorage) {
     return perms[action].indexOf(userid) !== -1;
   };
 }
-
-module.exports = Permissions;

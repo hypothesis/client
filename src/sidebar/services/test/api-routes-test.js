@@ -1,4 +1,4 @@
-const apiRoutesFactory = require('../api-routes');
+import apiRoutesFactory from '../api-routes';
 
 // Abridged version of the response returned by https://hypothes.is/api,
 // with the domain name changed.

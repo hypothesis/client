@@ -1,7 +1,13 @@
-const SearchClient = require('../search-client');
+import SearchClient from '../search-client';
 
 // @ngInject
-function annotations(annotationMapper, api, store, streamer, streamFilter) {
+export default function annotations(
+  annotationMapper,
+  api,
+  store,
+  streamer,
+  streamFilter
+) {
   let searchClient = null;
 
   /**
@@ -57,5 +63,3 @@ function annotations(annotationMapper, api, store, streamer, streamFilter) {
     load,
   };
 }
-
-module.exports = annotations;

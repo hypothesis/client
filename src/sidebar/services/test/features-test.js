@@ -1,7 +1,7 @@
-const features = require('../features');
-const { $imports } = require('../features');
-const events = require('../../events');
-const bridgeEvents = require('../../../shared/bridge-events');
+import bridgeEvents from '../../../shared/bridge-events';
+import events from '../../events';
+import features from '../features';
+import { $imports } from '../features';
 
 describe('h:features - sidebar layer', function() {
   let fakeBridge;

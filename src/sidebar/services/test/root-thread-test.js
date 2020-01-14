@@ -1,11 +1,11 @@
-const angular = require('angular');
-const immutable = require('seamless-immutable');
+import angular from 'angular';
+import immutable from 'seamless-immutable';
 
-const annotationFixtures = require('../../test/annotation-fixtures');
-const events = require('../../events');
-const uiConstants = require('../../ui-constants');
-const rootThreadFactory = require('../root-thread');
-const { $imports } = require('../root-thread');
+import events from '../../events';
+import * as annotationFixtures from '../../test/annotation-fixtures';
+import uiConstants from '../../ui-constants';
+import rootThreadFactory from '../root-thread';
+import { $imports } from '../root-thread';
 
 const fixtures = immutable({
   emptyThread: {

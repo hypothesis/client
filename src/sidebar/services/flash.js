@@ -3,7 +3,7 @@
  */
 
 // @ngInject
-function flash(toastr) {
+export default function flash(toastr) {
   return {
     info: toastr.info.bind(toastr),
     success: toastr.success.bind(toastr),
@@ -11,5 +11,3 @@ function flash(toastr) {
     error: toastr.error.bind(toastr),
   };
 }
-
-module.exports = flash;

@@ -1,6 +1,6 @@
-const events = require('../events');
-const { resolve } = require('../util/url');
-const serviceConfig = require('../service-config');
+import events from '../events';
+import serviceConfig from '../service-config';
+import { resolve } from '../util/url';
 
 /**
  * @typedef RefreshOptions
@@ -21,7 +21,7 @@ const serviceConfig = require('../service-config');
  * Interaction with OAuth endpoints in the annotation service is delegated to
  * the `OAuthClient` class.
  */
-function auth(
+export default function auth(
   $rootScope,
   $window,
   OAuthClient,
@@ -311,5 +311,3 @@ auth.$inject = [
   'localStorage',
   'settings',
 ];
-
-module.exports = auth;

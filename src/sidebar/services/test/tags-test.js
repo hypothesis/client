@@ -1,6 +1,6 @@
-const angular = require('angular');
+import angular from 'angular';
 
-const tagsFactory = require('../tags');
+import tagsFactory from '../tags';
 
 const TAGS_LIST_KEY = 'hypothesis.user.tags.list';
 const TAGS_MAP_KEY = 'hypothesis.user.tags.map';

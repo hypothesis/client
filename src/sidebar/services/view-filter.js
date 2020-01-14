@@ -1,4 +1,4 @@
-const { quote } = require('../util/annotation-metadata');
+import { quote } from '../util/annotation-metadata';
 
 // Prevent Babel inserting helper code after `@ngInject` comment below which
 // breaks browserify-ngannotate.
@@ -20,7 +20,7 @@ function displayName(ann) {
  * which do not match the filter are then hidden.
  */
 // @ngInject
-function viewFilter(unicode) {
+export default function viewFilter(unicode) {
   /**
    * Normalize a field value or query term for comparison.
    */
@@ -176,5 +176,3 @@ function viewFilter(unicode) {
       .map(ann => ann.id);
   };
 }
-
-module.exports = viewFilter;

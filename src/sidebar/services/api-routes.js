@@ -1,10 +1,10 @@
-const { retryPromiseOperation } = require('../util/retry');
+import { retryPromiseOperation } from '../util/retry';
 
 /**
  * A service which fetches and caches API route metadata.
  */
 // @ngInject
-function apiRoutes(settings) {
+export default function apiRoutes(settings) {
   // Cache of route name => route metadata from API root.
   let routeCache;
   // Cache of links to pages on the service fetched from the API's "links"
@@ -57,5 +57,3 @@ function apiRoutes(settings) {
 
   return { routes, links };
 }
-
-module.exports = apiRoutes;
