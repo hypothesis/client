@@ -187,4 +187,4 @@ export default function session(
 
     update,
   };
-} // 5 minutes
+}
