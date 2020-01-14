@@ -29,10 +29,13 @@
  *  3. Checking that the UI correctly presents a given state.
  */
 
+import defaultKeys from '../util/default-keys';
+
 import createStore from './create-store';
 import debugMiddleware from './debug-middleware';
 import activity from './modules/activity';
 import annotations from './modules/annotations';
+import defaults from './modules/defaults';
 import directLinked from './modules/direct-linked';
 import drafts from './modules/drafts';
 import frames from './modules/frames';
@@ -78,15 +81,23 @@ function angularDigestMiddleware($rootScope) {
  * passing the current state of the store.
  */
 // @ngInject
-export default function store($rootScope, settings) {
+export default function store($rootScope, localStorage, settings) {
   const middleware = [
     debugMiddleware,
     angularDigestMiddleware.bind(null, $rootScope),
   ];
 
+  const persistedDefaults = {};
+  Object.keys(defaultKeys).forEach(defaultKey => {
+    persistedDefaults[defaultKey] = localStorage.getItem(
+      defaultKeys[defaultKey]
+    );
+  });
+
   const modules = [
     activity,
     annotations,
+    defaults,
     directLinked,
     drafts,
     frames,
@@ -98,5 +109,5 @@ export default function store($rootScope, settings) {
     sidebarPanels,
     viewer,
   ];
-  return createStore(modules, [settings], middleware);
+  return createStore(modules, [settings, persistedDefaults], middleware);
 }

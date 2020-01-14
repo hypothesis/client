@@ -113,6 +113,11 @@ function sendPageView(analytics) {
   analytics.sendPageView();
 }
 
+// @ngInject
+function persistDefaults(persistedDefaults) {
+  persistedDefaults.persistDefaults();
+}
+
 // Preact UI components that are wrapped for use within Angular templates.
 import AnnotationActionBar from './components/annotation-action-bar';
 import AnnotationBody from './components/annotation-body';
@@ -164,6 +169,7 @@ import frameSyncService from './services/frame-sync';
 import groupsService from './services/groups';
 import localStorageService from './services/local-storage';
 import permissionsService from './services/permissions';
+import persistedDefaultsService from './services/persisted-defaults';
 import rootThreadService from './services/root-thread';
 import searchFilterService from './services/search-filter';
 import serviceUrlService from './services/service-url';
@@ -243,6 +249,7 @@ function startAngularApp(config) {
     .service('groups', groupsService)
     .service('localStorage', localStorageService)
     .service('permissions', permissionsService)
+    .service('persistedDefaults', persistedDefaultsService)
     .service('rootThread', rootThreadService)
     .service('searchFilter', searchFilterService)
     .service('serviceUrl', serviceUrlService)
@@ -271,6 +278,7 @@ function startAngularApp(config) {
     .config(configureRoutes)
     .config(configureToastr)
 
+    .run(persistDefaults)
     .run(sendPageView)
     .run(setupApi)
     .run(crossOriginRPC.server.start);

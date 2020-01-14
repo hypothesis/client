@@ -10,6 +10,7 @@ describe('annotationMapper', function() {
   let $rootScope;
   let store;
   let fakeApi;
+  let fakeLocalStorage;
   let annotationMapper;
 
   beforeEach(function() {
@@ -19,9 +20,13 @@ describe('annotationMapper', function() {
         flag: sinon.stub().returns(Promise.resolve({})),
       },
     };
+
+    fakeLocalStorage = sinon.stub().returns({ getItem: sinon.stub() });
+
     angular
       .module('app', [])
       .service('annotationMapper', annotationMapperFactory)
+      .service('localStorage', fakeLocalStorage)
       .service('store', storeFactory)
       .value('api', fakeApi)
       .value('settings', {});

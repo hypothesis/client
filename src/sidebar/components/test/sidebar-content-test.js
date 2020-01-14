@@ -22,6 +22,7 @@ describe('sidebar.components.sidebar-content', function() {
   let fakeAnalytics;
   let fakeAnnotations;
   let fakeFrameSync;
+  let fakeLocalStorage;
   let fakeRootThread;
   let fakeSettings;
   let fakeStreamer;
@@ -50,6 +51,10 @@ describe('sidebar.components.sidebar-content', function() {
         scrollToAnnotation: sinon.stub(),
       };
 
+      fakeLocalStorage = {
+        getItem: sinon.stub(),
+      };
+
       fakeStreamer = {
         setConfig: sandbox.stub(),
         connect: sandbox.stub(),
@@ -66,6 +71,7 @@ describe('sidebar.components.sidebar-content', function() {
 
       $provide.value('analytics', fakeAnalytics);
       $provide.value('frameSync', fakeFrameSync);
+      $provide.value('localStorage', fakeLocalStorage);
       $provide.value('rootThread', fakeRootThread);
       $provide.value('streamer', fakeStreamer);
       $provide.value('annotations', fakeAnnotations);

@@ -52,8 +52,11 @@ describe('annotation threading', function() {
       flagEnabled: sinon.stub().returns(true),
     };
 
+    const fakeLocalStorage = sinon.stub().returns({ getItem: sinon.stub() });
+
     angular
       .module('app', [])
+      .service('localStorage', fakeLocalStorage)
       .service('store', storeFactory)
       .service('rootThread', rootThreadFactory)
       .service('searchFilter', searchFilterFactory)
