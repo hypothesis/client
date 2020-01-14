@@ -1,5 +1,5 @@
-const serviceUrlFactory = require('../service-url');
-const { $imports } = require('../service-url');
+import serviceUrlFactory from '../service-url';
+import { $imports } from '../service-url';
 
 /** Return a fake store object. */
 function fakeStore() {

@@ -1,7 +1,7 @@
-const EventEmitter = require('tiny-emitter');
+import EventEmitter from 'tiny-emitter';
 
-const annotations = require('../annotations');
-const { $imports } = require('../annotations');
+import annotations from '../annotations';
+import { $imports } from '../annotations';
 
 let searchClients;
 let longRunningSearchClient = false;

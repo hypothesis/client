@@ -1,8 +1,8 @@
-const buildThread = require('../build-thread');
-const events = require('../events');
-const memoize = require('../util/memoize');
-const metadata = require('../util/annotation-metadata');
-const tabs = require('../util/tabs');
+import buildThread from '../build-thread';
+import events from '../events';
+import * as metadata from '../util/annotation-metadata';
+import memoize from '../util/memoize';
+import * as tabs from '../util/tabs';
 
 function truthyKeys(map) {
   return Object.keys(map).filter(function(k) {
@@ -37,7 +37,12 @@ const sortFns = {
  * The root thread is then displayed by viewer.html
  */
 // @ngInject
-function RootThread($rootScope, store, searchFilter, viewFilter) {
+export default function RootThread(
+  $rootScope,
+  store,
+  searchFilter,
+  viewFilter
+) {
   /**
    * Build the root conversation thread from the given UI state.
    *
@@ -145,5 +150,3 @@ function RootThread($rootScope, store, searchFilter, viewFilter) {
    */
   this.thread = memoize(buildRootThread);
 }
-
-module.exports = RootThread;

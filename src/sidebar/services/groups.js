@@ -11,13 +11,13 @@ const DEFAULT_ORGANIZATION = {
     encodeURIComponent(require('../../images/icons/logo.svg')),
 };
 
-const events = require('../events');
-const { awaitStateChange } = require('../util/state');
-const { combineGroups } = require('../util/groups');
-const serviceConfig = require('../service-config');
+import events from '../events';
+import serviceConfig from '../service-config';
+import { combineGroups } from '../util/groups';
+import { awaitStateChange } from '../util/state';
 
 // @ngInject
-function groups(
+export default function groups(
   $rootScope,
   store,
   api,
@@ -372,5 +372,3 @@ function groups(
     focus: focus,
   };
 }
-
-module.exports = groups;

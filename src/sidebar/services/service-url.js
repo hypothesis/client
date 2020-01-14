@@ -1,4 +1,4 @@
-const urlUtil = require('../util/url');
+import * as urlUtil from '../util/url';
 
 /**
  * A function that returns an absolute URL given a link name and params, by
@@ -31,7 +31,7 @@ const urlUtil = require('../util/url');
  *
  * @ngInject
  */
-function serviceUrl(store, apiRoutes) {
+export default function serviceUrl(store, apiRoutes) {
   apiRoutes
     .links()
     .then(store.updateLinks)
@@ -63,5 +63,3 @@ function serviceUrl(store, apiRoutes) {
     return url.url;
   };
 }
-
-module.exports = serviceUrl;

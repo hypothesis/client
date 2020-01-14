@@ -1,4 +1,4 @@
-const analyticsService = require('../analytics');
+import analyticsService from '../analytics';
 
 describe('analytics', function() {
   let $windowStub;

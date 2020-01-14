@@ -259,11 +259,9 @@ function generateFacetedFilter(searchtext, focusFilters = {}) {
  * filter annotations displayed to the user or fetched from the API.
  */
 // @ngInject
-function searchFilter() {
+export default function searchFilter() {
   return {
     toObject,
     generateFacetedFilter,
   };
 }
-
-module.exports = searchFilter;

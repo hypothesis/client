@@ -1,9 +1,9 @@
-const angular = require('angular');
+import angular from 'angular';
 
-const events = require('../../events');
-const { events: analyticsEvents } = require('../analytics');
-const sessionFactory = require('../session');
-const { $imports } = require('../session');
+import events from '../../events';
+import { events as analyticsEvents } from '../analytics';
+import sessionFactory from '../session';
+import { $imports } from '../session';
 
 const mock = angular.mock;
 

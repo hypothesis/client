@@ -9,12 +9,13 @@
  * change at any time and should write code accordingly. Feature flags should
  * not be cached, and should not be interrogated only at setup time.
  */
-const events = require('../events');
-const bridgeEvents = require('../../shared/bridge-events');
-const warnOnce = require('../../shared/warn-once');
+
+import bridgeEvents from '../../shared/bridge-events';
+import warnOnce from '../../shared/warn-once';
+import events from '../events';
 
 // @ngInject
-function features($rootScope, bridge, session) {
+export default function features($rootScope, bridge, session) {
   const _sendFeatureFlags = function() {
     const userFeatures = session.state.features;
     bridge.call(bridgeEvents.FEATURE_FLAGS_UPDATED, userFeatures || {});
@@ -59,5 +60,3 @@ function features($rootScope, bridge, session) {
     flagEnabled: flagEnabled,
   };
 }
-
-module.exports = features;

@@ -1,7 +1,7 @@
-const EventEmitter = require('tiny-emitter');
+import EventEmitter from 'tiny-emitter';
 
-const Streamer = require('../streamer');
-const { $imports } = require('../streamer');
+import Streamer from '../streamer';
+import { $imports } from '../streamer';
 
 const fixtures = {
   createNotification: {

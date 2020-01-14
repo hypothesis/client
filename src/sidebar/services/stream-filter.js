@@ -5,7 +5,7 @@
  * See https://github.com/hypothesis/h/blob/master/h/streamer/filter.py
  * for the schema.
  */
-class StreamFilter {
+export default class StreamFilter {
   constructor() {
     this.resetFilter();
   }
@@ -47,5 +47,3 @@ class StreamFilter {
     return this;
   }
 }
-
-module.exports = StreamFilter;

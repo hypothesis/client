@@ -1,4 +1,4 @@
-const searchFilterFactory = require('../search-filter');
+import searchFilterFactory from '../search-filter';
 
 const searchFilter = searchFilterFactory();
 

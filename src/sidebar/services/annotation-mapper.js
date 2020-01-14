@@ -1,6 +1,6 @@
-const angular = require('angular');
+import angular from 'angular';
 
-const events = require('../events');
+import events from '../events';
 
 function getExistingAnnotation(store, id) {
   return store.getState().annotations.annotations.find(function(annot) {
@@ -10,7 +10,7 @@ function getExistingAnnotation(store, id) {
 
 // Wraps the annotation store to trigger events for the CRUD actions
 // @ngInject
-function annotationMapper($rootScope, store, api) {
+export default function annotationMapper($rootScope, store, api) {
   function loadAnnotations(annotations, replies) {
     annotations = annotations.concat(replies || []);
 
@@ -73,5 +73,3 @@ function annotationMapper($rootScope, store, api) {
     flagAnnotation: flagAnnotation,
   };
 }
-
-module.exports = annotationMapper;

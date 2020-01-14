@@ -1,9 +1,9 @@
-const angular = require('angular');
-const immutable = require('seamless-immutable');
+import angular from 'angular';
+import immutable from 'seamless-immutable';
 
-const annotationMapperFactory = require('../annotation-mapper');
-const storeFactory = require('../../store');
-const events = require('../../events');
+import events from '../../events';
+import storeFactory from '../../store';
+import annotationMapperFactory from '../annotation-mapper';
 
 describe('annotationMapper', function() {
   const sandbox = sinon.createSandbox();

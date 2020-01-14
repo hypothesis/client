@@ -1,9 +1,8 @@
-const queryString = require('query-string');
-const uuid = require('node-uuid');
+import uuid from 'node-uuid';
+import * as queryString from 'query-string';
 
-const warnOnce = require('../../shared/warn-once');
-
-const Socket = require('../websocket');
+import warnOnce from '../../shared/warn-once';
+import Socket from '../websocket';
 
 /**
  * Open a new WebSocket connection to the Hypothesis push notification service.
@@ -19,7 +18,7 @@ const Socket = require('../websocket');
  * @param settings - Application settings
  */
 // @ngInject
-function Streamer(
+export default function Streamer(
   $rootScope,
   annotationMapper,
   store,
@@ -236,5 +235,3 @@ function Streamer(
   this.reconnect = reconnect;
   this.setConfig = setConfig;
 }
-
-module.exports = Streamer;
