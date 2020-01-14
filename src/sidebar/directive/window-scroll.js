@@ -1,4 +1,4 @@
-module.exports = function() {
+function windowScrollDirective() {
   return {
     link: function(scope, elem, attr) {
       let active = true;
@@ -25,4 +25,6 @@ module.exports = function() {
       });
     },
   };
-};
+}
+
+module.exports = windowScrollDirective;

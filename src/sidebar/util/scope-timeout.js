@@ -11,7 +11,7 @@
  * @param {Function} fn - Callback to invoke with setTimeout
  * @param {number} delay - Delay argument to pass to setTimeout
  */
-module.exports = function($scope, fn, delay, setTimeoutFn, clearTimeoutFn) {
+function scopeTimeout($scope, fn, delay, setTimeoutFn, clearTimeoutFn) {
   setTimeoutFn = setTimeoutFn || setTimeout;
   clearTimeoutFn = clearTimeoutFn || clearTimeout;
 
@@ -23,4 +23,6 @@ module.exports = function($scope, fn, delay, setTimeoutFn, clearTimeoutFn) {
   removeDestroyHandler = $scope.$on('$destroy', function() {
     clearTimeoutFn(id);
   });
-};
+}
+
+module.exports = scopeTimeout;

@@ -77,7 +77,7 @@ function Tooltip(rootElement) {
  *
  * Example: '<button aria-label="Tooltip label" h-tooltip></button>'
  */
-module.exports = function() {
+function tooltipDirective() {
   if (!theTooltip) {
     theTooltip = new Tooltip(document.body);
   }
@@ -107,4 +107,6 @@ module.exports = function() {
       });
     },
   };
-};
+}
+
+module.exports = tooltipDirective;
