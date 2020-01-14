@@ -23,7 +23,7 @@ function init() {
  *    which are the user's draft changes to the annotation. These are returned
  *    from the drafts store selector by `drafts.getDraft()`.
  */
-class Draft {
+export class Draft {
   constructor(annotation, changes) {
     this.annotation = { id: annotation.id, $tag: annotation.$tag };
     this.isPrivate = changes.isPrivate;
@@ -200,5 +200,4 @@ export default {
     getDraftIfNotEmpty,
     unsavedAnnotations,
   },
-  Draft,
 };
