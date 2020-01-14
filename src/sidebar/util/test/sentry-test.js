@@ -1,4 +1,4 @@
-const sentry = require('../sentry');
+import * as sentry from '../sentry';
 
 describe('sidebar/util/sentry', () => {
   let fakeDocumentReferrer;

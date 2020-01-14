@@ -9,7 +9,7 @@
  *   store if the criteria is met or `null` otherwise.
  * @return {Promise<T>}
  */
-function awaitStateChange(store, selector) {
+export function awaitStateChange(store, selector) {
   const result = selector(store);
   if (result !== null) {
     return Promise.resolve(result);
@@ -24,5 +24,3 @@ function awaitStateChange(store, selector) {
     });
   });
 }
-
-module.exports = { awaitStateChange };

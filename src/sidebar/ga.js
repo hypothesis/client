@@ -1,6 +1,6 @@
 let loaded = false;
 
-function loadGoogleAnalytics(trackingId) {
+export default function loadGoogleAnalytics(trackingId) {
   // small measure to make we do not accidentally
   // load the analytics scripts more than once
   if (loaded) {
@@ -47,5 +47,3 @@ function loadGoogleAnalytics(trackingId) {
 
   /* eslint-enable */
 }
-
-module.exports = loadGoogleAnalytics;

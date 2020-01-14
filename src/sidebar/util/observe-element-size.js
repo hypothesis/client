@@ -11,7 +11,7 @@
  *   element when a change in its size is detected.
  * @return {() => void}
  */
-function observeElementSize(element, onSizeChanged) {
+export default function observeElementSize(element, onSizeChanged) {
   if (typeof ResizeObserver !== 'undefined') {
     const observer = new ResizeObserver(() =>
       onSizeChanged(element.clientWidth, element.clientHeight)
@@ -59,5 +59,3 @@ function observeElementSize(element, onSizeChanged) {
     observer.disconnect();
   };
 }
-
-module.exports = observeElementSize;

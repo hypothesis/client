@@ -9,4 +9,4 @@ const isSidebar = (window_ = window) => {
   );
 };
 
-module.exports = isSidebar;
+export default isSidebar;

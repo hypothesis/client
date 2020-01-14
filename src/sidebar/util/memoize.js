@@ -5,7 +5,7 @@
  * The argument to the input function may be of any type and is compared
  * using reference equality.
  */
-function memoize(fn) {
+export default function memoize(fn) {
   if (fn.length !== 1) {
     throw new Error('Memoize input must be a function of one argument');
   }
@@ -22,5 +22,3 @@ function memoize(fn) {
     return lastResult;
   };
 }
-
-module.exports = memoize;

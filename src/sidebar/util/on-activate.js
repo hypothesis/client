@@ -9,7 +9,7 @@
  * @param {Function} handler - Event handler
  * @return {Object} Props to spread into a React element
  */
-function onActivate(role, handler) {
+export function onActivate(role, handler) {
   return {
     // Support mouse activation.
     onClick: handler,
@@ -28,5 +28,3 @@ function onActivate(role, handler) {
     tabIndex: 0,
   };
 }
-
-module.exports = { onActivate };

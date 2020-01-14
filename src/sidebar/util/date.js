@@ -6,7 +6,7 @@ let formatter;
  * Returns a standard human-readable representation
  * of a date and time.
  */
-function format(date) {
+export function format(date) {
   if (typeof Intl !== 'undefined' && Intl.DateTimeFormat) {
     if (!formatter) {
       formatter = new Intl.DateTimeFormat(undefined, {
@@ -26,7 +26,3 @@ function format(date) {
     return date.toDateString() + ' ' + date.toLocaleTimeString();
   }
 }
-
-module.exports = {
-  format: format,
-};

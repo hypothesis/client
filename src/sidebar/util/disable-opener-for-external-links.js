@@ -15,7 +15,7 @@
  *
  * @param {Element} root - Root element
  */
-function disableOpenerForExternalLinks(root) {
+export default function disableOpenerForExternalLinks(root) {
   root.addEventListener('click', event => {
     if (event.target.tagName === 'A') {
       const linkEl = event.target;
@@ -25,5 +25,3 @@ function disableOpenerForExternalLinks(root) {
     }
   });
 }
-
-module.exports = disableOpenerForExternalLinks;

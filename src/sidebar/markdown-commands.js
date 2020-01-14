@@ -85,7 +85,7 @@ function replaceText(state, pos, length, text) {
  * @param {LinkType} linkType - The type of link to insert.
  * @return {EditorState} - The new state of the input field.
  */
-function convertSelectionToLink(state, linkType) {
+export function convertSelectionToLink(state, linkType) {
   if (typeof linkType === 'undefined') {
     linkType = LinkType.ANCHOR_LINK;
   }
@@ -140,7 +140,7 @@ function convertSelectionToLink(state, linkType) {
  *                               'suffix' if the input text is empty.
  * @return {EditorState} The new state of the input field.
  */
-function toggleSpanStyle(state, prefix, suffix, placeholder) {
+export function toggleSpanStyle(state, prefix, suffix, placeholder) {
   if (typeof suffix === 'undefined') {
     suffix = prefix;
   }
@@ -234,7 +234,7 @@ function transformLines(state, start, end, callback) {
  *                          of the selection.
  * @return {EditorState} - The new state of the input field.
  */
-function toggleBlockStyle(state, prefix) {
+export function toggleBlockStyle(state, prefix) {
   const start = state.selectionStart;
   const end = state.selectionEnd;
 
@@ -265,9 +265,4 @@ function toggleBlockStyle(state, prefix) {
   }
 }
 
-module.exports = {
-  toggleSpanStyle: toggleSpanStyle,
-  toggleBlockStyle: toggleBlockStyle,
-  convertSelectionToLink: convertSelectionToLink,
-  LinkType: LinkType,
-};
+export { LinkType };

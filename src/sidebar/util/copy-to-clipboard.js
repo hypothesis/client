@@ -8,7 +8,7 @@
  *   This function may throw an exception if the browser rejects the attempt
  *   to copy text.
  */
-function copyText(text) {
+export function copyText(text) {
   const temp = document.createElement('pre');
   temp.className = 'copy-text';
   temp.textContent = text;
@@ -26,5 +26,3 @@ function copyText(text) {
     temp.remove();
   }
 }
-
-module.exports = { copyText };

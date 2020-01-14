@@ -1,6 +1,5 @@
-const groupListItemCommon = require('../group-list-item-common');
-
-const { events } = require('../../services/analytics');
+import { events } from '../../services/analytics';
+import * as groupListItemCommon from '../group-list-item-common';
 
 describe('sidebar/util/groupListItemCommon', () => {
   describe('trackViewGroupActivity', () => {

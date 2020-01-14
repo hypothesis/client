@@ -1,10 +1,10 @@
-const queryString = require('query-string');
+import * as queryString from 'query-string';
 
 /**
  * Return the app configuration specified by the frame embedding the Hypothesis
  * client.
  */
-function hostPageConfig(window) {
+export default function hostPageConfig(window) {
   const configStr = window.location.hash.slice(1);
   const configJSON = queryString.parse(configStr).config;
   const config = JSON.parse(configJSON || '{}');
@@ -62,5 +62,3 @@ function hostPageConfig(window) {
     return result;
   }, {});
 }
-
-module.exports = hostPageConfig;

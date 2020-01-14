@@ -1,4 +1,4 @@
-const VersionData = require('../version-data');
+import VersionData from '../version-data';
 
 describe('VersionData', () => {
   let clock;

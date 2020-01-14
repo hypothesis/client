@@ -1,6 +1,6 @@
-const Sentry = require('@sentry/browser');
+import * as Sentry from '@sentry/browser';
 
-const warnOnce = require('../../shared/warn-once');
+import warnOnce from '../../shared/warn-once';
 
 /**
  * @typedef SentryConfig
@@ -35,7 +35,7 @@ function currentScriptOrigin() {
  *
  * @param {SentryConfig} config
  */
-function init(config) {
+export function init(config) {
   // Only send events for errors which can be attributed to our code. This
   // reduces noise in Sentry caused by errors triggered by eg. script tags added
   // by browser extensions. The downside is that this may cause us to miss errors
@@ -105,21 +105,13 @@ function init(config) {
  *
  * @param {import('@sentry/browser').User|null} user
  */
-function setUserInfo(user) {
+export function setUserInfo(user) {
   Sentry.setUser(user);
 }
 
 /**
  * Reset metrics used for client-side event filtering.
  */
-function reset() {
+export function reset() {
   eventsSent = 0;
 }
-
-module.exports = {
-  init,
-  setUserInfo,
-
-  // Test helpers.
-  reset,
-};

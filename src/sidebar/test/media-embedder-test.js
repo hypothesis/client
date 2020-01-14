@@ -1,4 +1,4 @@
-const mediaEmbedder = require('../media-embedder.js');
+import * as mediaEmbedder from '../media-embedder.js';
 
 describe('media-embedder', function() {
   function domElement(html) {

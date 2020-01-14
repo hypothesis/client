@@ -1,5 +1,5 @@
-const buildThread = require('../build-thread');
-const metadata = require('../util/annotation-metadata');
+import buildThread from '../build-thread';
+import * as metadata from '../util/annotation-metadata';
 
 // Fixture with two top level annotations, one note and one reply
 const SIMPLE_FIXTURE = [

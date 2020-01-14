@@ -1,9 +1,10 @@
+import { jsonConfigsFrom } from '../shared/settings';
+
+import crossOriginRPC from './cross-origin-rpc.js';
 import addAnalytics from './ga';
+import serviceConfig from './service-config';
 import disableOpenerForExternalLinks from './util/disable-opener-for-external-links';
 import { fetchConfig } from './util/fetch-config';
-import serviceConfig from './service-config';
-import { jsonConfigsFrom } from '../shared/settings';
-import crossOriginRPC from './cross-origin-rpc.js';
 import * as sentry from './util/sentry';
 
 // Read settings rendered into sidebar app HTML by service/extension.
@@ -29,6 +30,7 @@ disableOpenerForExternalLinks(document.body);
 import angular from 'angular';
 
 // Angular addons which export the Angular module name via `module.exports`.
+
 import angularRoute from 'angular-route';
 import angularToastr from 'angular-toastr';
 
@@ -114,6 +116,7 @@ function sendPageView(analytics) {
 }
 
 // Preact UI components that are wrapped for use within Angular templates.
+
 import AnnotationActionBar from './components/annotation-action-bar';
 import AnnotationBody from './components/annotation-body';
 import AnnotationHeader from './components/annotation-header';
@@ -135,6 +138,7 @@ import TagList from './components/tag-list';
 import TopBar from './components/top-bar';
 
 // Remaining UI components that are still built with Angular.
+
 import annotation from './components/annotation';
 import annotationThread from './components/annotation-thread';
 import annotationViewerContent from './components/annotation-viewer-content';
@@ -144,6 +148,7 @@ import streamContent from './components/stream-content';
 import threadList from './components/thread-list';
 
 // Angular directives.
+
 import hAutofocusDirective from './directive/h-autofocus';
 import hBrandingDirective from './directive/h-branding';
 import hOnTouchDirective from './directive/h-on-touch';
@@ -151,39 +156,44 @@ import hTooltipDirective from './directive/h-tooltip';
 import windowScrollDirective from './directive/window-scroll';
 
 // Services.
+
+import bridgeService from '../shared/bridge';
+
 import analyticsService from './services/analytics';
 import annotationMapperService from './services/annotation-mapper';
 import annotationsService from './services/annotations';
 import apiService from './services/api';
 import apiRoutesService from './services/api-routes';
-import authService from './services/oauth-auth';
-import bridgeService from '../shared/bridge';
 import featuresService from './services/features';
 import flashService from './services/flash';
 import frameSyncService from './services/frame-sync';
 import groupsService from './services/groups';
 import localStorageService from './services/local-storage';
+import authService from './services/oauth-auth';
 import permissionsService from './services/permissions';
 import rootThreadService from './services/root-thread';
 import searchFilterService from './services/search-filter';
 import serviceUrlService from './services/service-url';
 import sessionService from './services/session';
-import streamerService from './services/streamer';
 import streamFilterService from './services/stream-filter';
+import streamerService from './services/streamer';
 import tagsService from './services/tags';
 import unicodeService from './services/unicode';
 import viewFilterService from './services/view-filter';
 
 // Redux store.
+
 import store from './store';
 
 // Utilities.
+
 import Discovery from '../shared/discovery';
+
+import { encode as urlEncodeFilter } from './filter/url';
 import OAuthClient from './util/oauth-client';
-import VirtualThreadList from './virtual-thread-list';
 import * as random from './util/random';
 import * as time from './util/time';
-import { encode as urlEncodeFilter } from './filter/url';
+import VirtualThreadList from './virtual-thread-list';
 
 function startAngularApp(config) {
   angular

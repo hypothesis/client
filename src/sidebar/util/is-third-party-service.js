@@ -1,4 +1,4 @@
-const serviceConfig = require('../service-config');
+import serviceConfig from '../service-config';
 
 /**
  * Return `true` if the first configured service is a "third-party" service.
@@ -11,7 +11,7 @@ const serviceConfig = require('../service-config');
  * @param {Object} settings - the sidebar settings object
  *
  */
-function isThirdPartyService(settings) {
+export default function isThirdPartyService(settings) {
   const service = serviceConfig(settings);
 
   if (service === null) {
@@ -24,5 +24,3 @@ function isThirdPartyService(settings) {
 
   return service.authority !== settings.authDomain;
 }
-
-module.exports = isThirdPartyService;

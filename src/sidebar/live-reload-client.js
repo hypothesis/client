@@ -1,8 +1,8 @@
 /* eslint no-console: "off" */
 
-const queryString = require('query-string');
+import * as queryString from 'query-string';
 
-const Socket = require('./websocket');
+import Socket from './websocket';
 
 /**
  * Return a URL with a cache-busting query string parameter added.
@@ -66,7 +66,7 @@ function reloadExternalStyleSheets(changed) {
  *                       the 'livereloadserver' query string parameter is
  *                       used.
  */
-function connect(url) {
+export function connect(url) {
   const conn = new Socket(url);
   conn.on('open', function() {
     console.log('Live reload client listening');
@@ -94,7 +94,3 @@ function connect(url) {
     console.error('Error connecting to live reload server:', err);
   });
 }
-
-module.exports = {
-  connect: connect,
-};

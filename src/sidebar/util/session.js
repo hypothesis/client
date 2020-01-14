@@ -1,10 +1,10 @@
-const serviceConfig = require('../service-config');
+import serviceConfig from '../service-config';
 
 /**
  * Returns true if the sidebar tutorial has to be shown to a user for a given session.
  * @deprecated To be removed once preact help/tutorial panel is in place
  */
-function shouldShowSidebarTutorial(sessionState) {
+export function shouldShowSidebarTutorial(sessionState) {
   if (sessionState.preferences.show_sidebar_tutorial) {
     return true;
   }
@@ -29,7 +29,7 @@ function shouldShowSidebarTutorial(sessionState) {
  * @param {Object} settings - app configuration/settings
  * @return {boolean} - Tutorial panel should be displayed automatically
  */
-function shouldAutoDisplayTutorial(isSidebar, sessionState, settings) {
+export function shouldAutoDisplayTutorial(isSidebar, sessionState, settings) {
   const shouldShowBasedOnProfile =
     typeof sessionState.preferences === 'object' &&
     !!sessionState.preferences.show_sidebar_tutorial;
@@ -38,8 +38,3 @@ function shouldAutoDisplayTutorial(isSidebar, sessionState, settings) {
     isSidebar && !service.onHelpRequestProvided && shouldShowBasedOnProfile
   );
 }
-
-module.exports = {
-  shouldShowSidebarTutorial: shouldShowSidebarTutorial,
-  shouldAutoDisplayTutorial: shouldAutoDisplayTutorial,
-};

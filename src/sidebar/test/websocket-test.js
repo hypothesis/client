@@ -1,4 +1,4 @@
-const Socket = require('../websocket');
+import Socket from '../websocket';
 
 describe('websocket wrapper', function() {
   let fakeSocket;

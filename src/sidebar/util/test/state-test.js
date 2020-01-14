@@ -1,5 +1,5 @@
-const fakeStore = require('../../test/fake-redux-store');
-const stateUtil = require('../state');
+import fakeStore from '../../test/fake-redux-store';
+import * as stateUtil from '../state';
 
 describe('sidebar/util/state', function() {
   let store;

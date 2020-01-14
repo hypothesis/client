@@ -1,4 +1,4 @@
-const escapeStringRegexp = require('escape-string-regexp');
+import escapeStringRegexp from 'escape-string-regexp';
 
 /**
  * Combine groups from multiple api calls together to form a unique list of groups.
@@ -10,7 +10,7 @@ const escapeStringRegexp = require('escape-string-regexp');
  * @param {Group[]} featuredGroups - all other groups, may include some duplicates from the userGroups
  * @param {string} uri - uri of the current page
  */
-function combineGroups(userGroups, featuredGroups, uri) {
+export function combineGroups(userGroups, featuredGroups, uri) {
   const worldGroup = featuredGroups.find(g => g.id === '__world__');
   if (worldGroup) {
     userGroups.unshift(worldGroup);
@@ -59,7 +59,3 @@ function uriMatchesScopes(uri, scopes) {
     ) !== undefined
   );
 }
-
-module.exports = {
-  combineGroups,
-};

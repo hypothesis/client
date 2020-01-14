@@ -8,7 +8,7 @@
  * @param {boolean} [options.useCapture]
  * @return {function} Function which removes the event listeners.
  */
-function listen(element, events, listener, { useCapture = false } = {}) {
+export function listen(element, events, listener, { useCapture = false } = {}) {
   if (!Array.isArray(events)) {
     events = [events];
   }
@@ -21,7 +21,3 @@ function listen(element, events, listener, { useCapture = false } = {}) {
     );
   };
 }
-
-module.exports = {
-  listen,
-};

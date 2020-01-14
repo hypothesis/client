@@ -1,4 +1,4 @@
-const { copyText } = require('../copy-to-clipboard');
+import { copyText } from '../copy-to-clipboard';
 
 describe('copy-to-clipboard', () => {
   beforeEach(() => {

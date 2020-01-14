@@ -1,5 +1,5 @@
-const isThirdPartyService = require('../is-third-party-service');
-const { $imports } = require('../is-third-party-service');
+import isThirdPartyService from '../is-third-party-service';
+import { $imports } from '../is-third-party-service';
 
 describe('sidebar.util.isThirdPartyService', () => {
   let fakeServiceConfig;

@@ -1,4 +1,4 @@
-const urlUtil = require('../url');
+import * as urlUtil from '../url';
 
 describe('sidebar/util/url', function() {
   describe('replaceURLParams()', function() {

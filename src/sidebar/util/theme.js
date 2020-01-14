@@ -45,7 +45,7 @@ const supportedThemeProperties = {
  * // only one of those has a value in the `settings` object, so:
  * applyTheme(themeProperties, settings); // -> { color: '#ffc '}
  */
-function applyTheme(themeProperties, settings) {
+export function applyTheme(themeProperties, settings) {
   const style = {};
   if (!settings.branding) {
     return style;
@@ -61,7 +61,3 @@ function applyTheme(themeProperties, settings) {
 
   return style;
 }
-
-module.exports = {
-  applyTheme,
-};
