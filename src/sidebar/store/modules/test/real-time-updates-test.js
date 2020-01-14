@@ -27,13 +27,19 @@ describe('sidebar/store/modules/real-time-updates', () => {
 
     $imports.$mock({
       './annotations': {
-        selectors: { annotationExists: fakeAnnotationExists },
+        default: {
+          selectors: { annotationExists: fakeAnnotationExists },
+        },
       },
       './groups': {
-        selectors: { focusedGroupId: fakeFocusedGroupId },
+        default: {
+          selectors: { focusedGroupId: fakeFocusedGroupId },
+        },
       },
       './viewer': {
-        selectors: { isSidebar: fakeIsSidebar },
+        default: {
+          selectors: { isSidebar: fakeIsSidebar },
+        },
       },
     });
   });
