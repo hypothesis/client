@@ -3,7 +3,7 @@
  * values using the Observable API.
  */
 
-const Observable = require('zen-observable');
+import Observable from 'zen-observable';
 
 /**
  * Returns an observable of events emitted by a DOM event source
@@ -12,7 +12,7 @@ const Observable = require('zen-observable');
  * @param {EventTarget} src - The event source.
  * @param {Array<string>} eventNames - List of events to subscribe to
  */
-function listen(src, eventNames) {
+export function listen(src, eventNames) {
   return new Observable(function(observer) {
     const onNext = function(event) {
       observer.next(event);
@@ -33,7 +33,7 @@ function listen(src, eventNames) {
 /**
  * Delay events from a source Observable by `delay` ms.
  */
-function delay(delay, src) {
+export function delay(delay, src) {
   return new Observable(function(obs) {
     let timeouts = [];
     const sub = src.subscribe({
@@ -62,7 +62,7 @@ function delay(delay, src) {
  * @param {Observable<T>} src
  * @return {Observable<T>}
  */
-function buffer(delay, src) {
+export function buffer(delay, src) {
   return new Observable(function(obs) {
     let lastValue;
     let timeout;
@@ -92,7 +92,7 @@ function buffer(delay, src) {
  * @param {Array<Observable>} sources
  * @return Observable
  */
-function merge(sources) {
+export function merge(sources) {
   return new Observable(function(obs) {
     const subs = sources.map(function(src) {
       return src.subscribe({
@@ -111,7 +111,7 @@ function merge(sources) {
 }
 
 /** Drop the first `n` events from the `src` Observable. */
-function drop(src, n) {
+export function drop(src, n) {
   let count = 0;
   return src.filter(function() {
     ++count;
@@ -119,11 +119,4 @@ function drop(src, n) {
   });
 }
 
-module.exports = {
-  buffer: buffer,
-  delay: delay,
-  drop: drop,
-  listen: listen,
-  merge: merge,
-  Observable: Observable,
-};
+export { Observable };

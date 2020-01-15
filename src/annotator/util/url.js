@@ -1,4 +1,4 @@
-const baseURI = require('document-base-uri');
+import baseURI from 'document-base-uri';
 
 /**
  * Return a normalized version of a URI.
@@ -9,7 +9,7 @@ const baseURI = require('document-base-uri');
  * @param {string} [base] - Base URL to resolve relative to. Defaults to
  *   the document's base URL.
  */
-function normalizeURI(uri, base = baseURI) {
+export function normalizeURI(uri, base = baseURI) {
   const absUrl = new URL(uri, base).href;
 
   // Remove the fragment identifier.
@@ -18,7 +18,3 @@ function normalizeURI(uri, base = baseURI) {
   // See https://github.com/hypothesis/h/issues/3471#issuecomment-226713750
   return absUrl.toString().replace(/#.*/, '');
 }
-
-module.exports = {
-  normalizeURI,
-};
