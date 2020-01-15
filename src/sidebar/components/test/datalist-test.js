@@ -1,9 +1,10 @@
-const { createElement } = require('preact');
-const { mount } = require('enzyme');
+import { mount } from 'enzyme';
+import { createElement } from 'preact';
 
-const mockImportedComponents = require('./mock-imported-components');
-const Datalist = require('../datalist');
-const { $imports } = require('../datalist');
+import Datalist from '../datalist';
+import { $imports } from '../tag-editor';
+
+import mockImportedComponents from './mock-imported-components';
 
 describe('TagEditor', function() {
   let fakeList;

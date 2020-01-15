@@ -5,11 +5,27 @@
 }
 
 .datalist__items {
+  &:before {
+    /* creates a small outlined triangle above the drop down menu */
+    background-color: inherit;
+    border: inherit;
+    border-top-left-radius: 0.125rem;
+    clip-path: polygon(0 0, 100% 0, 0% 100%, 0% 100%);
+    content: '';
+    display: inline-block;
+    height: 0.5rem;
+    left: 0.5rem;
+    position: absolute;
+    top: -0.3125rem;
+    transform: rotate(45deg);
+    width: 0.5rem;
+  }
   position: absolute;
   font-size: var.$body2-font-size;
   top: 5px;
   max-width: 100%;
   min-width: 10em;
+  background-color: var.$white;
   border: 1px solid var.$grey-3;
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
   z-index: 10;
@@ -19,21 +35,8 @@
   }
 }
 
-.datalist__arrow-down {
-  position: absolute;
-  top: -6px;
-  left: 6px;
-  width: 0;
-  height: 0;
-  border-left: 7px solid transparent;
-  border-right: 7px solid transparent;
-  border-bottom: 7px solid var.$grey-4;
-  z-index: -1;
-}
-
 .datalist__ul {
   list-style: none;
-  background-color: var.$white;
   padding: 0;
   > li {
     padding: 0.25em 1.5em 0.25em 1em;
@@ -54,12 +57,14 @@
 @media screen and (prefers-color-scheme: dark) {
   .datalist__items {
     color: var.$white;
+    background-color: var.$grey-6;
+    &:before {
+    }
   }
   .datalist__arrow-down {
     border-bottom: 7px solid var.$grey-6;
   }
   .datalist__ul {
-    background-color: var.$grey-6;
     > li.is-selected {
       background-color: var.$grey-mid;
     }

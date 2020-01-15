@@ -1,11 +1,12 @@
 import { createElement } from 'preact';
-import { useMemo, useRef, useState } from 'preact/hooks';
+import { useRef, useState } from 'preact/hooks';
 import propTypes from 'prop-types';
 
 import { withServices } from '../util/service-context';
 
 import Datalist from './datalist';
 import SvgIcon from './svg-icon';
+import useElementShouldClose from './hooks/use-element-should-close';
 
 /**
  * Component to edit annotation's tags.

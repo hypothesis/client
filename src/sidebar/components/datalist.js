@@ -36,7 +36,6 @@ function Datalist({
     <div className="datalist">
       {list.length > 0 && open && (
         <div className="datalist__items">
-          <span className="datalist__arrow-down" />
           <ul className="datalist__ul">{items}</ul>
         </div>
       )}
