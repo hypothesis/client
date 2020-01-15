@@ -21,7 +21,7 @@
 //     them as `<fixture name>.json` in this directory
 //  4. Add an entry to the fixture list below.
 
-module.exports = [
+export default [
   {
     name: 'Minimal Document',
     html: require('./minimal.html'),

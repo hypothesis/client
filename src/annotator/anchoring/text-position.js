@@ -21,7 +21,7 @@
  * @param {number} end - Character offset within `root.textContent`
  * @return {Range} Range spanning text from `start` to `end`
  */
-function toRange(root, start, end) {
+export function toRange(root, start, end) {
   // The `filter` and `expandEntityReferences` arguments are mandatory in IE
   // although optional according to the spec.
   const nodeIter = root.ownerDocument.createNodeIterator(
@@ -76,7 +76,3 @@ function toRange(root, start, end) {
 
   return range;
 }
-
-module.exports = {
-  toRange,
-};

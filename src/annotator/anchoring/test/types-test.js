@@ -1,4 +1,4 @@
-const types = require('../types');
+import * as types from '../types';
 
 const TextQuoteAnchor = types.TextQuoteAnchor;
 const TextPositionAnchor = types.TextPositionAnchor;
