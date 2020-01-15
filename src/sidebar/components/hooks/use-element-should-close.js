@@ -24,6 +24,21 @@ export default function useElementShouldClose(
   isOpen,
   handleClose
 ) {
+  /**
+   *  Helper to return the underlying node object whether
+   *  `closeableEl` is attached to an HTMLNode or Preact component.
+   *
+   *  @param {Preact ref} closeableEl
+   *  @returns {HTMLNode}
+   */
+
+  const getCurrentNode = closeableEl => {
+    // if base is present, assume its a preact component
+    return closeableEl.current.base
+      ? closeableEl.current.base
+      : closeableEl.current;
+  };
+
   useEffect(() => {
     if (!isOpen) {
       return () => {};
@@ -46,7 +61,8 @@ export default function useElementShouldClose(
       document.body,
       'focus',
       event => {
-        if (!closeableEl.current.contains(event.target)) {
+        const current = getCurrentNode(closeableEl);
+        if (!current.contains(event.target)) {
           handleClose();
         }
       },
@@ -59,7 +75,8 @@ export default function useElementShouldClose(
       document.body,
       ['mousedown', 'click'],
       event => {
-        if (!closeableEl.current.contains(event.target)) {
+        const current = getCurrentNode(closeableEl);
+        if (!current.contains(event.target)) {
           handleClose();
         }
       },
