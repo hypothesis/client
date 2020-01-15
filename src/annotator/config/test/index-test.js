@@ -1,5 +1,5 @@
-const configFrom = require('../index');
-const { $imports } = require('../index');
+import configFrom from '../index';
+import { $imports } from '../index';
 
 describe('annotator.config.index', function() {
   let fakeSettingsFrom;

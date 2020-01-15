@@ -1,8 +1,9 @@
-const configFuncSettingsFrom = require('./config-func-settings-from');
-const isBrowserExtension = require('./is-browser-extension');
-const sharedSettings = require('../../shared/settings');
+import * as sharedSettings from '../../shared/settings';
 
-function settingsFrom(window_) {
+import configFuncSettingsFrom from './config-func-settings-from';
+import isBrowserExtension from './is-browser-extension';
+
+export default function settingsFrom(window_) {
   const jsonConfigs = sharedSettings.jsonConfigsFrom(window_.document);
   const configFuncSettings = configFuncSettingsFrom(window_);
 
@@ -214,5 +215,3 @@ function settingsFrom(window_) {
     hostPageSetting: hostPageSetting,
   };
 }
-
-module.exports = settingsFrom;

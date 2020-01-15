@@ -1,11 +1,11 @@
-const settingsFrom = require('./settings');
+import settingsFrom from './settings';
 
 /**
  * Reads the Hypothesis configuration from the environment.
  *
  * @param {Window} window_ - The Window object to read config from.
  */
-function configFrom(window_) {
+export default function configFrom(window_) {
   const settings = settingsFrom(window_);
   return {
     annotations: settings.annotations,
@@ -44,5 +44,3 @@ function configFrom(window_) {
     ),
   };
 }
-
-module.exports = configFrom;
