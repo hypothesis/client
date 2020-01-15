@@ -6,19 +6,24 @@ import 'focus-visible';
 import configFrom from './config/index';
 import Guest from './guest';
 import PdfSidebar from './pdf-sidebar';
+import BucketBarPlugin from './plugin/bucket-bar';
+import CrossFramePlugin from './plugin/cross-frame';
+import DocumentPlugin from './plugin/document';
+import PDFPlugin from './plugin/pdf';
+import ToolbarPlugin from './plugin/toolbar';
 import Sidebar from './sidebar';
 
 const pluginClasses = {
   // UI plugins
-  BucketBar: require('./plugin/bucket-bar'),
-  Toolbar: require('./plugin/toolbar'),
+  BucketBar: BucketBarPlugin,
+  Toolbar: ToolbarPlugin,
 
   // Document type plugins
-  PDF: require('./plugin/pdf'),
-  Document: require('./plugin/document'),
+  PDF: PDFPlugin,
+  Document: DocumentPlugin,
 
   // Cross-frame communication
-  CrossFrame: require('./plugin/cross-frame'),
+  CrossFrame: CrossFramePlugin,
 };
 
 const appLinkEl = document.querySelector(
