@@ -38,7 +38,7 @@ function currentScriptOrigin(document_ = document) {
  * running. In that case, all references to `localhost` need to be replaced
  * with the IP/hostname of the dev server.
  */
-function processUrlTemplate(url, document_ = document) {
+export default function processUrlTemplate(url, document_ = document) {
   if (url.indexOf('{') === -1) {
     // Not a template. This should always be the case in production.
     return url;
@@ -53,5 +53,3 @@ function processUrlTemplate(url, document_ = document) {
 
   return url;
 }
-
-module.exports = processUrlTemplate;
