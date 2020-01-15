@@ -1,5 +1,3 @@
-const STORAGE_KEY = 'hypothesis.privacy';
-
 /**
  * Object defining which principals can read, update and delete an annotation.
  *
@@ -23,11 +21,11 @@ const STORAGE_KEY = 'hypothesis.privacy';
  * annotations to local storage.
  */
 // @ngInject
-export default function Permissions(localStorage) {
+export default function Permissions(store) {
   const self = this;
 
   function defaultLevel() {
-    const savedLevel = localStorage.getItem(STORAGE_KEY);
+    const savedLevel = store.getDefault('annotationPrivacy');
     switch (savedLevel) {
       case 'private':
       case 'shared':
@@ -97,7 +95,7 @@ export default function Permissions(localStorage) {
    * @param {'private'|'shared'} level
    */
   this.setDefault = function(level) {
-    localStorage.setItem(STORAGE_KEY, level);
+    store.setDefault('annotationPrivacy', level);
   };
 
   /**
