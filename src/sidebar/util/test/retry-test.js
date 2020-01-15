@@ -1,5 +1,5 @@
-const retryUtil = require('../retry');
-const { toResult } = require('../../../shared/test/promise-util');
+import { toResult } from '../../../shared/test/promise-util';
+import * as retryUtil from '../retry';
 
 describe('sidebar.util.retry', function() {
   describe('.retryPromiseOperation', function() {

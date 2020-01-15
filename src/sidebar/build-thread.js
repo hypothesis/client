@@ -275,7 +275,7 @@ const defaultOpts = {
  * @return {Thread} - The root thread, whose children are the top-level
  *                    annotations to display.
  */
-function buildThread(annotations, opts) {
+export default function buildThread(annotations, opts) {
   opts = Object.assign({}, defaultOpts, opts);
 
   let thread = threadAnnotations(annotations);
@@ -358,5 +358,3 @@ function buildThread(annotations, opts) {
 
   return thread;
 }
-
-module.exports = buildThread;

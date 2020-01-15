@@ -1,5 +1,5 @@
-const crossOriginRPC = require('../cross-origin-rpc');
-const { $imports } = require('../cross-origin-rpc');
+import crossOriginRPC from '../cross-origin-rpc';
+import { $imports } from '../cross-origin-rpc';
 
 describe('crossOriginRPC', function() {
   describe('server', function() {

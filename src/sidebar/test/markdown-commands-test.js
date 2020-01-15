@@ -1,4 +1,4 @@
-const commands = require('../markdown-commands');
+import * as commands from '../markdown-commands';
 
 /**
  * Convert a string containing '<sel>' and '</sel>' markers

@@ -1,5 +1,5 @@
-const retry = require('retry');
-const EventEmitter = require('tiny-emitter');
+import retry from 'retry';
+import EventEmitter from 'tiny-emitter';
 
 // see https://developer.mozilla.org/en-US/docs/Web/API/CloseEvent
 const CLOSE_NORMAL = 1000;
@@ -16,7 +16,7 @@ const RECONNECT_MIN_DELAY = 1000;
  * - Uses the standard EventEmitter API for reporting open, close, error
  *   and message events.
  */
-class Socket extends EventEmitter {
+export default class Socket extends EventEmitter {
   constructor(url) {
     super();
 
@@ -131,5 +131,3 @@ class Socket extends EventEmitter {
     connect();
   }
 }
-
-module.exports = Socket;

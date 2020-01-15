@@ -1,5 +1,5 @@
-const groupsByOrganization = require('../group-organizations');
-const orgFixtures = require('../../test/group-fixtures');
+import * as orgFixtures from '../../test/group-fixtures';
+import groupsByOrganization from '../group-organizations';
 
 describe('group-organizations', function() {
   context('when sorting organizations and their contained groups', function() {

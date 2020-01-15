@@ -1,4 +1,4 @@
-const time = require('../time');
+import * as time from '../time';
 
 const second = 1000;
 const minute = second * 60;

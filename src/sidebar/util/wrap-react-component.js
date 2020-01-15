@@ -1,5 +1,6 @@
-const { createElement, render } = require('preact');
-const { ServiceContext } = require('./service-context');
+import { createElement, render } from 'preact';
+
+import { ServiceContext } from './service-context';
 
 function useExpressionBinding(propName) {
   return propName.match(/^on[A-Z]/);
@@ -109,7 +110,7 @@ class ReactController {
  * @return {Object} -
  *   An AngularJS component spec for use with `angular.component(...)`
  */
-function wrapReactComponent(type) {
+export default function wrapReactComponent(type) {
   if (!type.propTypes) {
     throw new Error(
       `React component ${type.name} does not specify its inputs using "propTypes"`
@@ -135,5 +136,3 @@ function wrapReactComponent(type) {
     controller: createController,
   };
 }
-
-module.exports = wrapReactComponent;

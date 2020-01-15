@@ -1,11 +1,11 @@
-const angular = require('angular');
-const { Component, createElement } = require('preact');
-const { useContext } = require('preact/hooks');
-const propTypes = require('prop-types');
+import angular from 'angular';
+import { Component, createElement } from 'preact';
+import { useContext } from 'preact/hooks';
+import propTypes from 'prop-types';
 
-const { ServiceContext } = require('../service-context');
-const wrapReactComponent = require('../wrap-react-component');
-const { createDirective } = require('../../directive/test/util');
+import { createDirective } from '../../directive/test/util';
+import { ServiceContext } from '../service-context';
+import wrapReactComponent from '../wrap-react-component';
 
 // Saved `onDblClick` prop from last render of `Button`.
 // This makes it easy to call it with different arguments.

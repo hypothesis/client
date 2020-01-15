@@ -2,7 +2,7 @@
  * This module defines the set of global events that are dispatched
  * on $rootScope
  */
-module.exports = {
+export default {
   // Internal state changes
   FRAME_CONNECTED: 'frameConnected',
 

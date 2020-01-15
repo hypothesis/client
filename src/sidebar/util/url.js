@@ -7,7 +7,7 @@
  *   replaceURLParams('/things/:id', {id: 'foo', q: 'bar'}) =>
  *     {url: '/things/foo', params: {q: 'bar'}}
  */
-function replaceURLParams(url, params) {
+export function replaceURLParams(url, params) {
   const unusedParams = {};
   for (const param in params) {
     if (params.hasOwnProperty(param)) {
@@ -29,11 +29,6 @@ function replaceURLParams(url, params) {
  * @param {string} relativeURL
  * @param {string} baseURL
  */
-function resolve(relativeURL, baseURL) {
+export function resolve(relativeURL, baseURL) {
   return new URL(relativeURL, baseURL).href;
 }
-
-module.exports = {
-  replaceURLParams: replaceURLParams,
-  resolve: resolve,
-};

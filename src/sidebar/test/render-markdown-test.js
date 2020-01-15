@@ -1,5 +1,5 @@
-const renderMarkdown = require('../render-markdown');
-const { $imports } = require('../render-markdown');
+import renderMarkdown from '../render-markdown';
+import { $imports } from '../render-markdown';
 
 describe('render-markdown', function() {
   let render;

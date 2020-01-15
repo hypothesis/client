@@ -1,4 +1,4 @@
-const scopeTimeout = require('../scope-timeout');
+import scopeTimeout from '../scope-timeout';
 
 function FakeScope() {
   this.listeners = {};

@@ -1,4 +1,4 @@
-const serviceConfig = require('../service-config');
+import serviceConfig from '../service-config';
 
 /**
  * Is the sharing of annotations enabled? Check for any defined `serviceConfig`,
@@ -7,7 +7,7 @@ const serviceConfig = require('../service-config');
  * @param {object} settings
  * @return {boolean}
  */
-function sharingEnabled(settings) {
+export function sharingEnabled(settings) {
   const serviceConfig_ = serviceConfig(settings);
   if (serviceConfig_ === null) {
     return true;
@@ -25,7 +25,7 @@ function sharingEnabled(settings) {
  * @param {object} annotation
  * @return {string|undefined}
  */
-function shareURI(annotation) {
+export function shareURI(annotation) {
   const links = annotation.links;
   return links && (links.incontext || links.html);
 }
@@ -38,12 +38,6 @@ function shareURI(annotation) {
  * @param {object} settings
  * @return {boolean}
  */
-function isShareable(annotation, settings) {
+export function isShareable(annotation, settings) {
   return !!(sharingEnabled(settings) && shareURI(annotation));
 }
-
-module.exports = {
-  sharingEnabled,
-  shareURI,
-  isShareable,
-};

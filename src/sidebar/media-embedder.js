@@ -1,4 +1,4 @@
-const queryString = require('query-string');
+import * as queryString from 'query-string';
 
 /**
  * Return an HTML5 audio player with the given src URL.
@@ -321,7 +321,7 @@ function replaceLinkWithEmbed(link) {
  * embeds of the same media.
  *
  */
-function replaceLinksWithEmbeds(element) {
+export function replaceLinksWithEmbeds(element) {
   let links = element.getElementsByTagName('a');
 
   // `links` is a "live list" of the <a> element children of `element`.
@@ -335,7 +335,3 @@ function replaceLinksWithEmbeds(element) {
     replaceLinkWithEmbed(links[i]);
   }
 }
-
-module.exports = {
-  replaceLinksWithEmbeds: replaceLinksWithEmbeds,
-};

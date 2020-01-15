@@ -1,4 +1,4 @@
-const observeElementSize = require('../observe-element-size');
+import observeElementSize from '../observe-element-size';
 
 /**
  * Wait for a condition to become true.

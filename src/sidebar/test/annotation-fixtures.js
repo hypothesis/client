@@ -1,7 +1,7 @@
 /**
  * Return a fake annotation with the basic properties filled in.
  */
-function defaultAnnotation() {
+export function defaultAnnotation() {
   return {
     id: 'deadbeef',
     created: '2015-05-10T20:18:56.613388+00:00',
@@ -18,7 +18,7 @@ function defaultAnnotation() {
 /**
  * Return a fake annotation created by a third-party user.
  */
-function thirdPartyAnnotation() {
+export function thirdPartyAnnotation() {
   return Object.assign(defaultAnnotation(), {
     user: 'acct:ben@publisher.org',
   });
@@ -27,7 +27,7 @@ function thirdPartyAnnotation() {
 /**
  * Return a fake public annotation with the basic properties filled in.
  */
-function publicAnnotation() {
+export function publicAnnotation() {
   return {
     id: 'pubann',
     document: {
@@ -48,7 +48,7 @@ function publicAnnotation() {
  * Components will never see this data structure, as it will have been
  * amended by store reducers.
  */
-function newAnnotation() {
+export function newAnnotation() {
   return {
     id: undefined,
     $highlight: undefined,
@@ -61,7 +61,7 @@ function newAnnotation() {
 }
 
 /** Return a new reply */
-function newReply() {
+export function newReply() {
   return {
     id: undefined,
     $highlight: undefined,
@@ -73,7 +73,7 @@ function newReply() {
 }
 
 /** Return a new annotation which has no tags or text. */
-function newEmptyAnnotation() {
+export function newEmptyAnnotation() {
   return {
     id: undefined,
     $highlight: undefined,
@@ -87,7 +87,7 @@ function newEmptyAnnotation() {
 /** Return an annotation domain model object for a new highlight
  * (newly-created client-side, not yet saved to the server).
  */
-function newHighlight() {
+export function newHighlight() {
   return {
     id: undefined,
     $highlight: true,
@@ -99,7 +99,7 @@ function newHighlight() {
 /** Return an annotation domain model object for an existing annotation
  *  received from the server.
  */
-function oldAnnotation() {
+export function oldAnnotation() {
   return {
     id: 'annotation_id',
     $highlight: undefined,
@@ -113,7 +113,7 @@ function oldAnnotation() {
 /** Return an annotation domain model object for an existing highlight
  *  received from the server.
  */
-function oldHighlight() {
+export function oldHighlight() {
   return {
     id: 'annotation_id',
     $highlight: undefined,
@@ -127,7 +127,7 @@ function oldHighlight() {
 /** Return an annotation domain model object for an existing page note
  *  received from the server.
  */
-function oldPageNote() {
+export function oldPageNote() {
   return {
     highlight: undefined,
     target: [{ source: 'http://example.org' }],
@@ -140,7 +140,7 @@ function oldPageNote() {
 /** Return an annotation domain model object for an existing reply
  *  received from the server.
  */
-function oldReply() {
+export function oldReply() {
   return {
     highlight: undefined,
     target: ['foo'],
@@ -161,7 +161,7 @@ function oldReply() {
  *
  * @param {ModerationState} modInfo
  */
-function moderatedAnnotation(modInfo) {
+export function moderatedAnnotation(modInfo) {
   return Object.assign(defaultAnnotation(), {
     id: 'ann-id',
     hidden: !!modInfo.hidden,
@@ -170,18 +170,3 @@ function moderatedAnnotation(modInfo) {
     },
   });
 }
-
-module.exports = {
-  defaultAnnotation: defaultAnnotation,
-  publicAnnotation: publicAnnotation,
-  moderatedAnnotation: moderatedAnnotation,
-  newAnnotation: newAnnotation,
-  newEmptyAnnotation: newEmptyAnnotation,
-  newHighlight: newHighlight,
-  newReply: newReply,
-  oldAnnotation: oldAnnotation,
-  oldHighlight: oldHighlight,
-  oldPageNote: oldPageNote,
-  oldReply: oldReply,
-  thirdPartyAnnotation: thirdPartyAnnotation,
-};

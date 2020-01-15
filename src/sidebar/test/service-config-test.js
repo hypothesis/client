@@ -1,4 +1,4 @@
-const serviceConfig = require('../service-config');
+import serviceConfig from '../service-config';
 
 describe('serviceConfig', function() {
   it('returns null if services is not an array', function() {

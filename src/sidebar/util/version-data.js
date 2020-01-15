@@ -22,7 +22,7 @@
  * @property {DocMetadata} metadata - document metadata
  */
 
-class VersionData {
+export default class VersionData {
   /**
    * @param {UserInfo} userInfo
    * @param {DocumentInfo} documentInfo
@@ -78,5 +78,3 @@ class VersionData {
     return encodeURIComponent(this.asFormattedString());
   }
 }
-
-module.exports = VersionData;

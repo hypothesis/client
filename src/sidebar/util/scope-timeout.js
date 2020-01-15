@@ -11,7 +11,13 @@
  * @param {Function} fn - Callback to invoke with setTimeout
  * @param {number} delay - Delay argument to pass to setTimeout
  */
-function scopeTimeout($scope, fn, delay, setTimeoutFn, clearTimeoutFn) {
+export default function scopeTimeout(
+  $scope,
+  fn,
+  delay,
+  setTimeoutFn,
+  clearTimeoutFn
+) {
   setTimeoutFn = setTimeoutFn || setTimeout;
   clearTimeoutFn = clearTimeoutFn || clearTimeout;
 
@@ -24,5 +30,3 @@ function scopeTimeout($scope, fn, delay, setTimeoutFn, clearTimeoutFn) {
     clearTimeoutFn(id);
   });
 }
-
-module.exports = scopeTimeout;

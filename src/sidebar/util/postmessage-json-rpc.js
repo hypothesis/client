@@ -1,4 +1,4 @@
-const { generateHexString } = require('./random');
+import { generateHexString } from './random';
 
 /** Generate a random ID to associate RPC requests and responses. */
 function generateId() {
@@ -26,7 +26,7 @@ function createTimeout(delay, message) {
  * @param [id] id - Test seam.
  * @return {Promise<any>} - A Promise for the response to the call
  */
-function call(
+export function call(
   frame,
   origin,
   method,
@@ -96,7 +96,3 @@ function call(
       throw err;
     });
 }
-
-module.exports = {
-  call,
-};

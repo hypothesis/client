@@ -1,12 +1,8 @@
-const { mount } = require('enzyme');
-const propTypes = require('prop-types');
-const { createElement, render } = require('preact');
+import { mount } from 'enzyme';
+import { createElement, render } from 'preact';
+import propTypes from 'prop-types';
 
-const {
-  ServiceContext,
-  withServices,
-  useService,
-} = require('../service-context');
+import { ServiceContext, withServices, useService } from '../service-context';
 
 describe('service-context', () => {
   describe('withServices', () => {

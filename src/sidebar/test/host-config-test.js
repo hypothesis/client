@@ -1,4 +1,4 @@
-const hostPageConfig = require('../host-config');
+import hostPageConfig from '../host-config';
 
 function fakeWindow(config) {
   return {

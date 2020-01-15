@@ -10,7 +10,7 @@
  *   uri, domain and title.
  *
  */
-function documentMetadata(annotation) {
+export function documentMetadata(annotation) {
   const uri = annotation.uri;
   let domain = new URL(uri).hostname;
   let title = domain;
@@ -34,7 +34,7 @@ function documentMetadata(annotation) {
  * Return the domain and title of an annotation for display on an annotation
  * card.
  */
-function domainAndTitle(annotation) {
+export function domainAndTitle(annotation) {
   return {
     domain: domainTextFromAnnotation(annotation),
     titleText: titleTextFromAnnotation(annotation),
@@ -89,7 +89,7 @@ function titleTextFromAnnotation(annotation) {
 }
 
 /** Return `true` if the given annotation is a reply, `false` otherwise. */
-function isReply(annotation) {
+export function isReply(annotation) {
   return (annotation.references || []).length > 0;
 }
 
@@ -98,12 +98,12 @@ function isReply(annotation) {
  * "New" means this annotation has been newly created client-side and not
  * saved to the server yet.
  */
-function isNew(annotation) {
+export function isNew(annotation) {
   return !annotation.id;
 }
 
 /** Return `true` if the given annotation is public, `false` otherwise. */
-function isPublic(annotation) {
+export function isPublic(annotation) {
   let isPublic = false;
 
   if (!annotation.permissions) {
@@ -141,7 +141,7 @@ function hasSelector(annotation) {
  * Returns false if anchoring is still in process but the flag indicating that
  * the initial timeout allowed for anchoring has expired.
  */
-function isWaitingToAnchor(annotation) {
+export function isWaitingToAnchor(annotation) {
   return (
     hasSelector(annotation) &&
     typeof annotation.$orphan === 'undefined' &&
@@ -158,7 +158,7 @@ function isWaitingToAnchor(annotation) {
  * @param {Object} annotation
  * @return {boolean}
  */
-function isHighlight(annotation) {
+export function isHighlight(annotation) {
   // `$highlight` is an ephemeral attribute set by the `annotator` on new
   // annotation objects (created by clicking the "highlight" button).
   // It is not persisted and cannot be relied upon, but if it IS present,
@@ -187,17 +187,17 @@ function isHighlight(annotation) {
 }
 
 /** Return `true` if the given annotation is an orphan. */
-function isOrphan(annotation) {
+export function isOrphan(annotation) {
   return hasSelector(annotation) && annotation.$orphan;
 }
 
 /** Return `true` if the given annotation is a page note. */
-function isPageNote(annotation) {
+export function isPageNote(annotation) {
   return !hasSelector(annotation) && !isReply(annotation);
 }
 
 /** Return `true` if the given annotation is a top level annotation, `false` otherwise. */
-function isAnnotation(annotation) {
+export function isAnnotation(annotation) {
   return !!(hasSelector(annotation) && !isOrphan(annotation));
 }
 
@@ -207,7 +207,7 @@ function isAnnotation(annotation) {
  *                    the document, where lower numbers mean closer to the
  *                    start.
  */
-function location(annotation) {
+export function location(annotation) {
   if (annotation) {
     const targets = annotation.target || [];
     for (let i = 0; i < targets.length; i++) {
@@ -228,7 +228,7 @@ function location(annotation) {
  *
  * @return {number|null}
  */
-function flagCount(ann) {
+export function flagCount(ann) {
   if (!ann.moderation) {
     return null;
   }
@@ -240,7 +240,7 @@ function flagCount(ann) {
  *
  * @return {string|null}
  */
-function quote(ann) {
+export function quote(ann) {
   if (ann.target.length === 0) {
     return null;
   }
@@ -251,19 +251,3 @@ function quote(ann) {
   const quoteSel = target.selector.find(s => s.type === 'TextQuoteSelector');
   return quoteSel ? quoteSel.exact : null;
 }
-
-module.exports = {
-  documentMetadata: documentMetadata,
-  domainAndTitle: domainAndTitle,
-  flagCount: flagCount,
-  isAnnotation: isAnnotation,
-  isHighlight: isHighlight,
-  isNew: isNew,
-  isOrphan: isOrphan,
-  isPageNote: isPageNote,
-  isPublic: isPublic,
-  isReply: isReply,
-  isWaitingToAnchor: isWaitingToAnchor,
-  location: location,
-  quote,
-};

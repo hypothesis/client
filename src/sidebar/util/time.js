@@ -14,7 +14,7 @@ let formatters = {};
 /**
  * Clears the cache of formatters.
  */
-function clearFormatters() {
+export function clearFormatters() {
   formatters = {};
 }
 
@@ -166,7 +166,7 @@ function getBreakpoint(date, now) {
  * @return {Number|null} - ms until next update or `null` if no update
  *                         should occur
  */
-function nextFuzzyUpdate(date, now) {
+export function nextFuzzyUpdate(date, now) {
   if (!date) {
     return null;
   }
@@ -199,7 +199,7 @@ function nextFuzzyUpdate(date, now) {
  * @param {UpdateCallback} callback - A callback function to call when the timestamp changes.
  * @return {Function} A function that cancels the automatic refresh.
  */
-function decayingInterval(date, callback) {
+export function decayingInterval(date, callback) {
   let timer;
   const timeStamp = date ? new Date(date) : null;
 
@@ -235,16 +235,9 @@ function decayingInterval(date, callback) {
  *                      param is present for dependency injection during test.
  * @return {string} A 'fuzzy' string describing the relative age of the date.
  */
-function toFuzzyString(date, now, Intl) {
+export function toFuzzyString(date, now, Intl) {
   if (!date) {
     return '';
   }
   return getBreakpoint(date, now).formatFn(date, now, Intl);
 }
-
-module.exports = {
-  clearFormatters: clearFormatters, // For testing
-  decayingInterval: decayingInterval,
-  nextFuzzyUpdate: nextFuzzyUpdate, // For testing
-  toFuzzyString: toFuzzyString,
-};

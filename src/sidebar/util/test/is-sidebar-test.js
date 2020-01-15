@@ -1,4 +1,4 @@
-const isSidebar = require('../is-sidebar');
+import isSidebar from '../is-sidebar';
 
 describe('sidebar.utils.is-sidebar', () => {
   [

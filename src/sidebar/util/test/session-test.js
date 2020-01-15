@@ -1,4 +1,4 @@
-const sessionUtil = require('../session');
+import * as sessionUtil from '../session';
 
 describe('sidebar/util/session', () => {
   describe('#shouldShowSidebarTutorial', () => {

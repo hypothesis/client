@@ -1,11 +1,11 @@
-const EventEmitter = require('tiny-emitter');
+import EventEmitter from 'tiny-emitter';
 
 /**
  * Client for the Hypothesis search API.
  *
  * SearchClient handles paging through results, canceling search etc.
  */
-class SearchClient extends EventEmitter {
+export default class SearchClient extends EventEmitter {
   /**
    * @param {Object} searchFn - Function for querying the search API
    * @param {Object} opts - Search options
@@ -100,5 +100,3 @@ class SearchClient extends EventEmitter {
     this.emit('end');
   }
 }
-
-module.exports = SearchClient;

@@ -1,4 +1,4 @@
-class FakeWindow {
+export default class FakeWindow {
   constructor() {
     this.callbacks = [];
 
@@ -49,5 +49,3 @@ class FakeWindow {
     this.trigger(evt);
   }
 }
-
-module.exports = FakeWindow;

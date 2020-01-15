@@ -1,6 +1,6 @@
-const queryString = require('query-string');
+import * as queryString from 'query-string';
 
-const random = require('./random');
+import * as random from './random';
 
 /**
  * An object holding the details of an access token from the tokenUrl endpoint.
@@ -57,7 +57,7 @@ function generateState() {
  * OAuthClient handles interaction with the annotation service's OAuth
  * endpoints.
  */
-class OAuthClient {
+export default class OAuthClient {
   /**
    * Create a new OAuthClient
    *
@@ -260,5 +260,3 @@ class OAuthClient {
     );
   }
 }
-
-module.exports = OAuthClient;

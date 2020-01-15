@@ -1,5 +1,5 @@
-const EventEmitter = require('tiny-emitter');
-const debounce = require('lodash.debounce');
+import debounce from 'lodash.debounce';
+import EventEmitter from 'tiny-emitter';
 
 /**
  * @typedef Options
@@ -24,7 +24,7 @@ const debounce = require('lodash.debounce');
  * the number of watchers (functions created by template expressions or
  * '$scope.$watch' calls) that have to be run on every '$scope.$digest()' cycle.
  */
-class VirtualThreadList extends EventEmitter {
+export default class VirtualThreadList extends EventEmitter {
   /*
    * @param {Window} container - The Window displaying the list of annotation threads.
    * @param {Thread} rootThread - The initial Thread object for the top-level
@@ -211,5 +211,3 @@ class VirtualThreadList extends EventEmitter {
     };
   }
 }
-
-module.exports = VirtualThreadList;

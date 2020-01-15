@@ -11,7 +11,7 @@ function byteToHex(val) {
  * @param {number} - An even-numbered length string to generate.
  * @return {string}
  */
-function generateHexString(len) {
+export function generateHexString(len) {
   const crypto = window.crypto || window.msCrypto; /* IE 11 */
   const bytes = new Uint8Array(len / 2);
   crypto.getRandomValues(bytes);
@@ -19,7 +19,3 @@ function generateHexString(len) {
     .map(byteToHex)
     .join('');
 }
-
-module.exports = {
-  generateHexString,
-};

@@ -12,8 +12,8 @@
  *     https://reactjs.org/docs/hooks-reference.html#usecontext
  */
 
-const { useContext } = require('preact/hooks');
-const { createContext, createElement } = require('preact');
+import { createContext, createElement } from 'preact';
+import { useContext } from 'preact/hooks';
 
 const fallbackInjector = {
   get(service) {
@@ -54,7 +54,7 @@ const ServiceContext = createContext(fallbackInjector);
  *   // Wrap `MyComponent` to inject any services it needs.
  *   module.exports = withServices(MyComponent);
  */
-function withServices(Component) {
+export function withServices(Component) {
   if (!Component.injectedProps) {
     // This component doesn't depend on any services, so there is no need
     // to wrap it.
@@ -108,13 +108,9 @@ function withServices(Component) {
  *
  * @param {string} service - Name of the service to look up
  */
-function useService(service) {
+export function useService(service) {
   const injector = useContext(ServiceContext);
   return injector.get(service);
 }
 
-module.exports = {
-  ServiceContext,
-  withServices,
-  useService,
-};
+export { ServiceContext };

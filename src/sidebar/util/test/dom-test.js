@@ -1,4 +1,4 @@
-const { listen } = require('../dom');
+import { listen } from '../dom';
 
 describe('sidebar/util/dom', () => {
   const createElement = () => ({

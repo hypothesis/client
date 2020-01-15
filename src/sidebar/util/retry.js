@@ -1,4 +1,4 @@
-const retry = require('retry');
+import retry from 'retry';
 
 /**
  * Retry a Promise-returning operation until it succeeds or
@@ -10,7 +10,7 @@ const retry = require('retry');
  * @return A promise for the first successful result of the operation, if
  *         it succeeds within the allowed number of attempts.
  */
-function retryPromiseOperation(opFn, options) {
+export function retryPromiseOperation(opFn, options) {
   return new Promise(function(resolve, reject) {
     const operation = retry.operation(options);
     operation.attempt(function() {
@@ -27,7 +27,3 @@ function retryPromiseOperation(opFn, options) {
     });
   });
 }
-
-module.exports = {
-  retryPromiseOperation: retryPromiseOperation,
-};

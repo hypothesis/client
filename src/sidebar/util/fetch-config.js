@@ -1,6 +1,7 @@
-const getApiUrl = require('../get-api-url');
-const hostConfig = require('../host-config');
-const postMessageJsonRpc = require('./postmessage-json-rpc');
+import getApiUrl from '../get-api-url';
+import hostConfig from '../host-config';
+
+import * as postMessageJsonRpc from './postmessage-json-rpc';
 
 function ancestors(window_) {
   if (window_ === window_.top) {
@@ -57,7 +58,7 @@ function fetchConfigFromAncestorFrame(origin, window_ = window) {
  * @param {Window} window_ - Test seam.
  * @return {Promise<Object>} - The merged settings.
  */
-function fetchConfig(appConfig, window_ = window) {
+export function fetchConfig(appConfig, window_ = window) {
   const hostPageConfig = hostConfig(window_);
 
   let embedderConfig;
@@ -74,7 +75,3 @@ function fetchConfig(appConfig, window_ = window) {
     return mergedConfig;
   });
 }
-
-module.exports = {
-  fetchConfig,
-};
