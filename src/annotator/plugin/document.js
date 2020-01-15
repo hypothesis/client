@@ -10,16 +10,16 @@
  ** https://github.com/openannotation/annotator/blob/master/LICENSE
  */
 
-const baseURI = require('document-base-uri');
+import baseURI from 'document-base-uri';
 
-const Plugin = require('../plugin');
-const { normalizeURI } = require('../util/url');
+import Plugin from '../plugin';
+import { normalizeURI } from '../util/url';
 
 /**
  * DocumentMeta reads metadata/links from the current HTML document and
  * populates the `document` property of new annotations.
  */
-class DocumentMeta extends Plugin {
+export default class DocumentMeta extends Plugin {
   constructor(element, options) {
     super(element, options);
 
@@ -298,5 +298,3 @@ class DocumentMeta extends Plugin {
     return href;
   }
 }
-
-module.exports = DocumentMeta;

@@ -1,4 +1,4 @@
-const { normalizeURI } = require('../util/url');
+import { normalizeURI } from '../util/url';
 
 /**
  * @typedef Link
@@ -25,7 +25,7 @@ const { normalizeURI } = require('../util/url');
  *    // Do something with the URL of the PDF.
  * })
  */
-class PDFMetadata {
+export default class PDFMetadata {
   /**
    * Construct a `PDFMetadata` that returns URIs/metadata associated with a
    * given PDF viewer.
@@ -126,5 +126,3 @@ function getPDFURL(app) {
 
   return null;
 }
-
-module.exports = PDFMetadata;
