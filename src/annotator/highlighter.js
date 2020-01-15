@@ -4,10 +4,9 @@ import $ from 'jquery';
  * Wraps the DOM Nodes within the provided range with a highlight
  * element of the specified class and returns the highlight Elements.
  *
- * normedRange - A NormalizedRange to be highlighted.
- * cssClass - A CSS class to use for the highlight (default: 'annotator-hl')
- *
- * Returns an array of highlight Elements.
+ * @param {NormalizedRange} normedRange - Range to be highlighted.
+ * @param {string} cssClass - A CSS class to use for the highlight (default: 'annotator-hl')
+ * @return - A jQuery array of highlighted elements
  */
 export function highlightRange(normedRange, cssClass = 'annotator-hl') {
   const white = /^\s*$/;
@@ -33,6 +32,11 @@ export function highlightRange(normedRange, cssClass = 'annotator-hl') {
     .toArray();
 }
 
+/**
+ * Remove highlights from a range previously highlighted with `highlightRange`.
+ *
+ * @param highlights - The highlight elements returned by `highlightRange`
+ */
 export function removeHighlights(highlights) {
   for (let h of highlights) {
     if (h.parentNode) {
@@ -42,10 +46,22 @@ export function removeHighlights(highlights) {
 }
 
 /**
+ * @typedef Rect
+ * @prop {number} top
+ * @prop {number} left
+ * @prop {number} bottom
+ * @prop {number} right
+ */
+
+/**
  * Get the bounding client rectangle of a collection in viewport coordinates.
- * Unfortunately, Chrome has issues[1] with Range.getBoundingClient rect or we
+ * Unfortunately, Chrome has issues ([1]) with Range.getBoundingClient rect or we
  * could just use that.
- * [1] https://code.google.com/p/chromium/issues/detail?id=324437
+ *
+ * [1] https://bugs.chromium.org/p/chromium/issues/detail?id=324437
+ *
+ * @param {HTMLElement[]} collection
+ * @return {Rect}
  */
 export function getBoundingClientRect(collection) {
   // Reduce the client rectangles of the highlights to a bounding box
