@@ -1,6 +1,6 @@
-const classnames = require('classnames');
+import classnames from 'classnames';
 
-const template = require('./adder.html');
+import template from './adder.html';
 
 const ANNOTATE_BTN_SELECTOR = '.js-annotate-btn';
 const HIGHLIGHT_BTN_SELECTOR = '.js-highlight-btn';
@@ -120,7 +120,7 @@ function createAdderDOM(container) {
  * Annotation 'adder' toolbar which appears next to the selection
  * and provides controls for the user to create new annotations.
  */
-class Adder {
+export class Adder {
   /**
    * Construct the toolbar and populate the UI.
    *
@@ -288,9 +288,4 @@ class Adder {
   }
 }
 
-module.exports = {
-  ARROW_POINTING_DOWN: ARROW_POINTING_DOWN,
-  ARROW_POINTING_UP: ARROW_POINTING_UP,
-
-  Adder: Adder,
-};
+export { ARROW_POINTING_DOWN, ARROW_POINTING_UP };

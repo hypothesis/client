@@ -1,8 +1,7 @@
-const { isLoaded } = require('../../util/frame-util');
-
-const FRAME_DEBOUNCE_WAIT = require('../../frame-observer').DEBOUNCE_WAIT + 10;
-const CrossFrame = require('../../plugin/cross-frame');
-const { $imports } = require('../../plugin/cross-frame');
+import { DEBOUNCE_WAIT } from '../../frame-observer';
+import CrossFrame from '../../plugin/cross-frame';
+import { $imports } from '../../plugin/cross-frame';
+import { isLoaded } from '../../util/frame-util';
 
 describe('CrossFrame multi-frame scenario', function() {
   let fakeAnnotationSync;
@@ -16,7 +15,8 @@ describe('CrossFrame multi-frame scenario', function() {
   const sandbox = sinon.createSandbox();
 
   const waitForFrameObserver = function(cb) {
-    return setTimeout(cb, FRAME_DEBOUNCE_WAIT);
+    const wait = DEBOUNCE_WAIT + 10;
+    return setTimeout(cb, wait);
   };
 
   beforeEach(function() {

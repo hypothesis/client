@@ -2,7 +2,7 @@
  * Returns true if the start point of a selection occurs after the end point,
  * in document order.
  */
-function isSelectionBackwards(selection) {
+export function isSelectionBackwards(selection) {
   if (selection.focusNode === selection.anchorNode) {
     return selection.focusOffset < selection.anchorOffset;
   }
@@ -20,7 +20,7 @@ function isSelectionBackwards(selection) {
  * @param {Range} range
  * @param {Node} node
  */
-function isNodeInRange(range, node) {
+export function isNodeInRange(range, node) {
   if (node === range.startContainer || node === range.endContainer) {
     return true;
   }
@@ -69,7 +69,7 @@ function forEachNodeInRange(range, callback) {
  * @param {Range} range
  * @return {Array<Rect>} Array of bounding rects in viewport coordinates.
  */
-function getTextBoundingBoxes(range) {
+export function getTextBoundingBoxes(range) {
   const whitespaceOnly = /^\s*$/;
   const textNodes = [];
   forEachNodeInRange(range, function(node) {
@@ -114,7 +114,7 @@ function getTextBoundingBoxes(range) {
  * @param {Selection} selection
  * @return {Rect|null}
  */
-function selectionFocusRect(selection) {
+export function selectionFocusRect(selection) {
   if (selection.isCollapsed) {
     return null;
   }
@@ -129,10 +129,3 @@ function selectionFocusRect(selection) {
     return textBoxes[textBoxes.length - 1];
   }
 }
-
-module.exports = {
-  getTextBoundingBoxes: getTextBoundingBoxes,
-  isNodeInRange: isNodeInRange,
-  isSelectionBackwards: isSelectionBackwards,
-  selectionFocusRect: selectionFocusRect,
-};
