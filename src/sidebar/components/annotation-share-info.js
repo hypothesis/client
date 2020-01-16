@@ -2,7 +2,7 @@ import { createElement } from 'preact';
 import propTypes from 'prop-types';
 
 import useStore from '../store/use-store';
-import { withServices } from '../util/service-context';
+import { isPrivate } from '../util/permissions';
 
 import SvgIcon from './svg-icon';
 
@@ -10,7 +10,7 @@ import SvgIcon from './svg-icon';
  * Render information about what group an annotation is in and
  * whether it is private to the current user (only me)
  */
-function AnnotationShareInfo({ annotation, permissions }) {
+function AnnotationShareInfo({ annotation }) {
   const group = useStore(store => store.getGroup(annotation.group));
 
   // We may not have access to the group object beyond its ID
@@ -20,7 +20,7 @@ function AnnotationShareInfo({ annotation, permissions }) {
   // URL (link) returned by the API for this group. Some groups do not have links
   const linkToGroup = hasGroup && group.links && group.links.html;
 
-  const isPrivate = !permissions.isShared(
+  const annotationIsPrivate = isPrivate(
     annotation.permissions,
     annotation.user
   );
@@ -44,7 +44,7 @@ function AnnotationShareInfo({ annotation, permissions }) {
           </span>
         </a>
       )}
-      {isPrivate && (
+      {annotationIsPrivate && (
         <span className="annotation-share-info__private">
           {/* Show the lock icon in all cases when the annotation is private... */}
           <SvgIcon
@@ -65,11 +65,6 @@ function AnnotationShareInfo({ annotation, permissions }) {
 AnnotationShareInfo.propTypes = {
   /** The current annotation object for which sharing info will be rendered */
   annotation: propTypes.object.isRequired,
-
-  /** injected services */
-  permissions: propTypes.object.isRequired,
 };
 
-AnnotationShareInfo.injectedProps = ['permissions'];
-
-export default withServices(AnnotationShareInfo);
+export default AnnotationShareInfo;

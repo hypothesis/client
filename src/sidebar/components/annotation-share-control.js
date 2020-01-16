@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'preact/hooks';
 import propTypes from 'prop-types';
 
 import { copyText } from '../util/copy-to-clipboard';
+import { isPrivate } from '../util/permissions';
 import { withServices } from '../util/service-context';
 
 import Button from './button';
@@ -18,10 +19,9 @@ function AnnotationShareControl({
   analytics,
   flash,
   group,
-  permissions,
   shareUri,
 }) {
-  const isPrivate = !permissions.isShared(
+  const annotationIsPrivate = isPrivate(
     annotation.permissions,
     annotation.user
   );
@@ -76,10 +76,10 @@ function AnnotationShareControl({
       <span>Anyone using this link may view this annotation.</span>
     );
 
-  // However, if the annotation is marked as "only me" (`isPrivate` is `true`),
+  // However, if the annotation is marked as "only me" (`annotationIsPrivate` is `true`),
   // then group sharing settings are irrelevant—only the author may view the
   // annotation.
-  const annotationSharingInfo = isPrivate ? (
+  const annotationSharingInfo = annotationIsPrivate ? (
     <span>Only you may view this annotation.</span>
   ) : (
     groupSharingInfo
@@ -144,9 +144,8 @@ AnnotationShareControl.propTypes = {
   /* services */
   analytics: propTypes.object.isRequired,
   flash: propTypes.object.isRequired,
-  permissions: propTypes.object.isRequired,
 };
 
-AnnotationShareControl.injectedProps = ['analytics', 'flash', 'permissions'];
+AnnotationShareControl.injectedProps = ['analytics', 'flash'];
 
 export default withServices(AnnotationShareControl);

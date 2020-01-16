@@ -18,7 +18,7 @@ describe('AnnotationActionBar', () => {
   // Fake services
   let fakeAnnotationMapper;
   let fakeFlash;
-  let fakePermissions;
+  let fakePermits;
   let fakeSettings;
   // Fake dependencies
   let fakeIsShareable;
@@ -32,7 +32,6 @@ describe('AnnotationActionBar', () => {
         flash={fakeFlash}
         onEdit={fakeOnEdit}
         onReply={fakeOnReply}
-        permissions={fakePermissions}
         settings={fakeSettings}
         {...props}
       />
@@ -40,14 +39,14 @@ describe('AnnotationActionBar', () => {
   }
 
   const allowOnly = action => {
-    fakePermissions.permits.returns(false);
-    fakePermissions.permits
+    fakePermits.returns(false);
+    fakePermits
       .withArgs(sinon.match.any, action, sinon.match.any)
       .returns(true);
   };
 
   const disallowOnly = action => {
-    fakePermissions.permits
+    fakePermits
       .withArgs(sinon.match.any, action, sinon.match.any)
       .returns(false);
   };
@@ -80,9 +79,7 @@ describe('AnnotationActionBar', () => {
     fakeOnEdit = sinon.stub();
     fakeOnReply = sinon.stub();
 
-    fakePermissions = {
-      permits: sinon.stub().returns(true),
-    };
+    fakePermits = sinon.stub().returns(true);
     fakeSettings = {};
 
     fakeIsShareable = sinon.stub().returns(true);
@@ -99,6 +96,7 @@ describe('AnnotationActionBar', () => {
         isShareable: fakeIsShareable,
         shareURI: sinon.stub().returns('http://share.me'),
       },
+      '../util/permissions': { permits: fakePermits },
       '../store/use-store': callback => callback(fakeStore),
     });
     sinon.stub(window, 'confirm').returns(false);

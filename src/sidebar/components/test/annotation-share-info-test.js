@@ -11,13 +11,12 @@ describe('AnnotationShareInfo', () => {
   let fakeGroup;
   let fakeStore;
   let fakeGetGroup;
-  let fakePermissions;
+  let fakeIsPrivate;
 
   const createAnnotationShareInfo = props => {
     return mount(
       <AnnotationShareInfo
         annotation={fixtures.defaultAnnotation()}
-        permissions={fakePermissions}
         {...props}
       />
     );
@@ -33,13 +32,12 @@ describe('AnnotationShareInfo', () => {
     };
     fakeGetGroup = sinon.stub().returns(fakeGroup);
     fakeStore = { getGroup: fakeGetGroup };
-    fakePermissions = {
-      isShared: sinon.stub().returns(true),
-    };
+    fakeIsPrivate = sinon.stub().returns(false);
 
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
       '../store/use-store': callback => callback(fakeStore),
+      '../util/permissions': { isPrivate: fakeIsPrivate },
     });
   });
 
@@ -109,7 +107,7 @@ describe('AnnotationShareInfo', () => {
     });
     context('private annotation', () => {
       beforeEach(() => {
-        fakePermissions.isShared.returns(false);
+        fakeIsPrivate.returns(true);
       });
 
       it('should show privacy icon', () => {

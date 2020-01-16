@@ -13,9 +13,6 @@ import { $imports } from '../annotation-omega';
 describe('AnnotationOmega', () => {
   let fakeOnReplyCountClick;
 
-  // Injected service mocks
-  let fakePermissions;
-
   // Dependency Mocks
   let fakeQuote;
   let fakeStore;
@@ -25,7 +22,6 @@ describe('AnnotationOmega', () => {
       <Annotation
         annotation={fixtures.defaultAnnotation()}
         onReplyCountClick={fakeOnReplyCountClick}
-        permissions={fakePermissions}
         replyCount={0}
         showDocumentInfo={false}
         {...props}
@@ -39,10 +35,7 @@ describe('AnnotationOmega', () => {
     fakeQuote = sinon.stub();
     fakeStore = {
       getDraft: sinon.stub(),
-    };
-
-    fakePermissions = {
-      default: sinon.stub(),
+      getDefault: sinon.stub(),
     };
 
     $imports.$mock(mockImportedComponents());
