@@ -6,7 +6,7 @@ import $ from 'jquery';
  *
  * @param {NormalizedRange} normedRange - Range to be highlighted.
  * @param {string} cssClass - A CSS class to use for the highlight (default: 'annotator-hl')
- * @return - A jQuery array of highlighted elements
+ * @return {HTMLElement[]} - Elements wrapping text in `normedRange` to add a highlight effect
  */
 export function highlightRange(normedRange, cssClass = 'annotator-hl') {
   const white = /^\s*$/;
@@ -35,7 +35,7 @@ export function highlightRange(normedRange, cssClass = 'annotator-hl') {
 /**
  * Remove highlights from a range previously highlighted with `highlightRange`.
  *
- * @param highlights - The highlight elements returned by `highlightRange`
+ * @param {HTMLElement[]} highlights - The highlight elements returned by `highlightRange`
  */
 export function removeHighlights(highlights) {
   for (let h of highlights) {
