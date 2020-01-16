@@ -10,6 +10,7 @@
   &__btn {
     @include forms.primary-action-btn;
     display: flex;
+    align-items: center;
     margin-left: auto;
     height: 30px;
     padding-left: 10px;
