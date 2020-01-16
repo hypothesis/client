@@ -33,6 +33,7 @@ import createStore from './create-store';
 import debugMiddleware from './debug-middleware';
 import activity from './modules/activity';
 import annotations from './modules/annotations';
+import defaults from './modules/defaults';
 import directLinked from './modules/direct-linked';
 import drafts from './modules/drafts';
 import frames from './modules/frames';
@@ -87,6 +88,7 @@ export default function store($rootScope, settings) {
   const modules = [
     activity,
     annotations,
+    defaults,
     directLinked,
     drafts,
     frames,

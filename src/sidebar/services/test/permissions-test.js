@@ -3,15 +3,15 @@ import Permissions from '../permissions';
 const userid = 'acct:flash@gord.on';
 
 describe('permissions', function() {
-  let fakeLocalStorage;
+  let fakeStore;
   let permissions;
 
   beforeEach(function() {
-    fakeLocalStorage = {
-      getItem: sinon.stub().returns(null),
-      setItem: sinon.stub(),
+    fakeStore = {
+      getDefault: sinon.stub().returns(null),
+      setDefault: sinon.stub(),
     };
-    permissions = new Permissions(fakeLocalStorage);
+    permissions = new Permissions(fakeStore);
   });
 
   describe('#private', function() {
@@ -43,7 +43,7 @@ describe('permissions', function() {
     });
 
     it('returns private permissions if the saved level is "private"', function() {
-      fakeLocalStorage.getItem.returns('private');
+      fakeStore.getDefault.withArgs('annotationPrivacy').returns('private');
       assert.deepEqual(
         permissions.default(userid, 'gid'),
         permissions.private(userid)
@@ -54,7 +54,7 @@ describe('permissions', function() {
       // FIXME: This test is necessary for the patch fix to prevent the "split-null" bug
       // https://github.com/hypothesis/client/issues/1221 but should be removed when the
       // code is refactored.
-      fakeLocalStorage.getItem.returns('private');
+      fakeStore.getDefault.withArgs('annotationPrivacy').returns('private');
       assert.deepEqual(
         permissions.default(undefined, 'gid'),
         permissions.shared(undefined, 'gid')
@@ -62,7 +62,7 @@ describe('permissions', function() {
     });
 
     it('returns shared permissions if the saved level is "shared"', function() {
-      fakeLocalStorage.getItem.returns('shared');
+      fakeStore.getDefault.withArgs('annotationPrivacy').returns('shared');
       assert.deepEqual(
         permissions.default(userid, 'gid'),
         permissions.shared(userid, 'gid')
@@ -71,13 +71,9 @@ describe('permissions', function() {
   });
 
   describe('#setDefault', function() {
-    it('saves the default permissions', function() {
+    it('saves the default permissions in the store', function() {
       permissions.setDefault('private');
-      assert.calledWith(
-        fakeLocalStorage.setItem,
-        'hypothesis.privacy',
-        'private'
-      );
+      assert.calledWith(fakeStore.setDefault, 'annotationPrivacy', 'private');
     });
   });
 
