@@ -24,17 +24,6 @@
 export default function Permissions(store) {
   const self = this;
 
-  function defaultLevel() {
-    const savedLevel = store.getDefault('annotationPrivacy');
-    switch (savedLevel) {
-      case 'private':
-      case 'shared':
-        return savedLevel;
-      default:
-        return 'shared';
-    }
-  }
-
   /**
    * Return the permissions for a private annotation.
    *
@@ -64,29 +53,6 @@ export default function Permissions(store) {
     return Object.assign(self.private(userid), {
       read: ['group:' + groupId],
     });
-  };
-
-  /**
-   * Return the default permissions for an annotation in a given group.
-   *
-   * @param {string} userid - User ID of the author
-   * @param {string} groupId - ID of the group the annotation is being shared
-   * with
-   * @return {Permissions}
-   */
-  this.default = function(userid, groupId) {
-    // FIXME: The `&& userid` guard was put in place to protect against
-    // https://github.com/hypothesis/client/issues/1221 for the short term
-    // It prevents the setting of permissions to a private level, which
-    // will throw Errors if no `userid` is available (i.e. the annotation was
-    // just created by an anonymous user). Translation: default permissions for
-    // a newly-created (but not saved-to-server) annotation created by a
-    // non-authenticated (anonymous) user will always be shared. For now.
-    if (defaultLevel() === 'private' && userid) {
-      return self.private(userid);
-    } else {
-      return self.shared(userid, groupId);
-    }
   };
 
   /**

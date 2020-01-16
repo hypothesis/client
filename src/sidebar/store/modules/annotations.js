@@ -8,6 +8,7 @@ import { createSelector } from 'reselect';
 import uiConstants from '../../ui-constants';
 import * as metadata from '../../util/annotation-metadata';
 import * as arrayUtil from '../../util/array';
+import { defaultPermissions } from '../../util/permissions';
 import * as util from '../util';
 
 import drafts from './drafts';
@@ -334,20 +335,27 @@ function createAnnotation(ann, now = new Date()) {
   return (dispatch, getState) => {
     /**
      * Extend the new, unsaved annotation object with defaults for some
-     * required data fields.
+     * required data fields and default permissions.
      *
      * Note: the `created` and `updated` values will be ignored and superseded
      * by the service when the annotation is persisted, but they are used
      * app-side for annotation card sorting until then.
      */
+    const groupid = getState().groups.focusedGroupId;
+    const userid = getState().session.userid;
     ann = Object.assign(
       {
         created: now.toISOString(),
-        group: getState().groups.focusedGroupId,
+        group: groupid,
+        permissions: defaultPermissions(
+          userid,
+          groupid,
+          getState().defaults.annotationPrivacy
+        ),
         tags: [],
         text: '',
         updated: now.toISOString(),
-        user: getState().session.userid,
+        user: userid,
         user_info: getState().session.user_info,
       },
       ann
