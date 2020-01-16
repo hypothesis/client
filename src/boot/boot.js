@@ -1,4 +1,4 @@
-const { requiredPolyfillSets } = require('../shared/polyfills');
+import { requiredPolyfillSets } from '../shared/polyfills';
 
 function injectStylesheet(doc, href) {
   const link = doc.createElement('link');
@@ -126,12 +126,10 @@ function bootSidebarApp(doc, config) {
   ]);
 }
 
-function boot(document_, config) {
+export default function boot(document_, config) {
   if (document_.querySelector('hypothesis-app')) {
     bootSidebarApp(document_, config);
   } else {
     bootHypothesisClient(document_, config);
   }
 }
-
-module.exports = boot;
