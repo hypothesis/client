@@ -1,4 +1,4 @@
-const frameUtil = require('../frame-util');
+import * as frameUtil from '../frame-util';
 
 describe('annotator.util.frame-util', function() {
   describe('findFrames', function() {

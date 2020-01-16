@@ -1,4 +1,4 @@
-const observable = require('../observable');
+import * as observable from '../observable';
 
 describe('observable', function() {
   describe('delay()', function() {

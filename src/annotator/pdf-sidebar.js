@@ -1,4 +1,4 @@
-const Sidebar = require('./sidebar');
+import Sidebar from './sidebar';
 
 const DEFAULT_CONFIG = {
   TextSelection: {},
@@ -12,10 +12,8 @@ const DEFAULT_CONFIG = {
   },
 };
 
-class PdfSidebar extends Sidebar {
+export default class PdfSidebar extends Sidebar {
   constructor(element, config) {
     super(element, Object.assign({}, DEFAULT_CONFIG, config));
   }
 }
-
-module.exports = PdfSidebar;
