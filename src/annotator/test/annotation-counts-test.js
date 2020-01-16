@@ -1,4 +1,4 @@
-const annotationCounts = require('../annotation-counts');
+import annotationCounts from '../annotation-counts';
 
 describe('annotationCounts', function() {
   let countEl1;

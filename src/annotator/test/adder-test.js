@@ -1,4 +1,4 @@
-const adder = require('../adder');
+import * as adder from '../adder';
 
 function rect(left, top, width, height) {
   return { left: left, top: top, width: width, height: height };

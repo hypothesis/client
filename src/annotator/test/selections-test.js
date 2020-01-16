@@ -1,5 +1,5 @@
-const observable = require('../util/observable');
-const selections = require('../selections');
+import selections from '../selections';
+import * as observable from '../util/observable';
 
 function FakeDocument() {
   const listeners = {};

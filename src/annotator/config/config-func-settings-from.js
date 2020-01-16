@@ -16,7 +16,7 @@
  * @return {Object} - Any config settings returned by hypothesisConfig()
  *
  */
-function configFuncSettingsFrom(window_) {
+export default function configFuncSettingsFrom(window_) {
   if (!window_.hasOwnProperty('hypothesisConfig')) {
     return {};
   }
@@ -30,5 +30,3 @@ function configFuncSettingsFrom(window_) {
 
   return window_.hypothesisConfig();
 }
-
-module.exports = configFuncSettingsFrom;

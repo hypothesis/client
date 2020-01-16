@@ -9,7 +9,7 @@
  * each of the relevant classes in PDF.js.
  */
 
-const RenderingStates = require('../../pdfjs-rendering-states');
+import RenderingStates from '../../pdfjs-rendering-states';
 
 /**
  * Create the DOM structure for a page which matches the structure produced by
@@ -197,7 +197,7 @@ class FakePDFViewer {
  *
  * The original is defined at https://github.com/mozilla/pdf.js/blob/master/web/app.js
  */
-class FakePDFViewerApplication {
+export default class FakePDFViewerApplication {
   /**
    * @param {Options} options
    */
@@ -215,5 +215,3 @@ class FakePDFViewerApplication {
     this.pdfViewer.dispose();
   }
 }
-
-module.exports = FakePDFViewerApplication;

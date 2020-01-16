@@ -1,4 +1,4 @@
-const sidebarTrigger = require('../sidebar-trigger');
+import sidebarTrigger from '../sidebar-trigger';
 
 describe('sidebarTrigger', function() {
   let triggerEl1;

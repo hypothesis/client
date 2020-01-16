@@ -1,7 +1,8 @@
-const html = require('../html');
+import { toResult } from '../../../shared/test/promise-util';
+import * as html from '../html';
 
-const { toResult } = require('../../../shared/test/promise-util');
-const fixture = require('./html-anchoring-fixture.html');
+import fixture from './html-anchoring-fixture.html';
+import htmlBaselines from './html-baselines';
 
 /** Return all text node children of `container`. */
 function textNodes(container) {
@@ -419,7 +420,6 @@ describe('HTML anchoring', function() {
   });
 
   describe('Web page baselines', function() {
-    const fixtures = require('./html-baselines');
     let frame;
 
     before(function() {
@@ -431,7 +431,7 @@ describe('HTML anchoring', function() {
       frame.remove();
     });
 
-    fixtures.forEach(fixture => {
+    htmlBaselines.forEach(fixture => {
       it(`generates selectors which match the baseline ${fixture.name}`, () => {
         let fixtureHtml = fixture.html;
         const annotations = fixture.annotations.rows;

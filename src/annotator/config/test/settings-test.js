@@ -1,5 +1,5 @@
-const settingsFrom = require('../settings');
-const { $imports } = require('../settings');
+import settingsFrom from '../settings';
+import { $imports } from '../settings';
 
 describe('annotator.config.settingsFrom', function() {
   let fakeConfigFuncSettingsFrom;

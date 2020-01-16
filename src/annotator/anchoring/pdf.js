@@ -1,15 +1,16 @@
 /* global PDFViewerApplication */
 
-const seek = require('dom-seek');
+import seek from 'dom-seek';
 
 // `dom-node-iterator` polyfills optional arguments of `createNodeIterator`
 // and properties of the returned `NodeIterator` for IE 11 compatibility.
 const createNodeIterator = require('dom-node-iterator/polyfill')();
 
-const xpathRange = require('./range');
-const RenderingStates = require('../pdfjs-rendering-states');
-const { TextPositionAnchor, TextQuoteAnchor } = require('./types');
-const { toRange: textPositionToRange } = require('./text-position');
+import RenderingStates from '../pdfjs-rendering-states';
+
+import xpathRange from './range';
+import { toRange as textPositionToRange } from './text-position';
+import { TextPositionAnchor, TextQuoteAnchor } from './types';
 
 // Caches for performance.
 
@@ -342,7 +343,7 @@ function prioritizePages(position) {
  * @param {Array} selectors - Selector objects to anchor
  * @return {Promise<Range>}
  */
-function anchor(root, selectors) {
+export function anchor(root, selectors) {
   const position = selectors.find(s => s.type === 'TextPositionSelector');
   const quote = selectors.find(s => s.type === 'TextQuoteSelector');
 
@@ -406,7 +407,7 @@ function anchor(root, selectors) {
  *   `toSelector` methods.
  * @return {Promise<[TextPositionSelector, TextQuoteSelector]>}
  */
-function describe(root, range, options = {}) {
+export function describe(root, range, options = {}) {
   const normalizedRange = new xpathRange.BrowserRange(range).normalize();
 
   const startTextLayer = getNodeTextLayer(normalizedRange.start);
@@ -461,13 +462,7 @@ function describe(root, range, options = {}) {
  *
  * This exists mainly as a helper for use in tests.
  */
-function purgeCache() {
+export function purgeCache() {
   pageTextCache = {};
   quotePositionCache = {};
 }
-
-module.exports = {
-  anchor,
-  describe,
-  purgeCache,
-};
