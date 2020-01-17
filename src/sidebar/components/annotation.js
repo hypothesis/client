@@ -92,14 +92,6 @@ function AnnotationController(
      */
     newlyCreatedByHighlightButton = self.annotation.$highlight || false;
 
-    // FIXME: This logic needs to move into the `annotations` store module
-    if (!self.annotation.permissions) {
-      self.annotation.permissions = permissions.default(
-        self.annotation.user,
-        self.annotation.group
-      );
-    }
-
     // Automatically save new highlights to the server when they're created.
     // Note that this line also gets called when the user logs in (since
     // AnnotationController instances are re-created on login) so serves to

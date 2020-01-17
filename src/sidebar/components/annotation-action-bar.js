@@ -3,6 +3,7 @@ import propTypes from 'prop-types';
 
 import useStore from '../store/use-store';
 import { isShareable, shareURI } from '../util/annotation-sharing';
+import { permits } from '../util/permissions';
 import { withServices } from '../util/service-context';
 
 import AnnotationShareControl from './annotation-share-control';
@@ -18,7 +19,6 @@ function AnnotationActionBar({
   flash,
   onEdit,
   onReply,
-  permissions,
   settings,
 }) {
   const userProfile = useStore(store => store.profile());
@@ -26,11 +26,7 @@ function AnnotationActionBar({
 
   // Is the current user allowed to take the given `action` on this annotation?
   const userIsAuthorizedTo = action => {
-    return permissions.permits(
-      annotation.permissions,
-      action,
-      userProfile.userid
-    );
+    return permits(annotation.permissions, action, userProfile.userid);
   };
 
   const showDeleteAction = userIsAuthorizedTo('delete');
@@ -110,15 +106,9 @@ AnnotationActionBar.propTypes = {
   // Injected services
   annotationMapper: propTypes.object.isRequired,
   flash: propTypes.object.isRequired,
-  permissions: propTypes.object.isRequired,
   settings: propTypes.object.isRequired,
 };
 
-AnnotationActionBar.injectedProps = [
-  'annotationMapper',
-  'flash',
-  'permissions',
-  'settings',
-];
+AnnotationActionBar.injectedProps = ['annotationMapper', 'flash', 'settings'];
 
 export default withServices(AnnotationActionBar);

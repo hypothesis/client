@@ -34,42 +34,6 @@ describe('permissions', function() {
     });
   });
 
-  describe('#default', function() {
-    it('returns shared permissions by default', function() {
-      assert.deepEqual(
-        permissions.default(userid, 'gid'),
-        permissions.shared(userid, 'gid')
-      );
-    });
-
-    it('returns private permissions if the saved level is "private"', function() {
-      fakeStore.getDefault.withArgs('annotationPrivacy').returns('private');
-      assert.deepEqual(
-        permissions.default(userid, 'gid'),
-        permissions.private(userid)
-      );
-    });
-
-    it('returns shared permissions if the saved level is "private" but no `userid`', function() {
-      // FIXME: This test is necessary for the patch fix to prevent the "split-null" bug
-      // https://github.com/hypothesis/client/issues/1221 but should be removed when the
-      // code is refactored.
-      fakeStore.getDefault.withArgs('annotationPrivacy').returns('private');
-      assert.deepEqual(
-        permissions.default(undefined, 'gid'),
-        permissions.shared(undefined, 'gid')
-      );
-    });
-
-    it('returns shared permissions if the saved level is "shared"', function() {
-      fakeStore.getDefault.withArgs('annotationPrivacy').returns('shared');
-      assert.deepEqual(
-        permissions.default(userid, 'gid'),
-        permissions.shared(userid, 'gid')
-      );
-    });
-  });
-
   describe('#setDefault', function() {
     it('saves the default permissions in the store', function() {
       permissions.setDefault('private');

@@ -3,6 +3,8 @@ import uiConstants from '../../../ui-constants';
 import * as metadata from '../../../util/annotation-metadata';
 import createStore from '../../create-store';
 import annotations from '../annotations';
+import { $imports } from '../annotations';
+import defaults from '../defaults';
 import drafts from '../drafts';
 import groups from '../groups';
 import selection from '../selection';
@@ -13,7 +15,7 @@ const { actions, selectors } = annotations;
 
 function createTestStore() {
   return createStore(
-    [annotations, selection, drafts, groups, session, viewer],
+    [annotations, selection, defaults, drafts, groups, session, viewer],
     [{}]
   );
 }
@@ -22,6 +24,19 @@ function createTestStore() {
 // in the tests for the whole Redux store
 
 describe('sidebar/store/modules/annotations', function() {
+  let fakeDefaultPermissions;
+
+  beforeEach(() => {
+    fakeDefaultPermissions = sinon.stub();
+    $imports.$mock({
+      '../../util/permissions': { defaultPermissions: fakeDefaultPermissions },
+    });
+  });
+
+  afterEach(() => {
+    $imports.$restore();
+  });
+
   describe('#addAnnotations()', function() {
     const ANCHOR_TIME_LIMIT = 1000;
     let clock;
@@ -448,6 +463,18 @@ describe('sidebar/store/modules/annotations', function() {
       );
     });
 
+    it('should set default permissions on a new annotation', () => {
+      fakeDefaultPermissions.returns('somePermissions');
+      store.dispatch(actions.createAnnotation({ id: 'myID' }, now));
+
+      const createdAnnotation = selectors.findAnnotationByID(
+        store.getState(),
+        'myID'
+      );
+
+      assert.equal(createdAnnotation.permissions, 'somePermissions');
+    });
+
     it('should set group to currently-focused group if not set on annotation', () => {
       store.dispatch(actions.createAnnotation({ id: 'myID' }, now));
 
@@ -472,6 +499,7 @@ describe('sidebar/store/modules/annotations', function() {
             text: 'my annotation',
             tags: ['foo', 'bar'],
             group: 'fzzy',
+            permissions: ['whatever'],
             user: 'acct:foo@bar.com',
             user_info: {
               display_name: 'Herbivore Fandango',
@@ -495,6 +523,7 @@ describe('sidebar/store/modules/annotations', function() {
       });
 
       assert.include(createdAnnotation.tags, 'foo', 'bar');
+      assert.include(createdAnnotation.permissions, 'whatever');
       assert.equal(
         createdAnnotation.user_info.display_name,
         'Herbivore Fandango'

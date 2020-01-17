@@ -13,7 +13,7 @@ describe('AnnotationShareControl', () => {
   let fakeCopyToClipboard;
   let fakeFlash;
   let fakeGroup;
-  let fakePermissions;
+  let fakeIsPrivate;
   let fakeShareUri;
 
   let container;
@@ -29,7 +29,6 @@ describe('AnnotationShareControl', () => {
         analytics={fakeAnalytics}
         flash={fakeFlash}
         group={fakeGroup}
-        permissions={fakePermissions}
         shareUri={fakeShareUri}
         {...props}
       />,
@@ -75,14 +74,13 @@ describe('AnnotationShareControl', () => {
       name: 'My Group',
       type: 'private',
     };
-    fakePermissions = {
-      isShared: sinon.stub().returns(true),
-    };
+    fakeIsPrivate = sinon.stub().returns(false);
     fakeShareUri = 'https://www.example.com';
 
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
       '../util/copy-to-clipboard': fakeCopyToClipboard,
+      '../util/permissions': { isPrivate: fakeIsPrivate },
       './hooks/use-element-should-close': sinon.stub(),
     });
   });
@@ -166,27 +164,27 @@ describe('AnnotationShareControl', () => {
   [
     {
       groupType: 'private',
-      isShared: true,
+      isPrivate: false,
       expected: 'Only members of the group My Group may view this annotation.',
     },
     {
       groupType: 'open',
-      isShared: true,
+      isPrivate: false,
       expected: 'Anyone using this link may view this annotation.',
     },
     {
       groupType: 'private',
-      isShared: false,
+      isPrivate: true,
       expected: 'Only you may view this annotation.',
     },
     {
       groupType: 'open',
-      isShared: false,
+      isPrivate: true,
       expected: 'Only you may view this annotation.',
     },
   ].forEach(testcase => {
-    it(`renders the correct sharing information for a ${testcase.groupType} group when annotation sharing is ${testcase.isShared}`, () => {
-      fakePermissions.isShared.returns(testcase.isShared);
+    it(`renders the correct sharing information for a ${testcase.groupType} group when annotation privacy is ${testcase.isPrivate}`, () => {
+      fakeIsPrivate.returns(testcase.isPrivate);
       fakeGroup.type = testcase.groupType;
       const wrapper = createComponent({ isPrivate: testcase.isPrivate });
       openElement(wrapper);

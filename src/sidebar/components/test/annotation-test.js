@@ -183,9 +183,6 @@ describe('annotation', function() {
           private: sandbox.stub().returns({
             read: ['justme'],
           }),
-          default: sandbox.stub().returns({
-            read: ['default'],
-          }),
           setDefault: sandbox.stub(),
         };
 
@@ -245,49 +242,6 @@ describe('annotation', function() {
     });
 
     describe('initialization', function() {
-      it('sets the permissions of new annotations', function() {
-        // You can create annotations while logged out and then login.
-        // When you login a new AnnotationController instance is created for
-        // each of your annotations, and on initialization it will set the
-        // annotation's permissions using your username from the session.
-        const annotation = fixtures.newAnnotation();
-        annotation.permissions = undefined;
-        annotation.group = '__world__';
-        fakePermissions.default = function(userid, group) {
-          return {
-            read: [userid, group],
-          };
-        };
-
-        createDirective(annotation);
-
-        assert.deepEqual(
-          annotation.permissions,
-          fakePermissions.default(annotation.user, annotation.group)
-        );
-      });
-
-      it('preserves the permissions of existing annotations', function() {
-        const annotation = fixtures.newAnnotation();
-        annotation.permissions = {
-          permissions: {
-            read: ['foo'],
-            update: ['bar'],
-            delete: ['gar'],
-            admin: ['har'],
-          },
-        };
-        const originalPermissions = JSON.parse(
-          JSON.stringify(annotation.permissions)
-        );
-        fakePermissions.default = function() {
-          return 'new permissions';
-        };
-        fakePermissions.isShared = function() {};
-        createDirective(annotation);
-        assert.deepEqual(annotation.permissions, originalPermissions);
-      });
-
       it('saves new highlights to the server on initialization', function() {
         const annotation = fixtures.newHighlight();
         // The user is logged-in.
