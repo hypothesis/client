@@ -1,4 +1,4 @@
-const warnOnce = require('../warn-once');
+import warnOnce from '../warn-once';
 
 describe('warnOnce', () => {
   beforeEach(() => {

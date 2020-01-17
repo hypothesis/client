@@ -1,4 +1,4 @@
-const Discovery = require('../discovery');
+import Discovery from '../discovery';
 
 function createWindow() {
   return {

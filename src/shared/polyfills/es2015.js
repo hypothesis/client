@@ -3,16 +3,16 @@
 // nb. The imports which add entire classes (Promise, Set etc.) will also add
 // all features for later ES years, so this can result in some duplication with
 // bundles for later ES years.
-require('core-js/es/promise');
-require('core-js/es/map');
-require('core-js/es/number');
-require('core-js/es/set');
-require('core-js/es/symbol');
-require('core-js/es/array/fill');
-require('core-js/es/array/find');
-require('core-js/es/array/find-index');
-require('core-js/es/array/from');
-require('core-js/es/object/assign');
-require('core-js/es/string/includes');
-require('core-js/es/string/ends-with');
-require('core-js/es/string/starts-with');
+import 'core-js/es/promise';
+import 'core-js/es/map';
+import 'core-js/es/number';
+import 'core-js/es/set';
+import 'core-js/es/symbol';
+import 'core-js/es/array/fill';
+import 'core-js/es/array/find';
+import 'core-js/es/array/find-index';
+import 'core-js/es/array/from';
+import 'core-js/es/object/assign';
+import 'core-js/es/string/includes';
+import 'core-js/es/string/ends-with';
+import 'core-js/es/string/starts-with';

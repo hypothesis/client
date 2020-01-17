@@ -1,2 +1,2 @@
-require('core-js/es/object/entries');
-require('core-js/es/object/values');
+import 'core-js/es/object/entries';
+import 'core-js/es/object/values';

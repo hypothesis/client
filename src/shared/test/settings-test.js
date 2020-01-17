@@ -1,4 +1,4 @@
-const settings = require('../settings');
+import * as settings from '../settings';
 
 const sandbox = sinon.createSandbox();
 

@@ -1,5 +1,5 @@
-const Bridge = require('../bridge');
-const RPC = require('../frame-rpc');
+import Bridge from '../bridge';
+import RPC from '../frame-rpc';
 
 describe('shared.bridge', function() {
   const sandbox = sinon.createSandbox();

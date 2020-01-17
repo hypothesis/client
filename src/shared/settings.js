@@ -25,7 +25,7 @@ function assign(dest, src) {
  *
  * @param {Document|Element} document - The root element to search.
  */
-function jsonConfigsFrom(document) {
+export function jsonConfigsFrom(document) {
   const config = {};
   const settingsElements = document.querySelectorAll(
     'script.js-hypothesis-config'
@@ -47,7 +47,3 @@ function jsonConfigsFrom(document) {
 
   return config;
 }
-
-module.exports = {
-  jsonConfigsFrom: jsonConfigsFrom,
-};

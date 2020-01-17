@@ -1,1 +1,1 @@
-require('js-polyfills/url');
+import 'js-polyfills/url';
