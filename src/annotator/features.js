@@ -1,5 +1,5 @@
-const events = require('../shared/bridge-events');
-const warnOnce = require('../shared/warn-once');
+import events from '../shared/bridge-events';
+import warnOnce from '../shared/warn-once';
 
 let _features = {};
 
@@ -7,7 +7,7 @@ const _set = features => {
   _features = features || {};
 };
 
-module.exports = {
+export default {
   init: function(crossframe) {
     crossframe.on(events.FEATURE_FLAGS_UPDATED, _set);
   },

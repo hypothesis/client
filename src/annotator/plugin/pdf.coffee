@@ -1,6 +1,6 @@
 Plugin = require('../plugin')
 
-RenderingStates = require('../pdfjs-rendering-states')
+{ default: RenderingStates } = require('../pdfjs-rendering-states')
 
 module.exports = class PDF extends Plugin
   documentLoaded: null

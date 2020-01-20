@@ -1,4 +1,4 @@
-events = require('../../shared/bridge-events')
+{ default: events } = require('../../shared/bridge-events')
 
 Sidebar = require('../sidebar')
 { $imports } = require('../sidebar')

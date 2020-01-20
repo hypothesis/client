@@ -1,12 +1,12 @@
-const extend = require('extend');
+import extend from 'extend';
 
-const RPC = require('./frame-rpc');
+import RPC from './frame-rpc';
 
 /**
  * The Bridge service sets up a channel between frames and provides an events
  * API on top of it.
  */
-class Bridge {
+export default class Bridge {
   constructor() {
     this.links = [];
     this.channelListeners = {};
@@ -167,5 +167,3 @@ class Bridge {
     return this;
   }
 }
-
-module.exports = Bridge;

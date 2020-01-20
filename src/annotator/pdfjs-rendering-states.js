@@ -12,4 +12,4 @@ const RenderingStates = {
   FINISHED: 3,
 };
 
-module.exports = RenderingStates;
+export default RenderingStates;

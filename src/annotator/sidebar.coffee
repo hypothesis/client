@@ -3,10 +3,10 @@ raf = require('raf')
 Hammer = require('hammerjs')
 
 Host = require('./host')
-annotationCounts = require('./annotation-counts')
-sidebarTrigger = require('./sidebar-trigger')
-events = require('../shared/bridge-events')
-features = require('./features')
+{ default: annotationCounts } = require('./annotation-counts')
+{ default: sidebarTrigger } = require('./sidebar-trigger')
+{ default: events } = require('../shared/bridge-events')
+{ default: features } = require('./features')
 
 # Minimum width to which the frame can be resized.
 MIN_RESIZE = 280

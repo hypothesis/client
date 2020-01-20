@@ -3,7 +3,7 @@
 //
 // It also listens for events from Guest when new annotations are created or
 // annotations successfully anchor and relays these to the sidebar app.
-function AnnotationSync(bridge, options) {
+export default function AnnotationSync(bridge, options) {
   const self = this;
 
   this.bridge = bridge;
@@ -174,5 +174,3 @@ AnnotationSync.prototype._format = function(ann) {
     msg: ann,
   };
 };
-
-module.exports = AnnotationSync;

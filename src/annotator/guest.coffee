@@ -10,7 +10,7 @@ adder = require('./adder')
 htmlAnchoring = require('./anchoring/html')
 highlighter = require('./highlighter')
 rangeUtil = require('./range-util')
-selections = require('./selections')
+{ default: selections } = require('./selections')
 xpathRange = require('./anchoring/range')
 { normalizeURI } = require('./util/url')
 
