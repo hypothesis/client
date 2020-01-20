@@ -123,12 +123,8 @@ describe('annotation', function() {
         .component('annotation', annotationComponent)
         .component('annotationBody', {
           bindings: {
-            collapse: '<',
             isEditing: '<',
-            isHiddenByModerator: '<',
-            onCollapsibleChanged: '&',
             onEditText: '&',
-            onToggleCollapsed: '&',
             text: '<',
           },
         })
@@ -805,36 +801,6 @@ describe('annotation', function() {
         sandbox.spy($rootScope, '$broadcast');
         controller.revert();
         assert.calledWith($rootScope.$broadcast, events.ANNOTATION_DELETED);
-      });
-    });
-
-    [
-      {
-        context: 'for moderators',
-        ann: Object.assign(fixtures.moderatedAnnotation({ hidden: true }), {
-          // Content still present.
-          text: 'Some offensive content',
-        }),
-        isHiddenByModerator: true,
-      },
-      {
-        context: 'for non-moderators',
-        ann: Object.assign(fixtures.moderatedAnnotation({ hidden: true }), {
-          // Content filtered out by service.
-          tags: [],
-          text: '',
-        }),
-        isHiddenByModerator: true,
-      },
-    ].forEach(({ ann, context, isHiddenByModerator }) => {
-      it(`passes moderation status to annotation body (${context})`, () => {
-        const el = createDirective(ann).element;
-        assert.match(
-          el.find('annotation-body').controller('annotationBody'),
-          sinon.match({
-            isHiddenByModerator,
-          })
-        );
       });
     });
   });

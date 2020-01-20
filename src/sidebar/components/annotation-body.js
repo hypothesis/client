@@ -1,6 +1,10 @@
 import { createElement } from 'preact';
+import { useState } from 'preact/hooks';
 import propTypes from 'prop-types';
 
+import { isHidden } from '../util/annotation-metadata';
+
+import Button from './button';
 import Excerpt from './excerpt';
 import MarkdownEditor from './markdown-editor';
 import MarkdownView from './markdown-view';
@@ -9,48 +13,65 @@ import MarkdownView from './markdown-view';
  * Display the rendered content of an annotation.
  */
 export default function AnnotationBody({
-  collapse,
+  annotation,
   isEditing,
-  isHiddenByModerator,
-  onCollapsibleChanged,
   onEditText,
-  onToggleCollapsed,
   text,
 }) {
+  // Should the text content of `Excerpt` be rendered in a collapsed state,
+  // assuming it is collapsible (exceeds allotted collapsed space)?
+  const [isCollapsed, setIsCollapsed] = useState(true);
+
+  // Does the text content of `Excerpt` take up enough vertical space that
+  // collapsing/expanding is relevant?
+  const [isCollapsible, setIsCollapsible] = useState(false);
+
+  const toggleText = isCollapsed ? 'More' : 'Less';
+  const toggleTitle = isCollapsed
+    ? 'Show full annotation text'
+    : 'Show the first few lines only';
+
   return (
     <section className="annotation-body">
       {!isEditing && (
         <Excerpt
-          collapse={collapse}
+          collapse={isCollapsed}
           collapsedHeight={400}
           inlineControls={false}
-          onCollapsibleChanged={onCollapsibleChanged}
-          onToggleCollapsed={collapsed => onToggleCollapsed({ collapsed })}
+          onCollapsibleChanged={setIsCollapsible}
+          onToggleCollapsed={setIsCollapsed}
           overflowThreshold={20}
         >
           <MarkdownView
             markdown={text}
             textClass={{
               'annotation-body__text': true,
-              'is-hidden': isHiddenByModerator,
+              'is-hidden': isHidden(annotation),
               'has-content': text.length > 0,
             }}
           />
         </Excerpt>
       )}
       {isEditing && <MarkdownEditor text={text} onEditText={onEditText} />}
+      {isCollapsible && !isEditing && (
+        <div className="annotation-body__collapse-toggle">
+          <Button
+            className="annotation-body__collapse-toggle-button"
+            onClick={() => setIsCollapsed(!isCollapsed)}
+            buttonText={toggleText}
+            title={toggleTitle}
+          />
+        </div>
+      )}
     </section>
   );
 }
 
 AnnotationBody.propTypes = {
   /**
-   * Whether to limit the height of the annotation body.
-   *
-   * If this is true and the intrinsic height exceeds a fixed threshold, the
-   * body is truncated. See `onCollapsibleChanged` and `onToggleCollapsed`.
+   * The annotation in question
    */
-  collapse: propTypes.bool,
+  annotation: propTypes.object.isRequired,
 
   /**
    * Whether to display the body in edit mode (if true) or view mode.
@@ -58,32 +79,9 @@ AnnotationBody.propTypes = {
   isEditing: propTypes.bool,
 
   /**
-   * `true` if the contents of this annotation body have been redacted by
-   * a moderator.
-   *
-   * For redacted annotations, the text is shown struck-through (if available)
-   * or replaced by a placeholder indicating redacted content (if `text` is
-   * empty).
-   */
-  isHiddenByModerator: propTypes.bool,
-
-  /**
-   * Callback invoked when the height of the rendered annotation body increases
-   * above or falls below the threshold at which the `collapse` prop will affect
-   * it.
-   */
-  onCollapsibleChanged: propTypes.func,
-
-  /**
    * Callback invoked when the user edits the content of the annotation body.
    */
   onEditText: propTypes.func,
-
-  /**
-   * Callback invoked when the user clicks a shaded area at the bottom of a
-   * truncated body to indicate that they want to see the rest of the content.
-   */
-  onToggleCollapsed: propTypes.func,
 
   /**
    * The markdown annotation body, which is either rendered as HTML (if `isEditing`

@@ -6,9 +6,11 @@
   // Margin between top of ascent of annotation body and
   // bottom of ascent of annotation-quote should be ~15px.
   margin-top: var.$layout-h-margin - 5px;
-  margin-bottom: var.$layout-h-margin;
   margin-right: 0px;
   margin-left: 0px;
+  .annotation-body__collapse-toggle-button {
+    background-color: transparent;
+  }
 }
 
 .annotation-body__text {
@@ -35,4 +37,10 @@
       white 20px
     );
   }
+}
+
+.annotation-body__collapse-toggle {
+  display: flex;
+  justify-content: flex-end;
+  padding: 0.5em 0;
 }
