@@ -7,7 +7,7 @@ let difference = (arrayA, arrayB) => {
   return arrayA.filter(x => !arrayB.includes(x));
 };
 
-const DEBOUNCE_WAIT = 40;
+export const DEBOUNCE_WAIT = 40;
 
 export default class FrameObserver {
   constructor(target) {
@@ -71,5 +71,3 @@ export default class FrameObserver {
     }
   }
 }
-
-FrameObserver.DEBOUNCE_WAIT = DEBOUNCE_WAIT;
