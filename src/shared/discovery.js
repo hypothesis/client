@@ -30,7 +30,7 @@
  * 5. Clients listen for "ack" messages. When they receive one from a server
  *    they call the callback to `startDiscovery`.
  */
-class Discovery {
+export default class Discovery {
   /**
    * @param {Window} target
    * @param {Object} options
@@ -227,5 +227,3 @@ class Discovery {
       .replace(/\D/g, '');
   }
 }
-
-module.exports = Discovery;

@@ -1,10 +1,10 @@
 Plugin = require('../plugin')
 
-AnnotationSync = require('../annotation-sync')
-Bridge = require('../../shared/bridge')
-Discovery = require('../../shared/discovery')
+{ default: AnnotationSync } = require('../annotation-sync')
+{ default: Bridge } = require('../../shared/bridge')
+{ default: Discovery } = require('../../shared/discovery')
 FrameUtil = require('../util/frame-util')
-FrameObserver = require('../frame-observer')
+{ default: FrameObserver } = require('../frame-observer')
 
 # Extracts individual keys from an object and returns a new one.
 extract = extract = (obj, keys...) ->

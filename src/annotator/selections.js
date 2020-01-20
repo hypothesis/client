@@ -1,4 +1,4 @@
-const observable = require('./util/observable');
+import * as observable from './util/observable';
 
 /** Returns the selected `DOMRange` in `document`. */
 function selectedRange(document) {
@@ -21,7 +21,7 @@ function selectedRange(document) {
  *
  * @return Observable<DOMRange|null>
  */
-function selections(document) {
+export default function selections(document) {
   // Get a stream of selection changes that occur whilst the user is not
   // making a selection with the mouse.
   let isMouseDown;
@@ -54,5 +54,3 @@ function selections(document) {
     return selectedRange(document);
   });
 }
-
-module.exports = selections;

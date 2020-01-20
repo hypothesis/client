@@ -1,14 +1,15 @@
-let FrameUtil = require('./util/frame-util');
-let debounce = require('lodash.debounce');
+import debounce from 'lodash.debounce';
+
+import * as FrameUtil from './util/frame-util';
 
 // Find difference of two arrays
 let difference = (arrayA, arrayB) => {
   return arrayA.filter(x => !arrayB.includes(x));
 };
 
-const DEBOUNCE_WAIT = 40;
+export const DEBOUNCE_WAIT = 40;
 
-class FrameObserver {
+export default class FrameObserver {
   constructor(target) {
     this._target = target;
     this._handledFrames = [];
@@ -70,6 +71,3 @@ class FrameObserver {
     }
   }
 }
-FrameObserver.DEBOUNCE_WAIT = DEBOUNCE_WAIT;
-
-module.exports = FrameObserver;

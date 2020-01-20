@@ -8,7 +8,7 @@ const SIDEBAR_TRIGGER_BTN_ATTR = 'data-hypothesis-trigger';
  * @param {Object} showFn - Function which shows the sidebar.
  */
 
-function trigger(rootEl, showFn) {
+export default function trigger(rootEl, showFn) {
   const triggerElems = rootEl.querySelectorAll(
     '[' + SIDEBAR_TRIGGER_BTN_ATTR + ']'
   );
@@ -22,5 +22,3 @@ function trigger(rootEl, showFn) {
     event.stopPropagation();
   }
 }
-
-module.exports = trigger;
