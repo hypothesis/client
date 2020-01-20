@@ -150,6 +150,16 @@ export function isWaitingToAnchor(annotation) {
 }
 
 /**
+ * Has this annotation hidden by moderators?
+ *
+ * @param {Object} annotation
+ * @return {boolean}
+ */
+export function isHidden(annotation) {
+  return !!annotation.hidden;
+}
+
+/**
  * Is this annotation a highlight?
  *
  * Highlights are generally identifiable by having no text content AND no tags,
