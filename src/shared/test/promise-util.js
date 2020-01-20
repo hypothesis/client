@@ -8,7 +8,7 @@
  * @param {Promise} promise
  * @param {string} expectedErr - Expected `message` property of error
  */
-function assertPromiseIsRejected(promise, expectedErr) {
+export function assertPromiseIsRejected(promise, expectedErr) {
   const rejectFlag = {};
   return promise
     .catch(err => {
@@ -33,7 +33,7 @@ function assertPromiseIsRejected(promise, expectedErr) {
  *
  * Consider using `assertPromiseIsRejected` instead.
  */
-function toResult(promise) {
+export function toResult(promise) {
   return promise
     .then(function(result) {
       return { result: result };
@@ -42,8 +42,3 @@ function toResult(promise) {
       return { error: err };
     });
 }
-
-module.exports = {
-  assertPromiseIsRejected,
-  toResult,
-};

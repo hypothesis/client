@@ -1,4 +1,4 @@
-const { requiredPolyfillSets } = require('../');
+import { requiredPolyfillSets } from '../';
 
 function stubOut(obj, property, replacement = undefined) {
   const saved = obj[property];

@@ -95,7 +95,7 @@ const needsPolyfill = {
  * Return the subset of polyfill sets from `needed`  which are needed by the
  * current browser.
  */
-function requiredPolyfillSets(needed) {
+export function requiredPolyfillSets(needed) {
   return needed.filter(set => {
     const checker = needsPolyfill[set];
     if (!checker) {
@@ -104,7 +104,3 @@ function requiredPolyfillSets(needed) {
     return checker();
   });
 }
-
-module.exports = {
-  requiredPolyfillSets,
-};
