@@ -4,6 +4,7 @@ import propTypes from 'prop-types';
 import useStore from '../store/use-store';
 import { quote } from '../util/annotation-metadata';
 
+import AnnotationBody from './annotation-body';
 import AnnotationHeader from './annotation-header';
 import AnnotationQuote from './annotation-quote';
 
@@ -25,6 +26,18 @@ function AnnotationOmega({
   // TODO: `isEditing` will also take into account `isSaving`
   const isEditing = !!draft;
 
+  const annotationState = () =>
+    draft || {
+      text: annotation.text,
+      tags: annotation.tags,
+      annotation,
+    };
+
+  // TODO
+  const fakeOnEditText = () => {
+    alert('TBD');
+  };
+
   return (
     <div className="annotation-omega">
       <AnnotationHeader
@@ -35,6 +48,12 @@ function AnnotationOmega({
         showDocumentInfo={showDocumentInfo}
       />
       {hasQuote && <AnnotationQuote annotation={annotation} />}
+      <AnnotationBody
+        annotation={annotation}
+        isEditing={isEditing}
+        onEditText={fakeOnEditText}
+        text={annotationState().text}
+      />
     </div>
   );
 }

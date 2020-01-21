@@ -77,7 +77,7 @@ function Excerpt({
     // prettier-ignore
     const isCollapsible =
       newContentHeight > (collapsedHeight + overflowThreshold);
-    onCollapsibleChanged({ collapsible: isCollapsible });
+    onCollapsibleChanged(isCollapsible);
   }, [collapsedHeight, onCollapsibleChanged, overflowThreshold]);
 
   useLayoutEffect(() => {

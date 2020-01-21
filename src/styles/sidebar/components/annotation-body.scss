@@ -36,3 +36,14 @@
     );
   }
 }
+
+.annotation-body__collapse-toggle {
+  // Negative top margin to bring this up tight under `.annotation-body`
+  margin-top: -(var.$layout-h-margin - 5px);
+  display: flex;
+  justify-content: flex-end;
+
+  .annotation-body__collapse-toggle-button {
+    background-color: transparent;
+  }
+}

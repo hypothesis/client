@@ -101,7 +101,7 @@ describe('Excerpt', () => {
       sizeChangedCallback();
     });
 
-    assert.calledWith(onCollapsibleChanged, { collapsible: true });
+    assert.calledWith(onCollapsibleChanged, true);
   });
 
   it('calls `onToggleCollapsed` when user clicks in bottom area to expand excerpt', () => {

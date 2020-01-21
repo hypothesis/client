@@ -71,14 +71,6 @@ function AnnotationController(
    * methods goes here.
    */
   this.$onInit = () => {
-    /** Determines whether controls to expand/collapse the annotation body
-     * are displayed adjacent to the tags field.
-     */
-    self.canCollapseBody = false;
-
-    /** Determines whether the annotation body should be collapsed. */
-    self.collapseBody = true;
-
     /** True if the annotation is currently being saved. */
     self.isSaving = false;
 
@@ -242,11 +234,6 @@ function AnnotationController(
     }
   };
 
-  this.toggleCollapseBody = function(event) {
-    event.stopPropagation();
-    self.collapseBody = !self.collapseBody;
-  };
-
   /**
    * @ngdoc method
    * @name annotation.AnnotationController#reply
@@ -364,23 +351,8 @@ function AnnotationController(
     return store.hasPendingDeletion(self.annotation.id);
   };
 
-  this.isHiddenByModerator = function() {
-    return self.annotation.hidden;
-  };
-
   this.isReply = function() {
     return isReply(self.annotation);
-  };
-
-  /**
-   * Sets whether or not the controls for expanding/collapsing the body of
-   * lengthy annotations should be shown.
-   */
-  this.setBodyCollapsible = function(canCollapse) {
-    if (canCollapse === self.canCollapseBody) {
-      return;
-    }
-    self.canCollapseBody = canCollapse;
   };
 
   this.setText = function(text) {

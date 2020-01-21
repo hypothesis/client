@@ -234,6 +234,24 @@ describe('annotation-metadata', function() {
     });
   });
 
+  describe('.isHidden', () => {
+    it('returns `true` if annotation has been hidden', () => {
+      const annotation = fixtures.moderatedAnnotation({ hidden: true });
+      assert.isTrue(annotationMetadata.isHidden(annotation));
+    });
+
+    [
+      fixtures.newEmptyAnnotation(),
+      fixtures.newReply(),
+      fixtures.newHighlight(),
+      fixtures.oldAnnotation(),
+    ].forEach(nonHiddenAnnotation => {
+      it('returns `false` if annotation is not hidden', () => {
+        assert.isFalse(annotationMetadata.isHidden(nonHiddenAnnotation));
+      });
+    });
+  });
+
   describe('.isHighlight', () => {
     [
       {

@@ -15,22 +15,12 @@
   </annotation-quote>
 
   <annotation-body
-    collapse="vm.collapseBody"
+    annotation="vm.annotation"
     is-editing="vm.editing()"
-    is-hidden-by-moderator="vm.isHiddenByModerator()"
-    on-collapsible-changed="vm.setBodyCollapsible(collapsible)"
     on-edit-text="vm.setText(text)"
-    on-toggle-collapsed="vm.collapseBody = collapsed"
     text="vm.state().text">
   </annotation-body>
 
-  <div class="annotation-link-more">
-    <a class="annotation-link u-strong" ng-show="vm.canCollapseBody && !vm.editing()"
-      ng-click="vm.toggleCollapseBody($event)"
-      ng-title="vm.collapseBody ? 'Show the full annotation text' : 'Show the first few lines only'"
-      ng-bind="vm.collapseBody ? 'More' : 'Less'"
-      h-branding="accentColor">more</a>
-  </div>
   <!-- Tags -->
   <tag-editor
     ng-if="vm.editing()"
