@@ -1,4 +1,4 @@
-import { createElement } from 'preact';
+import { Fragment, createElement } from 'preact';
 import { useState } from 'preact/hooks';
 import propTypes from 'prop-types';
 
@@ -32,27 +32,29 @@ export default function AnnotationBody({
     : 'Show the first few lines only';
 
   return (
-    <section className="annotation-body">
-      {!isEditing && (
-        <Excerpt
-          collapse={isCollapsed}
-          collapsedHeight={400}
-          inlineControls={false}
-          onCollapsibleChanged={setIsCollapsible}
-          onToggleCollapsed={setIsCollapsed}
-          overflowThreshold={20}
-        >
-          <MarkdownView
-            markdown={text}
-            textClass={{
-              'annotation-body__text': true,
-              'is-hidden': isHidden(annotation),
-              'has-content': text.length > 0,
-            }}
-          />
-        </Excerpt>
-      )}
-      {isEditing && <MarkdownEditor text={text} onEditText={onEditText} />}
+    <Fragment>
+      <section className="annotation-body">
+        {!isEditing && (
+          <Excerpt
+            collapse={isCollapsed}
+            collapsedHeight={400}
+            inlineControls={false}
+            onCollapsibleChanged={setIsCollapsible}
+            onToggleCollapsed={setIsCollapsed}
+            overflowThreshold={20}
+          >
+            <MarkdownView
+              markdown={text}
+              textClass={{
+                'annotation-body__text': true,
+                'is-hidden': isHidden(annotation),
+                'has-content': text.length > 0,
+              }}
+            />
+          </Excerpt>
+        )}
+        {isEditing && <MarkdownEditor text={text} onEditText={onEditText} />}
+      </section>
       {isCollapsible && !isEditing && (
         <div className="annotation-body__collapse-toggle">
           <Button
@@ -63,7 +65,7 @@ export default function AnnotationBody({
           />
         </div>
       )}
-    </section>
+    </Fragment>
   );
 }
 
