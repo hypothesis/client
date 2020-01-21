@@ -21,7 +21,7 @@
  * Types of Markdown link that can be inserted with
  * convertSelectionToLink()
  */
-const LinkType = {
+export const LinkType = {
   ANCHOR_LINK: 0,
   IMAGE_LINK: 1,
 };
@@ -264,5 +264,3 @@ export function toggleBlockStyle(state, prefix) {
     });
   }
 }
-
-export { LinkType };
