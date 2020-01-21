@@ -1,5 +1,6 @@
 import { mount } from 'enzyme';
 import { createElement } from 'preact';
+import { act } from 'preact/test-utils';
 
 import * as fixtures from '../../test/annotation-fixtures';
 
@@ -34,8 +35,8 @@ describe('AnnotationOmega', () => {
 
     fakeQuote = sinon.stub();
     fakeStore = {
-      getDraft: sinon.stub(),
-      getDefault: sinon.stub(),
+      createDraft: sinon.stub(),
+      getDraft: sinon.stub().returns(null),
     };
 
     $imports.$mock(mockImportedComponents());
@@ -51,20 +52,66 @@ describe('AnnotationOmega', () => {
     $imports.$restore();
   });
 
-  it('renders quote if annotation has a quote', () => {
-    fakeQuote.returns('quote');
-    const wrapper = createComponent();
+  describe('annotation quote', () => {
+    it('renders quote if annotation has a quote', () => {
+      fakeQuote.returns('quote');
+      const wrapper = createComponent();
 
-    const quote = wrapper.find('AnnotationQuote');
-    assert.isTrue(quote.exists());
+      const quote = wrapper.find('AnnotationQuote');
+      assert.isTrue(quote.exists());
+    });
+
+    it('does not render quote if annotation does not have a quote', () => {
+      fakeQuote.returns(null);
+
+      const wrapper = createComponent();
+
+      const quote = wrapper.find('AnnotationQuote');
+      assert.isFalse(quote.exists());
+    });
   });
 
-  it('does not render quote if annotation does not have a quote', () => {
-    fakeQuote.returns(null);
+  describe('annotation body and excerpt', () => {
+    it('updates annotation state when text edited', () => {
+      const wrapper = createComponent();
+      const body = wrapper.find('AnnotationBody');
 
-    const wrapper = createComponent();
+      act(() => {
+        body.props().onEditText({ text: 'updated text' });
+      });
 
-    const quote = wrapper.find('AnnotationQuote');
-    assert.isFalse(quote.exists());
+      assert.calledOnce(fakeStore.createDraft);
+    });
+  });
+
+  describe('tags', () => {
+    it('renders tag editor if `isEditing', () => {
+      // The presence of a draft will make `isEditing` `true`
+      fakeStore.getDraft.returns(fixtures.defaultDraft());
+
+      const wrapper = createComponent();
+
+      assert.isOk(wrapper.find('TagEditor').exists());
+      assert.notOk(wrapper.find('TagList').exists());
+    });
+
+    it('updates annotation state if tags changed', () => {
+      fakeStore.getDraft.returns(fixtures.defaultDraft());
+      const wrapper = createComponent();
+
+      wrapper
+        .find('TagEditor')
+        .props()
+        .onEditTags({ tags: ['uno', 'dos'] });
+
+      assert.calledOnce(fakeStore.createDraft);
+    });
+
+    it('renders tag list if not `isEditing', () => {
+      const wrapper = createComponent();
+
+      assert.isOk(wrapper.find('TagList').exists());
+      assert.notOk(wrapper.find('TagEditor').exists());
+    });
   });
 });

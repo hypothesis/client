@@ -7,6 +7,8 @@ import { quote } from '../util/annotation-metadata';
 import AnnotationBody from './annotation-body';
 import AnnotationHeader from './annotation-header';
 import AnnotationQuote from './annotation-quote';
+import TagEditor from './tag-editor';
+import TagList from './tag-list';
 
 /**
  * The "new", migrated-to-preact annotation component.
@@ -17,25 +19,23 @@ function AnnotationOmega({
   replyCount,
   showDocumentInfo,
 }) {
+  const createDraft = useStore(store => store.createDraft);
+
+  // An annotation will have a draft if it is being edited
   const draft = useStore(store => store.getDraft(annotation));
+  const tags = draft ? draft.tags : annotation.tags;
+  const text = draft ? draft.text : annotation.text;
 
-  // Annotation metadata
   const hasQuote = !!quote(annotation);
+  const isSaving = false;
+  const isEditing = !!draft && !isSaving;
 
-  // Local component state
-  // TODO: `isEditing` will also take into account `isSaving`
-  const isEditing = !!draft;
+  const onEditTags = ({ tags }) => {
+    createDraft(annotation, { ...draft, tags });
+  };
 
-  const annotationState = () =>
-    draft || {
-      text: annotation.text,
-      tags: annotation.tags,
-      annotation,
-    };
-
-  // TODO
-  const fakeOnEditText = () => {
-    alert('TBD');
+  const onEditText = ({ text }) => {
+    createDraft(annotation, { ...draft, text });
   };
 
   return (
@@ -51,9 +51,11 @@ function AnnotationOmega({
       <AnnotationBody
         annotation={annotation}
         isEditing={isEditing}
-        onEditText={fakeOnEditText}
-        text={annotationState().text}
+        onEditText={onEditText}
+        text={text}
       />
+      {isEditing && <TagEditor onEditTags={onEditTags} tagList={tags} />}
+      {!isEditing && <TagList annotation={annotation} tags={tags} />}
     </div>
   );
 }
