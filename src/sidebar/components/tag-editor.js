@@ -183,14 +183,14 @@ function TagEditor({ onEditTags, tags: tagsService, tagList }) {
   return (
     <section className="tag-editor">
       <ul
-        className="tag-editor__tag-list"
+        className="tag-editor__tags"
         aria-label="Suggested tags for annotation"
       >
         {tagList.map(tag => {
           return (
             <li
               key={`${tag}`}
-              className="tag-editor__tag-item"
+              className="tag-editor__item"
               aria-label={`Tag: ${tag}`}
             >
               <span className="tag-editor__edit">{tag}</span>
