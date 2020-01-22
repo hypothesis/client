@@ -2,10 +2,14 @@ import { createElement } from 'preact';
 import propTypes from 'prop-types';
 
 import useStore from '../store/use-store';
-import { quote } from '../util/annotation-metadata';
+import { isNew, isReply, quote } from '../util/annotation-metadata';
+import { isShared } from '../util/permissions';
 
+import AnnotationActionBar from './annotation-action-bar';
 import AnnotationBody from './annotation-body';
 import AnnotationHeader from './annotation-header';
+import AnnotationLicense from './annotation-license';
+import AnnotationPublishControl from './annotation-publish-control';
 import AnnotationQuote from './annotation-quote';
 import TagEditor from './tag-editor';
 import TagList from './tag-list';
@@ -20,15 +24,23 @@ function AnnotationOmega({
   showDocumentInfo,
 }) {
   const createDraft = useStore(store => store.createDraft);
+  const setDefault = useStore(store => store.setDefault);
 
   // An annotation will have a draft if it is being edited
   const draft = useStore(store => store.getDraft(annotation));
+  const group = useStore(store => store.getGroup(annotation.group));
+
+  const isPrivate = draft ? draft.isPrivate : !isShared(annotation.permissions);
   const tags = draft ? draft.tags : annotation.tags;
   const text = draft ? draft.text : annotation.text;
 
   const hasQuote = !!quote(annotation);
+  const isEmpty = !text && !tags.length;
   const isSaving = false;
   const isEditing = !!draft && !isSaving;
+
+  const shouldShowActions = !isEditing && !isNew(annotation);
+  const shouldShowLicense = isEditing && !isPrivate && group.type !== 'private';
 
   const onEditTags = ({ tags }) => {
     createDraft(annotation, { ...draft, tags });
@@ -37,6 +49,20 @@ function AnnotationOmega({
   const onEditText = ({ text }) => {
     createDraft(annotation, { ...draft, text });
   };
+
+  const onSetPrivacy = ({ level }) => {
+    createDraft(annotation, { ...draft, isPrivate: level === 'private' });
+    // Persist this as privacy default for future annotations unless this is a reply
+    if (!isReply(annotation)) {
+      setDefault('annotationPrivacy', level);
+    }
+  };
+
+  // TODO
+  const fakeOnEdit = () => alert('Enter edit mode: TBD');
+  const fakeOnReply = () => alert('Reply: TBD');
+  const fakeOnRevert = () => alert('Revert changes: TBD');
+  const fakeOnSave = () => alert('Save changes: TBD');
 
   return (
     <div className="annotation-omega">
@@ -56,6 +82,28 @@ function AnnotationOmega({
       />
       {isEditing && <TagEditor onEditTags={onEditTags} tagList={tags} />}
       {!isEditing && <TagList annotation={annotation} tags={tags} />}
+      <footer className="annotation-footer">
+        {isEditing && (
+          <AnnotationPublishControl
+            group={group}
+            isDisabled={isEmpty}
+            isShared={!isPrivate}
+            onCancel={fakeOnRevert}
+            onSave={fakeOnSave}
+            onSetPrivacy={onSetPrivacy}
+          />
+        )}
+        {shouldShowLicense && <AnnotationLicense />}
+        {shouldShowActions && (
+          <div className="annotation-actions">
+            <AnnotationActionBar
+              annotation={annotation}
+              onEdit={fakeOnEdit}
+              onReply={fakeOnReply}
+            />
+          </div>
+        )}
+      </footer>
     </div>
   );
 }
