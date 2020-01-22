@@ -15,6 +15,8 @@ describe('TagEditor', function() {
   let fakeOnEditTags;
 
   function createComponent(props) {
+    container = document.createElement('div');
+    document.body.appendChild(container);
     return mount(
       <TagEditor
         // props
@@ -61,9 +63,6 @@ describe('TagEditor', function() {
   }
 
   beforeEach(function() {
-    container = document.createElement('div');
-    document.body.appendChild(container);
-
     fakeOnEditTags = sinon.stub();
     fakeServiceUrl = sinon.stub().returns('http://serviceurl.com');
     fakeTagsService = {
@@ -100,6 +99,59 @@ describe('TagEditor', function() {
     typeInput(wrapper);
     assert.isTrue(fakeTagsService.filter.calledOnce);
     assert.isTrue(fakeTagsService.filter.calledWith('tag3'));
+  });
+
+  describe('accessability attributes and ids', () => {
+    it('creates multiple TagEditors with unique datalist `id`s', () => {
+      const wrapper1 = createComponent();
+      const wrapper2 = createComponent();
+      assert.notEqual(
+        wrapper1.find('Datalist').prop('id'),
+        wrapper2.find('Datalist').prop('id')
+      );
+    });
+
+    it('sets the <Datalist> `id` prop to the same value as the `aria-owns` attribute', () => {
+      const wrapper = createComponent();
+      wrapper.find('Datalist');
+      assert.equal(
+        wrapper.find('input').prop('aria-owns'),
+        wrapper.find('Datalist').prop('id')
+      );
+    });
+
+    it('sets aria-expanded value to match open state', () => {
+      const wrapper = createComponent();
+      wrapper.find('input').instance().value = 'non-empty'; // to open list
+      typeInput(wrapper);
+      assert.equal(wrapper.find('input').prop('aria-expanded'), true);
+      selectOption(wrapper, 'tag4');
+      wrapper.update();
+      assert.equal(wrapper.find('input').prop('aria-expanded'), false);
+    });
+
+    it('sets the <Datalist> `activeItem` prop to match the selected item index', () => {
+      function checkAttributes(wrapper) {
+        const activeDescendant = wrapper
+          .find('input')
+          .prop('aria-activedescendant');
+        const itemPrefixId = wrapper.find('Datalist').prop('itemPrefixId');
+        const activeDescendantIndex = activeDescendant.split(itemPrefixId);
+        assert.equal(
+          activeDescendantIndex[1],
+          wrapper.find('Datalist').prop('activeItem')
+        );
+      }
+
+      const wrapper = createComponent();
+      wrapper.find('input').instance().value = 'non-empty';
+      typeInput(wrapper);
+      // 2 suggestions: ['tag3', 'tag4'];
+      navigateDown(wrapper); // press down once
+      checkAttributes(wrapper);
+      navigateDown(wrapper); // press down again once
+      checkAttributes(wrapper);
+    });
   });
 
   describe('suggestions open / close', () => {

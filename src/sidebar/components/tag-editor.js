@@ -8,8 +8,14 @@ import Datalist from './datalist';
 import SvgIcon from './svg-icon';
 import useElementShouldClose from './hooks/use-element-should-close';
 
+// Global counter used to create a unique id for each instance of a TagEditor
+let tagEditorIdCounter = 0;
+
 /**
  * Component to edit annotation's tags.
+ *
+ * Component accessability is modeled after "Combobox with Listbox Popup Examples" found here:
+ * https://www.w3.org/TR/wai-aria-practices/examples/combobox/aria1.1pattern/listbox-combo.html
  */
 
 function TagEditor({ onEditTags, tags: tagsService, tagList }) {
@@ -17,6 +23,10 @@ function TagEditor({ onEditTags, tags: tagsService, tagList }) {
   const [suggestions, setSuggestions] = useState([]);
   const [activeItem, setActiveItem] = useState(-1); // -1 is unselected
   const [isOpen, setOpen] = useState(false);
+  const [tagEditorId] = useState(() => {
+    ++tagEditorIdCounter;
+    return `tag-editor-${tagEditorIdCounter}`;
+  });
 
   // Set up callback to monitor outside click events to lose the Datalist
   const closeWrapperRef = useRef();
@@ -182,6 +192,11 @@ function TagEditor({ onEditTags, tags: tagsService, tagList }) {
     }
   };
 
+  // Only add the aria-activedescendant prop when there is an item selected.
+  // -1 value means no item selected.
+  const activeDescendant =
+    activeItem >= 0 ? `${tagEditorId}-datalist-item-${activeItem}` : false;
+
   return (
     <section className="tag-editor">
       <ul
@@ -211,6 +226,7 @@ function TagEditor({ onEditTags, tags: tagsService, tagList }) {
       </ul>
       <span ref={closeWrapperRef}>
         <input
+          id={tagEditorId}
           onInput={handleOnInput}
           onKeyDown={handleKeyDown}
           onFocus={handleFocus}
@@ -218,13 +234,19 @@ function TagEditor({ onEditTags, tags: tagsService, tagList }) {
           placeholder="Add new tags"
           className="tag-editor__input"
           type="text"
+          autoComplete="off"
+          role="combobox"
+          aria-autocomplete="list"
+          aria-expanded={isOpen}
+          aria-owns={`${tagEditorId}-datalist`}
+          aria-activedescendant={activeDescendant}
         />
         <Datalist
+          id={`${tagEditorId}-datalist`}
           list={suggestions}
           open={isOpen}
-          onSelectItem={item => {
-            handleSelect(item);
-          }}
+          onSelectItem={handleSelect}
+          itemPrefixId={`${tagEditorId}-datalist-item-`}
           activeItem={activeItem}
         />
       </span>

@@ -114,4 +114,52 @@ describe('TagEditor', function() {
     assert.calledWith(fakeListFormatter, 'tag1', 0);
     assert.calledWith(fakeListFormatter, 'tag2', 1);
   });
+
+  it('adds the `id` attribute to <ul> only if its present', () => {
+    let wrapper = createComponent();
+    assert.isNotOk(wrapper.find('ul').prop('id'));
+    wrapper = createComponent({ id: 'datalist-id' });
+    assert.equal(wrapper.find('ul').prop('id'), 'datalist-id');
+  });
+
+  it('creates unique ids on the <li> tags with the `itemPrefixId` only if its present', () => {
+    let wrapper = createComponent();
+    assert.isNotOk(
+      wrapper
+        .find('li')
+        .at(0)
+        .prop('id')
+    );
+    wrapper = createComponent({ itemPrefixId: 'item-prefix-id-' });
+    assert.equal(
+      wrapper
+        .find('li')
+        .at(0)
+        .prop('id'),
+      'item-prefix-id-0'
+    );
+    assert.equal(
+      wrapper
+        .find('li')
+        .at(1)
+        .prop('id'),
+      'item-prefix-id-1'
+    );
+  });
+
+  it('sets the `aria-selected` attribute on the active index ', () => {
+    const wrapper = createComponent({ activeItem: 0 });
+    assert.isTrue(
+      wrapper
+        .find('li')
+        .at(0)
+        .prop('aria-selected')
+    );
+    assert.isFalse(
+      wrapper
+        .find('li')
+        .at(1)
+        .prop('aria-selected')
+    );
+  });
 });
