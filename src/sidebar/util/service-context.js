@@ -32,7 +32,7 @@ const fallbackInjector = {
  * Consumers will either use this directly via `useContext` or use the
  * `withServices` wrapper.
  */
-const ServiceContext = createContext(fallbackInjector);
+export const ServiceContext = createContext(fallbackInjector);
 
 /**
  * Wrap a React component to inject any services it depends upon as props.
@@ -112,5 +112,3 @@ export function useService(service) {
   const injector = useContext(ServiceContext);
   return injector.get(service);
 }
-
-export { ServiceContext };

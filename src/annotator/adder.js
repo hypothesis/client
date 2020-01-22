@@ -16,13 +16,13 @@ const HIGHLIGHT_BTN_SELECTOR = '.js-highlight-btn';
  * Show the adder above the selection with an arrow pointing down at the
  * selected text.
  */
-const ARROW_POINTING_DOWN = 1;
+export const ARROW_POINTING_DOWN = 1;
 
 /**
  * Show the adder above the selection with an arrow pointing up at the
  * selected text.
  */
-const ARROW_POINTING_UP = 2;
+export const ARROW_POINTING_UP = 2;
 
 function toPx(pixels) {
   return pixels.toString() + 'px';
@@ -287,5 +287,3 @@ export class Adder {
     }, 1);
   }
 }
-
-export { ARROW_POINTING_DOWN, ARROW_POINTING_UP };
