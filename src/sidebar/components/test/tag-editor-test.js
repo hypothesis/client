@@ -60,7 +60,7 @@ describe('TagEditor', function() {
   it('adds appropriate tag values to the elements', () => {
     const wrapper = createComponent();
     wrapper.find('li').forEach((tag, i) => {
-      assert.isTrue(tag.hasClass('tag-editor__tag-item'));
+      assert.isTrue(tag.hasClass('tag-editor__item'));
       assert.equal(tag.text(), fakeTags[i]);
       assert.equal(tag.prop('aria-label'), `Tag: ${fakeTags[i]}`);
     });
