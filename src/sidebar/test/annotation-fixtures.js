@@ -16,12 +16,15 @@ export function defaultAnnotation() {
 }
 
 /**
- * Return a fake annotation created by a third-party user.
+ * Return a fake draft based on a default annotation.
  */
-export function thirdPartyAnnotation() {
-  return Object.assign(defaultAnnotation(), {
-    user: 'acct:ben@publisher.org',
-  });
+export function defaultDraft() {
+  return {
+    annotation: defaultAnnotation(),
+    text: '',
+    tags: [],
+    isPrivate: false,
+  };
 }
 
 /**
