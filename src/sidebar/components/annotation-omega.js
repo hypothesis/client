@@ -59,7 +59,6 @@ function AnnotationOmega({
   };
 
   // TODO
-  const fakeOnEdit = () => alert('Enter edit mode: TBD');
   const fakeOnReply = () => alert('Reply: TBD');
   const fakeOnRevert = () => alert('Revert changes: TBD');
   const fakeOnSave = () => alert('Save changes: TBD');
@@ -98,7 +97,6 @@ function AnnotationOmega({
           <div className="annotation-actions">
             <AnnotationActionBar
               annotation={annotation}
-              onEdit={fakeOnEdit}
               onReply={fakeOnReply}
             />
           </div>
