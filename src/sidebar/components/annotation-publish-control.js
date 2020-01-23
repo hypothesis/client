@@ -1,6 +1,9 @@
 import { createElement } from 'preact';
 import propTypes from 'prop-types';
 
+import useStore from '../store/use-store';
+import { isNew, isReply } from '../util/annotation-metadata';
+import { isShared } from '../util/permissions';
 import { withServices } from '../util/service-context';
 import { applyTheme } from '../util/theme';
 
@@ -15,16 +18,39 @@ import MenuItem from './menu-item';
  *
  */
 function AnnotationPublishControl({
-  group,
+  annotation,
   isDisabled,
-  isShared,
-  onCancel,
   onSave,
-  onSetPrivacy,
   settings,
 }) {
-  const publishDestination = isShared ? group.name : 'Only Me';
+  const draft = useStore(store => store.getDraft(annotation));
+  const group = useStore(store => store.getGroup(annotation.group));
+
+  const createDraft = useStore(store => store.createDraft);
+  const removeDraft = useStore(store => store.removeDraft);
+  const setDefault = useStore(store => store.setDefault);
+  const removeAnnotations = useStore(store => store.removeAnnotations);
+
+  const isPrivate = draft ? draft.isPrivate : !isShared(annotation.permissions);
+
+  const publishDestination = isPrivate ? 'Only Me' : group.name;
   const themeProps = ['ctaTextColor', 'ctaBackgroundColor'];
+
+  // Revert changes to this annotation
+  const onCancel = () => {
+    removeDraft(annotation);
+    if (isNew(annotation)) {
+      removeAnnotations([annotation]);
+    }
+  };
+
+  const onSetPrivacy = level => {
+    createDraft(annotation, { ...draft, isPrivate: level === 'private' });
+    // Persist this as privacy default for future annotations unless this is a reply
+    if (!isReply(annotation)) {
+      setDefault('annotationPrivacy', level);
+    }
+  };
 
   const menuLabel = (
     <div className="annotation-publish-control__btn-dropdown-arrow">
@@ -62,14 +88,14 @@ function AnnotationPublishControl({
           <MenuItem
             icon={group.type === 'open' ? 'public' : 'groups'}
             label={group.name}
-            isSelected={isShared}
-            onClick={() => onSetPrivacy({ level: 'shared' })}
+            isSelected={!isPrivate}
+            onClick={() => onSetPrivacy('shared')}
           />
           <MenuItem
             icon="lock"
             label="Only Me"
-            isSelected={!isShared}
-            onClick={() => onSetPrivacy({ level: 'private' })}
+            isSelected={isPrivate}
+            onClick={() => onSetPrivacy('private')}
           />
         </Menu>
       </div>
@@ -84,8 +110,7 @@ function AnnotationPublishControl({
 }
 
 AnnotationPublishControl.propTypes = {
-  /** The group the annotation is currently associated with */
-  group: propTypes.object.isRequired,
+  annotation: propTypes.object.isRequired,
 
   /**
    * Should the save button be disabled?
@@ -93,17 +118,8 @@ AnnotationPublishControl.propTypes = {
    */
   isDisabled: propTypes.bool,
 
-  /** The current privacy setting on the annotation. Is it shared to group? */
-  isShared: propTypes.bool,
-
-  /** Callback for cancel button click */
-  onCancel: propTypes.func.isRequired,
-
   /** Callback for save button click */
   onSave: propTypes.func.isRequired,
-
-  /** Callback when selecting a privacy option in the menu */
-  onSetPrivacy: propTypes.func.isRequired,
 
   /** services */
   settings: propTypes.object.isRequired,

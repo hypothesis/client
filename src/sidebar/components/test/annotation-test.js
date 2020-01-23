@@ -499,52 +499,6 @@ describe('annotation', function() {
       });
     });
 
-    describe('#setPrivacy', function() {
-      it('makes the annotation private when level is "private"', function() {
-        const parts = createDirective();
-        parts.controller.setPrivacy('private');
-        assert.calledWith(
-          fakeStore.createDraft,
-          parts.controller.annotation,
-          sinon.match({
-            isPrivate: true,
-          })
-        );
-      });
-
-      it('makes the annotation shared when level is "shared"', function() {
-        const parts = createDirective();
-        parts.controller.setPrivacy('shared');
-        assert.calledWith(
-          fakeStore.createDraft,
-          parts.controller.annotation,
-          sinon.match({
-            isPrivate: false,
-          })
-        );
-      });
-
-      it('sets the default visibility level if "shared"', function() {
-        const parts = createDirective();
-        parts.controller.edit();
-        parts.controller.setPrivacy('shared');
-        assert.calledWith(fakePermissions.setDefault, 'shared');
-      });
-
-      it('sets the default visibility if "private"', function() {
-        const parts = createDirective();
-        parts.controller.edit();
-        parts.controller.setPrivacy('private');
-        assert.calledWith(fakePermissions.setDefault, 'private');
-      });
-
-      it("doesn't save the visibility if the annotation is a reply", function() {
-        const parts = createDirective(fixtures.oldReply());
-        parts.controller.setPrivacy('private');
-        assert.notCalled(fakePermissions.setDefault);
-      });
-    });
-
     describe('#hasContent', function() {
       it('returns false if the annotation has no tags or text', function() {
         const controller = createDirective(fixtures.oldHighlight()).controller;
@@ -770,13 +724,6 @@ describe('annotation', function() {
         assert.equal(controller.state().text, 'unsaved-text');
       });
 
-      it('removes the draft when changes are discarded', function() {
-        const parts = createDirective();
-        parts.controller.edit();
-        parts.controller.revert();
-        assert.calledWith(fakeStore.removeDraft, parts.annotation);
-      });
-
       it('removes the draft when changes are saved', function() {
         const annotation = fixtures.defaultAnnotation();
         const controller = createDirective(annotation).controller;
@@ -784,23 +731,6 @@ describe('annotation', function() {
         return controller.save().then(function() {
           assert.calledWith(fakeStore.removeDraft, annotation);
         });
-      });
-    });
-
-    describe('reverting edits', function() {
-      it('removes the current draft', function() {
-        const controller = createDirective(fixtures.defaultAnnotation())
-          .controller;
-        controller.edit();
-        controller.revert();
-        assert.calledWith(fakeStore.removeDraft, controller.annotation);
-      });
-
-      it('deletes the annotation if it was new', function() {
-        const controller = createDirective(fixtures.newAnnotation()).controller;
-        sandbox.spy($rootScope, '$broadcast');
-        controller.revert();
-        assert.calledWith($rootScope.$broadcast, events.ANNOTATION_DELETED);
       });
     });
   });

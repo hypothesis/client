@@ -2,7 +2,7 @@ import { createElement } from 'preact';
 import propTypes from 'prop-types';
 
 import useStore from '../store/use-store';
-import { isNew, isReply, quote } from '../util/annotation-metadata';
+import { isNew, quote } from '../util/annotation-metadata';
 import { isShared } from '../util/permissions';
 
 import AnnotationActionBar from './annotation-action-bar';
@@ -24,7 +24,6 @@ function AnnotationOmega({
   showDocumentInfo,
 }) {
   const createDraft = useStore(store => store.createDraft);
-  const setDefault = useStore(store => store.setDefault);
 
   // An annotation will have a draft if it is being edited
   const draft = useStore(store => store.getDraft(annotation));
@@ -50,17 +49,8 @@ function AnnotationOmega({
     createDraft(annotation, { ...draft, text });
   };
 
-  const onSetPrivacy = ({ level }) => {
-    createDraft(annotation, { ...draft, isPrivate: level === 'private' });
-    // Persist this as privacy default for future annotations unless this is a reply
-    if (!isReply(annotation)) {
-      setDefault('annotationPrivacy', level);
-    }
-  };
-
   // TODO
   const fakeOnReply = () => alert('Reply: TBD');
-  const fakeOnRevert = () => alert('Revert changes: TBD');
   const fakeOnSave = () => alert('Save changes: TBD');
 
   return (
@@ -84,12 +74,9 @@ function AnnotationOmega({
       <footer className="annotation-footer">
         {isEditing && (
           <AnnotationPublishControl
-            group={group}
+            annotation={annotation}
             isDisabled={isEmpty}
-            isShared={!isPrivate}
-            onCancel={fakeOnRevert}
             onSave={fakeOnSave}
-            onSetPrivacy={onSetPrivacy}
           />
         )}
         {shouldShowLicense && <AnnotationLicense />}
