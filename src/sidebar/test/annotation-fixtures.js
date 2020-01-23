@@ -8,7 +8,12 @@ export function defaultAnnotation() {
     document: {
       title: 'A special document',
     },
+    permissions: {
+      read: ['group:__world__'],
+    },
+    tags: [],
     target: [{ source: 'source', selector: [] }],
+    text: '',
     uri: 'http://example.com',
     user: 'acct:bill@localhost',
     updated: '2015-05-10T20:18:56.613388+00:00',

@@ -371,7 +371,9 @@ describe('annotation-metadata', function() {
     });
 
     it('returns false if an annotation is missing permissions', function() {
-      assert.isFalse(annotationMetadata.isPublic(fixtures.defaultAnnotation()));
+      const annot = fixtures.defaultAnnotation();
+      delete annot.permissions;
+      assert.isFalse(annotationMetadata.isPublic(annot));
     });
   });
 

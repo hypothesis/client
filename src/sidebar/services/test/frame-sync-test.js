@@ -156,8 +156,11 @@ describe('sidebar.frame-sync', function() {
     });
 
     it('sends a "publicAnnotationCountChanged" message to the frame when there are only private annotations', function() {
+      const annot = annotationFixtures.defaultAnnotation();
+      delete annot.permissions;
+
       fakeStore.setState({
-        annotations: { annotations: [annotationFixtures.defaultAnnotation()] },
+        annotations: { annotations: [annot] },
       });
       assert.calledWithMatch(
         fakeBridge.call,
