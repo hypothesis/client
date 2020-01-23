@@ -14,6 +14,7 @@
       annotation="vm.thread.annotation"
       ng-if="vm.thread.annotation">
     </moderation-banner>
+    <div ng-if="vm.shouldShowAnnotationOmega()"><em>Viewing AnnotationOmega</em></div>
     <annotation-omega ng-if="vm.shouldShowAnnotationOmega()"
       annotation="vm.thread.annotation"
       reply-count="vm.thread.replyCount"
@@ -26,7 +27,7 @@
              name="annotation"
              ng-mouseenter="vm.annotationHovered = true"
              ng-mouseleave="vm.annotationHovered = false"
-             ng-if="vm.thread.annotation"
+             ng-if="vm.thread.annotation && !vm.shouldShowAnnotationOmega()"
              ng-show="vm.thread.visible"
              show-document-info="vm.showDocumentInfo"
              on-reply-count-click="vm.toggleCollapsed()"

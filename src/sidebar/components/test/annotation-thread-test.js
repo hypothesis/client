@@ -259,7 +259,7 @@ describe('annotationThread', function() {
   });
 
   describe('preact-migrated Annotation component', () => {
-    it('additionally renders `AnnotationOmega` when `client_preact_annotation` feature flag is enabled', () => {
+    it('renders `AnnotationOmega` when `client_preact_annotation` feature flag is enabled', () => {
       fakeFeatures.flagEnabled
         .withArgs('client_preact_annotation')
         .returns(true);
@@ -280,7 +280,7 @@ describe('annotationThread', function() {
         },
       });
 
-      assert.ok(element[0].querySelector('annotation'));
+      assert.notOk(element[0].querySelector('annotation'));
       assert.ok(element[0].querySelector('annotation-omega'));
     });
     it('does not render `AnnotationOmega` if `client_preact_annotation` feature flag is not enabled', () => {
