@@ -1,7 +1,9 @@
-const { createElement } = require('preact');
-const classnames = require('classnames');
-const propTypes = require('prop-types');
-const { useMemo } = require('preact/hooks');
+import { createElement } from 'preact';
+import classnames from 'classnames';
+import propTypes from 'prop-types';
+import { useMemo } from 'preact/hooks';
+
+const defaultListFormatter = item => item;
 
 /**
  * Custom datalist component. Use this in conjunction with an input field.
@@ -12,7 +14,7 @@ function Datalist({
   id,
   itemPrefixId,
   list,
-  listFormatter = item => item,
+  listFormatter = defaultListFormatter,
   onSelectItem,
   open = false,
 }) {
@@ -26,9 +28,12 @@ function Datalist({
           key={`datalist-${index}`}
           role="option"
           aria-selected={activeItem === index}
-          className={classnames({
-            'is-selected': activeItem === index,
-          })}
+          className={classnames(
+            {
+              'is-selected': activeItem === index,
+            },
+            'datalist__li'
+          )}
           onClick={() => {
             onSelectItem(item);
           }}

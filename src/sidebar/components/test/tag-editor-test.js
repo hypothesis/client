@@ -114,8 +114,9 @@ describe('TagEditor', function() {
     it('sets the <Datalist> `id` prop to the same value as the `aria-owns` attribute', () => {
       const wrapper = createComponent();
       wrapper.find('Datalist');
+
       assert.equal(
-        wrapper.find('input').prop('aria-owns'),
+        wrapper.find('.tag-editor__combobox-wrapper').prop('aria-owns'),
         wrapper.find('Datalist').prop('id')
       );
     });
@@ -124,10 +125,16 @@ describe('TagEditor', function() {
       const wrapper = createComponent();
       wrapper.find('input').instance().value = 'non-empty'; // to open list
       typeInput(wrapper);
-      assert.equal(wrapper.find('input').prop('aria-expanded'), true);
+      assert.equal(
+        wrapper.find('.tag-editor__combobox-wrapper').prop('aria-expanded'),
+        'true'
+      );
       selectOption(wrapper, 'tag4');
       wrapper.update();
-      assert.equal(wrapper.find('input').prop('aria-expanded'), false);
+      assert.equal(
+        wrapper.find('.tag-editor__combobox-wrapper').prop('aria-expanded'),
+        'false'
+      );
     });
 
     it('sets the <Datalist> `activeItem` prop to match the selected item index', () => {

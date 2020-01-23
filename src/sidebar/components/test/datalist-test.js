@@ -2,18 +2,17 @@ import { mount } from 'enzyme';
 import { createElement } from 'preact';
 
 import Datalist from '../datalist';
-import { $imports } from '../tag-editor';
+import { $imports } from '../datalist';
 
 import mockImportedComponents from './mock-imported-components';
 
-describe('TagEditor', function() {
+describe('Datalist', function() {
   let fakeList;
   let fakeOnSelectItem;
   let fakeListFormatter;
   function createComponent(props) {
     return mount(
       <Datalist
-        // props
         list={fakeList}
         open={true}
         onSelectItem={fakeOnSelectItem}
@@ -43,7 +42,7 @@ describe('TagEditor', function() {
     assert.isFalse(wrapper.find('.datalist__items').exists());
   });
 
-  it('sets uniques keys to the <li> items', () => {
+  it('sets unique keys to the <li> items', () => {
     const wrapper = createComponent();
     assert.equal(
       wrapper

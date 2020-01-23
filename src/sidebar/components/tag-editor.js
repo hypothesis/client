@@ -14,7 +14,7 @@ let tagEditorIdCounter = 0;
 /**
  * Component to edit annotation's tags.
  *
- * Component accessability is modeled after "Combobox with Listbox Popup Examples" found here:
+ * Component accessibility is modeled after "Combobox with Listbox Popup Examples" found here:
  * https://www.w3.org/TR/wai-aria-practices/examples/combobox/aria1.1pattern/listbox-combo.html
  */
 
@@ -224,21 +224,26 @@ function TagEditor({ onEditTags, tags: tagsService, tagList }) {
           );
         })}
       </ul>
-      <span ref={closeWrapperRef}>
+      <span
+        id={tagEditorId}
+        className="tag-editor__combobox-wrapper"
+        ref={closeWrapperRef}
+        role="combobox"
+        aria-expanded={isOpen.toString()}
+        aria-owns={`${tagEditorId}-datalist`}
+        aria-haspopup="true"
+      >
         <input
-          id={tagEditorId}
           onInput={handleOnInput}
           onKeyDown={handleKeyDown}
+          aria-controls={`${tagEditorId}-datalist`}
           onFocus={handleFocus}
           ref={inputEl}
           placeholder="Add new tags"
           className="tag-editor__input"
           type="text"
           autoComplete="off"
-          role="combobox"
           aria-autocomplete="list"
-          aria-expanded={isOpen}
-          aria-owns={`${tagEditorId}-datalist`}
           aria-activedescendant={activeDescendant}
         />
         <Datalist

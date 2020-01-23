@@ -31,22 +31,24 @@
   z-index: 10;
 
   @media (pointer: coarse) {
-    font-size: var.$touch-input-font-size;
+    font-size: var.$touch-target-size;
+    line-height: var.$touch-target-size;
   }
 }
 
 .datalist__ul {
   list-style: none;
   padding: 0;
-  > li {
-    padding: 0.25em 1.5em 0.25em 1em;
-    border-left: 4px transparent solid;
-  }
-  > li.is-selected {
+}
+.datalist__li {
+  padding: 0.25em 1.5em 0.25em 1em;
+  border-left: 4px transparent solid;
+
+  &.is-selected {
     border-left: 4px var.$brand solid;
     background-color: var.$grey-1;
   }
-  > li:hover {
+  &:hover {
     cursor: pointer;
     background-color: var.$grey-2;
   }
