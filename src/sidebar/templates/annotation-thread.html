@@ -15,11 +15,12 @@
       ng-if="vm.thread.annotation">
     </moderation-banner>
     <div ng-if="vm.shouldShowAnnotationOmega()"><em>Viewing AnnotationOmega</em></div>
-    <annotation-omega ng-if="vm.shouldShowAnnotationOmega()"
+    <annotation-omega ng-if="vm.thread.annotation && vm.shouldShowAnnotationOmega()"
       annotation="vm.thread.annotation"
       reply-count="vm.thread.replyCount"
       on-reply-count-click="vm.toggleCollapsed()"
-      show-document-info="vm.showDocumentInfo">
+      show-document-info="vm.showDocumentInfo"
+      thread="vm.thread">
     </annotation-omega>
     <annotation ng-class="vm.annotationClasses()"
              annotation="vm.thread.annotation"
