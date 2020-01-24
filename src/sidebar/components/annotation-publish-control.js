@@ -58,9 +58,7 @@ function AnnotationPublishControl({
       <div
         className="annotation-publish-control__btn-dropdown-arrow-indicator"
         style={applyTheme(themeProps, settings)}
-      >
-        <div>▼</div>
-      </div>
+      />
     </div>
   );
 

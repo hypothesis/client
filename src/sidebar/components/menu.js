@@ -126,14 +126,19 @@ export default function Menu({
         onClick={toggleMenu}
         title={title}
       >
-        {label}
-        {menuIndicator && (
-          <span
-            className={classnames('menu__toggle-arrow', isOpen && 'is-open')}
-          >
-            <SvgIcon name="expand-menu" className="menu__toggle-icon" />
-          </span>
-        )}
+        <span
+          // wrapper is needed to serve as the flex layout for the label and indicator content.
+          className="menu__toggle-wrapper"
+        >
+          {label}
+          {menuIndicator && (
+            <span
+              className={classnames('menu__toggle-arrow', isOpen && 'is-open')}
+            >
+              <SvgIcon name="expand-menu" className="menu__toggle-icon" />
+            </span>
+          )}
+        </span>
       </button>
       {isOpen && (
         <Fragment>
