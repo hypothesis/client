@@ -1,0 +1,20 @@
+// TEMPORARY styles for use during annotation migration
+.annotation-omega {
+  &__controls {
+    display: flex;
+  }
+
+  &__reply-toggle.button {
+    padding: 0;
+    background-color: transparent;
+    font-weight: 400;
+    &:hover {
+      background-color: transparent;
+      text-decoration: underline;
+    }
+  }
+}
+
+.annotation-omega-actions {
+  margin-left: auto;
+}

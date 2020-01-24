@@ -3,7 +3,12 @@ import { useEffect } from 'preact/hooks';
 import propTypes from 'prop-types';
 
 import useStore from '../store/use-store';
-import { isHighlight, isNew, quote } from '../util/annotation-metadata';
+import {
+  isHighlight,
+  isNew,
+  isReply,
+  quote,
+} from '../util/annotation-metadata';
 import { isShared } from '../util/permissions';
 
 import AnnotationActionBar from './annotation-action-bar';
@@ -12,6 +17,7 @@ import AnnotationHeader from './annotation-header';
 import AnnotationLicense from './annotation-license';
 import AnnotationPublishControl from './annotation-publish-control';
 import AnnotationQuote from './annotation-quote';
+import Button from './button';
 import TagEditor from './tag-editor';
 import TagList from './tag-list';
 
@@ -23,8 +29,10 @@ function AnnotationOmega({
   onReplyCountClick,
   replyCount,
   showDocumentInfo,
+  threadIsCollapsed,
 }) {
   const createDraft = useStore(store => store.createDraft);
+  const setCollapsed = useStore(store => store.setCollapsed);
 
   // An annotation will have a draft if it is being edited
   const draft = useStore(store => store.getDraft(annotation));
@@ -50,9 +58,12 @@ function AnnotationOmega({
   const isEmpty = !text && !tags.length;
   const isSaving = false;
   const isEditing = !!draft && !isSaving;
+  const toggleAction = threadIsCollapsed ? 'Show replies' : 'Hide replies';
+  const toggleText = `${toggleAction} (${replyCount})`;
 
   const shouldShowActions = !isEditing && !isNew(annotation);
   const shouldShowLicense = isEditing && !isPrivate && group.type !== 'private';
+  const shouldShowThreadToggle = replyCount > 0 && !isReply(annotation);
 
   const onEditTags = ({ tags }) => {
     createDraft(annotation, { ...draft, tags });
@@ -61,6 +72,8 @@ function AnnotationOmega({
   const onEditText = ({ text }) => {
     createDraft(annotation, { ...draft, text });
   };
+
+  const onToggleThread = () => setCollapsed(annotation.id, !threadIsCollapsed);
 
   // TODO
   const fakeOnReply = () => alert('Reply: TBD');
@@ -95,14 +108,23 @@ function AnnotationOmega({
           )}
         </div>
         {shouldShowLicense && <AnnotationLicense />}
-        {shouldShowActions && (
-          <div className="annotation-actions">
-            <AnnotationActionBar
-              annotation={annotation}
-              onReply={fakeOnReply}
+        <div className="annotation-omega__controls">
+          {shouldShowThreadToggle && (
+            <Button
+              buttonText={toggleText}
+              className="annotation-omega__reply-toggle"
+              onClick={onToggleThread}
             />
-          </div>
-        )}
+          )}
+          {shouldShowActions && (
+            <div className="annotation-omega-actions">
+              <AnnotationActionBar
+                annotation={annotation}
+                onReply={fakeOnReply}
+              />
+            </div>
+          )}
+        </div>
       </footer>
     </div>
   );
@@ -117,6 +139,8 @@ AnnotationOmega.propTypes = {
   replyCount: propTypes.number.isRequired,
   /** Should extended document info be rendered (e.g. in non-sidebar contexts)? */
   showDocumentInfo: propTypes.bool.isRequired,
+  /** Is the thread to which this annotation belongs currently collapsed? */
+  threadIsCollapsed: propTypes.bool.isRequired,
 };
 
 export default AnnotationOmega;
