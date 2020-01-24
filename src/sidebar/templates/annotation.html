@@ -41,12 +41,9 @@
 
     <div class="annotation-form-actions" ng-if="vm.editing()">
       <annotation-publish-control
-        group="vm.group()"
+        annotation="vm.annotation"
         is-disabled="!vm.hasContent()"
-        is-shared="vm.isShared()"
-        on-cancel="vm.revert()"
-        on-save="vm.save()"
-        on-set-privacy="vm.setPrivacy(level)"></annotation-publish-control>
+        on-save="vm.save()"></annotation-publish-control>
     </div>
 
     <annotation-license ng-if="vm.shouldShowLicense()"></annotation-license>
@@ -66,7 +63,6 @@
     <div class="annotation-actions" ng-if="!vm.isSaving && !vm.editing() && vm.id()">
       <annotation-action-bar
         annotation="vm.annotation"
-        on-edit="vm.edit()"
         on-reply="vm.reply()"></annotation-action-bar>
     </div>
   </footer>

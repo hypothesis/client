@@ -261,18 +261,6 @@ function AnnotationController(
     });
   };
 
-  /**
-   * @ngdoc method
-   * @name annotation.AnnotationController#revert
-   * @description Reverts an edit in progress and returns to the viewer.
-   */
-  this.revert = function() {
-    store.removeDraft(self.annotation);
-    if (isNew(self.annotation)) {
-      $rootScope.$broadcast(events.ANNOTATION_DELETED, self.annotation);
-    }
-  };
-
   this.save = function() {
     if (!self.annotation.user) {
       flash.info('Please log in to save your annotations.');
@@ -311,32 +299,6 @@ function AnnotationController(
         self.edit();
         flash.error(err.message, 'Saving annotation failed');
       });
-  };
-
-  /**
-   * @ngdoc method
-   * @name annotation.AnnotationController#setPrivacy
-   *
-   * Set the privacy settings on the annotation to a predefined
-   * level. The supported levels are 'private' which makes the annotation
-   * visible only to its creator and 'shared' which makes the annotation
-   * visible to everyone in the group.
-   *
-   * The changes take effect when the annotation is saved
-   */
-  this.setPrivacy = function(privacy) {
-    // When the user changes the privacy level of an annotation they're
-    // creating or editing, we cache that and use the same privacy level the
-    // next time they create an annotation.
-    // But _don't_ cache it when they change the privacy level of a reply.
-    if (!isReply(self.annotation)) {
-      permissions.setDefault(privacy);
-    }
-    store.createDraft(self.annotation, {
-      tags: self.state().tags,
-      text: self.state().text,
-      isPrivate: privacy === 'private',
-    });
   };
 
   this.user = function() {

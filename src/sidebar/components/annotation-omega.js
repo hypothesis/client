@@ -1,8 +1,9 @@
 import { createElement } from 'preact';
+import { useEffect } from 'preact/hooks';
 import propTypes from 'prop-types';
 
 import useStore from '../store/use-store';
-import { isNew, isReply, quote } from '../util/annotation-metadata';
+import { isHighlight, isNew, quote } from '../util/annotation-metadata';
 import { isShared } from '../util/permissions';
 
 import AnnotationActionBar from './annotation-action-bar';
@@ -24,11 +25,22 @@ function AnnotationOmega({
   showDocumentInfo,
 }) {
   const createDraft = useStore(store => store.createDraft);
-  const setDefault = useStore(store => store.setDefault);
 
   // An annotation will have a draft if it is being edited
   const draft = useStore(store => store.getDraft(annotation));
   const group = useStore(store => store.getGroup(annotation.group));
+
+  useEffect(() => {
+    // TEMPORARY. Create a new draft for new (non-highlight) annotations
+    // to put the component in "edit mode."
+    if (!draft && isNew(annotation) && !isHighlight(annotation)) {
+      createDraft(annotation, {
+        tags: annotation.tags,
+        text: annotation.text,
+        isPrivate: !isShared(annotation.permissions),
+      });
+    }
+  }, [annotation, draft, createDraft]);
 
   const isPrivate = draft ? draft.isPrivate : !isShared(annotation.permissions);
   const tags = draft ? draft.tags : annotation.tags;
@@ -50,18 +62,8 @@ function AnnotationOmega({
     createDraft(annotation, { ...draft, text });
   };
 
-  const onSetPrivacy = ({ level }) => {
-    createDraft(annotation, { ...draft, isPrivate: level === 'private' });
-    // Persist this as privacy default for future annotations unless this is a reply
-    if (!isReply(annotation)) {
-      setDefault('annotationPrivacy', level);
-    }
-  };
-
   // TODO
-  const fakeOnEdit = () => alert('Enter edit mode: TBD');
   const fakeOnReply = () => alert('Reply: TBD');
-  const fakeOnRevert = () => alert('Revert changes: TBD');
   const fakeOnSave = () => alert('Save changes: TBD');
 
   return (
@@ -83,22 +85,20 @@ function AnnotationOmega({
       {isEditing && <TagEditor onEditTags={onEditTags} tagList={tags} />}
       {!isEditing && <TagList annotation={annotation} tags={tags} />}
       <footer className="annotation-footer">
-        {isEditing && (
-          <AnnotationPublishControl
-            group={group}
-            isDisabled={isEmpty}
-            isShared={!isPrivate}
-            onCancel={fakeOnRevert}
-            onSave={fakeOnSave}
-            onSetPrivacy={onSetPrivacy}
-          />
-        )}
+        <div className="annotation-form-actions">
+          {isEditing && (
+            <AnnotationPublishControl
+              annotation={annotation}
+              isDisabled={isEmpty}
+              onSave={fakeOnSave}
+            />
+          )}
+        </div>
         {shouldShowLicense && <AnnotationLicense />}
         {shouldShowActions && (
           <div className="annotation-actions">
             <AnnotationActionBar
               annotation={annotation}
-              onEdit={fakeOnEdit}
               onReply={fakeOnReply}
             />
           </div>

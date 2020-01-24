@@ -3,7 +3,7 @@ import propTypes from 'prop-types';
 
 import useStore from '../store/use-store';
 import { isShareable, shareURI } from '../util/annotation-sharing';
-import { permits } from '../util/permissions';
+import { isPrivate, permits } from '../util/permissions';
 import { withServices } from '../util/service-context';
 
 import AnnotationShareControl from './annotation-share-control';
@@ -17,7 +17,6 @@ function AnnotationActionBar({
   annotation,
   annotationMapper,
   flash,
-  onEdit,
   onReply,
   settings,
 }) {
@@ -37,6 +36,7 @@ function AnnotationActionBar({
   const showFlagAction = userProfile.userid !== annotation.user;
   const showShareAction = isShareable(annotation, settings);
 
+  const createDraft = useStore(store => store.createDraft);
   const updateFlagFn = useStore(store => store.updateFlagStatus);
 
   const updateFlag = () => {
@@ -49,6 +49,14 @@ function AnnotationActionBar({
         flash.error(err.message, 'Deleting annotation failed');
       });
     }
+  };
+
+  const onEdit = () => {
+    createDraft(annotation, {
+      tags: annotation.tags,
+      text: annotation.text,
+      isPrivate: isPrivate(annotation.permissions),
+    });
   };
 
   const onFlag = () => {
@@ -100,7 +108,6 @@ function AnnotationActionBar({
 AnnotationActionBar.propTypes = {
   annotation: propTypes.object.isRequired,
   /** Callbacks for when action buttons are clicked/tapped */
-  onEdit: propTypes.func.isRequired,
   onReply: propTypes.func.isRequired,
 
   // Injected services

@@ -45,7 +45,6 @@ describe('AnnotationOmega', () => {
 
     fakeMetadata = {
       isNew: sinon.stub(),
-      isReply: sinon.stub().returns(false),
       quote: sinon.stub(),
     };
 
@@ -59,7 +58,6 @@ describe('AnnotationOmega', () => {
       getGroup: sinon.stub().returns({
         type: 'private',
       }),
-      setDefault: sinon.stub(),
     };
 
     $imports.$mock(mockImportedComponents());
@@ -157,6 +155,18 @@ describe('AnnotationOmega', () => {
       assert.isFalse(wrapper.find('AnnotationPublishControl').exists());
     });
 
+    it('should enable the publish control if the annotation is not empty', () => {
+      const draft = fixtures.defaultDraft();
+      draft.text = 'bananas';
+      fakeStore.getDraft.returns(draft);
+
+      const wrapper = createComponent();
+
+      assert.isFalse(
+        wrapper.find('AnnotationPublishControl').props().isDisabled
+      );
+    });
+
     it('should set the publish control to disabled if annotation is empty', () => {
       const draft = fixtures.defaultDraft();
       draft.tags = [];
@@ -168,78 +178,6 @@ describe('AnnotationOmega', () => {
       assert.isTrue(
         wrapper.find('AnnotationPublishControl').props().isDisabled
       );
-    });
-
-    it('should set `isShared` to `false` if annotation is private', () => {
-      const draft = fixtures.defaultDraft();
-      draft.isPrivate = true;
-
-      fakeStore.getDraft.returns(draft);
-
-      const wrapper = createComponent();
-
-      assert.isFalse(wrapper.find('AnnotationPublishControl').props().isShared);
-    });
-
-    it('should set `isShared` to `true` if annotation is shared', () => {
-      const draft = fixtures.defaultDraft();
-      draft.isPrivate = false;
-      fakeStore.getDraft.returns(draft);
-
-      const wrapper = createComponent();
-
-      assert.isTrue(wrapper.find('AnnotationPublishControl').props().isShared);
-    });
-
-    it('should update annotation privacy when changed by publish control', () => {
-      setEditingMode(true);
-
-      const wrapper = createComponent();
-
-      act(() => {
-        wrapper
-          .find('AnnotationPublishControl')
-          .props()
-          .onSetPrivacy({ level: 'private' });
-      });
-
-      const call = fakeStore.createDraft.getCall(0);
-
-      assert.calledOnce(fakeStore.createDraft);
-      assert.isTrue(call.args[1].isPrivate);
-    });
-
-    it('should update annotation privacy default on change', () => {
-      setEditingMode(true);
-
-      const wrapper = createComponent();
-
-      act(() => {
-        wrapper
-          .find('AnnotationPublishControl')
-          .props()
-          .onSetPrivacy({ level: 'private' });
-      });
-
-      assert.calledOnce(fakeStore.setDefault);
-      assert.calledWith(fakeStore.setDefault, 'annotationPrivacy', 'private');
-    });
-
-    it('should not update annotation privacy default on change if annotation is reply', () => {
-      fakeMetadata.isReply.returns(true);
-
-      setEditingMode(true);
-
-      const wrapper = createComponent();
-
-      act(() => {
-        wrapper
-          .find('AnnotationPublishControl')
-          .props()
-          .onSetPrivacy({ level: 'private' });
-      });
-
-      assert.equal(fakeStore.setDefault.callCount, 0);
     });
   });
 

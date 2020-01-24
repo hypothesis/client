@@ -4,13 +4,13 @@ import { act } from 'preact/test-utils';
 
 import AnnotationActionBar from '../annotation-action-bar';
 import { $imports } from '../annotation-action-bar';
+import * as fixtures from '../../test/annotation-fixtures';
 
 import mockImportedComponents from './mock-imported-components';
 import { waitFor } from './util';
 
 describe('AnnotationActionBar', () => {
   let fakeAnnotation;
-  let fakeOnEdit;
   let fakeOnReply;
 
   let fakeUserProfile;
@@ -30,7 +30,6 @@ describe('AnnotationActionBar', () => {
         annotation={fakeAnnotation}
         annotationMapper={fakeAnnotationMapper}
         flash={fakeFlash}
-        onEdit={fakeOnEdit}
         onReply={fakeOnReply}
         settings={fakeSettings}
         {...props}
@@ -56,12 +55,7 @@ describe('AnnotationActionBar', () => {
   };
 
   beforeEach(() => {
-    fakeAnnotation = {
-      group: 'fakegroup',
-      permissions: {},
-      user: 'acct:bar@foo.com',
-    };
-
+    fakeAnnotation = fixtures.defaultAnnotation();
     fakeUserProfile = {
       userid: 'account:foo@bar.com',
     };
@@ -76,7 +70,6 @@ describe('AnnotationActionBar', () => {
       error: sinon.stub(),
     };
 
-    fakeOnEdit = sinon.stub();
     fakeOnReply = sinon.stub();
 
     fakePermits = sinon.stub().returns(true);
@@ -85,8 +78,9 @@ describe('AnnotationActionBar', () => {
     fakeIsShareable = sinon.stub().returns(true);
 
     fakeStore = {
-      profile: sinon.stub().returns(fakeUserProfile),
+      createDraft: sinon.stub(),
       getGroup: sinon.stub().returns({}),
+      profile: sinon.stub().returns(fakeUserProfile),
       updateFlagStatus: sinon.stub(),
     };
 
@@ -115,13 +109,20 @@ describe('AnnotationActionBar', () => {
       assert.isTrue(getButton(wrapper, 'edit').exists());
     });
 
-    it('invokes `onEdit` callback when edit button clicked', () => {
+    it('creates a new draft when `Edit` button clicked', () => {
       allowOnly('update');
       const button = getButton(createComponent(), 'edit');
 
       button.props().onClick();
 
-      assert.calledOnce(fakeOnEdit);
+      const call = fakeStore.createDraft.getCall(0);
+      assert.calledOnce(fakeStore.createDraft);
+      assert.equal(call.args[0], fakeAnnotation);
+      assert.include(call.args[1], {
+        isPrivate: false,
+        text: fakeAnnotation.text,
+      });
+      assert.isArray(call.args[1].tags);
     });
 
     it('does not show edit button if permissions do not allow', () => {
