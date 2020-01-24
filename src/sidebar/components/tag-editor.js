@@ -1,31 +1,38 @@
 import { createElement } from 'preact';
-import { useMemo, useRef, useState } from 'preact/hooks';
+import { useRef, useState } from 'preact/hooks';
 import propTypes from 'prop-types';
 
 import { withServices } from '../util/service-context';
 
+import Datalist from './datalist';
 import SvgIcon from './svg-icon';
+import useElementShouldClose from './hooks/use-element-should-close';
 
 // Global counter used to create a unique id for each instance of a TagEditor
-let datalistIdCounter = 0;
+let tagEditorIdCounter = 0;
 
 /**
  * Component to edit annotation's tags.
+ *
+ * Component accessibility is modeled after "Combobox with Listbox Popup Examples" found here:
+ * https://www.w3.org/TR/wai-aria-practices/examples/combobox/aria1.1pattern/listbox-combo.html
  */
 
 function TagEditor({ onEditTags, tags: tagsService, tagList }) {
   const inputEl = useRef(null);
-  const [showSuggestions, setShowSuggestions] = useState(false);
-  const [suggestionsFiltered, setSuggestionsFiltered] = useState([]); // For Chrome only
-  const [datalistId] = useState(() => {
-    ++datalistIdCounter;
-    return `tag-editor-datalist-${datalistIdCounter}`;
+  const [suggestions, setSuggestions] = useState([]);
+  const [activeItem, setActiveItem] = useState(-1); // -1 is unselected
+  const [isOpen, setOpen] = useState(false);
+  const [tagEditorId] = useState(() => {
+    ++tagEditorIdCounter;
+    return `tag-editor-${tagEditorIdCounter}`;
   });
 
-  const isChromeUA = !!window.navigator.userAgent.match(/Chrome\/[.0-9]*/);
-  // Suggestion limiter to speed up the performance in Chrome
-  // See https://github.com/hypothesis/client/issues/1606
-  const chromeSuggestionsLimit = 20;
+  // Set up callback to monitor outside click events to lose the Datalist
+  const closeWrapperRef = useRef();
+  useElementShouldClose(closeWrapperRef, isOpen, () => {
+    setOpen(false);
+  });
 
   /**
    * Helper function that returns a list of suggestions less any
@@ -45,12 +52,23 @@ function TagEditor({ onEditTags, tags: tagsService, tagList }) {
     return suggestionsSet.sort();
   };
 
-  // List of suggestions returned from the tagsService
-  const suggestions = useMemo(() => {
-    // Remove any repeated suggestions that are already tags.
-    // Call filter with an empty string to return all suggestions
-    return removeDuplicates(tagsService.filter(''), tagList);
-  }, [tagsService, tagList]);
+  /**
+   * Get a list of suggestions returned from the tagsService
+   * reset the activeItem and open the Datalist
+   */
+  const updateSuggestions = () => {
+    const value = inputEl.current.value.trim();
+    if (value === '') {
+      // If there is no input, just hide the suggestions
+      setOpen(false);
+    } else {
+      // Remove any repeated suggestions that are already tags.
+      // Call filter with an empty string to return all suggestions
+      setSuggestions(removeDuplicates(tagsService.filter(value), tagList));
+      setOpen(true);
+    }
+    setActiveItem(-1);
+  };
 
   /**
    * Handle changes to this annotation's tags
@@ -77,8 +95,8 @@ function TagEditor({ onEditTags, tags: tagsService, tagList }) {
    * Adds a tag to the annotation equal to the value of the input field
    * and then clears out the suggestions list and the input field.
    */
-  const addTag = () => {
-    const value = inputEl.current.value.trim();
+  const addTag = newTag => {
+    const value = newTag.trim();
     if (value.length === 0) {
       // don't add an empty tag
       return;
@@ -88,97 +106,96 @@ function TagEditor({ onEditTags, tags: tagsService, tagList }) {
       return;
     }
     updateTags([...tagList, value]);
-    setShowSuggestions(false);
+    setOpen(false);
 
     inputEl.current.value = '';
     inputEl.current.focus();
   };
 
   /**
-   *  If the user pressed enter or comma while focused on
-   *  the <input>, then add a new tag.
+   *  Update the suggestions if the user changes the value of the input
    */
-  const handleKeyPress = e => {
-    if (e.key === 'Enter' || e.key === ',') {
-      addTag();
-      // preventDefault stops the delimiter from being
-      // added to the input field
-      e.preventDefault();
-    }
-  };
-
   const handleOnInput = e => {
     if (
       e.inputType === 'insertText' ||
       e.inputType === 'deleteContentBackward'
     ) {
-      if (inputEl.current.value.length === 0) {
-        // If the user deleted input, hide suggestions. This has
-        // no effect in Safari and the list will stay open.
-        setShowSuggestions(false);
-      } else {
-        if (isChromeUA) {
-          // Filter down the suggestions list for Chrome to subvert a performance
-          // issue. Returning too many suggestions causes a noticeable delay when
-          // rendering the datalist.
-          // See https://github.com/hypothesis/client/issues/1606
-          setSuggestionsFiltered(
-            removeDuplicates(
-              tagsService.filter(inputEl.current.value, chromeSuggestionsLimit),
-              tagList
-            )
-          );
+      updateSuggestions();
+    }
+  };
+
+  /**
+   *  Callback when the user clicked one of the items in the suggestions list.
+   *  This will add a new tag.
+   */
+  const handleSelect = item => {
+    if (item) {
+      addTag(item);
+    }
+  };
+
+  /**
+   * Opens the Datalist on focus if there is a value in the input
+   */
+  const handleFocus = () => {
+    if (inputEl.current.value.trim().length) {
+      setOpen(true);
+    }
+  };
+
+  /**
+   *  Called when the user uses keyboard navigation to move
+   *  up or down the suggestions list creating a highlighted
+   *  item.
+   *
+   *  The first value in the list is an unselected value (-1).
+   *  A user can arrive at this value by pressing the up arrow back to
+   *  the beginning or the down arrow until the end.
+   *
+   * @param {number} direction - Pass 1 for the next item or -1 for the previous
+   */
+  const changeSelectedItem = direction => {
+    let nextActiveItem = activeItem + direction;
+    if (nextActiveItem < -1) {
+      nextActiveItem = suggestions.length - 1;
+    } else if (nextActiveItem >= suggestions.length) {
+      nextActiveItem = -1;
+    }
+    setActiveItem(nextActiveItem);
+  };
+
+  /**
+   * Keydown handler for keyboard navigation of the suggestions list
+   * and when the user presses "Enter" or ","" to add a new typed item not
+   * found in the suggestions list
+   */
+  const handleKeyDown = e => {
+    switch (e.key) {
+      case 'ArrowUp':
+        changeSelectedItem(-1);
+        e.preventDefault();
+        break;
+      case 'ArrowDown':
+        changeSelectedItem(1);
+        e.preventDefault();
+        break;
+      case 'Enter':
+      case ',':
+        if (activeItem === -1) {
+          // nothing selected, just add the typed text
+          addTag(inputEl.current.value);
+        } else {
+          addTag(suggestions[activeItem]);
         }
-        // Show the suggestions if the user types something into the field
-        setShowSuggestions(true);
-      }
-    } else if (
-      e.inputType === undefined ||
-      e.inputType === 'insertReplacementText'
-    ) {
-      // nb. Chrome / Safari reports undefined and Firefox reports 'insertReplacementText'
-      // for the inputTyp value when clicking on an element in the datalist.
-      //
-      // There are two ways to arrive here, either click an item with the mouse
-      // or use keyboard navigation and press 'Enter'.
-      //
-      // If the input value typed already exactly matches the option selected
-      // then this event won't fire and a user would have to press 'Enter' a second
-      // time to trigger the handleKeyPress callback above to add the tag.
-      // Bug: https://github.com/hypothesis/client/issues/1604
-      addTag();
+        e.preventDefault();
+        break;
     }
   };
 
-  const handleKeyUp = e => {
-    // Safari on macOS and iOS have an issue where pressing "Enter" in an
-    // input when its value exactly matches a suggestion in the associated <datalist>
-    // does not generate a "keypress" event. Therefore we catch the subsequent
-    // "keyup" event instead.
-
-    if (e.key === 'Enter') {
-      // nb. `addTag` will do nothing if the "keypress" event was already handled.
-      addTag();
-    }
-  };
-
-  const suggestionsList = () => {
-    // If this is Chrome, use the filtered list, otherwise use the full list
-    // See https://github.com/hypothesis/client/issues/1606
-    const optionsList = isChromeUA ? suggestionsFiltered : suggestions;
-    return (
-      <datalist
-        id={datalistId}
-        className="tag-editor__suggestions"
-        aria-label="Annotation suggestions"
-      >
-        {showSuggestions &&
-          optionsList.map(suggestion => (
-            <option key={suggestion} value={suggestion} />
-          ))}
-      </datalist>
-    );
-  };
+  // Only add the aria-activedescendant prop when there is an item selected.
+  // -1 value means no item selected.
+  const activeDescendant =
+    activeItem >= 0 ? `${tagEditorId}-datalist-item-${activeItem}` : false;
 
   return (
     <section className="tag-editor">
@@ -207,17 +224,37 @@ function TagEditor({ onEditTags, tags: tagsService, tagList }) {
           );
         })}
       </ul>
-      <input
-        list={datalistId}
-        onInput={handleOnInput}
-        onKeyPress={handleKeyPress}
-        onKeyUp={handleKeyUp}
-        ref={inputEl}
-        placeholder="Add tags..."
-        className="tag-editor__input"
-        type="text"
-      />
-      {suggestionsList()}
+      <span
+        id={tagEditorId}
+        className="tag-editor__combobox-wrapper"
+        ref={closeWrapperRef}
+        role="combobox"
+        aria-expanded={isOpen.toString()}
+        aria-owns={`${tagEditorId}-datalist`}
+        aria-haspopup="true"
+      >
+        <input
+          onInput={handleOnInput}
+          onKeyDown={handleKeyDown}
+          aria-controls={`${tagEditorId}-datalist`}
+          onFocus={handleFocus}
+          ref={inputEl}
+          placeholder="Add new tags"
+          className="tag-editor__input"
+          type="text"
+          autoComplete="off"
+          aria-autocomplete="list"
+          aria-activedescendant={activeDescendant}
+        />
+        <Datalist
+          id={`${tagEditorId}-datalist`}
+          list={suggestions}
+          open={isOpen}
+          onSelectItem={handleSelect}
+          itemPrefixId={`${tagEditorId}-datalist-item-`}
+          activeItem={activeItem}
+        />
+      </span>
     </section>
   );
 }

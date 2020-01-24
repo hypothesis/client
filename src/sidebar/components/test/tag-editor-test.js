@@ -1,5 +1,6 @@
 import { mount } from 'enzyme';
 import { createElement } from 'preact';
+import { act } from 'preact/test-utils';
 
 import TagEditor from '../tag-editor';
 import { $imports } from '../tag-editor';
@@ -7,12 +8,18 @@ import { $imports } from '../tag-editor';
 import mockImportedComponents from './mock-imported-components';
 
 describe('TagEditor', function() {
+  let containers = [];
   let fakeTags = ['tag1', 'tag2'];
   let fakeTagsService;
   let fakeServiceUrl;
   let fakeOnEditTags;
 
   function createComponent(props) {
+    // Use an array of containers so we can test more
+    // than one component at a time.
+    let newContainer = document.createElement('div');
+    containers.push(newContainer);
+    document.body.appendChild(newContainer);
     return mount(
       <TagEditor
         // props
@@ -22,22 +29,45 @@ describe('TagEditor', function() {
         serviceUrl={fakeServiceUrl}
         tags={fakeTagsService}
         {...props}
-      />
+      />,
+      { attachTo: newContainer }
     );
   }
 
+  afterEach(function() {
+    containers.forEach(container => {
+      container.remove();
+    });
+    containers = [];
+  });
+
   // Simulates a selection event from datalist
-  function selectOption(wrapper) {
-    wrapper.find('input').simulate('input', { inputType: undefined });
-  }
-  // Simulates a selection event from datalist. This is the
-  // only event that fires in in Safari. In Chrome, both the `keyup`
-  // and `input` events fire, but only the first one adds the tag.
-  function selectOptionViaKeyUp(wrapper) {
-    wrapper.find('input').simulate('keyup', { key: 'Enter' });
+  function selectOption(wrapper, item) {
+    act(() => {
+      wrapper
+        .find('Datalist')
+        .props()
+        .onSelectItem(item);
+    });
   }
 
-  // Simulates a typing input event
+  // Simulates pressing Enter
+  function selectOptionViaEnter(wrapper) {
+    wrapper.find('input').simulate('keydown', { key: 'Enter' });
+  }
+  // Simulates typing ","
+  function selectOptionViaDelimiter(wrapper) {
+    wrapper.find('input').simulate('keydown', { key: ',' });
+  }
+  // Simulates typing the down arrow
+  function navigateDown(wrapper) {
+    wrapper.find('input').simulate('keydown', { key: 'ArrowDown' });
+  }
+  // Simulates typing the up arrow
+  function navigateUp(wrapper) {
+    wrapper.find('input').simulate('keydown', { key: 'ArrowUp' });
+  }
+  // Simulates typing text
   function typeInput(wrapper) {
     wrapper.find('input').simulate('input', { inputType: 'insertText' });
   }
@@ -49,7 +79,6 @@ describe('TagEditor', function() {
       filter: sinon.stub().returns(['tag4', 'tag3']),
       store: sinon.stub(),
     };
-
     $imports.$mock(mockImportedComponents());
   });
 
@@ -66,118 +95,166 @@ describe('TagEditor', function() {
     });
   });
 
-  it("creates a `list` prop on the input that matches the datalist's `id`", () => {
-    const wrapper = createComponent();
-    assert.equal(
-      wrapper.find('input').prop('list'),
-      wrapper.find('datalist').prop('id')
-    );
-  });
-
-  it('creates multiple TagEditors with unique datalist `id`s', () => {
-    const wrapper1 = createComponent();
-    const wrapper2 = createComponent();
-    assert.notEqual(
-      wrapper1.find('datalist').prop('id'),
-      wrapper2.find('datalist').prop('id')
-    );
-  });
-
-  it('generates a ordered datalist containing the array values returned from fakeTagsService.filter ', () => {
+  it('generates an ordered datalist containing the array values returned from fakeTagsService.filter ', () => {
     const wrapper = createComponent();
     wrapper.find('input').instance().value = 'non-empty';
-    wrapper.find('input').simulate('input', { inputType: 'insertText' });
-
-    // fakeTagsService.filter returns ['tag4', 'tag3'], but
-    // datalist shall be ordered as ['tag3', 'tag4']
-    assert.equal(
-      wrapper
-        .find('datalist option')
-        .at(0)
-        .prop('value'),
-      'tag3'
-    );
-    assert.equal(
-      wrapper
-        .find('datalist option')
-        .at(1)
-        .prop('value'),
-      'tag4'
-    );
+    typeInput(wrapper);
+    assert.equal(wrapper.find('Datalist').prop('list')[0], 'tag3');
+    assert.equal(wrapper.find('Datalist').prop('list')[1], 'tag4');
   });
 
-  [
-    {
-      text: ' in Chrome and Safari',
-      eventPayload: { inputType: undefined },
-    },
-    {
-      text: ' in Firefox',
-      eventPayload: { inputType: 'insertReplacementText' },
-    },
-  ].forEach(test => {
-    it(`clears the suggestions when selecting a tag from datalist ${test.text}`, () => {
+  it('passes the text value to filter() after receiving input', () => {
+    const wrapper = createComponent();
+    wrapper.find('input').instance().value = 'tag3';
+    typeInput(wrapper);
+    assert.isTrue(fakeTagsService.filter.calledOnce);
+    assert.isTrue(fakeTagsService.filter.calledWith('tag3'));
+  });
+
+  describe('accessibility attributes and ids', () => {
+    it('creates multiple TagEditors with unique datalist `id`s', () => {
+      const wrapper1 = createComponent();
+      const wrapper2 = createComponent();
+      assert.notEqual(
+        wrapper1.find('Datalist').prop('id'),
+        wrapper2.find('Datalist').prop('id')
+      );
+    });
+
+    it('sets the <Datalist> `id` prop to the same value as the `aria-owns` attribute', () => {
+      const wrapper = createComponent();
+      wrapper.find('Datalist');
+
+      assert.equal(
+        wrapper.find('.tag-editor__combobox-wrapper').prop('aria-owns'),
+        wrapper.find('Datalist').prop('id')
+      );
+    });
+
+    it('sets aria-expanded value to match open state', () => {
+      const wrapper = createComponent();
+      wrapper.find('input').instance().value = 'non-empty'; // to open list
+      typeInput(wrapper);
+      assert.equal(
+        wrapper.find('.tag-editor__combobox-wrapper').prop('aria-expanded'),
+        'true'
+      );
+      selectOption(wrapper, 'tag4');
+      wrapper.update();
+      assert.equal(
+        wrapper.find('.tag-editor__combobox-wrapper').prop('aria-expanded'),
+        'false'
+      );
+    });
+
+    it('sets the <Datalist> `activeItem` prop to match the selected item index', () => {
+      function checkAttributes(wrapper) {
+        const activeDescendant = wrapper
+          .find('input')
+          .prop('aria-activedescendant');
+        const itemPrefixId = wrapper.find('Datalist').prop('itemPrefixId');
+        const activeDescendantIndex = activeDescendant.split(itemPrefixId);
+        assert.equal(
+          activeDescendantIndex[1],
+          wrapper.find('Datalist').prop('activeItem')
+        );
+      }
+
+      const wrapper = createComponent();
+      wrapper.find('input').instance().value = 'non-empty';
+      typeInput(wrapper);
+      // 2 suggestions: ['tag3', 'tag4'];
+      navigateDown(wrapper); // press down once
+      checkAttributes(wrapper);
+      navigateDown(wrapper); // press down again once
+      checkAttributes(wrapper);
+    });
+  });
+
+  describe('suggestions open / close', () => {
+    it('closes the suggestions when selecting a tag from datalist', () => {
+      const wrapper = createComponent();
+      wrapper.find('input').instance().value = 'non-empty'; // to open list
+      typeInput(wrapper);
+      assert.equal(wrapper.find('Datalist').prop('open'), true);
+      selectOption(wrapper, 'tag4');
+      wrapper.update();
+      assert.equal(wrapper.find('Datalist').prop('open'), false);
+    });
+
+    it('closes the suggestions when deleting input', () => {
       const wrapper = createComponent();
       wrapper.find('input').instance().value = 'tag3';
       typeInput(wrapper);
-      assert.equal(wrapper.find('datalist option').length, 2);
-      wrapper.find('input').simulate('input', test.eventPayload); // simulates a selection
-      assert.equal(wrapper.find('datalist option').length, 0);
-
-      assert.isTrue(
-        fakeTagsService.store.calledWith([
-          { text: 'tag1' },
-          { text: 'tag2' },
-          { text: 'tag3' },
-        ])
-      );
-    });
-  });
-
-  it('clears the suggestions when deleting input', () => {
-    const wrapper = createComponent();
-    wrapper.find('input').instance().value = 'tag3';
-    typeInput(wrapper);
-    assert.equal(wrapper.find('datalist option').length, 2);
-    wrapper.find('input').instance().value = '';
-    wrapper
-      .find('input')
-      .simulate('input', { inputType: 'deleteContentBackward' });
-    assert.equal(wrapper.find('datalist option').length, 0);
-  });
-
-  it('does not clear the suggestions when deleting only part of the input', () => {
-    const wrapper = createComponent();
-    wrapper.find('input').instance().value = 'tag3';
-    typeInput(wrapper);
-    assert.equal(wrapper.find('datalist option').length, 2);
-    wrapper.find('input').instance().value = 't'; // non-empty input remains
-    wrapper
-      .find('input')
-      .simulate('input', { inputType: 'deleteContentBackward' });
-    assert.notEqual(wrapper.find('datalist option').length, 0);
-  });
-
-  it('does not render duplicate suggestions', () => {
-    // `tag3` supplied in the `tagList` will be a duplicate value relative
-    // with the fakeTagsService.filter result above.
-    const wrapper = createComponent({
-      editMode: true,
-      tagList: ['tag1', 'tag2', 'tag3'],
-    });
-    wrapper.find('input').instance().value = 'non-empty';
-    typeInput(wrapper);
-    assert.equal(wrapper.find('datalist option').length, 1);
-    assert.equal(
+      assert.equal(wrapper.find('Datalist').prop('list').length, 2);
+      wrapper.update();
+      assert.equal(wrapper.find('Datalist').prop('open'), true);
+      wrapper.find('input').instance().value = ''; // clear input
       wrapper
-        .find('datalist option')
-        .at(0)
-        .prop('value'),
-      'tag4'
-    );
+        .find('input')
+        .simulate('input', { inputType: 'deleteContentBackward' });
+      assert.equal(wrapper.find('Datalist').prop('open'), false);
+    });
+
+    it('does not close the suggestions when deleting only part of the input', () => {
+      const wrapper = createComponent();
+      wrapper.find('input').instance().value = 'tag3';
+      typeInput(wrapper);
+      assert.equal(wrapper.find('Datalist').prop('list').length, 2);
+      assert.equal(wrapper.find('Datalist').prop('open'), true);
+      wrapper.find('input').instance().value = 't'; // non-empty input remains
+      wrapper
+        .find('input')
+        .simulate('input', { inputType: 'deleteContentBackward' });
+      assert.equal(wrapper.find('Datalist').prop('open'), true);
+    });
+
+    it('opens the suggestions on focus if input is not empty', () => {
+      const wrapper = createComponent();
+      wrapper.find('input').instance().value = 'tag3';
+      assert.equal(wrapper.find('Datalist').prop('open'), false);
+      wrapper.find('input').simulate('focus', {});
+      assert.equal(wrapper.find('Datalist').prop('open'), true);
+    });
+
+    it('does not open the suggestions on focus if input is empty', () => {
+      const wrapper = createComponent();
+      wrapper.find('input').simulate('focus', {});
+      assert.equal(wrapper.find('Datalist').prop('open'), false);
+    });
+
+    it('does not open the suggestions on focus if input is only white space', () => {
+      const wrapper = createComponent();
+      wrapper.find('input').instance().value = ' ';
+      wrapper.find('input').simulate('focus', {});
+      assert.equal(wrapper.find('Datalist').prop('open'), false);
+    });
+
+    it('closes the suggestions when focus is removed from the input', () => {
+      const wrapper = createComponent();
+      wrapper.find('input').instance().value = 'non-empty';
+      typeInput(wrapper);
+      assert.equal(wrapper.find('Datalist').prop('open'), true);
+      document.body.dispatchEvent(new Event('focus'));
+      wrapper.update();
+      assert.equal(wrapper.find('Datalist').prop('open'), false);
+    });
+
+    it('does not render duplicate suggestions', () => {
+      // `tag3` supplied in the `tagList` will be a duplicate value relative
+      // with the fakeTagsService.filter result above.
+      const wrapper = createComponent({
+        editMode: true,
+        tagList: ['tag1', 'tag2', 'tag3'],
+      });
+      wrapper.find('input').instance().value = 'non-empty';
+      typeInput(wrapper);
+      assert.equal(wrapper.find('Datalist').prop('list').length, 1);
+      assert.equal(wrapper.find('Datalist').prop('list')[0], 'tag4');
+    });
   });
 
-  context('when adding tags', () => {
+  describe('when adding tags', () => {
     /**
      * Helper function to assert that a tag was correctly added
      */
@@ -188,11 +265,12 @@ describe('TagEditor', function() {
       );
       // called the onEditTags callback prop
       assert.isTrue(fakeOnEditTags.calledWith({ tags: tagList }));
-      // clears out the suggestions
-      assert.equal(wrapper.find('datalist option').length, 0);
+      // hides the suggestions
+      assert.equal(wrapper.find('Datalist').prop('open'), false);
       // assert the input value is cleared out
       assert.equal(wrapper.find('input').instance().value, '');
-      // note: focus not tested
+      // input element should have focus
+      assert.equal(document.activeElement.nodeName, 'INPUT');
     };
     /**
      * Helper function to assert that a tag was correctly not added
@@ -204,95 +282,54 @@ describe('TagEditor', function() {
 
     it('adds a tag from the input field', () => {
       const wrapper = createComponent();
-      wrapper.find('input').instance().value = 'tag3';
-      selectOption(wrapper);
+      selectOption(wrapper, 'tag3');
       assertAddTagsSuccess(wrapper, ['tag1', 'tag2', 'tag3']);
     });
 
-    it('adds a tag from the input field via keyup event', () => {
+    it('adds a tag from the input field via keydown event', () => {
       const wrapper = createComponent();
       wrapper.find('input').instance().value = 'tag3';
-      selectOptionViaKeyUp(wrapper);
+      selectOptionViaEnter(wrapper);
       assertAddTagsSuccess(wrapper, ['tag1', 'tag2', 'tag3']);
     });
 
-    it('populate the datalist, then adds a tag from the input field', () => {
+    it('adds a tag from the input field when typing "," delimiter', () => {
       const wrapper = createComponent();
       wrapper.find('input').instance().value = 'tag3';
-
-      typeInput(wrapper);
-      assert.equal(wrapper.find('datalist option').length, 2);
-
-      selectOption(wrapper);
+      selectOptionViaDelimiter(wrapper);
       assertAddTagsSuccess(wrapper, ['tag1', 'tag2', 'tag3']);
-    });
-
-    it('clears out the <option> elements after adding a tag', () => {
-      const wrapper = createComponent();
-      wrapper.find('input').instance().value = 'non-empty';
-
-      typeInput(wrapper);
-      assert.equal(wrapper.find('datalist option').length, 2);
-
-      selectOption(wrapper);
-      assert.equal(wrapper.find('datalist option').length, 0);
     });
 
     it('should not add a tag if the input is empty', () => {
       const wrapper = createComponent();
       wrapper.find('input').instance().value = '';
+      selectOptionViaEnter(wrapper);
+      assertAddTagsFail();
+    });
 
-      selectOption(wrapper);
+    it('should not add a tag if the input is empty', () => {
+      const wrapper = createComponent();
+      wrapper.find('input').instance().value = '';
+      selectOptionViaEnter(wrapper);
       assertAddTagsFail();
     });
 
     it('should not add a tag if the input is blank space', () => {
       const wrapper = createComponent();
       wrapper.find('input').instance().value = '  ';
-      selectOption(wrapper);
+      selectOptionViaEnter(wrapper);
       assertAddTagsFail();
     });
 
     it('should not add a tag if its a duplicate of one already in the list', () => {
       const wrapper = createComponent();
       wrapper.find('input').instance().value = 'tag1';
-      selectOption(wrapper);
+      selectOptionViaEnter(wrapper);
       assertAddTagsFail();
-    });
-
-    [
-      {
-        key: 'Enter',
-        text: 'adds a tag via keypress `Enter`',
-        run: wrapper => {
-          assertAddTagsSuccess(wrapper, ['tag1', 'tag2', 'tag3']);
-        },
-      },
-      {
-        key: ',',
-        text: 'adds a tag via keypress `,`',
-        run: wrapper => {
-          assertAddTagsSuccess(wrapper, ['tag1', 'tag2', 'tag3']);
-        },
-      },
-      {
-        key: 'e',
-        text: 'does not add a tag when key is not `,` or  `Enter`',
-        run: () => {
-          assertAddTagsFail();
-        },
-      },
-    ].forEach(test => {
-      it(test.text, () => {
-        const wrapper = createComponent();
-        wrapper.find('input').instance().value = 'tag3';
-        wrapper.find('input').simulate('keypress', { key: test.key });
-        test.run(wrapper);
-      });
     });
   });
 
-  context('when removing tags', () => {
+  describe('when removing tags', () => {
     it('removes `tag1` when clicking its delete button', () => {
       const wrapper = createComponent(); // note: initial tagList is ['tag1', 'tag2']
       assert.equal(wrapper.find('.tag-editor__edit').length, 2);
@@ -308,35 +345,52 @@ describe('TagEditor', function() {
     });
   });
 
-  describe('filter on text input based on user agent', () => {
-    let fakeNavigator;
-    beforeEach(function() {
-      fakeNavigator = sinon.stub(navigator, 'userAgent');
-    });
-
-    afterEach(function() {
-      fakeNavigator.restore();
-    });
-
-    it('calls filter when changing input with a limit of 20 when browser is Chrome', () => {
-      fakeNavigator.get(() => 'Chrome/1.0');
+  describe('navigating suggestions via keyboard', () => {
+    it('should set the initial activeItem value to -1 when opening suggestions', () => {
       const wrapper = createComponent();
-      wrapper.find('input').instance().value = 'tag';
+      wrapper.find('input').instance().value = 'non-empty';
       typeInput(wrapper);
-
-      assert.isTrue(fakeTagsService.filter.calledTwice);
-      assert.isTrue(fakeTagsService.filter.calledWith('tag', 20));
+      assert.equal(wrapper.find('Datalist').prop('open'), true);
+      assert.equal(wrapper.find('Datalist').prop('activeItem'), -1);
+    });
+    it('should increment the activeItem when pressing down circularly', () => {
+      const wrapper = createComponent();
+      wrapper.find('input').instance().value = 'non-empty';
+      typeInput(wrapper);
+      // 2 suggestions: ['tag3', 'tag4'];
+      navigateDown(wrapper);
+      assert.equal(wrapper.find('Datalist').prop('activeItem'), 0);
+      navigateDown(wrapper);
+      assert.equal(wrapper.find('Datalist').prop('activeItem'), 1);
+      navigateDown(wrapper);
+      // back to unselected
+      assert.equal(wrapper.find('Datalist').prop('activeItem'), -1);
     });
 
-    it('does not call filter when changing input when browser is not Chrome', () => {
-      fakeNavigator.get(() => '');
+    it('should decrement the activeItem when pressing up circularly', () => {
       const wrapper = createComponent();
-
-      wrapper.find('input').instance().value = 'tag';
+      wrapper.find('input').instance().value = 'non-empty';
       typeInput(wrapper);
+      // 2 suggestions: ['tag3', 'tag4'];
+      navigateUp(wrapper);
+      assert.equal(wrapper.find('Datalist').prop('activeItem'), 1);
+      navigateUp(wrapper);
+      assert.equal(wrapper.find('Datalist').prop('activeItem'), 0);
+      navigateUp(wrapper);
+      assert.equal(wrapper.find('Datalist').prop('activeItem'), -1);
+    });
 
-      assert.isTrue(fakeTagsService.filter.calledOnce);
-      assert.isTrue(fakeTagsService.filter.calledWith(''));
+    it('should set activeItem to -1 when clearing the suggestions', () => {
+      const wrapper = createComponent();
+      wrapper.find('input').instance().value = 'non-empty';
+      typeInput(wrapper);
+      navigateDown(wrapper);
+      // change to non-default value
+      assert.equal(wrapper.find('Datalist').prop('activeItem'), 0);
+      // clear suggestions
+      wrapper.find('input').instance().value = '';
+      typeInput(wrapper);
+      assert.equal(wrapper.find('Datalist').prop('activeItem'), -1);
     });
   });
 });
