@@ -16,6 +16,7 @@
     $arrow-indicator-width: 26px;
 
     height: $height;
+    display: flex;
     position: relative;
     margin-right: 1em;
 
@@ -38,22 +39,20 @@
       width: 100%;
       height: 100%;
       text-align: left;
-      padding-left: $h-padding;
-      padding-right: $arrow-indicator-width + 8px;
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
     }
 
     // dropdown arrow which reveals the button's associated menu
     // when clicked
     &-dropdown-arrow {
-      position: absolute;
+      display: flex;
+      align-items: center;
       right: 0px;
       top: 0px;
 
       height: 100%;
       width: $arrow-indicator-width;
-      padding-left: 0px;
-      padding-right: $h-padding;
-      margin-left: 8px;
 
       border: none;
       background-color: var.$grey-mid;
@@ -90,15 +89,17 @@
       // the ▼ arrow which reveals the dropdown menu when clicked
       &-indicator {
         color: $text-color;
-        position: absolute;
         left: 0px;
         right: 0px;
         top: 0px;
         bottom: 0px;
         line-height: $height;
         text-align: center;
+        width: 100%;
 
-        & > div {
+        &:after {
+          content: '▼';
+          display: inline-block;
           transform: scaleY(0.7);
         }
       }

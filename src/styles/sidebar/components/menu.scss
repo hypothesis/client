@@ -14,10 +14,18 @@
   background: none;
   padding: 0;
   color: inherit;
-  display: flex;
+  // "block" display is needed so it can take up the
+  //  full height of its parent container
+  display: block;
+  height: 100%;
   align-items: center;
 }
 
+.menu__toggle-wrapper {
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
 .menu__toggle-icon {
   width: 10px;
   height: 10px;
