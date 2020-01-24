@@ -8,15 +8,18 @@ import { $imports } from '../tag-editor';
 import mockImportedComponents from './mock-imported-components';
 
 describe('TagEditor', function() {
-  let container;
+  let containers = [];
   let fakeTags = ['tag1', 'tag2'];
   let fakeTagsService;
   let fakeServiceUrl;
   let fakeOnEditTags;
 
   function createComponent(props) {
-    container = document.createElement('div');
-    document.body.appendChild(container);
+    // Use an array of containers so we can test more
+    // than one component at a time.
+    let newContainer = document.createElement('div');
+    containers.push(newContainer);
+    document.body.appendChild(newContainer);
     return mount(
       <TagEditor
         // props
@@ -27,9 +30,16 @@ describe('TagEditor', function() {
         tags={fakeTagsService}
         {...props}
       />,
-      { attachTo: container }
+      { attachTo: newContainer }
     );
   }
+
+  afterEach(function() {
+    containers.forEach(container => {
+      container.remove();
+    });
+    containers = [];
+  });
 
   // Simulates a selection event from datalist
   function selectOption(wrapper, item) {
@@ -57,7 +67,7 @@ describe('TagEditor', function() {
   function navigateUp(wrapper) {
     wrapper.find('input').simulate('keydown', { key: 'ArrowUp' });
   }
-  // Simulates a typing text
+  // Simulates typing text
   function typeInput(wrapper) {
     wrapper.find('input').simulate('input', { inputType: 'insertText' });
   }
@@ -101,7 +111,7 @@ describe('TagEditor', function() {
     assert.isTrue(fakeTagsService.filter.calledWith('tag3'));
   });
 
-  describe('accessability attributes and ids', () => {
+  describe('accessibility attributes and ids', () => {
     it('creates multiple TagEditors with unique datalist `id`s', () => {
       const wrapper1 = createComponent();
       const wrapper2 = createComponent();
@@ -162,7 +172,7 @@ describe('TagEditor', function() {
   });
 
   describe('suggestions open / close', () => {
-    it('close the suggestions when selecting a tag from datalist', () => {
+    it('closes the suggestions when selecting a tag from datalist', () => {
       const wrapper = createComponent();
       wrapper.find('input').instance().value = 'non-empty'; // to open list
       typeInput(wrapper);
@@ -172,7 +182,7 @@ describe('TagEditor', function() {
       assert.equal(wrapper.find('Datalist').prop('open'), false);
     });
 
-    it('close the suggestions when deleting input', () => {
+    it('closes the suggestions when deleting input', () => {
       const wrapper = createComponent();
       wrapper.find('input').instance().value = 'tag3';
       typeInput(wrapper);
