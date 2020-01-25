@@ -283,6 +283,7 @@ export default function MarkdownEditor({ onEditText = () => {}, text = '' }) {
       ) : (
         <textarea
           className="markdown-editor__input"
+          dir="auto"
           ref={input}
           onClick={e => e.stopPropagation()}
           onKeydown={handleKeyDown}
