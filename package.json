@@ -78,7 +78,7 @@
     "lodash.debounce": "^4.0.3",
     "lodash.get": "^4.3.0",
     "loose-envify": "^1.4.0",
-    "mkdirp": "^0.5.1",
+    "mkdirp": "^1.0.3",
     "mocha": "^7.0.0",
     "node-uuid": "^1.4.3",
     "npm-packlist": "^2.0.1",
