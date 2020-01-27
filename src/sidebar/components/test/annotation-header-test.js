@@ -5,6 +5,7 @@ import * as fixtures from '../../test/annotation-fixtures';
 import AnnotationHeader from '../annotation-header';
 import { $imports } from '../annotation-header';
 
+import { checkAccessibility } from './accessibility';
 import mockImportedComponents from './mock-imported-components';
 
 describe('AnnotationHeader', () => {
@@ -180,4 +181,26 @@ describe('AnnotationHeader', () => {
       assert.isFalse(highlight.exists());
     });
   });
+
+  it(
+    'should pass a11y checks',
+    checkAccessibility([
+      {
+        name: 'not editing',
+        content: () =>
+          createAnnotationHeader({
+            annotation: fixtures.defaultAnnotation(),
+            isEditing: false,
+          }),
+      },
+      {
+        name: 'editing',
+        content: () =>
+          createAnnotationHeader({
+            annotation: fixtures.defaultAnnotation(),
+            isEditing: true,
+          }),
+      },
+    ])
+  );
 });

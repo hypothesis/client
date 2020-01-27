@@ -4,6 +4,7 @@ import { createElement } from 'preact';
 import Button from '../button';
 import { $imports } from '../button';
 
+import { checkAccessibility } from './accessibility';
 import mockImportedComponents from './mock-imported-components';
 
 describe('Button', () => {
@@ -89,4 +90,11 @@ describe('Button', () => {
 
     assert.isTrue(wrapper.find('button').hasClass('button--primary'));
   });
+
+  it(
+    'should pass a11y checks',
+    checkAccessibility({
+      content: () => createComponent(),
+    })
+  );
 });

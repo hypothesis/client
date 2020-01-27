@@ -4,6 +4,7 @@ import { createElement } from 'preact';
 import Tutorial from '../tutorial';
 import { $imports } from '../tutorial';
 
+import { checkAccessibility } from './accessibility';
 import mockImportedComponents from './mock-imported-components';
 
 describe('Tutorial', function() {
@@ -55,4 +56,11 @@ describe('Tutorial', function() {
       assert.isTrue(instruction.exists());
     });
   });
+
+  it(
+    'should pass a11y checks',
+    checkAccessibility({
+      content: () => createComponent(),
+    })
+  );
 });

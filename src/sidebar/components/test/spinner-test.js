@@ -3,6 +3,8 @@ import { createElement } from 'preact';
 
 import Spinner from '../spinner';
 
+import { checkAccessibility } from './accessibility';
+
 describe('Spinner', function() {
   const createSpinner = (props = {}) => mount(<Spinner {...props} />);
 
@@ -11,4 +13,11 @@ describe('Spinner', function() {
     const wrapper = createSpinner();
     assert.isTrue(wrapper.exists('.spinner'));
   });
+
+  it(
+    'should pass a11y checks',
+    checkAccessibility({
+      content: () => createSpinner(),
+    })
+  );
 });

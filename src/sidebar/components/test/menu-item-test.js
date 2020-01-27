@@ -4,6 +4,7 @@ import { createElement } from 'preact';
 import MenuItem from '../menu-item';
 import { $imports } from '../menu-item';
 
+import { checkAccessibility } from './accessibility';
 import mockImportedComponents from './mock-imported-components';
 
 describe('MenuItem', () => {
@@ -150,4 +151,46 @@ describe('MenuItem', () => {
       'Submenu content'
     );
   });
+
+  it(
+    'should pass a11y checks',
+    checkAccessibility([
+      {
+        name: 'default',
+        content: () => (
+          <div role="menu">
+            <MenuItem label="Test item" />
+          </div>
+        ),
+      },
+      {
+        name: 'with link',
+        content: () => (
+          <div role="menu">
+            <MenuItem label="Test" href="https://foobar.com" />
+          </div>
+        ),
+      },
+      {
+        name: 'with icon',
+        content: () => (
+          <div role="menu">
+            <MenuItem label="Test" icon="an-svg-icon" />
+          </div>
+        ),
+      },
+      {
+        name: 'with submenu',
+        content: () => (
+          <div role="menu">
+            <MenuItem
+              label="Test"
+              isSubmenuVisible={true}
+              submenu={<div>Submenu content</div>}
+            />
+          </div>
+        ),
+      },
+    ])
+  );
 });

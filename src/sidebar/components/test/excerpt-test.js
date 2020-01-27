@@ -5,6 +5,8 @@ import { act } from 'preact/test-utils';
 import Excerpt from '../excerpt';
 import { $imports } from '../excerpt';
 
+import { checkAccessibility } from './accessibility';
+
 describe('Excerpt', () => {
   const SHORT_DIV = <div id="foo" style="height: 5px;" />;
   const TALL_DIV = (
@@ -132,4 +134,18 @@ describe('Excerpt', () => {
       assert.equal(getExcerptHeight(wrapper), 200);
     });
   });
+
+  it(
+    'should pass a11y checks',
+    checkAccessibility([
+      {
+        name: 'external controls',
+        content: () => createExcerpt({}, TALL_DIV),
+      },
+      {
+        name: 'internal controls',
+        content: () => createExcerpt({ inlineControls: true }, TALL_DIV),
+      },
+    ])
+  );
 });

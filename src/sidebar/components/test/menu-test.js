@@ -5,6 +5,8 @@ import { act } from 'preact/test-utils';
 import Menu from '../menu';
 import { $imports } from '../menu';
 
+import { checkAccessibility } from './accessibility';
+
 describe('Menu', () => {
   let container;
 
@@ -223,4 +225,18 @@ describe('Menu', () => {
 
     assert.include({ position: 'static' }, menuContainer.prop('style'));
   });
+
+  it(
+    'should pass a11y checks',
+    checkAccessibility([
+      {
+        name: 'default',
+        content: () => (
+          <Menu label={<TestLabel />} title="Test menu">
+            <TestMenuItem />
+          </Menu>
+        ),
+      },
+    ])
+  );
 });

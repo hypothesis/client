@@ -6,6 +6,7 @@ import events from '../../events';
 import NewNoteButton from '../new-note-btn';
 import { $imports } from '../new-note-btn';
 
+import { checkAccessibility } from './accessibility';
 import mockImportedComponents from './mock-imported-components';
 
 describe('NewNoteButton', function() {
@@ -76,4 +77,11 @@ describe('NewNoteButton', function() {
       }
     );
   });
+
+  it(
+    'should pass a11y checks',
+    checkAccessibility({
+      content: () => createComponent(),
+    })
+  );
 });

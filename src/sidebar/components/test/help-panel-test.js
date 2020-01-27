@@ -5,6 +5,7 @@ import { act } from 'preact/test-utils';
 import HelpPanel from '../help-panel';
 import { $imports } from '../help-panel';
 
+import { checkAccessibility } from './accessibility';
 import mockImportedComponents from './mock-imported-components';
 
 describe('HelpPanel', function() {
@@ -194,4 +195,11 @@ describe('HelpPanel', function() {
       });
     });
   });
+
+  it(
+    'should pass a11y checks',
+    checkAccessibility({
+      content: () => createComponent(),
+    })
+  );
 });

@@ -5,6 +5,8 @@ import { act } from 'preact/test-utils';
 import Timestamp from '../timestamp';
 import { $imports } from '../timestamp';
 
+import { checkAccessibility } from './accessibility';
+
 describe('Timestamp', () => {
   let clock;
   let fakeTime;
@@ -125,4 +127,19 @@ describe('Timestamp', () => {
       });
     });
   });
+
+  it(
+    'should pass a11y checks',
+    checkAccessibility({
+      content: () => {
+        // Fake timers break axe-core.
+        clock.restore();
+
+        return createTimestamp({
+          timestamp: '2016-06-10T10:04:04.939Z',
+          href: 'https://annotate.com/a/1234',
+        });
+      },
+    })
+  );
 });

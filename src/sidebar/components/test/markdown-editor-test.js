@@ -6,6 +6,8 @@ import { LinkType } from '../../markdown-commands';
 import MarkdownEditor from '../markdown-editor';
 import { $imports } from '../markdown-editor';
 
+import { checkAccessibility } from './accessibility';
+
 describe('MarkdownEditor', () => {
   const formatResult = {
     text: 'formatted text',
@@ -240,4 +242,27 @@ describe('MarkdownEditor', () => {
       container.remove();
     }
   });
+
+  // FIXME-A11Y
+  it.skip(
+    'should pass a11y checks',
+    checkAccessibility([
+      {
+        content: () => <MarkdownEditor text="test" />,
+      },
+      {
+        name: 'Preview mode',
+        content: () => {
+          const wrapper = mount(<MarkdownEditor text="test" />);
+
+          const previewButton = wrapper
+            .find('button')
+            .filterWhere(el => el.text() === 'Preview');
+          previewButton.simulate('click');
+
+          return wrapper;
+        },
+      },
+    ])
+  );
 });

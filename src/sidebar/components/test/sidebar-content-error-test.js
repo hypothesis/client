@@ -4,6 +4,7 @@ import { createElement } from 'preact';
 import SidebarContentError from '../sidebar-content-error';
 import { $imports } from '../sidebar-content-error';
 
+import { checkAccessibility } from './accessibility';
 import mockImportedComponents from './mock-imported-components';
 
 describe('SidebarContentError', () => {
@@ -71,4 +72,38 @@ describe('SidebarContentError', () => {
 
     assert.equal(errorText, loggedInErrorMessage);
   });
+
+  it(
+    'should pass a11y checks',
+    checkAccessibility([
+      {
+        name: 'logged out',
+        content: () => {
+          const isLoggedIn = false;
+          const loggedOutErrorMessage = 'This annotation is not available.';
+          const loggedInErrorMessage =
+            'You do not have permission to view this annotation.';
+          return createSidebarContentError(
+            loggedOutErrorMessage,
+            loggedInErrorMessage,
+            isLoggedIn
+          );
+        },
+      },
+      {
+        name: 'logged in',
+        content: () => {
+          const isLoggedIn = true;
+          const loggedOutErrorMessage = 'This annotation is not available.';
+          const loggedInErrorMessage =
+            'You do not have permission to view this annotation.';
+          return createSidebarContentError(
+            loggedOutErrorMessage,
+            loggedInErrorMessage,
+            isLoggedIn
+          );
+        },
+      },
+    ])
+  );
 });

@@ -5,6 +5,7 @@ import * as fixtures from '../../test/annotation-fixtures';
 import ModerationBanner from '../moderation-banner';
 import { $imports } from '../moderation-banner';
 
+import { checkAccessibility } from './accessibility';
 import mockImportedComponents from './mock-imported-components';
 
 const moderatedAnnotation = fixtures.moderatedAnnotation;
@@ -182,4 +183,16 @@ describe('ModerationBanner', () => {
       done();
     }, 0);
   });
+
+  it(
+    'should pass a11y checks',
+    checkAccessibility({
+      content: () =>
+        createComponent({
+          annotation: moderatedAnnotation({
+            flagCount: 10,
+          }),
+        }),
+    })
+  );
 });

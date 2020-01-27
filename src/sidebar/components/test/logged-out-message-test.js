@@ -4,6 +4,7 @@ import { createElement } from 'preact';
 import LoggedOutMessage from '../logged-out-message';
 import { $imports } from '../logged-out-message';
 
+import { checkAccessibility } from './accessibility';
 import mockImportedComponents from './mock-imported-components';
 
 describe('LoggedOutMessage', () => {
@@ -43,4 +44,11 @@ describe('LoggedOutMessage', () => {
 
     assert.equal(loginLink.prop('onClick'), fakeOnLogin);
   });
+
+  it(
+    'should pass a11y checks',
+    checkAccessibility({
+      content: () => createLoggedOutMessage(),
+    })
+  );
 });

@@ -6,6 +6,7 @@ import AnnotationActionBar from '../annotation-action-bar';
 import { $imports } from '../annotation-action-bar';
 import * as fixtures from '../../test/annotation-fixtures';
 
+import { checkAccessibility } from './accessibility';
 import mockImportedComponents from './mock-imported-components';
 import { waitFor } from './util';
 
@@ -311,4 +312,12 @@ describe('AnnotationActionBar', () => {
       });
     });
   });
+
+  it(
+    'should pass a11y checks',
+    checkAccessibility({
+      name: 'default',
+      content: () => createComponent(),
+    })
+  );
 });

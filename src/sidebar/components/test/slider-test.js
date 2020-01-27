@@ -3,6 +3,8 @@ import { createElement } from 'preact';
 
 import Slider from '../slider';
 
+import { checkAccessibility } from './accessibility';
+
 describe('Slider', () => {
   let container;
 
@@ -99,4 +101,18 @@ describe('Slider', () => {
       wrapper.unmount();
     });
   });
+
+  it(
+    'should pass a11y checks',
+    checkAccessibility([
+      {
+        name: 'visible',
+        content: () => createSlider({ visible: true }),
+      },
+      {
+        name: 'hidden',
+        content: () => createSlider({ visible: false }),
+      },
+    ])
+  );
 });

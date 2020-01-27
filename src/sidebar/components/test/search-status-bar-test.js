@@ -4,6 +4,7 @@ import { createElement } from 'preact';
 import SearchStatusBar from '../search-status-bar';
 import { $imports } from '../search-status-bar';
 
+import { checkAccessibility } from './accessibility';
 import mockImportedComponents from './mock-imported-components';
 
 describe('SearchStatusBar', () => {
@@ -314,4 +315,11 @@ describe('SearchStatusBar', () => {
       });
     });
   });
+
+  it(
+    'should pass a11y checks',
+    checkAccessibility({
+      content: () => createComponent({}),
+    })
+  );
 });

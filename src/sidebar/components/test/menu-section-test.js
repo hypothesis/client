@@ -4,6 +4,7 @@ import { createElement } from 'preact';
 import MenuSection from '../menu-section';
 import { $imports } from '../menu-section';
 
+import { checkAccessibility } from './accessibility';
 import mockImportedComponents from './mock-imported-components';
 
 describe('MenuSection', () => {
@@ -36,4 +37,11 @@ describe('MenuSection', () => {
     const wrapper = createMenuSection();
     assert.isTrue(wrapper.exists('li > .menu-item'));
   });
+
+  it(
+    'should pass a11y checks',
+    checkAccessibility({
+      content: () => createMenuSection(),
+    })
+  );
 });

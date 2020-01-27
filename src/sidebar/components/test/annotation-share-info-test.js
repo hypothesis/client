@@ -5,6 +5,7 @@ import * as fixtures from '../../test/annotation-fixtures';
 import AnnotationShareInfo from '../annotation-share-info';
 import { $imports } from '../annotation-share-info';
 
+import { checkAccessibility } from './accessibility';
 import mockImportedComponents from './mock-imported-components';
 
 describe('AnnotationShareInfo', () => {
@@ -142,4 +143,11 @@ describe('AnnotationShareInfo', () => {
       });
     });
   });
+
+  it(
+    'should pass a11y checks',
+    checkAccessibility({
+      content: () => createAnnotationShareInfo(),
+    })
+  );
 });

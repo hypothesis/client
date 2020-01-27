@@ -4,6 +4,8 @@ import { createElement } from 'preact';
 import VersionInfo from '../version-info';
 import { $imports } from '../version-info';
 
+import { checkAccessibility } from './accessibility';
+
 describe('VersionInfo', function() {
   let fakeVersionData;
   // Services
@@ -81,4 +83,11 @@ describe('VersionInfo', function() {
       assert.calledWith(fakeFlash.error, 'Unable to copy version info');
     });
   });
+
+  it(
+    'should pass a11y checks',
+    checkAccessibility({
+      content: () => createComponent(),
+    })
+  );
 });

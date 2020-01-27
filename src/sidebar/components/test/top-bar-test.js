@@ -6,6 +6,7 @@ import uiConstants from '../../ui-constants';
 import TopBar from '../top-bar';
 import { $imports } from '../top-bar';
 
+import { checkAccessibility } from './accessibility';
 import mockImportedComponents from './mock-imported-components';
 
 describe('TopBar', () => {
@@ -264,4 +265,18 @@ describe('TopBar', () => {
       assert.isFalse(wrapper.exists('button[title="Share this page"]'));
     });
   });
+
+  it(
+    'should pass a11y checks',
+    checkAccessibility([
+      {
+        name: 'in sidebar',
+        content: () => createTopBar({ isSidebar: true }),
+      },
+      {
+        name: 'in stream / single annotation view',
+        content: () => createTopBar({ isSidebar: false }),
+      },
+    ])
+  );
 });

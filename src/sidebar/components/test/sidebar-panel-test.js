@@ -4,6 +4,7 @@ import { createElement } from 'preact';
 import SidebarPanel from '../sidebar-panel';
 import { $imports } from '../sidebar-panel';
 
+import { checkAccessibility } from './accessibility';
 import mockImportedComponents from './mock-imported-components';
 
 describe('SidebarPanel', () => {
@@ -117,4 +118,11 @@ describe('SidebarPanel', () => {
       assert.isFalse(fakeScrollIntoView.called);
     });
   });
+
+  it(
+    'should pass a11y checks',
+    checkAccessibility({
+      content: () => createSidebarPanel(),
+    })
+  );
 });

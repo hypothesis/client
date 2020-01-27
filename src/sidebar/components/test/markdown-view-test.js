@@ -4,6 +4,8 @@ import { createElement } from 'preact';
 import MarkdownView from '../markdown-view';
 import { $imports } from '../markdown-view';
 
+import { checkAccessibility } from './accessibility';
+
 describe('MarkdownView', () => {
   let fakeMediaEmbedder;
   let fakeRenderMarkdown;
@@ -57,4 +59,11 @@ describe('MarkdownView', () => {
     );
     assert.isTrue(wrapper.find('.markdown-view.fancy-effect').exists());
   });
+
+  it(
+    'should pass a11y checks',
+    checkAccessibility({
+      content: () => <MarkdownView markdown="foo" />,
+    })
+  );
 });

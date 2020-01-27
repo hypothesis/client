@@ -5,6 +5,7 @@ import * as fixtures from '../../test/annotation-fixtures';
 import AnnotationDocumentInfo from '../annotation-document-info';
 import { $imports } from '../annotation-document-info';
 
+import { checkAccessibility } from './accessibility';
 import mockImportedComponents from './mock-imported-components';
 
 describe('AnnotationDocumentInfo', () => {
@@ -75,4 +76,17 @@ describe('AnnotationDocumentInfo', () => {
 
     assert.equal(domain.text(), '(www.example.com)');
   });
+
+  it(
+    'should pass a11y checks',
+    checkAccessibility({
+      content: () => {
+        fakeDomainAndTitle.returns({
+          titleText: 'I have a title',
+          domain: 'www.example.com',
+        });
+        return createAnnotationDocumentInfo();
+      },
+    })
+  );
 });

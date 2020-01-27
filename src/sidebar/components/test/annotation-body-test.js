@@ -7,6 +7,7 @@ import * as fixtures from '../../test/annotation-fixtures';
 import AnnotationBody from '../annotation-body';
 import { $imports } from '../annotation-body';
 
+import { checkAccessibility } from './accessibility';
 import mockImportedComponents from './mock-imported-components';
 
 describe('AnnotationBody', () => {
@@ -89,4 +90,11 @@ describe('AnnotationBody', () => {
     assert.equal(buttonProps.buttonText, 'Less');
     assert.equal(buttonProps.title, 'Show the first few lines only');
   });
+
+  it(
+    'should pass a11y checks',
+    checkAccessibility({
+      content: () => createBody(),
+    })
+  );
 });

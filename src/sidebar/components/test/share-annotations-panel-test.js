@@ -4,6 +4,7 @@ import { createElement } from 'preact';
 import ShareAnnotationsPanel from '../share-annotations-panel';
 import { $imports } from '../share-annotations-panel';
 
+import { checkAccessibility } from './accessibility';
 import mockImportedComponents from './mock-imported-components';
 
 describe('ShareAnnotationsPanel', () => {
@@ -183,4 +184,11 @@ describe('ShareAnnotationsPanel', () => {
       });
     });
   });
+
+  it(
+    'should pass a11y checks',
+    checkAccessibility({
+      content: () => createShareAnnotationsPanel(),
+    })
+  );
 });
