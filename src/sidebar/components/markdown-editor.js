@@ -3,6 +3,8 @@ import { createElement } from 'preact';
 import { useEffect, useRef, useState } from 'preact/hooks';
 import propTypes from 'prop-types';
 
+import Button from './button';
+
 import {
   LinkType,
   convertSelectionToLink,
@@ -105,8 +107,17 @@ function ToolbarButton({
     tooltip += ` (Ctrl+${shortcutKey.toUpperCase()})`;
   }
 
+  const optionalProps = {};
+  if (label) {
+    optionalProps.buttonText = label;
+  }
+  if (iconName) {
+    optionalProps.icon = iconName;
+  }
+
   return (
-    <button
+    <Button
+      useCompactStyle={true}
       className={classnames(
         'markdown-editor__toolbar-button',
         label && 'is-text'
@@ -114,15 +125,8 @@ function ToolbarButton({
       disabled={disabled}
       onClick={onClick}
       title={tooltip}
-    >
-      {iconName && (
-        <SvgIcon
-          name={iconName}
-          className="markdown-editor__toolbar-button-icon"
-        />
-      )}
-      {label}
-    </button>
+      {...optionalProps}
+    />
   );
 }
 

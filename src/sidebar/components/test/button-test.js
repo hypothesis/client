@@ -89,4 +89,9 @@ describe('Button', () => {
 
     assert.isTrue(wrapper.find('button').hasClass('button--primary'));
   });
+
+  it('disables the button when `disabled` is truthy', () => {
+    const wrapper = createComponent({ disabled: true });
+    assert.isTrue(wrapper.find('button[disabled=true]').exists());
+  });
 });

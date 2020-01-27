@@ -97,9 +97,7 @@ describe('MarkdownEditor', () => {
         const wrapper = mount(
           <MarkdownEditor text="test" onEditText={onEditText} />
         );
-        const button = wrapper.find(
-          `ToolbarButton[title="${command}"] > button`
-        );
+        const button = wrapper.find(`ToolbarButton[title="${command}"] button`);
         const input = wrapper.find('textarea').getDOMNode();
         input.selectionStart = 0;
         input.selectionEnd = 4;

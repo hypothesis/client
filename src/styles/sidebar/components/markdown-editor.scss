@@ -21,15 +21,7 @@ $toolbar-border: 0.1em solid var.$grey-3;
 }
 
 .markdown-editor__toolbar-button {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  appearance: none;
-  border: none;
-  background: none;
-  min-width: 24px;
-  min-height: 24px;
-
+  flex-shrink: 0;
   color: var.$grey-5;
 
   &:hover,
@@ -45,8 +37,8 @@ $toolbar-border: 0.1em solid var.$grey-3;
     font-size: 13px;
   }
 
-  &-icon {
-    width: 10px;
+  & svg {
+    width: 100%; // Centers the svg in its parent
     height: 10px;
   }
 }
@@ -61,6 +53,7 @@ $toolbar-border: 0.1em solid var.$grey-3;
   display: flex;
   align-items: center;
   margin-bottom: 2px; // Tweak to align help icon better with adjacent buttons
+  z-index: 1; // Makes focus halo renders above preview button
 }
 
 .markdown-editor__input {
