@@ -32,6 +32,8 @@ export default function AnnotationHeader({
       <div className="annotation-header__row">
         <AnnotationUser annotation={annotation} />
         <div className="annotation-collapsed-replies">
+          {/* FIXME-A11Y */}
+          {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events, jsx-a11y/anchor-is-valid */}
           <a className="annotation-link" onClick={onReplyCountClick}>
             {replyCount} {replyPluralized}
           </a>

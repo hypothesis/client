@@ -1,5 +1,8 @@
 {
-  "extends": ["hypothesis"],
+  "extends": [
+    "hypothesis",
+    "plugin:jsx-a11y/recommended"
+  ],
   "globals": {
     "Set": false
   },

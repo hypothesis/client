@@ -50,6 +50,7 @@
     "escape-string-regexp": "^1.0.5",
     "eslint": "^6.0.1",
     "eslint-config-hypothesis": "^2.0.0",
+    "eslint-plugin-jsx-a11y": "^6.2.3",
     "eslint-plugin-mocha": "^5.2.1",
     "eslint-plugin-react": "^7.12.4",
     "eslint-plugin-react-hooks": "^1.6.0",

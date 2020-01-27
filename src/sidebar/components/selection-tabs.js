@@ -22,6 +22,8 @@ function Tab({
   type,
 }) {
   return (
+    // FIXME-A11Y
+    // eslint-disable-next-line jsx-a11y/anchor-is-valid
     <a
       className={classnames('selection-tabs__type', {
         'is-selected': selected,

@@ -18,7 +18,8 @@ export default function SidebarContentError({
           <Fragment>
             {loggedOutErrorMessage}
             <br />
-            You may need to{' '}
+            You may need to {/* FIXME-A11Y */}
+            {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
             <a
               className="loggedout-message__link"
               href=""
