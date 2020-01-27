@@ -105,6 +105,8 @@ function HelpPanel({ auth, session }) {
         </h3>
         <div className="help-panel__footer">
           {activeSubPanel === 'versionInfo' && (
+            // FIXME-A11Y
+            // eslint-disable-next-line jsx-a11y/anchor-is-valid
             <a
               href="#"
               className="help-panel__sub-panel-link"
@@ -118,6 +120,8 @@ function HelpPanel({ auth, session }) {
             </a>
           )}
           {activeSubPanel === 'tutorial' && (
+            // FIXME-A11Y
+            // eslint-disable-next-line jsx-a11y/anchor-is-valid
             <a
               href="#"
               className="help-panel__sub-panel-link"

@@ -105,6 +105,8 @@ export default function Menu({
   };
 
   return (
+    // FIXME-A11Y
+    // eslint-disable-next-line jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events
     <div
       className="menu"
       ref={menuRef}
@@ -143,6 +145,8 @@ export default function Menu({
       {isOpen && (
         <Fragment>
           {menuArrow(arrowClass)}
+          {/* FIXME-A11Y */}
+          {/* eslint-disable-next-line jsx-a11y/interactive-supports-focus */}
           <div
             className={classnames(
               'menu__content',

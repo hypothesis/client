@@ -72,10 +72,13 @@ function TopBar({
       )}
       {auth.status === 'logged-out' && (
         <span className="top-bar__login-links">
+          {/* FIXME-A11Y */}
+          {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
           <a href="#" onClick={onSignUp} target="_blank" style={loginLinkStyle}>
             Sign up
           </a>{' '}
-          /{' '}
+          / {/* FIXME-A11Y */}
+          {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
           <a href="#" onClick={onLogin} style={loginLinkStyle}>
             Log in
           </a>

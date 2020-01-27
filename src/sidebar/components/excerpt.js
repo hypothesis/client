@@ -20,6 +20,8 @@ function InlineControls({ isCollapsed, setCollapsed, linkStyle = {} }) {
   return (
     <div className="excerpt__inline-controls">
       <span className="excerpt__toggle-link">
+        {/* FIXME-A11Y */}
+        {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
         <a
           href="#"
           onClick={() => setCollapsed(!isCollapsed)}
@@ -111,6 +113,8 @@ function Excerpt({
       <div className="excerpt__content" ref={contentElement}>
         {children}
       </div>
+      {/* FIXME-A11Y */}
+      {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */}
       <div
         onClick={() => setCollapsed(false)}
         className={classnames({

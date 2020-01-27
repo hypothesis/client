@@ -89,6 +89,8 @@ function GroupListItem({
       onToggleSubmenu={toggleSubmenu}
       submenu={
         <Fragment>
+          {/* FIXME-A11Y */}
+          {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events */}
           <ul onClick={collapseSubmenu}>
             {activityUrl && (
               <li>

@@ -60,6 +60,8 @@ export default function MenuItem({
     // Wrapper element is a `<div>` rather than a `Fragment` to work around
     // limitations of Enzyme's shallow rendering.
     <div>
+      {/* FIXME-A11Y */}
+      {/* eslint-disable-next-line jsx-a11y/role-supports-aria-props */}
       <div
         aria-checked={isSelected}
         className={classnames('menu-item', {

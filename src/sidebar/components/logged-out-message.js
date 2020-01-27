@@ -24,7 +24,8 @@ function LoggedOutMessage({ onLogin, serviceUrl }) {
         >
           create a free account
         </a>{' '}
-        or{' '}
+        or {/* FIXME-A11Y */}
+        {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
         <a className="logged-out-message__link" href="" onClick={onLogin}>
           log in
         </a>

@@ -63,6 +63,8 @@ function GroupList({ serviceUrl, settings }) {
     const icon = focusedGroup.organization.logo;
     label = (
       <span className="group-list__menu-label">
+        {/* FIXME-A11Y */}
+        {/* eslint-disable-next-line jsx-a11y/alt-text */}
         <img
           className="group-list__menu-icon"
           src={icon || publisherProvidedIcon(settings)}
