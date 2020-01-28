@@ -1,5 +1,5 @@
 import classnames from 'classnames';
-import { createElement } from 'preact';
+import { Fragment, createElement } from 'preact';
 import propTypes from 'prop-types';
 
 import { onActivate } from '../util/on-activate';
@@ -57,9 +57,7 @@ export default function MenuItem({
   const rightIcon = isSubmenuItem ? renderedIcon : null;
 
   return (
-    // Wrapper element is a `<div>` rather than a `Fragment` to work around
-    // limitations of Enzyme's shallow rendering.
-    <div>
+    <Fragment>
       {/* FIXME-A11Y */}
       {/* eslint-disable-next-line jsx-a11y/role-supports-aria-props */}
       <div
@@ -114,7 +112,7 @@ export default function MenuItem({
           <div className="menu-item__submenu">{submenu}</div>
         </Slider>
       )}
-    </div>
+    </Fragment>
   );
 }
 
