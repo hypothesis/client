@@ -83,10 +83,6 @@ describe('GroupListItem', () => {
   });
 
   const createGroupListItem = (fakeGroup, props = {}) => {
-    // nb. Mount rendering is used here with a manually mocked `MenuItem`
-    // because `GroupListItem` renders multiple top-level elements (wrapped in
-    // a fragment) and `wrapper.update()` cannot be used in that case when using
-    // shallow rendering.
     return mount(
       <GroupListItem
         flash={fakeFlash}
