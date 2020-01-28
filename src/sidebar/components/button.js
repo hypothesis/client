@@ -15,24 +15,40 @@ import SvgIcon from './svg-icon';
  * - `useInputStyle`: for placing an icon-only button next to an input field
  * - `usePrimaryStyle`: for applying "primary action" styling
  * - `className`: arbitrary additional class name(s) to apply
+ *
+ * Buttons have an option `actionType` value that maps the `isActive`
+ * state to the appropriate corresponding aria attribute according to the
+ * `actionType` rules defined in the propTypes def below.
  */
 export default function Button({
   buttonText = '',
   className = '',
   icon = '',
   isActive = false,
-  onClick = () => null,
-  style = {},
   title,
+  actionType,
   useCompactStyle = false,
   useInputStyle = false,
   usePrimaryStyle = false,
+  ...props
 }) {
   // If `buttonText` is provided, the `title` prop is optional and the `button`'s
   // `title` attribute will be set from the `buttonText`
   title = title || buttonText;
 
   const baseClassName = buttonText ? 'button--labeled' : 'button--icon-only';
+
+  // The `actionType` determines which aria attribute is used to
+  // express the `isActive` prop.
+  //
+  // "toggle" for aria-pressed
+  // "group" for aria-expanded
+  const ariaProp = {};
+  if (actionType === 'toggle') {
+    ariaProp['aria-pressed'] = isActive;
+  } else if (actionType === 'group') {
+    ariaProp['aria-expanded'] = isActive;
+  }
 
   return (
     <button
@@ -47,10 +63,9 @@ export default function Button({
         },
         className
       )}
-      onClick={onClick}
-      aria-pressed={isActive}
       title={title}
-      style={style}
+      {...ariaProp}
+      {...props}
     >
       {icon && <SvgIcon name={icon} className="button__icon" />}
       {buttonText}
@@ -105,16 +120,18 @@ Button.propTypes = {
   /** Is this button currently in an "active"/"on" state? */
   isActive: propTypes.bool,
 
-  /** callback for button clicks */
-  onClick: propTypes.func,
-
-  /** optional inline styling  */
-  style: propTypes.object,
-
   /**
    * `title`, used for button `title`, is required unless `buttonText` is present
    */
   title: requiredStringIfButtonTextMissing,
+
+  /**
+   * One of: "toggle", "group".
+   *  "toggle" type uses the `aria-pressed` attribute in conjunction with `isActive`.
+   *  "group" type uses the `aria-expanded` attribute in conjunction with `isActive`.
+   *  If this property is not provided then both aria attributes are undefined.
+   */
+  actionType: propTypes.string,
 
   /** Allows a variant of button that takes up less space */
   useCompactStyle: propTypes.bool,
@@ -127,4 +144,11 @@ Button.propTypes = {
    * differentiating styles will be applied.
    */
   usePrimaryStyle: propTypes.bool,
+
+  /**
+   * Any other provided props will be passed directly to the
+   * <button> tag. Use this for extra event handlers or attributes
+   * not covered by the explicit props above.
+   */
+  props: propTypes.object,
 };
