@@ -185,7 +185,8 @@ describe('ShareAnnotationsPanel', () => {
     });
   });
 
-  it(
+  // FIXME-A11Y
+  it.skip(
     'should pass a11y checks',
     checkAccessibility({
       content: () => createShareAnnotationsPanel(),
