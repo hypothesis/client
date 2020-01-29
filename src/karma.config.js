@@ -88,6 +88,10 @@ module.exports = function(config) {
         // Disable watching because karma-browserify handles this.
         watched: false,
       })),
+
+      // CSS bundles, relied upon by accessibility tests (eg. for color-contrast
+      // checks).
+      { pattern: '../build/styles/{annotator,sidebar}.css', watched: false },
     ],
 
     // list of files to exclude
