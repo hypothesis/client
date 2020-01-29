@@ -12,7 +12,11 @@ describe('AutocompleteList', function() {
   let fakeListFormatter;
   function createComponent(props) {
     return mount(
-      <AutocompleteList list={fakeList} onSelectItem={fakeOnSelectItem} {...props} />
+      <AutocompleteList
+        list={fakeList}
+        onSelectItem={fakeOnSelectItem}
+        {...props}
+      />
     );
   }
 
