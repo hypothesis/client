@@ -6,7 +6,7 @@ import propTypes from 'prop-types';
 const defaultListFormatter = item => item;
 
 /**
- * Custom datalist component. Use this in conjunction with an <input> field.
+ * Custom autocomplete component. Use this in conjunction with an <input> field.
  * To make this component W3 accessibility compliant, it is is intended to be
  * coupled to an <input> field or the TagEditor component and can not be
  * used by itself.
@@ -14,7 +14,7 @@ const defaultListFormatter = item => item;
  * Modeled after the "ARIA 1.1 Combobox with Listbox Popup"
  */
 
-export default function Datalist({
+export default function AutocompleteList({
   activeItem = -1,
   id,
   itemPrefixId,
@@ -32,14 +32,14 @@ export default function Datalist({
         // The parent <input> field should capture keyboard events
         // eslint-disable-next-line jsx-a11y/click-events-have-key-events
         <li
-          key={`datalist-${index}`}
+          key={`autocomplete-list-${index}`}
           role="option"
           aria-selected={activeItem === index}
           className={classnames(
             {
               'is-selected': activeItem === index,
             },
-            'datalist__li'
+            'autocomplete-list__li'
           )}
           onClick={() => {
             onSelectItem(item);
@@ -54,10 +54,10 @@ export default function Datalist({
 
   const props = id ? { id } : {}; // only add the id if its passed
   return (
-    <div className="datalist">
+    <div className="autocomplete-list">
       {list.length > 0 && open && (
         <ul
-          className="datalist__items"
+          className="autocomplete-list__items"
           tabIndex="-1"
           aria-label="Suggestions"
           role="listbox"
@@ -70,7 +70,7 @@ export default function Datalist({
   );
 }
 
-Datalist.propTypes = {
+AutocompleteList.propTypes = {
   /**
    * The index of the highlighted item.
    */

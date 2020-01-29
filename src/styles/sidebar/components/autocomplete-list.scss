@@ -1,10 +1,10 @@
 @use "../../variables" as var;
 
-.datalist {
+.autocomplete-list {
   position: relative;
 }
 
-.datalist__items {
+.autocomplete-list__items {
   @supports (clip-path: polygon(0 0, 100% 0, 0% 100%, 0% 100%)) {
     &:before {
       /** 
@@ -41,7 +41,7 @@
   }
 }
 
-.datalist__li {
+.autocomplete-list__li {
   padding: 0.25em 1.5em 0.25em 1em;
   border-left: 4px transparent solid;
 
@@ -58,16 +58,16 @@
 /* Dark theme */
 
 @media screen and (prefers-color-scheme: dark) {
-  .datalist__items {
+  .autocomplete-list__items {
     list-style: none;
     padding: 0;
     color: var.$white;
     background-color: var.$grey-6;
   }
-  .datalist__arrow-down {
+  .autocomplete-list__arrow-down {
     border-bottom: 7px solid var.$grey-6;
   }
-  .datalist__li {
+  .autocomplete-list__li {
     &.is-selected {
       background-color: var.$grey-mid;
     }

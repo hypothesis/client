@@ -1,18 +1,18 @@
 import { mount } from 'enzyme';
 import { createElement } from 'preact';
 
-import Datalist from '../datalist';
-import { $imports } from '../datalist';
+import AutocompleteList from '../autocomplete-list';
+import { $imports } from '../autocomplete-list';
 
 import mockImportedComponents from './mock-imported-components';
 
-describe('Datalist', function() {
+describe('AutocompleteList', function() {
   let fakeList;
   let fakeOnSelectItem;
   let fakeListFormatter;
   function createComponent(props) {
     return mount(
-      <Datalist list={fakeList} onSelectItem={fakeOnSelectItem} {...props} />
+      <AutocompleteList list={fakeList} onSelectItem={fakeOnSelectItem} {...props} />
     );
   }
 
@@ -29,12 +29,12 @@ describe('Datalist', function() {
 
   it('does not render the list when `open` is false', () => {
     const wrapper = createComponent();
-    assert.isFalse(wrapper.find('.datalist__items').exists());
+    assert.isFalse(wrapper.find('.autocomplete-list__items').exists());
   });
 
   it('does not render the list when `list` is empty', () => {
     const wrapper = createComponent({ open: true, list: [] });
-    assert.isFalse(wrapper.find('.datalist__items').exists());
+    assert.isFalse(wrapper.find('.autocomplete-list__items').exists());
   });
 
   it('sets unique keys to the <li> items', () => {
@@ -44,14 +44,14 @@ describe('Datalist', function() {
         .find('li')
         .at(0)
         .key(),
-      'datalist-0'
+      'autocomplete-list-0'
     );
     assert.equal(
       wrapper
         .find('li')
         .at(1)
         .key(),
-      'datalist-1'
+      'autocomplete-list-1'
     );
   });
 
@@ -112,8 +112,8 @@ describe('Datalist', function() {
   it('adds the `id` attribute to <ul> only if its present', () => {
     let wrapper = createComponent({ open: true });
     assert.isNotOk(wrapper.find('ul').prop('id'));
-    wrapper = createComponent({ open: true, id: 'datalist-id' });
-    assert.equal(wrapper.find('ul').prop('id'), 'datalist-id');
+    wrapper = createComponent({ open: true, id: 'autocomplete-list-id' });
+    assert.equal(wrapper.find('ul').prop('id'), 'autocomplete-list-id');
   });
 
   it('creates unique ids on the <li> tags with the `itemPrefixId` only if its present', () => {
