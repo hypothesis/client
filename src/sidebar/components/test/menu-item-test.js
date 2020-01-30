@@ -156,7 +156,6 @@ describe('MenuItem', () => {
     'should pass a11y checks',
     checkAccessibility([
       {
-        name: 'default',
         // eslint-disable-next-line react/display-name
         content: () => (
           <div role="menu">

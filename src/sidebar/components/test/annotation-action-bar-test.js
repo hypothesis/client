@@ -316,7 +316,6 @@ describe('AnnotationActionBar', () => {
   it(
     'should pass a11y checks',
     checkAccessibility({
-      name: 'default',
       content: () => createComponent(),
     })
   );
