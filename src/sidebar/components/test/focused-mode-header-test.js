@@ -4,6 +4,7 @@ import { createElement } from 'preact';
 import FocusedModeHeader from '../focused-mode-header';
 import { $imports } from '../focused-mode-header';
 
+import { checkAccessibility } from './accessibility';
 import mockImportedComponents from './mock-imported-components';
 
 describe('FocusedModeHeader', function() {
@@ -103,4 +104,11 @@ describe('FocusedModeHeader', function() {
       });
     });
   });
+
+  it(
+    'should pass a11y checks',
+    checkAccessibility({
+      content: () => createComponent(),
+    })
+  );
 });

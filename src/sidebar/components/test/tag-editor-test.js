@@ -4,6 +4,7 @@ import { createElement } from 'preact';
 import TagEditor from '../tag-editor';
 import { $imports } from '../tag-editor';
 
+import { checkAccessibility } from './accessibility';
 import mockImportedComponents from './mock-imported-components';
 
 describe('TagEditor', function() {
@@ -339,4 +340,12 @@ describe('TagEditor', function() {
       assert.isTrue(fakeTagsService.filter.calledWith(''));
     });
   });
+
+  // FIXME-A11Y
+  it.skip(
+    'should pass a11y checks',
+    checkAccessibility({
+      content: () => createComponent(),
+    })
+  );
 });

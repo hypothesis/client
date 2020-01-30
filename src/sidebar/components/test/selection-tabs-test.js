@@ -5,6 +5,7 @@ import uiConstants from '../../ui-constants';
 import SelectionTabs from '../selection-tabs';
 import { $imports } from '../selection-tabs';
 
+import { checkAccessibility } from './accessibility';
 import mockImportedComponents from './mock-imported-components';
 
 describe('SelectionTabs', function() {
@@ -196,4 +197,16 @@ describe('SelectionTabs', function() {
       );
     });
   });
+
+  it(
+    'should pass a11y checks',
+    checkAccessibility({
+      content: () => {
+        fakeStore.annotationCount.returns(1);
+        fakeStore.noteCount.returns(2);
+        fakeStore.orphanCount.returns(3);
+        return createComponent({});
+      },
+    })
+  );
 });

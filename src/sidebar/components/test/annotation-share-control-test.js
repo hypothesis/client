@@ -5,6 +5,7 @@ import { act } from 'preact/test-utils';
 import AnnotationShareControl from '../annotation-share-control';
 import { $imports } from '../annotation-share-control';
 
+import { checkAccessibility } from './accessibility';
 import mockImportedComponents from './mock-imported-components';
 
 describe('AnnotationShareControl', () => {
@@ -208,4 +209,23 @@ describe('AnnotationShareControl', () => {
       'Use this URL to share this annotation'
     );
   });
+
+  it(
+    'should pass a11y checks',
+    checkAccessibility(
+      {
+        name: 'when closed',
+        content: () => createComponent(),
+      },
+      {
+        name: 'when open',
+        content: () => {
+          const wrapper = createComponent();
+          openElement(wrapper);
+          wrapper.update();
+          return wrapper;
+        },
+      }
+    )
+  );
 });

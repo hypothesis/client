@@ -4,6 +4,7 @@ import { createElement } from 'preact';
 import AnnotationQuote from '../annotation-quote';
 import { $imports } from '../annotation-quote';
 
+import { checkAccessibility } from './accessibility';
 import mockImportedComponents from './mock-imported-components';
 
 describe('AnnotationQuote', () => {
@@ -43,4 +44,12 @@ describe('AnnotationQuote', () => {
     const quote = wrapper.find('blockquote');
     assert.equal(quote.text(), 'test quote');
   });
+
+  // FIXME-A11Y
+  it.skip(
+    'should pass a11y checks',
+    checkAccessibility({
+      content: () => createQuote(),
+    })
+  );
 });

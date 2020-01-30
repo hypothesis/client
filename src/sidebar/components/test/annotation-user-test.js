@@ -4,6 +4,7 @@ import { createElement } from 'preact';
 import AnnotationUser from '../annotation-user';
 import { $imports } from '../annotation-user';
 
+import { checkAccessibility } from './accessibility';
 import mockImportedComponents from './mock-imported-components';
 
 describe('AnnotationUser', () => {
@@ -143,4 +144,11 @@ describe('AnnotationUser', () => {
       });
     });
   });
+
+  it(
+    'should pass a11y checks',
+    checkAccessibility({
+      content: () => createAnnotationUser(),
+    })
+  );
 });

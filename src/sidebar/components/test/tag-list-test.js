@@ -4,6 +4,7 @@ import { createElement } from 'preact';
 import TagList from '../tag-list';
 import { $imports } from '../tag-list';
 
+import { checkAccessibility } from './accessibility';
 import mockImportedComponents from './mock-imported-components';
 
 describe('TagList', function() {
@@ -87,4 +88,21 @@ describe('TagList', function() {
       assert.notCalled(fakeServiceUrl);
     });
   });
+
+  it(
+    'should pass a11y checks',
+    checkAccessibility([
+      {
+        name: 'first-party user',
+        content: () => createComponent({ tags: ['tag1', 'tag2'] }),
+      },
+      {
+        name: 'third-party user',
+        content: () => {
+          fakeIsThirdPartyUser.returns(true);
+          return createComponent({ tags: ['tag1', 'tag2'] });
+        },
+      },
+    ])
+  );
 });

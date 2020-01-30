@@ -4,6 +4,8 @@ import { createElement } from 'preact';
 import SearchInput from '../search-input';
 import { $imports } from '../search-input';
 
+import { checkAccessibility } from './accessibility';
+
 describe('SearchInput', () => {
   let fakeStore;
 
@@ -84,4 +86,21 @@ describe('SearchInput', () => {
     const wrapper = createSearchInput();
     assert.isTrue(wrapper.exists('button'));
   });
+
+  // FIXME-A11Y
+  it.skip(
+    'should pass a11y checks',
+    checkAccessibility([
+      {
+        content: () => createSearchInput(),
+      },
+      {
+        name: 'loading state',
+        content: () => {
+          fakeStore.isLoading.returns(true);
+          return createSearchInput();
+        },
+      },
+    ])
+  );
 });

@@ -4,6 +4,7 @@ import { createElement } from 'preact';
 import ShareLinks from '../share-links';
 import { $imports } from '../share-links';
 
+import { checkAccessibility } from './accessibility';
 import mockImportedComponents from './mock-imported-components';
 
 describe('ShareLinks', () => {
@@ -74,4 +75,11 @@ describe('ShareLinks', () => {
       );
     });
   });
+
+  it(
+    'should pass a11y checks',
+    checkAccessibility({
+      content: () => createComponent(),
+    })
+  );
 });
