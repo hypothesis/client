@@ -63,6 +63,7 @@ describe('MarkdownView', () => {
   it(
     'should pass a11y checks',
     checkAccessibility({
+      // eslint-disable-next-line react/display-name
       content: () => <MarkdownView markdown="foo" />,
     })
   );

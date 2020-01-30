@@ -157,6 +157,7 @@ describe('MenuItem', () => {
     checkAccessibility([
       {
         name: 'default',
+        // eslint-disable-next-line react/display-name
         content: () => (
           <div role="menu">
             <MenuItem label="Test item" />
@@ -165,6 +166,7 @@ describe('MenuItem', () => {
       },
       {
         name: 'with link',
+        // eslint-disable-next-line react/display-name
         content: () => (
           <div role="menu">
             <MenuItem label="Test" href="https://foobar.com" />
@@ -173,6 +175,7 @@ describe('MenuItem', () => {
       },
       {
         name: 'with icon',
+        // eslint-disable-next-line react/display-name
         content: () => (
           <div role="menu">
             <MenuItem label="Test" icon="an-svg-icon" />
@@ -181,6 +184,7 @@ describe('MenuItem', () => {
       },
       {
         name: 'with submenu',
+        // eslint-disable-next-line react/display-name
         content: () => (
           <div role="menu">
             <MenuItem

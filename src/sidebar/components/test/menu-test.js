@@ -231,6 +231,7 @@ describe('Menu', () => {
     checkAccessibility([
       {
         name: 'default',
+        // eslint-disable-next-line react/display-name
         content: () => (
           <Menu label={<TestLabel />} title="Test menu">
             <TestMenuItem />
