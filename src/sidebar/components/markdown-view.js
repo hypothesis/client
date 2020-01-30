@@ -23,6 +23,7 @@ export default function MarkdownView({ markdown = '', textClass = {} }) {
   return (
     <div
       className={classnames('markdown-view', textClass)}
+      dir="auto"
       ref={content}
       dangerouslySetInnerHTML={{ __html: html }}
     />

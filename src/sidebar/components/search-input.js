@@ -50,6 +50,7 @@ export default function SearchInput({ alwaysExpanded, query, onSearch }) {
         className={classnames('search-input__input', {
           'is-expanded': alwaysExpanded || query,
         })}
+        dir="auto"
         type="text"
         name="query"
         placeholder={(isLoading && 'Loading…') || 'Search…'}

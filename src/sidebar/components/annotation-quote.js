@@ -26,6 +26,7 @@ function AnnotationQuote({ annotation, settings = {} }) {
       >
         <blockquote
           className="annotation-quote__quote"
+          dir="auto"
           style={applyTheme(['selectionFontFamily'], settings)}
         >
           {quote(annotation)}
