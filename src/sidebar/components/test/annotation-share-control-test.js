@@ -5,8 +5,8 @@ import { act } from 'preact/test-utils';
 import AnnotationShareControl from '../annotation-share-control';
 import { $imports } from '../annotation-share-control';
 
-import { checkAccessibility } from './accessibility';
-import mockImportedComponents from './mock-imported-components';
+import { checkAccessibility } from '../../../test-util/accessibility';
+import mockImportedComponents from '../../../test-util/mock-imported-components';
 
 describe('AnnotationShareControl', () => {
   let fakeAnnotation;

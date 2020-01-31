@@ -5,7 +5,7 @@ import { act } from 'preact/test-utils';
 import Timestamp from '../timestamp';
 import { $imports } from '../timestamp';
 
-import { checkAccessibility } from './accessibility';
+import { checkAccessibility } from '../../../test-util/accessibility';
 
 describe('Timestamp', () => {
   let clock;

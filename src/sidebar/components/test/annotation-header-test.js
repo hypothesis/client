@@ -5,8 +5,8 @@ import * as fixtures from '../../test/annotation-fixtures';
 import AnnotationHeader from '../annotation-header';
 import { $imports } from '../annotation-header';
 
-import { checkAccessibility } from './accessibility';
-import mockImportedComponents from './mock-imported-components';
+import { checkAccessibility } from '../../../test-util/accessibility';
+import mockImportedComponents from '../../../test-util/mock-imported-components';
 
 describe('AnnotationHeader', () => {
   let fakeIsHighlight;

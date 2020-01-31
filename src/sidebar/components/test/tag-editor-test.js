@@ -5,8 +5,8 @@ import { act } from 'preact/test-utils';
 import TagEditor from '../tag-editor';
 import { $imports } from '../tag-editor';
 
-import { checkAccessibility } from './accessibility';
-import mockImportedComponents from './mock-imported-components';
+import { checkAccessibility } from '../../../test-util/accessibility';
+import mockImportedComponents from '../../../test-util/mock-imported-components';
 
 describe('TagEditor', function() {
   let containers = [];

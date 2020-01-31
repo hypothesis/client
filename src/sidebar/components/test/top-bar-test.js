@@ -6,8 +6,8 @@ import uiConstants from '../../ui-constants';
 import TopBar from '../top-bar';
 import { $imports } from '../top-bar';
 
-import { checkAccessibility } from './accessibility';
-import mockImportedComponents from './mock-imported-components';
+import { checkAccessibility } from '../../../test-util/accessibility';
+import mockImportedComponents from '../../../test-util/mock-imported-components';
 
 describe('TopBar', () => {
   const fakeSettings = {};

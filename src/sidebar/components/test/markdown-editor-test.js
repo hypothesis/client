@@ -6,7 +6,7 @@ import { LinkType } from '../../markdown-commands';
 import MarkdownEditor from '../markdown-editor';
 import { $imports } from '../markdown-editor';
 
-import { checkAccessibility } from './accessibility';
+import { checkAccessibility } from '../../../test-util/accessibility';
 
 describe('MarkdownEditor', () => {
   const formatResult = {

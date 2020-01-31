@@ -4,8 +4,8 @@ import { createElement } from 'preact';
 import Tutorial from '../tutorial';
 import { $imports } from '../tutorial';
 
-import { checkAccessibility } from './accessibility';
-import mockImportedComponents from './mock-imported-components';
+import { checkAccessibility } from '../../../test-util/accessibility';
+import mockImportedComponents from '../../../test-util/mock-imported-components';
 
 describe('Tutorial', function() {
   let fakeIsThirdPartyService;

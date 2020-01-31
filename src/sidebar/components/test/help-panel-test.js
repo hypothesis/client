@@ -5,8 +5,8 @@ import { act } from 'preact/test-utils';
 import HelpPanel from '../help-panel';
 import { $imports } from '../help-panel';
 
-import { checkAccessibility } from './accessibility';
-import mockImportedComponents from './mock-imported-components';
+import { checkAccessibility } from '../../../test-util/accessibility';
+import mockImportedComponents from '../../../test-util/mock-imported-components';
 
 describe('HelpPanel', function() {
   let fakeAuth;

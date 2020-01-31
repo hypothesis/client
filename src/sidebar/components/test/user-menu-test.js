@@ -5,7 +5,7 @@ import bridgeEvents from '../../../shared/bridge-events';
 import UserMenu from '../user-menu';
 import { $imports } from '../user-menu';
 
-import mockImportedComponents from './mock-imported-components';
+import mockImportedComponents from '../../../test-util/mock-imported-components';
 
 describe('UserMenu', () => {
   let fakeAuth;

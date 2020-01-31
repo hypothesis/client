@@ -4,8 +4,8 @@ import { createElement } from 'preact';
 import TagList from '../tag-list';
 import { $imports } from '../tag-list';
 
-import { checkAccessibility } from './accessibility';
-import mockImportedComponents from './mock-imported-components';
+import { checkAccessibility } from '../../../test-util/accessibility';
+import mockImportedComponents from '../../../test-util/mock-imported-components';
 
 describe('TagList', function() {
   let fakeServiceUrl;

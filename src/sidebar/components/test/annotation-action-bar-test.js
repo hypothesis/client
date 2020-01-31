@@ -6,9 +6,9 @@ import AnnotationActionBar from '../annotation-action-bar';
 import { $imports } from '../annotation-action-bar';
 import * as fixtures from '../../test/annotation-fixtures';
 
-import { checkAccessibility } from './accessibility';
-import mockImportedComponents from './mock-imported-components';
-import { waitFor } from './util';
+import { checkAccessibility } from '../../../test-util/accessibility';
+import mockImportedComponents from '../../../test-util/mock-imported-components';
+import { waitFor } from '../../../test-util/wait';
 
 describe('AnnotationActionBar', () => {
   let fakeAnnotation;

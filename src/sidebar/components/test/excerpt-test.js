@@ -5,7 +5,7 @@ import { act } from 'preact/test-utils';
 import Excerpt from '../excerpt';
 import { $imports } from '../excerpt';
 
-import { checkAccessibility } from './accessibility';
+import { checkAccessibility } from '../../../test-util/accessibility';
 
 describe('Excerpt', () => {
   const SHORT_DIV = <div id="foo" style="height: 5px;" />;

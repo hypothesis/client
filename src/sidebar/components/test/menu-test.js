@@ -5,7 +5,7 @@ import { act } from 'preact/test-utils';
 import Menu from '../menu';
 import { $imports } from '../menu';
 
-import { checkAccessibility } from './accessibility';
+import { checkAccessibility } from '../../../test-util/accessibility';
 
 describe('Menu', () => {
   let container;

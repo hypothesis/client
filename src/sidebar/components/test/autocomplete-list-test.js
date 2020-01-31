@@ -4,7 +4,7 @@ import { createElement } from 'preact';
 import AutocompleteList from '../autocomplete-list';
 import { $imports } from '../autocomplete-list';
 
-import mockImportedComponents from './mock-imported-components';
+import mockImportedComponents from '../../../test-util/mock-imported-components';
 
 describe('AutocompleteList', function() {
   let fakeList;

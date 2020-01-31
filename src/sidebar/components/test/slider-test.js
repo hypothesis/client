@@ -3,7 +3,7 @@ import { createElement } from 'preact';
 
 import Slider from '../slider';
 
-import { checkAccessibility } from './accessibility';
+import { checkAccessibility } from '../../../test-util/accessibility';
 
 describe('Slider', () => {
   let container;

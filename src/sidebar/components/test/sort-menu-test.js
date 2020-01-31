@@ -4,7 +4,7 @@ import { createElement } from 'preact';
 import SortMenu from '../sort-menu';
 import { $imports } from '../sort-menu';
 
-import mockImportedComponents from './mock-imported-components';
+import mockImportedComponents from '../../../test-util/mock-imported-components';
 
 describe('SortMenu', () => {
   let fakeState;

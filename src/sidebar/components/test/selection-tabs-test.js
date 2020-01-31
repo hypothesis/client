@@ -5,8 +5,8 @@ import uiConstants from '../../ui-constants';
 import SelectionTabs from '../selection-tabs';
 import { $imports } from '../selection-tabs';
 
-import { checkAccessibility } from './accessibility';
-import mockImportedComponents from './mock-imported-components';
+import { checkAccessibility } from '../../../test-util/accessibility';
+import mockImportedComponents from '../../../test-util/mock-imported-components';
 
 describe('SelectionTabs', function() {
   // mock services

@@ -4,7 +4,7 @@ import { createElement } from 'preact';
 import VersionInfo from '../version-info';
 import { $imports } from '../version-info';
 
-import { checkAccessibility } from './accessibility';
+import { checkAccessibility } from '../../../test-util/accessibility';
 
 describe('VersionInfo', function() {
   let fakeVersionData;

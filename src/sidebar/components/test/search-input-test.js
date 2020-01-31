@@ -4,7 +4,7 @@ import { createElement } from 'preact';
 import SearchInput from '../search-input';
 import { $imports } from '../search-input';
 
-import { checkAccessibility } from './accessibility';
+import { checkAccessibility } from '../../../test-util/accessibility';
 
 describe('SearchInput', () => {
   let fakeStore;

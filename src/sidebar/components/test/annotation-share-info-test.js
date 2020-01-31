@@ -5,8 +5,8 @@ import * as fixtures from '../../test/annotation-fixtures';
 import AnnotationShareInfo from '../annotation-share-info';
 import { $imports } from '../annotation-share-info';
 
-import { checkAccessibility } from './accessibility';
-import mockImportedComponents from './mock-imported-components';
+import { checkAccessibility } from '../../../test-util/accessibility';
+import mockImportedComponents from '../../../test-util/mock-imported-components';
 
 describe('AnnotationShareInfo', () => {
   let fakeGroup;
