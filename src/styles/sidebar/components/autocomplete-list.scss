@@ -2,6 +2,9 @@
 
 .autocomplete-list {
   position: relative;
+  &.is-hidden {
+    display: none;
+  }
 }
 
 .autocomplete-list__items {

@@ -2,6 +2,7 @@ import { mount } from 'enzyme';
 import { createElement } from 'preact';
 import { act } from 'preact/test-utils';
 
+import AutocompleteList from '../autocomplete-list';
 import TagEditor from '../tag-editor';
 import { $imports } from '../tag-editor';
 
@@ -112,70 +113,6 @@ describe('TagEditor', function() {
     assert.isTrue(fakeTagsService.filter.calledWith('tag3'));
   });
 
-  describe('accessibility attributes and ids', () => {
-    it('creates multiple <TagEditor> components with unique autocomplete-list `id` props', () => {
-      const wrapper1 = createComponent();
-      const wrapper2 = createComponent();
-      assert.notEqual(
-        wrapper1.find('AutocompleteList').prop('id'),
-        wrapper2.find('AutocompleteList').prop('id')
-      );
-    });
-
-    it('sets the <AutocompleteList> `id` prop to the same value as the `aria-owns` attribute', () => {
-      const wrapper = createComponent();
-      wrapper.find('AutocompleteList');
-
-      assert.equal(
-        wrapper.find('.tag-editor__combobox-wrapper').prop('aria-owns'),
-        wrapper.find('AutocompleteList').prop('id')
-      );
-    });
-
-    it('sets `aria-expanded` value to match open state', () => {
-      const wrapper = createComponent();
-      wrapper.find('input').instance().value = 'non-empty'; // to open list
-      typeInput(wrapper);
-      assert.equal(
-        wrapper.find('.tag-editor__combobox-wrapper').prop('aria-expanded'),
-        'true'
-      );
-      selectOption(wrapper, 'tag4');
-      wrapper.update();
-      assert.equal(
-        wrapper.find('.tag-editor__combobox-wrapper').prop('aria-expanded'),
-        'false'
-      );
-    });
-
-    it('sets the <AutocompleteList> `activeItem` prop to match the selected item index', () => {
-      function checkAttributes(wrapper) {
-        const activeDescendant = wrapper
-          .find('input')
-          .prop('aria-activedescendant');
-        const itemPrefixId = wrapper
-          .find('AutocompleteList')
-          .prop('itemPrefixId');
-        const activeDescendantIndex = activeDescendant.split(itemPrefixId);
-        assert.equal(
-          activeDescendantIndex[1],
-          wrapper.find('AutocompleteList').prop('activeItem')
-        );
-      }
-
-      const wrapper = createComponent();
-      wrapper.find('input').instance().value = 'non-empty';
-      typeInput(wrapper);
-      // initial aria-activedescendant value is "" when index is -1
-      assert.equal(wrapper.find('input').prop('aria-activedescendant'), '');
-      // 2 suggestions: ['tag3', 'tag4'];
-      navigateDown(wrapper); // press down once
-      checkAttributes(wrapper);
-      navigateDown(wrapper); // press down again once
-      checkAttributes(wrapper);
-    });
-  });
-
   describe('suggestions open / close', () => {
     it('closes the suggestions when selecting a tag from autocomplete-list', () => {
       const wrapper = createComponent();
@@ -271,6 +208,8 @@ describe('TagEditor', function() {
       assert.isTrue(fakeOnEditTags.calledWith({ tags: tagList }));
       // hides the suggestions
       assert.equal(wrapper.find('AutocompleteList').prop('open'), false);
+      // removes the selected index
+      assert.equal(wrapper.find('AutocompleteList').prop('activeItem'), -1);
       // assert the input value is cleared out
       assert.equal(wrapper.find('input').instance().value, '');
       // input element should have focus
@@ -408,11 +347,107 @@ describe('TagEditor', function() {
     });
   });
 
-  // FIXME-A11Y
-  it.skip(
-    'should pass a11y checks',
-    checkAccessibility({
-      content: () => createComponent(),
-    })
-  );
+  describe('accessibility attributes and ids', () => {
+    it('creates multiple <TagEditor> components with unique autocomplete-list `id` props', () => {
+      const wrapper1 = createComponent();
+      const wrapper2 = createComponent();
+      assert.notEqual(
+        wrapper1.find('AutocompleteList').prop('id'),
+        wrapper2.find('AutocompleteList').prop('id')
+      );
+    });
+
+    it('sets the <AutocompleteList> `id` prop to the same value as the `aria-owns` attribute', () => {
+      const wrapper = createComponent();
+      wrapper.find('AutocompleteList');
+
+      assert.equal(
+        wrapper.find('.tag-editor__combobox-wrapper').prop('aria-owns'),
+        wrapper.find('AutocompleteList').prop('id')
+      );
+    });
+
+    it('sets `aria-expanded` value to match open state', () => {
+      const wrapper = createComponent();
+      wrapper.find('input').instance().value = 'non-empty'; // to open list
+      typeInput(wrapper);
+      assert.equal(
+        wrapper.find('.tag-editor__combobox-wrapper').prop('aria-expanded'),
+        'true'
+      );
+      selectOption(wrapper, 'tag4');
+      wrapper.update();
+      assert.equal(
+        wrapper.find('.tag-editor__combobox-wrapper').prop('aria-expanded'),
+        'false'
+      );
+    });
+
+    it('sets the <AutocompleteList> `activeItem` prop to match the selected item index', () => {
+      function checkAttributes(wrapper) {
+        const activeDescendant = wrapper
+          .find('input')
+          .prop('aria-activedescendant');
+        const itemPrefixId = wrapper
+          .find('AutocompleteList')
+          .prop('itemPrefixId');
+        const activeDescendantIndex = activeDescendant.split(itemPrefixId);
+        assert.equal(
+          activeDescendantIndex[1],
+          wrapper.find('AutocompleteList').prop('activeItem')
+        );
+      }
+
+      const wrapper = createComponent();
+      wrapper.find('input').instance().value = 'non-empty';
+      typeInput(wrapper);
+      // initial aria-activedescendant value is "" when index is -1
+      assert.equal(wrapper.find('input').prop('aria-activedescendant'), '');
+      // 2 suggestions: ['tag3', 'tag4'];
+      navigateDown(wrapper); // press down once
+      checkAttributes(wrapper);
+      navigateDown(wrapper); // press down again once
+      checkAttributes(wrapper);
+    });
+  });
+
+  describe('accessibility validation', () => {
+    beforeEach(function() {
+      // create a full dom tree for a11y testing
+      $imports.$mock({
+        './autocomplete-list': AutocompleteList,
+      });
+    });
+
+    it(
+      'should pass a11y checks',
+      checkAccessibility([
+        {
+          name: 'suggestions open',
+          content: () => {
+            const wrapper = createComponent();
+            wrapper.find('input').instance().value = 'non-empty';
+            typeInput(wrapper);
+            return wrapper;
+          },
+        },
+        {
+          name: 'suggestions open, first item selected',
+          content: () => {
+            const wrapper = createComponent();
+            wrapper.find('input').instance().value = 'non-empty';
+            typeInput(wrapper);
+            navigateDown(wrapper);
+            return wrapper;
+          },
+        },
+        {
+          name: 'suggestions closed',
+          content: () => {
+            return createComponent();
+          },
+        },
+      ])
+    );
+  });
 });
