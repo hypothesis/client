@@ -5,7 +5,7 @@ import { act } from 'preact/test-utils';
 import StreamSearchInput from '../stream-search-input';
 import { $imports } from '../stream-search-input';
 
-import mockImportedComponents from './mock-imported-components';
+import mockImportedComponents from '../../../test-util/mock-imported-components';
 
 describe('StreamSearchInput', () => {
   let fakeLocation;

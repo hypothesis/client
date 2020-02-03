@@ -4,8 +4,8 @@ import { createElement } from 'preact';
 import SidebarContentError from '../sidebar-content-error';
 import { $imports } from '../sidebar-content-error';
 
-import { checkAccessibility } from './accessibility';
-import mockImportedComponents from './mock-imported-components';
+import { checkAccessibility } from '../../../test-util/accessibility';
+import mockImportedComponents from '../../../test-util/mock-imported-components';
 
 describe('SidebarContentError', () => {
   const createSidebarContentError = (

@@ -5,8 +5,8 @@ import * as fixtures from '../../test/annotation-fixtures';
 import AnnotationDocumentInfo from '../annotation-document-info';
 import { $imports } from '../annotation-document-info';
 
-import { checkAccessibility } from './accessibility';
-import mockImportedComponents from './mock-imported-components';
+import { checkAccessibility } from '../../../test-util/accessibility';
+import mockImportedComponents from '../../../test-util/mock-imported-components';
 
 describe('AnnotationDocumentInfo', () => {
   let fakeDomainAndTitle;

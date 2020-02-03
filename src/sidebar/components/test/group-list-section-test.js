@@ -4,7 +4,7 @@ import { createElement } from 'preact';
 import GroupListSection from '../group-list-section';
 import { $imports } from '../group-list-section';
 
-import mockImportedComponents from './mock-imported-components';
+import mockImportedComponents from '../../../test-util/mock-imported-components';
 
 describe('GroupListSection', () => {
   const testGroups = [

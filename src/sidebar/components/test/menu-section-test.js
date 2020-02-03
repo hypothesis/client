@@ -4,8 +4,8 @@ import { createElement } from 'preact';
 import MenuSection from '../menu-section';
 import { $imports } from '../menu-section';
 
-import { checkAccessibility } from './accessibility';
-import mockImportedComponents from './mock-imported-components';
+import { checkAccessibility } from '../../../test-util/accessibility';
+import mockImportedComponents from '../../../test-util/mock-imported-components';
 
 describe('MenuSection', () => {
   const createMenuSection = props =>

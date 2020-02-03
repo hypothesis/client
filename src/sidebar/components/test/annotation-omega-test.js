@@ -4,7 +4,7 @@ import { act } from 'preact/test-utils';
 
 import * as fixtures from '../../test/annotation-fixtures';
 
-import mockImportedComponents from './mock-imported-components';
+import mockImportedComponents from '../../../test-util/mock-imported-components';
 
 // @TODO Note this import as `Annotation` for easier updating later
 

@@ -4,7 +4,7 @@ import { createElement } from 'preact';
 import MarkdownView from '../markdown-view';
 import { $imports } from '../markdown-view';
 
-import { checkAccessibility } from './accessibility';
+import { checkAccessibility } from '../../../test-util/accessibility';
 
 describe('MarkdownView', () => {
   let fakeMediaEmbedder;

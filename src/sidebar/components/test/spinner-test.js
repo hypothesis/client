@@ -3,7 +3,7 @@ import { createElement } from 'preact';
 
 import Spinner from '../spinner';
 
-import { checkAccessibility } from './accessibility';
+import { checkAccessibility } from '../../../test-util/accessibility';
 
 describe('Spinner', function() {
   const createSpinner = (props = {}) => mount(<Spinner {...props} />);

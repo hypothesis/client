@@ -4,8 +4,8 @@ import { createElement } from 'preact';
 import AnnotationQuote from '../annotation-quote';
 import { $imports } from '../annotation-quote';
 
-import { checkAccessibility } from './accessibility';
-import mockImportedComponents from './mock-imported-components';
+import { checkAccessibility } from '../../../test-util/accessibility';
+import mockImportedComponents from '../../../test-util/mock-imported-components';
 
 describe('AnnotationQuote', () => {
   let fakeAnnotation;

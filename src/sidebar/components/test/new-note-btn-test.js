@@ -6,8 +6,8 @@ import events from '../../events';
 import NewNoteButton from '../new-note-btn';
 import { $imports } from '../new-note-btn';
 
-import { checkAccessibility } from './accessibility';
-import mockImportedComponents from './mock-imported-components';
+import { checkAccessibility } from '../../../test-util/accessibility';
+import mockImportedComponents from '../../../test-util/mock-imported-components';
 
 describe('NewNoteButton', function() {
   let fakeStore;
