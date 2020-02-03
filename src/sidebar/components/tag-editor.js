@@ -109,6 +109,7 @@ function TagEditor({ onEditTags, tags: tagsService, tagList }) {
     }
     updateTags([...tagList, value]);
     setSuggestionsListOpen(false);
+    setActiveItem(-1);
 
     inputEl.current.value = '';
     inputEl.current.focus();
@@ -248,6 +249,7 @@ function TagEditor({ onEditTags, tags: tagsService, tagList }) {
           className="tag-editor__input"
           type="text"
           autoComplete="off"
+          aria-label="Add tag field"
           aria-autocomplete="list"
           aria-activedescendant={activeDescendant}
           aria-controls={`${tagEditorId}-autocomplete-list`}

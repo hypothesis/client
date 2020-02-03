@@ -53,19 +53,25 @@ export default function AutocompleteList({
   }, [activeItem, itemPrefixId, list, listFormatter, onSelectItem]);
 
   const props = id ? { id } : {}; // only add the id if its passed
+  const isHidden = list.length === 0 || !open;
   return (
-    <div className="autocomplete-list">
-      {list.length > 0 && open && (
-        <ul
-          className="autocomplete-list__items"
-          tabIndex="-1"
-          aria-label="Suggestions"
-          role="listbox"
-          {...props}
-        >
-          {items}
-        </ul>
+    <div
+      className={classnames(
+        {
+          'is-hidden': isHidden,
+        },
+        'autocomplete-list'
       )}
+    >
+      <ul
+        className="autocomplete-list__items"
+        tabIndex="-1"
+        aria-label="Suggestions"
+        role="listbox"
+        {...props}
+      >
+        {items}
+      </ul>
     </div>
   );
 }

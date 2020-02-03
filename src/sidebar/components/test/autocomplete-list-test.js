@@ -4,6 +4,7 @@ import { createElement } from 'preact';
 import AutocompleteList from '../autocomplete-list';
 import { $imports } from '../autocomplete-list';
 
+import { checkAccessibility } from '../../../test-util/accessibility';
 import mockImportedComponents from '../../../test-util/mock-imported-components';
 
 describe('AutocompleteList', function() {
@@ -33,12 +34,12 @@ describe('AutocompleteList', function() {
 
   it('does not render the list when `open` is false', () => {
     const wrapper = createComponent();
-    assert.isFalse(wrapper.find('.autocomplete-list__items').exists());
+    assert.isTrue(wrapper.find('.autocomplete-list').hasClass('is-hidden'));
   });
 
   it('does not render the list when `list` is empty', () => {
     const wrapper = createComponent({ open: true, list: [] });
-    assert.isFalse(wrapper.find('.autocomplete-list__items').exists());
+    assert.isTrue(wrapper.find('.autocomplete-list').hasClass('is-hidden'));
   });
 
   it('sets unique keys to the <li> items', () => {
@@ -160,4 +161,22 @@ describe('AutocompleteList', function() {
         .prop('aria-selected')
     );
   });
+
+  it(
+    'should pass a11y checks',
+    checkAccessibility([
+      {
+        name: 'list open',
+        content: () => {
+          return createComponent({ open: true });
+        },
+      },
+      {
+        name: 'list open, first item selected',
+        content: () => {
+          return createComponent({ open: true, activeItem: 1 });
+        },
+      },
+    ])
+  );
 });
