@@ -12,12 +12,7 @@ describe('GroupList', () => {
   let fakeServiceUrl;
   let fakeSettings;
   let fakeStore;
-
-  const testGroup = {
-    id: 'testgroup',
-    name: 'Test group',
-    organization: { id: 'testorg', name: 'Test Org' },
-  };
+  let testGroup;
 
   function createGroupList() {
     return mount(
@@ -47,6 +42,12 @@ describe('GroupList', () => {
   }
 
   beforeEach(() => {
+    testGroup = {
+      id: 'testgroup',
+      name: 'Test group',
+      organization: { id: 'testorg', name: 'Test Org' },
+    };
+
     fakeServiceUrl = sinon.stub();
     fakeSettings = {
       authDomain: 'hypothes.is',
@@ -158,6 +159,23 @@ describe('GroupList', () => {
     });
     const wrapper = createGroupList();
     assert.equal(wrapper.text(), 'Test group');
+  });
+
+  it('uses the organization name for the `alt` attribute', () => {
+    $imports.$mock({
+      '../util/is-third-party-service': () => true,
+    });
+    const wrapper = createGroupList();
+    assert.equal(wrapper.find('img').prop('alt'), 'Test Org');
+  });
+
+  it('uses a blank string for the `alt` attribute if the organization name is missing', () => {
+    $imports.$mock({
+      '../util/is-third-party-service': () => true,
+    });
+    testGroup.organization = {};
+    const wrapper = createGroupList();
+    assert.equal(wrapper.find('img').prop('alt'), '');
   });
 
   it('renders a placeholder if groups have not loaded yet', () => {
