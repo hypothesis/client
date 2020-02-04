@@ -397,8 +397,16 @@ function runKarma({ singleRun }, done) {
   ).start();
 }
 
-gulp.task('test', done => runKarma({ singleRun: true }, done));
-gulp.task('test-watch', done => runKarma({ singleRun: false }, done));
+// Unit and integration testing tasks.
+// Some (eg. a11y) tests rely on CSS bundles, so build these first.
+gulp.task(
+  'test',
+  gulp.series('build-css', done => runKarma({ singleRun: true }, done))
+);
+gulp.task(
+  'test-watch',
+  gulp.series('build-css', done => runKarma({ singleRun: false }, done))
+);
 
 gulp.task(
   'upload-sourcemaps',
