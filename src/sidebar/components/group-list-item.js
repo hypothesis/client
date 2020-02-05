@@ -73,9 +73,6 @@ function GroupListItem({
   const copyLinkLabel =
     group.type === 'private' ? 'Copy invite link' : 'Copy activity link';
 
-  // Close the submenu when any clicks happen which close the top-level menu.
-  const collapseSubmenu = () => onExpand(false);
-
   return (
     <MenuItem
       icon={group.logo || 'blank'}
@@ -89,9 +86,7 @@ function GroupListItem({
       onToggleSubmenu={toggleSubmenu}
       submenu={
         <Fragment>
-          {/* FIXME-A11Y */}
-          {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events */}
-          <ul onClick={collapseSubmenu}>
+          <ul>
             {activityUrl && (
               <li>
                 <MenuItem

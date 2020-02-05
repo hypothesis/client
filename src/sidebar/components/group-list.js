@@ -5,6 +5,7 @@ import propTypes from 'prop-types';
 import serviceConfig from '../service-config';
 import useStore from '../store/use-store';
 import { isThirdPartyUser } from '../util/account-id';
+import { orgName } from '../util/group-list-item-common';
 import groupsByOrganization from '../util/group-organizations';
 import isThirdPartyService from '../util/is-third-party-service';
 import { withServices } from '../util/service-context';
@@ -61,13 +62,15 @@ function GroupList({ serviceUrl, settings }) {
   let label;
   if (focusedGroup) {
     const icon = focusedGroup.organization.logo;
+    // If org name is missing, then treat this icon like decoration
+    // and pass an empty string.
+    const altName = orgName(focusedGroup) ? orgName(focusedGroup) : '';
     label = (
       <span className="group-list__menu-label">
-        {/* FIXME-A11Y */}
-        {/* eslint-disable-next-line jsx-a11y/alt-text */}
         <img
           className="group-list__menu-icon"
           src={icon || publisherProvidedIcon(settings)}
+          alt={altName}
         />
         {focusedGroup.name}
       </span>
