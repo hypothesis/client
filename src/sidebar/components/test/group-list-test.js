@@ -12,12 +12,7 @@ describe('GroupList', () => {
   let fakeServiceUrl;
   let fakeSettings;
   let fakeStore;
-
-  const testGroup = {
-    id: 'testgroup',
-    name: 'Test group',
-    organization: { id: 'testorg', name: 'Test Org' },
-  };
+  let testGroup;
 
   function createGroupList() {
     return mount(
@@ -47,6 +42,12 @@ describe('GroupList', () => {
   }
 
   beforeEach(() => {
+    testGroup = {
+      id: 'testgroup',
+      name: 'Test group',
+      organization: { id: 'testorg', name: 'Test Org' },
+    };
+
     fakeServiceUrl = sinon.stub();
     fakeSettings = {
       authDomain: 'hypothes.is',
@@ -152,12 +153,28 @@ describe('GroupList', () => {
     assert.equal(newGroupButton.props().href, 'https://example.com/groups/new');
   });
 
-  it('displays the group name and icon as static text if there is only one group and no actions available', () => {
-    $imports.$mock({
-      '../util/is-third-party-service': () => true,
+  context('when `isThirdPartyService` is true', () => {
+    beforeEach(() => {
+      $imports.$mock({
+        '../util/is-third-party-service': () => true,
+      });
     });
-    const wrapper = createGroupList();
-    assert.equal(wrapper.text(), 'Test group');
+
+    it('displays the group name and icon as static text if there is only one group and no actions available', () => {
+      const wrapper = createGroupList();
+      assert.equal(wrapper.text(), 'Test group');
+    });
+
+    it('uses the organization name for the `alt` attribute', () => {
+      const wrapper = createGroupList();
+      assert.equal(wrapper.find('img').prop('alt'), 'Test Org');
+    });
+
+    it('uses a blank string for the `alt` attribute if the organization name is missing', () => {
+      testGroup.organization = {};
+      const wrapper = createGroupList();
+      assert.equal(wrapper.find('img').prop('alt'), '');
+    });
   });
 
   it('renders a placeholder if groups have not loaded yet', () => {
