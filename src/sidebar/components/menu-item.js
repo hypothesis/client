@@ -4,6 +4,7 @@ import propTypes from 'prop-types';
 
 import { onActivate } from '../util/on-activate';
 
+import Button from './button';
 import Slider from './slider';
 import SvgIcon from './svg-icon';
 
@@ -56,57 +57,74 @@ export default function MenuItem({
   const leftIcon = isSubmenuItem ? null : renderedIcon;
   const rightIcon = isSubmenuItem ? renderedIcon : null;
 
-  return (
-    <Fragment>
-      {/* FIXME-A11Y */}
-      {/* eslint-disable-next-line jsx-a11y/role-supports-aria-props */}
-      <div
-        aria-checked={isSelected}
-        className={classnames('menu-item', {
+  let menuItem = null;
+
+  if (href) {
+    // link item
+    //
+    menuItem = (
+      <a
+        className={classnames('menu-item__action', {
           'menu-item--submenu': isSubmenuItem,
           'is-disabled': isDisabled,
           'is-expanded': isExpanded,
           'is-selected': isSelected,
         })}
-        role="menuitem"
+        href={href}
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        {hasLeftIcon && (
+          <div className="menu-item__icon-container">{leftIcon}</div>
+        )}
+        <span className={labelClass}>{label}</span>
+        {hasRightIcon && (
+          <div className="menu-item__icon-container">{rightIcon}</div>
+        )}
+      </a>
+    );
+  } else {
+    // button item
+    //
+    menuItem = (
+      // eslint-disable-next-line jsx-a11y/role-supports-aria-props
+      <button
+        className={classnames('menu-item__action', {
+          'menu-item--submenu': isSubmenuItem,
+          'is-disabled': isDisabled,
+          'is-expanded': isExpanded,
+          'is-selected': isSelected,
+        })}
+        role="radio"
+        aria-checked={isSelected}
         {...(onClick && onActivate('menuitem', onClick))}
       >
-        <div className="menu-item__action">
-          {hasLeftIcon && (
-            <div className="menu-item__icon-container">{leftIcon}</div>
-          )}
-          {href && (
-            <a
-              className={labelClass}
-              href={href}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {label}
-            </a>
-          )}
-          {!href && <span className={labelClass}>{label}</span>}
-          {hasRightIcon && (
-            <div className="menu-item__icon-container">{rightIcon}</div>
-          )}
-        </div>
+        {hasLeftIcon && (
+          <div className="menu-item__icon-container">{leftIcon}</div>
+        )}
+        <span className={labelClass}>{label}</span>
+        {hasRightIcon && (
+          <div className="menu-item__icon-container">{rightIcon}</div>
+        )}
+
         {typeof isSubmenuVisible === 'boolean' && (
-          <div
+          <Button
+            icon={isSubmenuVisible ? 'collapse-menu' : 'expand-menu'}
             className="menu-item__toggle"
             // We need to pass strings here rather than just the boolean attribute
             // because otherwise the attribute will be omitted entirely when
             // `isSubmenuVisible` is false.
-            aria-expanded={isSubmenuVisible ? 'true' : 'false'}
-            aria-label={`Show actions for ${label}`}
+            isActive={!!isSubmenuVisible}
             {...onActivate('button', onToggleSubmenu)}
-          >
-            <SvgIcon
-              name={isSubmenuVisible ? 'collapse-menu' : 'expand-menu'}
-              className="menu-item__toggle-icon"
-            />
-          </div>
+            title={`Show actions for ${label}`}
+          />
         )}
-      </div>
+      </button>
+    );
+  }
+  return (
+    <Fragment>
+      {menuItem}
       {typeof isSubmenuVisible === 'boolean' && (
         <Slider visible={isSubmenuVisible}>
           <div className="menu-item__submenu">{submenu}</div>

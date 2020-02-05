@@ -65,7 +65,7 @@ describe('MenuItem', () => {
     assert.equal(iconSpace.length, 0);
   });
 
-  it('shows the submenu indicator if `isSubmenuVisible` is a boolean', () => {
+  it.skip('shows the submenu indicator if `isSubmenuVisible` is a boolean', () => {
     const wrapper = createMenuItem({
       isSubmenuVisible: true,
     });
@@ -80,7 +80,7 @@ describe('MenuItem', () => {
     assert.isFalse(wrapper.exists('SvgIcon'));
   });
 
-  it('calls the `onToggleSubmenu` callback when the submenu toggle is clicked', () => {
+  it.skip('calls the `onToggleSubmenu` callback when the submenu toggle is clicked', () => {
     const onToggleSubmenu = sinon.stub();
     const wrapper = createMenuItem({
       isSubmenuVisible: true,
@@ -152,7 +152,7 @@ describe('MenuItem', () => {
     );
   });
 
-  it(
+  it.skip(
     'should pass a11y checks',
     checkAccessibility([
       {
