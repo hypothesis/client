@@ -252,7 +252,7 @@ function startAngularApp(config) {
 
     .service('analytics', analyticsService)
     .service('annotationMapper', annotationMapperService)
-    .service('annotations', annotationsService)
+    .service('annotationsService', annotationsService)
     .service('api', apiService)
     .service('apiRoutes', apiRoutesService)
     .service('auth', authService)
