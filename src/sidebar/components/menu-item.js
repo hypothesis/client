@@ -55,13 +55,15 @@ export default function MenuItem({
   }
   const leftIcon = isSubmenuItem ? null : renderedIcon;
   const rightIcon = isSubmenuItem ? renderedIcon : null;
+  // Only add `aria-checked` attribute if `isSubmenuItem` is false. Ensure that the value
+  // is a "true" or "false" string
+  const ariaChecked = !isSubmenuItem
+    ? { 'aria-checked': (!!isSelected).toString() }
+    : {};
 
   return (
     <Fragment>
-      {/* FIXME-A11Y */}
-      {/* eslint-disable-next-line jsx-a11y/role-supports-aria-props */}
       <div
-        aria-checked={isSelected}
         className={classnames('menu-item', {
           'menu-item--submenu': isSubmenuItem,
           'is-disabled': isDisabled,
@@ -69,9 +71,17 @@ export default function MenuItem({
           'is-selected': isSelected,
         })}
         role="menuitem"
-        {...(onClick && onActivate('menuitem', onClick))}
       >
-        <div className="menu-item__action">
+        <div
+          className="menu-item__action"
+          // When `isSubmenuItem` is false, treat these items as "radio" buttons since they can be
+          // "selected". Otherwise this is treated as a "button". Note, If there is no `onClick`
+          // event, then no role will be added in any case.
+          {...ariaChecked}
+          // onActivate will add the `role` attribute
+          {...(onClick &&
+            onActivate(isSubmenuItem ? 'button' : 'radio', onClick))}
+        >
           {hasLeftIcon && (
             <div className="menu-item__icon-container">{leftIcon}</div>
           )}

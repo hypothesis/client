@@ -22,7 +22,7 @@ describe('MenuItem', () => {
   it('invokes `onClick` callback when clicked', () => {
     const onClick = sinon.stub();
     const wrapper = createMenuItem({ onClick });
-    wrapper.find('[role="menuitem"]').simulate('click');
+    wrapper.find('.menu-item__action').simulate('click');
     assert.called(onClick);
   });
 
@@ -150,6 +150,71 @@ describe('MenuItem', () => {
         .text(),
       'Submenu content'
     );
+  });
+
+  describe('accessibility attributes', () => {
+    context('when `isSubmenuItem` is truthy', () => {
+      it('sets `role="button"` attribute"', () => {
+        //  submenu button
+        const onClick = sinon.stub();
+        const wrapper = createMenuItem({ onClick, isSubmenuItem: true });
+        assert.equal(wrapper.find('.menu-item__action').prop('role'), 'button');
+      });
+
+      it('does not add the `role` attribute if `onClick` is missing', () => {
+        //  submenu link
+        const wrapper = createMenuItem({ isSubmenuItem: true });
+        assert.equal(
+          wrapper.find('.menu-item__action').prop('role'),
+          undefined
+        );
+      });
+
+      it('does not add the `aria-checked` attribute', () => {
+        //  submenu button
+        const onClick = sinon.stub();
+        const wrapper = createMenuItem({ onClick, isSubmenuItem: true });
+        assert.equal(
+          wrapper.find('.menu-item__action').prop('aria-checked'),
+          undefined
+        );
+      });
+    });
+
+    context('when `isSubmenuItem` is falsey', () => {
+      it('sets `role="radio"` attribute', () => {
+        const onClick = sinon.stub();
+        const wrapper = createMenuItem({ onClick });
+        assert.equal(wrapper.find('.menu-item__action').prop('role'), 'radio');
+      });
+
+      it('sets `aria-checked` to "false" when `isSelected` is missing', () => {
+        const onClick = sinon.stub();
+        const wrapper = createMenuItem({ onClick });
+        assert.equal(
+          wrapper.find('.menu-item__action').prop('aria-checked'),
+          'false'
+        );
+      });
+
+      it('sets `aria-checked` to "false" when `isSelected` is `false`', () => {
+        const onClick = sinon.stub();
+        const wrapper = createMenuItem({ onClick, isSelected: false });
+        assert.equal(
+          wrapper.find('.menu-item__action').prop('aria-checked'),
+          'false'
+        );
+      });
+
+      it('sets `aria-checked` to "true" when `isSelected` is `true`', () => {
+        const onClick = sinon.stub();
+        const wrapper = createMenuItem({ onClick, isSelected: true });
+        assert.equal(
+          wrapper.find('.menu-item__action').prop('aria-checked'),
+          'true'
+        );
+      });
+    });
   });
 
   it(
