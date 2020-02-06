@@ -2,7 +2,7 @@ import { Injector } from '../injector';
 
 describe('Injector', () => {
   describe('#get', () => {
-    it('calls factory function to create instance', () => {
+    it('calls a non-class factory as a function to create instance', () => {
       const instance = {};
       const factory = sinon.stub().returns(instance);
 
@@ -13,7 +13,7 @@ describe('Injector', () => {
       assert.equal(constructed, instance);
     });
 
-    it('calls constructor to create instance', () => {
+    it('calls a class factory with `new` to create instance', () => {
       class Foo {}
 
       const container = new Injector();

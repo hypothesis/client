@@ -99,6 +99,7 @@ export class Injector {
    * @param {() => any} factory -
    *   A function that constructs the service, or a class that will be instantiated
    *   when the object is requested.
+   * @return {this}
    */
   register(name, factory) {
     this._factories.set(name, factory);
