@@ -20,7 +20,7 @@ function displayName(ann) {
  * which do not match the filter are then hidden.
  */
 // @ngInject
-export default function viewFilter(unicode) {
+export default function ViewFilter(unicode) {
   /**
    * Normalize a field value or query term for comparison.
    */
