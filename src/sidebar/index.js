@@ -199,7 +199,6 @@ import store from './store';
 
 import Discovery from '../shared/discovery';
 
-import { encode as urlEncodeFilter } from './filter/url';
 import OAuthClient from './util/oauth-client';
 import * as random from './util/random';
 import * as time from './util/time';
@@ -255,7 +254,6 @@ function startAngularApp(config) {
     .register('serviceConfig', { value: serviceConfig })
     .register('settings', { value: config })
     .register('time', { value: time })
-    .register('urlEncodeFilter', { value: urlEncodeFilter });
 
   // Register services which only Angular can construct, once Angular has
   // constructed them.
@@ -345,7 +343,6 @@ function startAngularApp(config) {
     .value('serviceConfig', container.get('serviceConfig'))
     .value('settings', container.get('settings'))
     .value('time', container.get('time'))
-    .value('urlEncodeFilter', container.get('urlEncodeFilter'))
 
     .config(configureLocation)
     .config(configureRoutes)
