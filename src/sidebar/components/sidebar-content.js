@@ -6,7 +6,7 @@ import * as tabs from '../util/tabs';
 function SidebarContentController(
   $scope,
   analytics,
-  annotations,
+  annotationsService,
   store,
   frameSync,
   rootThread,
@@ -120,7 +120,7 @@ function SidebarContentController(
       }
 
       const searchUris = store.searchUris();
-      annotations.load(searchUris, currentGroupId);
+      annotationsService.load(searchUris, currentGroupId);
     },
     true
   );

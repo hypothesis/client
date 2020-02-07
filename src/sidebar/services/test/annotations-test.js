@@ -1,6 +1,6 @@
 import EventEmitter from 'tiny-emitter';
 
-import annotations from '../annotations';
+import annotationsService from '../annotations';
 import { $imports } from '../annotations';
 
 let searchClients;
@@ -29,7 +29,7 @@ class FakeSearchClient extends EventEmitter {
   }
 }
 
-describe('annotations', () => {
+describe('annotationService', () => {
   let fakeStore;
   let fakeApi;
   let fakeAnnotationMapper;
@@ -90,7 +90,7 @@ describe('annotations', () => {
         return { uri: uri };
       })
     );
-    return annotations(
+    return annotationsService(
       fakeAnnotationMapper,
       fakeApi,
       fakeStore,

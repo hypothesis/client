@@ -68,7 +68,7 @@ describe('sidebar.components.sidebar-content', function() {
       $provide.value('frameSync', fakeFrameSync);
       $provide.value('rootThread', fakeRootThread);
       $provide.value('streamer', fakeStreamer);
-      $provide.value('annotations', fakeAnnotations);
+      $provide.value('annotationsService', fakeAnnotations);
       $provide.value('settings', fakeSettings);
     });
   });

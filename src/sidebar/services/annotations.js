@@ -1,7 +1,7 @@
 import SearchClient from '../search-client';
 
 // @ngInject
-export default function annotations(
+export default function annotationsService(
   annotationMapper,
   api,
   store,
