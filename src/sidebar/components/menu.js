@@ -105,7 +105,7 @@ export default function Menu({
   };
 
   return (
-    // FIXME-A11Y
+    // See https://github.com/evcohen/eslint-plugin-jsx-a11y/blob/master/docs/rules/no-static-element-interactions.md#case-the-event-handler-is-only-being-used-to-capture-bubbled-events
     // eslint-disable-next-line jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events
     <div
       className="menu"
@@ -145,8 +145,6 @@ export default function Menu({
       {isOpen && (
         <Fragment>
           {menuArrow(arrowClass)}
-          {/* FIXME-A11Y */}
-          {/* eslint-disable-next-line jsx-a11y/interactive-supports-focus */}
           <div
             className={classnames(
               'menu__content',
@@ -154,6 +152,7 @@ export default function Menu({
               contentClass
             )}
             role="menu"
+            tabIndex="-1"
             onClick={closeMenu}
             onKeyPress={handleMenuKeyPress}
           >
