@@ -251,6 +251,8 @@ function startAngularApp(config) {
       .register('$rootScope', { value: $rootScope });
   }
 
+  const wrapComponent = component => wrapReactComponent(component, container);
+
   angular
     .module('h', [angularRoute, angularToastr])
 
@@ -259,36 +261,33 @@ function startAngularApp(config) {
 
     // UI components
     .component('annotation', annotation)
-    .component('annotationBody', wrapReactComponent(AnnotationBody))
-    .component('annotationHeader', wrapReactComponent(AnnotationHeader))
-    .component('annotationActionBar', wrapReactComponent(AnnotationActionBar))
-    .component('annotationLicense', wrapReactComponent(AnnotationLicense))
-    .component('annotationOmega', wrapReactComponent(AnnotationOmega))
+    .component('annotationBody', wrapComponent(AnnotationBody))
+    .component('annotationHeader', wrapComponent(AnnotationHeader))
+    .component('annotationActionBar', wrapComponent(AnnotationActionBar))
+    .component('annotationLicense', wrapComponent(AnnotationLicense))
+    .component('annotationOmega', wrapComponent(AnnotationOmega))
     .component(
       'annotationPublishControl',
-      wrapReactComponent(AnnotationPublishControl)
+      wrapComponent(AnnotationPublishControl)
     )
-    .component('annotationQuote', wrapReactComponent(AnnotationQuote))
+    .component('annotationQuote', wrapComponent(AnnotationQuote))
     .component('annotationThread', annotationThread)
     .component('annotationViewerContent', annotationViewerContent)
-    .component('helpPanel', wrapReactComponent(HelpPanel))
-    .component('loggedOutMessage', wrapReactComponent(LoggedOutMessage))
-    .component('moderationBanner', wrapReactComponent(ModerationBanner))
-    .component('searchStatusBar', wrapReactComponent(SearchStatusBar))
-    .component('focusedModeHeader', wrapReactComponent(FocusedModeHeader))
-    .component('selectionTabs', wrapReactComponent(SelectionTabs))
+    .component('helpPanel', wrapComponent(HelpPanel))
+    .component('loggedOutMessage', wrapComponent(LoggedOutMessage))
+    .component('moderationBanner', wrapComponent(ModerationBanner))
+    .component('searchStatusBar', wrapComponent(SearchStatusBar))
+    .component('focusedModeHeader', wrapComponent(FocusedModeHeader))
+    .component('selectionTabs', wrapComponent(SelectionTabs))
     .component('sidebarContent', sidebarContent)
-    .component('sidebarContentError', wrapReactComponent(SidebarContentError))
-    .component(
-      'shareAnnotationsPanel',
-      wrapReactComponent(ShareAnnotationsPanel)
-    )
+    .component('sidebarContentError', wrapComponent(SidebarContentError))
+    .component('shareAnnotationsPanel', wrapComponent(ShareAnnotationsPanel))
     .component('streamContent', streamContent)
-    .component('svgIcon', wrapReactComponent(SvgIcon))
-    .component('tagEditor', wrapReactComponent(TagEditor))
-    .component('tagList', wrapReactComponent(TagList))
+    .component('svgIcon', wrapComponent(SvgIcon))
+    .component('tagEditor', wrapComponent(TagEditor))
+    .component('tagList', wrapComponent(TagList))
     .component('threadList', threadList)
-    .component('topBar', wrapReactComponent(TopBar))
+    .component('topBar', wrapComponent(TopBar))
     .directive('hAutofocus', hAutofocusDirective)
     .directive('hBranding', hBrandingDirective)
     .directive('hOnTouch', hOnTouchDirective)
@@ -315,7 +314,6 @@ function startAngularApp(config) {
     .service('session', () => container.get('session'))
     .service('streamer', () => container.get('streamer'))
     .service('streamFilter', () => container.get('streamFilter'))
-    .service('tags', () => container.get('tags'))
 
     // Redux store
     .service('store', () => container.get('store'))
