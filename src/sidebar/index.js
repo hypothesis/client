@@ -246,16 +246,16 @@ function startAngularApp(config) {
   // nb. In many cases these can be replaced by direct imports in the services
   // that use them, since they don't depend on instances of other services.
   container
-    .register('$window', () => window)
-    .register('Discovery', () => Discovery)
-    .register('OAuthClient', () => OAuthClient)
-    .register('VirtualThreadList', () => VirtualThreadList)
-    .register('isSidebar', () => isSidebar)
-    .register('random', () => random)
-    .register('serviceConfig', () => serviceConfig)
-    .register('settings', () => config)
-    .register('time', () => time)
-    .register('urlEncodeFilter', () => urlEncodeFilter);
+    .register('$window', { value: window })
+    .register('Discovery', { value: Discovery })
+    .register('OAuthClient', { value: OAuthClient })
+    .register('VirtualThreadList', { value: VirtualThreadList })
+    .register('isSidebar', { value: isSidebar })
+    .register('random', { value: random })
+    .register('serviceConfig', { value: serviceConfig })
+    .register('settings', { value: config })
+    .register('time', { value: time })
+    .register('urlEncodeFilter', { value: urlEncodeFilter });
 
   // Register services which only Angular can construct, once Angular has
   // constructed them.
@@ -263,8 +263,8 @@ function startAngularApp(config) {
   // @ngInject
   function registerAngularServices($rootScope, toastr) {
     container
-      .register('toastr', () => toastr)
-      .register('$rootScope', () => $rootScope);
+      .register('toastr', { value: toastr })
+      .register('$rootScope', { value: $rootScope });
   }
 
   angular

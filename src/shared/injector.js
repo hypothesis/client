@@ -1,29 +1,47 @@
 /* global Map */
 
-function isClass(functionOrClass) {
-  return functionOrClass.name.match(/^[A-Z]/);
+/**
+ * @typedef Provider
+ * @prop {any} [value] - The value for the object
+ * @prop {Function} [class] - A class that should be instantiated to create the object
+ * @prop {Function} [factory] - Function that should be called to create the object
+ */
+
+/**
+ * @param {Provider} provider
+ */
+function isValidProvider(provider) {
+  if (typeof provider !== 'object' || provider === null) {
+    return false;
+  }
+
+  return (
+    'value' in provider ||
+    typeof provider.class === 'function' ||
+    typeof provider.factory === 'function'
+  );
 }
 
 /**
  * `Injector` is a dependency injection container.
  *
  * It provides a convenient way to instantiate a set of named objects with
- * dependencies. Objects are constructed using a factory function or
- * class constructor. The factory function or constructor may have dependencies
+ * dependencies. Objects are constructed using a _provider_, which can be a
+ * factory function, class constructor or value.
+ *
+ * If the provider is a factory function or constructor it may have dependencies
  * which are indicated by a `$inject` property on the function/class which
  * is a list of the names of the dependencies. The `$inject` property can be
  * added manually or by a compiler plugin (eg. `babel-plugin-angularjs-annotate`).
  *
- * To construct an object, call the `register` method with the name and factory
- * function/class for the object and each of its dependencies, and then call
- * the `get` method to construct or return the existing object with a given name,
- * along with all of its dependencies.
+ * To construct an object, call the `register` method with the name and provider
+ * for the object and each of its dependencies, and then call
+ * the `get` method to construct the object and its dependencies return it.
  */
 export class Injector {
   constructor() {
-    // Map of name to factory function that creates an instance or class used
-    // as prototype for instance.
-    this._factories = new Map();
+    // Map of name to object specifying how to create/provide that object.
+    this._providers = new Map();
 
     // Map of name to existing instance.
     this._instances = new Map();
@@ -44,10 +62,15 @@ export class Injector {
       return this._instances.get(name);
     }
 
-    const factory = this._factories.get(name);
+    const provider = this._providers.get(name);
 
-    if (!factory) {
+    if (!provider) {
       throw new Error(`"${name}" is not registered`);
+    }
+
+    if ('value' in provider) {
+      this._instances.set(name, provider.value);
+      return provider.value;
     }
 
     if (this._constructing.has(name)) {
@@ -59,7 +82,10 @@ export class Injector {
     this._constructing.add(name);
     try {
       const resolvedDependencies = [];
-      const dependencies = factory.$inject || [];
+      const dependencies =
+        ('class' in provider && provider.class.$inject) ||
+        ('factory' in provider && provider.factory.$inject) ||
+        [];
 
       for (const dependency of dependencies) {
         try {
@@ -74,10 +100,11 @@ export class Injector {
       }
 
       let instance;
-      if (isClass(factory)) {
+      if (provider.class) {
         // eslint-disable-next-line new-cap
-        instance = new factory(...resolvedDependencies);
+        instance = new provider.class(...resolvedDependencies);
       } else {
+        const factory = provider.factory;
         instance = factory(...resolvedDependencies);
       }
       this._instances.set(name, instance);
@@ -89,20 +116,24 @@ export class Injector {
   }
 
   /**
-   * Register a factory with a given name.
+   * Register a provider for an object in the container.
    *
-   * If `factory`'s name starts with an upper-case letter it is treated as a
-   * class. If it starts with a lower-case letter it is treated as a factory
-   * function, which may return any type of value.
+   * If `provider` is a function, it is treated like a class. In other words
+   * `register(name, SomeClass)` is the same as `register(name, { class: SomeClass })`.
    *
    * @param {string} name - Name of object
-   * @param {() => any} factory -
-   *   A function that constructs the service, or a class that will be instantiated
-   *   when the object is requested.
+   * @param {Function|Provider} provider -
+   *   The class or other provider to use to create the object.
    * @return {this}
    */
-  register(name, factory) {
-    this._factories.set(name, factory);
+  register(name, provider) {
+    if (typeof provider === 'function') {
+      provider = { class: provider };
+    } else if (!isValidProvider(provider)) {
+      throw new Error(`Invalid provider for "${name}"`);
+    }
+
+    this._providers.set(name, provider);
     return this;
   }
 }

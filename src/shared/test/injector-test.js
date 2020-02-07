@@ -2,25 +2,41 @@ import { Injector } from '../injector';
 
 describe('Injector', () => {
   describe('#get', () => {
-    it('calls a non-class factory as a function to create instance', () => {
-      const instance = {};
-      const factory = sinon.stub().returns(instance);
+    it('calls a "factory" provider as a function to create the object', () => {
+      const instance = 'aValue';
+      const factory = sinon.stub().callsFake(function() {
+        assert.isUndefined(this);
+        return instance;
+      });
 
       const container = new Injector();
-      container.register('service', factory);
+      container.register('service', { factory });
       const constructed = container.get('service');
 
       assert.equal(constructed, instance);
     });
 
-    it('calls a class factory with `new` to create instance', () => {
+    it('calls a "class" provider with `new` to create instance', () => {
       class Foo {}
 
       const container = new Injector();
       container.register('foo', Foo);
+      container.register('foo2', { class: Foo });
 
       const constructed = container.get('foo');
       assert.instanceOf(constructed, Foo);
+
+      const constructed2 = container.get('foo2');
+      assert.instanceOf(constructed2, Foo);
+    });
+
+    it('uses the value of a "value" provider as the instance', () => {
+      const instance = {};
+
+      const container = new Injector();
+      container.register('anObject', { value: instance });
+
+      assert.equal(container.get('anObject'), instance);
     });
 
     it('returns the existing instance if already constructed', () => {
@@ -64,20 +80,16 @@ describe('Injector', () => {
         return factory;
       };
 
-      container.register('a', () => 'a');
-      container.register(
-        'b',
-        addDeps(a => a + 'b', ['a'])
-      );
-      container.register(
-        'c',
-        addDeps((b, a) => b + 'c' + a, ['b', 'a'])
-      );
+      container.register('a', { value: 'a' });
+      container.register('b', { factory: addDeps(a => a + 'b', ['a']) });
+      container.register('c', {
+        factory: addDeps((b, a) => b + 'c' + a, ['b', 'a']),
+      });
 
       assert.equal(container.get('c'), 'abca');
     });
 
-    it('throws an error if factory is not registered', () => {
+    it('throws an error if provider is not registered for name', () => {
       const container = new Injector();
       assert.throws(() => {
         container.get('invalid');
@@ -130,6 +142,15 @@ describe('Injector', () => {
         container.register('foo', () => 42),
         container
       );
+    });
+
+    [{}, 'invalid', true, null, undefined].forEach(invalidProvider => {
+      it('throws an error if the provider is not valid', () => {
+        const container = new Injector();
+        assert.throws(() => {
+          container.register('foo', invalidProvider);
+        }, `Invalid provider for "foo"`);
+      });
     });
   });
 });
