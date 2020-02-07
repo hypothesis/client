@@ -19,6 +19,7 @@ import SvgIcon from './svg-icon';
 export default function Button({
   buttonText = '',
   className = '',
+  disabled = false,
   icon = '',
   isActive = false,
   onClick = () => null,
@@ -51,6 +52,7 @@ export default function Button({
       aria-pressed={isActive}
       title={title}
       style={style}
+      disabled={disabled}
     >
       {icon && <SvgIcon name={icon} className="button__icon" />}
       {buttonText}
@@ -107,6 +109,9 @@ Button.propTypes = {
 
   /** callback for button clicks */
   onClick: propTypes.func,
+
+  /** disables the button when true */
+  disabled: propTypes.bool,
 
   /** optional inline styling  */
   style: propTypes.object,
