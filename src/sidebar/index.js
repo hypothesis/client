@@ -317,14 +317,12 @@ function startAngularApp(config) {
     .service('annotationMapper', () => container.get('annotationMapper'))
     .service('annotationsService', () => container.get('annotationsService'))
     .service('api', () => container.get('api'))
-    .service('apiRoutes', () => container.get('apiRoutes'))
     .service('auth', () => container.get('auth'))
     .service('bridge', () => container.get('bridge'))
     .service('features', () => container.get('features'))
     .service('flash', () => container.get('flash'))
     .service('frameSync', () => container.get('frameSync'))
     .service('groups', () => container.get('groups'))
-    .service('localStorage', () => container.get('localStorage'))
     .service('permissions', () => container.get('permissions'))
     .service('persistedDefaults', () => container.get('persistedDefaults'))
     .service('rootThread', () => container.get('rootThread'))
@@ -334,8 +332,6 @@ function startAngularApp(config) {
     .service('streamer', () => container.get('streamer'))
     .service('streamFilter', () => container.get('streamFilter'))
     .service('tags', () => container.get('tags'))
-    .service('unicode', () => container.get('unicode'))
-    .service('viewFilter', () => container.get('viewFilter'))
 
     // Redux store
     .service('store', () => container.get('store'))
