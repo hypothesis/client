@@ -1,4 +1,5 @@
 import events from '../events';
+import serviceConfig from '../service-config';
 import * as retryUtil from '../util/retry';
 import * as sentry from '../util/sentry';
 
@@ -26,8 +27,7 @@ export default function session(
   api,
   auth,
   flash,
-  settings,
-  serviceConfig
+  settings
 ) {
   // Cache the result of load()
   let lastLoad;

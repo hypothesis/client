@@ -2,6 +2,7 @@ import debounce from 'lodash.debounce';
 
 import bridgeEvents from '../../shared/bridge-events';
 import events from '../events';
+import Discovery from '../../shared/discovery';
 import uiConstants from '../ui-constants';
 import * as metadata from '../util/annotation-metadata';
 
@@ -39,13 +40,7 @@ export function formatAnnot(ann) {
  * sidebar.
  */
 // @ngInject
-export default function FrameSync(
-  $rootScope,
-  $window,
-  Discovery,
-  store,
-  bridge
-) {
+export default function FrameSync($rootScope, $window, store, bridge) {
   // Set of tags of annotations that are currently loaded into the frame
   const inFrame = new Set();
 

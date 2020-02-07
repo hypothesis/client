@@ -67,10 +67,10 @@ describe('sidebar.session', function() {
       auth: fakeAuth,
       flash: fakeFlash,
       settings: fakeSettings,
-      serviceConfig: fakeServiceConfig,
     });
 
     $imports.$mock({
+      '../service-config': fakeServiceConfig,
       '../util/sentry': fakeSentry,
     });
   });
