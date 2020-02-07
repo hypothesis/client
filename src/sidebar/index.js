@@ -205,7 +205,68 @@ import * as random from './util/random';
 import * as time from './util/time';
 import VirtualThreadList from './virtual-thread-list';
 
+import { Injector } from '../shared/injector';
+
 function startAngularApp(config) {
+  // Create dependency injection container for services.
+  //
+  // This is a replacement for the use of Angular's dependency injection
+  // (including its `$injector` service) to construct services with dependencies.
+  const container = new Injector();
+
+  // Register services.
+  container
+    .register('analytics', analyticsService)
+    .register('annotationMapper', annotationMapperService)
+    .register('annotationsService', annotationsService)
+    .register('api', apiService)
+    .register('apiRoutes', apiRoutesService)
+    .register('auth', authService)
+    .register('bridge', bridgeService)
+    .register('features', featuresService)
+    .register('flash', flashService)
+    .register('frameSync', frameSyncService)
+    .register('groups', groupsService)
+    .register('localStorage', localStorageService)
+    .register('permissions', permissionsService)
+    .register('persistedDefaults', persistedDefaultsService)
+    .register('rootThread', rootThreadService)
+    .register('searchFilter', searchFilterService)
+    .register('serviceUrl', serviceUrlService)
+    .register('session', sessionService)
+    .register('streamer', streamerService)
+    .register('streamFilter', streamFilterService)
+    .register('tags', tagsService)
+    .register('unicode', unicodeService)
+    .register('viewFilter', viewFilterService)
+    .register('store', store);
+
+  // Register utility values/classes.
+  //
+  // nb. In many cases these can be replaced by direct imports in the services
+  // that use them, since they don't depend on instances of other services.
+  container
+    .register('$window', { value: window })
+    .register('Discovery', { value: Discovery })
+    .register('OAuthClient', { value: OAuthClient })
+    .register('VirtualThreadList', { value: VirtualThreadList })
+    .register('isSidebar', { value: isSidebar })
+    .register('random', { value: random })
+    .register('serviceConfig', { value: serviceConfig })
+    .register('settings', { value: config })
+    .register('time', { value: time })
+    .register('urlEncodeFilter', { value: urlEncodeFilter });
+
+  // Register services which only Angular can construct, once Angular has
+  // constructed them.
+  //
+  // @ngInject
+  function registerAngularServices($rootScope, toastr) {
+    container
+      .register('toastr', { value: toastr })
+      .register('$rootScope', { value: $rootScope });
+  }
+
   angular
     .module('h', [angularRoute, angularToastr])
 
@@ -250,47 +311,52 @@ function startAngularApp(config) {
     .directive('hTooltip', hTooltipDirective)
     .directive('windowScroll', windowScrollDirective)
 
-    .service('analytics', analyticsService)
-    .service('annotationMapper', annotationMapperService)
-    .service('annotationsService', annotationsService)
-    .service('api', apiService)
-    .service('apiRoutes', apiRoutesService)
-    .service('auth', authService)
-    .service('bridge', bridgeService)
-    .service('features', featuresService)
-    .service('flash', flashService)
-    .service('frameSync', frameSyncService)
-    .service('groups', groupsService)
-    .service('localStorage', localStorageService)
-    .service('permissions', permissionsService)
-    .service('persistedDefaults', persistedDefaultsService)
-    .service('rootThread', rootThreadService)
-    .service('searchFilter', searchFilterService)
-    .service('serviceUrl', serviceUrlService)
-    .service('session', sessionService)
-    .service('streamer', streamerService)
-    .service('streamFilter', streamFilterService)
-    .service('tags', tagsService)
-    .service('unicode', unicodeService)
-    .service('viewFilter', viewFilterService)
+    // Register services, the store and utilities with Angular, so that
+    // Angular components can use them.
+    .service('analytics', () => container.get('analytics'))
+    .service('annotationMapper', () => container.get('annotationMapper'))
+    .service('annotationsService', () => container.get('annotationsService'))
+    .service('api', () => container.get('api'))
+    .service('apiRoutes', () => container.get('apiRoutes'))
+    .service('auth', () => container.get('auth'))
+    .service('bridge', () => container.get('bridge'))
+    .service('features', () => container.get('features'))
+    .service('flash', () => container.get('flash'))
+    .service('frameSync', () => container.get('frameSync'))
+    .service('groups', () => container.get('groups'))
+    .service('localStorage', () => container.get('localStorage'))
+    .service('permissions', () => container.get('permissions'))
+    .service('persistedDefaults', () => container.get('persistedDefaults'))
+    .service('rootThread', () => container.get('rootThread'))
+    .service('searchFilter', () => container.get('searchFilter'))
+    .service('serviceUrl', () => container.get('serviceUrl'))
+    .service('session', () => container.get('session'))
+    .service('streamer', () => container.get('streamer'))
+    .service('streamFilter', () => container.get('streamFilter'))
+    .service('tags', () => container.get('tags'))
+    .service('unicode', () => container.get('unicode'))
+    .service('viewFilter', () => container.get('viewFilter'))
 
     // Redux store
-    .service('store', store)
+    .service('store', () => container.get('store'))
 
     // Utilities
-    .value('Discovery', Discovery)
-    .value('OAuthClient', OAuthClient)
-    .value('VirtualThreadList', VirtualThreadList)
-    .value('isSidebar', isSidebar)
-    .value('random', random)
-    .value('serviceConfig', serviceConfig)
-    .value('settings', config)
-    .value('time', time)
-    .value('urlEncodeFilter', urlEncodeFilter)
+    .value('Discovery', container.get('Discovery'))
+    .value('OAuthClient', container.get('OAuthClient'))
+    .value('VirtualThreadList', container.get('VirtualThreadList'))
+    .value('isSidebar', container.get('isSidebar'))
+    .value('random', container.get('random'))
+    .value('serviceConfig', container.get('serviceConfig'))
+    .value('settings', container.get('settings'))
+    .value('time', container.get('time'))
+    .value('urlEncodeFilter', container.get('urlEncodeFilter'))
 
     .config(configureLocation)
     .config(configureRoutes)
     .config(configureToastr)
+
+    // Make Angular built-ins available to services constructed by `container`.
+    .run(registerAngularServices)
 
     .run(persistDefaults)
     .run(sendPageView)
