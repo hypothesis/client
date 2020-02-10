@@ -5,10 +5,10 @@ import $ from 'jquery';
  * element of the specified class and returns the highlight Elements.
  *
  * @param {NormalizedRange} normedRange - Range to be highlighted.
- * @param {string} cssClass - A CSS class to use for the highlight (default: 'annotator-hl')
+ * @param {string} cssClass - A CSS class to use for the highlight
  * @return {HTMLElement[]} - Elements wrapping text in `normedRange` to add a highlight effect
  */
-export function highlightRange(normedRange, cssClass = 'annotator-hl') {
+export function highlightRange(normedRange, cssClass = 'hypothesis-highlight') {
   const white = /^\s*$/;
 
   // A custom element name is used here rather than `<span>` to reduce the

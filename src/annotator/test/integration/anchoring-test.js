@@ -27,11 +27,11 @@ function annotateQuote(quote) {
  * @param {Element} container
  */
 function highlightedPhrases(container) {
-  return Array.from(container.querySelectorAll('.annotator-hl')).map(function(
-    el
-  ) {
-    return el.textContent;
-  });
+  return Array.from(container.querySelectorAll('.hypothesis-highlight')).map(
+    function(el) {
+      return el.textContent;
+    }
+  );
 }
 
 function simplifyWhitespace(quote) {

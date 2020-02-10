@@ -218,18 +218,18 @@ describe 'Guest', ->
           {annotation: {$tag: 'tag2'}, highlights: highlight1.toArray()}
         ]
         emitGuestEvent('focusAnnotations', ['tag1'])
-        assert.isTrue(highlight0.hasClass('annotator-hl-focused'))
+        assert.isTrue(highlight0.hasClass('hypothesis-highlight-focused'))
 
       it 'unfocuses any annotations without a matching tag', ->
-        highlight0 = $('<span class="annotator-hl-focused"></span>')
-        highlight1 = $('<span class="annotator-hl-focused"></span>')
+        highlight0 = $('<span class="hypothesis-highlight-focused"></span>')
+        highlight1 = $('<span class="hypothesis-highlight-focused"></span>')
         guest = createGuest()
         guest.anchors = [
           {annotation: {$tag: 'tag1'}, highlights: highlight0.toArray()}
           {annotation: {$tag: 'tag2'}, highlights: highlight1.toArray()}
         ]
         emitGuestEvent('focusAnnotations', 'ctx', ['tag1'])
-        assert.isFalse(highlight1.hasClass('annotator-hl-focused'))
+        assert.isFalse(highlight1.hasClass('hypothesis-highlight-focused'))
 
     describe 'on "scrollToAnnotation" event', ->
 

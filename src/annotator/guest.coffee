@@ -23,13 +23,13 @@ animationPromise = (fn) ->
         reject(error)
 
 module.exports = class Guest extends Delegator
-  SHOW_HIGHLIGHTS_CLASS = 'annotator-highlights-always-on'
+  SHOW_HIGHLIGHTS_CLASS = 'hypothesis-highlights-always-on'
 
   # Events to be bound on Delegator#element.
   events:
-    ".annotator-hl click":               "onHighlightClick"
-    ".annotator-hl mouseover":           "onHighlightMouseover"
-    ".annotator-hl mouseout":            "onHighlightMouseout"
+    ".hypothesis-highlight click":               "onHighlightClick"
+    ".hypothesis-highlight mouseover":           "onHighlightMouseover"
+    ".hypothesis-highlight mouseout":            "onHighlightMouseout"
     "click":                             "onElementClick"
     "touchstart":                        "onElementTouchStart"
 
@@ -153,7 +153,7 @@ module.exports = class Guest extends Delegator
     crossframe.on 'focusAnnotations', (tags=[]) =>
       for anchor in @anchors when anchor.highlights?
         toggle = anchor.annotation.$tag in tags
-        $(anchor.highlights).toggleClass('annotator-hl-focused', toggle)
+        $(anchor.highlights).toggleClass('hypothesis-highlight-focused', toggle)
 
     crossframe.on 'scrollToAnnotation', (tag) =>
       for anchor in @anchors when anchor.highlights?
@@ -181,7 +181,7 @@ module.exports = class Guest extends Delegator
     this.selections.unsubscribe()
     @adder.remove()
 
-    @element.find('.annotator-hl').each ->
+    @element.find('.hypothesis-highlight').each ->
       $(this).contents().insertBefore(this)
       $(this).remove()
 
