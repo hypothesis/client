@@ -1,4 +1,6 @@
 import SearchClient from '../search-client';
+import { isNew } from '../util/annotation-metadata';
+import { privatePermissions, sharedPermissions } from '../util/permissions';
 
 // @ngInject
 export default function annotationsService(
@@ -59,7 +61,63 @@ export default function annotationsService(
     searchClient.get({ uri: uris, group: groupId });
   }
 
+  /**
+   * Apply changes for the given `annotation` from its draft in the store (if
+   * any) and return a new object with those changes integrated.
+   */
+  function applyDraftChanges(annotation) {
+    const changes = {};
+    const draft = store.getDraft(annotation);
+
+    if (draft) {
+      changes.tags = draft.tags;
+      changes.text = draft.text;
+      changes.permissions = draft.isPrivate
+        ? privatePermissions(annotation.user)
+        : sharedPermissions(annotation.user, annotation.group);
+    }
+
+    // Integrate changes from draft into object to be persisted
+    return { ...annotation, ...changes };
+  }
+
+  /**
+   * Save new (or update existing) annotation. On success,
+   * the annotation's `Draft` will be removed and the annotation added
+   * to the store.
+   */
+  async function save(annotation) {
+    let saved;
+
+    const annotationWithChanges = applyDraftChanges(annotation);
+
+    if (isNew(annotation)) {
+      saved = api.annotation.create({}, annotationWithChanges);
+    } else {
+      saved = api.annotation.update(
+        { id: annotation.id },
+        annotationWithChanges
+      );
+    }
+
+    const savedAnnotation = await saved;
+
+    Object.keys(annotation).forEach(key => {
+      if (key[0] === '$') {
+        savedAnnotation[key] = annotation[key];
+      }
+    });
+
+    // Clear out any pending changes (draft)
+    store.removeDraft(annotation);
+
+    // Add (or, in effect, update) the annotation to the store's collection
+    store.addAnnotations([savedAnnotation]);
+    return savedAnnotation;
+  }
+
   return {
     load,
+    save,
   };
 }

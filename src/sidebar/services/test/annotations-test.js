@@ -1,5 +1,7 @@
 import EventEmitter from 'tiny-emitter';
 
+import * as fixtures from '../../test/annotation-fixtures';
+
 import annotationsService from '../annotations';
 import { $imports } from '../annotations';
 
@@ -33,6 +35,7 @@ describe('annotationService', () => {
   let fakeStore;
   let fakeApi;
   let fakeAnnotationMapper;
+  let fakeIsNew;
   let fakeStreamer;
   let fakeStreamFilter;
 
@@ -48,17 +51,25 @@ describe('annotationService', () => {
       unloadAnnotations: sinon.stub(),
     };
     fakeApi = {
+      annotation: {
+        create: sinon.stub().resolves(fixtures.defaultAnnotation()),
+        update: sinon.stub().resolves(fixtures.defaultAnnotation()),
+      },
       search: sinon.stub(),
     };
+    fakeIsNew = sinon.stub().returns(true);
     fakeStore = {
-      getState: sinon.stub(),
+      addAnnotations: sinon.stub(),
+      annotationFetchFinished: sinon.stub(),
+      annotationFetchStarted: sinon.stub(),
       frames: sinon.stub(),
+      getDraft: sinon.stub().returns(null),
+      getState: sinon.stub(),
+      hasSelectedAnnotations: sinon.stub(),
+      removeDraft: sinon.stub(),
       searchUris: sinon.stub(),
       savedAnnotations: sinon.stub(),
-      hasSelectedAnnotations: sinon.stub(),
       updateFrameAnnotationFetchStatus: sinon.stub(),
-      annotationFetchStarted: sinon.stub(),
-      annotationFetchFinished: sinon.stub(),
     };
     fakeStreamer = {
       setConfig: sinon.stub(),
@@ -76,6 +87,7 @@ describe('annotationService', () => {
 
     $imports.$mock({
       '../search-client': FakeSearchClient,
+      '../util/annotation-metadata': { isNew: fakeIsNew },
     });
   });
 
@@ -263,6 +275,121 @@ describe('annotationService', () => {
       searchClients[0].emit('error', error);
 
       assert.calledWith(console.error, error);
+    });
+  });
+
+  describe('save', () => {
+    let svc;
+
+    beforeEach(() => {
+      svc = service();
+    });
+
+    it('calls the `create` API service for new annotations', () => {
+      fakeIsNew.returns(true);
+      // Using the new-annotation fixture has no bearing on which API method
+      // will get called because `isNew` is mocked, but it has representative
+      // properties
+      const annotation = fixtures.newAnnotation();
+      return svc.save(annotation).then(() => {
+        assert.calledOnce(fakeApi.annotation.create);
+        assert.notCalled(fakeApi.annotation.update);
+      });
+    });
+
+    it('calls the `update` API service for pre-existing annotations', () => {
+      fakeIsNew.returns(false);
+
+      const annotation = fixtures.defaultAnnotation();
+      return svc.save(annotation).then(() => {
+        assert.calledOnce(fakeApi.annotation.update);
+        assert.notCalled(fakeApi.annotation.create);
+      });
+    });
+
+    it('calls the relevant API service with an object that has any draft changes integrated', () => {
+      const annotation = fixtures.defaultAnnotation();
+      annotation.text = 'not this';
+      annotation.tags = ['nope'];
+
+      fakeStore.getDraft.returns({
+        tags: ['one', 'two'],
+        text: 'my text',
+        isPrivate: true,
+        annotation: fixtures.defaultAnnotation(),
+      });
+
+      return svc.save(fixtures.defaultAnnotation()).then(() => {
+        const annotationWithChanges = fakeApi.annotation.create.getCall(0)
+          .args[1];
+        assert.equal(annotationWithChanges.text, 'my text');
+        assert.sameMembers(annotationWithChanges.tags, ['one', 'two']);
+        // Permissions converted to "private"
+        assert.include(
+          annotationWithChanges.permissions.read,
+          fixtures.defaultAnnotation().user
+        );
+        assert.notInclude(annotationWithChanges.permissions.read, [
+          'group:__world__',
+        ]);
+      });
+    });
+
+    context('successful save', () => {
+      it('copies over internal app-specific keys to the annotation object', () => {
+        fakeIsNew.returns(false);
+        const annotation = fixtures.defaultAnnotation();
+        annotation.$tag = 'mytag';
+        annotation.$foo = 'bar';
+
+        // The fixture here has no `$`-prefixed props
+        fakeApi.annotation.update.resolves(fixtures.defaultAnnotation());
+
+        return svc.save(annotation).then(() => {
+          const savedAnnotation = fakeStore.addAnnotations.getCall(0)
+            .args[0][0];
+          assert.equal(savedAnnotation.$tag, 'mytag');
+          assert.equal(savedAnnotation.$foo, 'bar');
+        });
+      });
+
+      it('removes the annotation draft', () => {
+        const annotation = fixtures.defaultAnnotation();
+
+        return svc.save(annotation).then(() => {
+          assert.calledWith(fakeStore.removeDraft, annotation);
+        });
+      });
+
+      it('adds the updated annotation to the store', () => {
+        const annotation = fixtures.defaultAnnotation();
+        fakeIsNew.returns(false);
+        fakeApi.annotation.update.resolves(annotation);
+
+        return svc.save(annotation).then(() => {
+          assert.calledWith(fakeStore.addAnnotations, [annotation]);
+        });
+      });
+    });
+
+    context('error on save', () => {
+      it('does not remove the annotation draft', () => {
+        fakeApi.annotation.update.rejects();
+        fakeIsNew.returns(false);
+
+        return svc.save(fixtures.defaultAnnotation()).catch(() => {
+          assert.notCalled(fakeStore.removeDraft);
+        });
+      });
+
+      it('does not add the annotation to the store', () => {
+        fakeApi.annotation.update.rejects();
+        fakeIsNew.returns(false);
+
+        return svc.save(fixtures.defaultAnnotation()).catch(() => {
+          assert.notCalled(fakeStore.addAnnotations);
+        });
+      });
     });
   });
 });

@@ -57,6 +57,10 @@ const needsPolyfill = {
     return !hasMethods(Object, 'entries', 'values');
   },
 
+  es2018: () => {
+    return !hasMethods(Promise.prototype, 'finally');
+  },
+
   // Test for a fully-working URL constructor.
   url: () => {
     try {
