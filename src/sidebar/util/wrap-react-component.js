@@ -7,6 +7,10 @@ function useExpressionBinding(propName) {
 }
 
 /**
+ * @typedef {import('../../shared/injector').Injector} Injector
+ */
+
+/**
  * Controller for an Angular component that wraps a React component.
  *
  * This is responsible for taking the inputs to the Angular component and
@@ -14,14 +18,16 @@ function useExpressionBinding(propName) {
  * has been created.
  */
 class ReactController {
-  constructor($element, $injector, $scope, type) {
+  constructor($element, services, $scope, type) {
     /** The DOM element where the React component should be rendered. */
     this.domElement = $element[0];
 
     /**
-     * The Angular service injector, used by this component and its descendants.
+     * The services injector, used by this component and its descendants.
+     *
+     * @type {Injector}
      */
-    this.$injector = $injector;
+    this.services = services;
 
     /** The React component function or class. */
     this.type = type;
@@ -83,10 +89,10 @@ class ReactController {
 
   updateReactComponent() {
     // Render component, with a `ServiceContext.Provider` wrapper which
-    // provides access to Angular services via `withServices` or `useContext`
+    // provides access to services via `withServices` or `useContext`
     // in child components.
     render(
-      <ServiceContext.Provider value={this.$injector}>
+      <ServiceContext.Provider value={this.services}>
         <this.type {...this.props} />
       </ServiceContext.Provider>,
       this.domElement
@@ -103,14 +109,16 @@ class ReactController {
  * one-way ('<') bindings except for those with names matching /^on[A-Z]/ which
  * are assumed to be callbacks that use expression ('&') bindings.
  *
- * If the React component needs access to an Angular service, it can get at
+ * If the React component needs access to a service, it can get at
  * them using the `withServices` wrapper from service-context.js.
  *
  * @param {Function} type - The React component class or function
+ * @param {Injector} services
+ *   Dependency injection container providing services that components use.
  * @return {Object} -
  *   An AngularJS component spec for use with `angular.component(...)`
  */
-export default function wrapReactComponent(type) {
+export default function wrapReactComponent(type, services) {
   if (!type.propTypes) {
     throw new Error(
       `React component ${type.name} does not specify its inputs using "propTypes"`
@@ -122,8 +130,8 @@ export default function wrapReactComponent(type) {
    * component being wrapped.
    */
   // @ngInject
-  function createController($element, $injector, $scope) {
-    return new ReactController($element, $injector, $scope, type);
+  function createController($element, $scope) {
+    return new ReactController($element, services, $scope, type);
   }
 
   const bindings = {};

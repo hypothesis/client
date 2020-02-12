@@ -64,7 +64,7 @@ export function withServices(Component) {
   function Wrapper(props) {
     // Get the current dependency injector instance that is provided by a
     // `ServiceContext.Provider` somewhere higher up the component tree.
-    const $injector = useContext(ServiceContext);
+    const injector = useContext(ServiceContext);
 
     // Inject services, unless they have been overridden by props passed from
     // the parent component.
@@ -80,7 +80,7 @@ export function withServices(Component) {
       }
 
       if (!(service in props)) {
-        services[service] = $injector.get(service);
+        services[service] = injector.get(service);
       }
     }
     return <Component {...services} {...props} />;

@@ -3,6 +3,7 @@ import { Component, createElement } from 'preact';
 import { useContext } from 'preact/hooks';
 import propTypes from 'prop-types';
 
+import { Injector } from '../../../shared/injector';
 import { createDirective } from '../../directive/test/util';
 import { ServiceContext } from '../service-context';
 import wrapReactComponent from '../wrap-react-component';
@@ -58,11 +59,15 @@ describe('wrapReactComponent', () => {
     return { element, onClick, onDblClick };
   }
 
+  let servicesInjector;
+
   beforeEach(() => {
+    const servicesInjector = new Injector();
+    servicesInjector.register('theme', { value: 'dark' });
+
     angular
       .module('app', [])
-      .component('btn', wrapReactComponent(Button))
-      .value('theme', 'dark');
+      .component('btn', wrapReactComponent(Button, servicesInjector));
     angular.mock.module('app');
   });
 
@@ -73,7 +78,7 @@ describe('wrapReactComponent', () => {
   });
 
   it('derives Angular component "bindings" from React "propTypes"', () => {
-    const ngComponent = wrapReactComponent(Button);
+    const ngComponent = wrapReactComponent(Button, servicesInjector);
     assert.deepEqual(ngComponent.bindings, {
       label: '<',
       isDisabled: '<',
@@ -141,7 +146,7 @@ describe('wrapReactComponent', () => {
     angular
       .module('app', [])
       .component('parent', parentComponent)
-      .component('child', wrapReactComponent(ChildComponent));
+      .component('child', wrapReactComponent(ChildComponent, servicesInjector));
     angular.mock.module('app');
 
     // Render the component with the child initially visible.
@@ -160,7 +165,7 @@ describe('wrapReactComponent', () => {
       return <div>Hello world</div>;
     }
     assert.throws(
-      () => wrapReactComponent(TestComponent),
+      () => wrapReactComponent(TestComponent, servicesInjector),
       'React component TestComponent does not specify its inputs using "propTypes"'
     );
   });
@@ -231,7 +236,7 @@ describe('wrapReactComponent', () => {
     angular
       .module('app', [])
       .component('parent', parentComponent)
-      .component('child', wrapReactComponent(Child));
+      .component('child', wrapReactComponent(Child, servicesInjector));
     angular.mock.module('app');
 
     const element = createDirective(document, 'parent');
