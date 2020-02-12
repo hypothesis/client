@@ -25,7 +25,7 @@ function StreamSearchInput({ $location, $rootScope }) {
     $rootScope.$on('$locationChangeSuccess', () => {
       setQuery($location.search().q);
     });
-  });
+  }, [$location, $rootScope]);
 
   return <SearchInput query={query} onSearch={search} alwaysExpanded={true} />;
 }
