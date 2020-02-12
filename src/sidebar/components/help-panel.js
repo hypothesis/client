@@ -105,34 +105,30 @@ function HelpPanel({ auth, session }) {
         </h3>
         <div className="help-panel__footer">
           {activeSubPanel === 'versionInfo' && (
-            // FIXME-A11Y
-            // eslint-disable-next-line jsx-a11y/anchor-is-valid
-            <a
-              href="#"
+            <button
               className="help-panel__sub-panel-link"
               onClick={e => openSubPanel(e, 'tutorial')}
+              aria-label="Show tutorial panel"
             >
-              <div>Getting started</div>
+              Getting started
               <SvgIcon
                 name="arrow-right"
                 className="help-panel__sub-panel-link-icon"
               />
-            </a>
+            </button>
           )}
           {activeSubPanel === 'tutorial' && (
-            // FIXME-A11Y
-            // eslint-disable-next-line jsx-a11y/anchor-is-valid
-            <a
-              href="#"
+            <button
               className="help-panel__sub-panel-link"
               onClick={e => openSubPanel(e, 'versionInfo')}
+              aria-label="Show version information panel"
             >
-              <div>About this version</div>
+              About this version
               <SvgIcon
                 name="arrow-right"
                 className="help-panel__sub-panel-link-icon"
               />
-            </a>
+            </button>
           )}
         </div>
       </div>

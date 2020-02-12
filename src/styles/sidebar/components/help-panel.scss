@@ -1,3 +1,4 @@
+@use "../../mixins/buttons";
 @use "../../variables" as var;
 
 .help-panel {
@@ -29,6 +30,7 @@
   }
 
   &__sub-panel-link {
+    @include buttons.reset-native-btn-styles;
     display: flex;
     align-items: center;
     margin-left: auto;
