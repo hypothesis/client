@@ -5,6 +5,7 @@ import { act } from 'preact/test-utils';
 import * as fixtures from '../../test/annotation-fixtures';
 
 import mockImportedComponents from '../../../test-util/mock-imported-components';
+import { waitFor } from '../../../test-util/wait';
 
 // @TODO Note this import as `Annotation` for easier updating later
 
@@ -17,6 +18,10 @@ describe('AnnotationOmega', () => {
   // Dependency Mocks
   let fakeMetadata;
   let fakePermissions;
+
+  // Injected dependency mocks
+  let fakeAnnotationsService;
+  let fakeFlash;
   let fakeStore;
 
   const setEditingMode = (isEditing = true) => {
@@ -32,6 +37,8 @@ describe('AnnotationOmega', () => {
     return mount(
       <Annotation
         annotation={fixtures.defaultAnnotation()}
+        annotationsService={fakeAnnotationsService}
+        flash={fakeFlash}
         onReplyCountClick={fakeOnReplyCountClick}
         replyCount={0}
         showDocumentInfo={false}
@@ -42,6 +49,14 @@ describe('AnnotationOmega', () => {
 
   beforeEach(() => {
     fakeOnReplyCountClick = sinon.stub();
+
+    fakeAnnotationsService = {
+      save: sinon.stub().resolves(),
+    };
+
+    fakeFlash = {
+      error: sinon.stub(),
+    };
 
     fakeMetadata = {
       isNew: sinon.stub(),
@@ -71,6 +86,8 @@ describe('AnnotationOmega', () => {
   afterEach(() => {
     $imports.$restore();
   });
+
+  it('should test `isSaving`');
 
   describe('annotation quote', () => {
     it('renders quote if annotation has a quote', () => {
@@ -178,6 +195,36 @@ describe('AnnotationOmega', () => {
       assert.isTrue(
         wrapper.find('AnnotationPublishControl').props().isDisabled
       );
+    });
+
+    context('saving an annotation', () => {
+      it('should save the annotation when the publish control invokes the `onSave` callback', () => {
+        setEditingMode(true);
+
+        const wrapper = createComponent();
+        wrapper
+          .find('AnnotationPublishControl')
+          .props()
+          .onSave();
+
+        assert.calledWith(
+          fakeAnnotationsService.save,
+          wrapper.props().annotation
+        );
+      });
+
+      it('should flash an error message on failure', async () => {
+        setEditingMode(true);
+        fakeAnnotationsService.save.rejects();
+
+        const wrapper = createComponent();
+        wrapper
+          .find('AnnotationPublishControl')
+          .props()
+          .onSave();
+
+        await waitFor(() => fakeFlash.error.called);
+      });
     });
   });
 

@@ -1,10 +1,11 @@
 import { createElement } from 'preact';
-import { useEffect } from 'preact/hooks';
+import { useEffect, useState } from 'preact/hooks';
 import propTypes from 'prop-types';
 
 import useStore from '../store/use-store';
 import { isHighlight, isNew, quote } from '../util/annotation-metadata';
 import { isShared } from '../util/permissions';
+import { withServices } from '../util/service-context';
 
 import AnnotationActionBar from './annotation-action-bar';
 import AnnotationBody from './annotation-body';
@@ -20,6 +21,8 @@ import TagList from './tag-list';
  */
 function AnnotationOmega({
   annotation,
+  annotationsService,
+  flash,
   onReplyCountClick,
   replyCount,
   showDocumentInfo,
@@ -30,26 +33,27 @@ function AnnotationOmega({
   const draft = useStore(store => store.getDraft(annotation));
   const group = useStore(store => store.getGroup(annotation.group));
 
-  useEffect(() => {
-    // TEMPORARY. Create a new draft for new (non-highlight) annotations
-    // to put the component in "edit mode."
-    if (!draft && isNew(annotation) && !isHighlight(annotation)) {
-      createDraft(annotation, {
-        tags: annotation.tags,
-        text: annotation.text,
-        isPrivate: !isShared(annotation.permissions),
-      });
-    }
-  }, [annotation, draft, createDraft]);
-
   const isPrivate = draft ? draft.isPrivate : !isShared(annotation.permissions);
   const tags = draft ? draft.tags : annotation.tags;
   const text = draft ? draft.text : annotation.text;
 
   const hasQuote = !!quote(annotation);
   const isEmpty = !text && !tags.length;
-  const isSaving = false;
+
+  const [isSaving, setIsSaving] = useState(false);
   const isEditing = !!draft && !isSaving;
+
+  useEffect(() => {
+    // TEMPORARY. Create a new draft for new (non-highlight) annotations
+    // to put the component in "edit mode."
+    if (!isSaving && !draft && isNew(annotation) && !isHighlight(annotation)) {
+      createDraft(annotation, {
+        tags: annotation.tags,
+        text: annotation.text,
+        isPrivate: !isShared(annotation.permissions),
+      });
+    }
+  }, [annotation, draft, createDraft, isSaving]);
 
   const shouldShowActions = !isEditing && !isNew(annotation);
   const shouldShowLicense = isEditing && !isPrivate && group.type !== 'private';
@@ -62,9 +66,19 @@ function AnnotationOmega({
     createDraft(annotation, { ...draft, text });
   };
 
+  const onSave = async () => {
+    setIsSaving(true);
+    try {
+      await annotationsService.save(annotation);
+    } catch (err) {
+      flash.error(err.message, 'Saving annotation failed');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   // TODO
   const fakeOnReply = () => alert('Reply: TBD');
-  const fakeOnSave = () => alert('Save changes: TBD');
 
   return (
     <div className="annotation-omega">
@@ -90,7 +104,7 @@ function AnnotationOmega({
             <AnnotationPublishControl
               annotation={annotation}
               isDisabled={isEmpty}
-              onSave={fakeOnSave}
+              onSave={onSave}
             />
           )}
         </div>
@@ -117,6 +131,12 @@ AnnotationOmega.propTypes = {
   replyCount: propTypes.number.isRequired,
   /** Should extended document info be rendered (e.g. in non-sidebar contexts)? */
   showDocumentInfo: propTypes.bool.isRequired,
+
+  /* Injected services */
+  annotationsService: propTypes.object.isRequired,
+  flash: propTypes.object.isRequired,
 };
 
-export default AnnotationOmega;
+AnnotationOmega.injectedProps = ['annotationsService', 'flash'];
+
+export default withServices(AnnotationOmega);
