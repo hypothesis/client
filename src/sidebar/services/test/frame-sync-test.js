@@ -5,7 +5,7 @@ import events from '../../events';
 import * as annotationFixtures from '../../test/annotation-fixtures';
 import createFakeStore from '../../test/fake-redux-store';
 import uiConstants from '../../ui-constants';
-import FrameSync, { formatAnnot } from '../frame-sync';
+import FrameSync, { $imports, formatAnnot } from '../frame-sync';
 
 const fixtures = {
   ann: Object.assign({ $tag: 't1' }, annotationFixtures.defaultAnnotation()),
@@ -90,7 +90,6 @@ describe('sidebar.frame-sync', function() {
     }
 
     angular.mock.module('app', {
-      Discovery: FakeDiscovery,
       store: fakeStore,
       bridge: fakeBridge,
     });
@@ -99,9 +98,14 @@ describe('sidebar.frame-sync', function() {
       $rootScope = _$rootScope_;
       frameSync = _frameSync_;
     });
+
+    $imports.$mock({
+      '../../shared/discovery': FakeDiscovery,
+    });
   });
 
   beforeEach(function() {
+    $imports.$restore();
     frameSync.connect();
   });
 

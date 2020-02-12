@@ -2,7 +2,6 @@ import { jsonConfigsFrom } from '../shared/settings';
 
 import crossOriginRPC from './cross-origin-rpc.js';
 import addAnalytics from './ga';
-import serviceConfig from './service-config';
 import disableOpenerForExternalLinks from './util/disable-opener-for-external-links';
 import { fetchConfig } from './util/fetch-config';
 import * as sentry from './util/sentry';
@@ -197,14 +196,6 @@ import store from './store';
 
 // Utilities.
 
-import Discovery from '../shared/discovery';
-
-import { encode as urlEncodeFilter } from './filter/url';
-import OAuthClient from './util/oauth-client';
-import * as random from './util/random';
-import * as time from './util/time';
-import VirtualThreadList from './virtual-thread-list';
-
 import { Injector } from '../shared/injector';
 
 function startAngularApp(config) {
@@ -247,15 +238,8 @@ function startAngularApp(config) {
   // that use them, since they don't depend on instances of other services.
   container
     .register('$window', { value: window })
-    .register('Discovery', { value: Discovery })
-    .register('OAuthClient', { value: OAuthClient })
-    .register('VirtualThreadList', { value: VirtualThreadList })
     .register('isSidebar', { value: isSidebar })
-    .register('random', { value: random })
-    .register('serviceConfig', { value: serviceConfig })
-    .register('settings', { value: config })
-    .register('time', { value: time })
-    .register('urlEncodeFilter', { value: urlEncodeFilter });
+    .register('settings', { value: config });
 
   // Register services which only Angular can construct, once Angular has
   // constructed them.
@@ -317,14 +301,12 @@ function startAngularApp(config) {
     .service('annotationMapper', () => container.get('annotationMapper'))
     .service('annotationsService', () => container.get('annotationsService'))
     .service('api', () => container.get('api'))
-    .service('apiRoutes', () => container.get('apiRoutes'))
     .service('auth', () => container.get('auth'))
     .service('bridge', () => container.get('bridge'))
     .service('features', () => container.get('features'))
     .service('flash', () => container.get('flash'))
     .service('frameSync', () => container.get('frameSync'))
     .service('groups', () => container.get('groups'))
-    .service('localStorage', () => container.get('localStorage'))
     .service('permissions', () => container.get('permissions'))
     .service('persistedDefaults', () => container.get('persistedDefaults'))
     .service('rootThread', () => container.get('rootThread'))
@@ -334,22 +316,13 @@ function startAngularApp(config) {
     .service('streamer', () => container.get('streamer'))
     .service('streamFilter', () => container.get('streamFilter'))
     .service('tags', () => container.get('tags'))
-    .service('unicode', () => container.get('unicode'))
-    .service('viewFilter', () => container.get('viewFilter'))
 
     // Redux store
     .service('store', () => container.get('store'))
 
     // Utilities
-    .value('Discovery', container.get('Discovery'))
-    .value('OAuthClient', container.get('OAuthClient'))
-    .value('VirtualThreadList', container.get('VirtualThreadList'))
     .value('isSidebar', container.get('isSidebar'))
-    .value('random', container.get('random'))
-    .value('serviceConfig', container.get('serviceConfig'))
     .value('settings', container.get('settings'))
-    .value('time', container.get('time'))
-    .value('urlEncodeFilter', container.get('urlEncodeFilter'))
 
     .config(configureLocation)
     .config(configureRoutes)

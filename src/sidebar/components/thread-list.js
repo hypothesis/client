@@ -1,5 +1,6 @@
 import events from '../events';
 import * as metadata from '../util/annotation-metadata';
+import VirtualThreadList from '../virtual-thread-list';
 
 /**
  * Component which displays a virtualized list of annotation threads.
@@ -47,13 +48,7 @@ const virtualThreadOptions = {
 };
 
 // @ngInject
-function ThreadListController(
-  $element,
-  $scope,
-  settings,
-  store,
-  VirtualThreadList
-) {
+function ThreadListController($element, $scope, settings, store) {
   // `visibleThreads` keeps track of the subset of all threads matching the
   // current filters which are in or near the viewport and the view then renders
   // only those threads, using placeholders above and below the visible threads

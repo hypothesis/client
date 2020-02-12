@@ -2,7 +2,7 @@ import angular from 'angular';
 
 import events from '../../events';
 import FakeWindow from '../../util/test/fake-window';
-import authFactory from '../oauth-auth';
+import authFactory, { $imports } from '../oauth-auth';
 
 const DEFAULT_TOKEN_EXPIRES_IN_SECS = 1000;
 const TOKEN_KEY = 'hypothesis.oauth.hypothes%2Eis.token';
@@ -99,16 +99,21 @@ describe('sidebar.oauth-auth', function() {
       flash: fakeFlash,
       localStorage: fakeLocalStorage,
       settings: fakeSettings,
-      OAuthClient: FakeOAuthClient,
     });
 
     angular.mock.inject((_auth_, _$rootScope_) => {
       auth = _auth_;
       $rootScope = _$rootScope_;
     });
+
+    $imports.$mock({
+      '../util/oauth-client': FakeOAuthClient,
+    });
   });
 
   afterEach(function() {
+    $imports.$restore();
+
     performance.now.restore();
     clock.restore();
   });

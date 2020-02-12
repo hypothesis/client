@@ -4,7 +4,7 @@ import EventEmitter from 'tiny-emitter';
 
 import * as util from '../../directive/test/util';
 import events from '../../events';
-import threadList from '../thread-list';
+import threadList, { $imports } from '../thread-list';
 
 const annotFixtures = immutable({
   annotation: { $tag: 't1', id: '1', text: 'text' },
@@ -132,14 +132,19 @@ describe('threadList', function() {
 
   beforeEach(function() {
     angular.mock.module('app', {
-      VirtualThreadList: FakeVirtualThreadList,
       settings: fakeSettings,
       store: fakeStore,
     });
     threadListContainers = [];
+
+    $imports.$mock({
+      '../virtual-thread-list': FakeVirtualThreadList,
+    });
   });
 
   afterEach(function() {
+    $imports.$restore();
+
     threadListContainers.forEach(function(el) {
       el.remove();
     });

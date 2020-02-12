@@ -1,5 +1,6 @@
 import events from '../events';
 import serviceConfig from '../service-config';
+import OAuthClient from '../util/oauth-client';
 import { resolve } from '../util/url';
 
 /**
@@ -24,7 +25,6 @@ import { resolve } from '../util/url';
 export default function auth(
   $rootScope,
   $window,
-  OAuthClient,
   apiRoutes,
   flash,
   localStorage,
@@ -305,7 +305,6 @@ export default function auth(
 auth.$inject = [
   '$rootScope',
   '$window',
-  'OAuthClient',
   'apiRoutes',
   'flash',
   'localStorage',
