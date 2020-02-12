@@ -146,19 +146,22 @@ describe('AutocompleteList', function() {
     );
   });
 
-  it('sets the `aria-selected` attribute on the active index ', () => {
+  it('sets the `aria-selected` attribute to "true" on the active item and "false" for all others', () => {
     const wrapper = createComponent({ open: true, activeItem: 0 });
-    assert.isTrue(
+    assert.equal(
       wrapper
         .find('li')
         .at(0)
-        .prop('aria-selected')
+        .prop('aria-selected'),
+      'true'
     );
-    assert.isFalse(
+
+    assert.equal(
       wrapper
         .find('li')
         .at(1)
-        .prop('aria-selected')
+        .prop('aria-selected'),
+      'false'
     );
   });
 

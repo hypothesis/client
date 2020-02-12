@@ -34,7 +34,7 @@ export default function AutocompleteList({
         <li
           key={`autocomplete-list-${index}`}
           role="option"
-          aria-selected={activeItem === index}
+          aria-selected={(activeItem === index).toString()}
           className={classnames(
             {
               'is-selected': activeItem === index,
