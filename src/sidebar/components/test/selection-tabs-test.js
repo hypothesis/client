@@ -58,7 +58,7 @@ describe('SelectionTabs', function() {
   context('displays selection tabs and counts', function() {
     it('should display the tabs and counts of annotations and notes', function() {
       const wrapper = createComponent();
-      const tabs = wrapper.find('a');
+      const tabs = wrapper.find('button');
       assert.isTrue(tabs.at(0).contains('Annotations'));
       assert.equal(
         tabs
@@ -79,8 +79,8 @@ describe('SelectionTabs', function() {
 
     it('should display annotations tab as selected', function() {
       const wrapper = createComponent();
-      const aTags = wrapper.find('a');
-      assert.isTrue(aTags.at(0).hasClass('is-selected'));
+      const tabs = wrapper.find('button');
+      assert.isTrue(tabs.at(0).hasClass('is-selected'));
     });
 
     it('should display notes tab as selected', function() {
@@ -88,7 +88,7 @@ describe('SelectionTabs', function() {
         selection: { selectedTab: uiConstants.TAB_NOTES },
       });
       const wrapper = createComponent({});
-      const tabs = wrapper.find('a');
+      const tabs = wrapper.find('button');
       assert.isTrue(tabs.at(1).hasClass('is-selected'));
     });
 
@@ -98,7 +98,7 @@ describe('SelectionTabs', function() {
       });
       fakeStore.orphanCount.returns(1);
       const wrapper = createComponent({});
-      const tabs = wrapper.find('a');
+      const tabs = wrapper.find('button');
       assert.isTrue(tabs.at(2).hasClass('is-selected'));
     });
 
@@ -107,7 +107,7 @@ describe('SelectionTabs', function() {
         selection: { selectedTab: uiConstants.TAB_ORPHANS },
       });
       const wrapper = createComponent({});
-      const tabs = wrapper.find('a');
+      const tabs = wrapper.find('button');
       assert.equal(tabs.length, 2);
     });
 

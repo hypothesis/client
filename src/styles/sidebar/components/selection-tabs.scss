@@ -1,4 +1,5 @@
 @use "../../mixins/focus";
+@use "../../mixins/buttons";
 @use "../../variables" as var;
 
 .selection-tabs {
@@ -19,6 +20,7 @@
 }
 
 .selection-tabs__type {
+  @include buttons.reset-native-btn-styles;
   @include focus.outline-on-keyboard-focus;
 
   color: var.$grey-6;
@@ -28,6 +30,10 @@
   min-height: 18px;
 
   user-select: none;
+
+  &:hover {
+    color: var.$link-color-hover;
+  }
 }
 
 .selection-tabs__type.is-selected {

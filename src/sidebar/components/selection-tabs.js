@@ -22,9 +22,7 @@ function Tab({
   type,
 }) {
   return (
-    // FIXME-A11Y
-    // eslint-disable-next-line jsx-a11y/anchor-is-valid
-    <a
+    <button
       className={classnames('selection-tabs__type', {
         'is-selected': selected,
       })}
@@ -38,7 +36,7 @@ function Tab({
       {count > 0 && !isWaitingToAnchor && (
         <span className="selection-tabs__count"> {count}</span>
       )}
-    </a>
+    </button>
   );
 }
 Tab.propTypes = {
