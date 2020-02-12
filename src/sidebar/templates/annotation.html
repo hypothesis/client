@@ -8,7 +8,8 @@
                          is-editing="vm.editing()"
                          on-reply-count-click="vm.onReplyCountClick()"
                          reply-count="vm.replyCount"
-                         show-document-info="vm.showDocumentInfo">
+                         show-document-info="vm.showDocumentInfo"
+                         thread-is-collapsed="vm.isCollapsed">
   </annotation-header>
 
   <annotation-quote annotation="vm.annotation" ng-if="vm.quote()">

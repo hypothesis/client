@@ -102,6 +102,7 @@ function AnnotationOmega({
         onReplyCountClick={onReplyCountClick}
         replyCount={replyCount}
         showDocumentInfo={showDocumentInfo}
+        threadIsCollapsed={threadIsCollapsed}
       />
       {hasQuote && <AnnotationQuote annotation={annotation} />}
       <AnnotationBody
