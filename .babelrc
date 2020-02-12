@@ -13,5 +13,15 @@
     "angularjs-annotate",
     "transform-async-to-promises"
   ],
-  "ignore": ["**/vendor/*"]
+  "ignore": ["**/vendor/*"],
+  "env": {
+    "development": {
+      "presets": [
+        ["@babel/preset-react", {
+          "development": true,
+          "pragma": "createElement"
+        }]
+      ]
+    }
+  }
 }
