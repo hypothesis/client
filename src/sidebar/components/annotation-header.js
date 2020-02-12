@@ -1,11 +1,12 @@
 import { createElement } from 'preact';
 import propTypes from 'prop-types';
 
-import { isHighlight } from '../util/annotation-metadata';
+import { isHighlight, isReply } from '../util/annotation-metadata';
 
 import AnnotationDocumentInfo from './annotation-document-info';
 import AnnotationShareInfo from './annotation-share-info';
 import AnnotationUser from './annotation-user';
+import Button from './button';
 import SvgIcon from './svg-icon';
 import Timestamp from './timestamp';
 
@@ -20,6 +21,7 @@ export default function AnnotationHeader({
   onReplyCountClick,
   replyCount,
   showDocumentInfo,
+  threadIsCollapsed,
 }) {
   const annotationLink = annotation.links ? annotation.links.html : '';
   const replyPluralized = !replyCount || replyCount > 1 ? 'replies' : 'reply';
@@ -27,17 +29,21 @@ export default function AnnotationHeader({
   const hasBeenEdited =
     annotation.updated && annotation.created !== annotation.updated;
 
+  const showReplyButton = threadIsCollapsed && isReply(annotation);
+  const replyButtonText = `${replyCount} ${replyPluralized}`;
+
   return (
     <header className="annotation-header">
       <div className="annotation-header__row">
         <AnnotationUser annotation={annotation} />
-        <div className="annotation-collapsed-replies">
-          {/* FIXME-A11Y */}
-          {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events, jsx-a11y/anchor-is-valid */}
-          <a className="annotation-link" onClick={onReplyCountClick}>
-            {replyCount} {replyPluralized}
-          </a>
-        </div>
+        {showReplyButton && (
+          <Button
+            className="annotation-header__reply-toggle"
+            buttonText={replyButtonText}
+            onClick={onReplyCountClick}
+            title="Expand replies"
+          />
+        )}
         {!isEditing && annotation.created && (
           <div className="annotation-header__timestamp">
             {hasBeenEdited && (
@@ -93,4 +99,8 @@ AnnotationHeader.propTypes = {
    * annotation and stream views
    */
   showDocumentInfo: propTypes.bool,
+  /**
+   * Is this thread currently collapsed?
+   */
+  threadIsCollapsed: propTypes.bool.isRequired,
 };
