@@ -34,11 +34,11 @@ module.exports = class Guest extends Delegator
 
   # Events to be bound on Delegator#element.
   events:
-    ".hypothesis-highlight click":               "onHighlightClick"
-    ".hypothesis-highlight mouseover":           "onHighlightMouseover"
-    ".hypothesis-highlight mouseout":            "onHighlightMouseout"
-    "click":                             "onElementClick"
-    "touchstart":                        "onElementTouchStart"
+    ".hypothesis-highlight click":      "onHighlightClick"
+    ".hypothesis-highlight mouseover":  "onHighlightMouseover"
+    ".hypothesis-highlight mouseout":   "onHighlightMouseout"
+    "click":                            "onElementClick"
+    "touchstart":                       "onElementTouchStart"
 
   options:
     Document: {}
