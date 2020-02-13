@@ -1,5 +1,7 @@
 @use '../variables' as var;
 
+// `hypothesis-highlights-always-on` is a class that is toggled on the root
+// of the annotated document when highlights are enabled/disabled.
 .hypothesis-highlights-always-on {
   .hypothesis-highlight {
     background-color: var.$highlight-color;
