@@ -22,6 +22,13 @@ animationPromise = (fn) ->
       catch error
         reject(error)
 
+# A selector which matches elements added to the DOM by Hypothesis (eg. for
+# highlights and annotation UI).
+#
+# We can simplify this once all classes are converted from an "annotator-"
+# prefix to a "hypothesis-" prefix.
+IGNORE_SELECTOR = '[class^="annotator-"],[class^="hypothesis-"]'
+
 module.exports = class Guest extends Delegator
   SHOW_HIGHLIGHTS_CLASS = 'hypothesis-highlights-always-on'
 
@@ -228,7 +235,7 @@ module.exports = class Guest extends Delegator
       # Find a target using the anchoring module.
       options = {
         cache: self.anchoringCache
-        ignoreSelector: '[class^="annotator-"]'
+        ignoreSelector: IGNORE_SELECTOR
       }
       return self.anchoring.anchor(root, target.selector, options)
       .then((range) -> {annotation, target, range})
@@ -326,7 +333,7 @@ module.exports = class Guest extends Delegator
     getSelectors = (range) ->
       options = {
         cache: self.anchoringCache
-        ignoreSelector: '[class^="annotator-"]'
+        ignoreSelector: IGNORE_SELECTOR
       }
       # Returns an array of selectors for the passed range.
       return self.anchoring.describe(root, range, options)
