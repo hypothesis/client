@@ -1,11 +1,34 @@
 @use '../variables' as var;
 
+@mixin screen-reader-only {
+  // Hide this content visually, but without preventing screen readers from
+  // reading it.
+  opacity: 0;
+
+  // Avoid this content affecting the visual layout.
+  position: absolute;
+}
+
 // `hypothesis-highlights-always-on` is a class that is toggled on the root
 // of the annotated document when highlights are enabled/disabled.
 .hypothesis-highlights-always-on {
   .hypothesis-highlight {
     background-color: var.$highlight-color;
     cursor: pointer;
+
+    // Make highlights visible to screen readers.
+    // See also - https://developer.paciellogroup.com/blog/2017/12/short-note-on-making-your-mark-more-accessible/.
+    &::before {
+      @include screen-reader-only;
+
+      // nb. The leading/trailing spaces are intended to ensure the text is treated
+      // as separate words by assisitve technologies from the content before/after it.
+      content: ' comment start ';
+    }
+    &::after {
+      @include screen-reader-only;
+      content: ' comment end ';
+    }
   }
 
   .hypothesis-highlight .hypothesis-highlight {
