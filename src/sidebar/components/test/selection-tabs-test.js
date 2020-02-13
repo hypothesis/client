@@ -81,6 +81,8 @@ describe('SelectionTabs', function() {
       const wrapper = createComponent();
       const tabs = wrapper.find('button');
       assert.isTrue(tabs.at(0).hasClass('is-selected'));
+      assert.equal(tabs.at(0).prop('aria-selected'), 'true');
+      assert.equal(tabs.at(1).prop('aria-selected'), 'false');
     });
 
     it('should display notes tab as selected', function() {
@@ -90,6 +92,8 @@ describe('SelectionTabs', function() {
       const wrapper = createComponent({});
       const tabs = wrapper.find('button');
       assert.isTrue(tabs.at(1).hasClass('is-selected'));
+      assert.equal(tabs.at(1).prop('aria-selected'), 'true');
+      assert.equal(tabs.at(0).prop('aria-selected'), 'false');
     });
 
     it('should display orphans tab as selected if there is 1 or more orphans', function() {
@@ -100,6 +104,9 @@ describe('SelectionTabs', function() {
       const wrapper = createComponent({});
       const tabs = wrapper.find('button');
       assert.isTrue(tabs.at(2).hasClass('is-selected'));
+      assert.equal(tabs.at(2).prop('aria-selected'), 'true');
+      assert.equal(tabs.at(1).prop('aria-selected'), 'false');
+      assert.equal(tabs.at(0).prop('aria-selected'), 'false');
     });
 
     it('should not display orphans tab if there are 0 orphans', function() {
