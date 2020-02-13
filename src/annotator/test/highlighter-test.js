@@ -23,7 +23,7 @@ describe('annotator/highlighter', () => {
       assert.equal(result.length, 1);
       assert.strictEqual(el.childNodes[0], result[0]);
       assert.equal(result[0].nodeName, 'HYPOTHESIS-HIGHLIGHT');
-      assert.isTrue(result[0].classList.contains('annotator-hl'));
+      assert.isTrue(result[0].classList.contains('hypothesis-highlight'));
     });
 
     it('skips text nodes that are only white space', () => {

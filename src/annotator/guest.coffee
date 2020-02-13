@@ -22,16 +22,23 @@ animationPromise = (fn) ->
       catch error
         reject(error)
 
+# A selector which matches elements added to the DOM by Hypothesis (eg. for
+# highlights and annotation UI).
+#
+# We can simplify this once all classes are converted from an "annotator-"
+# prefix to a "hypothesis-" prefix.
+IGNORE_SELECTOR = '[class^="annotator-"],[class^="hypothesis-"]'
+
 module.exports = class Guest extends Delegator
-  SHOW_HIGHLIGHTS_CLASS = 'annotator-highlights-always-on'
+  SHOW_HIGHLIGHTS_CLASS = 'hypothesis-highlights-always-on'
 
   # Events to be bound on Delegator#element.
   events:
-    ".annotator-hl click":               "onHighlightClick"
-    ".annotator-hl mouseover":           "onHighlightMouseover"
-    ".annotator-hl mouseout":            "onHighlightMouseout"
-    "click":                             "onElementClick"
-    "touchstart":                        "onElementTouchStart"
+    ".hypothesis-highlight click":      "onHighlightClick"
+    ".hypothesis-highlight mouseover":  "onHighlightMouseover"
+    ".hypothesis-highlight mouseout":   "onHighlightMouseout"
+    "click":                            "onElementClick"
+    "touchstart":                       "onElementTouchStart"
 
   options:
     Document: {}
@@ -153,7 +160,7 @@ module.exports = class Guest extends Delegator
     crossframe.on 'focusAnnotations', (tags=[]) =>
       for anchor in @anchors when anchor.highlights?
         toggle = anchor.annotation.$tag in tags
-        $(anchor.highlights).toggleClass('annotator-hl-focused', toggle)
+        $(anchor.highlights).toggleClass('hypothesis-highlight-focused', toggle)
 
     crossframe.on 'scrollToAnnotation', (tag) =>
       for anchor in @anchors when anchor.highlights?
@@ -181,7 +188,7 @@ module.exports = class Guest extends Delegator
     this.selections.unsubscribe()
     @adder.remove()
 
-    @element.find('.annotator-hl').each ->
+    @element.find('.hypothesis-highlight').each ->
       $(this).contents().insertBefore(this)
       $(this).remove()
 
@@ -228,7 +235,7 @@ module.exports = class Guest extends Delegator
       # Find a target using the anchoring module.
       options = {
         cache: self.anchoringCache
-        ignoreSelector: '[class^="annotator-"]'
+        ignoreSelector: IGNORE_SELECTOR
       }
       return self.anchoring.anchor(root, target.selector, options)
       .then((range) -> {annotation, target, range})
@@ -326,7 +333,7 @@ module.exports = class Guest extends Delegator
     getSelectors = (range) ->
       options = {
         cache: self.anchoringCache
-        ignoreSelector: '[class^="annotator-"]'
+        ignoreSelector: IGNORE_SELECTOR
       }
       # Returns an array of selectors for the passed range.
       return self.anchoring.describe(root, range, options)
