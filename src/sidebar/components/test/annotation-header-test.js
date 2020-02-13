@@ -10,6 +10,7 @@ import mockImportedComponents from '../../../test-util/mock-imported-components'
 
 describe('AnnotationHeader', () => {
   let fakeIsHighlight;
+  let fakeIsReply;
 
   const createAnnotationHeader = props => {
     return mount(
@@ -19,6 +20,7 @@ describe('AnnotationHeader', () => {
         onReplyCountClick={sinon.stub()}
         replyCount={0}
         showDocumentInfo={false}
+        threadIsCollapsed={false}
         {...props}
       />
     );
@@ -26,11 +28,13 @@ describe('AnnotationHeader', () => {
 
   beforeEach(() => {
     fakeIsHighlight = sinon.stub().returns(false);
+    fakeIsReply = sinon.stub().returns(false);
 
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
       '../util/annotation-metadata': {
         isHighlight: fakeIsHighlight,
+        isReply: fakeIsReply,
       },
     });
   });
@@ -40,13 +44,38 @@ describe('AnnotationHeader', () => {
   });
 
   describe('collapsed replies', () => {
-    it('should have a callback', () => {
-      const fakeCallback = sinon.stub();
+    const findReplyButton = wrapper =>
+      wrapper.find('Button').filter('.annotation-header__reply-toggle');
+
+    it('should render if annotation is a reply and thread is collapsed', () => {
+      let fakeCallback = sinon.stub();
+      fakeIsReply.returns(true);
       const wrapper = createAnnotationHeader({
         onReplyCountClick: fakeCallback,
+        threadIsCollapsed: true,
       });
-      const replyCollapseLink = wrapper.find('.annotation-link');
-      assert.equal(replyCollapseLink.prop('onClick'), fakeCallback);
+
+      const btn = findReplyButton(wrapper);
+      assert.isTrue(btn.exists());
+      assert.equal(btn.props().onClick, fakeCallback);
+    });
+
+    it('should not render if annotation is not a reply', () => {
+      fakeIsReply.returns(false);
+      const wrapper = createAnnotationHeader({
+        threadIsCollapsed: true,
+      });
+      const btn = findReplyButton(wrapper);
+      assert.isFalse(btn.exists());
+    });
+
+    it('should not render if thread is not collapsed', () => {
+      fakeIsReply.returns(true);
+      const wrapper = createAnnotationHeader({
+        threadIsCollapsed: false,
+      });
+      const btn = findReplyButton(wrapper);
+      assert.isFalse(btn.exists());
     });
 
     [
@@ -63,12 +92,14 @@ describe('AnnotationHeader', () => {
         expected: '2 replies',
       },
     ].forEach(testCase => {
-      it(`it should render the annotation reply count (${testCase.replyCount})`, () => {
+      it(`it should render the annotation reply count button (${testCase.replyCount})`, () => {
+        fakeIsReply.returns(true);
         const wrapper = createAnnotationHeader({
           replyCount: testCase.replyCount,
+          threadIsCollapsed: true,
         });
-        const replyCollapseLink = wrapper.find('.annotation-link');
-        assert.equal(replyCollapseLink.text(), testCase.expected);
+        const replyCollapseButton = findReplyButton(wrapper);
+        assert.equal(replyCollapseButton.props().buttonText, testCase.expected);
       });
     });
   });

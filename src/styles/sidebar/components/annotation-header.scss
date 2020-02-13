@@ -13,6 +13,16 @@
     align-items: baseline;
   }
 
+  &__reply-toggle.button {
+    padding: 0 0.5em;
+    font-weight: 400;
+    background-color: transparent;
+    &:hover {
+      background-color: transparent;
+      color: var.$link-color-hover;
+    }
+  }
+
   // Timestamps are right aligned in a flex row
   &__timestamp {
     margin-left: auto;
