@@ -22,9 +22,7 @@ function Tab({
   type,
 }) {
   return (
-    // FIXME-A11Y
-    // eslint-disable-next-line jsx-a11y/anchor-is-valid
-    <a
+    <button
       className={classnames('selection-tabs__type', {
         'is-selected': selected,
       })}
@@ -32,13 +30,13 @@ function Tab({
       onTouchStart={onChangeTab.bind(this, type)}
       role="tab"
       tabIndex="0"
-      aria-selected={selected}
+      aria-selected={selected.toString()}
     >
       {children}
       {count > 0 && !isWaitingToAnchor && (
         <span className="selection-tabs__count"> {count}</span>
       )}
-    </a>
+    </button>
   );
 }
 Tab.propTypes = {

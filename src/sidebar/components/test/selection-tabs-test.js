@@ -58,7 +58,7 @@ describe('SelectionTabs', function() {
   context('displays selection tabs and counts', function() {
     it('should display the tabs and counts of annotations and notes', function() {
       const wrapper = createComponent();
-      const tabs = wrapper.find('a');
+      const tabs = wrapper.find('button');
       assert.isTrue(tabs.at(0).contains('Annotations'));
       assert.equal(
         tabs
@@ -79,8 +79,10 @@ describe('SelectionTabs', function() {
 
     it('should display annotations tab as selected', function() {
       const wrapper = createComponent();
-      const aTags = wrapper.find('a');
-      assert.isTrue(aTags.at(0).hasClass('is-selected'));
+      const tabs = wrapper.find('button');
+      assert.isTrue(tabs.at(0).hasClass('is-selected'));
+      assert.equal(tabs.at(0).prop('aria-selected'), 'true');
+      assert.equal(tabs.at(1).prop('aria-selected'), 'false');
     });
 
     it('should display notes tab as selected', function() {
@@ -88,8 +90,10 @@ describe('SelectionTabs', function() {
         selection: { selectedTab: uiConstants.TAB_NOTES },
       });
       const wrapper = createComponent({});
-      const tabs = wrapper.find('a');
+      const tabs = wrapper.find('button');
       assert.isTrue(tabs.at(1).hasClass('is-selected'));
+      assert.equal(tabs.at(1).prop('aria-selected'), 'true');
+      assert.equal(tabs.at(0).prop('aria-selected'), 'false');
     });
 
     it('should display orphans tab as selected if there is 1 or more orphans', function() {
@@ -98,8 +102,11 @@ describe('SelectionTabs', function() {
       });
       fakeStore.orphanCount.returns(1);
       const wrapper = createComponent({});
-      const tabs = wrapper.find('a');
+      const tabs = wrapper.find('button');
       assert.isTrue(tabs.at(2).hasClass('is-selected'));
+      assert.equal(tabs.at(2).prop('aria-selected'), 'true');
+      assert.equal(tabs.at(1).prop('aria-selected'), 'false');
+      assert.equal(tabs.at(0).prop('aria-selected'), 'false');
     });
 
     it('should not display orphans tab if there are 0 orphans', function() {
@@ -107,7 +114,7 @@ describe('SelectionTabs', function() {
         selection: { selectedTab: uiConstants.TAB_ORPHANS },
       });
       const wrapper = createComponent({});
-      const tabs = wrapper.find('a');
+      const tabs = wrapper.find('button');
       assert.equal(tabs.length, 2);
     });
 
