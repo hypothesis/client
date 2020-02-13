@@ -26,6 +26,27 @@ describe('annotator/highlighter', () => {
       assert.isTrue(result[0].classList.contains('hypothesis-highlight'));
     });
 
+    it('wraps multiple text nodes', () => {
+      const strings = ['hello', ' Brave ', ' New ', ' World'];
+      const textNodes = strings.map(s => document.createTextNode(s));
+
+      const el = document.createElement('span');
+      textNodes.forEach(n => el.append(n));
+
+      const r = new Range.NormalizedRange({
+        commonAncestor: el,
+        start: textNodes[0],
+        end: textNodes[textNodes.length - 1],
+      });
+      const result = highlightRange(r);
+
+      assert.equal(result.length, textNodes.length);
+      result.forEach((highlight, i) => {
+        assert.equal(highlight.nodeName, 'HYPOTHESIS-HIGHLIGHT');
+        assert.deepEqual(Array.from(highlight.childNodes), [textNodes[i]]);
+      });
+    });
+
     it('skips text nodes that are only white space', () => {
       const txt = document.createTextNode('one');
       const blank = document.createTextNode(' ');

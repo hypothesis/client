@@ -1,5 +1,3 @@
-import $ from 'jquery';
-
 /**
  * Wraps the DOM Nodes within the provided range with a highlight
  * element of the specified class and returns the highlight Elements.
@@ -11,25 +9,45 @@ import $ from 'jquery';
 export function highlightRange(normedRange, cssClass = 'hypothesis-highlight') {
   const white = /^\s*$/;
 
-  // A custom element name is used here rather than `<span>` to reduce the
-  // likelihood of highlights being hidden by page styling.
-  const hl = $(
-    `<hypothesis-highlight class='${cssClass}'></hypothesis-highlight>`
-  );
+  // Find text nodes within the range to highlight.
+  //
+  // We ignore text nodes that contain only whitespace to avoid inserting
+  // elements in places that can only contain a restricted subset of nodes such
+  // as table rows and lists. This does mean that there may be the odd abandoned
+  // whitespace node in a paragraph that is skipped but better than breaking
+  // table layouts.
+  const textNodes = normedRange
+    .textNodes()
+    .filter(node => !white.test(node.nodeValue));
 
-  // Ignore text nodes that contain only whitespace characters. This prevents
-  // spans being injected between elements that can only contain a restricted
-  // subset of nodes such as table rows and lists. This does mean that there
-  // may be the odd abandoned whitespace node in a paragraph that is skipped
-  // but better than breaking table layouts.
-  const nodes = $(normedRange.textNodes()).filter(function() {
-    return !white.test(this.nodeValue);
+  // Wrap each text node with a `<hypothesis-highlight>` element.
+  const highlights = [];
+  textNodes.forEach(node => {
+    // A custom element name is used here rather than `<span>` to reduce the
+    // likelihood of highlights being hidden by page styling.
+    const highlightEl = document.createElement('hypothesis-highlight');
+    highlightEl.className = cssClass;
+
+    node.parentNode.replaceChild(highlightEl, node);
+    highlightEl.appendChild(node);
+    highlights.push(highlightEl);
   });
 
-  return nodes
-    .wrap(hl)
-    .parent()
-    .toArray();
+  return highlights;
+}
+
+/**
+ * Replace a child `node` with `replacements`.
+ *
+ * nb. This is like `ChildNode.replaceWith` but it works in IE 11.
+ *
+ * @param {Node} node
+ * @param {Node[]} replacements
+ */
+function replaceWith(node, replacements) {
+  const parent = node.parentNode;
+  replacements.forEach(r => parent.insertBefore(r, node));
+  node.remove();
 }
 
 /**
@@ -40,7 +58,8 @@ export function highlightRange(normedRange, cssClass = 'hypothesis-highlight') {
 export function removeHighlights(highlights) {
   for (let h of highlights) {
     if (h.parentNode) {
-      $(h).replaceWith(h.childNodes);
+      const children = Array.from(h.childNodes);
+      replaceWith(h, children);
     }
   }
 }
