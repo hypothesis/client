@@ -40,6 +40,7 @@ function AnnotationOmega({
   // An annotation will have a draft if it is being edited
   const draft = useStore(store => store.getDraft(annotation));
   const group = useStore(store => store.getGroup(annotation.group));
+  const userid = useStore(store => store.profile().userid);
 
   const isPrivate = draft ? draft.isPrivate : !isShared(annotation.permissions);
   const tags = draft ? draft.tags : annotation.tags;
@@ -78,6 +79,15 @@ function AnnotationOmega({
     createDraft(annotation, { ...draft, text });
   };
 
+  const onReply = () => {
+    // TODO: Re-evaluate error handling here
+    if (!userid) {
+      flash.error('Please log in to reply to annotations');
+    } else {
+      annotationsService.reply(annotation, userid);
+    }
+  };
+
   const onSave = async () => {
     setIsSaving(true);
     try {
@@ -90,9 +100,6 @@ function AnnotationOmega({
   };
 
   const onToggleReplies = () => setCollapsed(annotation.id, !threadIsCollapsed);
-
-  // TODO
-  const fakeOnReply = () => alert('Reply: TBD');
 
   return (
     <div className="annotation-omega">
@@ -134,10 +141,7 @@ function AnnotationOmega({
           )}
           {shouldShowActions && (
             <div className="annotation-omega__actions">
-              <AnnotationActionBar
-                annotation={annotation}
-                onReply={fakeOnReply}
-              />
+              <AnnotationActionBar annotation={annotation} onReply={onReply} />
             </div>
           )}
         </div>
