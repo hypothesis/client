@@ -42,6 +42,7 @@ describe('AnnotationOmega', () => {
         onReplyCountClick={fakeOnReplyCountClick}
         replyCount={0}
         showDocumentInfo={false}
+        threadIsCollapsed={true}
         {...props}
       />
     );
@@ -60,6 +61,7 @@ describe('AnnotationOmega', () => {
 
     fakeMetadata = {
       isNew: sinon.stub(),
+      isReply: sinon.stub(),
       quote: sinon.stub(),
     };
 
@@ -73,6 +75,7 @@ describe('AnnotationOmega', () => {
       getGroup: sinon.stub().returns({
         type: 'private',
       }),
+      setCollapsed: sinon.stub(),
     };
 
     $imports.$mock(mockImportedComponents());
@@ -265,6 +268,66 @@ describe('AnnotationOmega', () => {
       const wrapper = createComponent();
 
       assert.isFalse(wrapper.find('AnnotationLicense').exists());
+    });
+  });
+
+  describe('reply thread toggle button', () => {
+    const findRepliesButton = wrapper =>
+      wrapper.find('Button').filter('.annotation-omega__reply-toggle');
+
+    it('should render a toggle button if the annotation has replies', () => {
+      fakeMetadata.isReply.returns(false);
+      const wrapper = createComponent({
+        replyCount: 5,
+        threadIsCollapsed: true,
+      });
+
+      assert.isTrue(findRepliesButton(wrapper).exists());
+      assert.equal(
+        findRepliesButton(wrapper).props().buttonText,
+        'Show replies (5)'
+      );
+    });
+
+    it('should not render a toggle button if the annotation has no replies', () => {
+      fakeMetadata.isReply.returns(false);
+      const wrapper = createComponent({
+        replyCount: 0,
+        threadIsCollapsed: true,
+      });
+
+      assert.isFalse(findRepliesButton(wrapper).exists());
+    });
+
+    it('should not render a toggle button if the annotation itself is a reply', () => {
+      fakeMetadata.isReply.returns(true);
+      const wrapper = createComponent({
+        replyCount: 5,
+        threadIsCollapsed: true,
+      });
+
+      assert.isFalse(findRepliesButton(wrapper).exists());
+    });
+
+    it('should toggle the collapsed state of the thread on click', () => {
+      fakeMetadata.isReply.returns(false);
+      const wrapper = createComponent({
+        replyCount: 5,
+        threadIsCollapsed: true,
+      });
+
+      act(() => {
+        findRepliesButton(wrapper)
+          .props()
+          .onClick();
+      });
+      wrapper.setProps({ threadIsCollapsed: false });
+
+      assert.calledOnce(fakeStore.setCollapsed);
+      assert.equal(
+        findRepliesButton(wrapper).props().buttonText,
+        'Hide replies (5)'
+      );
     });
   });
 
