@@ -128,10 +128,25 @@ describe('Excerpt', () => {
 
     it('toggles the expanded state when clicked', () => {
       const wrapper = createExcerpt({ inlineControls: true }, TALL_DIV);
-      const control = wrapper.find('.excerpt__inline-controls a');
+      const button = wrapper.find('.excerpt__toggle-button');
       assert.equal(getExcerptHeight(wrapper), 40);
-      control.simulate('click');
+      button.simulate('click');
       assert.equal(getExcerptHeight(wrapper), 200);
+    });
+
+    it("sets button's default state to unpressed", () => {
+      const wrapper = createExcerpt({ inlineControls: true }, TALL_DIV);
+      const button = wrapper.find('.excerpt__toggle-button');
+      assert.equal(button.prop('aria-pressed'), 'false');
+      assert.equal(button.text(), 'More');
+    });
+
+    it("changes button's state to pressed when clicked", () => {
+      const wrapper = createExcerpt({ inlineControls: true }, TALL_DIV);
+      wrapper.find('.excerpt__toggle-button').simulate('click');
+      const button = wrapper.find('.excerpt__toggle-button');
+      assert.equal(button.prop('aria-pressed'), 'true');
+      assert.equal(button.text(), 'Less');
     });
   });
 

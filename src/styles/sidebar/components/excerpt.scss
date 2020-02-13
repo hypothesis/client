@@ -1,3 +1,4 @@
+@use "../../mixins/buttons";
 @use "../../variables" as var;
 
 // FIXME - Remove the `@at-root` here when SASS modules are used, as local
@@ -35,6 +36,11 @@
     padding-left: 15px;
     background-image: linear-gradient(to right, transparent 0px, white 12px);
     line-height: var.$normal-line-height;
+  }
+
+  .excerpt__toggle-button {
+    @include buttons.reset-native-btn-styles;
+    font-style: italic;
   }
 
   .excerpt__toggle-link > a {

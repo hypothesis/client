@@ -12,24 +12,20 @@ import { applyTheme } from '../util/theme';
  * it is expanded or collapsed.
  */
 function InlineControls({ isCollapsed, setCollapsed, linkStyle = {} }) {
-  const toggleTitle = isCollapsed
-    ? 'Show the full excerpt'
-    : 'Show the first few lines only';
   const toggleLabel = isCollapsed ? 'More' : 'Less';
 
   return (
     <div className="excerpt__inline-controls">
       <span className="excerpt__toggle-link">
-        {/* FIXME-A11Y */}
-        {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
-        <a
-          href="#"
+        <button
+          className="excerpt__toggle-button"
           onClick={() => setCollapsed(!isCollapsed)}
-          title={toggleTitle}
+          aria-label="Toggle to show the full excerpt or first few lines only"
+          aria-pressed={(!isCollapsed).toString()}
           style={linkStyle}
         >
           {toggleLabel}
-        </a>
+        </button>
       </span>
     </div>
   );
@@ -113,9 +109,8 @@ function Excerpt({
       <div className="excerpt__content" ref={contentElement}>
         {children}
       </div>
-      {/* FIXME-A11Y */}
-      {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */}
       <div
+        role="presentation"
         onClick={() => setCollapsed(false)}
         className={classnames({
           excerpt__shadow: true,
