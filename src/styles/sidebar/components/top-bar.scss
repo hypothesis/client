@@ -54,6 +54,7 @@
 
 .top-bar__login-links {
   display: flex;
+  flex-shrink: 0;
 }
 
 .top-bar__inner {
