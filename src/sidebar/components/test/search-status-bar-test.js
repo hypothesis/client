@@ -22,7 +22,6 @@ describe('SearchStatusBar', () => {
     fakeStore = {
       getState: sinon.stub().returns({
         selection: {},
-        directLinked: {},
       }),
       annotationCount: sinon.stub().returns(1),
       focusModeFocused: sinon.stub().returns(false),
@@ -46,9 +45,6 @@ describe('SearchStatusBar', () => {
         selection: {
           filterQuery: 'tag:foo',
           selectedTab: 'annotation',
-        },
-        directLinked: {
-          directLinkedGroupFetchFailed: false,
         },
       });
       fakeStore.annotationCount.returns(3);
@@ -184,7 +180,6 @@ describe('SearchStatusBar', () => {
           filterQuery: 'tag:foo',
           selectedTab: 'annotation',
         },
-        directLinked: {},
       });
 
       const wrapper = createComponent({});
@@ -245,7 +240,6 @@ describe('SearchStatusBar', () => {
               selectedAnnotationMap: { annId: true },
               selectedTab: test.tab,
             },
-            directLinked: {},
           });
           fakeStore.annotationCount.returns(test.annotationCount);
           fakeStore.noteCount.returns(test.noteCount);
@@ -272,9 +266,7 @@ describe('SearchStatusBar', () => {
             selection: {
               filterQuery: null,
               selectedTab: test.tab,
-            },
-            directLinked: {
-              directLinkedGroupFetchFailed: true,
+              selectedAnnotationMap: { annId: true },
             },
           });
           fakeStore.annotationCount.returns(5);
@@ -298,9 +290,6 @@ describe('SearchStatusBar', () => {
           selection: {
             filterQuery: 'tag:foo',
             selectedTab: 'annotation',
-          },
-          directLinked: {
-            directLinkedGroupFetchFailed: false,
           },
         });
         fakeStore.annotationCount.returns(5);
