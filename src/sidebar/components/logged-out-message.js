@@ -3,6 +3,7 @@ import propTypes from 'prop-types';
 
 import { withServices } from '../util/service-context';
 
+import Button from './button';
 import SvgIcon from './svg-icon';
 
 /**
@@ -24,11 +25,12 @@ function LoggedOutMessage({ onLogin, serviceUrl }) {
         >
           create a free account
         </a>{' '}
-        or {/* FIXME-A11Y */}
-        {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
-        <a className="logged-out-message__link" href="" onClick={onLogin}>
-          log in
-        </a>
+        or{' '}
+        <Button
+          className="logged-out-message__link"
+          onClick={onLogin}
+          buttonText="log in"
+        />
         .
       </span>
       <div className="logged-out-message__logo">
