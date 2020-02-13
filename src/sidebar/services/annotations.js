@@ -1,5 +1,5 @@
 import SearchClient from '../search-client';
-import { isNew } from '../util/annotation-metadata';
+import { isNew, isPublic } from '../util/annotation-metadata';
 import { privatePermissions, sharedPermissions } from '../util/permissions';
 
 // @ngInject
@@ -82,6 +82,25 @@ export default function annotationsService(
   }
 
   /**
+   * Create a reply to `annotation` by the user `userid` and add to the store.
+   *
+   * @param {Object} annotation
+   * @param {string} userid
+   */
+  function reply(annotation, userid) {
+    const replyAnnotation = {
+      group: annotation.group,
+      permissions: isPublic(annotation)
+        ? sharedPermissions(userid, annotation.group)
+        : privatePermissions(userid),
+      references: (annotation.references || []).concat(annotation.id),
+      target: [{ source: annotation.target[0].source }],
+      uri: annotation.uri,
+    };
+    store.createAnnotation(replyAnnotation);
+  }
+
+  /**
    * Save new (or update existing) annotation. On success,
    * the annotation's `Draft` will be removed and the annotation added
    * to the store.
@@ -118,6 +137,7 @@ export default function annotationsService(
 
   return {
     load,
+    reply,
     save,
   };
 }
