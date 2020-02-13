@@ -40,10 +40,20 @@
   border-bottom: none;
 }
 
-.top-bar__login-links {
-  flex-shrink: 0;
+.top-bar__login-button.button {
+  padding: 0 0.25em;
+  background-color: transparent;
+  color: var.$brand;
   font-size: var.$body2-font-size;
-  padding-left: 5px;
+  font-weight: 400;
+
+  &:hover {
+    color: var.$link-color-hover;
+  }
+}
+
+.top-bar__login-links {
+  display: flex;
 }
 
 .top-bar__inner {

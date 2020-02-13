@@ -72,16 +72,19 @@ function TopBar({
       )}
       {auth.status === 'logged-out' && (
         <span className="top-bar__login-links">
-          {/* FIXME-A11Y */}
-          {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
-          <a href="#" onClick={onSignUp} target="_blank" style={loginLinkStyle}>
-            Sign up
-          </a>{' '}
-          / {/* FIXME-A11Y */}
-          {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
-          <a href="#" onClick={onLogin} style={loginLinkStyle}>
-            Log in
-          </a>
+          <Button
+            className="top-bar__login-button"
+            buttonText="Sign up"
+            onClick={onSignUp}
+            style={loginLinkStyle}
+          />{' '}
+          /
+          <Button
+            className="top-bar__login-button"
+            buttonText="Log in"
+            onClick={onLogin}
+            style={loginLinkStyle}
+          />
         </span>
       )}
       {auth.status === 'logged-in' && (

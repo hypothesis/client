@@ -158,16 +158,14 @@ describe('TopBar', () => {
         onSignUp,
       });
       const loginText = getLoginText(wrapper);
-      const links = loginText.find('a');
-      assert.equal(links.length, 2);
+      const loginButtons = loginText.find('Button');
+      assert.equal(loginButtons.length, 2);
 
-      assert.equal(links.at(0).text(), 'Sign up');
-      links.at(0).simulate('click');
-      assert.called(onSignUp);
+      assert.equal(loginButtons.at(0).props().buttonText, 'Sign up');
+      assert.equal(loginButtons.at(0).props().onClick, onSignUp);
 
-      assert.equal(links.at(1).text(), 'Log in');
-      links.at(1).simulate('click');
-      assert.called(onLogin);
+      assert.equal(loginButtons.at(1).props().buttonText, 'Log in');
+      assert.equal(loginButtons.at(1).props().onClick, onLogin);
     });
 
     it('Shows user menu when logged in', () => {
