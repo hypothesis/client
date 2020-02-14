@@ -38,15 +38,12 @@ function SearchStatusBar({ rootThread }) {
   }));
 
   const {
-    directLinkedGroupFetchFailed,
     filterQuery,
     focusModeFocused,
     focusModeUserPrettyName,
     selectionMap,
     selectedTab,
   } = useStore(store => ({
-    directLinkedGroupFetchFailed: store.getState().directLinked
-      .directLinkedGroupFetchFailed,
     filterQuery: store.getState().selection.filterQuery,
     focusModeFocused: store.focusModeFocused(),
     focusModeUserPrettyName: store.focusModeUserPrettyName(),
@@ -75,9 +72,6 @@ function SearchStatusBar({ rootThread }) {
      * `filtered` mode.
      */
     selected: (() => {
-      if (directLinkedGroupFetchFailed) {
-        return true;
-      }
       return (
         !!selectionMap && Object.keys(selectionMap).length > 0 && !filterQuery
       );

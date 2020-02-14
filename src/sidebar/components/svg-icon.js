@@ -41,6 +41,7 @@ const icons = {
   profile: require('../../images/icons/profile.svg'),
   public: require('../../images/icons/public.svg'),
   refresh: require('../../images/icons/refresh.svg'),
+  restricted: require('../../images/icons/restricted.svg'),
   reply: require('../../images/icons/reply.svg'),
   search: require('../../images/icons/search.svg'),
   share: require('../../images/icons/share.svg'),

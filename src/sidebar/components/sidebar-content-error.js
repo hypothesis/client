@@ -1,49 +1,69 @@
-import { Fragment, createElement } from 'preact';
+import { createElement } from 'preact';
 import propTypes from 'prop-types';
+
+import useStore from '../store/use-store';
+
+import Button from './button';
+import SvgIcon from './svg-icon';
 
 /**
  * An error message to display in the sidebar.
  */
-export default function SidebarContentError({
-  loggedOutErrorMessage,
-  loggedInErrorMessage,
-  onLoginRequest,
-  isLoggedIn,
-}) {
+export default function SidebarContentError({ errorType, onLoginRequest }) {
+  const clearSelection = useStore(store => store.clearSelection);
+  const isLoggedIn = useStore(store => store.isLoggedIn());
+
+  const errorTitle =
+    errorType === 'annotation' ? 'Annotation unavailable' : 'Group unavailable';
+
+  const errorMessage = (() => {
+    if (!isLoggedIn) {
+      return `The ${errorType} associated with the current URL is unavailable.
+        You may need to log in to see it.`;
+    }
+    if (errorType === 'group') {
+      return `The current URL links to a group, but that group cannot be found,
+        or you do not have permission to view the annotations in that group.`;
+    }
+    return `The current URL links to an annotation, but that annotation
+      cannot be found, or you do not have permission to view it.`;
+  })();
+
   return (
-    <div className="annotation-unavailable-message">
-      <div className="annotation-unavailable-message__icon" />
-      <p className="annotation-unavailable-message__label">
-        {!isLoggedIn ? (
-          <Fragment>
-            {loggedOutErrorMessage}
-            <br />
-            You may need to {/* FIXME-A11Y */}
-            {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
-            <a
-              className="loggedout-message__link"
-              href=""
+    <div className="sidebar-content-error">
+      <div className="sidebar-content-error__header">
+        <div className="sidebar-content-error__header-icon">
+          <SvgIcon name="restricted" title={errorTitle} />
+        </div>
+        <div className="sidebar-content-error__title u-stretch">
+          {errorTitle}
+        </div>
+      </div>
+      <div className="sidebar-content-error__content">
+        <p>{errorMessage}</p>
+        <div className="sidebar-content-error__actions">
+          <Button
+            buttonText="Show all annotations"
+            className="sidebar-content-error__button"
+            onClick={clearSelection}
+            usePrimaryStyle={isLoggedIn}
+          />
+          {!isLoggedIn && (
+            <Button
+              buttonText="Log in"
+              className="sidebar-content-error__button"
               onClick={onLoginRequest}
-            >
-              log in
-            </a>{' '}
-            to see it.
-          </Fragment>
-        ) : (
-          <span>{loggedInErrorMessage}</span>
-        )}
-      </p>
+              usePrimaryStyle
+            />
+          )}
+        </div>
+      </div>
     </div>
   );
 }
 
 SidebarContentError.propTypes = {
-  /* A short error message to be displayed when logged out along with a login prompt. */
-  loggedOutErrorMessage: propTypes.string,
-  /* A detailed error message explaining why the error message happened when logged in. */
-  loggedInErrorMessage: propTypes.string,
+  errorType: propTypes.oneOf(['annotation', 'group']),
   /* A function that will launch the login flow for the user. */
   onLoginRequest: propTypes.func.isRequired,
-  /* A boolean indicating whether the user is logged in or not. */
-  isLoggedIn: propTypes.bool,
 };
