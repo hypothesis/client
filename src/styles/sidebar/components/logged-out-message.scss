@@ -4,17 +4,22 @@
   margin: 25px auto;
   width: 70%;
   text-align: center;
-  color: var.$grey-5;
+  color: var.$grey-mid;
   display: flex;
   flex-direction: column;
 }
 
 .logged-out-message__link {
+  padding: 0;
+  display: inline;
+  color: var.$grey-mid;
+  background-color: transparent;
   text-decoration: underline;
-  color: var.$grey-5;
+  font-weight: 400;
 
   &:hover {
     color: var.$grey-7;
+    text-decoration: none;
   }
 }
 
