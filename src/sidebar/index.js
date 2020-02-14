@@ -123,6 +123,14 @@ function persistDefaults(persistedDefaults) {
   persistedDefaults.init();
 }
 
+/**
+ * Set up autosave-new-highlights service
+ */
+// @ngInject
+function autosave(autosaveService) {
+  autosaveService.init();
+}
+
 // Preact UI components that are wrapped for use within Angular templates.
 
 import AnnotationActionBar from './components/annotation-action-bar';
@@ -173,12 +181,13 @@ import annotationMapperService from './services/annotation-mapper';
 import annotationsService from './services/annotations';
 import apiService from './services/api';
 import apiRoutesService from './services/api-routes';
+import authService from './services/oauth-auth';
+import autosaveService from './services/autosave';
 import featuresService from './services/features';
 import flashService from './services/flash';
 import frameSyncService from './services/frame-sync';
 import groupsService from './services/groups';
 import localStorageService from './services/local-storage';
-import authService from './services/oauth-auth';
 import permissionsService from './services/permissions';
 import persistedDefaultsService from './services/persisted-defaults';
 import rootThreadService from './services/root-thread';
@@ -214,6 +223,7 @@ function startAngularApp(config) {
     .register('api', apiService)
     .register('apiRoutes', apiRoutesService)
     .register('auth', authService)
+    .register('autosaveService', autosaveService)
     .register('bridge', bridgeService)
     .register('features', featuresService)
     .register('flash', flashService)
@@ -303,6 +313,7 @@ function startAngularApp(config) {
     .service('annotationsService', () => container.get('annotationsService'))
     .service('api', () => container.get('api'))
     .service('auth', () => container.get('auth'))
+    .service('autosaveService', () => container.get('autosaveService'))
     .service('bridge', () => container.get('bridge'))
     .service('features', () => container.get('features'))
     .service('flash', () => container.get('flash'))
@@ -332,6 +343,7 @@ function startAngularApp(config) {
     .run(registerAngularServices)
 
     .run(persistDefaults)
+    .run(autosave)
     .run(sendPageView)
     .run(setupApi)
     .run(crossOriginRPC.server.start);

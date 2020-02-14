@@ -25,11 +25,16 @@ function createTestStore() {
 
 describe('sidebar/store/modules/annotations', function() {
   let fakeDefaultPermissions;
+  let fakePrivatePermissions;
 
   beforeEach(() => {
     fakeDefaultPermissions = sinon.stub();
+    fakePrivatePermissions = sinon.stub();
     $imports.$mock({
-      '../../util/permissions': { defaultPermissions: fakeDefaultPermissions },
+      '../../util/permissions': {
+        defaultPermissions: fakeDefaultPermissions,
+        privatePermissions: fakePrivatePermissions,
+      },
     });
   });
 
@@ -224,6 +229,39 @@ describe('sidebar/store/modules/annotations', function() {
         },
       };
       assert.isFalse(selectors.isWaitingToAnchorAnnotations(state));
+    });
+  });
+
+  describe('newHighlights', () => {
+    [
+      {
+        annotations: [fixtures.oldAnnotation(), fixtures.newAnnotation()],
+        expectedLength: 0,
+      },
+      {
+        annotations: [
+          fixtures.oldAnnotation(),
+          Object.assign(fixtures.newHighlight(), { $tag: 'atag' }),
+          Object.assign(fixtures.newHighlight(), { $tag: 'anothertag' }),
+        ],
+        expectedLength: 2,
+      },
+      {
+        annotations: [
+          fixtures.oldHighlight(),
+          Object.assign(fixtures.newHighlight(), { $tag: 'atag' }),
+          Object.assign(fixtures.newHighlight(), { $tag: 'anothertag' }),
+        ],
+        expectedLength: 2,
+      },
+    ].forEach(testCase => {
+      it('returns number of unsaved, new highlights', () => {
+        const state = { annotations: { annotations: testCase.annotations } };
+        assert.lengthOf(
+          selectors.newHighlights(state),
+          testCase.expectedLength
+        );
+      });
     });
   });
 
@@ -473,6 +511,20 @@ describe('sidebar/store/modules/annotations', function() {
       );
 
       assert.equal(createdAnnotation.permissions, 'somePermissions');
+    });
+
+    it('should always assign private permissions to highlights', () => {
+      fakePrivatePermissions.returns('private');
+      store.dispatch(
+        actions.createAnnotation({ id: 'myID', $highlight: true }, now)
+      );
+
+      const createdAnnotation = selectors.findAnnotationByID(
+        store.getState(),
+        'myID'
+      );
+
+      assert.equal(createdAnnotation.permissions, 'private');
     });
 
     it('should set group to currently-focused group if not set on annotation', () => {

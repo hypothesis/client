@@ -8,7 +8,7 @@ import { createSelector } from 'reselect';
 import uiConstants from '../../ui-constants';
 import * as metadata from '../../util/annotation-metadata';
 import * as arrayUtil from '../../util/array';
-import { defaultPermissions } from '../../util/permissions';
+import { defaultPermissions, privatePermissions } from '../../util/permissions';
 import * as util from '../util';
 
 import drafts from './drafts';
@@ -360,6 +360,11 @@ function createAnnotation(ann, now = new Date()) {
       },
       ann
     );
+    // Highlights are peculiar in that they always have private permissions
+    if (metadata.isHighlight(ann)) {
+      ann.permissions = privatePermissions(userid);
+    }
+
     // When a new annotation is created, remove any existing annotations
     // that are empty.
     dispatch(drafts.actions.deleteNewAndEmptyDrafts([ann]));
@@ -438,6 +443,16 @@ function findAnnotationByID(state, id) {
 }
 
 /**
+ * Return all loaded annotations that are highlights and have not been saved
+ * to the server.
+ */
+const newHighlights = createSelector(
+  state => state.annotations.annotations,
+  annotations =>
+    annotations.filter(ann => metadata.isNew(ann) && metadata.isHighlight(ann))
+);
+
+/**
  * Return the number of page notes.
  */
 const noteCount = createSelector(
@@ -485,13 +500,14 @@ export default {
   },
 
   selectors: {
-    annotationExists,
-    noteCount,
     annotationCount,
-    orphanCount,
-    isWaitingToAnchorAnnotations,
+    annotationExists,
     findAnnotationByID,
     findIDsForTags,
+    isWaitingToAnchorAnnotations,
+    newHighlights,
+    noteCount,
+    orphanCount,
     savedAnnotations,
   },
 };
