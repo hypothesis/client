@@ -52,6 +52,7 @@ describe('AnnotationOmega', () => {
     fakeOnReplyCountClick = sinon.stub();
 
     fakeAnnotationsService = {
+      reply: sinon.stub(),
       save: sinon.stub().resolves(),
     };
 
@@ -75,6 +76,7 @@ describe('AnnotationOmega', () => {
       getGroup: sinon.stub().returns({
         type: 'private',
       }),
+      profile: sinon.stub().returns({ userid: 'acct:foo@bar.com' }),
       setCollapsed: sinon.stub(),
     };
 
@@ -332,6 +334,42 @@ describe('AnnotationOmega', () => {
   });
 
   describe('annotation actions', () => {
+    describe('replying to an annotation', () => {
+      // nb: There's no reason this logic needs to stay within `AnnotationOmega`
+      // once we've migrated to it; it could happily move to `AnnotationActionBar`
+      it('should show a flash alert if user not logged in', () => {
+        // No logged-in user...
+        fakeStore.profile.returns({});
+
+        const wrapper = createComponent();
+
+        wrapper
+          .find('AnnotationActionBar')
+          .props()
+          .onReply();
+
+        assert.calledOnce(fakeFlash.error);
+        assert.notCalled(fakeAnnotationsService.reply);
+      });
+
+      it('should create a reply', () => {
+        const theAnnot = fixtures.defaultAnnotation();
+        const wrapper = createComponent({ annotation: theAnnot });
+
+        wrapper
+          .find('AnnotationActionBar')
+          .props()
+          .onReply();
+
+        assert.calledOnce(fakeAnnotationsService.reply);
+        assert.calledWith(
+          fakeAnnotationsService.reply,
+          theAnnot,
+          'acct:foo@bar.com'
+        );
+      });
+    });
+
     it('should show annotation actions', () => {
       const wrapper = createComponent();
 

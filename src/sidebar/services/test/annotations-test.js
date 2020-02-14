@@ -35,21 +35,27 @@ describe('annotationService', () => {
   let fakeStore;
   let fakeApi;
   let fakeAnnotationMapper;
-  let fakeIsNew;
   let fakeStreamer;
   let fakeStreamFilter;
 
   let fakeUris;
   let fakeGroupId;
 
+  let fakeIsNew;
+  let fakeIsPublic;
+  let fakePrivatePermissions;
+  let fakeSharedPermissions;
+
   beforeEach(() => {
     sinon.stub(console, 'error');
     searchClients = [];
     longRunningSearchClient = false;
+
     fakeAnnotationMapper = {
       loadAnnotations: sinon.stub(),
       unloadAnnotations: sinon.stub(),
     };
+
     fakeApi = {
       annotation: {
         create: sinon.stub().resolves(fixtures.defaultAnnotation()),
@@ -57,11 +63,23 @@ describe('annotationService', () => {
       },
       search: sinon.stub(),
     };
+
     fakeIsNew = sinon.stub().returns(true);
+    fakeIsPublic = sinon.stub().returns(true);
+
+    fakePrivatePermissions = sinon.stub().returns({
+      read: ['acct:foo@bar.com'],
+      update: ['acct:foo@bar.com'],
+      delete: ['acct:foo@bar.com'],
+    });
+    fakeSharedPermissions = sinon.stub().returns({
+      read: ['group:__world__'],
+    });
     fakeStore = {
       addAnnotations: sinon.stub(),
       annotationFetchFinished: sinon.stub(),
       annotationFetchStarted: sinon.stub(),
+      createAnnotation: sinon.stub(),
       frames: sinon.stub(),
       getDraft: sinon.stub().returns(null),
       getState: sinon.stub(),
@@ -87,7 +105,14 @@ describe('annotationService', () => {
 
     $imports.$mock({
       '../search-client': FakeSearchClient,
-      '../util/annotation-metadata': { isNew: fakeIsNew },
+      '../util/annotation-metadata': {
+        isNew: fakeIsNew,
+        isPublic: fakeIsPublic,
+      },
+      '../util/permissions': {
+        privatePermissions: fakePrivatePermissions,
+        sharedPermissions: fakeSharedPermissions,
+      },
     });
   });
 
@@ -278,6 +303,70 @@ describe('annotationService', () => {
     });
   });
 
+  describe('reply', () => {
+    let svc;
+
+    beforeEach(() => {
+      svc = service();
+    });
+
+    const filledAnnotation = () => {
+      const annot = fixtures.defaultAnnotation();
+      annot.group = 'mix3boop';
+      annot.references = ['feedbeef'];
+
+      return annot;
+    };
+
+    it('creates a new annotation in the store', () => {
+      const annotation = fixtures.defaultAnnotation();
+
+      svc.reply(annotation, 'acct:foo@bar.com');
+
+      assert.calledOnce(fakeStore.createAnnotation);
+    });
+
+    it('associates the reply with the annotation', () => {
+      const annotation = filledAnnotation();
+
+      svc.reply(annotation, 'acct:foo@bar.com');
+
+      const reply = fakeStore.createAnnotation.getCall(0).args[0];
+
+      assert.equal(
+        reply.references[reply.references.length - 1],
+        annotation.id
+      );
+      assert.equal(reply.group, annotation.group);
+      assert.equal(reply.target[0].source, annotation.target[0].source);
+      assert.equal(reply.uri, annotation.uri);
+    });
+
+    it('uses public permissions if annotation is public', () => {
+      fakeIsPublic.returns(true);
+      fakeSharedPermissions.returns('public');
+
+      const annotation = filledAnnotation();
+
+      svc.reply(annotation, 'acct:foo@bar.com');
+
+      const reply = fakeStore.createAnnotation.getCall(0).args[0];
+      assert.equal(reply.permissions, 'public');
+    });
+
+    it('uses private permissions if annotation is private', () => {
+      fakeIsPublic.returns(false);
+      fakePrivatePermissions.returns('private');
+
+      const annotation = filledAnnotation();
+
+      svc.reply(annotation, 'acct:foo@bar.com');
+
+      const reply = fakeStore.createAnnotation.getCall(0).args[0];
+      assert.equal(reply.permissions, 'private');
+    });
+  });
+
   describe('save', () => {
     let svc;
 
@@ -308,6 +397,7 @@ describe('annotationService', () => {
     });
 
     it('calls the relevant API service with an object that has any draft changes integrated', () => {
+      fakePrivatePermissions.returns({ read: ['foo'] });
       const annotation = fixtures.defaultAnnotation();
       annotation.text = 'not this';
       annotation.tags = ['nope'];
@@ -325,10 +415,7 @@ describe('annotationService', () => {
         assert.equal(annotationWithChanges.text, 'my text');
         assert.sameMembers(annotationWithChanges.tags, ['one', 'two']);
         // Permissions converted to "private"
-        assert.include(
-          annotationWithChanges.permissions.read,
-          fixtures.defaultAnnotation().user
-        );
+        assert.include(annotationWithChanges.permissions.read, 'foo');
         assert.notInclude(annotationWithChanges.permissions.read, [
           'group:__world__',
         ]);
