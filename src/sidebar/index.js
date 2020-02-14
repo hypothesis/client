@@ -123,6 +123,14 @@ function persistDefaults(persistedDefaults) {
   persistedDefaults.init();
 }
 
+/**
+ * Set up autosave-new-highlights service
+ */
+// @ngInject
+function autosave(autosaveService) {
+  autosaveService.init();
+}
+
 // Preact UI components that are wrapped for use within Angular templates.
 
 import AnnotationActionBar from './components/annotation-action-bar';
@@ -169,6 +177,7 @@ import windowScrollDirective from './directive/window-scroll';
 import bridgeService from '../shared/bridge';
 
 import analyticsService from './services/analytics';
+import autosaveService from './services/autosave';
 import annotationMapperService from './services/annotation-mapper';
 import annotationsService from './services/annotations';
 import apiService from './services/api';
@@ -211,6 +220,7 @@ function startAngularApp(config) {
     .register('analytics', analyticsService)
     .register('annotationMapper', annotationMapperService)
     .register('annotationsService', annotationsService)
+    .register('autosaveService', autosaveService)
     .register('api', apiService)
     .register('apiRoutes', apiRoutesService)
     .register('auth', authService)
@@ -301,6 +311,7 @@ function startAngularApp(config) {
     .service('analytics', () => container.get('analytics'))
     .service('annotationMapper', () => container.get('annotationMapper'))
     .service('annotationsService', () => container.get('annotationsService'))
+    .service('autosaveService', () => container.get('autosaveService'))
     .service('api', () => container.get('api'))
     .service('auth', () => container.get('auth'))
     .service('bridge', () => container.get('bridge'))
@@ -332,6 +343,7 @@ function startAngularApp(config) {
     .run(registerAngularServices)
 
     .run(persistDefaults)
+    .run(autosave)
     .run(sendPageView)
     .run(setupApi)
     .run(crossOriginRPC.server.start);

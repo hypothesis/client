@@ -84,13 +84,6 @@ function AnnotationController(
      */
     newlyCreatedByHighlightButton = self.annotation.$highlight || false;
 
-    // Automatically save new highlights to the server when they're created.
-    // Note that this line also gets called when the user logs in (since
-    // AnnotationController instances are re-created on login) so serves to
-    // automatically save highlights that were created while logged out when you
-    // log in.
-    saveNewHighlight();
-
     // If this annotation is not a highlight and if it's new (has just been
     // created by the annotate button) or it has edits not yet saved to the
     // server - then open the editor on AnnotationController instantiation.
@@ -100,45 +93,6 @@ function AnnotationController(
       }
     }
   };
-
-  /** Save this annotation if it's a new highlight.
-   *
-   * The highlight will be saved to the server if the user is logged in,
-   * saved to drafts if they aren't.
-   *
-   * If the annotation is not new (it has already been saved to the server) or
-   * is not a highlight then nothing will happen.
-   *
-   */
-  function saveNewHighlight() {
-    if (!isNew(self.annotation)) {
-      // Already saved.
-      return;
-    }
-
-    if (!self.annotation.user) {
-      // Open sidebar to display error message about needing to login to create highlights.
-      bridge.call('showSidebar');
-    }
-
-    if (!self.isHighlight()) {
-      // Not a highlight,
-      return;
-    }
-
-    if (self.annotation.user) {
-      // User is logged in, save to server.
-      // Highlights are always private.
-      self.annotation.permissions = permissions.private(self.annotation.user);
-      save(self.annotation).then(function(model) {
-        model.$tag = self.annotation.$tag;
-        $rootScope.$broadcast(events.ANNOTATION_CREATED, model);
-      });
-    } else {
-      // User isn't logged in, save to drafts.
-      store.createDraft(self.annotation, self.state());
-    }
-  }
 
   /**
    * @ngdoc method

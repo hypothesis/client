@@ -1,8 +1,8 @@
 {
-  "extends": [
-    "hypothesis",
-    "plugin:jsx-a11y/recommended"
-  ],
+  "extends": ["hypothesis", "plugin:jsx-a11y/recommended"],
+  "env": {
+    "es6": true
+  },
   "globals": {
     "Set": false
   },
