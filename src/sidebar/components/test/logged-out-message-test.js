@@ -45,7 +45,6 @@ describe('LoggedOutMessage', () => {
     assert.equal(loginLink.prop('onClick'), fakeOnLogin);
   });
 
-  // FIXME-A11Y
   it(
     'should pass a11y checks',
     checkAccessibility({
