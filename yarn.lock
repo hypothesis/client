@@ -1498,9 +1498,9 @@ aws4@^1.8.0:
   integrity sha512-ReZxvNHIOv88FlT7rxcXIIC0fPt4KZqZbOlivyWtXLt8ESx84zd3kMC6iK5jVeS2qt+g7ftS7ye4fi06X5rtRQ==
 
 axe-core@^3.4.1:
-  version "3.4.2"
-  resolved "https://registry.yarnpkg.com/axe-core/-/axe-core-3.4.2.tgz#d51d2fcb401685e8b49a1dd94212da0759fd7ca0"
-  integrity sha512-aPpM84KPiRfeaK3LhA9ag4OmjLUZkNKMH0sZuK+YRBS+QJcegjveidCyvWSBlBr/iIMQdn/1hU00e3YBiuTEdw==
+  version "3.5.1"
+  resolved "https://registry.yarnpkg.com/axe-core/-/axe-core-3.5.1.tgz#d8d5aaef73f003e8b766ea28bb078343f3622201"
+  integrity sha512-mwpDgPwWB+5kMHyLjlxh4w25ClJfqSxi+c6LQ4ix349TdCUctMwJNPTkhPD1qP9SYIjFgjeVpVZWCvK9oBGwCg==
 
 axobject-query@^2.0.2:
   version "2.1.1"
