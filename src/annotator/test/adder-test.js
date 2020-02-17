@@ -1,4 +1,4 @@
-import * as adder from '../adder';
+import { Adder, ARROW_POINTING_UP, ARROW_POINTING_DOWN } from '../adder';
 
 function rect(left, top, width, height) {
   return { left: left, top: top, width: width, height: height };
@@ -22,12 +22,14 @@ function revertOffsetElement(el) {
   el.style.top = '0';
 }
 
-describe('annotator.adder', function() {
+// nb. These tests currently cover the `AdderToolbar` Preact component as well
+// as the `Adder` container.
+describe('Adder', () => {
   let adderCtrl;
   let adderCallbacks;
   let adderEl;
 
-  beforeEach(function() {
+  beforeEach(() => {
     adderCallbacks = {
       onAnnotate: sinon.stub(),
       onHighlight: sinon.stub(),
@@ -35,102 +37,95 @@ describe('annotator.adder', function() {
     adderEl = document.createElement('div');
     document.body.appendChild(adderEl);
 
-    adderCtrl = new adder.Adder(adderEl, adderCallbacks);
+    adderCtrl = new Adder(adderEl, adderCallbacks);
   });
 
-  afterEach(function() {
+  afterEach(() => {
     adderCtrl.hide();
     adderEl.remove();
   });
 
   function windowSize() {
-    const window = adderCtrl.element.ownerDocument.defaultView;
     return { width: window.innerWidth, height: window.innerHeight };
   }
 
+  function getContent() {
+    return adderCtrl._shadowRoot;
+  }
+
   function adderSize() {
-    const rect = adderCtrl.element.getBoundingClientRect();
+    const rect = getContent(adderCtrl).firstChild.getBoundingClientRect();
     return { width: rect.width, height: rect.height };
   }
 
-  context('when Shadow DOM is supported', function() {
-    [
-      {
-        attachFn: 'createShadowRoot', // Shadow DOM v0 API
-      },
-      {
-        attachFn: 'attachShadow', // Shadow DOM v1 API
-      },
-    ].forEach(testCase => {
-      it(`creates the adder DOM in a shadow root (using ${testCase.attachFn})`, () => {
-        const adderEl = document.createElement('div');
-        let shadowEl;
+  it('renders the adder toolbar into a shadow root', () => {
+    const adderEl = document.createElement('div');
+    let shadowEl;
 
-        // Disable use of native Shadow DOM for this element, if supported.
-        adderEl.createShadowRoot = null;
-        adderEl.attachShadow = null;
-
-        adderEl[testCase.attachFn] = sinon.spy(function() {
-          shadowEl = document.createElement('shadow-root');
-          adderEl.appendChild(shadowEl);
-          return shadowEl;
-        });
-        document.body.appendChild(adderEl);
-
-        new adder.Adder(adderEl, adderCallbacks);
-
-        assert.called(adderEl[testCase.attachFn]);
-        assert.equal(
-          shadowEl.childNodes[0].tagName.toLowerCase(),
-          'hypothesis-adder-toolbar'
-        );
-
-        adderEl.remove();
-      });
+    adderEl.attachShadow = sinon.spy(() => {
+      shadowEl = document.createElement('shadow-root');
+      adderEl.appendChild(shadowEl);
+      return shadowEl;
     });
+    document.body.appendChild(adderEl);
+
+    new Adder(adderEl, adderCallbacks);
+
+    assert.called(adderEl.attachShadow);
+    assert.equal(
+      shadowEl.childNodes[0].tagName.toLowerCase(),
+      'hypothesis-adder-toolbar'
+    );
+
+    adderEl.remove();
   });
 
-  describe('button handling', function() {
-    it('calls onHighlight callback when Highlight button is clicked', function() {
-      const highlightBtn = adderCtrl.element.querySelector('.js-highlight-btn');
+  describe('button handling', () => {
+    it('calls onHighlight callback when Highlight button is clicked', () => {
+      const highlightBtn = getContent(adderCtrl).querySelector(
+        'button.h-icon-highlight'
+      );
       highlightBtn.dispatchEvent(new Event('click'));
       assert.called(adderCallbacks.onHighlight);
     });
 
-    it('calls onAnnotate callback when Annotate button is clicked', function() {
-      const annotateBtn = adderCtrl.element.querySelector('.js-annotate-btn');
+    it('calls onAnnotate callback when Annotate button is clicked', () => {
+      const annotateBtn = getContent(adderCtrl).querySelector(
+        'button.h-icon-annotate'
+      );
       annotateBtn.dispatchEvent(new Event('click'));
       assert.called(adderCallbacks.onAnnotate);
     });
 
     it("calls onAnnotate callback when Annotate button's label is clicked", () => {
-      const annotateBtn = adderCtrl.element.querySelector('.js-annotate-btn');
-      const annotateLabel = annotateBtn.querySelector('span');
+      const annotateLabel = getContent(adderCtrl).querySelector(
+        'button.h-icon-annotate > span'
+      );
       annotateLabel.dispatchEvent(new Event('click', { bubbles: true }));
       assert.called(adderCallbacks.onAnnotate);
     });
   });
 
-  describe('#target', function() {
-    it('positions the adder below the selection if the selection is forwards', function() {
+  describe('#target', () => {
+    it('positions the adder below the selection if the selection is forwards', () => {
       const target = adderCtrl.target(rect(100, 200, 100, 20), false);
       assert.isAbove(target.top, 220);
-      assert.equal(target.arrowDirection, adder.ARROW_POINTING_UP);
+      assert.equal(target.arrowDirection, ARROW_POINTING_UP);
     });
 
-    it('positions the adder above the selection if the selection is backwards', function() {
+    it('positions the adder above the selection if the selection is backwards', () => {
       const target = adderCtrl.target(rect(100, 200, 100, 20), true);
       assert.isBelow(target.top, 200);
-      assert.equal(target.arrowDirection, adder.ARROW_POINTING_DOWN);
+      assert.equal(target.arrowDirection, ARROW_POINTING_DOWN);
     });
 
-    it('does not position the adder above the top of the viewport', function() {
+    it('does not position the adder above the top of the viewport', () => {
       const target = adderCtrl.target(rect(100, -100, 100, 20), false);
       assert.isAtLeast(target.top, 0);
-      assert.equal(target.arrowDirection, adder.ARROW_POINTING_UP);
+      assert.equal(target.arrowDirection, ARROW_POINTING_UP);
     });
 
-    it('does not position the adder below the bottom of the viewport', function() {
+    it('does not position the adder below the bottom of the viewport', () => {
       const viewSize = windowSize();
       const target = adderCtrl.target(
         rect(0, viewSize.height + 100, 10, 20),
@@ -139,7 +134,7 @@ describe('annotator.adder', function() {
       assert.isAtMost(target.top, viewSize.height - adderSize().height);
     });
 
-    it('does not position the adder beyond the right edge of the viewport', function() {
+    it('does not position the adder beyond the right edge of the viewport', () => {
       const viewSize = windowSize();
       const target = adderCtrl.target(
         rect(viewSize.width + 100, 100, 10, 20),
@@ -148,7 +143,7 @@ describe('annotator.adder', function() {
       assert.isAtMost(target.left, viewSize.width);
     });
 
-    it('does not positon the adder beyond the left edge of the viewport', function() {
+    it('does not positon the adder beyond the left edge of the viewport', () => {
       const target = adderCtrl.target(rect(-100, 100, 10, 10), false);
       assert.isAtLeast(target.left, 0);
     });
@@ -157,7 +152,7 @@ describe('annotator.adder', function() {
   describe('#showAt', () => {
     context('when the document and body elements have no offset', () => {
       it('shows adder at target position', () => {
-        adderCtrl.showAt(100, 100, adder.ARROW_POINTING_UP);
+        adderCtrl.showAt(100, 100, ARROW_POINTING_UP);
 
         const { left, top } = adderEl.getBoundingClientRect();
         assert.equal(left, 100);
@@ -175,7 +170,7 @@ describe('annotator.adder', function() {
       });
 
       it('shows adder at target position', () => {
-        adderCtrl.showAt(100, 100, adder.ARROW_POINTING_UP);
+        adderCtrl.showAt(100, 100, ARROW_POINTING_UP);
 
         const { left, top } = adderEl.getBoundingClientRect();
         assert.equal(left, 100);
@@ -193,7 +188,7 @@ describe('annotator.adder', function() {
       });
 
       it('shows adder at target position when document element is offset', () => {
-        adderCtrl.showAt(100, 100, adder.ARROW_POINTING_UP);
+        adderCtrl.showAt(100, 100, ARROW_POINTING_UP);
 
         const { left, top } = adderEl.getBoundingClientRect();
         assert.equal(left, 100);
