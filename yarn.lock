@@ -1538,9 +1538,9 @@ babel-plugin-istanbul@^6.0.0:
     test-exclude "^6.0.0"
 
 babel-plugin-mockable-imports@^1.5.1:
-  version "1.7.0"
-  resolved "https://registry.yarnpkg.com/babel-plugin-mockable-imports/-/babel-plugin-mockable-imports-1.7.0.tgz#ac513a4efb7c24fc516024c4df95ee01c85d3290"
-  integrity sha512-atYOxS3JjmsuXmof68Fgh6YykLIl20POE4q2o5Dq8lBXqJoSd1DX/Oascl/9nHxC3fD3cY7llizDRVpueOe8Xg==
+  version "1.7.1"
+  resolved "https://registry.yarnpkg.com/babel-plugin-mockable-imports/-/babel-plugin-mockable-imports-1.7.1.tgz#8f68608a3bbe08bacf6a7bcc430a3c83514caceb"
+  integrity sha512-WuAB1CKwwlXC+/tzV3Ouu1R3MaibE4JQuR1LHYYVE0ofrEkBq6UiiR+S6+y9AV0PNoehcIOR4SKXIfbRh/YDVw==
 
 babel-plugin-transform-async-to-promises@^0.8.6:
   version "0.8.15"
