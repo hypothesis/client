@@ -100,13 +100,14 @@ describe('MarkdownEditor', () => {
     describe(`"${command}" toolbar command`, () => {
       it('applies formatting when toolbar button is clicked', () => {
         const onEditText = sinon.stub();
-        const wrapper = createComponent({ text: 'test', onEditText });
+        const text = 'toolbar command test';
+        const wrapper = createComponent({ text, onEditText });
         const button = wrapper.find(
           `ToolbarButton[title="${command}"] > button`
         );
         const input = wrapper.find('textarea').getDOMNode();
         input.selectionStart = 0;
-        input.selectionEnd = 4;
+        input.selectionEnd = text.length;
 
         button.simulate('click');
 
@@ -116,7 +117,7 @@ describe('MarkdownEditor', () => {
         const [formatFunction, ...args] = effect;
         assert.calledWith(
           formatFunction,
-          sinon.match({ text: 'test', selectionStart: 0, selectionEnd: 4 }),
+          sinon.match({ text, selectionStart: 0, selectionEnd: text.length }),
           ...args
         );
       });
@@ -124,10 +125,11 @@ describe('MarkdownEditor', () => {
       if (key) {
         it('applies formatting when shortcut key is pressed', () => {
           const onEditText = sinon.stub();
-          const wrapper = createComponent({ text: 'test', onEditText });
+          const text = 'toolbar shortcut test';
+          const wrapper = createComponent({ text, onEditText });
           const input = wrapper.find('textarea');
           input.getDOMNode().selectionStart = 0;
-          input.getDOMNode().selectionEnd = 4;
+          input.getDOMNode().selectionEnd = text.length;
 
           input.simulate('keydown', {
             ctrlKey: true,
@@ -140,7 +142,7 @@ describe('MarkdownEditor', () => {
           const [formatFunction, ...args] = effect;
           assert.calledWith(
             formatFunction,
-            sinon.match({ text: 'test', selectionStart: 0, selectionEnd: 4 }),
+            sinon.match({ text, selectionStart: 0, selectionEnd: text.length }),
             ...args
           );
         });
