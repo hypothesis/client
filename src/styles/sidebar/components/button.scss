@@ -29,12 +29,6 @@
   border-radius: 0; // Turn off border-radius to align with <input> edges
   border: 1px solid var.$grey-3;
   border-left: 0px; // Avoid double border with the <input>
-  color: var.$grey-4;
-
-  &:hover {
-    background-color: var.$grey-2;
-    color: var.$grey-5;
-  }
 }
 
 // In a few cases, it's necessary to squeeze buttons into tight spots
