@@ -105,7 +105,7 @@ function TopBar({
           <Button
             className="top-bar__icon-button"
             icon="help"
-            isActive={currentActivePanel === uiConstants.PANEL_HELP}
+            isPressed={currentActivePanel === uiConstants.PANEL_HELP}
             onClick={requestHelp}
             title="Help"
             useCompactStyle
@@ -135,7 +135,7 @@ function TopBar({
             <Button
               className="top-bar__icon-button"
               icon="share"
-              isActive={
+              isPressed={
                 currentActivePanel === uiConstants.PANEL_SHARE_ANNOTATIONS
               }
               onClick={toggleSharePanel}
@@ -146,7 +146,7 @@ function TopBar({
           <Button
             className="top-bar__icon-button"
             icon="help"
-            isActive={currentActivePanel === uiConstants.PANEL_HELP}
+            isPressed={currentActivePanel === uiConstants.PANEL_HELP}
             onClick={requestHelp}
             title="Help"
             useCompactStyle

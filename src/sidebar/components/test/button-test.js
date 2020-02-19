@@ -14,7 +14,6 @@ describe('Button', () => {
     return mount(
       <Button
         icon="fakeIcon"
-        isActive={false}
         title="My Action"
         onClick={fakeOnClick}
         {...props}
@@ -31,8 +30,8 @@ describe('Button', () => {
     $imports.$restore();
   });
 
-  it('adds active className if `isActive` is `true`', () => {
-    const wrapper = createComponent({ isActive: true });
+  it('adds active className if `isPressed` is `true`', () => {
+    const wrapper = createComponent({ isPressed: true });
 
     assert.isTrue(wrapper.find('button').hasClass('is-active'));
   });
@@ -42,9 +41,16 @@ describe('Button', () => {
     assert.equal(wrapper.find('SvgIcon').prop('name'), 'fakeIcon');
   });
 
-  it('sets ARIA `aria-pressed` attribute if `isActive`', () => {
-    const wrapper = createComponent({ isActive: true });
-    assert.isTrue(wrapper.find('button').prop('aria-pressed'));
+  [true, false].forEach(isPressed => {
+    it('sets `aria-pressed` attribute if `isPressed` is a boolean', () => {
+      const wrapper = createComponent({ isPressed });
+      assert.equal(wrapper.find('button').prop('aria-pressed'), isPressed);
+    });
+  });
+
+  it('does not set `aria-pressed` attribute if `isPressed` is omitted', () => {
+    const wrapper = createComponent();
+    assert.notProperty(wrapper.find('button').props(), 'aria-pressed');
   });
 
   it('sets `title` to provided `title` prop', () => {
