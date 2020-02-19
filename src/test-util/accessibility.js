@@ -9,10 +9,17 @@ import { isValidElement } from 'preact';
  * @prop {() => import('preact').VNode|ReactWrapper} content -
  *   A function that returns the rendered output to test or an Enzyme wrapper
  *   created using Enzyme's `mount` function.
+ * @prop {string} [backgroundColor] -
+ *   Background color onto which to render the element. This can affect the
+ *   result of color contrast tests. Defaults to white.
  */
 
-async function testScenario(elementOrWrapper) {
+async function testScenario(
+  elementOrWrapper,
+  { backgroundColor = 'white' } = {}
+) {
   const container = document.createElement('div');
+  container.style.backgroundColor = backgroundColor;
   document.body.appendChild(container);
 
   let wrapper;
@@ -58,7 +65,7 @@ export function checkAccessibility(scenarios) {
   }
 
   return async () => {
-    for (let { name = 'default', content } of scenarios) {
+    for (let { name = 'default', content, ...config } of scenarios) {
       if (typeof content !== 'function') {
         throw new Error(
           `"content" key for accessibility scenario "${name}" should be a function but is a ${typeof content}`
@@ -76,7 +83,7 @@ export function checkAccessibility(scenarios) {
         );
       }
 
-      const violations = await testScenario(elementOrWrapper);
+      const violations = await testScenario(elementOrWrapper, config);
       assert.deepEqual(
         violations,
         [],

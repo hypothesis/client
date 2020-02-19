@@ -144,8 +144,7 @@ describe('AnnotationShareInfo', () => {
     });
   });
 
-  // FIXME-A11Y
-  it.skip(
+  it(
     'should pass a11y checks',
     checkAccessibility({
       content: () => createAnnotationShareInfo(),
