@@ -47,6 +47,7 @@ export default function SearchInput({ alwaysExpanded, query, onSearch }) {
       onSubmit={onSubmit}
     >
       <input
+        aria-label="Search"
         className={classnames('search-input__input', {
           'is-expanded': alwaysExpanded || query,
         })}
