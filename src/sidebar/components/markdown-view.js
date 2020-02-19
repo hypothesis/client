@@ -20,10 +20,16 @@ export default function MarkdownView({ markdown = '', textClass = {} }) {
     replaceLinksWithEmbeds(content.current);
   }, [markdown]);
 
+  // Use a blank string to indicate that the content language is unknown and may be
+  // different than the client UI. The user agent may pick a default or analyze
+  // the content to guess.
+  const contentLanguage = '';
+
   return (
     <div
       className={classnames('markdown-view', textClass)}
       dir="auto"
+      lang={contentLanguage}
       ref={content}
       dangerouslySetInnerHTML={{ __html: html }}
     />

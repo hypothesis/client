@@ -32,6 +32,7 @@ function TagList({ annotation, serviceUrl, settings, tags }) {
             <a
               className="tag-list__link"
               href={createTagSearchURL(tag)}
+              lang=""
               target="_blank"
               rel="noopener noreferrer"
               aria-label={`Tag: ${tag}`}
@@ -41,7 +42,7 @@ function TagList({ annotation, serviceUrl, settings, tags }) {
             </a>
           )}
           {!renderLink && (
-            <span className="tag-list__text" aria-label={`Tag: ${tag}`}>
+            <span className="tag-list__text" aria-label={`Tag: ${tag}`} lang="">
               {tag}
             </span>
           )}

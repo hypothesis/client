@@ -215,7 +215,9 @@ function TagEditor({ onEditTags, tags: tagsService, tagList }) {
               className="tag-editor__item"
               aria-label={`Tag: ${tag}`}
             >
-              <span className="tag-editor__edit">{tag}</span>
+              <span lang="" className="tag-editor__edit">
+                {tag}
+              </span>
               <button
                 onClick={() => {
                   removeTag(tag);
