@@ -21,7 +21,7 @@ export default function Button({
   className = '',
   disabled = false,
   icon = '',
-  isActive = false,
+  isPressed,
   onClick = () => null,
   style = {},
   title,
@@ -35,6 +35,12 @@ export default function Button({
 
   const baseClassName = buttonText ? 'button--labeled' : 'button--icon-only';
 
+  const extraProps = {};
+  if (typeof isPressed === 'boolean') {
+    // Indicate that this is a toggle button.
+    extraProps['aria-pressed'] = isPressed;
+  }
+
   return (
     <button
       className={classnames(
@@ -44,15 +50,15 @@ export default function Button({
           'button--compact': useCompactStyle,
           'button--input': useInputStyle,
           'button--primary': usePrimaryStyle,
-          'is-active': isActive,
+          'is-active': isPressed,
         },
         className
       )}
       onClick={onClick}
-      aria-pressed={isActive}
       title={title}
       style={style}
       disabled={disabled}
+      {...extraProps}
     >
       {icon && <SvgIcon name={icon} className="button__icon" />}
       {buttonText}
@@ -104,8 +110,13 @@ Button.propTypes = {
    */
   icon: requiredStringIfButtonTextMissing,
 
-  /** Is this button currently in an "active"/"on" state? */
-  isActive: propTypes.bool,
+  /**
+   * Indicate that this is a toggle button (if `isPressed` is a boolean) and
+   * whether it is pressed.
+   *
+   * If omitted, the button is a non-toggle button.
+   */
+  isPressed: propTypes.bool,
 
   /** callback for button clicks */
   onClick: propTypes.func,

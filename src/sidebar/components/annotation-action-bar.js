@@ -96,7 +96,7 @@ function AnnotationActionBar({
       )}
       {showFlagAction && annotation.flagged && (
         <Button
-          isActive={true}
+          isPressed={true}
           icon="flag--active"
           title="Annotation has been reported to the moderators"
         />
