@@ -42,6 +42,10 @@ describe('MarkdownEditor', () => {
     $imports.$restore();
   });
 
+  function createComponent(props = {}) {
+    return mount(<MarkdownEditor label="Test editor" text="test" {...props} />);
+  }
+
   const commands = [
     {
       command: 'Bold',
@@ -96,15 +100,14 @@ describe('MarkdownEditor', () => {
     describe(`"${command}" toolbar command`, () => {
       it('applies formatting when toolbar button is clicked', () => {
         const onEditText = sinon.stub();
-        const wrapper = mount(
-          <MarkdownEditor text="test" onEditText={onEditText} />
-        );
+        const text = 'toolbar command test';
+        const wrapper = createComponent({ text, onEditText });
         const button = wrapper.find(
           `ToolbarButton[title="${command}"] > button`
         );
         const input = wrapper.find('textarea').getDOMNode();
         input.selectionStart = 0;
-        input.selectionEnd = 4;
+        input.selectionEnd = text.length;
 
         button.simulate('click');
 
@@ -114,7 +117,7 @@ describe('MarkdownEditor', () => {
         const [formatFunction, ...args] = effect;
         assert.calledWith(
           formatFunction,
-          sinon.match({ text: 'test', selectionStart: 0, selectionEnd: 4 }),
+          sinon.match({ text, selectionStart: 0, selectionEnd: text.length }),
           ...args
         );
       });
@@ -122,12 +125,11 @@ describe('MarkdownEditor', () => {
       if (key) {
         it('applies formatting when shortcut key is pressed', () => {
           const onEditText = sinon.stub();
-          const wrapper = mount(
-            <MarkdownEditor text="test" onEditText={onEditText} />
-          );
+          const text = 'toolbar shortcut test';
+          const wrapper = createComponent({ text, onEditText });
           const input = wrapper.find('textarea');
           input.getDOMNode().selectionStart = 0;
-          input.getDOMNode().selectionEnd = 4;
+          input.getDOMNode().selectionEnd = text.length;
 
           input.simulate('keydown', {
             ctrlKey: true,
@@ -140,7 +142,7 @@ describe('MarkdownEditor', () => {
           const [formatFunction, ...args] = effect;
           assert.calledWith(
             formatFunction,
-            sinon.match({ text: 'test', selectionStart: 0, selectionEnd: 4 }),
+            sinon.match({ text, selectionStart: 0, selectionEnd: text.length }),
             ...args
           );
         });
@@ -162,9 +164,7 @@ describe('MarkdownEditor', () => {
   ].forEach(({ ctrlKey, key }) => {
     it('does not apply formatting when a non-shortcut key is pressed', () => {
       const onEditText = sinon.stub();
-      const wrapper = mount(
-        <MarkdownEditor text="test" onEditText={onEditText} />
-      );
+      const wrapper = createComponent({ onEditText });
       const input = wrapper.find('textarea');
 
       input.simulate('keydown', {
@@ -178,9 +178,7 @@ describe('MarkdownEditor', () => {
 
   it('calls `onEditText` callback when text is changed', () => {
     const onEditText = sinon.stub();
-    const wrapper = mount(
-      <MarkdownEditor text="test" onEditText={onEditText} />
-    );
+    const wrapper = createComponent({ onEditText });
     const input = wrapper.find('textarea').getDOMNode();
     input.value = 'changed';
     wrapper.find('textarea').simulate('input');
@@ -190,7 +188,7 @@ describe('MarkdownEditor', () => {
   });
 
   it('enters preview mode when Preview button is clicked', () => {
-    const wrapper = mount(<MarkdownEditor text="test" />);
+    const wrapper = createComponent();
 
     const previewButton = wrapper
       .find('button')
@@ -206,7 +204,7 @@ describe('MarkdownEditor', () => {
   });
 
   it('exits preview mode when Write button is clicked', () => {
-    const wrapper = mount(<MarkdownEditor text="test" />);
+    const wrapper = createComponent();
 
     // Switch to "Preview" mode.
     const previewButton = wrapper
@@ -234,7 +232,7 @@ describe('MarkdownEditor', () => {
       document.body.focus();
       document.body.appendChild(container);
       act(() => {
-        render(<MarkdownEditor text="test" />, container);
+        render(<MarkdownEditor label="An editor" text="test" />, container);
       });
 
       assert.equal(document.activeElement.nodeName, 'TEXTAREA');
@@ -243,18 +241,23 @@ describe('MarkdownEditor', () => {
     }
   });
 
-  // FIXME-A11Y
-  it.skip(
+  it('sets accessible label for input field', () => {
+    const wrapper = createComponent({ label: 'Annotation body' });
+    const inputField = wrapper.find('textarea');
+    assert.equal(inputField.prop('aria-label'), 'Annotation body');
+  });
+
+  it(
     'should pass a11y checks',
     checkAccessibility([
       {
         // eslint-disable-next-line react/display-name
-        content: () => <MarkdownEditor text="test" />,
+        content: () => createComponent(),
       },
       {
         name: 'Preview mode',
         content: () => {
-          const wrapper = mount(<MarkdownEditor text="test" />);
+          const wrapper = createComponent();
 
           const previewButton = wrapper
             .find('button')

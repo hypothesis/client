@@ -234,7 +234,11 @@ Toolbar.propTypes = {
 /**
  * Viewer/editor for the body of an annotation in markdown format.
  */
-export default function MarkdownEditor({ onEditText = () => {}, text = '' }) {
+export default function MarkdownEditor({
+  label = '',
+  onEditText = () => {},
+  text = '',
+}) {
   /** Whether the preview mode is currently active. */
   const [preview, setPreview] = useState(false);
 
@@ -282,6 +286,7 @@ export default function MarkdownEditor({ onEditText = () => {}, text = '' }) {
         />
       ) : (
         <textarea
+          aria-label={label}
           className="markdown-editor__input"
           dir="auto"
           ref={input}
@@ -296,6 +301,11 @@ export default function MarkdownEditor({ onEditText = () => {}, text = '' }) {
 }
 
 MarkdownEditor.propTypes = {
+  /**
+   * An accessible label for the input field.
+   */
+  label: propTypes.string.isRequired,
+
   /** The markdown text to edit. */
   text: propTypes.string,
 

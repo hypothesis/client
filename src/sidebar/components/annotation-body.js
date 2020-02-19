@@ -53,7 +53,13 @@ export default function AnnotationBody({
             />
           </Excerpt>
         )}
-        {isEditing && <MarkdownEditor text={text} onEditText={onEditText} />}
+        {isEditing && (
+          <MarkdownEditor
+            label="Annotation body"
+            text={text}
+            onEditText={onEditText}
+          />
+        )}
       </section>
       {isCollapsible && !isEditing && (
         <div className="annotation-body__collapse-toggle">
