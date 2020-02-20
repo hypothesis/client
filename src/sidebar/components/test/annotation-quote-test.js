@@ -45,8 +45,7 @@ describe('AnnotationQuote', () => {
     assert.equal(quote.text(), 'test quote');
   });
 
-  // FIXME-A11Y
-  it.skip(
+  it(
     'should pass a11y checks',
     checkAccessibility({
       content: () => createQuote(),
