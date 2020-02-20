@@ -16,7 +16,7 @@
 @mixin button-base {
   @include reset-native-btn-styles;
   padding: 0.5em;
-  color: var.$grey-5;
+  color: var.$grey-mid;
 
   &__icon {
     width: 16px;
@@ -47,7 +47,7 @@
   border: none;
   background-color: var.$grey-1;
   font-weight: 700;
-  color: var.$grey-5;
+  color: var.$grey-mid;
 
   padding-right: 0.75em;
   padding-left: 0.75em;
