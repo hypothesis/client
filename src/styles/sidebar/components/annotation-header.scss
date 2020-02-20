@@ -6,7 +6,7 @@
   // Margin between top of x-height of username and
   // top of the annotation card should be ~15px
   margin-top: -(var.$layout-h-margin) + 10px;
-  color: var.$grey-5;
+  color: var.$grey-6;
 
   &__row {
     display: flex;
@@ -31,7 +31,7 @@
   &__timestamp-edited {
     @include var.font-small;
     font-style: italic;
-    color: var.$grey-4;
+    color: var.$grey-5;
   }
 
   &__timestamp-created-link {
@@ -41,7 +41,7 @@
   }
 
   &__timestamp-created-link {
-    color: var.$grey-5;
+    color: var.$grey-6;
   }
 
   &__highlight {
