@@ -75,6 +75,7 @@ describe('sidebar.components.hypothesis-app', function() {
           },
         }),
         clearGroups: sinon.stub(),
+        closeSidebarPanel: sinon.stub(),
         openSidebarPanel: sinon.stub(),
         // draft store
         countDrafts: sandbox.stub().returns(0),
@@ -332,6 +333,13 @@ describe('sidebar.components.hypothesis-app', function() {
       const ctrl = createController();
       return ctrl.login().then(() => {
         assert.called(fakeSession.reload);
+      });
+    });
+
+    it('closes the login prompt panel', () => {
+      const ctrl = createController();
+      return ctrl.login().then(() => {
+        assert.called(fakeStore.closeSidebarPanel);
       });
     });
 

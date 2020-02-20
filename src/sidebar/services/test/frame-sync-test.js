@@ -50,7 +50,6 @@ const fixtures = {
 describe('sidebar.frame-sync', function() {
   let fakeStore;
   let fakeBridge;
-  let fakeFlash;
   let frameSync;
   let $rootScope;
 
@@ -59,10 +58,6 @@ describe('sidebar.frame-sync', function() {
   });
 
   beforeEach(function() {
-    fakeFlash = {
-      error: sinon.stub(),
-    };
-
     fakeStore = createFakeStore(
       { annotations: [] },
       {
@@ -72,6 +67,7 @@ describe('sidebar.frame-sync', function() {
         focusAnnotations: sinon.stub(),
         frames: sinon.stub().returns([fixtures.framesListEntry]),
         isLoggedIn: sinon.stub().returns(false),
+        openSidebarPanel: sinon.stub(),
         selectAnnotations: sinon.stub(),
         selectTab: sinon.stub(),
         toggleSelectedAnnotations: sinon.stub(),
@@ -96,7 +92,6 @@ describe('sidebar.frame-sync', function() {
     }
 
     angular.mock.module('app', {
-      flash: fakeFlash,
       store: fakeStore,
       bridge: fakeBridge,
     });
@@ -260,13 +255,13 @@ describe('sidebar.frame-sync', function() {
         assert.calledWith(fakeBridge.call, 'showSidebar');
       });
 
-      it('should flash an error message', () => {
+      it('should open the login prompt panel', () => {
         const ann = { target: [] };
         fakeBridge.emit('beforeCreateAnnotation', { tag: 't1', msg: ann });
 
         assert.calledWith(
-          fakeFlash.error,
-          'Please log in to create annotations or highlights'
+          fakeStore.openSidebarPanel,
+          uiConstants.PANEL_LOGIN_PROMPT
         );
       });
 

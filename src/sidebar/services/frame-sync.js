@@ -40,7 +40,7 @@ export function formatAnnot(ann) {
  * sidebar.
  */
 // @ngInject
-export default function FrameSync($rootScope, $window, flash, store, bridge) {
+export default function FrameSync($rootScope, $window, store, bridge) {
   // Set of tags of annotations that are currently loaded into the frame
   const inFrame = new Set();
 
@@ -135,7 +135,7 @@ export default function FrameSync($rootScope, $window, flash, store, bridge) {
       // target document
       if (!store.isLoggedIn()) {
         bridge.call('showSidebar');
-        flash.error('Please log in to create annotations or highlights');
+        store.openSidebarPanel(uiConstants.PANEL_LOGIN_PROMPT);
         bridge.call('deleteAnnotation', formatAnnot(annot));
         return;
       }

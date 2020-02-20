@@ -5,13 +5,4 @@
   @include panel.panel;
   position: relative;
   margin-bottom: 0.75em;
-
-  &__button {
-    margin-left: 1em;
-  }
-
-  &__actions {
-    display: flex;
-    justify-content: flex-end;
-  }
 }

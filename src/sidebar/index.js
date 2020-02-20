@@ -85,7 +85,7 @@ function configureRoutes($routeProvider) {
   });
   $routeProvider.otherwise({
     template:
-      '<sidebar-content auth="vm.auth" on-login="vm.login()"></sidebar-content>',
+      '<sidebar-content auth="vm.auth" on-login="vm.login()" on-sign-up="vm.signUp()"></sidebar-content>',
     reloadOnSearch: false,
     resolve: resolve,
   });
@@ -135,6 +135,7 @@ import AnnotationQuote from './components/annotation-quote';
 import FocusedModeHeader from './components/focused-mode-header';
 import HelpPanel from './components/help-panel';
 import LoggedOutMessage from './components/logged-out-message';
+import LoginPromptPanel from './components/login-prompt-panel';
 import ModerationBanner from './components/moderation-banner';
 import SearchStatusBar from './components/search-status-bar';
 import SelectionTabs from './components/selection-tabs';
@@ -274,6 +275,7 @@ function startAngularApp(config) {
     .component('annotationThread', annotationThread)
     .component('annotationViewerContent', annotationViewerContent)
     .component('helpPanel', wrapComponent(HelpPanel))
+    .component('loginPromptPanel', wrapComponent(LoginPromptPanel))
     .component('loggedOutMessage', wrapComponent(LoggedOutMessage))
     .component('moderationBanner', wrapComponent(ModerationBanner))
     .component('searchStatusBar', wrapComponent(SearchStatusBar))
