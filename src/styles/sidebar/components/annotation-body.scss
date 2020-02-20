@@ -2,7 +2,7 @@
 
 .annotation-body {
   @include var.font-normal;
-  color: var.$grey-6;
+  color: var.$grey-7;
   // Margin between top of ascent of annotation body and
   // bottom of ascent of annotation-quote should be ~15px.
   margin-top: var.$layout-h-margin - 5px;
