@@ -1,6 +1,7 @@
 import { createElement } from 'preact';
 import propTypes from 'prop-types';
 
+import uiConstants from '../ui-constants';
 import useStore from '../store/use-store';
 import { isShareable, shareURI } from '../util/annotation-sharing';
 import { isPrivate, permits } from '../util/permissions';
@@ -22,7 +23,9 @@ function AnnotationActionBar({
 }) {
   const userProfile = useStore(store => store.profile());
   const annotationGroup = useStore(store => store.getGroup(annotation.group));
+  const isLoggedIn = useStore(store => store.isLoggedIn());
 
+  const openSidebarPanel = useStore(store => store.openSidebarPanel);
   // Is the current user allowed to take the given `action` on this annotation?
   const userIsAuthorizedTo = action => {
     return permits(annotation.permissions, action, userProfile.userid);
@@ -73,13 +76,21 @@ function AnnotationActionBar({
       .catch(err => flash.error(err.message, 'Flagging annotation failed'));
   };
 
+  const onReplyClick = () => {
+    if (!isLoggedIn) {
+      openSidebarPanel(uiConstants.PANEL_LOGIN_PROMPT);
+      return;
+    }
+    onReply();
+  };
+
   return (
     <div className="annotation-action-bar">
       {showEditAction && <Button icon="edit" title="Edit" onClick={onEdit} />}
       {showDeleteAction && (
         <Button icon="trash" title="Delete" onClick={onDelete} />
       )}
-      <Button icon="reply" title="Reply" onClick={onReply} />
+      <Button icon="reply" title="Reply" onClick={onReplyClick} />
       {showShareAction && (
         <AnnotationShareControl
           annotation={annotation}

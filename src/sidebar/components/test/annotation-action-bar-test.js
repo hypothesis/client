@@ -5,6 +5,7 @@ import { act } from 'preact/test-utils';
 import AnnotationActionBar from '../annotation-action-bar';
 import { $imports } from '../annotation-action-bar';
 import * as fixtures from '../../test/annotation-fixtures';
+import uiConstants from '../../ui-constants';
 
 import { checkAccessibility } from '../../../test-util/accessibility';
 import mockImportedComponents from '../../../test-util/mock-imported-components';
@@ -81,6 +82,8 @@ describe('AnnotationActionBar', () => {
     fakeStore = {
       createDraft: sinon.stub(),
       getGroup: sinon.stub().returns({}),
+      isLoggedIn: sinon.stub(),
+      openSidebarPanel: sinon.stub(),
       profile: sinon.stub().returns(fakeUserProfile),
       updateFlagStatus: sinon.stub(),
     };
@@ -198,14 +201,33 @@ describe('AnnotationActionBar', () => {
       assert.isTrue(getButton(wrapper, 'reply').exists());
     });
 
-    it('invokes `onReply` callback when reply button clicked', () => {
-      const button = getButton(createComponent(), 'reply');
+    describe('when clicked', () => {
+      it('shows login prompt if user is not logged in', () => {
+        fakeStore.isLoggedIn.returns(false);
+        const button = getButton(createComponent(), 'reply');
 
-      act(() => {
-        button.props().onClick();
+        act(() => {
+          button.props().onClick();
+        });
+
+        assert.calledWith(
+          fakeStore.openSidebarPanel,
+          uiConstants.PANEL_LOGIN_PROMPT
+        );
+        assert.notCalled(fakeOnReply);
       });
 
-      assert.calledOnce(fakeOnReply);
+      it('invokes `onReply` callback if user is logged in', () => {
+        fakeStore.isLoggedIn.returns(true);
+        const button = getButton(createComponent(), 'reply');
+
+        act(() => {
+          button.props().onClick();
+        });
+
+        assert.calledOnce(fakeOnReply);
+        assert.notCalled(fakeStore.openSidebarPanel);
+      });
     });
   });
 
