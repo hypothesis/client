@@ -66,6 +66,8 @@ describe('sidebar.frame-sync', function() {
         findIDsForTags: sinon.stub(),
         focusAnnotations: sinon.stub(),
         frames: sinon.stub().returns([fixtures.framesListEntry]),
+        isLoggedIn: sinon.stub().returns(false),
+        openSidebarPanel: sinon.stub(),
         selectAnnotations: sinon.stub(),
         selectTab: sinon.stub(),
         toggleSelectedAnnotations: sinon.stub(),
@@ -211,21 +213,64 @@ describe('sidebar.frame-sync', function() {
   });
 
   context('when a new annotation is created in the frame', function() {
-    it('emits a BEFORE_ANNOTATION_CREATED event', function() {
-      const onCreated = sinon.stub();
-      const ann = { target: [] };
-      $rootScope.$on(events.BEFORE_ANNOTATION_CREATED, onCreated);
+    context('when an authenticated user is present', () => {
+      it('emits a BEFORE_ANNOTATION_CREATED event', function() {
+        fakeStore.isLoggedIn.returns(true);
+        const onCreated = sinon.stub();
+        const ann = { target: [] };
+        $rootScope.$on(events.BEFORE_ANNOTATION_CREATED, onCreated);
 
-      fakeBridge.emit('beforeCreateAnnotation', { tag: 't1', msg: ann });
+        fakeBridge.emit('beforeCreateAnnotation', { tag: 't1', msg: ann });
 
-      assert.calledWithMatch(
-        onCreated,
-        sinon.match.any,
-        sinon.match({
-          $tag: 't1',
-          target: [],
-        })
-      );
+        assert.calledWithMatch(
+          onCreated,
+          sinon.match.any,
+          sinon.match({
+            $tag: 't1',
+            target: [],
+          })
+        );
+      });
+    });
+
+    context('when no authenticated user is present', () => {
+      beforeEach(() => {
+        fakeStore.isLoggedIn.returns(false);
+      });
+
+      it('should not emit BEFORE_ANNOTATION_CREATED event', () => {
+        const onCreated = sinon.stub();
+        const ann = { target: [] };
+        $rootScope.$on(events.BEFORE_ANNOTATION_CREATED, onCreated);
+
+        fakeBridge.emit('beforeCreateAnnotation', { tag: 't1', msg: ann });
+
+        assert.notCalled(onCreated);
+      });
+
+      it('should open the sidebar', () => {
+        const ann = { target: [] };
+        fakeBridge.emit('beforeCreateAnnotation', { tag: 't1', msg: ann });
+
+        assert.calledWith(fakeBridge.call, 'showSidebar');
+      });
+
+      it('should open the login prompt panel', () => {
+        const ann = { target: [] };
+        fakeBridge.emit('beforeCreateAnnotation', { tag: 't1', msg: ann });
+
+        assert.calledWith(
+          fakeStore.openSidebarPanel,
+          uiConstants.PANEL_LOGIN_PROMPT
+        );
+      });
+
+      it('should send a "deleteAnnotation" message to the frame', () => {
+        const ann = { target: [] };
+        fakeBridge.emit('beforeCreateAnnotation', { tag: 't1', msg: ann });
+
+        assert.calledWith(fakeBridge.call, 'deleteAnnotation');
+      });
     });
   });
 

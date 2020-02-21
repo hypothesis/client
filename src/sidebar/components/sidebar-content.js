@@ -197,6 +197,7 @@ export default {
   bindings: {
     auth: '<',
     onLogin: '&',
+    onSignUp: '&',
   },
   template: require('../templates/sidebar-content.html'),
 };

@@ -44,6 +44,15 @@
     margin: 1em;
     margin-top: 0;
   }
+
+  &__button {
+    margin-left: 1em;
+  }
+
+  &__actions {
+    display: flex;
+    justify-content: flex-end;
+  }
 }
 
 /**

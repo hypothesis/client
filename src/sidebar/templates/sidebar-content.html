@@ -2,6 +2,8 @@
   ng-if="vm.showFocusedHeader()">
 </focused-mode-header>
 
+<login-prompt-panel on-login="vm.onLogin()" on-sign-up="vm.onSignUp()"></login-prompt-panel>
+
 <selection-tabs
   ng-if="vm.showSelectedTabs()"
   is-loading="vm.isLoading()">
@@ -26,6 +28,7 @@
   ng-if="vm.selectedGroupUnavailable()"
 >
 </sidebar-content-error>
+
 
 <thread-list
   on-change-collapsed="vm.setCollapsed(id, collapsed)"

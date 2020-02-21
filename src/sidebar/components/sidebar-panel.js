@@ -7,6 +7,7 @@ import useStore from '../store/use-store';
 
 import Button from './button';
 import Slider from './slider';
+import SvgIcon from './svg-icon';
 
 /**
  * Base component for a sidebar panel.
@@ -17,6 +18,7 @@ import Slider from './slider';
  */
 export default function SidebarPanel({
   children,
+  icon = '',
   panelName,
   title,
   onActiveChanged,
@@ -48,6 +50,11 @@ export default function SidebarPanel({
     <Slider visible={panelIsActive}>
       <div className="sidebar-panel" ref={panelElement}>
         <div className="sidebar-panel__header">
+          {icon && (
+            <div className="sidebar-panel__header-icon">
+              <SvgIcon name={icon} title={title} />
+            </div>
+          )}
           <div className="sidebar-panel__title u-stretch">{title}</div>
           <div>
             <Button
@@ -66,6 +73,11 @@ export default function SidebarPanel({
 
 SidebarPanel.propTypes = {
   children: propTypes.any,
+
+  /**
+   * An optional icon name for display next to the panel's title
+   */
+  icon: propTypes.string,
 
   /**
    * A string identifying this panel. Only one `panelName` may be active at

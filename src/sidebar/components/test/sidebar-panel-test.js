@@ -44,6 +44,14 @@ describe('SidebarPanel', () => {
     assert.equal(titleEl.text(), 'My Panel');
   });
 
+  it('renders an icon if provided', () => {
+    const wrapper = createSidebarPanel({ icon: 'restricted' });
+
+    const icon = wrapper.find('SvgIcon').filter({ name: 'restricted' });
+
+    assert.isTrue(icon.exists());
+  });
+
   it('closes the panel when close button is clicked', () => {
     const wrapper = createSidebarPanel({ panelName: 'flibberty' });
 

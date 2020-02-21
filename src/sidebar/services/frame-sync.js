@@ -128,8 +128,18 @@ export default function FrameSync($rootScope, $window, store, bridge) {
   function setupSyncFromFrame() {
     // A new annotation, note or highlight was created in the frame
     bridge.on('beforeCreateAnnotation', function(event) {
-      inFrame.add(event.tag);
       const annot = Object.assign({}, event.msg, { $tag: event.tag });
+      // If user is not logged in, we can't really create a meaningful highlight
+      // or annotation. Instead, we need to open the sidebar, show an error,
+      // and delete the (unsaved) annotation so it gets un-selected in the
+      // target document
+      if (!store.isLoggedIn()) {
+        bridge.call('showSidebar');
+        store.openSidebarPanel(uiConstants.PANEL_LOGIN_PROMPT);
+        bridge.call('deleteAnnotation', formatAnnot(annot));
+        return;
+      }
+      inFrame.add(event.tag);
       $rootScope.$broadcast(events.BEFORE_ANNOTATION_CREATED, annot);
     });
 

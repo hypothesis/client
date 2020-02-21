@@ -103,6 +103,8 @@ function HypothesisAppController(
     return auth
       .login()
       .then(() => {
+        // If the prompt-to-log-in sidebar panel is open, close it
+        store.closeSidebarPanel(uiConstants.PANEL_LOGIN_PROMPT);
         store.clearGroups();
         session.reload();
       })
