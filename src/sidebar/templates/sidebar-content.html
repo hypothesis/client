@@ -4,14 +4,6 @@
 
 <login-prompt-panel on-login="vm.onLogin()" on-sign-up="vm.onSignUp()"></login-prompt-panel>
 
-<selection-tabs
-  ng-if="vm.showSelectedTabs()"
-  is-loading="vm.isLoading()">
-</selection-tabs>
-
-<search-status-bar
-  ng-if="!vm.isLoading() && !(vm.selectedAnnotationUnavailable() || vm.selectedGroupUnavailable())">
-</search-status-bar>
 
 <!-- Display error message if direct-linked annotation fetch failed. -->
 <sidebar-content-error
@@ -28,6 +20,18 @@
   ng-if="vm.selectedGroupUnavailable()"
 >
 </sidebar-content-error>
+
+
+<selection-tabs
+  ng-if="vm.showSelectedTabs()"
+  is-loading="vm.isLoading()">
+</selection-tabs>
+
+
+
+<search-status-bar
+  ng-if="!vm.isLoading() && !(vm.selectedAnnotationUnavailable() || vm.selectedGroupUnavailable())">
+</search-status-bar>
 
 
 <thread-list
