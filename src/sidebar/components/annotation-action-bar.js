@@ -76,12 +76,12 @@ function AnnotationActionBar({
       .catch(err => flash.error(err.message, 'Flagging annotation failed'));
   };
 
-  const onReplyClick = () => {
+  const onReplyClick = event => {
     if (!isLoggedIn) {
       openSidebarPanel(uiConstants.PANEL_LOGIN_PROMPT);
       return;
     }
-    onReply();
+    onReply(event);
   };
 
   return (
