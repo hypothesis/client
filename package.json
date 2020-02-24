@@ -101,7 +101,7 @@
     "seamless-immutable": "^7.1.4",
     "shallowequal": "^1.1.0",
     "showdown": "^1.6.4",
-    "sinon": "^8.0.1",
+    "sinon": "^9.0.0",
     "stringify": "^5.1.0",
     "terser": "^4.4.0",
     "through2": "^3.0.0",
