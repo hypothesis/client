@@ -1,14 +1,9 @@
 import { createElement } from 'preact';
-import { useEffect, useState } from 'preact/hooks';
+import { useState } from 'preact/hooks';
 import propTypes from 'prop-types';
 
 import useStore from '../store/use-store';
-import {
-  isHighlight,
-  isNew,
-  isReply,
-  quote,
-} from '../util/annotation-metadata';
+import { isNew, isReply, quote } from '../util/annotation-metadata';
 import { isShared } from '../util/permissions';
 import { withServices } from '../util/service-context';
 
@@ -55,18 +50,6 @@ function AnnotationOmega({
   const toggleAction = threadIsCollapsed ? 'Show replies' : 'Hide replies';
   const toggleText = `${toggleAction} (${replyCount})`;
 
-  useEffect(() => {
-    // TEMPORARY. Create a new draft for new (non-highlight) annotations
-    // to put the component in "edit mode."
-    if (!isSaving && !draft && isNew(annotation) && !isHighlight(annotation)) {
-      createDraft(annotation, {
-        tags: annotation.tags,
-        text: annotation.text,
-        isPrivate: !isShared(annotation.permissions),
-      });
-    }
-  }, [annotation, draft, createDraft, isSaving]);
-
   const shouldShowActions = !isEditing && !isNew(annotation);
   const shouldShowLicense = isEditing && !isPrivate && group.type !== 'private';
   const shouldShowReplyToggle = replyCount > 0 && !isReply(annotation);
@@ -79,14 +62,7 @@ function AnnotationOmega({
     createDraft(annotation, { ...draft, text });
   };
 
-  const onReply = () => {
-    // TODO: Re-evaluate error handling here
-    if (!userid) {
-      flash.error('Please log in to reply to annotations');
-    } else {
-      annotationsService.reply(annotation, userid);
-    }
-  };
+  const onReply = () => annotationsService.reply(annotation, userid);
 
   const onSave = async () => {
     setIsSaving(true);

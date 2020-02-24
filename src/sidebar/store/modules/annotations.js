@@ -327,8 +327,9 @@ function hideAnnotation(id) {
  * 1. Set some default data attributes on the annotation
  * 2. Remove any existing, empty drafts
  * 3. Add the annotation to the current collection of annotations
- * 4. Change focused tab to the applicable one for the new annotation's meta-type
- * 5. Expand all of the new annotation's parents
+ * 4. Create a draft for the new annotation (if it is not a highlight)
+ * 5. Change focused tab to the applicable one for the new annotation's meta-type
+ * 6. Expand all of the new annotation's parents
  *
  */
 function createAnnotation(ann, now = new Date()) {
@@ -357,6 +358,10 @@ function createAnnotation(ann, now = new Date()) {
         updated: now.toISOString(),
         user: userid,
         user_info: getState().session.user_info,
+        // It's necessary to assign a $tag here such that we have a way to look
+        // up the annotation after it's added (as `ann` will not be a reference
+        // to the added annotation object after extend-copying within the state)
+        $tag: window.btoa(Math.random()),
       },
       ann
     );
@@ -370,6 +375,19 @@ function createAnnotation(ann, now = new Date()) {
     dispatch(drafts.actions.deleteNewAndEmptyDrafts([ann]));
 
     dispatch(addAnnotations([ann]));
+
+    // When a new annotation is created, create a draft for it unless it's a
+    // highlight
+    if (!metadata.isHighlight(ann)) {
+      dispatch(
+        drafts.actions.createDraft(ann, {
+          tags: ann.tags,
+          text: ann.text,
+          isPrivate: !metadata.isPublic(ann),
+        })
+      );
+    }
+
     // If the annotation is of type note or annotation, make sure
     // the appropriate tab is selected. If it is of type reply, user
     // stays in the selected tab.
