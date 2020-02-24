@@ -20,6 +20,7 @@ const fixtures = immutable({
 });
 
 describe('rootThread', function() {
+  let fakeAnnotationsService;
   let fakeStore;
   let fakeBuildThread;
   let fakeSearchFilter;
@@ -31,6 +32,9 @@ describe('rootThread', function() {
   let rootThread;
 
   beforeEach(function() {
+    fakeAnnotationsService = {
+      create: sinon.stub(),
+    };
     fakeStore = {
       state: {
         annotations: {
@@ -83,6 +87,7 @@ describe('rootThread', function() {
 
     angular
       .module('app', [])
+      .value('annotationsService', fakeAnnotationsService)
       .value('store', fakeStore)
       .value('searchFilter', fakeSearchFilter)
       .value('settings', fakeSettings)
@@ -351,10 +356,10 @@ describe('rootThread', function() {
   context('when annotation events occur', function() {
     const annot = annotationFixtures.defaultAnnotation();
 
-    it('creates a new annotation in the store when BEFORE_ANNOTATION_CREATED event occurs', function() {
+    it('creates a new annotation when BEFORE_ANNOTATION_CREATED event occurs', function() {
       $rootScope.$broadcast(events.BEFORE_ANNOTATION_CREATED, annot);
       assert.notCalled(fakeStore.removeAnnotations);
-      assert.calledWith(fakeStore.createAnnotation, sinon.match(annot));
+      assert.calledWith(fakeAnnotationsService.create, sinon.match(annot));
     });
 
     [

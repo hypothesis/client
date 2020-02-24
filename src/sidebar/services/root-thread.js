@@ -39,6 +39,7 @@ const sortFns = {
 // @ngInject
 export default function RootThread(
   $rootScope,
+  annotationsService,
   store,
   searchFilter,
   viewFilter
@@ -114,7 +115,7 @@ export default function RootThread(
   });
 
   $rootScope.$on(events.BEFORE_ANNOTATION_CREATED, function(event, ann) {
-    store.createAnnotation(ann);
+    annotationsService.create(ann);
   });
 
   // Remove any annotations that are deleted or unloaded

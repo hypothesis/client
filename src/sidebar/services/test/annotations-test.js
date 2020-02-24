@@ -1,6 +1,7 @@
 import EventEmitter from 'tiny-emitter';
 
 import * as fixtures from '../../test/annotation-fixtures';
+import uiConstants from '../../ui-constants';
 
 import annotationsService from '../annotations';
 import { $imports } from '../annotations';
@@ -38,11 +39,11 @@ describe('annotationService', () => {
   let fakeStreamer;
   let fakeStreamFilter;
 
+  let fakeMetadata;
   let fakeUris;
   let fakeGroupId;
 
-  let fakeIsNew;
-  let fakeIsPublic;
+  let fakeDefaultPermissions;
   let fakePrivatePermissions;
   let fakeSharedPermissions;
 
@@ -64,8 +65,7 @@ describe('annotationService', () => {
       search: sinon.stub(),
     };
 
-    fakeIsNew = sinon.stub().returns(true);
-    fakeIsPublic = sinon.stub().returns(true);
+    fakeDefaultPermissions = sinon.stub();
 
     fakePrivatePermissions = sinon.stub().returns({
       read: ['acct:foo@bar.com'],
@@ -75,20 +75,33 @@ describe('annotationService', () => {
     fakeSharedPermissions = sinon.stub().returns({
       read: ['group:__world__'],
     });
+
+    fakeMetadata = {
+      isAnnotation: sinon.stub(),
+      isHighlight: sinon.stub(),
+      isNew: sinon.stub(),
+      isPageNote: sinon.stub(),
+      isPublic: sinon.stub(),
+    };
+
     fakeStore = {
       addAnnotations: sinon.stub(),
       annotationFetchFinished: sinon.stub(),
       annotationFetchStarted: sinon.stub(),
-      createAnnotation: sinon.stub(),
+      createDraft: sinon.stub(),
+      deleteNewAndEmptyDrafts: sinon.stub(),
+      focusedGroupId: sinon.stub(),
       frames: sinon.stub(),
+      getDefault: sinon.stub(),
       getDraft: sinon.stub().returns(null),
-      getState: sinon.stub(),
-      hasSelectedAnnotations: sinon.stub(),
+      profile: sinon.stub().returns({}),
       removeDraft: sinon.stub(),
-      searchUris: sinon.stub(),
       savedAnnotations: sinon.stub(),
+      selectTab: sinon.stub(),
+      setCollapsed: sinon.stub(),
       updateFrameAnnotationFetchStatus: sinon.stub(),
     };
+
     fakeStreamer = {
       setConfig: sinon.stub(),
       connect: sinon.stub(),
@@ -105,11 +118,9 @@ describe('annotationService', () => {
 
     $imports.$mock({
       '../search-client': FakeSearchClient,
-      '../util/annotation-metadata': {
-        isNew: fakeIsNew,
-        isPublic: fakeIsPublic,
-      },
+      '../util/annotation-metadata': fakeMetadata,
       '../util/permissions': {
+        defaultPermissions: fakeDefaultPermissions,
         privatePermissions: fakePrivatePermissions,
         sharedPermissions: fakeSharedPermissions,
       },
@@ -135,6 +146,166 @@ describe('annotationService', () => {
       fakeStreamFilter
     );
   }
+
+  describe('create', () => {
+    let now;
+    let svc;
+
+    const getLastAddedAnnotation = () => {
+      if (fakeStore.addAnnotations.callCount <= 0) {
+        return null;
+      }
+      const callCount = fakeStore.addAnnotations.callCount;
+      return fakeStore.addAnnotations.getCall(callCount - 1).args[0][0];
+    };
+
+    beforeEach(() => {
+      now = new Date();
+      svc = service();
+
+      fakeStore.focusedGroupId.returns('mygroup');
+      fakeStore.profile.returns({
+        userid: 'acct:foo@bar.com',
+        user_info: {},
+      });
+    });
+
+    it('extends the provided annotation object with defaults', () => {
+      fakeStore.focusedGroupId.returns('mygroup');
+
+      svc.create({}, now);
+
+      const annotation = getLastAddedAnnotation();
+
+      assert.equal(annotation.created, now.toISOString());
+      assert.equal(annotation.group, 'mygroup');
+      assert.isArray(annotation.tags);
+      assert.isEmpty(annotation.tags);
+      assert.isString(annotation.text);
+      assert.isEmpty(annotation.text);
+      assert.equal(annotation.updated, now.toISOString());
+      assert.equal(annotation.user, 'acct:foo@bar.com');
+      assert.isOk(annotation.$tag);
+      assert.isString(annotation.$tag);
+    });
+
+    describe('annotation permissions', () => {
+      it('sets private permissions if default privacy level is "private"', () => {
+        fakeStore.getDefault.returns('private');
+        fakeDefaultPermissions.returns('private-permissions');
+
+        svc.create({}, now);
+        const annotation = getLastAddedAnnotation();
+
+        assert.calledOnce(fakeDefaultPermissions);
+        assert.calledWith(
+          fakeDefaultPermissions,
+          'acct:foo@bar.com',
+          'mygroup',
+          'private'
+        );
+        assert.equal(annotation.permissions, 'private-permissions');
+      });
+
+      it('sets shared permissions if default privacy level is "shared"', () => {
+        fakeStore.getDefault.returns('shared');
+        fakeDefaultPermissions.returns('default permissions');
+
+        svc.create({}, now);
+        const annotation = getLastAddedAnnotation();
+
+        assert.calledOnce(fakeDefaultPermissions);
+        assert.calledWith(
+          fakeDefaultPermissions,
+          'acct:foo@bar.com',
+          'mygroup',
+          'shared'
+        );
+        assert.equal(annotation.permissions, 'default permissions');
+      });
+
+      it('sets private permissions if annotation is a highlight', () => {
+        fakeMetadata.isHighlight.returns(true);
+        fakePrivatePermissions.returns('private permissions');
+        fakeDefaultPermissions.returns('default permissions');
+
+        svc.create({}, now);
+        const annotation = getLastAddedAnnotation();
+
+        assert.calledOnce(fakePrivatePermissions);
+        assert.equal(annotation.permissions, 'private permissions');
+      });
+    });
+
+    it('creates a draft for the new annotation', () => {
+      fakeMetadata.isHighlight.returns(false);
+
+      svc.create(fixtures.newAnnotation(), now);
+
+      assert.calledOnce(fakeStore.createDraft);
+    });
+
+    it('adds the annotation to the store', () => {
+      svc.create(fixtures.newAnnotation(), now);
+
+      assert.calledOnce(fakeStore.addAnnotations);
+    });
+
+    it('deletes other empty drafts for new annotations', () => {
+      svc.create(fixtures.newAnnotation(), now);
+
+      assert.calledOnce(fakeStore.deleteNewAndEmptyDrafts);
+    });
+
+    it('does not create a draft if the annotation is a highlight', () => {
+      fakeMetadata.isHighlight.returns(true);
+
+      svc.create(fixtures.newAnnotation(), now);
+
+      assert.notCalled(fakeStore.createDraft);
+    });
+
+    describe('automatic tab selection', () => {
+      it('sets the active tab to "Page Notes" if the annotation is a Page Note', () => {
+        fakeMetadata.isPageNote.returns(true);
+
+        svc.create(fixtures.newAnnotation(), now);
+
+        assert.calledOnce(fakeStore.selectTab);
+        assert.calledWith(fakeStore.selectTab, uiConstants.TAB_NOTES);
+      });
+
+      it('sets the active tab to "Annotations" if the annotation is an annotation', () => {
+        fakeMetadata.isAnnotation.returns(true);
+
+        svc.create(fixtures.newAnnotation(), now);
+
+        assert.calledOnce(fakeStore.selectTab);
+        assert.calledWith(fakeStore.selectTab, uiConstants.TAB_ANNOTATIONS);
+      });
+
+      it('does nothing if the annotation is neither an annotation nor a page note (e.g. reply)', () => {
+        fakeMetadata.isAnnotation.returns(false);
+        fakeMetadata.isPageNote.returns(false);
+
+        svc.create(fixtures.newAnnotation(), now);
+
+        assert.notCalled(fakeStore.selectTab);
+      });
+    });
+
+    it("expands all of the new annotation's parents", () => {
+      const annot = fixtures.newAnnotation();
+      annot.references = ['aparent', 'anotherparent', 'yetanotherancestor'];
+
+      svc.create(annot, now);
+
+      assert.equal(fakeStore.setCollapsed.callCount, 3);
+      assert.calledWith(fakeStore.setCollapsed, 'aparent', false);
+      assert.calledWith(fakeStore.setCollapsed, 'anotherparent', false);
+      assert.calledWith(fakeStore.setCollapsed, 'yetanotherancestor', false);
+    });
+  });
 
   describe('load', () => {
     it('unloads any existing annotations', () => {
@@ -323,7 +494,7 @@ describe('annotationService', () => {
 
       svc.reply(annotation, 'acct:foo@bar.com');
 
-      assert.calledOnce(fakeStore.createAnnotation);
+      assert.calledOnce(fakeStore.addAnnotations);
     });
 
     it('associates the reply with the annotation', () => {
@@ -331,7 +502,7 @@ describe('annotationService', () => {
 
       svc.reply(annotation, 'acct:foo@bar.com');
 
-      const reply = fakeStore.createAnnotation.getCall(0).args[0];
+      const reply = fakeStore.addAnnotations.getCall(0).args[0][0];
 
       assert.equal(
         reply.references[reply.references.length - 1],
@@ -343,26 +514,26 @@ describe('annotationService', () => {
     });
 
     it('uses public permissions if annotation is public', () => {
-      fakeIsPublic.returns(true);
+      fakeMetadata.isPublic.returns(true);
       fakeSharedPermissions.returns('public');
 
       const annotation = filledAnnotation();
 
       svc.reply(annotation, 'acct:foo@bar.com');
 
-      const reply = fakeStore.createAnnotation.getCall(0).args[0];
+      const reply = fakeStore.addAnnotations.getCall(0).args[0][0];
       assert.equal(reply.permissions, 'public');
     });
 
     it('uses private permissions if annotation is private', () => {
-      fakeIsPublic.returns(false);
+      fakeMetadata.isPublic.returns(false);
       fakePrivatePermissions.returns('private');
 
       const annotation = filledAnnotation();
 
       svc.reply(annotation, 'acct:foo@bar.com');
 
-      const reply = fakeStore.createAnnotation.getCall(0).args[0];
+      const reply = fakeStore.addAnnotations.getCall(0).args[0][0];
       assert.equal(reply.permissions, 'private');
     });
   });
@@ -375,7 +546,7 @@ describe('annotationService', () => {
     });
 
     it('calls the `create` API service for new annotations', () => {
-      fakeIsNew.returns(true);
+      fakeMetadata.isNew.returns(true);
       // Using the new-annotation fixture has no bearing on which API method
       // will get called because `isNew` is mocked, but it has representative
       // properties
@@ -387,7 +558,7 @@ describe('annotationService', () => {
     });
 
     it('calls the `update` API service for pre-existing annotations', () => {
-      fakeIsNew.returns(false);
+      fakeMetadata.isNew.returns(false);
 
       const annotation = fixtures.defaultAnnotation();
       return svc.save(annotation).then(() => {
@@ -397,6 +568,7 @@ describe('annotationService', () => {
     });
 
     it('calls the relevant API service with an object that has any draft changes integrated', () => {
+      fakeMetadata.isNew.returns(true);
       fakePrivatePermissions.returns({ read: ['foo'] });
       const annotation = fixtures.defaultAnnotation();
       annotation.text = 'not this';
@@ -424,7 +596,7 @@ describe('annotationService', () => {
 
     context('successful save', () => {
       it('copies over internal app-specific keys to the annotation object', () => {
-        fakeIsNew.returns(false);
+        fakeMetadata.isNew.returns(false);
         const annotation = fixtures.defaultAnnotation();
         annotation.$tag = 'mytag';
         annotation.$foo = 'bar';
@@ -450,7 +622,7 @@ describe('annotationService', () => {
 
       it('adds the updated annotation to the store', () => {
         const annotation = fixtures.defaultAnnotation();
-        fakeIsNew.returns(false);
+        fakeMetadata.isNew.returns(false);
         fakeApi.annotation.update.resolves(annotation);
 
         return svc.save(annotation).then(() => {
@@ -462,7 +634,7 @@ describe('annotationService', () => {
     context('error on save', () => {
       it('does not remove the annotation draft', () => {
         fakeApi.annotation.update.rejects();
-        fakeIsNew.returns(false);
+        fakeMetadata.isNew.returns(false);
 
         return svc.save(fixtures.defaultAnnotation()).catch(() => {
           assert.notCalled(fakeStore.removeDraft);
@@ -471,7 +643,7 @@ describe('annotationService', () => {
 
       it('does not add the annotation to the store', () => {
         fakeApi.annotation.update.rejects();
-        fakeIsNew.returns(false);
+        fakeMetadata.isNew.returns(false);
 
         return svc.save(fixtures.defaultAnnotation()).catch(() => {
           assert.notCalled(fakeStore.addAnnotations);

@@ -11,13 +11,22 @@ import mockImportedComponents from '../../../test-util/mock-imported-components'
 
 describe('NewNoteButton', function() {
   let fakeStore;
+  let fakeAnnotationsService;
   let fakeSettings;
 
   function createComponent() {
-    return mount(<NewNoteButton settings={fakeSettings} />);
+    return mount(
+      <NewNoteButton
+        annotationsService={fakeAnnotationsService}
+        settings={fakeSettings}
+      />
+    );
   }
 
   beforeEach(function() {
+    fakeAnnotationsService = {
+      create: sinon.stub(),
+    };
     fakeSettings = {
       branding: {
         ctaBackgroundColor: '#00f',
@@ -77,7 +86,7 @@ describe('NewNoteButton', function() {
         .onClick();
     });
 
-    assert.calledWith(fakeStore.createAnnotation, {
+    assert.calledWith(fakeAnnotationsService.create, {
       target: [],
       uri: 'thisFrame',
     });

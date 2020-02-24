@@ -57,6 +57,7 @@ describe('annotation threading', function() {
       .service('store', storeFactory)
       .service('rootThread', rootThreadFactory)
       .service('searchFilter', searchFilterFactory)
+      .service('annotationsService', () => {})
       .service('viewFilter', viewFilterFactory)
       .value('features', fakeFeatures)
       .value('settings', {})

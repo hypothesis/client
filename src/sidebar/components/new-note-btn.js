@@ -8,11 +8,10 @@ import { applyTheme } from '../util/theme';
 
 import Button from './button';
 
-function NewNoteButton({ settings }) {
+function NewNoteButton({ annotationsService, settings }) {
   const topLevelFrame = useStore(store => store.mainFrame());
   const isLoggedIn = useStore(store => store.isLoggedIn());
 
-  const createAnnotation = useStore(store => store.createAnnotation);
   const openSidebarPanel = useStore(store => store.openSidebarPanel);
 
   const onNewNoteBtnClick = function() {
@@ -24,7 +23,7 @@ function NewNoteButton({ settings }) {
       target: [],
       uri: topLevelFrame.uri,
     };
-    createAnnotation(annot);
+    annotationsService.create(annot);
   };
 
   return (
@@ -42,9 +41,10 @@ function NewNoteButton({ settings }) {
 }
 NewNoteButton.propTypes = {
   // Injected services.
+  annotationsService: propTypes.object.isRequired,
   settings: propTypes.object.isRequired,
 };
 
-NewNoteButton.injectedProps = ['settings'];
+NewNoteButton.injectedProps = ['annotationsService', 'settings'];
 
 export default withServices(NewNoteButton);

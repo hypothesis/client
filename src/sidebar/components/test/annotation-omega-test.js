@@ -445,23 +445,6 @@ describe('AnnotationOmega', () => {
 
   describe('annotation actions', () => {
     describe('replying to an annotation', () => {
-      // nb: There's no reason this logic needs to stay within `AnnotationOmega`
-      // once we've migrated to it; it could happily move to `AnnotationActionBar`
-      it('should show a flash alert if user not logged in', () => {
-        // No logged-in user...
-        fakeStore.profile.returns({});
-
-        const wrapper = createComponent();
-
-        wrapper
-          .find('AnnotationActionBar')
-          .props()
-          .onReply();
-
-        assert.calledOnce(fakeFlash.error);
-        assert.notCalled(fakeAnnotationsService.reply);
-      });
-
       it('should create a reply', () => {
         const theAnnot = fixtures.defaultAnnotation();
         const wrapper = createComponent({ annotation: theAnnot });
