@@ -2,9 +2,9 @@ import { mount } from 'enzyme';
 import { createElement } from 'preact';
 import { act } from 'preact/test-utils';
 
-import events from '../../events';
 import NewNoteButton from '../new-note-btn';
 import { $imports } from '../new-note-btn';
+import uiConstants from '../../ui-constants';
 
 import { checkAccessibility } from '../../../test-util/accessibility';
 import mockImportedComponents from '../../../test-util/mock-imported-components';
@@ -12,22 +12,12 @@ import mockImportedComponents from '../../../test-util/mock-imported-components'
 describe('NewNoteButton', function() {
   let fakeStore;
   let fakeSettings;
-  let fakeRootScope;
 
   function createComponent() {
-    return mount(
-      <NewNoteButton
-        $rootScope={fakeRootScope}
-        settings={fakeSettings}
-        store={fakeStore}
-      />
-    );
+    return mount(<NewNoteButton settings={fakeSettings} />);
   }
 
   beforeEach(function() {
-    fakeRootScope = {
-      $broadcast: sinon.stub(),
-    };
     fakeSettings = {
       branding: {
         ctaBackgroundColor: '#00f',
@@ -35,10 +25,9 @@ describe('NewNoteButton', function() {
     };
     fakeStore = {
       createAnnotation: sinon.stub(),
-      frames: sinon.stub().returns([
-        { id: null, uri: 'www.example.org' },
-        { id: '1', uri: 'www.example.org' },
-      ]),
+      mainFrame: sinon.stub(),
+      isLoggedIn: sinon.stub(),
+      openSidebarPanel: sinon.stub(),
     };
 
     $imports.$mock(mockImportedComponents());
@@ -59,23 +48,39 @@ describe('NewNoteButton', function() {
     );
   });
 
-  it('should broadcast BEFORE_ANNOTATION_CREATED event when the new note button is clicked', () => {
+  it('should display login prompt on click if user not logged in', () => {
+    fakeStore.isLoggedIn.returns(false);
     const wrapper = createComponent();
+
     act(() => {
       wrapper
         .find('Button')
         .props()
         .onClick();
     });
-    const topLevelFrame = fakeStore.frames().find(f => !f.id);
+
     assert.calledWith(
-      fakeRootScope.$broadcast,
-      events.BEFORE_ANNOTATION_CREATED,
-      {
-        target: [],
-        uri: topLevelFrame.uri,
-      }
+      fakeStore.openSidebarPanel,
+      uiConstants.PANEL_LOGIN_PROMPT
     );
+  });
+
+  it('should add a new annotation to the store if user is logged in', () => {
+    fakeStore.isLoggedIn.returns(true);
+    fakeStore.mainFrame.returns({ uri: 'thisFrame' });
+    const wrapper = createComponent();
+
+    act(() => {
+      wrapper
+        .find('Button')
+        .props()
+        .onClick();
+    });
+
+    assert.calledWith(fakeStore.createAnnotation, {
+      target: [],
+      uri: 'thisFrame',
+    });
   });
 
   it(

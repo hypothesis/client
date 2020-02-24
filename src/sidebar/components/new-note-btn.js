@@ -1,25 +1,30 @@
 import { createElement } from 'preact';
 import propTypes from 'prop-types';
 
-import events from '../events';
+import uiConstants from '../ui-constants';
 import useStore from '../store/use-store';
 import { withServices } from '../util/service-context';
 import { applyTheme } from '../util/theme';
 
 import Button from './button';
 
-function NewNoteButton({ $rootScope, settings }) {
-  const store = useStore(store => ({
-    frames: store.frames(),
-  }));
+function NewNoteButton({ settings }) {
+  const topLevelFrame = useStore(store => store.mainFrame());
+  const isLoggedIn = useStore(store => store.isLoggedIn());
+
+  const createAnnotation = useStore(store => store.createAnnotation);
+  const openSidebarPanel = useStore(store => store.openSidebarPanel);
 
   const onNewNoteBtnClick = function() {
-    const topLevelFrame = store.frames.find(f => !f.id);
+    if (!isLoggedIn) {
+      openSidebarPanel(uiConstants.PANEL_LOGIN_PROMPT);
+      return;
+    }
     const annot = {
       target: [],
       uri: topLevelFrame.uri,
     };
-    $rootScope.$broadcast(events.BEFORE_ANNOTATION_CREATED, annot);
+    createAnnotation(annot);
   };
 
   return (
@@ -37,10 +42,9 @@ function NewNoteButton({ $rootScope, settings }) {
 }
 NewNoteButton.propTypes = {
   // Injected services.
-  $rootScope: propTypes.object.isRequired,
   settings: propTypes.object.isRequired,
 };
 
-NewNoteButton.injectedProps = ['$rootScope', 'settings'];
+NewNoteButton.injectedProps = ['settings'];
 
 export default withServices(NewNoteButton);
