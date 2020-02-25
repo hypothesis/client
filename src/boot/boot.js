@@ -121,7 +121,6 @@ function bootSidebarApp(doc, config) {
 
     'styles/angular-csp.css',
     'styles/angular-toastr.css',
-    'styles/icomoon.css',
     'styles/katex.min.css',
     'styles/sidebar.css',
   ]);
