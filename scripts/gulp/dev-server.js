@@ -2,7 +2,6 @@
 
 const fs = require('fs');
 const log = require('fancy-log');
-const WebSocketServer = require('websocket').server;
 const urlParser = require('url');
 
 const { createServer, useSsl } = require('./create-server');
@@ -25,21 +24,14 @@ function codeOfConductText() {
  */
 
 /**
- * An HTTP and WebSocket server which enables live reloading of the client.
- *
- * A simple HTTP and WebSocket server
- * which serves a test page with the Hypothesis client embedded
- * and notifies connected clients when assets are modified, enabling
- * the client to live-reload.
+ * An HTTP server which serves a test page with the development client embedded.
  *
  * @param {number} port - The port that the test server should listen on.
  * @param {Config} config - Config for the server
  *
  * @constructor
  */
-function LiveReloadServer(port, config) {
-  let connections = [];
-
+function DevServer(port, config) {
   function listen() {
     const app = function(req, response) {
       const url = urlParser.parse(req.url);
@@ -95,7 +87,6 @@ function LiveReloadServer(port, config) {
 
             window.hypothesisConfig = function () {
               return {
-                liveReloadServer: 'ws://' + appHost + ':${port}',
                 // Force into focused user mode
 
                 // Example focused user mode
@@ -111,12 +102,6 @@ function LiveReloadServer(port, config) {
                 openSidebar: true,
               };
             };
-
-            window.addEventListener('message', function (event) {
-              if (event.data.type && event.data.type === 'reloadrequest') {
-                window.location.reload();
-              }
-            });
 
             var embedScript = document.createElement('script');
             embedScript.src = '${
@@ -153,49 +138,14 @@ function LiveReloadServer(port, config) {
     const server = createServer(app);
     server.listen(port, function(err) {
       if (err) {
-        log('Setting up live reload server failed', err);
+        log('Setting up dev server failed', err);
       }
       const scheme = useSsl ? 'https' : 'http';
-      log(`Live reload server listening at ${scheme}://localhost:${port}/`);
-    });
-
-    const ws = new WebSocketServer({
-      httpServer: server,
-    });
-
-    ws.on('request', function(req) {
-      log('Live reload client connected');
-      const conn = req.accept(null, req.origin);
-      connections.push(conn);
-
-      conn.on('close', function() {
-        const closedConn = conn;
-        connections = connections.filter(function(conn) {
-          return conn !== closedConn;
-        });
-      });
+      log(`Dev server listening at ${scheme}://localhost:${port}/`);
     });
   }
-
-  /**
-   * Notify connected clients about assets that changed.
-   *
-   * @param {Array<string>} assets - A list of paths of assets that changed.
-   *                                 Paths are relative to the root asset
-   *                                 build directory.
-   */
-  this.notifyChanged = function(assets) {
-    connections.forEach(function(conn) {
-      conn.sendUTF(
-        JSON.stringify({
-          type: 'assets-changed',
-          changed: assets,
-        })
-      );
-    });
-  };
 
   listen();
 }
 
-module.exports = LiveReloadServer;
+module.exports = DevServer;

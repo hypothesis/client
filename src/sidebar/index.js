@@ -336,10 +336,6 @@ function startAngularApp(config) {
     .run(setupApi)
     .run(crossOriginRPC.server.start);
 
-  if (config.liveReloadServer) {
-    require('./live-reload-client').connect(config.liveReloadServer);
-  }
-
   // Work around a check in Angular's $sniffer service that causes it to
   // incorrectly determine that Firefox extensions are Chrome Packaged Apps which
   // do not support the HTML 5 History API. This results Angular redirecting the
