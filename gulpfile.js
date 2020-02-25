@@ -355,21 +355,3 @@ gulp.task(
   'test-watch',
   gulp.series('build-css', done => runKarma({ singleRun: false }, done))
 );
-
-gulp.task(
-  'upload-sourcemaps',
-  gulp.series('build-js', function() {
-    const uploadToSentry = require('./scripts/gulp/upload-to-sentry');
-
-    const opts = {
-      key: getEnv('SENTRY_API_KEY'),
-      organization: getEnv('SENTRY_ORGANIZATION'),
-    };
-    const projects = getEnv('SENTRY_PROJECTS').split(',');
-    const release = getEnv('SENTRY_RELEASE_VERSION');
-
-    return gulp
-      .src(['build/scripts/*.js', 'build/scripts/*.map'])
-      .pipe(uploadToSentry(opts, projects, release));
-  })
-);
