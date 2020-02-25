@@ -346,7 +346,7 @@ function generateManifest(opts) {
 
 gulp.task('watch-manifest', function() {
   gulp.watch(MANIFEST_SOURCE_FILES, { delay: 500 }, function updateManifest() {
-    generateManifest({ usingDevServer: true });
+    return generateManifest({ usingDevServer: true });
   });
 });
 
