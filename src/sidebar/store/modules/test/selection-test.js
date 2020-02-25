@@ -2,6 +2,7 @@ import uiConstants from '../../../ui-constants';
 import createStore from '../../create-store';
 import annotations from '../annotations';
 import selection from '../selection';
+import * as fixtures from '../../../test/annotation-fixtures';
 
 describe('sidebar/store/modules/selection', () => {
   let store;
@@ -421,6 +422,61 @@ describe('sidebar/store/modules/selection', () => {
       store.selectTab(uiConstants.TAB_NOTES);
 
       assert.equal(getSelectionState().sortKey, 'Newest');
+    });
+  });
+
+  describe('ADD_ANNOTATIONS', () => {
+    it('should select the page notes tab if all top-level annotations are page notes', () => {
+      store.dispatch({
+        type: 'ADD_ANNOTATIONS',
+        annotations: [fixtures.oldPageNote(), fixtures.oldPageNote()],
+        currentAnnotationCount: 0,
+      });
+
+      assert.equal(getSelectionState().selectedTab, uiConstants.TAB_NOTES);
+    });
+
+    it('should select the page notes tab if page notes have replies', () => {
+      const pageNote = fixtures.oldPageNote();
+      const reply = fixtures.newReply();
+      reply.references = [pageNote.id];
+      store.dispatch({
+        type: 'ADD_ANNOTATIONS',
+        annotations: [pageNote, reply],
+        currentAnnotationCount: 0,
+      });
+
+      assert.equal(getSelectionState().selectedTab, uiConstants.TAB_NOTES);
+    });
+
+    it('should not select the page notes tab if there were previously annotations in the store', () => {
+      store.dispatch({
+        type: 'ADD_ANNOTATIONS',
+        annotations: [fixtures.oldPageNote(), fixtures.oldPageNote()],
+        currentAnnotationCount: 4,
+      });
+
+      assert.equal(
+        getSelectionState().selectedTab,
+        uiConstants.TAB_ANNOTATIONS
+      );
+    });
+
+    it('should not select the page notes tab if there are non-page-note annotations at the top level', () => {
+      store.dispatch({
+        type: 'ADD_ANNOTATIONS',
+        annotations: [
+          fixtures.oldPageNote(),
+          fixtures.oldPageNote(),
+          fixtures.oldHighlight(),
+        ],
+        currentAnnotationCount: 0,
+      });
+
+      assert.equal(
+        getSelectionState().selectedTab,
+        uiConstants.TAB_ANNOTATIONS
+      );
     });
   });
 });
