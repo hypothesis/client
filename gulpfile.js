@@ -40,13 +40,6 @@ function parseCommandLine() {
 
 const taskArgs = parseCommandLine();
 
-function getEnv(key) {
-  if (!process.env.hasOwnProperty(key)) {
-    throw new Error(`Environment variable ${key} is not set`);
-  }
-  return process.env[key];
-}
-
 /** A list of all modules included in vendor bundles. */
 const vendorModules = Object.keys(vendorBundles.bundles).reduce(function(
   deps,
