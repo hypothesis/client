@@ -16,7 +16,6 @@
     "angular-mocks": "^1.7.5",
     "angular-route": "^1.7.5",
     "angular-toastr": "^2.1.1",
-    "autofill-event": "0.0.1",
     "autoprefixer": "^9.4.7",
     "aws-sdk": "^2.345.0",
     "axe-core": "^3.4.1",

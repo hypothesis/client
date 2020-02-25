@@ -33,10 +33,6 @@ import angular from 'angular';
 import angularRoute from 'angular-route';
 import angularToastr from 'angular-toastr';
 
-// autofill-event relies on the existence of window.angular so
-// it must be require'd after angular is first require'd
-import 'autofill-event';
-
 // Load polyfill for :focus-visible pseudo-class.
 import 'focus-visible';
 
