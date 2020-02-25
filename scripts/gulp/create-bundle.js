@@ -12,7 +12,6 @@ const coffeeify = require('coffeeify');
 const exorcist = require('exorcist');
 const log = require('fancy-log');
 const envify = require('loose-envify/custom');
-const mkdirp = require('mkdirp');
 const watchify = require('watchify');
 
 const minifyStream = require('./minify-stream');
@@ -61,7 +60,7 @@ function waitForever() {
  *                   waits forever otherwise.
  */
 module.exports = function createBundle(config, buildOpts) {
-  mkdirp.sync(config.path);
+  fs.mkdirSync(config.path, { recursive: true });
 
   buildOpts = buildOpts || { watch: false };
 
