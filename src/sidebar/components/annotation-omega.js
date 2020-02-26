@@ -99,10 +99,23 @@ function AnnotationOmega({
     }
   };
 
+  // Allow saving of annotation by pressing CMD/CTRL-Enter
+  const onKeyDown = event => {
+    if (isEmpty || !isEditing) {
+      return;
+    }
+    if ((event.metaKey || event.ctrlKey) && event.key === 'Enter') {
+      event.stopPropagation();
+      event.preventDefault();
+      onSave();
+    }
+  };
+
   const onToggleReplies = () => setCollapsed(annotation.id, !threadIsCollapsed);
 
   return (
-    <div className="annotation-omega">
+    /* eslint-disable-next-line jsx-a11y/no-static-element-interactions */
+    <div className="annotation-omega" onKeyDown={onKeyDown}>
       <AnnotationHeader
         annotation={annotation}
         isEditing={isEditing}
