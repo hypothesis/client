@@ -58,7 +58,7 @@ async function* itemsInGitHubAPIResponse(octokit, options) {
 async function getPRsMergedSince(octokit, org, repo, tag) {
   const tagDate = getTagDate(tag);
 
-  const options = await octokit.pullRequests.list.endpoint.merge({
+  const options = await octokit.pulls.list.endpoint.merge({
     owner: org,
     repo,
     state: 'closed',
@@ -136,7 +136,7 @@ async function changelistSinceTag(octokit, tag = getHighestVersionTag()) {
 }
 
 if (require.main === module) {
-  const Octokit = require('@octokit/rest');
+  const { Octokit } = require('@octokit/rest');
   const octokit = new Octokit({ auth: `token ${process.env.GITHUB_TOKEN}` });
   const tag = process.argv[2] || getHighestVersionTag();
 
