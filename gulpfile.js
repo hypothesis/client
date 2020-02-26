@@ -40,13 +40,6 @@ function parseCommandLine() {
 
 const taskArgs = parseCommandLine();
 
-function getEnv(key) {
-  if (!process.env.hasOwnProperty(key)) {
-    throw new Error(`Environment variable ${key} is not set`);
-  }
-  return process.env[key];
-}
-
 /** A list of all modules included in vendor bundles. */
 const vendorModules = Object.keys(vendorBundles.bundles).reduce(function(
   deps,
@@ -354,22 +347,4 @@ gulp.task(
 gulp.task(
   'test-watch',
   gulp.series('build-css', done => runKarma({ singleRun: false }, done))
-);
-
-gulp.task(
-  'upload-sourcemaps',
-  gulp.series('build-js', function() {
-    const uploadToSentry = require('./scripts/gulp/upload-to-sentry');
-
-    const opts = {
-      key: getEnv('SENTRY_API_KEY'),
-      organization: getEnv('SENTRY_ORGANIZATION'),
-    };
-    const projects = getEnv('SENTRY_PROJECTS').split(',');
-    const release = getEnv('SENTRY_RELEASE_VERSION');
-
-    return gulp
-      .src(['build/scripts/*.js', 'build/scripts/*.map'])
-      .pipe(uploadToSentry(opts, projects, release));
-  })
 );
