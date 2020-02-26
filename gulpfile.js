@@ -7,7 +7,6 @@ const path = require('path');
 
 const changed = require('gulp-changed');
 const commander = require('commander');
-const debounce = require('lodash.debounce');
 const log = require('fancy-log');
 const gulp = require('gulp');
 const replace = require('gulp-replace');
@@ -25,14 +24,6 @@ const SCRIPT_DIR = 'build/scripts';
 const STYLE_DIR = 'build/styles';
 const FONTS_DIR = 'build/fonts';
 const IMAGES_DIR = 'build/images';
-const TEMPLATES_DIR = 'src/sidebar/templates';
-
-// LiveReloadServer instance for sending messages to connected
-// development clients
-let liveReloadServer;
-// List of file paths that changed since the last live-reload
-// notification was dispatched
-let liveReloadChangedFiles = [];
 
 function parseCommandLine() {
   commander
@@ -234,46 +225,8 @@ gulp.task(
   })
 );
 
-gulp.task('watch-templates', function() {
-  gulp.watch(TEMPLATES_DIR + '/*.html', function(file) {
-    liveReloadServer.notifyChanged([file.path]);
-  });
-});
-
 const MANIFEST_SOURCE_FILES =
   'build/@(fonts|images|scripts|styles)/*.@(js|css|woff|jpg|png|svg)';
-
-let prevManifest = {};
-
-/**
- * Return an array of asset paths that changed between
- * two versions of a manifest.
- */
-function changedAssets(prevManifest, newManifest) {
-  return Object.keys(newManifest).filter(function(asset) {
-    return newManifest[asset] !== prevManifest[asset];
-  });
-}
-
-const debouncedLiveReload = debounce(function() {
-  // Notify dev clients about the changed assets. Note: This currently has an
-  // issue that if CSS, JS and templates are all changed in quick succession,
-  // some of the assets might be empty/incomplete files that are still being
-  // generated when this is invoked, causing the reload to fail.
-  //
-  // Live reload notifications are debounced to reduce the likelihood of this
-  // happening.
-  liveReloadServer.notifyChanged(liveReloadChangedFiles);
-  liveReloadChangedFiles = [];
-}, 250);
-
-function triggerLiveReload(changedFiles) {
-  if (!liveReloadServer) {
-    return;
-  }
-  liveReloadChangedFiles = liveReloadChangedFiles.concat(changedFiles);
-  debouncedLiveReload();
-}
 
 let isFirstBuild = true;
 
@@ -328,11 +281,7 @@ function generateManifest(opts) {
     .pipe(manifest({ name: 'manifest.json' }))
     .pipe(
       through.obj(function(file, enc, callback) {
-        // Trigger a reload of the client in the dev server at localhost:3000
         const newManifest = JSON.parse(file.contents.toString());
-        const changed = changedAssets(prevManifest, newManifest);
-        prevManifest = newManifest;
-        triggerLiveReload(changed);
 
         // Expand template vars in boot script bundle
         generateBootScript(newManifest, opts);
@@ -354,9 +303,9 @@ gulp.task('serve-package', function() {
   servePackage(3001);
 });
 
-gulp.task('serve-live-reload', function() {
-  const LiveReloadServer = require('./scripts/gulp/live-reload-server');
-  liveReloadServer = new LiveReloadServer(3000, {
+gulp.task('serve-test-pages', function() {
+  const DevServer = require('./scripts/gulp/dev-server');
+  new DevServer(3000, {
     // The scheme is omitted here as the client asset server will use the same
     // protcol (HTTP or HTTPS) as the test page server.
     clientUrl: `//{current_host}:3001/hypothesis`,
@@ -375,13 +324,12 @@ gulp.task(
   'watch',
   gulp.parallel(
     'serve-package',
-    'serve-live-reload',
+    'serve-test-pages',
     'watch-js',
     'watch-css',
     'watch-fonts',
     'watch-images',
-    'watch-manifest',
-    'watch-templates'
+    'watch-manifest'
   )
 );
 
