@@ -1,5 +1,3 @@
-/* global Map */
-
 /**
  * @typedef Provider
  * @prop {any} [value] - The value for the object

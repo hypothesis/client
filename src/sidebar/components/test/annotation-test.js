@@ -72,7 +72,6 @@ describe('annotation', function() {
 
   describe('AnnotationController', function() {
     let $rootScope;
-    let $scope;
     const fakeAccountID = {
       isThirdPartyUser: sinon.stub(),
     };
@@ -230,7 +229,6 @@ describe('annotation', function() {
 
     beforeEach(inject(function(_$rootScope_) {
       $rootScope = _$rootScope_;
-      $scope = $rootScope.$new();
     }));
 
     afterEach(function() {
@@ -238,62 +236,6 @@ describe('annotation', function() {
     });
 
     describe('initialization', function() {
-      it('saves new highlights to the server on initialization', function() {
-        const annotation = fixtures.newHighlight();
-        // The user is logged-in.
-        annotation.user = fakeSession.state.userid = 'acct:bill@localhost';
-        createDirective(annotation);
-
-        assert.called(fakeApi.annotation.create);
-      });
-
-      it('saves new highlights to drafts if not logged in', function() {
-        const annotation = fixtures.newHighlight();
-        // The user is not logged-in.
-        annotation.user = fakeSession.state.userid = undefined;
-
-        createDirective(annotation);
-
-        assert.notCalled(fakeApi.annotation.create);
-        assert.called(fakeStore.createDraft);
-      });
-
-      it('opens the sidebar when trying to save highlights while logged out', () => {
-        // The sidebar is opened in order to draw the user's attention to
-        // the `You must be logged in to create annotations and highlights` message.
-        const annotation = fixtures.newHighlight();
-        // The user is not logged-in.
-        annotation.user = fakeSession.state.userid = undefined;
-
-        createDirective(annotation);
-
-        assert.calledWith(fakeBridge.call, 'showSidebar');
-      });
-
-      it('does not save new annotations on initialization', function() {
-        const annotation = fixtures.newAnnotation();
-
-        createDirective(annotation);
-
-        assert.notCalled(fakeApi.annotation.create);
-      });
-
-      it('does not save old highlights on initialization', function() {
-        const annotation = fixtures.oldHighlight();
-
-        createDirective(annotation);
-
-        assert.notCalled(fakeApi.annotation.create);
-      });
-
-      it('does not save old annotations on initialization', function() {
-        const annotation = fixtures.oldAnnotation();
-
-        createDirective(annotation);
-
-        assert.notCalled(fakeApi.annotation.create);
-      });
-
       it('creates drafts for new annotations on initialization', function() {
         const annotation = fixtures.newAnnotation();
         createDirective(annotation);
@@ -302,14 +244,6 @@ describe('annotation', function() {
           tags: annotation.tags,
           text: annotation.text,
         });
-      });
-
-      it('does not create drafts for new highlights on initialization', function() {
-        const annotation = fixtures.newHighlight();
-        const controller = createDirective(annotation).controller;
-
-        assert.notOk(controller.editing());
-        assert.notCalled(fakeStore.createDraft);
       });
 
       it('edits annotations with drafts on initialization', function() {
@@ -416,24 +350,6 @@ describe('annotation', function() {
         const vm = createDirective(ann).controller;
 
         assert.isFalse(vm.isHighlight());
-      });
-    });
-
-    describe('when the annotation is a highlight', function() {
-      let annotation;
-
-      beforeEach(function() {
-        annotation = fixtures.defaultAnnotation();
-        annotation.$highlight = true;
-      });
-
-      it('is private', function() {
-        delete annotation.id;
-        createDirective(annotation);
-        $scope.$digest();
-        assert.deepEqual(annotation.permissions, {
-          read: ['justme'],
-        });
       });
     });
 
