@@ -9,7 +9,7 @@
  * `v<VERSION>` where <VERSION> is the `version` field in package.json.
  */
 
-const Octokit = require('@octokit/rest');
+const { Octokit } = require('@octokit/rest');
 
 const pkg = require('../package.json');
 const { changelistSinceTag } = require('./generate-change-list');
