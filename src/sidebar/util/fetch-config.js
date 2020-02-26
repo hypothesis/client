@@ -1,77 +1,48 @@
 import getApiUrl from '../get-api-url';
-import hostConfig from '../host-config';
 
 import * as postMessageJsonRpc from './postmessage-json-rpc';
 
-function ancestors(window_) {
-  if (window_ === window_.top) {
-    return [];
-  }
-
-  // nb. The top window's `parent` is itself!
-  const ancestors = [];
-  do {
-    window_ = window_.parent;
-    ancestors.push(window_);
-  } while (window_ !== window_.top);
-
-  return ancestors;
-}
 
 /**
- * Fetch client configuration from an ancestor frame.
+ * Merge client configuration from h service with config fetched from
+ * an embedding frame synchronously.
+ * 
+ * Use this method to retrieve the config synchronously from the embedding
+ * frame's query string. See tests for more details.
  *
- * @param {string} origin - The origin of the frame to fetch config from.
- * @param {Window} window_ - Test seam.
- * @return {Promise<any>}
+ * @param {Object} appConfig - App config settings rendered into `app.html` by the h service.
+ * @param {Object} hostPageConfig - App configuration specified by the embedding  frame.
+ * @return {Object} - The merged settings.
  */
-function fetchConfigFromAncestorFrame(origin, window_ = window) {
-  const configResponses = [];
-
-  for (let ancestor of ancestors(window_)) {
-    const timeout = 3000;
-    const result = postMessageJsonRpc.call(
-      ancestor,
-      origin,
-      'requestConfig',
-      timeout
-    );
-    configResponses.push(result);
-  }
-
-  if (configResponses.length === 0) {
-    configResponses.push(Promise.reject(new Error('Client is top frame')));
-  }
-
-  return Promise.race(configResponses);
+export function fetchConfig(appConfig, hostPageConfig) {
+  const mergedConfig = {
+    ...appConfig, 
+    ...hostPageConfig,
+  };
+  mergedConfig.apiUrl = getApiUrl(mergedConfig);
+  return mergedConfig;
 }
 
 /**
  * Merge client configuration from h service with config fetched from
- * embedding frame.
- *
- * Typically the configuration from the embedding frame is passed
- * synchronously in the query string. However it can also be retrieved from
- * an ancestor of the embedding frame. See tests for more details.
+ * an embedding frame asynchronously.
+ * 
+ * Use this method to retrieve the config asynchronously from an ancestor 
+ * frame via RPC. See tests for more details.
  *
  * @param {Object} appConfig - Settings rendered into `app.html` by the h service.
- * @param {Window} window_ - Test seam.
+ * @param {Window} parentFrame - Frame to send call to.
+ * @param {string} origin - Origin filter for `window.postMessage` call.
  * @return {Promise<Object>} - The merged settings.
  */
-export function fetchConfig(appConfig, window_ = window) {
-  const hostPageConfig = hostConfig(window_);
-
-  let embedderConfig;
-  if (hostPageConfig.requestConfigFromFrame) {
-    const origin = hostPageConfig.requestConfigFromFrame;
-    embedderConfig = fetchConfigFromAncestorFrame(origin, window_);
-  } else {
-    embedderConfig = Promise.resolve(hostPageConfig);
-  }
-
-  return embedderConfig.then(embedderConfig => {
-    const mergedConfig = Object.assign({}, appConfig, embedderConfig);
-    mergedConfig.apiUrl = getApiUrl(mergedConfig);
-    return mergedConfig;
-  });
+export async function fetchConfigRpc(appConfig, parentFrame, origin) {
+  const remoteConfig = await postMessageJsonRpc.call(
+    parentFrame,
+    origin,
+    'requestConfig',
+    [],
+    3000
+  );
+  return Promise.resolve(fetchConfig(appConfig, remoteConfig));
 }
+

@@ -2,8 +2,11 @@ import { jsonConfigsFrom } from '../shared/settings';
 
 import crossOriginRPC from './cross-origin-rpc.js';
 import addAnalytics from './ga';
+import hostConfig from './host-config';
 import disableOpenerForExternalLinks from './util/disable-opener-for-external-links';
-import { fetchConfig } from './util/fetch-config';
+import { fetchConfig, fetchConfigRpc  } from './util/fetch-config';
+import * as postMessageJsonRpc from './util/postmessage-json-rpc';
+import { ancestor } from './util/ancestor-frame-rpc';
 import * as sentry from './util/sentry';
 
 // Read settings rendered into sidebar app HTML by service/extension.
@@ -334,7 +337,7 @@ function startAngularApp(config) {
     .run(persistDefaults)
     .run(sendPageView)
     .run(setupApi)
-    .run(crossOriginRPC.server.start);
+    .run(crossOriginRPC.server.start)
 
   if (config.liveReloadServer) {
     require('./live-reload-client').connect(config.liveReloadServer);
@@ -355,13 +358,38 @@ function startAngularApp(config) {
   angular.bootstrap(appEl, ['h'], { strictDi: true });
 }
 
-fetchConfig(appConfig)
-  .then(config => {
-    startAngularApp(config);
-  })
-  .catch(err => {
-    // Report error. This will be the only notice that the user gets because the
-    // sidebar does not currently appear at all if the Angular app fails to
-    // start.
-    console.error('Failed to start Hypothesis client: ', err);
+// ** Launch the angular app **
+//
+// There are 2 ways to get the config to launch the app.
+//  Case 1. From the query string of the embedder frame. (simple case)
+//  Case 2. From a ancestor parent frame that passes it down via RPC.
+
+const hostPageConfig = hostConfig(window);
+const origin = hostPageConfig.requestConfigFromFrame;
+
+if (!origin) {
+  // Case 1 (synchronous)
+  const config = fetchConfig(appConfig, hostPageConfig)
+  startAngularApp(config);
+} else {
+  // Case 2. (asynchronous)
+  // First, find the ancestor iframe that responds to RCP requests
+  ancestor().then(parentFrame => {
+    // Request the client config object from that parent frame.
+    fetchConfigRpc(appConfig, parentFrame, origin)
+    .then(config => {
+      // Note: startAngularApp()  will also start our RPC server 
+      // to receive requests from the ancestor.
+      startAngularApp(config);
+      // Tell the parent frame we're ready to accept RPC messages.
+      // FIXME uncomment next line once this message it defined in LMS
+      // postMessageJsonRpc.call(parentFrame, origin, 'readyToReceive');
+    })
+    .catch(err => {
+      // Report error. This will be the only notice that the user gets because the
+      // sidebar does not currently appear at all if the Angular app fails to
+      // start.
+      console.error('Failed to start Hypothesis client: ', err);
+    });
   });
+}
