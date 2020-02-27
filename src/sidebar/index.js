@@ -160,10 +160,6 @@ import sidebarContent from './components/sidebar-content';
 import streamContent from './components/stream-content';
 import threadList from './components/thread-list';
 
-// Angular directives.
-
-import windowScrollDirective from './directive/window-scroll';
-
 // Services.
 
 import bridgeService from '../shared/bridge';
@@ -293,7 +289,6 @@ function startAngularApp(config) {
     .component('tagList', wrapComponent(TagList))
     .component('threadList', threadList)
     .component('topBar', wrapComponent(TopBar))
-    .directive('windowScroll', windowScrollDirective)
 
     // Register services, the store and utilities with Angular, so that
     // Angular components can use them.

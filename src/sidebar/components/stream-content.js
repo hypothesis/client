@@ -62,8 +62,6 @@ function StreamContentController(
 
   // Sort the stream so that the newest annotations are at the top
   store.setSortKey('Newest');
-
-  this.loadMore = fetch;
 }
 
 export default {
