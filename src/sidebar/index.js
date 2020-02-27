@@ -162,10 +162,7 @@ import threadList from './components/thread-list';
 
 // Angular directives.
 
-import hAutofocusDirective from './directive/h-autofocus';
 import hBrandingDirective from './directive/h-branding';
-import hOnTouchDirective from './directive/h-on-touch';
-import hTooltipDirective from './directive/h-tooltip';
 import windowScrollDirective from './directive/window-scroll';
 
 // Services.
@@ -296,10 +293,7 @@ function startAngularApp(config) {
     .component('tagList', wrapComponent(TagList))
     .component('threadList', threadList)
     .component('topBar', wrapComponent(TopBar))
-    .directive('hAutofocus', hAutofocusDirective)
     .directive('hBranding', hBrandingDirective)
-    .directive('hOnTouch', hOnTouchDirective)
-    .directive('hTooltip', hTooltipDirective)
     .directive('windowScroll', windowScrollDirective)
 
     // Register services, the store and utilities with Angular, so that

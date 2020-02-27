@@ -11,30 +11,6 @@ function hyphenate(name) {
 }
 
 /**
- * Helper for retrieving an Angular module in a test.
- *
- * Given the 'inject' function from the 'angular-mocks' module,
- * retrieves an instance of the specified Angular module.
- */
-export function ngModule(inject, name) {
-  let module;
-  const helper = function(_module) {
-    module = _module;
-  };
-
-  // Tell Angular which module we want using $inject
-  // annotations. These take priority over function argument names.
-  helper.$inject = [name];
-
-  // inject() creates a new 'angular.$injector' service instance
-  // for the current test, if one has not already been created and then
-  // calls the passed function, injecting the modules it depends upon.
-  inject(helper);
-
-  return module;
-}
-
-/**
  * A helper for instantiating an AngularJS directive in a unit test.
  *
  * Usage:
@@ -175,29 +151,4 @@ export function createDirective(
 export function sendEvent(element, eventType) {
   const event = new Event(eventType, { bubbles: true, cancelable: true });
   element.dispatchEvent(event);
-}
-
-/**
- * Return true if a given element is hidden on the page.
- *
- * There are many possible ways of hiding DOM elements on a page, this just
- * looks for approaches that are common in our app.
- */
-export function isHidden(element) {
-  const style = window.getComputedStyle(element);
-
-  if (style.display === 'none') {
-    return true;
-  }
-
-  // Test for element or ancestor being hidden with `ng-hide` directive
-  let el = element;
-  while (el) {
-    if (el.classList.contains('ng-hide')) {
-      return true;
-    }
-    el = el.parentElement;
-  }
-
-  return false;
 }
