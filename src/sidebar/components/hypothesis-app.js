@@ -5,6 +5,7 @@ import uiConstants from '../ui-constants';
 import { parseAccountID } from '../util/account-id';
 import isSidebar from '../util/is-sidebar';
 import { shouldAutoDisplayTutorial } from '../util/session';
+import { applyTheme } from '../util/theme';
 
 /**
  * Return the user's authentication status from their profile.
@@ -56,6 +57,8 @@ function HypothesisAppController(
   // logged-in or not, so it has an initial status of 'unknown'. This can be
   // used by templates to show an intermediate or loading state.
   this.auth = { status: 'unknown' };
+
+  this.backgroundStyle = applyTheme(['appBackgroundColor'], settings);
 
   // Check to see if we're in the sidebar, or on a standalone page such as
   // the stream page or an individual annotation page.
