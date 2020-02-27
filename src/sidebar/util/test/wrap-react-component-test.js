@@ -4,7 +4,7 @@ import { useContext } from 'preact/hooks';
 import propTypes from 'prop-types';
 
 import { Injector } from '../../../shared/injector';
-import { createDirective } from '../../directive/test/util';
+import { createDirective } from '../../components/test/angular-util';
 import { ServiceContext } from '../service-context';
 import wrapReactComponent from '../wrap-react-component';
 

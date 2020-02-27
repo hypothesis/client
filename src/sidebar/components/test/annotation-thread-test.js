@@ -1,6 +1,6 @@
 import angular from 'angular';
 
-import * as util from '../../directive/test/util';
+import * as util from './angular-util';
 import * as fixtures from '../../test/annotation-fixtures';
 import annotationThread from '../annotation-thread';
 import moderationBanner from '../moderation-banner';

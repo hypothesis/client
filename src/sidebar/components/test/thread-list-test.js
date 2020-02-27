@@ -2,7 +2,7 @@ import angular from 'angular';
 import immutable from 'seamless-immutable';
 import EventEmitter from 'tiny-emitter';
 
-import * as util from '../../directive/test/util';
+import * as util from './angular-util';
 import events from '../../events';
 import threadList, { $imports } from '../thread-list';
 
