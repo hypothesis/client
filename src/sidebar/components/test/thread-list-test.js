@@ -227,8 +227,10 @@ describe('threadList', function() {
     const element = createThreadList(inputs);
     fakeVirtualThread.notify();
     element.scope.$digest();
-    const annotation = element[0].querySelector('.thread-list__card');
-    util.sendEvent(annotation, 'mouseover');
+
+    const cardElement = element[0].querySelector('.thread-list__card');
+    cardElement.dispatchEvent(new Event('mouseover'));
+
     assert.calledWithMatch(
       inputs.onFocus.callback,
       sinon.match(annotFixtures.annotation)
@@ -245,8 +247,10 @@ describe('threadList', function() {
     const element = createThreadList(inputs);
     fakeVirtualThread.notify();
     element.scope.$digest();
-    const annotation = element[0].querySelector('.thread-list__card');
-    util.sendEvent(annotation, 'click');
+
+    const cardElement = element[0].querySelector('.thread-list__card');
+    cardElement.dispatchEvent(new Event('click'));
+
     assert.calledWithMatch(
       inputs.onSelect.callback,
       sinon.match(annotFixtures.annotation)
