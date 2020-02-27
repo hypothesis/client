@@ -252,9 +252,10 @@ function startAngularApp(config) {
   // constructed them.
   //
   // @ngInject
-  function registerAngularServices($rootScope, toastr) {
+  function registerAngularServices($location, $rootScope, toastr) {
     container
       .register('toastr', { value: toastr })
+      .register('$location', { value: $location })
       .register('$rootScope', { value: $rootScope });
   }
 
