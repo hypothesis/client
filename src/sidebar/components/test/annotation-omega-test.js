@@ -4,6 +4,7 @@ import { act } from 'preact/test-utils';
 
 import * as fixtures from '../../test/annotation-fixtures';
 
+import { checkAccessibility } from '../../../test-util/accessibility';
 import mockImportedComponents from '../../../test-util/mock-imported-components';
 import { waitFor } from '../../../test-util/wait';
 
@@ -230,6 +231,79 @@ describe('AnnotationOmega', () => {
 
         await waitFor(() => fakeFlash.error.called);
       });
+
+      describe('saving using shortcut-key combo', () => {
+        context('in editing mode with text or tag content populated', () => {
+          beforeEach(() => {
+            // Put into editing mode by presence of draft, and add some `text`
+            // so that the annotation is not seen as "empty"
+            const draft = fixtures.defaultDraft();
+            draft.text = 'bananas';
+            fakeStore.getDraft.returns(draft);
+          });
+
+          it('should save annotation if `CTRL+Enter` is typed', () => {
+            const wrapper = createComponent();
+
+            wrapper
+              .find('.annotation-omega')
+              .simulate('keydown', { key: 'Enter', ctrlKey: true });
+
+            assert.calledWith(
+              fakeAnnotationsService.save,
+              wrapper.props().annotation
+            );
+          });
+
+          it('should save annotation if `META+Enter` is typed', () => {
+            const wrapper = createComponent();
+
+            wrapper
+              .find('.annotation-omega')
+              .simulate('keydown', { key: 'Enter', metaKey: true });
+
+            assert.calledWith(
+              fakeAnnotationsService.save,
+              wrapper.props().annotation
+            );
+          });
+
+          it('should not save annotation if `META+g` is typed', () => {
+            // i.e. don't save on non-"Enter" keys
+            const wrapper = createComponent();
+
+            wrapper
+              .find('.annotation-omega')
+              .simulate('keydown', { key: 'g', metaKey: true });
+
+            assert.notCalled(fakeAnnotationsService.save);
+          });
+        });
+
+        context('empty or not in editing mode', () => {
+          it('should not save annotation if not in editing mode', () => {
+            fakeStore.getDraft.returns(null);
+            const wrapper = createComponent();
+
+            wrapper
+              .find('.annotation-omega')
+              .simulate('keydown', { key: 'Enter', metaKey: true });
+
+            assert.notCalled(fakeAnnotationsService.save);
+          });
+
+          it('should not save annotation if content is empty', () => {
+            fakeStore.getDraft.returns(fixtures.defaultDraft());
+            const wrapper = createComponent();
+
+            wrapper
+              .find('.annotation-omega')
+              .simulate('keydown', { key: 'Enter', ctrlKey: true });
+
+            assert.notCalled(fakeAnnotationsService.save);
+          });
+        });
+      });
     });
   });
 
@@ -391,5 +465,21 @@ describe('AnnotationOmega', () => {
 
       assert.isFalse(wrapper.find('AnnotationActionBar').exists());
     });
+
+    it(
+      'should pass a11y checks',
+      checkAccessibility([
+        {
+          content: () => createComponent(),
+        },
+        {
+          name: 'When editing',
+          content: () => {
+            setEditingMode(true);
+            return createComponent();
+          },
+        },
+      ])
+    );
   });
 });
