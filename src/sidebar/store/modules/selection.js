@@ -19,8 +19,7 @@ import immutable from 'seamless-immutable';
 
 import uiConstants from '../../ui-constants';
 import * as metadata from '../../util/annotation-metadata';
-import * as arrayUtil from '../../util/array';
-import { toSet } from '../../util/array';
+import { countIf, toSet } from '../../util/array';
 import * as util from '../util';
 
 /**
@@ -204,14 +203,18 @@ const update = {
     return setTab(state.selectedTab, action.tab);
   },
 
+  /**
+   * Automatically select the Page Notes tab, for convenience, if all of the
+   * top-level annotations in `action.annotations` are Page Notes and the
+   * previous annotation count was 0 (i.e. collection empty).
+   */
   ADD_ANNOTATIONS(state, action) {
-    const noteCount = arrayUtil.countIf(
-      action.annotations,
-      metadata.isPageNote
+    const topLevelAnnotations = action.annotations.filter(
+      annotation => !metadata.isReply(annotation)
     );
-    // If there are no annotations at all, ADD_ANNOTATIONS will not be called.
-    const haveOnlyPageNotes = noteCount === action.annotations.length;
-    // If this is the init phase and there are only page notes, select the page notes tab.
+    const noteCount = countIf(action.annotations, metadata.isPageNote);
+
+    const haveOnlyPageNotes = noteCount === topLevelAnnotations.length;
     if (action.currentAnnotationCount === 0 && haveOnlyPageNotes) {
       return { selectedTab: uiConstants.TAB_NOTES };
     }
@@ -228,7 +231,7 @@ const update = {
     let selectedTab = state.selectedTab;
     if (
       selectedTab === uiConstants.TAB_ORPHANS &&
-      arrayUtil.countIf(action.remainingAnnotations, metadata.isOrphan) === 0
+      countIf(action.remainingAnnotations, metadata.isOrphan) === 0
     ) {
       selectedTab = uiConstants.TAB_ANNOTATIONS;
     }
