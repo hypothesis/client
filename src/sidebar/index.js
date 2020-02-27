@@ -162,7 +162,6 @@ import threadList from './components/thread-list';
 
 // Angular directives.
 
-import hBrandingDirective from './directive/h-branding';
 import windowScrollDirective from './directive/window-scroll';
 
 // Services.
@@ -294,7 +293,6 @@ function startAngularApp(config) {
     .component('tagList', wrapComponent(TagList))
     .component('threadList', threadList)
     .component('topBar', wrapComponent(TopBar))
-    .directive('hBranding', hBrandingDirective)
     .directive('windowScroll', windowScrollDirective)
 
     // Register services, the store and utilities with Angular, so that
