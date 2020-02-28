@@ -1,11 +1,11 @@
 import angular from 'angular';
-import immutable from 'seamless-immutable';
 
 import events from '../../events';
 import * as annotationFixtures from '../../test/annotation-fixtures';
 import uiConstants from '../../ui-constants';
 import rootThreadFactory from '../root-thread';
 import { $imports } from '../root-thread';
+import immutable from '../../util/immutable';
 
 const fixtures = immutable({
   emptyThread: {

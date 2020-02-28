@@ -1,10 +1,9 @@
-import immutable from 'seamless-immutable';
-
 import createStore from '../../create-store';
 import annotations from '../annotations';
 import drafts from '../drafts';
 import { Draft } from '../drafts';
 import selection from '../selection';
+import immutable from '../../../util/immutable';
 
 const fixtures = immutable({
   draftWithText: {

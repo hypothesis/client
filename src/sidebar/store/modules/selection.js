@@ -15,11 +15,11 @@
  */
 
 import { createSelector } from 'reselect';
-import immutable from 'seamless-immutable';
 
 import uiConstants from '../../ui-constants';
 import * as metadata from '../../util/annotation-metadata';
 import { countIf, toSet } from '../../util/array';
+import immutable from '../../util/immutable';
 import * as util from '../util';
 
 /**

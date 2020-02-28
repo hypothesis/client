@@ -1,4 +1,4 @@
-import immutable from 'seamless-immutable';
+import immutable from './immutable';
 
 // TODO: Update when this is a property available on the API response
 const DEFAULT_ORG_ID = '__default__';
