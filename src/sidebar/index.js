@@ -1,3 +1,5 @@
+/* global process */
+
 import { jsonConfigsFrom } from '../shared/settings';
 
 import crossOriginRPC from './cross-origin-rpc.js';
@@ -37,7 +39,9 @@ import angularToastr from 'angular-toastr';
 import 'focus-visible';
 
 // Enable debugging checks for Preact.
-import 'preact/debug';
+if (process.env.NODE_ENV !== 'production') {
+  require('preact/debug');
+}
 
 import wrapReactComponent from './util/wrap-react-component';
 
