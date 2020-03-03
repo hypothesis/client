@@ -95,6 +95,25 @@ describe('AnnotationOmega', () => {
 
   it('should test `isSaving`');
 
+  describe('annotation classnames', () => {
+    it('should assign a reply class if the annotation is a reply', () => {
+      fakeMetadata.isReply.returns(true);
+
+      const wrapper = createComponent({ threadIsCollapsed: false });
+      const annot = wrapper.find('.annotation-omega');
+
+      assert.isTrue(annot.hasClass('annotation--reply'));
+      assert.isFalse(annot.hasClass('is-collapsed'));
+    });
+
+    it('should assign a collapsed class if the annotation thread is collapsed', () => {
+      const wrapper = createComponent({ threadIsCollapsed: true });
+      const annot = wrapper.find('.annotation-omega');
+
+      assert.isTrue(annot.hasClass('is-collapsed'));
+    });
+  });
+
   describe('annotation quote', () => {
     it('renders quote if annotation has a quote', () => {
       fakeMetadata.quote.returns('quote');

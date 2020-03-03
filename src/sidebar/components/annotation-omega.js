@@ -1,3 +1,4 @@
+import classnames from 'classnames';
 import { createElement } from 'preact';
 import { useEffect, useState } from 'preact/hooks';
 import propTypes from 'prop-types';
@@ -115,7 +116,13 @@ function AnnotationOmega({
 
   return (
     /* eslint-disable-next-line jsx-a11y/no-static-element-interactions */
-    <div className="annotation-omega" onKeyDown={onKeyDown}>
+    <div
+      className={classnames('annotation-omega', {
+        'annotation--reply': isReply(annotation),
+        'is-collapsed': threadIsCollapsed,
+      })}
+      onKeyDown={onKeyDown}
+    >
       <AnnotationHeader
         annotation={annotation}
         isEditing={isEditing}
