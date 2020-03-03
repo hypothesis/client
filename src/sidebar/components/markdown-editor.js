@@ -102,7 +102,9 @@ function ToolbarButton({
 }) {
   let tooltip = title;
   if (shortcutKey) {
-    tooltip += ` (Ctrl+${shortcutKey.toUpperCase()})`;
+    const modifierKey =
+      window.navigator.userAgent.indexOf('Mac OS') !== -1 ? 'Cmd' : 'Ctrl';
+    tooltip += ` (${modifierKey}-${shortcutKey.toUpperCase()})`;
   }
 
   return (
@@ -259,7 +261,7 @@ export default function MarkdownEditor({
   };
 
   const handleKeyDown = event => {
-    if (!event.ctrlKey) {
+    if (!event.ctrlKey && !event.metaKey) {
       return;
     }
 

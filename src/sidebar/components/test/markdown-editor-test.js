@@ -123,28 +123,82 @@ describe('MarkdownEditor', () => {
       });
 
       if (key) {
-        it('applies formatting when shortcut key is pressed', () => {
-          const onEditText = sinon.stub();
-          const text = 'toolbar shortcut test';
-          const wrapper = createComponent({ text, onEditText });
-          const input = wrapper.find('textarea');
-          input.getDOMNode().selectionStart = 0;
-          input.getDOMNode().selectionEnd = text.length;
+        describe('renders appropriate tooltip for user OS', () => {
+          let fakeUserAgent;
+          let stubbedUserAgent;
 
-          input.simulate('keydown', {
-            ctrlKey: true,
-            key,
+          beforeEach(() => {
+            stubbedUserAgent = sinon
+              .stub(window.navigator, 'userAgent')
+              .get(() => fakeUserAgent);
           });
 
-          assert.calledWith(onEditText, {
-            text: 'formatted text',
+          afterEach(() => {
+            stubbedUserAgent.restore();
           });
-          const [formatFunction, ...args] = effect;
-          assert.calledWith(
-            formatFunction,
-            sinon.match({ text, selectionStart: 0, selectionEnd: text.length }),
-            ...args
-          );
+
+          // Test that button `title` shows the correct modifier for user OS:
+          // `Cmd-shortcut` for Mac users and `Ctrl-shortcut` for everyone else
+          [
+            {
+              userAgent:
+                'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.116 Safari/537.36',
+              expectedModifier: 'Cmd',
+            },
+            { userAgent: 'literally anything else', expectedModifier: 'Ctrl' },
+          ].forEach(testCase => {
+            it('should the correct modifier key for user OS in button `title`', () => {
+              fakeUserAgent = testCase.userAgent;
+
+              const wrapper = createComponent();
+              const button = wrapper.find(
+                `ToolbarButton[title="${command}"] > button`
+              );
+
+              const buttonTitlePattern = new RegExp(
+                `${testCase.expectedModifier}-${key.toUpperCase()}`
+              );
+              assert.match(button.props().title, buttonTitlePattern);
+            });
+          });
+        });
+
+        // Test that shortcuts are executed with different Ctrl- and Cmd- combos
+        const keyEventDetails = [
+          { ctrlKey: true, metaKey: false, key },
+          { ctrlKey: false, metaKey: true, key },
+          { ctrlKey: true, metaKey: true, key },
+        ];
+
+        keyEventDetails.forEach(keyEvent => {
+          it('applies formatting when shortcut key is pressed', () => {
+            const onEditText = sinon.stub();
+            const text = 'toolbar shortcut test';
+            const wrapper = createComponent({ text, onEditText });
+            const input = wrapper.find('textarea');
+            input.getDOMNode().selectionStart = 0;
+            input.getDOMNode().selectionEnd = text.length;
+
+            input.simulate('keydown', {
+              ctrlKey: keyEvent.ctrlKey,
+              metaKey: keyEvent.metaKey,
+              key: keyEvent.key,
+            });
+
+            assert.calledWith(onEditText, {
+              text: 'formatted text',
+            });
+            const [formatFunction, ...args] = effect;
+            assert.calledWith(
+              formatFunction,
+              sinon.match({
+                text,
+                selectionStart: 0,
+                selectionEnd: text.length,
+              }),
+              ...args
+            );
+          });
         });
       }
     });
