@@ -146,9 +146,3 @@ export function createDirective(
 
   return linkDirective(initialScope);
 }
-
-/** Helper to dispatch a native event to a DOM element. */
-export function sendEvent(element, eventType) {
-  const event = new Event(eventType, { bubbles: true, cancelable: true });
-  element.dispatchEvent(event);
-}

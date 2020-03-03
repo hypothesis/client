@@ -1,6 +1,6 @@
 import angular from 'angular';
 
-import * as util from '../../directive/test/util';
+import * as util from './angular-util';
 import events from '../../events';
 import * as fixtures from '../../test/annotation-fixtures';
 import annotationComponent from '../annotation';
