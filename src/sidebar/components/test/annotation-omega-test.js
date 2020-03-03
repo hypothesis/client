@@ -93,8 +93,6 @@ describe('AnnotationOmega', () => {
     $imports.$restore();
   });
 
-  it('should test `isSaving`');
-
   describe('annotation classnames', () => {
     it('should assign a reply class if the annotation is a reply', () => {
       fakeMetadata.isReply.returns(true);
@@ -235,6 +233,25 @@ describe('AnnotationOmega', () => {
         assert.calledWith(
           fakeAnnotationsService.save,
           wrapper.props().annotation
+        );
+      });
+
+      it('should show a "Saving" message when annotation is saving', () => {
+        setEditingMode(true);
+
+        const wrapper = createComponent();
+        act(() => {
+          wrapper
+            .find('AnnotationPublishControl')
+            .props()
+            .onSave();
+        });
+
+        wrapper.update();
+
+        assert.include(
+          wrapper.find('.annotation-omega__actions').text(),
+          'Saving...'
         );
       });
 

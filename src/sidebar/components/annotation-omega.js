@@ -68,7 +68,7 @@ function AnnotationOmega({
     }
   }, [annotation, draft, createDraft, isSaving]);
 
-  const shouldShowActions = !isEditing && !isNew(annotation);
+  const shouldShowActions = !isSaving && !isEditing && !isNew(annotation);
   const shouldShowLicense = isEditing && !isPrivate && group.type !== 'private';
   const shouldShowReplyToggle = replyCount > 0 && !isReply(annotation);
 
@@ -158,6 +158,9 @@ function AnnotationOmega({
               onClick={onToggleReplies}
               buttonText={toggleText}
             />
+          )}
+          {isSaving && (
+            <div className="annotation-omega__actions">Saving...</div>
           )}
           {shouldShowActions && (
             <div className="annotation-omega__actions">
