@@ -23,11 +23,11 @@
 
       // nb. The leading/trailing spaces are intended to ensure the text is treated
       // as separate words by assisitve technologies from the content before/after it.
-      content: ' comment start ';
+      content: ' annotation start ';
     }
     &::after {
       @include screen-reader-only;
-      content: ' comment end ';
+      content: ' annotation end ';
     }
   }
 
