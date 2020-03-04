@@ -1,7 +1,7 @@
 import { createElement } from 'preact';
-import { useEffect, useState } from 'preact/hooks';
 import propTypes from 'prop-types';
 
+import useStore from '../store/use-store';
 import { withServices } from '../util/service-context';
 
 import SearchInput from './search-input';
@@ -11,30 +11,23 @@ import SearchInput from './search-input';
  *
  * This displays and updates the "q" query param in the URL.
  */
-function StreamSearchInput({ $location, $rootScope }) {
-  const [query, setQuery] = useState($location.search().q);
-  const search = query => {
-    $rootScope.$apply(() => {
-      // Re-route the user to `/stream` if they are on `/a/:id` and then set
-      // the search query.
-      $location.path('/stream').search({ q: query });
-    });
+function StreamSearchInput({ router }) {
+  const query = useStore(store => store.routeParams().q);
+  const setQuery = query => {
+    // Re-route the user to `/stream` if they are on `/a/:id` and then set
+    // the search query.
+    router.navigate('stream', { q: query });
   };
 
-  useEffect(() => {
-    $rootScope.$on('$locationChangeSuccess', () => {
-      setQuery($location.search().q);
-    });
-  }, [$location, $rootScope]);
-
-  return <SearchInput query={query} onSearch={search} alwaysExpanded={true} />;
+  return (
+    <SearchInput query={query} onSearch={setQuery} alwaysExpanded={true} />
+  );
 }
 
 StreamSearchInput.propTypes = {
-  $location: propTypes.object,
-  $rootScope: propTypes.object,
+  router: propTypes.object,
 };
 
-StreamSearchInput.injectedProps = ['$location', '$rootScope'];
+StreamSearchInput.injectedProps = ['router'];
 
 export default withServices(StreamSearchInput);

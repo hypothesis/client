@@ -40,6 +40,7 @@ import frames from './modules/frames';
 import groups from './modules/groups';
 import links from './modules/links';
 import realTimeUpdates from './modules/real-time-updates';
+import route from './modules/route';
 import selection from './modules/selection';
 import session from './modules/session';
 import sidebarPanels from './modules/sidebar-panels';
@@ -95,6 +96,7 @@ export default function store($rootScope, settings) {
     links,
     groups,
     realTimeUpdates,
+    route,
     selection,
     session,
     sidebarPanels,

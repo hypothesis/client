@@ -1,16 +1,12 @@
 // @ngInject
 function StreamContentController(
   $scope,
-  $route,
-  $routeParams,
   annotationMapper,
   store,
   api,
   rootThread,
   searchFilter
 ) {
-  store.setAppIsSidebar(false);
-
   /** `offset` parameter for the next search API call. */
   let offset = 0;
 
@@ -19,6 +15,8 @@ function StreamContentController(
     offset += result.rows.length;
     annotationMapper.loadAnnotations(result.rows, result.replies);
   };
+
+  const currentQuery = () => store.routeParams().q;
 
   /**
    * Fetch the next `limit` annotations starting from `offset` from the API.
@@ -30,7 +28,7 @@ function StreamContentController(
         offset: offset,
         limit: limit,
       },
-      searchFilter.toObject($routeParams.q)
+      searchFilter.toObject(currentQuery())
     );
 
     api
@@ -41,21 +39,27 @@ function StreamContentController(
       });
   };
 
-  // Re-do search when query changes
-  const lastQuery = $routeParams.q;
-  $scope.$on('$routeUpdate', function() {
-    if ($routeParams.q !== lastQuery) {
-      store.clearAnnotations();
-      $route.reload();
+  function clearAndFetch() {
+    // In case this route loaded after a client-side route change (eg. from
+    // '/a/:id'), clear any existing annotations.
+    store.clearAnnotations();
+
+    // Fetch initial batch of annotations.
+    offset = 0;
+    fetch(20);
+  }
+
+  let lastQuery = currentQuery();
+  const unsubscribe = store.subscribe(() => {
+    const query = currentQuery();
+    if (query !== lastQuery) {
+      lastQuery = query;
+      clearAndFetch();
     }
   });
+  $scope.$on('$destroy', unsubscribe);
 
-  // In case this route loaded after a client-side route change (eg. from
-  // '/a/:id'), clear any existing annotations.
-  store.clearAnnotations();
-
-  // Perform the initial search
-  fetch(20);
+  clearAndFetch();
 
   this.setCollapsed = store.setCollapsed;
   this.rootThread = () => rootThread.thread(store.getState());

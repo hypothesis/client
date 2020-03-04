@@ -8,20 +8,20 @@ import { $imports } from '../stream-search-input';
 import mockImportedComponents from '../../../test-util/mock-imported-components';
 
 describe('StreamSearchInput', () => {
-  let fakeLocation;
-  let fakeRootScope;
+  let fakeRouter;
+  let fakeStore;
 
   beforeEach(() => {
-    fakeLocation = {
-      path: sinon.stub().returnsThis(),
-      search: sinon.stub().returns({ q: 'the-query' }),
+    fakeRouter = {
+      navigate: sinon.stub(),
     };
-    fakeRootScope = {
-      $apply: callback => callback(),
-      $on: sinon.stub(),
+    fakeStore = {
+      routeParams: sinon.stub().returns({}),
     };
-
     $imports.$mock(mockImportedComponents());
+    $imports.$mock({
+      '../store/use-store': callback => callback(fakeStore),
+    });
   });
 
   afterEach(() => {
@@ -29,16 +29,11 @@ describe('StreamSearchInput', () => {
   });
 
   function createSearchInput(props = {}) {
-    return mount(
-      <StreamSearchInput
-        $location={fakeLocation}
-        $rootScope={fakeRootScope}
-        {...props}
-      />
-    );
+    return mount(<StreamSearchInput router={fakeRouter} {...props} />);
   }
 
   it('displays current "q" search param', () => {
+    fakeStore.routeParams.returns({ q: 'the-query' });
     const wrapper = createSearchInput();
     assert.equal(wrapper.find('SearchInput').prop('query'), 'the-query');
   });
@@ -51,23 +46,6 @@ describe('StreamSearchInput', () => {
         .props()
         .onSearch('new-query');
     });
-    assert.calledWith(fakeLocation.path, '/stream');
-    assert.calledWith(fakeLocation.search, { q: 'new-query' });
-  });
-
-  it('updates query when changed in URL', () => {
-    fakeLocation.search.returns({ q: 'query-b' });
-    const wrapper = createSearchInput();
-
-    assert.calledOnce(fakeRootScope.$on);
-    assert.calledWith(fakeRootScope.$on, '$locationChangeSuccess');
-
-    act(() => {
-      fakeRootScope.$on.lastCall.callback();
-    });
-
-    // Check that new query is displayed.
-    wrapper.update();
-    assert.equal(wrapper.find('SearchInput').prop('query'), 'query-b');
+    assert.calledWith(fakeRouter.navigate, 'stream', { q: 'new-query' });
   });
 });

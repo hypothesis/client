@@ -12,9 +12,6 @@ class FakeRootThread extends EventEmitter {
 
 describe('StreamContentController', function() {
   let $componentController;
-  let $rootScope;
-  let fakeRoute;
-  let fakeRouteParams;
   let fakeAnnotationMapper;
   let fakeStore;
   let fakeRootThread;
@@ -34,17 +31,11 @@ describe('StreamContentController', function() {
 
     fakeStore = {
       clearAnnotations: sinon.spy(),
-      setAppIsSidebar: sinon.spy(),
+      routeParams: sinon.stub().returns({ id: 'test' }),
       setCollapsed: sinon.spy(),
       setForceVisible: sinon.spy(),
       setSortKey: sinon.spy(),
       subscribe: sinon.spy(),
-    };
-
-    fakeRouteParams = { id: 'test' };
-
-    fakeRoute = {
-      reload: sinon.spy(),
     };
 
     fakeSearchFilter = {
@@ -74,8 +65,6 @@ describe('StreamContentController', function() {
     fakeRootThread = new FakeRootThread();
 
     angular.mock.module('h', {
-      $route: fakeRoute,
-      $routeParams: fakeRouteParams,
       annotationMapper: fakeAnnotationMapper,
       store: fakeStore,
       api: fakeApi,
@@ -85,9 +74,8 @@ describe('StreamContentController', function() {
       streamer: fakeStreamer,
     });
 
-    angular.mock.inject(function(_$componentController_, _$rootScope_) {
+    angular.mock.inject(function(_$componentController_) {
       $componentController = _$componentController_;
-      $rootScope = _$rootScope_;
     });
   });
 
@@ -125,25 +113,30 @@ describe('StreamContentController', function() {
     });
   });
 
-  context('when a $routeUpdate event occurs', function() {
-    it('reloads the route if the query changed', function() {
-      fakeRouteParams.q = 'test query';
-      createController();
-      fakeRouteParams.q = 'new query';
-      $rootScope.$broadcast('$routeUpdate');
-      assert.called(fakeStore.clearAnnotations);
-      assert.calledOnce(fakeRoute.reload);
-    });
-
-    it('does not reload the route if the query did not change', function() {
-      fakeRouteParams.q = 'test query';
+  context('when route parameters change', function() {
+    it('updates annotations if the query changed', function() {
+      fakeStore.routeParams.returns({ q: 'test query' });
       createController();
       fakeStore.clearAnnotations.resetHistory();
+      fakeApi.search.resetHistory();
 
-      $rootScope.$broadcast('$routeUpdate');
+      fakeStore.routeParams.returns({ q: 'new query' });
+      fakeStore.subscribe.lastCall.callback();
+
+      assert.called(fakeStore.clearAnnotations);
+      assert.called(fakeApi.search);
+    });
+
+    it('does not clear annotations if the query did not change', function() {
+      fakeStore.routeParams.returns({ q: 'test query' });
+      createController();
+      fakeApi.search.resetHistory();
+      fakeStore.clearAnnotations.resetHistory();
+
+      fakeStore.subscribe.lastCall.callback();
 
       assert.notCalled(fakeStore.clearAnnotations);
-      assert.notCalled(fakeRoute.reload);
+      assert.notCalled(fakeApi.search);
     });
   });
 });

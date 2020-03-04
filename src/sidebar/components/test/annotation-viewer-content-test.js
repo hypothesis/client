@@ -41,12 +41,11 @@ describe('annotationViewerContent', function() {
 
   function createController(opts) {
     const locals = {
-      $location: {},
-      $routeParams: { id: 'test_annotation_id' },
       store: {
-        setAppIsSidebar: sinon.stub(),
+        clearAnnotations: sinon.stub(),
         setCollapsed: sinon.stub(),
         highlightAnnotations: sinon.stub(),
+        routeParams: sinon.stub().returns({ id: 'test_annotation_id' }),
         subscribe: sinon.stub(),
       },
       api: opts.api,

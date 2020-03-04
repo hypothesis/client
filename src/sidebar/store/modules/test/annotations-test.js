@@ -2,12 +2,12 @@ import * as fixtures from '../../../test/annotation-fixtures';
 import * as metadata from '../../../util/annotation-metadata';
 import createStore from '../../create-store';
 import annotations from '../annotations';
-import viewer from '../viewer';
+import route from '../route';
 
 const { actions, selectors } = annotations;
 
 function createTestStore() {
-  return createStore([annotations, viewer], [{}]);
+  return createStore([annotations, route], [{}]);
 }
 
 // Tests for most of the functionality in reducers/annotations.js are currently
@@ -30,6 +30,7 @@ describe('sidebar/store/modules/annotations', function() {
     beforeEach(function() {
       clock = sinon.useFakeTimers();
       store = createTestStore();
+      store.changeRoute('sidebar', {});
     });
 
     afterEach(function() {
@@ -134,7 +135,7 @@ describe('sidebar/store/modules/annotations', function() {
       };
 
       const annot = fixtures.defaultAnnotation();
-      store.setAppIsSidebar(false);
+      store.changeRoute('stream', { q: 'a-query' });
       store.addAnnotations([annot]);
 
       clock.tick(ANCHOR_TIME_LIMIT);

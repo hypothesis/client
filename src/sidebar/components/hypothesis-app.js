@@ -35,7 +35,6 @@ function authStateFromProfile(profile) {
 function HypothesisAppController(
   $document,
   $rootScope,
-  $route,
   $scope,
   $window,
   analytics,
@@ -81,6 +80,8 @@ function HypothesisAppController(
       store.openSidebarPanel(uiConstants.PANEL_HELP);
     }
   };
+
+  this.route = () => store.route();
 
   $scope.$on(events.USER_CHANGED, function(event, data) {
     self.onUserChange(data.profile);

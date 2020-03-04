@@ -11,14 +11,14 @@ const { focusGroup } = groups.actions;
 describe('sidebar/store/modules/real-time-updates', () => {
   let fakeAnnotationExists;
   let fakeFocusedGroupId;
-  let fakeIsSidebar;
+  let fakeRoute;
   let fakeSettings = {};
   let store;
 
   beforeEach(() => {
     fakeAnnotationExists = sinon.stub().returns(true);
     fakeFocusedGroupId = sinon.stub().returns('group-1');
-    fakeIsSidebar = sinon.stub().returns(true);
+    fakeRoute = sinon.stub().returns('sidebar');
 
     store = createStore(
       [realTimeUpdates, annotations, selection],
@@ -36,9 +36,9 @@ describe('sidebar/store/modules/real-time-updates', () => {
           selectors: { focusedGroupId: fakeFocusedGroupId },
         },
       },
-      './viewer': {
+      './route': {
         default: {
-          selectors: { isSidebar: fakeIsSidebar },
+          selectors: { route: fakeRoute },
         },
       },
     });
@@ -84,7 +84,7 @@ describe('sidebar/store/modules/real-time-updates', () => {
 
     it('always adds pending updates in the stream where there is no focused group', () => {
       fakeFocusedGroupId.returns(null);
-      fakeIsSidebar.returns(false);
+      fakeRoute.returns('stream');
 
       addPendingUpdates(store);
 

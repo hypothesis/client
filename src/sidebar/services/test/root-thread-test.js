@@ -41,7 +41,6 @@ describe('rootThread', function() {
           annotations: [],
         },
         viewer: {
-          isSidebar: true,
           visibleHighlights: false,
         },
         drafts: [],
@@ -54,6 +53,10 @@ describe('rootThread', function() {
           selectedAnnotationMap: null,
           sortKey: 'Location',
           sortKeysAvailable: ['Location'],
+        },
+        route: {
+          name: 'sidebar',
+          params: {},
         },
       },
       getState: function() {
@@ -294,7 +297,7 @@ describe('rootThread', function() {
 
     it('does not filter annotations when not in the sidebar', function() {
       fakeBuildThread.reset();
-      fakeStore.state.viewer.isSidebar = false;
+      fakeStore.state.route.name = 'stream';
 
       rootThread.thread(fakeStore.state);
       const threadFilterFn = fakeBuildThread.args[0][1].threadFilterFn;
