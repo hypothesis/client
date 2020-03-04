@@ -82,15 +82,6 @@ function AnnotationController(
      * new client-side).
      */
     newlyCreatedByHighlightButton = self.annotation.$highlight || false;
-
-    // If this annotation is not a highlight and if it's new (has just been
-    // created by the annotate button) or it has edits not yet saved to the
-    // server - then open the editor on AnnotationController instantiation.
-    if (!newlyCreatedByHighlightButton) {
-      if (isNew(self.annotation) || store.getDraft(self.annotation)) {
-        self.edit();
-      }
-    }
   };
 
   /**

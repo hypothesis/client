@@ -5,14 +5,9 @@
 
 import { createSelector } from 'reselect';
 
-import uiConstants from '../../ui-constants';
 import * as metadata from '../../util/annotation-metadata';
 import * as arrayUtil from '../../util/array';
-import { defaultPermissions, privatePermissions } from '../../util/permissions';
 import * as util from '../util';
-
-import drafts from './drafts';
-import selection from './selection';
 
 /**
  * Return a copy of `current` with all matching annotations in `annotations`
@@ -241,6 +236,8 @@ function addAnnotations(annotations) {
     });
 
     // If we're not in the sidebar, we're done here.
+    // FIXME Split the annotation-adding from the anchoring code; possibly
+    // move into service
     if (!getState().viewer.isSidebar) {
       return;
     }
@@ -317,71 +314,6 @@ function hideAnnotation(id) {
   return {
     type: actions.HIDE_ANNOTATION,
     id: id,
-  };
-}
-
-/**
- * Create a new annotation (as-yet unpersisted)
- *
- * This method has several responsibilities:
- * 1. Set some default data attributes on the annotation
- * 2. Remove any existing, empty drafts
- * 3. Add the annotation to the current collection of annotations
- * 4. Change focused tab to the applicable one for the new annotation's meta-type
- * 5. Expand all of the new annotation's parents
- *
- */
-function createAnnotation(ann, now = new Date()) {
-  return (dispatch, getState) => {
-    /**
-     * Extend the new, unsaved annotation object with defaults for some
-     * required data fields and default permissions.
-     *
-     * Note: the `created` and `updated` values will be ignored and superseded
-     * by the service when the annotation is persisted, but they are used
-     * app-side for annotation card sorting until then.
-     */
-    const groupid = getState().groups.focusedGroupId;
-    const userid = getState().session.userid;
-    ann = Object.assign(
-      {
-        created: now.toISOString(),
-        group: groupid,
-        permissions: defaultPermissions(
-          userid,
-          groupid,
-          getState().defaults.annotationPrivacy
-        ),
-        tags: [],
-        text: '',
-        updated: now.toISOString(),
-        user: userid,
-        user_info: getState().session.user_info,
-      },
-      ann
-    );
-    // Highlights are peculiar in that they always have private permissions
-    if (metadata.isHighlight(ann)) {
-      ann.permissions = privatePermissions(userid);
-    }
-
-    // When a new annotation is created, remove any existing annotations
-    // that are empty.
-    dispatch(drafts.actions.deleteNewAndEmptyDrafts([ann]));
-
-    dispatch(addAnnotations([ann]));
-    // If the annotation is of type note or annotation, make sure
-    // the appropriate tab is selected. If it is of type reply, user
-    // stays in the selected tab.
-    if (metadata.isPageNote(ann)) {
-      dispatch(selection.actions.selectTab(uiConstants.TAB_NOTES));
-    } else if (metadata.isAnnotation(ann)) {
-      dispatch(selection.actions.selectTab(uiConstants.TAB_ANNOTATIONS));
-    }
-    (ann.references || []).forEach(parent => {
-      // Expand any parents of this annotation.
-      dispatch(selection.actions.setCollapsed(parent, false));
-    });
   };
 }
 
@@ -491,7 +423,6 @@ export default {
   actions: {
     addAnnotations,
     clearAnnotations,
-    createAnnotation,
     hideAnnotation,
     removeAnnotations,
     updateAnchorStatus,

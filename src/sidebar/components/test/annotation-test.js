@@ -235,28 +235,6 @@ describe('annotation', function() {
       sandbox.restore();
     });
 
-    describe('initialization', function() {
-      it('creates drafts for new annotations on initialization', function() {
-        const annotation = fixtures.newAnnotation();
-        createDirective(annotation);
-        assert.calledWith(fakeStore.createDraft, annotation, {
-          isPrivate: false,
-          tags: annotation.tags,
-          text: annotation.text,
-        });
-      });
-
-      it('edits annotations with drafts on initialization', function() {
-        const annotation = fixtures.oldAnnotation();
-        // The drafts store has some draft changes for this annotation.
-        fakeStore.getDraft.returns({ text: 'foo', tags: [] });
-
-        const controller = createDirective(annotation).controller;
-
-        assert.isTrue(controller.editing());
-      });
-    });
-
     describe('#editing()', function() {
       it('returns false if the annotation does not have a draft', function() {
         const controller = createDirective().controller;

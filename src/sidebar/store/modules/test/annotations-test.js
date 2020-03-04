@@ -1,47 +1,19 @@
 import * as fixtures from '../../../test/annotation-fixtures';
-import uiConstants from '../../../ui-constants';
 import * as metadata from '../../../util/annotation-metadata';
 import createStore from '../../create-store';
 import annotations from '../annotations';
-import { $imports } from '../annotations';
-import defaults from '../defaults';
-import drafts from '../drafts';
-import groups from '../groups';
-import selection from '../selection';
-import session from '../session';
 import viewer from '../viewer';
 
 const { actions, selectors } = annotations;
 
 function createTestStore() {
-  return createStore(
-    [annotations, selection, defaults, drafts, groups, session, viewer],
-    [{}]
-  );
+  return createStore([annotations, viewer], [{}]);
 }
 
 // Tests for most of the functionality in reducers/annotations.js are currently
 // in the tests for the whole Redux store
 
 describe('sidebar/store/modules/annotations', function() {
-  let fakeDefaultPermissions;
-  let fakePrivatePermissions;
-
-  beforeEach(() => {
-    fakeDefaultPermissions = sinon.stub();
-    fakePrivatePermissions = sinon.stub();
-    $imports.$mock({
-      '../../util/permissions': {
-        defaultPermissions: fakeDefaultPermissions,
-        privatePermissions: fakePrivatePermissions,
-      },
-    });
-  });
-
-  afterEach(() => {
-    $imports.$restore();
-  });
-
   describe('#addAnnotations()', function() {
     const ANCHOR_TIME_LIMIT = 1000;
     let clock;
@@ -70,36 +42,6 @@ describe('sidebar/store/modules/annotations', function() {
       assert.match(store.getState().annotations.annotations, [
         sinon.match(annot),
       ]);
-    });
-
-    it('does not change `selectedTab` state if annotations are already loaded', function() {
-      const annot = fixtures.defaultAnnotation();
-      store.addAnnotations([annot]);
-      const page = fixtures.oldPageNote();
-      store.addAnnotations([page]);
-      assert.equal(
-        store.getState().selection.selectedTab,
-        uiConstants.TAB_ANNOTATIONS
-      );
-    });
-
-    it('sets `selectedTab` to "note" if only page notes are present', function() {
-      const page = fixtures.oldPageNote();
-      store.addAnnotations([page]);
-      assert.equal(
-        store.getState().selection.selectedTab,
-        uiConstants.TAB_NOTES
-      );
-    });
-
-    it('leaves `selectedTab` as "annotation" if annotations and/or page notes are present', function() {
-      const page = fixtures.oldPageNote();
-      const annot = fixtures.defaultAnnotation();
-      store.addAnnotations([annot, page]);
-      assert.equal(
-        store.getState().selection.selectedTab,
-        uiConstants.TAB_ANNOTATIONS
-      );
     });
 
     it('assigns a local tag to annotations', function() {
@@ -442,189 +384,6 @@ describe('sidebar/store/modules/annotations', function() {
         assert.equal(storeAnn.flagged, testCase.nowFlagged);
         assert.deepEqual(storeAnn.moderation, testCase.newModeration);
       });
-    });
-  });
-
-  describe('#createAnnotation', function() {
-    let clock;
-    let now;
-    let store;
-
-    beforeEach(() => {
-      // Stop the clock to keep the current date from advancing
-      clock = sinon.useFakeTimers();
-      now = new Date();
-      store = createTestStore();
-    });
-
-    afterEach(() => {
-      clock.restore();
-    });
-
-    it('should create an annotation', function() {
-      const ann = fixtures.oldAnnotation();
-      store.dispatch(actions.createAnnotation(ann));
-      assert.equal(
-        selectors.findAnnotationByID(store.getState(), ann.id).id,
-        ann.id
-      );
-    });
-
-    it('should set basic default properties on a new/empty annotation', () => {
-      store.dispatch(actions.createAnnotation({ id: 'myID' }, now));
-
-      const createdAnnotation = selectors.findAnnotationByID(
-        store.getState(),
-        'myID'
-      );
-
-      assert.include(createdAnnotation, {
-        created: now.toISOString(),
-        updated: now.toISOString(),
-        text: '',
-      });
-      assert.isArray(createdAnnotation.tags);
-    });
-
-    it('should set user properties on a new/empty annotation', () => {
-      store.dispatch(actions.createAnnotation({ id: 'myID' }, now));
-
-      const createdAnnotation = selectors.findAnnotationByID(
-        store.getState(),
-        'myID'
-      );
-
-      assert.equal(createdAnnotation.user, store.getState().session.userid);
-      assert.equal(
-        createdAnnotation.user_info,
-        store.getState().session.user_info
-      );
-    });
-
-    it('should set default permissions on a new annotation', () => {
-      fakeDefaultPermissions.returns('somePermissions');
-      store.dispatch(actions.createAnnotation({ id: 'myID' }, now));
-
-      const createdAnnotation = selectors.findAnnotationByID(
-        store.getState(),
-        'myID'
-      );
-
-      assert.equal(createdAnnotation.permissions, 'somePermissions');
-    });
-
-    it('should always assign private permissions to highlights', () => {
-      fakePrivatePermissions.returns('private');
-      store.dispatch(
-        actions.createAnnotation({ id: 'myID', $highlight: true }, now)
-      );
-
-      const createdAnnotation = selectors.findAnnotationByID(
-        store.getState(),
-        'myID'
-      );
-
-      assert.equal(createdAnnotation.permissions, 'private');
-    });
-
-    it('should set group to currently-focused group if not set on annotation', () => {
-      store.dispatch(actions.createAnnotation({ id: 'myID' }, now));
-
-      const createdAnnotation = selectors.findAnnotationByID(
-        store.getState(),
-        'myID'
-      );
-
-      assert.equal(
-        createdAnnotation.group,
-        store.getState().groups.focusedGroupId
-      );
-    });
-
-    it('should set not overwrite properties if present', () => {
-      store.dispatch(
-        actions.createAnnotation(
-          {
-            id: 'myID',
-            created: 'when',
-            updated: 'then',
-            text: 'my annotation',
-            tags: ['foo', 'bar'],
-            group: 'fzzy',
-            permissions: ['whatever'],
-            user: 'acct:foo@bar.com',
-            user_info: {
-              display_name: 'Herbivore Fandango',
-            },
-          },
-          now
-        )
-      );
-
-      const createdAnnotation = selectors.findAnnotationByID(
-        store.getState(),
-        'myID'
-      );
-
-      assert.include(createdAnnotation, {
-        created: 'when',
-        updated: 'then',
-        text: 'my annotation',
-        group: 'fzzy',
-        user: 'acct:foo@bar.com',
-      });
-
-      assert.include(createdAnnotation.tags, 'foo', 'bar');
-      assert.include(createdAnnotation.permissions, 'whatever');
-      assert.equal(
-        createdAnnotation.user_info.display_name,
-        'Herbivore Fandango'
-      );
-    });
-
-    it('should change tab focus to TAB_ANNOTATIONS when a new annotation is created', function() {
-      store.dispatch(actions.createAnnotation(fixtures.oldAnnotation()));
-      assert.equal(
-        store.getState().selection.selectedTab,
-        uiConstants.TAB_ANNOTATIONS
-      );
-    });
-
-    it('should change tab focus to TAB_NOTES when a new note annotation is created', function() {
-      store.dispatch(actions.createAnnotation(fixtures.oldPageNote()));
-      assert.equal(
-        store.getState().selection.selectedTab,
-        uiConstants.TAB_NOTES
-      );
-    });
-
-    it('should expand parent of created annotation', function() {
-      const store = createTestStore();
-      store.dispatch(
-        actions.addAnnotations([
-          {
-            id: 'annotation_id',
-            $highlight: undefined,
-            target: [{ source: 'source', selector: [] }],
-            references: [],
-            text: 'This is my annotation',
-            tags: ['tag_1', 'tag_2'],
-          },
-        ])
-      );
-      // Collapse the parent.
-      store.dispatch(selection.actions.setCollapsed('annotation_id', true));
-      // Creating a new child annotation should expand its parent.
-      store.dispatch(
-        actions.createAnnotation({
-          highlight: undefined,
-          target: [{ source: 'http://example.org' }],
-          references: ['annotation_id'],
-          text: '',
-          tags: [],
-        })
-      );
-      assert.isTrue(store.getState().selection.expanded.annotation_id);
     });
   });
 });

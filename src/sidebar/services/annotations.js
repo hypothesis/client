@@ -1,6 +1,12 @@
 import SearchClient from '../search-client';
-import { isNew, isPublic } from '../util/annotation-metadata';
-import { privatePermissions, sharedPermissions } from '../util/permissions';
+import * as metadata from '../util/annotation-metadata';
+import {
+  defaultPermissions,
+  privatePermissions,
+  sharedPermissions,
+} from '../util/permissions';
+import { generateHexString } from '../util/random';
+import uiConstants from '../ui-constants';
 
 // @ngInject
 export default function annotationsService(
@@ -11,6 +17,88 @@ export default function annotationsService(
   streamFilter
 ) {
   let searchClient = null;
+
+  /**
+   * Extend new annotation objects with defaults and permissions.
+   */
+  function initialize(annotationData, now = new Date()) {
+    const defaultPrivacy = store.getDefault('annotationPrivacy');
+    const groupid = store.focusedGroupId();
+    const profile = store.profile();
+
+    const userid = profile.userid;
+    const userInfo = profile.user_info;
+
+    // We need a unique local/app identifier for this new annotation such
+    // that we might look it up later in the store. It won't have an ID yet,
+    // as it has not been persisted to the service.
+    const $tag = generateHexString(8);
+
+    let permissions = defaultPermissions(userid, groupid, defaultPrivacy);
+
+    // Highlights are peculiar in that they always have private permissions
+    if (metadata.isHighlight(annotationData)) {
+      permissions = privatePermissions(userid);
+    }
+
+    return Object.assign(
+      {
+        created: now.toISOString(),
+        group: groupid,
+        permissions,
+        tags: [],
+        text: '',
+        updated: now.toISOString(),
+        user: userid,
+        user_info: userInfo,
+        $tag: $tag,
+      },
+      annotationData
+    );
+  }
+
+  /**
+   * Populate a new annotation object from `annotation` and add it to the store.
+   * Create a draft for it unless it's a highlight and clear other empty
+   * drafts out of the way.
+   *
+   * @param {Object} annotationData
+   * @param {Date} now
+   */
+  function create(annotationData, now = new Date()) {
+    const annotation = initialize(annotationData, now);
+
+    store.addAnnotations([annotation]);
+
+    // Remove other drafts that are in the way, and their annotations (if new)
+    store.deleteNewAndEmptyDrafts();
+
+    // Create a draft unless it's a highlight
+    if (!metadata.isHighlight(annotation)) {
+      store.createDraft(annotation, {
+        tags: annotation.tags,
+        text: annotation.text,
+        isPrivate: !metadata.isPublic(annotation),
+      });
+    }
+
+    // NB: It may make sense to move the following code at some point to
+    // the UI layer
+    // Select the correct tab
+    // If the annotation is of type note or annotation, make sure
+    // the appropriate tab is selected. If it is of type reply, user
+    // stays in the selected tab.
+    if (metadata.isPageNote(annotation)) {
+      store.selectTab(uiConstants.TAB_NOTES);
+    } else if (metadata.isAnnotation(annotation)) {
+      store.selectTab(uiConstants.TAB_ANNOTATIONS);
+    }
+
+    (annotation.references || []).forEach(parent => {
+      // Expand any parents of this annotation.
+      store.setCollapsed(parent, false);
+    });
+  }
 
   /**
    * Load annotations for all URIs and groupId.
@@ -90,14 +178,14 @@ export default function annotationsService(
   function reply(annotation, userid) {
     const replyAnnotation = {
       group: annotation.group,
-      permissions: isPublic(annotation)
+      permissions: metadata.isPublic(annotation)
         ? sharedPermissions(userid, annotation.group)
         : privatePermissions(userid),
       references: (annotation.references || []).concat(annotation.id),
       target: [{ source: annotation.target[0].source }],
       uri: annotation.uri,
     };
-    store.createAnnotation(replyAnnotation);
+    create(replyAnnotation);
   }
 
   /**
@@ -110,7 +198,7 @@ export default function annotationsService(
 
     const annotationWithChanges = applyDraftChanges(annotation);
 
-    if (isNew(annotation)) {
+    if (metadata.isNew(annotation)) {
       saved = api.annotation.create({}, annotationWithChanges);
     } else {
       saved = api.annotation.update(
@@ -136,6 +224,7 @@ export default function annotationsService(
   }
 
   return {
+    create,
     load,
     reply,
     save,
