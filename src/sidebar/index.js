@@ -175,6 +175,7 @@ import featuresService from './services/features';
 import flashService from './services/flash';
 import frameSyncService from './services/frame-sync';
 import groupsService from './services/groups';
+import loadAnnotationsService from './services/load-annotations';
 import localStorageService from './services/local-storage';
 import permissionsService from './services/permissions';
 import persistedDefaultsService from './services/persisted-defaults';
@@ -217,6 +218,7 @@ function startAngularApp(config) {
     .register('flash', flashService)
     .register('frameSync', frameSyncService)
     .register('groups', groupsService)
+    .register('loadAnnotationsService', loadAnnotationsService)
     .register('localStorage', localStorageService)
     .register('permissions', permissionsService)
     .register('persistedDefaults', persistedDefaultsService)
@@ -303,6 +305,9 @@ function startAngularApp(config) {
     .service('flash', () => container.get('flash'))
     .service('frameSync', () => container.get('frameSync'))
     .service('groups', () => container.get('groups'))
+    .service('loadAnnotationsService', () =>
+      container.get('loadAnnotationsService')
+    )
     .service('permissions', () => container.get('permissions'))
     .service('persistedDefaults', () => container.get('persistedDefaults'))
     .service('rootThread', () => container.get('rootThread'))

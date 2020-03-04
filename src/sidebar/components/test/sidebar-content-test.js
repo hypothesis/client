@@ -20,7 +20,7 @@ describe('sidebar.components.sidebar-content', function() {
   let store;
   let ctrl;
   let fakeAnalytics;
-  let fakeAnnotations;
+  let fakeLoadAnnotationsService;
   let fakeFrameSync;
   let fakeRootThread;
   let fakeSettings;
@@ -56,7 +56,7 @@ describe('sidebar.components.sidebar-content', function() {
         reconnect: sandbox.stub(),
       };
 
-      fakeAnnotations = {
+      fakeLoadAnnotationsService = {
         load: sinon.stub(),
       };
 
@@ -68,7 +68,7 @@ describe('sidebar.components.sidebar-content', function() {
       $provide.value('frameSync', fakeFrameSync);
       $provide.value('rootThread', fakeRootThread);
       $provide.value('streamer', fakeStreamer);
-      $provide.value('annotationsService', fakeAnnotations);
+      $provide.value('loadAnnotationsService', fakeLoadAnnotationsService);
       $provide.value('settings', fakeSettings);
     });
   });
@@ -167,7 +167,7 @@ describe('sidebar.components.sidebar-content', function() {
   function connectFrameAndPerformInitialFetch() {
     setFrames([{ uri: 'https://a-page.com' }]);
     $scope.$digest();
-    fakeAnnotations.load.reset();
+    fakeLoadAnnotationsService.load.reset();
   }
 
   it('generates the thread list', () => {
@@ -184,7 +184,7 @@ describe('sidebar.components.sidebar-content', function() {
       $scope.$digest();
 
       assert.calledWith(
-        fakeAnnotations.load,
+        fakeLoadAnnotationsService.load,
         ['https://a-page.com', 'https://new-frame.com'],
         'group-id'
       );
@@ -203,7 +203,7 @@ describe('sidebar.components.sidebar-content', function() {
       $scope.$digest();
 
       assert.calledWith(
-        fakeAnnotations.load,
+        fakeLoadAnnotationsService.load,
         ['https://a-page.com'],
         'group-id'
       );
@@ -219,7 +219,7 @@ describe('sidebar.components.sidebar-content', function() {
       store.updateSession(newProfile);
       $scope.$digest();
 
-      assert.notCalled(fakeAnnotations.load);
+      assert.notCalled(fakeLoadAnnotationsService.load);
     });
   });
 
@@ -250,7 +250,7 @@ describe('sidebar.components.sidebar-content', function() {
       store.addAnnotations = sinon.stub();
       setFrames([{ uri: uri }]);
       $scope.$digest();
-      fakeAnnotations.load = sinon.stub();
+      fakeLoadAnnotationsService.load = sinon.stub();
     });
 
     it('should load annotations for the new group', () => {
@@ -260,7 +260,7 @@ describe('sidebar.components.sidebar-content', function() {
       $scope.$digest();
 
       assert.calledWith(
-        fakeAnnotations.load,
+        fakeLoadAnnotationsService.load,
         ['http://example.com'],
         'different-group'
       );
