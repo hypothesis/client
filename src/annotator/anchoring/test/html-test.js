@@ -1,4 +1,3 @@
-import { toResult } from '../../../shared/test/promise-util';
 import * as html from '../html';
 
 import fixture from './html-anchoring-fixture.html';
@@ -379,17 +378,17 @@ describe('HTML anchoring', function() {
       exact: 'Lorem ipsum',
     };
 
-    it('throws an error if anchoring using a quote fails', function() {
+    it('throws an error if anchoring using a quote fails', async function() {
       const quoteSelector = {
         type: 'TextQuoteSelector',
         exact: 'This text does not appear in the web page',
       };
-
-      return toResult(html.anchor(container, [quoteSelector])).then(function(
-        result
-      ) {
-        assert.equal(result.error.message, 'Quote not found');
-      });
+      try {
+        await html.anchor(container, [quoteSelector]);
+        throw new Error('Failed to catch error');
+      } catch (e) {
+        assert.equal(e.message, 'Quote not found');
+      }
     });
 
     it('does not throw an error if anchoring using a position fails', function() {

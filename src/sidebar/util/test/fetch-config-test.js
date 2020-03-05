@@ -1,4 +1,3 @@
-import { assertPromiseIsRejected } from '../../../shared/test/promise-util';
 import { fetchConfig, $imports } from '../fetch-config';
 
 describe('sidebar.util.fetch-config', () => {
@@ -108,18 +107,25 @@ describe('sidebar.util.fetch-config', () => {
         });
       });
 
-      it('rejects if sidebar is top frame', () => {
+      it('rejects if sidebar is top frame', async () => {
         fakeWindow.parent = fakeWindow;
         fakeWindow.top = fakeWindow;
-
-        const config = fetchConfig({}, fakeWindow);
-        return assertPromiseIsRejected(config, 'Client is top frame');
+        try {
+          await fetchConfig({}, fakeWindow);
+          throw new Error('Failed to catch error');
+        } catch (e) {
+          assert.equal(e.message, 'Client is top frame');
+        }
       });
 
-      it('rejects if fetching config fails', () => {
-        fakeJsonRpc.call.returns(Promise.reject(new Error('Nope')));
-        const config = fetchConfig({}, fakeWindow);
-        return assertPromiseIsRejected(config, 'Nope');
+      it('rejects if fetching config fails', async () => {
+        fakeJsonRpc.call.rejects(new Error('Nope'));
+        try {
+          await fetchConfig({}, fakeWindow);
+          throw new Error('Failed to catch error');
+        } catch (e) {
+          assert.equal(e.message, 'Nope');
+        }
       });
 
       it('returns config from ancestor frame', async () => {
@@ -233,9 +239,12 @@ describe('sidebar.util.fetch-config', () => {
       it('rejects if fetching config fails` ', async () => {
         fakeJsonRpc.call.rejects(new Error('Nope'));
         const appConfig = { foo: 'bar', appType: 'via' };
-
-        const result = fetchConfig(appConfig, fakeWindow);
-        return assertPromiseIsRejected(result, 'Nope');
+        try {
+          await fetchConfig(appConfig, fakeWindow);
+          throw new Error('Failed to catch error');
+        } catch (e) {
+          assert.equal(e.message, 'Nope');
+        }
       });
     });
 

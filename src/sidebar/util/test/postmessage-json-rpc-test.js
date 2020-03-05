@@ -1,6 +1,5 @@
 import EventEmitter from 'tiny-emitter';
 
-import { assertPromiseIsRejected } from '../../../shared/test/promise-util';
 import { call } from '../postmessage-json-rpc';
 
 class FakeWindow {
@@ -48,12 +47,14 @@ describe('sidebar.util.postmessage-json-rpc', () => {
       });
     });
 
-    it('rejects if `postMessage` fails', () => {
+    it('rejects if `postMessage` fails', async () => {
       frame.postMessage.throws(new Error('Nope!'));
-
-      const result = doCall();
-
-      assertPromiseIsRejected(result, 'Nope!');
+      try {
+        await doCall();
+        throw new Error('Failed to catch error');
+      } catch (e) {
+        assert.equal(e.message, 'Nope!');
+      }
     });
 
     [
@@ -103,7 +104,7 @@ describe('sidebar.util.postmessage-json-rpc', () => {
       });
     });
 
-    it('rejects with an error if the `error` field is set in the response', () => {
+    it('rejects with an error if the `error` field is set in the response', async () => {
       const result = doCall();
       fakeWindow.emitter.emit('message', {
         origin,
@@ -115,21 +116,27 @@ describe('sidebar.util.postmessage-json-rpc', () => {
           },
         },
       });
-
-      return assertPromiseIsRejected(result, 'Something went wrong');
+      try {
+        await result;
+        throw new Error('Failed to catch error');
+      } catch (e) {
+        assert.equal(e.message, 'Something went wrong');
+      }
     });
 
-    it('rejects if no `error` or `result` field is set in the response', () => {
+    it('rejects if no `error` or `result` field is set in the response', async () => {
       const result = doCall();
       fakeWindow.emitter.emit('message', {
         origin,
         data: { jsonrpc: '2.0', id: messageId },
       });
 
-      return assertPromiseIsRejected(
-        result,
-        'RPC reply had no result or error'
-      );
+      try {
+        await result;
+        throw new Error('Failed to catch error');
+      } catch (e) {
+        assert.equal(e.message, 'RPC reply had no result or error');
+      }
     });
 
     it('resolves with the result if the `result` field is set in the response', () => {
@@ -149,12 +156,13 @@ describe('sidebar.util.postmessage-json-rpc', () => {
       });
     });
 
-    it('rejects with an error if the timeout is exceeded', () => {
-      const result = doCall();
-      return assertPromiseIsRejected(
-        result,
-        'Request to https://embedder.com timed out'
-      );
+    it('rejects with an error if the timeout is exceeded', async () => {
+      try {
+        await doCall();
+        throw new Error('Failed to catch error');
+      } catch (e) {
+        assert.equal(e.message, 'Request to https://embedder.com timed out');
+      }
     });
   });
 });
