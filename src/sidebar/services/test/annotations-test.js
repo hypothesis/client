@@ -1,80 +1,30 @@
-import EventEmitter from 'tiny-emitter';
-
 import * as fixtures from '../../test/annotation-fixtures';
 import uiConstants from '../../ui-constants';
 
-import annotationsService from '../annotations';
-import { $imports } from '../annotations';
+import annotationsService, { $imports } from '../annotations';
 
-let searchClients;
-let longRunningSearchClient = false;
-class FakeSearchClient extends EventEmitter {
-  constructor(searchFn, opts) {
-    super();
-
-    assert.ok(searchFn);
-    searchClients.push(this);
-    this.cancel = sinon.stub();
-    this.incremental = !!opts.incremental;
-
-    this.get = sinon.spy(query => {
-      assert.ok(query.uri);
-
-      for (let i = 0; i < query.uri.length; i++) {
-        const uri = query.uri[i];
-        this.emit('results', [{ id: uri + '123', group: '__world__' }]);
-        this.emit('results', [{ id: uri + '456', group: 'private-group' }]);
-      }
-      if (!longRunningSearchClient) {
-        this.emit('end');
-      }
-    });
-  }
-}
-
-describe('annotationService', () => {
-  let fakeStore;
+describe('annotationsService', () => {
   let fakeApi;
-  let fakeAnnotationMapper;
-  let fakeStreamer;
-  let fakeStreamFilter;
-
   let fakeMetadata;
-  let fakeUris;
-  let fakeGroupId;
+  let fakeStore;
 
   let fakeDefaultPermissions;
   let fakePrivatePermissions;
   let fakeSharedPermissions;
 
+  let svc;
+
   beforeEach(() => {
-    sinon.stub(console, 'error');
-    searchClients = [];
-    longRunningSearchClient = false;
-
-    fakeAnnotationMapper = {
-      loadAnnotations: sinon.stub(),
-      unloadAnnotations: sinon.stub(),
-    };
-
     fakeApi = {
       annotation: {
         create: sinon.stub().resolves(fixtures.defaultAnnotation()),
         update: sinon.stub().resolves(fixtures.defaultAnnotation()),
       },
-      search: sinon.stub(),
     };
 
     fakeDefaultPermissions = sinon.stub();
-
-    fakePrivatePermissions = sinon.stub().returns({
-      read: ['acct:foo@bar.com'],
-      update: ['acct:foo@bar.com'],
-      delete: ['acct:foo@bar.com'],
-    });
-    fakeSharedPermissions = sinon.stub().returns({
-      read: ['group:__world__'],
-    });
+    fakePrivatePermissions = sinon.stub();
+    fakeSharedPermissions = sinon.stub();
 
     fakeMetadata = {
       isAnnotation: sinon.stub(),
@@ -86,38 +36,18 @@ describe('annotationService', () => {
 
     fakeStore = {
       addAnnotations: sinon.stub(),
-      annotationFetchFinished: sinon.stub(),
-      annotationFetchStarted: sinon.stub(),
       createDraft: sinon.stub(),
       deleteNewAndEmptyDrafts: sinon.stub(),
       focusedGroupId: sinon.stub(),
-      frames: sinon.stub(),
       getDefault: sinon.stub(),
       getDraft: sinon.stub().returns(null),
       profile: sinon.stub().returns({}),
       removeDraft: sinon.stub(),
-      savedAnnotations: sinon.stub(),
       selectTab: sinon.stub(),
       setCollapsed: sinon.stub(),
-      updateFrameAnnotationFetchStatus: sinon.stub(),
     };
-
-    fakeStreamer = {
-      setConfig: sinon.stub(),
-      connect: sinon.stub(),
-      reconnect: sinon.stub(),
-    };
-    fakeStreamFilter = {
-      resetFilter: sinon.stub().returns({
-        addClause: sinon.stub(),
-      }),
-      getFilter: sinon.stub().returns({}),
-    };
-    fakeUris = ['http://example.com'];
-    fakeGroupId = 'group-id';
 
     $imports.$mock({
-      '../search-client': FakeSearchClient,
       '../util/annotation-metadata': fakeMetadata,
       '../util/permissions': {
         defaultPermissions: fakeDefaultPermissions,
@@ -125,31 +55,16 @@ describe('annotationService', () => {
         sharedPermissions: fakeSharedPermissions,
       },
     });
+
+    svc = annotationsService(fakeApi, fakeStore);
   });
 
   afterEach(() => {
-    console.error.restore();
     $imports.$restore();
   });
 
-  function service() {
-    fakeStore.frames.returns(
-      fakeUris.map(uri => {
-        return { uri: uri };
-      })
-    );
-    return annotationsService(
-      fakeAnnotationMapper,
-      fakeApi,
-      fakeStore,
-      fakeStreamer,
-      fakeStreamFilter
-    );
-  }
-
   describe('create', () => {
     let now;
-    let svc;
 
     const getLastAddedAnnotation = () => {
       if (fakeStore.addAnnotations.callCount <= 0) {
@@ -161,7 +76,6 @@ describe('annotationService', () => {
 
     beforeEach(() => {
       now = new Date();
-      svc = service();
 
       fakeStore.focusedGroupId.returns('mygroup');
       fakeStore.profile.returns({
@@ -307,180 +221,7 @@ describe('annotationService', () => {
     });
   });
 
-  describe('load', () => {
-    it('unloads any existing annotations', () => {
-      // When new clients connect, all existing annotations should be unloaded
-      // before reloading annotations for each currently-connected client.
-      fakeStore.savedAnnotations.returns([
-        { id: fakeUris[0] + '123' },
-        { id: fakeUris[0] + '456' },
-      ]);
-      const svc = service();
-
-      svc.load(fakeUris, fakeGroupId);
-      assert.calledWith(fakeAnnotationMapper.unloadAnnotations, [
-        sinon.match({ id: fakeUris[0] + '123' }),
-        sinon.match({ id: fakeUris[0] + '456' }),
-      ]);
-    });
-
-    it('loads all annotations for a URI', () => {
-      const svc = service();
-
-      svc.load(fakeUris, fakeGroupId);
-      assert.calledWith(fakeAnnotationMapper.loadAnnotations, [
-        sinon.match({ id: fakeUris[0] + '123' }),
-      ]);
-      assert.calledWith(fakeAnnotationMapper.loadAnnotations, [
-        sinon.match({ id: fakeUris[0] + '456' }),
-      ]);
-    });
-
-    it('loads all annotations for a frame with multiple URIs', () => {
-      const uri = 'http://example.com/test.pdf';
-      const fingerprint = 'urn:x-pdf:fingerprint';
-      fakeUris = [uri, fingerprint];
-      const svc = service();
-      // Override the default frames set by the service call above.
-      fakeStore.frames.returns([
-        {
-          uri: uri,
-          metadata: {
-            documentFingerprint: 'fingerprint',
-            link: [
-              {
-                href: fingerprint,
-              },
-              {
-                href: uri,
-              },
-            ],
-          },
-        },
-      ]);
-
-      svc.load(fakeUris, fakeGroupId);
-      assert.calledWith(fakeAnnotationMapper.loadAnnotations, [
-        sinon.match({ id: uri + '123' }),
-      ]);
-      assert.calledWith(fakeAnnotationMapper.loadAnnotations, [
-        sinon.match({ id: fingerprint + '123' }),
-      ]);
-      assert.calledWith(fakeAnnotationMapper.loadAnnotations, [
-        sinon.match({ id: uri + '456' }),
-      ]);
-      assert.calledWith(fakeAnnotationMapper.loadAnnotations, [
-        sinon.match({ id: fingerprint + '456' }),
-      ]);
-    });
-
-    it('loads all annotations for all URIs', () => {
-      fakeUris = ['http://example.com', 'http://foobar.com'];
-      const svc = service();
-
-      svc.load(fakeUris, fakeGroupId);
-
-      [
-        fakeUris[0] + '123',
-        fakeUris[0] + '456',
-        fakeUris[1] + '123',
-        fakeUris[1] + '456',
-      ].forEach(uri => {
-        assert.calledWith(fakeAnnotationMapper.loadAnnotations, [
-          sinon.match({ id: uri }),
-        ]);
-      });
-    });
-
-    it('updates annotation fetch status for all frames', () => {
-      fakeUris = ['http://example.com', 'http://foobar.com'];
-      const svc = service();
-
-      svc.load(fakeUris, fakeGroupId);
-      assert.calledWith(
-        fakeStore.updateFrameAnnotationFetchStatus,
-        fakeUris[0],
-        true
-      );
-      assert.calledWith(
-        fakeStore.updateFrameAnnotationFetchStatus,
-        fakeUris[1],
-        true
-      );
-    });
-
-    it('fetches annotations for the specified group', () => {
-      const svc = service();
-
-      svc.load(fakeUris, fakeGroupId);
-      assert.calledWith(searchClients[0].get, {
-        uri: fakeUris,
-        group: fakeGroupId,
-      });
-    });
-
-    it('loads annotations in batches', () => {
-      const svc = service();
-
-      svc.load(fakeUris, fakeGroupId);
-      assert.ok(searchClients[0].incremental);
-    });
-
-    it("cancels previously search client if it's still running", () => {
-      const svc = service();
-
-      // Issue a long running load annotations request.
-      longRunningSearchClient = true;
-      svc.load(fakeUris, fakeGroupId);
-      // Issue another load annotations request while the
-      // previous annotation load is still running.
-      svc.load(fakeUris, fakeGroupId);
-
-      assert.calledOnce(searchClients[0].cancel);
-    });
-
-    it('does not load annotations if URIs list is empty', () => {
-      fakeUris = [];
-      const svc = service();
-
-      svc.load(fakeUris, fakeGroupId);
-      assert.notCalled(fakeAnnotationMapper.loadAnnotations);
-    });
-
-    it('calls annotationFetchStarted when it starts searching for annotations', () => {
-      const svc = service();
-
-      svc.load(fakeUris, fakeGroupId);
-
-      assert.calledOnce(fakeStore.annotationFetchStarted);
-    });
-
-    it('calls annotationFetchFinished when all annotations have been found', () => {
-      const svc = service();
-
-      svc.load(fakeUris, fakeGroupId);
-
-      assert.calledOnce(fakeStore.annotationFetchFinished);
-    });
-
-    it('logs an error to the console if the search client runs into an error', () => {
-      const svc = service();
-      const error = new Error('search for annotations failed');
-
-      svc.load(fakeUris, fakeGroupId);
-      searchClients[0].emit('error', error);
-
-      assert.calledWith(console.error, error);
-    });
-  });
-
   describe('reply', () => {
-    let svc;
-
-    beforeEach(() => {
-      svc = service();
-    });
-
     const filledAnnotation = () => {
       const annot = fixtures.defaultAnnotation();
       annot.group = 'mix3boop';
@@ -539,12 +280,6 @@ describe('annotationService', () => {
   });
 
   describe('save', () => {
-    let svc;
-
-    beforeEach(() => {
-      svc = service();
-    });
-
     it('calls the `create` API service for new annotations', () => {
       fakeMetadata.isNew.returns(true);
       // Using the new-annotation fixture has no bearing on which API method
