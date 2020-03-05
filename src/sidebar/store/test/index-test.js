@@ -1,8 +1,7 @@
-import immutable from 'seamless-immutable';
-
 import * as annotationFixtures from '../../test/annotation-fixtures';
 import uiConstants from '../../ui-constants';
 import storeFactory from '../index';
+import immutable from '../../util/immutable';
 
 const defaultAnnotation = annotationFixtures.defaultAnnotation;
 const newAnnotation = annotationFixtures.newAnnotation;

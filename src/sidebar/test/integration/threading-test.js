@@ -1,10 +1,10 @@
 import angular from 'angular';
-import immutable from 'seamless-immutable';
 
 import rootThreadFactory from '../../services/root-thread';
 import searchFilterFactory from '../../services/search-filter';
 import viewFilterFactory from '../../services/view-filter';
 import storeFactory from '../../store';
+import immutable from '../../util/immutable';
 
 const fixtures = immutable({
   annotations: [

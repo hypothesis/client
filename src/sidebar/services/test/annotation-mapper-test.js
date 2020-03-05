@@ -1,9 +1,9 @@
 import angular from 'angular';
-import immutable from 'seamless-immutable';
 
 import events from '../../events';
 import storeFactory from '../../store';
 import annotationMapperFactory from '../annotation-mapper';
+import immutable from '../../util/immutable';
 
 describe('annotationMapper', function() {
   const sandbox = sinon.createSandbox();
