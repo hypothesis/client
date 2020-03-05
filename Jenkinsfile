@@ -178,6 +178,14 @@ stage('Publish') {
     }
 }
 
+milestone()
+stage('Update browser extension') {
+    build(job: 'browser-extension/master',
+          parameters: [
+               string(name: 'BUILD_TYPE', value: 'update-hypothesis-client')
+          ])
+}
+
 // Increment the minor part of a `MAJOR.MINOR.PATCH` semver version.
 String bumpMinorVersion(String version) {
     def parts = version.tokenize('.')
