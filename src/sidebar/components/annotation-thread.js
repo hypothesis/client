@@ -1,22 +1,4 @@
-function hiddenCount(thread) {
-  const isHidden = thread.annotation && !thread.visible;
-  return thread.children.reduce(
-    function(count, reply) {
-      return count + hiddenCount(reply);
-    },
-    isHidden ? 1 : 0
-  );
-}
-
-function visibleCount(thread) {
-  const isVisible = thread.annotation && thread.visible;
-  return thread.children.reduce(
-    function(count, reply) {
-      return count + visibleCount(reply);
-    },
-    isVisible ? 1 : 0
-  );
-}
+import { countVisible, countHidden } from '../util/thread';
 
 function showAllChildren(thread, showFn) {
   thread.children.forEach(child => {
@@ -72,7 +54,8 @@ function AnnotationThreadController(features, store) {
   };
 
   /**
-   * Show this thread and any of its children
+   * Show this thread and any of its children. This is available if filtering
+   * is applied that hides items in the thread.
    */
   this.showThreadAndReplies = function() {
     showAllParents(this.thread, this.onForceVisible);
@@ -90,11 +73,11 @@ function AnnotationThreadController(features, store) {
    * search filter.
    */
   this.hiddenCount = function() {
-    return hiddenCount(this.thread);
+    return countHidden(this.thread);
   };
 
   this.shouldShowReply = function(child) {
-    return visibleCount(child) > 0;
+    return countVisible(child) > 0;
   };
 
   this.onForceVisible = function(thread) {
