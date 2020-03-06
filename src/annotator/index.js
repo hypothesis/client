@@ -1,7 +1,14 @@
+/* global process */
+
 import $ from 'jquery';
 
 // Load polyfill for :focus-visible pseudo-class.
 import 'focus-visible';
+
+// Enable debug checks for Preact components.
+if (process.env.NODE_ENV !== 'production') {
+  require('preact/debug');
+}
 
 import configFrom from './config/index';
 import Guest from './guest';

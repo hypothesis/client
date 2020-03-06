@@ -91,7 +91,10 @@ module.exports = function(config) {
 
       // CSS bundles, relied upon by accessibility tests (eg. for color-contrast
       // checks).
-      { pattern: '../build/styles/{annotator,sidebar}.css', watched: false },
+      {
+        pattern: '../build/styles/{annotator,icomoon,sidebar}.css',
+        watched: false,
+      },
     ],
 
     // list of files to exclude

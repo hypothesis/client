@@ -1,9 +1,7 @@
-import classnames from 'classnames';
+import { createElement, render } from 'preact';
 
-import template from './adder.html';
-
-const ANNOTATE_BTN_SELECTOR = '.js-annotate-btn';
-const HIGHLIGHT_BTN_SELECTOR = '.js-highlight-btn';
+import AdderToolbar from './components/adder-toolbar';
+import { createShadowRoot } from './util/shadow-root';
 
 /**
  * @typedef Target
@@ -34,18 +32,6 @@ const ARROW_HEIGHT = 10;
 // arrow position.
 const ARROW_H_MARGIN = 20;
 
-function attachShadow(element) {
-  if (element.attachShadow) {
-    // Shadow DOM v1 (Chrome v53, Safari 10)
-    return element.attachShadow({ mode: 'open' });
-  } else if (element.createShadowRoot) {
-    // Shadow DOM v0 (Chrome ~35-52)
-    return element.createShadowRoot();
-  } else {
-    return null;
-  }
-}
-
 /**
  * Return the closest ancestor of `el` which has been positioned.
  *
@@ -66,63 +52,17 @@ function nearestPositionedAncestor(el) {
 }
 
 /**
- * Create the DOM structure for the Adder.
+ * Container for the 'adder' toolbar which provides controls for the user to
+ * annotate and highlight the selected text.
  *
- * Returns the root DOM node for the adder, which may be in a shadow tree.
- */
-function createAdderDOM(container) {
-  let element;
-
-  // If the browser supports Shadow DOM, use it to isolate the adder
-  // from the page's CSS
-  //
-  // See https://developers.google.com/web/fundamentals/primers/shadowdom/
-  const shadowRoot = attachShadow(container);
-  if (shadowRoot) {
-    shadowRoot.innerHTML = template;
-    element = shadowRoot.querySelector('.js-adder');
-
-    // Load stylesheets required by adder into shadow DOM element
-    const adderStyles = Array.from(document.styleSheets)
-      .map(function(sheet) {
-        return sheet.href;
-      })
-      .filter(function(url) {
-        return (url || '').match(/(icomoon|annotator)\.css/);
-      });
-
-    // Stylesheet <link> elements are inert inside shadow roots [1]. Until
-    // Shadow DOM implementations support external stylesheets [2], grab the
-    // relevant CSS files from the current page and `@import` them.
-    //
-    // [1] http://stackoverflow.com/questions/27746590
-    // [2] https://github.com/w3c/webcomponents/issues/530
-    //
-    // This will unfortunately break if the page blocks inline stylesheets via
-    // CSP, but that appears to be rare and if this happens, the user will still
-    // get a usable adder, albeit one that uses browser default styles for the
-    // toolbar.
-    const styleEl = document.createElement('style');
-    styleEl.textContent = adderStyles
-      .map(function(url) {
-        return '@import "' + url + '";';
-      })
-      .join('\n');
-    shadowRoot.appendChild(styleEl);
-  } else {
-    container.innerHTML = template;
-    element = container.querySelector('.js-adder');
-  }
-  return element;
-}
-
-/**
- * Annotation 'adder' toolbar which appears next to the selection
- * and provides controls for the user to create new annotations.
+ * The toolbar implementation is split between this class, which is
+ * the container for the toolbar that positions it on the page and isolates
+ * it from the page's styles using shadow DOM, and the `AdderToolbar` Preact
+ * component which actually renders the toolbar.
  */
 export class Adder {
   /**
-   * Construct the toolbar and populate the UI.
+   * Create the toolbar's container and hide it.
    *
    * The adder is initially hidden.
    *
@@ -131,8 +71,8 @@ export class Adder {
    *        event handlers.
    */
   constructor(container, options) {
-    this.element = createAdderDOM(container);
     this._container = container;
+    this._shadowRoot = createShadowRoot(container);
 
     // Set initial style
     Object.assign(container.style, {
@@ -147,42 +87,24 @@ export class Adder {
       zIndex: 999,
     });
 
-    // The adder is hidden using the `visibility` property rather than `display`
-    // so that we can compute its size in order to position it before display.
-    this.element.style.visibility = 'hidden';
+    this._view = container.ownerDocument.defaultView;
 
-    this._view = this.element.ownerDocument.defaultView;
-    this._enterTimeout = null;
+    this._width = () =>
+      this._shadowRoot.firstChild.getBoundingClientRect().width;
+    this._height = () =>
+      this._shadowRoot.firstChild.getBoundingClientRect().height;
 
-    const handleCommand = (event, callback) => {
-      event.preventDefault();
-      event.stopPropagation();
-
-      callback();
-
-      this.hide();
-    };
-
-    this.element
-      .querySelector(ANNOTATE_BTN_SELECTOR)
-      .addEventListener('click', event =>
-        handleCommand(event, options.onAnnotate)
-      );
-    this.element
-      .querySelector(HIGHLIGHT_BTN_SELECTOR)
-      .addEventListener('click', event =>
-        handleCommand(event, options.onHighlight)
-      );
-
-    this._width = () => this.element.getBoundingClientRect().width;
-    this._height = () => this.element.getBoundingClientRect().height;
+    this._isVisible = false;
+    this._arrowDirection = 'up';
+    this._onAnnotate = options.onAnnotate;
+    this._onHighlight = options.onHighlight;
+    this._render();
   }
 
   /** Hide the adder */
   hide() {
-    clearTimeout(this._enterTimeout);
-    this.element.className = classnames({ 'annotator-adder': true });
-    this.element.style.visibility = 'hidden';
+    this._isVisible = false;
+    this._render();
   }
 
   /**
@@ -252,20 +174,6 @@ export class Adder {
    * @param {number} top - Vertical offset from top edge of viewport.
    */
   showAt(left, top, arrowDirection) {
-    this.element.className = classnames({
-      'annotator-adder': true,
-      'annotator-adder--arrow-down': arrowDirection === ARROW_POINTING_DOWN,
-      'annotator-adder--arrow-up': arrowDirection === ARROW_POINTING_UP,
-    });
-
-    // Some sites make big assumptions about interactive
-    // elements on the page. Some want to hide interactive elements
-    // after use. So we need to make sure the button stays displayed
-    // the way it was originally displayed - without the inline styles
-    // See: https://github.com/hypothesis/client/issues/137
-    this.element.querySelector(ANNOTATE_BTN_SELECTOR).style.display = '';
-    this.element.querySelector(HIGHLIGHT_BTN_SELECTOR).style.display = '';
-
     // Translate the (left, top) viewport coordinates into positions relative to
     // the adder's nearest positioned ancestor (NPA).
     //
@@ -279,11 +187,35 @@ export class Adder {
       top: toPx(top - parentRect.top),
       left: toPx(left - parentRect.left),
     });
-    this.element.style.visibility = 'visible';
 
-    clearTimeout(this._enterTimeout);
-    this._enterTimeout = setTimeout(() => {
-      this.element.className += ' is-active';
-    }, 1);
+    this._isVisible = true;
+    this._arrowDirection = arrowDirection === ARROW_POINTING_UP ? 'up' : 'down';
+    this._render();
+  }
+
+  _render() {
+    const handleCommand = command => {
+      switch (command) {
+        case 'annotate':
+          this._onAnnotate();
+          break;
+        case 'highlight':
+          this._onHighlight();
+          break;
+        default:
+          break;
+      }
+
+      this.hide();
+    };
+
+    render(
+      <AdderToolbar
+        isVisible={this._isVisible}
+        arrowDirection={this._arrowDirection}
+        onCommand={handleCommand}
+      />,
+      this._shadowRoot
+    );
   }
 }
