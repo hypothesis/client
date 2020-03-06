@@ -52,6 +52,14 @@ function nearestPositionedAncestor(el) {
 }
 
 /**
+ * @typedef AdderOptions
+ * @prop {() => any} onAnnotate - Callback invoked when "Annotate" button is clicked
+ * @prop {() => any} onHighlight - Callback invoked when "Highlight" button is clicked
+ * @prop {(annotations: Object[]) => any} onShowAnnotations -
+ *   Callback invoked when  "Show" button is clicked
+ */
+
+/**
  * Container for the 'adder' toolbar which provides controls for the user to
  * annotate and highlight the selected text.
  *
@@ -66,8 +74,8 @@ export class Adder {
    *
    * The adder is initially hidden.
    *
-   * @param {Element} container - The DOM element into which the adder will be created
-   * @param {Object} options - Options object specifying `onAnnotate` and `onHighlight`
+   * @param {HTMLElement} container - The DOM element into which the adder will be created
+   * @param {AdderOptions} options - Options object specifying `onAnnotate` and `onHighlight`
    *        event handlers.
    */
   constructor(container, options) {
@@ -98,6 +106,17 @@ export class Adder {
     this._arrowDirection = 'up';
     this._onAnnotate = options.onAnnotate;
     this._onHighlight = options.onHighlight;
+    this._onShowAnnotations = options.onShowAnnotations;
+
+    /**
+     * Annotation objects associated with the current selection. If non-empty,
+     * a "Show" button appears in the toolbar. Clicking the button calls the
+     * `onShowAnnotations` callback with the current value of `annotationsForSelection`.
+     *
+     * @type {Object[]}
+     */
+    this.annotationsForSelection = [];
+
     this._render();
   }
 
@@ -198,15 +217,18 @@ export class Adder {
       switch (command) {
         case 'annotate':
           this._onAnnotate();
+          this.hide();
           break;
         case 'highlight':
           this._onHighlight();
+          this.hide();
+          break;
+        case 'show':
+          this._onShowAnnotations(this.annotationsForSelection);
           break;
         default:
           break;
       }
-
-      this.hide();
     };
 
     render(
@@ -214,6 +236,7 @@ export class Adder {
         isVisible={this._isVisible}
         arrowDirection={this._arrowDirection}
         onCommand={handleCommand}
+        annotationCount={this.annotationsForSelection.length}
       />,
       this._shadowRoot
     );

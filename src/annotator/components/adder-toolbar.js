@@ -5,7 +5,7 @@ import propTypes from 'prop-types';
 import { useShortcut } from '../../shared/shortcut';
 import SvgIcon from '../../shared/components/svg-icon';
 
-function ToolbarButton({ icon, label, onClick, shortcut }) {
+function ToolbarButton({ badgeCount, icon, label, onClick, shortcut }) {
   useShortcut(shortcut, onClick);
 
   const title = shortcut ? `${label} (${shortcut})` : label;
@@ -16,14 +16,18 @@ function ToolbarButton({ icon, label, onClick, shortcut }) {
       onClick={onClick}
       title={title}
     >
-      <SvgIcon name={icon} />
+      {icon && <SvgIcon name={icon} />}
+      {typeof badgeCount === 'number' && (
+        <span className="annotator-adder-actions__badge">{badgeCount}</span>
+      )}
       <span className="annotator-adder-actions__label">{label}</span>
     </button>
   );
 }
 
 ToolbarButton.propTypes = {
-  icon: propTypes.string.isRequired,
+  badgeCount: propTypes.number,
+  icon: propTypes.string,
   label: propTypes.string.isRequired,
   onClick: propTypes.func.isRequired,
   shortcut: propTypes.string,
@@ -33,7 +37,12 @@ ToolbarButton.propTypes = {
  * The toolbar that is displayed above selected text in the document providing
  * options to create annotations or highlights.
  */
-export default function AdderToolbar({ arrowDirection, isVisible, onCommand }) {
+export default function AdderToolbar({
+  arrowDirection,
+  isVisible,
+  onCommand,
+  annotationCount = 0,
+}) {
   const handleCommand = (event, command) => {
     event.preventDefault();
     event.stopPropagation();
@@ -46,6 +55,7 @@ export default function AdderToolbar({ arrowDirection, isVisible, onCommand }) {
   // the shortcut. This avoids conflicts with browser/OS shortcuts.
   const annotateShortcut = isVisible ? 'a' : null;
   const highlightShortcut = isVisible ? 'h' : null;
+  const showShortcut = isVisible ? 's' : null;
 
   // nb. The adder is hidden using the `visibility` property rather than `display`
   // so that we can compute its size in order to position it before display.
@@ -71,6 +81,17 @@ export default function AdderToolbar({ arrowDirection, isVisible, onCommand }) {
           label="Highlight"
           shortcut={highlightShortcut}
         />
+        {annotationCount > 0 && (
+          <div className="annotator-adder-actions__separator" />
+        )}
+        {annotationCount > 0 && (
+          <ToolbarButton
+            badgeCount={annotationCount}
+            onClick={e => handleCommand(e, 'show')}
+            label="Show"
+            shortcut={showShortcut}
+          />
+        )}
       </hypothesis-adder-actions>
     </hypothesis-adder-toolbar>
   );
@@ -90,8 +111,16 @@ AdderToolbar.propTypes = {
   isVisible: propTypes.bool.isRequired,
 
   /**
-   * Callback invoked with the name ("annotate", "highlight") of the selected
-   * command when a toolbar command is clicked.
+   * Callback invoked with the name ("annotate", "highlight", "show") of the
+   * selected command when a toolbar command is clicked.
    */
   onCommand: propTypes.func.isRequired,
+
+  /**
+   * Number of annotations associated with the selected text.
+   *
+   * If non-zero, a "Show" button is displayed to allow the user to see the
+   * annotations that correspond to the selection.
+   */
+  annotationCount: propTypes.number,
 };

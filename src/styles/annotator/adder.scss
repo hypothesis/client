@@ -97,20 +97,12 @@ $adder-transition-duration: 80ms;
   flex-direction: row;
 }
 
-.annotator-adder-actions:hover .annotator-adder-actions__button {
-  color: var.$grey-semi !important;
-}
-
-.annotator-adder-actions:hover .annotator-adder-actions__label {
-  color: var.$grey-semi !important;
-}
-
 .annotator-adder-actions__button {
   box-shadow: none;
   font-family: h;
   font-size: 18px;
-  background: transparent !important;
-  color: var.$grey-mid !important;
+  background: transparent;
+  color: var.$grey-mid;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -125,11 +117,20 @@ $adder-transition-duration: 80ms;
   transition: color $adder-transition-duration;
 }
 
-.annotator-adder-actions .annotator-adder-actions__button:hover {
-  color: var.$grey-mid !important;
+.annotator-adder-actions__separator {
+  margin: 5px 5px;
+  border-right: 1px solid var.$grey-4;
+}
 
-  .annotator-adder-actions__label {
-    color: var.$grey-mid !important;
+// The toolbar has full contrast when not hovered. When the toolbar is hovered,
+// the buttons are dimmed except for the one which is currently hovered.
+.annotator-adder-actions:hover {
+  .annotator-adder-actions__button:not(:hover) {
+    color: var.$grey-semi;
+
+    .annotator-adder-actions__badge {
+      background-color: var.$grey-semi;
+    }
   }
 }
 
@@ -137,8 +138,20 @@ $adder-transition-duration: 80ms;
   margin-bottom: 2px;
   margin-top: 4px;
 
-  font-size: 11px;
+  font-size: 12px;
   font-family: sans-serif;
-  color: var.$grey-mid !important;
   transition: color $adder-transition-duration;
+}
+
+.annotator-adder-actions__badge {
+  background-color: var.$grey-mid;
+  border-radius: 3px;
+  color: white;
+
+  // The badge should be vertically aligned with icons in other toolbar buttons
+  // and the label underneath should also align with labels in other buttons.
+  font-family: sans-serif;
+  font-size: 12px;
+  font-weight: bold;
+  padding: 2px 4px;
 }

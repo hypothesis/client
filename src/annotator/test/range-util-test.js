@@ -134,4 +134,21 @@ describe('annotator.range-util', function () {
       );
     });
   });
+
+  describe('itemsForRange', () => {
+    it('returns unique items for range', () => {
+      const range = document.createRange();
+      range.setStart(testNode, 0);
+      range.setEnd(testNode, testNode.childNodes.length);
+
+      const data = new Map();
+      data.set(testNode, 'itemA');
+      data.set(testNode.childNodes[0], 'itemB');
+      data.set(testNode.childNodes[1], 'itemB'); // Intentional duplicate.
+      data.set(testNode.childNodes[2], 'itemC');
+      const items = rangeUtil.itemsForRange(range, item => data.get(item));
+
+      assert.deepEqual(items, ['itemA', 'itemB', 'itemC']);
+    });
+  });
 });
