@@ -180,3 +180,33 @@ export async function fetchConfig(appConfig, window_ = window) {
     );
   }
 }
+
+/**
+ * Makes an RPC request `readyToReceive` to the ancestor window to
+ * inform that it is ready to receive incoming RPC requests. This
+ * function must only be called after the RPC server is started.
+ *
+ * e.g.
+ * crossOriginRPC.server.start
+ *
+ * @param {Window} window_ - Test seam.
+ */
+export function sendReadyToReceive(window_ = window) {
+  const requestConfigFromFrame = hostConfig(window).requestConfigFromFrame;
+  // Does it get the config from an ancestor frame?
+  if (
+    requestConfigFromFrame &&
+    typeof requestConfigFromFrame.ancestorLevel === 'number' &&
+    typeof requestConfigFromFrame.origin === 'string'
+  ) {
+    const parentFrame = getAncestorFrame(
+      requestConfigFromFrame.ancestorLevel,
+      window_
+    );
+    postMessageJsonRpc.call(
+      parentFrame,
+      requestConfigFromFrame.origin,
+      'readyToReceive'
+    );
+  }
+}

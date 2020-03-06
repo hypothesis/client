@@ -1,5 +1,5 @@
 import { assertPromiseIsRejected } from '../../../shared/test/promise-util';
-import { fetchConfig, $imports } from '../fetch-config';
+import { fetchConfig, sendReadyToReceive, $imports } from '../fetch-config';
 
 describe('sidebar.util.fetch-config', () => {
   let fakeHostConfig;
@@ -279,6 +279,40 @@ describe('sidebar.util.fetch-config', () => {
           );
         }
       });
+    });
+  });
+
+  describe('sendReadyToReceive', () => {
+    beforeEach(() => {
+      fakeJsonRpc.call.resolves({});
+    });
+
+    it('does not send RCP if there is no requestConfigFromFrame', () => {
+      sendReadyToReceive(fakeWindow);
+      assert.notCalled(fakeJsonRpc.call);
+    });
+
+    it('does not send RPC if requestConfigFromFrame is not an object', () => {
+      fakeHostConfig.returns({
+        requestConfigFromFrame: 'https://embedder.com',
+      });
+      sendReadyToReceive(fakeWindow);
+      assert.notCalled(fakeJsonRpc.call);
+    });
+
+    it('sends RPC when requestConfigFromFrame has origin and ancestorLevel keys', () => {
+      fakeHostConfig.returns({
+        requestConfigFromFrame: {
+          origin: 'https://embedder.com',
+          ancestorLevel: 2,
+        },
+      });
+      sendReadyToReceive(fakeWindow);
+      fakeJsonRpc.call.calledWithExactly(
+        fakeTopWindow,
+        'https://embedder.com',
+        'readyToReceive'
+      );
     });
   });
 });

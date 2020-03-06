@@ -5,7 +5,7 @@ import { jsonConfigsFrom } from '../shared/settings';
 import crossOriginRPC from './cross-origin-rpc.js';
 import addAnalytics from './ga';
 import disableOpenerForExternalLinks from './util/disable-opener-for-external-links';
-import { fetchConfig } from './util/fetch-config';
+import { fetchConfig, sendReadyToReceive } from './util/fetch-config';
 import * as sentry from './util/sentry';
 
 // Read settings rendered into sidebar app HTML by service/extension.
@@ -359,6 +359,7 @@ function startAngularApp(config) {
 fetchConfig(appConfig)
   .then(config => {
     startAngularApp(config);
+    sendReadyToReceive();
   })
   .catch(err => {
     // Report error. This will be the only notice that the user gets because the
