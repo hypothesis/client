@@ -222,7 +222,7 @@ export default function Streamer(
 
     const deletions = Object.keys(store.pendingDeletions()).map(id => ({ id }));
     if (deletions.length) {
-      annotationMapper.unloadAnnotations(deletions);
+      store.removeAnnotations(deletions);
     }
 
     store.clearPendingUpdates();

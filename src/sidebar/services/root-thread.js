@@ -123,10 +123,6 @@ export default function RootThread(
     store.removeAnnotations([annotation]);
   });
 
-  $rootScope.$on(events.ANNOTATIONS_UNLOADED, function(event, annotations) {
-    store.removeAnnotations(annotations);
-  });
-
   // Once the focused group state is moved to the app state store, then the
   // logic in this event handler can be moved to the annotations reducer.
   $rootScope.$on(events.GROUP_FOCUSED, function(event, focusedGroupId) {

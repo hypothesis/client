@@ -114,33 +114,6 @@ describe('annotationMapper', function() {
     });
   });
 
-  describe('#unloadAnnotations()', function() {
-    it('triggers the annotationsUnloaded event', function() {
-      sandbox.stub($rootScope, '$broadcast');
-      const annotations = [{ id: 1 }, { id: 2 }, { id: 3 }];
-      annotationMapper.unloadAnnotations(annotations);
-      assert.calledWith(
-        $rootScope.$broadcast,
-        events.ANNOTATIONS_UNLOADED,
-        annotations
-      );
-    });
-
-    it('replaces the properties on the cached annotation with those from the deleted one', function() {
-      sandbox.stub($rootScope, '$broadcast');
-      const annotations = [{ id: 1, url: 'http://example.com' }];
-      store.addAnnotations([{ id: 1, $tag: 'tag1' }]);
-
-      annotationMapper.unloadAnnotations(annotations);
-      assert.calledWith($rootScope.$broadcast, events.ANNOTATIONS_UNLOADED, [
-        {
-          id: 1,
-          url: 'http://example.com',
-        },
-      ]);
-    });
-  });
-
   describe('#flagAnnotation()', function() {
     it('flags an annotation', function() {
       const ann = { id: 'test-id' };

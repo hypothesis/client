@@ -45,7 +45,6 @@ describe('loadAnnotationsService', () => {
 
     fakeAnnotationMapper = {
       loadAnnotations: sinon.stub(),
-      unloadAnnotations: sinon.stub(),
     };
 
     fakeApi = {
@@ -56,6 +55,7 @@ describe('loadAnnotationsService', () => {
       annotationFetchFinished: sinon.stub(),
       annotationFetchStarted: sinon.stub(),
       frames: sinon.stub(),
+      removeAnnotations: sinon.stub(),
       savedAnnotations: sinon.stub(),
       updateFrameAnnotationFetchStatus: sinon.stub(),
     };
@@ -109,7 +109,7 @@ describe('loadAnnotationsService', () => {
       const svc = createService();
 
       svc.load(fakeUris, fakeGroupId);
-      assert.calledWith(fakeAnnotationMapper.unloadAnnotations, [
+      assert.calledWith(fakeStore.removeAnnotations, [
         sinon.match({ id: fakeUris[0] + '123' }),
         sinon.match({ id: fakeUris[0] + '456' }),
       ]);

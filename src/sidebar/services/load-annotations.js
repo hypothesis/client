@@ -20,7 +20,7 @@ export default function loadAnnotationsService(
    * @param {string} groupId
    */
   function load(uris, groupId) {
-    annotationMapper.unloadAnnotations(store.savedAnnotations());
+    store.removeAnnotations(store.savedAnnotations());
 
     // Cancel previously running search client.
     if (searchClient) {
