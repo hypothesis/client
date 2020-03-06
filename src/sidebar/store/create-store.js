@@ -1,5 +1,9 @@
+/* global process */
+
 import * as redux from 'redux';
 import thunk from 'redux-thunk';
+
+import immutable from '../util/immutable';
 
 import { createReducer, bindSelectors } from './util';
 
@@ -56,14 +60,21 @@ export default function createStore(modules, initArgs = [], middleware = []) {
     // asynchronous (see https://github.com/gaearon/redux-thunk#motivation)
     thunk,
   ];
+
   const enhancer = redux.applyMiddleware(...defaultMiddleware, ...middleware);
 
+  // Create the combined reducer from the reducers for each module.
+  let reducer = redux.combineReducers(allReducers);
+
+  // In debug builds, freeze the new state after each action to catch any attempts
+  // to mutate it, which indicates a bug since it is supposed to be immutable.
+  if (process.env.NODE_ENV !== 'production') {
+    const originalReducer = reducer;
+    reducer = (state, action) => immutable(originalReducer(state, action));
+  }
+
   // Create the store.
-  const store = redux.createStore(
-    redux.combineReducers(allReducers),
-    initialState,
-    enhancer
-  );
+  const store = redux.createStore(reducer, initialState, enhancer);
 
   // Add actions and selectors as methods to the store.
   const actions = Object.assign({}, ...modules.map(m => m.actions));

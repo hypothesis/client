@@ -1,3 +1,5 @@
+/* global process */
+
 import createStore from '../create-store';
 
 const A = 0;
@@ -159,4 +161,13 @@ describe('sidebar/store/create-store', () => {
     assert.equal(store.getState().a.count, 0);
     assert.equal(store.getState().b.count, 0);
   });
+
+  if (process.env.NODE_ENV !== 'production') {
+    it('freezes store state in development builds', () => {
+      const store = counterStore();
+      assert.throws(() => {
+        store.getState().a.count = 1;
+      }, /Cannot assign to read only property/);
+    });
+  }
 });
