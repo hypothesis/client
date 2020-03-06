@@ -12,6 +12,9 @@ import * as util from '../util';
 /**
  * Return a copy of `current` with all matching annotations in `annotations`
  * removed.
+ *
+ * Annotations in `annotations` may be complete annotations or "stubs" with only
+ * the `id` field set.
  */
 function excludeAnnotations(current, annotations) {
   const ids = {};
@@ -272,7 +275,13 @@ function addAnnotations(annotations) {
   };
 }
 
-/** Remove annotations from the currently displayed set. */
+/**
+ * Remove annotations from the currently displayed set.
+ *
+ * @param {Annotation[]} annotations -
+ *   Annotations to remove. These may be complete annotations or stubs which
+ *   only contain an `id` property.
+ */
 function removeAnnotations(annotations) {
   return (dispatch, getState) => {
     const remainingAnnotations = excludeAnnotations(

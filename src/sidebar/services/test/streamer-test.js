@@ -113,7 +113,6 @@ describe('Streamer', function() {
 
     fakeAnnotationMapper = {
       loadAnnotations: sinon.stub(),
-      unloadAnnotations: sinon.stub(),
     };
 
     fakeStore = {
@@ -128,6 +127,7 @@ describe('Streamer', function() {
       pendingUpdates: sinon.stub().returns({}),
       pendingDeletions: sinon.stub().returns({}),
       receiveRealTimeUpdates: sinon.stub(),
+      removeAnnotations: sinon.stub(),
     };
 
     fakeGroups = {
@@ -330,7 +330,7 @@ describe('Streamer', function() {
 
         fakeWebSocket.notify(fixtures.deleteNotification);
 
-        assert.notCalled(fakeAnnotationMapper.unloadAnnotations);
+        assert.notCalled(fakeStore.removeAnnotations);
       });
     });
   });
@@ -355,7 +355,7 @@ describe('Streamer', function() {
       activeStreamer.applyPendingUpdates();
 
       assert.calledWithMatch(
-        fakeAnnotationMapper.unloadAnnotations,
+        fakeStore.removeAnnotations,
         sinon.match([{ id: 'an-id' }])
       );
     });

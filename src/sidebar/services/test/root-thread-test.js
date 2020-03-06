@@ -380,11 +380,6 @@ describe('rootThread', function() {
       assert.calledWith(fakeStore.removeAnnotations, sinon.match([annot]));
     });
 
-    it('removes annotations when ANNOTATIONS_UNLOADED event occurs', function() {
-      $rootScope.$broadcast(events.ANNOTATIONS_UNLOADED, annot);
-      assert.calledWith(fakeStore.removeAnnotations, sinon.match(annot));
-    });
-
     describe('when a new annotation is created', function() {
       let existingNewAnnot;
       let onDelete;

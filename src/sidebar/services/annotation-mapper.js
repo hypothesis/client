@@ -1,5 +1,3 @@
-import angular from 'angular';
-
 import events from '../events';
 
 function getExistingAnnotation(store, id) {
@@ -25,17 +23,6 @@ export default function annotationMapper($rootScope, store, api) {
     });
 
     $rootScope.$broadcast(events.ANNOTATIONS_LOADED, loaded);
-  }
-
-  function unloadAnnotations(annotations) {
-    const unloaded = annotations.map(function(annotation) {
-      const existing = getExistingAnnotation(store, annotation.id);
-      if (existing && annotation !== existing) {
-        annotation = angular.copy(annotation, existing);
-      }
-      return annotation;
-    });
-    $rootScope.$broadcast(events.ANNOTATIONS_UNLOADED, unloaded);
   }
 
   function createAnnotation(annotation) {
@@ -67,7 +54,6 @@ export default function annotationMapper($rootScope, store, api) {
 
   return {
     loadAnnotations: loadAnnotations,
-    unloadAnnotations: unloadAnnotations,
     createAnnotation: createAnnotation,
     deleteAnnotation: deleteAnnotation,
     flagAnnotation: flagAnnotation,
