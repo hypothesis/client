@@ -1,4 +1,3 @@
-import get from 'lodash.get';
 import * as queryString from 'query-string';
 
 import { replaceURLParams } from '../util/url';
@@ -76,6 +75,14 @@ function stripInternalProperties(obj) {
 
 // istanbul ignore next
 const noop = () => null;
+
+function get(object, path) {
+  let cursor = object;
+  path.split('.').forEach(segment => {
+    cursor = cursor[segment];
+  });
+  return cursor;
+}
 
 /**
  * Creates a function that will make an API call to a named route.

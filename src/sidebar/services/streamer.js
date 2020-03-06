@@ -1,7 +1,7 @@
-import uuid from 'node-uuid';
 import * as queryString from 'query-string';
 
 import warnOnce from '../../shared/warn-once';
+import { generateHexString } from '../util/random';
 import Socket from '../websocket';
 
 /**
@@ -27,8 +27,8 @@ export default function Streamer(
   session,
   settings
 ) {
-  // The randomly generated session UUID
-  const clientId = uuid.v4();
+  // The randomly generated session ID
+  const clientId = generateHexString(32);
 
   // The socket instance for this Streamer instance
   let socket;
