@@ -1,6 +1,5 @@
 import classnames from 'classnames';
 import { createElement } from 'preact';
-import { useEffect, useState } from 'preact/hooks';
 import propTypes from 'prop-types';
 
 /**
@@ -15,18 +14,6 @@ export default function AdderToolbar({ arrowDirection, isVisible, onCommand }) {
     onCommand(command);
   };
 
-  const [isActive, setActive] = useState(false);
-
-  useEffect(() => {
-    if (isVisible) {
-      const timeout = setTimeout(() => setActive(true), 1);
-      return () => clearTimeout(timeout);
-    } else {
-      setActive(false);
-      return null;
-    }
-  }, [isVisible]);
-
   // nb. The adder is hidden using the `visibility` property rather than `display`
   // so that we can compute its size in order to position it before display.
   return (
@@ -34,7 +21,7 @@ export default function AdderToolbar({ arrowDirection, isVisible, onCommand }) {
       class={classnames('annotator-adder', {
         'annotator-adder--arrow-down': arrowDirection === 'down',
         'annotator-adder--arrow-up': arrowDirection === 'up',
-        'is-active': isActive,
+        'is-active': isVisible,
       })}
       style={{ visibility: isVisible ? 'visible' : 'hidden' }}
     >

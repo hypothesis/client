@@ -174,9 +174,6 @@ export class Adder {
    * @param {number} top - Vertical offset from top edge of viewport.
    */
   showAt(left, top, arrowDirection) {
-    // TODO - Check that https://github.com/hypothesis/client/issues/137 remains
-    // fixed.
-
     // Translate the (left, top) viewport coordinates into positions relative to
     // the adder's nearest positioned ancestor (NPA).
     //
