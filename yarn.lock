@@ -3566,14 +3566,15 @@ fd-slicer@~1.0.1:
     pend "~1.2.0"
 
 fetch-mock@9:
-  version "9.0.0"
-  resolved "https://registry.yarnpkg.com/fetch-mock/-/fetch-mock-9.0.0.tgz#0174913da7a9411fc820529868c188aad49a3f3a"
-  integrity sha512-Nr7vPs0CdkhHiet0E9upniEAcHCb9liTNFtXtsphi3xKmkdllVIBDqcPwvIzS+wqjJMePs6BMNolLdQd0/+qAg==
+  version "9.1.1"
+  resolved "https://registry.yarnpkg.com/fetch-mock/-/fetch-mock-9.1.1.tgz#840b8abaf5e42f464715fe9d0810f6598df6eec9"
+  integrity sha512-v216/fXpLttuXZloT22T5mkOTmvHIHSienp3bCuUIN6QrBfw0Bdke4O6GFAHxPKRmUMwCKPgHI2jVJBzVndlDw==
   dependencies:
     babel-runtime "^6.26.0"
     core-js "^3.0.0"
     debug "^4.1.1"
     glob-to-regexp "^0.4.0"
+    is-subset "^0.1.1"
     lodash.isequal "^4.5.0"
     path-to-regexp "^2.2.1"
     querystring "^0.2.0"
