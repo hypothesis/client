@@ -192,6 +192,15 @@ function TagEditor({ onEditTags, tags: tagsService, tagList }) {
         }
         e.preventDefault();
         break;
+      case 'Tab':
+        if (activeItem === -1) {
+          // allow tab key to add tag, but only if the <input> value
+          // matches a suggestion from the list
+          if (suggestions.indexOf(inputEl.current.value) > -1) {
+            addTag(inputEl.current.value);
+            e.preventDefault();
+          }
+        }
     }
   };
 
