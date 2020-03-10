@@ -13,9 +13,9 @@ import SvgIcon from './svg-icon';
 /**
  *  Display name of the tab and annotation count.
  */
-function Tab({ children, count, isWaitingToAnchor, onSelect, selected }) {
+function Tab({ children, count, isWaitingToAnchor, isSelected, onSelect }) {
   const selectTab = () => {
-    if (!selected) {
+    if (!isSelected) {
       onSelect();
     }
   };
@@ -23,7 +23,7 @@ function Tab({ children, count, isWaitingToAnchor, onSelect, selected }) {
   return (
     <button
       className={classnames('selection-tabs__type', {
-        'is-selected': selected,
+        'is-selected': isSelected,
       })}
       // Listen for `onMouseDown` so that the tab is selected when _pressed_
       // as this makes the UI feel faster. Also listen for `onClick` as a fallback
@@ -32,7 +32,7 @@ function Tab({ children, count, isWaitingToAnchor, onSelect, selected }) {
       onMouseDown={selectTab}
       role="tab"
       tabIndex="0"
-      aria-selected={selected.toString()}
+      aria-selected={isSelected.toString()}
     >
       {children}
       {count > 0 && !isWaitingToAnchor && (
@@ -52,6 +52,10 @@ Tab.propTypes = {
    */
   count: propTypes.number.isRequired,
   /**
+   * Is this tab currently selected?
+   */
+  isSelected: propTypes.bool.isRequired,
+  /**
    * Are there any annotations still waiting to anchor?
    */
   isWaitingToAnchor: propTypes.bool.isRequired,
@@ -59,10 +63,6 @@ Tab.propTypes = {
    * Callback to invoke when this tab is selected.
    */
   onSelect: propTypes.func.isRequired,
-  /**
-   * Is this tab currently selected?
-   */
-  selected: propTypes.bool.isRequired,
 };
 
 /**
@@ -85,9 +85,9 @@ function SelectionTabs({ isLoading, settings }) {
 
   const isThemeClean = settings.theme === 'clean';
 
-  const selectTab = type => {
+  const selectTab = tabId => {
     store.clearSelectedAnnotations();
-    store.selectTab(type);
+    store.selectTab(tabId);
   };
 
   const showAnnotationsUnavailableMessage =
@@ -109,7 +109,7 @@ function SelectionTabs({ isLoading, settings }) {
         <Tab
           count={annotationCount}
           isWaitingToAnchor={isWaitingToAnchorAnnotations}
-          selected={selectedTab === uiConstants.TAB_ANNOTATIONS}
+          isSelected={selectedTab === uiConstants.TAB_ANNOTATIONS}
           onSelect={() => selectTab(uiConstants.TAB_ANNOTATIONS)}
         >
           Annotations
@@ -117,7 +117,7 @@ function SelectionTabs({ isLoading, settings }) {
         <Tab
           count={noteCount}
           isWaitingToAnchor={isWaitingToAnchorAnnotations}
-          selected={selectedTab === uiConstants.TAB_NOTES}
+          isSelected={selectedTab === uiConstants.TAB_NOTES}
           onSelect={() => selectTab(uiConstants.TAB_NOTES)}
         >
           Page Notes
@@ -126,7 +126,7 @@ function SelectionTabs({ isLoading, settings }) {
           <Tab
             count={orphanCount}
             isWaitingToAnchor={isWaitingToAnchorAnnotations}
-            selected={selectedTab === uiConstants.TAB_ORPHANS}
+            isSelected={selectedTab === uiConstants.TAB_ORPHANS}
             onSelect={() => selectTab(uiConstants.TAB_ORPHANS)}
           >
             Orphans
