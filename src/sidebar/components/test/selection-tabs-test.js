@@ -205,6 +205,49 @@ describe('SelectionTabs', function() {
     });
   });
 
+  const findButton = (wrapper, label) =>
+    wrapper.findWhere(
+      el => el.type() === 'button' && el.text().includes(label)
+    );
+
+  [
+    { label: 'Annotations', tab: uiConstants.TAB_ANNOTATIONS },
+    { label: 'Page Notes', tab: uiConstants.TAB_NOTES },
+    { label: 'Orphans', tab: uiConstants.TAB_ORPHANS },
+  ].forEach(({ label, tab }) => {
+    it(`should change the selected tab when "${label}" tab is clicked`, () => {
+      // Pre-select a different tab than the one we are about to click.
+      fakeStore.getState.returns({
+        selection: {
+          selectedTab: 'other-tab',
+        },
+      });
+
+      // Make the "Orphans" tab appear.
+      fakeStore.orphanCount.returns(1);
+      const wrapper = createComponent({});
+
+      findButton(wrapper, label).simulate('click');
+
+      assert.calledOnce(fakeStore.clearSelectedAnnotations);
+      assert.calledWith(fakeStore.selectTab, tab);
+    });
+  });
+
+  it('does not change the selected tab if it is already selected', () => {
+    fakeStore.getState.returns({
+      selection: {
+        selectedTab: uiConstants.TAB_NOTES,
+      },
+    });
+    const wrapper = createComponent({});
+
+    findButton(wrapper, 'Page Notes').simulate('click');
+
+    assert.notCalled(fakeStore.clearSelectedAnnotations);
+    assert.notCalled(fakeStore.selectTab);
+  });
+
   it(
     'should pass a11y checks',
     checkAccessibility({
