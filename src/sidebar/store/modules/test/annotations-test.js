@@ -174,6 +174,41 @@ describe('sidebar/store/modules/annotations', function() {
     });
   });
 
+  describe('newAnnotations', () => {
+    [
+      {
+        annotations: [
+          fixtures.oldAnnotation(), // no
+          fixtures.newAnnotation(), // yes
+          fixtures.newAnnotation(), // yes
+          fixtures.newReply(), // yes
+        ],
+        expectedLength: 3,
+      },
+      {
+        annotations: [fixtures.oldAnnotation(), fixtures.newHighlight()],
+        expectedLength: 0,
+      },
+      {
+        annotations: [
+          fixtures.newHighlight(), // no
+          fixtures.newReply(), // yes
+          fixtures.oldAnnotation(), // no
+          fixtures.newPageNote(), // yes
+        ],
+        expectedLength: 2,
+      },
+    ].forEach(testCase => {
+      it('returns number of unsaved, new annotations', () => {
+        const state = { annotations: { annotations: testCase.annotations } };
+        assert.lengthOf(
+          selectors.newAnnotations(state),
+          testCase.expectedLength
+        );
+      });
+    });
+  });
+
   describe('newHighlights', () => {
     [
       {

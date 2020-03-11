@@ -50,7 +50,11 @@ describe('store/modules/defaults', function() {
 
         const latestDefaults = store.getDefaults();
 
-        assert.hasAllKeys(latestDefaults, ['foo', 'annotationPrivacy']);
+        assert.hasAllKeys(latestDefaults, [
+          'foo',
+          'annotationPrivacy',
+          'focusedGroup',
+        ]);
       });
     });
   });

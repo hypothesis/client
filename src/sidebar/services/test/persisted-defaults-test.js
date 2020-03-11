@@ -3,6 +3,7 @@ import persistedDefaults from '../persisted-defaults';
 
 const DEFAULT_KEYS = {
   annotationPrivacy: 'hypothesis.privacy',
+  focusedGroup: 'hypothesis.groups.focus',
 };
 
 describe('sidebar/services/persisted-defaults', function() {
@@ -41,14 +42,15 @@ describe('sidebar/services/persisted-defaults', function() {
 
       svc.init();
 
-      // Retrieving the one default from localStorage
-      assert.calledOnce(fakeLocalStorage.getItem);
-      assert.calledWith(
-        fakeLocalStorage.getItem,
-        DEFAULT_KEYS.annotationPrivacy
+      // Retrieving each known default from localStorage...
+      assert.equal(
+        fakeLocalStorage.getItem.callCount,
+        Object.keys(DEFAULT_KEYS).length
       );
-      // Setting the one default in the store
-      assert.calledOnce(fakeStore.setDefault);
+
+      Object.keys(DEFAULT_KEYS).forEach(defaultKey => {
+        assert.calledWith(fakeLocalStorage.getItem, DEFAULT_KEYS[defaultKey]);
+      });
     });
 
     it('should set defaults on the store with the values returned by `localStorage`', () => {
@@ -57,7 +59,9 @@ describe('sidebar/services/persisted-defaults', function() {
 
       svc.init();
 
-      assert.calledWith(fakeStore.setDefault, 'annotationPrivacy', 'bananas');
+      Object.keys(DEFAULT_KEYS).forEach(defaultKey => {
+        assert.calledWith(fakeStore.setDefault, defaultKey, 'bananas');
+      });
     });
 
     it('should set default to `null` if key non-existent in storage', () => {
@@ -66,7 +70,9 @@ describe('sidebar/services/persisted-defaults', function() {
 
       svc.init();
 
-      assert.calledWith(fakeStore.setDefault, 'annotationPrivacy', null);
+      Object.keys(DEFAULT_KEYS).forEach(defaultKey => {
+        assert.calledWith(fakeStore.setDefault, defaultKey, null);
+      });
     });
 
     context('when defaults change in the store', () => {
@@ -113,7 +119,7 @@ describe('sidebar/services/persisted-defaults', function() {
       });
 
       it('should not update local storage if default has not changed', () => {
-        const defaults = { annotationPrivacy: 'carrots' };
+        const defaults = { focusedGroup: 'carrots' };
         fakeLocalStorage.getItem.returns('carrots');
         fakeStore.getDefaults.returns(defaults);
         fakeStore.setState({ defaults: defaults });

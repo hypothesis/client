@@ -33,14 +33,13 @@ function GroupListItem({
   const actions = useStore(store => ({
     clearDirectLinkedGroupFetchFailed: store.clearDirectLinkedGroupFetchFailed,
     clearDirectLinkedIds: store.clearDirectLinkedIds,
-    focusGroup: store.focusGroup,
   }));
 
   const focusGroup = () => {
     analytics.track(analytics.events.GROUP_SWITCH);
     actions.clearDirectLinkedGroupFetchFailed();
     actions.clearDirectLinkedIds();
-    actions.focusGroup(group.id);
+    groupsService.focus(group.id);
   };
 
   const leaveGroup = () => {

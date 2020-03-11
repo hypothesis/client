@@ -18,9 +18,6 @@ export default {
 
   // UI state changes
 
-  /** The currently selected group changed */
-  GROUP_FOCUSED: 'groupFocused',
-
   // Annotation events
 
   /** A new annotation has been created locally. */

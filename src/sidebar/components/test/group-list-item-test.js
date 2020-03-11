@@ -29,7 +29,6 @@ describe('GroupListItem', () => {
     };
 
     fakeStore = {
-      focusGroup: sinon.stub(),
       focusedGroupId: sinon.stub().returns('groupid'),
       clearDirectLinkedIds: sinon.stub(),
       clearDirectLinkedGroupFetchFailed: sinon.stub(),
@@ -50,6 +49,7 @@ describe('GroupListItem', () => {
     };
 
     fakeGroupsService = {
+      focus: sinon.stub(),
       leave: sinon.stub(),
     };
 
@@ -111,7 +111,7 @@ describe('GroupListItem', () => {
       .props()
       .onClick();
 
-    assert.calledWith(fakeStore.focusGroup, fakeGroup.id);
+    assert.calledWith(fakeGroupsService.focus, fakeGroup.id);
     assert.calledWith(fakeAnalytics.track, fakeAnalytics.events.GROUP_SWITCH);
   });
 

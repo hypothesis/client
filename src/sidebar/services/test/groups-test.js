@@ -1,6 +1,6 @@
 import events from '../../events';
 import fakeReduxStore from '../../test/fake-redux-store';
-import groups from '../groups';
+import groups, { $imports } from '../groups';
 
 /**
  * Generate a truth table containing every possible combination of a set of
@@ -44,13 +44,17 @@ describe('groups', function() {
   let fakeSession;
   let fakeSettings;
   let fakeApi;
-  let fakeLocalStorage;
   let fakeRootScope;
   let fakeServiceUrl;
+  let fakeMetadata;
 
   beforeEach(function() {
     fakeAuth = {
       tokenGetter: sinon.stub().returns('1234'),
+    };
+
+    fakeMetadata = {
+      isReply: sinon.stub(),
     };
 
     fakeStore = fakeReduxStore(
@@ -66,9 +70,13 @@ describe('groups', function() {
         },
       },
       {
+        addAnnotations: sinon.stub(),
         focusGroup: sinon.stub(),
+        focusedGroupId: sinon.stub(),
+        getDefault: sinon.stub(),
         getGroup: sinon.stub(),
         loadGroups: sinon.stub(),
+        newAnnotations: sinon.stub().returns([]),
         allGroups() {
           return this.getState().groups.groups;
         },
@@ -78,20 +86,13 @@ describe('groups', function() {
         mainFrame() {
           return this.getState().frames[0];
         },
-        focusedGroupId() {
-          const group = this.getState().groups.focusedGroup;
-          return group ? group.id : null;
-        },
+        setDefault: sinon.stub(),
         setDirectLinkedGroupFetchFailed: sinon.stub(),
         clearDirectLinkedGroupFetchFailed: sinon.stub(),
       }
     );
     fakeSession = sessionWithThreeGroups();
     fakeIsSidebar = true;
-    fakeLocalStorage = {
-      getItem: sinon.stub(),
-      setItem: sinon.stub(),
-    };
     fakeRootScope = {
       eventCallbacks: {},
 
@@ -129,6 +130,14 @@ describe('groups', function() {
     };
     fakeServiceUrl = sinon.stub();
     fakeSettings = { group: null };
+
+    $imports.$mock({
+      '../util/annotation-metadata': fakeMetadata,
+    });
+  });
+
+  afterEach(() => {
+    $imports.$restore();
   });
 
   function service() {
@@ -137,13 +146,87 @@ describe('groups', function() {
       fakeStore,
       fakeApi,
       fakeIsSidebar,
-      fakeLocalStorage,
       fakeServiceUrl,
       fakeSession,
       fakeSettings,
       fakeAuth
     );
   }
+
+  describe('#focus', () => {
+    it('updates the focused group in the store', () => {
+      const svc = service();
+      fakeStore.focusedGroupId.returns('whatever');
+
+      svc.focus('whatnot');
+
+      assert.calledOnce(fakeStore.focusGroup);
+      assert.calledWith(fakeStore.focusGroup, 'whatnot');
+    });
+
+    context('focusing to a different group than before', () => {
+      beforeEach(() => {
+        fakeStore.focusedGroupId.returns('newgroup');
+        fakeStore.focusedGroupId.onFirstCall().returns('whatnot');
+      });
+
+      it('moves top-level annotations to the newly-focused group', () => {
+        const fakeAnnotations = [
+          { $tag: '1', group: 'groupA' },
+          { $tag: '2', group: 'groupB' },
+        ];
+        fakeMetadata.isReply.returns(false);
+        fakeStore.newAnnotations.returns(fakeAnnotations);
+
+        const svc = service();
+        svc.focus('newgroup');
+
+        assert.calledWith(
+          fakeStore.addAnnotations,
+          sinon.match([
+            { $tag: '1', group: 'newgroup' },
+            { $tag: '2', group: 'newgroup' },
+          ])
+        );
+
+        const updatedAnnotations = fakeStore.addAnnotations.getCall(0).args[0];
+        updatedAnnotations.forEach(annot => {
+          assert.equal(annot.group, 'newgroup');
+        });
+      });
+
+      it('does not move replies to the newly-focused group', () => {
+        fakeMetadata.isReply.returns(true);
+        fakeStore.newAnnotations.returns([
+          { $tag: '1', group: 'groupA' },
+          { $tag: '2', group: 'groupB' },
+        ]);
+
+        const svc = service();
+        svc.focus('newgroup');
+
+        assert.calledTwice(fakeMetadata.isReply);
+        assert.notCalled(fakeStore.addAnnotations);
+      });
+
+      it('updates the focused-group default', () => {
+        const svc = service();
+        svc.focus('newgroup');
+
+        assert.calledOnce(fakeStore.setDefault);
+        assert.calledWith(fakeStore.setDefault, 'focusedGroup', 'newgroup');
+      });
+    });
+
+    it('does not update the focused-group default if the group has not changed', () => {
+      fakeStore.focusedGroupId.returns('samegroup');
+
+      const svc = service();
+      svc.focus('samegroup');
+
+      assert.notCalled(fakeStore.setDefault);
+    });
+  });
 
   describe('#all', function() {
     it('returns all groups from store.allGroups', () => {
@@ -157,7 +240,7 @@ describe('groups', function() {
   describe('#load', function() {
     it('filters out direct-linked groups that are out of scope and scope enforced', () => {
       const svc = service();
-      fakeLocalStorage.getItem.returns(dummyGroups[0].id);
+      fakeStore.getDefault.returns(dummyGroups[0].id);
       const outOfScopeEnforcedGroup = {
         id: 'oos',
         scopes: { enforced: true, uri_patterns: ['http://foo.com'] },
@@ -180,7 +263,7 @@ describe('groups', function() {
 
     it('catches error from api.group.read request', () => {
       const svc = service();
-      fakeLocalStorage.getItem.returns(dummyGroups[0].id);
+      fakeStore.getDefault.returns(dummyGroups[0].id);
       fakeStore.setState({
         directLinked: {
           directLinkedGroupId: 'does-not-exist',
@@ -325,7 +408,7 @@ describe('groups', function() {
 
     it('sets the focused group from the value saved in local storage', () => {
       const svc = service();
-      fakeLocalStorage.getItem.returns(dummyGroups[1].id);
+      fakeStore.getDefault.returns(dummyGroups[1].id);
       return svc.load().then(() => {
         assert.calledWith(fakeStore.focusGroup, dummyGroups[1].id);
       });
@@ -339,7 +422,7 @@ describe('groups', function() {
           directLinkedGroupId: dummyGroups[1].id,
         },
       });
-      fakeLocalStorage.getItem.returns(dummyGroups[0].id);
+      fakeStore.getDefault.returns(dummyGroups[0].id);
       fakeApi.groups.list.returns(Promise.resolve(dummyGroups));
       fakeApi.annotation.get.returns(
         Promise.resolve({
@@ -360,7 +443,7 @@ describe('groups', function() {
         },
       });
       fakeApi.groups.list.returns(Promise.resolve(dummyGroups));
-      fakeLocalStorage.getItem.returns(dummyGroups[0].id);
+      fakeStore.getDefault.returns(dummyGroups[0].id);
       fakeApi.annotation.get.returns(
         Promise.resolve({
           id: 'ann-id',
@@ -379,7 +462,7 @@ describe('groups', function() {
           directLinkedGroupId: dummyGroups[1].id,
         },
       });
-      fakeLocalStorage.getItem.returns(dummyGroups[0].id);
+      fakeStore.getDefault.returns(dummyGroups[0].id);
       fakeApi.groups.list.returns(Promise.resolve(dummyGroups));
       return svc.load().then(() => {
         assert.calledWith(fakeStore.focusGroup, dummyGroups[1].id);
@@ -416,7 +499,7 @@ describe('groups', function() {
     [null, 'some-group-id'].forEach(groupId => {
       it('does not set the focused group if not present in the groups list', () => {
         const svc = service();
-        fakeLocalStorage.getItem.returns(groupId);
+        fakeStore.getDefault.returns(groupId);
         return svc.load().then(() => {
           assert.notCalled(fakeStore.focusGroup);
         });
@@ -742,69 +825,6 @@ describe('groups', function() {
       fakeStore.getGroup.withArgs('foo').returns(dummyGroups[1]);
 
       assert.equal(svc.get('foo'), dummyGroups[1]);
-    });
-  });
-
-  describe('#focused', function() {
-    it('returns the focused group', function() {
-      const svc = service();
-      fakeStore.setState({
-        groups: { groups: dummyGroups, focusedGroup: dummyGroups[2] },
-      });
-      assert.equal(svc.focused(), dummyGroups[2]);
-    });
-  });
-
-  describe('#focus', function() {
-    it('sets the focused group to the named group', function() {
-      const svc = service();
-      svc.focus('foo');
-      assert.calledWith(fakeStore.focusGroup, 'foo');
-    });
-  });
-
-  context('when the focused group changes', () => {
-    it('stores the focused group id in localStorage', function() {
-      service();
-
-      fakeStore.setState({
-        groups: { groups: dummyGroups, focusedGroup: dummyGroups[1] },
-      });
-
-      assert.calledWithMatch(
-        fakeLocalStorage.setItem,
-        sinon.match.any,
-        dummyGroups[1].id
-      );
-    });
-
-    it('emits the GROUP_FOCUSED event if the focused group changed', function() {
-      service();
-
-      fakeStore.setState({
-        groups: { groups: dummyGroups, focusedGroup: dummyGroups[1] },
-      });
-
-      assert.calledWith(
-        fakeRootScope.$broadcast,
-        events.GROUP_FOCUSED,
-        dummyGroups[1].id
-      );
-    });
-
-    it('does not emit GROUP_FOCUSED if the focused group did not change', () => {
-      service();
-
-      fakeStore.setState({
-        groups: { groups: dummyGroups, focusedGroup: dummyGroups[1] },
-      });
-
-      fakeRootScope.$broadcast.reset();
-      fakeStore.setState({
-        groups: { groups: dummyGroups, focusedGroup: dummyGroups[1] },
-      });
-
-      assert.notCalled(fakeRootScope.$broadcast);
     });
   });
 
