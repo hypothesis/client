@@ -5,6 +5,7 @@
 
 const DEFAULT_KEYS = {
   annotationPrivacy: 'hypothesis.privacy',
+  focusedGroup: 'hypothesis.groups.focus',
 };
 
 // @ngInject

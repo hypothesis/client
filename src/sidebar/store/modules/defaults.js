@@ -23,6 +23,7 @@ function init() {
    */
   return {
     annotationPrivacy: null,
+    focusedGroup: null,
   };
 }
 

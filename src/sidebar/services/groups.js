@@ -1,4 +1,9 @@
-const STORAGE_KEY = 'hypothesis.groups.focus';
+import events from '../events';
+import serviceConfig from '../service-config';
+import { isReply } from '../util/annotation-metadata';
+import { combineGroups } from '../util/groups';
+import { awaitStateChange } from '../util/state';
+
 const DEFAULT_ORG_ID = '__default__';
 
 /**
@@ -11,18 +16,12 @@ const DEFAULT_ORGANIZATION = {
     encodeURIComponent(require('../../images/icons/logo.svg')),
 };
 
-import events from '../events';
-import serviceConfig from '../service-config';
-import { combineGroups } from '../util/groups';
-import { awaitStateChange } from '../util/state';
-
 // @ngInject
 export default function groups(
   $rootScope,
   store,
   api,
   isSidebar,
-  localStorage,
   serviceUrl,
   session,
   settings,
@@ -40,6 +39,40 @@ export default function groups(
       return mainFrame.uri;
     }
     return awaitStateChange(store, mainUri);
+  }
+
+  /**
+   * Update the focused group. Update the store, then check to see if
+   * there are any new (unsaved) annotations—if so, update those annotations
+   * such that they are associated with the newly-focused group.
+   */
+  function focus(groupId) {
+    const prevGroupId = store.focusedGroupId();
+
+    store.focusGroup(groupId);
+
+    const newGroupId = store.focusedGroupId();
+
+    const groupHasChanged = prevGroupId !== newGroupId && prevGroupId !== null;
+    if (groupHasChanged) {
+      // Move any top-level new annotations to the newly-focused group.
+      // Leave replies where they are.
+      const updatedAnnotations = [];
+      store.newAnnotations().forEach(annot => {
+        if (!isReply(annot)) {
+          updatedAnnotations.push(
+            Object.assign({}, annot, { group: newGroupId })
+          );
+        }
+      });
+
+      if (updatedAnnotations.length) {
+        store.addAnnotations(updatedAnnotations);
+      }
+
+      // Persist this group as the last focused group default
+      store.setDefault('focusedGroup', newGroupId);
+    }
   }
 
   /**
@@ -276,17 +309,17 @@ export default function groups(
     // Step 5. Load the groups into the store and focus the appropriate
     // group.
     const isFirstLoad = store.allGroups().length === 0;
-    const prevFocusedGroup = localStorage.getItem(STORAGE_KEY);
+    const prevFocusedGroup = store.getDefault('focusedGroup');
 
     store.loadGroups(groups);
 
     if (isFirstLoad) {
       if (groups.some(g => g.id === directLinkedAnnotationGroupId)) {
-        store.focusGroup(directLinkedAnnotationGroupId);
+        focus(directLinkedAnnotationGroupId);
       } else if (groups.some(g => g.id === directLinkedGroupId)) {
-        store.focusGroup(directLinkedGroupId);
+        focus(directLinkedGroupId);
       } else if (groups.some(g => g.id === prevFocusedGroup)) {
-        store.focusGroup(prevFocusedGroup);
+        focus(prevFocusedGroup);
       }
     }
 
@@ -316,34 +349,6 @@ export default function groups(
     });
   }
 
-  /** Return the currently focused group. If no group is explicitly focused we
-   * will check localStorage to see if we have persisted a focused group from
-   * a previous session. Lastly, we fall back to the first group available.
-   */
-  function focused() {
-    return store.focusedGroup();
-  }
-
-  /** Set the group with the passed id as the currently focused group. */
-  function focus(id) {
-    store.focusGroup(id);
-  }
-
-  // Persist the focused group to storage when it changes.
-  let prevFocusedId = store.focusedGroupId();
-  store.subscribe(() => {
-    const focusedId = store.focusedGroupId();
-    // The focused group may be null when the user login state changes.
-    if (focusedId !== null && focusedId !== prevFocusedId) {
-      prevFocusedId = focusedId;
-
-      localStorage.setItem(STORAGE_KEY, focusedId);
-
-      // Emit the `GROUP_FOCUSED` event for code that still relies on it.
-      $rootScope.$broadcast(events.GROUP_FOCUSED, focusedId);
-    }
-  });
-
   // refetch the list of groups when user changes
   $rootScope.$on(events.USER_CHANGED, () => {
     // FIXME Makes a second api call on page load. better way?
@@ -368,7 +373,6 @@ export default function groups(
     leave: leave,
     load: load,
 
-    focused: focused,
     focus: focus,
   };
 }

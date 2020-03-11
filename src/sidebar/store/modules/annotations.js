@@ -384,6 +384,16 @@ function findAnnotationByID(state, id) {
 }
 
 /**
+ * Return all loaded annotations that are not highlights and have not been saved
+ * to the server.
+ */
+const newAnnotations = createSelector(
+  state => state.annotations.annotations,
+  annotations =>
+    annotations.filter(ann => metadata.isNew(ann) && !metadata.isHighlight(ann))
+);
+
+/**
  * Return all loaded annotations that are highlights and have not been saved
  * to the server.
  */
@@ -445,6 +455,7 @@ export default {
     findAnnotationByID,
     findIDsForTags,
     isWaitingToAnchorAnnotations,
+    newAnnotations,
     newHighlights,
     noteCount,
     orphanCount,

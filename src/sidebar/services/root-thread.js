@@ -123,24 +123,6 @@ export default function RootThread(
     store.removeAnnotations([annotation]);
   });
 
-  // Once the focused group state is moved to the app state store, then the
-  // logic in this event handler can be moved to the annotations reducer.
-  $rootScope.$on(events.GROUP_FOCUSED, function(event, focusedGroupId) {
-    const updatedAnnots = store
-      .getState()
-      .annotations.annotations.filter(function(ann) {
-        return metadata.isNew(ann) && !metadata.isReply(ann);
-      })
-      .map(function(ann) {
-        return Object.assign(ann, {
-          group: focusedGroupId,
-        });
-      });
-    if (updatedAnnots.length > 0) {
-      store.addAnnotations(updatedAnnots);
-    }
-  });
-
   /**
    * Build the root conversation thread from the given UI state.
    * @return {Thread}
