@@ -1,0 +1,48 @@
+@use "../../mixins/panel";
+
+.toast-messages {
+  position: absolute;
+  z-index: 1000;
+  width: 100%;
+  left: 0;
+  padding: 0 8px;
+}
+
+.toast-message {
+  @include panel.panel;
+  position: relative;
+  width: 100%;
+  z-index: 1000;
+  box-shadow: 0px 2px 3px 0px rgba(0, 0, 0, 0.15);
+  border-radius: 2px;
+  margin-bottom: 0.75em;
+
+  &--success {
+    border: 1px solid #00a36d;
+  }
+
+  &--error {
+    border: 1px solid #e8885e;
+  }
+
+  &__type {
+    padding: 1em;
+    color: white;
+  }
+
+  &--success &__type {
+    background-color: #00a36d;
+  }
+
+  &--error &__type {
+    background-color: #e8885e;
+  }
+
+  &__row {
+    display: flex;
+  }
+
+  &__message {
+    padding: 1em;
+  }
+}
