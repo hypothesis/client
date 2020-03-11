@@ -104,6 +104,18 @@ export function newHighlight() {
   };
 }
 
+/** Return an annotation domain model object for a new page note.
+ */
+export function newPageNote() {
+  return {
+    $highlight: undefined,
+    target: [{ source: 'http://example.org' }],
+    references: [],
+    text: '',
+    tags: [],
+  };
+}
+
 /** Return an annotation domain model object for an existing annotation
  *  received from the server.
  */
@@ -137,7 +149,8 @@ export function oldHighlight() {
  */
 export function oldPageNote() {
   return {
-    highlight: undefined,
+    id: 'note_id',
+    $highlight: undefined,
     target: [{ source: 'http://example.org' }],
     references: [],
     text: '',
