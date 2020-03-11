@@ -19,7 +19,7 @@ import { listen } from '../../util/dom';
 /**
  * This hook adds appropriate `eventListener`s to the document when a target
  * element (`closeableEl`) is open. Events such as `click` and `focus` on
- * elements that fall outside of `closeableEl` in the document, or keypress
+ * elements that fall outside of `closeableEl` in the document, or keydown
  * events for the `esc` key, will invoke the provided `handleClose` function
  * to indicate that `closeableEl` should be closed. This hook also performs
  * cleanup to remove `eventListener`s when appropriate.
@@ -66,15 +66,11 @@ export default function useElementShouldClose(
     }
 
     // Close element when user presses Escape key, regardless of focus.
-    const removeKeypressListener = listen(
-      document.body,
-      ['keypress'],
-      event => {
-        if (event.key === 'Escape') {
-          handleClose();
-        }
+    const removeKeypressListener = listen(document.body, ['keydown'], event => {
+      if (event.key === 'Escape') {
+        handleClose();
       }
-    );
+    });
 
     // Close element if user focuses an element outside of it via any means
     // (key press, programmatic focus change).

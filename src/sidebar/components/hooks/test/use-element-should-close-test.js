@@ -12,7 +12,7 @@ describe('hooks.useElementShouldClose', () => {
   const events = [
     new Event('mousedown'),
     new Event('click'),
-    ((e = new Event('keypress')), (e.key = 'Escape'), e),
+    ((e = new Event('keydown')), (e.key = 'Escape'), e),
     new Event('focus'),
   ];
 
