@@ -11,25 +11,6 @@ export function countIf(ary, predicate) {
 }
 
 /**
- * Create a new array with the result of calling `mapFn` on every element in
- * `ary`.
- *
- * Only truthy values are included in the resulting array.
- *
- * @param {Array} ary
- * @param {Function} mapFn
- */
-export function filterMap(ary, mapFn) {
-  return ary.reduce(function(newArray, item) {
-    const mapped = mapFn(item);
-    if (mapped) {
-      newArray.push(mapped);
-    }
-    return newArray;
-  }, []);
-}
-
-/**
  * Convert an array to a set represented as an object.
  *
  * @param {string[]} list - List of keys for the set.
