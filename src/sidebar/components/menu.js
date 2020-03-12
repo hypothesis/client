@@ -94,7 +94,7 @@ export default function Menu({
   const stopPropagation = e => e.stopPropagation();
 
   // It should also close if the user presses a key which activates menu items.
-  const handleMenuKeyPress = event => {
+  const handleMenuKeyDown = event => {
     if (event.key === 'Enter' || event.key === ' ') {
       closeMenu();
     }
@@ -154,7 +154,7 @@ export default function Menu({
             role="menu"
             tabIndex="-1"
             onClick={closeMenu}
-            onKeyPress={handleMenuKeyPress}
+            onKeyDown={handleMenuKeyDown}
           >
             {children}
           </div>
