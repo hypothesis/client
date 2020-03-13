@@ -15,7 +15,7 @@ export function onActivate(role, handler) {
     onClick: handler,
 
     // Support keyboard activation.
-    onKeypress: event => {
+    onKeyDown: event => {
       if (event.key === 'Enter' || event.key === ' ') {
         handler(event);
       }

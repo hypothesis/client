@@ -293,7 +293,7 @@ export default function MarkdownEditor({
           dir="auto"
           ref={input}
           onClick={e => e.stopPropagation()}
-          onKeydown={handleKeyDown}
+          onKeyDown={handleKeyDown}
           onInput={e => onEditText({ text: e.target.value })}
           value={text}
         />

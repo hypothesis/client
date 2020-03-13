@@ -111,7 +111,7 @@ describe('Menu', () => {
     const wrapper = createMenu({ defaultOpen: true });
 
     act(() => {
-      const event = new Event('keypress');
+      const event = new Event('keydown');
       event.key = 'a';
       document.body.dispatchEvent(event);
     });
@@ -140,17 +140,17 @@ describe('Menu', () => {
       shouldClose: true,
     },
     {
-      eventType: 'keypress',
+      eventType: 'keydown',
       key: 'Enter',
       shouldClose: true,
     },
     {
-      eventType: 'keypress',
+      eventType: 'keydown',
       key: ' ',
       shouldClose: true,
     },
     {
-      eventType: 'keypress',
+      eventType: 'keydown',
       key: 'a',
       shouldClose: false,
     },
