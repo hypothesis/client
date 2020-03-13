@@ -62,12 +62,24 @@ describe('shared/shortcut', () => {
   });
 
   describe('installShortcut', () => {
-    it('should install a shortcut listener on the root element', () => {
+    it('should install a shortcut listener on the document body', () => {
       const onPress = sinon.stub();
       const removeShortcut = installShortcut('a', onPress);
       const event = new KeyboardEvent('keydown', { key: 'a' });
 
       document.body.dispatchEvent(event);
+      removeShortcut();
+
+      assert.calledWith(onPress, event);
+    });
+
+    it('should install a shortcut listener on a custom root element', () => {
+      const onPress = sinon.stub();
+      const el = document.createElement('div');
+      const removeShortcut = installShortcut('a', onPress, { rootElement: el });
+      const event = new KeyboardEvent('keydown', { key: 'a' });
+
+      el.dispatchEvent(event);
       removeShortcut();
 
       assert.calledWith(onPress, event);
