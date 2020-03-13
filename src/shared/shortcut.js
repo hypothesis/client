@@ -87,8 +87,12 @@ export function installShortcut(
  * An effect hook that installs a shortcut using `installShortcut` and removes
  * it when the component is unmounted.
  *
- * This provides a convenient way to enable a shortcut while a component is
- * rendered. To conditionally disable the shortcut, set `shortcut` to `null`.
+ * This provides a convenient way to enable a document-level shortcut while
+ * a component is mounted. This differs from adding an `onKeyDown` handler to
+ * one of the component's DOM elements in that it doesn't require the component
+ * to have focus.
+ *
+ * To conditionally disable the shortcut, set `shortcut` to `null`.
  *
  * @param {string|null} shortcut -
  *   A shortcut key sequence to match or `null` to disable. See `matchShortcut`.
