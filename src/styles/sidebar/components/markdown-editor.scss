@@ -1,3 +1,4 @@
+@use "../../mixins/buttons";
 @use "../../mixins/forms";
 @use "../../variables" as var;
 
@@ -21,12 +22,11 @@ $toolbar-border: 0.1em solid var.$grey-3;
 }
 
 .markdown-editor__toolbar-button {
+  @include buttons.reset-native-btn-styles;
   display: flex;
   justify-content: center;
   align-items: center;
   appearance: none;
-  border: none;
-  background: none;
   min-width: 24px;
   min-height: 24px;
 

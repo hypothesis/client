@@ -42,8 +42,11 @@ describe('MarkdownEditor', () => {
     $imports.$restore();
   });
 
-  function createComponent(props = {}) {
-    return mount(<MarkdownEditor label="Test editor" text="test" {...props} />);
+  function createComponent(props = {}, mountProps = {}) {
+    return mount(
+      <MarkdownEditor label="Test editor" text="test" {...props} />,
+      mountProps
+    );
   }
 
   const commands = [
@@ -282,6 +285,7 @@ describe('MarkdownEditor', () => {
 
   it('focuses the input field when created', () => {
     const container = document.createElement('div');
+
     try {
       document.body.focus();
       document.body.appendChild(container);
@@ -299,6 +303,193 @@ describe('MarkdownEditor', () => {
     const wrapper = createComponent({ label: 'Annotation body' });
     const inputField = wrapper.find('textarea');
     assert.equal(inputField.prop('aria-label'), 'Annotation body');
+  });
+
+  describe('keyboard navigation', () => {
+    let newContainer;
+    let wrapper;
+
+    beforeEach(() => {
+      newContainer = document.createElement('div');
+      document.body.appendChild(newContainer);
+      wrapper = mount(<MarkdownEditor label="Test editor" text="test" />, {
+        attachTo: newContainer,
+      });
+    });
+
+    afterEach(() => {
+      newContainer.remove();
+    });
+
+    /**
+     * Helper method to simulate a keypress on the markdown wrapper
+     *
+     * @param {string} key - One of 'ArrowRight', 'ArrowLeft', 'End', 'Home'
+     */
+    const pressKey = key =>
+      wrapper.find('.markdown-editor__toolbar').simulate('keydown', { key });
+
+    /**
+     * Asserts the active button's title partially matches the supplied string.
+     *
+     * @param {string} partialTitle
+     */
+    const matchesFocusedTitle = partialTitle => {
+      assert.isTrue(
+        document.activeElement.getAttribute('title').indexOf(partialTitle) >= 0
+      );
+    };
+    /**
+     * Asserts the active button's inner text partially matches the supplied string.
+     *
+     * @param {string} partialText
+     */
+    const matchesFocusedText = partialText => {
+      assert.isTrue(document.activeElement.innerText.indexOf(partialText) >= 0);
+    };
+
+    /**
+     * Asserts there should only be one "0" `tabIndex` value at a time which
+     * should be set on the focused element. All other `tabIndex` values
+     * on elements shall be "-1".
+     */
+    const testRovingIndex = () => {
+      assert.isTrue(document.activeElement.getAttribute('tabIndex') === '0');
+      assert.equal(
+        wrapper.find('ToolbarButton[tabIndex=0]').length +
+          wrapper.find('a[tabIndex=0]').length,
+        1
+      );
+    };
+
+    context('when `isPreviewing` is false', () => {
+      it('changes focus circularly to the left', () => {
+        pressKey('ArrowLeft');
+        // preview is the last button
+        matchesFocusedText('Preview');
+        testRovingIndex();
+      });
+
+      it('changes focus circularly to the right', () => {
+        pressKey('ArrowLeft'); // move to the end node
+        pressKey('ArrowRight'); // move back to the start
+        matchesFocusedTitle('Bold');
+        testRovingIndex();
+      });
+
+      it('changes focus to the last element when pressing `end`', () => {
+        pressKey('End'); // move to the end node
+        matchesFocusedText('Preview');
+        testRovingIndex();
+      });
+
+      it('changes focus to the first element when pressing `home`', () => {
+        pressKey('ArrowRight'); // move focus off first button
+        pressKey('Home');
+        matchesFocusedTitle('Bold');
+        testRovingIndex();
+      });
+
+      it('preserves the elements order and roving index', () => {
+        [
+          {
+            title: 'Italic',
+          },
+          {
+            title: 'Quote',
+          },
+          {
+            title: 'Insert link',
+          },
+          {
+            title: 'Insert image',
+          },
+          {
+            title: 'Insert math (LaTeX is supported)',
+          },
+          {
+            title: 'Numbered list',
+          },
+          {
+            title: 'Bulleted list',
+          },
+          {
+            title: 'Formatting help',
+          },
+          {
+            text: 'Preview',
+          },
+          {
+            // back to the start
+            title: 'Bold',
+          },
+        ].forEach(test => {
+          pressKey('ArrowRight');
+          if (test.title) {
+            matchesFocusedTitle(test.title);
+          }
+          if (test.text) {
+            matchesFocusedText(test.text);
+          }
+          testRovingIndex();
+        });
+      });
+    });
+
+    context('when `isPreviewing` is true', () => {
+      beforeEach(() => {
+        // turn on Preview mode
+        act(() => {
+          wrapper
+            .find('Toolbar')
+            .props()
+            .onTogglePreview();
+        });
+        const previewButton = wrapper
+          .find('button')
+          .filterWhere(el => el.text() === 'Write');
+        previewButton.simulate('focus');
+        pressKey('Home');
+      });
+
+      it('changes focus to the last element when pressing `end`', () => {
+        pressKey('End'); // move to the end node
+        matchesFocusedText('Write');
+        testRovingIndex();
+      });
+
+      it('changes focus to the first element when pressing `home`', () => {
+        pressKey('ArrowRight'); // move focus off first button
+        pressKey('Home');
+        matchesFocusedTitle('Formatting help');
+        testRovingIndex();
+      });
+
+      it('preserves the elements order', () => {
+        [
+          {
+            text: 'Write',
+          },
+          {
+            title: 'Formatting help',
+          },
+          {
+            // back to the start
+            text: 'Write',
+          },
+        ].forEach(test => {
+          // only 2 enabled buttons
+          pressKey('ArrowRight');
+          if (test.title) {
+            matchesFocusedTitle(test.title);
+          }
+          if (test.text) {
+            matchesFocusedText(test.text);
+          }
+          testRovingIndex();
+        });
+      });
+    });
   });
 
   it(
