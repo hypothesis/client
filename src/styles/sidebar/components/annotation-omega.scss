@@ -1,3 +1,5 @@
+@use "../../variables" as var;
+
 .annotation-omega {
   &__reply-toggle.button {
     background-color: transparent;
@@ -16,5 +18,52 @@
 
   &__actions {
     margin-left: auto;
+  }
+
+  &__form-actions {
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 10px;
+  }
+
+  &__footer {
+    @include var.font-normal;
+    color: var.$grey-5;
+    margin-top: var.$layout-h-margin;
+  }
+
+  &--reply &__footer {
+    margin-top: var.$layout-h-margin - 8px;
+  }
+}
+
+// FIXME vertical rhythm here should be refactored
+.annotation-omega--reply {
+  .annotation-header {
+    // Margin between bottom of ascent of annotation card footer labels
+    // and top of ascent of username should be ~20px
+    margin-top: 0px;
+  }
+
+  .annotation-body {
+    // Margin between top of ascent of annotation body and
+    // bottom of ascent of username should be ~15px
+    margin-top: var.$layout-h-margin - 8px;
+    // Margin between bottom of ascent of annotation body and
+    // top of annotation footer labels should be ~15px
+    margin-bottom: var.$layout-h-margin - 3px;
+  }
+}
+
+.annotation-omega--reply.is-collapsed {
+  margin-bottom: 0;
+
+  .annotation-header {
+    margin: 0;
+  }
+
+  .annotation-body,
+  .annotation-footer {
+    display: none;
   }
 }
