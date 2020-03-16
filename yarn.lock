@@ -1503,9 +1503,9 @@ aws-sdk@^2.345.0:
     xml2js "0.4.19"
 
 axe-core@^3.4.1:
-  version "3.5.1"
-  resolved "https://registry.yarnpkg.com/axe-core/-/axe-core-3.5.1.tgz#d8d5aaef73f003e8b766ea28bb078343f3622201"
-  integrity sha512-mwpDgPwWB+5kMHyLjlxh4w25ClJfqSxi+c6LQ4ix349TdCUctMwJNPTkhPD1qP9SYIjFgjeVpVZWCvK9oBGwCg==
+  version "3.5.2"
+  resolved "https://registry.yarnpkg.com/axe-core/-/axe-core-3.5.2.tgz#1946be7a18a05b5d37f18d339989db0d5434ebf6"
+  integrity sha512-9wBDgdzbn06on6Xt+ay7EM4HV+NBOkeXhjK9DMezD8/qvJKeUTzheGHhM+U1uNaX4OvuIR4BePDStRLF7vyOfg==
 
 axobject-query@^2.0.2:
   version "2.1.1"
