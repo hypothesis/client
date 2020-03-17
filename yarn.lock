@@ -5751,10 +5751,12 @@ now-and-later@^2.0.0:
   dependencies:
     once "^1.3.2"
 
-npm-bundled@^1.0.1:
-  version "1.0.6"
-  resolved "https://registry.yarnpkg.com/npm-bundled/-/npm-bundled-1.0.6.tgz#e7ba9aadcef962bb61248f91721cd932b3fe6bdd"
-  integrity sha512-8/JCaftHwbd//k6y2rEWp6k1wxVfpFzB6t1p825+cUb7Ym2XQfhwIC5KwhrvzZRJu+LtDE585zVaS32+CGtf0g==
+npm-bundled@^1.0.1, npm-bundled@^1.1.1:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/npm-bundled/-/npm-bundled-1.1.1.tgz#1edd570865a94cdb1bc8220775e29466c9fb234b"
+  integrity sha512-gqkfgGePhTpAEgUsGEgcq1rqPXA+tv/aVBlgEzfXwA1yiUJF7xtEt3CtVwOjNYQOVknDk0F20w58Fnm3EtG0fA==
+  dependencies:
+    npm-normalize-package-bin "^1.0.1"
 
 npm-normalize-package-bin@^1.0.1:
   version "1.0.1"
@@ -5770,13 +5772,13 @@ npm-packlist@^1.1.6:
     npm-bundled "^1.0.1"
 
 npm-packlist@^2.0.1:
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/npm-packlist/-/npm-packlist-2.1.0.tgz#ab9c8de31df6d55b78ae94eb5c47f145bc304dc0"
-  integrity sha512-XXqrT4WXVc8M1cdL7LCOUflEdyvCu9lKmM5j5mFwXAK8hUMRxzClNml8ox2d8YIDhS7p51AP6zYWNsgNiWuSLQ==
+  version "2.1.1"
+  resolved "https://registry.yarnpkg.com/npm-packlist/-/npm-packlist-2.1.1.tgz#08806a1df79acdc43d02d20c83a3d5472d96c90c"
+  integrity sha512-95TSDvGwujIhqfSpIiRRLodEF+y6mJMopuZdahoGzqtRDFZXGav46S0p6ngeWaiAkb5R72w6eVARhzej0HvZeQ==
   dependencies:
     glob "^7.1.6"
     ignore-walk "^3.0.3"
-    npm-bundled "^1.0.1"
+    npm-bundled "^1.1.1"
     npm-normalize-package-bin "^1.0.1"
 
 npm-run-path@^2.0.0:
