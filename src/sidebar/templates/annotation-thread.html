@@ -14,7 +14,6 @@
       annotation="vm.thread.annotation"
       ng-if="vm.thread.annotation">
     </moderation-banner>
-    <div ng-if="vm.shouldShowAnnotationOmega()"><em>Viewing AnnotationOmega</em></div>
     <annotation-omega ng-if="vm.shouldShowAnnotationOmega() && vm.thread.annotation"
       annotation="vm.thread.annotation"
       reply-count="vm.thread.replyCount"
