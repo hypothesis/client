@@ -17,7 +17,7 @@ import SvgIcon from './svg-icon';
 function AnnotationShareControl({
   annotation,
   analytics,
-  flash,
+  toastMessagesService,
   group,
   shareUri,
 }) {
@@ -56,9 +56,9 @@ function AnnotationShareControl({
   const copyShareLink = () => {
     try {
       copyText(shareUri);
-      flash.info('Copied share link to clipboard');
+      toastMessagesService.success('Copied share link to clipboard');
     } catch (err) {
-      flash.error('Unable to copy link');
+      toastMessagesService.error('Unable to copy link');
     }
   };
 
@@ -143,9 +143,9 @@ AnnotationShareControl.propTypes = {
 
   /* services */
   analytics: propTypes.object.isRequired,
-  flash: propTypes.object.isRequired,
+  toastMessagesService: propTypes.object.isRequired,
 };
 
-AnnotationShareControl.injectedProps = ['analytics', 'flash'];
+AnnotationShareControl.injectedProps = ['analytics', 'toastMessagesService'];
 
 export default withServices(AnnotationShareControl);

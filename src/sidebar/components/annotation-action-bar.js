@@ -17,7 +17,7 @@ import Button from './button';
 function AnnotationActionBar({
   annotation,
   annotationMapper,
-  flash,
+  toastMessagesService,
   onReply,
   settings,
 }) {
@@ -49,7 +49,7 @@ function AnnotationActionBar({
   const onDelete = () => {
     if (window.confirm('Are you sure you want to delete this annotation?')) {
       annotationMapper.deleteAnnotation(annotation).catch(err => {
-        flash.error(err.message, 'Deleting annotation failed');
+        toastMessagesService.error(err.message, 'Deleting annotation failed');
       });
     }
   };
@@ -64,7 +64,7 @@ function AnnotationActionBar({
 
   const onFlag = () => {
     if (!userProfile.userid) {
-      flash.error(
+      toastMessagesService.error(
         'You must be logged in to report an annotation to moderators.',
         'Log in to flag annotations'
       );
@@ -73,7 +73,9 @@ function AnnotationActionBar({
     annotationMapper
       .flagAnnotation(annotation) // Flag annotation on service
       .then(updateFlag) // Update app state with flag
-      .catch(err => flash.error(err.message, 'Flagging annotation failed'));
+      .catch(err =>
+        toastMessagesService.error(err.message, 'Flagging annotation failed')
+      );
   };
 
   const onReplyClick = event => {
@@ -123,10 +125,14 @@ AnnotationActionBar.propTypes = {
 
   // Injected services
   annotationMapper: propTypes.object.isRequired,
-  flash: propTypes.object.isRequired,
+  toastMessagesService: propTypes.object.isRequired,
   settings: propTypes.object.isRequired,
 };
 
-AnnotationActionBar.injectedProps = ['annotationMapper', 'flash', 'settings'];
+AnnotationActionBar.injectedProps = [
+  'annotationMapper',
+  'toastMessagesService',
+  'settings',
+];
 
 export default withServices(AnnotationActionBar);

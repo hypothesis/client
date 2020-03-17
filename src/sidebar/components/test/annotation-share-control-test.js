@@ -12,7 +12,7 @@ describe('AnnotationShareControl', () => {
   let fakeAnnotation;
   let fakeAnalytics;
   let fakeCopyToClipboard;
-  let fakeFlash;
+  let fakeToastMessagesService;
   let fakeGroup;
   let fakeIsPrivate;
   let fakeShareUri;
@@ -28,7 +28,7 @@ describe('AnnotationShareControl', () => {
       <AnnotationShareControl
         annotation={fakeAnnotation}
         analytics={fakeAnalytics}
-        flash={fakeFlash}
+        toastMessagesService={fakeToastMessagesService}
         group={fakeGroup}
         shareUri={fakeShareUri}
         {...props}
@@ -67,8 +67,8 @@ describe('AnnotationShareControl', () => {
     fakeCopyToClipboard = {
       copyText: sinon.stub(),
     };
-    fakeFlash = {
-      info: sinon.stub(),
+    fakeToastMessagesService = {
+      success: sinon.stub(),
       error: sinon.stub(),
     };
     fakeGroup = {
@@ -146,7 +146,10 @@ describe('AnnotationShareControl', () => {
         .props()
         .onClick();
 
-      assert.calledWith(fakeFlash.info, 'Copied share link to clipboard');
+      assert.calledWith(
+        fakeToastMessagesService.success,
+        'Copied share link to clipboard'
+      );
     });
 
     it('flashes an error if link copying unsuccessful', () => {
@@ -158,7 +161,7 @@ describe('AnnotationShareControl', () => {
         .props()
         .onClick();
 
-      assert.calledWith(fakeFlash.error, 'Unable to copy link');
+      assert.calledWith(fakeToastMessagesService.error, 'Unable to copy link');
     });
   });
 

@@ -9,7 +9,7 @@ import { $imports } from '../group-list-item';
 describe('GroupListItem', () => {
   let fakeAnalytics;
   let fakeCopyText;
-  let fakeFlash;
+  let fakeToastMessagesService;
   let fakeGroupsService;
   let fakeStore;
   let fakeGroupListItemCommon;
@@ -39,8 +39,8 @@ describe('GroupListItem', () => {
       events,
     };
 
-    fakeFlash = {
-      info: sinon.stub(),
+    fakeToastMessagesService = {
+      success: sinon.stub(),
       error: sinon.stub(),
     };
 
@@ -85,7 +85,7 @@ describe('GroupListItem', () => {
   const createGroupListItem = (fakeGroup, props = {}) => {
     return mount(
       <GroupListItem
-        flash={fakeFlash}
+        toastMessagesService={fakeToastMessagesService}
         group={fakeGroup}
         groups={fakeGroupsService}
         analytics={fakeAnalytics}
@@ -380,7 +380,10 @@ describe('GroupListItem', () => {
     });
     clickMenuItem(getSubmenu(wrapper), 'Copy invite link');
     assert.calledWith(fakeCopyText, 'https://annotate.com/groups/groupid');
-    assert.calledWith(fakeFlash.info, 'Copied link for "Test"');
+    assert.calledWith(
+      fakeToastMessagesService.success,
+      'Copied link for "Test"'
+    );
   });
 
   it('reports an error if "Copy link" action fails', () => {
@@ -390,6 +393,6 @@ describe('GroupListItem', () => {
     });
     clickMenuItem(getSubmenu(wrapper), 'Copy invite link');
     assert.calledWith(fakeCopyText, 'https://annotate.com/groups/groupid');
-    assert.calledWith(fakeFlash.error, 'Unable to copy link');
+    assert.calledWith(fakeToastMessagesService.error, 'Unable to copy link');
   });
 });
