@@ -17,24 +17,6 @@
   .annotation-action-btn {
     color: var.$grey-6;
   }
-
-  .annotation-header__timestamp-link {
-    color: var.$grey-5;
-  }
-}
-
-.annotation {
-  display: block;
-  font-family: var.$sans-font-family;
-  position: relative;
-}
-
-.annotation.is-dimmed {
-  // Lighten the bodies of dimmed annotations to make other
-  // annotations which are not dimmed stand out
-  .annotation-body {
-    color: var.$grey-5;
-  }
 }
 
 .annotation.is-highlighted {
@@ -46,19 +28,12 @@
   }
 }
 
-.annotation-link-more {
-  display: flex;
-  flex-flow: row-reverse;
-}
-
-.annotation-link {
-  @include var.font-small;
-  color: var.$grey-4;
-  // Decrease the margin between the more/less link
-  // and the annotation body.
-  margin-top: -1em;
-  padding-bottom: 0.5em;
-  padding-top: 0.5em;
+.annotation.is-dimmed {
+  // Lighten the bodies of dimmed annotations to make other
+  // annotations which are not dimmed stand out
+  .annotation-body {
+    color: var.$grey-5;
+  }
 }
 
 .annotation-replies:hover {
@@ -69,18 +44,9 @@
 
 .annotation-footer {
   @include forms.pie-clearfix;
-}
-
-// the footer at the bottom of an annotation displaying
-// the annotation actions and reply counts
-.annotation-footer {
   @include var.font-normal;
   color: var.$grey-5;
   margin-top: var.$layout-h-margin;
-}
-
-.u-flex-spacer {
-  flex-grow: 1;
 }
 
 .annotation-media-embed {
@@ -105,22 +71,6 @@
   display: flex;
 }
 
-.annotation-action-btn {
-  color: var.$grey-5;
-  font-weight: normal;
-  padding: 0;
-  margin: 0px 0px 0px 12px;
-
-  &[disabled] {
-    opacity: 0.2;
-  }
-}
-
-.annotation-citation-domain {
-  color: var.$grey-semi;
-  font-size: var.$body1-font-size;
-}
-
 .annotation-collapsed-replies {
   display: none;
 }
@@ -143,10 +93,6 @@
   }
 }
 
-.annotation-share-dialog-wrapper {
-  position: relative;
-}
-
 // the actions for publishing annotations and reverting changes
 // at the bottom of an annotation card
 .annotation-form-actions {
@@ -157,10 +103,6 @@
 
 // Style adjustments for annotation cards that are replies
 .annotation--reply {
-  .annotation-action-btn {
-    color: var.$grey-4;
-  }
-
   .annotation-footer {
     // Margin between bottom of ascent of annotation body and
     // top of annotation footer should be ~15px
@@ -181,9 +123,4 @@
     // top of annotation footer labels should be ~15px
     margin-bottom: var.$layout-h-margin - 3px;
   }
-}
-
-.annotation--flagged {
-  color: var.$brand;
-  cursor: default;
 }

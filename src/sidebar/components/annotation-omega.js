@@ -94,7 +94,7 @@ function AnnotationOmega({
     /* eslint-disable-next-line jsx-a11y/no-static-element-interactions */
     <div
       className={classnames('annotation-omega', {
-        'annotation--reply': isReply(annotation),
+        'annotation-omega--reply': isReply(annotation),
         'is-collapsed': threadIsCollapsed,
       })}
       onKeyDown={onKeyDown}
@@ -116,8 +116,8 @@ function AnnotationOmega({
       />
       {isEditing && <TagEditor onEditTags={onEditTags} tagList={tags} />}
       {!isEditing && <TagList annotation={annotation} tags={tags} />}
-      <footer className="annotation-footer">
-        <div className="annotation-form-actions">
+      <footer className="annotation-omega__footer">
+        <div className="annotation-omega__form-actions">
           {isEditing && (
             <AnnotationPublishControl
               annotation={annotation}

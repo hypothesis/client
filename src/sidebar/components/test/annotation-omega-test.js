@@ -100,7 +100,7 @@ describe('AnnotationOmega', () => {
       const wrapper = createComponent({ threadIsCollapsed: false });
       const annot = wrapper.find('.annotation-omega');
 
-      assert.isTrue(annot.hasClass('annotation--reply'));
+      assert.isTrue(annot.hasClass('annotation-omega--reply'));
       assert.isFalse(annot.hasClass('is-collapsed'));
     });
 

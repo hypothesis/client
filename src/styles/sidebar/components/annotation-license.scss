@@ -3,7 +3,8 @@
 .annotation-license {
   @include var.font-small;
   border-top: 1px solid var.$grey-3;
-  padding-top: 0.75em;
+  padding-top: 0.5em;
+  margin: 0.5em 0;
 
   &__link {
     display: flex;
