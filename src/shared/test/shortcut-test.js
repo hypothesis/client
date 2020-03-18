@@ -59,6 +59,12 @@ describe('shared/shortcut', () => {
         });
       });
     });
+
+    it('should throw an error if multiple non-modifier keys are specified', () => {
+      assert.throws(() => {
+        matchShortcut(createEvent('a'), 'a+b');
+      }, 'Multiple non-modifier keys specified');
+    });
   });
 
   describe('installShortcut', () => {

@@ -30,8 +30,10 @@ export function matchShortcut(event, shortcut) {
     const modifierFlag = modifiers[part];
     if (modifierFlag) {
       requiredModifiers |= modifierFlag;
-    } else {
+    } else if (requiredKey === null) {
       requiredKey = part;
+    } else {
+      throw new Error('Multiple non-modifier keys specified');
     }
   }
 
