@@ -16,10 +16,23 @@ function createEvent(key, { ctrl, alt, shift, meta } = {}) {
 describe('shared/shortcut', () => {
   describe('matchShortcut', () => {
     [
+      // Single modifier.
       { shortcut: 'ctrl+a', event: createEvent('a', { ctrl: true }) },
       { shortcut: 'meta+a', event: createEvent('a', { meta: true }) },
       { shortcut: 'shift+a', event: createEvent('a', { shift: true }) },
       { shortcut: 'alt+a', event: createEvent('a', { alt: true }) },
+
+      // Multiple modifiers.
+      {
+        shortcut: 'ctrl+shift+a',
+        event: createEvent('a', { ctrl: true, shift: true }),
+      },
+      {
+        shortcut: 'alt+meta+a',
+        event: createEvent('a', { alt: true, meta: true }),
+      },
+
+      // No modifier.
       { shortcut: 'a', event: createEvent('a') },
     ].forEach(({ shortcut, event }) => {
       it('should match if modifiers match', () => {
@@ -27,13 +40,17 @@ describe('shared/shortcut', () => {
       });
     });
 
-    [{ shortcut: 'ctrl+a', event: createEvent('a', { ctrl: false }) }].forEach(
-      ({ shortcut, event }) => {
-        it('should not match if modifiers do not match', () => {
-          assert.isFalse(matchShortcut(event, shortcut));
-        });
-      }
-    );
+    [
+      { shortcut: 'ctrl+a', event: createEvent('a', { ctrl: false }) },
+      {
+        shortcut: 'ctrl+shift+a',
+        event: createEvent('a', { ctrl: true, shift: false }),
+      },
+    ].forEach(({ shortcut, event }) => {
+      it('should not match if modifiers do not match', () => {
+        assert.isFalse(matchShortcut(event, shortcut));
+      });
+    });
 
     [
       { shortcut: 'a', event: createEvent('a') },
@@ -169,6 +186,8 @@ describe('shared/shortcut', () => {
       });
 
       triggerShortcut({ key: 'a' });
+
+      assert.notCalled(onClick);
     });
   });
 });
