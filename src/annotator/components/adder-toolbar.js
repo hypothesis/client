@@ -2,6 +2,31 @@ import classnames from 'classnames';
 import { createElement } from 'preact';
 import propTypes from 'prop-types';
 
+import { useShortcut } from '../../shared/shortcut';
+
+function ToolbarButton({ icon, label, onClick, shortcut }) {
+  useShortcut(shortcut, onClick);
+
+  const title = shortcut ? `${label} (${shortcut})` : null;
+
+  return (
+    <button
+      className={classnames('annotator-adder-actions__button', icon)}
+      onClick={onClick}
+      title={title}
+    >
+      <span className="annotator-adder-actions__label">{label}</span>
+    </button>
+  );
+}
+
+ToolbarButton.propTypes = {
+  icon: propTypes.string.isRequired,
+  label: propTypes.string.isRequired,
+  onClick: propTypes.func.isRequired,
+  shortcut: propTypes.string,
+};
+
 /**
  * The toolbar that is displayed above selected text in the document providing
  * options to create annotations or highlights.
@@ -13,6 +38,12 @@ export default function AdderToolbar({ arrowDirection, isVisible, onCommand }) {
 
     onCommand(command);
   };
+
+  // Since the selection toolbar is only shown when there is a selection
+  // of static text, we can use a plain key without any modifier as
+  // the shortcut. This avoids conflicts with browser/OS shortcuts.
+  const annotateShortcut = isVisible ? 'a' : null;
+  const highlightShortcut = isVisible ? 'h' : null;
 
   // nb. The adder is hidden using the `visibility` property rather than `display`
   // so that we can compute its size in order to position it before display.
@@ -26,18 +57,18 @@ export default function AdderToolbar({ arrowDirection, isVisible, onCommand }) {
       style={{ visibility: isVisible ? 'visible' : 'hidden' }}
     >
       <hypothesis-adder-actions className="annotator-adder-actions">
-        <button
-          className="annotator-adder-actions__button h-icon-annotate"
+        <ToolbarButton
+          icon="h-icon-annotate"
           onClick={e => handleCommand(e, 'annotate')}
-        >
-          <span className="annotator-adder-actions__label">Annotate</span>
-        </button>
-        <button
-          className="annotator-adder-actions__button h-icon-highlight"
+          label="Annotate"
+          shortcut={annotateShortcut}
+        />
+        <ToolbarButton
+          icon="h-icon-highlight"
           onClick={e => handleCommand(e, 'highlight')}
-        >
-          <span className="annotator-adder-actions__label">Highlight</span>
-        </button>
+          label="Highlight"
+          shortcut={highlightShortcut}
+        />
       </hypothesis-adder-actions>
     </hypothesis-adder-toolbar>
   );

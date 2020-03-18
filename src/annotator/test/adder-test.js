@@ -1,3 +1,5 @@
+import { act } from 'preact/test-utils';
+
 import { Adder, ARROW_POINTING_UP, ARROW_POINTING_DOWN } from '../adder';
 
 function rect(left, top, width, height) {
@@ -23,7 +25,8 @@ function revertOffsetElement(el) {
 }
 
 // nb. These tests currently cover the `AdderToolbar` Preact component as well
-// as the `Adder` container.
+// as the `Adder` container. The tests for `AdderToolbar` should be moved into
+// `adder-toolbar-test.js`.
 describe('Adder', () => {
   let adderCtrl;
   let adderCallbacks;
@@ -103,6 +106,31 @@ describe('Adder', () => {
       );
       annotateLabel.dispatchEvent(new Event('click', { bubbles: true }));
       assert.called(adderCallbacks.onAnnotate);
+    });
+
+    it('calls onAnnotate callback when shortcut is pressed if adder is visible', () => {
+      // nb. `act` is necessary here to flush effect hooks in `AdderToolbar`.
+      act(() => {
+        adderCtrl.showAt(100, 100, ARROW_POINTING_UP);
+      });
+      document.body.dispatchEvent(new KeyboardEvent('keydown', { key: 'a' }));
+      assert.called(adderCallbacks.onAnnotate);
+    });
+
+    it('calls onHighlight callback when shortcut is pressed if adder is visible', () => {
+      // nb. `act` is necessary here to flush effect hooks in `AdderToolbar`.
+      act(() => {
+        adderCtrl.showAt(100, 100, ARROW_POINTING_UP);
+      });
+      document.body.dispatchEvent(new KeyboardEvent('keydown', { key: 'h' }));
+      assert.called(adderCallbacks.onHighlight);
+    });
+
+    it('does not call callbacks when adder is hidden', () => {
+      document.body.dispatchEvent(new KeyboardEvent('keydown', { key: 'a' }));
+      document.body.dispatchEvent(new KeyboardEvent('keydown', { key: 'h' }));
+      assert.notCalled(adderCallbacks.onAnnotate);
+      assert.notCalled(adderCallbacks.onHighlight);
     });
   });
 
