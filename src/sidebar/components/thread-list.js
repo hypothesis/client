@@ -37,16 +37,6 @@ function getThreadHeight(id) {
   return elementHeight + marginHeight;
 }
 
-const virtualThreadOptions = {
-  // identify the thread types that need to be rendered
-  // but not actually visible to the user
-  invisibleThreadFilter: function(thread) {
-    // new highlights should always get rendered so we don't
-    // miss saving them via the render-save process
-    return thread.annotation.$highlight && metadata.isNew(thread.annotation);
-  },
-};
-
 // @ngInject
 function ThreadListController($element, $scope, settings, store) {
   // `visibleThreads` keeps track of the subset of all threads matching the
@@ -66,12 +56,7 @@ function ThreadListController($element, $scope, settings, store) {
 
   this.isThemeClean = settings.theme === 'clean';
 
-  const options = Object.assign(
-    {
-      scrollRoot: this.scrollRoot,
-    },
-    virtualThreadOptions
-  );
+  const options = { scrollRoot: this.scrollRoot };
   let visibleThreads;
 
   this.$onInit = () => {
@@ -98,7 +83,6 @@ function ThreadListController($element, $scope, settings, store) {
   function onVisibleThreadsChanged(state) {
     self.virtualThreadList = {
       visibleThreads: state.visibleThreads,
-      invisibleThreads: state.invisibleThreads,
       offscreenUpperHeight: state.offscreenUpperHeight + 'px',
       offscreenLowerHeight: state.offscreenLowerHeight + 'px',
     };
