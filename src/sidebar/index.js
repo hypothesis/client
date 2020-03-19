@@ -76,7 +76,7 @@ function setupApi(api, streamer) {
  * route to match the current URL.
  */
 // @ngInject
-function setupRoute(api, groups, session, router) {
+function setupRoute(groups, session, router) {
   Promise.all([groups.load(), session.load()]).finally(() => {
     router.sync();
   });
