@@ -1,4 +1,3 @@
-raf = require('raf')
 scrollIntoView = require('scroll-into-view')
 CustomEvent = require('custom-event')
 
@@ -15,7 +14,7 @@ xpathRange = require('./anchoring/range')
 
 animationPromise = (fn) ->
   return new Promise (resolve, reject) ->
-    raf ->
+    requestAnimationFrame ->
       try
         resolve(fn())
       catch error
@@ -295,7 +294,7 @@ module.exports = class Guest extends Delegator
         self.anchors.push(anchor)
 
     # Remove all the highlights that have no corresponding target anymore.
-    raf -> highlighter.removeHighlights(deadHighlights)
+    requestAnimationFrame -> highlighter.removeHighlights(deadHighlights)
 
     # Anchor any targets of this annotation that are not anchored already.
     for target in annotation.target when target not in anchoredTargets
@@ -318,7 +317,7 @@ module.exports = class Guest extends Delegator
     this.anchors = anchors
 
     unhighlight = Array::concat(unhighlight...)
-    raf =>
+    requestAnimationFrame =>
       highlighter.removeHighlights(unhighlight)
       this.plugins.BucketBar?.update()
 

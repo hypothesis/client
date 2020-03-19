@@ -11,9 +11,6 @@ Guest = require('../guest')
 rangeUtil = null
 selections = null
 
-raf = sinon.stub().yields()
-raf['@noCallThru'] = true
-
 scrollIntoView = sinon.stub()
 scrollIntoView['@noCallThru'] = true
 
@@ -75,6 +72,8 @@ describe 'Guest', ->
       anchor: sinon.stub()
     }
 
+    sinon.stub(window, 'requestAnimationFrame').yields()
+
     $imports.$mock({
       './adder': {Adder: FakeAdder},
       './anchoring/html': htmlAnchoring,
@@ -86,7 +85,6 @@ describe 'Guest', ->
           return () ->
         )
       './delegator': Delegator,
-      'raf': raf,
       'scroll-into-view': scrollIntoView,
     })
 
@@ -102,6 +100,7 @@ describe 'Guest', ->
     guestConfig.pluginClasses['CrossFrame'] = CrossFrame
 
   afterEach ->
+    window.requestAnimationFrame.restore()
     sandbox.restore()
     console.warn.restore()
     $imports.$restore()

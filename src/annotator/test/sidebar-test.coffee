@@ -14,11 +14,10 @@ describe 'Sidebar', ->
   sidebarConfig = {pluginClasses: {}}
 
   before ->
-    rafStub = (fn) ->
-      fn()
-    $imports.$mock({ raf: rafStub })
+    sinon.stub(window, 'requestAnimationFrame').yields()
 
   after ->
+    window.requestAnimationFrame.restore();
     $imports.$restore()
 
   createSidebar = (config={}) ->

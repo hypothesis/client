@@ -1,5 +1,3 @@
-raf = require('raf')
-
 $ = require('jquery')
 Plugin = require('../plugin')
 
@@ -101,7 +99,7 @@ module.exports = class BucketBar extends Plugin
   # Update sometime soon
   update: =>
     return if @_updatePending?
-    @_updatePending = raf =>
+    @_updatePending = requestAnimationFrame =>
       delete @_updatePending
       @_update()
 
