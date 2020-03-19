@@ -15,13 +15,17 @@ export default function router($window, store) {
     const params = queryString.parse($window.location.search);
 
     let route;
-    if (pathSegments[0] === 'a') {
-      route = 'annotation';
-      params.id = pathSegments[1] || '';
-    } else if (pathSegments[0] === 'stream') {
-      route = 'stream';
-    } else {
-      route = 'sidebar';
+    switch (pathSegments[0]) {
+      case 'a':
+        route = 'annotation';
+        params.id = pathSegments[1] || '';
+        break;
+      case 'stream':
+        route = 'stream';
+        break;
+      default:
+        route = 'sidebar';
+        break;
     }
 
     return { route, params };
@@ -34,15 +38,19 @@ export default function router($window, store) {
     let url;
     const queryParams = { ...params };
 
-    if (name === 'annotation') {
-      const id = params.id;
-      delete queryParams.id;
-
-      url = `/a/${id}`;
-    } else if (name === 'stream') {
-      url = '/stream';
-    } else {
-      throw new Error(`Cannot generate URL for route "${name}"`);
+    switch (name) {
+      case 'annotation':
+        {
+          const id = params.id;
+          delete queryParams.id;
+          url = `/a/${id}`;
+        }
+        break;
+      case 'stream':
+        url = '/stream';
+        break;
+      default:
+        throw new Error(`Cannot generate URL for route "${name}"`);
     }
 
     const query = queryString.stringify(queryParams);
