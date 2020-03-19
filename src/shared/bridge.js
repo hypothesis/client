@@ -1,5 +1,3 @@
-import extend from 'extend';
-
 import RPC from './frame-rpc';
 
 /**
@@ -54,7 +52,7 @@ export default class Bridge {
       }
     };
 
-    const listeners = extend({ connect }, this.channelListeners);
+    const listeners = { connect, ...this.channelListeners };
 
     // Set up a channel
     channel = new RPC(window, source, origin, listeners);

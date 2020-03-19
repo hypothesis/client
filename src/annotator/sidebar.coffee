@@ -1,4 +1,3 @@
-extend = require('extend')
 raf = require('raf')
 Hammer = require('hammerjs')
 
