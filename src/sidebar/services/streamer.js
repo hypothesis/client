@@ -52,7 +52,7 @@ export default function Streamer(
         break;
     }
 
-    if (!store.isSidebar()) {
+    if (store.route() !== 'sidebar') {
       applyPendingUpdates();
     }
   }

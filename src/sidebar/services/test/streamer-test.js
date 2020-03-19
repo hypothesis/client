@@ -123,11 +123,11 @@ describe('Streamer', function() {
           userid: 'jim@hypothes.is',
         },
       }),
-      isSidebar: sinon.stub().returns(true),
       pendingUpdates: sinon.stub().returns({}),
       pendingDeletions: sinon.stub().returns({}),
       receiveRealTimeUpdates: sinon.stub(),
       removeAnnotations: sinon.stub(),
+      route: sinon.stub().returns('sidebar'),
     };
 
     fakeGroups = {
@@ -275,7 +275,7 @@ describe('Streamer', function() {
 
     context('when the app is the stream', function() {
       beforeEach(function() {
-        fakeStore.isSidebar.returns(false);
+        fakeStore.route.returns('stream');
       });
 
       it('applies updates immediately', function() {
