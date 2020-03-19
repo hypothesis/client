@@ -36,8 +36,17 @@ describe('VirtualThreadList', function() {
   }
 
   beforeEach(() => {
+    const fakeDebounce = callback => {
+      const debounced = () => {
+        // Update synchronously instead of really debouncing.
+        callback();
+      };
+      debounced.cancel = sinon.stub();
+      return debounced;
+    };
+
     $imports.$mock({
-      'lodash.debounce': fn => fn,
+      'lodash.debounce': fakeDebounce,
     });
   });
 
