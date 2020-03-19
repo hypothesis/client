@@ -34,8 +34,6 @@ export default class VirtualThreadList extends EventEmitter {
   constructor($scope, window_, rootThread, options) {
     super();
 
-    const self = this;
-
     this._rootThread = rootThread;
 
     this._options = Object.assign({}, options);
@@ -46,16 +44,22 @@ export default class VirtualThreadList extends EventEmitter {
     this.window = window_;
     this.scrollRoot = options.scrollRoot || document.body;
 
-    const debouncedUpdate = debounce(function() {
-      self.calculateVisibleThreads();
-      $scope.$digest();
-    }, 20);
+    const debouncedUpdate = debounce(
+      () => {
+        this.calculateVisibleThreads();
+        $scope.$digest();
+      },
+      10,
+      { maxWait: 100 }
+    );
+
     this.scrollRoot.addEventListener('scroll', debouncedUpdate);
     this.window.addEventListener('resize', debouncedUpdate);
 
     this._detach = function() {
       this.scrollRoot.removeEventListener('scroll', debouncedUpdate);
       this.window.removeEventListener('resize', debouncedUpdate);
+      debouncedUpdate.cancel();
     };
   }
 
