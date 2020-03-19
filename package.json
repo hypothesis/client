@@ -25,7 +25,6 @@
     "babel-plugin-transform-async-to-promises": "^0.8.6",
     "babelify": "^10.0.0",
     "browserify": "^16.2.3",
-    "browserify-shim": "^3.8.12",
     "browserify-versionify": "^1.0.6",
     "chai": "^4.1.2",
     "chance": "^1.0.13",
@@ -108,7 +107,6 @@
   },
   "browserify": {
     "transform": [
-      "browserify-shim",
       "browserify-versionify",
       [
         "stringify",
@@ -127,15 +125,6 @@
     "hammerjs": "./node_modules/hammerjs/hammer.js",
     "fetch-mock": "./node_modules/fetch-mock/cjs/client.js",
     "jquery": "./node_modules/jquery/dist/jquery.slim.js"
-  },
-  "browserify-shim": {
-    "angular": {
-      "depends": [
-        "jquery"
-      ]
-    },
-    "hammerjs": "Hammer",
-    "jquery": "$"
   },
   "main": "./build/boot.js",
   "scripts": {

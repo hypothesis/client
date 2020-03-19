@@ -242,7 +242,7 @@ describe('wrapReactComponent', () => {
     const element = createDirective(document, 'parent');
     assert.isNull(element[0].querySelector('.click-indicator'));
 
-    const btn = element.find('button');
+    const btn = element.find('button')[0];
     btn.click();
 
     // Check that parent component DOM has been updated to reflect new state of
