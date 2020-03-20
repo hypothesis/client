@@ -17,10 +17,10 @@ import MenuItem from './menu-item';
 function GroupListItem({
   analytics,
   isExpanded,
-  flash,
   group,
   groups: groupsService,
   onExpand,
+  toastMessenger,
 }) {
   const canLeaveGroup = group.type === 'private';
   const activityUrl = group.links.html;
@@ -63,9 +63,9 @@ function GroupListItem({
   const copyLink = () => {
     try {
       copyText(activityUrl);
-      flash.info(`Copied link for "${group.name}"`);
+      toastMessenger.success(`Copied link for "${group.name}"`);
     } catch (err) {
-      flash.error('Unable to copy link');
+      toastMessenger.error('Unable to copy link');
     }
   };
 
@@ -145,10 +145,10 @@ GroupListItem.propTypes = {
 
   // Injected services.
   analytics: propTypes.object.isRequired,
-  flash: propTypes.object.isRequired,
   groups: propTypes.object.isRequired,
+  toastMessenger: propTypes.object.isRequired,
 };
 
-GroupListItem.injectedProps = ['analytics', 'flash', 'groups'];
+GroupListItem.injectedProps = ['analytics', 'groups', 'toastMessenger'];
 
 export default withServices(GroupListItem);

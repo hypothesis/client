@@ -19,7 +19,7 @@ describe('AnnotationActionBar', () => {
 
   // Fake services
   let fakeAnnotationMapper;
-  let fakeFlash;
+  let fakeToastMessenger;
   let fakePermits;
   let fakeSettings;
   // Fake dependencies
@@ -31,7 +31,7 @@ describe('AnnotationActionBar', () => {
       <AnnotationActionBar
         annotation={fakeAnnotation}
         annotationMapper={fakeAnnotationMapper}
-        flash={fakeFlash}
+        toastMessenger={fakeToastMessenger}
         onReply={fakeOnReply}
         settings={fakeSettings}
         {...props}
@@ -67,8 +67,7 @@ describe('AnnotationActionBar', () => {
       flagAnnotation: sinon.stub().resolves(),
     };
 
-    fakeFlash = {
-      info: sinon.stub(),
+    fakeToastMessenger = {
       error: sinon.stub(),
     };
 
@@ -180,7 +179,7 @@ describe('AnnotationActionBar', () => {
         button.props().onClick();
       });
 
-      await waitFor(() => fakeFlash.error.called);
+      await waitFor(() => fakeToastMessenger.error.called);
     });
   });
 
@@ -264,7 +263,7 @@ describe('AnnotationActionBar', () => {
         button.props().onClick();
       });
 
-      assert.calledOnce(fakeFlash.error);
+      assert.calledOnce(fakeToastMessenger.error);
       assert.notCalled(fakeAnnotationMapper.flagAnnotation);
     });
 
@@ -304,7 +303,7 @@ describe('AnnotationActionBar', () => {
         button.props().onClick();
       });
 
-      await waitFor(() => fakeFlash.error.called);
+      await waitFor(() => fakeToastMessenger.error.called);
       assert.notCalled(fakeStore.updateFlagStatus);
     });
 

@@ -18,7 +18,7 @@ import SvgIcon from './svg-icon';
  * are on the current page (as defined by the main frame's URI) and contained
  * within the app's currently-focused group.
  */
-function ShareAnnotationsPanel({ analytics, flash }) {
+function ShareAnnotationsPanel({ analytics, toastMessenger }) {
   const mainFrame = useStore(store => store.mainFrame());
   const focusedGroup = useStore(store => store.focusedGroup());
 
@@ -45,9 +45,9 @@ function ShareAnnotationsPanel({ analytics, flash }) {
   const copyShareLink = () => {
     try {
       copyText(shareURI);
-      flash.info('Copied share link to clipboard');
+      toastMessenger.success('Copied share link to clipboard');
     } catch (err) {
-      flash.error('Unable to copy link');
+      toastMessenger.error('Unable to copy link');
     }
   };
 
@@ -118,9 +118,9 @@ function ShareAnnotationsPanel({ analytics, flash }) {
 ShareAnnotationsPanel.propTypes = {
   // Injected services
   analytics: propTypes.object.isRequired,
-  flash: propTypes.object.isRequired,
+  toastMessenger: propTypes.object.isRequired,
 };
 
-ShareAnnotationsPanel.injectedProps = ['analytics', 'flash'];
+ShareAnnotationsPanel.injectedProps = ['analytics', 'toastMessenger'];
 
 export default withServices(ShareAnnotationsPanel);

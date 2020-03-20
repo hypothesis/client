@@ -10,7 +10,7 @@ import { withServices } from '../util/service-context';
  * Banner allows moderators to hide/unhide the flagged
  * annotation from other users.
  */
-function ModerationBanner({ annotation, api, flash }) {
+function ModerationBanner({ annotation, api, toastMessenger }) {
   // actions
   const store = useStore(store => ({
     hide: store.hideAnnotation,
@@ -32,7 +32,7 @@ function ModerationBanner({ annotation, api, flash }) {
         store.hide(annotation.id);
       })
       .catch(() => {
-        flash.error('Failed to hide annotation');
+        toastMessenger.error('Failed to hide annotation');
       });
   };
 
@@ -46,7 +46,7 @@ function ModerationBanner({ annotation, api, flash }) {
         store.unhide(annotation.id);
       })
       .catch(() => {
-        flash.error('Failed to unhide annotation');
+        toastMessenger.error('Failed to unhide annotation');
       });
   };
 
@@ -96,9 +96,9 @@ ModerationBanner.propTypes = {
 
   // Injected services.
   api: propTypes.object.isRequired,
-  flash: propTypes.object.isRequired,
+  toastMessenger: propTypes.object.isRequired,
 };
 
-ModerationBanner.injectedProps = ['api', 'flash'];
+ModerationBanner.injectedProps = ['api', 'toastMessenger'];
 
 export default withServices(ModerationBanner);

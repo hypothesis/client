@@ -22,7 +22,7 @@ describe('Annotation', () => {
 
   // Injected dependency mocks
   let fakeAnnotationsService;
-  let fakeFlash;
+  let fakeToastMessenger;
   let fakeStore;
 
   const setEditingMode = (isEditing = true) => {
@@ -39,7 +39,7 @@ describe('Annotation', () => {
       <Annotation
         annotation={fixtures.defaultAnnotation()}
         annotationsService={fakeAnnotationsService}
-        flash={fakeFlash}
+        toastMessenger={fakeToastMessenger}
         onReplyCountClick={fakeOnReplyCountClick}
         replyCount={0}
         showDocumentInfo={false}
@@ -57,7 +57,7 @@ describe('Annotation', () => {
       save: sinon.stub().resolves(),
     };
 
-    fakeFlash = {
+    fakeToastMessenger = {
       error: sinon.stub(),
     };
 
@@ -255,7 +255,7 @@ describe('Annotation', () => {
         );
       });
 
-      it('should flash an error message on failure', async () => {
+      it('should show an error message on failure', async () => {
         setEditingMode(true);
         fakeAnnotationsService.save.rejects();
 
@@ -265,7 +265,7 @@ describe('Annotation', () => {
           .props()
           .onSave();
 
-        await waitFor(() => fakeFlash.error.called);
+        await waitFor(() => fakeToastMessenger.error.called);
       });
 
       describe('saving using shortcut-key combo', () => {

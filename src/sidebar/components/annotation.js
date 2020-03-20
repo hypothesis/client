@@ -24,11 +24,11 @@ import TagList from './tag-list';
 function Annotation({
   annotation,
   annotationsService,
-  flash,
   onReplyCountClick,
   replyCount,
   showDocumentInfo,
   threadIsCollapsed,
+  toastMessenger,
 }) {
   const createDraft = useStore(store => store.createDraft);
   const setCollapsed = useStore(store => store.setCollapsed);
@@ -70,7 +70,7 @@ function Annotation({
     try {
       await annotationsService.save(annotation);
     } catch (err) {
-      flash.error(err.message, 'Saving annotation failed');
+      toastMessenger.error('Saving annotation failed');
     } finally {
       setIsSaving(false);
     }
@@ -161,9 +161,9 @@ Annotation.propTypes = {
 
   /* Injected services */
   annotationsService: propTypes.object.isRequired,
-  flash: propTypes.object.isRequired,
+  toastMessenger: propTypes.object.isRequired,
 };
 
-Annotation.injectedProps = ['annotationsService', 'flash'];
+Annotation.injectedProps = ['annotationsService', 'toastMessenger'];
 
 export default withServices(Annotation);

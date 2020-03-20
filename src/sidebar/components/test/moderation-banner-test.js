@@ -12,16 +12,20 @@ const moderatedAnnotation = fixtures.moderatedAnnotation;
 
 describe('ModerationBanner', () => {
   let fakeApi;
-  let fakeFlash;
+  let fakeToastMessenger;
 
   function createComponent(props) {
     return mount(
-      <ModerationBanner api={fakeApi} flash={fakeFlash} {...props} />
+      <ModerationBanner
+        api={fakeApi}
+        toastMessenger={fakeToastMessenger}
+        {...props}
+      />
     );
   }
 
   beforeEach(() => {
-    fakeFlash = {
+    fakeToastMessenger = {
       error: sinon.stub(),
     };
 
@@ -151,7 +155,7 @@ describe('ModerationBanner', () => {
     wrapper.find('button').simulate('click');
 
     setTimeout(function() {
-      assert.calledWith(fakeFlash.error, 'Failed to hide annotation');
+      assert.calledWith(fakeToastMessenger.error, 'Failed to hide annotation');
       done();
     }, 0);
   });
@@ -179,7 +183,10 @@ describe('ModerationBanner', () => {
     );
     wrapper.find('button').simulate('click');
     setTimeout(function() {
-      assert.calledWith(fakeFlash.error, 'Failed to unhide annotation');
+      assert.calledWith(
+        fakeToastMessenger.error,
+        'Failed to unhide annotation'
+      );
       done();
     }, 0);
   });
