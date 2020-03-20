@@ -43,6 +43,7 @@ import realTimeUpdates from './modules/real-time-updates';
 import selection from './modules/selection';
 import session from './modules/session';
 import sidebarPanels from './modules/sidebar-panels';
+import toastMessages from './modules/toast-messages';
 import viewer from './modules/viewer';
 
 /**
@@ -98,6 +99,7 @@ export default function store($rootScope, settings) {
     selection,
     session,
     sidebarPanels,
+    toastMessages,
     viewer,
   ];
   return createStore(modules, [settings], middleware);
