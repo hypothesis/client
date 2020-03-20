@@ -86,10 +86,6 @@ function AnnotationThreadController(features, store) {
       store.setCollapsed(thread.parent.id, false);
     }
   };
-
-  this.shouldShowAnnotationOmega = () => {
-    return features.flagEnabled('client_preact_annotation');
-  };
 }
 
 export default {

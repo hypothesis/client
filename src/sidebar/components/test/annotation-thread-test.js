@@ -7,7 +7,7 @@ import moderationBanner from '../moderation-banner';
 
 function PageObject(element) {
   this.annotations = function() {
-    return Array.from(element[0].querySelectorAll('annotation'));
+    return Array.from(element[0].querySelectorAll('annotation-omega'));
   };
   this.visibleReplies = function() {
     return Array.from(
@@ -81,8 +81,7 @@ describe('annotationThread', function() {
       },
     });
     const pageObject = new PageObject(element);
-    assert.equal(pageObject.annotations().length, 1);
-    assert.isTrue(pageObject.isHidden(pageObject.annotations()[0]));
+    assert.equal(pageObject.annotations().length, 0);
   });
 
   describe('onForceVisible', () => {
@@ -241,7 +240,6 @@ describe('annotationThread', function() {
       thread: thread,
     });
     assert.ok(element[0].querySelector('moderation-banner'));
-    assert.ok(element[0].querySelector('annotation'));
   });
 
   it('does not render the annotation or moderation banner if there is no annotation', function() {
@@ -259,11 +257,7 @@ describe('annotationThread', function() {
   });
 
   describe('preact-migrated Annotation component', () => {
-    it('renders `AnnotationOmega` when `client_preact_annotation` feature flag is enabled', () => {
-      fakeFeatures.flagEnabled
-        .withArgs('client_preact_annotation')
-        .returns(true);
-
+    it('renders `AnnotationOmega`', () => {
       const element = util.createDirective(document, 'annotationThread', {
         thread: {
           id: '1',
@@ -282,30 +276,6 @@ describe('annotationThread', function() {
 
       assert.notOk(element[0].querySelector('annotation'));
       assert.ok(element[0].querySelector('annotation-omega'));
-    });
-    it('does not render `AnnotationOmega` if `client_preact_annotation` feature flag is not enabled', () => {
-      fakeFeatures.flagEnabled
-        .withArgs('client_preact_annotation')
-        .returns(false);
-
-      const element = util.createDirective(document, 'annotationThread', {
-        thread: {
-          id: '1',
-          annotation: { id: '1', text: 'text' },
-          children: [
-            {
-              id: '2',
-              annotation: { id: '2', text: 'areply' },
-              children: [],
-              visible: true,
-            },
-          ],
-          visible: true,
-        },
-      });
-
-      assert.ok(element[0].querySelector('annotation'));
-      assert.notOk(element[0].querySelector('annotation-omega'));
     });
   });
 });
