@@ -4,9 +4,7 @@ import { $imports } from '../virtual-thread-list';
 describe('VirtualThreadList', function() {
   let lastState;
   let threadList;
-  const threadOptions = {
-    invisibleThreadFilter: null,
-  };
+  const threadOptions = {};
 
   let fakeScope;
   let fakeScrollRoot;
@@ -95,7 +93,6 @@ describe('VirtualThreadList', function() {
       innerHeight: 100,
     };
 
-    threadOptions.invisibleThreadFilter = sinon.stub().returns(false);
     threadOptions.scrollRoot = fakeScrollRoot;
 
     const rootThread = { annotation: undefined, children: [] };
@@ -145,19 +142,10 @@ describe('VirtualThreadList', function() {
       fakeScrollRoot.scrollTop = testCase.scrollOffset;
       fakeWindow.innerHeight = testCase.windowHeight;
 
-      // make sure for everything that is not being presented in the
-      // visible viewport, we pass it to this function.
-      threadOptions.invisibleThreadFilter.returns(true);
-
       threadList.setRootThread(thread);
 
       const visibleIDs = threadIDs(lastState.visibleThreads);
-      const invisibleIDs = threadIDs(lastState.invisibleThreads);
       assert.deepEqual(visibleIDs, testCase.expectedVisibleThreads);
-      assert.equal(
-        invisibleIDs.length,
-        testCase.threads - testCase.expectedVisibleThreads.length
-      );
       assert.equal(
         lastState.offscreenUpperHeight,
         testCase.expectedHeightAbove

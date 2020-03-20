@@ -3,9 +3,6 @@ import EventEmitter from 'tiny-emitter';
 
 /**
  * @typedef Options
- * @property {Function} [invisibleThreadFilter] - Function used to determine
- *   whether an off-screen thread should be rendered or not.  Called with a
- *   `Thread` and if it returns `true`, the thread is rendered even if offscreen.
  * @property {Element} [scrollRoot] - The scrollable Element which contains the
  *   thread list. The set of on-screen threads is determined based on the scroll
  *   position and height of this element.
@@ -35,8 +32,6 @@ export default class VirtualThreadList extends EventEmitter {
     super();
 
     this._rootThread = rootThread;
-
-    this._options = Object.assign({}, options);
 
     // Cache of thread ID -> last-seen height
     this._heights = {};
@@ -151,12 +146,6 @@ export default class VirtualThreadList extends EventEmitter {
     // actually be created.
     const visibleThreads = [];
 
-    // List of annotations which are required to be rendered but we do not
-    // want them visible. This is to ensure that we allow items to be rendered
-    // and initialized (for saving purposes) without having them be presented
-    // in out of context scenarios (i.e. in wrong order for sort)
-    const invisibleThreads = [];
-
     const allThreads = this._rootThread.children;
     const visibleHeight = this.window.innerHeight;
     let usedHeight = 0;
@@ -165,8 +154,6 @@ export default class VirtualThreadList extends EventEmitter {
     for (let i = 0; i < allThreads.length; i++) {
       thread = allThreads[i];
       const threadHeight = this._height(thread.id);
-
-      let added = false;
 
       if (
         usedHeight + threadHeight <
@@ -180,22 +167,9 @@ export default class VirtualThreadList extends EventEmitter {
       ) {
         // Thread is either in or close to the viewport
         visibleThreads.push(thread);
-        added = true;
       } else {
         // Thread is below viewport
         offscreenLowerHeight += threadHeight;
-      }
-
-      // any thread that is not going to go through the render process
-      // because it is already outside of the viewport should be checked
-      // to see if it needs to be added as an invisible render. So it will
-      // be available to go through rendering but not visible to the user
-      if (
-        !added &&
-        this._options.invisibleThreadFilter &&
-        this._options.invisibleThreadFilter(thread)
-      ) {
-        invisibleThreads.push(thread);
       }
 
       usedHeight += threadHeight;
@@ -205,13 +179,11 @@ export default class VirtualThreadList extends EventEmitter {
       offscreenLowerHeight: offscreenLowerHeight,
       offscreenUpperHeight: offscreenUpperHeight,
       visibleThreads: visibleThreads,
-      invisibleThreads: invisibleThreads,
     });
     return {
       offscreenLowerHeight,
       offscreenUpperHeight,
       visibleThreads,
-      invisibleThreads,
     };
   }
 }
