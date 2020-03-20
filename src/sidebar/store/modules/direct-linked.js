@@ -125,6 +125,17 @@ function clearDirectLinkedIds() {
   };
 }
 
+/**
+ * Selectors
+ */
+function directLinkedAnnotationId(state) {
+  return state.directLinked.directLinkedAnnotationId;
+}
+
+function directLinkedGroupId(state) {
+  return state.directLinked.directLinkedGroupId;
+}
+
 export default {
   init,
   namespace: 'directLinked',
@@ -136,5 +147,8 @@ export default {
     clearDirectLinkedGroupFetchFailed,
     clearDirectLinkedIds,
   },
-  selectors: {},
+  selectors: {
+    directLinkedAnnotationId,
+    directLinkedGroupId,
+  },
 };
