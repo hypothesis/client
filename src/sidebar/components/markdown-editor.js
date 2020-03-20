@@ -1,5 +1,5 @@
 import classnames from 'classnames';
-import { createElement } from 'preact';
+import { createElement, createRef } from 'preact';
 import { useEffect, useRef, useState } from 'preact/hooks';
 import propTypes from 'prop-types';
 
@@ -93,12 +93,14 @@ function handleToolbarCommand(command, inputEl) {
 }
 
 function ToolbarButton({
+  buttonRef,
   disabled = false,
   iconName,
   label = null,
   onClick,
   shortcutKey,
-  title,
+  tabIndex,
+  title = '',
 }) {
   let tooltip = title;
   if (shortcutKey) {
@@ -116,6 +118,8 @@ function ToolbarButton({
       disabled={disabled}
       onClick={onClick}
       title={tooltip}
+      tabIndex={tabIndex}
+      ref={buttonRef}
     >
       {iconName && (
         <SvgIcon
@@ -129,26 +133,142 @@ function ToolbarButton({
 }
 
 ToolbarButton.propTypes = {
+  buttonRef: propTypes.object.isRequired,
   disabled: propTypes.bool,
   iconName: propTypes.string,
   label: propTypes.string,
-  onClick: propTypes.func,
+  onClick: propTypes.func.isRequired,
   shortcutKey: propTypes.string,
+  tabIndex: propTypes.number.isRequired,
   title: propTypes.string,
 };
 
+/**
+ * @typedef {string} ButtonID
+ * A unique string that can be one of one of:
+ * [bold, italic, quote, link, image, math, numlist, list, preview, help]
+ */
+
+/**
+ * An array of toolbar elements with a roving tab stop. Left and right
+ * array keys can be used to change focus of the elements. Home and end
+ * keys will navigate to the first and last elements respectively.
+ *
+ * Canonical example
+ * https://www.w3.org/TR/wai-aria-practices/examples/toolbar/toolbar.html
+ */
 function Toolbar({ isPreviewing, onCommand, onTogglePreview }) {
+  const buttonIds = {
+    // Ordered buttons
+    bold: 0,
+    italic: 1,
+    quote: 2,
+    link: 3,
+    image: 4,
+    math: 5,
+    numlist: 6,
+    list: 7,
+    help: 8,
+    preview: 9,
+
+    // Total button count
+    maxId: 10,
+  };
+
+  // Keep track of a roving index. The active roving tabIndex
+  // is set to 0, and all other elements are set to -1.
+  const [rovingElement, setRovingElement] = useState(0);
+
+  // An array of refs
+  const buttonRefs = useRef([]).current;
+  if (buttonRefs.length === 0) {
+    // Initialize buttonRefs on first render only
+    for (let i = 0; i <= buttonIds.maxId; i++) {
+      buttonRefs.push(createRef());
+    }
+  }
+
+  /**
+   * Sets the element to be both focused and the active roving index.
+   *
+   * @param {number} index - Ordered index that matches the element
+   */
+  const setFocusedElement = index => {
+    setRovingElement(index);
+    buttonRefs[index].current.focus();
+  };
+
+  /**
+   * Handles left and right arrow navigation as well as home and end
+   * keys so the user may navigate the toolbar without multiple tab stops.
+   */
+  const handleKeyDown = e => {
+    let lowerLimit = 0;
+    const upperLimit = buttonIds.maxId - 1;
+    if (isPreviewing) {
+      // When isPreviewing is true, only allow navigation of
+      // the last 2 items.
+      lowerLimit = buttonIds.help;
+    }
+    let newFocusedElement = null;
+    switch (e.key) {
+      case 'ArrowLeft':
+        if (rovingElement <= lowerLimit) {
+          newFocusedElement = upperLimit;
+        } else {
+          newFocusedElement = rovingElement - 1;
+        }
+        break;
+      case 'ArrowRight':
+        if (rovingElement >= upperLimit) {
+          newFocusedElement = lowerLimit;
+        } else {
+          newFocusedElement = rovingElement + 1;
+        }
+        break;
+      case 'Home':
+        newFocusedElement = lowerLimit;
+        break;
+      case 'End':
+        newFocusedElement = upperLimit;
+        break;
+    }
+    if (newFocusedElement !== null) {
+      setFocusedElement(newFocusedElement);
+      e.preventDefault();
+    }
+  };
+
+  /**
+   * Returns the tab index value for a given element.
+   * Each element should be set to -1 unless its the
+   * active roving index, in which case it will be 0.
+   *
+   * @param {ButtonID} id
+   * @return {number} index - An index from `buttonIds`
+   */
+  const getTabIndex = index => {
+    if (rovingElement === index) {
+      return 0;
+    } else {
+      return -1;
+    }
+  };
+
   return (
     <div
       className="markdown-editor__toolbar"
       role="toolbar"
       aria-label="Markdown editor toolbar"
+      onKeyDown={handleKeyDown}
     >
       <ToolbarButton
         disabled={isPreviewing}
         iconName="format-bold"
         onClick={() => onCommand('bold')}
         shortcutKey={SHORTCUT_KEYS.bold}
+        buttonRef={buttonRefs[buttonIds.bold]}
+        tabIndex={getTabIndex(buttonIds.bold)}
         title="Bold"
       />
       <ToolbarButton
@@ -156,6 +276,8 @@ function Toolbar({ isPreviewing, onCommand, onTogglePreview }) {
         iconName="format-italic"
         onClick={() => onCommand('italic')}
         shortcutKey={SHORTCUT_KEYS.italic}
+        buttonRef={buttonRefs[buttonIds.italic]}
+        tabIndex={getTabIndex(buttonIds.italic)}
         title="Italic"
       />
       <ToolbarButton
@@ -163,6 +285,8 @@ function Toolbar({ isPreviewing, onCommand, onTogglePreview }) {
         iconName="format-quote"
         onClick={() => onCommand('quote')}
         shortcutKey={SHORTCUT_KEYS.quote}
+        buttonRef={buttonRefs[buttonIds.quote]}
+        tabIndex={getTabIndex(buttonIds.quote)}
         title="Quote"
       />
       <ToolbarButton
@@ -170,6 +294,8 @@ function Toolbar({ isPreviewing, onCommand, onTogglePreview }) {
         iconName="link"
         onClick={() => onCommand('link')}
         shortcutKey={SHORTCUT_KEYS.link}
+        buttonRef={buttonRefs[buttonIds.link]}
+        tabIndex={getTabIndex(buttonIds.link)}
         title="Insert link"
       />
       <ToolbarButton
@@ -177,12 +303,16 @@ function Toolbar({ isPreviewing, onCommand, onTogglePreview }) {
         iconName="image"
         onClick={() => onCommand('image')}
         shortcutKey={SHORTCUT_KEYS.image}
+        buttonRef={buttonRefs[buttonIds.image]}
+        tabIndex={getTabIndex(buttonIds.image)}
         title="Insert image"
       />
       <ToolbarButton
         disabled={isPreviewing}
         iconName="format-functions"
         onClick={() => onCommand('math')}
+        buttonRef={buttonRefs[buttonIds.math]}
+        tabIndex={getTabIndex(buttonIds.math)}
         title="Insert math (LaTeX is supported)"
       />
       <ToolbarButton
@@ -190,6 +320,8 @@ function Toolbar({ isPreviewing, onCommand, onTogglePreview }) {
         iconName="format-list-numbered"
         onClick={() => onCommand('numlist')}
         shortcutKey={SHORTCUT_KEYS.numlist}
+        buttonRef={buttonRefs[buttonIds.numlist]}
+        tabIndex={getTabIndex(buttonIds.numlist)}
         title="Numbered list"
       />
       <ToolbarButton
@@ -197,6 +329,8 @@ function Toolbar({ isPreviewing, onCommand, onTogglePreview }) {
         iconName="format-list-unordered"
         onClick={() => onCommand('list')}
         shortcutKey={SHORTCUT_KEYS.list}
+        buttonRef={buttonRefs[buttonIds.list]}
+        tabIndex={getTabIndex(buttonIds.list)}
         title="Bulleted list"
       />
       <span className="u-stretch" />
@@ -206,6 +340,8 @@ function Toolbar({ isPreviewing, onCommand, onTogglePreview }) {
           target="_blank"
           rel="noopener noreferrer"
           className="markdown-editor__toolbar-button"
+          ref={buttonRefs[buttonIds.help]}
+          tabIndex={getTabIndex(buttonIds.help)}
           title="Formatting help"
         >
           <SvgIcon
@@ -217,6 +353,8 @@ function Toolbar({ isPreviewing, onCommand, onTogglePreview }) {
       <ToolbarButton
         label={isPreviewing ? 'Write' : 'Preview'}
         onClick={onTogglePreview}
+        buttonRef={buttonRefs[buttonIds.preview]}
+        tabIndex={getTabIndex(buttonIds.preview)}
       />
     </div>
   );
