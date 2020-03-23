@@ -93,8 +93,8 @@ function AnnotationOmega({
   return (
     /* eslint-disable-next-line jsx-a11y/no-static-element-interactions */
     <div
-      className={classnames('annotation-omega', {
-        'annotation-omega--reply': isReply(annotation),
+      className={classnames('annotation', {
+        'annotation--reply': isReply(annotation),
         'is-collapsed': threadIsCollapsed,
       })}
       onKeyDown={onKeyDown}
@@ -116,8 +116,8 @@ function AnnotationOmega({
       />
       {isEditing && <TagEditor onEditTags={onEditTags} tagList={tags} />}
       {!isEditing && <TagList annotation={annotation} tags={tags} />}
-      <footer className="annotation-omega__footer">
-        <div className="annotation-omega__form-actions">
+      <footer className="annotation__footer">
+        <div className="annotation__form-actions">
           {isEditing && (
             <AnnotationPublishControl
               annotation={annotation}
@@ -127,19 +127,17 @@ function AnnotationOmega({
           )}
         </div>
         {shouldShowLicense && <AnnotationLicense />}
-        <div className="annotation-omega__controls">
+        <div className="annotation__controls">
           {shouldShowReplyToggle && (
             <Button
-              className="annotation-omega__reply-toggle"
+              className="annotation__reply-toggle"
               onClick={onToggleReplies}
               buttonText={toggleText}
             />
           )}
-          {isSaving && (
-            <div className="annotation-omega__actions">Saving...</div>
-          )}
+          {isSaving && <div className="annotation__actions">Saving...</div>}
           {shouldShowActions && (
-            <div className="annotation-omega__actions">
+            <div className="annotation__actions">
               <AnnotationActionBar annotation={annotation} onReply={onReply} />
             </div>
           )}

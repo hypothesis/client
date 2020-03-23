@@ -98,15 +98,15 @@ describe('AnnotationOmega', () => {
       fakeMetadata.isReply.returns(true);
 
       const wrapper = createComponent({ threadIsCollapsed: false });
-      const annot = wrapper.find('.annotation-omega');
+      const annot = wrapper.find('.annotation');
 
-      assert.isTrue(annot.hasClass('annotation-omega--reply'));
+      assert.isTrue(annot.hasClass('annotation--reply'));
       assert.isFalse(annot.hasClass('is-collapsed'));
     });
 
     it('should assign a collapsed class if the annotation thread is collapsed', () => {
       const wrapper = createComponent({ threadIsCollapsed: true });
-      const annot = wrapper.find('.annotation-omega');
+      const annot = wrapper.find('.annotation');
 
       assert.isTrue(annot.hasClass('is-collapsed'));
     });
@@ -250,7 +250,7 @@ describe('AnnotationOmega', () => {
         wrapper.update();
 
         assert.include(
-          wrapper.find('.annotation-omega__actions').text(),
+          wrapper.find('.annotation__actions').text(),
           'Saving...'
         );
       });
@@ -282,7 +282,7 @@ describe('AnnotationOmega', () => {
             const wrapper = createComponent();
 
             wrapper
-              .find('.annotation-omega')
+              .find('.annotation')
               .simulate('keydown', { key: 'Enter', ctrlKey: true });
 
             assert.calledWith(
@@ -295,7 +295,7 @@ describe('AnnotationOmega', () => {
             const wrapper = createComponent();
 
             wrapper
-              .find('.annotation-omega')
+              .find('.annotation')
               .simulate('keydown', { key: 'Enter', metaKey: true });
 
             assert.calledWith(
@@ -309,7 +309,7 @@ describe('AnnotationOmega', () => {
             const wrapper = createComponent();
 
             wrapper
-              .find('.annotation-omega')
+              .find('.annotation')
               .simulate('keydown', { key: 'g', metaKey: true });
 
             assert.notCalled(fakeAnnotationsService.save);
@@ -322,7 +322,7 @@ describe('AnnotationOmega', () => {
             const wrapper = createComponent();
 
             wrapper
-              .find('.annotation-omega')
+              .find('.annotation')
               .simulate('keydown', { key: 'Enter', metaKey: true });
 
             assert.notCalled(fakeAnnotationsService.save);
@@ -333,7 +333,7 @@ describe('AnnotationOmega', () => {
             const wrapper = createComponent();
 
             wrapper
-              .find('.annotation-omega')
+              .find('.annotation')
               .simulate('keydown', { key: 'Enter', ctrlKey: true });
 
             assert.notCalled(fakeAnnotationsService.save);
@@ -385,7 +385,7 @@ describe('AnnotationOmega', () => {
 
   describe('reply thread toggle button', () => {
     const findRepliesButton = wrapper =>
-      wrapper.find('Button').filter('.annotation-omega__reply-toggle');
+      wrapper.find('Button').filter('.annotation__reply-toggle');
 
     it('should render a toggle button if the annotation has replies', () => {
       fakeMetadata.isReply.returns(false);
