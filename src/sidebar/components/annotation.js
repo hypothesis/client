@@ -1,318 +1,169 @@
-import events from '../events';
-import { isThirdPartyUser } from '../util/account-id';
-import { isNew, isReply, isPageNote, quote } from '../util/annotation-metadata';
+import classnames from 'classnames';
+import { createElement } from 'preact';
+import { useState } from 'preact/hooks';
+import propTypes from 'prop-types';
+
+import useStore from '../store/use-store';
+import { isNew, isReply, quote } from '../util/annotation-metadata';
+import { isShared } from '../util/permissions';
+import { withServices } from '../util/service-context';
+
+import AnnotationActionBar from './annotation-action-bar';
+import AnnotationBody from './annotation-body';
+import AnnotationHeader from './annotation-header';
+import AnnotationLicense from './annotation-license';
+import AnnotationPublishControl from './annotation-publish-control';
+import AnnotationQuote from './annotation-quote';
+import Button from './button';
+import TagEditor from './tag-editor';
+import TagList from './tag-list';
 
 /**
- * Return a copy of `annotation` with changes made in the editor applied.
+ * A single annotation.
  */
-export function updateModel(annotation, changes, permissions) {
-  const userid = annotation.user;
-
-  return Object.assign({}, annotation, {
-    // Apply changes from the draft
-    tags: changes.tags,
-    text: changes.text,
-    permissions: changes.isPrivate
-      ? permissions.private(userid)
-      : permissions.shared(userid, annotation.group),
-  });
-}
-
-// @ngInject
-function AnnotationController(
-  $document,
-  $rootScope,
-  $timeout,
-  $window,
-  store,
-  annotationMapper,
-  api,
-  bridge,
+function Annotation({
+  annotation,
+  annotationsService,
   flash,
-  groups,
-  permissions,
-  serviceUrl,
-  session,
-  settings
-) {
-  const self = this;
-  let newlyCreatedByHighlightButton;
+  onReplyCountClick,
+  replyCount,
+  showDocumentInfo,
+  threadIsCollapsed,
+}) {
+  const createDraft = useStore(store => store.createDraft);
+  const setCollapsed = useStore(store => store.setCollapsed);
 
-  /** Save an annotation to the server. */
-  function save(annot) {
-    let saved;
-    const updating = !!annot.id;
+  // An annotation will have a draft if it is being edited
+  const draft = useStore(store => store.getDraft(annotation));
+  const group = useStore(store => store.getGroup(annotation.group));
+  const userid = useStore(store => store.profile().userid);
 
-    if (updating) {
-      saved = api.annotation.update({ id: annot.id }, annot);
-    } else {
-      saved = api.annotation.create({}, annot);
-    }
+  const isPrivate = draft ? draft.isPrivate : !isShared(annotation.permissions);
+  const tags = draft ? draft.tags : annotation.tags;
+  const text = draft ? draft.text : annotation.text;
 
-    return saved.then(function(savedAnnot) {
-      // Copy across internal properties which are not part of the annotation
-      // model saved on the server
-      savedAnnot.$tag = annot.$tag;
-      Object.keys(annot).forEach(function(k) {
-        if (k[0] === '$') {
-          savedAnnot[k] = annot[k];
-        }
-      });
+  const hasQuote = !!quote(annotation);
+  const isEmpty = !text && !tags.length;
 
-      return savedAnnot;
-    });
-  }
+  const [isSaving, setIsSaving] = useState(false);
+  const isEditing = !!draft && !isSaving;
 
-  /**
-   * Initialize the controller instance.
-   *
-   * All initialization code except for assigning the controller instance's
-   * methods goes here.
-   */
-  this.$onInit = () => {
-    /** True if the annotation is currently being saved. */
-    self.isSaving = false;
+  const toggleAction = threadIsCollapsed ? 'Show replies' : 'Hide replies';
+  const toggleText = `${toggleAction} (${replyCount})`;
 
-    /**
-     * `true` if this AnnotationController instance was created as a result of
-     * the highlight button being clicked.
-     *
-     * `false` if the annotation button was clicked, or if this is a highlight
-     * or annotation that was fetched from the server (as opposed to created
-     * new client-side).
-     */
-    newlyCreatedByHighlightButton = self.annotation.$highlight || false;
+  const shouldShowActions = !isSaving && !isEditing && !isNew(annotation);
+  const shouldShowLicense = isEditing && !isPrivate && group.type !== 'private';
+  const shouldShowReplyToggle = replyCount > 0 && !isReply(annotation);
+
+  const onEditTags = ({ tags }) => {
+    createDraft(annotation, { ...draft, tags });
   };
 
-  /**
-   * @ngdoc method
-   * @name annotation.AnnotationController#edit
-   * @description Switches the view to an editor.
-   */
-  this.edit = function() {
-    if (!store.getDraft(self.annotation)) {
-      store.createDraft(self.annotation, self.state());
+  const onEditText = ({ text }) => {
+    createDraft(annotation, { ...draft, text });
+  };
+
+  const onReply = () => annotationsService.reply(annotation, userid);
+
+  const onSave = async () => {
+    setIsSaving(true);
+    try {
+      await annotationsService.save(annotation);
+    } catch (err) {
+      flash.error(err.message, 'Saving annotation failed');
+    } finally {
+      setIsSaving(false);
     }
   };
 
-  /**
-   * @ngdoc method
-   * @name annotation.AnnotationController#editing.
-   * @returns {boolean} `true` if this annotation is currently being edited
-   *   (i.e. the annotation editor form should be open), `false` otherwise.
-   */
-  this.editing = function() {
-    return store.getDraft(self.annotation) && !self.isSaving;
-  };
-
-  /**
-   * @ngdoc method
-   * @name annotation.AnnotationController#group.
-   * @returns {Object} The full group object associated with the annotation.
-   */
-  this.group = function() {
-    return groups.get(self.annotation.group);
-  };
-
-  /**
-   * @ngdoc method
-   * @name annotation.AnnotaitonController#hasContent
-   * @returns {boolean} `true` if this annotation has content, `false`
-   *   otherwise.
-   */
-  this.hasContent = function() {
-    return self.state().text.length > 0 || self.state().tags.length > 0;
-  };
-
-  /**
-   * Return the annotation's quote if it has one or `null` otherwise.
-   */
-  this.quote = () => quote(self.annotation);
-
-  this.id = function() {
-    return self.annotation.id;
-  };
-
-  /**
-   * @ngdoc method
-   * @name annotation.AnnotationController#isHighlight.
-   * @returns {boolean} true if the annotation is a highlight, false otherwise
-   */
-  this.isHighlight = function() {
-    if (newlyCreatedByHighlightButton) {
-      return true;
-    } else if (isNew(self.annotation)) {
-      return false;
-    } else {
-      // Once an annotation has been saved to the server there's no longer a
-      // simple property that says whether it's a highlight or not. Instead an
-      // annotation is considered a highlight if it has a) content and b) is
-      // linked to a specific part of the document.
-      if (isPageNote(self.annotation) || isReply(self.annotation)) {
-        return false;
-      }
-      if (self.annotation.hidden) {
-        // Annotation has been censored so we have to assume that it had
-        // content.
-        return false;
-      }
-      return !self.hasContent();
+  // Allow saving of annotation by pressing CMD/CTRL-Enter
+  const onKeyDown = event => {
+    if (isEmpty || !isEditing) {
+      return;
     }
-  };
-
-  /**
-   * @ngdoc method
-   * @name annotation.AnnotationController#isShared
-   * @returns {boolean} True if the annotation is shared (either with the
-   * current group or with everyone).
-   */
-  this.isShared = function() {
-    return !self.state().isPrivate;
-  };
-
-  // Save on Meta + Enter or Ctrl + Enter.
-  this.onKeydown = function(event) {
-    if (event.keyCode === 13 && (event.metaKey || event.ctrlKey)) {
+    if ((event.metaKey || event.ctrlKey) && event.key === 'Enter') {
+      event.stopPropagation();
       event.preventDefault();
-      self.save();
+      onSave();
     }
   };
 
-  /**
-   * @ngdoc method
-   * @name annotation.AnnotationController#reply
-   * @description
-   * Creates a new message in reply to this annotation.
-   */
-  this.reply = function() {
-    const references = (self.annotation.references || []).concat(
-      self.annotation.id
-    );
-    const group = self.annotation.group;
-    let replyPermissions;
-    const userid = session.state.userid;
-    if (userid) {
-      replyPermissions = self.state().isPrivate
-        ? permissions.private(userid)
-        : permissions.shared(userid, group);
-    }
-    annotationMapper.createAnnotation({
-      group: group,
-      references: references,
-      permissions: replyPermissions,
-      target: [{ source: self.annotation.target[0].source }],
-      uri: self.annotation.uri,
-    });
-  };
+  const onToggleReplies = () => setCollapsed(annotation.id, !threadIsCollapsed);
 
-  this.save = function() {
-    if (!self.annotation.user) {
-      flash.info('Please log in to save your annotations.');
-      return Promise.resolve();
-    }
-    if (!self.hasContent() && self.isShared()) {
-      flash.info('Please add text or a tag before publishing.');
-      return Promise.resolve();
-    }
-
-    const updatedModel = updateModel(
-      self.annotation,
-      self.state(),
-      permissions
-    );
-
-    // Optimistically switch back to view mode and display the saving
-    // indicator
-    self.isSaving = true;
-
-    return save(updatedModel)
-      .then(function(model) {
-        Object.assign(updatedModel, model);
-
-        self.isSaving = false;
-
-        const event = isNew(self.annotation)
-          ? events.ANNOTATION_CREATED
-          : events.ANNOTATION_UPDATED;
-        store.removeDraft(self.annotation);
-
-        $rootScope.$broadcast(event, updatedModel);
-      })
-      .catch(function(err) {
-        self.isSaving = false;
-        self.edit();
-        flash.error(err.message, 'Saving annotation failed');
-      });
-  };
-
-  this.user = function() {
-    return self.annotation.user;
-  };
-
-  this.isThirdPartyUser = function() {
-    return isThirdPartyUser(self.annotation.user, settings.authDomain);
-  };
-
-  this.isDeleted = function() {
-    return store.hasPendingDeletion(self.annotation.id);
-  };
-
-  this.isReply = function() {
-    return isReply(self.annotation);
-  };
-
-  this.setText = function(text) {
-    store.createDraft(self.annotation, {
-      isPrivate: self.state().isPrivate,
-      tags: self.state().tags,
-      text: text,
-    });
-  };
-
-  this.setTags = function(tags) {
-    store.createDraft(self.annotation, {
-      isPrivate: self.state().isPrivate,
-      tags: tags,
-      text: self.state().text,
-    });
-  };
-
-  this.state = function() {
-    const draft = store.getDraft(self.annotation);
-    if (draft) {
-      return draft;
-    }
-    return {
-      tags: self.annotation.tags,
-      text: self.annotation.text,
-      isPrivate: !permissions.isShared(
-        self.annotation.permissions,
-        self.annotation.user
-      ),
-    };
-  };
-
-  /**
-   * Return true if the CC 0 license notice should be shown beneath the
-   * annotation body.
-   */
-  this.shouldShowLicense = function() {
-    if (!self.editing() || !self.isShared()) {
-      return false;
-    }
-    return self.group().type !== 'private';
-  };
+  return (
+    /* eslint-disable-next-line jsx-a11y/no-static-element-interactions */
+    <div
+      className={classnames('annotation', {
+        'annotation--reply': isReply(annotation),
+        'is-collapsed': threadIsCollapsed,
+      })}
+      onKeyDown={onKeyDown}
+    >
+      <AnnotationHeader
+        annotation={annotation}
+        isEditing={isEditing}
+        onReplyCountClick={onReplyCountClick}
+        replyCount={replyCount}
+        showDocumentInfo={showDocumentInfo}
+        threadIsCollapsed={threadIsCollapsed}
+      />
+      {hasQuote && <AnnotationQuote annotation={annotation} />}
+      <AnnotationBody
+        annotation={annotation}
+        isEditing={isEditing}
+        onEditText={onEditText}
+        text={text}
+      />
+      {isEditing && <TagEditor onEditTags={onEditTags} tagList={tags} />}
+      {!isEditing && <TagList annotation={annotation} tags={tags} />}
+      <footer className="annotation__footer">
+        <div className="annotation__form-actions">
+          {isEditing && (
+            <AnnotationPublishControl
+              annotation={annotation}
+              isDisabled={isEmpty}
+              onSave={onSave}
+            />
+          )}
+        </div>
+        {shouldShowLicense && <AnnotationLicense />}
+        <div className="annotation__controls">
+          {shouldShowReplyToggle && (
+            <Button
+              className="annotation__reply-toggle"
+              onClick={onToggleReplies}
+              buttonText={toggleText}
+            />
+          )}
+          {isSaving && <div className="annotation__actions">Saving...</div>}
+          {shouldShowActions && (
+            <div className="annotation__actions">
+              <AnnotationActionBar annotation={annotation} onReply={onReply} />
+            </div>
+          )}
+        </div>
+      </footer>
+    </div>
+  );
 }
 
-export default {
-  controller: AnnotationController,
-  controllerAs: 'vm',
-  bindings: {
-    annotation: '<',
-    showDocumentInfo: '<',
-    onReplyCountClick: '&',
-    replyCount: '<',
-    isCollapsed: '<',
-  },
-  template: require('../templates/annotation.html'),
+Annotation.propTypes = {
+  annotation: propTypes.object.isRequired,
+
+  /** Callback for reply-count clicks */
+  onReplyCountClick: propTypes.func.isRequired,
+  /** Number of replies to this annotation (thread) */
+  replyCount: propTypes.number.isRequired,
+  /** Should extended document info be rendered (e.g. in non-sidebar contexts)? */
+  showDocumentInfo: propTypes.bool.isRequired,
+  /** Is the thread to which this annotation belongs currently collapsed? */
+  threadIsCollapsed: propTypes.bool.isRequired,
+
+  /* Injected services */
+  annotationsService: propTypes.object.isRequired,
+  flash: propTypes.object.isRequired,
 };
+
+Annotation.injectedProps = ['annotationsService', 'flash'];
+
+export default withServices(Annotation);

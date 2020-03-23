@@ -7,7 +7,7 @@ import moderationBanner from '../moderation-banner';
 
 function PageObject(element) {
   this.annotations = function() {
-    return Array.from(element[0].querySelectorAll('annotation-omega'));
+    return Array.from(element[0].querySelectorAll('annotation'));
   };
   this.visibleReplies = function() {
     return Array.from(
@@ -254,28 +254,5 @@ describe('annotationThread', function() {
     });
     assert.notOk(element[0].querySelector('moderation-banner'));
     assert.notOk(element[0].querySelector('annotation'));
-  });
-
-  describe('preact-migrated Annotation component', () => {
-    it('renders `AnnotationOmega`', () => {
-      const element = util.createDirective(document, 'annotationThread', {
-        thread: {
-          id: '1',
-          annotation: { id: '1', text: 'text' },
-          children: [
-            {
-              id: '2',
-              annotation: { id: '2', text: 'areply' },
-              children: [],
-              visible: true,
-            },
-          ],
-          visible: true,
-        },
-      });
-
-      assert.notOk(element[0].querySelector('annotation'));
-      assert.ok(element[0].querySelector('annotation-omega'));
-    });
   });
 });

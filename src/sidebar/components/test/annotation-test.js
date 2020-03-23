@@ -1,631 +1,504 @@
-import angular from 'angular';
+import { mount } from 'enzyme';
+import { createElement } from 'preact';
+import { act } from 'preact/test-utils';
 
-import * as util from './angular-util';
-import events from '../../events';
 import * as fixtures from '../../test/annotation-fixtures';
-import annotationComponent from '../annotation';
-import { $imports, updateModel } from '../annotation';
 
-const inject = angular.mock.inject;
+import { checkAccessibility } from '../../../test-util/accessibility';
+import mockImportedComponents from '../../../test-util/mock-imported-components';
+import { waitFor } from '../../../test-util/wait';
 
-const draftFixtures = {
-  shared: { text: 'draft', tags: [], isPrivate: false },
-  private: { text: 'draft', tags: [], isPrivate: true },
-};
+// @TODO Note this import as `Annotation` for easier updating later
 
-const groupFixtures = {
-  private: {
-    id: 'private',
-    url: 'https://example.org/g/private',
-    type: 'private',
-  },
-  open: {
-    id: 'world',
-    url: 'https://example.org/g/open',
-    type: 'open',
-  },
-  restricted: {
-    id: 'restricto',
-    url: 'https://example.org/g/restricto',
-    type: 'restricted',
-  },
-};
+import Annotation from '../annotation';
+import { $imports } from '../annotation';
 
-describe('annotation', function() {
-  describe('updateModel()', function() {
-    function fakePermissions() {
-      return {
-        shared: function() {},
-        private: function() {},
-      };
+describe('Annotation', () => {
+  let fakeOnReplyCountClick;
+
+  // Dependency Mocks
+  let fakeMetadata;
+  let fakePermissions;
+
+  // Injected dependency mocks
+  let fakeAnnotationsService;
+  let fakeFlash;
+  let fakeStore;
+
+  const setEditingMode = (isEditing = true) => {
+    // The presence of a draft will make `isEditing` `true`
+    if (isEditing) {
+      fakeStore.getDraft.returns(fixtures.defaultDraft());
+    } else {
+      fakeStore.getDraft.returns(null);
     }
+  };
 
-    it('copies tags and text into the new model', function() {
-      const changes = { text: 'bar', tags: ['foo', 'bar'] };
-      const newModel = updateModel(
-        fixtures.defaultAnnotation(),
-        changes,
-        fakePermissions()
-      );
-      assert.deepEqual(newModel.tags, changes.tags);
-      assert.equal(newModel.text, changes.text);
-    });
+  const createComponent = props => {
+    return mount(
+      <Annotation
+        annotation={fixtures.defaultAnnotation()}
+        annotationsService={fakeAnnotationsService}
+        flash={fakeFlash}
+        onReplyCountClick={fakeOnReplyCountClick}
+        replyCount={0}
+        showDocumentInfo={false}
+        threadIsCollapsed={true}
+        {...props}
+      />
+    );
+  };
 
-    it('sets permissions to private if the draft is private', function() {
-      const changes = { isPrivate: true, text: 'bar', tags: ['foo', 'bar'] };
-      const annot = fixtures.defaultAnnotation();
-      const permissions = fakePermissions();
-      permissions.private = sinon.stub().returns('private permissions');
-      const newModel = updateModel(annot, changes, permissions);
-      assert.equal(newModel.permissions, 'private permissions');
-    });
+  beforeEach(() => {
+    fakeOnReplyCountClick = sinon.stub();
 
-    it('sets permissions to shared if the draft is shared', function() {
-      const changes = { isPrivate: false, text: 'bar', tags: ['foo', 'bar'] };
-      const annot = fixtures.defaultAnnotation();
-      const permissions = fakePermissions();
-      permissions.shared = sinon.stub().returns('shared permissions');
-      const newModel = updateModel(annot, changes, permissions);
-      assert.equal(newModel.permissions, 'shared permissions');
+    fakeAnnotationsService = {
+      reply: sinon.stub(),
+      save: sinon.stub().resolves(),
+    };
+
+    fakeFlash = {
+      error: sinon.stub(),
+    };
+
+    fakeMetadata = {
+      isNew: sinon.stub(),
+      isReply: sinon.stub(),
+      quote: sinon.stub(),
+    };
+
+    fakePermissions = {
+      isShared: sinon.stub().returns(true),
+    };
+
+    fakeStore = {
+      createDraft: sinon.stub(),
+      getDraft: sinon.stub().returns(null),
+      getGroup: sinon.stub().returns({
+        type: 'private',
+      }),
+      profile: sinon.stub().returns({ userid: 'acct:foo@bar.com' }),
+      setCollapsed: sinon.stub(),
+    };
+
+    $imports.$mock(mockImportedComponents());
+    $imports.$mock({
+      '../util/annotation-metadata': fakeMetadata,
+      '../util/permissions': fakePermissions,
+      '../store/use-store': callback => callback(fakeStore),
     });
   });
 
-  describe('AnnotationController', function() {
-    let $rootScope;
-    const fakeAccountID = {
-      isThirdPartyUser: sinon.stub(),
-    };
-    let fakeAnnotationMapper;
-    let fakeStore;
-    let fakeFlash;
-    let fakeGroups;
-    let fakePermissions;
-    let fakeServiceUrl;
-    let fakeSession;
-    let fakeSettings;
-    let fakeApi;
-    let fakeBridge;
-    let sandbox;
+  afterEach(() => {
+    $imports.$restore();
+  });
 
-    beforeEach(() => {
-      $imports.$mock({
-        '../util/account-id': fakeAccountID,
-      });
+  describe('annotation classnames', () => {
+    it('should assign a reply class if the annotation is a reply', () => {
+      fakeMetadata.isReply.returns(true);
+
+      const wrapper = createComponent({ threadIsCollapsed: false });
+      const annot = wrapper.find('.annotation');
+
+      assert.isTrue(annot.hasClass('annotation--reply'));
+      assert.isFalse(annot.hasClass('is-collapsed'));
     });
 
-    afterEach(() => {
-      $imports.$restore();
+    it('should assign a collapsed class if the annotation thread is collapsed', () => {
+      const wrapper = createComponent({ threadIsCollapsed: true });
+      const annot = wrapper.find('.annotation');
+
+      assert.isTrue(annot.hasClass('is-collapsed'));
+    });
+  });
+
+  describe('annotation quote', () => {
+    it('renders quote if annotation has a quote', () => {
+      fakeMetadata.quote.returns('quote');
+      const wrapper = createComponent();
+
+      const quote = wrapper.find('AnnotationQuote');
+      assert.isTrue(quote.exists());
     });
 
-    function createDirective(annotation) {
-      annotation = annotation || fixtures.defaultAnnotation();
-      const element = util.createDirective(document, 'annotation', {
-        annotation: annotation,
+    it('does not render quote if annotation does not have a quote', () => {
+      fakeMetadata.quote.returns(null);
+
+      const wrapper = createComponent();
+
+      const quote = wrapper.find('AnnotationQuote');
+      assert.isFalse(quote.exists());
+    });
+  });
+
+  describe('annotation body and excerpt', () => {
+    it('updates annotation draft when text edited', () => {
+      const wrapper = createComponent();
+      const body = wrapper.find('AnnotationBody');
+
+      act(() => {
+        body.props().onEditText({ text: 'updated text' });
       });
 
-      // A new annotation won't have any saved drafts yet.
-      if (!annotation.id) {
-        fakeStore.getDraft.returns(null);
-      }
+      const call = fakeStore.createDraft.getCall(0);
+      assert.calledOnce(fakeStore.createDraft);
+      assert.equal(call.args[1].text, 'updated text');
+    });
+  });
 
-      return {
-        annotation: annotation,
-        controller: element.ctrl,
-        element: element,
-        scope: element.scope,
-      };
-    }
+  describe('tags', () => {
+    it('renders tag editor if `isEditing', () => {
+      setEditingMode(true);
 
-    before(function() {
-      angular
-        .module('h', [])
-        .component('annotation', annotationComponent)
-        .component('annotationBody', {
-          bindings: {
-            isEditing: '<',
-            onEditText: '&',
-            text: '<',
-          },
-        })
-        .component('annotationQuote', {
-          bindings: {
-            annotation: '<',
-          },
+      const wrapper = createComponent();
+
+      assert.isTrue(wrapper.find('TagEditor').exists());
+      assert.isFalse(wrapper.find('TagList').exists());
+    });
+
+    it('updates annotation draft if tags changed', () => {
+      setEditingMode(true);
+      const wrapper = createComponent();
+
+      wrapper
+        .find('TagEditor')
+        .props()
+        .onEditTags({ tags: ['uno', 'dos'] });
+
+      const call = fakeStore.createDraft.getCall(0);
+      assert.calledOnce(fakeStore.createDraft);
+      assert.sameMembers(call.args[1].tags, ['uno', 'dos']);
+    });
+
+    it('renders tag list if not `isEditing', () => {
+      const wrapper = createComponent();
+
+      assert.isTrue(wrapper.find('TagList').exists());
+      assert.isFalse(wrapper.find('TagEditor').exists());
+    });
+  });
+
+  describe('publish control', () => {
+    it('should show the publish control if in edit mode', () => {
+      setEditingMode(true);
+
+      const wrapper = createComponent();
+
+      assert.isTrue(wrapper.find('AnnotationPublishControl').exists());
+    });
+
+    it('should not show the publish control if not in edit mode', () => {
+      setEditingMode(false);
+
+      const wrapper = createComponent();
+
+      assert.isFalse(wrapper.find('AnnotationPublishControl').exists());
+    });
+
+    it('should enable the publish control if the annotation is not empty', () => {
+      const draft = fixtures.defaultDraft();
+      draft.text = 'bananas';
+      fakeStore.getDraft.returns(draft);
+
+      const wrapper = createComponent();
+
+      assert.isFalse(
+        wrapper.find('AnnotationPublishControl').props().isDisabled
+      );
+    });
+
+    it('should set the publish control to disabled if annotation is empty', () => {
+      const draft = fixtures.defaultDraft();
+      draft.tags = [];
+      draft.text = '';
+      fakeStore.getDraft.returns(draft);
+
+      const wrapper = createComponent();
+
+      assert.isTrue(
+        wrapper.find('AnnotationPublishControl').props().isDisabled
+      );
+    });
+
+    context('saving an annotation', () => {
+      it('should save the annotation when the publish control invokes the `onSave` callback', () => {
+        setEditingMode(true);
+
+        const wrapper = createComponent();
+        wrapper
+          .find('AnnotationPublishControl')
+          .props()
+          .onSave();
+
+        assert.calledWith(
+          fakeAnnotationsService.save,
+          wrapper.props().annotation
+        );
+      });
+
+      it('should show a "Saving" message when annotation is saving', () => {
+        setEditingMode(true);
+
+        const wrapper = createComponent();
+        act(() => {
+          wrapper
+            .find('AnnotationPublishControl')
+            .props()
+            .onSave();
         });
+
+        wrapper.update();
+
+        assert.include(
+          wrapper.find('.annotation__actions').text(),
+          'Saving...'
+        );
+      });
+
+      it('should flash an error message on failure', async () => {
+        setEditingMode(true);
+        fakeAnnotationsService.save.rejects();
+
+        const wrapper = createComponent();
+        wrapper
+          .find('AnnotationPublishControl')
+          .props()
+          .onSave();
+
+        await waitFor(() => fakeFlash.error.called);
+      });
+
+      describe('saving using shortcut-key combo', () => {
+        context('in editing mode with text or tag content populated', () => {
+          beforeEach(() => {
+            // Put into editing mode by presence of draft, and add some `text`
+            // so that the annotation is not seen as "empty"
+            const draft = fixtures.defaultDraft();
+            draft.text = 'bananas';
+            fakeStore.getDraft.returns(draft);
+          });
+
+          it('should save annotation if `CTRL+Enter` is typed', () => {
+            const wrapper = createComponent();
+
+            wrapper
+              .find('.annotation')
+              .simulate('keydown', { key: 'Enter', ctrlKey: true });
+
+            assert.calledWith(
+              fakeAnnotationsService.save,
+              wrapper.props().annotation
+            );
+          });
+
+          it('should save annotation if `META+Enter` is typed', () => {
+            const wrapper = createComponent();
+
+            wrapper
+              .find('.annotation')
+              .simulate('keydown', { key: 'Enter', metaKey: true });
+
+            assert.calledWith(
+              fakeAnnotationsService.save,
+              wrapper.props().annotation
+            );
+          });
+
+          it('should not save annotation if `META+g` is typed', () => {
+            // i.e. don't save on non-"Enter" keys
+            const wrapper = createComponent();
+
+            wrapper
+              .find('.annotation')
+              .simulate('keydown', { key: 'g', metaKey: true });
+
+            assert.notCalled(fakeAnnotationsService.save);
+          });
+        });
+
+        context('empty or not in editing mode', () => {
+          it('should not save annotation if not in editing mode', () => {
+            fakeStore.getDraft.returns(null);
+            const wrapper = createComponent();
+
+            wrapper
+              .find('.annotation')
+              .simulate('keydown', { key: 'Enter', metaKey: true });
+
+            assert.notCalled(fakeAnnotationsService.save);
+          });
+
+          it('should not save annotation if content is empty', () => {
+            fakeStore.getDraft.returns(fixtures.defaultDraft());
+            const wrapper = createComponent();
+
+            wrapper
+              .find('.annotation')
+              .simulate('keydown', { key: 'Enter', ctrlKey: true });
+
+            assert.notCalled(fakeAnnotationsService.save);
+          });
+        });
+      });
+    });
+  });
+
+  describe('license information', () => {
+    it('should show license information when editing shared annotations in public groups', () => {
+      fakeStore.getGroup.returns({ type: 'open' });
+      setEditingMode(true);
+
+      const wrapper = createComponent();
+
+      assert.isTrue(wrapper.find('AnnotationLicense').exists());
     });
 
-    beforeEach(angular.mock.module('h'));
-    beforeEach(
-      angular.mock.module(function($provide) {
-        sandbox = sinon.createSandbox();
+    it('should not show license information when not editing', () => {
+      fakeStore.getGroup.returns({ type: 'open' });
+      setEditingMode(false);
 
-        fakeAnnotationMapper = {
-          createAnnotation: sandbox.stub().returns({
-            permissions: {
-              read: ['acct:bill@localhost'],
-              update: ['acct:bill@localhost'],
-              destroy: ['acct:bill@localhost'],
-              admin: ['acct:bill@localhost'],
-            },
-          }),
-        };
+      const wrapper = createComponent();
 
-        fakeStore = {
-          hasPendingDeletion: sinon.stub(),
-          updateFlagStatus: sandbox.stub().returns(true),
-          // draft store
-          countDrafts: sandbox.stub().returns(0),
-          createDraft: sandbox.stub(),
-          discardAllDrafts: sandbox.stub(),
-          getDraft: sandbox.stub().returns(null),
-          getDraftIfNotEmpty: sandbox.stub().returns(null),
-          removeDraft: sandbox.stub(),
-        };
+      assert.isFalse(wrapper.find('AnnotationLicense').exists());
+    });
 
-        fakeFlash = {
-          error: sandbox.stub(),
-        };
+    it('should not show license information for annotations in private groups', () => {
+      fakeStore.getGroup.returns({ type: 'private' });
+      setEditingMode(true);
 
-        fakeAccountID.isThirdPartyUser.reset();
-        fakeAccountID.isThirdPartyUser.returns(false);
+      const wrapper = createComponent();
 
-        fakePermissions = {
-          isShared: sandbox.stub().returns(true),
-          permits: sandbox.stub().returns(true),
-          shared: sandbox.stub().returns({
-            read: ['everybody'],
-          }),
-          private: sandbox.stub().returns({
-            read: ['justme'],
-          }),
-          setDefault: sandbox.stub(),
-        };
+      assert.isFalse(wrapper.find('AnnotationLicense').exists());
+    });
 
-        fakeSession = {
-          state: {
-            userid: 'acct:bill@localhost',
+    it('should not show license information for private annotations', () => {
+      const draft = fixtures.defaultDraft();
+      draft.isPrivate = true;
+      fakeStore.getGroup.returns({ type: 'open' });
+      fakeStore.getDraft.returns(draft);
+
+      const wrapper = createComponent();
+
+      assert.isFalse(wrapper.find('AnnotationLicense').exists());
+    });
+  });
+
+  describe('reply thread toggle button', () => {
+    const findRepliesButton = wrapper =>
+      wrapper.find('Button').filter('.annotation__reply-toggle');
+
+    it('should render a toggle button if the annotation has replies', () => {
+      fakeMetadata.isReply.returns(false);
+      const wrapper = createComponent({
+        replyCount: 5,
+        threadIsCollapsed: true,
+      });
+
+      assert.isTrue(findRepliesButton(wrapper).exists());
+      assert.equal(
+        findRepliesButton(wrapper).props().buttonText,
+        'Show replies (5)'
+      );
+    });
+
+    it('should not render a toggle button if the annotation has no replies', () => {
+      fakeMetadata.isReply.returns(false);
+      const wrapper = createComponent({
+        replyCount: 0,
+        threadIsCollapsed: true,
+      });
+
+      assert.isFalse(findRepliesButton(wrapper).exists());
+    });
+
+    it('should not render a toggle button if the annotation itself is a reply', () => {
+      fakeMetadata.isReply.returns(true);
+      const wrapper = createComponent({
+        replyCount: 5,
+        threadIsCollapsed: true,
+      });
+
+      assert.isFalse(findRepliesButton(wrapper).exists());
+    });
+
+    it('should toggle the collapsed state of the thread on click', () => {
+      fakeMetadata.isReply.returns(false);
+      const wrapper = createComponent({
+        replyCount: 5,
+        threadIsCollapsed: true,
+      });
+
+      act(() => {
+        findRepliesButton(wrapper)
+          .props()
+          .onClick();
+      });
+      wrapper.setProps({ threadIsCollapsed: false });
+
+      assert.calledOnce(fakeStore.setCollapsed);
+      assert.equal(
+        findRepliesButton(wrapper).props().buttonText,
+        'Hide replies (5)'
+      );
+    });
+  });
+
+  describe('annotation actions', () => {
+    describe('replying to an annotation', () => {
+      it('should create a reply', () => {
+        const theAnnot = fixtures.defaultAnnotation();
+        const wrapper = createComponent({ annotation: theAnnot });
+
+        wrapper
+          .find('AnnotationActionBar')
+          .props()
+          .onReply();
+
+        assert.calledOnce(fakeAnnotationsService.reply);
+        assert.calledWith(
+          fakeAnnotationsService.reply,
+          theAnnot,
+          'acct:foo@bar.com'
+        );
+      });
+    });
+
+    it('should show annotation actions', () => {
+      const wrapper = createComponent();
+
+      assert.isTrue(wrapper.find('AnnotationActionBar').exists());
+    });
+
+    it('should not show annotation actions when editing', () => {
+      setEditingMode(true);
+
+      const wrapper = createComponent();
+
+      assert.isFalse(wrapper.find('AnnotationActionBar').exists());
+    });
+
+    it('should not show annotation actions for new annotation', () => {
+      fakeMetadata.isNew.returns(true);
+
+      const wrapper = createComponent();
+
+      assert.isFalse(wrapper.find('AnnotationActionBar').exists());
+    });
+
+    it(
+      'should pass a11y checks',
+      checkAccessibility([
+        {
+          content: () => createComponent(),
+        },
+        {
+          name: 'When editing',
+          content: () => {
+            setEditingMode(true);
+            return createComponent();
           },
-        };
-
-        fakeServiceUrl = sinon.stub();
-
-        fakeGroups = {
-          focused: sinon.stub().returns(groupFixtures.open),
-          get: sinon.stub().returns(groupFixtures.open),
-        };
-
-        fakeSettings = {
-          // "localhost" is the host used by 'first party' annotation fixtures
-          authDomain: 'localhost',
-        };
-
-        fakeApi = {
-          annotation: {
-            create: sinon.spy(function(annot) {
-              return Promise.resolve(Object.assign({}, annot));
-            }),
-            update: sinon.spy(function(annot) {
-              return Promise.resolve(Object.assign({}, annot));
-            }),
-          },
-        };
-
-        fakeBridge = {
-          call: sinon.stub(),
-        };
-
-        $provide.value('annotationMapper', fakeAnnotationMapper);
-        $provide.value('store', fakeStore);
-        $provide.value('api', fakeApi);
-        $provide.value('bridge', fakeBridge);
-        $provide.value('flash', fakeFlash);
-        $provide.value('groups', fakeGroups);
-        $provide.value('permissions', fakePermissions);
-        $provide.value('session', fakeSession);
-        $provide.value('serviceUrl', fakeServiceUrl);
-        $provide.value('settings', fakeSettings);
-      })
+        },
+      ])
     );
-
-    beforeEach(inject(function(_$rootScope_) {
-      $rootScope = _$rootScope_;
-    }));
-
-    afterEach(function() {
-      sandbox.restore();
-    });
-
-    describe('#editing()', function() {
-      it('returns false if the annotation does not have a draft', function() {
-        const controller = createDirective().controller;
-        assert.notOk(controller.editing());
-      });
-
-      it('returns true if the annotation has a draft', function() {
-        const controller = createDirective().controller;
-        fakeStore.getDraft.returns({ tags: [], text: '', isPrivate: false });
-        assert.isTrue(controller.editing());
-      });
-
-      it('returns false if the annotation has a draft but is being saved', function() {
-        const controller = createDirective().controller;
-        fakeStore.getDraft.returns({ tags: [], text: '', isPrivate: false });
-        controller.isSaving = true;
-        assert.isFalse(controller.editing());
-      });
-    });
-
-    describe('#isHighlight()', function() {
-      it('returns true for new highlights', function() {
-        const annotation = fixtures.newHighlight();
-
-        const vm = createDirective(annotation).controller;
-
-        assert.isTrue(vm.isHighlight());
-      });
-
-      it('returns false for new annotations', function() {
-        const annotation = fixtures.newAnnotation();
-
-        const vm = createDirective(annotation).controller;
-
-        assert.isFalse(vm.isHighlight());
-      });
-
-      it('returns false for page notes', function() {
-        const annotation = fixtures.oldPageNote();
-
-        const vm = createDirective(annotation).controller;
-
-        assert.isFalse(vm.isHighlight());
-      });
-
-      it('returns false for replies', function() {
-        const annotation = fixtures.oldReply();
-
-        const vm = createDirective(annotation).controller;
-
-        assert.isFalse(vm.isHighlight());
-      });
-
-      it('returns false for annotations with text but no tags', function() {
-        const annotation = fixtures.oldAnnotation();
-        annotation.text = 'This is my annotation';
-        annotation.tags = [];
-
-        const vm = createDirective(annotation).controller;
-
-        assert.isFalse(vm.isHighlight());
-      });
-
-      it('returns false for annotations with tags but no text', function() {
-        const annotation = fixtures.oldAnnotation();
-        annotation.text = '';
-        annotation.tags = ['foo'];
-
-        const vm = createDirective(annotation).controller;
-
-        assert.isFalse(vm.isHighlight());
-      });
-
-      it('returns true for annotations with no text or tags', function() {
-        const annotation = fixtures.oldAnnotation();
-        annotation.text = '';
-        annotation.tags = [];
-
-        const vm = createDirective(annotation).controller;
-
-        assert.isTrue(vm.isHighlight());
-      });
-
-      it('returns false for censored annotations', function() {
-        const ann = Object.assign(fixtures.oldAnnotation(), {
-          hidden: true,
-          text: '',
-          tags: [],
-        });
-
-        const vm = createDirective(ann).controller;
-
-        assert.isFalse(vm.isHighlight());
-      });
-    });
-
-    describe('#reply', function() {
-      let annotation;
-
-      beforeEach(function() {
-        annotation = fixtures.defaultAnnotation();
-        annotation.permissions = {
-          read: ['acct:joe@localhost'],
-          update: ['acct:joe@localhost'],
-          destroy: ['acct:joe@localhost'],
-          admin: ['acct:joe@localhost'],
-        };
-      });
-
-      it('creates a new reply with the proper uri and references', function() {
-        const controller = createDirective(annotation).controller;
-        const reply = sinon.match({
-          references: [annotation.id],
-          target: [
-            {
-              source: annotation.target[0].source,
-            },
-          ],
-          uri: annotation.uri,
-        });
-        controller.reply();
-        assert.calledWith(fakeAnnotationMapper.createAnnotation, reply);
-      });
-
-      it('makes the reply shared if the parent is shared', function() {
-        const controller = createDirective(annotation).controller;
-        const perms = { read: ['agroup'] };
-        const reply = sinon.match({
-          references: [annotation.id],
-          permissions: perms,
-          uri: annotation.uri,
-        });
-        fakePermissions.isShared.returns(true);
-        fakePermissions.shared.returns(perms);
-        controller.reply();
-        assert.calledWith(fakeAnnotationMapper.createAnnotation, reply);
-      });
-
-      it('makes the reply private if the parent is private', function() {
-        const controller = createDirective(annotation).controller;
-        fakePermissions.isShared.returns(false);
-        const perms = { read: ['onlyme'] };
-        fakePermissions.private.returns(perms);
-        const reply = sinon.match({ permissions: perms });
-        controller.reply();
-        assert.calledWith(fakeAnnotationMapper.createAnnotation, reply);
-      });
-
-      it("sets the reply's group to be the same as its parent's", function() {
-        const annotation = fixtures.defaultAnnotation();
-        annotation.group = 'my group';
-        const controller = createDirective(annotation).controller;
-        const reply = sinon.match({ group: annotation.group });
-        controller.reply();
-        assert.calledWith(fakeAnnotationMapper.createAnnotation, reply);
-      });
-    });
-
-    describe('#hasContent', function() {
-      it('returns false if the annotation has no tags or text', function() {
-        const controller = createDirective(fixtures.oldHighlight()).controller;
-        assert.ok(!controller.hasContent());
-      });
-
-      it('returns true if the annotation has tags or text', function() {
-        const controller = createDirective(fixtures.oldAnnotation()).controller;
-        assert.ok(controller.hasContent());
-      });
-    });
-
-    describe('#quote', function() {
-      it("returns the annotation's quote", () => {
-        const ann = fixtures.defaultAnnotation();
-        const controller = createDirective(ann).controller;
-        ann.target[0].selector = [
-          { type: 'TextQuoteSelector', exact: 'test quote' },
-        ];
-        assert.equal(controller.quote(), 'test quote');
-      });
-    });
-
-    describe('#isThirdPartyUser', function() {
-      it('returns whether the user is a third party user', function() {
-        const { annotation, controller } = createDirective();
-
-        const returned = controller.isThirdPartyUser();
-
-        assert.calledOnce(fakeAccountID.isThirdPartyUser);
-        assert.alwaysCalledWithExactly(
-          fakeAccountID.isThirdPartyUser,
-          annotation.user,
-          fakeSettings.authDomain
-        );
-        assert.equal(returned, fakeAccountID.isThirdPartyUser());
-      });
-    });
-
-    describe('#isDeleted', function() {
-      it('returns true if the annotation has been marked as deleted', function() {
-        const controller = createDirective().controller;
-        fakeStore.hasPendingDeletion.returns(true);
-        assert.equal(controller.isDeleted(), true);
-      });
-
-      it('returns false if the annotation has not been marked as deleted', function() {
-        const controller = createDirective().controller;
-        fakeStore.hasPendingDeletion.returns(false);
-        assert.equal(controller.isDeleted(), false);
-      });
-    });
-
-    describe('#shouldShowLicense', function() {
-      [
-        {
-          case_: 'the annotation is not being edited',
-          draft: null,
-          group: groupFixtures.open,
-          expected: false,
-        },
-        {
-          case_: 'the draft is private',
-          draft: draftFixtures.private,
-          group: groupFixtures.open,
-          expected: false,
-        },
-        {
-          case_: 'the group is private',
-          draft: draftFixtures.shared,
-          group: groupFixtures.private,
-          expected: false,
-        },
-        {
-          case_: 'the draft is shared and the group is open',
-          draft: draftFixtures.shared,
-          group: groupFixtures.open,
-          expected: true,
-        },
-        {
-          case_: 'the draft is shared and the group is restricted',
-          draft: draftFixtures.shared,
-          group: groupFixtures.restricted,
-          expected: true,
-        },
-      ].forEach(testCase => {
-        it(`returns ${testCase.expected} if ${testCase.case_}`, () => {
-          const ann = fixtures.publicAnnotation();
-          ann.group = testCase.group.id;
-          fakeStore.getDraft.returns(testCase.draft);
-          fakeGroups.get.returns(testCase.group);
-
-          const controller = createDirective(ann).controller;
-
-          assert.equal(controller.shouldShowLicense(), testCase.expected);
-        });
-      });
-    });
-
-    describe('saving a new annotation', function() {
-      let annotation;
-
-      beforeEach(function() {
-        annotation = fixtures.newAnnotation();
-      });
-
-      function createController() {
-        return createDirective(annotation).controller;
-      }
-
-      it('removes the draft when saving an annotation succeeds', function() {
-        const controller = createController();
-        return controller.save().then(function() {
-          assert.calledWith(fakeStore.removeDraft, annotation);
-        });
-      });
-
-      it('emits annotationCreated when saving an annotation succeeds', function() {
-        const controller = createController();
-        sandbox.spy($rootScope, '$broadcast');
-        return controller.save().then(function() {
-          assert.calledWith($rootScope.$broadcast, events.ANNOTATION_CREATED);
-        });
-      });
-
-      it('flashes an error if saving the annotation fails on the server', function() {
-        const controller = createController();
-        const err = new Error('500 Server Error');
-        fakeApi.annotation.create = sinon.stub().returns(Promise.reject(err));
-        return controller.save().then(function() {
-          assert.calledWith(
-            fakeFlash.error,
-            '500 Server Error',
-            'Saving annotation failed'
-          );
-        });
-      });
-
-      it("doesn't flash an error when saving an annotation succeeds", function() {
-        const controller = createController();
-        return controller.save().then(function() {
-          assert.notCalled(fakeFlash.error);
-        });
-      });
-
-      it('shows a saving indicator when saving an annotation', function() {
-        const controller = createController();
-        let create;
-        fakeApi.annotation.create = sinon.stub().returns(
-          new Promise(function(resolve) {
-            create = resolve;
-          })
-        );
-        const saved = controller.save();
-        assert.equal(controller.isSaving, true);
-        create(Object.assign({}, controller.annotation, { id: 'new-id' }));
-        return saved.then(function() {
-          assert.equal(controller.isSaving, false);
-        });
-      });
-
-      it('does not remove the draft if saving fails', function() {
-        const controller = createController();
-        fakeApi.annotation.create = sinon
-          .stub()
-          .returns(Promise.reject({ status: -1 }));
-        return controller.save().then(function() {
-          assert.notCalled(fakeStore.removeDraft);
-        });
-      });
-    });
-
-    describe('saving an edited an annotation', function() {
-      let annotation;
-
-      beforeEach(function() {
-        annotation = fixtures.defaultAnnotation();
-        fakeStore.getDraft.returns({ text: 'unsaved change' });
-      });
-
-      function createController() {
-        return createDirective(annotation).controller;
-      }
-
-      it('flashes an error if saving the annotation fails on the server', function() {
-        const controller = createController();
-        const err = new Error('500 Server Error');
-        fakeApi.annotation.update = sinon.stub().returns(Promise.reject(err));
-        return controller.save().then(function() {
-          assert.calledWith(
-            fakeFlash.error,
-            '500 Server Error',
-            'Saving annotation failed'
-          );
-        });
-      });
-
-      it("doesn't flash an error if saving the annotation succeeds", function() {
-        const controller = createController();
-        return controller.save().then(function() {
-          assert.notCalled(fakeFlash.error);
-        });
-      });
-    });
-
-    describe('drafts', function() {
-      it('starts editing immediately if there is a draft', function() {
-        fakeStore.getDraft.returns({
-          tags: ['unsaved'],
-          text: 'unsaved-text',
-        });
-        const controller = createDirective().controller;
-        assert.isTrue(controller.editing());
-      });
-
-      it('uses the text and tags from the draft if present', function() {
-        fakeStore.getDraft.returns({
-          tags: ['unsaved-tag'],
-          text: 'unsaved-text',
-        });
-        const controller = createDirective().controller;
-        assert.deepEqual(controller.state().tags, ['unsaved-tag']);
-        assert.equal(controller.state().text, 'unsaved-text');
-      });
-
-      it('removes the draft when changes are saved', function() {
-        const annotation = fixtures.defaultAnnotation();
-        const controller = createDirective(annotation).controller;
-        fakeStore.getDraft.returns({ text: 'unsaved changes' });
-        return controller.save().then(function() {
-          assert.calledWith(fakeStore.removeDraft, annotation);
-        });
-      });
-    });
   });
 });
