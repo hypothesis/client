@@ -82,7 +82,7 @@
     "postcss": "^7.0.13",
     "postcss-url": "^8.0.0",
     "preact": "^10.0.4",
-    "prettier": "1.19.1",
+    "prettier": "2.0.1",
     "puppeteer": "^2.0.0",
     "query-string": "^3.0.1",
     "redux": "^4.0.1",
