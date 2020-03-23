@@ -32,64 +32,57 @@ describe('websocket wrapper', function() {
     console.warn.restore();
   });
 
-  it('should reconnect after an abnormal disconnection', function() {
-    new Socket('ws://test:1234');
-    assert.ok(fakeSocket);
-    const initialSocket = fakeSocket;
-    fakeSocket.onopen({});
-    fakeSocket.onclose({ code: CLOSE_ABNORMAL });
-    clock.tick(2000);
-    assert.ok(fakeSocket);
-    assert.notEqual(fakeSocket, initialSocket);
-  });
-
-  it('should reconnect if initial connection fails', function() {
-    new Socket('ws://test:1234');
-    assert.ok(fakeSocket);
-    const initialSocket = fakeSocket;
-    fakeSocket.onopen({});
-    fakeSocket.onclose({ code: CLOSE_ABNORMAL });
-    clock.tick(4000);
-    assert.ok(fakeSocket);
-    assert.notEqual(fakeSocket, initialSocket);
-  });
-
-  it('should send queued messages after a reconnect', function() {
-    // simulate WebSocket setup and initial connection
-    const socket = new Socket('ws://test:1234');
-    fakeSocket.onopen({});
-
-    // simulate abnormal disconnection
-    fakeSocket.onclose({ code: CLOSE_ABNORMAL });
-
-    // enqueue a message and check that it is sent after the WS reconnects
-    socket.send({ aKey: 'aValue' });
-    fakeSocket.onopen({});
-    assert.calledWith(fakeSocket.send, '{"aKey":"aValue"}');
-  });
-
-  [CLOSE_NORMAL, CLOSE_GOING_AWAY].forEach(closeCode => {
-    it('should not reconnect after a normal disconnection by the client', function() {
+  context('when the connection is closed by the browser or server', () => {
+    it('should reconnect after an abnormal disconnection', function() {
       new Socket('ws://test:1234');
       assert.ok(fakeSocket);
       const initialSocket = fakeSocket;
-
       fakeSocket.onopen({});
-      fakeSocket.onclose({ code: closeCode });
-      clock.tick(4000);
-
+      fakeSocket.onclose({ code: CLOSE_ABNORMAL });
+      clock.tick(2000);
       assert.ok(fakeSocket);
-      assert.equal(fakeSocket, initialSocket);
+      assert.notEqual(fakeSocket, initialSocket);
     });
-  });
 
-  it('should not reconnect after a normal disconnection by the server', function() {
-    const socket = new Socket('ws://test:1234');
-    socket.close();
-    assert.called(fakeSocket.close);
-    const initialSocket = fakeSocket;
-    clock.tick(2000);
-    assert.equal(fakeSocket, initialSocket);
+    it('should reconnect if initial connection fails', function() {
+      new Socket('ws://test:1234');
+      assert.ok(fakeSocket);
+      const initialSocket = fakeSocket;
+      fakeSocket.onopen({});
+      fakeSocket.onclose({ code: CLOSE_ABNORMAL });
+      clock.tick(4000);
+      assert.ok(fakeSocket);
+      assert.notEqual(fakeSocket, initialSocket);
+    });
+
+    it('should send queued messages after a reconnect', function() {
+      // simulate WebSocket setup and initial connection
+      const socket = new Socket('ws://test:1234');
+      fakeSocket.onopen({});
+
+      // simulate abnormal disconnection
+      fakeSocket.onclose({ code: CLOSE_ABNORMAL });
+
+      // enqueue a message and check that it is sent after the WS reconnects
+      socket.send({ aKey: 'aValue' });
+      fakeSocket.onopen({});
+      assert.calledWith(fakeSocket.send, '{"aKey":"aValue"}');
+    });
+
+    [CLOSE_NORMAL, CLOSE_GOING_AWAY].forEach(closeCode => {
+      it('should not reconnect after a normal disconnection', function() {
+        new Socket('ws://test:1234');
+        assert.ok(fakeSocket);
+        const initialSocket = fakeSocket;
+
+        fakeSocket.onopen({});
+        fakeSocket.onclose({ code: closeCode });
+        clock.tick(4000);
+
+        assert.ok(fakeSocket);
+        assert.equal(fakeSocket, initialSocket);
+      });
+    });
   });
 
   it('should queue messages sent prior to connection', function() {
@@ -105,5 +98,23 @@ describe('websocket wrapper', function() {
     fakeSocket.readyState = FakeWebSocket.OPEN;
     socket.send({ abc: 'foo' });
     assert.calledWith(fakeSocket.send, '{"abc":"foo"}');
+  });
+
+  describe('#close', () => {
+    it('should close the socket with a normal status', () => {
+      const socket = new Socket('ws://test:1234');
+      socket.close();
+      assert.calledWith(fakeSocket.close, CLOSE_NORMAL);
+    });
+
+    it('should not reconnect after closing', () => {
+      const socket = new Socket('ws://test:1234');
+      const initialSocket = fakeSocket;
+
+      socket.close();
+
+      clock.tick(2000);
+      assert.equal(fakeSocket, initialSocket);
+    });
   });
 });
