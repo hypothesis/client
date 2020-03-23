@@ -14,25 +14,13 @@
       annotation="vm.thread.annotation"
       ng-if="vm.thread.annotation">
     </moderation-banner>
-    <annotation-omega ng-if="vm.shouldShowAnnotationOmega() && vm.thread.annotation"
+    <annotation-omega ng-if="vm.thread.annotation && vm.thread.visible"
       annotation="vm.thread.annotation"
       reply-count="vm.thread.replyCount"
       on-reply-count-click="vm.toggleCollapsed()"
       show-document-info="vm.showDocumentInfo"
       thread-is-collapsed="vm.thread.collapsed">
     </annotation-omega>
-    <annotation ng-class="vm.annotationClasses()"
-             annotation="vm.thread.annotation"
-             is-collapsed="vm.thread.collapsed"
-             name="annotation"
-             ng-mouseenter="vm.annotationHovered = true"
-             ng-mouseleave="vm.annotationHovered = false"
-             ng-if="vm.thread.annotation && !vm.shouldShowAnnotationOmega()"
-             ng-show="vm.thread.visible"
-             show-document-info="vm.showDocumentInfo"
-             on-reply-count-click="vm.toggleCollapsed()"
-             reply-count="vm.thread.replyCount">
-    </annotation>
 
     <div ng-if="!vm.thread.annotation" class="thread-deleted">
       <p><em>Message not available.</em></p>
