@@ -133,11 +133,11 @@ function autosave(autosaveService) {
 
 // Preact UI components that are wrapped for use within Angular templates.
 
+import Annotation from './components/annotation';
 import AnnotationActionBar from './components/annotation-action-bar';
 import AnnotationBody from './components/annotation-body';
 import AnnotationHeader from './components/annotation-header';
 import AnnotationLicense from './components/annotation-license';
-import AnnotationOmega from './components/annotation-omega';
 import AnnotationPublishControl from './components/annotation-publish-control';
 import AnnotationQuote from './components/annotation-quote';
 import FocusedModeHeader from './components/focused-mode-header';
@@ -265,11 +265,11 @@ function startAngularApp(config) {
     .component('hypothesisApp', hypothesisApp)
 
     // UI components
+    .component('annotation', wrapComponent(Annotation))
     .component('annotationBody', wrapComponent(AnnotationBody))
     .component('annotationHeader', wrapComponent(AnnotationHeader))
     .component('annotationActionBar', wrapComponent(AnnotationActionBar))
     .component('annotationLicense', wrapComponent(AnnotationLicense))
-    .component('annotationOmega', wrapComponent(AnnotationOmega))
     .component(
       'annotationPublishControl',
       wrapComponent(AnnotationPublishControl)

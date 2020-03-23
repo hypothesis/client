@@ -10,10 +10,10 @@ import { waitFor } from '../../../test-util/wait';
 
 // @TODO Note this import as `Annotation` for easier updating later
 
-import Annotation from '../annotation-omega';
-import { $imports } from '../annotation-omega';
+import Annotation from '../annotation';
+import { $imports } from '../annotation';
 
-describe('AnnotationOmega', () => {
+describe('Annotation', () => {
   let fakeOnReplyCountClick;
 
   // Dependency Mocks

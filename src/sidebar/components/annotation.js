@@ -19,9 +19,9 @@ import TagEditor from './tag-editor';
 import TagList from './tag-list';
 
 /**
- * The "new", migrated-to-preact annotation component.
+ * A single annotation.
  */
-function AnnotationOmega({
+function Annotation({
   annotation,
   annotationsService,
   flash,
@@ -147,7 +147,7 @@ function AnnotationOmega({
   );
 }
 
-AnnotationOmega.propTypes = {
+Annotation.propTypes = {
   annotation: propTypes.object.isRequired,
 
   /** Callback for reply-count clicks */
@@ -164,6 +164,6 @@ AnnotationOmega.propTypes = {
   flash: propTypes.object.isRequired,
 };
 
-AnnotationOmega.injectedProps = ['annotationsService', 'flash'];
+Annotation.injectedProps = ['annotationsService', 'flash'];
 
-export default withServices(AnnotationOmega);
+export default withServices(Annotation);
