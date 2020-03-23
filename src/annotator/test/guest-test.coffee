@@ -4,7 +4,6 @@ Plugin = require('../plugin')
 
 Delegator = require('../delegator')
 $ = require('jquery')
-Delegator['@noCallThru'] = true
 
 Guest = require('../guest')
 { $imports } = require('../guest')
@@ -12,7 +11,6 @@ rangeUtil = null
 selections = null
 
 scrollIntoView = sinon.stub()
-scrollIntoView['@noCallThru'] = true
 
 class FakeAdder
   instance: null
