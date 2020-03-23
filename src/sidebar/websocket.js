@@ -1,8 +1,19 @@
 import retry from 'retry';
 import EventEmitter from 'tiny-emitter';
 
-// see https://developer.mozilla.org/en-US/docs/Web/API/CloseEvent
-const CLOSE_NORMAL = 1000;
+// Status codes indicating the reason why a WebSocket connection closed.
+// See https://developer.mozilla.org/en-US/docs/Web/API/CloseEvent and
+// https://tools.ietf.org/html/rfc6455#section-7.4.
+
+// "Normal" closures.
+export const CLOSE_NORMAL = 1000;
+export const CLOSE_GOING_AWAY = 1001;
+
+// "Abnormal" closures.
+export const CLOSE_ABNORMAL = 1006;
+
+// There are other possible close status codes not listed here. They are all
+// considered abnormal closures.
 
 // Minimum delay, in ms, before reconnecting after an abnormal connection close.
 const RECONNECT_MIN_DELAY = 1000;
@@ -60,7 +71,7 @@ export default class Socket extends EventEmitter {
           self.emit('open', event);
         };
         socket.onclose = function(event) {
-          if (event.code === CLOSE_NORMAL) {
+          if (event.code === CLOSE_NORMAL || event.code === CLOSE_GOING_AWAY) {
             self.emit('close', event);
             return;
           }
@@ -109,7 +120,20 @@ export default class Socket extends EventEmitter {
 
     /** Close the underlying WebSocket connection */
     this.close = function() {
-      socket.close();
+      // nb. Always sent a status code in the `close()` call to work around
+      // a problem in the backend's ws4py library.
+      //
+      // If no status code is provided in the `close()` call, the browser will
+      // send a close frame with no payload, which is allowed by the spec.
+      // ws4py however, will respond by sending back a close frame with a 1005
+      // status code, which is not allowed by the spec. What ws4py should do in
+      // that scenario is send back a close frame with no payload itself. This
+      // invalid close frame causes browsers to report an abnormal WS
+      // termination, even though nothing really went wrong.
+      //
+      // To avoid the problem, we just explicitly send a "closed normally"
+      // status code here and ws4py will respond with the same status.
+      socket.close(CLOSE_NORMAL);
     };
 
     /**
