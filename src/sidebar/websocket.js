@@ -1,8 +1,19 @@
 import retry from 'retry';
 import EventEmitter from 'tiny-emitter';
 
-// see https://developer.mozilla.org/en-US/docs/Web/API/CloseEvent
-const CLOSE_NORMAL = 1000;
+// Status codes indicating the reason why a WebSocket connection closed.
+// See https://developer.mozilla.org/en-US/docs/Web/API/CloseEvent and
+// https://tools.ietf.org/html/rfc6455#section-7.4.
+
+// "Normal" closures.
+export const CLOSE_NORMAL = 1000;
+export const CLOSE_GOING_AWAY = 1001;
+
+// "Abnormal" closures.
+export const CLOSE_ABNORMAL = 1006;
+
+// There are other possible close status codes not listed here. They are all
+// considered abnormal closures.
 
 // Minimum delay, in ms, before reconnecting after an abnormal connection close.
 const RECONNECT_MIN_DELAY = 1000;
@@ -60,7 +71,7 @@ export default class Socket extends EventEmitter {
           self.emit('open', event);
         };
         socket.onclose = function(event) {
-          if (event.code === CLOSE_NORMAL) {
+          if (event.code === CLOSE_NORMAL || event.code === CLOSE_GOING_AWAY) {
             self.emit('close', event);
             return;
           }

@@ -1,4 +1,8 @@
-import Socket from '../websocket';
+import Socket, {
+  CLOSE_NORMAL,
+  CLOSE_GOING_AWAY,
+  CLOSE_ABNORMAL,
+} from '../websocket';
 
 describe('websocket wrapper', function() {
   let fakeSocket;
@@ -33,7 +37,7 @@ describe('websocket wrapper', function() {
     assert.ok(fakeSocket);
     const initialSocket = fakeSocket;
     fakeSocket.onopen({});
-    fakeSocket.onclose({ code: 1006 });
+    fakeSocket.onclose({ code: CLOSE_ABNORMAL });
     clock.tick(2000);
     assert.ok(fakeSocket);
     assert.notEqual(fakeSocket, initialSocket);
@@ -44,7 +48,7 @@ describe('websocket wrapper', function() {
     assert.ok(fakeSocket);
     const initialSocket = fakeSocket;
     fakeSocket.onopen({});
-    fakeSocket.onclose({ code: 1006 });
+    fakeSocket.onclose({ code: CLOSE_ABNORMAL });
     clock.tick(4000);
     assert.ok(fakeSocket);
     assert.notEqual(fakeSocket, initialSocket);
@@ -56,7 +60,7 @@ describe('websocket wrapper', function() {
     fakeSocket.onopen({});
 
     // simulate abnormal disconnection
-    fakeSocket.onclose({ code: 1006 });
+    fakeSocket.onclose({ code: CLOSE_ABNORMAL });
 
     // enqueue a message and check that it is sent after the WS reconnects
     socket.send({ aKey: 'aValue' });
@@ -64,7 +68,22 @@ describe('websocket wrapper', function() {
     assert.calledWith(fakeSocket.send, '{"aKey":"aValue"}');
   });
 
-  it('should not reconnect after a normal disconnection', function() {
+  [CLOSE_NORMAL, CLOSE_GOING_AWAY].forEach(closeCode => {
+    it('should not reconnect after a normal disconnection by the client', function() {
+      new Socket('ws://test:1234');
+      assert.ok(fakeSocket);
+      const initialSocket = fakeSocket;
+
+      fakeSocket.onopen({});
+      fakeSocket.onclose({ code: closeCode });
+      clock.tick(4000);
+
+      assert.ok(fakeSocket);
+      assert.equal(fakeSocket, initialSocket);
+    });
+  });
+
+  it('should not reconnect after a normal disconnection by the server', function() {
     const socket = new Socket('ws://test:1234');
     socket.close();
     assert.called(fakeSocket.close);
