@@ -1,4 +1,3 @@
-raf = require('raf')
 Hammer = require('hammerjs')
 
 Host = require('./host')
@@ -130,7 +129,7 @@ module.exports = class Sidebar extends Host
     return if @renderFrame
 
     # Schedule a frame
-    @renderFrame = raf =>
+    @renderFrame = requestAnimationFrame =>
       @renderFrame = null  # Clear the schedule
 
       # Process the resize gesture

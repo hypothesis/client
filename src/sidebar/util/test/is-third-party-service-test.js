@@ -11,7 +11,6 @@ describe('sidebar.util.isThirdPartyService', () => {
 
     $imports.$mock({
       '../service-config': fakeServiceConfig,
-      '@noCallThru': true,
     });
   });
 
