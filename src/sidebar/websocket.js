@@ -120,16 +120,16 @@ export default class Socket extends EventEmitter {
 
     /** Close the underlying WebSocket connection */
     this.close = function() {
-      // nb. h's ws4py-based WebSocket server will currently use whatever
-      // status code we call `close()` with as the status code in its response.
+      // nb. Always sent a status code in the `close()` call to work around
+      // a problem in the backend's ws4py library.
       //
-      // If no status code is provided, the browser will send a close frame
-      // with no payload, which is allowed by the spec. ws4py however, will
-      // respond by sending back a close frame with a 1005 status code, which
-      // is not allowed by the spec. What ws4py should do in that scenario is
-      // send back a close frame with no payload itself. This invalid close frame
-      // causes browsers to report an abnormal WS termination, even though
-      // nothing really went wrong.
+      // If no status code is provided in the `close()` call, the browser will
+      // send a close frame with no payload, which is allowed by the spec.
+      // ws4py however, will respond by sending back a close frame with a 1005
+      // status code, which is not allowed by the spec. What ws4py should do in
+      // that scenario is send back a close frame with no payload itself. This
+      // invalid close frame causes browsers to report an abnormal WS
+      // termination, even though nothing really went wrong.
       //
       // To avoid the problem, we just explicitly send a "closed normally"
       // status code here and ws4py will respond with the same status.
