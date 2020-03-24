@@ -72,7 +72,7 @@ export default function RootThread(
     }
 
     let threadFilterFn;
-    if (state.viewer.isSidebar && !shouldFilterThread()) {
+    if (state.route.name === 'sidebar' && !shouldFilterThread()) {
       threadFilterFn = function(thread) {
         if (!thread.annotation) {
           return false;

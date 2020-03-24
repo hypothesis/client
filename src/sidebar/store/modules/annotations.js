@@ -9,6 +9,8 @@ import * as metadata from '../../util/annotation-metadata';
 import * as arrayUtil from '../../util/array';
 import * as util from '../util';
 
+import route from './route';
+
 /**
  * Return a copy of `current` with all matching annotations in `annotations`
  * removed.
@@ -241,7 +243,7 @@ function addAnnotations(annotations) {
     // If we're not in the sidebar, we're done here.
     // FIXME Split the annotation-adding from the anchoring code; possibly
     // move into service
-    if (!getState().viewer.isSidebar) {
+    if (route.selectors.route(getState()) !== 'sidebar') {
       return;
     }
 

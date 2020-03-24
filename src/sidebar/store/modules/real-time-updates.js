@@ -9,7 +9,7 @@ import { actionTypes } from '../util';
 
 import annotations from './annotations';
 import groups from './groups';
-import viewer from './viewer';
+import route from './route';
 
 function init() {
   return {
@@ -96,7 +96,7 @@ function receiveRealTimeUpdates({
       // when switching groups.
       if (
         ann.group === groups.selectors.focusedGroupId(getState()) ||
-        !viewer.selectors.isSidebar(getState())
+        route.selectors.route(getState()) !== 'sidebar'
       ) {
         pendingUpdates[ann.id] = ann;
       }

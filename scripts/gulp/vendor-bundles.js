@@ -9,7 +9,7 @@
 module.exports = {
   bundles: {
     jquery: ['jquery'],
-    angular: ['angular', 'angular-route', 'angular-toastr'],
+    angular: ['angular', 'angular-toastr'],
     katex: ['katex'],
     sentry: ['@sentry/browser'],
     showdown: ['showdown'],

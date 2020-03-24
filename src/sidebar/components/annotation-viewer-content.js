@@ -26,7 +26,6 @@ function fetchThread(api, id) {
 
 // @ngInject
 function AnnotationViewerContentController(
-  $routeParams,
   store,
   api,
   rootThread,
@@ -34,9 +33,9 @@ function AnnotationViewerContentController(
   streamFilter,
   annotationMapper
 ) {
-  store.setAppIsSidebar(false);
+  store.clearAnnotations();
 
-  const id = $routeParams.id;
+  const annotationId = store.routeParams().id;
 
   this.rootThread = () => rootThread.thread(store.getState());
 
@@ -44,7 +43,7 @@ function AnnotationViewerContentController(
     store.setCollapsed(id, collapsed);
   };
 
-  this.ready = fetchThread(api, id).then(function(annots) {
+  this.ready = fetchThread(api, annotationId).then(function(annots) {
     annotationMapper.loadAnnotations(annots);
 
     const topLevelAnnot = annots.filter(function(annot) {
@@ -65,8 +64,8 @@ function AnnotationViewerContentController(
       store.setCollapsed(annot.id, false);
     });
 
-    if (topLevelAnnot.id !== id) {
-      store.highlightAnnotations([id]);
+    if (topLevelAnnot.id !== annotationId) {
+      store.highlightAnnotations([annotationId]);
     }
   });
 }

@@ -18,12 +18,10 @@ describe('sidebar.components.hypothesis-app', function() {
   let fakeFlash = null;
   let fakeFrameSync = null;
   let fakeIsSidebar = null;
-  let fakeParams = null;
   let fakeServiceConfig = null;
   let fakeSession = null;
   let fakeShouldAutoDisplayTutorial = null;
   let fakeGroups = null;
-  let fakeRoute = null;
   let fakeServiceUrl = null;
   let fakeSettings = null;
   let fakeWindow = null;
@@ -103,8 +101,6 @@ describe('sidebar.components.hypothesis-app', function() {
         connect: sandbox.spy(),
       };
 
-      fakeParams = { id: 'test' };
-
       fakeSession = {
         load: sandbox.stub().returns(Promise.resolve({ userid: null })),
         logout: sandbox.stub(),
@@ -114,8 +110,6 @@ describe('sidebar.components.hypothesis-app', function() {
       fakeGroups = {
         focus: sandbox.spy(),
       };
-
-      fakeRoute = { reload: sandbox.spy() };
 
       fakeWindow = {
         top: {},
@@ -140,8 +134,6 @@ describe('sidebar.components.hypothesis-app', function() {
       $provide.value('settings', fakeSettings);
       $provide.value('bridge', fakeBridge);
       $provide.value('groups', fakeGroups);
-      $provide.value('$route', fakeRoute);
-      $provide.value('$routeParams', fakeParams);
       $provide.value('$window', fakeWindow);
     })
   );
