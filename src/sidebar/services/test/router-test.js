@@ -101,13 +101,27 @@ describe('router', () => {
   context('when a browser history navigation happens', () => {
     fixtures.forEach(({ path, search, route, params }) => {
       it('updates the active route in the store', () => {
-        createService();
+        const svc = createService();
+        svc.sync();
+        fakeStore.changeRoute.resetHistory();
 
         updateUrl(path, search);
         fakeWindow.emit('popstate');
 
         assert.calledWith(fakeStore.changeRoute, route, params);
       });
+    });
+
+    it('does nothing if the initial call to `sync()` has not happened', () => {
+      createService();
+
+      // Simulate a "popstate" event being triggered by the browser before
+      // the app is ready to initialize the router by calling `sync()`.
+      //
+      // Safari and Chrome do this when the page loads. Firefox does not.
+      fakeWindow.emit('popstate');
+
+      assert.notCalled(fakeStore.changeRoute);
     });
   });
 });

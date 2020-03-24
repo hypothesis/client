@@ -61,13 +61,31 @@ export default function router($window, store) {
     return url;
   }
 
+  let didRegisterPopstateListener = false;
+
   /**
    * Synchronize the route name and parameters in the store with the current
    * URL.
+   *
+   * The first call to this method also registers a listener for future back/forwards
+   * navigation in the browser.
    */
   function sync() {
     const { route, params } = currentRoute();
     store.changeRoute(route, params);
+
+    // Setup listener for back/forward navigation. We do this in `sync()` to avoid
+    // the route being changed by eg. a "popstate" emitted by the browser on
+    // document load (which Safari and Chrome do).
+    if (!didRegisterPopstateListener) {
+      $window.addEventListener('popstate', () => {
+        // All the state we need to update the route is contained in the URL, which
+        // has already been updated at this point, so just sync the store route
+        // to match the URL.
+        sync();
+      });
+      didRegisterPopstateListener = true;
+    }
   }
 
   /**
@@ -80,14 +98,6 @@ export default function router($window, store) {
     $window.history.pushState({}, '', routeUrl(name, params));
     sync();
   }
-
-  // Handle back/forward navigation.
-  $window.addEventListener('popstate', () => {
-    // All the state we need to update the route is contained in the URL, which
-    // has already been updated at this point, so just sync the store route
-    // to match the URL.
-    sync();
-  });
 
   return { sync, navigate };
 }
