@@ -160,7 +160,6 @@ import frameSyncService from './services/frame-sync';
 import groupsService from './services/groups';
 import loadAnnotationsService from './services/load-annotations';
 import localStorageService from './services/local-storage';
-import permissionsService from './services/permissions';
 import persistedDefaultsService from './services/persisted-defaults';
 import rootThreadService from './services/root-thread';
 import routerService from './services/router';
@@ -205,7 +204,6 @@ function startAngularApp(config) {
     .register('groups', groupsService)
     .register('loadAnnotationsService', loadAnnotationsService)
     .register('localStorage', localStorageService)
-    .register('permissions', permissionsService)
     .register('persistedDefaults', persistedDefaultsService)
     .register('rootThread', rootThreadService)
     .register('router', routerService)
@@ -295,7 +293,6 @@ function startAngularApp(config) {
     .service('loadAnnotationsService', () =>
       container.get('loadAnnotationsService')
     )
-    .service('permissions', () => container.get('permissions'))
     .service('persistedDefaults', () => container.get('persistedDefaults'))
     .service('rootThread', () => container.get('rootThread'))
     .service('router', () => container.get('router'))
