@@ -6,6 +6,17 @@ import propTypes from 'prop-types';
 import useElementShouldClose from './hooks/use-element-should-close';
 import SvgIcon from './svg-icon';
 
+let nextId = 0;
+
+function useId(prefix) {
+  const idRef = useRef(null);
+  if (!idRef.current) {
+    ++nextId;
+    idRef.current = prefix + '-' + nextId;
+  }
+  return idRef.current;
+}
+
 // The triangular indicator below the menu toggle button that visually links it
 // to the menu content.
 const menuArrow = className => (
@@ -20,6 +31,80 @@ const menuArrow = className => (
  * triggered by a preceding "mousedown" event.
  */
 let ignoreNextClick = false;
+
+function isElementVisible(element) {
+  return element.offsetParent !== null;
+}
+
+function MenuList({ align, menuButtonId, contentClass, closeMenu, children }) {
+  const menuRef = useRef(null);
+
+  const handleMenuKeyDown = event => {
+    const menuItems = Array.from(
+      menuRef.current.querySelectorAll('[role^="menuitem"]')
+    ).filter(isElementVisible);
+
+    let focusedIndex = menuItems.findIndex(el =>
+      el.contains(document.activeElement)
+    );
+
+    let handled = false;
+
+    switch (event.key) {
+      case 'Enter':
+      case ' ':
+        closeMenu();
+        break;
+      case 'ArrowUp':
+        focusedIndex -= 1;
+        if (focusedIndex < 0) {
+          focusedIndex = menuItems.length - 1;
+        }
+        handled = true;
+        break;
+      case 'ArrowDown':
+        focusedIndex += 1;
+        if (focusedIndex === menuItems.length) {
+          focusedIndex = 0;
+        }
+        handled = true;
+        break;
+      case 'Home':
+        focusedIndex = 0;
+        handled = true;
+        break;
+      case 'End':
+        focusedIndex = menuItems.length - 1;
+        handled = true;
+        break;
+    }
+
+    if (handled && focusedIndex >= 0) {
+      event.stopPropagation();
+      event.preventDefault();
+
+      menuItems[focusedIndex].focus();
+    }
+  };
+
+  return (
+    <div
+      aria-labelledby={menuButtonId}
+      className={classnames(
+        'menu__content',
+        `menu__content--align-${align}`,
+        contentClass
+      )}
+      ref={menuRef}
+      role="menu"
+      tabIndex={-1}
+      onClick={closeMenu}
+      onKeyDown={handleMenuKeyDown}
+    >
+      {children}
+    </div>
+  );
+}
 
 /**
  * A drop-down menu.
@@ -53,12 +138,32 @@ export default function Menu({
 }) {
   const [isOpen, setOpen] = useState(defaultOpen);
 
-  // Notify parent when menu is opened or closed.
+  const menuRef = useRef(null);
+  const toggleButtonRef = useRef(null);
+
   const wasOpen = useRef(isOpen);
   useEffect(() => {
-    if (typeof onOpenChanged === 'function' && wasOpen.current !== isOpen) {
+    if (wasOpen.current !== isOpen) {
       wasOpen.current = isOpen;
-      onOpenChanged(isOpen);
+
+      // Focus first item in the menu when it is opened.
+      if (isOpen) {
+        const firstItem = menuRef.current.querySelector('[role^="menuitem"]');
+        if (firstItem) {
+          firstItem.focus();
+        }
+      } else {
+        // When the menu is closed as a result of an action that doesn't transfer
+        // focus outside of the menu, focus the toggle button that opens the menu.
+        if (document.activeElement === document.body) {
+          toggleButtonRef.current.focus();
+        }
+      }
+
+      // Notify parent when menu is opened or closed.
+      if (typeof onOpenChanged === 'function') {
+        onOpenChanged(isOpen);
+      }
     }
   }, [isOpen, onOpenChanged]);
 
@@ -85,7 +190,6 @@ export default function Menu({
   //
   // These handlers close the menu when the user taps or clicks outside the
   // menu or presses Escape.
-  const menuRef = useRef();
 
   // Menu element should close via `closeMenu` whenever it's open and there
   // are user interactions outside of it (e.g. clicks) in the document
@@ -93,16 +197,11 @@ export default function Menu({
 
   const stopPropagation = e => e.stopPropagation();
 
-  // It should also close if the user presses a key which activates menu items.
-  const handleMenuKeyDown = event => {
-    if (event.key === 'Enter' || event.key === ' ') {
-      closeMenu();
-    }
-  };
-
   const containerStyle = {
     position: containerPositioned ? 'relative' : 'static',
   };
+
+  const menuButtonId = useId('menu-button');
 
   return (
     // See https://github.com/evcohen/eslint-plugin-jsx-a11y/blob/master/docs/rules/no-static-element-interactions.md#case-the-event-handler-is-only-being-used-to-capture-bubbled-events
@@ -124,8 +223,10 @@ export default function Menu({
         aria-expanded={isOpen ? 'true' : 'false'}
         aria-haspopup={true}
         className="menu__toggle"
+        id={menuButtonId}
         onMouseDown={toggleMenu}
         onClick={toggleMenu}
+        ref={toggleButtonRef}
         title={title}
       >
         <span
@@ -145,19 +246,14 @@ export default function Menu({
       {isOpen && (
         <Fragment>
           {menuArrow(arrowClass)}
-          <div
-            className={classnames(
-              'menu__content',
-              `menu__content--align-${align}`,
-              contentClass
-            )}
-            role="menu"
-            tabIndex="-1"
-            onClick={closeMenu}
-            onKeyDown={handleMenuKeyDown}
+          <MenuList
+            menuButtonId={menuButtonId}
+            align={align}
+            contentClass={contentClass}
+            closeMenu={closeMenu}
           >
             {children}
-          </div>
+          </MenuList>
         </Fragment>
       )}
     </div>

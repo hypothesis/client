@@ -1,8 +1,7 @@
 import classnames from 'classnames';
 import { Fragment, createElement } from 'preact';
+import { useRef } from 'preact/hooks';
 import propTypes from 'prop-types';
-
-import { onActivate } from '../util/on-activate';
 
 import Slider from './slider';
 import SvgIcon from './svg-icon';
@@ -56,49 +55,79 @@ export default function MenuItem({
   const leftIcon = isSubmenuItem ? null : renderedIcon;
   const rightIcon = isSubmenuItem ? renderedIcon : null;
 
+  const handleClick = event => {
+    if (onClick) {
+      onClick(event);
+    }
+    if (href) {
+      // TBD - Could we revert the menu item label to be a link as it was before
+      // but with `tabIndex` set to `-1` and then just click the link here.
+      window.open(href, '_blank');
+    }
+  };
+
+  const handleKeyDown = event => {
+    if (event.key === 'ArrowRight' && !isSubmenuVisible) {
+      // TODO - This should focus the first item in the submenu, which should then
+      // support the same keys (Up, Down, Home, End) for navigating between items
+      // as when a top-level menu is focused.
+      onToggleSubmenu(event);
+    } else if (event.key === 'ArrowLeft' && isSubmenuVisible) {
+      onToggleSubmenu(event);
+    } else if (event.key === 'Enter' || event.key === ' ') {
+      handleClick(event);
+    }
+  };
+
+  const optionalAriaProps = {};
+  let role = 'menuitem';
+
+  if (typeof isSelected === 'boolean') {
+    optionalAriaProps['aria-checked'] = isSelected;
+    role = 'menuitemradio';
+  }
+
+  if (typeof isSubmenuVisible === 'boolean') {
+    optionalAriaProps['aria-expanded'] = isSubmenuVisible;
+  }
+
   return (
     <Fragment>
-      {/* FIXME-A11Y */}
-      {/* eslint-disable-next-line jsx-a11y/role-supports-aria-props */}
       <div
-        aria-checked={isSelected}
+        arrow-key-focus={true}
+        aria-haspopup={typeof isSubmenuVisible === 'boolean'}
         className={classnames('menu-item', {
           'menu-item--submenu': isSubmenuItem,
           'is-disabled': isDisabled,
           'is-expanded': isExpanded,
           'is-selected': isSelected,
         })}
-        role="menuitem"
-        {...(onClick && onActivate('menuitem', onClick))}
+        role={role}
+        onClick={handleClick}
+        onKeyDown={handleKeyDown}
+        tabIndex={-1}
+        {...optionalAriaProps}
       >
         <div className="menu-item__action">
           {hasLeftIcon && (
             <div className="menu-item__icon-container">{leftIcon}</div>
           )}
-          {href && (
-            <a
-              className={labelClass}
-              href={href}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {label}
-            </a>
-          )}
-          {!href && <span className={labelClass}>{label}</span>}
+          <span className={labelClass}>{label}</span>
           {hasRightIcon && (
             <div className="menu-item__icon-container">{rightIcon}</div>
           )}
         </div>
         {typeof isSubmenuVisible === 'boolean' && (
+          // Activating this toggle via the keyboard is done by pressing the
+          // right arrow key when the parent "menuitem" has keyboard focus.
+          // This is the standard interaction pattern for opening a submenu
+          // from a parent menu item.
+          //
+          // eslint-disable-next-line jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events
           <div
             className="menu-item__toggle"
-            // We need to pass strings here rather than just the boolean attribute
-            // because otherwise the attribute will be omitted entirely when
-            // `isSubmenuVisible` is false.
-            aria-expanded={isSubmenuVisible ? 'true' : 'false'}
-            aria-label={`Show actions for ${label}`}
-            {...onActivate('button', onToggleSubmenu)}
+            onClick={onToggleSubmenu}
+            tabIndex={-1}
           >
             <SvgIcon
               name={isSubmenuVisible ? 'collapse-menu' : 'expand-menu'}
