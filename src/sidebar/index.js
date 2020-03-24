@@ -54,12 +54,6 @@ const isSidebar = !(
 );
 
 // @ngInject
-function configureLocation($locationProvider) {
-  // Use HTML5 history
-  return $locationProvider.html5Mode(true);
-}
-
-// @ngInject
 function configureToastr(toastrConfig) {
   angular.extend(toastrConfig, {
     preventOpenDuplicates: true,
@@ -113,12 +107,6 @@ function autosave(autosaveService) {
 // Preact UI components that are wrapped for use within Angular templates.
 
 import Annotation from './components/annotation';
-import AnnotationActionBar from './components/annotation-action-bar';
-import AnnotationBody from './components/annotation-body';
-import AnnotationHeader from './components/annotation-header';
-import AnnotationLicense from './components/annotation-license';
-import AnnotationPublishControl from './components/annotation-publish-control';
-import AnnotationQuote from './components/annotation-quote';
 import FocusedModeHeader from './components/focused-mode-header';
 import HelpPanel from './components/help-panel';
 import LoggedOutMessage from './components/logged-out-message';
@@ -129,8 +117,6 @@ import SelectionTabs from './components/selection-tabs';
 import ShareAnnotationsPanel from './components/share-annotations-panel';
 import SidebarContentError from './components/sidebar-content-error';
 import SvgIcon from './components/svg-icon';
-import TagEditor from './components/tag-editor';
-import TagList from './components/tag-list';
 import ToastMessages from './components/toast-messages';
 import TopBar from './components/top-bar';
 
@@ -231,10 +217,9 @@ function startAngularApp(config) {
   // constructed them.
   //
   // @ngInject
-  function registerAngularServices($location, $rootScope, toastr) {
+  function registerAngularServices($rootScope, toastr) {
     container
       .register('toastr', { value: toastr })
-      .register('$location', { value: $location })
       .register('$rootScope', { value: $rootScope });
   }
 
@@ -248,15 +233,6 @@ function startAngularApp(config) {
 
     // UI components
     .component('annotation', wrapComponent(Annotation))
-    .component('annotationBody', wrapComponent(AnnotationBody))
-    .component('annotationHeader', wrapComponent(AnnotationHeader))
-    .component('annotationActionBar', wrapComponent(AnnotationActionBar))
-    .component('annotationLicense', wrapComponent(AnnotationLicense))
-    .component(
-      'annotationPublishControl',
-      wrapComponent(AnnotationPublishControl)
-    )
-    .component('annotationQuote', wrapComponent(AnnotationQuote))
     .component('annotationThread', annotationThread)
     .component('annotationViewerContent', annotationViewerContent)
     .component('helpPanel', wrapComponent(HelpPanel))
@@ -271,8 +247,6 @@ function startAngularApp(config) {
     .component('shareAnnotationsPanel', wrapComponent(ShareAnnotationsPanel))
     .component('streamContent', streamContent)
     .component('svgIcon', wrapComponent(SvgIcon))
-    .component('tagEditor', wrapComponent(TagEditor))
-    .component('tagList', wrapComponent(TagList))
     .component('threadList', threadList)
     .component('toastMessages', wrapComponent(ToastMessages))
     .component('topBar', wrapComponent(TopBar))
@@ -310,7 +284,6 @@ function startAngularApp(config) {
     .value('isSidebar', container.get('isSidebar'))
     .value('settings', container.get('settings'))
 
-    .config(configureLocation)
     .config(configureToastr)
 
     // Make Angular built-ins available to services constructed by `container`.
