@@ -54,12 +54,6 @@ const isSidebar = !(
 );
 
 // @ngInject
-function configureLocation($locationProvider) {
-  // Use HTML5 history
-  return $locationProvider.html5Mode(true);
-}
-
-// @ngInject
 function configureToastr(toastrConfig) {
   angular.extend(toastrConfig, {
     preventOpenDuplicates: true,
@@ -233,10 +227,9 @@ function startAngularApp(config) {
   // constructed them.
   //
   // @ngInject
-  function registerAngularServices($location, $rootScope, toastr) {
+  function registerAngularServices($rootScope, toastr) {
     container
       .register('toastr', { value: toastr })
-      .register('$location', { value: $location })
       .register('$rootScope', { value: $rootScope });
   }
 
@@ -313,7 +306,6 @@ function startAngularApp(config) {
     .value('isSidebar', container.get('isSidebar'))
     .value('settings', container.get('settings'))
 
-    .config(configureLocation)
     .config(configureToastr)
 
     // Make Angular built-ins available to services constructed by `container`.
