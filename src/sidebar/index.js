@@ -117,6 +117,7 @@ import SelectionTabs from './components/selection-tabs';
 import ShareAnnotationsPanel from './components/share-annotations-panel';
 import SidebarContentError from './components/sidebar-content-error';
 import SvgIcon from './components/svg-icon';
+import Thread from './components/thread';
 import ToastMessages from './components/toast-messages';
 import TopBar from './components/top-bar';
 
@@ -155,6 +156,7 @@ import sessionService from './services/session';
 import streamFilterService from './services/stream-filter';
 import streamerService from './services/streamer';
 import tagsService from './services/tags';
+import threadsService from './services/threads';
 import toastMessenger from './services/toast-messenger';
 import unicodeService from './services/unicode';
 import viewFilterService from './services/view-filter';
@@ -199,6 +201,7 @@ function startAngularApp(config) {
     .register('streamer', streamerService)
     .register('streamFilter', streamFilterService)
     .register('tags', tagsService)
+    .register('threadsService', threadsService)
     .register('toastMessenger', toastMessenger)
     .register('unicode', unicodeService)
     .register('viewFilter', viewFilterService)
@@ -247,6 +250,7 @@ function startAngularApp(config) {
     .component('shareAnnotationsPanel', wrapComponent(ShareAnnotationsPanel))
     .component('streamContent', streamContent)
     .component('svgIcon', wrapComponent(SvgIcon))
+    .component('thread', wrapComponent(Thread))
     .component('threadList', threadList)
     .component('toastMessages', wrapComponent(ToastMessages))
     .component('topBar', wrapComponent(TopBar))
@@ -275,6 +279,7 @@ function startAngularApp(config) {
     .service('session', () => container.get('session'))
     .service('streamer', () => container.get('streamer'))
     .service('streamFilter', () => container.get('streamFilter'))
+    .service('threadsService', () => container.get('threadsService'))
     .service('toastMessenger', () => container.get('toastMessenger'))
 
     // Redux store
