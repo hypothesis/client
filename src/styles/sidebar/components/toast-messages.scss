@@ -1,0 +1,87 @@
+@use "../../mixins/panel";
+@use "../../variables" as var;
+
+.toast-messages {
+  position: absolute;
+  z-index: 1;
+  width: 100%;
+  left: 0;
+  padding: 0 8px;
+}
+
+.toast-message-container {
+  position: relative;
+  width: 100%;
+  animation: slidein 0.3s forwards ease-in-out;
+
+  &:hover {
+    cursor: pointer;
+  }
+
+  &.is-dismissed {
+    animation: fadeout 0.3s forwards;
+  }
+}
+
+.toast-message {
+  @include panel.panel;
+  display: flex;
+  position: relative;
+  width: 100%;
+  box-shadow: 0px 2px 3px 0px rgba(0, 0, 0, 0.15);
+  border-radius: 2px;
+  margin-bottom: 0.75em;
+
+  &--success {
+    border: 1px solid var.$color-success;
+  }
+
+  &--error {
+    border: 1px solid var.$color-error;
+  }
+
+  &__type {
+    padding: 1em;
+    color: white;
+  }
+
+  &--success &__type {
+    background-color: var.$color-success;
+  }
+
+  &--error &__type {
+    background-color: var.$color-error;
+  }
+
+  &__icon {
+    // Specific adjustments for success and error icons
+    margin-top: 2px;
+  }
+
+  &__message {
+    padding: 1em;
+  }
+}
+
+@keyframes slidein {
+  0% {
+    opacity: 0;
+    left: 100%;
+  }
+  80% {
+    left: -10px;
+  }
+  100% {
+    left: 0;
+    opacity: 1;
+  }
+}
+
+@keyframes fadeout {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}

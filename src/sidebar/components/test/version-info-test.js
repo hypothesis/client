@@ -9,18 +9,22 @@ import { checkAccessibility } from '../../../test-util/accessibility';
 describe('VersionInfo', function() {
   let fakeVersionData;
   // Services
-  let fakeFlash;
+  let fakeToastMessenger;
   // Mocked dependencies
   let fakeCopyToClipboard;
 
   function createComponent(props) {
     // Services
-    fakeFlash = {
-      info: sinon.stub(),
+    fakeToastMessenger = {
+      success: sinon.stub(),
       error: sinon.stub(),
     };
     return mount(
-      <VersionInfo flash={fakeFlash} versionData={fakeVersionData} {...props} />
+      <VersionInfo
+        toastMessenger={fakeToastMessenger}
+        versionData={fakeVersionData}
+        {...props}
+      />
     );
   }
 
@@ -71,7 +75,10 @@ describe('VersionInfo', function() {
 
       wrapper.find('button').simulate('click');
 
-      assert.calledWith(fakeFlash.info, 'Copied version info to clipboard');
+      assert.calledWith(
+        fakeToastMessenger.success,
+        'Copied version info to clipboard'
+      );
     });
 
     it('flashes an error if info copying unsuccessful', () => {
@@ -80,7 +87,10 @@ describe('VersionInfo', function() {
 
       wrapper.find('button').simulate('click');
 
-      assert.calledWith(fakeFlash.error, 'Unable to copy version info');
+      assert.calledWith(
+        fakeToastMessenger.error,
+        'Unable to copy version info'
+      );
     });
   });
 

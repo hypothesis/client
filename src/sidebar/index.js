@@ -131,6 +131,7 @@ import SidebarContentError from './components/sidebar-content-error';
 import SvgIcon from './components/svg-icon';
 import TagEditor from './components/tag-editor';
 import TagList from './components/tag-list';
+import ToastMessages from './components/toast-messages';
 import TopBar from './components/top-bar';
 
 // Remaining UI components that are still built with Angular.
@@ -169,6 +170,7 @@ import sessionService from './services/session';
 import streamFilterService from './services/stream-filter';
 import streamerService from './services/streamer';
 import tagsService from './services/tags';
+import toastMessenger from './services/toast-messenger';
 import unicodeService from './services/unicode';
 import viewFilterService from './services/view-filter';
 
@@ -213,6 +215,7 @@ function startAngularApp(config) {
     .register('streamer', streamerService)
     .register('streamFilter', streamFilterService)
     .register('tags', tagsService)
+    .register('toastMessenger', toastMessenger)
     .register('unicode', unicodeService)
     .register('viewFilter', viewFilterService)
     .register('store', store);
@@ -273,6 +276,7 @@ function startAngularApp(config) {
     .component('tagEditor', wrapComponent(TagEditor))
     .component('tagList', wrapComponent(TagList))
     .component('threadList', threadList)
+    .component('toastMessages', wrapComponent(ToastMessages))
     .component('topBar', wrapComponent(TopBar))
 
     // Register services, the store and utilities with Angular, so that
@@ -300,6 +304,7 @@ function startAngularApp(config) {
     .service('session', () => container.get('session'))
     .service('streamer', () => container.get('streamer'))
     .service('streamFilter', () => container.get('streamFilter'))
+    .service('toastMessenger', () => container.get('toastMessenger'))
 
     // Redux store
     .service('store', () => container.get('store'))

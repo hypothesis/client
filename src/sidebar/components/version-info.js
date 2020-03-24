@@ -9,13 +9,13 @@ import Button from './button';
 /**
  * Display current client version info
  */
-function VersionInfo({ flash, versionData }) {
+function VersionInfo({ toastMessenger, versionData }) {
   const copyVersionData = () => {
     try {
       copyText(versionData.asFormattedString());
-      flash.info('Copied version info to clipboard');
+      toastMessenger.success('Copied version info to clipboard');
     } catch (err) {
-      flash.error('Unable to copy version info');
+      toastMessenger.error('Unable to copy version info');
     }
   };
 
@@ -55,9 +55,9 @@ VersionInfo.propTypes = {
   versionData: propTypes.object.isRequired,
 
   /** injected properties */
-  flash: propTypes.object.isRequired,
+  toastMessenger: propTypes.object.isRequired,
 };
 
-VersionInfo.injectedProps = ['flash'];
+VersionInfo.injectedProps = ['toastMessenger'];
 
 export default withServices(VersionInfo);
