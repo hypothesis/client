@@ -72,6 +72,10 @@ function AnnotationController(
     let saved;
     const updating = !!annot.id;
 
+    if (!self.canPost()) {
+      return false;
+    }
+
     if (updating) {
       saved = api.annotation.update({ id: annot.id }, annot);
     } else {
