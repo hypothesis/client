@@ -1,6 +1,5 @@
-import angular from 'angular';
-
 import events from '../../events';
+import { Injector } from '../../../shared/injector';
 import FakeWindow from '../../util/test/fake-window';
 import authFactory, { $imports } from '../oauth-auth';
 
@@ -34,10 +33,6 @@ describe('sidebar.oauth-auth', function () {
     );
     return auth.login();
   }
-
-  before(() => {
-    angular.module('app', []).service('auth', authFactory);
-  });
 
   beforeEach(function () {
     // Setup fake clock. This has to be done before setting up the `window`
@@ -93,22 +88,21 @@ describe('sidebar.oauth-auth', function () {
 
     fakeWindow = new FakeWindow();
 
-    angular.mock.module('app', {
-      $window: fakeWindow,
-      apiRoutes: fakeApiRoutes,
-      flash: fakeFlash,
-      localStorage: fakeLocalStorage,
-      settings: fakeSettings,
-    });
-
-    angular.mock.inject((_auth_, _$rootScope_) => {
-      auth = _auth_;
-      $rootScope = _$rootScope_;
-    });
-
     $imports.$mock({
       '../util/oauth-client': FakeOAuthClient,
     });
+
+    $rootScope = { $broadcast: sinon.stub() };
+
+    auth = new Injector()
+      .register('$rootScope', { value: $rootScope })
+      .register('$window', { value: fakeWindow })
+      .register('apiRoutes', { value: fakeApiRoutes })
+      .register('flash', { value: fakeFlash })
+      .register('localStorage', { value: fakeLocalStorage })
+      .register('settings', { value: fakeSettings })
+      .register('auth', authFactory)
+      .get('auth');
   });
 
   afterEach(function () {
@@ -519,12 +513,9 @@ describe('sidebar.oauth-auth', function () {
     });
 
     it('notifies other services about the change', () => {
-      const onTokenChange = sinon.stub();
-      $rootScope.$on(events.OAUTH_TOKENS_CHANGED, onTokenChange);
-
       notifyStoredTokenChange();
 
-      assert.called(onTokenChange);
+      assert.calledWith($rootScope.$broadcast, events.OAUTH_TOKENS_CHANGED);
     });
   });
 

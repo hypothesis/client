@@ -1,6 +1,7 @@
-import angular from 'angular';
+import EventEmitter from 'tiny-emitter';
 
 import events from '../../events';
+import { Injector } from '../../../shared/injector';
 import * as annotationFixtures from '../../test/annotation-fixtures';
 import uiConstants from '../../ui-constants';
 import rootThreadFactory from '../root-thread';
@@ -88,21 +89,21 @@ describe('rootThread', function () {
       filter: sinon.stub(),
     };
 
-    angular
-      .module('app', [])
-      .value('annotationsService', fakeAnnotationsService)
-      .value('store', fakeStore)
-      .value('searchFilter', fakeSearchFilter)
-      .value('settings', fakeSettings)
-      .value('viewFilter', fakeViewFilter)
-      .service('rootThread', rootThreadFactory);
+    const emitter = new EventEmitter();
+    $rootScope = {
+      $on: (event, cb) => emitter.on(event, data => cb(null, data)),
+      $broadcast: (event, data) => emitter.emit(event, data),
+    };
 
-    angular.mock.module('app');
-
-    angular.mock.inject(function (_$rootScope_, _rootThread_) {
-      $rootScope = _$rootScope_;
-      rootThread = _rootThread_;
-    });
+    rootThread = new Injector()
+      .register('$rootScope', { value: $rootScope })
+      .register('annotationsService', { value: fakeAnnotationsService })
+      .register('store', { value: fakeStore })
+      .register('searchFilter', { value: fakeSearchFilter })
+      .register('settings', { value: fakeSettings })
+      .register('viewFilter', { value: fakeViewFilter })
+      .register('rootThread', rootThreadFactory)
+      .get('rootThread');
   });
 
   beforeEach(() => {

@@ -1,13 +1,12 @@
-import angular from 'angular';
+import EventEmitter from 'tiny-emitter';
 
 import events from '../../events';
 import { events as analyticsEvents } from '../analytics';
 import sessionFactory from '../session';
 import { $imports } from '../session';
+import { Injector } from '../../../shared/injector';
 
-const mock = angular.mock;
-
-describe('sidebar.session', function () {
+describe('sidebar/services/session', function () {
   let $rootScope;
 
   let fakeAnalytics;
@@ -21,10 +20,6 @@ describe('sidebar.session', function () {
 
   // The instance of the `session` service.
   let session;
-
-  before(function () {
-    angular.module('h', []).service('session', sessionFactory);
-  });
 
   beforeEach(function () {
     sandbox = sinon.createSandbox();
@@ -60,27 +55,28 @@ describe('sidebar.session', function () {
       serviceUrl: 'https://test.hypothes.is/root/',
     };
 
-    mock.module('h', {
-      analytics: fakeAnalytics,
-      store: fakeStore,
-      api: fakeApi,
-      auth: fakeAuth,
-      flash: fakeFlash,
-      settings: fakeSettings,
-    });
-
     $imports.$mock({
       '../service-config': fakeServiceConfig,
       '../util/sentry': fakeSentry,
     });
-  });
 
-  beforeEach(
-    mock.inject(function (_$rootScope_, _session_) {
-      session = _session_;
-      $rootScope = _$rootScope_;
-    })
-  );
+    const emitter = new EventEmitter();
+    $rootScope = {
+      $on: (event, cb) => emitter.on(event, data => cb(null, data)),
+      $broadcast: (event, data) => emitter.emit(event, data),
+    };
+
+    session = new Injector()
+      .register('$rootScope', { value: $rootScope })
+      .register('analytics', { value: fakeAnalytics })
+      .register('store', { value: fakeStore })
+      .register('api', { value: fakeApi })
+      .register('auth', { value: fakeAuth })
+      .register('flash', { value: fakeFlash })
+      .register('settings', { value: fakeSettings })
+      .register('session', sessionFactory)
+      .get('session');
+  });
 
   afterEach(function () {
     $imports.$restore();

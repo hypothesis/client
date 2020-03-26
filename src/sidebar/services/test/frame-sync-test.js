@@ -1,7 +1,7 @@
-import angular from 'angular';
 import EventEmitter from 'tiny-emitter';
 
 import events from '../../events';
+import { Injector } from '../../../shared/injector';
 import * as annotationFixtures from '../../test/annotation-fixtures';
 import createFakeStore from '../../test/fake-redux-store';
 import uiConstants from '../../ui-constants';
@@ -47,15 +47,11 @@ const fixtures = {
   },
 };
 
-describe('sidebar.frame-sync', function () {
+describe('sidebar/services/frame-sync', function () {
   let fakeStore;
   let fakeBridge;
   let frameSync;
   let $rootScope;
-
-  before(function () {
-    angular.module('app', []).service('frameSync', FrameSync);
-  });
 
   beforeEach(function () {
     fakeStore = createFakeStore(
@@ -91,24 +87,27 @@ describe('sidebar.frame-sync', function () {
       this.startDiscovery = sinon.stub();
     }
 
-    angular.mock.module('app', {
-      store: fakeStore,
-      bridge: fakeBridge,
-    });
-
-    angular.mock.inject(function (_$rootScope_, _frameSync_) {
-      $rootScope = _$rootScope_;
-      frameSync = _frameSync_;
-    });
-
     $imports.$mock({
       '../../shared/discovery': FakeDiscovery,
     });
+
+    $rootScope = {
+      $broadcast: sinon.stub(),
+    };
+
+    frameSync = new Injector()
+      .register('$rootScope', { value: $rootScope })
+      .register('$window', { value: {} })
+      .register('bridge', { value: fakeBridge })
+      .register('store', { value: fakeStore })
+      .register('frameSync', FrameSync)
+      .get('frameSync');
+
+    frameSync.connect();
   });
 
-  beforeEach(function () {
+  afterEach(() => {
     $imports.$restore();
-    frameSync.connect();
   });
 
   context('when annotations are loaded into the sidebar', function () {
@@ -216,15 +215,13 @@ describe('sidebar.frame-sync', function () {
     context('when an authenticated user is present', () => {
       it('emits a BEFORE_ANNOTATION_CREATED event', function () {
         fakeStore.isLoggedIn.returns(true);
-        const onCreated = sinon.stub();
         const ann = { target: [] };
-        $rootScope.$on(events.BEFORE_ANNOTATION_CREATED, onCreated);
 
         fakeBridge.emit('beforeCreateAnnotation', { tag: 't1', msg: ann });
 
-        assert.calledWithMatch(
-          onCreated,
-          sinon.match.any,
+        assert.calledWith(
+          $rootScope.$broadcast,
+          events.BEFORE_ANNOTATION_CREATED,
           sinon.match({
             $tag: 't1',
             target: [],
@@ -239,13 +236,11 @@ describe('sidebar.frame-sync', function () {
       });
 
       it('should not emit BEFORE_ANNOTATION_CREATED event', () => {
-        const onCreated = sinon.stub();
         const ann = { target: [] };
-        $rootScope.$on(events.BEFORE_ANNOTATION_CREATED, onCreated);
 
         fakeBridge.emit('beforeCreateAnnotation', { tag: 't1', msg: ann });
 
-        assert.notCalled(onCreated);
+        assert.notCalled($rootScope.$broadcast);
       });
 
       it('should open the sidebar', () => {
@@ -312,13 +307,11 @@ describe('sidebar.frame-sync', function () {
     });
 
     it('emits an ANNOTATIONS_SYNCED event', function () {
-      const onSync = sinon.stub();
-      $rootScope.$on(events.ANNOTATIONS_SYNCED, onSync);
-
       fakeBridge.emit('sync', [{ tag: 't1', msg: { $orphan: false } }]);
       expireDebounceTimeout();
-
-      assert.calledWithMatch(onSync, sinon.match.any, sinon.match(['t1']));
+      assert.calledWith($rootScope.$broadcast, events.ANNOTATIONS_SYNCED, [
+        't1',
+      ]);
     });
   });
 
@@ -384,12 +377,8 @@ describe('sidebar.frame-sync', function () {
 
   describe('on "sidebarOpened" message', function () {
     it('broadcasts a sidebarOpened event', function () {
-      const onSidebarOpened = sinon.stub();
-      $rootScope.$on('sidebarOpened', onSidebarOpened);
-
       fakeBridge.emit('sidebarOpened');
-
-      assert.called(onSidebarOpened);
+      assert.calledWith($rootScope.$broadcast, 'sidebarOpened');
     });
   });
 
