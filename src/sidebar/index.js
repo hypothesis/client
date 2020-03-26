@@ -126,7 +126,6 @@ import TopBar from './components/top-bar';
 
 // Remaining UI components that are still built with Angular.
 
-import annotationThread from './components/annotation-thread';
 import annotationViewerContent from './components/annotation-viewer-content';
 import hypothesisApp from './components/hypothesis-app';
 import sidebarContent from './components/sidebar-content';
@@ -239,7 +238,6 @@ function startAngularApp(config) {
 
     // UI components
     .component('annotation', wrapComponent(Annotation))
-    .component('annotationThread', annotationThread)
     .component('annotationViewerContent', annotationViewerContent)
     .component('helpPanel', wrapComponent(HelpPanel))
     .component('loginPromptPanel', wrapComponent(LoginPromptPanel))
