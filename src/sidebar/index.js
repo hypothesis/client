@@ -2,7 +2,10 @@
 
 import { jsonConfigsFrom } from '../shared/settings';
 
-import crossOriginRPC from './cross-origin-rpc.js';
+import {
+  startServer as startRPCServer,
+  preStartServer as preStartRPCServer,
+} from './cross-origin-rpc.js';
 import addAnalytics from './ga';
 import disableOpenerForExternalLinks from './util/disable-opener-for-external-links';
 import { fetchConfig } from './util/fetch-config';
@@ -294,7 +297,7 @@ function startAngularApp(config) {
     .run(sendPageView)
     .run(setupApi)
     .run(setupRoute)
-    .run(crossOriginRPC.server.start);
+    .run(startRPCServer);
 
   // Work around a check in Angular's $sniffer service that causes it to
   // incorrectly determine that Firefox extensions are Chrome Packaged Apps which
@@ -310,6 +313,9 @@ function startAngularApp(config) {
   const appEl = document.querySelector('hypothesis-app');
   angular.bootstrap(appEl, ['h'], { strictDi: true });
 }
+
+// Start capturing RPC requests before we start the RPC server (startRPCServer)
+preStartRPCServer();
 
 fetchConfig(appConfig)
   .then(config => {
