@@ -117,15 +117,15 @@ function Annotation({
       {isEditing && <TagEditor onEditTags={onEditTags} tagList={tags} />}
       {!isEditing && <TagList annotation={annotation} tags={tags} />}
       <footer className="annotation__footer">
-        <div className="annotation__form-actions">
-          {isEditing && (
+        {isEditing && (
+          <div className="annotation__form-actions">
             <AnnotationPublishControl
               annotation={annotation}
               isDisabled={isEmpty}
               onSave={onSave}
             />
-          )}
-        </div>
+          </div>
+        )}
         {shouldShowLicense && <AnnotationLicense />}
         <div className="annotation__controls">
           {shouldShowReplyToggle && (
