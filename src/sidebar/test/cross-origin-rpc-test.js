@@ -1,74 +1,59 @@
-import crossOriginRPC from '../cross-origin-rpc';
-import { $imports } from '../cross-origin-rpc';
+import EventEmitter from 'tiny-emitter';
 
-describe('crossOriginRPC', function() {
-  describe('server', function() {
-    let addedListener; // The postMessage() listener that the server adds.
-    let fakeStore;
-    let fakeWarnOnce;
-    let fakeWindow;
-    let settings;
-    let source;
+import { startServer, preStartServer, $imports } from '../cross-origin-rpc.js';
 
-    beforeEach(function() {
-      fakeStore = {
-        changeFocusModeUser: sinon.stub(),
-      };
+class FakeWindow {
+  constructor() {
+    this.emitter = new EventEmitter();
+    this.addEventListener = this.emitter.on.bind(this.emitter);
+    this.removeEventListener = this.emitter.off.bind(this.emitter);
+  }
+}
 
-      fakeWindow = {
-        addEventListener: sinon.stub().callsFake(function(type, listener) {
-          // Save the registered listener function in a variable so test code
-          // can access it later.
-          addedListener = listener;
-        }),
-      };
+describe('sidebar/cross-origin-rcp', function() {
+  let fakeStore;
+  let fakeWarnOnce;
+  let fakeWindow;
+  let settings;
+  let frame;
 
-      settings = {
-        rpcAllowedOrigins: ['https://allowed1.com', 'https://allowed2.com'],
-      };
+  beforeEach(function() {
+    fakeStore = {
+      changeFocusModeUser: sinon.stub(),
+    };
 
-      source = { postMessage: sinon.stub() };
+    frame = { postMessage: sinon.stub() };
+    fakeWindow = new FakeWindow();
 
-      fakeWarnOnce = sinon.stub();
+    settings = {
+      rpcAllowedOrigins: ['https://allowed1.com', 'https://allowed2.com'],
+    };
 
-      $imports.$mock({
-        '../shared/warn-once': fakeWarnOnce,
-      });
+    fakeWarnOnce = sinon.stub();
+
+    $imports.$mock({
+      '../shared/warn-once': fakeWarnOnce,
     });
+  });
 
-    afterEach(() => {
-      $imports.$restore();
-    });
+  afterEach(() => {
+    $imports.$restore();
+  });
 
-    /**
-     * Directly call the postMessage() listener func that the server
-     * registered. This simulates what would happen if window.postMessage()
-     * were called.
-     */
-    function postMessage(event) {
-      addedListener(event);
-    }
-
-    it('adds a postMessage() event listener function', function() {
-      crossOriginRPC.server.start(fakeStore, {}, fakeWindow);
-
-      assert.isTrue(fakeWindow.addEventListener.calledOnce);
-      assert.isTrue(fakeWindow.addEventListener.calledWith('message'));
-    });
-
+  describe('#startServer', function() {
     it('sends a response with the "ok" result', function() {
-      crossOriginRPC.server.start(fakeStore, settings, fakeWindow);
+      startServer(fakeStore, settings, fakeWindow);
 
-      postMessage({
+      fakeWindow.emitter.emit('message', {
         data: { jsonrpc: '2.0', method: 'changeFocusModeUser', id: 42 },
         origin: 'https://allowed1.com',
-        source: source,
+        source: frame,
       });
 
-      assert.isTrue(source.postMessage.calledOnce);
+      assert.isTrue(frame.postMessage.calledOnce);
 
       assert.isTrue(
-        source.postMessage.calledWithExactly(
+        frame.postMessage.calledWithExactly(
           {
             jsonrpc: '2.0',
             id: 42,
@@ -80,9 +65,9 @@ describe('crossOriginRPC', function() {
     });
 
     it('calls the registered method with the provided params', function() {
-      crossOriginRPC.server.start(fakeStore, settings, fakeWindow);
+      startServer(fakeStore, settings, fakeWindow);
 
-      postMessage({
+      fakeWindow.emitter.emit('message', {
         data: {
           jsonrpc: '2.0',
           method: 'changeFocusModeUser',
@@ -90,38 +75,39 @@ describe('crossOriginRPC', function() {
           params: ['one', 'two'],
         },
         origin: 'https://allowed1.com',
-        source: source,
+        source: frame,
       });
+
       assert.isTrue(
         fakeStore.changeFocusModeUser.calledWithExactly('one', 'two')
       );
     });
 
     it('calls the registered method with no params', function() {
-      crossOriginRPC.server.start(fakeStore, settings, fakeWindow);
+      startServer(fakeStore, settings, fakeWindow);
 
-      postMessage({
+      fakeWindow.emitter.emit('message', {
         data: {
           jsonrpc: '2.0',
           method: 'changeFocusModeUser',
           id: 42,
         },
         origin: 'https://allowed1.com',
-        source: source,
+        source: frame,
       });
       assert.isTrue(fakeStore.changeFocusModeUser.calledWithExactly());
     });
 
     it('does not call the unregistered method', function() {
-      crossOriginRPC.server.start(fakeStore, settings, fakeWindow);
+      startServer(fakeStore, settings, fakeWindow);
 
-      postMessage({
+      fakeWindow.emitter.emit('message', {
         data: {
           method: 'unregisteredMethod',
           id: 42,
         },
         origin: 'https://allowed1.com',
-        source: source,
+        source: frame,
       });
       assert.isTrue(fakeStore.changeFocusModeUser.notCalled);
     });
@@ -129,12 +115,16 @@ describe('crossOriginRPC', function() {
     [{}, null, { jsonrpc: '1.0' }].forEach(invalidMessage => {
       it('ignores non JSON-RPC messages', () => {
         const settings = { rpcAllowedOrigins: [] };
-        crossOriginRPC.server.start(fakeStore, settings, fakeWindow);
+        startServer(fakeStore, settings, fakeWindow);
 
-        postMessage({ data: invalidMessage, origin: 'https://foo.com' });
+        fakeWindow.emitter.emit('message', {
+          data: invalidMessage,
+          origin: 'https://foo.com',
+          source: frame,
+        });
 
         assert.notCalled(fakeWarnOnce);
-        assert.isTrue(source.postMessage.notCalled);
+        assert.isTrue(frame.postMessage.notCalled);
       });
     });
 
@@ -144,35 +134,35 @@ describe('crossOriginRPC', function() {
       { rpcAllowedOrigins: ['https://allowed1.com', 'https://allowed2.com'] },
     ].forEach(function(settings) {
       it("doesn't respond if the origin isn't allowed", function() {
-        crossOriginRPC.server.start(fakeStore, settings, fakeWindow);
+        startServer(fakeStore, settings, fakeWindow);
 
-        postMessage({
+        fakeWindow.emitter.emit('message', {
           origin: 'https://notallowed.com',
           data: { jsonrpc: '2.0', method: 'changeFocusModeUser', id: 42 },
-          source: source,
+          source: frame,
         });
 
         assert.calledWith(
           fakeWarnOnce,
           sinon.match(/Ignoring JSON-RPC request from non-whitelisted origin/)
         );
-        assert.isTrue(source.postMessage.notCalled);
+        assert.isTrue(frame.postMessage.notCalled);
       });
     });
 
     it("responds with an error if there's no method", function() {
-      crossOriginRPC.server.start(fakeStore, settings, fakeWindow);
+      startServer(fakeStore, settings, fakeWindow);
       let jsonRpcRequest = { jsonrpc: '2.0', id: 42 }; // No "method" member.
 
-      postMessage({
+      fakeWindow.emitter.emit('message', {
         origin: 'https://allowed1.com',
         data: jsonRpcRequest,
-        source: source,
+        source: frame,
       });
 
-      assert.isTrue(source.postMessage.calledOnce);
+      assert.isTrue(frame.postMessage.calledOnce);
       assert.isTrue(
-        source.postMessage.calledWithExactly(
+        frame.postMessage.calledWithExactly(
           {
             jsonrpc: '2.0',
             id: 42,
@@ -188,17 +178,17 @@ describe('crossOriginRPC', function() {
 
     ['unknownMethod', null].forEach(function(method) {
       it('responds with an error if the method is unknown', function() {
-        crossOriginRPC.server.start(fakeStore, settings, fakeWindow);
+        startServer(fakeStore, settings, fakeWindow);
 
-        postMessage({
+        fakeWindow.emitter.emit('message', {
           origin: 'https://allowed1.com',
           data: { jsonrpc: '2.0', method: method, id: 42 },
-          source: source,
+          source: frame,
         });
 
-        assert.isTrue(source.postMessage.calledOnce);
+        assert.isTrue(frame.postMessage.calledOnce);
         assert.isTrue(
-          source.postMessage.calledWithExactly(
+          frame.postMessage.calledWithExactly(
             {
               jsonrpc: '2.0',
               id: 42,
@@ -211,6 +201,72 @@ describe('crossOriginRPC', function() {
           )
         );
       });
+    });
+  });
+
+  describe('#preStartServer', function() {
+    beforeEach(function() {
+      preStartServer(fakeWindow);
+    });
+
+    it('responds to an incoming request that arrives before the server starts', function() {
+      fakeWindow.emitter.emit('message', {
+        data: { jsonrpc: '2.0', method: 'changeFocusModeUser', id: 42 },
+        origin: 'https://allowed1.com',
+        source: frame,
+      });
+      startServer(fakeStore, settings, fakeWindow);
+      assert.isTrue(
+        frame.postMessage.calledWithExactly(
+          {
+            jsonrpc: '2.0',
+            id: 42,
+            result: 'ok',
+          },
+          'https://allowed1.com'
+        )
+      );
+    });
+
+    it('responds to multiple incoming requests that arrive before the server starts', function() {
+      const messageEvent = id => ({
+        data: { jsonrpc: '2.0', method: 'changeFocusModeUser', id },
+        origin: 'https://allowed1.com',
+        source: frame,
+      });
+      const response = id => [
+        {
+          jsonrpc: '2.0',
+          id,
+          result: 'ok',
+        },
+        'https://allowed1.com',
+      ];
+
+      fakeWindow.emitter.emit('message', messageEvent(42));
+      fakeWindow.emitter.emit('message', messageEvent(43));
+      fakeWindow.emitter.emit('message', messageEvent(44));
+
+      startServer(fakeStore, settings, fakeWindow);
+
+      assert.equal(frame.postMessage.callCount, 3);
+      assert.isTrue(frame.postMessage.calledWithExactly(...response(42)));
+      assert.isTrue(frame.postMessage.calledWithExactly(...response(43)));
+      assert.isTrue(frame.postMessage.calledWithExactly(...response(44)));
+    });
+
+    it("does not respond to pre-start incoming requests if the origin isn't allowed", function() {
+      fakeWindow.emitter.emit('message', {
+        data: { jsonrpc: '2.0', method: 'changeFocusModeUser', id: 42 },
+        origin: 'https://fake.com',
+        source: frame,
+      });
+      startServer(fakeStore, settings, fakeWindow);
+
+      assert.calledWith(
+        fakeWarnOnce,
+        sinon.match(/Ignoring JSON-RPC request from non-whitelisted origin/)
+      );
     });
   });
 });

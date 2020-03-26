@@ -1,5 +1,8 @@
 import warnOnce from '../shared/warn-once';
 
+// Array to keep track of pre-start requests
+let preStartQueue = [];
+
 /**
  * Return the mapped methods that can be called remotely via this server.
  *
@@ -48,7 +51,18 @@ function isJsonRpcMessage(data) {
 function start(store, settings, $window) {
   const methods = registeredMethods(store);
 
-  $window.addEventListener('message', function receiveMessage(event) {
+  // Process the pre-start incoming RPC requests
+  preStartQueue.forEach(event => {
+    receiveMessage(event);
+  });
+  // Clear the queue and remove the preStartMessageListener
+  preStartQueue = [];
+  window.removeEventListener('message', preStartMessageListener);
+
+  // Start listening to new RPC requests
+  $window.addEventListener('message', receiveMessage);
+
+  function receiveMessage(event) {
     let allowedOrigins = settings.rpcAllowedOrigins || [];
 
     if (!isJsonRpcMessage(event.data)) {
@@ -67,7 +81,7 @@ function start(store, settings, $window) {
     let jsonRpcRequest = event.data;
 
     event.source.postMessage(jsonRpcResponse(jsonRpcRequest), event.origin);
-  });
+  }
 
   /** Return a JSON-RPC response to the given JSON-RPC request object. */
   function jsonRpcResponse(request) {
@@ -93,8 +107,32 @@ function start(store, settings, $window) {
   }
 }
 
-export default {
-  server: {
-    start: start,
-  },
+/**
+ * Queues all incoming RPC requests so they can be handled later.
+ *
+ * @param {MessageEvent} event - RPC event payload
+ */
+function preStartMessageListener(event) {
+  preStartQueue.push(event);
+}
+
+/**
+ * Start listening to incoming RPC requests right away so they don't timeout. These
+ * requests are saved until the server starts up and then they can be handled accordingly.
+ *
+ * Why?
+ *
+ * This allows the client to fetch its config from the parent app frame and potentially
+ * receive new unsolicited incoming requests that the parent app may send before this
+ * RPC server starts.
+ *
+ * @param {Window} window_ - Test seam
+ */
+function preStart(window_ = window) {
+  window_.addEventListener('message', preStartMessageListener);
+}
+
+module.exports = {
+  preStartServer: preStart,
+  startServer: start,
 };

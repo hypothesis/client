@@ -176,7 +176,7 @@ describe('sidebar.util.fetch-config', () => {
         });
       });
 
-      it('makes an RCP request to `requestConfig` ', async () => {
+      it('makes an RPC request to `requestConfig` ', async () => {
         await fetchConfig({}, fakeWindow);
         fakeJsonRpc.call.calledWithExactly(
           fakeTopWindow,
