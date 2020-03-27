@@ -224,6 +224,9 @@ function AnnotationController(
     if (action === 'reply') {
         return !!session.state.privileges.length;
     }
+    if ((action === 'delete' || action === 'update') && !this.canPostToCurrentGroup()) {
+      return false;
+    }
     const belongsToUser = permissions.permits(
       self.annotation.permissions,
       action,
