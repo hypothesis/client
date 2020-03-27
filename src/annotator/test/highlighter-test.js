@@ -26,12 +26,16 @@ describe('annotator/highlighter', () => {
       assert.isTrue(result[0].classList.contains('hypothesis-highlight'));
     });
 
-    it('wraps multiple text nodes', () => {
+    it('wraps multiple text nodes which are not adjacent', () => {
       const strings = ['hello', ' Brave ', ' New ', ' World'];
       const textNodes = strings.map(s => document.createTextNode(s));
 
       const el = document.createElement('span');
-      textNodes.forEach(n => el.append(n));
+      textNodes.forEach(n => {
+        const childEl = document.createElement('span');
+        childEl.append(n);
+        el.append(childEl);
+      });
 
       const r = new Range.NormalizedRange({
         commonAncestor: el,
@@ -47,7 +51,27 @@ describe('annotator/highlighter', () => {
       });
     });
 
-    it('skips text nodes that are only white space', () => {
+    it('wraps multiple text nodes which are adjacent', () => {
+      const strings = ['hello', ' Brave ', ' New ', ' World'];
+      const textNodes = strings.map(s => document.createTextNode(s));
+
+      const el = document.createElement('span');
+      textNodes.forEach(n => el.append(n));
+
+      const r = new Range.NormalizedRange({
+        commonAncestor: el,
+        start: textNodes[0],
+        end: textNodes[textNodes.length - 1],
+      });
+      const result = highlightRange(r);
+
+      assert.equal(result.length, 1);
+      assert.equal(el.childNodes.length, 1);
+      assert.equal(el.childNodes[0], result[0]);
+      assert.equal(result[0].textContent, strings.join(''));
+    });
+
+    it('wraps a span of text nodes which include space-only nodes', () => {
       const txt = document.createTextNode('one');
       const blank = document.createTextNode(' ');
       const txt2 = document.createTextNode('two');
@@ -63,9 +87,24 @@ describe('annotator/highlighter', () => {
 
       const result = highlightRange(r);
 
-      assert.equal(result.length, 2);
-      assert.strictEqual(el.childNodes[0], result[0]);
-      assert.strictEqual(el.childNodes[2], result[1]);
+      assert.equal(result.length, 1);
+      assert.equal(result[0].textContent, 'one two');
+    });
+
+    it('skips text node spans which consist only of spaces', () => {
+      const el = document.createElement('span');
+      el.appendChild(document.createTextNode(' '));
+      el.appendChild(document.createTextNode(''));
+      el.appendChild(document.createTextNode('   '));
+      const r = new Range.NormalizedRange({
+        commonAncestor: el,
+        start: el.childNodes[0],
+        end: el.childNodes[2],
+      });
+
+      const result = highlightRange(r);
+
+      assert.equal(result.length, 0);
     });
   });
 
