@@ -160,7 +160,7 @@ describe('threadList', function() {
     element.scope.$digest();
     assert.equal(
       element[0].querySelectorAll('.thread-list__card--theme-clean').length,
-      element[0].querySelectorAll('annotation-thread').length
+      element[0].querySelectorAll('thread').length
     );
   });
 
@@ -168,7 +168,7 @@ describe('threadList', function() {
     const element = createThreadList();
     fakeVirtualThread.notify();
     element.scope.$digest();
-    const children = element[0].querySelectorAll('annotation-thread');
+    const children = element[0].querySelectorAll('thread');
     assert.equal(children.length, 2);
   });
 

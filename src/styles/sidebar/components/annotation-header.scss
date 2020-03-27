@@ -10,6 +10,7 @@
 
   &__row {
     display: flex;
+    flex-wrap: wrap-reverse;
     align-items: baseline;
   }
 

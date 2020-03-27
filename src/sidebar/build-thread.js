@@ -264,7 +264,7 @@ const defaultOpts = {
 
 /**
  * Project, filter and sort a list of annotations into a thread structure for
- * display by the <annotation-thread> directive.
+ * display by the <Thread> component.
  *
  * buildThread() takes as inputs a flat list of annotations,
  * the current visibility filters and sort function and returns

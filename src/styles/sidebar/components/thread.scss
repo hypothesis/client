@@ -1,0 +1,52 @@
+@use "../../variables" as var;
+
+.thread {
+  display: flex;
+
+  &--reply {
+    margin-top: 0.5em;
+    padding-top: 0.5em;
+  }
+
+  &__collapse {
+    margin: 0.25em;
+    margin-top: 0;
+    cursor: auto;
+    border-left: 1px dashed var.$grey-3;
+
+    &:hover {
+      border-left: 1px dashed var.$grey-4;
+    }
+
+    .is-collapsed & {
+      border-left: none;
+    }
+  }
+
+  // TODO These styles should be consolidated with other `Button` styles
+  &__collapse-button {
+    margin-left: -1.25em;
+    padding: 0.25em 0.75em 1em 0.75em;
+    // Need a non-transparent background so that the dashed border line
+    // does not show through the button
+    background-color: var.$white;
+
+    .button__icon {
+      width: 12px;
+      height: 12px;
+      color: var.$grey-4;
+    }
+
+    &:hover {
+      .button__icon {
+        color: var.$grey-6;
+      }
+    }
+  }
+
+  &__content {
+    flex-grow: 1;
+    // Prevent annotation content from overflowing the container
+    max-width: 100%;
+  }
+}
