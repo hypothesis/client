@@ -126,7 +126,7 @@ module.exports = function(config) {
               [
                 'babel-plugin-istanbul',
                 {
-                  exclude: ['**/test/**/*.{coffee,js}'],
+                  exclude: ['**/test/**/*.{coffee,js}', '**/test-util/**'],
                 },
               ],
             ],
