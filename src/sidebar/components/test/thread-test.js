@@ -131,9 +131,7 @@ describe('Thread', () => {
       const wrapper = createComponent({ thread: replyThread });
 
       act(() => {
-        getToggleButton(wrapper)
-          .props()
-          .onClick();
+        getToggleButton(wrapper).props().onClick();
       });
 
       assert.calledOnce(fakeStore.setCollapsed);

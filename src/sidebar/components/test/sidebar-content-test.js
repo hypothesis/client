@@ -14,7 +14,7 @@ class FakeRootThread extends EventEmitter {
   }
 }
 
-describe('sidebar.components.sidebar-content', function() {
+describe('sidebar.components.sidebar-content', function () {
   let $rootScope;
   let $scope;
   let store;
@@ -27,7 +27,7 @@ describe('sidebar.components.sidebar-content', function() {
   let fakeStreamer;
   let sandbox;
 
-  before(function() {
+  before(function () {
     angular
       .module('h', [])
       .service('store', storeFactory)
@@ -37,7 +37,7 @@ describe('sidebar.components.sidebar-content', function() {
   beforeEach(angular.mock.module('h'));
 
   beforeEach(() => {
-    angular.mock.module(function($provide) {
+    angular.mock.module(function ($provide) {
       sandbox = sinon.createSandbox();
 
       fakeAnalytics = {
@@ -74,13 +74,13 @@ describe('sidebar.components.sidebar-content', function() {
   });
 
   function setFrames(frames) {
-    frames.forEach(function(frame) {
+    frames.forEach(function (frame) {
       store.connectFrame(frame);
     });
   }
 
   const makeSidebarContentController = () => {
-    angular.mock.inject(function($componentController, _store_, _$rootScope_) {
+    angular.mock.inject(function ($componentController, _store_, _$rootScope_) {
       $rootScope = _$rootScope_;
       $scope = $rootScope.$new();
 
@@ -104,7 +104,7 @@ describe('sidebar.components.sidebar-content', function() {
     makeSidebarContentController();
   });
 
-  afterEach(function() {
+  afterEach(function () {
     return sandbox.restore();
   });
 
@@ -223,8 +223,8 @@ describe('sidebar.components.sidebar-content', function() {
     });
   });
 
-  describe('when an annotation is anchored', function() {
-    it('focuses and scrolls to the annotation if already selected', function() {
+  describe('when an annotation is anchored', function () {
+    it('focuses and scrolls to the annotation if already selected', function () {
       const uri = 'http://example.com';
       store.selectAnnotations(['123']);
       setFrames([{ uri: uri }]);
@@ -277,7 +277,7 @@ describe('sidebar.components.sidebar-content', function() {
     });
   });
 
-  describe('direct linking messages', function() {
+  describe('direct linking messages', function () {
     /**
      * Connect a frame, indicating that the document has finished initial
      * loading.
@@ -294,18 +294,18 @@ describe('sidebar.components.sidebar-content', function() {
       ]);
     }
 
-    beforeEach(function() {
+    beforeEach(function () {
       store.setDirectLinkedAnnotationId('test');
     });
 
-    it('displays a message if the selection is unavailable', function() {
+    it('displays a message if the selection is unavailable', function () {
       addFrame();
       store.selectAnnotations(['missing']);
       $scope.$digest();
       assert.isTrue(ctrl.selectedAnnotationUnavailable());
     });
 
-    it('does not show a message if the selection is available', function() {
+    it('does not show a message if the selection is available', function () {
       addFrame();
       store.addAnnotations([{ id: '123' }]);
       store.selectAnnotations(['123']);
@@ -313,14 +313,14 @@ describe('sidebar.components.sidebar-content', function() {
       assert.isFalse(ctrl.selectedAnnotationUnavailable());
     });
 
-    it('does not a show a message if there is no selection', function() {
+    it('does not a show a message if there is no selection', function () {
       addFrame();
       store.selectAnnotations([]);
       $scope.$digest();
       assert.isFalse(ctrl.selectedAnnotationUnavailable());
     });
 
-    it("doesn't show a message if the document isn't loaded yet", function() {
+    it("doesn't show a message if the document isn't loaded yet", function () {
       // There is a selection but the selected annotation isn't available.
       store.selectAnnotations(['missing']);
       store.annotationFetchStarted();
@@ -329,7 +329,7 @@ describe('sidebar.components.sidebar-content', function() {
       assert.isFalse(ctrl.selectedAnnotationUnavailable());
     });
 
-    it('shows logged out message if selection is available', function() {
+    it('shows logged out message if selection is available', function () {
       addFrame();
       ctrl.auth = {
         status: 'logged-out',
@@ -340,7 +340,7 @@ describe('sidebar.components.sidebar-content', function() {
       assert.isTrue(ctrl.shouldShowLoggedOutMessage());
     });
 
-    it('does not show loggedout message if selection is unavailable', function() {
+    it('does not show loggedout message if selection is unavailable', function () {
       addFrame();
       ctrl.auth = {
         status: 'logged-out',
@@ -350,7 +350,7 @@ describe('sidebar.components.sidebar-content', function() {
       assert.isFalse(ctrl.shouldShowLoggedOutMessage());
     });
 
-    it('does not show loggedout message if there is no selection', function() {
+    it('does not show loggedout message if there is no selection', function () {
       addFrame();
       ctrl.auth = {
         status: 'logged-out',
@@ -360,7 +360,7 @@ describe('sidebar.components.sidebar-content', function() {
       assert.isFalse(ctrl.shouldShowLoggedOutMessage());
     });
 
-    it('does not show loggedout message if user is not logged out', function() {
+    it('does not show loggedout message if user is not logged out', function () {
       addFrame();
       ctrl.auth = {
         status: 'logged-in',
@@ -371,7 +371,7 @@ describe('sidebar.components.sidebar-content', function() {
       assert.isFalse(ctrl.shouldShowLoggedOutMessage());
     });
 
-    it('does not show loggedout message if not a direct link', function() {
+    it('does not show loggedout message if not a direct link', function () {
       addFrame();
       ctrl.auth = {
         status: 'logged-out',
@@ -383,7 +383,7 @@ describe('sidebar.components.sidebar-content', function() {
       assert.isFalse(ctrl.shouldShowLoggedOutMessage());
     });
 
-    it('does not show loggedout message if using third-party accounts', function() {
+    it('does not show loggedout message if using third-party accounts', function () {
       fakeSettings.services = [{ authority: 'publisher.com' }];
       addFrame();
       ctrl.auth = { status: 'logged-out' };
@@ -395,19 +395,19 @@ describe('sidebar.components.sidebar-content', function() {
     });
   });
 
-  describe('deferred websocket connection', function() {
-    it('should connect the websocket the first time the sidebar opens', function() {
+  describe('deferred websocket connection', function () {
+    it('should connect the websocket the first time the sidebar opens', function () {
       $rootScope.$broadcast('sidebarOpened');
       assert.called(fakeStreamer.connect);
     });
 
-    describe('when logged in user changes', function() {
-      it('should not reconnect if the sidebar is closed', function() {
+    describe('when logged in user changes', function () {
+      it('should not reconnect if the sidebar is closed', function () {
         $rootScope.$broadcast(events.USER_CHANGED);
         assert.calledOnce(fakeStreamer.reconnect);
       });
 
-      it('should reconnect if the sidebar is open', function() {
+      it('should reconnect if the sidebar is open', function () {
         $rootScope.$broadcast('sidebarOpened');
         fakeStreamer.connect.reset();
         $rootScope.$broadcast(events.USER_CHANGED);

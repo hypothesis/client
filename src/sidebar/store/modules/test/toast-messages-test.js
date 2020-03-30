@@ -1,7 +1,7 @@
 import createStore from '../../create-store';
 import toastMessages from '../toast-messages';
 
-describe('store/modules/toast-messages', function() {
+describe('store/modules/toast-messages', function () {
   let store;
   let fakeToastMessage;
 

@@ -39,7 +39,7 @@ export default class SearchClient extends EventEmitter {
 
     const self = this;
     this._searchFn(searchQuery)
-      .then(function(results) {
+      .then(function (results) {
         if (self._canceled) {
           return;
         }
@@ -67,7 +67,7 @@ export default class SearchClient extends EventEmitter {
           self.emit('end');
         }
       })
-      .catch(function(err) {
+      .catch(function (err) {
         if (self._canceled) {
           return;
         }

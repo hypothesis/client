@@ -72,7 +72,7 @@ function forEachNodeInRange(range, callback) {
 export function getTextBoundingBoxes(range) {
   const whitespaceOnly = /^\s*$/;
   const textNodes = [];
-  forEachNodeInRange(range, function(node) {
+  forEachNodeInRange(range, function (node) {
     if (
       node.nodeType === Node.TEXT_NODE &&
       !node.textContent.match(whitespaceOnly)
@@ -82,7 +82,7 @@ export function getTextBoundingBoxes(range) {
   });
 
   let rects = [];
-  textNodes.forEach(function(node) {
+  textNodes.forEach(function (node) {
     const nodeRange = node.ownerDocument.createRange();
     nodeRange.selectNodeContents(node);
     if (node === range.startContainer) {

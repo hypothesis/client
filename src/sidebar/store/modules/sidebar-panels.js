@@ -27,11 +27,11 @@ function init() {
 }
 
 const update = {
-  OPEN_SIDEBAR_PANEL: function(state, action) {
+  OPEN_SIDEBAR_PANEL: function (state, action) {
     return { activePanelName: action.panelName };
   },
 
-  CLOSE_SIDEBAR_PANEL: function(state, action) {
+  CLOSE_SIDEBAR_PANEL: function (state, action) {
     let activePanelName = state.activePanelName;
     if (action.panelName === activePanelName) {
       // `action.panelName` is indeed the currently-active panel; deactivate
@@ -43,7 +43,7 @@ const update = {
     };
   },
 
-  TOGGLE_SIDEBAR_PANEL: function(state, action) {
+  TOGGLE_SIDEBAR_PANEL: function (state, action) {
     let activePanelName;
     // Is the panel in question currently the active panel?
     const panelIsActive = state.activePanelName === action.panelName;

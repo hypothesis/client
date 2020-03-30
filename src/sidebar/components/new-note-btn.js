@@ -14,7 +14,7 @@ function NewNoteButton({ annotationsService, settings }) {
 
   const openSidebarPanel = useStore(store => store.openSidebarPanel);
 
-  const onNewNoteBtnClick = function() {
+  const onNewNoteBtnClick = function () {
     if (!isLoggedIn) {
       openSidebarPanel(uiConstants.PANEL_LOGIN_PROMPT);
       return;

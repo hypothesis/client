@@ -78,14 +78,14 @@ class FakePDFViewerApplication {
   }
 }
 
-describe('annotator/plugin/pdf-metadata', function() {
+describe('annotator/plugin/pdf-metadata', function () {
   [
     // Event dispatched in older PDF.js versions (pre-7bc4bfcc).
     'documentload',
     // Event dispatched in newer PDF.js versions (post-7bc4bfcc).
     'documentloaded',
   ].forEach(eventName => {
-    it('waits for the PDF to load before returning metadata', function() {
+    it('waits for the PDF to load before returning metadata', function () {
       const fakeApp = new FakePDFViewerApplication();
       const pdfMetadata = new PDFMetadata(fakeApp);
 
@@ -95,25 +95,25 @@ describe('annotator/plugin/pdf-metadata', function() {
         fingerprint: 'fakeFingerprint',
       });
 
-      return pdfMetadata.getUri().then(function(uri) {
+      return pdfMetadata.getUri().then(function (uri) {
         assert.equal(uri, 'http://fake.com/');
       });
     });
   });
 
-  it('does not wait for the PDF to load if it has already loaded', function() {
+  it('does not wait for the PDF to load if it has already loaded', function () {
     const fakePDFViewerApplication = new FakePDFViewerApplication();
     fakePDFViewerApplication.finishLoading({
       url: 'http://fake.com',
       fingerprint: 'fakeFingerprint',
     });
     const pdfMetadata = new PDFMetadata(fakePDFViewerApplication);
-    return pdfMetadata.getUri().then(function(uri) {
+    return pdfMetadata.getUri().then(function (uri) {
       assert.equal(uri, 'http://fake.com/');
     });
   });
 
-  describe('metadata sources', function() {
+  describe('metadata sources', function () {
     let pdfMetadata;
     const fakePDFViewerApplication = new FakePDFViewerApplication();
     fakePDFViewerApplication.finishLoading({
@@ -125,18 +125,18 @@ describe('annotator/plugin/pdf-metadata', function() {
       url: 'http://fake.com/',
     });
 
-    beforeEach(function() {
+    beforeEach(function () {
       pdfMetadata = new PDFMetadata(fakePDFViewerApplication);
     });
 
-    describe('#getUri', function() {
-      it('returns the non-file URI', function() {
-        return pdfMetadata.getUri().then(function(uri) {
+    describe('#getUri', function () {
+      it('returns the non-file URI', function () {
+        return pdfMetadata.getUri().then(function (uri) {
           assert.equal(uri, 'http://fake.com/');
         });
       });
 
-      it('returns the fingerprint as a URN when the PDF URL is a local file', function() {
+      it('returns the fingerprint as a URN when the PDF URL is a local file', function () {
         const fakePDFViewerApplication = new FakePDFViewerApplication();
         fakePDFViewerApplication.finishLoading({
           url: 'file:///test.pdf',
@@ -144,7 +144,7 @@ describe('annotator/plugin/pdf-metadata', function() {
         });
         const pdfMetadata = new PDFMetadata(fakePDFViewerApplication);
 
-        return pdfMetadata.getUri().then(function(uri) {
+        return pdfMetadata.getUri().then(function (uri) {
           assert.equal(uri, 'urn:x-pdf:fakeFingerprint');
         });
       });
@@ -167,8 +167,8 @@ describe('annotator/plugin/pdf-metadata', function() {
       });
     });
 
-    describe('#getMetadata', function() {
-      it('gets the title from the dc:title field', function() {
+    describe('#getMetadata', function () {
+      it('gets the title from the dc:title field', function () {
         const expectedMetadata = {
           title: 'dcFakeTitle',
           link: [
@@ -181,12 +181,12 @@ describe('annotator/plugin/pdf-metadata', function() {
           documentFingerprint: fakePDFViewerApplication.pdfDocument.fingerprint,
         };
 
-        return pdfMetadata.getMetadata().then(function(actualMetadata) {
+        return pdfMetadata.getMetadata().then(function (actualMetadata) {
           assert.deepEqual(actualMetadata, expectedMetadata);
         });
       });
 
-      it('gets the title from the documentInfo.Title field', function() {
+      it('gets the title from the documentInfo.Title field', function () {
         const expectedMetadata = {
           title: fakePDFViewerApplication.documentInfo.Title,
           link: [
@@ -201,12 +201,12 @@ describe('annotator/plugin/pdf-metadata', function() {
 
         fakePDFViewerApplication.metadata.has = sinon.stub().returns(false);
 
-        return pdfMetadata.getMetadata().then(function(actualMetadata) {
+        return pdfMetadata.getMetadata().then(function (actualMetadata) {
           assert.deepEqual(actualMetadata, expectedMetadata);
         });
       });
 
-      it('does not save file:// URLs in document metadata', function() {
+      it('does not save file:// URLs in document metadata', function () {
         let pdfMetadata;
         const fakePDFViewerApplication = new FakePDFViewerApplication();
         fakePDFViewerApplication.finishLoading({
@@ -224,7 +224,7 @@ describe('annotator/plugin/pdf-metadata', function() {
 
         pdfMetadata = new PDFMetadata(fakePDFViewerApplication);
 
-        return pdfMetadata.getMetadata().then(function(actualMetadata) {
+        return pdfMetadata.getMetadata().then(function (actualMetadata) {
           assert.equal(actualMetadata.link.length, 1);
           assert.equal(
             actualMetadata.link[0].href,

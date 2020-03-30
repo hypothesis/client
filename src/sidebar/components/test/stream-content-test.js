@@ -10,7 +10,7 @@ class FakeRootThread extends EventEmitter {
   }
 }
 
-describe('StreamContentController', function() {
+describe('StreamContentController', function () {
   let $componentController;
   let fakeAnnotationMapper;
   let fakeStore;
@@ -20,11 +20,11 @@ describe('StreamContentController', function() {
   let fakeStreamer;
   let fakeStreamFilter;
 
-  before(function() {
+  before(function () {
     angular.module('h', []).component('streamContent', streamContent);
   });
 
-  beforeEach(function() {
+  beforeEach(function () {
     fakeAnnotationMapper = {
       loadAnnotations: sinon.spy(),
     };
@@ -44,7 +44,7 @@ describe('StreamContentController', function() {
     };
 
     fakeApi = {
-      search: sinon.spy(function() {
+      search: sinon.spy(function () {
         return Promise.resolve({ rows: [], total: 0 });
       }),
     };
@@ -74,7 +74,7 @@ describe('StreamContentController', function() {
       streamer: fakeStreamer,
     });
 
-    angular.mock.inject(function(_$componentController_) {
+    angular.mock.inject(function (_$componentController_) {
       $componentController = _$componentController_;
     });
   });
@@ -88,13 +88,13 @@ describe('StreamContentController', function() {
     assert.calledOnce(fakeStore.clearAnnotations);
   });
 
-  it('calls the search API with `_separate_replies: true`', function() {
+  it('calls the search API with `_separate_replies: true`', function () {
     createController();
     assert.equal(fakeApi.search.firstCall.args[0]._separate_replies, true);
   });
 
-  it('passes the annotations and replies from search to loadAnnotations()', function() {
-    fakeApi.search = function() {
+  it('passes the annotations and replies from search to loadAnnotations()', function () {
+    fakeApi.search = function () {
       return Promise.resolve({
         rows: ['annotation_1', 'annotation_2'],
         replies: ['reply_1', 'reply_2', 'reply_3'],
@@ -103,7 +103,7 @@ describe('StreamContentController', function() {
 
     createController();
 
-    return Promise.resolve().then(function() {
+    return Promise.resolve().then(function () {
       assert.calledOnce(fakeAnnotationMapper.loadAnnotations);
       assert.calledWith(
         fakeAnnotationMapper.loadAnnotations,
@@ -113,8 +113,8 @@ describe('StreamContentController', function() {
     });
   });
 
-  context('when route parameters change', function() {
-    it('updates annotations if the query changed', function() {
+  context('when route parameters change', function () {
+    it('updates annotations if the query changed', function () {
       fakeStore.routeParams.returns({ q: 'test query' });
       createController();
       fakeStore.clearAnnotations.resetHistory();
@@ -127,7 +127,7 @@ describe('StreamContentController', function() {
       assert.called(fakeApi.search);
     });
 
-    it('does not clear annotations if the query did not change', function() {
+    it('does not clear annotations if the query did not change', function () {
       fakeStore.routeParams.returns({ q: 'test query' });
       createController();
       fakeApi.search.resetHistory();

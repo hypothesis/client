@@ -22,11 +22,11 @@ export default function scopeTimeout(
   clearTimeoutFn = clearTimeoutFn || clearTimeout;
 
   let removeDestroyHandler;
-  const id = setTimeoutFn(function() {
+  const id = setTimeoutFn(function () {
     removeDestroyHandler();
     fn();
   }, delay);
-  removeDestroyHandler = $scope.$on('$destroy', function() {
+  removeDestroyHandler = $scope.$on('$destroy', function () {
     clearTimeoutFn(id);
   });
 }

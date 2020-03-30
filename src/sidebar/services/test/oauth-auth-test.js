@@ -7,7 +7,7 @@ import authFactory, { $imports } from '../oauth-auth';
 const DEFAULT_TOKEN_EXPIRES_IN_SECS = 1000;
 const TOKEN_KEY = 'hypothesis.oauth.hypothes%2Eis.token';
 
-describe('sidebar.oauth-auth', function() {
+describe('sidebar.oauth-auth', function () {
   let $rootScope;
   let FakeOAuthClient;
   let auth;
@@ -39,7 +39,7 @@ describe('sidebar.oauth-auth', function() {
     angular.module('app', []).service('auth', authFactory);
   });
 
-  beforeEach(function() {
+  beforeEach(function () {
     // Setup fake clock. This has to be done before setting up the `window`
     // fake which makes use of timers.
     clock = sinon.useFakeTimers();
@@ -111,7 +111,7 @@ describe('sidebar.oauth-auth', function() {
     });
   });
 
-  afterEach(function() {
+  afterEach(function () {
     $imports.$restore();
 
     performance.now.restore();
@@ -130,14 +130,14 @@ describe('sidebar.oauth-auth', function() {
     });
   });
 
-  describe('#tokenGetter', function() {
+  describe('#tokenGetter', function () {
     const successfulTokenResponse = Promise.resolve({
       accessToken: 'firstAccessToken',
       refreshToken: 'firstRefreshToken',
       expiresAt: 100,
     });
 
-    it('exchanges the grant token for an access token if provided', function() {
+    it('exchanges the grant token for an access token if provided', function () {
       fakeClient.exchangeGrantToken.returns(successfulTokenResponse);
 
       return auth.tokenGetter().then(token => {
@@ -146,9 +146,9 @@ describe('sidebar.oauth-auth', function() {
       });
     });
 
-    context('when the access token request fails', function() {
+    context('when the access token request fails', function () {
       const expectedErr = new Error('Grant token exchange failed');
-      beforeEach('make access token requests fail', function() {
+      beforeEach('make access token requests fail', function () {
         fakeClient.exchangeGrantToken.returns(Promise.reject(expectedErr));
       });
 
@@ -158,8 +158,8 @@ describe('sidebar.oauth-auth', function() {
         }, func);
       }
 
-      it('shows an error message to the user', function() {
-        return assertThatAccessTokenPromiseWasRejectedAnd(function() {
+      it('shows an error message to the user', function () {
+        return assertThatAccessTokenPromiseWasRejectedAnd(function () {
           assert.calledOnce(fakeFlash.error);
           assert.equal(
             fakeFlash.error.firstCall.args[0],
@@ -168,22 +168,22 @@ describe('sidebar.oauth-auth', function() {
         });
       });
 
-      it('returns a rejected promise', function() {
+      it('returns a rejected promise', function () {
         return assertThatAccessTokenPromiseWasRejectedAnd(err => {
           assert.equal(err.message, expectedErr.message);
         });
       });
     });
 
-    it('should cache tokens for future use', function() {
+    it('should cache tokens for future use', function () {
       fakeClient.exchangeGrantToken.returns(successfulTokenResponse);
       return auth
         .tokenGetter()
-        .then(function() {
+        .then(function () {
           fakeClient.exchangeGrantToken.reset();
           return auth.tokenGetter();
         })
-        .then(function(token) {
+        .then(function (token) {
           assert.equal(token, 'firstAccessToken');
           assert.notCalled(fakeClient.exchangeGrantToken);
         });
@@ -193,7 +193,7 @@ describe('sidebar.oauth-auth', function() {
     // flight when tokenGetter() is called again, then it should just return
     // the pending Promise for the first request again (and not send a second
     // concurrent HTTP request).
-    it('should not make two concurrent access token requests', function() {
+    it('should not make two concurrent access token requests', function () {
       let respond;
       fakeClient.exchangeGrantToken.returns(
         new Promise(resolve => {
@@ -216,15 +216,15 @@ describe('sidebar.oauth-auth', function() {
       });
     });
 
-    it('should not attempt to exchange a grant token if none was provided', function() {
+    it('should not attempt to exchange a grant token if none was provided', function () {
       fakeSettings.services = [{ authority: 'publisher.org' }];
-      return auth.tokenGetter().then(function(token) {
+      return auth.tokenGetter().then(function (token) {
         assert.notCalled(fakeClient.exchangeGrantToken);
         assert.equal(token, null);
       });
     });
 
-    it('should refresh the access token if it expired', function() {
+    it('should refresh the access token if it expired', function () {
       fakeClient.exchangeGrantToken.returns(
         Promise.resolve(successfulTokenResponse)
       );
@@ -258,7 +258,7 @@ describe('sidebar.oauth-auth', function() {
 
     // It only sends one refresh request, even if tokenGetter() is called
     // multiple times and the refresh response hasn't come back yet.
-    it('does not send more than one refresh request', function() {
+    it('does not send more than one refresh request', function () {
       fakeClient.exchangeGrantToken.returns(
         Promise.resolve(successfulTokenResponse)
       );
@@ -296,13 +296,13 @@ describe('sidebar.oauth-auth', function() {
         });
     });
 
-    context('when a refresh request fails', function() {
-      beforeEach('make refresh token requests fail', function() {
+    context('when a refresh request fails', function () {
+      beforeEach('make refresh token requests fail', function () {
         fakeClient.refreshToken.returns(Promise.reject(new Error('failed')));
         fakeClient.exchangeGrantToken.returns(successfulTokenResponse);
       });
 
-      it('logs the user out', function() {
+      it('logs the user out', function () {
         expireAccessToken();
 
         return auth.tokenGetter(token => {

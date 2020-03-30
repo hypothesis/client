@@ -41,7 +41,7 @@ function parseCommandLine() {
 const taskArgs = parseCommandLine();
 
 /** A list of all modules included in vendor bundles. */
-const vendorModules = Object.keys(vendorBundles.bundles).reduce(function(
+const vendorModules = Object.keys(vendorBundles.bundles).reduce(function (
   deps,
   key
 ) {
@@ -50,9 +50,9 @@ const vendorModules = Object.keys(vendorBundles.bundles).reduce(function(
 []);
 
 // Builds the bundles containing vendor JS code
-gulp.task('build-vendor-js', function() {
+gulp.task('build-vendor-js', function () {
   const finished = [];
-  Object.keys(vendorBundles.bundles).forEach(function(name) {
+  Object.keys(vendorBundles.bundles).forEach(function (name) {
     finished.push(
       createBundle({
         name: name,
@@ -130,9 +130,9 @@ const appBundleConfigs = appBundles.concat(polyfillBundles).map(config => {
 
 gulp.task(
   'build-js',
-  gulp.parallel('build-vendor-js', function() {
+  gulp.parallel('build-vendor-js', function () {
     return Promise.all(
-      appBundleConfigs.map(function(config) {
+      appBundleConfigs.map(function (config) {
         return createBundle(config);
       })
     );
@@ -142,7 +142,7 @@ gulp.task(
 gulp.task(
   'watch-js',
   gulp.series('build-vendor-js', function watchJS() {
-    appBundleConfigs.forEach(function(config) {
+    appBundleConfigs.forEach(function (config) {
       createBundle(config, { watch: true });
     });
   })
@@ -161,7 +161,7 @@ const cssBundles = [
   './node_modules/angular-toastr/dist/angular-toastr.css',
 ];
 
-gulp.task('build-css', function() {
+gulp.task('build-css', function () {
   mkdirSync(STYLE_DIR, { recursive: true });
   const bundles = cssBundles.map(entry =>
     createStyleBundle({
@@ -189,7 +189,7 @@ const fontFiles = [
   'node_modules/katex/dist/fonts/*.woff2',
 ];
 
-gulp.task('build-fonts', function() {
+gulp.task('build-fonts', function () {
   return gulp
     .src(fontFiles)
     .pipe(changed(FONTS_DIR))
@@ -204,7 +204,7 @@ gulp.task(
 );
 
 const imageFiles = 'src/images/**/*';
-gulp.task('build-images', function() {
+gulp.task('build-images', function () {
   return gulp
     .src(imageFiles)
     .pipe(changed(IMAGES_DIR))
@@ -273,7 +273,7 @@ function generateManifest(opts) {
     .src(MANIFEST_SOURCE_FILES)
     .pipe(manifest({ name: 'manifest.json' }))
     .pipe(
-      through.obj(function(file, enc, callback) {
+      through.obj(function (file, enc, callback) {
         const newManifest = JSON.parse(file.contents.toString());
 
         // Expand template vars in boot script bundle
@@ -286,17 +286,17 @@ function generateManifest(opts) {
     .pipe(gulp.dest('build/'));
 }
 
-gulp.task('watch-manifest', function() {
+gulp.task('watch-manifest', function () {
   gulp.watch(MANIFEST_SOURCE_FILES, { delay: 500 }, function updateManifest() {
     return generateManifest({ usingDevServer: true });
   });
 });
 
-gulp.task('serve-package', function() {
+gulp.task('serve-package', function () {
   servePackage(3001);
 });
 
-gulp.task('serve-test-pages', function() {
+gulp.task('serve-test-pages', function () {
   const DevServer = require('./scripts/gulp/dev-server');
   new DevServer(3000, {
     // The scheme is omitted here as the client asset server will use the same

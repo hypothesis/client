@@ -51,10 +51,7 @@ function uriMatchesScopes(uri, scopes) {
     scopes.find(uriRegex =>
       uri.match(
         // Convert *'s to .*'s for regex matching and escape all other special characters.
-        uriRegex
-          .split('*')
-          .map(escapeStringRegexp)
-          .join('.*')
+        uriRegex.split('*').map(escapeStringRegexp).join('.*')
       )
     ) !== undefined
   );

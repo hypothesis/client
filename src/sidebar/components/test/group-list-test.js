@@ -210,20 +210,16 @@ describe('GroupList', () => {
 
     // Expand a group in one of the sections.
     act(() => {
-      wrapper
-        .find('GroupListSection')
-        .first()
-        .prop('onExpandGroup')(testGroups[0]);
+      wrapper.find('GroupListSection').first().prop('onExpandGroup')(
+        testGroups[0]
+      );
     });
     wrapper.update();
     verifyGroupIsExpanded(wrapper, testGroups[0]);
 
     // Reset expanded group.
     act(() => {
-      wrapper
-        .find('GroupListSection')
-        .first()
-        .prop('onExpandGroup')(null);
+      wrapper.find('GroupListSection').first().prop('onExpandGroup')(null);
     });
     wrapper.update();
     verifyGroupIsExpanded(wrapper, null);
@@ -235,10 +231,9 @@ describe('GroupList', () => {
 
     // Expand one of the submenus.
     act(() => {
-      wrapper
-        .find('GroupListSection')
-        .first()
-        .prop('onExpandGroup')(testGroups[0]);
+      wrapper.find('GroupListSection').first().prop('onExpandGroup')(
+        testGroups[0]
+      );
     });
     wrapper.update();
     verifyGroupIsExpanded(wrapper, testGroups[0]);

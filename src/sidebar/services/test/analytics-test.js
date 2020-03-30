@@ -1,10 +1,10 @@
 import analyticsService from '../analytics';
 
-describe('analytics', function() {
+describe('analytics', function () {
   let $windowStub;
   let svc;
 
-  beforeEach(function() {
+  beforeEach(function () {
     $windowStub = {
       ga: sinon.stub(),
       location: {
@@ -36,10 +36,10 @@ describe('analytics', function() {
     );
   }
 
-  describe('applying global category based on environment contexts', function() {
-    it('sets the category to match the appType setting value', function() {
+  describe('applying global category based on environment contexts', function () {
+    it('sets the category to match the appType setting value', function () {
       const validTypes = ['chrome-extension', 'embed', 'bookmarklet', 'via'];
-      validTypes.forEach(function(appType, index) {
+      validTypes.forEach(function (appType, index) {
         analyticsService($windowStub, { appType: appType }).track(
           'event' + index
         );
@@ -47,12 +47,12 @@ describe('analytics', function() {
       });
     });
 
-    it('sets category as embed if no other matches can be made', function() {
+    it('sets category as embed if no other matches can be made', function () {
       analyticsService($windowStub).track('eventA');
       checkEventSent('embed', 'eventA');
     });
 
-    it('sets category as via if url matches the via uri pattern', function() {
+    it('sets category as via if url matches the via uri pattern', function () {
       $windowStub.document.referrer = 'https://via.hypothes.is/';
       analyticsService($windowStub).track('eventA');
       checkEventSent('via', 'eventA');
@@ -63,7 +63,7 @@ describe('analytics', function() {
       checkEventSent('via', 'eventB');
     });
 
-    it('sets category as chrome-extension if protocol matches chrome-extension:', function() {
+    it('sets category as chrome-extension if protocol matches chrome-extension:', function () {
       $windowStub.location.protocol = 'chrome-extension:';
       analyticsService($windowStub).track('eventA');
       checkEventSent('chrome-extension', 'eventA');
@@ -71,17 +71,17 @@ describe('analytics', function() {
   });
 
   describe('#track', () => {
-    it('allows custom labels to be sent for an event', function() {
+    it('allows custom labels to be sent for an event', function () {
       svc.track('eventA', 'labelA');
       checkEventSent('embed', 'eventA', 'labelA');
     });
 
-    it('allows custom metricValues to be sent for an event', function() {
+    it('allows custom metricValues to be sent for an event', function () {
       svc.track('eventA', null, 242.2);
       checkEventSent('embed', 'eventA', null, 242.2);
     });
 
-    it('allows custom metricValues and labels to be sent for an event', function() {
+    it('allows custom metricValues and labels to be sent for an event', function () {
       svc.track('eventA', 'labelabc', 242.2);
       checkEventSent('embed', 'eventA', 'labelabc', 242.2);
     });

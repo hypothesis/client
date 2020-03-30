@@ -222,8 +222,6 @@ export default class Discovery {
    * and a server.
    */
   generateToken() {
-    return Math.random()
-      .toString()
-      .replace(/\D/g, '');
+    return Math.random().toString().replace(/\D/g, '');
   }
 }

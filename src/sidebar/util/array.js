@@ -5,7 +5,7 @@
  * @param {Function} predicate
  */
 export function countIf(ary, predicate) {
-  return ary.reduce(function(count, item) {
+  return ary.reduce(function (count, item) {
     return predicate(item) ? count + 1 : count;
   }, 0);
 }
@@ -16,7 +16,7 @@ export function countIf(ary, predicate) {
  * @param {string[]} list - List of keys for the set.
  */
 export function toSet(list) {
-  return list.reduce(function(set, key) {
+  return list.reduce(function (set, key) {
     set[key] = true;
     return set;
   }, {});

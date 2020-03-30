@@ -33,7 +33,7 @@ function codeOfConductText() {
  */
 function DevServer(port, config) {
   function listen() {
-    const app = function(req, response) {
+    const app = function (req, response) {
       const url = urlParser.parse(req.url);
       let content;
 
@@ -136,7 +136,7 @@ function DevServer(port, config) {
     };
 
     const server = createServer(app);
-    server.listen(port, function(err) {
+    server.listen(port, function (err) {
       if (err) {
         log('Setting up dev server failed', err);
       }

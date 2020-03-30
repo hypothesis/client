@@ -125,13 +125,7 @@ describe('MenuItem', () => {
       submenu: <div>Submenu content</div>,
     });
     assert.equal(wrapper.find('Slider').prop('visible'), true);
-    assert.equal(
-      wrapper
-        .find('Slider')
-        .children()
-        .text(),
-      'Submenu content'
-    );
+    assert.equal(wrapper.find('Slider').children().text(), 'Submenu content');
   });
 
   it('hides submenu content if `isSubmenuVisible` is false', () => {
@@ -143,13 +137,7 @@ describe('MenuItem', () => {
 
     // The submenu content may still be rendered if the submenu is currently
     // collapsing.
-    assert.equal(
-      wrapper
-        .find('Slider')
-        .children()
-        .text(),
-      'Submenu content'
-    );
+    assert.equal(wrapper.find('Slider').children().text(), 'Submenu content');
   });
 
   it(

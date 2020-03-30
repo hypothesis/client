@@ -1,7 +1,7 @@
 import VirtualThreadList from '../virtual-thread-list';
 import { $imports } from '../virtual-thread-list';
 
-describe('VirtualThreadList', function() {
+describe('VirtualThreadList', function () {
   let lastState;
   let threadList;
   const threadOptions = {};
@@ -19,7 +19,7 @@ describe('VirtualThreadList', function() {
   }
 
   function threadIDs(threads) {
-    return threads.map(function(thread) {
+    return threads.map(function (thread) {
       return thread.id;
     });
   }
@@ -27,7 +27,7 @@ describe('VirtualThreadList', function() {
   function generateRootThread(count) {
     return {
       annotation: undefined,
-      children: idRange(0, count - 1).map(function(id) {
+      children: idRange(0, count - 1).map(function (id) {
         return { id: id, annotation: undefined, children: [] };
       }),
     };
@@ -52,23 +52,23 @@ describe('VirtualThreadList', function() {
     $imports.$restore();
   });
 
-  beforeEach(function() {
+  beforeEach(function () {
     fakeScope = { $digest: sinon.stub() };
 
     fakeScrollRoot = {
       scrollTop: 0,
       listeners: {},
-      addEventListener: function(event, listener) {
+      addEventListener: function (event, listener) {
         this.listeners[event] = this.listeners[event] || [];
         this.listeners[event].push(listener);
       },
-      removeEventListener: function(event, listener) {
-        this.listeners[event] = this.listeners[event].filter(function(fn) {
+      removeEventListener: function (event, listener) {
+        this.listeners[event] = this.listeners[event].filter(function (fn) {
           return fn !== listener;
         });
       },
-      trigger: function(event) {
-        (this.listeners[event] || []).forEach(function(cb) {
+      trigger: function (event) {
+        (this.listeners[event] || []).forEach(function (cb) {
           cb();
         });
       },
@@ -76,17 +76,17 @@ describe('VirtualThreadList', function() {
 
     fakeWindow = {
       listeners: {},
-      addEventListener: function(event, listener) {
+      addEventListener: function (event, listener) {
         this.listeners[event] = this.listeners[event] || [];
         this.listeners[event].push(listener);
       },
-      removeEventListener: function(event, listener) {
-        this.listeners[event] = this.listeners[event].filter(function(fn) {
+      removeEventListener: function (event, listener) {
+        this.listeners[event] = this.listeners[event].filter(function (fn) {
           return fn !== listener;
         });
       },
-      trigger: function(event) {
-        (this.listeners[event] || []).forEach(function(cb) {
+      trigger: function (event) {
+        (this.listeners[event] || []).forEach(function (cb) {
           cb();
         });
       },
@@ -102,7 +102,7 @@ describe('VirtualThreadList', function() {
       rootThread,
       threadOptions
     );
-    threadList.on('changed', function(state) {
+    threadList.on('changed', function (state) {
       lastState = state;
     });
   });
@@ -157,24 +157,24 @@ describe('VirtualThreadList', function() {
     });
   });
 
-  it('recalculates when a window.resize occurs', function() {
+  it('recalculates when a window.resize occurs', function () {
     lastState = null;
     fakeWindow.trigger('resize');
     assert.ok(lastState);
   });
 
-  it('recalculates when a scrollRoot.scroll occurs', function() {
+  it('recalculates when a scrollRoot.scroll occurs', function () {
     lastState = null;
     fakeScrollRoot.trigger('scroll');
     assert.ok(lastState);
   });
 
-  it('recalculates when root thread changes', function() {
+  it('recalculates when root thread changes', function () {
     threadList.setRootThread({ annotation: undefined, children: [] });
     assert.ok(lastState);
   });
 
-  describe('#setThreadHeight', function() {
+  describe('#setThreadHeight', function () {
     [
       {
         threadHeight: 1000,
@@ -189,7 +189,7 @@ describe('VirtualThreadList', function() {
         const thread = generateRootThread(10);
         fakeWindow.innerHeight = 500;
         fakeScrollRoot.scrollTop = 0;
-        idRange(0, 10).forEach(function(id) {
+        idRange(0, 10).forEach(function (id) {
           threadList.setThreadHeight(id, testCase.threadHeight);
         });
         threadList.setRootThread(thread);
@@ -201,14 +201,14 @@ describe('VirtualThreadList', function() {
     });
   });
 
-  describe('#detach', function() {
-    it('stops listening to window.resize events', function() {
+  describe('#detach', function () {
+    it('stops listening to window.resize events', function () {
       threadList.detach();
       lastState = null;
       fakeWindow.trigger('resize');
       assert.isNull(lastState);
     });
-    it('stops listening to scrollRoot.scroll events', function() {
+    it('stops listening to scrollRoot.scroll events', function () {
       threadList.detach();
       lastState = null;
       fakeScrollRoot.trigger('scroll');
@@ -216,7 +216,7 @@ describe('VirtualThreadList', function() {
     });
   });
 
-  describe('#yOffsetOf', function() {
+  describe('#yOffsetOf', function () {
     [
       {
         nth: 'first',
@@ -237,7 +237,7 @@ describe('VirtualThreadList', function() {
       it(`returns ${testCase.offset} as the Y offset of the ${testCase.nth} thread`, () => {
         const thread = generateRootThread(10);
         threadList.setRootThread(thread);
-        idRange(0, 10).forEach(function(id) {
+        idRange(0, 10).forEach(function (id) {
           threadList.setThreadHeight(id, 100);
         });
         const id = idRange(testCase.index, testCase.index)[0];

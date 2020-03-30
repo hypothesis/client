@@ -8,15 +8,15 @@ const _set = features => {
 };
 
 export default {
-  init: function(crossframe) {
+  init: function (crossframe) {
     crossframe.on(events.FEATURE_FLAGS_UPDATED, _set);
   },
 
-  reset: function() {
+  reset: function () {
     _set({});
   },
 
-  flagEnabled: function(flag) {
+  flagEnabled: function (flag) {
     if (!(flag in _features)) {
       warnOnce('looked up unknown feature', flag);
       return false;

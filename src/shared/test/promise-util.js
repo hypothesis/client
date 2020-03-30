@@ -35,10 +35,10 @@ export function assertPromiseIsRejected(promise, expectedErr) {
  */
 export function toResult(promise) {
   return promise
-    .then(function(result) {
+    .then(function (result) {
       return { result: result };
     })
-    .catch(function(err) {
+    .catch(function (err) {
       return { error: err };
     });
 }

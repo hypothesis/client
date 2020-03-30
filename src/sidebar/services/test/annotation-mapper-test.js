@@ -5,14 +5,14 @@ import storeFactory from '../../store';
 import annotationMapperFactory from '../annotation-mapper';
 import immutable from '../../util/immutable';
 
-describe('annotationMapper', function() {
+describe('annotationMapper', function () {
   const sandbox = sinon.createSandbox();
   let $rootScope;
   let store;
   let fakeApi;
   let annotationMapper;
 
-  beforeEach(function() {
+  beforeEach(function () {
     fakeApi = {
       annotation: {
         delete: sinon.stub().returns(Promise.resolve({})),
@@ -27,19 +27,19 @@ describe('annotationMapper', function() {
       .value('settings', {});
     angular.mock.module('app');
 
-    angular.mock.inject(function(_$rootScope_, _store_, _annotationMapper_) {
+    angular.mock.inject(function (_$rootScope_, _store_, _annotationMapper_) {
       $rootScope = _$rootScope_;
       annotationMapper = _annotationMapper_;
       store = _store_;
     });
   });
 
-  afterEach(function() {
+  afterEach(function () {
     sandbox.restore();
   });
 
-  describe('#loadAnnotations()', function() {
-    it('triggers the annotationLoaded event', function() {
+  describe('#loadAnnotations()', function () {
+    it('triggers the annotationLoaded event', function () {
       sandbox.stub($rootScope, '$broadcast');
       const annotations = [{ id: 1 }, { id: 2 }, { id: 3 }];
       annotationMapper.loadAnnotations(annotations);
@@ -51,7 +51,7 @@ describe('annotationMapper', function() {
       ]);
     });
 
-    it('also includes replies in the annotationLoaded event', function() {
+    it('also includes replies in the annotationLoaded event', function () {
       sandbox.stub($rootScope, '$broadcast');
       const annotations = [{ id: 1 }];
       const replies = [{ id: 2 }, { id: 3 }];
@@ -64,7 +64,7 @@ describe('annotationMapper', function() {
       ]);
     });
 
-    it('triggers the annotationUpdated event for each loaded annotation', function() {
+    it('triggers the annotationUpdated event for each loaded annotation', function () {
       sandbox.stub($rootScope, '$broadcast');
       const annotations = immutable([{ id: 1 }, { id: 2 }, { id: 3 }]);
       store.addAnnotations(angular.copy(annotations));
@@ -78,7 +78,7 @@ describe('annotationMapper', function() {
       );
     });
 
-    it('also triggers annotationUpdated for cached replies', function() {
+    it('also triggers annotationUpdated for cached replies', function () {
       sandbox.stub($rootScope, '$broadcast');
       const annotations = [{ id: 1 }];
       const replies = [{ id: 2 }, { id: 3 }, { id: 4 }];
@@ -90,7 +90,7 @@ describe('annotationMapper', function() {
       );
     });
 
-    it('replaces the properties on the cached annotation with those from the loaded one', function() {
+    it('replaces the properties on the cached annotation with those from the loaded one', function () {
       sandbox.stub($rootScope, '$broadcast');
       const annotations = [{ id: 1, url: 'http://example.com' }];
       store.addAnnotations([{ id: 1, $tag: 'tag1' }]);
@@ -103,7 +103,7 @@ describe('annotationMapper', function() {
       });
     });
 
-    it('excludes cached annotations from the annotationLoaded event', function() {
+    it('excludes cached annotations from the annotationLoaded event', function () {
       sandbox.stub($rootScope, '$broadcast');
       const annotations = [{ id: 1, url: 'http://example.com' }];
       store.addAnnotations([{ id: 1, $tag: 'tag1' }]);
@@ -114,20 +114,20 @@ describe('annotationMapper', function() {
     });
   });
 
-  describe('#flagAnnotation()', function() {
-    it('flags an annotation', function() {
+  describe('#flagAnnotation()', function () {
+    it('flags an annotation', function () {
       const ann = { id: 'test-id' };
       annotationMapper.flagAnnotation(ann);
       assert.calledOnce(fakeApi.annotation.flag);
       assert.calledWith(fakeApi.annotation.flag, { id: ann.id });
     });
 
-    it('emits the "annotationFlagged" event', function(done) {
+    it('emits the "annotationFlagged" event', function (done) {
       sandbox.stub($rootScope, '$broadcast');
       const ann = { id: 'test-id' };
       annotationMapper
         .flagAnnotation(ann)
-        .then(function() {
+        .then(function () {
           assert.calledWith(
             $rootScope.$broadcast,
             events.ANNOTATION_FLAGGED,
@@ -138,14 +138,14 @@ describe('annotationMapper', function() {
     });
   });
 
-  describe('#createAnnotation()', function() {
-    it('creates a new annotation resource', function() {
+  describe('#createAnnotation()', function () {
+    it('creates a new annotation resource', function () {
       const ann = {};
       const ret = annotationMapper.createAnnotation(ann);
       assert.equal(ret, ann);
     });
 
-    it('emits the "beforeAnnotationCreated" event', function() {
+    it('emits the "beforeAnnotationCreated" event', function () {
       sandbox.stub($rootScope, '$broadcast');
       const ann = {};
       annotationMapper.createAnnotation(ann);
@@ -157,19 +157,19 @@ describe('annotationMapper', function() {
     });
   });
 
-  describe('#deleteAnnotation()', function() {
-    it('deletes the annotation on the server', function() {
+  describe('#deleteAnnotation()', function () {
+    it('deletes the annotation on the server', function () {
       const ann = { id: 'test-id' };
       annotationMapper.deleteAnnotation(ann);
       assert.calledWith(fakeApi.annotation.delete, { id: 'test-id' });
     });
 
-    it('triggers the "annotationDeleted" event on success', function(done) {
+    it('triggers the "annotationDeleted" event on success', function (done) {
       sandbox.stub($rootScope, '$broadcast');
       const ann = {};
       annotationMapper
         .deleteAnnotation(ann)
-        .then(function() {
+        .then(function () {
           assert.calledWith(
             $rootScope.$broadcast,
             events.ANNOTATION_DELETED,
@@ -180,13 +180,13 @@ describe('annotationMapper', function() {
       $rootScope.$apply();
     });
 
-    it('does not emit an event on error', function(done) {
+    it('does not emit an event on error', function (done) {
       sandbox.stub($rootScope, '$broadcast');
       fakeApi.annotation.delete.returns(Promise.reject());
       const ann = { id: 'test-id' };
       annotationMapper
         .deleteAnnotation(ann)
-        .catch(function() {
+        .catch(function () {
           assert.notCalled($rootScope.$broadcast);
         })
         .then(done, done);

@@ -7,7 +7,7 @@ import { $imports } from '../session';
 
 const mock = angular.mock;
 
-describe('sidebar.session', function() {
+describe('sidebar.session', function () {
   let $rootScope;
 
   let fakeAnalytics;
@@ -22,11 +22,11 @@ describe('sidebar.session', function() {
   // The instance of the `session` service.
   let session;
 
-  before(function() {
+  before(function () {
     angular.module('h', []).service('session', sessionFactory);
   });
 
-  beforeEach(function() {
+  beforeEach(function () {
     sandbox = sinon.createSandbox();
 
     let state = {};
@@ -35,10 +35,10 @@ describe('sidebar.session', function() {
       events: analyticsEvents,
     };
     const fakeStore = {
-      getState: function() {
+      getState: function () {
         return { session: state };
       },
-      updateSession: function(session) {
+      updateSession: function (session) {
         state = session;
       },
     };
@@ -76,20 +76,20 @@ describe('sidebar.session', function() {
   });
 
   beforeEach(
-    mock.inject(function(_$rootScope_, _session_) {
+    mock.inject(function (_$rootScope_, _session_) {
       session = _session_;
       $rootScope = _$rootScope_;
     })
   );
 
-  afterEach(function() {
+  afterEach(function () {
     $imports.$restore();
     sandbox.restore();
   });
 
-  describe('#load()', function() {
-    context('when the host page provides an OAuth grant token', function() {
-      beforeEach(function() {
+  describe('#load()', function () {
+    context('when the host page provides an OAuth grant token', function () {
+      beforeEach(function () {
         fakeServiceConfig.returns({
           authority: 'publisher.org',
           grantToken: 'a.jwt.token',
@@ -101,16 +101,16 @@ describe('sidebar.session', function() {
         );
       });
 
-      it('should pass the "authority" param when fetching the profile', function() {
-        return session.load().then(function() {
+      it('should pass the "authority" param when fetching the profile', function () {
+        return session.load().then(function () {
           assert.calledWith(fakeApi.profile.read, {
             authority: 'publisher.org',
           });
         });
       });
 
-      it('should update the session with the profile data from the API', function() {
-        return session.load().then(function() {
+      it('should update the session with the profile data from the API', function () {
+        return session.load().then(function () {
           assert.equal(session.state.userid, 'acct:user@publisher.org');
         });
       });
@@ -158,7 +158,7 @@ describe('sidebar.session', function() {
       });
 
       it('should update the session with the profile data from the API', () => {
-        return session.load().then(function() {
+        return session.load().then(function () {
           assert.equal(session.state.userid, 'acct:user@hypothes.is');
         });
       });
@@ -191,8 +191,8 @@ describe('sidebar.session', function() {
     });
   });
 
-  describe('#update()', function() {
-    it('broadcasts USER_CHANGED when the user changes', function() {
+  describe('#update()', function () {
+    it('broadcasts USER_CHANGED when the user changes', function () {
       const userChangeCallback = sinon.stub();
       $rootScope.$on(events.USER_CHANGED, userChangeCallback);
       session.update({
@@ -201,7 +201,7 @@ describe('sidebar.session', function() {
       assert.calledOnce(userChangeCallback);
     });
 
-    it('updates the user ID for Sentry error reports', function() {
+    it('updates the user ID for Sentry error reports', function () {
       session.update({
         userid: 'anne',
       });
@@ -211,8 +211,8 @@ describe('sidebar.session', function() {
     });
   });
 
-  describe('#dismissSidebarTutorial()', function() {
-    beforeEach(function() {
+  describe('#dismissSidebarTutorial()', function () {
+    beforeEach(function () {
       fakeApi.profile.update.returns(
         Promise.resolve({
           preferences: {},
@@ -220,7 +220,7 @@ describe('sidebar.session', function() {
       );
     });
 
-    it('disables the tutorial for the user', function() {
+    it('disables the tutorial for the user', function () {
       session.dismissSidebarTutorial();
       assert.calledWith(
         fakeApi.profile.update,
@@ -229,8 +229,8 @@ describe('sidebar.session', function() {
       );
     });
 
-    it('should update the session with the response from the API', function() {
-      return session.dismissSidebarTutorial().then(function() {
+    it('should update the session with the response from the API', function () {
+      return session.dismissSidebarTutorial().then(function () {
         assert.isNotOk(session.state.preferences.show_sidebar_tutorial);
       });
     });
@@ -260,7 +260,7 @@ describe('sidebar.session', function() {
     });
   });
 
-  describe('#logout', function() {
+  describe('#logout', function () {
     beforeEach(() => {
       let loggedIn = true;
 

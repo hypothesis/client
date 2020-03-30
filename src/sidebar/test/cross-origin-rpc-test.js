@@ -10,14 +10,14 @@ class FakeWindow {
   }
 }
 
-describe('sidebar/cross-origin-rcp', function() {
+describe('sidebar/cross-origin-rcp', function () {
   let fakeStore;
   let fakeWarnOnce;
   let fakeWindow;
   let settings;
   let frame;
 
-  beforeEach(function() {
+  beforeEach(function () {
     fakeStore = {
       changeFocusModeUser: sinon.stub(),
     };
@@ -40,8 +40,8 @@ describe('sidebar/cross-origin-rcp', function() {
     $imports.$restore();
   });
 
-  describe('#startServer', function() {
-    it('sends a response with the "ok" result', function() {
+  describe('#startServer', function () {
+    it('sends a response with the "ok" result', function () {
       startServer(fakeStore, settings, fakeWindow);
 
       fakeWindow.emitter.emit('message', {
@@ -64,7 +64,7 @@ describe('sidebar/cross-origin-rcp', function() {
       );
     });
 
-    it('calls the registered method with the provided params', function() {
+    it('calls the registered method with the provided params', function () {
       startServer(fakeStore, settings, fakeWindow);
 
       fakeWindow.emitter.emit('message', {
@@ -83,7 +83,7 @@ describe('sidebar/cross-origin-rcp', function() {
       );
     });
 
-    it('calls the registered method with no params', function() {
+    it('calls the registered method with no params', function () {
       startServer(fakeStore, settings, fakeWindow);
 
       fakeWindow.emitter.emit('message', {
@@ -98,7 +98,7 @@ describe('sidebar/cross-origin-rcp', function() {
       assert.isTrue(fakeStore.changeFocusModeUser.calledWithExactly());
     });
 
-    it('does not call the unregistered method', function() {
+    it('does not call the unregistered method', function () {
       startServer(fakeStore, settings, fakeWindow);
 
       fakeWindow.emitter.emit('message', {
@@ -132,8 +132,8 @@ describe('sidebar/cross-origin-rcp', function() {
       {},
       { rpcAllowedOrigins: [] },
       { rpcAllowedOrigins: ['https://allowed1.com', 'https://allowed2.com'] },
-    ].forEach(function(settings) {
-      it("doesn't respond if the origin isn't allowed", function() {
+    ].forEach(function (settings) {
+      it("doesn't respond if the origin isn't allowed", function () {
         startServer(fakeStore, settings, fakeWindow);
 
         fakeWindow.emitter.emit('message', {
@@ -150,7 +150,7 @@ describe('sidebar/cross-origin-rcp', function() {
       });
     });
 
-    it("responds with an error if there's no method", function() {
+    it("responds with an error if there's no method", function () {
       startServer(fakeStore, settings, fakeWindow);
       let jsonRpcRequest = { jsonrpc: '2.0', id: 42 }; // No "method" member.
 
@@ -176,8 +176,8 @@ describe('sidebar/cross-origin-rcp', function() {
       );
     });
 
-    ['unknownMethod', null].forEach(function(method) {
-      it('responds with an error if the method is unknown', function() {
+    ['unknownMethod', null].forEach(function (method) {
+      it('responds with an error if the method is unknown', function () {
         startServer(fakeStore, settings, fakeWindow);
 
         fakeWindow.emitter.emit('message', {
@@ -204,12 +204,12 @@ describe('sidebar/cross-origin-rcp', function() {
     });
   });
 
-  describe('#preStartServer', function() {
-    beforeEach(function() {
+  describe('#preStartServer', function () {
+    beforeEach(function () {
       preStartServer(fakeWindow);
     });
 
-    it('responds to an incoming request that arrives before the server starts', function() {
+    it('responds to an incoming request that arrives before the server starts', function () {
       fakeWindow.emitter.emit('message', {
         data: { jsonrpc: '2.0', method: 'changeFocusModeUser', id: 42 },
         origin: 'https://allowed1.com',
@@ -228,7 +228,7 @@ describe('sidebar/cross-origin-rcp', function() {
       );
     });
 
-    it('responds to multiple incoming requests that arrive before the server starts', function() {
+    it('responds to multiple incoming requests that arrive before the server starts', function () {
       const messageEvent = id => ({
         data: { jsonrpc: '2.0', method: 'changeFocusModeUser', id },
         origin: 'https://allowed1.com',
@@ -255,7 +255,7 @@ describe('sidebar/cross-origin-rcp', function() {
       assert.isTrue(frame.postMessage.calledWithExactly(...response(44)));
     });
 
-    it("does not respond to pre-start incoming requests if the origin isn't allowed", function() {
+    it("does not respond to pre-start incoming requests if the origin isn't allowed", function () {
       fakeWindow.emitter.emit('message', {
         data: { jsonrpc: '2.0', method: 'changeFocusModeUser', id: 42 },
         origin: 'https://fake.com',

@@ -34,7 +34,7 @@ const NESTED_THREADS = {
   ],
 };
 
-describe('threadsService', function() {
+describe('threadsService', function () {
   let fakeStore;
   let service;
 

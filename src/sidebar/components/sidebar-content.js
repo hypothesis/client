@@ -43,7 +43,7 @@ function SidebarContentController(
       const id = Object.keys(
         store.getState().selection.selectedAnnotationMap
       )[0];
-      return store.getState().annotations.annotations.find(function(annot) {
+      return store.getState().annotations.annotations.find(function (annot) {
         return annot.id === id;
       });
     } else {
@@ -53,7 +53,7 @@ function SidebarContentController(
 
   this.isLoading = () => {
     if (
-      !store.frames().some(function(frame) {
+      !store.frames().some(function (frame) {
         return frame.uri;
       })
     ) {
@@ -63,7 +63,7 @@ function SidebarContentController(
     return store.isFetchingAnnotations();
   };
 
-  $scope.$on('sidebarOpened', function() {
+  $scope.$on('sidebarOpened', function () {
     analytics.track(analytics.events.SIDEBAR_OPENED);
 
     streamer.connect();
@@ -76,18 +76,18 @@ function SidebarContentController(
     }
   };
 
-  $scope.$on(events.USER_CHANGED, function() {
+  $scope.$on(events.USER_CHANGED, function () {
     streamer.reconnect();
   });
 
-  $scope.$on(events.ANNOTATIONS_SYNCED, function(event, tags) {
+  $scope.$on(events.ANNOTATIONS_SYNCED, function (event, tags) {
     // When a direct-linked annotation is successfully anchored in the page,
     // focus and scroll to it
     const selectedAnnot = firstSelectedAnnotation();
     if (!selectedAnnot) {
       return;
     }
-    const matchesSelection = tags.some(function(tag) {
+    const matchesSelection = tags.some(function (tag) {
       return tag === selectedAnnot.$tag;
     });
     if (!matchesSelection) {
@@ -129,7 +129,7 @@ function SidebarContentController(
     return store.focusModeEnabled();
   };
 
-  this.showSelectedTabs = function() {
+  this.showSelectedTabs = function () {
     if (
       this.selectedAnnotationUnavailable() ||
       this.selectedGroupUnavailable() ||
@@ -143,25 +143,25 @@ function SidebarContentController(
     }
   };
 
-  this.setCollapsed = function(id, collapsed) {
+  this.setCollapsed = function (id, collapsed) {
     store.setCollapsed(id, collapsed);
   };
 
   this.focus = focusAnnotation;
   this.scrollTo = scrollToAnnotation;
 
-  this.selectedGroupUnavailable = function() {
+  this.selectedGroupUnavailable = function () {
     return store.getState().directLinked.directLinkedGroupFetchFailed;
   };
 
-  this.selectedAnnotationUnavailable = function() {
+  this.selectedAnnotationUnavailable = function () {
     const selectedID = store.getFirstSelectedAnnotationId();
     return (
       !this.isLoading() && !!selectedID && !store.annotationExists(selectedID)
     );
   };
 
-  this.shouldShowLoggedOutMessage = function() {
+  this.shouldShowLoggedOutMessage = function () {
     // If user is not logged out, don't show CTA.
     if (self.auth.status !== 'logged-out') {
       return false;

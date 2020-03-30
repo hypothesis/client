@@ -95,13 +95,13 @@ describe('ModerationBanner', () => {
     });
   });
 
-  it('displays the number of flags the annotation has received', function() {
+  it('displays the number of flags the annotation has received', function () {
     const ann = fixtures.moderatedAnnotation({ flagCount: 10 });
     const wrapper = createComponent({ annotation: ann });
     assert.include(wrapper.text(), 'Flagged for review x10');
   });
 
-  it('displays in a more compact form if the annotation is a reply', function() {
+  it('displays in a more compact form if the annotation is a reply', function () {
     const wrapper = createComponent({
       annotation: {
         ...fixtures.oldReply(),
@@ -113,7 +113,7 @@ describe('ModerationBanner', () => {
     wrapper.exists('.is-reply');
   });
 
-  it('does not display in a more compact form if the annotation is not a reply', function() {
+  it('does not display in a more compact form if the annotation is not a reply', function () {
     const wrapper = createComponent({
       annotation: {
         ...fixtures.moderatedAnnotation({}),
@@ -125,7 +125,7 @@ describe('ModerationBanner', () => {
     assert.isFalse(wrapper.exists('.is-reply'));
   });
 
-  it('reports if the annotation was hidden', function() {
+  it('reports if the annotation was hidden', function () {
     const wrapper = createComponent({
       annotation: fixtures.moderatedAnnotation({
         flagCount: 1,
@@ -135,7 +135,7 @@ describe('ModerationBanner', () => {
     assert.include(wrapper.text(), 'Hidden from users');
   });
 
-  it('hides the annotation if "Hide" is clicked', function() {
+  it('hides the annotation if "Hide" is clicked', function () {
     const wrapper = createComponent({
       annotation: fixtures.moderatedAnnotation({
         flagCount: 10,
@@ -145,7 +145,7 @@ describe('ModerationBanner', () => {
     assert.calledWith(fakeApi.annotation.hide, { id: 'ann-id' });
   });
 
-  it('reports an error if hiding the annotation fails', function(done) {
+  it('reports an error if hiding the annotation fails', function (done) {
     const wrapper = createComponent({
       annotation: moderatedAnnotation({
         flagCount: 10,
@@ -154,13 +154,13 @@ describe('ModerationBanner', () => {
     fakeApi.annotation.hide.returns(Promise.reject(new Error('Network Error')));
     wrapper.find('button').simulate('click');
 
-    setTimeout(function() {
+    setTimeout(function () {
       assert.calledWith(fakeToastMessenger.error, 'Failed to hide annotation');
       done();
     }, 0);
   });
 
-  it('unhides the annotation if "Unhide" is clicked', function() {
+  it('unhides the annotation if "Unhide" is clicked', function () {
     const wrapper = createComponent({
       annotation: moderatedAnnotation({
         flagCount: 1,
@@ -171,7 +171,7 @@ describe('ModerationBanner', () => {
     assert.calledWith(fakeApi.annotation.unhide, { id: 'ann-id' });
   });
 
-  it('reports an error if unhiding the annotation fails', function(done) {
+  it('reports an error if unhiding the annotation fails', function (done) {
     const wrapper = createComponent({
       annotation: moderatedAnnotation({
         flagCount: 1,
@@ -182,7 +182,7 @@ describe('ModerationBanner', () => {
       Promise.reject(new Error('Network Error'))
     );
     wrapper.find('button').simulate('click');
-    setTimeout(function() {
+    setTimeout(function () {
       assert.calledWith(
         fakeToastMessenger.error,
         'Failed to unhide annotation'

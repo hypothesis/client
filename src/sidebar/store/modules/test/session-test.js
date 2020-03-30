@@ -3,15 +3,15 @@ import session from '../session';
 
 const { init } = session;
 
-describe('sidebar/store/modules/session', function() {
+describe('sidebar/store/modules/session', function () {
   let store;
 
   beforeEach(() => {
     store = createStore([session]);
   });
 
-  describe('#updateSession', function() {
-    it('updates the session state', function() {
+  describe('#updateSession', function () {
+    it('updates the session state', function () {
       const newSession = Object.assign(init(), { userid: 'john' });
       store.updateSession({ userid: 'john' });
       assert.deepEqual(store.getState().session, newSession);

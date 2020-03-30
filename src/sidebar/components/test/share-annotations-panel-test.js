@@ -150,10 +150,7 @@ describe('ShareAnnotationsPanel', () => {
       it('copies link to clipboard when copy button clicked', () => {
         const wrapper = createShareAnnotationsPanel();
 
-        wrapper
-          .find('Button')
-          .props()
-          .onClick();
+        wrapper.find('Button').props().onClick();
 
         assert.calledWith(
           fakeCopyToClipboard.copyText,
@@ -164,10 +161,7 @@ describe('ShareAnnotationsPanel', () => {
       it('confirms link copy when successful', () => {
         const wrapper = createShareAnnotationsPanel();
 
-        wrapper
-          .find('Button')
-          .props()
-          .onClick();
+        wrapper.find('Button').props().onClick();
 
         assert.calledWith(
           fakeToastMessenger.success,
@@ -178,10 +172,7 @@ describe('ShareAnnotationsPanel', () => {
         fakeCopyToClipboard.copyText.throws();
         const wrapper = createShareAnnotationsPanel();
 
-        wrapper
-          .find('Button')
-          .props()
-          .onClick();
+        wrapper.find('Button').props().onClick();
 
         assert.calledWith(fakeToastMessenger.error, 'Unable to copy link');
       });

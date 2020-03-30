@@ -55,10 +55,7 @@ describe('SidebarPanel', () => {
   it('closes the panel when close button is clicked', () => {
     const wrapper = createSidebarPanel({ panelName: 'flibberty' });
 
-    wrapper
-      .find('Button')
-      .props()
-      .onClick();
+    wrapper.find('Button').props().onClick();
 
     assert.calledWith(fakeStore.toggleSidebarPanel, 'flibberty', false);
   });

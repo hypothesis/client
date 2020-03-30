@@ -7,7 +7,7 @@ import { $imports } from '../tag-list';
 import { checkAccessibility } from '../../../test-util/accessibility';
 import mockImportedComponents from '../../../test-util/mock-imported-components';
 
-describe('TagList', function() {
+describe('TagList', function () {
   let fakeServiceUrl;
   let fakeIsThirdPartyUser;
   const fakeTags = ['tag1', 'tag2'];
@@ -26,7 +26,7 @@ describe('TagList', function() {
     );
   }
 
-  beforeEach(function() {
+  beforeEach(function () {
     fakeServiceUrl = sinon.stub().returns('http://serviceurl.com');
     fakeIsThirdPartyUser = sinon.stub().returns(false);
 
@@ -70,7 +70,7 @@ describe('TagList', function() {
   });
 
   context('when `isThirdPartyUser` returns true', () => {
-    beforeEach(function() {
+    beforeEach(function () {
       fakeIsThirdPartyUser.returns(true);
     });
 

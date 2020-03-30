@@ -35,11 +35,11 @@ export default function serviceUrl(store, apiRoutes) {
   apiRoutes
     .links()
     .then(store.updateLinks)
-    .catch(function(error) {
+    .catch(function (error) {
       console.warn('The links API request was rejected: ' + error.message);
     });
 
-  return function(linkName, params) {
+  return function (linkName, params) {
     const links = store.getState().links;
 
     if (links === null) {

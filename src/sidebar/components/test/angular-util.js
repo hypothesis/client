@@ -81,12 +81,12 @@ export function createDirective(
   // we want to create and compile it.
   let $compile;
   let $scope;
-  angular.mock.inject(function(_$compile_, _$rootScope_) {
+  angular.mock.inject(function (_$compile_, _$rootScope_) {
     $compile = _$compile_;
     $scope = _$rootScope_.$new();
   });
   const templateElement = document.createElement(hyphenate(name));
-  Object.keys(attrs).forEach(function(key) {
+  Object.keys(attrs).forEach(function (key) {
     const attrName = hyphenate(key);
     let attrKey = key;
     if (typeof attrs[key] === 'function') {
@@ -109,7 +109,7 @@ export function createDirective(
   opts.parentElement.appendChild(templateElement);
 
   // setup initial scope
-  Object.keys(attrs).forEach(function(key) {
+  Object.keys(attrs).forEach(function (key) {
     if (attrs[key].callback) {
       $scope[key] = attrs[key].callback;
     } else {
@@ -124,7 +124,7 @@ export function createDirective(
   // scope values. The caller can then re-render/link
   // the template passing in different properties
   // and verify the output
-  const linkDirective = function(props) {
+  const linkDirective = function (props) {
     const childScope = $scope.$new();
     angular.extend(childScope, props);
     const element = linkFn(childScope);

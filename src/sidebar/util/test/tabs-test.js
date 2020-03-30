@@ -2,8 +2,8 @@ import * as fixtures from '../../test/annotation-fixtures';
 import uiConstants from '../../ui-constants';
 import * as tabs from '../tabs';
 
-describe('tabs', function() {
-  describe('tabForAnnotation', function() {
+describe('tabs', function () {
+  describe('tabForAnnotation', function () {
     [
       {
         ann: fixtures.defaultAnnotation(),
@@ -26,7 +26,7 @@ describe('tabs', function() {
     });
   });
 
-  describe('shouldShowInTab', function() {
+  describe('shouldShowInTab', function () {
     [
       {
         // Anchoring in progress.

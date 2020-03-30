@@ -13,8 +13,8 @@ function createTestStore() {
 // Tests for most of the functionality in reducers/annotations.js are currently
 // in the tests for the whole Redux store
 
-describe('sidebar/store/modules/annotations', function() {
-  describe('#addAnnotations()', function() {
+describe('sidebar/store/modules/annotations', function () {
+  describe('#addAnnotations()', function () {
     const ANCHOR_TIME_LIMIT = 1000;
     let clock;
     let store;
@@ -27,17 +27,17 @@ describe('sidebar/store/modules/annotations', function() {
       return storeAnn.$tag;
     }
 
-    beforeEach(function() {
+    beforeEach(function () {
       clock = sinon.useFakeTimers();
       store = createTestStore();
       store.changeRoute('sidebar', {});
     });
 
-    afterEach(function() {
+    afterEach(function () {
       clock.restore();
     });
 
-    it('adds annotations not in the store', function() {
+    it('adds annotations not in the store', function () {
       const annot = fixtures.defaultAnnotation();
       store.addAnnotations([annot]);
       assert.match(store.getState().annotations.annotations, [
@@ -45,20 +45,20 @@ describe('sidebar/store/modules/annotations', function() {
       ]);
     });
 
-    it('assigns a local tag to annotations', function() {
+    it('assigns a local tag to annotations', function () {
       const annotA = Object.assign(fixtures.defaultAnnotation(), { id: 'a1' });
       const annotB = Object.assign(fixtures.defaultAnnotation(), { id: 'a2' });
 
       store.addAnnotations([annotA, annotB]);
 
-      const tags = store.getState().annotations.annotations.map(function(a) {
+      const tags = store.getState().annotations.annotations.map(function (a) {
         return a.$tag;
       });
 
       assert.deepEqual(tags, ['t1', 't2']);
     });
 
-    it('updates annotations with matching IDs in the store', function() {
+    it('updates annotations with matching IDs in the store', function () {
       const annot = fixtures.defaultAnnotation();
       store.addAnnotations([annot]);
       const update = Object.assign({}, fixtures.defaultAnnotation(), {
@@ -70,7 +70,7 @@ describe('sidebar/store/modules/annotations', function() {
       assert.equal(updatedAnnot.text, 'update');
     });
 
-    it('updates annotations with matching tags in the store', function() {
+    it('updates annotations with matching tags in the store', function () {
       const annot = fixtures.newAnnotation();
       annot.$tag = 'local-tag';
       store.addAnnotations([annot]);
@@ -83,7 +83,7 @@ describe('sidebar/store/modules/annotations', function() {
       assert.equal(annots[0].id, 'server-id');
     });
 
-    it('preserves anchoring status of updated annotations', function() {
+    it('preserves anchoring status of updated annotations', function () {
       const annot = fixtures.defaultAnnotation();
       store.addAnnotations([annot]);
       store.updateAnchorStatus({ [tagForID(annot.id)]: 'anchored' });
@@ -97,7 +97,7 @@ describe('sidebar/store/modules/annotations', function() {
       assert.isFalse(updatedAnnot.$orphan);
     });
 
-    it('sets the timeout flag on annotations that fail to anchor within a time limit', function() {
+    it('sets the timeout flag on annotations that fail to anchor within a time limit', function () {
       const annot = fixtures.defaultAnnotation();
       store.addAnnotations([annot]);
 
@@ -106,7 +106,7 @@ describe('sidebar/store/modules/annotations', function() {
       assert.isTrue(store.getState().annotations.annotations[0].$anchorTimeout);
     });
 
-    it('does not set the timeout flag on annotations that do anchor within a time limit', function() {
+    it('does not set the timeout flag on annotations that do anchor within a time limit', function () {
       const annot = fixtures.defaultAnnotation();
       store.addAnnotations([annot]);
       store.updateAnchorStatus({ [tagForID(annot.id)]: 'anchored' });
@@ -118,19 +118,19 @@ describe('sidebar/store/modules/annotations', function() {
       );
     });
 
-    it('does not attempt to modify orphan status if annotations are removed before anchoring timeout expires', function() {
+    it('does not attempt to modify orphan status if annotations are removed before anchoring timeout expires', function () {
       const annot = fixtures.defaultAnnotation();
       store.addAnnotations([annot]);
       store.updateAnchorStatus({ [tagForID(annot.id)]: 'anchored' });
       store.removeAnnotations([annot]);
 
-      assert.doesNotThrow(function() {
+      assert.doesNotThrow(function () {
         clock.tick(ANCHOR_TIME_LIMIT);
       });
     });
 
-    it('does not expect annotations to anchor on the stream', function() {
-      const isOrphan = function() {
+    it('does not expect annotations to anchor on the stream', function () {
+      const isOrphan = function () {
         return !!metadata.isOrphan(store.getState().annotations.annotations[0]);
       };
 
@@ -143,7 +143,7 @@ describe('sidebar/store/modules/annotations', function() {
       assert.isFalse(isOrphan());
     });
 
-    it('initializes the $orphan field for new annotations', function() {
+    it('initializes the $orphan field for new annotations', function () {
       store.addAnnotations([fixtures.newAnnotation()]);
       assert.isFalse(store.getState().annotations.annotations[0].$orphan);
     });
@@ -289,10 +289,10 @@ describe('sidebar/store/modules/annotations', function() {
     });
   });
 
-  describe('#savedAnnotations', function() {
+  describe('#savedAnnotations', function () {
     const savedAnnotations = selectors.savedAnnotations;
 
-    it('returns annotations which are saved', function() {
+    it('returns annotations which are saved', function () {
       const state = {
         annotations: {
           annotations: [fixtures.newAnnotation(), fixtures.defaultAnnotation()],
@@ -302,10 +302,10 @@ describe('sidebar/store/modules/annotations', function() {
     });
   });
 
-  describe('#findIDsForTags', function() {
+  describe('#findIDsForTags', function () {
     const findIDsForTags = selectors.findIDsForTags;
 
-    it('returns the IDs corresponding to the provided local tags', function() {
+    it('returns the IDs corresponding to the provided local tags', function () {
       const ann = fixtures.defaultAnnotation();
       const state = {
         annotations: {
@@ -315,7 +315,7 @@ describe('sidebar/store/modules/annotations', function() {
       assert.deepEqual(findIDsForTags(state, ['t1']), [ann.id]);
     });
 
-    it('does not return IDs for annotations that do not have an ID', function() {
+    it('does not return IDs for annotations that do not have an ID', function () {
       const ann = fixtures.newAnnotation();
       const state = {
         annotations: {
@@ -326,8 +326,8 @@ describe('sidebar/store/modules/annotations', function() {
     });
   });
 
-  describe('#hideAnnotation', function() {
-    it('sets the `hidden` state to `true`', function() {
+  describe('#hideAnnotation', function () {
+    it('sets the `hidden` state to `true`', function () {
       const store = createTestStore();
       const ann = fixtures.moderatedAnnotation({ hidden: false });
 
@@ -339,8 +339,8 @@ describe('sidebar/store/modules/annotations', function() {
     });
   });
 
-  describe('#unhideAnnotation', function() {
-    it('sets the `hidden` state to `false`', function() {
+  describe('#unhideAnnotation', function () {
+    it('sets the `hidden` state to `false`', function () {
       const store = createTestStore();
       const ann = fixtures.moderatedAnnotation({ hidden: true });
 
@@ -352,8 +352,8 @@ describe('sidebar/store/modules/annotations', function() {
     });
   });
 
-  describe('#removeAnnotations', function() {
-    it('removes the annotation', function() {
+  describe('#removeAnnotations', function () {
+    it('removes the annotation', function () {
       const store = createTestStore();
       const ann = fixtures.defaultAnnotation();
       store.dispatch(actions.addAnnotations([ann]));
@@ -362,7 +362,7 @@ describe('sidebar/store/modules/annotations', function() {
     });
   });
 
-  describe('#updateFlagStatus', function() {
+  describe('#updateFlagStatus', function () {
     [
       {
         description: 'non-moderator flags annotation',

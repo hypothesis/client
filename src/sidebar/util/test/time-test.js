@@ -5,11 +5,11 @@ const minute = second * 60;
 const hour = minute * 60;
 const day = hour * 24;
 
-describe('sidebar.util.time', function() {
+describe('sidebar.util.time', function () {
   let sandbox;
   let fakeIntl;
 
-  beforeEach(function() {
+  beforeEach(function () {
     sandbox = sinon.createSandbox();
     sandbox.useFakeTimers();
 
@@ -23,7 +23,7 @@ describe('sidebar.util.time', function() {
     time.clearFormatters();
   });
 
-  afterEach(function() {
+  afterEach(function () {
     sandbox.restore();
   });
 
@@ -46,8 +46,8 @@ describe('sidebar.util.time', function() {
     return date;
   };
 
-  describe('.toFuzzyString', function() {
-    it('Handles empty dates', function() {
+  describe('.toFuzzyString', function () {
+    it('Handles empty dates', function () {
       const date = null;
       const expect = '';
       assert.equal(time.toFuzzyString(date, undefined), expect);
@@ -121,7 +121,7 @@ describe('sidebar.util.time', function() {
       );
     });
 
-    it('falls back to simple strings for >24hrs ago', function() {
+    it('falls back to simple strings for >24hrs ago', function () {
       // If window.Intl is not available then the date formatting for dates
       // more than one day ago falls back to a simple date string.
       const timeStamp = fakeDate('1970-01-01T00:00:00.000Z');
@@ -133,7 +133,7 @@ describe('sidebar.util.time', function() {
       assert.equal(formattedDate, 'Thu Jan 01 1970');
     });
 
-    it('falls back to simple strings for >1yr ago', function() {
+    it('falls back to simple strings for >1yr ago', function () {
       // If window.Intl is not available then the date formatting for dates
       // more than one year ago falls back to a simple date string.
       const timeStamp = fakeDate('1970-01-01T00:00:00.000Z');
@@ -146,13 +146,13 @@ describe('sidebar.util.time', function() {
     });
   });
 
-  describe('.decayingInterval', function() {
-    it('Handles empty dates', function() {
+  describe('.decayingInterval', function () {
+    it('Handles empty dates', function () {
       const date = null;
       time.decayingInterval(date, undefined);
     });
 
-    it('uses a short delay for recent timestamps', function() {
+    it('uses a short delay for recent timestamps', function () {
       const date = new Date().toISOString();
       const callback = sandbox.stub();
       time.decayingInterval(date, callback);
@@ -162,7 +162,7 @@ describe('sidebar.util.time', function() {
       assert.calledTwice(callback);
     });
 
-    it('uses a longer delay for older timestamps', function() {
+    it('uses a longer delay for older timestamps', function () {
       const date = new Date().toISOString();
       const ONE_MINUTE = minute;
       sandbox.clock.tick(10 * ONE_MINUTE);
@@ -176,7 +176,7 @@ describe('sidebar.util.time', function() {
       assert.calledTwice(callback);
     });
 
-    it('returned function cancels the timer', function() {
+    it('returned function cancels the timer', function () {
       const date = new Date().toISOString();
       const callback = sandbox.stub();
       const cancel = time.decayingInterval(date, callback);
@@ -185,7 +185,7 @@ describe('sidebar.util.time', function() {
       assert.notCalled(callback);
     });
 
-    it('does not set a timeout for dates > 24hrs ago', function() {
+    it('does not set a timeout for dates > 24hrs ago', function () {
       const date = new Date().toISOString();
       const ONE_DAY = day;
       sandbox.clock.tick(10 * ONE_DAY);
@@ -198,8 +198,8 @@ describe('sidebar.util.time', function() {
     });
   });
 
-  describe('.nextFuzzyUpdate', function() {
-    it('Handles empty dates', function() {
+  describe('.nextFuzzyUpdate', function () {
+    it('Handles empty dates', function () {
       const date = null;
       const expect = null;
       assert.equal(time.nextFuzzyUpdate(date, undefined), expect);

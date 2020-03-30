@@ -13,7 +13,7 @@ import apiFactory from '../api';
 //
 const routes = require('./api-index.json').links;
 
-describe('sidebar.services.api', function() {
+describe('sidebar.services.api', function () {
   let fakeAuth;
   let fakeStore;
   let api;

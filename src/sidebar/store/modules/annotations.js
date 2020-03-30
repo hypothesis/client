@@ -21,7 +21,7 @@ import route from './route';
 function excludeAnnotations(current, annotations) {
   const ids = {};
   const tags = {};
-  annotations.forEach(function(annot) {
+  annotations.forEach(function (annot) {
     if (annot.id) {
       ids[annot.id] = true;
     }
@@ -29,7 +29,7 @@ function excludeAnnotations(current, annotations) {
       tags[annot.$tag] = true;
     }
   });
-  return current.filter(function(annot) {
+  return current.filter(function (annot) {
     const shouldRemove =
       (annot.id && annot.id in ids) || (annot.$tag && annot.$tag in tags);
     return !shouldRemove;
@@ -37,13 +37,13 @@ function excludeAnnotations(current, annotations) {
 }
 
 function findByID(annotations, id) {
-  return annotations.find(function(annot) {
+  return annotations.find(function (annot) {
     return annot.id === id;
   });
 }
 
 function findByTag(annotations, tag) {
-  return annotations.find(function(annot) {
+  return annotations.find(function (annot) {
     return annot.$tag === tag;
   });
 }
@@ -87,7 +87,7 @@ function init() {
 }
 
 const update = {
-  ADD_ANNOTATIONS: function(state, action) {
+  ADD_ANNOTATIONS: function (state, action) {
     const updatedIDs = {};
     const updatedTags = {};
 
@@ -133,18 +133,18 @@ const update = {
     };
   },
 
-  REMOVE_ANNOTATIONS: function(state, action) {
+  REMOVE_ANNOTATIONS: function (state, action) {
     return {
       annotations: [...action.remainingAnnotations],
     };
   },
 
-  CLEAR_ANNOTATIONS: function() {
+  CLEAR_ANNOTATIONS: function () {
     return { annotations: [] };
   },
 
-  UPDATE_FLAG_STATUS: function(state, action) {
-    const annotations = state.annotations.map(function(annot) {
+  UPDATE_FLAG_STATUS: function (state, action) {
+    const annotations = state.annotations.map(function (annot) {
       const match = annot.id && annot.id === action.id;
       if (match) {
         if (annot.flagged === action.isFlagged) {
@@ -168,8 +168,8 @@ const update = {
     return { annotations: annotations };
   },
 
-  UPDATE_ANCHOR_STATUS: function(state, action) {
-    const annotations = state.annotations.map(function(annot) {
+  UPDATE_ANCHOR_STATUS: function (state, action) {
+    const annotations = state.annotations.map(function (annot) {
       if (!action.statusUpdates.hasOwnProperty(annot.$tag)) {
         return annot;
       }
@@ -184,8 +184,8 @@ const update = {
     return { annotations: annotations };
   },
 
-  HIDE_ANNOTATION: function(state, action) {
-    const anns = state.annotations.map(function(ann) {
+  HIDE_ANNOTATION: function (state, action) {
+    const anns = state.annotations.map(function (ann) {
       if (ann.id !== action.id) {
         return ann;
       }
@@ -194,8 +194,8 @@ const update = {
     return { annotations: anns };
   },
 
-  UNHIDE_ANNOTATION: function(state, action) {
-    const anns = state.annotations.map(function(ann) {
+  UNHIDE_ANNOTATION: function (state, action) {
+    const anns = state.annotations.map(function (ann) {
       if (ann.id !== action.id) {
         return ann;
       }
@@ -229,7 +229,7 @@ function updateFlagStatus(id, isFlagged) {
  * @param {Object}[] annotations - Array of annotation objects to add.
  */
 function addAnnotations(annotations) {
-  return function(dispatch, getState) {
+  return function (dispatch, getState) {
     const added = annotations.filter(annot => {
       return !findByID(getState().annotations.annotations, annot.id);
     });
@@ -347,14 +347,14 @@ function unhideAnnotation(id) {
  * @param {state} - The global app state
  */
 function savedAnnotations(state) {
-  return state.annotations.annotations.filter(function(ann) {
+  return state.annotations.annotations.filter(function (ann) {
     return !metadata.isNew(ann);
   });
 }
 
 /** Return true if the annotation with a given ID is currently loaded. */
 function annotationExists(state, id) {
-  return state.annotations.annotations.some(function(annot) {
+  return state.annotations.annotations.some(function (annot) {
     return annot.id === id;
   });
 }
@@ -369,7 +369,7 @@ function annotationExists(state, id) {
  */
 function findIDsForTags(state, tags) {
   const ids = [];
-  tags.forEach(function(tag) {
+  tags.forEach(function (tag) {
     const annot = findByTag(state.annotations.annotations, tag);
     if (annot && annot.id) {
       ids.push(annot.id);

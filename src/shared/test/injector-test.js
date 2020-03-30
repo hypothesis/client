@@ -4,7 +4,7 @@ describe('Injector', () => {
   describe('#get', () => {
     it('calls a "factory" provider as a function to create the object', () => {
       const instance = 'aValue';
-      const factory = sinon.stub().callsFake(function() {
+      const factory = sinon.stub().callsFake(function () {
         assert.isUndefined(this);
         return instance;
       });

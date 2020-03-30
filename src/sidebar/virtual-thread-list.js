@@ -51,7 +51,7 @@ export default class VirtualThreadList extends EventEmitter {
     this.scrollRoot.addEventListener('scroll', debouncedUpdate);
     this.window.addEventListener('resize', debouncedUpdate);
 
-    this._detach = function() {
+    this._detach = function () {
       this.scrollRoot.removeEventListener('scroll', debouncedUpdate);
       this.window.removeEventListener('resize', debouncedUpdate);
       debouncedUpdate.cancel();
@@ -111,13 +111,13 @@ export default class VirtualThreadList extends EventEmitter {
   yOffsetOf(id) {
     const self = this;
     const allThreads = this._rootThread.children;
-    const matchIndex = allThreads.findIndex(function(thread) {
+    const matchIndex = allThreads.findIndex(function (thread) {
       return thread.id === id;
     });
     if (matchIndex === -1) {
       return 0;
     }
-    return allThreads.slice(0, matchIndex).reduce(function(offset, thread) {
+    return allThreads.slice(0, matchIndex).reduce(function (offset, thread) {
       return offset + self._height(thread.id);
     }, 0);
   }

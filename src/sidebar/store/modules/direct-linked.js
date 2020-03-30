@@ -62,7 +62,7 @@ const update = {
       directLinkedGroupId: null,
     };
   },
-  CLEAR_SELECTION: function() {
+  CLEAR_SELECTION: function () {
     return {
       directLinkedAnnotationId: null,
       directLinkedGroupId: null,

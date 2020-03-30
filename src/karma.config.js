@@ -48,7 +48,7 @@ if (process.env.RUNNING_IN_DOCKER) {
   process.env.CHROME_BIN = 'chromium-browser';
 }
 
-module.exports = function(config) {
+module.exports = function (config) {
   let testFiles = [
     'annotator/**/*-test.coffee',
     '**/test/*-test.js',

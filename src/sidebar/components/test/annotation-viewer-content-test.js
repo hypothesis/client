@@ -8,10 +8,10 @@ function FakeApi(annots) {
   this.annots = annots;
 
   this.annotation = {
-    get: function(query) {
+    get: function (query) {
       let result;
       if (query.id) {
-        result = annots.find(function(a) {
+        result = annots.find(function (a) {
           return a.id === query.id;
         });
       }
@@ -19,10 +19,10 @@ function FakeApi(annots) {
     },
   };
 
-  this.search = function(query) {
+  this.search = function (query) {
     let result;
     if (query.references) {
-      result = annots.filter(function(a) {
+      result = annots.filter(function (a) {
         return a.references && a.references.indexOf(query.references) !== -1;
       });
     }
@@ -30,8 +30,8 @@ function FakeApi(annots) {
   };
 }
 
-describe('annotationViewerContent', function() {
-  before(function() {
+describe('annotationViewerContent', function () {
+  before(function () {
     angular
       .module('h', [])
       .component('annotationViewerContent', annotationViewerContent);
@@ -51,16 +51,16 @@ describe('annotationViewerContent', function() {
       api: opts.api,
       rootThread: { thread: sinon.stub() },
       streamer: {
-        setConfig: function() {},
-        connect: function() {},
+        setConfig: function () {},
+        connect: function () {},
       },
       streamFilter: {
-        addClause: function() {
+        addClause: function () {
           return {
-            addClause: function() {},
+            addClause: function () {},
           };
         },
-        getFilter: function() {},
+        getFilter: function () {},
       },
       annotationMapper: {
         loadAnnotations: sinon.spy(),
@@ -68,7 +68,7 @@ describe('annotationViewerContent', function() {
     };
 
     let $componentController;
-    angular.mock.inject(function(_$componentController_) {
+    angular.mock.inject(function (_$componentController_) {
       $componentController = _$componentController_;
     });
     locals.ctrl = $componentController('annotationViewerContent', locals, {
@@ -77,14 +77,14 @@ describe('annotationViewerContent', function() {
     return locals;
   }
 
-  describe('the standalone view for a top-level annotation', function() {
-    it('loads the annotation and all replies', function() {
+  describe('the standalone view for a top-level annotation', function () {
+    it('loads the annotation and all replies', function () {
       const fakeApi = new FakeApi([
         { id: 'test_annotation_id' },
         { id: 'test_reply_id', references: ['test_annotation_id'] },
       ]);
       const controller = createController({ api: fakeApi });
-      return controller.ctrl.ready.then(function() {
+      return controller.ctrl.ready.then(function () {
         assert.calledOnce(controller.annotationMapper.loadAnnotations);
         assert.calledWith(
           controller.annotationMapper.loadAnnotations,
@@ -93,26 +93,26 @@ describe('annotationViewerContent', function() {
       });
     });
 
-    it('does not highlight any annotations', function() {
+    it('does not highlight any annotations', function () {
       const fakeApi = new FakeApi([
         { id: 'test_annotation_id' },
         { id: 'test_reply_id', references: ['test_annotation_id'] },
       ]);
       const controller = createController({ api: fakeApi });
-      return controller.ctrl.ready.then(function() {
+      return controller.ctrl.ready.then(function () {
         assert.notCalled(controller.store.highlightAnnotations);
       });
     });
   });
 
-  describe('the standalone view for a reply', function() {
-    it('loads the top-level annotation and all replies', function() {
+  describe('the standalone view for a reply', function () {
+    it('loads the top-level annotation and all replies', function () {
       const fakeApi = new FakeApi([
         { id: 'parent_id' },
         { id: 'test_annotation_id', references: ['parent_id'] },
       ]);
       const controller = createController({ api: fakeApi });
-      return controller.ctrl.ready.then(function() {
+      return controller.ctrl.ready.then(function () {
         assert.calledWith(
           controller.annotationMapper.loadAnnotations,
           sinon.match(fakeApi.annots)
@@ -120,13 +120,13 @@ describe('annotationViewerContent', function() {
       });
     });
 
-    it('expands the thread', function() {
+    it('expands the thread', function () {
       const fakeApi = new FakeApi([
         { id: 'parent_id' },
         { id: 'test_annotation_id', references: ['parent_id'] },
       ]);
       const controller = createController({ api: fakeApi });
-      return controller.ctrl.ready.then(function() {
+      return controller.ctrl.ready.then(function () {
         assert.calledWith(controller.store.setCollapsed, 'parent_id', false);
         assert.calledWith(
           controller.store.setCollapsed,
@@ -136,13 +136,13 @@ describe('annotationViewerContent', function() {
       });
     });
 
-    it('highlights the reply', function() {
+    it('highlights the reply', function () {
       const fakeApi = new FakeApi([
         { id: 'parent_id' },
         { id: 'test_annotation_id', references: ['parent_id'] },
       ]);
       const controller = createController({ api: fakeApi });
-      return controller.ctrl.ready.then(function() {
+      return controller.ctrl.ready.then(function () {
         assert.calledWith(
           controller.store.highlightAnnotations,
           sinon.match(['test_annotation_id'])

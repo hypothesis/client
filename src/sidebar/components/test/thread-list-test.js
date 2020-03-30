@@ -54,10 +54,10 @@ class FakeVirtualThreadList extends EventEmitter {
     let thread = rootThread;
 
     this.options = options;
-    this.setRootThread = function(_thread) {
+    this.setRootThread = function (_thread) {
       thread = _thread;
     };
-    this.notify = function() {
+    this.notify = function () {
       this.emit('changed', {
         offscreenLowerHeight: 10,
         offscreenUpperHeight: 20,
@@ -65,7 +65,7 @@ class FakeVirtualThreadList extends EventEmitter {
       });
     };
     this.detach = sinon.stub();
-    this.yOffsetOf = function() {
+    this.yOffsetOf = function () {
       return 42;
     };
     this.calculateVisibleThreads = () => {
@@ -78,7 +78,7 @@ class FakeVirtualThreadList extends EventEmitter {
   }
 }
 
-describe('threadList', function() {
+describe('threadList', function () {
   let threadListContainers;
 
   function createThreadList(inputs) {
@@ -122,7 +122,7 @@ describe('threadList', function() {
     return element;
   }
 
-  before(function() {
+  before(function () {
     fakeStore = {
       clearSelection: sinon.stub(),
     };
@@ -130,7 +130,7 @@ describe('threadList', function() {
     angular.module('app', []).component('threadList', threadList);
   });
 
-  beforeEach(function() {
+  beforeEach(function () {
     angular.mock.module('app', {
       settings: fakeSettings,
       store: fakeStore,
@@ -142,15 +142,15 @@ describe('threadList', function() {
     });
   });
 
-  afterEach(function() {
+  afterEach(function () {
     $imports.$restore();
 
-    threadListContainers.forEach(function(el) {
+    threadListContainers.forEach(function (el) {
       el.remove();
     });
   });
 
-  it('shows the clean theme when settings contains the clean theme option', function() {
+  it('shows the clean theme when settings contains the clean theme option', function () {
     angular.mock.module('app', {
       VirtualThreadList: FakeVirtualThreadList,
       settings: { theme: 'clean' },
@@ -164,7 +164,7 @@ describe('threadList', function() {
     );
   });
 
-  it('displays the children of the root thread', function() {
+  it('displays the children of the root thread', function () {
     const element = createThreadList();
     fakeVirtualThread.notify();
     element.scope.$digest();
@@ -172,8 +172,8 @@ describe('threadList', function() {
     assert.equal(children.length, 2);
   });
 
-  describe('when a new annotation is created', function() {
-    it('scrolls the annotation into view', function() {
+  describe('when a new annotation is created', function () {
+    it('scrolls the annotation into view', function () {
       const element = createThreadList();
       element.parentEl.scrollTop = 500;
 
@@ -185,7 +185,7 @@ describe('threadList', function() {
       assert.isBelow(element.parentEl.scrollTop, 100);
     });
 
-    it('does not scroll the annotation into view if it is a reply', function() {
+    it('does not scroll the annotation into view if it is a reply', function () {
       const element = createThreadList();
       element.parentEl.scrollTop = 500;
 
@@ -196,7 +196,7 @@ describe('threadList', function() {
       assert.equal(element.parentEl.scrollTop, 500);
     });
 
-    it('does not scroll the annotation into view if it is a highlight', function() {
+    it('does not scroll the annotation into view if it is a highlight', function () {
       const element = createThreadList();
       element.parentEl.scrollTop = 500;
 
@@ -207,7 +207,7 @@ describe('threadList', function() {
       assert.equal(element.parentEl.scrollTop, 500);
     });
 
-    it('clears the selection', function() {
+    it('clears the selection', function () {
       const element = createThreadList();
       element.scope.$broadcast(
         events.BEFORE_ANNOTATION_CREATED,
@@ -217,7 +217,7 @@ describe('threadList', function() {
     });
   });
 
-  it('calls onFocus() when the user hovers an annotation', function() {
+  it('calls onFocus() when the user hovers an annotation', function () {
     const inputs = {
       onFocus: {
         args: ['annotation'],
@@ -237,7 +237,7 @@ describe('threadList', function() {
     );
   });
 
-  it('calls onSelect() when a user clicks an annotation', function() {
+  it('calls onSelect() when a user clicks an annotation', function () {
     const inputs = {
       onSelect: {
         args: ['annotation'],
@@ -257,7 +257,7 @@ describe('threadList', function() {
     );
   });
 
-  it('uses the correct scroll root', function() {
+  it('uses the correct scroll root', function () {
     createThreadList();
     const scrollRoot = fakeVirtualThread.options.scrollRoot;
     assert.isTrue(scrollRoot.classList.contains('js-thread-list-scroll-root'));

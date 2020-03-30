@@ -71,10 +71,7 @@ describe('Slider', () => {
     let containerStyle = wrapper.getDOMNode().style;
     assert.equal(containerStyle.height, '200px');
 
-    wrapper
-      .find('div')
-      .first()
-      .simulate('transitionend');
+    wrapper.find('div').first().simulate('transitionend');
 
     containerStyle = wrapper.getDOMNode().style;
     assert.equal(containerStyle.height, 'auto');
@@ -85,10 +82,7 @@ describe('Slider', () => {
 
     wrapper.setProps({ visible: false });
 
-    wrapper
-      .find('div')
-      .first()
-      .simulate('transitionend');
+    wrapper.find('div').first().simulate('transitionend');
 
     const containerStyle = wrapper.getDOMNode().style;
     assert.equal(containerStyle.display, 'none');

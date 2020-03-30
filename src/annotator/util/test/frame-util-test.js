@@ -1,7 +1,7 @@
 import * as frameUtil from '../frame-util';
 
-describe('annotator.util.frame-util', function() {
-  describe('findFrames', function() {
+describe('annotator.util.frame-util', function () {
+  describe('findFrames', function () {
     let container;
 
     const _addFrameToContainer = (options = {}) => {
@@ -14,16 +14,16 @@ describe('annotator.util.frame-util', function() {
       return frame;
     };
 
-    beforeEach(function() {
+    beforeEach(function () {
       container = document.createElement('div');
       document.body.appendChild(container);
     });
 
-    afterEach(function() {
+    afterEach(function () {
       container.remove();
     });
 
-    it('should return valid frames', function() {
+    it('should return valid frames', function () {
       let foundFrames = frameUtil.findFrames(container);
 
       assert.lengthOf(
@@ -53,7 +53,7 @@ describe('annotator.util.frame-util', function() {
       assert.lengthOf(foundFrames, 0);
     });
 
-    it('should not return the Hypothesis sidebar', function() {
+    it('should not return the Hypothesis sidebar', function () {
       _addFrameToContainer({ className: 'h-sidebar-iframe other-class-too' });
 
       const foundFrames = frameUtil.findFrames(container);

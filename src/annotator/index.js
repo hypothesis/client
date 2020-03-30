@@ -38,7 +38,7 @@ const appLinkEl = document.querySelector(
 );
 const config = configFrom(window);
 
-$.noConflict(true)(function() {
+$.noConflict(true)(function () {
   let Klass = window.PDFViewerApplication ? PdfSidebar : Sidebar;
 
   if (config.hasOwnProperty('constructor')) {
@@ -62,7 +62,7 @@ $.noConflict(true)(function() {
   config.pluginClasses = pluginClasses;
 
   const annotator = new Klass(document.body, config);
-  appLinkEl.addEventListener('destroy', function() {
+  appLinkEl.addEventListener('destroy', function () {
     appLinkEl.parentElement.removeChild(appLinkEl);
     annotator.destroy();
   });

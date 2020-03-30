@@ -2,27 +2,27 @@ import * as util from '../util';
 
 const fixtures = {
   update: {
-    ADD_ANNOTATIONS: function(state, action) {
+    ADD_ANNOTATIONS: function (state, action) {
       if (!state.annotations) {
         return { annotations: action.annotations };
       }
       return { annotations: state.annotations.concat(action.annotations) };
     },
-    SELECT_TAB: function(state, action) {
+    SELECT_TAB: function (state, action) {
       return { tab: action.tab };
     },
   },
   selectors: {
     namespace1: {
       selectors: {
-        countAnnotations1: function(state) {
+        countAnnotations1: function (state) {
           return state.namespace1.annotations.length;
         },
       },
     },
     namespace2: {
       selectors: {
-        countAnnotations2: function(state) {
+        countAnnotations2: function (state) {
           return state.namespace2.annotations.length;
         },
       },
@@ -30,9 +30,9 @@ const fixtures = {
   },
 };
 
-describe('reducer utils', function() {
-  describe('#actionTypes', function() {
-    it('returns an object with values equal to keys', function() {
+describe('reducer utils', function () {
+  describe('#actionTypes', function () {
+    it('returns an object with values equal to keys', function () {
       assert.deepEqual(
         util.actionTypes({
           SOME_ACTION: sinon.stub(),
@@ -46,8 +46,8 @@ describe('reducer utils', function() {
     });
   });
 
-  describe('#createReducer', function() {
-    it('returns an object if input state is undefined', function() {
+  describe('#createReducer', function () {
+    it('returns an object if input state is undefined', function () {
       // See redux.js:assertReducerShape in the "redux" package.
       const reducer = util.createReducer(fixtures.update);
       const initialState = reducer(undefined, {
@@ -56,7 +56,7 @@ describe('reducer utils', function() {
       assert.isOk(initialState);
     });
 
-    it('returns a reducer that combines each update function from the input object', function() {
+    it('returns a reducer that combines each update function from the input object', function () {
       const reducer = util.createReducer(fixtures.update);
       const newState = reducer(
         {},
@@ -70,7 +70,7 @@ describe('reducer utils', function() {
       });
     });
 
-    it('returns a new object if the action was handled', function() {
+    it('returns a new object if the action was handled', function () {
       const reducer = util.createReducer(fixtures.update);
       const originalState = { someFlag: false };
       assert.notEqual(
@@ -79,7 +79,7 @@ describe('reducer utils', function() {
       );
     });
 
-    it('returns the original object if the action was not handled', function() {
+    it('returns the original object if the action was not handled', function () {
       const reducer = util.createReducer(fixtures.update);
       const originalState = { someFlag: false };
       assert.equal(
@@ -88,7 +88,7 @@ describe('reducer utils', function() {
       );
     });
 
-    it('preserves state not modified by the update function', function() {
+    it('preserves state not modified by the update function', function () {
       const reducer = util.createReducer(fixtures.update);
       const newState = reducer(
         { otherFlag: false },
@@ -103,7 +103,7 @@ describe('reducer utils', function() {
       });
     });
 
-    it('supports reducer functions that return an array', function() {
+    it('supports reducer functions that return an array', function () {
       const action = {
         type: 'FIRST_ITEM',
         item: 'bar',
@@ -120,8 +120,8 @@ describe('reducer utils', function() {
     });
   });
 
-  describe('#bindSelectors', function() {
-    it('bound functions call original functions with current value of getState()', function() {
+  describe('#bindSelectors', function () {
+    it('bound functions call original functions with current value of getState()', function () {
       const getState = sinon.stub().returns({
         namespace1: {
           annotations: [{ id: 1 }],

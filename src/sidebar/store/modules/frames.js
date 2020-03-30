@@ -8,16 +8,16 @@ function init() {
 }
 
 const update = {
-  CONNECT_FRAME: function(state, action) {
+  CONNECT_FRAME: function (state, action) {
     return [...state, action.frame];
   },
 
-  DESTROY_FRAME: function(state, action) {
+  DESTROY_FRAME: function (state, action) {
     return state.filter(f => f !== action.frame);
   },
 
-  UPDATE_FRAME_ANNOTATION_FETCH_STATUS: function(state, action) {
-    const frames = state.map(function(frame) {
+  UPDATE_FRAME_ANNOTATION_FETCH_STATUS: function (state, action) {
+    const frames = state.map(function (frame) {
       const match = frame.uri && frame.uri === action.uri;
       if (match) {
         return Object.assign({}, frame, {
@@ -87,13 +87,13 @@ function searchUrisForFrame(frame) {
   let uris = [frame.uri];
 
   if (frame.metadata && frame.metadata.documentFingerprint) {
-    uris = frame.metadata.link.map(function(link) {
+    uris = frame.metadata.link.map(function (link) {
       return link.href;
     });
   }
 
   if (frame.metadata && frame.metadata.link) {
-    frame.metadata.link.forEach(function(link) {
+    frame.metadata.link.forEach(function (link) {
       if (link.href.startsWith('doi:')) {
         uris.push(link.href);
       }
@@ -108,7 +108,7 @@ function searchUrisForFrame(frame) {
  * current page.
  */
 function searchUris(state) {
-  return state.frames.reduce(function(uris, frame) {
+  return state.frames.reduce(function (uris, frame) {
     return uris.concat(searchUrisForFrame(frame));
   }, []);
 }

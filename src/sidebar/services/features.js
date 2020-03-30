@@ -16,7 +16,7 @@ import events from '../events';
 
 // @ngInject
 export default function features($rootScope, bridge, session) {
-  const _sendFeatureFlags = function() {
+  const _sendFeatureFlags = function () {
     const userFeatures = session.state.features;
     bridge.call(bridgeEvents.FEATURE_FLAGS_UPDATED, userFeatures || {});
   };

@@ -12,7 +12,7 @@ function init() {
 }
 
 const update = {
-  SET_HIGHLIGHTS_VISIBLE: function(state, action) {
+  SET_HIGHLIGHTS_VISIBLE: function (state, action) {
     return { visibleHighlights: action.visible };
   },
 };

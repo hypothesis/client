@@ -6,7 +6,7 @@ import { $imports } from '../version-info';
 
 import { checkAccessibility } from '../../../test-util/accessibility';
 
-describe('VersionInfo', function() {
+describe('VersionInfo', function () {
   let fakeVersionData;
   // Services
   let fakeToastMessenger;

@@ -13,17 +13,17 @@ import Observable from 'zen-observable';
  * @param {Array<string>} eventNames - List of events to subscribe to
  */
 export function listen(src, eventNames) {
-  return new Observable(function(observer) {
-    const onNext = function(event) {
+  return new Observable(function (observer) {
+    const onNext = function (event) {
       observer.next(event);
     };
 
-    eventNames.forEach(function(event) {
+    eventNames.forEach(function (event) {
       src.addEventListener(event, onNext);
     });
 
-    return function() {
-      eventNames.forEach(function(event) {
+    return function () {
+      eventNames.forEach(function (event) {
         src.removeEventListener(event, onNext);
       });
     };
@@ -34,12 +34,12 @@ export function listen(src, eventNames) {
  * Delay events from a source Observable by `delay` ms.
  */
 export function delay(delay, src) {
-  return new Observable(function(obs) {
+  return new Observable(function (obs) {
     let timeouts = [];
     const sub = src.subscribe({
-      next: function(value) {
-        const t = setTimeout(function() {
-          timeouts = timeouts.filter(function(other) {
+      next: function (value) {
+        const t = setTimeout(function () {
+          timeouts = timeouts.filter(function (other) {
             return other !== t;
           });
           obs.next(value);
@@ -47,7 +47,7 @@ export function delay(delay, src) {
         timeouts.push(t);
       },
     });
-    return function() {
+    return function () {
       timeouts.forEach(clearTimeout);
       sub.unsubscribe();
     };
@@ -63,7 +63,7 @@ export function delay(delay, src) {
  * @return {Observable<T>}
  */
 export function buffer(delay, src) {
-  return new Observable(function(obs) {
+  return new Observable(function (obs) {
     let lastValue;
     let timeout;
 
@@ -72,14 +72,14 @@ export function buffer(delay, src) {
     }
 
     const sub = src.subscribe({
-      next: function(value) {
+      next: function (value) {
         lastValue = value;
         clearTimeout(timeout);
         timeout = setTimeout(onNext, delay);
       },
     });
 
-    return function() {
+    return function () {
       sub.unsubscribe();
       clearTimeout(timeout);
     };
@@ -93,17 +93,17 @@ export function buffer(delay, src) {
  * @return Observable
  */
 export function merge(sources) {
-  return new Observable(function(obs) {
-    const subs = sources.map(function(src) {
+  return new Observable(function (obs) {
+    const subs = sources.map(function (src) {
       return src.subscribe({
-        next: function(value) {
+        next: function (value) {
           obs.next(value);
         },
       });
     });
 
-    return function() {
-      subs.forEach(function(sub) {
+    return function () {
+      subs.forEach(function (sub) {
         sub.unsubscribe();
       });
     };
@@ -113,7 +113,7 @@ export function merge(sources) {
 /** Drop the first `n` events from the `src` Observable. */
 export function drop(src, n) {
   let count = 0;
-  return src.filter(function() {
+  return src.filter(function () {
     ++count;
     return count > n;
   });

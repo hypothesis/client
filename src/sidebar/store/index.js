@@ -58,15 +58,15 @@ import viewer from './modules/viewer';
  * See http://redux.js.org/docs/advanced/Middleware.html
  */
 function angularDigestMiddleware($rootScope) {
-  return function(next) {
-    return function(action) {
+  return function (next) {
+    return function (action) {
       next(action);
 
       // '$$phase' is set if Angular is in the middle of a digest cycle already
       if (!$rootScope.$$phase) {
         // $applyAsync() is similar to $apply() but provides debouncing.
         // See http://stackoverflow.com/questions/30789177
-        $rootScope.$applyAsync(function() {});
+        $rootScope.$applyAsync(function () {});
       }
     };
   };

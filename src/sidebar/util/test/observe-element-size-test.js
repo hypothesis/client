@@ -48,7 +48,7 @@ describe('observeElementSize', () => {
     stopObserving = observeElementSize(content, sizeChanged);
   }
 
-  context('when `ResizeObserver` is available', function() {
+  context('when `ResizeObserver` is available', function () {
     if (typeof ResizeObserver === 'undefined') {
       this.skip();
     }

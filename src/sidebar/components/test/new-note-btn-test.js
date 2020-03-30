@@ -9,7 +9,7 @@ import uiConstants from '../../ui-constants';
 import { checkAccessibility } from '../../../test-util/accessibility';
 import mockImportedComponents from '../../../test-util/mock-imported-components';
 
-describe('NewNoteButton', function() {
+describe('NewNoteButton', function () {
   let fakeStore;
   let fakeAnnotationsService;
   let fakeSettings;
@@ -23,7 +23,7 @@ describe('NewNoteButton', function() {
     );
   }
 
-  beforeEach(function() {
+  beforeEach(function () {
     fakeAnnotationsService = {
       create: sinon.stub(),
     };
@@ -62,10 +62,7 @@ describe('NewNoteButton', function() {
     const wrapper = createComponent();
 
     act(() => {
-      wrapper
-        .find('Button')
-        .props()
-        .onClick();
+      wrapper.find('Button').props().onClick();
     });
 
     assert.calledWith(
@@ -80,10 +77,7 @@ describe('NewNoteButton', function() {
     const wrapper = createComponent();
 
     act(() => {
-      wrapper
-        .find('Button')
-        .props()
-        .onClick();
+      wrapper.find('Button').props().onClick();
     });
 
     assert.calledWith(fakeAnnotationsService.create, {

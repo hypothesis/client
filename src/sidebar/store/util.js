@@ -2,7 +2,7 @@
  * Return an object where each key in `updateFns` is mapped to the key itself.
  */
 export function actionTypes(updateFns) {
-  return Object.keys(updateFns).reduce(function(types, key) {
+  return Object.keys(updateFns).reduce(function (types, key) {
     types[key] = key;
     return types;
   }, {});
@@ -44,7 +44,7 @@ export function bindSelectors(namespaces, getState) {
   Object.keys(namespaces).forEach(namespace => {
     const selectors = namespaces[namespace].selectors;
     Object.keys(selectors).forEach(selector => {
-      totalSelectors[selector] = function() {
+      totalSelectors[selector] = function () {
         const args = [].slice.apply(arguments);
         args.unshift(getState());
         return selectors[selector].apply(null, args);

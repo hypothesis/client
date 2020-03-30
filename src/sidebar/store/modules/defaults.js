@@ -28,7 +28,7 @@ function init() {
 }
 
 const update = {
-  SET_DEFAULT: function(state, action) {
+  SET_DEFAULT: function (state, action) {
     return { [action.defaultKey]: action.value };
   },
 };
