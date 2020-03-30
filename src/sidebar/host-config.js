@@ -1,4 +1,10 @@
 import * as queryString from 'query-string';
+import {
+  toBoolean,
+  toInteger,
+  toObject,
+  toString,
+} from '../shared/type-coercions';
 
 /**
  * Return the app configuration specified by the frame embedding the Hypothesis
@@ -50,13 +56,52 @@ export default function hostPageConfig(window) {
     'usernameUrl',
   ];
 
+  // We need to coerce incoming values from the host config for 2 reasons:
+  //
+  // 1. New versions of via may no longer support passing any type other than
+  // string and our client is set up to expect values that are in fact not a
+  // string in some cases. This will help cast these values to the expected
+  // type if they can be.
+  //
+  // 2. A publisher of our sidebar could accidentally pass un-sanitized values
+  // into the config and this ensures they safely work downstream even if they
+  // are incorrect.
+  //
+  // Currently we are only handling the following config values do to the fact
+  // that via3 will soon discontinue passing boolean types or integer types.
+  //  - requestConfigFromFrame
+  //  - openSidebar
+  //
+  // It is assumed we should expand this list and coerce and eventually
+  // even validate all such config values.
+  // See https://github.com/hypothesis/client/issues/1968
+  const coercions = {
+    openSidebar: toBoolean,
+    requestConfigFromFrame: value => {
+      if (typeof value === 'string') {
+        // Legacy `requestConfigFromFrame` value which holds only the origin.
+        return value;
+      }
+      const objectVal = toObject(value);
+      return {
+        origin: toString(objectVal.origin),
+        ancestorLevel: toInteger(objectVal.ancestorLevel),
+      };
+    },
+  };
+
   return Object.keys(config).reduce(function(result, key) {
     if (paramWhiteList.indexOf(key) !== -1) {
       // Ignore `null` values as these indicate a default value.
       // In this case the config value set in the sidebar app HTML config is
       // used.
       if (config[key] !== null) {
-        result[key] = config[key];
+        if (coercions[key]) {
+          // If a coercion method exists, pass it through
+          result[key] = coercions[key](config[key]);
+        } else {
+          result[key] = config[key];
+        }
       }
     }
     return result;
