@@ -9,7 +9,7 @@ import { $imports } from '../tag-editor';
 import { checkAccessibility } from '../../../test-util/accessibility';
 import mockImportedComponents from '../../../test-util/mock-imported-components';
 
-describe('TagEditor', function() {
+describe('TagEditor', function () {
   let containers = [];
   let fakeTags = ['tag1', 'tag2'];
   let fakeTagsService;
@@ -36,7 +36,7 @@ describe('TagEditor', function() {
     );
   }
 
-  afterEach(function() {
+  afterEach(function () {
     containers.forEach(container => {
       container.remove();
     });
@@ -46,10 +46,7 @@ describe('TagEditor', function() {
   // Simulates a selection event from autocomplete-list
   function selectOption(wrapper, item) {
     act(() => {
-      wrapper
-        .find('AutocompleteList')
-        .props()
-        .onSelectItem(item);
+      wrapper.find('AutocompleteList').props().onSelectItem(item);
     });
   }
 
@@ -74,7 +71,7 @@ describe('TagEditor', function() {
     wrapper.find('input').simulate('input', { inputType: 'insertText' });
   }
 
-  beforeEach(function() {
+  beforeEach(function () {
     fakeOnEditTags = sinon.stub();
     fakeServiceUrl = sinon.stub().returns('http://serviceurl.com');
     fakeTagsService = {
@@ -445,7 +442,7 @@ describe('TagEditor', function() {
   });
 
   describe('accessibility validation', () => {
-    beforeEach(function() {
+    beforeEach(function () {
       // create a full dom tree for a11y testing
       $imports.$mock({
         './autocomplete-list': AutocompleteList,

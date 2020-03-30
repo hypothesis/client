@@ -193,7 +193,7 @@ process.argv.slice(2).forEach(filePath => {
   const inFile = path.resolve(filePath);
   const outFile = inFile.replace(/\.coffee$/, '.js');
   conversions.push(
-    toResultOrError(convertFile(inFile, outFile)).then(function(result) {
+    toResultOrError(convertFile(inFile, outFile)).then(function (result) {
       result.fileName = inFile;
       return result;
     })

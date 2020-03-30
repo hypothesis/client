@@ -8,8 +8,8 @@ function fakeWindow(config) {
   };
 }
 
-describe('hostPageConfig', function() {
-  it('parses config from location string and returns whitelisted params', function() {
+describe('hostPageConfig', function () {
+  it('parses config from location string and returns whitelisted params', function () {
     const window_ = fakeWindow({
       annotations: '1234',
       group: 'abc12',
@@ -39,7 +39,7 @@ describe('hostPageConfig', function() {
     });
   });
 
-  it('coerces `requestConfigFromFrame` and `openSidebar` values', function() {
+  it('coerces `requestConfigFromFrame` and `openSidebar` values', function () {
     const window_ = fakeWindow({
       openSidebar: 'false',
       requestConfigFromFrame: {
@@ -57,7 +57,7 @@ describe('hostPageConfig', function() {
     });
   });
 
-  it('ignores non-whitelisted config params', function() {
+  it('ignores non-whitelisted config params', function () {
     const window_ = fakeWindow({
       apiUrl: 'https://not-the-hypothesis/api/',
     });
@@ -65,7 +65,7 @@ describe('hostPageConfig', function() {
     assert.deepEqual(hostPageConfig(window_), {});
   });
 
-  it('ignores `null` values in config', function() {
+  it('ignores `null` values in config', function () {
     const window_ = fakeWindow({
       openSidebar: null,
     });

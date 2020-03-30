@@ -41,10 +41,7 @@ describe('StreamSearchInput', () => {
   it('sets path and query when user searches', () => {
     const wrapper = createSearchInput();
     act(() => {
-      wrapper
-        .find('SearchInput')
-        .props()
-        .onSearch('new-query');
+      wrapper.find('SearchInput').props().onSearch('new-query');
     });
     assert.calledWith(fakeRouter.navigate, 'stream', { q: 'new-query' });
   });

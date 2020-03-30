@@ -59,11 +59,7 @@ describe('GroupListSection', () => {
   it("sets expanded group when a group's submenu is expanded", () => {
     const onExpandGroup = sinon.stub();
     const wrapper = createGroupListSection({ onExpandGroup });
-    wrapper
-      .find('GroupListItem')
-      .first()
-      .props()
-      .onExpand(true);
+    wrapper.find('GroupListItem').first().props().onExpand(true);
     assert.calledWith(onExpandGroup, testGroups[0]);
   });
 
@@ -73,11 +69,7 @@ describe('GroupListSection', () => {
       expandedGroup: testGroups[0],
       onExpandGroup,
     });
-    wrapper
-      .find('GroupListItem')
-      .first()
-      .props()
-      .onExpand(false);
+    wrapper.find('GroupListItem').first().props().onExpand(false);
     assert.calledWith(onExpandGroup, null);
   });
 });

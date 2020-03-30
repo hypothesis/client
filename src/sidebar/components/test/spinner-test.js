@@ -5,7 +5,7 @@ import Spinner from '../spinner';
 
 import { checkAccessibility } from '../../../test-util/accessibility';
 
-describe('Spinner', function() {
+describe('Spinner', function () {
   const createSpinner = (props = {}) => mount(<Spinner {...props} />);
 
   // A spinner is a trivial component with no props. Just make sure it renders.

@@ -100,7 +100,7 @@ function threadAnnotations(annotations) {
   const threads = {};
 
   // Build mapping of annotation ID -> thread
-  annotations.forEach(function(annotation) {
+  annotations.forEach(function (annotation) {
     threads[id(annotation)] = Object.assign({}, DEFAULT_THREAD_STATE, {
       id: id(annotation),
       annotation: annotation,
@@ -109,7 +109,7 @@ function threadAnnotations(annotations) {
   });
 
   // Set each thread's parent based on the references field
-  annotations.forEach(function(annotation) {
+  annotations.forEach(function (annotation) {
     if (!annotation.references) {
       return;
     }
@@ -119,7 +119,7 @@ function threadAnnotations(annotations) {
   // Collect the set of threads which have no parent as
   // children of the thread root
   const roots = [];
-  Object.keys(threads).forEach(function(id) {
+  Object.keys(threads).forEach(function (id) {
     if (!threads[id].parent) {
       // Top-level threads are collapsed by default
       threads[id].collapsed = true;
@@ -147,7 +147,7 @@ function threadAnnotations(annotations) {
  */
 function mapThread(thread, mapFn) {
   return Object.assign({}, mapFn(thread), {
-    children: thread.children.map(function(child) {
+    children: thread.children.map(function (child) {
       return mapThread(child, mapFn);
     }),
   });
@@ -161,7 +161,7 @@ function mapThread(thread, mapFn) {
  * @return {Array<Thread>} Sorted list of threads
  */
 function sort(threads, compareFn) {
-  return threads.slice().sort(function(a, b) {
+  return threads.slice().sort(function (a, b) {
     // Threads with no annotation always sort to the top
     if (!a.annotation || !b.annotation) {
       if (!a.annotation && !b.annotation) {
@@ -186,7 +186,7 @@ function sort(threads, compareFn) {
  * to `compareFn` and replies sorted by `replyCompareFn`.
  */
 function sortThread(thread, compareFn, replyCompareFn) {
-  const children = thread.children.map(function(child) {
+  const children = thread.children.map(function (child) {
     return sortThread(child, replyCompareFn, replyCompareFn);
   });
 
@@ -200,13 +200,13 @@ function sortThread(thread, compareFn, replyCompareFn) {
  * updated.
  */
 function countRepliesAndDepth(thread, depth) {
-  const children = thread.children.map(function(c) {
+  const children = thread.children.map(function (c) {
     return countRepliesAndDepth(c, depth + 1);
   });
   return Object.assign({}, thread, {
     children: children,
     depth: depth,
-    replyCount: children.reduce(function(total, child) {
+    replyCount: children.reduce(function (total, child) {
       return total + 1 + child.replyCount;
     }, 0),
   });
@@ -214,7 +214,7 @@ function countRepliesAndDepth(thread, depth) {
 
 /** Return true if a thread has any visible children. */
 function hasVisibleChildren(thread) {
-  return thread.children.some(function(child) {
+  return thread.children.some(function (child) {
     return child.visible || hasVisibleChildren(child);
   });
 }
@@ -250,14 +250,14 @@ const defaultOpts = {
    * Less-than comparison function used to compare annotations in order to sort
    * the top-level thread.
    */
-  sortCompareFn: function(a, b) {
+  sortCompareFn: function (a, b) {
     return a.id < b.id;
   },
   /**
    * Less-than comparison function used to compare annotations in order to sort
    * replies.
    */
-  replySortCompareFn: function(a, b) {
+  replySortCompareFn: function (a, b) {
     return a.created < b.created;
   },
 };
@@ -283,7 +283,7 @@ export default function buildThread(annotations, opts) {
   // Mark annotations as visible or hidden depending on whether
   // they are being edited and whether they match the current filter
   // criteria
-  const shouldShowThread = function(annotation) {
+  const shouldShowThread = function (annotation) {
     if (opts.forceVisible && opts.forceVisible.indexOf(id(annotation)) !== -1) {
       return true;
     }
@@ -297,14 +297,14 @@ export default function buildThread(annotations, opts) {
   // that are selected
   if (opts.selected.length > 0) {
     thread = Object.assign({}, thread, {
-      children: thread.children.filter(function(child) {
+      children: thread.children.filter(function (child) {
         return opts.selected.indexOf(child.id) !== -1;
       }),
     });
   }
 
   // Set the visibility and highlight states of threads
-  thread = mapThread(thread, function(thread) {
+  thread = mapThread(thread, function (thread) {
     let highlightState;
     if (opts.highlighted.length > 0) {
       const isHighlighted =
@@ -324,7 +324,7 @@ export default function buildThread(annotations, opts) {
   // Expand any threads which:
   // 1) Have been explicitly expanded OR
   // 2) Have children matching the filter
-  thread = mapThread(thread, function(thread) {
+  thread = mapThread(thread, function (thread) {
     const id = thread.id;
 
     // If the thread was explicitly expanded or collapsed, respect that option
@@ -340,7 +340,7 @@ export default function buildThread(annotations, opts) {
   });
 
   // Remove top-level threads which contain no visible annotations
-  thread.children = thread.children.filter(function(child) {
+  thread.children = thread.children.filter(function (child) {
     return child.visible || hasVisibleChildren(child);
   });
 

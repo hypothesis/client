@@ -225,10 +225,7 @@ describe('Annotation', () => {
         setEditingMode(true);
 
         const wrapper = createComponent();
-        wrapper
-          .find('AnnotationPublishControl')
-          .props()
-          .onSave();
+        wrapper.find('AnnotationPublishControl').props().onSave();
 
         assert.calledWith(
           fakeAnnotationsService.save,
@@ -241,10 +238,7 @@ describe('Annotation', () => {
 
         const wrapper = createComponent();
         act(() => {
-          wrapper
-            .find('AnnotationPublishControl')
-            .props()
-            .onSave();
+          wrapper.find('AnnotationPublishControl').props().onSave();
         });
 
         wrapper.update();
@@ -260,10 +254,7 @@ describe('Annotation', () => {
         fakeAnnotationsService.save.rejects();
 
         const wrapper = createComponent();
-        wrapper
-          .find('AnnotationPublishControl')
-          .props()
-          .onSave();
+        wrapper.find('AnnotationPublishControl').props().onSave();
 
         await waitFor(() => fakeToastMessenger.error.called);
       });
@@ -429,9 +420,7 @@ describe('Annotation', () => {
       });
 
       act(() => {
-        findRepliesButton(wrapper)
-          .props()
-          .onClick();
+        findRepliesButton(wrapper).props().onClick();
       });
       wrapper.setProps({ threadIsCollapsed: false });
 
@@ -449,10 +438,7 @@ describe('Annotation', () => {
         const theAnnot = fixtures.defaultAnnotation();
         const wrapper = createComponent({ annotation: theAnnot });
 
-        wrapper
-          .find('AnnotationActionBar')
-          .props()
-          .onReply();
+        wrapper.find('AnnotationActionBar').props().onReply();
 
         assert.calledOnce(fakeAnnotationsService.reply);
         assert.calledWith(

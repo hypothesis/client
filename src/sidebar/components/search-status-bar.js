@@ -14,7 +14,7 @@ import Button from './button';
  */
 const countVisibleAnns = annThread => {
   return annThread.children.reduce(
-    function(count, child) {
+    function (count, child) {
       return count + countVisibleAnns(child);
     },
     annThread.visible ? 1 : 0

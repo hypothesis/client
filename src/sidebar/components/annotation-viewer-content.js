@@ -7,7 +7,7 @@ function fetchThread(api, id) {
   let annot;
   return api.annotation
     .get({ id: id })
-    .then(function(annot) {
+    .then(function (annot) {
       if (annot.references && annot.references.length) {
         // This is a reply, fetch the top-level annotation
         return api.annotation.get({ id: annot.references[0] });
@@ -15,11 +15,11 @@ function fetchThread(api, id) {
         return annot;
       }
     })
-    .then(function(annot_) {
+    .then(function (annot_) {
       annot = annot_;
       return api.search({ references: annot.id });
     })
-    .then(function(searchResult) {
+    .then(function (searchResult) {
       return [annot].concat(searchResult.rows);
     });
 }
@@ -39,14 +39,14 @@ function AnnotationViewerContentController(
 
   this.rootThread = () => rootThread.thread(store.getState());
 
-  this.setCollapsed = function(id, collapsed) {
+  this.setCollapsed = function (id, collapsed) {
     store.setCollapsed(id, collapsed);
   };
 
-  this.ready = fetchThread(api, annotationId).then(function(annots) {
+  this.ready = fetchThread(api, annotationId).then(function (annots) {
     annotationMapper.loadAnnotations(annots);
 
-    const topLevelAnnot = annots.filter(function(annot) {
+    const topLevelAnnot = annots.filter(function (annot) {
       return (annot.references || []).length === 0;
     })[0];
 
@@ -60,7 +60,7 @@ function AnnotationViewerContentController(
     streamer.setConfig('filter', { filter: streamFilter.getFilter() });
     streamer.connect();
 
-    annots.forEach(function(annot) {
+    annots.forEach(function (annot) {
       store.setCollapsed(annot.id, false);
     });
 

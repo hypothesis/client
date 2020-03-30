@@ -11,7 +11,7 @@ function StreamContentController(
   let offset = 0;
 
   /** Load annotations fetched from the API into the app. */
-  const load = function(result) {
+  const load = function (result) {
     offset += result.rows.length;
     annotationMapper.loadAnnotations(result.rows, result.replies);
   };
@@ -21,7 +21,7 @@ function StreamContentController(
   /**
    * Fetch the next `limit` annotations starting from `offset` from the API.
    */
-  const fetch = function(limit) {
+  const fetch = function (limit) {
     const query = Object.assign(
       {
         _separate_replies: true,
@@ -34,7 +34,7 @@ function StreamContentController(
     api
       .search(query)
       .then(load)
-      .catch(function(err) {
+      .catch(function (err) {
         console.error(err);
       });
   };

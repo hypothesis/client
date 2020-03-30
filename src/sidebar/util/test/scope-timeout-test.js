@@ -2,27 +2,27 @@ import scopeTimeout from '../scope-timeout';
 
 function FakeScope() {
   this.listeners = {};
-  this.$on = function(event, fn) {
+  this.$on = function (event, fn) {
     this.listeners[event] = this.listeners[event] || [];
     this.listeners[event].push(fn);
-    return function() {
-      this.listeners[event] = this.listeners[event].filter(function(otherFn) {
+    return function () {
+      this.listeners[event] = this.listeners[event].filter(function (otherFn) {
         return otherFn !== fn;
       });
     }.bind(this);
   };
 }
 
-describe('scope-timeout', function() {
+describe('scope-timeout', function () {
   let fakeSetTimeout;
   let fakeClearTimeout;
 
-  beforeEach(function() {
+  beforeEach(function () {
     fakeSetTimeout = sinon.stub().returns(42);
     fakeClearTimeout = sinon.stub();
   });
 
-  it('schedules a timeout', function() {
+  it('schedules a timeout', function () {
     const $scope = new FakeScope();
     const callback = sinon.stub();
     scopeTimeout($scope, callback, 0, fakeSetTimeout, fakeClearTimeout);
@@ -32,7 +32,7 @@ describe('scope-timeout', function() {
     assert.called(callback);
   });
 
-  it('removes the scope listener when the timeout fires', function() {
+  it('removes the scope listener when the timeout fires', function () {
     const $scope = new FakeScope();
     const callback = sinon.stub();
     scopeTimeout($scope, callback, 0, fakeSetTimeout, fakeClearTimeout);
@@ -42,7 +42,7 @@ describe('scope-timeout', function() {
     assert.equal($scope.listeners.$destroy.length, 0);
   });
 
-  it('clears the timeout when the scope is destroyed', function() {
+  it('clears the timeout when the scope is destroyed', function () {
     const $scope = new FakeScope();
     const callback = sinon.stub();
     scopeTimeout($scope, callback, 0, fakeSetTimeout, fakeClearTimeout);

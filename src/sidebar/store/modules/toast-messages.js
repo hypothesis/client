@@ -12,20 +12,20 @@ function init() {
 }
 
 const update = {
-  ADD_MESSAGE: function(state, action) {
+  ADD_MESSAGE: function (state, action) {
     return {
       messages: state.messages.concat({ ...action.message }),
     };
   },
 
-  REMOVE_MESSAGE: function(state, action) {
+  REMOVE_MESSAGE: function (state, action) {
     const updatedMessages = state.messages.filter(
       message => message.id !== action.id
     );
     return { messages: updatedMessages };
   },
 
-  UPDATE_MESSAGE: function(state, action) {
+  UPDATE_MESSAGE: function (state, action) {
     const updatedMessages = state.messages.map(message => {
       if (message.id && message.id === action.message.id) {
         return { ...action.message };

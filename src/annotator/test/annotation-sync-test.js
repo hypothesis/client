@@ -2,23 +2,23 @@ import EventEmitter from 'tiny-emitter';
 
 import AnnotationSync from '../annotation-sync';
 
-describe('AnnotationSync', function() {
+describe('AnnotationSync', function () {
   let createAnnotationSync;
   let fakeBridge;
   let options;
   let publish;
   const sandbox = sinon.createSandbox();
 
-  beforeEach(function() {
+  beforeEach(function () {
     const emitter = new EventEmitter();
     const listeners = {};
 
-    createAnnotationSync = function() {
+    createAnnotationSync = function () {
       return new AnnotationSync(fakeBridge, options);
     };
 
     fakeBridge = {
-      on: sandbox.spy(function(method, fn) {
+      on: sandbox.spy(function (method, fn) {
         listeners[method] = fn;
       }),
       call: sandbox.stub(),
@@ -31,7 +31,7 @@ describe('AnnotationSync', function() {
       emit: emitter.emit.bind(emitter), // eslint-disable-line no-restricted-properties
     };
 
-    publish = function() {
+    publish = function () {
       const method = arguments[0];
       const args = [].slice.call(arguments, 1);
 
@@ -39,26 +39,26 @@ describe('AnnotationSync', function() {
     };
   });
 
-  afterEach(function() {
+  afterEach(function () {
     sandbox.restore();
   });
 
-  describe('#constructor', function() {
-    context('when "deleteAnnotation" is published', function() {
-      it('calls emit("annotationDeleted")', function() {
+  describe('#constructor', function () {
+    context('when "deleteAnnotation" is published', function () {
+      it('calls emit("annotationDeleted")', function () {
         const ann = { id: 1, $tag: 'tag1' };
         const eventStub = sinon.stub();
         options.on('annotationDeleted', eventStub);
         createAnnotationSync();
 
-        publish('deleteAnnotation', { msg: ann }, function() {});
+        publish('deleteAnnotation', { msg: ann }, function () {});
 
         assert.calledWith(eventStub, ann);
       });
 
-      it("calls the 'deleteAnnotation' event's callback function", function(done) {
+      it("calls the 'deleteAnnotation' event's callback function", function (done) {
         const ann = { id: 1, $tag: 'tag1' };
-        const callback = function(err, ret) {
+        const callback = function (err, ret) {
           assert.isNull(err);
           assert.deepEqual(ret, { tag: 'tag1', msg: ann });
           done();
@@ -68,30 +68,30 @@ describe('AnnotationSync', function() {
         publish('deleteAnnotation', { msg: ann }, callback);
       });
 
-      it('deletes any existing annotation from its cache before calling emit', function() {
+      it('deletes any existing annotation from its cache before calling emit', function () {
         const ann = { id: 1, $tag: 'tag1' };
         const annSync = createAnnotationSync();
         annSync.cache.tag1 = ann;
-        options.emit = function() {
+        options.emit = function () {
           assert(!annSync.cache.tag1);
         };
 
-        publish('deleteAnnotation', { msg: ann }, function() {});
+        publish('deleteAnnotation', { msg: ann }, function () {});
       });
 
-      it('deletes any existing annotation from its cache', function() {
+      it('deletes any existing annotation from its cache', function () {
         const ann = { id: 1, $tag: 'tag1' };
         const annSync = createAnnotationSync();
         annSync.cache.tag1 = ann;
 
-        publish('deleteAnnotation', { msg: ann }, function() {});
+        publish('deleteAnnotation', { msg: ann }, function () {});
 
         assert(!annSync.cache.tag1);
       });
     });
 
-    context('when "loadAnnotations" is published', function() {
-      it('calls emit("annotationsLoaded")', function() {
+    context('when "loadAnnotations" is published', function () {
+      it('calls emit("annotationsLoaded")', function () {
         const annotations = [
           { id: 1, $tag: 'tag1' },
           { id: 2, $tag: 'tag2' },
@@ -106,14 +106,14 @@ describe('AnnotationSync', function() {
         options.on('annotationsLoaded', loadedStub);
         createAnnotationSync();
 
-        publish('loadAnnotations', bodies, function() {});
+        publish('loadAnnotations', bodies, function () {});
 
         assert.calledWith(loadedStub, annotations);
       });
     });
 
-    context('when "beforeAnnotationCreated" is emitted', function() {
-      it('calls bridge.call() passing the event', function() {
+    context('when "beforeAnnotationCreated" is emitted', function () {
+      it('calls bridge.call() passing the event', function () {
         const ann = { id: 1 };
         createAnnotationSync();
 
@@ -128,8 +128,8 @@ describe('AnnotationSync', function() {
         );
       });
 
-      context('if the annotation has a $tag', function() {
-        it('does not call bridge.call()', function() {
+      context('if the annotation has a $tag', function () {
+        it('does not call bridge.call()', function () {
           const ann = { id: 1, $tag: 'tag1' };
           createAnnotationSync();
 

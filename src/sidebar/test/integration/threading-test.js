@@ -34,16 +34,16 @@ const fixtures = immutable({
   ],
 });
 
-describe('annotation threading', function() {
+describe('annotation threading', function () {
   let store;
   let rootThread;
 
-  beforeEach(function() {
+  beforeEach(function () {
     const fakeUnicode = {
-      normalize: function(s) {
+      normalize: function (s) {
         return s;
       },
-      fold: function(s) {
+      fold: function (s) {
         return s;
       },
     };
@@ -65,24 +65,24 @@ describe('annotation threading', function() {
 
     angular.mock.module('app');
 
-    angular.mock.inject(function(_store_, _rootThread_) {
+    angular.mock.inject(function (_store_, _rootThread_) {
       store = _store_;
       rootThread = _rootThread_;
     });
   });
 
-  it('should display newly loaded annotations', function() {
+  it('should display newly loaded annotations', function () {
     store.addAnnotations(fixtures.annotations);
     assert.equal(rootThread.thread(store.getState()).children.length, 2);
   });
 
-  it('should not display unloaded annotations', function() {
+  it('should not display unloaded annotations', function () {
     store.addAnnotations(fixtures.annotations);
     store.removeAnnotations(fixtures.annotations);
     assert.equal(rootThread.thread(store.getState()).children.length, 0);
   });
 
-  it('should filter annotations when a search is set', function() {
+  it('should filter annotations when a search is set', function () {
     store.addAnnotations(fixtures.annotations);
     store.setFilterQuery('second');
     assert.equal(rootThread.thread(store.getState()).children.length, 1);
@@ -104,7 +104,7 @@ describe('annotation threading', function() {
       store.setSortKey(testCase.sortKey);
       const actualOrder = rootThread
         .thread(store.getState())
-        .children.map(function(thread) {
+        .children.map(function (thread) {
           return thread.annotation.id;
         });
       assert.deepEqual(actualOrder, testCase.expectedOrder);

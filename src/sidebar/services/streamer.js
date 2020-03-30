@@ -84,7 +84,7 @@ export default function Streamer(
     // Wrap message dispatches in $rootScope.$apply() so that
     // scope watches on app state affected by the received message
     // are updated
-    $rootScope.$apply(function() {
+    $rootScope.$apply(function () {
       const message = JSON.parse(event.data);
       if (!message) {
         return;
@@ -110,7 +110,7 @@ export default function Streamer(
   }
 
   function sendClientConfig() {
-    Object.keys(configMessages).forEach(function(key) {
+    Object.keys(configMessages).forEach(function (key) {
       if (configMessages[key]) {
         socket.send(configMessages[key]);
       }
@@ -129,7 +129,7 @@ export default function Streamer(
     }
   }
 
-  const _connect = function() {
+  const _connect = function () {
     // If we have no URL configured, don't do anything.
     if (!settings.websocketUrl) {
       return Promise.resolve();
@@ -137,7 +137,7 @@ export default function Streamer(
 
     return auth
       .tokenGetter()
-      .then(function(token) {
+      .then(function (token) {
         let url;
         if (token) {
           // Include the access token in the URL via a query param. This method
@@ -173,7 +173,7 @@ export default function Streamer(
           id: 1,
         });
       })
-      .catch(function(err) {
+      .catch(function (err) {
         console.error(
           'Failed to fetch token for WebSocket authentication',
           err

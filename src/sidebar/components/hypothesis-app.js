@@ -83,7 +83,7 @@ function HypothesisAppController(
 
   this.route = () => store.route();
 
-  $scope.$on(events.USER_CHANGED, function(event, data) {
+  $scope.$on(events.USER_CHANGED, function (event, data) {
     self.onUserChange(data.profile);
   });
 
@@ -97,7 +97,7 @@ function HypothesisAppController(
    * @return {Promise<void>} - A Promise that resolves when the login flow
    *   completes. For non-OAuth logins, always resolves immediately.
    */
-  this.login = function() {
+  this.login = function () {
     if (serviceConfig(settings)) {
       // Let the host page handle the login request
       bridge.call(bridgeEvents.LOGIN_REQUESTED);
@@ -117,7 +117,7 @@ function HypothesisAppController(
       });
   };
 
-  this.signUp = function() {
+  this.signUp = function () {
     analytics.track(analytics.events.SIGN_UP_REQUESTED);
 
     if (serviceConfig(settings)) {
@@ -129,7 +129,7 @@ function HypothesisAppController(
   };
 
   // Prompt to discard any unsaved drafts.
-  const promptToLogout = function() {
+  const promptToLogout = function () {
     // TODO - Replace this with a UI which doesn't look terrible.
     let text = '';
     const drafts = store.countDrafts();
@@ -148,13 +148,13 @@ function HypothesisAppController(
   };
 
   // Log the user out.
-  this.logout = function() {
+  this.logout = function () {
     if (!promptToLogout()) {
       return;
     }
 
     store.clearGroups();
-    store.unsavedAnnotations().forEach(function(annotation) {
+    store.unsavedAnnotations().forEach(function (annotation) {
       $rootScope.$emit(events.ANNOTATION_DELETED, annotation);
     });
     store.discardAllDrafts();

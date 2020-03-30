@@ -6,7 +6,7 @@ const DEFAULT_KEYS = {
   focusedGroup: 'hypothesis.groups.focus',
 };
 
-describe('sidebar/services/persisted-defaults', function() {
+describe('sidebar/services/persisted-defaults', function () {
   let fakeLocalStorage;
   let fakeGetItem;
   let fakeSetItem;

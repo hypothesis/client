@@ -1,7 +1,7 @@
 import SearchClient from '../search-client';
 
 function awaitEvent(emitter, event) {
-  return new Promise(function(resolve) {
+  return new Promise(function (resolve) {
     emitter.on(event, resolve);
   });
 }
@@ -17,7 +17,7 @@ describe('SearchClient', () => {
   let fakeSearchFn;
 
   beforeEach(() => {
-    fakeSearchFn = sinon.spy(function(params) {
+    fakeSearchFn = sinon.spy(function (params) {
       return Promise.resolve({
         rows: RESULTS.slice(params.offset, params.offset + params.limit),
         total: RESULTS.length,

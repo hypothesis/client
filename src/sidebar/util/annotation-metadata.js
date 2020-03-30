@@ -110,7 +110,7 @@ export function isPublic(annotation) {
     return isPublic;
   }
 
-  annotation.permissions.read.forEach(function(perm) {
+  annotation.permissions.read.forEach(function (perm) {
     const readPermArr = perm.split(':');
     if (readPermArr.length === 2 && readPermArr[0] === 'group') {
       isPublic = true;

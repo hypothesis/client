@@ -17,7 +17,7 @@ const fixtures = immutable({
   ],
 });
 
-describe('store', function() {
+describe('store', function () {
   let store;
   let fakeRootScope;
 
@@ -29,25 +29,25 @@ describe('store', function() {
     return storeAnn.$tag;
   }
 
-  beforeEach(function() {
+  beforeEach(function () {
     fakeRootScope = { $applyAsync: sinon.stub() };
     store = storeFactory(fakeRootScope, {});
   });
 
-  describe('initialization', function() {
-    it('does not set a selection when settings.annotations is null', function() {
+  describe('initialization', function () {
+    it('does not set a selection when settings.annotations is null', function () {
       assert.isFalse(store.hasSelectedAnnotations());
       assert.equal(Object.keys(store.getState().selection.expanded).length, 0);
     });
 
-    it('sets the selection when settings.annotations is set', function() {
+    it('sets the selection when settings.annotations is set', function () {
       store = storeFactory(fakeRootScope, { annotations: 'testid' });
       assert.deepEqual(store.getState().selection.selectedAnnotationMap, {
         testid: true,
       });
     });
 
-    it('expands the selected annotations when settings.annotations is set', function() {
+    it('expands the selected annotations when settings.annotations is set', function () {
       store = storeFactory(fakeRootScope, { annotations: 'testid' });
       assert.deepEqual(store.getState().selection.expanded, {
         testid: true,
@@ -120,35 +120,35 @@ describe('store', function() {
     });
   });
 
-  describe('#removeAnnotations()', function() {
-    it('removes annotations from the current state', function() {
+  describe('#removeAnnotations()', function () {
+    it('removes annotations from the current state', function () {
       const annot = defaultAnnotation();
       store.addAnnotations([annot]);
       store.removeAnnotations([annot]);
       assert.deepEqual(store.getState().annotations.annotations, []);
     });
 
-    it('matches annotations to remove by ID', function() {
+    it('matches annotations to remove by ID', function () {
       store.addAnnotations(fixtures.pair);
       store.removeAnnotations([{ id: fixtures.pair[0].id }]);
 
-      const ids = store.getState().annotations.annotations.map(function(a) {
+      const ids = store.getState().annotations.annotations.map(function (a) {
         return a.id;
       });
       assert.deepEqual(ids, [fixtures.pair[1].id]);
     });
 
-    it('matches annotations to remove by tag', function() {
+    it('matches annotations to remove by tag', function () {
       store.addAnnotations(fixtures.pair);
       store.removeAnnotations([{ $tag: fixtures.pair[0].$tag }]);
 
-      const tags = store.getState().annotations.annotations.map(function(a) {
+      const tags = store.getState().annotations.annotations.map(function (a) {
         return a.$tag;
       });
       assert.deepEqual(tags, [fixtures.pair[1].$tag]);
     });
 
-    it('switches back to the Annotations tab when the last orphan is removed', function() {
+    it('switches back to the Annotations tab when the last orphan is removed', function () {
       const orphan = Object.assign(defaultAnnotation(), { $orphan: true });
       store.addAnnotations([orphan]);
       store.selectTab(uiConstants.TAB_ORPHANS);
@@ -160,8 +160,8 @@ describe('store', function() {
     });
   });
 
-  describe('#clearAnnotations()', function() {
-    it('removes all annotations', function() {
+  describe('#clearAnnotations()', function () {
+    it('removes all annotations', function () {
       const annot = defaultAnnotation();
       store.addAnnotations([annot]);
       store.clearAnnotations();
@@ -169,7 +169,7 @@ describe('store', function() {
     });
   });
 
-  describe('#setShowHighlights()', function() {
+  describe('#setShowHighlights()', function () {
     [{ state: true }, { state: false }].forEach(testCase => {
       it(`sets the visibleHighlights state flag to ${testCase.state}`, () => {
         store.setShowHighlights(testCase.state);
@@ -178,8 +178,8 @@ describe('store', function() {
     });
   });
 
-  describe('#updatingAnchorStatus', function() {
-    it("updates the annotation's orphan flag", function() {
+  describe('#updatingAnchorStatus', function () {
+    it("updates the annotation's orphan flag", function () {
       const annot = defaultAnnotation();
       store.addAnnotations([annot]);
       store.updateAnchorStatus({ [tagForID(annot.id)]: 'orphan' });

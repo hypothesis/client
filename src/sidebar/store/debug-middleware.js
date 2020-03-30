@@ -12,8 +12,8 @@ export default function debugMiddleware(store) {
   /* eslint-disable no-console */
   let serial = 0;
 
-  return function(next) {
-    return function(action) {
+  return function (next) {
+    return function (action) {
       if (!window.debug) {
         next(action);
         return;

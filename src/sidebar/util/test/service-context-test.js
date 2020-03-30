@@ -78,10 +78,7 @@ describe('service-context', () => {
   describe('useService', () => {
     it('returns the named service', () => {
       const injector = {
-        get: sinon
-          .stub()
-          .withArgs('aService')
-          .returns('aValue'),
+        get: sinon.stub().withArgs('aService').returns('aValue'),
       };
       function TestComponent() {
         const value = useService('aService');

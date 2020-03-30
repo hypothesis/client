@@ -90,7 +90,7 @@ export default function hostPageConfig(window) {
     },
   };
 
-  return Object.keys(config).reduce(function(result, key) {
+  return Object.keys(config).reduce(function (result, key) {
     if (paramWhiteList.indexOf(key) !== -1) {
       // Ignore `null` values as these indicate a default value.
       // In this case the config value set in the sidebar app HTML config is

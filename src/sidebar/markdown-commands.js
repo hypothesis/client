@@ -241,7 +241,7 @@ export function toggleBlockStyle(state, prefix) {
   // Test whether all lines in the selected range already have the style
   // applied
   let blockHasStyle = true;
-  transformLines(state, start, end, function(state, lineStart) {
+  transformLines(state, start, end, function (state, lineStart) {
     if (state.text.slice(lineStart, lineStart + prefix.length) !== prefix) {
       blockHasStyle = false;
     }
@@ -250,12 +250,12 @@ export function toggleBlockStyle(state, prefix) {
 
   if (blockHasStyle) {
     // Remove the formatting.
-    return transformLines(state, start, end, function(state, lineStart) {
+    return transformLines(state, start, end, function (state, lineStart) {
       return replaceText(state, lineStart, prefix.length, '');
     });
   } else {
     // Add the block style to any lines which do not already have it applied
-    return transformLines(state, start, end, function(state, lineStart) {
+    return transformLines(state, start, end, function (state, lineStart) {
       if (state.text.slice(lineStart, lineStart + prefix.length) === prefix) {
         return state;
       } else {

@@ -3,14 +3,14 @@ import events from '../../events';
 import features from '../features';
 import { $imports } from '../features';
 
-describe('h:features - sidebar layer', function() {
+describe('h:features - sidebar layer', function () {
   let fakeBridge;
   let fakeWarnOnce;
   let fakeRootScope;
   let fakeSession;
   let sandbox;
 
-  beforeEach(function() {
+  beforeEach(function () {
     sandbox = sinon.createSandbox();
 
     fakeBridge = {
@@ -24,7 +24,7 @@ describe('h:features - sidebar layer', function() {
 
       $broadcast: sandbox.stub(),
 
-      $on: function(event, callback) {
+      $on: function (event, callback) {
         this.eventCallbacks[event] = callback;
       },
     };
@@ -44,38 +44,38 @@ describe('h:features - sidebar layer', function() {
     });
   });
 
-  afterEach(function() {
+  afterEach(function () {
     $imports.$restore();
     sandbox.restore();
   });
 
-  describe('flagEnabled', function() {
-    it('should retrieve features data', function() {
+  describe('flagEnabled', function () {
+    it('should retrieve features data', function () {
       const features_ = features(fakeRootScope, fakeBridge, fakeSession);
       assert.equal(features_.flagEnabled('feature_on'), true);
       assert.equal(features_.flagEnabled('feature_off'), false);
     });
 
-    it('should return false if features have not been loaded', function() {
+    it('should return false if features have not been loaded', function () {
       const features_ = features(fakeRootScope, fakeBridge, fakeSession);
       // simulate feature data not having been loaded yet
       fakeSession.state = {};
       assert.equal(features_.flagEnabled('feature_on'), false);
     });
 
-    it('should trigger a refresh of session data', function() {
+    it('should trigger a refresh of session data', function () {
       const features_ = features(fakeRootScope, fakeBridge, fakeSession);
       features_.flagEnabled('feature_on');
       assert.calledOnce(fakeSession.load);
     });
 
-    it('should return false for unknown flags', function() {
+    it('should return false for unknown flags', function () {
       const features_ = features(fakeRootScope, fakeBridge, fakeSession);
       assert.isFalse(features_.flagEnabled('unknown_feature'));
     });
   });
 
-  it('should broadcast feature flags to annotation layer based on load/user changes', function() {
+  it('should broadcast feature flags to annotation layer based on load/user changes', function () {
     assert.notProperty(fakeRootScope.eventCallbacks, events.USER_CHANGED);
     assert.notProperty(fakeRootScope.eventCallbacks, events.FRAME_CONNECTED);
 

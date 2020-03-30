@@ -20,7 +20,7 @@ function injectScript(doc, src) {
 }
 
 function injectAssets(doc, config, assets) {
-  assets.forEach(function(path) {
+  assets.forEach(function (path) {
     const url = config.assetRoot + 'build/' + config.manifest[path];
     if (url.match(/\.css/)) {
       injectStylesheet(doc, url);

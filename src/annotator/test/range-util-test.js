@@ -21,11 +21,11 @@ function roundCoords(rect) {
   };
 }
 
-describe('annotator.range-util', function() {
+describe('annotator.range-util', function () {
   let selection;
   let testNode;
 
-  beforeEach(function() {
+  beforeEach(function () {
     selection = window.getSelection();
     selection.collapse(null);
 
@@ -34,7 +34,7 @@ describe('annotator.range-util', function() {
     document.body.appendChild(testNode);
   });
 
-  afterEach(function() {
+  afterEach(function () {
     testNode.parentElement.removeChild(testNode);
   });
 
@@ -44,19 +44,19 @@ describe('annotator.range-util', function() {
     selection.addRange(range);
   }
 
-  describe('#isNodeInRange', function() {
-    it('is true for a node in the range', function() {
+  describe('#isNodeInRange', function () {
+    it('is true for a node in the range', function () {
       const rng = createRange(testNode, 0, 1);
       assert.equal(rangeUtil.isNodeInRange(rng, testNode.firstChild), true);
     });
 
-    it('is false for a node before the range', function() {
+    it('is false for a node before the range', function () {
       testNode.innerHTML = 'one <b>two</b> three';
       const rng = createRange(testNode, 1, 2);
       assert.equal(rangeUtil.isNodeInRange(rng, testNode.firstChild), false);
     });
 
-    it('is false for a node after the range', function() {
+    it('is false for a node after the range', function () {
       testNode.innerHTML = 'one <b>two</b> three';
       const rng = createRange(testNode, 1, 2);
       assert.equal(
@@ -66,15 +66,15 @@ describe('annotator.range-util', function() {
     });
   });
 
-  describe('#getTextBoundingBoxes', function() {
-    it('gets the bounding box of a range in a text node', function() {
+  describe('#getTextBoundingBoxes', function () {
+    it('gets the bounding box of a range in a text node', function () {
       testNode.innerHTML = 'plain text';
       const rng = createRange(testNode.firstChild, 0, 5);
       const boxes = rangeUtil.getTextBoundingBoxes(rng);
       assert.ok(boxes.length);
     });
 
-    it('gets the bounding box of a range containing a text node', function() {
+    it('gets the bounding box of a range containing a text node', function () {
       testNode.innerHTML = 'plain text';
       const rng = createRange(testNode, 0, 1);
 
@@ -92,7 +92,7 @@ describe('annotator.range-util', function() {
       ]);
     });
 
-    it('returns the bounding box in viewport coordinates', function() {
+    it('returns the bounding box in viewport coordinates', function () {
       testNode.innerHTML = 'plain text';
       const rng = createRange(testNode, 0, 1);
 
@@ -105,17 +105,17 @@ describe('annotator.range-util', function() {
     });
   });
 
-  describe('#selectionFocusRect', function() {
-    it('returns null if the selection is empty', function() {
+  describe('#selectionFocusRect', function () {
+    it('returns null if the selection is empty', function () {
       assert.isNull(rangeUtil.selectionFocusRect(selection));
     });
 
-    it('returns a point if the selection is not empty', function() {
+    it('returns a point if the selection is not empty', function () {
       selectNode(testNode);
       assert.ok(rangeUtil.selectionFocusRect(selection));
     });
 
-    it("returns the first line's rect if the selection is backwards", function() {
+    it("returns the first line's rect if the selection is backwards", function () {
       selectNode(testNode);
       selection.collapseToEnd();
       selection.extend(testNode, 0);
@@ -124,7 +124,7 @@ describe('annotator.range-util', function() {
       assert.equal(rect.top, testNode.offsetTop);
     });
 
-    it("returns the last line's rect if the selection is forwards", function() {
+    it("returns the last line's rect if the selection is forwards", function () {
       selectNode(testNode);
       const rect = rangeUtil.selectionFocusRect(selection);
       assert.equal(rect.left, testNode.offsetLeft);

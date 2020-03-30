@@ -27,7 +27,7 @@ export default function selections(document) {
   let isMouseDown;
   const selectionEvents = observable
     .listen(document, ['mousedown', 'mouseup', 'selectionchange'])
-    .filter(function(event) {
+    .filter(function (event) {
       if (event.type === 'mousedown' || event.type === 'mouseup') {
         isMouseDown = event.type === 'mousedown';
         return false;
@@ -50,7 +50,7 @@ export default function selections(document) {
     observable.delay(0, observable.Observable.of({})),
   ]);
 
-  return events.map(function() {
+  return events.map(function () {
     return selectedRange(document);
   });
 }

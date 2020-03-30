@@ -51,7 +51,7 @@ export default function loadAnnotationsService(
       // Remove client as it's no longer active.
       searchClient = null;
 
-      store.frames().forEach(function(frame) {
+      store.frames().forEach(function (frame) {
         if (0 <= uris.indexOf(frame.uri)) {
           store.updateFrameAnnotationFetchStatus(frame.uri, true);
         }

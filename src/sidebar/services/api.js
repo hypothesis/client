@@ -103,7 +103,7 @@ function createAPICall(
     onRequestFinished = noop,
   } = {}
 ) {
-  return function(params, data, options = {}) {
+  return function (params, data, options = {}) {
     onRequestStarted();
 
     let accessToken;

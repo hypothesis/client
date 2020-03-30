@@ -63,7 +63,7 @@ export default function session(
       // the /app endpoint.
       lastLoadTime = Date.now();
       lastLoad = retryUtil
-        .retryPromiseOperation(function() {
+        .retryPromiseOperation(function () {
           const authority = getAuthority();
           const opts = {};
           if (authority) {
@@ -71,12 +71,12 @@ export default function session(
           }
           return api.profile.read(opts);
         }, profileFetchRetryOpts)
-        .then(function(session) {
+        .then(function (session) {
           update(session);
           lastLoadTime = Date.now();
           return session;
         })
-        .catch(function(err) {
+        .catch(function (err) {
           lastLoadTime = null;
           throw err;
         });
@@ -142,12 +142,12 @@ export default function session(
     });
 
     return loggedOut
-      .catch(function(err) {
+      .catch(function (err) {
         flash.error('Log out failed');
         analytics.track(analytics.events.LOGOUT_FAILURE);
         throw new Error(err);
       })
-      .then(function() {
+      .then(function () {
         analytics.track(analytics.events.LOGOUT_SUCCESS);
       });
   }

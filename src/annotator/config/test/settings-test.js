@@ -1,7 +1,7 @@
 import settingsFrom from '../settings';
 import { $imports } from '../settings';
 
-describe('annotator.config.settingsFrom', function() {
+describe('annotator.config.settingsFrom', function () {
   let fakeConfigFuncSettingsFrom;
   let fakeIsBrowserExtension;
   let fakeSharedSettings;
@@ -24,7 +24,7 @@ describe('annotator.config.settingsFrom', function() {
     $imports.$restore();
   });
 
-  describe('#sidebarAppUrl', function() {
+  describe('#sidebarAppUrl', function () {
     function appendSidebarLinkToDocument(href) {
       const link = document.createElement('link');
       link.type = 'application/annotator+html';
@@ -36,18 +36,18 @@ describe('annotator.config.settingsFrom', function() {
       return link;
     }
 
-    context("when there's an application/annotator+html link", function() {
+    context("when there's an application/annotator+html link", function () {
       let link;
 
-      beforeEach('add an application/annotator+html <link>', function() {
+      beforeEach('add an application/annotator+html <link>', function () {
         link = appendSidebarLinkToDocument('http://example.com/app.html');
       });
 
-      afterEach('tidy up the link', function() {
+      afterEach('tidy up the link', function () {
         document.head.removeChild(link);
       });
 
-      it('returns the href from the link', function() {
+      it('returns the href from the link', function () {
         assert.equal(
           settingsFrom(window).sidebarAppUrl,
           'http://example.com/app.html'
@@ -55,21 +55,21 @@ describe('annotator.config.settingsFrom', function() {
       });
     });
 
-    context('when there are multiple annotator+html links', function() {
+    context('when there are multiple annotator+html links', function () {
       let link1;
       let link2;
 
-      beforeEach('add two links to the document', function() {
+      beforeEach('add two links to the document', function () {
         link1 = appendSidebarLinkToDocument('http://example.com/app1');
         link2 = appendSidebarLinkToDocument('http://example.com/app2');
       });
 
-      afterEach('tidy up the links', function() {
+      afterEach('tidy up the links', function () {
         document.head.removeChild(link1);
         document.head.removeChild(link2);
       });
 
-      it('returns the href from the first one', function() {
+      it('returns the href from the first one', function () {
         assert.equal(
           settingsFrom(window).sidebarAppUrl,
           'http://example.com/app1'
@@ -77,37 +77,37 @@ describe('annotator.config.settingsFrom', function() {
       });
     });
 
-    context('when the annotator+html link has no href', function() {
+    context('when the annotator+html link has no href', function () {
       let link;
 
       beforeEach(
         'add an application/annotator+html <link> with no href',
-        function() {
+        function () {
           link = appendSidebarLinkToDocument();
         }
       );
 
-      afterEach('tidy up the link', function() {
+      afterEach('tidy up the link', function () {
         document.head.removeChild(link);
       });
 
-      it('throws an error', function() {
-        assert.throws(function() {
+      it('throws an error', function () {
+        assert.throws(function () {
           settingsFrom(window).sidebarAppUrl; // eslint-disable-line no-unused-expressions
         }, 'application/annotator+html (rel="sidebar") link has no href');
       });
     });
 
-    context("when there's no annotator+html link", function() {
-      it('throws an error', function() {
-        assert.throws(function() {
+    context("when there's no annotator+html link", function () {
+      it('throws an error', function () {
+        assert.throws(function () {
           settingsFrom(window).sidebarAppUrl; // eslint-disable-line no-unused-expressions
         }, 'No application/annotator+html (rel="sidebar") link in the document');
       });
     });
   });
 
-  describe('#clientUrl', function() {
+  describe('#clientUrl', function () {
     function appendClientUrlLinkToDocument(href) {
       const link = document.createElement('link');
       link.type = 'application/annotator+javascript';
@@ -121,21 +121,21 @@ describe('annotator.config.settingsFrom', function() {
 
     context(
       "when there's an application/annotator+javascript link",
-      function() {
+      function () {
         let link;
 
         beforeEach(
           'add an application/annotator+javascript <link>',
-          function() {
+          function () {
             link = appendClientUrlLinkToDocument('http://example.com/app.html');
           }
         );
 
-        afterEach('tidy up the link', function() {
+        afterEach('tidy up the link', function () {
           document.head.removeChild(link);
         });
 
-        it('returns the href from the link', function() {
+        it('returns the href from the link', function () {
           assert.equal(
             settingsFrom(window).clientUrl,
             'http://example.com/app.html'
@@ -144,49 +144,49 @@ describe('annotator.config.settingsFrom', function() {
       }
     );
 
-    context('when there are multiple annotator+javascript links', function() {
+    context('when there are multiple annotator+javascript links', function () {
       let link1;
       let link2;
 
-      beforeEach('add two links to the document', function() {
+      beforeEach('add two links to the document', function () {
         link1 = appendClientUrlLinkToDocument('http://example.com/app1');
         link2 = appendClientUrlLinkToDocument('http://example.com/app2');
       });
 
-      afterEach('tidy up the links', function() {
+      afterEach('tidy up the links', function () {
         document.head.removeChild(link1);
         document.head.removeChild(link2);
       });
 
-      it('returns the href from the first one', function() {
+      it('returns the href from the first one', function () {
         assert.equal(settingsFrom(window).clientUrl, 'http://example.com/app1');
       });
     });
 
-    context('when the annotator+javascript link has no href', function() {
+    context('when the annotator+javascript link has no href', function () {
       let link;
 
       beforeEach(
         'add an application/annotator+javascript <link> with no href',
-        function() {
+        function () {
           link = appendClientUrlLinkToDocument();
         }
       );
 
-      afterEach('tidy up the link', function() {
+      afterEach('tidy up the link', function () {
         document.head.removeChild(link);
       });
 
-      it('throws an error', function() {
-        assert.throws(function() {
+      it('throws an error', function () {
+        assert.throws(function () {
           settingsFrom(window).clientUrl; // eslint-disable-line no-unused-expressions
         }, 'application/annotator+javascript (rel="hypothesis-client") link has no href');
       });
     });
 
-    context("when there's no annotator+javascript link", function() {
-      it('throws an error', function() {
-        assert.throws(function() {
+    context("when there's no annotator+javascript link", function () {
+      it('throws an error', function () {
+        assert.throws(function () {
           settingsFrom(window).clientUrl; // eslint-disable-line no-unused-expressions
         }, 'No application/annotator+javascript (rel="hypothesis-client") link in the document');
       });
@@ -204,20 +204,20 @@ describe('annotator.config.settingsFrom', function() {
     };
   }
 
-  describe('#annotations', function() {
+  describe('#annotations', function () {
     context(
       'when the host page has a js-hypothesis-config with an annotations setting',
-      function() {
+      function () {
         beforeEach(
           'add a js-hypothesis-config annotations setting',
-          function() {
+          function () {
             fakeSharedSettings.jsonConfigsFrom.returns({
               annotations: 'annotationsFromJSON',
             });
           }
         );
 
-        it('returns the annotations from the js-hypothesis-config script', function() {
+        it('returns the annotations from the js-hypothesis-config script', function () {
           assert.equal(
             settingsFrom(fakeWindow()).annotations,
             'annotationsFromJSON'
@@ -226,10 +226,10 @@ describe('annotator.config.settingsFrom', function() {
 
         context(
           "when there's also an annotations in the URL fragment",
-          function() {
+          function () {
             specify(
               'js-hypothesis-config annotations override URL ones',
-              function() {
+              function () {
                 const window_ = fakeWindow(
                   'http://localhost:3000#annotations:annotationsFromURL'
                 );
@@ -270,9 +270,9 @@ describe('annotator.config.settingsFrom', function() {
         url: 'http://localhost:3000',
         returns: null,
       },
-    ].forEach(function(test) {
-      describe(test.describe, function() {
-        it(test.it, function() {
+    ].forEach(function (test) {
+      describe(test.describe, function () {
+        it(test.it, function () {
           assert.deepEqual(
             settingsFrom(fakeWindow(test.url)).annotations,
             test.returns
@@ -305,28 +305,31 @@ describe('annotator.config.settingsFrom', function() {
     });
   });
 
-  describe('#query', function() {
+  describe('#query', function () {
     context(
       'when the host page has a js-hypothesis-config with a query setting',
-      function() {
-        beforeEach('add a js-hypothesis-config query setting', function() {
+      function () {
+        beforeEach('add a js-hypothesis-config query setting', function () {
           fakeSharedSettings.jsonConfigsFrom.returns({
             query: 'queryFromJSON',
           });
         });
 
-        it('returns the query from the js-hypothesis-config script', function() {
+        it('returns the query from the js-hypothesis-config script', function () {
           assert.equal(settingsFrom(fakeWindow()).query, 'queryFromJSON');
         });
 
-        context("when there's also a query in the URL fragment", function() {
-          specify('js-hypothesis-config queries override URL ones', function() {
-            const window_ = fakeWindow(
-              'http://localhost:3000#annotations:query:queryFromUrl'
-            );
+        context("when there's also a query in the URL fragment", function () {
+          specify(
+            'js-hypothesis-config queries override URL ones',
+            function () {
+              const window_ = fakeWindow(
+                'http://localhost:3000#annotations:query:queryFromUrl'
+              );
 
-            assert.equal(settingsFrom(window_).query, 'queryFromJSON');
-          });
+              assert.equal(settingsFrom(window_).query, 'queryFromJSON');
+            }
+          );
         });
       }
     );
@@ -374,9 +377,9 @@ describe('annotator.config.settingsFrom', function() {
         url: 'http://localhost:3000',
         returns: null,
       },
-    ].forEach(function(test) {
-      describe(test.describe, function() {
-        it(test.it, function() {
+    ].forEach(function (test) {
+      describe(test.describe, function () {
+        it(test.it, function () {
           assert.deepEqual(
             settingsFrom(fakeWindow(test.url)).query,
             test.returns
@@ -385,8 +388,8 @@ describe('annotator.config.settingsFrom', function() {
       });
     });
 
-    describe('when the URL contains an invalid fragment', function() {
-      it('returns null', function() {
+    describe('when the URL contains an invalid fragment', function () {
+      it('returns null', function () {
         // An invalid escape sequence which will cause decodeURIComponent() to
         // throw a URIError.
         const invalidFrag = '%aaaaa';
@@ -398,7 +401,7 @@ describe('annotator.config.settingsFrom', function() {
     });
   });
 
-  describe('#showHighlights', function() {
+  describe('#showHighlights', function () {
     [
       {
         it: 'returns an "always" setting from the host page unmodified',
@@ -463,8 +466,8 @@ describe('annotator.config.settingsFrom', function() {
         input: /regex/,
         output: /regex/,
       },
-    ].forEach(function(test) {
-      it(test.it, function() {
+    ].forEach(function (test) {
+      it(test.it, function () {
         fakeSharedSettings.jsonConfigsFrom.returns({
           showHighlights: test.input,
         });
@@ -473,7 +476,7 @@ describe('annotator.config.settingsFrom', function() {
         assert.deepEqual(settings.showHighlights, test.output);
       });
 
-      it(test.it, function() {
+      it(test.it, function () {
         fakeConfigFuncSettingsFrom.returns({
           showHighlights: test.input,
         });
@@ -483,16 +486,16 @@ describe('annotator.config.settingsFrom', function() {
       });
     });
 
-    it("defaults to 'always' if there's no showHighlights setting in the host page", function() {
+    it("defaults to 'always' if there's no showHighlights setting in the host page", function () {
       assert.equal(settingsFrom(fakeWindow()).showHighlights, 'always');
     });
 
-    context('when the client is in a browser extension', function() {
-      beforeEach('configure a browser extension client', function() {
+    context('when the client is in a browser extension', function () {
+      beforeEach('configure a browser extension client', function () {
         fakeIsBrowserExtension.returns(true);
       });
 
-      it("doesn't read the setting from the host page, defaults to 'always'", function() {
+      it("doesn't read the setting from the host page, defaults to 'always'", function () {
         fakeSharedSettings.jsonConfigsFrom.returns({
           showHighlights: 'never',
         });
@@ -505,7 +508,7 @@ describe('annotator.config.settingsFrom', function() {
     });
   });
 
-  describe('#hostPageSetting', function() {
+  describe('#hostPageSetting', function () {
     [
       {
         when: 'the client is embedded in a web page',
@@ -619,9 +622,9 @@ describe('annotator.config.settingsFrom', function() {
         defaultValue: 'the default value',
         expected: 'the default value',
       },
-    ].forEach(function(test) {
-      context(test.when, function() {
-        specify(test.specify, function() {
+    ].forEach(function (test) {
+      context(test.when, function () {
+        specify(test.specify, function () {
           fakeIsBrowserExtension.returns(test.isBrowserExtension);
           fakeConfigFuncSettingsFrom.returns(test.configFuncSettings);
           fakeSharedSettings.jsonConfigsFrom.returns(test.jsonSettings);

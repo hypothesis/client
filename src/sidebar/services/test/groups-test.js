@@ -21,7 +21,7 @@ function truthTable(columns) {
 }
 
 // Return a mock session service containing three groups.
-const sessionWithThreeGroups = function() {
+const sessionWithThreeGroups = function () {
   return {
     state: {},
   };
@@ -37,7 +37,7 @@ const dummyGroups = [
   { name: 'Group 3', id: 'id3' },
 ];
 
-describe('groups', function() {
+describe('groups', function () {
   let fakeAuth;
   let fakeStore;
   let fakeIsSidebar;
@@ -48,7 +48,7 @@ describe('groups', function() {
   let fakeServiceUrl;
   let fakeMetadata;
 
-  beforeEach(function() {
+  beforeEach(function () {
     fakeAuth = {
       tokenGetter: sinon.stub().returns('1234'),
     };
@@ -98,11 +98,11 @@ describe('groups', function() {
     fakeRootScope = {
       eventCallbacks: {},
 
-      $apply: function(callback) {
+      $apply: function (callback) {
         callback();
       },
 
-      $on: function(event, callback) {
+      $on: function (event, callback) {
         if (event === events.USER_CHANGED || event === events.FRAME_CONNECTED) {
           this.eventCallbacks[event] = callback;
         }
@@ -230,7 +230,7 @@ describe('groups', function() {
     });
   });
 
-  describe('#all', function() {
+  describe('#all', function () {
     it('returns all groups from store.allGroups', () => {
       const svc = service();
       fakeStore.allGroups = sinon.stub().returns(dummyGroups);
@@ -239,7 +239,7 @@ describe('groups', function() {
     });
   });
 
-  describe('#load', function() {
+  describe('#load', function () {
     it('filters out direct-linked groups that are out of scope and scope enforced', () => {
       const svc = service();
       fakeStore.getDefault.returns(dummyGroups[0].id);
@@ -281,7 +281,7 @@ describe('groups', function() {
       });
     });
 
-    it('combines groups from both endpoints', function() {
+    it('combines groups from both endpoints', function () {
       const svc = service();
 
       const groups = [
@@ -356,7 +356,7 @@ describe('groups', function() {
       });
     });
 
-    it('loads all available groups', function() {
+    it('loads all available groups', function () {
       const svc = service();
 
       return svc.load().then(() => {
@@ -364,7 +364,7 @@ describe('groups', function() {
       });
     });
 
-    it('sends `expand` parameter', function() {
+    it('sends `expand` parameter', function () {
       const svc = service();
       fakeApi.groups.list.returns(
         Promise.resolve([{ id: 'groupa', name: 'GroupA' }])
@@ -516,7 +516,7 @@ describe('groups', function() {
       });
     });
 
-    it('injects a defalt organization if group is missing an organization', function() {
+    it('injects a defalt organization if group is missing an organization', function () {
       const svc = service();
       const groups = [{ id: '39r39f', name: 'Ding Dong!' }];
       fakeApi.groups.list.returns(Promise.resolve(groups));
@@ -769,8 +769,8 @@ describe('groups', function() {
     });
   });
 
-  describe('#get', function() {
-    it('returns the requested group', function() {
+  describe('#get', function () {
+    it('returns the requested group', function () {
       const svc = service();
       fakeStore.getGroup.withArgs('foo').returns(dummyGroups[1]);
 
@@ -778,8 +778,8 @@ describe('groups', function() {
     });
   });
 
-  describe('#leave', function() {
-    it('should call the group leave API', function() {
+  describe('#leave', function () {
+    it('should call the group leave API', function () {
       const s = service();
       return s.leave('id2').then(() => {
         assert.calledWithMatch(fakeApi.group.member.delete, {
@@ -790,7 +790,7 @@ describe('groups', function() {
     });
   });
 
-  describe('calls load on various events', function() {
+  describe('calls load on various events', function () {
     it('refetches groups when the logged-in user changes', () => {
       service();
 

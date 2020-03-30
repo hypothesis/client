@@ -5,7 +5,7 @@ import memoize from '../util/memoize';
 import * as tabs from '../util/tabs';
 
 function truthyKeys(map) {
-  return Object.keys(map).filter(function(k) {
+  return Object.keys(map).filter(function (k) {
     return !!map[k];
   });
 }
@@ -13,13 +13,13 @@ function truthyKeys(map) {
 // Mapping from sort order name to a less-than predicate
 // function for comparing annotations to determine their sort order.
 const sortFns = {
-  Newest: function(a, b) {
+  Newest: function (a, b) {
     return a.updated > b.updated;
   },
-  Oldest: function(a, b) {
+  Oldest: function (a, b) {
     return a.updated < b.updated;
   },
-  Location: function(a, b) {
+  Location: function (a, b) {
     return metadata.location(a) < metadata.location(b);
   },
 };
@@ -66,14 +66,14 @@ export default function RootThread(
         }
       );
 
-      filterFn = function(annot) {
+      filterFn = function (annot) {
         return viewFilter.filter([annot], filters).length > 0;
       };
     }
 
     let threadFilterFn;
     if (state.route.name === 'sidebar' && !shouldFilterThread()) {
-      threadFilterFn = function(thread) {
+      threadFilterFn = function (thread) {
         if (!thread.annotation) {
           return false;
         }
@@ -108,18 +108,18 @@ export default function RootThread(
     events.ANNOTATION_UPDATED,
     events.ANNOTATIONS_LOADED,
   ];
-  loadEvents.forEach(function(event) {
-    $rootScope.$on(event, function(event, annotation) {
+  loadEvents.forEach(function (event) {
+    $rootScope.$on(event, function (event, annotation) {
       store.addAnnotations([].concat(annotation));
     });
   });
 
-  $rootScope.$on(events.BEFORE_ANNOTATION_CREATED, function(event, ann) {
+  $rootScope.$on(events.BEFORE_ANNOTATION_CREATED, function (event, ann) {
     annotationsService.create(ann);
   });
 
   // Remove any annotations that are deleted or unloaded
-  $rootScope.$on(events.ANNOTATION_DELETED, function(event, annotation) {
+  $rootScope.$on(events.ANNOTATION_DELETED, function (event, annotation) {
     store.removeAnnotations([annotation]);
   });
 

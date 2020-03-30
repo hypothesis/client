@@ -112,7 +112,7 @@ function extractMath(content) {
 }
 
 function insertMath(html, mathBlocks) {
-  return mathBlocks.reduce(function(html, block) {
+  return mathBlocks.reduce(function (html, block) {
     let renderedMath;
     try {
       if (block.inline) {

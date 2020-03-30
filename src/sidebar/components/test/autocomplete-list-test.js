@@ -7,7 +7,7 @@ import { $imports } from '../autocomplete-list';
 import { checkAccessibility } from '../../../test-util/accessibility';
 import mockImportedComponents from '../../../test-util/mock-imported-components';
 
-describe('AutocompleteList', function() {
+describe('AutocompleteList', function () {
   let fakeList;
   let fakeOnSelectItem;
   let fakeListFormatter;
@@ -21,7 +21,7 @@ describe('AutocompleteList', function() {
     );
   }
 
-  beforeEach(function() {
+  beforeEach(function () {
     fakeList = ['tag1', 'tag2'];
     fakeOnSelectItem = sinon.stub();
     fakeListFormatter = sinon.stub();
@@ -44,38 +44,14 @@ describe('AutocompleteList', function() {
 
   it('sets unique keys to the <li> items', () => {
     const wrapper = createComponent({ open: true });
-    assert.equal(
-      wrapper
-        .find('li')
-        .at(0)
-        .key(),
-      'autocomplete-list-0'
-    );
-    assert.equal(
-      wrapper
-        .find('li')
-        .at(1)
-        .key(),
-      'autocomplete-list-1'
-    );
+    assert.equal(wrapper.find('li').at(0).key(), 'autocomplete-list-0');
+    assert.equal(wrapper.find('li').at(1).key(), 'autocomplete-list-1');
   });
 
   it('renders the items in order of the list prop', () => {
     const wrapper = createComponent({ open: true });
-    assert.equal(
-      wrapper
-        .find('li')
-        .at(0)
-        .text(),
-      'tag1'
-    );
-    assert.equal(
-      wrapper
-        .find('li')
-        .at(1)
-        .text(),
-      'tag2'
-    );
+    assert.equal(wrapper.find('li').at(0).text(), 'tag1');
+    assert.equal(wrapper.find('li').at(1).text(), 'tag2');
   });
 
   it('does not apply the `is-selected` class to items that are not selected', () => {
@@ -85,26 +61,13 @@ describe('AutocompleteList', function() {
 
   it('applies `is-selected` class only to the <li> at the matching index', () => {
     const wrapper = createComponent({ open: true, activeItem: 0 });
-    assert.isTrue(
-      wrapper
-        .find('li')
-        .at(0)
-        .hasClass('is-selected')
-    );
-    assert.isFalse(
-      wrapper
-        .find('li')
-        .at(1)
-        .hasClass('is-selected')
-    );
+    assert.isTrue(wrapper.find('li').at(0).hasClass('is-selected'));
+    assert.isFalse(wrapper.find('li').at(1).hasClass('is-selected'));
   });
 
   it('calls `onSelect` when an <li> is clicked with the corresponding item', () => {
     const wrapper = createComponent({ open: true, activeItem: 0 });
-    wrapper
-      .find('li')
-      .at(0)
-      .simulate('click');
+    wrapper.find('li').at(0).simulate('click');
     assert.calledWith(fakeOnSelectItem, 'tag1');
   });
 
@@ -123,46 +86,17 @@ describe('AutocompleteList', function() {
 
   it('creates unique ids on the <li> tags with the `itemPrefixId` only if its present', () => {
     let wrapper = createComponent({ open: true });
-    assert.isNotOk(
-      wrapper
-        .find('li')
-        .at(0)
-        .prop('id')
-    );
+    assert.isNotOk(wrapper.find('li').at(0).prop('id'));
     wrapper = createComponent({ open: true, itemPrefixId: 'item-prefix-id-' });
-    assert.equal(
-      wrapper
-        .find('li')
-        .at(0)
-        .prop('id'),
-      'item-prefix-id-0'
-    );
-    assert.equal(
-      wrapper
-        .find('li')
-        .at(1)
-        .prop('id'),
-      'item-prefix-id-1'
-    );
+    assert.equal(wrapper.find('li').at(0).prop('id'), 'item-prefix-id-0');
+    assert.equal(wrapper.find('li').at(1).prop('id'), 'item-prefix-id-1');
   });
 
   it('sets the `aria-selected` attribute to "true" on the active item and "false" for all others', () => {
     const wrapper = createComponent({ open: true, activeItem: 0 });
-    assert.equal(
-      wrapper
-        .find('li')
-        .at(0)
-        .prop('aria-selected'),
-      'true'
-    );
+    assert.equal(wrapper.find('li').at(0).prop('aria-selected'), 'true');
 
-    assert.equal(
-      wrapper
-        .find('li')
-        .at(1)
-        .prop('aria-selected'),
-      'false'
-    );
+    assert.equal(wrapper.find('li').at(1).prop('aria-selected'), 'false');
   });
 
   it(

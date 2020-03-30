@@ -53,16 +53,16 @@ export class Draft {
 /* Reducer */
 
 const update = {
-  DISCARD_ALL_DRAFTS: function() {
+  DISCARD_ALL_DRAFTS: function () {
     return [];
   },
-  REMOVE_DRAFT: function(state, action) {
+  REMOVE_DRAFT: function (state, action) {
     const drafts = state.filter(draft => {
       return !draft.match(action.annotation);
     });
     return drafts;
   },
-  UPDATE_DRAFT: function(state, action) {
+  UPDATE_DRAFT: function (state, action) {
     // removes a matching existing draft, then adds
     const drafts = state.filter(draft => {
       return !draft.match(action.draft.annotation);

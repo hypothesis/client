@@ -39,10 +39,7 @@ describe('AnnotationShareControl', () => {
 
   function openElement(wrapper) {
     act(() => {
-      wrapper
-        .find('Button')
-        .props()
-        .onClick();
+      wrapper.find('Button').props().onClick();
     });
     wrapper.update();
   }
@@ -128,9 +125,7 @@ describe('AnnotationShareControl', () => {
       const wrapper = createComponent();
       openElement(wrapper);
 
-      getButton(wrapper, 'copy')
-        .props()
-        .onClick();
+      getButton(wrapper, 'copy').props().onClick();
 
       assert.calledWith(
         fakeCopyToClipboard.copyText,
@@ -142,9 +137,7 @@ describe('AnnotationShareControl', () => {
       const wrapper = createComponent();
       openElement(wrapper);
 
-      getButton(wrapper, 'copy')
-        .props()
-        .onClick();
+      getButton(wrapper, 'copy').props().onClick();
 
       assert.calledWith(
         fakeToastMessenger.success,
@@ -157,9 +150,7 @@ describe('AnnotationShareControl', () => {
       const wrapper = createComponent();
       openElement(wrapper);
 
-      getButton(wrapper, 'copy')
-        .props()
-        .onClick();
+      getButton(wrapper, 'copy').props().onClick();
 
       assert.calledWith(fakeToastMessenger.error, 'Unable to copy link');
     });

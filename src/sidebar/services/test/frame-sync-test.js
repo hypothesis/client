@@ -47,17 +47,17 @@ const fixtures = {
   },
 };
 
-describe('sidebar.frame-sync', function() {
+describe('sidebar.frame-sync', function () {
   let fakeStore;
   let fakeBridge;
   let frameSync;
   let $rootScope;
 
-  before(function() {
+  before(function () {
     angular.module('app', []).service('frameSync', FrameSync);
   });
 
-  beforeEach(function() {
+  beforeEach(function () {
     fakeStore = createFakeStore(
       { annotations: [] },
       {
@@ -80,7 +80,7 @@ describe('sidebar.frame-sync', function() {
       call: sinon.stub(),
       createChannel: sinon.stub(),
       on: emitter.on.bind(emitter),
-      onConnect: function(listener) {
+      onConnect: function (listener) {
         emitter.on('connect', listener);
       },
 
@@ -96,7 +96,7 @@ describe('sidebar.frame-sync', function() {
       bridge: fakeBridge,
     });
 
-    angular.mock.inject(function(_$rootScope_, _frameSync_) {
+    angular.mock.inject(function (_$rootScope_, _frameSync_) {
       $rootScope = _$rootScope_;
       frameSync = _frameSync_;
     });
@@ -106,13 +106,13 @@ describe('sidebar.frame-sync', function() {
     });
   });
 
-  beforeEach(function() {
+  beforeEach(function () {
     $imports.$restore();
     frameSync.connect();
   });
 
-  context('when annotations are loaded into the sidebar', function() {
-    it('sends a "loadAnnotations" message to the frame', function() {
+  context('when annotations are loaded into the sidebar', function () {
+    it('sends a "loadAnnotations" message to the frame', function () {
       fakeStore.setState({
         annotations: { annotations: [fixtures.ann] },
       });
@@ -123,7 +123,7 @@ describe('sidebar.frame-sync', function() {
       );
     });
 
-    it('sends a "loadAnnotations" message only for new annotations', function() {
+    it('sends a "loadAnnotations" message only for new annotations', function () {
       const ann2 = Object.assign({}, fixtures.ann, { $tag: 't2', id: 'a2' });
       fakeStore.setState({
         annotations: { annotations: [fixtures.ann] },
@@ -141,7 +141,7 @@ describe('sidebar.frame-sync', function() {
       );
     });
 
-    it('does not send a "loadAnnotations" message for replies', function() {
+    it('does not send a "loadAnnotations" message for replies', function () {
       fakeStore.setState({
         annotations: { annotations: [annotationFixtures.newReply()] },
       });
@@ -149,8 +149,8 @@ describe('sidebar.frame-sync', function() {
     });
   });
 
-  context('when annotation count has changed', function() {
-    it('sends a "publicAnnotationCountChanged" message to the frame when there are public annotations', function() {
+  context('when annotation count has changed', function () {
+    it('sends a "publicAnnotationCountChanged" message to the frame when there are public annotations', function () {
       fakeStore.setState({
         annotations: { annotations: [annotationFixtures.publicAnnotation()] },
       });
@@ -161,7 +161,7 @@ describe('sidebar.frame-sync', function() {
       );
     });
 
-    it('sends a "publicAnnotationCountChanged" message to the frame when there are only private annotations', function() {
+    it('sends a "publicAnnotationCountChanged" message to the frame when there are only private annotations', function () {
       const annot = annotationFixtures.defaultAnnotation();
       delete annot.permissions;
 
@@ -175,7 +175,7 @@ describe('sidebar.frame-sync', function() {
       );
     });
 
-    it('does not send a "publicAnnotationCountChanged" message to the frame if annotation fetch is not complete', function() {
+    it('does not send a "publicAnnotationCountChanged" message to the frame if annotation fetch is not complete', function () {
       fakeStore.frames.returns([{ uri: 'http://example.com' }]);
       fakeStore.setState({
         annotations: { annotations: [annotationFixtures.publicAnnotation()] },
@@ -185,7 +185,7 @@ describe('sidebar.frame-sync', function() {
       );
     });
 
-    it('does not send a "publicAnnotationCountChanged" message if there are no connected frames', function() {
+    it('does not send a "publicAnnotationCountChanged" message if there are no connected frames', function () {
       fakeStore.frames.returns([]);
       fakeStore.setState({
         annotations: { annotations: [annotationFixtures.publicAnnotation()] },
@@ -196,8 +196,8 @@ describe('sidebar.frame-sync', function() {
     });
   });
 
-  context('when annotations are removed from the sidebar', function() {
-    it('sends a "deleteAnnotation" message to the frame', function() {
+  context('when annotations are removed from the sidebar', function () {
+    it('sends a "deleteAnnotation" message to the frame', function () {
       fakeStore.setState({
         annotations: { annotations: [fixtures.ann] },
       });
@@ -212,9 +212,9 @@ describe('sidebar.frame-sync', function() {
     });
   });
 
-  context('when a new annotation is created in the frame', function() {
+  context('when a new annotation is created in the frame', function () {
     context('when an authenticated user is present', () => {
-      it('emits a BEFORE_ANNOTATION_CREATED event', function() {
+      it('emits a BEFORE_ANNOTATION_CREATED event', function () {
         fakeStore.isLoggedIn.returns(true);
         const onCreated = sinon.stub();
         const ann = { target: [] };
@@ -274,7 +274,7 @@ describe('sidebar.frame-sync', function() {
     });
   });
 
-  context('when anchoring completes', function() {
+  context('when anchoring completes', function () {
     let clock = sinon.stub();
 
     beforeEach(() => {
@@ -291,7 +291,7 @@ describe('sidebar.frame-sync', function() {
       clock.tick(20);
     }
 
-    it('updates the anchoring status for the annotation', function() {
+    it('updates the anchoring status for the annotation', function () {
       fakeBridge.emit('sync', [{ tag: 't1', msg: { $orphan: false } }]);
 
       expireDebounceTimeout();
@@ -311,7 +311,7 @@ describe('sidebar.frame-sync', function() {
       });
     });
 
-    it('emits an ANNOTATIONS_SYNCED event', function() {
+    it('emits an ANNOTATIONS_SYNCED event', function () {
       const onSync = sinon.stub();
       $rootScope.$on(events.ANNOTATIONS_SYNCED, onSync);
 
@@ -322,15 +322,15 @@ describe('sidebar.frame-sync', function() {
     });
   });
 
-  context('when a new frame connects', function() {
+  context('when a new frame connects', function () {
     let frameInfo;
     const fakeChannel = {
-      call: function(name, callback) {
+      call: function (name, callback) {
         callback(null, frameInfo);
       },
     };
 
-    it("adds the page's metadata to the frames list", function() {
+    it("adds the page's metadata to the frames list", function () {
       frameInfo = fixtures.htmlDocumentInfo;
 
       fakeBridge.emit('connect', fakeChannel);
@@ -343,18 +343,18 @@ describe('sidebar.frame-sync', function() {
     });
   });
 
-  context('when a frame is destroyed', function() {
+  context('when a frame is destroyed', function () {
     const frameId = fixtures.framesListEntry.id;
 
-    it('removes the frame from the frames list', function() {
+    it('removes the frame from the frames list', function () {
       fakeBridge.emit('destroyFrame', frameId);
 
       assert.calledWith(fakeStore.destroyFrame, fixtures.framesListEntry);
     });
   });
 
-  describe('on "showAnnotations" message', function() {
-    it('selects annotations which have an ID', function() {
+  describe('on "showAnnotations" message', function () {
+    it('selects annotations which have an ID', function () {
       fakeStore.findIDsForTags.returns(['id1', 'id2', 'id3']);
       fakeBridge.emit('showAnnotations', ['tag1', 'tag2', 'tag3']);
 
@@ -363,15 +363,15 @@ describe('sidebar.frame-sync', function() {
     });
   });
 
-  describe('on "focusAnnotations" message', function() {
-    it('focuses the annotations', function() {
+  describe('on "focusAnnotations" message', function () {
+    it('focuses the annotations', function () {
       fakeBridge.emit('focusAnnotations', ['tag1', 'tag2', 'tag3']);
       assert.calledWith(fakeStore.focusAnnotations, ['tag1', 'tag2', 'tag3']);
     });
   });
 
-  describe('on "toggleAnnotationSelection" message', function() {
-    it('toggles the selected state of the annotations', function() {
+  describe('on "toggleAnnotationSelection" message', function () {
+    it('toggles the selected state of the annotations', function () {
       fakeStore.findIDsForTags.returns(['id1', 'id2', 'id3']);
       fakeBridge.emit('toggleAnnotationSelection', ['tag1', 'tag2', 'tag3']);
       assert.calledWith(fakeStore.toggleSelectedAnnotations, [
@@ -382,8 +382,8 @@ describe('sidebar.frame-sync', function() {
     });
   });
 
-  describe('on "sidebarOpened" message', function() {
-    it('broadcasts a sidebarOpened event', function() {
+  describe('on "sidebarOpened" message', function () {
+    it('broadcasts a sidebarOpened event', function () {
       const onSidebarOpened = sinon.stub();
       $rootScope.$on('sidebarOpened', onSidebarOpened);
 
@@ -393,20 +393,20 @@ describe('sidebar.frame-sync', function() {
     });
   });
 
-  describe('on a relayed bridge call', function() {
-    it('calls "showSidebar"', function() {
+  describe('on a relayed bridge call', function () {
+    it('calls "showSidebar"', function () {
       fakeBridge.emit('showSidebar');
 
       assert.calledWith(fakeBridge.call, 'showSidebar');
     });
 
-    it('calls "hideSidebar"', function() {
+    it('calls "hideSidebar"', function () {
       fakeBridge.emit('hideSidebar');
 
       assert.calledWith(fakeBridge.call, 'hideSidebar');
     });
 
-    it('calls "setVisibleHighlights"', function() {
+    it('calls "setVisibleHighlights"', function () {
       fakeBridge.emit('setVisibleHighlights');
 
       assert.calledWith(fakeBridge.call, 'setVisibleHighlights');

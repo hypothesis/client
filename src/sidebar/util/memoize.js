@@ -13,7 +13,7 @@ export default function memoize(fn) {
   let lastArg;
   let lastResult;
 
-  return function(arg) {
+  return function (arg) {
     if (arg === lastArg) {
       return lastResult;
     }

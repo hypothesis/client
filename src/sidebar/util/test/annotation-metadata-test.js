@@ -4,10 +4,10 @@ import * as annotationMetadata from '../annotation-metadata';
 const documentMetadata = annotationMetadata.documentMetadata;
 const domainAndTitle = annotationMetadata.domainAndTitle;
 
-describe('annotation-metadata', function() {
-  describe('.documentMetadata', function() {
-    context('when the model has a document property', function() {
-      it('returns the hostname from model.uri as the domain', function() {
+describe('annotation-metadata', function () {
+  describe('.documentMetadata', function () {
+    context('when the model has a document property', function () {
+      it('returns the hostname from model.uri as the domain', function () {
         const model = {
           document: {},
           uri: 'http://example.com/',
@@ -16,8 +16,8 @@ describe('annotation-metadata', function() {
         assert.equal(documentMetadata(model).domain, 'example.com');
       });
 
-      context('when model.uri does not start with "urn"', function() {
-        it('uses model.uri as the uri', function() {
+      context('when model.uri does not start with "urn"', function () {
+        it('uses model.uri as the uri', function () {
           const model = {
             document: {},
             uri: 'http://example.com/',
@@ -27,8 +27,8 @@ describe('annotation-metadata', function() {
         });
       });
 
-      context('when document.title is an available', function() {
-        it('uses the first document title as the title', function() {
+      context('when document.title is an available', function () {
+        it('uses the first document title as the title', function () {
           const model = {
             uri: 'http://example.com/',
             document: {
@@ -40,8 +40,8 @@ describe('annotation-metadata', function() {
         });
       });
 
-      context('when there is no document.title', function() {
-        it('returns the domain as the title', function() {
+      context('when there is no document.title', function () {
+        it('returns the domain as the title', function () {
           const model = {
             document: {},
             uri: 'http://example.com/',
@@ -52,20 +52,20 @@ describe('annotation-metadata', function() {
       });
     });
 
-    context('when the model does not have a document property', function() {
-      it('returns model.uri for the uri', function() {
+    context('when the model does not have a document property', function () {
+      it('returns model.uri for the uri', function () {
         const model = { uri: 'http://example.com/' };
 
         assert.equal(documentMetadata(model).uri, model.uri);
       });
 
-      it('returns the hostname of model.uri for the domain', function() {
+      it('returns the hostname of model.uri for the domain', function () {
         const model = { uri: 'http://example.com/' };
 
         assert.equal(documentMetadata(model).domain, 'example.com');
       });
 
-      it('returns the hostname of model.uri for the title', function() {
+      it('returns the hostname of model.uri for the title', function () {
         const model = { uri: 'http://example.com/' };
 
         assert.equal(documentMetadata(model).title, 'example.com');
@@ -73,9 +73,9 @@ describe('annotation-metadata', function() {
     });
   });
 
-  describe('.domainAndTitle', function() {
-    context('when an annotation has a non-http(s) uri', function() {
-      it('returns no title link', function() {
+  describe('.domainAndTitle', function () {
+    context('when an annotation has a non-http(s) uri', function () {
+      it('returns no title link', function () {
         const model = {
           uri: 'file:///example.pdf',
         };
@@ -84,8 +84,8 @@ describe('annotation-metadata', function() {
       });
     });
 
-    context('when an annotation has a direct link', function() {
-      it('returns the direct link as a title link', function() {
+    context('when an annotation has a direct link', function () {
+      it('returns the direct link as a title link', function () {
         const model = {
           uri: 'https://annotatedsite.com/',
           links: {
@@ -99,8 +99,8 @@ describe('annotation-metadata', function() {
 
     context(
       'when an annotation has no direct link but has a http(s) uri',
-      function() {
-        it('returns the uri as title link', function() {
+      function () {
+        it('returns the uri as title link', function () {
           const model = {
             uri: 'https://example.com',
           };
@@ -112,8 +112,8 @@ describe('annotation-metadata', function() {
 
     context(
       'when the annotation title is shorter than 30 characters',
-      function() {
-        it('returns the annotation title as title text', function() {
+      function () {
+        it('returns the annotation title as title text', function () {
           const model = {
             uri: 'https://annotatedsite.com/',
             document: {
@@ -131,8 +131,8 @@ describe('annotation-metadata', function() {
 
     context(
       'when the annotation title is longer than 30 characters',
-      function() {
-        it('truncates the title text with "…"', function() {
+      function () {
+        it('truncates the title text with "…"', function () {
           const model = {
             uri: 'http://example.com/',
             document: {
@@ -148,8 +148,8 @@ describe('annotation-metadata', function() {
       }
     );
 
-    context('when the document uri refers to a filename', function() {
-      it('returns the filename as domain text', function() {
+    context('when the document uri refers to a filename', function () {
+      it('returns the filename as domain text', function () {
         const model = {
           uri: 'file:///path/to/example.pdf',
           document: {
@@ -161,8 +161,8 @@ describe('annotation-metadata', function() {
       });
     });
 
-    context('when domain and title are the same', function() {
-      it('returns an empty domain text string', function() {
+    context('when domain and title are the same', function () {
+      it('returns an empty domain text string', function () {
         const model = {
           uri: 'https://example.com',
           document: {
@@ -174,8 +174,8 @@ describe('annotation-metadata', function() {
       });
     });
 
-    context('when the document has no domain', function() {
-      it('returns an empty domain text string', function() {
+    context('when the document has no domain', function () {
+      it('returns an empty domain text string', function () {
         const model = {
           uri: 'doi:10.1234/5678',
           document: {
@@ -187,8 +187,8 @@ describe('annotation-metadata', function() {
       });
     });
 
-    context('when the document is a local file with a title', function() {
-      it('returns the filename', function() {
+    context('when the document is a local file with a title', function () {
+      it('returns the filename', function () {
         const model = {
           uri: 'file:///home/seanh/MyFile.pdf',
           document: {
@@ -201,8 +201,8 @@ describe('annotation-metadata', function() {
     });
   });
 
-  describe('.location', function() {
-    it('returns the position for annotations with a text position', function() {
+  describe('.location', function () {
+    it('returns the position for annotations with a text position', function () {
       assert.equal(
         annotationMetadata.location({
           target: [
@@ -220,7 +220,7 @@ describe('annotation-metadata', function() {
       );
     });
 
-    it('returns +ve infinity for annotations without a text position', function() {
+    it('returns +ve infinity for annotations without a text position', function () {
       assert.equal(
         annotationMetadata.location({
           target: [
@@ -304,29 +304,29 @@ describe('annotation-metadata', function() {
     });
   });
 
-  describe('.isPageNote', function() {
-    it('returns true for an annotation with an empty target', function() {
+  describe('.isPageNote', function () {
+    it('returns true for an annotation with an empty target', function () {
       assert.isTrue(
         annotationMetadata.isPageNote({
           target: [],
         })
       );
     });
-    it('returns true for an annotation without selectors', function() {
+    it('returns true for an annotation without selectors', function () {
       assert.isTrue(
         annotationMetadata.isPageNote({
           target: [{ selector: undefined }],
         })
       );
     });
-    it('returns true for an annotation without a target', function() {
+    it('returns true for an annotation without a target', function () {
       assert.isTrue(
         annotationMetadata.isPageNote({
           target: undefined,
         })
       );
     });
-    it('returns false for an annotation which is a reply', function() {
+    it('returns false for an annotation which is a reply', function () {
       assert.isFalse(
         annotationMetadata.isPageNote({
           target: [],
@@ -336,21 +336,21 @@ describe('annotation-metadata', function() {
     });
   });
 
-  describe('.isAnnotation', function() {
-    it('returns true if an annotation is a top level annotation', function() {
+  describe('.isAnnotation', function () {
+    it('returns true if an annotation is a top level annotation', function () {
       assert.isTrue(
         annotationMetadata.isAnnotation({
           target: [{ selector: [] }],
         })
       );
     });
-    it('returns false if an annotation has no target', function() {
+    it('returns false if an annotation has no target', function () {
       assert.isFalse(annotationMetadata.isAnnotation({}));
     });
   });
 
-  describe('.isPublic', function() {
-    it('returns true if an annotation is shared within a group', function() {
+  describe('.isPublic', function () {
+    it('returns true if an annotation is shared within a group', function () {
       assert.isTrue(annotationMetadata.isPublic(fixtures.publicAnnotation()));
     });
 
@@ -370,22 +370,22 @@ describe('annotation-metadata', function() {
       });
     });
 
-    it('returns false if an annotation is missing permissions', function() {
+    it('returns false if an annotation is missing permissions', function () {
       const annot = fixtures.defaultAnnotation();
       delete annot.permissions;
       assert.isFalse(annotationMetadata.isPublic(annot));
     });
   });
 
-  describe('.isOrphan', function() {
-    it('returns true if an annotation failed to anchor', function() {
+  describe('.isOrphan', function () {
+    it('returns true if an annotation failed to anchor', function () {
       const annotation = Object.assign(fixtures.defaultAnnotation(), {
         $orphan: true,
       });
       assert.isTrue(annotationMetadata.isOrphan(annotation));
     });
 
-    it('returns false if an annotation successfully anchored', function() {
+    it('returns false if an annotation successfully anchored', function () {
       const orphan = Object.assign(fixtures.defaultAnnotation(), {
         $orphan: false,
       });
@@ -393,36 +393,36 @@ describe('annotation-metadata', function() {
     });
   });
 
-  describe('.isWaitingToAnchor', function() {
+  describe('.isWaitingToAnchor', function () {
     const isWaitingToAnchor = annotationMetadata.isWaitingToAnchor;
 
-    it('returns true for annotations that are not yet anchored', function() {
+    it('returns true for annotations that are not yet anchored', function () {
       assert.isTrue(isWaitingToAnchor(fixtures.defaultAnnotation()));
     });
 
-    it('returns false for annotations that are anchored', function() {
+    it('returns false for annotations that are anchored', function () {
       const anchored = Object.assign({}, fixtures.defaultAnnotation(), {
         $orphan: false,
       });
       assert.isFalse(isWaitingToAnchor(anchored));
     });
 
-    it('returns false for annotations that failed to anchor', function() {
+    it('returns false for annotations that failed to anchor', function () {
       const anchored = Object.assign({}, fixtures.defaultAnnotation(), {
         $orphan: true,
       });
       assert.isFalse(isWaitingToAnchor(anchored));
     });
 
-    it('returns false for replies', function() {
+    it('returns false for replies', function () {
       assert.isFalse(isWaitingToAnchor(fixtures.oldReply()));
     });
 
-    it('returns false for page notes', function() {
+    it('returns false for page notes', function () {
       assert.isFalse(isWaitingToAnchor(fixtures.oldPageNote()));
     });
 
-    it('returns false if the anchoring timeout flag was set', function() {
+    it('returns false if the anchoring timeout flag was set', function () {
       const pending = Object.assign({}, fixtures.defaultAnnotation(), {
         $anchorTimeout: true,
       });
@@ -430,14 +430,14 @@ describe('annotation-metadata', function() {
     });
   });
 
-  describe('.flagCount', function() {
+  describe('.flagCount', function () {
     const flagCount = annotationMetadata.flagCount;
 
-    it('returns `null` if the user is not a moderator', function() {
+    it('returns `null` if the user is not a moderator', function () {
       assert.equal(flagCount(fixtures.defaultAnnotation()), null);
     });
 
-    it('returns the flag count if present', function() {
+    it('returns the flag count if present', function () {
       const ann = fixtures.moderatedAnnotation({ flagCount: 10 });
       assert.equal(flagCount(ann), 10);
     });

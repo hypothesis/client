@@ -42,25 +42,25 @@ function formatState(state) {
   );
 }
 
-describe('markdown commands', function() {
-  describe('span formatting', function() {
+describe('markdown commands', function () {
+  describe('span formatting', function () {
     function toggle(state, prefix, suffix, placeholder) {
       prefix = prefix || '**';
       suffix = suffix || '**';
       return commands.toggleSpanStyle(state, prefix, suffix, placeholder);
     }
 
-    it('adds formatting to spans', function() {
+    it('adds formatting to spans', function () {
       const output = toggle(parseState('make <sel>text</sel> bold'));
       assert.equal(formatState(output), 'make **<sel>text</sel>** bold');
     });
 
-    it('removes formatting from spans', function() {
+    it('removes formatting from spans', function () {
       const output = toggle(parseState('make **<sel>text</sel>** bold'));
       assert.equal(formatState(output), 'make <sel>text</sel> bold');
     });
 
-    it('adds formatting to spans when the prefix and suffix differ', function() {
+    it('adds formatting to spans when the prefix and suffix differ', function () {
       const output = toggle(
         parseState('make <sel>math</sel> mathy'),
         '\\(',
@@ -69,7 +69,7 @@ describe('markdown commands', function() {
       assert.equal(formatState(output), 'make \\(<sel>math</sel>\\) mathy');
     });
 
-    it('inserts placeholders if the selection is empty', function() {
+    it('inserts placeholders if the selection is empty', function () {
       const output = toggle(
         parseState('make <sel></sel> bold'),
         '**',
@@ -80,7 +80,7 @@ describe('markdown commands', function() {
     });
   });
 
-  describe('block formatting', function() {
+  describe('block formatting', function () {
     [
       {
         tag: 'adds formatting to blocks',
@@ -113,8 +113,8 @@ describe('markdown commands', function() {
     });
   });
 
-  describe('link formatting', function() {
-    const linkify = function(text, linkType) {
+  describe('link formatting', function () {
+    const linkify = function (text, linkType) {
       return commands.convertSelectionToLink(parseState(text), linkType);
     };
 
@@ -144,7 +144,7 @@ describe('markdown commands', function() {
       });
     });
 
-    it('converts URLs to image links', function() {
+    it('converts URLs to image links', function () {
       const output = linkify(
         'one <sel>http://foobar.com</sel> three',
         commands.LinkType.IMAGE_LINK

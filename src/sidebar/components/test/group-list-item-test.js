@@ -96,20 +96,14 @@ describe('GroupListItem', () => {
 
   function clickMenuItem(wrapper, label) {
     act(() => {
-      wrapper
-        .find(`MenuItem[label="${label}"]`)
-        .props()
-        .onClick();
+      wrapper.find(`MenuItem[label="${label}"]`).props().onClick();
     });
     wrapper.update();
   }
 
   it('changes the focused group when group is clicked', () => {
     const wrapper = createGroupListItem(fakeGroup);
-    wrapper
-      .find('MenuItem')
-      .props()
-      .onClick();
+    wrapper.find('MenuItem').props().onClick();
 
     assert.calledWith(fakeGroupsService.focus, fakeGroup.id);
     assert.calledWith(fakeAnalytics.track, fakeAnalytics.events.GROUP_SWITCH);
@@ -117,20 +111,14 @@ describe('GroupListItem', () => {
 
   it('clears the direct linked ids from the store when the group is clicked', () => {
     const wrapper = createGroupListItem(fakeGroup);
-    wrapper
-      .find('MenuItem')
-      .props()
-      .onClick();
+    wrapper.find('MenuItem').props().onClick();
 
     assert.calledOnce(fakeStore.clearDirectLinkedIds);
   });
 
   it('clears the direct-linked group fetch failed from the store when the group is clicked', () => {
     const wrapper = createGroupListItem(fakeGroup);
-    wrapper
-      .find('MenuItem')
-      .props()
-      .onClick();
+    wrapper.find('MenuItem').props().onClick();
 
     assert.calledOnce(fakeStore.clearDirectLinkedGroupFetchFailed);
   });
@@ -180,22 +168,12 @@ describe('GroupListItem', () => {
 
   it('expands submenu if `isExpanded` is `true`', () => {
     const wrapper = createGroupListItem(fakeGroup, { isExpanded: true });
-    assert.isTrue(
-      wrapper
-        .find('MenuItem')
-        .first()
-        .prop('isExpanded')
-    );
+    assert.isTrue(wrapper.find('MenuItem').first().prop('isExpanded'));
   });
 
   it('collapses submenu if `isExpanded` is `false`', () => {
     const wrapper = createGroupListItem(fakeGroup, { isExpanded: false });
-    assert.isFalse(
-      wrapper
-        .find('MenuItem')
-        .first()
-        .prop('isExpanded')
-    );
+    assert.isFalse(wrapper.find('MenuItem').first().prop('isExpanded'));
   });
 
   it('toggles submenu when toggle is clicked', () => {
@@ -204,11 +182,7 @@ describe('GroupListItem', () => {
     const toggleSubmenu = () => {
       const dummyEvent = new Event('dummy');
       act(() => {
-        wrapper
-          .find('MenuItem')
-          .first()
-          .props()
-          .onToggleSubmenu(dummyEvent);
+        wrapper.find('MenuItem').first().props().onToggleSubmenu(dummyEvent);
       });
       wrapper.update();
     };
@@ -230,10 +204,7 @@ describe('GroupListItem', () => {
   });
 
   function getSubmenu(wrapper) {
-    const submenu = wrapper
-      .find('MenuItem')
-      .first()
-      .prop('submenu');
+    const submenu = wrapper.find('MenuItem').first().prop('submenu');
     return mount(<div>{submenu}</div>);
   }
 
@@ -321,10 +292,7 @@ describe('GroupListItem', () => {
         isExpanded: true,
       });
       assert.equal(
-        wrapper
-          .find('MenuItem')
-          .first()
-          .prop('isDisabled'),
+        wrapper.find('MenuItem').first().prop('isDisabled'),
         expectDisabled
       );
 

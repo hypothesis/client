@@ -50,7 +50,7 @@ function tokenize(searchtext) {
   //   "bar" -> bar
   //   'foo" -> 'foo"
   //   bar"  -> bar"
-  const _removeQuoteCharacter = function(text) {
+  const _removeQuoteCharacter = function (text) {
     const start = text.slice(0, 1);
     const end = text.slice(-1);
     if ((start === '"' || start === "'") && start === end) {
@@ -87,7 +87,7 @@ function toObject(searchtext) {
   const obj = {};
   const backendFilter = f => (f === 'tag' ? 'tags' : f);
 
-  const addToObj = function(key, data) {
+  const addToObj = function (key, data) {
     if (obj[key]) {
       return obj[key].push(data);
     } else {

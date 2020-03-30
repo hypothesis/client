@@ -1,7 +1,7 @@
 import configFrom from '../index';
 import { $imports } from '../index';
 
-describe('annotator.config.index', function() {
+describe('annotator.config.index', function () {
   let fakeSettingsFrom;
 
   beforeEach(() => {
@@ -18,7 +18,7 @@ describe('annotator.config.index', function() {
     $imports.$restore();
   });
 
-  it('gets the configuration settings', function() {
+  it('gets the configuration settings', function () {
     configFrom('WINDOW');
 
     assert.calledOnce(fakeSettingsFrom);
@@ -37,28 +37,28 @@ describe('annotator.config.index', function() {
     }
   );
 
-  context("when there's no application/annotator+html <link>", function() {
-    beforeEach('remove the application/annotator+html <link>', function() {
+  context("when there's no application/annotator+html <link>", function () {
+    beforeEach('remove the application/annotator+html <link>', function () {
       Object.defineProperty(fakeSettingsFrom(), 'sidebarAppUrl', {
         get: sinon.stub().throws(new Error("there's no link")),
       });
     });
 
-    it('throws an error', function() {
-      assert.throws(function() {
+    it('throws an error', function () {
+      assert.throws(function () {
         configFrom('WINDOW');
       }, "there's no link");
     });
   });
 
-  ['assetRoot', 'subFrameIdentifier', 'openSidebar'].forEach(function(
+  ['assetRoot', 'subFrameIdentifier', 'openSidebar'].forEach(function (
     settingName
   ) {
     it(
       'reads ' +
         settingName +
         ' from the host page, even when in a browser extension',
-      function() {
+      function () {
         configFrom('WINDOW');
 
         assert.calledWithExactly(
@@ -70,12 +70,12 @@ describe('annotator.config.index', function() {
     );
   });
 
-  ['branding', 'services'].forEach(function(settingName) {
+  ['branding', 'services'].forEach(function (settingName) {
     it(
       'reads ' +
         settingName +
         ' from the host page only when in an embedded client',
-      function() {
+      function () {
         configFrom('WINDOW');
 
         assert.calledWithExactly(
@@ -92,8 +92,8 @@ describe('annotator.config.index', function() {
     'openSidebar',
     'requestConfigFromFrame',
     'services',
-  ].forEach(function(settingName) {
-    it('returns the ' + settingName + ' value from the host page', function() {
+  ].forEach(function (settingName) {
+    it('returns the ' + settingName + ' value from the host page', function () {
       const settings = {
         assetRoot: 'chrome-extension://1234/client/',
         branding: 'BRANDING_SETTING',
@@ -101,7 +101,7 @@ describe('annotator.config.index', function() {
         requestConfigFromFrame: 'https://embedder.com',
         services: 'SERVICES_SETTING',
       };
-      fakeSettingsFrom().hostPageSetting = function(settingName) {
+      fakeSettingsFrom().hostPageSetting = function (settingName) {
         return settings[settingName];
       };
 

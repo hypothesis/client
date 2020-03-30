@@ -13,7 +13,5 @@ export function generateHexString(len) {
   const crypto = window.crypto || window.msCrypto; /* IE 11 */
   const bytes = new Uint8Array(len / 2);
   crypto.getRandomValues(bytes);
-  return Array.from(bytes)
-    .map(byteToHex)
-    .join('');
+  return Array.from(bytes).map(byteToHex).join('');
 }

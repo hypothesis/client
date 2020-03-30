@@ -28,7 +28,7 @@ function annotateQuote(quote) {
  */
 function highlightedPhrases(container) {
   return Array.from(container.querySelectorAll('.hypothesis-highlight')).map(
-    function(el) {
+    function (el) {
       return el.textContent;
     }
   );
@@ -45,16 +45,16 @@ function FakeCrossFrame() {
   this.sync = sinon.stub();
 }
 
-describe('anchoring', function() {
+describe('anchoring', function () {
   let guest;
   let guestConfig;
   let container;
 
-  before(function() {
+  before(function () {
     guestConfig = { pluginClasses: { CrossFrame: FakeCrossFrame } };
   });
 
-  beforeEach(function() {
+  beforeEach(function () {
     sinon.stub(console, 'warn');
     container = document.createElement('div');
     container.innerHTML = require('./test-page.html');
@@ -62,7 +62,7 @@ describe('anchoring', function() {
     guest = new Guest(container, guestConfig);
   });
 
-  afterEach(function() {
+  afterEach(function () {
     guest.destroy();
     container.parentNode.removeChild(container);
     console.warn.restore();
@@ -87,21 +87,21 @@ describe('anchoring', function() {
     },
   ].forEach(testCase => {
     it(`should highlight ${testCase.tag} when annotations are loaded`, () => {
-      const normalize = function(quotes) {
-        return quotes.map(function(q) {
+      const normalize = function (quotes) {
+        return quotes.map(function (q) {
           return simplifyWhitespace(q);
         });
       };
 
-      const annotations = testCase.quotes.map(function(q) {
+      const annotations = testCase.quotes.map(function (q) {
         return annotateQuote(q);
       });
 
-      const anchored = annotations.map(function(ann) {
+      const anchored = annotations.map(function (ann) {
         return guest.anchor(ann);
       });
 
-      return Promise.all(anchored).then(function() {
+      return Promise.all(anchored).then(function () {
         const assertFn = testCase.expectFail
           ? assert.notDeepEqual
           : assert.deepEqual;

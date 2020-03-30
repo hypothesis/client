@@ -13,7 +13,7 @@ export default function trigger(rootEl, showFn) {
     '[' + SIDEBAR_TRIGGER_BTN_ATTR + ']'
   );
 
-  Array.from(triggerElems).forEach(function(triggerElem) {
+  Array.from(triggerElems).forEach(function (triggerElem) {
     triggerElem.addEventListener('click', handleCommand);
   });
 

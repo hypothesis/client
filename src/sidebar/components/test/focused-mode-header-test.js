@@ -7,13 +7,13 @@ import { $imports } from '../focused-mode-header';
 import { checkAccessibility } from '../../../test-util/accessibility';
 import mockImportedComponents from '../../../test-util/mock-imported-components';
 
-describe('FocusedModeHeader', function() {
+describe('FocusedModeHeader', function () {
   let fakeStore;
   function createComponent() {
     return mount(<FocusedModeHeader />);
   }
 
-  beforeEach(function() {
+  beforeEach(function () {
     fakeStore = {
       selection: {
         focusMode: {

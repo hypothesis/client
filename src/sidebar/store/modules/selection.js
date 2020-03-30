@@ -130,7 +130,7 @@ function init(settings) {
 }
 
 const update = {
-  CLEAR_SELECTION: function(state) {
+  CLEAR_SELECTION: function (state) {
     let selectedTab = state.selectedTab;
     if (selectedTab === uiConstants.TAB_ORPHANS) {
       selectedTab = uiConstants.TAB_ANNOTATIONS;
@@ -143,19 +143,19 @@ const update = {
     };
   },
 
-  CLEAR_SELECTED_ANNOTATIONS: function() {
+  CLEAR_SELECTED_ANNOTATIONS: function () {
     return { filterQuery: null, selectedAnnotationMap: null };
   },
 
-  SELECT_ANNOTATIONS: function(state, action) {
+  SELECT_ANNOTATIONS: function (state, action) {
     return { selectedAnnotationMap: action.selection };
   },
 
-  FOCUS_ANNOTATIONS: function(state, action) {
+  FOCUS_ANNOTATIONS: function (state, action) {
     return { focusedAnnotationMap: action.focused };
   },
 
-  SET_FOCUS_MODE_FOCUSED: function(state, action) {
+  SET_FOCUS_MODE_FOCUSED: function (state, action) {
     return {
       focusMode: {
         ...state.focusMode,
@@ -164,7 +164,7 @@ const update = {
     };
   },
 
-  CHANGE_FOCUS_MODE_USER: function(state, action) {
+  CHANGE_FOCUS_MODE_USER: function (state, action) {
     if (action.user.username === undefined) {
       return {
         focusMode: {
@@ -187,19 +187,19 @@ const update = {
     }
   },
 
-  SET_FORCE_VISIBLE: function(state, action) {
+  SET_FORCE_VISIBLE: function (state, action) {
     return { forceVisible: action.forceVisible };
   },
 
-  SET_EXPANDED: function(state, action) {
+  SET_EXPANDED: function (state, action) {
     return { expanded: action.expanded };
   },
 
-  HIGHLIGHT_ANNOTATIONS: function(state, action) {
+  HIGHLIGHT_ANNOTATIONS: function (state, action) {
     return { highlighted: action.highlighted };
   },
 
-  SELECT_TAB: function(state, action) {
+  SELECT_TAB: function (state, action) {
     return setTab(state.selectedTab, action.tab);
   },
 
@@ -221,7 +221,7 @@ const update = {
     return {};
   },
 
-  REMOVE_ANNOTATIONS: function(state, action) {
+  REMOVE_ANNOTATIONS: function (state, action) {
     const selection = Object.assign({}, state.selectedAnnotationMap);
     action.annotationsToRemove.forEach(annotation => {
       if (annotation.id) {
@@ -241,7 +241,7 @@ const update = {
     };
   },
 
-  SET_FILTER_QUERY: function(state, action) {
+  SET_FILTER_QUERY: function (state, action) {
     return {
       filterQuery: action.query,
       forceVisible: {},
@@ -249,7 +249,7 @@ const update = {
     };
   },
 
-  SET_SORT_KEY: function(state, action) {
+  SET_SORT_KEY: function (state, action) {
     return { sortKey: action.key };
   },
 };
@@ -272,7 +272,7 @@ function selectAnnotations(ids) {
 
 /** Toggle whether annotations are selected or not. */
 function toggleSelectedAnnotations(ids) {
-  return function(dispatch, getState) {
+  return function (dispatch, getState) {
     const selection = Object.assign(
       {},
       getState().selection.selectedAnnotationMap
@@ -299,7 +299,7 @@ function toggleSelectedAnnotations(ids) {
 function setForceVisible(id, visible) {
   // FIXME: This should be converted to a plain action and accessing the state
   // should happen in the update() function
-  return function(dispatch, getState) {
+  return function (dispatch, getState) {
     const forceVisible = Object.assign({}, getState().selection.forceVisible);
     forceVisible[id] = visible;
     dispatch({
@@ -324,7 +324,7 @@ function focusAnnotations(tags) {
 function setCollapsed(id, collapsed) {
   // FIXME: This should be converted to a plain action and accessing the state
   // should happen in the update() function
-  return function(dispatch, getState) {
+  return function (dispatch, getState) {
     const expanded = Object.assign({}, getState().selection.expanded);
     expanded[id] = !collapsed;
     dispatch({

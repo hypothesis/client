@@ -11,15 +11,15 @@ import retry from 'retry';
  *         it succeeds within the allowed number of attempts.
  */
 export function retryPromiseOperation(opFn, options) {
-  return new Promise(function(resolve, reject) {
+  return new Promise(function (resolve, reject) {
     const operation = retry.operation(options);
-    operation.attempt(function() {
+    operation.attempt(function () {
       opFn()
-        .then(function(result) {
+        .then(function (result) {
           operation.retry();
           resolve(result);
         })
-        .catch(function(err) {
+        .catch(function (err) {
           if (!operation.retry(err)) {
             reject(err);
           }

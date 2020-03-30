@@ -1,7 +1,7 @@
 import events from '../events';
 
 function getExistingAnnotation(store, id) {
-  return store.getState().annotations.annotations.find(function(annot) {
+  return store.getState().annotations.annotations.find(function (annot) {
     return annot.id === id;
   });
 }
@@ -13,7 +13,7 @@ export default function annotationMapper($rootScope, store, api) {
     annotations = annotations.concat(replies || []);
 
     const loaded = [];
-    annotations.forEach(function(annotation) {
+    annotations.forEach(function (annotation) {
       const existing = getExistingAnnotation(store, annotation.id);
       if (existing) {
         $rootScope.$broadcast(events.ANNOTATION_UPDATED, annotation);
@@ -35,7 +35,7 @@ export default function annotationMapper($rootScope, store, api) {
       .delete({
         id: annotation.id,
       })
-      .then(function() {
+      .then(function () {
         $rootScope.$broadcast(events.ANNOTATION_DELETED, annotation);
         return annotation;
       });
@@ -46,7 +46,7 @@ export default function annotationMapper($rootScope, store, api) {
       .flag({
         id: annot.id,
       })
-      .then(function() {
+      .then(function () {
         $rootScope.$broadcast(events.ANNOTATION_FLAGGED, annot);
         return annot;
       });

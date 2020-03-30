@@ -1,10 +1,10 @@
 import sidebarTrigger from '../sidebar-trigger';
 
-describe('sidebarTrigger', function() {
+describe('sidebarTrigger', function () {
   let triggerEl1;
   let triggerEl2;
 
-  beforeEach(function() {
+  beforeEach(function () {
     triggerEl1 = document.createElement('button');
     triggerEl1.setAttribute('data-hypothesis-trigger', '');
     document.body.appendChild(triggerEl1);
@@ -14,7 +14,7 @@ describe('sidebarTrigger', function() {
     document.body.appendChild(triggerEl2);
   });
 
-  it('calls the show callback which a trigger button is clicked', function() {
+  it('calls the show callback which a trigger button is clicked', function () {
     const fakeShowFn = sinon.stub();
     sidebarTrigger(document, fakeShowFn);
 

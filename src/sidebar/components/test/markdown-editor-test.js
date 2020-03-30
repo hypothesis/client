@@ -440,10 +440,7 @@ describe('MarkdownEditor', () => {
       beforeEach(() => {
         // turn on Preview mode
         act(() => {
-          wrapper
-            .find('Toolbar')
-            .props()
-            .onTogglePreview();
+          wrapper.find('Toolbar').props().onTogglePreview();
         });
         const previewButton = wrapper
           .find('button')

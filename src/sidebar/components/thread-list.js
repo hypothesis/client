@@ -89,8 +89,8 @@ function ThreadListController($element, $scope, settings, store) {
 
     scopeTimeout(
       $scope,
-      function() {
-        state.visibleThreads.forEach(function(thread) {
+      function () {
+        state.visibleThreads.forEach(function (thread) {
           const height = getThreadHeight(thread.id);
           if (!height) {
             return;
@@ -131,7 +131,7 @@ function ThreadListController($element, $scope, settings, store) {
     // estimated Y offset changed and if so, trigger scrolling again.
     scopeTimeout(
       $scope,
-      function() {
+      function () {
         const newYOffset = scrollOffset(id);
         if (newYOffset !== estimatedYOffset) {
           scrollIntoView(id);
@@ -141,7 +141,7 @@ function ThreadListController($element, $scope, settings, store) {
     );
   }
 
-  $scope.$on(events.BEFORE_ANNOTATION_CREATED, function(event, annotation) {
+  $scope.$on(events.BEFORE_ANNOTATION_CREATED, function (event, annotation) {
     if (annotation.$highlight || metadata.isReply(annotation)) {
       return;
     }
@@ -149,13 +149,13 @@ function ThreadListController($element, $scope, settings, store) {
     scrollIntoView(annotation.$tag);
   });
 
-  this.$onChanges = function(changes) {
+  this.$onChanges = function (changes) {
     if (changes.thread && visibleThreads) {
       visibleThreads.setRootThread(changes.thread.currentValue);
     }
   };
 
-  this.$onDestroy = function() {
+  this.$onDestroy = function () {
     visibleThreads.detach();
   };
 }

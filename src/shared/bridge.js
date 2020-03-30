@@ -94,11 +94,11 @@ export default class Bridge {
       };
     };
 
-    const promises = this.links.map(function(l) {
-      const p = new Promise(function(resolve, reject) {
+    const promises = this.links.map(function (l) {
+      const p = new Promise(function (resolve, reject) {
         const timeout = setTimeout(() => resolve(null), 1000);
         try {
-          return l.channel.call(method, ...Array.from(args), function(
+          return l.channel.call(method, ...Array.from(args), function (
             err,
             result
           ) {

@@ -78,10 +78,7 @@ describe('AnnotationBody', () => {
     wrapper.update();
 
     act(() => {
-      wrapper
-        .find('Button')
-        .props()
-        .onClick();
+      wrapper.find('Button').props().onClick();
     });
     wrapper.update();
 
