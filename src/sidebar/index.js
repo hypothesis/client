@@ -107,6 +107,11 @@ function autosave(autosaveService) {
   autosaveService.init();
 }
 
+// Register icons used by the sidebar app (and maybe other assets in future).
+import { registerIcons } from './components/svg-icon';
+import iconSet from './icons';
+registerIcons(iconSet);
+
 // Preact UI components that are wrapped for use within Angular templates.
 
 import Annotation from './components/annotation';
