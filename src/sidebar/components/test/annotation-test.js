@@ -62,7 +62,6 @@ describe('Annotation', () => {
     };
 
     fakeMetadata = {
-      isNew: sinon.stub(),
       isReply: sinon.stub(),
       quote: sinon.stub(),
     };
@@ -463,10 +462,9 @@ describe('Annotation', () => {
       assert.isFalse(wrapper.find('AnnotationActionBar').exists());
     });
 
-    it('should not show annotation actions for new annotation', () => {
-      fakeMetadata.isNew.returns(true);
-
-      const wrapper = createComponent();
+    it('should not show annotations if the annotation is a collapsed reply', () => {
+      fakeMetadata.isReply.returns(true);
+      const wrapper = createComponent({ threadIsCollapsed: true });
 
       assert.isFalse(wrapper.find('AnnotationActionBar').exists());
     });

@@ -106,30 +106,12 @@ describe('AnnotationShareInfo', () => {
 
       assert.notOk(privacy.exists());
     });
+
     context('private annotation', () => {
       beforeEach(() => {
         fakeIsPrivate.returns(true);
       });
 
-      it('should show privacy icon', () => {
-        const wrapper = createAnnotationShareInfo();
-
-        const privacyIcon = wrapper.find(
-          '.annotation-share-info__private .annotation-share-info__icon'
-        );
-
-        assert.isOk(privacyIcon.exists());
-        assert.equal(privacyIcon.prop('name'), 'lock');
-      });
-      it('should not show "only me" text for first-party group', () => {
-        const wrapper = createAnnotationShareInfo();
-
-        const privacyText = wrapper.find(
-          '.annotation-share-info__private-info'
-        );
-
-        assert.notOk(privacyText.exists());
-      });
       it('should show "only me" text for annotation in third-party group', () => {
         fakeGetGroup.returns({ name: 'Some Name' });
         const wrapper = createAnnotationShareInfo();

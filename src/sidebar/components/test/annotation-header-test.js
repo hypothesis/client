@@ -11,6 +11,7 @@ import mockImportedComponents from '../../../test-util/mock-imported-components'
 describe('AnnotationHeader', () => {
   let fakeIsHighlight;
   let fakeIsReply;
+  let fakeIsPrivate;
 
   const createAnnotationHeader = props => {
     return mount(
@@ -29,12 +30,16 @@ describe('AnnotationHeader', () => {
   beforeEach(() => {
     fakeIsHighlight = sinon.stub().returns(false);
     fakeIsReply = sinon.stub().returns(false);
+    fakeIsPrivate = sinon.stub();
 
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
       '../util/annotation-metadata': {
         isHighlight: fakeIsHighlight,
         isReply: fakeIsReply,
+      },
+      '../util/permissions': {
+        isPrivate: fakeIsPrivate,
       },
     });
   });
@@ -43,21 +48,49 @@ describe('AnnotationHeader', () => {
     $imports.$restore();
   });
 
-  describe('collapsed replies', () => {
+  describe('only me icon', () => {
+    it('should render an "Only Me" icon if the annotation is private', () => {
+      fakeIsPrivate.returns(true);
+
+      const wrapper = createAnnotationHeader();
+
+      assert.isTrue(wrapper.find('SvgIcon').filter({ name: 'lock' }).exists());
+    });
+    it('should not render an "Only Me" icon if the annotation is not private', () => {
+      fakeIsPrivate.returns(false);
+
+      const wrapper = createAnnotationHeader();
+
+      assert.isFalse(wrapper.find('SvgIcon').filter({ name: 'lock' }).exists());
+    });
+  });
+
+  describe('expand replies toggle button', () => {
     const findReplyButton = wrapper =>
       wrapper.find('Button').filter('.annotation-header__reply-toggle');
 
-    it('should render if annotation is a reply and thread is collapsed', () => {
+    it('should render if annotation is a collapsed reply and there are replies to show', () => {
       let fakeCallback = sinon.stub();
       fakeIsReply.returns(true);
       const wrapper = createAnnotationHeader({
         onReplyCountClick: fakeCallback,
+        replyCount: 1,
         threadIsCollapsed: true,
       });
 
       const btn = findReplyButton(wrapper);
       assert.isTrue(btn.exists());
       assert.equal(btn.props().onClick, fakeCallback);
+    });
+
+    it('should not render if there are no replies to show', () => {
+      fakeIsReply.returns(true);
+      const wrapper = createAnnotationHeader({
+        threadIsCollapsed: true,
+        replyCount: 0,
+      });
+      const btn = findReplyButton(wrapper);
+      assert.isFalse(btn.exists());
     });
 
     it('should not render if annotation is not a reply', () => {
@@ -79,10 +112,6 @@ describe('AnnotationHeader', () => {
     });
 
     [
-      {
-        replyCount: 0,
-        expected: '0 replies',
-      },
       {
         replyCount: 1,
         expected: '1 reply',
@@ -112,15 +141,6 @@ describe('AnnotationHeader', () => {
       assert.isTrue(timestamp.exists());
     });
 
-    it('should not render timestamp container if annotation does not have a `created` value', () => {
-      const wrapper = createAnnotationHeader({
-        annotation: fixtures.newAnnotation(),
-      });
-      const timestamp = wrapper.find('.annotation-header__timestamp');
-
-      assert.isFalse(timestamp.exists());
-    });
-
     it('should render edited timestamp if annotation has been edited', () => {
       const annotation = fixtures.defaultAnnotation();
       annotation.updated = '2018-05-10T20:18:56.613388+00:00';
@@ -147,45 +167,74 @@ describe('AnnotationHeader', () => {
 
       assert.isFalse(timestamp.exists());
     });
-  });
 
-  describe('annotation is-highlight icon', () => {
-    it('should display is-highlight icon if annotation is a highlight', () => {
-      fakeIsHighlight.returns(true);
+    it('should not render edited timestamp if annotation is collapsed reply', () => {
+      const annotation = fixtures.defaultAnnotation();
+      annotation.updated = '2018-05-10T20:18:56.613388+00:00';
+      fakeIsReply.returns(true);
+
       const wrapper = createAnnotationHeader({
-        isEditing: false,
+        annotation: annotation,
+        threadIsCollapsed: true,
       });
-      const highlightIcon = wrapper.find('.annotation-header__highlight');
 
-      assert.isTrue(highlightIcon.exists());
-    });
+      const timestamp = wrapper
+        .find('Timestamp')
+        .filter('.annotation-header__timestamp-edited-link');
 
-    it('should not display the is-highlight icon if annotation is not a highlight', () => {
-      fakeIsHighlight.returns(false);
-      const wrapper = createAnnotationHeader({
-        isEditing: false,
-      });
-      const highlightIcon = wrapper.find('.annotation-header__highlight');
-
-      assert.isFalse(highlightIcon.exists());
+      assert.isFalse(timestamp.exists());
     });
   });
 
-  describe('annotation document info', () => {
-    it('should render document info if `showDocumentInfo` is enabled', () => {
-      const wrapper = createAnnotationHeader({ showDocumentInfo: true });
+  describe('extended header information', () => {
+    it('should not render extended header information if annotation is reply', () => {
+      fakeIsReply.returns(true);
+      const wrapper = createAnnotationHeader({
+        showDocumentInfo: true,
+      });
 
-      const documentInfo = wrapper.find('AnnotationDocumentInfo');
-
-      assert.isTrue(documentInfo.exists());
+      assert.isFalse(wrapper.find('AnnotationShareInfo').exists());
+      assert.isFalse(wrapper.find('AnnotationDocumentInfo').exists());
     });
 
-    it('should not render document info if `showDocumentInfo` is not enabled', () => {
-      const wrapper = createAnnotationHeader({ showDocumentInfo: false });
+    describe('annotation is-highlight icon', () => {
+      it('should display is-highlight icon if annotation is a highlight', () => {
+        fakeIsHighlight.returns(true);
+        const wrapper = createAnnotationHeader({
+          isEditing: false,
+        });
+        const highlightIcon = wrapper.find('.annotation-header__highlight');
 
-      const documentInfo = wrapper.find('AnnotationDocumentInfo');
+        assert.isTrue(highlightIcon.exists());
+      });
 
-      assert.isFalse(documentInfo.exists());
+      it('should not display the is-highlight icon if annotation is not a highlight', () => {
+        fakeIsHighlight.returns(false);
+        const wrapper = createAnnotationHeader({
+          isEditing: false,
+        });
+        const highlightIcon = wrapper.find('.annotation-header__highlight');
+
+        assert.isFalse(highlightIcon.exists());
+      });
+    });
+
+    describe('annotation document info', () => {
+      it('should render document info if `showDocumentInfo` is enabled', () => {
+        const wrapper = createAnnotationHeader({ showDocumentInfo: true });
+
+        const documentInfo = wrapper.find('AnnotationDocumentInfo');
+
+        assert.isTrue(documentInfo.exists());
+      });
+
+      it('should not render document info if `showDocumentInfo` is not enabled', () => {
+        const wrapper = createAnnotationHeader({ showDocumentInfo: false });
+
+        const documentInfo = wrapper.find('AnnotationDocumentInfo');
+
+        assert.isFalse(documentInfo.exists());
+      });
     });
   });
 

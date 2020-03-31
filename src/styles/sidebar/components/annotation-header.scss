@@ -14,6 +14,13 @@
     align-items: baseline;
   }
 
+  &__icon {
+    margin-right: 5px;
+    width: 10px;
+    height: 10px;
+    color: var.$grey-6;
+  }
+
   &__reply-toggle.button {
     padding: 0 0.5em;
     font-weight: 400;

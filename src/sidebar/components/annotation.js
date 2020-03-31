@@ -4,7 +4,7 @@ import { useState } from 'preact/hooks';
 import propTypes from 'prop-types';
 
 import useStore from '../store/use-store';
-import { isNew, isReply, quote } from '../util/annotation-metadata';
+import { isReply, quote } from '../util/annotation-metadata';
 import { isShared } from '../util/permissions';
 import { withServices } from '../util/service-context';
 
@@ -38,6 +38,7 @@ function Annotation({
   const group = useStore(store => store.getGroup(annotation.group));
   const userid = useStore(store => store.profile().userid);
 
+  const isCollapsedReply = isReply(annotation) && threadIsCollapsed;
   const isPrivate = draft ? draft.isPrivate : !isShared(annotation.permissions);
   const tags = draft ? draft.tags : annotation.tags;
   const text = draft ? draft.text : annotation.text;
@@ -51,7 +52,7 @@ function Annotation({
   const toggleAction = threadIsCollapsed ? 'Show replies' : 'Hide replies';
   const toggleText = `${toggleAction} (${replyCount})`;
 
-  const shouldShowActions = !isSaving && !isEditing && !isNew(annotation);
+  const shouldShowActions = !isSaving && !isEditing && !isCollapsedReply;
   const shouldShowLicense = isEditing && !isPrivate && group.type !== 'private';
   const shouldShowReplyToggle = replyCount > 0 && !isReply(annotation);
 
