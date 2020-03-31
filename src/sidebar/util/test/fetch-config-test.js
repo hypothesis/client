@@ -178,12 +178,14 @@ describe('sidebar.util.fetch-config', () => {
 
       it('makes an RPC request to `requestConfig` ', async () => {
         await fetchConfig({}, fakeWindow);
-        fakeJsonRpc.call.calledWithExactly(
-          fakeTopWindow,
-          'https://embedder.com',
-          'requestConfig',
-          [],
-          3000
+        assert.isTrue(
+          fakeJsonRpc.call.calledWithExactly(
+            fakeTopWindow,
+            'https://embedder.com',
+            'requestConfig',
+            [],
+            3000
+          )
         );
       });
 
@@ -219,7 +221,7 @@ describe('sidebar.util.fetch-config', () => {
         }
       });
 
-      it('creates a merged config when the rpc requests returns the host config` ', async () => {
+      it('creates a merged config when the RPC requests returns the host config', async () => {
         const appConfig = { foo: 'bar', appType: 'via' };
         fakeJsonRpc.call.resolves({ foo: 'baz' }); // host config
         const result = await fetchConfig(appConfig, fakeWindow);
@@ -236,6 +238,52 @@ describe('sidebar.util.fetch-config', () => {
 
         const result = fetchConfig(appConfig, fakeWindow);
         return assertPromiseIsRejected(result, 'Nope');
+      });
+
+      it('returns the `groups` array with the initial host config request', async () => {
+        const appConfig = {
+          services: [{ groups: ['group1', 'group2'] }],
+          appType: 'via',
+        };
+        fakeJsonRpc.call.onFirstCall().resolves({ foo: 'baz' }); // host config
+        const result = await fetchConfig(appConfig, fakeWindow);
+        assert.deepEqual(await result.services[0].groups, ['group1', 'group2']);
+      });
+
+      it("creates a merged config where `groups` returns a promise when its initial value is '$rpc:requestGroups'", async () => {
+        const appConfig = {
+          services: [{ groups: '$rpc:requestGroups' }],
+          appType: 'via',
+        };
+        fakeJsonRpc.call.onFirstCall().resolves({ foo: 'baz' }); // host config
+        fakeJsonRpc.call.onSecondCall().resolves(['group1', 'group2']); // requestGroups
+        const result = await fetchConfig(appConfig, fakeWindow);
+        assert.deepEqual(await result.services[0].groups, ['group1', 'group2']);
+        assert.isTrue(
+          fakeJsonRpc.call.getCall(1).calledWithExactly(
+            fakeTopWindow,
+            'https://embedder.com',
+            'requestGroups',
+            [0], // passes service index to requestGroups
+            5000
+          )
+        );
+      });
+
+      it('throws an error when the RPC call to `requestGroups` fails', async () => {
+        const appConfig = {
+          services: [{ groups: '$rpc:requestGroups' }],
+          appType: 'via',
+        };
+        fakeJsonRpc.call.onFirstCall().resolves({ foo: 'baz' }); // host config
+        fakeJsonRpc.call.onSecondCall().rejects(); // requestGroups
+        const result = await fetchConfig(appConfig, fakeWindow);
+        try {
+          await result.services[0].groups;
+          throw new Error('Failed to catch error');
+        } catch (e) {
+          assert.equal(e.message, 'Unable to fetch groups');
+        }
       });
     });
 

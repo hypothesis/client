@@ -132,9 +132,45 @@ async function fetchConfigRpc(appConfig, parentFrame, origin) {
     [],
     3000
   );
-  return fetchConfigEmbed(appConfig, remoteConfig);
+  // Closure for the RPC call for mutateAsyncGroups to scope parentFrame
+  // and origin variables.
+  const rpcCall = (method, args = [], timeout = 3000) =>
+    postMessageJsonRpc.call(parentFrame, origin, method, args, timeout);
+  const mergedConfig = fetchConfigEmbed(appConfig, remoteConfig);
+  return mutateAsyncGroups(mergedConfig, rpcCall);
 }
 
+/**
+ * Potentially mutates the `groups` config object(s) to be a promise that
+ * resolves right away if the `groups` value exists in the original
+ * config, or returns a promise that resolves with a secondary RPC
+ * call to `requestGroups` when the `groups` value is '$rpc:requestGroups'
+ * If the `groups` value is missing or falsely then it won't be mutated.
+ *
+ * This allows the app to start with an incomplete config and then.
+ * lazily fill in the `groups` value(s) later when its ready. This helps
+ * speed up the loading process.
+ *
+ * @param {Object} config - The configuration object to mutate. This should
+ *  already have the `services` value
+ * @param {function} rpcCall - RPC method
+ *  (method, args, timeout) => Promise
+ * @return {Object} - The mutated settings
+ */
+
+async function mutateAsyncGroups(config, rpcCall) {
+  if (Array.isArray(config.services)) {
+    config.services.forEach((service, index) => {
+      if (service.groups === '$rpc:requestGroups') {
+        // The `groups` need to be fetched from a secondary RPC call
+        service.groups = rpcCall('requestGroups', [index], 5000).catch(() => {
+          throw new Error('Unable to fetch groups');
+        });
+      }
+    });
+  }
+  return config;
+}
 /**
  * Fetch the host configuration and merge it with the app configuration from h.
  *

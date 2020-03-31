@@ -47,6 +47,7 @@ describe('groups', function () {
   let fakeRootScope;
   let fakeServiceUrl;
   let fakeMetadata;
+  let fakeToastMessenger;
 
   beforeEach(function () {
     fakeAuth = {
@@ -151,6 +152,7 @@ describe('groups', function () {
       fakeServiceUrl,
       fakeSession,
       fakeSettings,
+      fakeToastMessenger,
       fakeAuth
     );
   }

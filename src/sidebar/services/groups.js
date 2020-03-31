@@ -25,6 +25,7 @@ export default function groups(
   serviceUrl,
   session,
   settings,
+  toastMessenger,
   auth
 ) {
   const svc = serviceConfig(settings);
@@ -87,7 +88,7 @@ export default function groups(
    * @param {string|null} directLinkedGroupId
    * @return {Group[]}
    */
-  function filterGroups(
+  async function filterGroups(
     groups,
     isLoggedIn,
     directLinkedAnnotationGroupId,
@@ -106,14 +107,20 @@ export default function groups(
         directLinkedGroupId = null;
       }
     }
-
     // If service groups are specified only return those.
     // If a service group doesn't exist in the list of groups don't return it.
     if (svc && svc.groups) {
-      const focusedGroups = groups.filter(
-        g => svc.groups.includes(g.id) || svc.groups.includes(g.groupid)
-      );
-      return focusedGroups;
+      try {
+        // The groups may not be available if they are being fetched via RPC.
+        // See mutateAsyncGroups in fetch-config.js
+        const focusedGroups = await svc.groups;
+        const filteredGroups = groups.filter(
+          g => focusedGroups.includes(g.id) || focusedGroups.includes(g.groupid)
+        );
+        return filteredGroups;
+      } catch (e) {
+        toastMessenger.error(e.message);
+      }
     }
 
     // Logged-in users always see the "Public" group.
@@ -295,7 +302,7 @@ export default function groups(
     // Step 4. Combine all the groups into a single list and set additional
     // metadata on them that will be used elsewhere in the app.
     const isLoggedIn = token !== null;
-    const groups = filterGroups(
+    const groups = await filterGroups(
       combineGroups(myGroups, featuredGroups, documentUri),
       isLoggedIn,
       directLinkedAnnotationGroupId,
