@@ -1,5 +1,3 @@
-import angular from 'angular';
-
 import service from '../local-storage';
 
 function windowWithLocalStoragePropertyThatThrows() {
@@ -27,8 +25,6 @@ function windowWithLocalStorageMethodsThatThrow() {
 describe('sidebar.localStorage', () => {
   let fakeWindow;
 
-  before(() => angular.module('h', []).service('localStorage', service));
-
   [
     windowWithLocalStorageMethodsThatThrow(),
     windowWithLocalStoragePropertyThatThrows(),
@@ -38,17 +34,9 @@ describe('sidebar.localStorage', () => {
       let key = null;
 
       beforeEach(() => {
-        angular.mock.module('h', {
-          $window,
-        });
+        localStorage = service($window);
+        key = 'test.memory.key';
       });
-
-      beforeEach(
-        angular.mock.inject(_localStorage_ => {
-          localStorage = _localStorage_;
-          key = 'test.memory.key';
-        })
-      );
 
       it('sets/gets Item', () => {
         const value = 'What shall we do with a drunken sailor?';
@@ -87,14 +75,10 @@ describe('sidebar.localStorage', () => {
           removeItem: sinon.stub(),
         },
       };
-
-      angular.mock.module('h', {
-        $window: fakeWindow,
-      });
     });
 
     beforeEach(() => {
-      angular.mock.inject(_localStorage_ => (localStorage = _localStorage_));
+      localStorage = service(fakeWindow);
     });
 
     it('uses window.localStorage functions to handle data', () => {

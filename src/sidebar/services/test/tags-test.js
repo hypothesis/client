@@ -1,5 +1,3 @@
-import angular from 'angular';
-
 import tagsFactory from '../tags';
 
 const TAGS_LIST_KEY = 'hypothesis.user.tags.list';
@@ -22,10 +20,6 @@ class FakeStorage {
 describe('sidebar.tags', () => {
   let fakeLocalStorage;
   let tags;
-
-  before(() => {
-    angular.module('h', []).service('tags', tagsFactory);
-  });
 
   beforeEach(() => {
     fakeLocalStorage = new FakeStorage();
@@ -58,12 +52,7 @@ describe('sidebar.tags', () => {
     fakeLocalStorage.setObject(TAGS_MAP_KEY, savedTagsMap);
     fakeLocalStorage.setObject(TAGS_LIST_KEY, savedTagsList);
 
-    angular.mock.module('h', {
-      localStorage: fakeLocalStorage,
-    });
-    angular.mock.inject(_tags_ => {
-      tags = _tags_;
-    });
+    tags = tagsFactory(fakeLocalStorage);
   });
 
   describe('#filter', () => {
