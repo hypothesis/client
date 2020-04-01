@@ -42,7 +42,7 @@ function Thread({ showDocumentInfo = false, thread, threadsService }) {
 
   const onToggleReplies = () => setCollapsed(thread.id, !thread.collapsed);
   return (
-    <div
+    <section
       className={classnames('thread', {
         'thread--reply': thread.depth > 0,
         'is-collapsed': thread.collapsed,
@@ -96,7 +96,7 @@ function Thread({ showDocumentInfo = false, thread, threadsService }) {
           </ul>
         )}
       </div>
-    </div>
+    </section>
   );
 }
 
