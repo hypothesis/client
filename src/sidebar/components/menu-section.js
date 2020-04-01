@@ -38,8 +38,5 @@ MenuSection.propTypes = {
   /**
    * Menu items to display in this section.
    */
-  children: propTypes.oneOfType([
-    propTypes.object,
-    propTypes.arrayOf(propTypes.object),
-  ]).isRequired,
+  children: propTypes.any.isRequired,
 };

@@ -59,7 +59,13 @@ export default function mockImportedComponents() {
     }
 
     const mock = props => props.children;
+
+    // Make it possible to do `wrapper.find('ComponentName')` where `wrapper`
+    // is an Enzyme wrapper.
     mock.displayName = getDisplayName(value);
+
+    // Mocked components validate props in the same way as the real component.
+    mock.propTypes = value.propTypes;
 
     return mock;
   };
