@@ -1,3 +1,5 @@
+$ = require('jquery')
+
 BucketBar = require('../bucket-bar')
 
 # Return DOM elements for non-empty bucket indicators in a `BucketBar`.

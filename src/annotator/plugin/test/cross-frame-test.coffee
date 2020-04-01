@@ -1,3 +1,5 @@
+$ = require('jquery')
+
 Plugin = require('../../plugin')
 CrossFrame = require('../cross-frame')
 { $imports } = require('../cross-frame')
