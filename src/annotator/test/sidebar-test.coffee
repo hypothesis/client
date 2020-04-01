@@ -1,3 +1,5 @@
+$ = require('jquery')
+
 { default: events } = require('../../shared/bridge-events')
 
 Sidebar = require('../sidebar')
