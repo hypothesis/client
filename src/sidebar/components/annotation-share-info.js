@@ -44,18 +44,9 @@ function AnnotationShareInfo({ annotation }) {
           </span>
         </a>
       )}
-      {annotationIsPrivate && (
+      {annotationIsPrivate && !linkToGroup && (
         <span className="annotation-share-info__private">
-          {/* Show the lock icon in all cases when the annotation is private... */}
-          <SvgIcon
-            className="annotation-share-info__icon"
-            name="lock"
-            title="This annotation is visible only to you"
-          />
-          {/* but only render the "Only Me" text if we're not showing/linking a group name */}
-          {!linkToGroup && (
-            <span className="annotation-share-info__private-info">Only me</span>
-          )}
+          <span className="annotation-share-info__private-info">Only me</span>
         </span>
       )}
     </div>

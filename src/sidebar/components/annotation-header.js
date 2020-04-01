@@ -2,6 +2,7 @@ import { createElement } from 'preact';
 import propTypes from 'prop-types';
 
 import { isHighlight, isReply } from '../util/annotation-metadata';
+import { isPrivate } from '../util/permissions';
 
 import AnnotationDocumentInfo from './annotation-document-info';
 import AnnotationShareInfo from './annotation-share-info';
@@ -23,18 +24,34 @@ export default function AnnotationHeader({
   showDocumentInfo,
   threadIsCollapsed,
 }) {
+  const isCollapsedReply = isReply(annotation) && threadIsCollapsed;
+  const annotationIsPrivate = isPrivate(
+    annotation.permissions,
+    annotation.user
+  );
   const annotationLink = annotation.links ? annotation.links.html : '';
-  const replyPluralized = !replyCount || replyCount > 1 ? 'replies' : 'reply';
+
   // NB: `created` and `updated` are strings, not `Date`s
   const hasBeenEdited =
     annotation.updated && annotation.created !== annotation.updated;
+  const showTimestamp = !isEditing;
+  const showEditedTimestamp = hasBeenEdited && !isCollapsedReply;
 
-  const showReplyButton = threadIsCollapsed && isReply(annotation);
+  const replyPluralized = replyCount > 1 ? 'replies' : 'reply';
   const replyButtonText = `${replyCount} ${replyPluralized}`;
+  const showReplyButton = replyCount > 0 && isCollapsedReply;
+  const showExtendedInfo = !isReply(annotation);
 
   return (
     <header className="annotation-header">
       <div className="annotation-header__row">
+        {annotationIsPrivate && (
+          <SvgIcon
+            className="annotation-header__icon"
+            name="lock"
+            title="This annotation is visible only to you"
+          />
+        )}
         <AnnotationUser annotation={annotation} />
         {showReplyButton && (
           <Button
@@ -44,9 +61,10 @@ export default function AnnotationHeader({
             title="Expand replies"
           />
         )}
-        {!isEditing && annotation.created && (
+
+        {showTimestamp && (
           <div className="annotation-header__timestamp">
-            {hasBeenEdited && (
+            {showEditedTimestamp && (
               <span className="annotation-header__timestamp-edited">
                 (edited{' '}
                 <Timestamp
@@ -67,20 +85,24 @@ export default function AnnotationHeader({
         )}
       </div>
 
-      <div className="annotation-header__row">
-        <AnnotationShareInfo annotation={annotation} />
-        {!isEditing && isHighlight(annotation) && (
-          <div className="annotation-header__highlight">
-            <SvgIcon
-              name="highlight"
-              title="This is a highlight. Click 'edit' to add a note or tag."
-              inline={true}
-              className="annotation-header__highlight-icon"
-            />
-          </div>
-        )}
-        {showDocumentInfo && <AnnotationDocumentInfo annotation={annotation} />}
-      </div>
+      {showExtendedInfo && (
+        <div className="annotation-header__row">
+          <AnnotationShareInfo annotation={annotation} />
+          {!isEditing && isHighlight(annotation) && (
+            <div className="annotation-header__highlight">
+              <SvgIcon
+                name="highlight"
+                title="This is a highlight. Click 'edit' to add a note or tag."
+                inline={true}
+                className="annotation-header__highlight-icon"
+              />
+            </div>
+          )}
+          {showDocumentInfo && (
+            <AnnotationDocumentInfo annotation={annotation} />
+          )}
+        </div>
+      )}
     </header>
   );
 }
