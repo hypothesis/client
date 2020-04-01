@@ -4,7 +4,15 @@ import { useLayoutEffect, useRef } from 'preact/hooks';
 import propTypes from 'prop-types';
 
 /**
+ * Object mapping icon names to SVG markup.
+ *
+ * @typedef {{[name: string]: string}} IconMap
+ */
+
+/**
  * Map of icon name to SVG data.
+ *
+ * @type {IconMap}
  */
 let iconRegistry = {};
 
@@ -54,7 +62,7 @@ export default function SvgIcon({
 
 SvgIcon.propTypes = {
   /**
-   * The name of the icon to load.
+   * The name of the icon to display.
    *
    * The name must match a name that has already been registered using the
    * `registerIcons` function.
@@ -74,7 +82,7 @@ SvgIcon.propTypes = {
 /**
  * Register icons for use with the `SvgIcon` component.
  *
- * @param {Object} icons - Object mapping icon names to SVG data.
+ * @param {IconMap} icons - Object mapping icon names to SVG data.
  * @param {boolean} [options.reset] - If `true`, remove existing registered icons.
  */
 export function registerIcons(icons, { reset = false } = {}) {
@@ -89,6 +97,8 @@ export function registerIcons(icons, { reset = false } = {}) {
  *
  * To register icons, don't mutate this directly but call `registerIcons`
  * instead.
+ *
+ * @return {IconMap}
  */
 export function availableIcons() {
   return iconRegistry;
