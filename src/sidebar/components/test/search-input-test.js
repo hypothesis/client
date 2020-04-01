@@ -4,6 +4,7 @@ import { createElement } from 'preact';
 import SearchInput from '../search-input';
 import { $imports } from '../search-input';
 
+import mockImportedComponents from '../../../test-util/mock-imported-components';
 import { checkAccessibility } from '../../../test-util/accessibility';
 
 describe('SearchInput', () => {
@@ -22,11 +23,8 @@ describe('SearchInput', () => {
   beforeEach(() => {
     fakeStore = { isLoading: sinon.stub().returns(false) };
 
-    const FakeSpinner = () => null;
-    FakeSpinner.displayName = 'Spinner';
-
+    $imports.$mock(mockImportedComponents());
     $imports.$mock({
-      './spinner': FakeSpinner,
       '../store/use-store': callback => callback(fakeStore),
     });
   });
@@ -84,7 +82,7 @@ describe('SearchInput', () => {
   it('renders search button when app is not in "loading" state', () => {
     fakeStore.isLoading.returns(false);
     const wrapper = createSearchInput();
-    assert.isTrue(wrapper.exists('button'));
+    assert.isTrue(wrapper.exists('Button'));
   });
 
   it(

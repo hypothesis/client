@@ -4,6 +4,7 @@ import { createElement } from 'preact';
 import VersionInfo from '../version-info';
 import { $imports } from '../version-info';
 
+import mockImportedComponents from '../../../test-util/mock-imported-components';
 import { checkAccessibility } from '../../../test-util/accessibility';
 
 describe('VersionInfo', function () {
@@ -32,6 +33,7 @@ describe('VersionInfo', function () {
     fakeCopyToClipboard = {
       copyText: sinon.stub(),
     };
+    $imports.$mock(mockImportedComponents());
     $imports.$mock({
       '../util/copy-to-clipboard': fakeCopyToClipboard,
     });
@@ -65,7 +67,7 @@ describe('VersionInfo', function () {
     it('copies version info to clipboard when copy button clicked', () => {
       const wrapper = createComponent();
 
-      wrapper.find('button').simulate('click');
+      wrapper.find('Button').props().onClick();
 
       assert.calledWith(fakeCopyToClipboard.copyText, 'fakeString');
     });
@@ -73,7 +75,7 @@ describe('VersionInfo', function () {
     it('confirms info copy when successful', () => {
       const wrapper = createComponent();
 
-      wrapper.find('button').simulate('click');
+      wrapper.find('Button').props().onClick();
 
       assert.calledWith(
         fakeToastMessenger.success,
@@ -85,7 +87,7 @@ describe('VersionInfo', function () {
       fakeCopyToClipboard.copyText.throws();
       const wrapper = createComponent();
 
-      wrapper.find('button').simulate('click');
+      wrapper.find('Button').props().onClick();
 
       assert.calledWith(
         fakeToastMessenger.error,
