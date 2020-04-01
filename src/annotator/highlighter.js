@@ -10,26 +10,43 @@ export function highlightRange(normedRange, cssClass = 'hypothesis-highlight') {
   const white = /^\s*$/;
 
   // Find text nodes within the range to highlight.
-  //
-  // We ignore text nodes that contain only whitespace to avoid inserting
-  // elements in places that can only contain a restricted subset of nodes such
-  // as table rows and lists. This does mean that there may be the odd abandoned
-  // whitespace node in a paragraph that is skipped but better than breaking
-  // table layouts.
-  const textNodes = normedRange
-    .textNodes()
-    .filter(node => !white.test(node.nodeValue));
+  const textNodes = normedRange.textNodes();
 
-  // Wrap each text node with a `<hypothesis-highlight>` element.
-  const highlights = [];
+  // Group text nodes into spans of adjacent nodes. If a group of text nodes are
+  // adjacent, we only need to create one highlight element for the group.
+  let textNodeSpans = [];
+  let prevNode = null;
+  let currentSpan = null;
+
   textNodes.forEach(node => {
+    if (prevNode && prevNode.nextSibling === node) {
+      currentSpan.push(node);
+    } else {
+      currentSpan = [node];
+      textNodeSpans.push(currentSpan);
+    }
+    prevNode = node;
+  });
+
+  // Filter out text node spans that consist only of white space. This avoids
+  // inserting highlight elements in places that can only contain a restricted
+  // subset of nodes such as table rows and lists.
+  textNodeSpans = textNodeSpans.filter(span =>
+    // Check for at least one text node with non-space content.
+    span.some(node => !white.test(node.nodeValue))
+  );
+
+  // Wrap each text node span with a `<hypothesis-highlight>` element.
+  const highlights = [];
+  textNodeSpans.forEach(nodes => {
     // A custom element name is used here rather than `<span>` to reduce the
     // likelihood of highlights being hidden by page styling.
     const highlightEl = document.createElement('hypothesis-highlight');
     highlightEl.className = cssClass;
 
-    node.parentNode.replaceChild(highlightEl, node);
-    highlightEl.appendChild(node);
+    nodes[0].parentNode.replaceChild(highlightEl, nodes[0]);
+
+    nodes.forEach(node => highlightEl.appendChild(node));
     highlights.push(highlightEl);
   });
 
