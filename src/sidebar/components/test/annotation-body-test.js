@@ -16,6 +16,8 @@ describe('AnnotationBody', () => {
       <AnnotationBody
         annotation={fixtures.defaultAnnotation()}
         isEditing={false}
+        onEditTags={() => null}
+        tags={[]}
         text="test comment"
         {...props}
       />
@@ -88,10 +90,41 @@ describe('AnnotationBody', () => {
     assert.equal(buttonProps.title, 'Show the first few lines only');
   });
 
+  describe('tag list and editor', () => {
+    it('renders a list of tags if not editing and annotation has tags', () => {
+      const wrapper = createBody({ isEditing: false, tags: ['foo', 'bar'] });
+
+      assert.isTrue(wrapper.find('TagList').exists());
+    });
+
+    it('does not render a tag list if annotation has no tags', () => {
+      const wrapper = createBody({ isEditing: false, tags: [] });
+
+      assert.isFalse(wrapper.find('TagList').exists());
+    });
+
+    it('renders a tag editor if annotation is being edited', () => {
+      const wrapper = createBody({ isEditing: true, tags: ['foo', 'bar'] });
+
+      assert.isTrue(wrapper.find('TagEditor').exists());
+      assert.isFalse(wrapper.find('TagList').exists());
+    });
+  });
+
   it(
     'should pass a11y checks',
-    checkAccessibility({
-      content: () => createBody(),
-    })
+    checkAccessibility([
+      {
+        content: () => createBody(),
+      },
+      {
+        name: 'when annotation has tags (tag list)',
+        content: () => createBody({ isEditing: false, tags: ['foo', 'bar'] }),
+      },
+      {
+        name: 'when annotation is being edited and has tags',
+        content: () => createBody({ isEditing: true, tags: ['foo', 'bar'] }),
+      },
+    ])
   );
 });

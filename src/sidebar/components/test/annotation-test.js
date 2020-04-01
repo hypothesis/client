@@ -8,8 +8,6 @@ import { checkAccessibility } from '../../../test-util/accessibility';
 import mockImportedComponents from '../../../test-util/mock-imported-components';
 import { waitFor } from '../../../test-util/wait';
 
-// @TODO Note this import as `Annotation` for easier updating later
-
 import Annotation from '../annotation';
 import { $imports } from '../annotation';
 
@@ -142,38 +140,6 @@ describe('Annotation', () => {
       const call = fakeStore.createDraft.getCall(0);
       assert.calledOnce(fakeStore.createDraft);
       assert.equal(call.args[1].text, 'updated text');
-    });
-  });
-
-  describe('tags', () => {
-    it('renders tag editor if `isEditing', () => {
-      setEditingMode(true);
-
-      const wrapper = createComponent();
-
-      assert.isTrue(wrapper.find('TagEditor').exists());
-      assert.isFalse(wrapper.find('TagList').exists());
-    });
-
-    it('updates annotation draft if tags changed', () => {
-      setEditingMode(true);
-      const wrapper = createComponent();
-
-      wrapper
-        .find('TagEditor')
-        .props()
-        .onEditTags({ tags: ['uno', 'dos'] });
-
-      const call = fakeStore.createDraft.getCall(0);
-      assert.calledOnce(fakeStore.createDraft);
-      assert.sameMembers(call.args[1].tags, ['uno', 'dos']);
-    });
-
-    it('renders tag list if not `isEditing', () => {
-      const wrapper = createComponent();
-
-      assert.isTrue(wrapper.find('TagList').exists());
-      assert.isFalse(wrapper.find('TagEditor').exists());
     });
   });
 
@@ -461,28 +427,66 @@ describe('Annotation', () => {
 
       assert.isFalse(wrapper.find('AnnotationActionBar').exists());
     });
+  });
 
-    it('should not show annotations if the annotation is a collapsed reply', () => {
-      fakeMetadata.isReply.returns(true);
-      const wrapper = createComponent({ threadIsCollapsed: true });
+  context('annotation thread is collapsed', () => {
+    context('collapsed reply', () => {
+      beforeEach(() => {
+        fakeMetadata.isReply.returns(true);
+      });
 
-      assert.isFalse(wrapper.find('AnnotationActionBar').exists());
+      it('should not render body or footer', () => {
+        const wrapper = createComponent({ threadIsCollapsed: true });
+
+        assert.isFalse(wrapper.find('AnnotationBody').exists());
+        assert.isFalse(wrapper.find('footer').exists());
+      });
+
+      it('should not show actions', () => {
+        const wrapper = createComponent({ threadIsCollapsed: true });
+
+        assert.isFalse(wrapper.find('AnnotationActionBar').exists());
+      });
     });
 
-    it(
-      'should pass a11y checks',
-      checkAccessibility([
-        {
-          content: () => createComponent(),
-        },
-        {
-          name: 'When editing',
-          content: () => {
-            setEditingMode(true);
-            return createComponent();
-          },
-        },
-      ])
-    );
+    context('collapsed top-level annotation', () => {
+      it('should render body and footer', () => {
+        fakeMetadata.isReply.returns(false);
+        const wrapper = createComponent({ threadIsCollapsed: true });
+
+        assert.isTrue(wrapper.find('AnnotationBody').exists());
+        assert.isTrue(wrapper.find('footer').exists());
+      });
+    });
   });
+
+  it(
+    'should pass a11y checks',
+    checkAccessibility([
+      {
+        content: () => createComponent(),
+      },
+      {
+        name: 'When editing',
+        content: () => {
+          setEditingMode(true);
+          return createComponent();
+        },
+      },
+      {
+        name: 'when a collapsed top-level thread',
+        content: () => {
+          fakeMetadata.isReply.returns(false);
+          return createComponent({ threadIsCollapsed: true });
+        },
+      },
+      {
+        name: 'when a collapsed reply',
+        content: () => {
+          fakeMetadata.isReply.returns(true);
+          return createComponent({ threadIsCollapsed: true });
+        },
+      },
+    ])
+  );
 });

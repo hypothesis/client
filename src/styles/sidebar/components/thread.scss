@@ -5,28 +5,35 @@
 
   &--reply {
     margin-top: 0.5em;
-    padding-top: 0.5em;
   }
 
-  &__collapse {
-    margin: 0.25em;
-    margin-top: 0;
-    cursor: auto;
-    border-left: 1px dashed var.$grey-3;
+  // Conserve space for deeper usable nesting
+  &__children {
+    margin-left: -0.75em;
+  }
 
+  // Left "channel" of thread
+  &__collapse {
+    margin-right: 1em;
+    border-right: 1px dashed var.$grey-3;
+    // The entire channel is NOT clickable so don't make it look like it is
+    // (overrides `pointer` cursor applied to entire card)
+    cursor: auto;
+
+    // Darken thread line on hover as a visual cue to show related thread items
     &:hover {
-      border-left: 1px dashed var.$grey-4;
+      border-right: 1px dashed var.$grey-4;
     }
 
     .is-collapsed & {
-      border-left: none;
+      border-right: none;
     }
   }
 
   // TODO These styles should be consolidated with other `Button` styles
   &__collapse-button {
-    margin-left: -1.25em;
-    padding: 0.25em 0.75em 1em 0.75em;
+    margin-right: -1.25em;
+    padding: 0.25em 0.75em 0.75em 0.75em;
     // Need a non-transparent background so that the dashed border line
     // does not show through the button
     background-color: var.$white;

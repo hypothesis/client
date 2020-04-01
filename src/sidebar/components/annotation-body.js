@@ -1,4 +1,4 @@
-import { Fragment, createElement } from 'preact';
+import { createElement } from 'preact';
 import { useState } from 'preact/hooks';
 import propTypes from 'prop-types';
 
@@ -8,6 +8,8 @@ import Button from './button';
 import Excerpt from './excerpt';
 import MarkdownEditor from './markdown-editor';
 import MarkdownView from './markdown-view';
+import TagEditor from './tag-editor';
+import TagList from './tag-list';
 
 /**
  * Display the rendered content of an annotation.
@@ -15,7 +17,9 @@ import MarkdownView from './markdown-view';
 export default function AnnotationBody({
   annotation,
   isEditing,
+  onEditTags,
   onEditText,
+  tags,
   text,
 }) {
   // Should the text content of `Excerpt` be rendered in a collapsed state,
@@ -31,36 +35,37 @@ export default function AnnotationBody({
     ? 'Show full annotation text'
     : 'Show the first few lines only';
 
+  const showExcerpt = !isEditing && text.length > 0;
+  const showTagList = !isEditing && tags.length > 0;
+
   return (
-    <Fragment>
-      <section className="annotation-body">
-        {!isEditing && (
-          <Excerpt
-            collapse={isCollapsed}
-            collapsedHeight={400}
-            inlineControls={false}
-            onCollapsibleChanged={setIsCollapsible}
-            onToggleCollapsed={setIsCollapsed}
-            overflowThreshold={20}
-          >
-            <MarkdownView
-              markdown={text}
-              textClass={{
-                'annotation-body__text': true,
-                'is-hidden': isHidden(annotation),
-                'has-content': text.length > 0,
-              }}
-            />
-          </Excerpt>
-        )}
-        {isEditing && (
-          <MarkdownEditor
-            label="Annotation body"
-            text={text}
-            onEditText={onEditText}
+    <section className="annotation-body">
+      {showExcerpt && (
+        <Excerpt
+          collapse={isCollapsed}
+          collapsedHeight={400}
+          inlineControls={false}
+          onCollapsibleChanged={setIsCollapsible}
+          onToggleCollapsed={setIsCollapsed}
+          overflowThreshold={20}
+        >
+          <MarkdownView
+            markdown={text}
+            textClass={{
+              'annotation-body__text': true,
+              'is-hidden': isHidden(annotation),
+              'has-content': text.length > 0,
+            }}
           />
-        )}
-      </section>
+        </Excerpt>
+      )}
+      {isEditing && (
+        <MarkdownEditor
+          label="Annotation body"
+          text={text}
+          onEditText={onEditText}
+        />
+      )}
       {isCollapsible && !isEditing && (
         <div className="annotation-body__collapse-toggle">
           <Button
@@ -71,7 +76,9 @@ export default function AnnotationBody({
           />
         </div>
       )}
-    </Fragment>
+      {showTagList && <TagList annotation={annotation} tags={tags} />}
+      {isEditing && <TagEditor onEditTags={onEditTags} tagList={tags} />}
+    </section>
   );
 }
 
@@ -87,9 +94,16 @@ AnnotationBody.propTypes = {
   isEditing: propTypes.bool,
 
   /**
+   * Callback invoked when the user edits tags.
+   */
+  onEditTags: propTypes.func,
+
+  /**
    * Callback invoked when the user edits the content of the annotation body.
    */
   onEditText: propTypes.func,
+
+  tags: propTypes.array.isRequired,
 
   /**
    * The markdown annotation body, which is either rendered as HTML (if `isEditing`

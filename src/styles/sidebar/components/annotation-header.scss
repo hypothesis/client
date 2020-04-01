@@ -3,9 +3,6 @@
 
 .annotation-header {
   @include forms.pie-clearfix;
-  // Margin between top of x-height of username and
-  // top of the annotation card should be ~15px
-  margin-top: -(var.$layout-h-margin) + 10px;
   color: var.$grey-6;
 
   &__row {

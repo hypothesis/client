@@ -3,6 +3,8 @@
 @use "../../variables" as var;
 
 .tag-editor {
+  margin: 0.5em 0;
+
   &__input {
     @include forms.form-input;
     width: 100%;
@@ -11,12 +13,13 @@
   &__tags {
     display: flex;
     flex-wrap: wrap;
+    margin: 0.5em 0;
   }
 
   &__item {
     display: flex;
-    margin-right: 0.5em;
-    margin-bottom: 0.5em;
+    margin: 0.25em 0.5em 0.25em 0;
+    line-height: var.$base-line-height;
   }
 
   &__edit {
