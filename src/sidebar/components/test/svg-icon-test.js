@@ -1,11 +1,31 @@
 import { createElement, render } from 'preact';
 
-import SvgIcon from '../svg-icon';
+import SvgIcon, { availableIcons, registerIcons } from '../svg-icon';
 
 describe('SvgIcon', () => {
   // Tests here use DOM APIs rather than Enzyme because SvgIcon uses
   // `dangerouslySetInnerHTML` for its content, and that is not visible in the
   // Enzyme tree.
+
+  // Global icon set that is registered with `SvgIcon` outside of these tests.
+  let savedIconSet;
+
+  beforeEach(() => {
+    savedIconSet = availableIcons();
+
+    registerIcons(
+      {
+        'collapse-menu': require('../../../images/icons/collapse-menu.svg'),
+        'expand-menu': require('../../../images/icons/expand-menu.svg'),
+        refresh: require('../../../images/icons/refresh.svg'),
+      },
+      { reset: true }
+    );
+  });
+
+  afterEach(() => {
+    registerIcons(savedIconSet, { reset: true });
+  });
 
   it("sets the element's content to the content of the SVG", () => {
     const container = document.createElement('div');
@@ -13,11 +33,11 @@ describe('SvgIcon', () => {
     assert.ok(container.querySelector('svg'));
   });
 
-  it('throws an error if the icon is unknown', () => {
+  it('throws an error if the icon name is not registered', () => {
     assert.throws(() => {
       const container = document.createElement('div');
       render(<SvgIcon name="unknown" />, container);
-    });
+    }, 'Icon name "unknown" is not registered');
   });
 
   it('does not set the class of the SVG by default', () => {
