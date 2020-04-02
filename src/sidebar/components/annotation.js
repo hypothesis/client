@@ -1,6 +1,5 @@
 import classnames from 'classnames';
 import { createElement } from 'preact';
-import { useState } from 'preact/hooks';
 import propTypes from 'prop-types';
 
 import useStore from '../store/use-store';
@@ -35,6 +34,7 @@ function Annotation({
   const draft = useStore(store => store.getDraft(annotation));
   const group = useStore(store => store.getGroup(annotation.group));
   const userid = useStore(store => store.profile().userid);
+  const isSaving = useStore(store => store.isSavingAnnotation(annotation));
 
   const isCollapsedReply = isReply(annotation) && threadIsCollapsed;
   const isPrivate = draft ? draft.isPrivate : !isShared(annotation.permissions);
@@ -44,7 +44,6 @@ function Annotation({
   const hasQuote = !!quote(annotation);
   const isEmpty = !text && !tags.length;
 
-  const [isSaving, setIsSaving] = useState(false);
   const isEditing = !!draft && !isSaving;
 
   const toggleAction = threadIsCollapsed ? 'Show replies' : 'Hide replies';
@@ -65,13 +64,10 @@ function Annotation({
   const onReply = () => annotationsService.reply(annotation, userid);
 
   const onSave = async () => {
-    setIsSaving(true);
     try {
       await annotationsService.save(annotation);
     } catch (err) {
       toastMessenger.error('Saving annotation failed');
-    } finally {
-      setIsSaving(false);
     }
   };
 

@@ -154,7 +154,13 @@ export default function annotationsService(api, store) {
       );
     }
 
-    const savedAnnotation = await saved;
+    let savedAnnotation;
+    store.annotationSaveStarted(annotation);
+    try {
+      savedAnnotation = await saved;
+    } finally {
+      store.annotationSaveFinished(annotation);
+    }
 
     Object.keys(annotation).forEach(key => {
       if (key[0] === '$') {

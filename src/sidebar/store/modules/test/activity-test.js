@@ -54,6 +54,25 @@ describe('sidebar/store/modules/activity', () => {
     });
   });
 
+  describe('isSavingAnnotation', () => {
+    beforeEach(() => {
+      store.annotationSaveStarted({ $tag: '1' });
+      store.annotationSaveStarted({ $tag: '2' });
+    });
+
+    it('returns `true` if annotation $tag is in current save requests', () => {
+      assert.isTrue(store.isSavingAnnotation({ $tag: '1' }));
+    });
+
+    it('returns `false` if annotation does not have a $tag', () => {
+      assert.isFalse(store.isSavingAnnotation({}));
+    });
+
+    it('returns `false` if annotation `$tag` not in current save requests', () => {
+      assert.isFalse(store.isSavingAnnotation({ $tag: '4' }));
+    });
+  });
+
   it('defaults `activeAnnotationFetches` counter to zero', () => {
     assert.equal(store.getState().activity.activeAnnotationFetches, 0);
   });
@@ -85,6 +104,88 @@ describe('sidebar/store/modules/activity', () => {
       store.annotationFetchFinished();
 
       assert.equal(store.getState().activity.activeAnnotationFetches, 0);
+    });
+  });
+
+  describe('#annotationSaveFinished', () => {
+    it('removes matching `$tag` from saving-annotations Array when present', () => {
+      store.annotationSaveStarted({ $tag: 'nine' });
+
+      store.annotationSaveFinished({ $tag: 'nine' });
+
+      assert.lengthOf(
+        store.getState().activity.activeAnnotationSaveRequests,
+        0
+      );
+    });
+
+    it('does not remove `$tag` if it is not in the saving-annotations Array', () => {
+      store.annotationSaveStarted({ $tag: 'nine' });
+
+      store.annotationSaveFinished({ $tag: 'seven' });
+
+      const annotationsBeingSaved = store.getState().activity
+        .activeAnnotationSaveRequests;
+
+      assert.lengthOf(annotationsBeingSaved, 1);
+      assert.deepEqual(annotationsBeingSaved, ['nine']);
+    });
+
+    it('does not remove annotation from saving-annotations Array if it has no `$tag`', () => {
+      store.annotationSaveStarted({ $tag: 'nine' });
+
+      store.annotationSaveFinished({});
+
+      const annotationsBeingSaved = store.getState().activity
+        .activeAnnotationSaveRequests;
+
+      assert.lengthOf(annotationsBeingSaved, 1);
+      assert.deepEqual(annotationsBeingSaved, ['nine']);
+    });
+
+    it('does not remove non-matching annotations from saving-annotations Array', () => {
+      store.annotationSaveStarted({ $tag: 'nine' });
+      store.annotationSaveStarted({ $tag: 'four' });
+
+      store.annotationSaveFinished({ $tag: 'four' });
+
+      const annotationsBeingSaved = store.getState().activity
+        .activeAnnotationSaveRequests;
+
+      assert.lengthOf(annotationsBeingSaved, 1);
+      assert.deepEqual(annotationsBeingSaved, ['nine']);
+    });
+  });
+
+  describe('#annotationSaveStarted', () => {
+    it('adds annotation `$tag` to list of saving annotations', () => {
+      store.annotationSaveStarted({ $tag: 'five' });
+
+      const annotationsBeingSaved = store.getState().activity
+        .activeAnnotationSaveRequests;
+
+      assert.lengthOf(annotationsBeingSaved, 1);
+      assert.deepEqual(annotationsBeingSaved, ['five']);
+    });
+
+    it('does not add the same `$tag` twice', () => {
+      store.annotationSaveStarted({ $tag: 'five' });
+      store.annotationSaveStarted({ $tag: 'five' });
+
+      const annotationsBeingSaved = store.getState().activity
+        .activeAnnotationSaveRequests;
+
+      assert.lengthOf(annotationsBeingSaved, 1);
+      assert.deepEqual(annotationsBeingSaved, ['five']);
+    });
+
+    it('does not add the annotation if it does not have a `$tag`', () => {
+      store.annotationSaveStarted({});
+
+      const annotationsBeingSaved = store.getState().activity
+        .activeAnnotationSaveRequests;
+
+      assert.lengthOf(annotationsBeingSaved, 0);
     });
   });
 
