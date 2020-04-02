@@ -52,7 +52,7 @@ export const ServiceContext = createContext(fallbackInjector);
  *   MyComponent.injectedProps = ['settings']
  *
  *   // Wrap `MyComponent` to inject any services it needs.
- *   module.exports = withServices(MyComponent);
+ *   export default withServices(MyComponent);
  */
 export function withServices(Component) {
   if (!Component.injectedProps) {
