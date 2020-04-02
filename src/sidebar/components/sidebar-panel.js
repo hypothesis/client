@@ -7,7 +7,7 @@ import useStore from '../store/use-store';
 
 import Button from './button';
 import Slider from './slider';
-import SvgIcon from './svg-icon';
+import SvgIcon from '../../shared/components/svg-icon';
 
 /**
  * Base component for a sidebar panel.

@@ -9,7 +9,7 @@ import { withServices } from '../util/service-context';
 import Button from './button';
 import useElementShouldClose from './hooks/use-element-should-close';
 import ShareLinks from './share-links';
-import SvgIcon from './svg-icon';
+import SvgIcon from '../../shared/components/svg-icon';
 
 /**
  * "Popup"-style component for sharing a single annotation.

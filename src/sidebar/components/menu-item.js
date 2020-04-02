@@ -5,7 +5,7 @@ import propTypes from 'prop-types';
 import { onActivate } from '../util/on-activate';
 
 import Slider from './slider';
-import SvgIcon from './svg-icon';
+import SvgIcon from '../../shared/components/svg-icon';
 
 /**
  * An item in a dropdown menu.

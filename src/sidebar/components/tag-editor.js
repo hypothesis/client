@@ -5,7 +5,7 @@ import propTypes from 'prop-types';
 import { withServices } from '../util/service-context';
 
 import AutocompleteList from './autocomplete-list';
-import SvgIcon from './svg-icon';
+import SvgIcon from '../../shared/components/svg-icon';
 import useElementShouldClose from './hooks/use-element-should-close';
 
 // Global counter used to create a unique id for each instance of a TagEditor

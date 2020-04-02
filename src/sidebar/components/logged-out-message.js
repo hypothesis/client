@@ -4,7 +4,7 @@ import propTypes from 'prop-types';
 import { withServices } from '../util/service-context';
 
 import Button from './button';
-import SvgIcon from './svg-icon';
+import SvgIcon from '../../shared/components/svg-icon';
 
 /**
  * Render a call-to-action to log in or sign up. This message is intended to be

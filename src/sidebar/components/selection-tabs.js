@@ -8,7 +8,7 @@ import uiConstants from '../ui-constants';
 import { withServices } from '../util/service-context';
 
 import NewNoteBtn from './new-note-btn';
-import SvgIcon from './svg-icon';
+import SvgIcon from '../../shared/components/svg-icon';
 
 /**
  *  Display name of the tab and annotation count.
