@@ -48,7 +48,7 @@ function isJsonRpcMessage(data) {
  * All methods called upon must be mapped in the `registeredMethods` function.
  */
 // @ngInject
-function start(store, settings, $window) {
+export function startServer(store, settings, $window) {
   const methods = registeredMethods(store);
 
   // Process the pre-start incoming RPC requests
@@ -128,11 +128,6 @@ function preStartMessageListener(event) {
  *
  * @param {Window} window_ - Test seam
  */
-function preStart(window_ = window) {
+export function preStartServer(window_ = window) {
   window_.addEventListener('message', preStartMessageListener);
 }
-
-module.exports = {
-  preStartServer: preStart,
-  startServer: start,
-};
