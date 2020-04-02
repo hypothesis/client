@@ -3,18 +3,20 @@ import { createElement } from 'preact';
 import propTypes from 'prop-types';
 
 import { useShortcut } from '../../shared/shortcut';
+import SvgIcon from '../../shared/components/svg-icon';
 
 function ToolbarButton({ icon, label, onClick, shortcut }) {
   useShortcut(shortcut, onClick);
 
-  const title = shortcut ? `${label} (${shortcut})` : null;
+  const title = shortcut ? `${label} (${shortcut})` : label;
 
   return (
     <button
-      className={classnames('annotator-adder-actions__button', icon)}
+      className="annotator-adder-actions__button"
       onClick={onClick}
       title={title}
     >
+      <SvgIcon name={icon} />
       <span className="annotator-adder-actions__label">{label}</span>
     </button>
   );
@@ -58,13 +60,13 @@ export default function AdderToolbar({ arrowDirection, isVisible, onCommand }) {
     >
       <hypothesis-adder-actions className="annotator-adder-actions">
         <ToolbarButton
-          icon="h-icon-annotate"
+          icon="annotate"
           onClick={e => handleCommand(e, 'annotate')}
           label="Annotate"
           shortcut={annotateShortcut}
         />
         <ToolbarButton
-          icon="h-icon-highlight"
+          icon="highlight"
           onClick={e => handleCommand(e, 'highlight')}
           label="Highlight"
           shortcut={highlightShortcut}

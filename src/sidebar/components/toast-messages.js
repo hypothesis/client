@@ -5,7 +5,7 @@ import propTypes from 'prop-types';
 import useStore from '../store/use-store';
 import { withServices } from '../util/service-context';
 
-import SvgIcon from './svg-icon';
+import SvgIcon from '../../shared/components/svg-icon';
 
 /**
  * An individual toast message—a brief and transient success or error message.

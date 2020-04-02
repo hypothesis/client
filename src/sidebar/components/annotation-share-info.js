@@ -4,7 +4,7 @@ import propTypes from 'prop-types';
 import useStore from '../store/use-store';
 import { isPrivate } from '../util/permissions';
 
-import SvgIcon from './svg-icon';
+import SvgIcon from '../../shared/components/svg-icon';
 
 /**
  * Render information about what group an annotation is in and

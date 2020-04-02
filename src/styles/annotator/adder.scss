@@ -134,8 +134,10 @@ $adder-transition-duration: 80ms;
 }
 
 .annotator-adder-actions__label {
+  margin-bottom: 2px;
+  margin-top: 4px;
+
   font-size: 11px;
-  margin: 2px 0px;
   font-family: sans-serif;
   color: var.$grey-mid !important;
   transition: color $adder-transition-duration;

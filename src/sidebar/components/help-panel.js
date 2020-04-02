@@ -8,7 +8,7 @@ import { withServices } from '../util/service-context';
 import VersionData from '../util/version-data';
 
 import SidebarPanel from './sidebar-panel';
-import SvgIcon from './svg-icon';
+import SvgIcon from '../../shared/components/svg-icon';
 import Tutorial from './tutorial';
 import VersionInfo from './version-info';
 

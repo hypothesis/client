@@ -9,7 +9,7 @@ import { withServices } from '../util/service-context';
 import Button from './button';
 import ShareLinks from './share-links';
 import SidebarPanel from './sidebar-panel';
-import SvgIcon from './svg-icon';
+import SvgIcon from '../../shared/components/svg-icon';
 
 /**
  * A panel for sharing the current group's annotations.

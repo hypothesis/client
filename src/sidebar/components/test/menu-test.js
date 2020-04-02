@@ -5,6 +5,7 @@ import { act } from 'preact/test-utils';
 import Menu from '../menu';
 import { $imports } from '../menu';
 
+import mockImportedComponents from '../../../test-util/mock-imported-components';
 import { checkAccessibility } from '../../../test-util/accessibility';
 
 describe('Menu', () => {
@@ -32,10 +33,7 @@ describe('Menu', () => {
     container = document.createElement('div');
     document.body.appendChild(container);
 
-    $imports.$mock({
-      // eslint-disable-next-line react/display-name
-      './svg-icon': () => <span>Fake SVG icon</span>,
-    });
+    $imports.$mock(mockImportedComponents());
   });
 
   afterEach(() => {

@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'preact/hooks';
 import propTypes from 'prop-types';
 
 import useElementShouldClose from './hooks/use-element-should-close';
-import SvgIcon from './svg-icon';
+import SvgIcon from '../../shared/components/svg-icon';
 
 // The triangular indicator below the menu toggle button that visually links it
 // to the menu content.

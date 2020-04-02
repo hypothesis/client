@@ -108,7 +108,7 @@ function autosave(autosaveService) {
 }
 
 // Register icons used by the sidebar app (and maybe other assets in future).
-import { registerIcons } from './components/svg-icon';
+import { registerIcons } from '../shared/components/svg-icon';
 import iconSet from './icons';
 registerIcons(iconSet);
 
@@ -124,7 +124,7 @@ import SearchStatusBar from './components/search-status-bar';
 import SelectionTabs from './components/selection-tabs';
 import ShareAnnotationsPanel from './components/share-annotations-panel';
 import SidebarContentError from './components/sidebar-content-error';
-import SvgIcon from './components/svg-icon';
+import SvgIcon from '../shared/components/svg-icon';
 import Thread from './components/thread';
 import ToastMessages from './components/toast-messages';
 import TopBar from './components/top-bar';

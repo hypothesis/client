@@ -86,7 +86,7 @@ describe('Adder', () => {
   describe('button handling', () => {
     it('calls onHighlight callback when Highlight button is clicked', () => {
       const highlightBtn = getContent(adderCtrl).querySelector(
-        'button.h-icon-highlight'
+        'button[title^="Highlight"]'
       );
       highlightBtn.dispatchEvent(new Event('click'));
       assert.called(adderCallbacks.onHighlight);
@@ -94,7 +94,7 @@ describe('Adder', () => {
 
     it('calls onAnnotate callback when Annotate button is clicked', () => {
       const annotateBtn = getContent(adderCtrl).querySelector(
-        'button.h-icon-annotate'
+        'button[title^="Annotate"]'
       );
       annotateBtn.dispatchEvent(new Event('click'));
       assert.called(adderCallbacks.onAnnotate);
@@ -102,7 +102,7 @@ describe('Adder', () => {
 
     it("calls onAnnotate callback when Annotate button's label is clicked", () => {
       const annotateLabel = getContent(adderCtrl).querySelector(
-        'button.h-icon-annotate > span'
+        'button[title^="Annotate"] > span'
       );
       annotateLabel.dispatchEvent(new Event('click', { bubbles: true }));
       assert.called(adderCallbacks.onAnnotate);

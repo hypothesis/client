@@ -11,7 +11,7 @@ import {
 } from '../markdown-commands';
 
 import MarkdownView from './markdown-view';
-import SvgIcon from './svg-icon';
+import SvgIcon from '../../shared/components/svg-icon';
 
 // Mapping of toolbar command name to key for Ctrl+<key> keyboard shortcuts.
 // The shortcuts are taken from Stack Overflow's editor.
