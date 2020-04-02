@@ -247,10 +247,10 @@ describe('sidebar.util.fetch-config', () => {
         };
         fakeJsonRpc.call.onFirstCall().resolves({ foo: 'baz' }); // host config
         const result = await fetchConfig(appConfig, fakeWindow);
-        assert.deepEqual(await result.services[0].groups, ['group1', 'group2']);
+        assert.deepEqual(result.services[0].groups, ['group1', 'group2']);
       });
 
-      it("creates a merged config where `groups` returns a promise when its initial value is '$rpc:requestGroups'", async () => {
+      it("creates a merged config where `groups` is a promise when its initial value is '$rpc:requestGroups'", async () => {
         const appConfig = {
           services: [{ groups: '$rpc:requestGroups' }],
           appType: 'via',

@@ -58,6 +58,10 @@ describe('groups', function () {
       isReply: sinon.stub(),
     };
 
+    fakeToastMessenger = {
+      error: sinon.stub(),
+    };
+
     fakeStore = fakeReduxStore(
       {
         frames: [{ uri: 'http://example.org' }],
@@ -748,27 +752,40 @@ describe('groups', function () {
         services: [{}],
         expected: ['__world__', 'abc123', 'def456'],
       },
-    ].forEach(({ description, services, expected }) => {
-      it(description, () => {
-        fakeSettings.services = services;
-        const svc = service();
+      {
+        description: 'does not show any groups if the groups promise rejects',
+        services: [
+          { groups: Promise.reject(new Error('something went wrong')) },
+        ],
+        toastMessageError: 'something went wrong',
+        expected: [],
+      },
+    ].forEach(
+      ({ description, services, expected, toastMessageError = null }) => {
+        it(description, () => {
+          fakeSettings.services = services;
+          const svc = service();
 
-        // Create groups response from server.
-        const groups = [
-          { name: 'Public', id: '__world__' },
-          { name: 'ABC', id: 'abc123', groupid: 'group:42@example.com' },
-          { name: 'DEF', id: 'def456', groupid: null },
-        ];
+          // Create groups response from server.
+          const groups = [
+            { name: 'Public', id: '__world__' },
+            { name: 'ABC', id: 'abc123', groupid: 'group:42@example.com' },
+            { name: 'DEF', id: 'def456', groupid: null },
+          ];
 
-        fakeApi.groups.list.returns(Promise.resolve(groups));
-        fakeApi.profile.groups.read.returns(Promise.resolve([]));
+          fakeApi.groups.list.returns(Promise.resolve(groups));
+          fakeApi.profile.groups.read.returns(Promise.resolve([]));
 
-        return svc.load().then(groups => {
-          let displayedGroups = groups.map(g => g.id);
-          assert.deepEqual(displayedGroups, expected);
+          return svc.load().then(groups => {
+            let displayedGroups = groups.map(g => g.id);
+            assert.deepEqual(displayedGroups, expected);
+            if (toastMessageError) {
+              assert.calledWith(fakeToastMessenger.error, toastMessageError);
+            }
+          });
         });
-      });
-    });
+      }
+    );
   });
 
   describe('#get', function () {

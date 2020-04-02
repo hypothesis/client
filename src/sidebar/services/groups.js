@@ -111,8 +111,7 @@ export default function groups(
     // If a service group doesn't exist in the list of groups don't return it.
     if (svc && svc.groups) {
       try {
-        // The groups may not be available if they are being fetched via RPC.
-        // See mutateAsyncGroups in fetch-config.js
+        // The groups may not be immediately available if they are being fetched via RPC.
         const focusedGroups = await svc.groups;
         const filteredGroups = groups.filter(
           g => focusedGroups.includes(g.id) || focusedGroups.includes(g.groupid)
@@ -120,6 +119,8 @@ export default function groups(
         return filteredGroups;
       } catch (e) {
         toastMessenger.error(e.message);
+        // Don't show any groups if we catch an error
+        return [];
       }
     }
 
