@@ -3,12 +3,7 @@
 .annotation-body {
   @include var.font-normal;
   color: var.$grey-7;
-  // Margin between top of ascent of annotation body and
-  // bottom of ascent of annotation-quote should be ~15px.
-  margin-top: var.$layout-h-margin - 5px;
-  margin-bottom: var.$layout-h-margin;
-  margin-right: 0px;
-  margin-left: 0px;
+  margin: 1em 0;
 }
 
 .annotation-body__text {
@@ -38,12 +33,12 @@
 }
 
 .annotation-body__collapse-toggle {
-  // Negative top margin to bring this up tight under `.annotation-body`
-  margin-top: -(var.$layout-h-margin - 5px);
+  margin: 0.5em 0;
   display: flex;
   justify-content: flex-end;
 
   .annotation-body__collapse-toggle-button {
+    padding: 0.5em;
     background-color: transparent;
   }
 }

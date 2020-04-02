@@ -1,12 +1,7 @@
 @use '../../variables' as var;
 
 .annotation-quote {
-  // Margin between top of ascent of annotation quote and
-  // bottom of ascent of username should be ~15px
-  margin-top: var.$layout-h-margin - 5px;
-  // Margin between bottom of ascent of annotation quote and
-  // top of ascent of annotation-body should be ~15px
-  margin-bottom: var.$layout-h-margin - 3px;
+  margin: 1em 0;
 }
 
 .annotation-quote.is-orphan {

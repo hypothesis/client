@@ -15,8 +15,6 @@ import AnnotationLicense from './annotation-license';
 import AnnotationPublishControl from './annotation-publish-control';
 import AnnotationQuote from './annotation-quote';
 import Button from './button';
-import TagEditor from './tag-editor';
-import TagList from './tag-list';
 
 /**
  * A single annotation.
@@ -52,7 +50,7 @@ function Annotation({
   const toggleAction = threadIsCollapsed ? 'Show replies' : 'Hide replies';
   const toggleText = `${toggleAction} (${replyCount})`;
 
-  const shouldShowActions = !isSaving && !isEditing && !isCollapsedReply;
+  const shouldShowActions = !isSaving && !isEditing;
   const shouldShowLicense = isEditing && !isPrivate && group.type !== 'private';
   const shouldShowReplyToggle = replyCount > 0 && !isReply(annotation);
 
@@ -108,42 +106,52 @@ function Annotation({
         showDocumentInfo={showDocumentInfo}
         threadIsCollapsed={threadIsCollapsed}
       />
+
       {hasQuote && <AnnotationQuote annotation={annotation} />}
-      <AnnotationBody
-        annotation={annotation}
-        isEditing={isEditing}
-        onEditText={onEditText}
-        text={text}
-      />
-      {isEditing && <TagEditor onEditTags={onEditTags} tagList={tags} />}
-      {!isEditing && <TagList annotation={annotation} tags={tags} />}
-      <footer className="annotation__footer">
-        {isEditing && (
-          <div className="annotation__form-actions">
-            <AnnotationPublishControl
-              annotation={annotation}
-              isDisabled={isEmpty}
-              onSave={onSave}
-            />
-          </div>
-        )}
-        {shouldShowLicense && <AnnotationLicense />}
-        <div className="annotation__controls">
-          {shouldShowReplyToggle && (
-            <Button
-              className="annotation__reply-toggle"
-              onClick={onToggleReplies}
-              buttonText={toggleText}
-            />
-          )}
-          {isSaving && <div className="annotation__actions">Saving...</div>}
-          {shouldShowActions && (
-            <div className="annotation__actions">
-              <AnnotationActionBar annotation={annotation} onReply={onReply} />
+
+      {!isCollapsedReply && (
+        <AnnotationBody
+          annotation={annotation}
+          isEditing={isEditing}
+          onEditTags={onEditTags}
+          onEditText={onEditText}
+          tags={tags}
+          text={text}
+        />
+      )}
+
+      {!isCollapsedReply && (
+        <footer className="annotation__footer">
+          {isEditing && (
+            <div className="annotation__form-actions">
+              <AnnotationPublishControl
+                annotation={annotation}
+                isDisabled={isEmpty}
+                onSave={onSave}
+              />
             </div>
           )}
-        </div>
-      </footer>
+          {shouldShowLicense && <AnnotationLicense />}
+          <div className="annotation__controls">
+            {shouldShowReplyToggle && (
+              <Button
+                className="annotation__reply-toggle"
+                onClick={onToggleReplies}
+                buttonText={toggleText}
+              />
+            )}
+            {isSaving && <div className="annotation__actions">Saving...</div>}
+            {shouldShowActions && (
+              <div className="annotation__actions">
+                <AnnotationActionBar
+                  annotation={annotation}
+                  onReply={onReply}
+                />
+              </div>
+            )}
+          </div>
+        </footer>
+      )}
     </article>
   );
 }
