@@ -92,8 +92,8 @@ function Annotation({
   const onToggleReplies = () => setCollapsed(annotation.id, !threadIsCollapsed);
 
   return (
-    /* eslint-disable-next-line jsx-a11y/no-static-element-interactions */
-    <div
+    /* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */
+    <article
       className={classnames('annotation', {
         'annotation--reply': isReply(annotation),
         'is-collapsed': threadIsCollapsed,
@@ -144,7 +144,7 @@ function Annotation({
           )}
         </div>
       </footer>
-    </div>
+    </article>
   );
 }
 
