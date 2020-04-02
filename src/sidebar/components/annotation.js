@@ -22,7 +22,6 @@ import Button from './button';
 function Annotation({
   annotation,
   annotationsService,
-  onReplyCountClick,
   replyCount,
   showDocumentInfo,
   threadIsCollapsed,
@@ -101,7 +100,6 @@ function Annotation({
       <AnnotationHeader
         annotation={annotation}
         isEditing={isEditing}
-        onReplyCountClick={onReplyCountClick}
         replyCount={replyCount}
         showDocumentInfo={showDocumentInfo}
         threadIsCollapsed={threadIsCollapsed}
@@ -159,8 +157,6 @@ function Annotation({
 Annotation.propTypes = {
   annotation: propTypes.object.isRequired,
 
-  /** Callback for reply-count clicks */
-  onReplyCountClick: propTypes.func.isRequired,
   /** Number of replies to this annotation (thread) */
   replyCount: propTypes.number.isRequired,
   /** Should extended document info be rendered (e.g. in non-sidebar contexts)? */

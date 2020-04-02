@@ -66,7 +66,6 @@ function Thread({ showDocumentInfo = false, thread, threadsService }) {
             <Annotation
               annotation={thread.annotation}
               replyCount={thread.replyCount}
-              onReplyCountClick={onToggleReplies}
               showDocumentInfo={showDocumentInfo}
               threadIsCollapsed={thread.collapsed}
             />

@@ -12,8 +12,6 @@ import Annotation from '../annotation';
 import { $imports } from '../annotation';
 
 describe('Annotation', () => {
-  let fakeOnReplyCountClick;
-
   // Dependency Mocks
   let fakeMetadata;
   let fakePermissions;
@@ -38,7 +36,6 @@ describe('Annotation', () => {
         annotation={fixtures.defaultAnnotation()}
         annotationsService={fakeAnnotationsService}
         toastMessenger={fakeToastMessenger}
-        onReplyCountClick={fakeOnReplyCountClick}
         replyCount={0}
         showDocumentInfo={false}
         threadIsCollapsed={true}
@@ -48,8 +45,6 @@ describe('Annotation', () => {
   };
 
   beforeEach(() => {
-    fakeOnReplyCountClick = sinon.stub();
-
     fakeAnnotationsService = {
       reply: sinon.stub(),
       save: sinon.stub().resolves(),
