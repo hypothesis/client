@@ -75,14 +75,12 @@ describe('Streamer', function () {
   let fakeStore;
   let fakeAuth;
   let fakeGroups;
-  let fakeRootScope;
   let fakeSession;
   let fakeSettings;
   let activeStreamer;
 
   function createDefaultStreamer() {
     activeStreamer = new Streamer(
-      fakeRootScope,
       fakeAnnotationMapper,
       fakeStore,
       fakeAuth,
@@ -93,21 +91,9 @@ describe('Streamer', function () {
   }
 
   beforeEach(function () {
-    const emitter = new EventEmitter();
-
     fakeAuth = {
       tokenGetter: function () {
         return Promise.resolve('dummy-access-token');
-      },
-    };
-
-    fakeRootScope = {
-      $apply: function (callback) {
-        callback();
-      },
-      $on: emitter.on.bind(emitter),
-      $broadcast: function (event, data) {
-        emitter.emit(event, { event: event }, data);
       },
     };
 

@@ -9,9 +9,6 @@ import Socket from '../websocket';
  * Only one websocket connection may exist at a time, any existing socket is
  * closed.
  *
- * @param $rootScope - Scope used to $apply() app state changes
- *                     resulting from WebSocket messages, in order to update
- *                     appropriate watchers.
  * @param annotationMapper - The local annotation store
  * @param groups - The local groups store
  * @param session - Provides access to read and update the session state
@@ -19,7 +16,6 @@ import Socket from '../websocket';
  */
 // @ngInject
 export default function Streamer(
-  $rootScope,
   annotationMapper,
   store,
   auth,
@@ -81,32 +77,27 @@ export default function Streamer(
   }
 
   function handleSocketOnMessage(event) {
-    // Wrap message dispatches in $rootScope.$apply() so that
-    // scope watches on app state affected by the received message
-    // are updated
-    $rootScope.$apply(function () {
-      const message = JSON.parse(event.data);
-      if (!message) {
-        return;
-      }
+    const message = JSON.parse(event.data);
+    if (!message) {
+      return;
+    }
 
-      if (message.type === 'annotation-notification') {
-        handleAnnotationNotification(message);
-      } else if (message.type === 'session-change') {
-        handleSessionChangeNotification(message);
-      } else if (message.type === 'whoyouare') {
-        const userid = store.getState().session.userid;
-        if (message.userid !== userid) {
-          console.warn(
-            'WebSocket user ID "%s" does not match logged-in ID "%s"',
-            message.userid,
-            userid
-          );
-        }
-      } else {
-        warnOnce('received unsupported notification', message.type);
+    if (message.type === 'annotation-notification') {
+      handleAnnotationNotification(message);
+    } else if (message.type === 'session-change') {
+      handleSessionChangeNotification(message);
+    } else if (message.type === 'whoyouare') {
+      const userid = store.getState().session.userid;
+      if (message.userid !== userid) {
+        console.warn(
+          'WebSocket user ID "%s" does not match logged-in ID "%s"',
+          message.userid,
+          userid
+        );
       }
-    });
+    } else {
+      warnOnce('received unsupported notification', message.type);
+    }
   }
 
   function sendClientConfig() {
