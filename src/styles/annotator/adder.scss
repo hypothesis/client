@@ -1,3 +1,4 @@
+@use '../mixins/focus' as focus;
 @use '../variables' as var;
 
 $adder-transition-duration: 80ms;
@@ -98,6 +99,8 @@ $adder-transition-duration: 80ms;
 }
 
 .annotator-adder-actions__button {
+  @include focus.outline-on-keyboard-focus;
+
   box-shadow: none;
   font-family: h;
   font-size: 18px;
