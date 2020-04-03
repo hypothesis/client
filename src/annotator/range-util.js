@@ -133,6 +133,9 @@ export function selectionFocusRect(selection) {
 /**
  * Retrieve a set of items associated with nodes in a given range.
  *
+ * An `item` can be any data that the caller wishes to compute from or associate
+ * with a node. Only unique items, as determined by `Object.is`, are returned.
+ *
  * @template T
  * @param {Range} range
  * @param {(n: Node) => T} itemForNode - Callback returning the item for a given node
