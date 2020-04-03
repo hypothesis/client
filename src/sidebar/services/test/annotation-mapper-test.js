@@ -1,13 +1,11 @@
 import { Injector } from '../../../shared/injector';
 import events from '../../events';
-import storeFactory from '../../store';
 import annotationMapperFactory from '../annotation-mapper';
-import immutable from '../../util/immutable';
 
 describe('annotationMapper', function () {
   let $rootScope;
-  let store;
   let fakeApi;
+  let fakeStore;
   let annotationMapper;
 
   beforeEach(function () {
@@ -19,31 +17,31 @@ describe('annotationMapper', function () {
     };
 
     $rootScope = {
-      // nb. `$applyAsync` is needed because this test uses the real `store`
-      // service.
-      $applyAsync: sinon.stub().yields(),
       $broadcast: sinon.stub(),
+    };
+
+    fakeStore = {
+      addAnnotations: sinon.stub(),
+      removeAnnotations: sinon.stub(),
     };
 
     const injector = new Injector()
       .register('$rootScope', { value: $rootScope })
       .register('api', { value: fakeApi })
       .register('settings', { value: {} })
-      .register('store', storeFactory)
+      .register('store', { value: fakeStore })
       .register('annotationMapper', annotationMapperFactory);
-    store = injector.get('store');
     annotationMapper = injector.get('annotationMapper');
   });
 
   describe('#loadAnnotations', function () {
     it('adds annotations and replies to the store', () => {
-      store.addAnnotations = sinon.stub();
       const annotations = [{ id: 1 }, { id: 2 }, { id: 3 }];
       const replies = [{ id: 4 }];
 
       annotationMapper.loadAnnotations(annotations, replies);
 
-      assert.calledWith(store.addAnnotations, [...annotations, ...replies]);
+      assert.calledWith(fakeStore.addAnnotations, [...annotations, ...replies]);
     });
   });
 
@@ -75,10 +73,6 @@ describe('annotationMapper', function () {
   });
 
   describe('#deleteAnnotation', function () {
-    beforeEach(() => {
-      store.removeAnnotations = sinon.stub();
-    });
-
     it('deletes the annotation on the server', function () {
       const ann = { id: 'test-id' };
       annotationMapper.deleteAnnotation(ann);
@@ -88,14 +82,14 @@ describe('annotationMapper', function () {
     it('removes the annotation from the store on success', async () => {
       const ann = {};
       await annotationMapper.deleteAnnotation(ann);
-      assert.calledWith(store.removeAnnotations, [ann]);
+      assert.calledWith(fakeStore.removeAnnotations, [ann]);
     });
 
     it('does not remove the annotation from the store on error', () => {
       fakeApi.annotation.delete.returns(Promise.reject());
       const ann = { id: 'test-id' };
       return annotationMapper.deleteAnnotation(ann).catch(function () {
-        assert.notCalled(store.removeAnnotations);
+        assert.notCalled(fakeStore.removeAnnotations);
       });
     });
   });
