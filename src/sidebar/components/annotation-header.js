@@ -1,6 +1,7 @@
 import { createElement } from 'preact';
 import propTypes from 'prop-types';
 
+import useStore from '../store/use-store';
 import { isHighlight, isReply } from '../util/annotation-metadata';
 import { isPrivate } from '../util/permissions';
 
@@ -19,12 +20,13 @@ import Timestamp from './timestamp';
 export default function AnnotationHeader({
   annotation,
   isEditing,
-  onReplyCountClick,
   replyCount,
   showDocumentInfo,
   threadIsCollapsed,
 }) {
   const isCollapsedReply = isReply(annotation) && threadIsCollapsed;
+  const setCollapsed = useStore(store => store.setCollapsed);
+
   const annotationIsPrivate = isPrivate(
     annotation.permissions,
     annotation.user
@@ -34,13 +36,15 @@ export default function AnnotationHeader({
   // NB: `created` and `updated` are strings, not `Date`s
   const hasBeenEdited =
     annotation.updated && annotation.created !== annotation.updated;
-  const showTimestamp = !isEditing;
+  const showTimestamp = !isEditing && annotation.created;
   const showEditedTimestamp = hasBeenEdited && !isCollapsedReply;
 
   const replyPluralized = replyCount > 1 ? 'replies' : 'reply';
   const replyButtonText = `${replyCount} ${replyPluralized}`;
   const showReplyButton = replyCount > 0 && isCollapsedReply;
   const showExtendedInfo = !isReply(annotation);
+
+  const onReplyCountClick = () => setCollapsed(annotation.id, false);
 
   return (
     <header className="annotation-header">
@@ -112,8 +116,6 @@ AnnotationHeader.propTypes = {
   annotation: propTypes.object.isRequired,
   /* Whether the annotation is actively being edited */
   isEditing: propTypes.bool,
-  /* Callback for when the toggle-replies element is clicked */
-  onReplyCountClick: propTypes.func.isRequired,
   /* How many replies this annotation currently has */
   replyCount: propTypes.number,
   /**

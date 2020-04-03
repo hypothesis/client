@@ -12,13 +12,13 @@ describe('AnnotationHeader', () => {
   let fakeIsHighlight;
   let fakeIsReply;
   let fakeIsPrivate;
+  let fakeStore;
 
   const createAnnotationHeader = props => {
     return mount(
       <AnnotationHeader
         annotation={fixtures.defaultAnnotation()}
         isEditing={false}
-        onReplyCountClick={sinon.stub()}
         replyCount={0}
         showDocumentInfo={false}
         threadIsCollapsed={false}
@@ -32,8 +32,13 @@ describe('AnnotationHeader', () => {
     fakeIsReply = sinon.stub().returns(false);
     fakeIsPrivate = sinon.stub();
 
+    fakeStore = {
+      setCollapsed: sinon.stub(),
+    };
+
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
+      '../store/use-store': callback => callback(fakeStore),
       '../util/annotation-metadata': {
         isHighlight: fakeIsHighlight,
         isReply: fakeIsReply,
@@ -70,17 +75,30 @@ describe('AnnotationHeader', () => {
       wrapper.find('Button').filter('.annotation-header__reply-toggle');
 
     it('should render if annotation is a collapsed reply and there are replies to show', () => {
-      let fakeCallback = sinon.stub();
       fakeIsReply.returns(true);
       const wrapper = createAnnotationHeader({
-        onReplyCountClick: fakeCallback,
         replyCount: 1,
         threadIsCollapsed: true,
       });
 
       const btn = findReplyButton(wrapper);
       assert.isTrue(btn.exists());
-      assert.equal(btn.props().onClick, fakeCallback);
+    });
+
+    it('should expand replies when clicked', () => {
+      fakeIsReply.returns(true);
+      const fakeAnnotation = fixtures.defaultAnnotation();
+      const wrapper = createAnnotationHeader({
+        annotation: fakeAnnotation,
+        replyCount: 1,
+        threadIsCollapsed: true,
+      });
+
+      const btn = findReplyButton(wrapper);
+      btn.props().onClick();
+
+      assert.calledOnce(fakeStore.setCollapsed);
+      assert.calledWith(fakeStore.setCollapsed, fakeAnnotation.id, false);
     });
 
     it('should not render if there are no replies to show', () => {
