@@ -36,6 +36,7 @@ describe('Adder', () => {
     adderCallbacks = {
       onAnnotate: sinon.stub(),
       onHighlight: sinon.stub(),
+      onShowAnnotations: sinon.stub(),
     };
     adderEl = document.createElement('div');
     document.body.appendChild(adderEl);
@@ -84,20 +85,55 @@ describe('Adder', () => {
   });
 
   describe('button handling', () => {
+    const getButton = label =>
+      getContent(adderCtrl).querySelector(`button[title^="${label}"]`);
+
+    const triggerShortcut = key =>
+      document.body.dispatchEvent(new KeyboardEvent('keydown', { key }));
+
+    const showAdder = () => {
+      // nb. `act` is necessary here to flush effect hooks in `AdderToolbar`
+      // which setup shortcut handlers.
+      act(() => {
+        adderCtrl.showAt(0, 0, ARROW_POINTING_UP);
+      });
+    };
+
     it('calls onHighlight callback when Highlight button is clicked', () => {
-      const highlightBtn = getContent(adderCtrl).querySelector(
-        'button[title^="Highlight"]'
-      );
+      const highlightBtn = getButton('Highlight');
       highlightBtn.dispatchEvent(new Event('click'));
       assert.called(adderCallbacks.onHighlight);
     });
 
     it('calls onAnnotate callback when Annotate button is clicked', () => {
-      const annotateBtn = getContent(adderCtrl).querySelector(
-        'button[title^="Annotate"]'
-      );
+      const annotateBtn = getButton('Annotate');
       annotateBtn.dispatchEvent(new Event('click'));
       assert.called(adderCallbacks.onAnnotate);
+    });
+
+    it('does not show "Show" button if the selection has no annotations', () => {
+      showAdder();
+      assert.isNull(getButton('Show'));
+    });
+
+    it('shows the "Show" button if the selection has annotations', () => {
+      adderCtrl.annotationsForSelection = ['ann1', 'ann2'];
+      showAdder();
+
+      const showBtn = getButton('Show');
+      assert.ok(showBtn, '"Show" button not visible');
+      assert.equal(showBtn.querySelector('span').textContent, '2');
+    });
+
+    it('calls onShowAnnotations callback when Show button is clicked', () => {
+      adderCtrl.annotationsForSelection = ['ann1'];
+      showAdder();
+      const showBtn = getButton('Show');
+
+      showBtn.click();
+
+      assert.called(adderCallbacks.onShowAnnotations);
+      assert.calledWith(adderCallbacks.onShowAnnotations, ['ann1']);
     });
 
     it("calls onAnnotate callback when Annotate button's label is clicked", () => {
@@ -109,28 +145,32 @@ describe('Adder', () => {
     });
 
     it('calls onAnnotate callback when shortcut is pressed if adder is visible', () => {
-      // nb. `act` is necessary here to flush effect hooks in `AdderToolbar`.
-      act(() => {
-        adderCtrl.showAt(100, 100, ARROW_POINTING_UP);
-      });
-      document.body.dispatchEvent(new KeyboardEvent('keydown', { key: 'a' }));
+      showAdder();
+      triggerShortcut('a');
       assert.called(adderCallbacks.onAnnotate);
     });
 
     it('calls onHighlight callback when shortcut is pressed if adder is visible', () => {
-      // nb. `act` is necessary here to flush effect hooks in `AdderToolbar`.
-      act(() => {
-        adderCtrl.showAt(100, 100, ARROW_POINTING_UP);
-      });
-      document.body.dispatchEvent(new KeyboardEvent('keydown', { key: 'h' }));
+      showAdder();
+      triggerShortcut('h');
       assert.called(adderCallbacks.onHighlight);
     });
 
+    it('calls onShowAnnotations callback when shortcut is pressed if adder is visible', () => {
+      adderCtrl.annotationsForSelection = ['ann1'];
+      showAdder();
+      triggerShortcut('s');
+      assert.called(adderCallbacks.onShowAnnotations);
+    });
+
     it('does not call callbacks when adder is hidden', () => {
-      document.body.dispatchEvent(new KeyboardEvent('keydown', { key: 'a' }));
-      document.body.dispatchEvent(new KeyboardEvent('keydown', { key: 'h' }));
+      triggerShortcut('a');
+      triggerShortcut('h');
+      triggerShortcut('s');
+
       assert.notCalled(adderCallbacks.onAnnotate);
       assert.notCalled(adderCallbacks.onHighlight);
+      assert.notCalled(adderCallbacks.onShowAnnotations);
     });
   });
 

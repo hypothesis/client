@@ -15,12 +15,13 @@ scrollIntoView = sinon.stub()
 class FakeAdder
   instance: null
 
-  constructor: ->
+  constructor: (container, options) ->
     FakeAdder::instance = this
 
     this.hide = sinon.stub()
     this.showAt = sinon.stub()
     this.target = sinon.stub()
+    this.options = options
 
 class FakePlugin extends Plugin
   instance: null
@@ -57,6 +58,7 @@ describe 'Guest', ->
 
     FakeAdder::instance = null
     rangeUtil = {
+      itemsForRange: sinon.stub().returns([])
       isSelectionBackwards: sinon.stub()
       selectionFocusRect: sinon.stub()
     }
@@ -335,6 +337,17 @@ describe 'Guest', ->
         assert.calledWith(guest.plugins.CrossFrame.call, 'hideSidebar')
 
   describe 'when the selection changes', ->
+    container = null
+
+    beforeEach ->
+      container = document.createElement('div')
+      container.innerHTML = 'test text'
+      document.body.appendChild(container)
+      window.getSelection().selectAllChildren(container)
+
+    afterEach ->
+      container.remove()
+
     it 'shows the adder if the selection contains text', ->
       guest = createGuest()
       rangeUtil.selectionFocusRect.returns({left: 0, top: 0, width: 5, height: 5})
@@ -343,6 +356,22 @@ describe 'Guest', ->
       })
       selections.next({})
       assert.called FakeAdder::instance.showAt
+
+    it 'sets the annotations associated with the selection', ->
+      guest = createGuest()
+      ann = {}
+      $(container).data('annotation', ann)
+      rangeUtil.selectionFocusRect.returns({left: 0, top: 0, width: 5, height: 5})
+      FakeAdder::instance.target.returns({
+        left: 0, top: 0, arrowDirection: adder.ARROW_POINTING_UP
+      })
+      rangeUtil.itemsForRange.callsFake((range, callback) ->
+        [callback(range.startContainer)]
+      )
+
+      selections.next({})
+
+      assert.deepEqual FakeAdder::instance.annotationsForSelection, [ann]
 
     it 'hides the adder if the selection does not contain text', ->
       guest = createGuest()
@@ -355,6 +384,17 @@ describe 'Guest', ->
       guest = createGuest()
       selections.next(null)
       assert.called FakeAdder::instance.hide
+
+  describe 'when adder toolbar buttons are clicked', ->
+    # TODO - Add tests for "Annotate" and "Highlight" buttons.
+
+    it 'shows annotations if "Show" is clicked', ->
+      createGuest()
+
+      FakeAdder::instance.options.onShowAnnotations([{ $tag: 'ann1' }]);
+
+      assert.calledWith(fakeCrossFrame.call, 'showSidebar')
+      assert.calledWith(fakeCrossFrame.call, 'showAnnotations', ['ann1'])
 
   describe '#getDocumentInfo()', ->
     guest = null
