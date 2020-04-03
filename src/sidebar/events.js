@@ -25,13 +25,4 @@ export default {
 
   /** Annotations were anchored in a connected document. */
   ANNOTATIONS_SYNCED: 'sync',
-
-  /** An annotation was created on the server and assigned an ID. */
-  ANNOTATION_CREATED: 'annotationCreated',
-
-  /** An annotation has been updated. */
-  ANNOTATION_UPDATED: 'annotationUpdated',
-
-  /** A set of annotations were loaded from the server. */
-  ANNOTATIONS_LOADED: 'annotationsLoaded',
 };

@@ -35,73 +35,15 @@ describe('annotationMapper', function () {
     annotationMapper = injector.get('annotationMapper');
   });
 
-  describe('#loadAnnotations()', function () {
-    it('triggers the annotationLoaded event', function () {
+  describe('#loadAnnotations', function () {
+    it('adds annotations and replies to the store', () => {
+      store.addAnnotations = sinon.stub();
       const annotations = [{ id: 1 }, { id: 2 }, { id: 3 }];
-      annotationMapper.loadAnnotations(annotations);
-      assert.called($rootScope.$broadcast);
-      assert.calledWith($rootScope.$broadcast, events.ANNOTATIONS_LOADED, [
-        { id: 1 },
-        { id: 2 },
-        { id: 3 },
-      ]);
-    });
-
-    it('also includes replies in the annotationLoaded event', function () {
-      const annotations = [{ id: 1 }];
-      const replies = [{ id: 2 }, { id: 3 }];
-      annotationMapper.loadAnnotations(annotations, replies);
-      assert.called($rootScope.$broadcast);
-      assert.calledWith($rootScope.$broadcast, events.ANNOTATIONS_LOADED, [
-        { id: 1 },
-        { id: 2 },
-        { id: 3 },
-      ]);
-    });
-
-    it('triggers the annotationUpdated event for each loaded annotation', function () {
-      const annotations = immutable([{ id: 1 }, { id: 2 }, { id: 3 }]);
-      store.addAnnotations(annotations);
-
-      annotationMapper.loadAnnotations(annotations);
-      assert.called($rootScope.$broadcast);
-      assert.calledWith(
-        $rootScope.$broadcast,
-        events.ANNOTATION_UPDATED,
-        annotations[0]
-      );
-    });
-
-    it('also triggers annotationUpdated for cached replies', function () {
-      const annotations = [{ id: 1 }];
-      const replies = [{ id: 2 }, { id: 3 }, { id: 4 }];
-      store.addAnnotations([{ id: 3 }]);
+      const replies = [{ id: 4 }];
 
       annotationMapper.loadAnnotations(annotations, replies);
-      assert(
-        $rootScope.$broadcast.calledWith(events.ANNOTATION_UPDATED, { id: 3 })
-      );
-    });
 
-    it('replaces the properties on the cached annotation with those from the loaded one', function () {
-      const annotations = [{ id: 1, url: 'http://example.com' }];
-      store.addAnnotations([{ id: 1, $tag: 'tag1' }]);
-
-      annotationMapper.loadAnnotations(annotations);
-      assert.called($rootScope.$broadcast);
-      assert.calledWith($rootScope.$broadcast, events.ANNOTATION_UPDATED, {
-        id: 1,
-        url: 'http://example.com',
-      });
-    });
-
-    it('excludes cached annotations from the annotationLoaded event', function () {
-      const annotations = [{ id: 1, url: 'http://example.com' }];
-      store.addAnnotations([{ id: 1, $tag: 'tag1' }]);
-
-      annotationMapper.loadAnnotations(annotations);
-      assert.called($rootScope.$broadcast);
-      assert.calledWith($rootScope.$broadcast, events.ANNOTATIONS_LOADED, []);
+      assert.calledWith(store.addAnnotations, [...annotations, ...replies]);
     });
   });
 
