@@ -118,11 +118,6 @@ export default function RootThread(
     annotationsService.create(ann);
   });
 
-  // Remove any annotations that are deleted or unloaded
-  $rootScope.$on(events.ANNOTATION_DELETED, function (event, annotation) {
-    store.removeAnnotations([annotation]);
-  });
-
   /**
    * Build the root conversation thread from the given UI state.
    * @return {Thread}

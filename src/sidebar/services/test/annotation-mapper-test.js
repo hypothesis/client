@@ -132,36 +132,29 @@ describe('annotationMapper', function () {
     });
   });
 
-  describe('#deleteAnnotation()', function () {
+  describe('#deleteAnnotation', function () {
+    beforeEach(() => {
+      store.removeAnnotations = sinon.stub();
+    });
+
     it('deletes the annotation on the server', function () {
       const ann = { id: 'test-id' };
       annotationMapper.deleteAnnotation(ann);
       assert.calledWith(fakeApi.annotation.delete, { id: 'test-id' });
     });
 
-    it('triggers the "annotationDeleted" event on success', function (done) {
+    it('removes the annotation from the store on success', async () => {
       const ann = {};
-      annotationMapper
-        .deleteAnnotation(ann)
-        .then(function () {
-          assert.calledWith(
-            $rootScope.$broadcast,
-            events.ANNOTATION_DELETED,
-            ann
-          );
-        })
-        .then(done, done);
+      await annotationMapper.deleteAnnotation(ann);
+      assert.calledWith(store.removeAnnotations, [ann]);
     });
 
-    it('does not emit an event on error', function (done) {
+    it('does not remove the annotation from the store on error', () => {
       fakeApi.annotation.delete.returns(Promise.reject());
       const ann = { id: 'test-id' };
-      annotationMapper
-        .deleteAnnotation(ann)
-        .catch(function () {
-          assert.notCalled($rootScope.$broadcast);
-        })
-        .then(done, done);
+      return annotationMapper.deleteAnnotation(ann).catch(function () {
+        assert.notCalled(store.removeAnnotations);
+      });
     });
   });
 });

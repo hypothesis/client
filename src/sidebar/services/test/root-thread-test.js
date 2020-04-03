@@ -379,18 +379,9 @@ describe('rootThread', function () {
       });
     });
 
-    it('removes annotations when ANNOTATION_DELETED event occurs', function () {
-      $rootScope.$broadcast(events.ANNOTATION_DELETED, annot);
-      assert.calledWith(fakeStore.removeAnnotations, sinon.match([annot]));
-    });
-
     describe('when a new annotation is created', function () {
       let existingNewAnnot;
-      let onDelete;
       beforeEach(function () {
-        onDelete = sinon.stub();
-        $rootScope.$on(events.ANNOTATION_DELETED, onDelete);
-
         existingNewAnnot = { $tag: 'a-new-tag' };
         fakeStore.state.annotations.annotations.push(existingNewAnnot);
       });
@@ -403,7 +394,6 @@ describe('rootThread', function () {
         );
 
         assert.notCalled(fakeStore.removeDraft);
-        assert.notCalled(onDelete);
       });
 
       it('does not remove saved annotations', function () {
@@ -416,7 +406,6 @@ describe('rootThread', function () {
         );
 
         assert.notCalled(fakeStore.removeDraft);
-        assert.notCalled(onDelete);
       });
     });
   });

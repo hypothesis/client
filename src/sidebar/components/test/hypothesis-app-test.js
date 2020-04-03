@@ -79,6 +79,7 @@ describe('sidebar.components.hypothesis-app', function () {
         countDrafts: sandbox.stub().returns(0),
         discardAllDrafts: sandbox.stub(),
         unsavedAnnotations: sandbox.stub().returns([]),
+        removeAnnotations: sandbox.stub(),
       };
 
       fakeAnalytics = {
@@ -382,31 +383,22 @@ describe('sidebar.components.hypothesis-app', function () {
         assert.called(fakeStore.clearGroups);
       });
 
-      it('emits "annotationDeleted" for each unsaved draft annotation', function () {
+      it('removes unsaved annotations', function () {
         fakeStore.unsavedAnnotations = sandbox
           .stub()
           .returns(['draftOne', 'draftTwo', 'draftThree']);
         const ctrl = createController();
-        $rootScope.$emit = sandbox.stub();
 
         ctrl.logout();
 
-        assert($rootScope.$emit.calledThrice);
-        assert.deepEqual($rootScope.$emit.firstCall.args, [
-          'annotationDeleted',
+        assert.calledWith(fakeStore.removeAnnotations, [
           'draftOne',
-        ]);
-        assert.deepEqual($rootScope.$emit.secondCall.args, [
-          'annotationDeleted',
           'draftTwo',
-        ]);
-        assert.deepEqual($rootScope.$emit.thirdCall.args, [
-          'annotationDeleted',
           'draftThree',
         ]);
       });
 
-      it('discards draft annotations', function () {
+      it('discards drafts', function () {
         const ctrl = createController();
 
         ctrl.logout();
@@ -414,7 +406,7 @@ describe('sidebar.components.hypothesis-app', function () {
         assert(fakeStore.discardAllDrafts.calledOnce);
       });
 
-      it('does not emit "annotationDeleted" if the user cancels the prompt', function () {
+      it('does not remove unsaved annotations if the user cancels the prompt', function () {
         const ctrl = createController();
         fakeStore.countDrafts.returns(1);
         $rootScope.$emit = sandbox.stub();
@@ -422,7 +414,7 @@ describe('sidebar.components.hypothesis-app', function () {
 
         ctrl.logout();
 
-        assert($rootScope.$emit.notCalled);
+        assert.notCalled(fakeStore.removeAnnotations);
       });
 
       it('does not discard drafts if the user cancels the prompt', function () {

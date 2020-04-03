@@ -29,9 +29,6 @@ export default {
   /** An annotation was created on the server and assigned an ID. */
   ANNOTATION_CREATED: 'annotationCreated',
 
-  /** An annotation was either deleted or unloaded. */
-  ANNOTATION_DELETED: 'annotationDeleted',
-
   /** An annotation has been updated. */
   ANNOTATION_UPDATED: 'annotationUpdated',
 

@@ -36,7 +36,7 @@ export default function annotationMapper($rootScope, store, api) {
         id: annotation.id,
       })
       .then(function () {
-        $rootScope.$broadcast(events.ANNOTATION_DELETED, annotation);
+        store.removeAnnotations([annotation]);
         return annotation;
       });
   }
