@@ -47,7 +47,6 @@ export default function annotationMapper($rootScope, store, api) {
         id: annot.id,
       })
       .then(function () {
-        $rootScope.$broadcast(events.ANNOTATION_FLAGGED, annot);
         return annot;
       });
   }

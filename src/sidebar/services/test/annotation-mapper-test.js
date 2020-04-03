@@ -112,20 +112,6 @@ describe('annotationMapper', function () {
       assert.calledOnce(fakeApi.annotation.flag);
       assert.calledWith(fakeApi.annotation.flag, { id: ann.id });
     });
-
-    it('emits the "annotationFlagged" event', function (done) {
-      const ann = { id: 'test-id' };
-      annotationMapper
-        .flagAnnotation(ann)
-        .then(function () {
-          assert.calledWith(
-            $rootScope.$broadcast,
-            events.ANNOTATION_FLAGGED,
-            ann
-          );
-        })
-        .then(done, done);
-    });
   });
 
   describe('#createAnnotation()', function () {
