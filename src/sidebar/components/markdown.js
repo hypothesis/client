@@ -8,7 +8,7 @@ const renderMarkdown = require('../render-markdown');
 const scopeTimeout = require('../util/scope-timeout');
 
 // @ngInject
-function MarkdownController($element, $scope) {
+function MarkdownController($element, $scope, groups, session) {
   const input = $element[0].querySelector('.js-markdown-input');
   const output = $element[0].querySelector('.js-markdown-preview');
 
@@ -111,6 +111,11 @@ function MarkdownController($element, $scope) {
     });
   };
 
+  this.canPostToCurrentGroup = function() {
+    const currentGroup = groups.focused().id;
+    return session.state.groups.some(function(group) { return group.id === currentGroup; });
+  };
+
   // Keyboard shortcuts for bold, italic, and link.
   $element.on('keydown', function(e) {
     const shortcuts = {
@@ -147,7 +152,7 @@ function MarkdownController($element, $scope) {
           (event.relatedTarget
                 && event.relatedTarget.id !== 'dropdown-saving-selector'
                 && event.relatedTarget.id !== 'cancel-btn')) {
-          if (self.text) {
+          if (self.text && this.canPostToCurrentGroup()) {
               self.onSave();
           }
       }

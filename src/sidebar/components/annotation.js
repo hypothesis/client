@@ -72,6 +72,10 @@ function AnnotationController(
     let saved;
     const updating = !!annot.id;
 
+    if (!self.canPost()) {
+      return false;
+    }
+
     if (updating) {
       saved = api.annotation.update({ id: annot.id }, annot);
     } else {
@@ -219,6 +223,9 @@ function AnnotationController(
   this.authorize = function(action) {
     if (action === 'reply') {
         return !!session.state.privileges.length;
+    }
+    if ((action === 'delete' || action === 'update') && !this.canPostToCurrentGroup()) {
+      return false;
     }
     const belongsToUser = permissions.permits(
       self.annotation.permissions,
