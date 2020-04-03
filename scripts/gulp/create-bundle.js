@@ -87,11 +87,19 @@ module.exports = function createBundle(config, buildOpts) {
     // modules provide the implementations of these.
     builtins: ['console', '_process', 'querystring'],
     externalRequireName,
+
+    // Map of global variable names to functions returning _source code_ for
+    // the values of those globals.
     insertGlobalVars: {
+      // Workaround for Hammer.JS on pages that use RequireJS. Hammer doesn't
+      // set `module.exports` if a global variable called `define` exists.
+      define: () => 'undefined',
+
       // The Browserify polyfill for the `Buffer` global is large and
       // unnecessary, but can get pulled into the bundle by modules that can
       // optionally use it if present.
       Buffer: undefined,
+
       // Override the default stub for the `global` var which defaults to
       // the `global`, `self` and `window` globals in that order.
       //
