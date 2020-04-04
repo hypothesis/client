@@ -18,7 +18,7 @@ describe('AnnotationActionBar', () => {
   let fakeUserProfile;
 
   // Fake services
-  let fakeAnnotationMapper;
+  let fakeAnnotationsService;
   let fakeToastMessenger;
   let fakePermits;
   let fakeSettings;
@@ -30,7 +30,7 @@ describe('AnnotationActionBar', () => {
     return mount(
       <AnnotationActionBar
         annotation={fakeAnnotation}
-        annotationMapper={fakeAnnotationMapper}
+        annotationsService={fakeAnnotationsService}
         toastMessenger={fakeToastMessenger}
         onReply={fakeOnReply}
         settings={fakeSettings}
@@ -62,9 +62,9 @@ describe('AnnotationActionBar', () => {
       userid: 'account:foo@bar.com',
     };
 
-    fakeAnnotationMapper = {
-      deleteAnnotation: sinon.stub().resolves(),
-      flagAnnotation: sinon.stub().resolves(),
+    fakeAnnotationsService = {
+      delete: sinon.stub().resolves(),
+      flag: sinon.stub().resolves(),
     };
 
     fakeToastMessenger = {
@@ -84,7 +84,6 @@ describe('AnnotationActionBar', () => {
       isLoggedIn: sinon.stub(),
       openSidebarPanel: sinon.stub(),
       profile: sinon.stub().returns(fakeUserProfile),
-      updateFlagStatus: sinon.stub(),
     };
 
     $imports.$mock(mockImportedComponents());
@@ -154,7 +153,7 @@ describe('AnnotationActionBar', () => {
       });
 
       assert.calledOnce(confirm);
-      assert.notCalled(fakeAnnotationMapper.deleteAnnotation);
+      assert.notCalled(fakeAnnotationsService.delete);
     });
 
     it('invokes delete on service when confirmed', () => {
@@ -166,13 +165,13 @@ describe('AnnotationActionBar', () => {
         button.props().onClick();
       });
 
-      assert.calledWith(fakeAnnotationMapper.deleteAnnotation, fakeAnnotation);
+      assert.calledWith(fakeAnnotationsService.delete, fakeAnnotation);
     });
 
     it('sets a flash message if there is an error with deletion', async () => {
       allowOnly('delete');
       window.confirm.returns(true);
-      fakeAnnotationMapper.deleteAnnotation.rejects();
+      fakeAnnotationsService.delete.rejects();
 
       const button = getButton(createComponent(), 'trash');
       act(() => {
@@ -264,7 +263,7 @@ describe('AnnotationActionBar', () => {
       });
 
       assert.calledOnce(fakeToastMessenger.error);
-      assert.notCalled(fakeAnnotationMapper.flagAnnotation);
+      assert.notCalled(fakeAnnotationsService.flag);
     });
 
     it('invokes flag on service when clicked', () => {
@@ -276,26 +275,12 @@ describe('AnnotationActionBar', () => {
         button.props().onClick();
       });
 
-      assert.calledWith(fakeAnnotationMapper.flagAnnotation, fakeAnnotation);
-    });
-
-    it('updates flag state in store after flagging on service is successful', async () => {
-      window.confirm.returns(true);
-      fakeAnnotationMapper.flagAnnotation.resolves(fakeAnnotation);
-
-      const button = getButton(createComponent(), 'flag');
-
-      act(() => {
-        button.props().onClick();
-      });
-
-      await fakeAnnotation;
-      assert.calledWith(fakeStore.updateFlagStatus, fakeAnnotation.id, true);
+      assert.calledWith(fakeAnnotationsService.flag, fakeAnnotation);
     });
 
     it('sets flash error message if flagging fails on service', async () => {
       window.confirm.returns(true);
-      fakeAnnotationMapper.flagAnnotation.rejects();
+      fakeAnnotationsService.flag.rejects();
 
       const button = getButton(createComponent(), 'flag');
 
@@ -304,7 +289,6 @@ describe('AnnotationActionBar', () => {
       });
 
       await waitFor(() => fakeToastMessenger.error.called);
-      assert.notCalled(fakeStore.updateFlagStatus);
     });
 
     it('does not show flag action button if user is author', () => {

@@ -16,7 +16,7 @@ import Button from './button';
  */
 function AnnotationActionBar({
   annotation,
-  annotationMapper,
+  annotationsService,
   onReply,
   settings,
   toastMessenger,
@@ -40,15 +40,10 @@ function AnnotationActionBar({
   const showShareAction = isShareable(annotation, settings);
 
   const createDraft = useStore(store => store.createDraft);
-  const updateFlagFn = useStore(store => store.updateFlagStatus);
-
-  const updateFlag = () => {
-    updateFlagFn(annotation.id, true);
-  };
 
   const onDelete = () => {
     if (window.confirm('Are you sure you want to delete this annotation?')) {
-      annotationMapper.deleteAnnotation(annotation).catch(err => {
+      annotationsService.delete(annotation).catch(err => {
         toastMessenger.error(err.message, 'Deleting annotation failed');
       });
     }
@@ -67,9 +62,8 @@ function AnnotationActionBar({
       toastMessenger.error('You must be logged in to report an annotation');
       return;
     }
-    annotationMapper
-      .flagAnnotation(annotation) // Flag annotation on service
-      .then(updateFlag) // Update app state with flag
+    annotationsService
+      .flag(annotation)
       .catch(() => toastMessenger.error('Flagging annotation failed'));
   };
 
@@ -119,13 +113,13 @@ AnnotationActionBar.propTypes = {
   onReply: propTypes.func.isRequired,
 
   // Injected services
-  annotationMapper: propTypes.object.isRequired,
+  annotationsService: propTypes.object.isRequired,
   settings: propTypes.object.isRequired,
   toastMessenger: propTypes.object.isRequired,
 };
 
 AnnotationActionBar.injectedProps = [
-  'annotationMapper',
+  'annotationsService',
   'settings',
   'toastMessenger',
 ];
