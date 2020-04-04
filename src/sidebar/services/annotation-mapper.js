@@ -4,18 +4,13 @@ import events from '../events';
 // updating the store afterwards. This is being removed.
 //
 // @ngInject
-export default function annotationMapper($rootScope, store) {
-  function loadAnnotations(annotations, replies = []) {
-    store.addAnnotations([...annotations, ...replies]);
-  }
-
+export default function annotationMapper($rootScope) {
   function createAnnotation(annotation) {
     $rootScope.$broadcast(events.BEFORE_ANNOTATION_CREATED, annotation);
     return annotation;
   }
 
   return {
-    loadAnnotations: loadAnnotations,
     createAnnotation: createAnnotation,
   };
 }

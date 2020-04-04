@@ -30,8 +30,7 @@ function AnnotationViewerContentController(
   api,
   rootThread,
   streamer,
-  streamFilter,
-  annotationMapper
+  streamFilter
 ) {
   store.clearAnnotations();
 
@@ -44,7 +43,7 @@ function AnnotationViewerContentController(
   };
 
   this.ready = fetchThread(api, annotationId).then(function (annots) {
-    annotationMapper.loadAnnotations(annots);
+    store.addAnnotations(annots);
 
     const topLevelAnnot = annots.filter(function (annot) {
       return (annot.references || []).length === 0;

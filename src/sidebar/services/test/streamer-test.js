@@ -71,7 +71,6 @@ class FakeSocket extends EventEmitter {
 }
 
 describe('Streamer', function () {
-  let fakeAnnotationMapper;
   let fakeStore;
   let fakeAuth;
   let fakeGroups;
@@ -81,7 +80,6 @@ describe('Streamer', function () {
 
   function createDefaultStreamer() {
     activeStreamer = new Streamer(
-      fakeAnnotationMapper,
       fakeStore,
       fakeAuth,
       fakeGroups,
@@ -97,11 +95,8 @@ describe('Streamer', function () {
       },
     };
 
-    fakeAnnotationMapper = {
-      loadAnnotations: sinon.stub(),
-    };
-
     fakeStore = {
+      addAnnotations: sinon.stub(),
       annotationExists: sinon.stub().returns(false),
       clearPendingUpdates: sinon.stub(),
       getState: sinon.stub().returns({
@@ -276,7 +271,7 @@ describe('Streamer', function () {
           updatedAnnotations: [ann],
         });
         assert.calledWith(
-          fakeAnnotationMapper.loadAnnotations,
+          fakeStore.addAnnotations,
           fixtures.createNotification.payload
         );
       });
@@ -305,7 +300,7 @@ describe('Streamer', function () {
 
         fakeWebSocket.notify(fixtures.createNotification);
 
-        assert.notCalled(fakeAnnotationMapper.loadAnnotations);
+        assert.notCalled(fakeStore.addAnnotations);
       });
 
       it('does not apply deletions immediately', function () {
@@ -330,9 +325,7 @@ describe('Streamer', function () {
     it('applies pending updates', function () {
       fakeStore.pendingUpdates.returns({ 'an-id': { id: 'an-id' } });
       activeStreamer.applyPendingUpdates();
-      assert.calledWith(fakeAnnotationMapper.loadAnnotations, [
-        { id: 'an-id' },
-      ]);
+      assert.calledWith(fakeStore.addAnnotations, [{ id: 'an-id' }]);
     });
 
     it('applies pending deletions', function () {

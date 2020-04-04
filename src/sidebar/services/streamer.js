@@ -8,21 +8,9 @@ import Socket from '../websocket';
  * Open a new WebSocket connection to the Hypothesis push notification service.
  * Only one websocket connection may exist at a time, any existing socket is
  * closed.
- *
- * @param annotationMapper - The local annotation store
- * @param groups - The local groups store
- * @param session - Provides access to read and update the session state
- * @param settings - Application settings
  */
 // @ngInject
-export default function Streamer(
-  annotationMapper,
-  store,
-  auth,
-  groups,
-  session,
-  settings
-) {
+export default function Streamer(store, auth, groups, session, settings) {
   // The randomly generated session ID
   const clientId = generateHexString(32);
 
@@ -208,7 +196,7 @@ export default function Streamer(
   function applyPendingUpdates() {
     const updates = Object.values(store.pendingUpdates());
     if (updates.length) {
-      annotationMapper.loadAnnotations(updates);
+      store.addAnnotations(updates);
     }
 
     const deletions = Object.keys(store.pendingDeletions()).map(id => ({ id }));

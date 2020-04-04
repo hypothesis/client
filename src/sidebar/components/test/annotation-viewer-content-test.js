@@ -42,6 +42,7 @@ describe('annotationViewerContent', function () {
   function createController(opts) {
     const locals = {
       store: {
+        addAnnotations: sinon.stub(),
         clearAnnotations: sinon.stub(),
         setCollapsed: sinon.stub(),
         highlightAnnotations: sinon.stub(),
@@ -61,9 +62,6 @@ describe('annotationViewerContent', function () {
           };
         },
         getFilter: function () {},
-      },
-      annotationMapper: {
-        loadAnnotations: sinon.spy(),
       },
     };
 
@@ -85,9 +83,9 @@ describe('annotationViewerContent', function () {
       ]);
       const controller = createController({ api: fakeApi });
       return controller.ctrl.ready.then(function () {
-        assert.calledOnce(controller.annotationMapper.loadAnnotations);
+        assert.calledOnce(controller.store.addAnnotations);
         assert.calledWith(
-          controller.annotationMapper.loadAnnotations,
+          controller.store.addAnnotations,
           sinon.match(fakeApi.annots)
         );
       });
@@ -114,7 +112,7 @@ describe('annotationViewerContent', function () {
       const controller = createController({ api: fakeApi });
       return controller.ctrl.ready.then(function () {
         assert.calledWith(
-          controller.annotationMapper.loadAnnotations,
+          controller.store.addAnnotations,
           sinon.match(fakeApi.annots)
         );
       });
