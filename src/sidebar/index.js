@@ -142,7 +142,6 @@ import threadList from './components/thread-list';
 import bridgeService from '../shared/bridge';
 
 import analyticsService from './services/analytics';
-import annotationMapperService from './services/annotation-mapper';
 import annotationsService from './services/annotations';
 import apiService from './services/api';
 import apiRoutesService from './services/api-routes';
@@ -186,7 +185,6 @@ function startAngularApp(config) {
   // Register services.
   container
     .register('analytics', analyticsService)
-    .register('annotationMapper', annotationMapperService)
     .register('annotationsService', annotationsService)
     .register('api', apiService)
     .register('apiRoutes', apiRoutesService)
@@ -264,7 +262,6 @@ function startAngularApp(config) {
     // Register services, the store and utilities with Angular, so that
     // Angular components can use them.
     .service('analytics', () => container.get('analytics'))
-    .service('annotationMapper', () => container.get('annotationMapper'))
     .service('annotationsService', () => container.get('annotationsService'))
     .service('api', () => container.get('api'))
     .service('auth', () => container.get('auth'))
