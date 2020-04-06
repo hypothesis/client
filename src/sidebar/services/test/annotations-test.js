@@ -36,6 +36,8 @@ describe('annotationsService', () => {
 
     fakeStore = {
       addAnnotations: sinon.stub(),
+      annotationSaveFinished: sinon.stub(),
+      annotationSaveStarted: sinon.stub(),
       createDraft: sinon.stub(),
       deleteNewAndEmptyDrafts: sinon.stub(),
       focusedGroupId: sinon.stub(),
@@ -289,6 +291,8 @@ describe('annotationsService', () => {
       return svc.save(annotation).then(() => {
         assert.calledOnce(fakeApi.annotation.create);
         assert.notCalled(fakeApi.annotation.update);
+        assert.calledOnce(fakeStore.annotationSaveStarted);
+        assert.calledOnce(fakeStore.annotationSaveFinished);
       });
     });
 
@@ -299,6 +303,8 @@ describe('annotationsService', () => {
       return svc.save(annotation).then(() => {
         assert.calledOnce(fakeApi.annotation.update);
         assert.notCalled(fakeApi.annotation.create);
+        assert.calledOnce(fakeStore.annotationSaveStarted);
+        assert.calledOnce(fakeStore.annotationSaveFinished);
       });
     });
 
@@ -367,6 +373,16 @@ describe('annotationsService', () => {
     });
 
     context('error on save', () => {
+      it('removes the active save request from the store', () => {
+        fakeApi.annotation.update.rejects();
+        fakeMetadata.isNew.returns(false);
+
+        return svc.save(fixtures.defaultAnnotation()).catch(() => {
+          assert.notCalled(fakeStore.removeDraft);
+          assert.calledOnce(fakeStore.annotationSaveFinished);
+        });
+      });
+
       it('does not remove the annotation draft', () => {
         fakeApi.annotation.update.rejects();
         fakeMetadata.isNew.returns(false);

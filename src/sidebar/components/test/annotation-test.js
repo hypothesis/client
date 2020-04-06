@@ -69,6 +69,7 @@ describe('Annotation', () => {
       getGroup: sinon.stub().returns({
         type: 'private',
       }),
+      isSavingAnnotation: sinon.stub().returns(false),
       profile: sinon.stub().returns({ userid: 'acct:foo@bar.com' }),
       setCollapsed: sinon.stub(),
     };
@@ -195,13 +196,9 @@ describe('Annotation', () => {
 
       it('should show a "Saving" message when annotation is saving', () => {
         setEditingMode(true);
+        fakeStore.isSavingAnnotation.returns(true);
 
         const wrapper = createComponent();
-        act(() => {
-          wrapper.find('AnnotationPublishControl').props().onSave();
-        });
-
-        wrapper.update();
 
         assert.include(
           wrapper.find('.annotation__actions').text(),

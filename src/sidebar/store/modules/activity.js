@@ -8,6 +8,10 @@ import { actionTypes } from '../util';
 function init() {
   return {
     /**
+     * Annotation `$tag`s that correspond to annotations with active API requests
+     */
+    activeAnnotationSaveRequests: [],
+    /**
      * The number of API requests that have started and not yet completed.
      */
     activeApiRequests: 0,
@@ -39,6 +43,33 @@ const update = {
     };
   },
 
+  ANNOTATION_SAVE_STARTED(state, action) {
+    let addToStarted = [];
+    if (
+      action.annotation.$tag &&
+      !state.activeAnnotationSaveRequests.includes(action.annotation.$tag)
+    ) {
+      addToStarted.push(action.annotation.$tag);
+    }
+    const updatedSaves = state.activeAnnotationSaveRequests.concat(
+      addToStarted
+    );
+    return {
+      ...state,
+      activeAnnotationSaveRequests: updatedSaves,
+    };
+  },
+
+  ANNOTATION_SAVE_FINISHED(state, action) {
+    const updatedSaves = state.activeAnnotationSaveRequests.filter(
+      $tag => $tag !== action.annotation.$tag
+    );
+    return {
+      ...state,
+      activeAnnotationSaveRequests: updatedSaves,
+    };
+  },
+
   ANNOTATION_FETCH_STARTED(state) {
     return {
       ...state,
@@ -62,6 +93,30 @@ const update = {
 
 const actions = actionTypes(update);
 
+/** Action Creators */
+
+function annotationFetchStarted() {
+  return { type: actions.ANNOTATION_FETCH_STARTED };
+}
+
+function annotationFetchFinished() {
+  return { type: actions.ANNOTATION_FETCH_FINISHED };
+}
+
+/**
+ * @param {object} annotation — annotation object with a `$tag` property
+ */
+function annotationSaveStarted(annotation) {
+  return { type: actions.ANNOTATION_SAVE_STARTED, annotation };
+}
+
+/**
+ * @param {object} annotation — annotation object with a `$tag` property
+ */
+function annotationSaveFinished(annotation) {
+  return { type: actions.ANNOTATION_SAVE_FINISHED, annotation };
+}
+
 function apiRequestStarted() {
   return { type: actions.API_REQUEST_STARTED };
 }
@@ -70,12 +125,13 @@ function apiRequestFinished() {
   return { type: actions.API_REQUEST_FINISHED };
 }
 
-function annotationFetchStarted() {
-  return { type: actions.ANNOTATION_FETCH_STARTED };
-}
+/** Selectors */
 
-function annotationFetchFinished() {
-  return { type: actions.ANNOTATION_FETCH_FINISHED };
+/**
+ * Return true when annotations are actively being fetched.
+ */
+function isFetchingAnnotations(state) {
+  return state.activity.activeAnnotationFetches > 0;
 }
 
 /**
@@ -87,10 +143,19 @@ function isLoading(state) {
 }
 
 /**
- * Return true when annotations are actively being fetched.
+ * Return `true` if `$tag` exists in the array of annotation `$tag`s that
+ * have in-flight save requests, i.e. the annotation in question is actively
+ * being saved to a remote service.
+ *
+ * @param {object} state
+ * @param {object} annotation
+ * @return {boolean}
  */
-function isFetchingAnnotations(state) {
-  return state.activity.activeAnnotationFetches > 0;
+function isSavingAnnotation(state, annotation) {
+  if (!annotation.$tag) {
+    return false;
+  }
+  return state.activity.activeAnnotationSaveRequests.includes(annotation.$tag);
 }
 
 export default {
@@ -99,14 +164,17 @@ export default {
   namespace: 'activity',
 
   actions: {
-    apiRequestStarted,
-    apiRequestFinished,
     annotationFetchStarted,
     annotationFetchFinished,
+    annotationSaveStarted,
+    annotationSaveFinished,
+    apiRequestStarted,
+    apiRequestFinished,
   },
 
   selectors: {
     isLoading,
     isFetchingAnnotations,
+    isSavingAnnotation,
   },
 };
