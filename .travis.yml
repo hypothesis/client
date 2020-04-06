@@ -15,5 +15,3 @@ matrix:
         - make lint
     - env: ACTION=test
       node_js: '10'
-      after_success:
-        yarn run report-coverage

@@ -71,7 +71,15 @@ node {
 
     stage('Test') {
         nodeEnv.inside("-e HOME=${workspace}") {
-          sh "make checkformatting lint test"
+            withCredentials([
+                string(credentialsId: 'codecov-token', variable: 'CODECOV_TOKEN')
+            ]) {
+              sh "make checkformatting lint test"
+              sh """
+              export CODECOV_TOKEN=${env.CODECOV_TOKEN}
+              yarn run report-coverage
+              """
+            }
         }
     }
 }
