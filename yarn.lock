@@ -2777,9 +2777,9 @@ dom-seek@^4.0.1:
     index-of "^0.2.0"
 
 dom-seek@^5.0.1:
-  version "5.0.1"
-  resolved "https://registry.yarnpkg.com/dom-seek/-/dom-seek-5.0.1.tgz#08420e087a3d89d3456fa4558eb15cce74cc4f0b"
-  integrity sha512-lYnn9c1LkElXWVXFm/2HOXBtw0UHLsbl/VmOq7xhZL8Dxet0kuDW1SAB96el49RmEe8AUNSb9IB3yuZ2S348iA==
+  version "5.1.1"
+  resolved "https://registry.yarnpkg.com/dom-seek/-/dom-seek-5.1.1.tgz#4e35bee763b6ba082f372345823ec9665d1fbf26"
+  integrity sha512-1strSwd201Gfhfkfsk77SX9xyJGzu12gqUo5Q0W3Njtj2QxcfQTwCDOynZ6npZ4ASUFRQq0asjYDRlFxYPKwTA==
 
 dom-serialize@^2.2.0:
   version "2.2.1"
