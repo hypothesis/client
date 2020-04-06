@@ -10,7 +10,7 @@ class FakeWindow {
   }
 }
 
-describe('sidebar/cross-origin-rcp', function () {
+describe('sidebar/cross-origin-rpc', function () {
   let fakeStore;
   let fakeWarnOnce;
   let fakeWindow;
