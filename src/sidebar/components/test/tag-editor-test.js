@@ -226,47 +226,39 @@ describe('TagEditor', function () {
       assertAddTagsSuccess(wrapper, ['tag1', 'tag2', 'tag3']);
     });
 
-    it('adds a tag from the <input> field via keydown event', () => {
-      const wrapper = createComponent();
-      wrapper.find('input').instance().value = 'tag3';
-      selectOptionViaEnter(wrapper);
-      assertAddTagsSuccess(wrapper, ['tag1', 'tag2', 'tag3']);
-      // ensure focus is still on the input field
-      assert.equal(document.activeElement.nodeName, 'INPUT');
+    [
+      [selectOptionViaEnter, 'Enter'],
+      [selectOptionViaDelimiter, ','],
+      [selectOptionViaTab, 'Tab'],
+    ].forEach(keyAction => {
+      it(`adds a tag from the <input> field when typing "${keyAction[1]}"`, () => {
+        const wrapper = createComponent();
+        wrapper.find('input').instance().value = 'tag3';
+        typeInput(wrapper); // opens suggestion list
+        keyAction[0](wrapper);
+        assertAddTagsSuccess(wrapper, ['tag1', 'tag2', 'tag3']);
+        // ensure focus is still on the input field
+        assert.equal(document.activeElement.nodeName, 'INPUT');
+      });
     });
 
-    it('adds a tag from the <input> field when typing "," delimiter', () => {
-      const wrapper = createComponent();
-      wrapper.find('input').instance().value = 'tag3';
-      selectOptionViaDelimiter(wrapper);
-      assertAddTagsSuccess(wrapper, ['tag1', 'tag2', 'tag3']);
-      // ensure focus is still on the input field
-      assert.equal(document.activeElement.nodeName, 'INPUT');
+    [
+      [selectOptionViaEnter, 'Enter'],
+      [selectOptionViaDelimiter, ','],
+      [selectOptionViaTab, 'Tab'],
+    ].forEach(keyAction => {
+      it(`adds a tag from the suggestions list when typing "${keyAction[1]}"`, () => {
+        const wrapper = createComponent();
+        wrapper.find('input').instance().value = 't';
+        typeInput(wrapper);
+        // suggestions: [tag3, tag4]
+        navigateDown(wrapper);
+        keyAction[0](wrapper);
+        assertAddTagsSuccess(wrapper, ['tag1', 'tag2', 'tag3']);
+        // ensure focus is still on the input field
+        assert.equal(document.activeElement.nodeName, 'INPUT');
+      });
     });
-
-    it('adds a tag when the <input> value is a match for a suggestion and "Tab" is pressed', () => {
-      const wrapper = createComponent();
-      wrapper.find('input').instance().value = 'tag3';
-      typeInput(wrapper);
-      // suggestions: [tag3, tag4]
-      selectOptionViaTab(wrapper);
-      assertAddTagsSuccess(wrapper, ['tag1', 'tag2', 'tag3']);
-      // ensure focus is still on the input field
-      assert.equal(document.activeElement.nodeName, 'INPUT');
-    });
-
-    it('adds a tag from the suggestions list', () => {
-      const wrapper = createComponent();
-      wrapper.find('input').instance().value = 'non-empty';
-      typeInput(wrapper);
-      // suggestions: [tag3, tag4]
-      navigateDown(wrapper);
-      selectOptionViaEnter(wrapper);
-      assertAddTagsSuccess(wrapper, ['tag1', 'tag2', 'tag3']);
-      // ensure focus is still on the input field
-      assert.equal(document.activeElement.nodeName, 'INPUT');
-    });
-
     it('should not add a tag if the <input> is empty', () => {
       const wrapper = createComponent();
       wrapper.find('input').instance().value = '';
@@ -295,8 +287,9 @@ describe('TagEditor', function () {
       assertAddTagsFail();
     });
 
-    it('should not a tag when pressing "Tab" and input typed is not a suggestion', () => {
+    it('should not add a tag when pressing "Tab" and there are no suggestions', () => {
       const wrapper = createComponent();
+      fakeTagsService.filter.returns([]);
       wrapper.find('input').instance().value = 'tag33';
       typeInput(wrapper);
       selectOptionViaTab(wrapper);

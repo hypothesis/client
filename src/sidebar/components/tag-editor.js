@@ -67,7 +67,7 @@ function TagEditor({ onEditTags, tags: tagsService, tagList }) {
       // Remove any repeated suggestions that are already tags
       // and set those to state.
       setSuggestions(removeDuplicates(suggestions, tagList));
-      setSuggestionsListOpen(true);
+      setSuggestionsListOpen(suggestions.length > 0);
     }
     setActiveItem(-1);
   };
@@ -193,13 +193,16 @@ function TagEditor({ onEditTags, tags: tagsService, tagList }) {
         e.preventDefault();
         break;
       case 'Tab':
-        if (activeItem === -1) {
-          // allow tab key to add tag, but only if the <input> value
-          // matches a suggestion from the list
-          if (suggestions.indexOf(inputEl.current.value) > -1) {
-            addTag(inputEl.current.value);
-            e.preventDefault();
-          }
+        if (activeItem !== -1) {
+          // If there is a selected item, then allow `Tab` to behave exactly
+          // like `Enter` or `,`.
+          addTag(suggestions[activeItem]);
+          e.preventDefault();
+        } else if (suggestionsListOpen) {
+          // If there is no selected item, then allow `Tab` to add the first
+          // item in the list if the list is open.
+          addTag(suggestions[0]);
+          e.preventDefault();
         }
     }
   };
