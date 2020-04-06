@@ -37,7 +37,7 @@
     "diff": "^4.0.1",
     "diff-match-patch": "^1.0.0",
     "document-base-uri": "^1.0.0",
-    "dom-anchor-text-position": "^4.0.0",
+    "dom-anchor-text-position": "^5.0.0",
     "dom-anchor-text-quote": "^4.0.2",
     "dom-node-iterator": "^3.5.3",
     "dom-seek": "^5.0.1",
