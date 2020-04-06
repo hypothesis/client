@@ -37,21 +37,33 @@
       @include screen-reader-only;
       content: ' annotation end ';
     }
-  }
 
-  .hypothesis-highlight .hypothesis-highlight {
-    background-color: var.$highlight-color-second;
-  }
+    // Give a highlight inside a larger highlight a different color to stand out.
+    & .hypothesis-highlight {
+      background-color: var.$highlight-color-second;
 
-  .hypothesis-highlight .hypothesis-highlight .hypothesis-highlight {
-    background-color: var.$highlight-color-third;
-  }
-}
+      // In document viewers where the highlight is drawn _on top of_ the text
+      // (eg. PDF.js) too many nested highlights can make the underlying text unreadable.
+      // Therefore we make any highlights that are 3+ levels deep transparent.
+      //
+      // In web pages highlights are drawn _underneath_ the text so nested
+      // highlights don't reduce text contrast as much, but we still only use
+      // two levels of highlight color for consistency.
+      //
+      // See https://github.com/hypothesis/client/issues/1995.
+      & .hypothesis-highlight {
+        background-color: transparent;
+      }
+    }
 
-.hypothesis-highlight.hypothesis-highlight-focused {
-  background-color: var.$highlight-color-focus !important;
+    // When an annotation card is hovered in the sidebar, the corresponding
+    // highlights are shown with a "focused" color.
+    &.hypothesis-highlight-focused {
+      background-color: var.$highlight-color-focus !important;
 
-  .hypothesis-highlight {
-    background-color: transparent !important;
+      .hypothesis-highlight {
+        background-color: transparent !important;
+      }
+    }
   }
 }
