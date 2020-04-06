@@ -1,19 +1,13 @@
 // @ngInject
-function StreamContentController(
-  $scope,
-  annotationMapper,
-  store,
-  api,
-  rootThread,
-  searchFilter
-) {
+function StreamContentController($scope, store, api, rootThread, searchFilter) {
   /** `offset` parameter for the next search API call. */
   let offset = 0;
 
   /** Load annotations fetched from the API into the app. */
   const load = function (result) {
     offset += result.rows.length;
-    annotationMapper.loadAnnotations(result.rows, result.replies);
+    const annots = [...result.rows, ...result.replies];
+    store.addAnnotations(annots);
   };
 
   const currentQuery = () => store.routeParams().q;

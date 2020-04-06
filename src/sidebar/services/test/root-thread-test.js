@@ -366,31 +366,9 @@ describe('rootThread', function () {
       assert.calledWith(fakeAnnotationsService.create, sinon.match(annot));
     });
 
-    [
-      { event: events.ANNOTATION_CREATED, annotations: annot },
-      { event: events.ANNOTATION_UPDATED, annotations: annot },
-      { event: events.ANNOTATIONS_LOADED, annotations: [annot] },
-    ].forEach(testCase => {
-      it(`adds or updates annotations when ${testCase.event} event occurs`, () => {
-        $rootScope.$broadcast(testCase.event, testCase.annotations);
-        const annotations = [].concat(testCase.annotations);
-        assert.notCalled(fakeStore.removeAnnotations);
-        assert.calledWith(fakeStore.addAnnotations, sinon.match(annotations));
-      });
-    });
-
-    it('removes annotations when ANNOTATION_DELETED event occurs', function () {
-      $rootScope.$broadcast(events.ANNOTATION_DELETED, annot);
-      assert.calledWith(fakeStore.removeAnnotations, sinon.match([annot]));
-    });
-
     describe('when a new annotation is created', function () {
       let existingNewAnnot;
-      let onDelete;
       beforeEach(function () {
-        onDelete = sinon.stub();
-        $rootScope.$on(events.ANNOTATION_DELETED, onDelete);
-
         existingNewAnnot = { $tag: 'a-new-tag' };
         fakeStore.state.annotations.annotations.push(existingNewAnnot);
       });
@@ -403,7 +381,6 @@ describe('rootThread', function () {
         );
 
         assert.notCalled(fakeStore.removeDraft);
-        assert.notCalled(onDelete);
       });
 
       it('does not remove saved annotations', function () {
@@ -416,7 +393,6 @@ describe('rootThread', function () {
         );
 
         assert.notCalled(fakeStore.removeDraft);
-        assert.notCalled(onDelete);
       });
     });
   });

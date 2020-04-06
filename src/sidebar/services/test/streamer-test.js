@@ -71,19 +71,15 @@ class FakeSocket extends EventEmitter {
 }
 
 describe('Streamer', function () {
-  let fakeAnnotationMapper;
   let fakeStore;
   let fakeAuth;
   let fakeGroups;
-  let fakeRootScope;
   let fakeSession;
   let fakeSettings;
   let activeStreamer;
 
   function createDefaultStreamer() {
     activeStreamer = new Streamer(
-      fakeRootScope,
-      fakeAnnotationMapper,
       fakeStore,
       fakeAuth,
       fakeGroups,
@@ -93,29 +89,14 @@ describe('Streamer', function () {
   }
 
   beforeEach(function () {
-    const emitter = new EventEmitter();
-
     fakeAuth = {
       tokenGetter: function () {
         return Promise.resolve('dummy-access-token');
       },
     };
 
-    fakeRootScope = {
-      $apply: function (callback) {
-        callback();
-      },
-      $on: emitter.on.bind(emitter),
-      $broadcast: function (event, data) {
-        emitter.emit(event, { event: event }, data);
-      },
-    };
-
-    fakeAnnotationMapper = {
-      loadAnnotations: sinon.stub(),
-    };
-
     fakeStore = {
+      addAnnotations: sinon.stub(),
       annotationExists: sinon.stub().returns(false),
       clearPendingUpdates: sinon.stub(),
       getState: sinon.stub().returns({
@@ -290,7 +271,7 @@ describe('Streamer', function () {
           updatedAnnotations: [ann],
         });
         assert.calledWith(
-          fakeAnnotationMapper.loadAnnotations,
+          fakeStore.addAnnotations,
           fixtures.createNotification.payload
         );
       });
@@ -319,7 +300,7 @@ describe('Streamer', function () {
 
         fakeWebSocket.notify(fixtures.createNotification);
 
-        assert.notCalled(fakeAnnotationMapper.loadAnnotations);
+        assert.notCalled(fakeStore.addAnnotations);
       });
 
       it('does not apply deletions immediately', function () {
@@ -344,9 +325,7 @@ describe('Streamer', function () {
     it('applies pending updates', function () {
       fakeStore.pendingUpdates.returns({ 'an-id': { id: 'an-id' } });
       activeStreamer.applyPendingUpdates();
-      assert.calledWith(fakeAnnotationMapper.loadAnnotations, [
-        { id: 'an-id' },
-      ]);
+      assert.calledWith(fakeStore.addAnnotations, [{ id: 'an-id' }]);
     });
 
     it('applies pending deletions', function () {

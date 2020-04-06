@@ -18,6 +18,8 @@ describe('annotationsService', () => {
     fakeApi = {
       annotation: {
         create: sinon.stub().resolves(fixtures.defaultAnnotation()),
+        delete: sinon.stub().resolves(),
+        flag: sinon.stub().resolves(),
         update: sinon.stub().resolves(fixtures.defaultAnnotation()),
       },
     };
@@ -44,9 +46,11 @@ describe('annotationsService', () => {
       getDefault: sinon.stub(),
       getDraft: sinon.stub().returns(null),
       profile: sinon.stub().returns({}),
+      removeAnnotations: sinon.stub(),
       removeDraft: sinon.stub(),
       selectTab: sinon.stub(),
       setCollapsed: sinon.stub(),
+      updateFlagStatus: sinon.stub(),
     };
 
     $imports.$mock({
@@ -220,6 +224,60 @@ describe('annotationsService', () => {
       assert.calledWith(fakeStore.setCollapsed, 'aparent', false);
       assert.calledWith(fakeStore.setCollapsed, 'anotherparent', false);
       assert.calledWith(fakeStore.setCollapsed, 'yetanotherancestor', false);
+    });
+  });
+
+  describe('delete', () => {
+    it('removes the annotation via the API', async () => {
+      const annot = fixtures.defaultAnnotation();
+      await svc.delete(annot);
+      assert.calledWith(fakeApi.annotation.delete, { id: annot.id });
+    });
+
+    it('removes the annotation from the store', async () => {
+      const annot = fixtures.defaultAnnotation();
+      await svc.delete(annot);
+      assert.calledWith(fakeStore.removeAnnotations, [annot]);
+    });
+
+    it('does not remove the annotation from the store if the API call fails', async () => {
+      fakeApi.annotation.delete.rejects(new Error('Annotation does not exist'));
+      const annot = fixtures.defaultAnnotation();
+
+      try {
+        await svc.delete(annot);
+      } catch (e) {
+        /* Ignored */
+      }
+
+      assert.notCalled(fakeStore.removeAnnotations);
+    });
+  });
+
+  describe('flag', () => {
+    it('flags the annotation via the API', async () => {
+      const annot = fixtures.defaultAnnotation();
+      await svc.flag(annot);
+      assert.calledWith(fakeApi.annotation.flag, { id: annot.id });
+    });
+
+    it('updates the flag status in the store', async () => {
+      const annot = fixtures.defaultAnnotation();
+      await svc.flag(annot);
+      assert.calledWith(fakeStore.updateFlagStatus, annot.id, true);
+    });
+
+    it('does not update the flag status if the API call fails', async () => {
+      fakeApi.annotation.flag.rejects(new Error('Annotation does not exist'));
+      const annot = fixtures.defaultAnnotation();
+
+      try {
+        await svc.flag(annot);
+      } catch (e) {
+        /* Ignored */
+      }
+
+      assert.notCalled(fakeStore.updateFlagStatus);
     });
   });
 

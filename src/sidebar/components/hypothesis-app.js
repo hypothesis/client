@@ -154,9 +154,7 @@ function HypothesisAppController(
     }
 
     store.clearGroups();
-    store.unsavedAnnotations().forEach(function (annotation) {
-      $rootScope.$emit(events.ANNOTATION_DELETED, annotation);
-    });
+    store.removeAnnotations(store.unsavedAnnotations());
     store.discardAllDrafts();
 
     if (serviceConfig(settings)) {

@@ -29,7 +29,6 @@ class FakeSearchClient extends EventEmitter {
 }
 
 describe('loadAnnotationsService', () => {
-  let fakeAnnotationMapper;
   let fakeApi;
   let fakeStore;
   let fakeStreamer;
@@ -43,15 +42,12 @@ describe('loadAnnotationsService', () => {
     searchClients = [];
     longRunningSearchClient = false;
 
-    fakeAnnotationMapper = {
-      loadAnnotations: sinon.stub(),
-    };
-
     fakeApi = {
       search: sinon.stub(),
     };
 
     fakeStore = {
+      addAnnotations: sinon.stub(),
       annotationFetchFinished: sinon.stub(),
       annotationFetchStarted: sinon.stub(),
       frames: sinon.stub(),
@@ -90,7 +86,6 @@ describe('loadAnnotationsService', () => {
       })
     );
     return loadAnnotationsService(
-      fakeAnnotationMapper,
       fakeApi,
       fakeStore,
       fakeStreamer,
@@ -119,10 +114,10 @@ describe('loadAnnotationsService', () => {
       const svc = createService();
 
       svc.load(fakeUris, fakeGroupId);
-      assert.calledWith(fakeAnnotationMapper.loadAnnotations, [
+      assert.calledWith(fakeStore.addAnnotations, [
         sinon.match({ id: fakeUris[0] + '123' }),
       ]);
-      assert.calledWith(fakeAnnotationMapper.loadAnnotations, [
+      assert.calledWith(fakeStore.addAnnotations, [
         sinon.match({ id: fakeUris[0] + '456' }),
       ]);
     });
@@ -151,16 +146,16 @@ describe('loadAnnotationsService', () => {
       ]);
 
       svc.load(fakeUris, fakeGroupId);
-      assert.calledWith(fakeAnnotationMapper.loadAnnotations, [
+      assert.calledWith(fakeStore.addAnnotations, [
         sinon.match({ id: uri + '123' }),
       ]);
-      assert.calledWith(fakeAnnotationMapper.loadAnnotations, [
+      assert.calledWith(fakeStore.addAnnotations, [
         sinon.match({ id: fingerprint + '123' }),
       ]);
-      assert.calledWith(fakeAnnotationMapper.loadAnnotations, [
+      assert.calledWith(fakeStore.addAnnotations, [
         sinon.match({ id: uri + '456' }),
       ]);
-      assert.calledWith(fakeAnnotationMapper.loadAnnotations, [
+      assert.calledWith(fakeStore.addAnnotations, [
         sinon.match({ id: fingerprint + '456' }),
       ]);
     });
@@ -177,9 +172,7 @@ describe('loadAnnotationsService', () => {
         fakeUris[1] + '123',
         fakeUris[1] + '456',
       ].forEach(uri => {
-        assert.calledWith(fakeAnnotationMapper.loadAnnotations, [
-          sinon.match({ id: uri }),
-        ]);
+        assert.calledWith(fakeStore.addAnnotations, [sinon.match({ id: uri })]);
       });
     });
 
@@ -235,7 +228,7 @@ describe('loadAnnotationsService', () => {
       const svc = createService();
 
       svc.load(fakeUris, fakeGroupId);
-      assert.notCalled(fakeAnnotationMapper.loadAnnotations);
+      assert.notCalled(fakeStore.addAnnotations);
     });
 
     it('calls annotationFetchStarted when it starts searching for annotations', () => {

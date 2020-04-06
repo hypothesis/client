@@ -5,7 +5,6 @@ import SearchClient from '../search-client';
 
 // @ngInject
 export default function loadAnnotationsService(
-  annotationMapper,
   api,
   store,
   streamer,
@@ -41,7 +40,7 @@ export default function loadAnnotationsService(
     });
     searchClient.on('results', results => {
       if (results.length) {
-        annotationMapper.loadAnnotations(results);
+        store.addAnnotations(results);
       }
     });
     searchClient.on('error', error => {

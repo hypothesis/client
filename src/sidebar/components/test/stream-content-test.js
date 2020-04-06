@@ -12,7 +12,6 @@ class FakeRootThread extends EventEmitter {
 
 describe('StreamContentController', function () {
   let $componentController;
-  let fakeAnnotationMapper;
   let fakeStore;
   let fakeRootThread;
   let fakeSearchFilter;
@@ -25,11 +24,8 @@ describe('StreamContentController', function () {
   });
 
   beforeEach(function () {
-    fakeAnnotationMapper = {
-      loadAnnotations: sinon.spy(),
-    };
-
     fakeStore = {
+      addAnnotations: sinon.stub(),
       clearAnnotations: sinon.spy(),
       routeParams: sinon.stub().returns({ id: 'test' }),
       setCollapsed: sinon.spy(),
@@ -44,9 +40,7 @@ describe('StreamContentController', function () {
     };
 
     fakeApi = {
-      search: sinon.spy(function () {
-        return Promise.resolve({ rows: [], total: 0 });
-      }),
+      search: sinon.stub().resolves({ rows: [], replies: [], total: 0 }),
     };
 
     fakeStreamer = {
@@ -65,7 +59,6 @@ describe('StreamContentController', function () {
     fakeRootThread = new FakeRootThread();
 
     angular.mock.module('h', {
-      annotationMapper: fakeAnnotationMapper,
       store: fakeStore,
       api: fakeApi,
       rootThread: fakeRootThread,
@@ -104,12 +97,14 @@ describe('StreamContentController', function () {
     createController();
 
     return Promise.resolve().then(function () {
-      assert.calledOnce(fakeAnnotationMapper.loadAnnotations);
-      assert.calledWith(
-        fakeAnnotationMapper.loadAnnotations,
-        ['annotation_1', 'annotation_2'],
-        ['reply_1', 'reply_2', 'reply_3']
-      );
+      assert.calledOnce(fakeStore.addAnnotations);
+      assert.calledWith(fakeStore.addAnnotations, [
+        'annotation_1',
+        'annotation_2',
+        'reply_1',
+        'reply_2',
+        'reply_3',
+      ]);
     });
   });
 

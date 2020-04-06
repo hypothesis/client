@@ -117,6 +117,22 @@ export default function annotationsService(api, store) {
   }
 
   /**
+   * Delete an annotation via the API and update the store.
+   */
+  async function delete_(annotation) {
+    await api.annotation.delete({ id: annotation.id });
+    store.removeAnnotations([annotation]);
+  }
+
+  /**
+   * Flag an annotation for review by a moderator.
+   */
+  async function flag(annotation) {
+    await api.annotation.flag({ id: annotation.id });
+    store.updateFlagStatus(annotation.id, true);
+  }
+
+  /**
    * Create a reply to `annotation` by the user `userid` and add to the store.
    *
    * @param {Object} annotation
@@ -178,6 +194,8 @@ export default function annotationsService(api, store) {
 
   return {
     create,
+    delete: delete_,
+    flag,
     reply,
     save,
   };
