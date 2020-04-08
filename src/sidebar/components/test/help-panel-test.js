@@ -25,10 +25,10 @@ describe('HelpPanel', function () {
     fakeAuth = {};
     fakeSessionService = { dismissSidebarTutorial: sinon.stub() };
     fakeStore = {
-      getState: sinon
-        .stub()
-        .returns({ session: { preferences: { show_sidebar_tutorial: true } } }),
       mainFrame: sinon.stub().returns(null),
+      profile: sinon.stub().returns({
+        preferences: { show_sidebar_tutorial: true },
+      }),
     };
     fakeVersionDataObject = {
       asEncodedURLString: sinon.stub().returns('fakeURLString'),
@@ -132,8 +132,8 @@ describe('HelpPanel', function () {
   context('dismissing the tutorial and clearing profile setting', () => {
     context('profile preference to auto-show tutorial is truthy', () => {
       beforeEach(() => {
-        fakeStore.getState.returns({
-          session: { preferences: { show_sidebar_tutorial: true } },
+        fakeStore.profile.returns({
+          preferences: { show_sidebar_tutorial: true },
         });
       });
 
@@ -172,8 +172,8 @@ describe('HelpPanel', function () {
 
     context('profile preference to auto-show tutorial is falsy', () => {
       beforeEach(() => {
-        fakeStore.getState.returns({
-          session: { preferences: { show_sidebar_tutorial: false } },
+        fakeStore.profile.returns({
+          preferences: { show_sidebar_tutorial: false },
         });
       });
 

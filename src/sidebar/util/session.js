@@ -29,10 +29,10 @@ export function shouldShowSidebarTutorial(sessionState) {
  * @param {Object} settings - app configuration/settings
  * @return {boolean} - Tutorial panel should be displayed automatically
  */
-export function shouldAutoDisplayTutorial(isSidebar, sessionState, settings) {
+export function shouldAutoDisplayTutorial(isSidebar, profile, settings) {
   const shouldShowBasedOnProfile =
-    typeof sessionState.preferences === 'object' &&
-    !!sessionState.preferences.show_sidebar_tutorial;
+    typeof profile.preferences === 'object' &&
+    !!profile.preferences.show_sidebar_tutorial;
   const service = serviceConfig(settings) || {};
   return (
     isSidebar && !service.onHelpRequestProvided && shouldShowBasedOnProfile
