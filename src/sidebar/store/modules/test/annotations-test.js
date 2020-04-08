@@ -51,11 +51,10 @@ describe('sidebar/store/modules/annotations', function () {
 
       store.addAnnotations([annotA, annotB]);
 
-      const tags = store.getState().annotations.annotations.map(function (a) {
-        return a.$tag;
+      store.getState().annotations.annotations.forEach(annot => {
+        assert.isString(annot.$tag);
+        assert.lengthOf(annot.$tag, 8);
       });
-
-      assert.deepEqual(tags, ['t1', 't2']);
     });
 
     it('updates annotations with matching IDs in the store', function () {

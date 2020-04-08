@@ -8,6 +8,7 @@ import { createSelector } from 'reselect';
 import * as metadata from '../../util/annotation-metadata';
 import * as arrayUtil from '../../util/array';
 import * as util from '../util';
+import { generateLocalId } from '../../util/random';
 
 import route from './route';
 
@@ -56,11 +57,9 @@ function findByTag(annotations, tag) {
  * from the service.
  *
  * @param {Object} annotation
- * @param {Number} tag - The `$tag` value that should be used for this
- *                       if it doesn't have a `$tag` already
  * @return {Object} - annotation with local (`$*`) fields set
  */
-function initializeAnnotation(annotation, tag) {
+function initializeAnnotation(annotation) {
   let orphan = annotation.$orphan;
 
   if (!annotation.id) {
@@ -71,7 +70,7 @@ function initializeAnnotation(annotation, tag) {
   return Object.assign({}, annotation, {
     // Flag indicating whether waiting for the annotation to anchor timed out.
     $anchorTimeout: false,
-    $tag: annotation.$tag || tag,
+    $tag: annotation.$tag || generateLocalId(),
     $orphan: orphan,
   });
 }
@@ -79,10 +78,6 @@ function initializeAnnotation(annotation, tag) {
 function init() {
   return {
     annotations: [],
-
-    // The local tag to assign to the next annotation that is loaded into the
-    // app
-    nextTag: 1,
   };
 }
 
@@ -94,7 +89,6 @@ const update = {
     const added = [];
     const unchanged = [];
     const updated = [];
-    let nextTag = state.nextTag;
 
     action.annotations.forEach(annot => {
       let existing;
@@ -116,8 +110,7 @@ const update = {
           updatedTags[existing.$tag] = true;
         }
       } else {
-        added.push(initializeAnnotation(annot, 't' + nextTag));
-        ++nextTag;
+        added.push(initializeAnnotation(annot));
       }
     });
 
@@ -129,7 +122,6 @@ const update = {
 
     return {
       annotations: added.concat(updated).concat(unchanged),
-      nextTag: nextTag,
     };
   },
 

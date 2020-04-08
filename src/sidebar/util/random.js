@@ -15,3 +15,13 @@ export function generateHexString(len) {
   crypto.getRandomValues(bytes);
   return Array.from(bytes).map(byteToHex).join('');
 }
+
+/**
+ * Generate a random hex string of 8 characters for use as a client-side
+ * local identifier.
+ *
+ * @return {string}
+ */
+export function generateLocalId() {
+  return generateHexString(8);
+}

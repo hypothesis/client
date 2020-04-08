@@ -9,7 +9,7 @@ import {
   privatePermissions,
   sharedPermissions,
 } from '../util/permissions';
-import { generateHexString } from '../util/random';
+import { generateLocalId } from '../util/random';
 import uiConstants from '../ui-constants';
 
 // @ngInject
@@ -48,7 +48,7 @@ export default function annotationsService(api, store) {
     // We need a unique local/app identifier for this new annotation such
     // that we might look it up later in the store. It won't have an ID yet,
     // as it has not been persisted to the service.
-    const $tag = generateHexString(8);
+    const $tag = generateLocalId();
 
     let permissions = defaultPermissions(userid, groupid, defaultPrivacy);
 
