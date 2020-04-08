@@ -17,11 +17,27 @@
   overflow: hidden;
 }
 
+// SVG highlights when the "Show Highlights" toggle is turned off.
+.hypothesis-svg-highlight {
+  fill: transparent;
+}
+
 // `hypothesis-highlights-always-on` is a class that is toggled on the root
 // of the annotated document when highlights are enabled/disabled.
 .hypothesis-highlights-always-on {
+  .hypothesis-svg-highlight {
+    fill: var.$highlight-color;
+  }
+
   .hypothesis-highlight {
     background-color: var.$highlight-color;
+
+    // For PDFs, we still create highlight elements to wrap the text but the
+    // highlight effect is created by another element.
+    &.is-transparent {
+      background-color: transparent;
+    }
+
     cursor: pointer;
 
     // Make highlights visible to screen readers.
@@ -41,6 +57,9 @@
     // Give a highlight inside a larger highlight a different color to stand out.
     & .hypothesis-highlight {
       background-color: var.$highlight-color-second;
+      &.is-transparent {
+        background-color: transparent;
+      }
 
       // In document viewers where the highlight is drawn _on top of_ the text
       // (eg. PDF.js) too many nested highlights can make the underlying text unreadable.
