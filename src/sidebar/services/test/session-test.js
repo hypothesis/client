@@ -15,6 +15,7 @@ describe('sidebar/services/session', function () {
   let fakeSentry;
   let fakeServiceConfig;
   let fakeSettings;
+  let fakeStore;
   let fakeApi;
   let sandbox;
 
@@ -24,21 +25,23 @@ describe('sidebar/services/session', function () {
   beforeEach(function () {
     sandbox = sinon.createSandbox();
 
-    let state = {};
+    let currentProfile = {
+      userid: null,
+    };
+
     fakeAnalytics = {
       track: sinon.stub(),
       events: analyticsEvents,
     };
-    const fakeStore = {
-      getState: function () {
-        return { session: state };
-      },
-      updateSession: function (session) {
-        state = session;
-      },
+    fakeStore = {
+      profile: sinon.stub().returns(currentProfile),
+      updateProfile: sinon.stub().callsFake(newProfile => {
+        currentProfile = newProfile;
+      }),
     };
     fakeAuth = {
       login: sandbox.stub().returns(Promise.resolve()),
+      logout: sinon.stub().resolves(),
     };
     fakeFlash = { error: sandbox.spy() };
     fakeSentry = {
@@ -46,8 +49,8 @@ describe('sidebar/services/session', function () {
     };
     fakeApi = {
       profile: {
-        read: sandbox.stub(),
-        update: sandbox.stub().returns(Promise.resolve({})),
+        read: sandbox.stub().resolves(),
+        update: sandbox.stub().resolves({}),
       },
     };
     fakeServiceConfig = sinon.stub().returns(null);
@@ -107,7 +110,9 @@ describe('sidebar/services/session', function () {
 
       it('should update the session with the profile data from the API', function () {
         return session.load().then(function () {
-          assert.equal(session.state.userid, 'acct:user@publisher.org');
+          assert.calledWith(fakeStore.updateProfile, {
+            userid: 'acct:user@publisher.org',
+          });
         });
       });
     });
@@ -136,26 +141,31 @@ describe('sidebar/services/session', function () {
       });
 
       it('should retry the profile fetch if it fails', () => {
+        const fetchedProfile = {
+          userid: 'acct:user@hypothes.is',
+          groups: [],
+        };
+
         fakeApi.profile.read
           .onCall(0)
           .returns(Promise.reject(new Error('Server error')));
-        fakeApi.profile.read
-          .onCall(1)
-          .returns(
-            Promise.resolve({ userid: 'acct:user@hypothes.is', groups: [] })
-          );
+        fakeApi.profile.read.onCall(1).returns(Promise.resolve(fetchedProfile));
 
         // Shorten the delay before retrying the fetch.
         session.profileFetchRetryOpts.minTimeout = 50;
 
         return session.load().then(() => {
-          assert.equal(session.state.userid, 'acct:user@hypothes.is');
+          assert.calledOnce(fakeStore.updateProfile);
+          assert.calledWith(fakeStore.updateProfile, fetchedProfile);
         });
       });
 
       it('should update the session with the profile data from the API', () => {
         return session.load().then(function () {
-          assert.equal(session.state.userid, 'acct:user@hypothes.is');
+          assert.calledOnce(fakeStore.updateProfile);
+          assert.calledWith(fakeStore.updateProfile, {
+            userid: 'acct:user@hypothes.is',
+          });
         });
       });
 
@@ -227,7 +237,10 @@ describe('sidebar/services/session', function () {
 
     it('should update the session with the response from the API', function () {
       return session.dismissSidebarTutorial().then(function () {
-        assert.isNotOk(session.state.preferences.show_sidebar_tutorial);
+        assert.calledOnce(fakeStore.updateProfile);
+        assert.calledWith(fakeStore.updateProfile, {
+          preferences: {},
+        });
       });
     });
   });
@@ -250,27 +263,28 @@ describe('sidebar/services/session', function () {
         })
       );
 
+      fakeStore.updateProfile.resetHistory();
+
       return session.reload().then(() => {
-        assert.equal(session.state.userid, 'acct:user_b@hypothes.is');
+        assert.calledOnce(fakeStore.updateProfile);
+        assert.calledWith(fakeStore.updateProfile, {
+          userid: 'acct:user_b@hypothes.is',
+        });
       });
     });
   });
 
   describe('#logout', function () {
+    const loggedOutProfile = {
+      userid: null,
+
+      // Dummy value used to differentiate this object from the default
+      // value of `store.profile()`.
+      isLoggedOutProfile: true,
+    };
+
     beforeEach(() => {
-      let loggedIn = true;
-
-      fakeAuth.logout = sinon.spy(() => {
-        loggedIn = false;
-        return Promise.resolve();
-      });
-
-      // Fake profile response after logout.
-      fakeApi.profile.read = () =>
-        Promise.resolve({
-          userid: null,
-          loggedIn,
-        });
+      fakeApi.profile.read.resolves(loggedOutProfile);
     });
 
     it('logs the user out', () => {
@@ -290,7 +304,8 @@ describe('sidebar/services/session', function () {
 
     it('updates the profile after logging out', () => {
       return session.logout().then(() => {
-        assert.isFalse(session.state.loggedIn);
+        assert.calledOnce(fakeStore.updateProfile);
+        assert.calledWith(fakeStore.updateProfile, loggedOutProfile);
       });
     });
   });
@@ -314,11 +329,22 @@ describe('sidebar/services/session', function () {
           );
           $rootScope.$broadcast(events.OAUTH_TOKENS_CHANGED);
 
+          fakeStore.updateProfile.resetHistory();
           return session.load();
         })
         .then(() => {
-          assert.equal(session.state.userid, 'acct:different_user@hypothes.is');
+          assert.calledOnce(fakeStore.updateProfile);
+          assert.calledWith(fakeStore.updateProfile, {
+            userid: 'acct:different_user@hypothes.is',
+          });
         });
+    });
+  });
+
+  // nb. This is a legacy property that should be removed.
+  describe('#state', () => {
+    it('returns the profile data', () => {
+      assert.equal(session.state, fakeStore.profile());
     });
   });
 });

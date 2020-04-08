@@ -229,7 +229,7 @@ describe('sidebar/store/modules/groups', () => {
     ].forEach(
       ({ description, isLoggedIn, allGroups, expectedFeaturedGroups }) => {
         it(description, () => {
-          store.updateSession({ userid: isLoggedIn ? '1234' : null });
+          store.updateProfile({ userid: isLoggedIn ? '1234' : null });
           store.loadGroups(allGroups);
           const featuredGroups = getListAssertNoDupes(store, 'featuredGroups');
           assert.deepEqual(featuredGroups, expectedFeaturedGroups);
@@ -269,7 +269,7 @@ describe('sidebar/store/modules/groups', () => {
       },
     ].forEach(({ description, isLoggedIn, allGroups, expectedMyGroups }) => {
       it(description, () => {
-        store.updateSession({ userid: isLoggedIn ? '1234' : null });
+        store.updateProfile({ userid: isLoggedIn ? '1234' : null });
         store.loadGroups(allGroups);
 
         const myGroups = getListAssertNoDupes(store, 'myGroups');
@@ -301,7 +301,7 @@ describe('sidebar/store/modules/groups', () => {
       },
     ].forEach(({ description, isLoggedIn, allGroups }) => {
       it(description, () => {
-        store.updateSession({ userid: isLoggedIn ? '1234' : null });
+        store.updateProfile({ userid: isLoggedIn ? '1234' : null });
         store.loadGroups(allGroups);
 
         const currentlyViewing = getListAssertNoDupes(

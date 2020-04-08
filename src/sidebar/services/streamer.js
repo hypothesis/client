@@ -75,7 +75,7 @@ export default function Streamer(store, auth, groups, session, settings) {
     } else if (message.type === 'session-change') {
       handleSessionChangeNotification(message);
     } else if (message.type === 'whoyouare') {
-      const userid = store.getState().session.userid;
+      const userid = store.profile().userid;
       if (message.userid !== userid) {
         console.warn(
           'WebSocket user ID "%s" does not match logged-in ID "%s"',

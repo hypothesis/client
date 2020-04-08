@@ -69,13 +69,7 @@ function HypothesisAppController(
   // Reload the view when the user switches accounts
   this.onUserChange = profile => {
     self.auth = authStateFromProfile(profile);
-    if (
-      shouldAutoDisplayTutorial(
-        this.isSidebar,
-        store.getState().session,
-        settings
-      )
-    ) {
+    if (shouldAutoDisplayTutorial(this.isSidebar, store.profile(), settings)) {
       // Auto-open the tutorial (help) panel
       store.openSidebarPanel(uiConstants.PANEL_HELP);
     }

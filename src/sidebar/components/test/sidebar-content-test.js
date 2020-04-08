@@ -199,7 +199,7 @@ describe('sidebar.components.sidebar-content', function () {
         userid: 'different-user@hypothes.is',
       });
 
-      store.updateSession(newProfile);
+      store.updateProfile(newProfile);
       $scope.$digest();
 
       assert.calledWith(
@@ -216,7 +216,7 @@ describe('sidebar.components.sidebar-content', function () {
         },
       });
 
-      store.updateSession(newProfile);
+      store.updateProfile(newProfile);
       $scope.$digest();
 
       assert.notCalled(fakeLoadAnnotationsService.load);

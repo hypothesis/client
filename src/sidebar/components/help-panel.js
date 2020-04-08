@@ -53,7 +53,7 @@ function HelpPanel({ auth, session }) {
   // This reference is such that we know whether we should "dismiss" the tutorial
   // (permanently for this user) when it is closed.
   const hasAutoDisplayPreference = useStore(
-    store => !!store.getState().session.preferences.show_sidebar_tutorial
+    store => !!store.profile().preferences.show_sidebar_tutorial
   );
 
   // The "Tutorial" (getting started) subpanel is the default panel shown

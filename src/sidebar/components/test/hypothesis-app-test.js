@@ -65,13 +65,6 @@ describe('sidebar.components.hypothesis-app', function () {
       fakeStore = {
         tool: 'comment',
         clearSelectedAnnotations: sandbox.spy(),
-        getState: sinon.stub().returns({
-          session: {
-            preferences: {
-              show_sidebar_tutorial: false,
-            },
-          },
-        }),
         clearGroups: sinon.stub(),
         closeSidebarPanel: sinon.stub(),
         openSidebarPanel: sinon.stub(),
@@ -80,6 +73,12 @@ describe('sidebar.components.hypothesis-app', function () {
         discardAllDrafts: sandbox.stub(),
         unsavedAnnotations: sandbox.stub().returns([]),
         removeAnnotations: sandbox.stub(),
+
+        profile: sinon.stub().returns({
+          preferences: {
+            show_sidebar_tutorial: false,
+          },
+        }),
       };
 
       fakeAnalytics = {
@@ -305,7 +304,6 @@ describe('sidebar.components.hypothesis-app', function () {
   describe('#login()', function () {
     beforeEach(() => {
       fakeAuth.login = sinon.stub().returns(Promise.resolve());
-      fakeStore.getState.returns({ directLinkedGroupFetchFailed: false });
     });
 
     it('clears groups', () => {

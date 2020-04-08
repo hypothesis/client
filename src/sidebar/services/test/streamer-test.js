@@ -99,13 +99,11 @@ describe('Streamer', function () {
       addAnnotations: sinon.stub(),
       annotationExists: sinon.stub().returns(false),
       clearPendingUpdates: sinon.stub(),
-      getState: sinon.stub().returns({
-        session: {
-          userid: 'jim@hypothes.is',
-        },
-      }),
       pendingUpdates: sinon.stub().returns({}),
       pendingDeletions: sinon.stub().returns({}),
+      profile: sinon.stub().returns({
+        userid: 'jim@hypothes.is',
+      }),
       receiveRealTimeUpdates: sinon.stub(),
       removeAnnotations: sinon.stub(),
       route: sinon.stub().returns('sidebar'),
@@ -387,10 +385,8 @@ describe('Streamer', function () {
       },
     ].forEach(testCase => {
       it('does nothing if the userid matches the logged-in userid', () => {
-        fakeStore.getState.returns({
-          session: {
-            userid: testCase.userid,
-          },
+        fakeStore.profile.returns({
+          userid: testCase.userid,
         });
         createDefaultStreamer();
         return activeStreamer.connect().then(function () {
@@ -414,10 +410,8 @@ describe('Streamer', function () {
       },
     ].forEach(testCase => {
       it('logs a warning if the userid does not match the logged-in userid', () => {
-        fakeStore.getState.returns({
-          session: {
-            userid: testCase.userid,
-          },
+        fakeStore.profile.returns({
+          userid: testCase.userid,
         });
         createDefaultStreamer();
         return activeStreamer.connect().then(function () {

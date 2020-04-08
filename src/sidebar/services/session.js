@@ -104,11 +104,10 @@ export default function session(
    * @return {Profile} The updated profile data
    */
   function update(model) {
-    const prevSession = store.getState().session;
+    const prevSession = store.profile();
     const userChanged = model.userid !== prevSession.userid;
 
-    // Update the session model used by the application
-    store.updateSession(model);
+    store.updateProfile(model);
 
     lastLoad = Promise.resolve(model);
     lastLoadTime = Date.now();
@@ -182,7 +181,7 @@ export default function session(
     // this service. In future, other services which access the session state
     // will do so directly from store or via selector functions
     get state() {
-      return store.getState().session;
+      return store.profile();
     },
 
     update,
