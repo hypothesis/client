@@ -184,7 +184,7 @@ describe('wrapReactComponent', () => {
 
     assert.calledWithMatch(
       consoleError,
-      /Invalid Button `label` of type `number`/
+      /Invalid prop `label` of type `number`/
     );
   });
 
