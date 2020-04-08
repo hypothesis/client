@@ -231,6 +231,18 @@ function startAngularApp(config) {
       .register('$rootScope', { value: $rootScope });
   }
 
+  // Run initialization logic that uses constructed services.
+  //
+  // @ngInject
+  function initServices() {
+    container.run(persistDefaults);
+    container.run(autosave);
+    container.run(sendPageView);
+    container.run(setupApi);
+    container.run(setupRoute);
+    container.run(startRPCServer);
+  }
+
   const wrapComponent = component => wrapReactComponent(component, container);
 
   angular
@@ -262,10 +274,7 @@ function startAngularApp(config) {
     // Register services, the store and utilities with Angular, so that
     // Angular components can use them.
     .service('analytics', () => container.get('analytics'))
-    .service('annotationsService', () => container.get('annotationsService'))
-    .service('api', () => container.get('api'))
     .service('auth', () => container.get('auth'))
-    .service('autosaveService', () => container.get('autosaveService'))
     .service('bridge', () => container.get('bridge'))
     .service('features', () => container.get('features'))
     .service('flash', () => container.get('flash'))
@@ -274,16 +283,12 @@ function startAngularApp(config) {
     .service('loadAnnotationsService', () =>
       container.get('loadAnnotationsService')
     )
-    .service('persistedDefaults', () => container.get('persistedDefaults'))
     .service('rootThread', () => container.get('rootThread'))
-    .service('router', () => container.get('router'))
     .service('searchFilter', () => container.get('searchFilter'))
     .service('serviceUrl', () => container.get('serviceUrl'))
     .service('session', () => container.get('session'))
     .service('streamer', () => container.get('streamer'))
     .service('streamFilter', () => container.get('streamFilter'))
-    .service('threadsService', () => container.get('threadsService'))
-    .service('toastMessenger', () => container.get('toastMessenger'))
 
     // Redux store
     .service('store', () => container.get('store'))
@@ -296,13 +301,7 @@ function startAngularApp(config) {
 
     // Make Angular built-ins available to services constructed by `container`.
     .run(registerAngularServices)
-
-    .run(persistDefaults)
-    .run(autosave)
-    .run(sendPageView)
-    .run(setupApi)
-    .run(setupRoute)
-    .run(startRPCServer);
+    .run(initServices);
 
   // Work around a check in Angular's $sniffer service that causes it to
   // incorrectly determine that Firefox extensions are Chrome Packaged Apps which
