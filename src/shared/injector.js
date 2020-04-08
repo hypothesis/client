@@ -34,7 +34,11 @@ function isValidProvider(provider) {
  *
  * To construct an object, call the `register` method with the name and provider
  * for the object and each of its dependencies, and then call
- * the `get` method to construct the object and its dependencies return it.
+ * the `get` method to construct the object and its dependencies and return it.
+ *
+ * To run a function with arguments provided by the container, without registering
+ * the function in the container for use by other factories or classes,
+ * use the `run` method.
  */
 export class Injector {
   constructor() {
@@ -133,5 +137,26 @@ export class Injector {
 
     this._providers.set(name, provider);
     return this;
+  }
+
+  /**
+   * Run a function which uses one or more dependencies provided by the
+   * container.
+   *
+   * @param {Function} -
+   *   A callback to run, with dependencies annotated in the same way as
+   *   functions or classes passed to `register`.
+   * @return {any} - Returns the result of running the function.
+   */
+  run(callback) {
+    const tempName = 'Injector.run';
+    this.register(tempName, { factory: callback });
+
+    try {
+      return this.get(tempName);
+    } finally {
+      this._instances.delete(tempName);
+      this._providers.delete(tempName);
+    }
   }
 }

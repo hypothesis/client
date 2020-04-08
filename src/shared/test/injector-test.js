@@ -153,4 +153,52 @@ describe('Injector', () => {
       });
     });
   });
+
+  describe('#run', () => {
+    const FIRST_VALUE = 3;
+    const SECOND_VALUE = 5;
+
+    function createContainer() {
+      const container = new Injector();
+      container
+        .register('first', { value: FIRST_VALUE })
+        .register('second', { value: SECOND_VALUE });
+      return container;
+    }
+
+    it('calls function with resolved dependencies as arguments', () => {
+      const stub = sinon.stub();
+      stub.$inject = ['first', 'first', 'second'];
+
+      const container = createContainer();
+      container.run(stub);
+
+      assert.calledWith(stub, FIRST_VALUE, FIRST_VALUE, SECOND_VALUE);
+    });
+
+    it("returns the function's result", () => {
+      function add(first, second) {
+        return first + second;
+      }
+      add.$inject = ['first', 'second'];
+
+      const container = createContainer();
+      const result = container.run(add);
+
+      assert.equal(result, FIRST_VALUE + SECOND_VALUE);
+    });
+
+    it('can be called multiple times', () => {
+      const container = createContainer();
+      let total = 0;
+
+      function increment(first) {
+        total += first;
+      }
+      container.run(increment);
+      container.run(increment);
+
+      assert.equal(total, FIRST_VALUE * 2);
+    });
+  });
 });
