@@ -48,7 +48,6 @@ describe('rootThread', function () {
         selection: {
           expanded: {},
           filterQuery: null,
-          focusedAnnotationMap: null,
           forceVisible: {},
           highlighted: [],
           selectedAnnotationMap: null,
