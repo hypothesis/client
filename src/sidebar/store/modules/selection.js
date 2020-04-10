@@ -504,6 +504,10 @@ function focusModeUserPrettyName(state) {
   }
 }
 
+function getSelectedAnnotationMap(state) {
+  return state.selection.selectedAnnotationMap;
+}
+
 export default {
   init: init,
   namespace: 'selection',
@@ -535,5 +539,6 @@ export default {
     focusModeUserPrettyName,
     isAnnotationSelected,
     getFirstSelectedAnnotationId,
+    getSelectedAnnotationMap,
   },
 };

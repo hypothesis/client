@@ -226,7 +226,7 @@ describe('sidebar.components.sidebar-content', function () {
   describe('when an annotation is anchored', function () {
     it('focuses and scrolls to the annotation if already selected', function () {
       const uri = 'http://example.com';
-      store.selectAnnotations(['123']);
+      store.getSelectedAnnotationMap = sinon.stub().returns({ '123': true });
       setFrames([{ uri: uri }]);
       const annot = {
         $tag: 'atag',

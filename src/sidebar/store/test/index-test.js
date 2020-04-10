@@ -42,7 +42,7 @@ describe('store', function () {
 
     it('sets the selection when settings.annotations is set', function () {
       store = storeFactory(fakeRootScope, { annotations: 'testid' });
-      assert.deepEqual(store.getState().selection.selectedAnnotationMap, {
+      assert.deepEqual(store.getSelectedAnnotationMap(), {
         testid: true,
       });
     });
@@ -60,7 +60,7 @@ describe('store', function () {
     // CLEAR_SELECTION action in multiple store modules.
     it('sets `selectedAnnotationMap` to null', () => {
       store.clearSelection();
-      assert.isNull(store.getState().selection.selectedAnnotationMap);
+      assert.isNull(store.getSelectedAnnotationMap());
     });
 
     it('sets `filterQuery` to null', () => {

@@ -91,7 +91,7 @@ export default function RootThread(
       forceVisible: truthyKeys(state.selection.forceVisible),
       expanded: state.selection.expanded,
       highlighted: state.selection.highlighted,
-      selected: truthyKeys(state.selection.selectedAnnotationMap || {}),
+      selected: truthyKeys(store.getSelectedAnnotationMap() || {}),
       sortCompareFn: sortFn,
       filterFn: filterFn,
       threadFilterFn: threadFilterFn,

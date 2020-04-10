@@ -39,10 +39,9 @@ function SidebarContentController(
    * not the order in which they appear in the document.
    */
   function firstSelectedAnnotation() {
-    if (store.getState().selection.selectedAnnotationMap) {
-      const id = Object.keys(
-        store.getState().selection.selectedAnnotationMap
-      )[0];
+    const selectedAnnotationMap = store.getSelectedAnnotationMap();
+    if (selectedAnnotationMap) {
+      const id = Object.keys(selectedAnnotationMap)[0];
       return store.getState().annotations.annotations.find(function (annot) {
         return annot.id === id;
       });
