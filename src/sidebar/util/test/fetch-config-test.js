@@ -1,4 +1,3 @@
-import { assertPromiseIsRejected } from '../../../shared/test/promise-util';
 import { fetchConfig, $imports } from '../fetch-config';
 
 describe('sidebar.util.fetch-config', () => {
@@ -108,18 +107,18 @@ describe('sidebar.util.fetch-config', () => {
         });
       });
 
-      it('rejects if sidebar is top frame', () => {
+      it('rejects if sidebar is top frame', async () => {
         fakeWindow.parent = fakeWindow;
         fakeWindow.top = fakeWindow;
-
-        const config = fetchConfig({}, fakeWindow);
-        return assertPromiseIsRejected(config, 'Client is top frame');
+        await assert.rejects(
+          fetchConfig({}, fakeWindow),
+          'Client is top frame'
+        );
       });
 
-      it('rejects if fetching config fails', () => {
+      it('rejects if fetching config fails', async () => {
         fakeJsonRpc.call.returns(Promise.reject(new Error('Nope')));
-        const config = fetchConfig({}, fakeWindow);
-        return assertPromiseIsRejected(config, 'Nope');
+        await assert.rejects(fetchConfig({}, fakeWindow), 'Nope');
       });
 
       it('returns config from ancestor frame', async () => {
@@ -210,15 +209,10 @@ describe('sidebar.util.fetch-config', () => {
             ancestorLevel: 10, // The top window is only 2 levels high
           },
         });
-        try {
-          await fetchConfig({}, fakeWindow);
-          throw new Error('Failed to catch error');
-        } catch (e) {
-          assert.equal(
-            e.message,
-            'The target parent frame has exceeded the ancestor tree. Try reducing the `requestConfigFromFrame.ancestorLevel` value in the `hypothesisConfig`'
-          );
-        }
+        await assert.rejects(
+          fetchConfig({}, fakeWindow),
+          /The target parent frame has exceeded the ancestor tree|Try reducing the/g
+        );
       });
 
       it('creates a merged config when the RPC requests returns the host config', async () => {
@@ -235,9 +229,7 @@ describe('sidebar.util.fetch-config', () => {
       it('rejects if fetching config fails` ', async () => {
         fakeJsonRpc.call.rejects(new Error('Nope'));
         const appConfig = { foo: 'bar', appType: 'via' };
-
-        const result = fetchConfig(appConfig, fakeWindow);
-        return assertPromiseIsRejected(result, 'Nope');
+        await assert.rejects(fetchConfig(appConfig, fakeWindow), 'Nope');
       });
 
       it('returns the `groups` array with the initial host config request', async () => {
@@ -278,12 +270,10 @@ describe('sidebar.util.fetch-config', () => {
         fakeJsonRpc.call.onFirstCall().resolves({ foo: 'baz' }); // host config
         fakeJsonRpc.call.onSecondCall().rejects(); // requestGroups
         const result = await fetchConfig(appConfig, fakeWindow);
-        try {
-          await result.services[0].groups;
-          throw new Error('Failed to catch error');
-        } catch (e) {
-          assert.equal(e.message, 'Unable to fetch groups');
-        }
+        await assert.rejects(
+          result.services[0].groups,
+          'Unable to fetch groups'
+        );
       });
     });
 
@@ -299,15 +289,10 @@ describe('sidebar.util.fetch-config', () => {
             // missing ancestorLevel
           },
         });
-        try {
-          await fetchConfig({}, fakeWindow);
-          throw new Error('Failed to catch error');
-        } catch (e) {
-          assert.equal(
-            e.message,
-            'Improper `requestConfigFromFrame` object. Both `ancestorLevel` and `origin` need to be specified'
-          );
-        }
+        await assert.rejects(
+          fetchConfig({}, fakeWindow),
+          'Improper `requestConfigFromFrame` object. Both `ancestorLevel` and `origin` need to be specified'
+        );
       });
 
       it('missing origin', async () => {
@@ -317,15 +302,10 @@ describe('sidebar.util.fetch-config', () => {
             ancestorLevel: 2,
           },
         });
-        try {
-          await fetchConfig({}, fakeWindow);
-          throw new Error('Failed to catch error');
-        } catch (e) {
-          assert.equal(
-            e.message,
-            'Improper `requestConfigFromFrame` object. Both `ancestorLevel` and `origin` need to be specified'
-          );
-        }
+        await assert.rejects(
+          fetchConfig({}, fakeWindow),
+          'Improper `requestConfigFromFrame` object. Both `ancestorLevel` and `origin` need to be specified'
+        );
       });
     });
   });

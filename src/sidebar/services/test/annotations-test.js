@@ -244,12 +244,7 @@ describe('annotationsService', () => {
       fakeApi.annotation.delete.rejects(new Error('Annotation does not exist'));
       const annot = fixtures.defaultAnnotation();
 
-      try {
-        await svc.delete(annot);
-      } catch (e) {
-        /* Ignored */
-      }
-
+      await assert.rejects(svc.delete(annot), 'Annotation does not exist');
       assert.notCalled(fakeStore.removeAnnotations);
     });
   });
@@ -271,12 +266,7 @@ describe('annotationsService', () => {
       fakeApi.annotation.flag.rejects(new Error('Annotation does not exist'));
       const annot = fixtures.defaultAnnotation();
 
-      try {
-        await svc.flag(annot);
-      } catch (e) {
-        /* Ignored */
-      }
-
+      await assert.rejects(svc.flag(annot), 'Annotation does not exist');
       assert.notCalled(fakeStore.updateFlagStatus);
     });
   });
