@@ -229,6 +229,19 @@ describe('sidebar/store/modules/selection', () => {
       assert.equal(store.focusModeFocused(), false);
       assert.equal(store.focusModeEnabled(), false);
     });
+
+    it('clears other applied selections', () => {
+      store.setFocusModeFocused(true);
+      store.setForceVisible('someAnnotationId');
+      store.setFilterQuery('somequery');
+      store.changeFocusModeUser({
+        username: 'testuser',
+        displayName: 'Test User',
+      });
+
+      assert.isEmpty(getSelectionState().forceVisible);
+      assert.isNull(store.filterQuery());
+    });
   });
 
   describe('setFocusModeFocused()', function () {

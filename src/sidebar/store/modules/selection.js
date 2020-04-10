@@ -138,6 +138,7 @@ const update = {
     const tabSettings = setTab(state.selectedTab, selectedTab);
     return {
       filterQuery: null,
+      forceVisible: {},
       selectedAnnotationMap: null,
       ...tabSettings,
     };
@@ -374,14 +375,15 @@ function setFocusModeFocused(focused) {
 }
 
 /**
- * Changes the focused user and sets focused enabled to `true`.
+ * Clears any applied filters, changes the focused user and sets
+ * focused enabled to `true`.
  *
  * @param {User} user - The user to focus on
  */
 function changeFocusModeUser(user) {
-  return {
-    type: actions.CHANGE_FOCUS_MODE_USER,
-    user,
+  return function (dispatch) {
+    dispatch({ type: actions.CLEAR_SELECTION });
+    dispatch({ type: actions.CHANGE_FOCUS_MODE_USER, user });
   };
 }
 
