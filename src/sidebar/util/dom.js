@@ -26,19 +26,14 @@ export function listen(element, events, listener, { useCapture = false } = {}) {
  * Obtain the pixel height of the element with id `elementId`, including
  * top and bottom margins.
  *
- * @param {string} elementId - The DOM element's id attribute
- * @return {number|null} - The element's height in pixels or `null` if no
- *                         element with id `elementId` exists
+ * @param {HTMLElement} element
+ * @return {number} - The element's height in pixels
  */
-export function getElementHeightWithMargins(elementId) {
-  const threadElement = document.getElementById(elementId);
-  if (!threadElement) {
-    return null;
-  }
-  const style = window.getComputedStyle(threadElement);
+export function getElementHeightWithMargins(element) {
+  const style = window.getComputedStyle(element);
   // Get the height of the element inside the border-box, excluding
   // top and bottom margins.
-  const elementHeight = threadElement.getBoundingClientRect().height;
+  const elementHeight = element.getBoundingClientRect().height;
 
   // Get the bottom margin of the element. style.margin{Side} will return
   // values of the form 'Npx', from which we extract 'N'.
