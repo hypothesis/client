@@ -430,6 +430,10 @@ const getFirstSelectedAnnotationId = createSelector(
   selected => (selected ? Object.keys(selected)[0] : null)
 );
 
+function expandedThreads(state) {
+  return state.selection.expanded;
+}
+
 function filterQuery(state) {
   return state.selection.filterQuery;
 }
@@ -531,6 +535,7 @@ export default {
 
   selectors: {
     hasSelectedAnnotations,
+    expandedThreads,
     filterQuery,
     focusModeFocused,
     focusModeEnabled,

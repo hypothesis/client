@@ -38,7 +38,7 @@ describe('sidebar/store/modules/selection', () => {
   describe('setCollapsed()', function () {
     it('sets the expanded state of the annotation', function () {
       store.setCollapsed('parent_id', false);
-      assert.deepEqual(getSelectionState().expanded, { parent_id: true });
+      assert.deepEqual(store.expandedThreads(), { parent_id: true });
     });
   });
 

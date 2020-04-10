@@ -89,7 +89,7 @@ export default function RootThread(
     // determines what is visible and build the visible thread structure
     return buildThread(state.annotations.annotations, {
       forceVisible: truthyKeys(state.selection.forceVisible),
-      expanded: state.selection.expanded,
+      expanded: store.expandedThreads(),
       highlighted: state.selection.highlighted,
       selected: truthyKeys(store.getSelectedAnnotationMap() || {}),
       sortCompareFn: sortFn,
