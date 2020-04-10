@@ -10,7 +10,7 @@
  * e.g. await rejects(someAsyncFunction(), /expected error/g);
  *
  * @param {Promise} promiseResult - The returned promise a function to test
- * @param errorMessage {RegEx|String} - A string or regex that matches the error
+ * @param {RegEx|String} errorMessage - A string or regex that matches the error
  * which is expected to be thrown.
  */
 
@@ -40,6 +40,6 @@ const rejects = async (promiseResult, errorMessage) => {
  *
  * @param {Object} assert - global assertion object.
  */
-export default function patch(assert) {
+export function patch(assert) {
   assert.rejects = rejects;
 }

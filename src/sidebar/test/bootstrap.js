@@ -2,7 +2,7 @@
 sinon.assert.expose(assert, { prefix: null });
 
 // Patch extra assert helper methods
-import patch from '../../test-util/assert-methods';
+import { patch } from '../../test-util/assert-methods';
 patch(assert);
 
 import 'angular';
