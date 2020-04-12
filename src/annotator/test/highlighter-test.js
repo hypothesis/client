@@ -221,6 +221,53 @@ describe('annotator/highlighter', () => {
         assert.isNull(container.querySelector('rect'));
         assert.notOk(highlight.svgHighlight);
       });
+
+      describe('CSS blend mode support testing', () => {
+        beforeEach(() => {
+          sinon.stub(CSS, 'supports');
+        });
+
+        afterEach(() => {
+          CSS.supports.restore();
+        });
+
+        it('renders highlights when mix-blend-mode is supported', () => {
+          const container = document.createElement('div');
+          render(<PdfPage />, container);
+          CSS.supports.withArgs('mix-blend-mode', 'multiply').returns(true);
+
+          highlightPdfRange(container);
+
+          // When mix blending is available, the highlight layer has default
+          // opacity and highlight rects are transparent.
+          const highlightLayer = container.querySelector(
+            '.hypothesis-highlight-layer'
+          );
+          assert.equal(highlightLayer.style.opacity, '');
+          const rect = container.querySelector('rect');
+          assert.equal(rect.getAttribute('class'), 'hypothesis-svg-highlight');
+        });
+
+        it('renders highlights when mix-blend-mode is not supported', () => {
+          const container = document.createElement('div');
+          render(<PdfPage />, container);
+          CSS.supports.withArgs('mix-blend-mode', 'multiply').returns(false);
+
+          highlightPdfRange(container);
+
+          // When mix blending is not available, highlight rects are opaque and
+          // the entire highlight layer is transparent.
+          const highlightLayer = container.querySelector(
+            '.hypothesis-highlight-layer'
+          );
+          assert.equal(highlightLayer.style.opacity, '0.3');
+          const rect = container.querySelector('rect');
+          assert.include(
+            rect.getAttribute('class'),
+            'hypothesis-svg-highlight is-opaque'
+          );
+        });
+      });
     });
   });
 

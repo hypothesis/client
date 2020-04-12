@@ -27,6 +27,10 @@
 .hypothesis-highlights-always-on {
   .hypothesis-svg-highlight {
     fill: var.$highlight-color;
+
+    &.is-opaque {
+      fill: yellow;
+    }
   }
 
   .hypothesis-highlight {
