@@ -274,6 +274,7 @@ function startAngularApp(config) {
     // Register services, the store and utilities with Angular, so that
     // Angular components can use them.
     .service('analytics', () => container.get('analytics'))
+    .service('api', () => container.get('api'))
     .service('auth', () => container.get('auth'))
     .service('bridge', () => container.get('bridge'))
     .service('features', () => container.get('features'))
