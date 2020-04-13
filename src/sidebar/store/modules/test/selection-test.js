@@ -38,7 +38,7 @@ describe('sidebar/store/modules/selection', () => {
   describe('setCollapsed()', function () {
     it('sets the expanded state of the annotation', function () {
       store.setCollapsed('parent_id', false);
-      assert.deepEqual(getSelectionState().expanded, { parent_id: true });
+      assert.deepEqual(store.expandedThreads(), { parent_id: true });
     });
   });
 
@@ -109,7 +109,7 @@ describe('sidebar/store/modules/selection', () => {
   describe('selectAnnotations()', function () {
     it('adds the passed annotations to the selectedAnnotationMap', function () {
       store.selectAnnotations([1, 2, 3]);
-      assert.deepEqual(getSelectionState().selectedAnnotationMap, {
+      assert.deepEqual(store.getSelectedAnnotationMap(), {
         1: true,
         2: true,
         3: true,
@@ -119,7 +119,7 @@ describe('sidebar/store/modules/selection', () => {
     it('replaces any annotations originally in the map', function () {
       store.selectAnnotations([1]);
       store.selectAnnotations([2, 3]);
-      assert.deepEqual(getSelectionState().selectedAnnotationMap, {
+      assert.deepEqual(store.getSelectedAnnotationMap(), {
         2: true,
         3: true,
       });
@@ -128,7 +128,7 @@ describe('sidebar/store/modules/selection', () => {
     it('nulls the map if no annotations are selected', function () {
       store.selectAnnotations([1]);
       store.selectAnnotations([]);
-      assert.isNull(getSelectionState().selectedAnnotationMap);
+      assert.isNull(store.getSelectedAnnotationMap());
     });
   });
 
@@ -136,7 +136,7 @@ describe('sidebar/store/modules/selection', () => {
     it('adds annotations missing from the selectedAnnotationMap', function () {
       store.selectAnnotations([1, 2]);
       store.toggleSelectedAnnotations([3, 4]);
-      assert.deepEqual(getSelectionState().selectedAnnotationMap, {
+      assert.deepEqual(store.getSelectedAnnotationMap(), {
         1: true,
         2: true,
         3: true,
@@ -147,7 +147,7 @@ describe('sidebar/store/modules/selection', () => {
     it('removes annotations already in the selectedAnnotationMap', function () {
       store.selectAnnotations([1, 3]);
       store.toggleSelectedAnnotations([1, 2]);
-      assert.deepEqual(getSelectionState().selectedAnnotationMap, {
+      assert.deepEqual(store.getSelectedAnnotationMap(), {
         2: true,
         3: true,
       });
@@ -156,7 +156,7 @@ describe('sidebar/store/modules/selection', () => {
     it('nulls the map if no annotations are selected', function () {
       store.selectAnnotations([1]);
       store.toggleSelectedAnnotations([1]);
-      assert.isNull(getSelectionState().selectedAnnotationMap);
+      assert.isNull(store.getSelectedAnnotationMap());
     });
   });
 
@@ -164,7 +164,7 @@ describe('sidebar/store/modules/selection', () => {
     it('removing an annotation should also remove it from selectedAnnotationMap', function () {
       store.selectAnnotations([1, 2, 3]);
       store.removeAnnotations([{ id: 2 }]);
-      assert.deepEqual(getSelectionState().selectedAnnotationMap, {
+      assert.deepEqual(store.getSelectedAnnotationMap(), {
         1: true,
         3: true,
       });
@@ -175,7 +175,7 @@ describe('sidebar/store/modules/selection', () => {
     it('removes all annotations from the selection', function () {
       store.selectAnnotations([1]);
       store.clearSelectedAnnotations();
-      assert.isNull(getSelectionState().selectedAnnotationMap);
+      assert.isNull(store.getSelectedAnnotationMap());
     });
 
     it('clears the current search query', function () {
@@ -228,6 +228,19 @@ describe('sidebar/store/modules/selection', () => {
       });
       assert.equal(store.focusModeFocused(), false);
       assert.equal(store.focusModeEnabled(), false);
+    });
+
+    it('clears other applied selections', () => {
+      store.setFocusModeFocused(true);
+      store.setForceVisible('someAnnotationId');
+      store.setFilterQuery('somequery');
+      store.changeFocusModeUser({
+        username: 'testuser',
+        displayName: 'Test User',
+      });
+
+      assert.isEmpty(getSelectionState().forceVisible);
+      assert.isNull(store.filterQuery());
     });
   });
 

@@ -138,6 +138,7 @@ const update = {
     const tabSettings = setTab(state.selectedTab, selectedTab);
     return {
       filterQuery: null,
+      forceVisible: {},
       selectedAnnotationMap: null,
       ...tabSettings,
     };
@@ -374,14 +375,15 @@ function setFocusModeFocused(focused) {
 }
 
 /**
- * Changes the focused user and sets focused enabled to `true`.
+ * Clears any applied filters, changes the focused user and sets
+ * focused enabled to `true`.
  *
  * @param {User} user - The user to focus on
  */
 function changeFocusModeUser(user) {
-  return {
-    type: actions.CHANGE_FOCUS_MODE_USER,
-    user,
+  return function (dispatch) {
+    dispatch({ type: actions.CLEAR_SELECTION });
+    dispatch({ type: actions.CHANGE_FOCUS_MODE_USER, user });
   };
 }
 
@@ -427,6 +429,10 @@ const getFirstSelectedAnnotationId = createSelector(
   state => state.selection.selectedAnnotationMap,
   selected => (selected ? Object.keys(selected)[0] : null)
 );
+
+function expandedThreads(state) {
+  return state.selection.expanded;
+}
 
 function filterQuery(state) {
   return state.selection.filterQuery;
@@ -502,6 +508,10 @@ function focusModeUserPrettyName(state) {
   }
 }
 
+function getSelectedAnnotationMap(state) {
+  return state.selection.selectedAnnotationMap;
+}
+
 export default {
   init: init,
   namespace: 'selection',
@@ -525,6 +535,7 @@ export default {
 
   selectors: {
     hasSelectedAnnotations,
+    expandedThreads,
     filterQuery,
     focusModeFocused,
     focusModeEnabled,
@@ -533,5 +544,6 @@ export default {
     focusModeUserPrettyName,
     isAnnotationSelected,
     getFirstSelectedAnnotationId,
+    getSelectedAnnotationMap,
   },
 };

@@ -47,7 +47,7 @@ function SearchStatusBar({ rootThread }) {
     filterQuery: store.getState().selection.filterQuery,
     focusModeFocused: store.focusModeFocused(),
     focusModeUserPrettyName: store.focusModeUserPrettyName(),
-    selectionMap: store.getState().selection.selectedAnnotationMap,
+    selectionMap: store.getSelectedAnnotationMap(),
     selectedTab: store.getState().selection.selectedTab,
   }));
 

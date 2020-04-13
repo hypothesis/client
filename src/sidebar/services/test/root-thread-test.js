@@ -46,12 +46,9 @@ describe('rootThread', function () {
         },
         drafts: [],
         selection: {
-          expanded: {},
           filterQuery: null,
-          focusedAnnotationMap: null,
           forceVisible: {},
           highlighted: [],
-          selectedAnnotationMap: null,
           sortKey: 'Location',
           sortKeysAvailable: ['Location'],
         },
@@ -64,6 +61,8 @@ describe('rootThread', function () {
         return this.state;
       },
 
+      expandedThreads: sinon.stub().returns({}),
+      getSelectedAnnotationMap: sinon.stub().returns(null),
       subscribe: sinon.stub(),
       removeAnnotations: sinon.stub(),
       removeSelectedAnnotation: sinon.stub(),
@@ -129,10 +128,10 @@ describe('rootThread', function () {
     });
 
     it('passes the current selection to buildThread()', function () {
-      fakeStore.state.selection.selectedAnnotationMap = {
+      fakeStore.getSelectedAnnotationMap.returns({
         id1: true,
         id2: true,
-      };
+      });
       rootThread.thread(fakeStore.state);
       assert.calledWith(
         fakeBuildThread,
@@ -144,7 +143,7 @@ describe('rootThread', function () {
     });
 
     it('passes the current expanded set to buildThread()', function () {
-      fakeStore.state.selection.expanded = { id1: true, id2: true };
+      fakeStore.expandedThreads.returns({ id1: true, id2: true });
       rootThread.thread(fakeStore.state);
       assert.calledWith(
         fakeBuildThread,
