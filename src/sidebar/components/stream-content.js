@@ -1,3 +1,5 @@
+import { watch } from '../util/watch';
+
 // @ngInject
 function StreamContentController($scope, store, api, rootThread, searchFilter) {
   /** `offset` parameter for the next search API call. */
@@ -43,13 +45,8 @@ function StreamContentController($scope, store, api, rootThread, searchFilter) {
     fetch(20);
   }
 
-  let lastQuery = currentQuery();
-  const unsubscribe = store.subscribe(() => {
-    const query = currentQuery();
-    if (query !== lastQuery) {
-      lastQuery = query;
-      clearAndFetch();
-    }
+  const unsubscribe = watch(store.subscribe, currentQuery, () => {
+    clearAndFetch();
   });
   $scope.$on('$destroy', unsubscribe);
 
