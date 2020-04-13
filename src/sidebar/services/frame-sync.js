@@ -5,6 +5,7 @@ import events from '../events';
 import Discovery from '../../shared/discovery';
 import uiConstants from '../ui-constants';
 import * as metadata from '../util/annotation-metadata';
+import { watch } from '../util/watch';
 
 /**
  * @typedef FrameInfo
@@ -49,76 +50,66 @@ export default function FrameSync($rootScope, $window, store, bridge) {
    * notify connected frames about new/updated/deleted annotations.
    */
   function setupSyncToFrame() {
-    // List of loaded annotations in previous state
-    let prevAnnotations = [];
-    let prevFrames = [];
     let prevPublicAnns = 0;
 
-    store.subscribe(function () {
-      const state = store.getState();
-      if (
-        state.annotations.annotations === prevAnnotations &&
-        state.frames === prevFrames
-      ) {
-        return;
-      }
+    watch(
+      store.subscribe,
+      [() => store.getState().annotations.annotations, () => store.frames()],
+      ([annotations, frames], [prevAnnotations]) => {
+        let publicAnns = 0;
+        const inSidebar = new Set();
+        const added = [];
 
-      let publicAnns = 0;
-      const inSidebar = new Set();
-      const added = [];
+        annotations.forEach(function (annot) {
+          if (metadata.isReply(annot)) {
+            // The frame does not need to know about replies
+            return;
+          }
 
-      state.annotations.annotations.forEach(function (annot) {
-        if (metadata.isReply(annot)) {
-          // The frame does not need to know about replies
-          return;
-        }
+          if (metadata.isPublic(annot)) {
+            ++publicAnns;
+          }
 
-        if (metadata.isPublic(annot)) {
-          ++publicAnns;
-        }
-
-        inSidebar.add(annot.$tag);
-        if (!inFrame.has(annot.$tag)) {
-          added.push(annot);
-        }
-      });
-      const deleted = prevAnnotations.filter(function (annot) {
-        return !inSidebar.has(annot.$tag);
-      });
-      prevAnnotations = state.annotations.annotations;
-      prevFrames = state.frames;
-
-      // We currently only handle adding and removing annotations from the frame
-      // when they are added or removed in the sidebar, but not re-anchoring
-      // annotations if their selectors are updated.
-      if (added.length > 0) {
-        bridge.call('loadAnnotations', added.map(formatAnnot));
-        added.forEach(function (annot) {
-          inFrame.add(annot.$tag);
+          inSidebar.add(annot.$tag);
+          if (!inFrame.has(annot.$tag)) {
+            added.push(annot);
+          }
         });
-      }
-      deleted.forEach(function (annot) {
-        bridge.call('deleteAnnotation', formatAnnot(annot));
-        inFrame.delete(annot.$tag);
-      });
+        const deleted = prevAnnotations.filter(function (annot) {
+          return !inSidebar.has(annot.$tag);
+        });
 
-      const frames = store.frames();
-      if (frames.length > 0) {
-        if (
-          frames.every(function (frame) {
-            return frame.isAnnotationFetchComplete;
-          })
-        ) {
-          if (publicAnns === 0 || publicAnns !== prevPublicAnns) {
-            bridge.call(
-              bridgeEvents.PUBLIC_ANNOTATION_COUNT_CHANGED,
-              publicAnns
-            );
-            prevPublicAnns = publicAnns;
+        // We currently only handle adding and removing annotations from the frame
+        // when they are added or removed in the sidebar, but not re-anchoring
+        // annotations if their selectors are updated.
+        if (added.length > 0) {
+          bridge.call('loadAnnotations', added.map(formatAnnot));
+          added.forEach(function (annot) {
+            inFrame.add(annot.$tag);
+          });
+        }
+        deleted.forEach(function (annot) {
+          bridge.call('deleteAnnotation', formatAnnot(annot));
+          inFrame.delete(annot.$tag);
+        });
+
+        if (frames.length > 0) {
+          if (
+            frames.every(function (frame) {
+              return frame.isAnnotationFetchComplete;
+            })
+          ) {
+            if (publicAnns === 0 || publicAnns !== prevPublicAnns) {
+              bridge.call(
+                bridgeEvents.PUBLIC_ANNOTATION_COUNT_CHANGED,
+                publicAnns
+              );
+              prevPublicAnns = publicAnns;
+            }
           }
         }
       }
-    });
+    );
   }
 
   /**
