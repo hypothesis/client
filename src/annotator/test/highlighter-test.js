@@ -14,7 +14,8 @@ import {
  *
  * This is used to test PDF-specific highlighting behavior.
  */
-function PdfPage() {
+// eslint-disable-next-line react/prop-types
+function PdfPage({ showPlaceholder = false }) {
   return (
     <div className="page">
       <div className="canvasWrapper">
@@ -22,11 +23,20 @@ function PdfPage() {
         <canvas />
       </div>
       {/* Transparent text layer created by PDF.js to enable text selection */}
-      <div className="textLayer">
-        {/* Text span created to correspond to some text rendered into the canvas.
+      {!showPlaceholder && (
+        <div className="textLayer">
+          {/* Text span created to correspond to some text rendered into the canvas.
             Hypothesis creates `<hypothesis-highlight>` elements here. */}
-        <span className="testText">Text to highlight</span>
-      </div>
+          <span className="testText">Text to highlight</span>
+        </div>
+      )}
+      {showPlaceholder && (
+        <div className="annotator-placeholder testText">
+          {/* Placeholder created to anchor annotations to if the text layer has not finished
+              rendering. */}
+          Loading annotations
+        </div>
+      )}
     </div>
   );
 }
@@ -220,6 +230,21 @@ describe('annotator/highlighter', () => {
         assert.isFalse(highlight.classList.contains('is-transparent'));
         assert.isNull(container.querySelector('rect'));
         assert.notOk(highlight.svgHighlight);
+      });
+
+      it('does not create an SVG highlight for placeholder highlights', () => {
+        const container = document.createElement('div');
+        render(<PdfPage showPlaceholder={true} />, container);
+        const [highlight] = highlightPdfRange(container);
+
+        // If the highlight is a placeholder, the highlight element should still
+        // be created.
+        assert.ok(highlight);
+        assert.equal(highlight.textContent, 'Loading annotations');
+
+        // ...but the highlight should be visually hidden so the SVG should
+        // not be created.
+        assert.isNull(container.querySelector('rect'));
       });
 
       describe('CSS blend mode support testing', () => {
