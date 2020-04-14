@@ -2,23 +2,27 @@
 
 .annotation-quote {
   margin: 1em 0;
-}
 
-.annotation-quote.is-orphan {
-  text-decoration: line-through;
-}
+  &.is-orphan {
+    text-decoration: line-through;
+  }
 
-.annotation-quote__quote {
-  @include var.font-normal;
+  &__quote {
+    @include var.font-normal;
 
-  border-left: 3px solid var.$grey-3;
-  color: var.$grey-5;
-  font-family: sans-serif;
-  font-size: 12px;
-  font-style: italic;
-  letter-spacing: 0.1px;
-  padding: 0 1em;
+    border-left: 3px solid var.$grey-3;
+    color: var.$grey-5;
+    font-family: sans-serif;
+    font-size: 12px;
+    font-style: italic;
+    letter-spacing: 0.1px;
+    padding: 0 1em;
 
-  // Prevent long URLs etc. in quote causing overflow
-  overflow-wrap: break-word;
+    // Prevent long URLs etc. in quote causing overflow
+    overflow-wrap: break-word;
+  }
+
+  &.is-focused &__quote {
+    border-left: var.$highlight 3px solid;
+  }
 }

@@ -92,8 +92,8 @@ const setTab = (selectedTab, newTab) => {
 
 function init(settings) {
   return {
-    // Contains a map of annotation tag:true pairs.
-    focusedAnnotationMap: null,
+    // An array of annotation `$tag`s representing annotations that are focused
+    focusedAnnotations: [],
 
     // Contains a map of annotation id:true pairs.
     selectedAnnotationMap: initialSelection(settings),
@@ -153,7 +153,7 @@ const update = {
   },
 
   FOCUS_ANNOTATIONS: function (state, action) {
-    return { focusedAnnotationMap: action.focused };
+    return { focusedAnnotations: [...action.focusedTags] };
   },
 
   SET_FOCUS_MODE_FOCUSED: function (state, action) {
@@ -318,7 +318,7 @@ function setForceVisible(id, visible) {
 function focusAnnotations(tags) {
   return {
     type: actions.FOCUS_ANNOTATIONS,
-    focused: freeze(toSet(tags)),
+    focusedTags: tags,
   };
 }
 
@@ -393,6 +393,13 @@ function setSortKey(key) {
     type: actions.SET_SORT_KEY,
     key: key,
   };
+}
+
+/** Is the annotation referenced by `$tag` currently focused? */
+function isAnnotationFocused(state, $tag) {
+  return (state.selection.focusedAnnotations || []).some(
+    focusedAnn => $tag && focusedAnn === $tag
+  );
 }
 
 /**
@@ -542,6 +549,7 @@ export default {
     focusModeHasUser,
     focusModeUserId,
     focusModeUserPrettyName,
+    isAnnotationFocused,
     isAnnotationSelected,
     getFirstSelectedAnnotationId,
     getSelectedAnnotationMap,

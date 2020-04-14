@@ -252,6 +252,7 @@ export default function FrameSync($rootScope, $window, store, bridge) {
    * @param {string[]} tags
    */
   this.focusAnnotations = function (tags) {
+    store.focusAnnotations(tags);
     bridge.call('focusAnnotations', tags);
   };
 
