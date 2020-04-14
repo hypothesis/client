@@ -47,7 +47,6 @@ describe('rootThread', function () {
         drafts: [],
         selection: {
           filterQuery: null,
-          forceVisible: {},
           highlighted: [],
           sortKey: 'Location',
           sortKeysAvailable: ['Location'],
@@ -62,6 +61,7 @@ describe('rootThread', function () {
       },
 
       expandedThreads: sinon.stub().returns({}),
+      getForceVisibleAnnotations: sinon.stub().returns([]),
       getSelectedAnnotationMap: sinon.stub().returns(null),
       subscribe: sinon.stub(),
       removeAnnotations: sinon.stub(),
@@ -155,7 +155,7 @@ describe('rootThread', function () {
     });
 
     it('passes the current force-visible set to buildThread()', function () {
-      fakeStore.state.selection.forceVisible = { id1: true, id2: true };
+      fakeStore.getForceVisibleAnnotations.returns(['id1', 'id2']);
       rootThread.thread(fakeStore.state);
       assert.calledWith(
         fakeBuildThread,

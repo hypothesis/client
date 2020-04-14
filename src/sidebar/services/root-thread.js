@@ -88,7 +88,7 @@ export default function RootThread(
     // Get the currently loaded annotations and the set of inputs which
     // determines what is visible and build the visible thread structure
     return buildThread(state.annotations.annotations, {
-      forceVisible: truthyKeys(state.selection.forceVisible),
+      forceVisible: store.getForceVisibleAnnotations(),
       expanded: store.expandedThreads(),
       highlighted: state.selection.highlighted,
       selected: truthyKeys(store.getSelectedAnnotationMap() || {}),

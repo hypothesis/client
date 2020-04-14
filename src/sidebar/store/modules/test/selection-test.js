@@ -29,9 +29,10 @@ describe('sidebar/store/modules/selection', () => {
   });
 
   describe('setForceVisible()', function () {
-    it('sets the visibility of the annotation', function () {
-      store.setForceVisible('id1', true);
-      assert.deepEqual(getSelectionState().forceVisible, { id1: true });
+    it('adds the passed id to the `forceVisble` array', function () {
+      store.setForceVisible('id1');
+      store.setForceVisible('id2');
+      assert.deepEqual(store.getForceVisibleAnnotations(), ['id1', 'id2']);
     });
   });
 
@@ -192,10 +193,10 @@ describe('sidebar/store/modules/selection', () => {
     });
 
     it('resets the force-visible and expanded sets', function () {
-      store.setForceVisible('123', true);
+      store.setForceVisible('123');
       store.setCollapsed('456', false);
       store.setFilterQuery('some-query');
-      assert.deepEqual(getSelectionState().forceVisible, {});
+      assert.deepEqual(store.getForceVisibleAnnotations(), []);
       assert.deepEqual(getSelectionState().expanded, {});
     });
   });
@@ -239,7 +240,7 @@ describe('sidebar/store/modules/selection', () => {
         displayName: 'Test User',
       });
 
-      assert.isEmpty(getSelectionState().forceVisible);
+      assert.isEmpty(store.getForceVisibleAnnotations());
       assert.isNull(store.filterQuery());
     });
   });

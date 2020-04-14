@@ -106,7 +106,7 @@ function init(settings) {
 
     // Set of IDs of annotations that have been explicitly shown
     // by the user even if they do not match the current search filter
-    forceVisible: {},
+    forceVisible: [],
 
     // IDs of annotations that should be highlighted
     highlighted: [],
@@ -138,7 +138,7 @@ const update = {
     const tabSettings = setTab(state.selectedTab, selectedTab);
     return {
       filterQuery: null,
-      forceVisible: {},
+      forceVisible: [],
       selectedAnnotationMap: null,
       ...tabSettings,
     };
@@ -189,7 +189,7 @@ const update = {
   },
 
   SET_FORCE_VISIBLE: function (state, action) {
-    return { forceVisible: action.forceVisible };
+    return { forceVisible: state.forceVisible.concat(action.id) };
   },
 
   SET_EXPANDED: function (state, action) {
@@ -245,7 +245,7 @@ const update = {
   SET_FILTER_QUERY: function (state, action) {
     return {
       filterQuery: action.query,
-      forceVisible: {},
+      forceVisible: [],
       expanded: {},
     };
   },
@@ -291,22 +291,15 @@ function toggleSelectedAnnotations(ids) {
 }
 
 /**
- * Sets whether a given annotation should be visible, even if it does not
- * match the current search query.
+ * Forces an annotation thread to be visible, even if it does not
+ * match the current search query or filters.
  *
  * @param {string} id - Annotation ID
- * @param {boolean} visible
  */
-function setForceVisible(id, visible) {
-  // FIXME: This should be converted to a plain action and accessing the state
-  // should happen in the update() function
-  return function (dispatch, getState) {
-    const forceVisible = Object.assign({}, getState().selection.forceVisible);
-    forceVisible[id] = visible;
-    dispatch({
-      type: actions.SET_FORCE_VISIBLE,
-      forceVisible: forceVisible,
-    });
+function setForceVisible(id) {
+  return {
+    type: actions.SET_FORCE_VISIBLE,
+    id: id,
   };
 }
 
@@ -508,6 +501,10 @@ function focusModeUserPrettyName(state) {
   }
 }
 
+function getForceVisibleAnnotations(state) {
+  return state.selection.forceVisible;
+}
+
 function getSelectedAnnotationMap(state) {
   return state.selection.selectedAnnotationMap;
 }
@@ -544,6 +541,7 @@ export default {
     focusModeUserPrettyName,
     isAnnotationSelected,
     getFirstSelectedAnnotationId,
+    getForceVisibleAnnotations,
     getSelectedAnnotationMap,
   },
 };
