@@ -249,9 +249,10 @@ export default function FrameSync($rootScope, $window, store, bridge) {
    * This is used to indicate the highlight in the document that corresponds to
    * a given annotation in the sidebar.
    *
-   * @param {string[]} tags
+   * @param {string[]} annotation $tags
    */
   this.focusAnnotations = function (tags) {
+    store.focusAnnotations(tags);
     bridge.call('focusAnnotations', tags);
   };
 

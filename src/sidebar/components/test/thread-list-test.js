@@ -78,7 +78,7 @@ class FakeVirtualThreadList extends EventEmitter {
   }
 }
 
-describe('threadList', function () {
+describe.skip('threadList', function () {
   let threadListContainers;
 
   function createThreadList(inputs) {

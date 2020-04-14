@@ -11,7 +11,7 @@ import Excerpt from './excerpt';
 /**
  * Display the selected text from the document associated with an annotation.
  */
-function AnnotationQuote({ annotation, settings = {} }) {
+function AnnotationQuote({ annotation, isFocused, settings = {} }) {
   // The language for the quote may be different than the client's UI (set by
   // `<html lang="...">`).
   //
@@ -24,10 +24,10 @@ function AnnotationQuote({ annotation, settings = {} }) {
 
   return (
     <section
-      className={classnames(
-        'annotation-quote',
-        isOrphan(annotation) && 'is-orphan'
-      )}
+      className={classnames('annotation-quote', {
+        'is-orphan': isOrphan(annotation),
+        'is-focused': isFocused,
+      })}
     >
       <Excerpt
         collapsedHeight={35}
@@ -49,7 +49,8 @@ function AnnotationQuote({ annotation, settings = {} }) {
 
 AnnotationQuote.propTypes = {
   annotation: propTypes.object.isRequired,
-
+  /** Is this annotation currently focused? */
+  isFocused: propTypes.bool,
   // Used for theming.
   settings: propTypes.object,
 };

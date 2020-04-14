@@ -43,28 +43,22 @@ describe('sidebar/store/modules/selection', () => {
   });
 
   describe('focusAnnotations()', function () {
-    it('adds the passed annotations to the focusedAnnotationMap', function () {
+    it('adds the provided annotation IDs to the focused annotations', function () {
       store.focusAnnotations([1, 2, 3]);
-      assert.deepEqual(getSelectionState().focusedAnnotationMap, {
-        1: true,
-        2: true,
-        3: true,
-      });
+      assert.deepEqual(getSelectionState().focusedAnnotations, [1, 2, 3]);
     });
 
-    it('replaces any annotations originally in the map', function () {
+    it('replaces any other focused annotation IDs', function () {
       store.focusAnnotations([1]);
       store.focusAnnotations([2, 3]);
-      assert.deepEqual(getSelectionState().focusedAnnotationMap, {
-        2: true,
-        3: true,
-      });
+      assert.deepEqual(getSelectionState().focusedAnnotations, [2, 3]);
     });
 
-    it('nulls the map if no annotations are focused', function () {
+    it('sets focused annotations to an empty array if no IDs provided', function () {
       store.focusAnnotations([1]);
       store.focusAnnotations([]);
-      assert.isNull(getSelectionState().focusedAnnotationMap);
+      assert.isArray(getSelectionState().focusedAnnotations);
+      assert.isEmpty(getSelectionState().focusedAnnotations);
     });
   });
 
@@ -365,6 +359,17 @@ describe('sidebar/store/modules/selection', () => {
     it('sets the highlighted annotations', function () {
       store.highlightAnnotations(['id1', 'id2']);
       assert.deepEqual(getSelectionState().highlighted, ['id1', 'id2']);
+    });
+  });
+
+  describe('isAnnotationFocused', () => {
+    it('returns true if the provided annotation ID is in the set of focused annotations', () => {
+      store.focusAnnotations([1, 2]);
+      assert.isTrue(store.isAnnotationFocused(2));
+    });
+
+    it('returns false if the provided annotation ID is not in the set of focused annotations', () => {
+      assert.isFalse(store.isAnnotationFocused(2));
     });
   });
 

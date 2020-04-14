@@ -136,6 +136,7 @@ import hypothesisApp from './components/hypothesis-app';
 import sidebarContent from './components/sidebar-content';
 import streamContent from './components/stream-content';
 import threadList from './components/thread-list';
+import threadListOmega from './components/thread-list-omega';
 
 // Services.
 
@@ -268,6 +269,7 @@ function startAngularApp(config) {
     .component('svgIcon', wrapComponent(SvgIcon))
     .component('thread', wrapComponent(Thread))
     .component('threadList', threadList)
+    .component('threadListOmega', wrapComponent(threadListOmega))
     .component('toastMessages', wrapComponent(ToastMessages))
     .component('topBar', wrapComponent(TopBar))
 

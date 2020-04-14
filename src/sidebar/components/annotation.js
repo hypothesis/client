@@ -27,6 +27,9 @@ function Annotation({
   toastMessenger,
 }) {
   const createDraft = useStore(store => store.createDraft);
+  const isFocused = useStore(store =>
+    store.isAnnotationFocused(annotation.$tag)
+  );
   const setCollapsed = useStore(store => store.setCollapsed);
 
   // An annotation will have a draft if it is being edited
@@ -90,6 +93,7 @@ function Annotation({
       className={classnames('annotation', {
         'annotation--reply': isReply(annotation),
         'is-collapsed': threadIsCollapsed,
+        'is-focused': isFocused,
       })}
       onKeyDown={onKeyDown}
     >
@@ -101,7 +105,9 @@ function Annotation({
         threadIsCollapsed={threadIsCollapsed}
       />
 
-      {hasQuote && <AnnotationQuote annotation={annotation} />}
+      {hasQuote && (
+        <AnnotationQuote annotation={annotation} isFocused={isFocused} />
+      )}
 
       {!isCollapsedReply && (
         <AnnotationBody
