@@ -9,7 +9,8 @@ function isCSSPropertySupported(property, value) {
 }
 
 /**
- * Polyfill for `element.closest(selector)`, only needed for IE 11.
+ * Implementation of `element.closest(selector)`. This is used to support browsers
+ * (IE 11) that don't have a native implementation.
  */
 function closest(element, selector) {
   while (element) {

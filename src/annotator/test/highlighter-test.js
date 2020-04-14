@@ -34,12 +34,12 @@ function PdfPage() {
 /**
  * Highlight the text in a fake PDF page.
  *
- * @param {HTMLElement} - HTML element into which `PdfPage` component has been
- *   rendered
+ * @param {HTMLElement} pageContainer - HTML element into which `PdfPage`
+ *   component has been rendered
  * @return {HTMLElement} - `<hypothesis-highlight>` element
  */
-function highlightPdfRange(pdfPage) {
-  const textSpan = pdfPage.querySelector('.testText');
+function highlightPdfRange(pageContainer) {
+  const textSpan = pageContainer.querySelector('.testText');
   const r = new Range.NormalizedRange({
     commonAncestor: textSpan,
     start: textSpan.childNodes[0],
