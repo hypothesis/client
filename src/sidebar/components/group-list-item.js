@@ -50,6 +50,11 @@ function GroupListItem({
     }
   };
 
+  /**
+   * Opens or closes the submenu.
+   *
+   * @param {MouseEvent|KeyboardEvent} event
+   */
   const toggleSubmenu = event => {
     event.stopPropagation();
 
@@ -85,9 +90,11 @@ function GroupListItem({
       onToggleSubmenu={toggleSubmenu}
       submenu={
         <Fragment>
-          <ul>
+          {/* Giving the role="menu" allows screen readers to have
+          correct number of subitems */}
+          <ul role="menu">
             {activityUrl && (
-              <li>
+              <li role="none">
                 <MenuItem
                   href={activityUrl}
                   icon="external"
@@ -97,7 +104,7 @@ function GroupListItem({
               </li>
             )}
             {activityUrl && (
-              <li>
+              <li role="none">
                 <MenuItem
                   onClick={copyLink}
                   icon="copy"
@@ -107,7 +114,7 @@ function GroupListItem({
               </li>
             )}
             {canLeaveGroup && (
-              <li>
+              <li role="none">
                 <MenuItem
                   icon="leave"
                   isSubmenuItem={true}

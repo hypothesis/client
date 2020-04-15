@@ -45,6 +45,7 @@ describe('Menu', () => {
     const wrapper = createMenu();
     assert.isFalse(isOpen(wrapper));
     wrapper.find('button').simulate('click');
+    assert.isTrue(wrapper.find('MenuKeyboardNavigation').prop('visible'));
     assert.isTrue(isOpen(wrapper));
     wrapper.find('button').simulate('click');
     assert.isFalse(isOpen(wrapper));
@@ -54,6 +55,7 @@ describe('Menu', () => {
     const onOpenChanged = sinon.stub();
     const wrapper = createMenu({ onOpenChanged });
     wrapper.find('button').simulate('click');
+    assert.isTrue(wrapper.find('MenuKeyboardNavigation').prop('visible'));
     assert.calledWith(onOpenChanged, true);
     wrapper.find('button').simulate('click');
     assert.calledWith(onOpenChanged, false);
@@ -64,6 +66,7 @@ describe('Menu', () => {
     assert.isFalse(isOpen(wrapper));
 
     wrapper.find('button').simulate('mousedown');
+    assert.isFalse(wrapper.find('MenuKeyboardNavigation').prop('visible'));
     // Make sure the follow-up click doesn't close the menu.
     wrapper.find('button').simulate('click');
 
@@ -161,9 +164,13 @@ describe('Menu', () => {
     it(`${
       shouldClose ? 'closes' : "doesn't close"
     } when user performs a "${eventType}" (key: "${key}") on menu content`, () => {
+      const clock = sinon.useFakeTimers();
       const wrapper = createMenu({ defaultOpen: true });
       wrapper.find('.menu__content').simulate(eventType, { key });
+      clock.tick(1);
+      wrapper.update();
       assert.equal(isOpen(wrapper), !shouldClose);
+      clock.restore();
     });
   });
 

@@ -3,96 +3,91 @@
 @use "../../variables" as var;
 
 $menu-item-padding: 10px;
+$item-height: 40px;
+
+// The container for the clickable area of the menu item which triggers an
+// action or link. For menu items without submenus, this covers the full area of
+// the menu item. For menu items with submenus, this covers the full area
+// except for the toggle button that opens the submenu.
+
+a.menu-item:hover {
+  color: var.$link-color-hover;
+}
 
 .menu-item {
   @include focus.outline-on-keyboard-focus;
-
-  $item-height: 40px;
-
-  color: var.$grey-6;
+  align-self: stretch;
   display: flex;
-  flex-direction: row;
   flex-grow: 1;
-  font-weight: 500;
+  appearance: none;
   align-items: center;
+  padding-left: $menu-item-padding;
+  color: var.$grey-6;
+  border: none;
+  padding-right: 0;
+  font-weight: 500;
+  min-height: 40px;
+  width: 100%;
   min-width: 150px;
-  min-height: $item-height;
-
-  // TODO - Make the link fill the full available vertical space.
-  cursor: pointer;
-
+  // Prevent height changes when .is-expanded border is rendered.
+  border-bottom: solid 1px transparent;
   // Prevent menu item text from being selected when user toggles menu.
   user-select: none;
 
-  // An item in a submenu associated with a top-level item.
-  &--submenu {
+  &:hover {
+    background-color: var.$grey-1;
+    .menu-item__toggle {
+      // Make it a bit darker when its a submenu item.
+      background-color: var.$grey-3;
+    }
+  }
+
+  &.is-submenu {
     min-height: $item-height - 10px;
     background: var.$grey-1;
     color: color.mix(var.$grey-5, var.$grey-6, $weight: 50%);
     font-weight: normal;
-  }
-
-  // Animate the background color transition of menu items with expanding submenus.
-  // The timing should match the expansion of the submenu.
-  transition: background 0.15s ease-in;
-
-  &.is-expanded {
-    // Set the background color of menu items with submenus to match the
-    // submenu items.
-    background: var.$grey-1;
-  }
-}
-
-// The container for the clickable area of the menu item which triggers its
-// main action. For menu items without submenus, this covers the full area of
-// the menu item. For menu items with submenus, this covers the full area
-// except for the toggle that opens the submenu.
-.menu-item__action {
-  align-self: stretch;
-  display: flex;
-  flex-grow: 1;
-  align-items: center;
-  padding-left: $menu-item-padding;
-
-  &:hover {
-    background: var.$grey-1;
-
-    .menu-item.is-expanded & {
-      // Since expanded items already have a light grey background, we need to
-      // make the hover state a little darker. This should match submenu items'
-      // hover state.
-      background: var.$grey-3;
-    }
-
-    // Since submenu items already have a light grey background, we need to
-    // use a slightly darker grey as the hover state.
-    .menu-item--submenu & {
-      background: var.$grey-3;
-      color: var.$grey-6;
+    &:hover {
+      background-color: var.$grey-3;
     }
   }
 
-  .menu-item.is-selected & {
+  &.is-selected {
     $border-width: 4px;
     border-left: $border-width solid var.$brand;
     padding-left: $menu-item-padding - $border-width;
   }
-}
 
-.menu-item__icon-container {
-  margin-right: 10px;
-  width: 15px;
-  height: 15px;
+  &.is-expanded {
+    background-color: var.$grey-1;
+    color: var.$grey-6;
+    border-bottom: solid 1px var.$grey-3;
+    &:hover {
+      background-color: var.$grey-3;
+    }
+    .menu-item__toggle {
+      // Make it a bit darker when its expanded. This is needed for
+      // a color darker than hover while expanded.
+      background-color: var.$grey-4;
+    }
+  }
+  &.is-disabled {
+    color: var.$grey-4;
+  }
 }
-
 .menu-item__icon {
   color: inherit;
   display: inline-block;
   margin-right: 4px;
   position: relative;
-
   height: 15px;
   width: 15px;
+
+  &-container {
+    margin-right: 10px;
+    width: 15px;
+    height: 15px;
+  }
 }
 
 .menu-item__label {
@@ -113,24 +108,20 @@ $menu-item-padding: 10px;
   &--submenu {
     font-weight: normal;
   }
-
-  .menu-item.is-disabled & {
-    color: var.$grey-4;
-  }
 }
 
 // Toggle button used to expand or collapse the submenu associated with a menu
 // item.
 .menu-item__toggle {
-  @include focus.outline-on-keyboard-focus;
-
-  color: var.$grey-4;
+  color: var.$grey-5;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   align-self: stretch;
   width: 40px;
+  padding: 0;
+  height: 40px;
 
   // Add a wide transparent border to provide a large-enough hit target (~40px),
   // larger than the visual size of the button (~20px).
@@ -143,11 +134,16 @@ $menu-item-padding: 10px;
   border-radius: 12px;
 
   &:hover {
-    background-color: var.$grey-3;
-    color: var.$grey-5;
+    background-color: var.$grey-4;
+    color: var.$grey-6;
   }
 
   &-icon {
+    width: 12px;
+    height: 12px;
+  }
+
+  svg {
     width: 12px;
     height: 12px;
   }
@@ -155,5 +151,9 @@ $menu-item-padding: 10px;
 
 // The container for open submenus
 .menu-item__submenu {
-  border-bottom: solid 1px var.$grey-2;
+  border-bottom: solid 1px var.$grey-3;
+  &:hover {
+    // Make it a bit darker on hover.
+    background-color: var.$grey-3;
+  }
 }

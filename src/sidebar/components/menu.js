@@ -5,6 +5,7 @@ import propTypes from 'prop-types';
 
 import useElementShouldClose from './hooks/use-element-should-close';
 import SvgIcon from '../../shared/components/svg-icon';
+import MenuKeyboardNavigation from './menu-keyboard-navigation';
 
 // The triangular indicator below the menu toggle button that visually links it
 // to the menu content.
@@ -52,6 +53,7 @@ export default function Menu({
   title,
 }) {
   const [isOpen, setOpen] = useState(defaultOpen);
+  const [openedByKeyboard, setOpenedByKeyboard] = useState(false);
 
   // Notify parent when menu is opened or closed.
   const wasOpen = useRef(isOpen);
@@ -76,6 +78,14 @@ export default function Menu({
       event.preventDefault();
       return;
     }
+    // State variable so we know to set focus() on the first item when opened
+    // via the keyboard.
+    if (!isOpen && event.type === 'click') {
+      setOpenedByKeyboard(true);
+    } else {
+      setOpenedByKeyboard(false);
+    }
+
     setOpen(!isOpen);
   };
   const closeMenu = useCallback(() => setOpen(false), [setOpen]);
@@ -96,7 +106,11 @@ export default function Menu({
   // It should also close if the user presses a key which activates menu items.
   const handleMenuKeyDown = event => {
     if (event.key === 'Enter' || event.key === ' ') {
-      closeMenu();
+      // Don't close the menu right away, the link still needs to be present at least one
+      // more render cycle for them to be followed.
+      setTimeout(() => {
+        closeMenu();
+      });
     }
   };
 
@@ -156,7 +170,9 @@ export default function Menu({
             onClick={closeMenu}
             onKeyDown={handleMenuKeyDown}
           >
-            {children}
+            <MenuKeyboardNavigation visible={openedByKeyboard}>
+              {children}
+            </MenuKeyboardNavigation>
           </div>
         </Fragment>
       )}
