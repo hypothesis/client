@@ -1,3 +1,5 @@
+import { watch } from '../util/watch';
+
 /**
  * A service for reading and persisting convenient client-side defaults for
  * the (browser) user.
@@ -10,14 +12,11 @@ const DEFAULT_KEYS = {
 
 // @ngInject
 export default function persistedDefaults(localStorage, store) {
-  let lastDefaults;
-
   /**
    * Store subscribe callback for persisting changes to defaults. It will only
    * persist defaults that it "knows about" via `DEFAULT_KEYS`.
    */
-  function persistChangedDefaults() {
-    const latestDefaults = store.getDefaults();
+  function persistChangedDefaults(latestDefaults, lastDefaults) {
     for (let defaultKey in latestDefaults) {
       if (
         lastDefaults[defaultKey] !== latestDefaults[defaultKey] &&
@@ -29,7 +28,6 @@ export default function persistedDefaults(localStorage, store) {
         );
       }
     }
-    lastDefaults = latestDefaults;
   }
 
   return {
@@ -45,10 +43,9 @@ export default function persistedDefaults(localStorage, store) {
         const defaultValue = localStorage.getItem(DEFAULT_KEYS[defaultKey]);
         store.setDefault(defaultKey, defaultValue);
       });
-      lastDefaults = store.getDefaults();
 
       // Listen for changes to those defaults from the store and persist them
-      store.subscribe(persistChangedDefaults);
+      watch(store.subscribe, () => store.getDefaults(), persistChangedDefaults);
     },
   };
 }
