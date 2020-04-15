@@ -1,4 +1,3 @@
-import { toResult } from '../../../shared/test/promise-util';
 import * as retryUtil from '../retry';
 
 describe('sidebar.util.retry', function () {
@@ -29,7 +28,7 @@ describe('sidebar.util.retry', function () {
       });
     });
 
-    it('should return the error if it repeatedly fails', function () {
+    it('should return the error if it repeatedly fails', async function () {
       const error = new Error('error');
       const operation = sinon.spy(function () {
         return Promise.reject(error);
@@ -38,9 +37,7 @@ describe('sidebar.util.retry', function () {
         minTimeout: 3,
         retries: 2,
       });
-      return toResult(wrappedOperation).then(function (result) {
-        assert.equal(result.error, error);
-      });
+      await assert.rejects(wrappedOperation, 'error');
     });
   });
 });
