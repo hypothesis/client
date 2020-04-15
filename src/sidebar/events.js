@@ -3,9 +3,6 @@
  * on $rootScope
  */
 export default {
-  // Internal state changes
-  FRAME_CONNECTED: 'frameConnected',
-
   // Session state changes
 
   /** The logged-in user changed */
