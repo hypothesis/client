@@ -3,6 +3,7 @@ import serviceConfig from '../service-config';
 import { isReply } from '../util/annotation-metadata';
 import { combineGroups } from '../util/groups';
 import { awaitStateChange } from '../util/state';
+import { watch } from '../util/watch';
 
 const DEFAULT_ORG_ID = '__default__';
 
@@ -31,14 +32,19 @@ export default function groups(
   const svc = serviceConfig(settings);
   const authority = svc ? svc.authority : null;
 
-  function getDocumentUriForGroupSearch() {
-    function mainUri() {
-      const mainFrame = store.mainFrame();
-      if (!mainFrame) {
-        return null;
-      }
-      return mainFrame.uri;
+  /**
+   * Return the main document URI that is used to fetch groups associated with
+   * the site that the user is on.
+   */
+  function mainUri() {
+    const mainFrame = store.mainFrame();
+    if (!mainFrame) {
+      return null;
     }
+    return mainFrame.uri;
+  }
+
+  function getDocumentUriForGroupSearch() {
     return awaitStateChange(store, mainUri);
   }
 
@@ -167,11 +173,7 @@ export default function groups(
     });
   }
 
-  // The document URI passed to the most recent `GET /api/groups` call in order
-  // to include groups associated with this page. This is retained to determine
-  // whether we need to re-fetch groups if the URLs of frames connected to the
-  // sidebar app changes.
-  let documentUri = null;
+  let didSubscribeToUriChanges = false;
 
   /*
    * Fetch an individual group.
@@ -193,13 +195,25 @@ export default function groups(
    * The groups that are fetched depend on the current user, the URI of
    * the current document, and the direct-linked group and/or annotation.
    *
+   * On startup, `load()` must be called to trigger the initial groups fetch.
+   * Subsequently groups are automatically reloaded if the logged-in user or
+   * main document URI changes.
+   *
    * @return {Promise<Group[]>}
    */
   async function load() {
     // Step 1: Get the URI of the active document, so we can fetch groups
     // associated with that document.
+    let documentUri;
     if (isSidebar) {
       documentUri = await getDocumentUriForGroupSearch();
+    }
+
+    if (!didSubscribeToUriChanges) {
+      didSubscribeToUriChanges = true;
+      watch(store.subscribe, mainUri, () => {
+        load();
+      });
     }
 
     // Step 2: Concurrently fetch the groups the user is a member of,
@@ -360,16 +374,6 @@ export default function groups(
     // FIXME Makes a second api call on page load. better way?
     // return for use in test
     return load();
-  });
-
-  // refetch the list of groups when document url changes
-  $rootScope.$on(events.FRAME_CONNECTED, () => {
-    return getDocumentUriForGroupSearch().then(uri => {
-      if (documentUri !== uri) {
-        documentUri = uri;
-        load();
-      }
-    });
   });
 
   return {
