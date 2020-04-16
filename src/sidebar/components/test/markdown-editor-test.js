@@ -21,13 +21,14 @@ describe('MarkdownEditor', () => {
     toggleSpanStyle: sinon.stub().returns(formatResult),
     LinkType,
   };
-
+  let fakeIsMacOS;
   let MarkdownView;
 
   beforeEach(() => {
     fakeMarkdownCommands.convertSelectionToLink.resetHistory();
     fakeMarkdownCommands.toggleBlockStyle.resetHistory();
     fakeMarkdownCommands.toggleSpanStyle.resetHistory();
+    fakeIsMacOS = sinon.stub().returns(false);
 
     MarkdownView = function MarkdownView() {
       return null;
@@ -37,6 +38,9 @@ describe('MarkdownEditor', () => {
     $imports.$mock({
       '../markdown-commands': fakeMarkdownCommands,
       './markdown-view': MarkdownView,
+      '../../shared/user-agent': {
+        isMacOS: fakeIsMacOS,
+      },
     });
   });
 
@@ -129,45 +133,36 @@ describe('MarkdownEditor', () => {
 
       if (key) {
         describe('renders appropriate tooltip for user OS', () => {
-          let fakeUserAgent;
-          let stubbedUserAgent;
-
-          beforeEach(() => {
-            stubbedUserAgent = sinon
-              .stub(window.navigator, 'userAgent')
-              .get(() => fakeUserAgent);
-          });
-
-          afterEach(() => {
-            stubbedUserAgent.restore();
-          });
-
-          // Test that button `title` shows the correct modifier for user OS:
-          // `Cmd-shortcut` for Mac users and `Ctrl-shortcut` for everyone else
           [
             {
-              userAgent:
-                'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.116 Safari/537.36',
+              setOs: () => {
+                fakeIsMacOS.returns(true);
+              },
               expectedModifier: 'Cmd',
             },
-            { userAgent: 'literally anything else', expectedModifier: 'Ctrl' },
-          ].forEach(testCase => {
-            it('should the correct modifier key for user OS in button `title`', () => {
-              fakeUserAgent = testCase.userAgent;
-
+            {
+              setOs: () => {
+                fakeIsMacOS.returns(false);
+              },
+              expectedModifier: 'Ctrl',
+            },
+          ].forEach(test => {
+            it('should show the correct modifier key for user OS in button `title`', () => {
+              // Test that button `title` shows the correct modifier for user OS:
+              // `Cmd-shortcut` for Mac users and `Ctrl-shortcut` for everyone else
+              test.setOs();
               const wrapper = createComponent();
               const button = wrapper.find(
                 `ToolbarButton[title="${command}"] > button`
               );
 
               const buttonTitlePattern = new RegExp(
-                `${testCase.expectedModifier}-${key.toUpperCase()}`
+                `${test.expectedModifier}-${key.toUpperCase()}`
               );
               assert.match(button.props().title, buttonTitlePattern);
             });
           });
         });
-
         // Test that shortcuts are executed with different Ctrl- and Cmd- combos
         const keyEventDetails = [
           { ctrlKey: true, metaKey: false, key },
@@ -365,18 +360,24 @@ describe('MarkdownEditor', () => {
     };
 
     context('when `isPreviewing` is false', () => {
-      it('changes focus circularly to the left', () => {
-        pressKey('ArrowLeft');
-        // preview is the last button
-        matchesFocusedText('Preview');
-        testRovingIndex();
+      ['ArrowLeft', 'Left'].forEach(event => {
+        // IE11 uses "Left"
+        it('changes focus circularly to the left', () => {
+          pressKey(event);
+          // preview is the last button
+          matchesFocusedText('Preview');
+          testRovingIndex();
+        });
       });
 
-      it('changes focus circularly to the right', () => {
-        pressKey('ArrowLeft'); // move to the end node
-        pressKey('ArrowRight'); // move back to the start
-        matchesFocusedTitle('Bold');
-        testRovingIndex();
+      ['ArrowRight', 'Right'].forEach(event => {
+        // IE11 uses "Right"
+        it('changes focus circularly to the right', () => {
+          pressKey('ArrowLeft'); // move to the end node
+          pressKey(event); // move back to the start
+          matchesFocusedTitle('Bold');
+          testRovingIndex();
+        });
       });
 
       it('changes focus to the last element when pressing `end`', () => {

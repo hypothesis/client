@@ -1,8 +1,9 @@
 import { createElement } from 'preact';
-import { useRef, useState } from 'preact/hooks';
+import { useMemo, useRef, useState } from 'preact/hooks';
 import propTypes from 'prop-types';
 
 import { withServices } from '../util/service-context';
+import { isIE11 } from '../../shared/user-agent';
 
 import AutocompleteList from './autocomplete-list';
 import SvgIcon from '../../shared/components/svg-icon';
@@ -33,6 +34,9 @@ function TagEditor({ onEditTags, tags: tagsService, tagList }) {
   useElementShouldClose(closeWrapperRef, suggestionsListOpen, () => {
     setSuggestionsListOpen(false);
   });
+
+  // Convenient boolean  for ie detection.
+  const ie11 = useMemo(() => isIE11(), []);
 
   /**
    * Helper function that returns a list of suggestions less any
@@ -121,7 +125,8 @@ function TagEditor({ onEditTags, tags: tagsService, tagList }) {
   const handleOnInput = e => {
     if (
       e.inputType === 'insertText' ||
-      e.inputType === 'deleteContentBackward'
+      e.inputType === 'deleteContentBackward' ||
+      ie11 // inputType is not defined in IE 11, so trigger on any input in this case.
     ) {
       updateSuggestions();
     }
@@ -175,10 +180,12 @@ function TagEditor({ onEditTags, tags: tagsService, tagList }) {
   const handleKeyDown = e => {
     switch (e.key) {
       case 'ArrowUp':
+      case 'Up': // IE11
         changeSelectedItem(-1);
         e.preventDefault();
         break;
       case 'ArrowDown':
+      case 'Down': // IE11
         changeSelectedItem(1);
         e.preventDefault();
         break;
