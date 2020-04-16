@@ -77,6 +77,23 @@ describe('Slider', () => {
     assert.equal(containerStyle.height, 'auto');
   });
 
+  it('should hide overflowing content when not fully visible', () => {
+    // When fully collapsed, overflow should be hidden.
+    const wrapper = createSlider({ visible: false });
+    let containerStyle = wrapper.getDOMNode().style;
+    assert.equal(containerStyle.overflow, 'hidden');
+
+    // When starting to expand, or when collapsing, overflow should also be hidden.
+    wrapper.setProps({ visible: true });
+    assert.equal(containerStyle.overflow, 'hidden');
+
+    // When fully visible, we make overflow visible to make focus rings or
+    // other content which extends beyond the bounds of the slider visible.
+    wrapper.find('div').first().simulate('transitionend');
+    containerStyle = wrapper.getDOMNode().style;
+    assert.equal(containerStyle.overflow, 'visible');
+  });
+
   it('should stop rendering content when a collapse transition finishes', () => {
     const wrapper = createSlider({ visible: true });
 

@@ -69,6 +69,8 @@ export default function Slider({ children, visible }) {
     }
   }, [setContainerHeight, visible]);
 
+  const isFullyVisible = containerHeight === 'auto';
+
   return (
     <div
       // nb. Preact uses "ontransitionend" rather than "onTransitionEnd".
@@ -80,7 +82,11 @@ export default function Slider({ children, visible }) {
       style={{
         display: contentVisible ? '' : 'none',
         height: containerHeight,
-        overflow: 'hidden',
+
+        // When the slider is fully open, overflow is made visible so that
+        // focus rings, which may extend outside the bounds of the slider content,
+        // are visible.
+        overflow: isFullyVisible ? 'visible' : 'hidden',
         transition: `height 0.15s ease-in`,
       }}
     >
