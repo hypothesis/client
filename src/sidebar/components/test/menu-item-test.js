@@ -150,6 +150,7 @@ describe('MenuItem', () => {
         onToggleSubmenu: fakeOnToggleSubmenu,
       });
       wrapper.find('.menu-item').simulate('keydown', { key: 'ArrowRight' });
+      assert.called(fakeOnToggleSubmenu);
     });
 
     it('renders submenu item icons on the right', () => {
@@ -217,18 +218,7 @@ describe('MenuItem', () => {
       assert.isTrue(fakeOnToggleSubmenu.called);
     });
 
-    it('calls `onToggleSubmenu` when the right arrow key is pressed', () => {
-      const fakeOnToggleSubmenu = sinon.stub();
-      const wrapper = createMenuItem({
-        isSubmenuVisible: true,
-        submenu: <div>Submenu content</div>,
-        onToggleSubmenu: fakeOnToggleSubmenu,
-      });
-      wrapper.find('.menu-item').simulate('keydown', { key: 'ArrowRight' });
-      assert.isTrue(fakeOnToggleSubmenu.called);
-    });
-
-    it('sets focus to div.menu-item when the submenu is closed via `closeMenu`', () => {
+    it('sets focus to the parent item when the submenu is closed via `closeMenu`', () => {
       const clock = sinon.useFakeTimers();
       const wrapper = createMenuItem({
         isSubmenuVisible: true,

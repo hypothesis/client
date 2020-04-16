@@ -21,6 +21,7 @@ import SvgIcon from '../../shared/components/svg-icon';
  *
  * For items that have submenus, the `MenuItem` will call the `renderSubmenu`
  * prop to render the content of the submenu, when the submenu is visible.
+ * Note that the `submenu` is not supported for link (`href`) items.
  */
 export default function MenuItem({
   href,
@@ -228,7 +229,7 @@ MenuItem.propTypes = {
   /**
    * If present, display a button to toggle the sub-menu associated with this
    * item and indicate the current state; `true` if the submenu is visible.
-   * Note. Omit this prop if there is no `submenu`.
+   * Note. Omit this prop, or set it to null, if there is no `submenu`.
    */
   isSubmenuVisible: propTypes.bool,
 

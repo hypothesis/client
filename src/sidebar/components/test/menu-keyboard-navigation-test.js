@@ -51,7 +51,7 @@ describe('MenuKeyboardNavigation', () => {
 
   // useFakeTimers does not work with checkAccessibility
   // so wrap these tests in their own describe block
-  describe('fake timer', () => {
+  describe('keyboard navigation', () => {
     beforeEach(() => {
       clock = sinon.useFakeTimers();
     });

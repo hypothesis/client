@@ -10,6 +10,7 @@ import { checkAccessibility } from '../../../test-util/accessibility';
 
 describe('Menu', () => {
   let container;
+  let clock;
 
   const TestLabel = () => 'Test label';
   const TestMenuItem = () => 'Test item';
@@ -39,6 +40,10 @@ describe('Menu', () => {
   afterEach(() => {
     $imports.$restore();
     container.remove();
+    if (clock) {
+      clock.restore();
+      clock = null;
+    }
   });
 
   it('opens and closes when the toggle button is clicked', () => {
@@ -164,13 +169,12 @@ describe('Menu', () => {
     it(`${
       shouldClose ? 'closes' : "doesn't close"
     } when user performs a "${eventType}" (key: "${key}") on menu content`, () => {
-      const clock = sinon.useFakeTimers();
+      clock = sinon.useFakeTimers();
       const wrapper = createMenu({ defaultOpen: true });
       wrapper.find('.menu__content').simulate(eventType, { key });
       clock.tick(1);
       wrapper.update();
       assert.equal(isOpen(wrapper), !shouldClose);
-      clock.restore();
     });
   });
 

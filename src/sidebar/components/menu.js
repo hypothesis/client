@@ -106,8 +106,8 @@ export default function Menu({
   // It should also close if the user presses a key which activates menu items.
   const handleMenuKeyDown = event => {
     if (event.key === 'Enter' || event.key === ' ') {
-      // Don't close the menu right away, the link still needs to be present at least one
-      // more render cycle for them to be followed.
+      // The link will not follow if its removed directly from an keypress event.
+      // Delay it a little.
       setTimeout(() => {
         closeMenu();
       });
