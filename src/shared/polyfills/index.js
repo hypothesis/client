@@ -58,6 +58,10 @@ const needsPolyfill = {
   },
 
   es2018: () => {
+    if (!window.Promise) {
+      // IE11 does not have a Promise object.
+      return true;
+    }
     return !hasMethods(Promise.prototype, 'finally');
   },
 
