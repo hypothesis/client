@@ -4,9 +4,9 @@ import { watch } from '../watch';
 
 function counterReducer(state = { a: 0, b: 0 }, action) {
   switch (action.type) {
-    case 'increment-a':
+    case 'INCREMENT_A':
       return { ...state, a: state.a + 1 };
-    case 'increment-b':
+    case 'INCREMENT_B':
       return { ...state, b: state.b + 1 };
     default:
       return state;
@@ -28,10 +28,10 @@ describe('sidebar/util/watch', () => {
 
       watch(store.subscribe, () => store.getState().a, callback);
 
-      store.dispatch({ type: 'increment-a' });
+      store.dispatch({ type: 'INCREMENT_A' });
       assert.calledWith(callback, 1, 0);
 
-      store.dispatch({ type: 'increment-a' });
+      store.dispatch({ type: 'INCREMENT_A' });
       assert.calledWith(callback, 2, 1);
     });
 
@@ -40,7 +40,7 @@ describe('sidebar/util/watch', () => {
       const store = counterStore();
 
       watch(store.subscribe, () => store.getState().a, callback);
-      store.dispatch({ type: 'increment-b' });
+      store.dispatch({ type: 'INCREMENT_B' });
 
       assert.notCalled(callback);
     });
@@ -54,7 +54,7 @@ describe('sidebar/util/watch', () => {
         [() => store.getState().a, () => store.getState().b],
         callback
       );
-      store.dispatch({ type: 'increment-a' });
+      store.dispatch({ type: 'INCREMENT_A' });
 
       assert.calledWith(callback, [1, 0], [0, 0]);
     });
@@ -68,13 +68,13 @@ describe('sidebar/util/watch', () => {
         () => store.getState().a,
         callback
       );
-      store.dispatch({ type: 'increment-a' });
+      store.dispatch({ type: 'INCREMENT_A' });
 
       assert.calledWith(callback, 1, 0);
 
       callback.resetHistory();
       unsubscribe();
-      store.dispatch({ type: 'increment-a' });
+      store.dispatch({ type: 'INCREMENT_A' });
 
       assert.notCalled(callback);
     });
