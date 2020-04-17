@@ -51,13 +51,20 @@ import shallowEqual from 'shallowequal';
  *   function that removes the subscription.
  */
 export function watch(subscribe, watchFns, callback) {
+  const isArray = Array.isArray(watchFns);
+
   const getWatchedValues = () =>
-    Array.isArray(watchFns) ? watchFns.map(fn => fn()) : watchFns();
+    isArray ? watchFns.map(fn => fn()) : watchFns();
 
   let prevValues = getWatchedValues();
   const unsubscribe = subscribe(() => {
     const values = getWatchedValues();
-    if (shallowEqual(values, prevValues)) {
+
+    const equal = isArray
+      ? shallowEqual(values, prevValues)
+      : values === prevValues;
+
+    if (equal) {
       return;
     }
 

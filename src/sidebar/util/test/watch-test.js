@@ -2,12 +2,14 @@ import { createStore } from 'redux';
 
 import { watch } from '../watch';
 
-function counterReducer(state = { a: 0, b: 0 }, action) {
+function counterReducer(state = { a: 0, b: 0, c: 0 }, action) {
   switch (action.type) {
     case 'INCREMENT_A':
       return { ...state, a: state.a + 1 };
     case 'INCREMENT_B':
       return { ...state, b: state.b + 1 };
+    case 'INCREMENT_C':
+      return { ...state, c: state.c + 1 };
     default:
       return state;
   }
@@ -45,7 +47,23 @@ describe('sidebar/util/watch', () => {
       assert.notCalled(callback);
     });
 
-    it('supports multiple value functions', () => {
+    it('compares watched values using strict equality', () => {
+      const callback = sinon.stub();
+      const store = counterStore();
+
+      const newEmptyObject = () => ({});
+      watch(store.subscribe, newEmptyObject, callback);
+
+      store.dispatch({ type: 'INCREMENT_A' });
+      store.dispatch({ type: 'INCREMENT_A' });
+
+      // This will trigger the callback because we're comparing values by
+      // strict equality rather than by shallow equality.
+      assert.calledTwice(callback);
+      assert.calledWith(callback, {});
+    });
+
+    it('runs callback if any of multiple watched values changes', () => {
       const callback = sinon.stub();
       const store = counterStore();
 
@@ -54,9 +72,20 @@ describe('sidebar/util/watch', () => {
         [() => store.getState().a, () => store.getState().b],
         callback
       );
-      store.dispatch({ type: 'INCREMENT_A' });
 
+      // Dispatch action that changes the first watched value.
+      store.dispatch({ type: 'INCREMENT_A' });
       assert.calledWith(callback, [1, 0], [0, 0]);
+
+      // Dispatch action that changes the second watched value.
+      callback.resetHistory();
+      store.dispatch({ type: 'INCREMENT_B' });
+      assert.calledWith(callback, [1, 1], [1, 0]);
+
+      // Dispatch action that doesn't change either watched value.
+      callback.resetHistory();
+      store.dispatch({ type: 'INCREMENT_C' });
+      assert.notCalled(callback);
     });
 
     it('returns unsubscription function', () => {
