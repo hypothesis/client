@@ -90,11 +90,9 @@ function GroupListItem({
       onToggleSubmenu={toggleSubmenu}
       submenu={
         <Fragment>
-          {/* Giving the role="menu" allows screen readers to have
-          correct number of subitems */}
-          <ul role="menu">
+          <ul>
             {activityUrl && (
-              <li role="none">
+              <li>
                 <MenuItem
                   href={activityUrl}
                   icon="external"
@@ -104,7 +102,7 @@ function GroupListItem({
               </li>
             )}
             {activityUrl && (
-              <li role="none">
+              <li>
                 <MenuItem
                   onClick={copyLink}
                   icon="copy"
@@ -114,7 +112,7 @@ function GroupListItem({
               </li>
             )}
             {canLeaveGroup && (
-              <li role="none">
+              <li>
                 <MenuItem
                   icon="leave"
                   isSubmenuItem={true}

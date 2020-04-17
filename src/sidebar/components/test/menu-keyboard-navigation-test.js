@@ -15,7 +15,11 @@ describe('MenuKeyboardNavigation', () => {
     const container = document.createElement('div');
     document.body.appendChild(container);
     return mount(
-      <MenuKeyboardNavigation closeMenu={fakeCloseMenu} {...props}>
+      <MenuKeyboardNavigation
+        closeMenu={fakeCloseMenu}
+        className="test-nav"
+        {...props}
+      >
         <button>Item 0</button>
         <button role="menuitem">Item 1</button>
         <button role="menuitem">Item 2</button>
@@ -42,8 +46,8 @@ describe('MenuKeyboardNavigation', () => {
   });
 
   ['ArrowLeft', 'Escape'].forEach(key => {
-    it(`calls \`closeMenu\` callback when the ${key} is pressed`, () => {
-      const wrapper = createMenuItem({ visible: true }).find('div');
+    it(`calls \`closeMenu\` callback when the '${key}' is pressed`, () => {
+      const wrapper = createMenuItem({ visible: true }).find('div.test-nav');
       wrapper.simulate('keydown', { key });
       assert.called(fakeCloseMenu);
     });
@@ -68,7 +72,7 @@ describe('MenuKeyboardNavigation', () => {
     });
 
     it('changes focus circularly when down arrow is pressed', () => {
-      const wrapper = createMenuItem({ visible: true }).find('div');
+      const wrapper = createMenuItem({ visible: true }).find('div.test-nav');
       clock.tick(1);
       wrapper.simulate('keydown', { key: 'ArrowDown' });
       assert.equal(document.activeElement.innerText, 'Item 2');
@@ -79,7 +83,7 @@ describe('MenuKeyboardNavigation', () => {
     });
 
     it('changes focus circularly when up arrow is pressed', () => {
-      const wrapper = createMenuItem({ visible: true }).find('div');
+      const wrapper = createMenuItem({ visible: true }).find('div.test-nav');
       clock.tick(1);
       wrapper.simulate('keydown', { key: 'ArrowUp' });
       assert.equal(document.activeElement.innerText, 'Item 3');
@@ -90,14 +94,14 @@ describe('MenuKeyboardNavigation', () => {
     });
 
     it('changes focus to the last item when up `End` is pressed', () => {
-      const wrapper = createMenuItem({ visible: true }).find('div');
+      const wrapper = createMenuItem({ visible: true }).find('div.test-nav');
       clock.tick(1);
       wrapper.simulate('keydown', { key: 'End' });
       assert.equal(document.activeElement.innerText, 'Item 3');
     });
 
     it('changes focus to the first item when up `Home` is pressed', () => {
-      const wrapper = createMenuItem({ visible: true }).find('div');
+      const wrapper = createMenuItem({ visible: true }).find('div.test-nav');
       clock.tick(1);
       wrapper.simulate('keydown', { key: 'End' }); // move focus off first item
       wrapper.simulate('keydown', { key: 'Home' });
@@ -111,7 +115,9 @@ describe('MenuKeyboardNavigation', () => {
       // eslint-disable-next-line react/display-name
       content: () => (
         <div>
-          <MenuKeyboardNavigation />
+          <MenuKeyboardNavigation>
+            <button role="menuitem">Item 1</button>
+          </MenuKeyboardNavigation>
         </div>
       ),
     })

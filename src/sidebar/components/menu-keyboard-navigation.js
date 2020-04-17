@@ -84,8 +84,14 @@ export default function MenuKeyboardNavigation({
   };
 
   return (
-    <div role="none" className={className} ref={menuRef} onKeyDown={onKeyDown}>
-      {children}
+    <div
+      role="presentation"
+      className={className}
+      ref={menuRef}
+      onKeyDown={onKeyDown}
+    >
+      {/* role="menu" helps screen readers separate submenu items from parent menu items */}
+      <div role="menu">{children}</div>
     </div>
   );
 }
@@ -100,6 +106,7 @@ MenuKeyboardNavigation.propTypes = {
   // which has a role="menuitem" attribute.
   visible: propTypes.bool,
 
-  // Array of nodes which may contain MenuItems
-  children: propTypes.any,
+  // Array of nodes which may contain <MenuItems> or any nodes
+  // that have role set to 'menuitem', 'menuitemradio', or 'menuitemcheckbox'
+  children: propTypes.any.isRequired,
 };
