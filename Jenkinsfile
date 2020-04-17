@@ -83,11 +83,10 @@ node {
         }
     }
 
-    // // TESTING
-    // if (env.BRANCH_NAME != releaseFromBranch) {
-    //     echo "Skipping deployment because ${env.BRANCH_NAME} is not the ${releaseFromBranch} branch"
-    //     return
-    // }
+    if (env.BRANCH_NAME != releaseFromBranch) {
+        echo "Skipping QA deployment because ${env.BRANCH_NAME} is not the ${releaseFromBranch} branch"
+        return
+    }
 
     milestone()
 
@@ -127,6 +126,11 @@ node {
         }
     }
 }
+}
+
+if (env.BRANCH_NAME != releaseFromBranch) {
+    echo "Skipping prod deployment because ${env.BRANCH_NAME} is not the ${releaseFromBranch} branch"
+    return
 }
 
 milestone()
