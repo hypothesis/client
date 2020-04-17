@@ -82,17 +82,15 @@ node {
             }
         }
     }
-}
-}
 
-if (env.BRANCH_NAME != releaseFromBranch) {
-    echo "Skipping deployment because ${env.BRANCH_NAME} is not the ${releaseFromBranch} branch"
-    return
-}
+    if (env.BRANCH_NAME != releaseFromBranch) {
+        echo "Skipping QA deployment because ${env.BRANCH_NAME} is not the ${releaseFromBranch} branch"
+        return
+    }
 
-milestone()
-stage('Publish to QA') {
-    node {
+    milestone()
+
+    stage('Publish to QA') {
         qaVersion = pkgVersion + "-${lastCommitHash}"
         nodeEnv.inside("-e HOME=${workspace}") {
             withCredentials([
@@ -128,6 +126,12 @@ stage('Publish to QA') {
         }
     }
 }
+}
+
+if (env.BRANCH_NAME != releaseFromBranch) {
+    echo "Skipping prod deployment because ${env.BRANCH_NAME} is not the ${releaseFromBranch} branch"
+    return
+}
 
 milestone()
 stage('Publish') {
@@ -135,6 +139,8 @@ stage('Publish') {
     milestone()
 
     node {
+        checkout scm
+
         echo "Publishing ${pkgName} v${newPkgVersion} from ${releaseFromBranch} branch."
 
         nodeEnv.inside("-e HOME=${workspace} -e BRANCH_NAME=${env.BRANCH_NAME}") {
