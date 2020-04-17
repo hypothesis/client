@@ -9,6 +9,7 @@ import {
   toggleBlockStyle,
   toggleSpanStyle,
 } from '../markdown-commands';
+import { normalizeKeyName } from '../../shared/browser-compatibility-utils';
 import { isMacOS } from '../../shared/user-agent';
 
 import MarkdownView from './markdown-view';
@@ -212,9 +213,8 @@ function Toolbar({ isPreviewing, onCommand, onTogglePreview }) {
       lowerLimit = buttonIds.help;
     }
     let newFocusedElement = null;
-    switch (e.key) {
+    switch (normalizeKeyName(e.key)) {
       case 'ArrowLeft':
-      case 'Left': // IE11
         if (rovingElement <= lowerLimit) {
           newFocusedElement = upperLimit;
         } else {
@@ -222,7 +222,6 @@ function Toolbar({ isPreviewing, onCommand, onTogglePreview }) {
         }
         break;
       case 'ArrowRight':
-      case 'Right': // IE11
         if (rovingElement >= upperLimit) {
           newFocusedElement = lowerLimit;
         } else {

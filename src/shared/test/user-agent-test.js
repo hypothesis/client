@@ -1,6 +1,6 @@
 import { isIE11, isMacOS } from '../user-agent';
 
-describe('sidebar/util/user-agent', () => {
+describe('shared/user-agent', () => {
   describe('isIE11', () => {
     it('returns true when the user agent is IE 11', () => {
       assert.isTrue(

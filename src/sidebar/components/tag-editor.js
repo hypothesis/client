@@ -6,6 +6,7 @@ import { withServices } from '../util/service-context';
 import { isIE11 } from '../../shared/user-agent';
 
 import AutocompleteList from './autocomplete-list';
+import { normalizeKeyName } from '../../shared/browser-compatibility-utils';
 import SvgIcon from '../../shared/components/svg-icon';
 import useElementShouldClose from './hooks/use-element-should-close';
 
@@ -35,7 +36,6 @@ function TagEditor({ onEditTags, tags: tagsService, tagList }) {
     setSuggestionsListOpen(false);
   });
 
-  // Convenient boolean  for ie detection.
   const ie11 = useMemo(() => isIE11(), []);
 
   /**
@@ -178,14 +178,12 @@ function TagEditor({ onEditTags, tags: tagsService, tagList }) {
    * found in the suggestions list
    */
   const handleKeyDown = e => {
-    switch (e.key) {
+    switch (normalizeKeyName(e.key)) {
       case 'ArrowUp':
-      case 'Up': // IE11
         changeSelectedItem(-1);
         e.preventDefault();
         break;
       case 'ArrowDown':
-      case 'Down': // IE11
         changeSelectedItem(1);
         e.preventDefault();
         break;

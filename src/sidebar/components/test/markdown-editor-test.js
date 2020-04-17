@@ -360,24 +360,18 @@ describe('MarkdownEditor', () => {
     };
 
     context('when `isPreviewing` is false', () => {
-      ['ArrowLeft', 'Left'].forEach(event => {
-        // IE11 uses "Left"
-        it('changes focus circularly to the left', () => {
-          pressKey(event);
-          // preview is the last button
-          matchesFocusedText('Preview');
-          testRovingIndex();
-        });
+      it('changes focus circularly to the left', () => {
+        pressKey('ArrowLeft');
+        // preview is the last button
+        matchesFocusedText('Preview');
+        testRovingIndex();
       });
 
-      ['ArrowRight', 'Right'].forEach(event => {
-        // IE11 uses "Right"
-        it('changes focus circularly to the right', () => {
-          pressKey('ArrowLeft'); // move to the end node
-          pressKey(event); // move back to the start
-          matchesFocusedTitle('Bold');
-          testRovingIndex();
-        });
+      it('changes focus circularly to the right', () => {
+        pressKey('ArrowLeft'); // move to the end node
+        pressKey('ArrowRight'); // move back to the start
+        matchesFocusedTitle('Bold');
+        testRovingIndex();
       });
 
       it('changes focus to the last element when pressing `end`', () => {
