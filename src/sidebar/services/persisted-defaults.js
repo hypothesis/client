@@ -16,16 +16,13 @@ export default function persistedDefaults(localStorage, store) {
    * Store subscribe callback for persisting changes to defaults. It will only
    * persist defaults that it "knows about" via `DEFAULT_KEYS`.
    */
-  function persistChangedDefaults(latestDefaults, lastDefaults) {
-    for (let defaultKey in latestDefaults) {
+  function persistChangedDefaults(defaults, prevDefaults) {
+    for (let defaultKey in defaults) {
       if (
-        lastDefaults[defaultKey] !== latestDefaults[defaultKey] &&
+        prevDefaults[defaultKey] !== defaults[defaultKey] &&
         defaultKey in DEFAULT_KEYS
       ) {
-        localStorage.setItem(
-          DEFAULT_KEYS[defaultKey],
-          latestDefaults[defaultKey]
-        );
+        localStorage.setItem(DEFAULT_KEYS[defaultKey], defaults[defaultKey]);
       }
     }
   }
