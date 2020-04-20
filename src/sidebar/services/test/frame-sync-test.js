@@ -401,4 +401,22 @@ describe('sidebar/services/frame-sync', function () {
       assert.calledWith(fakeBridge.call, 'setVisibleHighlights');
     });
   });
+
+  describe('when annotations are focused in the sidebar', () => {
+    it('should update the focused annotations in the store', () => {
+      frameSync.focusAnnotations(['a1', 'a2']);
+      assert.calledWith(
+        fakeStore.focusAnnotations,
+        sinon.match.array.deepEquals(['a1', 'a2'])
+      );
+    });
+    it('notify the host page', () => {
+      frameSync.focusAnnotations([1, 2]);
+      assert.calledWith(
+        fakeBridge.call,
+        'focusAnnotations',
+        sinon.match.array.deepEquals([1, 2])
+      );
+    });
+  });
 });

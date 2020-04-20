@@ -69,6 +69,7 @@ describe('Annotation', () => {
       getGroup: sinon.stub().returns({
         type: 'private',
       }),
+      isAnnotationFocused: sinon.stub().returns(false),
       isSavingAnnotation: sinon.stub().returns(false),
       profile: sinon.stub().returns({ userid: 'acct:foo@bar.com' }),
       setCollapsed: sinon.stub(),
@@ -97,6 +98,14 @@ describe('Annotation', () => {
       assert.isFalse(annot.hasClass('is-collapsed'));
     });
 
+    it('applies a focused class if annotation is focused', () => {
+      fakeStore.isAnnotationFocused.returns(true);
+      const wrapper = createComponent({ threadIsCollapsed: false });
+      const annot = wrapper.find('.annotation');
+
+      assert.isTrue(annot.hasClass('is-focused'));
+    });
+
     it('should assign a collapsed class if the annotation thread is collapsed', () => {
       const wrapper = createComponent({ threadIsCollapsed: true });
       const annot = wrapper.find('.annotation');
@@ -112,6 +121,14 @@ describe('Annotation', () => {
 
       const quote = wrapper.find('AnnotationQuote');
       assert.isTrue(quote.exists());
+    });
+
+    it('sets the quote to "focused" if annotation is currently focused', () => {
+      fakeStore.isAnnotationFocused.returns(true);
+      fakeMetadata.quote.returns('quote');
+      const wrapper = createComponent();
+
+      assert.isTrue(wrapper.find('AnnotationQuote').props().isFocused);
     });
 
     it('does not render quote if annotation does not have a quote', () => {
