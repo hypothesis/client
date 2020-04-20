@@ -1,265 +1,284 @@
-import angular from 'angular';
-import EventEmitter from 'tiny-emitter';
+import { mount } from 'enzyme';
+import { createElement } from 'preact';
 
-import * as util from './angular-util';
 import events from '../../events';
-import threadList, { $imports } from '../thread-list';
-import immutable from '../../util/immutable';
+import { act } from 'preact/test-utils';
 
-const annotFixtures = immutable({
-  annotation: { $tag: 't1', id: '1', text: 'text' },
-  reply: {
-    $tag: 't2',
-    id: '2',
-    references: ['1'],
-    text: 'areply',
-  },
-  highlight: { $highlight: true, $tag: 't3', id: '3' },
-});
+import ThreadList from '../thread-list';
+import { $imports } from '../thread-list';
 
-const threadFixtures = immutable({
-  thread: {
-    children: [
-      {
-        id: annotFixtures.annotation.id,
-        annotation: annotFixtures.annotation,
-        children: [
-          {
-            id: annotFixtures.reply.id,
-            annotation: annotFixtures.reply,
-            children: [],
-            visible: true,
-          },
-        ],
-        visible: true,
-      },
-      {
-        id: annotFixtures.highlight.id,
-        annotation: annotFixtures.highlight,
-      },
-    ],
-  },
-});
+import { checkAccessibility } from '../../../test-util/accessibility';
+import mockImportedComponents from '../../../test-util/mock-imported-components';
 
-let fakeVirtualThread;
-let fakeStore;
-const fakeSettings = {};
+describe('ThreadList', () => {
+  let fakeDebounce;
+  let fakeDomUtil;
+  let fakeMetadata;
+  let fakeTopThread;
+  let fakeRootScope;
+  let fakeScrollContainer;
+  let fakeStore;
+  let fakeVisibleThreadsUtil;
 
-class FakeVirtualThreadList extends EventEmitter {
-  constructor($scope, $window, rootThread, options) {
-    super();
-
-    fakeVirtualThread = this; // eslint-disable-line consistent-this
-
-    let thread = rootThread;
-
-    this.options = options;
-    this.setRootThread = function (_thread) {
-      thread = _thread;
-    };
-    this.notify = function () {
-      this.emit('changed', {
-        offscreenLowerHeight: 10,
-        offscreenUpperHeight: 20,
-        visibleThreads: thread.children,
-      });
-    };
-    this.detach = sinon.stub();
-    this.yOffsetOf = function () {
-      return 42;
-    };
-    this.calculateVisibleThreads = () => {
-      return {
-        offscreenLowerHeight: 10,
-        offscreenUpperHeight: 20,
-        visibleThreads: thread.children,
-      };
-    };
-  }
-}
-
-describe('threadList', function () {
-  let threadListContainers;
-
-  function createThreadList(inputs) {
-    const defaultInputs = {
-      thread: threadFixtures.thread,
-      onForceVisible: sinon.stub(),
-      onFocus: sinon.stub(),
-      onSelect: sinon.stub(),
-      onSetCollapsed: sinon.stub(),
-    };
-
-    // Create a scrollable container for the `<thread-list>` so that scrolling
-    // can be tested.
-    const parentEl = document.createElement('div');
-    parentEl.classList.add('js-thread-list-scroll-root');
-    parentEl.style.overflow = 'scroll';
-    parentEl.style.height = '100px';
-
-    // Add an element inside the scrollable container which is much taller than
-    // the container, so that it actually becomes scrollable.
-    const tallDiv = document.createElement('div');
-    tallDiv.style.height = '1000px';
-    parentEl.appendChild(tallDiv);
-
-    document.body.appendChild(parentEl);
-
-    // Create the `<thread-list>` instance
-    const element = util.createDirective(
-      document,
-      'threadList',
-      Object.assign({}, defaultInputs, inputs),
-      {}, // initialScope
-      '', // initialHtml
-      { parentElement: parentEl }
+  function createComponent(props) {
+    return mount(
+      <ThreadList
+        thread={fakeTopThread}
+        $rootScope={fakeRootScope}
+        {...props}
+      />,
+      { attachTo: fakeScrollContainer }
     );
-
-    element.parentEl = parentEl;
-
-    threadListContainers.push(parentEl);
-
-    return element;
   }
 
-  before(function () {
+  beforeEach(() => {
+    fakeDebounce = sinon.stub().returns(() => null);
+    fakeDomUtil = {
+      getElementHeightWithMargins: sinon.stub().returns(0),
+    };
+    fakeMetadata = {
+      isHighlight: sinon.stub().returns(false),
+      isReply: sinon.stub().returns(false),
+    };
+
+    fakeRootScope = {
+      eventCallbacks: {},
+
+      $apply: function (callback) {
+        callback();
+      },
+
+      $on: function (event, callback) {
+        if (event === events.BEFORE_ANNOTATION_CREATED) {
+          this.eventCallbacks[event] = callback;
+        }
+      },
+
+      $broadcast: sinon.stub(),
+    };
+
+    fakeScrollContainer = document.createElement('div');
+    fakeScrollContainer.className = 'js-thread-list-scroll-root';
+    fakeScrollContainer.style.height = '2000px';
+    document.body.appendChild(fakeScrollContainer);
+
     fakeStore = {
       clearSelection: sinon.stub(),
     };
 
-    angular.module('app', []).component('threadList', threadList);
-  });
+    fakeTopThread = {
+      id: 't0',
+      annotation: { $tag: 'myTag0' },
+      children: [
+        { id: 't1', children: [], annotation: { $tag: 't1' } },
+        { id: 't2', children: [], annotation: { $tag: 't2' } },
+        { id: 't3', children: [], annotation: { $tag: 't3' } },
+        { id: 't4', children: [], annotation: { $tag: 't4' } },
+      ],
+    };
 
-  beforeEach(function () {
-    angular.mock.module('app', {
-      settings: fakeSettings,
-      store: fakeStore,
-    });
-    threadListContainers = [];
+    fakeVisibleThreadsUtil = {
+      calculateVisibleThreads: sinon.stub().returns({
+        visibleThreads: fakeTopThread.children,
+        offscreenUpperHeight: 400,
+        offscreenLowerHeight: 600,
+      }),
+      THREAD_DIMENSION_DEFAULTS: {
+        defaultHeight: 200,
+      },
+    };
 
+    $imports.$mock(mockImportedComponents());
     $imports.$mock({
-      '../virtual-thread-list': FakeVirtualThreadList,
+      'lodash.debounce': fakeDebounce,
+      '../store/use-store': callback => callback(fakeStore),
+      '../util/annotation-metadata': fakeMetadata,
+      '../util/dom': fakeDomUtil,
+      '../util/visible-threads': fakeVisibleThreadsUtil,
     });
   });
 
-  afterEach(function () {
+  afterEach(() => {
     $imports.$restore();
-
-    threadListContainers.forEach(function (el) {
-      el.remove();
-    });
+    fakeScrollContainer.remove();
   });
 
-  it('shows the clean theme when settings contains the clean theme option', function () {
-    angular.mock.module('app', {
-      VirtualThreadList: FakeVirtualThreadList,
-      settings: { theme: 'clean' },
-    });
-    const element = createThreadList();
-    fakeVirtualThread.notify();
-    element.scope.$digest();
-    assert.equal(
-      element[0].querySelectorAll('.thread-list__card--theme-clean').length,
-      element[0].querySelectorAll('thread').length
+  it('works', () => {
+    const wrapper = createComponent();
+
+    assert.isTrue(wrapper.find('section').exists());
+  });
+
+  it('calculates visible threads', () => {
+    createComponent();
+
+    assert.calledWith(
+      fakeVisibleThreadsUtil.calculateVisibleThreads,
+      fakeTopThread.children,
+      sinon.match({}),
+      0,
+      sinon.match.number
     );
   });
 
-  it('displays the children of the root thread', function () {
-    const element = createThreadList();
-    fakeVirtualThread.notify();
-    element.scope.$digest();
-    const children = element[0].querySelectorAll('thread');
-    assert.equal(children.length, 2);
-  });
+  context('new annotation created in application', () => {
+    it('attaches a listener for the BEFORE_ANNOTATION_CREATED event', () => {
+      fakeRootScope.$on = sinon.stub();
 
-  describe('when a new annotation is created', function () {
-    it('scrolls the annotation into view', function () {
-      const element = createThreadList();
-      element.parentEl.scrollTop = 500;
+      createComponent();
 
-      const annot = annotFixtures.annotation;
-      element.scope.$broadcast(events.BEFORE_ANNOTATION_CREATED, annot);
-
-      // Check that the thread list was scrolled up to make the new annotation
-      // visible.
-      assert.isBelow(element.parentEl.scrollTop, 100);
-    });
-
-    it('does not scroll the annotation into view if it is a reply', function () {
-      const element = createThreadList();
-      element.parentEl.scrollTop = 500;
-
-      const reply = annotFixtures.reply;
-      element.scope.$broadcast(events.BEFORE_ANNOTATION_CREATED, reply);
-
-      // Check that the thread list was not scrolled
-      assert.equal(element.parentEl.scrollTop, 500);
-    });
-
-    it('does not scroll the annotation into view if it is a highlight', function () {
-      const element = createThreadList();
-      element.parentEl.scrollTop = 500;
-
-      const highlight = annotFixtures.highlight;
-      element.scope.$broadcast(events.BEFORE_ANNOTATION_CREATED, highlight);
-
-      // Check that the thread list was not scrolled
-      assert.equal(element.parentEl.scrollTop, 500);
-    });
-
-    it('clears the selection', function () {
-      const element = createThreadList();
-      element.scope.$broadcast(
+      assert.calledWith(
+        fakeRootScope.$on,
         events.BEFORE_ANNOTATION_CREATED,
-        annotFixtures.annotation
+        sinon.match.func
       );
-      assert.called(fakeStore.clearSelection);
+    });
+
+    it('clears the current selection in the store', () => {
+      createComponent();
+
+      fakeRootScope.eventCallbacks[events.BEFORE_ANNOTATION_CREATED]({}, {});
+
+      assert.calledOnce(fakeStore.clearSelection);
+    });
+
+    it('does not clear the selection in the store if new annotation is a highlight', () => {
+      fakeMetadata.isHighlight.returns(true);
+      createComponent();
+
+      fakeRootScope.eventCallbacks[events.BEFORE_ANNOTATION_CREATED]({}, {});
+
+      assert.notCalled(fakeStore.clearSelection);
+    });
+
+    it('does not clear the selection in the store if new annotation is a reply', () => {
+      fakeMetadata.isReply.returns(true);
+      createComponent();
+
+      fakeRootScope.eventCallbacks[events.BEFORE_ANNOTATION_CREATED]({}, {});
+
+      assert.notCalled(fakeStore.clearSelection);
     });
   });
 
-  it('calls onFocus() when the user hovers an annotation', function () {
-    const inputs = {
-      onFocus: {
-        args: ['annotation'],
-        callback: sinon.stub(),
+  context('active scroll to an annotation thread', () => {
+    let stubbedDocument;
+    let stubbedFakeScrollContainer;
+    let fakeScrollTop;
+
+    beforeEach(() => {
+      fakeScrollTop = sinon.stub();
+      stubbedFakeScrollContainer = sinon
+        .stub(fakeScrollContainer, 'scrollTop')
+        .set(fakeScrollTop);
+      stubbedDocument = sinon
+        .stub(document, 'querySelector')
+        .returns(fakeScrollContainer);
+    });
+
+    afterEach(() => {
+      stubbedFakeScrollContainer.restore();
+      stubbedDocument.restore();
+    });
+
+    it('should do nothing if there is no active annotation thread to scroll to', () => {
+      createComponent();
+
+      assert.notCalled(fakeScrollTop);
+    });
+
+    it('should do nothing if the annotation thread to scroll to is not in DOM', () => {
+      createComponent();
+
+      act(() => {
+        fakeRootScope.eventCallbacks[events.BEFORE_ANNOTATION_CREATED](
+          {},
+          { $tag: 'nonexistent' }
+        );
+      });
+
+      assert.notCalled(fakeScrollTop);
+    });
+
+    it('should set the scroll container `scrollTop` to derived position of thread', () => {
+      createComponent();
+
+      act(() => {
+        fakeRootScope.eventCallbacks[events.BEFORE_ANNOTATION_CREATED](
+          {},
+          fakeTopThread.children[3].annotation
+        );
+      });
+
+      // The third thread in a collection of threads at default height (200)
+      // should be at 600px. This setting of `scrollTop` is the only externally-
+      // observable thing that happens here...
+      assert.calledWith(fakeScrollTop, 600);
+    });
+  });
+
+  describe('scroll and resize event handling', () => {
+    let debouncedFn;
+
+    beforeEach(() => {
+      debouncedFn = sinon.stub();
+      fakeDebounce.returns(debouncedFn);
+    });
+
+    it('updates scroll position and window height for recalculation on container scroll', () => {
+      createComponent();
+      document
+        .querySelector('.js-thread-list-scroll-root')
+        .dispatchEvent(new Event('scroll'));
+
+      assert.calledOnce(debouncedFn);
+    });
+
+    it('updates scroll position and window height for recalculation on window resize', () => {
+      createComponent();
+      window.dispatchEvent(new Event('resize'));
+
+      assert.calledOnce(debouncedFn);
+    });
+  });
+
+  context('when top-level threads change', () => {
+    it('recalculates thread heights', () => {
+      const wrapper = createComponent();
+      // Initial render and effect hooks will trigger calculation twice
+      fakeDomUtil.getElementHeightWithMargins.resetHistory();
+      // Let's see it respond to the top-level threads changing
+      wrapper.setProps({ thread: fakeTopThread });
+      // It should check the element height for each top-level thread (assuming
+      // they are all onscreen, which these test threads "are")
+      assert.equal(
+        fakeDomUtil.getElementHeightWithMargins.callCount,
+        fakeTopThread.children.length
+      );
+    });
+  });
+
+  it('renders dimensional elements above and below visible threads', () => {
+    const wrapper = createComponent();
+    const upperDiv = wrapper.find('div').first();
+    const lowerDiv = wrapper.find('div').last();
+    assert.equal(upperDiv.getDOMNode().style.height, '400px');
+    assert.equal(lowerDiv.getDOMNode().style.height, '600px');
+  });
+
+  it('renders a `ThreadCard` for each visible thread', () => {
+    const wrapper = createComponent();
+    const cards = wrapper.find('ThreadCard');
+    assert.equal(cards.length, fakeTopThread.children.length);
+  });
+
+  it(
+    'should pass a11y checks',
+    checkAccessibility({
+      content: () => {
+        const wrapper = createComponent();
+        return wrapper;
       },
-    };
-    const element = createThreadList(inputs);
-    fakeVirtualThread.notify();
-    element.scope.$digest();
-
-    const cardElement = element[0].querySelector('.thread-list__card');
-    cardElement.dispatchEvent(new Event('mouseover'));
-
-    assert.calledWithMatch(
-      inputs.onFocus.callback,
-      sinon.match(annotFixtures.annotation)
-    );
-  });
-
-  it('calls onSelect() when a user clicks an annotation', function () {
-    const inputs = {
-      onSelect: {
-        args: ['annotation'],
-        callback: sinon.stub(),
-      },
-    };
-    const element = createThreadList(inputs);
-    fakeVirtualThread.notify();
-    element.scope.$digest();
-
-    const cardElement = element[0].querySelector('.thread-list__card');
-    cardElement.dispatchEvent(new Event('click'));
-
-    assert.calledWithMatch(
-      inputs.onSelect.callback,
-      sinon.match(annotFixtures.annotation)
-    );
-  });
-
-  it('uses the correct scroll root', function () {
-    createThreadList();
-    const scrollRoot = fakeVirtualThread.options.scrollRoot;
-    assert.isTrue(scrollRoot.classList.contains('js-thread-list-scroll-root'));
-  });
+    })
+  );
 });
