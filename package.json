@@ -45,7 +45,7 @@
     "enzyme": "^3.8.0",
     "enzyme-adapter-preact-pure": "^2.0.0",
     "escape-html": "^1.0.3",
-    "escape-string-regexp": "^3.0.0",
+    "escape-string-regexp": "^1.0.5",
     "eslint": "^6.0.1",
     "eslint-config-hypothesis": "^2.0.0",
     "eslint-plugin-jsx-a11y": "^6.2.3",

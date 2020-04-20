@@ -1,10 +1,12 @@
 import { createElement } from 'preact';
-import { useRef, useState } from 'preact/hooks';
+import { useMemo, useRef, useState } from 'preact/hooks';
 import propTypes from 'prop-types';
 
 import { withServices } from '../util/service-context';
+import { isIE11 } from '../../shared/user-agent';
 
 import AutocompleteList from './autocomplete-list';
+import { normalizeKeyName } from '../../shared/browser-compatibility-utils';
 import SvgIcon from '../../shared/components/svg-icon';
 import useElementShouldClose from './hooks/use-element-should-close';
 
@@ -33,6 +35,8 @@ function TagEditor({ onEditTags, tags: tagsService, tagList }) {
   useElementShouldClose(closeWrapperRef, suggestionsListOpen, () => {
     setSuggestionsListOpen(false);
   });
+
+  const ie11 = useMemo(() => isIE11(), []);
 
   /**
    * Helper function that returns a list of suggestions less any
@@ -121,7 +125,8 @@ function TagEditor({ onEditTags, tags: tagsService, tagList }) {
   const handleOnInput = e => {
     if (
       e.inputType === 'insertText' ||
-      e.inputType === 'deleteContentBackward'
+      e.inputType === 'deleteContentBackward' ||
+      ie11 // inputType is not defined in IE 11, so trigger on any input in this case.
     ) {
       updateSuggestions();
     }
@@ -173,7 +178,7 @@ function TagEditor({ onEditTags, tags: tagsService, tagList }) {
    * found in the suggestions list
    */
   const handleKeyDown = e => {
-    switch (e.key) {
+    switch (normalizeKeyName(e.key)) {
       case 'ArrowUp':
         changeSelectedItem(-1);
         e.preventDefault();

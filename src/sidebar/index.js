@@ -1,6 +1,7 @@
 /* global process */
 
 import { jsonConfigsFrom } from '../shared/settings';
+import * as rendererOptions from '../shared/renderer-options';
 
 import {
   startServer as startRPCServer,
@@ -55,6 +56,9 @@ const isSidebar = !(
   window.location.pathname.startsWith('/stream') ||
   window.location.pathname.startsWith('/a/')
 );
+
+// Install Preact renderer options to work around IE11 quirks
+rendererOptions.setupIE11Fixes();
 
 // @ngInject
 function configureToastr(toastrConfig) {

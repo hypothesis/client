@@ -15,6 +15,7 @@ describe('TagEditor', function () {
   let fakeTagsService;
   let fakeServiceUrl;
   let fakeOnEditTags;
+  let fakeIsIE11;
 
   function createComponent(props) {
     // Use an array of containers so we can test more
@@ -36,11 +37,28 @@ describe('TagEditor', function () {
     );
   }
 
+  beforeEach(function () {
+    fakeOnEditTags = sinon.stub();
+    fakeServiceUrl = sinon.stub().returns('http://serviceurl.com');
+    fakeIsIE11 = sinon.stub().returns(false);
+    fakeTagsService = {
+      filter: sinon.stub().returns(['tag4', 'tag3']),
+      store: sinon.stub(),
+    };
+    $imports.$mock(mockImportedComponents());
+    $imports.$mock({
+      '../../shared/user-agent': {
+        isIE11: fakeIsIE11,
+      },
+    });
+  });
+
   afterEach(function () {
     containers.forEach(container => {
       container.remove();
     });
     containers = [];
+    $imports.$restore();
   });
 
   // Simulates a selection event from autocomplete-list
@@ -68,22 +86,13 @@ describe('TagEditor', function () {
   }
   // Simulates typing text
   function typeInput(wrapper) {
-    wrapper.find('input').simulate('input', { inputType: 'insertText' });
+    if (!fakeIsIE11()) {
+      wrapper.find('input').simulate('input', { inputType: 'insertText' });
+    } else {
+      // IE11 does not have an inputType key.
+      wrapper.find('input').simulate('input', {});
+    }
   }
-
-  beforeEach(function () {
-    fakeOnEditTags = sinon.stub();
-    fakeServiceUrl = sinon.stub().returns('http://serviceurl.com');
-    fakeTagsService = {
-      filter: sinon.stub().returns(['tag4', 'tag3']),
-      store: sinon.stub(),
-    };
-    $imports.$mock(mockImportedComponents());
-  });
-
-  afterEach(() => {
-    $imports.$restore();
-  });
 
   it('adds appropriate tag values to the elements', () => {
     const wrapper = createComponent();
@@ -322,51 +331,56 @@ describe('TagEditor', function () {
   });
 
   describe('navigating suggestions via keyboard', () => {
-    it('should set the initial `activeItem` value to -1 when opening suggestions', () => {
-      const wrapper = createComponent();
-      wrapper.find('input').instance().value = 'non-empty';
-      typeInput(wrapper);
-      assert.equal(wrapper.find('AutocompleteList').prop('open'), true);
-      assert.equal(wrapper.find('AutocompleteList').prop('activeItem'), -1);
-    });
-    it('should increment the `activeItem` when pressing down circularly', () => {
-      const wrapper = createComponent();
-      wrapper.find('input').instance().value = 'non-empty';
-      typeInput(wrapper);
-      // 2 suggestions: ['tag3', 'tag4'];
-      navigateDown(wrapper);
-      assert.equal(wrapper.find('AutocompleteList').prop('activeItem'), 0);
-      navigateDown(wrapper);
-      assert.equal(wrapper.find('AutocompleteList').prop('activeItem'), 1);
-      navigateDown(wrapper);
-      // back to unselected
-      assert.equal(wrapper.find('AutocompleteList').prop('activeItem'), -1);
-    });
+    [true, false].forEach(ie11 => {
+      it('should set the initial `activeItem` value to -1 when opening suggestions', () => {
+        fakeIsIE11.returns(ie11);
+        const wrapper = createComponent();
+        wrapper.find('input').instance().value = 'non-empty';
+        typeInput(wrapper);
+        assert.equal(wrapper.find('AutocompleteList').prop('open'), true);
+        assert.equal(wrapper.find('AutocompleteList').prop('activeItem'), -1);
+      });
+      it('should increment the `activeItem` when pressing down circularly', () => {
+        fakeIsIE11.returns(ie11);
+        const wrapper = createComponent();
+        wrapper.find('input').instance().value = 'non-empty';
+        typeInput(wrapper);
+        // 2 suggestions: ['tag3', 'tag4'];
+        navigateDown(wrapper);
+        assert.equal(wrapper.find('AutocompleteList').prop('activeItem'), 0);
+        navigateDown(wrapper);
+        assert.equal(wrapper.find('AutocompleteList').prop('activeItem'), 1);
+        navigateDown(wrapper);
+        // back to unselected
+        assert.equal(wrapper.find('AutocompleteList').prop('activeItem'), -1);
+      });
 
-    it('should decrement the `activeItem` when pressing up circularly', () => {
-      const wrapper = createComponent();
-      wrapper.find('input').instance().value = 'non-empty';
-      typeInput(wrapper);
-      // 2 suggestions: ['tag3', 'tag4'];
-      navigateUp(wrapper);
-      assert.equal(wrapper.find('AutocompleteList').prop('activeItem'), 1);
-      navigateUp(wrapper);
-      assert.equal(wrapper.find('AutocompleteList').prop('activeItem'), 0);
-      navigateUp(wrapper);
-      assert.equal(wrapper.find('AutocompleteList').prop('activeItem'), -1);
-    });
-
-    it('should set `activeItem` to -1 when clearing the suggestions', () => {
-      const wrapper = createComponent();
-      wrapper.find('input').instance().value = 'non-empty';
-      typeInput(wrapper);
-      navigateDown(wrapper);
-      // change to non-default value
-      assert.equal(wrapper.find('AutocompleteList').prop('activeItem'), 0);
-      // clear suggestions
-      wrapper.find('input').instance().value = '';
-      typeInput(wrapper);
-      assert.equal(wrapper.find('AutocompleteList').prop('activeItem'), -1);
+      it('should decrement the `activeItem` when pressing up circularly', () => {
+        fakeIsIE11.returns(ie11);
+        const wrapper = createComponent();
+        wrapper.find('input').instance().value = 'non-empty';
+        typeInput(wrapper);
+        // 2 suggestions: ['tag3', 'tag4'];
+        navigateUp(wrapper);
+        assert.equal(wrapper.find('AutocompleteList').prop('activeItem'), 1);
+        navigateUp(wrapper);
+        assert.equal(wrapper.find('AutocompleteList').prop('activeItem'), 0);
+        navigateUp(wrapper);
+        assert.equal(wrapper.find('AutocompleteList').prop('activeItem'), -1);
+      });
+      it('should set `activeItem` to -1 when clearing the suggestions', () => {
+        fakeIsIE11.returns(ie11);
+        const wrapper = createComponent();
+        wrapper.find('input').instance().value = 'non-empty';
+        typeInput(wrapper);
+        navigateDown(wrapper);
+        // change to non-default value
+        assert.equal(wrapper.find('AutocompleteList').prop('activeItem'), 0);
+        // clear suggestions
+        wrapper.find('input').instance().value = '';
+        typeInput(wrapper);
+        assert.equal(wrapper.find('AutocompleteList').prop('activeItem'), -1);
+      });
     });
   });
 

@@ -41,6 +41,10 @@ describe('shared/polyfills/index', () => {
         providesMethod: [Promise.prototype, 'finally'],
       },
       {
+        set: 'es2018',
+        providesMethod: [window, 'Promise'],
+      },
+      {
         set: 'string.prototype.normalize',
         providesMethod: [String.prototype, 'normalize'],
       },

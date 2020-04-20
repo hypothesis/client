@@ -1,6 +1,6 @@
 import classnames from 'classnames';
 import { createElement, createRef } from 'preact';
-import { useEffect, useRef, useState } from 'preact/hooks';
+import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import propTypes from 'prop-types';
 
 import {
@@ -9,6 +9,8 @@ import {
   toggleBlockStyle,
   toggleSpanStyle,
 } from '../markdown-commands';
+import { normalizeKeyName } from '../../shared/browser-compatibility-utils';
+import { isMacOS } from '../../shared/user-agent';
 
 import MarkdownView from './markdown-view';
 import SvgIcon from '../../shared/components/svg-icon';
@@ -102,10 +104,10 @@ function ToolbarButton({
   tabIndex,
   title = '',
 }) {
+  const modifierKey = useMemo(() => (isMacOS() ? 'Cmd' : 'Ctrl'), []);
+
   let tooltip = title;
   if (shortcutKey) {
-    const modifierKey =
-      window.navigator.userAgent.indexOf('Mac OS') !== -1 ? 'Cmd' : 'Ctrl';
     tooltip += ` (${modifierKey}-${shortcutKey.toUpperCase()})`;
   }
 
@@ -211,7 +213,7 @@ function Toolbar({ isPreviewing, onCommand, onTogglePreview }) {
       lowerLimit = buttonIds.help;
     }
     let newFocusedElement = null;
-    switch (e.key) {
+    switch (normalizeKeyName(e.key)) {
       case 'ArrowLeft':
         if (rovingElement <= lowerLimit) {
           newFocusedElement = upperLimit;
@@ -379,10 +381,10 @@ export default function MarkdownEditor({
   onEditText = () => {},
   text = '',
 }) {
-  /** Whether the preview mode is currently active. */
+  // Whether the preview mode is currently active.
   const [preview, setPreview] = useState(false);
 
-  /** The input element where the user inputs their comment. */
+  // The input element where the user inputs their comment.
   const input = useRef(null);
 
   useEffect(() => {
