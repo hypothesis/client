@@ -55,7 +55,7 @@ describe('sidebar/services/frame-sync', function () {
 
   beforeEach(function () {
     fakeStore = createFakeStore(
-      { annotations: [] },
+      { annotations: { annotations: [] } },
       {
         connectFrame: sinon.stub(),
         destroyFrame: sinon.stub(),
