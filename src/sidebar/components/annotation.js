@@ -2,6 +2,7 @@ import classnames from 'classnames';
 import { createElement } from 'preact';
 import propTypes from 'prop-types';
 
+import { normalizeKeyName } from '../../shared/browser-compatibility-utils';
 import useStore from '../store/use-store';
 import { isReply, quote } from '../util/annotation-metadata';
 import { isShared } from '../util/permissions';
@@ -72,10 +73,11 @@ function Annotation({
 
   // Allow saving of annotation by pressing CMD/CTRL-Enter
   const onKeyDown = event => {
+    const key = normalizeKeyName(event.key);
     if (isEmpty || !isEditing) {
       return;
     }
-    if ((event.metaKey || event.ctrlKey) && event.key === 'Enter') {
+    if ((event.metaKey || event.ctrlKey) && key === 'Enter') {
       event.stopPropagation();
       event.preventDefault();
       onSave();

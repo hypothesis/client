@@ -1,5 +1,7 @@
 import { useEffect } from 'preact/hooks';
 
+import { normalizeKeyName } from './browser-compatibility-utils.js';
+
 // Bit flags indicating modifiers required by a shortcut or pressed in a key event.
 const modifiers = {
   alt: 1,
@@ -49,7 +51,7 @@ export function matchShortcut(event, shortcut) {
 
   return (
     actualModifiers === requiredModifiers &&
-    event.key.toLowerCase() === requiredKey
+    normalizeKeyName(event.key).toLowerCase() === requiredKey
   );
 }
 

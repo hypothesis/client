@@ -406,7 +406,7 @@ export default function MarkdownEditor({
     }
 
     for (let [command, key] of Object.entries(SHORTCUT_KEYS)) {
-      if (key === event.key) {
+      if (key === normalizeKeyName(event.key)) {
         event.stopPropagation();
         event.preventDefault();
         handleCommand(command);
