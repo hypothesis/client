@@ -1,11 +1,13 @@
 import classnames from 'classnames';
 import { Fragment, createElement } from 'preact';
-import { useRef } from 'preact/hooks';
+import { useEffect, useRef } from 'preact/hooks';
 import propTypes from 'prop-types';
 
+import { normalizeKeyName } from '../../shared/browser-compatibility-utils';
+
+import SvgIcon from '../../shared/components/svg-icon';
 import MenuKeyboardNavigation from './menu-keyboard-navigation';
 import Slider from './slider';
-import SvgIcon from '../../shared/components/svg-icon';
 
 /**
  * An item in a dropdown menu.
@@ -44,6 +46,7 @@ export default function MenuItem({
   const hasRightIcon = icon && isSubmenuItem;
 
   const menuItemRef = useRef(null);
+  const focusTimer = useRef(null);
 
   let renderedIcon = null;
   if (icon !== 'blank') {
@@ -61,18 +64,25 @@ export default function MenuItem({
   const hasSubmenuVisible = typeof isSubmenuVisible === 'boolean';
   const isRadioButtonType = typeof isSelected === 'boolean';
 
+  useEffect(() => {
+    return () => {
+      // unmount
+      clearTimeout(focusTimer.current);
+    };
+  }, []);
+
   const onCloseSubmenu = event => {
     if (onToggleSubmenu) {
       onToggleSubmenu(event);
     }
     // The focus won't work without delaying rendering.
-    setTimeout(() => {
+    focusTimer.current = setTimeout(() => {
       menuItemRef.current.focus();
     });
   };
 
   const onKeyDown = event => {
-    switch (event.key) {
+    switch (normalizeKeyName(event.key)) {
       case 'ArrowRight':
         if (onToggleSubmenu) {
           event.stopPropagation();
@@ -117,9 +127,6 @@ export default function MenuItem({
     // The menu item is a clickable button or radio button.
     // In either case there may be an optional submenu.
 
-    const expandedProp = {
-      'aria-expanded': hasSubmenuVisible ? isSubmenuVisible : undefined,
-    };
     menuItem = (
       <div
         ref={menuItemRef}
@@ -135,7 +142,7 @@ export default function MenuItem({
         role={isRadioButtonType ? 'menuitemradio' : 'menuitem'}
         aria-checked={isRadioButtonType ? isSelected : undefined}
         aria-haspopup={hasSubmenuVisible}
-        {...expandedProp}
+        aria-expanded={hasSubmenuVisible ? isSubmenuVisible : undefined}
       >
         {hasLeftIcon && (
           <div className="menu-item__icon-container">{leftIcon}</div>

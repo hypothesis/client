@@ -9,11 +9,13 @@ import { checkAccessibility } from '../../../test-util/accessibility';
 import mockImportedComponents from '../../../test-util/mock-imported-components';
 
 describe('MenuItem', () => {
+  let containers = [];
   const createMenuItem = props => {
-    const container = document.createElement('div');
-    document.body.appendChild(container);
+    let newContainer = document.createElement('div');
+    containers.push(newContainer);
+    document.body.appendChild(newContainer);
     return mount(<MenuItem label="Test item" {...props} />, {
-      attachTo: container,
+      attachTo: newContainer,
     });
   };
 
@@ -23,6 +25,10 @@ describe('MenuItem', () => {
 
   afterEach(() => {
     $imports.$restore();
+    containers.forEach(container => {
+      container.remove();
+    });
+    containers = [];
   });
 
   describe('link menu items', () => {
@@ -65,14 +71,6 @@ describe('MenuItem', () => {
       assert.called(onClick);
     });
 
-    it('has proper aria attributes when `isSelected` is a boolean', () => {
-      const wrapper = createMenuItem({ isSelected: true });
-      assert.equal(wrapper.find('.menu-item').prop('role'), 'menuitemradio');
-      assert.equal(wrapper.find('.menu-item').prop('aria-checked'), true);
-      // aria-haspopup should be false without a submenu
-      assert.equal(wrapper.find('.menu-item').prop('aria-haspopup'), false);
-    });
-
     it('invokes `onClick` callback when pressing `Enter` or space', () => {
       const onClick = sinon.stub();
       const wrapper = createMenuItem({ isSelected: true, onClick });
@@ -80,6 +78,14 @@ describe('MenuItem', () => {
       assert.called(onClick);
       wrapper.find('.menu-item').simulate('keydown', { key: ' ' });
       assert.calledTwice(onClick);
+    });
+
+    it('has proper aria attributes when `isSelected` is a boolean', () => {
+      const wrapper = createMenuItem({ isSelected: true });
+      assert.equal(wrapper.find('.menu-item').prop('role'), 'menuitemradio');
+      assert.equal(wrapper.find('.menu-item').prop('aria-checked'), true);
+      // aria-haspopup should be false without a submenu
+      assert.equal(wrapper.find('.menu-item').prop('aria-haspopup'), false);
     });
   });
 
@@ -113,9 +119,12 @@ describe('MenuItem', () => {
   });
 
   describe('submenu', () => {
+    afterEach(() => {});
+
     it('shows the submenu indicator if `isSubmenuVisible` is a boolean', () => {
       const wrapper = createMenuItem({
         isSubmenuVisible: true,
+        submenu: <div role="menuitem">Submenu content</div>,
       });
       assert.isTrue(wrapper.exists('SvgIcon[name="collapse-menu"]'));
       assert.equal(wrapper.find('.menu-item').prop('aria-expanded'), true);
@@ -124,12 +133,13 @@ describe('MenuItem', () => {
       assert.isTrue(wrapper.exists('SvgIcon[name="expand-menu"]'));
       assert.equal(wrapper.find('.menu-item').prop('aria-haspopup'), true);
       assert.equal(wrapper.find('.menu-item').prop('aria-expanded'), false);
+      assert.isNotOk(wrapper.find('.menu-item').prop('aria-expanded'));
     });
 
     it('does not show submenu indicator if `isSubmenuVisible` is undefined', () => {
       const wrapper = createMenuItem();
       assert.isFalse(wrapper.exists('SvgIcon'));
-      // aria-expanded should not be present
+      // aria-expanded should be undefined
       assert.equal(wrapper.find('.menu-item').prop('aria-expanded'), undefined);
     });
 
@@ -138,6 +148,7 @@ describe('MenuItem', () => {
       const wrapper = createMenuItem({
         isSubmenuVisible: true,
         onToggleSubmenu: fakeOnToggleSubmenu,
+        submenu: <div role="menuitem">Submenu content</div>,
       });
       wrapper.find('.menu-item__toggle').simulate('click');
       assert.called(fakeOnToggleSubmenu);
@@ -148,6 +159,7 @@ describe('MenuItem', () => {
       const wrapper = createMenuItem({
         isSubmenuVisible: true,
         onToggleSubmenu: fakeOnToggleSubmenu,
+        submenu: <div role="menuitem">Item</div>,
       });
       wrapper.find('.menu-item').simulate('keydown', { key: 'ArrowRight' });
       assert.called(fakeOnToggleSubmenu);
@@ -157,6 +169,7 @@ describe('MenuItem', () => {
       const wrapper = createMenuItem({
         icon: 'an-svg-icon',
         isSubmenuItem: true,
+        submenu: <div role="menuitem">Submenu content</div>,
       });
       const iconSpaces = wrapper.find('.menu-item__icon-container');
       assert.equal(iconSpaces.length, 2);
@@ -176,7 +189,7 @@ describe('MenuItem', () => {
     it('shows submenu content if `isSubmenuVisible` is true', () => {
       const wrapper = createMenuItem({
         isSubmenuVisible: true,
-        submenu: <div>Submenu content</div>,
+        submenu: <div role="menuitem">Submenu content</div>,
       });
       assert.equal(wrapper.find('Slider').prop('visible'), true);
       assert.equal(
@@ -206,7 +219,7 @@ describe('MenuItem', () => {
       const fakeOnToggleSubmenu = sinon.stub();
       const wrapper = createMenuItem({
         isSubmenuVisible: true,
-        submenu: <div>Submenu content</div>,
+        submenu: <div role="menuitem">Submenu content</div>,
         onToggleSubmenu: fakeOnToggleSubmenu,
       });
       act(() => {
@@ -220,19 +233,43 @@ describe('MenuItem', () => {
 
     it('sets focus to the parent item when the submenu is closed via `closeMenu`', () => {
       const clock = sinon.useFakeTimers();
-      const wrapper = createMenuItem({
-        isSubmenuVisible: true,
-        submenu: <div>Submenu content</div>,
-      });
-      act(() => {
-        wrapper
-          .find('MenuKeyboardNavigation')
-          .props()
-          .closeMenu({ key: 'Enter' });
-      });
-      clock.tick(1);
-      assert.equal(document.activeElement.className, 'menu-item');
-      clock.restore();
+      try {
+        const wrapper = createMenuItem({
+          isSubmenuVisible: true,
+          submenu: <div role="menuitem">Submenu content</div>,
+        });
+        act(() => {
+          wrapper
+            .find('MenuKeyboardNavigation')
+            .props()
+            .closeMenu({ key: 'Enter' });
+        });
+        clock.tick(1);
+        assert.equal(document.activeElement.className, 'menu-item');
+      } finally {
+        clock.restore();
+      }
+    });
+
+    it('does not throw an error when unmounting the component before the focus timeout finishes', () => {
+      const clock = sinon.useFakeTimers();
+      try {
+        const wrapper = createMenuItem({
+          isSubmenuVisible: true,
+          submenu: <div role="menuitem">Submenu content</div>,
+        });
+        act(() => {
+          wrapper
+            .find('MenuKeyboardNavigation')
+            .props()
+            .closeMenu({ key: 'Enter' });
+        });
+        wrapper.unmount();
+        clock.tick(1);
+      } finally {
+        clock.restore();
+      }
+      // no assert needed
     });
   });
 
@@ -282,7 +319,7 @@ describe('MenuItem', () => {
             <MenuItem
               label="Test"
               isSubmenuVisible={true}
-              submenu={<div>Submenu content</div>}
+              submenu={<div role="menuitem">Submenu content</div>}
             />
           </div>
         ),

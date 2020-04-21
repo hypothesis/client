@@ -2,6 +2,8 @@ import { createElement } from 'preact';
 import { useEffect, useRef } from 'preact/hooks';
 import propTypes from 'prop-types';
 
+import { normalizeKeyName } from '../../shared/browser-compatibility-utils';
+
 function isElementVisible(element) {
   return element.offsetParent !== null;
 }
@@ -20,17 +22,22 @@ export default function MenuKeyboardNavigation({
   visible,
 }) {
   const menuRef = useRef(null);
+  const focusTimer = useRef(null);
 
   useEffect(() => {
     if (visible) {
       // The focus won't work without delaying rendering.
-      setTimeout(() => {
+      focusTimer.current = setTimeout(() => {
         const firstItem = menuRef.current.querySelector('[role^="menuitem"]');
         if (firstItem) {
           firstItem.focus();
         }
       });
     }
+    return () => {
+      // unmount
+      clearTimeout(focusTimer.current);
+    };
   }, [visible]);
 
   const onKeyDown = event => {
@@ -44,7 +51,7 @@ export default function MenuKeyboardNavigation({
 
     let handled = false;
 
-    switch (event.key) {
+    switch (normalizeKeyName(event.key)) {
       case 'ArrowLeft':
       case 'Escape':
         if (closeMenu) {

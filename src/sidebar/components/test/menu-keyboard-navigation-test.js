@@ -10,10 +10,12 @@ import mockImportedComponents from '../../../test-util/mock-imported-components'
 describe('MenuKeyboardNavigation', () => {
   let fakeCloseMenu;
   let clock;
+  let containers = [];
 
   const createMenuItem = props => {
-    const container = document.createElement('div');
-    document.body.appendChild(container);
+    let newContainer = document.createElement('div');
+    containers.push(newContainer);
+    document.body.appendChild(newContainer);
     return mount(
       <MenuKeyboardNavigation
         closeMenu={fakeCloseMenu}
@@ -26,7 +28,7 @@ describe('MenuKeyboardNavigation', () => {
         <button role="menuitem">Item 3</button>
       </MenuKeyboardNavigation>,
       {
-        attachTo: container,
+        attachTo: newContainer,
       }
     );
   };
@@ -38,6 +40,10 @@ describe('MenuKeyboardNavigation', () => {
 
   afterEach(() => {
     $imports.$restore();
+    containers.forEach(container => {
+      container.remove();
+    });
+    containers = [];
   });
 
   it('renders the provided class name', () => {
@@ -106,6 +112,13 @@ describe('MenuKeyboardNavigation', () => {
       wrapper.simulate('keydown', { key: 'End' }); // move focus off first item
       wrapper.simulate('keydown', { key: 'Home' });
       assert.equal(document.activeElement.innerText, 'Item 1');
+    });
+
+    it('does not throw an error when unmounting the component before the focus timeout finishes', () => {
+      const wrapper = createMenuItem({ visible: true });
+      wrapper.unmount();
+      clock.tick(1);
+      // no assert needed
     });
   });
 

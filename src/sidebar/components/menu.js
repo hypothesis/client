@@ -4,6 +4,8 @@ import { useCallback, useEffect, useRef, useState } from 'preact/hooks';
 import propTypes from 'prop-types';
 
 import useElementShouldClose from './hooks/use-element-should-close';
+import { normalizeKeyName } from '../../shared/browser-compatibility-utils';
+
 import SvgIcon from '../../shared/components/svg-icon';
 import MenuKeyboardNavigation from './menu-keyboard-navigation';
 
@@ -73,13 +75,17 @@ export default function Menu({
     if (event.type === 'mousedown') {
       ignoreNextClick = true;
     } else if (event.type === 'click' && ignoreNextClick) {
+      // ignore mouseup event
       ignoreNextClick = false;
       event.stopPropagation();
       event.preventDefault();
       return;
     }
     // State variable so we know to set focus() on the first item when opened
-    // via the keyboard.
+    // via the keyboard. Note, when opening the menu via keyboard by pressing
+    // enter or space, a simulated MouseEvent is created with a type value of
+    // "click". We also know this is not a mouseup event because that condition
+    // is checked above.
     if (!isOpen && event.type === 'click') {
       setOpenedByKeyboard(true);
     } else {
@@ -105,7 +111,8 @@ export default function Menu({
 
   // It should also close if the user presses a key which activates menu items.
   const handleMenuKeyDown = event => {
-    if (event.key === 'Enter' || event.key === ' ') {
+    const key = normalizeKeyName(event.key);
+    if (key === 'Enter' || key === ' ') {
       // The link will not follow if its removed directly from an keypress event.
       // Delay it a little.
       setTimeout(() => {
