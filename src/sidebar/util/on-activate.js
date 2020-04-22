@@ -1,3 +1,5 @@
+import { normalizeKeyName } from '../../shared/browser-compatibility-utils';
+
 /**
  * Return a set of props that can be applied to a React DOM element to make
  * it activateable like a button.
@@ -16,7 +18,8 @@ export function onActivate(role, handler) {
 
     // Support keyboard activation.
     onKeyDown: event => {
-      if (event.key === 'Enter' || event.key === ' ') {
+      const key = normalizeKeyName(event.key);
+      if (key === 'Enter' || key === ' ') {
         handler(event);
       }
     },
