@@ -17,7 +17,8 @@
   // the window is scrolled.
   transform: translate3d(0, 0, 0);
 
-  &__icon-button {
+  &__icon-button,
+  &__menu-icon {
     &.is-active {
       color: var.$grey-6;
 
@@ -33,6 +34,10 @@
     &:hover {
       color: var.$brand;
     }
+  }
+
+  &__menu-label {
+    padding: 0.25em;
   }
 }
 

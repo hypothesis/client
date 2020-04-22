@@ -6,10 +6,10 @@ import serviceConfig from '../service-config';
 import { isThirdPartyUser } from '../util/account-id';
 import { withServices } from '../util/service-context';
 
-import Button from './button';
 import Menu from './menu';
 import MenuItem from './menu-item';
 import MenuSection from './menu-section';
+import SvgIcon from '../../shared/components/svg-icon';
 
 /**
  * A menu with user and account links.
@@ -44,12 +44,9 @@ function UserMenu({ auth, bridge, onLogout, serviceUrl, settings }) {
   })();
 
   const menuLabel = (
-    <Button
-      className="top-bar__icon-button"
-      icon="profile"
-      title="User menu"
-      useCompactStyle
-    />
+    <span className="top-bar__menu-label">
+      <SvgIcon name="profile" className="top-bar__menu-icon" />
+    </span>
   );
   return (
     <div className="user-menu">
