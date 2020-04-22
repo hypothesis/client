@@ -119,8 +119,6 @@ describe('MenuItem', () => {
   });
 
   describe('submenu', () => {
-    afterEach(() => {});
-
     it('shows the submenu indicator if `isSubmenuVisible` is a boolean', () => {
       const wrapper = createMenuItem({
         isSubmenuVisible: true,

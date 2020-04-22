@@ -22,12 +22,12 @@ export default function MenuKeyboardNavigation({
   visible,
 }) {
   const menuRef = useRef(null);
-  const focusTimer = useRef(null);
 
   useEffect(() => {
+    let focusTimer = null;
     if (visible) {
-      // The focus won't work without delaying rendering.
-      focusTimer.current = setTimeout(() => {
+      focusTimer = setTimeout(() => {
+        // The focus won't work without delaying rendering.
         const firstItem = menuRef.current.querySelector('[role^="menuitem"]');
         if (firstItem) {
           firstItem.focus();
@@ -36,7 +36,7 @@ export default function MenuKeyboardNavigation({
     }
     return () => {
       // unmount
-      clearTimeout(focusTimer.current);
+      clearTimeout(focusTimer);
     };
   }, [visible]);
 
@@ -91,14 +91,13 @@ export default function MenuKeyboardNavigation({
   };
 
   return (
-    <div
-      role="presentation"
-      className={className}
-      ref={menuRef}
-      onKeyDown={onKeyDown}
-    >
-      {/* role="menu" helps screen readers separate submenu items from parent menu items */}
-      <div role="menu">{children}</div>
+    // This element needs to have role="menu" to facilitate readers
+    // correctly enumerating discrete submenu items, but it also needs
+    // to facilitate keydown events for navigation. Disable the linter
+    // error so it can do both.
+    // eslint-disable-next-line jsx-a11y/interactive-supports-focus
+    <div role="menu" className={className} ref={menuRef} onKeyDown={onKeyDown}>
+      {children}
     </div>
   );
 }

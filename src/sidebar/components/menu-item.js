@@ -46,7 +46,7 @@ export default function MenuItem({
   const hasRightIcon = icon && isSubmenuItem;
 
   const menuItemRef = useRef(null);
-  const focusTimer = useRef(null);
+  let focusTimer = null;
 
   let renderedIcon = null;
   if (icon !== 'blank') {
@@ -67,8 +67,9 @@ export default function MenuItem({
   useEffect(() => {
     return () => {
       // unmount
-      clearTimeout(focusTimer.current);
+      clearTimeout(focusTimer);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const onCloseSubmenu = event => {
@@ -76,7 +77,7 @@ export default function MenuItem({
       onToggleSubmenu(event);
     }
     // The focus won't work without delaying rendering.
-    focusTimer.current = setTimeout(() => {
+    focusTimer = setTimeout(() => {
       menuItemRef.current.focus();
     });
   };

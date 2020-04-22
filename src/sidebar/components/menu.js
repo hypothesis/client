@@ -75,7 +75,7 @@ export default function Menu({
     if (event.type === 'mousedown') {
       ignoreNextClick = true;
     } else if (event.type === 'click' && ignoreNextClick) {
-      // ignore mouseup event
+      // Ignore "click" event triggered from the mouse up action.
       ignoreNextClick = false;
       event.stopPropagation();
       event.preventDefault();
@@ -113,8 +113,9 @@ export default function Menu({
   const handleMenuKeyDown = event => {
     const key = normalizeKeyName(event.key);
     if (key === 'Enter' || key === ' ') {
-      // The link will not follow if its removed directly from an keypress event.
-      // Delay it a little.
+      // The browser will not open the link if the link element is removed
+      // from within the keypress event that triggers it. Add a little
+      // delay to work around that.
       setTimeout(() => {
         closeMenu();
       });
