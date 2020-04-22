@@ -116,6 +116,12 @@ hypothesis-app {
   }
 }
 
+// Disable scroll anchoring as it interferes with `ThreadList` and
+// `visible-threads` calculations and can cause a render loop
+.js-thread-list-scroll-root {
+  overflow-anchor: none;
+}
+
 // Elements in root template (viewer.html)
 // ---------------------------------------
 

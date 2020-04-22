@@ -19,9 +19,10 @@ describe('ThreadList', () => {
   let fakeScrollContainer;
   let fakeStore;
   let fakeVisibleThreadsUtil;
+  let wrappers;
 
   function createComponent(props) {
-    return mount(
+    const wrapper = mount(
       <ThreadList
         thread={fakeTopThread}
         $rootScope={fakeRootScope}
@@ -29,9 +30,12 @@ describe('ThreadList', () => {
       />,
       { attachTo: fakeScrollContainer }
     );
+    wrappers.push(wrapper);
+    return wrapper;
   }
 
   beforeEach(() => {
+    wrappers = [];
     fakeDebounce = sinon.stub().returns(() => null);
     fakeDomUtil = {
       getElementHeightWithMargins: sinon.stub().returns(0),
@@ -90,7 +94,6 @@ describe('ThreadList', () => {
 
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
-      'lodash.debounce': fakeDebounce,
       '../store/use-store': callback => callback(fakeStore),
       '../util/annotation-metadata': fakeMetadata,
       '../util/dom': fakeDomUtil,
@@ -100,13 +103,9 @@ describe('ThreadList', () => {
 
   afterEach(() => {
     $imports.$restore();
+    // Make sure all mounted components are unmounted
+    wrappers.forEach(wrapper => wrapper.unmount());
     fakeScrollContainer.remove();
-  });
-
-  it('works', () => {
-    const wrapper = createComponent();
-
-    assert.isTrue(wrapper.find('section').exists());
   });
 
   it('calculates visible threads', () => {
@@ -162,23 +161,19 @@ describe('ThreadList', () => {
   });
 
   context('active scroll to an annotation thread', () => {
-    let stubbedDocument;
-    let stubbedFakeScrollContainer;
     let fakeScrollTop;
 
     beforeEach(() => {
       fakeScrollTop = sinon.stub();
-      stubbedFakeScrollContainer = sinon
-        .stub(fakeScrollContainer, 'scrollTop')
-        .set(fakeScrollTop);
-      stubbedDocument = sinon
+      sinon.stub(fakeScrollContainer, 'scrollTop').set(fakeScrollTop);
+      sinon
         .stub(document, 'querySelector')
+        .withArgs('.js-thread-list-scroll-root')
         .returns(fakeScrollContainer);
     });
 
     afterEach(() => {
-      stubbedFakeScrollContainer.restore();
-      stubbedDocument.restore();
+      document.querySelector.restore();
     });
 
     it('should do nothing if there is no active annotation thread to scroll to', () => {
@@ -218,43 +213,89 @@ describe('ThreadList', () => {
   });
 
   describe('scroll and resize event handling', () => {
-    let debouncedFn;
+    // TODO Needs additional testing for the actual debounced callback —
+    // check that `calculateVisibleThreads` gets called with updated dimensions
+    let stubbedWindow;
+    let innerHeightStub;
 
     beforeEach(() => {
-      debouncedFn = sinon.stub();
-      fakeDebounce.returns(debouncedFn);
+      innerHeightStub = sinon.stub().returns(5);
+      stubbedWindow = sinon.stub(window, 'innerHeight').get(innerHeightStub);
     });
 
-    it('updates scroll position and window height for recalculation on container scroll', () => {
-      createComponent();
-      document
-        .querySelector('.js-thread-list-scroll-root')
-        .dispatchEvent(new Event('scroll'));
-
-      assert.calledOnce(debouncedFn);
+    afterEach(() => {
+      stubbedWindow.restore();
     });
 
-    it('updates scroll position and window height for recalculation on window resize', () => {
-      createComponent();
-      window.dispatchEvent(new Event('resize'));
+    describe('event callbacks when scrolling or resizing', () => {
+      beforeEach(() => {
+        // This is restored by top-level afterEach
+        $imports.$mock({
+          'lodash.debounce': fakeDebounce,
+        });
+        fakeDebounce.callsArg(0);
+        // Return a `cancel` function, however...
+        fakeDebounce.returns({ cancel: sinon.stub() });
+      });
 
-      assert.calledOnce(debouncedFn);
+      it('updates scroll position and window height for recalculation on container scroll', () => {
+        createComponent();
+        document
+          .querySelector('.js-thread-list-scroll-root')
+          .dispatchEvent(new Event('scroll'));
+
+        assert.calledOnce(fakeDebounce);
+      });
+
+      it('updates scroll position and window height for recalculation on window resize', () => {
+        createComponent();
+        window.dispatchEvent(new Event('resize'));
+
+        assert.calledOnce(fakeDebounce);
+      });
     });
   });
 
   context('when top-level threads change', () => {
     it('recalculates thread heights', () => {
       const wrapper = createComponent();
+      const differentChildren = [
+        { id: 't1', children: [], annotation: { $tag: 't1' } },
+        { id: 't2', children: [], annotation: { $tag: 't2' } },
+      ];
       // Initial render and effect hooks will trigger calculation twice
       fakeDomUtil.getElementHeightWithMargins.resetHistory();
       // Let's see it respond to the top-level threads changing
-      wrapper.setProps({ thread: fakeTopThread });
+
+      wrapper.setProps({
+        thread: {
+          children: differentChildren,
+        },
+      });
       // It should check the element height for each top-level thread (assuming
       // they are all onscreen, which these test threads "are")
       assert.equal(
         fakeDomUtil.getElementHeightWithMargins.callCount,
-        fakeTopThread.children.length
+        differentChildren.length
       );
+    });
+
+    describe('handling non-existent or offscreen thread card elements', () => {
+      let stubbedDoc;
+
+      beforeEach(() => {
+        stubbedDoc = sinon.stub(document, 'getElementById').returns(null);
+      });
+
+      afterEach(() => {
+        stubbedDoc.restore();
+      });
+
+      it('should not check or update heights for these elements', () => {
+        createComponent();
+        // Initial render WOULD cause recalculation if any of the elements existed
+        assert.notCalled(fakeDomUtil.getElementHeightWithMargins);
+      });
     });
   });
 

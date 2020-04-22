@@ -1,5 +1,5 @@
 import { createElement } from 'preact';
-import { useEffect, useState } from 'preact/hooks';
+import { useEffect, useMemo, useState } from 'preact/hooks';
 import propTypes from 'prop-types';
 import debounce from 'lodash.debounce';
 import shallowEqual from 'shallowequal';
@@ -15,6 +15,10 @@ import {
 } from '../util/visible-threads';
 
 import ThreadCard from './thread-card';
+
+// The precision of the `scrollPosition` value in pixels; values will be rounded
+// down to the nearest multiple of this scale value
+const SCROLL_PRECISION = 50;
 
 function getScrollContainer() {
   return document.querySelector('.js-thread-list-scroll-root');
@@ -32,6 +36,8 @@ function ThreadList({ thread, $rootScope }) {
 
   // Scroll offset of scroll container. This is updated after the scroll
   // container is scrolled, with debouncing to limit update frequency.
+  // These values are in multiples of `SCROLL_PRECISION` to optimize
+  // for performance.
   const [scrollPosition, setScrollPosition] = useState(
     getScrollContainer().scrollTop
   );
@@ -44,7 +50,9 @@ function ThreadList({ thread, $rootScope }) {
   const [scrollToId, setScrollToId] = useState(null);
 
   const topLevelThreads = thread.children;
-  const topLevelThreadIds = topLevelThreads.map(t => t.id);
+  const topLevelThreadIds = useMemo(() => topLevelThreads.map(t => t.id), [
+    topLevelThreads,
+  ]);
 
   const {
     offscreenLowerHeight,
@@ -112,8 +120,14 @@ function ThreadList({ thread, $rootScope }) {
 
     const updateScrollPosition = debounce(
       () => {
+        const exactScrollPosition = scrollContainer.scrollTop;
+        // Get scroll position to the nearest `SCROLL_PRECISION` multiple
+        const roundedScrollPosition = Math.max(
+          exactScrollPosition - (exactScrollPosition % SCROLL_PRECISION),
+          0
+        );
         setWindowHeight(window.innerHeight);
-        setScrollPosition(scrollContainer.scrollTop);
+        setScrollPosition(roundedScrollPosition);
       },
       10,
       { maxWait: 100 }
@@ -125,6 +139,7 @@ function ThreadList({ thread, $rootScope }) {
     return () => {
       scrollContainer.removeEventListener('scroll', updateScrollPosition);
       window.removeEventListener('resize', updateScrollPosition);
+      updateScrollPosition.cancel();
     };
   }, []);
 
