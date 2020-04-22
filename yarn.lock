@@ -2869,9 +2869,12 @@ domhandler@^2.3.0:
     domelementtype "1"
 
 dompurify@^2.0.1:
-  version "2.0.8"
-  resolved "https://registry.yarnpkg.com/dompurify/-/dompurify-2.0.8.tgz#6ef89d2d227d041af139c7b01d9f67ed59c2eb3c"
-  integrity sha512-vIOSyOXkMx81ghEalh4MLBtDHMx1bhKlaqHDMqM2yeitJ996SLOk5mGdDpI9ifJAgokred8Rmu219fX4OltqXw==
+  version "2.0.9"
+  resolved "https://registry.yarnpkg.com/dompurify/-/dompurify-2.0.9.tgz#05bea47558e943edf234b0342cb9b39f607068d1"
+  integrity sha512-rLhTDpA79luXN4Lo5GsLU4rNMo380hp6/x8cOQCw4AsaYx2+EmpaHjWyZ9Q7FM+ZM85gZA4aRDooKtpWkeDiAA==
+  dependencies:
+    node "^13.13.0"
+    nvm "0.0.4"
 
 domutils@1.5.1:
   version "1.5.1"
@@ -5536,6 +5539,11 @@ no-case@^2.2.0:
   dependencies:
     lower-case "^1.1.1"
 
+node-bin-setup@^1.0.0:
+  version "1.0.6"
+  resolved "https://registry.yarnpkg.com/node-bin-setup/-/node-bin-setup-1.0.6.tgz#4b5c9bb937ece702d7069b36ca78af4684677528"
+  integrity sha512-uPIxXNis1CRbv1DwqAxkgBk5NFV3s7cMN/Gf556jSw6jBvV7ca4F9lRL/8cALcZecRibeqU+5dFYqFFmzv5a0Q==
+
 node-environment-flags@1.0.6:
   version "1.0.6"
   resolved "https://registry.yarnpkg.com/node-environment-flags/-/node-environment-flags-1.0.6.tgz#a30ac13621f6f7d674260a54dede048c3982c088"
@@ -5553,6 +5561,13 @@ node-releases@^1.1.53:
   version "1.1.53"
   resolved "https://registry.yarnpkg.com/node-releases/-/node-releases-1.1.53.tgz#2d821bfa499ed7c5dffc5e2f28c88e78a08ee3f4"
   integrity sha512-wp8zyQVwef2hpZ/dJH7SfSrIPD6YoJz6BDQDpGEkcA0s3LpAQoxBIYmfIq6QAhC1DhwsyCgTaTTcONwX8qzCuQ==
+
+node@^13.13.0:
+  version "13.13.0"
+  resolved "https://registry.yarnpkg.com/node/-/node-13.13.0.tgz#5138b94de149b7ddfddb18f8691d4a00f5761f2f"
+  integrity sha512-Ptccrn5A3D3EEZ4xTC9HNhCro2KzCF1j6rCgeczFFe1A6Y0HclzbRHw0OxsEjAZcgvmgzN3OIxZpAIkkNe8LTw==
+  dependencies:
+    node-bin-setup "^1.0.0"
 
 nopt@~1.0.10:
   version "1.0.10"
@@ -5640,6 +5655,11 @@ number-is-nan@^1.0.0:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/number-is-nan/-/number-is-nan-1.0.1.tgz#097b602b53422a522c1afb8790318336941a011d"
   integrity sha1-CXtgK1NCKlIsGvuHkDGDNpQaAR0=
+
+nvm@0.0.4:
+  version "0.0.4"
+  resolved "https://registry.yarnpkg.com/nvm/-/nvm-0.0.4.tgz#38a178e9d31b283508c92d15c9da861d1a9210bc"
+  integrity sha1-OKF46dMbKDUIyS0VydqGHRqSELw=
 
 object-assign@^4.0.1, object-assign@^4.1.1:
   version "4.1.1"
