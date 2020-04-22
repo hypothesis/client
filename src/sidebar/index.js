@@ -130,6 +130,7 @@ import ShareAnnotationsPanel from './components/share-annotations-panel';
 import SidebarContentError from './components/sidebar-content-error';
 import SvgIcon from '../shared/components/svg-icon';
 import Thread from './components/thread';
+import ThreadList from './components/thread-list';
 import ToastMessages from './components/toast-messages';
 import TopBar from './components/top-bar';
 
@@ -139,7 +140,6 @@ import annotationViewerContent from './components/annotation-viewer-content';
 import hypothesisApp from './components/hypothesis-app';
 import sidebarContent from './components/sidebar-content';
 import streamContent from './components/stream-content';
-import threadList from './components/thread-list';
 
 // Services.
 
@@ -271,7 +271,7 @@ function startAngularApp(config) {
     .component('streamContent', streamContent)
     .component('svgIcon', wrapComponent(SvgIcon))
     .component('thread', wrapComponent(Thread))
-    .component('threadList', threadList)
+    .component('threadList', wrapComponent(ThreadList))
     .component('toastMessages', wrapComponent(ToastMessages))
     .component('topBar', wrapComponent(TopBar))
 

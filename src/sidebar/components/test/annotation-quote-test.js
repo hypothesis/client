@@ -14,7 +14,12 @@ describe('AnnotationQuote', () => {
 
   function createQuote(props) {
     return mount(
-      <AnnotationQuote annotation={fakeAnnotation} settings={{}} {...props} />
+      <AnnotationQuote
+        annotation={fakeAnnotation}
+        isFocused={false}
+        settings={{}}
+        {...props}
+      />
     );
   }
 

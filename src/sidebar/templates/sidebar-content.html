@@ -33,15 +33,7 @@
   ng-if="!vm.isLoading() && !(vm.selectedAnnotationUnavailable() || vm.selectedGroupUnavailable())">
 </search-status-bar>
 
-
-<thread-list
-  on-change-collapsed="vm.setCollapsed(id, collapsed)"
-  on-focus="vm.focus(annotation)"
-  on-select="vm.scrollTo(annotation)"
-  show-document-info="false"
-  ng-if="!vm.selectedGroupUnavailable()"
-  thread="vm.rootThread()">
-</thread-list>
+<thread-list thread="vm.rootThread()"></thread-list>
 
 <logged-out-message ng-if="vm.shouldShowLoggedOutMessage()" on-login="vm.onLogin()">
 </logged-out-message>

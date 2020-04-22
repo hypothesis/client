@@ -235,14 +235,15 @@ export default function FrameSync($rootScope, $window, store, bridge) {
   };
 
   /**
-   * Focus annotations with the given tags.
+   * Focus annotations with the given $tags.
    *
    * This is used to indicate the highlight in the document that corresponds to
    * a given annotation in the sidebar.
    *
-   * @param {string[]} tags
+   * @param {string[]} tags - annotation $tags
    */
   this.focusAnnotations = function (tags) {
+    store.focusAnnotations(tags);
     bridge.call('focusAnnotations', tags);
   };
 

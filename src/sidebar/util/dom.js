@@ -1,4 +1,25 @@
 /**
+ * Obtain the pixel height of the provided DOM element, including
+ * top and bottom margins.
+ *
+ * @param {Element} element - DOM element to measure
+ * @return {number|null} - The element's height in pixels
+ */
+export function getElementHeightWithMargins(element) {
+  const style = window.getComputedStyle(element);
+  // Get the height of the element inside the border-box, excluding
+  // top and bottom margins.
+  const elementHeight = element.getBoundingClientRect().height;
+
+  // Get the bottom margin of the element. style.margin{Side} will return
+  // values of the form 'Npx', from which we extract 'N'.
+  const marginHeight =
+    parseFloat(style.marginTop) + parseFloat(style.marginBottom);
+
+  return elementHeight + marginHeight;
+}
+
+/**
  * Attach listeners for one or multiple events to an element and return a
  * function that removes the listeners.
  *

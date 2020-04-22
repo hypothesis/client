@@ -62,7 +62,7 @@
 @use './components/tag-editor';
 @use './components/tag-list';
 @use './components/thread';
-@use './components/thread-list';
+@use './components/thread-card';
 @use './components/toast-messages';
 @use './components/tooltip';
 @use './components/top-bar';
@@ -114,6 +114,12 @@ hypothesis-app {
     padding-left: 4rem;
     padding-right: 4rem;
   }
+}
+
+// Disable scroll anchoring as it interferes with `ThreadList` and
+// `visible-threads` calculations and can cause a render loop
+.js-thread-list-scroll-root {
+  overflow-anchor: none;
 }
 
 // Elements in root template (viewer.html)
