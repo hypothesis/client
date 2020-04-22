@@ -119,6 +119,7 @@ registerIcons(iconSet);
 // Preact UI components that are wrapped for use within Angular templates.
 
 import Annotation from './components/annotation';
+import AnnotationViewerContent from './components/annotation-viewer-content';
 import FocusedModeHeader from './components/focused-mode-header';
 import HelpPanel from './components/help-panel';
 import LoggedOutMessage from './components/logged-out-message';
@@ -136,7 +137,6 @@ import TopBar from './components/top-bar';
 
 // Remaining UI components that are still built with Angular.
 
-import annotationViewerContent from './components/annotation-viewer-content';
 import hypothesisApp from './components/hypothesis-app';
 import sidebarContent from './components/sidebar-content';
 import streamContent from './components/stream-content';
@@ -257,7 +257,10 @@ function startAngularApp(config) {
 
     // UI components
     .component('annotation', wrapComponent(Annotation))
-    .component('annotationViewerContent', annotationViewerContent)
+    .component(
+      'annotationViewerContent',
+      wrapComponent(AnnotationViewerContent)
+    )
     .component('helpPanel', wrapComponent(HelpPanel))
     .component('loginPromptPanel', wrapComponent(LoginPromptPanel))
     .component('loggedOutMessage', wrapComponent(LoggedOutMessage))
