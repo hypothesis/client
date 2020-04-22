@@ -2,9 +2,9 @@ import { createElement } from 'preact';
 
 import useStore from '../store/use-store';
 
-import Button from './button';
 import Menu from './menu';
 import MenuItem from './menu-item';
+import SvgIcon from '../../shared/components/svg-icon';
 
 /**
  * A drop-down menu of sorting options for a collection of annotations.
@@ -35,12 +35,9 @@ export default function SortMenu() {
   });
 
   const menuLabel = (
-    <Button
-      className="top-bar__icon-button"
-      icon="sort"
-      title="Sort annotations"
-      useCompactStyle
-    />
+    <span className="top-bar__menu-label">
+      <SvgIcon name="sort" className="top-bar__menu-icon" />
+    </span>
   );
 
   return (
