@@ -1,6 +1,7 @@
 import events from '../../events';
 import fakeReduxStore from '../../test/fake-redux-store';
 import groups, { $imports } from '../groups';
+import { waitFor } from '../../../test-util/wait';
 
 /**
  * Generate a truth table containing every possible combination of a set of
@@ -108,7 +109,7 @@ describe('groups', function () {
       },
 
       $on: function (event, callback) {
-        if (event === events.USER_CHANGED || event === events.FRAME_CONNECTED) {
+        if (event === events.USER_CHANGED) {
           this.eventCallbacks[event] = callback;
         }
       },
@@ -809,7 +810,7 @@ describe('groups', function () {
     });
   });
 
-  describe('calls load on various events', function () {
+  describe('automatic re-fetching', function () {
     it('refetches groups when the logged-in user changes', () => {
       service();
 
@@ -819,43 +820,46 @@ describe('groups', function () {
     });
 
     context('when a new frame connects', () => {
-      it('should refetch groups if main frame URL has changed', () => {
+      it('should refetch groups if main frame URL has changed', async () => {
         const svc = service();
 
         fakeStore.setState({
           frames: [{ uri: 'https://domain.com/page-a' }],
         });
-        return svc
-          .load()
-          .then(() => {
-            // Simulate main frame URL change, eg. due to client-side navigation in
-            // a single page application.
-            fakeApi.groups.list.resetHistory();
-            fakeStore.setState({
-              frames: [{ uri: 'https://domain.com/page-b' }],
-            });
+        await svc.load();
 
-            return fakeRootScope.eventCallbacks[events.FRAME_CONNECTED]();
-          })
-          .then(() => {
-            assert.calledOnce(fakeApi.groups.list);
-          });
+        // Simulate main frame URL change, eg. due to client-side navigation in
+        // a single page application.
+        fakeApi.groups.list.resetHistory();
+        fakeStore.setState({
+          frames: [{ uri: 'https://domain.com/page-b' }],
+        });
+
+        await waitFor(() => fakeApi.groups.list.callCount > 0);
+        assert.calledOnce(fakeApi.groups.list);
       });
 
-      it('should not refetch groups if main frame URL has not changed', () => {
+      it('should not refetch groups if main frame URL has not changed', async () => {
         const svc = service();
 
         fakeStore.setState({
           frames: [{ uri: 'https://domain.com/page-a' }],
         });
-        return svc
-          .load()
-          .then(() => {
-            return fakeRootScope.eventCallbacks[events.FRAME_CONNECTED]();
-          })
-          .then(() => {
-            assert.calledOnce(fakeApi.groups.list);
-          });
+
+        await svc.load();
+        assert.calledOnce(fakeApi.groups.list);
+
+        // A new frame connects, but the main frame URI remains the same.
+        fakeApi.groups.list.resetHistory();
+        fakeStore.setState({
+          frames: [
+            { uri: 'https://domain.com/page-a' },
+            { uri: 'https://domain.com/iframe-b' },
+          ],
+        });
+
+        await new Promise(resolve => setTimeout(resolve, 1));
+        assert.notCalled(fakeApi.groups.list);
       });
     });
   });

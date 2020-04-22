@@ -203,7 +203,6 @@ export default function FrameSync($rootScope, $window, store, bridge) {
         return;
       }
 
-      $rootScope.$broadcast(events.FRAME_CONNECTED);
       store.connectFrame({
         id: info.frameIdentifier,
         metadata: info.metadata,

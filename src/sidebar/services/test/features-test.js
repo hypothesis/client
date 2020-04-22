@@ -1,42 +1,33 @@
 import bridgeEvents from '../../../shared/bridge-events';
-import events from '../../events';
 import features from '../features';
 import { $imports } from '../features';
 
-describe('h:features - sidebar layer', function () {
+describe('sidebar/services/features', function () {
   let fakeBridge;
   let fakeWarnOnce;
-  let fakeRootScope;
   let fakeSession;
-  let sandbox;
+  let fakeStore;
 
   beforeEach(function () {
-    sandbox = sinon.createSandbox();
-
     fakeBridge = {
       call: sinon.stub(),
     };
 
     fakeWarnOnce = sinon.stub();
 
-    fakeRootScope = {
-      eventCallbacks: {},
-
-      $broadcast: sandbox.stub(),
-
-      $on: function (event, callback) {
-        this.eventCallbacks[event] = callback;
-      },
-    };
-
     fakeSession = {
       load: sinon.stub(),
-      state: {
+    };
+
+    fakeStore = {
+      subscribe: sinon.stub(),
+      frames: sinon.stub().returns([]),
+      profile: sinon.stub().returns({
         features: {
           feature_on: true,
           feature_off: false,
         },
-      },
+      }),
     };
 
     $imports.$mock({
@@ -46,64 +37,83 @@ describe('h:features - sidebar layer', function () {
 
   afterEach(function () {
     $imports.$restore();
-    sandbox.restore();
   });
+
+  function createService() {
+    return features(fakeBridge, fakeSession, fakeStore);
+  }
 
   describe('flagEnabled', function () {
     it('should retrieve features data', function () {
-      const features_ = features(fakeRootScope, fakeBridge, fakeSession);
+      const features_ = createService();
       assert.equal(features_.flagEnabled('feature_on'), true);
       assert.equal(features_.flagEnabled('feature_off'), false);
     });
 
     it('should return false if features have not been loaded', function () {
-      const features_ = features(fakeRootScope, fakeBridge, fakeSession);
-      // simulate feature data not having been loaded yet
-      fakeSession.state = {};
+      const features_ = createService();
+      // Simulate feature data not having been loaded yet
+      fakeStore.profile.returns({});
       assert.equal(features_.flagEnabled('feature_on'), false);
     });
 
     it('should trigger a refresh of session data', function () {
-      const features_ = features(fakeRootScope, fakeBridge, fakeSession);
+      const features_ = createService();
       features_.flagEnabled('feature_on');
       assert.calledOnce(fakeSession.load);
     });
 
     it('should return false for unknown flags', function () {
-      const features_ = features(fakeRootScope, fakeBridge, fakeSession);
+      const features_ = createService();
       assert.isFalse(features_.flagEnabled('unknown_feature'));
     });
   });
 
-  it('should broadcast feature flags to annotation layer based on load/user changes', function () {
-    assert.notProperty(fakeRootScope.eventCallbacks, events.USER_CHANGED);
-    assert.notProperty(fakeRootScope.eventCallbacks, events.FRAME_CONNECTED);
+  function notifyStoreSubscribers() {
+    const subscribers = fakeStore.subscribe.args.map(args => args[0]);
+    subscribers.forEach(s => s());
+  }
 
-    features(fakeRootScope, fakeBridge, fakeSession);
+  it('should broadcast feature flags to annotator if flags change', () => {
+    createService();
 
-    assert.property(fakeRootScope.eventCallbacks, events.USER_CHANGED);
-    assert.property(fakeRootScope.eventCallbacks, events.FRAME_CONNECTED);
-
-    // respond to user changing by broadcasting the feature flags
+    // First update, with no changes to feature flags.
+    notifyStoreSubscribers();
     assert.notCalled(fakeBridge.call);
 
-    fakeRootScope.eventCallbacks[events.USER_CHANGED]();
+    // Second update, with changes to feature flags.
+    fakeStore.profile.returns({
+      features: {
+        feature_on: true,
+        feature_off: true,
+      },
+    });
 
-    assert.calledOnce(fakeBridge.call);
+    notifyStoreSubscribers();
+
     assert.calledWith(
       fakeBridge.call,
       bridgeEvents.FEATURE_FLAGS_UPDATED,
-      fakeSession.state.features
+      fakeStore.profile().features
     );
+  });
 
-    // respond to frame connections by broadcasting the feature flags
-    fakeRootScope.eventCallbacks[events.FRAME_CONNECTED]();
+  it('should broadcast feature flags to annotator if a new frame connects', () => {
+    createService();
 
-    assert.calledTwice(fakeBridge.call);
+    // First update, with no changes to frames.
+    notifyStoreSubscribers();
+    assert.notCalled(fakeBridge.call);
+
+    // Second update, with changes to frames.
+    fakeStore.frames.returns([{ uri: 'https://example.com' }]);
+
+    notifyStoreSubscribers();
+
     assert.calledWith(
       fakeBridge.call,
       bridgeEvents.FEATURE_FLAGS_UPDATED,
-      fakeSession.state.features
+      fakeStore.profile().features
     );
   });
 });
