@@ -37,6 +37,12 @@ function AnnotationViewerContent({
       )[0];
 
       if (!topLevelAnnot) {
+        // `annotationId` refers to a reply. We were able to fetch the reply
+        // but not the top-level annotation at the top of the thread.
+        //
+        // We need to decide what what be the most useful behavior in this case
+        // and implement it.
+        /* istanbul ignore next */
         return;
       }
 
