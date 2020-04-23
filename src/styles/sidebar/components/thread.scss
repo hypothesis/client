@@ -53,8 +53,7 @@
 
   &__content {
     flex-grow: 1;
-    // Prevent long, non-wrapping content (typically URLs) from exceeding
-    // the width of the annotation card
-    overflow: hidden;
+    // Prevent annotation content from overflowing the container
+    max-width: 100%;
   }
 }
