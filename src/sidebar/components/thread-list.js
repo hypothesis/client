@@ -25,8 +25,13 @@ function getScrollContainer() {
 }
 
 /**
- * Render a list of threads, but only render those that are in or near the
- * current browser viewport.
+ * Render a list of threads.
+ *
+ * The thread list is "virtualized", meaning that only threads in or near the
+ * viewport are rendered. This is critical for performance and memory usage as
+ * annotations (and replies) are complex interactive components whose
+ * user-defined content may include rich media such as images, audio clips,
+ * embedded YouTube videos, rendered math and more.
  */
 function ThreadList({ thread, $rootScope }) {
   const clearSelection = useStore(store => store.clearSelection);
@@ -177,7 +182,7 @@ function ThreadList({ thread, $rootScope }) {
     <section>
       <div style={{ height: offscreenUpperHeight }} />
       {visibleThreads.map(child => (
-        <div id={child.id} key={child.id}>
+        <div className="thread-list__card" id={child.id} key={child.id}>
           <ThreadCard thread={child} />
         </div>
       ))}
