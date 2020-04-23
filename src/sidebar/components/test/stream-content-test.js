@@ -1,134 +1,129 @@
-import angular from 'angular';
-import EventEmitter from 'tiny-emitter';
+import { mount } from 'enzyme';
+import { createElement } from 'preact';
 
-import streamContent from '../stream-content';
+import mockImportedComponents from '../../../test-util/mock-imported-components';
+import { waitFor } from '../../../test-util/wait';
 
-class FakeRootThread extends EventEmitter {
-  constructor() {
-    super();
-    this.thread = sinon.stub();
-  }
-}
+import StreamContent, { $imports } from '../stream-content';
 
-describe('StreamContentController', function () {
-  let $componentController;
-  let fakeStore;
+describe('StreamContent', () => {
+  let fakeApi;
   let fakeRootThread;
   let fakeSearchFilter;
-  let fakeApi;
-  let fakeStreamer;
-  let fakeStreamFilter;
+  let fakeStore;
+  let fakeToastMessenger;
 
-  before(function () {
-    angular.module('h', []).component('streamContent', streamContent);
-  });
-
-  beforeEach(function () {
-    fakeStore = {
-      addAnnotations: sinon.stub(),
-      clearAnnotations: sinon.spy(),
-      routeParams: sinon.stub().returns({ id: 'test' }),
-      setCollapsed: sinon.spy(),
-      setForceVisible: sinon.spy(),
-      setSortKey: sinon.spy(),
-      subscribe: sinon.spy(),
-    };
-
-    fakeSearchFilter = {
-      generateFacetedFilter: sinon.stub(),
-      toObject: sinon.stub().returns({}),
-    };
-
+  beforeEach(() => {
     fakeApi = {
       search: sinon.stub().resolves({ rows: [], replies: [], total: 0 }),
     };
 
-    fakeStreamer = {
-      open: sinon.spy(),
-      close: sinon.spy(),
-      setConfig: sinon.spy(),
-      connect: sinon.spy(),
+    fakeRootThread = {
+      thread: sinon.stub().returns({}),
     };
 
-    fakeStreamFilter = {
-      resetFilter: sinon.stub().returnsThis(),
-      setMatchPolicyIncludeAll: sinon.stub().returnsThis(),
-      getFilter: sinon.stub(),
+    fakeSearchFilter = {
+      toObject: sinon.stub().returns({}),
     };
 
-    fakeRootThread = new FakeRootThread();
+    fakeStore = {
+      addAnnotations: sinon.stub(),
+      clearAnnotations: sinon.spy(),
+      getState: sinon.stub().returns({}),
+      routeParams: sinon.stub().returns({ id: 'test' }),
+      setSortKey: sinon.spy(),
+    };
 
-    angular.mock.module('h', {
-      store: fakeStore,
-      api: fakeApi,
-      rootThread: fakeRootThread,
-      searchFilter: fakeSearchFilter,
-      streamFilter: fakeStreamFilter,
-      streamer: fakeStreamer,
-    });
+    fakeToastMessenger = {
+      error: sinon.stub(),
+    };
 
-    angular.mock.inject(function (_$componentController_) {
-      $componentController = _$componentController_;
+    $imports.$mock(mockImportedComponents());
+    $imports.$mock({
+      '../store/use-store': callback => callback(fakeStore),
     });
   });
 
-  function createController() {
-    return $componentController('streamContent', {}, {});
+  afterEach(() => {
+    $imports.$restore();
+  });
+
+  function createComponent() {
+    return mount(
+      <StreamContent
+        api={fakeApi}
+        rootThread={fakeRootThread}
+        searchFilter={fakeSearchFilter}
+        toastMessenger={fakeToastMessenger}
+      />
+    );
   }
 
   it('clears any existing annotations when the /stream route is loaded', () => {
-    createController();
+    createComponent();
     assert.calledOnce(fakeStore.clearAnnotations);
   });
 
-  it('calls the search API with `_separate_replies: true`', function () {
-    createController();
+  it('calls the search API with `_separate_replies: true`', () => {
+    createComponent();
     assert.equal(fakeApi.search.firstCall.args[0]._separate_replies, true);
   });
 
-  it('passes the annotations and replies from search to loadAnnotations()', function () {
-    fakeApi.search = function () {
-      return Promise.resolve({
-        rows: ['annotation_1', 'annotation_2'],
-        replies: ['reply_1', 'reply_2', 'reply_3'],
-      });
-    };
-
-    createController();
-
-    return Promise.resolve().then(function () {
-      assert.calledOnce(fakeStore.addAnnotations);
-      assert.calledWith(fakeStore.addAnnotations, [
-        'annotation_1',
-        'annotation_2',
-        'reply_1',
-        'reply_2',
-        'reply_3',
-      ]);
+  it('loads the annotations and replies into the store', async () => {
+    fakeApi.search.resolves({
+      rows: ['annotation_1', 'annotation_2'],
+      replies: ['reply_1', 'reply_2', 'reply_3'],
     });
+
+    createComponent();
+    await waitFor(() => fakeStore.addAnnotations.called);
+
+    assert.calledOnce(fakeStore.addAnnotations);
+    assert.calledWith(fakeStore.addAnnotations, [
+      'annotation_1',
+      'annotation_2',
+      'reply_1',
+      'reply_2',
+      'reply_3',
+    ]);
   });
 
-  context('when route parameters change', function () {
-    it('updates annotations if the query changed', function () {
+  it('displays an error if fetching annotations fails', async () => {
+    fakeApi.search.rejects(new Error('Server error'));
+
+    createComponent();
+    await waitFor(() => fakeToastMessenger.error.called);
+
+    assert.calledWith(
+      fakeToastMessenger.error,
+      'Unable to fetch annotations: Server error'
+    );
+  });
+
+  context('when route parameters change', () => {
+    it('updates annotations if the query changed', () => {
       fakeStore.routeParams.returns({ q: 'test query' });
-      createController();
+      const wrapper = createComponent();
       fakeStore.clearAnnotations.resetHistory();
       fakeApi.search.resetHistory();
 
       fakeStore.routeParams.returns({ q: 'new query' });
-      fakeStore.subscribe.lastCall.callback();
+      // Force update. `useStore` handles this in the real app.
+      wrapper.setProps({});
 
       assert.called(fakeStore.clearAnnotations);
       assert.called(fakeApi.search);
     });
 
-    it('does not clear annotations if the query did not change', function () {
+    it('does not clear annotations if the query did not change', () => {
       fakeStore.routeParams.returns({ q: 'test query' });
-      createController();
+      const wrapper = createComponent();
       fakeApi.search.resetHistory();
       fakeStore.clearAnnotations.resetHistory();
 
-      fakeStore.subscribe.lastCall.callback();
+      fakeStore.routeParams.returns({ q: 'test query', other_param: 'foo' });
+      // Force update. `useStore` handles this in the real app.
+      wrapper.setProps({});
 
       assert.notCalled(fakeStore.clearAnnotations);
       assert.notCalled(fakeApi.search);

@@ -129,6 +129,7 @@ import SearchStatusBar from './components/search-status-bar';
 import SelectionTabs from './components/selection-tabs';
 import ShareAnnotationsPanel from './components/share-annotations-panel';
 import SidebarContentError from './components/sidebar-content-error';
+import StreamContent from './components/stream-content';
 import SvgIcon from '../shared/components/svg-icon';
 import Thread from './components/thread';
 import ThreadList from './components/thread-list';
@@ -139,7 +140,6 @@ import TopBar from './components/top-bar';
 
 import hypothesisApp from './components/hypothesis-app';
 import sidebarContent from './components/sidebar-content';
-import streamContent from './components/stream-content';
 
 // Services.
 
@@ -271,7 +271,7 @@ function startAngularApp(config) {
     .component('sidebarContent', sidebarContent)
     .component('sidebarContentError', wrapComponent(SidebarContentError))
     .component('shareAnnotationsPanel', wrapComponent(ShareAnnotationsPanel))
-    .component('streamContent', streamContent)
+    .component('streamContent', wrapComponent(StreamContent))
     .component('svgIcon', wrapComponent(SvgIcon))
     .component('thread', wrapComponent(Thread))
     .component('threadList', wrapComponent(ThreadList))
