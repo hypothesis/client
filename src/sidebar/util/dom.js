@@ -2,6 +2,10 @@
  * Obtain the pixel height of the provided DOM element, including
  * top and bottom margins.
  *
+ * Note that this function *only* accounts for margins on `element`, not any
+ * descendants which may contribute to the effective margin due to CSS "margin
+ * collapsing".
+ *
  * @param {Element} element - DOM element to measure
  * @return {number|null} - The element's height in pixels
  */

@@ -177,7 +177,7 @@ function ThreadList({ thread, $rootScope }) {
     <section>
       <div style={{ height: offscreenUpperHeight }} />
       {visibleThreads.map(child => (
-        <div id={child.id} key={child.id}>
+        <div className="thread-list__card" id={child.id} key={child.id}>
           <ThreadCard thread={child} />
         </div>
       ))}
