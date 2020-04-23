@@ -172,6 +172,10 @@ describe('Menu', () => {
       clock = sinon.useFakeTimers();
       const wrapper = createMenu({ defaultOpen: true });
       wrapper.find('.menu__content').simulate(eventType, { key });
+      // The close event is delayed by a minimal amount of time in
+      // order to allow links to say in the DOM long enough to be
+      // followed on a click. Therefore, this test must simulate
+      // time passing in order for the menu to close.
       clock.tick(1);
       wrapper.update();
       assert.equal(isOpen(wrapper), !shouldClose);

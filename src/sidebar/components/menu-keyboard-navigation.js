@@ -13,7 +13,7 @@ function isElementVisible(element) {
  * list of <MenuItem> components. This component should not be used directly.
  *
  * Note that `ArrowRight` shall be handled by the parent <MenuItem> directly and
- * all other focus() related  navigation is handled here.
+ * all other focus() related navigation is handled here.
  */
 export default function MenuKeyboardNavigation({
   className,

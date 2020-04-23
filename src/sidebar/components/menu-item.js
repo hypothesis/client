@@ -155,6 +155,10 @@ export default function MenuItem({
 
         {hasSubmenuVisible && (
           <div
+            // We should not have a <button> inside of the menu item itself
+            // but we have a non-standard mechanism with the toggle control
+            // requiring an onClick event nested inside a "menuitemradio|menuitem".
+            // Therefore, a static element with a role="none" is necessary here.
             role="none"
             icon={isSubmenuVisible ? 'collapse-menu' : 'expand-menu'}
             className="menu-item__toggle"
