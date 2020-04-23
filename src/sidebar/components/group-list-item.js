@@ -50,6 +50,11 @@ function GroupListItem({
     }
   };
 
+  /**
+   * Opens or closes the submenu.
+   *
+   * @param {MouseEvent|KeyboardEvent} event
+   */
   const toggleSubmenu = event => {
     event.stopPropagation();
 

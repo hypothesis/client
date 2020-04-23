@@ -4,7 +4,10 @@ import { useCallback, useEffect, useRef, useState } from 'preact/hooks';
 import propTypes from 'prop-types';
 
 import useElementShouldClose from './hooks/use-element-should-close';
+import { normalizeKeyName } from '../../shared/browser-compatibility-utils';
+
 import SvgIcon from '../../shared/components/svg-icon';
+import MenuKeyboardNavigation from './menu-keyboard-navigation';
 
 // The triangular indicator below the menu toggle button that visually links it
 // to the menu content.
@@ -52,6 +55,7 @@ export default function Menu({
   title,
 }) {
   const [isOpen, setOpen] = useState(defaultOpen);
+  const [openedByKeyboard, setOpenedByKeyboard] = useState(false);
 
   // Notify parent when menu is opened or closed.
   const wasOpen = useRef(isOpen);
@@ -71,11 +75,23 @@ export default function Menu({
     if (event.type === 'mousedown') {
       ignoreNextClick = true;
     } else if (event.type === 'click' && ignoreNextClick) {
+      // Ignore "click" event triggered from the mouse up action.
       ignoreNextClick = false;
       event.stopPropagation();
       event.preventDefault();
       return;
     }
+    // State variable so we know to set focus() on the first item when opened
+    // via the keyboard. Note, when opening the menu via keyboard by pressing
+    // enter or space, a simulated MouseEvent is created with a type value of
+    // "click". We also know this is not a mouseup event because that condition
+    // is checked above.
+    if (!isOpen && event.type === 'click') {
+      setOpenedByKeyboard(true);
+    } else {
+      setOpenedByKeyboard(false);
+    }
+
     setOpen(!isOpen);
   };
   const closeMenu = useCallback(() => setOpen(false), [setOpen]);
@@ -95,8 +111,14 @@ export default function Menu({
 
   // It should also close if the user presses a key which activates menu items.
   const handleMenuKeyDown = event => {
-    if (event.key === 'Enter' || event.key === ' ') {
-      closeMenu();
+    const key = normalizeKeyName(event.key);
+    if (key === 'Enter' || key === ' ') {
+      // The browser will not open the link if the link element is removed
+      // from within the keypress event that triggers it. Add a little
+      // delay to work around that.
+      setTimeout(() => {
+        closeMenu();
+      });
     }
   };
 
@@ -156,7 +178,9 @@ export default function Menu({
             onClick={closeMenu}
             onKeyDown={handleMenuKeyDown}
           >
-            {children}
+            <MenuKeyboardNavigation visible={openedByKeyboard}>
+              {children}
+            </MenuKeyboardNavigation>
           </div>
         </Fragment>
       )}

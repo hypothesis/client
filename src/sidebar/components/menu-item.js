@@ -1,11 +1,13 @@
 import classnames from 'classnames';
 import { Fragment, createElement } from 'preact';
+import { useEffect, useRef } from 'preact/hooks';
 import propTypes from 'prop-types';
 
-import { onActivate } from '../util/on-activate';
+import { normalizeKeyName } from '../../shared/browser-compatibility-utils';
 
-import Slider from './slider';
 import SvgIcon from '../../shared/components/svg-icon';
+import MenuKeyboardNavigation from './menu-keyboard-navigation';
+import Slider from './slider';
 
 /**
  * An item in a dropdown menu.
@@ -21,6 +23,7 @@ import SvgIcon from '../../shared/components/svg-icon';
  *
  * For items that have submenus, the `MenuItem` will call the `renderSubmenu`
  * prop to render the content of the submenu, when the submenu is visible.
+ * Note that the `submenu` is not supported for link (`href`) items.
  */
 export default function MenuItem({
   href,
@@ -38,12 +41,12 @@ export default function MenuItem({
 }) {
   const iconClass = 'menu-item__icon';
   const iconIsUrl = icon && icon.indexOf('/') !== -1;
-  const labelClass = classnames('menu-item__label', {
-    'menu-item__label--submenu': isSubmenuItem,
-  });
 
   const hasLeftIcon = icon || isSubmenuItem;
   const hasRightIcon = icon && isSubmenuItem;
+
+  const menuItemRef = useRef(null);
+  let focusTimer = null;
 
   let renderedIcon = null;
   if (icon !== 'blank') {
@@ -56,49 +59,111 @@ export default function MenuItem({
   const leftIcon = isSubmenuItem ? null : renderedIcon;
   const rightIcon = isSubmenuItem ? renderedIcon : null;
 
-  return (
-    <Fragment>
-      {/* FIXME-A11Y */}
-      {/* eslint-disable-next-line jsx-a11y/role-supports-aria-props */}
-      <div
-        aria-checked={isSelected}
+  // menuItem can be either a link or a button
+  let menuItem;
+  const hasSubmenuVisible = typeof isSubmenuVisible === 'boolean';
+  const isRadioButtonType = typeof isSelected === 'boolean';
+
+  useEffect(() => {
+    return () => {
+      // unmount
+      clearTimeout(focusTimer);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const onCloseSubmenu = event => {
+    if (onToggleSubmenu) {
+      onToggleSubmenu(event);
+    }
+    // The focus won't work without delaying rendering.
+    focusTimer = setTimeout(() => {
+      menuItemRef.current.focus();
+    });
+  };
+
+  const onKeyDown = event => {
+    switch (normalizeKeyName(event.key)) {
+      case 'ArrowRight':
+        if (onToggleSubmenu) {
+          event.stopPropagation();
+          event.preventDefault();
+          onToggleSubmenu(event);
+        }
+        break;
+      case 'Enter':
+      case ' ':
+        if (onClick) {
+          // Let event propagate so the menu closes
+          onClick(event);
+        }
+    }
+  };
+  if (href) {
+    // The menu item is a link
+    menuItem = (
+      <a
+        ref={menuItemRef}
         className={classnames('menu-item', {
-          'menu-item--submenu': isSubmenuItem,
+          'is-submenu': isSubmenuItem,
+          'is-disabled': isDisabled,
+        })}
+        href={href}
+        target="_blank"
+        tabIndex="-1"
+        rel="noopener noreferrer"
+        role="menuitem"
+        onKeyDown={onKeyDown}
+      >
+        {hasLeftIcon && (
+          <div className="menu-item__icon-container">{leftIcon}</div>
+        )}
+        <span className="menu-item__label">{label}</span>
+        {hasRightIcon && (
+          <div className="menu-item__icon-container">{rightIcon}</div>
+        )}
+      </a>
+    );
+  } else {
+    // The menu item is a clickable button or radio button.
+    // In either case there may be an optional submenu.
+
+    menuItem = (
+      <div
+        ref={menuItemRef}
+        className={classnames('menu-item', {
+          'is-submenu': isSubmenuItem,
           'is-disabled': isDisabled,
           'is-expanded': isExpanded,
           'is-selected': isSelected,
         })}
-        role="menuitem"
-        {...(onClick && onActivate('menuitem', onClick))}
+        tabIndex="-1"
+        onKeyDown={onKeyDown}
+        onClick={onClick}
+        role={isRadioButtonType ? 'menuitemradio' : 'menuitem'}
+        aria-checked={isRadioButtonType ? isSelected : undefined}
+        aria-haspopup={hasSubmenuVisible}
+        aria-expanded={hasSubmenuVisible ? isSubmenuVisible : undefined}
       >
-        <div className="menu-item__action">
-          {hasLeftIcon && (
-            <div className="menu-item__icon-container">{leftIcon}</div>
-          )}
-          {href && (
-            <a
-              className={labelClass}
-              href={href}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {label}
-            </a>
-          )}
-          {!href && <span className={labelClass}>{label}</span>}
-          {hasRightIcon && (
-            <div className="menu-item__icon-container">{rightIcon}</div>
-          )}
-        </div>
-        {typeof isSubmenuVisible === 'boolean' && (
+        {hasLeftIcon && (
+          <div className="menu-item__icon-container">{leftIcon}</div>
+        )}
+        <span className="menu-item__label">{label}</span>
+        {hasRightIcon && (
+          <div className="menu-item__icon-container">{rightIcon}</div>
+        )}
+
+        {hasSubmenuVisible && (
           <div
+            // We should not have a <button> inside of the menu item itself
+            // but we have a non-standard mechanism with the toggle control
+            // requiring an onClick event nested inside a "menuitemradio|menuitem".
+            // Therefore, a static element with a role="none" is necessary here.
+            role="none"
+            icon={isSubmenuVisible ? 'collapse-menu' : 'expand-menu'}
             className="menu-item__toggle"
-            // We need to pass strings here rather than just the boolean attribute
-            // because otherwise the attribute will be omitted entirely when
-            // `isSubmenuVisible` is false.
-            aria-expanded={isSubmenuVisible ? 'true' : 'false'}
-            aria-label={`Show actions for ${label}`}
-            {...onActivate('button', onToggleSubmenu)}
+            onClick={onToggleSubmenu}
+            title={`Show actions for ${label}`}
           >
             <SvgIcon
               name={isSubmenuVisible ? 'collapse-menu' : 'expand-menu'}
@@ -107,9 +172,20 @@ export default function MenuItem({
           </div>
         )}
       </div>
-      {typeof isSubmenuVisible === 'boolean' && (
+    );
+  }
+  return (
+    <Fragment>
+      {menuItem}
+      {hasSubmenuVisible && (
         <Slider visible={isSubmenuVisible}>
-          <div className="menu-item__submenu">{submenu}</div>
+          <MenuKeyboardNavigation
+            closeMenu={onCloseSubmenu}
+            visible={isSubmenuVisible}
+            className="menu-item__submenu"
+          >
+            {submenu}
+          </MenuKeyboardNavigation>
         </Slider>
       )}
     </Fragment>
@@ -165,6 +241,7 @@ MenuItem.propTypes = {
   /**
    * If present, display a button to toggle the sub-menu associated with this
    * item and indicate the current state; `true` if the submenu is visible.
+   * Note. Omit this prop, or set it to null, if there is no `submenu`.
    */
   isSubmenuVisible: propTypes.bool,
 
