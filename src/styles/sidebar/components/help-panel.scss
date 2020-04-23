@@ -15,6 +15,10 @@
     border-bottom: 1px solid var.$grey-3;
     line-height: var.$normal-line-height;
     font-size: var.$normal-font-size;
+
+    a {
+      text-decoration: underline;
+    }
   }
 
   &__icon {
