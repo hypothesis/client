@@ -118,20 +118,16 @@ registerIcons(iconSet);
 
 // Preact UI components that are wrapped for use within Angular templates.
 
-import Annotation from './components/annotation';
 import AnnotationViewerContent from './components/annotation-viewer-content';
 import FocusedModeHeader from './components/focused-mode-header';
 import HelpPanel from './components/help-panel';
 import LoggedOutMessage from './components/logged-out-message';
 import LoginPromptPanel from './components/login-prompt-panel';
-import ModerationBanner from './components/moderation-banner';
 import SearchStatusBar from './components/search-status-bar';
 import SelectionTabs from './components/selection-tabs';
 import ShareAnnotationsPanel from './components/share-annotations-panel';
 import SidebarContentError from './components/sidebar-content-error';
 import StreamContent from './components/stream-content';
-import SvgIcon from '../shared/components/svg-icon';
-import Thread from './components/thread';
 import ThreadList from './components/thread-list';
 import ToastMessages from './components/toast-messages';
 import TopBar from './components/top-bar';
@@ -256,7 +252,6 @@ function startAngularApp(config) {
     .component('hypothesisApp', hypothesisApp)
 
     // UI components
-    .component('annotation', wrapComponent(Annotation))
     .component(
       'annotationViewerContent',
       wrapComponent(AnnotationViewerContent)
@@ -264,7 +259,6 @@ function startAngularApp(config) {
     .component('helpPanel', wrapComponent(HelpPanel))
     .component('loginPromptPanel', wrapComponent(LoginPromptPanel))
     .component('loggedOutMessage', wrapComponent(LoggedOutMessage))
-    .component('moderationBanner', wrapComponent(ModerationBanner))
     .component('searchStatusBar', wrapComponent(SearchStatusBar))
     .component('focusedModeHeader', wrapComponent(FocusedModeHeader))
     .component('selectionTabs', wrapComponent(SelectionTabs))
@@ -272,8 +266,6 @@ function startAngularApp(config) {
     .component('sidebarContentError', wrapComponent(SidebarContentError))
     .component('shareAnnotationsPanel', wrapComponent(ShareAnnotationsPanel))
     .component('streamContent', wrapComponent(StreamContent))
-    .component('svgIcon', wrapComponent(SvgIcon))
-    .component('thread', wrapComponent(Thread))
     .component('threadList', wrapComponent(ThreadList))
     .component('toastMessages', wrapComponent(ToastMessages))
     .component('topBar', wrapComponent(TopBar))
