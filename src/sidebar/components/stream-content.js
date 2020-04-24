@@ -1,67 +1,86 @@
-import { watch } from '../util/watch';
+import { createElement } from 'preact';
+import { useCallback, useEffect } from 'preact/hooks';
+import propTypes from 'prop-types';
 
-// @ngInject
-function StreamContentController($scope, store, api, rootThread, searchFilter) {
-  /** `offset` parameter for the next search API call. */
-  let offset = 0;
+import { withServices } from '../util/service-context';
+import useStore from '../store/use-store';
 
-  /** Load annotations fetched from the API into the app. */
-  const load = function (result) {
-    offset += result.rows.length;
-    const annots = [...result.rows, ...result.replies];
-    store.addAnnotations(annots);
-  };
+import ThreadList from './thread-list';
 
-  const currentQuery = () => store.routeParams().q;
+/**
+ * The main content of the "stream" route (https://hypothes.is/stream)
+ */
+function StreamContent({
+  api,
+  rootThread: rootThreadService,
+  searchFilter,
+  toastMessenger,
+}) {
+  const addAnnotations = useStore(store => store.addAnnotations);
+  const clearAnnotations = useStore(store => store.clearAnnotations);
+  const currentQuery = useStore(store => store.routeParams().q);
+  const setSortKey = useStore(store => store.setSortKey);
 
   /**
-   * Fetch the next `limit` annotations starting from `offset` from the API.
+   * Fetch annotations from the API and display them in the stream.
+   *
+   * @param {string} query - The user-supplied search query
    */
-  const fetch = function (limit) {
-    const query = Object.assign(
-      {
+  const loadAnnotations = useCallback(
+    async query => {
+      const queryParams = {
         _separate_replies: true,
-        offset: offset,
-        limit: limit,
-      },
-      searchFilter.toObject(currentQuery())
-    );
 
-    api
-      .search(query)
-      .then(load)
-      .catch(function (err) {
-        console.error(err);
-      });
-  };
+        // nb. There is currently no way to load anything except the first
+        // 20 matching annotations in the UI.
+        offset: 0,
+        limit: 20,
 
-  function clearAndFetch() {
-    // In case this route loaded after a client-side route change (eg. from
-    // '/a/:id'), clear any existing annotations.
-    store.clearAnnotations();
+        ...searchFilter.toObject(query),
+      };
+      const results = await api.search(queryParams);
+      addAnnotations([...results.rows, ...results.replies]);
+    },
+    [addAnnotations, api, searchFilter]
+  );
 
-    // Fetch initial batch of annotations.
-    offset = 0;
-    fetch(20);
-  }
+  // Update the stream when this route is initially displayed and whenever
+  // the search query is updated.
+  useEffect(() => {
+    // Sort the stream so that the newest annotations are at the top
+    setSortKey('Newest');
+    clearAnnotations();
+    loadAnnotations(currentQuery).catch(err => {
+      toastMessenger.error(`Unable to fetch annotations: ${err.message}`);
+    });
+  }, [
+    clearAnnotations,
+    currentQuery,
+    loadAnnotations,
+    setSortKey,
+    toastMessenger,
+  ]);
 
-  const unsubscribe = watch(store.subscribe, currentQuery, () => {
-    clearAndFetch();
-  });
-  $scope.$on('$destroy', unsubscribe);
+  const rootThread = useStore(store =>
+    rootThreadService.thread(store.getState())
+  );
 
-  clearAndFetch();
-
-  this.setCollapsed = store.setCollapsed;
-  this.rootThread = () => rootThread.thread(store.getState());
-
-  // Sort the stream so that the newest annotations are at the top
-  store.setSortKey('Newest');
+  return <ThreadList thread={rootThread} />;
 }
 
-export default {
-  controller: StreamContentController,
-  controllerAs: 'vm',
-  bindings: {},
-  template: require('../templates/stream-content.html'),
+StreamContent.propTypes = {
+  // Injected services.
+  api: propTypes.object,
+  rootThread: propTypes.object,
+  searchFilter: propTypes.object,
+  toastMessenger: propTypes.object,
 };
+
+StreamContent.injectedProps = [
+  'api',
+  'rootThread',
+  'searchFilter',
+  'toastMessenger',
+];
+
+export default withServices(StreamContent);
