@@ -245,6 +245,7 @@ module.exports = class Sidebar extends Host
     if @frame
       @frame.css 'margin-left': "#{-1 * @frame.width()}px"
       @frame.removeClass 'annotator-collapsed'
+      @frame.find('iframe.h-sidebar-iframe').removeClass('is-closed')
 
     if @plugins.Toolbar?
       @plugins.Toolbar.showCollapseSidebarBtn();
@@ -260,6 +261,7 @@ module.exports = class Sidebar extends Host
     if @frame
       @frame.css 'margin-left': ''
       @frame.addClass 'annotator-collapsed'
+      @frame.find('iframe.h-sidebar-iframe').addClass('is-closed')
 
     if @plugins.Toolbar?
       @plugins.Toolbar.hideCloseBtn();

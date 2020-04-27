@@ -56,6 +56,10 @@ var.$base-font-size: 14px;
     position: relative;
   }
 
+  .is-closed {
+    visibility: hidden;
+  }
+
   @include icons.icons {
     font-family: 'h';
   }

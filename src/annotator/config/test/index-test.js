@@ -51,22 +51,31 @@ describe('annotator.config.index', function () {
     });
   });
 
-  ['assetRoot', 'subFrameIdentifier', 'openSidebar'].forEach(function (
-    settingName
-  ) {
+  ['assetRoot', 'subFrameIdentifier'].forEach(function (settingName) {
     it(
       'reads ' +
         settingName +
         ' from the host page, even when in a browser extension',
       function () {
         configFrom('WINDOW');
-
         assert.calledWithExactly(
           fakeSettingsFrom().hostPageSetting,
           settingName,
           { allowInBrowserExt: true }
         );
       }
+    );
+  });
+
+  it('reads openSidebar from the host page, even when in a browser extension', function () {
+    configFrom('WINDOW');
+    sinon.assert.calledWith(
+      fakeSettingsFrom().hostPageSetting,
+      'openSidebar',
+      sinon.match({
+        allowInBrowserExt: true,
+        coerce: sinon.match.any,
+      })
     );
   });
 

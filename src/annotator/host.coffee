@@ -40,6 +40,9 @@ module.exports = class Host extends Guest
     .attr('title', 'Hypothesis annotation viewer')
     .addClass('h-sidebar-iframe')
 
+    if config.openSidebar == false
+      app.addClass('is-closed')
+
     externalContainer = null
 
     if config.externalContainerSelector
