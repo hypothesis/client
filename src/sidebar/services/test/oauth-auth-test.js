@@ -155,9 +155,12 @@ describe('sidebar.oauth-auth', function () {
       it('shows an error message to the user', function () {
         return assertThatAccessTokenPromiseWasRejectedAnd(function () {
           assert.calledOnce(fakeToastMessenger.error);
-          assert.equal(
-            fakeToastMessenger.error.firstCall.args[0],
-            'Hypothesis login lost: You must reload the page to annotate.'
+          assert.calledWith(
+            fakeToastMessenger.error,
+            'Hypothesis login lost: You must reload the page to annotate.',
+            {
+              autoDismiss: false,
+            }
           );
         });
       });

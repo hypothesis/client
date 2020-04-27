@@ -57,7 +57,9 @@ export default function auth(
    * Show an error message telling the user that the access token has expired.
    */
   function showAccessTokenExpiredErrorMessage(message) {
-    toastMessenger.error(`Hypothesis login lost: ${message}`);
+    toastMessenger.error(`Hypothesis login lost: ${message}`, {
+      autoDismiss: false,
+    });
   }
 
   /**

@@ -100,6 +100,19 @@ describe('toastMessenger', function () {
       assert.calledOnce(fakeStore.getToastMessage);
       assert.notCalled(fakeStore.updateToastMessage);
     });
+
+    it('does not dismiss the message if `autoDismiss` is false', () => {
+      fakeStore.hasToastMessage.returns(false);
+      fakeStore.getToastMessage.returns(undefined);
+
+      service.error('boo', { autoDismiss: false });
+
+      // Move to the first scheduled timeout.
+      clock.next();
+
+      assert.notCalled(fakeStore.getToastMessage);
+      assert.notCalled(fakeStore.updateToastMessage);
+    });
   });
 
   describe('#dismiss', () => {
