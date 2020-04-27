@@ -158,7 +158,6 @@ const cssBundles = [
   './src/styles/vendor/angular-csp.css',
   './src/styles/vendor/icomoon.css',
   './node_modules/katex/dist/katex.min.css',
-  './node_modules/angular-toastr/dist/angular-toastr.css',
 ];
 
 gulp.task('build-css', function () {

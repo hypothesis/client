@@ -47,7 +47,6 @@ describe('bootstrap', function () {
       'scripts/sidebar.bundle.js',
 
       'styles/angular-csp.css',
-      'styles/angular-toastr.css',
       'styles/katex.min.css',
       'styles/sidebar.css',
     ];
@@ -153,7 +152,6 @@ describe('bootstrap', function () {
         'scripts/showdown.bundle.1234.js',
         'scripts/sidebar.bundle.1234.js',
         'styles/angular-csp.1234.css',
-        'styles/angular-toastr.1234.css',
         'styles/katex.min.1234.css',
         'styles/sidebar.1234.css',
       ].map(assetUrl);
