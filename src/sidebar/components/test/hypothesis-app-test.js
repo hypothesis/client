@@ -15,7 +15,6 @@ describe('sidebar.components.hypothesis-app', function () {
   let fakeAuth = null;
   let fakeBridge = null;
   let fakeFeatures = null;
-  let fakeFlash = null;
   let fakeFrameSync = null;
   let fakeIsSidebar = null;
   let fakeServiceConfig = null;
@@ -24,6 +23,7 @@ describe('sidebar.components.hypothesis-app', function () {
   let fakeGroups = null;
   let fakeServiceUrl = null;
   let fakeSettings = null;
+  let fakeToastMessenger = null;
   let fakeWindow = null;
 
   let sandbox = null;
@@ -93,10 +93,6 @@ describe('sidebar.components.hypothesis-app', function () {
         flagEnabled: sandbox.stub().returns(false),
       };
 
-      fakeFlash = {
-        error: sandbox.stub(),
-      };
-
       fakeFrameSync = {
         connect: sandbox.spy(),
       };
@@ -123,15 +119,19 @@ describe('sidebar.components.hypothesis-app', function () {
         call: sandbox.stub(),
       };
 
+      fakeToastMessenger = {
+        error: sandbox.stub(),
+      };
+
       $provide.value('store', fakeStore);
       $provide.value('auth', fakeAuth);
       $provide.value('analytics', fakeAnalytics);
       $provide.value('features', fakeFeatures);
-      $provide.value('flash', fakeFlash);
       $provide.value('frameSync', fakeFrameSync);
       $provide.value('serviceUrl', fakeServiceUrl);
       $provide.value('session', fakeSession);
       $provide.value('settings', fakeSettings);
+      $provide.value('toastMessenger', fakeToastMessenger);
       $provide.value('bridge', fakeBridge);
       $provide.value('groups', fakeGroups);
       $provide.value('$window', fakeWindow);
@@ -340,7 +340,7 @@ describe('sidebar.components.hypothesis-app', function () {
       const ctrl = createController();
 
       return ctrl.login().then(null, () => {
-        assert.called(fakeFlash.error);
+        assert.called(fakeToastMessenger.error);
       });
     });
 

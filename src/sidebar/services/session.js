@@ -26,8 +26,8 @@ export default function session(
   store,
   api,
   auth,
-  flash,
-  settings
+  settings,
+  toastMessenger
 ) {
   // Cache the result of load()
   let lastLoad;
@@ -142,7 +142,7 @@ export default function session(
 
     return loggedOut
       .catch(function (err) {
-        flash.error('Log out failed');
+        toastMessenger.error('Log out failed');
         analytics.track(analytics.events.LOGOUT_FAILURE);
         throw new Error(err);
       })

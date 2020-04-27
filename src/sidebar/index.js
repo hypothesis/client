@@ -297,6 +297,7 @@ function startAngularApp(config) {
     .service('session', () => container.get('session'))
     .service('streamer', () => container.get('streamer'))
     .service('streamFilter', () => container.get('streamFilter'))
+    .service('toastMessenger', () => container.get('toastMessenger'))
 
     // Redux store
     .service('store', () => container.get('store'))
