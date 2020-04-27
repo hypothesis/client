@@ -308,6 +308,16 @@ describe('sidebar/services/session', function () {
         assert.calledWith(fakeStore.updateProfile, loggedOutProfile);
       });
     });
+
+    it('displays an error if logging out fails', async () => {
+      fakeAuth.logout.rejects(new Error('Could not revoke token'));
+      try {
+        await session.logout();
+      } catch (e) {
+        // Ignored.
+      }
+      assert.calledWith(fakeToastMessenger.error, 'Log out failed');
+    });
   });
 
   context('when another client changes the current login', () => {
