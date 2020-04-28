@@ -29,6 +29,7 @@ export default function configFrom(window_) {
     onLayoutChange: settings.hostPageSetting('onLayoutChange'),
     openSidebar: settings.hostPageSetting('openSidebar', {
       allowInBrowserExt: true,
+      // Coerce value to a boolean because it may come from via as a string
       coerce: toBoolean,
     }),
     query: settings.query,

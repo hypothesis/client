@@ -325,21 +325,11 @@ describe 'Sidebar', ->
       sidebar.show()
       assert.isTrue sidebar.visibleHighlights
 
-    it 'removes `is-closed` class from the iframe when opened', ->
-      sidebar = createSidebar({ openSidebar: false })
-      sidebar.show()
-      assert.isFalse(sidebar.frame.find('iframe.h-sidebar-iframe').hasClass('is-closed'))
-
     it 'does not show highlights otherwise', ->
       sidebar = createSidebar({ showHighlights: 'never' })
       assert.isFalse sidebar.visibleHighlights
       sidebar.show()
       assert.isFalse sidebar.visibleHighlights
-
-    it 'adds `is-closed` class to the iframe when closed', ->
-      sidebar = createSidebar({ openSidebar: true })
-      sidebar.hide()
-      assert.isTrue(sidebar.frame.find('iframe.h-sidebar-iframe').hasClass('is-closed'))
 
   describe '#hide', ->
 

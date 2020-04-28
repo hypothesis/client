@@ -74,7 +74,7 @@ describe('annotator.config.index', function () {
       'openSidebar',
       sinon.match({
         allowInBrowserExt: true,
-        coerce: sinon.match.any,
+        coerce: sinon.match.func,
       })
     );
   });

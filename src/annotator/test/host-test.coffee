@@ -83,11 +83,3 @@ describe 'Host', ->
     it 'adds drop shadow if the clean theme is enabled', ->
       host = createHost({theme: 'clean'})
       assert.isTrue(host.frame.hasClass('annotator-frame--drop-shadow-enabled'))
-
-    it 'adds `is-closed` class to the iframe when openSidebar is false', () ->
-      host = createHost(openSidebar: false)
-      assert.isTrue(host.frame.find('iframe.h-sidebar-iframe').hasClass('is-closed'))
-    
-    it 'does not add `is-closed` class to the iframe when openSidebar is true', () ->
-      host = createHost(openSidebar: true)
-      assert.isFalse(host.frame.find('iframe.h-sidebar-iframe').hasClass('is-closed'))
