@@ -42,12 +42,12 @@ function HypothesisAppController(
   auth,
   bridge,
   features,
-  flash,
   frameSync,
   groups,
   serviceUrl,
   session,
-  settings
+  settings,
+  toastMessenger
 ) {
   const self = this;
 
@@ -107,7 +107,7 @@ function HypothesisAppController(
         session.reload();
       })
       .catch(err => {
-        flash.error(err.message);
+        toastMessenger.error(err.message);
       });
   };
 

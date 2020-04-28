@@ -10,6 +10,13 @@ const MESSAGE_DISPLAY_TIME = 5000;
 // Delay before removing the message entirely (allows animations to complete)
 const MESSAGE_DISMISS_DELAY = 500;
 
+/**
+ * Additional control over the display of a particular message.
+ *
+ * @typedef {Object} MessageOptions
+ * @prop {boolean} [autoDismiss=true] - Whether the toast message automatically disappears.
+ */
+
 // @ngInject
 export default function toastMessenger(store) {
   /**
@@ -38,8 +45,9 @@ export default function toastMessenger(store) {
    *
    * @param {('error'|'success')} type
    * @param {string} message - The message to be rendered
+   * @param {MessageOptions} [options]
    */
-  const addMessage = (type, message) => {
+  const addMessage = (type, message, { autoDismiss = true } = {}) => {
     // Do not add duplicate messages (messages with the same type and text)
     if (store.hasToastMessage(type, message)) {
       return;
@@ -49,26 +57,34 @@ export default function toastMessenger(store) {
 
     store.addToastMessage({ type, message, id, isDismissed: false });
 
-    // Attempt to dismiss message after a set time period. NB: The message may
-    // have been removed by other mechanisms at this point; do not assume its
-    // presence.
-    setTimeout(() => {
-      dismiss(id);
-    }, MESSAGE_DISPLAY_TIME);
+    if (autoDismiss) {
+      // Attempt to dismiss message after a set time period. NB: The message may
+      // have been removed by other mechanisms at this point; do not assume its
+      // presence.
+      setTimeout(() => {
+        dismiss(id);
+      }, MESSAGE_DISPLAY_TIME);
+    }
   };
 
   /**
    * Add an error toast message with `messageText`
+   *
+   * @param {string} messageText
+   * @param {MessageOptions} options
    */
-  const error = messageText => {
-    addMessage('error', messageText);
+  const error = (messageText, options) => {
+    addMessage('error', messageText, options);
   };
 
   /**
    * Add a success toast message with `messageText`
+   *
+   * @param {string} messageText
+   * @param {MessageOptions} options
    */
-  const success = messageText => {
-    addMessage('success', messageText);
+  const success = (messageText, options) => {
+    addMessage('success', messageText, options);
   };
 
   return {

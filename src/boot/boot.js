@@ -120,7 +120,6 @@ function bootSidebarApp(doc, config) {
     'scripts/sidebar.bundle.js',
 
     'styles/angular-csp.css',
-    'styles/angular-toastr.css',
     'styles/katex.min.css',
     'styles/sidebar.css',
   ]);

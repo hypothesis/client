@@ -34,10 +34,6 @@ disableOpenerForExternalLinks(document.body);
 
 import angular from 'angular';
 
-// Angular addons which export the Angular module name via `module.exports`.
-
-import angularToastr from 'angular-toastr';
-
 // Load polyfill for :focus-visible pseudo-class.
 import 'focus-visible';
 
@@ -59,13 +55,6 @@ const isSidebar = !(
 
 // Install Preact renderer options to work around IE11 quirks
 rendererOptions.setupIE11Fixes();
-
-// @ngInject
-function configureToastr(toastrConfig) {
-  angular.extend(toastrConfig, {
-    preventOpenDuplicates: true,
-  });
-}
 
 // @ngInject
 function setupApi(api, streamer) {
@@ -148,7 +137,6 @@ import apiRoutesService from './services/api-routes';
 import authService from './services/oauth-auth';
 import autosaveService from './services/autosave';
 import featuresService from './services/features';
-import flashService from './services/flash';
 import frameSyncService from './services/frame-sync';
 import groupsService from './services/groups';
 import loadAnnotationsService from './services/load-annotations';
@@ -192,7 +180,6 @@ function startAngularApp(config) {
     .register('autosaveService', autosaveService)
     .register('bridge', bridgeService)
     .register('features', featuresService)
-    .register('flash', flashService)
     .register('frameSync', frameSyncService)
     .register('groups', groupsService)
     .register('loadAnnotationsService', loadAnnotationsService)
@@ -225,10 +212,8 @@ function startAngularApp(config) {
   // constructed them.
   //
   // @ngInject
-  function registerAngularServices($rootScope, toastr) {
-    container
-      .register('toastr', { value: toastr })
-      .register('$rootScope', { value: $rootScope });
+  function registerAngularServices($rootScope) {
+    container.register('$rootScope', { value: $rootScope });
   }
 
   // Run initialization logic that uses constructed services.
@@ -246,7 +231,7 @@ function startAngularApp(config) {
   const wrapComponent = component => wrapReactComponent(component, container);
 
   angular
-    .module('h', [angularToastr])
+    .module('h', [])
 
     // The root component for the application
     .component('hypothesisApp', hypothesisApp)
@@ -277,7 +262,6 @@ function startAngularApp(config) {
     .service('auth', () => container.get('auth'))
     .service('bridge', () => container.get('bridge'))
     .service('features', () => container.get('features'))
-    .service('flash', () => container.get('flash'))
     .service('frameSync', () => container.get('frameSync'))
     .service('groups', () => container.get('groups'))
     .service('loadAnnotationsService', () =>
@@ -289,6 +273,7 @@ function startAngularApp(config) {
     .service('session', () => container.get('session'))
     .service('streamer', () => container.get('streamer'))
     .service('streamFilter', () => container.get('streamFilter'))
+    .service('toastMessenger', () => container.get('toastMessenger'))
 
     // Redux store
     .service('store', () => container.get('store'))
@@ -296,8 +281,6 @@ function startAngularApp(config) {
     // Utilities
     .value('isSidebar', container.get('isSidebar'))
     .value('settings', container.get('settings'))
-
-    .config(configureToastr)
 
     // Make Angular built-ins available to services constructed by `container`.
     .run(registerAngularServices)

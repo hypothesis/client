@@ -13,10 +13,10 @@ describe('sidebar.oauth-auth', function () {
   let nowStub;
   let fakeApiRoutes;
   let fakeClient;
-  let fakeFlash;
   let fakeLocalStorage;
   let fakeWindow;
   let fakeSettings;
+  let fakeToastMessenger;
   let clock;
 
   /**
@@ -51,10 +51,6 @@ describe('sidebar.oauth-auth', function () {
       ),
     };
 
-    fakeFlash = {
-      error: sinon.stub(),
-    };
-
     fakeSettings = {
       apiUrl: 'https://hypothes.is/api/',
       oauthClientId: 'the-client-id',
@@ -64,6 +60,10 @@ describe('sidebar.oauth-auth', function () {
           grantToken: 'a.jwt.token',
         },
       ],
+    };
+
+    fakeToastMessenger = {
+      error: sinon.stub(),
     };
 
     fakeLocalStorage = {
@@ -98,9 +98,9 @@ describe('sidebar.oauth-auth', function () {
       .register('$rootScope', { value: $rootScope })
       .register('$window', { value: fakeWindow })
       .register('apiRoutes', { value: fakeApiRoutes })
-      .register('flash', { value: fakeFlash })
       .register('localStorage', { value: fakeLocalStorage })
       .register('settings', { value: fakeSettings })
+      .register('toastMessenger', { value: fakeToastMessenger })
       .register('auth', authFactory)
       .get('auth');
   });
@@ -154,10 +154,13 @@ describe('sidebar.oauth-auth', function () {
 
       it('shows an error message to the user', function () {
         return assertThatAccessTokenPromiseWasRejectedAnd(function () {
-          assert.calledOnce(fakeFlash.error);
-          assert.equal(
-            fakeFlash.error.firstCall.args[0],
-            'You must reload the page to annotate.'
+          assert.calledOnce(fakeToastMessenger.error);
+          assert.calledWith(
+            fakeToastMessenger.error,
+            'Hypothesis login lost: You must reload the page to annotate.',
+            {
+              autoDismiss: false,
+            }
           );
         });
       });

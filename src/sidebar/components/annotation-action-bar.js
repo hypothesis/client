@@ -44,7 +44,7 @@ function AnnotationActionBar({
   const onDelete = () => {
     if (window.confirm('Are you sure you want to delete this annotation?')) {
       annotationsService.delete(annotation).catch(err => {
-        toastMessenger.error(err.message, 'Deleting annotation failed');
+        toastMessenger.error(err.message);
       });
     }
   };

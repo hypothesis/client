@@ -26,9 +26,9 @@ export default function auth(
   $rootScope,
   $window,
   apiRoutes,
-  flash,
   localStorage,
-  settings
+  settings,
+  toastMessenger
 ) {
   /**
    * Authorization code from auth popup window.
@@ -57,10 +57,8 @@ export default function auth(
    * Show an error message telling the user that the access token has expired.
    */
   function showAccessTokenExpiredErrorMessage(message) {
-    flash.error(message, 'Hypothesis login lost', {
-      extendedTimeOut: 0,
-      tapToDismiss: false,
-      timeOut: 0,
+    toastMessenger.error(`Hypothesis login lost: ${message}`, {
+      autoDismiss: false,
     });
   }
 
@@ -306,7 +304,7 @@ auth.$inject = [
   '$rootScope',
   '$window',
   'apiRoutes',
-  'flash',
   'localStorage',
   'settings',
+  'toastMessenger',
 ];

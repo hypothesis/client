@@ -11,11 +11,11 @@ describe('sidebar/services/session', function () {
 
   let fakeAnalytics;
   let fakeAuth;
-  let fakeFlash;
   let fakeSentry;
   let fakeServiceConfig;
   let fakeSettings;
   let fakeStore;
+  let fakeToastMessenger;
   let fakeApi;
   let sandbox;
 
@@ -43,7 +43,6 @@ describe('sidebar/services/session', function () {
       login: sandbox.stub().returns(Promise.resolve()),
       logout: sinon.stub().resolves(),
     };
-    fakeFlash = { error: sandbox.spy() };
     fakeSentry = {
       setUserInfo: sandbox.spy(),
     };
@@ -57,6 +56,7 @@ describe('sidebar/services/session', function () {
     fakeSettings = {
       serviceUrl: 'https://test.hypothes.is/root/',
     };
+    fakeToastMessenger = { error: sandbox.spy() };
 
     $imports.$mock({
       '../service-config': fakeServiceConfig,
@@ -75,9 +75,9 @@ describe('sidebar/services/session', function () {
       .register('store', { value: fakeStore })
       .register('api', { value: fakeApi })
       .register('auth', { value: fakeAuth })
-      .register('flash', { value: fakeFlash })
       .register('settings', { value: fakeSettings })
       .register('session', sessionFactory)
+      .register('toastMessenger', { value: fakeToastMessenger })
       .get('session');
   });
 
@@ -307,6 +307,16 @@ describe('sidebar/services/session', function () {
         assert.calledOnce(fakeStore.updateProfile);
         assert.calledWith(fakeStore.updateProfile, loggedOutProfile);
       });
+    });
+
+    it('displays an error if logging out fails', async () => {
+      fakeAuth.logout.rejects(new Error('Could not revoke token'));
+      try {
+        await session.logout();
+      } catch (e) {
+        // Ignored.
+      }
+      assert.calledWith(fakeToastMessenger.error, 'Log out failed');
     });
   });
 
