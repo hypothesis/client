@@ -2,7 +2,6 @@ import { createElement } from 'preact';
 import { useEffect, useMemo, useState } from 'preact/hooks';
 import propTypes from 'prop-types';
 import debounce from 'lodash.debounce';
-import shallowEqual from 'shallowequal';
 
 import events from '../events';
 import useStore from '../store/use-store';
@@ -35,9 +34,11 @@ function getScrollContainer() {
  */
 function ThreadList({ thread, $rootScope }) {
   const clearSelection = useStore(store => store.clearSelection);
-  // Height of the scrollable container. For the moment, this is the same as
-  // the window height.
-  const [windowHeight, setWindowHeight] = useState(window.innerHeight);
+
+  // Height of the visible area of the scroll container.
+  const [scrollContainerHeight, setScrollContainerHeight] = useState(
+    getScrollContainer().clientHeight
+  );
 
   // Scroll offset of scroll container. This is updated after the scroll
   // container is scrolled, with debouncing to limit update frequency.
@@ -55,19 +56,20 @@ function ThreadList({ thread, $rootScope }) {
   const [scrollToId, setScrollToId] = useState(null);
 
   const topLevelThreads = thread.children;
-  const topLevelThreadIds = useMemo(() => topLevelThreads.map(t => t.id), [
-    topLevelThreads,
-  ]);
 
   const {
     offscreenLowerHeight,
     offscreenUpperHeight,
     visibleThreads,
-  } = calculateVisibleThreads(
-    topLevelThreads,
-    threadHeights,
-    scrollPosition,
-    windowHeight
+  } = useMemo(
+    () =>
+      calculateVisibleThreads(
+        topLevelThreads,
+        threadHeights,
+        scrollPosition,
+        scrollContainerHeight
+      ),
+    [topLevelThreads, threadHeights, scrollPosition, scrollContainerHeight]
   );
 
   // Listen for when a new annotation is created in the application, and trigger
@@ -131,7 +133,7 @@ function ThreadList({ thread, $rootScope }) {
           exactScrollPosition - (exactScrollPosition % SCROLL_PRECISION),
           0
         );
-        setWindowHeight(window.innerHeight);
+        setScrollContainerHeight(scrollContainer.clientHeight);
         setScrollPosition(roundedScrollPosition);
       },
       10,
@@ -148,35 +150,28 @@ function ThreadList({ thread, $rootScope }) {
     };
   }, []);
 
-  // When the set of top-level threads changes, recalculate the real rendered
+  // When the set of visible threads changes, recalculate the real rendered
   // heights of thread cards and update `threadHeights` state if there are changes.
   useEffect(() => {
-    let newHeights = {};
-
-    for (let id of topLevelThreadIds) {
-      const threadElement = document.getElementById(id);
-      if (!threadElement) {
-        // Thread is currently off screen.
-        continue;
+    setThreadHeights(prevHeights => {
+      const changedHeights = {};
+      for (let { id } of visibleThreads) {
+        const threadElement = document.getElementById(id);
+        const height = getElementHeightWithMargins(threadElement);
+        if (height !== prevHeights[id]) {
+          changedHeights[id] = height;
+        }
       }
-      const height = getElementHeightWithMargins(threadElement);
-      if (height !== null) {
-        newHeights[id] = height;
-      }
-    }
 
-    // Functional update of `threadHeights` state: `heights` is previous state
-    setThreadHeights(heights => {
-      // Merge existing and new heights.
-      newHeights = Object.assign({}, heights, newHeights);
-
-      // Skip update if no heights actually changed.
-      if (shallowEqual(heights, newHeights)) {
-        return heights;
+      // Skip update if no heights changed from previous measured values
+      // (or defaults).
+      if (Object.keys(changedHeights).length === 0) {
+        return prevHeights;
       }
-      return newHeights;
+
+      return { ...prevHeights, ...changedHeights };
     });
-  }, [topLevelThreadIds]);
+  }, [visibleThreads]);
 
   return (
     <section>
