@@ -50,63 +50,67 @@ export default function FrameSync($rootScope, $window, store, bridge) {
    * notify connected frames about new/updated/deleted annotations.
    */
   function setupSyncToFrame() {
-    let prevPublicAnns = 0;
+    let prevPublicAnnotationCount = 0;
 
     watch(
       store.subscribe,
-      [() => store.getState().annotations.annotations, () => store.frames()],
+      [
+        () => store.getState().annotations.annotations,
+        () => store.frames(),
+        () => store.frameFetchStatus(),
+      ],
       ([annotations, frames], [prevAnnotations]) => {
-        let publicAnns = 0;
-        const inSidebar = new Set();
-        const added = [];
+        let publicAnnotationCount = 0;
+        const sidebarAnnotations = new Set();
+        const addedAnnotations = [];
 
-        annotations.forEach(function (annot) {
-          if (metadata.isReply(annot)) {
+        annotations.forEach(annotation => {
+          if (metadata.isReply(annotation)) {
             // The frame does not need to know about replies
             return;
           }
 
-          if (metadata.isPublic(annot)) {
-            ++publicAnns;
+          if (metadata.isPublic(annotation)) {
+            ++publicAnnotationCount;
           }
 
-          inSidebar.add(annot.$tag);
-          if (!inFrame.has(annot.$tag)) {
-            added.push(annot);
+          sidebarAnnotations.add(annotation.$tag);
+          if (!inFrame.has(annotation.$tag)) {
+            addedAnnotations.push(annotation);
           }
         });
-        const deleted = prevAnnotations.filter(function (annot) {
-          return !inSidebar.has(annot.$tag);
-        });
+
+        const deletedAnnotations = prevAnnotations.filter(
+          annotation => !sidebarAnnotations.has(annotation.$tag)
+        );
 
         // We currently only handle adding and removing annotations from the frame
         // when they are added or removed in the sidebar, but not re-anchoring
         // annotations if their selectors are updated.
-        if (added.length > 0) {
-          bridge.call('loadAnnotations', added.map(formatAnnot));
-          added.forEach(function (annot) {
-            inFrame.add(annot.$tag);
-          });
+        if (addedAnnotations.length) {
+          bridge.call('loadAnnotations', addedAnnotations.map(formatAnnot));
+          addedAnnotations.forEach(annotation => inFrame.add(annotation.$tag));
         }
-        deleted.forEach(function (annot) {
-          bridge.call('deleteAnnotation', formatAnnot(annot));
-          inFrame.delete(annot.$tag);
+
+        deletedAnnotations.forEach(annotation => {
+          bridge.call('deleteAnnotation', formatAnnot(annotation));
+          inFrame.delete(annotation.$tag);
         });
 
-        if (frames.length > 0) {
-          if (
-            frames.every(function (frame) {
-              return frame.isAnnotationFetchComplete;
-            })
-          ) {
-            if (publicAnns === 0 || publicAnns !== prevPublicAnns) {
-              bridge.call(
-                bridgeEvents.PUBLIC_ANNOTATION_COUNT_CHANGED,
-                publicAnns
-              );
-              prevPublicAnns = publicAnns;
-            }
-          }
+        const publicAnnotationCountChanged =
+          publicAnnotationCount === 0 ||
+          publicAnnotationCount !== prevPublicAnnotationCount;
+
+        const allFramesFetchComplete =
+          frames.length &&
+          frames.every(frame => store.isFrameFetchComplete(frame.uri));
+
+        if (publicAnnotationCountChanged && allFramesFetchComplete) {
+          bridge.call(
+            bridgeEvents.PUBLIC_ANNOTATION_COUNT_CHANGED,
+            publicAnnotationCount
+          );
+          prevPublicAnnotationCount = publicAnnotationCount;
         }
       }
     );

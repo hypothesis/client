@@ -4,30 +4,36 @@ import * as util from '../util';
 
 function init() {
   // The list of frames connected to the sidebar app
-  return [];
+  return {
+    frames: [],
+    // A map of frame `uri` => boolean — denotes that annotation fetching is
+    // complete for a given frame (by `uri`)
+    frameAnnotationFetchStatus: {},
+  };
 }
 
 const update = {
   CONNECT_FRAME: function (state, action) {
-    return [...state, action.frame];
+    return { frames: state.frames.concat(action.frame) };
   },
 
   DESTROY_FRAME: function (state, action) {
-    return state.filter(f => f !== action.frame);
+    const updatedStatus = { ...state.frames.frameAnnotationFetchStatus };
+    delete updatedStatus[action.frame.uri];
+    return {
+      frames: state.frames.filter(f => f !== action.frame),
+      frameAnnotationFetchStatus: updatedStatus,
+    };
   },
 
   UPDATE_FRAME_ANNOTATION_FETCH_STATUS: function (state, action) {
-    const frames = state.map(function (frame) {
-      const match = frame.uri && frame.uri === action.uri;
-      if (match) {
-        return Object.assign({}, frame, {
-          isAnnotationFetchComplete: action.isAnnotationFetchComplete,
-        });
-      } else {
-        return frame;
-      }
-    });
-    return frames;
+    const updatedStatus = {
+      ...state.frameAnnotationFetchStatus,
+    };
+    updatedStatus[action.uri] = action.isAnnotationFetchComplete;
+    return {
+      frameAnnotationFetchStatus: updatedStatus,
+    };
   },
 };
 
@@ -62,7 +68,7 @@ function updateFrameAnnotationFetchStatus(uri, status) {
  * Return the list of frames currently connected to the sidebar app.
  */
 function frames(state) {
-  return state.frames;
+  return state.frames.frames;
 }
 
 /**
@@ -76,7 +82,7 @@ function frames(state) {
  * This may be `null` during startup.
  */
 const mainFrame = createSelector(
-  state => state.frames,
+  state => state.frames.frames,
 
   // Sub-frames will all have a "frame identifier" set. The main frame is the
   // one with a `null` id.
@@ -107,10 +113,26 @@ function searchUrisForFrame(frame) {
  * Return the set of URIs that should be used to search for annotations on the
  * current page.
  */
-function searchUris(state) {
-  return state.frames.reduce(function (uris, frame) {
-    return uris.concat(searchUrisForFrame(frame));
-  }, []);
+const searchUris = createSelector(
+  state => state.frames.frames,
+  frames => {
+    return frames.reduce((uris, frame) => {
+      return uris.concat(searchUrisForFrame(frame));
+    }, []);
+  }
+);
+
+// Have the annotations for the frame associated with `uri` finished fetching?
+function isFrameFetchComplete(state, uri) {
+  if (state.frames.frameAnnotationFetchStatus[uri]) {
+    return true;
+  }
+  return false;
+}
+
+// Return fetch status for all known frame URIs
+function frameFetchStatus(state) {
+  return state.frames.frameAnnotationFetchStatus;
 }
 
 export default {
@@ -119,13 +141,15 @@ export default {
   update: update,
 
   actions: {
-    connectFrame: connectFrame,
-    destroyFrame: destroyFrame,
-    updateFrameAnnotationFetchStatus: updateFrameAnnotationFetchStatus,
+    connectFrame,
+    destroyFrame,
+    updateFrameAnnotationFetchStatus,
   },
 
   selectors: {
     frames,
+    frameFetchStatus,
+    isFrameFetchComplete,
     mainFrame,
     searchUris,
   },

@@ -62,6 +62,8 @@ describe('sidebar/services/frame-sync', function () {
         findIDsForTags: sinon.stub(),
         focusAnnotations: sinon.stub(),
         frames: sinon.stub().returns([fixtures.framesListEntry]),
+        frameFetchStatus: sinon.stub().returns({}),
+        isFrameFetchComplete: sinon.stub().returns(false),
         isLoggedIn: sinon.stub().returns(false),
         openSidebarPanel: sinon.stub(),
         selectAnnotations: sinon.stub(),
@@ -150,6 +152,8 @@ describe('sidebar/services/frame-sync', function () {
 
   context('when annotation count has changed', function () {
     it('sends a "publicAnnotationCountChanged" message to the frame when there are public annotations', function () {
+      fakeStore.frames.returns([{ uri: 'http://example.com' }]);
+      fakeStore.isFrameFetchComplete.returns(true);
       fakeStore.setState({
         annotations: { annotations: [annotationFixtures.publicAnnotation()] },
       });
@@ -164,6 +168,8 @@ describe('sidebar/services/frame-sync', function () {
       const annot = annotationFixtures.defaultAnnotation();
       delete annot.permissions;
 
+      fakeStore.frames.returns([{ uri: 'http://example.com' }]);
+      fakeStore.isFrameFetchComplete.returns(true);
       fakeStore.setState({
         annotations: { annotations: [annot] },
       });
