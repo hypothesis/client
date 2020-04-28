@@ -1,20 +1,26 @@
 import * as util from '../util';
 
+/**
+ * A dummy profile returned by the `profile` selector before the real profile
+ * is fetched.
+ */
+const blankProfile = {
+  /** A map of features that are enabled for the current user. */
+  features: {},
+  /** A map of preference names and values. */
+  preferences: {},
+  /**
+   * The authenticated user ID or null if the user is not logged in.
+   */
+  userid: null,
+};
+
 function init() {
   return {
     /**
      * Profile object fetched from the `/api/profile` endpoint.
      */
-    profile: {
-      /** A map of features that are enabled for the current user. */
-      features: {},
-      /** A map of preference names and values. */
-      preferences: {},
-      /**
-       * The authenticated user ID or null if the user is not logged in.
-       */
-      userid: null,
-    },
+    profile: null,
   };
 }
 
@@ -44,7 +50,8 @@ function updateProfile(profile) {
  * @param {object} state - The application state
  */
 function isLoggedIn(state) {
-  return state.session.profile.userid !== null;
+  const profile = state.session.profile;
+  return profile !== null && profile.userid !== null;
 }
 
 /**
@@ -55,16 +62,29 @@ function isLoggedIn(state) {
  *        name of the feature flag as declared in the Hypothesis service.
  */
 function isFeatureEnabled(state, feature) {
-  return !!state.session.profile.features[feature];
+  const profile = state.session.profile;
+  return profile !== null && !!profile.features[feature];
+}
+
+/**
+ * Return true if the user's profile has been fetched. This can be used to
+ * distinguish the dummy profile returned by `profile()` on startup from a
+ * logged-out user profile returned by the server.
+ */
+function hasFetchedProfile(state) {
+  return state.session.profile !== null;
 }
 
 /**
  * Return the user's profile.
  *
  * Returns the current user's profile fetched from the `/api/profile` endpoint.
+ *
+ * If the profile has not yet been fetched yet, a dummy logged-out profile is
+ * returned. This allows code to skip a null check.
  */
 function profile(state) {
-  return state.session.profile;
+  return state.session.profile || blankProfile;
 }
 
 export default {
@@ -77,6 +97,7 @@ export default {
   },
 
   selectors: {
+    hasFetchedProfile,
     isFeatureEnabled,
     isLoggedIn,
     profile,

@@ -28,6 +28,17 @@ describe('sidebar/store/modules/session', function () {
     });
   });
 
+  describe('#hasFetchedProfile', () => {
+    it('returns false before profile is updated', () => {
+      assert.isFalse(store.hasFetchedProfile());
+    });
+
+    it('returns true after profile is updated', () => {
+      store.updateProfile({ userid: 'john' });
+      assert.isTrue(store.hasFetchedProfile());
+    });
+  });
+
   describe('#profile', () => {
     it("returns the user's profile", () => {
       store.updateProfile({ userid: 'john' });
