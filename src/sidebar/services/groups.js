@@ -1,4 +1,3 @@
-import events from '../events';
 import serviceConfig from '../service-config';
 import { isReply } from '../util/annotation-metadata';
 import { combineGroups } from '../util/groups';
@@ -19,7 +18,6 @@ const DEFAULT_ORGANIZATION = {
 
 // @ngInject
 export default function groups(
-  $rootScope,
   store,
   api,
   isSidebar,
@@ -173,8 +171,6 @@ export default function groups(
     });
   }
 
-  let didSubscribeToUriChanges = false;
-
   /*
    * Fetch an individual group.
    *
@@ -186,6 +182,39 @@ export default function groups(
       // If the group does not exist or the user doesn't have permission.
       return null;
     });
+  }
+
+  let reloadSetUp = false;
+
+  /**
+   * Set up automatic re-fetching of groups in response to various events
+   * in the sidebar.
+   */
+  function setupAutoReload() {
+    if (reloadSetUp) {
+      return;
+    }
+    reloadSetUp = true;
+
+    // Reload groups when main document URI changes.
+    watch(store.subscribe, mainUri, () => {
+      load();
+    });
+
+    // Reload groups when user ID changes. This is a bit inefficient since it
+    // means we are not fetching the groups and profile concurrently after
+    // logging in or logging out.
+    watch(
+      store.subscribe,
+      [() => store.hasFetchedProfile(), () => store.profile().userid],
+      (_, [prevFetchedProfile]) => {
+        if (!prevFetchedProfile) {
+          // Ignore the first time that the profile is loaded.
+          return;
+        }
+        load();
+      }
+    );
   }
 
   /**
@@ -209,12 +238,7 @@ export default function groups(
       documentUri = await getDocumentUriForGroupSearch();
     }
 
-    if (!didSubscribeToUriChanges) {
-      didSubscribeToUriChanges = true;
-      watch(store.subscribe, mainUri, () => {
-        load();
-      });
-    }
+    setupAutoReload();
 
     // Step 2: Concurrently fetch the groups the user is a member of,
     // the groups associated with the current document and the annotation
@@ -368,13 +392,6 @@ export default function groups(
       userid: 'me',
     });
   }
-
-  // refetch the list of groups when user changes
-  $rootScope.$on(events.USER_CHANGED, () => {
-    // FIXME Makes a second api call on page load. better way?
-    // return for use in test
-    return load();
-  });
 
   return {
     all: all,
