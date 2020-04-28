@@ -14,8 +14,7 @@ const MESSAGE_DISMISS_DELAY = 500;
  * Additional control over the display of a particular message.
  *
  * @typedef {Object} MessageOptions
- * @prop {boolean} autoDismiss - Whether the toast message automatically disappears.
- *   Defaults to true.
+ * @prop {boolean} [autoDismiss=true] - Whether the toast message automatically disappears.
  */
 
 // @ngInject
