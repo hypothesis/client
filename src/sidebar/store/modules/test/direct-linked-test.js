@@ -88,6 +88,13 @@ describe('sidebar/store/modules/direct-linked', () => {
       });
     });
 
+    describe('#directLinkedGroupFetchFailed', () => {
+      it('should return the group fetch failed status', () => {
+        store.setDirectLinkedGroupFetchFailed(true);
+        assert.isTrue(store.directLinkedGroupFetchFailed());
+      });
+    });
+
     describe('#directLinkedGroupId', () => {
       it('should return the current direct-linked group ID', () => {
         store.setDirectLinkedGroupId('group-id');
