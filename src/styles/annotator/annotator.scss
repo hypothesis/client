@@ -10,6 +10,7 @@
 @use './highlights';
 
 var.$base-font-size: 14px;
+$sidebar-collapse-transition-time: 150ms;
 
 // Sidebar
 .annotator-frame {
@@ -38,6 +39,14 @@ var.$base-font-size: 14px;
 
   &.annotator-collapsed {
     margin-left: 0;
+
+    .h-sidebar-iframe {
+      // Add a transition when collapsing only. This serves to delay
+      // the effect until the sidebar finishes closing. Visibility is
+      // a boolean value and can not actually animate.
+      transition: visibility $sidebar-collapse-transition-time;
+      visibility: hidden;
+    }
   }
 
   * {
@@ -189,7 +198,8 @@ var.$base-font-size: 14px;
 
 @media screen and (min-width: 37.5em) {
   .annotator-frame {
-    transition: margin-left 0.15s cubic-bezier(0.55, 0, 0.2, 0.8);
+    transition: margin-left $sidebar-collapse-transition-time
+      cubic-bezier(0.55, 0, 0.2, 0.8);
     width: 428px;
     margin-left: -428px;
   }

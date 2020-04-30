@@ -1,4 +1,5 @@
 import settingsFrom from './settings';
+import { toBoolean } from '../../shared/type-coercions';
 
 /**
  * Reads the Hypothesis configuration from the environment.
@@ -28,6 +29,8 @@ export default function configFrom(window_) {
     onLayoutChange: settings.hostPageSetting('onLayoutChange'),
     openSidebar: settings.hostPageSetting('openSidebar', {
       allowInBrowserExt: true,
+      // Coerce value to a boolean because it may come from via as a string
+      coerce: toBoolean,
     }),
     query: settings.query,
     requestConfigFromFrame: settings.hostPageSetting('requestConfigFromFrame'),
