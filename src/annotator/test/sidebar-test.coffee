@@ -15,12 +15,14 @@ describe 'Sidebar', ->
   fakeCrossFrame = null
   sidebarConfig = {pluginClasses: {}}
 
+  FakeToolbarController = null
+  fakeToolbar = null
+
   before ->
     sinon.stub(window, 'requestAnimationFrame').yields()
 
   after ->
     window.requestAnimationFrame.restore();
-    $imports.$restore()
 
   createSidebar = (config={}) ->
     config = Object.assign({}, sidebarConfig, config)
@@ -41,37 +43,69 @@ describe 'Sidebar', ->
     fakeCrossFrame.call = sandbox.spy()
     fakeCrossFrame.destroy = sandbox.stub()
 
-    fakeToolbar = {}
-    fakeToolbar.disableMinimizeBtn = sandbox.spy()
-    fakeToolbar.disableHighlightsBtn = sandbox.spy()
-    fakeToolbar.disableNewNoteBtn = sandbox.spy()
-    fakeToolbar.disableCloseBtn = sandbox.spy()
-    fakeToolbar.hideCloseBtn = sandbox.spy()
-    fakeToolbar.showCloseBtn = sandbox.spy()
-    fakeToolbar.showExpandSidebarBtn = sandbox.spy()
-    fakeToolbar.showCollapseSidebarBtn = sandbox.spy()
-    fakeToolbar.getWidth = sandbox.stub()
-    fakeToolbar.destroy = sandbox.stub()
+    fakeToolbar = {
+      getWidth: sinon.stub().returns(100)
+      useMinimalControls: false,
+      sidebarOpen: false,
+      newAnnotationType: 'note',
+      highlightsVisible: false,
+      sidebarToggleButton: document.createElement('button')
+    }
+    FakeToolbarController = sinon.stub().returns(fakeToolbar)
 
     fakeBucketBar = {}
-    fakeBucketBar.element = {on: sandbox.stub()}
+    fakeBucketBar.element = $('<div></div>')
     fakeBucketBar.destroy = sandbox.stub()
 
     CrossFrame = sandbox.stub()
     CrossFrame.returns(fakeCrossFrame)
 
-    Toolbar = sandbox.stub()
-    Toolbar.returns(fakeToolbar)
-
     BucketBar = sandbox.stub()
     BucketBar.returns(fakeBucketBar)
 
     sidebarConfig.pluginClasses['CrossFrame'] = CrossFrame
-    sidebarConfig.pluginClasses['Toolbar'] = Toolbar
     sidebarConfig.pluginClasses['BucketBar'] = BucketBar
+
+    $imports.$mock({
+      './toolbar': {
+        ToolbarController: FakeToolbarController
+      }
+    })
 
   afterEach ->
     sandbox.restore()
+    $imports.$restore();
+
+  describe 'toolbar buttons', ->
+    it 'shows or hides sidebar when toolbar button is clicked', ->
+      sidebar = createSidebar({})
+      sinon.stub(sidebar, 'show')
+      sinon.stub(sidebar, 'hide')
+
+      FakeToolbarController.args[0][1].setSidebarOpen(true)
+      assert.called(sidebar.show)
+
+      FakeToolbarController.args[0][1].setSidebarOpen(false)
+      assert.called(sidebar.hide)
+
+    it 'shows or hides highlights when toolbar button is clicked', ->
+      sidebar = createSidebar({})
+      sinon.stub(sidebar, 'setAllVisibleHighlights')
+
+      FakeToolbarController.args[0][1].setHighlightsVisible(true)
+      assert.calledWith(sidebar.setAllVisibleHighlights, true)
+      sidebar.setAllVisibleHighlights.resetHistory()
+
+      FakeToolbarController.args[0][1].setHighlightsVisible(false)
+      assert.calledWith(sidebar.setAllVisibleHighlights, false)
+
+    it 'creates an annotation when toolbar button is clicked', ->
+      sidebar = createSidebar({})
+      sinon.stub(sidebar, 'createAnnotation')
+
+      FakeToolbarController.args[0][1].createAnnotation()
+
+      assert.called(sidebar.createAnnotation)
 
   describe 'crossframe listeners', ->
     emitEvent = (event, args...) ->
@@ -331,6 +365,12 @@ describe 'Sidebar', ->
       sidebar.show()
       assert.isFalse sidebar.visibleHighlights
 
+    it 'updates the toolbar', ->
+      sidebar = createSidebar()
+      sidebar.show()
+      assert.equal(fakeToolbar.sidebarOpen, true)
+
+
   describe '#hide', ->
 
     it 'hides highlights if "showHighlights" is set to "whenSidebarOpen"', ->
@@ -341,32 +381,28 @@ describe 'Sidebar', ->
 
       assert.isFalse sidebar.visibleHighlights
 
+    it 'updates the toolbar', ->
+      sidebar = createSidebar()
+
+      sidebar.show()
+      sidebar.hide()
+
+      assert.equal(fakeToolbar.sidebarOpen, false)
+
   describe '#setAllVisibleHighlights', ->
 
     it 'sets the state through crossframe and emits', ->
       sidebar = createSidebar({})
-      sandbox.stub(sidebar, 'publish')
       sidebar.setAllVisibleHighlights(true)
       assert.calledWith(fakeCrossFrame.call, 'setVisibleHighlights', true)
-      assert.calledWith(sidebar.publish, 'setVisibleHighlights', true)
 
-  context 'Hide toolbar buttons', ->
+  it 'hides toolbar controls when using the "clean" theme', ->
+    sidebar = createSidebar(config={theme: 'clean'})
+    assert.equal(fakeToolbar.useMinimalControls, true)
 
-    it 'disables minimize btn for the clean theme', ->
-      sidebar = createSidebar(config={theme: 'clean'})
-
-      assert.called(sidebar.plugins.Toolbar.disableMinimizeBtn)
-
-    it 'disables toolbar highlights btn for the clean theme', ->
-      sidebar = createSidebar(config={theme: 'clean'})
-
-      assert.called(sidebar.plugins.Toolbar.disableHighlightsBtn)
-
-    it 'disables new note btn for the clean theme', ->
-      sidebar = createSidebar(config={theme: 'clean'})
-
-      assert.called(sidebar.plugins.Toolbar.disableNewNoteBtn)
-
+  it 'shows toolbar controls when using the default theme', ->
+    createSidebar({})
+    assert.equal(fakeToolbar.useMinimalControls, false)
 
   describe 'layout change notifier', ->
 
@@ -374,7 +410,7 @@ describe 'Sidebar', ->
 
     assertLayoutValues = (args, expectations) ->
       expected = Object.assign {
-          width: DEFAULT_WIDTH,
+          width: DEFAULT_WIDTH + fakeToolbar.getWidth(),
           height: DEFAULT_HEIGHT,
           expanded: true
         }, expectations
@@ -419,18 +455,22 @@ describe 'Sidebar', ->
         assert.calledTwice layoutChangeHandlerSpy
         assertLayoutValues layoutChangeHandlerSpy.lastCall.args[0], {
           expanded: false,
-          width: 0,
+          width: fakeToolbar.getWidth(),
         }
 
       it 'notifies when sidebar is panned left', ->
         sidebar.gestureState = { initial: -DEFAULT_WIDTH }
         sidebar.onPan({type: 'panleft', deltaX: -50})
-        assertLayoutValues layoutChangeHandlerSpy.lastCall.args[0], { width: 400 }
+        assertLayoutValues layoutChangeHandlerSpy.lastCall.args[0], {
+          width: DEFAULT_WIDTH + 50 + fakeToolbar.getWidth()
+        }
 
       it 'notifies when sidebar is panned right', ->
         sidebar.gestureState = { initial: -DEFAULT_WIDTH }
         sidebar.onPan({type: 'panright', deltaX: 50})
-        assertLayoutValues layoutChangeHandlerSpy.lastCall.args[0], { width: 300 }
+        assertLayoutValues layoutChangeHandlerSpy.lastCall.args[0], {
+          width: DEFAULT_WIDTH - 50 + fakeToolbar.getWidth()
+        }
 
     describe 'with the frame in an external container', ->
       sidebar = null
@@ -465,7 +505,10 @@ describe 'Sidebar', ->
       it 'notifies when sidebar changes expanded state', ->
         sidebar.show()
         assert.calledOnce layoutChangeHandlerSpy
-        assertLayoutValues layoutChangeHandlerSpy.lastCall.args[0], {expanded: true}
+        assertLayoutValues layoutChangeHandlerSpy.lastCall.args[0], {
+          expanded: true
+          width: DEFAULT_WIDTH
+        }
 
         sidebar.hide()
         assert.calledTwice layoutChangeHandlerSpy
@@ -498,7 +541,6 @@ describe 'Sidebar', ->
       sidebar = createSidebar({ theme: 'clean' })
       assert.isUndefined(sidebar.plugins.BucketBar)
 
-    it 'does not have the BucketBar or Toolbar plugin if an external container is provided', ->
+    it 'does not have the BucketBar if an external container is provided', ->
       sidebar = createSidebar({ externalContainerSelector: '.' + EXTERNAL_CONTAINER_SELECTOR })
       assert.isUndefined(sidebar.plugins.BucketBar)
-      assert.isUndefined(sidebar.plugins.Toolbar)

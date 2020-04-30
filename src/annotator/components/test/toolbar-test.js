@@ -1,0 +1,82 @@
+import { mount } from 'enzyme';
+import { createElement } from 'preact';
+
+import Toolbar from '../toolbar';
+
+const noop = () => {};
+
+describe('Toolbar', () => {
+  const createToolbar = props =>
+    mount(
+      <Toolbar
+        closeSidebar={noop}
+        createAnnotation={noop}
+        toggleHighlights={noop}
+        toggleSidebar={noop}
+        isSidebarOpen={false}
+        showHighlights={false}
+        newAnnotationType="note"
+        useMinimalControls={false}
+        {...props}
+      />
+    );
+
+  const findButton = (wrapper, label) =>
+    wrapper.find(`button[title="${label}"]`);
+
+  it('renders nothing if `useMinimalControls` is true and the sidebar is closed', () => {
+    const wrapper = createToolbar({ useMinimalControls: true });
+    assert.isFalse(wrapper.find('button').exists());
+  });
+
+  it('renders only the Close button if `useMinimalControls` is true', () => {
+    const wrapper = createToolbar({
+      useMinimalControls: true,
+      isSidebarOpen: true,
+    });
+    assert.equal(wrapper.find('button').length, 1);
+    assert.isTrue(findButton(wrapper, 'Close annotation sidebar').exists());
+  });
+
+  it('renders the normal controls if `useMinimalControls` is false', () => {
+    const wrapper = createToolbar({ useMinimalControls: false });
+    assert.isFalse(findButton(wrapper, 'Close annotation sidebar').exists());
+    assert.isTrue(findButton(wrapper, 'Show annotation sidebar').exists());
+    assert.isTrue(findButton(wrapper, 'Show highlights').exists());
+    assert.isTrue(findButton(wrapper, 'New page note').exists());
+  });
+
+  it('shows the "New page note" button if `newAnnotationType` is `note`', () => {
+    const wrapper = createToolbar({ newAnnotationType: 'note' });
+    assert.isTrue(findButton(wrapper, 'New page note').exists());
+  });
+
+  it('shows the "New annotation" button if `newAnnotationType` is `annotation`', () => {
+    const wrapper = createToolbar({ newAnnotationType: 'annotation' });
+    assert.isTrue(findButton(wrapper, 'New annotation').exists());
+  });
+
+  it('toggles the sidebar when the sidebar toggle is clicked', () => {
+    const toggleSidebar = sinon.stub();
+    const wrapper = createToolbar({ isSidebarOpen: false, toggleSidebar });
+
+    findButton(wrapper, 'Show annotation sidebar').simulate('click');
+    assert.calledWith(toggleSidebar);
+
+    wrapper.setProps({ isSidebarOpen: true });
+    findButton(wrapper, 'Show annotation sidebar').simulate('click');
+    assert.calledWith(toggleSidebar);
+  });
+
+  it('toggles highlight visibility when the highlights toggle is clicked', () => {
+    const toggleHighlights = sinon.stub();
+    const wrapper = createToolbar({ showHighlights: false, toggleHighlights });
+
+    findButton(wrapper, 'Show highlights').simulate('click');
+    assert.calledWith(toggleHighlights);
+
+    wrapper.setProps({ showHighlights: true });
+    findButton(wrapper, 'Show highlights').simulate('click');
+    assert.calledWith(toggleHighlights);
+  });
+});
