@@ -347,6 +347,9 @@ function AnnotationController(
     if (!this.canPostToCurrentGroup()) {
       return false;
     }
+    if (this.isHighlight()) {
+      return true;
+    }
     return this.hasContent();
   };
 
