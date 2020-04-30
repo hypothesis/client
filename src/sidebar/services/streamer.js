@@ -3,6 +3,7 @@ import * as queryString from 'query-string';
 import warnOnce from '../../shared/warn-once';
 import { generateHexString } from '../util/random';
 import Socket from '../websocket';
+import { watch } from '../util/watch';
 
 /**
  * Open a new WebSocket connection to the Hypothesis push notification service.
@@ -160,6 +161,26 @@ export default function Streamer(store, auth, groups, session, settings) {
       });
   };
 
+  let reconnectSetUp = false;
+  /**
+   * Set up automatic reconnecting when user changes.
+   */
+  function setUpAutoReconnect() {
+    if (reconnectSetUp) {
+      return;
+    }
+    reconnectSetUp = true;
+
+    // Reconnect when user changes, as auth token will have changed
+    watch(
+      store.subscribe,
+      () => store.profile().userid,
+      () => {
+        reconnect();
+      }
+    );
+  }
+
   /**
    * Connect to the Hypothesis real time update service.
    *
@@ -169,10 +190,10 @@ export default function Streamer(store, auth, groups, session, settings) {
    *                   process has started.
    */
   function connect() {
+    setUpAutoReconnect();
     if (socket) {
       return Promise.resolve();
     }
-
     return _connect();
   }
 

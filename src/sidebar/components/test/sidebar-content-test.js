@@ -1,418 +1,269 @@
-import angular from 'angular';
-import EventEmitter from 'tiny-emitter';
+import { mount } from 'enzyme';
+import { createElement } from 'preact';
 
-import events from '../../events';
-import storeFactory from '../../store';
-import sidebarContent from '../sidebar-content';
+import SidebarContent from '../sidebar-content';
+import { $imports } from '../sidebar-content';
 
-class FakeRootThread extends EventEmitter {
-  constructor() {
-    super();
-    this.thread = sinon.stub().returns({
-      totalChildren: 0,
-    });
-  }
-}
+import { checkAccessibility } from '../../../test-util/accessibility';
+import mockImportedComponents from '../../../test-util/mock-imported-components';
 
-describe('sidebar.components.sidebar-content', function () {
-  let $rootScope;
-  let $scope;
-  let store;
-  let ctrl;
-  let fakeAnalytics;
-  let fakeLoadAnnotationsService;
+describe('SidebarContent', () => {
   let fakeFrameSync;
-  let fakeRootThread;
-  let fakeSettings;
+  let fakeLoadAnnotationsService;
+  let fakeRootThreadService;
+  let fakeStore;
   let fakeStreamer;
-  let sandbox;
+  let fakeTabsUtil;
 
-  before(function () {
-    angular
-      .module('h', [])
-      .service('store', storeFactory)
-      .component('sidebarContent', sidebarContent);
-  });
-
-  beforeEach(angular.mock.module('h'));
-
-  beforeEach(() => {
-    angular.mock.module(function ($provide) {
-      sandbox = sinon.createSandbox();
-
-      fakeAnalytics = {
-        track: sandbox.stub(),
-        events: {},
-      };
-
-      fakeFrameSync = {
-        focusAnnotations: sinon.stub(),
-        scrollToAnnotation: sinon.stub(),
-      };
-
-      fakeStreamer = {
-        setConfig: sandbox.stub(),
-        connect: sandbox.stub(),
-        reconnect: sandbox.stub(),
-      };
-
-      fakeLoadAnnotationsService = {
-        load: sinon.stub(),
-      };
-
-      fakeRootThread = new FakeRootThread();
-
-      fakeSettings = {};
-
-      $provide.value('analytics', fakeAnalytics);
-      $provide.value('frameSync', fakeFrameSync);
-      $provide.value('rootThread', fakeRootThread);
-      $provide.value('streamer', fakeStreamer);
-      $provide.value('loadAnnotationsService', fakeLoadAnnotationsService);
-      $provide.value('settings', fakeSettings);
-    });
-  });
-
-  function setFrames(frames) {
-    frames.forEach(function (frame) {
-      store.connectFrame(frame);
-    });
-  }
-
-  const makeSidebarContentController = () => {
-    angular.mock.inject(function ($componentController, _store_, _$rootScope_) {
-      $rootScope = _$rootScope_;
-      $scope = $rootScope.$new();
-
-      store = _store_;
-      store.updateFrameAnnotationFetchStatus = sinon.stub();
-      store.clearGroups();
-      store.loadGroups([{ id: 'group-id' }]);
-      store.focusGroup('group-id');
-
-      ctrl = $componentController(
-        'sidebarContent',
-        { $scope: $scope },
-        {
-          auth: { status: 'unknown' },
-        }
-      );
-    });
-  };
+  const createComponent = props =>
+    mount(
+      <SidebarContent
+        onLogin={() => null}
+        onSignUp={() => null}
+        frameSync={fakeFrameSync}
+        loadAnnotationsService={fakeLoadAnnotationsService}
+        rootThread={fakeRootThreadService}
+        streamer={fakeStreamer}
+        {...props}
+      />
+    );
 
   beforeEach(() => {
-    makeSidebarContentController();
+    fakeFrameSync = {
+      focusAnnotations: sinon.stub(),
+      scrollToAnnotation: sinon.stub(),
+    };
+    fakeLoadAnnotationsService = {
+      load: sinon.stub(),
+    };
+    fakeRootThreadService = {
+      thread: sinon.stub().returns({}),
+    };
+    fakeStreamer = {
+      connect: sinon.stub(),
+    };
+    fakeStore = {
+      // actions
+      clearSelectedAnnotations: sinon.stub(),
+      selectTab: sinon.stub(),
+      // selectors
+      annotationExists: sinon.stub(),
+      directLinkedAnnotationId: sinon.stub(),
+      directLinkedGroupFetchFailed: sinon.stub(),
+      findAnnotationByID: sinon.stub(),
+      focusedGroupId: sinon.stub(),
+      focusModeEnabled: sinon.stub(),
+      hasAppliedFilter: sinon.stub(),
+      hasFetchedAnnotations: sinon.stub(),
+      hasSidebarOpened: sinon.stub(),
+      isFetchingAnnotations: sinon.stub(),
+      isLoggedIn: sinon.stub(),
+      getState: sinon.stub(),
+      profile: sinon.stub().returns({ userid: null }),
+      searchUris: sinon.stub().returns([]),
+    };
+
+    fakeTabsUtil = {
+      tabForAnnotation: sinon.stub().returns('annotation'),
+    };
+
+    $imports.$mock(mockImportedComponents());
+    $imports.$mock({
+      '../store/use-store': callback => callback(fakeStore),
+      '../util/tabs': fakeTabsUtil,
+    });
   });
 
-  afterEach(function () {
-    return sandbox.restore();
+  afterEach(() => {
+    $imports.$restore();
   });
 
-  describe('isLoading', () => {
-    it("returns true if the document's url isn't known", () => {
-      assert.isTrue(ctrl.isLoading());
-    });
-
-    it('returns true if annotations are still being fetched', () => {
-      setFrames([{ uri: 'http://www.example.com' }]);
-      store.annotationFetchStarted('tag:foo');
-      assert.isTrue(ctrl.isLoading());
-    });
-
-    it('returns false if annotations have been fetched', () => {
-      setFrames([{ uri: 'http://www.example.com' }]);
-      assert.isFalse(ctrl.isLoading());
-    });
-  });
-
-  describe('showSelectedTabs', () => {
+  describe('loading annotations', () => {
+    let wrapper;
     beforeEach(() => {
-      setFrames([{ uri: 'http://www.example.com' }]);
+      fakeStore.focusedGroupId.returns('47');
+      fakeStore.searchUris.returns(['foobar']);
+      fakeStore.profile.returns({ userid: 'somebody' });
+      wrapper = createComponent();
+      fakeLoadAnnotationsService.load.resetHistory();
     });
 
-    it('returns false if there is a search query', () => {
-      store.setFilterQuery('tag:foo');
-      assert.isFalse(ctrl.showSelectedTabs());
+    it('loads annotations when userId changes', () => {
+      fakeStore.profile.returns({ userid: 'somethingElse' });
+      wrapper.setProps({});
+      assert.calledOnce(fakeLoadAnnotationsService.load);
+      assert.notCalled(fakeStore.clearSelectedAnnotations);
     });
 
-    it('returns false if selected group is unavailable', () => {
-      fakeSettings.group = 'group-id';
-      store.setDirectLinkedGroupFetchFailed();
-      $scope.$digest();
-      assert.isFalse(ctrl.showSelectedTabs());
+    it('clears selected annotations and loads annotations when groupId changes', () => {
+      fakeStore.focusedGroupId.returns('affable');
+      wrapper.setProps({});
+      assert.calledOnce(fakeLoadAnnotationsService.load);
+      assert.calledOnce(fakeStore.clearSelectedAnnotations);
     });
 
-    it('returns false if selected annotation is unavailable', () => {
-      store.selectAnnotations(['missing']);
-      $scope.$digest();
-      assert.isFalse(ctrl.showSelectedTabs());
-    });
-
-    it('returns true in all other cases', () => {
-      assert.isTrue(ctrl.showSelectedTabs());
-    });
-  });
-
-  describe('showFocusedHeader', () => {
-    it('returns true if focus mode is enabled', () => {
-      store.focusModeEnabled = sinon.stub().returns(true);
-      assert.isTrue(ctrl.showFocusedHeader());
-    });
-    it('returns false if focus mode is not enabled', () => {
-      store.focusModeEnabled = sinon.stub().returns(false);
-      assert.isFalse(ctrl.showFocusedHeader());
+    it('loads annotations when searchURIs change', () => {
+      fakeStore.searchUris.returns(['abandon-ship']);
+      wrapper.setProps({});
+      assert.calledOnce(fakeLoadAnnotationsService.load);
+      assert.notCalled(fakeStore.clearSelectedAnnotations);
     });
   });
 
-  function connectFrameAndPerformInitialFetch() {
-    setFrames([{ uri: 'https://a-page.com' }]);
-    $scope.$digest();
-    fakeLoadAnnotationsService.load.reset();
-  }
-
-  it('generates the thread list', () => {
-    const thread = fakeRootThread.thread(store.getState());
-    assert.equal(ctrl.rootThread(), thread);
-  });
-
-  context('when the search URIs of connected frames change', () => {
-    beforeEach(connectFrameAndPerformInitialFetch);
-
-    it('reloads annotations', () => {
-      setFrames([{ uri: 'https://new-frame.com' }]);
-
-      $scope.$digest();
-
-      assert.calledWith(
-        fakeLoadAnnotationsService.load,
-        ['https://a-page.com', 'https://new-frame.com'],
-        'group-id'
-      );
-    });
-  });
-
-  context('when the profile changes', () => {
-    beforeEach(connectFrameAndPerformInitialFetch);
-
-    it('reloads annotations if the user ID changed', () => {
-      const newProfile = Object.assign({}, store.profile(), {
-        userid: 'different-user@hypothes.is',
+  context('when viewing a direct-linked annotation', () => {
+    context('successful direct-linked annotation', () => {
+      beforeEach(() => {
+        fakeStore.hasFetchedAnnotations.returns(true);
+        fakeStore.isFetchingAnnotations.returns(false);
+        fakeStore.annotationExists.withArgs('someId').returns(true);
+        fakeStore.directLinkedAnnotationId.returns('someId');
+        fakeStore.findAnnotationByID
+          .withArgs('someId')
+          .returns({ $orphan: false, $tag: 'myTag' });
       });
 
-      store.updateProfile(newProfile);
-      $scope.$digest();
-
-      assert.calledWith(
-        fakeLoadAnnotationsService.load,
-        ['https://a-page.com'],
-        'group-id'
-      );
-    });
-
-    it('does not reload annotations if the user ID is the same', () => {
-      const newProfile = Object.assign({}, store.profile(), {
-        user_info: {
-          display_name: 'New display name',
-        },
+      it('focuses and scrolls to direct-linked annotations once anchored', () => {
+        createComponent();
+        assert.calledOnce(fakeFrameSync.scrollToAnnotation);
+        assert.calledWith(fakeFrameSync.scrollToAnnotation, 'myTag');
+        assert.calledOnce(fakeFrameSync.focusAnnotations);
+        assert.calledWith(
+          fakeFrameSync.focusAnnotations,
+          sinon.match(['myTag'])
+        );
       });
 
-      store.updateProfile(newProfile);
-      $scope.$digest();
+      it('selects the correct tab for direct-linked annotations once anchored', () => {
+        createComponent();
+        assert.calledOnce(fakeStore.selectTab);
+        assert.calledWith(fakeStore.selectTab, 'annotation');
+      });
 
-      assert.notCalled(fakeLoadAnnotationsService.load);
+      it('renders a logged-out message CTA if user is not logged in', () => {
+        fakeStore.isLoggedIn.returns(false);
+        const wrapper = createComponent();
+        assert.isTrue(wrapper.find('LoggedOutMessage').exists());
+      });
+    });
+
+    context('error on direct-linked annotation', () => {
+      beforeEach(() => {
+        // This puts us into a "direct-linked annotation" state
+        fakeStore.hasFetchedAnnotations.returns(true);
+        fakeStore.isFetchingAnnotations.returns(false);
+        fakeStore.directLinkedAnnotationId.returns('someId');
+
+        // This puts us into an error state
+        fakeStore.findAnnotationByID.withArgs('someId').returns(undefined);
+        fakeStore.annotationExists.withArgs('someId').returns(false);
+      });
+
+      it('renders a content error', () => {
+        const wrapper = createComponent();
+
+        assert.isTrue(
+          wrapper
+            .find('SidebarContentError')
+            .filter({ errorType: 'annotation' })
+            .exists()
+        );
+      });
+
+      it('does not render tabs', () => {
+        const wrapper = createComponent();
+
+        assert.isFalse(wrapper.find('SelectionTabs').exists());
+      });
     });
   });
 
-  describe('when an annotation is anchored', function () {
-    it('focuses and scrolls to the annotation if already selected', function () {
-      const uri = 'http://example.com';
-      store.getSelectedAnnotationMap = sinon.stub().returns({ '123': true });
-      setFrames([{ uri: uri }]);
-      const annot = {
-        $tag: 'atag',
-        id: '123',
-      };
-      store.addAnnotations([annot]);
-      $scope.$digest();
-      $rootScope.$broadcast(events.ANNOTATIONS_SYNCED, ['atag']);
-      assert.calledWith(fakeFrameSync.focusAnnotations, ['atag']);
-      assert.calledWith(fakeFrameSync.scrollToAnnotation, 'atag');
-    });
-  });
-
-  describe('when the focused group changes', () => {
-    const uri = 'http://example.com';
-
+  context('error with direct-linked group', () => {
     beforeEach(() => {
-      // Setup an initial state with frames connected, a group focused and some
-      // annotations loaded.
-      store.addAnnotations([{ id: '123' }]);
-      store.addAnnotations = sinon.stub();
-      setFrames([{ uri: uri }]);
-      $scope.$digest();
-      fakeLoadAnnotationsService.load = sinon.stub();
+      fakeStore.hasFetchedAnnotations.returns(true);
+      fakeStore.isFetchingAnnotations.returns(false);
+      fakeStore.directLinkedGroupFetchFailed.returns(true);
     });
 
-    it('should load annotations for the new group', () => {
-      store.loadGroups([{ id: 'different-group' }]);
-      store.focusGroup('different-group');
+    it('renders a content error', () => {
+      const wrapper = createComponent();
 
-      $scope.$digest();
-
-      assert.calledWith(
-        fakeLoadAnnotationsService.load,
-        ['http://example.com'],
-        'different-group'
+      assert.isTrue(
+        wrapper
+          .find('SidebarContentError')
+          .filter({ errorType: 'group' })
+          .exists()
       );
     });
 
-    it('should clear the selection', () => {
-      store.selectAnnotations(['123']);
-      store.loadGroups([{ id: 'different-group' }]);
-      store.focusGroup('different-group');
+    it('does not render tabs', () => {
+      const wrapper = createComponent();
 
-      $scope.$digest();
-
-      assert.isFalse(store.hasSelectedAnnotations());
+      assert.isFalse(wrapper.find('SelectionTabs').exists());
     });
   });
 
-  describe('direct linking messages', function () {
-    /**
-     * Connect a frame, indicating that the document has finished initial
-     * loading.
-     *
-     * In the case of an HTML document, this usually happens immediately. For
-     * PDFs, this happens once the entire PDF has been downloaded and the
-     * document's metadata has been read.
-     */
-    function addFrame() {
-      setFrames([
-        {
-          uri: 'http://www.example.com',
-        },
-      ]);
-    }
-
-    beforeEach(function () {
-      store.setDirectLinkedAnnotationId('test');
+  describe('streamer', () => {
+    it('connects to streamer when sidebar is opened', () => {
+      const wrapper = createComponent();
+      fakeStreamer.connect.resetHistory();
+      fakeStore.hasSidebarOpened.returns(true);
+      wrapper.setProps({});
+      assert.calledOnce(fakeStreamer.connect);
     });
 
-    it('displays a message if the selection is unavailable', function () {
-      addFrame();
-      store.selectAnnotations(['missing']);
-      $scope.$digest();
-      assert.isTrue(ctrl.selectedAnnotationUnavailable());
-    });
-
-    it('does not show a message if the selection is available', function () {
-      addFrame();
-      store.addAnnotations([{ id: '123' }]);
-      store.selectAnnotations(['123']);
-      $scope.$digest();
-      assert.isFalse(ctrl.selectedAnnotationUnavailable());
-    });
-
-    it('does not a show a message if there is no selection', function () {
-      addFrame();
-      store.selectAnnotations([]);
-      $scope.$digest();
-      assert.isFalse(ctrl.selectedAnnotationUnavailable());
-    });
-
-    it("doesn't show a message if the document isn't loaded yet", function () {
-      // There is a selection but the selected annotation isn't available.
-      store.selectAnnotations(['missing']);
-      store.annotationFetchStarted();
-      $scope.$digest();
-
-      assert.isFalse(ctrl.selectedAnnotationUnavailable());
-    });
-
-    it('shows logged out message if selection is available', function () {
-      addFrame();
-      ctrl.auth = {
-        status: 'logged-out',
-      };
-      store.addAnnotations([{ id: '123' }]);
-      store.selectAnnotations(['123']);
-      $scope.$digest();
-      assert.isTrue(ctrl.shouldShowLoggedOutMessage());
-    });
-
-    it('does not show loggedout message if selection is unavailable', function () {
-      addFrame();
-      ctrl.auth = {
-        status: 'logged-out',
-      };
-      store.selectAnnotations(['missing']);
-      $scope.$digest();
-      assert.isFalse(ctrl.shouldShowLoggedOutMessage());
-    });
-
-    it('does not show loggedout message if there is no selection', function () {
-      addFrame();
-      ctrl.auth = {
-        status: 'logged-out',
-      };
-      store.selectAnnotations([]);
-      $scope.$digest();
-      assert.isFalse(ctrl.shouldShowLoggedOutMessage());
-    });
-
-    it('does not show loggedout message if user is not logged out', function () {
-      addFrame();
-      ctrl.auth = {
-        status: 'logged-in',
-      };
-      store.addAnnotations([{ id: '123' }]);
-      store.selectAnnotations(['123']);
-      $scope.$digest();
-      assert.isFalse(ctrl.shouldShowLoggedOutMessage());
-    });
-
-    it('does not show loggedout message if not a direct link', function () {
-      addFrame();
-      ctrl.auth = {
-        status: 'logged-out',
-      };
-      store.setDirectLinkedAnnotationId(null);
-      store.addAnnotations([{ id: '123' }]);
-      store.selectAnnotations(['123']);
-      $scope.$digest();
-      assert.isFalse(ctrl.shouldShowLoggedOutMessage());
-    });
-
-    it('does not show loggedout message if using third-party accounts', function () {
-      fakeSettings.services = [{ authority: 'publisher.com' }];
-      addFrame();
-      ctrl.auth = { status: 'logged-out' };
-      store.addAnnotations([{ id: '123' }]);
-      store.selectAnnotations(['123']);
-      $scope.$digest();
-
-      assert.isFalse(ctrl.shouldShowLoggedOutMessage());
+    it('connects to streamer when user logs in', () => {
+      const wrapper = createComponent();
+      fakeStreamer.connect.resetHistory();
+      fakeStore.isLoggedIn.returns(true);
+      wrapper.setProps({});
+      assert.calledOnce(fakeStreamer.connect);
     });
   });
 
-  describe('deferred websocket connection', function () {
-    it('should connect the websocket the first time the sidebar opens', function () {
-      $rootScope.$broadcast('sidebarOpened');
-      assert.called(fakeStreamer.connect);
+  it('renders a focused header if in focused mode', () => {
+    fakeStore.focusModeEnabled.returns(true);
+    const wrapper = createComponent();
+
+    assert.isTrue(wrapper.find('FocusedModeHeader').exists());
+  });
+
+  it('renders search status', () => {
+    fakeStore.hasFetchedAnnotations.returns(true);
+    fakeStore.isFetchingAnnotations.returns(false);
+
+    const wrapper = createComponent();
+
+    assert.isTrue(wrapper.find('SearchStatusBar').exists());
+  });
+
+  it('does not render search status if annotations are loading', () => {
+    fakeStore.hasFetchedAnnotations.returns(false);
+
+    const wrapper = createComponent();
+
+    assert.isFalse(wrapper.find('SearchStatusBar').exists());
+  });
+
+  describe('selection tabs', () => {
+    it('renders tabs', () => {
+      const wrapper = createComponent();
+
+      assert.isTrue(wrapper.find('SelectionTabs').exists());
     });
 
-    describe('when logged in user changes', function () {
-      it('should not reconnect if the sidebar is closed', function () {
-        $rootScope.$broadcast(events.USER_CHANGED);
-        assert.calledOnce(fakeStreamer.reconnect);
-      });
+    it('does not render tabs if there is an applied filter', () => {
+      fakeStore.hasAppliedFilter.returns(true);
 
-      it('should reconnect if the sidebar is open', function () {
-        $rootScope.$broadcast('sidebarOpened');
-        fakeStreamer.connect.reset();
-        $rootScope.$broadcast(events.USER_CHANGED);
-        assert.called(fakeStreamer.reconnect);
-      });
+      const wrapper = createComponent();
+
+      assert.isFalse(wrapper.find('SelectionTabs').exists());
     });
   });
+
+  it(
+    'should pass a11y checks',
+    checkAccessibility({
+      content: () => createComponent(),
+    })
+  );
 });

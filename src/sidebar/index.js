@@ -108,14 +108,10 @@ registerIcons(iconSet);
 // Preact UI components that are wrapped for use within Angular templates.
 
 import AnnotationViewerContent from './components/annotation-viewer-content';
-import FocusedModeHeader from './components/focused-mode-header';
 import HelpPanel from './components/help-panel';
-import LoggedOutMessage from './components/logged-out-message';
 import LoginPromptPanel from './components/login-prompt-panel';
-import SearchStatusBar from './components/search-status-bar';
-import SelectionTabs from './components/selection-tabs';
 import ShareAnnotationsPanel from './components/share-annotations-panel';
-import SidebarContentError from './components/sidebar-content-error';
+import SidebarContent from './components/sidebar-content';
 import StreamContent from './components/stream-content';
 import ThreadList from './components/thread-list';
 import ToastMessages from './components/toast-messages';
@@ -124,7 +120,6 @@ import TopBar from './components/top-bar';
 // Remaining UI components that are still built with Angular.
 
 import hypothesisApp from './components/hypothesis-app';
-import sidebarContent from './components/sidebar-content';
 
 // Services.
 
@@ -243,12 +238,7 @@ function startAngularApp(config) {
     )
     .component('helpPanel', wrapComponent(HelpPanel))
     .component('loginPromptPanel', wrapComponent(LoginPromptPanel))
-    .component('loggedOutMessage', wrapComponent(LoggedOutMessage))
-    .component('searchStatusBar', wrapComponent(SearchStatusBar))
-    .component('focusedModeHeader', wrapComponent(FocusedModeHeader))
-    .component('selectionTabs', wrapComponent(SelectionTabs))
-    .component('sidebarContent', sidebarContent)
-    .component('sidebarContentError', wrapComponent(SidebarContentError))
+    .component('sidebarContent', wrapComponent(SidebarContent))
     .component('shareAnnotationsPanel', wrapComponent(ShareAnnotationsPanel))
     .component('streamContent', wrapComponent(StreamContent))
     .component('threadList', wrapComponent(ThreadList))
