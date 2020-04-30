@@ -14,8 +14,11 @@ import { applyTheme } from '../util/theme';
 function InlineControls({ isCollapsed, setCollapsed, linkStyle = {} }) {
   const toggleLabel = isCollapsed ? 'More' : 'Less';
 
+  // These controls are hidden from assistive technology using the
+  // `aria-hidden` attribute because the entire excerpt is present, it's
+  // just visually hidden, making these controls meaningless for screen readers
   return (
-    <div className="excerpt__inline-controls">
+    <div className="excerpt__inline-controls" aria-hidden="true">
       <span className="excerpt__toggle-link">
         <button
           className="excerpt__toggle-button"
@@ -110,6 +113,7 @@ function Excerpt({
         {children}
       </div>
       <div
+        aria-hidden="true"
         role="presentation"
         onClick={() => setCollapsed(false)}
         className={classnames({

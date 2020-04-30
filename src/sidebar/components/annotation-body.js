@@ -67,7 +67,10 @@ export default function AnnotationBody({
         />
       )}
       {isCollapsible && !isEditing && (
-        <div className="annotation-body__collapse-toggle">
+        <div className="annotation-body__collapse-toggle" aria-hidden="true">
+          {/* This is hidden from screen readers because the toggle
+              is only a visual toggle: the content is all present
+           */}
           <Button
             className="annotation-body__collapse-toggle-button"
             onClick={() => setIsCollapsed(!isCollapsed)}
