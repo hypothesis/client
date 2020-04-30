@@ -8,6 +8,23 @@ describe('sidebar/store/modules/activity', () => {
     store = createStore([activity]);
   });
 
+  describe('hasFetchedAnnotations', () => {
+    it('returns false if no fetches have completed yet', () => {
+      assert.isFalse(store.hasFetchedAnnotations());
+    });
+
+    it('returns false after fetch(es) started', () => {
+      store.annotationFetchStarted();
+      assert.isFalse(store.hasFetchedAnnotations());
+    });
+
+    it('returns true once a fetch has finished', () => {
+      store.annotationFetchStarted();
+      store.annotationFetchFinished();
+      assert.isTrue(store.hasFetchedAnnotations());
+    });
+  });
+
   describe('#isLoading', () => {
     it('returns false with the initial state', () => {
       assert.equal(store.isLoading(), false);

@@ -19,6 +19,10 @@ function init() {
      * The number of annotation fetches that have started and not yet completed.
      */
     activeAnnotationFetches: 0,
+    /**
+     * Have annotations ever been fetched?
+     */
+    hasFetchedAnnotations: false,
   };
 }
 
@@ -86,6 +90,7 @@ const update = {
 
     return {
       ...state,
+      hasFetchedAnnotations: true,
       activeAnnotationFetches: state.activeAnnotationFetches - 1,
     };
   },
@@ -126,6 +131,10 @@ function apiRequestFinished() {
 }
 
 /** Selectors */
+
+function hasFetchedAnnotations(state) {
+  return state.activity.hasFetchedAnnotations;
+}
 
 /**
  * Return true when annotations are actively being fetched.
@@ -173,6 +182,7 @@ export default {
   },
 
   selectors: {
+    hasFetchedAnnotations,
     isLoading,
     isFetchingAnnotations,
     isSavingAnnotation,
