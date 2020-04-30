@@ -519,6 +519,21 @@ function getSelectedAnnotationMap(state) {
   return state.selection.selectedAnnotationMap;
 }
 
+/**
+ * Is any sort of filtering currently applied to the list of annotations? This
+ * includes a search query, but also if annotations are selected or a user
+ * is focused.
+ *
+ * @return {boolean}
+ */
+const hasAppliedFilter = createSelector(
+  filterQuery,
+  focusModeFocused,
+  hasSelectedAnnotations,
+  (filterQuery, focusModeFocused, hasSelectedAnnotations) =>
+    !!filterQuery || focusModeFocused || hasSelectedAnnotations
+);
+
 export default {
   init: init,
   namespace: 'selection',
@@ -541,7 +556,6 @@ export default {
   },
 
   selectors: {
-    hasSelectedAnnotations,
     expandedThreads,
     filterQuery,
     focusModeFocused,
@@ -553,5 +567,7 @@ export default {
     isAnnotationSelected,
     getFirstSelectedAnnotationId,
     getSelectedAnnotationMap,
+    hasAppliedFilter,
+    hasSelectedAnnotations,
   },
 };
