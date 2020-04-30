@@ -176,7 +176,7 @@ export default function FrameSync($rootScope, $window, store, bridge) {
     });
 
     bridge.on('sidebarOpened', function () {
-      $rootScope.$broadcast('sidebarOpened');
+      store.setSidebarOpened(true);
     });
 
     // These invoke the matching methods by name on the Guests

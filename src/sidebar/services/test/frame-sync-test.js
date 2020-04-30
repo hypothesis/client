@@ -66,6 +66,7 @@ describe('sidebar/services/frame-sync', function () {
         openSidebarPanel: sinon.stub(),
         selectAnnotations: sinon.stub(),
         selectTab: sinon.stub(),
+        setSidebarOpened: sinon.stub(),
         toggleSelectedAnnotations: sinon.stub(),
         updateAnchorStatus: sinon.stub(),
       }
@@ -376,9 +377,10 @@ describe('sidebar/services/frame-sync', function () {
   });
 
   describe('on "sidebarOpened" message', function () {
-    it('broadcasts a sidebarOpened event', function () {
+    it('sets the sidebar open in the store', function () {
       fakeBridge.emit('sidebarOpened');
-      assert.calledWith($rootScope.$broadcast, 'sidebarOpened');
+
+      assert.calledWith(fakeStore.setSidebarOpened, true);
     });
   });
 
