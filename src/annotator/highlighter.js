@@ -1,3 +1,5 @@
+import { closest } from './util/dom';
+
 const SVG_NAMESPACE = 'http://www.w3.org/2000/svg';
 
 function isCSSPropertySupported(property, value) {
@@ -6,20 +8,6 @@ function isCSSPropertySupported(property, value) {
     return false;
   }
   return CSS.supports(property, value);
-}
-
-/**
- * Implementation of `element.closest(selector)`. This is used to support browsers
- * (IE 11) that don't have a native implementation.
- */
-function closest(element, selector) {
-  while (element) {
-    if (element.matches(selector)) {
-      return element;
-    }
-    element = element.parentElement;
-  }
-  return null;
 }
 
 /**

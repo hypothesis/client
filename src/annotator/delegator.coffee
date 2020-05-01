@@ -244,7 +244,7 @@ Delegator.natives = do ->
   """
   blur focus focusin focusout load resize scroll unload click dblclick
   mousedown mouseup mousemove mouseover mouseout mouseenter mouseleave
-  change select submit keydown keypress keyup error
+  change select submit keydown keypress keyup error touchstart
   """.split(/[^a-z]+/).concat(specials)
 
 
