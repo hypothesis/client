@@ -1,20 +1,26 @@
 import * as util from '../util';
 
+/**
+ * A dummy profile returned by the `profile` selector before the real profile
+ * is fetched.
+ */
+const initialProfile = {
+  /** A map of features that are enabled for the current user. */
+  features: {},
+  /** A map of preference names and values. */
+  preferences: {},
+  /**
+   * The authenticated user ID or null if the user is not logged in.
+   */
+  userid: null,
+};
+
 function init() {
   return {
     /**
      * Profile object fetched from the `/api/profile` endpoint.
      */
-    profile: {
-      /** A map of features that are enabled for the current user. */
-      features: {},
-      /** A map of preference names and values. */
-      preferences: {},
-      /**
-       * The authenticated user ID or null if the user is not logged in.
-       */
-      userid: null,
-    },
+    profile: initialProfile,
   };
 }
 
@@ -59,9 +65,21 @@ function isFeatureEnabled(state, feature) {
 }
 
 /**
+ * Return true if the user's profile has been fetched. This can be used to
+ * distinguish the dummy profile returned by `profile()` on startup from a
+ * logged-out user profile returned by the server.
+ */
+function hasFetchedProfile(state) {
+  return state.session.profile !== initialProfile;
+}
+
+/**
  * Return the user's profile.
  *
  * Returns the current user's profile fetched from the `/api/profile` endpoint.
+ *
+ * If the profile has not yet been fetched yet, a dummy logged-out profile is
+ * returned. This allows code to skip a null check.
  */
 function profile(state) {
   return state.session.profile;
@@ -77,6 +95,7 @@ export default {
   },
 
   selectors: {
+    hasFetchedProfile,
     isFeatureEnabled,
     isLoggedIn,
     profile,

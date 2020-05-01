@@ -28,6 +28,38 @@ describe('sidebar/store/modules/session', function () {
     });
   });
 
+  describe('#isFeatureEnabled', () => {
+    it('returns false before features have been fetched', () => {
+      assert.isFalse(store.isFeatureEnabled('some_feature'));
+    });
+
+    it('returns false if feature is unknown', () => {
+      store.updateProfile({ userid: null, features: {} });
+      assert.isFalse(store.isFeatureEnabled('some_feature'));
+    });
+
+    [true, false].forEach(enabled => {
+      it('returns feature flag state if profile is fetched and feature exists', () => {
+        store.updateProfile({
+          userid: null,
+          features: { some_feature: enabled },
+        });
+        assert.equal(store.isFeatureEnabled('some_feature'), enabled);
+      });
+    });
+  });
+
+  describe('#hasFetchedProfile', () => {
+    it('returns false before profile is updated', () => {
+      assert.isFalse(store.hasFetchedProfile());
+    });
+
+    it('returns true after profile is updated', () => {
+      store.updateProfile({ userid: 'john' });
+      assert.isTrue(store.hasFetchedProfile());
+    });
+  });
+
   describe('#profile', () => {
     it("returns the user's profile", () => {
       store.updateProfile({ userid: 'john' });

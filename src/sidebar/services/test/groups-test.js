@@ -1,4 +1,3 @@
-import events from '../../events';
 import fakeReduxStore from '../../test/fake-redux-store';
 import groups, { $imports } from '../groups';
 import { waitFor } from '../../../test-util/wait';
@@ -45,7 +44,6 @@ describe('groups', function () {
   let fakeSession;
   let fakeSettings;
   let fakeApi;
-  let fakeRootScope;
   let fakeServiceUrl;
   let fakeMetadata;
   let fakeToastMessenger;
@@ -83,6 +81,7 @@ describe('groups', function () {
         focusedGroupId: sinon.stub(),
         getDefault: sinon.stub(),
         getGroup: sinon.stub(),
+        hasFetchedProfile: sinon.stub().returns(false),
         loadGroups: sinon.stub(),
         newAnnotations: sinon.stub().returns([]),
         allGroups() {
@@ -97,25 +96,11 @@ describe('groups', function () {
         setDefault: sinon.stub(),
         setDirectLinkedGroupFetchFailed: sinon.stub(),
         clearDirectLinkedGroupFetchFailed: sinon.stub(),
+        profile: sinon.stub().returns({ userid: null }),
       }
     );
     fakeSession = sessionWithThreeGroups();
     fakeIsSidebar = true;
-    fakeRootScope = {
-      eventCallbacks: {},
-
-      $apply: function (callback) {
-        callback();
-      },
-
-      $on: function (event, callback) {
-        if (event === events.USER_CHANGED) {
-          this.eventCallbacks[event] = callback;
-        }
-      },
-
-      $broadcast: sinon.stub(),
-    };
     fakeApi = {
       annotation: {
         get: sinon.stub(),
@@ -150,7 +135,6 @@ describe('groups', function () {
 
   function service() {
     return groups(
-      fakeRootScope,
       fakeStore,
       fakeApi,
       fakeIsSidebar,
@@ -810,13 +794,35 @@ describe('groups', function () {
     });
   });
 
-  describe('automatic re-fetching', function () {
-    it('refetches groups when the logged-in user changes', () => {
-      service();
+  const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
-      return fakeRootScope.eventCallbacks[events.USER_CHANGED]().then(() => {
-        assert.calledOnce(fakeApi.groups.list);
-      });
+  describe('automatic re-fetching', function () {
+    it('refetches groups when the logged-in user changes', async () => {
+      const svc = service();
+
+      // Load groups before profile fetch has completed.
+      fakeStore.hasFetchedProfile.returns(false);
+      await svc.load();
+
+      // Simulate initial fetch of profile finishing. This should be ignored.
+      fakeApi.groups.list.resetHistory();
+      fakeStore.hasFetchedProfile.returns(true);
+      fakeStore.profile.returns({ userid: 'acct:firstuser@hypothes.is' });
+      fakeStore.setState({}); // Notify store subscribers.
+
+      // Wait briefly, as there are a few async steps before the group fetch
+      // from the API starts, if it is going to happen.
+      await delay(1);
+      assert.notCalled(fakeApi.groups.list);
+
+      // Simulate user logging out (or logging in). This should trigger a re-fetching
+      // of groups.
+      fakeStore.hasFetchedProfile.returns(true);
+      fakeStore.profile.returns({ userid: 'acct:otheruser@hypothes.is' });
+      fakeStore.setState({});
+
+      await waitFor(() => fakeApi.groups.list.callCount > 0);
+      assert.calledOnce(fakeApi.groups.list);
     });
 
     context('when a new frame connects', () => {
@@ -858,7 +864,9 @@ describe('groups', function () {
           ],
         });
 
-        await new Promise(resolve => setTimeout(resolve, 1));
+        // Wait briefly, as there are a few async steps before the group fetch
+        // from the API starts, if it is going to happen.
+        await delay(1);
         assert.notCalled(fakeApi.groups.list);
       });
     });
