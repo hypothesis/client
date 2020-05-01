@@ -144,10 +144,6 @@ export default function FrameSync($rootScope, $window, store, bridge) {
     let anchoringStatusUpdates = {};
     const scheduleAnchoringStatusUpdate = debounce(() => {
       store.updateAnchorStatus(anchoringStatusUpdates);
-      $rootScope.$broadcast(
-        events.ANNOTATIONS_SYNCED,
-        Object.keys(anchoringStatusUpdates)
-      );
       anchoringStatusUpdates = {};
     }, 10);
 

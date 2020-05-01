@@ -19,7 +19,4 @@ export default {
 
   /** A new annotation has been created locally. */
   BEFORE_ANNOTATION_CREATED: 'beforeAnnotationCreated',
-
-  /** Annotations were anchored in a connected document. */
-  ANNOTATIONS_SYNCED: 'sync',
 };

@@ -306,14 +306,6 @@ describe('sidebar/services/frame-sync', function () {
         t2: 'orphan',
       });
     });
-
-    it('emits an ANNOTATIONS_SYNCED event', function () {
-      fakeBridge.emit('sync', [{ tag: 't1', msg: { $orphan: false } }]);
-      expireDebounceTimeout();
-      assert.calledWith($rootScope.$broadcast, events.ANNOTATIONS_SYNCED, [
-        't1',
-      ]);
-    });
   });
 
   context('when a new frame connects', function () {
