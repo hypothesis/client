@@ -808,8 +808,10 @@ describe('groups', function () {
       fakeApi.groups.list.resetHistory();
       fakeStore.hasFetchedProfile.returns(true);
       fakeStore.profile.returns({ userid: 'acct:firstuser@hypothes.is' });
-      fakeStore.setState({});
+      fakeStore.setState({}); // Notify store subscribers.
 
+      // Wait briefly, as there are a few async steps before the group fetch
+      // from the API starts, if it is going to happen.
       await delay(1);
       assert.notCalled(fakeApi.groups.list);
 
@@ -862,6 +864,8 @@ describe('groups', function () {
           ],
         });
 
+        // Wait briefly, as there are a few async steps before the group fetch
+        // from the API starts, if it is going to happen.
         await delay(1);
         assert.notCalled(fakeApi.groups.list);
       });
