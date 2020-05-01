@@ -35,7 +35,7 @@ function Tutorial({ settings }) {
   return (
     <ol className="tutorial__list">
       <li className="tutorial__item">
-        To create an annotation, select text and click the{' '}
+        To create an annotation, select text and then select the{' '}
         <TutorialInstruction iconName="annotate" commandName="Annotate" />{' '}
         button.
       </li>
@@ -48,7 +48,7 @@ function Tutorial({ settings }) {
         >
           visible only to you
         </a>
-        ), select text and click the{' '}
+        ), select text and then select the{' '}
         <TutorialInstruction iconName="highlight" commandName="Highlight" />{' '}
         button.
       </li>
@@ -67,7 +67,7 @@ function Tutorial({ settings }) {
         </li>
       )}
       <li className="tutorial__item">
-        To reply to an annotation, click the{' '}
+        To reply to an annotation, select the{' '}
         <TutorialInstruction iconName="reply" commandName="Reply" /> button.
       </li>
     </ol>
