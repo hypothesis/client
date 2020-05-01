@@ -4,7 +4,7 @@ import * as util from '../util';
  * A dummy profile returned by the `profile` selector before the real profile
  * is fetched.
  */
-const blankProfile = {
+const initialProfile = {
   /** A map of features that are enabled for the current user. */
   features: {},
   /** A map of preference names and values. */
@@ -20,7 +20,7 @@ function init() {
     /**
      * Profile object fetched from the `/api/profile` endpoint.
      */
-    profile: null,
+    profile: initialProfile,
   };
 }
 
@@ -50,8 +50,7 @@ function updateProfile(profile) {
  * @param {object} state - The application state
  */
 function isLoggedIn(state) {
-  const profile = state.session.profile;
-  return profile !== null && profile.userid !== null;
+  return state.session.profile.userid !== null;
 }
 
 /**
@@ -62,8 +61,7 @@ function isLoggedIn(state) {
  *        name of the feature flag as declared in the Hypothesis service.
  */
 function isFeatureEnabled(state, feature) {
-  const profile = state.session.profile;
-  return profile !== null && !!profile.features[feature];
+  return !!state.session.profile.features[feature];
 }
 
 /**
@@ -72,7 +70,7 @@ function isFeatureEnabled(state, feature) {
  * logged-out user profile returned by the server.
  */
 function hasFetchedProfile(state) {
-  return state.session.profile !== null;
+  return state.session.profile !== initialProfile;
 }
 
 /**
@@ -84,7 +82,7 @@ function hasFetchedProfile(state) {
  * returned. This allows code to skip a null check.
  */
 function profile(state) {
-  return state.session.profile || blankProfile;
+  return state.session.profile;
 }
 
 export default {
