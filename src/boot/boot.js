@@ -112,14 +112,12 @@ function bootSidebarApp(doc, config) {
 
     // Vendor code required by sidebar.bundle.js
     'scripts/sentry.bundle.js',
-    'scripts/angular.bundle.js',
     'scripts/katex.bundle.js',
     'scripts/showdown.bundle.js',
 
     // The sidebar app
     'scripts/sidebar.bundle.js',
 
-    'styles/angular-csp.css',
     'styles/katex.min.css',
     'styles/sidebar.css',
   ]);

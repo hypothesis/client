@@ -41,12 +41,10 @@ describe('bootstrap', function () {
 
       // Sidebar app
       'scripts/sentry.bundle.js',
-      'scripts/angular.bundle.js',
       'scripts/katex.bundle.js',
       'scripts/showdown.bundle.js',
       'scripts/sidebar.bundle.js',
 
-      'styles/angular-csp.css',
       'styles/katex.min.css',
       'styles/sidebar.css',
     ];
@@ -146,12 +144,10 @@ describe('bootstrap', function () {
     it('loads assets for the sidebar application', function () {
       runBoot();
       const expectedAssets = [
-        'scripts/angular.bundle.1234.js',
         'scripts/katex.bundle.1234.js',
         'scripts/sentry.bundle.1234.js',
         'scripts/showdown.bundle.1234.js',
         'scripts/sidebar.bundle.1234.js',
-        'styles/angular-csp.1234.css',
         'styles/katex.min.1234.css',
         'styles/sidebar.1234.css',
       ].map(assetUrl);
