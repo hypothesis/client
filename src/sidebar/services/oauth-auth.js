@@ -257,7 +257,10 @@ export default function auth(
    * then exchange for access and refresh tokens.
    */
   function login() {
-    const authWindow = OAuthClient.openAuthPopupWindow($window);
+    const authWindow =
+      settings.appType !== 'firefox-extension'
+        ? OAuthClient.openAuthPopupWindow($window)
+        : null;
     return oauthClient()
       .then(client => {
         return client.authorize($window, authWindow);
