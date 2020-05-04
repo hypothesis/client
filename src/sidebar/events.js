@@ -5,8 +5,6 @@
 export default {
   // Session state changes
 
-  /** The logged-in user changed */
-  USER_CHANGED: 'userChanged',
   /**
    * API tokens were fetched and saved to local storage by another client
    * instance.

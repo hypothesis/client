@@ -113,10 +113,6 @@ export default function session(
     lastLoadTime = Date.now();
 
     if (userChanged) {
-      $rootScope.$broadcast(events.USER_CHANGED, {
-        profile: model,
-      });
-
       // Associate error reports with the current user in Sentry.
       if (model.userid) {
         sentry.setUserInfo({

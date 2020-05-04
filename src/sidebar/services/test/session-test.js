@@ -198,15 +198,6 @@ describe('sidebar/services/session', function () {
   });
 
   describe('#update()', function () {
-    it('broadcasts USER_CHANGED when the user changes', function () {
-      const userChangeCallback = sinon.stub();
-      $rootScope.$on(events.USER_CHANGED, userChangeCallback);
-      session.update({
-        userid: 'fred',
-      });
-      assert.calledOnce(userChangeCallback);
-    });
-
     it('updates the user ID for Sentry error reports', function () {
       session.update({
         userid: 'anne',
