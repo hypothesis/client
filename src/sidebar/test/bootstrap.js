@@ -5,9 +5,6 @@ sinon.assert.expose(assert, { prefix: null });
 import { patch } from '../../test-util/assert-methods';
 patch(assert);
 
-import 'angular';
-import 'angular-mocks';
-
 // Configure Enzyme for UI tests.
 import 'preact/debug';
 

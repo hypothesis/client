@@ -21,18 +21,8 @@ if (appConfig.sentry) {
   sentry.init(appConfig.sentry);
 }
 
-// Disable Angular features that are not compatible with CSP.
-//
-// See https://docs.angularjs.org/api/ng/directive/ngCsp
-//
-// The `ng-csp` attribute must be set on some HTML element in the document
-// _before_ Angular is require'd for the first time.
-document.body.setAttribute('ng-csp', '');
-
 // Prevent tab-jacking.
 disableOpenerForExternalLinks(document.body);
-
-import angular from 'angular';
 
 // Load polyfill for :focus-visible pseudo-class.
 import 'focus-visible';
@@ -41,8 +31,6 @@ import 'focus-visible';
 if (process.env.NODE_ENV !== 'production') {
   require('preact/debug');
 }
-
-import wrapReactComponent from './util/wrap-react-component';
 
 if (appConfig.googleAnalytics) {
   addAnalytics(appConfig.googleAnalytics);
@@ -100,29 +88,24 @@ function autosave(autosaveService) {
   autosaveService.init();
 }
 
+// @ngInject
+function setupFrameSync(frameSync) {
+  if (isSidebar) {
+    frameSync.connect();
+  }
+}
+
 // Register icons used by the sidebar app (and maybe other assets in future).
 import { registerIcons } from '../shared/components/svg-icon';
 import iconSet from './icons';
 registerIcons(iconSet);
 
-// Preact UI components that are wrapped for use within Angular templates.
-
-import AnnotationViewerContent from './components/annotation-viewer-content';
-import HelpPanel from './components/help-panel';
-import LoginPromptPanel from './components/login-prompt-panel';
-import ShareAnnotationsPanel from './components/share-annotations-panel';
-import SidebarContent from './components/sidebar-content';
-import StreamContent from './components/stream-content';
-import ThreadList from './components/thread-list';
-import ToastMessages from './components/toast-messages';
-import TopBar from './components/top-bar';
-
-// Remaining UI components that are still built with Angular.
-
-import hypothesisApp from './components/hypothesis-app';
+// The entry point component for the app.
+import { createElement, render } from 'preact';
+import HypothesisApp from './components/hypothesis-app';
+import { ServiceContext } from './util/service-context';
 
 // Services.
-
 import bridgeService from '../shared/bridge';
 
 import analyticsService from './services/analytics';
@@ -151,18 +134,13 @@ import unicodeService from './services/unicode';
 import viewFilterService from './services/view-filter';
 
 // Redux store.
-
 import store from './store';
 
 // Utilities.
-
 import { Injector } from '../shared/injector';
+import EventEmitter from 'tiny-emitter';
 
-function startAngularApp(config) {
-  // Create dependency injection container for services.
-  //
-  // This is a replacement for the use of Angular's dependency injection
-  // (including its `$injector` service) to construct services with dependencies.
+function startApp(config) {
   const container = new Injector();
 
   // Register services.
@@ -194,6 +172,15 @@ function startAngularApp(config) {
     .register('viewFilter', viewFilterService)
     .register('store', store);
 
+  // Register a dummy `$rootScope` pub-sub service for services that still
+  // use it.
+  const emitter = new EventEmitter();
+  const dummyRootScope = {
+    $on: (event, callback) => emitter.on(event, data => callback({}, data)),
+    $broadcast: (event, data) => emitter.emit(event, data),
+  };
+  container.register('$rootScope', { value: dummyRootScope });
+
   // Register utility values/classes.
   //
   // nb. In many cases these can be replaced by direct imports in the services
@@ -203,92 +190,23 @@ function startAngularApp(config) {
     .register('isSidebar', { value: isSidebar })
     .register('settings', { value: config });
 
-  // Register services which only Angular can construct, once Angular has
-  // constructed them.
-  //
-  // @ngInject
-  function registerAngularServices($rootScope) {
-    container.register('$rootScope', { value: $rootScope });
-  }
+  // Initialize services.
+  container.run(persistDefaults);
+  container.run(autosave);
+  container.run(sendPageView);
+  container.run(setupApi);
+  container.run(setupRoute);
+  container.run(startRPCServer);
+  container.run(setupFrameSync);
 
-  // Run initialization logic that uses constructed services.
-  //
-  // @ngInject
-  function initServices() {
-    container.run(persistDefaults);
-    container.run(autosave);
-    container.run(sendPageView);
-    container.run(setupApi);
-    container.run(setupRoute);
-    container.run(startRPCServer);
-  }
-
-  const wrapComponent = component => wrapReactComponent(component, container);
-
-  angular
-    .module('h', [])
-
-    // The root component for the application
-    .component('hypothesisApp', hypothesisApp)
-
-    // UI components
-    .component(
-      'annotationViewerContent',
-      wrapComponent(AnnotationViewerContent)
-    )
-    .component('helpPanel', wrapComponent(HelpPanel))
-    .component('loginPromptPanel', wrapComponent(LoginPromptPanel))
-    .component('sidebarContent', wrapComponent(SidebarContent))
-    .component('shareAnnotationsPanel', wrapComponent(ShareAnnotationsPanel))
-    .component('streamContent', wrapComponent(StreamContent))
-    .component('threadList', wrapComponent(ThreadList))
-    .component('toastMessages', wrapComponent(ToastMessages))
-    .component('topBar', wrapComponent(TopBar))
-
-    // Register services, the store and utilities with Angular, so that
-    // Angular components can use them.
-    .service('analytics', () => container.get('analytics'))
-    .service('api', () => container.get('api'))
-    .service('auth', () => container.get('auth'))
-    .service('bridge', () => container.get('bridge'))
-    .service('features', () => container.get('features'))
-    .service('frameSync', () => container.get('frameSync'))
-    .service('groups', () => container.get('groups'))
-    .service('loadAnnotationsService', () =>
-      container.get('loadAnnotationsService')
-    )
-    .service('rootThread', () => container.get('rootThread'))
-    .service('searchFilter', () => container.get('searchFilter'))
-    .service('serviceUrl', () => container.get('serviceUrl'))
-    .service('session', () => container.get('session'))
-    .service('streamer', () => container.get('streamer'))
-    .service('streamFilter', () => container.get('streamFilter'))
-    .service('toastMessenger', () => container.get('toastMessenger'))
-
-    // Redux store
-    .service('store', () => container.get('store'))
-
-    // Utilities
-    .value('isSidebar', container.get('isSidebar'))
-    .value('settings', container.get('settings'))
-
-    // Make Angular built-ins available to services constructed by `container`.
-    .run(registerAngularServices)
-    .run(initServices);
-
-  // Work around a check in Angular's $sniffer service that causes it to
-  // incorrectly determine that Firefox extensions are Chrome Packaged Apps which
-  // do not support the HTML 5 History API. This results Angular redirecting the
-  // browser on startup and thus the app fails to load.
-  // See https://github.com/angular/angular.js/blob/a03b75c6a812fcc2f616fc05c0f1710e03fca8e9/src/ng/sniffer.js#L30
-  if (window.chrome && !window.chrome.app) {
-    window.chrome.app = {
-      dummyAddedByHypothesisClient: true,
-    };
-  }
-
+  // Render the UI.
   const appEl = document.querySelector('hypothesis-app');
-  angular.bootstrap(appEl, ['h'], { strictDi: true });
+  render(
+    <ServiceContext.Provider value={container}>
+      <HypothesisApp />
+    </ServiceContext.Provider>,
+    appEl
+  );
 }
 
 // Start capturing RPC requests before we start the RPC server (startRPCServer)
@@ -296,11 +214,10 @@ preStartRPCServer();
 
 fetchConfig(appConfig)
   .then(config => {
-    startAngularApp(config);
+    startApp(config);
   })
   .catch(err => {
     // Report error. This will be the only notice that the user gets because the
-    // sidebar does not currently appear at all if the Angular app fails to
-    // start.
+    // sidebar does not currently appear at all if the app fails to start.
     console.error('Failed to start Hypothesis client: ', err);
   });

@@ -19,7 +19,6 @@ const fixtures = immutable({
 
 describe('store', function () {
   let store;
-  let fakeRootScope;
 
   function tagForID(id) {
     const storeAnn = store.findAnnotationByID(id);
@@ -30,8 +29,7 @@ describe('store', function () {
   }
 
   beforeEach(function () {
-    fakeRootScope = { $applyAsync: sinon.stub() };
-    store = storeFactory(fakeRootScope, {});
+    store = storeFactory({});
   });
 
   describe('initialization', function () {
@@ -41,14 +39,14 @@ describe('store', function () {
     });
 
     it('sets the selection when settings.annotations is set', function () {
-      store = storeFactory(fakeRootScope, { annotations: 'testid' });
+      store = storeFactory({ annotations: 'testid' });
       assert.deepEqual(store.getSelectedAnnotationMap(), {
         testid: true,
       });
     });
 
     it('expands the selected annotations when settings.annotations is set', function () {
-      store = storeFactory(fakeRootScope, { annotations: 'testid' });
+      store = storeFactory({ annotations: 'testid' });
       assert.deepEqual(store.expandedThreads(), {
         testid: true,
       });

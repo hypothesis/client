@@ -155,7 +155,6 @@ const cssBundles = [
   './src/styles/sidebar/sidebar.scss',
 
   // Vendor
-  './src/styles/vendor/angular-csp.css',
   './src/styles/vendor/icomoon.css',
   './node_modules/katex/dist/katex.min.css',
 ];
