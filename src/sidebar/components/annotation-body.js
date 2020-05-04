@@ -39,7 +39,7 @@ export default function AnnotationBody({
   const showTagList = !isEditing && tags.length > 0;
 
   return (
-    <section className="annotation-body">
+    <div className="annotation-body">
       {showExcerpt && (
         <Excerpt
           collapse={isCollapsed}
@@ -78,7 +78,7 @@ export default function AnnotationBody({
       )}
       {showTagList && <TagList annotation={annotation} tags={tags} />}
       {isEditing && <TagEditor onEditTags={onEditTags} tagList={tags} />}
-    </section>
+    </div>
   );
 }
 
