@@ -15,11 +15,7 @@
     <main ng-if="vm.route()">
       <annotation-viewer-content ng-if="vm.route() == 'annotation'"></annotation-viewer-content>
       <stream-content ng-if="vm.route() == 'stream'"></stream-content>
-      <sidebar-content
-        ng-if="vm.route() == 'sidebar'"
-        auth="vm.auth"
-        on-login="vm.login()"
-        on-sign-up="vm.signUp()"></sidebar-content>
+      <sidebar-content ng-if="vm.route() == 'sidebar'" on-login="vm.login()" on-signUp="vm.signUp()"></sidebar-content>
     </main>
   </div>
 </div>

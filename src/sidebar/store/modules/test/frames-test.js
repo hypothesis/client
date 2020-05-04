@@ -157,7 +157,12 @@ describe('sidebar/store/modules/frames', function () {
         testCase.frames.forEach(frame => {
           store.connectFrame(frame);
         });
-        assert.deepEqual(store.searchUris(), testCase.searchUris);
+        const firstResults = store.searchUris();
+        const secondResults = store.searchUris();
+        assert.deepEqual(firstResults, testCase.searchUris);
+        // The selector is memoized and should return the same Array reference
+        // assuming the list of search URIs hasn't changed
+        assert.equal(firstResults, secondResults);
       });
     });
   });

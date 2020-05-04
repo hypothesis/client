@@ -62,6 +62,34 @@ describe('sidebar/store/modules/selection', () => {
     });
   });
 
+  describe('hasAppliedFilter', () => {
+    it('returns true if there is a search query set', () => {
+      store.setFilterQuery('foobar');
+
+      assert.isTrue(store.hasAppliedFilter());
+    });
+
+    it('returns true if in user-focused mode', () => {
+      store = createStore([selection], [{ focus: { user: {} } }]);
+      store.setFocusModeFocused(true);
+
+      assert.isTrue(store.hasAppliedFilter());
+    });
+
+    it('returns true if there are selected annotations', () => {
+      store.selectAnnotations([1]);
+
+      assert.isTrue(store.hasAppliedFilter());
+    });
+
+    it('returns false after selection is cleared', () => {
+      store.setFilterQuery('foobar');
+      store.clearSelection();
+
+      assert.isFalse(store.hasAppliedFilter());
+    });
+  });
+
   describe('hasSelectedAnnotations', function () {
     it('returns true if there are any selected annotations', function () {
       store.selectAnnotations([1]);

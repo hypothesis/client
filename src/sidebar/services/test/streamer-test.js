@@ -1,5 +1,6 @@
 import EventEmitter from 'tiny-emitter';
 
+import fakeReduxStore from '../../test/fake-redux-store';
 import Streamer from '../streamer';
 import { $imports } from '../streamer';
 
@@ -43,12 +44,14 @@ const fixtures = {
 
 // the most recently created FakeSocket instance
 let fakeWebSocket = null;
+let fakeWebSockets = [];
 
 class FakeSocket extends EventEmitter {
   constructor(url) {
     super();
 
     fakeWebSocket = this; // eslint-disable-line consistent-this
+    fakeWebSockets.push(this);
 
     this.url = url;
     this.messages = [];
@@ -95,19 +98,22 @@ describe('Streamer', function () {
       },
     };
 
-    fakeStore = {
-      addAnnotations: sinon.stub(),
-      annotationExists: sinon.stub().returns(false),
-      clearPendingUpdates: sinon.stub(),
-      pendingUpdates: sinon.stub().returns({}),
-      pendingDeletions: sinon.stub().returns({}),
-      profile: sinon.stub().returns({
-        userid: 'jim@hypothes.is',
-      }),
-      receiveRealTimeUpdates: sinon.stub(),
-      removeAnnotations: sinon.stub(),
-      route: sinon.stub().returns('sidebar'),
-    };
+    fakeStore = fakeReduxStore(
+      {},
+      {
+        addAnnotations: sinon.stub(),
+        annotationExists: sinon.stub().returns(false),
+        clearPendingUpdates: sinon.stub(),
+        pendingUpdates: sinon.stub().returns({}),
+        pendingDeletions: sinon.stub().returns({}),
+        profile: sinon.stub().returns({
+          userid: 'jim@hypothes.is',
+        }),
+        receiveRealTimeUpdates: sinon.stub(),
+        removeAnnotations: sinon.stub(),
+        route: sinon.stub().returns('sidebar'),
+      }
+    );
 
     fakeGroups = {
       focused: sinon.stub().returns({ id: 'public' }),
@@ -130,6 +136,7 @@ describe('Streamer', function () {
   afterEach(function () {
     $imports.$restore();
     activeStreamer = null;
+    fakeWebSockets = [];
   });
 
   it('should not create a websocket connection if websocketUrl is not provided', function () {
@@ -243,6 +250,47 @@ describe('Streamer', function () {
           assert.ok(oldWebSocket.didClose);
           assert.ok(!fakeWebSocket.didClose);
         });
+    });
+  });
+
+  describe('Automatic reconnection', function () {
+    function delay(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    it('should reconnect when user changes', function () {
+      let oldWebSocket;
+      createDefaultStreamer();
+
+      return activeStreamer
+        .connect()
+        .then(function () {
+          oldWebSocket = fakeWebSocket;
+          fakeStore.profile.returns({ userid: 'somebody' });
+          return fakeStore.setState({});
+        })
+        .then(function () {
+          assert.ok(oldWebSocket.didClose);
+          assert.ok(!fakeWebSocket.didClose);
+        });
+    });
+
+    it('should only set up auto-reconnect once', async () => {
+      createDefaultStreamer();
+      // This should register auto-reconnect
+      await activeStreamer.connect();
+      // Call connect again: this should not "re-register" auto-reconnect
+      await activeStreamer.connect();
+
+      // This should trigger auto-reconnect, but only once, proving that
+      // only one registration happened
+      fakeStore.profile.returns({ userid: 'somebody' });
+      fakeStore.setState({});
+
+      await delay(1);
+      // Total number of web sockets blown through in this test should be 2
+      // 3+ would indicate `reconnect` fired more than once
+      assert.lengthOf(fakeWebSockets, 2);
     });
   });
 

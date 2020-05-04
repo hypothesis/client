@@ -144,10 +144,6 @@ export default function FrameSync($rootScope, $window, store, bridge) {
     let anchoringStatusUpdates = {};
     const scheduleAnchoringStatusUpdate = debounce(() => {
       store.updateAnchorStatus(anchoringStatusUpdates);
-      $rootScope.$broadcast(
-        events.ANNOTATIONS_SYNCED,
-        Object.keys(anchoringStatusUpdates)
-      );
       anchoringStatusUpdates = {};
     }, 10);
 
@@ -176,7 +172,7 @@ export default function FrameSync($rootScope, $window, store, bridge) {
     });
 
     bridge.on('sidebarOpened', function () {
-      $rootScope.$broadcast('sidebarOpened');
+      store.setSidebarOpened(true);
     });
 
     // These invoke the matching methods by name on the Guests
