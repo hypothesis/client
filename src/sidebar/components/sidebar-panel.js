@@ -55,7 +55,7 @@ export default function SidebarPanel({
               <SvgIcon name={icon} title={title} />
             </div>
           )}
-          <div className="sidebar-panel__title u-stretch">{title}</div>
+          <h2 className="sidebar-panel__title u-stretch">{title}</h2>
           <div>
             <Button
               icon="cancel"
