@@ -1,21 +1,5 @@
 @use '../variables' as var;
-
-// Hide content from sighted users but make it visible to screen readers.
-//
-// Resources:
-// - https://webaim.org/techniques/css/invisiblecontent/ (see "CSS clip")
-// - https://cloudfour.com/thinks/see-no-evil-hidden-content-and-accessibility/#showing-additional-content-for-screen-readers
-@mixin screen-reader-only {
-  // Take the content out of the normal layout flow.
-  position: absolute;
-
-  // Visually hide the content and prevent it from interfering with mouse/touch
-  // text selection by clipping it to an empty box. Compared to moving content with
-  // `top`/`left` this is less likely to cause the browser to scroll to a
-  // different part of the page when the hidden text has screen-reader focus.
-  clip: rect(0 0 0 0);
-  overflow: hidden;
-}
+@use "../mixins/a11y";
 
 // SVG highlights when the "Show Highlights" toggle is turned off.
 .hypothesis-svg-highlight {
@@ -47,14 +31,14 @@
     // Make highlights visible to screen readers.
     // See also - https://developer.paciellogroup.com/blog/2017/12/short-note-on-making-your-mark-more-accessible/.
     &::before {
-      @include screen-reader-only;
+      @include a11y.screen-reader-only;
 
       // nb. The leading/trailing spaces are intended to ensure the text is treated
       // as separate words by assisitve technologies from the content before/after it.
       content: ' annotation start ';
     }
     &::after {
-      @include screen-reader-only;
+      @include a11y.screen-reader-only;
       content: ' annotation end ';
     }
 
