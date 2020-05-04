@@ -342,7 +342,7 @@ export default function groups(
     // metadata on them that will be used elsewhere in the app.
     const isLoggedIn = token !== null;
     const groups = await filterGroups(
-      combineGroups(myGroups, featuredGroups, documentUri),
+      combineGroups(myGroups, featuredGroups, documentUri, settings),
       isLoggedIn,
       directLinkedAnnotationGroupId,
       directLinkedGroupId

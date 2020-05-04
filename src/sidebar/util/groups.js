@@ -1,4 +1,25 @@
 import escapeStringRegexp from 'escape-string-regexp';
+import serviceConfig from '../service-config';
+
+/**
+ * Returns the value for allowLeavingGroups from the service config
+ * settings. By default this value is true. In that case, it is
+ * intended that groups can be left if they are private. If this
+ * value returns false, then the user can not leave any groups.
+ *
+ * @param {object} settings
+ * @return {boolean}
+ */
+function allowLeavingGroups(settings) {
+  const serviceConfig_ = serviceConfig(settings);
+  if (serviceConfig_ === null) {
+    return true;
+  }
+  if (typeof serviceConfig_.allowLeavingGroups !== 'boolean') {
+    return true;
+  }
+  return serviceConfig_.allowLeavingGroups;
+}
 
 /**
  * Combine groups from multiple api calls together to form a unique list of groups.
@@ -9,8 +30,9 @@ import escapeStringRegexp from 'escape-string-regexp';
  * @param {Group[]} userGroups - groups the user is a member of
  * @param {Group[]} featuredGroups - all other groups, may include some duplicates from the userGroups
  * @param {string} uri - uri of the current page
+ * @param {object} settings - The settings object.
  */
-export function combineGroups(userGroups, featuredGroups, uri) {
+export function combineGroups(userGroups, featuredGroups, uri, settings) {
   const worldGroup = featuredGroups.find(g => g.id === '__world__');
   if (worldGroup) {
     userGroups.unshift(worldGroup);
@@ -19,9 +41,22 @@ export function combineGroups(userGroups, featuredGroups, uri) {
   const myGroupIds = userGroups.map(g => g.id);
   featuredGroups = featuredGroups.filter(g => !myGroupIds.includes(g.id));
 
+  // Set the `canLeave` property. Groups can be left if they are private unless
+  // the global `allowLeavingGroups` value is false in the config settings object.
+  const setCanLeave = group => {
+    group.canLeave = !allowLeavingGroups(settings)
+      ? false
+      : group.type === 'private';
+  };
   // Set the isMember property indicating user membership.
-  featuredGroups.forEach(group => (group.isMember = false));
-  userGroups.forEach(group => (group.isMember = true));
+  featuredGroups.forEach(group => {
+    group.isMember = false;
+    setCanLeave(group);
+  });
+  userGroups.forEach(group => {
+    group.isMember = true;
+    setCanLeave(group);
+  });
 
   const groups = userGroups.concat(featuredGroups);
 
