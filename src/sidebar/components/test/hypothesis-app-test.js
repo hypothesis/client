@@ -138,24 +138,26 @@ describe('HypothesisApp', () => {
     });
   });
 
-  const getAuthState = wrapper => wrapper.find('TopBar').prop('auth');
+  describe('"status" field of "auth" prop passed to children', () => {
+    const getStatus = wrapper => wrapper.find('TopBar').prop('auth').status;
 
-  it('auth state is "unknown" if profile has not yet been fetched', () => {
-    fakeStore.hasFetchedProfile.returns(false);
-    const wrapper = createComponent();
-    assert.equal(getAuthState(wrapper).status, 'unknown');
-  });
+    it('is "unknown" if profile has not yet been fetched', () => {
+      fakeStore.hasFetchedProfile.returns(false);
+      const wrapper = createComponent();
+      assert.equal(getStatus(wrapper), 'unknown');
+    });
 
-  it('auth state is "logged-out" if userid is null', () => {
-    fakeStore.profile.returns({ userid: null });
-    const wrapper = createComponent();
-    assert.equal(getAuthState(wrapper).status, 'logged-out');
-  });
+    it('is "logged-out" if userid is null', () => {
+      fakeStore.profile.returns({ userid: null });
+      const wrapper = createComponent();
+      assert.equal(getStatus(wrapper), 'logged-out');
+    });
 
-  it('auth state is "logged-in" if userid is non-null', () => {
-    fakeStore.profile.returns({ userid: 'acct:jimsmith@hypothes.is' });
-    const wrapper = createComponent();
-    assert.equal(getAuthState(wrapper).status, 'logged-in');
+    it('is "logged-in" if userid is non-null', () => {
+      fakeStore.profile.returns({ userid: 'acct:jimsmith@hypothes.is' });
+      const wrapper = createComponent();
+      assert.equal(getStatus(wrapper), 'logged-in');
+    });
   });
 
   [
@@ -192,10 +194,11 @@ describe('HypothesisApp', () => {
       },
     },
   ].forEach(({ profile, expectedAuth }) => {
-    it('sets auth state depending on profile', () => {
+    it('passes expected "auth" prop to children', () => {
       fakeStore.profile.returns(profile);
       const wrapper = createComponent();
-      assert.deepEqual(getAuthState(wrapper), expectedAuth);
+      const auth = wrapper.find('TopBar').prop('auth');
+      assert.deepEqual(auth, expectedAuth);
     });
   });
 
@@ -277,7 +280,7 @@ describe('HypothesisApp', () => {
       assert.called(fakeToastMessenger.error);
     });
 
-    it('sends LOGIN_REQUESTED if a third-party service is in use', async () => {
+    it('sends LOGIN_REQUESTED event to host page if using a third-party service', async () => {
       // If the client is using a third-party annotation service then clicking
       // on a login button should send the LOGIN_REQUESTED event over the bridge
       // (so that the partner site we're embedded in can do its own login
