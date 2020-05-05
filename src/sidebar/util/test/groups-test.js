@@ -1,8 +1,16 @@
-import { combineGroups } from '../groups';
+import { combineGroups, $imports } from '../groups';
 
 describe('sidebar.util.groups', () => {
+  let fakeServiceConfig;
   describe('combineGroups', () => {
-    it('labels groups in both lists as isMember true', () => {
+    beforeEach(() => {
+      fakeServiceConfig = sinon.stub().returns(null);
+      $imports.$mock({
+        '../service-config': fakeServiceConfig,
+      });
+    });
+
+    it('labels groups in both lists as `isMember` true', () => {
       const userGroups = [{ id: 'groupa', name: 'GroupA' }];
       const featuredGroups = [{ id: 'groupa', name: 'GroupA' }];
       const groups = combineGroups(
@@ -12,6 +20,55 @@ describe('sidebar.util.groups', () => {
       );
       const groupA = groups.find(g => g.id === 'groupa');
       assert.equal(groupA.isMember, true);
+    });
+
+    it('sets `canLeave` to true if a group is private and `allowLeavingGroups` is null', () => {
+      const userGroups = [{ id: 'groupa', name: 'GroupA', type: 'private' }];
+      const featuredGroups = [{ id: 'groupb', name: 'GroupB', type: 'open' }];
+      const groups = combineGroups(
+        userGroups,
+        featuredGroups,
+        'https://foo.com/bar'
+      );
+      const groupA = groups.find(g => g.id === 'groupa');
+      const groupB = groups.find(g => g.id === 'groupb');
+      assert.equal(groupA.canLeave, true);
+      assert.equal(groupB.canLeave, false);
+    });
+
+    it('sets `canLeave` to true if a group is private and `allowLeavingGroups` is not a boolean', () => {
+      fakeServiceConfig.returns({
+        allowLeavingGroups: () => {},
+      });
+      const userGroups = [{ id: 'groupa', name: 'GroupA', type: 'private' }];
+      const featuredGroups = [{ id: 'groupb', name: 'GroupB', type: 'open' }];
+      const groups = combineGroups(
+        userGroups,
+        featuredGroups,
+        'https://foo.com/bar'
+      );
+      const groupA = groups.find(g => g.id === 'groupa');
+      const groupB = groups.find(g => g.id === 'groupb');
+
+      assert.equal(groupA.canLeave, true);
+      assert.equal(groupB.canLeave, false);
+    });
+
+    it('sets `canLeave` to false for all groups if `allowLeavingGroups` is false', () => {
+      fakeServiceConfig.returns({
+        allowLeavingGroups: false,
+      });
+      const userGroups = [{ id: 'groupa', name: 'GroupA', type: 'private' }];
+      const featuredGroups = [{ id: 'groupb', name: 'GroupB', type: 'open' }];
+      const groups = combineGroups(
+        userGroups,
+        featuredGroups,
+        'https://foo.com/bar'
+      );
+      const groupA = groups.find(g => g.id === 'groupa');
+      const groupB = groups.find(g => g.id === 'groupb');
+      assert.equal(groupA.canLeave, false);
+      assert.equal(groupB.canLeave, false);
     });
 
     it('combines groups from both lists uniquely', () => {
@@ -32,7 +89,7 @@ describe('sidebar.util.groups', () => {
       assert.deepEqual(ids, ['__world__', 'groupa', 'groupb']);
     });
 
-    it('adds isMember attribute to each group', () => {
+    it('adds `isMember` attribute to each group', () => {
       const userGroups = [{ id: 'groupa', name: 'GroupA' }];
       const featuredGroups = [
         { id: 'groupb', name: 'GroupB' },

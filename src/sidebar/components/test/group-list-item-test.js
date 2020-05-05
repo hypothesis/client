@@ -26,6 +26,7 @@ describe('GroupListItem', () => {
         enforced: false,
       },
       type: 'private',
+      canLeave: true,
     };
 
     fakeStore = {
@@ -199,6 +200,7 @@ describe('GroupListItem', () => {
   it('does not show submenu toggle if there are no available actions', () => {
     fakeGroup.links.html = null;
     fakeGroup.type = 'open';
+    fakeGroup.canLeave = false;
     const wrapper = createGroupListItem(fakeGroup);
     assert.isFalse(wrapper.find('MenuItem').prop('isExpanded'));
   });
@@ -227,6 +229,7 @@ describe('GroupListItem', () => {
 
   it('does not show "Leave" action if user cannot leave', () => {
     fakeGroup.type = 'open';
+    fakeGroup.canLeave = false;
     const wrapper = createGroupListItem(fakeGroup, {
       isExpanded: true,
     });
