@@ -9,6 +9,7 @@ describe('sidebar.util.groups', () => {
         '../service-config': fakeServiceConfig,
       });
     });
+
     it('labels groups in both lists as `isMember` true', () => {
       const userGroups = [{ id: 'groupa', name: 'GroupA' }];
       const featuredGroups = [{ id: 'groupa', name: 'GroupA' }];

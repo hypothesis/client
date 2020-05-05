@@ -2,23 +2,19 @@ import escapeStringRegexp from 'escape-string-regexp';
 import serviceConfig from '../service-config';
 
 /**
- * Returns the value for allowLeavingGroups from the service config
- * settings. By default this value is true. In that case, it is
- * intended that groups can be left if they are private. If this
- * value returns false, then the user can not leave any groups.
+ * Should users be able to leave private groups of which they
+ * are a member? Users may leave private groups unless
+ * explicitly disallowed in the service configuration of the
+ * `settings` object.
  *
  * @param {object} settings
  * @return {boolean}
  */
 function allowLeavingGroups(settings) {
-  const serviceConfig_ = serviceConfig(settings);
-  if (serviceConfig_ === null) {
-    return true;
-  }
-  if (typeof serviceConfig_.allowLeavingGroups !== 'boolean') {
-    return true;
-  }
-  return serviceConfig_.allowLeavingGroups;
+  const config = serviceConfig(settings) || {};
+  return typeof config.allowLeavingGroups === 'boolean'
+    ? config.allowLeavingGroups
+    : true;
 }
 
 /**
