@@ -1,26 +1,13 @@
-// Variables and mixins
-// --------------------
 @use '../variables' as var with (
   $base-font-size: 12px,
   $base-line-height: 20px
 );
-@use '../mixins/buttons';
-@use '../mixins/focus';
-@use '../mixins/forms';
-@use '../mixins/icons';
-@use '../mixins/responsive';
 
 // Base styles
 // -----------
 @use '../reset';
 @use '../util';
 @use './elements';
-
-// Misc. legacy :(
-// ---------------
-@use '../forms' as forms2;
-@use './styled-text';
-@use './common';
 
 // Components
 // ----------
@@ -39,9 +26,11 @@
 @use './components/button';
 @use './components/excerpt';
 @use './components/focused-mode-header';
+@use './components/form-input';
 @use './components/group-list';
 @use './components/group-list-item';
 @use './components/help-panel';
+@use './components/hypothesis-app';
 @use './components/logged-out-message';
 @use './components/markdown-editor';
 @use './components/markdown-view';
@@ -72,106 +61,14 @@
 
 // Top-level styles
 // ----------------
-html,
-body {
-  height: 100%;
-}
 
 body {
-  background: var.$grey-2;
-  font-family: var.$sans-font-family;
-  font-weight: normal;
-  -webkit-overflow-scrolling: touch;
-}
-
-hypothesis-app {
-  display: block;
   height: 100%;
-}
 
-.app-content-wrapper {
-  $sidebar-h-padding: 9px;
-
-  background: var.$grey-2;
-  min-height: 100%;
-  height: 100%;
-  overflow: scroll;
-  -webkit-overflow-scrolling: touch;
-  padding: $sidebar-h-padding;
-  padding-top: $sidebar-h-padding + var.$top-bar-height;
-
-  @include responsive.respond-to(tablets desktops) {
-    padding-bottom: 4rem;
-  }
-}
-
-.content {
-  margin-left: auto;
-  margin-right: auto;
-
-  @include responsive.respond-to(tablets desktops) {
-    margin: auto;
-    max-width: responsive.$break-tablet;
-    padding-left: 4rem;
-    padding-right: 4rem;
-  }
-}
-
-// Disable scroll anchoring as it interferes with `ThreadList` and
-// `visible-threads` calculations and can cause a render loop
-.js-thread-list-scroll-root {
-  overflow-anchor: none;
-}
-
-// Elements in root template (viewer.html)
-// ---------------------------------------
-
-.sheet {
-  border: solid 1px var.$grey-3;
-  border-radius: 2px;
-  font-family: var.$sans-font-family;
-  font-weight: 300;
-  margin-bottom: 0.72em;
-  padding: 1em;
-  position: relative;
   background-color: var.$body-background;
-
-  .close {
-    position: absolute;
-    right: 1em;
-    top: 1em;
-  }
-}
-
-.sheet--short {
-  padding: 0.5em 1em;
-}
-
-.sheet--is-theme-clean {
-  padding-left: 30px;
-  padding-bottom: 30px;
-  margin-bottom: 20px;
-  margin-left: 5px;
-  margin-right: 5px;
-}
-
-.annotation-unavailable-message {
-  display: flex;
-  flex-direction: column;
-  border: 1px solid var.$grey-3;
-  padding-top: 30px;
-  padding-bottom: 30px;
-  border-radius: 3px;
-  align-items: center;
-
-  &__label {
-    text-align: center;
-  }
-
-  &__icon {
-    background-image: url(../images/icons/lock.svg);
-    background-repeat: no-repeat;
-    width: 56px;
-    height: 48px;
-  }
+  color: var.$text-color;
+  font-family: var.$sans-font-family;
+  font-size: var.$base-font-size;
+  font-weight: normal;
+  line-height: var.$base-line-height;
 }

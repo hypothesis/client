@@ -1,4 +1,5 @@
 @use "../../mixins/buttons";
+@use "../../mixins/layout";
 @use "../../variables" as var;
 
 .top-bar {
@@ -63,6 +64,8 @@
 }
 
 .top-bar__inner {
+  @include layout.sidebar-content;
+
   // the edges of the top-bar's contents should be aligned
   // with the edges of annotation cards displayed below
   $h-padding: 9px;
