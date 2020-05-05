@@ -37,24 +37,19 @@ export function combineGroups(userGroups, featuredGroups, uri, settings) {
   const myGroupIds = userGroups.map(g => g.id);
   featuredGroups = featuredGroups.filter(g => !myGroupIds.includes(g.id));
 
+  // Set the isMember property indicating user membership.
+  featuredGroups.forEach(group => (group.isMember = false));
+  userGroups.forEach(group => (group.isMember = true));
+
+  const groups = userGroups.concat(featuredGroups);
+
   // Set the `canLeave` property. Groups can be left if they are private unless
   // the global `allowLeavingGroups` value is false in the config settings object.
-  const setCanLeave = group => {
+  groups.forEach(group => {
     group.canLeave = !allowLeavingGroups(settings)
       ? false
       : group.type === 'private';
-  };
-  // Set the isMember property indicating user membership.
-  featuredGroups.forEach(group => {
-    group.isMember = false;
-    setCanLeave(group);
   });
-  userGroups.forEach(group => {
-    group.isMember = true;
-    setCanLeave(group);
-  });
-
-  const groups = userGroups.concat(featuredGroups);
 
   // Add isScopedToUri property indicating whether a group is within scope
   // of the given uri. If the scope check cannot be performed, isScopedToUri
