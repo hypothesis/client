@@ -20,7 +20,8 @@ function InlineControls({ isCollapsed, setCollapsed, linkStyle = {} }) {
         <button
           className="excerpt__toggle-button"
           onClick={() => setCollapsed(!isCollapsed)}
-          aria-label="Toggle to show the full excerpt or first few lines only"
+          aria-expanded={!isCollapsed}
+          aria-label="Toggle to show the full excerpt"
           aria-pressed={(!isCollapsed).toString()}
           style={linkStyle}
         >
