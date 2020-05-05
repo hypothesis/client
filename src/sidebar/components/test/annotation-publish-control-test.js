@@ -95,10 +95,6 @@ describe('AnnotationPublishControl', () => {
         const wrapper = createAnnotationPublishControl();
 
         const btn = wrapper.find(btnClass);
-        assert.equal(
-          btn.prop('title'),
-          `Publish this annotation to ${fakeGroup.name}`
-        );
         assert.equal(btn.text(), `Post to ${fakeGroup.name}`);
       });
     });
@@ -111,7 +107,6 @@ describe('AnnotationPublishControl', () => {
         const wrapper = createAnnotationPublishControl();
 
         const btn = wrapper.find(btnClass);
-        assert.equal(btn.prop('title'), 'Publish this annotation to Only Me');
         assert.equal(btn.text(), 'Post to Only Me');
       });
     });

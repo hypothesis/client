@@ -119,6 +119,7 @@ function ToolbarButton({
       )}
       disabled={disabled}
       onClick={onClick}
+      aria-label={tooltip}
       title={tooltip}
       tabIndex={tabIndex}
       ref={buttonRef}

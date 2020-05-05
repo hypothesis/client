@@ -70,7 +70,6 @@ function AnnotationPublishControl({
           style={applyTheme(themeProps, settings)}
           onClick={onSave}
           disabled={isDisabled}
-          title={`Publish this annotation to ${publishDestination}`}
         >
           Post to {publishDestination}
         </button>

@@ -14,6 +14,7 @@ function ToolbarButton({ badgeCount, icon, label, onClick, shortcut }) {
     <button
       className="annotator-adder-actions__button"
       onClick={onClick}
+      aria-label={title}
       title={title}
     >
       {icon && <SvgIcon name={icon} />}

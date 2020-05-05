@@ -145,6 +145,7 @@ export default function Menu({
       <button
         aria-expanded={isOpen ? 'true' : 'false'}
         aria-haspopup={true}
+        aria-label={title}
         className="menu__toggle"
         onMouseDown={toggleMenu}
         onClick={toggleMenu}
