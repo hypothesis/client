@@ -127,6 +127,7 @@ function SidebarContent({
 
   return (
     <div>
+      <h2 className="u-screen-reader-only">Annotations</h2>
       {isFocusedMode && <FocusedModeHeader />}
       <LoginPromptPanel onLogin={onLogin} onSignUp={onSignUp} />
       {hasDirectLinkedAnnotationError && (

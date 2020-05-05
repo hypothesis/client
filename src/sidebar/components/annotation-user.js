@@ -39,7 +39,7 @@ function AnnotationUser({ annotation, features, serviceUrl, settings }) {
           target="_blank"
           rel="noopener noreferrer"
         >
-          <span className="annotation-user__user-name">{displayName}</span>
+          <h3 className="annotation-user__user-name">{displayName}</h3>
         </a>
       </div>
     );
@@ -47,7 +47,7 @@ function AnnotationUser({ annotation, features, serviceUrl, settings }) {
 
   return (
     <div className="annotation-user">
-      <span className="annotation-user__user-name">{displayName}</span>
+      <h3 className="annotation-user__user-name">{displayName}</h3>
     </div>
   );
 }

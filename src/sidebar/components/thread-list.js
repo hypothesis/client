@@ -174,7 +174,7 @@ function ThreadList({ thread, $rootScope }) {
   }, [visibleThreads]);
 
   return (
-    <section>
+    <div>
       <div style={{ height: offscreenUpperHeight }} />
       {visibleThreads.map(child => (
         <div className="thread-list__card" id={child.id} key={child.id}>
@@ -182,7 +182,7 @@ function ThreadList({ thread, $rootScope }) {
         </div>
       ))}
       <div style={{ height: offscreenLowerHeight }} />
-    </section>
+    </div>
   );
 }
 

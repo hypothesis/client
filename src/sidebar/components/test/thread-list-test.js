@@ -214,13 +214,13 @@ describe('ThreadList', () => {
    * Get the blank spacer `<div>` that reserves space for non-rendered threads
    * above the viewport.
    */
-  const getUpperSpacer = wrapper => wrapper.find('div').first();
+  const getUpperSpacer = wrapper => wrapper.find('div > div').first();
 
   /**
    * Get the blank spacer `<div>` that reserves space for non-rendered threads
    * below the viewport.
    */
-  const getLowerSpacer = wrapper => wrapper.find('div').last();
+  const getLowerSpacer = wrapper => wrapper.find('div > div').last();
 
   it('renders dimensional elements above and below visible threads', () => {
     const wrapper = createComponent();
