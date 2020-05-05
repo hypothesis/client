@@ -59,6 +59,7 @@ export default function Button({
         className
       )}
       onClick={onClick}
+      aria-label={title}
       title={title}
       style={style}
       disabled={disabled}

@@ -70,6 +70,11 @@ describe('Button', () => {
     assert.equal(wrapper.find('button').prop('title'), 'My Action');
   });
 
+  it('sets `aria-label` to provided `title` prop', () => {
+    const wrapper = createComponent({});
+    assert.equal(wrapper.find('button').prop('aria-label'), 'My Action');
+  });
+
   it('uses `buttonText` to set `title` attr if `title` missing', () => {
     const wrapper = createComponent({
       buttonText: 'My Label',
