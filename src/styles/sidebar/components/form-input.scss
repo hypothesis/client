@@ -1,5 +1,5 @@
-@use "mixins/forms";
-@use "variables" as var;
+@use "../../mixins/forms";
+@use "../../variables" as var;
 
 .form-input {
   @include forms.form-input;
