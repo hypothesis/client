@@ -151,7 +151,7 @@ function HypothesisApp({
 
   return (
     <div
-      className="app-content-wrapper js-thread-list-scroll-root"
+      className="hypothesis-app js-thread-list-scroll-root"
       style={backgroundStyle}
     >
       <TopBar
@@ -161,7 +161,7 @@ function HypothesisApp({
         onLogout={logout}
         isSidebar={isSidebar}
       />
-      <div className="content">
+      <div className="hypothesis-app__content">
         <ToastMessages />
         <HelpPanel auth={authState} />
         <ShareAnnotationsPanel />

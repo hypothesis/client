@@ -1,0 +1,29 @@
+@use "../../variables" as var;
+@use "../mixins/layout";
+@use "../mixins/responsive";
+
+.hypothesis-app {
+  $sidebar-h-padding: 9px;
+
+  background: var.$grey-2;
+  min-height: 100%;
+  height: 100%;
+  overflow: scroll;
+  -webkit-overflow-scrolling: touch;
+  padding: $sidebar-h-padding;
+  padding-top: $sidebar-h-padding + var.$top-bar-height;
+
+  @include responsive.respond-to(tablets desktops) {
+    padding-bottom: 4rem;
+  }
+
+  &__content {
+    @include layout.sidebar-content;
+  }
+}
+
+// Disable scroll anchoring as it interferes with `ThreadList` and
+// `visible-threads` calculations and can cause a render loop
+.js-thread-list-scroll-root {
+  overflow-anchor: none;
+}

@@ -16,6 +16,18 @@ a:hover {
   color: var.$link-color-hover;
 }
 
+em {
+  font-style: italic;
+}
+
+p {
+  hyphens: auto;
+
+  & + p {
+    margin: 1em 0 0;
+  }
+}
+
 ol {
   list-style-type: decimal;
   padding-left: 3em;
