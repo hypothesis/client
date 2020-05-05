@@ -1,7 +1,5 @@
 import { mount } from 'enzyme';
 import { createElement } from 'preact';
-
-import events from '../../events';
 import { act } from 'preact/test-utils';
 
 import ThreadList from '../thread-list';
@@ -14,21 +12,15 @@ describe('ThreadList', () => {
   let fakeDomUtil;
   let fakeMetadata;
   let fakeTopThread;
-  let fakeRootScope;
   let fakeScrollContainer;
   let fakeStore;
   let fakeVisibleThreadsUtil;
   let wrappers;
 
   function createComponent(props) {
-    const wrapper = mount(
-      <ThreadList
-        thread={fakeTopThread}
-        $rootScope={fakeRootScope}
-        {...props}
-      />,
-      { attachTo: fakeScrollContainer }
-    );
+    const wrapper = mount(<ThreadList thread={fakeTopThread} {...props} />, {
+      attachTo: fakeScrollContainer,
+    });
     wrappers.push(wrapper);
     return wrapper;
   }
@@ -40,23 +32,6 @@ describe('ThreadList', () => {
     };
     fakeMetadata = {
       isHighlight: sinon.stub().returns(false),
-      isReply: sinon.stub().returns(false),
-    };
-
-    fakeRootScope = {
-      eventCallbacks: {},
-
-      $apply: function (callback) {
-        callback();
-      },
-
-      $on: function (event, callback) {
-        if (event === events.BEFORE_ANNOTATION_CREATED) {
-          this.eventCallbacks[event] = callback;
-        }
-      },
-
-      $broadcast: sinon.stub(),
     };
 
     fakeScrollContainer = document.createElement('div');
@@ -66,6 +41,7 @@ describe('ThreadList', () => {
 
     fakeStore = {
       clearSelection: sinon.stub(),
+      unsavedAnnotations: sinon.stub().returns([]),
     };
 
     fakeTopThread = {
@@ -118,41 +94,27 @@ describe('ThreadList', () => {
     );
   });
 
+  /**
+   * Simulate what happens when a new draft annotation is created in the
+   * application.
+   */
+  const addNewAnnotation = (wrapper, annotation = { $tag: 'foobar' }) => {
+    fakeStore.unsavedAnnotations.returns([annotation]);
+    wrapper.setProps({});
+  };
+
   context('new annotation created in application', () => {
-    it('attaches a listener for the BEFORE_ANNOTATION_CREATED event', () => {
-      fakeRootScope.$on = sinon.stub();
-
-      createComponent();
-
-      assert.calledWith(
-        fakeRootScope.$on,
-        events.BEFORE_ANNOTATION_CREATED,
-        sinon.match.func
-      );
-    });
-
     it('clears the current selection in the store', () => {
-      createComponent();
-
-      fakeRootScope.eventCallbacks[events.BEFORE_ANNOTATION_CREATED]({}, {});
-
+      const wrapper = createComponent();
+      addNewAnnotation(wrapper);
       assert.calledOnce(fakeStore.clearSelection);
     });
 
     it('does not clear the selection in the store if new annotation is a highlight', () => {
       fakeMetadata.isHighlight.returns(true);
-      createComponent();
+      const wrapper = createComponent();
 
-      fakeRootScope.eventCallbacks[events.BEFORE_ANNOTATION_CREATED]({}, {});
-
-      assert.notCalled(fakeStore.clearSelection);
-    });
-
-    it('does not clear the selection in the store if new annotation is a reply', () => {
-      fakeMetadata.isReply.returns(true);
-      createComponent();
-
-      fakeRootScope.eventCallbacks[events.BEFORE_ANNOTATION_CREATED]({}, {});
+      addNewAnnotation(wrapper);
 
       assert.notCalled(fakeStore.clearSelection);
     });
@@ -181,27 +143,17 @@ describe('ThreadList', () => {
     });
 
     it('should do nothing if the annotation thread to scroll to is not in DOM', () => {
-      createComponent();
+      const wrapper = createComponent();
 
-      act(() => {
-        fakeRootScope.eventCallbacks[events.BEFORE_ANNOTATION_CREATED](
-          {},
-          { $tag: 'nonexistent' }
-        );
-      });
+      addNewAnnotation(wrapper);
 
       assert.notCalled(fakeScrollTop);
     });
 
     it('should set the scroll container `scrollTop` to derived position of thread', () => {
-      createComponent();
+      const wrapper = createComponent();
 
-      act(() => {
-        fakeRootScope.eventCallbacks[events.BEFORE_ANNOTATION_CREATED](
-          {},
-          fakeTopThread.children[3].annotation
-        );
-      });
+      addNewAnnotation(wrapper, fakeTopThread.children[3].annotation);
 
       // The third thread in a collection of threads at default height (200)
       // should be at 600px. This setting of `scrollTop` is the only externally-

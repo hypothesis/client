@@ -52,13 +52,7 @@ describe('annotation threading', function () {
       flagEnabled: sinon.stub().returns(true),
     };
 
-    const fakeRootScope = {
-      $applyAsync: sinon.stub(),
-      $on: sinon.stub(),
-    };
-
     const container = new Injector()
-      .register('$rootScope', { value: fakeRootScope })
       .register('store', storeFactory)
       .register('rootThread', rootThreadFactory)
       .register('searchFilter', searchFilterFactory)

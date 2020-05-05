@@ -1,6 +1,5 @@
 import EventEmitter from 'tiny-emitter';
 
-import events from '../../events';
 import { Injector } from '../../../shared/injector';
 import * as annotationFixtures from '../../test/annotation-fixtures';
 import createFakeStore from '../../test/fake-redux-store';
@@ -48,10 +47,10 @@ const fixtures = {
 };
 
 describe('sidebar/services/frame-sync', function () {
+  let fakeAnnotationsService;
   let fakeStore;
   let fakeBridge;
   let frameSync;
-  let $rootScope;
 
   beforeEach(function () {
     fakeStore = createFakeStore(
@@ -71,6 +70,8 @@ describe('sidebar/services/frame-sync', function () {
         updateAnchorStatus: sinon.stub(),
       }
     );
+
+    fakeAnnotationsService = { create: sinon.stub() };
 
     const emitter = new EventEmitter();
     fakeBridge = {
@@ -92,13 +93,8 @@ describe('sidebar/services/frame-sync', function () {
       '../../shared/discovery': FakeDiscovery,
     });
 
-    $rootScope = {
-      $broadcast: sinon.stub(),
-    };
-
     frameSync = new Injector()
-      .register('$rootScope', { value: $rootScope })
-      .register('$window', { value: {} })
+      .register('annotationsService', { value: fakeAnnotationsService })
       .register('bridge', { value: fakeBridge })
       .register('store', { value: fakeStore })
       .register('frameSync', FrameSync)
@@ -214,15 +210,14 @@ describe('sidebar/services/frame-sync', function () {
 
   context('when a new annotation is created in the frame', function () {
     context('when an authenticated user is present', () => {
-      it('emits a BEFORE_ANNOTATION_CREATED event', function () {
+      it('creates the annotation in the sidebar', function () {
         fakeStore.isLoggedIn.returns(true);
         const ann = { target: [] };
 
         fakeBridge.emit('beforeCreateAnnotation', { tag: 't1', msg: ann });
 
         assert.calledWith(
-          $rootScope.$broadcast,
-          events.BEFORE_ANNOTATION_CREATED,
+          fakeAnnotationsService.create,
           sinon.match({
             $tag: 't1',
             target: [],
@@ -236,12 +231,12 @@ describe('sidebar/services/frame-sync', function () {
         fakeStore.isLoggedIn.returns(false);
       });
 
-      it('should not emit BEFORE_ANNOTATION_CREATED event', () => {
+      it('should not create an annotation in the sidebar', () => {
         const ann = { target: [] };
 
         fakeBridge.emit('beforeCreateAnnotation', { tag: 't1', msg: ann });
 
-        assert.notCalled($rootScope.$broadcast);
+        assert.notCalled(fakeAnnotationsService.create);
       });
 
       it('should open the sidebar', () => {
