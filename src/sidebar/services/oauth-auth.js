@@ -1,4 +1,5 @@
-import events from '../events';
+import EventEmitter from 'tiny-emitter';
+
 import serviceConfig from '../service-config';
 import OAuthClient from '../util/oauth-client';
 import { resolve } from '../util/url';
@@ -23,7 +24,6 @@ import { resolve } from '../util/url';
  * the `OAuthClient` class.
  */
 export default function auth(
-  $rootScope,
   $window,
   apiRoutes,
   localStorage,
@@ -127,6 +127,8 @@ export default function auth(
       });
   }
 
+  const emitter = new EventEmitter();
+
   /**
    * Listen for updated access & refresh tokens saved by other instances of the
    * client.
@@ -137,7 +139,7 @@ export default function auth(
         // Reset cached token information. Tokens will be reloaded from storage
         // on the next call to `tokenGetter()`.
         tokenInfoPromise = null;
-        $rootScope.$broadcast(events.OAUTH_TOKENS_CHANGED);
+        emitter.emit('oauthTokensChanged');
       }
     });
   }
@@ -290,18 +292,17 @@ export default function auth(
 
   listenForTokenStorageEvents();
 
-  return {
+  return Object.assign(emitter, {
     login,
     logout,
     tokenGetter,
-  };
+  });
 }
 
 // `$inject` is added manually rather than using `@ngInject` to work around
 // a conflict between the transform-async-to-promises and angularjs-annotate
 // Babel plugins.
 auth.$inject = [
-  '$rootScope',
   '$window',
   'apiRoutes',
   'localStorage',

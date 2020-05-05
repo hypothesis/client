@@ -1,14 +1,11 @@
 import EventEmitter from 'tiny-emitter';
 
-import events from '../../events';
 import { events as analyticsEvents } from '../analytics';
 import sessionFactory from '../session';
 import { $imports } from '../session';
 import { Injector } from '../../../shared/injector';
 
 describe('sidebar/services/session', function () {
-  let $rootScope;
-
   let fakeAnalytics;
   let fakeAuth;
   let fakeSentry;
@@ -39,10 +36,10 @@ describe('sidebar/services/session', function () {
         currentProfile = newProfile;
       }),
     };
-    fakeAuth = {
+    fakeAuth = Object.assign(new EventEmitter(), {
       login: sandbox.stub().returns(Promise.resolve()),
       logout: sinon.stub().resolves(),
-    };
+    });
     fakeSentry = {
       setUserInfo: sandbox.spy(),
     };
@@ -63,14 +60,7 @@ describe('sidebar/services/session', function () {
       '../util/sentry': fakeSentry,
     });
 
-    const emitter = new EventEmitter();
-    $rootScope = {
-      $on: (event, cb) => emitter.on(event, data => cb(null, data)),
-      $broadcast: (event, data) => emitter.emit(event, data),
-    };
-
     session = new Injector()
-      .register('$rootScope', { value: $rootScope })
       .register('analytics', { value: fakeAnalytics })
       .register('store', { value: fakeStore })
       .register('api', { value: fakeApi })
@@ -328,7 +318,7 @@ describe('sidebar/services/session', function () {
               userid: 'acct:different_user@hypothes.is',
             })
           );
-          $rootScope.$broadcast(events.OAUTH_TOKENS_CHANGED);
+          fakeAuth.emit('oauthTokensChanged');
 
           fakeStore.updateProfile.resetHistory();
           return session.load();
