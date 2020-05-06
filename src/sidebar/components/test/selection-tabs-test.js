@@ -106,6 +106,20 @@ describe('SelectionTabs', function () {
       assert.equal(tabs.length, 2);
     });
 
+    it('should render `title` and `aria-label` attributes for tab buttons', () => {
+      fakeStore.orphanCount.returns(1);
+      const wrapper = createComponent({});
+
+      const tabs = wrapper.find('button');
+
+      assert.equal(tabs.at(0).prop('aria-label'), 'Select annotations tab');
+      assert.equal(tabs.at(0).prop('title'), 'Select annotations tab');
+      assert.equal(tabs.at(1).prop('aria-label'), 'Select page notes tab');
+      assert.equal(tabs.at(1).prop('title'), 'Select page notes tab');
+      assert.equal(tabs.at(2).prop('aria-label'), 'Select orphans tab');
+      assert.equal(tabs.at(2).prop('title'), 'Select orphans tab');
+    });
+
     it('should show the clean theme when settings contains the clean theme option', function () {
       fakeSettings.theme = 'clean';
       const wrapper = createComponent();
