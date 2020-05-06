@@ -148,6 +148,7 @@ export default function Menu({
         className="menu__toggle"
         onMouseDown={toggleMenu}
         onClick={toggleMenu}
+        aria-label={title}
         title={title}
       >
         <span

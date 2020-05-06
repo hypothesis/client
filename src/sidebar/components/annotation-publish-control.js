@@ -70,6 +70,7 @@ function AnnotationPublishControl({
           style={applyTheme(themeProps, settings)}
           onClick={onSave}
           disabled={isDisabled}
+          aria-label={`Publish this annotation to ${publishDestination}`}
           title={`Publish this annotation to ${publishDestination}`}
         >
           Post to {publishDestination}
