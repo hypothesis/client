@@ -69,9 +69,12 @@ export default function Toolbar({
         <ToolbarButton
           extraClasses="annotator-frame-button--sidebar_toggle"
           buttonRef={toggleSidebarRef}
-          label="Show annotation sidebar"
+          label={
+            isSidebarOpen
+              ? 'Hide annotation sidebar'
+              : 'Show annotation sidebar'
+          }
           icon={isSidebarOpen ? 'h-icon-chevron-right' : 'h-icon-chevron-left'}
-          selected={isSidebarOpen}
           onClick={toggleSidebar}
         />
       )}
