@@ -425,7 +425,7 @@ module.exports = class Guest extends Delegator
       return
 
     @selectedRanges = [range]
-    @toolbar?.newAnnotationType = 'note'
+    @toolbar?.newAnnotationType = 'annotation'
 
     {left, top, arrowDirection} = this.adderCtrl.target(focusRect, isBackwards)
     this.adderCtrl.annotationsForSelection = annotationsForSelection()
@@ -434,7 +434,7 @@ module.exports = class Guest extends Delegator
   _onClearSelection: () ->
     this.adderCtrl.hide()
     @selectedRanges = []
-    @toolbar?.newAnnotationType = 'annotation'
+    @toolbar?.newAnnotationType = 'note'
 
   selectAnnotations: (annotations, toggle) ->
     if toggle
