@@ -24,13 +24,11 @@ import BucketBarPlugin from './plugin/bucket-bar';
 import CrossFramePlugin from './plugin/cross-frame';
 import DocumentPlugin from './plugin/document';
 import PDFPlugin from './plugin/pdf';
-import ToolbarPlugin from './plugin/toolbar';
 import Sidebar from './sidebar';
 
 const pluginClasses = {
   // UI plugins
   BucketBar: BucketBarPlugin,
-  Toolbar: ToolbarPlugin,
 
   // Document type plugins
   PDF: PDFPlugin,

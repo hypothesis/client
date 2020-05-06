@@ -425,11 +425,7 @@ module.exports = class Guest extends Delegator
       return
 
     @selectedRanges = [range]
-
-    $('.annotator-toolbar .h-icon-note')
-      .attr('title', 'New Annotation')
-      .removeClass('h-icon-note')
-      .addClass('h-icon-annotate');
+    @toolbar?.newAnnotationType = 'note'
 
     {left, top, arrowDirection} = this.adderCtrl.target(focusRect, isBackwards)
     this.adderCtrl.annotationsForSelection = annotationsForSelection()
@@ -438,11 +434,7 @@ module.exports = class Guest extends Delegator
   _onClearSelection: () ->
     this.adderCtrl.hide()
     @selectedRanges = []
-
-    $('.annotator-toolbar .h-icon-annotate')
-      .attr('title', 'New Page Note')
-      .removeClass('h-icon-annotate')
-      .addClass('h-icon-note');
+    @toolbar?.newAnnotationType = 'annotation'
 
   selectAnnotations: (annotations, toggle) ->
     if toggle
@@ -502,3 +494,4 @@ module.exports = class Guest extends Delegator
       @element.removeClass(SHOW_HIGHLIGHTS_CLASS)
 
     @visibleHighlights = shouldShowHighlights
+    @toolbar?.highlightsVisible = shouldShowHighlights
