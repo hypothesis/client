@@ -21,6 +21,7 @@ export default function Button({
   className = '',
   disabled = false,
   icon = '',
+  isExpanded,
   isPressed,
   onClick = () => null,
   style = {},
@@ -39,6 +40,9 @@ export default function Button({
   if (typeof isPressed === 'boolean') {
     // Indicate that this is a toggle button.
     extraProps['aria-pressed'] = isPressed;
+  }
+  if (typeof isExpanded === 'boolean') {
+    extraProps['aria-expanded'] = isExpanded;
   }
 
   return (
@@ -109,6 +113,11 @@ Button.propTypes = {
    * provided.
    */
   icon: requiredStringIfButtonTextMissing,
+
+  /**
+   * Is the expandable element controlled by this button currently expanded?
+   */
+  isExpanded: propTypes.bool,
 
   /**
    * Indicate that this is a toggle button (if `isPressed` is a boolean) and

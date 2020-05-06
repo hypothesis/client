@@ -31,10 +31,6 @@ export default function AnnotationBody({
   const [isCollapsible, setIsCollapsible] = useState(false);
 
   const toggleText = isCollapsed ? 'More' : 'Less';
-  const toggleTitle = isCollapsed
-    ? 'Show full annotation text'
-    : 'Show the first few lines only';
-
   const showExcerpt = !isEditing && text.length > 0;
   const showTagList = !isEditing && tags.length > 0;
 
@@ -69,10 +65,11 @@ export default function AnnotationBody({
       {isCollapsible && !isEditing && (
         <div className="annotation-body__collapse-toggle">
           <Button
-            className="annotation-body__collapse-toggle-button"
-            onClick={() => setIsCollapsed(!isCollapsed)}
             buttonText={toggleText}
-            title={toggleTitle}
+            className="annotation-body__collapse-toggle-button"
+            isExpanded={!isCollapsed}
+            onClick={() => setIsCollapsed(!isCollapsed)}
+            title="Toggle to show full annotation text"
           />
         </div>
       )}

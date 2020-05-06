@@ -41,6 +41,18 @@ describe('Button', () => {
     assert.equal(wrapper.find('SvgIcon').prop('name'), 'fakeIcon');
   });
 
+  [true, false].forEach(isExpanded => {
+    it('sets `aria-expanded` attribute if `isExpanded` is a boolean', () => {
+      const wrapper = createComponent({ isExpanded });
+      assert.equal(wrapper.find('button').prop('aria-expanded'), isExpanded);
+    });
+  });
+
+  it('does not set `aria-expanded` attribute if `isExpanded` is omitted', () => {
+    const wrapper = createComponent();
+    assert.notProperty(wrapper.find('button').props(), 'aria-expanded');
+  });
+
   [true, false].forEach(isPressed => {
     it('sets `aria-pressed` attribute if `isPressed` is a boolean', () => {
       const wrapper = createComponent({ isPressed });
