@@ -66,7 +66,7 @@ describe('Toolbar', () => {
     assert.calledWith(toggleSidebar);
 
     wrapper.setProps({ isSidebarOpen: true });
-    findButton(wrapper, 'Show annotation sidebar').simulate('click');
+    findButton(wrapper, 'Hide annotation sidebar').simulate('click');
     assert.calledWith(toggleSidebar);
   });
 
