@@ -27,10 +27,6 @@ module.exports = class Sidebar extends Host
     if config.theme == 'clean' || config.externalContainerSelector
       delete config.pluginClasses.BucketBar
 
-    # TODO - Make this work again.
-    if config.externalContainerSelector
-      delete config.pluginClasses.Toolbar
-
     super
 
     if config.openSidebar || config.annotations || config.query || config.group
