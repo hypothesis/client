@@ -37,6 +37,13 @@ export default function Button({
   const baseClassName = buttonText ? 'button--labeled' : 'button--icon-only';
 
   const extraProps = {};
+
+  // If there is no displayed text in the button, or if the provided `title`
+  // differs from the displayed text, add `aria-label` and `title` attributes
+  if (!buttonText || title !== buttonText) {
+    extraProps.title = title;
+    extraProps['aria-label'] = title;
+  }
   if (typeof isPressed === 'boolean') {
     // Indicate that this is a toggle button.
     extraProps['aria-pressed'] = isPressed;
@@ -59,7 +66,6 @@ export default function Button({
         className
       )}
       onClick={onClick}
-      title={title}
       style={style}
       disabled={disabled}
       {...extraProps}
