@@ -348,35 +348,38 @@ describe 'Guest', ->
     afterEach ->
       container.remove()
 
-    it 'shows the adder if the selection contains text', ->
-      guest = createGuest()
+    simulateSelectionWithText = ->
       rangeUtil.selectionFocusRect.returns({left: 0, top: 0, width: 5, height: 5})
       FakeAdder::instance.target.returns({
         left: 0, top: 0, arrowDirection: adder.ARROW_POINTING_UP
       })
       selections.next({})
+
+    simulateSelectionWithoutText = ->
+      rangeUtil.selectionFocusRect.returns(null)
+      selections.next({})
+
+    it 'shows the adder if the selection contains text', ->
+      guest = createGuest()
+      simulateSelectionWithText()
       assert.called FakeAdder::instance.showAt
 
     it 'sets the annotations associated with the selection', ->
       guest = createGuest()
       ann = {}
       $(container).data('annotation', ann)
-      rangeUtil.selectionFocusRect.returns({left: 0, top: 0, width: 5, height: 5})
-      FakeAdder::instance.target.returns({
-        left: 0, top: 0, arrowDirection: adder.ARROW_POINTING_UP
-      })
       rangeUtil.itemsForRange.callsFake((range, callback) ->
         [callback(range.startContainer)]
       )
-
-      selections.next({})
+      simulateSelectionWithText()
 
       assert.deepEqual FakeAdder::instance.annotationsForSelection, [ann]
 
     it 'hides the adder if the selection does not contain text', ->
       guest = createGuest()
-      rangeUtil.selectionFocusRect.returns(null)
-      selections.next({})
+
+      simulateSelectionWithoutText()
+
       assert.called FakeAdder::instance.hide
       assert.notCalled FakeAdder::instance.showAt
 
@@ -384,6 +387,22 @@ describe 'Guest', ->
       guest = createGuest()
       selections.next(null)
       assert.called FakeAdder::instance.hide
+
+    it "sets the toolbar's `newAnnotationType` to 'annotation' if there is a selection", ->
+      guest = createGuest()
+      guest.toolbar = {}
+
+      simulateSelectionWithText()
+
+      assert.equal guest.toolbar.newAnnotationType, 'annotation'
+
+    it "sets the toolbar's `newAnnotationType` to 'note' if the selection is empty", ->
+      guest = createGuest()
+      guest.toolbar = {}
+
+      simulateSelectionWithoutText()
+
+      assert.equal guest.toolbar.newAnnotationType, 'note'
 
   describe 'when adder toolbar buttons are clicked', ->
     # TODO - Add tests for "Annotate" and "Highlight" buttons.
