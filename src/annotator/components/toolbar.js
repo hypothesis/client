@@ -11,6 +11,8 @@ function ToolbarButton({
   selected,
 }) {
   const handleClick = event => {
+    // Stop event from propagating up to the document and being treated as a
+    // click on document content, causing the sidebar to close.
     event.stopPropagation();
     onClick();
   };
@@ -103,7 +105,11 @@ Toolbar.propTypes = {
    */
   closeSidebar: propTypes.func.isRequired,
 
-  /** Callback for the "Create page note" button. */
+  /**
+   * Callback for the "Create annotation" / "Create page note" button. The type
+   * of annotation depends on whether there is a text selection and is decided
+   * by the caller.
+   */
   createAnnotation: propTypes.func.isRequired,
 
   /** Is the sidebar currently visible? */

@@ -88,7 +88,7 @@ describe('ToolbarController', () => {
     });
   });
 
-  it('toggles sidebar visibility', () => {
+  it('calls `setSidebarOpen` callback when sidebar toggle button is clicked', () => {
     const setSidebarOpen = sinon.stub();
     const controller = createToolbar({ setSidebarOpen });
 
@@ -100,7 +100,7 @@ describe('ToolbarController', () => {
     assert.calledWith(setSidebarOpen, false);
   });
 
-  it('closes the sidebar', () => {
+  it('calls `setSidebarOpen` callback when sidebar close button is clicked', () => {
     const setSidebarOpen = sinon.stub();
     const controller = createToolbar({ setSidebarOpen });
     controller.useMinimalControls = true;
@@ -110,7 +110,7 @@ describe('ToolbarController', () => {
     assert.calledWith(setSidebarOpen, false);
   });
 
-  it('toggles highlight visibility', () => {
+  it('calls `setHighlightsVisible` callback when highlights toggle button is clicked', () => {
     const setHighlightsVisible = sinon.stub();
     const controller = createToolbar({ setHighlightsVisible });
 
@@ -122,7 +122,7 @@ describe('ToolbarController', () => {
     assert.calledWith(setHighlightsVisible, false);
   });
 
-  it('creates an annotation', () => {
+  it('calls `createAnnotation` callback when Create Note/Annotation button is clicked', () => {
     const createAnnotation = sinon.stub();
     const setSidebarOpen = sinon.stub();
     createToolbar({ createAnnotation, setSidebarOpen });

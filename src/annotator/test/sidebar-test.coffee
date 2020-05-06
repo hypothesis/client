@@ -281,7 +281,7 @@ describe 'Sidebar', ->
       )
       show = sandbox.stub(sidebar, 'show')
       sidebar.publish('panelReady')
-      assert.calledOnce(show)        
+      assert.calledOnce(show)
 
     it 'opens the sidebar when a direct-linked group is present.', ->
       sidebar = createSidebar(
@@ -291,7 +291,7 @@ describe 'Sidebar', ->
       )
       show = sandbox.stub(sidebar, 'show')
       sidebar.publish('panelReady')
-      assert.calledOnce(show)        
+      assert.calledOnce(show)
 
     it 'opens the sidebar when a direct-linked query is present.', ->
       sidebar = createSidebar(
@@ -301,7 +301,7 @@ describe 'Sidebar', ->
       )
       show = sandbox.stub(sidebar, 'show')
       sidebar.publish('panelReady')
-      assert.calledOnce(show)        
+      assert.calledOnce(show)
 
     it 'opens the sidebar when openSidebar is set to true.', ->
       sidebar = createSidebar(
@@ -311,7 +311,7 @@ describe 'Sidebar', ->
       )
       show = sandbox.stub(sidebar, 'show')
       sidebar.publish('panelReady')
-      assert.calledOnce(show)        
+      assert.calledOnce(show)
 
     it 'does not show the sidebar if not configured to.', ->
       sidebar = createSidebar(
@@ -320,7 +320,7 @@ describe 'Sidebar', ->
       )
       show = sandbox.stub(sidebar, 'show')
       sidebar.publish('panelReady')
-      assert.notCalled(show)        
+      assert.notCalled(show)
 
 
 
@@ -365,7 +365,7 @@ describe 'Sidebar', ->
       sidebar.show()
       assert.isFalse sidebar.visibleHighlights
 
-    it 'updates the toolbar', ->
+    it 'updates the `sidebarOpen` property of the toolbar', ->
       sidebar = createSidebar()
       sidebar.show()
       assert.equal(fakeToolbar.sidebarOpen, true)
@@ -381,7 +381,7 @@ describe 'Sidebar', ->
 
       assert.isFalse sidebar.visibleHighlights
 
-    it 'updates the toolbar', ->
+    it 'updates the `sidebarOpen` property of the toolbar', ->
       sidebar = createSidebar()
 
       sidebar.show()

@@ -24,18 +24,20 @@ describe('Toolbar', () => {
   const findButton = (wrapper, label) =>
     wrapper.find(`button[title="${label}"]`);
 
-  it('renders nothing if `useMinimalControls` is true and the sidebar is closed', () => {
-    const wrapper = createToolbar({ useMinimalControls: true });
-    assert.isFalse(wrapper.find('button').exists());
-  });
-
-  it('renders only the Close button if `useMinimalControls` is true', () => {
-    const wrapper = createToolbar({
-      useMinimalControls: true,
-      isSidebarOpen: true,
+  context('when `useMinimalControls` is true', () => {
+    it('renders nothing if the sidebar is closed', () => {
+      const wrapper = createToolbar({ useMinimalControls: true });
+      assert.isFalse(wrapper.find('button').exists());
     });
-    assert.equal(wrapper.find('button').length, 1);
-    assert.isTrue(findButton(wrapper, 'Close annotation sidebar').exists());
+
+    it('renders only the "Close" button if the sidebar is open', () => {
+      const wrapper = createToolbar({
+        useMinimalControls: true,
+        isSidebarOpen: true,
+      });
+      assert.equal(wrapper.find('button').length, 1);
+      assert.isTrue(findButton(wrapper, 'Close annotation sidebar').exists());
+    });
   });
 
   it('renders the normal controls if `useMinimalControls` is false', () => {
