@@ -2,6 +2,8 @@ import classnames from 'classnames';
 import propTypes from 'prop-types';
 import { createElement } from 'preact';
 
+import SvgIcon from '../../shared/components/svg-icon';
+
 function ToolbarButton({
   buttonRef,
   extraClasses,
@@ -19,15 +21,15 @@ function ToolbarButton({
 
   return (
     <button
-      // This currently uses the icon font. This needs to be converted to
-      // `SvgIcon`.
-      className={classnames('annotator-frame-button', extraClasses, icon)}
+      className={classnames('annotator-frame-button', extraClasses)}
       aria-label={label}
       aria-pressed={selected}
       onClick={handleClick}
       ref={buttonRef}
       title={label}
-    />
+    >
+      <SvgIcon name={icon} />
+    </button>
   );
 }
 
@@ -61,7 +63,7 @@ export default function Toolbar({
         <ToolbarButton
           extraClasses="annotator-frame-button--sidebar_close"
           label="Close annotation sidebar"
-          icon="h-icon-close"
+          icon="cancel"
           onClick={closeSidebar}
         />
       )}
@@ -74,14 +76,14 @@ export default function Toolbar({
               ? 'Hide annotation sidebar'
               : 'Show annotation sidebar'
           }
-          icon={isSidebarOpen ? 'h-icon-chevron-right' : 'h-icon-chevron-left'}
+          icon={isSidebarOpen ? 'caret-right' : 'caret-left'}
           onClick={toggleSidebar}
         />
       )}
       {!useMinimalControls && (
         <ToolbarButton
           label="Show highlights"
-          icon={showHighlights ? 'h-icon-visibility' : 'h-icon-visibility-off'}
+          icon={showHighlights ? 'show' : 'hide'}
           selected={showHighlights}
           onClick={toggleHighlights}
         />
@@ -91,9 +93,7 @@ export default function Toolbar({
           label={
             newAnnotationType === 'note' ? 'New page note' : 'New annotation'
           }
-          icon={
-            newAnnotationType === 'note' ? 'h-icon-note' : 'h-icon-annotate'
-          }
+          icon={newAnnotationType === 'note' ? 'note' : 'annotate'}
           onClick={createAnnotation}
         />
       )}
