@@ -55,7 +55,6 @@ export default function Menu({
   title,
 }) {
   const [isOpen, setOpen] = useState(defaultOpen);
-  const [openedByKeyboard, setOpenedByKeyboard] = useState(false);
 
   // Notify parent when menu is opened or closed.
   const wasOpen = useRef(isOpen);
@@ -81,17 +80,6 @@ export default function Menu({
       event.preventDefault();
       return;
     }
-    // State variable so we know to set focus() on the first item when opened
-    // via the keyboard. Note, when opening the menu via keyboard by pressing
-    // enter or space, a simulated MouseEvent is created with a type value of
-    // "click". We also know this is not a mouseup event because that condition
-    // is checked above.
-    if (!isOpen && event.type === 'click') {
-      setOpenedByKeyboard(true);
-    } else {
-      setOpenedByKeyboard(false);
-    }
-
     setOpen(!isOpen);
   };
   const closeMenu = useCallback(() => setOpen(false), [setOpen]);
@@ -179,7 +167,7 @@ export default function Menu({
             onClick={closeMenu}
             onKeyDown={handleMenuKeyDown}
           >
-            <MenuKeyboardNavigation visible={openedByKeyboard}>
+            <MenuKeyboardNavigation visible={true}>
               {children}
             </MenuKeyboardNavigation>
           </div>
