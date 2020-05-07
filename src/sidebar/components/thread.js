@@ -31,7 +31,7 @@ function Thread({ showDocumentInfo = false, thread, threadsService }) {
   // Render a control to expand/collapse the current thread if this thread has
   // a parent (i.e. is a reply thread)
   const showThreadToggle = !!thread.parent;
-  const toggleIcon = thread.collapsed ? 'caret-right' : 'expand-menu';
+  const toggleIcon = thread.collapsed ? 'collapsed' : 'expand-menu';
   const toggleTitle = thread.collapsed ? 'Expand replies' : 'Collapse replies';
 
   // If rendering child threads, only render those that have at least one
