@@ -20,6 +20,10 @@ let iconRegistry = {};
  * Component that renders icons using inline `<svg>` elements.
  * This enables their appearance to be customized via CSS.
  *
+ * Supply either a registerer icon `name` or a trusted SVG object
+ * to the `src` prop.
+ * a
+ *
  * This matches the way we do icons on the website, see
  * https://github.com/hypothesis/h/pull/3675
  */
@@ -27,12 +31,29 @@ export default function SvgIcon({
   name,
   className = '',
   inline = false,
+  src,
   title = '',
 }) {
-  if (!iconRegistry[name]) {
-    throw new Error(`Icon name "${name}" is not registered`);
+  let markup;
+
+  // Registered icon
+  if (name) {
+    if (!iconRegistry[name]) {
+      throw new Error(`Icon name "${name}" is not registered`);
+    }
+    markup = { __html: iconRegistry[name] };
   }
-  const markup = { __html: iconRegistry[name] };
+  // Trusted icon
+  else if (src) {
+    if (!src.trustedHTML) {
+      throw new Error(
+        'Un-trusted resource passed to SvgIcon. If this is a valid SVG, use the `trustMarkup` wrapper.'
+      );
+    }
+    markup = { __html: src.trustedHTML };
+  } else {
+    throw new Error('Either `svg` or `name` must be supplied');
+  }
 
   const element = useRef();
   useLayoutEffect(() => {
@@ -74,6 +95,11 @@ SvgIcon.propTypes = {
 
   /** Apply a style allowing for inline display of icon wrapper */
   inline: propTypes.bool,
+
+  /** Imported SVG resource with a trusted wrapper. */
+  src: propTypes.shape({
+    trustedHTML: propTypes.string,
+  }),
 
   /** Optional title attribute to apply to the SVG's containing `span` */
   title: propTypes.string,
