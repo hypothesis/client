@@ -120,7 +120,7 @@ describe('SvgIcon', () => {
       });
     });
 
-    it('throws an error if the icon is un-trusted svg', () => {
+    it('throws an error if the icon is an un-trusted svg', () => {
       assert.throws(() => {
         const container = document.createElement('div');
         render(<SvgIcon src={unTrustedSvg} />, container);
