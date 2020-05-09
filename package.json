@@ -165,6 +165,7 @@
     "prepublishOnly": "make clean build/manifest.json"
   },
   "dependencies": {
+    "deepmerge": "^4.2.2",
     "paho-mqtt": "^1.1.0"
   }
 }
