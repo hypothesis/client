@@ -320,21 +320,45 @@ describe 'Guest', ->
 
   describe 'document events', ->
 
+    fakeSidebarFrame = null
     guest = null
+    rootElement = null
+
+    methods =
+      'click': 'onElementClick'
+      'touchstart': 'onElementTouchStart'
 
     beforeEach ->
+      fakeSidebarFrame = null
       guest = createGuest()
+      rootElement = guest.element[0]
 
-    it 'emits "hideSidebar" on cross frame when the user taps or clicks in the page', ->
-      methods =
-        'click': 'onElementClick'
-        'touchstart': 'onElementTouchStart'
+    afterEach ->
+      fakeSidebarFrame?.remove()
+
+    it 'hides sidebar when the user taps or clicks in the page', ->
 
       for event in ['click', 'touchstart']
         sandbox.spy(guest, methods[event])
-        guest.element.trigger(event)
+
+        rootElement.dispatchEvent(new Event(event))
+
         assert.called(guest[methods[event]])
         assert.calledWith(guest.plugins.CrossFrame.call, 'hideSidebar')
+
+    it 'does not hide sidebar if event occurs inside annotator UI', ->
+      fakeSidebarFrame = document.createElement('div')
+      fakeSidebarFrame.className = 'annotator-frame'
+      rootElement.appendChild(fakeSidebarFrame)
+
+      for event in ['click', 'touchstart']
+        sandbox.spy(guest, methods[event])
+
+        fakeSidebarFrame.dispatchEvent(new Event(event, { bubbles: true }))
+
+        assert.called(guest[methods[event]])
+        assert.notCalled(guest.plugins.CrossFrame.call)
+
 
   describe 'when the selection changes', ->
     container = null
