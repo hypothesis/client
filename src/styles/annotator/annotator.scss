@@ -103,12 +103,11 @@ $sidebar-collapse-transition-time: 150ms;
     background: var.$white;
     border: solid 1px var.$grey-3;
     border-radius: 4px;
-    color: var.$grey-semi;
+    color: var.$grey-5;
     text-decoration: none;
     height: 30px;
     width: 30px;
     padding: 0;
-    font-size: 16px;
     margin-bottom: 5px;
 
     &:active {
@@ -117,7 +116,7 @@ $sidebar-collapse-transition-time: 150ms;
 
     &:focus,
     &:hover {
-      color: var.$text-color;
+      color: var.$grey-7;
     }
   }
 
@@ -129,6 +128,7 @@ $sidebar-collapse-transition-time: 150ms;
     width: 36px;
     margin-bottom: 10px;
     height: var.$top-bar-height;
+    color: var.$grey-semi;
   }
 
   .annotator-frame-button--sidebar_close {

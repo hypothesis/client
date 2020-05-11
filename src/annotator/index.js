@@ -12,10 +12,8 @@ if (process.env.NODE_ENV !== 'production') {
 
 // Load icons.
 import { registerIcons } from '../shared/components/svg-icon';
-registerIcons({
-  annotate: require('../images/icons/annotate.svg'),
-  highlight: require('../images/icons/highlight.svg'),
-});
+import iconSet from './icons';
+registerIcons(iconSet);
 
 import configFrom from './config/index';
 import Guest from './guest';
