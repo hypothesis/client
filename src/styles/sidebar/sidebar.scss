@@ -9,6 +9,10 @@
 @use '../util';
 @use './elements';
 
+// Shared components
+// -----------------
+@use '../components/svg-icon';
+
 // Components
 // ----------
 @use './components/annotation-action-bar';
@@ -46,7 +50,6 @@
 @use './components/share-links';
 @use './components/sidebar-content-error';
 @use './components/sidebar-panel';
-@use './components/svg-icon';
 @use './components/spinner';
 @use './components/tag-editor';
 @use './components/tag-list';
