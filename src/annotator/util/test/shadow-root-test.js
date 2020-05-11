@@ -28,7 +28,6 @@ describe('annotator/util/shadow-root', () => {
       const styleEl = container.shadowRoot.querySelector('style');
       assert.ok(styleEl);
       assert.match(styleEl.textContent, /@import ".*annotator\.css.*"/);
-      assert.match(styleEl.textContent, /@import ".*icomoon\.css.*"/);
     });
   });
 });
