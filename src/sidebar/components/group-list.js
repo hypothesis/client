@@ -89,13 +89,17 @@ function GroupList({ serviceUrl, settings }) {
     return label;
   }
 
+  const menuTitle = focusedGroup
+    ? `Select group (now viewing: ${focusedGroup.name})`
+    : 'Select group';
+
   return (
     <Menu
       align="left"
       contentClass="group-list__content"
       label={label}
       onOpenChanged={() => setExpandedGroup(null)}
-      title="Select group"
+      title={menuTitle}
     >
       {currentGroupsSorted.length > 0 && (
         <GroupListSection
