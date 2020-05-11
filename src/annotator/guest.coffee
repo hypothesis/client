@@ -10,7 +10,7 @@ highlighter = require('./highlighter')
 rangeUtil = require('./range-util')
 { default: selections } = require('./selections')
 xpathRange = require('./anchoring/range')
-{ closest } = require('./util/dom')
+{ closest } = require('./util/dom-element')
 { normalizeURI } = require('./util/url')
 
 animationPromise = (fn) ->

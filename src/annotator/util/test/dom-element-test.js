@@ -1,6 +1,6 @@
-import { closest } from '../dom';
+import { closest } from '../dom-element';
 
-describe('annotator/util/dom', () => {
+describe('annotator/util/dom-element', () => {
   let container;
 
   beforeEach(() => {
