@@ -12,16 +12,8 @@ if (process.env.NODE_ENV !== 'production') {
 
 // Load icons.
 import { registerIcons } from '../shared/components/svg-icon';
-registerIcons({
-  annotate: require('../images/icons/annotate.svg'),
-  cancel: require('../images/icons/cancel.svg'),
-  'caret-left': require('../images/icons/caret-left.svg'),
-  'caret-right': require('../images/icons/caret-right.svg'),
-  hide: require('../images/icons/hide.svg'),
-  highlight: require('../images/icons/highlight.svg'),
-  note: require('../images/icons/note.svg'),
-  show: require('../images/icons/show.svg'),
-});
+import iconSet from './icons';
+registerIcons(iconSet);
 
 import configFrom from './config/index';
 import Guest from './guest';

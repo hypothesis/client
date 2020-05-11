@@ -1,5 +1,5 @@
 /**
- * Set of icons used by the sidebar application for use with the `SvgIcon`
+ * Set of icons used by the sidebar application via the `SvgIcon`
  * component.
  */
 export default {
@@ -8,7 +8,6 @@ export default {
   'arrow-left': require('../images/icons/arrow-left.svg'),
   'arrow-right': require('../images/icons/arrow-right.svg'),
   cancel: require('../images/icons/cancel.svg'),
-  'caret-left': require('../images/icons/caret-left.svg'),
   'caret-right': require('../images/icons/caret-right.svg'),
   'cc-std': require('../images/icons/cc-std.svg'),
   'cc-zero': require('../images/icons/cc-zero.svg'),
@@ -32,14 +31,12 @@ export default {
   'format-quote': require('../images/icons/format-quote.svg'),
   groups: require('../images/icons/groups.svg'),
   help: require('../images/icons/help.svg'),
-  hide: require('../images/icons/hide.svg'),
   highlight: require('../images/icons/highlight.svg'),
   image: require('../images/icons/image.svg'),
   leave: require('../images/icons/leave.svg'),
   link: require('../images/icons/link.svg'),
   lock: require('../images/icons/lock.svg'),
   logo: require('../images/icons/logo.svg'),
-  note: require('../images/icons/note.svg'),
   pointer: require('../images/icons/pointer.svg'),
   profile: require('../images/icons/profile.svg'),
   public: require('../images/icons/public.svg'),
@@ -48,7 +45,6 @@ export default {
   reply: require('../images/icons/reply.svg'),
   search: require('../images/icons/search.svg'),
   share: require('../images/icons/share.svg'),
-  show: require('../images/icons/show.svg'),
   success: require('../images/icons/check.svg'),
   sort: require('../images/icons/sort.svg'),
   trash: require('../images/icons/trash.svg'),
