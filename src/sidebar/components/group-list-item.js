@@ -83,7 +83,7 @@ function GroupListItem({
       isDisabled={!isSelectable}
       isExpanded={hasActionMenu ? isExpanded : false}
       isSelected={isSelected}
-      isSubmenuVisible={isExpanded}
+      isSubmenuVisible={hasActionMenu ? isExpanded : undefined}
       label={group.name}
       onClick={isSelectable ? focusGroup : toggleSubmenu}
       onToggleSubmenu={toggleSubmenu}
