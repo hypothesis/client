@@ -39,6 +39,7 @@ function DevServer(port, config) {
 
       if (url.pathname === '/document/license') {
         content = `
+          <!DOCTYPE html>
           <html>
           <head>
             <meta charset="UTF-8">
@@ -51,6 +52,7 @@ function DevServer(port, config) {
         `;
       } else if (url.pathname === '/document/code_of_conduct') {
         content = `
+          <!DOCTYPE html>
           <html>
           <head>
             <meta charset="UTF-8">
@@ -63,6 +65,7 @@ function DevServer(port, config) {
         `;
       } else {
         content = `
+          <!DOCTYPE html>
           <html>
           <head>
             <meta charset="UTF-8">

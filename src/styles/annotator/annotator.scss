@@ -5,6 +5,10 @@
 @use '../mixins/reset';
 @use '../mixins/shadow';
 
+// Shared components.
+@use '../components/svg-icon';
+
+// Annotator-specific components.
 @use './adder';
 @use './bucket-bar';
 @use './highlights';
@@ -107,7 +111,6 @@ $sidebar-collapse-transition-time: 150ms;
     text-decoration: none;
     height: 30px;
     width: 30px;
-    padding: 0;
     margin-bottom: 5px;
 
     &:active {
