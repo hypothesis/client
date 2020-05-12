@@ -1,6 +1,5 @@
 @use "sass:meta";
 @use '../variables' as var;
-@use '../mixins/icons';
 @use '../mixins/focus';
 @use '../mixins/reset';
 @use '../mixins/shadow';
@@ -67,10 +66,6 @@ $sidebar-collapse-transition-time: 150ms;
     width: 100%;
     z-index: 3;
     position: relative;
-  }
-
-  @include icons.icons {
-    font-family: 'h';
   }
 
   // the vertical toolbar at the left-edge of the sidebar

@@ -84,7 +84,6 @@ function bootHypothesisClient(doc, config) {
     // Main entry point for the client
     'scripts/annotator.bundle.js',
 
-    'styles/icomoon.css',
     'styles/annotator.css',
     'styles/pdfjs-overrides.css',
   ]);

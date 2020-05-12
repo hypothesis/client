@@ -36,7 +36,6 @@ describe('bootstrap', function () {
       'scripts/jquery.bundle.js',
       'scripts/annotator.bundle.js',
       'styles/annotator.css',
-      'styles/icomoon.css',
       'styles/pdfjs-overrides.css',
 
       // Sidebar app
@@ -85,7 +84,6 @@ describe('bootstrap', function () {
         'scripts/annotator.bundle.1234.js',
         'scripts/jquery.bundle.1234.js',
         'styles/annotator.1234.css',
-        'styles/icomoon.1234.css',
         'styles/pdfjs-overrides.1234.css',
       ].map(assetUrl);
 
