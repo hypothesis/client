@@ -50,7 +50,6 @@ describe('Menu', () => {
     const wrapper = createMenu();
     assert.isFalse(isOpen(wrapper));
     wrapper.find('button').simulate('click');
-    assert.isTrue(wrapper.find('MenuKeyboardNavigation').prop('visible'));
     assert.isTrue(isOpen(wrapper));
     wrapper.find('button').simulate('click');
     assert.isFalse(isOpen(wrapper));
@@ -60,7 +59,6 @@ describe('Menu', () => {
     const onOpenChanged = sinon.stub();
     const wrapper = createMenu({ onOpenChanged });
     wrapper.find('button').simulate('click');
-    assert.isTrue(wrapper.find('MenuKeyboardNavigation').prop('visible'));
     assert.calledWith(onOpenChanged, true);
     wrapper.find('button').simulate('click');
     assert.calledWith(onOpenChanged, false);
@@ -71,7 +69,6 @@ describe('Menu', () => {
     assert.isFalse(isOpen(wrapper));
 
     wrapper.find('button').simulate('mousedown');
-    assert.isFalse(wrapper.find('MenuKeyboardNavigation').prop('visible'));
     // Make sure the follow-up click doesn't close the menu.
     wrapper.find('button').simulate('click');
 
