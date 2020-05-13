@@ -80,16 +80,16 @@ export function call(
     window_.addEventListener('message', listener);
   });
 
-  const raceConditions = [response];
+  const responseOrTimeout = [response];
   if (timeout) {
-    raceConditions.push(
+    responseOrTimeout.push(
       createTimeout(timeout, `Request to ${origin} timed out`)
     );
   }
 
   // Cleanup and return.
   // FIXME: If we added a `Promise.finally` polyfill we could simplify this.
-  return Promise.race(raceConditions)
+  return Promise.race(responseOrTimeout)
     .then(result => {
       window_.removeEventListener('message', listener);
       return result;

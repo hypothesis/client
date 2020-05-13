@@ -19,13 +19,12 @@ describe('sidebar.util.postmessage-json-rpc', () => {
     let fakeWindow;
 
     function doCall(timeout = 1) {
-      const _timeout = timeout;
       return call(
         frame,
         origin,
         'testMethod',
         [1, 2, 3],
-        _timeout,
+        timeout,
         fakeWindow,
         messageId
       );
