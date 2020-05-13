@@ -257,7 +257,7 @@ describe('sidebar.util.fetch-config', () => {
             'https://embedder.com',
             'requestGroups',
             [0], // passes service index to requestGroups
-            5000
+            null // no timeout
           )
         );
       });

@@ -160,8 +160,9 @@ async function fetchGroupsAsync(config, rpcCall) {
   if (Array.isArray(config.services)) {
     config.services.forEach((service, index) => {
       if (service.groups === '$rpc:requestGroups') {
-        // The `groups` need to be fetched from a secondary RPC call
-        service.groups = rpcCall('requestGroups', [index], 5000).catch(() => {
+        // The `groups` need to be fetched from a secondary RPC call and
+        // there should be no timeout as it may be waiting for user input.
+        service.groups = rpcCall('requestGroups', [index], null).catch(() => {
           throw new Error('Unable to fetch groups');
         });
       }

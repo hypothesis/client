@@ -18,14 +18,14 @@ describe('sidebar.util.postmessage-json-rpc', () => {
     let frame;
     let fakeWindow;
 
-    function doCall() {
-      const timeout = 1;
+    function doCall(timeout = 1) {
+      const _timeout = timeout;
       return call(
         frame,
         origin,
         'testMethod',
         [1, 2, 3],
-        timeout,
+        _timeout,
         fakeWindow,
         messageId
       );
@@ -145,6 +145,22 @@ describe('sidebar.util.postmessage-json-rpc', () => {
         doCall(),
         'Request to https://embedder.com timed out'
       );
+    });
+
+    it('if timeout is null, then it does not timeout', async () => {
+      const clock = sinon.useFakeTimers();
+      const result = doCall(null);
+      clock.tick(100000); // wait a long time
+      fakeWindow.emitter.emit('message', {
+        origin,
+        data: {
+          jsonrpc: '2.0',
+          id: messageId,
+          result: {},
+        },
+      });
+      await result;
+      clock.restore();
     });
   });
 });
