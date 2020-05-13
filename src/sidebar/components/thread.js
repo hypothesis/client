@@ -81,6 +81,7 @@ function Thread({ showDocumentInfo = false, thread, threadsService }) {
         {showHiddenToggle && (
           <Button
             buttonText={`Show ${countHidden(thread)} more in conversation`}
+            className="thread__hidden-toggle-button"
             onClick={() => threadsService.forceVisible(thread)}
           />
         )}

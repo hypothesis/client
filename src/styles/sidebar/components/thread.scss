@@ -50,6 +50,11 @@
       }
     }
   }
+  &__hidden-toggle-button {
+    // This makes the vertical alignment with thread-collapse chevrons
+    // more precise
+    margin-top: -0.25em;
+  }
 
   &__content {
     flex-grow: 1;
