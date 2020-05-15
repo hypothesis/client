@@ -190,12 +190,10 @@ loads.
 
    .. option:: groups
 
-      ``String[]|null``. An array of group IDs. If provided, the list of groups
-      fetched from the API will be filtered against this list so that the user
-      can only select from these groups.
-
-      This can be useful in contexts where it is important that annotations
-      are made in a particular group.
+      ``String[]|null``. An array of group IDs. If provided, only these groups
+      will be fetched and displayed in the client. This is used, for example,
+      in the Hypothesis LMS app to show only the groups appropriate for a
+      user looking at a particular assignment.
 
    .. option:: icon
 

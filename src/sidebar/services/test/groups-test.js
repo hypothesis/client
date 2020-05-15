@@ -708,41 +708,48 @@ describe('groups', function () {
 
     [
       {
-        description: 'shows service groups',
+        description: 'loads groups specified by id in service config',
         services: [{ groups: ['abc123'] }],
         expected: ['abc123'],
       },
       {
-        description: 'also supports identifying service groups by groupid',
+        description: 'loads groups specified by groupid in service config',
         services: [{ groups: ['group:42@example.com'] }],
         expected: ['abc123'],
       },
       {
-        description: 'only shows service groups that exist',
+        description:
+          'reports an error if some groups specified in service config fail to load',
         services: [{ groups: ['abc123', 'no_exist'] }],
         expected: ['abc123'],
+        toastMessageError: 'Unable to fetch groups: Not Found',
       },
       {
-        description: 'shows no groups if no service groups exist',
+        description:
+          'reports an error if all groups specified in service config fail to load',
         services: [{ groups: ['no_exist'] }],
         expected: [],
+        toastMessageError: 'Unable to fetch groups: Not Found',
       },
       {
-        description: 'shows all groups if service is null',
+        description:
+          'loads groups for current user/document if service is null',
         services: null,
         expected: ['__world__', 'abc123', 'def456'],
       },
       {
-        description: 'shows all groups if service groups does not exist',
+        description:
+          'loads groups for current user/document if service groups does not exist',
         services: [{}],
         expected: ['__world__', 'abc123', 'def456'],
       },
       {
-        description: 'does not show any groups if the groups promise rejects',
+        description: 'reports an error if fetching service config groups fails',
         services: [
           { groups: Promise.reject(new Error('something went wrong')) },
         ],
-        toastMessageError: 'something went wrong',
+        toastMessageError:
+          'Unable to fetch group configuration: something went wrong',
         expected: [],
       },
     ].forEach(
@@ -751,7 +758,6 @@ describe('groups', function () {
           fakeSettings.services = services;
           const svc = service();
 
-          // Create groups response from server.
           const groups = [
             { name: 'Public', id: '__world__' },
             { name: 'ABC', id: 'abc123', groupid: 'group:42@example.com' },
@@ -760,9 +766,17 @@ describe('groups', function () {
 
           fakeApi.groups.list.returns(Promise.resolve(groups));
           fakeApi.profile.groups.read.returns(Promise.resolve([]));
+          fakeApi.group.read.callsFake(async params => {
+            const id = params.id;
+            const match = groups.find(g => g.id === id || g.groupid === id);
+            if (!match) {
+              throw new Error('Not Found');
+            }
+            return match;
+          });
 
           return svc.load().then(groups => {
-            let displayedGroups = groups.map(g => g.id);
+            const displayedGroups = groups.map(g => g.id);
             assert.deepEqual(displayedGroups, expected);
             if (toastMessageError) {
               assert.calledWith(fakeToastMessenger.error, toastMessageError);
