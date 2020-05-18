@@ -107,10 +107,10 @@ function i18nService($rootScope, localStorage = window.localStorage) {
   }
 
   function getOverrideLanguageCode(ietfLanguageCode) {
-    const { UI_LANGUAGE_OVERRIDE } = window.marketplaceProperties;
+    const uiOverrideLang = localStorage.getItem('uiOverrideLanguage');
 
-    if (UI_LANGUAGE_OVERRIDE && marketplaceLanguageOverrides[UI_LANGUAGE_OVERRIDE]) {
-      return marketplaceLanguageOverrides[UI_LANGUAGE_OVERRIDE][ietfLanguageCode];
+    if (uiOverrideLang && marketplaceLanguageOverrides[uiOverrideLang]) {
+      return marketplaceLanguageOverrides[uiOverrideLang][ietfLanguageCode];
     }
 
     return undefined;
