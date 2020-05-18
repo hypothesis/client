@@ -807,12 +807,13 @@ describe('groups', function () {
         );
 
         const svc = service();
-        await svc.load();
+        const groups = await svc.load();
 
         assert.calledWith(
           fakeToastMessenger.error,
           'Unable to fetch group configuration: Something went wrong'
         );
+        assert.deepEqual(groups, []);
       });
     });
   });
