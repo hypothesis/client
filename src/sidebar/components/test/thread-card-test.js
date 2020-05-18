@@ -32,6 +32,7 @@ describe('ThreadCard', () => {
     };
     fakeStore = {
       isAnnotationFocused: sinon.stub().returns(false),
+      route: sinon.stub(),
     };
 
     fakeThread = {
@@ -67,6 +68,22 @@ describe('ThreadCard', () => {
     const wrapper = createComponent({ settings: { theme: 'clean' } });
 
     assert(wrapper.find('.thread-card').hasClass('thread-card--theme-clean'));
+  });
+
+  it('shows document info if current route is not sidebar', () => {
+    fakeStore.route.returns('whatever');
+
+    const wrapper = createComponent();
+
+    assert.isTrue(wrapper.find('Thread').props().showDocumentInfo);
+  });
+
+  it('does not show document info if current route is sidebar', () => {
+    fakeStore.route.returns('sidebar');
+
+    const wrapper = createComponent();
+
+    assert.isFalse(wrapper.find('Thread').props().showDocumentInfo);
   });
 
   describe('mouse and click events', () => {
