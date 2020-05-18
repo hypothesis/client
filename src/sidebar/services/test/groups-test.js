@@ -706,85 +706,115 @@ describe('groups', function () {
       }
     );
 
-    [
-      {
-        description: 'loads groups specified by id in service config',
-        services: [{ groups: ['abc123'] }],
-        expected: ['abc123'],
-      },
-      {
-        description: 'loads groups specified by groupid in service config',
-        services: [{ groups: ['group:42@example.com'] }],
-        expected: ['abc123'],
-      },
-      {
-        description:
-          'reports an error if some groups specified in service config fail to load',
-        services: [{ groups: ['abc123', 'no_exist'] }],
-        expected: ['abc123'],
-        toastMessageError: 'Unable to fetch groups: Not Found',
-      },
-      {
-        description:
-          'reports an error if all groups specified in service config fail to load',
-        services: [{ groups: ['no_exist'] }],
-        expected: [],
-        toastMessageError: 'Unable to fetch groups: Not Found',
-      },
-      {
-        description:
-          'loads groups for current user/document if service is null',
-        services: null,
-        expected: ['__world__', 'abc123', 'def456'],
-      },
-      {
-        description:
-          'loads groups for current user/document if service groups does not exist',
-        services: [{}],
-        expected: ['__world__', 'abc123', 'def456'],
-      },
-      {
-        description: 'reports an error if fetching service config groups fails',
-        services: [
-          { groups: Promise.reject(new Error('something went wrong')) },
-        ],
-        toastMessageError:
-          'Unable to fetch group configuration: something went wrong',
-        expected: [],
-      },
-    ].forEach(
-      ({ description, services, expected, toastMessageError = null }) => {
-        it(description, () => {
-          fakeSettings.services = services;
-          const svc = service();
+    context('when service config specifies which groups to show', () => {
+      const makeGroup = (id, groupid = null) => ({ id, groupid });
+      const setServiceConfigGroups = groupids => {
+        fakeSettings.services = [{ groups: groupids }];
+      };
 
-          const groups = [
-            { name: 'Public', id: '__world__' },
-            { name: 'ABC', id: 'abc123', groupid: 'group:42@example.com' },
-            { name: 'DEF', id: 'def456', groupid: null },
-          ];
+      const groupA = makeGroup('id-a');
+      const groupB = makeGroup('id-b', 'groupid-b');
+      const groupC = makeGroup('id-c');
 
-          fakeApi.groups.list.returns(Promise.resolve(groups));
-          fakeApi.profile.groups.read.returns(Promise.resolve([]));
-          fakeApi.group.read.callsFake(async params => {
-            const id = params.id;
-            const match = groups.find(g => g.id === id || g.groupid === id);
-            if (!match) {
-              throw new Error('Not Found');
-            }
-            return match;
-          });
+      beforeEach(() => {
+        fakeApi.profile.groups.read.resolves([]);
+        fakeApi.group.read.rejects(new Error('Not Found'));
+      });
 
-          return svc.load().then(groups => {
-            const displayedGroups = groups.map(g => g.id);
-            assert.deepEqual(displayedGroups, expected);
-            if (toastMessageError) {
-              assert.calledWith(fakeToastMessenger.error, toastMessageError);
-            }
-          });
+      it('loads groups specified by id or groupid in service config', async () => {
+        setServiceConfigGroups(['id-a', 'groupid-b']);
+        fakeApi.profile.groups.read.resolves([groupA, groupB, groupC]);
+
+        const svc = service();
+        const groups = await svc.load();
+
+        assert.deepEqual(
+          groups.map(g => g.id),
+          ['id-a', 'id-b']
+        );
+      });
+
+      it('loads groups specified asynchronously in service config', async () => {
+        setServiceConfigGroups(Promise.resolve(['id-a', 'groupid-b']));
+        fakeApi.profile.groups.read.resolves([groupA, groupB, groupC]);
+
+        const svc = service();
+        const groups = await svc.load();
+
+        assert.deepEqual(
+          groups.map(g => g.id),
+          ['id-a', 'id-b']
+        );
+      });
+
+      it(`fetches groups by ID if the group is not in the user's groups`, async () => {
+        setServiceConfigGroups(Promise.resolve(['id-a', 'groupid-b', 'id-c']));
+        const serverGroups = [groupA, groupB, groupC];
+        fakeApi.profile.groups.read.resolves([groupA]);
+        fakeApi.group.read.callsFake(async ({ id }) => {
+          const group = serverGroups.find(g => g.id === id || g.groupid === id);
+          if (!group) {
+            throw new Error(`Group ${id} not found`);
+          }
+          return group;
         });
-      }
-    );
+
+        const svc = service();
+        const groups = await svc.load();
+
+        const expand = ['organization', 'scopes'];
+        assert.calledWith(fakeApi.group.read, { expand, id: 'groupid-b' });
+        assert.calledWith(fakeApi.group.read, { expand, id: 'id-c' });
+        assert.deepEqual(
+          groups.map(g => g.id),
+          ['id-a', 'id-b', 'id-c']
+        );
+      });
+
+      it(`does not fetch group by ID if the group is in the user's groups`, async () => {
+        setServiceConfigGroups(Promise.resolve(['id-a', 'groupid-b']));
+        fakeApi.profile.groups.read.resolves([groupA, groupB, groupC]);
+
+        const svc = service();
+        await svc.load();
+
+        assert.notCalled(fakeApi.group.read);
+      });
+
+      it('reports an error if a group specified in service config fails to load', async () => {
+        setServiceConfigGroups(Promise.resolve(['id-a', 'missing']));
+        fakeApi.profile.groups.read.resolves([groupA]);
+        fakeApi.group.read.rejects(new Error('Not Found'));
+
+        const svc = service();
+        const groups = await svc.load();
+
+        assert.calledWith(
+          fakeToastMessenger.error,
+          'Unable to fetch groups: Not Found'
+        );
+
+        // The groups that were found should still be loaded.
+        assert.deepEqual(
+          groups.map(g => g.id),
+          ['id-a']
+        );
+      });
+
+      it('reports an error if fetching group IDs from service config fails', async () => {
+        setServiceConfigGroups(
+          Promise.reject(new Error('Something went wrong'))
+        );
+
+        const svc = service();
+        await svc.load();
+
+        assert.calledWith(
+          fakeToastMessenger.error,
+          'Unable to fetch group configuration: Something went wrong'
+        );
+      });
+    });
   });
 
   describe('#get', function () {

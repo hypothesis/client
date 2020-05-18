@@ -323,11 +323,9 @@ export default function groups(
       directLinkedGroupId
     );
 
-    addGroupsToStore(groups, [
-      directLinkedAnnotationGroupId,
-      directLinkedGroupId,
-      store.getDefault('focusedGroup'),
-    ]);
+    const groupToFocus =
+      directLinkedAnnotationGroupId || directLinkedGroupId || null;
+    addGroupsToStore(groups, groupToFocus);
 
     return groups;
   }
@@ -338,6 +336,14 @@ export default function groups(
    * @param {string[]} groupIds
    */
   async function loadServiceSpecifiedGroups(groupIds) {
+    // Fetch the groups that the user is a member of in one request and then
+    // fetch any other groups not returned in that request directly.
+    //
+    // This reduces the number of requests to the backend on the assumption
+    // that most or all of the group IDs that the service configures the client
+    // to show are groups that the user is a member of.
+    const userGroups = await api.profile.groups.read({ expand: expandParam });
+
     let error;
     const tryFetchGroup = async id => {
       try {
@@ -348,9 +354,13 @@ export default function groups(
       }
     };
 
-    const groups = (
-      await Promise.all(groupIds.map(id => tryFetchGroup(id)))
-    ).filter(g => g !== null);
+    const getGroup = id =>
+      userGroups.find(g => g.id === id || g.groupid === id) ||
+      tryFetchGroup(id);
+
+    const groups = (await Promise.all(groupIds.map(getGroup))).filter(
+      g => g !== null
+    );
 
     addGroupsToStore(groups);
 
@@ -364,25 +374,27 @@ export default function groups(
   }
 
   /**
+   * Add groups to the store and set the initial focused group.
+   *
    * @param {Group[]} groups
-   * @param {string[]} groupsToFocus - IDs of groups to focus, in preference order
+   * @param {string|null} [groupToFocus]
    */
-  function addGroupsToStore(groups, groupsToFocus = []) {
+  function addGroupsToStore(groups, groupToFocus) {
     // Add a default organization to groups that don't have one. The organization
     // provides the logo to display when the group is selected and is also used
     // to order groups.
     injectOrganizations(groups);
 
     const isFirstLoad = store.allGroups().length === 0;
+    const prevFocusedGroup = store.getDefault('focusedGroup');
 
     store.loadGroups(groups);
 
     if (isFirstLoad) {
-      for (let id of groupsToFocus) {
-        if (groups.some(g => g.id === id)) {
-          focus(id);
-          break;
-        }
+      if (groups.some(g => g.id === groupToFocus)) {
+        focus(groupToFocus);
+      } else if (groups.some(g => g.id === prevFocusedGroup)) {
+        focus(prevFocusedGroup);
       }
     }
   }
@@ -408,15 +420,15 @@ export default function groups(
   async function load() {
     let groups;
     if (svc && svc.groups) {
+      let groupIds = [];
       try {
-        const groupIds = await svc.groups;
-        groups = await loadServiceSpecifiedGroups(groupIds);
+        groupIds = await svc.groups;
       } catch (e) {
         toastMessenger.error(
           `Unable to fetch group configuration: ${e.message}`
         );
-        groups = [];
       }
+      groups = await loadServiceSpecifiedGroups(groupIds);
     } else {
       groups = await loadGroupsForUserAndDocument();
     }
