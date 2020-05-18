@@ -16,6 +16,7 @@ import Thread from './thread';
 function ThreadCard({ frameSync, settings = {}, thread }) {
   const threadTag = thread.annotation && thread.annotation.$tag;
   const isFocused = useStore(store => store.isAnnotationFocused(threadTag));
+  const showDocumentInfo = useStore(store => store.route() !== 'sidebar');
 
   const focusThreadAnnotation = useCallback(
     debounce(tag => {
@@ -44,7 +45,7 @@ function ThreadCard({ frameSync, settings = {}, thread }) {
         'thread-card--theme-clean': settings.theme === 'clean',
       })}
     >
-      <Thread thread={thread} showDocumentInfo={false} />
+      <Thread thread={thread} showDocumentInfo={showDocumentInfo} />
     </div>
   );
 }
