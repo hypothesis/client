@@ -102,8 +102,6 @@ $adder-transition-duration: 80ms;
   @include focus.outline-on-keyboard-focus;
 
   box-shadow: none;
-  font-family: h;
-  font-size: 18px;
   background: transparent;
   color: var.$grey-mid;
   display: flex;
@@ -111,12 +109,12 @@ $adder-transition-duration: 80ms;
   align-items: center;
   border: none;
   cursor: pointer;
+  font-size: 12px;
+  font-family: sans-serif;
+  line-height: 1em;
 
-  padding-top: 10px;
-  padding-bottom: 6px;
-  padding-left: 10px;
-  padding-right: 10px;
-
+  padding: 10px;
+  padding-bottom: 7px;
   transition: color $adder-transition-duration;
 }
 
@@ -141,8 +139,6 @@ $adder-transition-duration: 80ms;
   margin-bottom: 2px;
   margin-top: 4px;
 
-  font-size: 12px;
-  font-family: sans-serif;
   transition: color $adder-transition-duration;
 }
 
@@ -153,8 +149,6 @@ $adder-transition-duration: 80ms;
 
   // The badge should be vertically aligned with icons in other toolbar buttons
   // and the label underneath should also align with labels in other buttons.
-  font-family: sans-serif;
-  font-size: 12px;
   font-weight: bold;
   padding: 2px 4px;
 }
