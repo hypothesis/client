@@ -333,7 +333,7 @@ export default function groups(
   /**
    * Load the specific groups configured by the annotation service.
    *
-   * @param {string[]} groupIds
+   * @param {string[]} groupIds - `id` or `groupid`s of groups to fetch
    */
   async function loadServiceSpecifiedGroups(groupIds) {
     // Fetch the groups that the user is a member of in one request and then
