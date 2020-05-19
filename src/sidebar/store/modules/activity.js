@@ -145,10 +145,13 @@ function isFetchingAnnotations(state) {
 
 /**
  * Return true when any activity is happening in the app that needs to complete
- * before the UI will be idle.
+ * before the UI is ready for interactivity with annotations.
  */
 function isLoading(state) {
-  return state.activity.activeApiRequests > 0;
+  return (
+    state.activity.activeApiRequests > 0 ||
+    !state.activity.hasFetchedAnnotations
+  );
 }
 
 /**
