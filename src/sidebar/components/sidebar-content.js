@@ -131,7 +131,11 @@ function SidebarContent({
       {isFocusedMode && <FocusedModeHeader />}
       <LoginPromptPanel onLogin={onLogin} onSignUp={onSignUp} />
       {hasDirectLinkedAnnotationError && (
-        <SidebarContentError errorType="annotation" onLoginRequest={onLogin} />
+        <SidebarContentError
+          errorType="annotation"
+          onLoginRequest={onLogin}
+          showClearSelection={true}
+        />
       )}
       {hasDirectLinkedGroupError && (
         <SidebarContentError errorType="group" onLoginRequest={onLogin} />

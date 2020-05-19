@@ -47,7 +47,10 @@ describe('SidebarContentError', () => {
 
   it('should provide a button to clear the selection (show all annotations)', () => {
     const fakeOnLogin = sinon.stub();
-    const wrapper = createComponent({ onLoginRequest: fakeOnLogin });
+    const wrapper = createComponent({
+      onLoginRequest: fakeOnLogin,
+      showClearSelection: true,
+    });
 
     const clearButton = findButtonByText(wrapper, 'Show all annotations');
     assert.isTrue(clearButton.exists());

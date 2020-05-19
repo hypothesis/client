@@ -7,9 +7,14 @@ import Button from './button';
 import SvgIcon from '../../shared/components/svg-icon';
 
 /**
- * An error message to display in the sidebar.
+ * Show an error indicating that an annotation or group referenced in the URL
+ * could not be fetched.
  */
-export default function SidebarContentError({ errorType, onLoginRequest }) {
+export default function SidebarContentError({
+  errorType,
+  onLoginRequest,
+  showClearSelection = false,
+}) {
   const clearSelection = useStore(store => store.clearSelection);
   const isLoggedIn = useStore(store => store.isLoggedIn());
 
@@ -42,12 +47,14 @@ export default function SidebarContentError({ errorType, onLoginRequest }) {
       <div className="sidebar-content-error__content">
         <p>{errorMessage}</p>
         <div className="sidebar-content-error__actions">
-          <Button
-            buttonText="Show all annotations"
-            className="sidebar-content-error__button"
-            onClick={clearSelection}
-            usePrimaryStyle={isLoggedIn}
-          />
+          {showClearSelection && (
+            <Button
+              buttonText="Show all annotations"
+              className="sidebar-content-error__button"
+              onClick={clearSelection}
+              usePrimaryStyle={isLoggedIn}
+            />
+          )}
           {!isLoggedIn && (
             <Button
               buttonText="Log in"
@@ -64,6 +71,12 @@ export default function SidebarContentError({ errorType, onLoginRequest }) {
 
 SidebarContentError.propTypes = {
   errorType: propTypes.oneOf(['annotation', 'group']),
+
+  /**
+   * Whether to show a "Clear selection" button.
+   */
+  showClearSelection: propTypes.bool,
+
   /* A function that will launch the login flow for the user. */
   onLoginRequest: propTypes.func.isRequired,
 };

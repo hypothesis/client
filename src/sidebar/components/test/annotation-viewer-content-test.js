@@ -44,6 +44,7 @@ describe('AnnotationViewerContent', () => {
       getState: sinon.stub().returns({}),
       highlightAnnotations: sinon.stub(),
       routeParams: sinon.stub().returns({ id: 'test_annotation_id' }),
+      profile: sinon.stub().returns({ userid: null }),
       setCollapsed: sinon.stub(),
     };
 
@@ -73,10 +74,11 @@ describe('AnnotationViewerContent', () => {
     $imports.$restore();
   });
 
-  function createComponent({ api }) {
+  function createComponent({ api, onLogin = sinon.stub() }) {
     return mount(
       <AnnotationViewerContent
         api={api}
+        onLogin={onLogin}
         rootThread={fakeRootThread}
         streamer={fakeStreamer}
         streamFilter={fakeStreamFilter}
@@ -115,6 +117,36 @@ describe('AnnotationViewerContent', () => {
       await waitForAnnotationsToLoad();
 
       assert.notCalled(fakeStore.highlightAnnotations);
+    });
+
+    it('shows an error if the annotation could not be fetched', async () => {
+      const fakeApi = new FakeApi([]);
+      const onLogin = sinon.stub();
+      const wrapper = createComponent({ api: fakeApi, onLogin });
+
+      // Initially the annotation is not available to the user, so an error
+      // should be shown.
+      await waitFor(() => {
+        wrapper.update();
+        return wrapper.exists('SidebarContentError');
+      });
+
+      // Simulate clicking the "Login" button in the error.
+      const onLoginRequest = wrapper
+        .find('SidebarContentError')
+        .prop('onLoginRequest');
+      onLoginRequest();
+      assert.called(onLogin);
+
+      // After the user logs in, the annotation should be shown.
+      fakeApi.annotations = [{ id: 'test_annotation_id' }];
+      fakeStore.profile.returns({ userid: 'acct:jimsmith@hypothes.is' });
+
+      // Force re-render. `useStore` would do this in the actual app.
+      wrapper.setProps({});
+
+      await waitForAnnotationsToLoad();
+      assert.isFalse(wrapper.exists('SidebarContentError'));
     });
   });
 
