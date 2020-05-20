@@ -168,7 +168,9 @@ function HypothesisApp({
 
         {route && (
           <main>
-            {route === 'annotation' && <AnnotationViewerContent />}
+            {route === 'annotation' && (
+              <AnnotationViewerContent onLogin={login} />
+            )}
             {route === 'stream' && <StreamContent />}
             {route === 'sidebar' && (
               <SidebarContent onLogin={login} onSignUp={signUp} />

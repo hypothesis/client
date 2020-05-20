@@ -1,17 +1,19 @@
-import { createElement } from 'preact';
-import { useEffect } from 'preact/hooks';
+import { Fragment, createElement } from 'preact';
+import { useEffect, useState } from 'preact/hooks';
 import propTypes from 'prop-types';
 
 import useStore from '../store/use-store';
 import { withServices } from '../util/service-context';
 
 import ThreadList from './thread-list';
+import SidebarContentError from './sidebar-content-error';
 
 /**
  * The main content for the single annotation page (aka. https://hypothes.is/a/<annotation ID>)
  */
 function AnnotationViewerContent({
   api,
+  onLogin,
   rootThread: rootThreadService,
   streamer,
   streamFilter,
@@ -24,55 +26,66 @@ function AnnotationViewerContent({
     rootThreadService.thread(store.getState())
   );
   const setCollapsed = useStore(store => store.setCollapsed);
+  const userid = useStore(store => store.profile().userid);
+
+  const [fetchError, setFetchError] = useState(false);
 
   useEffect(() => {
+    setFetchError(false);
     clearAnnotations();
 
-    // TODO - Handle exceptions during the `fetchThread` call.
-    fetchThread(api, annotationId).then(annots => {
-      addAnnotations(annots);
+    fetchThread(api, annotationId)
+      .then(annots => {
+        addAnnotations(annots);
 
-      // Find the top-level annotation in the thread that `annotationId` is
-      // part of. This will be different to `annotationId` if `annotationId`
-      // is a reply.
-      const topLevelAnnot = annots.filter(
-        ann => (ann.references || []).length === 0
-      )[0];
+        // Find the top-level annotation in the thread that `annotationId` is
+        // part of. This will be different to `annotationId` if `annotationId`
+        // is a reply.
+        const topLevelAnnot = annots.filter(
+          ann => (ann.references || []).length === 0
+        )[0];
 
-      if (!topLevelAnnot) {
-        // We were able to fetch annotations in the thread that `annotationId`
-        // is part of (note that `annotationId` may refer to a reply) but
-        // couldn't find a top-level (non-reply) annotation in that thread.
-        //
-        // This might happen if the top-level annotation was deleted or
-        // moderated or had its permissions changed.
-        //
-        // We need to decide what what be the most useful behavior in this case
-        // and implement it.
-        /* istanbul ignore next */
-        return;
-      }
+        if (!topLevelAnnot) {
+          // We were able to fetch annotations in the thread that `annotationId`
+          // is part of (note that `annotationId` may refer to a reply) but
+          // couldn't find a top-level (non-reply) annotation in that thread.
+          //
+          // This might happen if the top-level annotation was deleted or
+          // moderated or had its permissions changed.
+          //
+          // We need to decide what what be the most useful behavior in this case
+          // and implement it.
+          /* istanbul ignore next */
+          return;
+        }
 
-      // Configure the connection to the real-time update service to send us
-      // updates to any of the annotations in the thread.
-      streamFilter
-        .addClause('/references', 'one_of', topLevelAnnot.id, true)
-        .addClause('/id', 'equals', topLevelAnnot.id, true);
-      streamer.setConfig('filter', { filter: streamFilter.getFilter() });
-      streamer.connect();
+        // Configure the connection to the real-time update service to send us
+        // updates to any of the annotations in the thread.
+        streamFilter
+          .addClause('/references', 'one_of', topLevelAnnot.id, true)
+          .addClause('/id', 'equals', topLevelAnnot.id, true);
+        streamer.setConfig('filter', { filter: streamFilter.getFilter() });
+        streamer.connect();
 
-      // Make the full thread of annotations visible. By default replies are
-      // not shown until the user expands the thread.
-      annots.forEach(annot => setCollapsed(annot.id, false));
+        // Make the full thread of annotations visible. By default replies are
+        // not shown until the user expands the thread.
+        annots.forEach(annot => setCollapsed(annot.id, false));
 
-      // FIXME - This should show a visual indication of which reply the
-      // annotation ID in the URL refers to. That isn't currently working.
-      if (topLevelAnnot.id !== annotationId) {
-        highlightAnnotations([annotationId]);
-      }
-    });
+        // FIXME - This should show a visual indication of which reply the
+        // annotation ID in the URL refers to. That isn't currently working.
+        if (topLevelAnnot.id !== annotationId) {
+          highlightAnnotations([annotationId]);
+        }
+      })
+      .catch(() => {
+        setFetchError(true);
+      });
   }, [
     annotationId,
+
+    // This is not used by the effect but ensures that the annotation is
+    // fetched after the user logs in/out, in case the annotation is private.
+    userid,
 
     // Static dependencies.
     addAnnotations,
@@ -84,10 +97,22 @@ function AnnotationViewerContent({
     streamer,
   ]);
 
-  return <ThreadList thread={rootThread} />;
+  return (
+    <Fragment>
+      {fetchError && (
+        // This is the same error shown if a direct-linked annotation cannot
+        // be fetched in the sidebar. Fortunately the error message makes sense
+        // for this scenario as well.
+        <SidebarContentError errorType="annotation" onLoginRequest={onLogin} />
+      )}
+      <ThreadList thread={rootThread} />
+    </Fragment>
+  );
 }
 
 AnnotationViewerContent.propTypes = {
+  onLogin: propTypes.func.isRequired,
+
   // Injected.
   api: propTypes.object,
   rootThread: propTypes.object,
