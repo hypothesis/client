@@ -35,6 +35,11 @@ $grey-6: #3f3f3f;
 $grey-7: #202020;
 
 // Colors
+$color-text: $grey-7;
+$color-text-light: $grey-5;
+// Text color when used on a dark background
+$color-text-inverted: $grey-1;
+
 $color-success: #00a36d;
 $color-notice: #fbc168;
 $color-error: #d93c3f;
