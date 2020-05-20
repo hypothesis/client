@@ -112,12 +112,12 @@ describe('SelectionTabs', function () {
 
       const tabs = wrapper.find('button');
 
-      assert.equal(tabs.at(0).prop('aria-label'), 'Select annotations tab');
-      assert.equal(tabs.at(0).prop('title'), 'Select annotations tab');
-      assert.equal(tabs.at(1).prop('aria-label'), 'Select page notes tab');
-      assert.equal(tabs.at(1).prop('title'), 'Select page notes tab');
-      assert.equal(tabs.at(2).prop('aria-label'), 'Select orphans tab');
-      assert.equal(tabs.at(2).prop('title'), 'Select orphans tab');
+      assert.equal(tabs.at(0).prop('aria-label'), 'Annotations');
+      assert.equal(tabs.at(0).prop('title'), 'Annotations');
+      assert.equal(tabs.at(1).prop('aria-label'), 'Page notes');
+      assert.equal(tabs.at(1).prop('title'), 'Page notes');
+      assert.equal(tabs.at(2).prop('aria-label'), 'Orphans');
+      assert.equal(tabs.at(2).prop('title'), 'Orphans');
     });
 
     it('should show the clean theme when settings contains the clean theme option', function () {
