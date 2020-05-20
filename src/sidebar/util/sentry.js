@@ -51,6 +51,8 @@ export function init(config) {
   Sentry.init({
     dsn: config.dsn,
     environment: config.environment,
+    // Do not log Fetch failures to avoid inundating with unhandled fetch exceptions
+    ignoreErrors: ['Fetch operation failed'],
     release: '__VERSION__', // replaced by versionify
     whitelistUrls,
 
