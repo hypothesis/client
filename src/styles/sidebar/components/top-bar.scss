@@ -20,6 +20,8 @@
 
   &__icon-button,
   &__menu-icon {
+    color: var.$grey-mid;
+
     &.is-active {
       color: var.$grey-7;
 

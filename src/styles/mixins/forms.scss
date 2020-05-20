@@ -26,7 +26,7 @@
 
   @include focus-outline;
   @include placeholder {
-    color: var.$grey-5;
+    color: var.$color-text-light;
   }
 }
 
@@ -36,7 +36,7 @@
   border-radius: 2px;
   padding: 0.5em 0.75em;
   font-weight: normal;
-  color: var.$grey-5;
+  color: var.$color-text-light;
   background-color: var.$grey-0;
 
   &:focus {

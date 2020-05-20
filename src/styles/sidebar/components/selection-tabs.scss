@@ -5,11 +5,11 @@
 .selection-tabs {
   display: flex;
   flex-direction: row;
-  color: var.$grey-5;
+  color: var.$color-text-light;
   @include var.font-normal;
 
   &:hover {
-    color: var.$grey-6;
+    color: var.$color-text;
   }
 
   padding-bottom: 10px;
@@ -23,7 +23,7 @@
   @include buttons.reset-native-btn-styles;
   @include focus.outline-on-keyboard-focus;
 
-  color: var.$grey-6;
+  color: var.$color-text;
   margin-right: 20px;
   cursor: pointer;
   min-width: 85px;
@@ -56,15 +56,8 @@
 }
 
 .selection-tabs__message {
+  color: var.$color-text;
   border: 1px solid var.$grey-3;
   padding: 3em;
   text-align: center;
-}
-
-.selection-tabs__icon {
-  width: 12px;
-  height: 12px;
-  margin-right: 1px;
-  margin-bottom: -1px; // Pull the icon a little toward the baseline
-  color: var.$grey-5;
 }

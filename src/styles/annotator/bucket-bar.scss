@@ -34,7 +34,7 @@
       @include reset.reset-box-model;
       @include reset.reset-font;
       background: none;
-      color: var.$text-color;
+      color: var.$color-text-light;
       font-weight: bold;
       font-family: var.$sans-font-family;
       font-size: 10px;

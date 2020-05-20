@@ -4,7 +4,7 @@
   margin: 25px auto;
   width: 70%;
   text-align: center;
-  color: var.$grey-mid;
+  color: var.$color-text;
   display: flex;
   flex-direction: column;
 }
@@ -12,13 +12,13 @@
 .logged-out-message__link {
   padding: 0;
   display: inline;
-  color: var.$grey-mid;
+  color: var.$color-text;
   background-color: transparent;
   text-decoration: underline;
   font-weight: 400;
 
   &:hover {
-    color: var.$grey-7;
+    color: var.$color-text;
     text-decoration: none;
   }
 }
@@ -31,7 +31,7 @@
 
 .logged-out-message__logo-icon {
   font-size: 30px;
-  color: var.$grey-4;
+  color: var.$grey-mid;
 
   &:hover {
     color: var.$grey-7;

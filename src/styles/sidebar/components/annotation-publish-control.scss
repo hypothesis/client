@@ -7,7 +7,7 @@
   // A split button with a primary submit on the left and a drop-down menu
   // of related options to the right
   .annotation-publish-control__btn {
-    $text-color: var.$grey-1;
+    $text-color: var.$color-text-inverted;
     $default-background-color: var.$grey-mid;
     $hover-background-color: var.$grey-6;
     $h-padding: 9px;
