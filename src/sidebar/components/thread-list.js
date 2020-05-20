@@ -71,11 +71,20 @@ function ThreadList({ thread }) {
   );
 
   // Scroll to newly created annotations and replies.
+  //
+  // A side effect of the approach here is that if there are multiple unsaved
+  // annotations and the newest one is saved or removed, the thread list will
+  // scroll to the next unsaved one.
   const newAnnotationTag = useStore(store => {
-    const ann = store
+    // If multiple unsaved annotations exist, assume that the last one in the
+    // list is the most recently created one.
+    const newAnnotations = store
       .unsavedAnnotations()
-      .find(ann => !ann.id && !isHighlight(ann));
-    return ann ? ann.$tag : null;
+      .filter(ann => !ann.id && !isHighlight(ann));
+    if (!newAnnotations.length) {
+      return null;
+    }
+    return newAnnotations[newAnnotations.length - 1].$tag;
   });
 
   useEffect(() => {
