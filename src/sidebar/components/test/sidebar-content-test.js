@@ -56,7 +56,7 @@ describe('SidebarContent', () => {
       hasAppliedFilter: sinon.stub(),
       hasFetchedAnnotations: sinon.stub(),
       hasSidebarOpened: sinon.stub(),
-      isFetchingAnnotations: sinon.stub(),
+      isLoading: sinon.stub().returns(false),
       isLoggedIn: sinon.stub(),
       getState: sinon.stub(),
       profile: sinon.stub().returns({ userid: null }),
@@ -113,8 +113,7 @@ describe('SidebarContent', () => {
   context('when viewing a direct-linked annotation', () => {
     context('successful direct-linked annotation', () => {
       beforeEach(() => {
-        fakeStore.hasFetchedAnnotations.returns(true);
-        fakeStore.isFetchingAnnotations.returns(false);
+        fakeStore.isLoading.returns(false);
         fakeStore.annotationExists.withArgs('someId').returns(true);
         fakeStore.directLinkedAnnotationId.returns('someId');
         fakeStore.findAnnotationByID
@@ -149,8 +148,7 @@ describe('SidebarContent', () => {
     context('error on direct-linked annotation', () => {
       beforeEach(() => {
         // This puts us into a "direct-linked annotation" state
-        fakeStore.hasFetchedAnnotations.returns(true);
-        fakeStore.isFetchingAnnotations.returns(false);
+        fakeStore.isLoading.returns(false);
         fakeStore.directLinkedAnnotationId.returns('someId');
 
         // This puts us into an error state
@@ -179,8 +177,7 @@ describe('SidebarContent', () => {
 
   context('error with direct-linked group', () => {
     beforeEach(() => {
-      fakeStore.hasFetchedAnnotations.returns(true);
-      fakeStore.isFetchingAnnotations.returns(false);
+      fakeStore.isLoading.returns(false);
       fakeStore.directLinkedGroupFetchFailed.returns(true);
     });
 
@@ -229,7 +226,7 @@ describe('SidebarContent', () => {
 
   it('renders search status', () => {
     fakeStore.hasFetchedAnnotations.returns(true);
-    fakeStore.isFetchingAnnotations.returns(false);
+    fakeStore.isLoading.returns(false);
 
     const wrapper = createComponent();
 
@@ -237,7 +234,7 @@ describe('SidebarContent', () => {
   });
 
   it('does not render search status if annotations are loading', () => {
-    fakeStore.hasFetchedAnnotations.returns(false);
+    fakeStore.isLoading.returns(true);
 
     const wrapper = createComponent();
 

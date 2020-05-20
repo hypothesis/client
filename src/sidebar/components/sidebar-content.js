@@ -33,9 +33,7 @@ function SidebarContent({
   const focusedGroupId = useStore(store => store.focusedGroupId());
   const hasAppliedFilter = useStore(store => store.hasAppliedFilter());
   const isFocusedMode = useStore(store => store.focusModeEnabled());
-  const annotationsLoading = useStore(store => {
-    return !store.hasFetchedAnnotations() || store.isFetchingAnnotations();
-  });
+  const isLoading = useStore(store => store.isLoading());
   const isLoggedIn = useStore(store => store.isLoggedIn());
   const linkedAnnotationId = useStore(store =>
     store.directLinkedAnnotationId()
@@ -68,7 +66,7 @@ function SidebarContent({
   // If, after loading completes, no `linkedAnnotation` object is present when
   // a `linkedAnnotationId` is set, that indicates an error
   const hasDirectLinkedAnnotationError =
-    !annotationsLoading && linkedAnnotationId ? !linkedAnnotation : false;
+    !isLoading && linkedAnnotationId ? !linkedAnnotation : false;
 
   const hasDirectLinkedGroupError = useStore(store =>
     store.directLinkedGroupFetchFailed()
@@ -78,7 +76,7 @@ function SidebarContent({
     hasDirectLinkedAnnotationError || hasDirectLinkedGroupError;
 
   const showTabs = !hasContentError && !hasAppliedFilter;
-  const showSearchStatus = !hasContentError && !annotationsLoading;
+  const showSearchStatus = !hasContentError && !isLoading;
 
   // Show a CTA to log in if successfully viewing a direct-linked annotation
   // and not logged in
@@ -86,7 +84,7 @@ function SidebarContent({
     linkedAnnotationId &&
     !isLoggedIn &&
     !hasDirectLinkedAnnotationError &&
-    !annotationsLoading;
+    !isLoading;
 
   const prevGroupId = useRef(focusedGroupId);
 
@@ -140,7 +138,7 @@ function SidebarContent({
       {hasDirectLinkedGroupError && (
         <SidebarContentError errorType="group" onLoginRequest={onLogin} />
       )}
-      {showTabs && <SelectionTabs isLoading={annotationsLoading} />}
+      {showTabs && <SelectionTabs isLoading={isLoading} />}
       {showSearchStatus && <SearchStatusBar />}
       <ThreadList thread={rootThread} />
       {showLoggedOutMessage && <LoggedOutMessage onLogin={onLogin} />}
