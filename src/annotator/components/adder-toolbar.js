@@ -17,7 +17,9 @@ function ToolbarButton({ badgeCount, icon, label, onClick, shortcut }) {
       aria-label={title}
       title={title}
     >
-      {icon && <SvgIcon name={icon} />}
+      {icon && (
+        <SvgIcon name={icon} className="annotator-adder-actions__icon" />
+      )}
       {typeof badgeCount === 'number' && (
         <span className="annotator-adder-actions__badge">{badgeCount}</span>
       )}
