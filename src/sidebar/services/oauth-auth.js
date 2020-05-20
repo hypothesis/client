@@ -292,6 +292,8 @@ export default function auth(
 
   listenForTokenStorageEvents();
 
+  // The returned object `extends` the EventEmitter. We could rework this
+  // service to be a class in future to do this more explicitly.
   return Object.assign(emitter, {
     login,
     logout,
