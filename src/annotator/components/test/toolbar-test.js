@@ -3,6 +3,8 @@ import { createElement } from 'preact';
 
 import Toolbar from '../toolbar';
 
+import { checkAccessibility } from '../../../test-util/accessibility';
+
 const noop = () => {};
 
 describe('Toolbar', () => {
@@ -43,7 +45,7 @@ describe('Toolbar', () => {
   it('renders the normal controls if `useMinimalControls` is false', () => {
     const wrapper = createToolbar({ useMinimalControls: false });
     assert.isFalse(findButton(wrapper, 'Close annotation sidebar').exists());
-    assert.isTrue(findButton(wrapper, 'Show annotation sidebar').exists());
+    assert.isTrue(findButton(wrapper, 'Annotation sidebar').exists());
     assert.isTrue(findButton(wrapper, 'Show highlights').exists());
     assert.isTrue(findButton(wrapper, 'New page note').exists());
   });
@@ -62,11 +64,11 @@ describe('Toolbar', () => {
     const toggleSidebar = sinon.stub();
     const wrapper = createToolbar({ isSidebarOpen: false, toggleSidebar });
 
-    findButton(wrapper, 'Show annotation sidebar').simulate('click');
+    findButton(wrapper, 'Annotation sidebar').simulate('click');
     assert.calledWith(toggleSidebar);
 
     wrapper.setProps({ isSidebarOpen: true });
-    findButton(wrapper, 'Hide annotation sidebar').simulate('click');
+    findButton(wrapper, 'Annotation sidebar').simulate('click');
     assert.calledWith(toggleSidebar);
   });
 
@@ -81,4 +83,21 @@ describe('Toolbar', () => {
     findButton(wrapper, 'Show highlights').simulate('click');
     assert.calledWith(toggleHighlights);
   });
+
+  it(
+    'should pass a11y checks',
+    checkAccessibility([
+      {
+        content: () => createToolbar(),
+      },
+      {
+        name: 'with minimal controls',
+        content: () =>
+          createToolbar({
+            useMinimalControls: true,
+            isSidebarOpen: false,
+          }),
+      },
+    ])
+  );
 });

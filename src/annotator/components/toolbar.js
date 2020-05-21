@@ -6,6 +6,7 @@ import SvgIcon from '../../shared/components/svg-icon';
 
 function ToolbarButton({
   buttonRef,
+  expanded,
   extraClasses,
   label,
   icon,
@@ -23,6 +24,7 @@ function ToolbarButton({
     <button
       className={classnames('annotator-frame-button', extraClasses)}
       aria-label={label}
+      aria-expanded={expanded}
       aria-pressed={selected}
       onClick={handleClick}
       ref={buttonRef}
@@ -35,6 +37,7 @@ function ToolbarButton({
 
 ToolbarButton.propTypes = {
   buttonRef: propTypes.any,
+  expanded: propTypes.bool,
   extraClasses: propTypes.string,
   label: propTypes.string.isRequired,
   icon: propTypes.string.isRequired,
@@ -71,12 +74,9 @@ export default function Toolbar({
         <ToolbarButton
           extraClasses="annotator-frame-button--sidebar_toggle"
           buttonRef={toggleSidebarRef}
-          label={
-            isSidebarOpen
-              ? 'Hide annotation sidebar'
-              : 'Show annotation sidebar'
-          }
+          label="Annotation sidebar"
           icon={isSidebarOpen ? 'caret-right' : 'caret-left'}
+          expanded={isSidebarOpen}
           onClick={toggleSidebar}
         />
       )}
