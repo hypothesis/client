@@ -21,8 +21,7 @@ function InlineControls({ isCollapsed, setCollapsed, linkStyle = {} }) {
           className="excerpt__toggle-button"
           onClick={() => setCollapsed(!isCollapsed)}
           aria-expanded={!isCollapsed}
-          aria-label="Toggle to show the full excerpt"
-          aria-pressed={(!isCollapsed).toString()}
+          aria-label="Toggle visibility of full excerpt text"
           style={linkStyle}
         >
           {toggleLabel}

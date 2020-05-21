@@ -69,7 +69,8 @@ export default function AnnotationBody({
             className="annotation-body__collapse-toggle-button"
             isExpanded={!isCollapsed}
             onClick={() => setIsCollapsed(!isCollapsed)}
-            title="Toggle to show full annotation text"
+            aria-label="Toggle visibility of full annotation text"
+            title="Toggle visibility of full annotation text"
           />
         </div>
       )}
