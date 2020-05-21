@@ -27,6 +27,8 @@ function Tab({
     }
   };
 
+  const title = count > 0 ? `${label} (${count} available)` : label;
+
   return (
     <button
       className={classnames('selection-tabs__type', {
@@ -39,8 +41,8 @@ function Tab({
       onMouseDown={selectTab}
       role="tab"
       tabIndex="0"
-      title={label}
-      aria-label={label}
+      title={title}
+      aria-label={title}
       aria-selected={isSelected.toString()}
     >
       {children}
