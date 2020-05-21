@@ -133,6 +133,18 @@ describe('AnnotationBody', () => {
         name: 'when annotation is being edited and has tags',
         content: () => createBody({ isEditing: true, tags: ['foo', 'bar'] }),
       },
+      {
+        name: 'when expandable and not editing',
+        content: () => {
+          const wrapper = createBody();
+          act(() => {
+            // change the `isCollapsible` state to `true` via the `Excerpt`
+            wrapper.find('Excerpt').props().onCollapsibleChanged(true);
+          });
+          wrapper.update();
+          return wrapper;
+        },
+      },
     ])
   );
 });
