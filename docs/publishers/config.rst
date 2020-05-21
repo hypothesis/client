@@ -185,8 +185,9 @@ loads.
 
    .. option:: allowLeavingGroups
       
-      ``boolean``. A flag indicating whether the Leave group button inside the groups menu
-      should be hidden. (Default: ``true``).
+      ``boolean``. A flag indicating whether users should be able to leave groups 
+      of which they are a member. When `false`, the controls for users to leave
+      groups will not be provided. (Default: `true`).
 
    .. option:: enableShareLinks
 
@@ -195,20 +196,21 @@ loads.
 
    .. option:: groups
 
-      ``String[]|"$rpc:requestGroups"|null``. An array of group IDs. If provided, 
-      only these groups will be fetched and displayed in the client. This is used, 
-      for example, in the Hypothesis LMS app to show only the groups appropriate 
-      for a user looking at a particular assignment.
+      ``String[]|"$rpc:requestGroups"|null``. An array of Group IDs or the literal 
+      string ``"$rpc:requestGroups"``. If provided, only these groups will be fetched 
+      and displayed in the client. This is used, for example, in the Hypothesis LMS app 
+      to show only the groups appropriate for a user looking at a particular assignment.
 
       .. note::
 
-        When the value is set to ``$rpc:requestGroups``, then the client will 
-        automatically send an **RPC** request ``requestGroups`` to the controlling 
-        parent iframe to asynchronously ask for the groups array. This may be necessary 
-        when the groups are not available at load time. The controlling frame must 
-        handle this **RPC** request and return the array of group ids or null. 
-        :option:`requestConfigFromFrame` must also be configured for this to correctly 
-        work.
+        The value ``"$rpc:requestGroups"`` indicates that a list of group IDs to 
+        fetch should be provided to the client by an ancestor iframe. This can 
+        be useful if the list of appropriate groups is not available at initial 
+        load time. The client will send an asynchronous **RPC** request (``requestGroups``) 
+        via postMessage to the target frame configured in :option:`requestConfigFromFrame`. 
+        The listening frame should respond with an array of group IDs (or ``null``).
+        :option:`requestConfigFromFrame` config object must also be present for this 
+        to be enabled.
 
    .. option:: icon
 
@@ -435,17 +437,17 @@ loads.
 
 .. option:: requestConfigFromFrame
 
-  ``Object``. An object that defines **RPC** settings of a parent controlling iframe. 
-  In the case of an LMS parent application, it is necessary for the client know some specific 
-  information so the client may send **RPC** requests to the parent for additional information 
-  or settings it needs after load time.
+
+  ``Object``. 
+  An object with configuration information about an ancestor iframe that should be able 
+  to receive and send **RPC** messages from/to the client.
   
   .. code-block:: javascript
     
     requestConfigFromFrame: {
-      origin: `hostname:8000` // Host url and port number of parent iframe
-      ancestorLevel: '2'      // Number of nested iframes deep the client is 
-                              // relative from the parent.
+      origin: `hostname:8000` // Host url and port number of receiving iframe
+      ancestorLevel: '2'      // Number of nested iframes deep the client is
+                              // relative from the receiving iframe.
     }
 
 .. option:: 
