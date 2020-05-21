@@ -3,6 +3,8 @@ import { createElement } from 'preact';
 
 import Toolbar from '../toolbar';
 
+import { checkAccessibility } from '../../../test-util/accessibility';
+
 const noop = () => {};
 
 describe('Toolbar', () => {
@@ -81,4 +83,21 @@ describe('Toolbar', () => {
     findButton(wrapper, 'Show highlights').simulate('click');
     assert.calledWith(toggleHighlights);
   });
+
+  it(
+    'should pass a11y checks',
+    checkAccessibility([
+      {
+        content: () => createToolbar(),
+      },
+      {
+        name: 'with minimal controls',
+        content: () =>
+          createToolbar({
+            useMinimalControls: true,
+            isSidebarOpen: false,
+          }),
+      },
+    ])
+  );
 });
