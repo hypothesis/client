@@ -183,6 +183,11 @@ loads.
 
   Optional keys:
 
+   .. option:: allowLeavingGroups
+      
+      ``boolean``. A flag indicating whether the Leave group button inside the groups menu
+      should be hidden. (Default: ``true``).
+
    .. option:: enableShareLinks
 
       ``boolean``. A flag indicating whether annotation cards should show links
@@ -190,10 +195,20 @@ loads.
 
    .. option:: groups
 
-      ``String[]|null``. An array of group IDs. If provided, only these groups
-      will be fetched and displayed in the client. This is used, for example,
-      in the Hypothesis LMS app to show only the groups appropriate for a
-      user looking at a particular assignment.
+      ``String[]|"$rpc:requestGroups"|null``. An array of group IDs. If provided, 
+      only these groups will be fetched and displayed in the client. This is used, 
+      for example, in the Hypothesis LMS app to show only the groups appropriate 
+      for a user looking at a particular assignment.
+
+      .. note::
+
+        When the value is set to ``$rpc:requestGroups``, then the client will 
+        automatically send an **RPC** request ``requestGroups`` to the controlling 
+        parent iframe to asynchronously ask for the groups array. This may be necessary 
+        when the groups are not available at load time. The controlling frame must 
+        handle this **RPC** request and return the array of group ids or null. 
+        :option:`requestConfigFromFrame` must also be configured for this to correctly 
+        work.
 
    .. option:: icon
 
@@ -417,6 +432,23 @@ loads.
 
     The :option:`focus`
     setting is currently still experimental and may change in the future.
+
+.. option:: requestConfigFromFrame
+
+  ``Object``. An object that defines **RPC** settings of a parent controlling iframe. 
+  In the case of an LMS parent application, it is necessary for the client know some specific 
+  information so the client may send **RPC** requests to the parent for additional information 
+  or settings it needs after load time.
+  
+  .. code-block:: javascript
+    
+    requestConfigFromFrame: {
+      origin: `hostname:8000` // Host url and port number of parent iframe
+      ancestorLevel: '2'      // Number of nested iframes deep the client is 
+                              // relative from the parent.
+    }
+
+.. option:: 
 
 Asset and Sidebar App Location
 ##############################
