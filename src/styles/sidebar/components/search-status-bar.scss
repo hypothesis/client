@@ -1,9 +1,13 @@
+@use '../../mixins/buttons';
+
 .search-status-bar {
   display: flex;
   align-items: center;
   margin-bottom: 10px;
 }
 
-.search-status-bar > button {
+.search-status-bar__button {
+  @include buttons.button--primary;
+  padding-right: 0.75em;
   margin-right: 10px;
 }

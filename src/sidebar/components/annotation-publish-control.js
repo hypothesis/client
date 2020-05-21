@@ -102,7 +102,7 @@ function AnnotationPublishControl({
         icon="cancel"
         buttonText="Cancel"
         onClick={onCancel}
-        useCompactStyle
+        className="annotation-publish-control__btn-cancel"
       />
     </div>
   );

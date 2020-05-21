@@ -1,5 +1,5 @@
-@use "buttons";
 @use "../variables" as var;
+@use "./buttons";
 
 /**
  * Base styles for a "panel"-like element, with appropriate
@@ -46,6 +46,12 @@
   }
 
   &__button {
+    @include buttons.button--labeled;
+    margin-left: 1em;
+  }
+
+  &__button--primary {
+    @include buttons.button--primary;
     margin-left: 1em;
   }
 

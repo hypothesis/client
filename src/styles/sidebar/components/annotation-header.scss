@@ -1,3 +1,4 @@
+@use "../../mixins/buttons";
 @use "../../mixins/forms";
 @use "../../variables" as var;
 
@@ -17,14 +18,9 @@
     color: var.$color-text;
   }
 
-  &__reply-toggle.button {
+  &__reply-toggle {
+    @include buttons.button--link;
     padding: 0 0.5em;
-    font-weight: 400;
-    background-color: transparent;
-    &:hover {
-      background-color: transparent;
-      color: var.$color-link-hover;
-    }
   }
 
   // Timestamps are right aligned in a flex row

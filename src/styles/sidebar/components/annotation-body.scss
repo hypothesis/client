@@ -1,4 +1,5 @@
 @use '../../variables' as var;
+@use "../../mixins/buttons";
 
 .annotation-body {
   @include var.font-normal;
@@ -38,6 +39,7 @@
   justify-content: flex-end;
 
   .annotation-body__collapse-toggle-button {
+    @include buttons.button--labeled;
     padding: 0.5em;
     background-color: transparent;
   }

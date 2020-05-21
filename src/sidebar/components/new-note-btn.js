@@ -30,11 +30,10 @@ function NewNoteButton({ annotationsService, settings }) {
     <div className="new-note-button">
       <Button
         buttonText="New note"
+        className="button--primary"
         icon="add"
         onClick={onNewNoteBtnClick}
         style={applyTheme(['ctaBackgroundColor'], settings)}
-        useCompactStyle
-        usePrimaryStyle
       />
     </div>
   );

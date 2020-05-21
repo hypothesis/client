@@ -23,6 +23,10 @@
     transition: 0.2s ease-out;
     color: var.$color-text;
   }
+  &[aria-expanded='true'],
+  &:hover[aria-expanded='true'] {
+    color: var.$color-brand;
+  }
 }
 
 .menu__toggle-wrapper {
@@ -45,6 +49,7 @@
   &.is-open {
     // Flip the indicator when the menu is open.
     transform: rotateX(180deg);
+    color: var.$color-text;
   }
 }
 

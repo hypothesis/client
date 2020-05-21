@@ -66,7 +66,6 @@ export default function SearchInput({ alwaysExpanded, query, onSearch }) {
           icon="search"
           onClick={() => input.current.focus()}
           title="Search annotations"
-          useCompactStyle
         />
       )}
       {isLoading && <Spinner className="top-bar__btn" title="Loading…" />}

@@ -30,9 +30,8 @@ export default function LoginPromptPanel({ onLogin, onSignUp }) {
         />
         <Button
           buttonText="Log in"
-          className="sidebar-panel__button"
+          className="sidebar-panel__button--primary"
           onClick={onLogin}
-          usePrimaryStyle
         />
       </div>
     </SidebarPanel>

@@ -1,5 +1,5 @@
 @use "../../variables" as var;
-
+@use "../../mixins/buttons";
 @use "../../mixins/links";
 
 .share-annotations-panel {
@@ -21,6 +21,10 @@
   &__icon--inline {
     width: 1em;
     height: 1em;
+  }
+
+  &__icon-button {
+    @include buttons.button--input;
   }
 
   .share-annotations-panel-links {

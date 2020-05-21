@@ -87,7 +87,12 @@ function AnnotationShareControl({
 
   return (
     <div className="annotation-share-control" ref={shareRef}>
-      <Button icon="share" title="Share" onClick={toggleSharePanel} />
+      <Button
+        icon="share"
+        title="Share"
+        onClick={toggleSharePanel}
+        isExpanded={isOpen}
+      />
       {isOpen && (
         <div className="annotation-share-panel">
           <div className="annotation-share-panel__header">
@@ -109,8 +114,7 @@ function AnnotationShareControl({
                 icon="copy"
                 title="Copy share link to clipboard"
                 onClick={copyShareLink}
-                useInputStyle
-                useCompactStyle
+                className="annotation-share-panel__icon-button"
               />
             </div>
             <div className="annotation-share-panel__permissions">
