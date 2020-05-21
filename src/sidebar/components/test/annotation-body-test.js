@@ -65,7 +65,10 @@ describe('AnnotationBody', () => {
     const button = wrapper.find('Button');
     assert.isOk(button.exists());
     assert.equal(button.props().buttonText, 'More');
-    assert.equal(button.props().title, 'Toggle to show full annotation text');
+    assert.equal(
+      button.props().title,
+      'Toggle visibility of full annotation text'
+    );
     assert.isFalse(button.props().isExpanded);
   });
 
@@ -88,7 +91,10 @@ describe('AnnotationBody', () => {
     const buttonProps = wrapper.find('Button').props();
 
     assert.equal(buttonProps.buttonText, 'Less');
-    assert.equal(buttonProps.title, 'Toggle to show full annotation text');
+    assert.equal(
+      buttonProps.title,
+      'Toggle visibility of full annotation text'
+    );
     assert.isTrue(buttonProps.isExpanded);
   });
 
@@ -126,6 +132,18 @@ describe('AnnotationBody', () => {
       {
         name: 'when annotation is being edited and has tags',
         content: () => createBody({ isEditing: true, tags: ['foo', 'bar'] }),
+      },
+      {
+        name: 'when expandable and not editing',
+        content: () => {
+          const wrapper = createBody();
+          act(() => {
+            // change the `isCollapsible` state to `true` via the `Excerpt`
+            wrapper.find('Excerpt').props().onCollapsibleChanged(true);
+          });
+          wrapper.update();
+          return wrapper;
+        },
       },
     ])
   );

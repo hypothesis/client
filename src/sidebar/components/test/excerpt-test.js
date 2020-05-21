@@ -134,18 +134,18 @@ describe('Excerpt', () => {
       assert.equal(getExcerptHeight(wrapper), 200);
     });
 
-    it("sets button's default state to unpressed", () => {
+    it("sets button's default state to un-expanded", () => {
       const wrapper = createExcerpt({ inlineControls: true }, TALL_DIV);
       const button = wrapper.find('.excerpt__toggle-button');
-      assert.equal(button.prop('aria-pressed'), 'false');
+      assert.equal(button.prop('aria-expanded'), false);
       assert.equal(button.text(), 'More');
     });
 
-    it("changes button's state to pressed when clicked", () => {
+    it("changes button's state to expanded when clicked", () => {
       const wrapper = createExcerpt({ inlineControls: true }, TALL_DIV);
       wrapper.find('.excerpt__toggle-button').simulate('click');
       const button = wrapper.find('.excerpt__toggle-button');
-      assert.equal(button.prop('aria-pressed'), 'true');
+      assert.equal(button.prop('aria-expanded'), true);
       assert.equal(button.text(), 'Less');
     });
   });
