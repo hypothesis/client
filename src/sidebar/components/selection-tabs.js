@@ -123,7 +123,7 @@ function SelectionTabs({ isLoading, settings }) {
           count={annotationCount}
           isWaitingToAnchor={isWaitingToAnchorAnnotations}
           isSelected={selectedTab === uiConstants.TAB_ANNOTATIONS}
-          label="Select annotations tab"
+          label="Annotations"
           onSelect={() => selectTab(uiConstants.TAB_ANNOTATIONS)}
         >
           Annotations
@@ -132,7 +132,7 @@ function SelectionTabs({ isLoading, settings }) {
           count={noteCount}
           isWaitingToAnchor={isWaitingToAnchorAnnotations}
           isSelected={selectedTab === uiConstants.TAB_NOTES}
-          label="Select page notes tab"
+          label="Page notes"
           onSelect={() => selectTab(uiConstants.TAB_NOTES)}
         >
           Page Notes
@@ -142,7 +142,7 @@ function SelectionTabs({ isLoading, settings }) {
             count={orphanCount}
             isWaitingToAnchor={isWaitingToAnchorAnnotations}
             isSelected={selectedTab === uiConstants.TAB_ORPHANS}
-            label="Select orphans tab"
+            label="Orphans"
             onSelect={() => selectTab(uiConstants.TAB_ORPHANS)}
           >
             Orphans
