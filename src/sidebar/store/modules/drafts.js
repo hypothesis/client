@@ -1,3 +1,5 @@
+import { createSelector } from 'reselect';
+
 import * as metadata from '../../util/annotation-metadata';
 import * as util from '../util';
 
@@ -178,11 +180,10 @@ function getDraftIfNotEmpty(state, annotation) {
  *
  * @return {Object[]}
  */
-function unsavedAnnotations(state) {
-  return state.drafts
-    .filter(draft => !draft.annotation.id)
-    .map(draft => draft.annotation);
-}
+const unsavedAnnotations = createSelector(
+  state => state.drafts,
+  drafts => drafts.filter(d => !d.annotation.id).map(d => d.annotation)
+);
 
 export default {
   init,

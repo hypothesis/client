@@ -1,6 +1,3 @@
-import EventEmitter from 'tiny-emitter';
-
-import events from '../../events';
 import { Injector } from '../../../shared/injector';
 import * as annotationFixtures from '../../test/annotation-fixtures';
 import uiConstants from '../../ui-constants';
@@ -22,13 +19,11 @@ const fixtures = immutable({
 
 describe('rootThread', function () {
   let fakeAnnotationsService;
-  let fakeStore;
   let fakeBuildThread;
   let fakeSearchFilter;
   let fakeSettings;
+  let fakeStore;
   let fakeViewFilter;
-
-  let $rootScope;
 
   let rootThread;
 
@@ -88,14 +83,7 @@ describe('rootThread', function () {
       filter: sinon.stub(),
     };
 
-    const emitter = new EventEmitter();
-    $rootScope = {
-      $on: (event, cb) => emitter.on(event, data => cb(null, data)),
-      $broadcast: (event, data) => emitter.emit(event, data),
-    };
-
     rootThread = new Injector()
-      .register('$rootScope', { value: $rootScope })
       .register('annotationsService', { value: fakeAnnotationsService })
       .register('store', { value: fakeStore })
       .register('searchFilter', { value: fakeSearchFilter })
@@ -353,46 +341,6 @@ describe('rootThread', function () {
         sinon.match([annotation]),
         filters
       );
-    });
-  });
-
-  context('when annotation events occur', function () {
-    const annot = annotationFixtures.defaultAnnotation();
-
-    it('creates a new annotation when BEFORE_ANNOTATION_CREATED event occurs', function () {
-      $rootScope.$broadcast(events.BEFORE_ANNOTATION_CREATED, annot);
-      assert.notCalled(fakeStore.removeAnnotations);
-      assert.calledWith(fakeAnnotationsService.create, sinon.match(annot));
-    });
-
-    describe('when a new annotation is created', function () {
-      let existingNewAnnot;
-      beforeEach(function () {
-        existingNewAnnot = { $tag: 'a-new-tag' };
-        fakeStore.state.annotations.annotations.push(existingNewAnnot);
-      });
-
-      it('does not remove annotations that have non-empty drafts', function () {
-        fakeStore.getDraftIfNotEmpty.returns(fixtures.nonEmptyDraft);
-        $rootScope.$broadcast(
-          events.BEFORE_ANNOTATION_CREATED,
-          annotationFixtures.newAnnotation()
-        );
-
-        assert.notCalled(fakeStore.removeDraft);
-      });
-
-      it('does not remove saved annotations', function () {
-        const ann = annotationFixtures.defaultAnnotation();
-        fakeStore.state.annotations.annotations = [ann];
-
-        $rootScope.$broadcast(
-          events.BEFORE_ANNOTATION_CREATED,
-          annotationFixtures.newAnnotation()
-        );
-
-        assert.notCalled(fakeStore.removeDraft);
-      });
     });
   });
 });
