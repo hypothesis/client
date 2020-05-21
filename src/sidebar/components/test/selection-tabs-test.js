@@ -123,7 +123,7 @@ describe('SelectionTabs', function () {
       assert.equal(tabs.at(2).prop('title'), 'Orphans (1 available)');
     });
 
-    it('should not render count in `aria-label` for page notes tab if there are no page notes', () => {
+    it('should not render count in `title` and `aria-label` for page notes tab if there are no page notes', () => {
       fakeStore.noteCount.returns(0);
 
       const wrapper = createComponent({});
