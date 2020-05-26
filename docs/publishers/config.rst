@@ -183,6 +183,12 @@ loads.
 
   Optional keys:
 
+   .. option:: allowLeavingGroups
+      
+      ``boolean``. A flag indicating whether users should be able to leave groups 
+      of which they are a member. When `false`, the controls for users to leave
+      groups will not be provided. (Default: `true`).
+
    .. option:: enableShareLinks
 
       ``boolean``. A flag indicating whether annotation cards should show links
@@ -190,10 +196,21 @@ loads.
 
    .. option:: groups
 
-      ``String[]|null``. An array of group IDs. If provided, only these groups
-      will be fetched and displayed in the client. This is used, for example,
-      in the Hypothesis LMS app to show only the groups appropriate for a
-      user looking at a particular assignment.
+      ``String[]|"$rpc:requestGroups"|null``. An array of Group IDs or the literal 
+      string ``"$rpc:requestGroups"``. If provided, only these groups will be fetched 
+      and displayed in the client. This is used, for example, in the Hypothesis LMS app 
+      to show only the groups appropriate for a user looking at a particular assignment.
+
+      .. note::
+
+        The value ``"$rpc:requestGroups"`` indicates that a list of group IDs to 
+        fetch should be provided to the client by an ancestor iframe. This can 
+        be useful if the list of appropriate groups is not available at initial 
+        load time. The client will send an asynchronous **RPC** request (``requestGroups``) 
+        via postMessage to the target frame configured in :option:`requestConfigFromFrame`. 
+        The listening frame should respond with an array of group IDs (or ``null``).
+        :option:`requestConfigFromFrame` config object must also be present for this 
+        to be enabled.
 
    .. option:: icon
 
@@ -417,6 +434,23 @@ loads.
 
     The :option:`focus`
     setting is currently still experimental and may change in the future.
+
+.. option:: requestConfigFromFrame
+
+
+  ``Object``. 
+  An object with configuration information about an ancestor iframe that should be able 
+  to receive and send **RPC** messages from/to the client.
+  
+  .. code-block:: javascript
+    
+    requestConfigFromFrame: {
+      origin: `hostname:8000` // Host url and port number of receiving iframe
+      ancestorLevel: '2'      // Number of nested iframes deep the client is
+                              // relative from the receiving iframe.
+    }
+
+.. option:: 
 
 Asset and Sidebar App Location
 ##############################
