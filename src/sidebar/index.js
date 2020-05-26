@@ -138,7 +138,6 @@ import store from './store';
 
 // Utilities.
 import { Injector } from '../shared/injector';
-import EventEmitter from 'tiny-emitter';
 
 function startApp(config) {
   const container = new Injector();
@@ -171,15 +170,6 @@ function startApp(config) {
     .register('unicode', unicodeService)
     .register('viewFilter', viewFilterService)
     .register('store', store);
-
-  // Register a dummy `$rootScope` pub-sub service for services that still
-  // use it.
-  const emitter = new EventEmitter();
-  const dummyRootScope = {
-    $on: (event, callback) => emitter.on(event, data => callback({}, data)),
-    $broadcast: (event, data) => emitter.emit(event, data),
-  };
-  container.register('$rootScope', { value: dummyRootScope });
 
   // Register utility values/classes.
   //

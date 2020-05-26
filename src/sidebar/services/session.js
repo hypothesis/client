@@ -1,4 +1,3 @@
-import events from '../events';
 import serviceConfig from '../service-config';
 import * as retryUtil from '../util/retry';
 import * as sentry from '../util/sentry';
@@ -21,7 +20,6 @@ const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
  * @ngInject
  */
 export default function session(
-  $rootScope,
   analytics,
   store,
   api,
@@ -160,7 +158,7 @@ export default function session(
     return load();
   }
 
-  $rootScope.$on(events.OAUTH_TOKENS_CHANGED, () => {
+  auth.on('oauthTokensChanged', () => {
     reload();
   });
 

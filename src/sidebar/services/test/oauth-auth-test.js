@@ -1,4 +1,3 @@
-import events from '../../events';
 import { Injector } from '../../../shared/injector';
 import FakeWindow from '../../util/test/fake-window';
 import authFactory, { $imports } from '../oauth-auth';
@@ -6,8 +5,7 @@ import authFactory, { $imports } from '../oauth-auth';
 const DEFAULT_TOKEN_EXPIRES_IN_SECS = 1000;
 const TOKEN_KEY = 'hypothesis.oauth.hypothes%2Eis.token';
 
-describe('sidebar.oauth-auth', function () {
-  let $rootScope;
+describe('sidebar/services/oauth-auth', function () {
   let FakeOAuthClient;
   let auth;
   let nowStub;
@@ -92,10 +90,7 @@ describe('sidebar.oauth-auth', function () {
       '../util/oauth-client': FakeOAuthClient,
     });
 
-    $rootScope = { $broadcast: sinon.stub() };
-
     auth = new Injector()
-      .register('$rootScope', { value: $rootScope })
       .register('$window', { value: fakeWindow })
       .register('apiRoutes', { value: fakeApiRoutes })
       .register('localStorage', { value: fakeLocalStorage })
@@ -516,9 +511,12 @@ describe('sidebar.oauth-auth', function () {
     });
 
     it('notifies other services about the change', () => {
+      const tokenChanged = sinon.stub();
+      auth.on('oauthTokensChanged', tokenChanged);
+
       notifyStoredTokenChange();
 
-      assert.calledWith($rootScope.$broadcast, events.OAUTH_TOKENS_CHANGED);
+      assert.called(tokenChanged);
     });
   });
 
