@@ -32,7 +32,6 @@
     "cross-env": "^7.0.0",
     "custom-event": "^1.0.1",
     "diff": "^4.0.1",
-    "diff-match-patch": "^1.0.0",
     "document-base-uri": "^1.0.0",
     "dom-anchor-text-position": "^5.0.0",
     "dom-anchor-text-quote": "^4.0.2",
