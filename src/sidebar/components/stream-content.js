@@ -17,6 +17,12 @@ function StreamContent({
   toastMessenger,
 }) {
   const addAnnotations = useStore(store => store.addAnnotations);
+  const annotationFetchStarted = useStore(
+    store => store.annotationFetchStarted
+  );
+  const annotationFetchFinished = useStore(
+    store => store.annotationFetchFinished
+  );
   const clearAnnotations = useStore(store => store.clearAnnotations);
   const currentQuery = useStore(store => store.routeParams().q);
   const setSortKey = useStore(store => store.setSortKey);
@@ -38,10 +44,21 @@ function StreamContent({
 
         ...searchFilter.toObject(query),
       };
-      const results = await api.search(queryParams);
-      addAnnotations([...results.rows, ...results.replies]);
+      try {
+        annotationFetchStarted();
+        const results = await api.search(queryParams);
+        addAnnotations([...results.rows, ...results.replies]);
+      } finally {
+        annotationFetchFinished();
+      }
     },
-    [addAnnotations, api, searchFilter]
+    [
+      addAnnotations,
+      annotationFetchStarted,
+      annotationFetchFinished,
+      api,
+      searchFilter,
+    ]
   );
 
   // Update the stream when this route is initially displayed and whenever

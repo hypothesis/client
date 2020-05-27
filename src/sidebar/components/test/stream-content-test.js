@@ -28,6 +28,8 @@ describe('StreamContent', () => {
 
     fakeStore = {
       addAnnotations: sinon.stub(),
+      annotationFetchStarted: sinon.stub(),
+      annotationFetchFinished: sinon.stub(),
       clearAnnotations: sinon.spy(),
       getState: sinon.stub().returns({}),
       routeParams: sinon.stub().returns({ id: 'test' }),
@@ -67,6 +69,21 @@ describe('StreamContent', () => {
   it('calls the search API with `_separate_replies: true`', () => {
     createComponent();
     assert.equal(fakeApi.search.firstCall.args[0]._separate_replies, true);
+  });
+
+  it('records the start and finish of the fetch request in the store', async () => {
+    createComponent();
+
+    await waitFor(() => fakeStore.annotationFetchStarted.calledOnce);
+    await waitFor(() => fakeStore.annotationFetchFinished.calledOnce);
+  });
+
+  it('records the finish of the fetch request on error', async () => {
+    fakeApi.search.throws();
+    createComponent();
+
+    await waitFor(() => fakeStore.annotationFetchStarted.calledOnce);
+    await waitFor(() => fakeStore.annotationFetchFinished.calledOnce);
   });
 
   it('loads the annotations and replies into the store', async () => {
