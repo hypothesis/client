@@ -37,10 +37,10 @@ $grey-7: #202020;
 $black: #000 !default;
 
 // Colors
-
 $color-success: #00a36d;
-$color-warning: #fbc168;
+$color-notice: #fbc168;
 $color-error: #d93c3f;
+
 $brand: #bd1c2b;
 $highlight: #58cef4;
 
@@ -52,9 +52,6 @@ $button-background-start: $white !default;
 $button-background-end: #f0f0f0 !default;
 $button-background-gradient: to bottom, $button-background-start,
   $button-background-end !default;
-
-$error-color: #f0480c !default;
-$success-color: #1cbd41 !default;
 
 // Tint and shade functions from
 // https://css-tricks.com/snippets/sass/tint-shade-functions
