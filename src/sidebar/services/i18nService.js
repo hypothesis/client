@@ -1,7 +1,7 @@
 'use strict';
 const i18next = require('i18next');
 const moment = require('moment');
-
+const deepmerge = require('deepmerge');
 /**
  * A wrapper around the i18n
  */
@@ -33,6 +33,20 @@ function i18nService($rootScope, localStorage = window.localStorage) {
       'sv-SE': 'Svenska',
       'es-CO': 'Español de América Latina',
   };
+
+  const marketplaceLanguageOverrides = {
+    ielts: {
+      'en-US': 'en-GB-ielts',
+    },
+
+    K12: {
+      'en-US': 'en-GB-K12',
+      'nn-NO': 'nn-NO-K12',
+      'nb-NO': 'nb-NO-K12',
+      'sv-SE': 'sv-SE-K12',
+    },
+  };
+
   function loadResourceBundle() {
     return require('../../../i18n/index.json');
   }
@@ -76,10 +90,42 @@ function i18nService($rootScope, localStorage = window.localStorage) {
     return locale;
   }
 
+  function returnTranslationsObject(defaultLangCode, overrideLangCode) {
+    const resources = loadResourceBundle();
+
+    if (resources[overrideLangCode]) {
+      const captionsToOverride = resources[defaultLangCode].translation;
+      const overrideCaptions = resources[overrideLangCode].translation;
+
+      resources[defaultLangCode].translation = deepmerge(captionsToOverride, overrideCaptions);
+      delete resources[overrideLangCode];
+
+      return resources;
+    }
+
+    return resources;
+  }
+
+  function getOverrideLanguageCode(ietfLanguageCode) {
+    const uiOverrideLang = localStorage.getItem('uiOverrideLanguage');
+
+    if (uiOverrideLang && marketplaceLanguageOverrides[uiOverrideLang]) {
+      return marketplaceLanguageOverrides[uiOverrideLang][ietfLanguageCode];
+    }
+
+    return undefined;
+  }
+
+  function buildResourceBundle(ietfLanguageCode) {
+    const overrideLanguageCode = getOverrideLanguageCode(ietfLanguageCode);
+
+    return returnTranslationsObject(ietfLanguageCode, overrideLanguageCode);
+  }
+
   function initI18n() {
     const locale = getInitialLanguage();
     const languageCode = getIetfLanguageCode(locale);
-    const resources = loadResourceBundle();
+    const resources = buildResourceBundle(languageCode);
 
     moment.locale(locale);
 
@@ -97,6 +143,9 @@ function i18nService($rootScope, localStorage = window.localStorage) {
   }
 
   function changeLanguage(language, callback) {
+    const langCode = getIetfLanguageCode(language);
+    const resources = buildResourceBundle(langCode);
+    i18next.addResourceBundle(language, 'translation', resources, true, true );
     i18next.changeLanguage(language, callback);
   }
 
