@@ -143,6 +143,9 @@ function i18nService($rootScope, localStorage = window.localStorage) {
   }
 
   function changeLanguage(language, callback) {
+    const langCode = getIetfLanguageCode(language);
+    const resources = buildResourceBundle(langCode);
+    i18next.addResourceBundle(language, 'translation', resources, true, true );
     i18next.changeLanguage(language, callback);
   }
 
