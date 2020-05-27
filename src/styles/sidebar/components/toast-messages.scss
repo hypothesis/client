@@ -40,7 +40,13 @@
     border: 1px solid var.$color-error;
   }
 
+  &--notice {
+    border: 1px solid var.$color-notice;
+  }
+
   &__type {
+    display: flex;
+    align-items: center;
     padding: 1em;
     color: white;
   }
@@ -53,6 +59,10 @@
     background-color: var.$color-error;
   }
 
+  &--notice &__type {
+    background-color: var.$color-notice;
+  }
+
   &__icon {
     // Specific adjustments for success and error icons
     margin-top: 2px;
@@ -60,6 +70,11 @@
 
   &__message {
     padding: 1em;
+  }
+
+  &__link {
+    text-align: right;
+    text-decoration: underline;
   }
 }
 

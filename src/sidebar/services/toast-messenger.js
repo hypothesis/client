@@ -15,6 +15,7 @@ const MESSAGE_DISMISS_DELAY = 500;
  *
  * @typedef {Object} MessageOptions
  * @prop {boolean} [autoDismiss=true] - Whether the toast message automatically disappears.
+ * @prop {string} [moreInfoURL=''] - Optional URL for users to visit for "more info"
  */
 
 // @ngInject
@@ -47,15 +48,23 @@ export default function toastMessenger(store) {
    * @param {string} message - The message to be rendered
    * @param {MessageOptions} [options]
    */
-  const addMessage = (type, message, { autoDismiss = true } = {}) => {
+  const addMessage = (
+    type,
+    messageText,
+    { autoDismiss = true, moreInfoURL = '' } = {}
+  ) => {
     // Do not add duplicate messages (messages with the same type and text)
-    if (store.hasToastMessage(type, message)) {
+    if (store.hasToastMessage(type, messageText)) {
       return;
     }
 
     const id = generateHexString(10);
+    const message = { type, id, message: messageText, moreInfoURL };
 
-    store.addToastMessage({ type, message, id, isDismissed: false });
+    store.addToastMessage({
+      isDismissed: false,
+      ...message,
+    });
 
     if (autoDismiss) {
       // Attempt to dismiss message after a set time period. NB: The message may
@@ -87,9 +96,20 @@ export default function toastMessenger(store) {
     addMessage('success', messageText, options);
   };
 
+  /**
+   * Add a warn/notice toast message with `messageText`
+   *
+   * @param {string} messageText
+   * @param {MessageOptions} options
+   */
+  const notice = (messageText, options) => {
+    addMessage('notice', messageText, options);
+  };
+
   return {
     dismiss,
     error,
     success,
+    notice,
   };
 }

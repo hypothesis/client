@@ -16,7 +16,7 @@ import SvgIcon from '../../shared/components/svg-icon';
 function ToastMessage({ message, onDismiss }) {
   // Capitalize the message type for prepending
   const prefix = message.type.charAt(0).toUpperCase() + message.type.slice(1);
-
+  const iconName = message.type === 'notice' ? 'cancel' : message.type;
   /**
    * a11y linting is disabled here: There is a click-to-remove handler on a
    * non-interactive element. This allows sighted users to get the toast message
@@ -40,11 +40,25 @@ function ToastMessage({ message, onDismiss }) {
         )}
       >
         <div className="toast-message__type">
-          <SvgIcon name={message.type} className="toast-message__icon" />
+          <SvgIcon name={iconName} className="toast-message__icon" />
         </div>
         <div className="toast-message__message">
           <strong>{prefix}: </strong>
           {message.message}
+          {message.moreInfoURL && (
+            <div className="toast-message__link">
+              <a
+                href={message.moreInfoURL}
+                onClick={
+                  event =>
+                    event.stopPropagation() /* consume the event so that it does not dismiss the message */
+                }
+                target="_new"
+              >
+                More info
+              </a>
+            </div>
+          )}
         </div>
       </div>
     </li>
