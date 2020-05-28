@@ -35,18 +35,15 @@ $grey-6: #3f3f3f;
 $grey-7: #202020;
 
 // Colors
-
 $color-success: #00a36d;
-$color-warning: #fbc168;
+$color-notice: #fbc168;
 $color-error: #d93c3f;
+
 $brand: #bd1c2b;
 $highlight: #58cef4;
 
 $color-focus-outline: #51a7e8;
 $color-focus-shadow: color.scale($color-focus-outline, $alpha: -50%);
-
-$error-color: #f0480c !default;
-$success-color: #1cbd41 !default;
 
 // Tint and shade functions from
 // https://css-tricks.com/snippets/sass/tint-shade-functions

@@ -1,12 +1,23 @@
 @use "../../mixins/panel";
+@use "../mixins/responsive";
 @use "../../variables" as var;
 
 .toast-messages {
   position: absolute;
   z-index: 1;
-  width: 100%;
   left: 0;
-  padding: 0 8px;
+  width: 100%;
+  padding: 0 0.5em;
+
+  @include responsive.tablet-and-up {
+    // When displaying in a wider viewport (desktop/tablet outside of sidebar)
+    max-width: responsive.$break-tablet;
+    width: responsive.$break-tablet;
+    padding-left: 2rem;
+    padding-right: 2rem;
+    left: 50%;
+    margin-left: calc(-0.5 * #{responsive.$break-tablet});
+  }
 }
 
 .toast-message-container {
@@ -40,7 +51,13 @@
     border: 1px solid var.$color-error;
   }
 
+  &--notice {
+    border: 1px solid var.$color-notice;
+  }
+
   &__type {
+    display: flex;
+    align-items: center;
     padding: 1em;
     color: white;
   }
@@ -53,6 +70,10 @@
     background-color: var.$color-error;
   }
 
+  &--notice &__type {
+    background-color: var.$color-notice;
+  }
+
   &__icon {
     // Specific adjustments for success and error icons
     margin-top: 2px;
@@ -60,6 +81,12 @@
 
   &__message {
     padding: 1em;
+    width: 100%;
+  }
+
+  &__link {
+    text-align: right;
+    text-decoration: underline;
   }
 }
 
