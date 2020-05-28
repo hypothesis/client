@@ -32,10 +32,10 @@
   }
 
   &__icon-button--refresh {
-    color: var.$brand;
+    color: var.$color-brand;
 
     &:hover {
-      color: var.$brand;
+      color: var.$color-brand;
     }
   }
 
@@ -51,12 +51,12 @@
 .top-bar__login-button.button {
   padding: 0 0.25em;
   background-color: transparent;
-  color: var.$brand;
+  color: var.$color-brand;
   font-size: var.$body2-font-size;
   font-weight: 400;
 
   &:hover {
-    color: var.$link-color-hover;
+    color: var.$color-link-hover;
   }
 }
 

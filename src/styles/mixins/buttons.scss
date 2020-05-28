@@ -29,10 +29,10 @@
   }
 
   &.is-active {
-    color: var.$brand;
+    color: var.$color-brand;
 
     &:hover {
-      color: var.$brand;
+      color: var.$color-brand;
     }
   }
 }

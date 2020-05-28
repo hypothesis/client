@@ -11,7 +11,7 @@ $item-height: 40px;
 // except for the toggle button that opens the submenu.
 
 a.menu-item:hover {
-  color: var.$link-color-hover;
+  color: var.$color-link-hover;
 }
 
 .menu-item {
@@ -54,7 +54,7 @@ a.menu-item:hover {
 
   &.is-selected {
     $border-width: 4px;
-    border-left: $border-width solid var.$brand;
+    border-left: $border-width solid var.$color-brand;
     padding-left: $menu-item-padding - $border-width;
   }
 

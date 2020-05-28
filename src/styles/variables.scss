@@ -44,20 +44,20 @@ $color-success: #00a36d;
 $color-notice: #fbc168;
 $color-error: #d93c3f;
 
-$brand: #bd1c2b;
-$highlight: #58cef4;
+$color-brand: #bd1c2b;
+$color-highlight: #58cef4;
 
 $color-focus-outline: #51a7e8;
 $color-focus-shadow: color.scale($color-focus-outline, $alpha: -50%);
 
 // Scaffolding
 // -------------------------
-$body-background: $white !default;
+$color-background: $white;
 
 // Links
 // -------------------------
-$link-color: $brand !default;
-$link-color-hover: #84141e !default;
+$color-link: $color-brand !default;
+$color-link-hover: #84141e !default;
 
 // Typography
 // -------------------------

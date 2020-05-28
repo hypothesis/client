@@ -23,7 +23,7 @@
   &__link {
     &:hover,
     &:focus {
-      color: var.$brand;
+      color: var.$color-brand;
       border-color: var.$grey-4;
     }
   }
