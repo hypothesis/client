@@ -1,7 +1,7 @@
 @use "sass:color";
 
-// Greys
-
+// Greys (layout colors)
+// These may be used for non-textual styling of components and elements
 $white: #fff !default;
 
 // Interim color variable for migration purposes.
@@ -34,12 +34,13 @@ $grey-6: #3f3f3f;
 
 $grey-7: #202020;
 
-// Colors
+// Text colors
 $color-text: $grey-7;
 $color-text-light: $grey-5;
 // Text color when used on a dark background
 $color-text-inverted: $grey-1;
 
+// Other colors
 $color-success: #00a36d;
 $color-notice: #fbc168;
 $color-error: #d93c3f;
