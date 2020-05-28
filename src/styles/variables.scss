@@ -34,8 +34,6 @@ $grey-6: #3f3f3f;
 
 $grey-7: #202020;
 
-$black: #000 !default;
-
 // Colors
 
 $color-success: #00a36d;
@@ -46,12 +44,6 @@ $highlight: #58cef4;
 
 $color-focus-outline: #51a7e8;
 $color-focus-shadow: color.scale($color-focus-outline, $alpha: -50%);
-
-$button-text-color: $grey-mid !default;
-$button-background-start: $white !default;
-$button-background-end: #f0f0f0 !default;
-$button-background-gradient: to bottom, $button-background-start,
-  $button-background-end !default;
 
 $error-color: #f0480c !default;
 $success-color: #1cbd41 !default;
@@ -123,8 +115,6 @@ $body1-line-height: 1.4em;
 
 $body2-font-size: 14px;
 
-$title-font-weight: bold;
-
 $normal-font-size: 13px;
 $normal-line-height: 17px;
 
@@ -154,7 +144,6 @@ $highlight-color: rgba(255, 255, 60, 0.4);
 $highlight-color-second: rgba(206, 206, 60, 0.4);
 $highlight-color-focus: rgba(156, 230, 255, 0.5);
 $top-bar-height: 40px;
-$group-list-width: 280px;
 $popup-menu-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
 
 // Mixins
