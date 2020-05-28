@@ -12,13 +12,10 @@ import SidebarContentError from './sidebar-content-error';
  * The main content for the single annotation page (aka. https://hypothes.is/a/<annotation ID>)
  */
 function AnnotationViewerContent({
-  api,
+  loadAnnotationsService,
   onLogin,
   rootThread: rootThreadService,
-  streamer,
-  streamFilter,
 }) {
-  const addAnnotations = useStore(store => store.addAnnotations);
   const annotationId = useStore(store => store.routeParams().id);
   const clearAnnotations = useStore(store => store.clearAnnotations);
   const highlightAnnotations = useStore(store => store.highlightAnnotations);
@@ -34,13 +31,12 @@ function AnnotationViewerContent({
     setFetchError(false);
     clearAnnotations();
 
-    fetchThread(api, annotationId)
+    loadAnnotationsService
+      .loadThread(annotationId)
       .then(annots => {
-        addAnnotations(annots);
-
         // Find the top-level annotation in the thread that `annotationId` is
         // part of. This will be different to `annotationId` if `annotationId`
-        // is a reply.
+        // is a reply. A top-level annotation will not have any references.
         const topLevelAnnot = annots.filter(
           ann => (ann.references || []).length === 0
         )[0];
@@ -58,14 +54,6 @@ function AnnotationViewerContent({
           /* istanbul ignore next */
           return;
         }
-
-        // Configure the connection to the real-time update service to send us
-        // updates to any of the annotations in the thread.
-        streamFilter
-          .addClause('/references', 'one_of', topLevelAnnot.id, true)
-          .addClause('/id', 'equals', topLevelAnnot.id, true);
-        streamer.setConfig('filter', { filter: streamFilter.getFilter() });
-        streamer.connect();
 
         // Make the full thread of annotations visible. By default replies are
         // not shown until the user expands the thread.
@@ -88,13 +76,10 @@ function AnnotationViewerContent({
     userid,
 
     // Static dependencies.
-    addAnnotations,
-    api,
     clearAnnotations,
     highlightAnnotations,
+    loadAnnotationsService,
     setCollapsed,
-    streamFilter,
-    streamer,
   ]);
 
   return (
@@ -114,44 +99,13 @@ AnnotationViewerContent.propTypes = {
   onLogin: propTypes.func.isRequired,
 
   // Injected.
-  api: propTypes.object,
+  loadAnnotationsService: propTypes.object,
   rootThread: propTypes.object,
-  streamer: propTypes.object,
-  streamFilter: propTypes.object,
 };
 
 AnnotationViewerContent.injectedProps = [
-  'api',
+  'loadAnnotationsService',
   'rootThread',
-  'streamer',
-  'streamFilter',
 ];
-
-// NOTE: The function below is intentionally at the bottom of the file.
-//
-// Putting it at the top resulted in an issue where the `createElement` import
-// wasn't correctly referenced in the body of `AnnotationViewerContent` in
-// the compiled JS, causing a runtime error.
-
-/**
- * Fetch all annotations in the same thread as `id`.
- *
- * @param {Object} api - API client
- * @param {string} id - Annotation ID. This may be an annotation or a reply.
- * @return Promise<Annotation[]> - The annotation, followed by any replies.
- */
-async function fetchThread(api, id) {
-  let annot = await api.annotation.get({ id });
-
-  if (annot.references && annot.references.length) {
-    // This is a reply, fetch the top-level annotation
-    annot = await api.annotation.get({ id: annot.references[0] });
-  }
-
-  // Fetch all replies to the top-level annotation.
-  const replySearchResult = await api.search({ references: annot.id });
-
-  return [annot, ...replySearchResult.rows];
-}
 
 export default withServices(AnnotationViewerContent);

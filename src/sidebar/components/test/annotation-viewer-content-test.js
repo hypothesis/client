@@ -8,38 +8,14 @@ import AnnotationViewerContent, {
   $imports,
 } from '../annotation-viewer-content';
 
-/**
- * Fake implementation of the `api` service.
- */
-class FakeApi {
-  constructor(annots) {
-    this.annotations = annots;
-
-    this.annotation = {
-      get: async query => this.annotations.find(a => a.id === query.id),
-    };
-  }
-
-  async search(query) {
-    let matches = [];
-    if (query.references) {
-      matches = this.annotations.filter(
-        a => a.references && a.references.includes(query.references)
-      );
-    }
-    return { rows: matches };
-  }
-}
-
 describe('AnnotationViewerContent', () => {
   let fakeStore;
+  let fakeOnLogin;
   let fakeRootThread;
-  let fakeStreamer;
-  let fakeStreamFilter;
+  let fakeLoadAnnotationsService;
 
   beforeEach(() => {
     fakeStore = {
-      addAnnotations: sinon.stub(),
       clearAnnotations: sinon.stub(),
       getState: sinon.stub().returns({}),
       highlightAnnotations: sinon.stub(),
@@ -48,21 +24,13 @@ describe('AnnotationViewerContent', () => {
       setCollapsed: sinon.stub(),
     };
 
+    fakeLoadAnnotationsService = {
+      loadThread: sinon.stub().resolves([]),
+    };
+
+    fakeOnLogin = sinon.stub();
+
     fakeRootThread = { thread: sinon.stub().returns({}) };
-
-    fakeStreamer = {
-      setConfig: () => {},
-      connect: () => {},
-    };
-
-    fakeStreamFilter = {
-      addClause: () => {
-        return {
-          addClause: () => {},
-        };
-      },
-      getFilter: () => {},
-    };
 
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
@@ -74,55 +42,54 @@ describe('AnnotationViewerContent', () => {
     $imports.$restore();
   });
 
-  function createComponent({ api, onLogin = sinon.stub() }) {
+  function createComponent(props = {}) {
     return mount(
       <AnnotationViewerContent
-        api={api}
-        onLogin={onLogin}
+        loadAnnotationsService={fakeLoadAnnotationsService}
+        onLogin={fakeOnLogin}
         rootThread={fakeRootThread}
-        streamer={fakeStreamer}
-        streamFilter={fakeStreamFilter}
+        {...props}
       />
     );
   }
 
-  function waitForAnnotationsToLoad() {
-    return waitFor(() => fakeStore.addAnnotations.called);
-  }
-
   describe('the standalone view for a top-level annotation', () => {
-    it('loads the annotation and all replies', async () => {
-      const fakeApi = new FakeApi([
-        { id: 'test_annotation_id' },
-        { id: 'test_reply_id', references: ['test_annotation_id'] },
-      ]);
-      createComponent({ api: fakeApi });
+    it('loads the annotation thread', () => {
+      createComponent();
 
-      await waitForAnnotationsToLoad();
-
-      assert.calledOnce(fakeStore.addAnnotations);
-      assert.calledWith(
-        fakeStore.addAnnotations,
-        sinon.match(fakeApi.annotations)
-      );
+      assert.calledOnce(fakeLoadAnnotationsService.loadThread);
     });
 
-    it('does not highlight any annotations', async () => {
-      const fakeApi = new FakeApi([
-        { id: 'test_annotation_id' },
-        { id: 'test_reply_id', references: ['test_annotation_id'] },
-      ]);
-      createComponent({ api: fakeApi });
+    context('successfully-loaded annotation thread', () => {
+      beforeEach(() => {
+        fakeLoadAnnotationsService.loadThread.resolves([
+          { id: 'test_annotation_id' },
+          { id: 'test_reply_id', references: ['test_annotation_id'] },
+        ]);
+      });
 
-      await waitForAnnotationsToLoad();
+      it('does not highlight any annotations', async () => {
+        createComponent();
 
-      assert.notCalled(fakeStore.highlightAnnotations);
+        await new Promise(resolve => setTimeout(resolve, 0));
+
+        assert.notCalled(fakeStore.highlightAnnotations);
+      });
+
+      it('expands the thread', async () => {
+        createComponent();
+
+        await new Promise(resolve => setTimeout(resolve, 0));
+
+        assert.calledWith(fakeStore.setCollapsed, 'test_annotation_id', false);
+        assert.calledWith(fakeStore.setCollapsed, 'test_reply_id', false);
+      });
     });
 
     it('shows an error if the annotation could not be fetched', async () => {
-      const fakeApi = new FakeApi([]);
+      fakeLoadAnnotationsService.loadThread.rejects();
       const onLogin = sinon.stub();
-      const wrapper = createComponent({ api: fakeApi, onLogin });
+      const wrapper = createComponent({ onLogin });
 
       // Initially the annotation is not available to the user, so an error
       // should be shown.
@@ -138,57 +105,28 @@ describe('AnnotationViewerContent', () => {
       onLoginRequest();
       assert.called(onLogin);
 
-      // After the user logs in, the annotation should be shown.
-      fakeApi.annotations = [{ id: 'test_annotation_id' }];
+      fakeLoadAnnotationsService.loadThread.resetHistory();
+      fakeLoadAnnotationsService.loadThread.resolves([
+        { id: 'test_annotation_id' },
+      ]);
       fakeStore.profile.returns({ userid: 'acct:jimsmith@hypothes.is' });
 
       // Force re-render. `useStore` would do this in the actual app.
       wrapper.setProps({});
 
-      await waitForAnnotationsToLoad();
+      await waitFor(() => fakeLoadAnnotationsService.loadThread.called);
       assert.isFalse(wrapper.exists('SidebarContentError'));
     });
-  });
 
-  describe('the standalone view for a reply', () => {
-    it('loads the top-level annotation and all replies', async () => {
-      const fakeApi = new FakeApi([
-        { id: 'parent_id' },
-        { id: 'test_annotation_id', references: ['parent_id'] },
-      ]);
-      createComponent({ api: fakeApi });
-
-      await waitForAnnotationsToLoad();
-
-      assert.calledWith(
-        fakeStore.addAnnotations,
-        sinon.match(fakeApi.annotations)
-      );
-    });
-
-    it('expands the thread', async () => {
-      const fakeApi = new FakeApi([
+    it('highlights the annotation if it is a reply', async () => {
+      fakeLoadAnnotationsService.loadThread.resolves([
         { id: 'parent_id' },
         { id: 'test_annotation_id', references: ['parent_id'] },
       ]);
 
-      createComponent({ api: fakeApi });
+      createComponent();
 
-      await waitForAnnotationsToLoad();
-
-      assert.calledWith(fakeStore.setCollapsed, 'parent_id', false);
-      assert.calledWith(fakeStore.setCollapsed, 'test_annotation_id', false);
-    });
-
-    it('highlights the reply', async () => {
-      const fakeApi = new FakeApi([
-        { id: 'parent_id' },
-        { id: 'test_annotation_id', references: ['parent_id'] },
-      ]);
-      createComponent({ api: fakeApi });
-
-      await waitForAnnotationsToLoad();
-
+      await new Promise(resolve => setTimeout(resolve, 0));
       assert.calledWith(
         fakeStore.highlightAnnotations,
         sinon.match(['test_annotation_id'])
