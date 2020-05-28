@@ -103,7 +103,7 @@ $adder-transition-duration: 80ms;
 
   box-shadow: none;
   background: transparent;
-  color: var.$grey-mid;
+  color: var.$color-text;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -116,6 +116,10 @@ $adder-transition-duration: 80ms;
   padding: 10px;
   padding-bottom: 7px;
   transition: color $adder-transition-duration;
+}
+
+.annotator-adder-actions__button {
+  color: var.$grey-mid;
 }
 
 .annotator-adder-actions__separator {

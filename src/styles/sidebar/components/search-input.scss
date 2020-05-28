@@ -6,7 +6,7 @@
   flex-flow: row nowrap;
 
   position: relative;
-  color: var.$grey-mid;
+  color: var.$color-text;
 }
 
 .search-input__icon-button {
@@ -33,7 +33,7 @@
 
   &:disabled {
     background: none;
-    color: var.$grey-semi;
+    color: var.$color-text-light;
   }
 
   // Expand the search input when focused (triggered by clicking

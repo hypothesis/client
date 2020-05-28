@@ -13,14 +13,14 @@
     line-height: 1.25em;
     text-align: right;
     font-weight: 500;
-    color: var.$grey-6;
+    color: var.$color-text;
   }
 
   &__value {
     margin-bottom: 0.5em;
     margin-left: 8em;
     overflow-wrap: break-word; // Keep really long userids from overflowing
-    color: var.$grey-6;
+    color: var.$color-text-light;
   }
 
   &__actions {

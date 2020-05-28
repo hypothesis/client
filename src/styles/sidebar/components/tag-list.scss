@@ -9,7 +9,7 @@
     margin: 0.25em 0.5em 0.25em 0;
     padding: 0 0.5em;
     line-height: var.$base-line-height;
-    background: var.$grey-1;
+    background: var.$grey-0;
     border: 1px solid var.$grey-3;
     border-radius: 2px;
   }
@@ -17,7 +17,7 @@
   &__link,
   &__text {
     text-decoration: none;
-    color: var.$grey-6;
+    color: var.$color-text-light;
   }
 
   &__link {
