@@ -2,7 +2,6 @@
 @use "../../variables" as var;
 
 .annotation-header {
-  @include forms.pie-clearfix;
   color: var.$grey-6;
 
   &__row {
