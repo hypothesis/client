@@ -50,49 +50,6 @@ $highlight: #58cef4;
 $color-focus-outline: #51a7e8;
 $color-focus-shadow: color.scale($color-focus-outline, $alpha: -50%);
 
-// Tint and shade functions from
-// https://css-tricks.com/snippets/sass/tint-shade-functions
-@function tint($color, $percent) {
-  @return color.mix(white, $color, $percent);
-}
-
-@function shade($color, $percent) {
-  @return color.mix(black, $color, $percent);
-}
-
-@function color-weight($c, $n: 500) {
-  @if $n == 50 {
-    @return tint($c, 85%);
-  }
-  @if $n == 100 {
-    @return tint($c, 70%);
-  }
-  @if $n == 200 {
-    @return tint($c, 50%);
-  }
-  @if $n == 300 {
-    @return tint($c, 30%);
-  }
-  @if $n == 400 {
-    @return tint($c, 15%);
-  }
-  @if $n == 500 {
-    @return $c;
-  }
-  @if $n == 600 {
-    @return shade($c, 15%);
-  }
-  @if $n == 700 {
-    @return shade($c, 30%);
-  }
-  @if $n == 800 {
-    @return shade($c, 50%);
-  }
-  @if $n == 900 {
-    @return shade($c, 85%);
-  }
-}
-
 // Scaffolding
 // -------------------------
 $body-background: $white !default;
@@ -100,7 +57,7 @@ $body-background: $white !default;
 // Links
 // -------------------------
 $link-color: $brand !default;
-$link-color-hover: color-weight($brand, 700) !default;
+$link-color-hover: #84141e !default;
 
 // Typography
 // -------------------------
