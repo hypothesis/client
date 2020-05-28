@@ -10,7 +10,7 @@
 // of the annotated document when highlights are enabled/disabled.
 .hypothesis-highlights-always-on {
   .hypothesis-svg-highlight {
-    fill: var.$highlight-color;
+    fill: var.$color-highlight;
 
     &.is-opaque {
       fill: yellow;
@@ -18,7 +18,7 @@
   }
 
   .hypothesis-highlight {
-    background-color: var.$highlight-color;
+    background-color: var.$color-highlight;
 
     // For PDFs, we still create highlight elements to wrap the text but the
     // highlight effect is created by another element.
@@ -44,7 +44,7 @@
 
     // Give a highlight inside a larger highlight a different color to stand out.
     & .hypothesis-highlight {
-      background-color: var.$highlight-color-second;
+      background-color: var.$color-highlight-second;
       &.is-transparent {
         background-color: transparent;
       }
@@ -66,7 +66,7 @@
     // When an annotation card is hovered in the sidebar, the corresponding
     // highlights are shown with a "focused" color.
     &.hypothesis-highlight-focused {
-      background-color: var.$highlight-color-focus !important;
+      background-color: var.$color-highlight-focused !important;
 
       .hypothesis-highlight {
         background-color: transparent !important;

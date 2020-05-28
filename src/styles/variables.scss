@@ -45,10 +45,14 @@ $color-notice: #fbc168;
 $color-error: #d93c3f;
 
 $color-brand: #bd1c2b;
-$color-highlight: #58cef4;
+$color-quote: #58cef4;
 
 $color-focus-outline: #51a7e8;
 $color-focus-shadow: color.scale($color-focus-outline, $alpha: -50%);
+
+$color-highlight: rgba(255, 255, 60, 0.4);
+$color-highlight-second: rgba(206, 206, 60, 0.4);
+$color-highlight-focused: rgba(156, 230, 255, 0.5);
 
 // Scaffolding
 // -------------------------
@@ -98,9 +102,6 @@ $zindex-tooltip: 20;
 // Other Variables
 // -------------------------
 $bucket-bar-width: 22px;
-$highlight-color: rgba(255, 255, 60, 0.4);
-$highlight-color-second: rgba(206, 206, 60, 0.4);
-$highlight-color-focus: rgba(156, 230, 255, 0.5);
 $top-bar-height: 40px;
 $popup-menu-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
 
