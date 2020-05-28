@@ -3,7 +3,7 @@
 // FIXME These hover-related rules should live elsewhere
 // Highlight quote of annotation whenever its thread is hovered
 .thread-list__card:hover .annotation-quote__quote {
-  border-left: var.$color-highlight 3px solid;
+  border-left: var.$color-quote 3px solid;
 }
 
 // When hovering a top-level annotation, show the footer in a hovered state.
