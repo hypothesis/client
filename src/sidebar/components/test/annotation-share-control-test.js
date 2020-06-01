@@ -16,6 +16,7 @@ describe('AnnotationShareControl', () => {
   let fakeGroup;
   let fakeIsPrivate;
   let fakeShareUri;
+  let fakeStopPropagation;
 
   let container;
 
@@ -39,7 +40,10 @@ describe('AnnotationShareControl', () => {
 
   function openElement(wrapper) {
     act(() => {
-      wrapper.find('Button').props().onClick();
+      wrapper
+        .find('Button')
+        .props()
+        .onClick({ stopPropagation: fakeStopPropagation });
     });
     wrapper.update();
   }
@@ -74,6 +78,7 @@ describe('AnnotationShareControl', () => {
     };
     fakeIsPrivate = sinon.stub().returns(false);
     fakeShareUri = 'https://www.example.com';
+    fakeStopPropagation = sinon.stub();
 
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
@@ -104,7 +109,7 @@ describe('AnnotationShareControl', () => {
     const button = getButton(wrapper, 'share');
 
     act(() => {
-      button.props().onClick();
+      button.props().onClick({ stopPropagation: fakeStopPropagation });
     });
     wrapper.update();
 
@@ -202,6 +207,13 @@ describe('AnnotationShareControl', () => {
       document.activeElement.getAttribute('aria-label'),
       'Use this URL to share this annotation'
     );
+  });
+
+  it('calls stopPropagation when button is clicked', () => {
+    const wrapper = createComponent();
+    openElement(wrapper);
+    wrapper.update();
+    assert.isTrue(fakeStopPropagation.called);
   });
 
   it(

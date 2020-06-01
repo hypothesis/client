@@ -14,6 +14,7 @@ import { waitFor } from '../../../test-util/wait';
 describe('AnnotationActionBar', () => {
   let fakeAnnotation;
   let fakeOnReply;
+  let fakeStopPropagation;
 
   let fakeUserProfile;
 
@@ -61,6 +62,7 @@ describe('AnnotationActionBar', () => {
     fakeUserProfile = {
       userid: 'account:foo@bar.com',
     };
+    fakeStopPropagation = sinon.stub();
 
     fakeAnnotationsService = {
       delete: sinon.stub().resolves(),
@@ -147,11 +149,9 @@ describe('AnnotationActionBar', () => {
     it('asks for confirmation before deletion', () => {
       allowOnly('delete');
       const button = getButton(createComponent(), 'trash');
-
       act(() => {
-        button.props().onClick();
+        button.props().onClick({ stopPropagation: fakeStopPropagation });
       });
-
       assert.calledOnce(confirm);
       assert.notCalled(fakeAnnotationsService.delete);
     });
@@ -162,7 +162,7 @@ describe('AnnotationActionBar', () => {
       const button = getButton(createComponent(), 'trash');
 
       act(() => {
-        button.props().onClick();
+        button.props().onClick({ stopPropagation: fakeStopPropagation });
       });
 
       assert.calledWith(fakeAnnotationsService.delete, fakeAnnotation);
@@ -175,10 +175,19 @@ describe('AnnotationActionBar', () => {
 
       const button = getButton(createComponent(), 'trash');
       act(() => {
-        button.props().onClick();
+        button.props().onClick({ stopPropagation: fakeStopPropagation });
       });
 
       await waitFor(() => fakeToastMessenger.error.called);
+    });
+
+    it('calls stopPropagation when delete button is clicked', () => {
+      allowOnly('delete');
+      const button = getButton(createComponent(), 'trash');
+      act(() => {
+        button.props().onClick({ stopPropagation: fakeStopPropagation });
+      });
+      assert.isTrue(fakeStopPropagation.called);
     });
   });
 

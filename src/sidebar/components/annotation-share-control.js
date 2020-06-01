@@ -31,7 +31,10 @@ function AnnotationShareControl({
   const [isOpen, setOpen] = useState(false);
   const wasOpen = useRef(isOpen);
 
-  const toggleSharePanel = () => setOpen(!isOpen);
+  const toggleSharePanel = e => {
+    setOpen(!isOpen);
+    e.stopPropagation();
+  };
   const closePanel = () => setOpen(false);
 
   // Interactions outside of the component when it is open should close it

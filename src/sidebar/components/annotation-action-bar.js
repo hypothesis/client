@@ -41,12 +41,13 @@ function AnnotationActionBar({
 
   const createDraft = useStore(store => store.createDraft);
 
-  const onDelete = () => {
+  const onDelete = e => {
     if (window.confirm('Are you sure you want to delete this annotation?')) {
       annotationsService.delete(annotation).catch(err => {
         toastMessenger.error(err.message);
       });
     }
+    e.stopPropagation();
   };
 
   const onEdit = () => {
