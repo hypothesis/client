@@ -26,9 +26,21 @@ function ThreadCard({ frameSync, settings = {}, thread }) {
     [frameSync]
   );
 
+  /**
+   * Is the target's event an <a> or <button> element, or does it have
+   * either as an ancestor?
+   */
+  const isFromButtonOrLink = target => {
+    return !!target.closest('button') || !!target.closest('a');
+  };
+
   const scrollToAnnotation = useCallback(
-    tag => {
-      frameSync.scrollToAnnotation(tag);
+    (tag, e) => {
+      // Prevents click events intended for another action from
+      // triggering a page scroll.
+      if (!isFromButtonOrLink(e.target)) {
+        frameSync.scrollToAnnotation(tag);
+      }
     },
     [frameSync]
   );
@@ -36,7 +48,7 @@ function ThreadCard({ frameSync, settings = {}, thread }) {
   return (
     /* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */
     <div
-      onClick={() => scrollToAnnotation(threadTag)}
+      onClick={e => scrollToAnnotation(threadTag, e)}
       onMouseEnter={() => focusThreadAnnotation(threadTag)}
       onMouseLeave={() => focusThreadAnnotation(null)}
       key={thread.id}
