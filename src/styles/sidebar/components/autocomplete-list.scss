@@ -10,7 +10,7 @@
 .autocomplete-list__items {
   @supports (clip-path: polygon(0 0, 100% 0, 0% 100%, 0% 100%)) {
     &:before {
-      /** 
+      /**
        * Creates a small outlined triangle above the drop down menu
        * that works nicely with a box-shadow and the dark/light themes.
        */
@@ -49,7 +49,7 @@
   border-left: 4px transparent solid;
 
   &.is-selected {
-    border-left: 4px var.$brand solid;
+    border-left: 4px var.$color-brand solid;
     background-color: var.$grey-1;
   }
   &:hover {

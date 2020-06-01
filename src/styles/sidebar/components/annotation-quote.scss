@@ -23,6 +23,6 @@
   }
 
   &.is-focused &__quote {
-    border-left: var.$highlight 3px solid;
+    border-left: var.$color-quote 3px solid;
   }
 }
