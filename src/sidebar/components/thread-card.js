@@ -4,6 +4,7 @@ import { useCallback } from 'preact/hooks';
 
 import debounce from 'lodash.debounce';
 import propTypes from 'prop-types';
+import { closest } from '../../shared/dom-element';
 import useStore from '../store/use-store';
 import { withServices } from '../util/service-context';
 
@@ -38,7 +39,7 @@ function ThreadCard({ frameSync, settings = {}, thread }) {
    * either as an ancestor?
    */
   const isFromButtonOrLink = target => {
-    return !!target.closest('button') || !!target.closest('a');
+    return !!closest(target, 'button') || !!closest(target, 'a');
   };
 
   return (

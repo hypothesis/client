@@ -103,6 +103,14 @@ describe('ThreadCard', () => {
       assert.calledWith(fakeFrameSync.focusAnnotations, sinon.match(['myTag']));
     });
 
+    it('unfocuses the annotation thread when mouse exits', () => {
+      const wrapper = createComponent();
+
+      wrapper.find('.thread-card').simulate('mouseleave');
+
+      assert.calledWith(fakeFrameSync.focusAnnotations, sinon.match([]));
+    });
+
     ['button', 'a'].forEach(tag => {
       it(`does not scroll to the annotation if the event's target or ancestor is a ${tag}`, () => {
         const wrapper = createComponent();

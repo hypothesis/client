@@ -1,6 +1,6 @@
 import { closest } from '../dom-element';
 
-describe('annotator/util/dom-element', () => {
+describe('shared/dom-element', () => {
   let container;
 
   beforeEach(() => {
