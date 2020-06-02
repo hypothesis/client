@@ -39,7 +39,7 @@ function i18nService($rootScope, localStorage = window.localStorage) {
       'en-US': 'en-GB-ielts',
     },
 
-    K12: {
+    k12: {
       'en-US': 'en-GB-K12',
       'nn-NO': 'nn-NO-K12',
       'nb-NO': 'nb-NO-K12',
