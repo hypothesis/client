@@ -110,6 +110,23 @@ describe('ThreadCard', () => {
 
       assert.calledWith(fakeFrameSync.focusAnnotations, sinon.match([]));
     });
+
+    ['button', 'a'].forEach(tag => {
+      it(`does not scroll to the annotation if the event's target or ancestor is a ${tag}`, () => {
+        const wrapper = createComponent();
+        const nodeTarget = document.createElement(tag);
+        const nodeChild = document.createElement('div');
+        nodeTarget.appendChild(nodeChild);
+
+        wrapper.find('.thread-card').props().onClick({
+          target: nodeTarget,
+        });
+        wrapper.find('.thread-card').props().onClick({
+          target: nodeChild,
+        });
+        assert.notCalled(fakeFrameSync.scrollToAnnotation);
+      });
+    });
   });
 
   it(

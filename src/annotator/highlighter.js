@@ -1,4 +1,4 @@
-import { closest } from './util/dom-element';
+import { closest } from '../shared/dom-element';
 
 const SVG_NAMESPACE = 'http://www.w3.org/2000/svg';
 
