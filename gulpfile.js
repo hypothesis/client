@@ -41,7 +41,18 @@ const webtranslateit = 'https://webtranslateit.com/api/projects/';
 const webtranslateitReadKey = process.env.WEBTRANSLATEITREADKEY;
 const captionFiles = {
     prodFile: '771777',
-    locales: ['en-US', 'nb-NO', 'nn-NO', 'sv-SE', 'pl-PL', 'es-CO' ],
+    locales: [
+      'en-US',
+      'nb-NO',
+      'nn-NO',
+      'sv-SE',
+      'pl-PL',
+      'es-CO',
+      'en-GB-K12',
+      'sv-SE-K12',
+      'nb-NO-K12',
+      'nn-NO-K12',
+    ],
 };
 
 // LiveReloadServer instance for sending messages to connected
